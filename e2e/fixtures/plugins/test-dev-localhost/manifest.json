@@ -1,0 +1,23 @@
+{
+  "manifest": 1,
+  "id": "test-dev-localhost",
+  "name": "Test Dev Localhost",
+  "description": "E2E test plugin: reaches http://localhost:47180, allowed only for developer plugins.",
+  "version": "1.1.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "net.origins"]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "http://localhost:47180",
+        "purpose": "origins.localhost"
+      }
+    ]
+  }
+}

@@ -78,6 +78,16 @@
       "keys": "↑ ↓ athraigh méid · PageUp/PageDown gliogáil · Home/End · Enter athshocraíonn",
       "releaseHint": "Lig uait chun é a íoslaghdú go dtí an barra beag",
       "minimised": "Limistéar na meán íoslaghdaithe"
+    },
+    "stage": {
+      "tabs": "An rud a thaispeánann an limistéar meán",
+      "hint": "Ní stopann athrú aon rud",
+      "share": "Comhroinnt scáileáin",
+      "plugin": "Breiseán",
+      "tabName": "{{label}}, cluaisín {{index}} as {{count}}",
+      "tabNameNew": "{{label}}, nua, cluaisín {{index}} as {{count}}",
+      "pluginTabName": "{{label}}, gníomhaíocht breiseáin, cluaisín {{index}} as {{count}}",
+      "pluginTabNameNew": "{{label}}, gníomhaíocht breiseáin, nua, cluaisín {{index}} as {{count}}"
     }
   }
 }

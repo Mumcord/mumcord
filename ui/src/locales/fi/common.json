@@ -78,6 +78,16 @@
       "keys": "↑ ↓ koko · PageUp/PageDown kiinnittyminen · Home/End · Enter palauttaa",
       "releaseHint": "Vapauta pienentääksesi minipalkkiin",
       "minimised": "Mediaalue pienennetty"
+    },
+    "stage": {
+      "tabs": "Mitä media-alue näyttää",
+      "hint": "Vaihtaminen ei pysäytä mitään",
+      "share": "Näytön jako",
+      "plugin": "Laajennus",
+      "tabName": "{{label}}, välilehti {{index}}/{{count}}",
+      "tabNameNew": "{{label}}, uusi, välilehti {{index}}/{{count}}",
+      "pluginTabName": "{{label}}, laajennuksen toiminta, välilehti {{index}}/{{count}}",
+      "pluginTabNameNew": "{{label}}, laajennuksen toiminta, uusi, välilehti {{index}}/{{count}}"
     }
   }
 }

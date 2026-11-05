@@ -55,6 +55,10 @@
     "messagesExpired": "Messages that expired",
     "incomingRateDropped": "Incoming messages dropped by the rate limit",
     "incomingInvalid": "Invalid incoming messages",
+    "uiFreezes": "Times Mumcord froze while its web content was open",
+    "webDisabled": "Its web content is turned off because Mumcord stopped responding while it was open.",
+    "reenableWeb": "Turn web content on",
+    "reenableFailed": "Web content could not be turned on.",
     "log": "Log",
     "logEmpty": "The log is empty.",
     "level": {

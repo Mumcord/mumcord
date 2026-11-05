@@ -1,0 +1,230 @@
+/*
+ * Security score components (FR-9.71, FR-9.77, §5.6; score mockups 01–03, 07). Only theme tokens,
+ * so dark, light and high-contrast themes follow. Nothing here animates (reduced motion).
+ */
+
+/* Score chip: colour, icon and words together, never colour alone. */
+.risk-chip {
+  --risk: var(--color-text-muted);
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border: 1px solid var(--risk);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--risk) 12%, transparent);
+  color: var(--risk);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.risk-chip svg {
+  flex: none;
+}
+
+.risk-chip[data-level="low"],
+.risk-chip[data-level="official"] {
+  --risk: var(--color-success);
+}
+
+.risk-chip[data-level="medium"] {
+  --risk: var(--color-warning);
+}
+
+.risk-chip[data-level="high"] {
+  --risk: var(--color-danger);
+}
+
+.risk-chip[data-level="blocked"] {
+  --risk: var(--color-danger);
+  border-style: dashed;
+}
+
+.risk-chip__score {
+  color: var(--color-text);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.risk-chip-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.risk-chip-note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Meter: a static bar with the band edges marked. */
+.risk-meter {
+  --risk: var(--color-text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 12rem;
+}
+
+.risk-meter[data-level="low"] {
+  --risk: var(--color-success);
+}
+
+.risk-meter[data-level="medium"] {
+  --risk: var(--color-warning);
+}
+
+.risk-meter[data-level="high"] {
+  --risk: var(--color-danger);
+}
+
+.risk-meter__track {
+  position: relative;
+  height: 0.625rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+}
+
+.risk-meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--risk);
+}
+
+.risk-meter__tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-bg-elevated);
+}
+
+.risk-meter__scale {
+  display: grid;
+  grid-template-columns: 30fr 30fr 40fr;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Breakdown: one table per part of the formula. */
+.risk-details > summary {
+  margin-bottom: var(--space-1);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.risk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.risk-table caption {
+  padding: var(--space-2) 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.risk-table th,
+.risk-table td {
+  padding: var(--space-1) var(--space-2);
+  border-top: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.risk-table thead th {
+  border-top: 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.risk-table tbody th {
+  width: 34%;
+  font-weight: 600;
+}
+
+.risk-table td:last-child,
+.risk-table th:last-child {
+  width: 7.5rem;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.risk-eff {
+  font-weight: 700;
+}
+
+.risk-eff[data-dir="up"] {
+  color: var(--color-danger);
+}
+
+.risk-eff[data-dir="down"] {
+  color: var(--color-success);
+}
+
+.risk-eff[data-dir="flat"] {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.risk-formula {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.risk-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Biggest reasons (install prompt). */
+.risk-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  list-style: none;
+}
+
+.risk-reasons li {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+}
+
+/* Forced colours drop background colours, so the meter fill and band edges use system colours. */
+@media (forced-colors: active) {
+  .risk-meter__track {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .risk-meter__fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  .risk-meter__tick {
+    background: CanvasText;
+  }
+}

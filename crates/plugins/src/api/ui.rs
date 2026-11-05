@@ -128,11 +128,15 @@ pub(crate) struct UiLimiter {
 
 impl UiLimiter {
     fn allow(&mut self, slot: &Slot, now: Instant) -> bool {
+        self.allow_key(slot_key(slot), now)
+    }
+
+    /// The same count for a place without a 1.0 slot, such as `stage`.
+    pub(crate) fn allow_key(&mut self, key: String, now: Instant) -> bool {
         if self.windows.len() >= MAX_TRACKED_SLOTS {
             self.windows
                 .retain(|_, (start, _)| now.duration_since(*start) < WINDOW);
         }
-        let key = slot_key(slot);
         if self.windows.len() >= MAX_TRACKED_SLOTS && !self.windows.contains_key(&key) {
             return false;
         }

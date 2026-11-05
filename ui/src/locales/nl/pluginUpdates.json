@@ -24,7 +24,8 @@
   "pill": {
     "none": "Geen nieuwe rechten",
     "permission": "Heeft een nieuw recht nodig",
-    "author": "Nieuwe auteur"
+    "author": "Nieuwe auteur",
+    "websites": "Communiceert met nieuwe websites"
   },
   "newPermissions": "Nieuwe rechten",
   "revoked": {
@@ -45,5 +46,63 @@
     "save": "Opslaan",
     "notNow": "Niet nu",
     "failed": "De machtigingen van {{name}} konden niet worden gewijzigd. Probeer het opnieuw."
+  },
+  "waitingHeading": "Updates in afwachting",
+  "autoNote": "Automatische updates worden alleen geïnstalleerd als de plug-in niets nieuws vraagt en de score in dezelfde categorie blijft of daalt. Al het andere wacht hier.",
+  "needsMumcord": "Update beschikbaar na het updaten van Mumcord",
+  "band": {
+    "low": "Laag",
+    "medium": "Gemiddeld",
+    "high": "Hoog"
+  },
+  "hold": {
+    "newWebsites_one": "Deze update wil communiceren met {{count}} nieuwe website. {{name}} blijft op {{version}} tot jij beslist.",
+    "newWebsites_other": "Deze update wil communiceren met {{count}} nieuwe websites. {{name}} blijft op {{version}} tot jij beslist.",
+    "riskUp": "Niet automatisch geïnstalleerd: het risico is gestegen van {{from}} naar {{to}}. Bekijk het eerst.",
+    "scoreUp": "Niet automatisch geïnstalleerd: de score is gestegen van {{from}} naar {{to}}. Bekijk het eerst.",
+    "blockedBySafety": "Niet geïnstalleerd: deze versie heeft hoog risico en “Geen plug-ins met hoog risico toestaan” staat aan.",
+    "scoreUnknown": "Niet automatisch geïnstalleerd: de beveiligingsscore van deze versie kon niet worden berekend. Bekijk het eerst."
+  },
+  "score": {
+    "label": "Beveiligingsscore:",
+    "unchanged": "ongewijzigd",
+    "points": "punten",
+    "goesUp": ", het risico stijgt",
+    "goesDown": ", het risico daalt"
+  },
+  "dialog": {
+    "title": "{{name}} updaten naar {{version}}?",
+    "now": "nu {{version}}",
+    "sameKey": "zelfde auteurssleutel",
+    "newKey": "nieuwe auteurssleutel",
+    "newWebsites_one": "Deze update wil communiceren met {{count}} nieuwe website.",
+    "newWebsites_other": "Deze update wil communiceren met {{count}} nieuwe websites.",
+    "staysOn": "{{name}} blijft op {{version}} tot jij beslist.",
+    "otherDomain": "Een ervan staat niet op het eigen domein van de plug-in.",
+    "whatsNew": "Wat is er nieuw in {{version}}",
+    "websitesLead": "{{name}} en de bijbehorende pagina zouden dan toegang hebben tot:",
+    "websitesWarning": "Deze websites kunnen je IP-adres zien en alles wat {{name}} hun stuurt.",
+    "websitesLabel": "Websites",
+    "new": "Nieuw",
+    "changed": "Gewijzigd",
+    "noOtherPermissions": "Er wijzigen geen andere rechten.",
+    "scoreNow": "Nu ({{version}})",
+    "scoreAfter": "Na de update ({{version}})",
+    "meterNow": "Beveiligingsscore nu",
+    "meterAfter": "Beveiligingsscore na de update",
+    "riskUpBy_one": "Het risico stijgt met {{count}} punt",
+    "riskUpBy_other": "Het risico stijgt met {{count}} punten",
+    "asksForMore": "omdat deze versie om meer vraagt:",
+    "permissionsLabel": "Nieuwe rechten",
+    "recentChange": "Dit telt ook als recente wijziging: nieuwe rechten in de laatste {{versions}} versies voegen nog +{{recent}} punten toe. Samen met de +{{permissions}} hierboven (× {{multiplier}}) is dat de +{{total}}.",
+    "highTitle": "Deze update zou de plug-in tot hoog risico maken",
+    "highText": "Hij wordt niet automatisch geïnstalleerd. Blijven op {{version}} behoudt de huidige score; je kunt de versie vastzetten onder Geïnstalleerd.",
+    "highTick": "Ik begrijp dat het risico is gestegen en vertrouw de auteur nog steeds",
+    "skipHint": "Overslaan laat {{version}} gewoon werken.",
+    "skip": "Deze versie overslaan",
+    "notNow": "Niet nu",
+    "allow": "Toestaan en updaten",
+    "updateAnyway": "Toch updaten",
+    "failed": "{{name}} kon niet worden geüpdatet. Probeer het opnieuw."
   }
 }

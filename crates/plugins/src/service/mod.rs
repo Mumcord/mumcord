@@ -12,6 +12,7 @@
 
 mod commands;
 mod dev;
+mod gates;
 mod install;
 mod lifecycle;
 mod messaging;
@@ -36,22 +37,29 @@ use crate::api::secrets::PluginSecrets;
 use crate::api::storage::{DataError, Storage};
 use crate::host::{HostError, HostEvent, LoadError, PluginHost, RunState};
 use crate::manifest::{ManifestError, OptionalPermission, Source};
-use crate::package::PackageError;
+use crate::package::{Package, PackageError};
 use crate::peer_key::PeerKeys;
-use crate::registry::RegistryError;
+use crate::registry::{Index, IndexPlugin, RegistryError};
 use crate::runtime::{CompileError, HostContext};
+use crate::score::{Score, Scored, facts};
 use crate::verify::{Integrity, VerifyFailure};
 use crate::wit::events::{Event, PluginSettings};
 use crate::wit::theme::Mode;
 
 pub use commands::{CommandOutcome, PluginCommand};
+pub use gates::{
+    ConfirmKind, GateReason, InstallCheck, InstallGate, PermissionEffect, RecentChange, Refusal,
+    ReviewOrigin, RiskChange, UpdateHold, UpdateReview,
+};
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
-pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, UiUpdate};
+pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, StageActivity, UiUpdate};
 pub use replay::{REPLAY_PER_PLUGIN, StoredLine};
 pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
 pub use ui::UiInput;
-pub use updates::{Approval, Due, Schedule, UpdateInfo, load_repository, run_check};
+pub use updates::{
+    Approval, Due, Schedule, UpdateInfo, load_repository, manifest_purposes, run_check,
+};
 
 /// The permission that lets a plugin show a badge next to user names (FR-6.63).
 const BADGE_PERMISSION: &str = "ui.member-badge";
@@ -91,8 +99,37 @@ pub enum ServiceEvent {
         plugin: String,
         outgoing: crate::messaging::Outgoing,
     },
+    /// A `relay` message to one person through the relay pair session (`Engine::plugin_relay_send`
+    /// with `api` for the envelope). `data` is the plugin's opaque payload: never log it.
+    RelaySend {
+        server: mumcord_store::ServerId,
+        plugin: String,
+        session: u32,
+        api: (u8, u8),
+        data: Vec<u8>,
+    },
+    /// A `relay` message to the channel through the sender's relay broadcast
+    /// (`Engine::plugin_relay_broadcast`): `receivers` are the members that may get it (they
+    /// announced the plugin), to be admitted when not yet. `data` stays opaque: never log it.
+    RelayBroadcast {
+        server: mumcord_store::ServerId,
+        plugin: String,
+        api: (u8, u8),
+        data: Vec<u8>,
+        receivers: Vec<u32>,
+    },
+    /// An Apps-menu item was enabled or disabled: list the items again with
+    /// [`PluginService::app_menu`].
+    AppMenuChanged,
     /// A plugin changed its UI (`plugin://ui`). Trees are untrusted.
     Ui { plugin: String, update: UiUpdate },
+    /// A frame of `plugin` closed without the plugin asking (another plugin's side panel took
+    /// its place, FR-9.39); the `Ui` hide went out already. Pass it back as
+    /// [`UiInput::SurfaceClosed`] so the plugin gets `surface-closed`.
+    SurfaceClosed {
+        plugin: String,
+        place: crate::api::webview::WebviewPlace,
+    },
     /// `chat.send` passed the gesture gate: post `line` ("[Name] text") as a channel message
     /// through the normal chat path, into the user's current channel on `server`.
     ChatPost {
@@ -100,12 +137,33 @@ pub enum ServiceEvent {
         server: mumcord_store::ServerId,
         line: String,
     },
+    /// A plugin's `files.save`, `files.import-picture` or `chat.post-image` passed its permission
+    /// and gesture checks (FR-9.103 … FR-9.105): the app carries it out and answers.
+    HostCall {
+        plugin: String,
+        request: crate::api::host_calls::HostRequest,
+    },
     /// Hide text message `message` and show the plugin's card `card` instead, or only a
     /// "Hidden by <Plugin>" line when `card` is `None` (FR-6.45).
     Supersede {
         plugin: String,
         card: Option<String>,
         message: u64,
+    },
+    /// The plugin activities in the user's channel changed: list them again with
+    /// [`PluginService::stage_activities`].
+    StageChanged,
+    /// A plugin's own `stage.start` or `stage.join` hit a limit: show its text ("Too many
+    /// activities in this channel", "This activity is full").
+    StageRefused {
+        plugin: String,
+        reason: crate::stage::Refusal,
+    },
+    /// A stage event for `plugin` that came out of the plugin's own call; pass it back with
+    /// [`PluginService::stage_event`] (it cannot be queued from the plugin's worker).
+    StageEvent {
+        plugin: String,
+        event: crate::runtime::PluginEvent,
     },
     /// A new plugin version is waiting in the Updates tab: a notification-centre entry, no OS
     /// notification (FR-6.69). Sent once per version.
@@ -179,6 +237,30 @@ pub struct PluginInfo {
     /// Optional permissions an update added that the user has not answered yet (never
     /// granted by the update; Plugins → Updates offers them).
     pub offered: Vec<String>,
+    /// How many Apps-menu items the manifest declares.
+    pub app_menu_items: u32,
+    /// Total size in bytes of the plugin's `web/` files; `None` when it has none.
+    pub web_size: Option<u64>,
+}
+
+/// The total size of the regular files under `dir/web`, `None` when there is no such folder.
+/// Symbolic links are not followed.
+fn web_size(dir: &Path) -> Option<u64> {
+    fn walk(dir: &Path) -> u64 {
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return 0;
+        };
+        entries
+            .flatten()
+            .map(|entry| match entry.file_type() {
+                Ok(kind) if kind.is_dir() => walk(&entry.path()),
+                Ok(kind) if kind.is_file() => entry.metadata().map_or(0, |m| m.len()),
+                _ => 0,
+            })
+            .sum()
+    }
+    let web = dir.join("web");
+    web.is_dir().then(|| walk(&web))
 }
 
 /// The manifest in a plugin's installed folder, read for display only (nothing is checked beyond
@@ -232,6 +314,8 @@ pub enum ServiceError {
     Io(#[from] io::Error),
     #[error("no plugin with the id {0:?} is installed")]
     NotInstalled(String),
+    #[error("{id} {version} is not in the loaded plugin lists")]
+    NotListed { id: String, version: String },
     #[error("This plugin is already installed")]
     AlreadyInstalled,
     #[error("Another plugin with the id {0:?} is already installed")]
@@ -252,8 +336,17 @@ pub enum ServiceError {
     /// Updates tab (FR-6.67).
     #[error("This update needs your approval")]
     NeedsApproval,
+    /// FR-9.17: the package needs a newer Mumcord (or is for an older one); nothing was written.
+    #[error("{0}")]
+    Incompatible(String),
     #[error("Mumcord turned this plugin off: {0}")]
     Revoked(String),
+    /// FR-9.81: a High plugin while "Don't allow high-risk plugins" is on.
+    #[error("Blocked by your safety setting")]
+    BlockedBySafety,
+    /// FR-9.80, FR-9.83: the prompt's confirmation box was not ticked.
+    #[error("Tick the confirmation box first")]
+    NeedsConfirmation,
 }
 
 /// Where an installed plugin came from, as stored in `plugin.source`.
@@ -334,6 +427,8 @@ pub struct PluginService {
     match_limit: crate::triggers::RateLimit,
     /// Chat messages each plugin already got, so a history replay never repeats one.
     replayed: replay::Seen,
+    /// The signed indexes last loaded, one per source, for listing scores (FR-9.76).
+    listings: Vec<(Source, Index)>,
 }
 
 impl PluginService {
@@ -364,7 +459,7 @@ impl PluginService {
             storage: Storage::new(Arc::clone(&store)),
             secrets,
             peer_keys: Some(peer_keys),
-            http: crate::api::http::Http::new(&config.plugins_dir),
+            http: crate::api::http::Http::new(&config.plugins_dir, Some(Arc::clone(&store))),
             io: Some(Arc::clone(&io) as Arc<dyn crate::api::io::PluginIo>),
             ..HostContext::default()
         });
@@ -397,7 +492,16 @@ impl PluginService {
                 crate::patterns::RATE_WINDOW,
             ),
             replayed: replay::Seen::default(),
+            listings: Vec::new(),
         };
+        let relay_on = service.store().settings().map_or_else(
+            |e| {
+                tracing::warn!(error = %e, "relay data switch not readable; it stays on");
+                true
+            },
+            |s| s.plugins.relay_data_enabled,
+        );
+        service.io.relay().switch_on = relay_on;
         Ok((service, host_rx, events_rx))
     }
 
@@ -588,6 +692,9 @@ impl PluginService {
             }
         };
         let revocation = self.revocation_notice(&record);
+        let app_menu_items =
+            manifest.map_or(0, |m| u32::try_from(m.app_menu.len()).unwrap_or(u32::MAX));
+        let web_size = dir.as_deref().and_then(web_size);
         PluginInfo {
             icon: manifest.and_then(|m| m.icon.clone()),
             authors: manifest.map(|m| m.authors.clone()).unwrap_or_default(),
@@ -608,6 +715,8 @@ impl PluginService {
                 .map(|t| t.description.clone())
                 .unwrap_or_default(),
             chat_patterns: text.map(|t| t.chat_patterns).unwrap_or_default(),
+            app_menu_items,
+            web_size,
             status,
             badge: badge == Some(record.id.as_str()),
             id: record.id,
@@ -761,8 +870,164 @@ fn with_required<'a>(
         .chain(optional)
 }
 
+/// What a security score is computed from (FR-9.76).
+pub enum ScoreFrom<'a> {
+    /// The signed index entry, as Browse shows it.
+    Listing,
+    /// The verified package, as the install prompt shows it.
+    Package {
+        package: &'a Package,
+        /// Size of the downloaded `.mcplugin`.
+        bytes: u64,
+        /// The author key the package signature was checked with.
+        author_key: &'a str,
+    },
+}
+
+/// The install prompt's score: the package score, plus whether it is worse than the listing
+/// promised ("This plugin scores higher than its listing said", FR-9.76).
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+pub struct InstallScore {
+    pub score: Scored,
+    /// `None` when the version is not listed (e.g. Developer mode).
+    pub listing: Option<Scored>,
+    pub higher_than_listing: bool,
+}
+
+impl PluginService {
+    /// Remembers a freshly loaded signed index for listing scores and records its keys and
+    /// versions as seen on this device. Call it after every successful index load.
+    pub fn note_index(&mut self, source: Source, index: &Index) -> Result<(), ServiceError> {
+        crate::registry::note_index(&self.store(), index, now_millis())?;
+        self.listings.retain(|(known, _)| *known != source);
+        self.listings.push((source, index.clone()));
+        Ok(())
+    }
+
+    fn listed(&self, source: &Source, id: &str) -> Option<&IndexPlugin> {
+        self.listings
+            .iter()
+            .filter(|(known, _)| known == source)
+            .find_map(|(_, index)| index.plugin(id))
+    }
+
+    /// The security score of `id` `version` from `source` (FR-9.72). Official plugins answer
+    /// [`Scored::Official`]. Hard stops are the install flow's to set.
+    pub fn plugin_score(
+        &self,
+        source: &Source,
+        id: &str,
+        version: &Version,
+        from: ScoreFrom<'_>,
+    ) -> Result<Scored, ServiceError> {
+        let plugin = self.listed(source, id);
+        let listed_version = plugin.and_then(|p| {
+            p.versions
+                .iter()
+                .find(|v| Version::parse(&v.version).is_ok_and(|v| v == *version))
+        });
+        let facts = match from {
+            ScoreFrom::Listing => {
+                let (Some(plugin), Some(listed)) = (plugin, listed_version) else {
+                    return Err(ServiceError::NotListed {
+                        id: id.to_owned(),
+                        version: version.to_string(),
+                    });
+                };
+                let keys: Vec<&str> = plugin.author_keys.iter().map(String::as_str).collect();
+                let local = facts::Local::load(&self.store(), id, &keys, now_millis())?;
+                facts::from_listing(source, plugin, listed, &local)
+            }
+            ScoreFrom::Package {
+                package,
+                bytes,
+                author_key,
+            } => {
+                let local = facts::Local::load(&self.store(), id, &[author_key], now_millis())?;
+                let listing = plugin.map(|p| (p, listed_version));
+                facts::from_package(source, package, bytes, author_key, listing, &local)
+            }
+        };
+        Ok(crate::score::score(&facts))
+    }
+
+    /// Scores a verified package for the install prompt and compares it with its listing.
+    pub fn install_score(
+        &self,
+        source: &Source,
+        package: &Package,
+        bytes: u64,
+        author_key: &str,
+    ) -> Result<InstallScore, ServiceError> {
+        let id = &package.manifest.id;
+        let version = &package.manifest.version;
+        let score = self.plugin_score(
+            source,
+            id,
+            version,
+            ScoreFrom::Package {
+                package,
+                bytes,
+                author_key,
+            },
+        )?;
+        let listing = match self.plugin_score(source, id, version, ScoreFrom::Listing) {
+            Ok(listing) => Some(listing),
+            Err(ServiceError::NotListed { .. }) => None,
+            Err(error) => return Err(error),
+        };
+        Ok(InstallScore {
+            higher_than_listing: higher(&score, listing.as_ref()),
+            score,
+            listing,
+        })
+    }
+}
+
+fn higher(package: &Scored, listing: Option<&Scored>) -> bool {
+    let value = |s: &Scored| match s {
+        Scored::Scored(Score { value, .. }) => Some(*value),
+        Scored::Official | Scored::Refused(_) => None,
+    };
+    matches!(
+        (value(package), listing.and_then(value)),
+        (Some(package), Some(listing)) if package > listing
+    )
+}
+
 fn now_millis() -> UnixMillis {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| i64::try_from(d.as_millis()).unwrap_or(i64::MAX))
+}
+
+#[cfg(test)]
+mod score_tests {
+    use super::*;
+    use crate::score::{HardStop, band_of};
+
+    fn scored(value: u8) -> Scored {
+        Scored::Scored(Score {
+            value,
+            band: band_of(value),
+            e: 0,
+            f: 1.0,
+            h: 0,
+            factors: Vec::new(),
+            version: 1,
+        })
+    }
+
+    #[test]
+    fn only_a_worse_package_score_is_flagged() {
+        assert!(higher(&scored(40), Some(&scored(30))));
+        assert!(!higher(&scored(30), Some(&scored(30))));
+        assert!(!higher(&scored(20), Some(&scored(30))));
+        assert!(!higher(&scored(40), None));
+        assert!(!higher(&Scored::Official, Some(&Scored::Official)));
+        assert!(!higher(
+            &Scored::Refused(HardStop::HashMismatch),
+            Some(&scored(30))
+        ));
+    }
 }

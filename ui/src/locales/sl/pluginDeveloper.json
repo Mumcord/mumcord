@@ -22,7 +22,7 @@
   "logEmpty": "Še ni vrstic dnevnika.",
   "level": {
     "debug": "Razhroščevanje",
-    "info": "Info",
+    "info": "Informacija",
     "warn": "Opozorilo",
     "error": "Napaka"
   },

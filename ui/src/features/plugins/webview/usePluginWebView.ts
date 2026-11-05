@@ -6,6 +6,5 @@ export function usePluginWebView(
   plugin: string,
   place: PluginWebviewPlace,
 ): PluginWebview | undefined {
-  const webview = usePluginUi().webviews.get(plugin);
-  return webview?.place === place ? webview : undefined;
+  return usePluginUi().webviews.get(plugin)?.get(place);
 }

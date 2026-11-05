@@ -24,7 +24,8 @@
   "pill": {
     "none": "Ebda permessi ġodda",
     "permission": "Teħtieġ permess ġdid",
-    "author": "Awtur ġdid"
+    "author": "Awtur ġdid",
+    "websites": "Ikellem siti web ġodda"
   },
   "newPermissions": "Permessi ġodda",
   "revoked": {
@@ -45,5 +46,72 @@
     "save": "Issejvja",
     "notNow": "Mhux issa",
     "failed": "Il-permessi ta' {{name}} ma setgħux jinbidlu. Erġa' pprova."
+  },
+  "waitingHeading": "Aġġornamenti li qed jistennew",
+  "autoNote": "L-aġġornamenti awtomatiċi jiġu installati biss meta l-plugin ma jitlob xejn ġdid u l-punteġġ tiegħu jibqa' fl-istess firxa jew jinżel. Kull ħaġa oħra tistenna hawn.",
+  "needsMumcord": "Aġġornament disponibbli wara li taġġorna Mumcord",
+  "band": {
+    "low": "Baxx",
+    "medium": "Medju",
+    "high": "Għoli"
+  },
+  "hold": {
+    "newWebsites_one": "Dan l-aġġornament irid jikkellem {{count}} sit web ġdid. {{name}} jibqa' fuq {{version}} sakemm tiddeċiedi.",
+    "newWebsites_two": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda. {{name}} jibqa' fuq {{version}} sakemm tiddeċiedi.",
+    "newWebsites_few": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda. {{name}} jibqa' fuq {{version}} sakemm tiddeċiedi.",
+    "newWebsites_many": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda. {{name}} jibqa' fuq {{version}} sakemm tiddeċiedi.",
+    "newWebsites_other": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda. {{name}} jibqa' fuq {{version}} sakemm tiddeċiedi.",
+    "riskUp": "Ma jiġix installat awtomatikament: ir-riskju żdied minn {{from}} għal {{to}}. Irrevedih l-ewwel.",
+    "scoreUp": "Ma jiġix installat awtomatikament: il-punteġġ żdied minn {{from}} għal {{to}}. Irrevedih l-ewwel.",
+    "blockedBySafety": "Ma ġiex installat: din il-verżjoni hija ta' riskju għoli u “Tippermettix plugins ta' riskju għoli” hija mixgħula.",
+    "scoreUnknown": "Ma jiġix installat awtomatikament: il-punteġġ tas-sigurtà ta' din il-verżjoni ma setax jiġi kkalkulat. Irrevedih l-ewwel."
+  },
+  "score": {
+    "label": "Punteġġ tas-sigurtà:",
+    "unchanged": "bla bidla",
+    "points": "punti",
+    "goesUp": ", ir-riskju jogħla",
+    "goesDown": ", ir-riskju jonqos"
+  },
+  "dialog": {
+    "title": "Taġġorna {{name}} għal {{version}}?",
+    "now": "issa {{version}}",
+    "sameKey": "l-istess ċavetta tal-awtur",
+    "newKey": "ċavetta ġdida tal-awtur",
+    "newWebsites_one": "Dan l-aġġornament irid jikkellem {{count}} sit web ġdid.",
+    "newWebsites_two": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda.",
+    "newWebsites_few": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda.",
+    "newWebsites_many": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda.",
+    "newWebsites_other": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda.",
+    "staysOn": "{{name}} jibqa' fuq {{version}} sakemm tiddeċiedi.",
+    "otherDomain": "Wieħed minnhom mhux fid-dominju tal-plugin stess.",
+    "whatsNew": "X'hemm ġdid fil-verżjoni {{version}}",
+    "websitesLead": "{{name}} u l-paġna tiegħu mbagħad jistgħu jaslu għal:",
+    "websitesWarning": "Dawn is-siti web jistgħu jaraw l-indirizz IP tiegħek u kull ma {{name}} jibgħatilhom.",
+    "websitesLabel": "Siti web",
+    "new": "Ġdid",
+    "changed": "Mibdul",
+    "noOtherPermissions": "L-ebda permess ieħor ma jinbidel.",
+    "scoreNow": "Issa ({{version}})",
+    "scoreAfter": "Wara l-aġġornament ({{version}})",
+    "meterNow": "Punteġġ tas-sigurtà issa",
+    "meterAfter": "Punteġġ tas-sigurtà wara l-aġġornament",
+    "riskUpBy_one": "Ir-riskju jogħla b'{{count}} punt",
+    "riskUpBy_two": "Ir-riskju jogħla b'{{count}} punti",
+    "riskUpBy_few": "Ir-riskju jogħla b'{{count}} punti",
+    "riskUpBy_many": "Ir-riskju jogħla b'{{count}} punti",
+    "riskUpBy_other": "Ir-riskju jogħla b'{{count}} punti",
+    "asksForMore": "għax din il-verżjoni titlob aktar:",
+    "permissionsLabel": "Permessi ġodda",
+    "recentChange": "Jgħodd ukoll bħala bidla riċenti: permessi ġodda fl-aħħar {{versions}} verżjonijiet iżidu +{{recent}} punti oħra. Flimkien ma' +{{permissions}} ta' hawn fuq (× {{multiplier}}) dak huwa +{{total}}.",
+    "highTitle": "Dan l-aġġornament jagħmel il-plugin ta' riskju għoli",
+    "highText": "Ma jiġix installat awtomatikament. Jekk tibqa' fuq {{version}} jinżamm il-punteġġ attwali; tista' tiffissa l-verżjoni f'Installati.",
+    "highTick": "Nifhem li r-riskju żdied u xorta nafda lill-awtur",
+    "skipHint": "Jekk taqbeż, {{version}} jibqa' jaħdem.",
+    "skip": "Aqbeż din il-verżjoni",
+    "notNow": "Mhux issa",
+    "allow": "Ippermetti u aġġorna",
+    "updateAnyway": "Aġġorna xorta",
+    "failed": "{{name}} ma setax jiġi aġġornat. Erġa' pprova."
   }
 }

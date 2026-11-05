@@ -24,7 +24,8 @@
   "pill": {
     "none": "Uusi õigusi pole",
     "permission": "Vajab uut õigust",
-    "author": "Uus autor"
+    "author": "Uus autor",
+    "websites": "Suhtleb uute veebisaitidega"
   },
   "newPermissions": "Uued õigused",
   "revoked": {
@@ -45,5 +46,63 @@
     "save": "Salvesta",
     "notNow": "Mitte praegu",
     "failed": "Lisandmooduli {{name}} õigusi ei õnnestunud muuta. Proovi uuesti."
+  },
+  "waitingHeading": "Ootel uuendused",
+  "autoNote": "Automaatsed uuendused paigaldatakse ainult siis, kui plugin ei küsi midagi uut ja selle hinne jääb samasse vahemikku või langeb. Kõik muu ootab siin.",
+  "needsMumcord": "Uuendus on saadaval pärast Mumcordi uuendamist",
+  "band": {
+    "low": "Väike",
+    "medium": "Keskmine",
+    "high": "Suur"
+  },
+  "hold": {
+    "newWebsites_one": "See uuendus soovib suhelda {{count}} uue veebisaidiga. {{name}} jääb versioonile {{version}}, kuni otsustad.",
+    "newWebsites_other": "See uuendus soovib suhelda {{count}} uue veebisaidiga. {{name}} jääb versioonile {{version}}, kuni otsustad.",
+    "riskUp": "Ei paigaldata automaatselt: risk kasvas tasemelt {{from}} tasemele {{to}}. Vaata see enne üle.",
+    "scoreUp": "Ei paigaldata automaatselt: hinne tõusis väärtuselt {{from}} väärtusele {{to}}. Vaata see enne üle.",
+    "blockedBySafety": "Ei paigaldata: see versioon on suure riskiga ja „Ära luba suure riskiga pluginaid“ on sees.",
+    "scoreUnknown": "Ei paigaldata automaatselt: selle versiooni turvahinnet ei õnnestunud arvutada. Vaata see enne üle."
+  },
+  "score": {
+    "label": "Turvahinne:",
+    "unchanged": "muutumatu",
+    "points": "punkti",
+    "goesUp": ", risk kasvab",
+    "goesDown": ", risk väheneb"
+  },
+  "dialog": {
+    "title": "Uuendad {{name}} versioonile {{version}}?",
+    "now": "praegu {{version}}",
+    "sameKey": "sama autorivõti",
+    "newKey": "uus autorivõti",
+    "newWebsites_one": "See uuendus soovib suhelda {{count}} uue veebisaidiga.",
+    "newWebsites_other": "See uuendus soovib suhelda {{count}} uue veebisaidiga.",
+    "staysOn": "{{name}} jääb versioonile {{version}}, kuni otsustad.",
+    "otherDomain": "Üks neist ei asu plugina enda domeenil.",
+    "whatsNew": "Mis on uut versioonis {{version}}",
+    "websitesLead": "{{name}} ja selle leht pääseksid siis ligi nendele:",
+    "websitesWarning": "Need veebisaidid näevad sinu IP-aadressi ja kõike, mida {{name}} neile saadab.",
+    "websitesLabel": "Veebisaidid",
+    "new": "Uus",
+    "changed": "Muudetud",
+    "noOtherPermissions": "Muud load ei muutu.",
+    "scoreNow": "Praegu ({{version}})",
+    "scoreAfter": "Pärast uuendust ({{version}})",
+    "meterNow": "Turvahinne praegu",
+    "meterAfter": "Turvahinne pärast uuendust",
+    "riskUpBy_one": "Risk kasvab {{count}} punkti võrra",
+    "riskUpBy_other": "Risk kasvab {{count}} punkti võrra",
+    "asksForMore": "sest see versioon küsib rohkem:",
+    "permissionsLabel": "Uued load",
+    "recentChange": "See loetakse ka hiljutiseks muudatuseks: uued load viimase {{versions}} versiooni jooksul lisavad veel +{{recent}} punkti. Koos ülaltoodud +{{permissions}}-ga (× {{multiplier}}) on kokku +{{total}}.",
+    "highTitle": "See uuendus muudaks plugina suure riskiga pluginaks",
+    "highText": "Seda ei paigaldata automaatselt. Versioonile {{version}} jäämine säilitab praeguse hinde; versiooni saad kinnitada jaotises Paigaldatud.",
+    "highTick": "Mõistan, et risk kasvas, ja usaldan autorit endiselt",
+    "skipHint": "Vahelejätmisel jääb {{version}} tööle.",
+    "skip": "Jäta see versioon vahele",
+    "notNow": "Mitte praegu",
+    "allow": "Luba ja uuenda",
+    "updateAnyway": "Uuenda ikkagi",
+    "failed": "Plugina {{name}} uuendamine ei õnnestunud. Proovi uuesti."
   }
 }

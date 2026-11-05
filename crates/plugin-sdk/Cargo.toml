@@ -7,7 +7,14 @@ readme = "README.md"
 keywords = ["mumcord", "mumble", "plugin", "wasm", "sdk"]
 categories = ["wasm", "api-bindings"]
 # The bindings are generated from wit/ at compile time, so the WIT files ship with the crate.
-include = ["src/**", "wit/**", "examples/**", "README.md"]
+include = [
+    "src/**",
+    "wit/**",
+    "examples/**",
+    "build.rs",
+    "bovnar-wasm/**",
+    "README.md",
+]
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -20,6 +27,11 @@ wit-bindgen.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 
+# Natively the pinned Bovnar crate compiles the C library; on wasm32 the SDK links the prebuilt
+# copy in bovnar-wasm/ instead (build.rs), whose C sources are the same pinned version.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+bovnar = { workspace = true, optional = true }
+
 [lints]
 workspace = true
 
@@ -30,6 +42,12 @@ workspace = true
 name = "hello"
 crate-type = ["cdylib"]
 
+# A complete 1.1 plugin: a stage activity, an Apps-menu item and versioned relay messages.
+[[example]]
+name = "stage_board"
+crate-type = ["cdylib"]
+required-features = ["1.1"]
+
 [features]
 # Opts a plugin into the 1.1 API (WIT package mumcord:plugin@1.1.0); off keeps the 1.0 world.
-"1.1" = []
+"1.1" = ["dep:bovnar"]

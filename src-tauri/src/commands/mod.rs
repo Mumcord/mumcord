@@ -35,6 +35,7 @@ pub mod now_playing;
 pub mod p2p;
 pub mod people;
 pub mod plugin_repos;
+pub mod plugin_safety;
 pub mod plugins;
 pub mod pm_overview;
 pub mod pm_rules;

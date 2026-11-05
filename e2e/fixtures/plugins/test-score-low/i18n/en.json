@@ -1,0 +1,4 @@
+{
+  "manifest.description": "E2E test plugin that scores Low risk: one quiet panel permission.",
+  "manifest.name": "Fixture score-low"
+}

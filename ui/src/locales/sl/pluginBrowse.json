@@ -75,7 +75,10 @@
   "unofficialText": "Mumcord ne pregleduje repozitorija {{repository}}. Vtičnik se še vedno izvaja v peskovniku in dobi le dovoljenja, ki jih dovolite.",
   "checksTitle": "Uradni pregledi še vedno veljajo",
   "checksText": "Mumcordov seznam preklicev ga lahko izklopi. Imena uradnih vtičnikov so rezervirana.",
-  "metaPermissions": "Dovoljenja: {{count}}",
+  "metaPermissions_one": "{{count}} dovoljenje",
+  "metaPermissions_two": "{{count}} dovoljenji",
+  "metaPermissions_few": "{{count}} dovoljenja",
+  "metaPermissions_other": "{{count}} dovoljenj",
   "footer": "Uradni repozitorij · podpisani seznam preverjen · nič o vas se ne pošilja",
   "factSource": "Vir: {{url}}",
   "factLicence": "Licenca: {{license}}",
@@ -96,5 +99,7 @@
     "unpacking": "Razpakiranje…",
     "starting": "Zagon…",
     "announce": "{{name}}: preneseno {{percent}} %"
-  }
+  },
+  "needsMumcord": "Potrebuje Mumcord {{version}} ali novejši",
+  "updateMumcord": "Posodobi Mumcord"
 }

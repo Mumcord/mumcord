@@ -5,6 +5,10 @@
     "body": "Avstängt efter upprepade krascher",
     "open": "Visa i Tillägg"
   },
+  "pictureRefused": {
+    "title": "{{name}} kunde inte använda bilden",
+    "body": "Den här bilden kan inte användas. Använd en PNG-, JPEG- eller WebP-fil på högst 10 MB."
+  },
   "update": {
     "title": "Uppdatering för {{name}}",
     "body": "Version {{version}} väntar på fliken Uppdateringar",

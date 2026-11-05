@@ -5,6 +5,10 @@
     "body": "Isključen nakon ponovljenih rušenja",
     "open": "Prikaži u Dodacima"
   },
+  "pictureRefused": {
+    "title": "{{name}} nije mogao upotrijebiti sliku",
+    "body": "Ova se slika ne može koristiti. Koristi PNG, JPEG ili WebP datoteku do 10 MB."
+  },
   "update": {
     "title": "Ažuriranje za {{name}}",
     "body": "Verzija {{version}} čeka na kartici Ažuriranja",

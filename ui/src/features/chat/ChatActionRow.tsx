@@ -1,6 +1,6 @@
 /**
- * "Apps" button left of the image picker (FR-2.65) with a menu of start actions: "Share screen"
- * (or pause, stop and viewers while sharing) and "Watch together" (paste a YouTube link). Shown
+ * "Apps" button left of the image picker (FR-2.65) with a menu of start actions: "Share your screen"
+ * (or pause, stop and viewers while sharing) and "Watch together" (paste a YouTube link), then the plugins' items (FR-9.53). Shown
  * only in the chat of the channel the user is in by voice; disabled entries show their reason.
  */
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
@@ -17,6 +17,8 @@ import {
   useShareActions,
 } from "../screenshare";
 import { WatchLinkDialog, useWatchParty } from "../watchparty";
+import { AppsMenuIcon } from "./appsMenuIcons";
+import { PluginMenuItems } from "../plugins/appmenu";
 import "./chatActionRow.css";
 
 const APPS_ICON = "M5 5h5v5H5zM14 5h5v5h-5zM5 14h5v5H5zM14 14h5v5h-5z";
@@ -113,7 +115,7 @@ export function ChatActionRow() {
     label: string,
     reasonText: string | null,
     run: () => void,
-    extra?: { onFocus?: () => void },
+    extra?: { onFocus?: () => void; icon?: "screen" | "watch" },
   ) => (
     <button
       type="button"
@@ -128,8 +130,11 @@ export function ChatActionRow() {
         run();
       }}
     >
-      {label}
-      {reasonText !== null && <span className="chat-apps__reason">{reasonText}</span>}
+      {extra?.icon !== undefined && <AppsMenuIcon name={extra.icon} />}
+      <span className="chat-apps__text">
+        {label}
+        {reasonText !== null && <span className="chat-apps__reason">{reasonText}</span>}
+      </span>
     </button>
   );
 
@@ -164,10 +169,10 @@ export function ChatActionRow() {
         >
           {sharing === null ? (
             item(
-              shareActions.starting ? tShare("choosing") : tShare("share"),
+              shareActions.starting ? tShare("choosing") : tShare("shareYourScreen"),
               shareReason,
               () => void shareActions.start(),
-              { onFocus: () => void share.recheck() },
+              { onFocus: () => void share.recheck(), icon: "screen" },
             )
           ) : (
             <>
@@ -196,10 +201,20 @@ export function ChatActionRow() {
               )}
             </>
           )}
-          {item(watchLabel, reason, () => {
-            setOpen(true);
-          })}
+          {item(
+            watchLabel,
+            reason,
+            () => {
+              setOpen(true);
+            },
+            { icon: "watch" },
+          )}
           {embedsOff && openPrivacy !== null && item(tParty("openPrivacy"), null, openPrivacy)}
+          <PluginMenuItems
+            onChosen={() => {
+              closeMenu(true);
+            }}
+          />
         </div>
       )}
       {shareActions.failed !== null && (

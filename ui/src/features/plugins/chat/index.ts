@@ -1,5 +1,6 @@
 export { CommandPicker } from "./CommandPicker";
 export { LeadingPluginCards, PluginChatCard, PluginLine } from "./PluginChatCard";
+export { PluginActivityLines } from "./ActivityLine";
 export { usePluginMentions } from "./pluginMentions";
 export { commandOptionId, useSlashCommands } from "./useSlashCommands";
 export { cardAnnouncement, createLineAnnouncer, type LineView } from "./lineAnnouncement";

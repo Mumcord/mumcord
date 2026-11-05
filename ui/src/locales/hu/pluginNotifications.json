@@ -5,6 +5,10 @@
     "body": "Ismételt összeomlások után kikapcsolva",
     "open": "Megjelenítés a Bővítményekben"
   },
+  "pictureRefused": {
+    "title": "A(z) {{name}} nem tudta használni a képet",
+    "body": "Ez a kép nem használható. Használj legfeljebb 10 MB-os PNG, JPEG vagy WebP fájlt."
+  },
   "update": {
     "title": "Frissítés ehhez: {{name}}",
     "body": "A(z) {{version}} verzió a Frissítések lapon vár",

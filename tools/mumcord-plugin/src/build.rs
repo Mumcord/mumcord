@@ -2,6 +2,9 @@
 //! component and packs a `.mcplugin`. Plugins target `wasm32-unknown-unknown` instead of
 //! `wasm32-wasip2` because the wasip2 std pulls in WASI imports the runtime refuses (lead decision
 //! after B25a, recorded as a spec addendum).
+//!
+//! The manifest's `api` is written from the WIT the component imports (FR-9.6, FR-9.21): the SDK
+//! feature picks the API, so authors never type it and it cannot drift from the build.
 
 use std::ffi::OsString;
 use std::fs;
@@ -12,6 +15,7 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 use mumcord_plugins::manifest::Manifest;
 use mumcord_plugins::package::{Digest, MANIFEST_FILE, OFFICIAL_FILES, WASM_FILE};
+use mumcord_plugins::version::ApiMinor;
 use zip::write::SimpleFileOptions;
 
 use crate::check;
@@ -19,8 +23,8 @@ use crate::registry::package_file_name;
 
 pub const TARGET: &str = "wasm32-unknown-unknown";
 
-/// Folders that are copied into the package as they are (FR-6.10).
-const PACKAGE_DIRS: &[&str] = &["i18n", "assets", "web"];
+/// Folders that are copied into the package as they are (FR-6.10, `sounds` FR-9.65).
+const PACKAGE_DIRS: &[&str] = &["i18n", "assets", "web", "sounds"];
 
 pub struct Built {
     pub path: PathBuf,
@@ -31,15 +35,22 @@ pub fn run(dir: &Path, reproducible: bool, out: Option<PathBuf>) -> Result<Built
     let dir = dir
         .canonicalize()
         .with_context(|| format!("{} is not a folder", dir.display()))?;
-    let manifest_bytes = fs::read(dir.join(MANIFEST_FILE))
+    let source_manifest = fs::read(dir.join(MANIFEST_FILE))
         .with_context(|| format!("{} has no {MANIFEST_FILE}", dir.display()))?;
-    let manifest = Manifest::parse(&manifest_bytes).context("manifest.json is invalid")?;
+    // Syntax errors show up before the slow compile; `api` may still be missing here.
+    serde_json::from_slice::<serde_json::Value>(&source_manifest)
+        .context("manifest.json is invalid")?;
 
     let module = compile(&dir, reproducible)?;
     let component = componentize(&module)?;
-    check::component_imports(&component)?;
+    let imports = check::component_imports(&component)?;
+    let api = check::imports_api(&imports).context(
+        "plugin.wasm imports no Mumcord host API; was it built with mumcord-plugin-sdk?",
+    )?;
+    let manifest_bytes = with_api(&source_manifest, api)?;
+    let manifest = Manifest::parse(&manifest_bytes).context("manifest.json is invalid")?;
 
-    let package = pack(&dir, &component)?;
+    let package = pack(&dir, &manifest_bytes, &component)?;
     let out = out.unwrap_or_else(|| dir.join("dist"));
     fs::create_dir_all(&out)?;
     let path = out.join(package_file_name(
@@ -134,11 +145,44 @@ pub fn componentize(module: &[u8]) -> Result<Vec<u8>> {
         .context("could not turn the module into a component")
 }
 
+/// The manifest with `"api": "^MAJOR.MINOR"` for the API the component imports. A manifest that
+/// already says so keeps its exact bytes; otherwise the value is set and the author told.
+fn with_api(manifest: &[u8], api: ApiMinor) -> Result<Vec<u8>> {
+    let mut value: serde_json::Value =
+        serde_json::from_slice(manifest).context("manifest.json is invalid")?;
+    let object = value
+        .as_object_mut()
+        .context("manifest.json is not a JSON object")?;
+    let range = format!("^{api}");
+    match object.get("api").and_then(serde_json::Value::as_str) {
+        Some(current) if lower_bound(current) == Some(api) => return Ok(manifest.to_vec()),
+        Some(current) => {
+            println!("note: api {current} replaced by {range}, the API plugin.wasm is built for");
+        }
+        None => {}
+    }
+    object.insert("api".to_owned(), range.into());
+    let mut bytes = serde_json::to_vec_pretty(&value)?;
+    bytes.push(b'\n');
+    Ok(bytes)
+}
+
+/// `^1.1` / `^1.1.0` → 1.1; anything else (e.g. the invalid `^1`) → None.
+fn lower_bound(range: &str) -> Option<ApiMinor> {
+    let rest = range.strip_prefix('^')?;
+    let version = semver::VersionReq::parse(range).ok()?;
+    let comparator = version.comparators.first()?;
+    (rest.contains('.')).then_some(ApiMinor {
+        major: comparator.major,
+        minor: comparator.minor?,
+    })
+}
+
 /// Packs the project files with fixed timestamps, permissions and order, so equal inputs give
-/// equal bytes.
-pub fn pack(dir: &Path, component: &[u8]) -> Result<Vec<u8>> {
+/// equal bytes. `manifest` is the manifest with `api` written in.
+pub fn pack(dir: &Path, manifest: &[u8], component: &[u8]) -> Result<Vec<u8>> {
     let mut files: Vec<(String, Vec<u8>)> = vec![
-        (MANIFEST_FILE.to_owned(), fs::read(dir.join(MANIFEST_FILE))?),
+        (MANIFEST_FILE.to_owned(), manifest.to_vec()),
         (WASM_FILE.to_owned(), component.to_vec()),
     ];
     for name in OFFICIAL_FILES {
@@ -203,9 +247,12 @@ mod tests {
         fs::write(root.join("assets/icons/a.svg"), "<svg/>").expect("test step");
         fs::write(root.join("README.md"), "# Demo").expect("test step");
         fs::write(root.join("notes.txt"), "not packed").expect("test step");
+        fs::create_dir_all(root.join("sounds")).expect("test step");
+        fs::write(root.join("sounds/ding.ogg"), "OggS").expect("test step");
+        let manifest = fs::read(root.join(MANIFEST_FILE)).expect("test step");
 
-        let first = pack(root, b"wasm").expect("test step");
-        let second = pack(root, b"wasm").expect("test step");
+        let first = pack(root, &manifest, b"wasm").expect("test step");
+        let second = pack(root, &manifest, b"wasm").expect("test step");
         assert_eq!(first, second);
 
         let archive = zip::ZipArchive::new(Cursor::new(first)).expect("test step");
@@ -215,7 +262,7 @@ mod tests {
             .collect();
         let mut sorted = names.clone();
         sorted.sort_unstable();
-        assert_eq!(names.len(), 5);
+        assert_eq!(names.len(), 6);
         assert_eq!(
             sorted,
             [
@@ -223,9 +270,36 @@ mod tests {
                 "assets/icons/a.svg",
                 "i18n/en.json",
                 "manifest.json",
-                "plugin.wasm"
+                "plugin.wasm",
+                "sounds/ding.ogg"
             ]
         );
+    }
+
+    #[test]
+    fn api_is_written_from_the_imports() {
+        let api_of = |bytes: &[u8]| {
+            let value: serde_json::Value = serde_json::from_slice(bytes).expect("json");
+            value["api"].as_str().map(str::to_owned)
+        };
+        let mut missing: serde_json::Value =
+            serde_json::from_str(&manifest("demo", "0.1.0", &[])).expect("json");
+        missing.as_object_mut().expect("object").remove("api");
+        let missing = serde_json::to_vec(&missing).expect("json");
+        let written = with_api(&missing, ApiMinor::V1_1).expect("test step");
+        assert_eq!(api_of(&written).as_deref(), Some("^1.1"));
+        Manifest::parse(&written).expect("a valid manifest");
+
+        let matching = manifest("demo", "0.1.0", &[]).replace("^1.0", "^1.0.0");
+        let kept = with_api(matching.as_bytes(), ApiMinor::V1_0).expect("test step");
+        assert_eq!(kept, matching.as_bytes(), "a matching api keeps the bytes");
+
+        let stale = manifest("demo", "0.1.0", &[]);
+        let fixed = with_api(stale.as_bytes(), ApiMinor::V1_1).expect("test step");
+        assert_eq!(api_of(&fixed).as_deref(), Some("^1.1"));
+        let invalid = stale.replace("^1.0", "^1");
+        let fixed = with_api(invalid.as_bytes(), ApiMinor::V1_0).expect("test step");
+        assert_eq!(api_of(&fixed).as_deref(), Some("^1.0"));
     }
 
     #[test]

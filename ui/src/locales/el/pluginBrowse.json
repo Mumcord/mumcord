@@ -75,7 +75,8 @@
   "unofficialText": "Το {{repository}} δεν ελέγχεται από το Mumcord. Εκτελείται παρ' όλα αυτά στο sandbox και λαμβάνει μόνο τα δικαιώματα που επιτρέπετε.",
   "checksTitle": "Οι επίσημοι έλεγχοι εξακολουθούν να ισχύουν",
   "checksText": "Η λίστα ανάκλησης του Mumcord μπορεί να το απενεργοποιήσει. Τα ονόματα των επίσημων πρόσθετων είναι δεσμευμένα.",
-  "metaPermissions": "Δικαιώματα: {{count}}",
+  "metaPermissions_one": "{{count}} άδεια",
+  "metaPermissions_other": "{{count}} άδειες",
   "footer": "Επίσημο αποθετήριο · η υπογεγραμμένη λίστα ελέγχθηκε · τίποτα για εσάς δεν αποστέλλεται",
   "factSource": "Πηγή: {{url}}",
   "factLicence": "Άδεια: {{license}}",
@@ -96,5 +97,7 @@
     "unpacking": "Αποσυμπίεση…",
     "starting": "Εκκίνηση…",
     "announce": "{{name}}: λήφθηκε {{percent}}%"
-  }
+  },
+  "needsMumcord": "Απαιτεί Mumcord {{version}} ή νεότερο",
+  "updateMumcord": "Ενημέρωση του Mumcord"
 }

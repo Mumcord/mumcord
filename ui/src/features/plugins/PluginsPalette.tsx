@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ModalDialog } from "../settings/components/ModalDialog";
 import { openSettingsSection } from "../settings/settingsOpener";
+import { activateAppMenuItem, useAppMenu } from "./appmenu";
 import { setAllPluginsOff } from "./pluginStore";
 
 interface Command {
@@ -59,6 +60,8 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
   const baseId = useId();
   const [query, setQuery] = useState("");
   const [index, setIndex] = useState(0);
+  const { t: tMenu } = useTranslation("pluginAppMenu");
+  const appItems = useAppMenu();
   const commands = useMemo<Command[]>(
     () => [
       {
@@ -75,8 +78,18 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
           void setAllPluginsOff(true);
         },
       },
+      // A disabled item cannot run, so it is not offered here (FR-9.55).
+      ...appItems
+        .filter((entry) => entry.enabled)
+        .map((entry) => ({
+          id: `app:${entry.plugin}/${entry.item}`,
+          label: tMenu("paletteItem", { plugin: entry.pluginName, label: entry.label }),
+          run: () => {
+            activateAppMenuItem(entry);
+          },
+        })),
     ],
-    [t],
+    [t, tMenu, appItems],
   );
   const needle = query.trim().toLowerCase();
   const shown = commands.filter((command) => command.label.toLowerCase().includes(needle));

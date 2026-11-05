@@ -17,6 +17,8 @@ interface ModalDialogProps {
   /** Optional icon and one-line subtitle shown beside the title. */
   icon?: ReactNode;
   subtitle?: ReactNode;
+  /** Start with focus on the title instead of the first control (install prompt, spec 09 §5.2). */
+  focusTitle?: boolean;
   children: ReactNode;
 }
 
@@ -34,6 +36,7 @@ export function ModalDialog({
   className,
   icon,
   subtitle,
+  focusTitle = false,
   children,
 }: ModalDialogProps) {
   const titleId = useId();
@@ -43,7 +46,10 @@ export function ModalDialog({
   useLayoutEffect(() => {
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const close = host?.open(opener);
-    ref.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+    const start = focusTitle
+      ? ref.current?.querySelector<HTMLElement>(`[id="${CSS.escape(titleId)}"]`)
+      : ref.current?.querySelector<HTMLElement>(FOCUSABLE);
+    start?.focus();
     return () => {
       if (close) close();
       else opener?.focus();
@@ -89,14 +95,22 @@ export function ModalDialog({
           <div className="settings-dialog__header">
             {icon}
             <div>
-              <h3 id={titleId} className="settings-dialog__title settings-dialog__title--tight">
+              <h3
+                id={titleId}
+                tabIndex={focusTitle ? -1 : undefined}
+                className="settings-dialog__title settings-dialog__title--tight"
+              >
                 {title}
               </h3>
               {subtitle}
             </div>
           </div>
         ) : (
-          <h3 id={titleId} className="settings-dialog__title">
+          <h3
+            id={titleId}
+            tabIndex={focusTitle ? -1 : undefined}
+            className="settings-dialog__title"
+          >
             {title}
           </h3>
         )}

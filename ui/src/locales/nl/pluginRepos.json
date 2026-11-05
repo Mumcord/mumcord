@@ -12,7 +12,7 @@
     "subtitle": "Voeg alleen repositories toe van mensen die je vertrouwt.",
     "signatureValid": "handtekening geldig",
     "contactLine": "contact: {{contact}}",
-    "pluginsLine": "Plugins: {{number}}",
+    "pluginsLine": "Plug-ins: {{number}}",
     "signingKey": "Ondertekeningssleutel",
     "warningTitle": "Onofficiële repository",
     "warningBody": "Mumcord controleert deze plugins niet. Deze sleutel wordt onthouden: als hij ooit verandert, wordt de repository gepauzeerd tot je hem controleert. Bladeren toont je IP-adres aan de host. Plugins met officiële namen worden hier nooit uit gehaald."

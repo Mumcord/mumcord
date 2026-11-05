@@ -1,0 +1,4 @@
+{
+  "manifest.name": "Test Stage",
+  "manifest.description": "E2E test plugin: a tree activity in the media area, started from the Apps menu."
+}

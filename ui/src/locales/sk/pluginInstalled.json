@@ -55,6 +55,10 @@
     "messagesExpired": "Správy, ktorým vypršala platnosť",
     "incomingRateDropped": "Prichádzajúce správy zahodené limitom rýchlosti",
     "incomingInvalid": "Neplatné prichádzajúce správy",
+    "uiFreezes": "Koľkokrát Mumcord zamrzol pri otvorenom webovom obsahu",
+    "webDisabled": "Webový obsah je vypnutý, pretože Mumcord prestal reagovať, keď bol otvorený.",
+    "reenableWeb": "Zapnúť webový obsah",
+    "reenableFailed": "Webový obsah sa nepodarilo zapnúť.",
     "log": "Záznam",
     "logEmpty": "Záznam je prázdny.",
     "level": {

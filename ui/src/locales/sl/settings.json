@@ -1070,6 +1070,19 @@
     "hint": "Vtičnikom doda zavihek Razvijalec, kjer lahko naložite nepodpisane vtičnike iz mape. Vklopite ga le, če sami razvijate vtičnike."
   },
   "newBadge": "Novo",
+  "pluginSafety": {
+    "title": "Varnost vtičnikov",
+    "blockHighRisk": "Ne dovoli vtičnikov z visokim tveganjem",
+    "hint": "Skrije gumb Namesti pri vtičnikih z oceno 60 ali več in ustavi posodobitve, zaradi katerih bi nameščen vtičnik dosegel to raven. Vtičniki, ki si jih že namestil, še naprej delujejo.",
+    "note": "Privzeto izklopljeno. Uradni vtičniki in razvijalski vtičniki nikoli niso prizadeti. Ocene so ocene, ne jamstvo."
+  },
+  "pluginSounds": {
+    "title": "Zvoki vtičnikov",
+    "volume": "Glasnost zvokov vtičnikov",
+    "mute": "Utišaj zvoke vtičnikov",
+    "hint": "Velja za vsak zvok, ki ga predvaja vtičnik. Zvoki vtičnikov so tišji, ko ljudje govorijo.",
+    "meter": "Izhodna raven (odpravljanje napak)"
+  },
   "screenShare": {
     "newBadge": "Novo",
     "qualityTitle": "Privzeta kakovost",
@@ -1101,6 +1114,7 @@
     "useGpuHint": "AV1 kodira na grafični kartici, zato deljenje skoraj ne obremenjuje procesorja. Izklopljeno: AV1 uporablja procesor.",
     "statusList": "Stanje kodirnika",
     "av1Encode": "Kodiranje AV1",
+    "sound": "Zvok",
     "askEachTime": "Vprašaj za te nastavitve ob vsakem deljenju",
     "av1Playback": "Predvajanje AV1",
     "vp9Playback": "Predvajanje VP9",

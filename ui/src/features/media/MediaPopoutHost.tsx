@@ -1,6 +1,6 @@
 /**
- * Keeps the pop-out windows (issue #164) in step with the main window, which owns the party, the
- * watch and the connection: a pop-out closes when what it shows ends, its window title follows the
+ * Keeps the pop-out windows (issue #164, FR-9.48) in step with the main window, which owns the
+ * party, the watch, the plugin activities and the connection: a pop-out closes when what it shows ends, its window title follows the
  * video and the channel, and a view comes back into the main column when its window closes.
  * Renders nothing; mounted once in the main window.
  */
@@ -8,15 +8,27 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type MediaPopoutKind, type MediaPopoutTarget } from "../../api";
 import { useServerStateOf } from "../channels";
+import {
+  activitiesLoaded,
+  joinedActivityOf,
+  useStageActivities,
+} from "../plugins/stage/activityStore";
 import { useWatchedShare, watchedShare } from "../screenshare/watching";
 import { useWatchParty, watchPartyOf } from "../watchparty/watchPartyStore";
-import { openMedia } from "./mediaView";
+import { openMedia, type StageId } from "./mediaView";
 import { popIn, sameTarget, usePopouts, usePopoutTitle } from "./popoutStore";
 
 /** Whether the main window still has what the closed pop-out showed. */
 function stillActive(kind: MediaPopoutKind, target: MediaPopoutTarget): boolean {
   if (kind === "watch") return watchPartyOf(target.serverId)?.party.joined ?? false;
+  if (kind === "stage")
+    return target.plugin !== null && joinedActivityOf(target.plugin) !== undefined;
   return sameTarget(watchedShare(), target);
+}
+
+/** The stage tab that shows what the pop-out of `kind` showed. */
+function stageIdOf(kind: MediaPopoutKind, target: MediaPopoutTarget): StageId {
+  return kind === "stage" ? `plugin:${target.plugin ?? ""}` : kind;
 }
 
 export function MediaPopoutHost(): ReactNode {
@@ -26,19 +38,25 @@ export function MediaPopoutHost(): ReactNode {
   useEffect(() => {
     const before = previous.current;
     previous.current = popouts;
-    for (const kind of ["watch", "share"] as const) {
+    for (const kind of ["watch", "share", "stage"] as const) {
       const was = before[kind].target;
-      if (was !== null && popouts[kind].target === null && stillActive(kind, was)) openMedia(kind);
+      if (was !== null && popouts[kind].target === null && stillActive(kind, was)) {
+        openMedia(stageIdOf(kind, was));
+      }
     }
   }, [popouts]);
 
   const watch = popouts.watch.target;
   const share = popouts.share.target;
+  const stage = popouts.stage.target;
   return (
     <>
       {watch !== null && <WatchPopoutSync serverId={watch.serverId} />}
       {share !== null && share.session !== null && (
         <SharePopoutSync serverId={share.serverId} session={share.session} />
+      )}
+      {stage !== null && stage.plugin !== null && (
+        <StagePopoutSync serverId={stage.serverId} plugin={stage.plugin} />
       )}
     </>
   );
@@ -80,5 +98,20 @@ function SharePopoutSync({ serverId, session }: { serverId: number; session: num
   useEffect(() => {
     if (!watching) popIn("share", tc("media.popInFailed"));
   }, [watching, tc]);
+  return null;
+}
+
+function StagePopoutSync({ serverId, plugin }: { serverId: number; plugin: string }): null {
+  const { t } = useTranslation("common");
+  const activity = useStageActivities().find(
+    (a) => a.plugin === plugin && a.kind === "activity" && a.joined,
+  );
+  const name = activity === undefined ? plugin : activity.pluginName || plugin;
+  useWindowTitle("stage", usePopoutTitle(serverId, name));
+  // Before the first list arrives the user may well still be in it.
+  const gone = activity === undefined && activitiesLoaded();
+  useEffect(() => {
+    if (gone) popIn("stage", t("media.popInFailed"));
+  }, [gone, t]);
   return null;
 }

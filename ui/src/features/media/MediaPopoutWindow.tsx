@@ -1,7 +1,7 @@
 /**
- * Root of a media pop-out window (issue #164): the watch party player or a watched screen share
- * with the same overlay and keys as in the main window. The window only renders: the party, the
- * watch and the connection stay in the main window, this one reads their state from the engine and
+ * Root of a media pop-out window (issue #164, FR-9.48): the watch party player, a watched screen
+ * share or a plugin activity with the same overlay and keys as in the main window. The window only
+ * renders: the party, the watch, the activity and the connection stay in the main window, this one reads their state from the engine and
  * sends its button presses back. Theme and language follow the main window; Ctrl+W, closing the
  * window and "Pop back in" dock the view again.
  */
@@ -11,6 +11,8 @@ import { LiveRegions } from "../../a11y";
 import { getApi, type MediaPopoutKind, type MediaPopoutTarget, type WindowLook } from "../../api";
 import { applyLanguage, resolveLanguage } from "../../i18n";
 import { applyRootLook, isCloseShortcut } from "../inspector/inspectorView";
+import { useStageActivities } from "../plugins/stage/activityStore";
+import { PluginStage } from "../plugins/stage/PluginStage";
 import { Viewer } from "../screenshare/ScreenShareView";
 import { seedScreenShares } from "../screenshare/sharesStore";
 import { WatchTogetherView } from "../watchparty/WatchTogetherView";
@@ -41,6 +43,8 @@ export function MediaPopoutWindow({ kind }: { kind: MediaPopoutKind }): ReactNod
         {target !== null &&
           (kind === "watch" ? (
             <WatchTogetherView serverId={target.serverId} />
+          ) : kind === "stage" ? (
+            target.plugin !== null && <StagePopout plugin={target.plugin} />
           ) : (
             target.session !== null && (
               <Viewer serverId={target.serverId} session={target.session} />
@@ -50,6 +54,14 @@ export function MediaPopoutWindow({ kind }: { kind: MediaPopoutKind }): ReactNod
       <LiveRegions />
     </InPopout>
   );
+}
+
+/** The activity of `plugin` the user is in; the main window closes this one once it ends. */
+function StagePopout({ plugin }: { plugin: string }): ReactNode {
+  const activity = useStageActivities().find(
+    (a) => a.plugin === plugin && a.kind === "activity" && a.joined,
+  );
+  return activity === undefined ? null : <PluginStage activity={activity} />;
 }
 
 /** Theme and language of the main window, which shares them through the engine. */
@@ -85,12 +97,12 @@ function useMainWindowLook(): void {
 
 /**
  * The party or the shares as they are now: the stores only follow events, and this window opens
- * after the last one. An event that arrives first wins.
+ * after the last one. An event that arrives first wins. The activity store reads its own list.
  */
 function useSeed(kind: MediaPopoutKind, target: MediaPopoutTarget | null): void {
   const serverId = target?.serverId ?? null;
   useEffect(() => {
-    if (serverId === null) return;
+    if (serverId === null || kind === "stage") return;
     const api = getApi();
     let current = true;
     if (kind === "watch") {

@@ -48,4 +48,20 @@ interface chat {
   /// Allowed only for messages this plugin was handed.
   /// Errors: `not-permitted`.
   hide: func(message: u64) -> result<_, error>;
+
+  /// Since 1.1. How `post-image` delivered the picture.
+  enum post-outcome {
+    /// Posted as a chat image, the same way as a pasted picture.
+    image,
+    /// Too large for the server's image limit, so offered through file sharing instead.
+    file-offer,
+  }
+
+  /// Since 1.1. Posts a PNG into the user's current channel through the normal chat image path
+  /// (FR-9.104). Needs `chat.post-image`. Allowed only within 8 s after a user gesture for this
+  /// plugin, one image per gesture. `alt` (at most 200 bytes) becomes the accessible description
+  /// and the plain text line for official Mumble clients, prefixed with the plugin name as for
+  /// `send`. Errors: `not-permitted`, `invalid` (not a PNG), `too-large` (above the file-sharing
+  /// limit), `no-recipients` (not connected).
+  post-image: func(png: list<u8>, alt: string) -> result<post-outcome, error>;
 }

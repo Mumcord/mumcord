@@ -62,11 +62,14 @@ describe("media view", () => {
     expect(mediaView().mini.watch).toBe(true);
   });
 
-  it("the last view opened takes the main column", () => {
+  it("a view opened later never takes the main column (FR-9.44)", () => {
     resetMediaView();
     openMedia("watch");
     openMedia("share");
-    expect(mediaView().cinema).toBe("share");
+    expect(mediaView()).toMatchObject({ cinema: "watch", stage: ["watch", "share"] });
+    expect(mediaView().unseen).toEqual(["share"]);
+    closeMedia("watch");
+    expect(mediaView()).toMatchObject({ cinema: "share", stage: ["share"], unseen: [] });
     closeMedia("share");
     expect(mediaView().cinema).toBeNull();
     setTab("viewers");

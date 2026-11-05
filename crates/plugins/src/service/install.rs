@@ -1,14 +1,20 @@
 //! Installing from a signed index (FR-6.15, FR-6.29, FR-6.60, spec §6.3): download → verify →
 //! unpack atomically → compile → start, with a progress event per step. A failed step leaves
 //! nothing behind: no half-written folder, no row, no grants.
+//!
+//! Before the prompt, [`PluginService::install_check`] refuses hard stops and computes the score
+//! and the confirmation gate (FR-9.78, FR-9.80, FR-9.81); `install` checks them again, so a
+//! package can never get past the gate by skipping the prompt.
 
 use mumcord_store::{PluginRecord, PluginVisibility};
 use tokio::sync::mpsc::UnboundedSender;
 
+use super::gates::{self, GateInput, InstallCheck, InstallGate};
 use super::{Origin, PluginService, ServiceError, ServiceEvent, allowed_grants, now_millis};
-use crate::manifest::Source;
+use crate::manifest::{Manifest, Source};
 use crate::registry::{Client, Download};
-use crate::verify::{IndexEntry, verify_package};
+use crate::score::Scored;
+use crate::verify::{IndexEntry, Verified, verify_package};
 
 /// What the user accepted in the install prompt.
 #[derive(Debug, Clone)]
@@ -21,6 +27,8 @@ pub struct InstallRequest {
     pub optional: Vec<String>,
     /// The visibility choice (only asked when the plugin uses `peers.messages`).
     pub visibility: PluginVisibility,
+    /// The user ticked the prompt's confirmation box (FR-9.80); needed when the gate asks.
+    pub confirmed: bool,
 }
 
 /// One step of an install, for the progress shown in the store.
@@ -160,13 +168,22 @@ impl PluginService {
         }
 
         self.progress(id, InstallStage::Verifying);
-        let verified = verify_package(
-            &download.bytes,
-            &request.entry,
-            &download.signature,
-            request.source,
-        )?;
+        let verified = self.verified(request.source, &request.entry, download)?;
         let manifest = &verified.package.manifest;
+        self.refuse_unrunnable(manifest)?;
+        let score = self.install_score(
+            &request.source,
+            &verified.package,
+            download_size(download),
+            &verified.author_key,
+        )?;
+        let gate = self.install_gate(request.source, manifest, &score.score)?;
+        if gate.blocked_by_safety {
+            return Err(ServiceError::BlockedBySafety);
+        }
+        if gate.confirm.is_some() && !request.confirmed {
+            return Err(ServiceError::NeedsConfirmation);
+        }
         let version = manifest.version.to_string();
         let granted = allowed_grants(
             manifest,
@@ -218,8 +235,102 @@ impl PluginService {
             self.undo_install(id, previous.as_ref());
             return Err(error.into());
         }
+        if gate.confirm == Some(gates::ConfirmKind::HighRisk) {
+            // FR-9.83 compares later updates with what the user accepted here.
+            self.store()
+                .confirm_plugin_high_risk(id, &record.version, now_millis())?;
+        }
         self.default_badge(id)?;
         Ok(())
+    }
+
+    /// What the install prompt shows for a downloaded package (FR-9.78, FR-9.80, FR-9.81): a
+    /// hard stop refuses it without a score; otherwise its score and the confirmation gate.
+    /// Nothing is unpacked or run. Other failures (a broken package, a newer Mumcord needed)
+    /// are errors as before.
+    pub fn install_check(
+        &self,
+        source: Source,
+        entry: &IndexEntry,
+        download: &Download,
+    ) -> Result<InstallCheck, ServiceError> {
+        let verified = match self.verified(source, entry, download) {
+            Ok(verified) => verified,
+            Err(error) => {
+                return match gates::refusal_of(&error) {
+                    Some(refusal) => Ok(InstallCheck::Refused { refusal }),
+                    None => Err(error),
+                };
+            }
+        };
+        let manifest = &verified.package.manifest;
+        self.refuse_unrunnable(manifest)?;
+        let score = self.install_score(
+            &source,
+            &verified.package,
+            download_size(download),
+            &verified.author_key,
+        )?;
+        let gate = self.install_gate(source, manifest, &score.score)?;
+        Ok(InstallCheck::Ready { score, gate })
+    }
+
+    /// Verifies a downloaded package (FR-6.50) and refuses a revoked one (FR-9.78).
+    pub(super) fn verified(
+        &self,
+        source: Source,
+        entry: &IndexEntry,
+        download: &Download,
+    ) -> Result<Verified, ServiceError> {
+        let verified = verify_package(&download.bytes, entry, &download.signature, source)?;
+        let manifest = &verified.package.manifest;
+        if let Some(revocation) = self.revoked.find(
+            &manifest.id,
+            &manifest.version.to_string(),
+            &verified.package.digest.sha256_hex(),
+            Some(&verified.author_key),
+        ) {
+            return Err(ServiceError::Revoked(
+                revocation.reason(&self.language).to_owned(),
+            ));
+        }
+        Ok(verified)
+    }
+
+    /// The confirmation box and safety setting for installing `manifest` (FR-9.80, FR-9.81).
+    fn install_gate(
+        &self,
+        source: Source,
+        manifest: &Manifest,
+        scored: &Scored,
+    ) -> Result<InstallGate, ServiceError> {
+        let store = self.store();
+        let block_high_risk = store.settings()?.plugins.block_high_risk;
+        let first_from_repository = match source {
+            Source::Repo { repository_id } => !store.plugins()?.iter().any(|record| {
+                record.removed_at.is_none()
+                    && Origin::parse(&record.source) == Some(Origin::Repo(repository_id))
+            }),
+            Source::Official | Source::Dev => false,
+        };
+        Ok(gates::install_gate(GateInput {
+            source,
+            scored,
+            own_code_and_websites: manifest
+                .all_permissions()
+                .any(|p| gates::OWN_CODE_AND_WEBSITES.contains(&p)),
+            first_from_repository,
+            block_high_risk,
+        }))
+    }
+
+    /// FR-9.17: refuses a package this Mumcord cannot run. Runs on the opened package, before
+    /// anything is written to disk.
+    pub(super) fn refuse_unrunnable(&self, manifest: &Manifest) -> Result<(), ServiceError> {
+        match crate::version::refusal(manifest, self.host.app_version()) {
+            Some(text) => Err(ServiceError::Incompatible(text)),
+            None => Ok(()),
+        }
     }
 
     /// Takes back a failed install: stops and forgets the plugin, deletes its files and puts
@@ -245,6 +356,11 @@ impl PluginService {
             stage,
         });
     }
+}
+
+/// The `.mcplugin` size the score counts.
+fn download_size(download: &Download) -> u64 {
+    u64::try_from(download.bytes.len()).unwrap_or(u64::MAX)
 }
 
 #[cfg(test)]

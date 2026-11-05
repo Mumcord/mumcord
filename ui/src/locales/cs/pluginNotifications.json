@@ -5,6 +5,10 @@
     "body": "Vypnuto po opakovaných pádech",
     "open": "Zobrazit v Doplňcích"
   },
+  "pictureRefused": {
+    "title": "{{name}} nemohl použít obrázek",
+    "body": "Tento obrázek nelze použít. Použij soubor PNG, JPEG nebo WebP do 10 MB."
+  },
   "update": {
     "title": "Aktualizace pro {{name}}",
     "body": "Verze {{version}} čeká na kartě Aktualizace",

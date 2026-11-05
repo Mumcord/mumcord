@@ -40,4 +40,12 @@ interface webview {
   /// the panel's limits and the user may still resize it. Errors: `not-permitted`, `invalid`
   /// (no side panel open).
   set-size-hint: func(min-width: u32, min-height: u32) -> result<_, error>;
+
+  /// Since 1.1. Sets the status line under the plugin's side panel, such as '3 drawing · relay ·
+  /// Esc leaves the board'. Plain text only, at most 80 characters; control characters become
+  /// spaces. An empty string clears it. At most 4 updates per second reach the screen; quicker
+  /// ones are merged and the last value wins. The line goes away when the side panel closes.
+  /// Errors: `not-permitted`, `invalid` (no side panel open, longer than 80 characters, or
+  /// markup such as '<' or '>').
+  set-status: func(text: string) -> result<_, error>;
 }

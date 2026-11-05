@@ -27,13 +27,16 @@
     "chatPatterns": "Teachtaireachtaí comhrá áirithe a aithint, mar shampla feistis chluiche a greamaíodh",
     "netHttp": "Cumarsáid a dhéanamh le freastalaí de do rogha",
     "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
-    "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)",
-    "uiStage": "Show an activity in the media area",
-    "uiSidePanel": "Show its own content in a side panel",
-    "uiAppMenu": "Add items to the Apps menu",
-    "netOrigins": "Talk to these websites",
-    "peersRelay": "Send data through the server's relay",
-    "audioEffects": "Play short sounds that come with the plugin"
+    "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe",
+    "uiStage": "Taispeáin gníomhaíocht i limistéar na meán",
+    "uiSidePanel": "Taispeáin a chuid inneachair féin i bpainéal taoibh",
+    "uiAppMenu": "Cuir míreanna le roghchlár na bhfeidhmchlár",
+    "netOrigins": "Labhair leis na suíomhanna gréasáin seo",
+    "peersRelay": "Seol sonraí trí athsheachadán an fhreastalaí",
+    "audioEffects": "Seinn fuaimeanna gearra a thagann leis an mbreiseán",
+    "filesSave": "Sábháil comhaid a roghnaíonn tú",
+    "chatPostImage": "Postáil íomhá sa chomhrá tar éis duit cliceáil",
+    "filesImportPicture": "Oscail pictiúir a roghnaíonn tú"
   },
   "explanations": {
     "uiPanel": "Taispeántar painéal beag den bhreiseán seo i stiall na mbreiseán.",
@@ -56,13 +59,16 @@
     "chatPatterns": "Ní fhaigheann sé ach teachtaireachtaí comhrá i do chainéal a thosaíonn mar a d'fhógair sé, mar shampla feisteas cluiche a greamaíodh. Ní shroicheann aon téacs comhrá eile é.",
     "netHttp": "Is féidir leis labhairt le freastalaí amháin a roghnaíonn tú, agus leis sin amháin.",
     "secrets": "Is féidir leis rún, mar eochair API, a choinneáil i eochairshlabhra do chórais.",
-    "uiWebview": "Is féidir leis a ábhar gréasáin féin a thaispeáint i bhfráma séalaithe gan rochtain idirlín.",
-    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
-    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
-    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
-    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
-    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
-    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
+    "uiWebview": "Ní féidir leis Mumcord, do chuid comhad, do mhicreafón, do cheamara ná do ghearrthaisce a fheiceáil.",
+    "uiStage": "Ach amháin nuair a thosaíonn tú nó nuair a bhaineann tú leis. Is féidir le daoine i do chainéal a bhfuil {{plugin}} acu bheith páirteach.",
+    "uiSidePanel": "Tagann a inneachar chun solais i gcolún cois an chomhrá, ach nuair a osclaíonn tú é.",
+    "uiAppMenu": "Suas le {{count}} mír, le feiceáil faoi “Breiseáin”.",
+    "netOrigins": "Ní féidir le {{plugin}} agus a leathanach sonraí a sheoladh ná a fháil ach leis na suíomhanna gréasáin atá liostaithe thíos.",
+    "peersRelay": "Gluaiseachtaí níos tapúla agus níos mó. Criptithe ó cheann go ceann; ní féidir leis an athsheachadán iad a léamh.",
+    "audioEffects": "Fuaimeanna gearra a thagann leis an mbreiseán. Is féidir leat iad a ísliú nó a mhúchadh in Socruithe → Breiseáin.",
+    "filesSave": "Fiafraíonn Mumcord díot cá bhfuil gach comhad le sábháil tar éis duit cliceáil; ní fheiceann an breiseán do fhillteáin choíche.",
+    "chatPostImage": "Tar éis duit cliceáil sa bhreiseán, is féidir leis pictiúr amháin a phostáil i do chainéal reatha, agus a ainm leis.",
+    "filesImportPicture": "Ligeann Mumcord duit pictiúr a roghnú tar éis duit cliceáil; ní fhaigheann an breiseán ach an pictiúr sin, ní fhaigheann sé do fhillteáin choíche."
   },
   "listLabel": "Ceadanna"
 }

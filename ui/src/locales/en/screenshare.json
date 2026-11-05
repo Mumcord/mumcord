@@ -1,5 +1,6 @@
 {
   "share": "Share screen",
+  "shareYourScreen": "Share your screen",
   "choosing": "Choosing what to share…",
   "stop": "Stop sharing",
   "startFailed": "Screen sharing could not start.",
@@ -18,8 +19,6 @@
   "pause": "Pause",
   "resume": "Resume",
   "sound": "Share sound",
-  "noSound": "Linux shares no sound: viewers see the picture only.",
-  "noSoundForShare": "This share has no sound (whole screen or unsupported system version).",
   "viewersNone": "Nobody is watching yet",
   "viewers_one": "{{count}} watching: {{names}}",
   "viewers_other": "{{count}} watching: {{names}}",
@@ -79,7 +78,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Share the app's sound",
+    "sound": "Sound",
+    "soundInfo": "Whole screen: desktop sound without Mumcord. One window: only that app's sound.",
+    "soundNeeds": {
+      "windows": "No sound: needs Windows 10 version 2004 or newer",
+      "macos": "No sound: needs macOS 13 or newer",
+      "pipewire": "No sound: needs PipeWire"
+    },
     "viewersGet": "Viewers get:",
     "viewersGetSummary": "up to {{resolution}} · {{fps}} fps · {{codec}} · about {{mbit}} Mbit/s",
     "pathRelay": "Sent once through the server's relay, which passes it on to up to {{count}} viewers.",
@@ -105,7 +110,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Direct"
+    "pathDirect": "Direct",
+    "soundDesktop": "Sound: desktop",
+    "soundApp": "Sound: {{app}}",
+    "noSound": "No sound",
+    "tipDesktop": "Whole screen: desktop sound without Mumcord.",
+    "tipApp": "One window: only that app's sound.",
+    "tipOff": "The Sound switch is off.",
+    "tipNone": "“No sound” was chosen for this window.",
+    "tipOldWindows": "No sound: needs Windows 10 version 2004 or newer",
+    "tipOldMacos": "No sound: needs macOS 13 or newer",
+    "tipNoPipeWire": "No sound: needs PipeWire",
+    "tipCaptureFailed": "Audio capture failed. The video share continues."
   },
   "qualityMenu": {
     "title": "Quality",
@@ -218,5 +234,14 @@
     "valueUnavailable": "Not available",
     "checkAgain": "Check again",
     "checking": "Checking…"
+  },
+  "soundPicker": {
+    "title": "Which app's sound?",
+    "noSound": "No sound",
+    "share": "Share sound",
+    "cancel": "Cancel",
+    "empty": "No app is playing sound right now",
+    "gone": "That app has stopped playing sound. Choose another.",
+    "failed": "Your choice could not be applied."
   }
 }

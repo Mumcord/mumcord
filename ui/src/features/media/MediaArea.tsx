@@ -21,6 +21,9 @@ import {
 import { ResizeHandle } from "../../app/ResizeHandle";
 import { leaveCinema } from "./mediaView";
 import { setMediaDrag, setMediaHeight, useMediaResize } from "./mediaResize";
+import { StagePanel } from "./StagePanel";
+import { StageTabs } from "./StageTabs";
+import { useStageEntries } from "./stageRegistry";
 
 const MEDIA_AREA_ID = "media-area";
 
@@ -36,6 +39,13 @@ function rootFontPx(): number {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
 }
 
+/** A part of the main item; the other stage items are hidden next to it (FR-9.44). */
+function shownPart(area: HTMLElement, selector: string): HTMLElement | null {
+  const shown = area.querySelector<HTMLElement>(`.media-stage__panel:not([hidden]) ${selector}`);
+  if (shown !== null || area.querySelector(".media-stage__panel") !== null) return shown;
+  return area.querySelector<HTMLElement>(selector);
+}
+
 interface Measured extends MediaRoom {
   /** Height of the picture as it is shown now. */
   picture: number;
@@ -49,7 +59,7 @@ interface Measured extends MediaRoom {
  */
 function measure(area: HTMLElement, handle: HTMLElement | null): Measured | null {
   const column = area.parentElement;
-  const picture = area.querySelector<HTMLElement>(".media-frame__picture");
+  const picture = shownPart(area, ".media-frame__picture");
   if (column === null || picture === null || document.fullscreenElement !== null) return null;
   if (column.clientHeight === 0) return null;
   const remPx = rootFontPx();
@@ -83,8 +93,13 @@ const sameRoom = (a: Measured | null, b: Measured | null) =>
     Math.abs(a.auto - b.auto) < 0.5 &&
     a.remPx === b.remPx);
 
+/**
+ * The built-in views come as children, each in its `StagePanel`; plugin activities registered in
+ * the stage registry are rendered here next to them.
+ */
 export function MediaArea({ children }: { children: ReactNode }) {
   const { t } = useTranslation("common", { keyPrefix: "media.resize" });
+  const { plugins } = useStageEntries();
   const areaRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLDivElement>(null);
   const [room, setRoom] = useState<Measured | null>(null);
@@ -220,7 +235,10 @@ export function MediaArea({ children }: { children: ReactNode }) {
             setMediaHeight(result.px / room.column, { animate: result.snapped });
             // The view may have rebuilt its frame since the last look; the hint goes into the
             // one shown now.
-            if (result.collapse) setFrame(areaRef.current?.querySelector(".media-frame") ?? null);
+            if (result.collapse)
+              setFrame(
+                areaRef.current === null ? null : shownPart(areaRef.current, ".media-frame"),
+              );
             setMediaDrag(true, result.collapse);
             return;
           }
@@ -285,7 +303,13 @@ export function MediaArea({ children }: { children: ReactNode }) {
           shownPx === null ? undefined : { ["--media-height" as string]: `${String(shownPx)}px` }
         }
       >
+        <StageTabs />
         {children}
+        {[...plugins].map(([id, item]) => (
+          <StagePanel key={id} id={id}>
+            {item.render()}
+          </StagePanel>
+        ))}
       </div>
       {handle !== null && (
         <div

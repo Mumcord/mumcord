@@ -8,6 +8,7 @@ import type { TFunction } from "i18next";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, type Settings, type SharePreview } from "../../../api";
+import { loadSoundBlock, SOUND_NEEDS_KEYS, type SoundBlock } from "../soundSupport";
 import {
   CODECS,
   FPS,
@@ -37,51 +38,55 @@ const DEFAULT_PICKS: StartPicks = {
 
 export interface ShareStartDialogProps {
   serverId: number;
-  /** The platform can share the app's sound (Windows and macOS); the switch is hidden otherwise. */
-  soundAvailable: boolean;
   onCancel: () => void;
   onConfirm: (picks: StartPicks) => void;
 }
 
 /** Loads the defaults first, so the dialog never flashes picks that change a moment later. */
 export function ShareStartDialog(props: ShareStartDialogProps) {
-  const [loaded, setLoaded] = useState<{ settings: Settings | null } | null>(null);
+  const [loaded, setLoaded] = useState<{
+    settings: Settings | null;
+    soundBlock: SoundBlock;
+  } | null>(null);
 
   useEffect(() => {
     let active = true;
-    getApi()
-      .settingsGet()
-      .then(
-        (settings) => {
-          if (active) setLoaded({ settings });
-        },
-        (error: unknown) => {
+    void Promise.all([
+      getApi()
+        .settingsGet()
+        .catch((error: unknown) => {
           console.error("Loading the screen share defaults failed", error);
-          if (active) setLoaded({ settings: null });
-        },
-      );
+          return null;
+        }),
+      loadSoundBlock(),
+    ]).then(([settings, soundBlock]) => {
+      if (active) setLoaded({ settings, soundBlock });
+    });
     return () => {
       active = false;
     };
   }, []);
 
   if (loaded === null) return null;
-  return <StartDialogContent {...props} settings={loaded.settings} />;
+  return <StartDialogContent {...props} {...loaded} />;
 }
 
 function StartDialogContent({
   serverId,
-  soundAvailable,
   onCancel,
   onConfirm,
   settings,
-}: ShareStartDialogProps & { settings: Settings | null }) {
+  soundBlock,
+}: ShareStartDialogProps & { settings: Settings | null; soundBlock: SoundBlock }) {
   const { t } = useTranslation("screenshare");
   const titleId = useId();
   const introId = useId();
   const codecId = useId();
   const codecHintId = useId();
   const uploadId = useId();
+  const soundId = useId();
+  const soundNoteId = useId();
+  const soundInfoId = useId();
   const ref = useRef<HTMLDialogElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
   const [picks, setPicks] = useState<StartPicks>(() =>
@@ -116,7 +121,7 @@ function StartDialogContent({
   };
 
   const confirm = () => {
-    const chosen = soundAvailable ? picks : { ...picks, sound: settings?.screenSound ?? true };
+    const chosen = picks;
     if (remember && settings !== null) {
       getApi()
         .settingsUpdate(settingsWithPicks(settings, chosen))
@@ -256,24 +261,33 @@ function StartDialogContent({
             </select>
           </div>
         </div>
-        {soundAvailable && (
-          <div className="settings-switch share-start__switch">
-            <div className="settings-switch__text">
-              <span aria-hidden="true">{t("start.sound")}</span>
-            </div>
-            <input
-              type="checkbox"
-              role="switch"
-              className="settings-switch__input"
-              checked={picks.sound}
-              aria-label={t("start.sound")}
-              onChange={(event) => {
-                const sound = event.target.checked;
-                setPicks((now) => ({ ...now, sound }));
-              }}
-            />
+        <div className="settings-switch share-start__switch">
+          <div className="settings-switch__text">
+            <label htmlFor={soundId}>{t("start.sound")}</label>
+            {soundBlock !== null && (
+              <p id={soundNoteId} className="share-start__soundnote">
+                {t(`start.${SOUND_NEEDS_KEYS[soundBlock]}`)}
+              </p>
+            )}
           </div>
-        )}
+          <input
+            id={soundId}
+            type="checkbox"
+            role="switch"
+            className="settings-switch__input"
+            checked={soundBlock === null && picks.sound}
+            disabled={soundBlock !== null}
+            aria-describedby={soundBlock !== null ? `${soundInfoId} ${soundNoteId}` : soundInfoId}
+            onChange={(event) => {
+              const sound = event.target.checked;
+              setPicks((now) => ({ ...now, sound }));
+            }}
+          />
+        </div>
+        <p id={soundInfoId} className="share-start__infoline">
+          <InfoIcon />
+          {t("start.soundInfo")}
+        </p>
         <ViewersGet preview={preview} />
         <label className="app-dialog__remember">
           <input

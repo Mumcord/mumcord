@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Dodaci",
+  "moreItems": "Više dodataka…",
+  "subline": "{{plugin}} · Neslužbeni",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Stavke dodataka uvijek prikazuju naziv dodatka. Upravljaj njima u Postavke → Dodaci.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Ponovno se pokreće nakon problema, pokušaj za trenutak"
 }

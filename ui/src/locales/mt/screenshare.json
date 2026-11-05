@@ -1,5 +1,6 @@
 {
   "share": "Aqsam l-iskrin",
+  "shareYourScreen": "Aqsam l-iskrin tiegħek",
   "choosing": "Qed tagħżel x'se taqsam…",
   "stop": "Waqqaf il-qsim",
   "startFailed": "Il-qsim tal-iskrin ma setax jibda.",
@@ -18,8 +19,6 @@
   "pause": "Pawża",
   "resume": "Kompli",
   "sound": "Aqsam il-ħoss",
-  "noSound": "Linux ma jaqsamx ħoss: it-telespettaturi jaraw l-istampa biss.",
-  "noSoundForShare": "Dan il-qsim m'għandux ħoss (skrin sħiħ jew verżjoni tas-sistema mhux appoġġjata).",
   "viewersNone": "Għad ħadd mhu qed jara",
   "viewers_one": "{{count}} qed jara: {{names}}",
   "viewers_two": "{{count}} qed jaraw: {{names}}",
@@ -85,7 +84,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Aqsam il-ħoss tal-app",
+    "sound": "Ħoss",
+    "soundInfo": "L-iskrin kollu: il-ħoss tal-kompjuter mingħajr Mumcord. Tieqa waħda: il-ħoss ta' dik l-app biss.",
+    "soundNeeds": {
+      "windows": "Ebda ħoss: teħtieġ Windows 10 verżjoni 2004 jew aktar ġdida",
+      "macos": "Ebda ħoss: teħtieġ macOS 13 jew aktar ġdid",
+      "pipewire": "Ebda ħoss: teħtieġ PipeWire"
+    },
     "viewersGet": "Dawk li jaraw jirċievu:",
     "viewersGetSummary": "sa {{resolution}} · {{fps}} fps · {{codec}} · madwar {{mbit}} Mbit/s",
     "pathRelay": "Jintbagħat darba permezz tar-relay tas-server, li jgħaddih lil sa {{count}} li jaraw.",
@@ -111,7 +116,18 @@
     "codecBadgeHardware": "{{codec}} · ħardwer",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Dirett"
+    "pathDirect": "Dirett",
+    "soundDesktop": "Ħoss: desktop",
+    "soundApp": "Ħoss: {{app}}",
+    "noSound": "Ebda ħoss",
+    "tipDesktop": "L-iskrin kollu: il-ħoss tad-desktop mingħajr Mumcord.",
+    "tipApp": "Tieqa waħda: il-ħoss ta' dik l-app biss.",
+    "tipOff": "L-iswiċċ tal-ħoss huwa mitfi.",
+    "tipNone": "“Ebda ħoss” intgħażel għal din it-tieqa.",
+    "tipOldWindows": "Ebda ħoss: teħtieġ Windows 10 verżjoni 2004 jew aktar ġdida",
+    "tipOldMacos": "Ebda ħoss: teħtieġ macOS 13 jew aktar ġdid",
+    "tipNoPipeWire": "Ebda ħoss: teħtieġ PipeWire",
+    "tipCaptureFailed": "Il-qbid tal-ħoss falla. It-tqassim tal-vidjo jkompli."
   },
   "qualityMenu": {
     "title": "Kwalità",
@@ -230,5 +246,14 @@
     "valueUnavailable": "Mhux disponibbli",
     "checkAgain": "Iċċekkja mill-ġdid",
     "checking": "Qed jiċċekkja…"
+  },
+  "soundPicker": {
+    "title": "Il-ħoss ta’ liema app?",
+    "noSound": "Bla ħoss",
+    "share": "Qassam il-ħoss",
+    "cancel": "Ikkanċella",
+    "empty": "Bħalissa l-ebda app mhi qed tindaq ħoss",
+    "gone": "Din l-app waqfet tindaq ħoss. Agħżel oħra.",
+    "failed": "L-għażla tiegħek ma setgħetx tiġi applikata."
   }
 }

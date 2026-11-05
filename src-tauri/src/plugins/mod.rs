@@ -4,9 +4,14 @@
 //! starting a plugin can take a while and must never stall the async runtime. Engine and
 //! service events are pumped by background tasks; commands are thin wrappers.
 
+pub mod child_webview;
 mod feed;
+#[cfg(any(windows, test))]
+mod frame_proxy;
+mod host_calls;
 pub mod suggestions;
 pub mod ui;
+pub mod watchdog;
 pub mod webview;
 
 use std::collections::{HashMap, HashSet};
@@ -19,7 +24,7 @@ use mumcord_plugins::api::webview::Webviews;
 use mumcord_plugins::registry::{Client, Download, Index, UrlPolicy};
 use mumcord_plugins::service::{
     InstallStage, PluginService, Schedule, ServiceConfig, ServiceError, ServiceEvent, Status,
-    run_check,
+    UiInput, run_check,
 };
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -29,6 +34,8 @@ use tokio::sync::mpsc::UnboundedReceiver;
 
 use crate::commands::types::{ApiError, ApiResult, ErrorCode};
 use ui::{PluginUi, Trees};
+
+pub mod sound;
 
 /// The command-line flag that starts Mumcord without any plugin (FR-6.6).
 const NO_PLUGINS_FLAG: &str = "--no-plugins";
@@ -77,6 +84,29 @@ const MAX_CACHED_IMAGES: usize = 200;
 #[tauri_specta(event_name = "plugins://changed")]
 pub struct PluginsChanged {}
 
+/// `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://app-menu-changed")]
+pub struct AppMenuChanged {}
+
+/// `plugins://stage-changed`: the activities in the user's channel changed; re-fetch them with
+/// `stage_activities`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://stage-changed")]
+pub struct StageChanged {}
+
+/// `plugins://stage-refused`: a plugin's own `stage.start` or `stage.join` hit a limit; show the
+/// text for `reason`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://stage-refused")]
+pub struct StageRefused {
+    pub plugin: String,
+    pub reason: ui::StageRefusal,
+}
+
 /// `plugins://shared-state`: whether `server` passes plugin data (FR-6.38). Sent whenever the
 /// engine decides, so the UI can show the "not supported" hint; `plugins_shared_supported`
 /// answers for a server that decided before the UI listened.
@@ -86,6 +116,16 @@ pub struct PluginsChanged {}
 pub struct PluginsSharedState {
     pub server_id: crate::commands::types::ServerId,
     pub supported: bool,
+}
+
+/// `plugins://relay-availability`: whether `serverId`'s relay can carry plugin data changed
+/// (FR-9.57). `plugin_relay_availability` answers for a server that changed before the UI listened.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://relay-availability")]
+pub struct PluginRelayAvailabilityChanged {
+    pub server_id: crate::commands::types::ServerId,
+    pub availability: crate::commands::plugins::PluginRelayAvailability,
 }
 
 /// One step of an install.
@@ -236,6 +276,12 @@ pub fn state(app: &AppHandle) -> ApiResult<Arc<Plugins>> {
 }
 
 /// Maps service errors; their texts are the user-facing ones of spec §5.7.
+/// The running Mumcord, to pick the plugin versions it can run (FR-9.16). Startup parses the
+/// same string and fails on it, so the fallback is never used; it would hide every plugin.
+pub fn app_version() -> semver::Version {
+    semver::Version::parse(env!("CARGO_PKG_VERSION")).unwrap_or(semver::Version::new(0, 0, 0))
+}
+
 pub fn service_error(error: ServiceError) -> ApiError {
     let code = match &error {
         ServiceError::NotInstalled(_) => ErrorCode::NotFound,
@@ -274,6 +320,13 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
     let (mut service, host_events, events) =
         PluginService::new(config, engine.store_handle(), secrets)?;
     test_hooks(&mut service);
+    sound::register(&service.context().audio, engine.sound_hub());
+    // The engine's own relay switch starts from the stored choice too (FR-9.63).
+    engine.plugin_relay_set_enabled(
+        engine
+            .settings()
+            .map_or(true, |s| s.plugins.relay_data_enabled),
+    );
     tracing::info!(no_plugins, "plugin service ready");
     let webviews = service.webviews();
     let plugins = Arc::new(Plugins {
@@ -294,6 +347,7 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
             tracing::error!(error = %e, "starting the plugins failed");
         }
     });
+    watchdog::start(app, &plugins);
     pump_host_events(&plugins, host_events);
     pump_service_events(app, &plugins, engine, events);
     feed::pump_engine_events(app, &plugins, engine);
@@ -413,6 +467,7 @@ async fn on_service_event(
                 .close_unless(|id| running.iter().any(|r| r == id));
             PluginsChanged {}.emit(app)?;
         }
+        ServiceEvent::AppMenuChanged => AppMenuChanged {}.emit(app)?,
         ServiceEvent::InstallProgress { id, stage } => PluginInstallProgress {
             id,
             progress: stage.into(),
@@ -423,6 +478,25 @@ async fn on_service_event(
             plugins.trees().apply(&plugin, &change);
             PluginUi { plugin, change }.emit(app)?;
         }
+        ServiceEvent::SurfaceClosed { plugin, place } => {
+            plugins
+                .call(move |service| Ok(service.ui_input(&plugin, UiInput::SurfaceClosed(place))))
+                .await?;
+        }
+        ServiceEvent::StageEvent { plugin, event } => {
+            plugins
+                .call(move |service| {
+                    service.stage_event(&plugin, event);
+                    Ok(())
+                })
+                .await?;
+        }
+        ServiceEvent::StageChanged => StageChanged {}.emit(app)?,
+        ServiceEvent::StageRefused { plugin, reason } => StageRefused {
+            plugin,
+            reason: reason.into(),
+        }
+        .emit(app)?,
         ServiceEvent::AutoOff { id } => PluginNotification {
             plugin: id,
             notice: PluginNotice::AutoOff,
@@ -443,6 +517,20 @@ async fn on_service_event(
             plugin,
             outgoing,
         } => feed::send(plugins, engine, server, plugin, outgoing),
+        ServiceEvent::RelaySend {
+            server,
+            plugin,
+            session,
+            api,
+            data,
+        } => engine.plugin_relay_send(server, session, &plugin, api, data),
+        ServiceEvent::RelayBroadcast {
+            server,
+            plugin,
+            api,
+            data,
+            receivers,
+        } => engine.plugin_relay_broadcast(server, &plugin, api, data, &receivers),
         ServiceEvent::ChatPost {
             plugin,
             server,
@@ -468,6 +556,9 @@ async fn on_service_event(
             }
             Err(e) => tracing::info!(plugin, error = %e, "plugin chat line not posted"),
         },
+        ServiceEvent::HostCall { plugin, request } => {
+            host_calls::handle(app, engine, plugin, request);
+        }
         ServiceEvent::Supersede {
             plugin,
             card,
@@ -492,6 +583,9 @@ pub enum PluginNotice {
     AutoOff,
     /// A new version waits in the Updates tab (no OS notification).
     UpdateAvailable { name: String, version: String },
+    /// `files.import-picture` refused the picked file: not a PNG, JPEG or WebP, or above 10 MB
+    /// (FR-9.105, section 5.5).
+    PictureRefused,
 }
 
 /// `plugins://notification`: an entry for the notification centre (category Plugins).
@@ -560,8 +654,99 @@ pub fn on_engine_event(
                 }
             });
         }
+        // The relay's announcement changed: its plugin-data availability may have too.
+        mumcord_engine::EngineEvent::RelayChanged(_) => {
+            refresh_relay_availability(app, &plugins, server_id);
+        }
+        mumcord_engine::EngineEvent::PluginRelayJoined { joined } => {
+            let (joined, plugins) = (joined.clone(), Arc::clone(&plugins));
+            tauri::async_runtime::spawn(async move {
+                let result = plugins
+                    .call(move |service| {
+                        service.set_relay_broadcast_joined(server_id, joined);
+                        Ok(())
+                    })
+                    .await;
+                if let Err(e) = result {
+                    tracing::warn!(error = %e, "updating the relay broadcast receivers failed");
+                }
+            });
+        }
+        mumcord_engine::EngineEvent::PluginRelayData {
+            session,
+            plugin,
+            data,
+            ..
+        } => {
+            let (session, plugin, data) = (*session, plugin.clone(), data.0.clone());
+            let plugins = Arc::clone(&plugins);
+            tauri::async_runtime::spawn(async move {
+                let result = plugins
+                    .call(move |service| {
+                        service.relay_received(server_id, session, &plugin, data);
+                        Ok(())
+                    })
+                    .await;
+                if let Err(e) = result {
+                    tracing::warn!(error = %e, "delivering relay plugin data failed");
+                }
+            });
+        }
         _ => {}
     }
+}
+
+/// Re-checks relay plugin-data availability on every connected server. Call after a P2P mode or
+/// identity change: the engine announces neither as a relay change.
+pub fn refresh_all_relay_availability(app: &AppHandle) {
+    let Ok(plugins) = state(app) else {
+        return;
+    };
+    let engine = app.state::<Engine>().inner().clone();
+    for server_id in engine.connections().iter().filter_map(|c| c.server_id()) {
+        refresh_relay_availability(app, &plugins, server_id);
+    }
+}
+
+/// Tells the plugin service whether `server_id`'s relay can carry plugin data now (FR-9.57).
+pub fn refresh_relay_availability(
+    app: &AppHandle,
+    plugins: &Arc<Plugins>,
+    server_id: mumcord_engine::ServerId,
+) {
+    use mumcord_engine::plugin_relay::PluginRelayAvailability as A;
+    use mumcord_plugins::api::relay::Availability;
+    let engine = app.state::<Engine>().inner().clone();
+    let plugins = Arc::clone(plugins);
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        let availability = match engine.plugin_relay_availability(server_id).await {
+            A::NoRelay => Availability::NoRelay,
+            A::UseNotAllowed => Availability::UseNotAllowed,
+            A::NotAllowedHere => Availability::NotAllowedHere,
+            A::Available { kbps } => Availability::Available { kbps },
+        };
+        let result = plugins
+            .call(move |service| {
+                let changed = service.relay_availability(server_id) != availability;
+                service.set_relay_availability(server_id, availability);
+                Ok(changed)
+            })
+            .await;
+        match result {
+            Ok(true) => {
+                let event = PluginRelayAvailabilityChanged {
+                    server_id: crate::commands::types::to_api_server_id(server_id),
+                    availability: availability.into(),
+                };
+                if let Err(e) = event.emit(&app) {
+                    tracing::warn!(error = %e, "emitting the relay availability failed");
+                }
+            }
+            Ok(false) => {}
+            Err(e) => tracing::warn!(error = %e, "updating the relay plugin data status failed"),
+        }
+    });
 }
 
 /// Plugins see the server the user is on; identity-scoped storage follows its identity.

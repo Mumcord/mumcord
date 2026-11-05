@@ -215,6 +215,33 @@ impl Engine {
         view
     }
 
+    /// Adds a chip for bytes the app hands over (a plugin's picture, FR-9.104): they are written
+    /// to `name` in a folder of their own in Mumcord's cache, which the share owns like a zip, so
+    /// the copy is deleted when the chip is removed or the share ends.
+    pub fn files_chip_add_owned(&self, name: &str, bytes: &[u8]) -> std::io::Result<ChipView> {
+        self.file_sharing().finish_cleanup();
+        let dir = super::zip_cache(self.data_dir())
+            .join("files")
+            .join(prepare::random_hex(8));
+        std::fs::create_dir_all(&dir)?;
+        let path = dir.join(name);
+        if let Err(e) = std::fs::write(&path, bytes) {
+            prepare::remove_zip(&path);
+            return Err(e);
+        }
+        let mut view = self.files_chip_add(path);
+        let mut sender = lock(&self.file_sharing().sender);
+        if let Some(chip) = sender.chips.get_mut(&view.id) {
+            chip.owns_zip = true;
+            if chip.path.is_none() {
+                // A failed check leaves no path, so the copy is removed here.
+                prepare::remove_zip(&dir.join(name));
+            }
+            view = chip.view.clone();
+        }
+        Ok(view)
+    }
+
     fn spawn_zip(&self, id: u64, src: PathBuf, cancel: Cancel) {
         let engine = self.downgrade();
         let progress_engine = self.downgrade();
@@ -888,6 +915,39 @@ mod tests {
             Some(Some(EndReason::LeftServer))
         );
         assert!(other.exists(), "the user's own file stays");
+    }
+
+    #[tokio::test]
+    async fn owned_bytes_are_deleted_with_the_chip_and_with_the_share() {
+        let (_dir, engine) = engine().await;
+        let chip = engine
+            .files_chip_add_owned("board.png", b"png")
+            .expect("chip");
+        assert_eq!((chip.state, chip.size), (ChipState::Ready, Some(3)));
+        let path = lock(&engine.files().sender).chips[&chip.id]
+            .path
+            .clone()
+            .expect("path");
+        assert!(path.exists());
+        engine.files_chip_remove(chip.id);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        while path.exists() {
+            assert!(std::time::Instant::now() < deadline, "copy not removed");
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+        }
+
+        let chip = engine
+            .files_chip_add_owned("board.png", b"png")
+            .expect("chip");
+        let path = lock(&engine.files().sender).chips[&chip.id]
+            .path
+            .clone()
+            .expect("path");
+        let share = share_of(&path, true);
+        let id = share.id.clone();
+        lock(&engine.files().sender).shares.insert(share);
+        engine.files_stop(&id);
+        assert!(!path.exists(), "the share's end deletes the copy");
     }
 
     #[test]

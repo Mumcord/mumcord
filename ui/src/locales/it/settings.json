@@ -1062,6 +1062,19 @@
     "hint": "Aggiunge una scheda Sviluppatore ai plugin per caricare plugin non firmati da una cartella. Attivala solo se crei plugin."
   },
   "newBadge": "Novità",
+  "pluginSafety": {
+    "title": "Sicurezza dei plugin",
+    "blockHighRisk": "Non consentire plugin ad alto rischio",
+    "hint": "Nasconde il pulsante Installa per i plugin con un punteggio di 60 o più e blocca gli aggiornamenti che porterebbero un plugin installato a quel livello. I plugin già installati continuano a funzionare.",
+    "note": "Disattivato per impostazione predefinita. I plugin ufficiali e quelli per sviluppatori non sono mai interessati. I punteggi sono stime, non una garanzia."
+  },
+  "pluginSounds": {
+    "title": "Suoni dei plugin",
+    "volume": "Volume dei suoni dei plugin",
+    "mute": "Disattiva i suoni dei plugin",
+    "hint": "Vale per ogni suono riprodotto da un plugin. I suoni dei plugin sono più bassi mentre le persone parlano.",
+    "meter": "Livello di uscita (debug)"
+  },
   "screenShare": {
     "newBadge": "Novità",
     "qualityTitle": "Qualità predefinita",
@@ -1093,6 +1106,7 @@
     "useGpuHint": "Codifica AV1 sulla tua scheda video, così la condivisione non pesa quasi sulla CPU. Disattivato: AV1 usa il processore.",
     "statusList": "Stato dell'encoder",
     "av1Encode": "Codifica AV1",
+    "sound": "Audio",
     "askEachTime": "Chiedi queste impostazioni a ogni condivisione",
     "av1Playback": "Riproduzione AV1",
     "vp9Playback": "Riproduzione VP9",

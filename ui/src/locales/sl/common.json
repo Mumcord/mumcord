@@ -78,6 +78,16 @@
       "keys": "↑ ↓ sprememba velikosti · PageUp/PageDown pripenjanje · Home/End · Enter ponastavi",
       "releaseHint": "Spusti, da se strne v majhno vrstico",
       "minimised": "Medijsko področje je strnjeno"
+    },
+    "stage": {
+      "tabs": "Kaj prikazuje predstavnostno območje",
+      "hint": "Preklop ničesar ne ustavi",
+      "share": "Deljenje zaslona",
+      "plugin": "Vtičnik",
+      "tabName": "{{label}}, zavihek {{index}} od {{count}}",
+      "tabNameNew": "{{label}}, novo, zavihek {{index}} od {{count}}",
+      "pluginTabName": "{{label}}, dejavnost vtičnika, zavihek {{index}} od {{count}}",
+      "pluginTabNameNew": "{{label}}, dejavnost vtičnika, novo, zavihek {{index}} od {{count}}"
     }
   }
 }

@@ -95,7 +95,12 @@ impl RelayUnavailable {
 }
 
 /// Every use, in the order the server info panel lists them (FR-7.7).
-const ALL_USES: [RelayUse; 3] = [RelayUse::Images, RelayUse::Files, RelayUse::ScreenShare];
+const ALL_USES: [RelayUse; 4] = [
+    RelayUse::Images,
+    RelayUse::Files,
+    RelayUse::ScreenShare,
+    RelayUse::PluginData,
+];
 
 /// State of the server's relay for the server info panel (FR-4.20).
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -462,6 +467,16 @@ impl Relays {
             .map(|_| ())
     }
 
+    /// The relay's per-sender cap for plugin data (`pk`), when it announces one.
+    pub(crate) fn plugin_data_kbps(&self, server_id: ServerId) -> Option<u32> {
+        lock(&self.state)
+            .servers
+            .get(&server_id)
+            .and_then(ServerRelay::single)
+            .filter(|a| a.ann.allows(RelayUse::PluginData))
+            .and_then(|a| a.ann.plugin_data_kbps)
+    }
+
     /// Whether the relay of `server_id` may carry `relay_use` by its current announcement. Only
     /// a relay that is in use can carry anything, so without one this is `true`: there is no
     /// relayed connection to refuse.
@@ -705,7 +720,7 @@ impl Relays {
             }
             BroadcastTokenRoute::PluginData => {
                 if let Some(engine) = engine() {
-                    engine.plugin_data_broadcast_token(ctx, sharer, id, token);
+                    engine.plugin_relay_broadcast_token(ctx, sharer, id, token);
                 }
             }
             BroadcastTokenRoute::Ignore(reason) => {
@@ -738,25 +753,37 @@ impl Relays {
         }
     }
 
-    /// The announcement of the relay usable for screen sharing, with the bot to ask.
+    /// The announcement of the relay usable for broadcasts of `relay_use` (screen sharing or
+    /// plugin data), with the bot to ask.
     fn broadcast_bot(
         &self,
         server_id: ServerId,
+        relay_use: RelayUse,
     ) -> Result<(u32, RelayAnnouncement), RelayUnavailable> {
         lock(&self.state)
             .servers
             .get(&server_id)
             .ok_or(RelayUnavailable::NoRelay)?
-            .usable_for(RelayUse::ScreenShare)
+            .usable_for(relay_use)
             .map(|a| (a.session, a.ann.clone()))
     }
 
-    /// The relay announcement for joining a broadcast as a viewer.
+    /// The relay announcement for joining a screen-share broadcast as a viewer.
     pub(crate) fn broadcast_announcement(
         &self,
         server_id: ServerId,
     ) -> Result<RelayAnnouncement, RelayUnavailable> {
-        self.broadcast_bot(server_id).map(|(_, ann)| ann)
+        self.broadcast_bot(server_id, RelayUse::ScreenShare)
+            .map(|(_, ann)| ann)
+    }
+
+    /// The relay announcement for joining a plugin-data broadcast as a receiver.
+    pub(crate) fn plugin_broadcast_announcement(
+        &self,
+        server_id: ServerId,
+    ) -> Result<RelayAnnouncement, RelayUnavailable> {
+        self.broadcast_bot(server_id, RelayUse::PluginData)
+            .map(|(_, ann)| ann)
     }
 
     /// Sends a broadcast message to `bot` and registers `rid` for the answer.
@@ -1177,6 +1204,7 @@ impl Engine {
     pub(crate) async fn relay_broadcast_request(
         &self,
         server_id: ServerId,
+        relay_use: RelayUse,
         max: u16,
     ) -> Result<(RelayAnnouncement, BroadcastId, RelayToken), FanoutUnavailable> {
         let ctx = self
@@ -1184,13 +1212,14 @@ impl Engine {
             .map_err(|_| FanoutUnavailable::Relay(RelayUnavailable::NotConnected))?;
         let (bot, ann) = self
             .relays()
-            .broadcast_bot(server_id)
+            .broadcast_bot(server_id, relay_use)
             .map_err(FanoutUnavailable::Relay)?;
         let rid = RequestId::random();
+        // Screen shares leave `k` out, which bots from before plugin data understand.
         let message = PeerMessage::BroadcastRequest {
             rid,
             max,
-            kind: None,
+            kind: (relay_use == RelayUse::PluginData).then_some(relay_use),
         };
         let rx = self
             .relays()
@@ -1214,6 +1243,7 @@ impl Engine {
     pub(crate) async fn relay_broadcast_admit(
         &self,
         server_id: ServerId,
+        relay_use: RelayUse,
         id: BroadcastId,
         viewer: u32,
     ) -> Result<(), BroadcastErrorReason> {
@@ -1222,7 +1252,7 @@ impl Engine {
             .map_err(|_| BroadcastErrorReason::RelayDown)?;
         let (bot, _) = self
             .relays()
-            .broadcast_bot(server_id)
+            .broadcast_bot(server_id, relay_use)
             .map_err(|_| BroadcastErrorReason::RelayDown)?;
         let rid = RequestId::random();
         let message = PeerMessage::BroadcastAdmit { rid, id, viewer };
@@ -1241,11 +1271,17 @@ impl Engine {
     }
 
     /// Tells the relay bot that `viewer` left broadcast `id` (`bcast-kick`); no answer.
-    pub(crate) fn relay_broadcast_kick(&self, server_id: ServerId, id: BroadcastId, viewer: u32) {
+    pub(crate) fn relay_broadcast_kick(
+        &self,
+        server_id: ServerId,
+        relay_use: RelayUse,
+        id: BroadcastId,
+        viewer: u32,
+    ) {
         let Ok(ctx) = self.session_ctx_for(server_id) else {
             return;
         };
-        let Ok((bot, _)) = self.relays().broadcast_bot(server_id) else {
+        let Ok((bot, _)) = self.relays().broadcast_bot(server_id, relay_use) else {
             return;
         };
         let sent = PeerMessage::BroadcastKick { id, viewer }
@@ -1277,20 +1313,6 @@ impl Engine {
     #[doc(hidden)]
     pub fn relay_set_timings(&self, timings: RelayTimings) {
         *lock(&self.relays().timings) = timings;
-    }
-
-    /// The bot's `bcast-tok` for a plugin-data broadcast (`k = plg`, spec 09), already checked
-    /// to come from the pinned bot usable for plugin data. This is the plugin-data side's hook:
-    /// it must take the token only while this client waits to join `sharer`'s plugin-data
-    /// broadcast. No plugin-data broadcast exists in this build, so nothing waits for it.
-    pub(crate) fn plugin_data_broadcast_token(
-        &self,
-        _ctx: &SessionCtx,
-        _sharer: u32,
-        _id: BroadcastId,
-        _token: RelayToken,
-    ) {
-        tracing::debug!("ignoring a broadcast token: no plugin-data broadcast is waiting");
     }
 }
 
@@ -1774,8 +1796,30 @@ mod tests {
     }
 
     #[test]
+    fn plugin_data_needs_its_use_and_reports_the_cap() {
+        let relays = Relays::default();
+        relays.change(1, |relay| {
+            *relay = trusted_relay(announcer(
+                5,
+                BOT,
+                RelayAnnouncement {
+                    uses: Some(vec![RelayUse::PluginData]),
+                    plugin_data_kbps: Some(512),
+                    ..ann(1, RelayState::Up, 1)
+                },
+            ));
+        });
+        assert_eq!(relays.availability_for(1, RelayUse::PluginData), Ok(()));
+        assert_eq!(relays.plugin_data_kbps(1), Some(512));
+        assert_eq!(relays.info(1).uses, [RelayUse::PluginData]);
+    }
+
+    #[test]
     fn broadcast_tokens_go_to_the_side_of_their_kind() {
-        let relays = relays_with_uses(None, Some(10));
+        let relays = relays_with_uses(
+            Some(vec![RelayUse::ScreenShare, RelayUse::PluginData]),
+            Some(10),
+        );
         // A sender with a screen share, plugin data and a camera broadcast at once: each token
         // reaches only its own side.
         assert_eq!(
@@ -1827,14 +1871,21 @@ mod tests {
     }
 
     #[test]
-    fn an_announcement_without_uses_allows_everything() {
+    fn an_announcement_without_uses_allows_everything_but_plugin_data() {
         let relays = relays_with_uses(None, None);
-        for relay_use in ALL_USES {
+        let old_uses = [RelayUse::Images, RelayUse::Files, RelayUse::ScreenShare];
+        for relay_use in old_uses {
             assert_eq!(relays.availability_for(1, relay_use), Ok(()));
             assert!(relays.allows(1, relay_use));
         }
+        // Plugin data is off unless announced (spec 09 FR-9.84).
+        assert_eq!(
+            relays.availability_for(1, RelayUse::PluginData),
+            Err(RelayUnavailable::UseNotAllowed(RelayUse::PluginData))
+        );
+        assert_eq!(relays.plugin_data_kbps(1), None);
         let info = relays.info(1);
-        assert_eq!(info.uses, ALL_USES);
+        assert_eq!(info.uses, old_uses);
         assert_eq!(info.broadcast_max, None);
     }
 
@@ -1885,6 +1936,7 @@ mod tests {
         });
         let info = changed.expect("the panel changes");
         assert_eq!(info.uses, [RelayUse::Images]);
+        assert_eq!(relays.plugin_data_kbps(1), None);
         assert_eq!(info.broadcast_max, None);
     }
 

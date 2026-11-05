@@ -1,5 +1,6 @@
 {
   "share": "Képernyő megosztása",
+  "shareYourScreen": "A saját képernyő megosztása",
   "choosing": "Megosztandó kiválasztása…",
   "stop": "Megosztás leállítása",
   "startFailed": "A képernyőmegosztást nem sikerült elindítani.",
@@ -18,8 +19,6 @@
   "pause": "Szünet",
   "resume": "Folytatás",
   "sound": "Hang megosztása",
-  "noSound": "Linuxon nincs hangmegosztás: a nézők csak a képet látják.",
-  "noSoundForShare": "Ennek a megosztásnak nincs hangja (teljes képernyő vagy nem támogatott rendszerverzió).",
   "viewersNone": "Még senki sem nézi",
   "viewers_one": "{{count}} nézi: {{names}}",
   "viewers_other": "{{count}} nézi: {{names}}",
@@ -79,7 +78,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Az alkalmazás hangjának megosztása",
+    "sound": "Hang",
+    "soundInfo": "Teljes képernyő: a számítógép hangja Mumcord nélkül. Egy ablak: csak az adott alkalmazás hangja.",
+    "soundNeeds": {
+      "windows": "Nincs hang: szükséges hozzá Windows 10 2004-es vagy újabb verziója",
+      "macos": "Nincs hang: szükséges hozzá macOS 13 vagy újabb",
+      "pipewire": "Nincs hang: szükséges hozzá PipeWire"
+    },
     "viewersGet": "A nézők ezt kapják:",
     "viewersGetSummary": "legfeljebb {{resolution}} · {{fps}} kép/s · {{codec}} · kb. {{mbit}} Mbit/s",
     "pathRelay": "A szerver átjátszóján keresztül egyszer kerül elküldésre, az pedig továbbítja legfeljebb {{count}} nézőnek.",
@@ -105,7 +110,18 @@
     "codecBadgeHardware": "{{codec}} · hardveres",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Átjátszó",
-    "pathDirect": "Közvetlen"
+    "pathDirect": "Közvetlen",
+    "soundDesktop": "Hang: asztal",
+    "soundApp": "Hang: {{app}}",
+    "noSound": "Nincs hang",
+    "tipDesktop": "Teljes képernyő: az asztal hangja a Mumcord nélkül.",
+    "tipApp": "Egy ablak: csak az adott alkalmazás hangja.",
+    "tipOff": "A hangkapcsoló ki van kapcsolva.",
+    "tipNone": "Ehhez az ablakhoz a „Nincs hang” lett kiválasztva.",
+    "tipOldWindows": "Nincs hang: Windows 10 2004-es vagy újabb verziója szükséges",
+    "tipOldMacos": "Nincs hang: macOS 13 vagy újabb szükséges",
+    "tipNoPipeWire": "Nincs hang: PipeWire szükséges",
+    "tipCaptureFailed": "A hangrögzítés sikertelen. A videómegosztás folytatódik."
   },
   "qualityMenu": {
     "title": "Minőség",
@@ -218,5 +234,14 @@
     "valueUnavailable": "Nem elérhető",
     "checkAgain": "Újraellenőrzés",
     "checking": "Ellenőrzés…"
+  },
+  "soundPicker": {
+    "title": "Melyik alkalmazás hangja?",
+    "noSound": "Nincs hang",
+    "share": "Hang megosztása",
+    "cancel": "Mégse",
+    "empty": "Jelenleg egyik alkalmazás sem játszik le hangot",
+    "gone": "Az alkalmazás már nem játszik le hangot. Válassz másikat.",
+    "failed": "A választásodat nem sikerült alkalmazni."
   }
 }

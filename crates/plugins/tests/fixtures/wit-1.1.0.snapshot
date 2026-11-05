@@ -19,6 +19,11 @@ current-message: func() -> option<u64>;
 is-replay: func() -> bool;
 replace: func(message: u64, card-id: string) -> result<_, error>;
 hide: func(message: u64) -> result<_, error>;
+enum post-outcome {
+image,
+file-offer,
+}
+post-image: func(png: list<u8>, alt: string) -> result<post-outcome, error>;
 }
 == clock.wit
 interface clock {
@@ -134,6 +139,16 @@ relay-message(tuple<peer, list<u8>>),
 relay-status-changed(relay-status),
 surface-closed(place),
 }
+}
+== files.wit
+interface files {
+use types.{error};
+record picture {
+name: string,
+data: list<u8>,
+}
+save: func(suggested-name: string, data: list<u8>) -> result<bool, error>;
+import-picture: func() -> result<option<picture>, error>;
 }
 == http.wit
 interface http {
@@ -555,6 +570,7 @@ show: func(place: place, entry: string) -> result<_, error>;
 hide: func();
 post: func(message: string) -> result<_, error>;
 set-size-hint: func(min-width: u32, min-height: u32) -> result<_, error>;
+set-status: func(text: string) -> result<_, error>;
 }
 == world.wit
 package mumcord:plugin@1.1.0;
@@ -578,6 +594,7 @@ import stage;
 import app-menu;
 import relay;
 import audio;
+import files;
 export start: func(info: start-info) -> result<_, string>;
 export on-event: func(event: event);
 export stop: func();

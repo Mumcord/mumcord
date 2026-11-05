@@ -88,7 +88,8 @@ pub(crate) struct OwnShare {
 }
 
 impl OwnShare {
-    pub fn new(sound: bool, sound_status: SoundStatus) -> Self {
+    pub fn new(sound: bool, mut sound_status: SoundStatus) -> Self {
+        sound_status.off = !sound;
         Self {
             paused: false,
             sound: sound && sound_status.available(),
@@ -354,10 +355,10 @@ impl Shares {
         current
     }
 
-    /// Hands `sharer`'s answer to the waiting watch request; ignored when nobody asked.
-    pub fn answered(&mut self, sharer: u32, answer: Answer) {
+    /// Hands `sharer`'s answer to the waiting watch request; ignored (false) when nobody asked.
+    pub fn answered(&mut self, sharer: u32, answer: Answer) -> bool {
         let Some(&Watching::Asked { attempt, .. }) = self.watching.get(&sharer) else {
-            return;
+            return false;
         };
         let next = match answer {
             Answer::Accept | Answer::Broadcast(..) => {
@@ -369,6 +370,7 @@ impl Shares {
             // The asking call may have timed out already.
             let _ = reply.send(answer);
         }
+        true
     }
 
     /// `session` is no longer in the user's channel: their share, their watching and the user
@@ -433,7 +435,7 @@ fn elapsed(then: Instant, now: Instant) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::screen_share::sound::{AppName, ShareSoundMode};
+    use crate::screen_share::sound::{AppName, NoSoundReason, ShareSoundMode};
 
     const NEW: ViewerCaps = ViewerCaps {
         av1: true,
@@ -538,7 +540,20 @@ mod tests {
         assert_eq!(view.sound_status, app);
 
         shares.own = Some(OwnShare::new(false, app));
-        assert!(!shares.views(1)[0].sound, "switched off");
+        let view = &shares.views(1)[0];
+        assert!(!view.sound, "switched off");
+        assert_eq!(
+            view.sound_status.no_sound_reason(),
+            Some(NoSoundReason::Off)
+        );
+
+        // With the switch off, a Linux window share is not asked "Which app's sound?": no
+        // source either, but the switch is what the live bar names.
+        shares.own = Some(OwnShare::new(false, SoundStatus::default()));
+        assert_eq!(
+            shares.views(1)[0].sound_status.no_sound_reason(),
+            Some(NoSoundReason::Off)
+        );
     }
 
     #[test]

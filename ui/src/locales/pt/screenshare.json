@@ -1,5 +1,6 @@
 {
   "share": "Partilhar ecrã",
+  "shareYourScreen": "Partilhar o seu ecrã",
   "choosing": "A escolher o que partilhar…",
   "stop": "Parar de partilhar",
   "startFailed": "Não foi possível iniciar a partilha de ecrã.",
@@ -18,8 +19,6 @@
   "pause": "Pausar",
   "resume": "Retomar",
   "sound": "Partilhar som",
-  "noSound": "O Linux não partilha som: os espectadores só veem a imagem.",
-  "noSoundForShare": "Esta partilha não tem som (ecrã inteiro ou versão do sistema não suportada).",
   "viewersNone": "Ainda ninguém está a ver",
   "viewers_one": "{{count}} a ver: {{names}}",
   "viewers_many": "{{count}} a ver: {{names}}",
@@ -81,7 +80,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Partilhar o som da aplicação",
+    "sound": "Som",
+    "soundInfo": "Ecrã inteiro: o som do computador sem o Mumcord. Uma janela: apenas o som dessa aplicação.",
+    "soundNeeds": {
+      "windows": "Sem som: requer Windows 10 versão 2004 ou posterior",
+      "macos": "Sem som: requer macOS 13 ou posterior",
+      "pipewire": "Sem som: requer PipeWire"
+    },
     "viewersGet": "Os espetadores recebem:",
     "viewersGetSummary": "até {{resolution}} · {{fps}} imagens/s · {{codec}} · cerca de {{mbit}} Mbit/s",
     "pathRelay": "Enviado uma só vez pelo retransmissor do servidor, que o passa a até {{count}} espetadores.",
@@ -107,7 +112,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Retransmissor",
-    "pathDirect": "Direto"
+    "pathDirect": "Direto",
+    "soundDesktop": "Som: ambiente de trabalho",
+    "soundApp": "Som: {{app}}",
+    "noSound": "Sem som",
+    "tipDesktop": "Ecrã inteiro: som do ambiente de trabalho sem o Mumcord.",
+    "tipApp": "Uma janela: apenas o som dessa aplicação.",
+    "tipOff": "O interruptor de som está desligado.",
+    "tipNone": "Foi escolhido «Sem som» para esta janela.",
+    "tipOldWindows": "Sem som: requer Windows 10 versão 2004 ou posterior",
+    "tipOldMacos": "Sem som: requer macOS 13 ou posterior",
+    "tipNoPipeWire": "Sem som: requer PipeWire",
+    "tipCaptureFailed": "A captura de áudio falhou. A partilha de vídeo continua."
   },
   "qualityMenu": {
     "title": "Qualidade",
@@ -222,5 +238,14 @@
     "valueUnavailable": "Não disponível",
     "checkAgain": "Verificar novamente",
     "checking": "A verificar…"
+  },
+  "soundPicker": {
+    "title": "O som de que aplicação?",
+    "noSound": "Sem som",
+    "share": "Partilhar som",
+    "cancel": "Cancelar",
+    "empty": "Nenhuma aplicação está a reproduzir som neste momento",
+    "gone": "Essa aplicação deixou de reproduzir som. Escolha outra.",
+    "failed": "Não foi possível aplicar a sua escolha."
   }
 }

@@ -75,7 +75,11 @@
   "unofficialText": "{{repository}} ma jiġix rivedut minn Mumcord. Xorta jaħdem fis-sandbox u jieħu biss il-permessi li inti tippermetti.",
   "checksTitle": "It-tiftixiet uffiċjali xorta japplikaw",
   "checksText": "Il-lista ta' revoka ta' Mumcord tista' titfih. L-ismijiet tal-plugins uffiċjali huma riżervati.",
-  "metaPermissions": "Permessi: {{count}}",
+  "metaPermissions_one": "{{count}} permess",
+  "metaPermissions_two": "{{count}} permessi",
+  "metaPermissions_few": "{{count}} permessi",
+  "metaPermissions_many": "{{count}} permess",
+  "metaPermissions_other": "{{count}} permess",
   "footer": "Repożitorju uffiċjali · lista ffirmata ċċekkjata · xejn dwarek ma jintbagħat",
   "factSource": "Sors: {{url}}",
   "factLicence": "Liċenzja: {{license}}",
@@ -96,5 +100,7 @@
     "unpacking": "Qed jinfetaħ…",
     "starting": "Qed jibda…",
     "announce": "{{name}}: {{percent}}% imniżżel"
-  }
+  },
+  "needsMumcord": "Jeħtieġ Mumcord {{version}} jew aktar ġdid",
+  "updateMumcord": "Aġġorna Mumcord"
 }

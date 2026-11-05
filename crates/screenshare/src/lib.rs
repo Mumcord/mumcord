@@ -27,7 +27,7 @@ mod frame;
 mod hw;
 
 pub use av1_dav1d::Av1Decoder;
-pub use av1_svt::{AV1_TEMPORAL_LAYERS, Av1Encoder, Av1Options};
+pub use av1_svt::{AV1_TEMPORAL_LAYERS, Av1Encoder, Av1Options, av1_cpu_supported};
 pub use codec::{Codec, VideoDecoder, VideoEncoder};
 pub use decoder::Decoder;
 pub use encoder::{EncodedFrame, Encoder, EncoderConfig, TEMPORAL_LAYERS, threads as vp9_threads};

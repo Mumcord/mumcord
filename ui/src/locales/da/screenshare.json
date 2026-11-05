@@ -1,5 +1,6 @@
 {
   "share": "Del skærm",
+  "shareYourScreen": "Del din skærm",
   "choosing": "Vælger, hvad der skal deles…",
   "stop": "Stop deling",
   "startFailed": "Skærmdelingen kunne ikke starte.",
@@ -18,8 +19,6 @@
   "pause": "Pause",
   "resume": "Genoptag",
   "sound": "Del lyd",
-  "noSound": "Linux deler ingen lyd: seerne ser kun billedet.",
-  "noSoundForShare": "Denne deling har ingen lyd (hele skærmen eller en systemversion, der ikke understøttes).",
   "viewersNone": "Ingen ser med endnu",
   "viewers_one": "{{count}} ser med: {{names}}",
   "viewers_other": "{{count}} ser med: {{names}}",
@@ -79,7 +78,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Del appens lyd",
+    "sound": "Lyd",
+    "soundInfo": "Hele skærmen: computerens lyd uden Mumcord. Ét vindue: kun lyden fra den app.",
+    "soundNeeds": {
+      "windows": "Ingen lyd: kræver Windows 10 version 2004 eller nyere",
+      "macos": "Ingen lyd: kræver macOS 13 eller nyere",
+      "pipewire": "Ingen lyd: kræver PipeWire"
+    },
     "viewersGet": "Seerne får:",
     "viewersGetSummary": "op til {{resolution}} · {{fps}} fps · {{codec}} · omkring {{mbit}} Mbit/s",
     "pathRelay": "Sendes én gang via serverens relæ, som videregiver det til op til {{count}} seere.",
@@ -105,7 +110,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relæ",
-    "pathDirect": "Direkte"
+    "pathDirect": "Direkte",
+    "soundDesktop": "Lyd: skrivebord",
+    "soundApp": "Lyd: {{app}}",
+    "noSound": "Ingen lyd",
+    "tipDesktop": "Hele skærmen: skrivebordets lyd uden Mumcord.",
+    "tipApp": "Ét vindue: kun denne apps lyd.",
+    "tipOff": "Lydkontakten er slået fra.",
+    "tipNone": "„Ingen lyd“ blev valgt til dette vindue.",
+    "tipOldWindows": "Ingen lyd: kræver Windows 10 version 2004 eller nyere",
+    "tipOldMacos": "Ingen lyd: kræver macOS 13 eller nyere",
+    "tipNoPipeWire": "Ingen lyd: kræver PipeWire",
+    "tipCaptureFailed": "Lydoptagelsen mislykkedes. Videodelingen fortsætter."
   },
   "qualityMenu": {
     "title": "Kvalitet",
@@ -218,5 +234,14 @@
     "valueUnavailable": "Ikke tilgængelig",
     "checkAgain": "Tjek igen",
     "checking": "Tjekker…"
+  },
+  "soundPicker": {
+    "title": "Hvilken apps lyd?",
+    "noSound": "Ingen lyd",
+    "share": "Del lyd",
+    "cancel": "Annuller",
+    "empty": "Ingen app afspiller lyd lige nu",
+    "gone": "Appen afspiller ikke lyd mere. Vælg en anden.",
+    "failed": "Dit valg kunne ikke anvendes."
   }
 }

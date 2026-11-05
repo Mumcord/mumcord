@@ -78,6 +78,16 @@
       "keys": "↑ ↓ suurus · PageUp/PageDown kinnitumine · Home/End · Enter lähtestab",
       "releaseHint": "Vabasta minimeerimiseks miniribale",
       "minimised": "Meediaala minimeeritud"
+    },
+    "stage": {
+      "tabs": "Mida meediaala näitab",
+      "hint": "Vahetamine ei peata midagi",
+      "share": "Ekraani jagamine",
+      "plugin": "Pistikprogramm",
+      "tabName": "{{label}}, vahekaart {{index}}/{{count}}",
+      "tabNameNew": "{{label}}, uus, vahekaart {{index}}/{{count}}",
+      "pluginTabName": "{{label}}, pistikprogrammi tegevus, vahekaart {{index}}/{{count}}",
+      "pluginTabNameNew": "{{label}}, pistikprogrammi tegevus, uus, vahekaart {{index}}/{{count}}"
     }
   }
 }

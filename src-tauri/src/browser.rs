@@ -51,8 +51,51 @@ pub fn open_url(url: &str) -> io::Result<()> {
     tauri_plugin_opener::open_url(url, None::<&str>).map_err(io::Error::other)
 }
 
+/// Opens `url` and returns once the browser is handed the link, so the caller may exit.
+#[cfg(not(target_os = "linux"))]
+pub fn open_url_before_exit(url: &str) -> io::Result<()> {
+    open_url(url)
+}
+
+/// Opens `url` and returns once a launcher has started, so the caller may exit: the
+/// launcher keeps running on its own, which [`open_url`]'s thread would not after an exit.
+#[cfg(target_os = "linux")]
+pub fn open_url_before_exit(url: &str) -> io::Result<()> {
+    let mut last = io::Error::from(io::ErrorKind::NotFound);
+    for mut launcher in launchers(url) {
+        match launcher.spawn() {
+            Ok(_) => return Ok(()),
+            Err(error) => last = error,
+        }
+    }
+    Err(last)
+}
+
 #[cfg(target_os = "linux")]
 pub fn open_url(url: &str) -> io::Result<()> {
+    let launchers = launchers(url);
+    // `xdg-open` may wait for the browser, so the launchers run on their own thread; a failing
+    // one hands over to the next, like `open::that`. The link itself is never logged.
+    std::thread::Builder::new()
+        .name("open-url".into())
+        .spawn(move || {
+            for mut launcher in launchers {
+                let program = launcher.get_program().to_string_lossy().into_owned();
+                match launcher.status() {
+                    Ok(status) if status.success() => return,
+                    Ok(status) => tracing::warn!(%program, %status, "link launcher failed"),
+                    Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+                    Err(error) => tracing::warn!(%program, %error, "link launcher did not start"),
+                }
+            }
+            tracing::error!("no launcher could open the link");
+        })?;
+    Ok(())
+}
+
+/// The desktop's link launchers for `url`, quiet and with the host's environment.
+#[cfg(target_os = "linux")]
+fn launchers(url: &str) -> Vec<std::process::Command> {
     use std::process::Stdio;
 
     let overrides = std::env::var_os("APPDIR")
@@ -71,23 +114,7 @@ pub fn open_url(url: &str) -> io::Result<()> {
             };
         }
     }
-    // `xdg-open` may wait for the browser, so the launchers run on their own thread; a failing
-    // one hands over to the next, like `open::that`. The link itself is never logged.
-    std::thread::Builder::new()
-        .name("open-url".into())
-        .spawn(move || {
-            for mut launcher in launchers {
-                let program = launcher.get_program().to_string_lossy().into_owned();
-                match launcher.status() {
-                    Ok(status) if status.success() => return,
-                    Ok(status) => tracing::warn!(%program, %status, "link launcher failed"),
-                    Err(error) if error.kind() == io::ErrorKind::NotFound => {}
-                    Err(error) => tracing::warn!(%program, %error, "link launcher did not start"),
-                }
-            }
-            tracing::error!("no launcher could open the link");
-        })?;
-    Ok(())
+    launchers
 }
 
 /// Environment changes that give host programs their own environment back inside an AppImage

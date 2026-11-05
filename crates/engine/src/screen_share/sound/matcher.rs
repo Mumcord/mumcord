@@ -11,6 +11,8 @@ pub struct SoundStream {
     pub app_name: Option<String>,
     pub binary: Option<String>,
     pub desktop_id: Option<String>,
+    /// The freedesktop icon name (`application.icon-name`), only for the list's icon.
+    pub icon_name: Option<String>,
     pub pid: Option<u32>,
 }
 
@@ -19,6 +21,7 @@ pub struct SoundStream {
 pub struct MatchedApp {
     pub app_name: Option<String>,
     pub binary: Option<String>,
+    pub icon_name: Option<String>,
     /// Every process id seen on the app's streams, sorted and without duplicates.
     pub pids: Vec<u32>,
 }
@@ -90,6 +93,7 @@ fn group(
                 let mut app = MatchedApp {
                     app_name: None,
                     binary: None,
+                    icon_name: None,
                     pids: Vec::new(),
                 };
                 merge(&mut app, stream);
@@ -119,6 +123,9 @@ fn merge(app: &mut MatchedApp, stream: &SoundStream) {
     if app.binary.is_none() {
         app.binary.clone_from(&stream.binary);
     }
+    if app.icon_name.is_none() {
+        app.icon_name.clone_from(&stream.icon_name);
+    }
     if let Some(pid) = stream.pid
         && let Err(at) = app.pids.binary_search(&pid)
     {
@@ -136,6 +143,7 @@ mod tests {
             app_name: opt(name),
             binary: opt(bin),
             desktop_id: opt(desktop),
+            icon_name: None,
             pid: Some(pid),
         }
     }

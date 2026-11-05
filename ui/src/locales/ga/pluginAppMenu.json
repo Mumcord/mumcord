@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Breiseáin",
+  "moreItems": "Breiseáin eile…",
+  "subline": "{{plugin}} · Neamhoifigiúil",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Taispeánann míreanna breiseáin ainm an bhreiseáin i gcónaí. Bainistigh iad in Socruithe → Breiseáin.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Ag atosú tar éis fadhb, bain triail eile as ar ball"
 }

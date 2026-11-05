@@ -18,6 +18,39 @@ const NAME_KEY: &str = "manifest.name";
 const DESCRIPTION_KEY: &str = "manifest.description";
 const MAX_NAME_CHARS: usize = 32;
 const MAX_DESCRIPTION_CHARS: usize = 140;
+const MAX_PURPOSE_CHARS: usize = 140;
+
+/// The plugin texts a website purpose key (`net.origins[].purpose`) is resolved in: the app
+/// language, its base language, English, then the key itself.
+pub struct PurposeTexts {
+    tables: Vec<BTreeMap<String, String>>,
+}
+
+impl PurposeTexts {
+    /// The translation files of an installed plugin folder.
+    pub fn from_dir(plugin_dir: &Path, language: &str) -> Self {
+        Self {
+            tables: tables(language, |tag| {
+                read_table(&plugin_dir.join("i18n").join(format!("{tag}.json")))
+            }),
+        }
+    }
+
+    /// The translation files of a package that is not installed (yet).
+    pub fn from_package(package: &Package, language: &str) -> Self {
+        Self {
+            tables: package_tables(package, language),
+        }
+    }
+
+    /// The text of `key`; the key itself when no language file has a usable text for it.
+    pub fn resolve(&self, key: &str) -> String {
+        self.tables
+            .iter()
+            .find_map(|t| clean(t.get(key)?, MAX_PURPOSE_CHARS))
+            .unwrap_or_else(|| key.to_owned())
+    }
+}
 
 /// Name and description in the user's language, as plain text.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -50,15 +83,18 @@ pub fn display_text(manifest: &Manifest, plugin_dir: &Path, language: &str) -> D
 /// The descriptions of the manifest's chat patterns in `language`, read from a package before it
 /// is installed (the install prompt shows them with `chat.patterns`).
 pub fn chat_pattern_descriptions(package: &Package, language: &str) -> Vec<String> {
-    let tables = tables(language, |tag| {
+    pattern_descriptions(&package.manifest, &package_tables(package, language))
+}
+
+fn package_tables(package: &Package, language: &str) -> Vec<BTreeMap<String, String>> {
+    tables(language, |tag| {
         let bytes = package.file(&format!("i18n/{tag}.json"))?;
         if bytes.len() as u64 > MAX_I18N_BYTES {
             tracing::warn!(tag, "plugin translation file too large, ignored");
             return None;
         }
         parse_table(bytes, tag)
-    });
-    pattern_descriptions(&package.manifest, &tables)
+    })
 }
 
 /// Each chat pattern's translated description, falling back to the manifest's own.
@@ -192,5 +228,53 @@ mod tests {
         assert_eq!(display_text(&m, dir.path(), "es").name, "Pets");
         assert_eq!(display_text(&m, dir.path(), "../en").name, "Pets");
         assert_eq!(display_text(&m, dir.path(), "de").name, "Pets");
+    }
+
+    #[test]
+    fn purposes_follow_the_language_then_english_then_the_key() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::create_dir(dir.path().join("i18n")).expect("mkdir");
+        std::fs::write(
+            dir.path().join("i18n/en.json"),
+            r#"{"origins.api":"Loads prices","origins.live":"Live scores"}"#,
+        )
+        .expect("write");
+        std::fs::write(
+            dir.path().join("i18n/de.json"),
+            r#"{"origins.api":"Lädt Preise"}"#,
+        )
+        .expect("write");
+
+        let de = PurposeTexts::from_dir(dir.path(), "de-AT");
+        assert_eq!(de.resolve("origins.api"), "Lädt Preise");
+        assert_eq!(de.resolve("origins.live"), "Live scores");
+        assert_eq!(de.resolve("origins.missing"), "origins.missing");
+
+        let fr = PurposeTexts::from_dir(dir.path(), "fr");
+        assert_eq!(fr.resolve("origins.api"), "Loads prices");
+    }
+
+    #[test]
+    fn unsafe_purpose_text_falls_back() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::create_dir(dir.path().join("i18n")).expect("mkdir");
+        std::fs::write(
+            dir.path().join("i18n/en.json"),
+            r#"{"origins.api":"Prices"}"#,
+        )
+        .expect("write");
+        std::fs::write(
+            dir.path().join("i18n/de.json"),
+            "{\"origins.api\":\"Bad\\u0007\"}",
+        )
+        .expect("write");
+        assert_eq!(
+            PurposeTexts::from_dir(dir.path(), "de").resolve("origins.api"),
+            "Prices"
+        );
+        assert_eq!(
+            PurposeTexts::from_dir(dir.path(), "../en").resolve("origins.api"),
+            "Prices"
+        );
     }
 }

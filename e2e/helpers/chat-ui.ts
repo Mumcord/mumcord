@@ -356,7 +356,7 @@ export async function readClipboard(kind: "text" | "png"): Promise<string> {
 export async function startScreenShare(): Promise<void> {
   await $("button.chat-apps__button").click();
   await $(
-    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
+    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share your screen')]",
   ).click();
   const confirm = $("//dialog//button[normalize-space()='Choose what to share']");
   await confirm.waitForClickable({

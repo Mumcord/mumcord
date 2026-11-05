@@ -75,7 +75,8 @@
   "unofficialText": "Mumcord ei ole tarkastanut tietovarastoa {{repository}}. Lisäosa toimii silti hiekkalaatikossa ja saa vain sallimasi oikeudet.",
   "checksTitle": "Viralliset tarkistukset ovat edelleen voimassa",
   "checksText": "Mumcordin estolista voi poistaa sen käytöstä. Virallisten lisäosien nimet on varattu.",
-  "metaPermissions": "Oikeudet: {{count}}",
+  "metaPermissions_one": "{{count}} oikeus",
+  "metaPermissions_other": "{{count}} oikeutta",
   "footer": "Virallinen lähde · allekirjoitettu luettelo tarkistettu · sinusta ei lähetetä mitään",
   "factSource": "Lähde: {{url}}",
   "factLicence": "Lisenssi: {{license}}",
@@ -96,5 +97,7 @@
     "unpacking": "Puretaan…",
     "starting": "Käynnistetään…",
     "announce": "{{name}}: {{percent}} % ladattu"
-  }
+  },
+  "needsMumcord": "Vaatii Mumcordin version {{version}} tai uudemman",
+  "updateMumcord": "Päivitä Mumcord"
 }

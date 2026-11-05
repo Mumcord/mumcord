@@ -153,17 +153,23 @@ describe("SettingsScreen", () => {
     expect(identity).toHaveFocus();
   });
 
-  it.each(["dark", "light"] as const)("has no axe violations in the %s theme", async (theme) => {
-    await setup(theme);
-    const { container } = renderScreen();
-    for (const name of GROUPS) {
-      fireEvent.click(screen.getByRole("tab", { name }));
-      await waitFor(() => {
-        expect(screen.queryByText("Loading settings…")).not.toBeInTheDocument();
-      });
-      expect(await axeViolations(container)).toEqual([]);
-    }
-  });
+  // Axe scans are CPU-heavy: they pass in seconds alone but can exceed the default 5 s timeout
+  // when the whole suite runs in parallel.
+  it.each(["dark", "light"] as const)(
+    "has no axe violations in the %s theme",
+    async (theme) => {
+      await setup(theme);
+      const { container } = renderScreen();
+      for (const name of GROUPS) {
+        fireEvent.click(screen.getByRole("tab", { name }));
+        await waitFor(() => {
+          expect(screen.queryByText("Loading settings…")).not.toBeInTheDocument();
+        });
+        expect(await axeViolations(container)).toEqual([]);
+      }
+    },
+    30_000,
+  );
 
   it("saves a change immediately and applies theme and language", async () => {
     const update = vi.spyOn(api, "settingsUpdate");

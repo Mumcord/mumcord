@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Wtyczki",
+  "moreItems": "Więcej wtyczek…",
+  "subline": "{{plugin}} · Nieoficjalna",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Pozycje wtyczek zawsze pokazują nazwę wtyczki. Zarządzaj nimi w Ustawienia → Wtyczki.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Ponowne uruchamianie po problemie, spróbuj za chwilę"
 }

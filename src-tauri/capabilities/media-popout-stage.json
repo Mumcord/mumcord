@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "media-popout-stage",
+  "description": "Permissions for the plugin stage pop-out window: engine events only",
+  "windows": ["media-popout-stage"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

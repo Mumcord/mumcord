@@ -78,6 +78,16 @@
       "keys": "↑ ↓ promjena veličine · PageUp/PageDown poravnanje · Home/End · Enter resetira",
       "releaseHint": "Otpusti za smanjenje na malu traku",
       "minimised": "Medijsko područje je smanjeno"
+    },
+    "stage": {
+      "tabs": "Što prikazuje medijsko područje",
+      "hint": "Prebacivanje ništa ne zaustavlja",
+      "share": "Dijeljenje zaslona",
+      "plugin": "Dodatak",
+      "tabName": "{{label}}, kartica {{index}} od {{count}}",
+      "tabNameNew": "{{label}}, novo, kartica {{index}} od {{count}}",
+      "pluginTabName": "{{label}}, aktivnost dodatka, kartica {{index}} od {{count}}",
+      "pluginTabNameNew": "{{label}}, aktivnost dodatka, novo, kartica {{index}} od {{count}}"
     }
   }
 }
