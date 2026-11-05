@@ -35,9 +35,11 @@ pub const POST_WAIT_CAP: Duration = Duration::from_millis(400);
 /// An extension longer than this is not kept when a long name is shortened.
 const MAX_KEPT_EXTENSION: usize = 16;
 
-/// The host calls a gesture can allow, each once per gesture (FR-9.106).
+/// The gesture-bound calls a gesture can allow, each once per gesture (FR-9.45, FR-9.106).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HostCall {
+    /// `webview.show` opening the web dialog (FR-9.40).
+    OpenDialog,
     Save,
     ImportPicture,
     PostImage,
