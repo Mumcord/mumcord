@@ -92,6 +92,7 @@ import {
   type ServerEventName,
   type Unsubscribe,
 } from "./client";
+import { createMockCamera } from "./mockCamera";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
 import { createMockInspector } from "./mockInspector";
 import { createMockPopouts } from "./mockPopout";
@@ -292,16 +293,6 @@ function mockChannelPath(channels: readonly ChannelInfo[], id: number): string[]
   return path;
 }
 const MOCK_FINGERPRINT = "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99";
-
-const MOCK_BUILTIN_BACKGROUNDS = [
-  "beach",
-  "library",
-  "mountains",
-  "night-city",
-  "soft-light",
-  "studio",
-];
-const mockOwnBackgrounds: string[] = [];
 
 const DEFAULT_SETTINGS: Settings = {
   wizardCompleted: false,
@@ -3931,21 +3922,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
     lockScreen: () => Promise.resolve(null),
-    // The browser mock has no camera; the camera UI shows "no camera" (spec 08).
-    cameraDevices: () => Promise.resolve([]),
-    cameraView: () => Promise.resolve(null),
-    cameraPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
-    cameraTurnOn: () => Promise.reject(new EngineError("camera", "busy")),
-    cameraTurnOff: () => Promise.resolve(),
-    cameraLocalPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
-    cameraLocalPreviewStop: () => Promise.resolve(),
-    cameraSetDevice: () => Promise.resolve(null),
-    cameraSetBackground: () => Promise.resolve(null),
-    cameraSetEffectQuality: () => Promise.resolve(),
-    cameraEffects: () =>
-      Promise.resolve({ unavailable: null, level: null, load: null, tooBusy: false }),
-    cameraPreviewAttach: () => Promise.resolve(),
-    cameraPreviewDetach: () => Promise.resolve(),
     // Nobody else has a camera in the browser mock: the room stays empty.
     cameraRoom: (serverId) =>
       Promise.resolve({ serverId, open: false, videosHidden: false, tiles: [] }),
@@ -3958,25 +3934,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     cameraFramesAttach: () => Promise.resolve(),
     cameraFramesDetach: () => Promise.resolve(),
     cameraSetDecodeCodecs: () => Promise.resolve(),
-    // The mock keeps own images in memory and has no thumbnails.
-    cameraBackgrounds: () =>
-      Promise.resolve({
-        builtin: MOCK_BUILTIN_BACKGROUNDS.map((id) => ({ id, thumbnail: null })),
-        own: mockOwnBackgrounds.map((id) => ({ id, thumbnail: null })),
-      }),
-    cameraOwnBackgroundAdd: () => {
-      const id = `own-${String(mockOwnBackgrounds.length + 1)}`;
-      mockOwnBackgrounds.push(id);
-      return Promise.resolve({ id, thumbnail: null });
-    },
-    cameraOwnBackgroundRemove: (id: string) => {
-      const index = mockOwnBackgrounds.indexOf(id);
-      if (index < 0) return Promise.reject(new EngineError("notFound", id));
-      mockOwnBackgrounds.splice(index, 1);
-      return Promise.resolve(null);
-    },
-    cameraDevicesWatchStart: () => Promise.resolve(),
-    cameraDevicesWatchStop: () => Promise.resolve(),
+    ...createMockCamera(
+      emit,
+      () => settings,
+      (next) => {
+        settings = next;
+      },
+    ),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
