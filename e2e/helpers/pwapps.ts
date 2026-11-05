@@ -68,7 +68,7 @@ export function startTestApp(name: string, hz: number): TestApp {
     const play = (): void => {
       if (stopped) return;
       const started = Date.now();
-      const child = spawn(binary, ["--playback", "-P", `application.name=${name}`, wav], {
+      const child = spawn(binary, ["--playback", "-P", `{ application.name = "${name}" }`, wav], {
         stdio: "ignore",
       });
       if (slot < 0) slot = players.push(child) - 1;
