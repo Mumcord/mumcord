@@ -29,11 +29,11 @@ export function RoomHeader({ model }: { model: RoomModel }) {
       </span>
       <span className="cam-room__chips">
         {model.cameraCount >= ROOM_MAX && (
-          <span className="cam-chip" title={t("room.fullTitle")}>
+          <span className="cam-chip" data-tooltip={t("room.fullTitle")}>
             {t("room.limit", { count: model.cameraCount, max: ROOM_MAX })}
           </span>
         )}
-        <span className="cam-chip" data-tone="ok" title={t("room.relayTitle")}>
+        <span className="cam-chip" data-tone="ok" data-tooltip={t("room.relayTitle")}>
           <RoomIcon name="relay" size={12} />
           {t("room.relay")}
         </span>
