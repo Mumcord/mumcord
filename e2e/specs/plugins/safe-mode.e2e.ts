@@ -57,7 +57,7 @@ async function install(id: string): Promise<{ error?: string }> {
     version: null,
     optional: [],
     visibility: "nobody",
-    confirmed: false,
+    confirmed: true,
   });
 }
 
