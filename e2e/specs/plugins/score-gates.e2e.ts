@@ -150,6 +150,7 @@ describe("plugins: confirmation box and the high-risk safety setting (AC-9.34, A
     await app.restart({ env: pluginenv.appEnv() });
     await openPlugins("Installed");
     await expect(installedRow(GROWTH).$("input[role='switch']")).toBeSelected();
-    await expect($(".plugins-safety-note")).toBeDisplayed();
+    // Settings → Plugins has several notes; this is the safety setting's promise.
+    await expect($("p.plugins-safety-note*=Plugins you already installed keep working")).toBeDisplayed();
   });
 });
