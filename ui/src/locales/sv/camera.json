@@ -178,6 +178,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Alternativ för {{name}}",
     "pin": "Fäst för mig",
     "unpin": "Lossa",
     "showLarge": "Visa stort",

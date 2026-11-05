@@ -178,6 +178,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Опции за {{name}}",
     "pin": "Закачи за мен",
     "unpin": "Откачи",
     "showLarge": "Покажи голямо",

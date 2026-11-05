@@ -185,6 +185,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "{{name}} opcijas",
     "pin": "Piespraust man",
     "unpin": "Atspraust",
     "showLarge": "Rādīt lielu",

@@ -192,6 +192,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opcje dla {{name}}",
     "pin": "Przypnij dla mnie",
     "unpin": "Odepnij",
     "showLarge": "Pokaż w dużym rozmiarze",

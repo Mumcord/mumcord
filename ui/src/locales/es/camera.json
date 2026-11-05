@@ -185,6 +185,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opciones para {{name}}",
     "pin": "Fijar para mí",
     "unpin": "Desfijar",
     "showLarge": "Mostrar en grande",

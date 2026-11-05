@@ -178,6 +178,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Επιλογές για {{name}}",
     "pin": "Καρφίτσωμα για μένα",
     "unpin": "Ξεκαρφίτσωμα",
     "showLarge": "Μεγάλη προβολή",

@@ -178,6 +178,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Asetukset: {{name}}",
     "pin": "Kiinnitä minulle",
     "unpin": "Poista kiinnitys",
     "showLarge": "Näytä suurena",
