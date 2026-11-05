@@ -3,6 +3,10 @@
 //! view, audio or plugins start. A failure later, in Tauri's setup hook, would end in a
 //! bare panic message from Tauri.
 //!
+//! When the newer app stored how to undo its changes, the message also offers to roll the
+//! profile back to this version (issue #521): a full backup copy is saved first, the newer
+//! changes are undone and start-up continues.
+//!
 //! The message is English only: the UI language is a setting inside the very database this
 //! app cannot read, and the web view (with the translations) does not run yet.
 
@@ -16,44 +20,85 @@ use crate::{browser, cache_dirs};
 const DOWNLOAD_URL: &str = "https://github.com/Mumcord/mumcord/releases/latest";
 const DOWNLOAD: &str = "Download the latest version";
 const QUIT: &str = "Quit";
+const ROLL_BACK: &str = "Roll back the profile to this version";
 
 #[derive(Debug, PartialEq, Eq)]
 struct NewerProfile {
     found: i64,
     supported: i64,
+    /// The schema version a rollback would leave, when one is possible.
+    rollback_to: Option<i64>,
 }
 
 impl NewerProfile {
     fn message(&self) -> String {
-        format!(
+        let mut message = format!(
             "This profile was created by a newer version of Mumcord (profile version {}, this \
              app supports up to {}). Please install the latest version of Mumcord to use it.\n\n\
              Your profile has not been changed.",
             self.found, self.supported
-        )
+        );
+        if let Some(to) = self.rollback_to {
+            message.push_str(&format!(
+                "\n\nYou can also roll the profile back to this version. Everything the newer \
+                 versions added to it (profile versions {} to {}) will be lost; your servers, \
+                 identities, history and settings from this version stay. A full backup copy of \
+                 the profile is saved next to it first.",
+                to + 1,
+                self.found
+            ));
+        }
+        message
     }
 }
 
 #[derive(Debug, PartialEq, Eq)]
 enum Choice {
     Download,
+    RollBack,
     Quit,
 }
 
 /// Ends the process with the message if the profile is too new; returns otherwise. Must run
 /// before anything opens the database.
+/// Returns as well after the user rolled the profile back.
 pub fn stop_if_newer(identifier: &str) {
-    let Some(newer) = cache_dirs::before_start(identifier).and_then(|dirs| detect(&dirs.data))
-    else {
+    let Some(dirs) = cache_dirs::before_start(identifier) else {
+        return;
+    };
+    let Some(newer) = detect(&dirs.data) else {
         return;
     };
     // Logging starts later; stderr also reaches users who start Mumcord from a terminal.
     eprintln!("{}", newer.message());
-    if can_show_dialog()
-        && ask(&newer) == Choice::Download
-        && let Err(e) = browser::open_url_before_exit(DOWNLOAD_URL)
-    {
-        eprintln!("the download page could not be opened: {e}");
+    if !can_show_dialog() {
+        std::process::exit(1);
+    }
+    match ask(&newer) {
+        Choice::Download => {
+            if let Err(e) = browser::open_url_before_exit(DOWNLOAD_URL) {
+                eprintln!("the download page could not be opened: {e}");
+            }
+        }
+        Choice::RollBack => match store::roll_back(&dirs.data) {
+            Ok(_) => {
+                eprintln!("the profile was rolled back; a backup copy was saved next to it");
+                return;
+            }
+            Err(e) => {
+                let message = format!(
+                    "Rolling the profile back failed: {e}\n\nYour profile has not been changed."
+                );
+                eprintln!("{message}");
+                MessageDialog::new()
+                    .set_level(MessageLevel::Error)
+                    .set_title("Mumcord could not roll back the profile")
+                    .set_description(message)
+                    .set_buttons(MessageButtons::Ok)
+                    .show();
+            }
+        },
+        Choice::Quit => {}
     }
     std::process::exit(1);
 }
@@ -63,7 +108,19 @@ pub fn stop_if_newer(identifier: &str) {
 fn detect(data_dir: &Path) -> Option<NewerProfile> {
     match store::check_schema(data_dir) {
         Ok(()) => None,
-        Err(Error::SchemaTooNew { found, supported }) => Some(NewerProfile { found, supported }),
+        Err(Error::SchemaTooNew { found, supported }) => {
+            let rollback_to = store::rollback_plan(data_dir)
+                .unwrap_or_else(|e| {
+                    eprintln!("checking whether the profile can be rolled back failed: {e}");
+                    None
+                })
+                .map(|plan| plan.to);
+            Some(NewerProfile {
+                found,
+                supported,
+                rollback_to,
+            })
+        }
         Err(e) => {
             eprintln!("checking the profile version failed: {e}");
             None
@@ -90,7 +147,11 @@ fn ask(newer: &NewerProfile) -> Choice {
         .set_level(MessageLevel::Warning)
         .set_title("Mumcord needs an update")
         .set_description(newer.message())
-        .set_buttons(MessageButtons::OkCancelCustom(DOWNLOAD.into(), QUIT.into()))
+        .set_buttons(if newer.rollback_to.is_some() {
+            MessageButtons::YesNoCancelCustom(DOWNLOAD.into(), ROLL_BACK.into(), QUIT.into())
+        } else {
+            MessageButtons::OkCancelCustom(DOWNLOAD.into(), QUIT.into())
+        })
         .show();
     choice(&result)
 }
@@ -100,6 +161,7 @@ fn choice(result: &MessageDialogResult) -> Choice {
     match result {
         MessageDialogResult::Ok => Choice::Download,
         MessageDialogResult::Custom(label) if label == DOWNLOAD => Choice::Download,
+        MessageDialogResult::Custom(label) if label == ROLL_BACK => Choice::RollBack,
         _ => Choice::Quit,
     }
 }
@@ -137,12 +199,14 @@ mod tests {
             newer,
             NewerProfile {
                 found: supported + 4,
-                supported
+                supported,
+                rollback_to: None
             }
         );
         let message = newer.message();
         assert!(message.contains(&format!("profile version {}", supported + 4)));
         assert!(message.contains(&format!("supports up to {supported}")));
+        assert!(!message.contains("roll the profile back"));
 
         assert_eq!(std::fs::read(&path).expect("read"), before);
         assert!(!dir.path().join(format!("{DB_FILE_NAME}-wal")).exists());
@@ -168,5 +232,22 @@ mod tests {
             Choice::Quit
         );
         assert_eq!(choice(&MessageDialogResult::Cancel), Choice::Quit);
+        assert_eq!(
+            choice(&MessageDialogResult::Custom(ROLL_BACK.into())),
+            Choice::RollBack
+        );
+    }
+
+    #[test]
+    fn the_message_explains_what_a_rollback_loses() {
+        let newer = NewerProfile {
+            found: 33,
+            supported: 30,
+            rollback_to: Some(31),
+        };
+        let message = newer.message();
+        assert!(message.contains("roll the profile back to this version"));
+        assert!(message.contains("(profile versions 32 to 33) will be lost"));
+        assert!(message.contains("backup copy"));
     }
 }
