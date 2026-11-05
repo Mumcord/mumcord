@@ -251,8 +251,11 @@ jobs:
 
       # Pull requests only restore: each one saving its own ~1 GB copy filled the 10 GB repository
       # cache and evicted main's caches, so later runs started cold.
+      # Only main saves: PR-scoped caches are unreadable by other PRs, and at 1-1.5 GB each they push
+      # the repository over the 10 GB limit, which evicts the small apt cache.
       - uses: Swatinem/rust-cache@v2
         with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
           key: ${{ matrix.task }}
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
