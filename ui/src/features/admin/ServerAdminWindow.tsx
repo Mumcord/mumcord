@@ -146,6 +146,8 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
   );
   const filtering = query.trim() !== "" || filter !== "all";
 
+  // The compiler skips this component: the virtualizer's functions must not be memoized.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
