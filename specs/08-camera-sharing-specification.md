@@ -147,7 +147,7 @@ The client only displays availability; the bot and relay decide who may create o
   - `not-same-channel`, `denied`: "Camera couldn't start: the server's relay refused it."
   - `relay-down`: "Camera couldn't start: the relay isn't reachable."
   - `rate-limited`: "Camera couldn't start: too many attempts. Try again in a minute."
-- **FR-8.52** A viewer limit reached for one camera (25, `broadcast_full`): the further viewer sees that person's tile as "Too many people are watching {name}" with no video; the client retries `cam-join` when a viewer slot frees up (on the next state announcement), at most once per 10 s.
+- **FR-8.52** A viewer limit reached for one camera (25, `broadcast_full`, or the relay says full): the sender's client sends `full` to that viewer (section 6.5), and the viewer's tile shows "Too many people are watching {name}" with no video. The viewer joins again on the next `on` announcement of that camera; the owner re-announces `on` when a viewer slot frees up. At most one retry per 10 s. A viewer whose `cam-join` gets no answer within 10 s shows "Couldn't join {name}'s camera" and retries every 10 s. "Too many people are watching {name}" appears only after an explicit `full`.
 
 ### 4.7 Receiving and viewer choices
 
@@ -310,7 +310,8 @@ Tile menu (button ⋯, Enter or Shift+F10 on a focused tile; mockup 10): **Pin f
 | Image import | "This image can't be used. Use a PNG, JPEG or WebP file up to 10 MB." |
 | Effects too heavy | "Your PC is too busy for this background effect. Try None." |
 | Viewer can't watch | "You can't see cameras on this server: {reason}" |
-| Viewer limit | "Too many people are watching {name}" |
+| Viewer limit (explicit `full`) | "Too many people are watching {name}" |
+| Join timed out (no answer in 10 s) | "Couldn't join {name}'s camera" (retried every 10 s) |
 | Hidden tile | "Video hidden" + **Show video** |
 
 All texts in `ui/src/locales/en/camera.json` (and touched namespaces); other locales follow the normal translation step.
@@ -411,6 +412,7 @@ stateDiagram-v2
 | `off` | sender → channel | `v` | Also implied when the sender leaves the channel or server |
 | `cam-join` | viewer → sender | `v`, `id`, `codecs` (`av1`, `vp9`) | Accepted only from a same-channel session, not blocked; at most 1 per 10 s per viewer |
 | `cam-leave` | viewer → sender | `v`, `id` | Sender kicks and rekeys |
+| `full` | sender → viewer | `v`, `id` | Sent to a viewer whose `cam-join` was refused because the camera has 25 viewers or the relay said full. The viewer shows "Too many people are watching {name}" and joins again on the next `on` (at most once per 10 s). The owner re-announces `on` when a viewer slot frees up |
 
 New hello feature: `camera` (within the hello limit of 16, spec 06).
 
@@ -458,8 +460,10 @@ stateDiagram-v2
     [*] --> Announced: mumcord.camera on
     Announced --> Joining: cam-join (Show cameras ≠ Never, not hidden, not blocked)
     Joining --> Playing: bcast-tok, bind, key
-    Joining --> Full: broadcast_full
-    Full --> Joining: retry on next state announcement
+    Joining --> Full: broadcast_full or explicit full
+    Joining --> Failed: no answer in 10 s
+    Failed --> Joining: retry every 10 s
+    Full --> Joining: retry on next on announcement (max once per 10 s)
     Playing --> Hidden: Hide video / position Hidden / room closed
     Hidden --> Joining: Show video / room opened
     Playing --> [*]: off / sender left / viewer left channel
@@ -586,6 +590,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Camera state signalling | New plugin data id `mumcord.camera` and hello feature `camera`, announced like screen shares (FR-2.75) | #388 "announced the same way as the screen share state" |
 | Effect quality "Best" | Label is "Best" (not "Best (graphics card)"): square 256×256 Selfie Segmenter on the CPU, no GPU path | User decision after spike CA0, 2026-11-03 (supersedes the mockup label) |
 | Mockups vs. issue text | Mockups win (Send quality options Auto / 720p · 15 fps / 360p · 30 fps; room bar buttons; tile menu wording) | Same rule as spec 07 (user decision 2026-11-02) |
+| Viewer full and failed join (2026-11-05) | Explicit `full` message from the sender shows "Too many people are watching {name}"; no answer to `cam-join` within 10 s shows "Couldn't join {name}'s camera" and retries every 10 s | Product owner decision 2026-11-05; FR-8.52, §5.6, §6.5, §7.2 |
 | Pure client | Works against an unmodified Mumble server; mumpeer and mumbot are the user's own projects and are extended | Project rule |
 | Camera signalling format (#400) | `mumcord.camera` uses **Bovnar** from the start (thin Rust wrapper around the upstream C library; decided as a pinned git dependency on the fork Mumcord/bovnar, since 12b34052 the published crates.io crate `bovnar`; building needs a C compiler). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-8.91, §6.5 |
 
