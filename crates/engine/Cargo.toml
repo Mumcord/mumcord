@@ -13,6 +13,7 @@ mumcord-audio.workspace = true
 mumcord-store.workspace = true
 mumcord-positional.workspace = true
 mumcord-camera.workspace = true
+mumcord-effects.workspace = true
 mumcord-p2p.workspace = true
 mumcord-screenshare.workspace = true
 tokio.workspace = true

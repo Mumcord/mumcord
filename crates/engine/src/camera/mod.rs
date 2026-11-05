@@ -2,9 +2,16 @@
 
 mod admit;
 pub mod avail;
+mod local;
+pub mod preview;
 mod send;
 pub mod session;
 pub mod signal;
 
-pub use send::{FrameEffect, SendEnded};
+pub use mumcord_camera::{CameraDevice, CameraError, DeviceId};
+pub use mumcord_effects::{
+    Background, EffectStats, EffectsError, Level as EffectLevel, Load as EffectLoad,
+};
+pub use preview::{PreviewPicture, PreviewSink};
+pub use send::SendEnded;
 pub use session::{CameraFailure, CameraState, CameraView};
