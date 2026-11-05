@@ -9,13 +9,20 @@
 //! [`TestCamera`] is the debug-build `MUMCORD_TEST_CAMERA` fixture (FR-8.31); it implements the
 //! same trait, so all later pipeline stages run unchanged.
 
+// Format choice, 16:9 crop, conversion to NV12 and MJPEG decoding for the backends that
+// negotiate camera formats themselves. AVFoundation converts and scales on its own.
+#[cfg(target_os = "linux")]
+mod convert;
 mod device;
 #[cfg(target_os = "linux")]
 mod linux;
-// Only the Linux backend reads MJPEG so far; the other backends get it from the OS decoded.
 #[cfg(target_os = "linux")]
 mod mjpeg;
+#[cfg(target_os = "linux")]
+mod mode;
 mod pool;
+#[cfg(target_os = "linux")]
+mod pump;
 mod testcam;
 
 use std::sync::Arc;
