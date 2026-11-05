@@ -20,7 +20,8 @@ use mumcord_store::ServerId;
 
 use super::{PeersState, ServiceIo, wit_peer};
 use crate::api::relay::{
-    self, Availability, Bucket, ENVELOPE_API, MAX_FALLBACK, Path, RelayStatus, SendError,
+    self, Availability, Broadcast, BroadcastState, Bucket, ENVELOPE_API, MAX_FALLBACK, Path,
+    RelayStatus, SendError,
 };
 use crate::api::v1_1::{Up, relay_status};
 use crate::messaging::envelope::{self, HOST_KIND_RELAY};
@@ -41,6 +42,8 @@ pub(in crate::service) struct RelayState {
     told: HashMap<String, RelayStatus>,
     /// Receivers in the own relay broadcast per server, as the engine reports them.
     joined: HashMap<ServerId, Vec<u32>>,
+    /// The own relay broadcast per server, as the engine reports it.
+    broadcast: HashMap<ServerId, Broadcast>,
 }
 
 impl Default for RelayState {
@@ -52,6 +55,7 @@ impl Default for RelayState {
             usage: HashMap::new(),
             told: HashMap::new(),
             joined: HashMap::new(),
+            broadcast: HashMap::new(),
         }
     }
 }
@@ -72,6 +76,7 @@ impl ServiceIo {
         let mut relay = self.relay();
         relay.availability.remove(&server);
         relay.joined.remove(&server);
+        relay.broadcast.remove(&server);
     }
 
     pub(in crate::service) fn relay(&self) -> MutexGuard<'_, RelayState> {
@@ -168,9 +173,19 @@ impl ServiceIo {
                     .filter(|m| receivers.contains(&m.session) && !joined.contains(&m.session))
                     .copied()
                     .collect();
+                let fell_back = fallback && data.len() <= MAX_FALLBACK && !outside.is_empty();
+                // Whether it can arrive while the broadcast starts or is down, before anything
+                // leaves; it counts only once it is sent.
+                let mut broadcast = self
+                    .relay()
+                    .broadcast
+                    .get(&server)
+                    .copied()
+                    .unwrap_or_default();
+                broadcast.accept(data.len(), fell_back, now)?;
                 // The members outside the broadcast first, so a refused fallback (its rate)
                 // sends nothing at all.
-                let outgoing = if fallback && data.len() <= MAX_FALLBACK && !outside.is_empty() {
+                let outgoing = if fell_back {
                     let frame = envelope::encode_host(HOST_KIND_RELAY, &data);
                     Some(
                         connection
@@ -181,7 +196,11 @@ impl ServiceIo {
                 } else {
                     None
                 };
-                take_rate(&mut self.relay())?;
+                {
+                    let mut relay = self.relay();
+                    take_rate(&mut relay)?;
+                    relay.broadcast.insert(server, broadcast);
+                }
                 drop(peers);
                 if let Some(outgoing) = outgoing {
                     self.emit(ServiceEvent::PeerSend {
@@ -196,6 +215,7 @@ impl ServiceIo {
                     api: ENVELOPE_API,
                     data,
                     receivers,
+                    fell_back,
                 });
             }
             Path::Fallback => {
@@ -227,6 +247,13 @@ impl PluginService {
     /// The receivers in the own relay broadcast on `server` (engine `PluginRelayJoined`).
     pub fn set_relay_broadcast_joined(&mut self, server: ServerId, joined: Vec<u32>) {
         self.io.relay().joined.insert(server, joined);
+    }
+
+    /// The own relay broadcast on `server` went live, down or ended (engine
+    /// `PluginRelayBroadcast`).
+    pub fn set_relay_broadcast_state(&mut self, server: ServerId, state: BroadcastState) {
+        let broadcast = Broadcast::reported(state, Instant::now());
+        self.io.relay().broadcast.insert(server, broadcast);
     }
 
     /// The global switch (FR-9.63). The app ends the engine's relay streams itself.
@@ -593,10 +620,45 @@ mod tests {
     }
 
     #[test]
+    fn relay_only_channel_sends_wait_for_the_broadcast_or_fail() {
+        let (io, mut rx) = io();
+        available(&io);
+        // The first send starts the broadcast; it and the next ones wait in its start queue.
+        for _ in 0..8 {
+            io.relay_send_to("dice", Target::Channel, vec![1; 10], false)
+                .expect("queued");
+        }
+        assert_eq!(
+            io.relay_send_to("dice", Target::Channel, vec![1; 10], false),
+            Err(SendError::Error(Error::RateLimited))
+        );
+        assert_eq!(split(&mut rx), (vec![], [2, 4].repeat(8)));
+        // The broadcast could not start: relay-only messages cannot arrive.
+        io.relay().broadcast.insert(
+            SERVER,
+            Broadcast::reported(
+                BroadcastState::Down {
+                    retry_in: std::time::Duration::from_secs(30),
+                },
+                Instant::now(),
+            ),
+        );
+        assert_eq!(
+            io.relay_send_to("dice", Target::Channel, vec![1; 10], false),
+            Err(SendError::Unavailable)
+        );
+        // With the fallback everyone got it through Mumble.
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
+            .expect("fallback");
+        assert_eq!(split(&mut rx), (vec![2, 4], vec![2, 4]));
+    }
+
+    #[test]
     fn channel_sends_share_the_plugin_rate() {
         let (io, mut rx) = io();
         available(&io);
         io.relay().joined.insert(SERVER, vec![2, 4]);
+        io.relay().broadcast.insert(SERVER, Broadcast::Live);
         for _ in 0..16 {
             io.relay_send_to("dice", Target::Channel, vec![0; MAX_MESSAGE], false)
                 .expect("within the burst");

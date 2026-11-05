@@ -18,6 +18,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use tokio::sync::mpsc;
 
+pub use broadcast::PluginBroadcastState;
 pub use envelope::MAX_DATA;
 pub(crate) use pair::accept;
 use pair::{Key, Order, Queue};

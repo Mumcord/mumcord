@@ -616,6 +616,10 @@ pub enum EngineEvent {
     PluginRelayJoined {
         joined: Vec<u32>,
     },
+    /// The own plugin-data broadcast went live, could not start or was lost, or ended (spec 09
+    /// FR-9.60): the plugin service tells a plugin whose channel message cannot arrive instead
+    /// of reporting it sent.
+    PluginRelayBroadcast(crate::plugin_relay::PluginBroadcastState),
     /// A P2P connection to `session` opened (`Some`, with how it travels) or closed (`None`)
     /// (FR-4.19).
     P2pLinkChanged {
