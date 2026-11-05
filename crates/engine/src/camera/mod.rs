@@ -2,6 +2,7 @@
 
 mod admit;
 pub mod avail;
+pub mod backgrounds;
 mod local;
 pub mod preview;
 pub mod recv;
