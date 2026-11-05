@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, State};
 
+use super::camera::{CameraBackground, CameraEffectQuality};
 use super::types::{
     ApiError, ApiResult, ErrorCode, ServerId, to_api_server_id, to_engine_server_id,
 };
@@ -325,6 +326,39 @@ mirror_enum! {
         #[serde(rename = "5")] Mbit5,
         #[serde(rename = "10")] Mbit10,
         #[serde(rename = "20")] Mbit20,
+    }
+}
+
+mirror_enum! {
+    /// Own camera send quality (FR-8.45).
+    CameraSendQuality => CameraSendQuality {
+        #[serde(rename = "auto")] Auto,
+        #[serde(rename = "720p15")] P720F15,
+        #[serde(rename = "360p30")] P360F30,
+    }
+}
+mirror_enum! {
+    /// When other people's cameras are shown (FR-8.75).
+    CameraShow => CameraShow {
+        #[serde(rename = "always")] Always,
+        #[serde(rename = "onOpen")] OnOpen,
+        #[serde(rename = "never")] Never,
+    }
+}
+mirror_enum! {
+    /// "Reduce motion" for the speaking frame; `system` follows the operating system.
+    CameraReduceMotion => CameraReduceMotion {
+        #[serde(rename = "system")] System,
+        #[serde(rename = "on")] On,
+        #[serde(rename = "off")] Off,
+    }
+}
+mirror_enum! {
+    /// Where the camera strip sits while something is shared (FR-8.72).
+    CameraStripPosition => CameraStripPosition {
+        #[serde(rename = "beside")] Beside,
+        #[serde(rename = "above")] Above,
+        #[serde(rename = "hidden")] Hidden,
     }
 }
 
@@ -756,6 +790,26 @@ pub struct Settings {
     pub screen_ask_each_time: bool,
     pub screen_sound: bool,
     pub screen_use_gpu: bool,
+    /// Last used camera (`CameraDevice.id`); `None` uses the system default (FR-8.27).
+    pub camera_device_id: Option<String>,
+    pub camera_send_quality: CameraSendQuality,
+    /// "Mirror my self-view".
+    pub camera_mirror_self: bool,
+    /// Default background of the next preview; "Use this background next time" writes it
+    /// (FR-8.11, FR-8.75).
+    pub camera_default_background: CameraBackground,
+    /// Blur strength 0 (Light) … 100 (Strong); clamped when stored.
+    pub camera_blur_strength: u8,
+    pub camera_effect_quality: CameraEffectQuality,
+    /// "Turn my camera off when my screen locks".
+    pub camera_off_on_lock: bool,
+    pub camera_show: CameraShow,
+    /// "Data saver: up to 15 fps for everyone".
+    pub camera_data_saver: bool,
+    pub camera_reduce_motion: CameraReduceMotion,
+    pub camera_strip_position: CameraStripPosition,
+    /// Global camera hotkey (FR-8.20); `None` is unset.
+    pub camera_hotkey: Option<String>,
 }
 
 impl Settings {
@@ -906,6 +960,18 @@ impl Settings {
             screen_ask_each_time: s.screen_ask_each_time,
             screen_sound: s.screen_sound,
             screen_use_gpu: s.screen_use_gpu,
+            camera_device_id: s.camera_device_id.clone(),
+            camera_send_quality: s.camera_send_quality.into(),
+            camera_mirror_self: s.camera_mirror_self,
+            camera_default_background: s.camera_default_background.clone().into(),
+            camera_blur_strength: s.camera_blur_strength,
+            camera_effect_quality: s.camera_effect_quality.into(),
+            camera_off_on_lock: s.camera_off_on_lock,
+            camera_show: s.camera_show.into(),
+            camera_data_saver: s.camera_data_saver,
+            camera_reduce_motion: s.camera_reduce_motion.into(),
+            camera_strip_position: s.camera_strip_position.into(),
+            camera_hotkey: s.camera_hotkey.clone(),
         }
     }
 
@@ -1057,6 +1123,20 @@ impl Settings {
         s.screen_ask_each_time = self.screen_ask_each_time;
         s.screen_sound = self.screen_sound;
         s.screen_use_gpu = self.screen_use_gpu;
+        s.camera_device_id = self.camera_device_id.clone().filter(|id| !id.is_empty());
+        s.camera_send_quality = self.camera_send_quality.into();
+        s.camera_mirror_self = self.camera_mirror_self;
+        s.camera_default_background = self.camera_default_background.clone().into();
+        s.camera_blur_strength = self
+            .camera_blur_strength
+            .min(store::MAX_CAMERA_BLUR_STRENGTH);
+        s.camera_effect_quality = self.camera_effect_quality.into();
+        s.camera_off_on_lock = self.camera_off_on_lock;
+        s.camera_show = self.camera_show.into();
+        s.camera_data_saver = self.camera_data_saver;
+        s.camera_reduce_motion = self.camera_reduce_motion.into();
+        s.camera_strip_position = self.camera_strip_position.into();
+        s.camera_hotkey = self.camera_hotkey.clone().filter(|key| !key.is_empty());
         s
     }
 }
@@ -1502,6 +1582,68 @@ mod tests {
 
         ui.max_connected_servers = 0;
         assert_eq!(ui.to_store(&base).max_connected_servers, 1);
+    }
+
+    #[test]
+    fn camera_settings_round_trip_with_limits() {
+        let base = store::Settings::default();
+        let mut ui = Settings::from_store(&base);
+        assert_eq!(ui.camera_device_id, None);
+        assert_eq!(ui.camera_send_quality, CameraSendQuality::Auto);
+        assert!(ui.camera_mirror_self && ui.camera_off_on_lock);
+        assert_eq!(ui.camera_default_background, CameraBackground::Blur);
+        assert_eq!(ui.camera_blur_strength, 50);
+        assert_eq!(ui.camera_effect_quality, CameraEffectQuality::Auto);
+        assert_eq!(ui.camera_show, CameraShow::Always);
+        assert_eq!(ui.camera_reduce_motion, CameraReduceMotion::System);
+        assert_eq!(ui.camera_strip_position, CameraStripPosition::Beside);
+
+        ui.camera_device_id = Some("cam-1".into());
+        ui.camera_send_quality = CameraSendQuality::P360F30;
+        ui.camera_mirror_self = false;
+        ui.camera_default_background = CameraBackground::Builtin { id: "beach".into() };
+        ui.camera_blur_strength = 250;
+        ui.camera_effect_quality = CameraEffectQuality::Light;
+        ui.camera_off_on_lock = false;
+        ui.camera_show = CameraShow::OnOpen;
+        ui.camera_data_saver = true;
+        ui.camera_reduce_motion = CameraReduceMotion::On;
+        ui.camera_strip_position = CameraStripPosition::Hidden;
+        ui.camera_hotkey = Some("Ctrl+Shift+V".into());
+        let stored = ui.to_store(&base);
+        assert_eq!(stored.camera_blur_strength, 100);
+        assert_eq!(
+            stored.camera_default_background,
+            store::CameraBackground::Builtin("beach".into())
+        );
+        assert_eq!(
+            stored.camera_send_quality,
+            store::CameraSendQuality::P360F30
+        );
+        assert_eq!(stored.camera_show, store::CameraShow::OnOpen);
+
+        let back = Settings::from_store(&stored);
+        assert_eq!(back.camera_device_id.as_deref(), Some("cam-1"));
+        assert_eq!(back.camera_default_background, ui.camera_default_background);
+        assert_eq!(back.camera_effect_quality, CameraEffectQuality::Light);
+        assert!(!back.camera_mirror_self && !back.camera_off_on_lock && back.camera_data_saver);
+        assert_eq!(back.camera_reduce_motion, CameraReduceMotion::On);
+        assert_eq!(back.camera_strip_position, CameraStripPosition::Hidden);
+        assert_eq!(back.camera_hotkey.as_deref(), Some("Ctrl+Shift+V"));
+
+        let json = serde_json::to_value(&back).expect("settings serialize");
+        assert_eq!(json["cameraSendQuality"], "360p30");
+        assert_eq!(json["cameraShow"], "onOpen");
+        assert_eq!(
+            json["cameraDefaultBackground"],
+            serde_json::json!({ "kind": "builtin", "id": "beach" })
+        );
+
+        ui.camera_device_id = Some(String::new());
+        ui.camera_hotkey = Some(String::new());
+        let cleared = ui.to_store(&base);
+        assert_eq!(cleared.camera_device_id, None);
+        assert_eq!(cleared.camera_hotkey, None);
     }
 
     #[test]

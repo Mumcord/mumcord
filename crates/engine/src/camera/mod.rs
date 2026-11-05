@@ -2,6 +2,7 @@
 
 mod admit;
 pub mod avail;
+pub mod backgrounds;
 mod local;
 #[cfg(target_os = "linux")]
 mod lock_linux;

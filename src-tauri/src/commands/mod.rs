@@ -10,6 +10,7 @@ pub mod audio;
 pub mod blocking;
 pub mod cache;
 pub mod camera;
+pub mod camera_settings;
 pub mod changelog;
 pub mod channel_audio;
 pub mod channels;

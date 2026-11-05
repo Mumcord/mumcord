@@ -293,6 +293,16 @@ function mockChannelPath(channels: readonly ChannelInfo[], id: number): string[]
 }
 const MOCK_FINGERPRINT = "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99";
 
+const MOCK_BUILTIN_BACKGROUNDS = [
+  "beach",
+  "library",
+  "mountains",
+  "night-city",
+  "soft-light",
+  "studio",
+];
+const mockOwnBackgrounds: string[] = [];
+
 const DEFAULT_SETTINGS: Settings = {
   wizardCompleted: false,
   theme: "system",
@@ -402,6 +412,18 @@ const DEFAULT_SETTINGS: Settings = {
   screenSound: true,
   screenAskEachTime: true,
   screenUseGpu: true,
+  cameraDeviceId: null,
+  cameraSendQuality: "auto",
+  cameraMirrorSelf: true,
+  cameraDefaultBackground: { kind: "blur" },
+  cameraBlurStrength: 50,
+  cameraEffectQuality: "auto",
+  cameraOffOnLock: true,
+  cameraShow: "always",
+  cameraDataSaver: false,
+  cameraReduceMotion: "system",
+  cameraStripPosition: "beside",
+  cameraHotkey: null,
 };
 
 /** Fictional titles and covers for the demo party's videos (issue #163). */
@@ -3936,6 +3958,25 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     cameraFramesAttach: () => Promise.resolve(),
     cameraFramesDetach: () => Promise.resolve(),
     cameraSetDecodeCodecs: () => Promise.resolve(),
+    // The mock keeps own images in memory and has no thumbnails.
+    cameraBackgrounds: () =>
+      Promise.resolve({
+        builtin: MOCK_BUILTIN_BACKGROUNDS.map((id) => ({ id, thumbnail: null })),
+        own: mockOwnBackgrounds.map((id) => ({ id, thumbnail: null })),
+      }),
+    cameraOwnBackgroundAdd: () => {
+      const id = `own-${String(mockOwnBackgrounds.length + 1)}`;
+      mockOwnBackgrounds.push(id);
+      return Promise.resolve({ id, thumbnail: null });
+    },
+    cameraOwnBackgroundRemove: (id: string) => {
+      const index = mockOwnBackgrounds.indexOf(id);
+      if (index < 0) return Promise.reject(new EngineError("notFound", id));
+      mockOwnBackgrounds.splice(index, 1);
+      return Promise.resolve(null);
+    },
+    cameraDevicesWatchStart: () => Promise.resolve(),
+    cameraDevicesWatchStop: () => Promise.resolve(),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
