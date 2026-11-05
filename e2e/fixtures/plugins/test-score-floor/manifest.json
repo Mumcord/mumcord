@@ -1,0 +1,23 @@
+{
+  "manifest": 1,
+  "id": "test-score-floor",
+  "name": "Fixture score-floor",
+  "description": "E2E test plugin that reaches the network floor: one website and nothing else that adds much risk.",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "net.origins"]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "https://fixture-a.example",
+        "purpose": "origin_0"
+      }
+    ]
+  }
+}
