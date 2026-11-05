@@ -80,6 +80,7 @@ fn panel() -> ui::El {
         ("open-side", "Open side panel"),
         ("open-dialog", "Open dialog"),
         ("open-popover", "Open popover"),
+        ("open-fourth", "Open dialog and popover"),
         ("close-web", "Close web view"),
         ("run-all", "Run all probes"),
         ("busy", "Busy loop"),
@@ -147,6 +148,13 @@ fn act(action: &str) {
             outcome(action, webview::show(Place::Dialog, "dialog.html"));
         }
         "open-popover" => outcome(action, webview::show(Place::PanelPopover, "panel.html")),
+        // The popover shares the dialog's slot, so with the dialog page up it is a fourth frame
+        // (FR-9.38). Both in one gesture, because the modal dialog covers the panel's buttons.
+        "open-fourth" => {
+            outcome("open-dialog-tree", ui::open_dialog(TITLE));
+            outcome("open-dialog", webview::show(Place::Dialog, "dialog.html"));
+            outcome("open-popover", webview::show(Place::PanelPopover, "panel.html"));
+        }
         "close-web" => {
             webview::hide();
             note(format!("{action}: ok"));

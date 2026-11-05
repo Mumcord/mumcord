@@ -108,8 +108,8 @@ fn send(action: &str, size: usize, fallback: bool, direct: bool) {
     };
     match result {
         Ok(()) => note(format!("{action}: sent #{seq} {size} B")),
-        // The host's own refusals keep their plain names (`RelayUnavailable`).
-        Err(bovnar::Error::Host(e)) => note(format!("{action}: {e:?}")),
+        // The host's own refusals by their WIT names (`relay-unavailable`).
+        Err(bovnar::Error::Host(e)) => note(format!("{action}: {}", e.name())),
         Err(e) => note(format!("{action}: {e}")),
     }
 }
