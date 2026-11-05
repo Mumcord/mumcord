@@ -26,6 +26,7 @@
     "noRelay": "Ta strežnik nima releja, zato deljenje datotek ni na voljo.",
     "filesDisallowed": "Relej tega strežnika ne dovoljuje deljenja datotek.",
     "screenDisallowed": "Relej tega strežnika ne dovoljuje deljenja zaslona.",
+    "camerasDisallowed": "Relej tega strežnika ne dovoljuje deljenja kamere.",
     "imagesDisallowed": "Polna velikost ni na voljo: relej tega strežnika ne dovoljuje slik",
     "noCertificate": "Deljenje datotek zahteva odjemalčevo potrdilo.",
     "modeNeedsRelay": "Deljenje datotek potrebuje relej; tvoja nastavitev peer-to-peer je {{mode}}.",

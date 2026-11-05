@@ -80,7 +80,8 @@
     [
       "specs/files/failures.e2e.ts",
       "specs/chat/follow-limit.e2e.ts",
-      "specs/chat/notification-centre.e2e.ts"
+      "specs/chat/notification-centre.e2e.ts",
+      "specs/plugins/versions.e2e.ts"
     ],
     [
       "specs/chat/message-cards.e2e.ts",
