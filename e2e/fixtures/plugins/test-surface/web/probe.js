@@ -255,6 +255,25 @@ const PROBES = {
       return Promise.resolve("blocked");
     }
   },
+  // Other frames in the app window (this plugin's other places, other plugins): reading their
+  // document must fail like the parent's.
+  "other-frames": () => {
+    let reached = false;
+    try {
+      const frames = window.parent.frames;
+      for (let i = 0; i < frames.length; i++) {
+        if (frames[i] === window) continue;
+        try {
+          if (frames[i].document.body) reached = true;
+        } catch {
+          // a cross-origin frame: blocked, as expected
+        }
+      }
+    } catch {
+      return Promise.resolve("blocked");
+    }
+    return Promise.resolve(reached ? "leaked" : "blocked");
+  },
   storage: async () => {
     try {
       window.localStorage.setItem("probe", "1");
