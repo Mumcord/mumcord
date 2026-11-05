@@ -107,7 +107,7 @@ native(
   "AV1 screen-share decoder, statically linked.",
 );
 // The hardware encoder interfaces are missing on macOS, the VA-API headers everywhere but Linux
-// (scripts/sbom-native.sh).
+// (scripts/sbom-native.sh). ONNX Runtime is in every bundle.
 for (const [key, purl, description] of [
   [
     "nv-codec-headers",
@@ -128,6 +128,11 @@ for (const [key, purl, description] of [
     "libva-headers",
     (v) => `pkg:github/intel/libva@${v}`,
     "VA-API headers for the Linux hardware encoders; the system libva is loaded at runtime.",
+  ],
+  [
+    "onnxruntime",
+    (v) => `pkg:github/microsoft/onnxruntime@v${v}`,
+    "ONNX Runtime (official CPU build) for the camera background effects, bundled as a shared library and loaded at runtime.",
   ],
 ]) {
   const [version] = field(key);

@@ -4,7 +4,7 @@
 # output; the SBOM is assembled later on another runner, which cannot see this host. Usage:
 #   scripts/sbom-native.sh [libvpx-version] > sbom-native-<build>.txt
 # The libvpx version defaults to the one scripts/build-libvpx.sh builds; Windows passes vcpkg's.
-# It adds SVT-AV1, dav1d and, except on macOS, the hardware encoder interfaces at the versions of
+# It adds SVT-AV1, dav1d, ONNX Runtime and, except on macOS, the hardware encoder interfaces at the versions of
 # their build scripts. On Linux it adds what the AppImage bundles from the build host: WebKitGTK, GStreamer, and the
 # plugins in GSTREAMER_PLUGINS_DIR (scripts/filter-gst-plugins.sh).
 set -euo pipefail
@@ -15,6 +15,10 @@ echo "libvpx $libvpx"
 version() { sed -n "s/^$1=//p" "$(dirname "$0")/$2"; }
 echo "svt-av1 $(version SVT_AV1_VERSION build-svt-av1.sh)"
 echo "dav1d $(version DAV1D_VERSION build-dav1d.sh)"
+# ONNX Runtime: the version pinned in the effects crate's download URLs (scripts/stage-onnxruntime.js).
+onnxruntime=$(sed -n 's#.*/onnxruntime/releases/download/v\([0-9.]*\)/.*#\1#p' "$(dirname "$0")/../crates/effects/build.rs" | sort -u)
+[ "$(printf '%s\n' "$onnxruntime" | wc -l)" -eq 1 ] && [ -n "$onnxruntime" ] || { echo "no single ONNX Runtime version in crates/effects/build.rs" >&2; exit 1; }
+echo "onnxruntime $onnxruntime"
 # macOS has no hardware encoder, so it gets none of the hardware encoder interfaces; the VA-API
 # headers are Linux only (scripts/build-hwenc-sdk.sh).
 if [ "$(uname -s)" != Darwin ]; then

@@ -53,11 +53,12 @@ $env:CERTUM_CERT_SHA1 = '<thumbprint>'
 $sign = Join-Path $PWD 'scripts\sign-windows.ps1'
 $overlay = @{ bundle = @{ windows = @{ signCommand = @{ cmd = 'pwsh'; args = @('-NoProfile', '-File', $sign, '%1') } } } } | ConvertTo-Json -Depth 5 -Compress
 Set-Content -Encoding utf8 tauri.signing.json $overlay
-npm run tauri build -- --bundles nsis --config tauri.signing.json
+node scripts/stage-onnxruntime.js
+npm run tauri build -- --bundles nsis --config tauri.signing.json --config src-tauri/tauri.onnxruntime.windows.json
 Remove-Item tauri.signing.json
 ```
 
-This runs the same `signtool` calls as the workflow on `mumcord.exe`, the uninstaller and the installer. To sign or check single files, call the script directly: `pwsh -File scripts/sign-windows.ps1 <file> [<file> …]`. Files signed by hand are not covered by the workflow's later steps: replacing the installer in the draft release also means replacing the portable zip and recreating its updater signature (`.sig`), `latest.json` and `SHA256SUMS`, so prefer re-running the workflow when possible.
+This runs the same `signtool` calls as the workflow on `mumcord.exe`, the uninstaller and the installer. The bundled DLLs (`onnxruntime.dll` for the camera background effects and the Visual C++ runtime it needs) already carry Microsoft's signature; Tauri only signs resources that are unsigned, so they keep it. To sign or check single files, call the script directly: `pwsh -File scripts/sign-windows.ps1 <file> [<file> …]`. Files signed by hand are not covered by the workflow's later steps: replacing the installer in the draft release also means replacing the portable zip and recreating its updater signature (`.sig`), `latest.json` and `SHA256SUMS`, so prefer re-running the workflow when possible.
 
 ### One-time setup (maintainer)
 
@@ -118,8 +119,11 @@ Signing is done by Tauri itself. It needs no server-side change.
 
 - **Identity:** `bundle.macOS.signingIdentity` in `src-tauri/tauri.conf.json` is `-` (ad-hoc).
   The `APPLE_SIGNING_IDENTITY` secret overrides it for signed releases. Tauri signs inside out
-  with that one identity: the app's only executable (the universal `Mumcord` binary; there are
-  no helpers, sidecars or embedded frameworks), then the `.app` bundle.
+  with that one identity: the ONNX Runtime library in `Contents/Frameworks` (camera background
+  effects; `src-tauri/tauri.onnxruntime.macos.json`, staged by `scripts/stage-onnxruntime.js`
+  as one universal file), then the app's only executable (the universal `Mumcord` binary; there
+  are no helpers or sidecars), then the `.app` bundle. The smoke test checks that the library
+  is signed by the same team as the app.
 - **Hardened runtime** (Tauri's default) with `src-tauri/Entitlements.plist`:
   - `com.apple.security.device.audio-input`: the microphone; without it the hardened runtime
     blocks capture.
