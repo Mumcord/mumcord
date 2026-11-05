@@ -12,8 +12,11 @@ export interface MediaFrameProps {
   ref: RefObject<HTMLElement | null>;
   /** Accessible name of the region, e.g. "Watch together – Northern Lights over a Quiet Lake". */
   label: string;
-  /** Top overlay: title, who added it, who is in control, the sync pill. */
-  header: ReactNode;
+  /**
+   * Top overlay: title, who added it, who is in control, the sync pill. Left out while the
+   * combined card's header next to the camera strip carries it (mockups 08–09).
+   */
+  header?: ReactNode;
   /** The picture area. */
   picture: ReactNode;
   /** Bottom overlay controls, in the shared order, before full screen. */
@@ -56,7 +59,7 @@ export function MediaFrame({
       data-fullscreen={fullscreen || undefined}
     >
       <div className="media-frame__picture">{picture}</div>
-      <header className="media-frame__top">{header}</header>
+      {header !== undefined && <header className="media-frame__top">{header}</header>}
       {hint !== undefined && <p className="media-frame__hint">{hint}</p>}
       <div className="media-frame__bottom">
         {seek !== undefined && <div className="media-frame__seek">{seek}</div>}

@@ -1,6 +1,6 @@
 /**
- * The header of the combined layout (FR-8.72, mockups 08–09): the main item's name, "{n} cameras
- * on" and the switch Cameras beside / Above / Hidden, a radio group (spec 08 §5.5).
+ * The header of the combined layout (FR-8.72, mockups 08–09): the main item's name, its own line
+ * and chips (drawn by the share or party view into the slots here), "{n} cameras on" and the switch Cameras beside / Above / Hidden, a radio group (spec 08 §5.5).
  */
 import { useRef, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,9 +18,19 @@ export interface StripHeaderProps {
   title: string;
   cameraCount: number;
   position: CameraStripPosition;
+  /** The main item's own line goes before the camera count, its chips before the switch. */
+  subSlot: (element: HTMLElement | null) => void;
+  chipsSlot: (element: HTMLElement | null) => void;
 }
 
-export function StripHeader({ main, title, cameraCount, position }: StripHeaderProps) {
+export function StripHeader({
+  main,
+  title,
+  cameraCount,
+  position,
+  subSlot,
+  chipsSlot,
+}: StripHeaderProps) {
   const { t } = useTranslation("camera");
   return (
     <header className="cam-room__head cam-combined__head">
@@ -29,9 +39,13 @@ export function StripHeader({ main, title, cameraCount, position }: StripHeaderP
       </span>
       <span className="cam-room__titles">
         <h2 className="cam-room__title">{title}</h2>
-        <span className="cam-room__sub">{t("room.cameras", { count: cameraCount })}</span>
+        <span className="cam-room__sub">
+          <span ref={subSlot} className="cam-combined__slot" />
+          {t("room.cameras", { count: cameraCount })}
+        </span>
       </span>
       <span className="cam-room__chips">
+        <span ref={chipsSlot} className="cam-combined__slot" />
         <PositionSwitch position={position} />
       </span>
     </header>

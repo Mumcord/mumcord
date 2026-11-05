@@ -1,11 +1,14 @@
 /** The camera strip next to a screen share or watch party (spec 08 §5.4, FR-8.71–8.74). */
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { createPortal } from "react-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CameraTile, MockApi } from "../../../api";
 import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll } from "../../channels/testUtils";
 import { closeMedia, openMedia, resetMediaView, selectStage } from "../../media/mediaView";
+import { useCombinedHeader } from "../../media/combinedHeader";
 import { resetPopoutStore } from "../../media/popoutStore";
+import { StageTabs } from "../../media/StageTabs";
 import { resetCameraDecode } from "./cameraDecode";
 import { resetRoomChoices } from "./roomChoices";
 import { resetCameraRoomStore } from "./roomStore";
@@ -53,6 +56,23 @@ function FakeShare() {
       }}
       data-testid="share"
     />
+  );
+}
+
+/** Stands in for the share view in combined mode: its line and a chip go into the one header. */
+function HeaderShare() {
+  const slots = useCombinedHeader();
+  return (
+    <div data-testid="share">
+      {slots !== null && createPortal("Window · since 07:44 · ", slots.sub)}
+      {slots !== null &&
+        createPortal(
+          <button type="button" className="cam-chip">
+            Stream details
+          </button>,
+          slots.chips,
+        )}
+    </div>
   );
 }
 
@@ -124,6 +144,46 @@ describe("camera strip", () => {
     await waitFor(() => {
       expect(hide).toHaveBeenLastCalledWith(1, true);
     });
+  });
+
+  it("has one header with the share's line, its chips and the switch (mockup 08)", async () => {
+    render(
+      <>
+        <StageTabs />
+        <StripLayout>
+          <HeaderShare />
+        </StripLayout>
+      </>,
+    );
+    act(() => {
+      api.mock.setCameraView({
+        serverId: 1,
+        state: "onAir",
+        error: null,
+        broadcast: "00",
+        viewers: [],
+      });
+    });
+    combined();
+    await screen.findByRole("radiogroup", { name: "Cameras" });
+    const header = document.querySelector<HTMLElement>(".cam-combined__head");
+    if (header === null) throw new Error("no combined header");
+    expect(header.querySelector(".cam-room__sub")).toHaveTextContent(
+      "Window · since 07:44 · 3 cameras on",
+    );
+    const chip = screen.getByRole("button", { name: "Stream details" });
+    const radios = screen.getByRole("radiogroup", { name: "Cameras" });
+    expect(header).toContainElement(chip);
+    expect(chip.compareDocumentPosition(radios) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // The camera room has no tab of its own while it is the strip, so no tab row is left.
+    expect(screen.queryByRole("tablist")).toBeNull();
+    // The self-view comes first in the strip.
+    expect(screen.getAllByRole("group", { name: /camera/ })[0]).toHaveAccessibleName(/^You/);
+
+    act(() => {
+      closeMedia("share");
+    });
+    expect(screen.queryByText(/Window · since/)).toBeNull();
   });
 
   it("moves through the positions with the arrow keys", async () => {
