@@ -190,6 +190,7 @@ pub fn collect_info(app_version: &str) -> DiagnosticInfo {
 }
 
 struct Shared {
+    sink: Arc<Mutex<Sink>>,
     ring: Mutex<VecDeque<String>>,
     level: reload::Handle<LevelFilter, Registry>,
 }
@@ -205,9 +206,35 @@ fn lock<T>(m: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 }
 
 /// Layer that redacts, formats, writes to the rotating file and keeps the in-memory ring.
+/// Where formatted lines go. `Pending` holds the lines logged before the log directory and
+/// level are known, so nothing from start-up is lost and nothing is written to disk before the
+/// profile has been checked.
+enum Sink {
+    Pending(Vec<String>),
+    File(RollingFileAppender),
+}
+
+impl Sink {
+    fn write_line(&mut self, line: &str) {
+        match self {
+            Self::Pending(lines) => {
+                if lines.len() < RING_CAPACITY {
+                    lines.push(line.to_owned());
+                }
+            }
+            Self::File(file) => {
+                if let Err(err) = file.write_all(format!("{line}\n").as_bytes()) {
+                    // Stderr is the only place left when the log file itself fails.
+                    eprintln!("mumcord: writing log file failed: {err}");
+                }
+            }
+        }
+    }
+}
+
 struct DiagLayer {
     shared: Arc<Shared>,
-    file: Mutex<RollingFileAppender>,
+    file: Arc<Mutex<Sink>>,
 }
 
 impl<S: Subscriber> Layer<S> for DiagLayer {
@@ -223,11 +250,7 @@ impl<S: Subscriber> Layer<S> for DiagLayer {
             }
             ring.push_back(line.clone());
         }
-        line.push('\n');
-        if let Err(err) = lock(&self.file).write_all(line.as_bytes()) {
-            // Stderr is the only place left when the log file itself fails.
-            eprintln!("mumcord: writing log file failed: {err}");
-        }
+        lock(&self.file).write_line(&line);
     }
 }
 
@@ -283,38 +306,65 @@ fn timestamp() -> String {
     format!("{}.{:03}", d.as_secs(), d.subsec_millis())
 }
 
-fn build(
-    logs_dir: &Path,
-    level: LogLevel,
-    max_files: usize,
-) -> anyhow::Result<(impl Subscriber + Send + Sync + 'static, Arc<Shared>)> {
-    let appender = RollingFileAppender::builder()
+fn open_appender(logs_dir: &Path, max_files: usize) -> anyhow::Result<RollingFileAppender> {
+    Ok(RollingFileAppender::builder()
         .rotation(Rotation::DAILY)
         .filename_prefix(LOG_PREFIX)
         .filename_suffix(LOG_SUFFIX)
         .max_log_files(max_files)
-        .build(logs_dir)?;
+        .build(logs_dir)?)
+}
+
+fn build_with(
+    sink: Sink,
+    level: LogLevel,
+) -> (impl Subscriber + Send + Sync + 'static, Arc<Shared>) {
     let (filter, level_handle) = reload::Layer::new(level.filter());
+    let sink = Arc::new(Mutex::new(sink));
     let shared = Arc::new(Shared {
+        sink: Arc::clone(&sink),
         ring: Mutex::new(VecDeque::with_capacity(RING_CAPACITY)),
         level: level_handle,
     });
     let layer = DiagLayer {
         shared: Arc::clone(&shared),
-        file: Mutex::new(appender),
+        file: sink,
     };
-    Ok((Registry::default().with(filter).with(layer), shared))
+    (Registry::default().with(filter).with(layer), shared)
 }
 
-/// Starts logging into `logs_dir` (created if missing) as the global tracing subscriber.
-/// Keeps at most `max_files` daily files. Call once at app start.
-pub fn init(logs_dir: &Path, level: LogLevel, max_files: usize) -> anyhow::Result<()> {
-    std::fs::create_dir_all(logs_dir)?;
-    let (subscriber, shared) = build(logs_dir, level, max_files)?;
+/// Starts logging into memory only, as the global tracing subscriber, so lines logged before
+/// the log directory and level are known are kept. Writes nothing to disk; call [`attach_file`]
+/// once the profile has been checked. Call once at app start.
+pub fn init_early() -> anyhow::Result<()> {
+    let (subscriber, shared) = build_with(Sink::Pending(Vec::new()), LogLevel::Info);
     tracing::subscriber::set_global_default(subscriber)?;
     GLOBAL
         .set(shared)
         .map_err(|_| anyhow::anyhow!("logging already initialised"))
+}
+
+/// Opens the log file in `logs_dir` (created if missing), writes the lines kept since
+/// [`init_early`] and sets the level. Keeps at most `max_files` daily files.
+pub fn attach_file(logs_dir: &Path, level: LogLevel, max_files: usize) -> anyhow::Result<()> {
+    let shared = GLOBAL
+        .get()
+        .ok_or_else(|| anyhow::anyhow!("logging not initialised"))?;
+    std::fs::create_dir_all(logs_dir)?;
+    attach(shared, logs_dir, max_files)?;
+    set_log_level(level)
+}
+
+fn attach(shared: &Shared, logs_dir: &Path, max_files: usize) -> anyhow::Result<()> {
+    let mut appender = open_appender(logs_dir, max_files)?;
+    let mut sink = lock(&shared.sink);
+    if let Sink::Pending(lines) = &*sink {
+        for line in lines {
+            appender.write_all(format!("{line}\n").as_bytes())?;
+        }
+    }
+    *sink = Sink::File(appender);
+    Ok(())
 }
 
 /// Changes the log level at runtime (settings `logLevel`).
@@ -463,9 +513,29 @@ mod tests {
 
     fn capture(level: LogLevel, f: impl FnOnce()) -> (tempfile::TempDir, Arc<Shared>) {
         let dir = tempfile::tempdir().unwrap();
-        let (sub, shared) = build(dir.path(), level, 7).unwrap();
+        let (sub, shared) = build_with(Sink::Pending(Vec::new()), level);
+        attach(&shared, dir.path(), 7).unwrap();
         tracing::subscriber::with_default(sub, f);
         (dir, shared)
+    }
+
+    #[test]
+    fn early_lines_reach_the_log_file_once_it_is_attached() {
+        let dir = tempfile::tempdir().unwrap();
+        let (sub, shared) = build_with(Sink::Pending(Vec::new()), LogLevel::Info);
+        tracing::subscriber::with_default(sub, || {
+            tracing::info!("CPU without AVX2, self-test skipped");
+        });
+        let log_files = |d: &Path| std::fs::read_dir(d).unwrap().count();
+        assert_eq!(log_files(dir.path()), 0, "nothing is written before attach");
+
+        attach(&shared, dir.path(), 7).unwrap();
+        let on_disk: String = std::fs::read_dir(dir.path())
+            .unwrap()
+            .filter_map(Result::ok)
+            .map(|e| std::fs::read_to_string(e.path()).unwrap())
+            .collect();
+        assert!(on_disk.contains("CPU without AVX2, self-test skipped"));
     }
 
     /// Writes the diagnostic file and parses it back.
@@ -680,7 +750,7 @@ mod tests {
             )
             .unwrap();
         }
-        let _ = build(dir.path(), LogLevel::Info, 3).unwrap();
+        let _ = open_appender(dir.path(), 3).unwrap();
         let count = std::fs::read_dir(dir.path()).unwrap().count();
         assert!(count <= 3, "{count} files kept");
     }
