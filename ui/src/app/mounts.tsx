@@ -36,6 +36,7 @@ import {
   useChannelPresence,
 } from "../features/members";
 import { ShareMiniBar, SharerBar } from "../features/screenshare";
+import { CameraMiniBar, CameraRoomSync } from "../features/camera/room";
 import {
   VideoDucking,
   WatchHeaderActions,
@@ -79,6 +80,9 @@ const WatchTogetherView = lazy(() =>
 );
 const WatchPartyPanel = lazy(() =>
   import("../features/watchparty/WatchPartyPanel").then((m) => ({ default: m.WatchPartyPanel })),
+);
+const CameraRoomPanel = lazy(() =>
+  import("../features/camera/room/CameraRoomPanel").then((m) => ({ default: m.CameraRoomPanel })),
 );
 const ScreenShareView = lazy(() =>
   import("../features/screenshare/ScreenShareView").then((m) => ({ default: m.ScreenShareView })),
@@ -196,6 +200,13 @@ export function ChatMount() {
             </LazyBoundary>
           </StagePanel>
         )}
+        {view.stage.includes("camera") && (
+          <StagePanel id="camera">
+            <LazyBoundary>
+              <CameraRoomPanel serverId={serverId} onTurnOn={null} />
+            </LazyBoundary>
+          </StagePanel>
+        )}
       </MediaArea>
     );
   // The channel header always stays at the very top (issue #163): the sharer bar, the mini bars
@@ -206,6 +217,8 @@ export function ChatMount() {
         <SharerBar />
         {view.mini.watch && <WatchMiniBar serverId={serverId} />}
         {view.mini.share && <ShareMiniBar serverId={serverId} />}
+        <CameraMiniBar serverId={serverId} />
+        <CameraRoomSync serverId={serverId} />
         <PluginMiniBars />
         <PluginActivityLines />
       </>

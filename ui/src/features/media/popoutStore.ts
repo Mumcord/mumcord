@@ -154,7 +154,9 @@ export function isStagePoppedOut(current: MediaPopoutState, plugin: string): boo
 /** The kind of pop-out this window is, from its address (`?window=media-popout&kind=…`). */
 export function popoutKindOf(search: string): MediaPopoutKind | null {
   const kind = new URLSearchParams(search).get("kind");
-  return kind === "watch" || kind === "share" || kind === "stage" ? kind : null;
+  return kind === "watch" || kind === "share" || kind === "stage" || kind === "camera"
+    ? kind
+    : null;
 }
 
 /**

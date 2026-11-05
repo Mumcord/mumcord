@@ -100,7 +100,11 @@
     "live": "Your camera is live",
     "stopped": "Your camera stopped",
     "joined": "{{name}} turned their camera on",
-    "left": "{{name}} turned their camera off"
+    "left": "{{name}} turned their camera off",
+    "turnedOn_one": "{{names}} turned on their camera",
+    "turnedOn_other": "{{names}} turned on their cameras",
+    "turnedOff_one": "{{names}} turned off their camera",
+    "turnedOff_other": "{{names}} turned off their cameras"
   },
   "room": {
     "title": "Camera room",
@@ -133,7 +137,8 @@
     "miniBar_one": "{{count}} camera on",
     "cameras": "Cameras",
     "label_other": "Camera room, {{count}} cameras on",
-    "miniBar_other": "{{count}} cameras on"
+    "miniBar_other": "{{count}} cameras on",
+    "fullTitle": "The room is full at 9 cameras"
   },
   "position": {
     "label": "Cameras",
@@ -156,7 +161,8 @@
     "retry": "Try again",
     "hidden": "Video hidden",
     "showVideo": "Show video",
-    "viewing": "Viewing"
+    "viewing": "Viewing",
+    "weak": "Weak connection"
   },
   "tileMenu": {
     "pin": "Pin for me",

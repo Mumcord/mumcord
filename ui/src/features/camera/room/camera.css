@@ -1,0 +1,420 @@
+/*
+ * The camera room (spec 08 §4.8, mockups 05–07). Like the media frame, the room keeps its dark
+ * picture background and light text in every theme (FR-8.70); everything else comes from the
+ * theme tokens.
+ */
+.cam-room {
+  --media-scrim: rgb(8 6 20 / 72%);
+  --media-on-scrim: #fff;
+  --media-on-scrim-muted: rgb(255 255 255 / 72%);
+  --media-glass: rgb(16 12 36 / 62%);
+  --media-glass-border: rgb(255 255 255 / 16%);
+  --cam-talk: #3ee39e;
+  --cam-off: #ff8f8f;
+  --cam-live: #e5484d;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: #0c0920;
+  box-shadow: var(--shadow-raised);
+  color: var(--media-on-scrim);
+}
+
+.media-popout .cam-room,
+.cam-room[data-fullscreen] {
+  height: 100%;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* --- Header ------------------------------------------------------------------------------- */
+.cam-room__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.cam-room__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--gradient-accent);
+  color: #fff;
+}
+
+.cam-room__titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cam-room__title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.cam-room__sub {
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+}
+
+.cam-room__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  margin-left: auto;
+}
+
+.cam-chip {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.cam-chip[data-tone="ok"] {
+  border-color: var(--cam-talk);
+  color: var(--cam-talk);
+}
+
+.cam-seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+}
+
+.cam-seg button {
+  height: 1.75rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--media-on-scrim-muted);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.cam-seg button[aria-checked="true"] {
+  background: #fff;
+  color: #120d2b;
+  font-weight: var(--font-weight-bold);
+}
+
+/* --- Tiles -------------------------------------------------------------------------------- */
+
+/* The tiles' area; with a chosen media area height it takes that height (spec 07 §4.9). */
+.cam-room .cam-room__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  aspect-ratio: auto;
+  overflow: visible;
+}
+
+.media-area[data-sized] .cam-room:not([data-fullscreen]) .cam-room__stage {
+  height: var(--media-height);
+}
+
+.media-popout .cam-room__stage,
+.cam-room[data-fullscreen] .cam-room__stage {
+  flex: 1;
+}
+
+.cam-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), 1fr);
+  gap: var(--space-2);
+  max-width: 100%;
+}
+
+.cam-tile {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #15112b;
+}
+
+.cam-tile:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.cam-tile[data-speaking] {
+  box-shadow:
+    0 0 0 3px var(--color-talking),
+    0 0 18px color-mix(in srgb, var(--color-talking) 45%, transparent);
+}
+
+/* Reduce motion (system or the app's switch): a plain green border, no glow (spec 08 §5.7). */
+.cam-room[data-reduce-motion] .cam-tile[data-speaking] {
+  box-shadow: 0 0 0 3px var(--color-talking);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cam-tile[data-speaking] {
+    box-shadow: 0 0 0 3px var(--color-talking);
+  }
+}
+
+.cam-video {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #111;
+}
+
+.cam-video > canvas,
+.cam-video > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Only the own view is mirrored; others see the picture the right way round (FR-8.66). */
+.cam-video[data-mirror] > canvas,
+.cam-video[data-mirror] > img {
+  transform: scaleX(-1);
+}
+
+.cam-tile__name {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-2);
+  z-index: 2;
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  max-width: calc(100% - 1rem);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--media-scrim);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.cam-tile__name > span {
+  display: inline-flex;
+}
+
+.cam-tile__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cam-tile__name [data-talk] {
+  color: var(--cam-talk);
+}
+
+.cam-tile__name [data-off] {
+  color: var(--cam-off);
+}
+
+.cam-tile__badges {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2;
+  display: flex;
+  gap: var(--space-1);
+}
+
+.cam-tile__badge {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--media-scrim);
+  color: var(--media-on-scrim);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.cam-tile__badge[data-tone="warn"] {
+  color: #ffd27a;
+}
+
+.cam-tile__badge[data-tone="live"] {
+  background: var(--cam-live);
+  color: #fff;
+}
+
+/* A tile without a picture: who it is and why (joining, full, couldn't join, hidden). */
+.cam-tile__off {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-2);
+  /* Leaves the bottom free for the name tag. */
+  padding: var(--space-3) var(--space-3) 2.25rem;
+  background: #1b1636;
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.cam-tile__off .avatar {
+  margin: 0 auto;
+}
+
+/* --- Speaker layout ------------------------------------------------------------------------- */
+.cam-speaker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+}
+
+.cam-speaker__large {
+  max-width: 100%;
+}
+
+.cam-strip--row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.cam-strip--row .cam-tile {
+  width: 11rem;
+}
+
+/* --- People without a camera and the room bar ------------------------------------------------ */
+.cam-room__others {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+}
+
+.cam-room__stack {
+  display: inline-flex;
+}
+
+.cam-room__stack .avatar {
+  box-shadow: 0 0 0 2px #0c0920;
+}
+
+.cam-room__stack .avatar + .avatar {
+  margin-left: -6px;
+}
+
+.cam-room__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+}
+
+.cam-btn {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  height: 2.25rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.cam-btn:hover {
+  background: rgb(255 255 255 / 14%);
+}
+
+.cam-btn:focus-visible,
+.cam-seg button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cam-btn[aria-pressed="true"] {
+  background: rgb(255 255 255 / 16%);
+}
+
+.cam-btn--icon {
+  justify-content: center;
+  width: 2.25rem;
+  padding: 0;
+}
+
+.cam-btn--small {
+  height: 1.75rem;
+  font-size: var(--font-size-xs);
+}
+
+.cam-btn--onair {
+  border-color: var(--cam-live);
+  background: rgb(229 72 77 / 22%);
+}
+
+.cam-btn--onair[aria-pressed="true"] {
+  background: rgb(229 72 77 / 22%);
+}
+
+.cam-btn--onair .cam-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #ff5c61;
+  box-shadow: 0 0 0 3px rgb(255 92 97 / 30%);
+}
+
+.cam-btn--leave {
+  border-color: var(--cam-off);
+  color: var(--cam-off);
+}
+
+@media (forced-colors: active) {
+  .cam-tile[data-speaking] {
+    outline: 3px solid Highlight;
+  }
+
+  .cam-btn,
+  .cam-chip,
+  .cam-seg button[aria-checked="true"] {
+    border: 1px solid ButtonText;
+  }
+}
