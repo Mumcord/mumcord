@@ -13,7 +13,7 @@ use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use mumcord_protocol::{
-    DenyKind, PermissionDenied, ServerState, TextMessage, TextTarget, permissions,
+    DenyKind, PermissionDenied, ServerState, TextMessage, TextTarget, User, permissions,
 };
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
 
@@ -293,15 +293,12 @@ pub(crate) fn on_text(
 ) -> Option<String> {
     let routed = ctx.handle.with_state(|s| {
         let route = route(s, msg)?;
-        let sender = msg.actor.and_then(|a| s.users.get(&a));
-        Some((
-            route,
-            sender.map(|u| u.name.clone()).unwrap_or_default(),
-            sender.and_then(|u| u.cert_hash.clone()),
-            is_own_sender(s, msg.actor),
-        ))
+        Some((route, is_own_sender(s, msg.sender.as_ref())))
     });
-    let (route, sender_name, sender_cert_hash, own) = routed?;
+    let (route, own) = routed?;
+    let sender = msg.sender.as_ref();
+    let sender_name = sender.map(|u| u.name.clone()).unwrap_or_default();
+    let sender_cert_hash = sender.and_then(|u| u.cert_hash.clone());
     let conversation = match route {
         Route::Channel(channel_id) => ConversationRef::Channel { channel_id },
         Route::Private { session } => match &sender_cert_hash {
@@ -324,9 +321,7 @@ pub(crate) fn on_text(
         synced_from: None,
         file: None,
     };
-    let blocked = msg
-        .actor
-        .is_some_and(|a| crate::blocking::is_blocked(ctx, block_list, a));
+    let blocked = sender.is_some_and(|u| crate::blocking::is_blocked_user(ctx, block_list, u));
     let private = matches!(route, Route::Private { .. });
     let verdict = crate::blocking::text_verdict(private, blocked);
     if verdict == crate::blocking::TextVerdict::Drop {
@@ -369,15 +364,15 @@ pub(crate) fn on_text(
 
 /// Whether `actor` is the user's own session or another session with the user's certificate:
 /// those messages are the user's own and never notify (issue #215).
-fn is_own_sender(state: &ServerState, actor: Option<u32>) -> bool {
-    let Some(actor) = actor else {
+fn is_own_sender(state: &ServerState, sender: Option<&User>) -> bool {
+    let Some(sender) = sender else {
         return false;
     };
-    if state.session == Some(actor) {
+    if state.session == Some(sender.session) {
         return true;
     }
     let own_hash = state.own_user().and_then(|u| u.cert_hash.as_deref());
-    own_hash.is_some() && state.users.get(&actor).and_then(|u| u.cert_hash.as_deref()) == own_hash
+    own_hash.is_some() && sender.cert_hash.as_deref() == own_hash
 }
 
 /// Stores, emits and counts an incoming message; also used for held message requests once
@@ -971,6 +966,7 @@ mod tests {
     fn text(actor: Option<u32>, target: TextTarget) -> TextMessage {
         TextMessage {
             actor,
+            sender: None,
             target,
             message: "hi".into(),
         }
@@ -1040,13 +1036,20 @@ mod tests {
                 ..Default::default()
             },
         );
-        assert!(is_own_sender(&s, Some(10)), "own session");
+        assert!(is_own_sender(&s, s.users.get(&10)), "own session");
         assert!(
-            is_own_sender(&s, Some(11)),
+            is_own_sender(&s, s.users.get(&11)),
             "second session, same certificate"
         );
-        assert!(!is_own_sender(&s, Some(5)));
+        assert!(!is_own_sender(&s, s.users.get(&5)));
         assert!(!is_own_sender(&s, None));
+        // The sender as the message carried it, after it already left the state.
+        let mut left = s.clone();
+        let second = left.users.remove(&11);
+        assert!(
+            is_own_sender(&left, second.as_ref()),
+            "second session that already left"
+        );
     }
 
     #[test]

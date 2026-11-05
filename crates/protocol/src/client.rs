@@ -79,10 +79,14 @@ impl TextTarget {
 }
 
 /// A received text message. `message` is server-provided HTML and must be sanitized.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TextMessage {
     /// Sender session; `None` for messages from the server itself.
     pub actor: Option<u32>,
+    /// The sender as known when the message arrived, without comment and avatar. Events are
+    /// handled after the state moved on, so a sender who left right after sending is no longer
+    /// in the state by then; `None` for the server itself or an unknown session.
+    pub sender: Option<User>,
     pub target: TextTarget,
     pub message: String,
 }
@@ -1058,8 +1062,16 @@ impl Dispatcher {
             }
             MessageType::TextMessage => {
                 let m: proto::TextMessage = decode("TextMessage", payload)?;
+                let sender = m.actor.and_then(|actor| {
+                    shared.state().users.get(&actor).map(|user| User {
+                        comment: None,
+                        texture: None,
+                        ..user.clone()
+                    })
+                });
                 self.emit(Event::TextMessage(TextMessage {
                     actor: m.actor,
+                    sender,
                     target: TextTarget {
                         sessions: m.session,
                         channels: m.channel_id,
@@ -1691,6 +1703,50 @@ mod tests {
         ));
         assert!(rx.try_recv().is_err(), "the query is only sent once");
         assert_eq!(events_rx.try_recv(), Ok(Event::Acl(Box::new(acl))));
+    }
+
+    #[test]
+    fn a_text_message_keeps_its_sender_after_the_sender_left() {
+        let mut state = ServerState::default();
+        state.users.insert(
+            9,
+            User {
+                session: 9,
+                name: "Mallory".into(),
+                cert_hash: Some("abc".into()),
+                comment: Some("long comment".into()),
+                texture: Some(vec![1, 2, 3]),
+                ..Default::default()
+            },
+        );
+        let (events, mut events_rx) = mpsc::unbounded_channel();
+        let mut dispatcher = Dispatcher {
+            shared: test_shared(state),
+            events,
+            synced: true,
+        };
+        let text = proto::TextMessage {
+            actor: Some(9),
+            channel_id: vec![0],
+            message: "hi".into(),
+            ..Default::default()
+        };
+        dispatcher.handle(Frame::from_message(MessageType::TextMessage, &text));
+        // The sender leaves before anyone handled the message event.
+        let remove = proto::UserRemove {
+            session: 9,
+            ..Default::default()
+        };
+        dispatcher.handle(Frame::from_message(MessageType::UserRemove, &remove));
+        let Ok(Event::TextMessage(message)) = events_rx.try_recv() else {
+            panic!("expected the text message first");
+        };
+        let sender = message
+            .sender
+            .expect("the sender as it was when the message came");
+        assert_eq!(sender.name, "Mallory");
+        assert_eq!(sender.cert_hash.as_deref(), Some("abc"));
+        assert_eq!((sender.comment, sender.texture), (None, None));
     }
 
     #[test]
