@@ -217,13 +217,20 @@ describe("received file card", () => {
     expect(screen.getByRole("button", { name: "Download" })).toBeVisible();
   });
 
-  it("shows a failed download with its reason and Retry (FR-7.20, FR-7.34)", () => {
+  it("shows a failed download with its reason and Retry (FR-7.20, FR-7.34)", async () => {
     const download = vi.spyOn(api, "filesDownload");
     render(
       <FileCardView card={card({ state: { kind: "failed", reason: { kind: "noAnswer" } } })} />,
     );
     expect(screen.getByText("Download failed: Alice did not answer")).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    // Download unlocks once the confirmation shows the save folder.
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Download" })).not.toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+    });
     fireEvent.click(screen.getByRole("button", { name: "Download" }));
     expect(download).toHaveBeenCalled();
   });
