@@ -79,7 +79,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Ton der App teilen",
+    "sound": "Ton",
+    "soundInfo": "Ganzer Bildschirm: Ton des Computers ohne Mumcord. Ein Fenster: nur der Ton dieser App.",
+    "soundNeeds": {
+      "windows": "Kein Ton: erfordert Windows 10 Version 2004 oder neuer",
+      "macos": "Kein Ton: erfordert macOS 13 oder neuer",
+      "pipewire": "Kein Ton: erfordert PipeWire"
+    },
     "viewersGet": "Zuschauer erhalten:",
     "viewersGetSummary": "bis zu {{resolution}} · {{fps}} fps · {{codec}} · etwa {{mbit}} Mbit/s",
     "pathRelay": "Wird einmal über das Relay des Servers gesendet, das es an bis zu {{count}} Zuschauer weitergibt.",

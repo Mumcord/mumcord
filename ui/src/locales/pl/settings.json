@@ -1101,6 +1101,7 @@
     "useGpuHint": "Koduje AV1 na karcie graficznej, więc udostępnianie prawie nie obciąża CPU. Wyłączone: AV1 używa procesora.",
     "statusList": "Stan enkodera",
     "av1Encode": "Kodowanie AV1",
+    "sound": "Dźwięk",
     "askEachTime": "Pytaj o te ustawienia przy każdym udostępnianiu",
     "av1Playback": "Odtwarzanie AV1",
     "vp9Playback": "Odtwarzanie VP9",

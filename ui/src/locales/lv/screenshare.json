@@ -81,7 +81,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Kopīgot lietotnes skaņu",
+    "sound": "Skaņa",
+    "soundInfo": "Viss ekrāns: datora skaņa bez Mumcord. Viens logs: tikai šīs lietotnes skaņa.",
+    "soundNeeds": {
+      "windows": "Nav skaņas: nepieciešams Windows 10 versija 2004 vai jaunāka",
+      "macos": "Nav skaņas: nepieciešams macOS 13 vai jaunāks",
+      "pipewire": "Nav skaņas: nepieciešams PipeWire"
+    },
     "viewersGet": "Skatītāji saņem:",
     "viewersGetSummary": "līdz {{resolution}} · {{fps}} fps · {{codec}} · apmēram {{mbit}} Mbit/s",
     "pathRelay": "Nosūtīts vienreiz caur servera releju, kas to pārsūta līdz {{count}} skatītājiem.",

@@ -1101,6 +1101,7 @@
     "useGpuHint": "Kóduje AV1 na grafické kartě, takže sdílení téměř nezatěžuje procesor. Vypnuto: AV1 používá procesor.",
     "statusList": "Stav enkodéru",
     "av1Encode": "Kódování AV1",
+    "sound": "Zvuk",
     "askEachTime": "Ptát se na tato nastavení při každém sdílení",
     "av1Playback": "Přehrávání AV1",
     "vp9Playback": "Přehrávání VP9",

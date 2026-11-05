@@ -85,7 +85,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Aqsam il-ħoss tal-app",
+    "sound": "Ħoss",
+    "soundInfo": "L-iskrin kollu: il-ħoss tal-kompjuter mingħajr Mumcord. Tieqa waħda: il-ħoss ta' dik l-app biss.",
+    "soundNeeds": {
+      "windows": "Ebda ħoss: teħtieġ Windows 10 verżjoni 2004 jew aktar ġdida",
+      "macos": "Ebda ħoss: teħtieġ macOS 13 jew aktar ġdid",
+      "pipewire": "Ebda ħoss: teħtieġ PipeWire"
+    },
     "viewersGet": "Dawk li jaraw jirċievu:",
     "viewersGetSummary": "sa {{resolution}} · {{fps}} fps · {{codec}} · madwar {{mbit}} Mbit/s",
     "pathRelay": "Jintbagħat darba permezz tar-relay tas-server, li jgħaddih lil sa {{count}} li jaraw.",

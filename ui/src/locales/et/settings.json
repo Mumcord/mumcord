@@ -1085,6 +1085,7 @@
     "useGpuHint": "Kodeerib AV1 graafikakaardil, nii et jagamine koormab protsessorit peaaegu üldse mitte. Väljas: AV1 kasutab protsessorit.",
     "statusList": "Kodeerija olek",
     "av1Encode": "AV1 kodeerimine",
+    "sound": "Heli",
     "askEachTime": "Küsi neid sätteid iga kord, kui jagan",
     "av1Playback": "AV1 esitus",
     "vp9Playback": "VP9 esitus",

@@ -1093,6 +1093,7 @@
     "useGpuHint": "Codifica AV1 sulla tua scheda video, così la condivisione non pesa quasi sulla CPU. Disattivato: AV1 usa il processore.",
     "statusList": "Stato dell'encoder",
     "av1Encode": "Codifica AV1",
+    "sound": "Audio",
     "askEachTime": "Chiedi queste impostazioni a ogni condivisione",
     "av1Playback": "Riproduzione AV1",
     "vp9Playback": "Riproduzione VP9",

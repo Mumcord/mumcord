@@ -1093,6 +1093,7 @@
     "useGpuHint": "Codifica AV1 na tua placa gráfica, por isso a partilha quase não gasta CPU. Desligado: o AV1 usa o processador.",
     "statusList": "Estado do codificador",
     "av1Encode": "Codificação AV1",
+    "sound": "Som",
     "askEachTime": "Perguntar por estas definições sempre que partilhar",
     "av1Playback": "Reprodução AV1",
     "vp9Playback": "Reprodução VP9",
