@@ -1,0 +1,64 @@
+/* Camera entry points (spec 08, mockups 01, 02, 05). */
+
+/* On air: red with a red ring, so the state reads by more than the icon colour. */
+.camera-button[data-onair] {
+  background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+  box-shadow: inset 0 0 0 1px var(--color-danger);
+  color: var(--color-danger);
+}
+
+.camera-button[aria-disabled="true"] {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.camera-button[aria-disabled="true"]:hover {
+  background: transparent;
+}
+
+.camera-on-line {
+  color: var(--color-danger);
+}
+
+.camera-menu-item[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.camera-menu-item[aria-disabled="true"] .chat-apps__builtin,
+.camera-menu-item[aria-disabled="true"] .camera-menu-item__label {
+  opacity: 0.5;
+}
+
+/* The icon sits on the label's line, also when a second line follows. */
+.chat-apps__item.camera-menu-item {
+  align-items: flex-start;
+}
+
+.camera-menu-item .chat-apps__builtin {
+  margin-top: 0.125rem;
+}
+
+.camera-menu-item__hint {
+  display: flex;
+  gap: var(--space-1);
+  align-items: flex-start;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.camera-menu-item__hint svg {
+  flex: none;
+  margin-top: 0.1rem;
+}
+
+/* Channel tree: the own camera red, other people's muted (mockup 05). It follows the status
+   icons, whose auto margin already pushes both to the row's end. */
+.camera-tree-icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.camera-tree-icon[data-self] {
+  color: var(--color-danger);
+}
