@@ -53,6 +53,11 @@ fn document_len(message: &TestMessage) -> Option<usize> {
     bovnar::encode(message, RELAY_LIMIT).ok().map(|d| d.len())
 }
 
+/// A message whose document is larger than the relay limit: its body alone fills the limit.
+pub fn oversized(seq: u32) -> TestMessage {
+    with_body_len(seq, RELAY_LIMIT)
+}
+
 /// A message whose Bovnar document is exactly `size` bytes (at least the empty message). The
 /// document length grows with the body by one byte per character plus a length field that may
 /// widen, so the body length is corrected until the document fits.
@@ -122,6 +127,14 @@ mod tests {
                 })
             );
         }
+    }
+
+    #[test]
+    fn an_oversized_message_does_not_encode() {
+        assert_eq!(
+            bovnar::encode(&oversized(1), RELAY_LIMIT).unwrap_err(),
+            Error::TooLarge
+        );
     }
 
     #[test]

@@ -80,6 +80,7 @@
     ],
     [
       "specs/files/failures.e2e.ts",
+      "specs/plugins/relay-data.e2e.ts",
       "specs/chat/notification-centre.e2e.ts",
       "specs/plugins/browse-install.e2e.ts",
       "specs/wizard/ac-149-rerun.e2e.ts"
