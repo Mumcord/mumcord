@@ -196,7 +196,8 @@
     "screenTitle": "Kasutaja {{name}} ekraan",
     "screenLive": "Otse",
     "partyTitle": "Ühisvaatamine",
-    "partyStarted": "Alustas {{name}}"
+    "partyStarted": "Alustas {{name}}",
+    "label": "{{title}} koos kaameraruumiga"
   },
   "settings": {
     "title": "Kaamera",

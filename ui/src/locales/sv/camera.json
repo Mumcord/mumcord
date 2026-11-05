@@ -196,7 +196,8 @@
     "screenTitle": "{{name}}s skärm",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Startad av {{name}}"
+    "partyStarted": "Startad av {{name}}",
+    "label": "{{title}} med kamerarummet"
   },
   "settings": {
     "title": "Kamera",

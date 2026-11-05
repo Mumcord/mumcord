@@ -203,7 +203,8 @@
     "screenTitle": "Zaslon korisnika {{name}}",
     "screenLive": "Uživo",
     "partyTitle": "Zajedničko gledanje",
-    "partyStarted": "Pokrenuo/pokrenula {{name}}"
+    "partyStarted": "Pokrenuo/pokrenula {{name}}",
+    "label": "{{title}} s kamerama u sobi"
   },
   "settings": {
     "title": "Kamera",

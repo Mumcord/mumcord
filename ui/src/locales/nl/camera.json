@@ -196,7 +196,8 @@
     "screenTitle": "Scherm van {{name}}",
     "screenLive": "Live",
     "partyTitle": "Watchparty",
-    "partyStarted": "Gestart door {{name}}"
+    "partyStarted": "Gestart door {{name}}",
+    "label": "{{title}} met de cameraruimte"
   },
   "settings": {
     "title": "Camera",

@@ -210,7 +210,8 @@
     "screenTitle": "{{name}} ekranas",
     "screenLive": "Tiesiogiai",
     "partyTitle": "Žiūrėjimas kartu",
-    "partyStarted": "Pradėjo {{name}}"
+    "partyStarted": "Pradėjo {{name}}",
+    "label": "{{title}} su kamerų kambariu"
   },
   "settings": {
     "title": "Kamera",

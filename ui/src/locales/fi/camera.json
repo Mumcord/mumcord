@@ -196,7 +196,8 @@
     "screenTitle": "Käyttäjän {{name}} näyttö",
     "screenLive": "Livenä",
     "partyTitle": "Yhteiskatselu",
-    "partyStarted": "Aloittanut {{name}}"
+    "partyStarted": "Aloittanut {{name}}",
+    "label": "{{title}} ja kamerahuone"
   },
   "settings": {
     "title": "Kamera",

@@ -196,7 +196,8 @@
     "screenTitle": "Екранът на {{name}}",
     "screenLive": "На живо",
     "partyTitle": "Общо гледане",
-    "partyStarted": "Започнато от {{name}}"
+    "partyStarted": "Започнато от {{name}}",
+    "label": "{{title}} с камерната стая"
   },
   "settings": {
     "title": "Камера",

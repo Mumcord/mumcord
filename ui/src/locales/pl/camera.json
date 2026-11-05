@@ -210,7 +210,8 @@
     "screenTitle": "Ekran użytkownika {{name}}",
     "screenLive": "Na żywo",
     "partyTitle": "Wspólne oglądanie",
-    "partyStarted": "Rozpoczęte przez {{name}}"
+    "partyStarted": "Rozpoczęte przez {{name}}",
+    "label": "{{title}} z pokojem kamer"
   },
   "settings": {
     "title": "Kamera",

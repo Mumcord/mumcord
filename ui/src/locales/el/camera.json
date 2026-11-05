@@ -196,7 +196,8 @@
     "screenTitle": "Η οθόνη του/της {{name}}",
     "screenLive": "Ζωντανά",
     "partyTitle": "Κοινή προβολή",
-    "partyStarted": "Ξεκίνησε από τον/την {{name}}"
+    "partyStarted": "Ξεκίνησε από τον/την {{name}}",
+    "label": "{{title}} με την αίθουσα καμερών"
   },
   "settings": {
     "title": "Κάμερα",
