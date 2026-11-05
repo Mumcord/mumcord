@@ -37,6 +37,7 @@
 
 ### Fixed
 
+- Screen share sound polish (#435): the "Which app's sound?" list shows each app's own icon on Linux (a coloured square where the app has none), the live bar's sound line says "The Sound switch is off" or "“No sound” was chosen for this window" correctly instead of mixing the two up, the disabled Sound button names the real reason, and the speaker icons are drawn as outlines as in the design
 - The download confirmation no longer lets you press Download before it shows the folder the file will be saved to
 - Joining a screen share no longer picks up the relay access meant for another broadcast of the same person (such as a camera or plugin data), so watching works while they share several things at once
 - If you are not registered on a server whose relay only serves registered users, file sharing and other relay features now say "This server's relay is only available to registered users. Register on this server to use it." instead of claiming the relay could not be reached (#406)
