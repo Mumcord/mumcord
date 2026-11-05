@@ -39,12 +39,13 @@ export async function openAllSettings(): Promise<void> {
 async function describeTabHit(group: SettingsGroup): Promise<string> {
   return browser.execute((label: string) => {
     const tab = [...document.querySelectorAll("button[role='tab']")].find(
-      (el) => el.textContent?.trim() === label,
+      (el) => el.textContent.trim() === label,
     );
     if (!tab) return "tab missing";
     const r = tab.getBoundingClientRect();
     const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-    return `viewport ${innerWidth}x${innerHeight}, tab ${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}x${Math.round(r.height)}, hit ${hit?.tagName}.${hit?.className}`;
+    const n = (value: number) => String(Math.round(value));
+    return `viewport ${n(innerWidth)}x${n(innerHeight)}, tab ${n(r.x)},${n(r.y)} ${n(r.width)}x${n(r.height)}, hit ${hit?.tagName ?? ""}.${hit?.className ?? ""}`;
   }, group);
 }
 
