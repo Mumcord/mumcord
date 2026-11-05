@@ -10,7 +10,10 @@ update gate (AC-9.36); its folders link to this one.
   and the undeclared origin and through the redirect, disable or enable the `side` item.
 - Pages `web/{stage,side,dialog,panel}.html` share `web/probe.js`: one button per probe
   (`#probe-<name>`), results in `#result-<name>[data-status]` and on the panel as
-  `<place>/<probe>: <status>`. Status `blocked`, `leaked`, `ok` (allowed action worked) or `sent`
+  `<place>/<probe>: <status>`.
+- `side.html` also has "Start stage from page": the page asks the plugin to start the web stage,
+  a gesture-bound call that works only after a trusted click in the page (FR-9.45, AC-9.13). The
+  panel log shows `side-start-stage: ok` or `side-start-stage: not-permitted`. Status `blocked`, `leaked`, `ok` (allowed action worked) or `sent`
   (only the HTTPS fixture's log can tell).
 - Fixed addresses: HTTPS fixture on port 47443 (`declared.plugins.test`, `undeclared.plugins.test`),
   STUN on 47478.
