@@ -52,6 +52,7 @@ export interface PluginFixtures {
 }
 
 interface Server {
+  name: string;
   child: ChildProcess;
   base: string;
   key: string;
@@ -79,7 +80,7 @@ function builtPackages(folder: string): string | undefined {
   return root === undefined || root === "" ? undefined : join(root, "packages", folder);
 }
 
-function startServer(cli: string, args: string[], marker: RegExp): Promise<Server> {
+function startServer(name: string, cli: string, args: string[], marker: RegExp): Promise<Server> {
   return new Promise((resolvePromise, reject) => {
     const child = spawn(cli, ["serve-registry", ...args, "--port", "0"], {
       stdio: ["ignore", "pipe", "pipe"],
@@ -97,7 +98,7 @@ function startServer(cli: string, args: string[], marker: RegExp): Promise<Serve
       const key = marker.exec(out)?.[1];
       if (base !== undefined && key !== undefined) {
         clearTimeout(timer);
-        resolvePromise({ child, base, key });
+        resolvePromise({ name, child, base, key });
       }
     });
     child.on("error", reject);
@@ -133,6 +134,7 @@ export async function startPluginFixtures(options: PluginFixtureOptions): Promis
       if (repository !== undefined) args.push("--repository", repository);
       for (const scenario of repo.scenarios ?? []) args.push("--scenario", scenario);
       const server = await startServer(
+        name,
         cli,
         args,
         repository === undefined ? /MUMCORD_PLUGIN_REGISTRY_KEY=(\S+)/ : /repository key (\S+)/,
@@ -176,6 +178,23 @@ export async function stopPluginFixtures(): Promise<void> {
   for (const server of old.servers) server.child.kill();
   await old.https?.stop();
   rmSync(old.dir, { recursive: true, force: true });
+}
+
+/**
+ * Replaces the active failure scenarios of a running repository (`serve-registry --help`), e.g.
+ * `setScenarios("third-party", [])` to serve its `v1.1` index again after `no-v1.1`.
+ */
+export async function setScenarios(
+  repo: "official" | "third-party",
+  scenarios: string[],
+): Promise<void> {
+  const server = state?.servers.find((s) => s.name === repo);
+  if (server === undefined) throw new Error(`no ${repo} repository is running`);
+  // serve-registry reads the query raw (no percent-decoding); scenario names are URL-safe.
+  const response = await fetch(`${server.base}_ctl/scenario?set=${scenarios.join(",")}`, {
+    method: "POST",
+  });
+  if (!response.ok) throw new Error(`scenario switch failed: HTTP ${String(response.status)}`);
 }
 
 /** Test hooks of the running fixtures (registry URL and key, CA) plus `extra` (e.g. KEY_AGE). */
