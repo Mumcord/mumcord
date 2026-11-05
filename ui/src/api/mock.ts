@@ -3200,10 +3200,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
             ? { kind: "pushToTalk" }
             : index >= 0
               ? { kind: "hotkey", index }
-              : null;
+              : slot.kind !== "camera" && same(settings.cameraHotkey)
+                ? { kind: "camera" }
+                : null;
       return Promise.resolve({ key: canonical, conflict });
     },
-    hotkeysStatus: () => Promise.resolve<HotkeysStatus>({ mode: "global", failed: [] }),
+    hotkeysStatus: () =>
+      Promise.resolve<HotkeysStatus>({ mode: "global", failed: [], cameraFailed: false }),
     pttSession: () =>
       Promise.resolve({ waylandDesktop: false, compatibilityActive: false, kde: false }),
     pttOpenKdeX11Settings: () => Promise.resolve(null),

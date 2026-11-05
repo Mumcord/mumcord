@@ -134,6 +134,16 @@ pub fn check(
     Ok((key, conflict))
 }
 
+/// [`HotkeyConflict::Camera`] when `key` (canonical) is the camera hotkey and `slot` is not.
+pub fn camera_conflict(
+    key: &str,
+    slot: &HotkeySlot,
+    camera_key: Option<&str>,
+) -> Option<HotkeyConflict> {
+    let taken = camera_key.is_some_and(|k| normalize_key(k).is_ok_and(|k| k == key));
+    (taken && *slot != HotkeySlot::Camera).then_some(HotkeyConflict::Camera)
+}
+
 /// The whisper target (#67) other than `except` whose hold-to-talk key is `key` (canonical).
 pub fn whisper_conflict(
     key: &str,
@@ -186,6 +196,11 @@ pub fn failed(hotkeys: &[Hotkey]) -> Vec<u32> {
         .filter(|(_, h)| failed.contains(&action_id(&h.action)))
         .map(|(i, _)| index_of(i))
         .collect()
+}
+
+/// Whether the camera hotkey could not be bound in the last [`configure`].
+pub fn camera_failed() -> bool {
+    with_state(|state| state.failed.iter().any(|id| id == CAMERA_ID))
 }
 
 fn action_bindings(app: &AppHandle, hotkeys: &[Hotkey]) -> Vec<Binding> {
@@ -535,6 +550,31 @@ mod tests {
         // A mouse button for push-to-talk never clashes with a keyboard key.
         let (_, conflict) = check("F9", HotkeySlot::New, &[], Some("Mouse4")).expect("valid");
         assert_eq!(conflict, None);
+    }
+
+    #[test]
+    fn camera_conflict_reports_the_camera_key_except_for_itself() {
+        let camera = Some("control+shift+KeyV");
+        assert_eq!(
+            camera_conflict("Ctrl+Shift+V", &HotkeySlot::New, camera),
+            Some(HotkeyConflict::Camera)
+        );
+        assert_eq!(
+            camera_conflict("Ctrl+Shift+V", &HotkeySlot::PushToTalk, camera),
+            Some(HotkeyConflict::Camera)
+        );
+        assert_eq!(
+            camera_conflict("Ctrl+Shift+V", &HotkeySlot::Camera, camera),
+            None
+        );
+        assert_eq!(
+            camera_conflict("Ctrl+Shift+B", &HotkeySlot::New, camera),
+            None
+        );
+        assert_eq!(
+            camera_conflict("Ctrl+Shift+V", &HotkeySlot::New, None),
+            None
+        );
     }
 
     #[test]
