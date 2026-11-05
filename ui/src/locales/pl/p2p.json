@@ -26,6 +26,7 @@
     "noRelay": "Ten serwer nie ma przekaźnika, więc udostępnianie plików jest niedostępne.",
     "filesDisallowed": "Przekaźnik tego serwera nie zezwala na udostępnianie plików.",
     "screenDisallowed": "Przekaźnik tego serwera nie zezwala na udostępnianie ekranu.",
+    "camerasDisallowed": "Przekaźnik tego serwera nie zezwala na udostępnianie kamery.",
     "imagesDisallowed": "Pełny rozmiar niedostępny: przekaźnik tego serwera nie zezwala na obrazy",
     "noCertificate": "Udostępnianie plików wymaga certyfikatu klienta.",
     "modeNeedsRelay": "Udostępnianie plików wymaga przekaźnika; Twoje ustawienie peer-to-peer to {{mode}}.",

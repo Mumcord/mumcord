@@ -26,6 +26,7 @@
     "noRelay": "Ovaj poslužitelj nema relej pa dijeljenje datoteka nije dostupno.",
     "filesDisallowed": "Relej ovog poslužitelja ne dopušta dijeljenje datoteka.",
     "screenDisallowed": "Relej ovog poslužitelja ne dopušta dijeljenje zaslona.",
+    "camerasDisallowed": "Relay ovog poslužitelja ne dopušta dijeljenje kamere.",
     "imagesDisallowed": "Puna veličina nije dostupna: relej ovog poslužitelja ne dopušta slike",
     "noCertificate": "Dijeljenje datoteka zahtijeva klijentski certifikat.",
     "modeNeedsRelay": "Dijeljenje datoteka treba relej; tvoja peer-to-peer postavka je {{mode}}.",

@@ -26,6 +26,7 @@
     "noRelay": "Este servidor não tem retransmissor, por isso a partilha de ficheiros não está disponível.",
     "filesDisallowed": "O retransmissor deste servidor não permite a partilha de ficheiros.",
     "screenDisallowed": "O retransmissor deste servidor não permite a partilha de ecrã.",
+    "camerasDisallowed": "O retransmissor deste servidor não permite a partilha da câmara.",
     "imagesDisallowed": "Tamanho original indisponível: o retransmissor deste servidor não permite imagens",
     "noCertificate": "A partilha de ficheiros precisa de um certificado de cliente.",
     "modeNeedsRelay": "A partilha de ficheiros precisa do retransmissor; a tua definição peer-to-peer é {{mode}}.",
