@@ -164,7 +164,8 @@ pub const STAGE_POPOUT: Spec = Spec {
 
 /// The camera room in its own window (FR-8.68 **Pop out**). It shows the own camera's picture
 /// (`camera_preview_attach`) and the room bar's camera controls; the dialog to turn the camera
-/// on stays in the main window. The tiles' commands come with the receive side (C-8).
+/// on stays in the main window. It shows the tiles of the room and their frames, and takes the
+/// tile choices; opening and closing the room stay with the main window.
 pub const CAMERA_POPOUT: Spec = Spec {
     label: "media-popout-camera",
     url: "index.html?window=media-popout&kind=camera",
@@ -179,6 +180,14 @@ pub const CAMERA_POPOUT: Spec = Spec {
         "camera_effects",
         "camera_preview_attach",
         "camera_preview_detach",
+        "camera_room",
+        "camera_tile_set_hidden",
+        "camera_tile_set_quality",
+        "camera_tile_set_height",
+        "camera_request_keyframe",
+        "camera_frames_attach",
+        "camera_frames_detach",
+        "camera_set_decode_codecs",
     ],
 };
 
@@ -547,6 +556,32 @@ mod tests {
             "screen_share_frames_attach",
             "watch_party_command",
             "settings_update",
+        ] {
+            assert!(!command_allowed(label, command), "{command}");
+        }
+    }
+
+    #[test]
+    fn the_camera_popout_gets_the_tiles_but_cannot_open_the_room() {
+        let label = CAMERA_POPOUT.label;
+        for command in [
+            "camera_room",
+            "camera_tile_set_hidden",
+            "camera_tile_set_quality",
+            "camera_tile_set_height",
+            "camera_request_keyframe",
+            "camera_frames_attach",
+            "camera_frames_detach",
+            "camera_set_decode_codecs",
+        ] {
+            assert!(command_allowed(label, command), "{command}");
+        }
+        for command in [
+            "camera_room_set_open",
+            "camera_room_set_videos_hidden",
+            "camera_turn_on",
+            "camera_preview_start",
+            "screen_share_frames_attach",
         ] {
             assert!(!command_allowed(label, command), "{command}");
         }
