@@ -9,6 +9,7 @@ import { reduceMotionOn, shownDeviceId } from "./cameraSettings";
 
 let api: MockApi;
 let settings: Settings;
+let firstImageId: string;
 
 beforeEach(async () => {
   await applyLanguage("en");
@@ -19,7 +20,7 @@ beforeEach(async () => {
   for (const image of (await api.cameraBackgrounds()).own) {
     await api.cameraOwnBackgroundRemove(image.id);
   }
-  await api.cameraOwnBackgroundAdd("/a.png");
+  firstImageId = (await api.cameraOwnBackgroundAdd("/a.png")).id;
   await api.cameraOwnBackgroundAdd("/b.png");
 });
 
@@ -43,9 +44,12 @@ describe("Settings → Camera (FR-8.75)", () => {
   it("shows the mockup's controls with their defaults", async () => {
     render(<Page update={vi.fn()} />);
     const camera = screen.getByRole("combobox", { name: "Camera" });
+    // Wait without opening the dropdown: a waitFor callback that changes the DOM re-runs itself
+    // from its own MutationObserver and never lets the timeout fire, so a failure would hang.
     await waitFor(() => {
-      expect(optionLabels(camera)).toEqual(["Webcam", "USB C920"]);
+      expect(camera).toHaveTextContent("Integrated Webcam (720p)");
     });
+    expect(optionLabels(camera)).toEqual(["Integrated Webcam (720p)", "USB Camera C920"]);
     expect(optionLabels(screen.getByRole("combobox", { name: "Send quality" }))).toEqual([
       "Auto",
       "720p · 15 fps",
@@ -75,11 +79,11 @@ describe("Settings → Camera (FR-8.75)", () => {
     render(<Page update={update} />);
     const camera = screen.getByRole("combobox", { name: "Camera" });
     await waitFor(() => {
-      expect(optionLabels(camera)).toContain("USB C920");
+      expect(camera).toHaveTextContent("Integrated Webcam (720p)");
     });
-    chooseOption(camera, "USB C920");
-    expect(update).toHaveBeenCalledWith({ cameraDeviceId: "mock-usb" });
-    expect(setDevice).toHaveBeenCalledWith("mock-usb");
+    chooseOption(camera, "USB Camera C920");
+    expect(update).toHaveBeenCalledWith({ cameraDeviceId: "mock-c920" });
+    expect(setDevice).toHaveBeenCalledWith("mock-c920");
   });
 
   it("saves the default background and applies it to the preview", async () => {
@@ -87,20 +91,19 @@ describe("Settings → Camera (FR-8.75)", () => {
     const update = vi.fn();
     render(<Page update={update} />);
     const select = screen.getByRole("combobox", { name: "Default background" });
-    await waitFor(() => {
-      expect(optionLabels(select)).toEqual([
-        "None",
-        "Blur",
-        "Image: Library",
-        "Image: Image 1 (yours)",
-        "Image: Image 2 (yours)",
-      ]);
-    });
+    await screen.findByText(/\(2 saved\)/);
+    expect(optionLabels(select)).toEqual([
+      "None",
+      "Blur",
+      "Image: Library",
+      "Image: Image 1 (yours)",
+      "Image: Image 2 (yours)",
+    ]);
     chooseOption(select, "Image: Library");
     expect(update).toHaveBeenCalledWith({
-      cameraDefaultBackground: { kind: "builtin", id: "beach" },
+      cameraDefaultBackground: { kind: "builtin", id: "abstract-warm-waves" },
     });
-    expect(setBackground).toHaveBeenCalledWith({ kind: "builtin", id: "beach" }, 50);
+    expect(setBackground).toHaveBeenCalledWith({ kind: "builtin", id: "abstract-warm-waves" }, 50);
   });
 
   it("offers blur strength as Light / Strong buttons", () => {
@@ -123,7 +126,7 @@ describe("Settings → Camera (FR-8.75)", () => {
   });
 
   it("deletes the default background image and falls back to Blur (FR-8.15)", async () => {
-    settings = { ...settings, cameraDefaultBackground: { kind: "own", id: "own-1" } };
+    settings = { ...settings, cameraDefaultBackground: { kind: "own", id: firstImageId } };
     const update = vi.fn();
     render(<Page update={update} />);
     fireEvent.click(await screen.findByRole("button", { name: "Manage images" }));
@@ -164,7 +167,7 @@ describe("Settings → Camera (FR-8.75)", () => {
   });
 
   it("explains why there is no preview", async () => {
-    setApi(createMockApi());
+    api.mock.failNext("cameraLocalPreviewStart", "camera", "noCamera");
     render(<Page update={vi.fn()} />);
     expect(await screen.findByRole("img", { name: /No camera found/ })).toBeInTheDocument();
   });
