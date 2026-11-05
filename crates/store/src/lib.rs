@@ -26,6 +26,7 @@ mod relay_pin;
 mod secrets;
 mod servers;
 mod settings;
+mod settings_compat;
 mod social;
 mod synced;
 

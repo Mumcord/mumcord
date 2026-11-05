@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use crate::db::Store;
 use crate::error::Result;
 use crate::servers::ServerId;
+use crate::settings_compat;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -1166,7 +1167,7 @@ impl Store {
             .optional()?;
         match json {
             Some(json) => {
-                let mut settings: Settings = serde_json::from_str(&json)?;
+                let mut settings: Settings = settings_compat::decode(&json)?;
                 settings.legacy_window_overlay_enabled |= legacy_window_overlay_enabled(&json);
                 if !has_key(&json, "p2p_mode") && settings.allow_direct_connections == Consent::No {
                     // FR-4.6: whoever refused direct connections before the relay existed keeps
@@ -1197,12 +1198,21 @@ impl Store {
         }
     }
 
+    /// Saves the settings. Keys and values from a newer Mumcord that this app could not use
+    /// are kept as they were (issue #521).
     pub fn save_settings(&self, settings: &Settings) -> Result<()> {
-        self.conn.execute(
+        let tx = self.conn.unchecked_transaction()?;
+        let stored: Option<String> = tx
+            .query_row("SELECT data FROM settings WHERE id = 1", [], |row| {
+                row.get(0)
+            })
+            .optional()?;
+        tx.execute(
             "INSERT INTO settings (id, data) VALUES (1, ?1)
              ON CONFLICT (id) DO UPDATE SET data = excluded.data",
-            params![serde_json::to_string(settings)?],
+            params![settings_compat::encode(settings, stored.as_deref())?],
         )?;
+        tx.commit()?;
         Ok(())
     }
 
