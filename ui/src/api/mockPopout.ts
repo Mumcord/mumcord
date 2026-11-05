@@ -24,6 +24,7 @@ export function createMockPopouts(
       target: stagePlugin === null ? null : { serverId: 1, session: null, plugin: stagePlugin },
       onTop: false,
     },
+    camera: { target: null, onTop: false },
   };
 
   function update(kind: MediaPopoutKind, change: Partial<MediaPopoutState[MediaPopoutKind]>): void {

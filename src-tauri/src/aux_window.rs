@@ -162,22 +162,44 @@ pub const STAGE_POPOUT: Spec = Spec {
     ],
 };
 
-const ALL: [&Spec; 6] = [
+/// The camera room in its own window (FR-8.68 **Pop out**). It shows the own camera's picture
+/// (`camera_preview_attach`) and the room bar's camera controls; the dialog to turn the camera
+/// on stays in the main window. The tiles' commands come with the receive side (C-8).
+pub const CAMERA_POPOUT: Spec = Spec {
+    label: "media-popout-camera",
+    url: "index.html?window=media-popout&kind=camera",
+    title: "Cameras — Mumcord",
+    default_size: (960.0, 600.0),
+    min_size: (320.0, 200.0),
+    geometry_file: "media-popout-camera-window.json",
+    allowed_commands: popout_commands![
+        "camera_view",
+        "camera_turn_off",
+        "camera_set_background",
+        "camera_effects",
+        "camera_preview_attach",
+        "camera_preview_detach",
+    ],
+};
+
+const ALL: [&Spec; 7] = [
     &INSPECTOR,
     &LICENCES,
     &CHANGELOG,
     &WATCH_POPOUT,
     &SHARE_POPOUT,
     &STAGE_POPOUT,
+    &CAMERA_POPOUT,
 ];
 
 /// The windows that follow the main window's theme and language.
-pub const FOLLOW_LOOK: [&Spec; 5] = [
+pub const FOLLOW_LOOK: [&Spec; 6] = [
     &LICENCES,
     &CHANGELOG,
     &WATCH_POPOUT,
     &SHARE_POPOUT,
     &STAGE_POPOUT,
+    &CAMERA_POPOUT,
 ];
 
 /// Whether the webview `label` may call `command`; only the windows above are limited.

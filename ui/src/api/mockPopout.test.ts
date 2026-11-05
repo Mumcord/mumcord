@@ -18,6 +18,7 @@ describe("mock media pop-outs", () => {
       watch: { target: null, onTop: false },
       share: { target: null, onTop: false },
       stage: { target: null, onTop: false },
+      camera: { target: null, onTop: false },
     });
   });
 
@@ -50,6 +51,7 @@ describe("mock media pop-outs", () => {
       watch: { target: null, onTop: false },
       share: { target: null, onTop: true },
       stage: { target: null, onTop: false },
+      camera: { target: null, onTop: false },
     });
   });
   it("starts with the stage popped out when asked for a plugin", () => {
