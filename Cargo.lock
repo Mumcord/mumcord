@@ -4118,6 +4118,7 @@ dependencies = [
  "tokio",
  "tracing",
  "v4l",
+ "windows",
  "zune-core",
  "zune-jpeg",
 ]

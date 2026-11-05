@@ -20,8 +20,9 @@ use v4l::io::traits::CaptureStream;
 use v4l::video::Capture;
 use v4l::{Device, Format, FourCC};
 
-use super::mode::{self, Geometry, Mode, PixelFormat, Rate};
-use super::pump::{Pump, Raw};
+use super::ranges;
+use crate::mode::{self, Geometry, Mode, PixelFormat, Rate};
+use crate::pump::{Pump, Raw};
 use crate::{CameraDevice, CameraError, CaptureRequest, CaptureSession, DeviceId, FrameSink};
 
 /// Backend name in [`DeviceId::from_os_key`].
@@ -200,7 +201,7 @@ fn modes(device: &Device) -> Vec<Mode> {
             .into_iter()
             .flat_map(|size| match size.size {
                 FrameSizeEnum::Discrete(d) => vec![(d.width, d.height)],
-                FrameSizeEnum::Stepwise(s) => mode::sizes_in_range(
+                FrameSizeEnum::Stepwise(s) => ranges::sizes_in_range(
                     (s.min_width, s.min_height),
                     (s.max_width, s.max_height),
                     (s.step_width, s.step_height),
@@ -219,7 +220,7 @@ fn modes(device: &Device) -> Vec<Mode> {
                         num: t.denominator,
                         den: t.numerator,
                     },
-                    FrameIntervalEnum::Stepwise(s) => mode::rate_in_range(
+                    FrameIntervalEnum::Stepwise(s) => ranges::rate_in_range(
                         Rate {
                             num: s.max.denominator,
                             den: s.max.numerator,
