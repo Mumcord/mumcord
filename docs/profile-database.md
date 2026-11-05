@@ -18,11 +18,40 @@ Both live in the SQLite file header (bytes 60 and 68), so `store::check_schema` 
 - Schema version ≤ the app's newest migration: it runs the missing migrations, as before.
 - Schema version > the app's newest migration:
   - minimum reader version recorded and ≤ the app's newest migration: the app opens the profile as it is. It never runs migrations backwards and never touches tables, columns or settings it does not know.
-  - otherwise (a breaking change, or a newer profile from before #521): the app shows the "made by a newer Mumcord" message (#512) and leaves the file byte for byte untouched.
+  - otherwise (a breaking change, or a newer profile from before #521): the app shows the "made by a newer Mumcord" message (#512) and leaves the file byte for byte untouched. If the profile can be rolled back (see below), the message also offers **Roll back the profile to this version** next to Download and Quit.
+
+## Rolling back
+
+Every migration comes with a **down step**: SQL that restores the schema from before it. Since v30 the app stores the down step of each migration it applies in the profile itself, in the table `migration_down (version, breaking, sql)`; v30 fills in the steps of v1–v30 from the code. So an older app can undo migrations it does not know, using only what the newer app stored.
+
+A rollback only runs when it is needed and the user asks for it:
+
+- It is offered only when the profile is unreadable for this app (minimum reader version > the app's newest migration).
+- It goes back to the version just before the **oldest breaking migration** the app does not know, not further. Additive migrations below that one stay: the app can work with them. Additive migrations above it are undone too, because the breaking one below them has to go.
+- It is offered only if every migration it has to undo has a stored, reversible down step. Otherwise the message offers only Download and Quit.
+
+When the user confirms, the app
+
+1. checkpoints the WAL and copies the database file to `mumcord.sqlite3.backup-<YYYYMMDD-HHMMSS>` beside it (local time; an existing file is never overwritten),
+2. runs the stored down steps from the newest migration on, in **one transaction**, with foreign keys off so a rebuilt table cannot cascade into older tables,
+3. deletes the undone steps from `migration_down` and sets `user_version` to the target and `application_id` to its own minimum reader version,
+4. and continues starting.
+
+If a down step fails, the transaction is rolled back and the profile stays byte for byte as it was; the backup copy remains.
+
+`store::rollback_plan` decides whether a rollback is possible without changing any file (it opens the database read-only, as an immutable file when no WAL exists); `store::roll_back` performs it.
 
 ## Writing a migration
 
 Append a new entry to `MIGRATIONS`; never edit or reorder a released one. Wrap it in `additive(...)` or `breaking(...)`; the type makes the mark mandatory.
+
+Every migration also gets a down step, `Down::Sql("…")` or `Down::Irreversible`:
+
+- The down step may only remove what its migration added (drop the tables, indexes and columns it created) or rebuild what it changed, so only data written since the migration is lost. A breaking migration's step restores the old form and keeps whatever data the old form can hold.
+- Mark the migration `Down::Irreversible` when undoing it would lose data from before it, or when it created certificate or identity data (identities, trusted certificates, certificate pins) and is additive. A profile that needs an irreversible migration undone is never rolled back. Today v1, v14, v20 and v21 are irreversible; they are all older than the stored down steps, so no rollback ever reaches them.
+- `ALTER TABLE … DROP COLUMN` cannot drop a column with a foreign key, `UNIQUE` or an index; rebuild the table or mark the migration irreversible then.
+
+The unit test `db::tests::every_down_step_round_trips_on_a_seeded_profile` runs every reversible migration up, down and up again on a profile with data and checks that schema and rows match each time.
 
 **Additive** – an older app ignores the change and keeps working:
 
@@ -63,4 +92,4 @@ Removing a settings key is safe for older apps, but its value stays in the recor
 
 ## Released history
 
-Of the migrations v1–v29, only v26 is breaking: it rebuilt `encoder_selftest` with a new `NOT NULL` key column (`optimize`), which an app from before v26 cannot insert. So the minimum reader version of current profiles is 26. Every Mumcord that includes #521 (0.7.0 and later) can therefore open profiles from later versions as long as those only add things; versions before it cannot, because they do not know the minimum reader version.
+Of the migrations v1–v30, only v26 is breaking: it rebuilt `encoder_selftest` with a new `NOT NULL` key column (`optimize`), which an app from before v26 cannot insert. So the minimum reader version of current profiles is 26. Every Mumcord that includes #521 (0.7.0 and later) can therefore open profiles from later versions as long as those only add things; versions before it cannot, because they do not know the minimum reader version. Rolling back works between versions that both include v30 (the stored down steps).
