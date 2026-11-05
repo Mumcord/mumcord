@@ -14,6 +14,7 @@ import { CameraButton } from "./CameraButton";
 import { CameraMenuItem } from "./CameraMenuItem";
 import { CameraTreeIcon, CameraTreeLabel } from "./CameraTreeIcon";
 import { resetCameraPreview, useCameraPreviewTarget } from "./previewStore";
+import { resetCameraRoomStore } from "./room/roomStore";
 
 function PreviewProbe() {
   const target = useCameraPreviewTarget();
@@ -41,12 +42,14 @@ function camera(api: MockApi, state: CameraState): void {
 beforeEach(() => {
   resetCameraAvailability();
   resetCameraPreview();
+  resetCameraRoomStore();
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
   resetCameraAvailability();
   resetCameraPreview();
+  resetCameraRoomStore();
   resetAll();
 });
 
@@ -221,10 +224,10 @@ describe("channel-tree camera marker", () => {
       <>
         <span data-testid="name">
           Priya
-          <CameraTreeLabel self name="Priya" />
+          <CameraTreeLabel self session={1} name="Priya" />
         </span>
-        <CameraTreeIcon self />
-        <CameraTreeIcon self={false} />
+        <CameraTreeIcon self session={1} />
+        <CameraTreeIcon self={false} session={2} />
       </>,
     );
     expect(container.querySelector(".camera-tree-icon")).toBeNull();
@@ -234,5 +237,42 @@ describe("channel-tree camera marker", () => {
     expect(container.querySelectorAll(".camera-tree-icon")).toHaveLength(1);
     expect(container.querySelector(".camera-tree-icon")).toHaveAttribute("data-self");
     expect(screen.getByTestId("name")).toHaveTextContent("Priya, Your camera is on");
+  });
+
+  it("marks other people whose camera is on, from the camera room (FR-8.18)", async () => {
+    const api = await setup();
+    const { container } = render(
+      <>
+        <span data-testid="name">
+          Jonas
+          <CameraTreeLabel self={false} session={2} name="Jonas" />
+        </span>
+        <CameraTreeIcon self={false} session={2} />
+        <CameraTreeIcon self={false} session={3} />
+      </>,
+    );
+    expect(container.querySelector(".camera-tree-icon")).toBeNull();
+    const tile = {
+      sharer: 2,
+      state: "hidden" as const,
+      hidden: false,
+      quality: "auto" as const,
+      dataSaver: false,
+      fpsBadge: null,
+    };
+    act(() => {
+      api.mock.emit("cameraRoomChanged", {
+        view: { serverId: 1, open: false, videosHidden: false, tiles: [tile] },
+      });
+    });
+    expect(container.querySelectorAll(".camera-tree-icon")).toHaveLength(1);
+    expect(container.querySelector(".camera-tree-icon")).not.toHaveAttribute("data-self");
+    expect(screen.getByTestId("name")).toHaveTextContent("Jonas, Jonas's camera is on");
+    act(() => {
+      api.mock.emit("cameraRoomChanged", {
+        view: { serverId: 1, open: false, videosHidden: false, tiles: [] },
+      });
+    });
+    expect(container.querySelector(".camera-tree-icon")).toBeNull();
   });
 });
