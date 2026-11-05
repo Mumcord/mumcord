@@ -7,6 +7,7 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+crossbeam-queue.workspace = true
 mumcord-protocol.workspace = true
 mumcord-audio.workspace = true
 mumcord-store.workspace = true
@@ -63,7 +64,6 @@ ashpd = { workspace = true, features = ["screencast"] }
 pipewire.workspace = true
 futures-util.workspace = true
 # Ready share-sound frames go from the PipeWire loop to the sound thread without locks.
-crossbeam-queue.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Screen capture with the shared app's sound: ScreenCaptureKit (macOS 12.3+, sound 13+, system
