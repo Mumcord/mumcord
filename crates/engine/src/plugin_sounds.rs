@@ -431,8 +431,10 @@ impl Mixer {
             }
             voice.pos += out.len();
         }
-        self.gain = target;
         self.voices.retain(|v| v.pos < v.samples.len());
+        // With nothing playing, the next sound fades in from silence instead of ramping down
+        // from an old gain: a sound started while deafened or muted would leak its first chunk.
+        self.gain = if self.voices.is_empty() { 0.0 } else { target };
         for dst in out.iter_mut() {
             match self.notifications.pop_front() {
                 Some(s) => *dst += s,
@@ -681,6 +683,21 @@ mod tests {
         let db = 20.0 * (ducked / full).log10();
         assert!((db + 12.0).abs() < 0.3, "ducked by {db} dB");
         assert!(settled_peak(&mut mixer, 0.0) < 1e-6, "silent at gain 0");
+    }
+
+    #[test]
+    fn a_new_sound_while_deafened_or_muted_is_silent_from_its_first_sample() {
+        let mut mixer = Mixer::default();
+        mixer.play("a".into(), tone(SAMPLE_RATE as usize, 0.02), 1.0);
+        while !mixer.idle() {
+            settled_peak(&mut mixer, 0.7);
+        }
+        mixer.play("a".into(), tone(SAMPLE_RATE as usize, 0.1), 1.0);
+        let mut out = vec![0.0; CHUNK];
+        assert!(
+            mixer.fill(&mut out, 0.0) < 1e-6,
+            "no ramp from the last sound's gain"
+        );
     }
 
     #[test]
