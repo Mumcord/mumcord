@@ -530,7 +530,8 @@ async fn on_service_event(
             api,
             data,
             receivers,
-        } => engine.plugin_relay_broadcast(server, &plugin, api, data, &receivers),
+            fell_back,
+        } => engine.plugin_relay_broadcast(server, &plugin, api, data, &receivers, fell_back),
         ServiceEvent::ChatPost {
             plugin,
             server,
@@ -669,6 +670,27 @@ pub fn on_engine_event(
                     .await;
                 if let Err(e) = result {
                     tracing::warn!(error = %e, "updating the relay broadcast receivers failed");
+                }
+            });
+        }
+        mumcord_engine::EngineEvent::PluginRelayBroadcast(state) => {
+            use mumcord_engine::plugin_relay::PluginBroadcastState as Engine;
+            use mumcord_plugins::api::relay::BroadcastState;
+            let state = match *state {
+                Engine::Live => BroadcastState::Live,
+                Engine::Down { retry_in } => BroadcastState::Down { retry_in },
+                Engine::Ended => BroadcastState::Ended,
+            };
+            let plugins = Arc::clone(&plugins);
+            tauri::async_runtime::spawn(async move {
+                let result = plugins
+                    .call(move |service| {
+                        service.set_relay_broadcast_state(server_id, state);
+                        Ok(())
+                    })
+                    .await;
+                if let Err(e) = result {
+                    tracing::warn!(error = %e, "updating the relay broadcast state failed");
                 }
             });
         }
