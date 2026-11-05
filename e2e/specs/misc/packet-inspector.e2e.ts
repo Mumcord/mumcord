@@ -124,8 +124,19 @@ describe("packet inspector (issue #60)", () => {
   it("expands the row to the decoded hello and raw hex", async () => {
     const row = $("//tr[contains(@class,'pi-row-sent')][.//code[normalize-space()='mumcord.hello']]");
     const toggle = row.$("button.pi-expand");
+    // While following, every new packet (the client pings every few seconds) scrolls the list,
+    // which can move another row under the pointer between locating the toggle and the click
+    // (seen: a received ServerConfig row opened). Pausing first keeps the rows in place.
+    const follow = button("Follow");
+    if ((await follow.getAttribute("aria-pressed")) === "true") await follow.click();
+    await browser.waitUntil(async () => (await follow.getAttribute("aria-pressed")) === "false", {
+      timeoutMsg: "following did not pause",
+    });
     await toggle.click();
-    expect(await toggle.getAttribute("aria-expanded")).toBe("true");
+    await browser.waitUntil(async () => (await toggle.getAttribute("aria-expanded")) === "true", {
+      timeout: 5_000,
+      timeoutMsg: "the hello row did not expand",
+    });
     const decoded = $("pre[aria-label='Decoded content']");
     await decoded.waitForDisplayed();
     expect(await decoded.getText()).toContain('"app": "mumcord"');
@@ -149,7 +160,7 @@ describe("packet inspector (issue #60)", () => {
   it("follows new packets and stops following when scrolled up", async () => {
     const list = $(".pi-table-wrap");
     const follow = button("Follow");
-    // Expanding a row in the earlier test paused following; the toggle resumes it.
+    // The earlier test paused following; the toggle resumes it.
     expect(await follow.getAttribute("aria-pressed")).toBe("false");
     await follow.click();
     expect(await follow.getAttribute("aria-pressed")).toBe("true");
