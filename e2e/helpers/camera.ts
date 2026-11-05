@@ -88,15 +88,44 @@ export async function setP2pMode(mode: "directRelay" | "relayOnly" | "directOnly
   await $("fieldset.p2p-modes").waitForExist({ reverse: true });
 }
 
+/** The "Relay allows" row of the shown server's info panel (opens and closes the panel). */
+export async function relayAllows(): Promise<string> {
+  await $("button[aria-label^='Server options']").click();
+  await $("//*[@role='menuitem'][normalize-space()='Server info']").click();
+  const row = $("//dt[normalize-space()='Relay allows']/following-sibling::dd[1]");
+  try {
+    await row.waitForExist({ timeout: 30_000, timeoutMsg: "server info has no Relay allows row" });
+    return (await row.getText()).trim();
+  } finally {
+    await browser.keys("Escape");
+  }
+}
+
+/** Blocks `name` from the person menu in the tree, confirming the dialog. */
+export async function blockPerson(name: string): Promise<void> {
+  const row = personRow(name);
+  await row.waitForDisplayed({ timeout: 30_000 });
+  await row.click({ button: "right" });
+  const item = $("//*[@role='menuitem'][normalize-space()='Block…']");
+  await item.waitForClickable();
+  await item.click();
+  await $(`//dialog[.//h2[normalize-space()='Block ${name}?']]`).waitForDisplayed();
+  await $("[data-testid='block-confirm']").click();
+  await $(`//dialog[.//h2[normalize-space()='Block ${name}?']]`).waitForExist({ reverse: true });
+}
+
 // ---------------------------------------------------------------------------------------------
 // Engine state (Tauri commands, see the G-1 contract)
 
 export interface CameraView {
   serverId: number;
   state: "off" | "preview" | "requesting" | "onAir";
-  error: string | { reason?: string } | null;
-  broadcast: unknown;
-  viewers: number;
+  /** A `CameraFailure` code ("roomFull", "relayDown", …). */
+  error: string | null;
+  /** The broadcast id while on air. */
+  broadcast: string | null;
+  /** Session ids of the people who receive the camera now. */
+  viewers: number[];
 }
 
 /** The own camera of the running client (`camera_view`), `null` when it is off. */
