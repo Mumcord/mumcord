@@ -33,7 +33,9 @@ use objc2_foundation::{
     NSNumber, NSObject, NSObjectProtocol, NSString,
 };
 
-use super::mode::{self, Choice, Mode, Planes, Rate};
+use super::mode::{self, Choice, Mode, Rate};
+use crate::convert::{Picture, to_nv12};
+use crate::mode::Geometry;
 use crate::{
     CameraBackend, CameraDevice, CameraError, CameraFrame, CaptureRequest, CaptureSession,
     DeviceId, FramePool, FrameSink, HotplugCallback, HotplugWatch, POOL_BUFFERS, nv12_len,
@@ -214,8 +216,8 @@ impl Drop for Observers {
 /// What the capture queue needs. Only touched on the session's serial dispatch queue.
 struct Delivery {
     pool: FramePool,
-    /// Size of every frame after the crop.
-    frame: (u32, u32),
+    /// The crop of the delivered pictures; its size is that of every frame.
+    geometry: Geometry,
     started: Instant,
     state: UnsafeCell<QueueState>,
 }
@@ -352,23 +354,25 @@ fn copy_frame(delivery: &Delivery, buffer: &CMSampleBuffer) -> Copied {
         // SAFETY: the locked plane holds `rows` rows of `stride` bytes.
         unsafe { std::slice::from_raw_parts(base.cast::<u8>(), stride * rows) }
     };
-    let planes = Planes {
-        width: CVPixelBufferGetWidth(&pixels) as u32,
-        height: CVPixelBufferGetHeight(&pixels) as u32,
-        luma: plane(0),
-        luma_stride: CVPixelBufferGetBytesPerRowOfPlane(&pixels, 0),
-        chroma: plane(1),
-        chroma_stride: CVPixelBufferGetBytesPerRowOfPlane(&pixels, 1),
+    let (width, height) = (
+        CVPixelBufferGetWidth(&pixels) as u32,
+        CVPixelBufferGetHeight(&pixels) as u32,
+    );
+    let picture = Picture::Nv12 {
+        y: plane(0),
+        y_stride: CVPixelBufferGetBytesPerRowOfPlane(&pixels, 0),
+        uv: plane(1),
+        uv_stride: CVPixelBufferGetBytesPerRowOfPlane(&pixels, 1),
     };
-    let copied = mode::copy_cropped(&planes, delivery.frame, &mut out);
+    let copied = to_nv12(picture, width, height, &delivery.geometry, &mut out);
     // SAFETY: matches the lock above.
     unsafe { CVPixelBufferUnlockBaseAddress(&pixels, CVPixelBufferLockFlags::ReadOnly) };
     if !copied {
         return Copied::Unreadable;
     }
     Copied::Frame(CameraFrame {
-        width: delivery.frame.0,
-        height: delivery.frame.1,
+        width: delivery.geometry.width,
+        height: delivery.geometry.height,
         timestamp: delivery.started.elapsed(),
         data: out,
     })
@@ -408,8 +412,11 @@ impl MacSession {
             .map_err(|error| av_error(&error))?;
 
         let delivery = Arc::new(Delivery {
-            pool: FramePool::new(POOL_BUFFERS, nv12_len(choice.frame.0, choice.frame.1)),
-            frame: choice.frame,
+            pool: FramePool::new(
+                POOL_BUFFERS,
+                nv12_len(choice.geometry.width, choice.geometry.height),
+            ),
+            geometry: choice.geometry,
             started: Instant::now(),
             state: UnsafeCell::new(QueueState {
                 sink,
