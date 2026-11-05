@@ -166,9 +166,13 @@ async function connect(name: string, port: number): Promise<void> {
       await files.cardButton("game-night.dat", "Download").click();
       const confirm = files.dialog();
       await confirm.waitForDisplayed();
+      const folder = join(app.downloadsDir("b"), "Mumcord");
+      await browser.waitUntil(async () => (await confirm.getText()).includes(folder), {
+        timeoutMsg: "the confirmation did not show the download folder",
+      });
       const text = (await confirm.getText()).replace(/\s+/g, " ");
       expect(text).toContain(hash);
-      expect(text).toContain(join(app.downloadsDir("b"), "Mumcord"));
+      expect(text).toContain(folder);
       await confirm.$(".//button[normalize-space()='Download']").click();
       await files.waitDownloaded("game-night.dat");
     });

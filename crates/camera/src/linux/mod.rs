@@ -3,12 +3,11 @@
 //!
 //! The path is chosen once per process, on first use: the portal when it reports a camera (or
 //! always inside Flatpak, where `/dev/video*` is not reachable), otherwise V4L2. Both deliver
-//! through the same mode choice, crop and conversion ([`mode`], [`convert`], [`pump`]).
+//! through the same mode choice, crop and conversion as the other backends ([`crate::mode`],
+//! [`crate::convert`], [`crate::pump`]).
 
-mod convert;
-mod mode;
 mod portal;
-mod pump;
+mod ranges;
 mod v4l2;
 
 use std::path::Path;
