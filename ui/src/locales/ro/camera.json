@@ -37,6 +37,7 @@
     "imageYoursLabel": "Imaginea ta: {{name}}",
     "addImage": "Adaugă imagine",
     "addImageLabel": "Adaugă o imagine proprie",
+    "imageFilter": "Imagini",
     "effectsLoad": "Efectele rulează pe acest dispozitiv. Încărcare: {{load}} ({{unit}})",
     "loadLow": "mică",
     "loadMedium": "medie",

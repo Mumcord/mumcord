@@ -37,6 +37,7 @@
     "imageYoursLabel": "Sinu pilt: {{name}}",
     "addImage": "Lisa pilt",
     "addImageLabel": "Lisa oma pilt",
+    "imageFilter": "Pildid",
     "effectsLoad": "Efektid töötavad selles seadmes. Koormus: {{load}} ({{unit}})",
     "loadLow": "madal",
     "loadMedium": "keskmine",

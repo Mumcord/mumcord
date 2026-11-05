@@ -37,6 +37,7 @@
     "imageYoursLabel": "Твоето изображение: {{name}}",
     "addImage": "Добави изображение",
     "addImageLabel": "Добави свое изображение",
+    "imageFilter": "Изображения",
     "effectsLoad": "Ефектите работят на това устройство. Натоварване: {{load}} ({{unit}})",
     "loadLow": "ниско",
     "loadMedium": "средно",

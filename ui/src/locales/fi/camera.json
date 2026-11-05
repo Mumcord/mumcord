@@ -37,6 +37,7 @@
     "imageYoursLabel": "Oma kuvasi: {{name}}",
     "addImage": "Lisää kuva",
     "addImageLabel": "Lisää oma kuvasi",
+    "imageFilter": "Kuvat",
     "effectsLoad": "Tehosteet toimivat tällä laitteella. Kuormitus: {{load}} ({{unit}})",
     "loadLow": "pieni",
     "loadMedium": "keskitasoinen",

@@ -37,6 +37,7 @@
     "imageYoursLabel": "Jouw afbeelding: {{name}}",
     "addImage": "Afbeelding toevoegen",
     "addImageLabel": "Voeg je eigen afbeelding toe",
+    "imageFilter": "Afbeeldingen",
     "effectsLoad": "Effecten draaien op dit apparaat. Belasting: {{load}} ({{unit}})",
     "loadLow": "laag",
     "loadMedium": "gemiddeld",

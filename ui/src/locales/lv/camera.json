@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tavs attēls: {{name}}",
     "addImage": "Pievienot attēlu",
     "addImageLabel": "Pievienot savu attēlu",
+    "imageFilter": "Attēli",
     "effectsLoad": "Efekti darbojas šajā ierīcē. Slodze: {{load}} ({{unit}})",
     "loadLow": "zema",
     "loadMedium": "vidēja",

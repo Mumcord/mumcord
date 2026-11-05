@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tvoja slika: {{name}}",
     "addImage": "Dodaj sliku",
     "addImageLabel": "Dodaj vlastitu sliku",
+    "imageFilter": "Slike",
     "effectsLoad": "Efekti se izvode na ovom uređaju. Opterećenje: {{load}} ({{unit}})",
     "loadLow": "nisko",
     "loadMedium": "srednje",
