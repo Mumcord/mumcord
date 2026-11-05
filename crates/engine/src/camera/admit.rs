@@ -46,7 +46,7 @@ impl CameraViewers {
     /// `viewer` with certificate `hash` asked to join, playing `codecs`. A viewer who is already
     /// in is admitted again (it binds anew, for example after a reconnect of its link).
     pub fn join(&mut self, viewer: u32, hash: &str, codecs: &[Codec]) -> Join {
-        if !self.viewers.contains_key(&viewer) && self.viewers.len() >= self.limit {
+        if !self.viewers.contains_key(&viewer) && self.is_full() {
             return Join::Full;
         }
         self.viewers.insert(
@@ -63,6 +63,11 @@ impl CameraViewers {
     /// drops it and rekeys, or `None` when it was not admitted.
     pub fn leave(&mut self, viewer: u32) -> Option<String> {
         self.viewers.remove(&viewer).map(|v| v.hash)
+    }
+
+    /// No room for another viewer.
+    pub fn is_full(&self) -> bool {
+        self.viewers.len() >= self.limit
     }
 
     pub fn contains(&self, viewer: u32) -> bool {
@@ -91,12 +96,14 @@ mod tests {
         assert_eq!(viewers.join(1, "AA", BOTH), Join::Admit);
         assert_eq!(viewers.join(2, "bb", BOTH), Join::Admit);
         assert_eq!(viewers.join(3, "cc", BOTH), Join::Full);
+        assert!(viewers.is_full());
         // Joining again is fine for someone who is in.
         assert_eq!(viewers.join(1, "aa", BOTH), Join::Admit);
         assert_eq!(viewers.sessions(), [1, 2]);
         // A leave frees the seat and hands back the hash for the rekey.
         assert_eq!(viewers.leave(1).as_deref(), Some("aa"));
         assert_eq!(viewers.leave(1), None);
+        assert!(!viewers.is_full());
         assert_eq!(viewers.join(3, "cc", BOTH), Join::Admit);
         assert!(viewers.contains(3));
     }

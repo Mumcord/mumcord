@@ -18,8 +18,11 @@ import { useWatchParty, watchPartyOf } from "../watchparty/watchPartyStore";
 import { openMedia, type StageId } from "./mediaView";
 import { popIn, sameTarget, usePopouts, usePopoutTitle } from "./popoutStore";
 
+/** The pop-outs docked back here; the camera room (spec 08) handles its own pop-out. */
+type DockedKind = Exclude<MediaPopoutKind, "camera">;
+
 /** Whether the main window still has what the closed pop-out showed. */
-function stillActive(kind: MediaPopoutKind, target: MediaPopoutTarget): boolean {
+function stillActive(kind: DockedKind, target: MediaPopoutTarget): boolean {
   if (kind === "watch") return watchPartyOf(target.serverId)?.party.joined ?? false;
   if (kind === "stage")
     return target.plugin !== null && joinedActivityOf(target.plugin) !== undefined;
@@ -27,7 +30,7 @@ function stillActive(kind: MediaPopoutKind, target: MediaPopoutTarget): boolean 
 }
 
 /** The stage tab that shows what the pop-out of `kind` showed. */
-function stageIdOf(kind: MediaPopoutKind, target: MediaPopoutTarget): StageId {
+function stageIdOf(kind: DockedKind, target: MediaPopoutTarget): StageId {
   return kind === "stage" ? `plugin:${target.plugin ?? ""}` : kind;
 }
 
