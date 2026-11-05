@@ -835,6 +835,7 @@ impl Engine {
         after: &[mumcord_store::BlockedUser],
     ) {
         self.plugin_blocks_changed();
+        self.camera_blocks_changed();
         let mut core = lock(&self.inner.core);
         let Some(server_id) = core.audio_server else {
             return;
@@ -1931,6 +1932,11 @@ impl Inner {
                     .for_server(server_id)
                     .emit(EngineEvent::ScreenSharesChanged(Vec::new()));
             }
+            if let Some(room) = crate::camera::recv::on_connection_reset(&self.cameras, server_id) {
+                self.events
+                    .for_server(server_id)
+                    .emit(EngineEvent::CameraRoomChanged(room));
+            }
             if crate::camera::session::on_connection_reset(
                 &self.cameras,
                 &self.camera_signals,
@@ -1968,6 +1974,9 @@ impl Inner {
         if crate::screen_share::reset(&self.screen_shares, ctx.server_id) {
             ctx.events
                 .emit(EngineEvent::ScreenSharesChanged(Vec::new()));
+        }
+        if let Some(room) = crate::camera::recv::on_connection_reset(&self.cameras, ctx.server_id) {
+            ctx.events.emit(EngineEvent::CameraRoomChanged(room));
         }
         if crate::camera::session::on_connection_reset(
             &self.cameras,

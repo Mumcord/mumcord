@@ -4,6 +4,7 @@ mod admit;
 pub mod avail;
 mod local;
 pub mod preview;
+pub mod recv;
 mod send;
 pub mod session;
 pub mod signal;
@@ -13,5 +14,6 @@ pub use mumcord_effects::{
     Background, EffectStats, EffectsError, Level as EffectLevel, Load as EffectLoad,
 };
 pub use preview::{PreviewPicture, PreviewSink};
+pub use recv::{CameraRoomView, CameraTile, TileQuality, TileState};
 pub use send::SendEnded;
 pub use session::{CameraFailure, CameraState, CameraView};

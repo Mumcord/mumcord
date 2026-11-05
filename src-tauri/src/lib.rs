@@ -634,12 +634,17 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let data_dir = portable::data_dir(app)?;
     let logs_dir = portable::log_dir(app)?;
     std::fs::create_dir_all(&data_dir)?;
-    std::fs::create_dir_all(&logs_dir)?;
 
+    // Engine start-up already logs (e.g. the encoder probe), but the log level lives in the
+    // profile and a too-new profile must be rejected before anything is written: keep lines in
+    // memory until the profile is open.
+    if let Err(e) = diag::init_early() {
+        eprintln!("early logging unavailable: {e}");
+    }
     let runtime = tauri::async_runtime::handle().inner().clone();
     let (engine, mut events) = Engine::new(&data_dir, SecretStore::os(), runtime)?;
     let stored = engine.settings()?;
-    if let Err(e) = diag::init(&logs_dir, settings::diag_level(stored.log_level), 7) {
+    if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {
         eprintln!("file logging unavailable: {e}");
     }
     tracing::info!(
@@ -1057,6 +1062,7 @@ fn emit_engine_event(
         EngineEvent::CameraChanged(view) => {
             commands::camera::CameraChanged { view: view.into() }.emit(app)
         }
+        EngineEvent::CameraRoomChanged(_) => Ok(()),
     }
 }
 
