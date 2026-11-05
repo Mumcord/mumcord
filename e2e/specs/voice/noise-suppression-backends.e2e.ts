@@ -46,11 +46,13 @@ const CLIP_SECONDS = Math.floor(noisy.length / RATE);
  * about the suppressor. */
 const PREFIX = 15;
 /** How far the recorded copy may sit from the window the connect time implies for it. The copy cannot
- * start before the app connected, so the alignment may not put it earlier than that; the app buffers
+ * start before the app connected, so the alignment may not put it much earlier than that: the test
+ * sees the connection only when the label shows it, one poll of up to 100 ms or more later (locally
+ * up to 7 windows). The app buffers
  * before its first frame goes out and a neural model shifts the frame it returns, so it can sit later.
  * Runs that measured correctly landed 3-57 windows after the connect; the run that failed in CI was 50
  * windows before it, which is impossible, so it matched a shifted part of the clip. */
-const ALIGN_EARLY_GRACE_WINDOWS = 2;
+const ALIGN_EARLY_GRACE_WINDOWS = 25;
 const ALIGN_LATE_SLACK_WINDOWS = 100;
 /** How far the second copy of the switch run may sit from where the first copy puts it: the neural
  * backend returns its frame one window late, anything more means audio was lost or held up. */
@@ -138,15 +140,18 @@ async function choose(text: string): Promise<void> {
   await pick(text);
 }
 
-/** Reconnects after an app restart; the server bar label can carry extra text. */
-async function reconnectApp(): Promise<void> {
+/** Reconnects after an app restart; the server bar label can carry extra text. Returns when the
+ * connection showed (`Date.now()`), not when the channel tree followed. */
+async function reconnectApp(): Promise<number> {
   const connected = await $("//button[starts-with(@aria-label, 'localhost (connected)')]");
-  if (await connected.isDisplayed()) return;
+  if (await connected.isDisplayed()) return Date.now();
   const button = await $("//button[starts-with(@aria-label, 'localhost')]");
   await button.waitForDisplayed({ timeout: 30_000 });
   await button.click();
   await waitFor("//button[starts-with(@aria-label, 'localhost (connected)')]", 30_000);
+  const shown = Date.now();
   await waitFor("[role='tree']", 30_000);
+  return shown;
 }
 
 /**
@@ -173,8 +178,7 @@ async function record(
   });
   await app.restart({ audio: `file:${f(`${label}-in.wav`)}:${f(`${label}-out.wav`)}` });
   const restarted = Date.now();
-  await reconnectApp();
-  const reconnected = Date.now();
+  const reconnected = await reconnectApp();
   const connected = reconnected - restarted;
   if (connected > PREFIX * 1000 - 1000) {
     throw new Error(
