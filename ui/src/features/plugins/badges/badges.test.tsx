@@ -35,7 +35,8 @@ function plugin(id: string, extra: Partial<InstalledPlugin> = {}): InstalledPlug
 let api: MockApi;
 
 function listPlugins(plugins: InstalledPlugin[]): void {
-  api.pluginsList = () => Promise.resolve({ noPlugins: false, allOff: false, plugins });
+  api.pluginsList = () =>
+    Promise.resolve({ noPlugins: false, allOff: false, plugins, refused: [] });
 }
 
 function setTree(pluginId: string, kind: "memberBadge" | "profileCard", label: string): void {

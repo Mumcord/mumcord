@@ -68,6 +68,7 @@ function setup(updates: PluginUpdate[], installed: InstalledPlugin = plugin) {
     noPlugins: false,
     allOff: false,
     plugins: [installed],
+    refused: [],
   });
   vi.spyOn(api, "pluginUpdates").mockResolvedValue(updates);
   const apply = vi.spyOn(api, "pluginApplyUpdate").mockResolvedValue(null);
@@ -119,6 +120,7 @@ describe("UpdatesTab", () => {
       noPlugins: false,
       allOff: false,
       plugins: [{ ...plugin, enabled: false, disabledReason: "revoked", revocation: "Leaks" }],
+      refused: [],
     });
     vi.spyOn(api, "pluginUpdates").mockResolvedValue([]);
     const remove = vi.spyOn(api, "pluginRemove").mockResolvedValue(null);

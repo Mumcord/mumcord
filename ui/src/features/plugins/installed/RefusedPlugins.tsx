@@ -25,9 +25,11 @@ export function RefusedPlugins({ refused }: { refused: RefusedPlugin[] }) {
                     permission: entry.issue.permission,
                   })}
             </p>
-            <p className="settings-hint">
-              {t("refused.when", { time: new Date(entry.atMillis).toLocaleString() })}
-            </p>
+            {entry.atMillis !== null && (
+              <p className="settings-hint">
+                {t("refused.when", { time: new Date(entry.atMillis).toLocaleString() })}
+              </p>
+            )}
           </li>
         ))}
       </ul>
