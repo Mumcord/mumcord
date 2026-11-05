@@ -65,9 +65,22 @@ async function useTheme(theme: "dark" | "light"): Promise<void> {
   await $(".settings__nav").waitForExist({ reverse: true, timeout: 10_000 });
 }
 
-/** True when the icon is drawn as an outline (stroke, no fill), as in the mockups. */
+/**
+ * True when the icon is drawn as an outline (stroke, no fill), as in the mockups. Reads the
+ * computed style of the drawn shapes: the app sets fill and stroke on an inner group, the mockup
+ * on the <svg> itself, and both draw the same outline.
+ */
 async function outlined(svg: ChainablePromiseElement): Promise<boolean> {
-  return (await svg.getAttribute("fill")) === "none" && (await svg.getAttribute("stroke")) !== null;
+  return browser.execute((el) => {
+    const shapes = [...el.querySelectorAll("path, rect, circle, line, polyline, polygon, ellipse")];
+    return (
+      shapes.length > 0 &&
+      shapes.every((shape) => {
+        const style = getComputedStyle(shape);
+        return style.fill === "none" && style.stroke !== "none" && style.strokeWidth !== "0px";
+      })
+    );
+  }, await svg);
 }
 
 /** The vertical centres of the live bar's visible buttons. */
@@ -153,7 +166,9 @@ async function showMembers(): Promise<void> {
       await expectSoundLine(`Sound: ${P1}`);
       const source = $(".sharer-bar__source");
       expect((await source.getText()).startsWith("Window")).toBe(true);
-      const badge = source.$("//span[contains(@class,'share-badge')][starts-with(normalize-space(),'Sound:')]");
+      const badge = source.$(
+        ".//span[contains(concat(' ',@class,' '),' share-badge ')][starts-with(normalize-space(),'Sound:')]",
+      );
       expect(await outlined(badge.$("svg"))).toBe(true);
       const centres = await buttonCentres();
       expect(centres.length).toBeGreaterThanOrEqual(6);
