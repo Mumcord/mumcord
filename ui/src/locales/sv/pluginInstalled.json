@@ -56,6 +56,8 @@
     "incomingRateDropped": "Inkommande meddelanden som tappats av hastighetsgränsen",
     "incomingInvalid": "Ogiltiga inkommande meddelanden",
     "uiFreezes": "Antal gånger Mumcord frös medan webbinnehållet var öppet",
+    "refusedAppMenuLabel": "Det här tillägget avvisades: en etikett i Appar-menyn är densamma som en av Mumcords egna eller börjar med \"Mumcord\".",
+    "fieldWithoutPermission": "Det här tillägget avvisades: det använder \"{{field}}\" utan behörigheten \"{{permission}}\".",
     "webDisabled": "Webbinnehållet är avstängt eftersom Mumcord slutade svara medan det var öppet.",
     "reenableWeb": "Slå på webbinnehåll",
     "reenableFailed": "Webbinnehållet kunde inte slås på.",

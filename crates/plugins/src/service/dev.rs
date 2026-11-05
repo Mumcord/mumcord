@@ -99,6 +99,9 @@ impl PluginService {
             Ok(manifest) => manifest,
             Err(error) => {
                 self.load_errors.insert(id.to_owned(), error.to_string());
+                if let Some(issue) = error.load_issue() {
+                    self.load_issues.insert(id.to_owned(), issue);
+                }
                 self.changed();
                 return Err(error);
             }

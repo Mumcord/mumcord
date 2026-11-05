@@ -35,6 +35,7 @@ use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
 use crate::api::secrets::PluginSecrets;
 use crate::api::storage::{DataError, Storage};
+use crate::diag::LoadIssue;
 use crate::host::{HostError, HostEvent, LoadError, PluginHost, RunState};
 use crate::manifest::{ManifestError, OptionalPermission, Source};
 use crate::package::{Package, PackageError};
@@ -290,6 +291,18 @@ fn installed_manifest(dir: &Path, id: &str) -> Option<crate::manifest::Manifest>
     }
 }
 
+impl ServiceError {
+    /// The Diagnostics entry (FR-9.90) this load failure leaves, if it is one of the listed kinds.
+    pub fn load_issue(&self) -> Option<LoadIssue> {
+        match self {
+            ServiceError::Manifest(error) | ServiceError::Load(LoadError::Manifest(error)) => {
+                error.diagnostic()
+            }
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum ServiceError {
     #[error(transparent)]
@@ -416,6 +429,8 @@ pub struct PluginService {
     quiet: bool,
     /// Why an installed plugin could not be loaded in this run.
     load_errors: BTreeMap<String, String>,
+    /// The Diagnostics entry (FR-9.90) of a plugin that was refused at load, if it has one.
+    load_issues: BTreeMap<String, LoadIssue>,
     events: UnboundedSender<ServiceEvent>,
     /// Available updates and rollback reasons (FR-6.66–6.69).
     updates: updates::Updates,
@@ -483,6 +498,7 @@ impl PluginService {
             language: "en".into(),
             quiet: false,
             load_errors: BTreeMap::new(),
+            load_issues: BTreeMap::new(),
             events,
             updates: updates::Updates::default(),
             revoked: crate::registry::RevocationList::bundled(),
@@ -537,6 +553,11 @@ impl PluginService {
     /// The plugin's own log lines, oldest first (Developer tab, FR-6.73).
     pub fn log_lines(&self, id: &str) -> Vec<(crate::Level, String)> {
         self.host.log_lines(id)
+    }
+
+    /// Why the plugin was refused at load, when Diagnostics lists that reason (FR-9.90).
+    pub fn load_issue(&self, id: &str) -> Option<LoadIssue> {
+        self.load_issues.get(id).copied()
     }
 
     pub fn diagnostics(&self, id: &str) -> Option<crate::DiagSnapshot> {

@@ -56,6 +56,8 @@
     "incomingRateDropped": "Messaggi in arrivo scartati dal limite di frequenza",
     "incomingInvalid": "Messaggi in arrivo non validi",
     "uiFreezes": "Volte in cui Mumcord si è bloccato con il suo contenuto web aperto",
+    "refusedAppMenuLabel": "Questo plugin è stato rifiutato: un'etichetta del menu App è uguale a una di Mumcord o inizia con «Mumcord».",
+    "fieldWithoutPermission": "Questo plugin è stato rifiutato: usa «{{field}}» senza il permesso «{{permission}}».",
     "webDisabled": "Il suo contenuto web è disattivato perché Mumcord ha smesso di rispondere mentre era aperto.",
     "reenableWeb": "Attiva il contenuto web",
     "reenableFailed": "Impossibile attivare il contenuto web.",

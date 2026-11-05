@@ -56,6 +56,8 @@
     "incomingRateDropped": "Inkomende berichten weggegooid door de snelheidslimiet",
     "incomingInvalid": "Ongeldige inkomende berichten",
     "uiFreezes": "Aantal keren dat Mumcord vastliep terwijl de webinhoud open was",
+    "refusedAppMenuLabel": "Deze plug-in is geweigerd: een label in het Apps-menu is gelijk aan een eigen label van Mumcord of begint met \"Mumcord\".",
+    "fieldWithoutPermission": "Deze plug-in is geweigerd: hij gebruikt \"{{field}}\" zonder de toestemming \"{{permission}}\".",
     "webDisabled": "De webinhoud is uitgeschakeld omdat Mumcord niet meer reageerde terwijl deze open was.",
     "reenableWeb": "Webinhoud inschakelen",
     "reenableFailed": "De webinhoud kon niet worden ingeschakeld.",

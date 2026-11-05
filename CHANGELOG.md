@@ -72,6 +72,7 @@
 
 ### Fixed
 
+- Settings → Plugins → Diagnostics now says why a plugin was refused at load, for example "an Apps-menu label is the same as one of Mumcord's own", instead of showing nothing.
 - Log lines from the very start of the app, such as the screen-share encoder check on older CPUs, are no longer missing from the log file and the diagnostic file
 - A chat message from someone who leaves right after sending it (a shared file, too) now shows their name instead of an empty sender, and a block still applies to it.
 - A screen share sent with VP9 no longer risks crashing Mumcord when the shared window grows or the quality steps up to a size larger than the one the share started at; the encoder now restarts at the new size with a fresh keyframe.

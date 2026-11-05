@@ -16,7 +16,7 @@ use mumcord_plugins::service::{
     ServiceError, ServiceEvent, Status, StoredLine,
 };
 use mumcord_plugins::verify::IndexEntry;
-use mumcord_plugins::{Digest, HostEvent};
+use mumcord_plugins::{Digest, HostEvent, LoadIssue};
 use mumcord_store::{NewPluginRepository, PluginVisibility, Store};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -605,6 +605,37 @@ fn developer_folders_follow_developer_mode() {
     service.developer_mode_changed(false).expect("unloads");
     assert!(service.list().expect("list").iter().all(|p| p.id != id));
     assert!(service.dir(&id).is_none());
+}
+
+#[test]
+fn a_refused_apps_menu_label_is_kept_for_diagnostics() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, _events) = fx.service();
+    let folder = dev_folder(fx.root.path(), "badlabel", "");
+    let id = service.load_dev(&folder).expect("loads");
+    assert_eq!(service.load_issue(&id), None);
+
+    std::fs::write(
+        folder.join("manifest.json"),
+        manifest(
+            "badlabel",
+            "0.1.0",
+            r#","permissions":{"required":["ui.app-menu"]},"app_menu":[{"id":"open","label":"Settings"}]"#,
+        )
+        .replace("^1.0", "^1.1"),
+    )
+    .expect("manifest");
+    let error = service.reload_dev(&id).expect_err("refused");
+    assert_eq!(
+        error.load_issue(),
+        Some(LoadIssue::RefusedAppMenuLabel),
+        "{error:?}"
+    );
+    assert_eq!(
+        service.load_issue(&id),
+        Some(LoadIssue::RefusedAppMenuLabel)
+    );
 }
 
 /// Core module: `start` sends "hi" (kind 5) to the channel with `peers.send`. On an error it

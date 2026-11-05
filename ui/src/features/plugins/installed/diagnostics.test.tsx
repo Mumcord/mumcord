@@ -34,6 +34,7 @@ function diagnostics(change: Partial<PluginDiagnostics>): PluginDiagnostics {
     incomingInvalid: 0,
     uiFreezes: 0,
     webDisabled: false,
+    loadIssue: null,
     log: [],
     ...change,
   };
@@ -69,6 +70,14 @@ describe("Diagnostics", () => {
     await vi.waitFor(() => {
       expect(screen.queryByRole("button", { name: "Turn web content on" })).toBeNull();
     });
+  });
+
+  it("lists a plugin refused for its Apps-menu label", async () => {
+    api.diagnostics = diagnostics({ loadIssue: { kind: "refused_app_menu_label" } });
+    render(<Diagnostics id="badlabel" />);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "This plugin was refused: an Apps-menu label is the same as one of Mumcord's own",
+    );
   });
 
   it("says so when turning web content on fails", async () => {

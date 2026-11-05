@@ -5,7 +5,7 @@ import { formatSize } from "../../settings/formatSize";
 
 type Counter = Exclude<
   keyof PluginDiagnostics,
-  "log" | "cpuTimeMs" | "memoryBytes" | "peakMemoryBytes" | "webDisabled"
+  "log" | "loadIssue" | "cpuTimeMs" | "memoryBytes" | "peakMemoryBytes" | "webDisabled"
 >;
 
 const COUNTERS: readonly Counter[] = [
@@ -102,6 +102,16 @@ export function Diagnostics({ id }: { id: string }) {
             </p>
           )}
         </div>
+      )}
+      {data.loadIssue && (
+        <p role="alert" className="settings-error">
+          {data.loadIssue.kind === "refused_app_menu_label"
+            ? t("diagnostics.refusedAppMenuLabel")
+            : t("diagnostics.fieldWithoutPermission", {
+                field: data.loadIssue.field,
+                permission: data.loadIssue.permission,
+              })}
+        </p>
       )}
       <dl>
         {rows.map(([key, shown]) => (
