@@ -204,7 +204,12 @@ impl Plugin for TestSurface {
                 let Some(action) = action else { return };
                 match result.outcome {
                     Ok(response) => note(format!("{action}: {}", response.status)),
-                    Err(e) => note(format!("{action}: {}", kebab(&format!("{e:?}")))),
+                    // `HttpError::HostNotAllowed` → `host-not-allowed`, the WIT case name.
+                    Err(e) => {
+                        let case = format!("{e:?}");
+                        let case = case.trim_start_matches("HttpError::");
+                        note(format!("{action}: {}", kebab(case)));
+                    }
                 }
             }
             Event::SurfaceClosed(place) => {
