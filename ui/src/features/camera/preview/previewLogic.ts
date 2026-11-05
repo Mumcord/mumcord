@@ -78,14 +78,26 @@ export function canRetryAccess(failure: CameraFailure, os: DesktopOs | null): bo
   return failure === "permissionDenied" && (os === "linux" || os === null);
 }
 
-/** The six built-in images (FR-8.39), in mockup order; `key` names the text in `backgrounds`. */
+/** The 18 built-in images (FR-8.39), in display order; `key` names the text in `backgrounds`. */
 export const BUILTIN_BACKGROUNDS = [
-  { id: "soft-light", key: "softLight" },
-  { id: "library", key: "library" },
-  { id: "mountains", key: "mountains" },
-  { id: "studio", key: "studio" },
-  { id: "night-city", key: "nightCity" },
-  { id: "beach", key: "beach" },
+  { id: "abstract-warm-waves", key: "abstractWarmWaves" },
+  { id: "blue-magenta-waves", key: "blueMagentaWaves" },
+  { id: "glossy-waves-orb", key: "glossyWavesOrb" },
+  { id: "pixel-mountain-sunset", key: "pixelMountainSunset" },
+  { id: "city-balcony-night", key: "cityBalconyNight" },
+  { id: "modern-wc", key: "modernWc" },
+  { id: "electronics-lab", key: "electronicsLab" },
+  { id: "server-corridor", key: "serverCorridor" },
+  { id: "neon-gaming-room", key: "neonGamingRoom" },
+  { id: "neon-nerd-room", key: "neonNerdRoom" },
+  { id: "pixel-gaming-room-cat", key: "pixelGamingRoomCat" },
+  { id: "reef-aquarium-room", key: "reefAquariumRoom" },
+  { id: "night-model-railway", key: "nightModelRailway" },
+  { id: "model-railway-viaduct", key: "modelRailwayViaduct" },
+  { id: "spaceship-bridge-cat", key: "spaceshipBridgeCat" },
+  { id: "space-station-earth", key: "spaceStationEarth" },
+  { id: "scifi-room-golden-valley", key: "scifiRoomGoldenValley" },
+  { id: "underwater-base-whale", key: "underwaterBaseWhale" },
 ] as const;
 
 export type BackgroundMode = "none" | "blur" | "image";

@@ -57,12 +57,15 @@ describe("CameraPreviewDialog", () => {
     const { dialog } = await openDialog();
     const setBackground = vi.spyOn(api, "cameraSetBackground");
     fireEvent.click(within(dialog).getByRole("radio", { name: "Image" }));
-    expect(setBackground).toHaveBeenLastCalledWith({ kind: "builtin", id: "soft-light" }, 50);
+    expect(setBackground).toHaveBeenLastCalledWith(
+      { kind: "builtin", id: "abstract-warm-waves" },
+      50,
+    );
     const library = within(dialog).getByRole("radiogroup", { name: "Image" });
     await within(library).findByRole("radio", { name: "Your image 1" });
-    expect(within(library).getAllByRole("radio")).toHaveLength(7);
-    fireEvent.click(within(library).getByRole("radio", { name: "Mountains" }));
-    expect(setBackground).toHaveBeenLastCalledWith({ kind: "builtin", id: "mountains" }, 50);
+    expect(within(library).getAllByRole("radio")).toHaveLength(19);
+    fireEvent.click(within(library).getByRole("radio", { name: "Modern WC" }));
+    expect(setBackground).toHaveBeenLastCalledWith({ kind: "builtin", id: "modern-wc" }, 50);
     expect(within(dialog).getByRole("button", { name: "Add your own image" })).toBeEnabled();
     fireEvent.click(within(dialog).getByRole("radio", { name: "None" }));
     expect(setBackground).toHaveBeenLastCalledWith({ kind: "none" }, 50);
