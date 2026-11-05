@@ -380,10 +380,12 @@ mod tests {
         assert_eq!(clean_country_code("D1"), "");
     }
 
-    #[tokio::test]
+    // Paused time: the clock only moves when every task sleeps, so a slow runner cannot skew it.
+    // `start` is taken before the pacer, whose first slot is its creation time.
+    #[tokio::test(start_paused = true)]
     async fn pings_are_spaced_out() {
-        let pacer = PingPacer::new(PING_SPACING, 100);
         let start = Instant::now();
+        let pacer = PingPacer::new(PING_SPACING, 100);
         let mut starts = Vec::new();
         for _ in 0..5 {
             let _slot = pacer.slot().await;
@@ -397,12 +399,12 @@ mod tests {
         }
     }
 
-    #[tokio::test]
+    #[tokio::test(start_paused = true)]
     async fn concurrent_pings_are_spaced_and_capped() {
+        let start = Instant::now();
         let pacer = Arc::new(PingPacer::new(PING_SPACING, 2));
         let active = Arc::new(std::sync::atomic::AtomicUsize::new(0));
         let peak = Arc::new(std::sync::atomic::AtomicUsize::new(0));
-        let start = Instant::now();
         let tasks: Vec<_> = (0..8)
             .map(|_| {
                 let (pacer, active, peak) = (pacer.clone(), active.clone(), peak.clone());
