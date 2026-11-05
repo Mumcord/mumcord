@@ -1,25 +1,29 @@
 //! The own camera (spec 08): devices, the preview with its background effect, turning the
 //! camera on and off, and its picture for the preview, the Settings preview and the self-view
 //! (FR-8.10 – FR-8.15, FR-8.29, FR-8.30, FR-8.40). Availability per server is
-//! `camera_unavailable` / `cameraAvailabilityChanged` (p2p.rs).
+//! `camera_unavailable` / `cameraAvailabilityChanged` (p2p.rs). The cameras of others come as
+//! the camera room with its tiles and their frames (FR-8.53 – FR-8.58).
 
 use std::sync::{Arc, Mutex, PoisonError};
 
 use mumcord_engine::Engine;
 use mumcord_engine::camera::{
-    self as engine_camera, CameraFailure as EngineFailure, CameraState as EngineState,
-    CameraView as EngineView, EffectLevel, EffectLoad, PreviewPicture,
+    self as engine_camera, CameraFailure as EngineFailure, CameraRoomView as EngineRoomView,
+    CameraState as EngineState, CameraTile as EngineTile, CameraView as EngineView, EffectLevel,
+    EffectLoad, PreviewPicture, TileQuality as EngineQuality, TileState as EngineTileState,
 };
+use mumcord_engine::screen_share::wire::Codec;
 use mumcord_engine::store;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
+use super::screen_share::VideoCodec;
 use super::types::{
     ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_api_server_id, to_engine_server_id,
 };
-use crate::screen_frames::{self, FrameChannel};
+use crate::screen_frames::{self, FrameChannel, ScreenFrames};
 
 /// Where the own camera is (spec 08, section 6.4).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -64,6 +68,8 @@ pub enum CameraFailure {
     UseNotAllowed,
     Denied,
     RelayDown,
+    /// The relay ended the broadcast ("Camera stopped by the server's relay").
+    RelayEnded,
     RateLimited,
     /// The P2P mode leaves the relay out.
     Mode,
@@ -86,6 +92,7 @@ impl From<&EngineFailure> for CameraFailure {
             EngineFailure::UseNotAllowed => Self::UseNotAllowed,
             EngineFailure::Refused => Self::Denied,
             EngineFailure::RelayDown => Self::RelayDown,
+            EngineFailure::RelayEnded => Self::RelayEnded,
             EngineFailure::RateLimited => Self::RateLimited,
             EngineFailure::Mode => Self::Mode,
             EngineFailure::NoCertificate => Self::NoCertificate,
@@ -414,6 +421,236 @@ pub fn camera_preview_detach(
     }
 }
 
+/// Where a camera tile is (spec 08, section 6.6).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum CameraTileState {
+    /// The person's camera is on; nothing is downloaded yet.
+    Announced,
+    /// Joining the camera; the tile shows the loading state.
+    Joining,
+    /// Receiving video; its frames come on the tile's channel (`camera_frames_attach`).
+    Playing,
+    /// "Too many people are watching {name}" (FR-8.52).
+    Full,
+    /// The join brought no answer; retried every 10 s.
+    Failed,
+    /// Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never.
+    Hidden,
+}
+
+impl From<EngineTileState> for CameraTileState {
+    fn from(s: EngineTileState) -> Self {
+        match s {
+            EngineTileState::Announced => Self::Announced,
+            EngineTileState::Joining => Self::Joining,
+            EngineTileState::Playing => Self::Playing,
+            EngineTileState::Full => Self::Full,
+            EngineTileState::Failed => Self::Failed,
+            EngineTileState::Hidden => Self::Hidden,
+        }
+    }
+}
+
+/// "Quality for me" of one tile (FR-8.56).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum CameraTileQuality {
+    Auto,
+    DataSaver,
+    Best,
+}
+
+impl From<EngineQuality> for CameraTileQuality {
+    fn from(q: EngineQuality) -> Self {
+        match q {
+            EngineQuality::Auto => Self::Auto,
+            EngineQuality::DataSaver => Self::DataSaver,
+            EngineQuality::Best => Self::Best,
+        }
+    }
+}
+
+impl From<CameraTileQuality> for EngineQuality {
+    fn from(q: CameraTileQuality) -> Self {
+        match q {
+            CameraTileQuality::Auto => Self::Auto,
+            CameraTileQuality::DataSaver => Self::DataSaver,
+            CameraTileQuality::Best => Self::Best,
+        }
+    }
+}
+
+/// One camera of another person in the room.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct CameraTile {
+    /// The camera owner's session.
+    pub sharer: SessionId,
+    pub state: CameraTileState,
+    /// The user chose "Hide {name}'s video" on this tile.
+    pub hidden: bool,
+    pub quality: CameraTileQuality,
+    /// Data saver is in effect (the tile's choice or the Settings switch).
+    pub data_saver: bool,
+    /// The "{n} fps" badge with "Weak connection" (FR-8.58); `null` hides it.
+    pub fps_badge: Option<u32>,
+}
+
+impl From<EngineTile> for CameraTile {
+    fn from(t: EngineTile) -> Self {
+        Self {
+            sharer: t.sharer,
+            state: t.state.into(),
+            hidden: t.hidden,
+            quality: t.quality.into(),
+            data_saver: t.data_saver,
+            fps_badge: t.fps_badge,
+        }
+    }
+}
+
+/// The cameras of the own channel on one server; blocked people are left out (FR-8.59).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct CameraRoomView {
+    pub server_id: ServerId,
+    /// The room is open (also opened by the engine for "Show cameras: Always", FR-8.53).
+    pub open: bool,
+    /// The strip position Hidden is in effect (FR-8.71).
+    pub videos_hidden: bool,
+    /// Ordered by session.
+    pub tiles: Vec<CameraTile>,
+}
+
+impl From<EngineRoomView> for CameraRoomView {
+    fn from(v: EngineRoomView) -> Self {
+        Self {
+            server_id: to_api_server_id(v.server_id),
+            open: v.open,
+            videos_hidden: v.videos_hidden,
+            tiles: v.tiles.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// The camera room of a server changed (tiles, their states, open, hidden).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct CameraRoomChanged {
+    pub view: CameraRoomView,
+}
+
+/// The channel of every camera tile, by server and camera owner. Its own map, so a person's
+/// camera and screen share never take each other's channel.
+#[derive(Default)]
+pub struct CameraFrames(pub Arc<ScreenFrames>);
+
+/// The camera room of a server now (empty while nobody's camera is on).
+#[tauri::command]
+#[specta::specta]
+pub fn camera_room(engine: State<'_, Engine>, server_id: ServerId) -> CameraRoomView {
+    engine.camera_room(to_engine_server_id(server_id)).into()
+}
+
+/// The UI opened or closed the camera room (FR-8.53); closing stops every download.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_room_set_open(engine: State<'_, Engine>, server_id: ServerId, open: bool) {
+    engine.camera_room_set_open(to_engine_server_id(server_id), open);
+}
+
+/// The strip position Hidden (FR-8.71): no video is downloaded while it is in effect.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_room_set_videos_hidden(engine: State<'_, Engine>, server_id: ServerId, hidden: bool) {
+    engine.camera_room_set_videos_hidden(to_engine_server_id(server_id), hidden);
+}
+
+/// "Hide {name}'s video" / "Show video" on one tile (FR-8.57).
+#[tauri::command]
+#[specta::specta]
+pub fn camera_tile_set_hidden(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    sharer: SessionId,
+    hidden: bool,
+) {
+    engine.camera_tile_set_hidden(to_engine_server_id(server_id), sharer, hidden);
+}
+
+/// "Quality for me" of one tile (FR-8.56).
+#[tauri::command]
+#[specta::specta]
+pub fn camera_tile_set_quality(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    sharer: SessionId,
+    quality: CameraTileQuality,
+) {
+    engine.camera_tile_set_quality(to_engine_server_id(server_id), sharer, quality.into());
+}
+
+/// The tile's height on screen in device pixels, so Auto asks for a fitting resolution.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_tile_set_height(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    sharer: SessionId,
+    height: u32,
+) {
+    engine.camera_tile_set_height(to_engine_server_id(server_id), sharer, height);
+}
+
+/// Asks the camera owner for a keyframe, e.g. after the tile's decoder failed.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_request_keyframe(engine: State<'_, Engine>, server_id: ServerId, sharer: SessionId) {
+    engine.camera_request_keyframe(to_engine_server_id(server_id), sharer);
+}
+
+/// Sends the frames of `sharer`'s camera to `frames` from now on (layout in
+/// `ui/src/api/screenFrames.ts`), replacing an earlier channel of that tile: the main window and
+/// the pop-out each attach their tiles. Asks for a keyframe so the new decoder can start.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_frames_attach(
+    engine: State<'_, Engine>,
+    camera_frames: State<'_, CameraFrames>,
+    server_id: ServerId,
+    sharer: SessionId,
+    frames: FrameChannel,
+) {
+    let server_id = to_engine_server_id(server_id);
+    camera_frames.0.attach(server_id, sharer, frames);
+    engine.camera_request_keyframe(server_id, sharer);
+}
+
+/// Stops sending `sharer`'s frames to the channel `channel_id` (`Channel.id` in JavaScript);
+/// does nothing when another window attached that tile since.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_frames_detach(
+    camera_frames: State<'_, CameraFrames>,
+    server_id: ServerId,
+    sharer: SessionId,
+    channel_id: u32,
+) {
+    camera_frames
+        .0
+        .detach_channel(to_engine_server_id(server_id), sharer, channel_id);
+}
+
+/// Decodes camera frames of `codecs` in Rust and sends RGBA pictures instead, for the codecs the
+/// webview's WebCodecs cannot decode (FR-8.54). Replaces the earlier list; for every camera.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_set_decode_codecs(engine: State<'_, Engine>, codecs: Vec<VideoCodec>) {
+    let codecs: Vec<Codec> = codecs.into_iter().map(Codec::from).collect();
+    engine.camera_set_decode_codecs(&codecs);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -439,6 +676,21 @@ mod tests {
         assert_eq!(
             json.ok(),
             Some(serde_json::json!({ "kind": "builtin", "id": "beach" }))
+        );
+    }
+
+    #[test]
+    fn tile_qualities_go_both_ways_in_camel_case() {
+        for q in [
+            CameraTileQuality::Auto,
+            CameraTileQuality::DataSaver,
+            CameraTileQuality::Best,
+        ] {
+            assert_eq!(CameraTileQuality::from(EngineQuality::from(q)), q);
+        }
+        assert_eq!(
+            serde_json::to_value(CameraTileQuality::DataSaver).ok(),
+            Some(serde_json::json!("dataSaver"))
         );
     }
 }
