@@ -81,7 +81,7 @@ export async function openPanel(): Promise<void> {
   const icon = $(`button.pstrip-icon[aria-label='${NAME}']`);
   await icon.waitForClickable({ timeout: 20_000, timeoutMsg: `${NAME} has no strip icon` });
   if ((await icon.getAttribute("aria-pressed")) !== "true") await icon.click();
-}
+  const body = $(".pstrip-body");
   await body.waitForExist({ timeout: 10_000, timeoutMsg: `${NAME}'s panel did not open` });
 }
 
