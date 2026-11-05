@@ -61,6 +61,12 @@ describe("plugins: confirmation box and the high-risk safety setting (AC-9.34, A
     await addRepository(fixtures.thirdPartyUrl);
   });
 
+  // A test that fails with its install prompt open would leave the modal over Settings, and every
+  // later test would then fail on that overlay instead of on its own check.
+  afterEach(async () => {
+    if (await prompt().isExisting()) await cancelPrompt();
+  });
+
   after(async () => {
     await pluginenv.stopPluginFixtures();
     if (devFolder !== "") rmSync(devFolder, { recursive: true, force: true });
@@ -72,18 +78,8 @@ describe("plugins: confirmation box and the high-risk safety setting (AC-9.34, A
     await waitForCard(GROWTH);
     expect(await chipLevel(card(GROWTH))).toBe("blocked");
     expect(await chipText(card(GROWTH))).toBe("Blocked by your safety setting");
-    await openPrompt(GROWTH);
-    await expect(prompt().$(".plugin-prompt-score")).toHaveText(
-      expect.stringContaining("Install is disabled because “Don't allow high-risk plugins” is on."),
-    );
-    // The button reads plain "Install" (not "Install anyway") and stays disabled, tick or not.
-    await expect(promptInstall()).toHaveText("Install");
-    await expect(promptInstall()).toBeDisabled();
-    if (await tick().isExisting()) {
-      await tick().click();
-      await expect(promptInstall()).toBeDisabled();
-    }
-    await cancelPrompt();
+    // FR-9.81: the card's Install is disabled, so no install prompt can be opened from Browse.
+    await expect(card(GROWTH).$(`button[aria-label='Install ${GROWTH}']`)).toBeDisabled();
   });
 
   it("AC-9.35: official plugins are unaffected by the setting", async () => {
