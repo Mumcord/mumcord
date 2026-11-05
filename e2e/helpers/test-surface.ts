@@ -91,8 +91,12 @@ export async function setUp(
 /** Opens the plugin's panel in the Plugins strip (no-op when it is open). */
 export async function openPanel(): Promise<void> {
   const icon = $(`button.pstrip-icon[aria-label='${NAME}']`);
-  await icon.waitForClickable({ timeout: 20_000, timeoutMsg: `${NAME} has no strip icon` });
-  if ((await icon.getAttribute("aria-pressed")) !== "true") await icon.click();
+  await icon.waitForExist({ timeout: 20_000, timeoutMsg: `${NAME} has no strip icon` });
+  // An open panel stays readable while a modal (the plugin's web dialog) covers the strip, so
+  // only a closed panel needs the icon to be clickable.
+  if ((await icon.getAttribute("aria-pressed")) === "true") return;
+  await icon.waitForClickable({ timeout: 20_000, timeoutMsg: `${NAME}'s strip icon is covered` });
+  await icon.click();
 }
 
 /** Clicks a button of the plugin's panel (a user gesture for the plugin). */
