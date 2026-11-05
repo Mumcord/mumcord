@@ -68,10 +68,14 @@ export async function chipText(scope: Scope): Promise<string> {
       for (const hidden of clone.querySelectorAll(".visually-hidden")) hidden.remove();
       return clone.textContent;
     },
-    chip as unknown as HTMLElement,
+    (await chip.getElement()) as unknown as HTMLElement,
   );
   return text.replace(/\s+/g, " ").trim();
 }
+
+/** The "✓ Official · reviewed" label official Browse cards keep in their title row (FR-9.77). */
+export const officialLabel = (scope: Scope | WebdriverIO.Element) =>
+  scope.$(`.//span[@class='plugin-label']`);
 
 /** The chip's band (`data-level`: low, medium, high, official, blocked). */
 export async function chipLevel(scope: Scope): Promise<string | null> {
@@ -92,14 +96,18 @@ export const prompt = () => $(`//div[${cls("plugin-prompt")}]`);
 export const promptInstall = () =>
   prompt().$(`.//div[${cls("plugin-prompt-actions")}]//button[${cls("settings-button--primary")}]`);
 
-/** Opens the install prompt from a Browse card and waits until the package was checked. */
+/**
+ * Opens the install prompt from a Browse card and waits until the package was checked: a score
+ * (unofficial), the permission intro (official plugins have no score), a refusal or an error.
+ */
 export async function openPrompt(name: string): Promise<void> {
   await card(name).$(`button[aria-label='Install ${name}']`).click();
   await prompt().waitForDisplayed({ timeout: 30_000 });
   await browser.waitUntil(
     async () =>
-      (await prompt().$(".plugin-prompt-score, .plugin-prompt-refused").isExisting()) ||
-      (await prompt().$("[role='alert']").isExisting()),
+      (await prompt()
+        .$(".plugin-prompt-score, .plugin-prompt-subtitle, .plugin-prompt-refused")
+        .isExisting()) || (await prompt().$("[role='alert']").isExisting()),
     { timeout: 60_000, timeoutMsg: `the install prompt of ${name} never finished its check` },
   );
 }
