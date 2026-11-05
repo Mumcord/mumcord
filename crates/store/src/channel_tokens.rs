@@ -157,25 +157,36 @@ impl Store {
         let tx = self.conn.unchecked_transaction()?;
         let mut tokens = self.all_channel_tokens(server)?;
         change(&mut tokens);
-        tx.execute("DELETE FROM channel_token WHERE server_id = ?1", [server])?;
+        // Rows are updated in place rather than deleted and inserted again, so columns a newer
+        // Mumcord added keep their values (issue #521).
         {
-            let mut stmt = tx.prepare(
+            let mut upsert = tx.prepare(
                 "INSERT INTO channel_token (server_id, position, label, channels, last_used_at)
-                 VALUES (?1, ?2, ?3, ?4, ?5)",
+                 VALUES (?1, ?2, ?3, ?4, ?5)
+                 ON CONFLICT (server_id, position) DO UPDATE SET label = excluded.label,
+                     channels = excluded.channels, last_used_at = excluded.last_used_at",
             )?;
+            let mut delete =
+                tx.prepare("DELETE FROM channel_token WHERE server_id = ?1 AND position = ?2")?;
             for (position, token) in tokens.iter().enumerate() {
+                let position = i64::try_from(position).unwrap_or(i64::MAX);
                 if *token == ChannelToken::default() {
+                    delete.execute(params![server, position])?;
                     continue;
                 }
-                stmt.execute(params![
+                upsert.execute(params![
                     server,
-                    i64::try_from(position).unwrap_or(i64::MAX),
+                    position,
                     token.label,
                     serde_json::to_string(&token.channels)?,
                     token.last_used_at,
                 ])?;
             }
         }
+        tx.execute(
+            "DELETE FROM channel_token WHERE server_id = ?1 AND position >= ?2",
+            params![server, i64::try_from(tokens.len()).unwrap_or(i64::MAX)],
+        )?;
         tx.commit()?;
         Ok(())
     }
@@ -199,6 +210,44 @@ mod tests {
             .add_server(&NewServer::new("Home", "localhost", "Tester"))
             .expect("add")
             .id
+    }
+
+    #[test]
+    fn changing_tokens_keeps_columns_from_a_newer_app() {
+        let (_dir, store) = temp_store();
+        let id = server(&store);
+        store
+            .rename_channel_token(id, 0, Some("A"))
+            .expect("rename");
+        store
+            .rename_channel_token(id, 1, Some("B"))
+            .expect("rename");
+        store
+            .conn
+            .execute_batch(
+                "ALTER TABLE channel_token ADD COLUMN future TEXT;
+                 UPDATE channel_token SET future = 'kept' WHERE position = 0;",
+            )
+            .expect("newer column");
+        store
+            .rename_channel_token(id, 1, Some("C"))
+            .expect("rename");
+        let future: Option<String> = store
+            .conn
+            .query_row(
+                "SELECT future FROM channel_token WHERE position = 0",
+                [],
+                |row| row.get(0),
+            )
+            .expect("future");
+        assert_eq!(future.as_deref(), Some("kept"));
+        let labels: Vec<Option<String>> = store
+            .channel_tokens(id, 2)
+            .expect("read")
+            .into_iter()
+            .map(|token| token.label)
+            .collect();
+        assert_eq!(labels, [Some("A".into()), Some("C".into())]);
     }
 
     #[test]

@@ -27,8 +27,11 @@ impl Store {
             FileCardRecord::Mismatch => ("mismatch", None),
         };
         self.conn.execute(
-            "INSERT OR REPLACE INTO file_card (message_id, state, path)
-             SELECT id, ?2, ?3 FROM chat_message WHERE id = ?1",
+            // An upsert, not `INSERT OR REPLACE`: replacing deletes the row and would lose
+            // columns a newer Mumcord added (issue #521).
+            "INSERT INTO file_card (message_id, state, path)
+             SELECT id, ?2, ?3 FROM chat_message WHERE id = ?1
+             ON CONFLICT (message_id) DO UPDATE SET state = excluded.state, path = excluded.path",
             params![message_id, state, path],
         )?;
         Ok(())
@@ -99,6 +102,27 @@ mod tests {
             store.file_cards(&[id]).expect("read")[&id],
             FileCardRecord::Mismatch
         );
+    }
+
+    #[test]
+    fn replacing_a_result_keeps_columns_from_a_newer_app() {
+        let (_dir, store) = temp_store();
+        let id = message(&store);
+        store
+            .save_file_card(id, &FileCardRecord::Mismatch)
+            .expect("save");
+        store
+            .conn
+            .execute_batch("ALTER TABLE file_card ADD COLUMN future TEXT; UPDATE file_card SET future = 'kept';")
+            .expect("newer column");
+        let done = FileCardRecord::Done { path: "/x".into() };
+        store.save_file_card(id, &done).expect("save");
+        let future: String = store
+            .conn
+            .query_row("SELECT future FROM file_card", [], |row| row.get(0))
+            .expect("future");
+        assert_eq!(future, "kept");
+        assert_eq!(store.file_cards(&[id]).expect("read")[&id], done);
     }
 
     #[test]

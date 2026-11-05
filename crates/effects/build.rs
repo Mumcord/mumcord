@@ -12,8 +12,8 @@
 //! - ONNX Runtime 1.23.2 (MIT, the official Microsoft release, CPU only) is loaded at run time.
 //!   The library is copied next to the build's executables for development and test runs, and
 //!   its cached path is passed to the crate as `MUMCORD_ORT_BUILD_DYLIB` (used by debug builds
-//!   only). Installers have to carry the library in one of the places `src/runtime.rs` looks
-//!   in; the copy next to the release executable is the one to bundle. A failed
+//!   only, and read by scripts/stage-onnxruntime.js, which copies the library into the
+//!   installers at one of the places `src/runtime.rs` looks in). A failed
 //!   download is only a warning: Mumcord then runs with background effects disabled and says
 //!   why (FR-8.33), which is the same state a user sees when the library is missing.
 
@@ -64,6 +64,15 @@ fn runtime_for(os: &str, arch: &str) -> Option<Runtime> {
                 name: "onnxruntime-linux-x64-1.23.2.tgz",
             },
             member: "onnxruntime-linux-x64-1.23.2/lib/libonnxruntime.so.1.23.2",
+            library: "libonnxruntime.so.1.23.2",
+        },
+        ("linux", "aarch64") => Runtime {
+            archive: Download {
+                url: "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-linux-aarch64-1.23.2.tgz",
+                sha256: "7c63c73560ed76b1fac6cff8204ffe34fe180e70d6582b5332ec094810241e5c",
+                name: "onnxruntime-linux-aarch64-1.23.2.tgz",
+            },
+            member: "onnxruntime-linux-aarch64-1.23.2/lib/libonnxruntime.so.1.23.2",
             library: "libonnxruntime.so.1.23.2",
         },
         ("windows", "x86_64") => Runtime {

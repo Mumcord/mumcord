@@ -5,7 +5,7 @@
 //! working. No `ort` API may be called before [`availability`] returned `Ok`: `ort` would
 //! otherwise try to load the library itself and panic when that fails.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 use crate::hooks;
@@ -48,31 +48,55 @@ fn load() -> Result<(), String> {
     }
 }
 
-/// Where the library is looked for, in order: next to the executable (Windows, development
-/// builds), in the folder above it (test binaries in `deps/`), the app bundle's Frameworks and
-/// Resources folders (macOS), the `lib` folder beside `bin` (Linux packages and AppImage), and
-/// in debug builds the build's download cache.
+/// Where the library is looked for, in order: the places an installed package carries it
+/// (see [`beside_executable`]), and in debug builds the build's download cache.
 fn candidates() -> Vec<PathBuf> {
-    let mut paths = Vec::new();
-    if let Some(dir) = std::env::current_exe()
+    let mut paths = std::env::current_exe()
         .ok()
-        .and_then(|exe| exe.parent().map(PathBuf::from))
-    {
-        paths.push(dir.join(LIBRARY));
-        if let Some(parent) = dir.parent() {
-            paths.push(parent.join(LIBRARY));
-            if cfg!(target_os = "macos") {
-                paths.push(parent.join("Frameworks").join(LIBRARY));
-                paths.push(parent.join("Resources").join(LIBRARY));
-            } else if cfg!(target_os = "linux") {
-                paths.push(parent.join("lib").join(LIBRARY));
-                paths.push(parent.join("lib/mumcord").join(LIBRARY));
-            }
-        }
-    }
+        .and_then(|exe| exe.parent().map(beside_executable))
+        .unwrap_or_default();
     let build_copy = env!("MUMCORD_ORT_BUILD_DYLIB");
     if cfg!(debug_assertions) && !build_copy.is_empty() {
         paths.push(PathBuf::from(build_copy));
     }
     paths
+}
+
+/// The library's places relative to the executable's folder: next to it (Windows installer and
+/// portable zip, development builds), the folder above it (test binaries in `deps/`), the app
+/// bundle's Frameworks and Resources folders (macOS), and the `lib/mumcord` folder beside `bin`
+/// (Linux AppImage, .deb and .rpm; scripts/stage-onnxruntime.js puts it in all of them).
+fn beside_executable(dir: &Path) -> Vec<PathBuf> {
+    let mut paths = vec![dir.join(LIBRARY)];
+    if let Some(parent) = dir.parent() {
+        paths.push(parent.join(LIBRARY));
+        if cfg!(target_os = "macos") {
+            paths.push(parent.join("Frameworks").join(LIBRARY));
+            paths.push(parent.join("Resources").join(LIBRARY));
+        } else if cfg!(target_os = "linux") {
+            paths.push(parent.join("lib").join(LIBRARY));
+            paths.push(parent.join("lib/mumcord").join(LIBRARY));
+        }
+    }
+    paths
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The installers put the library where the packaged executable finds it.
+    #[test]
+    fn finds_the_library_where_the_packages_put_it() {
+        #[cfg(target_os = "linux")]
+        let (exe_dir, bundled) = ("/usr/bin", "/usr/lib/mumcord/libonnxruntime.so.1.23.2");
+        #[cfg(target_os = "macos")]
+        let (exe_dir, bundled) = (
+            "/Applications/Mumcord.app/Contents/MacOS",
+            "/Applications/Mumcord.app/Contents/Frameworks/libonnxruntime.1.23.2.dylib",
+        );
+        #[cfg(target_os = "windows")]
+        let (exe_dir, bundled) = (r"C:\Mumcord", r"C:\Mumcord\onnxruntime.dll");
+        assert!(beside_executable(Path::new(exe_dir)).contains(&PathBuf::from(bundled)));
+    }
 }

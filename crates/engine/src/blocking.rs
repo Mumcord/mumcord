@@ -62,6 +62,16 @@ pub(crate) fn user_blocked(
         )
 }
 
+/// Whether `user` (also one who already left) on the server of `ctx` is blocked.
+pub(crate) fn is_blocked_user(ctx: &SessionCtx, list: &BlockList, user: &User) -> bool {
+    let list = lock(list);
+    if list.is_empty() {
+        return false;
+    }
+    ctx.handle
+        .with_state(|s| user_blocked(&list, s, ctx.server_id, user))
+}
+
 /// Whether the person with `session` on the server of `ctx` is blocked.
 pub(crate) fn is_blocked(ctx: &SessionCtx, list: &BlockList, session: u32) -> bool {
     let list = lock(list);

@@ -55,15 +55,15 @@ jobs:
           # AppImage, .deb and .rpm (FR-2.53) for x86_64 and, on GitHub's ARM runner, ARM64.
           - name: linux
             os: ubuntu-24.04
-            args: --bundles appimage,deb,rpm
+            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json
             bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
           - name: linux-arm64
             os: ubuntu-24.04-arm
-            args: --bundles appimage,deb,rpm
+            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json
             bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
           - name: windows
             os: windows-latest
-            args: --bundles nsis
+            args: --bundles nsis --config src-tauri/tauri.onnxruntime.windows.json
             # The installer and the portable zip (packaged below from the same Mumcord.exe).
             bundle: target/release/bundle/nsis/*-setup.exe target/release/bundle/nsis/*-portable.zip
           # One DMG for Apple Silicon and Intel Macs. The smoke test on the arm64 runner
@@ -71,7 +71,8 @@ jobs:
           # deletes it otherwise); releases pack it into the updater archive.
           - name: macos
             os: macos-latest
-            args: --bundles app,dmg --target universal-apple-darwin
+            args: --bundles app,dmg --target universal-apple-darwin --config src-tauri/tauri.onnxruntime.macos.json
+            onnxruntime-target: universal-apple-darwin
             bundle: target/universal-apple-darwin/release/bundle/dmg/*.dmg
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
@@ -89,14 +90,42 @@ jobs:
         with:
           name: third-party-notices
 
+      # The runner's Ubuntu mirror is often very slow, so the downloaded packages are cached per
+      # runner image and only main saves them; PRs restore read-only.
+      - name: apt cache key
+        id: apt
+        if: runner.os == 'Linux'
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Restore apt packages
+        id: apt-cache
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/apt-archives
+          key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
+          restore-keys: apt-build-${{ matrix.os }}-
+
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
         timeout-minutes: 20
         run: |
-          scripts/ci/apt-install.sh \
+          scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
             libxdo-dev libasound2-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils \
             gstreamer1.0-plugins-bad
+
+      # apt's lock and partial downloads are root-only and must not go into the cache.
+      - name: Clean apt cache
+        if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        run: sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
+
+      - name: Save apt packages
+        if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/apt-archives
+          key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
 
       # Screen sharing links a static libvpx into every bundle (scripts/build-libvpx.sh,
       # RELEASING.md); on Linux this keeps the packages off the build host's libvpx soname. It is
@@ -164,6 +193,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
           key: release
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
@@ -241,6 +271,13 @@ jobs:
           done
           echo "enabled=true" >> "$GITHUB_OUTPUT"
 
+      # Camera background effects (spec 08, FR-8.33): the pinned, checksum-verified ONNX Runtime
+      # library goes into every bundle through the src-tauri/tauri.onnxruntime.<os>.json overlay
+      # in the build arguments (Linux /usr/lib/mumcord, Windows next to Mumcord.exe with the
+      # Visual C++ runtime it needs, macOS Contents/Frameworks, signed with the app).
+      - name: Stage ONNX Runtime
+        run: node scripts/stage-onnxruntime.js ${{ matrix.onnxruntime-target }}
+
       # The AppImage bundles the GStreamer plugins (bundleMediaFramework) but not H.264 (gst-libav,
       # x264) or the GPL-only codecs; see RELEASING.md. The deb/rpm packages depend on gst-libav instead.
       - name: Exclude H.264 and GPL-only GStreamer plugins from the AppImage
@@ -263,7 +300,7 @@ jobs:
       # SimplySign login so the cloud session is fresh when the first file is signed.
       - name: Build Windows app for signing
         if: steps.certum.outputs.enabled == 'true'
-        run: npm run tauri build -- --no-bundle -- --locked
+        run: npm run tauri build -- --no-bundle --config src-tauri/tauri.onnxruntime.windows.json -- --locked
 
       # Certum's official installer, pinned by version and checksum. A new version needs a new
       # checksum (docs/release-signing.md); the URL follows Certum's download server layout.
@@ -321,7 +358,7 @@ jobs:
               }
             }
           } | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8 $overlay
-          npm run tauri bundle -- --bundles nsis --config $overlay
+          npm run tauri bundle -- --bundles nsis --config $overlay --config src-tauri/tauri.onnxruntime.windows.json
           if ($LASTEXITCODE -ne 0) { throw "tauri bundle failed (exit code $LASTEXITCODE)." }
           "MUMCORD_WINDOWS_SIGNED=true" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
 
@@ -357,6 +394,10 @@ jobs:
           $dir = "$env:RUNNER_TEMP\portable"
           New-Item -ItemType Directory -Force $dir | Out-Null
           Copy-Item $exe "$dir\Mumcord.exe"
+          # ONNX Runtime and the Visual C++ runtime it needs, installed next to Mumcord.exe.
+          $dlls = @(Get-ChildItem (Split-Path $exe) -File -Filter *.dll)
+          if (-not ($dlls.Name -contains 'onnxruntime.dll')) { throw 'onnxruntime.dll is missing from the installer.' }
+          $dlls | Copy-Item -Destination $dir
           New-Item -ItemType File "$dir\portable" | Out-Null
           Copy-Item packaging/windows/README-portable.txt, LICENSE, NOTICE, THIRD_PARTY_NOTICES $dir
           Compress-Archive -Path "$dir\*" -DestinationPath $zip
@@ -438,11 +479,27 @@ jobs:
 
       # --- Test server -----------------------------------------------------------------------
 
+      # The runner's Ubuntu mirror is often very slow, so the downloaded packages are cached per
+      # runner image and only main saves them; PRs restore read-only.
+      - name: apt cache key
+        id: apt-smoke
+        if: runner.os == 'Linux'
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Restore apt packages
+        id: apt-cache-smoke
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/apt-archives
+          key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
+          restore-keys: apt-smoke-${{ matrix.os }}-
+
       - name: Start test server (Linux, testenv v15)
         if: runner.os == 'Linux'
         timeout-minutes: 30
         run: |
-          scripts/ci/apt-install.sh \
+          scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
             libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
             libwebkit2gtk-4.1-0 libpipewire-0.3-0t64
           # The AppImage must bring its own tray library (it is loaded at runtime, so a missing
@@ -455,6 +512,17 @@ jobs:
           # Throwaway SuperUser password for this runner only (same as e2e/run.sh).
           printf 'SUPERUSER_PASSWORD=%s\nSERVER_PASSWORD=\n' "$(openssl rand -hex 16)" > testenv/.env
           testenv/up.sh v15
+
+      - name: Clean apt cache
+        if: always() && runner.os == 'Linux' && steps.apt-cache-smoke.outputs.cache-hit != 'true'
+        run: sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
+
+      - name: Save apt packages
+        if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache-smoke.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/apt-archives
+          key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
 
       - name: Start test server (Windows, official Mumble server)
         if: runner.os == 'Windows'
@@ -537,6 +605,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
           key: smoke
           save-if: ${{ github.ref == 'refs/heads/main' }}
           workspaces: |
@@ -589,6 +658,11 @@ jobs:
           # Without the bundled scanner every plugin load warns and runs in-process.
           test -x "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
             || { echo "gst-plugin-scanner is missing from the AppImage" >&2; exit 1; }
+          # Camera background effects: the bundled ONNX Runtime loads from where
+          # crates/effects/src/runtime.rs looks for it (usr/lib/mumcord beside usr/bin).
+          test -x "$RUNNER_TEMP/squashfs-root/usr/bin/mumcord" \
+            || { echo "usr/bin/mumcord is missing from the AppImage" >&2; exit 1; }
+          python3 -I scripts/smoke/check-onnxruntime.py "$RUNNER_TEMP/squashfs-root/usr/lib/mumcord/libonnxruntime.so.1.23.2"
           rm -rf "$RUNNER_TEMP/squashfs-root"
           # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
           # An EMPTY password creates no `login` collection, so unlock with a fixed non-empty
@@ -612,7 +686,7 @@ jobs:
 
       # The smoke test ran the AppImage; the .deb and .rpm carry the same binary, so check that
       # each installs on its distribution with every shared library resolved and the menu entry
-      # (with the mumble:// handler) and the in-game overlay layer in place. Tauri does not scan
+      # (with the mumble:// handler), the in-game overlay layer and ONNX Runtime in place. Tauri does not scan
       # the binary for its libraries, so a missing package dependency only shows here.
       - name: Check .deb and .rpm packages
         if: runner.os == 'Linux'
@@ -623,12 +697,15 @@ jobs:
             missing=$(ldd /usr/bin/mumcord | grep "=> not found" || true)
             if [ -n "$missing" ]; then echo "unresolved libraries: $missing" >&2; exit 1; fi
             test -e /usr/lib/mumcord/libmumcord_overlay_layer.so
+            missing=$(ldd /usr/lib/mumcord/libonnxruntime.so.1.23.2 | grep "=> not found" || true)
+            if [ -n "$missing" ]; then echo "ONNX Runtime: unresolved libraries: $missing" >&2; exit 1; fi
             grep -qx "MimeType=x-scheme-handler/mumble;" /usr/share/applications/Mumcord.desktop
             grep -qx "StartupWMClass=app.mumcord.client" /usr/share/applications/Mumcord.desktop
             test -e /usr/share/icons/hicolor/128x128/apps/mumcord.png
           '
           sudo apt-get install -y --no-install-recommends "$PWD/$(ls build/*.deb)"
           bash -c "$check"
+          python3 -I scripts/smoke/check-onnxruntime.py /usr/lib/mumcord/libonnxruntime.so.1.23.2
           docker run --rm -v "$PWD/build:/build:ro" fedora:42 bash -c \
             "dnf install -y -q /build/*.rpm >/dev/null && $check"
 
@@ -643,6 +720,19 @@ jobs:
           "$installer" /S
           app=$(find "$(cygpath -u "$LOCALAPPDATA")" -maxdepth 3 -iname 'mumcord.exe' | head -n 1)
           test -n "$app" || { echo "Mumcord.exe not found after install" >&2; exit 1; }
+          # Camera background effects: ONNX Runtime next to Mumcord.exe, with the Visual C++
+          # runtime DLLs it links (the runner has the redistributable installed system-wide, so
+          # only their presence shows that users without it can load the library). Microsoft
+          # signs onnxruntime.dll and the runtime DLLs; Tauri keeps signed files as they are.
+          check_onnxruntime() {
+            local dir=$1 dll
+            for dll in onnxruntime.dll vcruntime140.dll vcruntime140_1.dll msvcp140.dll msvcp140_1.dll; do
+              test -f "$dir/$dll" || { echo "$dll is missing next to Mumcord.exe in $dir" >&2; return 1; }
+            done
+            powershell -NoProfile -Command "\$s = Get-AuthenticodeSignature '$(cygpath -w "$dir/onnxruntime.dll")'; if (\$s.Status -ne 'Valid') { Write-Error \"onnxruntime.dll signature: \$(\$s.Status)\"; exit 1 }; Write-Host \"onnxruntime.dll is signed by \$(\$s.SignerCertificate.Subject)\"" || return 1
+            python -I scripts/smoke/check-onnxruntime.py "$(cygpath -w "$dir/onnxruntime.dll")"
+          }
+          check_onnxruntime "$(dirname "$app")"
           dir=$(cygpath -w "$RUNNER_TEMP")\\mumble-server
           dump() { powershell -NoProfile -File scripts/smoke/dump-win-server.ps1 "$dir" || true; }
           # Same step as the smoke run, so the server process stays alive for it.
@@ -667,6 +757,7 @@ jobs:
           powershell -NoProfile -Command "Expand-Archive -Path '$(cygpath -w "$(ls build/*-portable.zip)")' -DestinationPath '$(cygpath -w "$portable")'"
           ls -l "$portable"
           test -f "$portable/portable" || { echo "the portable marker is missing from the zip" >&2; exit 1; }
+          check_onnxruntime "$portable"
           scripts/smoke/smoke.sh --portable --app "$portable/Mumcord.exe" --seed target/release/mumcord-smoke-seed.exe --bot "$RUNNER_TEMP/mumbot/mumbot.exe" || { dump; exit 1; }
           test -d "$portable/MumcordData/local/EBWebView" || { echo "no web view data in MumcordData" >&2; exit 1; }
           [[ -n $(ls -A "$portable/MumcordData/logs" 2>/dev/null) ]] || { echo "no logs in MumcordData" >&2; exit 1; }
@@ -686,6 +777,19 @@ jobs:
           mount=$(hdiutil attach -nobrowse -readonly "$dmg" | awk -F'\t' '/\/Volumes\//{print $NF}')
           cp -R "$mount/Mumcord.app" /Applications/
           hdiutil detach "$mount"
+          # Camera background effects: ONNX Runtime for both architectures in the app's
+          # Frameworks, signed with the app (Developer ID in a signed build, ad hoc otherwise).
+          ort=/Applications/Mumcord.app/Contents/Frameworks/libonnxruntime.1.23.2.dylib
+          for arch in arm64 x86_64; do
+            lipo "$ort" -verify_arch "$arch" || { echo "ONNX Runtime has no $arch slice" >&2; exit 1; }
+          done
+          codesign --verify --strict --verbose=2 "$ort"
+          if [[ -e build/MACOS-SIGNED ]]; then
+            team() { codesign -dv "$1" 2>&1 | grep '^TeamIdentifier='; }
+            [[ -n "$(team "$ort")" && "$(team "$ort")" == "$(team /Applications/Mumcord.app)" ]] \
+              || { echo "ONNX Runtime is not signed by the app's team" >&2; exit 1; }
+          fi
+          python3 -I scripts/smoke/check-onnxruntime.py "$ort"
           if [[ "${{ steps.mac-server.outcome }}" == "success" ]]; then
             scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot "$RUNNER_TEMP/mumbot/mumbot"
           else
