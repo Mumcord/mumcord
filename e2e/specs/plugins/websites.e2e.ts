@@ -206,6 +206,7 @@ describe("plugins: websites and net.http (AC-9.7 … AC-9.10)", function () {
   });
 
   it("AC-9.8: the details show the website, approval date, last request and today's count", async () => {
+    await closePanel(SURFACE);
     await openSettingsGroup("Plugins");
     await pluginTab("Installed").click();
     const row = $(
