@@ -156,7 +156,8 @@
     "cameras": "Kameras",
     "label_other": "Kameru istaba, {{count}} kameras ieslēgtas",
     "miniBar_other": "{{count}} kameras ieslēgtas",
-    "fullTitle": "Telpa ir pilna ar 9 kamerām"
+    "fullTitle": "Telpa ir pilna ar 9 kamerām",
+    "backgroundPicker": "Mainīt fonu"
   },
   "position": {
     "label": "Kameras",
@@ -180,7 +181,8 @@
     "hidden": "Video paslēpts",
     "showVideo": "Rādīt video",
     "viewing": "Skaties",
-    "weak": "Vājš savienojums"
+    "weak": "Vājš savienojums",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Piespraust man",

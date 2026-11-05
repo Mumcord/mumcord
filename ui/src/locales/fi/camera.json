@@ -149,7 +149,8 @@
     "cameras": "Kamerat",
     "label_other": "Kamerahuone, {{count}} kameraa päällä",
     "miniBar_other": "{{count}} kameraa päällä",
-    "fullTitle": "Huone on täynnä 9 kameralla"
+    "fullTitle": "Huone on täynnä 9 kameralla",
+    "backgroundPicker": "Vaihda tausta"
   },
   "position": {
     "label": "Kamerat",
@@ -173,7 +174,8 @@
     "hidden": "Video piilotettu",
     "showVideo": "Näytä video",
     "viewing": "Katselet",
-    "weak": "Heikko yhteys"
+    "weak": "Heikko yhteys",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Kiinnitä minulle",

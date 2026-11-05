@@ -268,6 +268,37 @@
   color: #fff;
 }
 
+/* The received format shows with the tile's controls: under the pointer, with the focus or the menu open. */
+.cam-tile__badge[data-tone="format"] {
+  display: none;
+}
+
+.cam-tile:hover .cam-tile__badge[data-tone="format"],
+.cam-tile:focus-within .cam-tile__badge[data-tone="format"],
+.cam-tile:has(.cam-tile__more[aria-expanded="true"]) .cam-tile__badge[data-tone="format"] {
+  display: inline-flex;
+}
+
+/* The room bar's background picker (FR-8.40): the preview's picker in a popover, in the app theme. */
+.cam-bg-popover {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 22rem;
+  max-width: calc(100vw - 1rem);
+  max-height: calc(100vh - 1rem);
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
 /* A tile without a picture: who it is and why (joining, full, couldn't join, hidden). */
 .cam-tile__off {
   position: absolute;
@@ -639,4 +670,14 @@
   background: none;
   color: inherit;
   font-size: inherit;
+}
+
+/* The room's own segmented control is dark glass; inside the popover the picker keeps its theme. */
+.cam-bg-popover .cam-seg {
+  border-color: var(--color-border);
+  background: var(--color-bg-chat);
+}
+
+.cam-bg-popover .cam-seg__button:not([aria-pressed="true"]) {
+  color: var(--color-text-secondary);
 }

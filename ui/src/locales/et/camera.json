@@ -149,7 +149,8 @@
     "cameras": "Kaamerad",
     "label_other": "Kaameraruum, {{count}} kaamerat sees",
     "miniBar_other": "{{count}} kaamerat sees",
-    "fullTitle": "Ruum on 9 kaameraga täis"
+    "fullTitle": "Ruum on 9 kaameraga täis",
+    "backgroundPicker": "Muuda tausta"
   },
   "position": {
     "label": "Kaamerad",
@@ -173,7 +174,8 @@
     "hidden": "Video peidetud",
     "showVideo": "Näita videot",
     "viewing": "Vaatad",
-    "weak": "Nõrk ühendus"
+    "weak": "Nõrk ühendus",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Kinnita mulle",

@@ -4,7 +4,7 @@
  * media area of the main window and in the camera pop-out; it keeps its dark picture background
  * in both themes (FR-8.70).
  */
-import { useRef, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAvatars } from "../../members/useAvatars";
 import { closeMedia } from "../../media/mediaView";
@@ -13,6 +13,7 @@ import { useStageShown } from "../../media/stageContext";
 import { useStageLabel } from "../../media/stageRegistry";
 import { useFullscreen } from "../../media/useFullscreen";
 import { CameraTile } from "./CameraTile";
+import { RoomBackground } from "./RoomBackground";
 import { RoomBar } from "./RoomBar";
 import { RoomHeader } from "./RoomHeader";
 import { forgetTileChoices } from "./roomChoices";
@@ -28,10 +29,6 @@ export interface CameraRoomProps {
   serverId: number;
   /** Opens the preview dialog; `null` where it cannot open (the pop-out). */
   onTurnOn: (() => void) | null;
-  /** The "Background: {name}" control of the room bar (FR-8.40). */
-  background?: ReactNode;
-  /** Opens the room bar's background picker; the self-view menu offers "Background" with it. */
-  onBackground?: () => void;
 }
 
 /** Closes the room: the media area lets it go and the per-tile choices are forgotten. */
@@ -40,7 +37,7 @@ function closeCameraRoom(): void {
   closeMedia("camera");
 }
 
-export function CameraRoom({ serverId, onTurnOn, background, onBackground }: CameraRoomProps) {
+export function CameraRoom({ serverId, onTurnOn }: CameraRoomProps) {
   const { t } = useTranslation("camera");
   const { t: tc } = useTranslation("common");
   const model = useRoomModel(serverId);
@@ -48,6 +45,10 @@ export function CameraRoom({ serverId, onTurnOn, background, onBackground }: Cam
   const { mirror, reduceMotion } = useCameraLook();
   const ref = useRef<HTMLElement>(null);
   const { fullscreen, toggle } = useFullscreen(ref);
+  // The bar's background picker; the self-view menu's "Background" opens it as well (FR-8.40).
+  const [pickingBackground, setPickingBackground] = useState(false);
+  const onAir = model.own?.state === "onAir";
+  if (!onAir && pickingBackground) setPickingBackground(false);
   const avatarOf = useAvatars(
     [
       ...model.tiles.flatMap((tile) => (tile.user === undefined ? [] : [tile.user])),
@@ -83,7 +84,13 @@ export function CameraRoom({ serverId, onTurnOn, background, onBackground }: Cam
                 serverId={serverId}
                 tile={tile}
                 large={model.large}
-                onBackground={onBackground ?? null}
+                onBackground={
+                  onAir
+                    ? () => {
+                        setPickingBackground(true);
+                      }
+                    : null
+                }
               />
             }
           />
@@ -92,10 +99,12 @@ export function CameraRoom({ serverId, onTurnOn, background, onBackground }: Cam
       <WithoutCamera people={model.withoutCamera} avatarOf={avatarOf} />
       <RoomBar
         serverId={serverId}
-        onAir={model.own?.state === "onAir"}
+        onAir={onAir}
         selfHidden={model.selfHidden}
         onTurnOn={onTurnOn}
-        background={background}
+        background={
+          <RoomBackground open={pickingBackground && onAir} onOpenChange={setPickingBackground} />
+        }
         onPopOut={() => {
           popOut(
             "camera",

@@ -149,7 +149,8 @@
     "cameras": "Kameras",
     "label_other": "Kameraraum, {{count}} Kameras an",
     "miniBar_other": "{{count}} Kameras an",
-    "fullTitle": "Der Raum ist mit 9 Kameras voll"
+    "fullTitle": "Der Raum ist mit 9 Kameras voll",
+    "backgroundPicker": "Hintergrund ändern"
   },
   "position": {
     "label": "Kameras",
@@ -173,7 +174,8 @@
     "hidden": "Video ausgeblendet",
     "showVideo": "Video anzeigen",
     "viewing": "Ansicht",
-    "weak": "Schwache Verbindung"
+    "weak": "Schwache Verbindung",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Für mich anheften",

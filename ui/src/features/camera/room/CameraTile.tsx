@@ -1,6 +1,7 @@
 /**
  * One camera tile (FR-8.65, spec 08 §5.3): the video, the name tag with the microphone icon, the
- * green speaking frame, "● Live" on the self-view and the "{n} fps" badge of a weak connection.
+ * green speaking frame, "● Live" on the self-view, the "{n} fps" badge of a weak connection and,
+ * with the tile under the pointer or focused, the height and codec it arrives in (mockup 10).
  * Without a picture it shows who it is and why: joining, full, couldn't join or hidden (§7.2).
  * Names come from the server and are rendered as text only.
  */
@@ -11,9 +12,13 @@ import { getApi } from "../../../api";
 import { MockPicture } from "../../media/MockPicture";
 import { mockPlaceholder } from "../../media/mockPlaceholder";
 import { Avatar } from "../../members/Avatar";
+import { codecName } from "../../screenshare/shareFormat";
 import { RoomIcon } from "./icons";
 import type { TileModel } from "./useRoomModel";
-import { useTileFrames, useTileHeight } from "./useTileFrames";
+import { useTileFrames, useTileHeight, type TileFormat } from "./useTileFrames";
+
+/** Mock mode draws no frames; its tiles show the format a real 720p AV1 camera would. */
+const MOCK_FORMAT: TileFormat = { height: 720, codec: "av1" };
 
 export interface CameraTileProps {
   serverId: number;
@@ -43,6 +48,7 @@ export function CameraTile({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tileRef = useRef<HTMLDivElement>(null);
   const [pictured, setPictured] = useState(false);
+  const [received, setReceived] = useState<TileFormat | null>(null);
   const self = tile.state === "self";
   const video = self || tile.state === "playing";
   const mock = mockPlaceholder() !== null;
@@ -53,8 +59,11 @@ export function CameraTile({
     backgrounded,
     useCallback((shown: boolean) => {
       setPictured(shown);
+      if (!shown) setReceived(null);
     }, []),
+    setReceived,
   );
+  const format = self || tile.state !== "playing" ? null : mock ? MOCK_FORMAT : received;
   useTileHeight(tileRef, serverId, self || !video ? null : tile.session);
 
   const status = statusText(tile, t);
@@ -66,7 +75,6 @@ export function CameraTile({
       });
   };
 
-   
   return (
     <div
       ref={tileRef}
@@ -112,6 +120,11 @@ export function CameraTile({
             ● {t("room.live")}
           </span>
         )}
+        {format !== null && (
+          <span className="cam-tile__badge" data-tone="format">
+            {t("tile.format", { height: format.height, codec: codecName(format.codec) })}
+          </span>
+        )}
         {tile.fpsBadge !== null && video && (
           <span className="cam-tile__badge" data-tone="warn" data-tooltip={t("tile.weak")}>
             <RoomIcon name="weak" size={11} />
@@ -136,7 +149,6 @@ export function CameraTile({
       </span>
     </div>
   );
-   
 }
 
 /** The screen-reader name of a tile (spec 08 §5.7). */

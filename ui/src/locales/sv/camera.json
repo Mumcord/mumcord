@@ -149,7 +149,8 @@
     "cameras": "Kameror",
     "label_other": "Kamerarum, {{count}} kameror på",
     "miniBar_other": "{{count}} kameror på",
-    "fullTitle": "Rummet är fullt vid 9 kameror"
+    "fullTitle": "Rummet är fullt vid 9 kameror",
+    "backgroundPicker": "Byt bakgrund"
   },
   "position": {
     "label": "Kameror",
@@ -173,7 +174,8 @@
     "hidden": "Video dold",
     "showVideo": "Visa video",
     "viewing": "Tittar",
-    "weak": "Svag anslutning"
+    "weak": "Svag anslutning",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Fäst för mig",

@@ -163,7 +163,8 @@
     "miniBar_few": "{{count}} vklopljene kamere",
     "miniBar_other": "{{count}} vklopljenih kamer",
     "cameras": "Kamere",
-    "fullTitle": "Soba je polna pri 9 kamerah"
+    "fullTitle": "Soba je polna pri 9 kamerah",
+    "backgroundPicker": "Spremeni ozadje"
   },
   "position": {
     "label": "Kamere",
@@ -187,7 +188,8 @@
     "hidden": "Video skrit",
     "showVideo": "Pokaži video",
     "viewing": "Gledaš",
-    "weak": "Šibka povezava"
+    "weak": "Šibka povezava",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Pripni zame",

@@ -6,13 +6,19 @@
  */
 import { useEffect, useRef, type RefObject } from "react";
 import type { Channel } from "@tauri-apps/api/core";
-import { getApi } from "../../../api";
+import { getApi, type VideoCodec } from "../../../api";
 import { screenFrameChannel } from "../../../api/screenFrames";
 import { createFrameRenderer, type FrameRenderer } from "../../screenshare/frameRenderer";
 import { decodeInEngine, ensureDecodeCodecs } from "./cameraDecode";
 import { heightStep } from "./layout";
 
 type Source = { kind: "self" } | { kind: "camera"; serverId: number; sharer: number };
+
+/** What a camera tile receives (mockup 10 "720p · AV1"). */
+export interface TileFormat {
+  height: number;
+  codec: VideoCodec;
+}
 
 function attach(source: Source, channel: Channel<ArrayBuffer>): Promise<void> {
   const api = getApi();
@@ -30,7 +36,8 @@ function detach(source: Source, channelId: number): Promise<void> {
 
 /**
  * Runs the frames of `source` into `canvas` while `active`; `hidden` keeps decoding without
- * drawing. `onPicture` reports whether a picture is on the canvas.
+ * drawing. `onPicture` reports whether a picture is on the canvas; `onFormat` reports the height and
+ * codec another person's camera arrives in, each time either changes.
  */
 export function useTileFrames(
   canvas: RefObject<HTMLCanvasElement | null>,
@@ -38,13 +45,16 @@ export function useTileFrames(
   active: boolean,
   hidden: boolean,
   onPicture: (shown: boolean) => void,
+  onFormat?: (format: TileFormat) => void,
 ): void {
   const rendererRef = useRef<FrameRenderer | null>(null);
   const hiddenRef = useRef(hidden);
   const onPictureRef = useRef(onPicture);
+  const onFormatRef = useRef(onFormat);
   useEffect(() => {
     onPictureRef.current = onPicture;
-  }, [onPicture]);
+    onFormatRef.current = onFormat;
+  }, [onPicture, onFormat]);
   const serverId = source.kind === "camera" ? source.serverId : null;
   const sharer = source.kind === "camera" ? source.sharer : null;
 
@@ -60,7 +70,18 @@ export function useTileFrames(
       serverId === null || sharer === null
         ? { kind: "self" }
         : { kind: "camera", serverId, sharer };
+    let format: TileFormat | null = null;
     const renderer = createFrameRenderer(element, {
+      onFrame: (frame) => {
+        // Compared per frame so the tile only re-renders when the sender changes step or codec.
+        if (
+          from.kind === "self" ||
+          (format?.height === frame.height && format.codec === frame.codec)
+        )
+          return;
+        format = { height: frame.height, codec: frame.codec };
+        onFormatRef.current?.(format);
+      },
       requestKeyframe: () => {
         if (from.kind === "self") return;
         getApi()

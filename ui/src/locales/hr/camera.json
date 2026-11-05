@@ -156,7 +156,8 @@
     "label_few": "Soba kamera, {{count}} kamere uključene",
     "label_other": "Soba kamera, {{count}} kamera uključeno",
     "miniBar_other": "{{count}} kamera uključeno",
-    "fullTitle": "Soba je puna s 9 kamera"
+    "fullTitle": "Soba je puna s 9 kamera",
+    "backgroundPicker": "Promijeni pozadinu"
   },
   "position": {
     "label": "Kamere",
@@ -180,7 +181,8 @@
     "hidden": "Video skriven",
     "showVideo": "Prikaži video",
     "viewing": "Gledaš",
-    "weak": "Slaba veza"
+    "weak": "Slaba veza",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Prikvači za mene",

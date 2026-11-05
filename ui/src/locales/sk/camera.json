@@ -163,7 +163,8 @@
     "miniBar_many": "{{count}} zapnutej kamery",
     "miniBar_other": "{{count}} zapnutých kamier",
     "cameras": "Kamery",
-    "fullTitle": "Miestnosť je plná pri 9 kamerách"
+    "fullTitle": "Miestnosť je plná pri 9 kamerách",
+    "backgroundPicker": "Zmeniť pozadie"
   },
   "position": {
     "label": "Kamery",
@@ -187,7 +188,8 @@
     "hidden": "Video skryté",
     "showVideo": "Zobraziť video",
     "viewing": "Sleduješ",
-    "weak": "Slabé pripojenie"
+    "weak": "Slabé pripojenie",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Pripnúť pre mňa",
