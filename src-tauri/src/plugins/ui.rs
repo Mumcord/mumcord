@@ -6,8 +6,11 @@
 
 use std::collections::HashMap;
 
+use mumcord_plugins::api::app_menu::AppMenuEntry;
 use mumcord_plugins::api::webview::WebviewPlace;
+use mumcord_plugins::service::StageActivity;
 use mumcord_plugins::service::UiUpdate;
+use mumcord_plugins::stage::{ActivityKind, JoinError, Refusal};
 use mumcord_plugins::wit::events::PanelVisibility as WitPanelVisibility;
 use mumcord_plugins::wit::ui as wit;
 use serde::{Deserialize, Serialize};
@@ -34,6 +37,9 @@ pub enum PluginSlot {
     Settings,
     /// The plugin's own dialog while it is open.
     Dialog,
+    /// The plugin's activity in the media area (FR-9.46). Only the source of `ui-action`s: the
+    /// tree arrives as [`PluginUiChange::StageTree`].
+    Stage,
 }
 
 impl From<wit::Slot> for PluginSlot {
@@ -50,17 +56,20 @@ impl From<wit::Slot> for PluginSlot {
     }
 }
 
-impl From<PluginSlot> for wit::Slot {
-    fn from(slot: PluginSlot) -> Self {
-        match slot {
-            PluginSlot::Panel => Self::Panel,
-            PluginSlot::MemberBadge { session } => Self::MemberBadge(session),
-            PluginSlot::ProfileCard { session } => Self::ProfileCard(session),
-            PluginSlot::ChatCard { id } => Self::ChatCard(id),
-            PluginSlot::ChatDecoration { session } => Self::ChatDecoration(session),
-            PluginSlot::Settings => Self::Settings,
-            PluginSlot::Dialog => Self::Dialog,
-        }
+impl PluginSlot {
+    /// The slot as plugins built for API 1.0 know it; `None` for the stage, whose actions go
+    /// out as 1.1 events (see `PluginService::stage_action`).
+    pub fn into_wit(self) -> Option<wit::Slot> {
+        Some(match self {
+            Self::Panel => wit::Slot::Panel,
+            Self::MemberBadge { session } => wit::Slot::MemberBadge(session),
+            Self::ProfileCard { session } => wit::Slot::ProfileCard(session),
+            Self::ChatCard { id } => wit::Slot::ChatCard(id),
+            Self::ChatDecoration { session } => wit::Slot::ChatDecoration(session),
+            Self::Settings => wit::Slot::Settings,
+            Self::Dialog => wit::Slot::Dialog,
+            Self::Stage => return None,
+        })
     }
 }
 
@@ -334,18 +343,44 @@ pub enum PluginUiChange {
         place: PluginWebviewPlace,
         url: String,
     },
-    /// The web view closes; its place shows the plugin's tree again.
-    WebviewHide,
-    /// A bridge message for the page (untrusted text). Not part of the snapshot.
-    WebviewPost { message: String },
+    /// The web view in `place` closes; the place shows the plugin's tree again (or closes, for
+    /// the side panel and the stage).
+    WebviewHide { place: PluginWebviewPlace },
+    /// A bridge message for the pages in `places` (untrusted text). Not part of the snapshot.
+    WebviewPost {
+        message: String,
+        places: Vec<PluginWebviewPlace>,
+    },
+    /// The smallest size the plugin asks for its side panel, in CSS pixels; the UI clamps it to
+    /// the panel's limits and the user may still resize (FR-9.39).
+    #[serde(rename_all = "camelCase")]
+    WebviewSizeHint { min_width: u32, min_height: u32 },
+    /// The plain-text status line under the plugin's side panel (untrusted text, at most 80
+    /// characters, no markup); empty clears it. Gone once the side panel closes.
+    SidePanelStatus { text: String },
+    /// The tree of the plugin's stage activity (FR-9.46); empty once the user left it.
+    StageTree { nodes: Vec<PluginNode> },
 }
 
 /// Where a plugin's web view is shown.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum PluginWebviewPlace {
     PanelPopover,
     Dialog,
+    SidePanel,
+    Stage,
+}
+
+impl From<PluginWebviewPlace> for WebviewPlace {
+    fn from(place: PluginWebviewPlace) -> Self {
+        match place {
+            PluginWebviewPlace::PanelPopover => Self::PanelPopover,
+            PluginWebviewPlace::Dialog => Self::Dialog,
+            PluginWebviewPlace::SidePanel => Self::SidePanel,
+            PluginWebviewPlace::Stage => Self::Stage,
+        }
+    }
 }
 
 impl From<WebviewPlace> for PluginWebviewPlace {
@@ -353,6 +388,8 @@ impl From<WebviewPlace> for PluginWebviewPlace {
         match place {
             WebviewPlace::PanelPopover => Self::PanelPopover,
             WebviewPlace::Dialog => Self::Dialog,
+            WebviewPlace::SidePanel => Self::SidePanel,
+            WebviewPlace::Stage => Self::Stage,
         }
     }
 }
@@ -364,6 +401,62 @@ impl From<WebviewPlace> for PluginWebviewPlace {
 pub struct PluginUi {
     pub plugin: String,
     pub change: PluginUiChange,
+}
+
+/// `plugin://frame-mute`: mute (or unmute) the sound of one plugin's frames (`plugin` set) or of
+/// all of them (`plugin` empty). The frame hosts send `{mumcordWebview:"mute", muted}` to the
+/// page's bootstrap.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugin://frame-mute")]
+pub struct PluginFrameMute {
+    pub plugin: Option<String>,
+    pub muted: bool,
+}
+
+/// What every plugin frame must currently hear, kept so a window that opens later (a popped-out
+/// stage) can still mute its frames for a mute or deafen that happened before.
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginFrameMuteState {
+    /// All frames are muted (the user is deafened).
+    pub all: bool,
+    /// Plugins whose frames the user muted, sorted.
+    pub plugins: Vec<String>,
+}
+
+/// The mute state behind [`PluginFrameMuteState`], kept in the app's managed state.
+#[derive(Default)]
+pub struct FrameMuteStore(std::sync::Mutex<PluginFrameMuteState>);
+
+impl FrameMuteStore {
+    /// Records one `plugin://frame-mute` change.
+    pub fn apply(&self, change: &PluginFrameMute) {
+        let mut state = self
+            .0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        match &change.plugin {
+            None => state.all = change.muted,
+            Some(plugin) => {
+                let position = state.plugins.binary_search(plugin);
+                match (position, change.muted) {
+                    (Err(at), true) => state.plugins.insert(at, plugin.clone()),
+                    (Ok(at), false) => {
+                        state.plugins.remove(at);
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    pub fn snapshot(&self) -> PluginFrameMuteState {
+        self.0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .clone()
+    }
 }
 
 /// How the user saw the plugin's panel.
@@ -613,8 +706,143 @@ impl From<UiUpdate> for PluginUiChange {
                 place: place.into(),
                 url: entry,
             },
-            UiUpdate::WebviewHide => Self::WebviewHide,
-            UiUpdate::WebviewPost { message } => Self::WebviewPost { message },
+            UiUpdate::WebviewHide { place } => Self::WebviewHide {
+                place: place.into(),
+            },
+            UiUpdate::WebviewPost { message, places } => Self::WebviewPost {
+                message,
+                places: places.into_iter().map(Into::into).collect(),
+            },
+            UiUpdate::WebviewSizeHint {
+                min_width,
+                min_height,
+            } => Self::WebviewSizeHint {
+                min_width,
+                min_height,
+            },
+            UiUpdate::SidePanelStatus { text } => Self::SidePanelStatus { text },
+            UiUpdate::StageTree { nodes } => Self::StageTree {
+                nodes: nodes.into_iter().map(Into::into).collect(),
+            },
+        }
+    }
+}
+
+/// One plugin activity as the stage and the activity line show it (mirrors the host's
+/// `ActivitySnapshot` plus the starter's name). Text is untrusted.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StageActivityView {
+    pub id: String,
+    pub plugin: String,
+    pub plugin_name: String,
+    pub title: String,
+    pub starter: u32,
+    pub starter_name: String,
+    pub participants: Vec<u32>,
+    pub max: u32,
+    pub joined: bool,
+    pub started_by_me: bool,
+    /// The content is the plugin's web page rather than a tree.
+    pub web: bool,
+    pub kind: StageActivityKind,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum StageActivityKind {
+    /// "<name> started <plugin> · Join".
+    Activity,
+    /// "<name> is playing <plugin> · Get plugin".
+    GetPlugin,
+}
+
+impl From<StageActivity> for StageActivityView {
+    fn from(a: StageActivity) -> Self {
+        let s = a.activity;
+        Self {
+            id: s.id,
+            plugin: s.plugin,
+            plugin_name: s.plugin_name,
+            title: s.title,
+            starter: s.starter,
+            starter_name: a.starter_name,
+            participants: s.participants,
+            max: s.max,
+            joined: s.joined,
+            started_by_me: s.started_by_me,
+            web: s.web,
+            kind: match s.kind {
+                ActivityKind::Activity => StageActivityKind::Activity,
+                ActivityKind::GetPlugin => StageActivityKind::GetPlugin,
+            },
+        }
+    }
+}
+
+/// Why `stage_join` failed, for the UI texts ("This activity is full", "no longer running").
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum StageJoinError {
+    Gone,
+    Full,
+    NotPermitted,
+    /// The host failed internally; nothing was joined.
+    Failed,
+}
+
+impl From<JoinError> for StageJoinError {
+    fn from(e: JoinError) -> Self {
+        match e {
+            JoinError::Gone => Self::Gone,
+            JoinError::Full => Self::Full,
+            JoinError::NotPermitted => Self::NotPermitted,
+        }
+    }
+}
+
+/// The limit text for a plugin's own `stage.start` / `stage.join` that was refused.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum StageRefusal {
+    /// "Too many activities in this channel".
+    TooMany,
+    /// "This activity is full".
+    Full,
+}
+
+impl From<Refusal> for StageRefusal {
+    fn from(r: Refusal) -> Self {
+        match r {
+            Refusal::TooMany => Self::TooMany,
+            Refusal::Full => Self::Full,
+        }
+    }
+}
+
+/// One Apps-menu item (FR-9.53); text is untrusted.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AppMenuItem {
+    pub plugin: String,
+    pub plugin_name: String,
+    pub item: String,
+    pub label: String,
+    pub icon: Option<String>,
+    pub enabled: bool,
+    pub reason: Option<String>,
+}
+
+impl From<AppMenuEntry> for AppMenuItem {
+    fn from(e: AppMenuEntry) -> Self {
+        Self {
+            plugin: e.plugin,
+            plugin_name: e.plugin_name,
+            item: e.item,
+            label: e.label,
+            icon: e.icon,
+            enabled: e.enabled,
+            reason: e.reason,
         }
     }
 }
@@ -641,7 +869,12 @@ pub struct Trees {
     dialogs: HashMap<String, (String, Option<String>)>,
     /// Label and the sessions it shows on (`None`: everyone).
     menu_entries: HashMap<String, (String, Option<Vec<u32>>)>,
-    webviews: HashMap<String, (PluginWebviewPlace, String)>,
+    /// The page URL of each open frame, by plugin and place.
+    webviews: HashMap<(String, PluginWebviewPlace), String>,
+    /// The side-panel size hint of each plugin with an open side panel.
+    size_hints: HashMap<String, (u32, u32)>,
+    /// The status line of each plugin with an open side panel; never empty.
+    statuses: HashMap<String, String>,
 }
 
 impl Trees {
@@ -661,16 +894,14 @@ impl Trees {
             PluginUiChange::OpenDialog { title, subtitle } => {
                 self.dialogs
                     .insert(plugin.to_owned(), (title.clone(), subtitle.clone()));
+                // The modal dialog takes the popover's frame slot (FR-9.38).
+                self.webviews
+                    .remove(&(plugin.to_owned(), PluginWebviewPlace::PanelPopover));
             }
             PluginUiChange::CloseDialog => {
                 self.dialogs.remove(plugin);
-                if self
-                    .webviews
-                    .get(plugin)
-                    .is_some_and(|(place, _)| *place == PluginWebviewPlace::Dialog)
-                {
-                    self.webviews.remove(plugin);
-                }
+                self.webviews
+                    .remove(&(plugin.to_owned(), PluginWebviewPlace::Dialog));
                 if let Some(slots) = self.trees.get_mut(plugin) {
                     slots.remove(&PluginSlot::Dialog);
                 }
@@ -688,12 +919,45 @@ impl Trees {
             },
             PluginUiChange::WebviewShow { place, url } => {
                 self.webviews
-                    .insert(plugin.to_owned(), (*place, url.clone()));
+                    .insert((plugin.to_owned(), *place), url.clone());
             }
-            PluginUiChange::WebviewHide => {
-                self.webviews.remove(plugin);
+            PluginUiChange::WebviewHide { place } => {
+                self.webviews.remove(&(plugin.to_owned(), *place));
+                if *place == PluginWebviewPlace::SidePanel {
+                    self.size_hints.remove(plugin);
+                    self.statuses.remove(plugin);
+                }
             }
+            // The stage tree is kept as the `Stage` slot, so a `ui-action` from it is checked like
+            // any other and a late window gets it in the snapshot. Empty: the user left.
+            PluginUiChange::StageTree { nodes } => {
+                if nodes.is_empty() {
+                    if let Some(slots) = self.trees.get_mut(plugin) {
+                        slots.remove(&PluginSlot::Stage);
+                    }
+                } else {
+                    self.trees
+                        .entry(plugin.to_owned())
+                        .or_default()
+                        .insert(PluginSlot::Stage, nodes.clone());
+                }
+            }
+            // Posts are not replayed.
             PluginUiChange::WebviewPost { .. } => {}
+            PluginUiChange::WebviewSizeHint {
+                min_width,
+                min_height,
+            } => {
+                self.size_hints
+                    .insert(plugin.to_owned(), (*min_width, *min_height));
+            }
+            PluginUiChange::SidePanelStatus { text } => {
+                if text.is_empty() {
+                    self.statuses.remove(plugin);
+                } else {
+                    self.statuses.insert(plugin.to_owned(), text.clone());
+                }
+            }
         }
     }
 
@@ -702,7 +966,9 @@ impl Trees {
         self.trees.retain(|id, _| running(id));
         self.dialogs.retain(|id, _| running(id));
         self.menu_entries.retain(|id, _| running(id));
-        self.webviews.retain(|id, _| running(id));
+        self.webviews.retain(|(id, _), _| running(id));
+        self.size_hints.retain(|id, _| running(id));
+        self.statuses.retain(|id, _| running(id));
     }
 
     /// Everything on screen, as the changes that rebuild it.
@@ -710,13 +976,20 @@ impl Trees {
         let mut out = Vec::new();
         for (plugin, slots) in &self.trees {
             for (slot, nodes) in slots {
-                out.push(PluginUi {
-                    plugin: plugin.clone(),
-                    change: PluginUiChange::SetTree {
+                let change = if *slot == PluginSlot::Stage {
+                    PluginUiChange::StageTree {
+                        nodes: nodes.clone(),
+                    }
+                } else {
+                    PluginUiChange::SetTree {
                         slot: slot.clone(),
                         nodes: nodes.clone(),
                         server_id: None,
-                    },
+                    }
+                };
+                out.push(PluginUi {
+                    plugin: plugin.clone(),
+                    change,
                 });
             }
         }
@@ -739,13 +1012,29 @@ impl Trees {
             });
         }
         // After the dialogs, so a web view in a dialog finds it open.
-        for (plugin, (place, url)) in &self.webviews {
+        for ((plugin, place), url) in &self.webviews {
             out.push(PluginUi {
                 plugin: plugin.clone(),
                 change: PluginUiChange::WebviewShow {
                     place: *place,
                     url: url.clone(),
                 },
+            });
+        }
+        // After the frames, so the side panel the hint is for is open.
+        for (plugin, (min_width, min_height)) in &self.size_hints {
+            out.push(PluginUi {
+                plugin: plugin.clone(),
+                change: PluginUiChange::WebviewSizeHint {
+                    min_width: *min_width,
+                    min_height: *min_height,
+                },
+            });
+        }
+        for (plugin, text) in &self.statuses {
+            out.push(PluginUi {
+                plugin: plugin.clone(),
+                change: PluginUiChange::SidePanelStatus { text: text.clone() },
             });
         }
         out
@@ -824,6 +1113,40 @@ fn kind_of(component: &PluginComponent, wanted: &str) -> Option<ActionKind> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn mute(plugin: Option<&str>, muted: bool) -> PluginFrameMute {
+        PluginFrameMute {
+            plugin: plugin.map(str::to_owned),
+            muted,
+        }
+    }
+
+    #[test]
+    fn frame_mute_store_keeps_deafen_and_per_plugin_state() {
+        let store = FrameMuteStore::default();
+        assert_eq!(store.snapshot(), PluginFrameMuteState::default());
+        store.apply(&mute(None, true));
+        store.apply(&mute(Some("b"), true));
+        store.apply(&mute(Some("a"), true));
+        store.apply(&mute(Some("a"), true));
+        assert_eq!(
+            store.snapshot(),
+            PluginFrameMuteState {
+                all: true,
+                plugins: vec!["a".into(), "b".into()]
+            }
+        );
+        store.apply(&mute(Some("a"), false));
+        store.apply(&mute(Some("zzz"), false));
+        store.apply(&mute(None, false));
+        assert_eq!(
+            store.snapshot(),
+            PluginFrameMuteState {
+                all: false,
+                plugins: vec!["b".into()]
+            }
+        );
+    }
 
     fn node(component: PluginComponent) -> PluginNode {
         PluginNode {
@@ -948,6 +1271,60 @@ mod tests {
     }
 
     #[test]
+    fn stage_errors_and_refusals_map_one_to_one() {
+        assert_eq!(StageJoinError::from(JoinError::Gone), StageJoinError::Gone);
+        assert_eq!(StageJoinError::from(JoinError::Full), StageJoinError::Full);
+        assert_eq!(
+            StageJoinError::from(JoinError::NotPermitted),
+            StageJoinError::NotPermitted
+        );
+        assert_eq!(StageRefusal::from(Refusal::TooMany), StageRefusal::TooMany);
+        assert_eq!(StageRefusal::from(Refusal::Full), StageRefusal::Full);
+    }
+
+    #[test]
+    fn the_stage_slot_has_no_1_0_form() {
+        assert!(PluginSlot::Stage.into_wit().is_none());
+        assert!(matches!(
+            PluginSlot::Panel.into_wit(),
+            Some(wit::Slot::Panel)
+        ));
+    }
+
+    #[test]
+    fn the_stage_tree_is_replayed_and_its_actions_are_checked() {
+        let mut trees = Trees::default();
+        let button = node(PluginComponent::Button {
+            label: "Roll".into(),
+            action: "roll".into(),
+            kind: PluginButtonKind::Primary,
+            disabled: false,
+            expanded: None,
+            detail: None,
+        });
+        trees.apply(
+            "poll",
+            &PluginUiChange::StageTree {
+                nodes: vec![button],
+            },
+        );
+        assert!(matches!(
+            trees.snapshot().as_slice(),
+            [PluginUi {
+                change: PluginUiChange::StageTree { nodes },
+                ..
+            }] if nodes.len() == 1
+        ));
+        assert_eq!(
+            trees.action_kind("poll", &PluginSlot::Stage, "roll"),
+            Some(ActionKind::Plain)
+        );
+        trees.apply("poll", &PluginUiChange::StageTree { nodes: vec![] });
+        assert!(trees.snapshot().is_empty(), "left: nothing to replay");
+        assert_eq!(trees.action_kind("poll", &PluginSlot::Stage, "roll"), None);
+    }
+
+    #[test]
     fn closing_the_dialog_and_forgetting_remove_the_ui() {
         let mut trees = Trees::default();
         let button = node(PluginComponent::Button {
@@ -998,6 +1375,7 @@ mod tests {
             "snacks",
             &PluginUiChange::WebviewPost {
                 message: "hi".into(),
+                places: vec![PluginWebviewPlace::Dialog],
             },
         );
         let snapshot = trees.snapshot();
@@ -1006,10 +1384,70 @@ mod tests {
         trees.apply("snacks", &PluginUiChange::CloseDialog);
         assert!(trees.snapshot().is_empty());
         trees.apply("snacks", &show(PluginWebviewPlace::PanelPopover));
-        trees.apply("snacks", &PluginUiChange::WebviewHide);
+        trees.apply(
+            "snacks",
+            &PluginUiChange::WebviewHide {
+                place: PluginWebviewPlace::PanelPopover,
+            },
+        );
         assert!(trees.snapshot().is_empty());
         trees.apply("snacks", &show(PluginWebviewPlace::PanelPopover));
         trees.retain(|_| false);
+        assert!(trees.snapshot().is_empty());
+    }
+
+    #[test]
+    fn each_place_keeps_its_own_frame_and_the_side_panel_its_hint() {
+        let mut trees = Trees::default();
+        let show = |place| PluginUiChange::WebviewShow {
+            place,
+            url: "mumcord-web://localhost/board/index.html".into(),
+        };
+        trees.apply("board", &show(PluginWebviewPlace::Stage));
+        trees.apply("board", &show(PluginWebviewPlace::SidePanel));
+        let hint = PluginUiChange::WebviewSizeHint {
+            min_width: 320,
+            min_height: 200,
+        };
+        trees.apply("board", &hint);
+        let snapshot = trees.snapshot();
+        assert_eq!(snapshot.len(), 3);
+        assert_eq!(snapshot[2].change, hint);
+        trees.apply(
+            "board",
+            &PluginUiChange::WebviewHide {
+                place: PluginWebviewPlace::SidePanel,
+            },
+        );
+        let snapshot = trees.snapshot();
+        assert_eq!(snapshot.len(), 1);
+        assert_eq!(snapshot[0].change, show(PluginWebviewPlace::Stage));
+    }
+
+    #[test]
+    fn the_side_panel_status_is_replayed_until_cleared_or_the_panel_closes() {
+        let mut trees = Trees::default();
+        trees.apply(
+            "board",
+            &PluginUiChange::WebviewShow {
+                place: PluginWebviewPlace::SidePanel,
+                url: "mumcord-web://localhost/board/index.html".into(),
+            },
+        );
+        let status = |text: &str| PluginUiChange::SidePanelStatus { text: text.into() };
+        trees.apply("board", &status("3 drawing"));
+        let snapshot = trees.snapshot();
+        assert_eq!(snapshot.len(), 2);
+        assert_eq!(snapshot[1].change, status("3 drawing"));
+        trees.apply("board", &status(""));
+        assert_eq!(trees.snapshot().len(), 1);
+        trees.apply("board", &status("relay"));
+        trees.apply(
+            "board",
+            &PluginUiChange::WebviewHide {
+                place: PluginWebviewPlace::SidePanel,
+            },
+        );
         assert!(trees.snapshot().is_empty());
     }
 }

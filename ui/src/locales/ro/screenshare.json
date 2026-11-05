@@ -1,5 +1,6 @@
 {
   "share": "Partajează ecranul",
+  "shareYourScreen": "Partajează ecranul tău",
   "choosing": "Se alege ce se partajează…",
   "stop": "Oprește partajarea",
   "startFailed": "Partajarea ecranului nu a putut porni.",
@@ -18,8 +19,6 @@
   "pause": "Pauză",
   "resume": "Reia",
   "sound": "Partajează sunetul",
-  "noSound": "Linux nu partajează sunet: spectatorii văd doar imaginea.",
-  "noSoundForShare": "Această partajare nu are sunet (ecran întreg sau versiune de sistem neacceptată).",
   "viewersNone": "Nimeni nu se uită încă",
   "viewers_one": "{{count}} urmărește: {{names}}",
   "viewers_few": "{{count}} urmăresc: {{names}}",
@@ -81,7 +80,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Partajează sunetul aplicației",
+    "sound": "Sunet",
+    "soundInfo": "Tot ecranul: sunetul computerului fără Mumcord. O fereastră: doar sunetul acelei aplicații.",
+    "soundNeeds": {
+      "windows": "Fără sunet: necesită Windows 10 versiunea 2004 sau mai nouă",
+      "macos": "Fără sunet: necesită macOS 13 sau mai nou",
+      "pipewire": "Fără sunet: necesită PipeWire"
+    },
     "viewersGet": "Spectatorii primesc:",
     "viewersGetSummary": "până la {{resolution}} · {{fps}} cadre/s · {{codec}} · aproximativ {{mbit}} Mbit/s",
     "pathRelay": "Trimis o singură dată prin releul serverului, care îl transmite mai departe la până la {{count}} spectatori.",
@@ -107,7 +112,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Releu",
-    "pathDirect": "Direct"
+    "pathDirect": "Direct",
+    "soundDesktop": "Sunet: desktop",
+    "soundApp": "Sunet: {{app}}",
+    "noSound": "Fără sunet",
+    "tipDesktop": "Tot ecranul: sunetul desktopului, fără Mumcord.",
+    "tipApp": "O fereastră: doar sunetul acelei aplicații.",
+    "tipOff": "Comutatorul de sunet este oprit.",
+    "tipNone": "Pentru această fereastră a fost aleasă opțiunea „Fără sunet”.",
+    "tipOldWindows": "Fără sunet: necesită Windows 10 versiunea 2004 sau mai nouă",
+    "tipOldMacos": "Fără sunet: necesită macOS 13 sau mai nou",
+    "tipNoPipeWire": "Fără sunet: necesită PipeWire",
+    "tipCaptureFailed": "Captarea sunetului a eșuat. Partajarea video continuă."
   },
   "qualityMenu": {
     "title": "Calitate",
@@ -222,5 +238,14 @@
     "valueUnavailable": "Indisponibil",
     "checkAgain": "Verifică din nou",
     "checking": "Se verifică…"
+  },
+  "soundPicker": {
+    "title": "Sunetul cărei aplicații?",
+    "noSound": "Fără sunet",
+    "share": "Partajează sunetul",
+    "cancel": "Anulează",
+    "empty": "Nicio aplicație nu redă sunet acum",
+    "gone": "Aplicația nu mai redă sunet. Alege alta.",
+    "failed": "Alegerea ta nu a putut fi aplicată."
   }
 }

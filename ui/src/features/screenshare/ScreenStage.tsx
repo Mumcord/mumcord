@@ -9,6 +9,8 @@ import { p2pBlockText } from "../p2p/relayReason";
 import { MockPicture } from "../media/MockPicture";
 import { mockPlaceholder } from "../media/mockPlaceholder";
 import { useInPopout } from "../media/popoutStore";
+import { useStageShown } from "../media/stageContext";
+import { useStageLabel } from "../media/stageRegistry";
 import { useScreenShareOf } from "./sharesStore";
 import { useScreenWatch, type ScreenWatch } from "./useScreenWatch";
 import type { StreamMeter } from "./streamStats";
@@ -30,17 +32,21 @@ export function ScreenStage({ serverId, session, name, paused, meter, onWatch }:
   const { t: tP2p } = useTranslation("p2p");
   const relayReason = useScreenShareOf(serverId, session)?.relayReason ?? null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const inPopout = useInPopout();
+  const shown = useStageShown();
+  // The stage tab of this share reads "Jonas's screen" (FR-9.44).
+  useStageLabel("share", t("title", { name }));
   const { status, retry, codec, maxFps, setMaxFps } = useScreenWatch(
     serverId,
     session,
     canvasRef,
     paused,
     meter,
+    !shown,
   );
   useEffect(() => {
     onWatch?.({ codec, maxFps, setMaxFps });
   }, [onWatch, codec, maxFps, setMaxFps]);
-  const inPopout = useInPopout();
 
   let message: string | null = null;
   if (status.state === "failed")

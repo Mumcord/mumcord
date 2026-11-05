@@ -6,7 +6,7 @@ The command-line tool for authors of [Mumcord](https://github.com/Mumcord/mumcor
 cargo install mumcord-plugin
 ```
 
-- `mumcord-plugin new <id>` creates a plugin project that uses [`mumcord-plugin-sdk`](https://crates.io/crates/mumcord-plugin-sdk).
+- `mumcord-plugin new <id>` creates a plugin project that uses [`mumcord-plugin-sdk`](https://crates.io/crates/mumcord-plugin-sdk). `--template stage-tree` or `--template stage-web` creates an API 1.1 stage plugin; see the [API 1.1 author guide](../../docs/plugins/api-1-1.md).
 - `mumcord-plugin build` builds the plugin into a `.mcplugin` package (`--reproducible` for byte-identical builds).
 - `mumcord-plugin check <package>` checks a package the way Mumcord does before installing it.
 - `mumcord-plugin test` runs the plugin against YAML scenarios in a mock host that uses the client's own runtime.

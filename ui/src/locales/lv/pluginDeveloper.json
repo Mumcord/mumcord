@@ -22,7 +22,7 @@
   "logEmpty": "Žurnāla ierakstu vēl nav.",
   "level": {
     "debug": "Atkļūdošana",
-    "info": "Info",
+    "info": "Informācija",
     "warn": "Brīdinājums",
     "error": "Kļūda"
   },

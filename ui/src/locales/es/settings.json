@@ -56,12 +56,12 @@
     "results": "Resultados de búsqueda",
     "empty": "Ningún ajuste coincide con «{{query}}».",
     "count_one": "{{count}} ajuste encontrado",
-    "count_other": "{{count}} ajustes encontrados",
     "count_many": "{{count}} ajustes encontrados",
+    "count_other": "{{count}} ajustes encontrados",
     "shortcut": "Ctrl F",
     "groupCount_one": "{{count}} resultado",
-    "groupCount_other": "{{count}} resultados",
-    "groupCount_many": "{{count}} de resultados"
+    "groupCount_many": "{{count}} de resultados",
+    "groupCount_other": "{{count}} resultados"
   },
   "errors": {
     "secureStorage": "El almacenamiento seguro del sistema no está disponible o se denegó el acceso.",
@@ -274,8 +274,8 @@
       "noServer": "Conéctate a un servidor para elegir personas o un canal.",
       "missingChannel": "{{channel}} (no está en este servidor)",
       "summaryPeople_one": "{{count}} persona · susurro",
-      "summaryPeople_other": "{{count}} personas · susurro",
       "summaryPeople_many": "{{count}} de personas · susurro",
+      "summaryPeople_other": "{{count}} personas · susurro",
       "summaryChannel": "Solo el canal · grito",
       "summaryChannelTree": "Canal y subcanales · grito",
       "hotkey": "Mantén para hablar:",
@@ -589,8 +589,8 @@
   },
   "retention": {
     "days_one": "{{count}} día",
-    "days_other": "{{count}} días",
-    "days_many": "{{count}} días"
+    "days_many": "{{count}} días",
+    "days_other": "{{count}} días"
   },
   "nowGaming": {
     "title": "Jugando ahora",
@@ -716,8 +716,8 @@
     },
     "details": "Detalles del paquete de las {{time}}",
     "toUsers_one": "→ {{count}} usuario",
-    "toUsers_other": "→ {{count}} usuarios",
     "toUsers_many": "→ {{count}} de usuarios",
+    "toUsers_other": "→ {{count}} usuarios",
     "delayed": "retrasado {{ms}} ms",
     "notDelayed": "sin retraso",
     "tokensLeft": "tokens restantes: {{tokens}}",
@@ -876,12 +876,12 @@
     "autoUnavailable": "Esta copia no puede actualizarse sola, así que Mumcord solo te avisa de las versiones nuevas.",
     "interval": "Buscar actualizaciones",
     "intervalHint_one": "Al iniciar y cada hora",
-    "intervalHint_other": "Al iniciar y cada {{count}} de horas",
     "intervalHint_many": "Al iniciar y cada {{count}} horas",
+    "intervalHint_other": "Al iniciar y cada {{count}} de horas",
     "intervalWeekHint": "Al iniciar y una vez por semana",
     "intervalHours_one": "Cada hora",
-    "intervalHours_other": "Cada {{count}} de horas",
     "intervalHours_many": "Cada {{count}} horas",
+    "intervalHours_other": "Cada {{count}} de horas",
     "intervalWeek": "Una vez por semana",
     "state": {
       "idle": "Aún no comprobado",
@@ -927,8 +927,8 @@
     "none": "Sin preajuste",
     "customised": "{{preset}}, personalizado",
     "changed_one": "{{count}} ajuste cambiado desde la configuración inicial",
-    "changed_other": "{{count}} ajustes cambiados desde la configuración inicial",
     "changed_many": "{{count}} de ajustes cambiados desde la configuración inicial",
+    "changed_other": "{{count}} ajustes cambiados desde la configuración inicial",
     "unchanged": "Sin cambios desde la configuración inicial",
     "switch": "Cambiar",
     "switchLabel": "Cambiar de preajuste",
@@ -1062,6 +1062,19 @@
     "hint": "Añade una pestaña Desarrollador a Plugins para cargar plugins sin firmar desde una carpeta. Actívalo solo si creas plugins."
   },
   "newBadge": "Nuevo",
+  "pluginSafety": {
+    "title": "Seguridad de los plugins",
+    "blockHighRisk": "No permitir plugins de alto riesgo",
+    "hint": "Oculta el botón Instalar en los plugins con una puntuación de 60 o más y bloquea las actualizaciones que llevarían un plugin instalado a ese nivel. Los plugins que ya instalaste siguen funcionando.",
+    "note": "Desactivado por defecto. Los plugins oficiales y los de desarrollador nunca se ven afectados. Las puntuaciones son estimaciones, no una garantía."
+  },
+  "pluginSounds": {
+    "title": "Sonidos de plugins",
+    "volume": "Volumen de los sonidos de plugins",
+    "mute": "Silenciar los sonidos de plugins",
+    "hint": "Se aplica a todos los sonidos que reproduce un plugin. Los sonidos de plugins se oyen más bajos mientras la gente habla.",
+    "meter": "Nivel de salida (depuración)"
+  },
   "screenShare": {
     "newBadge": "Nuevo",
     "qualityTitle": "Calidad predeterminada",
@@ -1093,6 +1106,7 @@
     "useGpuHint": "Codifica AV1 en tu tarjeta gráfica, así compartir casi no consume CPU. Desactivado: AV1 usa el procesador.",
     "statusList": "Estado del codificador",
     "av1Encode": "Codificación AV1",
+    "sound": "Sonido",
     "askEachTime": "Preguntar por estos ajustes cada vez que comparta",
     "av1Playback": "Reproducción AV1",
     "vp9Playback": "Reproducción VP9",

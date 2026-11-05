@@ -1,0 +1,5 @@
+{
+  "manifest.description": "E2E hard-stop test plugin: declares a website that is not encrypted; must never install.",
+  "manifest.name": "Fixture stop-http",
+  "origin_0": "Loads the fixture content"
+}

@@ -27,13 +27,16 @@
     "chatPatterns": "Rozpoznávať určité správy v chate, napr. vložené herné zostavy",
     "netHttp": "Komunikovať so serverom, ktorý si vyberiete",
     "secrets": "Uložiť tajomstvo (napr. kľúč API) do zväzku kľúčov systému",
-    "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)",
-    "uiStage": "Show an activity in the media area",
-    "uiSidePanel": "Show its own content in a side panel",
-    "uiAppMenu": "Add items to the Apps menu",
-    "netOrigins": "Talk to these websites",
-    "peersRelay": "Send data through the server's relay",
-    "audioEffects": "Play short sounds that come with the plugin"
+    "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme",
+    "uiStage": "Zobraziť aktivitu v mediálnej oblasti",
+    "uiSidePanel": "Zobraziť vlastný obsah v bočnom paneli",
+    "uiAppMenu": "Pridať položky do ponuky aplikácií",
+    "netOrigins": "Komunikovať s týmito webmi",
+    "peersRelay": "Posielať údaje cez relay servera",
+    "audioEffects": "Prehrávať krátke zvuky, ktoré sú súčasťou doplnku",
+    "filesSave": "Ukladať súbory, ktoré vyberieš",
+    "chatPostImage": "Po kliknutí odoslať obrázok do chatu",
+    "filesImportPicture": "Otvárať obrázky, ktoré vyberieš"
   },
   "explanations": {
     "uiPanel": "Malý panel tohto pluginu sa zobrazí v lište pluginov.",
@@ -56,13 +59,16 @@
     "chatPatterns": "Dostáva len správy v chate vášho kanála, ktoré začínajú tak, ako deklaroval, napríklad vloženú hernú zostavu. Žiadny iný text z chatu sa k nemu nedostane.",
     "netHttp": "Môže komunikovať s jedným serverom, ktorý zvolíte, a len s ním.",
     "secrets": "Môže uložiť tajomstvo, napríklad kľúč API, do kľúčenky systému.",
-    "uiWebview": "Môže zobraziť vlastný webový obsah v uzavretom ráme bez prístupu na internet.",
-    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
-    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
-    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
-    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
-    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
-    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
+    "uiWebview": "Nevidí Mumcord, tvoje súbory, mikrofón, kameru ani schránku.",
+    "uiStage": "Iba keď ju spustíš alebo sa k nej pripojíš. Pripojiť sa môžu ľudia vo tvojom kanáli, ktorí majú {{plugin}}.",
+    "uiSidePanel": "Jeho obsah sa zobrazí v stĺpci vedľa chatu, iba keď ho otvoríš.",
+    "uiAppMenu": "Najviac položiek: {{count}}, zobrazených pod „Doplnky“.",
+    "netOrigins": "{{plugin}} a jeho stránka môžu posielať a prijímať údaje iba s webmi uvedenými nižšie.",
+    "peersRelay": "Rýchlejšie a väčšie ťahy. Šifrované end-to-end; relay ich nemôže prečítať.",
+    "audioEffects": "Krátke zvuky, ktoré sú súčasťou doplnku. Môžeš ich stíšiť alebo vypnúť v Nastaveniach → Doplnky.",
+    "filesSave": "Mumcord sa po kliknutí opýta, kam každý súbor uložiť; doplnok tvoje priečinky nikdy nevidí.",
+    "chatPostImage": "Po kliknutí v doplnku môže do tvojho aktuálneho kanála odoslať jeden obrázok označený svojím názvom.",
+    "filesImportPicture": "Mumcord ťa po kliknutí nechá vybrať obrázok; doplnok dostane iba tento obrázok, nikdy tvoje priečinky."
   },
   "listLabel": "Oprávnenia"
 }

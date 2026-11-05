@@ -55,6 +55,10 @@
     "messagesExpired": "Lejárt üzenetek",
     "incomingRateDropped": "A sebességkorlát által eldobott bejövő üzenetek",
     "incomingInvalid": "Érvénytelen bejövő üzenetek",
+    "uiFreezes": "Hányszor fagyott le a Mumcord, miközben a webes tartalma nyitva volt",
+    "webDisabled": "A webes tartalma ki van kapcsolva, mert a Mumcord nem válaszolt, amíg nyitva volt.",
+    "reenableWeb": "Webes tartalom bekapcsolása",
+    "reenableFailed": "A webes tartalmat nem sikerült bekapcsolni.",
     "log": "Napló",
     "logEmpty": "A napló üres.",
     "level": {

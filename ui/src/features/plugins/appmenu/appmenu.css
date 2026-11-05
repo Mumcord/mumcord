@@ -1,0 +1,71 @@
+.appmenu__group {
+  margin: var(--space-1) var(--space-2) 2px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chat-apps__item.appmenu__item {
+  flex-direction: row;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  text-align: start;
+}
+
+.appmenu__item[aria-disabled="true"] {
+  opacity: 0.6;
+}
+
+.appmenu__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  object-fit: cover;
+}
+
+.appmenu__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.appmenu__sub {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.appmenu__foot {
+  margin: 2px var(--space-2) var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (forced-colors: active) {
+  .appmenu__item[aria-disabled="true"] {
+    opacity: 1;
+    color: GrayText;
+  }
+
+  .appmenu__icon {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .appmenu__sub,
+  .appmenu__group,
+  .appmenu__foot {
+    color: CanvasText;
+  }
+}

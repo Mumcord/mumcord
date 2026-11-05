@@ -1078,6 +1078,19 @@
     "hint": "Cuireann sé cluaisín Forbróir leis na Breiseáin inar féidir breiseáin gan síniú a lódáil ó fhillteán. Cuir air é mura gcruthaíonn tú breiseáin tú féin."
   },
   "newBadge": "Nua",
+  "pluginSafety": {
+    "title": "Sábháilteacht breiseán",
+    "blockHighRisk": "Ná lig breiseáin ardriosca",
+    "hint": "Folaíonn sé an cnaipe Suiteáil do bhreiseáin a bhfuil scór 60 nó níos mó acu, agus stopann sé nuashonruithe a chuirfeadh breiseán suiteáilte ansin. Leanann na breiseáin atá suiteáilte agat cheana ag obair.",
+    "note": "As de réir réamhshocraithe. Ní dhéanann sé difear riamh do bhreiseáin oifigiúla ná do bhreiseáin forbróra. Meastacháin is ea scóir, ní ráthaíocht."
+  },
+  "pluginSounds": {
+    "title": "Fuaimeanna breiseán",
+    "volume": "Airde fuaime breiseán",
+    "mute": "Balbhaigh fuaimeanna breiseán",
+    "hint": "Baineann sé le gach fuaim a sheinneann breiseán. Bíonn fuaimeanna breiseán níos ciúine agus daoine ag caint.",
+    "meter": "Leibhéal aschuir (dífhabhtú)"
+  },
   "screenShare": {
     "newBadge": "Nua",
     "qualityTitle": "Réamhshocruithe cáilíochta",
@@ -1109,6 +1122,7 @@
     "useGpuHint": "Ionchódaíonn AV1 ar do chárta grafaicí, mar sin is beag ualach a chuireann an chomhroinnt ar an LAP. As: úsáideann AV1 an próiseálaí.",
     "statusList": "Stádas an ionchódóra",
     "av1Encode": "Ionchódú AV1",
+    "sound": "Fuaim",
     "askEachTime": "Fiafraigh díom faoi na socruithe seo gach uair a chomhroinnim",
     "av1Playback": "Seinm AV1",
     "vp9Playback": "Seinm VP9",

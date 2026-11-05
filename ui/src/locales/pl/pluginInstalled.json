@@ -55,6 +55,10 @@
     "messagesExpired": "Wiadomości, które wygasły",
     "incomingRateDropped": "Przychodzące wiadomości odrzucone przez limit częstotliwości",
     "incomingInvalid": "Nieprawidłowe wiadomości przychodzące",
+    "uiFreezes": "Ile razy Mumcord się zawiesił przy otwartej treści internetowej",
+    "webDisabled": "Treść internetowa jest wyłączona, ponieważ Mumcord przestał odpowiadać, gdy była otwarta.",
+    "reenableWeb": "Włącz treść internetową",
+    "reenableFailed": "Nie udało się włączyć treści internetowej.",
     "log": "Dziennik",
     "logEmpty": "Dziennik jest pusty.",
     "level": {

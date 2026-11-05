@@ -78,6 +78,16 @@
       "keys": "↑ ↓ промяна на размера · PageUp/PageDown прилепване · Home/End · Enter нулира",
       "releaseHint": "Отпусни, за да се свие до малката лента",
       "minimised": "Медийната област е свита"
+    },
+    "stage": {
+      "tabs": "Какво показва медийната област",
+      "hint": "Превключването не спира нищо",
+      "share": "Споделяне на екрана",
+      "plugin": "Плъгин",
+      "tabName": "{{label}}, раздел {{index}} от {{count}}",
+      "tabNameNew": "{{label}}, ново, раздел {{index}} от {{count}}",
+      "pluginTabName": "{{label}}, активност на плъгин, раздел {{index}} от {{count}}",
+      "pluginTabNameNew": "{{label}}, активност на плъгин, ново, раздел {{index}} от {{count}}"
     }
   }
 }

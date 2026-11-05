@@ -86,7 +86,7 @@ async function expectShareReason(expected: string | null): Promise<void> {
   await button.waitForClickable({ timeout: 20_000 });
   await button.click();
   const item = $(
-    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
+    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share your screen')]",
   );
   await item.waitForDisplayed();
   const read = async (): Promise<string | null> => {
@@ -199,7 +199,6 @@ async function expectFullSizeNote(expected: string): Promise<void> {
 
   after(async () => {
     await apps.stopB();
-    await relayenv.stopRelay();
   });
 
   it("AC-7.1: the default relay allows everything and says so in server info", async () => {

@@ -278,6 +278,12 @@ impl PluginService {
             origin.source(),
             record.granted.iter().map(String::as_str),
         );
+        // `validate` above already accepted these origins, so this cannot fail here.
+        let origins = manifest
+            .validate_origins(origin.source() == Source::Dev)
+            .unwrap_or_default();
+        self.io.webviews().set_origins(&record.id, origins.clone());
+        self.ctx.http.set_origins(&record.id, origins);
         self.set_webview_root(&record.id, origin.source(), &dir, &granted);
         self.ctx.grants.set(&record.id, granted);
         self.ctx
@@ -303,6 +309,7 @@ impl PluginService {
     pub(super) fn stop(&mut self, id: &str) {
         // Failures while stopping are logged by the host; the plugin is off either way.
         let _ = self.host.disable(id);
+        self.ctx.audio.stop_all(id);
     }
 
     /// Stops and forgets a plugin in the runtime and the permission gate.
@@ -321,6 +328,7 @@ impl PluginService {
         self.ctx.grants.forget(id);
         self.ctx.notify.forget(id);
         self.ctx.http.forget(id);
+        self.ctx.audio.forget(id);
         self.io.forget(id);
     }
 
@@ -330,8 +338,8 @@ impl PluginService {
             .ok_or_else(|| ServiceError::NotInstalled(id.to_owned()))
     }
 
-    /// Lets an official plugin with `ui.webview` serve its `web/` folder (FR-6.48); without the
-    /// grant any open web view closes.
+    /// Lets a plugin with `ui.webview` serve its `web/` folder in the places its manifest allows
+    /// (FR-6.48, FR-9.32); without the grant any open web view closes.
     pub(super) fn set_webview_root(
         &self,
         id: &str,
@@ -339,15 +347,55 @@ impl PluginService {
         dir: &Path,
         granted: &[String],
     ) {
-        let allowed =
-            source == Source::Official && granted.iter().any(|g| g == webview::PERMISSION);
+        // Every place that roots a package's web content roots its declared sounds too.
+        self.ctx.audio.set_sounds(id, dir, self.host.manifest(id));
+        let places = self
+            .host
+            .manifest(id)
+            .map(webview::allowed_places)
+            .unwrap_or_default();
+        let allowed = may_show_web_content(self.host.manifest(id), source, granted);
         if !allowed {
             self.io.webview_hide(id);
         }
         let web = dir.join("web");
-        self.io
-            .webviews()
-            .set_root(id, (allowed && web.is_dir()).then_some(web));
+        let webviews = self.io.webviews();
+        webviews.set_origins_granted(id, granted.iter().any(|g| g == "net.origins"));
+        webviews.set_root(id, (allowed && web.is_dir()).then_some(web), places);
+        let disabled = self
+            .store()
+            .plugin_web_disabled(id)
+            .unwrap_or_else(|error| {
+                tracing::error!(%error, "reading whether a plugin's web content is off failed");
+                false
+            });
+        webviews.set_web_disabled(id, disabled);
+    }
+
+    /// Turns a plugin's web content off because Mumcord's window stopped answering while one of
+    /// its frames was open (FR-9.42): its frames close, none opens again (also after a restart)
+    /// until [`Self::re_enable_web`], and Diagnostics counts it.
+    pub fn set_web_disabled(&self, id: &str) -> Result<(), ServiceError> {
+        self.io.webviews().set_web_disabled(id, true);
+        if let Some(diag) = self.host.diagnostics(id) {
+            diag.ui_froze();
+        }
+        self.store()
+            .set_plugin_web_disabled(id, true, now_millis())?;
+        Ok(())
+    }
+
+    /// The user turned the plugin's web content on again in Settings → Plugins.
+    pub fn re_enable_web(&self, id: &str) -> Result<(), ServiceError> {
+        self.store()
+            .set_plugin_web_disabled(id, false, now_millis())?;
+        self.io.webviews().set_web_disabled(id, false);
+        Ok(())
+    }
+
+    /// Whether the plugin's web content is off (FR-9.42).
+    pub fn web_disabled(&self, id: &str) -> bool {
+        self.io.webviews().web_disabled(id)
     }
 
     pub(super) fn version_dir(&self, id: &str, version: &str) -> PathBuf {
@@ -465,4 +513,59 @@ fn version_folders(dir: &std::path::Path) -> Vec<String> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+/// Whether a plugin may show its own web content (FR-9.32): it holds `ui.webview` and is
+/// official (as in 1.0) or built for API 1.1 or later, whose stricter frame rules make web
+/// content safe enough for unofficial plugins.
+fn may_show_web_content(
+    manifest: Option<&crate::Manifest>,
+    source: Source,
+    granted: &[String],
+) -> bool {
+    granted.iter().any(|g| g == webview::PERMISSION)
+        && (source == Source::Official
+            || manifest
+                .is_some_and(|m| crate::version::api_of(m) >= crate::version::ApiMinor::V1_1))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn manifest(api: &str) -> crate::Manifest {
+        let mut manifest = crate::Manifest::parse(crate::manifest::tests::EXAMPLE.as_bytes())
+            .expect("example parses");
+        manifest.api = api.parse().expect("api range");
+        manifest
+    }
+
+    #[test]
+    fn unofficial_plugins_get_web_content_only_with_api_1_1() {
+        let granted = vec![webview::PERMISSION.to_owned()];
+        let (old, new) = (manifest("^1.0"), manifest("^1.1"));
+        assert!(may_show_web_content(Some(&old), Source::Official, &granted));
+        assert!(may_show_web_content(Some(&new), Source::Official, &granted));
+        assert!(!may_show_web_content(
+            Some(&old),
+            Source::Repo { repository_id: 1 },
+            &granted
+        ));
+        assert!(may_show_web_content(
+            Some(&new),
+            Source::Repo { repository_id: 1 },
+            &granted
+        ));
+        assert!(!may_show_web_content(
+            None,
+            Source::Repo { repository_id: 1 },
+            &granted
+        ));
+        assert!(!may_show_web_content(
+            Some(&new),
+            Source::Repo { repository_id: 1 },
+            &[]
+        ));
+        assert!(!may_show_web_content(Some(&new), Source::Official, &[]));
+    }
 }

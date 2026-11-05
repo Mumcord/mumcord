@@ -75,7 +75,9 @@
   "unofficialText": "{{repository}} n'est pas vérifié par Mumcord. Le plugin s'exécute quand même dans le bac à sable et n'obtient que les autorisations que vous accordez.",
   "checksTitle": "Les contrôles officiels s'appliquent toujours",
   "checksText": "La liste de révocation de Mumcord peut le désactiver. Les noms des plugins officiels sont réservés.",
-  "metaPermissions": "Autorisations : {{count}}",
+  "metaPermissions_one": "{{count}} autorisation",
+  "metaPermissions_many": "{{count}} d’autorisations",
+  "metaPermissions_other": "{{count}} autorisations",
   "footer": "Dépôt officiel · liste signée vérifiée · rien sur vous n'est envoyé",
   "factSource": "Source : {{url}}",
   "factLicence": "Licence : {{license}}",
@@ -96,5 +98,7 @@
     "unpacking": "Décompression…",
     "starting": "Démarrage…",
     "announce": "{{name}} : {{percent}} % téléchargés"
-  }
+  },
+  "needsMumcord": "Nécessite Mumcord {{version}} ou une version plus récente",
+  "updateMumcord": "Mettre à jour Mumcord"
 }

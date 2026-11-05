@@ -24,7 +24,8 @@
   "pill": {
     "none": "Inga nya behörigheter",
     "permission": "Behöver en ny behörighet",
-    "author": "Ny upphovsperson"
+    "author": "Ny upphovsperson",
+    "websites": "Kommunicerar med nya webbplatser"
   },
   "newPermissions": "Nya behörigheter",
   "revoked": {
@@ -45,5 +46,63 @@
     "save": "Spara",
     "notNow": "Inte nu",
     "failed": "Behörigheterna för {{name}} kunde inte ändras. Försök igen."
+  },
+  "waitingHeading": "Väntande uppdateringar",
+  "autoNote": "Automatiska uppdateringar installeras bara när tillägget inte ber om något nytt och dess poäng stannar i samma nivå eller sjunker. Allt annat väntar här.",
+  "needsMumcord": "Uppdatering finns efter att du uppdaterat Mumcord",
+  "band": {
+    "low": "Låg",
+    "medium": "Medel",
+    "high": "Hög"
+  },
+  "hold": {
+    "newWebsites_one": "Den här uppdateringen vill kommunicera med {{count}} ny webbplats. {{name}} stannar på {{version}} tills du bestämmer dig.",
+    "newWebsites_other": "Den här uppdateringen vill kommunicera med {{count}} nya webbplatser. {{name}} stannar på {{version}} tills du bestämmer dig.",
+    "riskUp": "Installeras inte automatiskt: risken har ökat från {{from}} till {{to}}. Granska den först.",
+    "scoreUp": "Installeras inte automatiskt: poängen har ökat från {{from}} till {{to}}. Granska den först.",
+    "blockedBySafety": "Installeras inte: den här versionen har hög risk och ”Tillåt inte tillägg med hög risk” är på.",
+    "scoreUnknown": "Installeras inte automatiskt: säkerhetspoängen för den här versionen kunde inte räknas ut. Granska den först."
+  },
+  "score": {
+    "label": "Säkerhetspoäng:",
+    "unchanged": "oförändrad",
+    "points": "poäng",
+    "goesUp": ", risken ökar",
+    "goesDown": ", risken minskar"
+  },
+  "dialog": {
+    "title": "Uppdatera {{name}} till {{version}}?",
+    "now": "nu {{version}}",
+    "sameKey": "samma upphovsnyckel",
+    "newKey": "ny upphovsnyckel",
+    "newWebsites_one": "Den här uppdateringen vill kommunicera med {{count}} ny webbplats.",
+    "newWebsites_other": "Den här uppdateringen vill kommunicera med {{count}} nya webbplatser.",
+    "staysOn": "{{name}} stannar på {{version}} tills du bestämmer dig.",
+    "otherDomain": "En av dem ligger inte på tilläggets egen domän.",
+    "whatsNew": "Nytt i {{version}}",
+    "websitesLead": "{{name}} och dess sida skulle då kunna nå:",
+    "websitesWarning": "Dessa webbplatser kan se din IP-adress och allt som {{name}} skickar till dem.",
+    "websitesLabel": "Webbplatser",
+    "new": "Ny",
+    "changed": "Ändrad",
+    "noOtherPermissions": "Inga andra behörigheter ändras.",
+    "scoreNow": "Nu ({{version}})",
+    "scoreAfter": "Efter uppdateringen ({{version}})",
+    "meterNow": "Säkerhetspoäng nu",
+    "meterAfter": "Säkerhetspoäng efter uppdateringen",
+    "riskUpBy_one": "Risken ökar med {{count}} poäng",
+    "riskUpBy_other": "Risken ökar med {{count}} poäng",
+    "asksForMore": "eftersom den här versionen ber om mer:",
+    "permissionsLabel": "Nya behörigheter",
+    "recentChange": "Det räknas också som en nylig ändring: nya behörigheter under de senaste {{versions}} versionerna ger ytterligare +{{recent}} poäng. Tillsammans med +{{permissions}} ovan (× {{multiplier}}) blir det +{{total}}.",
+    "highTitle": "Den här uppdateringen skulle ge tillägget hög risk",
+    "highText": "Det installeras inte automatiskt. Om du stannar på {{version}} behålls den nuvarande poängen; du kan fästa versionen under Installerade.",
+    "highTick": "Jag förstår att risken har ökat och litar fortfarande på upphovspersonen",
+    "skipHint": "Om du hoppar över den fungerar {{version}} fortfarande.",
+    "skip": "Hoppa över den här versionen",
+    "notNow": "Inte nu",
+    "allow": "Tillåt och uppdatera",
+    "updateAnyway": "Uppdatera ändå",
+    "failed": "{{name}} kunde inte uppdateras. Försök igen."
   }
 }

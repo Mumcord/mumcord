@@ -1,0 +1,58 @@
+{
+  "manifest": 1,
+  "id": "test-surface",
+  "name": "Test Surface",
+  "description": "E2E test plugin: web content in the stage, side panel and dialog, with isolation probes.",
+  "version": "1.1.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": [
+      "ui.panel",
+      "ui.dialog",
+      "ui.webview",
+      "ui.stage",
+      "ui.side-panel",
+      "ui.app-menu",
+
+      "net.origins"
+    ],
+    "optional": [
+      {
+        "id": "audio.effects",
+        "suggested": true
+      }
+    ]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "https://declared.plugins.test:47443",
+        "purpose": "origins.declared"
+      }
+    ]
+  },
+  "app_menu": [
+    {
+      "id": "start",
+      "label": "Start Test Surface"
+    },
+    {
+      "id": "side",
+      "label": "Open Test Surface panel"
+    }
+  ],
+  "stage": {
+    "title": "Test Surface",
+    "max_participants": 8
+  },
+  "webview": {
+    "places": ["stage", "side-panel", "dialog", "panel"]
+  },
+  "audio": {
+    "sounds": ["sounds/beep.wav"]
+  }
+}

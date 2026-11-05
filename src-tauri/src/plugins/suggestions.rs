@@ -125,10 +125,12 @@ pub async fn handle(
         let revoked = cached_revocations(&worker.registry_cache().join("official"));
         let index = worker.index();
         let is_installed = |id: &str| installed.iter().any(|i| i == id);
+        let app_version = super::app_version();
         let env = Environment {
             index: index.as_ref(),
             revoked: &revoked,
             installed: &is_installed,
+            app: &app_version,
         };
         let store = store
             .lock()

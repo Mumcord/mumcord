@@ -25,6 +25,10 @@ function share(patch: Partial<ScreenShare> = {}): ScreenShare {
     paused: false,
     sound: false,
     soundAvailable: false,
+    soundMode: "none",
+    soundApp: null,
+    soundReason: null,
+    soundChoice: null,
     viewers: [],
     blocked: null,
     relayReason: null,
@@ -76,10 +80,10 @@ describe("share availability", () => {
     ).toEqual({ kind: "unsupportedPlatform" });
   });
 
-  it("supports Linux without sound, macOS and Windows with sound", () => {
-    expect(platformOf("Linux x86_64")).toEqual({ supported: true, sound: false });
-    expect(platformOf("macos aarch64")).toEqual({ supported: true, sound: true });
-    expect(platformOf("windows x86_64")).toEqual({ supported: true, sound: true });
+  it("supports Linux, macOS and Windows", () => {
+    expect(platformOf("Linux x86_64")).toEqual({ supported: true });
+    expect(platformOf("macos aarch64")).toEqual({ supported: true });
+    expect(platformOf("windows x86_64")).toEqual({ supported: true });
   });
 });
 
@@ -96,23 +100,36 @@ describe("sound of the own share", () => {
     await screen.findByRole("group", { name: BAR_NAME });
   }
 
-  it("disables the sound switch with its reason when the share has no source", async () => {
-    await sharing(false);
-    const sound = screen.getByRole("button", { name: "Sound" });
+  it("disables the sound switch with what the system lacks", async () => {
+    const api = await linuxMock();
+    vi.spyOn(api, "screenShareSoundSupport").mockResolvedValue("noPipeWire");
+    render(<SharerBar />);
+    act(() => {
+      api.mock.emit("screenSharesChanged", {
+        serverId: 1,
+        shares: [share({ soundReason: "noPipeWire" })],
+      });
+    });
+    const sound = await screen.findByRole("button", { name: "Sound" });
     expect(sound).toHaveAttribute("aria-disabled", "true");
-    expect(sound).toHaveAccessibleDescription(/Linux shares no sound/);
+    await waitFor(() => {
+      expect(sound).toHaveAccessibleDescription("No sound: needs PipeWire");
+    });
   });
 
-  it("names the whole screen on systems that can send sound", async () => {
+  it("otherwise gives the sound line's reason", async () => {
     const api = await connectedMock({ bindStore: true });
     onOs(api, "windows x86_64");
     api.mock.emit("voiceServerChanged", { serverId: 1 });
     render(<SharerBar />);
     act(() => {
-      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [share()] });
+      api.mock.emit("screenSharesChanged", {
+        serverId: 1,
+        shares: [share({ soundReason: "notChosen" })],
+      });
     });
     expect(await screen.findByRole("button", { name: "Sound" })).toHaveAccessibleDescription(
-      /This share has no sound/,
+      /No sound.{1,3}was chosen for this window/,
     );
   });
 
@@ -269,7 +286,7 @@ describe("sharer control bar", () => {
       expect(bar).toHaveTextContent("Live");
       expect(bar).toHaveTextContent("You are sharing0:00");
       expect(bar).toHaveTextContent("Shared picture");
-      expect(bar).toHaveTextContent("no sound");
+      expect(bar).toHaveTextContent("No sound");
     });
   });
 

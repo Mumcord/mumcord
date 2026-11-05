@@ -1,0 +1,4 @@
+{
+  "manifest.name": "Test Relay",
+  "manifest.description": "E2E test plugin: 64 KiB and small messages through the relay, with and without the Mumble fallback."
+}

@@ -5,6 +5,10 @@
     "body": "Désactivé après des plantages répétés",
     "open": "Afficher dans Plugins"
   },
+  "pictureRefused": {
+    "title": "{{name}} n'a pas pu utiliser l'image",
+    "body": "Cette image ne peut pas être utilisée. Utilisez un fichier PNG, JPEG ou WebP de 10 Mo maximum."
+  },
   "update": {
     "title": "Mise à jour de {{name}}",
     "body": "La version {{version}} attend dans l’onglet Mises à jour",

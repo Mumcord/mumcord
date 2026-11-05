@@ -5,8 +5,9 @@ use std::sync::Arc;
 use mumcord_engine::Engine;
 use mumcord_engine::screen_share::wire::Codec;
 use mumcord_engine::screen_share::{
-    self as engine_share, QualityPrefs, ScreenShareView, ShareKind as EngineShareKind,
-    WatchBlock as EngineWatchBlock,
+    self as engine_share, NoSoundReason as EngineNoSoundReason, QualityPrefs, ScreenShareView,
+    ShareKind as EngineShareKind, ShareSoundMode as EngineSoundMode, SoundApp as EngineSoundApp,
+    SoundUnavailable as EngineSoundUnavailable, WatchBlock as EngineWatchBlock,
 };
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -47,6 +48,15 @@ pub struct ScreenShare {
     pub sound: bool,
     /// The own share has a sound source; always `false` for the shares of others.
     pub sound_available: bool,
+    /// What the own share's sound carries; `none` for the shares of others.
+    pub sound_mode: ShareSoundMode,
+    /// The app whose sound is shared, when `soundMode` is `app` (stays on the sharer's device).
+    pub sound_app: Option<String>,
+    /// Why the own share sends no sound, for the live bar's sound line (FR-7.85); `null` while
+    /// it sends sound, for the shares of others, and when nothing explains it.
+    pub sound_reason: Option<ShareSoundReason>,
+    /// Set while the share waits for "Which app's sound?" (FR-7.83); the list to offer.
+    pub sound_choice: Option<Vec<SoundApp>>,
     /// Who is watching (up to 8).
     pub viewers: Vec<SessionId>,
     /// Why the user cannot watch; always `null` for the own share.
@@ -58,6 +68,112 @@ pub struct ScreenShare {
     pub kind: Option<ShareKind>,
     /// How long the share has been running (issue #163).
     pub elapsed_ms: u32,
+}
+
+/// What the own share's sound carries (FR-7.76).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ShareSoundMode {
+    Desktop,
+    App,
+    None,
+}
+
+impl From<EngineSoundMode> for ShareSoundMode {
+    fn from(m: EngineSoundMode) -> Self {
+        match m {
+            EngineSoundMode::Desktop => Self::Desktop,
+            EngineSoundMode::App => Self::App,
+            EngineSoundMode::None => Self::None,
+        }
+    }
+}
+
+/// Why there is no sound to share (FR-7.84, FR-7.85).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum SoundUnavailableReason {
+    /// The system is too old (Windows before 10 version 2004, macOS before 13).
+    OsTooOld,
+    /// Linux without a running PipeWire.
+    NoPipeWire,
+    /// The sound capture could not start or stopped.
+    CaptureFailed,
+}
+
+impl From<EngineSoundUnavailable> for SoundUnavailableReason {
+    fn from(r: EngineSoundUnavailable) -> Self {
+        match r {
+            EngineSoundUnavailable::OsTooOld => Self::OsTooOld,
+            EngineSoundUnavailable::NoPipeWire => Self::NoPipeWire,
+            EngineSoundUnavailable::CaptureFailed => Self::CaptureFailed,
+        }
+    }
+}
+
+/// Why the own share sends no sound (FR-7.85).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ShareSoundReason {
+    /// The Sound switch is off.
+    Off,
+    /// "No sound" was chosen in "Which app's sound?".
+    NotChosen,
+    /// The system is too old (Windows before 10 version 2004, macOS before 13).
+    OsTooOld,
+    /// Linux without a running PipeWire.
+    NoPipeWire,
+    /// The sound capture could not start or stopped.
+    CaptureFailed,
+}
+
+impl From<EngineNoSoundReason> for ShareSoundReason {
+    fn from(r: EngineNoSoundReason) -> Self {
+        match r {
+            EngineNoSoundReason::Off => Self::Off,
+            EngineNoSoundReason::NotChosen => Self::NotChosen,
+            EngineNoSoundReason::Unavailable(EngineSoundUnavailable::OsTooOld) => Self::OsTooOld,
+            EngineNoSoundReason::Unavailable(EngineSoundUnavailable::NoPipeWire) => {
+                Self::NoPipeWire
+            }
+            EngineNoSoundReason::Unavailable(EngineSoundUnavailable::CaptureFailed) => {
+                Self::CaptureFailed
+            }
+        }
+    }
+}
+
+/// One app offered in "Which app's sound?" (FR-7.83).
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SoundApp {
+    /// What `screenShareChooseSound` takes.
+    pub id: String,
+    pub name: String,
+    /// The app's icon as a `data:` URL (Linux, where the system has one); the list shows a
+    /// coloured square without it.
+    pub icon: Option<String>,
+}
+
+impl std::fmt::Debug for SoundApp {
+    /// App names and ids never reach a log (FR-7.87).
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("SoundApp(..)")
+    }
+}
+
+impl From<EngineSoundApp> for SoundApp {
+    fn from(a: EngineSoundApp) -> Self {
+        Self {
+            id: a.id,
+            name: a.name.as_str().to_owned(),
+            icon: a.icon.map(|icon| {
+                use base64::Engine as _;
+                let data = base64::engine::general_purpose::STANDARD.encode(icon.bytes);
+                format!("data:{};base64,{data}", icon.mime)
+            }),
+        }
+    }
 }
 
 /// What the sharer picked in the system picker (issue #163).
@@ -251,6 +367,13 @@ impl From<ScreenShareView> for ScreenShare {
             paused: v.paused,
             sound: v.sound,
             sound_available: v.sound_status.available(),
+            sound_mode: v.sound_status.mode.into(),
+            sound_app: v.sound_status.app.as_ref().map(|a| a.as_str().to_owned()),
+            sound_reason: v.sound_status.no_sound_reason().map(Into::into),
+            sound_choice: v
+                .sound_status
+                .choice
+                .map(|apps| apps.into_iter().map(Into::into).collect()),
             viewers: v.viewers,
             blocked: v.blocked.map(Into::into),
             relay_reason: match v.blocked {
@@ -326,6 +449,41 @@ pub fn screen_share_set_sound(
     enabled: bool,
 ) -> ApiResult<()> {
     Ok(engine.screen_share_set_sound(to_engine_server_id(server_id), enabled)?)
+}
+
+/// Why this system cannot share sound (FR-7.84), asked before a share starts so the start
+/// dialog and Settings can show the Sound switch off and disabled with the matching note;
+/// `null` where sound can be shared.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_sound_support(engine: State<'_, Engine>) -> Option<SoundUnavailableReason> {
+    engine.screen_share_sound_unavailable().map(Into::into)
+}
+
+/// The apps playing sound now, for "Which app's sound?" while the own share waits for the
+/// pick (`soundChoice` is set). Call it again to refresh the open list; empty where the
+/// system has no per-app choice.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_sound_apps(engine: State<'_, Engine>) -> ApiResult<Vec<SoundApp>> {
+    Ok(engine
+        .screen_share_sound_apps()?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+/// Answers "Which app's sound?": an app id shares that app's sound, `null` ("No sound" or
+/// Cancel) keeps the share silent. Errors: `notFound` when the app stopped playing (keep the
+/// dialog open and refresh the list), `invalidInput` when nothing is asked.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_choose_sound(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    app: Option<String>,
+) -> ApiResult<()> {
+    Ok(engine.screen_share_choose_sound(to_engine_server_id(server_id), app.as_deref())?)
 }
 
 /// Level of watched shares' sound, 0.0–1.0, while people talk (auto-ducking, FR-2.76).
@@ -840,6 +998,91 @@ pub fn screen_encoder_prepare(engine: State<'_, Engine>, choice: QualityChoice) 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use mumcord_engine::screen_share::{AppIcon as EngineAppIcon, AppName, SoundStatus};
+
+    fn view(sound_status: SoundStatus) -> ScreenShareView {
+        ScreenShareView {
+            session: 1,
+            paused: false,
+            sound: true,
+            sound_status,
+            viewers: Vec::new(),
+            blocked: None,
+            kind: None,
+            elapsed_ms: 0,
+        }
+    }
+
+    #[test]
+    fn sound_status_maps_to_mode_app_and_reason() {
+        let s = ScreenShare::from(view(SoundStatus {
+            mode: EngineSoundMode::App,
+            app: Some(AppName::new("Firefox")),
+            ..SoundStatus::default()
+        }));
+        assert!(s.sound_available);
+        assert_eq!(s.sound_mode, ShareSoundMode::App);
+        assert_eq!(s.sound_app.as_deref(), Some("Firefox"));
+        assert_eq!((s.sound_reason, s.sound_choice), (None, None));
+
+        let s = ScreenShare::from(view(SoundStatus {
+            unavailable: Some(EngineSoundUnavailable::NoPipeWire),
+            ..SoundStatus::default()
+        }));
+        assert!(!s.sound_available);
+        assert_eq!(s.sound_mode, ShareSoundMode::None);
+        assert_eq!(s.sound_reason, Some(ShareSoundReason::NoPipeWire));
+    }
+
+    #[test]
+    fn the_switch_and_a_declined_choice_have_their_own_reason() {
+        let off = ScreenShare::from(view(SoundStatus {
+            off: true,
+            ..SoundStatus::default()
+        }));
+        assert_eq!(off.sound_reason, Some(ShareSoundReason::Off));
+        let declined = ScreenShare::from(view(SoundStatus {
+            declined: true,
+            ..SoundStatus::default()
+        }));
+        assert_eq!(declined.sound_reason, Some(ShareSoundReason::NotChosen));
+    }
+
+    #[test]
+    fn pending_choice_maps_the_app_list() {
+        let s = ScreenShare::from(view(SoundStatus {
+            choice: Some(vec![EngineSoundApp {
+                id: "a1".into(),
+                name: AppName::new("Music"),
+                icon: Some(EngineAppIcon {
+                    mime: "image/png",
+                    bytes: b"png".to_vec(),
+                }),
+            }]),
+            ..SoundStatus::default()
+        }));
+        assert_eq!(
+            s.sound_choice,
+            Some(vec![SoundApp {
+                id: "a1".into(),
+                name: "Music".into(),
+                icon: Some("data:image/png;base64,cG5n".into()),
+            }])
+        );
+    }
+
+    #[test]
+    fn every_unavailable_reason_has_its_own_code() {
+        use EngineSoundUnavailable as E;
+        assert_eq!(
+            SoundUnavailableReason::from(E::OsTooOld),
+            SoundUnavailableReason::OsTooOld
+        );
+        assert_eq!(
+            SoundUnavailableReason::from(E::CaptureFailed),
+            SoundUnavailableReason::CaptureFailed
+        );
+    }
 
     #[test]
     fn engine_prefs_map_back_to_the_menu_choice() {

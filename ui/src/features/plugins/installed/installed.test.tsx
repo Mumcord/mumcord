@@ -10,6 +10,7 @@ import {
   useRequestedPluginTab,
 } from "../pluginRequestStore";
 import { resetPluginStore } from "../pluginStore";
+import { forgetListingScores } from "../score/useListingScore";
 import { InstalledTab } from "./InstalledTab";
 import { initials, permissionChips, sourceLabel, stateLabel } from "./labels";
 
@@ -38,10 +39,22 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
     authors: [],
     chatPatterns: [],
     offered: [],
+    appMenuItems: 0,
+    webSize: null,
     ...overrides,
   };
 }
 
+const noReview = {
+  origins: [],
+  otherDomain: false,
+  risk: null,
+  needsHighRiskConfirm: false,
+  highRiskConfirmed: false,
+  notesUrl: null,
+  permissionEffects: [],
+  recentChange: null,
+};
 const echolings = plugin({});
 const foo = plugin({
   id: "foo",
@@ -60,6 +73,7 @@ const foo = plugin({
 beforeEach(async () => {
   await applyLanguage("en");
   resetPluginStore();
+  forgetListingScores();
   resetPluginRequestStore();
   api = createMockApi();
   setApi(api);
@@ -244,6 +258,9 @@ describe("InstalledTab", () => {
         size: 10,
         approval: null,
         failed: null,
+        needsMumcord: null,
+        hold: null,
+        review: noReview,
       },
     ]);
     const apply = vi.spyOn(api, "pluginApplyUpdate").mockResolvedValue(null);
@@ -282,6 +299,9 @@ describe("InstalledTab", () => {
         size: 10,
         approval: null,
         failed: null,
+        needsMumcord: null,
+        hold: null,
+        review: noReview,
       },
     ]);
     const { container } = render(<InstalledTab />);
@@ -358,5 +378,19 @@ describe("InstalledTab", () => {
     expect(
       await screen.findByRole("button", { name: "Permissions", description: "foo" }),
     ).toHaveAttribute("aria-expanded", "true");
+  });
+});
+
+describe("score chip", () => {
+  it("shows a chip on unofficial rows only", async () => {
+    withPlugins([echolings, foo]);
+    const score = vi.spyOn(api, "pluginScore").mockResolvedValue({
+      kind: "scored",
+      score: { value: 37, band: "medium", e: 0, f: 1, h: 0, factors: [], version: 1 },
+    });
+    render(<InstalledTab />);
+    expect(await screen.findByText(/Security score 37 out of 100/)).toBeInTheDocument();
+    expect(score).toHaveBeenCalledTimes(1);
+    expect(score).toHaveBeenCalledWith("foo", foo.version, "listing");
   });
 });

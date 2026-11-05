@@ -78,6 +78,16 @@
       "keys": "↑ ↓ keisti dydį · PageUp/PageDown prisegti · Home/End · Enter atstato",
       "releaseHint": "Atleisk, kad sumažintum į mini juostą",
       "minimised": "Medijos sritis sumažinta"
+    },
+    "stage": {
+      "tabs": "Ką rodo medijos sritis",
+      "hint": "Perjungimas nieko nesustabdo",
+      "share": "Ekrano bendrinimas",
+      "plugin": "Papildinys",
+      "tabName": "{{label}}, skirtukas {{index}} iš {{count}}",
+      "tabNameNew": "{{label}}, nauja, skirtukas {{index}} iš {{count}}",
+      "pluginTabName": "{{label}}, papildinio veikla, skirtukas {{index}} iš {{count}}",
+      "pluginTabNameNew": "{{label}}, papildinio veikla, nauja, skirtukas {{index}} iš {{count}}"
     }
   }
 }

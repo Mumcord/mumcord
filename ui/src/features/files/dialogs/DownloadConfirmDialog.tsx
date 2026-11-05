@@ -69,7 +69,11 @@ export function DownloadConfirmDialog({ card, onConfirm, onClose }: DownloadConf
           ref={confirmRef}
           type="button"
           className="button button--primary"
-          onClick={onConfirm}
+          aria-disabled={folder === null}
+          onClick={() => {
+            // The user must see where the file goes before confirming (FR-7.22).
+            if (folder !== null) onConfirm();
+          }}
         >
           {t("dialog.confirm")}
         </button>

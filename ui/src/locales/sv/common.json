@@ -78,6 +78,16 @@
       "keys": "↑ ↓ ändra storlek · PageUp/PageDown fäst · Home/End · Enter återställer",
       "releaseHint": "Släpp för att minimera till minifältet",
       "minimised": "Mediaytan minimerad"
+    },
+    "stage": {
+      "tabs": "Vad mediaytan visar",
+      "hint": "Att byta stoppar ingenting",
+      "share": "Skärmdelning",
+      "plugin": "Tillägg",
+      "tabName": "{{label}}, flik {{index}} av {{count}}",
+      "tabNameNew": "{{label}}, ny, flik {{index}} av {{count}}",
+      "pluginTabName": "{{label}}, tilläggsaktivitet, flik {{index}} av {{count}}",
+      "pluginTabNameNew": "{{label}}, tilläggsaktivitet, ny, flik {{index}} av {{count}}"
     }
   }
 }

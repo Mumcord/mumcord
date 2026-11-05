@@ -1054,6 +1054,19 @@
     "hint": "Adds a Developer tab to Plugins where you can load unsigned plugins from a folder. Only turn it on if you build plugins yourself."
   },
   "newBadge": "New",
+  "pluginSafety": {
+    "title": "Plugin safety",
+    "blockHighRisk": "Don't allow high-risk plugins",
+    "hint": "Hides the Install button for plugins with a score of 60 or more, and stops updates that would push an installed plugin there. Plugins you already installed keep working.",
+    "note": "Off by default. Official plugins and developer plugins are never affected. Scores are estimates, not a guarantee."
+  },
+  "pluginSounds": {
+    "title": "Plugin sounds",
+    "volume": "Plugin sound volume",
+    "mute": "Mute plugin sounds",
+    "hint": "Applies to every sound a plugin plays. Plugin sounds are quieter while people talk.",
+    "meter": "Output level (debug)"
+  },
   "screenShare": {
     "newBadge": "New",
     "qualityTitle": "Quality defaults",
@@ -1085,6 +1098,7 @@
     "useGpuHint": "Encodes AV1 on your graphics card, so sharing costs almost no CPU. Off: AV1 uses the processor.",
     "statusList": "Encoder status",
     "av1Encode": "AV1 encode",
+    "sound": "Sound",
     "askEachTime": "Ask for these settings each time I share",
     "av1Playback": "AV1 playback",
     "vp9Playback": "VP9 playback",

@@ -30,6 +30,23 @@ it, so a build (from another checkout, too) waits until they are done instead of
 binaries under them. A run id needs `MUMCORD_E2E_STEP=test`. 2–3 parallel runs work on a 16-core
 machine; more invite timing flakes in the voice and packet-loss specs.
 
+### Sound for the share-sound specs (spec 07, AC-7.61 to 7.66)
+
+The container starts a sound daemon per run, in the run's own `XDG_RUNTIME_DIR`:
+`MUMCORD_E2E_AUDIO=pipewire` (default) runs PipeWire and WirePlumber with a null sink `e2e-sink` as
+the output; `pulse` runs only PulseAudio (no PipeWire: AC-7.66); `none` starts nothing.
+
+- `helpers/pwapps.ts`: `startTestApp("Test App A", 440)` plays a tone under that
+  `application.name`. Each app is its own copy of `pw-cat` (own binary), so apps differ in name
+  and binary like real ones. `stopTestApps()` cleans up. `tonePower`, `dominantFrequencies` and
+  `receivedFrequencies(outWav, [440, 880, 1000])` report which tones are audible in the receiving
+  app's file-backend output (`audio: "file:<in>:<out>"`); this is the receiving-side report.
+- Test hook `sharePick` of `hookEnv` (`MUMCORD_TEST_SHARE_PICK`, debug builds only): the test
+  backend has no window picker, so the spec feeds the pick: `"screen"` (desktop sound without
+  Mumcord), `"window:Test App A"` (app hint; a clear match shares only that app and the streams it
+  opens later) or `"window"` (no hint: no sound, the app list is not part of this hook). The sound
+  is the real PipeWire capture. Without the hook a test share has no sound capture.
+
 Requires only Docker (user in the `docker` group) and `npm ci` on the host. Everything else runs
 in the `mumcord-e2e` image, because Arch's webkit2gtk ships without `WebKitWebDriver`.
 
@@ -67,20 +84,30 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   in parallel jobs (`MUMCORD_E2E_STEP=test MUMCORD_E2E_SHARD=<n>`, each runner with its own test
   servers). The "Linux E2E" job fails if the build or any shard failed. A push to main runs only
   the build job, to keep its caches warm for pull requests (which only restore caches).
-- **Shard balance:** eight shards, balanced by the measured CI duration of each spec file
+- **Shard balance:** ten shards, balanced by the measured CI duration of each spec file
   (`e2e/spec-durations.json`). The longest spec (network resilience, ~5 min in CI) is pinned alone
-  to shard 1 and sets the floor; the others are spread longest-first onto the emptiest shard.
-  `scripts/e2e-shards.js` rewrites `shards.json`:
+  to shard 1 and sets the floor. The relay specs (the ones that call `relayenv.startRelay`) go to as
+  few shards as the balance allows, first in their shard and ordered by relay profile, because only
+  those shards load the relay images and the specs share one relay environment there. The others
+  are spread longest-first onto the emptiest shard. `scripts/e2e-shards.js` rewrites `shards.json`:
 
       node scripts/e2e-shards.js                                 # rebalance (e.g. after adding a spec)
-      node scripts/e2e-shards.js --measure <run-id> [<run-id>…]  # re-measure from passed CI runs first
+      node scripts/e2e-shards.js --measure <run-id> [<run-id>…]  # re-measure from CI runs first
       node scripts/e2e-shards.js --shards 12                     # change the number of shards
 
-  `--measure` reads the shard logs with the `gh` CLI (take ~10 recent passed E2E runs from
-  `gh run list --workflow e2e.yml --status success`). A spec without a measured duration counts with
-  the median. A run with `MUMCORD_E2E_SHARD` set fails while `shards.json` and the spec files
-  disagree. When changing the number of shards, also change the job matrix in `e2e.yml` (the script
-  warns).
+  Every shard job uploads the durations of its passed spec files (`e2e-durations-shard-<n>`,
+  written by `wdio.conf.ts`); `--measure` downloads them with the `gh` CLI and keeps the median per
+  spec (take ~5 recent passed E2E runs from `gh run list --workflow e2e.yml --status success`). A
+  spec without a measured duration counts with the median. A run with `MUMCORD_E2E_SHARD` set fails
+  while `shards.json` and the spec files disagree. When changing the number of shards, also change
+  the job matrix in `e2e.yml` (the script warns).
+
+- **Relay environment:** `relayenv.startRelay(profile)` starts the mumpeer testenv or switches the
+  running one to the profile; the spec files of a run share it, and `wdio.conf.ts` stops it at the
+  end. An idle environment with the same profile is reused as is. Registering a user
+  (`files.registerOnServer`) marks the server dirty, and the next `startRelay` wipes its data first,
+  so every spec file starts on an empty server and still runs alone. CI builds the mumpeer and
+  relay bot images once per pinned commit pair (job "E2E relay images") instead of in every shard.
 
 - **Failures:** screenshot + page source of the app go to `e2e/artifacts/` (git-ignored); CI uploads
   them (instance B: same name with `-B`). axe reports land there too.
@@ -168,8 +195,10 @@ image (minutes). `relayenv.relayStatus()` reads the relay's `/v1/status`.
   (helpers/x11-drop.py), the same GTK path as a file manager; `files.pickInFileDialog` drives the system
   file picker. Every client has its own Downloads folder (`app.downloadsDir(id)`).
 - **Test hooks:** `env: relayenv.hookEnv({ fileExpirySeconds, fileCorrupt, fileStallAfterBytes,
-encoderProbe, svtSelftest, encodeDelayMs, onBattery, noWebcodecsAv1, keepOldKey })` for
-  `app.restart`/`startB`/`startC`; debug builds only.
+encoderProbe, svtSelftest, encodeDelayMs, onBattery, noWebcodecsAv1, keepOldKey, pluginSavePath,
+pluginPickPath })` for `app.restart`/`startB`/`startC`; debug builds only. `pluginSavePath` /
+  `pluginPickPath` answer the plugin save dialog and picture picker (spec 09 `files.save`,
+  `files.import-picture`) with a path or `"cancel"`.
 
 ## Plugin test environment
 

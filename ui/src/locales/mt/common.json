@@ -78,6 +78,16 @@
       "keys": "↑ ↓ ibdel id-daqs · PageUp/PageDown aqbad · Home/End · Enter jirrisetja",
       "releaseHint": "Ħalli biex timminimizza għall-bar żgħir",
       "minimised": "Iż-żona tal-media ġiet minimizzata"
+    },
+    "stage": {
+      "tabs": "X'turi ż-żona tal-midja",
+      "hint": "Il-qlib ma jwaqqaf xejn",
+      "share": "Qsim tal-iskrin",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, tab {{index}} minn {{count}}",
+      "tabNameNew": "{{label}}, ġdid, tab {{index}} minn {{count}}",
+      "pluginTabName": "{{label}}, attività tal-plugin, tab {{index}} minn {{count}}",
+      "pluginTabNameNew": "{{label}}, attività tal-plugin, ġdid, tab {{index}} minn {{count}}"
     }
   }
 }

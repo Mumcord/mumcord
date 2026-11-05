@@ -456,3 +456,73 @@ fn official_size_limits_are_larger_but_web_files_are_capped() {
         Err(PackageError::TooLarge(64))
     ));
 }
+
+fn wav(seconds: u32) -> Vec<u8> {
+    let spec = hound::WavSpec {
+        channels: 1,
+        sample_rate: 8000,
+        bits_per_sample: 8,
+        sample_format: hound::SampleFormat::Int,
+    };
+    let mut out = std::io::Cursor::new(Vec::new());
+    let mut writer = hound::WavWriter::new(&mut out, spec).expect("writer");
+    for _ in 0..seconds * 8000 {
+        writer.write_sample(0i8).expect("sample");
+    }
+    writer.finalize().expect("finalize");
+    out.into_inner()
+}
+
+fn sound_manifest(sound: &str) -> Vec<u8> {
+    MANIFEST
+        .replace("^1.0", "^1.1")
+        .replace(
+            "\"license\"",
+            &format!(
+                "\"permissions\":{{\"required\":[\"audio.effects\"]}},\"audio\":{{\"sounds\":[\"{sound}\"]}},\"license\""
+            ),
+        )
+        .into_bytes()
+}
+
+#[test]
+fn bundled_sounds_are_checked_when_the_package_is_read() {
+    let build = |sound: &str, data: Option<Vec<u8>>| {
+        with(|files| {
+            files[0].1 = sound_manifest(sound);
+            if let Some(data) = data {
+                files.push((sound.to_owned(), data));
+            }
+        })
+    };
+    assert!(build("sounds/ding.wav", Some(wav(2))).is_ok());
+    assert!(matches!(
+        build("sounds/ding.wav", None),
+        Err(PackageError::Sound(_))
+    ));
+    assert!(matches!(
+        build("sounds/ding.wav", Some(wav(11))),
+        Err(PackageError::Sound(_))
+    ));
+    assert!(matches!(
+        build("sounds/ding.wav", Some(b"junk".to_vec())),
+        Err(PackageError::Sound(_))
+    ));
+}
+
+#[test]
+fn a_package_with_a_bad_origin_is_a_hard_stop() {
+    let manifest = MANIFEST
+        .replace("^1.0", "^1.1")
+        .replace(
+            "\"license\"",
+            "\"permissions\":{\"required\":[\"net.origins\"]},\"net\":{\"origins\":[{\"origin\":\"http://api.example\",\"purpose\":\"x\"}]},\"license\"",
+        )
+        .into_bytes();
+    let err = with(|files| files[0].1 = manifest).expect_err("refused");
+    assert!(matches!(
+        err,
+        PackageError::Manifest(ManifestError::Origin(_))
+    ));
+    assert!(err.to_string().contains("not encrypted"));
+}

@@ -5,6 +5,10 @@
     "body": "Vypnuté po opakovaných zlyhaniach",
     "open": "Zobraziť v Doplnkoch"
   },
+  "pictureRefused": {
+    "title": "{{name}} nemohol použiť obrázok",
+    "body": "Tento obrázok sa nedá použiť. Použi súbor PNG, JPEG alebo WebP do 10 MB."
+  },
   "update": {
     "title": "Aktualizácia pre {{name}}",
     "body": "Verzia {{version}} čaká na karte Aktualizácie",

@@ -7,10 +7,20 @@ use std::fmt::Debug;
 
 use mumcord_store::ServerId;
 
+use crate::api::host_calls::{Picture, PostOutcome, Waiter};
+use crate::api::relay::{RelayStatus, SendError as RelaySendError};
+use crate::api::webview::WebviewPlace;
 use crate::runtime::wit::peers::Target;
 use crate::runtime::wit::types::{BotInfo, Error, Peer};
 use crate::runtime::wit::ui::{Node, Slot, UserMenuFilter};
-use crate::runtime::wit::webview::Place;
+
+/// What a new activity shows (WIT `stage.stage-content`), already checked.
+#[derive(Debug, Clone)]
+pub enum StageContent {
+    Tree(Vec<Node>),
+    /// The entry below `web/`.
+    Web(String),
+}
 
 /// Carries out what a plugin asks of the UI, other users and the chat. `plugin` is the id of
 /// the calling plugin; its permission for the call has already been checked.
@@ -57,6 +67,14 @@ pub trait PluginIo: Send + Sync + Debug {
     fn close_panel_popover(&self, plugin: &str);
     /// `ui.open-permissions`.
     fn open_permissions(&self, plugin: &str) -> Result<(), Error>;
+    /// `app-menu.set-state`: the caller checked `ui.app-menu`.
+    fn app_menu_set_state(
+        &self,
+        plugin: &str,
+        item: &str,
+        enabled: bool,
+        reason: Option<String>,
+    ) -> Result<(), Error>;
     /// `peers.send`.
     fn peer_send(&self, plugin: &str, to: Target, kind: u8, payload: Vec<u8>) -> Result<(), Error>;
     /// `peers.start-game-burst`.
@@ -89,14 +107,108 @@ pub trait PluginIo: Send + Sync + Debug {
     ) -> Result<(), Error> {
         Err(Error::NotPermitted)
     }
-    /// `webview.show` (FR-6.46). Hosts without web views refuse it.
-    fn webview_show(&self, _plugin: &str, _place: Place, _entry: String) -> Result<(), Error> {
+    /// `webview.show` (FR-6.46, FR-9.39): the permissions for `place` are checked; the host
+    /// checks the gesture for a new side panel. Hosts without web views refuse it.
+    fn webview_show(
+        &self,
+        _plugin: &str,
+        _place: WebviewPlace,
+        _entry: String,
+    ) -> Result<(), Error> {
         Err(Error::NotPermitted)
     }
     /// `webview.hide`.
     fn webview_hide(&self, _plugin: &str) {}
-    /// `webview.post`: a message to the plugin's page.
+    /// `webview.post`: a message to the plugin's pages.
     fn webview_post(&self, _plugin: &str, _message: String) -> Result<(), Error> {
         Err(Error::NotPermitted)
+    }
+    /// `webview.set-size-hint` for the plugin's open side panel (`ui.side-panel` checked).
+    fn webview_set_size_hint(
+        &self,
+        _plugin: &str,
+        _min_width: u32,
+        _min_height: u32,
+    ) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `webview.set-status` for the plugin's open side panel (`ui.side-panel` checked; `text`
+    /// already cleaned, empty clears the line).
+    fn webview_set_status(&self, _plugin: &str, _text: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// Opens the stage frame of an activity started with web content (`stage.start` with
+    /// `stage-content.web`, FR-9.46). The caller has checked `ui.stage` and the gesture.
+    fn stage_web_show(&self, _plugin: &str, _entry: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `stage.start` (FR-9.45, FR-9.46): the caller checked `ui.stage`, the title and the content
+    /// (and `ui.webview` for web content). Checks the gesture, the channel and the limits, opens
+    /// web content and returns the new activity id.
+    fn stage_start(
+        &self,
+        _plugin: &str,
+        _title: String,
+        _content: StageContent,
+    ) -> Result<String, Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `stage.join` from the plugin's own Join button: needs a fresh gesture.
+    fn stage_join(&self, _plugin: &str, _activity: &str) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `stage.leave`.
+    fn stage_leave(&self, _plugin: &str) {}
+    /// `stage.end`.
+    fn stage_end(&self, _plugin: &str) {}
+    /// `stage.set-tree`: the caller validated the tree; `invalid` without a tree activity.
+    fn stage_set_tree(&self, _plugin: &str, _nodes: Vec<Node>) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `files.save` (FR-9.103): `name` is already a plain file name and `data` within the
+    /// limit. Checks and uses up the gesture, then hands the dialog to the app; the caller
+    /// waits on the answer (true = saved). Hosts without dialogs refuse it.
+    fn files_save(
+        &self,
+        _plugin: &str,
+        _name: String,
+        _data: Vec<u8>,
+    ) -> Result<Waiter<bool>, Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `files.import-picture` (FR-9.105): checks and uses up the gesture, then hands the picker
+    /// to the app; the caller waits on the answer (`None` = cancelled).
+    fn files_import_picture(
+        &self,
+        _plugin: &str,
+    ) -> Result<Waiter<Result<Option<Picture>, Error>>, Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `chat.post-image` (FR-9.104): `png` is a checked PNG and `alt` within the limit. Checks
+    /// and uses up the gesture, then hands the image to the app for `server`'s chat (see
+    /// [`PluginIo::chat_send`]); the caller waits on how it went out.
+    fn chat_post_image(
+        &self,
+        _plugin: &str,
+        _png: Vec<u8>,
+        _alt: String,
+        _server: Option<ServerId>,
+    ) -> Result<Waiter<Result<PostOutcome, Error>>, Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `relay.status()` for a plugin holding `peers.relay` (FR-9.57).
+    fn relay_status(&self, _plugin: &str) -> RelayStatus {
+        RelayStatus::NoRelay
+    }
+    /// `relay.send-channel` / `relay.send-direct`: the caller checked `peers.relay` and the
+    /// 64 KiB limit. Checks reach, the plugin's rate and the path (relay or Mumble fallback).
+    fn relay_send(
+        &self,
+        _plugin: &str,
+        _target: crate::messaging::Target,
+        _data: Vec<u8>,
+        _fallback: bool,
+    ) -> Result<(), RelaySendError> {
+        Err(RelaySendError::Unavailable)
     }
 }

@@ -9,11 +9,12 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 
 use super::keys::normalize_key;
-use super::{FORMAT_VERSION, MAX_REPOSITORY_PLUGINS, RegistryError};
+use super::{FORMAT_VERSION, FORMAT_VERSION_2, MAX_REPOSITORY_PLUGINS, RegistryError};
 use crate::Digest;
 use crate::manifest::is_valid_id;
 use crate::package::{MAX_OFFICIAL_PACKAGE_BYTES, MAX_PACKAGE_BYTES, check_unofficial_id};
 use crate::verify::IndexEntry;
+use crate::version::{self, ApiMinor, Release};
 
 /// Which kind of index is parsed; third-party indexes get the FR-6.76 rules.
 pub enum IndexKind<'a> {
@@ -104,12 +105,13 @@ pub struct IndexPlugin {
     pub versions: Vec<IndexVersion>,
 }
 
-/// One published version of a plugin.
+/// One published version of a plugin. Serializes as a format-2 entry (FR-9.15).
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct IndexVersion {
     pub version: String,
-    /// Plugin API major version the package targets.
-    pub api: u32,
+    /// Plugin API minor the package targets: `"1.1"`, or `1` (= `"1.0"`) in format 1.
+    #[serde(with = "api_wire")]
+    pub api: ApiMinor,
     /// Package download URL; the author signature is at `url` + `.minisig`.
     pub url: String,
     pub size: u64,
@@ -117,6 +119,60 @@ pub struct IndexVersion {
     pub sha256: String,
     /// Every permission (required and optional) the reviewed version may ask for.
     pub permissions: Vec<String>,
+    /// Lowest Mumcord release, e.g. `"0.7"`; default: the plugin's `min_mumcord`, at least the
+    /// first release with `api` (FR-9.15).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_mumcord: Option<String>,
+    /// Score input: the network origins the version declares.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub origins: Vec<String>,
+    /// Where the author explains what changed in this version (format 2, optional): https only,
+    /// at most [`MAX_NOTES_URL_LEN`] characters. Anything else is dropped when the index is read.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes_url: Option<String>,
+    /// Score input: number of WASM modules in the package.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub modules: Option<u32>,
+    /// Score input: the author claims a reproducible build.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reproducible: Option<bool>,
+}
+
+/// The `api` field: an integer major in format 1, a `"major.minor"` string in format 2.
+mod api_wire {
+    use serde::{Deserialize, Deserializer, Serializer, de::Error};
+
+    use crate::version::ApiMinor;
+
+    pub fn serialize<S: Serializer>(api: &ApiMinor, s: S) -> Result<S::Ok, S::Error> {
+        s.collect_str(api)
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<ApiMinor, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Wire {
+            Major(u64),
+            Minor(String),
+        }
+        match Wire::deserialize(d)? {
+            Wire::Major(major) => Ok(ApiMinor { major, minor: 0 }),
+            Wire::Minor(text) => text
+                .parse()
+                .map_err(|()| D::Error::custom(format!("bad api \"{text}\""))),
+        }
+    }
+}
+
+/// Which version of a plugin this Mumcord offers (FR-9.16).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Choice<'a> {
+    /// The newest version this Mumcord can run.
+    Runnable(&'a IndexVersion),
+    /// No version runs here; the lowest release that runs one (text: `needs_mumcord_text`).
+    NeedsMumcord(Release),
+    /// Only versions for API majors no known release runs.
+    Unsupported,
 }
 
 /// A dropped index entry.
@@ -184,7 +240,7 @@ impl Index {
     pub fn parse(bytes: &[u8], kind: &IndexKind<'_>) -> Result<Self, RegistryError> {
         let raw: RawIndex =
             serde_json::from_slice(bytes).map_err(|e| RegistryError::Format(e.to_string()))?;
-        if raw.format != FORMAT_VERSION {
+        if raw.format != FORMAT_VERSION && raw.format != FORMAT_VERSION_2 {
             return Err(RegistryError::Format(format!(
                 "unsupported format {}",
                 raw.format
@@ -280,8 +336,10 @@ fn check_plugin(
         IndexKind::Repository { .. } => MAX_PACKAGE_BYTES,
     };
     let mut versions = HashSet::new();
-    for version in &plugin.versions {
-        if semver::Version::parse(&version.version).is_err() || !versions.insert(&version.version) {
+    for version in &mut plugin.versions {
+        if semver::Version::parse(&version.version).is_err()
+            || !versions.insert(version.version.clone())
+        {
             return Err(invalid("bad or duplicate version"));
         }
         if version.size == 0 || version.size > max_size {
@@ -293,8 +351,43 @@ fn check_plugin(
         if reqwest::Url::parse(&version.url).is_err() {
             return Err(invalid("bad package url"));
         }
+        if version
+            .min_mumcord
+            .as_deref()
+            .is_some_and(|text| Release::parse(text).is_none())
+        {
+            return Err(invalid("bad minimum Mumcord version"));
+        }
+        if version.origins.len() > MAX_VERSION_ORIGINS
+            || version.origins.iter().any(|o| o.len() > MAX_ORIGIN_LEN)
+        {
+            return Err(invalid("bad origins"));
+        }
+        if let Some(url) = &version.notes_url
+            && !is_notes_url(url)
+        {
+            tracing::warn!(
+                plugin = plugin.id,
+                version = version.version,
+                "ignoring a release-notes link that is not a short https URL"
+            );
+            version.notes_url = None;
+        }
     }
     Ok(plugin)
+}
+
+/// The index only repeats a manifest's origin list, so the same bound applies (FR-9.25).
+const MAX_VERSION_ORIGINS: usize = crate::origins::MAX_ORIGINS;
+const MAX_ORIGIN_LEN: usize = 300;
+/// Longest release-notes link accepted from a registry.
+pub const MAX_NOTES_URL_LEN: usize = 512;
+
+/// A release-notes link must be a plain `https` URL; the link opens in the user's browser.
+pub fn is_notes_url(text: &str) -> bool {
+    text.len() <= MAX_NOTES_URL_LEN
+        && reqwest::Url::parse(text)
+            .is_ok_and(|url| url.scheme() == "https" && url.host().is_some())
 }
 
 /// The optional details fields come from the repository, so they are length-limited and checked
@@ -345,6 +438,39 @@ impl IndexPlugin {
             .iter()
             .max_by_key(|v| semver::Version::parse(&v.version).ok())
             .expect("validated: at least one version")
+    }
+
+    /// The lowest Mumcord release that runs `version`: its own `min_mumcord`, else the plugin's,
+    /// never below the first release with its API (FR-9.15). `None` for an unknown API.
+    /// A plugin-level value that is not a release (free text from older indexes) is ignored.
+    pub fn required_release(&self, version: &IndexVersion) -> Option<Release> {
+        let first = version::first_release(version.api)?;
+        let declared = version
+            .min_mumcord
+            .as_deref()
+            .or(self.min_mumcord.as_deref())
+            .and_then(Release::parse);
+        Some(declared.map_or(first, |d| d.max(first)))
+    }
+
+    /// FR-9.16: the newest version whose API this build links and whose release requirement
+    /// `app` meets; otherwise the lowest release that would run one.
+    pub fn choose(&self, app: &semver::Version) -> Choice<'_> {
+        let here = Release::of(app);
+        let newest = self
+            .versions
+            .iter()
+            .filter(|v| version::check_api(v.api).is_ok())
+            .filter(|v| self.required_release(v).is_some_and(|r| r <= here))
+            .max_by_key(|v| semver::Version::parse(&v.version).ok());
+        if let Some(found) = newest {
+            return Choice::Runnable(found);
+        }
+        self.versions
+            .iter()
+            .filter_map(|v| self.required_release(v))
+            .min()
+            .map_or(Choice::Unsupported, Choice::NeedsMumcord)
     }
 
     pub fn version(&self, version: &str) -> Option<&IndexVersion> {
@@ -458,6 +584,27 @@ pub(super) mod tests {
     }
 
     #[test]
+    fn notes_url_is_kept_only_when_it_is_a_short_https_url() {
+        let long = format!("https://example.org/{}", "a".repeat(MAX_NOTES_URL_LEN));
+        let cases = [
+            (json!("https://example.org/notes/2.0"), true),
+            (json!("http://example.org/notes"), false),
+            (json!("javascript:alert(1)"), false),
+            (json!("not a url"), false),
+            (json!(long), false),
+        ];
+        for (value, kept) in cases {
+            let mut v = entry("2.0.0", json!("1.1"), None);
+            v["notes_url"] = value.clone();
+            let p = with_versions(vec![v]);
+            let got = p.version("2.0.0").expect("test step").notes_url.clone();
+            assert_eq!(got.is_some(), kept, "{value}");
+        }
+        let p = with_versions(vec![entry("2.0.0", json!("1.1"), None)]);
+        assert_eq!(p.version("2.0.0").expect("test step").notes_url, None);
+    }
+
+    #[test]
     fn bad_entries_are_dropped_with_a_note() {
         let mut bad_hash = plugin("bad-hash");
         bad_hash["versions"][0]["sha256"] = json!("xyz");
@@ -511,12 +658,154 @@ pub(super) mod tests {
 
     #[test]
     fn unknown_format_is_rejected() {
-        let bytes = serde_json::to_vec(&json!({"format": 2, "sequence": 1, "plugins": []}))
+        let bytes = serde_json::to_vec(&json!({"format": 3, "sequence": 1, "plugins": []}))
             .expect("test step");
         assert!(matches!(
             Index::parse(&bytes, &IndexKind::Official),
             Err(RegistryError::Format(_))
         ));
+    }
+
+    fn format_2(plugins: Vec<serde_json::Value>) -> Vec<u8> {
+        serde_json::to_vec(&json!({"format": 2, "sequence": 7, "plugins": plugins}))
+            .expect("test step")
+    }
+
+    /// A version entry for the choice tests.
+    fn entry(version: &str, api: serde_json::Value, min: Option<&str>) -> serde_json::Value {
+        let mut v = json!({"version": version, "api": api,
+            "url": format!("https://example.org/dice-{version}.mcplugin"),
+            "size": 10, "sha256": "ab".repeat(32), "permissions": []});
+        if let Some(min) = min {
+            v["min_mumcord"] = json!(min);
+        }
+        v
+    }
+
+    fn with_versions(versions: Vec<serde_json::Value>) -> IndexPlugin {
+        let mut p = plugin("dice");
+        p["versions"] = json!(versions);
+        let index = Index::parse(&format_2(vec![p]), &IndexKind::Official).expect("test step");
+        assert!(index.ignored.is_empty(), "{:?}", index.ignored);
+        index.plugins[0].clone()
+    }
+
+    fn app(text: &str) -> semver::Version {
+        semver::Version::parse(text).expect("test step")
+    }
+
+    #[test]
+    fn format_2_reads_new_version_fields() {
+        let mut v = entry("2.0.0", json!("1.1"), Some("0.7.3"));
+        v["origins"] = json!(["https://api.example"]);
+        v["modules"] = json!(2);
+        v["reproducible"] = json!(true);
+        v["future_field"] = json!("ignored");
+        let p = with_versions(vec![entry("1.0.0", json!("1.0"), None), v]);
+        let new = p.version("2.0.0").expect("test step");
+        assert_eq!(new.api, ApiMinor::V1_1);
+        assert_eq!(new.min_mumcord.as_deref(), Some("0.7.3"));
+        assert_eq!(new.origins, ["https://api.example"]);
+        assert_eq!((new.modules, new.reproducible), (Some(2), Some(true)));
+        assert_eq!(p.version("1.0.0").expect("test step").api, ApiMinor::V1_0);
+
+        // Serializes back as format 2; absent optional fields stay absent.
+        let wire = serde_json::to_value(p.version("1.0.0").expect("test step")).expect("test step");
+        assert_eq!(wire["api"], "1.0");
+        assert!(wire.get("min_mumcord").is_none() && wire.get("origins").is_none());
+    }
+
+    #[test]
+    fn format_1_api_integer_counts_as_1_0() {
+        let index =
+            Index::parse(&official(vec![plugin("dice")]), &IndexKind::Official).expect("test step");
+        let dice = index.plugin("dice").expect("test step");
+        assert!(dice.versions.iter().all(|v| v.api == ApiMinor::V1_0));
+    }
+
+    #[test]
+    fn bad_api_min_mumcord_or_origins_drop_the_plugin() {
+        let mut too_many = entry("1.0.0", json!("1.0"), None);
+        too_many["origins"] = json!(vec!["https://a.example"; 9]);
+        for bad in [
+            entry("1.0.0", json!("1"), None),
+            entry("1.0.0", json!("1.1.0"), None),
+            entry("1.0.0", json!(-1), None),
+            entry("1.0.0", json!("1.0"), Some("soon")),
+            too_many,
+        ] {
+            let mut p = plugin("dice");
+            p["versions"] = json!([bad]);
+            let index = Index::parse(&format_2(vec![p]), &IndexKind::Official).expect("test step");
+            assert!(index.plugins.is_empty(), "{bad}");
+            assert_eq!(index.ignored.len(), 1);
+        }
+    }
+
+    #[test]
+    fn choice_takes_the_newest_runnable_version() {
+        let p = with_versions(vec![
+            entry("1.0.0", json!(1), None),
+            entry("2.0.0", json!("1.1"), None),
+            entry("3.0.0", json!("1.1"), Some("0.8")),
+            entry("4.0.0", json!("2.0"), None),
+        ]);
+        let chosen = |app_version| match p.choose(&app(app_version)) {
+            Choice::Runnable(v) => v.version.clone(),
+            other => panic!("{other:?}"),
+        };
+        // 0.6 runs only API 1.0; 0.7 adds 1.1; 0.8 meets 3.0.0's min_mumcord; 2.0 is unknown.
+        assert_eq!(chosen("0.6.5"), "1.0.0");
+        assert_eq!(chosen("0.7.0"), "2.0.0");
+        assert_eq!(chosen("0.8.0-dev"), "3.0.0");
+    }
+
+    #[test]
+    fn choice_names_the_lowest_fitting_release() {
+        // FR-9.13: 0.7.3 is satisfied by 0.7.0.
+        let p = with_versions(vec![
+            entry("2.0.0", json!("1.1"), Some("0.7.3")),
+            entry("3.0.0", json!("1.1"), Some("0.9")),
+        ]);
+        let needs = p.choose(&app("0.6.2"));
+        assert_eq!(needs, Choice::NeedsMumcord(Release { major: 0, minor: 7 }));
+        assert_eq!(
+            version::needs_mumcord_text(Release { major: 0, minor: 7 }),
+            "Needs Mumcord 0.7.0 or newer"
+        );
+        assert!(matches!(p.choose(&app("0.7.0")), Choice::Runnable(v) if v.version == "2.0.0"));
+
+        let unknown = with_versions(vec![entry("4.0.0", json!("2.0"), None)]);
+        assert_eq!(unknown.choose(&app("0.7.0")), Choice::Unsupported);
+    }
+
+    #[test]
+    fn plugin_min_mumcord_is_the_fallback_but_never_below_the_api() {
+        let mut p = with_versions(vec![
+            entry("1.0.0", json!(1), None),
+            entry("2.0.0", json!("1.1"), Some("0.7")),
+        ]);
+        p.min_mumcord = Some("0.8".into());
+        let one = p.version("1.0.0").expect("test step").clone();
+        let two = p.version("2.0.0").expect("test step").clone();
+        assert_eq!(
+            p.required_release(&one),
+            Some(Release { major: 0, minor: 8 })
+        );
+        assert_eq!(
+            p.required_release(&two),
+            Some(Release { major: 0, minor: 7 })
+        );
+        p.min_mumcord = Some("0.5".into());
+        assert_eq!(
+            p.required_release(&one),
+            Some(Release { major: 0, minor: 6 })
+        );
+        p.min_mumcord = Some("needs a recent build".into());
+        assert_eq!(
+            p.required_release(&one),
+            Some(Release { major: 0, minor: 6 })
+        );
     }
 
     fn repo(plugins: Vec<serde_json::Value>) -> Vec<u8> {

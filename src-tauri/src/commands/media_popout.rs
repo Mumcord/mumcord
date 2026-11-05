@@ -1,5 +1,5 @@
-//! The watch party and screen share pop-outs (issue #164): either view can move into a window of
-//! its own. Which kind is popped out, for which party or share, and whether it stays on top live
+//! The watch party, screen share and plugin stage pop-outs (issue #164, FR-9.48): each view can
+//! move into a window of its own. Which kind is popped out, for which party or share, and whether it stays on top live
 //! here, in one place, so the main window and the pop-out never disagree; every change goes to
 //! all windows as `mediaPopoutChanged`. Closing a pop-out by any means docks the view again.
 //! Always on top is remembered per kind on this device.
@@ -13,7 +13,7 @@ use tauri::{AppHandle, Manager, Runtime, State, Window, WindowEvent};
 use tauri_specta::Event;
 
 use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId};
-use crate::aux_window::{SHARE_POPOUT, Spec, WATCH_POPOUT};
+use crate::aux_window::{SHARE_POPOUT, STAGE_POPOUT, Spec, WATCH_POPOUT};
 
 /// File in the data folder that keeps always on top per kind.
 const ON_TOP_FILE: &str = "media-popout.json";
@@ -26,34 +26,42 @@ pub enum MediaPopoutKind {
     Watch,
     /// A watched screen share.
     Share,
+    /// A plugin activity on the stage.
+    Stage,
 }
 
 impl MediaPopoutKind {
+    const ALL: [Self; 3] = [Self::Watch, Self::Share, Self::Stage];
+
     fn spec(self) -> &'static Spec {
         match self {
             Self::Watch => &WATCH_POPOUT,
             Self::Share => &SHARE_POPOUT,
+            Self::Stage => &STAGE_POPOUT,
         }
     }
 
     fn of_label(label: &str) -> Option<Self> {
-        [Self::Watch, Self::Share]
+        Self::ALL
             .into_iter()
             .find(|kind| kind.spec().label == label)
     }
 }
 
-/// What a pop-out shows: the party of `serverId`, or the share of `session` on `serverId`.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+/// What a pop-out shows: the party of `serverId`, the share of `session` on `serverId`, or the
+/// activity of `plugin` in the user's channel on `serverId`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaPopoutTarget {
     pub server_id: ServerId,
-    /// The sharer; `null` for the watch party.
+    /// The sharer; `null` for the watch party and the stage.
     pub session: Option<SessionId>,
+    /// The plugin whose activity the stage pop-out shows; `null` for the other kinds.
+    pub plugin: Option<String>,
 }
 
 /// One kind of pop-out.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, Type)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaPopoutSlot {
     /// What the open pop-out shows; `null` while the view is docked in the main window.
@@ -62,12 +70,13 @@ pub struct MediaPopoutSlot {
     pub on_top: bool,
 }
 
-/// Both pop-outs.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, Type)]
+/// All pop-outs.
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaPopoutState {
     pub watch: MediaPopoutSlot,
     pub share: MediaPopoutSlot,
+    pub stage: MediaPopoutSlot,
 }
 
 impl MediaPopoutState {
@@ -75,6 +84,7 @@ impl MediaPopoutState {
         match kind {
             MediaPopoutKind::Watch => &mut self.watch,
             MediaPopoutKind::Share => &mut self.share,
+            MediaPopoutKind::Stage => &mut self.stage,
         }
     }
 
@@ -85,13 +95,13 @@ impl MediaPopoutState {
         target: MediaPopoutTarget,
         on_top: Option<bool>,
     ) -> bool {
-        let before = *self;
         let slot = self.slot(kind);
+        let before = slot.clone();
         slot.target = Some(target);
         if let Some(on_top) = on_top {
             slot.on_top = on_top;
         }
-        *self != before
+        *slot != before
     }
 
     /// The pop-out of `kind` is gone; its view is docked again.
@@ -110,15 +120,19 @@ impl MediaPopoutState {
         OnTop {
             watch: self.watch.on_top,
             share: self.share.on_top,
+            stage: self.stage.on_top,
         }
     }
 }
 
-/// Always on top per kind, as stored on this device.
+/// Always on top per kind, as stored on this device. Files from before the stage pop-out lack
+/// `stage`, which then starts off.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[serde(default)]
 struct OnTop {
     watch: bool,
     share: bool,
+    stage: bool,
 }
 
 /// The pop-out state, managed by the app.
@@ -133,6 +147,7 @@ impl MediaPopouts {
         if let Some(on_top) = on_top {
             state.watch.on_top = on_top.watch;
             state.share.on_top = on_top.share;
+            state.stage.on_top = on_top.stage;
         }
         Self(Mutex::new(state))
     }
@@ -245,7 +260,7 @@ pub fn media_popout_set_title(
 #[tauri::command]
 #[specta::specta]
 pub fn media_popout_state(popouts: State<'_, MediaPopouts>) -> ApiResult<MediaPopoutState> {
-    Ok(*popouts.lock())
+    Ok(popouts.lock().clone())
 }
 
 /// Window event hook: a pop-out that is gone, however it was closed, docks its view again.
@@ -263,15 +278,15 @@ pub fn on_window_event(window: &Window, event: &WindowEvent) {
     }
 }
 
-/// Closes both pop-outs; they only show what the main window runs.
+/// Closes every pop-out; they only show what the main window runs.
 pub fn close_all(app: &AppHandle) {
-    for kind in [MediaPopoutKind::Watch, MediaPopoutKind::Share] {
+    for kind in MediaPopoutKind::ALL {
         crate::aux_window::close(app, kind.spec());
     }
 }
 
 fn emit_state(app: &AppHandle, popouts: &MediaPopouts) {
-    let state = *popouts.lock();
+    let state = popouts.lock().clone();
     if let Err(e) = (MediaPopoutChanged { state }).emit(app) {
         tracing::warn!(error = %e, "announcing the pop-out state failed");
     }
@@ -321,10 +336,12 @@ mod tests {
     const PARTY: MediaPopoutTarget = MediaPopoutTarget {
         server_id: 1,
         session: None,
+        plugin: None,
     };
     const SHARE: MediaPopoutTarget = MediaPopoutTarget {
         server_id: 1,
         session: Some(7),
+        plugin: None,
     };
 
     #[test]
@@ -346,8 +363,9 @@ mod tests {
         let other_server = MediaPopoutTarget {
             server_id: 2,
             session: None,
+            plugin: None,
         };
-        assert!(state.opened(MediaPopoutKind::Watch, other_server, None));
+        assert!(state.opened(MediaPopoutKind::Watch, other_server.clone(), None));
         assert_eq!(state.watch.target, Some(other_server));
     }
 
@@ -385,7 +403,8 @@ mod tests {
             state.on_top(),
             OnTop {
                 watch: false,
-                share: true
+                share: true,
+                stage: false,
             }
         );
     }
@@ -400,6 +419,10 @@ mod tests {
             MediaPopoutKind::of_label(SHARE_POPOUT.label),
             Some(MediaPopoutKind::Share)
         );
+        assert_eq!(
+            MediaPopoutKind::of_label(STAGE_POPOUT.label),
+            Some(MediaPopoutKind::Stage)
+        );
         assert_eq!(MediaPopoutKind::of_label("main"), None);
     }
 
@@ -412,8 +435,46 @@ mod tests {
             json,
             serde_json::json!({
                 "watch": { "target": null, "onTop": false },
-                "share": { "target": { "serverId": 1, "session": 7 }, "onTop": true },
+                "share": { "target": { "serverId": 1, "session": 7, "plugin": null }, "onTop": true },
+                "stage": { "target": null, "onTop": false },
             })
+        );
+    }
+
+    #[test]
+    fn the_stage_pop_out_follows_its_plugin() {
+        let mut state = MediaPopoutState::default();
+        let board = MediaPopoutTarget {
+            server_id: 1,
+            session: None,
+            plugin: Some("board-brawl".into()),
+        };
+        assert!(state.opened(MediaPopoutKind::Stage, board.clone(), None));
+        assert!(!state.opened(MediaPopoutKind::Stage, board.clone(), None));
+        let dice = MediaPopoutTarget {
+            plugin: Some("dice".into()),
+            ..board
+        };
+        assert!(
+            state.opened(MediaPopoutKind::Stage, dice.clone(), None),
+            "another plugin's activity replaces it"
+        );
+        assert_eq!(state.stage.target, Some(dice));
+        assert_eq!(state.watch, MediaPopoutSlot::default());
+        assert_eq!(state.share, MediaPopoutSlot::default());
+    }
+
+    #[test]
+    fn on_top_files_from_before_the_stage_still_load() {
+        let on_top: OnTop =
+            serde_json::from_str(r#"{"watch":true,"share":false}"#).expect("old file parses");
+        assert_eq!(
+            on_top,
+            OnTop {
+                watch: true,
+                share: false,
+                stage: false,
+            }
         );
     }
 }

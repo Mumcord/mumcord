@@ -24,7 +24,8 @@
   "pill": {
     "none": "Brak nowych uprawnień",
     "permission": "Wymaga nowego uprawnienia",
-    "author": "Nowy autor"
+    "author": "Nowy autor",
+    "websites": "Łączy się z nowymi stronami"
   },
   "newPermissions": "Nowe uprawnienia",
   "revoked": {
@@ -45,5 +46,69 @@
     "save": "Zapisz",
     "notNow": "Nie teraz",
     "failed": "Nie udało się zmienić uprawnień {{name}}. Spróbuj ponownie."
+  },
+  "waitingHeading": "Oczekujące aktualizacje",
+  "autoNote": "Automatyczne aktualizacje instalują się tylko wtedy, gdy wtyczka o nic nowego nie prosi, a jej ocena zostaje w tym samym przedziale lub spada. Reszta czeka tutaj.",
+  "needsMumcord": "Aktualizacja będzie dostępna po zaktualizowaniu Mumcord",
+  "band": {
+    "low": "Niskie",
+    "medium": "Średnie",
+    "high": "Wysokie"
+  },
+  "hold": {
+    "newWebsites_one": "Ta aktualizacja chce łączyć się z {{count}} nową stroną. {{name}} zostaje przy wersji {{version}}, dopóki nie zdecydujesz.",
+    "newWebsites_few": "Ta aktualizacja chce łączyć się z {{count}} nowymi stronami. {{name}} zostaje przy wersji {{version}}, dopóki nie zdecydujesz.",
+    "newWebsites_many": "Ta aktualizacja chce łączyć się z {{count}} nowymi stronami. {{name}} zostaje przy wersji {{version}}, dopóki nie zdecydujesz.",
+    "newWebsites_other": "Ta aktualizacja chce łączyć się z {{count}} nowej strony. {{name}} zostaje przy wersji {{version}}, dopóki nie zdecydujesz.",
+    "riskUp": "Nie zainstalowano automatycznie: ryzyko wzrosło z {{from}} do {{to}}. Najpierw to sprawdź.",
+    "scoreUp": "Nie zainstalowano automatycznie: ocena wzrosła z {{from}} do {{to}}. Najpierw to sprawdź.",
+    "blockedBySafety": "Nie zainstalowano: ta wersja ma wysokie ryzyko, a opcja „Nie zezwalaj na wtyczki wysokiego ryzyka” jest włączona.",
+    "scoreUnknown": "Nie zainstalowano automatycznie: nie udało się obliczyć oceny bezpieczeństwa tej wersji. Najpierw to sprawdź."
+  },
+  "score": {
+    "label": "Ocena bezpieczeństwa:",
+    "unchanged": "bez zmian",
+    "points": "pkt",
+    "goesUp": ", ryzyko rośnie",
+    "goesDown": ", ryzyko maleje"
+  },
+  "dialog": {
+    "title": "Zaktualizować {{name}} do {{version}}?",
+    "now": "teraz {{version}}",
+    "sameKey": "ten sam klucz autora",
+    "newKey": "nowy klucz autora",
+    "newWebsites_one": "Ta aktualizacja chce łączyć się z {{count}} nową stroną.",
+    "newWebsites_few": "Ta aktualizacja chce łączyć się z {{count}} nowymi stronami.",
+    "newWebsites_many": "Ta aktualizacja chce łączyć się z {{count}} nowymi stronami.",
+    "newWebsites_other": "Ta aktualizacja chce łączyć się z {{count}} nowej strony.",
+    "staysOn": "{{name}} zostaje przy wersji {{version}}, dopóki nie zdecydujesz.",
+    "otherDomain": "Jedna z nich nie należy do domeny wtyczki.",
+    "whatsNew": "Co nowego w wersji {{version}}",
+    "websitesLead": "{{name}} i jej strona mogłyby wtedy łączyć się z:",
+    "websitesWarning": "Te strony widzą Twój adres IP i wszystko, co wyśle im {{name}}.",
+    "websitesLabel": "Strony internetowe",
+    "new": "Nowa",
+    "changed": "Zmieniona",
+    "noOtherPermissions": "Żadne inne uprawnienia się nie zmieniają.",
+    "scoreNow": "Teraz ({{version}})",
+    "scoreAfter": "Po aktualizacji ({{version}})",
+    "meterNow": "Ocena bezpieczeństwa teraz",
+    "meterAfter": "Ocena bezpieczeństwa po aktualizacji",
+    "riskUpBy_one": "Ryzyko rośnie o {{count}} punkt",
+    "riskUpBy_few": "Ryzyko rośnie o {{count}} punkty",
+    "riskUpBy_many": "Ryzyko rośnie o {{count}} punktów",
+    "riskUpBy_other": "Ryzyko rośnie o {{count}} punktu",
+    "asksForMore": "bo ta wersja prosi o więcej:",
+    "permissionsLabel": "Nowe uprawnienia",
+    "recentChange": "Liczy się to także jako niedawna zmiana: nowe uprawnienia w ostatnich wersjach ({{versions}}) dodają kolejne +{{recent}} pkt. Razem z +{{permissions}} powyżej (× {{multiplier}}) daje to +{{total}}.",
+    "highTitle": "Ta aktualizacja sprawiłaby, że wtyczka stałaby się wtyczką wysokiego ryzyka",
+    "highText": "Nie zostanie zainstalowana automatycznie. Pozostanie przy wersji {{version}} zachowa obecną ocenę; wersję możesz przypiąć w Zainstalowane.",
+    "highTick": "Rozumiem, że ryzyko wzrosło, i nadal ufam autorowi",
+    "skipHint": "Pominięcie zachowuje działającą wersję {{version}}.",
+    "skip": "Pomiń tę wersję",
+    "notNow": "Nie teraz",
+    "allow": "Zezwól i zaktualizuj",
+    "updateAnyway": "Zaktualizuj mimo to",
+    "failed": "Nie udało się zaktualizować wtyczki {{name}}. Spróbuj ponownie."
   }
 }

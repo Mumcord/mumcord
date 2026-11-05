@@ -78,6 +78,16 @@
       "keys": "↑ ↓ mainīt izmēru · PageUp/PageDown fiksēt · Home/End · Enter atiestata",
       "releaseHint": "Atlaid, lai samazinātu līdz mazajai joslai",
       "minimised": "Multivides apgabals samazināts"
+    },
+    "stage": {
+      "tabs": "Ko rāda multivides apgabals",
+      "hint": "Pārslēgšana neko neaptur",
+      "share": "Ekrāna kopīgošana",
+      "plugin": "Spraudnis",
+      "tabName": "{{label}}, cilne {{index}} no {{count}}",
+      "tabNameNew": "{{label}}, jauns, cilne {{index}} no {{count}}",
+      "pluginTabName": "{{label}}, spraudņa aktivitāte, cilne {{index}} no {{count}}",
+      "pluginTabNameNew": "{{label}}, spraudņa aktivitāte, jauns, cilne {{index}} no {{count}}"
     }
   }
 }

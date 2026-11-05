@@ -10,6 +10,8 @@
 //! a new ring whenever the hub's generation changed.
 
 #[cfg(any(target_os = "linux", test))]
+pub mod icon;
+#[cfg(any(target_os = "linux", test))]
 pub mod linux;
 #[cfg(any(target_os = "macos", test))]
 pub mod macos;
@@ -32,7 +34,8 @@ use crate::session::lock;
 use crate::voice::VoiceShared;
 
 pub use status::{
-    AppName, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+    AppIcon, AppName, NoSoundReason, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest,
+    SoundStatus, SoundUnavailable,
 };
 
 /// Why this system cannot share sound at all (FR-7.84), checked before the share starts and
@@ -54,6 +57,40 @@ pub(crate) fn unavailable() -> Option<SoundUnavailable> {
     #[cfg(not(any(windows, target_os = "macos", target_os = "linux")))]
     {
         Some(SoundUnavailable::NoPipeWire)
+    }
+}
+
+/// The sound for the test backend's pretend pick (test hook): the real PipeWire capture, so the
+/// E2E hears exactly what a Linux share would carry. A window whose app does not match clearly
+/// has no sound here; the "Which app's sound?" list is not part of this hook.
+#[cfg(all(target_os = "linux", feature = "test-backend"))]
+pub(crate) fn test_pick(request: SoundRequest, hint: Option<&str>) -> SoundOutcome {
+    use linux::{PipeWireSound, SoundTarget};
+    let mut app = None;
+    let target = match request {
+        SoundRequest::Display => SoundTarget::Desktop,
+        SoundRequest::Window => {
+            let streams = match linux::playback_streams() {
+                Ok(streams) => streams,
+                Err(reason) => return SoundOutcome::Unavailable(reason),
+            };
+            let hints: Vec<&str> = hint.into_iter().collect();
+            match matcher::match_sound_app(&hints, &streams, &linux::own_pids()) {
+                matcher::SoundMatch::Clear(matched) => {
+                    app = matched.app_name.clone().map(AppName::new);
+                    SoundTarget::App(matched)
+                }
+                matcher::SoundMatch::Unclear => return SoundOutcome::NoSound,
+            }
+        }
+    };
+    match PipeWireSound::start(target) {
+        Ok(source) => SoundOutcome::Captured {
+            source: Box::new(source),
+            mode: request.mode(),
+            app,
+        },
+        Err(reason) => SoundOutcome::Unavailable(reason),
     }
 }
 

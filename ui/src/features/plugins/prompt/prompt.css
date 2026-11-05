@@ -1,7 +1,7 @@
 /* Install prompt and plugin toasts. Colours come from theme tokens only. */
 .plugin-prompt {
-  /* Wide enough for the visibility control to sit beside its explanation. */
-  width: min(36rem, calc(100vw - 2 * var(--space-4)));
+  /* Wide enough for the score chip line (score mockup 03) and the visibility control. */
+  width: min(40rem, calc(100vw - 2 * var(--space-4)));
   max-width: none;
 }
 
@@ -20,6 +20,28 @@
   margin: 0;
   color: var(--color-text-secondary);
   font-size: 0.8125rem;
+}
+
+/* The source of the plugin: unofficial sources get a dashed amber chip (surfaces mockups 01, 09). */
+.plugin-prompt-chip {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.plugin-prompt-chip--unofficial {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--color-warning) 60%, transparent);
+  color: var(--color-warning);
+}
+
+@media (forced-colors: active) {
+  .plugin-prompt-chip,
+  .plugin-prompt-chip--unofficial {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
 }
 
 .plugin-prompt-visibility {
@@ -149,4 +171,142 @@
 .plugin-prompt-box p {
   margin: var(--space-1) 0 0;
   color: var(--color-text-secondary);
+}
+
+/* Score card (score mockup 03). */
+.plugin-prompt-score {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.plugin-prompt-score-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.plugin-prompt-muted,
+.plugin-prompt-honesty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-prompt-score-note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-prompt-more {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.plugin-prompt-more:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.plugin-prompt-honesty {
+  margin: var(--space-2) 0 0;
+}
+
+/* Website list inside the "Talk to these websites" row (surfaces mockup 01). */
+.plugin-prompt-origins {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 6px 0 2px;
+  padding: 0;
+  list-style: none;
+}
+
+.plugin-prompt-origin {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-size: var(--font-size-sm);
+}
+
+.plugin-prompt-origin code {
+  padding: 0 4px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.plugin-prompt-origin span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* The one confirmation box (FR-9.80): warning colours, danger colours when High risk. */
+.plugin-prompt-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 55%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+}
+
+.plugin-prompt-confirm--danger {
+  border: 2px solid var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.plugin-prompt-confirm p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-prompt-confirm strong {
+  color: var(--color-text);
+}
+
+.plugin-prompt-check {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-prompt-check input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-accent);
+}
+
+/* Hard stop (score mockup 07 "Can't be installed") and "Needs Mumcord". */
+.plugin-prompt-refused,
+.plugin-prompt-notice {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-hover);
+}
+
+.plugin-prompt-refused p {
+  margin: var(--space-2) 0 0;
 }

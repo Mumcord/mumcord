@@ -1062,6 +1062,19 @@
     "hint": "Pievieno spraudņiem cilni Izstrādātājs, kurā var ielādēt neparakstītus spraudņus no mapes. Ieslēdziet to tikai tad, ja paši veidojat spraudņus."
   },
   "newBadge": "Jaunums",
+  "pluginSafety": {
+    "title": "Spraudņu drošība",
+    "blockHighRisk": "Neļaut augsta riska spraudņus",
+    "hint": "Paslēpj pogu Instalēt spraudņiem ar vērtējumu 60 vai augstāku un aptur atjauninājumus, kas instalētu spraudni novestu līdz tam. Jau instalētie spraudņi turpina darboties.",
+    "note": "Pēc noklusējuma izslēgts. Oficiālos spraudņus un izstrādātāju spraudņus tas nekad neietekmē. Vērtējumi ir aplēses, nevis garantija."
+  },
+  "pluginSounds": {
+    "title": "Spraudņu skaņas",
+    "volume": "Spraudņu skaņu skaļums",
+    "mute": "Izslēgt spraudņu skaņas",
+    "hint": "Attiecas uz katru skaņu, ko atskaņo spraudnis. Spraudņu skaņas ir klusākas, kamēr cilvēki runā.",
+    "meter": "Izvades līmenis (atkļūdošana)"
+  },
   "screenShare": {
     "newBadge": "Jaunums",
     "qualityTitle": "Noklusējuma kvalitāte",
@@ -1093,6 +1106,7 @@
     "useGpuHint": "AV1 tiek kodēts grafiskajā kartē, tāpēc kopīgošana gandrīz neslogo procesoru. Izslēgts: AV1 izmanto procesoru.",
     "statusList": "Kodētāja statuss",
     "av1Encode": "AV1 kodēšana",
+    "sound": "Skaņa",
     "askEachTime": "Vaicāt pēc šiem iestatījumiem katru reizi, kad kopīgoju",
     "av1Playback": "AV1 atskaņošana",
     "vp9Playback": "VP9 atskaņošana",

@@ -1,0 +1,29 @@
+{
+  "manifest": 1,
+  "id": "test-stage",
+  "name": "Test Stage",
+  "description": "E2E test plugin: a tree activity in the media area, started from the Apps menu.",
+  "version": "1.1.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["games"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "ui.stage", "ui.app-menu"]
+  },
+  "app_menu": [
+    {
+      "id": "start",
+      "label": "Start Test Stage"
+    },
+    {
+      "id": "late",
+      "label": "Start Test Stage later"
+    }
+  ],
+  "stage": {
+    "title": "Test Stage",
+    "max_participants": 2
+  }
+}

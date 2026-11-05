@@ -1,5 +1,6 @@
 {
   "share": "Scherm delen",
+  "shareYourScreen": "Je scherm delen",
   "choosing": "Kiezen wat je deelt…",
   "stop": "Delen stoppen",
   "startFailed": "Scherm delen kon niet starten.",
@@ -18,8 +19,6 @@
   "pause": "Pauzeren",
   "resume": "Hervatten",
   "sound": "Geluid delen",
-  "noSound": "Linux deelt geen geluid: kijkers zien alleen het beeld.",
-  "noSoundForShare": "Deze schermdeling heeft geen geluid (volledig scherm of niet-ondersteunde systeemversie).",
   "viewersNone": "Nog niemand kijkt",
   "viewers_one": "{{count}} kijkt: {{names}}",
   "viewers_other": "{{count}} kijken: {{names}}",
@@ -79,7 +78,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Geluid van de app delen",
+    "sound": "Geluid",
+    "soundInfo": "Heel scherm: het geluid van de computer zonder Mumcord. Eén venster: alleen het geluid van die app.",
+    "soundNeeds": {
+      "windows": "Geen geluid: vereist Windows 10 versie 2004 of nieuwer",
+      "macos": "Geen geluid: vereist macOS 13 of nieuwer",
+      "pipewire": "Geen geluid: vereist PipeWire"
+    },
     "viewersGet": "Kijkers krijgen:",
     "viewersGetSummary": "tot {{resolution}} · {{fps}} fps · {{codec}} · ongeveer {{mbit}} Mbit/s",
     "pathRelay": "Eén keer verstuurd via de relay van de server, die het doorgeeft aan maximaal {{count}} kijkers.",
@@ -105,7 +110,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Direct"
+    "pathDirect": "Direct",
+    "soundDesktop": "Geluid: bureaublad",
+    "soundApp": "Geluid: {{app}}",
+    "noSound": "Geen geluid",
+    "tipDesktop": "Heel scherm: geluid van het bureaublad zonder Mumcord.",
+    "tipApp": "Eén venster: alleen het geluid van die app.",
+    "tipOff": "De geluidsschakelaar staat uit.",
+    "tipNone": "Voor dit venster is “Geen geluid” gekozen.",
+    "tipOldWindows": "Geen geluid: vereist Windows 10 versie 2004 of nieuwer",
+    "tipOldMacos": "Geen geluid: vereist macOS 13 of nieuwer",
+    "tipNoPipeWire": "Geen geluid: vereist PipeWire",
+    "tipCaptureFailed": "Geluidsopname mislukt. Het delen van beeld gaat door."
   },
   "qualityMenu": {
     "title": "Kwaliteit",
@@ -218,5 +234,14 @@
     "valueUnavailable": "Niet beschikbaar",
     "checkAgain": "Opnieuw controleren",
     "checking": "Controleren…"
+  },
+  "soundPicker": {
+    "title": "Het geluid van welke app?",
+    "noSound": "Geen geluid",
+    "share": "Geluid delen",
+    "cancel": "Annuleren",
+    "empty": "Er speelt nu geen app geluid af",
+    "gone": "Die app speelt geen geluid meer af. Kies een andere.",
+    "failed": "Je keuze kon niet worden toegepast."
   }
 }

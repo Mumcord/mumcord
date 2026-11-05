@@ -1054,6 +1054,19 @@
     "hint": "Lisab pluginate alla vahekaardi Arendaja, kus saab kaustast laadida allkirjastamata pluginaid. Lülita sisse ainult siis, kui ehitad ise pluginaid."
   },
   "newBadge": "Uus",
+  "pluginSafety": {
+    "title": "Pluginate turvalisus",
+    "blockHighRisk": "Ära luba suure riskiga pluginaid",
+    "hint": "Peidab nupu Paigalda pluginatel, mille hinne on 60 või rohkem, ja peatab uuendused, mis viiksid paigaldatud plugina sinna. Juba paigaldatud pluginad töötavad edasi.",
+    "note": "Vaikimisi väljas. Ametlikke pluginaid ja arendajate pluginaid see kunagi ei mõjuta. Hinded on hinnangud, mitte garantii."
+  },
+  "pluginSounds": {
+    "title": "Pluginate helid",
+    "volume": "Pluginate helide helitugevus",
+    "mute": "Vaigista pluginate helid",
+    "hint": "Kehtib kõigile helidele, mida plugin esitab. Pluginate helid on vaiksemad, kui inimesed räägivad.",
+    "meter": "Väljundtase (silumine)"
+  },
   "screenShare": {
     "newBadge": "Uus",
     "qualityTitle": "Kvaliteedi vaikeväärtused",
@@ -1085,6 +1098,7 @@
     "useGpuHint": "Kodeerib AV1 graafikakaardil, nii et jagamine koormab protsessorit peaaegu üldse mitte. Väljas: AV1 kasutab protsessorit.",
     "statusList": "Kodeerija olek",
     "av1Encode": "AV1 kodeerimine",
+    "sound": "Heli",
     "askEachTime": "Küsi neid sätteid iga kord, kui jagan",
     "av1Playback": "AV1 esitus",
     "vp9Playback": "VP9 esitus",

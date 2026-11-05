@@ -55,6 +55,10 @@
     "messagesExpired": "Pasibaigusio galiojimo pranešimai",
     "incomingRateDropped": "Dažnio ribos atmesti gaunami pranešimai",
     "incomingInvalid": "Netinkami gaunami pranešimai",
+    "uiFreezes": "Kiek kartų Mumcord užstrigo, kai buvo atidarytas žiniatinklio turinys",
+    "webDisabled": "Žiniatinklio turinys išjungtas, nes Mumcord nustojo reaguoti, kol jis buvo atidarytas.",
+    "reenableWeb": "Įjungti žiniatinklio turinį",
+    "reenableFailed": "Nepavyko įjungti žiniatinklio turinio.",
     "log": "Žurnalas",
     "logEmpty": "Žurnalas tuščias.",
     "level": {

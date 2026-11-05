@@ -24,7 +24,8 @@
   "pill": {
     "none": "Sem novas permissões",
     "permission": "Precisa de uma nova permissão",
-    "author": "Novo autor"
+    "author": "Novo autor",
+    "websites": "Comunica com novos websites"
   },
   "newPermissions": "Novas permissões",
   "revoked": {
@@ -45,5 +46,66 @@
     "save": "Guardar",
     "notNow": "Agora não",
     "failed": "Não foi possível alterar as permissões de {{name}}. Tente novamente."
+  },
+  "waitingHeading": "Atualizações em espera",
+  "autoNote": "As atualizações automáticas só são instaladas quando o plugin não pede nada de novo e a sua pontuação se mantém na mesma faixa ou desce. Tudo o resto fica a aguardar aqui.",
+  "needsMumcord": "Atualização disponível depois de atualizares o Mumcord",
+  "band": {
+    "low": "Baixo",
+    "medium": "Médio",
+    "high": "Elevado"
+  },
+  "hold": {
+    "newWebsites_one": "Esta atualização quer comunicar com {{count}} novo website. {{name}} fica na versão {{version}} até decidires.",
+    "newWebsites_many": "Esta atualização quer comunicar com {{count}} novos websites. {{name}} fica na versão {{version}} até decidires.",
+    "newWebsites_other": "Esta atualização quer comunicar com {{count}} novos websites. {{name}} fica na versão {{version}} até decidires.",
+    "riskUp": "Não instalada automaticamente: o risco subiu de {{from}} para {{to}}. Revê primeiro.",
+    "scoreUp": "Não instalada automaticamente: a pontuação subiu de {{from}} para {{to}}. Revê primeiro.",
+    "blockedBySafety": "Não instalada: esta versão é de risco elevado e “Não permitir plugins de risco elevado” está ativado.",
+    "scoreUnknown": "Não instalada automaticamente: não foi possível calcular a pontuação de segurança desta versão. Revê primeiro."
+  },
+  "score": {
+    "label": "Pontuação de segurança:",
+    "unchanged": "inalterada",
+    "points": "pontos",
+    "goesUp": ", o risco aumenta",
+    "goesDown": ", o risco diminui"
+  },
+  "dialog": {
+    "title": "Atualizar {{name}} para {{version}}?",
+    "now": "agora {{version}}",
+    "sameKey": "mesma chave do autor",
+    "newKey": "nova chave do autor",
+    "newWebsites_one": "Esta atualização quer comunicar com {{count}} novo website.",
+    "newWebsites_many": "Esta atualização quer comunicar com {{count}} novos websites.",
+    "newWebsites_other": "Esta atualização quer comunicar com {{count}} novos websites.",
+    "staysOn": "{{name}} fica na versão {{version}} até decidires.",
+    "otherDomain": "Um deles não pertence ao domínio do próprio plugin.",
+    "whatsNew": "Novidades da versão {{version}}",
+    "websitesLead": "{{name}} e a sua página passariam a poder aceder a:",
+    "websitesWarning": "Estes websites podem ver o teu endereço IP e tudo o que {{name}} lhes enviar.",
+    "websitesLabel": "Websites",
+    "new": "Novo",
+    "changed": "Alterado",
+    "noOtherPermissions": "Nenhuma outra permissão muda.",
+    "scoreNow": "Agora ({{version}})",
+    "scoreAfter": "Após a atualização ({{version}})",
+    "meterNow": "Pontuação de segurança atual",
+    "meterAfter": "Pontuação de segurança após a atualização",
+    "riskUpBy_one": "O risco aumenta {{count}} ponto",
+    "riskUpBy_many": "O risco aumenta {{count}} pontos",
+    "riskUpBy_other": "O risco aumenta {{count}} pontos",
+    "asksForMore": "porque esta versão pede mais:",
+    "permissionsLabel": "Novas permissões",
+    "recentChange": "Conta também como alteração recente: novas permissões nas últimas {{versions}} versões somam mais +{{recent}} pontos. Juntamente com os +{{permissions}} acima (× {{multiplier}}), dá +{{total}}.",
+    "highTitle": "Esta atualização tornaria o plugin de risco elevado",
+    "highText": "Não será instalada automaticamente. Ficar na versão {{version}} mantém a pontuação atual; podes fixar a versão em Instalados.",
+    "highTick": "Compreendo que o risco aumentou e continuo a confiar no autor",
+    "skipHint": "Ignorar mantém a versão {{version}} a funcionar.",
+    "skip": "Ignorar esta versão",
+    "notNow": "Agora não",
+    "allow": "Permitir e atualizar",
+    "updateAnyway": "Atualizar mesmo assim",
+    "failed": "Não foi possível atualizar {{name}}. Tenta novamente."
   }
 }

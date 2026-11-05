@@ -8,7 +8,7 @@ use mumcord_store::{IdentityId, PluginSuggestion, ServerId, Store, UnixMillis};
 use semver::Version;
 use serde::Deserialize;
 
-use crate::registry::{Index, RevocationList, check_repository_url};
+use crate::registry::{Choice, Index, RevocationList, check_repository_url};
 
 /// At most this many entries are read (FR-6.77).
 pub const MAX_ENTRIES: usize = 8;
@@ -131,6 +131,8 @@ pub struct Environment<'a> {
     pub revoked: &'a RevocationList,
     /// Whether a plugin with this id is installed.
     pub installed: &'a dyn Fn(&str) -> bool,
+    /// The running Mumcord: only a version it can run is suggested (FR-9.16).
+    pub app: &'a semver::Version,
 }
 
 /// A suggestion the user should see.
@@ -233,7 +235,9 @@ fn resolve(entry: &Entry, env: &Environment<'_>) -> Option<SuggestionSource> {
     match &entry.source {
         EntrySource::Official => {
             let plugin = env.index?.plugin(&entry.id)?;
-            let latest = plugin.latest();
+            let Choice::Runnable(latest) = plugin.choose(env.app) else {
+                return None;
+            };
             if Version::parse(&latest.version).ok()? < entry.min {
                 return None;
             }
@@ -397,6 +401,7 @@ mod tests {
             index: Some(&index),
             revoked,
             installed: &is_installed,
+            app: &app(),
         };
         process(store, ids.0, ids.1, "ABCD", ann, &env, now)
             .expect("process")
@@ -459,6 +464,10 @@ mod tests {
         let states: Vec<_> = rows.iter().map(|r| (&*r.plugin_id, &*r.state)).collect();
         assert_eq!(states, [("dice", "new"), ("poll", "installed")]);
         assert_eq!(rows[0].sender_pin, "abcd");
+    }
+
+    fn app() -> Version {
+        Version::new(0, 7, 0)
     }
 
     #[test]
@@ -573,6 +582,7 @@ mod tests {
             index: None,
             revoked: &none(),
             installed: &|_| false,
+            app: &app(),
         };
         let shown = process(&store, server, identity, "AB", &ann, &env, NOW).expect("process");
         assert_eq!(

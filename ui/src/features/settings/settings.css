@@ -648,6 +648,11 @@
   margin: 0;
 }
 
+/* A dialog that starts on its title (ModalDialog `focusTitle`) needs no ring on plain text. */
+.settings-dialog__title[tabindex="-1"]:focus {
+  outline: none;
+}
+
 @media (max-width: 40rem) {
   .settings {
     flex-direction: column;

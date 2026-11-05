@@ -192,7 +192,7 @@ impl FrameSealer {
     }
 
     /// Encrypts one encoded frame into `out` (cleared first) as clear header + ciphertext + tag.
-    /// A video keyframe switches to a staged key first. Returns the header that was written.
+    /// A video keyframe or a plugin-data unit switches to a staged key first. Returns the header that was written.
     pub fn seal(
         &mut self,
         content: Content,
@@ -205,7 +205,11 @@ impl FrameSealer {
         let sequence = self.next_sequence.ok_or(CryptoError::CounterExhausted)?;
         let payload_len = u32::try_from(frame.len() + TAG_LEN)
             .map_err(|_| CryptoError::Header(HeaderError::BadSize(u32::MAX)))?;
-        let keyframe = matches!(content, Content::Video { keyframe: true, .. });
+        // Every plugin-data unit stands alone, so it can start a new key like a keyframe.
+        let keyframe = matches!(
+            content,
+            Content::Video { keyframe: true, .. } | Content::Data
+        );
         let switch = keyframe && self.pending.is_some();
         let key_id = if switch {
             self.pending.as_ref().map_or(self.current.id, |key| key.id)
@@ -423,6 +427,25 @@ mod tests {
             FrameOpener::new().open(&mut unit).expect_err("must fail"),
             CryptoError::UnknownKey(0)
         );
+    }
+
+    #[test]
+    fn a_plugin_data_unit_switches_to_the_staged_key_at_once() {
+        let mut sealer = FrameSealer::new().expect("sealer");
+        let mut stays = opener_for(&sealer);
+        let mut leaves = opener_for(&sealer);
+        let new_key = sealer.rekey().expect("rekey");
+        stays.add_key(&new_key);
+        let mut unit = Vec::new();
+        let header = sealer
+            .seal(Content::Data, b"data", &mut unit)
+            .expect("seal");
+        assert_eq!(header.key_id, 1);
+        assert_eq!(
+            leaves.open(&mut unit.clone()).expect_err("must fail"),
+            CryptoError::UnknownKey(1)
+        );
+        assert_eq!(stays.open(&mut unit).expect("new key").1, b"data");
     }
 
     #[test]

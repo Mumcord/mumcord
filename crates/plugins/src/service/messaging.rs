@@ -18,7 +18,7 @@ use super::plugin_io::{
 use super::{Origin, PluginService};
 use crate::manifest::Visibility;
 use crate::messaging::announce::{self, ANNOUNCE_DATA_ID, AnnounceEntry, SourceTag};
-use crate::messaging::envelope::plugin_id_of;
+use crate::messaging::envelope::{self, plugin_id_of};
 use crate::messaging::{Counters, Member, PluginRef};
 use crate::registry::key_fingerprint_prefix;
 use crate::wit::events::{Channel, Event, PeerMessage, SelfState};
@@ -39,6 +39,9 @@ impl PluginService {
         if changed {
             self.io.menu_forget_sessions(None);
             self.io.refresh_menus();
+            // A server switch leaves the activities on the old one, which stays connected.
+            self.stage_sync_place(true);
+            self.relay_refresh();
         }
         self.broadcast_self();
     }
@@ -63,7 +66,12 @@ impl PluginService {
         if focused {
             self.io.menu_forget_sessions(None);
             self.io.refresh_menus();
+            self.stage_sync_place(false);
             self.broadcast_self();
+        }
+        self.io.relay_forget_server(server);
+        if focused {
+            self.relay_refresh();
         }
     }
 
@@ -87,6 +95,10 @@ impl PluginService {
             .members
             .insert(peer.session, peer.clone());
         self.io.refresh_menus();
+        if self.io.peers().focused == Some(server) {
+            // Their announce may have come first; running activities reach them either way.
+            self.stage_member_announced(peer.session);
+        }
         self.dispatch(server, |keys, id| Event::Joined(wit_peer(keys, id, &peer)));
     }
 
@@ -106,6 +118,9 @@ impl PluginService {
 
     /// Someone left the user's channel or the server, or the user left their channel.
     pub fn peer_left(&mut self, server: ServerId, peer: &PeerInfo) {
+        if self.io.peers().focused == Some(server) {
+            self.stage_peer_left(peer.session);
+        }
         {
             let mut state = self.io.peers();
             let connection = connection(&mut state.connections, server);
@@ -173,6 +188,8 @@ impl PluginService {
             state.focused == Some(server)
         };
         if focused {
+            // A channel change leaves the activities of the old channel (FR-9.51).
+            self.stage_sync_place(false);
             self.broadcast_self();
         }
     }
@@ -198,6 +215,9 @@ impl PluginService {
             };
             connection.announced.insert(sender.session, entries);
             drop(state);
+            if focused {
+                self.stage_member_announced(sender.session);
+            }
             // A poll or game state sent before this announce never reached them (FR-6.35).
             let keys = self.ctx.peer_keys.as_ref();
             for id in ready {
@@ -212,7 +232,23 @@ impl PluginService {
         if state.focused != Some(server) {
             return;
         }
-        let Some(meta) = state.plugins.get(plugin).and_then(|m| m.messaging.clone()) else {
+        // Host frames are the host's own, never a plugin's message: stage frames (FR-9.47)
+        // and `relay` messages through the Mumble fallback (FR-9.61).
+        if let Some((kind, body)) = envelope::decode_host(data) {
+            drop(state);
+            if kind == envelope::HOST_KIND_RELAY {
+                self.relay_fallback_frame(server, sender.session, plugin, body);
+            } else {
+                self.stage_frame(sender.session, plugin, data);
+            }
+            return;
+        }
+        let Some(meta) = state
+            .plugins
+            .get(plugin)
+            .and_then(|m| m.messaging.clone())
+            .filter(|m| m.messages)
+        else {
             return;
         };
         let Some(connection) = state.connections.get_mut(&server) else {
@@ -348,12 +384,31 @@ impl PluginService {
         };
         let repositories = self.store().plugin_repositories().unwrap_or_default();
         let mut metas = std::collections::HashMap::new();
+        let mut menus = Vec::new();
         if !self.host.all_off() {
             for record in records.iter().filter(|r| r.enabled) {
                 let Some(manifest) = self.host.manifest(&record.id) else {
                     continue;
                 };
-                let messaging = if self.ctx.grants.allows(&record.id, "peers.messages") {
+                let messages = self.ctx.grants.allows(&record.id, "peers.messages");
+                let stage = self
+                    .ctx
+                    .grants
+                    .allows(&record.id, crate::api::stage::PERMISSION)
+                    .then(|| {
+                        manifest
+                            .stage
+                            .as_ref()
+                            .and_then(|s| s.max_participants)
+                            .unwrap_or(crate::stage::MAX_PARTICIPANTS)
+                    });
+                // Stage and relay plugins are announced too, so peers with the same plugin see
+                // their activities and reach them without `peers.messages`.
+                let relay = self
+                    .ctx
+                    .grants
+                    .allows(&record.id, crate::api::relay::PERMISSION);
+                let messaging = if messages || stage.is_some() || relay {
                     self.source_tag(&record.source, &repositories)
                         .map(|source| MessagingMeta {
                             source,
@@ -363,21 +418,28 @@ impl PluginService {
                                 PluginVisibility::Nobody => Visibility::Nobody,
                             },
                             max_payload: manifest.messaging.max_payload,
+                            messages,
                         })
                 } else {
                     None
                 };
+                menus.push((record.id.clone(), manifest.app_menu.clone()));
                 metas.insert(
                     record.id.clone(),
                     PluginMeta {
                         name: manifest.name.clone(),
                         messaging,
+                        stage,
                     },
                 );
             }
         }
+        self.io.app_menus().sync(menus);
         let mut state = self.io.peers();
         if state.plugins == metas {
+            drop(state);
+            // A permission change may still move `relay.status()`.
+            self.relay_refresh();
             return;
         }
         let now = Instant::now();
@@ -401,6 +463,8 @@ impl PluginService {
             }
         }
         state.plugins = metas;
+        drop(state);
+        self.relay_refresh();
     }
 
     /// How peers tell this plugin's source apart (FR-6.35); `None` for a repository that is
@@ -505,7 +569,7 @@ impl PluginService {
         self.io.chat_text(server, message, sender, line)
     }
 
-    fn loaded_ids(&self) -> Vec<String> {
+    pub(super) fn loaded_ids(&self) -> Vec<String> {
         self.host.ids().map(str::to_owned).collect()
     }
 }
@@ -536,7 +600,7 @@ fn newly_reachable(
     plugins
         .iter()
         .filter_map(|(id, meta)| {
-            let messaging = meta.messaging.as_ref()?;
+            let messaging = meta.messaging.as_ref().filter(|m| m.messages)?;
             let plugin = PluginRef {
                 id,
                 source: messaging.source,

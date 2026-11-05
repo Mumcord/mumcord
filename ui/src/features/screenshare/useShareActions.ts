@@ -26,7 +26,7 @@ export function startFailure(error: unknown): ShareFailure {
     : "startFailed";
 }
 
-export function useShareActions({ serverId, own, block, platform, recheck }: OwnShareState) {
+export function useShareActions({ serverId, own, block, recheck }: OwnShareState) {
   const { t } = useTranslation("screenshare");
   const { t: tP2p } = useTranslation("p2p");
   const [starting, setStarting] = useState(false);
@@ -55,12 +55,7 @@ export function useShareActions({ serverId, own, block, platform, recheck }: Own
       // "Change window": the system picker only opens with a fresh share, so the old one ends.
       if (own !== null) await getApi().screenShareStop(serverId);
       // Resolves without a share when the picker was closed; nothing changes then.
-      await getApi().screenShareStart(
-        serverId,
-        (platform?.sound ?? false) && picks.sound,
-        picks.choice,
-        picks.codec,
-      );
+      await getApi().screenShareStart(serverId, picks.sound, picks.choice, picks.codec);
     } catch (error: unknown) {
       console.error("Starting the screen share failed", error);
       setFailed(startFailure(error));
@@ -89,7 +84,6 @@ export function useShareActions({ serverId, own, block, platform, recheck }: Own
     asking && serverId !== null
       ? {
           serverId,
-          soundAvailable: platform?.sound ?? false,
           onCancel: () => {
             setAsking(false);
           },

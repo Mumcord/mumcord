@@ -24,7 +24,7 @@ use crate::runtime::{
     CallError, CompileError, Compiled, EventQueue, HostContext, Instance, Level, LogBuffer, Next,
     Runtime, StartParams,
 };
-use crate::version::{Incompatibility, check_compatibility};
+use crate::version::{Incompatibility, api_of, check_compatibility};
 
 /// Largest component file that is read from disk; matches the unpacked package limit.
 const MAX_ENTRY_BYTES: u64 = crate::package::MAX_UNPACKED_BYTES;
@@ -180,7 +180,9 @@ impl PluginHost {
         if std::fs::metadata(&entry)?.len() > MAX_ENTRY_BYTES {
             return Err(LoadError::EntryTooLarge);
         }
-        let compiled = self.runtime.compile(&std::fs::read(&entry)?)?;
+        let compiled = self
+            .runtime
+            .compile(&std::fs::read(&entry)?, api_of(&manifest))?;
 
         let id = manifest.id.clone();
         let state = if self.all_off {
@@ -342,6 +344,64 @@ impl PluginHost {
             .is_some_and(|worker| worker.queue.push_chat(event, chat))
     }
 
+    /// Queues `app-menu-activated` for plugin `id` if it is running and holds `ui.app-menu`
+    /// (a 1.1 event, so it skips the 1.0 event path of [`Self::send`]).
+    pub fn send_app_menu_activated(&self, id: &str, item: &str) -> bool {
+        if !self.ctx.grants.allows(id, crate::api::app_menu::PERMISSION) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| {
+                worker
+                    .queue
+                    .push(crate::runtime::PluginEvent::AppMenuActivated(
+                        item.to_owned(),
+                    ))
+            })
+    }
+
+    /// Queues a stage event (`stage-activity-started`, `-ended`, `stage-joined`, `stage-left`)
+    /// for plugin `id` if it is running and holds `ui.stage` (1.1 events, past the 1.0 path).
+    pub fn send_stage(&self, id: &str, event: crate::runtime::PluginEvent) -> bool {
+        if !self.ctx.grants.allows(id, crate::api::stage::PERMISSION) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| worker.queue.push(event))
+    }
+
+    /// Queues a relay event (`relay-message`, `relay-status-changed`) for plugin `id` if it is
+    /// running and holds `peers.relay` (1.1 events, past the 1.0 path).
+    pub fn send_relay(&self, id: &str, event: crate::runtime::PluginEvent) -> bool {
+        if !self.ctx.grants.allows(id, crate::api::relay::PERMISSION) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| worker.queue.push(event))
+    }
+
+    /// Queues `surface-closed` for plugin `id` if it is running and holds `ui.webview` (a 1.1
+    /// event: a 1.0 plugin never sees it).
+    pub fn send_surface_closed(&self, id: &str, place: crate::api::webview::WebviewPlace) -> bool {
+        if !self.ctx.grants.allows(id, crate::api::webview::PERMISSION) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| {
+                worker
+                    .queue
+                    .push(crate::runtime::PluginEvent::SurfaceClosed(place.into()))
+            })
+    }
+
     /// Whether replayed chat events can go to plugin `id` at all.
     pub fn takes_replays(&self, id: &str) -> bool {
         self.plugins
@@ -493,7 +553,7 @@ fn serve(instance: &mut Instance, queue: &EventQueue) -> Option<CallError> {
         match queue.pop() {
             Next::Stop => return None,
             Next::Event(event, chat) => {
-                if let Err(error) = instance.on_event(&event, chat) {
+                if let Err(error) = instance.on_event(*event, chat) {
                     return Some(error);
                 }
             }
