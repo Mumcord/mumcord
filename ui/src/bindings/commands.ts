@@ -954,6 +954,12 @@ export const commands = {
 	relayInfo: (serverId: number) => typedError<RelayInfo, ApiError>(__TAURI_INVOKE("relay_info", { serverId })),
 	/**  Why camera sharing is unavailable on a connected server; `null` when it is available. */
 	cameraUnavailable: (serverId: number) => typedError<CameraUnavailable | null, ApiError>(__TAURI_INVOKE("camera_unavailable", { serverId })),
+	/**
+	 *  Test command `lockScreen` (spec 08, section 10.3): simulates a screen lock, which turns the
+	 *  camera off when "Turn my camera off when my screen locks" is on. Inert (`notImplemented`)
+	 *  unless a debug build runs with `MUMCORD_TEST_SCREEN_LOCK=1`.
+	 */
+	lockScreen: () => typedError<null, ApiError>(__TAURI_INVOKE("lock_screen")),
 	/**  The cameras of this computer, in OS order (FR-8.11 picker, Settings → Camera). */
 	cameraDevices: () => typedError<CameraDevice[], ApiError>(__TAURI_INVOKE("camera_devices")),
 	/**  The own camera now; `null` while it is off. */
@@ -1012,6 +1018,36 @@ export const commands = {
 	 *  nothing when another window attached since.
 	 */
 	cameraPreviewDetach: (channelId: number) => __TAURI_INVOKE<void>("camera_preview_detach", { channelId }),
+	/**  The camera room of a server now (empty while nobody's camera is on). */
+	cameraRoom: (serverId: number) => __TAURI_INVOKE<CameraRoomView>("camera_room", { serverId }),
+	/**  The UI opened or closed the camera room (FR-8.53); closing stops every download. */
+	cameraRoomSetOpen: (serverId: number, open: boolean) => __TAURI_INVOKE<void>("camera_room_set_open", { serverId, open }),
+	/**  The strip position Hidden (FR-8.71): no video is downloaded while it is in effect. */
+	cameraRoomSetVideosHidden: (serverId: number, hidden: boolean) => __TAURI_INVOKE<void>("camera_room_set_videos_hidden", { serverId, hidden }),
+	/**  "Hide {name}'s video" / "Show video" on one tile (FR-8.57). */
+	cameraTileSetHidden: (serverId: number, sharer: number, hidden: boolean) => __TAURI_INVOKE<void>("camera_tile_set_hidden", { serverId, sharer, hidden }),
+	/**  "Quality for me" of one tile (FR-8.56). */
+	cameraTileSetQuality: (serverId: number, sharer: number, quality: CameraTileQuality) => __TAURI_INVOKE<void>("camera_tile_set_quality", { serverId, sharer, quality }),
+	/**  The tile's height on screen in device pixels, so Auto asks for a fitting resolution. */
+	cameraTileSetHeight: (serverId: number, sharer: number, height: number) => __TAURI_INVOKE<void>("camera_tile_set_height", { serverId, sharer, height }),
+	/**  Asks the camera owner for a keyframe, e.g. after the tile's decoder failed. */
+	cameraRequestKeyframe: (serverId: number, sharer: number) => __TAURI_INVOKE<void>("camera_request_keyframe", { serverId, sharer }),
+	/**
+	 *  Sends the frames of `sharer`'s camera to `frames` from now on (layout in
+	 *  `ui/src/api/screenFrames.ts`), replacing an earlier channel of that tile: the main window and
+	 *  the pop-out each attach their tiles. Asks for a keyframe so the new decoder can start.
+	 */
+	cameraFramesAttach: (serverId: number, sharer: number, frames: Channel<ArrayBuffer>) => __TAURI_INVOKE<void>("camera_frames_attach", { serverId, sharer, frames }),
+	/**
+	 *  Stops sending `sharer`'s frames to the channel `channel_id` (`Channel.id` in JavaScript);
+	 *  does nothing when another window attached that tile since.
+	 */
+	cameraFramesDetach: (serverId: number, sharer: number, channelId: number) => __TAURI_INVOKE<void>("camera_frames_detach", { serverId, sharer, channelId }),
+	/**
+	 *  Decodes camera frames of `codecs` in Rust and sends RGBA pictures instead, for the codecs the
+	 *  webview's WebCodecs cannot decode (FR-8.54). Replaces the earlier list; for every camera.
+	 */
+	cameraSetDecodeCodecs: (codecs: VideoCodec[]) => __TAURI_INVOKE<void>("camera_set_decode_codecs", { codecs }),
 	/**  The background library with thumbnails. */
 	cameraBackgrounds: () => typedError<CameraBackgroundLibrary, ApiError>(__TAURI_INVOKE("camera_backgrounds")),
 	/**
@@ -1227,6 +1263,7 @@ export const events = {
 	cameraAvailabilityChanged: makeEvent<CameraAvailabilityChanged, CameraAvailabilityChanged>("camera-availability-changed"),
 	cameraChanged: makeEvent<CameraChanged, CameraChanged>("camera-changed"),
 	cameraDevicesChanged: makeEvent<CameraDevicesChanged, CameraDevicesChanged>("camera-devices-changed"),
+	cameraRoomChanged: makeEvent<CameraRoomChanged, CameraRoomChanged>("camera-room-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
@@ -1627,20 +1664,20 @@ export type CameraChanged = {
 	view: CameraView,
 };
 
-/**
- *  The cameras changed (plugged in, removed, renamed or a new default); sent only while a
- *  device watch runs.
- */
-export type CameraDevicesChanged = {
-	devices: CameraDevice[],
-};
-
 /**  A camera of this computer. The name is for the picker only and never logged (FR-8.28). */
 export type CameraDevice = {
 	/**  Stable id; Settings remember it as `cameraDeviceId` (FR-8.27). */
 	id: string,
 	name: string,
 	isDefault: boolean,
+};
+
+/**
+ *  The cameras changed (plugged in, removed, renamed or a new default); sent only while a
+ *  device watch runs.
+ */
+export type CameraDevicesChanged = {
+	devices: CameraDevice[],
 };
 
 /**  The effect level that runs: "Best" or "Light" (FR-8.36). */
@@ -1676,13 +1713,30 @@ export type CameraFailure = "notConnected" |
  *  Another camera runs already (one per Mumcord instance, FR-8.29), or the step does not fit
  *  the camera's state.
  */
-"busy" | "noCamera" | "permissionDenied" | "deviceGone" | "unreadable" | "cameraFailed" | "roomFull" | "relayFull" | "useNotAllowed" | "denied" | "relayDown" | "rateLimited" | 
+"busy" | "noCamera" | "permissionDenied" | "deviceGone" | "unreadable" | "cameraFailed" | "roomFull" | "relayFull" | "useNotAllowed" | "denied" | "relayDown" | 
+/**  The relay ended the broadcast ("Camera stopped by the server's relay"). */
+"relayEnded" | "rateLimited" | 
 /**  The P2P mode leaves the relay out. */
 "mode" | "noCertificate";
 
-/**  Where the own camera is (spec 08, section 6.4). */
 /**  "Reduce motion" for the speaking frame; `system` follows the operating system. */
 export type CameraReduceMotion = "system" | "on" | "off";
+
+/**  The camera room of a server changed (tiles, their states, open, hidden). */
+export type CameraRoomChanged = {
+	view: CameraRoomView,
+};
+
+/**  The cameras of the own channel on one server; blocked people are left out (FR-8.59). */
+export type CameraRoomView = {
+	serverId: number,
+	/**  The room is open (also opened by the engine for "Show cameras: Always", FR-8.53). */
+	open: boolean,
+	/**  The strip position Hidden is in effect (FR-8.71). */
+	videosHidden: boolean,
+	/**  Ordered by session. */
+	tiles: CameraTile[],
+};
 
 /**  Own camera send quality (FR-8.45). */
 export type CameraSendQuality = "auto" | "720p15" | "360p30";
@@ -1690,6 +1744,7 @@ export type CameraSendQuality = "auto" | "720p15" | "360p30";
 /**  When other people's cameras are shown (FR-8.75). */
 export type CameraShow = "always" | "onOpen" | "never";
 
+/**  Where the own camera is (spec 08, section 6.4). */
 export type CameraState = "off" | 
 /**  The preview runs locally; nothing is sent (FR-8.10). */
 "preview" | 
@@ -1698,10 +1753,42 @@ export type CameraState = "off" |
 /**  The camera is on air. */
 "onAir";
 
-/**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
 /**  Where the camera strip sits while something is shared (FR-8.72). */
 export type CameraStripPosition = "beside" | "above" | "hidden";
 
+/**  One camera of another person in the room. */
+export type CameraTile = {
+	/**  The camera owner's session. */
+	sharer: number,
+	state: CameraTileState,
+	/**  The user chose "Hide {name}'s video" on this tile. */
+	hidden: boolean,
+	quality: CameraTileQuality,
+	/**  Data saver is in effect (the tile's choice or the Settings switch). */
+	dataSaver: boolean,
+	/**  The "{n} fps" badge with "Weak connection" (FR-8.58); `null` hides it. */
+	fpsBadge: number | null,
+};
+
+/**  "Quality for me" of one tile (FR-8.56). */
+export type CameraTileQuality = "auto" | "dataSaver" | "best";
+
+/**  Where a camera tile is (spec 08, section 6.6). */
+export type CameraTileState = 
+/**  The person's camera is on; nothing is downloaded yet. */
+"announced" | 
+/**  Joining the camera; the tile shows the loading state. */
+"joining" | 
+/**  Receiving video; its frames come on the tile's channel (`camera_frames_attach`). */
+"playing" | 
+/**  "Too many people are watching {name}" (FR-8.52). */
+"full" | 
+/**  The join brought no answer; retried every 10 s. */
+"failed" | 
+/**  Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never. */
+"hidden";
+
+/**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
 export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
 
 /**  The own camera as the preview dialog, Settings, the room and the tray see it. */
@@ -3309,6 +3396,8 @@ export type PluginDiagnostics = {
 	uiFreezes: number | null,
 	/**  The plugin's web content is turned off after a freeze, until the user re-enables it. */
 	webDisabled: boolean,
+	/**  Why the plugin was refused at load, when Diagnostics lists that reason. */
+	loadIssue: PluginLoadIssue | null,
 	/**  The plugin's own log lines (in memory only). */
 	log: PluginLogLine[],
 };
@@ -3475,6 +3564,16 @@ export type PluginInstallStage =
 export type PluginJustify = "start" | "end" | "spaceBetween" | 
 /**  Rows: the first child takes the free width, the others keep their natural width. */
 "fillFirst";
+
+/**
+ *  Why a plugin was refused at load, as Diagnostics lists it (FR-9.90). Only fixed names, never
+ *  the plugin's own text.
+ */
+export type PluginLoadIssue = 
+/**  A manifest field was used without the permission it needs. */
+{ kind: "field_without_permission"; field: string; permission: string } | 
+/**  An Apps-menu label equal to a built-in one or starting with "Mumcord". */
+{ kind: "refused_app_menu_label" };
 
 export type PluginLogLevel = "debug" | "info" | "warn" | "error";
 
