@@ -4007,18 +4007,6 @@ export type PluginsOverview = {
 };
 
 /**
- *  A plugin refused before it was stored, as Diagnostics lists it. Carries only the id or folder
- *  name, the fixed reason and the time, never the plugin's own text.
- */
-export type RefusedPlugin = {
-	/**  The plugin id, or the folder name of a developer plugin. */
-	name: string,
-	issue: PluginLoadIssue,
-	/**  When it was refused, in milliseconds since 1970. */
-	atMillis: number,
-};
-
-/**
  *  `plugins://shared-state`: whether `server` passes plugin data (FR-6.38). Sent whenever the
  *  engine decides, so the UI can show the "not supported" hint; `plugins_shared_supported`
  *  answers for a server that decided before the UI listened.
@@ -4211,6 +4199,18 @@ export type QualityChoice = {
 	fps: ScreenFps,
 	optimize: ScreenOptimize,
 	uploadLimit: ScreenUploadLimit,
+};
+
+/**
+ *  A plugin refused before it was stored, as Diagnostics lists it. Carries only the id or folder
+ *  name, the fixed reason and the time, never the plugin's own text.
+ */
+export type RefusedPlugin = {
+	/**  The plugin id, or the folder name of a developer plugin. */
+	name: string,
+	issue: PluginLoadIssue,
+	/**  When it was refused, in milliseconds since 1970. */
+	atMillis: number | null,
 };
 
 /**  The relay of a server changed (FR-4.20). */
