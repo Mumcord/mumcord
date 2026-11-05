@@ -38,6 +38,7 @@
 ### Fixed
 
 - Screen share sound polish (#435): the "Which app's sound?" list shows each app's own icon on Linux (a coloured square where the app has none), the live bar's sound line says "The Sound switch is off" or "“No sound” was chosen for this window" correctly instead of mixing the two up, the disabled Sound button names the real reason, and the speaker icons are drawn as outlines as in the design
+- Opening a profile that a newer Mumcord already upgraded no longer ends start-up with a bare error: Mumcord now explains that the profile is from a newer version, shows both profile versions and offers "Download the latest version" and "Quit". The profile is left exactly as it is (#510)
 - Kick… and Ban… in the Admin ▸ sub-menu of a person now open their dialog when clicked with the mouse; the click used to close the menu before it reached the item, so nothing happened (#507)
 - The download confirmation no longer lets you press Download before it shows the folder the file will be saved to
 - Joining a screen share no longer picks up the relay access meant for another broadcast of the same person (such as a camera or plugin data), so watching works while they share several things at once

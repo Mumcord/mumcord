@@ -248,6 +248,8 @@ tauri-plugin-single-instance = { version = "2.5", features = ["deep-link"] }
 tauri-plugin-deep-link = "2.6"
 tauri-plugin-global-shortcut = "2.4"
 tauri-plugin-dialog = "2.8"
+# The same build tauri-plugin-dialog uses, for a message before Tauri starts.
+rfd = { version = "0.17", default-features = false, features = ["gtk3", "common-controls-v6"] }
 tauri-plugin-opener = "2.7"
 tauri-plugin-clipboard-manager = "2.5"
 tauri-plugin-updater = { version = "2.10", default-features = false, features = ["rustls-tls", "zip"] }

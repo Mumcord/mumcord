@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use rusqlite::Connection;
+use rusqlite::{Connection, OpenFlags};
 
 use crate::error::{Error, Result};
 
@@ -443,6 +443,9 @@ impl Store {
     /// Opens (or creates) the database in `data_dir` and applies pending migrations.
     /// The directory must exist; the caller decides where app data lives.
     pub fn open(data_dir: &Path) -> Result<Self> {
+        // A read-write open already writes (journal mode, WAL files), which a newer
+        // profile must never see: an older app may not change it (issue #510).
+        check_schema(data_dir)?;
         Self::from_connection(Connection::open(data_dir.join(DB_FILE_NAME))?)
     }
 
@@ -465,15 +468,65 @@ impl Store {
     }
 }
 
-fn migrate(conn: &mut Connection) -> Result<()> {
+/// Fails with [`Error::SchemaTooNew`] if the profile in `data_dir` was upgraded by a newer
+/// Mumcord. Reads only: the database file and its WAL files stay exactly as they are, so the
+/// newer app can still open the profile. No database yet is fine (first start).
+pub fn check_schema(data_dir: &Path) -> Result<()> {
+    let path = data_dir.join(DB_FILE_NAME);
+    if !path.is_file() {
+        return Ok(());
+    }
+    let mut wal = path.clone().into_os_string();
+    wal.push("-wal");
+    if Path::new(&wal).exists() {
+        // The newest version may still sit in the WAL, so SQLite has to read it. Its WAL
+        // files already exist; a read-only connection leaves the database file alone.
+        let conn = Connection::open_with_flags(
+            path,
+            OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX,
+        )?;
+        let current: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        return ensure_supported(current);
+    }
+    // Without a WAL the file header is the whole truth. Reading it directly avoids SQLite,
+    // which would create WAL files beside a closed WAL-mode database even when read-only.
+    match header_user_version(&path)? {
+        Some(current) => ensure_supported(current),
+        // Not an SQLite file: the normal open reports that properly.
+        None => Ok(()),
+    }
+}
+
+/// `user_version` from the database header (a big-endian integer at byte offset 60, see
+/// <https://www.sqlite.org/fileformat.html#the_database_header>), or `None` if `path` holds
+/// no SQLite header.
+fn header_user_version(path: &Path) -> Result<Option<i64>> {
+    use std::io::Read;
+
+    const MAGIC: &[u8; 16] = b"SQLite format 3\0";
+    let mut header = [0u8; 64];
+    let mut file = std::fs::File::open(path).map_err(Error::ProfileRead)?;
+    if file.read_exact(&mut header).is_err() || !header.starts_with(MAGIC) {
+        return Ok(None);
+    }
+    let bytes: [u8; 4] = header[60..64].try_into().expect("four header bytes");
+    Ok(Some(i64::from(i32::from_be_bytes(bytes))))
+}
+
+fn ensure_supported(current: i64) -> Result<()> {
     let supported = MIGRATIONS.len() as i64;
-    let current: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
     if current > supported {
         return Err(Error::SchemaTooNew {
             found: current,
             supported,
         });
     }
+    Ok(())
+}
+
+fn migrate(conn: &mut Connection) -> Result<()> {
+    let current: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+    ensure_supported(current)?;
     for (version, sql) in MIGRATIONS.iter().enumerate().skip(current as usize) {
         let tx = conn.transaction()?;
         tx.execute_batch(sql)?;
@@ -893,6 +946,80 @@ pub(crate) mod tests {
         assert_eq!(store.backfill_server_avatars(None).expect("backfill"), 1);
         assert_eq!(store.server_avatar(id).expect("avatar"), None);
         assert_eq!(store.backfill_server_avatars(Some(b"x")).expect("again"), 0);
+    }
+
+    /// A profile a newer Mumcord already upgraded, closed cleanly as that app leaves it.
+    fn newer_profile(dir: &Path) -> std::path::PathBuf {
+        drop(Store::open(dir).expect("open"));
+        let path = dir.join(DB_FILE_NAME);
+        let conn = Connection::open(&path).expect("open");
+        conn.pragma_update(None, "user_version", MIGRATIONS.len() as i64 + 4)
+            .expect("pragma");
+        drop(conn);
+        path
+    }
+
+    fn sidecars(dir: &Path) -> Vec<String> {
+        let mut names: Vec<String> = std::fs::read_dir(dir)
+            .expect("read dir")
+            .map(|e| e.expect("entry").file_name().to_string_lossy().into_owned())
+            .collect();
+        names.sort();
+        names
+    }
+
+    #[test]
+    fn opening_a_newer_profile_leaves_it_untouched() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = newer_profile(dir.path());
+        let before = std::fs::read(&path).expect("read");
+        let files = sidecars(dir.path());
+
+        let supported = MIGRATIONS.len() as i64;
+        let found = supported + 4;
+        assert!(matches!(
+            check_schema(dir.path()),
+            Err(Error::SchemaTooNew { found: f, supported: s }) if f == found && s == supported
+        ));
+        assert!(matches!(
+            Store::open(dir.path()),
+            Err(Error::SchemaTooNew { .. })
+        ));
+
+        assert_eq!(std::fs::read(&path).expect("read"), before);
+        assert_eq!(sidecars(dir.path()), files);
+    }
+
+    #[test]
+    fn schema_check_reads_a_version_still_in_the_wal() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        drop(Store::open(dir.path()).expect("open"));
+        // The newer app still runs (or crashed): its upgrade is not checkpointed yet.
+        let conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+        conn.pragma_update(None, "wal_autocheckpoint", 0)
+            .expect("pragma");
+        conn.pragma_update(None, "user_version", MIGRATIONS.len() as i64 + 1)
+            .expect("pragma");
+        assert!(matches!(
+            check_schema(dir.path()),
+            Err(Error::SchemaTooNew { .. })
+        ));
+    }
+
+    #[test]
+    fn schema_check_leaves_a_non_database_to_the_open() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        std::fs::write(dir.path().join(DB_FILE_NAME), b"not a database").expect("write");
+        check_schema(dir.path()).expect("the open reports it");
+    }
+
+    #[test]
+    fn schema_check_accepts_a_current_or_missing_profile() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        check_schema(dir.path()).expect("no profile yet");
+        assert!(sidecars(dir.path()).is_empty(), "the check creates no file");
+        drop(Store::open(dir.path()).expect("open"));
+        check_schema(dir.path()).expect("current profile");
     }
 
     #[test]

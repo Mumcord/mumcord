@@ -17,6 +17,7 @@ mod ingame_overlay;
 mod kde;
 #[cfg(target_os = "linux")]
 mod kde_x11;
+mod newer_profile;
 mod notifications;
 mod now_gaming;
 mod now_playing;
@@ -449,6 +450,8 @@ pub fn run() {
         std::process::exit(1);
     }
     let context = tauri::generate_context!();
+    // Before anything opens the database: a profile from a newer Mumcord must stay untouched.
+    newer_profile::stop_if_newer(&context.config().identifier);
     // Before anything else starts a thread or GTK: it may switch to XWayland (FR-1.48).
     display::prepare(&context.config().identifier);
     // Before any web view holds the web cache files open.

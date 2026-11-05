@@ -8,6 +8,8 @@ pub enum Error {
     Database(#[from] rusqlite::Error),
     #[error("database schema version {found} is newer than this app supports ({supported})")]
     SchemaTooNew { found: i64, supported: i64 },
+    #[error("the profile database could not be read: {0}")]
+    ProfileRead(std::io::Error),
     #[error("settings could not be (de)serialized: {0}")]
     Settings(#[from] serde_json::Error),
     #[error("secure storage error: {0}")]
