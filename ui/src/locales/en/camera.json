@@ -53,7 +53,6 @@
     "effectsUnavailable": "Background effects are not available on this PC: {{reason}}",
     "levelBest": "Best",
     "levelLight": "Light",
-    "blurStrengthValue": "{{value}} of 100",
     "imageYoursNumbered": "Your image {{number}}",
     "errorUseNotAllowed": "This server's relay doesn't allow camera sharing.",
     "errorRelayDown": "Camera couldn't start: the relay isn't reachable."

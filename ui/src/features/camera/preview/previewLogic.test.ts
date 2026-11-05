@@ -9,6 +9,7 @@ import {
   desktopOs,
   failureText,
   initialDevice,
+  isStrongBlur,
   loadLine,
   loadLineText,
   sameBackground,
@@ -142,5 +143,14 @@ describe("loadLine", () => {
       "Your PC is too busy for this background effect. Try None.",
     );
     expect(loadLine(null)).toBeNull();
+  });
+});
+
+describe("isStrongBlur", () => {
+  it("treats anything above Light as Strong", () => {
+    expect(isStrongBlur(50)).toBe(false);
+    expect(isStrongBlur(0)).toBe(false);
+    expect(isStrongBlur(100)).toBe(true);
+    expect(isStrongBlur(75)).toBe(true);
   });
 });

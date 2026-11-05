@@ -46,7 +46,11 @@ describe("CameraPreviewDialog", () => {
     expect(within(dialog).getByRole("combobox", { name: "Camera" })).toHaveValue("mock-integrated");
     expect((await api.cameraView())?.state).toBe("preview");
     expect(within(dialog).getByRole("radio", { name: "Blur" })).toBeChecked();
-    expect(within(dialog).getByRole("slider", { name: "Blur strength" })).toHaveValue("50");
+    const strength = within(dialog).getByRole("group", { name: "Blur strength" });
+    expect(within(strength).getByRole("button", { name: "Light" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("switches the background and shows the image library", async () => {
@@ -63,6 +67,26 @@ describe("CameraPreviewDialog", () => {
     fireEvent.click(within(dialog).getByRole("radio", { name: "None" }));
     expect(setBackground).toHaveBeenLastCalledWith({ kind: "none" }, 50);
     expect(within(dialog).queryByRole("radiogroup", { name: "Image" })).toBeNull();
+  });
+
+  it("maps Light and Strong to fixed strengths and saves the choice", async () => {
+    const { dialog, turnOn } = await openDialog();
+    const setBackground = vi.spyOn(api, "cameraSetBackground");
+    const strength = within(dialog).getByRole("group", { name: "Blur strength" });
+    fireEvent.click(within(strength).getByRole("button", { name: "Strong" }));
+    expect(setBackground).toHaveBeenLastCalledWith({ kind: "blur" }, 100);
+    expect(within(strength).getByRole("button", { name: "Strong" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    fireEvent.click(turnOn);
+    await waitFor(
+      () => {
+        expect(screen.queryByRole("dialog")).toBeNull();
+      },
+      { timeout: 3000 },
+    );
+    expect((await api.settingsGet()).cameraBlurStrength).toBe(100);
   });
 
   it("turns the camera on, saves the background and closes once on air", async () => {
