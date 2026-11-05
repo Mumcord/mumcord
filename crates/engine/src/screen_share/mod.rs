@@ -73,7 +73,8 @@ pub use preview::{CpuCores, SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
 pub use sound::{
-    AppName, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+    AppIcon, AppName, NoSoundReason, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest,
+    SoundStatus, SoundUnavailable,
 };
 pub use start::StartOutcome;
 pub use thumbnail::ShareThumbnail;
@@ -923,6 +924,7 @@ impl Engine {
     pub fn screen_share_set_sound(&self, server_id: ServerId, sound: bool) -> EngineResult<()> {
         self.update_own_share(server_id, |own| {
             own.sound = sound && own.sound_status.available();
+            own.sound_status.off = !sound;
             own.sound_status.log(own.sound);
             if let Some(media) = &own.media {
                 media.set_sound(own.sound);
@@ -964,7 +966,8 @@ impl Engine {
             None => SoundOutcome::NoSound,
             Some(id) => chosen_sound(id)?,
         };
-        let (source, status) = outcome.into_parts();
+        let (source, mut status) = outcome.into_parts();
+        status.declined = app.is_none();
         let mut source = Some(source);
         self.update_own_share(server_id, |own| {
             // Another answer may have come first.

@@ -3567,8 +3567,11 @@ export type ScreenShare = {
 	soundMode: ShareSoundMode,
 	/**  The app whose sound is shared, when `soundMode` is `app` (stays on the sharer's device). */
 	soundApp: string | null,
-	/**  Why the share has no sound although the user wanted it (FR-7.85). */
-	soundReason: SoundUnavailableReason | null,
+	/**
+	 *  Why the own share sends no sound, for the live bar's sound line (FR-7.85); `null` while
+	 *  it sends sound, for the shares of others, and when nothing explains it.
+	 */
+	soundReason: ShareSoundReason | null,
 	/**  Set while the share waits for "Which app's sound?" (FR-7.83); the list to offer. */
 	soundChoice: SoundApp[] | null,
 	/**  Who is watching (up to 8). */
@@ -3985,6 +3988,19 @@ export type ShareQuality = {
 /**  What the own share's sound carries (FR-7.76). */
 export type ShareSoundMode = "desktop" | "app" | "none";
 
+/**  Why the own share sends no sound (FR-7.85). */
+export type ShareSoundReason = 
+/**  The Sound switch is off. */
+"off" | 
+/**  "No sound" was chosen in "Which app's sound?". */
+"notChosen" | 
+/**  The system is too old (Windows before 10 version 2004, macOS before 13). */
+"osTooOld" | 
+/**  Linux without a running PipeWire. */
+"noPipeWire" | 
+/**  The sound capture could not start or stopped. */
+"captureFailed";
+
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
 export type ShareStartBlock = {
 	blocked: WatchBlock,
@@ -4011,6 +4027,11 @@ export type SoundApp = {
 	/**  What `screenShareChooseSound` takes. */
 	id: string,
 	name: string,
+	/**
+	 *  The app's icon as a `data:` URL (Linux, where the system has one); the list shows a
+	 *  coloured square without it.
+	 */
+	icon: string | null,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

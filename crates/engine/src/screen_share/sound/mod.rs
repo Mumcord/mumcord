@@ -10,6 +10,8 @@
 //! a new ring whenever the hub's generation changed.
 
 #[cfg(any(target_os = "linux", test))]
+pub mod icon;
+#[cfg(any(target_os = "linux", test))]
 pub mod linux;
 #[cfg(any(target_os = "macos", test))]
 pub mod macos;
@@ -32,7 +34,8 @@ use crate::session::lock;
 use crate::voice::VoiceShared;
 
 pub use status::{
-    AppName, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+    AppIcon, AppName, NoSoundReason, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest,
+    SoundStatus, SoundUnavailable,
 };
 
 /// Why this system cannot share sound at all (FR-7.84), checked before the share starts and

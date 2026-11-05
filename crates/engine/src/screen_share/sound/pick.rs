@@ -8,7 +8,7 @@
 
 use super::linux::SoundTarget;
 use super::matcher::{MatchedApp, SoundMatch, SoundStream, match_sound_app, sound_apps};
-use super::{AppName, SoundApp, SoundRequest, SoundUnavailable};
+use super::{AppIcon, AppName, SoundApp, SoundRequest, SoundUnavailable};
 
 /// The decision for one share's sound.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,13 +66,19 @@ fn id(app: &MatchedApp) -> String {
     }
 }
 
-/// The list entries for `apps`, sorted by name (FR-7.83).
-pub fn entries(apps: &[MatchedApp]) -> Vec<SoundApp> {
+/// The list entries for `apps`, sorted by name (FR-7.83), with the icon `icon` finds for an
+/// icon name: the app's own `application.icon-name`, else its binary, which usually names the
+/// icon too.
+pub fn entries(apps: &[MatchedApp], icon: impl Fn(&str) -> Option<AppIcon>) -> Vec<SoundApp> {
     let mut entries: Vec<SoundApp> = apps
         .iter()
         .map(|app| SoundApp {
             id: id(app),
             name: AppName::new(name(app)),
+            icon: [&app.icon_name, &app.binary]
+                .into_iter()
+                .flatten()
+                .find_map(|n| icon(n)),
         })
         .collect();
     entries.sort_by_cached_key(|e| e.name.as_str().to_lowercase());
@@ -89,6 +95,7 @@ pub use live::{list, start_chosen, take};
 
 #[cfg(target_os = "linux")]
 mod live {
+    use super::super::icon;
     use super::super::linux::{PipeWireSound, SoundTarget, own_pids, playback_streams};
     use super::super::matcher::sound_apps;
     use super::super::{AppName, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest};
@@ -99,14 +106,17 @@ mod live {
     pub fn take(request: SoundRequest, hints: &[&str]) -> SoundOutcome {
         match decide(request, hints, playback_streams, &own_pids()) {
             Decision::Start(target) => start(target),
-            Decision::Choose(apps) => SoundOutcome::Choose(entries(&apps)),
+            Decision::Choose(apps) => SoundOutcome::Choose(entries(&apps, icon::resolve)),
             Decision::Unavailable(reason) => SoundOutcome::Unavailable(reason),
         }
     }
 
     /// The apps playing sound now, for "Which app's sound?" and its live refresh (FR-7.83).
     pub fn list() -> Result<Vec<SoundApp>, SoundUnavailable> {
-        Ok(entries(&sound_apps(&playback_streams()?, &own_pids())))
+        Ok(entries(
+            &sound_apps(&playback_streams()?, &own_pids()),
+            icon::resolve,
+        ))
     }
 
     /// Captures the app the user's answer `id` names; `None` when it stopped playing meanwhile.
@@ -144,6 +154,7 @@ mod tests {
             app_name: Some(name.to_owned()),
             binary: Some(binary.to_owned()),
             desktop_id: None,
+            icon_name: None,
             pid: Some(pid),
         }
     }
@@ -182,7 +193,10 @@ mod tests {
             let Decision::Choose(apps) = decide(SoundRequest::Window, hints, running, &[99]) else {
                 panic!("expected a choice for {hints:?}");
             };
-            let names: Vec<_> = entries(&apps).into_iter().map(|e| e.name).collect();
+            let names: Vec<_> = entries(&apps, |_| None)
+                .into_iter()
+                .map(|e| e.name)
+                .collect();
             assert_eq!(names, [AppName::new("Firefox"), AppName::new("Spotify")]);
         }
     }
@@ -202,9 +216,36 @@ mod tests {
     }
 
     #[test]
+    fn an_entry_takes_the_icon_name_first_and_the_binary_second() {
+        let icon = |name: &str| {
+            (name == "firefox-esr" || name == "spotify").then(|| AppIcon {
+                mime: "image/png",
+                bytes: name.as_bytes().to_vec(),
+            })
+        };
+        let mut streams = running().unwrap_or_default();
+        for s in &mut streams {
+            if s.binary.as_deref() == Some("firefox") {
+                s.icon_name = Some("firefox-esr".into());
+            }
+        }
+        let listed = entries(&sound_apps(&streams, &[99]), icon);
+        let icons: Vec<_> = listed
+            .iter()
+            .map(|e| e.icon.as_ref().map(|i| i.bytes.clone()))
+            .collect();
+        assert_eq!(
+            icons,
+            [Some(b"firefox-esr".to_vec()), Some(b"spotify".to_vec())]
+        );
+        let none = entries(&sound_apps(&streams, &[99]), |_| None);
+        assert!(none.iter().all(|e| e.icon.is_none()), "the fallback square");
+    }
+
+    #[test]
     fn an_answer_finds_its_app_again() {
         let apps = sound_apps(&running().unwrap_or_default(), &[99]);
-        let listed = entries(&apps);
+        let listed = entries(&apps, |_| None);
         let firefox = listed.iter().find(|e| e.name.as_str() == "Firefox");
         let firefox = firefox.map(|e| e.id.clone()).unwrap_or_default();
         assert_eq!(firefox, "bin:firefox");
@@ -220,6 +261,7 @@ mod tests {
         let app = MatchedApp {
             app_name: None,
             binary: None,
+            icon_name: None,
             pids: vec![7, 9],
         };
         assert_eq!(id(&app), "pid:7");
