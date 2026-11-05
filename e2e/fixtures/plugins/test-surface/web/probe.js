@@ -393,6 +393,11 @@ function build() {
   document.getElementById("run-all").addEventListener("click", runAll);
   document.getElementById("busy").addEventListener("click", busy);
   document.getElementById("tone").addEventListener("click", () => show("tone-click", tone()));
+  // A gesture-bound host call asked for from inside the page (FR-9.45): it works only after a
+  // trusted click here, never after a script-made one.
+  document
+    .getElementById("start-stage")
+    ?.addEventListener("click", () => send(`start-stage:${PLACE}`));
 }
 
 window.addEventListener("message", (event) => {

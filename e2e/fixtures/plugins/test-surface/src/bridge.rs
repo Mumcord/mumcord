@@ -2,12 +2,14 @@
 //!
 //! Plugin → page: `run:<place>:<probe>` (`all` runs every probe that does not navigate),
 //! `busy:<place>`, `hog:<place>`, `tone:<place>`; `<place>` is a page's place or `*`.
-//! Page → plugin: `ready:<place>` and `result:<place>:<probe>:<status>`.
+//! Page → plugin: `ready:<place>`, `result:<place>:<probe>:<status>` and `start-stage:<place>`
+//! (the page's button asks the plugin to start the stage, a gesture-bound call).
 
 /// What a page reported. The page is untrusted, so anything else is dropped.
 #[derive(Debug, PartialEq, Eq)]
 pub enum PageMessage {
     Ready(String),
+    StartStage(String),
     Result {
         place: String,
         probe: String,
@@ -30,6 +32,7 @@ pub fn parse(message: &str) -> Option<PageMessage> {
     let mut parts = message.split(':');
     let message = match (parts.next()?, parts.next(), parts.next(), parts.next()) {
         ("ready", Some(place), None, None) => PageMessage::Ready(word(place)?),
+        ("start-stage", Some(place), None, None) => PageMessage::StartStage(word(place)?),
         ("result", Some(place), Some(probe), Some(status)) => PageMessage::Result {
             place: word(place)?,
             probe: word(probe)?,
@@ -49,6 +52,10 @@ mod tests {
         assert_eq!(
             parse("ready:stage"),
             Some(PageMessage::Ready("stage".into()))
+        );
+        assert_eq!(
+            parse("start-stage:side"),
+            Some(PageMessage::StartStage("side".into()))
         );
         assert_eq!(
             parse("result:side:fetch-undeclared:blocked"),
@@ -71,6 +78,8 @@ mod tests {
             "result:stage:x:ok:extra",
             "result:stage:<b>:ok",
             "hello:stage",
+            "start-stage",
+            "start-stage:side:x",
         ] {
             assert_eq!(parse(bad), None, "{bad}");
         }

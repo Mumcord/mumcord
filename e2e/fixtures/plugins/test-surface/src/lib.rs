@@ -1,8 +1,9 @@
 //! E2E test plugin for web content (spec 09 §10.2): pages in the stage, side panel, dialog and
 //! panel popover with one probe per isolation check (AC-9.2, AC-9.3, S0), busy-loop and
-//! memory-hog modes (AC-9.4), a bundled sound (AC-9.23), `net.http` calls (AC-9.7) and two
-//! Apps-menu items (AC-9.17). The panel is the control surface: its buttons are user gestures, and
-//! it shows every result so the E2E test can read them without entering a frame.
+//! memory-hog modes (AC-9.4), a bundled sound (AC-9.23), `net.http` calls (AC-9.7), two
+//! Apps-menu items (AC-9.17) and a side-panel page button that starts the stage (AC-9.13). The
+//! panel is the control surface: its buttons are user gestures, and it shows every result so the
+//! E2E test can read them without entering a frame.
 
 mod bridge;
 mod messages;
@@ -169,6 +170,13 @@ fn act(action: &str) {
 fn on_page(message: &str) {
     match bridge::parse(message) {
         Some(PageMessage::Ready(place)) => note(format!("ready: {place}")),
+        // Gesture-bound: it works only within 8 s of a trusted click (here: in the page).
+        Some(PageMessage::StartStage(place)) => {
+            outcome(
+                &format!("{place}-start-stage"),
+                stage::start_web(TITLE, "stage.html"),
+            );
+        }
         Some(PageMessage::Result {
             place,
             probe,
