@@ -86,8 +86,12 @@ async function chooseApp(label: string): Promise<void> {
 
 async function openPanel(): Promise<void> {
   const icon = $(`button.pstrip-icon[aria-label='${SURFACE}']`);
-  await icon.waitForClickable({ timeout: 20_000, timeoutMsg: `${SURFACE} has no strip icon` });
-  if ((await icon.getAttribute("aria-pressed")) !== "true") await icon.click();
+  await icon.waitForExist({ timeout: 20_000, timeoutMsg: `${SURFACE} has no strip icon` });
+  // An open panel is left alone: reading its log must work while a plugin dialog covers it.
+  if ((await icon.getAttribute("aria-pressed")) !== "true") {
+    await icon.waitForClickable({ timeout: 10_000 });
+    await icon.click();
+  }
 }
 
 /** Clicks a button of the plugin's panel (a user gesture for the plugin). */
@@ -265,7 +269,8 @@ describe("plugins 1.1: Apps menu, command palette and web frames (AC-9.16, AC-9.
     await dialog.waitForDisplayed({ timeout: 15_000, timeoutMsg: "the web dialog did not open" });
     await expect(dialog.$(".plugin-frame__tag")).toHaveText(TAG);
     await expect(dialog.$(`button[aria-label='Close ${SURFACE}']`)).toBeDisplayed();
-    await expect(dialog.$(".plugin-webview__frame")).toHaveAttribute("aria-label", `${SURFACE}, plugin content`);
+    // On Linux the frame is an iframe, named by its title (the native web views elsewhere use aria-label).
+    await expect(dialog.$("iframe.plugin-webview__frame")).toHaveAttribute("title", `${SURFACE}, plugin content`);
     await dialog.$(`button[aria-label='Close ${SURFACE}']`).click();
     await dialog.waitForExist({ reverse: true, timeout: 10_000 });
 
@@ -275,14 +280,14 @@ describe("plugins 1.1: Apps menu, command palette and web frames (AC-9.16, AC-9.
     await expect(sidePanel().$(`button[aria-label='${SURFACE} options']`)).toBeDisplayed();
     await expect(sidePanel().$(`button[aria-label='Close ${SURFACE} side panel']`)).toBeDisplayed();
 
-    // Stage, side panel and popover are three frames; the dialog would be the fourth.
-    await panelButton("Open popover");
-    await waitLog(/^open-popover: ok$/);
-    await panelButton("Open dialog");
-    const refused = await waitLog(/^open-dialog: (?!ok$)/);
+    // Stage, side panel and dialog page are three frames; the panel popover, which shares the
+    // dialog's slot, would be the fourth. (A popover opened first closes when the dialog opens.)
+    await panelButton("Open dialog and popover");
+    await waitLog(/^open-dialog: ok$/);
+    const refused = await waitLog(/^open-popover: (?!ok$)/);
     expect(refused).toMatch(/quota/i);
-    await expect($(`div.plugin-web-dialog[role='dialog']`)).not.toBeExisting();
-    // The dialog's tree part may still have opened; close whatever modal is up.
+    await expect($(`div.plugin-web-dialog[role='dialog']`)).toBeDisplayed();
+    // Close the dialog again.
     if (await $("[role='dialog'][aria-modal='true']").isExisting()) await browser.keys("Escape");
   });
 

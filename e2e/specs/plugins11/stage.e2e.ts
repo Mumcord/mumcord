@@ -145,8 +145,12 @@ async function chooseApp(label: string): Promise<void> {
 /** Opens a plugin's panel in the strip (no-op when it is open). */
 async function openPanel(plugin: string): Promise<void> {
   const icon = $(`button.pstrip-icon[aria-label='${plugin}']`);
-  await icon.waitForClickable({ timeout: 20_000, timeoutMsg: `${plugin} has no strip icon` });
-  if ((await icon.getAttribute("aria-pressed")) !== "true") await icon.click();
+  await icon.waitForExist({ timeout: 20_000, timeoutMsg: `${plugin} has no strip icon` });
+  // An open panel is left alone: reading its log must work while a plugin dialog covers it.
+  if ((await icon.getAttribute("aria-pressed")) !== "true") {
+    await icon.waitForClickable({ timeout: 10_000 });
+    await icon.click();
+  }
 }
 
 /**
