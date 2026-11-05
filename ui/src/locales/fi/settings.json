@@ -17,7 +17,8 @@
     "packetInspector": "Pakettitarkastin",
     "hotkeys": "Pikanäppäimet",
     "plugins": "Lisäosat",
-    "screenSharing": "Näytön jakaminen"
+    "screenSharing": "Näytön jakaminen",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Käynnistys, kieli, päivitykset ja saavutettavuus.",
@@ -31,7 +32,8 @@
     "advanced": "Kehittäjätyökalut, diagnostiikka, tallennustila ja lisenssit.",
     "about": "Versio, tuki ja käyttöönottoavustaja.",
     "plugins": "Lisäosat toimivat hiekkalaatikossa ja saavat vain sen, minkä sallit. Ne eivät koskaan näe ääntäsi, tiedostojasi tai varmennettasi.",
-    "screenSharing": "Näytön jakamisen laatu, koodekki ja laitteisto. Katsojat näkevät aina sen, minkä valitset, ennen kuin aloitat."
+    "screenSharing": "Näytön jakamisen laatu, koodekki ja laitteisto. Katsojat näkevät aina sen, minkä valitset, ennen kuin aloitat.",
+    "camera": "Kamerasi, taustatehosteet ja se, miten näet muiden kamerat. Kameran jakaminen vaatii palvelimen, jossa on mumpeer-välitys."
   },
   "breadcrumb": "Asetukset / {{section}}",
   "moreInfo": "Lisätietoja: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "hälytykset ponnahdusikkunat",
     "externalContent": "upotukset kuvat esikatselut",
     "fileSharing": "tiedostot lähetä vastaanota lataa tallenna kansio liite zip",
-    "screenSharing": "näytön jakaminen laatu tarkkuus fps koodekki AV1 VP9 enkooderi näytönohjain"
+    "screenSharing": "näytön jakaminen laatu tarkkuus fps koodekki AV1 VP9 enkooderi näytönohjain",
+    "camera": "kamera web-kamera video tausta sumennus virtuaalitausta peilaus omakuva"
   },
   "search": {
     "label": "Hae asetuksista",
@@ -1046,7 +1049,9 @@
     "addNone": "Yhdistä palvelimeen valitaksesi jonkin sen kanavista.",
     "addConfirm": "Lisää",
     "reset": "Nollaa kaikki pikanäppäimet",
-    "resetHint": "Poistaa kaikki pikanäppäimet paitsi Puhu painamalla; oletuksena mitään ei ole asetettu."
+    "resetHint": "Poistaa kaikki pikanäppäimet paitsi Puhu painamalla; oletuksena mitään ei ole asetettu.",
+    "camera": "Kamera päälle / pois",
+    "cameraHint": "Avaa esikatselun, kun kamera on pois päältä, ja sammuttaa kameran, kun se on päällä."
   },
   "developerMode": {
     "title": "Kehittäjätila",
@@ -1124,5 +1129,71 @@
     "skippedAboveLimit": "VP9 (kuvasi ylittää sen, minkä AV1 jaksaa tässä)",
     "softwareWarning": "AV1 toimii suorittimella ilman läpäistyä tarkistusta ja voi olla liian raskas tälle tietokoneelle.",
     "checkAgain": "Tarkista uudelleen"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Kameran esikatselu",
+    "previewName": "Sinä",
+    "previewNote": "Esikatselu, vain tällä laitteella. Se pysähtyy, kun poistut tältä sivulta.",
+    "device": "Kamera",
+    "deviceDefault": "Järjestelmän oletus",
+    "noDevice": "Kameraa ei löytynyt",
+    "sendQuality": "Lähetyksen laatu",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (enintään 720p · 30 fps) lähettää vain sen, mitä katsojat tarvitsevat: pienempänä suuressa ruudukossa, tarkempana kun joku kiinnittää sinut.",
+    "mirror": "Peilaa oma kuvani",
+    "mirrorHint": "Vain oma näkymäsi peilataan. Muut näkevät sinut oikein päin.",
+    "backgroundTitle": "Tausta",
+    "defaultBackground": "Oletustausta",
+    "backgroundNone": "Ei mitään",
+    "backgroundBlur": "Sumennus",
+    "backgroundLibrary": "Kuva: kirjasto",
+    "backgroundOwn": "Kuva: {{name}} (oma)",
+    "blurStrength": "Sumennuksen voimakkuus",
+    "blurLight": "Kevyt",
+    "blurStrong": "Voimakas",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Tehosteiden laatu",
+    "effectAuto": "Auto",
+    "effectBest": "Paras (näytönohjain)",
+    "effectLight": "Kevyt (säästää akkua)",
+    "effectHint": "Auto käyttää näytönohjainta, kun se on mahdollista, ja vaihtaa Kevyeen akulla tai kun tietokone on kuormitettu.",
+    "ownImages_one": "Omat taustakuvasi pysyvät tällä laitteella (tallennettu: {{count}}). Vain valmis kuva lähetetään.",
+    "ownImages_other": "Omat taustakuvasi pysyvät tällä laitteella (tallennettu: {{count}}). Vain valmis kuva lähetetään.",
+    "manageImages": "Hallitse kuvia",
+    "imagesTitle": "Taustakuvasi",
+    "imagesEmpty": "Ei vielä kuvia. Lisää PNG-, JPEG- tai WebP-kuva käytettäväksi taustana.",
+    "imageName": "Kuva {{number}}",
+    "imageDelete": "Poista",
+    "imageDeleteLabel": "Poista {{name}}",
+    "imageDeleted": "{{name}} poistettu",
+    "imageAdded": "{{name}} lisätty",
+    "addImage": "Lisää kuva",
+    "addImageTitle": "Valitse taustakuva",
+    "imageFilter": "Kuvat",
+    "close": "Sulje",
+    "privacyTitle": "Yksityisyys",
+    "lockOff": "Sammuta kamerani, kun näyttö lukittuu",
+    "privacyNote": "Kamerasi alkaa aina pois päältä ja näyttää ensin esikatselun. Se sammuu, kun poistut kanavalta tai katkaiset yhteyden. Vain puhekanavasi jäsenet näkevät sen tämän palvelimen välityksen kautta, päästä päähän salattuna. Mumcord ei koskaan tallenna kameroita.",
+    "othersTitle": "Muiden kamerat",
+    "showCameras": "Näytä kamerat",
+    "showAlways": "Aina",
+    "showOnOpen": "Kun avaan huoneen",
+    "showNever": "Ei koskaan",
+    "showHint": "Aina avaa kamerahuoneen, kun joku kanavallasi kytkee kameran päälle. Ei koskaan pitää sinut vain äänessä eikä lataa videota.",
+    "dataSaver": "Datansäästö: enintään 15 fps kaikille",
+    "reduceMotion": "Vähennä liikettä: ei hehkua tai animaatiota puhujan kehyksessä",
+    "reduceMotionHint": "Noudattaa oletuksena järjestelmän liikkeen vähennys -asetusta.",
+    "errors": {
+      "busy": "Kamera pysähtyi: toinen sovellus käyttää kameraasi.",
+      "noCamera": "Kameraa ei löytynyt. Liitä kamera, niin se näkyy tässä.",
+      "permissionDenied": "Kameran käyttö estettiin",
+      "deviceGone": "Kamera pysähtyi: kamera irrotettiin.",
+      "unreadable": "Kamera pysähtyi: kamera lähettää lukukelvotonta kuvaa.",
+      "cameraFailed": "Kameraa ei voitu käynnistää."
+    },
+    "imageImportFailed": "Tätä kuvaa ei voi käyttää. Käytä enintään 10 Mt:n PNG-, JPEG- tai WebP-tiedostoa."
   }
 }

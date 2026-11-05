@@ -1,0 +1,115 @@
+/* Settings → Camera page (spec 08, mockup 11). */
+
+.settings-camera-preview {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin: var(--space-2) 0;
+}
+
+.settings-camera-preview__tile {
+  position: relative;
+  flex: none;
+  width: 13rem;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #15112b;
+}
+
+.settings-camera-preview__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Only the own view is mirrored; the picture that is sent never is (FR-8.11). */
+.settings-camera-preview__video[data-mirror] {
+  transform: scaleX(-1);
+}
+
+.settings-camera-preview__message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--space-3);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.settings-camera-preview__name {
+  position: absolute;
+  left: var(--space-2);
+  bottom: var(--space-2);
+  z-index: 2;
+  max-width: calc(100% - 1rem);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--media-scrim);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.settings-camera-preview__note {
+  margin: 0;
+}
+
+.settings-camera-images {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-camera-images__item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.settings-camera-images__thumb {
+  flex: none;
+  width: 4.5rem;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-chat);
+  object-fit: cover;
+}
+
+.settings-camera-images__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-camera-images__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+@media (forced-colors: active) {
+  .settings-camera-preview__tile {
+    border: 1px solid CanvasText;
+  }
+}
+
+.settings-camera-blur {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

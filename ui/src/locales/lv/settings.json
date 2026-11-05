@@ -17,7 +17,8 @@
     "packetInspector": "Pakešu inspektors",
     "hotkeys": "Īsinājumtaustiņi",
     "plugins": "Spraudņi",
-    "screenSharing": "Ekrāna kopīgošana"
+    "screenSharing": "Ekrāna kopīgošana",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Palaišana, valoda, atjauninājumi un pieejamība.",
@@ -31,7 +32,8 @@
     "advanced": "Izstrādātāju rīki, diagnostika, krātuve un licences.",
     "about": "Versija, atbalsts un iestatīšanas vednis.",
     "plugins": "Spraudņi darbojas izolētā vidē un saņem tikai to, ko atļaujat. Tie nekad neredz jūsu audio, failus vai sertifikātu.",
-    "screenSharing": "Ekrāna kopīgošanas kvalitāte, kodeks un aparatūra. Skatītāji vienmēr redz to, ko izvēlies pirms sākšanas."
+    "screenSharing": "Ekrāna kopīgošanas kvalitāte, kodeks un aparatūra. Skatītāji vienmēr redz to, ko izvēlies pirms sākšanas.",
+    "camera": "Jūsu kamera, fona efekti un tas, kā redzat citu kameras. Kameras kopīgošanai nepieciešams serveris ar mumpeer relay."
   },
   "breadcrumb": "Iestatījumi / {{section}}",
   "moreInfo": "Papildinformācija: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "brīdinājumi uznirstošie logi",
     "externalContent": "iegulumi attēli priekšskatījumi",
     "fileSharing": "faili sūtīt saņemt lejupielādēt saglabāt mape pielikums zip",
-    "screenSharing": "ekrāna kopīgošana kvalitāte izšķirtspēja fps kodeks AV1 VP9 kodētājs grafiskā karte"
+    "screenSharing": "ekrāna kopīgošana kvalitāte izšķirtspēja fps kodeks AV1 VP9 kodētājs grafiskā karte",
+    "camera": "kamera tīmekļa kamera video fons izpludināšana virtuālais fons spoguļot paša skats"
   },
   "search": {
     "label": "Meklēt iestatījumos",
@@ -1054,7 +1057,9 @@
     "addNone": "Pieslēdzies serverim, lai izvēlētos kādu no tā kanāliem.",
     "addConfirm": "Pievienot",
     "reset": "Atiestatīt visus īsinājumtaustiņus",
-    "resetHint": "Noņem visus īsinājumtaustiņus, izņemot push-to-talk; pēc noklusējuma nekas nav iestatīts."
+    "resetHint": "Noņem visus īsinājumtaustiņus, izņemot push-to-talk; pēc noklusējuma nekas nav iestatīts.",
+    "camera": "Ieslēgt / izslēgt kameru",
+    "cameraHint": "Atver priekšskatījumu, kad kamera ir izslēgta, un izslēdz to, kad tā ir ieslēgta."
   },
   "developerMode": {
     "title": "Izstrādātāja režīms",
@@ -1132,5 +1137,72 @@
     "skippedAboveLimit": "VP9 (tavs attēls pārsniedz to, ko AV1 šeit spēj)",
     "softwareWarning": "AV1 darbosies procesorā bez izturētas pārbaudes un var būt pārāk smags šim datoram.",
     "checkAgain": "Pārbaudīt vēlreiz"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Jūsu kameras priekšskatījums",
+    "previewName": "Jūs",
+    "previewNote": "Priekšskatījums tikai šajā ierīcē. Tas apstājas, kad atstājat šo lapu.",
+    "device": "Kamera",
+    "deviceDefault": "Sistēmas noklusējums",
+    "noDevice": "Kamera nav atrasta",
+    "sendQuality": "Sūtīšanas kvalitāte",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (līdz 720p · 30 fps) sūta tikai tik, cik vajag skatītājiem: mazāk lielā režģī, skaidrāk, kad kāds jūs piespraud.",
+    "mirror": "Spoguļot manu paša skatu",
+    "mirrorHint": "Tiek spoguļots tikai jūsu paša skats. Citi jūs redz pareizi.",
+    "backgroundTitle": "Fons",
+    "defaultBackground": "Noklusējuma fons",
+    "backgroundNone": "Nav",
+    "backgroundBlur": "Izpludināšana",
+    "backgroundLibrary": "Attēls: bibliotēka",
+    "backgroundOwn": "Attēls: {{name}} (jūsu)",
+    "blurStrength": "Izpludināšanas stiprums",
+    "blurLight": "Vāja",
+    "blurStrong": "Stipra",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Efektu kvalitāte",
+    "effectAuto": "Auto",
+    "effectBest": "Labākā (grafikas karte)",
+    "effectLight": "Viegla (taupa bateriju)",
+    "effectHint": "Auto izmanto grafikas karti, kad var, un pārslēdzas uz Vieglu, strādājot ar bateriju vai kad dators ir noslogots.",
+    "ownImages_zero": "Jūsu paša fona attēli paliek šajā ierīcē (saglabāti: {{count}}). Tiek sūtīts tikai gatavais attēls.",
+    "ownImages_one": "Jūsu paša fona attēli paliek šajā ierīcē (saglabāti: {{count}}). Tiek sūtīts tikai gatavais attēls.",
+    "ownImages_other": "Jūsu paša fona attēli paliek šajā ierīcē (saglabāti: {{count}}). Tiek sūtīts tikai gatavais attēls.",
+    "manageImages": "Pārvaldīt attēlus",
+    "imagesTitle": "Jūsu fona attēli",
+    "imagesEmpty": "Attēlu vēl nav. Pievienojiet PNG, JPEG vai WebP attēlu, lai izmantotu to kā fonu.",
+    "imageName": "Attēls {{number}}",
+    "imageDelete": "Dzēst",
+    "imageDeleteLabel": "Dzēst {{name}}",
+    "imageDeleted": "{{name}} izdzēsts",
+    "imageAdded": "{{name}} pievienots",
+    "addImage": "Pievienot attēlu",
+    "addImageTitle": "Izvēlieties fona attēlu",
+    "imageFilter": "Attēli",
+    "close": "Aizvērt",
+    "privacyTitle": "Privātums",
+    "lockOff": "Izslēgt manu kameru, kad ekrāns tiek bloķēts",
+    "privacyNote": "Jūsu kamera vienmēr sākas izslēgta un vispirms rāda priekšskatījumu. Tā izslēdzas, kad atstājat kanālu vai atvienojaties. To var redzēt tikai jūsu balss kanāla cilvēki, izmantojot šī servera relay, ar pilnīgu šifrēšanu. Mumcord nekad neieraksta kameras.",
+    "othersTitle": "Citu kameras",
+    "showCameras": "Rādīt kameras",
+    "showAlways": "Vienmēr",
+    "showOnOpen": "Kad atveru istabu",
+    "showNever": "Nekad",
+    "showHint": "Vienmēr atver kameru istabu, kad kāds jūsu kanālā ieslēdz kameru. Nekad paliek tikai balss un neielādē video.",
+    "dataSaver": "Datu taupīšana: līdz 15 fps visiem",
+    "reduceMotion": "Samazināt kustību: bez mirdzuma un animācijas ap runātāja rāmi",
+    "reduceMotionHint": "Pēc noklusējuma ievēro sistēmas kustības samazināšanas iestatījumu.",
+    "errors": {
+      "busy": "Kamera apstājās: jūsu kameru izmanto cita lietotne.",
+      "noCamera": "Kamera nav atrasta. Pieslēdziet kameru, un tā parādīsies šeit.",
+      "permissionDenied": "Piekļuve kamerai tika liegta",
+      "deviceGone": "Kamera apstājās: kamera tika atvienota.",
+      "unreadable": "Kamera apstājās: kamera sūta nelasāmu attēlu.",
+      "cameraFailed": "Kameru neizdevās startēt."
+    },
+    "imageImportFailed": "Šo attēlu nevar izmantot. Izmantojiet PNG, JPEG vai WebP failu līdz 10 MB."
   }
 }

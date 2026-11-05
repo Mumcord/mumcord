@@ -174,6 +174,16 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
     update({ pttKey, hotkeys: (await freed(conflict)).hotkeys });
   };
 
+  /** The camera hotkey is its own setting (FR-8.20), not an entry of the hotkey list. */
+  const assignCamera = async (key: string, conflict: HotkeyConflict | null) => {
+    const rest = await freed(conflict);
+    update(
+      rest.clearPtt
+        ? { cameraHotkey: key, hotkeys: rest.hotkeys, pttKey: null }
+        : { cameraHotkey: key, hotkeys: rest.hotkeys },
+    );
+  };
+
   const assignPending = (
     assign: (key: string, conflict: HotkeyConflict | null) => Promise<void>,
     conflict: PendingConflict,
@@ -361,6 +371,18 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
         />
       )}
       {AFTER_CHANNELS.map((kind) => actionRow({ kind }))}
+      <HotkeyRow
+        label={t("hotkeys.camera")}
+        description={t("hotkeys.cameraHint")}
+        value={settings.cameraHotkey}
+        onCapture={(combo) => capture(combo, { kind: "new" }, assignCamera)}
+        onAssign={(conflict) => {
+          assignPending(assignCamera, conflict);
+        }}
+        onClear={() => {
+          update({ cameraHotkey: null });
+        }}
+      />
       {whisper?.targets.map(whisperRow)}
       <AddChannelHotkey
         taken={channelRows}

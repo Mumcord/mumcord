@@ -17,7 +17,8 @@
     "packetInspector": "Ispettur tal-pakketti",
     "hotkeys": "Shortcuts",
     "plugins": "Plagins",
-    "screenSharing": "Qsim tal-iskrin"
+    "screenSharing": "Qsim tal-iskrin",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Tnedija, lingwa, aġġornamenti u aċċessibbiltà.",
@@ -31,7 +32,8 @@
     "advanced": "Għodod għall-iżviluppaturi, dijanjostika, ħażna u liċenzji.",
     "about": "Verżjoni, appoġġ u l-wizard tas-setup.",
     "plugins": "Il-plugins jaħdmu f'sandbox u jirċievu biss dak li tippermetti. Qatt ma jaraw l-awdjo, il-fajls jew iċ-ċertifikat tiegħek.",
-    "screenSharing": "Kwalità, kodek u ħardwer biex taqsam l-iskrin tiegħek. Dawk li jaraw dejjem jaraw dak li tagħżel qabel tibda."
+    "screenSharing": "Kwalità, kodek u ħardwer biex taqsam l-iskrin tiegħek. Dawk li jaraw dejjem jaraw dak li tagħżel qabel tibda.",
+    "camera": "Il-kamera tiegħek, l-effetti tal-isfond u kif tara l-kameras tal-oħrajn. Il-qsim tal-kamera jeħtieġ server b'relay mumpeer."
   },
   "breadcrumb": "Settings / {{section}}",
   "moreInfo": "Aktar informazzjoni: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "twissijiet pop-ups",
     "externalContent": "embeds immaġini previews",
     "fileSharing": "fajls ibgħat irċievi niżżel sejvja folder anness zip",
-    "screenSharing": "qsim tal-iskrin kwalità riżoluzzjoni fps kodek AV1 VP9 enkoder karta grafika"
+    "screenSharing": "qsim tal-iskrin kwalità riżoluzzjoni fps kodek AV1 VP9 enkoder karta grafika",
+    "camera": "kamera webcam vidjo isfond tbajja isfond virtwali mirja veduta tiegħi"
   },
   "search": {
     "label": "Fittex fis-settings",
@@ -1070,7 +1073,9 @@
     "addNone": "Qabbad ma' server biex tagħżel wieħed mill-kanali tiegħu.",
     "addConfirm": "Żid",
     "reset": "Irrisettja s-shortcuts kollha",
-    "resetHint": "Ineħħi s-shortcuts kollha ħlief push-to-talk; b'mod awtomatiku ma hemm xejn issettjat."
+    "resetHint": "Ineħħi s-shortcuts kollha ħlief push-to-talk; b'mod awtomatiku ma hemm xejn issettjat.",
+    "camera": "Qabbad / itfi l-kamera",
+    "cameraHint": "Jiftaħ il-previżjoni meta l-kamera tkun mitfija u jitfiha meta tkun mixgħula."
   },
   "developerMode": {
     "title": "Modalità tal-iżviluppatur",
@@ -1148,5 +1153,74 @@
     "skippedAboveLimit": "VP9 (l-immaġni tiegħek hija ogħla minn dak li AV1 jimmaniġġja hawn)",
     "softwareWarning": "AV1 se jaħdem fuq il-proċessur mingħajr verifika li għaddiet u jista' jkun tqil wisq għal dan il-PC.",
     "checkAgain": "Iċċekkja mill-ġdid"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Previżjoni tal-kamera tiegħek",
+    "previewName": "Int",
+    "previewNote": "Previżjoni, biss fuq dan l-apparat. Tieqaf meta tħalli din il-paġna.",
+    "device": "Kamera",
+    "deviceDefault": "Awtomatika tas-sistema",
+    "noDevice": "Ma nstabet ebda kamera",
+    "sendQuality": "Kwalità tal-intbagħt",
+    "sendQualityAuto": "Awto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Awto (sa 720p · 30 fps) jibgħat biss dak li jeħtieġu dawk li qed jaraw: iżgħar f'griglja kbira, aktar ċar meta xi ħadd jippinjak.",
+    "mirror": "Immirja l-veduta tiegħi",
+    "mirrorHint": "Il-veduta tiegħek biss tkun mirjata. L-oħrajn jarawk sew.",
+    "backgroundTitle": "Isfond",
+    "defaultBackground": "Isfond standard",
+    "backgroundNone": "Xejn",
+    "backgroundBlur": "Tbajja",
+    "backgroundLibrary": "Stampa: librerija",
+    "backgroundOwn": "Stampa: {{name}} (tiegħek)",
+    "blurStrength": "Qawwa tat-tbajja",
+    "blurLight": "Ħafifa",
+    "blurStrong": "Qawwija",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Kwalità tal-effetti",
+    "effectAuto": "Awto",
+    "effectBest": "L-aqwa (kard grafika)",
+    "effectLight": "Ħafifa (tfaddal il-batterija)",
+    "effectHint": "Awto juża l-kard grafika meta jista' u jaqleb għal Ħafifa bil-batterija jew meta l-PC ikun okkupat.",
+    "ownImages_one": "L-istampi tal-isfond tiegħek stess jibqgħu fuq dan l-apparat (maħżuna: {{count}}). Tintbagħat biss l-istampa lesta.",
+    "ownImages_two": "L-istampi tal-isfond tiegħek stess jibqgħu fuq dan l-apparat (maħżuna: {{count}}). Tintbagħat biss l-istampa lesta.",
+    "ownImages_few": "L-istampi tal-isfond tiegħek stess jibqgħu fuq dan l-apparat (maħżuna: {{count}}). Tintbagħat biss l-istampa lesta.",
+    "ownImages_many": "L-istampi tal-isfond tiegħek stess jibqgħu fuq dan l-apparat (maħżuna: {{count}}). Tintbagħat biss l-istampa lesta.",
+    "ownImages_other": "L-istampi tal-isfond tiegħek stess jibqgħu fuq dan l-apparat (maħżuna: {{count}}). Tintbagħat biss l-istampa lesta.",
+    "manageImages": "Immaniġġja l-istampi",
+    "imagesTitle": "L-istampi tal-isfond tiegħek",
+    "imagesEmpty": "Għad m'hemm l-ebda stampa. Żid stampa PNG, JPEG jew WebP biex tużaha bħala isfond.",
+    "imageName": "Stampa {{number}}",
+    "imageDelete": "Ħassar",
+    "imageDeleteLabel": "Ħassar {{name}}",
+    "imageDeleted": "{{name}} tħassar",
+    "imageAdded": "{{name}} żdied",
+    "addImage": "Żid stampa",
+    "addImageTitle": "Agħżel stampa tal-isfond",
+    "imageFilter": "Stampi",
+    "close": "Agħlaq",
+    "privacyTitle": "Privatezza",
+    "lockOff": "Itfi l-kamera tiegħi meta l-iskrin jissakkar",
+    "privacyNote": "Il-kamera tiegħek dejjem tibda mitfija u l-ewwel turi previżjoni. Titfi meta titlaq mill-kanal jew tiskonnettja. Jarawha biss in-nies fil-kanal tal-leħen tiegħek, permezz tar-relay ta' dan is-server, imkriptjata minn tarf sa tarf. Mumcord qatt ma jirrekordja kameras.",
+    "othersTitle": "Kameras tal-oħrajn",
+    "showCameras": "Uri l-kameras",
+    "showAlways": "Dejjem",
+    "showOnOpen": "Meta niftaħ il-kamra",
+    "showNever": "Qatt",
+    "showHint": "Dejjem jiftaħ il-kamra tal-kameras meta xi ħadd fil-kanal tiegħek iqabbad kamera. Qatt iżommok bil-leħen biss u ma jniżżilx vidjo.",
+    "dataSaver": "Iffrankar tad-data: sa 15 fps għal kulħadd",
+    "reduceMotion": "Naqqas il-moviment: l-ebda tleqqija jew animazzjoni fuq il-qafas ta' min qed jitkellem",
+    "reduceMotionHint": "B'mod awtomatiku jsegwi l-issettjar tas-sistema għat-tnaqqis tal-moviment.",
+    "errors": {
+      "busy": "Il-kamera waqfet: app oħra qed tuża l-kamera tiegħek.",
+      "noCamera": "Ma nstabet ebda kamera. Qabbad kamera u tidher hawn.",
+      "permissionDenied": "L-aċċess għall-kamera ġie miċħud",
+      "deviceGone": "Il-kamera waqfet: il-kamera ġiet skonnettjata.",
+      "unreadable": "Il-kamera waqfet: il-kamera qed tibgħat stampi li ma jinqrawx.",
+      "cameraFailed": "Ma setgħetx tinbeda l-kamera."
+    },
+    "imageImportFailed": "Din l-istampa ma tistax tintuża. Uża fajl PNG, JPEG jew WebP sa 10 MB."
   }
 }

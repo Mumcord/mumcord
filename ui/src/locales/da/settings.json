@@ -17,7 +17,8 @@
     "packetInspector": "Pakkeinspektør",
     "hotkeys": "Genveje",
     "plugins": "Plugins",
-    "screenSharing": "Skærmdeling"
+    "screenSharing": "Skærmdeling",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Start, sprog, opdateringer og tilgængelighed.",
@@ -31,7 +32,8 @@
     "advanced": "Udviklerværktøjer, diagnostik, lagring og licenser.",
     "about": "Version, support og opsætningsguiden.",
     "plugins": "Plugins kører i en sandbox og får kun det, du tillader. De ser aldrig din lyd, dine filer eller dit certifikat.",
-    "screenSharing": "Kvalitet, kodek og hardware til deling af din skærm. Seerne ser altid det, du vælger, før du starter."
+    "screenSharing": "Kvalitet, kodek og hardware til deling af din skærm. Seerne ser altid det, du vælger, før du starter.",
+    "camera": "Dit kamera, baggrundseffekter og hvordan du ser andres kameraer. Kameradeling kræver en server med mumpeer-relay."
   },
   "breadcrumb": "Indstillinger / {{section}}",
   "moreInfo": "Mere information: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "alarmer pop-ups",
     "externalContent": "indlejringer billeder forhåndsvisninger",
     "fileSharing": "filer send modtag download gem mappe vedhæftning zip",
-    "screenSharing": "skærmdeling kvalitet opløsning fps kodek AV1 VP9 encoder grafikkort"
+    "screenSharing": "skærmdeling kvalitet opløsning fps kodek AV1 VP9 encoder grafikkort",
+    "camera": "kamera webcam video baggrund sløring virtuel baggrund spejl egenvisning"
   },
   "search": {
     "label": "Søg i indstillinger",
@@ -1046,7 +1049,9 @@
     "addNone": "Opret forbindelse til en server for at vælge en af dens kanaler.",
     "addConfirm": "Tilføj",
     "reset": "Nulstil alle genveje",
-    "resetHint": "Fjerner alle genveje undtagen push-to-talk; som standard er intet indstillet."
+    "resetHint": "Fjerner alle genveje undtagen push-to-talk; som standard er intet indstillet.",
+    "camera": "Slå kameraet til / fra",
+    "cameraHint": "Åbner forhåndsvisningen, når kameraet er slukket, og slukker det, når det er tændt."
   },
   "developerMode": {
     "title": "Udviklertilstand",
@@ -1124,5 +1129,71 @@
     "skippedAboveLimit": "VP9 (dit billede er over, hvad AV1 klarer her)",
     "softwareWarning": "AV1 kører på processoren uden en bestået test og kan være for tungt for denne pc.",
     "checkAgain": "Tjek igen"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Forhåndsvisning af dit kamera",
+    "previewName": "Dig",
+    "previewNote": "Forhåndsvisning, kun på denne enhed. Den stopper, når du forlader siden.",
+    "device": "Kamera",
+    "deviceDefault": "Systemstandard",
+    "noDevice": "Intet kamera fundet",
+    "sendQuality": "Sendekvalitet",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (op til 720p · 30 fps) sender kun så meget, som seerne har brug for: mindre i et stort gitter, skarpere når nogen fastgør dig.",
+    "mirror": "Spejl min egen visning",
+    "mirrorHint": "Kun din egen visning spejles. Andre ser dig den rigtige vej.",
+    "backgroundTitle": "Baggrund",
+    "defaultBackground": "Standardbaggrund",
+    "backgroundNone": "Ingen",
+    "backgroundBlur": "Sløring",
+    "backgroundLibrary": "Billede: bibliotek",
+    "backgroundOwn": "Billede: {{name}} (dit eget)",
+    "blurStrength": "Sløringsstyrke",
+    "blurLight": "Let",
+    "blurStrong": "Kraftig",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Effektkvalitet",
+    "effectAuto": "Auto",
+    "effectBest": "Bedst (grafikkort)",
+    "effectLight": "Let (sparer batteri)",
+    "effectHint": "Auto bruger grafikkortet, når det kan, og skifter til Let på batteri, eller når pc'en har travlt.",
+    "ownImages_one": "Dine egne baggrundsbilleder bliver på denne enhed (gemt: {{count}}). Kun det færdige billede sendes.",
+    "ownImages_other": "Dine egne baggrundsbilleder bliver på denne enhed (gemt: {{count}}). Kun det færdige billede sendes.",
+    "manageImages": "Administrer billeder",
+    "imagesTitle": "Dine baggrundsbilleder",
+    "imagesEmpty": "Ingen billeder endnu. Tilføj et PNG-, JPEG- eller WebP-billede som baggrund.",
+    "imageName": "Billede {{number}}",
+    "imageDelete": "Slet",
+    "imageDeleteLabel": "Slet {{name}}",
+    "imageDeleted": "{{name}} slettet",
+    "imageAdded": "{{name}} tilføjet",
+    "addImage": "Tilføj billede",
+    "addImageTitle": "Vælg et baggrundsbillede",
+    "imageFilter": "Billeder",
+    "close": "Luk",
+    "privacyTitle": "Privatliv",
+    "lockOff": "Sluk mit kamera, når skærmen låses",
+    "privacyNote": "Dit kamera starter altid slukket og viser først en forhåndsvisning. Det slukkes, når du forlader kanalen eller afbryder forbindelsen. Kun personer i din talekanal kan se det, via denne servers relay og end-to-end-krypteret. Mumcord optager aldrig kameraer.",
+    "othersTitle": "Andres kameraer",
+    "showCameras": "Vis kameraer",
+    "showAlways": "Altid",
+    "showOnOpen": "Når jeg åbner rummet",
+    "showNever": "Aldrig",
+    "showHint": "Altid åbner kamerarummet, når nogen i din kanal tænder et kamera. Aldrig holder dig på kun tale og henter ingen video.",
+    "dataSaver": "Datasparer: op til 15 fps for alle",
+    "reduceMotion": "Reducer bevægelse: ingen glød eller animation på talerens ramme",
+    "reduceMotionHint": "Følger som standard systemets indstilling for reduceret bevægelse.",
+    "errors": {
+      "busy": "Kameraet stoppede: en anden app bruger dit kamera.",
+      "noCamera": "Intet kamera fundet. Tilslut et kamera, så vises det her.",
+      "permissionDenied": "Adgang til kameraet blev afvist",
+      "deviceGone": "Kameraet stoppede: kameraet blev afbrudt.",
+      "unreadable": "Kameraet stoppede: kameraet sender ulæselige billeder.",
+      "cameraFailed": "Kameraet kunne ikke startes."
+    },
+    "imageImportFailed": "Dette billede kan ikke bruges. Brug en PNG-, JPEG- eller WebP-fil på op til 10 MB."
   }
 }

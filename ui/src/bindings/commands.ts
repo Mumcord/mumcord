@@ -1012,6 +1012,14 @@ export const commands = {
 	 *  nothing when another window attached since.
 	 */
 	cameraPreviewDetach: (channelId: number) => __TAURI_INVOKE<void>("camera_preview_detach", { channelId }),
+	/**  The built-in background images (FR-8.11). */
+	cameraBuiltinBackgrounds: () => __TAURI_INVOKE<BuiltinBackground[]>("camera_builtin_backgrounds"),
+	/**  The user's own background images, oldest first (FR-8.15). */
+	cameraOwnBackgrounds: () => typedError<OwnBackground[], ApiError>(__TAURI_INVOKE("camera_own_backgrounds")),
+	/**  Copies the image at `path` into the own backgrounds (re-encoded, no metadata). Errors: `invalidInput` for an image that can't be used. */
+	cameraOwnBackgroundAdd: (path: string) => typedError<OwnBackground, ApiError>(__TAURI_INVOKE("camera_own_background_add", { path })),
+	/**  Deletes one own image; a default background showing it falls back to Blur (FR-8.15). */
+	cameraOwnBackgroundRemove: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("camera_own_background_remove", { id })),
 	/**
 	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
 	 *  `p2pLinkChanged`.
@@ -1580,6 +1588,11 @@ export type CameraAvailabilityChanged = {
 };
 
 /**  A background choice (FR-8.11): none, blur, a built-in image or an own image. */
+/**  One built-in background image (FR-8.11). */
+export type BuiltinBackground = {
+	id: string,
+};
+
 export type CameraBackground = { kind: "none" } | { kind: "blur" } | { kind: "builtin"; id: string } | { kind: "own"; id: string };
 
 /**  The own camera changed (state, error, viewers). `state: "off"` once it is off. */
@@ -1603,6 +1616,24 @@ export type CameraEffectLoad = "low" | "medium" | "high";
 
 /**  Effect quality (FR-8.35). */
 export type CameraEffectQuality = "auto" | "best" | "light";
+
+export type CameraReduceMotion = "system" | "on" | "off";
+
+/**  One own background image (FR-8.15). */
+export type OwnBackground = {
+	/**  Random id; `{ kind: "own", id }` in the settings. */
+	id: string,
+	/**  Unix milliseconds, for the list order. */
+	addedAt: number,
+	/**  Small JPEG preview as a `data:` URL. */
+	thumbnail: string,
+};
+
+export type CameraSendQuality = "auto" | "720p15" | "360p30";
+
+export type CameraShow = "always" | "onOpen" | "never";
+
+export type CameraStripPosition = "beside" | "above" | "hidden";
 
 /**  The background effects of this PC and of the running camera. */
 export type CameraEffects = {
@@ -4566,6 +4597,24 @@ export type Settings = {
 	screenAskEachTime: boolean,
 	screenSound: boolean,
 	screenUseGpu: boolean,
+	/**  Last used camera (`CameraDevice.id`); `None` uses the system default (FR-8.27). */
+	cameraDeviceId: string | null,
+	cameraSendQuality: CameraSendQuality,
+	/**  "Mirror my self-view". */
+	cameraMirrorSelf: boolean,
+	cameraDefaultBackground: CameraBackground,
+	/**  Blur strength 0 (Light) … 100 (Strong); clamped when stored. */
+	cameraBlurStrength: number,
+	cameraEffectQuality: CameraEffectQuality,
+	/**  "Turn my camera off when my screen locks". */
+	cameraOffOnLock: boolean,
+	cameraShow: CameraShow,
+	/**  "Data saver: up to 15 fps for everyone". */
+	cameraDataSaver: boolean,
+	cameraReduceMotion: CameraReduceMotion,
+	cameraStripPosition: CameraStripPosition,
+	/**  Global camera hotkey (FR-8.20); `None` is unset. */
+	cameraHotkey: string | null,
 };
 
 /**  The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom. */

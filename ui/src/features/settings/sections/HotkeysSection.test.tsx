@@ -112,6 +112,21 @@ describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, ()
     });
   });
 
+  it("saves the camera hotkey as its own setting (FR-8.20)", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openHotkeys();
+    record("Turn camera on / off", "F9", { ctrlKey: true });
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({ cameraHotkey: "Ctrl+F9", hotkeys: [] }),
+      );
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "Clear Turn camera on / off" }));
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ cameraHotkey: null }));
+    });
+  });
+
   it("shows a conflict and can assign the key here, clearing the other", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openHotkeys();

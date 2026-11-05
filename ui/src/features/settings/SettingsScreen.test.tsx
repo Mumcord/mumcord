@@ -109,6 +109,7 @@ const GROUPS = [
   "Account & Identity",
   "Voice & Audio",
   "Screen sharing",
+  "Camera",
   "Chat & Notifications",
   "Privacy & Connections",
   "Plugins",
@@ -127,7 +128,7 @@ describe("SettingsScreen", () => {
     expect(
       within(list)
         .getAllByRole("tab")
-        .map((tab) => tab.textContent.replace("sharingNew", "sharing")),
+        .map((tab) => tab.textContent.replace(/New$/, "")),
     ).toEqual(GROUPS);
     const identity = screen.getByRole("tab", { name: "General" });
     expect(identity).toHaveAttribute("aria-selected", "true");

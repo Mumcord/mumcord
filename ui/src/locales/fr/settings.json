@@ -17,7 +17,8 @@
     "packetInspector": "Inspecteur de paquets",
     "hotkeys": "Raccourcis",
     "plugins": "Plugins",
-    "screenSharing": "Partage d'écran"
+    "screenSharing": "Partage d'écran",
+    "camera": "Caméra"
   },
   "sectionDescriptions": {
     "general": "Démarrage, langue, mises à jour et accessibilité.",
@@ -31,7 +32,8 @@
     "advanced": "Outils de développement, diagnostics, stockage et licences.",
     "about": "Version, assistance et assistant de configuration.",
     "plugins": "Les plugins s'exécutent dans un bac à sable et n'obtiennent que ce que vous autorisez. Ils ne voient jamais votre audio, vos fichiers ni votre certificat.",
-    "screenSharing": "Qualité, codec et matériel pour partager ton écran. Les spectateurs voient toujours ce que tu choisis avant de commencer."
+    "screenSharing": "Qualité, codec et matériel pour partager ton écran. Les spectateurs voient toujours ce que tu choisis avant de commencer.",
+    "camera": "Votre caméra, les effets d'arrière-plan et la façon dont vous voyez les caméras des autres. Le partage de caméra nécessite un serveur avec un relais mumpeer."
   },
   "breadcrumb": "Paramètres / {{section}}",
   "moreInfo": "Plus d'informations : {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "alertes fenêtres contextuelles",
     "externalContent": "intégrations images aperçus",
     "fileSharing": "fichiers envoyer recevoir télécharger enregistrer dossier pièce jointe zip",
-    "screenSharing": "partage écran qualité résolution fps codec vidéo AV1 VP9 encodeur carte graphique"
+    "screenSharing": "partage écran qualité résolution fps codec vidéo AV1 VP9 encodeur carte graphique",
+    "camera": "caméra webcam vidéo arrière-plan flou fond virtuel miroir auto-visualisation"
   },
   "search": {
     "label": "Rechercher dans les paramètres",
@@ -1054,7 +1057,9 @@
     "addNone": "Connectez-vous à un serveur pour choisir l'un de ses salons.",
     "addConfirm": "Ajouter",
     "reset": "Réinitialiser tous les raccourcis",
-    "resetHint": "Supprime tous les raccourcis sauf le push-to-talk ; aucun n'est défini par défaut."
+    "resetHint": "Supprime tous les raccourcis sauf le push-to-talk ; aucun n'est défini par défaut.",
+    "camera": "Activer / désactiver la caméra",
+    "cameraHint": "Ouvre l'aperçu quand votre caméra est éteinte et l'éteint quand elle est allumée."
   },
   "developerMode": {
     "title": "Mode développeur",
@@ -1132,5 +1137,72 @@
     "skippedAboveLimit": "VP9 (ton image dépasse ce qu'AV1 gère ici)",
     "softwareWarning": "AV1 s'exécutera sur le processeur sans test réussi et peut être trop lourd pour ce PC.",
     "checkAgain": "Vérifier à nouveau"
+  },
+  "camera": {
+    "cameraTitle": "Caméra",
+    "previewLabel": "Aperçu de votre caméra",
+    "previewName": "Vous",
+    "previewNote": "Aperçu, uniquement sur cet appareil. Il s'arrête quand vous quittez cette page.",
+    "device": "Caméra",
+    "deviceDefault": "Par défaut du système",
+    "noDevice": "Aucune caméra trouvée",
+    "sendQuality": "Qualité d'envoi",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (jusqu'à 720p · 30 fps) n'envoie que ce dont les spectateurs ont besoin : plus petit dans une grande grille, plus net quand quelqu'un vous épingle.",
+    "mirror": "Inverser ma propre image",
+    "mirrorHint": "Seule votre propre vue est inversée. Les autres vous voient dans le bon sens.",
+    "backgroundTitle": "Arrière-plan",
+    "defaultBackground": "Arrière-plan par défaut",
+    "backgroundNone": "Aucun",
+    "backgroundBlur": "Flou",
+    "backgroundLibrary": "Image : bibliothèque",
+    "backgroundOwn": "Image : {{name}} (la vôtre)",
+    "blurStrength": "Intensité du flou",
+    "blurLight": "Léger",
+    "blurStrong": "Fort",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Qualité des effets",
+    "effectAuto": "Auto",
+    "effectBest": "Maximale (carte graphique)",
+    "effectLight": "Légère (économise la batterie)",
+    "effectHint": "Auto utilise la carte graphique quand c'est possible et passe en Légère sur batterie ou quand le PC est sollicité.",
+    "ownImages_one": "Vos propres images d'arrière-plan restent sur cet appareil (enregistrées : {{count}}). Seule l'image finale est envoyée.",
+    "ownImages_many": "Vos propres images d'arrière-plan restent sur cet appareil (enregistrées : {{count}}). Seule l'image finale est envoyée.",
+    "ownImages_other": "Vos propres images d'arrière-plan restent sur cet appareil (enregistrées : {{count}}). Seule l'image finale est envoyée.",
+    "manageImages": "Gérer les images",
+    "imagesTitle": "Vos images d'arrière-plan",
+    "imagesEmpty": "Aucune image pour l'instant. Ajoutez une image PNG, JPEG ou WebP pour l'utiliser comme arrière-plan.",
+    "imageName": "Image {{number}}",
+    "imageDelete": "Supprimer",
+    "imageDeleteLabel": "Supprimer {{name}}",
+    "imageDeleted": "{{name}} supprimée",
+    "imageAdded": "{{name}} ajoutée",
+    "addImage": "Ajouter une image",
+    "addImageTitle": "Choisir une image d'arrière-plan",
+    "imageFilter": "Images",
+    "close": "Fermer",
+    "privacyTitle": "Confidentialité",
+    "lockOff": "Éteindre ma caméra quand mon écran se verrouille",
+    "privacyNote": "Votre caméra démarre toujours éteinte et affiche d'abord un aperçu. Elle s'éteint quand vous quittez le salon ou vous déconnectez. Seules les personnes de votre salon vocal peuvent la voir, via le relais de ce serveur, chiffrée de bout en bout. Mumcord n'enregistre jamais les caméras.",
+    "othersTitle": "Caméras des autres",
+    "showCameras": "Afficher les caméras",
+    "showAlways": "Toujours",
+    "showOnOpen": "Quand j'ouvre la salle",
+    "showNever": "Jamais",
+    "showHint": "Toujours ouvre la salle des caméras dès que quelqu'un de votre salon allume une caméra. Jamais vous garde en audio seul et ne télécharge aucune vidéo.",
+    "dataSaver": "Économiseur de données : 15 fps maximum pour tout le monde",
+    "reduceMotion": "Réduire les animations : pas de halo ni d'animation sur le cadre de la personne qui parle",
+    "reduceMotionHint": "Suit par défaut le réglage de réduction des animations de votre système.",
+    "errors": {
+      "busy": "Caméra arrêtée : une autre application utilise votre caméra.",
+      "noCamera": "Aucune caméra trouvée. Branchez une caméra et elle apparaîtra ici.",
+      "permissionDenied": "L'accès à la caméra a été refusé",
+      "deviceGone": "Caméra arrêtée : la caméra a été déconnectée.",
+      "unreadable": "Caméra arrêtée : la caméra envoie des images illisibles.",
+      "cameraFailed": "La caméra n'a pas pu être démarrée."
+    },
+    "imageImportFailed": "Cette image ne peut pas être utilisée. Utilisez un fichier PNG, JPEG ou WebP de 10 Mo maximum."
   }
 }

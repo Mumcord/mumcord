@@ -17,7 +17,8 @@
     "packetInspector": "Inspector de paquetes",
     "hotkeys": "Atajos",
     "plugins": "Plugins",
-    "screenSharing": "Compartir pantalla"
+    "screenSharing": "Compartir pantalla",
+    "camera": "Cámara"
   },
   "sectionDescriptions": {
     "general": "Inicio, idioma, actualizaciones y accesibilidad.",
@@ -31,7 +32,8 @@
     "advanced": "Herramientas de desarrollo, diagnóstico, almacenamiento y licencias.",
     "about": "Versión, soporte y el asistente de configuración.",
     "plugins": "Los complementos se ejecutan en un entorno aislado y solo reciben lo que permites. Nunca ven tu audio, tus archivos ni tu certificado.",
-    "screenSharing": "Calidad, códec y hardware para compartir tu pantalla. Los espectadores siempre ven lo que eliges antes de empezar."
+    "screenSharing": "Calidad, códec y hardware para compartir tu pantalla. Los espectadores siempre ven lo que eliges antes de empezar.",
+    "camera": "Tu cámara, los efectos de fondo y cómo ves las cámaras de los demás. Compartir cámara necesita un servidor con un relé mumpeer."
   },
   "breadcrumb": "Ajustes / {{section}}",
   "moreInfo": "Más información: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "avisos alertas ventanas emergentes",
     "externalContent": "incrustados imágenes vistas previas",
     "fileSharing": "archivos enviar recibir descargar guardar carpeta adjunto zip",
-    "screenSharing": "compartir pantalla calidad resolución fps códec AV1 VP9 codificador tarjeta gráfica"
+    "screenSharing": "compartir pantalla calidad resolución fps códec AV1 VP9 codificador tarjeta gráfica",
+    "camera": "cámara webcam vídeo fondo desenfoque fondo virtual espejo autovista"
   },
   "search": {
     "label": "Buscar ajustes",
@@ -1054,7 +1057,9 @@
     "addNone": "Conéctate a un servidor para elegir uno de sus canales.",
     "addConfirm": "Añadir",
     "reset": "Restablecer todos los atajos",
-    "resetHint": "Quita todos los atajos excepto pulsar para hablar; por defecto no hay ninguno."
+    "resetHint": "Quita todos los atajos excepto pulsar para hablar; por defecto no hay ninguno.",
+    "camera": "Activar / desactivar la cámara",
+    "cameraHint": "Abre la vista previa cuando tu cámara está apagada y la apaga cuando está encendida."
   },
   "developerMode": {
     "title": "Modo desarrollador",
@@ -1132,5 +1137,72 @@
     "skippedAboveLimit": "VP9 (tu imagen supera lo que AV1 gestiona aquí)",
     "softwareWarning": "AV1 se ejecutará en el procesador sin una prueba superada y puede ser demasiado pesado para este PC.",
     "checkAgain": "Comprobar de nuevo"
+  },
+  "camera": {
+    "cameraTitle": "Cámara",
+    "previewLabel": "Vista previa de tu cámara",
+    "previewName": "Tú",
+    "previewNote": "Vista previa, solo en este dispositivo. Se detiene al salir de esta página.",
+    "device": "Cámara",
+    "deviceDefault": "Predeterminada del sistema",
+    "noDevice": "No se encontró ninguna cámara",
+    "sendQuality": "Calidad de envío",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (hasta 720p · 30 fps) envía solo lo que necesitan quienes miran: más pequeño en una cuadrícula grande, más nítido cuando alguien te fija.",
+    "mirror": "Reflejar mi propia vista",
+    "mirrorHint": "Solo se refleja tu propia vista. Los demás te ven del derecho.",
+    "backgroundTitle": "Fondo",
+    "defaultBackground": "Fondo predeterminado",
+    "backgroundNone": "Ninguno",
+    "backgroundBlur": "Desenfoque",
+    "backgroundLibrary": "Imagen: biblioteca",
+    "backgroundOwn": "Imagen: {{name}} (tuya)",
+    "blurStrength": "Intensidad del desenfoque",
+    "blurLight": "Suave",
+    "blurStrong": "Fuerte",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Calidad de los efectos",
+    "effectAuto": "Auto",
+    "effectBest": "Máxima (tarjeta gráfica)",
+    "effectLight": "Ligera (ahorra batería)",
+    "effectHint": "Auto usa la tarjeta gráfica cuando puede y cambia a Ligera con batería o cuando el PC está ocupado.",
+    "ownImages_one": "Tus propias imágenes de fondo se quedan en este dispositivo (guardadas: {{count}}). Solo se envía la imagen final.",
+    "ownImages_many": "Tus propias imágenes de fondo se quedan en este dispositivo (guardadas: {{count}}). Solo se envía la imagen final.",
+    "ownImages_other": "Tus propias imágenes de fondo se quedan en este dispositivo (guardadas: {{count}}). Solo se envía la imagen final.",
+    "manageImages": "Gestionar imágenes",
+    "imagesTitle": "Tus imágenes de fondo",
+    "imagesEmpty": "Aún no hay imágenes. Añade una imagen PNG, JPEG o WebP para usarla como fondo.",
+    "imageName": "Imagen {{number}}",
+    "imageDelete": "Eliminar",
+    "imageDeleteLabel": "Eliminar {{name}}",
+    "imageDeleted": "{{name}} eliminada",
+    "imageAdded": "{{name}} añadida",
+    "addImage": "Añadir imagen",
+    "addImageTitle": "Elegir una imagen de fondo",
+    "imageFilter": "Imágenes",
+    "close": "Cerrar",
+    "privacyTitle": "Privacidad",
+    "lockOff": "Apagar mi cámara cuando se bloquee la pantalla",
+    "privacyNote": "Tu cámara siempre empieza apagada y muestra primero una vista previa. Se apaga cuando sales del canal o te desconectas. Solo las personas de tu canal de voz pueden verla, a través del relé de este servidor y con cifrado de extremo a extremo. Mumcord nunca graba las cámaras.",
+    "othersTitle": "Cámaras de los demás",
+    "showCameras": "Mostrar cámaras",
+    "showAlways": "Siempre",
+    "showOnOpen": "Al abrir la sala",
+    "showNever": "Nunca",
+    "showHint": "Siempre abre la sala de cámaras cuando alguien de tu canal enciende una cámara. Nunca te mantiene solo con voz y no descarga vídeo.",
+    "dataSaver": "Ahorro de datos: hasta 15 fps para todos",
+    "reduceMotion": "Reducir movimiento: sin brillo ni animación en el marco de quien habla",
+    "reduceMotionHint": "Por defecto sigue el ajuste de reducción de movimiento de tu sistema.",
+    "errors": {
+      "busy": "Cámara detenida: otra aplicación está usando tu cámara.",
+      "noCamera": "No se encontró ninguna cámara. Conecta una y aparecerá aquí.",
+      "permissionDenied": "Se denegó el acceso a la cámara",
+      "deviceGone": "Cámara detenida: la cámara se desconectó.",
+      "unreadable": "Cámara detenida: la cámara envía imágenes ilegibles.",
+      "cameraFailed": "No se pudo iniciar la cámara."
+    },
+    "imageImportFailed": "No se puede usar esta imagen. Usa un archivo PNG, JPEG o WebP de hasta 10 MB."
   }
 }

@@ -17,7 +17,8 @@
     "packetInspector": "Pregledovalnik paketov",
     "hotkeys": "Bližnjice",
     "plugins": "Vtičniki",
-    "screenSharing": "Deljenje zaslona"
+    "screenSharing": "Deljenje zaslona",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Zagon, jezik, posodobitve in dostopnost.",
@@ -31,7 +32,8 @@
     "advanced": "Razvijalska orodja, diagnostika, shramba in licence.",
     "about": "Različica, podpora in čarovnik za nastavitev.",
     "plugins": "Vtičniki delujejo v peskovniku in dobijo le tisto, kar dovolite. Nikoli ne vidijo vašega zvoka, datotek ali potrdila.",
-    "screenSharing": "Kakovost, kodek in strojna oprema za deljenje zaslona. Gledalci vedno vidijo tisto, kar izbereš pred začetkom."
+    "screenSharing": "Kakovost, kodek in strojna oprema za deljenje zaslona. Gledalci vedno vidijo tisto, kar izbereš pred začetkom.",
+    "camera": "Vaša kamera, učinki ozadja in način, kako vidite kamere drugih. Za deljenje kamere potrebujete strežnik z relejem mumpeer."
   },
   "breadcrumb": "Nastavitve / {{section}}",
   "moreInfo": "Več informacij: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "opozorila pojavna okna",
     "externalContent": "vdelana vsebina slike predogledi",
     "fileSharing": "datoteke pošlji prejmi prenesi shrani mapa priloga zip",
-    "screenSharing": "deljenje zaslona kakovost ločljivost fps kodek AV1 VP9 kodirnik grafična kartica"
+    "screenSharing": "deljenje zaslona kakovost ločljivost fps kodek AV1 VP9 kodirnik grafična kartica",
+    "camera": "kamera spletna kamera video ozadje zameglitev virtualno ozadje zrcaljenje lasten pogled"
   },
   "search": {
     "label": "Išči nastavitve",
@@ -1062,7 +1065,9 @@
     "addNone": "Poveži se s strežnikom, da izbereš enega od njegovih kanalov.",
     "addConfirm": "Dodaj",
     "reset": "Ponastavi vse bližnjice",
-    "resetHint": "Odstrani vse bližnjice razen pritisni za govor; privzeto ni nastavljena nobena."
+    "resetHint": "Odstrani vse bližnjice razen pritisni za govor; privzeto ni nastavljena nobena.",
+    "camera": "Vklopi / izklopi kamero",
+    "cameraHint": "Odpre predogled, ko je kamera izklopljena, in jo izklopi, ko je vklopljena."
   },
   "developerMode": {
     "title": "Razvijalski način",
@@ -1140,5 +1145,73 @@
     "skippedAboveLimit": "VP9 (tvoja slika presega to, kar AV1 tukaj zmore)",
     "softwareWarning": "AV1 bo tekel na procesorju brez opravljenega preizkusa in je lahko za ta računalnik preveč zahteven.",
     "checkAgain": "Preveri znova"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Predogled vaše kamere",
+    "previewName": "Vi",
+    "previewNote": "Predogled samo na tej napravi. Ustavi se, ko zapustite to stran.",
+    "device": "Kamera",
+    "deviceDefault": "Sistemska privzeta",
+    "noDevice": "Kamere ni mogoče najti",
+    "sendQuality": "Kakovost pošiljanja",
+    "sendQualityAuto": "Samodejno",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Samodejno (do 720p · 30 fps) pošilja le toliko, kot ga gledalci potrebujejo: manjše v veliki mreži, ostrejše, ko vas nekdo pripne.",
+    "mirror": "Zrcali moj lastni pogled",
+    "mirrorHint": "Zrcali se samo vaš lasten pogled. Drugi vas vidijo pravilno obrnjene.",
+    "backgroundTitle": "Ozadje",
+    "defaultBackground": "Privzeto ozadje",
+    "backgroundNone": "Brez",
+    "backgroundBlur": "Zameglitev",
+    "backgroundLibrary": "Slika: knjižnica",
+    "backgroundOwn": "Slika: {{name}} (vaša)",
+    "blurStrength": "Moč zameglitve",
+    "blurLight": "Šibka",
+    "blurStrong": "Močna",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Kakovost učinkov",
+    "effectAuto": "Samodejno",
+    "effectBest": "Najboljša (grafična kartica)",
+    "effectLight": "Lahka (varčuje z baterijo)",
+    "effectHint": "Samodejno uporabi grafično kartico, ko je to mogoče, in preklopi na Lahko na bateriji ali ko je računalnik zaseden.",
+    "ownImages_one": "Vaše lastne slike ozadja ostanejo v tej napravi (shranjeno: {{count}}). Pošlje se samo končna slika.",
+    "ownImages_two": "Vaše lastne slike ozadja ostanejo v tej napravi (shranjeno: {{count}}). Pošlje se samo končna slika.",
+    "ownImages_few": "Vaše lastne slike ozadja ostanejo v tej napravi (shranjeno: {{count}}). Pošlje se samo končna slika.",
+    "ownImages_other": "Vaše lastne slike ozadja ostanejo v tej napravi (shranjeno: {{count}}). Pošlje se samo končna slika.",
+    "manageImages": "Upravljaj slike",
+    "imagesTitle": "Vaše slike ozadja",
+    "imagesEmpty": "Še ni slik. Dodajte sliko PNG, JPEG ali WebP in jo uporabite kot ozadje.",
+    "imageName": "Slika {{number}}",
+    "imageDelete": "Izbriši",
+    "imageDeleteLabel": "Izbriši {{name}}",
+    "imageDeleted": "{{name}} izbrisana",
+    "imageAdded": "{{name}} dodana",
+    "addImage": "Dodaj sliko",
+    "addImageTitle": "Izberite sliko ozadja",
+    "imageFilter": "Slike",
+    "close": "Zapri",
+    "privacyTitle": "Zasebnost",
+    "lockOff": "Izklopi mojo kamero, ko se zaslon zaklene",
+    "privacyNote": "Vaša kamera se vedno zažene izklopljena in najprej pokaže predogled. Izklopi se, ko zapustite kanal ali prekinete povezavo. Vidijo jo samo osebe v vašem glasovnem kanalu, prek releja tega strežnika in s šifriranjem od konca do konca. Mumcord kamer nikoli ne snema.",
+    "othersTitle": "Kamere drugih",
+    "showCameras": "Prikaži kamere",
+    "showAlways": "Vedno",
+    "showOnOpen": "Ko odprem sobo",
+    "showNever": "Nikoli",
+    "showHint": "Vedno odpre sobo s kamerami, ko nekdo v vašem kanalu vklopi kamero. Nikoli vas pusti samo pri glasu in ne prenaša videa.",
+    "dataSaver": "Varčevanje s podatki: največ 15 fps za vse",
+    "reduceMotion": "Zmanjšaj gibanje: brez sijaja in animacije na okvirju govorca",
+    "reduceMotionHint": "Privzeto sledi sistemski nastavitvi za zmanjšano gibanje.",
+    "errors": {
+      "busy": "Kamera se je ustavila: vašo kamero uporablja druga aplikacija.",
+      "noCamera": "Kamere ni mogoče najti. Priklopite kamero in prikazala se bo tukaj.",
+      "permissionDenied": "Dostop do kamere je bil zavrnjen",
+      "deviceGone": "Kamera se je ustavila: kamera je bila odklopljena.",
+      "unreadable": "Kamera se je ustavila: kamera pošilja neberljivo sliko.",
+      "cameraFailed": "Kamere ni bilo mogoče zagnati."
+    },
+    "imageImportFailed": "Te slike ni mogoče uporabiti. Uporabite datoteko PNG, JPEG ali WebP do 10 MB."
   }
 }

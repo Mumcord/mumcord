@@ -17,7 +17,8 @@
     "packetInspector": "Packet inspector",
     "hotkeys": "Hotkeys",
     "plugins": "Plugins",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Screen sharing",
+    "camera": "Camera"
   },
   "sectionDescriptions": {
     "general": "Startup, language, updates and accessibility.",
@@ -31,7 +32,8 @@
     "advanced": "Developer tools, diagnostics, storage and licences.",
     "about": "Version, support and the setup wizard.",
     "plugins": "Plugins run in a sandbox and only get what you allow. They never see your audio, files or certificate.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start.",
+    "camera": "Your camera, background effects and how you see other people's cameras. Camera sharing needs a server with a mumpeer relay."
   },
   "breadcrumb": "Settings / {{section}}",
   "moreInfo": "More information: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "alerts pop-ups",
     "externalContent": "embeds images previews",
     "fileSharing": "files send receive download save folder attachment zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card",
+    "camera": "webcam video background blur virtual background mirror self-view"
   },
   "search": {
     "label": "Search settings",
@@ -1046,7 +1049,9 @@
     "addNone": "Connect to a server to choose one of its channels.",
     "addConfirm": "Add",
     "reset": "Reset all hotkeys",
-    "resetHint": "Removes every hotkey except push-to-talk; nothing is set by default."
+    "resetHint": "Removes every hotkey except push-to-talk; nothing is set by default.",
+    "camera": "Turn camera on / off",
+    "cameraHint": "Opens the preview when your camera is off and turns it off when it's on."
   },
   "developerMode": {
     "title": "Developer mode",
@@ -1124,5 +1129,71 @@
     "skippedAboveLimit": "VP9 (your picture is above what AV1 manages here)",
     "softwareWarning": "AV1 will run on the processor without a passed check and may be too heavy for this PC.",
     "checkAgain": "Check again"
+  },
+  "camera": {
+    "cameraTitle": "Camera",
+    "previewLabel": "Your camera preview",
+    "previewName": "You",
+    "previewNote": "Preview, only on this device. It stops when you leave this page.",
+    "device": "Camera",
+    "deviceDefault": "System default",
+    "noDevice": "No camera found",
+    "sendQuality": "Send quality",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (up to 720p · 30 fps) sends only as much as the people watching need: smaller in a big grid, sharper when someone pins you.",
+    "mirror": "Mirror my self-view",
+    "mirrorHint": "Only your own view is mirrored. Others see you the right way round.",
+    "backgroundTitle": "Background",
+    "defaultBackground": "Default background",
+    "backgroundNone": "None",
+    "backgroundBlur": "Blur",
+    "backgroundLibrary": "Image: Library",
+    "backgroundOwn": "Image: {{name}} (yours)",
+    "blurStrength": "Blur strength",
+    "blurLight": "Light",
+    "blurStrong": "Strong",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Effect quality",
+    "effectAuto": "Auto",
+    "effectBest": "Best (graphics card)",
+    "effectLight": "Light (saves battery)",
+    "effectHint": "Auto uses the graphics card when it can and switches to Light on battery or when the PC is busy.",
+    "ownImages_one": "Your own background images stay on this device ({{count}} saved). Only the finished picture is sent.",
+    "ownImages_other": "Your own background images stay on this device ({{count}} saved). Only the finished picture is sent.",
+    "manageImages": "Manage images",
+    "imagesTitle": "Your background images",
+    "imagesEmpty": "No images yet. Add a PNG, JPEG or WebP picture to use it as your background.",
+    "imageName": "Image {{number}}",
+    "imageDelete": "Delete",
+    "imageDeleteLabel": "Delete {{name}}",
+    "imageDeleted": "{{name}} deleted",
+    "imageAdded": "{{name}} added",
+    "addImage": "Add image",
+    "addImageTitle": "Choose a background image",
+    "imageFilter": "Images",
+    "close": "Close",
+    "privacyTitle": "Privacy",
+    "lockOff": "Turn my camera off when my screen locks",
+    "privacyNote": "Your camera always starts off and shows a preview first. It turns off when you leave the channel or disconnect. Only people in your voice channel can see it, through this server's relay, end-to-end encrypted. Mumcord never records cameras.",
+    "othersTitle": "Other people's cameras",
+    "showCameras": "Show cameras",
+    "showAlways": "Always",
+    "showOnOpen": "When I open the room",
+    "showNever": "Never",
+    "showHint": "Always opens the camera room when someone in your channel turns on a camera. Never keeps you voice-only and downloads no video.",
+    "dataSaver": "Data saver: up to 15 fps for everyone",
+    "reduceMotion": "Reduce motion: no glow or animation on the speaking frame",
+    "reduceMotionHint": "Follows your system's reduce-motion setting by default.",
+    "errors": {
+      "busy": "Camera stopped: another app is using your camera.",
+      "noCamera": "No camera found. Connect a camera and it appears here.",
+      "permissionDenied": "Camera access was denied",
+      "deviceGone": "Camera stopped: the camera was disconnected.",
+      "unreadable": "Camera stopped: the camera sends unreadable pictures.",
+      "cameraFailed": "The camera couldn't be started."
+    },
+    "imageImportFailed": "This image can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
   }
 }

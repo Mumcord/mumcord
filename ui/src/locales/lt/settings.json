@@ -17,7 +17,8 @@
     "packetInspector": "Paketų tikrintuvas",
     "hotkeys": "Spartieji klavišai",
     "plugins": "Papildiniai",
-    "screenSharing": "Ekrano bendrinimas"
+    "screenSharing": "Ekrano bendrinimas",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Paleidimas, kalba, atnaujinimai ir prieinamumas.",
@@ -31,7 +32,8 @@
     "advanced": "Kūrėjų įrankiai, diagnostika, saugykla ir licencijos.",
     "about": "Versija, pagalba ir sąrankos vedlys.",
     "plugins": "Papildiniai veikia izoliuotoje aplinkoje ir gauna tik tai, ką leidžiate. Jie niekada nemato jūsų garso, failų ar sertifikato.",
-    "screenSharing": "Ekrano bendrinimo kokybė, kodekas ir aparatinė įranga. Žiūrovai visada mato tai, ką pasirinkai prieš pradėdamas."
+    "screenSharing": "Ekrano bendrinimo kokybė, kodekas ir aparatinė įranga. Žiūrovai visada mato tai, ką pasirinkai prieš pradėdamas.",
+    "camera": "Jūsų kamera, fono efektai ir tai, kaip matote kitų kameras. Kameros bendrinimui reikia serverio su mumpeer relay."
   },
   "breadcrumb": "Nustatymai / {{section}}",
   "moreInfo": "Daugiau informacijos: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "įspėjimai iššokantys langai",
     "externalContent": "įterpiniai paveikslėliai peržiūros",
     "fileSharing": "failai siųsti gauti atsisiųsti išsaugoti aplankas priedas zip",
-    "screenSharing": "ekrano bendrinimas kokybė skiriamoji geba fps kodekas AV1 VP9 kodavimo įrenginys vaizdo plokštė"
+    "screenSharing": "ekrano bendrinimas kokybė skiriamoji geba fps kodekas AV1 VP9 kodavimo įrenginys vaizdo plokštė",
+    "camera": "kamera internetinė kamera vaizdo įrašas fonas suliejimas virtualus fonas atspindys savo vaizdas"
   },
   "search": {
     "label": "Ieškoti nustatymų",
@@ -1062,7 +1065,9 @@
     "addNone": "Prisijunk prie serverio, kad pasirinktum vieną jo kanalų.",
     "addConfirm": "Pridėti",
     "reset": "Atstatyti visus spartuosius klavišus",
-    "resetHint": "Pašalina visus spartuosius klavišus, išskyrus spausk ir kalbėk; pagal numatytuosius nustatymus nieko nenustatyta."
+    "resetHint": "Pašalina visus spartuosius klavišus, išskyrus spausk ir kalbėk; pagal numatytuosius nustatymus nieko nenustatyta.",
+    "camera": "Įjungti / išjungti kamerą",
+    "cameraHint": "Atidaro peržiūrą, kai kamera išjungta, ir išjungia ją, kai ji įjungta."
   },
   "developerMode": {
     "title": "Kūrėjo režimas",
@@ -1140,5 +1145,73 @@
     "skippedAboveLimit": "VP9 (tavo vaizdas viršija tai, ką čia gali AV1)",
     "softwareWarning": "AV1 veiks procesoriumi be išlaikyto patikrinimo ir gali būti per sunkus šiam kompiuteriui.",
     "checkAgain": "Tikrinti dar kartą"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Jūsų kameros peržiūra",
+    "previewName": "Jūs",
+    "previewNote": "Peržiūra tik šiame įrenginyje. Sustoja, kai išeinate iš šio puslapio.",
+    "device": "Kamera",
+    "deviceDefault": "Sistemos numatytoji",
+    "noDevice": "Kamera nerasta",
+    "sendQuality": "Siuntimo kokybė",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (iki 720p · 30 fps) siunčia tik tiek, kiek reikia žiūrintiesiems: mažiau dideliame tinklelyje, ryškiau, kai kas nors jus prisega.",
+    "mirror": "Atspindėti mano paties vaizdą",
+    "mirrorHint": "Atspindimas tik jūsų paties vaizdas. Kiti mato jus teisingai.",
+    "backgroundTitle": "Fonas",
+    "defaultBackground": "Numatytasis fonas",
+    "backgroundNone": "Nėra",
+    "backgroundBlur": "Suliejimas",
+    "backgroundLibrary": "Vaizdas: biblioteka",
+    "backgroundOwn": "Vaizdas: {{name}} (jūsų)",
+    "blurStrength": "Suliejimo stiprumas",
+    "blurLight": "Silpnas",
+    "blurStrong": "Stiprus",
+    "blurValue": "{{percent}} %",
+    "effectQuality": "Efektų kokybė",
+    "effectAuto": "Auto",
+    "effectBest": "Geriausia (vaizdo plokštė)",
+    "effectLight": "Lengva (taupo bateriją)",
+    "effectHint": "Auto naudoja vaizdo plokštę, kai gali, o naudojant bateriją ar kai kompiuteris apkrautas, perjungia į Lengvą.",
+    "ownImages_one": "Jūsų pačių fono vaizdai lieka šiame įrenginyje (išsaugota: {{count}}). Siunčiamas tik galutinis vaizdas.",
+    "ownImages_few": "Jūsų pačių fono vaizdai lieka šiame įrenginyje (išsaugota: {{count}}). Siunčiamas tik galutinis vaizdas.",
+    "ownImages_many": "Jūsų pačių fono vaizdai lieka šiame įrenginyje (išsaugota: {{count}}). Siunčiamas tik galutinis vaizdas.",
+    "ownImages_other": "Jūsų pačių fono vaizdai lieka šiame įrenginyje (išsaugota: {{count}}). Siunčiamas tik galutinis vaizdas.",
+    "manageImages": "Tvarkyti vaizdus",
+    "imagesTitle": "Jūsų fono vaizdai",
+    "imagesEmpty": "Vaizdų dar nėra. Pridėkite PNG, JPEG ar WebP vaizdą, kad naudotumėte jį kaip foną.",
+    "imageName": "Vaizdas {{number}}",
+    "imageDelete": "Ištrinti",
+    "imageDeleteLabel": "Ištrinti {{name}}",
+    "imageDeleted": "{{name}} ištrintas",
+    "imageAdded": "{{name}} pridėtas",
+    "addImage": "Pridėti vaizdą",
+    "addImageTitle": "Pasirinkite fono vaizdą",
+    "imageFilter": "Vaizdai",
+    "close": "Uždaryti",
+    "privacyTitle": "Privatumas",
+    "lockOff": "Išjungti mano kamerą, kai užrakinamas ekranas",
+    "privacyNote": "Jūsų kamera visada startuoja išjungta ir pirmiausia rodo peržiūrą. Ji išsijungia, kai paliekate kanalą arba atsijungiate. Ją mato tik jūsų balso kanalo žmonės per šio serverio relay, su visapusiu šifravimu. Mumcord niekada neįrašo kamerų.",
+    "othersTitle": "Kitų kameros",
+    "showCameras": "Rodyti kameras",
+    "showAlways": "Visada",
+    "showOnOpen": "Kai atidarau kambarį",
+    "showNever": "Niekada",
+    "showHint": "Visada atidaro kamerų kambarį, kai kas nors jūsų kanale įjungia kamerą. Niekada palieka jus tik su balsu ir neatsisiunčia vaizdo.",
+    "dataSaver": "Duomenų taupymas: iki 15 fps visiems",
+    "reduceMotion": "Mažinti judesį: be švytėjimo ir animacijos aplink kalbančiojo rėmelį",
+    "reduceMotionHint": "Pagal numatytuosius nustatymus laikosi sistemos judesio mažinimo nustatymo.",
+    "errors": {
+      "busy": "Kamera sustojo: jūsų kamerą naudoja kita programa.",
+      "noCamera": "Kamera nerasta. Prijunkite kamerą ir ji atsiras čia.",
+      "permissionDenied": "Prieiga prie kameros buvo atmesta",
+      "deviceGone": "Kamera sustojo: kamera buvo atjungta.",
+      "unreadable": "Kamera sustojo: kamera siunčia neįskaitomą vaizdą.",
+      "cameraFailed": "Kameros nepavyko paleisti."
+    },
+    "imageImportFailed": "Šio vaizdo naudoti negalima. Naudokite iki 10 MB PNG, JPEG ar WebP failą."
   }
 }

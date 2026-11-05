@@ -4,6 +4,7 @@
 
 ### Added
 
+- New Settings → Camera tab: a live preview that only runs on this device and stops when you leave the page, your camera, send quality, mirrored self-view, default background, blur strength and effect quality, "Manage images" for your own background images, "Turn my camera off when my screen locks", and how you see other people's cameras (Always / When I open the room / Never, data saver, reduce motion). Settings → Voice & Audio → Hotkeys has a "Turn camera on / off" hotkey.
 - New documents for plugin authors and users: the API 1.1 author guide, how the plugin security score is calculated (and what it cannot tell you), and the updated registry format. The privacy policy now covers plugin websites, relay plugin data and plugin sounds.
 - The plugin update review shows a "What's new in <version>" link when the plugin author gave release notes for that version; it opens in your browser.
 - The Apps menu now shows icons for "Share your screen" and "Watch together", and plugins without an icon get a coloured tile of their own, also in the side panel, dialogs, the media area, plugin details and the relay data card
