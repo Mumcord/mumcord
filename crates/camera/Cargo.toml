@@ -23,5 +23,19 @@ objc2-av-foundation = { workspace = true, features = ["AVCaptureDevice", "AVCapt
 objc2-core-media = { workspace = true, features = ["CMBase", "CMFormatDescription", "CMSampleBuffer", "CMTime", "objc2-core-video"] }
 objc2-core-video = { workspace = true, features = ["CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVReturn"] }
 
+[target.'cfg(target_os = "linux")'.dependencies]
+# xdg-desktop-portal Camera: access request and the PipeWire remote with the camera nodes.
+ashpd = { workspace = true, features = ["camera"] }
+pipewire.workspace = true
+# The portal calls are async; they run on a small runtime of their own (see linux/portal.rs).
+tokio = { workspace = true, features = ["rt-multi-thread"] }
+# poll() constants and errno values for the V4L2 capture loop.
+libc.workspace = true
+# V4L2 fallback when there is no camera portal (FR-8.25).
+v4l = "0.14"
+# MJPEG frames of USB 2 cameras (FR-8.26); already in the tree through `image`.
+zune-jpeg = "0.5"
+zune-core = "0.5"
+
 [lints]
 workspace = true

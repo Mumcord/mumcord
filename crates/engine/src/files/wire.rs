@@ -47,7 +47,7 @@ impl FileMessage {
 /// Why a received Bovnar document was refused. Logs carry this reason and the size only, never
 /// payload content (FR-7.75).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
-pub(super) enum Rejected {
+pub(crate) enum Rejected {
     #[error("too-large")]
     TooLarge,
     #[error("malformed")]
@@ -59,7 +59,7 @@ pub(super) enum Rejected {
 }
 
 /// Parses a Bovnar document after checking its size, so oversized input never reaches the parser.
-pub(super) fn parse_document(data: &[u8], max: usize) -> Result<DomDoc, Rejected> {
+pub(crate) fn parse_document(data: &[u8], max: usize) -> Result<DomDoc, Rejected> {
     if data.len() > max {
         return Err(Rejected::TooLarge);
     }
@@ -67,20 +67,20 @@ pub(super) fn parse_document(data: &[u8], max: usize) -> Result<DomDoc, Rejected
 }
 
 /// A required field; a missing one makes the document malformed.
-pub(super) fn field<'a>(doc: &'a DomDoc, key: &str) -> Result<DomNode<'a>, Rejected> {
+pub(crate) fn field<'a>(doc: &'a DomDoc, key: &str) -> Result<DomNode<'a>, Rejected> {
     doc.get(key).ok_or(Rejected::Malformed)
 }
 
-pub(super) fn str_field<'a>(doc: &'a DomDoc, key: &str) -> Result<&'a str, Rejected> {
+pub(crate) fn str_field<'a>(doc: &'a DomDoc, key: &str) -> Result<&'a str, Rejected> {
     field(doc, key)?.as_str().ok_or(Rejected::WrongType)
 }
 
-pub(super) fn u64_field(doc: &DomDoc, key: &str) -> Result<u64, Rejected> {
+pub(crate) fn u64_field(doc: &DomDoc, key: &str) -> Result<u64, Rejected> {
     field(doc, key)?.as_u64().ok_or(Rejected::WrongType)
 }
 
 /// The format version; any version from `min` on is read, unknown fields are ignored.
-pub(super) fn version_field(doc: &DomDoc, min: u8) -> Result<(), Rejected> {
+pub(crate) fn version_field(doc: &DomDoc, min: u8) -> Result<(), Rejected> {
     let v = field(doc, "v")?.as_u8().ok_or(Rejected::WrongType)?;
     if v < min {
         return Err(Rejected::Invalid);
@@ -89,7 +89,7 @@ pub(super) fn version_field(doc: &DomDoc, min: u8) -> Result<(), Rejected> {
 }
 
 /// Writes a flat Bovnar document of at most `cap` bytes with the fields `write` adds.
-pub(super) fn write_document(
+pub(crate) fn write_document(
     cap: usize,
     write: impl FnOnce(&mut Writer) -> bovnar::Result<()>,
 ) -> Option<Vec<u8>> {

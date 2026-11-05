@@ -47,6 +47,15 @@ pub trait CaptureSource: Send {
 #[derive(Default)]
 pub struct TestPattern {
     tick: u32,
+    /// The pretend picker result (test hook); `None` is a share without sound capture.
+    pick: Option<crate::test_hooks::SharePick>,
+}
+
+impl TestPattern {
+    /// A pattern that behaves as if the user had made `pick` in the system picker.
+    pub fn with_pick(pick: Option<crate::test_hooks::SharePick>) -> Self {
+        Self { tick: 0, pick }
+    }
 }
 
 /// Pixels the bar moves per frame.
@@ -81,6 +90,24 @@ impl CaptureSource for TestPattern {
         data.extend(std::iter::repeat_n(64 + (tick % 128) as u8, half));
         data.extend(std::iter::repeat_n(192 - (tick % 128) as u8, chroma - half));
         I420Frame::new(width, height, data).ok()
+    }
+
+    fn kind(&self) -> Option<ShareKind> {
+        use crate::test_hooks::SharePick;
+        self.pick.as_ref().map(|pick| match pick {
+            SharePick::Screen => ShareKind::Screen,
+            SharePick::Window(_) => ShareKind::Window,
+        })
+    }
+
+    #[cfg(all(target_os = "linux", feature = "test-backend"))]
+    fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
+        use crate::test_hooks::SharePick;
+        match &self.pick {
+            None => SoundOutcome::NoSound,
+            Some(SharePick::Screen) => super::sound::test_pick(request, None),
+            Some(SharePick::Window(hint)) => super::sound::test_pick(request, hint.as_deref()),
+        }
     }
 }
 

@@ -993,6 +993,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           paused: false,
           sound: false,
           soundAvailable: false,
+          soundMode: "none",
+          soundApp: null,
+          soundReason: null,
+          soundChoice: null,
           kind: "window",
           elapsedMs: 126000,
           viewers: [1, 2, 5],
@@ -2196,6 +2200,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       },
     ];
   }
+
+  /** Apps "Which app's sound?" offers in the browser mock. */
+  const MOCK_SOUND_APPS = [
+    { id: "music", name: "Music Player" },
+    { id: "browser", name: "Web Browser" },
+  ];
 
   const commands: EngineCommands = {
     // identity
@@ -3735,6 +3745,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         paused: false,
         sound: withSound,
         soundAvailable: withSound,
+        soundMode: withSound ? "desktop" : "none",
+        soundApp: null,
+        soundReason: null,
+        soundChoice: null,
         kind: null,
         elapsedMs: 0,
         viewers: [],
@@ -3753,6 +3767,22 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     screenShareSetSoundLevel: () => Promise.resolve(null),
+    screenShareSoundApps: () => Promise.resolve(MOCK_SOUND_APPS.map((a) => ({ ...a }))),
+    screenShareChooseSound: (serverId, app) => {
+      const own = requireOwnShare(serverId);
+      if (own.soundChoice === null) fail("invalidInput", "no sound choice is asked");
+      const chosen = app === null ? undefined : MOCK_SOUND_APPS.find((a) => a.id === app);
+      if (app !== null && chosen === undefined) fail("notFound", "that app no longer plays sound");
+      changeOwnShare(serverId, {
+        ...own,
+        sound: chosen !== undefined,
+        soundAvailable: chosen !== undefined,
+        soundMode: chosen === undefined ? "none" : "app",
+        soundApp: chosen?.name ?? null,
+        soundChoice: null,
+      });
+      return Promise.resolve(null);
+    },
     screenShareSetSound: (serverId, enabled) => {
       changeOwnShare(serverId, {
         ...requireOwnShare(serverId),
