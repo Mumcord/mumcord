@@ -33,7 +33,7 @@ pub mod sound;
 mod start;
 mod state;
 mod thumbnail;
-mod watch;
+pub(crate) mod watch;
 mod windows_rules;
 pub mod wire;
 

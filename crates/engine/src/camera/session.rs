@@ -248,6 +248,8 @@ pub(crate) struct Cameras {
     backend: Option<Arc<dyn CameraBackend>>,
     /// Viewers waiting for the bot's `bcast-tok` of a camera, by server and camera owner.
     waiting: HashMap<(ServerId, u32), oneshot::Sender<(BroadcastId, RelayToken)>>,
+    /// Other people's cameras (the viewer side).
+    pub(super) recv: super::recv::Receiving,
     /// Broadcast ends kept open by the test viewer.
     #[cfg(feature = "test-backend")]
     test_views: Vec<crate::screen_share::broadcast::link::Subscriber>,
@@ -284,7 +286,7 @@ fn encoder_prefs(ceiling: SendCeiling) -> QualityPrefs {
     }
 }
 
-fn cert_hash(ctx: &SessionCtx, session: u32) -> Option<String> {
+pub(super) fn cert_hash(ctx: &SessionCtx, session: u32) -> Option<String> {
     ctx.handle
         .with_state(|s| s.users.get(&session).and_then(|u| u.cert_hash.clone()))
 }
@@ -559,16 +561,20 @@ impl Engine {
                 return;
             };
             match live.viewers.join(viewer, &hash, codecs) {
-                Join::Full => {
-                    tracing::debug!("camera viewer not admitted: the broadcast is full");
-                    return;
-                }
+                Join::Full => None,
                 Join::Admit => {
                     live.publisher.admit(&hash);
                     send.set_vp9_only(live.viewers.needs_vp9());
+                    Some(live.id)
                 }
             }
-            live.id
+        };
+        let Some(broadcast) = broadcast else {
+            tracing::debug!("camera viewer not admitted: the broadcast is full");
+            // Told, so the viewer shows "Too many people are watching" instead of waiting for a
+            // token that never comes (FR-8.52).
+            signal::send(ctx, &[viewer], &CameraMessage::Full { id: id.to_owned() });
+            return;
         };
         let engine = self.clone();
         let server_id = ctx.server_id;
@@ -584,6 +590,14 @@ impl Engine {
                 reason = reason.as_str(),
                 "camera viewer not admitted by the bot"
             );
+            if reason == BroadcastErrorReason::Full
+                && let Ok(ctx) = engine.session_ctx_for(server_id)
+            {
+                let full = CameraMessage::Full {
+                    id: broadcast_hex(broadcast),
+                };
+                signal::send(&ctx, &[viewer], &full);
+            }
             engine.camera_remove_viewer(server_id, broadcast, viewer, false);
         });
     }
@@ -599,19 +613,33 @@ impl Engine {
             let on_air = own.server_id == server_id && own.state == CameraState::OnAir;
             let send = &own.send;
             match own.live.as_mut().filter(|l| on_air && l.id == id) {
-                Some(live) => match live.viewers.leave(viewer) {
-                    Some(hash) => {
-                        live.publisher.remove(&hash);
-                        send.set_vp9_only(live.viewers.needs_vp9());
-                        true
+                Some(live) => {
+                    let was_full = live.viewers.is_full();
+                    match live.viewers.leave(viewer) {
+                        Some(hash) => {
+                            live.publisher.remove(&hash);
+                            send.set_vp9_only(live.viewers.needs_vp9());
+                            Some(was_full)
+                        }
+                        None => None,
                     }
-                    None => false,
-                },
-                None => false,
+                }
+                None => None,
             }
         };
-        if !removed {
+        let Some(was_full) = removed else {
             return;
+        };
+        // A freed slot is announced again, so viewers turned away as full ask anew (FR-8.52).
+        if was_full && let Ok(ctx) = self.session_ctx_for(server_id) {
+            let peers = signal::channel_peers(&ctx, self.mumcord_state());
+            signal::send(
+                &ctx,
+                &peers,
+                &CameraMessage::On {
+                    id: broadcast_hex(id),
+                },
+            );
         }
         if kick {
             self.relay_broadcast_kick(server_id, RelayUse::Camera, id, viewer);
@@ -648,8 +676,6 @@ impl Engine {
 
     /// Waits for the bot's token to `sharer`'s camera on `server_id` (the viewer side, C-8):
     /// register before sending `cam-join`. A later call replaces an earlier one.
-    /// Only the test viewer uses it until C-8.
-    #[cfg(feature = "test-backend")]
     pub(crate) fn camera_await_token(
         &self,
         server_id: ServerId,
@@ -737,8 +763,9 @@ pub(crate) fn on_plugin_data(
                 engine.camera_remove_viewer(ctx.server_id, live, event.sender, true);
             }
         }
-        // Other people's cameras are the viewer side's (C-8).
-        CameraMessage::On { .. } | CameraMessage::Off => {}
+        CameraMessage::On { id } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
+        CameraMessage::Full { id } => super::recv::on_camera_full(&engine, ctx, event.sender, &id),
+        CameraMessage::Off => super::recv::on_camera_gone(&engine, ctx, event.sender),
     }
 }
 
@@ -754,10 +781,14 @@ pub(crate) fn on_tick(state: &ServerCameras, ctx: &SessionCtx) {
             .and_then(|o| o.send.ended());
         (ended, cameras.engine())
     };
-    if let (Some(reason), Some(engine)) = (ended, engine) {
+    let Some(engine) = engine else {
+        return;
+    };
+    if let Some(reason) = ended {
         tracing::info!(?reason, "camera stopped on its own");
         engine.camera_turn_off(ctx.server_id);
     }
+    super::recv::on_tick(&engine, ctx);
 }
 
 /// A person told this client its features: a newcomer in the channel gets the own `on`
@@ -793,13 +824,17 @@ pub(crate) fn on_user_moved(
     ctx: &SessionCtx,
     session: u32,
 ) {
+    let Some(engine) = lock(state).engine() else {
+        return;
+    };
+    if ctx.handle.with_state(|s| s.session) == Some(session) {
+        super::recv::on_own_channel_changed(&engine, ctx);
+    }
     if in_own_channel(ctx, session) {
         on_peer_known(state, peers, ctx, session);
         return;
     }
-    let Some(engine) = lock(state).engine() else {
-        return;
-    };
+    super::recv::on_camera_gone(&engine, ctx, session);
     if let Some(id) = engine.camera_watched_by(ctx.server_id, session) {
         engine.camera_remove_viewer(ctx.server_id, id, session, true);
     }
@@ -817,6 +852,7 @@ pub(crate) fn on_user_removed(
     let Some(engine) = lock(state).engine() else {
         return;
     };
+    super::recv::on_camera_gone(&engine, ctx, session);
     if let Some(id) = engine.camera_watched_by(ctx.server_id, session) {
         engine.camera_remove_viewer(ctx.server_id, id, session, true);
     }
