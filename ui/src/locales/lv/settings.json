@@ -1162,7 +1162,6 @@
     "blurStrength": "Izpludināšanas stiprums",
     "blurLight": "Vāja",
     "blurStrong": "Stipra",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Efektu kvalitāte",
     "effectAuto": "Auto",
     "effectBest": "Labākā (grafikas karte)",

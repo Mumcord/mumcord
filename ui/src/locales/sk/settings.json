@@ -1170,7 +1170,6 @@
     "blurStrength": "Sila rozmazania",
     "blurLight": "Slabé",
     "blurStrong": "Silné",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Kvalita efektov",
     "effectAuto": "Auto",
     "effectBest": "Najlepšia (grafická karta)",

@@ -1170,7 +1170,6 @@
     "blurStrength": "Siła rozmycia",
     "blurLight": "Lekkie",
     "blurStrong": "Mocne",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Jakość efektów",
     "effectAuto": "Auto",
     "effectBest": "Najlepsza (karta graficzna)",

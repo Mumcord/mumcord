@@ -1154,7 +1154,6 @@
     "blurStrength": "Ένταση θολώματος",
     "blurLight": "Ελαφρύ",
     "blurStrong": "Έντονο",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Ποιότητα εφέ",
     "effectAuto": "Αυτόματο",
     "effectBest": "Η καλύτερη (κάρτα γραφικών)",

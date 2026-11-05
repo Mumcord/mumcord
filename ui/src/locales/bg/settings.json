@@ -1154,7 +1154,6 @@
     "blurStrength": "Сила на размазването",
     "blurLight": "Слабо",
     "blurStrong": "Силно",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Качество на ефектите",
     "effectAuto": "Авто",
     "effectBest": "Най-добро (видеокарта)",

@@ -1170,7 +1170,6 @@
     "blurStrength": "Moč zameglitve",
     "blurLight": "Šibka",
     "blurStrong": "Močna",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Kakovost učinkov",
     "effectAuto": "Samodejno",
     "effectBest": "Najboljša (grafična kartica)",

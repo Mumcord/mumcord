@@ -1170,7 +1170,6 @@
     "blurStrength": "Suliejimo stiprumas",
     "blurLight": "Silpnas",
     "blurStrong": "Stiprus",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Efektų kokybė",
     "effectAuto": "Auto",
     "effectBest": "Geriausia (vaizdo plokštė)",

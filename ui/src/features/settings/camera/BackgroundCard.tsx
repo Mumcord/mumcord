@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type CameraBackground, type CameraEffectQuality } from "../../../api";
 import { Group } from "../components/Section";
@@ -6,7 +6,7 @@ import { InfoLineIcon } from "./InfoLineIcon";
 import { SelectRow } from "../sections/ScreenSharingSection";
 import type { SettingsSectionProps } from "../sections/types";
 import { backgroundOf, choiceOf, type BackgroundChoice } from "./backgroundChoice";
-import { BlurStrengthSlider } from "./BlurStrengthSlider";
+import { BlurStrengthButtons } from "./BlurStrengthButtons";
 import { ManageImagesDialog } from "./ManageImagesDialog";
 import { ownImageNumber, useOwnImages } from "./useOwnImages";
 
@@ -16,28 +16,6 @@ const EFFECT_KEYS = {
   best: "camera.effectBest",
   light: "camera.effectLight",
 } as const;
-
-/** The built-in background ids, for "Image: Library". */
-function useBuiltinIds(): readonly string[] {
-  const [ids, setIds] = useState<readonly string[]>([]);
-  useEffect(() => {
-    let active = true;
-    getApi()
-      .cameraBuiltinBackgrounds()
-      .then(
-        (list) => {
-          if (active) setIds(list.map((background) => background.id));
-        },
-        (error: unknown) => {
-          console.error("Listing the built-in backgrounds failed", error);
-        },
-      );
-    return () => {
-      active = false;
-    };
-  }, []);
-  return ids;
-}
 
 /** Applies a saved background to the running Settings preview (FR-8.76). */
 function applyToPreview(background: CameraBackground, blurStrength: number) {
@@ -55,10 +33,10 @@ function applyToPreview(background: CameraBackground, blurStrength: number) {
 export function BackgroundCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const effectHint = useId();
-  const builtinIds = useBuiltinIds();
   const ownImages = useOwnImages();
   const [managing, setManaging] = useState(false);
-  const images = ownImages.images ?? [];
+  const builtinIds = (ownImages.library?.builtin ?? []).map((image) => image.id);
+  const images = ownImages.library?.own ?? [];
   const ownIds = images.map((image) => image.id);
   const background = settings.cameraDefaultBackground;
 
@@ -87,11 +65,11 @@ export function BackgroundCard({ settings, update }: SettingsSectionProps) {
     <Group title={t("camera.backgroundTitle")} icon="personBackground">
       <SelectRow
         label={t("camera.defaultBackground")}
-        value={choiceOf(background, ownImages.images === null ? [] : ownIds)}
+        value={choiceOf(background, ownIds)}
         options={options}
         onChange={chooseBackground}
       />
-      <BlurStrengthSlider
+      <BlurStrengthButtons
         value={settings.cameraBlurStrength}
         onChange={(cameraBlurStrength) => {
           update({ cameraBlurStrength });

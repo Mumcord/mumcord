@@ -15,7 +15,6 @@ import type {
   MumbleImportFound,
   MumbleLinkStats,
   NotifyOutcome,
-  OwnBackground,
   SystemDnd,
   WhisperSetup,
   WhisperState,
@@ -294,6 +293,16 @@ function mockChannelPath(channels: readonly ChannelInfo[], id: number): string[]
 }
 const MOCK_FINGERPRINT = "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99";
 
+const MOCK_BUILTIN_BACKGROUNDS = [
+  "beach",
+  "library",
+  "mountains",
+  "night-city",
+  "soft-light",
+  "studio",
+];
+const mockOwnBackgrounds: string[] = [];
+
 const DEFAULT_SETTINGS: Settings = {
   wizardCompleted: false,
   theme: "system",
@@ -416,14 +425,6 @@ const DEFAULT_SETTINGS: Settings = {
   cameraStripPosition: "beside",
   cameraHotkey: null,
 };
-
-const MOCK_BUILTIN_BACKGROUNDS = ["beach", "mountains", "nightCity", "softLight", "studio"];
-
-/** An own background image with a plain coloured thumbnail. */
-function mockOwnBackground(id: string, hue: number): OwnBackground {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 9"><rect width="16" height="9" fill="hsl(${String(hue)} 45% 55%)"/></svg>`;
-  return { id, addedAt: Date.now(), thumbnail: `data:image/svg+xml,${encodeURIComponent(svg)}` };
-}
 
 /** Fictional titles and covers for the demo party's videos (issue #163). */
 const DEMO_VIDEOS: Record<string, { title: string; hue: number }> = {
@@ -1001,10 +1002,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
-  let ownBackgrounds: OwnBackground[] = demo
-    ? [mockOwnBackground("own-1", 110), mockOwnBackground("own-2", 200)]
-    : [];
-  let ownBackgroundSeq = ownBackgrounds.length;
   /** What the mock answered for each `mumble://` link in this run (issue #175). */
   const queryAnswers = new Map<string, MumbleLinkStats>();
   const serverVersion = options.serverVersion ?? "1.5.735";
@@ -3933,6 +3930,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticePending: () => Promise.resolve(false),
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
+    lockScreen: () => Promise.resolve(null),
     // The browser mock has no camera; the camera UI shows "no camera" (spec 08). The demo seeds
     // list two cameras and start the Settings preview (without a picture) for screenshots.
     cameraDevices: () =>
@@ -3958,28 +3956,37 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve({ unavailable: null, level: null, load: null, tooBusy: false }),
     cameraPreviewAttach: () => Promise.resolve(),
     cameraPreviewDetach: () => Promise.resolve(),
-    cameraBuiltinBackgrounds: () => Promise.resolve(MOCK_BUILTIN_BACKGROUNDS.map((id) => ({ id }))),
-    cameraOwnBackgrounds: () => Promise.resolve([...ownBackgrounds]),
-    cameraOwnBackgroundAdd: (path) => {
-      if (!/\.(png|jpe?g|webp)$/i.test(path)) {
-        return Promise.reject(new EngineError("invalidInput", "unsupported image"));
-      }
-      ownBackgroundSeq += 1;
-      const added = mockOwnBackground(`own-${String(ownBackgroundSeq)}`, ownBackgroundSeq * 70);
-      ownBackgrounds = [...ownBackgrounds, added];
-      return Promise.resolve(added);
+    // The mock keeps own images in memory and has no thumbnails.
+    cameraBackgrounds: () =>
+      Promise.resolve({
+        builtin: MOCK_BUILTIN_BACKGROUNDS.map((id) => ({ id, thumbnail: null })),
+        own: mockOwnBackgrounds.map((id) => ({ id, thumbnail: null })),
+      }),
+    cameraOwnBackgroundAdd: () => {
+      const id = `own-${String(mockOwnBackgrounds.length + 1)}`;
+      mockOwnBackgrounds.push(id);
+      return Promise.resolve({ id, thumbnail: null });
     },
-    cameraOwnBackgroundRemove: (id) => {
-      if (!ownBackgrounds.some((image) => image.id === id)) {
-        return Promise.reject(new EngineError("notFound", "no such image"));
-      }
-      ownBackgrounds = ownBackgrounds.filter((image) => image.id !== id);
-      const current = settings.cameraDefaultBackground;
-      if (current.kind === "own" && current.id === id) {
-        settings = { ...settings, cameraDefaultBackground: { kind: "blur" } };
-      }
+    cameraOwnBackgroundRemove: (id: string) => {
+      const index = mockOwnBackgrounds.indexOf(id);
+      if (index < 0) return Promise.reject(new EngineError("notFound", id));
+      mockOwnBackgrounds.splice(index, 1);
       return Promise.resolve(null);
     },
+    cameraDevicesWatchStart: () => Promise.resolve(),
+    cameraDevicesWatchStop: () => Promise.resolve(),
+    // Nobody else has a camera in the browser mock: the room stays empty.
+    cameraRoom: (serverId) =>
+      Promise.resolve({ serverId, open: false, videosHidden: false, tiles: [] }),
+    cameraRoomSetOpen: () => Promise.resolve(),
+    cameraRoomSetVideosHidden: () => Promise.resolve(),
+    cameraTileSetHidden: () => Promise.resolve(),
+    cameraTileSetQuality: () => Promise.resolve(),
+    cameraTileSetHeight: () => Promise.resolve(),
+    cameraRequestKeyframe: () => Promise.resolve(),
+    cameraFramesAttach: () => Promise.resolve(),
+    cameraFramesDetach: () => Promise.resolve(),
+    cameraSetDecodeCodecs: () => Promise.resolve(),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.

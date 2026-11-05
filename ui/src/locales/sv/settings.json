@@ -1154,7 +1154,6 @@
     "blurStrength": "Oskärpans styrka",
     "blurLight": "Svag",
     "blurStrong": "Stark",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Effektkvalitet",
     "effectAuto": "Auto",
     "effectBest": "Bäst (grafikkort)",

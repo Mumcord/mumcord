@@ -1154,7 +1154,6 @@
     "blurStrength": "Blur strength",
     "blurLight": "Light",
     "blurStrong": "Strong",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Effect quality",
     "effectAuto": "Auto",
     "effectBest": "Best (graphics card)",

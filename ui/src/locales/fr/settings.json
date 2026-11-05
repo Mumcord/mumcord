@@ -1162,7 +1162,6 @@
     "blurStrength": "Intensité du flou",
     "blurLight": "Léger",
     "blurStrong": "Fort",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Qualité des effets",
     "effectAuto": "Auto",
     "effectBest": "Maximale (carte graphique)",

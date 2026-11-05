@@ -1154,7 +1154,6 @@
     "blurStrength": "Elmosás erőssége",
     "blurLight": "Gyenge",
     "blurStrong": "Erős",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Effektek minősége",
     "effectAuto": "Auto",
     "effectBest": "Legjobb (videókártya)",

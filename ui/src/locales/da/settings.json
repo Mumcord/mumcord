@@ -1154,7 +1154,6 @@
     "blurStrength": "Sløringsstyrke",
     "blurLight": "Let",
     "blurStrong": "Kraftig",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Effektkvalitet",
     "effectAuto": "Auto",
     "effectBest": "Bedst (grafikkort)",

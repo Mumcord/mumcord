@@ -1162,7 +1162,6 @@
     "blurStrength": "Jačina zamućenja",
     "blurLight": "Slabo",
     "blurStrong": "Jako",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Kvaliteta efekata",
     "effectAuto": "Auto",
     "effectBest": "Najbolja (grafička kartica)",

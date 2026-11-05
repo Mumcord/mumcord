@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi, type Settings } from "../../../api";
 import { chooseOption, optionLabels } from "../../../components/SelectTestUtils";
@@ -15,6 +15,12 @@ beforeEach(async () => {
   api = createMockApi({ seed: "demo" });
   setApi(api);
   settings = await api.settingsGet();
+  // The mock keeps own images for the whole test run; start each test with two.
+  for (const image of (await api.cameraBackgrounds()).own) {
+    await api.cameraOwnBackgroundRemove(image.id);
+  }
+  await api.cameraOwnBackgroundAdd("/a.png");
+  await api.cameraOwnBackgroundAdd("/b.png");
 });
 
 afterEach(() => {
@@ -97,14 +103,16 @@ describe("Settings → Camera (FR-8.75)", () => {
     expect(setBackground).toHaveBeenCalledWith({ kind: "builtin", id: "beach" }, 50);
   });
 
-  it("saves the blur strength when the slider is let go", () => {
+  it("offers blur strength as Light / Strong buttons", () => {
     const update = vi.fn();
     render(<Page update={update} />);
-    const slider = screen.getByRole("slider", { name: "Blur strength" });
-    fireEvent.change(slider, { target: { value: "80" } });
-    expect(update).not.toHaveBeenCalled();
-    fireEvent.blur(slider);
-    expect(update).toHaveBeenCalledWith({ cameraBlurStrength: 80 });
+    const group = screen.getByRole("group", { name: "Blur strength" });
+    expect(within(group).getByRole("button", { name: "Light" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    fireEvent.click(within(group).getByRole("button", { name: "Strong" }));
+    expect(update).toHaveBeenCalledWith({ cameraBlurStrength: 100 });
   });
 
   it("stores reduce motion as an explicit choice", () => {
@@ -125,7 +133,7 @@ describe("Settings → Camera (FR-8.75)", () => {
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith({ cameraDefaultBackground: { kind: "blur" } });
     });
-    expect(await api.cameraOwnBackgrounds()).toHaveLength(1);
+    expect((await api.cameraBackgrounds()).own).toHaveLength(1);
   });
 
   it("adds an image and explains a file that can't be used", async () => {
@@ -136,6 +144,7 @@ describe("Settings → Camera (FR-8.75)", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Add image" }));
     expect(await screen.findByRole("button", { name: "Delete Image 3" })).toBeInTheDocument();
     prompt.mockReturnValueOnce("/home/me/notes.txt");
+    api.mock.failNext("cameraOwnBackgroundAdd", "invalidInput");
     fireEvent.click(screen.getByRole("button", { name: "Add image" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("This image can't be used");
   });

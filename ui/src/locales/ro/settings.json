@@ -1162,7 +1162,6 @@
     "blurStrength": "Intensitatea estompării",
     "blurLight": "Ușoară",
     "blurStrong": "Puternică",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Calitatea efectelor",
     "effectAuto": "Auto",
     "effectBest": "Cea mai bună (placă video)",

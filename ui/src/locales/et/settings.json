@@ -1154,7 +1154,6 @@
     "blurStrength": "Hägususe tugevus",
     "blurLight": "Nõrk",
     "blurStrong": "Tugev",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Efektide kvaliteet",
     "effectAuto": "Auto",
     "effectBest": "Parim (graafikakaart)",

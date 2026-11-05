@@ -1154,7 +1154,6 @@
     "blurStrength": "Sumennuksen voimakkuus",
     "blurLight": "Kevyt",
     "blurStrong": "Voimakas",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Tehosteiden laatu",
     "effectAuto": "Auto",
     "effectBest": "Paras (näytönohjain)",

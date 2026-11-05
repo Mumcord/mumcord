@@ -1154,7 +1154,6 @@
     "blurStrength": "Stärke der Unschärfe",
     "blurLight": "Leicht",
     "blurStrong": "Stark",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Effektqualität",
     "effectAuto": "Auto",
     "effectBest": "Beste (Grafikkarte)",

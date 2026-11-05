@@ -1,37 +1,39 @@
 import { useCallback, useEffect, useState } from "react";
-import { getApi, type OwnBackground } from "../../../api";
+import { getApi, type CameraBackgroundImage, type CameraBackgroundLibrary } from "../../../api";
 
-/** The user's own background images (FR-8.15) with add and delete; `null` while loading. */
+/** The background library (FR-8.11, FR-8.15) with add and delete; `null` while loading. */
 export interface OwnImages {
-  images: readonly OwnBackground[] | null;
+  library: CameraBackgroundLibrary | null;
   /** Adds the image at `path`; rejects with the engine error when it can't be used. */
-  add: (path: string) => Promise<OwnBackground>;
+  add: (path: string) => Promise<CameraBackgroundImage>;
   remove: (id: string) => Promise<void>;
 }
 
+const EMPTY: CameraBackgroundLibrary = { builtin: [], own: [] };
+
 export function useOwnImages(): OwnImages {
-  const [images, setImages] = useState<readonly OwnBackground[] | null>(null);
+  const [library, setLibrary] = useState<CameraBackgroundLibrary | null>(null);
 
   const reload = useCallback(async () => {
     try {
-      setImages(await getApi().cameraOwnBackgrounds());
+      setLibrary(await getApi().cameraBackgrounds());
     } catch (error) {
-      console.error("Loading the own background images failed", error);
-      setImages([]);
+      console.error("Loading the camera backgrounds failed", error);
+      setLibrary(EMPTY);
     }
   }, []);
 
   useEffect(() => {
     let active = true;
     getApi()
-      .cameraOwnBackgrounds()
+      .cameraBackgrounds()
       .then(
-        (list) => {
-          if (active) setImages(list);
+        (next) => {
+          if (active) setLibrary(next);
         },
         (error: unknown) => {
-          console.error("Loading the own background images failed", error);
-          if (active) setImages([]);
+          console.error("Loading the camera backgrounds failed", error);
+          if (active) setLibrary(EMPTY);
         },
       );
     return () => {
@@ -56,13 +58,13 @@ export function useOwnImages(): OwnImages {
     [reload],
   );
 
-  return { images, add, remove };
+  return { library, add, remove };
 }
 
 /**
- * The name the UI shows for an own image. Only a random id is stored (no file name, so nothing
- * about the original file stays around), so images are numbered in the order they were added.
+ * The number the UI names an own image by. Only a random id is stored (no file name, so nothing
+ * about the original file stays around), so images are numbered oldest first.
  */
-export function ownImageNumber(images: readonly OwnBackground[], id: string): number {
+export function ownImageNumber(images: readonly CameraBackgroundImage[], id: string): number {
   return images.findIndex((image) => image.id === id) + 1;
 }

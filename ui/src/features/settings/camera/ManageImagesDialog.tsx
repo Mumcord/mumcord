@@ -24,7 +24,7 @@ export function ManageImagesDialog({
 }) {
   const { t } = useTranslation("settings");
   const [error, setError] = useState<string | null>(null);
-  const images = ownImages.images ?? [];
+  const images = ownImages.library?.own ?? [];
   const nameOf = (id: string) => t("camera.imageName", { number: ownImageNumber(images, id) });
 
   const addImage = async () => {
@@ -68,7 +68,11 @@ export function ManageImagesDialog({
         <ul className="settings-camera-images">
           {images.map((image) => (
             <li key={image.id} className="settings-camera-images__item">
-              <img className="settings-camera-images__thumb" src={image.thumbnail} alt="" />
+              {image.thumbnail === null ? (
+                <span className="settings-camera-images__thumb" />
+              ) : (
+                <img className="settings-camera-images__thumb" src={image.thumbnail} alt="" />
+              )}
               <span className="settings-camera-images__name">{nameOf(image.id)}</span>
               <button
                 type="button"

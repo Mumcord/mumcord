@@ -1162,7 +1162,6 @@
     "blurStrength": "Intensità della sfocatura",
     "blurLight": "Leggera",
     "blurStrong": "Forte",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Qualità degli effetti",
     "effectAuto": "Auto",
     "effectBest": "Massima (scheda grafica)",

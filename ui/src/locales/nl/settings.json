@@ -1154,7 +1154,6 @@
     "blurStrength": "Sterkte van vervaging",
     "blurLight": "Licht",
     "blurStrong": "Sterk",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Effectkwaliteit",
     "effectAuto": "Auto",
     "effectBest": "Beste (grafische kaart)",

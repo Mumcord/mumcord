@@ -15,23 +15,32 @@ const SEND_QUALITY_KEYS = {
   "360p30": "camera.sendQuality360",
 } as const;
 
-/** The cameras of this PC; empty while loading or without any. */
+/** The cameras of this PC, kept current while the page is open; empty while loading or without any. */
 function useCameraDevices(): readonly CameraDevice[] {
   const [devices, setDevices] = useState<readonly CameraDevice[]>([]);
   useEffect(() => {
+    const api = getApi();
     let active = true;
-    getApi()
-      .cameraDevices()
-      .then(
-        (list) => {
-          if (active) setDevices(list);
-        },
-        (error: unknown) => {
-          console.error("Listing the cameras failed", error);
-        },
-      );
+    const unsubscribe = api.on("cameraDevicesChanged", (event) => {
+      setDevices(event.devices);
+    });
+    api.cameraDevicesWatchStart().catch((error: unknown) => {
+      console.error("Watching the cameras failed", error);
+    });
+    api.cameraDevices().then(
+      (list) => {
+        if (active) setDevices(list);
+      },
+      (error: unknown) => {
+        console.error("Listing the cameras failed", error);
+      },
+    );
     return () => {
       active = false;
+      unsubscribe();
+      api.cameraDevicesWatchStop().catch((error: unknown) => {
+        console.error("Stopping the camera watch failed", error);
+      });
     };
   }, []);
   return devices;

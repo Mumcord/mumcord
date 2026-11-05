@@ -1162,7 +1162,6 @@
     "blurStrength": "Intensidad del desenfoque",
     "blurLight": "Suave",
     "blurStrong": "Fuerte",
-    "blurValue": "{{percent}} %",
     "effectQuality": "Calidad de los efectos",
     "effectAuto": "Auto",
     "effectBest": "Máxima (tarjeta gráfica)",
