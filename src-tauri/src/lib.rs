@@ -340,6 +340,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::p2p_consent_decide,
             commands::p2p::relay_info,
             commands::p2p::camera_unavailable,
+            commands::p2p::lock_screen,
             commands::p2p::p2p_link,
             commands::p2p::relay_trust_new,
             commands::p2p::relay_keep_blocked,

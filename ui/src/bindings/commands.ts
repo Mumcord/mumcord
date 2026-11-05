@@ -955,6 +955,12 @@ export const commands = {
 	/**  Why camera sharing is unavailable on a connected server; `null` when it is available. */
 	cameraUnavailable: (serverId: number) => typedError<CameraUnavailable | null, ApiError>(__TAURI_INVOKE("camera_unavailable", { serverId })),
 	/**
+	 *  Test command `lockScreen` (spec 08, section 10.3): simulates a screen lock, which turns the
+	 *  camera off when "Turn my camera off when my screen locks" is on. Inert (`notImplemented`)
+	 *  unless a debug build runs with `MUMCORD_TEST_SCREEN_LOCK=1`.
+	 */
+	lockScreen: () => typedError<null, ApiError>(__TAURI_INVOKE("lock_screen")),
+	/**
 	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
 	 *  `p2pLinkChanged`.
 	 */

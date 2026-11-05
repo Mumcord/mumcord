@@ -3908,6 +3908,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticePending: () => Promise.resolve(false),
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
+    lockScreen: () => Promise.resolve(null),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.

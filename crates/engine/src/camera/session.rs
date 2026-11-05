@@ -9,8 +9,8 @@
 //!   (FR-8.8), viewers are admitted on `cam-join` and removed with a rekey (FR-8.47 – FR-8.49),
 //!   and the encoder follows their `want` reports (FR-8.45).
 //!
-//! One camera per Mumcord instance (FR-8.29). The stop rules (leave channel, lock screen, …) are
-//! C-9's; they end the camera through [`Engine::camera_turn_off`].
+//! One camera per Mumcord instance (FR-8.29). The stop rules (leave channel, lock screen, …) live
+//! in `stop`.
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -19,7 +19,9 @@ use mumcord_camera::{
     CameraBackend, CameraError, DeviceId, DeviceList, TestCamera, TestCameraMode,
 };
 use mumcord_p2p::broadcast::BindRole;
-use mumcord_p2p::{BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken};
+use mumcord_p2p::{
+    BroadcastEnd, BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken,
+};
 use mumcord_protocol::PluginData;
 use mumcord_store::{ScreenFps, ScreenOptimize, ScreenResolution};
 use tokio::sync::oneshot;
@@ -27,6 +29,7 @@ use tokio::sync::oneshot;
 use super::admit::{CameraViewers, Join, MAX_VIEWERS};
 use super::send::{CameraSend, SendCeiling};
 use super::signal::{self, CameraMessage, CameraSignals, Codec};
+use super::stop::StopReason;
 use crate::ServerId;
 use crate::mumcord::ServerPeers;
 use crate::peer::{RelayUnavailable, RelayUse};
@@ -66,8 +69,11 @@ pub enum CameraFailure {
     UseNotAllowed,
     /// The relay or the bot refused (`not-same-channel`, `denied`).
     Refused,
-    /// The relay isn't reachable (`relay-down`, no answer, link failed).
+    /// The relay isn't reachable (`relay-down`, no answer, link failed), or it became unavailable
+    /// while the camera was on (FR-8.24).
     RelayDown,
+    /// The relay ended the broadcast (`end` with `deleted` or `revoked`, FR-8.24).
+    RelayEnded,
     /// Too many attempts (`rate-limited`).
     RateLimited,
     /// The P2P mode leaves the relay out.
@@ -91,6 +97,7 @@ impl CameraFailure {
             Self::UseNotAllowed => "use-not-allowed",
             Self::Refused => "denied",
             Self::RelayDown => "relay-down",
+            Self::RelayEnded => "relay-ended",
             Self::RateLimited => "rate-limited",
             Self::Mode => "mode",
             Self::NoCertificate => "no-certificate",
@@ -266,7 +273,7 @@ impl Cameras {
         self.backend.clone()
     }
 
-    fn engine(&self) -> Option<Engine> {
+    pub(super) fn engine(&self) -> Option<Engine> {
         self.engine.as_ref().and_then(WeakEngine::upgrade)
     }
 }
@@ -326,6 +333,7 @@ impl Engine {
     pub fn camera_preview_start(&self, server_id: ServerId) -> Result<(), CameraFailure> {
         self.session_ctx_for(server_id)
             .map_err(|_| CameraFailure::NotConnected)?;
+        super::stop::watch_screen_lock(self);
         let settings = self.encoder_settings();
         let ceiling = SendCeiling::from_setting(settings.camera_send_quality);
         let view = {
@@ -453,7 +461,7 @@ impl Engine {
                 let on_end: OnEnd = Box::new(move |end| {
                     tracing::info!(?end, "camera broadcast ended");
                     if let Some(engine) = weak.upgrade() {
-                        engine.camera_broadcast_ended(server_id, id);
+                        engine.camera_broadcast_ended(server_id, id, end);
                     }
                 });
                 let publisher =
@@ -499,10 +507,16 @@ impl Engine {
         result
     }
 
-    /// Turns the camera off from any state (Cancel in the preview, the camera button, every
-    /// stop rule of FR-8.21): announces `off` when it was on air, ends the broadcast and
-    /// releases the device.
+    /// Turns the camera off from any state (Cancel in the preview, the camera button): announces
+    /// `off` when it was on air, ends the broadcast and releases the device. The stop rules of
+    /// FR-8.21 – FR-8.24 take the same path with their reason ([`Self::camera_stop`]).
     pub fn camera_turn_off(&self, server_id: ServerId) {
+        self.camera_stop(server_id, StopReason::TurnedOff);
+    }
+
+    /// Ends the own camera on `server_id` if it runs there; `error` is the "Camera stopped"
+    /// notice the off view carries (FR-8.23, FR-8.24).
+    pub(super) fn camera_end(&self, server_id: ServerId, error: Option<CameraFailure>) {
         let own = {
             let mut cameras = lock(self.camera_state());
             let applies = cameras.own.as_ref().is_some_and(|o| {
@@ -525,20 +539,37 @@ impl Engine {
         // The publisher's drop closes the link (the relay ends the broadcast), the capture's
         // drop turns the camera light off.
         drop(own);
-        tracing::info!("camera off");
-        self.emit_camera(server_id, None);
+        tracing::info!(
+            reason = error.as_ref().map(CameraFailure::code),
+            "camera off"
+        );
+        self.emit_camera(
+            server_id,
+            Some(CameraView {
+                error,
+                ..CameraView::off(server_id)
+            }),
+        );
     }
 
-    /// The relay link of the own camera ended by itself ("relay lost", FR-8.21).
-    fn camera_broadcast_ended(&self, server_id: ServerId, id: BroadcastId) {
+    /// The relay link of the own camera ended by itself (FR-8.24).
+    fn camera_broadcast_ended(&self, server_id: ServerId, id: BroadcastId, end: BroadcastEnd) {
         let same = lock(self.camera_state())
             .own
             .as_ref()
             .and_then(|o| o.live.as_ref().filter(|_| o.server_id == server_id))
             .is_some_and(|l| l.id == id);
         if same {
-            self.camera_turn_off(server_id);
+            self.camera_stop(server_id, StopReason::from_end(end));
         }
+    }
+
+    /// The own camera's server and state, if it runs.
+    pub(super) fn camera_own(&self) -> Option<(ServerId, CameraState)> {
+        lock(self.camera_state())
+            .own
+            .as_ref()
+            .map(|o| (o.server_id, o.state))
     }
 
     /// A viewer asked to join the own camera `id` (FR-8.47). Same channel, not blocked and
@@ -786,7 +817,7 @@ pub(crate) fn on_tick(state: &ServerCameras, ctx: &SessionCtx) {
     };
     if let Some(reason) = ended {
         tracing::info!(?reason, "camera stopped on its own");
-        engine.camera_turn_off(ctx.server_id);
+        engine.camera_stop(ctx.server_id, StopReason::DeviceLost(reason));
     }
     super::recv::on_tick(&engine, ctx);
 }
@@ -828,6 +859,8 @@ pub(crate) fn on_user_moved(
         return;
     };
     if ctx.handle.with_state(|s| s.session) == Some(session) {
+        // Leaving or being moved out of the channel ends the own camera (FR-8.21, FR-8.50).
+        engine.camera_stop(ctx.server_id, StopReason::LeftChannel);
         super::recv::on_own_channel_changed(&engine, ctx);
     }
     if in_own_channel(ctx, session) {

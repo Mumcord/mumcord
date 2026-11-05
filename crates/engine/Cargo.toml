@@ -63,6 +63,8 @@ x11rb.workspace = true
 ashpd = { workspace = true, features = ["screencast"] }
 pipewire.workspace = true
 futures-util.workspace = true
+# Screen-lock events from systemd-logind turn the camera off (spec 08, FR-8.21).
+zbus.workspace = true
 # Ready share-sound frames go from the PipeWire loop to the sound thread without locks.
 
 [target.'cfg(target_os = "macos")'.dependencies]
@@ -71,7 +73,7 @@ futures-util.workspace = true
 objc2.workspace = true
 block2.workspace = true
 dispatch2.workspace = true
-objc2-foundation = { workspace = true, features = ["NSArray", "NSEnumerator", "NSError", "NSProcessInfo", "NSString", "NSValue"] }
+objc2-foundation = { workspace = true, features = ["NSArray", "NSDistributedNotificationCenter", "NSEnumerator", "NSError", "NSNotification", "NSOperation", "NSProcessInfo", "NSString", "NSValue", "block2"] }
 objc2-screen-capture-kit = { workspace = true, features = ["SCContentSharingPicker", "SCError", "SCShareableContent", "SCStream", "block2", "dispatch2", "objc2-core-foundation", "objc2-core-graphics", "objc2-core-media"] }
 objc2-core-media = { workspace = true, features = ["CMBase", "CMBlockBuffer", "CMFormatDescription", "CMSampleBuffer", "CMTime", "objc2-core-audio-types", "objc2-core-video"] }
 objc2-core-video = { workspace = true, features = ["CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVReturn"] }
@@ -101,7 +103,9 @@ windows = { version = "0.62", features = [
     "Win32_System_Com",
     "Win32_System_Com_StructuredStorage",
     "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_LibraryLoader",
     "Win32_System_Power",
+    "Win32_System_RemoteDesktop",
     "Win32_System_SystemInformation",
     "Win32_System_Threading",
     "Win32_System_Variant",
