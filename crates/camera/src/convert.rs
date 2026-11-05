@@ -4,7 +4,7 @@
 //! Runs on the capture thread for every frame, so it only reads the source and writes into the
 //! caller's pooled buffer: no allocation.
 
-use super::mode::Geometry;
+use crate::mode::Geometry;
 
 /// One camera picture as it arrives. Strides are bytes per row; rows may be padded.
 #[derive(Clone, Copy)]

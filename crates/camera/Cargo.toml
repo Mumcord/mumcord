@@ -22,9 +22,22 @@ tokio = { workspace = true, features = ["rt-multi-thread"] }
 libc.workspace = true
 # V4L2 fallback when there is no camera portal (FR-8.25).
 v4l = "0.14"
+
+[target.'cfg(any(target_os = "linux", windows))'.dependencies]
 # MJPEG frames of USB 2 cameras (FR-8.26); already in the tree through `image`.
 zune-jpeg = "0.5"
 zune-core = "0.5"
+
+[target.'cfg(windows)'.dependencies]
+# Media Foundation capture (FR-8.25) and device-interface notifications for hot-plug (FR-8.27).
+# Same version as the engine's and Tauri's own `windows`.
+windows = { version = "0.62", features = [
+    "Win32_Devices_DeviceAndDriverInstallation",
+    "Win32_Foundation",
+    "Win32_Media_KernelStreaming",
+    "Win32_Media_MediaFoundation",
+    "Win32_System_Com",
+] }
 
 [lints]
 workspace = true
