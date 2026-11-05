@@ -127,5 +127,9 @@
     "netHttp": "Dostęp do internetu",
     "secrets": "Klucze systemowe"
   },
-  "offerBadge": "Nowe uprawnienia"
+  "offerBadge": "Nowe uprawnienia",
+  "refused": {
+    "title": "Odrzucone wtyczki",
+    "when": "Odrzucono: {{time}}"
+  }
 }

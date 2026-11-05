@@ -127,5 +127,9 @@
     "netHttp": "Internet-hozzáférés",
     "secrets": "Kulcstartó"
   },
-  "offerBadge": "Új engedélyek"
+  "offerBadge": "Új engedélyek",
+  "refused": {
+    "title": "Elutasított bővítmények",
+    "when": "Elutasítva: {{time}}"
+  }
 }

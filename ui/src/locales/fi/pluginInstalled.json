@@ -127,5 +127,9 @@
     "netHttp": "Internet-yhteys",
     "secrets": "Avainnippu"
   },
-  "offerBadge": "Uudet käyttöoikeudet"
+  "offerBadge": "Uudet käyttöoikeudet",
+  "refused": {
+    "title": "Hylätyt lisäosat",
+    "when": "Hylätty {{time}}"
+  }
 }

@@ -127,5 +127,9 @@
     "netHttp": "Acceso a internet",
     "secrets": "Llavero"
   },
-  "offerBadge": "Permisos nuevos"
+  "offerBadge": "Permisos nuevos",
+  "refused": {
+    "title": "Complementos rechazados",
+    "when": "Rechazado el {{time}}"
+  }
 }

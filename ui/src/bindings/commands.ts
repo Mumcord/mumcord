@@ -4002,6 +4002,20 @@ export type PluginsOverview = {
 	/**  "Turn off all plugins" is on. */
 	allOff: boolean,
 	plugins: InstalledPlugin[],
+	/**  Plugins refused at their first load in this run, which have no stored record (FR-9.90). */
+	refused: RefusedPlugin[],
+};
+
+/**
+ *  A plugin refused before it was stored, as Diagnostics lists it. Carries only the id or folder
+ *  name, the fixed reason and the time, never the plugin's own text.
+ */
+export type RefusedPlugin = {
+	/**  The plugin id, or the folder name of a developer plugin. */
+	name: string,
+	issue: PluginLoadIssue,
+	/**  When it was refused, in milliseconds since 1970. */
+	atMillis: number,
 };
 
 /**

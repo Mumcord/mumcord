@@ -127,5 +127,9 @@
     "netHttp": "Internetijuurdepääs",
     "secrets": "Võtmehoidja"
   },
-  "offerBadge": "Uued õigused"
+  "offerBadge": "Uued õigused",
+  "refused": {
+    "title": "Tagasi lükatud pistikprogrammid",
+    "when": "Tagasi lükatud: {{time}}"
+  }
 }
