@@ -134,6 +134,19 @@
       "texts": ["licenses/mediapipe-selfie-segmenter.txt", "licenses/apache-2.0.txt"]
     },
     {
+      "name": "Mumcord camera background images",
+      "version": "",
+      "license": "AGPL-3.0-only",
+      "repository": "https://github.com/Mumcord/mumcord",
+      "description": [
+        "The six built-in camera background images (Soft light, Library, Mountains, Studio,",
+        "Night city, Beach) are Mumcord's own work: drawn from simple shapes by",
+        "assets/backgrounds/generate.py and covered by Mumcord's own licence. They contain",
+        "no third-party artwork, photos or fonts."
+      ],
+      "texts": []
+    },
+    {
       "name": "ONNX Runtime",
       "version": "1.23.2",
       "license": "MIT",
