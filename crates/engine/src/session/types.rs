@@ -592,6 +592,9 @@ pub enum EngineEvent {
     /// The own camera changed state, viewers or error (spec 08, section 6.4); `Off` once it
     /// is off.
     CameraChanged(crate::camera::CameraView),
+    /// Other people's cameras in the user's channel changed: tiles, their states, the fps
+    /// badges or whether the room is open (spec 08, section 7.2).
+    CameraRoomChanged(crate::camera::CameraRoomView),
     /// The screen share encoder status changed: a probe or self-test started or finished
     /// (Settings → Screen sharing, FR-7.60).
     ScreenEncoderStatusChanged(crate::screen_share::EncoderStatus),

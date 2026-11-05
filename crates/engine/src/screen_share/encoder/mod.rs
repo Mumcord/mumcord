@@ -6,7 +6,7 @@
 //! ever blocks a share start: a missing result simply counts as "not usable yet", and the
 //! share starts with the next encoder in the order while the test runs.
 
-mod battery;
+pub(crate) mod battery;
 mod driver;
 pub(crate) mod monitor;
 mod probe;

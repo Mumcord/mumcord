@@ -15,9 +15,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use mumcord_camera::{
-    CameraBackend, CameraError, DeviceId, DeviceList, TestCamera, TestCameraMode,
-};
+use mumcord_camera::{CameraBackend, CameraError, TestCamera, TestCameraMode};
 use mumcord_p2p::broadcast::BindRole;
 use mumcord_p2p::{BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken};
 use mumcord_protocol::PluginData;
@@ -25,6 +23,7 @@ use mumcord_store::{ScreenFps, ScreenOptimize, ScreenResolution};
 use tokio::sync::oneshot;
 
 use super::admit::{CameraViewers, Join, MAX_VIEWERS};
+use super::preview::PreviewTap;
 use super::send::{CameraSend, SendCeiling};
 use super::signal::{self, CameraMessage, CameraSignals, Codec};
 use crate::ServerId;
@@ -34,7 +33,6 @@ use crate::screen_share::QualityPrefs;
 use crate::screen_share::broadcast::keyx::CertKey;
 use crate::screen_share::broadcast::link::{OnEnd, Publisher};
 use crate::screen_share::broadcast::{FanoutUnavailable, cert_key};
-use crate::screen_share::encoder::natural_factory;
 use crate::session::{Engine, EngineEvent, SessionCtx, WeakEngine, lock};
 
 /// Where the own camera is (section 6.4).
@@ -205,13 +203,13 @@ struct Live {
     viewers: CameraViewers,
 }
 
-struct Own {
+pub(super) struct Own {
     server_id: ServerId,
-    state: CameraState,
+    pub(super) state: CameraState,
     /// Tells a Turn on apart from an earlier one that was cancelled meanwhile.
     attempt: u64,
     error: Option<CameraFailure>,
-    send: CameraSend,
+    pub(super) send: CameraSend,
     live: Option<Live>,
 }
 
@@ -242,12 +240,23 @@ impl Own {
 #[derive(Default)]
 pub(crate) struct Cameras {
     pub(crate) engine: Option<WeakEngine>,
-    own: Option<Own>,
+    pub(super) own: Option<Own>,
+    /// The Settings → Camera preview (FR-8.30): the camera runs locally without a server. The
+    /// preview dialog takes it over (FR-8.29).
+    pub(super) local: Option<CameraSend>,
+    /// The background of the running camera, kept for a device change.
+    pub(super) background: Option<mumcord_effects::Background>,
+    /// Where the built-in background images are (the app's resources).
+    pub(super) builtin_backgrounds: Option<std::path::PathBuf>,
+    /// The own picture for the preview and the self-view, shared by every camera session.
+    pub(super) preview: Arc<PreviewTap>,
     attempts: u64,
     /// The OS camera API, or the test camera; set once.
     backend: Option<Arc<dyn CameraBackend>>,
     /// Viewers waiting for the bot's `bcast-tok` of a camera, by server and camera owner.
     waiting: HashMap<(ServerId, u32), oneshot::Sender<(BroadcastId, RelayToken)>>,
+    /// Other people's cameras (the viewer side).
+    pub(super) recv: super::recv::Receiving,
     /// Broadcast ends kept open by the test viewer.
     #[cfg(feature = "test-backend")]
     test_views: Vec<crate::screen_share::broadcast::link::Subscriber>,
@@ -256,10 +265,11 @@ pub(crate) struct Cameras {
 pub(crate) type ServerCameras = std::sync::Mutex<Cameras>;
 
 impl Cameras {
-    fn backend(&mut self) -> Option<Arc<dyn CameraBackend>> {
+    pub(super) fn backend(&mut self) -> Option<Arc<dyn CameraBackend>> {
         if self.backend.is_none() {
             self.backend = TestCameraMode::from_env()
-                .map(|mode| Arc::new(TestCamera::new(mode)) as Arc<dyn CameraBackend>);
+                .map(|mode| Arc::new(TestCamera::new(mode)) as Arc<dyn CameraBackend>)
+                .or_else(os_backend);
         }
         self.backend.clone()
     }
@@ -269,9 +279,24 @@ impl Cameras {
     }
 }
 
+/// The camera API of this OS.
+fn os_backend() -> Option<Arc<dyn CameraBackend>> {
+    #[cfg(target_os = "linux")]
+    let backend: Option<Arc<dyn CameraBackend>> =
+        Some(Arc::new(mumcord_camera::LinuxCamera::new()));
+    #[cfg(target_os = "macos")]
+    let backend: Option<Arc<dyn CameraBackend>> = Some(Arc::new(mumcord_camera::MacCamera::new()));
+    #[cfg(windows)]
+    let backend: Option<Arc<dyn CameraBackend>> =
+        Some(Arc::new(mumcord_camera::WindowsCamera::new()));
+    #[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
+    let backend = None;
+    backend
+}
+
 /// The screen-share prefs whose encoder selection and self-test the camera uses (FR-8.43):
 /// 720p30 (or 15) natural video.
-fn encoder_prefs(ceiling: SendCeiling) -> QualityPrefs {
+pub(super) fn encoder_prefs(ceiling: SendCeiling) -> QualityPrefs {
     QualityPrefs {
         resolution: ScreenResolution::P720,
         fps: if ceiling.fps <= 15 {
@@ -284,7 +309,7 @@ fn encoder_prefs(ceiling: SendCeiling) -> QualityPrefs {
     }
 }
 
-fn cert_hash(ctx: &SessionCtx, session: u32) -> Option<String> {
+pub(super) fn cert_hash(ctx: &SessionCtx, session: u32) -> Option<String> {
     ctx.handle
         .with_state(|s| s.users.get(&session).and_then(|u| u.cert_hash.clone()))
 }
@@ -319,13 +344,13 @@ impl Engine {
             .emit(EngineEvent::CameraChanged(view));
     }
 
-    /// Opens the preview (Off → Preview, FR-8.10): the camera runs, nothing is sent. The effects
-    /// of C-4 hook in between capture and encoding (`send::FrameEffect`).
+    /// Opens the preview (Off → Preview, FR-8.10): the camera runs with the default background
+    /// (FR-8.76), nothing is sent. A running Settings preview moves to it (FR-8.29).
     pub fn camera_preview_start(&self, server_id: ServerId) -> Result<(), CameraFailure> {
         self.session_ctx_for(server_id)
             .map_err(|_| CameraFailure::NotConnected)?;
         let settings = self.encoder_settings();
-        let ceiling = SendCeiling::from_setting(settings.camera_send_quality);
+        let background = self.camera_default_background(&settings);
         let view = {
             let mut cameras = lock(self.camera_state());
             if let Some(own) = &cameras.own {
@@ -335,23 +360,10 @@ impl Engine {
                     Err(CameraFailure::Busy)
                 };
             }
-            let backend = cameras
-                .backend()
-                .ok_or(CameraFailure::Camera(CameraError::NoCamera))?;
-            let mut devices = DeviceList::new();
-            devices.update(backend.devices().map_err(CameraFailure::Camera)?);
-            let remembered = settings.camera_device_id.clone().map(DeviceId::from_stored);
-            let device = devices
-                .pick(remembered.as_ref())
-                .ok_or(CameraFailure::Camera(CameraError::NoCamera))?
-                .id
-                .clone();
-            let selection = self
-                .screen_encoders()
-                .select(&settings, encoder_prefs(ceiling));
-            let encoders = natural_factory(selection.candidates, Arc::default());
-            let send = CameraSend::start(backend.as_ref(), &device, ceiling, encoders, None)
-                .map_err(CameraFailure::Camera)?;
+            let send = match cameras.local.take() {
+                Some(send) => send,
+                None => self.camera_send_start(&mut cameras, &settings, None, background)?,
+            };
             let Some(state) = next_state(CameraState::Off, Step::Open) else {
                 return Err(CameraFailure::Busy);
             };
@@ -559,16 +571,20 @@ impl Engine {
                 return;
             };
             match live.viewers.join(viewer, &hash, codecs) {
-                Join::Full => {
-                    tracing::debug!("camera viewer not admitted: the broadcast is full");
-                    return;
-                }
+                Join::Full => None,
                 Join::Admit => {
                     live.publisher.admit(&hash);
                     send.set_vp9_only(live.viewers.needs_vp9());
+                    Some(live.id)
                 }
             }
-            live.id
+        };
+        let Some(broadcast) = broadcast else {
+            tracing::debug!("camera viewer not admitted: the broadcast is full");
+            // Told, so the viewer shows "Too many people are watching" instead of waiting for a
+            // token that never comes (FR-8.52).
+            signal::send(ctx, &[viewer], &CameraMessage::Full { id: id.to_owned() });
+            return;
         };
         let engine = self.clone();
         let server_id = ctx.server_id;
@@ -584,6 +600,14 @@ impl Engine {
                 reason = reason.as_str(),
                 "camera viewer not admitted by the bot"
             );
+            if reason == BroadcastErrorReason::Full
+                && let Ok(ctx) = engine.session_ctx_for(server_id)
+            {
+                let full = CameraMessage::Full {
+                    id: broadcast_hex(broadcast),
+                };
+                signal::send(&ctx, &[viewer], &full);
+            }
             engine.camera_remove_viewer(server_id, broadcast, viewer, false);
         });
     }
@@ -599,19 +623,33 @@ impl Engine {
             let on_air = own.server_id == server_id && own.state == CameraState::OnAir;
             let send = &own.send;
             match own.live.as_mut().filter(|l| on_air && l.id == id) {
-                Some(live) => match live.viewers.leave(viewer) {
-                    Some(hash) => {
-                        live.publisher.remove(&hash);
-                        send.set_vp9_only(live.viewers.needs_vp9());
-                        true
+                Some(live) => {
+                    let was_full = live.viewers.is_full();
+                    match live.viewers.leave(viewer) {
+                        Some(hash) => {
+                            live.publisher.remove(&hash);
+                            send.set_vp9_only(live.viewers.needs_vp9());
+                            Some(was_full)
+                        }
+                        None => None,
                     }
-                    None => false,
-                },
-                None => false,
+                }
+                None => None,
             }
         };
-        if !removed {
+        let Some(was_full) = removed else {
             return;
+        };
+        // A freed slot is announced again, so viewers turned away as full ask anew (FR-8.52).
+        if was_full && let Ok(ctx) = self.session_ctx_for(server_id) {
+            let peers = signal::channel_peers(&ctx, self.mumcord_state());
+            signal::send(
+                &ctx,
+                &peers,
+                &CameraMessage::On {
+                    id: broadcast_hex(id),
+                },
+            );
         }
         if kick {
             self.relay_broadcast_kick(server_id, RelayUse::Camera, id, viewer);
@@ -648,8 +686,6 @@ impl Engine {
 
     /// Waits for the bot's token to `sharer`'s camera on `server_id` (the viewer side, C-8):
     /// register before sending `cam-join`. A later call replaces an earlier one.
-    /// Only the test viewer uses it until C-8.
-    #[cfg(feature = "test-backend")]
     pub(crate) fn camera_await_token(
         &self,
         server_id: ServerId,
@@ -737,8 +773,9 @@ pub(crate) fn on_plugin_data(
                 engine.camera_remove_viewer(ctx.server_id, live, event.sender, true);
             }
         }
-        // Other people's cameras are the viewer side's (C-8).
-        CameraMessage::On { .. } | CameraMessage::Off => {}
+        CameraMessage::On { id } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
+        CameraMessage::Full { id } => super::recv::on_camera_full(&engine, ctx, event.sender, &id),
+        CameraMessage::Off => super::recv::on_camera_gone(&engine, ctx, event.sender),
     }
 }
 
@@ -754,10 +791,14 @@ pub(crate) fn on_tick(state: &ServerCameras, ctx: &SessionCtx) {
             .and_then(|o| o.send.ended());
         (ended, cameras.engine())
     };
-    if let (Some(reason), Some(engine)) = (ended, engine) {
+    let Some(engine) = engine else {
+        return;
+    };
+    if let Some(reason) = ended {
         tracing::info!(?reason, "camera stopped on its own");
         engine.camera_turn_off(ctx.server_id);
     }
+    super::recv::on_tick(&engine, ctx);
 }
 
 /// A person told this client its features: a newcomer in the channel gets the own `on`
@@ -793,13 +834,17 @@ pub(crate) fn on_user_moved(
     ctx: &SessionCtx,
     session: u32,
 ) {
+    let Some(engine) = lock(state).engine() else {
+        return;
+    };
+    if ctx.handle.with_state(|s| s.session) == Some(session) {
+        super::recv::on_own_channel_changed(&engine, ctx);
+    }
     if in_own_channel(ctx, session) {
         on_peer_known(state, peers, ctx, session);
         return;
     }
-    let Some(engine) = lock(state).engine() else {
-        return;
-    };
+    super::recv::on_camera_gone(&engine, ctx, session);
     if let Some(id) = engine.camera_watched_by(ctx.server_id, session) {
         engine.camera_remove_viewer(ctx.server_id, id, session, true);
     }
@@ -817,6 +862,7 @@ pub(crate) fn on_user_removed(
     let Some(engine) = lock(state).engine() else {
         return;
     };
+    super::recv::on_camera_gone(&engine, ctx, session);
     if let Some(id) = engine.camera_watched_by(ctx.server_id, session) {
         engine.camera_remove_viewer(ctx.server_id, id, session, true);
     }
