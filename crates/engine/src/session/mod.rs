@@ -432,6 +432,11 @@ impl WeakEngine {
     pub fn upgrade(&self) -> Option<Engine> {
         self.0.upgrade().map(|inner| Engine { inner })
     }
+
+    /// Whether this points at `engine`.
+    pub fn is(&self, engine: &Engine) -> bool {
+        std::ptr::eq(self.0.as_ptr(), Arc::as_ptr(&engine.inner))
+    }
 }
 
 /// A live connection.
@@ -1093,6 +1098,7 @@ impl Engine {
     /// [`QUIT_WAIT_MAX`](crate::sounds::QUIT_WAIT_MAX), in parallel with the drain.
     pub fn shutdown(&self) -> impl Future<Output = ()> + Send + use<> {
         self.files_quit();
+        self.camera_quit();
         let mut core = lock(&self.inner.core);
         let mut slots: Vec<(ServerId, u64)> = core
             .slots
@@ -2050,6 +2056,7 @@ impl Inner {
         Self::make_read_only(core, server_id);
         // Nothing to offer for rejoining after a restart, as after a disconnect.
         self.forget_voice_channel();
+        crate::camera::stop::on_voice_server_changed(&self.cameras, None);
         self.events.emit(EngineEvent::VoiceServerChanged(None));
         self.rebind_audio(core);
     }
@@ -2066,6 +2073,7 @@ impl Inner {
         core.voice_server = Some(server_id);
         // Only the voice server's channel is offered for rejoining after a restart (FR-2.3).
         self.forget_voice_channel();
+        crate::camera::stop::on_voice_server_changed(&self.cameras, Some(server_id));
         self.events
             .emit(EngineEvent::VoiceServerChanged(Some(server_id)));
         self.rebind_audio(core);

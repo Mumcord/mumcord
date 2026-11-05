@@ -75,6 +75,9 @@ impl Engine {
     pub(crate) fn camera_availability_refresh(&self, server_id: ServerId) {
         let reason = self.camera_unavailable(server_id);
         if self.relays().camera_changed(server_id, reason) {
+            if reason.is_some() {
+                self.camera_relay_unavailable(server_id);
+            }
             self.events()
                 .for_server(server_id)
                 .emit(EngineEvent::CameraAvailabilityChanged(reason));

@@ -954,6 +954,12 @@ export const commands = {
 	relayInfo: (serverId: number) => typedError<RelayInfo, ApiError>(__TAURI_INVOKE("relay_info", { serverId })),
 	/**  Why camera sharing is unavailable on a connected server; `null` when it is available. */
 	cameraUnavailable: (serverId: number) => typedError<CameraUnavailable | null, ApiError>(__TAURI_INVOKE("camera_unavailable", { serverId })),
+	/**
+	 *  Test command `lockScreen` (spec 08, section 10.3): simulates a screen lock, which turns the
+	 *  camera off when "Turn my camera off when my screen locks" is on. Inert (`notImplemented`)
+	 *  unless a debug build runs with `MUMCORD_TEST_SCREEN_LOCK=1`.
+	 */
+	lockScreen: () => typedError<null, ApiError>(__TAURI_INVOKE("lock_screen")),
 	/**  The cameras of this computer, in OS order (FR-8.11 picker, Settings → Camera). */
 	cameraDevices: () => typedError<CameraDevice[], ApiError>(__TAURI_INVOKE("camera_devices")),
 	/**  The own camera now; `null` while it is off. */
@@ -1012,6 +1018,36 @@ export const commands = {
 	 *  nothing when another window attached since.
 	 */
 	cameraPreviewDetach: (channelId: number) => __TAURI_INVOKE<void>("camera_preview_detach", { channelId }),
+	/**  The camera room of a server now (empty while nobody's camera is on). */
+	cameraRoom: (serverId: number) => __TAURI_INVOKE<CameraRoomView>("camera_room", { serverId }),
+	/**  The UI opened or closed the camera room (FR-8.53); closing stops every download. */
+	cameraRoomSetOpen: (serverId: number, open: boolean) => __TAURI_INVOKE<void>("camera_room_set_open", { serverId, open }),
+	/**  The strip position Hidden (FR-8.71): no video is downloaded while it is in effect. */
+	cameraRoomSetVideosHidden: (serverId: number, hidden: boolean) => __TAURI_INVOKE<void>("camera_room_set_videos_hidden", { serverId, hidden }),
+	/**  "Hide {name}'s video" / "Show video" on one tile (FR-8.57). */
+	cameraTileSetHidden: (serverId: number, sharer: number, hidden: boolean) => __TAURI_INVOKE<void>("camera_tile_set_hidden", { serverId, sharer, hidden }),
+	/**  "Quality for me" of one tile (FR-8.56). */
+	cameraTileSetQuality: (serverId: number, sharer: number, quality: CameraTileQuality) => __TAURI_INVOKE<void>("camera_tile_set_quality", { serverId, sharer, quality }),
+	/**  The tile's height on screen in device pixels, so Auto asks for a fitting resolution. */
+	cameraTileSetHeight: (serverId: number, sharer: number, height: number) => __TAURI_INVOKE<void>("camera_tile_set_height", { serverId, sharer, height }),
+	/**  Asks the camera owner for a keyframe, e.g. after the tile's decoder failed. */
+	cameraRequestKeyframe: (serverId: number, sharer: number) => __TAURI_INVOKE<void>("camera_request_keyframe", { serverId, sharer }),
+	/**
+	 *  Sends the frames of `sharer`'s camera to `frames` from now on (layout in
+	 *  `ui/src/api/screenFrames.ts`), replacing an earlier channel of that tile: the main window and
+	 *  the pop-out each attach their tiles. Asks for a keyframe so the new decoder can start.
+	 */
+	cameraFramesAttach: (serverId: number, sharer: number, frames: Channel<ArrayBuffer>) => __TAURI_INVOKE<void>("camera_frames_attach", { serverId, sharer, frames }),
+	/**
+	 *  Stops sending `sharer`'s frames to the channel `channel_id` (`Channel.id` in JavaScript);
+	 *  does nothing when another window attached that tile since.
+	 */
+	cameraFramesDetach: (serverId: number, sharer: number, channelId: number) => __TAURI_INVOKE<void>("camera_frames_detach", { serverId, sharer, channelId }),
+	/**
+	 *  Decodes camera frames of `codecs` in Rust and sends RGBA pictures instead, for the codecs the
+	 *  webview's WebCodecs cannot decode (FR-8.54). Replaces the earlier list; for every camera.
+	 */
+	cameraSetDecodeCodecs: (codecs: VideoCodec[]) => __TAURI_INVOKE<void>("camera_set_decode_codecs", { codecs }),
 	/**
 	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
 	 *  `p2pLinkChanged`.
@@ -1206,6 +1242,7 @@ export const events = {
 	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
 	cameraAvailabilityChanged: makeEvent<CameraAvailabilityChanged, CameraAvailabilityChanged>("camera-availability-changed"),
 	cameraChanged: makeEvent<CameraChanged, CameraChanged>("camera-changed"),
+	cameraRoomChanged: makeEvent<CameraRoomChanged, CameraRoomChanged>("camera-room-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
@@ -1628,9 +1665,27 @@ export type CameraFailure = "notConnected" |
  *  Another camera runs already (one per Mumcord instance, FR-8.29), or the step does not fit
  *  the camera's state.
  */
-"busy" | "noCamera" | "permissionDenied" | "deviceGone" | "unreadable" | "cameraFailed" | "roomFull" | "relayFull" | "useNotAllowed" | "denied" | "relayDown" | "rateLimited" | 
+"busy" | "noCamera" | "permissionDenied" | "deviceGone" | "unreadable" | "cameraFailed" | "roomFull" | "relayFull" | "useNotAllowed" | "denied" | "relayDown" | 
+/**  The relay ended the broadcast ("Camera stopped by the server's relay"). */
+"relayEnded" | "rateLimited" | 
 /**  The P2P mode leaves the relay out. */
 "mode" | "noCertificate";
+
+/**  The camera room of a server changed (tiles, their states, open, hidden). */
+export type CameraRoomChanged = {
+	view: CameraRoomView,
+};
+
+/**  The cameras of the own channel on one server; blocked people are left out (FR-8.59). */
+export type CameraRoomView = {
+	serverId: number,
+	/**  The room is open (also opened by the engine for "Show cameras: Always", FR-8.53). */
+	open: boolean,
+	/**  The strip position Hidden is in effect (FR-8.71). */
+	videosHidden: boolean,
+	/**  Ordered by session. */
+	tiles: CameraTile[],
+};
 
 /**  Where the own camera is (spec 08, section 6.4). */
 export type CameraState = "off" | 
@@ -1640,6 +1695,38 @@ export type CameraState = "off" |
 "requesting" | 
 /**  The camera is on air. */
 "onAir";
+
+/**  One camera of another person in the room. */
+export type CameraTile = {
+	/**  The camera owner's session. */
+	sharer: number,
+	state: CameraTileState,
+	/**  The user chose "Hide {name}'s video" on this tile. */
+	hidden: boolean,
+	quality: CameraTileQuality,
+	/**  Data saver is in effect (the tile's choice or the Settings switch). */
+	dataSaver: boolean,
+	/**  The "{n} fps" badge with "Weak connection" (FR-8.58); `null` hides it. */
+	fpsBadge: number | null,
+};
+
+/**  "Quality for me" of one tile (FR-8.56). */
+export type CameraTileQuality = "auto" | "dataSaver" | "best";
+
+/**  Where a camera tile is (spec 08, section 6.6). */
+export type CameraTileState = 
+/**  The person's camera is on; nothing is downloaded yet. */
+"announced" | 
+/**  Joining the camera; the tile shows the loading state. */
+"joining" | 
+/**  Receiving video; its frames come on the tile's channel (`camera_frames_attach`). */
+"playing" | 
+/**  "Too many people are watching {name}" (FR-8.52). */
+"full" | 
+/**  The join brought no answer; retried every 10 s. */
+"failed" | 
+/**  Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never. */
+"hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
 export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
