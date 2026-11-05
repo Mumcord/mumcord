@@ -316,10 +316,20 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
     const de = JSON.parse(readFileSync(join(repoRoot, "ui", "src", "locales", "de", "settings.json"), "utf8")) as {
       p2p: { modeLabel: string; explanation: string; mode: Record<Mode, string> };
       badges: { changed: string };
+      sections: { privacy: string };
     };
     await $("//button[@role='tab'][normalize-space()='General']").click();
     await chooseLanguage("de", "German");
-    await $('[role="tab"][id$="-tab-privacy"]').click();
+    // The German labels are longer and wrap, which moves the tabs: clicking before they render
+    // lands on whatever tab moved under the English position (seen: Chat & Notifications).
+    const privacy = $('[role="tab"][id$="-tab-privacy"]');
+    await browser.waitUntil(async () => (await privacy.getText()).trim() === de.sections.privacy, {
+      timeoutMsg: "the settings tabs never switched to German",
+    });
+    await privacy.click();
+    await browser.waitUntil(async () => (await privacy.getAttribute("aria-selected")) === "true", {
+      timeoutMsg: "the Privacy & Connections tab never became selected",
+    });
     await $("fieldset.p2p-modes").waitForDisplayed();
     // The mode still differs from the wizard's preset, so the group keeps its "Changed" note.
     const name = `${de.p2p.modeLabel}, ${de.badges.changed}`;

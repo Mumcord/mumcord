@@ -56,6 +56,7 @@ Some features work only between Mumcord users. They exchange small messages as M
 - **Full-size images:** pictures you send in chat go to the server as a thumbnail. Other Mumcord users who open the picture fetch the full-size version from your client, over a direct connection when you both allow it (see below), otherwise through the server. Switch off offering your originals ("Offer my full-size images") or loading others' originals ("Load full-size images from others") in _Settings_ (both on by default).
 - **Watch party (Beta):** when you start or join a watch party, the YouTube video IDs of the playlist, who added them, who is in the party, and play, pause, seek and skip commands go to the Mumcord users in your voice channel. Titles and thumbnails come from the link preview described above.
 - **Screen sharing (Beta):** that you are sharing, requests to watch and their answers are exchanged with the Mumcord users in your voice channel. The picture and sound themselves never go through the server: see below.
+- **Camera sharing:** that your camera is on or off, and who in your voice channel opens or leaves your camera, are exchanged with the Mumcord users in that channel. The picture itself never goes through the Mumble server: see "Camera sharing" below.
 - **Now playing** and **Now gaming:** share the track playing in your media player or the game you are playing. Both are **off by default**; while off, Mumcord reads nothing from your system. When on, the track or game is also added to your Mumble comment, which every user on the server can see.
 
 ### Plugins
@@ -99,6 +100,16 @@ Some server communities run a relay (_mumpeer_) next to their Mumble server, tog
 
 The relay operator is the server's community, not Mumcord. If you do not want a relay to see your IP address, choose "Direct only" or "Off".
 
+### Camera sharing
+
+Your camera is used only when you turn it on yourself, and always after a preview that only you see. It stays off otherwise, and it turns off when your screen locks (on by default, _Settings → Camera_).
+
+- **Effects run on your computer:** background blur and background images are applied on your own computer before the picture is encoded. No camera frames, masks or images are sent to any service for processing, and the segmentation model is part of Mumcord.
+- **End-to-end encrypted:** your camera picture goes through the community relay of your server (see above) as one end-to-end encrypted broadcast to the Mumcord users in your voice channel who watch it. Camera frames never leave your computer unencrypted. The relay operator sees who sends and who watches (certificate hashes), how much data flows and when, but not the picture.
+- **Your own background images stay on your computer:** an image you add is re-encoded without its metadata and stored in Mumcord's data folder. Only the finished picture is sent; the image file, its name and its path are never sent to anyone.
+- **No recording:** Mumcord never records cameras, and other people's Mumcord clients never write your camera picture to disk. Mumcord cannot stop someone from taking a screenshot or screen recording with their operating system or another program.
+- **Logs** never contain camera frames, device names, background image names or paths; only counts, the chosen codec, resolution and effect level.
+
 ### Links you open
 
 Links in chat, the website, changelog and issue links in _Settings → About_, and "Join game" (a `steam://` link) are handed to your browser or the operating system only when you click them.
@@ -119,6 +130,7 @@ Mumcord stores the following locally, in your user profile's application data fo
 - **Chat history** of channels and private chats, so you can read it after a restart. You can set a maximum age in _Settings_; older messages are deleted automatically.
 - **Preview and image cache:** link previews, inline images and full-size chat images, deleted after the maximum age set in _Settings_ (7 days by default). You can clear it at any time ("Clear now").
 - **Plugins:** the plugins you installed, their permissions and settings, their saved data and the repositories you added, with the key of each pinned on first use. Plugin secrets are in the operating system's secure storage.
+- **Camera settings and your own background images:** your camera choices (device, default background, blur strength, quality) and the background images you added, which you can delete in _Settings → Camera → Manage images_.
 - **Log files:** technical logs for troubleshooting, kept for at most 7 days. By design they contain no chat text, user or channel names, server addresses, passwords, certificates or audio. A diagnostic file is created only when you export it yourself, and you decide whether to share it.
 
 To remove everything, uninstall Mumcord and delete its application data folder; remove the "Mumcord" entries from the operating system's secure storage if you want to delete your identity as well (export it first if you want to keep it).
