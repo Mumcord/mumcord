@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "bundle": {
+    "linux": {
+      "appimage": {
+        "files": {
+          "/usr/lib/mumcord/libonnxruntime.so.1.23.2": "gen/onnxruntime/libonnxruntime.so.1.23.2"
+        }
+      },
+      "deb": {
+        "files": {
+          "/usr/lib/mumcord/libonnxruntime.so.1.23.2": "gen/onnxruntime/libonnxruntime.so.1.23.2"
+        }
+      },
+      "rpm": {
+        "files": {
+          "/usr/lib/mumcord/libonnxruntime.so.1.23.2": "gen/onnxruntime/libonnxruntime.so.1.23.2"
+        }
+      }
+    }
+  }
+}

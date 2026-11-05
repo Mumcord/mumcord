@@ -3,6 +3,7 @@
 /dist/
 /src-tauri/gen/schemas/
 /src-tauri/gen/overlay-layer/
+/src-tauri/gen/onnxruntime/
 node_modules/
 *.tsbuildinfo
 
