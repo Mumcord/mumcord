@@ -92,7 +92,10 @@ describe("backgrounds", () => {
   });
 
   it("returns to the last image when Image is picked again", () => {
-    expect(backgroundForMode("image", null)).toEqual({ kind: "builtin", id: "soft-light" });
+    expect(backgroundForMode("image", null)).toEqual({
+      kind: "builtin",
+      id: "abstract-warm-waves",
+    });
     expect(backgroundForMode("image", { kind: "own", id: "a" })).toEqual({ kind: "own", id: "a" });
     expect(backgroundForMode("blur", { kind: "own", id: "a" })).toEqual({ kind: "blur" });
   });

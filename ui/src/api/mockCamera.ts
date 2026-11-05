@@ -20,12 +20,24 @@ const DEVICES: CameraDevice[] = [
 
 /** The built-in images, sorted by id like the engine's list. */
 const BUILTIN: readonly [string, [string, string]][] = [
-  ["beach", ["#9fd6f2", "#f1d9a6"]],
-  ["library", ["#4a3424", "#a33"]],
-  ["mountains", ["#7fb2e5", "#4f7a5a"]],
-  ["night-city", ["#141a3a", "#313b70"]],
-  ["soft-light", ["#8f7cff", "#ffc59e"]],
-  ["studio", ["#ece6dc", "#c9b79c"]],
+  ["abstract-warm-waves", ["#ebe0de", "#dcdbe3"]],
+  ["blue-magenta-waves", ["#304ab8", "#4550ca"]],
+  ["city-balcony-night", ["#282e38", "#4f3e38"]],
+  ["electronics-lab", ["#313748", "#403d4d"]],
+  ["glossy-waves-orb", ["#371f2e", "#231a2f"]],
+  ["model-railway-viaduct", ["#313132", "#4e3b26"]],
+  ["modern-wc", ["#4c3021", "#3c2a26"]],
+  ["neon-gaming-room", ["#412563", "#2f174a"]],
+  ["neon-nerd-room", ["#36223c", "#2d1a34"]],
+  ["night-model-railway", ["#3b2d39", "#402727"]],
+  ["pixel-gaming-room-cat", ["#3f2758", "#3e1b54"]],
+  ["pixel-mountain-sunset", ["#5c1365", "#600d83"]],
+  ["reef-aquarium-room", ["#1e3458", "#292a42"]],
+  ["scifi-room-golden-valley", ["#64534a", "#403535"]],
+  ["server-corridor", ["#1c233c", "#192852"]],
+  ["space-station-earth", ["#293147", "#394261"]],
+  ["spaceship-bridge-cat", ["#2f2c3d", "#383241"]],
+  ["underwater-base-whale", ["#134056", "#1e3241"]],
 ];
 
 const FRAME_WIDTH = 640;
