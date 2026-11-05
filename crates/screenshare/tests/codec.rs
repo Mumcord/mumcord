@@ -126,6 +126,42 @@ fn resolution_steps_down_and_up() {
 }
 
 #[test]
+fn resolution_grows_beyond_the_opened_size() {
+    // A shared window that grows, or a quality step up on an encoder opened small: libvpx
+    // corrupts its heap when a running VP9 encoder is grown past the size it was opened at.
+    let mut encoder = Encoder::new(config(320, 180)).expect("encoder");
+    let mut decoder = Decoder::new().expect("decoder");
+    let steps = [(320, 180), (1280, 720), (640, 360), (1920, 1080)];
+    let mut index = 0;
+    let mut largest = 0;
+    for (width, height) in steps {
+        encoder
+            .set_resolution(width, height)
+            .expect("set resolution");
+        let grown = width > largest;
+        largest = largest.max(width);
+        for frame_in_step in 0..8 {
+            let frame = pattern(width, height, index);
+            let encoded = encode_one(&mut encoder, &frame, index, false);
+            if frame_in_step == 0 && grown {
+                assert!(encoded.keyframe, "a grown size starts with a keyframe");
+            }
+            let decoded = decoder
+                .decode(&encoded.data)
+                .expect("decode")
+                .expect("picture");
+            assert_eq!((decoded.width(), decoded.height()), (width, height));
+            assert!(
+                psnr(frame.y(), decoded.y()) > 20.0,
+                "picture at {width}x{height}"
+            );
+            index += 1;
+        }
+    }
+    assert_eq!(encoder.config().width, 1920);
+}
+
+#[test]
 fn rejects_frame_of_wrong_size() {
     let mut encoder = Encoder::new(config(640, 480)).expect("encoder");
     assert!(encoder.encode(&pattern(320, 240, 0), 0, false).is_err());
