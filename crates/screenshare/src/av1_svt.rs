@@ -116,6 +116,12 @@ unsafe impl Send for Av1Encoder {}
 
 impl Av1Encoder {
     pub fn new(config: EncoderConfig, options: Av1Options) -> Result<Self> {
+        if !av1_cpu_supported() {
+            return Err(codec_error(
+                "encoder init",
+                "the CPU has no AVX2, and SVT-AV1's code for such CPUs crashes".to_owned(),
+            ));
+        }
         validate(&config)?;
         let handle = open(&config, options)?;
         Ok(Self {
@@ -471,6 +477,22 @@ fn close(handle: *mut ffi::EbComponentType) {
             eprintln!("SVT-AV1 encoder shutdown failed: {status:#x}");
         }
         ffi::svt_av1_enc_deinit_handle(handle);
+    }
+}
+
+/// SVT-AV1 4.2's SSSE3 code, which it picks on x86 CPUs without AVX2, reads a reference block
+/// with an aligned load that is not always aligned (`svt_aom_sub_pixel_variance16xh_ssse3`), so
+/// the encoder kills the whole app with a general protection fault. Such CPUs are also far too
+/// slow for real-time AV1, so screen sharing uses VP9 there instead. Callers check this before
+/// opening an encoder; [`Av1Encoder::new`] refuses such CPUs as a safety net.
+pub fn av1_cpu_supported() -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        std::arch::is_x86_feature_detected!("avx2")
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        true
     }
 }
 

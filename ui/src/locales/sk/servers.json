@@ -313,6 +313,7 @@
     "line": "Relay povoľuje: {{uses}}",
     "images": "Obrázky",
     "files": "Súbory",
-    "screen": "Zdieľanie obrazovky"
+    "screen": "Zdieľanie obrazovky",
+    "cameras": "Kamery"
   }
 }

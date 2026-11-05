@@ -669,6 +669,7 @@ impl Engine {
             store.update_server(&saved).map_err(store_error)?;
             saved
         };
+        self.camera_availability_refresh(id);
         let has_password = self.apply_password(id, PasswordChange::Keep).await?;
         Ok(server_view(saved, has_password))
     }
@@ -761,6 +762,9 @@ impl Engine {
             || previous.p2p_mode != settings.p2p_mode
         {
             self.files_settings_changed();
+        }
+        if previous.p2p_mode != settings.p2p_mode {
+            self.camera_availability_refresh_all();
         }
         if previous.positional != settings.positional {
             self.positional_configure(&settings.positional);
