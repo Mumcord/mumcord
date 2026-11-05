@@ -67,10 +67,35 @@ const NAVIGATING = ["navigation", "top-navigation", "meta-refresh", "form"] as c
 
 const DECLARED_HOST = "declared.plugins.test";
 
-const stageFrame = () => $(".plugin-stage iframe.plugin-webview__frame");
-const sideFrame = () => $(".plugin-sidepanel iframe.plugin-webview__frame");
-const dialog = () => $("div.plugin-web-dialog[role='dialog']");
-const dialogFrame = () => dialog().$("iframe.plugin-webview__frame");
+const STAGE_FRAME = ".plugin-stage iframe.plugin-webview__frame";
+const SIDE_FRAME = ".plugin-sidepanel iframe.plugin-webview__frame";
+const DIALOG = "div.plugin-web-dialog[role='dialog']";
+const DIALOG_FRAME = `${DIALOG} iframe.plugin-webview__frame`;
+const stageFrame = () => $(STAGE_FRAME);
+const sideFrame = () => $(SIDE_FRAME);
+const dialog = () => $(DIALOG);
+const dialogFrame = () => $(DIALOG_FRAME);
+
+/** How often the panel log says the side page loaded. */
+async function sideReadyCount(): Promise<number> {
+  return (await surface.panelLines()).filter((l) => l === "ready: side").length;
+}
+
+/** Closes the side panel and opens it again, so it shows a fresh page. */
+async function reopenSide(): Promise<void> {
+  const before = await sideReadyCount();
+  const close = $(".plugin-sidepanel__head .plugin-sidepanel__tool:last-of-type");
+  if (await close.isExisting()) {
+    await close.click();
+    await $(".plugin-sidepanel").waitForExist({ reverse: true, timeout: 10_000 });
+  }
+  await surface.panelButton("Open side panel");
+  await sideFrame().waitForExist({ timeout: 15_000, timeoutMsg: "the side panel did not open" });
+  await browser.waitUntil(async () => (await sideReadyCount()) > before, {
+    timeout: 15_000,
+    timeoutMsg: "the side page did not load again",
+  });
+}
 
 /** What reached the fixture apart from the declared fetch (`GET /` on the declared host). */
 function leaks(): string[] {
@@ -105,11 +130,11 @@ async function focused(): Promise<string> {
   });
 }
 
-/** Moves focus to the wrapper in front of `frame`, then Tab moves it into the page. */
-async function tabInto(frame: ReturnType<typeof $>): Promise<void> {
-  await browser.execute((el) => {
-    el.closest<HTMLElement>(".plugin-webview")?.focus();
-  }, frame);
+/** Moves focus to the wrapper in front of the frame at `frameSelector`, then Tab moves it into the page. */
+async function tabInto(frameSelector: string): Promise<void> {
+  await browser.execute((sel: string) => {
+    document.querySelector(sel)?.closest<HTMLElement>(".plugin-webview")?.focus();
+  }, frameSelector);
   await browser.waitUntil(async () => (await focused()) === "wrapper", {
     timeout: 5_000,
     timeoutMsg: "the frame's wrapper did not take focus",
@@ -190,33 +215,44 @@ describe("plugins 1.1: web frame isolation and keyboard (AC-9.2, AC-9.3, AC-9.5)
   });
 
   it("AC-9.2: navigation, top navigation, meta refresh and form submission go nowhere", async function () {
-    this.timeout(3 * 60_000);
+    this.timeout(5 * 60_000);
     pluginenv.clearHttpsLog();
     for (const probe of NAVIGATING) {
-      await postToFrame(".plugin-sidepanel iframe.plugin-webview__frame", `run:side:${probe}`);
-      // A navigation that went through replaces the page, so it never reports; the host then
-      // removes the frame (PluginFrame: a second load is a navigation).
-      const line = await surface.waitLine(new RegExp(`^side/${probe}: (blocked|error)$`), 20_000);
-      expect(line).toBe(`side/${probe}: blocked`);
-      await expect(sideFrame()).toBeExisting();
+      await postToFrame(SIDE_FRAME, `run:side:${probe}`);
+      // The host removes a frame whose page loads a second time (PluginFrame: that is a
+      // navigation), so a probe either reports "blocked" or its frame disappears. Either way the
+      // HTTPS fixture decides whether anything left the frame.
+      let outcome = "";
+      await browser.waitUntil(
+        async () => {
+          const line = (await surface.panelLines()).find((l) => l.startsWith(`side/${probe}: `));
+          if (line !== undefined && !line.endsWith(": running")) outcome = line;
+          else if (!(await sideFrame().isExisting())) outcome = "removed";
+          return outcome !== "";
+        },
+        { timeout: 20_000, interval: 250, timeoutMsg: `side/${probe} neither reported nor closed` },
+      );
+      expect([`side/${probe}: blocked`, "removed"]).toContain(outcome);
+      if (outcome === "removed") await reopenSide();
     }
     // The main window never left the app either.
     expect(await browser.execute(() => location.protocol)).not.toBe("https:");
     expect(leaks()).toEqual([]);
   });
 
+
   it("AC-9.5: in the stage, Tab enters the page and Esc or F6 return focus to Mumcord", async () => {
-    await tabInto(stageFrame());
+    await tabInto(STAGE_FRAME);
     await leaveWith("Escape");
-    await tabInto(stageFrame());
+    await tabInto(STAGE_FRAME);
     await leaveWith("F6");
     await expect(stageFrame()).toBeExisting();
   });
 
   it("AC-9.5: in the side panel, Tab enters the page and Esc or F6 return focus to Mumcord", async () => {
-    await tabInto(sideFrame());
+    await tabInto(SIDE_FRAME);
     await leaveWith("Escape");
-    await tabInto(sideFrame());
+    await tabInto(SIDE_FRAME);
     await leaveWith("F6");
     await expect(sideFrame()).toBeExisting();
   });
@@ -225,10 +261,10 @@ describe("plugins 1.1: web frame isolation and keyboard (AC-9.2, AC-9.3, AC-9.5)
     await surface.panelButton("Open dialog");
     await dialogFrame().waitForExist({ timeout: 15_000, timeoutMsg: "the web dialog did not open" });
     await surface.waitLine(/^ready: dialog$/);
-    await tabInto(dialogFrame());
+    await tabInto(DIALOG_FRAME);
     await leaveWith("F6");
     await expect(dialog()).toBeDisplayed();
-    await tabInto(dialogFrame());
+    await tabInto(DIALOG_FRAME);
     await browser.keys("Escape");
     await dialog().waitForExist({ reverse: true, timeout: 5_000, timeoutMsg: "Esc did not close the dialog" });
     // Focus is back in Mumcord, not lost with the removed frame.

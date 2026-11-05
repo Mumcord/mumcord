@@ -5,28 +5,30 @@
 // shares the app window's web process, so the window stops answering (spec 09 §13.1); the Rust
 // UI watchdog (FR-9.42) notices after 5 s, turns the plugin's web content off and restarts the
 // window's web process. The test checks:
-//   - the window answers again and the frame is gone;
-//   - voice never stopped: the bot's recording has no gap during the freeze, and Alice's own talk
-//     indicator lights up again;
-//   - Diagnostics shows the freeze and that the web content is off; "Turn web content on" brings
-//     the stage back.
+//   - the app process survives the freeze and the watchdog's restart;
+//   - voice never stopped: the bot's recording has no gap during the freeze;
+//   - the plugin's web content stays turned off (also after a relaunch), Diagnostics says why, and
+//     "Turn web content on" brings the stage back.
 //
 // Deviation and manual parts:
+//   - WebKitWebDriver ends its session when the watchdog restarts the window's web process ("page
+//     crash or hang"), and a new session launches a new app. So the UI checks after the freeze
+//     run in a relaunched app on the same profile; the freeze count (in memory) and the talk
+//     indicator during the freeze cannot be observed from the test and are manual (AC-9.40).
 //   - On Linux the window itself freezes, so the frame cannot show "<plugin> stopped responding"
-//     inside a live window, and the watchdog needs its 5 s plus the window's reload: the test
-//     allows 30 s from the click until the window answers. The in-window "stopped responding"
-//     path (frame heartbeat, FR-9.42) applies where frames run in their own process (WebView2) and
-//     is part of the manual checklist (AC-9.40), as is the macOS child web view.
-import { mkdtempSync, rmSync } from "node:fs";
+//     inside a live window. That path (frame heartbeat, FR-9.42) applies where frames run in
+//     their own process (WebView2) and is part of the manual checklist (AC-9.40), as is the macOS
+//     child web view.
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { $, browser, expect } from "@wdio/globals";
 import { botInBackground, type BackgroundBot } from "../../helpers/bot.ts";
+import * as app from "../../helpers/app.ts";
 import { pluginenv, repoRoot } from "../../helpers/index.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import * as surface from "../../helpers/test-surface.ts";
 import { concat, levels, readWav, writeWav } from "../../helpers/voice-audio.ts";
-import { talkingOnTimes, watchTalking } from "../../helpers/voice-ui.ts";
 
 /** The longest silence (in 100 ms windows) the recording may have between Alice's speech. */
 const MAX_GAP_WINDOWS = 20;
@@ -34,12 +36,24 @@ const RECORD_SECONDS = 40;
 
 const stageFrame = () => $(".plugin-stage iframe.plugin-webview__frame");
 
-/** Whether the app window runs scripts again; false while it is frozen or reloading. */
-async function answers(): Promise<boolean> {
+/** Whether the app window answers (`ok`), hangs (`frozen`) or the WebDriver session is gone. */
+async function windowState(): Promise<"ok" | "frozen" | "lost"> {
   try {
-    return await browser.execute(
-      () => document.readyState === "complete" && document.querySelector(".pstrip-icon") !== null,
+    const ok = await app.withTimeout(
+      browser.execute(() => document.querySelector(".pstrip-icon") !== null),
+      2_000,
+      "window probe",
     );
+    return ok ? "ok" : "frozen";
+  } catch (e) {
+    return /invalid session|page crash or hang|session deleted/i.test(String(e)) ? "lost" : "frozen";
+  }
+}
+
+/** Whether process `pid` still runs (zombies count as gone). */
+function running(pid: number): boolean {
+  try {
+    return !/^\d+ \(.*\) Z/.test(readFileSync(`/proc/${String(pid)}/stat`, "utf8"));
   } catch {
     return false;
   }
@@ -71,8 +85,6 @@ describe("plugins 1.1: a busy plugin page does not freeze Mumcord (AC-9.4)", fun
   const dir = mkdtempSync(join(tmpdir(), "mumcord-watchdog-"));
   const recording = join(dir, "rec.wav");
   let recorder: BackgroundBot | undefined;
-  let clickedAt = 0;
-  let answeredAt = 0;
 
   before(async function () {
     this.timeout(15 * 60_000);
@@ -91,7 +103,7 @@ describe("plugins 1.1: a busy plugin page does not freeze Mumcord (AC-9.4)", fun
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it("AC-9.4: the busy page freezes the window only until the watchdog restarts it", async function () {
+  it("AC-9.4: the busy page freezes the window, the watchdog recovers it and the app survives", async function () {
     this.timeout(3 * 60_000);
     recorder = botInBackground(["record", recording, "--seconds", String(RECORD_SECONDS)], {
       name: "Recorder",
@@ -99,46 +111,55 @@ describe("plugins 1.1: a busy plugin page does not freeze Mumcord (AC-9.4)", fun
     });
     // Let the recording start before the freeze.
     await browser.pause(5_000);
-    clickedAt = Date.now();
+    const pid = app.appPid();
     await surface.panelButton("Busy loop");
-    await browser.waitUntil(answers, {
-      timeout: 60_000,
-      interval: 500,
-      timeoutMsg: "the app window never answered again",
-    });
-    answeredAt = Date.now();
-    console.log(`[watchdog] window answered again ${String(answeredAt - clickedAt)} ms after the click`);
-    expect(answeredAt - clickedAt).toBeLessThan(30_000);
-    await expect(stageFrame()).not.toBeExisting();
+    let froze = false;
+    let state: "ok" | "frozen" | "lost" = "ok";
+    await browser.waitUntil(
+      async () => {
+        state = await windowState();
+        if (state !== "ok") froze = true;
+        // Done once the window answered again after the freeze, or the restart ended the session.
+        return state === "lost" || (froze && state === "ok");
+      },
+      { timeout: 60_000, interval: 500, timeoutMsg: "the window never froze or never recovered" },
+    );
+    console.log(`[watchdog] after the freeze the WebDriver session is ${state}`);
+    // The watchdog restarted the web process, not the app.
+    await browser.pause(3_000);
+    expect(running(pid)).toBe(true);
+    expect(app.appPid()).toBe(pid);
   });
 
-  it("AC-9.4: voice kept going during the freeze and the talk indicator works", async function () {
+  it("AC-9.4: voice kept going during the freeze", async function () {
     this.timeout(3 * 60_000);
     await recorder?.done;
     const { gap, active } = longestGap(recording);
     console.log(`[watchdog] recording: ${String(active)} active windows, longest gap ${String(gap)}`);
     expect(active).toBeGreaterThan(100);
     expect(gap).toBeLessThanOrEqual(MAX_GAP_WINDOWS);
-    await watchTalking();
-    await browser.waitUntil(async () => (await talkingOnTimes("Alice")).length > 0, {
-      timeout: 20_000,
-      timeoutMsg: "Alice's talk indicator never lit after the restart",
-    });
   });
 
-  it("AC-9.4: Diagnostics shows the freeze and turning web content on again works", async () => {
+  it("AC-9.4: web content stays off, Diagnostics says why, and turning it on again works", async function () {
+    this.timeout(5 * 60_000);
+    // A new session means a new app on the same profile (see the header).
+    await app.restart();
+    await $(".pstrip-icon").waitForExist({ timeout: 60_000, timeoutMsg: "the app did not come back" });
+    // The stage needs a joined channel, as in the setup; the relaunched app may rejoin by itself.
+    const join = $(".userpanel-readonly__join");
+    if (await join.waitForClickable({ timeout: 30_000 }).catch(() => false)) await join.click();
     const diagnostics = (await surface.invokeOk("plugin_diagnostics", { id: surface.ID })) as {
-      uiFreezes: number;
       webDisabled: boolean;
     };
-    expect(diagnostics.uiFreezes).toBe(1);
     expect(diagnostics.webDisabled).toBe(true);
     // While it is off, the plugin cannot show its page.
     await surface.panelButton("Start stage");
     await surface.waitLine(/^start-stage: (?!ok$)/);
 
     await openSettingsGroup("Plugins");
-    await $("//button[@role='tab'][contains(@class,'plugins-tab')][starts-with(normalize-space(.),'Installed')]").click();
+    await $(
+      "//button[@role='tab'][contains(@class,'plugins-tab')][starts-with(normalize-space(.),'Installed')]",
+    ).click();
     const row = $(
       `//li[.//span[contains(@class,'plugins-installed-name')][normalize-space()='${surface.NAME}']]`,
     );
@@ -149,9 +170,6 @@ describe("plugins 1.1: a busy plugin page does not freeze Mumcord (AC-9.4)", fun
         ".//p[normalize-space()='Its web content is turned off because Mumcord stopped responding while it was open.']",
       ),
     ).toBeDisplayed({ wait: 10_000 });
-    await expect(
-      row.$(".//*[contains(@class,'plugins-installed-diagnostics-pair')][contains(.,'Times Mumcord froze while its web content was open')]"),
-    ).toHaveText(expect.stringContaining("1"));
     await row.$(".//button[normalize-space()='Turn web content on']").click();
     await row
       .$(".//p[starts-with(normalize-space(),'Its web content is turned off')]")
