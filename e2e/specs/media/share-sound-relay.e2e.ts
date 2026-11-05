@@ -10,6 +10,7 @@
 // Run: npm run e2e -- --spec e2e/specs/media/share-sound-relay.e2e.ts
 import { browser, $, expect } from "@wdio/globals";
 import { app, apps, pwapps, relayenv } from "../../helpers/index.ts";
+import { registerOnServer } from "../../helpers/files-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import {
   P1_HZ,
@@ -56,24 +57,41 @@ const run = relayenv.relayAvailable() && pwapps.pipewireRunning();
     pwapps.startTestApp(P1, P1_HZ);
     pwapps.startTestApp(P2, P2_HZ);
     await startSharer({ sharePick: "screen" }, port);
+    // The relay bot hands out relay tokens to registered users only.
+    await registerOnServer();
     await relayOnly();
     await startViewer(port);
-    await apps.onB(relayOnly);
+    await apps.onB(async () => {
+      await registerOnServer();
+      await relayOnly();
+    });
     await share();
     await expectSoundLine("Sound: desktop");
     await watch();
+    // The watch must run through the broadcast before its sound can be checked; the relay
+    // tokens and the broadcast link take a moment after the view opens.
+    await apps.onB(async () => {
+      let path: string | undefined;
+      await browser
+        .waitUntil(
+          async () => {
+            const serverId = await app.invoke<number | null>("voice_server_get");
+            const listed = await app.invoke<{ session: number }[]>("screen_share_list", { serverId });
+            const stats = await app.invoke<{ path: string } | null>("screen_share_watch_stats", {
+              serverId,
+              session: listed[0]?.session,
+            });
+            path = stats?.path;
+            return path === "broadcast";
+          },
+          { timeout: 45_000, interval: 500 },
+        )
+        .catch(() => {
+          throw new Error(`B watches through ${String(path)}, want the broadcast`);
+        });
+    });
     await app.invoke("audio_test_sound");
     await expectHeard([P1_HZ, P2_HZ]);
-    const path = await apps.onB(async () => {
-      const serverId = await app.invoke<number | null>("voice_server_get");
-      const listed = await app.invoke<{ session: number }[]>("screen_share_list", { serverId });
-      const stats = await app.invoke<{ path: string } | null>("screen_share_watch_stats", {
-        serverId,
-        session: listed[0]?.session,
-      });
-      return stats?.path;
-    });
-    expect(path).toBe("broadcast");
   });
 
   it("AC-7.70: the relay sees no app name", async () => {
