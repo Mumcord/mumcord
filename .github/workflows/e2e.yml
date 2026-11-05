@@ -366,6 +366,17 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
+      # Screenshots for the side-by-side check against the mockups (AC-7.71); the repo has no
+      # image diff, so a person compares them.
+      - name: Upload mockup screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-mockup-shots-shard-${{ matrix.shard }}
+          path: e2e/artifacts/mockup-shots/
+          retention-days: 14
+          if-no-files-found: ignore
+
       - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v7

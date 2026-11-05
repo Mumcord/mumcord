@@ -153,13 +153,14 @@ export function QualityMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
+        data-tooltip={t("liveBar.quality")}
         disabled={choice === null}
         onClick={() => {
           setOpen((value) => !value);
         }}
       >
         <GaugeIcon />
-        {t("liveBar.quality")}
+        <span className="sharer-bar__label">{t("liveBar.quality")}</span>
         <ChevronDownIcon />
       </button>
       {open && choice !== null && (

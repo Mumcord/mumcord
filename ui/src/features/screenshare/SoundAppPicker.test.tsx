@@ -61,7 +61,12 @@ describe("SoundAppPicker", () => {
     expect(icon).toHaveAttribute("alt", "");
     const spotify = within(list).getByRole("option", { name: "Spotify", hidden: true });
     expect(spotify.querySelector("img")).toBeNull();
-    expect(spotify.querySelector(".sound-picker__icon")).toHaveAttribute("aria-hidden", "true");
+    const square = spotify.querySelector<HTMLElement>(".sound-picker__icon");
+    expect(square).toHaveAttribute("aria-hidden", "true");
+    // One of the mockup's square colours, not a generated one.
+    expect(["#e66000", "#1db954", "#ff8800", "#e53935"]).toContain(
+      square?.style.getPropertyValue("--app-colour"),
+    );
   });
 
   it("shares the chosen app's sound", () => {

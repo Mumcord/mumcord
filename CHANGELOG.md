@@ -80,6 +80,8 @@
 - Settings → Plugins → Diagnostics now says why a plugin was refused at load, for example "an Apps-menu label is the same as one of Mumcord's own", instead of showing nothing.
 - A plugin that talks to websites could not reach them right after it was installed, updated or loaded from a developer folder: its requests were refused until Mumcord was restarted
 - Plugin SDK: a Bovnar document with one text of 64 KB or more is now refused as `too-large` instead of `malformed`, so plugins can tell the player the message is too big.
+- The screen-share live bar keeps its buttons on one row when the chat is narrow (small window or members panel open): they show only their icons there, with their names as tooltips and for screen readers
+- Apps without an icon of their own in "Which app's sound?" now get a square in the colours of the design instead of a random colour
 - Log lines from the very start of the app, such as the screen-share encoder check on older CPUs, are no longer missing from the log file and the diagnostic file
 - A chat message from someone who leaves right after sending it (a shared file, too) now shows their name instead of an empty sender, and a block still applies to it.
 - A screen share sent with VP9 no longer risks crashing Mumcord when the shared window grows or the quality steps up to a size larger than the one the share started at; the encoder now restarts at the new size with a fresh keyframe.
