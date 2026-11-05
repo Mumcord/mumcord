@@ -19,5 +19,7 @@
   "channelsOf": "Kanāli · {server}",
   "moreChannels": "Vairāk kanālu Mumcord…",
   "recentChats": "Nesenās tērzēšanas",
-  "chatUnread": "{name} – {count} nelasīti"
+  "chatUnread": "{name} – {count} nelasīti",
+  "cameraOn": "Kamera ieslēgta",
+  "turnOffCamera": "Izslēgt kameru"
 }

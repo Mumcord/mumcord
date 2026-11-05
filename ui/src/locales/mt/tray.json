@@ -19,5 +19,7 @@
   "channelsOf": "Kanali · {server}",
   "moreChannels": "Aktar kanali f'Mumcord…",
   "recentChats": "Chats riċenti",
-  "chatUnread": "{name} – {count} mhux moqrija"
+  "chatUnread": "{name} – {count} mhux moqrija",
+  "cameraOn": "Kamera mixgħula",
+  "turnOffCamera": "Itfi l-kamera"
 }

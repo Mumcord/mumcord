@@ -19,5 +19,7 @@
   "channelsOf": "Canale · {server}",
   "moreChannels": "Mai multe canale în Mumcord…",
   "recentChats": "Conversații recente",
-  "chatUnread": "{name} – {count} necitite"
+  "chatUnread": "{name} – {count} necitite",
+  "cameraOn": "Cameră pornită",
+  "turnOffCamera": "Oprește camera"
 }

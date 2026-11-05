@@ -8,7 +8,8 @@
 //!
 //! Nothing is bound by default (Q1.7). A key press runs [`trigger`]: "Open Mumcord" brings the
 //! window to the front here, every other action goes to the UI as [`HotkeyPressed`], which
-//! already knows the voice server, the channels and the layout.
+//! already knows the voice server, the channels and the layout. The camera hotkey
+//! (`camera_hotkey`, FR-8.20) is bound with the actions and runs [`toggle_camera`] here.
 //!
 //! Other features bind their keys through [`bind_group`] as well (whisper targets, #67): each
 //! [`Group`] is replaced as a whole and never touches the keys of another group.
@@ -16,8 +17,10 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
+use mumcord_engine::camera::{CameraState, CameraView};
 use mumcord_engine::store::{self, Hotkey, HotkeyAction};
-use tauri::AppHandle;
+use mumcord_engine::{Engine, ServerId};
+use tauri::{AppHandle, Manager};
 use tauri_specta::Event;
 
 use crate::commands::hotkeys::{HotkeyConflict, HotkeyPressed, HotkeySlot, InAppShortcut};
@@ -164,7 +167,9 @@ fn index_of(i: usize) -> u32 {
 /// background" is on, none while it is off.
 pub async fn configure(app: &AppHandle, settings: &store::Settings) {
     let bindings = if settings.global_hotkeys {
-        action_bindings(app, &settings.hotkeys)
+        let mut bindings = action_bindings(app, &settings.hotkeys);
+        bindings.extend(camera_binding(app, settings.camera_hotkey.as_deref()));
+        bindings
     } else {
         Vec::new()
     };
@@ -218,6 +223,64 @@ fn trigger(app: &AppHandle, action: &HotkeyAction) {
     };
     if let Err(e) = event.emit(app) {
         tracing::warn!(error = %e, "telling the UI about a hotkey failed");
+    }
+}
+
+/// Id of the camera hotkey; it is not an action of the hotkeys list.
+const CAMERA_ID: &str = "camera";
+
+fn camera_binding(app: &AppHandle, key: Option<&str>) -> Option<Binding> {
+    let app = app.clone();
+    Some(Binding {
+        id: CAMERA_ID.to_owned(),
+        description: "Turn camera on / off".to_owned(),
+        key: key?.to_owned(),
+        sink: Arc::new(move |pressed| {
+            if pressed {
+                toggle_camera(&app);
+            }
+        }),
+    })
+}
+
+/// What the camera hotkey does (FR-8.20).
+#[derive(Debug, PartialEq, Eq)]
+enum CameraStep {
+    /// The camera is on (or being turned on): off at once, without asking (FR-8.19).
+    TurnOff(ServerId),
+    /// The camera is off: the window comes to the front and the preview opens (FR-8.10).
+    OpenPreview(ServerId),
+    /// The preview is already open, or there is no voice server to use the camera on: only
+    /// the window comes to the front.
+    Show,
+}
+
+fn camera_step(view: Option<&CameraView>, voice: Option<ServerId>) -> CameraStep {
+    match view {
+        Some(view) if matches!(view.state, CameraState::Requesting | CameraState::OnAir) => {
+            CameraStep::TurnOff(view.server_id)
+        }
+        Some(view) if view.state == CameraState::Preview => CameraStep::Show,
+        _ => voice.map_or(CameraStep::Show, CameraStep::OpenPreview),
+    }
+}
+
+/// Runs the camera hotkey on the voice server, where the camera is used.
+fn toggle_camera(app: &AppHandle) {
+    let engine = app.state::<Engine>();
+    match camera_step(engine.camera_view().as_ref(), engine.voice_server()) {
+        CameraStep::TurnOff(server_id) => engine.camera_turn_off(server_id),
+        CameraStep::OpenPreview(server_id) => {
+            crate::window::show(app);
+            // The preview reports its state (and the dialog opens) through `cameraChanged`.
+            if let Err(e) = engine.camera_preview_start(server_id) {
+                tracing::warn!(
+                    error = e.code(),
+                    "opening the camera preview from the hotkey failed"
+                );
+            }
+        }
+        CameraStep::Show => crate::window::show(app),
     }
 }
 
@@ -406,6 +469,33 @@ mod tests {
         Hotkey {
             key: key.into(),
             action,
+        }
+    }
+
+    fn camera(server_id: ServerId, state: CameraState) -> CameraView {
+        let mut view = CameraView::off(server_id);
+        view.state = state;
+        view
+    }
+
+    #[test]
+    fn camera_hotkey_opens_the_preview_when_off_and_turns_off_when_on() {
+        assert_eq!(camera_step(None, Some(3)), CameraStep::OpenPreview(3));
+        assert_eq!(
+            camera_step(Some(&camera(3, CameraState::Off)), Some(3)),
+            CameraStep::OpenPreview(3)
+        );
+        assert_eq!(camera_step(None, None), CameraStep::Show);
+        assert_eq!(
+            camera_step(Some(&camera(3, CameraState::Preview)), Some(3)),
+            CameraStep::Show
+        );
+        // The camera's own server counts, even when voice moved meanwhile.
+        for state in [CameraState::Requesting, CameraState::OnAir] {
+            assert_eq!(
+                camera_step(Some(&camera(2, state)), Some(3)),
+                CameraStep::TurnOff(2)
+            );
         }
     }
 

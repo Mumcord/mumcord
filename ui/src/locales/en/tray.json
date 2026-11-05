@@ -19,5 +19,7 @@
   "channelsOf": "Channels · {server}",
   "moreChannels": "More channels in Mumcord…",
   "recentChats": "Recent chats",
-  "chatUnread": "{name} – {count} unread"
+  "chatUnread": "{name} – {count} unread",
+  "cameraOn": "Camera on",
+  "turnOffCamera": "Turn off camera"
 }

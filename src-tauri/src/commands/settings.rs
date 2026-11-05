@@ -1229,7 +1229,10 @@ pub async fn settings_update(
     if mouse_changed || key != active_ptt_key(&previous) {
         configure_ptt(&app, key);
     }
-    if stored.hotkeys != previous.hotkeys || stored.global_hotkeys != previous.global_hotkeys {
+    if stored.hotkeys != previous.hotkeys
+        || stored.global_hotkeys != previous.global_hotkeys
+        || stored.camera_hotkey != previous.camera_hotkey
+    {
         super::hotkeys::configure(&app, &stored);
     }
     if stored.language != previous.language {

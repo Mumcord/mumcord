@@ -19,5 +19,7 @@
   "channelsOf": "Kanalid · {server}",
   "moreChannels": "Rohkem kanaleid Mumcordis…",
   "recentChats": "Viimased vestlused",
-  "chatUnread": "{name} – {count} lugemata"
+  "chatUnread": "{name} – {count} lugemata",
+  "cameraOn": "Kaamera sees",
+  "turnOffCamera": "Lülita kaamera välja"
 }
