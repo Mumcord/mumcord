@@ -569,3 +569,74 @@
   border-radius: 0;
   box-shadow: none;
 }
+
+/* The share or party view draws its line and chips into these places of the one header. */
+.cam-combined__slot {
+  display: contents;
+}
+
+/* Who or what the main picture is, always on it in the combined card (mockups 08–09). */
+.cam-main__label {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 2;
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--media-scrim);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  pointer-events: none;
+}
+
+.cam-combined[data-large] .cam-main__label {
+  display: none;
+}
+
+/* The share's own buttons among the header chips take the chips' size (mockup 08). */
+.cam-room__chips .share-chip {
+  height: 1.5rem;
+  font-size: var(--font-size-xs);
+}
+
+.cam-room__chips .share-chip--button {
+  width: 1.5rem;
+}
+
+.cam-room__chips .viewer-quality__button {
+  width: auto;
+  padding: 0 var(--space-2);
+}
+
+/* The party sits in the card without its own padding and rule (mockup 09). */
+.cam-combined .watch-cinema {
+  padding: 0;
+  border-bottom: 0;
+}
+
+/* Above the picture the cameras stay one row and shrink to fit it (mockup 09). */
+.cam-combined > .cam-strip--row {
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.cam-combined > .cam-strip--row > .cam-strip__item {
+  flex: 0 1 11rem;
+  min-width: 0;
+}
+
+.cam-combined > .cam-strip--row .cam-tile {
+  width: 100%;
+}
+
+.cam-chip .share-path {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}

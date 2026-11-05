@@ -30,6 +30,9 @@ export interface StripRoomProps {
   title: string;
   /** The card around main item and strip; full screen takes it. */
   frame: RefObject<HTMLElement | null>;
+  /** Receive the header places the main item draws into (see `combinedHeader`). */
+  subSlot: (element: HTMLElement | null) => void;
+  chipsSlot: (element: HTMLElement | null) => void;
   /** The tile menu button of a tile (spec 08 §5.3), as in the room. */
   renderTileMenu?: (tile: TileModel) => ReactNode;
 }
@@ -39,6 +42,8 @@ export function StripRoom({
   main,
   title: mainTitle,
   frame,
+  subSlot,
+  chipsSlot,
   renderTileMenu,
 }: StripRoomProps) {
   const { t } = useTranslation("camera");
@@ -54,6 +59,11 @@ export function StripRoom({
   const title = usePopoutTitle(serverId, t("room.title"));
   useCameraAnnouncements(model.tiles);
   const hidden = position === "hidden";
+  // The strip starts with the self-view (mockups 08–09); the others keep the room's order.
+  const tiles = [
+    ...model.tiles.filter((tile) => tile.key === "self"),
+    ...model.tiles.filter((tile) => tile.key !== "self"),
+  ];
   const largeTile = large === null ? undefined : model.tiles.find((tile) => tile.key === large);
 
   // Hidden unbinds every camera like Hide video; the header keeps counting them (FR-8.71).
@@ -127,12 +137,12 @@ export function StripRoom({
         title={mainTitle}
         cameraCount={model.cameraCount}
         position={position}
+        subSlot={subSlot}
+        chipsSlot={chipsSlot}
       />
       {!hidden && (
         <StripTiles
-          tiles={
-            largeTile === undefined ? model.tiles : model.tiles.filter((tile) => tile !== largeTile)
-          }
+          tiles={largeTile === undefined ? tiles : tiles.filter((tile) => tile !== largeTile)}
           position={position}
           renderTile={renderTile}
         />
