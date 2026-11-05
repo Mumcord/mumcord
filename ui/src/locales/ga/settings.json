@@ -1202,7 +1202,7 @@
     "close": "Dún",
     "privacyTitle": "Príobháideacht",
     "lockOff": "Cas mo cheamara as nuair a ghlasálann an scáileán",
-    "privacyNote": "Tosaíonn do cheamara as i gcónaí agus taispeánann sé réamhamharc ar dtús. Casann sé as nuair a fhágann tú an cainéal nó nuair a dhínascann tú. Ní fheiceann ach daoine i do chainéal gutha é, trí athsheachadán an fhreastalaí seo, criptithe ó cheann go ceann. Ní thaifeadann Mumcord ceamaraí riamh.",
+    "privacyNote": "Tosaíonn do cheamara as i gcónaí agus taispeánann sé réamhamharc ar dtús. Casann sé as nuair a fhágann tú an cainéal nó nuair a dhínascann tú. Ní fheiceann ach daoine i do chainéal gutha é, trí athsheachadán an fhreastalaí seo, criptithe ó cheann go ceann. Ní thaifeadann Mumcord ceamaraí riamh. Ní shábhálann Mumcord an lucht féachana d'íomhá ar an diosca riamh, ach ní féidir leis cosc a chur ar dhuine gabháil scáileáin a dhéanamh lena chóras oibriúcháin.",
     "othersTitle": "Ceamaraí daoine eile",
     "showCameras": "Taispeáin ceamaraí",
     "showAlways": "I gcónaí",

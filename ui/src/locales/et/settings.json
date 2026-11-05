@@ -1175,7 +1175,7 @@
     "close": "Sulge",
     "privacyTitle": "Privaatsus",
     "lockOff": "Lülita minu kaamera välja, kui ekraan lukustub",
-    "privacyNote": "Sinu kaamera algab alati väljalülitatuna ja näitab kõigepealt eelvaadet. See lülitub välja, kui lahkud kanalilt või katkestad ühenduse. Seda näevad ainult sinu häälkanali liikmed selle serveri relee kaudu, otspunktkrüptitult. Mumcord ei salvesta kunagi kaameraid.",
+    "privacyNote": "Sinu kaamera algab alati väljalülitatuna ja näitab kõigepealt eelvaadet. See lülitub välja, kui lahkud kanalilt või katkestad ühenduse. Seda näevad ainult sinu häälkanali liikmed selle serveri relee kaudu, otspunktkrüptitult. Mumcord ei salvesta kunagi kaameraid. Vaatajate Mumcord ei salvesta sinu pilti kunagi kettale, kuid ei saa takistada kedagi oma operatsioonisüsteemiga ekraanipilti tegemast.",
     "othersTitle": "Teiste kaamerad",
     "showCameras": "Näita kaameraid",
     "showAlways": "Alati",

@@ -1175,7 +1175,7 @@
     "close": "Luk",
     "privacyTitle": "Privatliv",
     "lockOff": "Sluk mit kamera, når skærmen låses",
-    "privacyNote": "Dit kamera starter altid slukket og viser først en forhåndsvisning. Det slukkes, når du forlader kanalen eller afbryder forbindelsen. Kun personer i din talekanal kan se det, via denne servers relay og end-to-end-krypteret. Mumcord optager aldrig kameraer.",
+    "privacyNote": "Dit kamera starter altid slukket og viser først en forhåndsvisning. Det slukkes, når du forlader kanalen eller afbryder forbindelsen. Kun personer i din talekanal kan se det, via denne servers relay og end-to-end-krypteret. Mumcord optager aldrig kameraer. Seernes Mumcord gemmer aldrig dit billede på disken, men kan ikke forhindre nogen i at tage et skærmbillede med deres styresystem.",
     "othersTitle": "Andres kameraer",
     "showCameras": "Vis kameraer",
     "showAlways": "Altid",

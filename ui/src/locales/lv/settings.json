@@ -1184,7 +1184,7 @@
     "close": "Aizvērt",
     "privacyTitle": "Privātums",
     "lockOff": "Izslēgt manu kameru, kad ekrāns tiek bloķēts",
-    "privacyNote": "Jūsu kamera vienmēr sākas izslēgta un vispirms rāda priekšskatījumu. Tā izslēdzas, kad atstājat kanālu vai atvienojaties. To var redzēt tikai jūsu balss kanāla cilvēki, izmantojot šī servera relay, ar pilnīgu šifrēšanu. Mumcord nekad neieraksta kameras.",
+    "privacyNote": "Jūsu kamera vienmēr sākas izslēgta un vispirms rāda priekšskatījumu. Tā izslēdzas, kad atstājat kanālu vai atvienojaties. To var redzēt tikai jūsu balss kanāla cilvēki, izmantojot šī servera relay, ar pilnīgu šifrēšanu. Mumcord nekad neieraksta kameras. Skatītāju Mumcord nekad nesaglabā tavu attēlu diskā, taču tas nevar nevienam liegt uzņemt ekrānuzņēmumu ar savu operētājsistēmu.",
     "othersTitle": "Citu kameras",
     "showCameras": "Rādīt kameras",
     "showAlways": "Vienmēr",

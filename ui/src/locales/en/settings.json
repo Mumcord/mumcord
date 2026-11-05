@@ -1175,7 +1175,7 @@
     "close": "Close",
     "privacyTitle": "Privacy",
     "lockOff": "Turn my camera off when my screen locks",
-    "privacyNote": "Your camera always starts off and shows a preview first. It turns off when you leave the channel or disconnect. Only people in your voice channel can see it, through this server's relay, end-to-end encrypted. Mumcord never records cameras.",
+    "privacyNote": "Your camera always starts off and shows a preview first. It turns off when you leave the channel or disconnect. Only people in your voice channel can see it, through this server's relay, end-to-end encrypted. Mumcord never records cameras. Viewers' Mumcord never saves your picture to disk, but it can't stop someone from taking a screenshot with their operating system.",
     "othersTitle": "Other people's cameras",
     "showCameras": "Show cameras",
     "showAlways": "Always",
