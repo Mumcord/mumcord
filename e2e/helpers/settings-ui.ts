@@ -18,9 +18,14 @@ export const SETTINGS_GROUPS = [
 ] as const;
 export type SettingsGroup = (typeof SETTINGS_GROUPS)[number];
 
-/** The sidebar tab of `group`. */
+/**
+ * The sidebar tab of `group`, found by its label: badges (the Plugins update count, "New") add
+ * their own text to the tab.
+ */
 export function settingsTab(group: SettingsGroup) {
-  return $(`//button[@role='tab'][normalize-space(.)='${group}']`);
+  return $(
+    `//button[@role='tab'][.//span[contains(@class,'settings__tab-label')][normalize-space(.)='${group}']]`,
+  );
 }
 
 /** Opens Settings through Quick settings → "All settings…" (no-op when it is already open). */
@@ -39,7 +44,7 @@ export async function openAllSettings(): Promise<void> {
 async function describeTabHit(group: SettingsGroup): Promise<string> {
   return browser.execute((label: string) => {
     const tab = [...document.querySelectorAll("button[role='tab']")].find(
-      (el) => el.textContent.trim() === label,
+      (el) => el.querySelector(".settings__tab-label")?.textContent.trim() === label,
     );
     if (!tab) return "tab missing";
     const r = tab.getBoundingClientRect();

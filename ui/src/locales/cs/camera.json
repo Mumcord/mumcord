@@ -53,18 +53,29 @@
     "effectsUnavailable": "Efekty pozadí nejsou na tomto počítači dostupné: {{reason}}",
     "levelBest": "Nejlepší",
     "levelLight": "Lehká",
-    "blurStrengthValue": "{{value}} ze 100",
     "imageYoursNumbered": "Tvůj obrázek {{number}}",
     "errorUseNotAllowed": "Relay tohoto serveru sdílení kamery nepovoluje.",
     "errorRelayDown": "Kameru se nepodařilo spustit: relay není dostupný."
   },
   "backgrounds": {
-    "beach": "Pláž",
-    "mountains": "Hory",
-    "nightCity": "Noční město",
-    "softLight": "Měkké světlo",
-    "studio": "Studio",
-    "library": "Knihovna"
+    "abstractWarmWaves": "Teplé světelné vlny",
+    "blueMagentaWaves": "Modré a purpurové vlny",
+    "glossyWavesOrb": "Lesklé vlny",
+    "pixelMountainSunset": "Pixelový západ slunce v horách",
+    "cityBalconyNight": "Městský balkon v noci",
+    "modernWc": "Moderní WC",
+    "electronicsLab": "Elektronická laboratoř",
+    "serverCorridor": "Serverová chodba",
+    "neonGamingRoom": "Neonová herní místnost",
+    "neonNerdRoom": "Neonový nerdovský pokoj",
+    "pixelGamingRoomCat": "Pixelová herní místnost s kočkou",
+    "reefAquariumRoom": "Místnost s útesovým akváriem",
+    "nightModelRailway": "Modelová železnice v noci",
+    "modelRailwayViaduct": "Diorama s železničním viaduktem",
+    "spaceshipBridgeCat": "Můstek vesmírné lodi s kočkou",
+    "spaceStationEarth": "Vesmírná stanice nad Zemí",
+    "scifiRoomGoldenValley": "Sci-fi místnost se zlatým údolím",
+    "underwaterBaseWhale": "Podvodní základna s velrybou"
   },
   "noCameraFound": "Nenalezena žádná kamera. Připoj kameru a objeví se tady.",
   "imageImportFailed": "Tento obrázek nelze použít. Použij soubor PNG, JPEG nebo WebP do 10 MB.",
@@ -100,7 +111,15 @@
     "live": "Tvoje kamera běží živě",
     "stopped": "Tvoje kamera se zastavila",
     "joined": "{{name}} zapnul(a) kameru",
-    "left": "{{name}} vypnul(a) kameru"
+    "left": "{{name}} vypnul(a) kameru",
+    "turnedOn_one": "{{names}} zapnul(a) kameru",
+    "turnedOn_few": "{{names}} zapnuli kamery",
+    "turnedOn_many": "{{names}} zapnuli kamery",
+    "turnedOn_other": "{{names}} zapnuli kamery",
+    "turnedOff_one": "{{names}} vypnul(a) kameru",
+    "turnedOff_few": "{{names}} vypnuli kamery",
+    "turnedOff_many": "{{names}} vypnuli kamery",
+    "turnedOff_other": "{{names}} vypnuli kamery"
   },
   "room": {
     "title": "Místnost kamer",
@@ -143,7 +162,8 @@
     "miniBar_few": "{{count}} zapnuté kamery",
     "miniBar_many": "{{count}} zapnuté kamery",
     "miniBar_other": "{{count}} zapnutých kamer",
-    "cameras": "Kamery"
+    "cameras": "Kamery",
+    "fullTitle": "Místnost je plná při 9 kamerách"
   },
   "position": {
     "label": "Kamery",
@@ -166,7 +186,8 @@
     "retry": "Zkusit znovu",
     "hidden": "Video skryto",
     "showVideo": "Zobrazit video",
-    "viewing": "Sleduješ"
+    "viewing": "Sleduješ",
+    "weak": "Slabé připojení"
   },
   "tileMenu": {
     "pin": "Připnout pro mě",

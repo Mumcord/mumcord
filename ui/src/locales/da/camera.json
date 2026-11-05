@@ -53,18 +53,29 @@
     "effectsUnavailable": "Baggrundseffekter er ikke tilgængelige på denne pc: {{reason}}",
     "levelBest": "Bedst",
     "levelLight": "Let",
-    "blurStrengthValue": "{{value}} af 100",
     "imageYoursNumbered": "Dit billede {{number}}",
     "errorUseNotAllowed": "Denne servers relæ tillader ikke kameradeling.",
     "errorRelayDown": "Kameraet kunne ikke starte: relæet kan ikke nås."
   },
   "backgrounds": {
-    "beach": "Strand",
-    "mountains": "Bjerge",
-    "nightCity": "By om natten",
-    "softLight": "Blødt lys",
-    "studio": "Studie",
-    "library": "Bibliotek"
+    "abstractWarmWaves": "Varme lysbølger",
+    "blueMagentaWaves": "Blå og magenta bølger",
+    "glossyWavesOrb": "Blanke bølger",
+    "pixelMountainSunset": "Pixel-bjerge i solnedgang",
+    "cityBalconyNight": "Byaltan om natten",
+    "modernWc": "Moderne toilet",
+    "electronicsLab": "Elektroniklaboratorium",
+    "serverCorridor": "Servergang",
+    "neonGamingRoom": "Neon-gamingværelse",
+    "neonNerdRoom": "Neon-nørdeværelse",
+    "pixelGamingRoomCat": "Pixel-gamingværelse med kat",
+    "reefAquariumRoom": "Rum med revakvarium",
+    "nightModelRailway": "Modeljernbane om natten",
+    "modelRailwayViaduct": "Diorama med jernbaneviadukt",
+    "spaceshipBridgeCat": "Rumskibsbro med kat",
+    "spaceStationEarth": "Rumstation over Jorden",
+    "scifiRoomGoldenValley": "Sci-fi-rum med gylden dal",
+    "underwaterBaseWhale": "Undervandsbase med hval"
   },
   "noCameraFound": "Intet kamera fundet. Tilslut et kamera, så vises det her.",
   "imageImportFailed": "Dette billede kan ikke bruges. Brug en PNG-, JPEG- eller WebP-fil på op til 10 MB.",
@@ -100,7 +111,11 @@
     "live": "Dit kamera er live",
     "stopped": "Dit kamera stoppede",
     "joined": "{{name}} tændte sit kamera",
-    "left": "{{name}} slukkede sit kamera"
+    "left": "{{name}} slukkede sit kamera",
+    "turnedOn_one": "{{names}} tændte sit kamera",
+    "turnedOn_other": "{{names}} tændte deres kameraer",
+    "turnedOff_one": "{{names}} slukkede sit kamera",
+    "turnedOff_other": "{{names}} slukkede deres kameraer"
   },
   "room": {
     "title": "Kamerarum",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} kamera tændt",
     "cameras": "Kameraer",
     "label_other": "Kamerarum, {{count}} kameraer tændt",
-    "miniBar_other": "{{count}} kameraer tændt"
+    "miniBar_other": "{{count}} kameraer tændt",
+    "fullTitle": "Rummet er fuldt ved 9 kameraer"
   },
   "position": {
     "label": "Kameraer",
@@ -156,7 +172,8 @@
     "retry": "Prøv igen",
     "hidden": "Video skjult",
     "showVideo": "Vis video",
-    "viewing": "Ser med"
+    "viewing": "Ser med",
+    "weak": "Svag forbindelse"
   },
   "tileMenu": {
     "pin": "Fastgør for mig",

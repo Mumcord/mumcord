@@ -105,7 +105,7 @@ export function CameraTile({
           </span>
         )}
         {tile.fpsBadge !== null && video && (
-          <span className="cam-tile__badge" data-tone="warn" title={t("tile.weak")}>
+          <span className="cam-tile__badge" data-tone="warn" data-tooltip={t("tile.weak")}>
             <RoomIcon name="weak" size={11} />
             {t("tile.fps", { fps: tile.fpsBadge })}
             <span className="visually-hidden">, {t("tile.weak")}</span>

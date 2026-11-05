@@ -11,6 +11,7 @@ import { app, pluginenv, testenv } from "../../helpers/index.ts";
 import { addFirstServer, finishWizard } from "../../helpers/chat-ui.ts";
 import { fill } from "../../helpers/servers-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
+import { confirmInstall, openPrompt } from "../../helpers/score-ui.ts";
 
 const NAME = "Test Surface";
 /** FR-9.45's gesture window. */
@@ -20,7 +21,6 @@ const pluginTab = (name: string) =>
   $(`//button[@role='tab'][contains(@class,'plugins-tab')][starts-with(normalize-space(.),'${name}')]`);
 const card = (name: string) =>
   $(`//li[@class='plugin-card'][.//*[contains(@class,'plugin-card-name')][normalize-space(.)='${name}']]`);
-const prompt = () => $("//div[contains(concat(' ',@class,' '),' plugin-prompt ')]");
 const panelLine = (text: string) =>
   $(`//*[contains(@class,'pstrip-panel')]//*[normalize-space(.)='${text}']`);
 const sideFrame = () =>
@@ -70,19 +70,11 @@ describe("plugins: a trusted click in the plugin's page is a gesture (FR-9.45, A
     await add.waitForDisplayed({ reverse: true, timeout: 10_000 });
 
     await pluginTab("Browse").click();
-    const install = card(NAME).$(`button[aria-label='Install ${NAME}']`);
-    await install.waitForClickable({ timeout: 30_000 });
-    await install.click();
-    const confirm = prompt().$("button=Install");
-    await confirm.waitForExist({ timeout: 60_000 });
-    // An unofficial plugin may need the "I understand" tick first (FR-9.80).
-    const tick = prompt().$("input[type='checkbox']");
-    if (await tick.isExisting()) await tick.click();
-    await confirm.waitForClickable({ timeout: 10_000 });
-    await confirm.click();
-    await expect($(".plugin-toast")).toHaveText(expect.stringContaining(`${NAME} installed`), {
-      wait: 60_000,
-    });
+    await card(NAME).$(`button[aria-label='Install ${NAME}']`).waitForClickable({ timeout: 30_000 });
+    await openPrompt(NAME);
+    // An unofficial plugin may need the "I understand" tick first (FR-9.80); the prompt also
+    // lists per-website checkboxes, so only the confirmation box may be ticked here.
+    await confirmInstall(NAME);
     await closeSettings();
   });
 

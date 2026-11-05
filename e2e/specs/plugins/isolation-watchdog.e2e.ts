@@ -25,6 +25,7 @@ import { join } from "node:path";
 import { $, browser, expect } from "@wdio/globals";
 import { botInBackground, type BackgroundBot } from "../../helpers/bot.ts";
 import * as app from "../../helpers/app.ts";
+import { reconnectSaved } from "../../helpers/chat-ui.ts";
 import { pluginenv, repoRoot } from "../../helpers/index.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import * as surface from "../../helpers/test-surface.ts";
@@ -144,8 +145,10 @@ describe("plugins 1.1: a busy plugin page does not freeze Mumcord (AC-9.4)", fun
     this.timeout(5 * 60_000);
     // A new session means a new app on the same profile (see the header).
     await app.restart();
+    // After a restart nothing connects by itself, and the plugin strip only shows while connected.
+    await reconnectSaved();
     await $(".pstrip-icon").waitForExist({ timeout: 60_000, timeoutMsg: "the app did not come back" });
-    // The stage needs a joined channel, as in the setup; the relaunched app may rejoin by itself.
+    // The stage needs a joined channel, as in the setup.
     const join = $(".userpanel-readonly__join");
     if (await join.waitForClickable({ timeout: 30_000 }).catch(() => false)) await join.click();
     const diagnostics = (await surface.invokeOk("plugin_diagnostics", { id: surface.ID })) as {

@@ -423,8 +423,15 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
     const mini = $(`div.mini-bar[aria-label='Media area: ${STAGE}']`);
     if (await mini.isExisting()) await expect(mini).toBeDisplayed();
     await browser.switchToWindow(popout);
-    await browser.keys(["Control", "w"]);
-    await browser.switchToWindow(main);
+    try {
+      await browser.keys(["Control", "w"]);
+    } catch (error) {
+      // The window closes on the key press, so releasing the keys finds no window; the wait
+      // below checks that it really closed.
+      if (!/no such window/i.test(String(error))) throw error;
+    } finally {
+      await browser.switchToWindow(main);
+    }
     await browser.waitUntil(async () => (await browser.getWindowHandles()).length === 1, {
       timeout: 10_000,
       timeoutMsg: "the pop-out did not close with Ctrl+W",

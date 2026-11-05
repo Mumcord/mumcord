@@ -53,18 +53,29 @@
     "effectsUnavailable": "Níl éifeachtaí cúlra ar fáil ar an ríomhaire seo: {{reason}}",
     "levelBest": "Is fearr",
     "levelLight": "Éadrom",
-    "blurStrengthValue": "{{value}} as 100",
     "imageYoursNumbered": "D'íomhá {{number}}",
     "errorUseNotAllowed": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt ceamara.",
     "errorRelayDown": "Níor tosaíodh an ceamara: níl an t-athsheachadán inrochtana."
   },
   "backgrounds": {
-    "beach": "Trá",
-    "mountains": "Sléibhte",
-    "nightCity": "Cathair san oíche",
-    "softLight": "Solas bog",
-    "studio": "Stiúideo",
-    "library": "Leabharlann"
+    "abstractWarmWaves": "Tonnta teo solais",
+    "blueMagentaWaves": "Tonnta gorma agus maigeanta",
+    "glossyWavesOrb": "Tonnta snasta",
+    "pixelMountainSunset": "Luí gréine picteilíní ar shléibhte",
+    "cityBalconyNight": "Balcóin chathrach san oíche",
+    "modernWc": "Leithreas nua-aimseartha",
+    "electronicsLab": "Saotharlann leictreonaice",
+    "serverCorridor": "Dorchla freastalaithe",
+    "neonGamingRoom": "Seomra cluichíochta neoin",
+    "neonNerdRoom": "Seomra nirdeanna neoin",
+    "pixelGamingRoomCat": "Seomra cluichíochta picteilíní le cat",
+    "reefAquariumRoom": "Seomra le huisceadán sceire",
+    "nightModelRailway": "Iarnród samhla san oíche",
+    "modelRailwayViaduct": "Dioráma de tharbhealach iarnróid",
+    "spaceshipBridgeCat": "Droichead spáslong le cat",
+    "spaceStationEarth": "Stáisiún spáis os cionn an Domhain",
+    "scifiRoomGoldenValley": "Seomra ficsean eolaíochta le gleann órga",
+    "underwaterBaseWhale": "Bunáit faoi uisce le míol mór"
   },
   "noCameraFound": "Níor aimsíodh ceamara. Ceangail ceamara agus beidh sé le feiceáil anseo.",
   "imageImportFailed": "Ní féidir an íomhá seo a úsáid. Úsáid comhad PNG, JPEG nó WebP suas le 10 MB.",
@@ -100,7 +111,17 @@
     "live": "Tá do cheamara beo",
     "stopped": "Stop do cheamara",
     "joined": "Chas {{name}} a cheamara air",
-    "left": "Chas {{name}} a cheamara as"
+    "left": "Chas {{name}} a cheamara as",
+    "turnedOn_one": "Chas {{names}} a cheamara air",
+    "turnedOn_two": "Chas {{names}} a gceamaraí air",
+    "turnedOn_few": "Chas {{names}} a gceamaraí air",
+    "turnedOn_many": "Chas {{names}} a gceamaraí air",
+    "turnedOn_other": "Chas {{names}} a gceamaraí air",
+    "turnedOff_one": "Chas {{names}} a cheamara as",
+    "turnedOff_two": "Chas {{names}} a gceamaraí as",
+    "turnedOff_few": "Chas {{names}} a gceamaraí as",
+    "turnedOff_many": "Chas {{names}} a gceamaraí as",
+    "turnedOff_other": "Chas {{names}} a gceamaraí as"
   },
   "room": {
     "title": "Seomra ceamaraí",
@@ -148,7 +169,8 @@
     "miniBar_two": "{{count}} cheamara ar siúl",
     "miniBar_few": "{{count}} cheamara ar siúl",
     "miniBar_many": "{{count}} gceamara ar siúl",
-    "miniBar_other": "{{count}} ceamara ar siúl"
+    "miniBar_other": "{{count}} ceamara ar siúl",
+    "fullTitle": "Tá an seomra lán ag 9 gceamara"
   },
   "position": {
     "label": "Ceamaraí",
@@ -171,7 +193,8 @@
     "retry": "Bain triail eile as",
     "hidden": "Físeán folaithe",
     "showVideo": "Taispeáin an físeán",
-    "viewing": "Ag féachaint"
+    "viewing": "Ag féachaint",
+    "weak": "Nasc lag"
   },
   "tileMenu": {
     "pin": "Greamaigh dom",

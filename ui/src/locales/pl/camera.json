@@ -53,18 +53,29 @@
     "effectsUnavailable": "Efekty tła nie są dostępne na tym komputerze: {{reason}}",
     "levelBest": "Najlepsza",
     "levelLight": "Lekka",
-    "blurStrengthValue": "{{value}} ze 100",
     "imageYoursNumbered": "Twój obraz {{number}}",
     "errorUseNotAllowed": "Przekaźnik tego serwera nie pozwala na udostępnianie kamery.",
     "errorRelayDown": "Nie udało się uruchomić kamery: przekaźnik jest nieosiągalny."
   },
   "backgrounds": {
-    "beach": "Plaża",
-    "mountains": "Góry",
-    "nightCity": "Miasto nocą",
-    "softLight": "Miękkie światło",
-    "studio": "Studio",
-    "library": "Biblioteka"
+    "abstractWarmWaves": "Ciepłe fale światła",
+    "blueMagentaWaves": "Niebieskie i purpurowe fale",
+    "glossyWavesOrb": "Błyszczące fale",
+    "pixelMountainSunset": "Pikselowy zachód słońca w górach",
+    "cityBalconyNight": "Miejski balkon nocą",
+    "modernWc": "Nowoczesna toaleta",
+    "electronicsLab": "Laboratorium elektroniczne",
+    "serverCorridor": "Korytarz serwerowy",
+    "neonGamingRoom": "Neonowy pokój gamingowy",
+    "neonNerdRoom": "Neonowy pokój nerda",
+    "pixelGamingRoomCat": "Pikselowy pokój gamingowy z kotem",
+    "reefAquariumRoom": "Pokój z akwarium rafowym",
+    "nightModelRailway": "Makieta kolejowa nocą",
+    "modelRailwayViaduct": "Diorama z wiaduktem kolejowym",
+    "spaceshipBridgeCat": "Mostek statku kosmicznego z kotem",
+    "spaceStationEarth": "Stacja kosmiczna nad Ziemią",
+    "scifiRoomGoldenValley": "Pokój sci-fi ze złotą doliną",
+    "underwaterBaseWhale": "Podwodna baza z wielorybem"
   },
   "noCameraFound": "Nie znaleziono kamery. Podłącz kamerę, a pojawi się tutaj.",
   "imageImportFailed": "Nie można użyć tego obrazu. Użyj pliku PNG, JPEG lub WebP do 10 MB.",
@@ -100,7 +111,15 @@
     "live": "Twoja kamera nadaje na żywo",
     "stopped": "Twoja kamera się zatrzymała",
     "joined": "{{name}} włączył(a) kamerę",
-    "left": "{{name}} wyłączył(a) kamerę"
+    "left": "{{name}} wyłączył(a) kamerę",
+    "turnedOn_one": "{{names}} włączył(a) kamerę",
+    "turnedOn_few": "{{names}} włączyli kamery",
+    "turnedOn_many": "{{names}} włączyli kamery",
+    "turnedOn_other": "{{names}} włączyli kamery",
+    "turnedOff_one": "{{names}} wyłączył(a) kamerę",
+    "turnedOff_few": "{{names}} wyłączyli kamery",
+    "turnedOff_many": "{{names}} wyłączyli kamery",
+    "turnedOff_other": "{{names}} wyłączyli kamery"
   },
   "room": {
     "title": "Pokój kamer",
@@ -143,7 +162,8 @@
     "miniBar_few": "{{count}} kamery włączone",
     "miniBar_many": "{{count}} kamer włączonych",
     "miniBar_other": "{{count}} kamery włączone",
-    "cameras": "Kamery"
+    "cameras": "Kamery",
+    "fullTitle": "Pokój jest pełny przy 9 kamerach"
   },
   "position": {
     "label": "Kamery",
@@ -166,7 +186,8 @@
     "retry": "Spróbuj ponownie",
     "hidden": "Wideo ukryte",
     "showVideo": "Pokaż wideo",
-    "viewing": "Oglądasz"
+    "viewing": "Oglądasz",
+    "weak": "Słabe połączenie"
   },
   "tileMenu": {
     "pin": "Przypnij dla mnie",

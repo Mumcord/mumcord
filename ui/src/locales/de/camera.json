@@ -53,18 +53,29 @@
     "effectsUnavailable": "Hintergrundeffekte sind auf diesem PC nicht verfügbar: {{reason}}",
     "levelBest": "Beste",
     "levelLight": "Leicht",
-    "blurStrengthValue": "{{value}} von 100",
     "imageYoursNumbered": "Dein Bild {{number}}",
     "errorUseNotAllowed": "Das Relay dieses Servers erlaubt keine Kamerafreigabe.",
     "errorRelayDown": "Die Kamera konnte nicht gestartet werden: Das Relay ist nicht erreichbar."
   },
   "backgrounds": {
-    "beach": "Strand",
-    "mountains": "Berge",
-    "nightCity": "Stadt bei Nacht",
-    "softLight": "Sanftes Licht",
-    "studio": "Studio",
-    "library": "Bibliothek"
+    "abstractWarmWaves": "Warme Lichtwellen",
+    "blueMagentaWaves": "Blaue und magentafarbene Wellen",
+    "glossyWavesOrb": "Glänzende Wellen",
+    "pixelMountainSunset": "Pixel-Berge im Sonnenuntergang",
+    "cityBalconyNight": "Stadtbalkon bei Nacht",
+    "modernWc": "Modernes WC",
+    "electronicsLab": "Elektroniklabor",
+    "serverCorridor": "Serverflur",
+    "neonGamingRoom": "Neon-Gaming-Zimmer",
+    "neonNerdRoom": "Neon-Nerd-Zimmer",
+    "pixelGamingRoomCat": "Pixel-Gaming-Zimmer mit Katze",
+    "reefAquariumRoom": "Zimmer mit Riffaquarium",
+    "nightModelRailway": "Modelleisenbahn bei Nacht",
+    "modelRailwayViaduct": "Diorama mit Eisenbahnviadukt",
+    "spaceshipBridgeCat": "Raumschiffbrücke mit Katze",
+    "spaceStationEarth": "Raumstation über der Erde",
+    "scifiRoomGoldenValley": "Sci-Fi-Raum mit goldenem Tal",
+    "underwaterBaseWhale": "Unterwasserbasis mit Wal"
   },
   "noCameraFound": "Keine Kamera gefunden. Schließe eine Kamera an, dann erscheint sie hier.",
   "imageImportFailed": "Dieses Bild kann nicht verwendet werden. Nutze eine PNG-, JPEG- oder WebP-Datei bis 10 MB.",
@@ -100,7 +111,11 @@
     "live": "Deine Kamera ist live",
     "stopped": "Deine Kamera wurde angehalten",
     "joined": "{{name}} hat die Kamera eingeschaltet",
-    "left": "{{name}} hat die Kamera ausgeschaltet"
+    "left": "{{name}} hat die Kamera ausgeschaltet",
+    "turnedOn_one": "{{names}} hat die Kamera eingeschaltet",
+    "turnedOn_other": "{{names}} haben ihre Kameras eingeschaltet",
+    "turnedOff_one": "{{names}} hat die Kamera ausgeschaltet",
+    "turnedOff_other": "{{names}} haben ihre Kameras ausgeschaltet"
   },
   "room": {
     "title": "Kameraraum",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} Kamera an",
     "cameras": "Kameras",
     "label_other": "Kameraraum, {{count}} Kameras an",
-    "miniBar_other": "{{count}} Kameras an"
+    "miniBar_other": "{{count}} Kameras an",
+    "fullTitle": "Der Raum ist mit 9 Kameras voll"
   },
   "position": {
     "label": "Kameras",
@@ -156,7 +172,8 @@
     "retry": "Erneut versuchen",
     "hidden": "Video ausgeblendet",
     "showVideo": "Video anzeigen",
-    "viewing": "Ansicht"
+    "viewing": "Ansicht",
+    "weak": "Schwache Verbindung"
   },
   "tileMenu": {
     "pin": "Für mich anheften",
