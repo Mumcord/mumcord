@@ -19,5 +19,7 @@
   "channelsOf": "Kanavat · {server}",
   "moreChannels": "Lisää kanavia Mumcordissa…",
   "recentChats": "Viimeisimmät keskustelut",
-  "chatUnread": "{name} – {count} lukematonta"
+  "chatUnread": "{name} – {count} lukematonta",
+  "cameraOn": "Kamera päällä",
+  "turnOffCamera": "Sammuta kamera"
 }

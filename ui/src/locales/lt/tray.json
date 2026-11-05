@@ -19,5 +19,7 @@
   "channelsOf": "Kanalai · {server}",
   "moreChannels": "Daugiau kanalų Mumcord…",
   "recentChats": "Naujausi pokalbiai",
-  "chatUnread": "{name} – {count} neperskaityti"
+  "chatUnread": "{name} – {count} neperskaityti",
+  "cameraOn": "Kamera įjungta",
+  "turnOffCamera": "Išjungti kamerą"
 }

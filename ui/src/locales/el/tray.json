@@ -19,5 +19,7 @@
   "channelsOf": "Κανάλια · {server}",
   "moreChannels": "Περισσότερα κανάλια στο Mumcord…",
   "recentChats": "Πρόσφατες συνομιλίες",
-  "chatUnread": "{name} – {count} μη αναγνωσμένα"
+  "chatUnread": "{name} – {count} μη αναγνωσμένα",
+  "cameraOn": "Κάμερα ενεργή",
+  "turnOffCamera": "Απενεργοποίηση κάμερας"
 }

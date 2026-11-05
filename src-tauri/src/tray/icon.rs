@@ -1,6 +1,7 @@
 //! Tray icon pictures (FR-3.132): the tray mark greyed out while disconnected, dimmed with a red
 //! slash while muted or deafened, with a green ring while someone in the user's channel talks,
-//! plus a pink unread badge (with the mention count) and a moon for Do Not Disturb.
+//! plus a pink unread badge (with the mention count), a moon for Do Not Disturb and a red camera
+//! badge while the own camera is on air (FR-8.22).
 
 use tauri::image::Image;
 
@@ -197,7 +198,30 @@ pub fn compose(base: &Image<'_>, state: IconState) -> Image<'static> {
             (inside && !bitten).then_some(opaque(MOON))
         });
     }
+    if state.camera {
+        draw_camera_badge(&mut canvas, size);
+    }
     Image::new_owned(canvas.rgba, canvas.w, canvas.h)
+}
+
+/// The red camera badge bottom right: a white camera body with its lens wedge on a red disc. It
+/// replaces the amber connecting badge's spot, which cannot show while the camera is on air.
+fn draw_camera_badge(canvas: &mut Canvas, size: f32) {
+    let r = size * 0.22;
+    let (cx, cy) = (size - r - size * 0.04, size - r - size * 0.04);
+    canvas.badge(cx, cy, r, RED);
+    let (body_w, body_h) = (r * 0.55, r * 0.42);
+    let body_cx = cx - r * 0.15;
+    let wedge_left = body_cx + body_w;
+    canvas.paint(|x, y| {
+        let (dx, dy) = (x - body_cx, y - cy);
+        let body = dx.abs() <= body_w && dy.abs() <= body_h;
+        // The lens wedge widens to the right like a camcorder's.
+        let t = x - wedge_left;
+        let wedge =
+            (0.0..=r * 0.4).contains(&t) && dy.abs() <= body_h * (0.35 + t / (r * 0.4) * 0.65);
+        (body || wedge).then_some([255, 255, 255, 255])
+    });
 }
 
 /// A small coloured dot for menu rows (server state, unread chats).
@@ -224,6 +248,7 @@ mod tests {
             unread: false,
             mentions: 0,
             dnd: false,
+            camera: false,
         }
     }
 
@@ -284,6 +309,18 @@ mod tests {
         let img = compose(&white(), s);
         assert_eq!(at(&img, 12, 51), opaque(MOON));
         assert_eq!(at(&img, 52, 12), WHITE);
+    }
+
+    #[test]
+    fn camera_adds_a_red_badge_bottom_right() {
+        let mut s = state(Look::Idle);
+        s.camera = true;
+        let img = compose(&white(), s);
+        // The badge's rim, the white camera body in its centre, and the untouched corner.
+        assert_eq!(at(&img, 47, 56), opaque(RED));
+        assert_eq!(at(&img, 47, 47), WHITE);
+        assert_eq!(at(&img, 10, 10), WHITE);
+        assert_ne!(at(&img, 47, 40), WHITE);
     }
 
     #[test]

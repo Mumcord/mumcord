@@ -19,5 +19,7 @@
   "channelsOf": "Kanaler · {server}",
   "moreChannels": "Fler kanaler i Mumcord…",
   "recentChats": "Senaste chattar",
-  "chatUnread": "{name} – {count} olästa"
+  "chatUnread": "{name} – {count} olästa",
+  "cameraOn": "Kamera på",
+  "turnOffCamera": "Stäng av kameran"
 }

@@ -19,5 +19,7 @@
   "channelsOf": "Канали · {server}",
   "moreChannels": "Още канали в Mumcord…",
   "recentChats": "Последни чатове",
-  "chatUnread": "{name} – {count} непрочетени"
+  "chatUnread": "{name} – {count} непрочетени",
+  "cameraOn": "Камерата е включена",
+  "turnOffCamera": "Изключи камерата"
 }
