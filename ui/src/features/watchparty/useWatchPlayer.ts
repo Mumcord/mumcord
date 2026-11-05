@@ -213,7 +213,7 @@ export function useWatchPlayer(
       syncRef.current = null;
       window.clearTimeout(timeout);
     };
-  }, [videoId, origin]);
+  }, [videoId, origin, frameRef]);
 
   /** The user pressed a control: it goes to the player and to everyone (issue #163). */
   const act = useCallback((command: WatchCommand, toPlayer: BridgeCommand) => {
