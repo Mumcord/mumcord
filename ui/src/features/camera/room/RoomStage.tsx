@@ -2,6 +2,8 @@
  * The tiles of the camera room in the Grid (FR-8.63) or Speaker layout (FR-8.64). The tiles keep
  * 16:9 and are letterboxed inside the area: without a chosen media area height the grid takes the
  * mockups' width for its count (at most 58 % of the window high), with one it fits that height.
+ * A tile chosen with "Show large" takes the Speaker layout's large place in either layout. The
+ * tiles are one Tab stop with roving focus and their own keys (spec 08 §5.5).
  */
 import {
   useLayoutEffect,
@@ -12,7 +14,10 @@ import {
   type RefObject,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { fitGridWidth, gridShape, presetWidthRem } from "./layout";
+import { fitGridWidth, gridShape, presetWidthRem, type TileKey } from "./layout";
+import { setLargeTile } from "./roomChoices";
+import { openTileMenu, toggleHidden, toggleLarge, togglePin } from "./TileMenuActions";
+import { useGridKeys, type TileCommand } from "./useGridKeys";
 import type { RoomModel, TileModel } from "./useRoomModel";
 
 /** Gap between tiles (`--space-2`) in rem. */
@@ -69,19 +74,63 @@ function useBox(ref: RefObject<HTMLElement | null>): Box | null {
 
 export interface RoomStageProps {
   model: RoomModel;
-  renderTile: (tile: TileModel, place: "grid" | "large" | "strip") => ReactNode;
+  renderTile: (tile: TileModel, place: "grid" | "large" | "strip", tabIndex: 0 | -1) => ReactNode;
+}
+
+/** Runs a tile key (spec 08 §5.5); `false` when it had nothing to do. */
+function runTileCommand(
+  model: RoomModel,
+  key: TileKey,
+  command: TileCommand,
+  element: HTMLElement,
+): boolean {
+  const tile = model.tiles.find((candidate) => candidate.key === key);
+  if (tile === undefined) return false;
+  switch (command) {
+    case "menu":
+      openTileMenu(key, element);
+      return true;
+    case "pin":
+      togglePin(tile);
+      return true;
+    case "large":
+      toggleLarge(tile, model.large);
+      return true;
+    case "hide":
+      toggleHidden(model.serverId, tile);
+      return true;
+    case "escape":
+      if (model.large === null) return false;
+      setLargeTile(null);
+      return true;
+  }
 }
 
 export function RoomStage({ model, renderTile }: RoomStageProps) {
   const { t } = useTranslation("camera");
   const ref = useRef<HTMLDivElement>(null);
   const box = useBox(ref);
-  const speaker = model.layout === "speaker" && model.tiles.length > 1 ? model.speaker : null;
-  const large = speaker === null ? null : model.tiles.find((tile) => tile.key === speaker);
+  const speaker =
+    model.tiles.length < 2
+      ? null
+      : (model.large ?? (model.layout === "speaker" ? model.speaker : null));
+  const large = speaker === null ? undefined : model.tiles.find((tile) => tile.key === speaker);
+  const shape = gridShape(model.tiles.length);
+  // Reading order: the large tile comes first, then the strip.
+  const keys =
+    large === undefined
+      ? model.tiles.map((tile) => tile.key)
+      : [large.key, ...model.tiles.filter((tile) => tile !== large).map((tile) => tile.key)];
+  const gridKeys = useGridKeys(
+    keys,
+    large === undefined ? shape.cols : 1,
+    (key, command, element) => runTileCommand(model, key, command, element),
+  );
+  const place = (tile: TileModel, where: "grid" | "large" | "strip") =>
+    renderTile(tile, where, gridKeys.tabIndexOf(tile.key));
 
   let content: ReactNode;
-  if (large === undefined || large === null) {
-    const shape = gridShape(model.tiles.length);
+  if (large === undefined) {
     const preset = presetWidthRem(model.tiles.length);
     const width =
       box === null
@@ -99,19 +148,24 @@ export function RoomStage({ model, renderTile }: RoomStageProps) {
       >
         {model.tiles.map((tile) => (
           <div key={String(tile.key)} role="listitem" className="cam-grid__item">
-            {renderTile(tile, "grid")}
+            {place(tile, "grid")}
           </div>
         ))}
       </div>
     );
   } else {
-    content = (
-      <SpeakerLayout box={box} large={large} others={model.tiles} renderTile={renderTile} />
-    );
+    content = <SpeakerLayout box={box} large={large} others={model.tiles} place={place} />;
   }
 
   return (
-    <div ref={ref} className="cam-room__stage media-frame__picture">
+    // The keys come from the focused tile inside (a focusable group); the stage only delegates.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div
+      ref={ref}
+      className="cam-room__stage media-frame__picture"
+      onKeyDown={gridKeys.onKeyDown}
+      onFocus={gridKeys.onFocus}
+    >
       {content}
     </div>
   );
@@ -126,12 +180,12 @@ function SpeakerLayout({
   box,
   large,
   others,
-  renderTile,
+  place,
 }: {
   box: Box | null;
   large: TileModel;
   others: readonly TileModel[];
-  renderTile: RoomStageProps["renderTile"];
+  place: (tile: TileModel, where: "large" | "strip") => ReactNode;
 }) {
   const { t } = useTranslation("camera");
   const strip = others.filter((tile) => tile.key !== large.key);
@@ -146,12 +200,12 @@ function SpeakerLayout({
   return (
     <div className="cam-speaker">
       <div className="cam-speaker__large" style={{ width }}>
-        {renderTile(large, "large")}
+        {place(large, "large")}
       </div>
       <div className="cam-strip cam-strip--row" role="list" aria-label={t("room.cameras")}>
         {strip.map((tile) => (
           <div key={String(tile.key)} role="listitem" className="cam-grid__item">
-            {renderTile(tile, "strip")}
+            {place(tile, "strip")}
           </div>
         ))}
       </div>

@@ -3978,7 +3978,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       });
       return Promise.resolve();
     },
-    cameraTileSetQuality: () => Promise.resolve(),
+    cameraTileSetQuality: (serverId, sharer, quality) => {
+      const room = cameraRoomOf(serverId);
+      setCameraRoomView({
+        ...room,
+        tiles: room.tiles.map((tile) => (tile.sharer === sharer ? { ...tile, quality } : tile)),
+      });
+      return Promise.resolve();
+    },
     cameraTileSetHeight: () => Promise.resolve(),
     cameraRequestKeyframe: () => Promise.resolve(),
     cameraFramesAttach: () => Promise.resolve(),
