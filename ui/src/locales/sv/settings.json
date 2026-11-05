@@ -17,7 +17,8 @@
     "packetInspector": "Paketinspektör",
     "hotkeys": "Kortkommandon",
     "plugins": "Tillägg",
-    "screenSharing": "Skärmdelning"
+    "screenSharing": "Skärmdelning",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Start, språk, uppdateringar och tillgänglighet.",
@@ -31,7 +32,8 @@
     "advanced": "Utvecklarverktyg, diagnostik, lagring och licenser.",
     "about": "Version, support och installationsguiden.",
     "plugins": "Tillägg körs i en sandlåda och får bara det du tillåter. De ser aldrig ditt ljud, dina filer eller ditt certifikat.",
-    "screenSharing": "Kvalitet, kodek och hårdvara för att dela din skärm. Tittarna ser alltid det du väljer innan du börjar."
+    "screenSharing": "Kvalitet, kodek och hårdvara för att dela din skärm. Tittarna ser alltid det du väljer innan du börjar.",
+    "camera": "Din kamera, bakgrundseffekter och hur du ser andras kameror. Kameradelning kräver en server med mumpeer-relä."
   },
   "breadcrumb": "Inställningar / {{section}}",
   "moreInfo": "Mer information: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "aviseringar popup-fönster",
     "externalContent": "inbäddat innehåll bilder förhandsvisningar",
     "fileSharing": "filer skicka ta emot ladda ner spara mapp bilaga zip",
-    "screenSharing": "skärmdelning kvalitet upplösning fps videokodek AV1 VP9 kodare grafikkort"
+    "screenSharing": "skärmdelning kvalitet upplösning fps videokodek AV1 VP9 kodare grafikkort",
+    "camera": "kamera webbkamera video bakgrund oskärpa virtuell bakgrund spegla egenvy"
   },
   "search": {
     "label": "Sök i inställningar",
@@ -1046,7 +1049,9 @@
     "addNone": "Anslut till en server för att välja en av dess kanaler.",
     "addConfirm": "Lägg till",
     "reset": "Återställ alla kortkommandon",
-    "resetHint": "Tar bort alla kortkommandon utom push-to-talk; som standard är inget inställt."
+    "resetHint": "Tar bort alla kortkommandon utom push-to-talk; som standard är inget inställt.",
+    "camera": "Slå på / av kameran",
+    "cameraHint": "Öppnar förhandsvisningen när kameran är av och stänger av den när den är på."
   },
   "developerMode": {
     "title": "Utvecklarläge",
@@ -1124,5 +1129,70 @@
     "skippedAboveLimit": "VP9 (din bild är över vad AV1 klarar här)",
     "softwareWarning": "AV1 körs på processorn utan godkänt test och kan vara för tungt för den här datorn.",
     "checkAgain": "Kontrollera igen"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Förhandsvisning av din kamera",
+    "previewName": "Du",
+    "previewNote": "Förhandsvisning, bara på den här enheten. Den stoppas när du lämnar sidan.",
+    "device": "Kamera",
+    "deviceDefault": "Systemstandard",
+    "noDevice": "Ingen kamera hittades",
+    "sendQuality": "Sändningskvalitet",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (upp till 720p · 30 fps) skickar bara så mycket som tittarna behöver: mindre i ett stort rutnät, skarpare när någon fäster dig.",
+    "mirror": "Spegla min egen vy",
+    "mirrorHint": "Bara din egen vy speglas. Andra ser dig rättvänd.",
+    "backgroundTitle": "Bakgrund",
+    "defaultBackground": "Standardbakgrund",
+    "backgroundNone": "Ingen",
+    "backgroundBlur": "Oskärpa",
+    "backgroundLibrary": "Bild: bibliotek",
+    "backgroundOwn": "Bild: {{name}} (din)",
+    "blurStrength": "Oskärpans styrka",
+    "blurLight": "Svag",
+    "blurStrong": "Stark",
+    "effectQuality": "Effektkvalitet",
+    "effectAuto": "Auto",
+    "effectBest": "Bäst (grafikkort)",
+    "effectLight": "Lätt (sparar batteri)",
+    "effectHint": "Auto använder grafikkortet när det går och växlar till Lätt på batteri eller när datorn är upptagen.",
+    "ownImages_one": "Dina egna bakgrundsbilder stannar på den här enheten (sparade: {{count}}). Bara den färdiga bilden skickas.",
+    "ownImages_other": "Dina egna bakgrundsbilder stannar på den här enheten (sparade: {{count}}). Bara den färdiga bilden skickas.",
+    "manageImages": "Hantera bilder",
+    "imagesTitle": "Dina bakgrundsbilder",
+    "imagesEmpty": "Inga bilder än. Lägg till en PNG-, JPEG- eller WebP-bild som bakgrund.",
+    "imageName": "Bild {{number}}",
+    "imageDelete": "Ta bort",
+    "imageDeleteLabel": "Ta bort {{name}}",
+    "imageDeleted": "{{name}} borttagen",
+    "imageAdded": "{{name}} tillagd",
+    "addImage": "Lägg till bild",
+    "addImageTitle": "Välj en bakgrundsbild",
+    "imageFilter": "Bilder",
+    "close": "Stäng",
+    "privacyTitle": "Integritet",
+    "lockOff": "Stäng av min kamera när skärmen låses",
+    "privacyNote": "Din kamera startar alltid avstängd och visar först en förhandsvisning. Den stängs av när du lämnar kanalen eller kopplar från. Bara personer i din röstkanal kan se den, via den här serverns relä och end-to-end-krypterad. Mumcord spelar aldrig in kameror.",
+    "othersTitle": "Andras kameror",
+    "showCameras": "Visa kameror",
+    "showAlways": "Alltid",
+    "showOnOpen": "När jag öppnar rummet",
+    "showNever": "Aldrig",
+    "showHint": "Alltid öppnar kamerarummet när någon i din kanal slår på en kamera. Aldrig håller dig i enbart röst och laddar inte ner någon video.",
+    "dataSaver": "Datasparläge: högst 15 fps för alla",
+    "reduceMotion": "Minska rörelse: inget sken eller ingen animation på talarens ram",
+    "reduceMotionHint": "Följer som standard systemets inställning för minskad rörelse.",
+    "errors": {
+      "busy": "Kameran stoppades: en annan app använder din kamera.",
+      "noCamera": "Ingen kamera hittades. Anslut en kamera så visas den här.",
+      "permissionDenied": "Kameraåtkomst nekades",
+      "deviceGone": "Kameran stoppades: kameran kopplades från.",
+      "unreadable": "Kameran stoppades: kameran skickar oläsliga bilder.",
+      "cameraFailed": "Kameran kunde inte startas."
+    },
+    "imageImportFailed": "Den här bilden kan inte användas. Använd en PNG-, JPEG- eller WebP-fil upp till 10 MB."
   }
 }

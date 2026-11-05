@@ -17,7 +17,8 @@
     "packetInspector": "Csomagvizsgáló",
     "hotkeys": "Gyorsbillentyűk",
     "plugins": "Bővítmények",
-    "screenSharing": "Képernyőmegosztás"
+    "screenSharing": "Képernyőmegosztás",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Indítás, nyelv, frissítések és kisegítő lehetőségek.",
@@ -31,7 +32,8 @@
     "advanced": "Fejlesztői eszközök, diagnosztika, tárhely és licencek.",
     "about": "Verzió, támogatás és a beállítási varázsló.",
     "plugins": "A bővítmények elszigetelt környezetben futnak, és csak azt kapják meg, amit engedélyezel. Soha nem látják a hangodat, a fájljaidat vagy a tanúsítványodat.",
-    "screenSharing": "Minőség, kodek és hardver a képernyőd megosztásához. A nézők mindig azt látják, amit a kezdés előtt kiválasztasz."
+    "screenSharing": "Minőség, kodek és hardver a képernyőd megosztásához. A nézők mindig azt látják, amit a kezdés előtt kiválasztasz.",
+    "camera": "A kamerád, a háttéreffektek és az, hogyan látod mások kameráit. A kamera megosztásához mumpeer-relével rendelkező szerver kell."
   },
   "breadcrumb": "Beállítások / {{section}}",
   "moreInfo": "További információ: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "riasztások felugró ablakok",
     "externalContent": "beágyazások képek előnézetek",
     "fileSharing": "fájlok küldés fogadás letöltés mentés mappa melléklet zip",
-    "screenSharing": "képernyőmegosztás képernyő minőség felbontás fps kodek AV1 VP9 kódoló videokártya"
+    "screenSharing": "képernyőmegosztás képernyő minőség felbontás fps kodek AV1 VP9 kódoló videokártya",
+    "camera": "kamera webkamera videó háttér elmosás virtuális háttér tükrözés saját kép"
   },
   "search": {
     "label": "Beállítások keresése",
@@ -1046,7 +1049,9 @@
     "addNone": "Csatlakozz egy szerverhez, hogy kiválaszthasd az egyik csatornáját.",
     "addConfirm": "Hozzáadás",
     "reset": "Összes gyorsbillentyű visszaállítása",
-    "resetHint": "Eltávolít minden gyorsbillentyűt a push-to-talk kivételével; alapértelmezés szerint semmi nincs beállítva."
+    "resetHint": "Eltávolít minden gyorsbillentyűt a push-to-talk kivételével; alapértelmezés szerint semmi nincs beállítva.",
+    "camera": "Kamera be / ki",
+    "cameraHint": "Megnyitja az előnézetet, ha a kamera ki van kapcsolva, és kikapcsolja, ha be van kapcsolva."
   },
   "developerMode": {
     "title": "Fejlesztői mód",
@@ -1124,5 +1129,70 @@
     "skippedAboveLimit": "VP9 (a képed meghaladja, amit az AV1 itt kezelni tud)",
     "softwareWarning": "Az AV1 sikeres ellenőrzés nélkül a processzoron fut, és túl nehéz lehet ennek a gépnek.",
     "checkAgain": "Ellenőrzés újra"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "A kamerád előnézete",
+    "previewName": "Te",
+    "previewNote": "Előnézet, csak ezen az eszközön. Leáll, ha elhagyod ezt az oldalt.",
+    "device": "Kamera",
+    "deviceDefault": "Rendszer alapértelmezett",
+    "noDevice": "Nem található kamera",
+    "sendQuality": "Küldési minőség",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Az Auto (legfeljebb 720p · 30 fps) csak annyit küld, amennyi a nézőknek kell: kisebbet nagy rácsban, élesebbet, ha valaki kitűz téged.",
+    "mirror": "Saját képem tükrözése",
+    "mirrorHint": "Csak a saját nézeted tükröződik. Mások a helyes irányban látnak.",
+    "backgroundTitle": "Háttér",
+    "defaultBackground": "Alapértelmezett háttér",
+    "backgroundNone": "Nincs",
+    "backgroundBlur": "Elmosás",
+    "backgroundLibrary": "Kép: könyvtár",
+    "backgroundOwn": "Kép: {{name}} (saját)",
+    "blurStrength": "Elmosás erőssége",
+    "blurLight": "Gyenge",
+    "blurStrong": "Erős",
+    "effectQuality": "Effektek minősége",
+    "effectAuto": "Auto",
+    "effectBest": "Legjobb (videókártya)",
+    "effectLight": "Könnyű (spórol az akkuval)",
+    "effectHint": "Az Auto a videókártyát használja, ha tudja, és akkumulátoron vagy terhelt gépnél Könnyűre vált.",
+    "ownImages_one": "A saját háttérképeid ezen az eszközön maradnak (mentve: {{count}}). Csak a kész kép kerül elküldésre.",
+    "ownImages_other": "A saját háttérképeid ezen az eszközön maradnak (mentve: {{count}}). Csak a kész kép kerül elküldésre.",
+    "manageImages": "Képek kezelése",
+    "imagesTitle": "A háttérképeid",
+    "imagesEmpty": "Még nincsenek képek. Adj hozzá egy PNG, JPEG vagy WebP képet háttérnek.",
+    "imageName": "{{number}}. kép",
+    "imageDelete": "Törlés",
+    "imageDeleteLabel": "{{name}} törlése",
+    "imageDeleted": "{{name}} törölve",
+    "imageAdded": "{{name}} hozzáadva",
+    "addImage": "Kép hozzáadása",
+    "addImageTitle": "Válassz háttérképet",
+    "imageFilter": "Képek",
+    "close": "Bezárás",
+    "privacyTitle": "Adatvédelem",
+    "lockOff": "Kamerám kikapcsolása, ha a képernyő zárolódik",
+    "privacyNote": "A kamerád mindig kikapcsolva indul, és először előnézetet mutat. Kikapcsol, ha elhagyod a csatornát vagy bontod a kapcsolatot. Csak a hangcsatornád tagjai látják, a szerver relén keresztül, végpontok közötti titkosítással. A Mumcord soha nem rögzít kamerákat.",
+    "othersTitle": "Mások kamerái",
+    "showCameras": "Kamerák megjelenítése",
+    "showAlways": "Mindig",
+    "showOnOpen": "Amikor megnyitom a szobát",
+    "showNever": "Soha",
+    "showHint": "A Mindig megnyitja a kameraszobát, ha valaki a csatornádban bekapcsol egy kamerát. A Soha csak hangon tart, és nem tölt le videót.",
+    "dataSaver": "Adatkímélő: legfeljebb 15 fps mindenkinek",
+    "reduceMotion": "Kevesebb mozgás: nincs fény és animáció a beszélő keretén",
+    "reduceMotionHint": "Alapértelmezés szerint a rendszer csökkentett mozgás beállítását követi.",
+    "errors": {
+      "busy": "A kamera leállt: másik alkalmazás használja a kamerádat.",
+      "noCamera": "Nem található kamera. Csatlakoztass egyet, és itt megjelenik.",
+      "permissionDenied": "A kamera elérését megtagadták",
+      "deviceGone": "A kamera leállt: a kamerát leválasztották.",
+      "unreadable": "A kamera leállt: a kamera olvashatatlan képet küld.",
+      "cameraFailed": "A kamerát nem sikerült elindítani."
+    },
+    "imageImportFailed": "Ez a kép nem használható. Használj legfeljebb 10 MB-os PNG, JPEG vagy WebP fájlt."
   }
 }

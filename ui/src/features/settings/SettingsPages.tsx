@@ -31,6 +31,7 @@ import { ConnectionsCard } from "./sections/PrivacySection";
 import { PrivacySummaryCard } from "./sections/PrivacySummaryCard";
 import { PrivateMessagesGroup } from "./sections/PrivateMessagesGroup";
 import { CodecCard, HardwareCard, QualityDefaultsCard } from "./sections/ScreenSharingSection";
+import { BackgroundCard, CameraCard, CameraPrivacyCard, OthersCamerasCard } from "./camera";
 import { ServerConnectionsCard } from "./sections/ServersSection";
 import { NotificationsCard, SoundsCard } from "./sections/SoundsSection";
 import type { SettingsSectionProps } from "./sections/types";
@@ -138,6 +139,15 @@ export function SettingsPageCards({
           <QualityDefaultsCard {...props} />
           <CodecCard {...props} />
           <HardwareCard {...props} />
+        </>
+      );
+    case "camera":
+      return (
+        <>
+          <CameraCard {...props} />
+          <BackgroundCard {...props} />
+          <CameraPrivacyCard {...props} />
+          <OthersCamerasCard {...props} />
         </>
       );
     case "appearance":

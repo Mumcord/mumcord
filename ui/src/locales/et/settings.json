@@ -17,7 +17,8 @@
     "packetInspector": "Pakettide inspektor",
     "hotkeys": "Kiirklahvid",
     "plugins": "Pluginad",
-    "screenSharing": "Ekraani jagamine"
+    "screenSharing": "Ekraani jagamine",
+    "camera": "Kaamera"
   },
   "sectionDescriptions": {
     "general": "Käivitamine, keel, uuendused ja juurdepääsetavus.",
@@ -31,7 +32,8 @@
     "advanced": "Arendaja tööriistad, diagnostika, salvestusruum ja litsentsid.",
     "about": "Versioon, tugi ja seadistusviisard.",
     "plugins": "Pluginad töötavad liivakastis ja saavad ainult selle, mida lubad. Nad ei näe kunagi sinu heli, faile ega sertifikaati.",
-    "screenSharing": "Ekraani jagamise kvaliteet, koodek ja riistvara. Vaatajad näevad alati seda, mille valid, enne kui alustad."
+    "screenSharing": "Ekraani jagamise kvaliteet, koodek ja riistvara. Vaatajad näevad alati seda, mille valid, enne kui alustad.",
+    "camera": "Sinu kaamera, taustaefektid ja see, kuidas näed teiste kaameraid. Kaamera jagamine vajab mumpeer-releega serverit."
   },
   "breadcrumb": "Seaded / {{section}}",
   "moreInfo": "Lisateave: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "hoiatused hüpikaknad",
     "externalContent": "manused pildid eelvaated",
     "fileSharing": "failid saada võta vastu laadi alla salvesta kaust manus zip",
-    "screenSharing": "ekraani jagamine kvaliteet eraldusvõime fps koodek AV1 VP9 kodeerija graafikakaart"
+    "screenSharing": "ekraani jagamine kvaliteet eraldusvõime fps koodek AV1 VP9 kodeerija graafikakaart",
+    "camera": "kaamera veebikaamera video taust hägustamine virtuaalne taust peegeldamine enda vaade"
   },
   "search": {
     "label": "Otsi seadeid",
@@ -1046,7 +1049,9 @@
     "addNone": "Ühendu serveriga, et valida selle kanalite hulgast.",
     "addConfirm": "Lisa",
     "reset": "Lähtesta kõik kiirklahvid",
-    "resetHint": "Eemaldab kõik kiirklahvid peale vajuta-ja-räägi; vaikimisi pole midagi seatud."
+    "resetHint": "Eemaldab kõik kiirklahvid peale vajuta-ja-räägi; vaikimisi pole midagi seatud.",
+    "camera": "Lülita kaamera sisse / välja",
+    "cameraHint": "Avab eelvaate, kui kaamera on väljas, ja lülitab selle välja, kui see on sees."
   },
   "developerMode": {
     "title": "Arendajarežiim",
@@ -1124,5 +1129,70 @@
     "skippedAboveLimit": "VP9 (sinu pilt ületab selle, mida AV1 siin suudab)",
     "softwareWarning": "AV1 jookseb protsessoril ilma läbitud kontrollita ning võib olla selle arvuti jaoks liiga raske.",
     "checkAgain": "Kontrolli uuesti"
+  },
+  "camera": {
+    "cameraTitle": "Kaamera",
+    "previewLabel": "Sinu kaamera eelvaade",
+    "previewName": "Sina",
+    "previewNote": "Eelvaade, ainult sellel seadmel. See peatub, kui lahkud sellelt lehelt.",
+    "device": "Kaamera",
+    "deviceDefault": "Süsteemi vaikimisi",
+    "noDevice": "Kaamerat ei leitud",
+    "sendQuality": "Saatmiskvaliteet",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (kuni 720p · 30 fps) saadab ainult nii palju, kui vaatajad vajavad: väiksem suures ruudustikus, teravam, kui keegi sind kinnitab.",
+    "mirror": "Peegelda minu enda vaadet",
+    "mirrorHint": "Peegeldatakse ainult sinu enda vaadet. Teised näevad sind õiget pidi.",
+    "backgroundTitle": "Taust",
+    "defaultBackground": "Vaiketaust",
+    "backgroundNone": "Puudub",
+    "backgroundBlur": "Hägustamine",
+    "backgroundLibrary": "Pilt: kogu",
+    "backgroundOwn": "Pilt: {{name}} (sinu oma)",
+    "blurStrength": "Hägususe tugevus",
+    "blurLight": "Nõrk",
+    "blurStrong": "Tugev",
+    "effectQuality": "Efektide kvaliteet",
+    "effectAuto": "Auto",
+    "effectBest": "Parim (graafikakaart)",
+    "effectLight": "Kerge (säästab akut)",
+    "effectHint": "Auto kasutab graafikakaarti, kui saab, ja lülitub akutoitel või koormatud arvutis Kergele.",
+    "ownImages_one": "Sinu enda taustapildid jäävad sellele seadmele (salvestatud: {{count}}). Saadetakse ainult valmis pilt.",
+    "ownImages_other": "Sinu enda taustapildid jäävad sellele seadmele (salvestatud: {{count}}). Saadetakse ainult valmis pilt.",
+    "manageImages": "Halda pilte",
+    "imagesTitle": "Sinu taustapildid",
+    "imagesEmpty": "Pilte veel pole. Lisa PNG-, JPEG- või WebP-pilt, et seda taustana kasutada.",
+    "imageName": "Pilt {{number}}",
+    "imageDelete": "Kustuta",
+    "imageDeleteLabel": "Kustuta {{name}}",
+    "imageDeleted": "{{name}} kustutatud",
+    "imageAdded": "{{name}} lisatud",
+    "addImage": "Lisa pilt",
+    "addImageTitle": "Vali taustapilt",
+    "imageFilter": "Pildid",
+    "close": "Sulge",
+    "privacyTitle": "Privaatsus",
+    "lockOff": "Lülita minu kaamera välja, kui ekraan lukustub",
+    "privacyNote": "Sinu kaamera algab alati väljalülitatuna ja näitab kõigepealt eelvaadet. See lülitub välja, kui lahkud kanalilt või katkestad ühenduse. Seda näevad ainult sinu häälkanali liikmed selle serveri relee kaudu, otspunktkrüptitult. Mumcord ei salvesta kunagi kaameraid.",
+    "othersTitle": "Teiste kaamerad",
+    "showCameras": "Näita kaameraid",
+    "showAlways": "Alati",
+    "showOnOpen": "Kui ruumi avan",
+    "showNever": "Mitte kunagi",
+    "showHint": "Alati avab kaameraruumi, kui keegi sinu kanalil kaamera sisse lülitab. Mitte kunagi hoiab sind ainult hääle peal ega laadi videot alla.",
+    "dataSaver": "Andmesääst: kuni 15 fps kõigile",
+    "reduceMotion": "Vähenda liikumist: ei sära ega animatsiooni rääkija raamil",
+    "reduceMotionHint": "Järgib vaikimisi süsteemi liikumise vähendamise sätet.",
+    "errors": {
+      "busy": "Kaamera peatus: teine rakendus kasutab sinu kaamerat.",
+      "noCamera": "Kaamerat ei leitud. Ühenda kaamera ja see ilmub siia.",
+      "permissionDenied": "Kaamera juurdepääs keelati",
+      "deviceGone": "Kaamera peatus: kaamera ühendati lahti.",
+      "unreadable": "Kaamera peatus: kaamera saadab loetamatut pilti.",
+      "cameraFailed": "Kaamerat ei õnnestunud käivitada."
+    },
+    "imageImportFailed": "Seda pilti ei saa kasutada. Kasuta kuni 10 MB suurust PNG-, JPEG- või WebP-faili."
   }
 }

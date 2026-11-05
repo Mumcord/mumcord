@@ -17,7 +17,8 @@
     "packetInspector": "Ispettore pacchetti",
     "hotkeys": "Scorciatoie",
     "plugins": "Plugin",
-    "screenSharing": "Condivisione schermo"
+    "screenSharing": "Condivisione schermo",
+    "camera": "Fotocamera"
   },
   "sectionDescriptions": {
     "general": "Avvio, lingua, aggiornamenti e accessibilità.",
@@ -31,7 +32,8 @@
     "advanced": "Strumenti per sviluppatori, diagnostica, archiviazione e licenze.",
     "about": "Versione, supporto e procedura guidata di configurazione.",
     "plugins": "I plugin vengono eseguiti in una sandbox e ricevono solo ciò che consenti. Non vedono mai il tuo audio, i tuoi file o il tuo certificato.",
-    "screenSharing": "Qualità, codec e hardware per condividere il tuo schermo. Gli spettatori vedono sempre ciò che scegli prima di iniziare."
+    "screenSharing": "Qualità, codec e hardware per condividere il tuo schermo. Gli spettatori vedono sempre ciò che scegli prima di iniziare.",
+    "camera": "La tua fotocamera, gli effetti di sfondo e come vedi le fotocamere degli altri. La condivisione della fotocamera richiede un server con un relay mumpeer."
   },
   "breadcrumb": "Impostazioni / {{section}}",
   "moreInfo": "Ulteriori informazioni: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "avvisi popup",
     "externalContent": "incorporamenti immagini anteprime",
     "fileSharing": "file invia ricevi scarica salva cartella allegato zip",
-    "screenSharing": "condivisione schermo qualità risoluzione fps codec video AV1 VP9 encoder scheda video"
+    "screenSharing": "condivisione schermo qualità risoluzione fps codec video AV1 VP9 encoder scheda video",
+    "camera": "fotocamera webcam video sfondo sfocatura sfondo virtuale specchio autovisione"
   },
   "search": {
     "label": "Cerca nelle impostazioni",
@@ -1054,7 +1057,9 @@
     "addNone": "Connettiti a un server per scegliere uno dei suoi canali.",
     "addConfirm": "Aggiungi",
     "reset": "Ripristina tutte le scorciatoie",
-    "resetHint": "Rimuove tutte le scorciatoie tranne il push-to-talk; per impostazione predefinita non ne è impostata nessuna."
+    "resetHint": "Rimuove tutte le scorciatoie tranne il push-to-talk; per impostazione predefinita non ne è impostata nessuna.",
+    "camera": "Attiva / disattiva la fotocamera",
+    "cameraHint": "Apre l'anteprima quando la fotocamera è spenta e la spegne quando è accesa."
   },
   "developerMode": {
     "title": "Modalità sviluppatore",
@@ -1132,5 +1137,71 @@
     "skippedAboveLimit": "VP9 (la tua immagine supera ciò che AV1 gestisce qui)",
     "softwareWarning": "AV1 verrà eseguito sul processore senza un test superato e potrebbe essere troppo pesante per questo PC.",
     "checkAgain": "Verifica di nuovo"
+  },
+  "camera": {
+    "cameraTitle": "Fotocamera",
+    "previewLabel": "Anteprima della tua fotocamera",
+    "previewName": "Tu",
+    "previewNote": "Anteprima, solo su questo dispositivo. Si interrompe quando lasci questa pagina.",
+    "device": "Fotocamera",
+    "deviceDefault": "Predefinita del sistema",
+    "noDevice": "Nessuna fotocamera trovata",
+    "sendQuality": "Qualità di invio",
+    "sendQualityAuto": "Auto",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (fino a 720p · 30 fps) invia solo ciò che serve a chi guarda: più piccolo in una griglia ampia, più nitido quando qualcuno ti fissa.",
+    "mirror": "Specchia la mia immagine",
+    "mirrorHint": "Solo la tua immagine è specchiata. Gli altri ti vedono dal verso giusto.",
+    "backgroundTitle": "Sfondo",
+    "defaultBackground": "Sfondo predefinito",
+    "backgroundNone": "Nessuno",
+    "backgroundBlur": "Sfocatura",
+    "backgroundLibrary": "Immagine: libreria",
+    "backgroundOwn": "Immagine: {{name}} (tua)",
+    "blurStrength": "Intensità della sfocatura",
+    "blurLight": "Leggera",
+    "blurStrong": "Forte",
+    "effectQuality": "Qualità degli effetti",
+    "effectAuto": "Auto",
+    "effectBest": "Massima (scheda grafica)",
+    "effectLight": "Leggera (risparmia batteria)",
+    "effectHint": "Auto usa la scheda grafica quando può e passa a Leggera a batteria o quando il PC è occupato.",
+    "ownImages_one": "Le tue immagini di sfondo restano su questo dispositivo (salvate: {{count}}). Viene inviata solo l'immagine finale.",
+    "ownImages_many": "Le tue immagini di sfondo restano su questo dispositivo (salvate: {{count}}). Viene inviata solo l'immagine finale.",
+    "ownImages_other": "Le tue immagini di sfondo restano su questo dispositivo (salvate: {{count}}). Viene inviata solo l'immagine finale.",
+    "manageImages": "Gestisci immagini",
+    "imagesTitle": "Le tue immagini di sfondo",
+    "imagesEmpty": "Ancora nessuna immagine. Aggiungi un'immagine PNG, JPEG o WebP da usare come sfondo.",
+    "imageName": "Immagine {{number}}",
+    "imageDelete": "Elimina",
+    "imageDeleteLabel": "Elimina {{name}}",
+    "imageDeleted": "{{name}} eliminata",
+    "imageAdded": "{{name}} aggiunta",
+    "addImage": "Aggiungi immagine",
+    "addImageTitle": "Scegli un'immagine di sfondo",
+    "imageFilter": "Immagini",
+    "close": "Chiudi",
+    "privacyTitle": "Privacy",
+    "lockOff": "Spegni la mia fotocamera quando lo schermo si blocca",
+    "privacyNote": "La tua fotocamera parte sempre spenta e mostra prima un'anteprima. Si spegne quando lasci il canale o ti disconnetti. Solo le persone nel tuo canale vocale possono vederla, tramite il relay di questo server, con crittografia end-to-end. Mumcord non registra mai le fotocamere.",
+    "othersTitle": "Fotocamere degli altri",
+    "showCameras": "Mostra fotocamere",
+    "showAlways": "Sempre",
+    "showOnOpen": "Quando apro la stanza",
+    "showNever": "Mai",
+    "showHint": "Sempre apre la stanza delle fotocamere quando qualcuno nel tuo canale ne accende una. Mai ti lascia solo in voce e non scarica video.",
+    "dataSaver": "Risparmio dati: fino a 15 fps per tutti",
+    "reduceMotion": "Riduci movimento: nessun alone né animazione sulla cornice di chi parla",
+    "reduceMotionHint": "Per impostazione predefinita segue l'impostazione di riduzione del movimento del sistema.",
+    "errors": {
+      "busy": "Fotocamera interrotta: un'altra app sta usando la fotocamera.",
+      "noCamera": "Nessuna fotocamera trovata. Collegane una e comparirà qui.",
+      "permissionDenied": "L'accesso alla fotocamera è stato negato",
+      "deviceGone": "Fotocamera interrotta: la fotocamera è stata scollegata.",
+      "unreadable": "Fotocamera interrotta: la fotocamera invia immagini illeggibili.",
+      "cameraFailed": "Impossibile avviare la fotocamera."
+    },
+    "imageImportFailed": "Questa immagine non può essere usata. Usa un file PNG, JPEG o WebP fino a 10 MB."
   }
 }
