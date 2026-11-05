@@ -75,6 +75,23 @@ describe("plugin entries of the notification centre", () => {
     expect(within(centre).getByText("6 and 6")).toBeInTheDocument();
   });
 
+  it("explains a refused picture without any action", async () => {
+    await setup();
+    act(() => {
+      api.mock.emit("pluginsNotification", {
+        plugin: "dice",
+        notice: { kind: "pictureRefused" },
+      });
+    });
+    const centre = openPanel();
+    expect(
+      await within(centre).findByText(
+        "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB.",
+      ),
+    ).toBeInTheDocument();
+    expect(within(centre).queryByRole("button", { name: /Show/ })).toBeNull();
+  });
+
   it("tells about an available update and opens the Updates tab", async () => {
     await setup();
     const requests: PluginRequest[] = [];

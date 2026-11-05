@@ -26,6 +26,7 @@
     "noRelay": "Níl athsheachadán ag an bhfreastalaí seo, mar sin níl comhroinnt comhad ar fáil.",
     "filesDisallowed": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt comhad.",
     "screenDisallowed": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt scáileáin.",
+    "camerasDisallowed": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt ceamara.",
     "imagesDisallowed": "Níl an méid iomlán ar fáil: ní cheadaíonn athsheachadán an fhreastalaí seo íomhánna",
     "noCertificate": "Teastaíonn teastas cliaint le haghaidh comhroinnte comhad.",
     "modeNeedsRelay": "Teastaíonn an t-athsheachadán le haghaidh comhroinnte comhad; is é {{mode}} do shocrú peer-to-peer.",

@@ -27,13 +27,16 @@
     "chatPatterns": "Tuvastada teatud vestlussõnumeid, nt kleebitud mänguvarustusi",
     "netHttp": "Suhelda sinu valitud serveriga",
     "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
-    "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)",
-    "uiStage": "Show an activity in the media area",
-    "uiSidePanel": "Show its own content in a side panel",
-    "uiAppMenu": "Add items to the Apps menu",
-    "netOrigins": "Talk to these websites",
-    "peersRelay": "Send data through the server's relay",
-    "audioEffects": "Play short sounds that come with the plugin"
+    "uiWebview": "Kuvada oma veebisisu isoleeritud raamis",
+    "uiStage": "Näita tegevust meediaalal",
+    "uiSidePanel": "Näita oma sisu külgpaneelis",
+    "uiAppMenu": "Lisa kirjeid rakenduste menüüsse",
+    "netOrigins": "Suhtle nende veebisaitidega",
+    "peersRelay": "Saada andmeid serveri releeserveri kaudu",
+    "audioEffects": "Esita pluginaga kaasas olevaid lühikesi helisid",
+    "filesSave": "Salvesta sinu valitud faile",
+    "chatPostImage": "Postita vestlusesse pilt pärast sinu klõpsu",
+    "filesImportPicture": "Ava sinu valitud pilte"
   },
   "explanations": {
     "uiPanel": "Selle plugina väike paneel ilmub pluginate ribale.",
@@ -56,13 +59,16 @@
     "chatPatterns": "See saab ainult sinu kanali vestlussõnumeid, mis algavad nii, nagu see on määranud, näiteks kleebitud mänguvarustuse. Muu vestlustekst selleni ei jõua.",
     "netHttp": "See võib suhelda ühe sinu valitud serveriga ja ainult sellega.",
     "secrets": "See võib hoida saladust, näiteks API võtit, süsteemi võtmehoidjas.",
-    "uiWebview": "See võib näidata oma veebisisu suletud raamis ilma internetiühenduseta.",
-    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
-    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
-    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
-    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
-    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
-    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
+    "uiWebview": "See ei näe Mumcordi, sinu faile, mikrofoni, kaamerat ega lõikelauda.",
+    "uiStage": "Ainult siis, kui sa selle käivitad või sellega liitud. Sinu kanalis olevad inimesed, kellel on {{plugin}}, saavad liituda.",
+    "uiSidePanel": "Selle sisu ilmub vestluse kõrvale veergu, ainult siis, kui sa selle avad.",
+    "uiAppMenu": "Kuni {{count}} kirjet, kuvatakse jaotises „Pluginad“.",
+    "netOrigins": "{{plugin}} ja selle leht saavad andmeid saata ja vastu võtta ainult allpool loetletud veebisaitidega.",
+    "peersRelay": "Kiiremad ja suuremad käigud. Otspunktkrüptitud; releeserver ei saa seda lugeda.",
+    "audioEffects": "Pluginaga kaasas olevad lühikesed helid. Saad neid vaiksemaks keerata või vaigistada jaotises Seaded → Pluginad.",
+    "filesSave": "Mumcord küsib pärast sinu klõpsu, kuhu iga fail salvestada; plugin ei näe kunagi sinu kaustu.",
+    "chatPostImage": "Pärast sinu klõpsu pluginas saab see postitada sinu praegusesse kanalisse ühe pildi, mis on märgitud selle nimega.",
+    "filesImportPicture": "Mumcord laseb sul pärast klõpsu pildi valida; plugin saab ainult selle pildi, mitte kunagi sinu kaustu."
   },
   "listLabel": "Õigused"
 }

@@ -1062,6 +1062,19 @@
     "hint": "Ajoute un onglet Développeur aux plugins pour charger des plugins non signés depuis un dossier. À activer seulement si vous créez vous-même des plugins."
   },
   "newBadge": "Nouveau",
+  "pluginSafety": {
+    "title": "Sécurité des plugins",
+    "blockHighRisk": "Ne pas autoriser les plugins à haut risque",
+    "hint": "Masque le bouton Installer pour les plugins ayant un score de 60 ou plus et bloque les mises à jour qui amèneraient un plugin installé à ce niveau. Les plugins déjà installés continuent de fonctionner.",
+    "note": "Désactivé par défaut. Les plugins officiels et les plugins de développement ne sont jamais concernés. Les scores sont des estimations, pas une garantie."
+  },
+  "pluginSounds": {
+    "title": "Sons des plugins",
+    "volume": "Volume des sons des plugins",
+    "mute": "Couper les sons des plugins",
+    "hint": "S’applique à chaque son joué par un plugin. Les sons des plugins sont plus faibles pendant que des personnes parlent.",
+    "meter": "Niveau de sortie (débogage)"
+  },
   "screenShare": {
     "newBadge": "Nouveau",
     "qualityTitle": "Qualité par défaut",

@@ -5,41 +5,22 @@
  */
 import { useId, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import type { ScreenShare, SoundUnavailableReason } from "../../../api";
+import type { ScreenShare } from "../../../api";
 import { useAppOs } from "../useAppOs";
-import { VolumeIcon } from "../../chat/mediaIcons";
-
-const REASON_KEY: Record<Exclude<SoundUnavailableReason, "osTooOld">, string> = {
-  noPipeWire: "liveBar.tipNoPipeWire",
-  captureFailed: "liveBar.tipCaptureFailed",
-};
+import { SpeakerIcon } from "../icons";
+import { sendsSound, soundTip } from "./soundTip";
 
 export function SoundBadge({ own }: { own: ScreenShare }): ReactNode {
   const { t } = useTranslation("screenshare");
   const os = useAppOs();
   const reasonId = useId();
-  const hasSound = own.sound && own.soundMode !== "none";
-
-  let label: string;
-  let tip: string;
-  if (hasSound) {
-    label =
-      own.soundMode === "app" && own.soundApp !== null
-        ? t("liveBar.soundApp", { app: own.soundApp })
-        : t("liveBar.soundDesktop");
-    tip = t(own.soundMode === "app" ? "liveBar.tipApp" : "liveBar.tipDesktop");
-  } else {
-    label = t("liveBar.noSound");
-    if (own.soundReason === "osTooOld") {
-      tip = t(
-        os.toLowerCase().startsWith("windows") ? "liveBar.tipOldWindows" : "liveBar.tipOldMacos",
-      );
-    } else if (own.soundReason !== null) {
-      tip = t(REASON_KEY[own.soundReason]);
-    } else {
-      tip = t(own.soundMode === "none" ? "liveBar.tipNone" : "liveBar.tipOff");
-    }
-  }
+  const hasSound = sendsSound(own);
+  const label = !hasSound
+    ? t("liveBar.noSound")
+    : own.soundMode === "app" && own.soundApp !== null
+      ? t("liveBar.soundApp", { app: own.soundApp })
+      : t("liveBar.soundDesktop");
+  const tip = soundTip(own, os, t);
   const warn = !hasSound && own.soundReason === "captureFailed";
 
   return (
@@ -54,7 +35,7 @@ export function SoundBadge({ own }: { own: ScreenShare }): ReactNode {
         data-tooltip-placement="bottom"
         aria-describedby={reasonId}
       >
-        <VolumeIcon muted={!hasSound} size={12} />
+        <SpeakerIcon muted={!hasSound} size={12} />
         {label}
       </span>
       <span id={reasonId} className="visually-hidden">

@@ -22,7 +22,7 @@
   "logEmpty": "Još nema redaka zapisnika.",
   "level": {
     "debug": "Ispravljanje",
-    "info": "Info",
+    "info": "Informacija",
     "warn": "Upozorenje",
     "error": "Pogreška"
   },

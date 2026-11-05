@@ -62,6 +62,7 @@
 use std::fmt;
 
 /// Generated bindings. Public only because [`export!`] refers to them; use the re-exports below.
+#[cfg(not(feature = "1.1"))]
 #[doc(hidden)]
 pub mod bindings {
     wit_bindgen::generate!({
@@ -69,6 +70,19 @@ pub mod bindings {
         // A copy of the canonical WIT in crates/plugins/wit/1.0.0, so the published crate is
         // self-contained; tests/wit_copy.rs keeps the two identical.
         path: "wit/1.0.0",
+        pub_export_macro: true,
+        default_bindings_module: "mumcord_plugin_sdk::bindings",
+    });
+}
+
+/// Generated bindings of the 1.1 API (feature `1.1`). 1.0 stays the default so that existing
+/// plugins keep importing only 1.0 interfaces.
+#[cfg(feature = "1.1")]
+#[doc(hidden)]
+pub mod bindings {
+    wit_bindgen::generate!({
+        world: "plugin",
+        path: "wit/1.1.0",
         pub_export_macro: true,
         default_bindings_module: "mumcord_plugin_sdk::bindings",
     });
@@ -85,10 +99,27 @@ pub use bindings::mumcord::plugin::{
     chat, clock, events, http, notify, random, secrets, theme, timers, types, webview,
 };
 
+/// Compiles the examples of the Bovnar author guide as doc tests, so they cannot go stale.
+#[cfg(all(doctest, feature = "1.1"))]
+#[doc = include_str!("../../../docs/plugins/peer-data-bovnar.md")]
+struct PeerDataGuide;
+
+#[cfg(feature = "1.1")]
+pub mod app_menu;
+#[cfg(feature = "1.1")]
+pub mod audio;
+#[cfg(feature = "1.1")]
+pub mod bovnar;
 pub mod chat_card;
+#[cfg(feature = "1.1")]
+pub mod files;
 pub mod i18n;
 pub mod log;
 pub mod peers;
+#[cfg(feature = "1.1")]
+pub mod relay;
+#[cfg(feature = "1.1")]
+pub mod stage;
 pub mod storage;
 pub mod ui;
 

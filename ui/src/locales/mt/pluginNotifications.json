@@ -5,6 +5,10 @@
     "body": "Mitfi wara ħabtiet ripetuti",
     "open": "Uri fil-Plagins"
   },
+  "pictureRefused": {
+    "title": "{{name}} ma setax juża l-istampa",
+    "body": "Din l-istampa ma tistax tintuża. Uża fajl PNG, JPEG jew WebP sa 10 MB."
+  },
   "update": {
     "title": "Aġġornament għal {{name}}",
     "body": "Il-verżjoni {{version}} qed tistenna fit-tab Aġġornamenti",

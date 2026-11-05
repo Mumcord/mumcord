@@ -1,0 +1,7 @@
+{
+  "manifest.description": "E2E test plugin that scores High risk: three websites, web surfaces and many yellow permissions.",
+  "manifest.name": "Fixture score-high",
+  "origin_0": "Loads the fixture content",
+  "origin_1": "Loads the fixture content",
+  "origin_2": "Loads the fixture content"
+}

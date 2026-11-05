@@ -78,6 +78,16 @@
       "keys": "↑ ↓ zmena veľkosti · PageUp/PageDown prichytenie · Home/End · Enter obnoví",
       "releaseHint": "Pusti na zbalenie do malého pruhu",
       "minimised": "Oblasť médií je zbalená"
+    },
+    "stage": {
+      "tabs": "Čo zobrazuje oblasť médií",
+      "hint": "Prepnutie nič nezastaví",
+      "share": "Zdieľanie obrazovky",
+      "plugin": "Doplnok",
+      "tabName": "{{label}}, karta {{index}} z {{count}}",
+      "tabNameNew": "{{label}}, nové, karta {{index}} z {{count}}",
+      "pluginTabName": "{{label}}, aktivita doplnku, karta {{index}} z {{count}}",
+      "pluginTabNameNew": "{{label}}, aktivita doplnku, nové, karta {{index}} z {{count}}"
     }
   }
 }

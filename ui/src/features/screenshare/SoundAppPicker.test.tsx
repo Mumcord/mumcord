@@ -6,9 +6,10 @@ import { axeViolations } from "../../test/axe";
 import { stubDialog } from "../channels/testUtils";
 import { SoundAppPicker } from "./SoundAppPicker";
 
+const FF_ICON = "data:image/svg+xml;base64,PHN2Zy8+";
 const APPS: SoundApp[] = [
-  { id: "ff", name: "Firefox" },
-  { id: "sp", name: "Spotify" },
+  { id: "ff", name: "Firefox", icon: FF_ICON },
+  { id: "sp", name: "Spotify", icon: null },
 ];
 
 let api: MockApi;
@@ -49,6 +50,18 @@ describe("SoundAppPicker", () => {
       "true",
     );
     expect(await axeViolations(dialog)).toEqual([]);
+  });
+
+  it("shows the app's own icon and a coloured square without one", () => {
+    const { list } = open();
+    const firefox = within(list).getByRole("option", { name: "Firefox", hidden: true });
+    const icon = firefox.querySelector("img");
+    expect(icon).toHaveAttribute("src", FF_ICON);
+    // Decorative: the row is named by the app's name only.
+    expect(icon).toHaveAttribute("alt", "");
+    const spotify = within(list).getByRole("option", { name: "Spotify", hidden: true });
+    expect(spotify.querySelector("img")).toBeNull();
+    expect(spotify.querySelector(".sound-picker__icon")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("shares the chosen app's sound", () => {
@@ -105,7 +118,9 @@ describe("SoundAppPicker", () => {
   it("refreshes the list while open and drops a chosen app that stopped", async () => {
     vi.useFakeTimers();
     const { list, dialog } = open();
-    vi.spyOn(api, "screenShareSoundApps").mockResolvedValue([{ id: "sp", name: "Spotify" }]);
+    vi.spyOn(api, "screenShareSoundApps").mockResolvedValue([
+      { id: "sp", name: "Spotify", icon: null },
+    ]);
     await act(async () => {
       await vi.advanceTimersByTimeAsync(2100);
     });
@@ -118,7 +133,9 @@ describe("SoundAppPicker", () => {
   it("keeps the dialog open and refreshes when the chosen app stopped", async () => {
     const { choose, list, dialog } = open();
     choose.mockRejectedValueOnce(new EngineError("notFound", "gone"));
-    vi.spyOn(api, "screenShareSoundApps").mockResolvedValue([{ id: "sp", name: "Spotify" }]);
+    vi.spyOn(api, "screenShareSoundApps").mockResolvedValue([
+      { id: "sp", name: "Spotify", icon: null },
+    ]);
     fireEvent.click(within(dialog).getByRole("button", { name: "Share sound", hidden: true }));
     expect(await within(dialog).findByRole("alert", { hidden: true })).toHaveTextContent(
       "That app has stopped playing sound",

@@ -313,6 +313,7 @@
     "line": "Relay allows: {{uses}}",
     "images": "Images",
     "files": "Files",
-    "screen": "Screen sharing"
+    "screen": "Screen sharing",
+    "cameras": "Cameras"
   }
 }

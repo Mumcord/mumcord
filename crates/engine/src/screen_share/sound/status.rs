@@ -55,6 +55,17 @@ impl SoundUnavailable {
     }
 }
 
+/// Why the own share sends no sound, as its live bar names it (FR-7.85).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NoSoundReason {
+    /// The Sound switch is off.
+    Off,
+    /// "No sound" (or Cancel) was the answer to "Which app's sound?" (FR-7.83).
+    NotChosen,
+    /// Sound cannot be shared (FR-7.84).
+    Unavailable(SoundUnavailable),
+}
+
 /// The name of the app whose sound is shared, for the sharer's own live bar (FR-7.85). It stays
 /// on this device (FR-7.87): `Debug` hides it and there is no `Display`, so it cannot slip into
 /// a log line by accident.
@@ -137,6 +148,11 @@ pub struct SoundStatus {
     /// The apps offered in "Which app's sound?" while the user has not answered it yet
     /// (Linux, FR-7.83); `None` when nothing is asked.
     pub choice: Option<Vec<SoundApp>>,
+    /// The Sound switch is off. Kept apart from the share's `sound`, which is also off when
+    /// there is no source, so the live bar can tell the switch from a missing source (FR-7.85).
+    pub off: bool,
+    /// "No sound" was the answer to "Which app's sound?" (FR-7.83).
+    pub declined: bool,
 }
 
 /// One app offered in "Which app's sound?" (FR-7.83). Stays on the sharer's device (FR-7.87).
@@ -145,6 +161,16 @@ pub struct SoundApp {
     /// What the answer names; stays the same while the app keeps playing.
     pub id: String,
     pub name: AppName,
+    /// The app's own icon, where the system has one (Linux).
+    pub icon: Option<AppIcon>,
+}
+
+/// An app icon file, ready to show.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AppIcon {
+    /// `image/svg+xml` or `image/png`.
+    pub mime: &'static str,
+    pub bytes: Vec<u8>,
 }
 
 impl std::fmt::Debug for SoundApp {
@@ -158,6 +184,20 @@ impl SoundStatus {
     /// A source to share sound from exists.
     pub fn available(&self) -> bool {
         self.mode != ShareSoundMode::None
+    }
+
+    /// Why no sound is sent; `None` while sound is sent or nothing explains its absence (e.g.
+    /// no single app behind the picked window, or the question still open).
+    pub fn no_sound_reason(&self) -> Option<NoSoundReason> {
+        if let Some(reason) = self.unavailable {
+            Some(NoSoundReason::Unavailable(reason))
+        } else if self.off {
+            Some(NoSoundReason::Off)
+        } else if self.declined {
+            Some(NoSoundReason::NotChosen)
+        } else {
+            None
+        }
     }
 
     /// What is sent with the switch at `sound`.
@@ -268,6 +308,33 @@ mod tests {
     }
 
     #[test]
+    fn the_reason_tells_the_switch_from_a_declined_choice() {
+        let unavailable = SoundStatus {
+            unavailable: Some(SoundUnavailable::NoPipeWire),
+            off: true,
+            ..SoundStatus::default()
+        };
+        assert_eq!(
+            unavailable.no_sound_reason(),
+            Some(NoSoundReason::Unavailable(SoundUnavailable::NoPipeWire)),
+            "a missing system part wins over the switch"
+        );
+        let off = SoundStatus {
+            mode: ShareSoundMode::Desktop,
+            off: true,
+            ..SoundStatus::default()
+        };
+        assert_eq!(off.no_sound_reason(), Some(NoSoundReason::Off));
+        let declined = SoundStatus {
+            declined: true,
+            ..SoundStatus::default()
+        };
+        assert_eq!(declined.no_sound_reason(), Some(NoSoundReason::NotChosen));
+        assert_eq!(SoundStatus::test_source().no_sound_reason(), None);
+        assert_eq!(SoundStatus::default().no_sound_reason(), None);
+    }
+
+    #[test]
     fn the_pick_decides_the_request() {
         assert_eq!(
             SoundRequest::for_kind(Some(ShareKind::Screen)),
@@ -316,6 +383,7 @@ mod tests {
         let asking = SoundOutcome::Choose(vec![SoundApp {
             id: "bin:secret-player".into(),
             name: AppName::new("Secret Player"),
+            icon: None,
         }]);
         let (source, asking) = asking.into_parts();
         assert!(source.is_none());

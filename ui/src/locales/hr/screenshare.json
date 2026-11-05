@@ -1,5 +1,6 @@
 {
   "share": "Dijeli zaslon",
+  "shareYourScreen": "Podijeli svoj zaslon",
   "choosing": "Odabir onoga što dijeliš…",
   "stop": "Prestani dijeliti",
   "startFailed": "Dijeljenje zaslona nije se moglo pokrenuti.",
@@ -18,8 +19,6 @@
   "pause": "Pauziraj",
   "resume": "Nastavi",
   "sound": "Dijeli zvuk",
-  "noSound": "Linux ne dijeli zvuk: gledatelji vide samo sliku.",
-  "noSoundForShare": "Ovo dijeljenje nema zvuka (cijeli zaslon ili nepodržana verzija sustava).",
   "viewersNone": "Još nitko ne gleda",
   "viewers_one": "{{count}} gleda: {{names}}",
   "viewers_few": "{{count}} gledaju: {{names}}",

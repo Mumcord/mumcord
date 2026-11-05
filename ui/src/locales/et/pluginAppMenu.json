@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Pluginad",
+  "moreItems": "Veel pluginaid…",
+  "subline": "{{plugin}} · Mitteametlik",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Plugina menüükirjed näitavad alati plugina nime. Halda neid jaotises Seaded → Pluginad.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Taaskäivitub pärast probleemi, proovi hetke pärast uuesti"
 }

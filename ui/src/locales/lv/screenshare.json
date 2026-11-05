@@ -1,5 +1,6 @@
 {
   "share": "Kopīgot ekrānu",
+  "shareYourScreen": "Kopīgot savu ekrānu",
   "choosing": "Izvēlas, ko kopīgot…",
   "stop": "Pārtraukt kopīgošanu",
   "startFailed": "Ekrāna kopīgošanu neizdevās sākt.",
@@ -18,8 +19,6 @@
   "pause": "Pauzēt",
   "resume": "Turpināt",
   "sound": "Kopīgot skaņu",
-  "noSound": "Linux nekopīgo skaņu: skatītāji redz tikai attēlu.",
-  "noSoundForShare": "Šai kopīgošanai nav skaņas (viss ekrāns vai neatbalstīta sistēmas versija).",
   "viewersNone": "Vēl neviens neskatās",
   "viewers_zero": "{{count}} skatās: {{names}}",
   "viewers_one": "{{count}} skatās: {{names}}",

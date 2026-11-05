@@ -27,6 +27,8 @@ pub mod p2p;
 pub mod peer;
 pub mod people;
 pub mod plain_text;
+pub mod plugin_relay;
+pub mod plugin_sounds;
 pub mod plugins;
 pub mod pm_overview;
 pub mod pm_rules;

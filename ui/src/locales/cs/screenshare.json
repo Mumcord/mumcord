@@ -1,5 +1,6 @@
 {
   "share": "Sdílet obrazovku",
+  "shareYourScreen": "Sdílet vlastní obrazovku",
   "choosing": "Vybírá se, co sdílet…",
   "stop": "Ukončit sdílení",
   "startFailed": "Sdílení obrazovky se nepodařilo spustit.",
@@ -18,8 +19,6 @@
   "pause": "Pozastavit",
   "resume": "Pokračovat",
   "sound": "Sdílet zvuk",
-  "noSound": "Linux nesdílí zvuk: diváci vidí jen obraz.",
-  "noSoundForShare": "Toto sdílení nemá zvuk (celá obrazovka nebo nepodporovaná verze systému).",
   "viewersNone": "Zatím se nikdo nedívá",
   "viewers_one": "{{count}} sleduje: {{names}}",
   "viewers_few": "{{count}} sledují: {{names}}",

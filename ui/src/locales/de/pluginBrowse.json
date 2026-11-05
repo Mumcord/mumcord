@@ -75,7 +75,8 @@
   "unofficialText": "{{repository}} wird nicht von Mumcord geprüft. Es läuft trotzdem in der Sandbox und erhält nur die Berechtigungen, die du erlaubst.",
   "checksTitle": "Offizielle Prüfungen gelten weiterhin",
   "checksText": "Die Sperrliste von Mumcord kann es abschalten. Namen offizieller Plugins sind reserviert.",
-  "metaPermissions": "Berechtigungen: {{count}}",
+  "metaPermissions_one": "{{count}} Berechtigung",
+  "metaPermissions_other": "{{count}} Berechtigungen",
   "footer": "Offizielles Repository · signierte Liste geprüft · nichts über dich wird gesendet",
   "factSource": "Quelle: {{url}}",
   "factLicence": "Lizenz: {{license}}",
@@ -96,5 +97,7 @@
     "unpacking": "Wird entpackt…",
     "starting": "Wird gestartet…",
     "announce": "{{name}}: {{percent}} % heruntergeladen"
-  }
+  },
+  "needsMumcord": "Benötigt Mumcord {{version}} oder neuer",
+  "updateMumcord": "Mumcord aktualisieren"
 }

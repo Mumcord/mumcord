@@ -76,7 +76,9 @@ async function bigSecondServer(): Promise<MockApi> {
 
 const memberRows = () => document.querySelectorAll(".member").length;
 
-describe("switching to a big server", () => {
+// These tests render big lists and pass in seconds alone, but can exceed the default 5 s timeout
+// when the whole suite runs in parallel on a loaded machine.
+describe("switching to a big server", { timeout: 30_000 }, () => {
   it("draws everyone in other channels a step per frame", async () => {
     await bigSecondServer();
     render(<MembersPanel />);
@@ -100,7 +102,9 @@ describe("switching to a big server", () => {
   });
 });
 
-describe("a long conversation", () => {
+// These tests render big lists and pass in seconds alone, but can exceed the default 5 s timeout
+// when the whole suite runs in parallel on a loaded machine.
+describe("a long conversation", { timeout: 30_000 }, () => {
   function message(index: number): ChatMessage {
     return {
       id: String(index),

@@ -82,6 +82,12 @@ fn new_build_reproducibly_check_and_sign() {
     );
 
     let package = project.join("dist/wave-demo-0.1.0.mcplugin");
+    let archive = std::fs::File::open(&package).expect("test step");
+    let mut archive = zip::ZipArchive::new(archive).expect("zip");
+    let manifest: serde_json::Value =
+        serde_json::from_reader(archive.by_name("manifest.json").expect("manifest")).expect("json");
+    let api = manifest["api"].as_str().expect("build writes api");
+    assert!(api.starts_with("^1."), "{api}");
     let package = package.to_str().expect("utf-8");
     assert!(cli(work.path(), &["check", package]).contains(&first));
 
@@ -109,4 +115,29 @@ fn new_build_reproducibly_check_and_sign() {
     );
     cli(work.path(), &["sign", package, "--key", "author.key"]);
     cli(work.path(), &["check", package, "--key", "author.pub"]);
+}
+
+#[test]
+#[ignore = "builds wasm plugins (slow); run with --ignored"]
+fn stage_templates_build_and_check() {
+    let work = tempfile::tempdir().expect("test step");
+    let sdk = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/plugin-sdk");
+    let sdk = sdk.to_str().expect("utf-8");
+    for template in ["stage-tree", "stage-web"] {
+        let id = format!("{template}-demo");
+        cli(
+            work.path(),
+            &["new", &id, "--template", template, "--sdk-path", sdk],
+        );
+        let project = work.path().join(&id);
+        let status = Command::new(std::env::var("CARGO").unwrap_or_else(|_| "cargo".into()))
+            .current_dir(&project)
+            .args(["generate-lockfile", "--quiet"])
+            .status()
+            .expect("cargo runs");
+        assert!(status.success());
+        cli(&project, &["build"]);
+        let package = project.join(format!("dist/{id}-0.1.0.mcplugin"));
+        cli(work.path(), &["check", package.to_str().expect("utf-8")]);
+    }
 }

@@ -1,0 +1,29 @@
+{
+  "manifest": 1,
+  "id": "test-stage-official",
+  "name": "Test Stage Official",
+  "description": "E2E test plugin: Test Stage served by the official fixture registry (Get plugin notice).",
+  "version": "1.1.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["games"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "ui.stage", "ui.app-menu"]
+  },
+  "app_menu": [
+    {
+      "id": "start",
+      "label": "Start Test Stage Official"
+    },
+    {
+      "id": "late",
+      "label": "Start Test Stage Official later"
+    }
+  ],
+  "stage": {
+    "title": "Test Stage Official",
+    "max_participants": 2
+  }
+}

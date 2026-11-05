@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use mumcord_engine::{Engine, IdentityView};
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::State;
+use tauri::{AppHandle, State};
 
 use super::types::{
     ApiResult, ServerId, to_api_identity_id, to_api_server_id, to_engine_identity_id,
@@ -73,26 +73,31 @@ pub async fn identity_list(engine: State<'_, Engine>) -> ApiResult<Vec<Identity>
 #[tauri::command]
 #[specta::specta]
 pub async fn identity_create(
+    app: AppHandle,
     engine: State<'_, Engine>,
     name: String,
     label: Option<String>,
 ) -> ApiResult<Identity> {
-    Ok(engine.identity_create(name, label).await?.into())
+    let created = engine.identity_create(name, label).await?;
+    crate::plugins::refresh_all_relay_availability(&app);
+    Ok(created.into())
 }
 
 /// Imports a PKCS#12 file (e.g. exported from the official client) as another identity.
 #[tauri::command]
 #[specta::specta]
 pub async fn identity_import(
+    app: AppHandle,
     engine: State<'_, Engine>,
     path: String,
     password: Option<String>,
     label: Option<String>,
 ) -> ApiResult<Identity> {
-    Ok(engine
+    let imported = engine
         .identity_import(PathBuf::from(path), password, label)
-        .await?
-        .into())
+        .await?;
+    crate::plugins::refresh_all_relay_availability(&app);
+    Ok(imported.into())
 }
 
 /// Changes the local label of an identity; the certificate stays the same.
@@ -126,32 +131,39 @@ pub async fn identity_export(
 /// Removes an identity with its key material; the last identity cannot be removed.
 #[tauri::command]
 #[specta::specta]
-pub async fn identity_delete(engine: State<'_, Engine>, id: u32) -> ApiResult<()> {
-    Ok(engine.identity_delete(to_engine_identity_id(id)).await?)
+pub async fn identity_delete(app: AppHandle, engine: State<'_, Engine>, id: u32) -> ApiResult<()> {
+    engine.identity_delete(to_engine_identity_id(id)).await?;
+    crate::plugins::refresh_all_relay_availability(&app);
+    Ok(())
 }
 
 /// Makes an identity the default one; returns the new list.
 #[tauri::command]
 #[specta::specta]
-pub async fn identity_set_default(engine: State<'_, Engine>, id: u32) -> ApiResult<Vec<Identity>> {
-    Ok(engine
+pub async fn identity_set_default(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    id: u32,
+) -> ApiResult<Vec<Identity>> {
+    let list = engine
         .identity_set_default(to_engine_identity_id(id))
-        .await?
-        .into_iter()
-        .map(Identity::from)
-        .collect())
+        .await?;
+    crate::plugins::refresh_all_relay_availability(&app);
+    Ok(list.into_iter().map(Identity::from).collect())
 }
 
 /// Chooses the identity a saved server connects with; `null` uses the default.
 #[tauri::command]
 #[specta::specta]
 pub async fn server_set_identity(
+    app: AppHandle,
     engine: State<'_, Engine>,
     server_id: ServerId,
     identity_id: Option<u32>,
 ) -> ApiResult<super::servers::SavedServer> {
-    Ok(engine
+    let saved = engine
         .server_set_identity(server_id.into(), identity_id.map(to_engine_identity_id))
-        .await?
-        .into())
+        .await?;
+    crate::plugins::refresh_all_relay_availability(&app);
+    Ok(saved.into())
 }

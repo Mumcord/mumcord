@@ -5,6 +5,10 @@
     "body": "Desativado após falhas repetidas",
     "open": "Mostrar em Plugins"
   },
+  "pictureRefused": {
+    "title": "{{name}} não conseguiu usar a imagem",
+    "body": "Não é possível usar esta imagem. Usa um ficheiro PNG, JPEG ou WebP até 10 MB."
+  },
   "update": {
     "title": "Atualização de {{name}}",
     "body": "A versão {{version}} aguarda no separador Atualizações",

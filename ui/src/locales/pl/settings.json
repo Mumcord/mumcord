@@ -1070,6 +1070,19 @@
     "hint": "Dodaje do wtyczek kartę Deweloper, w której możesz wczytać niepodpisane wtyczki z folderu. Włącz ją tylko, jeśli sam tworzysz wtyczki."
   },
   "newBadge": "Nowość",
+  "pluginSafety": {
+    "title": "Bezpieczeństwo wtyczek",
+    "blockHighRisk": "Nie zezwalaj na wtyczki wysokiego ryzyka",
+    "hint": "Ukrywa przycisk Zainstaluj przy wtyczkach z oceną 60 lub wyższą i blokuje aktualizacje, które podniosłyby ocenę zainstalowanej wtyczki do tego poziomu. Wtyczki, które już zainstalowałeś, nadal działają.",
+    "note": "Domyślnie wyłączone. Nigdy nie dotyczy wtyczek oficjalnych ani deweloperskich. Oceny są szacunkami, nie gwarancją."
+  },
+  "pluginSounds": {
+    "title": "Dźwięki wtyczek",
+    "volume": "Głośność dźwięków wtyczek",
+    "mute": "Wycisz dźwięki wtyczek",
+    "hint": "Dotyczy każdego dźwięku odtwarzanego przez wtyczkę. Dźwięki wtyczek są cichsze, gdy ktoś mówi.",
+    "meter": "Poziom wyjścia (debugowanie)"
+  },
   "screenShare": {
     "newBadge": "Nowość",
     "qualityTitle": "Domyślna jakość",

@@ -78,6 +78,16 @@
       "keys": "↑ ↓ grootte wijzigen · PageUp/PageDown vastklikken · Home/End · Enter herstelt",
       "releaseHint": "Loslaten om te verkleinen tot de minibalk",
       "minimised": "Mediagedeelte verkleind"
+    },
+    "stage": {
+      "tabs": "Wat het mediagebied toont",
+      "hint": "Wisselen stopt niets",
+      "share": "Schermdeling",
+      "plugin": "Plug-in",
+      "tabName": "{{label}}, tabblad {{index}} van {{count}}",
+      "tabNameNew": "{{label}}, nieuw, tabblad {{index}} van {{count}}",
+      "pluginTabName": "{{label}}, plug-inactiviteit, tabblad {{index}} van {{count}}",
+      "pluginTabNameNew": "{{label}}, plug-inactiviteit, nieuw, tabblad {{index}} van {{count}}"
     }
   }
 }

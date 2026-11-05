@@ -611,9 +611,11 @@ export const commands = {
 	pluginsIndex: (language: string) => typedError<PluginIndex, ApiError>(__TAURI_INVOKE("plugins_index", { language })),
 	/**
 	 *  Installs a plugin from the lists loaded by `plugins_index` (official or a repository) (latest version unless
-	 *  `version` is given), with the optional permissions the user left on.
+	 *  `version` is given), with the optional permissions the user left on. `confirmed` is the tick
+	 *  of the prompt's confirmation box (`check.gate.confirm` of the offer); without it a gated
+	 *  plugin is refused, and "Don't allow high-risk plugins" refuses a High one even with it.
 	 */
-	pluginInstall: (id: string, version: string | null, optional: string[], visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_install", { id, version, optional, visibility })),
+	pluginInstall: (id: string, version: string | null, optional: string[], visibility: PluginVisibilityChoice, confirmed: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_install", { id, version, optional, visibility, confirmed })),
 	/**
 	 *  Downloads and verifies the latest version of a store plugin (official or from a repository)
 	 *  before the install prompt
@@ -638,8 +640,55 @@ export const commands = {
 	pluginRemove: (id: string, deleteData: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_remove", { id, deleteData })),
 	/**  The updates waiting for the user. */
 	pluginUpdates: () => typedError<PluginUpdate[], ApiError>(__TAURI_INVOKE("plugin_updates")),
+	/**
+	 *  The review of the waiting update of `id` to `version` with every website's purpose, new
+	 *  ones included. Their purposes are plugin text that only the new package holds, so this
+	 *  downloads and verifies it first (as `plugin_install_prepare` does) and reads nothing else
+	 *  from it. Nothing is unpacked or run.
+	 */
+	pluginUpdateReviewPrepare: (id: string, version: string) => typedError<PluginUpdateReview, ApiError>(__TAURI_INVOKE("plugin_update_review_prepare", { id, version })),
 	/**  Installs the waiting update of `id`; `optional` are the optional permissions to keep on. */
 	pluginApplyUpdate: (id: string, optional: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_apply_update", { id, optional })),
+	/**
+	 *  The security score of a store plugin version (FR-9.72). `listing` scores the signed index
+	 *  entry, as Browse shows it; `package` scores the package the install prompt downloaded for
+	 *  this version (so `plugin_install_prepare` ran first), as the prompt shows it. `version`
+	 *  defaults to the one the store offers. Never scored in the UI.
+	 */
+	pluginScore: (id: string, version: string | null, from: PluginScoreSource) => typedError<PluginScored, ApiError>(__TAURI_INVOKE("plugin_score", { id, version, from })),
+	/**
+	 *  FR-9.83: the tick "I understand the risk went up and I still trust the author" for the
+	 *  waiting update of `id` to `version`. `plugin_apply_update` needs it for an update that makes
+	 *  the plugin High (`review.needsHighRiskConfirm`); the updates list shows it as
+	 *  `review.highRiskConfirmed` afterwards.
+	 */
+	pluginConfirmUpdateHighRisk: (id: string, version: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_confirm_update_high_risk", { id, version })),
+	/**
+	 *  FR-9.83 "Skip this version": the waiting update of `id` to `version` is no longer offered or
+	 *  installed automatically; a newer version is offered again.
+	 */
+	pluginSkipUpdateVersion: (id: string, version: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_skip_update_version", { id, version })),
+	/**
+	 *  The websites an installed plugin declares and what it did with them over the last 7 days
+	 *  (FR-9.30). Both are empty for a plugin without websites.
+	 */
+	pluginWebsites: (id: string) => typedError<PluginWebsites, ApiError>(__TAURI_INVOKE("plugin_websites", { id })),
+	pluginPlatformSettings: () => typedError<PluginPlatformSettings, ApiError>(__TAURI_INVOKE("plugin_platform_settings")),
+	/**  Current output level (0.0 … 1.0) of plugin sounds, for the debug audio meter (AC-9.23). */
+	pluginSoundMeter: () => __TAURI_INVOKE<number | null>("plugin_sound_meter"),
+	/**  Saves the plugin platform's settings; the volume is clamped to 0–100. */
+	pluginSetPlatformSettings: (settings: PluginPlatformSettings) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_platform_settings", { settings })),
+	/**  The width in rem the user last gave `plugin`'s side panel (FR-9.39), if any. */
+	pluginSidePanelWidth: (plugin: string) => typedError<number | null, ApiError>(__TAURI_INVOKE("plugin_side_panel_width", { plugin })),
+	/**  Remembers `plugin`'s side panel width; the store clamps it to 18–32 rem. */
+	pluginSetSidePanelWidth: (plugin: string, width: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_side_panel_width", { plugin, width })),
+	/**
+	 *  The relay's plugin-data availability on `server_id`; kept current by the
+	 *  `plugins://relay-availability` event.
+	 */
+	pluginRelayAvailability: (serverId: number) => typedError<PluginRelayAvailability, ApiError>(__TAURI_INVOKE("plugin_relay_availability", { serverId })),
+	/**  Relay data used this session, one entry per installed plugin (zero when unused). */
+	pluginRelayUsage: () => typedError<PluginRelayUsage[], ApiError>(__TAURI_INVOKE("plugin_relay_usage")),
 	/**  "Check now": looks for plugin updates and revocations right away. */
 	pluginCheckNow: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_check_now")),
 	/**  The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`. */
@@ -655,6 +704,65 @@ export const commands = {
 	/**  Which plugin's member badge is shown (`None`: no badge). */
 	pluginSetBadge: (id: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_badge", { id })),
 	pluginDiagnostics: (id: string) => typedError<PluginDiagnostics, ApiError>(__TAURI_INVOKE("plugin_diagnostics", { id })),
+	/**
+	 *  The user turned a plugin's web content on again in Settings → Plugins (FR-9.42); it was off
+	 *  after the window froze while one of its frames was open.
+	 */
+	pluginReenableWeb: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_reenable_web", { id })),
+	/**
+	 *  Mutes or unmutes the sound of plugin frames: one plugin's (`plugin` set, the frame's mute
+	 *  button) or all of them (`plugin` empty, deafen). The frame hosts forward it to the page as
+	 *  `{mumcordWebview:"mute", muted}`.
+	 */
+	pluginFramesMute: (plugin: string | null, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frames_mute", { plugin, muted })),
+	/**
+	 *  The current frame mute state. A window that opens later (a popped-out stage) reads it once and
+	 *  then follows `plugin://frame-mute`.
+	 */
+	pluginFramesMuteState: () => __TAURI_INVOKE<PluginFrameMuteState>("plugin_frames_mute_state"),
+	/**
+	 *  Opens plugin `plugin`'s page `url` as frame `frame` at `bounds` in the main window. The UI
+	 *  listens for `plugin://frame` events of `frame` before calling this. macOS only.
+	 */
+	pluginFrameOpen: (frame: string, plugin: string, url: string, bounds: PluginFrameBounds) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_open", { frame, plugin, url, bounds })),
+	/**
+	 *  Moves frame `frame` to `bounds`, or hides it (`None`: its place is off screen, covered or in
+	 *  a hidden tab).
+	 */
+	pluginFrameBounds: (frame: string, bounds: PluginFrameBounds | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_bounds", { frame, bounds })),
+	/**  Hands one bridge message, the gesture key or the mute state to frame `frame`'s page. */
+	pluginFramePost: (frame: string, delivery: PluginFrameDelivery) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_post", { frame, delivery })),
+	/**
+	 *  Moves keyboard focus into frame `frame`, or back to the main window (`None`; Escape or F6
+	 *  inside the page, FR-9.41).
+	 */
+	pluginFrameFocus: (frame: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_focus", { frame })),
+	/**
+	 *  Closes frame `frame` (unmounted, stopped responding or navigated away). Closing needs nothing
+	 *  from the frame's own web process, so it also ends a frozen page.
+	 */
+	pluginFrameClose: (frame: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_close", { frame })),
+	/**
+	 *  The plugin activities in the user's channel on the focused server (activity lines, stage
+	 *  tabs and header). Re-fetch on `plugins://stage-changed`.
+	 */
+	stageActivities: () => typedError<StageActivityView[], ApiError>(__TAURI_INVOKE("stage_activities")),
+	/**  The user clicked Join on an activity line or the stage (FR-9.45). */
+	stageJoin: (activity: string) => typedError<null, StageJoinError>(__TAURI_INVOKE("stage_join", { activity })),
+	/**  The user clicked Leave in the stage header. */
+	stageLeave: (activity: string) => typedError<null, ApiError>(__TAURI_INVOKE("stage_leave", { activity })),
+	/**  The plugin's stage tab became visible or hidden: the plugin gets `stage-visibility-changed`. */
+	stageVisibility: (plugin: string, visible: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("stage_visibility", { plugin, visible })),
+	/**
+	 *  The Apps-menu items of the running plugins, in menu order. Re-fetch on
+	 *  `plugins://app-menu-changed` and `plugins://changed`.
+	 */
+	appMenu: () => typedError<AppMenuItem[], ApiError>(__TAURI_INVOKE("app_menu")),
+	/**
+	 *  The user picked an Apps-menu item: the plugin gets `app-menu-activated` and an 8 s chat
+	 *  gesture window.
+	 */
+	appMenuActivate: (plugin: string, item: string) => typedError<null, ApiError>(__TAURI_INVOKE("app_menu_activate", { plugin, item })),
 	pluginAsset: (id: string, path: string) => typedError<PluginAsset, ApiError>(__TAURI_INVOKE("plugin_asset", { id, path })),
 	/**
 	 *  Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts
@@ -787,6 +895,11 @@ export const commands = {
 	notificationDismiss: (serverId: number, conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { serverId, conversation })),
 	/**  Replaces the tray's unread summary and recent chats. */
 	trayAttentionSet: (attention: TrayAttention) => typedError<null, ApiError>(__TAURI_INVOKE("tray_attention_set", { attention })),
+	/**
+	 *  Brings the main window to the front and tells it to open Settings → Plugins → Installed, for
+	 *  the "Details" button of the stage pop-out's no-relay banner.
+	 */
+	pluginDetailsOpen: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_details_open")),
 	/**  Platform support and the own shared track (for the settings). */
 	nowPlayingStatus: () => typedError<NowPlayingStatus, ApiError>(__TAURI_INVOKE("now_playing_status")),
 	/**
@@ -839,6 +952,8 @@ export const commands = {
 	p2pConsentDecide: (allow: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("p2p_consent_decide", { allow })),
 	/**  The relay of a server for the server info panel; "no relay" when not connected. */
 	relayInfo: (serverId: number) => typedError<RelayInfo, ApiError>(__TAURI_INVOKE("relay_info", { serverId })),
+	/**  Why camera sharing is unavailable on a connected server; `null` when it is available. */
+	cameraUnavailable: (serverId: number) => typedError<CameraUnavailable | null, ApiError>(__TAURI_INVOKE("camera_unavailable", { serverId })),
 	/**
 	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
 	 *  `p2pLinkChanged`.
@@ -1031,6 +1146,7 @@ export const events = {
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
+	cameraAvailabilityChanged: makeEvent<CameraAvailabilityChanged, CameraAvailabilityChanged>("camera-availability-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
@@ -1063,13 +1179,20 @@ export const events = {
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
 	p2pLinkChanged: makeEvent<P2pLinkChanged, P2pLinkChanged>("p2p-link-changed"),
+	pluginDetailsRequested: makeEvent<PluginDetailsRequested, PluginDetailsRequested>("plugin-details-requested"),
+	pluginFrame: makeEvent<PluginFrameEvent, PluginFrameEvent>("plugin://frame"),
+	pluginFrameMute: makeEvent<PluginFrameMute, PluginFrameMute>("plugin://frame-mute"),
 	pluginSupersede: makeEvent<PluginSupersede, PluginSupersede>("plugin://supersede"),
 	pluginUi: makeEvent<PluginUi, PluginUi>("plugin://ui"),
+	pluginsAppMenuChanged: makeEvent<AppMenuChanged, AppMenuChanged>("plugins://app-menu-changed"),
 	pluginsChanged: makeEvent<PluginsChanged, PluginsChanged>("plugins://changed"),
 	pluginsInstallProgress: makeEvent<PluginInstallProgress, PluginInstallProgress>("plugins://install-progress"),
 	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
 	pluginsOpenDetails: makeEvent<PluginsOpenDetails, PluginsOpenDetails>("plugins://open-details"),
+	pluginsRelayAvailability: makeEvent<PluginRelayAvailabilityChanged, PluginRelayAvailabilityChanged>("plugins://relay-availability"),
 	pluginsSharedState: makeEvent<PluginsSharedState, PluginsSharedState>("plugins://shared-state"),
+	pluginsStageChanged: makeEvent<StageChanged, StageChanged>("plugins://stage-changed"),
+	pluginsStageRefused: makeEvent<StageRefused, StageRefused>("plugins://stage-refused"),
 	pluginsSuggestion: makeEvent<PluginSuggestion, PluginSuggestion>("plugins://suggestion"),
 	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
@@ -1158,6 +1281,20 @@ export type AppInfo = {
 	 *  systems or without a readable os-release file.
 	 */
 	distro: LinuxDistro | null,
+};
+
+/**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
+export type AppMenuChanged = Record<string, never>;
+
+/**  One Apps-menu item (FR-9.53); text is untrusted. */
+export type AppMenuItem = {
+	plugin: string,
+	pluginName: string,
+	item: string,
+	label: string,
+	icon: string | null,
+	enabled: boolean,
+	reason: string | null,
 };
 
 export type AudioDevice = {
@@ -1373,6 +1510,18 @@ export type CacheSizes = {
 	webKib: number,
 	tempKib: number,
 };
+
+/**
+ *  Camera sharing became available or unavailable on a server (FR-8.2); `reason` is `null`
+ *  when it is available.
+ */
+export type CameraAvailabilityChanged = {
+	serverId: number,
+	reason: CameraUnavailable | null,
+};
+
+/**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
 export type CertTrustRequired = {
@@ -2155,6 +2304,13 @@ export type IndexedPlugin = {
 	size: number | null,
 	/**  Every permission (required and optional) the version may ask for. */
 	permissions: string[],
+	/**
+	 *  FR-9.18: set (e.g. "0.8.0") when no version of the plugin runs on this Mumcord yet.
+	 *  The card says "Needs Mumcord 0.8.0 or newer" and Install is disabled.
+	 */
+	needsMumcord: string | null,
+	/**  The websites the shown version declares (`net.origins`); plain, untrusted text. */
+	origins: string[],
 };
 
 /**  An external image or image link, ready to show inline (FR-1.55). */
@@ -2264,6 +2420,10 @@ export type InstalledPlugin = {
 	 *  Answering means `plugin_set_permissions` (which clears this).
 	 */
 	offered: string[],
+	/**  How many Apps-menu items the plugin declares (Details → Places). */
+	appMenuItems: number,
+	/**  Size in bytes of the plugin's web pages (its `web/` files); `None` when it has none. */
+	webSize: number | null,
 };
 
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
@@ -2383,7 +2543,9 @@ export type MediaPopoutKind =
 /**  The watch party player. */
 "watch" | 
 /**  A watched screen share. */
-"share";
+"share" | 
+/**  A plugin activity on the stage. */
+"stage";
 
 /**  One kind of pop-out. */
 export type MediaPopoutSlot = {
@@ -2393,17 +2555,23 @@ export type MediaPopoutSlot = {
 	onTop: boolean,
 };
 
-/**  Both pop-outs. */
+/**  All pop-outs. */
 export type MediaPopoutState = {
 	watch: MediaPopoutSlot,
 	share: MediaPopoutSlot,
+	stage: MediaPopoutSlot,
 };
 
-/**  What a pop-out shows: the party of `serverId`, or the share of `session` on `serverId`. */
+/**
+ *  What a pop-out shows: the party of `serverId`, the share of `session` on `serverId`, or the
+ *  activity of `plugin` in the user's channel on `serverId`.
+ */
 export type MediaPopoutTarget = {
 	serverId: number,
-	/**  The sharer; `null` for the watch party. */
+	/**  The sharer; `null` for the watch party and the stage. */
 	session: number | null,
+	/**  The plugin whose activity the stage pop-out shows; `null` for the other kinds. */
+	plugin: string | null,
 };
 
 /**  One new message as the UI would announce it. Texts are translated and plain (no HTML). */
@@ -2860,6 +3028,8 @@ export type PluginAsset = {
 	base64: string,
 };
 
+export type PluginBand = "low" | "medium" | "high";
+
 export type PluginButtonKind = "primary" | "secondary" | "danger";
 
 /**  A slash command of an active plugin (FR-6.43). */
@@ -2905,6 +3075,19 @@ error: string | null } |
 /**  The renderer copies `text` itself on a click; there is no action back to the plugin. */
 { type: "copyButton"; label: string; text: string; kind: PluginButtonKind };
 
+/**  What the person has to tick before Install is enabled. */
+export type PluginConfirmKind = 
+/**  "I understand the risk and I trust the author" / "Install anyway". */
+"highRisk" | 
+/**  "I understand" / "Install". */
+"understand";
+
+/**
+ *  A pop-out window asked for the installed plugins' settings; the main window is already in
+ *  front.
+ */
+export type PluginDetailsRequested = Record<string, never>;
+
 /**  The Diagnostics section of a plugin (counts only, never payloads). */
 export type PluginDiagnostics = {
 	cpuTimeMs: number | null,
@@ -2919,11 +3102,85 @@ export type PluginDiagnostics = {
 	messagesReceived: number | null,
 	incomingRateDropped: number | null,
 	incomingInvalid: number | null,
+	/**  Times the window stopped answering while a frame of this plugin was open (FR-9.42). */
+	uiFreezes: number | null,
+	/**  The plugin's web content is turned off after a freeze, until the user re-enables it. */
+	webDisabled: boolean,
 	/**  The plugin's own log lines (in memory only). */
 	log: PluginLogLine[],
 };
 
 export type PluginDirection = "row" | "column";
+
+/**  What a factor does to the score: whole points or a percentage. */
+export type PluginEffect = { kind: "points"; value: number } | { kind: "percent"; value: number };
+
+/**  One line of the score breakdown table. */
+export type PluginFactorKind = "highPermission" | "webSurface" | "relay" | "mediumPermission" | "lowPermissions" | "websites" | "packageSize" | "wasmModules" | "sourceLink" | "licence" | "reproducible" | "keyAge" | "expectedKey" | "developerTrust" | "recentChange" | "noHistory" | "networkFloor";
+
+/**
+ *  Where a frame sits in the main window, in physical (device) pixels from the top left corner
+ *  of its web view: the UI's CSS pixels times its device pixel ratio, so page zoom and display
+ *  scale are already in.
+ */
+export type PluginFrameBounds = {
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+};
+
+export type PluginFrameChange = 
+/**  The page posted a string (a bridge message for the plugin). */
+{ type: "message"; text: string } | 
+/**  The bootstrap (or the page pretending) posted `{mumcordWebview: kind, key?}`. */
+{ type: "signal"; kind: string; key: string | null } | 
+/**  The page finished loading. */
+{ type: "loaded" } | 
+/**  The page tried to leave its own file; the frame must be closed. */
+{ type: "navigated" };
+
+/**  A message for a frame's page, as the UI's bridge sends it. */
+export type PluginFrameDelivery = 
+/**  A plugin's bridge message (a `message` event with the text as data). */
+{ type: "text"; text: string } | 
+/**  The bootstrap's gesture key (`{mumcordWebview:"key", key}`). */
+{ type: "key"; key: string } | 
+/**  Mute or unmute the page (`{mumcordWebview:"mute", muted}`). */
+{ type: "mute"; muted: boolean };
+
+/**  `plugin://frame`: something from a frame's web view, for the main window only. */
+export type PluginFrameEvent = {
+	frame: string,
+	change: PluginFrameChange,
+};
+
+/**
+ *  `plugin://frame-mute`: mute (or unmute) the sound of one plugin's frames (`plugin` set) or of
+ *  all of them (`plugin` empty). The frame hosts send `{mumcordWebview:"mute", muted}` to the
+ *  page's bootstrap.
+ */
+export type PluginFrameMute = {
+	plugin: string | null,
+	muted: boolean,
+};
+
+/**
+ *  What every plugin frame must currently hear, kept so a window that opens later (a popped-out
+ *  stage) can still mute its frames for a mute or deafen that happened before.
+ */
+export type PluginFrameMuteState = {
+	/**  All frames are muted (the user is deafened). */
+	all: boolean,
+	/**  Plugins whose frames the user muted, sorted. */
+	plugins: string[],
+};
+
+/**  Why the one confirmation box shows. */
+export type PluginGateReason = "highRisk" | "ownCodeAndWebsites" | "repositoryWarning";
+
+/**  Why a package is refused instead of scored (FR-9.78). */
+export type PluginHardStop = "invalidSignature" | "hashMismatch" | "manifestMismatch" | "revoked" | "unsafeOrigin";
 
 /**  The store's official plugin list. */
 export type PluginIndex = {
@@ -2939,6 +3196,24 @@ export type PluginIndexImage = { kind: "icon" } | { kind: "screenshot"; index: n
 export type PluginInputPurpose = "plain" | 
 /**  Hosts typed here become the only ones the plugin may reach with `net.http`. */
 "serverAddress";
+
+/**  What the install prompt shows once the package is downloaded and checked. */
+export type PluginInstallCheck = 
+/**  "Can't be installed": no score, no Install button. */
+{ kind: "refused"; stop: PluginHardStop; 
+/**  User-facing text. */
+reason: string } | { kind: "ready"; score: PluginInstallScore; gate: PluginInstallGate };
+
+export type PluginInstallGate = {
+	/**  `None`: Install is enabled right away. */
+	confirm: PluginConfirmKind | null,
+	/**
+	 *  "Don't allow high-risk plugins" is on and the plugin is High: Install stays disabled
+	 *  with "Blocked by your safety setting".
+	 */
+	blockedBySafety: boolean,
+	reasons: PluginGateReason[],
+};
 
 /**
  *  What the install prompt shows, read from the verified package's manifest (the index only
@@ -2957,12 +3232,31 @@ export type PluginInstallOffer = {
 	 *  `chat.patterns`). Plugin text: plain, untrusted.
 	 */
 	chatPatterns: string[],
+	/**
+	 *  The websites the package declares, each with its reason in the app language (the
+	 *  plugin's own text; the key itself when it has none). Plugin text: plain, untrusted.
+	 */
+	origins: PluginWebsite[],
+	/**
+	 *  The score, the one confirmation box and the safety setting for this package, or the
+	 *  hard stop that refuses it (`refused`: no Install button, the other fields are empty).
+	 */
+	check: PluginInstallCheck,
 };
 
 /**  `plugins://install-progress`. */
 export type PluginInstallProgress = {
 	id: string,
 	progress: PluginInstallStage,
+};
+
+/**  The package score of the install prompt next to what the listing promised. */
+export type PluginInstallScore = {
+	score: PluginScored,
+	/**  `None` when the version is not listed (e.g. Developer mode). */
+	listing: PluginScored | null,
+	/**  "This plugin scores higher than its listing said." */
+	higherThanListing: boolean,
 };
 
 /**  One step of an install. */
@@ -2986,6 +3280,18 @@ export type PluginLogLine = {
 	text: string,
 };
 
+/**  One day of a plugin's network use (kept for 7 days). */
+export type PluginNetworkDay = {
+	/**  Local calendar day, `YYYY-MM-DD`. */
+	day: string,
+	requests: number,
+	blocked: number,
+	/**  Unix milliseconds of the last request. */
+	lastRequestAt: number | null,
+	/**  Host of the last request; plain, untrusted text. */
+	lastHost: string | null,
+};
+
 /**  One node of a flat tree: node 0 is the root, `children` are indices into the same list. */
 export type PluginNode = {
 	component: PluginComponent,
@@ -3000,7 +3306,12 @@ export type PluginNotice =
 /**  "Turned off after repeated crashes". */
 { kind: "autoOff" } | 
 /**  A new version waits in the Updates tab (no OS notification). */
-{ kind: "updateAvailable"; name: string; version: string };
+{ kind: "updateAvailable"; name: string; version: string } | 
+/**
+ *  `files.import-picture` refused the picked file: not a PNG, JPEG or WebP, or above 10 MB
+ *  (FR-9.105, section 5.5).
+ */
+{ kind: "pictureRefused" };
 
 /**  `plugins://notification`: an entry for the notification centre (category Plugins). */
 export type PluginNotification = {
@@ -3016,6 +3327,118 @@ export type PluginOptionalPermission = {
 
 /**  How the user saw the plugin's panel. */
 export type PluginPanelVisibility = "hidden" | "inline" | "expanded";
+
+/**  The points one permission that is new in an update adds to the score. */
+export type PluginPermissionEffect = {
+	permission: string,
+	points: number,
+};
+
+/**  The plugin platform's own settings (Settings → Plugins). */
+export type PluginPlatformSettings = {
+	/**  "Don't allow high-risk plugins" (FR-9.81). Off by default. */
+	blockHighRisk: boolean,
+	/**  Plugins may send and receive data through the relay. On by default. */
+	relayDataEnabled: boolean,
+	/**  Plugin sound volume in percent, 0–100. */
+	soundVolume: number,
+	soundMuted: boolean,
+};
+
+/**  The "recent change" part of the score: new permissions within the last versions. */
+export type PluginRecentChange = {
+	/**  Points added on top (outside the trust percentage). */
+	points: number,
+	/**  The trust percentage applied to the permission points, e.g. 90. */
+	trustPercent: number,
+	/**  The permissions that count as a recent change. */
+	permissions: string[],
+};
+
+/**
+ *  Whether `server`'s relay can carry plugin data right now (FR-9.57), before the global
+ *  switch and a plugin's own permission.
+ */
+export type PluginRelayAvailability = 
+/**  No relay is connected on this server. */
+{ kind: "noRelay" } | 
+/**  The relay does not announce `plugin_data`. */
+{ kind: "useNotAllowed" } | 
+/**  The P2P mode does not allow the relay, or there is no client certificate. */
+{ kind: "notAllowedHere" } | 
+/**  `kbps`: the relay's per-sender cap, when it announces one. */
+{ kind: "available"; kbps: number | null };
+
+/**
+ *  `plugins://relay-availability`: whether `serverId`'s relay can carry plugin data changed
+ *  (FR-9.57). `plugin_relay_availability` answers for a server that changed before the UI listened.
+ */
+export type PluginRelayAvailabilityChanged = {
+	serverId: number,
+	availability: PluginRelayAvailability,
+};
+
+/**  Plugin data a plugin sent and received through relays in this app session (FR-9.64). */
+export type PluginRelayUsage = {
+	pluginId: string,
+	bytes: number | null,
+};
+
+/**  One website of an update; plain, untrusted text. */
+export type PluginReviewOrigin = {
+	origin: string,
+	/**  Marked "New". */
+	new: boolean,
+	/**
+	 *  The plugin's reason for this website in the app language (its own text). `None` for a
+	 *  new website until `plugin_update_review_prepare` has read the new package: the registry
+	 *  index lists no purposes. Before `resolve_purposes` it holds the manifest's key.
+	 */
+	purpose: string | null,
+	/**  A new website outside every domain the installed version already used. */
+	otherDomain: boolean,
+};
+
+/**  The score before and after an update. */
+export type PluginRiskChange = {
+	fromValue: number,
+	fromBand: PluginBand,
+	toValue: number,
+	toBand: PluginBand,
+};
+
+/**  A computed security score: 0–100, its band and the breakdown behind it. */
+export type PluginScore = {
+	value: number,
+	band: PluginBand,
+	e: number,
+	f: number | null,
+	h: number,
+	factors: PluginScoreFactor[],
+	/**  Version of the weights the score was computed with. */
+	version: number,
+};
+
+export type PluginScoreFactor = {
+	kind: PluginFactorKind,
+	effect: PluginEffect,
+	/**  Translation key of the factor's detail text. */
+	detailKey: string,
+};
+
+/**  Where a score is read from. */
+export type PluginScoreSource = 
+/**  The signed index entry, as Browse shows it. */
+"listing" | 
+/**  The package the install prompt downloaded and verified. */
+"package";
+
+/**  The score of a plugin version, or why there is none. */
+export type PluginScored = 
+/**  Official plugins show "Official · reviewed" instead of a number. */
+{ kind: "official" } | 
+/**  Cannot be installed; no number. */
+{ kind: "refused"; stop: PluginHardStop } | { kind: "scored"; score: PluginScore };
 
 export type PluginSelectOption = {
 	value: string,
@@ -3037,7 +3460,12 @@ export type PluginSlot =
 /**  The plugin's form in Settings → Plugins. */
 { kind: "settings" } | 
 /**  The plugin's own dialog while it is open. */
-{ kind: "dialog" };
+{ kind: "dialog" } | 
+/**
+ *  The plugin's activity in the media area (FR-9.46). Only the source of `ui-action`s: the
+ *  tree arrives as [`PluginUiChange::StageTree`].
+ */
+{ kind: "stage" };
 
 /**  Where an installed plugin came from. */
 export type PluginSourceInfo = { kind: "official" } | { kind: "repo"; repositoryId: number; 
@@ -3135,15 +3563,41 @@ serverId: number | null } |
  *  app serves from the plugin's `web/` folder (FR-6.46).
  */
 { type: "webviewShow"; place: PluginWebviewPlace; url: string } | 
-/**  The web view closes; its place shows the plugin's tree again. */
-{ type: "webviewHide" } | 
-/**  A bridge message for the page (untrusted text). Not part of the snapshot. */
-{ type: "webviewPost"; message: string };
+/**
+ *  The web view in `place` closes; the place shows the plugin's tree again (or closes, for
+ *  the side panel and the stage).
+ */
+{ type: "webviewHide"; place: PluginWebviewPlace } | 
+/**  A bridge message for the pages in `places` (untrusted text). Not part of the snapshot. */
+{ type: "webviewPost"; message: string; places: PluginWebviewPlace[] } | 
+/**
+ *  The smallest size the plugin asks for its side panel, in CSS pixels; the UI clamps it to
+ *  the panel's limits and the user may still resize (FR-9.39).
+ */
+{ type: "webviewSizeHint"; minWidth: number; minHeight: number } | 
+/**
+ *  The plain-text status line under the plugin's side panel (untrusted text, at most 80
+ *  characters, no markup); empty clears it. Gone once the side panel closes.
+ */
+{ type: "sidePanelStatus"; text: string } | 
+/**  The tree of the plugin's stage activity (FR-9.46); empty once the user left it. */
+{ type: "stageTree"; nodes: PluginNode[] };
 
 /**  A user input for a plugin's UI other than an action. */
 export type PluginUiInput = { type: "profileCardOpened"; session: number } | { type: "panelVisibility"; visibility: PluginPanelVisibility } | { type: "userMenuRequested"; session: number } | { type: "dialogClosed" } | 
-/**  A bridge message from the plugin's web view page (≤ 16 KiB, ≤ 60/s; dropped otherwise). */
-{ type: "webviewMessage"; text: string };
+/**
+ *  A bridge message from the plugin's page in `place` (≤ 16 KiB, 64 KiB from the stage,
+ *  ≤ 60/s; dropped otherwise, or when that frame is not open).
+ */
+{ type: "webviewMessage"; place: PluginWebviewPlace; text: string } | 
+/**
+ *  A genuine click or key press inside the plugin's page in `place` (FR-9.45), reported by
+ *  the page's bootstrap with the frame's key, which the UI checked. Counts as a user gesture
+ *  for the plugin; dropped when that frame is not open or the reports come too fast.
+ */
+{ type: "webviewGesture"; place: PluginWebviewPlace } | 
+/**  The user closed the plugin's frame in `place` (its close button). */
+{ type: "surfaceClosed"; place: PluginWebviewPlace };
 
 /**  One update on offer in Settings → Plugins → Updates. */
 export type PluginUpdate = {
@@ -3159,6 +3613,18 @@ export type PluginUpdate = {
 	approval: PluginUpdateApproval | null,
 	/**  This version was installed, failed to start and was rolled back: the reason. */
 	failed: string | null,
+	/**
+	 *  FR-9.18: set (e.g. "0.8.0") when the newest version needs a newer Mumcord. The plugin
+	 *  stays on its version; show "Update available after updating Mumcord" and no install.
+	 */
+	needsMumcord: string | null,
+	/**
+	 *  FR-9.81, FR-9.82: why the update does not install by itself although `approval` would let
+	 *  it (new websites, the risk went up, the safety setting). The plugin stays on its version.
+	 */
+	hold: PluginUpdateHold | null,
+	/**  Websites and score before/after, for the review (FR-9.83). */
+	review: PluginUpdateReview,
 };
 
 /**  Why an update waits for the user (FR-6.67). */
@@ -3168,14 +3634,56 @@ export type PluginUpdateApproval =
 /**  The new version is signed by a different author key. */
 { kind: "newAuthorKey" };
 
+/**  Why an update waits for the user although it may otherwise install by itself. */
+export type PluginUpdateHold = { kind: "newWebsites"; count: number } | { kind: "riskUp"; from: PluginBand; to: PluginBand } | { kind: "scoreUp"; from: number; to: number } | { kind: "blockedBySafety" } | { kind: "scoreUnknown" };
+
+/**  What the Updates tab shows to decide on an update. */
+export type PluginUpdateReview = {
+	origins: PluginReviewOrigin[],
+	/**  "One of them is not on the plugin's own domain." */
+	otherDomain: boolean,
+	/**  `None` for official plugins or when a score is unknown. */
+	risk: PluginRiskChange | null,
+	/**  Points each new permission adds; empty when the score is unknown. */
+	permissionEffects: PluginPermissionEffect[],
+	/**  `None` when no permission is new in the last versions. */
+	recentChange: PluginRecentChange | null,
+	/**
+	 *  The update makes the plugin High: the tick and "Update anyway" are needed
+	 *  (`plugin_confirm_update_high_risk`).
+	 */
+	needsHighRiskConfirm: boolean,
+	highRiskConfirmed: boolean,
+	/**  The author's release notes for the new version: an https link, or `None`. */
+	notesUrl: string | null,
+};
+
 /**  How plugin updates are handled. */
 export type PluginUpdates = "auto" | "notify" | "off";
 
 /**  Who sees that the user has a plugin (FR-6.35). */
 export type PluginVisibilityChoice = "everyone" | "friends" | "nobody";
 
+/**  One website an installed plugin declares. */
+export type PluginWebsite = {
+	/**  ASCII form; plain, untrusted text. */
+	origin: string,
+	/**
+	 *  The plugin's reason in the app language (its own text; the manifest's key when it has
+	 *  none). Plugin text: plain, untrusted.
+	 */
+	purpose: string,
+};
+
+/**  The websites an installed plugin may reach and what it did with them (FR-9.30). */
+export type PluginWebsites = {
+	origins: PluginWebsite[],
+	/**  Newest day first. */
+	days: PluginNetworkDay[],
+};
+
 /**  Where a plugin's web view is shown. */
-export type PluginWebviewPlace = "panelPopover" | "dialog";
+export type PluginWebviewPlace = "panelPopover" | "dialog" | "sidePanel" | "stage";
 
 /**  `plugins://changed`: the plugin list or a plugin's state changed; reload `plugins_list`. */
 export type PluginsChanged = Record<string, never>;
@@ -3457,8 +3965,8 @@ export type RelayUnavailable =
 /**  "This server's relay doesn't allow {images / file sharing / screen sharing}" (FR-7.7). */
 { kind: "useNotAllowed"; use: RelayUse };
 
-/**  What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing". */
-export type RelayUse = "images" | "files" | "screenShare";
+/**  What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing", "Cameras". */
+export type RelayUse = "images" | "files" | "screenShare" | "cameras";
 
 /**  The changes of one release between the installed and the offered version. */
 export type ReleaseNote = {
@@ -3567,8 +4075,11 @@ export type ScreenShare = {
 	soundMode: ShareSoundMode,
 	/**  The app whose sound is shared, when `soundMode` is `app` (stays on the sharer's device). */
 	soundApp: string | null,
-	/**  Why the share has no sound although the user wanted it (FR-7.85). */
-	soundReason: SoundUnavailableReason | null,
+	/**
+	 *  Why the own share sends no sound, for the live bar's sound line (FR-7.85); `null` while
+	 *  it sends sound, for the shares of others, and when nothing explains it.
+	 */
+	soundReason: ShareSoundReason | null,
 	/**  Set while the share waits for "Which app's sound?" (FR-7.83); the list to offer. */
 	soundChoice: SoundApp[] | null,
 	/**  Who is watching (up to 8). */
@@ -3985,6 +4496,19 @@ export type ShareQuality = {
 /**  What the own share's sound carries (FR-7.76). */
 export type ShareSoundMode = "desktop" | "app" | "none";
 
+/**  Why the own share sends no sound (FR-7.85). */
+export type ShareSoundReason = 
+/**  The Sound switch is off. */
+"off" | 
+/**  "No sound" was chosen in "Which app's sound?". */
+"notChosen" | 
+/**  The system is too old (Windows before 10 version 2004, macOS before 13). */
+"osTooOld" | 
+/**  Linux without a running PipeWire. */
+"noPipeWire" | 
+/**  The sound capture could not start or stopped. */
+"captureFailed";
+
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
 export type ShareStartBlock = {
 	blocked: WatchBlock,
@@ -4011,6 +4535,11 @@ export type SoundApp = {
 	/**  What `screenShareChooseSound` takes. */
 	id: string,
 	name: string,
+	/**
+	 *  The app's icon as a `data:` URL (Linux, where the system has one); the list shows a
+	 *  coloured square without it.
+	 */
+	icon: string | null,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -4059,6 +4588,59 @@ export type SoundUnavailableReason =
 "noPipeWire" | 
 /**  The sound capture could not start or stopped. */
 "captureFailed";
+
+export type StageActivityKind = 
+/**  "<name> started <plugin> · Join". */
+"activity" | 
+/**  "<name> is playing <plugin> · Get plugin". */
+"getPlugin";
+
+/**
+ *  One plugin activity as the stage and the activity line show it (mirrors the host's
+ *  `ActivitySnapshot` plus the starter's name). Text is untrusted.
+ */
+export type StageActivityView = {
+	id: string,
+	plugin: string,
+	pluginName: string,
+	title: string,
+	starter: number,
+	starterName: string,
+	participants: number[],
+	max: number,
+	joined: boolean,
+	startedByMe: boolean,
+	/**  The content is the plugin's web page rather than a tree. */
+	web: boolean,
+	kind: StageActivityKind,
+};
+
+/**
+ *  `plugins://stage-changed`: the activities in the user's channel changed; re-fetch them with
+ *  `stage_activities`.
+ */
+export type StageChanged = Record<string, never>;
+
+/**  Why `stage_join` failed, for the UI texts ("This activity is full", "no longer running"). */
+export type StageJoinError = "gone" | "full" | "notPermitted" | 
+/**  The host failed internally; nothing was joined. */
+"failed";
+
+/**  The limit text for a plugin's own `stage.start` / `stage.join` that was refused. */
+export type StageRefusal = 
+/**  "Too many activities in this channel". */
+"tooMany" | 
+/**  "This activity is full". */
+"full";
+
+/**
+ *  `plugins://stage-refused`: a plugin's own `stage.start` or `stage.join` hit a limit; show the
+ *  text for `reason`.
+ */
+export type StageRefused = {
+	plugin: string,
+	reason: StageRefusal,
+};
 
 /**  Why the share left its encoder for VP9. */
 export type SwitchReason = 

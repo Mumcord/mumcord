@@ -1,5 +1,6 @@
 {
   "share": "Aqsam l-iskrin",
+  "shareYourScreen": "Aqsam l-iskrin tiegħek",
   "choosing": "Qed tagħżel x'se taqsam…",
   "stop": "Waqqaf il-qsim",
   "startFailed": "Il-qsim tal-iskrin ma setax jibda.",
@@ -18,8 +19,6 @@
   "pause": "Pawża",
   "resume": "Kompli",
   "sound": "Aqsam il-ħoss",
-  "noSound": "Linux ma jaqsamx ħoss: it-telespettaturi jaraw l-istampa biss.",
-  "noSoundForShare": "Dan il-qsim m'għandux ħoss (skrin sħiħ jew verżjoni tas-sistema mhux appoġġjata).",
   "viewersNone": "Għad ħadd mhu qed jara",
   "viewers_one": "{{count}} qed jara: {{names}}",
   "viewers_two": "{{count}} qed jaraw: {{names}}",

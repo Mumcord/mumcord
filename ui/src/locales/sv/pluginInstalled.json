@@ -55,6 +55,10 @@
     "messagesExpired": "Meddelanden som har gått ut",
     "incomingRateDropped": "Inkommande meddelanden som tappats av hastighetsgränsen",
     "incomingInvalid": "Ogiltiga inkommande meddelanden",
+    "uiFreezes": "Antal gånger Mumcord frös medan webbinnehållet var öppet",
+    "webDisabled": "Webbinnehållet är avstängt eftersom Mumcord slutade svara medan det var öppet.",
+    "reenableWeb": "Slå på webbinnehåll",
+    "reenableFailed": "Webbinnehållet kunde inte slås på.",
     "log": "Logg",
     "logEmpty": "Loggen är tom.",
     "level": {

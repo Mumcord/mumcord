@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Doplnky",
+  "moreItems": "Ďalšie doplnky…",
+  "subline": "{{plugin}} · Neoficiálny",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Položky doplnkov vždy zobrazujú názov doplnku. Spravuj ich v Nastaveniach → Doplnky.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Reštartuje sa po probléme, skús to o chvíľu znova"
 }

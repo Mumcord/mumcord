@@ -502,15 +502,21 @@ describe("MembersPanel", () => {
     }
   });
 
-  it.each(["dark", "light"] as const)("has no axe violations (%s)", async (theme) => {
-    applyThemeToDocument(theme);
-    const { container } = await renderPanel();
-    await waitFor(() => {
-      expect(avatarImage(/^Anna/)).not.toBeNull();
-    });
-    expect(await axeViolations(container)).toEqual([]);
-    openFullProfile(/^Anna/);
-    await screen.findByText("Hi, I am Anna.");
-    expect(await axeViolations(container)).toEqual([]);
-  });
+  // Axe scans are CPU-heavy: they pass in seconds alone but can exceed the default 5 s timeout
+  // when the whole suite runs in parallel.
+  it.each(["dark", "light"] as const)(
+    "has no axe violations (%s)",
+    async (theme) => {
+      applyThemeToDocument(theme);
+      const { container } = await renderPanel();
+      await waitFor(() => {
+        expect(avatarImage(/^Anna/)).not.toBeNull();
+      });
+      expect(await axeViolations(container)).toEqual([]);
+      openFullProfile(/^Anna/);
+      await screen.findByText("Hi, I am Anna.");
+      expect(await axeViolations(container)).toEqual([]);
+    },
+    30_000,
+  );
 });

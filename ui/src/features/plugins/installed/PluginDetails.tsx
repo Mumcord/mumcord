@@ -1,14 +1,18 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   getApi,
   type InstalledPlugin,
+  type PluginWebsites,
   type PluginSlot,
   type PluginVisibilityChoice,
 } from "../../../api";
 import { Select } from "../../../components/Select";
 import { ConfirmDialog } from "../../settings/components/ConfirmDialog";
 import { pickSavePath } from "../../settings/fileDialogs";
+import { DetailSection, OwnCode, PluginPlaces, PluginScoreCard } from "../browse/PluginDetails";
+import { usePluginScore } from "../browse/usePluginScore";
+import "../browse/details.css";
 import { PermissionList } from "../permissions/PermissionList";
 import { PluginTree } from "../render/PluginTree";
 import { usePluginTree } from "../render/pluginUiStore";
@@ -17,6 +21,8 @@ import { MESSAGES_PERMISSION, displayName, requests } from "./labels";
 
 const SETTINGS_SLOT: PluginSlot = { kind: "settings" };
 const VISIBILITIES: readonly PluginVisibilityChoice[] = ["everyone", "friends", "nobody"];
+
+const RELAY = "peers.relay";
 
 interface PluginDetailsProps {
   plugin: InstalledPlugin;
@@ -31,6 +37,7 @@ interface PluginDetailsProps {
  */
 export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
   const { t } = useTranslation("pluginInstalled");
+  const { t: tOrigins } = useTranslation("pluginOrigins");
   const baseId = useId();
   const [dialog, setDialog] = useState<"reset" | null>(null);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
@@ -62,7 +69,16 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
       active = false;
     };
   }, [plugin.id, plugin.enabled, plugin.granted]);
+  const websites = usePluginWebsites(plugin.id);
+  const scored = usePluginScore(
+    plugin.id,
+    plugin.version,
+    "package",
+    plugin.source.kind === "official",
+  );
+  const permissionsHeading = useRef<HTMLHeadingElement>(null);
   const dev = plugin.source.kind === "dev";
+  const official = plugin.source.kind === "official";
   const granted = new Set(plugin.granted);
   const requested = [
     ...plugin.required.map((id) => ({ id, required: true })),
@@ -89,14 +105,53 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
       setNotice(t("export.done"));
     }, "errors.export");
 
+  const shown = [...plugin.required, ...plugin.granted];
+  const relayRequested = requested.some((p) => p.id === RELAY);
+
   return (
     <div className="plugins-installed-details">
+      {!official && (
+        <PluginScoreCard
+          name={name}
+          scored={scored}
+          official={false}
+          developer={dev}
+          facts={{ websites: websites?.origins.length ?? 0 }}
+        />
+      )}
+      <WebsitesSection name={name} websites={websites} approvedOn={plugin.installedAt} />
+      <PluginPlaces permissions={shown} appMenuItems={plugin.appMenuItems} />
+      <OwnCode
+        permissions={shown}
+        webSize={plugin.webSize}
+        relay={
+          plugin.granted.includes(RELAY) ? (
+            tOrigins("details.relayOn")
+          ) : relayRequested ? (
+            <>
+              {tOrigins("details.relayOff")}{" "}
+              <button
+                type="button"
+                className="settings-link"
+                onClick={() => {
+                  permissionsHeading.current?.focus();
+                }}
+              >
+                {tOrigins("details.turnOnInPermissions")}
+              </button>
+            </>
+          ) : null
+        }
+      />
       {requested.length > 0 && (
         <section aria-labelledby={`${baseId}-permissions`}>
-          <h4 id={`${baseId}-permissions`}>{t("details.permissions")}</h4>
+          <h4 id={`${baseId}-permissions`} ref={permissionsHeading} tabIndex={-1}>
+            {t("details.permissions")}
+          </h4>
           <PermissionList
             requested={requested}
             enabled={granted}
+            pluginName={plugin.name}
             onToggle={togglePermission}
             readOnly={busy}
             chatPatterns={plugin.chatPatterns}
@@ -223,5 +278,90 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
         />
       )}
     </div>
+  );
+}
+
+/** The websites an installed plugin declares and its counters (FR-9.30); `null` while loading. */
+function usePluginWebsites(id: string): PluginWebsites | null {
+  const [websites, setWebsites] = useState<PluginWebsites | null>(null);
+  useEffect(() => {
+    let active = true;
+    getApi()
+      .pluginWebsites(id)
+      .then(
+        (result) => {
+          if (active) setWebsites(result);
+        },
+        (error: unknown) => {
+          console.error("Loading the plugin's websites failed", error);
+        },
+      );
+    return () => {
+      active = false;
+    };
+  }, [id]);
+  return websites;
+}
+
+function localDay(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${String(date.getFullYear())}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+/** "Websites it talks to": origins with purpose and today's local counters. */
+function WebsitesSection({
+  name,
+  websites,
+  approvedOn,
+}: {
+  name: string;
+  websites: PluginWebsites | null;
+  approvedOn: number | null;
+}) {
+  const { t, i18n } = useTranslation("pluginOrigins");
+  if (websites === null || websites.origins.length === 0) return null;
+  const today = websites.days.find((d) => d.day === localDay(new Date()));
+  const last = websites.days.find((d) => d.lastRequestAt !== null);
+  const date =
+    approvedOn !== null && approvedOn > 0
+      ? new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(approvedOn))
+      : null;
+  return (
+    <DetailSection title={t("details.title")}>
+      <p className="pd-hint">
+        {date !== null ? t("details.text", { plugin: name, date }) : t("intro", { plugin: name })}
+      </p>
+      <ul className="ps-origins" aria-label={t("listLabel")}>
+        {websites.origins.map((site) => (
+          <li key={site.origin} className="ps-origin">
+            <code>{site.origin}</code>
+            <span>{site.purpose}</span>
+          </li>
+        ))}
+      </ul>
+      <dl className="ps-facts">
+        <dt>{t("details.lastRequest")}</dt>
+        <dd>
+          {last?.lastRequestAt != null
+            ? [
+                new Intl.DateTimeFormat(i18n.language, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).format(new Date(last.lastRequestAt)),
+                last.lastHost,
+              ]
+                .filter((part) => part !== null)
+                .join(" · ")
+            : t("details.none")}
+        </dd>
+        <dt>{t("details.requestsToday")}</dt>
+        <dd>
+          {t("details.requestsTodayValue", {
+            count: today?.requests ?? 0,
+            blocked: today?.blocked ?? 0,
+          })}
+        </dd>
+      </dl>
+    </DetailSection>
   );
 }

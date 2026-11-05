@@ -17,7 +17,7 @@ import { getApi, toEngineError, type VideoCodec } from "../../api";
 import { screenFrameChannel, VIDEO_CODECS, webCodecsCodecs } from "../../api/screenFrames";
 import { isPoppedOut, popouts, useInPopout } from "../media/popoutStore";
 import { keepWatch, takeKeptWatch } from "./frameHandover";
-import { createFrameRenderer } from "./frameRenderer";
+import { createFrameRenderer, type FrameRenderer } from "./frameRenderer";
 import type { StreamMeter } from "./streamStats";
 import { CONNECT_TIMEOUT_MS, watchFailure, type WatchFailure } from "./watchFailure";
 
@@ -47,6 +47,8 @@ export function useScreenWatch(
   canvasRef: RefObject<HTMLCanvasElement | null>,
   paused: boolean,
   meter?: StreamMeter,
+  /** Another stage tab is the main item: keep watching, but skip drawing (FR-9.44). */
+  hidden = false,
 ): ScreenWatch {
   const [status, setStatus] = useState<WatchStatus>({ state: "starting" });
   const [attempt, setAttempt] = useState(0);
@@ -62,6 +64,12 @@ export function useScreenWatch(
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+  const hiddenRef = useRef(hidden);
+  const rendererRef = useRef<FrameRenderer | null>(null);
+  useEffect(() => {
+    hiddenRef.current = hidden;
+    rendererRef.current?.setHidden(hidden);
+  }, [hidden]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -136,11 +144,14 @@ export function useScreenWatch(
           setStatus({ state: "live" });
         },
       });
+      renderer.setHidden(hiddenRef.current);
+      rendererRef.current = renderer;
       const channel = screenFrameChannel((frame) => {
         renderer.push(frame);
       });
       const stop = () => {
         renderer.close();
+        if (rendererRef.current === renderer) rendererRef.current = null;
         channel.onmessage = () => undefined;
         if (inPopout) return;
         if (isPoppedOut(popouts(), "share", serverId, session)) {

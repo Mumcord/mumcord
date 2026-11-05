@@ -1,5 +1,6 @@
 {
   "share": "Compartir pantalla",
+  "shareYourScreen": "Compartir tu pantalla",
   "choosing": "Eligiendo qué compartir…",
   "stop": "Dejar de compartir",
   "startFailed": "No se pudo iniciar la pantalla compartida.",
@@ -18,8 +19,6 @@
   "pause": "Pausar",
   "resume": "Reanudar",
   "sound": "Compartir sonido",
-  "noSound": "Linux no comparte sonido: los espectadores solo ven la imagen.",
-  "noSoundForShare": "Esta pantalla compartida no tiene sonido (pantalla completa o versión del sistema no compatible).",
   "viewersNone": "Nadie está mirando todavía",
   "viewers_one": "{{count}} mirando: {{names}}",
   "viewers_many": "{{count}} mirando: {{names}}",

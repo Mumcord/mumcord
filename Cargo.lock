@@ -4065,8 +4065,10 @@ dependencies = [
  "mumcord-plugins",
  "mumcord-protocol 0.7.0-dev",
  "notify-rust",
+ "objc2",
  "open",
  "rand 0.10.3",
+ "rfd",
  "semver",
  "serde",
  "serde_json",
@@ -4188,8 +4190,10 @@ dependencies = [
  "crossbeam-queue",
  "dispatch2",
  "futures-util",
+ "hound",
  "html5ever 0.40.1",
  "image",
+ "lewton",
  "mumbot",
  "mumcord-audio",
  "mumcord-p2p 0.7.0-dev",
@@ -4333,6 +4337,7 @@ dependencies = [
 name = "mumcord-plugin-sdk"
 version = "0.7.0-dev"
 dependencies = [
+ "bovnar",
  "serde",
  "serde_json",
  "wit-bindgen 0.63.0",
@@ -4344,8 +4349,11 @@ version = "0.7.0-dev"
 dependencies = [
  "ammonia",
  "base64 0.23.1",
+ "bovnar",
  "chrono",
  "hmac 0.13.0",
+ "hound",
+ "image",
  "keyring",
  "lewton",
  "minisign",

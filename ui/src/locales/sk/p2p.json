@@ -26,6 +26,7 @@
     "noRelay": "Tento server nemá relay, takže zdieľanie súborov nie je dostupné.",
     "filesDisallowed": "Relay tohto servera zdieľanie súborov nepovoľuje.",
     "screenDisallowed": "Relay tohto servera zdieľanie obrazovky nepovoľuje.",
+    "camerasDisallowed": "Relay tohto servera nepovoľuje zdieľanie kamery.",
     "imagesDisallowed": "Plná veľkosť nie je dostupná: relay tohto servera nepovoľuje obrázky",
     "noCertificate": "Zdieľanie súborov vyžaduje klientsky certifikát.",
     "modeNeedsRelay": "Zdieľanie súborov potrebuje relay; tvoje nastavenie peer-to-peer je {{mode}}.",

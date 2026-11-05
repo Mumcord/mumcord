@@ -42,6 +42,9 @@ enum Command {
         /// Use a local checkout of `mumcord-plugin-sdk` instead of the release on crates.io.
         #[arg(long)]
         sdk_path: Option<PathBuf>,
+        /// Which project to create.
+        #[arg(long, value_enum, default_value_t)]
+        template: new::Template,
     },
     /// Build the plugin in a project folder into a `.mcplugin` package.
     Build {
@@ -98,7 +101,12 @@ enum Command {
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let result = match cli.command {
-        Command::New { id, dir, sdk_path } => new::run(&id, dir, sdk_path.as_deref()),
+        Command::New {
+            id,
+            dir,
+            sdk_path,
+            template,
+        } => new::run(&id, dir, sdk_path.as_deref(), template),
         Command::Build {
             dir,
             reproducible,

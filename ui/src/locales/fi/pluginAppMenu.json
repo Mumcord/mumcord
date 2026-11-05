@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Lisäosat",
+  "moreItems": "Lisää lisäosia…",
+  "subline": "{{plugin}} · Epävirallinen",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Lisäosien kohteet näyttävät aina lisäosan nimen. Hallitse niitä kohdassa Asetukset → Lisäosat.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Käynnistyy uudelleen ongelman jälkeen, yritä hetken kuluttua uudelleen"
 }

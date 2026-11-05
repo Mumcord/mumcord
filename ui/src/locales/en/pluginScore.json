@@ -4,6 +4,11 @@
     "medium": "Medium risk",
     "high": "High risk"
   },
+  "bandInSentence": {
+    "low": "low risk",
+    "medium": "medium risk",
+    "high": "high risk"
+  },
   "bandMeaning": {
     "low": "Asks for little and can be verified well.",
     "medium": "Can run web pages or reach the internet, or is hard to verify.",
@@ -36,6 +41,7 @@
   "notReviewedTitle": "Not reviewed by Mumcord",
   "notReviewedText": "This plugin comes from the third-party repository “{{repository}}”. Mumcord checks that it is unchanged, but nobody at Mumcord has looked at what it does.",
   "biggestReasons": "Biggest reasons",
+  "reasonWorse": "{{factor}}: worse than average",
   "showBreakdown": "Show the full breakdown",
   "hideBreakdown": "Hide the full breakdown",
   "breakdown": {
@@ -53,6 +59,7 @@
     "newPermissionsNone": "None in the last {{count}} versions",
     "newPermissions": "New permissions",
     "formula": "Score = {{points}} points × {{factor}} ({{percent}}) + {{history}} = {{score}}",
+    "floor": "Raised to {{score}} because the plugin can reach the internet.",
     "formulaVersion": "Formula version {{version}}",
     "howCalculated": "How the score is calculated",
     "firstWebSurface": "first web surface",

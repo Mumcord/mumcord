@@ -1,5 +1,6 @@
 {
   "share": "Comhroinn an scáileán",
+  "shareYourScreen": "Comhroinn do scáileán",
   "choosing": "Ag roghnú cad le comhroinnt…",
   "stop": "Stop ag comhroinnt",
   "startFailed": "Níorbh fhéidir comhroinnt scáileáin a thosú.",
@@ -18,8 +19,6 @@
   "pause": "Sos",
   "resume": "Lean ar aghaidh",
   "sound": "Comhroinn fuaim",
-  "noSound": "Ní chomhroinneann Linux fuaim: ní fheiceann breathnóirí ach an pictiúr.",
-  "noSoundForShare": "Níl fuaim ag an gcomhroinnt seo (scáileán iomlán nó leagan córais nach dtacaítear leis).",
   "viewersNone": "Níl aon duine ag féachaint fós",
   "viewers_one": "{{count}} ag féachaint: {{names}}",
   "viewers_two": "{{count}} ag féachaint: {{names}}",

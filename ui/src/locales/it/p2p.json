@@ -26,6 +26,7 @@
     "noRelay": "Questo server non ha un relay, quindi la condivisione file non è disponibile.",
     "filesDisallowed": "Il relay di questo server non consente la condivisione file.",
     "screenDisallowed": "Il relay di questo server non consente la condivisione dello schermo.",
+    "camerasDisallowed": "Il relay di questo server non consente la condivisione della fotocamera.",
     "imagesDisallowed": "Dimensione intera non disponibile: il relay di questo server non consente le immagini",
     "noCertificate": "La condivisione file richiede un certificato client.",
     "modeNeedsRelay": "La condivisione file richiede il relay; la tua impostazione peer-to-peer è {{mode}}.",

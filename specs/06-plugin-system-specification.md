@@ -112,6 +112,8 @@ The Mumble server only relays plugin data and text messages under its normal ACL
 
 ### 4.4 Permissions (#275, Q1.4 … Q1.7)
 
+> Extended by spec 09 (API 1.1, new permissions, `net.origins`): see `specs/09-plugin-platform-1-1-specification.md` §4.4 and §4.5, and `docs/plugins/api-1-1.md`.
+
 - **FR-6.27** The permission catalogue is closed: only the ids below exist. Risk colours: green (low), yellow (medium), red (high).
 
 | Permission | Plain-language text in the prompt | Risk | Availability | Notes |
@@ -167,6 +169,8 @@ The Mumble server only relays plugin data and text messages under its normal ACL
 
 ### 4.8 Web view (official only, Q2.3, Q3.2)
 
+> Partly reversed by spec 09 for unofficial plugins (own web content in a sealed frame, declared websites): see `specs/09-plugin-platform-1-1-specification.md` §4.5 and §4.6, and `docs/plugins/api-1-1.md`.
+
 - **FR-6.46** An official plugin with `ui.webview` may ship HTML, CSS, JS and images in `web/` and show them in the large panel popover or in a dialog.
 - **FR-6.47** The web view is a sandboxed frame with an opaque origin: no network (CSP `default-src 'none'` plus inline/package-local script, style and image only), no Tauri IPC, no storage, no navigation, no popups, no access to the Mumcord window. It talks only to its own plugin through a message bridge (≤ 16 KiB per message, ≤ 60 per second); the plugin decides what to share via the normal API.
   - *Addendum 2026-11-01 (EV3):* successful responses for a plugin's `web/` files carry `Access-Control-Allow-Origin: *` (never `Allow-Credentials`), because the frame's opaque origin makes CSS masks, `fetch` and fonts CORS requests. Not-found answers get no such header. The per-frame CSP stays the guard: a frame may only reach its own plugin's folder.
@@ -189,6 +193,8 @@ The Mumble server only relays plugin data and text messages under its normal ACL
 
 ### 4.11 Settings → Plugins (#277, Q1.9, Q2.6, Q2.8)
 
+> Spec 09 adds the security score, the safety setting and the relay data card: see `specs/09-plugin-platform-1-1-specification.md` §4.11, §4.12 and `docs/plugin-score.md`.
+
 - **FR-6.58** New Settings section "Plugins" after Privacy with tabs Installed, Browse, Updates, Repositories and (Developer mode only) Developer. Command palette entry "Plugins".
 - **FR-6.59** Browse lists the official index (and enabled third-party repositories) by category with search; Echolings has a highlighted card at the top (Q1.9). No plugin is preinstalled and there is no first-run promotion.
 - **FR-6.60** Install flow: permission prompt → download → verify (FR-6.50) → unpack → start → toast "<name> installed". The prompt lists plain-language permissions with risk colours, required fixed, optional as toggles, the visibility choice when `peers.messages` is present, and red rows for `net.http` and `secrets` (Q2.6).
@@ -199,6 +205,8 @@ The Mumble server only relays plugin data and text messages under its normal ACL
 - **FR-6.65** Deep link `mumcord://plugins/<id>` opens the details of an official plugin in Browse; it never installs.
 
 ### 4.12 Updates & kill switch (#278, Q4.2, Q4.6, Q5.2)
+
+> Spec 09 adds update gates and a second index (`v1.1`): see `specs/09-plugin-platform-1-1-specification.md` §4.3 and §4.12, and `docs/plugin-registry-format.md`.
 
 - **FR-6.66** Separate setting "Plugin updates": Install automatically (default) / Notify only / Off, independent of the app updater. Checked at app start and every 6 hours while running (not when Off).
 - **FR-6.67** Automatic install happens only if the update needs the same or fewer permissions and is signed by the same author key; otherwise it waits in the Updates tab and asks. Per-plugin "Pin version" excludes it from updates.
@@ -276,6 +284,8 @@ flowchart LR
 Icons are buttons with the plugin name as label; arrow keys move between them; Enter activates; "⤢" opens the popover (Escape closes).
 
 ### 5.3 Install prompt
+
+> Spec 09 extends the install prompt (websites, sealed frame, score): see `specs/09-plugin-platform-1-1-specification.md` §5.2 and `docs/plugin-score.md`.
 
 ```text
 ┌ Install Dice roller? ────────────────────────────────┐

@@ -313,6 +313,7 @@
     "line": "Relay erlaubt: {{uses}}",
     "images": "Bilder",
     "files": "Dateien",
-    "screen": "Bildschirmfreigabe"
+    "screen": "Bildschirmfreigabe",
+    "cameras": "Kameras"
   }
 }

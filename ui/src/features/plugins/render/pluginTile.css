@@ -1,0 +1,28 @@
+/*
+ * Tile for plugins without an icon image: a gradient from the plugin's own hue. The fixed
+ * lightness keeps white initials above 4.5:1 contrast for every hue, in light and dark. The
+ * element selector outranks the size classes of the surfaces that reuse the tile.
+ */
+span.plugin-tile {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  border: 0;
+  background: oklch(0.5 0.16 var(--plugin-hue, 250));
+  background: linear-gradient(
+    135deg,
+    oklch(0.5 0.16 var(--plugin-hue, 250)),
+    oklch(0.5 0.16 calc(var(--plugin-hue, 250) + 60))
+  );
+  color: #fff;
+  font-weight: var(--font-weight-bold);
+  user-select: none;
+}
+
+@media (forced-colors: active) {
+  span.plugin-tile {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}

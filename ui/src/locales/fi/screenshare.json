@@ -1,5 +1,6 @@
 {
   "share": "Jaa näyttö",
+  "shareYourScreen": "Jaa oma näyttösi",
   "choosing": "Valitaan jaettavaa…",
   "stop": "Lopeta jakaminen",
   "startFailed": "Näytön jakoa ei voitu aloittaa.",
@@ -18,8 +19,6 @@
   "pause": "Tauko",
   "resume": "Jatka",
   "sound": "Jaa ääni",
-  "noSound": "Linux ei jaa ääntä: katsojat näkevät vain kuvan.",
-  "noSoundForShare": "Tässä jaossa ei ole ääntä (koko näyttö tai järjestelmäversiota ei tueta).",
   "viewersNone": "Kukaan ei vielä katso",
   "viewers_one": "{{count}} katsoo: {{names}}",
   "viewers_other": "{{count}} katsoo: {{names}}",

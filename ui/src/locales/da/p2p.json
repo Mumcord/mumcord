@@ -26,6 +26,7 @@
     "noRelay": "Denne server har intet relæ, så fildeling er ikke tilgængelig.",
     "filesDisallowed": "Denne servers relæ tillader ikke fildeling.",
     "screenDisallowed": "Denne servers relæ tillader ikke skærmdeling.",
+    "camerasDisallowed": "Dette servers relæ tillader ikke deling af kamera.",
     "imagesDisallowed": "Fuld størrelse er ikke tilgængelig: Denne servers relæ tillader ikke billeder",
     "noCertificate": "Fildeling kræver et klientcertifikat.",
     "modeNeedsRelay": "Fildeling kræver relæet; din peer-to-peer-indstilling er {{mode}}.",

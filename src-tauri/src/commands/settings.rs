@@ -1235,6 +1235,9 @@ pub async fn settings_update(
     if stored.language != previous.language {
         crate::tray::language_changed(&app);
     }
+    if stored.p2p_mode != previous.p2p_mode {
+        crate::plugins::refresh_all_relay_availability(&app);
+    }
     if stored.developer_mode != previous.developer_mode {
         crate::plugins::developer_mode_changed(&app, stored.developer_mode);
     }

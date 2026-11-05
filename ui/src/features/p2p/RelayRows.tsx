@@ -10,12 +10,13 @@ import { relayReasonText } from "./relayReason";
 import { useRelayInfo } from "./useRelayInfo";
 import "./p2p.css";
 
-const USE_KEY: Record<RelayUse, "images" | "files" | "screen"> = {
+const USE_KEY: Record<RelayUse, "images" | "files" | "screen" | "cameras"> = {
   images: "images",
   files: "files",
   screenShare: "screen",
+  cameras: "cameras",
 };
-const USE_ORDER: RelayUse[] = ["images", "files", "screenShare"];
+const USE_ORDER: RelayUse[] = ["images", "files", "screenShare", "cameras"];
 
 export type RelayAction = "trustNew" | "keepBlocked" | "forget";
 

@@ -129,4 +129,38 @@ describe("frame renderer", () => {
     expect(onUnsupported).toHaveBeenCalledTimes(1);
     warn.mockRestore();
   });
+
+  it("holds pictures while hidden and draws the latest when shown (FR-9.44)", () => {
+    const { element, context } = canvas();
+    const onFirstPicture = vi.fn();
+    const onFrame = vi.fn();
+    const renderer = createFrameRenderer(element, {
+      requestKeyframe: vi.fn(),
+      onFirstPicture,
+      onFrame,
+    });
+    const filled = (fill: number): ScreenFrame => ({
+      kind: "rgba",
+      codec: "vp9",
+      width: 1,
+      height: 1,
+      data: new Uint8ClampedArray([fill, fill, fill, 255]),
+    });
+
+    renderer.setHidden(true);
+    renderer.push(filled(1));
+    renderer.push(filled(2));
+    expect(context.putImageData).not.toHaveBeenCalled();
+    // The share still counts as live and its frames as received.
+    expect(onFirstPicture).toHaveBeenCalledTimes(1);
+    expect(onFrame).toHaveBeenCalledTimes(2);
+
+    renderer.setHidden(false);
+    expect(context.putImageData).toHaveBeenCalledTimes(1);
+    const drawn = context.putImageData.mock.calls[0]?.[0] as { data: Uint8ClampedArray };
+    expect(drawn.data[0]).toBe(2);
+
+    renderer.push(filled(3));
+    expect(context.putImageData).toHaveBeenCalledTimes(2);
+  });
 });

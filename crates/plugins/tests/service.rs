@@ -41,10 +41,18 @@ fn component(start: &str) -> Vec<u8> {
 }
 
 fn encode(core: &str) -> Vec<u8> {
+    encode_for(core, "1.0.0")
+}
+
+fn encode_for(core: &str, version: &str) -> Vec<u8> {
     let mut module = wat::parse_str(core).expect("fixture is valid WAT");
     let mut resolve = wit_parser::Resolve::default();
     let (package, _) = resolve
-        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("wit/1.0.0"))
+        .push_dir(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("wit")
+                .join(version),
+        )
         .expect("WIT parses");
     let world = resolve
         .select_world(&[package], Some("plugin"))
@@ -118,6 +126,7 @@ fn signed_wasm(id: &str, wasm: &[u8], extra: &str, optional: &[&str]) -> Signed 
             },
             optional: optional.iter().map(|p| (*p).to_owned()).collect(),
             visibility: PluginVisibility::Friends,
+            confirmed: true,
         },
         download: Download { bytes, signature },
     }
@@ -1695,4 +1704,114 @@ fn installing_a_plugin_announces_at_once_despite_the_interval() {
         .expect("visibility");
     assert!(service.poll_announces().is_empty());
     assert!(service.next_announce_at().is_some());
+}
+
+/// A 1.1 plugin: `start` disables its item "history" with the reason "Busy"; any event makes it
+/// post a chat line (which only works inside the gesture window of an activation) and log
+/// whether that worked.
+const APP_MENU_CORE: &str = r#"
+(module
+  (import "mumcord:plugin/log@1.1.0" "write" (func $log (param i32 i32 i32)))
+  (import "mumcord:plugin/chat@1.1.0" "send" (func $chat_send (param i32 i32 i32)))
+  (import "mumcord:plugin/app-menu@1.1.0" "set-state"
+    (func $set (param i32 i32 i32 i32 i32 i32 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (data (i32.const 200) "history")
+  (data (i32.const 216) "Busy")
+  (data (i32.const 232) "hello")
+  (data (i32.const 248) "posted")
+  (data (i32.const 264) "refused")
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    ;; Round the bump pointer up to the requested alignment; the host refuses unaligned results.
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (call $set (i32.const 200) (i32.const 7) (i32.const 0) (i32.const 1) (i32.const 216)
+      (i32.const 4) (i32.const 128))
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param i32)
+    (call $chat_send (i32.const 232) (i32.const 5) (i32.const 128))
+    (if (i32.eqz (i32.load8_u (i32.const 128)))
+      (then (call $log (i32.const 1) (i32.const 248) (i32.const 6)))
+      (else (call $log (i32.const 1) (i32.const 264) (i32.const 7)))))
+  (func (export "stop"))
+)"#;
+
+/// FR-9.53 … FR-9.55: the items of a running plugin are listed with their state; choosing an
+/// enabled item sends `app-menu-activated` and opens the 8 s gesture window, a disabled or
+/// unknown item does nothing.
+#[test]
+fn choosing_an_apps_menu_item_activates_the_plugin_with_a_gesture() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+
+    let extra = r#","permissions":{"required":["ui.app-menu","chat.send"]},"app_menu":[{"id":"roll","label":"Roll dice"},{"id":"history","label":"Roll history"}]"#;
+    let dir = fx.root.path().join("src-menu");
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(
+        dir.join("manifest.json"),
+        manifest("menu", "0.1.0", extra).replace("\"^1.0\"", "\"^1.1\""),
+    )
+    .expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), encode_for(APP_MENU_CORE, "1.1.0")).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    let id = service.load_dev(&dir).expect("loads");
+    assert_eq!(info(&service, &id).status, Status::Running);
+
+    let entries = service.app_menu();
+    let state: Vec<_> = entries
+        .iter()
+        .map(|e| (e.item.as_str(), e.enabled, e.reason.as_deref()))
+        .collect();
+    assert_eq!(
+        state,
+        [("roll", true, None), ("history", false, Some("Busy"))]
+    );
+    assert_eq!(entries[0].plugin_name, "Test");
+
+    assert!(!service.app_menu_activate(&id, "history"), "disabled");
+    assert!(!service.app_menu_activate(&id, "nope"), "unknown");
+    assert!(!service.app_menu_activate("other", "roll"), "not loaded");
+    assert!(service.app_menu_activate(&id, "roll"));
+
+    let until = std::time::Instant::now() + std::time::Duration::from_secs(2);
+    let mut posted = Vec::new();
+    loop {
+        while let Ok(event) = host_events.try_recv() {
+            service.handle_host_event(event).expect("handled");
+        }
+        while let Ok(event) = events.try_recv() {
+            if let ServiceEvent::ChatPost { line, .. } = event {
+                posted.push(line);
+            }
+        }
+        let lines = service.log_lines(&id);
+        if lines.iter().any(|(_, l)| l == "posted") {
+            break;
+        }
+        assert!(
+            lines.iter().all(|(_, l)| l != "refused"),
+            "no gesture: {lines:?}"
+        );
+        assert!(std::time::Instant::now() < until, "no event: {lines:?}");
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+    assert_eq!(posted, ["[Test] hello"]);
+
+    service.set_enabled(&id, false).expect("turns off");
+    assert!(
+        service.app_menu().is_empty(),
+        "a stopped plugin has no items"
+    );
+    assert!(!service.app_menu_activate(&id, "roll"));
 }

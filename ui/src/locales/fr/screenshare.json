@@ -1,5 +1,6 @@
 {
   "share": "Partager l’écran",
+  "shareYourScreen": "Partager votre écran",
   "choosing": "Choix de ce qu’il faut partager…",
   "stop": "Arrêter le partage",
   "startFailed": "Le partage d’écran n’a pas pu démarrer.",
@@ -18,8 +19,6 @@
   "pause": "Pause",
   "resume": "Reprendre",
   "sound": "Partager le son",
-  "noSound": "Sous Linux, aucun son n’est partagé : les spectateurs ne voient que l’image.",
-  "noSoundForShare": "Ce partage n’a pas de son (écran entier ou version du système non prise en charge).",
   "viewersNone": "Personne ne regarde encore",
   "viewers_one": "{{count}} regarde : {{names}}",
   "viewers_many": "{{count}} regardent : {{names}}",

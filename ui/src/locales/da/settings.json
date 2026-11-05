@@ -1054,6 +1054,19 @@
     "hint": "Tilføjer fanen Udvikler til Plugins, hvor du kan indlæse usignerede plugins fra en mappe. Slå den kun til, hvis du selv laver plugins."
   },
   "newBadge": "Ny",
+  "pluginSafety": {
+    "title": "Plugin-sikkerhed",
+    "blockHighRisk": "Tillad ikke plugins med høj risiko",
+    "hint": "Skjuler knappen Installér for plugins med en score på 60 eller mere og stopper opdateringer, der ville løfte et installeret plugin dertil. Plugins, du allerede har installeret, virker stadig.",
+    "note": "Slået fra som standard. Officielle plugins og udviklerplugins påvirkes aldrig. Score er skøn, ikke en garanti."
+  },
+  "pluginSounds": {
+    "title": "Plugin-lyde",
+    "volume": "Lydstyrke for plugin-lyde",
+    "mute": "Slå plugin-lyde fra",
+    "hint": "Gælder for alle lyde, et plugin afspiller. Plugin-lyde er lavere, mens folk taler.",
+    "meter": "Udgangsniveau (fejlfinding)"
+  },
   "screenShare": {
     "newBadge": "Ny",
     "qualityTitle": "Standardkvalitet",

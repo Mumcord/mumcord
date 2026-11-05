@@ -271,6 +271,15 @@ pub async fn plugin_repo_add(
         let id = store
             .add_plugin_repository(&new, now)
             .map_err(store_error)?;
+        // The preview already rejected a key that differs, so any entered key matched.
+        let key_entered = expected_key
+            .as_deref()
+            .is_some_and(|k| !k.trim().is_empty());
+        if key_entered {
+            store
+                .set_plugin_repository_expected_key_matched(id, true)
+                .map_err(store_error)?;
+        }
         let repository = store
             .plugin_repositories()
             .map_err(store_error)?
@@ -415,6 +424,7 @@ mod tests {
             paused_reason: paused.map(str::to_owned),
             last_sequence: 0,
             last_checked: None,
+            expected_key_matched: false,
         }
     }
 

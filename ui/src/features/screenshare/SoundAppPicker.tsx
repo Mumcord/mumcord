@@ -30,7 +30,10 @@ export interface SoundAppPickerProps {
   apps: SoundApp[];
 }
 
-/** A stable colour per app, so the rows stay recognisable while the list refreshes. */
+/**
+ * A stable colour per app without an icon of its own, so the rows stay recognisable while the
+ * list refreshes.
+ */
 function appHue(name: string): number {
   let hash = 0;
   for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 360;
@@ -165,11 +168,15 @@ export function SoundAppPicker({ serverId, apps: offered }: SoundAppPickerProps)
           row(
             app.id,
             app.name,
-            <span
-              className="sound-picker__icon"
-              style={{ "--hue": appHue(app.name) } as CSSProperties}
-              aria-hidden="true"
-            />,
+            app.icon !== null ? (
+              <img className="sound-picker__icon sound-picker__icon--app" src={app.icon} alt="" />
+            ) : (
+              <span
+                className="sound-picker__icon"
+                style={{ "--hue": appHue(app.name) } as CSSProperties}
+                aria-hidden="true"
+              />
+            ),
           ),
         )}
         {row(

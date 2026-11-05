@@ -55,11 +55,15 @@
     "messagesExpired": "Ziņojumi, kuriem beidzies derīgums",
     "incomingRateDropped": "Ar ātruma ierobežojumu izmestie ienākošie ziņojumi",
     "incomingInvalid": "Nederīgi ienākošie ziņojumi",
+    "uiFreezes": "Cik reizes Mumcord sastinga, kamēr tīmekļa saturs bija atvērts",
+    "webDisabled": "Tīmekļa saturs ir izslēgts, jo Mumcord pārstāja reaģēt, kamēr tas bija atvērts.",
+    "reenableWeb": "Ieslēgt tīmekļa saturu",
+    "reenableFailed": "Tīmekļa saturu neizdevās ieslēgt.",
     "log": "Žurnāls",
     "logEmpty": "Žurnāls ir tukšs.",
     "level": {
       "debug": "Atkļūdošana",
-      "info": "Info",
+      "info": "Informācija",
       "warn": "Brīdinājums",
       "error": "Kļūda"
     }

@@ -210,3 +210,216 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Websites, places and own code: boxed on the Browse page, plain rows in the Installed list. */
+.pd-surfaces {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-3);
+}
+
+.pd-surfaces .pd-section {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.pd-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.pd-section .pd-card-title {
+  margin: 0;
+}
+
+.pd-hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.ps-origins {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-origin {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-size: var(--font-size-sm);
+}
+
+.ps-origin code {
+  padding: 0 4px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.ps-origin span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.ps-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px var(--space-4);
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.ps-facts dt {
+  color: var(--color-text-muted);
+}
+
+.ps-facts dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.ps-places {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+/* Score card (score mockups 02 and 06). */
+.pd-score {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.pd-score[data-level="high"] {
+  border-color: var(--color-danger);
+}
+
+.pd-score[data-level="medium"] {
+  border-color: var(--color-warning);
+}
+
+.pd-score .pd-card-title {
+  margin: 0;
+}
+
+.pd-score-top {
+  display: grid;
+  grid-template-columns: auto minmax(14rem, 1fr) minmax(0, 1.4fr);
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.pd-score-big {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  font-family: var(--font-family-display);
+}
+
+.pd-score-num {
+  font-size: 3rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-score[data-level="low"] .pd-score-num {
+  color: var(--color-success);
+}
+
+.pd-score[data-level="medium"] .pd-score-num {
+  color: var(--color-warning);
+}
+
+.pd-score[data-level="high"] .pd-score-num {
+  color: var(--color-danger);
+}
+
+.pd-score-of {
+  color: var(--color-text-muted);
+}
+
+.pd-score-gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.pd-score-gauge > :first-child {
+  align-self: flex-start;
+}
+
+.pd-score-official {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.pd-score-lead {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.pd-score-lead strong {
+  color: var(--color-text);
+}
+
+.pd-score-note {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+@media (width <= 52rem) {
+  .pd-score-top {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+}
+
+.plugins-installed-details .pd-section .pd-card-title {
+  color: inherit;
+  font-size: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}

@@ -75,7 +75,9 @@
   "unofficialText": "{{repository}} nu este verificat de Mumcord. Rulează totuși în sandbox și primește doar permisiunile pe care le permiți.",
   "checksTitle": "Verificările oficiale se aplică în continuare",
   "checksText": "Lista de revocare Mumcord îl poate dezactiva. Numele pluginurilor oficiale sunt rezervate.",
-  "metaPermissions": "Permisiuni: {{count}}",
+  "metaPermissions_one": "{{count}} permisiune",
+  "metaPermissions_few": "{{count}} permisiuni",
+  "metaPermissions_other": "{{count}} de permisiuni",
   "footer": "Depozit oficial · lista semnată verificată · nu se trimite nimic despre tine",
   "factSource": "Sursă: {{url}}",
   "factLicence": "Licență: {{license}}",
@@ -96,5 +98,7 @@
     "unpacking": "Se dezarhivează…",
     "starting": "Se pornește…",
     "announce": "{{name}}: {{percent}}% descărcat"
-  }
+  },
+  "needsMumcord": "Necesită Mumcord {{version}} sau mai nou",
+  "updateMumcord": "Actualizează Mumcord"
 }

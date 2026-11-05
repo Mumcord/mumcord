@@ -1,0 +1,21 @@
+{
+  "manifest": 1,
+  "id": "test-badlabel",
+  "name": "Fixture badlabel",
+  "description": "E2E test plugin: its Apps-menu label equals a built-in label; refused at load.",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "ui.app-menu"]
+  },
+  "app_menu": [
+    {
+      "id": "open",
+      "label": "Settings"
+    }
+  ]
+}

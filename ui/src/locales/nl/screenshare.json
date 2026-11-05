@@ -1,5 +1,6 @@
 {
   "share": "Scherm delen",
+  "shareYourScreen": "Je scherm delen",
   "choosing": "Kiezen wat je deelt…",
   "stop": "Delen stoppen",
   "startFailed": "Scherm delen kon niet starten.",
@@ -18,8 +19,6 @@
   "pause": "Pauzeren",
   "resume": "Hervatten",
   "sound": "Geluid delen",
-  "noSound": "Linux deelt geen geluid: kijkers zien alleen het beeld.",
-  "noSoundForShare": "Deze schermdeling heeft geen geluid (volledig scherm of niet-ondersteunde systeemversie).",
   "viewersNone": "Nog niemand kijkt",
   "viewers_one": "{{count}} kijkt: {{names}}",
   "viewers_other": "{{count}} kijken: {{names}}",

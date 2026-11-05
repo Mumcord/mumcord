@@ -43,6 +43,6 @@ export default defineConfig(
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
-  { files: ["**/*.js"], extends: [tseslint.configs.disableTypeChecked] },
+  { files: ["**/*.{js,mjs}"], extends: [tseslint.configs.disableTypeChecked] },
   prettier,
 );

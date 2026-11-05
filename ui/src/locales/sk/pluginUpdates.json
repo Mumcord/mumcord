@@ -24,7 +24,8 @@
   "pill": {
     "none": "Žiadne nové oprávnenia",
     "permission": "Potrebuje nové oprávnenie",
-    "author": "Nový autor"
+    "author": "Nový autor",
+    "websites": "Komunikuje s novými webmi"
   },
   "newPermissions": "Nové oprávnenia",
   "revoked": {
@@ -45,5 +46,69 @@
     "save": "Uložiť",
     "notNow": "Teraz nie",
     "failed": "Povolenia pre {{name}} sa nepodarilo zmeniť. Skúste to znova."
+  },
+  "waitingHeading": "Čakajúce aktualizácie",
+  "autoNote": "Automatické aktualizácie sa nainštalujú, iba ak doplnok nežiada o nič nové a jeho skóre zostane v tom istom pásme alebo klesne. Všetko ostatné čaká tu.",
+  "needsMumcord": "Aktualizácia bude dostupná po aktualizácii aplikácie Mumcord",
+  "band": {
+    "low": "Nízke",
+    "medium": "Stredné",
+    "high": "Vysoké"
+  },
+  "hold": {
+    "newWebsites_one": "Táto aktualizácia chce komunikovať s {{count}} novým webom. {{name}} zostane na verzii {{version}}, kým sa nerozhodneš.",
+    "newWebsites_few": "Táto aktualizácia chce komunikovať s {{count}} novými webmi. {{name}} zostane na verzii {{version}}, kým sa nerozhodneš.",
+    "newWebsites_many": "Táto aktualizácia chce komunikovať s {{count}} nového webu. {{name}} zostane na verzii {{version}}, kým sa nerozhodneš.",
+    "newWebsites_other": "Táto aktualizácia chce komunikovať s {{count}} novými webmi. {{name}} zostane na verzii {{version}}, kým sa nerozhodneš.",
+    "riskUp": "Neinštaluje sa automaticky: riziko stúplo z {{from}} na {{to}}. Najprv ho skontroluj.",
+    "scoreUp": "Neinštaluje sa automaticky: skóre stúplo z {{from}} na {{to}}. Najprv ho skontroluj.",
+    "blockedBySafety": "Neinštaluje sa: táto verzia je vysoko riziková a je zapnuté „Nepovoliť vysoko rizikové doplnky“.",
+    "scoreUnknown": "Neinštaluje sa automaticky: bezpečnostné skóre tejto verzie sa nepodarilo vypočítať. Najprv ho skontroluj."
+  },
+  "score": {
+    "label": "Bezpečnostné skóre:",
+    "unchanged": "bez zmeny",
+    "points": "bodov",
+    "goesUp": ", riziko stúpa",
+    "goesDown": ", riziko klesá"
+  },
+  "dialog": {
+    "title": "Aktualizovať {{name}} na {{version}}?",
+    "now": "teraz {{version}}",
+    "sameKey": "rovnaký kľúč autora",
+    "newKey": "nový kľúč autora",
+    "newWebsites_one": "Táto aktualizácia chce komunikovať s {{count}} novým webom.",
+    "newWebsites_few": "Táto aktualizácia chce komunikovať s {{count}} novými webmi.",
+    "newWebsites_many": "Táto aktualizácia chce komunikovať s {{count}} nového webu.",
+    "newWebsites_other": "Táto aktualizácia chce komunikovať s {{count}} novými webmi.",
+    "staysOn": "{{name}} zostane na verzii {{version}}, kým sa nerozhodneš.",
+    "otherDomain": "Jeden z nich nie je na vlastnej doméne doplnku.",
+    "whatsNew": "Čo je nové vo verzii {{version}}",
+    "websitesLead": "{{name}} a jeho stránka by potom mohli komunikovať s:",
+    "websitesWarning": "Tieto weby vidia tvoju IP adresu a všetko, čo im {{name}} pošle.",
+    "websitesLabel": "Weby",
+    "new": "Nové",
+    "changed": "Zmenené",
+    "noOtherPermissions": "Žiadne ďalšie oprávnenia sa nemenia.",
+    "scoreNow": "Teraz ({{version}})",
+    "scoreAfter": "Po aktualizácii ({{version}})",
+    "meterNow": "Bezpečnostné skóre teraz",
+    "meterAfter": "Bezpečnostné skóre po aktualizácii",
+    "riskUpBy_one": "Riziko stúpne o {{count}} bod",
+    "riskUpBy_few": "Riziko stúpne o {{count}} body",
+    "riskUpBy_many": "Riziko stúpne o {{count}} bodu",
+    "riskUpBy_other": "Riziko stúpne o {{count}} bodov",
+    "asksForMore": "pretože táto verzia žiada o viac:",
+    "permissionsLabel": "Nové oprávnenia",
+    "recentChange": "Počíta sa aj ako nedávna zmena: nové oprávnenia za posledné verzie ({{versions}}) pridávajú ďalších +{{recent}} bodov. Spolu s +{{permissions}} vyššie (× {{multiplier}}) to je +{{total}}.",
+    "highTitle": "Táto aktualizácia by z doplnku urobila vysoko rizikový doplnok",
+    "highText": "Nenainštaluje sa automaticky. Ak zostaneš na verzii {{version}}, zachová sa súčasné skóre; verziu môžeš pripnúť v časti Nainštalované.",
+    "highTick": "Rozumiem, že riziko vzrástlo, a autorovi stále dôverujem",
+    "skipHint": "Ak preskočíš, verzia {{version}} bude naďalej fungovať.",
+    "skip": "Preskočiť túto verziu",
+    "notNow": "Teraz nie",
+    "allow": "Povoliť a aktualizovať",
+    "updateAnyway": "Napriek tomu aktualizovať",
+    "failed": "Doplnok {{name}} sa nepodarilo aktualizovať. Skús to prosím znova."
   }
 }

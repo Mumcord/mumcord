@@ -1,5 +1,6 @@
 {
   "share": "Dela skärm",
+  "shareYourScreen": "Dela din skärm",
   "choosing": "Väljer vad som ska delas…",
   "stop": "Sluta dela",
   "startFailed": "Skärmdelningen kunde inte starta.",
@@ -18,8 +19,6 @@
   "pause": "Pausa",
   "resume": "Återuppta",
   "sound": "Dela ljud",
-  "noSound": "Linux delar inget ljud: tittarna ser bara bilden.",
-  "noSoundForShare": "Den här delningen har inget ljud (hela skärmen eller systemversion som inte stöds).",
   "viewersNone": "Ingen tittar än",
   "viewers_one": "{{count}} tittar: {{names}}",
   "viewers_other": "{{count}} tittar: {{names}}",

@@ -1054,6 +1054,19 @@
     "hint": "Fügt den Plugins einen Entwickler-Tab hinzu, in dem du unsignierte Plugins aus einem Ordner laden kannst. Schalte ihn nur ein, wenn du selbst Plugins baust."
   },
   "newBadge": "Neu",
+  "pluginSafety": {
+    "title": "Plugin-Sicherheit",
+    "blockHighRisk": "Plugins mit hohem Risiko nicht zulassen",
+    "hint": "Blendet die Schaltfläche Installieren für Plugins mit einer Bewertung ab 60 aus und verhindert Updates, die ein installiertes Plugin dorthin bringen würden. Bereits installierte Plugins funktionieren weiter.",
+    "note": "Standardmäßig aus. Offizielle Plugins und Entwickler-Plugins sind nie betroffen. Bewertungen sind Schätzungen, keine Garantie."
+  },
+  "pluginSounds": {
+    "title": "Plugin-Sounds",
+    "volume": "Lautstärke der Plugin-Sounds",
+    "mute": "Plugin-Sounds stummschalten",
+    "hint": "Gilt für jeden Sound, den ein Plugin abspielt. Plugin-Sounds sind leiser, während Leute sprechen.",
+    "meter": "Ausgangspegel (Debug)"
+  },
   "screenShare": {
     "newBadge": "Neu",
     "qualityTitle": "Standardqualität",

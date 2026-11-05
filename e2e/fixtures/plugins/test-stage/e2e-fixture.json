@@ -1,0 +1,5 @@
+{
+  "repo": "third-party",
+  "check": "pass",
+  "versions": ["."]
+}

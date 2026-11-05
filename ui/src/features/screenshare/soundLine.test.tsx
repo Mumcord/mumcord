@@ -75,13 +75,20 @@ const cases: {
   },
   {
     name: "switch off",
-    patch: { sound: false, soundAvailable: true, soundMode: "desktop" },
+    patch: { sound: false, soundAvailable: true, soundMode: "desktop", soundReason: "off" },
+    label: "No sound",
+    reason: /The Sound switch is off/,
+  },
+  {
+    // A Linux window share started with the switch off is never asked "Which app's sound?".
+    name: "switch off without a source",
+    patch: { soundMode: "none", soundReason: "off" },
     label: "No sound",
     reason: /The Sound switch is off/,
   },
   {
     name: "no sound chosen",
-    patch: { soundMode: "none" },
+    patch: { soundMode: "none", soundReason: "notChosen" },
     label: "No sound",
     reason: /No sound.{1,3}was chosen for this window/,
   },
@@ -121,6 +128,13 @@ describe("sound line of the live bar", () => {
     expect(badge.getAttribute("data-tooltip")).toMatch(c.reason);
     expect(badge).toHaveAttribute("tabindex", "0");
     expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("draws the speaker outlined, as in mockup 10", async () => {
+    await showing({ sound: true, soundAvailable: true, soundMode: "desktop" });
+    const badge = await screen.findByText("Sound: desktop", { selector: ".share-badge" });
+    expect(badge.querySelector("svg")).not.toBeNull();
+    expect(badge.querySelector('[fill="currentColor"]')).toBeNull();
   });
 
   it("marks a failed capture as a warning", async () => {

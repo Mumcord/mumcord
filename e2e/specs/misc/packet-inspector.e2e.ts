@@ -130,7 +130,9 @@ describe("packet inspector (issue #60)", () => {
     await decoded.waitForDisplayed();
     expect(await decoded.getText()).toContain('"app": "mumcord"');
     await button("Show raw hex").click();
-    expect(await $("pre[aria-label='Raw bytes in hex']").getText()).toMatch(/^0000 {2}7b/);
+    const hex = $("pre[aria-label='Raw bytes in hex']");
+    await hex.waitForDisplayed();
+    expect(await hex.getText()).toMatch(/^0000 {2}7b/);
   });
 
   it("exports the list as JSON", async () => {

@@ -55,6 +55,10 @@
     "messagesExpired": "Mesaje expirate",
     "incomingRateDropped": "Mesaje primite eliminate de limita de rată",
     "incomingInvalid": "Mesaje primite invalide",
+    "uiFreezes": "De câte ori s-a blocat Mumcord cu conținutul web deschis",
+    "webDisabled": "Conținutul web este dezactivat, deoarece Mumcord nu a mai răspuns cât timp era deschis.",
+    "reenableWeb": "Activează conținutul web",
+    "reenableFailed": "Conținutul web nu a putut fi activat.",
     "log": "Jurnal",
     "logEmpty": "Jurnalul este gol.",
     "level": {

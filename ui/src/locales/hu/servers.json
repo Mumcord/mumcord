@@ -313,6 +313,7 @@
     "line": "Az átjátszó engedélyezi: {{uses}}",
     "images": "Képek",
     "files": "Fájlok",
-    "screen": "Képernyőmegosztás"
+    "screen": "Képernyőmegosztás",
+    "cameras": "Kamerák"
   }
 }

@@ -1,0 +1,9 @@
+{
+  "region": "{{plugin}} külgpaneel",
+  "close": "Sulge {{plugin}} külgpaneel",
+  "resize": "Muuda {{plugin}} külgpaneeli suurust",
+  "failed": "{{plugin}} külgpaneeli ei saanud sulgeda. Proovi uuesti.",
+  "options": "{{plugin}} valikud",
+  "details": "Plugina üksikasjad",
+  "closePanel": "Sulge paneel"
+}

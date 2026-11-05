@@ -5,8 +5,8 @@ use std::sync::Arc;
 use mumcord_engine::Engine;
 use mumcord_engine::screen_share::wire::Codec;
 use mumcord_engine::screen_share::{
-    self as engine_share, QualityPrefs, ScreenShareView, ShareKind as EngineShareKind,
-    ShareSoundMode as EngineSoundMode, SoundApp as EngineSoundApp,
+    self as engine_share, NoSoundReason as EngineNoSoundReason, QualityPrefs, ScreenShareView,
+    ShareKind as EngineShareKind, ShareSoundMode as EngineSoundMode, SoundApp as EngineSoundApp,
     SoundUnavailable as EngineSoundUnavailable, WatchBlock as EngineWatchBlock,
 };
 use serde::{Deserialize, Serialize};
@@ -52,8 +52,9 @@ pub struct ScreenShare {
     pub sound_mode: ShareSoundMode,
     /// The app whose sound is shared, when `soundMode` is `app` (stays on the sharer's device).
     pub sound_app: Option<String>,
-    /// Why the share has no sound although the user wanted it (FR-7.85).
-    pub sound_reason: Option<SoundUnavailableReason>,
+    /// Why the own share sends no sound, for the live bar's sound line (FR-7.85); `null` while
+    /// it sends sound, for the shares of others, and when nothing explains it.
+    pub sound_reason: Option<ShareSoundReason>,
     /// Set while the share waits for "Which app's sound?" (FR-7.83); the list to offer.
     pub sound_choice: Option<Vec<SoundApp>>,
     /// Who is watching (up to 8).
@@ -110,6 +111,38 @@ impl From<EngineSoundUnavailable> for SoundUnavailableReason {
     }
 }
 
+/// Why the own share sends no sound (FR-7.85).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ShareSoundReason {
+    /// The Sound switch is off.
+    Off,
+    /// "No sound" was chosen in "Which app's sound?".
+    NotChosen,
+    /// The system is too old (Windows before 10 version 2004, macOS before 13).
+    OsTooOld,
+    /// Linux without a running PipeWire.
+    NoPipeWire,
+    /// The sound capture could not start or stopped.
+    CaptureFailed,
+}
+
+impl From<EngineNoSoundReason> for ShareSoundReason {
+    fn from(r: EngineNoSoundReason) -> Self {
+        match r {
+            EngineNoSoundReason::Off => Self::Off,
+            EngineNoSoundReason::NotChosen => Self::NotChosen,
+            EngineNoSoundReason::Unavailable(EngineSoundUnavailable::OsTooOld) => Self::OsTooOld,
+            EngineNoSoundReason::Unavailable(EngineSoundUnavailable::NoPipeWire) => {
+                Self::NoPipeWire
+            }
+            EngineNoSoundReason::Unavailable(EngineSoundUnavailable::CaptureFailed) => {
+                Self::CaptureFailed
+            }
+        }
+    }
+}
+
 /// One app offered in "Which app's sound?" (FR-7.83).
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -117,6 +150,9 @@ pub struct SoundApp {
     /// What `screenShareChooseSound` takes.
     pub id: String,
     pub name: String,
+    /// The app's icon as a `data:` URL (Linux, where the system has one); the list shows a
+    /// coloured square without it.
+    pub icon: Option<String>,
 }
 
 impl std::fmt::Debug for SoundApp {
@@ -131,6 +167,11 @@ impl From<EngineSoundApp> for SoundApp {
         Self {
             id: a.id,
             name: a.name.as_str().to_owned(),
+            icon: a.icon.map(|icon| {
+                use base64::Engine as _;
+                let data = base64::engine::general_purpose::STANDARD.encode(icon.bytes);
+                format!("data:{};base64,{data}", icon.mime)
+            }),
         }
     }
 }
@@ -328,7 +369,7 @@ impl From<ScreenShareView> for ScreenShare {
             sound_available: v.sound_status.available(),
             sound_mode: v.sound_status.mode.into(),
             sound_app: v.sound_status.app.as_ref().map(|a| a.as_str().to_owned()),
-            sound_reason: v.sound_status.unavailable.map(Into::into),
+            sound_reason: v.sound_status.no_sound_reason().map(Into::into),
             sound_choice: v
                 .sound_status
                 .choice
@@ -957,7 +998,7 @@ pub fn screen_encoder_prepare(engine: State<'_, Engine>, choice: QualityChoice) 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use mumcord_engine::screen_share::{AppName, SoundStatus};
+    use mumcord_engine::screen_share::{AppIcon as EngineAppIcon, AppName, SoundStatus};
 
     fn view(sound_status: SoundStatus) -> ScreenShareView {
         ScreenShareView {
@@ -977,8 +1018,7 @@ mod tests {
         let s = ScreenShare::from(view(SoundStatus {
             mode: EngineSoundMode::App,
             app: Some(AppName::new("Firefox")),
-            unavailable: None,
-            choice: None,
+            ..SoundStatus::default()
         }));
         assert!(s.sound_available);
         assert_eq!(s.sound_mode, ShareSoundMode::App);
@@ -991,7 +1031,21 @@ mod tests {
         }));
         assert!(!s.sound_available);
         assert_eq!(s.sound_mode, ShareSoundMode::None);
-        assert_eq!(s.sound_reason, Some(SoundUnavailableReason::NoPipeWire));
+        assert_eq!(s.sound_reason, Some(ShareSoundReason::NoPipeWire));
+    }
+
+    #[test]
+    fn the_switch_and_a_declined_choice_have_their_own_reason() {
+        let off = ScreenShare::from(view(SoundStatus {
+            off: true,
+            ..SoundStatus::default()
+        }));
+        assert_eq!(off.sound_reason, Some(ShareSoundReason::Off));
+        let declined = ScreenShare::from(view(SoundStatus {
+            declined: true,
+            ..SoundStatus::default()
+        }));
+        assert_eq!(declined.sound_reason, Some(ShareSoundReason::NotChosen));
     }
 
     #[test]
@@ -1000,6 +1054,10 @@ mod tests {
             choice: Some(vec![EngineSoundApp {
                 id: "a1".into(),
                 name: AppName::new("Music"),
+                icon: Some(EngineAppIcon {
+                    mime: "image/png",
+                    bytes: b"png".to_vec(),
+                }),
             }]),
             ..SoundStatus::default()
         }));
@@ -1007,7 +1065,8 @@ mod tests {
             s.sound_choice,
             Some(vec![SoundApp {
                 id: "a1".into(),
-                name: "Music".into()
+                name: "Music".into(),
+                icon: Some("data:image/png;base64,cG5n".into()),
             }])
         );
     }

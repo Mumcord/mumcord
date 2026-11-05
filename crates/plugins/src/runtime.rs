@@ -1,5 +1,6 @@
 //! The wasmtime sandbox (#268, FR-6.1–6.3). A plugin is a WebAssembly component that can only
-//! call the imports in `wit/1.0.0/`: there is no WASI, so no files, sockets, clocks or
+//! call the imports of the API minor it is built for (`wit/1.0.0/` or `wit/1.1.0/`, FR-9.8):
+//! there is no WASI, so no files, sockets, clocks or
 //! randomness. Each running plugin has its own `Store` with a memory limit, and every call into
 //! it has a CPU deadline enforced by epoch interruption. Events reach a plugin through its [`EventQueue`].
 
@@ -13,7 +14,7 @@ use std::time::{Duration, Instant};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedSender;
 use wasmtime::component::types::ComponentItem;
-use wasmtime::component::{Component, InstancePre, Linker};
+use wasmtime::component::{Component, Linker};
 use wasmtime::{
     Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsBuilder, Trap, UpdateDeadline,
 };
@@ -27,12 +28,14 @@ use crate::api::secrets::{PluginSecrets, SecretsApi};
 use crate::api::storage::{Storage, StorageApi};
 use crate::api::theme::Theme;
 use crate::api::timers::{TimerSet, Timers};
+use crate::api::v1_1::{self, Down};
 use crate::cache;
 use crate::chat::ChatRef;
 use crate::diag::Diagnostics;
 use crate::grants::Grants;
 use crate::host::HostEvent;
 use crate::peer_key::PeerKeys;
+use crate::version::{ApiMinor, imports_api};
 
 pub(crate) mod bindings {
     wasmtime::component::bindgen!({ path: "wit/1.0.0", world: "plugin" });
@@ -40,10 +43,11 @@ pub(crate) mod bindings {
 
 /// The WIT types (events, peers, UI tree …) as Rust types, for the service that feeds plugins.
 pub use bindings::mumcord::plugin as wit;
-use bindings::mumcord::plugin::events::Event;
 pub use bindings::mumcord::plugin::log::Level;
-use bindings::mumcord::plugin::types::{Peer, StartInfo};
-use bindings::{Plugin, PluginPre};
+/// An event as queued for a plugin: the newest minor's event, which every older event converts
+/// into (see [`v1_1`]).
+pub use v1_1::wit::events::Event as PluginEvent;
+use v1_1::wit::types::Peer;
 
 /// How often the CPU clock ticks.
 pub const EPOCH_TICK: Duration = Duration::from_millis(10);
@@ -97,18 +101,23 @@ const ALLOWED_IMPORTS: &[&str] = &[
     "mumcord:plugin/http",
     "mumcord:plugin/webview",
     "mumcord:plugin/events",
+    "mumcord:plugin/stage",
+    "mumcord:plugin/app-menu",
+    "mumcord:plugin/relay",
+    "mumcord:plugin/audio",
+    "mumcord:plugin/files",
 ];
 
-/// One WIT interface the host serves. Each `api/*` module implements the generated `Host` trait
-/// of its interface for [`PluginState`] and this trait to put it into the linker; [`HOST_APIS`]
-/// lists them all.
+/// One 1.0 WIT interface the host serves. Each `api/*` module implements the generated `Host`
+/// trait of its interface for [`PluginState`] and this trait to put it into the 1.0 linker;
+/// [`HOST_APIS`] lists them all. The 1.1 interfaces are in [`v1_1`].
 pub(crate) trait HostApi {
     fn add_to_linker(linker: &mut Linker<PluginState>) -> wasmtime::Result<()>;
 }
 
 type AddToLinker = fn(&mut Linker<PluginState>) -> wasmtime::Result<()>;
 
-/// Every interface the host serves. One line per `api/*` module.
+/// Every 1.0 interface the host serves. One line per `api/*` module.
 const HOST_APIS: &[AddToLinker] = &[
     <api::log::LogApi as HostApi>::add_to_linker,
     <api::timers::TimersApi as HostApi>::add_to_linker,
@@ -146,12 +155,17 @@ pub struct HostContext {
     pub files: Files,
     /// Carries out `ui`, `peers` and `chat` calls; `None` refuses them with `not-permitted`.
     pub io: Option<Arc<dyn PluginIo>>,
+    /// `audio` (1.1): declared sounds per plugin and the player.
+    pub audio: api::audio::Audio,
 }
 
 /// One wasmtime engine for all plugins plus the thread that ticks the CPU clock.
 pub struct Runtime {
     engine: Engine,
-    linker: Linker<PluginState>,
+    /// One linker per API minor, so a plugin can only resolve imports of its own minor:
+    /// wasmtime would otherwise satisfy a `1.0.0` import with a `1.1.0` definition.
+    linker_1_0: Linker<PluginState>,
+    linker_1_1: Linker<PluginState>,
     app_version: Version,
     cache_dir: Option<PathBuf>,
     ticker: Option<JoinHandle<()>>,
@@ -189,9 +203,22 @@ pub enum CallError {
 #[derive(Clone)]
 pub struct Compiled {
     engine: Engine,
-    pre: PluginPre<PluginState>,
+    pre: Pre,
     /// The plugin imports `chat.is-replay`, so it can tell replayed chat events from live ones.
     knows_replay: bool,
+}
+
+/// A component ready to instantiate, typed by the world of its API minor.
+#[derive(Clone)]
+enum Pre {
+    V1_0(bindings::PluginPre<PluginState>),
+    V1_1(v1_1::bindings::PluginPre<PluginState>),
+}
+
+/// The exports of a running plugin.
+enum Bound {
+    V1_0(bindings::Plugin),
+    V1_1(v1_1::bindings::Plugin),
 }
 
 /// Everything a plugin's store is built from.
@@ -211,7 +238,7 @@ pub(crate) struct StartParams {
 /// One running plugin: its store and instance. Lives on the plugin's own thread.
 pub struct Instance {
     store: Store<PluginState>,
-    plugin: Plugin,
+    plugin: Bound,
 }
 
 /// What the host keeps per running plugin, reachable from host functions.
@@ -308,10 +335,12 @@ impl Runtime {
         config.epoch_interruption(true);
         let engine = Engine::new(&config).map_err(|e| CompileError::Invalid(e.to_string()))?;
 
-        let mut linker = Linker::new(&engine);
+        let mut linker_1_0 = Linker::new(&engine);
         for add in HOST_APIS {
-            add(&mut linker).map_err(|e| CompileError::Invalid(e.to_string()))?;
+            add(&mut linker_1_0).map_err(|e| CompileError::Invalid(e.to_string()))?;
         }
+        let mut linker_1_1 = Linker::new(&engine);
+        v1_1::add_to_linker(&mut linker_1_1).map_err(|e| CompileError::Invalid(e.to_string()))?;
 
         let stop_ticker = Arc::new(AtomicBool::new(false));
         let ticker = {
@@ -329,7 +358,8 @@ impl Runtime {
         };
         Ok(Self {
             engine,
-            linker,
+            linker_1_0,
+            linker_1_1,
             app_version,
             cache_dir,
             ticker: Some(ticker),
@@ -338,8 +368,9 @@ impl Runtime {
     }
 
     /// Compiles a component (or takes it from the cache) and checks its imports before any of
-    /// its code runs.
-    pub fn compile(&self, wasm: &[u8]) -> Result<Compiled, CompileError> {
+    /// its code runs. `api` is the minor from the manifest; the component must be built for
+    /// exactly that minor and is linked against it alone (FR-9.8).
+    pub fn compile(&self, wasm: &[u8], api: ApiMinor) -> Result<Compiled, CompileError> {
         let cache_path = self
             .cache_dir
             .as_deref()
@@ -366,11 +397,37 @@ impl Runtime {
                     .any(|(export, _)| export == "is-replay");
             }
         }
-        let pre: InstancePre<PluginState> = self
-            .linker
-            .instantiate_pre(&component)
-            .map_err(|e| CompileError::Mismatch(format!("{e:#}")))?;
-        let pre = PluginPre::new(pre).map_err(|e| CompileError::Mismatch(format!("{e:#}")))?;
+        let built_for = imports_api(&component);
+        if built_for != Some(api) {
+            let built_for = built_for.map_or_else(|| "none".to_owned(), |a| a.to_string());
+            return Err(CompileError::Mismatch(format!(
+                "the manifest says API {api}, the component imports API {built_for}"
+            )));
+        }
+        let mismatch = |e: wasmtime::Error| CompileError::Mismatch(format!("{e:#}"));
+        let pre = match api {
+            ApiMinor::V1_0 => Pre::V1_0(
+                bindings::PluginPre::new(
+                    self.linker_1_0
+                        .instantiate_pre(&component)
+                        .map_err(mismatch)?,
+                )
+                .map_err(mismatch)?,
+            ),
+            ApiMinor::V1_1 => Pre::V1_1(
+                v1_1::bindings::PluginPre::new(
+                    self.linker_1_1
+                        .instantiate_pre(&component)
+                        .map_err(mismatch)?,
+                )
+                .map_err(mismatch)?,
+            ),
+            other => {
+                return Err(CompileError::Mismatch(format!(
+                    "API {other} is not linked by this Mumcord"
+                )));
+            }
+        };
         // Only components that passed the checks are cached.
         if let (true, Some(path)) = (fresh, &cache_path)
             && let Err(error) = cache::store(path, &component)
@@ -448,15 +505,27 @@ impl Compiled {
         store.set_epoch_deadline(START_TICKS);
         store.data_mut().clock = CallClock::default();
         let started = Instant::now();
-        let result = self.pre.instantiate(&mut store).and_then(|plugin| {
-            let info = StartInfo {
-                api_version: crate::API_VERSION.to_string(),
-                previous_version: params.previous_version.clone(),
-            };
-            plugin
-                .call_start(&mut store, &info)
-                .map(|outcome| (plugin, outcome))
-        });
+        let previous_version = params.previous_version.clone();
+        let result = match &self.pre {
+            Pre::V1_0(pre) => pre.instantiate(&mut store).and_then(|plugin| {
+                let info = bindings::mumcord::plugin::types::StartInfo {
+                    api_version: ApiMinor::V1_0.wit_version().to_string(),
+                    previous_version,
+                };
+                plugin
+                    .call_start(&mut store, &info)
+                    .map(|outcome| (Bound::V1_0(plugin), outcome))
+            }),
+            Pre::V1_1(pre) => pre.instantiate(&mut store).and_then(|plugin| {
+                let info = v1_1::wit::types::StartInfo {
+                    api_version: ApiMinor::V1_1.wit_version().to_string(),
+                    previous_version,
+                };
+                plugin
+                    .call_start(&mut store, &info)
+                    .map(|outcome| (Bound::V1_1(plugin), outcome))
+            }),
+        };
         params.diag.add_cpu(started.elapsed());
         let (plugin, outcome) = result.map_err(classify)?;
         outcome
@@ -466,26 +535,43 @@ impl Compiled {
 }
 
 impl Instance {
-    pub(crate) fn on_event(&mut self, event: &Event, chat: ChatRef) -> Result<(), CallError> {
-        self.store.set_epoch_deadline(CALL_TICKS);
-        self.store.data_mut().clock = CallClock::default();
-        self.store.data_mut().chat = chat;
-        let started = Instant::now();
-        let result = self.plugin.call_on_event(&mut self.store, event);
-        self.store.data_mut().chat = ChatRef::default();
-        self.store.data().diag.add_cpu(started.elapsed());
-        result.map_err(classify)
+    /// Delivers one event. A 1.0 plugin gets it converted to 1.0, or not at all when 1.0 has no
+    /// such event (FR-9.8).
+    pub(crate) fn on_event(&mut self, event: PluginEvent, chat: ChatRef) -> Result<(), CallError> {
+        let Self { store, plugin } = self;
+        match plugin {
+            Bound::V1_0(plugin) => match event.down() {
+                Some(event) => call(store, chat, |store| plugin.call_on_event(store, &event)),
+                None => Ok(()),
+            },
+            Bound::V1_1(plugin) => call(store, chat, |store| plugin.call_on_event(store, &event)),
+        }
     }
 
     /// Calls `stop`. The instance is dropped afterwards either way.
     pub(crate) fn stop(mut self) -> Result<(), CallError> {
-        self.store.set_epoch_deadline(CALL_TICKS);
-        self.store.data_mut().clock = CallClock::default();
-        let started = Instant::now();
-        let result = self.plugin.call_stop(&mut self.store);
-        self.store.data().diag.add_cpu(started.elapsed());
-        result.map_err(classify)
+        let Self { store, plugin } = &mut self;
+        match plugin {
+            Bound::V1_0(plugin) => call(store, ChatRef::default(), |store| plugin.call_stop(store)),
+            Bound::V1_1(plugin) => call(store, ChatRef::default(), |store| plugin.call_stop(store)),
+        }
     }
+}
+
+/// One call into a plugin with the normal call budget, its CPU time counted for Diagnostics.
+fn call(
+    store: &mut Store<PluginState>,
+    chat: ChatRef,
+    f: impl FnOnce(&mut Store<PluginState>) -> wasmtime::Result<()>,
+) -> Result<(), CallError> {
+    store.set_epoch_deadline(CALL_TICKS);
+    store.data_mut().clock = CallClock::default();
+    store.data_mut().chat = chat;
+    let started = Instant::now();
+    let result = f(store);
+    store.data_mut().chat = ChatRef::default();
+    store.data().diag.add_cpu(started.elapsed());
+    result.map_err(classify)
 }
 
 impl Drop for Instance {
@@ -591,7 +677,7 @@ impl LogBuffer {
 
 /// What a plugin thread does next.
 pub(crate) enum Next {
-    Event(Box<Event>, ChatRef),
+    Event(Box<PluginEvent>, ChatRef),
     Stop,
 }
 
@@ -606,7 +692,7 @@ pub(crate) struct EventQueue {
 }
 
 struct QueueState {
-    events: VecDeque<(u64, Event, ChatRef)>,
+    events: VecDeque<(u64, PluginEvent, ChatRef)>,
     /// Pending talking state per user, in order of the first change since the last delivery.
     talking: VecDeque<(u64, Peer, bool)>,
     /// When the talking events of the last second were delivered.
@@ -638,18 +724,18 @@ impl EventQueue {
 
     /// Queues an event. Returns false when the plugin is not taking events (backing off); the
     /// event is then dropped and counted.
-    pub(crate) fn push(&self, event: Event) -> bool {
+    pub(crate) fn push(&self, event: impl Into<PluginEvent>) -> bool {
         self.push_chat(event, ChatRef::default())
     }
 
     /// Queues a chat event together with the message it is about (`chat.current-message`).
-    pub(crate) fn push_chat(&self, event: Event, chat: ChatRef) -> bool {
+    pub(crate) fn push_chat(&self, event: impl Into<PluginEvent>, chat: ChatRef) -> bool {
         let mut state = self.lock();
         if !state.accepting {
             self.diag.events_dropped(1);
             return false;
         }
-        let dropped = state.push(event, chat);
+        let dropped = state.push(event.into(), chat);
         drop(state);
         self.diag.events_dropped(dropped);
         self.changed.notify_one();
@@ -722,10 +808,10 @@ impl EventQueue {
 
 impl QueueState {
     /// Adds an event; returns how many had to be dropped for it.
-    fn push(&mut self, event: Event, chat: ChatRef) -> usize {
+    fn push(&mut self, event: PluginEvent, chat: ChatRef) -> usize {
         let seq = self.next_seq;
         self.next_seq += 1;
-        if let Event::Talking((peer, talking)) = &event
+        if let PluginEvent::Talking((peer, talking)) = &event
             && let Some(pending) = self
                 .talking
                 .iter_mut()
@@ -741,7 +827,7 @@ impl QueueState {
             dropped += 1;
         }
         match event {
-            Event::Talking((peer, talking)) => self.talking.push_back((seq, peer, talking)),
+            PluginEvent::Talking((peer, talking)) => self.talking.push_back((seq, peer, talking)),
             event => self.events.push_back((seq, event, chat)),
         }
         dropped
@@ -770,7 +856,7 @@ impl QueueState {
 
     /// The next event in arrival order, unless it is a talking event over the rate limit; then
     /// other events go first.
-    fn pop(&mut self, now: Instant) -> Option<(Event, ChatRef)> {
+    fn pop(&mut self, now: Instant) -> Option<(PluginEvent, ChatRef)> {
         while self
             .talking_sent
             .front()
@@ -796,10 +882,10 @@ impl QueueState {
         }
     }
 
-    fn pop_talking(&mut self, now: Instant) -> Option<(Event, ChatRef)> {
+    fn pop_talking(&mut self, now: Instant) -> Option<(PluginEvent, ChatRef)> {
         let (_, peer, talking) = self.talking.pop_front()?;
         self.talking_sent.push_back(now);
-        Some((Event::Talking((peer, talking)), ChatRef::default()))
+        Some((PluginEvent::Talking((peer, talking)), ChatRef::default()))
     }
 
     /// When a held-back talking event may go out.
@@ -814,20 +900,21 @@ impl QueueState {
 }
 
 /// Events from the user's own interaction with the plugin's UI; they are dropped last.
-fn is_ui(event: &Event) -> bool {
+fn is_ui(event: &PluginEvent) -> bool {
     matches!(
         event,
-        Event::UiAction(_)
-            | Event::ProfileCardOpened(_)
-            | Event::PanelVisibilityChanged(_)
-            | Event::UserMenuRequested(_)
-            | Event::DialogClosed
+        PluginEvent::UiAction(_)
+            | PluginEvent::ProfileCardOpened(_)
+            | PluginEvent::PanelVisibilityChanged(_)
+            | PluginEvent::UserMenuRequested(_)
+            | PluginEvent::DialogClosed
     )
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use PluginEvent as Event;
 
     #[test]
     fn log_buffer_caps_lines_and_length() {

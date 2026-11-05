@@ -1,0 +1,31 @@
+{
+  "manifest": 1,
+  "id": "test-relay",
+  "name": "Test Relay",
+  "description": "E2E test plugin: 64 KiB and small messages through the relay, with and without the Mumble fallback.",
+  "version": "1.1.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "ui.stage", "ui.app-menu"],
+    "optional": [
+      {
+        "id": "peers.relay",
+        "suggested": true
+      }
+    ]
+  },
+  "app_menu": [
+    {
+      "id": "start",
+      "label": "Start Test Relay"
+    }
+  ],
+  "stage": {
+    "title": "Test Relay",
+    "max_participants": 8
+  }
+}

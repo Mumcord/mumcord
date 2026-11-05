@@ -8,10 +8,12 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use mumcord_plugins::manifest;
-use mumcord_plugins::registry::Revocation;
-use serde::{Deserialize, Serialize};
+use mumcord_plugins::registry::{MAX_NOTES_URL_LEN, Revocation, is_notes_url};
+use mumcord_plugins::version::ApiMinor;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::date;
+use crate::registry;
 
 pub const PLUGINS_DIR: &str = "plugins";
 pub const PLUGIN_FILE: &str = "plugin.toml";
@@ -70,7 +72,7 @@ pub struct ScreenshotFile {
 #[serde(deny_unknown_fields)]
 pub struct VersionFile {
     pub version: String,
-    pub api: u32,
+    pub api: SourceApi,
     pub size: u64,
     pub sha256: String,
     pub permissions: Vec<String>,
@@ -79,6 +81,54 @@ pub struct VersionFile {
     /// The author's detached minisign signature over the package.
     pub signature: String,
     pub source: SourceRef,
+    /// Lowest Mumcord release for this version, e.g. `0.7`; never below the first release with
+    /// its API (FR-9.20).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_mumcord: Option<String>,
+    /// The origins the manifest declares (`net.origins`), listed in the format-2 index.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub origins: Vec<String>,
+    /// Where the author explains what changed in this version (https, at most 512 characters);
+    /// listed in the format-2 index only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes_url: Option<String>,
+}
+
+/// The API minor of a version: `1` (written by 0.6-era tools, meaning 1.0) or `"1.1"`. 1.0 is
+/// still written as `1` so older tools keep reading the files.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SourceApi(pub ApiMinor);
+
+impl Serialize for SourceApi {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        if self.0.minor == 0 {
+            serializer.serialize_u64(self.0.major)
+        } else {
+            serializer.serialize_str(&self.0.to_string())
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for SourceApi {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Raw {
+            Major(u64),
+            Minor(String),
+        }
+        let api = match Raw::deserialize(deserializer)? {
+            Raw::Major(major) => Some(ApiMinor { major, minor: 0 }),
+            Raw::Minor(text) => text.split_once('.').and_then(|(major, minor)| {
+                Some(ApiMinor {
+                    major: major.parse().ok()?,
+                    minor: minor.parse().ok()?,
+                })
+            }),
+        };
+        api.map(SourceApi)
+            .ok_or_else(|| serde::de::Error::custom("api must be 1 or \"MAJOR.MINOR\""))
+    }
 }
 
 /// Where the package is rebuilt from for the reproducibility check (FR-6.56).
@@ -165,6 +215,16 @@ fn load_plugin(repo: &Path, id: String) -> Result<SourcePlugin> {
             if !date::is_date(&version.published) {
                 bail!("{}: published must be YYYY-MM-DD", path.display());
             }
+            registry::check_min_mumcord(version.api.0, version.min_mumcord.as_deref())
+                .with_context(|| path.display().to_string())?;
+            if let Some(url) = &version.notes_url
+                && !is_notes_url(url)
+            {
+                bail!(
+                    "{}: notes_url must be an https URL of at most {MAX_NOTES_URL_LEN} characters",
+                    path.display()
+                );
+            }
             versions.push(version);
         }
     }
@@ -224,7 +284,7 @@ pub mod tests {
         for version in versions {
             let file = VersionFile {
                 version: (*version).into(),
-                api: 1,
+                api: SourceApi(ApiMinor::V1_0),
                 size: 100,
                 sha256: "ab".repeat(32),
                 permissions: vec!["chat.send".into()],
@@ -238,6 +298,9 @@ pub mod tests {
                     commit: "0".repeat(40),
                     path: id.into(),
                 },
+                min_mumcord: None,
+                origins: Vec::new(),
+                notes_url: None,
             };
             fs::write(
                 version_path(repo, id, version),
@@ -264,6 +327,59 @@ pub mod tests {
             load_plugins(repo.path()).is_err(),
             "file name must match the version"
         );
+    }
+
+    #[test]
+    fn version_api_reads_old_and_new_files() {
+        #[derive(Serialize, Deserialize)]
+        struct Wrap {
+            api: SourceApi,
+        }
+        let read = |text: &str| toml::from_str::<Wrap>(text).map(|w| w.api.0);
+        assert_eq!(read("api = 1").expect("0.6 files"), ApiMinor::V1_0);
+        assert_eq!(read("api = \"1.1\"").expect("1.1"), ApiMinor::V1_1);
+        assert!(read("api = \"1\"").is_err());
+        assert!(read("api = \"1.x\"").is_err());
+        let write = |api| {
+            toml::to_string(&Wrap {
+                api: SourceApi(api),
+            })
+            .expect("test step")
+        };
+        assert_eq!(write(ApiMinor::V1_0), "api = 1\n");
+        assert_eq!(write(ApiMinor::V1_1), "api = \"1.1\"\n");
+    }
+
+    #[test]
+    fn rejects_a_notes_url_that_is_not_https() {
+        let repo = tempfile::tempdir().expect("test step");
+        write_plugin(repo.path(), "dice", &["1.0.0"]);
+        let path = version_path(repo.path(), "dice", "1.0.0");
+        let text = fs::read_to_string(&path).expect("test step");
+        fs::write(
+            &path,
+            format!("{text}notes_url = \"http://example.org/n\"\n"),
+        )
+        .expect("test step");
+        let error = format!(
+            "{:#}",
+            load_plugins(repo.path()).err().expect("http is refused")
+        );
+        assert!(error.contains("notes_url"), "{error}");
+    }
+
+    #[test]
+    fn rejects_a_min_mumcord_below_the_api() {
+        let repo = tempfile::tempdir().expect("test step");
+        write_plugin(repo.path(), "dice", &["1.0.0"]);
+        let path = version_path(repo.path(), "dice", "1.0.0");
+        let text = fs::read_to_string(&path).expect("test step");
+        let text = text.replace("api = 1", "api = \"1.1\"\nmin_mumcord = \"0.6\"");
+        fs::write(&path, text).expect("test step");
+        let Err(error) = load_plugins(repo.path()) else {
+            panic!("0.6 has no API 1.1");
+        };
+        assert!(format!("{error:#}").contains("first release"), "{error:#}");
     }
 
     #[test]

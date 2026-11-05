@@ -78,6 +78,16 @@
       "keys": "↑ ↓ redimensionner · PageUp/PageDown aimanter · Début/Fin · Entrée réinitialise",
       "releaseHint": "Relâchez pour réduire en mini-barre",
       "minimised": "Zone multimédia réduite"
+    },
+    "stage": {
+      "tabs": "Ce qu'affiche la zone multimédia",
+      "hint": "Changer d'onglet n'arrête rien",
+      "share": "Partage d'écran",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, onglet {{index}} sur {{count}}",
+      "tabNameNew": "{{label}}, nouveau, onglet {{index}} sur {{count}}",
+      "pluginTabName": "{{label}}, activité de plugin, onglet {{index}} sur {{count}}",
+      "pluginTabNameNew": "{{label}}, activité de plugin, nouveau, onglet {{index}} sur {{count}}"
     }
   }
 }

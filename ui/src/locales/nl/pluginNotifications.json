@@ -5,6 +5,10 @@
     "body": "Uitgeschakeld na herhaalde crashes",
     "open": "Tonen in Plug-ins"
   },
+  "pictureRefused": {
+    "title": "{{name}} kon de afbeelding niet gebruiken",
+    "body": "Deze afbeelding kan niet worden gebruikt. Gebruik een PNG-, JPEG- of WebP-bestand tot 10 MB."
+  },
   "update": {
     "title": "Update voor {{name}}",
     "body": "Versie {{version}} wacht op het tabblad Updates",

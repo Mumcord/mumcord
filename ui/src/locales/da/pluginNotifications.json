@@ -5,6 +5,10 @@
     "body": "Slået fra efter gentagne nedbrud",
     "open": "Vis i Plugins"
   },
+  "pictureRefused": {
+    "title": "{{name}} kunne ikke bruge billedet",
+    "body": "Dette billede kan ikke bruges. Brug en PNG-, JPEG- eller WebP-fil på op til 10 MB."
+  },
   "update": {
     "title": "Opdatering til {{name}}",
     "body": "Version {{version}} venter under fanen Opdateringer",

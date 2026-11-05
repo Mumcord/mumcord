@@ -11,9 +11,6 @@ const oldBotImage = process.env.MUMCORD_E2E_OLD_MUMBOT_IMAGE;
 
 (relayenv.relayAvailable() ? describe : describe.skip)("relay harness (spec 07 B4)", function () {
   this.timeout(900_000);
-  after(async () => {
-    await relayenv.stopRelay();
-  });
 
   it("connects A, B and C to the profile 'all'", async () => {
     const relay = await relayenv.startRelay("all");

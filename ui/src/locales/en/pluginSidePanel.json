@@ -1,0 +1,9 @@
+{
+  "region": "{{plugin}} side panel",
+  "close": "Close {{plugin}} side panel",
+  "resize": "Resize {{plugin}} side panel",
+  "failed": "{{plugin}} side panel could not be closed. Please try again.",
+  "options": "{{plugin}} options",
+  "details": "Plugin details",
+  "closePanel": "Close panel"
+}
