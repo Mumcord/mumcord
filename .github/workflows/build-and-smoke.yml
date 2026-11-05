@@ -90,14 +90,42 @@ jobs:
         with:
           name: third-party-notices
 
+      # The runner's Ubuntu mirror is often very slow, so the downloaded packages are cached per
+      # runner image and only main saves them; PRs restore read-only.
+      - name: apt cache key 
+        id: apt
+        if: runner.os == 'Linux'
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Restore apt packages
+        id: apt-cache
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/apt-archives
+          key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
+          restore-keys: apt-build-${{ matrix.os }}-
+
       - name: Install Linux system libraries
         if: runner.os == 'Linux'
         timeout-minutes: 20
         run: |
-          scripts/ci/apt-install.sh \
+          scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
             libxdo-dev libasound2-dev libpipewire-0.3-dev libclang-dev pkg-config cmake patchelf xdg-utils \
             gstreamer1.0-plugins-bad
+
+      # apt's lock and partial downloads are root-only and must not go into the cache.
+      - name: Clean apt cache
+        if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        run: sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
+
+      - name: Save apt packages
+        if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/apt-archives
+          key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
 
       # Screen sharing links a static libvpx into every bundle (scripts/build-libvpx.sh,
       # RELEASING.md); on Linux this keeps the packages off the build host's libvpx soname. It is
@@ -450,11 +478,27 @@ jobs:
 
       # --- Test server -----------------------------------------------------------------------
 
+      # The runner's Ubuntu mirror is often very slow, so the downloaded packages are cached per
+      # runner image and only main saves them; PRs restore read-only.
+      - name: apt cache key
+        id: apt-smoke
+        if: runner.os == 'Linux'
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Restore apt packages
+        id: apt-cache-smoke
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/apt-archives
+          key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
+          restore-keys: apt-smoke-${{ matrix.os }}-
+
       - name: Start test server (Linux, testenv v15)
         if: runner.os == 'Linux'
         timeout-minutes: 30
         run: |
-          scripts/ci/apt-install.sh \
+          scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
             libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
             libwebkit2gtk-4.1-0 libpipewire-0.3-0t64
           # The AppImage must bring its own tray library (it is loaded at runtime, so a missing
@@ -467,6 +511,17 @@ jobs:
           # Throwaway SuperUser password for this runner only (same as e2e/run.sh).
           printf 'SUPERUSER_PASSWORD=%s\nSERVER_PASSWORD=\n' "$(openssl rand -hex 16)" > testenv/.env
           testenv/up.sh v15
+
+      - name: Clean apt cache
+        if: always() && runner.os == 'Linux' && steps.apt-cache-smoke.outputs.cache-hit != 'true'
+        run: sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
+
+      - name: Save apt packages
+        if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache-smoke.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/apt-archives
+          key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
 
       - name: Start test server (Windows, official Mumble server)
         if: runner.os == 'Windows'
