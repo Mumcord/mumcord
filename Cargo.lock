@@ -4196,6 +4196,7 @@ dependencies = [
  "lewton",
  "mumbot",
  "mumcord-audio",
+ "mumcord-camera",
  "mumcord-p2p 0.7.0-dev",
  "mumcord-positional",
  "mumcord-protocol 0.5.0",

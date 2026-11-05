@@ -1033,6 +1033,8 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        // The camera's commands and events come with G-1 (spec 08).
+        EngineEvent::CameraChanged(_) => Ok(()),
     }
 }
 
