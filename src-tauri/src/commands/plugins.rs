@@ -1966,9 +1966,10 @@ pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -
         },
         PluginUiInput::WebviewGesture { place } => UiInput::WebviewGesture(place.into()),
         PluginUiInput::SurfaceClosed { place } => {
-            plugins
-                .trees()
-                .apply(&id, &PluginUiChange::WebviewHide { place });
+            plugins.trees().surface_closed(&id, place);
+            if place == PluginWebviewPlace::Dialog {
+                plugins.webviews().dialog_closed(&id);
+            }
             UiInput::SurfaceClosed(place.into())
         }
     };

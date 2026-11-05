@@ -192,7 +192,7 @@ async function press(label: string): Promise<void> {
 /**
  * A presses `label` and waits for a new "<action>: sent #<seq> <size> B"; returns the sequence
  * number, so B can wait for exactly that message. A refused send also takes a number, so the new
- * one is only known to be higher than any before.
+ * one is only known to be higher than any before; a refusal fails with the plugin's error name.
  */
 async function send(label: string, action: string, size: number): Promise<number> {
   const before = await lastSeq();
@@ -208,8 +208,11 @@ async function send(label: string, action: string, size: number): Promise<number
       },
       { timeout: 30_000, interval: 250 },
     )
-    .catch(() => {
-      throw new Error(`${label}: no "${action}: sent" line after #${String(before)}`);
+    .catch(async () => {
+      // The plugin logs a refused send by its host error name; show it instead of only "no sent".
+      const results = (await panelText()).match(new RegExp(`^${action}: .*$`, "gm")) ?? [];
+      const last = results.at(-1) ?? "nothing logged";
+      throw new Error(`${label}: no "${action}: sent" line after #${String(before)}; last result: ${last}`);
     });
   return seq;
 }
