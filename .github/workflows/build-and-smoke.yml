@@ -195,7 +195,6 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: release
-          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - uses: actions/setup-node@v7
         with:
@@ -607,7 +606,6 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: smoke
-          save-if: ${{ github.ref == 'refs/heads/main' }}
           workspaces: |
             . -> target
             scripts/smoke/seed -> target
