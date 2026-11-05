@@ -23,6 +23,8 @@ import { useMicLevelFill } from "./useMicLevelFill";
 import { usePushToTalk } from "./usePushToTalk";
 import { useUserPanel } from "./useUserPanel";
 import { onUiHotkey } from "../hotkeys";
+import { useOwnCamera } from "../camera/availability";
+import { CameraButton, CameraOnLine } from "../camera/CameraButton";
 import "./userpanel.css";
 
 type Dialog = "profile" | "register" | null;
@@ -62,6 +64,7 @@ export function UserPanel() {
   const previous = useRef<{ mute: boolean; deaf: boolean } | null>(null);
   const micButton = useRef<HTMLButtonElement>(null);
   const audio = useAudioPopover(openAudioSettings);
+  const cameraOnAir = useOwnCamera()?.state === "onAir";
 
   const mute = self?.selfMute ?? false;
   const deaf = self?.selfDeaf ?? false;
@@ -223,26 +226,32 @@ export function UserPanel() {
             <span className="userpanel__name" data-tooltip={name} data-tooltip-overflow>
               {name}
             </span>{" "}
-            <span className="userpanel__status" data-tooltip={subtitleTitle}>
-              {(game ?? track) !== null && (
-                <svg
-                  className="userpanel__status-icon"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path
-                    d={game !== null ? GAMEPAD_PATH : MUSIC}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              )}
-              {subtitle}
-            </span>
+            {cameraOnAir ? (
+              <span className="userpanel__status">
+                <CameraOnLine />
+              </span>
+            ) : (
+              <span className="userpanel__status" data-tooltip={subtitleTitle}>
+                {(game ?? track) !== null && (
+                  <svg
+                    className="userpanel__status-icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path
+                      d={game !== null ? GAMEPAD_PATH : MUSIC}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+                {subtitle}
+              </span>
+            )}
           </span>
         </div>
         <button
@@ -336,6 +345,7 @@ export function UserPanel() {
           </button>
           <AudioArrow kind="output" audio={audio} disabled={!connected} />
         </span>
+        <CameraButton serverId={voice?.serverId ?? null} />
         {link !== null ? (
           <span className="userpanel__split">
             <button

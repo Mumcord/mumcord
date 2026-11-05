@@ -25,6 +25,7 @@ import { clickPerson, doubleClickPerson } from "../members/personClick";
 import { previewOnFocus, releasePreview } from "../members/profilePreviewStore";
 import { AvatarStack, type StackPerson } from "./AvatarStack";
 import { StatusIcons } from "./PersonStatus";
+import { CameraTreeIcon, CameraTreeLabel } from "../camera/CameraTreeIcon";
 import { WhisperBadge } from "../whisper/WhisperBadge";
 import type { ServerState } from "./serverStore";
 import { useStatusText } from "./statusText";
@@ -536,11 +537,13 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
             <MemberBadge session={session} />
             {!isSelf && <BlockedBadge user={user} />}
             <LiveBadge session={session} />
+            <CameraTreeLabel self={isSelf} name={user.name} />
             <WhisperBadge session={session} self={isSelf} />
             {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
           </span>
         </ProfilePreviewTrigger>
         <StatusIcons user={user} />
+        <CameraTreeIcon self={isSelf} />
       </span>
     </div>
   );

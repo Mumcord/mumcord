@@ -1,0 +1,18 @@
+{
+  "turnOn": "Turn on camera",
+  "turnOnHint": "You see a preview first. Only people in {{channel}} can see you.",
+  "turnOff": "Turn off camera",
+  "turnOffLabel": "Turn off camera. Your camera is on.",
+  "cameraOn": "Camera on",
+  "cameraOnLabel": "Your camera is on",
+  "cameraOffLabel": "Your camera is off",
+  "personCameraOn": "{{name}}'s camera is on",
+  "notInChannel": "Join a voice channel to turn on your camera.",
+  "unavailable": {
+    "noRelay": "This server has no relay, so camera sharing isn't available.",
+    "relayTooOld": "This server's relay is too old for camera sharing.",
+    "relayDisallows": "This server's relay doesn't allow camera sharing.",
+    "needsRelayMode": "Camera sharing needs the relay. Change it in Privacy & Connections.",
+    "noCertificate": "Camera sharing needs a client certificate."
+  }
+}

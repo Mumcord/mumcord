@@ -1,6 +1,7 @@
 /**
  * "Apps" button left of the image picker (FR-2.65) with a menu of start actions: "Share your screen"
- * (or pause, stop and viewers while sharing) and "Watch together" (paste a YouTube link), then the plugins' items (FR-9.53). Shown
+ * (or pause, stop and viewers while sharing), "Watch together" (paste a YouTube link) and "Turn on
+ * camera" (FR-8.9), then the plugins' items (FR-9.53). Shown
  * only in the chat of the channel the user is in by voice; disabled entries show their reason.
  */
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
@@ -19,6 +20,7 @@ import {
 import { WatchLinkDialog, useWatchParty } from "../watchparty";
 import { AppsMenuIcon } from "./appsMenuIcons";
 import { PluginMenuItems } from "../plugins/appmenu";
+import { CameraMenuItem } from "../camera/CameraMenuItem";
 import "./chatActionRow.css";
 
 const APPS_ICON = "M5 5h5v5H5zM14 5h5v5h-5zM5 14h5v5H5zM14 14h5v5h-5z";
@@ -30,7 +32,7 @@ export function ChatActionRow() {
   const { t: tParty } = useTranslation("watchparty");
   const serverId = useShownServerId();
   const { conversation } = useSelectedConversation();
-  const { users, selfSession, connected } = useServerState();
+  const { users, channels, selfSession, connected } = useServerState();
   const party = useWatchParty(serverId);
   const embeds = useEmbedsAllowed();
   const openPrivacy = useOpenPrivacySettings();
@@ -210,6 +212,13 @@ export function ChatActionRow() {
             { icon: "watch" },
           )}
           {embedsOff && openPrivacy !== null && item(tParty("openPrivacy"), null, openPrivacy)}
+          <CameraMenuItem
+            serverId={serverId}
+            channelName={channels.get(ownChannel)?.name ?? ""}
+            onChosen={() => {
+              closeMenu(true);
+            }}
+          />
           <PluginMenuItems
             onChosen={() => {
               closeMenu(true);
