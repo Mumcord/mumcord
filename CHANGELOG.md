@@ -4,6 +4,7 @@
 
 ### Added
 
+- A "Which app's sound?" dialog opens while you share a window and Mumcord needs to know whose sound to share: pick an app that plays sound right now or "No sound"; the list updates while the dialog is open
 - The Sound switch in the screen share dialog and in Settings → Screen sharing is now shown on every system, with a line saying what is shared (whole screen: desktop sound without Mumcord; one window: only that app's sound). Where sound cannot be shared, the switch is off and disabled with a note: "No sound: needs Windows 10 version 2004 or newer", "…macOS 13 or newer" or "…PipeWire" (#435)
 - The live bar of your screen share says what its sound carries ("Sound: desktop", "Sound: Firefox") or "No sound" with the reason in a tooltip that screen readers read as well (#435)
 - Screen sharing can include sound: sharing a whole screen shares all sound except Mumcord's own, sharing a window shares that app's sound. Works on Windows 10 (2004+), macOS 13+ and Linux with PipeWire; where it is unclear which app you mean (always on Wayland), Mumcord asks "Which app's sound?". There is no sound without PipeWire or on older systems.

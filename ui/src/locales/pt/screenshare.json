@@ -239,5 +239,14 @@
     "valueUnavailable": "Não disponível",
     "checkAgain": "Verificar novamente",
     "checking": "A verificar…"
+  },
+  "soundPicker": {
+    "title": "O som de que aplicação?",
+    "noSound": "Sem som",
+    "share": "Partilhar som",
+    "cancel": "Cancelar",
+    "empty": "Nenhuma aplicação está a reproduzir som neste momento",
+    "gone": "Essa aplicação deixou de reproduzir som. Escolha outra.",
+    "failed": "Não foi possível aplicar a sua escolha."
   }
 }

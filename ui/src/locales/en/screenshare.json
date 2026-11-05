@@ -235,5 +235,14 @@
     "valueUnavailable": "Not available",
     "checkAgain": "Check again",
     "checking": "Checking…"
+  },
+  "soundPicker": {
+    "title": "Which app's sound?",
+    "noSound": "No sound",
+    "share": "Share sound",
+    "cancel": "Cancel",
+    "empty": "No app is playing sound right now",
+    "gone": "That app has stopped playing sound. Choose another.",
+    "failed": "Your choice could not be applied."
   }
 }

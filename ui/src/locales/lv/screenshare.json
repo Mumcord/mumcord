@@ -239,5 +239,14 @@
     "valueUnavailable": "Nav pieejams",
     "checkAgain": "Pārbaudīt vēlreiz",
     "checking": "Pārbauda…"
+  },
+  "soundPicker": {
+    "title": "Kuras lietotnes skaņa?",
+    "noSound": "Bez skaņas",
+    "share": "Kopīgot skaņu",
+    "cancel": "Atcelt",
+    "empty": "Pašlaik neviena lietotne neatskaņo skaņu",
+    "gone": "Šī lietotne vairs neatskaņo skaņu. Izvēlieties citu.",
+    "failed": "Jūsu izvēli neizdevās pielietot."
   }
 }
