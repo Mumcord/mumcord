@@ -228,6 +228,24 @@ async function bReceives(seq: number, size: number): Promise<void> {
   await apps.onB(() => waitPanel(`received #${String(seq)} ${String(size)} B intact from Alice`, 45_000));
 }
 
+/**
+ * A sends 64 KiB to the channel until B receives one; returns its sequence number. The first
+ * channel send only starts A's broadcast, and a receiver admitted at a send binds afterwards, so
+ * the messages sent before B has joined are lost for B by design (FR-9.60: best effort, lowest
+ * priority; crates/engine/src/plugin_relay/broadcast.rs). Once one arrives, B has joined.
+ */
+async function bJoinsBroadcast(tries = 6): Promise<number> {
+  for (let i = 1; i <= tries; i++) {
+    const seq = await send("Channel 64 KiB", "channel-big", BIG);
+    const arrived = await apps
+      .onB(() => waitPanel(`received #${String(seq)} ${String(BIG)} B intact from Alice`, 15_000))
+      .then(() => true)
+      .catch(() => false);
+    if (arrived) return seq;
+  }
+  throw new Error(`B never joined A's plugin-data broadcast after ${String(tries)} channel sends`);
+}
+
 /** Opens the Apps menu and chooses "Start Test Relay" (the click is the plugin's gesture). */
 async function startStage(): Promise<void> {
   const button = $("button.chat-apps__button");
@@ -402,6 +420,7 @@ async function bothInChannel(): Promise<void> {
     });
 
     it("AC-9.18, AC-9.41: 64 KiB documents reach B through the relay, to the channel and 1:1", async () => {
+      await bJoinsBroadcast();
       const channel = await send("Channel 64 KiB", "channel-big", BIG);
       await bReceives(channel, BIG);
       const direct = await send("Direct 64 KiB", "direct-big", BIG);
@@ -480,8 +499,8 @@ async function bothInChannel(): Promise<void> {
         await joinVoice();
       });
       await bothInChannel();
-      const back = await send("Channel 64 KiB", "channel-big", BIG);
-      await bReceives(back, BIG);
+      // Back in the channel, B is admitted to the broadcast again at A's next send.
+      await bJoinsBroadcast();
       await apps.onB(async () => {
         await openPanel();
         expect(await panelText()).not.toContain(`received #${String(missed)} `);
