@@ -9,7 +9,10 @@ patterned body, built with the SDK's `bovnar` helpers) through `relay`.
 - Panel buttons: 64 KiB or 900 B to the channel, with the fallback on or off; 64 KiB (fallback off)
   or 900 B (fallback on) to the last peer that announced this plugin. "Channel malformed bytes"
   sends 300 raw bytes that are no Bovnar document (AC-9.42): the receiver's SDK drops them and
-  logs the reason and size, the host delivers them unchanged.
+  logs the reason and size, the host delivers them unchanged. "Channel oversized document" sends a
+  document above the relay limit, which the SDK refuses with `too-large` before anything leaves
+  the machine; "Channel oversized bytes" sends 64 KiB + 1 raw bytes, which the host refuses with
+  `too-large`.
 - The panel and the stage show `Relay: <status>`, `Received: <n>` and a log: `<action>: sent #<seq>
-<size> B` or the error (e.g. `RelayUnavailable`), and `received #<seq> <size> B intact from
-<name>`, `received malformed 300 B dropped, bytes unchanged from <name>`.
+<size> B` or the error by its WIT name (e.g. `relay-unavailable`), `received #<seq> <size> B
+intact from <name>`, `received malformed 300 B dropped, bytes unchanged from <name>`.

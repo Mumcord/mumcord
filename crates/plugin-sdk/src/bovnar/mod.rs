@@ -241,6 +241,11 @@ impl Writer {
     }
 
     fn event(&mut self, event: i32, token: i32, text: &str) -> Result<(), Error> {
+        // A token as long as the buffer can never fit with its framing. The library refuses
+        // tokens of 64 KiB and more with a format error, which would read as `malformed`.
+        if text.len() >= self.buf.len() {
+            return Err(Error::TooLarge);
+        }
         let mut d = ffi::Data::zeroed();
         d.token_type = token;
         d.data = text.as_ptr().cast();

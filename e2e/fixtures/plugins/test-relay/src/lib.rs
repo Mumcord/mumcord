@@ -1,7 +1,8 @@
 //! E2E test plugin for relay plugin data (spec 09 §10.2, AC-9.18 … AC-9.21): 64 KiB and small
 //! messages to the channel or one person, with the Mumble fallback on or off. Its stage shows the
 //! relay status chip of the host; the stage and the panel show the relay status, every send
-//! outcome and every received message so the E2E test can read them.
+//! outcome and every received message so the E2E test can read them. Malformed and oversized
+//! sends cover the Bovnar error paths (AC-9.42).
 
 mod messages;
 
@@ -53,6 +54,8 @@ fn view(with_buttons: bool) -> ui::El {
         ("direct-big", "Direct 64 KiB"),
         ("direct-small-fallback", "Direct small, fallback"),
         ("channel-malformed", "Channel malformed bytes"),
+        ("channel-oversized", "Channel oversized document"),
+        ("channel-oversized-raw", "Channel oversized bytes"),
     ];
     STATE.with_borrow(|s| {
         let mut column = ui::column()
@@ -120,7 +123,32 @@ fn send_malformed(action: &str) {
     let data = messages::malformed();
     match relay::send_channel(&data, true) {
         Ok(()) => note(format!("{action}: sent {} B", data.len())),
-        Err(e) => note(format!("{action}: {e:?}")),
+        Err(e) => note(format!("{action}: {}", e.name())),
+    }
+}
+
+/// A document above the relay limit (AC-9.42): the SDK refuses to encode it, so nothing leaves
+/// the machine.
+fn send_oversized_document(action: &str) {
+    let seq = STATE.with_borrow_mut(|s| {
+        s.seq = s.seq.wrapping_add(1);
+        s.seq
+    });
+    match bovnar::send_document(
+        Destination::RelayChannel { fallback: false },
+        &messages::oversized(seq),
+    ) {
+        Ok(()) => note(format!("{action}: sent #{seq}")),
+        Err(bovnar::Error::Host(e)) => note(format!("{action}: {}", e.name())),
+        Err(e) => note(format!("{action}: {e}")),
+    }
+}
+
+/// Raw bytes one above the relay limit, past the SDK helpers: the host itself refuses them.
+fn send_oversized_raw(action: &str) {
+    match relay::send_channel(&vec![0; bovnar::RELAY_LIMIT + 1], false) {
+        Ok(()) => note(format!("{action}: sent {} B", bovnar::RELAY_LIMIT + 1)),
+        Err(e) => note(format!("{action}: {}", e.name())),
     }
 }
 
@@ -140,6 +168,8 @@ fn act(action: &str) {
         "direct-big" => send(action, BIG, false, true),
         "direct-small-fallback" => send(action, SMALL, true, true),
         "channel-malformed" => send_malformed(action),
+        "channel-oversized" => send_oversized_document(action),
+        "channel-oversized-raw" => send_oversized_raw(action),
         _ => {}
     }
 }

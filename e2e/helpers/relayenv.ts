@@ -1,9 +1,9 @@
 // The mumpeer test environment (relay + Mumble server + relay bot) for the file sharing, screen
 // share and relay-use specs, and the debug-only test hooks of the app (spec 07, B5).
 //
-// The environment lives in the mumpeer repo (`testenv/`). Check it out next to this repo or point
-// `MUMPEER_DIR` at it; e2e/run.sh mounts that folder into the container. Specs that need it call
-// `relayAvailable()` and skip themselves otherwise. CI checks mumpeer out only for the shards that
+// The environment lives in the mumpeer repo (`testenv/`). e2e/run.sh checks out the commit CI pins
+// (MUMPEER_REF in .github/workflows/e2e.yml), or takes `MUMPEER_DIR`, and mounts it into the
+// container. Specs that need it call `relayAvailable()` and skip themselves otherwise. CI checks mumpeer out only for the shards that
 // run such specs (scripts/e2e-shards.js groups them).
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -11,7 +11,16 @@ import { repoRoot } from "./paths.ts";
 import { run, runOk } from "./run.ts";
 
 /** The relay configurations of mumpeer's testenv (`MUMPEER_PROFILE`). */
-export type RelayProfile = "all" | "no-files" | "no-screen" | "no-images" | "no-broadcast" | "old";
+export type RelayProfile =
+  | "all"
+  | "no-files"
+  | "no-screen"
+  | "no-images"
+  | "no-camera"
+  | "plugin-data"
+  | "no-plugin-data"
+  | "no-broadcast"
+  | "old";
 
 /** Where a started relay environment listens. */
 export interface Relay {
