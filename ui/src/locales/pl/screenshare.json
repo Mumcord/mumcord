@@ -109,7 +109,18 @@
     "codecBadgeHardware": "{{codec}} · sprzętowo",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Przekaźnik",
-    "pathDirect": "Bezpośrednio"
+    "pathDirect": "Bezpośrednio",
+    "soundDesktop": "Dźwięk: pulpit",
+    "soundApp": "Dźwięk: {{app}}",
+    "noSound": "Bez dźwięku",
+    "tipDesktop": "Cały ekran: dźwięk pulpitu bez Mumcorda.",
+    "tipApp": "Jedno okno: tylko dźwięk tej aplikacji.",
+    "tipOff": "Przełącznik dźwięku jest wyłączony.",
+    "tipNone": "Dla tego okna wybrano „Bez dźwięku”.",
+    "tipOldWindows": "Bez dźwięku: wymaga Windows 10 w wersji 2004 lub nowszej",
+    "tipOldMacos": "Bez dźwięku: wymaga macOS 13 lub nowszego",
+    "tipNoPipeWire": "Bez dźwięku: wymaga PipeWire",
+    "tipCaptureFailed": "Przechwytywanie dźwięku nie powiodło się. Udostępnianie obrazu trwa dalej."
   },
   "qualityMenu": {
     "title": "Jakość",

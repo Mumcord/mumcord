@@ -105,7 +105,18 @@
     "codecBadgeHardware": "{{codec}} · хардуер",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Реле",
-    "pathDirect": "Директно"
+    "pathDirect": "Директно",
+    "soundDesktop": "Звук: работен плот",
+    "soundApp": "Звук: {{app}}",
+    "noSound": "Без звук",
+    "tipDesktop": "Целият екран: звукът на работния плот без Mumcord.",
+    "tipApp": "Един прозорец: само звукът на това приложение.",
+    "tipOff": "Превключвателят за звук е изключен.",
+    "tipNone": "За този прозорец е избрано „Без звук“.",
+    "tipOldWindows": "Без звук: нужен е Windows 10 версия 2004 или по-нов",
+    "tipOldMacos": "Без звук: нужен е macOS 13 или по-нов",
+    "tipNoPipeWire": "Без звук: нужен е PipeWire",
+    "tipCaptureFailed": "Записът на звука се провали. Видео споделянето продължава."
   },
   "qualityMenu": {
     "title": "Качество",

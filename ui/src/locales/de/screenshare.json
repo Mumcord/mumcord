@@ -105,7 +105,18 @@
     "codecBadgeHardware": "{{codec}} · Hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Direkt"
+    "pathDirect": "Direkt",
+    "soundDesktop": "Ton: Desktop",
+    "soundApp": "Ton: {{app}}",
+    "noSound": "Kein Ton",
+    "tipDesktop": "Ganzer Bildschirm: Desktop-Ton ohne Mumcord.",
+    "tipApp": "Ein Fenster: nur der Ton dieser App.",
+    "tipOff": "Der Ton-Schalter ist aus.",
+    "tipNone": "Für dieses Fenster wurde „Kein Ton“ gewählt.",
+    "tipOldWindows": "Kein Ton: benötigt Windows 10 Version 2004 oder neuer",
+    "tipOldMacos": "Kein Ton: benötigt macOS 13 oder neuer",
+    "tipNoPipeWire": "Kein Ton: benötigt PipeWire",
+    "tipCaptureFailed": "Die Tonaufnahme ist fehlgeschlagen. Die Bildfreigabe läuft weiter."
   },
   "qualityMenu": {
     "title": "Qualität",

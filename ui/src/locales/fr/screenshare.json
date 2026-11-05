@@ -107,7 +107,18 @@
     "codecBadgeHardware": "{{codec}} · matériel",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relais",
-    "pathDirect": "Direct"
+    "pathDirect": "Direct",
+    "soundDesktop": "Son : bureau",
+    "soundApp": "Son : {{app}}",
+    "noSound": "Pas de son",
+    "tipDesktop": "Écran entier : le son du bureau, sans Mumcord.",
+    "tipApp": "Une fenêtre : uniquement le son de cette application.",
+    "tipOff": "Le commutateur du son est désactivé.",
+    "tipNone": "« Pas de son » a été choisi pour cette fenêtre.",
+    "tipOldWindows": "Pas de son : nécessite Windows 10 version 2004 ou plus récent",
+    "tipOldMacos": "Pas de son : nécessite macOS 13 ou plus récent",
+    "tipNoPipeWire": "Pas de son : nécessite PipeWire",
+    "tipCaptureFailed": "La capture audio a échoué. Le partage vidéo continue."
   },
   "qualityMenu": {
     "title": "Qualité",

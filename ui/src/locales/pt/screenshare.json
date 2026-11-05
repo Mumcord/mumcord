@@ -107,7 +107,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Retransmissor",
-    "pathDirect": "Direto"
+    "pathDirect": "Direto",
+    "soundDesktop": "Som: ambiente de trabalho",
+    "soundApp": "Som: {{app}}",
+    "noSound": "Sem som",
+    "tipDesktop": "Ecrã inteiro: som do ambiente de trabalho sem o Mumcord.",
+    "tipApp": "Uma janela: apenas o som dessa aplicação.",
+    "tipOff": "O interruptor de som está desligado.",
+    "tipNone": "Foi escolhido «Sem som» para esta janela.",
+    "tipOldWindows": "Sem som: requer Windows 10 versão 2004 ou posterior",
+    "tipOldMacos": "Sem som: requer macOS 13 ou posterior",
+    "tipNoPipeWire": "Sem som: requer PipeWire",
+    "tipCaptureFailed": "A captura de áudio falhou. A partilha de vídeo continua."
   },
   "qualityMenu": {
     "title": "Qualidade",
