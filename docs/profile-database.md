@@ -6,9 +6,9 @@ Since issue #521 the profile is **backwards compatible**: an older Mumcord can o
 
 ## Two numbers in the file header
 
-| Number | Where | Meaning |
-| --- | --- | --- |
-| Schema version | `PRAGMA user_version` | How many migrations were applied. |
+| Number                 | Where                   | Meaning                                                                                                                                                                                                                           |
+| ---------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Schema version         | `PRAGMA user_version`   | How many migrations were applied.                                                                                                                                                                                                 |
 | Minimum reader version | `PRAGMA application_id` | The oldest schema version an app must know to use this profile safely: the number of the newest **breaking** migration applied (at least 1). `0` means "not recorded" (the profile was last migrated by an app from before #521). |
 
 Both live in the SQLite file header (bytes 60 and 68), so `store::check_schema` can read them without opening the database, and both change in the same transaction as the migration that moves them. Mumcord has no other use for `application_id`.
