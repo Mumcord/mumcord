@@ -44,8 +44,8 @@ the output; `pulse` runs only PulseAudio (no PipeWire: AC-7.66); `none` starts n
 - Test hook `sharePick` of `hookEnv` (`MUMCORD_TEST_SHARE_PICK`, debug builds only): the test
   backend has no window picker, so the spec feeds the pick: `"screen"` (desktop sound without
   Mumcord), `"window:Test App A"` (app hint; a clear match shares only that app and the streams it
-  opens later) or `"window"` (no hint: no sound, the app list is not part of this hook). The sound
-  is the real PipeWire capture. Without the hook a test share has no sound capture.
+  opens later) or `"window"` (no hint: the "Which app's sound?" list opens, as on a real Linux
+  share). The sound is the real PipeWire capture. Without the hook a test share has no sound capture.
 
 Requires only Docker (user in the `docker` group) and `npm ci` on the host. Everything else runs
 in the `mumcord-e2e` image, because Arch's webkit2gtk ships without `WebKitWebDriver`.
