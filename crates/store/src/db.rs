@@ -10,12 +10,44 @@ pub const DB_FILE_NAME: &str = "mumcord.sqlite3";
 /// Milliseconds since the Unix epoch (UTC). All timestamps are stored in this form.
 pub type UnixMillis = i64;
 
+/// Whether apps that know only the schema before a migration can still use the profile
+/// after it (issue #521, see `docs/profile-database.md`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Change {
+    /// Only adds tables, indexes or columns with a default (and fills columns it added).
+    /// An older app ignores them and keeps working.
+    Additive,
+    /// Renames, removes or changes the meaning or format of something an older app uses.
+    /// Older apps must refuse the profile.
+    Breaking,
+}
+
+struct Migration {
+    change: Change,
+    sql: &'static str,
+}
+
+const fn additive(sql: &'static str) -> Migration {
+    Migration {
+        change: Change::Additive,
+        sql,
+    }
+}
+
+const fn breaking(sql: &'static str) -> Migration {
+    Migration {
+        change: Change::Breaking,
+        sql,
+    }
+}
+
 /// Ordered schema migrations. Entry `n` upgrades the schema from version `n` to `n + 1`;
 /// the current version is kept in SQLite's `user_version`. Never edit a released
-/// migration – append a new one.
-const MIGRATIONS: &[&str] = &[
+/// migration – append a new one, marked [`additive`] or [`breaking`].
+const MIGRATIONS: &[Migration] = &[
     // v1: initial schema (spec section 7).
-    r"
+    additive(
+        r"
     CREATE TABLE saved_server (
         id           INTEGER PRIMARY KEY,
         label        TEXT    NOT NULL,
@@ -66,39 +98,49 @@ const MIGRATIONS: &[&str] = &[
         data TEXT    NOT NULL
     );
     ",
+    ),
     // v2: remember per server whether the default avatar was handled (FR-1.47).
-    r"
+    additive(
+        r"
     ALTER TABLE saved_server ADD COLUMN default_avatar_sent INTEGER NOT NULL DEFAULT 0
         CHECK (default_avatar_sent IN (0, 1));
     ",
+    ),
     // v3: the user's last own mute/deafen choice, restored on an explicit join (QA.7). Kept
     // out of the settings JSON so saving settings from the UI can never overwrite it.
-    r"
+    additive(
+        r"
     CREATE TABLE own_voice (
         id   INTEGER PRIMARY KEY CHECK (id = 1),
         mute INTEGER NOT NULL CHECK (mute IN (0, 1)),
         deaf INTEGER NOT NULL CHECK (deaf IN (0, 1))
     );
     ",
+    ),
     // v4: the channel the user is joined to for voice, kept when the app quits so the next
     // start can offer to rejoin it (QA.9). `last_channel` also follows the read-only default
     // channel, so it cannot tell whether voice was on.
-    r"
+    additive(
+        r"
     ALTER TABLE saved_server ADD COLUMN voice_channel TEXT;
     ",
+    ),
     // v5: the avatar remembered per server (hand-set or the default avatar, as a scaled PNG),
     // sent again on connect when the server keeps none for the user (FR-1.20, QA.10).
     // Servers that already got the default avatar are marked for a one-time backfill with
     // it; the image lives in a file, so the engine fills it in at start.
-    r"
+    additive(
+        r"
     ALTER TABLE saved_server ADD COLUMN avatar BLOB;
     ALTER TABLE saved_server ADD COLUMN avatar_backfill INTEGER NOT NULL DEFAULT 0
         CHECK (avatar_backfill IN (0, 1));
     UPDATE saved_server SET avatar_backfill = 1 WHERE default_avatar_sent = 1;
     ",
+    ),
     // v6: preview cards the user dismissed (QA.42), per message and link; they go away with
     // the message. The timestamp index makes deleting old history an index range scan.
-    r"
+    additive(
+        r"
     CREATE TABLE dismissed_preview (
         message_id INTEGER NOT NULL REFERENCES chat_message (id) ON DELETE CASCADE,
         url        TEXT    NOT NULL,
@@ -106,9 +148,11 @@ const MIGRATIONS: &[&str] = &[
     );
     CREATE INDEX chat_message_sent_at ON chat_message (sent_at);
     ",
+    ),
     // v7: GIF favorites (FR-1.52, QA.43): saved image links the user can send again. The
     // image itself comes from the link-preview image cache, so only the link is stored.
-    r"
+    additive(
+        r"
     CREATE TABLE gif_favorite (
         url          TEXT    PRIMARY KEY,
         added_at     INTEGER NOT NULL,
@@ -116,9 +160,11 @@ const MIGRATIONS: &[&str] = &[
     );
     CREATE INDEX gif_favorite_last_used ON gif_favorite (last_used_at DESC);
     ",
+    ),
     // v8: private notes about people (FR-1.63), keyed like the person settings. Kept apart
     // from them because a note is free text and has nothing to do with playback.
-    r"
+    additive(
+        r"
     CREATE TABLE person_note (
         server_id        INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
         person_cert_hash TEXT    NOT NULL,
@@ -126,15 +172,19 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, person_cert_hash)
     );
     ",
+    ),
     // v9: history sync between Mumcord clients (FR-1.60, QA.48): the display name of the
     // person whose history a channel message came from; NULL for messages received live.
-    r"
+    additive(
+        r"
     ALTER TABLE chat_message ADD COLUMN synced_from TEXT;
     ",
+    ),
     // v10: friends by certificate hash (FR-1.64), local only and across servers. Private
     // chats with a friend are read across servers (FR-1.65), so private history also gets an
     // index that does not start with the server.
-    r"
+    additive(
+        r"
     CREATE TABLE friend (
         cert_hash    TEXT    PRIMARY KEY,
         name         TEXT    NOT NULL,
@@ -144,30 +194,36 @@ const MIGRATIONS: &[&str] = &[
     CREATE INDEX chat_message_by_key
         ON chat_message (conversation_kind, conversation_key, sent_at);
     ",
+    ),
     // v11: multi-server state (FR-2.3, FR-2.7, FR-2.10, FR-2.17). `connected_at_quit` is the
     // quit time of a server that was connected then (NULL otherwise); the most recent one
     // wins when more servers than the limit were connected (AC-2.6).
-    r"
+    additive(
+        r"
     ALTER TABLE saved_server ADD COLUMN always_connect_at_start INTEGER NOT NULL DEFAULT 0;
     ALTER TABLE saved_server ADD COLUMN connected_at_quit INTEGER;
     ALTER TABLE saved_server ADD COLUMN was_voice_server_at_quit INTEGER NOT NULL DEFAULT 0;
     ALTER TABLE saved_server ADD COLUMN notifications_muted INTEGER NOT NULL DEFAULT 0;
     ALTER TABLE saved_server ADD COLUMN theme_id TEXT;
     ",
+    ),
     // v12: when the user last cleared channel history (issue #119), so history sync does not
     // bring the deleted messages back from other people's copies. `server_id` NULL: all
     // servers; `channel_key` NULL: every channel of the server.
-    r"
+    additive(
+        r"
     CREATE TABLE history_cleared (
         server_id   INTEGER REFERENCES saved_server (id) ON DELETE CASCADE,
         channel_key TEXT,
         cleared_at  INTEGER NOT NULL
     );
     ",
+    ),
     // v13: non-secret details of the saved channel passwords (issue #146), by the token's
     // position in the server's token list in secure storage. `channels` is a JSON array of
     // `{channel_id, path}`. Tokens saved before have no row and keep their default name.
-    r"
+    additive(
+        r"
     CREATE TABLE channel_token (
         server_id    INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
         position     INTEGER NOT NULL,
@@ -177,11 +233,13 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, position)
     );
     ",
+    ),
     // v14: several identities (issue #148). Certificates and keys stay in the OS secure
     // storage; this table holds the local label, the certificate's common name and hash, when
     // it was added and which one is the default. `saved_server.identity_id` NULL means "use
     // the default identity", so existing servers keep their identity after the upgrade.
-    r"
+    additive(
+        r"
     CREATE TABLE identity (
         id         INTEGER PRIMARY KEY,
         label      TEXT    NOT NULL,
@@ -195,13 +253,17 @@ const MIGRATIONS: &[&str] = &[
     ALTER TABLE saved_server ADD COLUMN identity_id INTEGER REFERENCES identity (id)
         ON DELETE SET NULL;
     ",
+    ),
     // v15: turning off `@all` / `@channel` mentions per server (issue #70, Q1.6).
-    r"
+    additive(
+        r"
     ALTER TABLE saved_server ADD COLUMN group_mentions_muted INTEGER NOT NULL DEFAULT 0;
     ",
+    ),
     // v16: accepted private conversations (issue #141). Kept per own identity, keyed by the
     // own certificate hash, so the same person can message one identity but not another.
-    r"
+    additive(
+        r"
     CREATE TABLE accepted_conversation (
         own_cert_hash TEXT    NOT NULL,
         cert_hash     TEXT    NOT NULL,
@@ -210,10 +272,12 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (own_cert_hash, cert_hash)
     );
     ",
+    ),
     // v17: pinned and muted private conversations in the private messages overview (issue
     // #173), by server and the other person's certificate hash. `muted_until` is Unix millis,
     // i64::MAX for "until turned back on", NULL when not muted.
-    r"
+    additive(
+        r"
     CREATE TABLE pm_conversation (
         server_id   INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
         cert_hash   TEXT    NOT NULL,
@@ -222,10 +286,12 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, cert_hash)
     );
     ",
+    ),
     // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
     // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
     // path kept so a renamed or recreated channel still matches.
-    r"
+    additive(
+        r"
     CREATE TABLE channel_audio_profile (
         server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
         channel_id    INTEGER NOT NULL,
@@ -236,13 +302,15 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, channel_id)
     );
     ",
+    ),
     // v19: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218,
     // whose `channel_audio_profile` (v18, above) keeps its version number so the version
     // numbers match. A certificate block (`cert_hash` set) covers every server of
     // that identity (Q1.4); a name block (`cert_hash` NULL) is for people without a
     // certificate and only applies on `server_id`. `server_label` keeps where the block was
     // set readable after the server is removed.
-    r"
+    additive(
+        r"
     CREATE TABLE blocked_user (
         id            INTEGER PRIMARY KEY,
         own_cert_hash TEXT    NOT NULL,
@@ -258,13 +326,15 @@ const MIGRATIONS: &[&str] = &[
         ON blocked_user (own_cert_hash, server_id, name COLLATE NOCASE)
         WHERE cert_hash IS NULL;
     ",
+    ),
     // v20: mumpeer relay (spec 04). Lands after #218 (v18 `channel_audio_profile`) and #224
     // (v19 `blocked_user`), both on main above, so the version numbers match testers.
     // databases. `saved_server.p2p_mode_override` holds a `P2pMode` in snake_case, NULL
     // uses the global setting (FR-4.2). `relay_pin` is the trust-on-first-use pin of a server's
     // relay per server entry and own identity (FR-4.9, §7.1): the bot's certificate hash
     // (40 hex), the relay's certificate fingerprint (64 hex) and when it was first accepted.
-    r"
+    additive(
+        r"
     ALTER TABLE saved_server ADD COLUMN p2p_mode_override TEXT CHECK (p2p_mode_override IN
         ('direct_relay', 'relay_first', 'direct_only', 'relay_only', 'off'));
 
@@ -277,11 +347,13 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, identity_id)
     );
     ",
+    ),
     // v21: plugin system (Epic 3.1, spec 06 section 7.1). `plugin` is one row per installed
     // plugin; `removed_at` is set when it is removed with its data kept (purged after 30
     // days, FR-6.62). `plugin_kv` holds plugin storage per scope (`global` or the identity id).
     // `server_plugin_suggestion` remembers what a server suggested to which identity.
-    r"
+    additive(
+        r"
     CREATE TABLE plugin (
         id               TEXT    PRIMARY KEY,
         version          TEXT    NOT NULL,
@@ -342,17 +414,21 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, identity_id)
     );
     ",
+    ),
     // v22: a person's screen share sound gets its own volume, separate from their voice
     // (issue #333). Existing rows keep their voice volume; their share starts at 100 %.
-    r"
+    additive(
+        r"
     ALTER TABLE person_setting ADD COLUMN share_volume INTEGER NOT NULL DEFAULT 100
         CHECK (share_volume BETWEEN 0 AND 200);
     ",
+    ),
     // v23: screen share encoder probe results, one set per machine (spec 07, FR-7.55). `meta`
     // holds the driver and app version the results were measured with; a change of either
     // means the probe runs again. `selftest` is the software encoder's measured time per
     // (resolution, frame rate).
-    r"
+    additive(
+        r"
     CREATE TABLE encoder_cache_meta (
         id          INTEGER PRIMARY KEY CHECK (id = 1),
         driver_id   TEXT NOT NULL,
@@ -370,20 +446,24 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (resolution, fps)
     );
     ",
+    ),
     // v24: how a file download ended, per chat message carrying the offer (spec 07, section
     // 7.2); it goes away with the message.
-    r"
+    additive(
+        r"
     CREATE TABLE file_card (
         message_id INTEGER PRIMARY KEY REFERENCES chat_message (id) ON DELETE CASCADE,
         state      TEXT NOT NULL CHECK (state IN ('done', 'mismatch')),
         path       TEXT
     );
     ",
+    ),
     // v25: plugin platform 1.1 trust data (spec 09, section 7.1). Origin approvals, per-day
     // request counters (kept 7 days), the first time a registry key was seen, per-version
     // permission history and confirmed high-risk plugins. v24 is the file-card table of the
     // file-sharing epic.
-    r"
+    additive(
+        r"
     CREATE TABLE plugin_origin_approval (
         plugin_id   TEXT NOT NULL,
         origin      TEXT NOT NULL,
@@ -419,10 +499,13 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (plugin_id, version)
     );
     ",
+    ),
     // v26: the software AV1 self-test also depends on "Optimize for" (spec 07, FR-7.56): Sharp
     // text costs about four times as much CPU, so a Balanced pass must not count for it. The
     // key changes, so the table is rebuilt; old results are dropped and simply measured again.
-    r"
+    // Breaking: an app before v26 writes rows without the new NOT NULL `optimize` column.
+    breaking(
+        r"
     DROP TABLE encoder_selftest;
     CREATE TABLE encoder_selftest (
         resolution      INTEGER NOT NULL,
@@ -432,29 +515,36 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (resolution, fps, optimize)
     );
     ",
+    ),
     // v27: whether the "Expected key" entered when a repository was added matched the pinned
     // key (FR-6.74), for the security score's trust factor. Existing repositories default to 0.
-    r"
+    additive(
+        r"
     ALTER TABLE plugin_repository ADD COLUMN expected_key_matched INTEGER NOT NULL DEFAULT 0;
     ",
+    ),
     // v28: "Skip this version" in the plugin Updates tab (FR-9.83): the newest version the user
     // skipped per plugin. That version and older ones are no longer offered; a newer one is.
-    r"
+    additive(
+        r"
     CREATE TABLE plugin_skipped_update (
         plugin_id  TEXT PRIMARY KEY,
         version    TEXT NOT NULL,
         skipped_at INTEGER NOT NULL
     );
     ",
+    ),
     // v29: plugins whose web content was turned off because Mumcord's window stopped answering
     // while one of their frames was open (FR-9.42). It stays off across restarts until the user
     // turns it on again in Settings → Plugins; the row is deleted then.
-    r"
+    additive(
+        r"
     CREATE TABLE plugin_web_disabled (
         plugin_id   TEXT PRIMARY KEY,
         disabled_at INTEGER NOT NULL
     );
     ",
+    ),
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -491,9 +581,39 @@ impl Store {
     }
 }
 
+/// The oldest schema an app must know to use a profile that has `applied` migrations: the
+/// number of the newest breaking migration among them (at least 1). It is kept in SQLite's
+/// `application_id`, a header field Mumcord has no other use for: it sits beside
+/// `user_version`, changes in the same transaction as a migration and can be read from the
+/// file header without opening the database (issue #521). 0 means "not recorded", as in
+/// profiles last migrated before #521.
+fn min_reader_version(applied: usize) -> i64 {
+    MIGRATIONS[..applied]
+        .iter()
+        .rposition(|m| m.change == Change::Breaking)
+        .map_or(1, |index| index as i64 + 1)
+}
+
+/// The schema versions stored in a profile.
+#[derive(Debug, Clone, Copy)]
+struct Versions {
+    /// Number of applied migrations (`user_version`).
+    schema: i64,
+    /// See [`min_reader_version`] (`application_id`).
+    min_reader: i64,
+}
+
+fn stored_versions(conn: &Connection) -> rusqlite::Result<Versions> {
+    Ok(Versions {
+        schema: conn.query_row("PRAGMA user_version", [], |row| row.get(0))?,
+        min_reader: conn.query_row("PRAGMA application_id", [], |row| row.get(0))?,
+    })
+}
+
 /// Fails with [`Error::SchemaTooNew`] if the profile in `data_dir` was upgraded by a newer
-/// Mumcord. Reads only: the database file and its WAL files stay exactly as they are, so the
-/// newer app can still open the profile. No database yet is fine (first start).
+/// Mumcord in a way this app cannot work with. A newer profile whose later migrations were
+/// all additive is fine. Reads only: the database file and its WAL files stay exactly as they
+/// are, so the newer app can still open the profile. No database yet is fine (first start).
 pub fn check_schema(data_dir: &Path) -> Result<()> {
     let path = data_dir.join(DB_FILE_NAME);
     if !path.is_file() {
@@ -508,53 +628,71 @@ pub fn check_schema(data_dir: &Path) -> Result<()> {
             path,
             OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX,
         )?;
-        let current: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
-        return ensure_supported(current);
+        return ensure_supported(stored_versions(&conn)?);
     }
     // Without a WAL the file header is the whole truth. Reading it directly avoids SQLite,
     // which would create WAL files beside a closed WAL-mode database even when read-only.
-    match header_user_version(&path)? {
-        Some(current) => ensure_supported(current),
+    match header_versions(&path)? {
+        Some(versions) => ensure_supported(versions),
         // Not an SQLite file: the normal open reports that properly.
         None => Ok(()),
     }
 }
 
-/// `user_version` from the database header (a big-endian integer at byte offset 60, see
-/// <https://www.sqlite.org/fileformat.html#the_database_header>), or `None` if `path` holds
-/// no SQLite header.
-fn header_user_version(path: &Path) -> Result<Option<i64>> {
+/// `user_version` and `application_id` from the database header (big-endian integers at
+/// byte offsets 60 and 68, see <https://www.sqlite.org/fileformat.html#the_database_header>),
+/// or `None` if `path` holds no SQLite header.
+fn header_versions(path: &Path) -> Result<Option<Versions>> {
     use std::io::Read;
 
     const MAGIC: &[u8; 16] = b"SQLite format 3\0";
-    let mut header = [0u8; 64];
+    let mut header = [0u8; 72];
     let mut file = std::fs::File::open(path).map_err(Error::ProfileRead)?;
     if file.read_exact(&mut header).is_err() || !header.starts_with(MAGIC) {
         return Ok(None);
     }
-    let bytes: [u8; 4] = header[60..64].try_into().expect("four header bytes");
-    Ok(Some(i64::from(i32::from_be_bytes(bytes))))
+    let field = |offset: usize| {
+        let bytes: [u8; 4] = header[offset..offset + 4]
+            .try_into()
+            .expect("four header bytes");
+        i64::from(i32::from_be_bytes(bytes))
+    };
+    Ok(Some(Versions {
+        schema: field(60),
+        min_reader: field(68),
+    }))
 }
 
-fn ensure_supported(current: i64) -> Result<()> {
+fn ensure_supported(stored: Versions) -> Result<()> {
     let supported = MIGRATIONS.len() as i64;
-    if current > supported {
+    // A newer profile without a recorded minimum comes from an app before #521, which did not
+    // mark its migrations, so nothing says this app can use it.
+    let readable =
+        stored.schema <= supported || (stored.min_reader > 0 && stored.min_reader <= supported);
+    if !readable {
         return Err(Error::SchemaTooNew {
-            found: current,
+            found: stored.schema,
             supported,
         });
     }
     Ok(())
 }
 
+/// Applies the pending migrations. A profile already past this app's schema is left exactly
+/// as it is: migrations never run backwards and newer tables and columns are not touched.
 fn migrate(conn: &mut Connection) -> Result<()> {
-    let current: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
-    ensure_supported(current)?;
-    for (version, sql) in MIGRATIONS.iter().enumerate().skip(current as usize) {
+    let stored = stored_versions(conn)?;
+    ensure_supported(stored)?;
+    for (version, migration) in MIGRATIONS.iter().enumerate().skip(stored.schema as usize) {
         let tx = conn.transaction()?;
-        tx.execute_batch(sql)?;
+        tx.execute_batch(migration.sql)?;
         tx.pragma_update(None, "user_version", version as i64 + 1)?;
+        tx.pragma_update(None, "application_id", min_reader_version(version + 1))?;
         tx.commit()?;
+    }
+    if stored.schema == MIGRATIONS.len() as i64 && stored.min_reader == 0 {
+        // Up to date but last migrated before #521: record the minimum once.
+        conn.pragma_update(None, "application_id", min_reader_version(MIGRATIONS.len()))?;
     }
     Ok(())
 }
@@ -591,13 +729,17 @@ pub(crate) mod tests {
     /// `blocked_user` must stay v19.
     #[test]
     fn blocked_user_is_v19_after_channel_audio_profile() {
-        assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
-        assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
-        assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
-        assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
-        assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
-        assert!(MIGRATIONS[21].contains("share_volume"));
-        assert!(MIGRATIONS[23].contains("CREATE TABLE file_card"));
+        assert!(MIGRATIONS[16].sql.contains("CREATE TABLE pm_conversation"));
+        assert!(
+            MIGRATIONS[17]
+                .sql
+                .contains("CREATE TABLE channel_audio_profile")
+        );
+        assert!(MIGRATIONS[18].sql.contains("CREATE TABLE blocked_user"));
+        assert!(MIGRATIONS[19].sql.contains("CREATE TABLE relay_pin"));
+        assert!(MIGRATIONS[20].sql.contains("CREATE TABLE plugin "));
+        assert!(MIGRATIONS[21].sql.contains("share_volume"));
+        assert!(MIGRATIONS[23].sql.contains("CREATE TABLE file_card"));
     }
 
     #[test]
@@ -637,8 +779,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..5] {
-                tx.execute_batch(sql).expect("migration");
+            for migration in &MIGRATIONS[..5] {
+                tx.execute_batch(migration.sql).expect("migration");
             }
             tx.pragma_update(None, "user_version", 5).expect("pragma");
             tx.execute(
@@ -673,8 +815,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..7] {
-                tx.execute_batch(sql).expect("migration");
+            for migration in &MIGRATIONS[..7] {
+                tx.execute_batch(migration.sql).expect("migration");
             }
             tx.pragma_update(None, "user_version", 7).expect("pragma");
             tx.execute(
@@ -717,8 +859,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..9] {
-                tx.execute_batch(sql).expect("migration");
+            for migration in &MIGRATIONS[..9] {
+                tx.execute_batch(migration.sql).expect("migration");
             }
             tx.pragma_update(None, "user_version", 9).expect("pragma");
             tx.execute(
@@ -754,8 +896,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..8] {
-                tx.execute_batch(sql).expect("migration");
+            for migration in &MIGRATIONS[..8] {
+                tx.execute_batch(migration.sql).expect("migration");
             }
             tx.pragma_update(None, "user_version", 8).expect("pragma");
             tx.execute(
@@ -795,8 +937,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..10] {
-                tx.execute_batch(sql).expect("migration");
+            for migration in &MIGRATIONS[..10] {
+                tx.execute_batch(migration.sql).expect("migration");
             }
             tx.pragma_update(None, "user_version", 10).expect("pragma");
             tx.execute(
@@ -824,29 +966,33 @@ pub(crate) mod tests {
     #[test]
     fn relay_migration_is_v20_after_audio_profile_and_blocked_user() {
         assert!(MIGRATIONS.len() >= 22);
-        assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
-        assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
-        assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
-        assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
-        assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
+        assert!(MIGRATIONS[16].sql.contains("CREATE TABLE pm_conversation"));
+        assert!(
+            MIGRATIONS[17]
+                .sql
+                .contains("CREATE TABLE channel_audio_profile")
+        );
+        assert!(MIGRATIONS[18].sql.contains("CREATE TABLE blocked_user"));
+        assert!(MIGRATIONS[20].sql.contains("CREATE TABLE plugin "));
+        assert!(MIGRATIONS[19].sql.contains("CREATE TABLE relay_pin"));
     }
 
     /// The repository "Expected key" flag (v27) defaults to false for existing rows.
     #[test]
     fn expected_key_migration_defaults_to_false() {
         assert!(MIGRATIONS.len() >= 27);
-        assert!(MIGRATIONS[26].contains("expected_key_matched"));
-        assert!(MIGRATIONS[26].contains("DEFAULT 0"));
+        assert!(MIGRATIONS[26].sql.contains("expected_key_matched"));
+        assert!(MIGRATIONS[26].sql.contains("DEFAULT 0"));
     }
 
     /// The plugin trust tables (v25) come right after the file-card table (v24).
     #[test]
     fn plugin_trust_migration_creates_its_five_tables() {
         assert!(MIGRATIONS.len() >= 25);
-        assert!(MIGRATIONS[23].contains("CREATE TABLE file_card"));
+        assert!(MIGRATIONS[23].sql.contains("CREATE TABLE file_card"));
         // v26 (the AV1 self-test keyed by "Optimize for") comes after it.
-        assert!(MIGRATIONS[25].contains("optimize"));
-        let sql = MIGRATIONS[24];
+        assert!(MIGRATIONS[25].sql.contains("optimize"));
+        let sql = MIGRATIONS[24].sql;
         for table in [
             "plugin_origin_approval",
             "plugin_origin_counters",
@@ -864,8 +1010,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..19] {
-                tx.execute_batch(sql).expect("migration");
+            for migration in &MIGRATIONS[..19] {
+                tx.execute_batch(migration.sql).expect("migration");
             }
             tx.pragma_update(None, "user_version", 19).expect("pragma");
             tx.execute(
@@ -895,8 +1041,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..25] {
-                tx.execute_batch(sql).expect("migration");
+            for migration in &MIGRATIONS[..25] {
+                tx.execute_batch(migration.sql).expect("migration");
             }
             tx.pragma_update(None, "user_version", 25).expect("pragma");
             tx.execute(
@@ -937,7 +1083,7 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            tx.execute_batch(MIGRATIONS[0]).expect("v1");
+            tx.execute_batch(MIGRATIONS[0].sql).expect("v1");
             tx.pragma_update(None, "user_version", 1).expect("pragma");
             tx.execute(
                 "INSERT INTO saved_server (label, address, username, sort_order)
@@ -964,8 +1110,8 @@ pub(crate) mod tests {
         {
             let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
             let tx = conn.transaction().expect("tx");
-            for sql in &MIGRATIONS[..4] {
-                tx.execute_batch(sql).expect("old schema");
+            for migration in &MIGRATIONS[..4] {
+                tx.execute_batch(migration.sql).expect("old schema");
             }
             tx.pragma_update(None, "user_version", 4).expect("pragma");
             tx.execute_batch(
@@ -1023,12 +1169,15 @@ pub(crate) mod tests {
         assert_eq!(store.backfill_server_avatars(Some(b"x")).expect("again"), 0);
     }
 
-    /// A profile a newer Mumcord already upgraded, closed cleanly as that app leaves it.
+    /// A profile a newer Mumcord already upgraded with a breaking migration, closed cleanly as
+    /// that app leaves it.
     fn newer_profile(dir: &Path) -> std::path::PathBuf {
         drop(Store::open(dir).expect("open"));
         let path = dir.join(DB_FILE_NAME);
         let conn = Connection::open(&path).expect("open");
         conn.pragma_update(None, "user_version", MIGRATIONS.len() as i64 + 4)
+            .expect("pragma");
+        conn.pragma_update(None, "application_id", MIGRATIONS.len() as i64 + 2)
             .expect("pragma");
         drop(conn);
         path
@@ -1075,6 +1224,8 @@ pub(crate) mod tests {
             .expect("pragma");
         conn.pragma_update(None, "user_version", MIGRATIONS.len() as i64 + 1)
             .expect("pragma");
+        conn.pragma_update(None, "application_id", MIGRATIONS.len() as i64 + 1)
+            .expect("pragma");
         assert!(matches!(
             check_schema(dir.path()),
             Err(Error::SchemaTooNew { .. })
@@ -1109,5 +1260,188 @@ pub(crate) mod tests {
             Store::open(dir.path()),
             Err(Error::SchemaTooNew { found: 99, .. })
         ));
+    }
+
+    #[test]
+    fn only_v26_is_breaking_so_the_minimum_reader_is_26() {
+        let breaking: Vec<usize> = MIGRATIONS
+            .iter()
+            .enumerate()
+            .filter(|(_, m)| m.change == Change::Breaking)
+            .map(|(index, _)| index + 1)
+            .collect();
+        assert_eq!(breaking, [26]);
+        assert_eq!(min_reader_version(1), 1);
+        assert_eq!(min_reader_version(25), 1);
+        assert_eq!(min_reader_version(26), 26);
+        assert_eq!(min_reader_version(MIGRATIONS.len()), 26);
+    }
+
+    /// The CI check for migration authors (`docs/profile-database.md`): a migration marked
+    /// additive may only create tables and indexes, add columns and fill columns it added.
+    /// Anything else must be marked breaking.
+    #[test]
+    fn additive_migrations_only_add() {
+        for (index, migration) in MIGRATIONS.iter().enumerate() {
+            if migration.change == Change::Breaking {
+                continue;
+            }
+            let code: String = migration
+                .sql
+                .lines()
+                .map(|line| line.split("--").next().unwrap_or_default())
+                .collect::<Vec<_>>()
+                .join(" ");
+            for statement in code.split(';') {
+                let words: Vec<String> = statement
+                    .split_whitespace()
+                    .take(5)
+                    .map(str::to_ascii_uppercase)
+                    .collect();
+                let words: Vec<&str> = words.iter().map(String::as_str).collect();
+                let allowed = match words.as_slice() {
+                    [] | ["CREATE", "TABLE", ..] | ["CREATE", "INDEX", ..] => true,
+                    ["CREATE", "UNIQUE", "INDEX", ..] => true,
+                    ["ALTER", "TABLE", _, "ADD", "COLUMN"] => true,
+                    ["UPDATE", table, "SET", column, ..] => migration.sql.contains(&format!(
+                        "ALTER TABLE {} ADD COLUMN {} ",
+                        table.to_ascii_lowercase(),
+                        column.to_ascii_lowercase()
+                    )),
+                    _ => false,
+                };
+                assert!(
+                    allowed,
+                    "v{} is marked additive but runs `{}`; mark it breaking",
+                    index + 1,
+                    statement.trim()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn opening_records_the_minimum_reader_version() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        drop(Store::open(dir.path()).expect("open"));
+        let path = dir.path().join(DB_FILE_NAME);
+        let id = |conn: &Connection| -> i64 {
+            conn.query_row("PRAGMA application_id", [], |row| row.get(0))
+                .expect("pragma")
+        };
+        let conn = Connection::open(&path).expect("open");
+        assert_eq!(id(&conn), 26);
+        // A profile last migrated before #521 gets it on the next open.
+        conn.pragma_update(None, "application_id", 0)
+            .expect("pragma");
+        drop(conn);
+        drop(Store::open(dir.path()).expect("open"));
+        assert_eq!(id(&Connection::open(&path).expect("open")), 26);
+    }
+
+    #[test]
+    fn a_newer_profile_from_before_the_minimum_was_recorded_is_rejected() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = newer_profile(dir.path());
+        let conn = Connection::open(&path).expect("open");
+        conn.pragma_update(None, "application_id", 0)
+            .expect("pragma");
+        drop(conn);
+        assert!(matches!(
+            check_schema(dir.path()),
+            Err(Error::SchemaTooNew { .. })
+        ));
+    }
+
+    /// Every row of `table`, each column quoted as SQL, so values compare byte for byte.
+    fn dump(conn: &Connection, table: &str) -> Vec<String> {
+        let columns: Vec<String> = conn
+            .prepare(&format!("SELECT name FROM pragma_table_info('{table}')"))
+            .expect("prepare")
+            .query_map([], |row| row.get(0))
+            .expect("query")
+            .collect::<rusqlite::Result<_>>()
+            .expect("columns");
+        let quoted: Vec<String> = columns.iter().map(|c| format!("quote({c})")).collect();
+        conn.prepare(&format!(
+            "SELECT {} FROM {table} ORDER BY rowid",
+            quoted.join(" || '|' || ")
+        ))
+        .expect("prepare")
+        .query_map([], |row| row.get(0))
+        .expect("query")
+        .collect::<rusqlite::Result<_>>()
+        .expect("rows")
+    }
+
+    /// Acceptance criteria of issue #521: an app opens a profile from a newer app whose later
+    /// migrations were all additive, works with it, and leaves the newer data untouched.
+    #[test]
+    fn an_additive_newer_profile_opens_and_keeps_the_newer_data() {
+        use crate::history::{Conversation, NewChatMessage};
+        use crate::servers::NewServer;
+
+        let dir = tempfile::tempdir().expect("tempdir");
+        let store = Store::open(dir.path()).expect("open");
+        let server = store
+            .add_server(&NewServer::new("Home", "localhost", "alice"))
+            .expect("server");
+        drop(store);
+
+        // A newer Mumcord adds a table, a column and settings this app does not know.
+        let path = dir.path().join(DB_FILE_NAME);
+        let newer = MIGRATIONS.len() as i64 + 3;
+        let conn = Connection::open(&path).expect("open");
+        conn.execute_batch(
+            "CREATE TABLE future_thing (id INTEGER PRIMARY KEY, payload BLOB NOT NULL);
+             INSERT INTO future_thing (payload) VALUES (x'00ff10'), (zeroblob(3));
+             ALTER TABLE saved_server ADD COLUMN future_color TEXT;
+             UPDATE saved_server SET future_color = 'teal';
+             INSERT INTO settings (id, data) VALUES (1,
+                 '{\"wizard_completed\":true,\"theme\":\"neon\",\"future_flag\":{\"a\":1}}');",
+        )
+        .expect("newer schema");
+        conn.pragma_update(None, "user_version", newer)
+            .expect("pragma");
+        drop(conn);
+
+        check_schema(dir.path()).expect("additive changes are readable");
+        let store = Store::open(dir.path()).expect("open");
+        assert_eq!(store.schema_version().expect("version"), newer);
+        let mut saved = store.servers().expect("servers").remove(0);
+        saved.label = "Renamed".into();
+        store.update_server(&saved).expect("update");
+        let message = NewChatMessage {
+            conversation: Conversation::Channel("Root".into()),
+            sender_name: "alice".into(),
+            sender_cert_hash: None,
+            sent_at: 1,
+            body: "hi".into(),
+        };
+        assert!(store.append_message(server.id, &message).expect("append"));
+        let mut settings = store.settings().expect("settings");
+        assert!(settings.wizard_completed);
+        settings.wizard_completed = false;
+        store.save_settings(&settings).expect("save");
+        drop(store);
+
+        // The newer app finds its data unchanged.
+        let conn = Connection::open(&path).expect("open");
+        let versions = stored_versions(&conn).expect("versions");
+        assert_eq!((versions.schema, versions.min_reader), (newer, 26));
+        assert_eq!(dump(&conn, "future_thing"), ["1|X'00FF10'", "2|X'000000'"]);
+        let color: String = conn
+            .query_row("SELECT future_color FROM saved_server", [], |row| {
+                row.get(0)
+            })
+            .expect("column");
+        assert_eq!(color, "teal");
+        let data: String = conn
+            .query_row("SELECT data FROM settings", [], |row| row.get(0))
+            .expect("settings");
+        let data: serde_json::Value = serde_json::from_str(&data).expect("json");
+        assert_eq!(data["theme"], "neon");
+        assert_eq!(data["future_flag"], serde_json::json!({ "a": 1 }));
+        assert_eq!(data["wizard_completed"], false);
     }
 }

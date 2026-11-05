@@ -109,16 +109,18 @@ mod tests {
     use super::*;
     use mumcord_engine::store::{DB_FILE_NAME, Store};
 
+    /// A profile a newer Mumcord upgraded with a breaking migration.
     fn newer_profile(dir: &Path) -> i64 {
         let supported = Store::open(dir)
             .and_then(|store| store.schema_version())
             .expect("current profile");
-        // The closed database holds everything in its file; `user_version` is the big-endian
-        // header field at byte 60.
+        // The closed database holds everything in its file; `user_version` and the minimum
+        // reader version (`application_id`) are big-endian header fields at bytes 60 and 68.
         let path = dir.join(DB_FILE_NAME);
         let mut bytes = std::fs::read(&path).expect("read");
         let found = i32::try_from(supported + 4).expect("small version");
         bytes[60..64].copy_from_slice(&found.to_be_bytes());
+        bytes[68..72].copy_from_slice(&(found - 1).to_be_bytes());
         std::fs::write(&path, bytes).expect("write");
         supported
     }
