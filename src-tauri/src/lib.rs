@@ -340,6 +340,19 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::p2p_consent_decide,
             commands::p2p::relay_info,
             commands::p2p::camera_unavailable,
+            commands::camera::camera_devices,
+            commands::camera::camera_view,
+            commands::camera::camera_preview_start,
+            commands::camera::camera_turn_on,
+            commands::camera::camera_turn_off,
+            commands::camera::camera_local_preview_start,
+            commands::camera::camera_local_preview_stop,
+            commands::camera::camera_set_device,
+            commands::camera::camera_set_background,
+            commands::camera::camera_set_effect_quality,
+            commands::camera::camera_effects,
+            commands::camera::camera_preview_attach,
+            commands::camera::camera_preview_detach,
             commands::p2p::p2p_link,
             commands::p2p::relay_trust_new,
             commands::p2p::relay_keep_blocked,
@@ -446,6 +459,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::DirectConsentRequired,
             commands::p2p::RelayChanged,
             commands::p2p::CameraAvailabilityChanged,
+            commands::camera::CameraChanged,
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
@@ -620,12 +634,17 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let data_dir = portable::data_dir(app)?;
     let logs_dir = portable::log_dir(app)?;
     std::fs::create_dir_all(&data_dir)?;
-    std::fs::create_dir_all(&logs_dir)?;
 
+    // Engine start-up already logs (e.g. the encoder probe), but the log level lives in the
+    // profile and a too-new profile must be rejected before anything is written: keep lines in
+    // memory until the profile is open.
+    if let Err(e) = diag::init_early() {
+        eprintln!("early logging unavailable: {e}");
+    }
     let runtime = tauri::async_runtime::handle().inner().clone();
     let (engine, mut events) = Engine::new(&data_dir, SecretStore::os(), runtime)?;
     let stored = engine.settings()?;
-    if let Err(e) = diag::init(&logs_dir, settings::diag_level(stored.log_level), 7) {
+    if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {
         eprintln!("file logging unavailable: {e}");
     }
     tracing::info!(
@@ -654,6 +673,13 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let screen_frames = std::sync::Arc::new(screen_frames::ScreenFrames::default());
     engine.set_screen_frame_sink(screen_frames.clone());
     app.manage(screen_frames);
+    app.manage(std::sync::Arc::new(
+        commands::camera::CameraPreview::default(),
+    ));
+    match app.path().resource_dir() {
+        Ok(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
+        Err(e) => tracing::warn!(error = %e, "no resource folder for the camera backgrounds"),
+    }
     now_playing::start(engine.clone());
     now_gaming::start(engine.clone());
     start_plugin_host(app, &engine, &data_dir, &stored.enabled_plugins);
@@ -1033,8 +1059,10 @@ fn emit_engine_event(
             }
             .emit(app)
         }
-        // The camera's commands and events come with G-1 (spec 08).
-        EngineEvent::CameraChanged(_) => Ok(()),
+        EngineEvent::CameraChanged(view) => {
+            commands::camera::CameraChanged { view: view.into() }.emit(app)
+        }
+        EngineEvent::CameraRoomChanged(_) => Ok(()),
     }
 }
 

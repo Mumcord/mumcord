@@ -92,7 +92,7 @@ jobs:
 
       # The runner's Ubuntu mirror is often very slow, so the downloaded packages are cached per
       # runner image and only main saves them; PRs restore read-only.
-      - name: apt cache key 
+      - name: apt cache key
         id: apt
         if: runner.os == 'Linux'
         run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
@@ -195,7 +195,6 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: release
-          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - uses: actions/setup-node@v7
         with:
@@ -607,7 +606,6 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: smoke
-          save-if: ${{ github.ref == 'refs/heads/main' }}
           workspaces: |
             . -> target
             scripts/smoke/seed -> target
