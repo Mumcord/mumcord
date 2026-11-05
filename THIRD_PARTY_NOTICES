@@ -1458,18 +1458,6 @@ modified.
    limitations under the License.
 
 --------------------------------------------------------------------------------
-Mumcord camera background images
---------------------------------------------------------------------------------
-
-License: AGPL-3.0-only
-Repository: https://github.com/Mumcord/mumcord
-
-The six built-in camera background images (Soft light, Library, Mountains, Studio,
-Night city, Beach) are Mumcord's own work: drawn from simple shapes by
-assets/backgrounds/generate.py and covered by Mumcord's own licence. They contain
-no third-party artwork, photos or fonts.
-
---------------------------------------------------------------------------------
 ONNX Runtime 1.23.2
 --------------------------------------------------------------------------------
 
