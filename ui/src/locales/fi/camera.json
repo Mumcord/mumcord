@@ -53,18 +53,29 @@
     "effectsUnavailable": "Taustatehosteet eivät ole käytettävissä tällä tietokoneella: {{reason}}",
     "levelBest": "Paras",
     "levelLight": "Kevyt",
-    "blurStrengthValue": "{{value}} / 100",
     "imageYoursNumbered": "Oma kuvasi {{number}}",
     "errorUseNotAllowed": "Tämän palvelimen välityspalvelin ei salli kameran jakamista.",
     "errorRelayDown": "Kameraa ei voitu käynnistää: välityspalvelin ei ole tavoitettavissa."
   },
   "backgrounds": {
-    "beach": "Ranta",
-    "mountains": "Vuoret",
-    "nightCity": "Yökaupunki",
-    "softLight": "Pehmeä valo",
-    "studio": "Studio",
-    "library": "Kirjasto"
+    "abstractWarmWaves": "Lämpimät valoaallot",
+    "blueMagentaWaves": "Siniset ja magentat aallot",
+    "glossyWavesOrb": "Kiiltävät aallot",
+    "pixelMountainSunset": "Pikselivuoriston auringonlasku",
+    "cityBalconyNight": "Kaupunkiparveke yöllä",
+    "modernWc": "Moderni WC",
+    "electronicsLab": "Elektroniikkalaboratorio",
+    "serverCorridor": "Palvelinkäytävä",
+    "neonGamingRoom": "Neonvalaistu pelihuone",
+    "neonNerdRoom": "Neonvalaistu nörttihuone",
+    "pixelGamingRoomCat": "Pikselipelihuone ja kissa",
+    "reefAquariumRoom": "Huone ja riutta-akvaario",
+    "nightModelRailway": "Pienoisrautatie yöllä",
+    "modelRailwayViaduct": "Rautatiesillan dioraama",
+    "spaceshipBridgeCat": "Avaruusaluksen komentosilta ja kissa",
+    "spaceStationEarth": "Avaruusasema Maan yllä",
+    "scifiRoomGoldenValley": "Scifi-huone ja kultainen laakso",
+    "underwaterBaseWhale": "Vedenalainen tukikohta ja valas"
   },
   "noCameraFound": "Kameraa ei löytynyt. Liitä kamera, niin se näkyy tässä.",
   "imageImportFailed": "Tätä kuvaa ei voi käyttää. Käytä PNG-, JPEG- tai WebP-tiedostoa, enintään 10 Mt.",
@@ -100,7 +111,11 @@
     "live": "Kamerasi on livenä",
     "stopped": "Kamerasi pysähtyi",
     "joined": "{{name}} laittoi kameransa päälle",
-    "left": "{{name}} sammutti kameransa"
+    "left": "{{name}} sammutti kameransa",
+    "turnedOn_one": "{{names}} laittoi kameransa päälle",
+    "turnedOn_other": "{{names}} laittoivat kameransa päälle",
+    "turnedOff_one": "{{names}} sulki kameransa",
+    "turnedOff_other": "{{names}} sulkivat kameransa"
   },
   "room": {
     "title": "Kamerahuone",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} kamera päällä",
     "cameras": "Kamerat",
     "label_other": "Kamerahuone, {{count}} kameraa päällä",
-    "miniBar_other": "{{count}} kameraa päällä"
+    "miniBar_other": "{{count}} kameraa päällä",
+    "fullTitle": "Huone on täynnä 9 kameralla"
   },
   "position": {
     "label": "Kamerat",
@@ -156,7 +172,8 @@
     "retry": "Yritä uudelleen",
     "hidden": "Video piilotettu",
     "showVideo": "Näytä video",
-    "viewing": "Katselet"
+    "viewing": "Katselet",
+    "weak": "Heikko yhteys"
   },
   "tileMenu": {
     "pin": "Kiinnitä minulle",

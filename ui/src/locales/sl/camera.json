@@ -53,18 +53,29 @@
     "effectsUnavailable": "Učinki ozadja na tem računalniku niso na voljo: {{reason}}",
     "levelBest": "Najboljša",
     "levelLight": "Lahka",
-    "blurStrengthValue": "{{value}} od 100",
     "imageYoursNumbered": "Tvoja slika {{number}}",
     "errorUseNotAllowed": "Relej tega strežnika ne dovoljuje deljenja kamere.",
     "errorRelayDown": "Kamere ni bilo mogoče zagnati: relej ni dosegljiv."
   },
   "backgrounds": {
-    "beach": "Plaža",
-    "mountains": "Gore",
-    "nightCity": "Nočno mesto",
-    "softLight": "Mehka svetloba",
-    "studio": "Studio",
-    "library": "Knjižnica"
+    "abstractWarmWaves": "Topli svetlobni valovi",
+    "blueMagentaWaves": "Modri in magenta valovi",
+    "glossyWavesOrb": "Bleščeči valovi",
+    "pixelMountainSunset": "Pikselni sončni zahod v gorah",
+    "cityBalconyNight": "Mestni balkon ponoči",
+    "modernWc": "Sodobno stranišče",
+    "electronicsLab": "Elektronski laboratorij",
+    "serverCorridor": "Hodnik s strežniki",
+    "neonGamingRoom": "Neonska igralna soba",
+    "neonNerdRoom": "Neonska soba za piflarje",
+    "pixelGamingRoomCat": "Pikselna igralna soba z mačko",
+    "reefAquariumRoom": "Soba z grebenskim akvarijem",
+    "nightModelRailway": "Maketa železnice ponoči",
+    "modelRailwayViaduct": "Diorama z železniškim viaduktom",
+    "spaceshipBridgeCat": "Poveljniški most vesoljske ladje z mačko",
+    "spaceStationEarth": "Vesoljska postaja nad Zemljo",
+    "scifiRoomGoldenValley": "Znanstvenofantastična soba z zlato dolino",
+    "underwaterBaseWhale": "Podvodna baza s kitom"
   },
   "noCameraFound": "Kamere ni bilo mogoče najti. Priklopi kamero in prikazala se bo tukaj.",
   "imageImportFailed": "Te slike ni mogoče uporabiti. Uporabi datoteko PNG, JPEG ali WebP do 10 MB.",
@@ -100,7 +111,15 @@
     "live": "Tvoja kamera je v živo",
     "stopped": "Tvoja kamera se je ustavila",
     "joined": "{{name}} je vklopil(a) kamero",
-    "left": "{{name}} je izklopil(a) kamero"
+    "left": "{{name}} je izklopil(a) kamero",
+    "turnedOn_one": "{{names}} je vklopil(a) kamero",
+    "turnedOn_two": "{{names}} sta vklopila kameri",
+    "turnedOn_few": "{{names}} so vklopili kamere",
+    "turnedOn_other": "{{names}} so vklopili kamere",
+    "turnedOff_one": "{{names}} je izklopil(a) kamero",
+    "turnedOff_two": "{{names}} sta izklopila kameri",
+    "turnedOff_few": "{{names}} so izklopili kamere",
+    "turnedOff_other": "{{names}} so izklopili kamere"
   },
   "room": {
     "title": "Soba s kamerami",
@@ -143,7 +162,8 @@
     "miniBar_two": "{{count}} vklopljeni kameri",
     "miniBar_few": "{{count}} vklopljene kamere",
     "miniBar_other": "{{count}} vklopljenih kamer",
-    "cameras": "Kamere"
+    "cameras": "Kamere",
+    "fullTitle": "Soba je polna pri 9 kamerah"
   },
   "position": {
     "label": "Kamere",
@@ -166,7 +186,8 @@
     "retry": "Poskusi znova",
     "hidden": "Video skrit",
     "showVideo": "Pokaži video",
-    "viewing": "Gledaš"
+    "viewing": "Gledaš",
+    "weak": "Šibka povezava"
   },
   "tileMenu": {
     "pin": "Pripni zame",

@@ -53,18 +53,29 @@
     "effectsUnavailable": "Fona efekti šajā datorā nav pieejami: {{reason}}",
     "levelBest": "Labākā",
     "levelLight": "Viegla",
-    "blurStrengthValue": "{{value}} no 100",
     "imageYoursNumbered": "Tavs attēls {{number}}",
     "errorUseNotAllowed": "Šī servera relejs neļauj kopīgot kameru.",
     "errorRelayDown": "Kameru neizdevās startēt: relejs nav sasniedzams."
   },
   "backgrounds": {
-    "beach": "Pludmale",
-    "mountains": "Kalni",
-    "nightCity": "Nakts pilsēta",
-    "softLight": "Maiga gaisma",
-    "studio": "Studija",
-    "library": "Bibliotēka"
+    "abstractWarmWaves": "Siltas gaismas viļņi",
+    "blueMagentaWaves": "Zili un fuksīna viļņi",
+    "glossyWavesOrb": "Spīdīgi viļņi",
+    "pixelMountainSunset": "Pikseļu saulriets kalnos",
+    "cityBalconyNight": "Pilsētas balkons naktī",
+    "modernWc": "Moderna tualete",
+    "electronicsLab": "Elektronikas laboratorija",
+    "serverCorridor": "Serveru koridors",
+    "neonGamingRoom": "Neona spēļu istaba",
+    "neonNerdRoom": "Neona nūģu istaba",
+    "pixelGamingRoomCat": "Pikseļu spēļu istaba ar kaķi",
+    "reefAquariumRoom": "Istaba ar rifa akvāriju",
+    "nightModelRailway": "Dzelzceļa makets naktī",
+    "modelRailwayViaduct": "Dzelzceļa viadukta diorāma",
+    "spaceshipBridgeCat": "Kosmosa kuģa tiltiņš ar kaķi",
+    "spaceStationEarth": "Kosmosa stacija virs Zemes",
+    "scifiRoomGoldenValley": "Zinātniskās fantastikas istaba ar zelta ieleju",
+    "underwaterBaseWhale": "Zemūdens bāze ar vali"
   },
   "noCameraFound": "Kamera nav atrasta. Pievieno kameru, un tā parādīsies šeit.",
   "imageImportFailed": "Šo attēlu nevar izmantot. Izmanto PNG, JPEG vai WebP failu līdz 10 MB.",
@@ -100,7 +111,13 @@
     "live": "Tava kamera ir tiešraidē",
     "stopped": "Tava kamera apstājās",
     "joined": "{{name}} ieslēdza savu kameru",
-    "left": "{{name}} izslēdza savu kameru"
+    "left": "{{name}} izslēdza savu kameru",
+    "turnedOn_zero": "{{names}} ieslēdza savas kameras",
+    "turnedOn_one": "{{names}} ieslēdza savu kameru",
+    "turnedOn_other": "{{names}} ieslēdza savas kameras",
+    "turnedOff_zero": "{{names}} izslēdza savas kameras",
+    "turnedOff_one": "{{names}} izslēdza savu kameru",
+    "turnedOff_other": "{{names}} izslēdza savas kameras"
   },
   "room": {
     "title": "Kameru istaba",
@@ -138,7 +155,8 @@
     "miniBar_one": "{{count}} kamera ieslēgta",
     "cameras": "Kameras",
     "label_other": "Kameru istaba, {{count}} kameras ieslēgtas",
-    "miniBar_other": "{{count}} kameras ieslēgtas"
+    "miniBar_other": "{{count}} kameras ieslēgtas",
+    "fullTitle": "Telpa ir pilna ar 9 kamerām"
   },
   "position": {
     "label": "Kameras",
@@ -161,7 +179,8 @@
     "retry": "Mēģināt vēlreiz",
     "hidden": "Video paslēpts",
     "showVideo": "Rādīt video",
-    "viewing": "Skaties"
+    "viewing": "Skaties",
+    "weak": "Vājš savienojums"
   },
   "tileMenu": {
     "pin": "Piespraust man",

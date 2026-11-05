@@ -53,18 +53,29 @@
     "effectsUnavailable": "Bakgrundseffekter är inte tillgängliga på den här datorn: {{reason}}",
     "levelBest": "Bäst",
     "levelLight": "Lätt",
-    "blurStrengthValue": "{{value}} av 100",
     "imageYoursNumbered": "Din bild {{number}}",
     "errorUseNotAllowed": "Serverns relä tillåter inte kameradelning.",
     "errorRelayDown": "Kameran kunde inte startas: reläet kan inte nås."
   },
   "backgrounds": {
-    "beach": "Strand",
-    "mountains": "Berg",
-    "nightCity": "Stad på natten",
-    "softLight": "Mjukt ljus",
-    "studio": "Studio",
-    "library": "Bibliotek"
+    "abstractWarmWaves": "Varma ljusvågor",
+    "blueMagentaWaves": "Blå och magenta vågor",
+    "glossyWavesOrb": "Glansiga vågor",
+    "pixelMountainSunset": "Pixlad solnedgång i bergen",
+    "cityBalconyNight": "Stadsbalkong på natten",
+    "modernWc": "Modern toalett",
+    "electronicsLab": "Elektroniklabb",
+    "serverCorridor": "Serverkorridor",
+    "neonGamingRoom": "Neonupplyst spelrum",
+    "neonNerdRoom": "Neonupplyst nördrum",
+    "pixelGamingRoomCat": "Pixlat spelrum med katt",
+    "reefAquariumRoom": "Rum med revakvarium",
+    "nightModelRailway": "Modelljärnväg på natten",
+    "modelRailwayViaduct": "Diorama med järnvägsviadukt",
+    "spaceshipBridgeCat": "Rymdskeppsbrygga med katt",
+    "spaceStationEarth": "Rymdstation ovanför jorden",
+    "scifiRoomGoldenValley": "Sci-fi-rum med gyllene dal",
+    "underwaterBaseWhale": "Undervattensbas med val"
   },
   "noCameraFound": "Ingen kamera hittades. Anslut en kamera så visas den här.",
   "imageImportFailed": "Den här bilden kan inte användas. Använd en PNG-, JPEG- eller WebP-fil på upp till 10 MB.",
@@ -100,7 +111,11 @@
     "live": "Din kamera är live",
     "stopped": "Din kamera stoppades",
     "joined": "{{name}} slog på sin kamera",
-    "left": "{{name}} stängde av sin kamera"
+    "left": "{{name}} stängde av sin kamera",
+    "turnedOn_one": "{{names}} slog på sin kamera",
+    "turnedOn_other": "{{names}} slog på sina kameror",
+    "turnedOff_one": "{{names}} stängde av sin kamera",
+    "turnedOff_other": "{{names}} stängde av sina kameror"
   },
   "room": {
     "title": "Kamerarum",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} kamera på",
     "cameras": "Kameror",
     "label_other": "Kamerarum, {{count}} kameror på",
-    "miniBar_other": "{{count}} kameror på"
+    "miniBar_other": "{{count}} kameror på",
+    "fullTitle": "Rummet är fullt vid 9 kameror"
   },
   "position": {
     "label": "Kameror",
@@ -156,7 +172,8 @@
     "retry": "Försök igen",
     "hidden": "Video dold",
     "showVideo": "Visa video",
-    "viewing": "Tittar"
+    "viewing": "Tittar",
+    "weak": "Svag anslutning"
   },
   "tileMenu": {
     "pin": "Fäst för mig",
