@@ -20,6 +20,7 @@ const DOCKED: MediaPopoutState = {
   watch: { target: null, onTop: false },
   share: { target: null, onTop: false },
   stage: { target: null, onTop: false },
+  camera: { target: null, onTop: false },
 };
 
 let state: MediaPopoutState = DOCKED;
