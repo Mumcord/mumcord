@@ -192,7 +192,7 @@ async function press(label: string): Promise<void> {
 /**
  * A presses `label` and waits for a new "<action>: sent #<seq> <size> B"; returns the sequence
  * number, so B can wait for exactly that message. A refused send also takes a number, so the new
- * one is only known to be higher than any before.
+ * one is only known to be higher than any before; a refusal fails with the plugin's error name.
  */
 async function send(label: string, action: string, size: number): Promise<number> {
   const before = await lastSeq();
@@ -208,8 +208,11 @@ async function send(label: string, action: string, size: number): Promise<number
       },
       { timeout: 30_000, interval: 250 },
     )
-    .catch(() => {
-      throw new Error(`${label}: no "${action}: sent" line after #${String(before)}`);
+    .catch(async () => {
+      // The plugin logs a refused send by its host error name; show it instead of only "no sent".
+      const results = (await panelText()).match(new RegExp(`^${action}: .*$`, "gm")) ?? [];
+      const last = results.at(-1) ?? "nothing logged";
+      throw new Error(`${label}: no "${action}: sent" line after #${String(before)}; last result: ${last}`);
     });
   return seq;
 }
@@ -226,24 +229,6 @@ async function refused(label: string, action: string, error: string): Promise<vo
 /** B waits for A's message `seq` of `size` bytes, decoded intact. */
 async function bReceives(seq: number, size: number): Promise<void> {
   await apps.onB(() => waitPanel(`received #${String(seq)} ${String(size)} B intact from Alice`, 45_000));
-}
-
-/**
- * A sends 64 KiB to the channel until B receives one; returns its sequence number. The first
- * channel send only starts A's broadcast, and a receiver admitted at a send binds afterwards, so
- * the messages sent before B has joined are lost for B by design (FR-9.60: best effort, lowest
- * priority; crates/engine/src/plugin_relay/broadcast.rs). Once one arrives, B has joined.
- */
-async function bJoinsBroadcast(tries = 6): Promise<number> {
-  for (let i = 1; i <= tries; i++) {
-    const seq = await send("Channel 64 KiB", "channel-big", BIG);
-    const arrived = await apps
-      .onB(() => waitPanel(`received #${String(seq)} ${String(BIG)} B intact from Alice`, 15_000))
-      .then(() => true)
-      .catch(() => false);
-    if (arrived) return seq;
-  }
-  throw new Error(`B never joined A's plugin-data broadcast after ${String(tries)} channel sends`);
 }
 
 /** Opens the Apps menu and chooses "Start Test Relay" (the click is the plugin's gesture). */
@@ -420,7 +405,7 @@ async function bothInChannel(): Promise<void> {
     });
 
     it("AC-9.18, AC-9.41: 64 KiB documents reach B through the relay, to the channel and 1:1", async () => {
-      await bJoinsBroadcast();
+      // The first channel send starts A's broadcast; it waits there and reaches B once B joins.
       const channel = await send("Channel 64 KiB", "channel-big", BIG);
       await bReceives(channel, BIG);
       const direct = await send("Direct 64 KiB", "direct-big", BIG);
@@ -499,8 +484,9 @@ async function bothInChannel(): Promise<void> {
         await joinVoice();
       });
       await bothInChannel();
-      // Back in the channel, B is admitted to the broadcast again at A's next send.
-      await bJoinsBroadcast();
+      // Back in the channel, B is admitted to the broadcast again with A's next send and gets it.
+      const back = await send("Channel 64 KiB", "channel-big", BIG);
+      await bReceives(back, BIG);
       await apps.onB(async () => {
         await openPanel();
         expect(await panelText()).not.toContain(`received #${String(missed)} `);
