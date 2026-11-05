@@ -550,7 +550,16 @@ fn handle(stream: TcpStream, registry: &Mutex<Registry>) -> Result<()> {
         _ => Response::text(405, "method not allowed\n"),
     };
     drop(registry);
-    eprintln!("{method} {path} {}", response.status);
+    // The full target and the body size, so the E2E capture (AC-9.38) sees everything a client
+    // sends besides its headers.
+    if content_length > 0 {
+        eprintln!(
+            "{method} {target} {} body={content_length}",
+            response.status
+        );
+    } else {
+        eprintln!("{method} {target} {}", response.status);
+    }
     response.write(&stream, method == "HEAD")?;
     close_gracefully(&stream, reader)
 }

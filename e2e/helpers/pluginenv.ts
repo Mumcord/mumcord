@@ -8,9 +8,9 @@
 //   ...
 //   await pluginenv.stopPluginFixtures();
 import { type ChildProcess, spawn } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { startHttpsFixture, type FixtureHit, type HttpsFixture } from "../fixtures/https/server.ts";
 import { repoRoot } from "./paths.ts";
 import { runOk } from "./run.ts";
@@ -42,6 +42,8 @@ export interface PluginFixtures {
   officialUrl?: string;
   /** Third-party `v1/index.json`; the `v1.1/index.json` sibling is next to it. */
   thirdPartyUrl?: string;
+  /** Public key of the third-party repository (it also signs the packages as their author). */
+  thirdPartyKey?: string;
   httpsOrigins?: {
     declared: string;
     undeclared: string;
@@ -56,10 +58,23 @@ interface Server {
   child: ChildProcess;
   base: string;
   key: string;
+  /** The folder the server lists packages from. */
+  packages: string;
+  /** Every request the server logged (`<METHOD> <path?query> <status>[ body=<bytes>]`), oldest first. */
+  requests: string[];
 }
 
+/** The repositories `publish` and `requests` take. */
+export type Repository = "official" | "third-party";
+
 let state:
-  { servers: Server[]; https?: HttpsFixture; dir: string; officialKey?: string } | undefined;
+  | {
+      servers: Server[];
+      https?: HttpsFixture;
+      dir: string;
+      officialKey?: string;
+    }
+  | undefined;
 let current: PluginFixtures = {};
 
 /** The CLI: `MUMCORD_PLUGIN_CLI`, else the debug build (built on first use). */
@@ -80,25 +95,51 @@ function builtPackages(folder: string): string | undefined {
   return root === undefined || root === "" ? undefined : join(root, "packages", folder);
 }
 
-function startServer(name: string, cli: string, args: string[], marker: RegExp): Promise<Server> {
+/**
+ * A package the registry script built (`<id>-<version>.mcplugin`), also those no repository serves
+ * from the start (newer versions for the update specs). Throws when the script was not run.
+ */
+export function stagedPackage(file: string): string {
+  const root = process.env.MUMCORD_E2E_PLUGIN_PACKAGES;
+  const path = root === undefined || root === "" ? undefined : join(root, "staged", file);
+  if (path === undefined || !existsSync(path)) throw new Error(`no built package ${file}`);
+  return path;
+}
+
+function startServer(
+  name: string,
+  cli: string,
+  args: string[],
+  marker: RegExp,
+  packages: string,
+): Promise<Server> {
   return new Promise((resolvePromise, reject) => {
     const child = spawn(cli, ["serve-registry", ...args, "--port", "0"], {
       stdio: ["ignore", "pipe", "pipe"],
     });
     let out = "";
     let err = "";
+    const requests: string[] = [];
+    let partial = "";
     const timer = setTimeout(() => {
       child.kill();
       reject(new Error(`serve-registry did not start in time\n${out}${err}`));
     }, START_TIMEOUT_MS);
-    child.stderr.on("data", (d: Buffer) => (err += d.toString()));
+    child.stderr.on("data", (d: Buffer) => {
+      err += d.toString();
+      // The server logs one line per request; keep them for `requests()` (AC-9.38).
+      const lines = (partial + d.toString()).split("\n");
+      partial = lines.pop() ?? "";
+      for (const line of lines)
+        if (/^[A-Z]+ \/\S* \d{3}( body=\d+)?$/.test(line)) requests.push(line);
+    });
     child.stdout.on("data", (d: Buffer) => {
       out += d.toString();
       const base = /(?:base|address) (http:\/\/127\.0\.0\.1:\d+\/)/.exec(out)?.[1];
       const key = marker.exec(out)?.[1];
       if (base !== undefined && key !== undefined) {
         clearTimeout(timer);
-        resolvePromise({ name, child, base, key });
+        resolvePromise({ name, child, base, key, packages, requests });
       }
     });
     child.on("error", reject);
@@ -138,6 +179,7 @@ export async function startPluginFixtures(options: PluginFixtureOptions): Promis
         cli,
         args,
         repository === undefined ? /MUMCORD_PLUGIN_REGISTRY_KEY=(\S+)/ : /repository key (\S+)/,
+        packages,
       );
       servers.push(server);
       return server;
@@ -150,6 +192,7 @@ export async function startPluginFixtures(options: PluginFixtureOptions): Promis
     if (options.thirdParty !== undefined) {
       const server = await launch("third-party", options.thirdParty, "repo", "E2E third-party");
       next.thirdPartyUrl = `${server.base}v1/index.json`;
+      next.thirdPartyKey = server.key;
     }
     if (options.https === true) {
       state.https = await startHttpsFixture();
@@ -180,18 +223,36 @@ export async function stopPluginFixtures(): Promise<void> {
   rmSync(old.dir, { recursive: true, force: true });
 }
 
+function server(repo: Repository): Server {
+  const found = state?.servers.find((s) => s.name === repo);
+  if (found === undefined) throw new Error(`the ${repo} repository is not running`);
+  return found;
+}
+
+/**
+ * Copies a package into a running repository and publishes it (the server rescans its folder and
+ * raises the index sequence), e.g. a newer version for the update specs.
+ */
+export async function publish(packageFile: string, repo: Repository): Promise<void> {
+  const target = server(repo);
+  copyFileSync(packageFile, join(target.packages, basename(packageFile)));
+  const response = await fetch(`${target.base}_ctl/reload`, { method: "POST" });
+  if (!response.ok) throw new Error(`publishing ${packageFile} failed: ${String(response.status)}`);
+}
+
+/** Every request a repository received so far (`<METHOD> <path?query> <status>[ body=<bytes>]`), oldest first. */
+export function requests(repo: Repository): string[] {
+  return [...server(repo).requests];
+}
+
 /**
  * Replaces the active failure scenarios of a running repository (`serve-registry --help`), e.g.
  * `setScenarios("third-party", [])` to serve its `v1.1` index again after `no-v1.1`.
  */
-export async function setScenarios(
-  repo: "official" | "third-party",
-  scenarios: string[],
-): Promise<void> {
-  const server = state?.servers.find((s) => s.name === repo);
-  if (server === undefined) throw new Error(`no ${repo} repository is running`);
+export async function setScenarios(repo: Repository, scenarios: string[]): Promise<void> {
+  const target = server(repo);
   // serve-registry reads the query raw (no percent-decoding); scenario names are URL-safe.
-  const response = await fetch(`${server.base}_ctl/scenario?set=${scenarios.join(",")}`, {
+  const response = await fetch(`${target.base}_ctl/scenario?set=${scenarios.join(",")}`, {
     method: "POST",
   });
   if (!response.ok) throw new Error(`scenario switch failed: HTTP ${String(response.status)}`);
