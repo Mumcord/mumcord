@@ -87,6 +87,7 @@
       "specs/files/guards.e2e.ts",
       "specs/misc/packet-inspector.e2e.ts",
       "specs/plugins/load.e2e.ts",
+      "specs/plugins/websites.e2e.ts",
       "specs/servers/password-modal.e2e.ts",
       "specs/voice/global-hotkeys.e2e.ts"
     ]
