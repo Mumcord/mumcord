@@ -22,28 +22,44 @@ enum Change {
     Breaking,
 }
 
+/// How an older app undoes a migration when it rolls a profile back (issue #521, see
+/// `docs/profile-database.md`). The step is stored in the profile when the migration runs,
+/// so an app that does not know the migration can still undo it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Down {
+    /// Restores the schema from before the migration. It may only drop what the migration
+    /// added, so only data written since then is lost.
+    Sql(&'static str),
+    /// Undoing it would lose data from before the migration, or certificate or identity data
+    /// an additive migration created. A profile that needs it undone is never rolled back.
+    Irreversible,
+}
+
 struct Migration {
     change: Change,
     sql: &'static str,
+    down: Down,
 }
 
-const fn additive(sql: &'static str) -> Migration {
+const fn additive(sql: &'static str, down: Down) -> Migration {
     Migration {
         change: Change::Additive,
         sql,
+        down,
     }
 }
 
-const fn breaking(sql: &'static str) -> Migration {
+const fn breaking(sql: &'static str, down: Down) -> Migration {
     Migration {
         change: Change::Breaking,
         sql,
+        down,
     }
 }
 
 /// Ordered schema migrations. Entry `n` upgrades the schema from version `n` to `n + 1`;
 /// the current version is kept in SQLite's `user_version`. Never edit a released
-/// migration – append a new one, marked [`additive`] or [`breaking`].
+/// migration – append a new one, marked [`additive`] or [`breaking`], with its [`Down`] step.
 const MIGRATIONS: &[Migration] = &[
     // v1: initial schema (spec section 7).
     additive(
@@ -98,6 +114,8 @@ const MIGRATIONS: &[Migration] = &[
         data TEXT    NOT NULL
     );
     ",
+        // The initial schema holds everything, trusted server certificates included.
+        Down::Irreversible,
     ),
     // v2: remember per server whether the default avatar was handled (FR-1.47).
     additive(
@@ -105,6 +123,7 @@ const MIGRATIONS: &[Migration] = &[
     ALTER TABLE saved_server ADD COLUMN default_avatar_sent INTEGER NOT NULL DEFAULT 0
         CHECK (default_avatar_sent IN (0, 1));
     ",
+        Down::Sql("ALTER TABLE saved_server DROP COLUMN default_avatar_sent;"),
     ),
     // v3: the user's last own mute/deafen choice, restored on an explicit join (QA.7). Kept
     // out of the settings JSON so saving settings from the UI can never overwrite it.
@@ -116,6 +135,7 @@ const MIGRATIONS: &[Migration] = &[
         deaf INTEGER NOT NULL CHECK (deaf IN (0, 1))
     );
     ",
+        Down::Sql("DROP TABLE own_voice;"),
     ),
     // v4: the channel the user is joined to for voice, kept when the app quits so the next
     // start can offer to rejoin it (QA.9). `last_channel` also follows the read-only default
@@ -124,6 +144,7 @@ const MIGRATIONS: &[Migration] = &[
         r"
     ALTER TABLE saved_server ADD COLUMN voice_channel TEXT;
     ",
+        Down::Sql("ALTER TABLE saved_server DROP COLUMN voice_channel;"),
     ),
     // v5: the avatar remembered per server (hand-set or the default avatar, as a scaled PNG),
     // sent again on connect when the server keeps none for the user (FR-1.20, QA.10).
@@ -136,6 +157,12 @@ const MIGRATIONS: &[Migration] = &[
         CHECK (avatar_backfill IN (0, 1));
     UPDATE saved_server SET avatar_backfill = 1 WHERE default_avatar_sent = 1;
     ",
+        Down::Sql(
+            r"
+            ALTER TABLE saved_server DROP COLUMN avatar_backfill;
+            ALTER TABLE saved_server DROP COLUMN avatar;
+            ",
+        ),
     ),
     // v6: preview cards the user dismissed (QA.42), per message and link; they go away with
     // the message. The timestamp index makes deleting old history an index range scan.
@@ -148,6 +175,12 @@ const MIGRATIONS: &[Migration] = &[
     );
     CREATE INDEX chat_message_sent_at ON chat_message (sent_at);
     ",
+        Down::Sql(
+            r"
+            DROP INDEX chat_message_sent_at;
+            DROP TABLE dismissed_preview;
+            ",
+        ),
     ),
     // v7: GIF favorites (FR-1.52, QA.43): saved image links the user can send again. The
     // image itself comes from the link-preview image cache, so only the link is stored.
@@ -160,6 +193,7 @@ const MIGRATIONS: &[Migration] = &[
     );
     CREATE INDEX gif_favorite_last_used ON gif_favorite (last_used_at DESC);
     ",
+        Down::Sql("DROP TABLE gif_favorite;"),
     ),
     // v8: private notes about people (FR-1.63), keyed like the person settings. Kept apart
     // from them because a note is free text and has nothing to do with playback.
@@ -172,6 +206,7 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (server_id, person_cert_hash)
     );
     ",
+        Down::Sql("DROP TABLE person_note;"),
     ),
     // v9: history sync between Mumcord clients (FR-1.60, QA.48): the display name of the
     // person whose history a channel message came from; NULL for messages received live.
@@ -179,6 +214,7 @@ const MIGRATIONS: &[Migration] = &[
         r"
     ALTER TABLE chat_message ADD COLUMN synced_from TEXT;
     ",
+        Down::Sql("ALTER TABLE chat_message DROP COLUMN synced_from;"),
     ),
     // v10: friends by certificate hash (FR-1.64), local only and across servers. Private
     // chats with a friend are read across servers (FR-1.65), so private history also gets an
@@ -194,6 +230,12 @@ const MIGRATIONS: &[Migration] = &[
     CREATE INDEX chat_message_by_key
         ON chat_message (conversation_kind, conversation_key, sent_at);
     ",
+        Down::Sql(
+            r"
+            DROP INDEX chat_message_by_key;
+            DROP TABLE friend;
+            ",
+        ),
     ),
     // v11: multi-server state (FR-2.3, FR-2.7, FR-2.10, FR-2.17). `connected_at_quit` is the
     // quit time of a server that was connected then (NULL otherwise); the most recent one
@@ -206,6 +248,15 @@ const MIGRATIONS: &[Migration] = &[
     ALTER TABLE saved_server ADD COLUMN notifications_muted INTEGER NOT NULL DEFAULT 0;
     ALTER TABLE saved_server ADD COLUMN theme_id TEXT;
     ",
+        Down::Sql(
+            r"
+            ALTER TABLE saved_server DROP COLUMN theme_id;
+            ALTER TABLE saved_server DROP COLUMN notifications_muted;
+            ALTER TABLE saved_server DROP COLUMN was_voice_server_at_quit;
+            ALTER TABLE saved_server DROP COLUMN connected_at_quit;
+            ALTER TABLE saved_server DROP COLUMN always_connect_at_start;
+            ",
+        ),
     ),
     // v12: when the user last cleared channel history (issue #119), so history sync does not
     // bring the deleted messages back from other people's copies. `server_id` NULL: all
@@ -218,6 +269,7 @@ const MIGRATIONS: &[Migration] = &[
         cleared_at  INTEGER NOT NULL
     );
     ",
+        Down::Sql("DROP TABLE history_cleared;"),
     ),
     // v13: non-secret details of the saved channel passwords (issue #146), by the token's
     // position in the server's token list in secure storage. `channels` is a JSON array of
@@ -233,6 +285,7 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (server_id, position)
     );
     ",
+        Down::Sql("DROP TABLE channel_token;"),
     ),
     // v14: several identities (issue #148). Certificates and keys stay in the OS secure
     // storage; this table holds the local label, the certificate's common name and hash, when
@@ -253,12 +306,15 @@ const MIGRATIONS: &[Migration] = &[
     ALTER TABLE saved_server ADD COLUMN identity_id INTEGER REFERENCES identity (id)
         ON DELETE SET NULL;
     ",
+        // Dropping `identity` would delete the identities' metadata.
+        Down::Irreversible,
     ),
     // v15: turning off `@all` / `@channel` mentions per server (issue #70, Q1.6).
     additive(
         r"
     ALTER TABLE saved_server ADD COLUMN group_mentions_muted INTEGER NOT NULL DEFAULT 0;
     ",
+        Down::Sql("ALTER TABLE saved_server DROP COLUMN group_mentions_muted;"),
     ),
     // v16: accepted private conversations (issue #141). Kept per own identity, keyed by the
     // own certificate hash, so the same person can message one identity but not another.
@@ -272,6 +328,7 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (own_cert_hash, cert_hash)
     );
     ",
+        Down::Sql("DROP TABLE accepted_conversation;"),
     ),
     // v17: pinned and muted private conversations in the private messages overview (issue
     // #173), by server and the other person's certificate hash. `muted_until` is Unix millis,
@@ -286,6 +343,7 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (server_id, cert_hash)
     );
     ",
+        Down::Sql("DROP TABLE pm_conversation;"),
     ),
     // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
     // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
@@ -302,6 +360,7 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (server_id, channel_id)
     );
     ",
+        Down::Sql("DROP TABLE channel_audio_profile;"),
     ),
     // v19: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218,
     // whose `channel_audio_profile` (v18, above) keeps its version number so the version
@@ -326,6 +385,7 @@ const MIGRATIONS: &[Migration] = &[
         ON blocked_user (own_cert_hash, server_id, name COLLATE NOCASE)
         WHERE cert_hash IS NULL;
     ",
+        Down::Sql("DROP TABLE blocked_user;"),
     ),
     // v20: mumpeer relay (spec 04). Lands after #218 (v18 `channel_audio_profile`) and #224
     // (v19 `blocked_user`), both on main above, so the version numbers match testers.
@@ -347,6 +407,8 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (server_id, identity_id)
     );
     ",
+        // `relay_pin` holds relay certificate pins.
+        Down::Irreversible,
     ),
     // v21: plugin system (Epic 3.1, spec 06 section 7.1). `plugin` is one row per installed
     // plugin; `removed_at` is set when it is removed with its data kept (purged after 30
@@ -414,6 +476,8 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (server_id, identity_id)
     );
     ",
+        // `plugin_sender_pin` holds certificate pins.
+        Down::Irreversible,
     ),
     // v22: a person's screen share sound gets its own volume, separate from their voice
     // (issue #333). Existing rows keep their voice volume; their share starts at 100 %.
@@ -422,6 +486,7 @@ const MIGRATIONS: &[Migration] = &[
     ALTER TABLE person_setting ADD COLUMN share_volume INTEGER NOT NULL DEFAULT 100
         CHECK (share_volume BETWEEN 0 AND 200);
     ",
+        Down::Sql("ALTER TABLE person_setting DROP COLUMN share_volume;"),
     ),
     // v23: screen share encoder probe results, one set per machine (spec 07, FR-7.55). `meta`
     // holds the driver and app version the results were measured with; a change of either
@@ -446,6 +511,13 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (resolution, fps)
     );
     ",
+        Down::Sql(
+            r"
+            DROP TABLE encoder_selftest;
+            DROP TABLE encoder_cache;
+            DROP TABLE encoder_cache_meta;
+            ",
+        ),
     ),
     // v24: how a file download ended, per chat message carrying the offer (spec 07, section
     // 7.2); it goes away with the message.
@@ -457,6 +529,7 @@ const MIGRATIONS: &[Migration] = &[
         path       TEXT
     );
     ",
+        Down::Sql("DROP TABLE file_card;"),
     ),
     // v25: plugin platform 1.1 trust data (spec 09, section 7.1). Origin approvals, per-day
     // request counters (kept 7 days), the first time a registry key was seen, per-version
@@ -499,6 +572,15 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (plugin_id, version)
     );
     ",
+        Down::Sql(
+            r"
+            DROP TABLE plugin_high_risk_confirmed;
+            DROP TABLE plugin_version_history;
+            DROP TABLE repo_key_first_seen;
+            DROP TABLE plugin_origin_counters;
+            DROP TABLE plugin_origin_approval;
+            ",
+        ),
     ),
     // v26: the software AV1 self-test also depends on "Optimize for" (spec 07, FR-7.56): Sharp
     // text costs about four times as much CPU, so a Balanced pass must not count for it. The
@@ -515,6 +597,24 @@ const MIGRATIONS: &[Migration] = &[
         PRIMARY KEY (resolution, fps, optimize)
     );
     ",
+        // Balanced results are what an app before v26 means by a result, so they are kept.
+        Down::Sql(
+            r"
+        CREATE TEMP TABLE encoder_selftest_down AS
+            SELECT resolution, fps, svt_selftest_ms FROM encoder_selftest
+            WHERE optimize = 'balanced';
+        DROP TABLE encoder_selftest;
+        CREATE TABLE encoder_selftest (
+            resolution     INTEGER NOT NULL,
+            fps            INTEGER NOT NULL,
+            svt_selftest_ms INTEGER NOT NULL,
+            PRIMARY KEY (resolution, fps)
+        );
+        INSERT INTO encoder_selftest (resolution, fps, svt_selftest_ms)
+            SELECT resolution, fps, svt_selftest_ms FROM temp.encoder_selftest_down;
+        DROP TABLE temp.encoder_selftest_down;
+        ",
+        ),
     ),
     // v27: whether the "Expected key" entered when a repository was added matched the pinned
     // key (FR-6.74), for the security score's trust factor. Existing repositories default to 0.
@@ -522,6 +622,7 @@ const MIGRATIONS: &[Migration] = &[
         r"
     ALTER TABLE plugin_repository ADD COLUMN expected_key_matched INTEGER NOT NULL DEFAULT 0;
     ",
+        Down::Sql("ALTER TABLE plugin_repository DROP COLUMN expected_key_matched;"),
     ),
     // v28: "Skip this version" in the plugin Updates tab (FR-9.83): the newest version the user
     // skipped per plugin. That version and older ones are no longer offered; a newer one is.
@@ -533,6 +634,7 @@ const MIGRATIONS: &[Migration] = &[
         skipped_at INTEGER NOT NULL
     );
     ",
+        Down::Sql("DROP TABLE plugin_skipped_update;"),
     ),
     // v29: plugins whose web content was turned off because Mumcord's window stopped answering
     // while one of their frames was open (FR-9.42). It stays off across restarts until the user
@@ -544,8 +646,26 @@ const MIGRATIONS: &[Migration] = &[
         disabled_at INTEGER NOT NULL
     );
     ",
+        Down::Sql("DROP TABLE plugin_web_disabled;"),
+    ),
+    // v30: the down step of every applied migration (issue #521), so an older app can roll a
+    // profile back past migrations it does not know. `sql` NULL: the migration is
+    // irreversible. Rows for v1–v30 are filled in from the code when this migration runs.
+    additive(
+        r"
+    CREATE TABLE migration_down (
+        version  INTEGER PRIMARY KEY,
+        breaking INTEGER NOT NULL CHECK (breaking IN (0, 1)),
+        sql      TEXT
+    );
+    ",
+        Down::Sql("DROP TABLE migration_down;"),
     ),
 ];
+
+/// The migration that creates `migration_down`. From here on every migration stores its down
+/// step as it runs.
+const DOWN_STEPS_VERSION: usize = 30;
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
 pub struct Store {
@@ -679,21 +799,199 @@ fn ensure_supported(stored: Versions) -> Result<()> {
 }
 
 /// Applies the pending migrations. A profile already past this app's schema is left exactly
-/// as it is: migrations never run backwards and newer tables and columns are not touched.
+/// as it is: migrations never run backwards on their own and newer tables and columns are not
+/// touched (see [`roll_back`] for the explicit way back).
 fn migrate(conn: &mut Connection) -> Result<()> {
     let stored = stored_versions(conn)?;
     ensure_supported(stored)?;
-    for (version, migration) in MIGRATIONS.iter().enumerate().skip(stored.schema as usize) {
-        let tx = conn.transaction()?;
-        tx.execute_batch(migration.sql)?;
-        tx.pragma_update(None, "user_version", version as i64 + 1)?;
-        tx.pragma_update(None, "application_id", min_reader_version(version + 1))?;
-        tx.commit()?;
+    for index in stored.schema as usize..MIGRATIONS.len() {
+        apply(conn, index)?;
     }
     if stored.schema == MIGRATIONS.len() as i64 && stored.min_reader == 0 {
         // Up to date but last migrated before #521: record the minimum once.
         conn.pragma_update(None, "application_id", min_reader_version(MIGRATIONS.len()))?;
     }
+    Ok(())
+}
+
+/// Runs migration `index` (version `index + 1`) in one transaction, together with its stored
+/// down step and the new version numbers.
+fn apply(conn: &mut Connection, index: usize) -> Result<()> {
+    let version = index + 1;
+    let tx = conn.transaction()?;
+    tx.execute_batch(MIGRATIONS[index].sql)?;
+    if version >= DOWN_STEPS_VERSION {
+        // The migration that creates the table also stores the steps of all before it.
+        let first = if version == DOWN_STEPS_VERSION {
+            1
+        } else {
+            version
+        };
+        for stored in first..=version {
+            let migration = &MIGRATIONS[stored - 1];
+            let sql = match migration.down {
+                Down::Sql(sql) => Some(sql),
+                Down::Irreversible => None,
+            };
+            tx.execute(
+                "INSERT INTO migration_down (version, breaking, sql) VALUES (?1, ?2, ?3)",
+                rusqlite::params![stored as i64, migration.change == Change::Breaking, sql],
+            )?;
+        }
+    }
+    tx.pragma_update(None, "user_version", version as i64)?;
+    tx.pragma_update(None, "application_id", min_reader_version(version))?;
+    tx.commit()?;
+    Ok(())
+}
+
+/// A rollback that makes a profile from a newer app usable by this one: undoing the newer
+/// migrations down to `to`, the version before the oldest breaking migration this app does
+/// not know. Additive migrations below that one stay, as this app can work with them.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Rollback {
+    /// The profile's schema version now.
+    pub found: i64,
+    /// Its schema version after the rollback.
+    pub to: i64,
+}
+
+/// The rollback that would make the profile in `data_dir` usable by this app, if one is
+/// needed and possible: every migration it has to undo must have a stored down step that is
+/// not irreversible. Reads only, like [`check_schema`].
+pub fn rollback_plan(data_dir: &Path) -> Result<Option<Rollback>> {
+    let path = data_dir.join(DB_FILE_NAME);
+    if check_schema(data_dir).is_ok() || !path.is_file() {
+        return Ok(None);
+    }
+    let conn = open_untouched(&path)?;
+    plan(&conn)
+}
+
+fn plan(conn: &Connection) -> Result<Option<Rollback>> {
+    let own = MIGRATIONS.len() as i64;
+    let found = stored_versions(conn)?.schema;
+    let has_steps: bool = conn.query_row(
+        "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'migration_down'",
+        [],
+        |row| row.get(0),
+    )?;
+    if found <= own || !has_steps {
+        return Ok(None);
+    }
+    let steps: Vec<(i64, bool, bool)> = conn
+        .prepare(
+            "SELECT version, breaking, sql IS NOT NULL FROM migration_down
+             WHERE version > ?1 AND version <= ?2 ORDER BY version",
+        )?
+        .query_map([own, found], |row| {
+            Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+        })?
+        .collect::<rusqlite::Result<_>>()?;
+    if steps.len() as i64 != found - own {
+        return Ok(None);
+    }
+    let Some(first_breaking) = steps.iter().position(|&(_, breaking, _)| breaking) else {
+        return Ok(None);
+    };
+    if !steps[first_breaking..]
+        .iter()
+        .all(|&(_, _, reversible)| reversible)
+    {
+        return Ok(None);
+    }
+    Ok(Some(Rollback {
+        found,
+        to: steps[first_breaking].0 - 1,
+    }))
+}
+
+/// Opens the database read-only without creating or changing any file: with its WAL files
+/// when they exist (SQLite needs them for the newest data), as an immutable file otherwise.
+fn open_untouched(path: &Path) -> Result<Connection> {
+    let flags = OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX;
+    let mut wal = path.as_os_str().to_owned();
+    wal.push("-wal");
+    if Path::new(&wal).exists() {
+        return Ok(Connection::open_with_flags(path, flags)?);
+    }
+    Ok(Connection::open_with_flags(
+        file_uri(path)? + "?immutable=1",
+        flags | OpenFlags::SQLITE_OPEN_URI,
+    )?)
+}
+
+/// `path` as an SQLite `file:` URI (<https://www.sqlite.org/uri.html>).
+fn file_uri(path: &Path) -> Result<String> {
+    let absolute = std::path::absolute(path).map_err(Error::ProfileRead)?;
+    let text = absolute.to_str().ok_or_else(|| {
+        Error::ProfileRead(std::io::Error::other("the profile path is not valid UTF-8"))
+    })?;
+    let mut uri = String::from("file://");
+    if !text.starts_with('/') {
+        // A Windows drive path: `file:///C:/...`.
+        uri.push('/');
+    }
+    for byte in text.replace('\\', "/").bytes() {
+        if byte.is_ascii_alphanumeric() || b"/:-._~".contains(&byte) {
+            uri.push(char::from(byte));
+        } else {
+            uri.push_str(&format!("%{byte:02X}"));
+        }
+    }
+    Ok(uri)
+}
+
+/// Rolls the profile in `data_dir` back as [`rollback_plan`] describes, after saving a full
+/// copy of the database file next to it, and returns that copy's path. The down steps run
+/// from the newest migration on, all in one transaction: if one fails, the profile stays
+/// exactly as it was.
+pub fn roll_back(data_dir: &Path) -> Result<std::path::PathBuf> {
+    let path = data_dir.join(DB_FILE_NAME);
+    let plan = rollback_plan(data_dir)?.ok_or(Error::RollbackUnavailable)?;
+    // Foreign keys stay off (the default): a down step that rebuilds a table must not
+    // cascade into the older tables that reference it.
+    let mut conn = Connection::open(&path)?;
+    // Everything still in the WAL goes into the file, so the copy is complete.
+    conn.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()))?;
+    let backup = backup(&path)?;
+    let tx = conn.transaction()?;
+    undo(&tx, plan)?;
+    tx.pragma_update(None, "application_id", min_reader_version(MIGRATIONS.len()))?;
+    tx.commit()?;
+    Ok(backup)
+}
+
+/// Copies the database file to `mumcord.sqlite3.backup-<local time>` beside it, never over an
+/// existing file.
+fn backup(path: &Path) -> Result<std::path::PathBuf> {
+    let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S");
+    let target = path.with_file_name(format!("{DB_FILE_NAME}.backup-{stamp}"));
+    let copy = || -> std::io::Result<()> {
+        let mut source = std::fs::File::open(path)?;
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&target)?;
+        std::io::copy(&mut source, &mut file)?;
+        file.sync_all()
+    };
+    copy().map_err(Error::ProfileBackup)?;
+    Ok(target)
+}
+
+/// Runs the stored down steps from `plan.found` down to `plan.to + 1` and forgets them.
+fn undo(tx: &rusqlite::Transaction<'_>, plan: Rollback) -> Result<()> {
+    for version in (plan.to + 1..=plan.found).rev() {
+        let sql: Option<String> = tx.query_row(
+            "SELECT sql FROM migration_down WHERE version = ?1",
+            [version],
+            |row| row.get(0),
+        )?;
+        tx.execute_batch(&sql.ok_or(Error::RollbackUnavailable)?)?;
+    }
+    tx.execute("DELETE FROM migration_down WHERE version > ?1", [plan.to])?;
+    tx.pragma_update(None, "user_version", plan.to)?;
     Ok(())
 }
 
@@ -1443,5 +1741,290 @@ pub(crate) mod tests {
         assert_eq!(data["theme"], "neon");
         assert_eq!(data["future_flag"], serde_json::json!({ "a": 1 }));
         assert_eq!(data["wizard_completed"], false);
+    }
+
+    /// Rows in the tables of the initial schema, which every later migration has to keep.
+    fn seed(conn: &Connection) {
+        conn.execute_batch(
+            "INSERT INTO saved_server (id, label, address, port, username, sort_order)
+                 VALUES (1, 'Home', 'localhost', 64738, 'alice', 0);
+             INSERT INTO trusted_cert (server_id, fingerprint) VALUES (1, 'ab12');
+             INSERT INTO followed_channel (server_id, channel_path, last_read_at)
+                 VALUES (1, 'Root/Games', 5);
+             INSERT INTO chat_message (id, server_id, conversation_kind, conversation_key,
+                 sender_name, sender_cert_hash, sent_at, body)
+                 VALUES (1, 1, 'channel', 'Root', 'bob', 'cd34', 7, 'hello');
+             INSERT INTO person_setting (server_id, person_cert_hash, volume, local_mute)
+                 VALUES (1, 'cd34', 150, 1);
+             INSERT INTO settings (id, data) VALUES (1, '{\"theme\":\"dark\"}');",
+        )
+        .expect("seed");
+    }
+
+    /// Schema (whitespace-insensitive), version numbers and every row of a database.
+    fn snapshot(conn: &Connection) -> Vec<String> {
+        let mut schema: Vec<(String, String, String)> = conn
+            .prepare("SELECT type, name, coalesce(sql, '') FROM sqlite_master")
+            .expect("prepare")
+            .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))
+            .expect("query")
+            .collect::<rusqlite::Result<_>>()
+            .expect("schema");
+        schema.sort();
+        let versions = stored_versions(conn).expect("versions");
+        let mut out = vec![format!("v{} min{}", versions.schema, versions.min_reader)];
+        for (kind, name, sql) in schema {
+            let sql = sql
+                .split_whitespace()
+                .collect::<Vec<_>>()
+                .join(" ")
+                .replace(" ,", ",")
+                .replace("( ", "(")
+                .replace(" )", ")")
+                .replace("\"", "");
+            out.push(format!("{kind} {name}: {sql}"));
+            if kind == "table" {
+                out.extend(
+                    dump(conn, &name)
+                        .into_iter()
+                        .map(|row| format!("{name}: {row}")),
+                );
+            }
+        }
+        out
+    }
+
+    fn down(conn: &mut Connection, index: usize) {
+        let Down::Sql(sql) = MIGRATIONS[index].down else {
+            panic!("v{} is irreversible", index + 1);
+        };
+        let tx = conn.transaction().expect("tx");
+        tx.execute_batch(sql).expect("down step");
+        tx.pragma_update(None, "user_version", index as i64)
+            .expect("pragma");
+        tx.pragma_update(None, "application_id", min_reader_version(index))
+            .expect("pragma");
+        tx.commit().expect("commit");
+    }
+
+    /// Every reversible migration's down step restores the schema and data from before it,
+    /// and the migration runs again afterwards with the same result.
+    #[test]
+    fn every_down_step_round_trips_on_a_seeded_profile() {
+        for (index, migration) in MIGRATIONS.iter().enumerate().skip(1) {
+            if migration.down == Down::Irreversible {
+                continue;
+            }
+            let mut conn = Connection::open_in_memory().expect("open");
+            apply(&mut conn, 0).expect("v1");
+            seed(&conn);
+            for earlier in 1..index {
+                apply(&mut conn, earlier).expect("earlier migration");
+            }
+            let before = snapshot(&conn);
+            apply(&mut conn, index).expect("up");
+            let after = snapshot(&conn);
+            down(&mut conn, index);
+            assert_eq!(snapshot(&conn), before, "v{} down", index + 1);
+            apply(&mut conn, index).expect("up again");
+            assert_eq!(snapshot(&conn), after, "v{} up again", index + 1);
+        }
+    }
+
+    #[test]
+    fn only_migrations_with_certificate_or_identity_tables_are_irreversible() {
+        let irreversible: Vec<usize> = MIGRATIONS
+            .iter()
+            .enumerate()
+            .filter(|(_, m)| m.down == Down::Irreversible)
+            .map(|(index, _)| index + 1)
+            .collect();
+        assert_eq!(irreversible, [1, 14, 20, 21]);
+    }
+
+    #[test]
+    fn the_down_steps_are_stored_for_every_applied_migration() {
+        let (_dir, store) = temp_store();
+        let steps: Vec<(i64, bool, Option<String>)> = store
+            .conn
+            .prepare("SELECT version, breaking, sql FROM migration_down ORDER BY version")
+            .expect("prepare")
+            .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))
+            .expect("query")
+            .collect::<rusqlite::Result<_>>()
+            .expect("rows");
+        assert_eq!(steps.len(), MIGRATIONS.len());
+        assert!(
+            MIGRATIONS[DOWN_STEPS_VERSION - 1]
+                .sql
+                .contains("CREATE TABLE migration_down")
+        );
+        for ((version, breaking, sql), migration) in steps.iter().zip(MIGRATIONS) {
+            assert_eq!(
+                *breaking,
+                migration.change == Change::Breaking,
+                "v{version}"
+            );
+            let expected = match migration.down {
+                Down::Sql(sql) => Some(sql),
+                Down::Irreversible => None,
+            };
+            assert_eq!(sql.as_deref(), expected, "v{version}");
+        }
+    }
+
+    /// What a newer Mumcord leaves behind: v+1 additive (`future_note`), v+2 breaking
+    /// (`saved_server.label` renamed), v+3 additive (`saved_server.color`), each with its down
+    /// step stored, and the given down step for v+2.
+    fn profile_from_a_newer_app(dir: &Path, breaking_down: Option<&str>) -> std::path::PathBuf {
+        use crate::servers::NewServer;
+
+        let store = Store::open(dir).expect("open");
+        store
+            .add_server(&NewServer::new("Home", "localhost", "alice"))
+            .expect("server");
+        drop(store);
+        let path = dir.join(DB_FILE_NAME);
+        let own = MIGRATIONS.len() as i64;
+        let conn = Connection::open(&path).expect("open");
+        conn.execute_batch(
+            "CREATE TABLE future_note (id INTEGER PRIMARY KEY, text TEXT NOT NULL);
+             INSERT INTO future_note (text) VALUES ('kept');
+             ALTER TABLE saved_server RENAME COLUMN label TO title;
+             ALTER TABLE saved_server ADD COLUMN color TEXT;
+             UPDATE saved_server SET color = 'teal';",
+        )
+        .expect("newer schema");
+        let mut insert = conn
+            .prepare("INSERT INTO migration_down (version, breaking, sql) VALUES (?1, ?2, ?3)")
+            .expect("prepare");
+        insert
+            .execute(rusqlite::params![own + 1, false, "DROP TABLE future_note;"])
+            .expect("step");
+        insert
+            .execute(rusqlite::params![own + 2, true, breaking_down])
+            .expect("step");
+        insert
+            .execute(rusqlite::params![
+                own + 3,
+                false,
+                "ALTER TABLE saved_server DROP COLUMN color;"
+            ])
+            .expect("step");
+        drop(insert);
+        conn.pragma_update(None, "user_version", own + 3)
+            .expect("pragma");
+        conn.pragma_update(None, "application_id", own + 2)
+            .expect("pragma");
+        drop(conn);
+        path
+    }
+
+    const RENAME_BACK: &str = "ALTER TABLE saved_server RENAME COLUMN title TO label;";
+
+    /// Acceptance criteria of the rollback (issue #521): this app undoes a newer app's breaking
+    /// migration with nothing but the stored down steps, saves a full copy first, keeps the
+    /// additive migration below it and starts normally afterwards.
+    #[test]
+    fn an_older_app_rolls_back_a_breaking_change_with_the_stored_steps() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = profile_from_a_newer_app(dir.path(), Some(RENAME_BACK));
+        let before = std::fs::read(&path).expect("read");
+        let files = sidecars(dir.path());
+        let own = MIGRATIONS.len() as i64;
+
+        let plan = rollback_plan(dir.path()).expect("plan");
+        assert_eq!(
+            plan,
+            Some(Rollback {
+                found: own + 3,
+                to: own + 1
+            })
+        );
+        assert_eq!(
+            std::fs::read(&path).expect("read"),
+            before,
+            "planning reads only"
+        );
+        assert_eq!(sidecars(dir.path()), files);
+
+        let backup = roll_back(dir.path()).expect("roll back");
+        assert_eq!(backup.parent(), Some(dir.path()));
+        let name = backup.file_name().expect("name").to_string_lossy();
+        assert!(
+            name.starts_with(&format!("{DB_FILE_NAME}.backup-")),
+            "{name}"
+        );
+        assert_eq!(std::fs::read(&backup).expect("backup"), before);
+
+        check_schema(dir.path()).expect("readable again");
+        let store = Store::open(dir.path()).expect("open");
+        assert_eq!(store.schema_version().expect("version"), own + 1);
+        assert_eq!(store.servers().expect("servers")[0].label, "Home");
+        let conn = &store.conn;
+        assert_eq!(stored_versions(conn).expect("versions").min_reader, 26);
+        assert_eq!(
+            dump(conn, "future_note"),
+            ["1|'kept'"],
+            "additive change stays"
+        );
+        let color: i64 = conn
+            .query_row(
+                "SELECT count(*) FROM pragma_table_info('saved_server') WHERE name = 'color'",
+                [],
+                |row| row.get(0),
+            )
+            .expect("columns");
+        assert_eq!(color, 0);
+        let newest: i64 = conn
+            .query_row("SELECT max(version) FROM migration_down", [], |row| {
+                row.get(0)
+            })
+            .expect("steps");
+        assert_eq!(newest, own + 1);
+    }
+
+    #[test]
+    fn a_failing_down_step_leaves_the_profile_byte_identical() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = profile_from_a_newer_app(
+            dir.path(),
+            Some("ALTER TABLE saved_server RENAME COLUMN missing TO label;"),
+        );
+        let before = std::fs::read(&path).expect("read");
+
+        assert!(rollback_plan(dir.path()).expect("plan").is_some());
+        assert!(matches!(roll_back(dir.path()), Err(Error::Database(_))));
+
+        assert_eq!(std::fs::read(&path).expect("read"), before);
+        assert!(!dir.path().join(format!("{DB_FILE_NAME}-wal")).exists());
+        assert!(matches!(
+            check_schema(dir.path()),
+            Err(Error::SchemaTooNew { .. })
+        ));
+    }
+
+    #[test]
+    fn an_irreversible_or_unknown_step_offers_no_rollback() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        profile_from_a_newer_app(dir.path(), None);
+        assert_eq!(rollback_plan(dir.path()).expect("plan"), None);
+        assert!(matches!(
+            roll_back(dir.path()),
+            Err(Error::RollbackUnavailable)
+        ));
+
+        // A newer profile without stored steps for its migrations.
+        let dir = tempfile::tempdir().expect("tempdir");
+        newer_profile(dir.path());
+        assert_eq!(rollback_plan(dir.path()).expect("plan"), None);
+    }
+
+    #[test]
+    fn a_readable_profile_needs_no_rollback() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        assert_eq!(rollback_plan(dir.path()).expect("no profile"), None);
+        drop(Store::open(dir.path()).expect("open"));
+        assert_eq!(rollback_plan(dir.path()).expect("current"), None);
     }
 }

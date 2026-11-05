@@ -37,7 +37,7 @@ pub use camera_backgrounds::{
 };
 pub use channel_audio::{ChannelAudioProfile, SavedChannelAudio, resolve_channel_audio};
 pub use channel_tokens::{ChannelToken, TokenChannel};
-pub use db::{DB_FILE_NAME, Store, UnixMillis, check_schema};
+pub use db::{DB_FILE_NAME, Rollback, Store, UnixMillis, check_schema, roll_back, rollback_plan};
 pub use encoder_cache::{EncoderCache, EncoderEntry, SvtSelftest};
 pub use error::{Error, Result};
 pub use favorites::{GifFavorite, MAX_GIF_FAVORITES};

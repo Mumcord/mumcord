@@ -10,6 +10,10 @@ pub enum Error {
     SchemaTooNew { found: i64, supported: i64 },
     #[error("the profile database could not be read: {0}")]
     ProfileRead(std::io::Error),
+    #[error("the backup copy of the profile could not be written: {0}")]
+    ProfileBackup(std::io::Error),
+    #[error("the profile cannot be rolled back to this version")]
+    RollbackUnavailable,
     #[error("settings could not be (de)serialized: {0}")]
     Settings(#[from] serde_json::Error),
     #[error("secure storage error: {0}")]

@@ -28,6 +28,7 @@ thiserror.workspace = true
 tracing.workspace = true
 image.workspace = true
 rand.workspace = true
+chrono.workspace = true
 
 [features]
 # Public in-memory `SecretStore` for tests in other crates.
