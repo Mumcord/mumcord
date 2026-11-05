@@ -18,8 +18,6 @@
   "pause": "Pauză",
   "resume": "Reia",
   "sound": "Partajează sunetul",
-  "noSound": "Linux nu partajează sunet: spectatorii văd doar imaginea.",
-  "noSoundForShare": "Această partajare nu are sunet (ecran întreg sau versiune de sistem neacceptată).",
   "viewersNone": "Nimeni nu se uită încă",
   "viewers_one": "{{count}} urmărește: {{names}}",
   "viewers_few": "{{count}} urmăresc: {{names}}",

@@ -18,8 +18,6 @@
   "pause": "Pauzēt",
   "resume": "Turpināt",
   "sound": "Kopīgot skaņu",
-  "noSound": "Linux nekopīgo skaņu: skatītāji redz tikai attēlu.",
-  "noSoundForShare": "Šai kopīgošanai nav skaņas (viss ekrāns vai neatbalstīta sistēmas versija).",
   "viewersNone": "Vēl neviens neskatās",
   "viewers_zero": "{{count}} skatās: {{names}}",
   "viewers_one": "{{count}} skatās: {{names}}",

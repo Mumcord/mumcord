@@ -11,22 +11,25 @@ import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { getApi, type ShareQuality, type ShareThumbnail, type User } from "../../api";
 import { useServerStateOf } from "../channels";
-import { PauseIcon, PlayIcon, StopIcon, VolumeIcon } from "../chat/mediaIcons";
+import { PauseIcon, PlayIcon, StopIcon } from "../chat/mediaIcons";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
 import { clockTime } from "../media/format";
 import { useTick } from "../media/useTick";
-import { ChevronDownIcon, WindowIcon } from "./icons";
+import { ChevronDownIcon, SpeakerIcon, WindowIcon } from "./icons";
 import { BarNotes } from "./notices/BarNotes";
 import { ShareNotices } from "./notices/ShareNotices";
 import { SoundBadge } from "./notices/SoundBadge";
+import { soundTip } from "./notices/soundTip";
 import { QualityMenu } from "./quality/QualityMenu";
 import { ShareBadges } from "./quality/ShareBadges";
 import { shareStartedAt } from "./sharesStore";
 import { useOwnShare } from "./useOwnShare";
 import { useDismiss } from "./useDismiss";
 import { SoundAppPicker } from "./SoundAppPicker";
+import { SOUND_NEEDS_KEYS, useSoundBlock } from "./soundSupport";
 import { ShareStartDialog } from "./start/ShareStartDialog";
+import { useAppOs } from "./useAppOs";
 import { useShareActions } from "./useShareActions";
 import { MAX_VIEWERS, ViewerList } from "./Viewers";
 
@@ -42,6 +45,8 @@ export function SharerBar(): ReactNode {
   const { start, stop, startDialog } = useShareActions(share);
   const serverId = share.serverId;
   const own = share.own;
+  const soundBlock = useSoundBlock();
+  const os = useAppOs();
   const { users } = useServerStateOf(serverId);
   const people: User[] = [...users.values()];
   const avatarOf = useAvatars(people, serverId ?? undefined);
@@ -121,7 +126,10 @@ export function SharerBar(): ReactNode {
           : "sharedUnknown",
     ),
   ];
-  const noSound = t(share.platform?.sound === false ? "noSound" : "noSoundForShare");
+  // Why the Sound button is disabled: what this system lacks, else what the share's sound line
+  // says (FR-7.84, FR-7.85).
+  const noSound =
+    soundBlock !== null ? t(`start.${SOUND_NEEDS_KEYS[soundBlock]}`) : soundTip(own, os, t);
 
   return (
     <>
@@ -177,7 +185,7 @@ export function SharerBar(): ReactNode {
                 run(getApi().screenShareSetSound(serverId, !own.sound), "sound");
             }}
           >
-            <VolumeIcon muted={!own.sound} size={14} />
+            <SpeakerIcon muted={!own.sound} size={14} />
             {tv("sound")}
           </button>
           {!own.soundAvailable && (

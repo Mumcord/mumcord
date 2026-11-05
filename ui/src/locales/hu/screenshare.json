@@ -18,8 +18,6 @@
   "pause": "Szünet",
   "resume": "Folytatás",
   "sound": "Hang megosztása",
-  "noSound": "Linuxon nincs hangmegosztás: a nézők csak a képet látják.",
-  "noSoundForShare": "Ennek a megosztásnak nincs hangja (teljes képernyő vagy nem támogatott rendszerverzió).",
   "viewersNone": "Még senki sem nézi",
   "viewers_one": "{{count}} nézi: {{names}}",
   "viewers_other": "{{count}} nézi: {{names}}",

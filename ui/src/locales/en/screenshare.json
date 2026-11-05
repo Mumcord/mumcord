@@ -18,8 +18,6 @@
   "pause": "Pause",
   "resume": "Resume",
   "sound": "Share sound",
-  "noSound": "Linux shares no sound: viewers see the picture only.",
-  "noSoundForShare": "This share has no sound (whole screen or unsupported system version).",
   "viewersNone": "Nobody is watching yet",
   "viewers_one": "{{count}} watching: {{names}}",
   "viewers_other": "{{count}} watching: {{names}}",

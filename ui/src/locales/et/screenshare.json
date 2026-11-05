@@ -18,8 +18,6 @@
   "pause": "Peata",
   "resume": "Jätka",
   "sound": "Jaga heli",
-  "noSound": "Linux ei jaga heli: vaatajad näevad ainult pilti.",
-  "noSoundForShare": "Sellel jagamisel pole heli (kogu ekraan või toetamata süsteemiversioon).",
   "viewersNone": "Keegi ei vaata veel",
   "viewers_one": "{{count}} vaatab: {{names}}",
   "viewers_other": "{{count}} vaatavad: {{names}}",

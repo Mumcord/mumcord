@@ -18,8 +18,6 @@
   "pause": "Začasno ustavi",
   "resume": "Nadaljuj",
   "sound": "Deli zvok",
-  "noSound": "Linux ne deli zvoka: gledalci vidijo samo sliko.",
-  "noSoundForShare": "To deljenje nima zvoka (cel zaslon ali nepodprta različica sistema).",
   "viewersNone": "Nihče še ne gleda",
   "viewers_one": "{{count}} gleda: {{names}}",
   "viewers_two": "{{count}} gledata: {{names}}",

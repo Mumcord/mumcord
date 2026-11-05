@@ -18,8 +18,6 @@
   "pause": "Pawża",
   "resume": "Kompli",
   "sound": "Aqsam il-ħoss",
-  "noSound": "Linux ma jaqsamx ħoss: it-telespettaturi jaraw l-istampa biss.",
-  "noSoundForShare": "Dan il-qsim m'għandux ħoss (skrin sħiħ jew verżjoni tas-sistema mhux appoġġjata).",
   "viewersNone": "Għad ħadd mhu qed jara",
   "viewers_one": "{{count}} qed jara: {{names}}",
   "viewers_two": "{{count}} qed jaraw: {{names}}",
