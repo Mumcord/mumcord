@@ -1,0 +1,272 @@
+/* Camera preview dialog (FR-8.10–8.14, mockups 03–04). */
+
+.cam-dialog {
+  width: min(48rem, calc(100vw - 2rem));
+}
+
+.cam-dialog p {
+  margin: 0;
+}
+
+.cam-preview {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (width <= 40rem) {
+  .cam-preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cam-preview__picture {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  /* The camera picture keeps its dark background in both themes. */
+  background: #111;
+}
+
+.cam-preview__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cam-preview__canvas[data-mirror] {
+  transform: scaleX(-1);
+}
+
+.cam-preview__tag {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 2;
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: rgb(8 6 20 / 72%);
+  color: #fff;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.cam-dialog .cam-preview__note {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.cam-preview__note svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--color-success);
+}
+
+.cam-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.cam-field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+}
+
+.cam-field .settings-input {
+  width: 100%;
+  text-align: left;
+}
+
+.cam-field__empty {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.cam-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.bg-modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.bg-mode {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: center;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-chat);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.bg-mode[data-checked] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.bg-mode svg {
+  color: var(--color-accent-text);
+}
+
+.bg-mode:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bg-mode:has(input:focus-visible),
+.bg-thumb:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cam-strength {
+  width: 100%;
+  accent-color: var(--color-accent);
+}
+
+.cam-strength__ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.bg-images {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.bg-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-chat);
+  cursor: pointer;
+}
+
+.bg-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bg-thumb[data-checked] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.bg-thumb__check {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.bg-thumb--add {
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-xs);
+}
+
+.bg-thumb--add span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.bg-thumb__own {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgb(8 6 20 / 72%);
+  color: #fff;
+  font-size: 0.5625rem;
+}
+
+.cam-dialog .cam-hint {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.cam-dialog .cam-preview__error {
+  margin-top: var(--space-1);
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+}
+
+.cam-load {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-chat);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.cam-load svg {
+  flex: none;
+  color: var(--color-accent-text);
+}
+
+.cam-load[data-busy] svg {
+  color: var(--color-warning);
+}
+
+.cam-dialog__status:empty {
+  display: none;
+}
+
+.cam-dialog__status {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.cam-dialog .button--primary svg {
+  vertical-align: -2px;
+}

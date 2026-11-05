@@ -92,6 +92,7 @@ import {
   type ServerEventName,
   type Unsubscribe,
 } from "./client";
+import { createMockCamera } from "./mockCamera";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
 import { createMockInspector } from "./mockInspector";
 import { createMockPopouts } from "./mockPopout";
@@ -402,6 +403,18 @@ const DEFAULT_SETTINGS: Settings = {
   screenSound: true,
   screenAskEachTime: true,
   screenUseGpu: true,
+  cameraDeviceId: null,
+  cameraSendQuality: "auto",
+  cameraMirrorSelf: true,
+  cameraDefaultBackground: { kind: "blur" },
+  cameraBlurStrength: 50,
+  cameraEffectQuality: "auto",
+  cameraOffOnLock: true,
+  cameraShow: "always",
+  cameraDataSaver: false,
+  cameraReduceMotion: "system",
+  cameraStripPosition: "beside",
+  cameraHotkey: null,
 };
 
 /** Fictional titles and covers for the demo party's videos (issue #163). */
@@ -3908,21 +3921,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticePending: () => Promise.resolve(false),
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
-    // The browser mock has no camera; the camera UI shows "no camera" (spec 08).
-    cameraDevices: () => Promise.resolve([]),
-    cameraView: () => Promise.resolve(null),
-    cameraPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
-    cameraTurnOn: () => Promise.reject(new EngineError("camera", "busy")),
-    cameraTurnOff: () => Promise.resolve(),
-    cameraLocalPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
-    cameraLocalPreviewStop: () => Promise.resolve(),
-    cameraSetDevice: () => Promise.resolve(null),
-    cameraSetBackground: () => Promise.resolve(null),
-    cameraSetEffectQuality: () => Promise.resolve(),
-    cameraEffects: () =>
-      Promise.resolve({ unavailable: null, level: null, load: null, tooBusy: false }),
-    cameraPreviewAttach: () => Promise.resolve(),
-    cameraPreviewDetach: () => Promise.resolve(),
+    ...createMockCamera(
+      emit,
+      () => settings,
+      (next) => {
+        settings = next;
+      },
+    ),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
