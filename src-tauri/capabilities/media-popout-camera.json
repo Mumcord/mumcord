@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "media-popout-camera",
+  "description": "Permissions for the camera room pop-out window: engine events only",
+  "windows": ["media-popout-camera"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

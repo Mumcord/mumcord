@@ -340,6 +340,30 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::p2p_consent_decide,
             commands::p2p::relay_info,
             commands::p2p::camera_unavailable,
+            commands::p2p::lock_screen,
+            commands::camera::camera_devices,
+            commands::camera::camera_view,
+            commands::camera::camera_preview_start,
+            commands::camera::camera_turn_on,
+            commands::camera::camera_turn_off,
+            commands::camera::camera_local_preview_start,
+            commands::camera::camera_local_preview_stop,
+            commands::camera::camera_set_device,
+            commands::camera::camera_set_background,
+            commands::camera::camera_set_effect_quality,
+            commands::camera::camera_effects,
+            commands::camera::camera_preview_attach,
+            commands::camera::camera_preview_detach,
+            commands::camera::camera_room,
+            commands::camera::camera_room_set_open,
+            commands::camera::camera_room_set_videos_hidden,
+            commands::camera::camera_tile_set_hidden,
+            commands::camera::camera_tile_set_quality,
+            commands::camera::camera_tile_set_height,
+            commands::camera::camera_request_keyframe,
+            commands::camera::camera_frames_attach,
+            commands::camera::camera_frames_detach,
+            commands::camera::camera_set_decode_codecs,
             commands::p2p::p2p_link,
             commands::p2p::relay_trust_new,
             commands::p2p::relay_keep_blocked,
@@ -446,6 +470,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::DirectConsentRequired,
             commands::p2p::RelayChanged,
             commands::p2p::CameraAvailabilityChanged,
+            commands::camera::CameraChanged,
+            commands::camera::CameraRoomChanged,
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
@@ -659,6 +685,16 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let screen_frames = std::sync::Arc::new(screen_frames::ScreenFrames::default());
     engine.set_screen_frame_sink(screen_frames.clone());
     app.manage(screen_frames);
+    app.manage(std::sync::Arc::new(
+        commands::camera::CameraPreview::default(),
+    ));
+    let camera_frames = commands::camera::CameraFrames::default();
+    engine.camera_set_frame_sink(camera_frames.0.clone());
+    app.manage(camera_frames);
+    match app.path().resource_dir() {
+        Ok(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
+        Err(e) => tracing::warn!(error = %e, "no resource folder for the camera backgrounds"),
+    }
     now_playing::start(engine.clone());
     now_gaming::start(engine.clone());
     start_plugin_host(app, &engine, &data_dir, &stored.enabled_plugins);
@@ -1038,9 +1074,16 @@ fn emit_engine_event(
             }
             .emit(app)
         }
-        // The camera's commands and events come with G-1 (spec 08).
-        EngineEvent::CameraChanged(_) => Ok(()),
-        EngineEvent::CameraRoomChanged(_) => Ok(()),
+        EngineEvent::CameraChanged(view) => {
+            commands::camera::CameraChanged { view: view.into() }.emit(app)
+        }
+        EngineEvent::CameraRoomChanged(view) => {
+            let sharers: Vec<u32> = view.tiles.iter().map(|t| t.sharer).collect();
+            app.state::<commands::camera::CameraFrames>()
+                .0
+                .retain(view.server_id, &sharers);
+            commands::camera::CameraRoomChanged { view: view.into() }.emit(app)
+        }
     }
 }
 

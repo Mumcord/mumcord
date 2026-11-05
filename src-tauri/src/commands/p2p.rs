@@ -11,7 +11,7 @@ use tauri::State;
 use tauri_specta::Event;
 
 use super::chat::rfc3339;
-use super::types::{ApiResult, ServerId, SessionId, to_engine_server_id};
+use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
 
 /// A direct connection would be used for the first time while `allowDirectConnections` is
 /// still `unset`; the UI asks once and answers with `p2p_consent_decide`.
@@ -315,6 +315,22 @@ impl From<camera::avail::CameraUnavailable> for CameraUnavailable {
 pub struct CameraAvailabilityChanged {
     pub server_id: ServerId,
     pub reason: Option<CameraUnavailable>,
+}
+
+/// Test command `lockScreen` (spec 08, section 10.3): simulates a screen lock, which turns the
+/// camera off when "Turn my camera off when my screen locks" is on. Inert (`notImplemented`)
+/// unless a debug build runs with `MUMCORD_TEST_SCREEN_LOCK=1`.
+#[tauri::command]
+#[specta::specta]
+pub fn lock_screen(engine: State<'_, Engine>) -> ApiResult<()> {
+    if engine.camera_test_lock_screen() {
+        Ok(())
+    } else {
+        Err(ApiError::new(
+            ErrorCode::NotImplemented,
+            "the screen-lock test hook is off",
+        ))
+    }
 }
 
 /// Why camera sharing is unavailable on a connected server; `null` when it is available.

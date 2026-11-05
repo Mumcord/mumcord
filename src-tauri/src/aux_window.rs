@@ -162,22 +162,53 @@ pub const STAGE_POPOUT: Spec = Spec {
     ],
 };
 
-const ALL: [&Spec; 6] = [
+/// The camera room in its own window (FR-8.68 **Pop out**). It shows the own camera's picture
+/// (`camera_preview_attach`) and the room bar's camera controls; the dialog to turn the camera
+/// on stays in the main window. It shows the tiles of the room and their frames, and takes the
+/// tile choices; opening and closing the room stay with the main window.
+pub const CAMERA_POPOUT: Spec = Spec {
+    label: "media-popout-camera",
+    url: "index.html?window=media-popout&kind=camera",
+    title: "Cameras — Mumcord",
+    default_size: (960.0, 600.0),
+    min_size: (320.0, 200.0),
+    geometry_file: "media-popout-camera-window.json",
+    allowed_commands: popout_commands![
+        "camera_view",
+        "camera_turn_off",
+        "camera_set_background",
+        "camera_effects",
+        "camera_preview_attach",
+        "camera_preview_detach",
+        "camera_room",
+        "camera_tile_set_hidden",
+        "camera_tile_set_quality",
+        "camera_tile_set_height",
+        "camera_request_keyframe",
+        "camera_frames_attach",
+        "camera_frames_detach",
+        "camera_set_decode_codecs",
+    ],
+};
+
+const ALL: [&Spec; 7] = [
     &INSPECTOR,
     &LICENCES,
     &CHANGELOG,
     &WATCH_POPOUT,
     &SHARE_POPOUT,
     &STAGE_POPOUT,
+    &CAMERA_POPOUT,
 ];
 
 /// The windows that follow the main window's theme and language.
-pub const FOLLOW_LOOK: [&Spec; 5] = [
+pub const FOLLOW_LOOK: [&Spec; 6] = [
     &LICENCES,
     &CHANGELOG,
     &WATCH_POPOUT,
     &SHARE_POPOUT,
     &STAGE_POPOUT,
+    &CAMERA_POPOUT,
 ];
 
 /// Whether the webview `label` may call `command`; only the windows above are limited.
@@ -525,6 +556,32 @@ mod tests {
             "screen_share_frames_attach",
             "watch_party_command",
             "settings_update",
+        ] {
+            assert!(!command_allowed(label, command), "{command}");
+        }
+    }
+
+    #[test]
+    fn the_camera_popout_gets_the_tiles_but_cannot_open_the_room() {
+        let label = CAMERA_POPOUT.label;
+        for command in [
+            "camera_room",
+            "camera_tile_set_hidden",
+            "camera_tile_set_quality",
+            "camera_tile_set_height",
+            "camera_request_keyframe",
+            "camera_frames_attach",
+            "camera_frames_detach",
+            "camera_set_decode_codecs",
+        ] {
+            assert!(command_allowed(label, command), "{command}");
+        }
+        for command in [
+            "camera_room_set_open",
+            "camera_room_set_videos_hidden",
+            "camera_turn_on",
+            "camera_preview_start",
+            "screen_share_frames_attach",
         ] {
             assert!(!command_allowed(label, command), "{command}");
         }

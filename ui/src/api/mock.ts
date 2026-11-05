@@ -3908,6 +3908,34 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticePending: () => Promise.resolve(false),
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
+    lockScreen: () => Promise.resolve(null),
+    // The browser mock has no camera; the camera UI shows "no camera" (spec 08).
+    cameraDevices: () => Promise.resolve([]),
+    cameraView: () => Promise.resolve(null),
+    cameraPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
+    cameraTurnOn: () => Promise.reject(new EngineError("camera", "busy")),
+    cameraTurnOff: () => Promise.resolve(),
+    cameraLocalPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
+    cameraLocalPreviewStop: () => Promise.resolve(),
+    cameraSetDevice: () => Promise.resolve(null),
+    cameraSetBackground: () => Promise.resolve(null),
+    cameraSetEffectQuality: () => Promise.resolve(),
+    cameraEffects: () =>
+      Promise.resolve({ unavailable: null, level: null, load: null, tooBusy: false }),
+    cameraPreviewAttach: () => Promise.resolve(),
+    cameraPreviewDetach: () => Promise.resolve(),
+    // Nobody else has a camera in the browser mock: the room stays empty.
+    cameraRoom: (serverId) =>
+      Promise.resolve({ serverId, open: false, videosHidden: false, tiles: [] }),
+    cameraRoomSetOpen: () => Promise.resolve(),
+    cameraRoomSetVideosHidden: () => Promise.resolve(),
+    cameraTileSetHidden: () => Promise.resolve(),
+    cameraTileSetQuality: () => Promise.resolve(),
+    cameraTileSetHeight: () => Promise.resolve(),
+    cameraRequestKeyframe: () => Promise.resolve(),
+    cameraFramesAttach: () => Promise.resolve(),
+    cameraFramesDetach: () => Promise.resolve(),
+    cameraSetDecodeCodecs: () => Promise.resolve(),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.

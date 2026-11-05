@@ -9,24 +9,26 @@
 //!   (FR-8.8), viewers are admitted on `cam-join` and removed with a rekey (FR-8.47 – FR-8.49),
 //!   and the encoder follows their `want` reports (FR-8.45).
 //!
-//! One camera per Mumcord instance (FR-8.29). The stop rules (leave channel, lock screen, …) are
-//! C-9's; they end the camera through [`Engine::camera_turn_off`].
+//! One camera per Mumcord instance (FR-8.29). The stop rules (leave channel, lock screen, …) live
+//! in `stop`.
 
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use mumcord_camera::{
-    CameraBackend, CameraError, DeviceId, DeviceList, TestCamera, TestCameraMode,
-};
+use mumcord_camera::{CameraBackend, CameraError, TestCamera, TestCameraMode};
 use mumcord_p2p::broadcast::BindRole;
-use mumcord_p2p::{BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken};
+use mumcord_p2p::{
+    BroadcastEnd, BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken,
+};
 use mumcord_protocol::PluginData;
 use mumcord_store::{ScreenFps, ScreenOptimize, ScreenResolution};
 use tokio::sync::oneshot;
 
 use super::admit::{CameraViewers, Join, MAX_VIEWERS};
+use super::preview::PreviewTap;
 use super::send::{CameraSend, SendCeiling};
 use super::signal::{self, CameraMessage, CameraSignals, Codec};
+use super::stop::StopReason;
 use crate::ServerId;
 use crate::mumcord::ServerPeers;
 use crate::peer::{RelayUnavailable, RelayUse};
@@ -34,7 +36,6 @@ use crate::screen_share::QualityPrefs;
 use crate::screen_share::broadcast::keyx::CertKey;
 use crate::screen_share::broadcast::link::{OnEnd, Publisher};
 use crate::screen_share::broadcast::{FanoutUnavailable, cert_key};
-use crate::screen_share::encoder::natural_factory;
 use crate::session::{Engine, EngineEvent, SessionCtx, WeakEngine, lock};
 
 /// Where the own camera is (section 6.4).
@@ -66,8 +67,11 @@ pub enum CameraFailure {
     UseNotAllowed,
     /// The relay or the bot refused (`not-same-channel`, `denied`).
     Refused,
-    /// The relay isn't reachable (`relay-down`, no answer, link failed).
+    /// The relay isn't reachable (`relay-down`, no answer, link failed), or it became unavailable
+    /// while the camera was on (FR-8.24).
     RelayDown,
+    /// The relay ended the broadcast (`end` with `deleted` or `revoked`, FR-8.24).
+    RelayEnded,
     /// Too many attempts (`rate-limited`).
     RateLimited,
     /// The P2P mode leaves the relay out.
@@ -91,6 +95,7 @@ impl CameraFailure {
             Self::UseNotAllowed => "use-not-allowed",
             Self::Refused => "denied",
             Self::RelayDown => "relay-down",
+            Self::RelayEnded => "relay-ended",
             Self::RateLimited => "rate-limited",
             Self::Mode => "mode",
             Self::NoCertificate => "no-certificate",
@@ -205,13 +210,13 @@ struct Live {
     viewers: CameraViewers,
 }
 
-struct Own {
+pub(super) struct Own {
     server_id: ServerId,
-    state: CameraState,
+    pub(super) state: CameraState,
     /// Tells a Turn on apart from an earlier one that was cancelled meanwhile.
     attempt: u64,
     error: Option<CameraFailure>,
-    send: CameraSend,
+    pub(super) send: CameraSend,
     live: Option<Live>,
 }
 
@@ -242,7 +247,16 @@ impl Own {
 #[derive(Default)]
 pub(crate) struct Cameras {
     pub(crate) engine: Option<WeakEngine>,
-    own: Option<Own>,
+    pub(super) own: Option<Own>,
+    /// The Settings → Camera preview (FR-8.30): the camera runs locally without a server. The
+    /// preview dialog takes it over (FR-8.29).
+    pub(super) local: Option<CameraSend>,
+    /// The background of the running camera, kept for a device change.
+    pub(super) background: Option<mumcord_effects::Background>,
+    /// Where the built-in background images are (the app's resources).
+    pub(super) builtin_backgrounds: Option<std::path::PathBuf>,
+    /// The own picture for the preview and the self-view, shared by every camera session.
+    pub(super) preview: Arc<PreviewTap>,
     attempts: u64,
     /// The OS camera API, or the test camera; set once.
     backend: Option<Arc<dyn CameraBackend>>,
@@ -258,22 +272,38 @@ pub(crate) struct Cameras {
 pub(crate) type ServerCameras = std::sync::Mutex<Cameras>;
 
 impl Cameras {
-    fn backend(&mut self) -> Option<Arc<dyn CameraBackend>> {
+    pub(super) fn backend(&mut self) -> Option<Arc<dyn CameraBackend>> {
         if self.backend.is_none() {
             self.backend = TestCameraMode::from_env()
-                .map(|mode| Arc::new(TestCamera::new(mode)) as Arc<dyn CameraBackend>);
+                .map(|mode| Arc::new(TestCamera::new(mode)) as Arc<dyn CameraBackend>)
+                .or_else(os_backend);
         }
         self.backend.clone()
     }
 
-    fn engine(&self) -> Option<Engine> {
+    pub(super) fn engine(&self) -> Option<Engine> {
         self.engine.as_ref().and_then(WeakEngine::upgrade)
     }
 }
 
+/// The camera API of this OS.
+fn os_backend() -> Option<Arc<dyn CameraBackend>> {
+    #[cfg(target_os = "linux")]
+    let backend: Option<Arc<dyn CameraBackend>> =
+        Some(Arc::new(mumcord_camera::LinuxCamera::new()));
+    #[cfg(target_os = "macos")]
+    let backend: Option<Arc<dyn CameraBackend>> = Some(Arc::new(mumcord_camera::MacCamera::new()));
+    #[cfg(windows)]
+    let backend: Option<Arc<dyn CameraBackend>> =
+        Some(Arc::new(mumcord_camera::WindowsCamera::new()));
+    #[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
+    let backend = None;
+    backend
+}
+
 /// The screen-share prefs whose encoder selection and self-test the camera uses (FR-8.43):
 /// 720p30 (or 15) natural video.
-fn encoder_prefs(ceiling: SendCeiling) -> QualityPrefs {
+pub(super) fn encoder_prefs(ceiling: SendCeiling) -> QualityPrefs {
     QualityPrefs {
         resolution: ScreenResolution::P720,
         fps: if ceiling.fps <= 15 {
@@ -321,13 +351,14 @@ impl Engine {
             .emit(EngineEvent::CameraChanged(view));
     }
 
-    /// Opens the preview (Off → Preview, FR-8.10): the camera runs, nothing is sent. The effects
-    /// of C-4 hook in between capture and encoding (`send::FrameEffect`).
+    /// Opens the preview (Off → Preview, FR-8.10): the camera runs with the default background
+    /// (FR-8.76), nothing is sent. A running Settings preview moves to it (FR-8.29).
     pub fn camera_preview_start(&self, server_id: ServerId) -> Result<(), CameraFailure> {
         self.session_ctx_for(server_id)
             .map_err(|_| CameraFailure::NotConnected)?;
+        super::stop::watch_screen_lock(self);
         let settings = self.encoder_settings();
-        let ceiling = SendCeiling::from_setting(settings.camera_send_quality);
+        let background = self.camera_default_background(&settings);
         let view = {
             let mut cameras = lock(self.camera_state());
             if let Some(own) = &cameras.own {
@@ -337,23 +368,10 @@ impl Engine {
                     Err(CameraFailure::Busy)
                 };
             }
-            let backend = cameras
-                .backend()
-                .ok_or(CameraFailure::Camera(CameraError::NoCamera))?;
-            let mut devices = DeviceList::new();
-            devices.update(backend.devices().map_err(CameraFailure::Camera)?);
-            let remembered = settings.camera_device_id.clone().map(DeviceId::from_stored);
-            let device = devices
-                .pick(remembered.as_ref())
-                .ok_or(CameraFailure::Camera(CameraError::NoCamera))?
-                .id
-                .clone();
-            let selection = self
-                .screen_encoders()
-                .select(&settings, encoder_prefs(ceiling));
-            let encoders = natural_factory(selection.candidates, Arc::default());
-            let send = CameraSend::start(backend.as_ref(), &device, ceiling, encoders, None)
-                .map_err(CameraFailure::Camera)?;
+            let send = match cameras.local.take() {
+                Some(send) => send,
+                None => self.camera_send_start(&mut cameras, &settings, None, background)?,
+            };
             let Some(state) = next_state(CameraState::Off, Step::Open) else {
                 return Err(CameraFailure::Busy);
             };
@@ -453,7 +471,7 @@ impl Engine {
                 let on_end: OnEnd = Box::new(move |end| {
                     tracing::info!(?end, "camera broadcast ended");
                     if let Some(engine) = weak.upgrade() {
-                        engine.camera_broadcast_ended(server_id, id);
+                        engine.camera_broadcast_ended(server_id, id, end);
                     }
                 });
                 let publisher =
@@ -499,10 +517,16 @@ impl Engine {
         result
     }
 
-    /// Turns the camera off from any state (Cancel in the preview, the camera button, every
-    /// stop rule of FR-8.21): announces `off` when it was on air, ends the broadcast and
-    /// releases the device.
+    /// Turns the camera off from any state (Cancel in the preview, the camera button): announces
+    /// `off` when it was on air, ends the broadcast and releases the device. The stop rules of
+    /// FR-8.21 – FR-8.24 take the same path with their reason ([`Self::camera_stop`]).
     pub fn camera_turn_off(&self, server_id: ServerId) {
+        self.camera_stop(server_id, StopReason::TurnedOff);
+    }
+
+    /// Ends the own camera on `server_id` if it runs there; `error` is the "Camera stopped"
+    /// notice the off view carries (FR-8.23, FR-8.24).
+    pub(super) fn camera_end(&self, server_id: ServerId, error: Option<CameraFailure>) {
         let own = {
             let mut cameras = lock(self.camera_state());
             let applies = cameras.own.as_ref().is_some_and(|o| {
@@ -525,20 +549,37 @@ impl Engine {
         // The publisher's drop closes the link (the relay ends the broadcast), the capture's
         // drop turns the camera light off.
         drop(own);
-        tracing::info!("camera off");
-        self.emit_camera(server_id, None);
+        tracing::info!(
+            reason = error.as_ref().map(CameraFailure::code),
+            "camera off"
+        );
+        self.emit_camera(
+            server_id,
+            Some(CameraView {
+                error,
+                ..CameraView::off(server_id)
+            }),
+        );
     }
 
-    /// The relay link of the own camera ended by itself ("relay lost", FR-8.21).
-    fn camera_broadcast_ended(&self, server_id: ServerId, id: BroadcastId) {
+    /// The relay link of the own camera ended by itself (FR-8.24).
+    fn camera_broadcast_ended(&self, server_id: ServerId, id: BroadcastId, end: BroadcastEnd) {
         let same = lock(self.camera_state())
             .own
             .as_ref()
             .and_then(|o| o.live.as_ref().filter(|_| o.server_id == server_id))
             .is_some_and(|l| l.id == id);
         if same {
-            self.camera_turn_off(server_id);
+            self.camera_stop(server_id, StopReason::from_end(end));
         }
+    }
+
+    /// The own camera's server and state, if it runs.
+    pub(super) fn camera_own(&self) -> Option<(ServerId, CameraState)> {
+        lock(self.camera_state())
+            .own
+            .as_ref()
+            .map(|o| (o.server_id, o.state))
     }
 
     /// A viewer asked to join the own camera `id` (FR-8.47). Same channel, not blocked and
@@ -786,7 +827,7 @@ pub(crate) fn on_tick(state: &ServerCameras, ctx: &SessionCtx) {
     };
     if let Some(reason) = ended {
         tracing::info!(?reason, "camera stopped on its own");
-        engine.camera_turn_off(ctx.server_id);
+        engine.camera_stop(ctx.server_id, StopReason::DeviceLost(reason));
     }
     super::recv::on_tick(&engine, ctx);
 }
@@ -828,6 +869,8 @@ pub(crate) fn on_user_moved(
         return;
     };
     if ctx.handle.with_state(|s| s.session) == Some(session) {
+        // Leaving or being moved out of the channel ends the own camera (FR-8.21, FR-8.50).
+        engine.camera_stop(ctx.server_id, StopReason::LeftChannel);
         super::recv::on_own_channel_changed(&engine, ctx);
     }
     if in_own_channel(ctx, session) {

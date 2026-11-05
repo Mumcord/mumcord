@@ -1,7 +1,8 @@
 //! The camera's capture → effects → encode pipeline (spec 08, FR-8.43 – FR-8.46).
 //!
-//! The capture backend pushes NV12 frames from its own thread into a small lock-free queue;
-//! one encode thread takes them, runs the effects seam (C-4), scales to the size the viewers
+//! The capture backend pushes NV12 frames from its own thread to the background effects thread
+//! (`mumcord_effects`, FR-8.38), which hands them on into a small lock-free queue; one encode
+//! thread takes them, offers them to the preview ([`PreviewTap`]), scales to the size the viewers
 //! want and encodes natural video in L1T3 with the screen-sharing encoder selection. Encoded
 //! frames go to the relay publisher ([`CameraFrames`], a [`FrameSource`]).
 //!
@@ -19,10 +20,12 @@ use crossbeam_queue::ArrayQueue;
 use mumcord_camera::{
     CameraBackend, CameraError, CameraFrame, CaptureRequest, CaptureSession, DeviceId, FrameSink,
 };
+use mumcord_effects::{Effects, EffectsConfig};
 use mumcord_screenshare::{EncoderConfig, I420Frame, VideoEncoder};
 use mumcord_store::{CameraSendQuality, ScreenOptimize};
 use tokio::sync::mpsc;
 
+use super::preview::PreviewTap;
 use crate::screen_share::EncoderFactory;
 use crate::screen_share::broadcast::link::FrameSource;
 use crate::screen_share::encoder::monitor::{FrameLoad, LoadMonitor};
@@ -151,10 +154,13 @@ impl Resize {
     }
 }
 
-/// The seam for background effects (C-4): runs on the encode thread between capture and
-/// encoding, on the NV12 picture in place. Real-time path: no allocation, lock, I/O or log.
-pub trait FrameEffect: Send {
-    fn apply(&mut self, frame: &mut CameraFrame);
+/// The stages between capture and encoding.
+#[derive(Default)]
+pub(crate) struct Stages {
+    /// The background effects; `None` passes frames unchanged (and the background can't be
+    /// changed while the camera runs).
+    pub effects: Option<EffectsConfig>,
+    pub preview: Option<Arc<PreviewTap>>,
 }
 
 /// Why the pipeline stopped on its own; read by the stop rules (C-9).
@@ -162,10 +168,12 @@ pub trait FrameEffect: Send {
 pub enum SendEnded {
     /// The camera was unplugged or vanished (FR-8.21 "device lost").
     DeviceGone,
-    /// The camera sent unreadable pictures, or the backend failed.
+    /// The backend failed.
     CameraFailed,
     /// No encoder could be opened.
     EncoderFailed,
+    /// More than 30 frames in a row could not be decoded (FR-8.26).
+    Unreadable,
 }
 
 impl SendEnded {
@@ -174,6 +182,7 @@ impl SendEnded {
             Self::DeviceGone => 1,
             Self::CameraFailed => 2,
             Self::EncoderFailed => 3,
+            Self::Unreadable => 4,
         }
     }
 
@@ -182,6 +191,7 @@ impl SendEnded {
             1 => Some(Self::DeviceGone),
             2 => Some(Self::CameraFailed),
             3 => Some(Self::EncoderFailed),
+            4 => Some(Self::Unreadable),
             _ => None,
         }
     }
@@ -266,7 +276,8 @@ impl FrameSink for QueueSink {
     fn ended(&mut self, reason: CameraError) {
         self.control.end(match reason {
             CameraError::DeviceGone | CameraError::NoCamera => SendEnded::DeviceGone,
-            _ => SendEnded::CameraFailed,
+            CameraError::Unreadable => SendEnded::Unreadable,
+            CameraError::PermissionDenied | CameraError::Backend(_) => SendEnded::CameraFailed,
         });
     }
 }
@@ -276,6 +287,7 @@ impl FrameSink for QueueSink {
 pub(crate) struct CameraSend {
     control: Arc<Control>,
     capture: Option<Box<dyn CaptureSession>>,
+    effects: Option<Effects>,
     frames: Option<mpsc::Receiver<Arc<Frame>>>,
     thread: Option<JoinHandle<()>>,
 }
@@ -288,7 +300,7 @@ impl CameraSend {
         device: &DeviceId,
         ceiling: SendCeiling,
         encoders: EncoderFactory,
-        effect: Option<Box<dyn FrameEffect>>,
+        stages: Stages,
     ) -> Result<Self, CameraError> {
         let control = Arc::new(Control::new());
         let queue = Arc::new(ArrayQueue::new(CAPTURE_QUEUE));
@@ -298,7 +310,7 @@ impl CameraSend {
             queue: queue.clone(),
             ceiling,
             encoders,
-            effect,
+            preview: stages.preview,
             out: tx,
         };
         let thread = thread::Builder::new()
@@ -306,15 +318,30 @@ impl CameraSend {
             .spawn(move || encode.run())
             .map_err(|e| CameraError::Backend(format!("encode thread: {e}")))?;
         let _ = control.thread.set(thread.thread().clone());
-        let sink = QueueSink {
+        let mut sink: Box<dyn FrameSink> = Box::new(QueueSink {
             queue,
             control: control.clone(),
-        };
+        });
+        let mut effects = None;
+        if let Some(config) = stages.effects {
+            // Without the effects thread the camera still works, with the background unchanged.
+            match Effects::start(config, sink) {
+                Ok((started, input)) => {
+                    effects = Some(started);
+                    sink = input;
+                }
+                Err(e) => {
+                    control.stop.store(true, Ordering::Relaxed);
+                    control.wake();
+                    return Err(CameraError::Backend(format!("effects thread: {e}")));
+                }
+            }
+        }
         let request = CaptureRequest {
             max_fps: ceiling.fps.max(1),
             ..CaptureRequest::default()
         };
-        let capture = match backend.open(device, request, Box::new(sink)) {
+        let capture = match backend.open(device, request, sink) {
             Ok(capture) => capture,
             Err(e) => {
                 control.stop.store(true, Ordering::Relaxed);
@@ -325,6 +352,7 @@ impl CameraSend {
         Ok(Self {
             control,
             capture: Some(capture),
+            effects,
             frames: Some(rx),
             thread: Some(thread),
         })
@@ -350,6 +378,11 @@ impl CameraSend {
         })
     }
 
+    /// The background effects of this camera, when they run.
+    pub fn effects(&self) -> Option<&Effects> {
+        self.effects.as_ref()
+    }
+
     /// Why the pipeline stopped on its own, if it did.
     pub fn ended(&self) -> Option<SendEnded> {
         SendEnded::from_code(self.control.ended.load(Ordering::Relaxed))
@@ -359,7 +392,9 @@ impl CameraSend {
 impl Drop for CameraSend {
     fn drop(&mut self) {
         // The capture first: its drop joins the capture thread and turns the camera light off.
+        // The effects thread then sees no more frames and stops when its handle drops.
         self.capture.take();
+        self.effects.take();
         self.control.stop.store(true, Ordering::Relaxed);
         self.control.wake();
         // Not joined: an encode in progress finishes on its own within a frame time.
@@ -411,12 +446,12 @@ struct EncodeLoop {
     queue: Arc<ArrayQueue<CameraFrame>>,
     ceiling: SendCeiling,
     encoders: EncoderFactory,
-    effect: Option<Box<dyn FrameEffect>>,
+    preview: Option<Arc<PreviewTap>>,
     out: mpsc::Sender<Arc<Frame>>,
 }
 
 impl EncodeLoop {
-    fn run(mut self) {
+    fn run(self) {
         let control = self.control.clone();
         let mut resize = Resize::new(target_height(None, self.ceiling));
         let mut running: Option<Running> = None;
@@ -436,12 +471,12 @@ impl EncodeLoop {
             if control.ended.load(Ordering::Relaxed) != 0 {
                 return;
             }
-            let Some(mut frame) = self.queue.pop() else {
+            let Some(frame) = self.queue.pop() else {
                 thread::park_timeout(IDLE_WAIT);
                 continue;
             };
-            if let Some(effect) = self.effect.as_mut() {
-                effect.apply(&mut frame);
+            if let Some(preview) = &self.preview {
+                preview.offer(&frame);
             }
             if control.paused() {
                 paused = true;
@@ -767,9 +802,14 @@ mod tests {
     fn the_test_camera_is_encoded_only_on_air_with_viewers_and_at_the_wanted_size() {
         let camera = TestCamera::new(TestCameraMode::Present);
         let ceiling = SendCeiling::from_setting(CameraSendQuality::Auto);
-        let mut send =
-            CameraSend::start(&camera, &TestCamera::device_id(), ceiling, vp9_only(), None)
-                .expect("test camera opens");
+        let mut send = CameraSend::start(
+            &camera,
+            &TestCamera::device_id(),
+            ceiling,
+            vp9_only(),
+            Stages::default(),
+        )
+        .expect("test camera opens");
         let mut rx = send.frames.take().expect("one taker");
         // The publisher's side of the control, without its queue.
         let frames = CameraFrames {
@@ -809,6 +849,49 @@ mod tests {
     }
 
     #[test]
+    fn the_preview_gets_pictures_through_the_effects_before_the_camera_is_on_air() {
+        use mumcord_effects::Background;
+        use mumcord_store::CameraEffectQuality;
+
+        let camera = TestCamera::new(TestCameraMode::Present);
+        let ceiling = SendCeiling::from_setting(CameraSendQuality::Auto);
+        let tap = Arc::new(PreviewTap::default());
+        let (tx, rx) = std::sync::mpsc::channel();
+        tap.set_sink(Some(Box::new(
+            move |p: super::super::PreviewPicture<'_>| {
+                let _ = tx.send((p.width, p.height, p.rgba.len()));
+            },
+        )));
+        let stages = Stages {
+            effects: Some(EffectsConfig {
+                fps: ceiling.fps,
+                quality: CameraEffectQuality::Auto,
+                background: Background::None,
+                on_battery: Arc::new(|| false),
+            }),
+            preview: Some(tap.clone()),
+        };
+        let send = CameraSend::start(
+            &camera,
+            &TestCamera::device_id(),
+            ceiling,
+            vp9_only(),
+            stages,
+        )
+        .expect("test camera opens");
+        let (w, h, len) = rx
+            .recv_timeout(Duration::from_secs(5))
+            .expect("a preview picture");
+        assert_eq!((w, h, len), (640, 360, 640 * 360 * 4));
+        assert!(send.effects().is_some());
+        // Without a sink nothing is converted any more.
+        tap.set_sink(None);
+        drop(send);
+        while rx.try_recv().is_ok() {}
+        assert!(rx.recv_timeout(Duration::from_millis(300)).is_err());
+    }
+
+    #[test]
     fn a_refused_camera_reports_the_error() {
         let camera = TestCamera::new(TestCameraMode::Denied);
         let opened = CameraSend::start(
@@ -816,7 +899,7 @@ mod tests {
             &TestCamera::device_id(),
             SendCeiling::from_setting(CameraSendQuality::Auto),
             vp9_only(),
-            None,
+            Stages::default(),
         );
         assert_eq!(opened.err(), Some(CameraError::PermissionDenied));
     }

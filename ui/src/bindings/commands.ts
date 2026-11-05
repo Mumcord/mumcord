@@ -955,6 +955,100 @@ export const commands = {
 	/**  Why camera sharing is unavailable on a connected server; `null` when it is available. */
 	cameraUnavailable: (serverId: number) => typedError<CameraUnavailable | null, ApiError>(__TAURI_INVOKE("camera_unavailable", { serverId })),
 	/**
+	 *  Test command `lockScreen` (spec 08, section 10.3): simulates a screen lock, which turns the
+	 *  camera off when "Turn my camera off when my screen locks" is on. Inert (`notImplemented`)
+	 *  unless a debug build runs with `MUMCORD_TEST_SCREEN_LOCK=1`.
+	 */
+	lockScreen: () => typedError<null, ApiError>(__TAURI_INVOKE("lock_screen")),
+	/**  The cameras of this computer, in OS order (FR-8.11 picker, Settings → Camera). */
+	cameraDevices: () => typedError<CameraDevice[], ApiError>(__TAURI_INVOKE("camera_devices")),
+	/**  The own camera now; `null` while it is off. */
+	cameraView: () => __TAURI_INVOKE<CameraView | null>("camera_view"),
+	/**
+	 *  Opens the preview dialog's camera on a server (Off → Preview, FR-8.10) with the default
+	 *  background; nothing is sent. Takes over a running Settings preview (FR-8.29). Errors:
+	 *  `notConnected`, `camera` (reason in `message`).
+	 */
+	cameraPreviewStart: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("camera_preview_start", { serverId })),
+	/**
+	 *  **Turn on camera** (FR-8.13): resolves once the camera is on air. A failure leaves the
+	 *  camera in the preview; the reason is the error's `message` and `CameraView.error`.
+	 */
+	cameraTurnOn: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("camera_turn_on", { serverId })),
+	/**
+	 *  Turns the camera off from any state: Cancel / Esc in the preview, the camera button
+	 *  (FR-8.12). Releases the device.
+	 */
+	cameraTurnOff: (serverId: number) => __TAURI_INVOKE<void>("camera_turn_off", { serverId }),
+	/**
+	 *  Starts the Settings → Camera preview (FR-8.30), without a server. Errors: `camera` with
+	 *  `busy` while the preview dialog or the camera runs, or the camera's reason.
+	 */
+	cameraLocalPreviewStart: () => typedError<null, ApiError>(__TAURI_INVOKE("camera_local_preview_start")),
+	/**  Stops the Settings preview when the page or the Settings window closes (FR-8.30). */
+	cameraLocalPreviewStop: () => __TAURI_INVOKE<void>("camera_local_preview_stop"),
+	/**
+	 *  Switches the running preview to another camera (id from `camera_devices`). Does not save
+	 *  the choice; the UI stores it as `cameraDeviceId`. Errors: `camera` with `busy` while on
+	 *  air, or the new camera's reason (the old one keeps running).
+	 */
+	cameraSetDevice: (deviceId: string) => typedError<null, ApiError>(__TAURI_INVOKE("camera_set_device", { deviceId })),
+	/**
+	 *  Changes the background of the running camera, also on air (FR-8.11, FR-8.40). Does not
+	 *  save it; "Use this background next time" saves the setting. Errors: `notFound` for an
+	 *  unknown image, `invalidInput` for an image that can't be decoded.
+	 */
+	cameraSetBackground: (background: CameraBackground, blurStrength: number) => typedError<null, ApiError>(__TAURI_INVOKE("camera_set_background", { background, blurStrength })),
+	/**  Changes the effect quality of the running camera (FR-8.35); Auto measures again. */
+	cameraSetEffectQuality: (quality: CameraEffectQuality) => __TAURI_INVOKE<void>("camera_set_effect_quality", { quality }),
+	/**
+	 *  Whether effects can run on this PC, and the load line of the running camera (FR-8.33,
+	 *  FR-8.36, FR-8.37). The preview polls it about once a second.
+	 */
+	cameraEffects: () => __TAURI_INVOKE<CameraEffects>("camera_effects"),
+	/**
+	 *  Sends the own camera's picture (after the effect, at most 640×360) to `frames` from now on:
+	 *  binary messages with an RGBA picture in the screen-share layout (`ui/src/api/screenFrames.ts`).
+	 *  One window at a time: the preview dialog, Settings or the room's self-view; attaching
+	 *  replaces the earlier channel. Pictures come while the camera runs in any state.
+	 */
+	cameraPreviewAttach: (frames: Channel<ArrayBuffer>) => __TAURI_INVOKE<void>("camera_preview_attach", { frames }),
+	/**
+	 *  Stops sending the picture to the channel `channel_id` (`Channel.id` in JavaScript); does
+	 *  nothing when another window attached since.
+	 */
+	cameraPreviewDetach: (channelId: number) => __TAURI_INVOKE<void>("camera_preview_detach", { channelId }),
+	/**  The camera room of a server now (empty while nobody's camera is on). */
+	cameraRoom: (serverId: number) => __TAURI_INVOKE<CameraRoomView>("camera_room", { serverId }),
+	/**  The UI opened or closed the camera room (FR-8.53); closing stops every download. */
+	cameraRoomSetOpen: (serverId: number, open: boolean) => __TAURI_INVOKE<void>("camera_room_set_open", { serverId, open }),
+	/**  The strip position Hidden (FR-8.71): no video is downloaded while it is in effect. */
+	cameraRoomSetVideosHidden: (serverId: number, hidden: boolean) => __TAURI_INVOKE<void>("camera_room_set_videos_hidden", { serverId, hidden }),
+	/**  "Hide {name}'s video" / "Show video" on one tile (FR-8.57). */
+	cameraTileSetHidden: (serverId: number, sharer: number, hidden: boolean) => __TAURI_INVOKE<void>("camera_tile_set_hidden", { serverId, sharer, hidden }),
+	/**  "Quality for me" of one tile (FR-8.56). */
+	cameraTileSetQuality: (serverId: number, sharer: number, quality: CameraTileQuality) => __TAURI_INVOKE<void>("camera_tile_set_quality", { serverId, sharer, quality }),
+	/**  The tile's height on screen in device pixels, so Auto asks for a fitting resolution. */
+	cameraTileSetHeight: (serverId: number, sharer: number, height: number) => __TAURI_INVOKE<void>("camera_tile_set_height", { serverId, sharer, height }),
+	/**  Asks the camera owner for a keyframe, e.g. after the tile's decoder failed. */
+	cameraRequestKeyframe: (serverId: number, sharer: number) => __TAURI_INVOKE<void>("camera_request_keyframe", { serverId, sharer }),
+	/**
+	 *  Sends the frames of `sharer`'s camera to `frames` from now on (layout in
+	 *  `ui/src/api/screenFrames.ts`), replacing an earlier channel of that tile: the main window and
+	 *  the pop-out each attach their tiles. Asks for a keyframe so the new decoder can start.
+	 */
+	cameraFramesAttach: (serverId: number, sharer: number, frames: Channel<ArrayBuffer>) => __TAURI_INVOKE<void>("camera_frames_attach", { serverId, sharer, frames }),
+	/**
+	 *  Stops sending `sharer`'s frames to the channel `channel_id` (`Channel.id` in JavaScript);
+	 *  does nothing when another window attached that tile since.
+	 */
+	cameraFramesDetach: (serverId: number, sharer: number, channelId: number) => __TAURI_INVOKE<void>("camera_frames_detach", { serverId, sharer, channelId }),
+	/**
+	 *  Decodes camera frames of `codecs` in Rust and sends RGBA pictures instead, for the codecs the
+	 *  webview's WebCodecs cannot decode (FR-8.54). Replaces the earlier list; for every camera.
+	 */
+	cameraSetDecodeCodecs: (codecs: VideoCodec[]) => __TAURI_INVOKE<void>("camera_set_decode_codecs", { codecs }),
+	/**
 	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
 	 *  `p2pLinkChanged`.
 	 */
@@ -1147,6 +1241,8 @@ export const events = {
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
 	cameraAvailabilityChanged: makeEvent<CameraAvailabilityChanged, CameraAvailabilityChanged>("camera-availability-changed"),
+	cameraChanged: makeEvent<CameraChanged, CameraChanged>("camera-changed"),
+	cameraRoomChanged: makeEvent<CameraRoomChanged, CameraRoomChanged>("camera-room-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
@@ -1520,8 +1616,132 @@ export type CameraAvailabilityChanged = {
 	reason: CameraUnavailable | null,
 };
 
+/**  A background choice (FR-8.11): none, blur, a built-in image or an own image. */
+export type CameraBackground = { kind: "none" } | { kind: "blur" } | { kind: "builtin"; id: string } | { kind: "own"; id: string };
+
+/**  The own camera changed (state, error, viewers). `state: "off"` once it is off. */
+export type CameraChanged = {
+	view: CameraView,
+};
+
+/**  A camera of this computer. The name is for the picker only and never logged (FR-8.28). */
+export type CameraDevice = {
+	/**  Stable id; Settings remember it as `cameraDeviceId` (FR-8.27). */
+	id: string,
+	name: string,
+	isDefault: boolean,
+};
+
+/**  The effect level that runs: "Best" or "Light" (FR-8.36). */
+export type CameraEffectLevel = "best" | "light";
+
+/**  The load line "Effects run on this device. Load: {low|medium|high}" (FR-8.36). */
+export type CameraEffectLoad = "low" | "medium" | "high";
+
+/**  Effect quality (FR-8.35). */
+export type CameraEffectQuality = "auto" | "best" | "light";
+
+/**  The background effects of this PC and of the running camera. */
+export type CameraEffects = {
+	/**
+	 *  Why background effects are off on this PC, for "Background effects are not available on
+	 *  this PC: {reason}" (FR-8.33); `null` when they can run.
+	 */
+	unavailable: string | null,
+	/**  The level that runs; `null` while no camera runs or the background is None. */
+	level: CameraEffectLevel | null,
+	/**  `null` while no camera runs. */
+	load: CameraEffectLoad | null,
+	/**  "Your PC is too busy for this background effect." (FR-8.37) */
+	tooBusy: boolean,
+};
+
+/**
+ *  Why the preview could not open or the camera could not turn on; the UI shows the texts of
+ *  FR-8.25, FR-8.26 and FR-8.51.
+ */
+export type CameraFailure = "notConnected" | 
+/**
+ *  Another camera runs already (one per Mumcord instance, FR-8.29), or the step does not fit
+ *  the camera's state.
+ */
+"busy" | "noCamera" | "permissionDenied" | "deviceGone" | "unreadable" | "cameraFailed" | "roomFull" | "relayFull" | "useNotAllowed" | "denied" | "relayDown" | 
+/**  The relay ended the broadcast ("Camera stopped by the server's relay"). */
+"relayEnded" | "rateLimited" | 
+/**  The P2P mode leaves the relay out. */
+"mode" | "noCertificate";
+
+/**  The camera room of a server changed (tiles, their states, open, hidden). */
+export type CameraRoomChanged = {
+	view: CameraRoomView,
+};
+
+/**  The cameras of the own channel on one server; blocked people are left out (FR-8.59). */
+export type CameraRoomView = {
+	serverId: number,
+	/**  The room is open (also opened by the engine for "Show cameras: Always", FR-8.53). */
+	open: boolean,
+	/**  The strip position Hidden is in effect (FR-8.71). */
+	videosHidden: boolean,
+	/**  Ordered by session. */
+	tiles: CameraTile[],
+};
+
+/**  Where the own camera is (spec 08, section 6.4). */
+export type CameraState = "off" | 
+/**  The preview runs locally; nothing is sent (FR-8.10). */
+"preview" | 
+/**  **Turn on camera** was pressed; waiting for the broadcast (FR-8.13). */
+"requesting" | 
+/**  The camera is on air. */
+"onAir";
+
+/**  One camera of another person in the room. */
+export type CameraTile = {
+	/**  The camera owner's session. */
+	sharer: number,
+	state: CameraTileState,
+	/**  The user chose "Hide {name}'s video" on this tile. */
+	hidden: boolean,
+	quality: CameraTileQuality,
+	/**  Data saver is in effect (the tile's choice or the Settings switch). */
+	dataSaver: boolean,
+	/**  The "{n} fps" badge with "Weak connection" (FR-8.58); `null` hides it. */
+	fpsBadge: number | null,
+};
+
+/**  "Quality for me" of one tile (FR-8.56). */
+export type CameraTileQuality = "auto" | "dataSaver" | "best";
+
+/**  Where a camera tile is (spec 08, section 6.6). */
+export type CameraTileState = 
+/**  The person's camera is on; nothing is downloaded yet. */
+"announced" | 
+/**  Joining the camera; the tile shows the loading state. */
+"joining" | 
+/**  Receiving video; its frames come on the tile's channel (`camera_frames_attach`). */
+"playing" | 
+/**  "Too many people are watching {name}" (FR-8.52). */
+"full" | 
+/**  The join brought no answer; retried every 10 s. */
+"failed" | 
+/**  Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never. */
+"hidden";
+
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
 export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
+
+/**  The own camera as the preview dialog, Settings, the room and the tray see it. */
+export type CameraView = {
+	serverId: number,
+	state: CameraState,
+	/**  Why the last **Turn on camera** failed; shown in the preview until the next try. */
+	error: CameraFailure | null,
+	/**  The broadcast id (16 hex) while on air. */
+	broadcast: string | null,
+	/**  The people who receive the camera now. */
+	viewers: number[],
+};
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
 export type CertTrustRequired = {
@@ -1889,6 +2109,13 @@ export type ErrorCode =
 "directUnavailable" | 
 /**  Connecting would exceed the "connected servers" limit (FR-2.1); `message` names it. */
 "serverLimitReached" | 
+/**
+ *  The camera could not be opened or turned on (spec 08); `message` is the reason code:
+ *  `busy`, `noCamera`, `permissionDenied`, `deviceGone`, `unreadable`, `cameraFailed`,
+ *  `roomFull`, `relayFull`, `useNotAllowed`, `denied`, `relayDown`, `rateLimited`, `mode`
+ *  or `noCertificate`.
+ */
+"camera" | 
 /**  Unexpected internal failure. */
 "internal";
 
@@ -2545,7 +2772,9 @@ export type MediaPopoutKind =
 /**  A watched screen share. */
 "share" | 
 /**  A plugin activity on the stage. */
-"stage";
+"stage" | 
+/**  The camera room of the own voice channel. */
+"camera";
 
 /**  One kind of pop-out. */
 export type MediaPopoutSlot = {
@@ -2560,15 +2789,16 @@ export type MediaPopoutState = {
 	watch: MediaPopoutSlot,
 	share: MediaPopoutSlot,
 	stage: MediaPopoutSlot,
+	camera: MediaPopoutSlot,
 };
 
 /**
- *  What a pop-out shows: the party of `serverId`, the share of `session` on `serverId`, or the
- *  activity of `plugin` in the user's channel on `serverId`.
+ *  What a pop-out shows: the party of `serverId`, the share of `session` on `serverId`, the
+ *  activity of `plugin` in the user's channel on `serverId`, or the camera room of `serverId`.
  */
 export type MediaPopoutTarget = {
 	serverId: number,
-	/**  The sharer; `null` for the watch party and the stage. */
+	/**  The sharer; `null` for the other kinds. */
 	session: number | null,
 	/**  The plugin whose activity the stage pop-out shows; `null` for the other kinds. */
 	plugin: string | null,
