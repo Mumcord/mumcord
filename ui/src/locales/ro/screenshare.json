@@ -222,5 +222,14 @@
     "valueUnavailable": "Indisponibil",
     "checkAgain": "Verifică din nou",
     "checking": "Se verifică…"
+  },
+  "soundPicker": {
+    "title": "Sunetul cărei aplicații?",
+    "noSound": "Fără sunet",
+    "share": "Partajează sunetul",
+    "cancel": "Anulează",
+    "empty": "Nicio aplicație nu redă sunet acum",
+    "gone": "Aplicația nu mai redă sunet. Alege alta.",
+    "failed": "Alegerea ta nu a putut fi aplicată."
   }
 }

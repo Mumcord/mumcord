@@ -218,5 +218,14 @@
     "valueUnavailable": "Pole saadaval",
     "checkAgain": "Kontrolli uuesti",
     "checking": "Kontrollin…"
+  },
+  "soundPicker": {
+    "title": "Millise rakenduse heli?",
+    "noSound": "Heli pole",
+    "share": "Jaga heli",
+    "cancel": "Tühista",
+    "empty": "Praegu ei esita ükski rakendus heli",
+    "gone": "See rakendus lõpetas heli esitamise. Vali teine.",
+    "failed": "Sinu valikut ei õnnestunud rakendada."
   }
 }

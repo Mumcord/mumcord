@@ -226,5 +226,14 @@
     "valueUnavailable": "Niedostępne",
     "checkAgain": "Sprawdź ponownie",
     "checking": "Sprawdzanie…"
+  },
+  "soundPicker": {
+    "title": "Dźwięk której aplikacji?",
+    "noSound": "Bez dźwięku",
+    "share": "Udostępnij dźwięk",
+    "cancel": "Anuluj",
+    "empty": "Żadna aplikacja nie odtwarza teraz dźwięku",
+    "gone": "Ta aplikacja przestała odtwarzać dźwięk. Wybierz inną.",
+    "failed": "Nie udało się zastosować Twojego wyboru."
   }
 }

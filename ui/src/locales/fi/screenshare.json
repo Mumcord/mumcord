@@ -218,5 +218,14 @@
     "valueUnavailable": "Ei saatavilla",
     "checkAgain": "Tarkista uudelleen",
     "checking": "Tarkistetaan…"
+  },
+  "soundPicker": {
+    "title": "Minkä sovelluksen ääni?",
+    "noSound": "Ei ääntä",
+    "share": "Jaa ääni",
+    "cancel": "Peruuta",
+    "empty": "Mikään sovellus ei toista ääntä juuri nyt",
+    "gone": "Sovellus lopetti äänen toiston. Valitse toinen.",
+    "failed": "Valintaasi ei voitu ottaa käyttöön."
   }
 }

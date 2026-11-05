@@ -4,6 +4,7 @@
 
 ### Added
 
+- A "Which app's sound?" dialog opens while you share a window and Mumcord needs to know whose sound to share: pick an app that plays sound right now or "No sound"; the list updates while the dialog is open
 - Bots are shown apart from people (#458): a new "Bots on this server" section below the channel tree lists every bot with what it does (e.g. Relay · Chat history · Webhooks), and its profile and menu, private messages included, work from there. Bots that never talk, like the relay, no longer appear in the channel tree, the member list, @mention suggestions or people pickers; bots with voice, like a music bot, stay in their channel. Bots carry a BOT badge instead of the Mumcord badge
 - Settings → Screen sharing has an "Ask for these settings each time I share" switch and shows whether this computer plays AV1 and VP9 with hardware or software
 - Kick… and Ban… in the Admin ▸ sub-menu of a person (issue #253): the kick dialog asks with the reason, the ban dialog with the reason, the length (1 hour, 1 day, 7 days, 30 days, permanent, a custom date), the targets (certificate and IP address with its mask, the address stays because a standard server matches it) and "Remove from server now". A precise ban adds one entry to the server's ban list with the safe save and then removes the person; a server that will not show its list only allows its own default length, and the dialog says so. The items show only with the Kick or Ban right on the root channel, never for yourself, and a refusal appears inside the open dialog.

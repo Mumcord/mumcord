@@ -222,5 +222,14 @@
     "valueUnavailable": "Non disponibile",
     "checkAgain": "Ricontrolla",
     "checking": "Controllo in corso…"
+  },
+  "soundPicker": {
+    "title": "L’audio di quale app?",
+    "noSound": "Nessun audio",
+    "share": "Condividi audio",
+    "cancel": "Annulla",
+    "empty": "In questo momento nessuna app riproduce audio",
+    "gone": "Questa app non riproduce più audio. Scegline un’altra.",
+    "failed": "Non è stato possibile applicare la tua scelta."
   }
 }

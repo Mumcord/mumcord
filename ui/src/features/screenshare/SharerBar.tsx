@@ -24,6 +24,7 @@ import { ShareBadges } from "./quality/ShareBadges";
 import { shareStartedAt } from "./sharesStore";
 import { useOwnShare } from "./useOwnShare";
 import { useDismiss } from "./useDismiss";
+import { SoundAppPicker } from "./SoundAppPicker";
 import { ShareStartDialog } from "./start/ShareStartDialog";
 import { useShareActions } from "./useShareActions";
 import { MAX_VIEWERS, ViewerList } from "./Viewers";
@@ -241,6 +242,7 @@ export function SharerBar(): ReactNode {
       </div>
       <ShareNotices serverId={serverId} own={own} quality={quality} />
       {startDialog !== null && <ShareStartDialog {...startDialog} />}
+      {own.soundChoice !== null && <SoundAppPicker serverId={serverId} apps={own.soundChoice} />}
     </>
   );
 }

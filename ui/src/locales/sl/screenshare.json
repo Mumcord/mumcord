@@ -226,5 +226,14 @@
     "valueUnavailable": "Ni na voljo",
     "checkAgain": "Preveri znova",
     "checking": "Preverjam…"
+  },
+  "soundPicker": {
+    "title": "Zvok katere aplikacije?",
+    "noSound": "Brez zvoka",
+    "share": "Deli zvok",
+    "cancel": "Prekliči",
+    "empty": "Trenutno nobena aplikacija ne predvaja zvoka",
+    "gone": "Ta aplikacija ne predvaja več zvoka. Izberite drugo.",
+    "failed": "Vaše izbire ni bilo mogoče uporabiti."
   }
 }

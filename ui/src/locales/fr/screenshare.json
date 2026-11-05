@@ -222,5 +222,14 @@
     "valueUnavailable": "Non disponible",
     "checkAgain": "Vérifier à nouveau",
     "checking": "Vérification…"
+  },
+  "soundPicker": {
+    "title": "Le son de quelle application ?",
+    "noSound": "Pas de son",
+    "share": "Partager le son",
+    "cancel": "Annuler",
+    "empty": "Aucune application ne joue de son pour le moment",
+    "gone": "Cette application ne joue plus de son. Choisissez-en une autre.",
+    "failed": "Votre choix n’a pas pu être appliqué."
   }
 }

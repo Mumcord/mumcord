@@ -222,5 +222,14 @@
     "valueUnavailable": "Nije dostupno",
     "checkAgain": "Provjeri ponovno",
     "checking": "Provjeravam…"
+  },
+  "soundPicker": {
+    "title": "Zvuk koje aplikacije?",
+    "noSound": "Bez zvuka",
+    "share": "Podijeli zvuk",
+    "cancel": "Odustani",
+    "empty": "Trenutačno nijedna aplikacija ne reproducira zvuk",
+    "gone": "Ta aplikacija više ne reproducira zvuk. Odaberi drugu.",
+    "failed": "Tvoj odabir nije mogao biti primijenjen."
   }
 }

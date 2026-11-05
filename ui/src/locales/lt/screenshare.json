@@ -226,5 +226,14 @@
     "valueUnavailable": "Nepasiekiama",
     "checkAgain": "Patikrinti dar kartą",
     "checking": "Tikrinama…"
+  },
+  "soundPicker": {
+    "title": "Kurios programos garsas?",
+    "noSound": "Be garso",
+    "share": "Bendrinti garsą",
+    "cancel": "Atšaukti",
+    "empty": "Šiuo metu jokia programa negroja garso",
+    "gone": "Ši programa nebegroja garso. Pasirinkite kitą.",
+    "failed": "Jūsų pasirinkimo nepavyko pritaikyti."
   }
 }

@@ -218,5 +218,14 @@
     "valueUnavailable": "Ikke tilgængelig",
     "checkAgain": "Tjek igen",
     "checking": "Tjekker…"
+  },
+  "soundPicker": {
+    "title": "Hvilken apps lyd?",
+    "noSound": "Ingen lyd",
+    "share": "Del lyd",
+    "cancel": "Annuller",
+    "empty": "Ingen app afspiller lyd lige nu",
+    "gone": "Appen afspiller ikke lyd mere. Vælg en anden.",
+    "failed": "Dit valg kunne ikke anvendes."
   }
 }

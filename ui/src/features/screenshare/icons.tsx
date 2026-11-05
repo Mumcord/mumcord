@@ -20,6 +20,15 @@ function Icon({ size = 14, children }: { size?: number; children: ReactNode }) {
   );
 }
 
+/** The "No sound" row of the app picker. */
+export function NoSoundIcon({ size = 14 }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <path d="M11 5 6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6" />
+    </Icon>
+  );
+}
+
 /** Resolution chip. */
 export function MonitorIcon() {
   return (

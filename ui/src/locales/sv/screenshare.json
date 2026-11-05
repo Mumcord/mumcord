@@ -218,5 +218,14 @@
     "valueUnavailable": "Inte tillgängligt",
     "checkAgain": "Kontrollera igen",
     "checking": "Kontrollerar…"
+  },
+  "soundPicker": {
+    "title": "Vilken apps ljud?",
+    "noSound": "Inget ljud",
+    "share": "Dela ljud",
+    "cancel": "Avbryt",
+    "empty": "Ingen app spelar upp ljud just nu",
+    "gone": "Appen spelar inte upp ljud längre. Välj en annan.",
+    "failed": "Ditt val kunde inte tillämpas."
   }
 }
