@@ -418,3 +418,154 @@
     border: 1px solid ButtonText;
   }
 }
+
+/* --- Combined layout: the strip next to a screen share or watch party (FR-8.71–8.74) ------- */
+/* Without cameras next to it the main item renders as if the wrapper were not there. */
+.cam-combined-off,
+.cam-combined-off > .cam-combined__main {
+  display: contents;
+}
+
+.cam-combined {
+  display: grid;
+  grid-template-areas:
+    "head head"
+    "main strip"
+    "bar bar";
+  grid-template-columns: minmax(0, 1fr) 13.5rem;
+  gap: var(--space-3) var(--space-2);
+  align-items: start;
+}
+
+.cam-combined[data-position="above"] {
+  grid-template-areas:
+    "head"
+    "strip"
+    "main"
+    "bar";
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cam-combined[data-position="hidden"] {
+  grid-template-areas:
+    "head"
+    "main"
+    "bar";
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Show large: the camera takes the main picture's place, the picture goes small (FR-8.73). */
+.cam-combined[data-large][data-position="beside"] {
+  grid-template-areas:
+    "head head"
+    "large small"
+    "large strip"
+    "bar bar";
+}
+
+.cam-combined[data-large][data-position="above"] {
+  grid-template-areas:
+    "head head"
+    "small strip"
+    "large large"
+    "bar bar";
+  grid-template-columns: 11rem minmax(0, 1fr);
+}
+
+.cam-combined > .cam-combined__head {
+  grid-area: head;
+}
+
+.cam-combined > .cam-combined__main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.cam-combined > .cam-strip {
+  grid-area: strip;
+}
+
+.cam-combined > .cam-room__bar {
+  grid-area: bar;
+}
+
+.cam-combined .media-frame {
+  box-shadow: none;
+}
+
+.cam-combined[data-position="above"] .media-frame:not([data-fullscreen]) {
+  max-width: min(100%, calc((58vh - 7rem) * 16 / 9));
+}
+
+.cam-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.cam-strip.cam-strip--row {
+  flex-direction: row;
+}
+
+/* Only the picture shows small; what the view has below it stays out of sight. */
+.cam-combined[data-large] > .cam-combined__main {
+  grid-area: small;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.cam-combined[data-large] .media-frame {
+  max-width: none;
+}
+
+/* The small main picture only shows; it comes back large with Escape or a click on it. */
+.cam-combined[data-large] .media-frame__top,
+.cam-combined[data-large] .media-frame__bottom,
+.cam-combined[data-large] .media-frame__hint {
+  display: none;
+}
+
+.cam-combined__large {
+  grid-area: large;
+  width: 100%;
+  max-width: calc(58vh * 16 / 9);
+  margin-inline: auto;
+}
+
+.cam-combined__back {
+  z-index: 1;
+  display: flex;
+  grid-area: small;
+  align-items: flex-end;
+  justify-content: center;
+  align-self: start;
+  aspect-ratio: 16 / 9;
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--media-on-scrim);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
+  cursor: pointer;
+}
+
+.cam-combined__back:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+.cam-combined__back:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cam-combined:fullscreen {
+  height: 100%;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
