@@ -55,6 +55,19 @@ export async function waitForCard(name: string): Promise<void> {
 
 type Scope = ReturnType<typeof $>;
 
+/** The W3C web element reference that `browser.execute` turns into the DOM element. */
+export type ElementRef = { "element-6066-11e4-a52e-4f735466cecf": string };
+
+/**
+ * The reference of `scope` for `browser.execute`. Built by hand: webdriverio passes a found
+ * element it does not recognise as loaded as a plain object, and the page then gets no element.
+ */
+export async function elementRef(scope: Scope): Promise<ElementRef> {
+  const element = await scope.getElement();
+  if (!element.elementId) throw new Error("the element for browser.execute was not found");
+  return { "element-6066-11e4-a52e-4f735466cecf": element.elementId };
+}
+
 /**
  * The visible chip text ("Medium risk · 45", "Official · reviewed", …), without the words only a
  * screen reader gets.
@@ -68,7 +81,7 @@ export async function chipText(scope: Scope): Promise<string> {
       for (const hidden of clone.querySelectorAll(".visually-hidden")) hidden.remove();
       return clone.textContent;
     },
-    (await chip.getElement()) as unknown as HTMLElement,
+    (await elementRef(chip)) as unknown as HTMLElement,
   );
   return text.replace(/\s+/g, " ").trim();
 }

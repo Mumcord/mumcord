@@ -18,7 +18,7 @@ import { browser, $, $$, expect } from "@wdio/globals";
 import type { ChainablePromiseElement } from "webdriverio";
 import { pwapps, testenv } from "../../helpers/index.ts";
 import { artifactsDir } from "../../helpers/paths.ts";
-import { openAllSettings, searchSettings } from "../../helpers/settings-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { ports } from "../../helpers/testenv.ts";
 import {
   P1_HZ,
@@ -50,9 +50,9 @@ const picker = () => $("dialog.sound-picker");
 
 /** Switches A to `theme` in Settings, as a person would, and waits until the page shows it. */
 async function useTheme(theme: "dark" | "light"): Promise<void> {
-  await openAllSettings();
-  await searchSettings("Dark or light");
-  const mode = $("//*[@role='combobox'][substring(@id, string-length(@id) - 4)='-mode']");
+  // Straight to Appearance: a search only lists its hits and does not open the page by itself.
+  await openSettingsGroup("Appearance");
+  const mode = $("//label[normalize-space(.)='Dark or light']/following::*[@role='combobox'][1]");
   await mode.waitForClickable({ timeout: 10_000 });
   await mode.click();
   const label = theme === "dark" ? "Dark" : "Light";
