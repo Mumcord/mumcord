@@ -22,6 +22,7 @@ import {
   closeSettings,
   confirmInstall,
   installedRow,
+  officialLabel,
   openPlugins,
   openPrompt,
   prompt,
@@ -87,7 +88,7 @@ describe("plugins: confirmation box and the high-risk safety setting (AC-9.34, A
 
   it("AC-9.35: official plugins are unaffected by the setting", async () => {
     await waitForCard(OFFICIAL);
-    expect(await chipLevel(card(OFFICIAL))).toBe("official");
+    await expect(officialLabel(card(OFFICIAL))).toHaveText("✓ Official · reviewed");
     await openPrompt(OFFICIAL);
     await expect(promptInstall()).toBeEnabled();
     await expect(prompt()).not.toHaveText(expect.stringContaining("Blocked by your safety setting"));
@@ -101,7 +102,8 @@ describe("plugins: confirmation box and the high-risk safety setting (AC-9.34, A
     const row = installedRow(DEVELOPER);
     await row.waitForDisplayed({ timeout: 30_000 });
     expect(await chipLevel(row)).toBe("high");
-    expect(await chipText(row)).toBe("High risk · 83 Developer plugin");
+    expect(await chipText(row)).toBe("High risk · 83");
+    await expect(row.$(".plugins-installed-pill")).toHaveText("Developer plugin");
     await expect(row.$("input[role='switch']")).toBeSelected();
   });
 

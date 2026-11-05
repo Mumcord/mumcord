@@ -127,5 +127,9 @@
     "netHttp": "Dostop do interneta",
     "secrets": "Obesek za ključe"
   },
-  "offerBadge": "Nova dovoljenja"
+  "offerBadge": "Nova dovoljenja",
+  "refused": {
+    "title": "Zavrnjeni vtičniki",
+    "when": "Zavrnjeno ob {{time}}"
+  }
 }

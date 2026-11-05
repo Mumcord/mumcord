@@ -96,6 +96,8 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
     switch (conflict.kind) {
       case "pushToTalk":
         return t("hotkeys.action.pushToTalk");
+      case "camera":
+        return t("hotkeys.camera");
       case "hotkey": {
         const other = hotkeys[conflict.index];
         return other === undefined ? null : actionName(other.action);
@@ -135,8 +137,8 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
   };
 
   /**
-   * Without the key's other owner: that hotkey goes, push-to-talk loses its key, a whisper target
-   * keeps working from the user panel without one.
+   * Without the key's other owner: that hotkey goes, push-to-talk or the camera hotkey loses its
+   * key, a whisper target keeps working from the user panel without one.
    */
   const freed = async (conflict: HotkeyConflict | null) => {
     if (conflict?.kind === "whisper") await clearWhisperKey(conflict.targetId);
@@ -144,8 +146,16 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
       hotkeys:
         conflict?.kind === "hotkey" ? hotkeys.filter((_, i) => i !== conflict.index) : hotkeys,
       clearPtt: conflict?.kind === "pushToTalk",
+      clearCamera: conflict?.kind === "camera",
     };
   };
+
+  /** The settings change that frees the key: the trimmed list plus a cleared key, if any. */
+  const freedChange = (rest: Awaited<ReturnType<typeof freed>>) => ({
+    hotkeys: rest.hotkeys,
+    ...(rest.clearPtt ? { pttKey: null } : {}),
+    ...(rest.clearCamera ? { cameraHotkey: null } : {}),
+  });
 
   const assignAction =
     (action: HotkeyAction) => async (key: string, conflict: HotkeyConflict | null) => {
@@ -155,7 +165,7 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
         at >= 0
           ? rest.hotkeys.map((h, i) => (i === at ? { key, action } : h))
           : [...rest.hotkeys, { key, action }];
-      update(rest.clearPtt ? { hotkeys: next, pttKey: null } : { hotkeys: next });
+      update({ ...freedChange(rest), hotkeys: next });
       setAdding(null);
     };
 
@@ -171,17 +181,12 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
         code === "shortcutNotConfirmed" ? t("voice.keyNotConfirmed") : t("voice.keyRejected"),
       );
     }
-    update({ pttKey, hotkeys: (await freed(conflict)).hotkeys });
+    update({ ...freedChange(await freed(conflict)), pttKey });
   };
 
   /** The camera hotkey is its own setting (FR-8.20), not an entry of the hotkey list. */
   const assignCamera = async (key: string, conflict: HotkeyConflict | null) => {
-    const rest = await freed(conflict);
-    update(
-      rest.clearPtt
-        ? { cameraHotkey: key, hotkeys: rest.hotkeys, pttKey: null }
-        : { cameraHotkey: key, hotkeys: rest.hotkeys },
-    );
+    update({ ...freedChange(await freed(conflict)), cameraHotkey: key });
   };
 
   const assignPending = (
@@ -213,9 +218,7 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
           targets.map((t) => (t.id === targetId ? { ...t, hotkey: key } : t)),
         ),
       );
-      if (rest.hotkeys !== hotkeys || rest.clearPtt) {
-        update(rest.clearPtt ? { hotkeys: rest.hotkeys, pttKey: null } : { hotkeys: rest.hotkeys });
-      }
+      if (rest.hotkeys !== hotkeys || rest.clearPtt || rest.clearCamera) update(freedChange(rest));
     };
 
   const whisperSummary = (target: WhisperTarget) =>
@@ -375,7 +378,8 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
         label={t("hotkeys.camera")}
         description={t("hotkeys.cameraHint")}
         value={settings.cameraHotkey}
-        onCapture={(combo) => capture(combo, { kind: "new" }, assignCamera)}
+        warning={status?.cameraFailed === true && globalHotkeys ? t("hotkeys.failed") : null}
+        onCapture={(combo) => capture(combo, { kind: "camera" }, assignCamera)}
         onAssign={(conflict) => {
           assignPending(assignCamera, conflict);
         }}

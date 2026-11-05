@@ -1184,7 +1184,7 @@
     "close": "Cerrar",
     "privacyTitle": "Privacidad",
     "lockOff": "Apagar mi cámara cuando se bloquee la pantalla",
-    "privacyNote": "Tu cámara siempre empieza apagada y muestra primero una vista previa. Se apaga cuando sales del canal o te desconectas. Solo las personas de tu canal de voz pueden verla, a través del relé de este servidor y con cifrado de extremo a extremo. Mumcord nunca graba las cámaras.",
+    "privacyNote": "Tu cámara siempre empieza apagada y muestra primero una vista previa. Se apaga cuando sales del canal o te desconectas. Solo las personas de tu canal de voz pueden verla, a través del relé de este servidor y con cifrado de extremo a extremo. Mumcord nunca graba las cámaras. El Mumcord de quienes te ven nunca guarda tu imagen en el disco, pero no puede impedir que alguien haga una captura de pantalla con su sistema operativo.",
     "othersTitle": "Cámaras de los demás",
     "showCameras": "Mostrar cámaras",
     "showAlways": "Siempre",

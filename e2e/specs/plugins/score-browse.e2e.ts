@@ -30,8 +30,10 @@ import {
   chipLevel,
   chipScore,
   chipText,
+  elementRef,
   closeSettings,
   openPlugins,
+  officialLabel,
   openPrompt,
   prompt,
   promptInstall,
@@ -108,7 +110,7 @@ async function backToBrowse(): Promise<void> {
 async function formulaLine(scope: ReturnType<typeof $>): Promise<string> {
   const text = await browser.execute(
     (el) => ((el as unknown as Element).textContent as string | null) ?? "",
-    scope.$("p.risk-formula") as unknown as HTMLElement,
+    (await elementRef(scope.$("p.risk-formula"))) as unknown as HTMLElement,
   );
   return text.replace(/\s+/g, " ").trim();
 }
@@ -128,7 +130,7 @@ async function effects(scope: ReturnType<typeof $>, table: number): Promise<stri
         return (copy.textContent as string | null)?.replace(/\s+/g, " ").trim() ?? "";
       });
     },
-    scope as unknown as HTMLElement,
+    (await elementRef(scope)) as unknown as HTMLElement,
     table,
   );
 }
@@ -164,12 +166,11 @@ describe("plugins: security score in Browse, details and the install prompt (AC-
 
   it("AC-9.31: official cards show “Official · reviewed” without a number", async () => {
     await waitForCard(OFFICIAL);
-    expect(await chipLevel(card(OFFICIAL))).toBe("official");
-    expect(await chipText(card(OFFICIAL))).toBe("Official · reviewed");
+    await expect(officialLabel(card(OFFICIAL))).toHaveText("✓ Official · reviewed");
     expect(await chipScore(card(OFFICIAL))).toBeNull();
     // No official card carries a number at all.
     const officialCards = await $$("li.plugin-card").filter(async (c) =>
-      (await c.$(".risk-chip[data-level='official']").isExisting()),
+      officialLabel(c).isExisting(),
     );
     expect(officialCards.length).toBeGreaterThan(0);
     for (const c of officialCards) await expect(c.$(".risk-chip__score")).not.toBeExisting();

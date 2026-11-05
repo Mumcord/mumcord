@@ -301,7 +301,7 @@ impl Client {
 
     fn send(&self, data: Vec<u8>, receivers: &[u32]) {
         self.engine
-            .plugin_relay_broadcast(self.server(), PLUGIN, (1, 1), data, receivers);
+            .plugin_relay_broadcast(self.server(), PLUGIN, (1, 1), data, receivers, false);
     }
 
     /// The next channel message from `sender`, if one comes within `wait`.

@@ -43,6 +43,7 @@ function withDevPlugin(): void {
     noPlugins: false,
     allOff: false,
     plugins: [devPlugin],
+    refused: [],
   });
   vi.spyOn(api, "pluginDiagnostics").mockResolvedValue({
     log: [{ level: "info", text: "started" }],

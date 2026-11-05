@@ -104,6 +104,23 @@ export function useCameraRoom(serverId: number | null): CameraRoomView | null {
   return useSyncExternalStore(subscribe, get);
 }
 
+/**
+ * Whether the person with `session` on `serverId` has their camera on (FR-8.18): they have a tile
+ * in the camera room, whether or not it is downloaded.
+ */
+export function usePersonCameraOn(serverId: number | null, session: number): boolean {
+  useEffect(() => {
+    if (serverId !== null) load(serverId);
+  }, [serverId]);
+  const get = useCallback(
+    () =>
+      serverId !== null &&
+      (rooms.get(serverId)?.tiles.some((tile) => tile.sharer === session) ?? false),
+    [serverId, session],
+  );
+  return useSyncExternalStore(subscribe, get);
+}
+
 /** The own camera when it belongs to `serverId`; `null` while it is off or on another server. */
 export function useOwnCamera(serverId: number | null): CameraView | null {
   const get = useCallback(() => {

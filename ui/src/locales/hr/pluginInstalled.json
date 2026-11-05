@@ -127,5 +127,9 @@
     "netHttp": "Pristup internetu",
     "secrets": "Privjesak za ključeve"
   },
-  "offerBadge": "Nova dopuštenja"
+  "offerBadge": "Nova dopuštenja",
+  "refused": {
+    "title": "Odbijeni dodaci",
+    "when": "Odbijeno u {{time}}"
+  }
 }

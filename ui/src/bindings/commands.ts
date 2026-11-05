@@ -2441,6 +2441,8 @@ export type HotkeyCheck = {
 export type HotkeyConflict = 
 /**  The hotkey at `index` in `hotkeys`. */
 { kind: "hotkey"; index: number } | { kind: "pushToTalk" } | 
+/**  The camera hotkey (FR-8.20). */
+{ kind: "camera" } | 
 /**  The hold-to-talk key of a whisper target (#67), named by the user. */
 { kind: "whisper"; targetId: string; name: string } | 
 /**  One of Mumcord's own shortcuts; cannot be cleared. */
@@ -2453,9 +2455,9 @@ export type HotkeyPressed = {
 
 /**
  *  The key being set: push-to-talk, an existing hotkey (index into `hotkeys`), a whisper
- *  target's key (#67), or a new hotkey.
+ *  target's key (#67), the camera hotkey (FR-8.20), or a new hotkey.
  */
-export type HotkeySlot = { kind: "pushToTalk" } | { kind: "hotkey"; index: number } | { kind: "whisper"; targetId: string } | { kind: "new" };
+export type HotkeySlot = { kind: "pushToTalk" } | { kind: "hotkey"; index: number } | { kind: "whisper"; targetId: string } | { kind: "camera" } | { kind: "new" };
 
 /**  How hotkeys reach Mumcord in this session. */
 export type HotkeysMode = 
@@ -2473,6 +2475,8 @@ export type HotkeysStatus = {
 	 *  desktop assigned none).
 	 */
 	failed: number[],
+	/**  The camera hotkey (FR-8.20) could not be registered. */
+	cameraFailed: boolean,
 };
 
 /**  Public view of an identity; the certificate and its key never leave the engine. */
@@ -4002,6 +4006,8 @@ export type PluginsOverview = {
 	/**  "Turn off all plugins" is on. */
 	allOff: boolean,
 	plugins: InstalledPlugin[],
+	/**  Plugins refused at their first load in this run, which have no stored record (FR-9.90). */
+	refused: RefusedPlugin[],
 };
 
 /**
@@ -4197,6 +4203,18 @@ export type QualityChoice = {
 	fps: ScreenFps,
 	optimize: ScreenOptimize,
 	uploadLimit: ScreenUploadLimit,
+};
+
+/**
+ *  A plugin refused before it was stored, as Diagnostics lists it. Carries only the id or folder
+ *  name, the fixed reason and the time, never the plugin's own text.
+ */
+export type RefusedPlugin = {
+	/**  The plugin id, or the folder name of a developer plugin. */
+	name: string,
+	issue: PluginLoadIssue,
+	/**  When it was refused, in milliseconds since 1970. */
+	atMillis: number | null,
 };
 
 /**  The relay of a server changed (FR-4.20). */

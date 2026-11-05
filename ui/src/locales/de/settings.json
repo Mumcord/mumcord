@@ -1175,7 +1175,7 @@
     "close": "Schließen",
     "privacyTitle": "Datenschutz",
     "lockOff": "Meine Kamera ausschalten, wenn der Bildschirm gesperrt wird",
-    "privacyNote": "Deine Kamera startet immer ausgeschaltet und zeigt zuerst eine Vorschau. Sie schaltet sich aus, wenn du den Kanal verlässt oder die Verbindung trennst. Nur Personen in deinem Sprachkanal sehen sie, über das Relay dieses Servers und Ende-zu-Ende-verschlüsselt. Mumcord zeichnet Kameras nie auf.",
+    "privacyNote": "Deine Kamera startet immer ausgeschaltet und zeigt zuerst eine Vorschau. Sie schaltet sich aus, wenn du den Kanal verlässt oder die Verbindung trennst. Nur Personen in deinem Sprachkanal sehen sie, über das Relay dieses Servers und Ende-zu-Ende-verschlüsselt. Mumcord zeichnet Kameras nie auf. Mumcord speichert dein Bild bei den Zuschauenden nie auf der Festplatte, kann aber niemanden daran hindern, mit dem Betriebssystem einen Screenshot zu machen.",
     "othersTitle": "Kameras anderer",
     "showCameras": "Kameras anzeigen",
     "showAlways": "Immer",

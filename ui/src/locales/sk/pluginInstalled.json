@@ -127,5 +127,9 @@
     "netHttp": "Prístup na internet",
     "secrets": "Zväzok kľúčov"
   },
-  "offerBadge": "Nové povolenia"
+  "offerBadge": "Nové povolenia",
+  "refused": {
+    "title": "Odmietnuté zásuvné moduly",
+    "when": "Odmietnuté {{time}}"
+  }
 }

@@ -8,16 +8,25 @@ import { useTranslation } from "react-i18next";
 import { useShownServerId } from "../channels/serverStore";
 import { useOwnCamera } from "./availability";
 import { CameraIcon } from "./CameraIcon";
+import { usePersonCameraOn } from "./room/roomStore";
 import "./cameraEntry.css";
 
-function useCameraOn(self: boolean): boolean {
-  const shownServerId = useShownServerId();
-  const own = useOwnCamera();
-  return self && own?.state === "onAir" && own.serverId === shownServerId;
+interface MarkerProps {
+  self: boolean;
+  /** The row's person; their tile in the camera room says whether their camera is on. */
+  session: number;
 }
 
-export function CameraTreeIcon({ self }: { self: boolean }) {
-  if (!useCameraOn(self)) return null;
+function useCameraOn({ self, session }: MarkerProps): boolean {
+  const shownServerId = useShownServerId();
+  const own = useOwnCamera();
+  const other = usePersonCameraOn(self ? null : shownServerId, session);
+  return self ? own?.state === "onAir" && own.serverId === shownServerId : other;
+}
+
+export function CameraTreeIcon(props: MarkerProps) {
+  const { self } = props;
+  if (!useCameraOn(props)) return null;
   return (
     <span className="camera-tree-icon" data-self={self ? "" : undefined} aria-hidden="true">
       <CameraIcon size={14} />
@@ -26,9 +35,10 @@ export function CameraTreeIcon({ self }: { self: boolean }) {
 }
 
 /** The marker's spoken part, placed inside the row's name element. */
-export function CameraTreeLabel({ self, name }: { self: boolean; name: string }) {
+export function CameraTreeLabel(props: MarkerProps & { name: string }) {
+  const { self, name } = props;
   const { t } = useTranslation("camera");
-  if (!useCameraOn(self)) return null;
+  if (!useCameraOn(props)) return null;
   return (
     <span className="visually-hidden">
       , {self ? t("cameraOnLabel") : t("personCameraOn", { name })}

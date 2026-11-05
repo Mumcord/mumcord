@@ -32,6 +32,7 @@ import {
   stateLabel,
 } from "./labels";
 import { PluginDetails } from "./PluginDetails";
+import { RefusedPlugins } from "./RefusedPlugins";
 import { RemoveDialog } from "./RemoveDialog";
 
 /** "" in the badge picker means: no badge next to names. */
@@ -94,18 +95,21 @@ export function InstalledTab() {
 
   if (plugins.length === 0) {
     return (
-      <div className="plugins-installed-empty">
-        <p>{t("empty")}</p>
-        <button
-          type="button"
-          className="settings-button"
-          onClick={() => {
-            openPluginTab("browse");
-          }}
-        >
-          {t("browse")}
-        </button>
-      </div>
+      <>
+        <div className="plugins-installed-empty">
+          <p>{t("empty")}</p>
+          <button
+            type="button"
+            className="settings-button"
+            onClick={() => {
+              openPluginTab("browse");
+            }}
+          >
+            {t("browse")}
+          </button>
+        </div>
+        <RefusedPlugins refused={overview.refused} />
+      </>
     );
   }
 
@@ -162,6 +166,7 @@ export function InstalledTab() {
           )}
         </div>
       )}
+      <RefusedPlugins refused={overview.refused} />
     </div>
   );
 }

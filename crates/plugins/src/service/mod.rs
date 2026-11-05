@@ -35,7 +35,7 @@ use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
 use crate::api::secrets::PluginSecrets;
 use crate::api::storage::{DataError, Storage};
-use crate::diag::LoadIssue;
+use crate::diag::{LoadIssue, RefusedPlugin};
 use crate::host::{HostError, HostEvent, LoadError, PluginHost, RunState};
 use crate::manifest::{ManifestError, OptionalPermission, Source};
 use crate::package::{Package, PackageError};
@@ -111,13 +111,16 @@ pub enum ServiceEvent {
     },
     /// A `relay` message to the channel through the sender's relay broadcast
     /// (`Engine::plugin_relay_broadcast`): `receivers` are the members that may get it (they
-    /// announced the plugin), to be admitted when not yet. `data` stays opaque: never log it.
+    /// announced the plugin), to be admitted when not yet; `fell_back` when the members
+    /// outside the broadcast got it through Mumble plugin data. `data` stays opaque: never log
+    /// it.
     RelayBroadcast {
         server: mumcord_store::ServerId,
         plugin: String,
         api: (u8, u8),
         data: Vec<u8>,
         receivers: Vec<u32>,
+        fell_back: bool,
     },
     /// An Apps-menu item was enabled or disabled: list the items again with
     /// [`PluginService::app_menu`].
@@ -291,11 +294,17 @@ fn installed_manifest(dir: &Path, id: &str) -> Option<crate::manifest::Manifest>
     }
 }
 
+/// How many refused plugins Diagnostics remembers; the oldest go first.
+const MAX_REFUSED: usize = 20;
+
 impl ServiceError {
     /// The Diagnostics entry (FR-9.90) this load failure leaves, if it is one of the listed kinds.
     pub fn load_issue(&self) -> Option<LoadIssue> {
         match self {
-            ServiceError::Manifest(error) | ServiceError::Load(LoadError::Manifest(error)) => {
+            ServiceError::Manifest(error)
+            | ServiceError::Load(LoadError::Manifest(error))
+            | ServiceError::Package(PackageError::Manifest(error))
+            | ServiceError::Verify(VerifyFailure::Package(PackageError::Manifest(error))) => {
                 error.diagnostic()
             }
             _ => None,
@@ -431,6 +440,8 @@ pub struct PluginService {
     load_errors: BTreeMap<String, String>,
     /// The Diagnostics entry (FR-9.90) of a plugin that was refused at load, if it has one.
     load_issues: BTreeMap<String, LoadIssue>,
+    /// Plugins refused before they had a record (install check, developer folder), newest last.
+    refused: Mutex<Vec<RefusedPlugin>>,
     events: UnboundedSender<ServiceEvent>,
     /// Available updates and rollback reasons (FR-6.66–6.69).
     updates: updates::Updates,
@@ -499,6 +510,7 @@ impl PluginService {
             quiet: false,
             load_errors: BTreeMap::new(),
             load_issues: BTreeMap::new(),
+            refused: Mutex::new(Vec::new()),
             events,
             updates: updates::Updates::default(),
             revoked: crate::registry::RevocationList::bundled(),
@@ -558,6 +570,33 @@ impl PluginService {
     /// Why the plugin was refused at load, when Diagnostics lists that reason (FR-9.90).
     pub fn load_issue(&self, id: &str) -> Option<LoadIssue> {
         self.load_issues.get(id).copied()
+    }
+
+    /// Plugins refused at their first load in this run, which have no record to show it on.
+    pub fn refused_plugins(&self) -> Vec<RefusedPlugin> {
+        self.refused
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone()
+    }
+
+    /// Remembers a refusal that Diagnostics lists, replacing an earlier one for the same name.
+    pub(super) fn note_refused(&self, name: &str, error: &ServiceError) {
+        let Some(issue) = error.load_issue() else {
+            return;
+        };
+        let mut refused = self.refused.lock().unwrap_or_else(PoisonError::into_inner);
+        refused.retain(|r| r.name != name);
+        if refused.len() >= MAX_REFUSED {
+            refused.remove(0);
+        }
+        refused.push(RefusedPlugin {
+            name: name.to_owned(),
+            issue,
+            at_millis: now_millis(),
+        });
+        drop(refused);
+        self.emit(ServiceEvent::Changed);
     }
 
     pub fn diagnostics(&self, id: &str) -> Option<crate::DiagSnapshot> {

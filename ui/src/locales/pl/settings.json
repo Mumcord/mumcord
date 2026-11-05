@@ -1193,7 +1193,7 @@
     "close": "Zamknij",
     "privacyTitle": "Prywatność",
     "lockOff": "Wyłącz moją kamerę po zablokowaniu ekranu",
-    "privacyNote": "Kamera zawsze startuje wyłączona i najpierw pokazuje podgląd. Wyłącza się, gdy opuścisz kanał lub się rozłączysz. Widzą ją tylko osoby z Twojego kanału głosowego, przez przekaźnik tego serwera, z szyfrowaniem end-to-end. Mumcord nigdy nie nagrywa kamer.",
+    "privacyNote": "Kamera zawsze startuje wyłączona i najpierw pokazuje podgląd. Wyłącza się, gdy opuścisz kanał lub się rozłączysz. Widzą ją tylko osoby z Twojego kanału głosowego, przez przekaźnik tego serwera, z szyfrowaniem end-to-end. Mumcord nigdy nie nagrywa kamer. Mumcord oglądających nigdy nie zapisuje Twojego obrazu na dysku, ale nie może powstrzymać nikogo przed zrobieniem zrzutu ekranu za pomocą systemu operacyjnego.",
     "othersTitle": "Kamery innych",
     "showCameras": "Pokazuj kamery",
     "showAlways": "Zawsze",

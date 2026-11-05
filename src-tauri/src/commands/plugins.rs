@@ -254,6 +254,20 @@ pub struct PluginsOverview {
     /// "Turn off all plugins" is on.
     pub all_off: bool,
     pub plugins: Vec<InstalledPlugin>,
+    /// Plugins refused at their first load in this run, which have no stored record (FR-9.90).
+    pub refused: Vec<RefusedPlugin>,
+}
+
+/// A plugin refused before it was stored, as Diagnostics lists it. Carries only the id or folder
+/// name, the fixed reason and the time, never the plugin's own text.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct RefusedPlugin {
+    /// The plugin id, or the folder name of a developer plugin.
+    pub name: String,
+    pub issue: PluginLoadIssue,
+    /// When it was refused, in milliseconds since 1970.
+    pub at_millis: f64,
 }
 
 /// How fresh the store's plugin list is.
@@ -539,6 +553,15 @@ fn overview(service: &mut PluginService) -> Result<PluginsOverview, ServiceError
                 .map(|p| InstalledPlugin::new(p, &repositories))
                 .collect()
         },
+        refused: service
+            .refused_plugins()
+            .into_iter()
+            .map(|r| RefusedPlugin {
+                name: r.name,
+                issue: r.issue.into(),
+                at_millis: r.at_millis as f64,
+            })
+            .collect(),
     })
 }
 
