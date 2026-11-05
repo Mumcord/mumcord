@@ -164,14 +164,7 @@ impl PluginService {
                 Event::WebviewMessage(text)
             }
             UiInput::WebviewGesture(place) => {
-                let counted =
-                    self.io
-                        .webviews()
-                        .accept_gesture(id, place, std::time::Instant::now());
-                if counted {
-                    self.gesture(id);
-                }
-                return counted;
+                return self.io.page_gesture(id, place, std::time::Instant::now());
             }
             UiInput::SurfaceClosed(place) => {
                 self.io.webviews().close(id, place);
