@@ -3767,6 +3767,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     screenShareSetSoundLevel: () => Promise.resolve(null),
+    screenShareSoundSupport: () => Promise.resolve(null),
     screenShareSoundApps: () => Promise.resolve(MOCK_SOUND_APPS.map((a) => ({ ...a }))),
     screenShareChooseSound: (serverId, app) => {
       const own = requireOwnShare(serverId);

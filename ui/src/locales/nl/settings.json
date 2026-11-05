@@ -1085,6 +1085,7 @@
     "useGpuHint": "Codeert AV1 op je videokaart, zodat delen bijna geen CPU kost. Uit: AV1 gebruikt de processor.",
     "statusList": "Encoderstatus",
     "av1Encode": "AV1-codering",
+    "sound": "Geluid",
     "askEachTime": "Vraag me bij elke keer delen om deze instellingen",
     "av1Playback": "AV1-weergave",
     "vp9Playback": "VP9-weergave",

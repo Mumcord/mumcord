@@ -79,7 +79,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Jaga rakenduse heli",
+    "sound": "Heli",
+    "soundInfo": "Terve ekraan: arvuti heli ilma Mumcordita. Üks aken: ainult selle rakenduse heli.",
+    "soundNeeds": {
+      "windows": "Heli puudub: nõuab Windows 10 versiooni 2004 või uuemat",
+      "macos": "Heli puudub: nõuab macOS 13 või uuemat",
+      "pipewire": "Heli puudub: nõuab PipeWire'i"
+    },
     "viewersGet": "Vaatajad saavad:",
     "viewersGetSummary": "kuni {{resolution}} · {{fps}} kaadrit/s · {{codec}} · umbes {{mbit}} Mbit/s",
     "pathRelay": "Saadetakse korra serveri releeserveri kaudu, mis edastab selle kuni {{count}} vaatajale.",

@@ -83,7 +83,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Bendrinti programos garsą",
+    "sound": "Garsas",
+    "soundInfo": "Visas ekranas: kompiuterio garsas be Mumcord. Vienas langas: tik tos programos garsas.",
+    "soundNeeds": {
+      "windows": "Be garso: reikia Windows 10 2004 ar naujesnės versijos",
+      "macos": "Be garso: reikia macOS 13 ar naujesnės versijos",
+      "pipewire": "Be garso: reikia PipeWire"
+    },
     "viewersGet": "Žiūrovai gauna:",
     "viewersGetSummary": "iki {{resolution}} · {{fps}} k/s · {{codec}} · apie {{mbit}} Mbit/s",
     "pathRelay": "Siunčiama vieną kartą per serverio perdavimo mazgą, kuris perduoda ją iki {{count}} žiūrovų.",

@@ -1093,6 +1093,7 @@
     "useGpuHint": "AV1 tiek kodēts grafiskajā kartē, tāpēc kopīgošana gandrīz neslogo procesoru. Izslēgts: AV1 izmanto procesoru.",
     "statusList": "Kodētāja statuss",
     "av1Encode": "AV1 kodēšana",
+    "sound": "Skaņa",
     "askEachTime": "Vaicāt pēc šiem iestatījumiem katru reizi, kad kopīgoju",
     "av1Playback": "AV1 atskaņošana",
     "vp9Playback": "VP9 atskaņošana",

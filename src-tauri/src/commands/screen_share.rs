@@ -410,6 +410,15 @@ pub fn screen_share_set_sound(
     Ok(engine.screen_share_set_sound(to_engine_server_id(server_id), enabled)?)
 }
 
+/// Why this system cannot share sound (FR-7.84), asked before a share starts so the start
+/// dialog and Settings can show the Sound switch off and disabled with the matching note;
+/// `null` where sound can be shared.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_sound_support(engine: State<'_, Engine>) -> Option<SoundUnavailableReason> {
+    engine.screen_share_sound_unavailable().map(Into::into)
+}
+
 /// The apps playing sound now, for "Which app's sound?" while the own share waits for the
 /// pick (`soundChoice` is set). Call it again to refresh the open list; empty where the
 /// system has no per-app choice.

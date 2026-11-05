@@ -1085,6 +1085,7 @@
     "useGpuHint": "Kodar AV1 på ditt grafikkort, så delningen kostar nästan ingen CPU. Av: AV1 använder processorn.",
     "statusList": "Kodarstatus",
     "av1Encode": "AV1-kodning",
+    "sound": "Ljud",
     "askEachTime": "Fråga efter dessa inställningar varje gång jag delar",
     "av1Playback": "AV1-uppspelning",
     "vp9Playback": "VP9-uppspelning",

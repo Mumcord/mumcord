@@ -1085,6 +1085,7 @@
     "useGpuHint": "Az AV1 kódolása a videokártyán történik, így a megosztás szinte nem terheli a CPU-t. Kikapcsolva az AV1 a processzort használja.",
     "statusList": "Kódoló állapota",
     "av1Encode": "AV1 kódolás",
+    "sound": "Hang",
     "askEachTime": "Kérdezz rá ezekre a beállításokra minden megosztáskor",
     "av1Playback": "AV1 lejátszás",
     "vp9Playback": "VP9 lejátszás",
