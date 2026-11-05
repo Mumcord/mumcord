@@ -22,7 +22,9 @@ export function CameraButton({ serverId }: { serverId: number | null }) {
         aria-disabled={blockText !== null || undefined}
         aria-label={onAir ? t("turnOffLabel") : t("turnOn")}
         data-tooltip={onAir ? t("turnOff") : (blockText ?? t("turnOn"))}
-        onClick={toggle}
+        onClick={(event) => {
+          toggle(event.currentTarget);
+        }}
       >
         <span className="userpanel__icon">
           <CameraIcon size={18} off={!onAir} />

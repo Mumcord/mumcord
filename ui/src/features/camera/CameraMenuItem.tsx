@@ -15,7 +15,7 @@ export function CameraMenuItem({
 }: {
   serverId: number;
   channelName: string;
-  /** Closes the menu; called before the entry acts. */
+  /** Closes the menu and focuses its trigger; called before the entry acts. */
   onChosen: () => void;
 }) {
   const { t } = useTranslation("camera");
@@ -33,7 +33,8 @@ export function CameraMenuItem({
       onClick={() => {
         if (blockText !== null) return;
         onChosen();
-        toggle();
+        // The menu is gone now; its trigger has the focus and gets it back from the dialog.
+        toggle(document.activeElement instanceof HTMLElement ? document.activeElement : null);
       }}
     >
       <span className="chat-apps__builtin">

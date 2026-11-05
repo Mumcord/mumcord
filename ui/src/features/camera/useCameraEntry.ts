@@ -22,8 +22,11 @@ export interface CameraEntry {
   block: CameraBlock | null;
   /** The block's text, or `null`. */
   blockText: string | null;
-  /** Turns the camera off when on air, else opens the preview; does nothing while blocked. */
-  toggle: () => void;
+  /**
+   * Turns the camera off when on air, else opens the preview (`opener` gets the focus back when
+   * it closes); does nothing while blocked.
+   */
+  toggle: (opener: HTMLElement | null) => void;
 }
 
 export function useCameraEntry(serverId: number | null): CameraEntry {
@@ -33,7 +36,7 @@ export function useCameraEntry(serverId: number | null): CameraEntry {
   const reason = useCameraUnavailable(serverId);
   const onAir = own?.state === "onAir";
   const block = onAir ? null : cameraBlock(serverId, voiceServerId, reason);
-  const toggle = () => {
+  const toggle = (opener: HTMLElement | null) => {
     if (onAir) {
       getApi()
         .cameraTurnOff(own.serverId)
@@ -41,7 +44,7 @@ export function useCameraEntry(serverId: number | null): CameraEntry {
           console.error("Turning the camera off failed", error);
         });
     } else if (block === null && serverId !== null) {
-      openCameraPreview(serverId);
+      openCameraPreview(serverId, opener);
     }
   };
   return { onAir, block, blockText: block === null ? null : t(cameraBlockKey(block)), toggle };

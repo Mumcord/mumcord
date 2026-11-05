@@ -6,13 +6,18 @@
 import { useSyncExternalStore } from "react";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
 
-let target: number | null = null;
+export interface CameraPreviewTarget {
+  serverId: number;
+  /** Gets the focus back when the dialog closes; `null` when opened by the hotkey. */
+  opener: HTMLElement | null;
+}
+
+let target: CameraPreviewTarget | null = null;
 let boundApi: MumcordApi | undefined;
 let unsubscribe: Unsubscribe | undefined;
 const listeners = new Set<() => void>();
 
-function set(next: number | null): void {
-  if (target === next) return;
+function set(next: CameraPreviewTarget | null): void {
   target = next;
   for (const listener of listeners) listener();
 }
@@ -23,7 +28,7 @@ function ensureBound(): void {
   unsubscribe?.();
   boundApi = api;
   unsubscribe = api.on("cameraChanged", ({ view }) => {
-    if (view.state === "preview" && target === null) set(view.serverId);
+    if (view.state === "preview" && target === null) set({ serverId: view.serverId, opener: null });
   });
 }
 
@@ -36,12 +41,12 @@ function subscribe(listener: () => void): () => void {
 }
 
 /** Opens the preview dialog for `serverId`; the camera itself starts in the dialog. */
-export function openCameraPreview(serverId: number): void {
-  set(serverId);
+export function openCameraPreview(serverId: number, opener: HTMLElement | null): void {
+  set({ serverId, opener });
 }
 
 export function closeCameraPreview(): void {
-  set(null);
+  if (target !== null) set(null);
 }
 
 /** Test helper: closes the dialog and forgets the binding. */
@@ -52,7 +57,7 @@ export function resetCameraPreview(): void {
   target = null;
 }
 
-/** The server the preview dialog is open for, or `null` while it is closed. */
-export function useCameraPreviewTarget(): number | null {
+/** What the preview dialog is open for, or `null` while it is closed. */
+export function useCameraPreviewTarget(): CameraPreviewTarget | null {
   return useSyncExternalStore(subscribe, () => target);
 }

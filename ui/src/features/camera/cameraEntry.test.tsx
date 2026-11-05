@@ -17,7 +17,9 @@ import { resetCameraPreview, useCameraPreviewTarget } from "./previewStore";
 
 function PreviewProbe() {
   const target = useCameraPreviewTarget();
-  return <output data-testid="preview">{target === null ? "closed" : String(target)}</output>;
+  return (
+    <output data-testid="preview">{target === null ? "closed" : String(target.serverId)}</output>
+  );
 }
 
 async function setup(): Promise<MockApi> {
