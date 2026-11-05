@@ -159,7 +159,7 @@ pub enum BackendKind {
     Cpal,
     /// Silence in, output discarded.
     #[cfg(any(test, feature = "test-backend"))]
-    Null,
+    Null { period_frames: u32 },
     /// Capture from a WAV file, record playback to a WAV file.
     #[cfg(any(test, feature = "test-backend"))]
     File { input: PathBuf, output: PathBuf },
@@ -183,7 +183,9 @@ impl BackendKind {
         match value {
             "" | "cpal" => Ok(BackendKind::Cpal),
             #[cfg(any(test, feature = "test-backend"))]
-            "null" => Ok(BackendKind::Null),
+            "null" => Ok(BackendKind::Null {
+                period_frames: test_backend::DEFAULT_PERIOD_FRAMES,
+            }),
             #[cfg(any(test, feature = "test-backend"))]
             _ if value.starts_with("file-stereo:") => {
                 parse_file_paths(&value["file-stereo:".len()..])
@@ -239,7 +241,12 @@ mod tests {
     #[cfg(any(test, feature = "test-backend"))]
     #[test]
     fn parses_test_backends() {
-        assert_eq!(BackendKind::parse("null").expect("null"), BackendKind::Null);
+        assert_eq!(
+            BackendKind::parse("null").expect("null"),
+            BackendKind::Null {
+                period_frames: test_backend::DEFAULT_PERIOD_FRAMES
+            }
+        );
         assert_eq!(
             BackendKind::parse("file:a.wav:b.wav").expect("file"),
             BackendKind::File {

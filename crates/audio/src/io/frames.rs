@@ -246,7 +246,7 @@ impl FrameSink {
 
 #[cfg(test)]
 mod tests {
-    use super::super::ring::stereo_ring;
+    use super::super::ring::{playback, stereo_ring};
     use super::*;
 
     #[test]
@@ -262,11 +262,78 @@ mod tests {
         // A callback of 1024 frames at 44.1 kHz, as the sound server delivers it when another
         // application makes the graph quantum grow.
         let mut buffer = vec![0.0f32; 2 * 1024];
-        super::super::ring::playback(&mut buffer, 2, &mut consumer, &counters);
+        playback(&mut buffer, 2, &mut consumer, &counters);
         assert_eq!(
             sink.device_period_samples(),
             1024 * SAMPLE_RATE as usize / 44_100,
             "reported in 48 kHz samples, as the mixer counts its queue"
         );
+    }
+
+    /// The mixer's playback thread against the real frame sink and ring, paced in real time.
+    /// Another application playing sound grows the sound server's quantum, so a callback can be
+    /// larger than the queue target; a queue that cannot cover one callback leaves the rest of it
+    /// silent, which is the stutter users hear.
+    #[test]
+    fn the_playback_thread_covers_a_grown_sound_server_period() {
+        let counters = Arc::new(Counters::default());
+        counters.stream_opened(Direction::Output, SAMPLE_RATE);
+        let (producer, mut consumer) = stereo_ring(SAMPLE_RATE);
+        let (tx, rx) = std::sync::mpsc::channel();
+        tx.send(PlaybackEndpoint::new(producer, SAMPLE_RATE).expect("endpoint"))
+            .expect("send");
+        let sink = FrameSink::new(rx, counters.clone());
+        let config = crate::mixer::PlaybackConfig {
+            target_queue_ms: crate::mixer::LOW_LATENCY_QUEUE_MS,
+            ..crate::mixer::PlaybackConfig::default()
+        };
+        let (playback_thread, mut ports) =
+            crate::mixer::Playback::start(sink, config).expect("playback");
+
+        // A stand-in device taking a whole callback at a time: the usual 10 ms period first, then
+        // 21.3 ms, as it grows when another application joins the graph.
+        let drain_counters = counters.clone();
+        let device = std::thread::spawn(move || {
+            let mut buffer = vec![0.0f32; 2 * 1024];
+            for frames in [480, 1024] {
+                let until = Instant::now() + Duration::from_millis(900);
+                let period = period_of(frames);
+                let mut next = Instant::now();
+                while Instant::now() < until {
+                    playback(&mut buffer[..2 * frames], 2, &mut consumer, &drain_counters);
+                    next += period;
+                    std::thread::sleep(next.saturating_duration_since(Instant::now()));
+                }
+            }
+        });
+
+        // Sound for the mixer to play through the sink during both phases.
+        for _ in 0..86_400 {
+            ports.mix_in.push(0.5).expect("tone sample");
+        }
+        device.join().expect("device thread");
+
+        let io = counters.snapshot();
+        let mixer = playback_thread.stats();
+        drop(playback_thread);
+
+        assert_eq!(io.playback_frames_dropped, 0, "{io:?}");
+        assert_eq!(mixer.frames_refused, 0, "{mixer:?}");
+        assert!(mixer.mix_time_avg_us > 0, "the tone was played: {mixer:?}");
+        // Two late polls on a loaded runner are allowed; before the change most callbacks ran dry.
+        assert!(
+            io.playback_underruns <= 2,
+            "no part of a callback stayed silent: {io:?}"
+        );
+        assert_eq!(
+            counters.periods().output,
+            Some(period_of(1024)),
+            "the queue has to cover the period the device delivers"
+        );
+    }
+
+    /// How long one device callback of `frames` frames takes in real time.
+    fn period_of(frames: usize) -> Duration {
+        Duration::from_secs_f64(frames as f64 / f64::from(SAMPLE_RATE))
     }
 }

@@ -217,7 +217,9 @@ fn make_backend(kind: BackendKind) -> Box<dyn Backend> {
     match kind {
         BackendKind::Cpal => Box::new(CpalBackend::new()),
         #[cfg(any(test, feature = "test-backend"))]
-        BackendKind::Null => Box::new(super::test_backend::TestBackend::Null),
+        BackendKind::Null { period_frames } => {
+            Box::new(super::test_backend::TestBackend::Null { period_frames })
+        }
         #[cfg(any(test, feature = "test-backend"))]
         BackendKind::File { input, output } => Box::new(super::test_backend::TestBackend::File {
             input,
@@ -898,7 +900,14 @@ mod tests {
 
     #[test]
     fn null_backend_paces_silence_and_survives_device_switch() {
-        let handles = AudioIo::start_with(BackendKind::Null, None, None).expect("start");
+        let handles = AudioIo::start_with(
+            BackendKind::Null {
+                period_frames: crate::io::test_backend::DEFAULT_PERIOD_FRAMES,
+            },
+            None,
+            None,
+        )
+        .expect("start");
         let mut source = handles.source;
         let mut frame: Frame = [1.0; FRAME_SAMPLES];
         assert!(source.wait_frame(&mut frame, Duration::from_millis(500)));
@@ -1017,8 +1026,13 @@ mod tests {
 
     #[test]
     fn lists_devices_without_starting() {
-        let devices =
-            AudioIo::list_devices_with(BackendKind::Null, Direction::Input).expect("devices");
+        let devices = AudioIo::list_devices_with(
+            BackendKind::Null {
+                period_frames: crate::io::test_backend::DEFAULT_PERIOD_FRAMES,
+            },
+            Direction::Input,
+        )
+        .expect("devices");
         assert_eq!(devices.len(), 1);
     }
 
