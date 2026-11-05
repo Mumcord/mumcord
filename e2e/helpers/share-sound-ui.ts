@@ -271,7 +271,7 @@ export class PrivateNames {
 export async function openShareDialog(): Promise<void> {
   await $("button.chat-apps__button").click();
   await $(
-    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
+    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share your screen')]",
   ).click();
   await $("//dialog//button[normalize-space()='Choose what to share']").waitForClickable({
     timeout: 20_000,
