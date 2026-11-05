@@ -7,7 +7,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../../api";
 import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll, stubDialog } from "../../channels/testUtils";
-import { CameraPreviewHost, openCameraPreview, useCameraPreviewTarget } from ".";
+import { CameraPreviewHost, openCameraPreview } from ".";
 import { resetCameraPreview } from "../previewStore";
 
 let api: MockApi;
@@ -125,16 +125,10 @@ describe("CameraPreviewDialog", () => {
 
   it("closes the dialog before turning the camera off on Escape", async () => {
     const { dialog } = await openDialog();
-    let target: ReturnType<typeof useCameraPreviewTarget> | undefined;
-    function Probe() {
-      target = useCameraPreviewTarget();
-      return null;
-    }
-    render(<Probe />);
     const openWhenTurnedOff: boolean[] = [];
     const turnOff = api.cameraTurnOff.bind(api);
     const off = vi.spyOn(api, "cameraTurnOff").mockImplementation((serverId) => {
-      openWhenTurnedOff.push(target !== null);
+      openWhenTurnedOff.push(dialog.isConnected);
       return turnOff(serverId);
     });
     act(() => {

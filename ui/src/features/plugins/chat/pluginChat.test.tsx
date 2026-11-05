@@ -180,6 +180,7 @@ describe("plugin chat UI", () => {
         noPlugins: false,
         allOff: false,
         plugins: [{ id: "poll", name: "Poll" } as InstalledPlugin],
+        refused: [],
       });
   });
 

@@ -59,7 +59,8 @@ vi.mock("../render/usePluginIcon", () => ({
 let api: MockApi;
 
 function setup(plugins: InstalledPlugin[], withPanel: string[]) {
-  api.pluginsList = () => Promise.resolve({ noPlugins: false, allOff: false, plugins });
+  api.pluginsList = () =>
+    Promise.resolve({ noPlugins: false, allOff: false, plugins, refused: [] });
   api.pluginsUiTrees = () =>
     Promise.resolve(
       withPanel.map((id) => ({
