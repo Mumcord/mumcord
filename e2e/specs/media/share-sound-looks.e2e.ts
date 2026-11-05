@@ -166,7 +166,9 @@ async function showMembers(): Promise<void> {
       await expectSoundLine(`Sound: ${P1}`);
       const source = $(".sharer-bar__source");
       expect((await source.getText()).startsWith("Window")).toBe(true);
-      const badge = source.$("//span[contains(@class,'share-badge')][starts-with(normalize-space(),'Sound:')]");
+      const badge = source.$(
+        ".//span[contains(concat(' ',@class,' '),' share-badge ')][starts-with(normalize-space(),'Sound:')]",
+      );
       expect(await outlined(badge.$("svg"))).toBe(true);
       const centres = await buttonCentres();
       expect(centres.length).toBeGreaterThanOrEqual(6);
