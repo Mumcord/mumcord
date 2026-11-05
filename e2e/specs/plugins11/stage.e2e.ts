@@ -361,7 +361,9 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
       const join = activityLine(STAGE).$(`button[aria-label='Join ${STAGE}']`);
       await join.waitForClickable({ timeout: 10_000 });
       await join.click();
-      await stageTab(STAGE).waitForExist({ timeout: 15_000 });
+      // B shares its own screen and watches nothing else, so the activity is B's only item: the
+      // tab row stays hidden (FR-9.44) and the stage shows the activity directly.
+      await stageFrame(STAGE).waitForDisplayed({ timeout: 15_000 });
       await expect(activityLine(STAGE).$("button.plugin-activity__action")).toHaveText("Open");
     });
     await waitLog(STAGE, "joined: Bob");
@@ -432,7 +434,7 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
 
   it("AC-9.15: leaving, ending when empty, and moving to another channel", async () => {
     await apps.onB(async () => {
-      await stageTab(STAGE).click();
+      await stageFrame(STAGE).waitForDisplayed({ timeout: 10_000 });
       await stageButton(STAGE, `Leave ${STAGE}`).click();
       await expect(activityLine(STAGE).$("button.plugin-activity__action")).toHaveText("Join", {
         wait: 15_000,
