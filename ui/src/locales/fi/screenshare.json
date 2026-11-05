@@ -79,7 +79,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Jaa sovelluksen ääni",
+    "sound": "Ääni",
+    "soundInfo": "Koko näyttö: tietokoneen ääni ilman Mumcordia. Yksi ikkuna: vain kyseisen sovelluksen ääni.",
+    "soundNeeds": {
+      "windows": "Ei ääntä: vaatii Windows 10 -version 2004 tai uudemman",
+      "macos": "Ei ääntä: vaatii macOS 13:n tai uudemman",
+      "pipewire": "Ei ääntä: vaatii PipeWiren"
+    },
     "viewersGet": "Katsojat saavat:",
     "viewersGetSummary": "enintään {{resolution}} · {{fps}} kuvaa/s · {{codec}} · noin {{mbit}} Mbit/s",
     "pathRelay": "Lähetetään kerran palvelimen välityspalvelimen kautta, joka välittää sen enintään {{count}} katsojalle.",
@@ -105,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · laitteisto",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Välitys",
-    "pathDirect": "Suora"
+    "pathDirect": "Suora",
+    "soundDesktop": "Ääni: työpöytä",
+    "soundApp": "Ääni: {{app}}",
+    "noSound": "Ei ääntä",
+    "tipDesktop": "Koko näyttö: työpöydän ääni ilman Mumcordia.",
+    "tipApp": "Yksi ikkuna: vain kyseisen sovelluksen ääni.",
+    "tipOff": "Äänen kytkin on pois päältä.",
+    "tipNone": "Tälle ikkunalle valittiin ”Ei ääntä”.",
+    "tipOldWindows": "Ei ääntä: vaatii Windows 10:n version 2004 tai uudemman",
+    "tipOldMacos": "Ei ääntä: vaatii macOS 13:n tai uudemman",
+    "tipNoPipeWire": "Ei ääntä: vaatii PipeWiren",
+    "tipCaptureFailed": "Äänen tallennus epäonnistui. Videon jakaminen jatkuu."
   },
   "qualityMenu": {
     "title": "Laatu",

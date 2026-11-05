@@ -81,7 +81,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Podijeli zvuk aplikacije",
+    "sound": "Zvuk",
+    "soundInfo": "Cijeli zaslon: zvuk računala bez Mumcorda. Jedan prozor: samo zvuk te aplikacije.",
+    "soundNeeds": {
+      "windows": "Bez zvuka: potrebno je Windows 10 verzija 2004 ili novija",
+      "macos": "Bez zvuka: potrebno je macOS 13 ili noviji",
+      "pipewire": "Bez zvuka: potrebno je PipeWire"
+    },
     "viewersGet": "Gledatelji dobivaju:",
     "viewersGetSummary": "do {{resolution}} · {{fps}} kadrova/s · {{codec}} · oko {{mbit}} Mbit/s",
     "pathRelay": "Šalje se jednom preko releja poslužitelja, koji ga prosljeđuje do {{count}} gledatelja.",
@@ -107,7 +113,18 @@
     "codecBadgeHardware": "{{codec}} · hardver",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relej",
-    "pathDirect": "Izravno"
+    "pathDirect": "Izravno",
+    "soundDesktop": "Zvuk: radna površina",
+    "soundApp": "Zvuk: {{app}}",
+    "noSound": "Bez zvuka",
+    "tipDesktop": "Cijeli zaslon: zvuk radne površine bez Mumcorda.",
+    "tipApp": "Jedan prozor: samo zvuk te aplikacije.",
+    "tipOff": "Prekidač zvuka je isključen.",
+    "tipNone": "Za ovaj je prozor odabrano „Bez zvuka“.",
+    "tipOldWindows": "Bez zvuka: potreban je Windows 10 verzije 2004 ili noviji",
+    "tipOldMacos": "Bez zvuka: potreban je macOS 13 ili noviji",
+    "tipNoPipeWire": "Bez zvuka: potreban je PipeWire",
+    "tipCaptureFailed": "Snimanje zvuka nije uspjelo. Dijeljenje videa se nastavlja."
   },
   "qualityMenu": {
     "title": "Kvaliteta",

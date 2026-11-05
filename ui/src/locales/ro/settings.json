@@ -1093,6 +1093,7 @@
     "useGpuHint": "Codifică AV1 pe placa video, deci partajarea consumă aproape deloc CPU. Dezactivat: AV1 folosește procesorul.",
     "statusList": "Starea encoderului",
     "av1Encode": "Codificare AV1",
+    "sound": "Sunet",
     "askEachTime": "Întreabă-mă aceste setări la fiecare partajare",
     "av1Playback": "Redare AV1",
     "vp9Playback": "Redare VP9",

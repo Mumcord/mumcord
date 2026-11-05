@@ -19,6 +19,7 @@ import { useTick } from "../media/useTick";
 import { ChevronDownIcon, WindowIcon } from "./icons";
 import { BarNotes } from "./notices/BarNotes";
 import { ShareNotices } from "./notices/ShareNotices";
+import { SoundBadge } from "./notices/SoundBadge";
 import { QualityMenu } from "./quality/QualityMenu";
 import { ShareBadges } from "./quality/ShareBadges";
 import { shareStartedAt } from "./sharesStore";
@@ -120,7 +121,6 @@ export function SharerBar(): ReactNode {
           : "sharedUnknown",
     ),
   ];
-  source.push(tv(own.sound ? "soundOnShort" : "soundOffShort"));
   const noSound = t(share.platform?.sound === false ? "noSound" : "noSoundForShare");
 
   return (
@@ -148,6 +148,7 @@ export function SharerBar(): ReactNode {
           </span>
           <span className="sharer-bar__source">
             {source.join(" · ")}
+            <SoundBadge own={own} />
             {quality !== null && <ShareBadges quality={quality} />}
           </span>
           <BarNotes quality={quality} nameOf={nameOf} />

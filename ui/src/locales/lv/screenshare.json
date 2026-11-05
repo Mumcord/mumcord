@@ -81,7 +81,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Kopīgot lietotnes skaņu",
+    "sound": "Skaņa",
+    "soundInfo": "Viss ekrāns: datora skaņa bez Mumcord. Viens logs: tikai šīs lietotnes skaņa.",
+    "soundNeeds": {
+      "windows": "Nav skaņas: nepieciešams Windows 10 versija 2004 vai jaunāka",
+      "macos": "Nav skaņas: nepieciešams macOS 13 vai jaunāks",
+      "pipewire": "Nav skaņas: nepieciešams PipeWire"
+    },
     "viewersGet": "Skatītāji saņem:",
     "viewersGetSummary": "līdz {{resolution}} · {{fps}} fps · {{codec}} · apmēram {{mbit}} Mbit/s",
     "pathRelay": "Nosūtīts vienreiz caur servera releju, kas to pārsūta līdz {{count}} skatītājiem.",
@@ -107,7 +113,18 @@
     "codecBadgeHardware": "{{codec}} · aparatūra",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relejs",
-    "pathDirect": "Tiešais"
+    "pathDirect": "Tiešais",
+    "soundDesktop": "Skaņa: darbvirsma",
+    "soundApp": "Skaņa: {{app}}",
+    "noSound": "Bez skaņas",
+    "tipDesktop": "Viss ekrāns: darbvirsmas skaņa bez Mumcord.",
+    "tipApp": "Viens logs: tikai šīs lietotnes skaņa.",
+    "tipOff": "Skaņas slēdzis ir izslēgts.",
+    "tipNone": "Šim logam izvēlēts „Bez skaņas“.",
+    "tipOldWindows": "Bez skaņas: nepieciešama Windows 10 versija 2004 vai jaunāka",
+    "tipOldMacos": "Bez skaņas: nepieciešama macOS 13 vai jaunāka",
+    "tipNoPipeWire": "Bez skaņas: nepieciešams PipeWire",
+    "tipCaptureFailed": "Skaņas tveršana neizdevās. Video kopīgošana turpinās."
   },
   "qualityMenu": {
     "title": "Kvalitāte",

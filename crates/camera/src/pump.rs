@@ -1,11 +1,11 @@
 //! Turns the camera pictures of one session into [`CameraFrame`]s for the sink. Shared by the
-//! portal and the V4L2 path.
+//! Linux portal and V4L2 paths and by Windows Media Foundation.
 
 use std::time::Instant;
 
-use super::convert::{Picture, to_nv12};
-use super::mode::{Geometry, Mode, PixelFormat};
+use crate::convert::{Picture, to_nv12};
 use crate::mjpeg::{MjpegDecoder, UnreadableRun};
+use crate::mode::{Geometry, Mode, PixelFormat};
 use crate::{CameraError, CameraFrame, FramePool, FrameSink, POOL_BUFFERS, nv12_len};
 
 /// One camera picture as the OS hands it over.
@@ -124,7 +124,7 @@ mod tests {
     use std::sync::mpsc;
 
     use super::*;
-    use crate::linux::mode::Rate;
+    use crate::mode::Rate;
 
     type Event = Result<(u32, u32, Vec<u8>), CameraError>;
 
@@ -176,7 +176,7 @@ mod tests {
 
     #[test]
     fn mjpeg_frames_decode_and_garbage_stops_the_camera() {
-        let frame = include_bytes!("../../tests/fixtures/mjpeg-64x48-no-dht.jpg");
+        let frame = include_bytes!("../tests/fixtures/mjpeg-64x48-no-dht.jpg");
         let (mut pump, rx) = pump(PixelFormat::Mjpeg, 64, 48);
         pump.push(Raw::Packed {
             data: frame,

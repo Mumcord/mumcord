@@ -1093,6 +1093,7 @@
     "useGpuHint": "Encode l'AV1 sur ta carte graphique, le partage ne coûte presque pas de CPU. Désactivé : AV1 utilise le processeur.",
     "statusList": "État de l'encodeur",
     "av1Encode": "Encodage AV1",
+    "sound": "Son",
     "askEachTime": "Demander ces réglages à chaque partage",
     "av1Playback": "Lecture AV1",
     "vp9Playback": "Lecture VP9",

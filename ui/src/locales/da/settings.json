@@ -1085,6 +1085,7 @@
     "useGpuHint": "Koder AV1 på dit grafikkort, så deling næsten ikke belaster CPU'en. Fra: AV1 bruger processoren.",
     "statusList": "Encoderstatus",
     "av1Encode": "AV1-kodning",
+    "sound": "Lyd",
     "askEachTime": "Spørg om disse indstillinger, hver gang jeg deler",
     "av1Playback": "AV1-afspilning",
     "vp9Playback": "VP9-afspilning",

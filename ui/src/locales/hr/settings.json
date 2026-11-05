@@ -1093,6 +1093,7 @@
     "useGpuHint": "Kodira AV1 na grafičkoj kartici pa dijeljenje gotovo ne opterećuje procesor. Isključeno: AV1 koristi procesor.",
     "statusList": "Status enkodera",
     "av1Encode": "AV1 kodiranje",
+    "sound": "Zvuk",
     "askEachTime": "Pitaj me za ove postavke svaki put kad dijelim",
     "av1Playback": "AV1 reprodukcija",
     "vp9Playback": "VP9 reprodukcija",

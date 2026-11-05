@@ -79,7 +79,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Κοινή χρήση του ήχου της εφαρμογής",
+    "sound": "Ήχος",
+    "soundInfo": "Ολόκληρη οθόνη: ο ήχος του υπολογιστή χωρίς το Mumcord. Ένα παράθυρο: μόνο ο ήχος αυτής της εφαρμογής.",
+    "soundNeeds": {
+      "windows": "Χωρίς ήχο: απαιτείται Windows 10 έκδοση 2004 ή νεότερη",
+      "macos": "Χωρίς ήχο: απαιτείται macOS 13 ή νεότερο",
+      "pipewire": "Χωρίς ήχο: απαιτείται PipeWire"
+    },
     "viewersGet": "Οι θεατές λαμβάνουν:",
     "viewersGetSummary": "έως {{resolution}} · {{fps}} καρέ/s · {{codec}} · περίπου {{mbit}} Mbit/s",
     "pathRelay": "Αποστέλλεται μία φορά μέσω του ρελέ του διακομιστή, που το προωθεί σε έως {{count}} θεατές.",
@@ -105,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · υλικό",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Ρελέ",
-    "pathDirect": "Άμεσα"
+    "pathDirect": "Άμεσα",
+    "soundDesktop": "Ήχος: επιφάνεια εργασίας",
+    "soundApp": "Ήχος: {{app}}",
+    "noSound": "Χωρίς ήχο",
+    "tipDesktop": "Ολόκληρη η οθόνη: ο ήχος της επιφάνειας εργασίας χωρίς το Mumcord.",
+    "tipApp": "Ένα παράθυρο: μόνο ο ήχος αυτής της εφαρμογής.",
+    "tipOff": "Ο διακόπτης ήχου είναι απενεργοποιημένος.",
+    "tipNone": "Για αυτό το παράθυρο επιλέχθηκε «Χωρίς ήχο».",
+    "tipOldWindows": "Χωρίς ήχο: απαιτείται Windows 10 έκδοση 2004 ή νεότερη",
+    "tipOldMacos": "Χωρίς ήχο: απαιτείται macOS 13 ή νεότερο",
+    "tipNoPipeWire": "Χωρίς ήχο: απαιτείται το PipeWire",
+    "tipCaptureFailed": "Η λήψη ήχου απέτυχε. Η κοινή χρήση βίντεο συνεχίζεται."
   },
   "qualityMenu": {
     "title": "Ποιότητα",

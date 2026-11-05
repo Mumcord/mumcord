@@ -9,14 +9,24 @@
 //! [`TestCamera`] is the debug-build `MUMCORD_TEST_CAMERA` fixture (FR-8.31); it implements the
 //! same trait, so all later pipeline stages run unchanged.
 
+// Format choice, 16:9 crop, conversion to NV12 and MJPEG decoding for the backends that
+// negotiate camera formats themselves. AVFoundation converts and scales on its own.
+#[cfg(any(target_os = "linux", windows))]
+mod convert;
 mod device;
 #[cfg(target_os = "linux")]
 mod linux;
-// Only the Linux backend reads MJPEG so far; the other backends get it from the OS decoded.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", windows))]
 mod mjpeg;
+#[cfg(any(target_os = "linux", windows))]
+mod mode;
 mod pool;
+#[cfg(any(target_os = "linux", windows))]
+mod pump;
 mod testcam;
+// The plain-Rust Media Foundation helpers in `windows::media_type` are unit tested on Linux too.
+#[cfg(any(windows, all(test, target_os = "linux")))]
+mod windows;
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -26,6 +36,8 @@ pub use device::{CameraDevice, DeviceEvent, DeviceId, DeviceList};
 pub use linux::LinuxCamera;
 pub use pool::{FramePool, PooledBuffer};
 pub use testcam::{TEST_CAMERA_NAME, TestCamera, TestCameraMode};
+#[cfg(windows)]
+pub use windows::{PRIVACY_SETTINGS_URL, WindowsCamera};
 
 /// Largest frame a backend delivers (FR-8.26).
 pub const MAX_WIDTH: u32 = 1280;

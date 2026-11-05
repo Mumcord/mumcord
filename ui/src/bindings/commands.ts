@@ -894,6 +894,12 @@ export const commands = {
 	/**  Level of watched shares' sound, 0.0–1.0, while people talk (auto-ducking, FR-2.76). */
 	screenShareSetSoundLevel: (level: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_sound_level", { level })),
 	/**
+	 *  Why this system cannot share sound (FR-7.84), asked before a share starts so the start
+	 *  dialog and Settings can show the Sound switch off and disabled with the matching note;
+	 *  `null` where sound can be shared.
+	 */
+	screenShareSoundSupport: () => __TAURI_INVOKE<SoundUnavailableReason | null>("screen_share_sound_support"),
+	/**
 	 *  The apps playing sound now, for "Which app's sound?" while the own share waits for the
 	 *  pick (`soundChoice` is set). Call it again to refresh the open list; empty where the
 	 *  system has no per-app choice.

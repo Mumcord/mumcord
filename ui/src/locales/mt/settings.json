@@ -1109,6 +1109,7 @@
     "useGpuHint": "Jikkodifika AV1 fuq il-karta grafika, għalhekk il-qsim kważi ma jiswa xejn CPU. Mitfi: AV1 juża l-proċessur.",
     "statusList": "Stat tal-enkoder",
     "av1Encode": "Kodifikazzjoni AV1",
+    "sound": "Ħoss",
     "askEachTime": "Staqsini għal dawn l-issettjar kull darba li naqsam",
     "av1Playback": "Riproduzzjoni AV1",
     "vp9Playback": "Riproduzzjoni VP9",
