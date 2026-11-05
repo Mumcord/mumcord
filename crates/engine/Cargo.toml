@@ -58,6 +58,8 @@ x11rb.workspace = true
 ashpd = { workspace = true, features = ["screencast"] }
 pipewire.workspace = true
 futures-util.workspace = true
+# Ready share-sound frames go from the PipeWire loop to the sound thread without locks.
+crossbeam-queue.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Screen capture with the shared app's sound: ScreenCaptureKit (macOS 12.3+, sound 13+, system
@@ -113,6 +115,7 @@ test-backend = ["mumcord-audio/test-backend"]
 
 [dev-dependencies]
 tempfile.workspace = true
+proptest.workspace = true
 # Paused time for the relay timeouts.
 tokio = { workspace = true, features = ["test-util"] }
 # Live tests drive scripted bots through the mumbot library.

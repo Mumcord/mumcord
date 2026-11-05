@@ -236,20 +236,6 @@ jobs:
           key: ${{ matrix.task }}
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
-      # Trial (#479): compiler-level cache on the Linux tests only, next to rust-cache.
-      - name: Set up sccache
-        if: runner.os == 'Linux' && matrix.task == 'test'
-        uses: mozilla-actions/sccache-action@v0.0.11
-
-      - name: Use sccache
-        if: runner.os == 'Linux' && matrix.task == 'test'
-        run: |
-          {
-            echo 'SCCACHE_GHA_ENABLED=true'
-            echo 'RUSTC_WRAPPER=sccache'
-            echo 'CARGO_INCREMENTAL=0'
-          } >> "$GITHUB_ENV"
-
       - uses: ./.github/actions/npm-ci
 
       - name: Rust format
@@ -275,10 +261,6 @@ jobs:
       - name: Rust tests
         if: matrix.task == 'test' || runner.os == 'macOS'
         run: cargo test --workspace --locked
-
-      - name: sccache statistics
-        if: always() && runner.os == 'Linux' && matrix.task == 'test'
-        run: sccache --show-stats
 
       # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,
       # tested and free of the device crates (cpal/ALSA) and the resampler.

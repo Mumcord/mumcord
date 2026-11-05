@@ -49,7 +49,7 @@ on). Otherwise each connection checks one flag per message and does nothing else
 | Voice (UDP and tunnelled through TCP)             | Counters only (sent and received per server)                    |
 
 All plugin data is captured, Mumcord's own (`mumcord.hello`, `mumcord.history`, `mumcord.image`,
-`mumcord.nowgaming`, `mumcord.nowplaying`, `mumcord.p2p`, `mumcord.screen`, `mumcord.watch`) and
+`mumcord.camera`, `mumcord.nowgaming`, `mumcord.nowplaying`, `mumcord.p2p`, `mumcord.screen`, `mumcord.watch`) and
 that of other clients or plugins. Standard control messages such as `TextMessage` or `UserState`
 are listed with their type and size so the order and timing around plugin data stays visible, but
 their content (chat text, names, comments) is not kept. The login messages `Version` and

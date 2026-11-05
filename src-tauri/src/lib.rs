@@ -332,6 +332,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_paused,
             commands::screen_share::screen_share_set_sound,
             commands::screen_share::screen_share_set_sound_level,
+            commands::screen_share::screen_share_sound_apps,
+            commands::screen_share::screen_share_choose_sound,
             commands::screen_share::screen_share_watch,
             commands::screen_share::screen_share_unwatch,
             commands::screen_share::screen_share_set_decode_codecs,

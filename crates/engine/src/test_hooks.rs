@@ -31,6 +31,16 @@ pub enum SvtSelftest {
     Fail,
 }
 
+/// What the pretend system picker hands over (issue #435, AC-7.61 to AC-7.64): the test
+/// backend has no window picker.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SharePick {
+    /// A whole screen.
+    Screen,
+    /// A window, with the app hint the portal or compositor would report (`None`: no hint).
+    Window(Option<String>),
+}
+
 /// Reads a hook variable; always `None` in release builds.
 fn var(name: &str) -> Option<String> {
     if cfg!(debug_assertions) {
@@ -91,6 +101,12 @@ pub fn keep_old_key() -> bool {
     flag("MUMCORD_TEST_KEEP_OLD_KEY")
 }
 
+/// The pick the test backend pretends the user made: `MUMCORD_TEST_SHARE_PICK=screen`,
+/// `window` or `window:<app hint>`. `None` keeps the plain test share without sound capture.
+pub fn share_pick() -> Option<SharePick> {
+    parse_pick(var("MUMCORD_TEST_SHARE_PICK")?.as_str())
+}
+
 fn parse_seconds(raw: &str) -> Option<Duration> {
     raw.trim().parse().ok().map(Duration::from_secs)
 }
@@ -101,6 +117,18 @@ fn parse_millis(raw: &str) -> Option<Duration> {
 
 fn parse_number(raw: &str) -> Option<u64> {
     raw.trim().parse().ok()
+}
+
+fn parse_pick(raw: &str) -> Option<SharePick> {
+    let raw = raw.trim();
+    match raw.split_once(':') {
+        None if raw == "screen" => Some(SharePick::Screen),
+        None if raw == "window" => Some(SharePick::Window(None)),
+        Some(("window", hint)) if !hint.trim().is_empty() => {
+            Some(SharePick::Window(Some(hint.trim().to_owned())))
+        }
+        _ => None,
+    }
 }
 
 fn parse_svt(raw: &str) -> Option<SvtSelftest> {
@@ -160,6 +188,18 @@ mod tests {
     }
 
     #[test]
+    fn pick_parses_screen_and_window_hints() {
+        assert_eq!(parse_pick("screen"), Some(SharePick::Screen));
+        assert_eq!(parse_pick("window"), Some(SharePick::Window(None)));
+        assert_eq!(
+            parse_pick("window: Test App A"),
+            Some(SharePick::Window(Some("Test App A".into())))
+        );
+        assert_eq!(parse_pick("window:"), None);
+        assert_eq!(parse_pick("monitor"), None);
+    }
+
+    #[test]
     fn numbers_and_svt_parse() {
         assert_eq!(parse_seconds(" 60 "), Some(Duration::from_secs(60)));
         assert_eq!(parse_millis("x"), None);
@@ -194,7 +234,9 @@ mod tests {
             std::env::set_var("MUMCORD_TEST_ON_BATTERY", "1");
             std::env::set_var("MUMCORD_TEST_NO_WEBCODECS_AV1", "1");
             std::env::set_var("MUMCORD_TEST_KEEP_OLD_KEY", "1");
+            std::env::set_var("MUMCORD_TEST_SHARE_PICK", "screen");
         }
+        assert!(share_pick().is_none());
         assert!(file_expiry().is_none());
         assert!(!file_corrupt());
         assert!(file_stall_after_bytes().is_none());

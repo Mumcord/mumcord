@@ -43,15 +43,43 @@ pub fn match_sound_app(hints: &[&str], streams: &[SoundStream], own_pids: &[u32]
         return SoundMatch::Unclear;
     }
 
+    let fits = |stream: &SoundStream| {
+        [&stream.app_name, &stream.binary, &stream.desktop_id]
+            .into_iter()
+            .flatten()
+            .any(|field| hints.contains(&field.trim().to_lowercase()))
+    };
+    let mut matching = group(streams, own_pids, fits)
+        .into_iter()
+        .filter(|(_, fits)| *fits)
+        .map(|(app, _)| app);
+    match (matching.next(), matching.next()) {
+        (Some(app), None) => SoundMatch::Clear(app),
+        _ => SoundMatch::Unclear,
+    }
+}
+
+/// The running apps behind `streams`, without Mumcord's (`own_pids`): what the "Which app's
+/// sound?" list offers (FR-7.83).
+pub fn sound_apps(streams: &[SoundStream], own_pids: &[u32]) -> Vec<MatchedApp> {
+    group(streams, own_pids, |_| false)
+        .into_iter()
+        .map(|(app, _)| app)
+        .collect()
+}
+
+/// Joins `streams` into apps, each with whether one of its streams `fits`.
+fn group(
+    streams: &[SoundStream],
+    own_pids: &[u32],
+    fits: impl Fn(&SoundStream) -> bool,
+) -> Vec<(MatchedApp, bool)> {
     let mut apps: Vec<(MatchedApp, bool)> = Vec::new();
     for stream in streams {
         if stream.pid.is_some_and(|pid| own_pids.contains(&pid)) {
             continue;
         }
-        let fits = [&stream.app_name, &stream.binary, &stream.desktop_id]
-            .into_iter()
-            .flatten()
-            .any(|field| hints.contains(&field.trim().to_lowercase()));
+        let fits = fits(stream);
         // A browser's several streams are one app: join by process id, else by binary.
         match apps.iter_mut().find(|(app, _)| same_app(app, stream)) {
             Some((app, matched)) => {
@@ -69,15 +97,7 @@ pub fn match_sound_app(hints: &[&str], streams: &[SoundStream], own_pids: &[u32]
             }
         }
     }
-
-    let mut matching = apps
-        .into_iter()
-        .filter(|(_, fits)| *fits)
-        .map(|(app, _)| app);
-    match (matching.next(), matching.next()) {
-        (Some(app), None) => SoundMatch::Clear(app),
-        _ => SoundMatch::Unclear,
-    }
+    apps
 }
 
 fn same_app(app: &MatchedApp, stream: &SoundStream) -> bool {
@@ -125,6 +145,25 @@ mod tests {
             SoundMatch::Clear(app) => app.pids,
             SoundMatch::Unclear => panic!("expected a clear match"),
         }
+    }
+
+    #[test]
+    fn the_list_joins_an_apps_streams_and_leaves_mumcord_out() {
+        let streams = [
+            stream("Firefox", "firefox", "", 20),
+            stream("", "firefox", "", 21),
+            stream("Spotify", "spotify", "", 10),
+            stream("Mumcord", "mumcord", "", 99),
+        ];
+        let apps = sound_apps(&streams, &[99]);
+        let listed: Vec<_> = apps
+            .iter()
+            .map(|a| (a.app_name.as_deref(), a.pids.clone()))
+            .collect();
+        assert_eq!(
+            listed,
+            [(Some("Firefox"), vec![20, 21]), (Some("Spotify"), vec![10])]
+        );
     }
 
     #[test]

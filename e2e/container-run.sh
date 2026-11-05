@@ -41,7 +41,33 @@ export MUMCORD_OVERLAY_SOCKET="mumcord-overlay-e2e-${run:-$$}"
 export DISPLAY=":$((99 + ${run:-0}))"
 Xvfb "$DISPLAY" -screen 0 1600x1000x24 -nolisten tcp >/dev/null 2>&1 &
 xvfb_pid=$!
-trap 'kill "$xvfb_pid" 2>/dev/null || true' EXIT
+pids=("$xvfb_pid")
+trap 'kill "${pids[@]}" 2>/dev/null || true' EXIT
+
+# Sound daemon for the share-sound specs. MUMCORD_E2E_AUDIO=pipewire (default) starts PipeWire and
+# WirePlumber with a null sink as the default output, so test apps (helpers/pwapps.ts) have
+# somewhere to play; =pulse starts only PulseAudio (no PipeWire: AC-7.66); =none starts nothing.
+# The sockets live in this run's own XDG_RUNTIME_DIR, so parallel runs never meet.
+audio="${MUMCORD_E2E_AUDIO:-pipewire}"
+case "$audio" in
+  pipewire)
+    pipewire >/dev/null 2>&1 &
+    pids+=($!)
+    for _ in $(seq 50); do pw-cli info 0 >/dev/null 2>&1 && break; sleep 0.1; done
+    # No Bluetooth: its logind module has no system bus here and ends WirePlumber.
+    sed '/bluetooth.lua/d' /usr/share/wireplumber/wireplumber.conf > "$XDG_RUNTIME_DIR/wireplumber.conf"
+    wireplumber -c "$XDG_RUNTIME_DIR/wireplumber.conf" >/dev/null 2>&1 &
+    pids+=($!)
+    pw-cli create-node adapter \
+      '{ factory.name=support.null-audio-sink node.name=e2e-sink media.class=Audio/Sink object.linger=true audio.position=[FL FR] }' >/dev/null
+    ;;
+  pulse)
+    pulseaudio --daemonize=no --exit-idle-time=-1 --load="module-null-sink sink_name=e2e-sink" >/dev/null 2>&1 &
+    pids+=($!)
+    ;;
+  none) ;;
+  *) echo "MUMCORD_E2E_AUDIO must be pipewire, pulse or none, got '$audio'" >&2; exit 2 ;;
+esac
 
 # WebKit's bubblewrap sandbox and DMA-BUF renderer do not work in an unprivileged container.
 export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 WEBKIT_DISABLE_DMABUF_RENDERER=1

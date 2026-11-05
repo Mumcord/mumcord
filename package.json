@@ -61,5 +61,19 @@
     "vite": "^8.3.5",
     "vitest": "^5.0.5",
     "webdriverio": "^10.1.0"
+  },
+  "overrides": {
+    "glob": {
+      "minimatch": "^11.0.1"
+    },
+    "mocha": {
+      "minimatch": "^11.0.1"
+    },
+    "readdir-glob": {
+      "minimatch": "^11.0.1"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.1"
+    }
   }
 }

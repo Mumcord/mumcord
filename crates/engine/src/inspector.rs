@@ -314,6 +314,11 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
     if data_id == crate::files::wire::DATA_ID {
         return crate::files::wire::decode(data).map(|m| file_json(&m));
     }
+    if data_id == crate::camera::signal::DATA_ID {
+        return crate::camera::signal::decode(data)
+            .ok()
+            .map(|m| camera_json(&m));
+    }
     if data_id == PEER_DATA_ID {
         return serde_json::from_slice::<Value>(data).ok().map(mask_token);
     }
@@ -328,6 +333,20 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
     std::str::from_utf8(data)
         .ok()
         .map(|text| Value::String(text.to_owned()))
+}
+
+fn camera_json(m: &crate::camera::signal::CameraMessage) -> Value {
+    use crate::camera::signal::CameraMessage;
+    match m {
+        CameraMessage::On { id } => json!({ "t": "on", "id": id }),
+        CameraMessage::Off => json!({ "t": "off" }),
+        CameraMessage::CamJoin { id, codecs } => json!({
+            "t": "cam-join",
+            "id": id,
+            "codecs": codecs.iter().map(|c| format!("{c:?}").to_lowercase()).collect::<Vec<_>>(),
+        }),
+        CameraMessage::CamLeave { id } => json!({ "t": "cam-leave", "id": id }),
+    }
 }
 
 fn file_json(m: &crate::files::wire::FileMessage) -> Value {
