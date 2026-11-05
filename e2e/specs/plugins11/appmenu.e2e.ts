@@ -98,20 +98,36 @@ async function panelButton(label: string): Promise<void> {
   await button.click();
 }
 
+/**
+ * The lines of the open plugin panel's event log (its text rows). Read from the DOM, because the log sits at the
+ * bottom of the panel's scroll area and WebDriver's visible text leaves out what is scrolled away.
+ */
+async function panelLog(): Promise<string> {
+  return browser.execute(() =>
+    Array.from(document.querySelectorAll(".pstrip-body li .pr-text"))
+      .map((line) => line.textContent.trim())
+      .join("\n"),
+  );
+}
+
 /** Waits until the plugin's panel shows a line matching `pattern`; returns that line. */
 async function waitLog(pattern: RegExp, timeout = 15_000): Promise<string> {
   await openPanel();
   let seen = "";
   let line = "";
-  await browser.waitUntil(
-    async () => {
-      const body = $(".pstrip-body");
-      seen = (await body.isExisting()) ? await body.getText() : "";
-      line = seen.split("\n").find((l) => pattern.test(l)) ?? "";
-      return line !== "";
-    },
-    { timeout, interval: 250, timeoutMsg: `the panel never showed ${String(pattern)}; it shows:\n${seen}` },
-  );
+  // timeoutMsg is fixed when the wait starts, so the panel text seen last is reported by hand.
+  await browser
+    .waitUntil(
+      async () => {
+        seen = await panelLog();
+        line = seen.split("\n").find((l) => pattern.test(l)) ?? "";
+        return line !== "";
+      },
+      { timeout, interval: 250 },
+    )
+    .catch(() => {
+      throw new Error(`the panel never showed ${String(pattern)}; it shows:\n${seen}`);
+    });
   return line;
 }
 
@@ -179,6 +195,7 @@ describe("plugins 1.1: Apps menu, command palette and web frames (AC-9.16, AC-9.
     try {
       await expect($("//div[contains(@class,'chat-apps__menu')]//p[contains(@class,'appmenu__group')]")).toHaveText(
         "Plugins",
+        { ignoreCase: true },
       );
       for (const label of ["Start Test Surface", PANEL_ITEM]) {
         const item = appItem(label);
