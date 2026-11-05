@@ -178,6 +178,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Valikud: {{name}}",
     "pin": "Kinnita mulle",
     "unpin": "Eemalda kinnitus",
     "showLarge": "Näita suurelt",

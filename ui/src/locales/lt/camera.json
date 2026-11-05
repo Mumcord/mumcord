@@ -192,6 +192,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "{{name}} parinktys",
     "pin": "Prisegti man",
     "unpin": "Atsegti",
     "showLarge": "Rodyti didelį",

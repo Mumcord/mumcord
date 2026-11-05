@@ -178,6 +178,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opties voor {{name}}",
     "pin": "Vastzetten voor mij",
     "unpin": "Losmaken",
     "showLarge": "Groot tonen",

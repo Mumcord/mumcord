@@ -199,6 +199,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Roghanna do {{name}}",
     "pin": "Greamaigh dom",
     "unpin": "Díghreamaigh",
     "showLarge": "Taispeáin mór",

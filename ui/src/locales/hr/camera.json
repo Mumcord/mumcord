@@ -185,6 +185,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opcije za {{name}}",
     "pin": "Prikvači za mene",
     "unpin": "Otkvači",
     "showLarge": "Prikaži veliko",

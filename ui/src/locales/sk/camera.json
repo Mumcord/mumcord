@@ -192,6 +192,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Možnosti pre {{name}}",
     "pin": "Pripnúť pre mňa",
     "unpin": "Odopnúť",
     "showLarge": "Zobraziť veľké",

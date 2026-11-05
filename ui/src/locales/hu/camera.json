@@ -178,6 +178,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "{{name}} beállításai",
     "pin": "Kitűzés nekem",
     "unpin": "Kitűzés megszüntetése",
     "showLarge": "Megjelenítés nagyban",

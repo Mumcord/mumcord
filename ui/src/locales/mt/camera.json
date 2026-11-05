@@ -199,6 +199,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Għażliet għal {{name}}",
     "pin": "Waħħal għalija",
     "unpin": "Neħħi t-twaħħil",
     "showLarge": "Uri kbir",

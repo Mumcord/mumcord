@@ -185,6 +185,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opțiuni pentru {{name}}",
     "pin": "Fixează pentru mine",
     "unpin": "Anulează fixarea",
     "showLarge": "Arată mare",
