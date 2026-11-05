@@ -81,7 +81,7 @@ async function expectNoShareSound(): Promise<void> {
 
   it("the switch off as the Settings default: no share sound", async () => {
     await openScreenSharingSettings();
-    const toggle = soundSetting();
+    const toggle = await soundSetting();
     await toggle.waitForExist();
     expect(await toggle.isSelected()).toBe(true);
     await toggle.click();
@@ -103,7 +103,7 @@ async function expectNoShareSound(): Promise<void> {
     const stored = await app.invoke<{ screenSound: boolean }>("settings_get");
     expect(stored.screenSound).toBe(false);
     await openScreenSharingSettings();
-    expect(await soundSetting().isSelected()).toBe(false);
+    expect(await (await soundSetting()).isSelected()).toBe(false);
     await browser.keys("Escape");
   });
 });

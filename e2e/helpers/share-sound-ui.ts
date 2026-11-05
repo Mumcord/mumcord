@@ -10,7 +10,8 @@
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { browser, $, expect } from "@wdio/globals";
+import { browser, $, $$, expect } from "@wdio/globals";
+import type { ChainablePromiseElement } from "webdriverio";
 import * as app from "./app.ts";
 import * as apps from "./apps.ts";
 import { startScreenShare } from "./chat-ui.ts";
@@ -58,6 +59,7 @@ export async function startSharer(hooks: TestHooks, port: number): Promise<void>
   await useDebugLog();
   await app.restart();
   await completeWizard(SHARER);
+  await allowDirect();
   await addAndConnect(`localhost:${String(port)}`);
   await joinIfReadOnly();
   // The share entry point and the sharer bar need a wide enough window.
@@ -75,6 +77,7 @@ export async function startViewer(port: number): Promise<void> {
   await apps.startB({ audio: `file:${voice}:${viewerOutput()}` });
   await apps.onB(async () => {
     await completeWizard(VIEWER);
+    await allowDirect();
     await addAndConnect(`localhost:${String(port)}`);
     await joinIfReadOnly();
     await browser.setWindowSize(1400, 900);
@@ -92,7 +95,7 @@ export async function stopShare(): Promise<void> {
   await $("//div[contains(@class,'sharer-bar')]").waitForExist({ reverse: true, timeout: 20_000 });
 }
 
-/** B starts watching A's share from its banner in the channel. */
+/** B starts watching A's share from its banner in the channel and waits for the picture. */
 export async function watch(): Promise<void> {
   await apps.onB(async () => {
     const button = $(
@@ -100,6 +103,11 @@ export async function watch(): Promise<void> {
     );
     await button.waitForClickable({ timeout: 30_000, timeoutMsg: "B never saw A's share" });
     await button.click();
+    const connecting = $(`//*[contains(text(),"Connecting to ${SHARER}'s screen")]`);
+    await browser.waitUntil(async () => !(await connecting.isExisting()), {
+      timeout: 45_000,
+      timeoutMsg: "B's view of the share never connected",
+    });
   });
 }
 
@@ -168,27 +176,48 @@ export async function shares(): Promise<OwnShare[]> {
   return app.invoke<OwnShare[]>("screen_share_list", { serverId });
 }
 
-/** The share line in A's sharer bar ("Sound: desktop", "Sound: {app}" or "No sound"). */
-export function soundLine() {
-  return $(".sharer-bar .share-badges .share-badge");
+/**
+ * The sound line in A's sharer bar ("Sound: desktop", "Sound: {app}" or "No sound"). The bar
+ * exists in a wide and a narrow layout, so this takes the one on screen.
+ */
+export async function soundLine(): Promise<string | null> {
+  const badges = await $$(
+    "//div[contains(@class,'sharer-bar')]//span[contains(@class,'share-badge')][starts-with(normalize-space(),'Sound:') or normalize-space()='No sound']",
+  );
+  for (const badge of badges) if (await badge.isDisplayed()) return (await badge.getText()).trim();
+  return null;
 }
 
 /** Waits until A's sharer bar says `text` on its sound line. */
 export async function expectSoundLine(text: string): Promise<void> {
-  const line = soundLine();
-  await browser.waitUntil(
-    async () => (await line.isExisting()) && (await line.getText()).trim() === text,
-    {
-      timeout: 20_000,
-      timeoutMsg: `the sound line never said "${text}"`,
-    },
-  );
+  let seen: string | null = null;
+  await browser
+    .waitUntil(
+      async () => {
+        seen = await soundLine();
+        return seen === text;
+      },
+      { timeout: 20_000 },
+    )
+    .catch(() => {
+      throw new Error(`the sound line says ${JSON.stringify(seen)}, want "${text}"`);
+    });
 }
 
 /** Switches A's log to debug level, which applies from the next start (AC-7.70). */
 export async function useDebugLog(): Promise<void> {
   const settings = await app.invoke<Record<string, unknown>>("settings_get");
   await app.invoke("settings_update", { settings: { ...settings, logLevel: "debug" } });
+}
+
+/**
+ * Allows direct connections on the current client, the path of a share without a relay.
+ * Without that answer the first watch asks both people first; that question is not what these
+ * specs are about.
+ */
+async function allowDirect(): Promise<void> {
+  const settings = await app.invoke<Record<string, unknown>>("settings_get");
+  await app.invoke("settings_update", { settings: { ...settings, allowDirectConnections: "yes" } });
 }
 
 /** A's client log files of the current profile, joined. */
@@ -267,7 +296,8 @@ export function dialogSoundSwitch() {
 /** Opens Settings → Screen sharing. */
 export async function openScreenSharingSettings(): Promise<void> {
   await openAllSettings();
-  const tab = $("//button[@role='tab'][normalize-space(.)='Screen sharing']");
+  // The tab may carry a "New" pill after its name.
+  const tab = $("//button[@role='tab'][starts-with(normalize-space(.),'Screen sharing')]");
   await tab.waitForClickable({ timeout: 10_000 });
   await tab.click();
   await $(
@@ -275,12 +305,18 @@ export async function openScreenSharingSettings(): Promise<void> {
   ).waitForDisplayed({ timeout: 10_000 });
 }
 
-/** The row of the Sound switch on the open Screen sharing settings page. */
-export function soundSettingRow() {
-  return $("//div[contains(@class,'settings-switch')][.//label[normalize-space()='Sound']]");
+/** The row of the Sound switch on the open Screen sharing settings page (the one on screen). */
+export async function soundSettingRow(): Promise<ChainablePromiseElement> {
+  const xpath = "//div[contains(@class,'settings-switch')][.//label[normalize-space()='Sound']]";
+  await $(`(${xpath})[1]`).waitForExist({ timeout: 10_000 });
+  const rows = await $$(xpath);
+  for (let i = 0; i < rows.length; i++) {
+    if (await rows[i].isDisplayed()) return $(`(${xpath})[${String(i + 1)}]`);
+  }
+  throw new Error("no Sound switch on screen");
 }
 
 /** The Sound switch on the open Screen sharing settings page. */
-export function soundSetting() {
-  return soundSettingRow().$("input[role='switch']");
+export async function soundSetting(): Promise<ChainablePromiseElement> {
+  return (await soundSettingRow()).$("input[role='switch']");
 }

@@ -115,10 +115,10 @@ describe("share sound without PipeWire (#435, AC-7.66)", function () {
 
   it("Settings shows the same, and the stored setting stays on", async () => {
     await openScreenSharingSettings();
-    const toggle = soundSetting();
+    const toggle = await soundSetting();
     expect(await toggle.isSelected()).toBe(false);
     expect(await toggle.isEnabled()).toBe(false);
-    const status = soundSettingRow().$("p.settings-switch__status");
+    const status = (await soundSettingRow()).$("p.settings-switch__status");
     expect(await status.getText()).toBe(NEEDS);
     await browser.keys("Escape");
     const stored = await app.invoke<{ screenSound: boolean }>("settings_get");
@@ -131,7 +131,7 @@ describe("share sound without PipeWire (#435, AC-7.66)", function () {
     const stored = await app.invoke<{ screenSound: boolean }>("settings_get");
     expect(stored.screenSound).toBe(true);
     await openScreenSharingSettings();
-    const toggle = soundSetting();
+    const toggle = await soundSetting();
     await browser.waitUntil(async () => toggle.isEnabled(), { timeoutMsg: "the Sound setting stayed disabled" });
     expect(await toggle.isSelected()).toBe(true);
     await browser.keys("Escape");
