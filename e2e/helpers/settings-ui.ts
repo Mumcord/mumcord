@@ -35,11 +35,27 @@ export async function openAllSettings(): Promise<void> {
   await $(".settings__nav").waitForExist({ timeout: 15_000 });
 }
 
+/** What sits on top of the tab's centre, for the failure message when it cannot be clicked. */
+async function describeTabHit(group: SettingsGroup): Promise<string> {
+  return browser.execute((label: string) => {
+    const tab = [...document.querySelectorAll("button[role='tab']")].find(
+      (el) => el.textContent?.trim() === label,
+    );
+    if (!tab) return "tab missing";
+    const r = tab.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+    return `viewport ${innerWidth}x${innerHeight}, tab ${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}x${Math.round(r.height)}, hit ${hit?.tagName}.${hit?.className}`;
+  }, group);
+}
+
 /** Opens Settings (if needed) and selects `group`; waits until its page shows. */
 export async function openSettingsGroup(group: SettingsGroup): Promise<void> {
   await openAllSettings();
   const tab = settingsTab(group);
-  await tab.waitForClickable({ timeout: 10_000 });
+  await tab.waitForClickable({
+    timeout: 10_000,
+    timeoutMsg: `settings tab ${group} not clickable: ${await describeTabHit(group)}`,
+  });
   await tab.click();
   await browser.waitUntil(async () => (await tab.getAttribute("aria-selected")) === "true", {
     timeout: 10_000,
