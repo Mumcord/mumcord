@@ -22,8 +22,20 @@
 //!
 //! Receivers count as joined from their admission on; the plugin service sends fallback-sized
 //! messages to the members that did not join through Mumble plugin data (FR-9.61) and learns
-//! the joined ones from [`EngineEvent::PluginRelayJoined`]. Messages sent while a receiver is
-//! still binding are lost for it rather than delivered twice.
+//! the joined ones from [`EngineEvent::PluginRelayJoined`].
+//!
+//! Channel messages that reached nobody through Mumble and were sent while the broadcast starts
+//! wait in a small bounded queue ([`Early`]); the queue then stays with the publisher for a short
+//! window, and each time receivers get their keys in that window it is sent again, so receivers
+//! admitted at the start get the first messages even though they bind only after the broadcast
+//! runs. A later admission (someone joins the channel) opens a new window that starts with the
+//! message it came with, so no receiver gets messages from before its admission. The relay
+//! stays blind: a repeat is an ordinary sealed unit for every receiver, and a receiver that had
+//! a message already drops the repeat by its sequence (FR-9.62). Sends to a receiver still
+//! binding after its window are lost for it rather than delivered twice. The plugin
+//! service mirrors the queue limits and the broadcast state
+//! ([`EngineEvent::PluginRelayBroadcast`]) so a message that cannot arrive returns an error
+//! instead of "sent".
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::{Arc, Mutex};
@@ -52,6 +64,16 @@ use crate::session::{Engine, EngineEvent, SessionCtx, WeakEngine, lock};
 /// After a broadcast could not start or was lost, channel sends use the fallback this long
 /// before the next try.
 const RETRY_AFTER: Duration = Duration::from_secs(30);
+/// Longest wait for the bot and the relay to start a broadcast; the queued messages then fail.
+/// Matches the plugin service's limit.
+const SETUP_TIMEOUT: Duration = Duration::from_secs(8);
+/// Messages and data bytes held while the broadcast starts. Match the plugin service's limits.
+const EARLY_MESSAGES: usize = 8;
+const EARLY_BYTES: usize = 256 * 1024;
+/// How long after the start the queued and early messages are sent again to new receivers.
+const REPLAY_WINDOW: Duration = Duration::from_secs(10);
+/// Receivers that get their keys this close together share one repeat.
+const REPLAY_DEBOUNCE: Duration = Duration::from_millis(250);
 /// Receivers a broadcast asks room for when the relay announces no broadcast limit.
 const DEFAULT_RECEIVERS: u16 = 16;
 /// A receiver without the keys asks again after this long.
@@ -123,6 +145,47 @@ impl Pieces {
     }
 }
 
+/// Channel messages of the broadcast's first moments: queued while it starts, then sent again to
+/// receivers that get their keys within [`REPLAY_WINDOW`]. Bounded by [`EARLY_MESSAGES`] and
+/// [`EARLY_BYTES`] of plugin data.
+#[derive(Debug, Default)]
+struct Early {
+    envelopes: Vec<Vec<u8>>,
+    bytes: usize,
+    /// Set once a message did not fit; later ones are not kept either, so a repeat never skips
+    /// one in the middle.
+    full: bool,
+}
+
+impl Early {
+    /// Keeps the envelope of a message with `data_len` bytes of plugin data; false when it does
+    /// not fit any more.
+    fn push(&mut self, data_len: usize, envelope: Vec<u8>) -> bool {
+        if self.full
+            || self.envelopes.len() >= EARLY_MESSAGES
+            || self.bytes + data_len > EARLY_BYTES
+        {
+            self.full = true;
+            return false;
+        }
+        self.bytes += data_len;
+        self.envelopes.push(envelope);
+        true
+    }
+}
+
+/// The own plugin-data broadcast's state, for the plugin service (spec 09 FR-9.60).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PluginBroadcastState {
+    /// It runs; queued messages went out.
+    Live,
+    /// It could not start or was lost; queued messages are gone and channel sends reach only
+    /// the fallback until it is tried again after `retry_in`.
+    Down { retry_in: Duration },
+    /// It ended (channel change, disconnect, switched off); the next channel send starts anew.
+    Ended,
+}
+
 /// The receivers admitted to the own broadcast and their certificate hashes.
 #[derive(Debug, Default)]
 struct Members {
@@ -163,8 +226,8 @@ impl Members {
 
 /// The own plugin-data broadcast on one server.
 enum Own {
-    /// Asking the bot and binding; the receivers to admit once it runs.
-    Starting { wanted: Vec<u32> },
+    /// Asking the bot and binding; the receivers to admit and the messages to send once it runs.
+    Starting { wanted: Vec<u32>, early: Early },
     Live {
         publisher: Publisher,
         members: Members,
@@ -195,23 +258,15 @@ impl std::fmt::Debug for Broadcasts {
 }
 
 impl Broadcasts {
-    /// Ends everything on `server_id` (or everywhere); the servers whose joined list emptied.
+    /// Ends everything on `server_id` (or everywhere); the servers whose own broadcast ended.
     fn end(&mut self, server_id: Option<ServerId>) -> Vec<ServerId> {
         let matches = |id: &ServerId| server_id.is_none_or(|s| s == *id);
-        let emptied = self
-            .own
-            .iter()
-            .filter(|(id, own)| {
-                matches(id)
-                    && matches!(own, Own::Live { members, .. } if !members.hashes.is_empty())
-            })
-            .map(|(id, _)| *id)
-            .collect();
+        let ended = self.own.keys().filter(|id| matches(id)).copied().collect();
         self.own.retain(|id, _| !matches(id));
         // Sequences and delivery order stay: senders keep counting, so nothing is delivered
         // twice after a rejoin.
         self.receiving.retain(|(id, _), _| !matches(id));
-        emptied
+        ended
     }
 }
 
@@ -234,7 +289,8 @@ impl Engine {
     /// started at the first send. `receivers` are the members the plugin service picked (they
     /// announced the plugin and pass the reach rules); the ones not admitted yet are admitted
     /// now. The caller checked permission, size and the plugin's rate, and sent the fallback to
-    /// the members that had not joined (FR-9.61).
+    /// the members that had not joined (FR-9.61); `fell_back` tells whether it did. A message
+    /// that went to nobody through Mumble waits in the start queue while the broadcast starts.
     pub fn plugin_relay_broadcast(
         &self,
         server_id: ServerId,
@@ -242,6 +298,7 @@ impl Engine {
         api: (u8, u8),
         data: Vec<u8>,
         receivers: &[u32],
+        fell_back: bool,
     ) {
         let relay = self.direct().plugin_relay();
         if !relay.enabled() {
@@ -250,6 +307,7 @@ impl Engine {
         let Ok(ctx) = self.session_ctx_for(server_id) else {
             return;
         };
+        let data_len = data.len();
         let mut state = lock(&relay.broadcasts);
         let seq = state
             .seqs
@@ -276,20 +334,28 @@ impl Engine {
             .or_insert(Own::Off { until: now });
         let admitted = match own {
             Own::Off { until } if *until <= now => {
-                // Nobody has joined yet, so the message went to everyone as fallback.
+                let mut early = Early::default();
+                if !fell_back {
+                    early.push(data_len, bytes);
+                }
                 *own = Own::Starting {
                     wanted: receivers.to_vec(),
+                    early,
                 };
                 drop(state);
                 self.start_plugin_broadcast(server_id);
                 return;
             }
+            // The plugin service knows the broadcast is down and reported what this means.
             Own::Off { .. } => return,
-            Own::Starting { wanted } => {
+            Own::Starting { wanted, early } => {
                 for receiver in receivers {
                     if !wanted.contains(receiver) {
                         wanted.push(*receiver);
                     }
+                }
+                if !fell_back && !early.push(data_len, bytes) {
+                    tracing::debug!("plugin broadcast start queue full; message dropped");
                 }
                 return;
             }
@@ -302,7 +368,7 @@ impl Engine {
                         session
                     })
                     .collect();
-                publisher.send(bytes);
+                publisher.send(bytes, data_len, !fell_back, !new.is_empty());
                 (!new.is_empty()).then(|| (publisher.id, new, members.joined()))
             }
         };
@@ -334,7 +400,13 @@ impl Engine {
     fn start_plugin_broadcast(&self, server_id: ServerId) {
         let engine = self.clone();
         self.runtime().spawn(async move {
-            let opened = engine.open_plugin_broadcast(server_id).await;
+            let opened =
+                tokio::time::timeout(SETUP_TIMEOUT, engine.open_plugin_broadcast(server_id))
+                    .await
+                    .unwrap_or_else(|_| {
+                        tracing::info!("plugin broadcast did not start in time");
+                        None
+                    });
             engine.plugin_broadcast_opened(server_id, opened);
         });
     }
@@ -395,16 +467,22 @@ impl Engine {
             // Switched off or the user moved meanwhile; dropping the link ends the broadcast.
             return;
         };
-        let Own::Starting { wanted } = own else {
+        let Own::Starting { wanted, early } = own else {
             return;
+        };
+        let down = PluginBroadcastState::Down {
+            retry_in: RETRY_AFTER,
         };
         let Some((id, me, link)) = opened else {
             *own = Own::Off {
                 until: Instant::now() + RETRY_AFTER,
             };
+            drop(state);
+            ctx.events.emit(EngineEvent::PluginRelayBroadcast(down));
             return;
         };
         let wanted = std::mem::take(wanted);
+        let early = std::mem::take(early);
         let weak = self.downgrade();
         let on_end: OnEnd = Box::new(move |end| {
             if let Some(engine) = weak.upgrade() {
@@ -415,13 +493,15 @@ impl Engine {
             .relays()
             .plugin_data_kbps(server_id)
             .unwrap_or(DEFAULT_KBPS);
-        let publisher = match Publisher::start(self.runtime(), id, me, link, kbps, on_end) {
+        let publisher = match Publisher::start(self.runtime(), id, me, link, kbps, early, on_end) {
             Ok(publisher) => publisher,
             Err(e) => {
                 tracing::warn!(error = %e, "plugin broadcast not started");
                 *own = Own::Off {
                     until: Instant::now() + RETRY_AFTER,
                 };
+                drop(state);
+                ctx.events.emit(EngineEvent::PluginRelayBroadcast(down));
                 return;
             }
         };
@@ -438,6 +518,9 @@ impl Engine {
         );
         *own = Own::Live { publisher, members };
         drop(state);
+        ctx.events.emit(EngineEvent::PluginRelayBroadcast(
+            PluginBroadcastState::Live,
+        ));
         if !joined.is_empty() {
             self.admit_plugin_receivers(server_id, id, joined.clone());
             ctx.events.emit(EngineEvent::PluginRelayJoined { joined });
@@ -460,6 +543,11 @@ impl Engine {
         };
         drop(state);
         if let Ok(ctx) = self.session_ctx_for(server_id) {
+            ctx.events.emit(EngineEvent::PluginRelayBroadcast(
+                PluginBroadcastState::Down {
+                    retry_in: RETRY_AFTER,
+                },
+            ));
             ctx.events
                 .emit(EngineEvent::PluginRelayJoined { joined: Vec::new() });
         }
@@ -514,9 +602,12 @@ impl Engine {
     /// Ends own and received broadcasts on `server_id`, or everywhere (FR-9.63).
     pub(super) fn end_plugin_broadcasts(&self, server_id: Option<ServerId>) {
         let relay = self.direct().plugin_relay();
-        let emptied = lock(&relay.broadcasts).end(server_id);
-        for server in emptied {
+        let ended = lock(&relay.broadcasts).end(server_id);
+        for server in ended {
             if let Ok(ctx) = self.session_ctx_for(server) {
+                ctx.events.emit(EngineEvent::PluginRelayBroadcast(
+                    PluginBroadcastState::Ended,
+                ));
                 ctx.events
                     .emit(EngineEvent::PluginRelayJoined { joined: Vec::new() });
             }
@@ -630,6 +721,14 @@ impl Engine {
     }
 }
 
+/// Waits until `at`; never resolves without one (the `select!` guard keeps it from running).
+async fn sleep_until(at: Option<Instant>) {
+    match at {
+        Some(at) => tokio::time::sleep_until(at.into()).await,
+        None => std::future::pending().await,
+    }
+}
+
 /// Called once when a link ends on its own (not when it is dropped).
 type OnEnd = Box<dyn FnOnce(BroadcastEnd) + Send>;
 
@@ -638,8 +737,15 @@ type OnEnd = Box<dyn FnOnce(BroadcastEnd) + Send>;
 // ---------------------------------------------------------------------------------------------
 
 enum PubCommand {
-    /// An encoded envelope for every receiver.
-    Data(Vec<u8>),
+    /// An encoded envelope for every receiver, with its plugin data size; `early` when it may
+    /// be sent again to receivers joining within the replay window (it reached nobody through
+    /// Mumble); `admits` when receivers were admitted with it, which opens a new window.
+    Data {
+        envelope: Vec<u8>,
+        data_len: usize,
+        early: bool,
+        admits: bool,
+    },
     /// A receiver left: drop its key channel and switch keys.
     Removed(String),
 }
@@ -660,6 +766,7 @@ impl Publisher {
         me: CertKey,
         link: BroadcastLink,
         kbps: u32,
+        early: Early,
         on_end: OnEnd,
     ) -> Result<Self, crate::screen_share::broadcast::crypto::CryptoError> {
         let admitted = Arc::new(Mutex::new(HashSet::new()));
@@ -674,6 +781,9 @@ impl Publisher {
                 reassembler: Reassembler::new(),
                 set_id: 0,
                 pacer: Pacer::new(kbps, Instant::now()),
+                early,
+                early_until: Instant::now() + REPLAY_WINDOW,
+                replay_at: None,
             }
             .run(link, command_rx, on_end),
         );
@@ -695,8 +805,14 @@ impl Publisher {
         let _ = self.commands.send(PubCommand::Removed(hash.to_owned()));
     }
 
-    fn send(&self, envelope: Vec<u8>) {
-        if self.commands.send(PubCommand::Data(envelope)).is_err() {
+    fn send(&self, envelope: Vec<u8>, data_len: usize, early: bool, admits: bool) {
+        let data = PubCommand::Data {
+            envelope,
+            data_len,
+            early,
+            admits,
+        };
+        if self.commands.send(data).is_err() {
             tracing::debug!("plugin broadcast gone");
         }
     }
@@ -717,6 +833,11 @@ struct PublisherTask {
     reassembler: Reassembler<u16>,
     set_id: u8,
     pacer: Pacer,
+    /// The messages sent again to receivers that get their keys before `early_until`.
+    early: Early,
+    early_until: Instant,
+    /// When the next repeat of `early` is due.
+    replay_at: Option<Instant>,
 }
 
 impl PublisherTask {
@@ -733,8 +854,30 @@ impl PublisherTask {
                     Ok(unit) => self.on_unit(&unit, &units).await,
                     Err(end) => break end,
                 },
+                () = sleep_until(self.replay_at), if self.replay_at.is_some() => {
+                    self.replay_at = None;
+                    self.replay(&units).await
+                }
                 command = commands.recv() => match command {
-                    Some(PubCommand::Data(envelope)) => self.send(&envelope, &units).await,
+                    Some(PubCommand::Data {
+                        envelope,
+                        data_len,
+                        early,
+                        admits,
+                    }) => {
+                        let now = Instant::now();
+                        if admits {
+                            // Repeats start at the newest admission, so no receiver gets a
+                            // message from before it was admitted.
+                            self.early = Early::default();
+                            self.early_until = now + REPLAY_WINDOW;
+                        }
+                        let alive = self.send(&envelope, &units).await;
+                        if early && now < self.early_until {
+                            self.early.push(data_len, envelope);
+                        }
+                        alive
+                    }
                     Some(PubCommand::Removed(hash)) => {
                         self.channels.retain(|_, ch| ch.cert_hash() != hash);
                         self.rekey(&units).await
@@ -747,6 +890,21 @@ impl PublisherTask {
             }
         };
         on_end(end);
+    }
+
+    /// Sends the early messages again for the receivers that got their keys meanwhile; the ones
+    /// that had them drop the repeats by sequence.
+    async fn replay(&mut self, units: &mpsc::Sender<Vec<u8>>) -> bool {
+        let early = std::mem::take(&mut self.early);
+        for envelope in &early.envelopes {
+            if !self.send(envelope, units).await {
+                return false;
+            }
+        }
+        if Instant::now() < self.early_until {
+            self.early = early;
+        }
+        true
     }
 
     /// Seals the envelope in pieces and sends them at the relay's per-sender rate.
@@ -812,6 +970,12 @@ impl PublisherTask {
             Ok((channel, answer)) => {
                 self.channels.insert(slot, channel);
                 self.set_id = self.set_id.wrapping_add(1);
+                let now = Instant::now();
+                if now >= self.early_until {
+                    self.early = Early::default();
+                } else if !self.early.envelopes.is_empty() && self.replay_at.is_none() {
+                    self.replay_at = Some(now + REPLAY_DEBOUNCE);
+                }
                 send_chunks(units, ControlKind::Key, Some(slot), &answer, self.set_id).await
             }
             Err(e) => {
@@ -1073,6 +1237,52 @@ mod tests {
         assert_eq!(received.push(&[0, 0, 1]), None);
         assert_eq!(received.push(&[3, 2, 1]), None);
         assert_eq!(received.push(&[0]), None);
+    }
+
+    #[test]
+    fn the_start_queue_holds_at_most_eight_messages_in_order() {
+        let mut early = Early::default();
+        for n in 0..EARLY_MESSAGES {
+            assert!(early.push(10, vec![n as u8]));
+        }
+        assert!(!early.push(10, vec![99]));
+        assert_eq!(early.envelopes.len(), EARLY_MESSAGES);
+        assert_eq!(early.envelopes[0], vec![0]);
+        assert_eq!(early.bytes, 10 * EARLY_MESSAGES);
+    }
+
+    #[test]
+    fn the_start_queue_holds_at_most_256_kib_and_never_skips_a_message() {
+        let mut early = Early::default();
+        assert!(early.push(EARLY_BYTES - 100, vec![1]));
+        // Too large for what is left: dropped, and a smaller one after it is not kept either,
+        // so a repeat never has a gap in the middle.
+        assert!(!early.push(101, vec![2]));
+        assert!(!early.push(1, vec![3]));
+        assert_eq!(early.envelopes, vec![vec![1]]);
+    }
+
+    #[test]
+    fn ending_reports_every_own_broadcast_of_the_server() {
+        let mut state = Broadcasts::default();
+        let (a, b): (ServerId, ServerId) = (1, 2);
+        state.own.insert(
+            a,
+            Own::Starting {
+                wanted: vec![2],
+                early: Early::default(),
+            },
+        );
+        state.own.insert(
+            b,
+            Own::Off {
+                until: Instant::now(),
+            },
+        );
+        assert_eq!(state.end(Some(a)), vec![a]);
+        assert!(!state.own.contains_key(&a));
+        assert_eq!(state.end(None), vec![b]);
+        assert!(state.own.is_empty());
     }
 
     #[test]

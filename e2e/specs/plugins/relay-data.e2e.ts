@@ -402,6 +402,7 @@ async function bothInChannel(): Promise<void> {
     });
 
     it("AC-9.18, AC-9.41: 64 KiB documents reach B through the relay, to the channel and 1:1", async () => {
+      // The first channel send starts A's broadcast; it waits there and reaches B once B joins.
       const channel = await send("Channel 64 KiB", "channel-big", BIG);
       await bReceives(channel, BIG);
       const direct = await send("Direct 64 KiB", "direct-big", BIG);
@@ -480,6 +481,7 @@ async function bothInChannel(): Promise<void> {
         await joinVoice();
       });
       await bothInChannel();
+      // Back in the channel, B is admitted to the broadcast again with A's next send and gets it.
       const back = await send("Channel 64 KiB", "channel-big", BIG);
       await bReceives(back, BIG);
       await apps.onB(async () => {

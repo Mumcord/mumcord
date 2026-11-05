@@ -12,6 +12,7 @@ import { addFirstServer, finishWizard } from "../../helpers/chat-ui.ts";
 import { fill } from "../../helpers/servers-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { confirmInstall, openPrompt } from "../../helpers/score-ui.ts";
+import { panelButton, waitLine } from "../../helpers/test-surface.ts";
 
 const NAME = "Test Surface";
 /** FR-9.45's gesture window. */
@@ -21,8 +22,6 @@ const pluginTab = (name: string) =>
   $(`//button[@role='tab'][contains(@class,'plugins-tab')][starts-with(normalize-space(.),'${name}')]`);
 const card = (name: string) =>
   $(`//li[@class='plugin-card'][.//*[contains(@class,'plugin-card-name')][normalize-space(.)='${name}']]`);
-const panelLine = (text: string) =>
-  $(`//*[contains(@class,'pstrip-panel')]//*[normalize-space(.)='${text}']`);
 const sideFrame = () =>
   $(`section.plugin-sidepanel[aria-label='${NAME} side panel'] iframe.plugin-webview__frame`);
 
@@ -83,13 +82,10 @@ describe("plugins: a trusted click in the plugin's page is a gesture (FR-9.45, A
   });
 
   it("opens the side panel from a panel click", async () => {
-    const icon = $(`//div[contains(@class,'pstrip-icons')]//button[@aria-label='${NAME}']`);
-    await icon.waitForClickable({ timeout: 15_000 });
-    await icon.click();
-    await $(".pstrip-panel button=Open side panel").click();
-    await panelLine("open-side: ok").waitForExist({ timeout: 10_000 });
+    await panelButton("Open side panel");
+    await waitLine(/^open-side: ok$/, 10_000);
     await sideFrame().waitForExist({ timeout: 15_000 });
-    await panelLine("ready: side").waitForExist({ timeout: 15_000 });
+    await waitLine(/^ready: side$/);
   });
 
   it("refuses the page's request after a script-made click", async () => {
@@ -103,13 +99,13 @@ describe("plugins: a trusted click in the plugin's page is a gesture (FR-9.45, A
         button?.click();
       });
     });
-    await panelLine("side-start-stage: not-permitted").waitForExist({ timeout: 10_000 });
+    await waitLine(/^side-start-stage: not-permitted$/, 10_000);
   });
 
   it("allows it after a real click in the page", async () => {
     await inSidePage(async () => {
       await $("#start-stage").click();
     });
-    await panelLine("side-start-stage: ok").waitForExist({ timeout: 10_000 });
+    await waitLine(/^side-start-stage: ok$/, 10_000);
   });
 });

@@ -111,13 +111,16 @@ pub enum ServiceEvent {
     },
     /// A `relay` message to the channel through the sender's relay broadcast
     /// (`Engine::plugin_relay_broadcast`): `receivers` are the members that may get it (they
-    /// announced the plugin), to be admitted when not yet. `data` stays opaque: never log it.
+    /// announced the plugin), to be admitted when not yet; `fell_back` when the members
+    /// outside the broadcast got it through Mumble plugin data. `data` stays opaque: never log
+    /// it.
     RelayBroadcast {
         server: mumcord_store::ServerId,
         plugin: String,
         api: (u8, u8),
         data: Vec<u8>,
         receivers: Vec<u32>,
+        fell_back: bool,
     },
     /// An Apps-menu item was enabled or disabled: list the items again with
     /// [`PluginService::app_menu`].
