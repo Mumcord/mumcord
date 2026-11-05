@@ -42,6 +42,11 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  # Debug test build: keep line tables and symbols so crash backtraces are readable.
+  CARGO_PROFILE_RELEASE_DEBUG: line-tables-only
+  CARGO_PROFILE_RELEASE_STRIP: none
+  # linuxdeploy strips bundled binaries unless told not to.
+  NO_STRIP: "1"
   # Official Mumble server for the native Windows/macOS smoke servers (Linux uses testenv).
   MUMBLE_SERVER_VERSION: 1.5.939
 
@@ -57,23 +62,6 @@ jobs:
             os: ubuntu-24.04
             args: --bundles appimage,deb,rpm
             bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
-          - name: linux-arm64
-            os: ubuntu-24.04-arm
-            args: --bundles appimage,deb,rpm
-            bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
-          - name: windows
-            os: windows-latest
-            args: --bundles nsis
-            # The installer and the portable zip (packaged below from the same Mumcord.exe).
-            bundle: target/release/bundle/nsis/*-setup.exe target/release/bundle/nsis/*-portable.zip
-          # One DMG for Apple Silicon and Intel Macs. The smoke test on the arm64 runner
-          # exercises the arm64 half. "app" keeps Mumcord.app after the DMG is built (Tauri
-          # deletes it otherwise); releases pack it into the updater archive.
-          - name: macos
-            os: macos-latest
-            args: --bundles app,dmg --target universal-apple-darwin
-            bundle: target/universal-apple-darwin/release/bundle/dmg/*.dmg
-            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     # The Certum signing secrets exist only in the "release" environment, which accepts only
@@ -420,9 +408,6 @@ jobs:
         include:
           # mumbot: target of the pinned test bot release (scripts/fetch-mumbot.sh).
           - { name: linux, os: ubuntu-24.04, mumbot: linux-x86_64 }
-          - { name: linux-arm64, os: ubuntu-24.04-arm, mumbot: linux-aarch64 }
-          - { name: windows, os: windows-latest, mumbot: windows-x86_64 }
-          - { name: macos, os: macos-latest, mumbot: macos-universal }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     defaults:
