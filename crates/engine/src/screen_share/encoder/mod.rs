@@ -285,6 +285,21 @@ fn startup_tests(settings: &Settings) -> Vec<TestKey> {
     keys
 }
 
+/// The self-test result of a test that failed, could not run or never finished.
+const FAILED_SELFTEST: u32 = u32::MAX;
+
+/// Sets the result for `key`, replacing an earlier one.
+fn record_selftest(cached: &mut Vec<CachedSelftest>, key: TestKey, ms: u32) {
+    let (height, fps, optimize) = key;
+    cached.retain(|t| (t.resolution, t.fps, t.optimize) != key);
+    cached.push(CachedSelftest {
+        resolution: height,
+        fps,
+        optimize,
+        svt_selftest_ms: ms,
+    });
+}
+
 struct Worker<'a> {
     encoders: &'a Encoders,
     store: &'a Mutex<Store>,
@@ -360,15 +375,18 @@ impl Worker<'_> {
         };
         if !known {
             let (height, fps, optimize) = key;
+            // Saved as failed before it runs: if SVT-AV1 takes the app down, the next start
+            // finds the failure in the cache and does not run the test (and crash) again.
+            record_selftest(
+                &mut lock(&self.encoders.state).selftests,
+                key,
+                FAILED_SELFTEST,
+            );
+            self.save();
             // A test that could not run counts as far too slow.
-            let ms = selftest::measure(height, fps, optimize).unwrap_or(u32::MAX);
+            let ms = selftest::measure(height, fps, optimize).unwrap_or(FAILED_SELFTEST);
             tracing::info!(height, fps, ?optimize, ms, "AV1 self-test measured");
-            lock(&self.encoders.state).selftests.push(CachedSelftest {
-                resolution: height,
-                fps,
-                optimize,
-                svt_selftest_ms: ms,
-            });
+            record_selftest(&mut lock(&self.encoders.state).selftests, key, ms);
             self.save();
         }
         lock(&self.encoders.state).queued.retain(|k| *k != key);
@@ -606,6 +624,17 @@ mod tests {
             optimize,
             svt_selftest_ms: ms,
         }
+    }
+
+    #[test]
+    fn an_unfinished_selftest_counts_as_failed_until_it_finishes() {
+        let key = (1080, 30, ScreenOptimize::Balanced);
+        let mut tests = vec![cached(720, 30, ScreenOptimize::Balanced, 5)];
+        record_selftest(&mut tests, key, FAILED_SELFTEST);
+        assert_eq!(selftest_passed(&tests, key), Some(false));
+        record_selftest(&mut tests, key, 5);
+        assert_eq!(selftest_passed(&tests, key), Some(true));
+        assert_eq!(tests.len(), 2);
     }
 
     #[test]
