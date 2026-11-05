@@ -78,7 +78,7 @@ export interface RoomStageProps {
 }
 
 /** Runs a tile key (spec 08 §5.5); `false` when it had nothing to do. */
-function runTileCommand(
+export function runTileCommand(
   model: RoomModel,
   key: TileKey,
   command: TileCommand,
