@@ -747,6 +747,11 @@ impl Engine {
         {
             self.run_maintenance_in_background();
         }
+        if previous.camera_show != settings.camera_show
+            || previous.camera_data_saver != settings.camera_data_saver
+        {
+            self.camera_settings_changed(&settings);
+        }
         if previous.now_playing != settings.now_playing {
             self.now_playing_set_enabled(settings.now_playing);
         }

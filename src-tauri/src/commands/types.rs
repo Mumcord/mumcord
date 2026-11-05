@@ -65,6 +65,11 @@ pub enum ErrorCode {
     DirectUnavailable,
     /// Connecting would exceed the "connected servers" limit (FR-2.1); `message` names it.
     ServerLimitReached,
+    /// The camera could not be opened or turned on (spec 08); `message` is the reason code:
+    /// `busy`, `noCamera`, `permissionDenied`, `deviceGone`, `unreadable`, `cameraFailed`,
+    /// `roomFull`, `relayFull`, `useNotAllowed`, `denied`, `relayDown`, `rateLimited`, `mode`
+    /// or `noCertificate`.
+    Camera,
     /// Unexpected internal failure.
     Internal,
 }

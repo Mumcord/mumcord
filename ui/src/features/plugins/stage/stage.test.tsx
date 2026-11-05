@@ -39,6 +39,7 @@ const api = vi.hoisted(() => ({
     watch: { target: null, onTop: false },
     share: { target: null, onTop: false },
     stage: { target: null, onTop: false },
+    camera: { target: null, onTop: false },
   }))(),
   popOut: vi.fn<(...args: unknown[]) => Promise<null>>(() => Promise.resolve(null)),
   popIn: vi.fn<(...args: unknown[]) => Promise<null>>(() => Promise.resolve(null)),
@@ -162,6 +163,7 @@ beforeEach(() => {
     watch: { target: null, onTop: false },
     share: { target: null, onTop: false },
     stage: { target: null, onTop: false },
+    camera: { target: null, onTop: false },
   };
   api.detailsOpen.mockClear();
   api.popOut.mockClear();

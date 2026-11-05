@@ -61,6 +61,7 @@
 - Plugin update review: "Skip this version" hides that version (a newer one is offered again), and the review shows the points each new permission adds and the recent-change points of the score.
 - Screen sharing through the relay: when the server's relay offers it, your share is uploaded once and the relay sends it to every viewer, so up to the relay's limit (25 by default) can watch without costing you more upload. The picture is end-to-end encrypted, so the relay can't see it, and viewers who stop watching can't read what comes after. Viewers on older Mumcord versions still get their own copy, and if the relay goes away during a share, the first 8 viewers continue on their own copies without interruption
 - A real click or key press inside a plugin's own web page now counts as a user gesture for that plugin, so it can open its side panel, dialog or activity, save a file or post to chat right after you click in its page. Clicks or key presses that the page fakes never count.
+- Six built-in camera background images (Soft light, Library, Mountains, Studio, Night city, Beach) ship with the app for camera sharing's background effects; the privacy policy gains a camera section
 
 ### Changed
 
@@ -71,6 +72,7 @@
 
 ### Fixed
 
+- Log lines from the very start of the app, such as the screen-share encoder check on older CPUs, are no longer missing from the log file and the diagnostic file
 - A chat message from someone who leaves right after sending it (a shared file, too) now shows their name instead of an empty sender, and a block still applies to it.
 - A screen share sent with VP9 no longer risks crashing Mumcord when the shared window grows or the quality steps up to a size larger than the one the share started at; the encoder now restarts at the new size with a fresh keyframe.
 - Mumcord no longer crashes at start-up on older x86 processors without AVX2 (for example AMD FX or Intel Core of the Sandy and Ivy Bridge generations). The AV1 encoder that screen sharing tests at start-up crashed on these processors; screen sharing now uses VP9 there. If the AV1 test ever ends the app, the next start counts it as failed and does not run it again.
