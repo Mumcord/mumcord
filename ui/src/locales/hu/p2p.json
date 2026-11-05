@@ -26,6 +26,7 @@
     "noRelay": "Ennek a szervernek nincs átjátszója, ezért a fájlmegosztás nem érhető el.",
     "filesDisallowed": "Ennek a szervernek az átjátszója nem engedélyezi a fájlmegosztást.",
     "screenDisallowed": "Ennek a szervernek az átjátszója nem engedélyezi a képernyőmegosztást.",
+    "camerasDisallowed": "Ennek a kiszolgálónak az átjátszója nem engedélyezi a kamera megosztását.",
     "imagesDisallowed": "A teljes méret nem elérhető: ennek a szervernek az átjátszója nem engedélyezi a képeket",
     "noCertificate": "A fájlmegosztáshoz ügyféltanúsítvány kell.",
     "modeNeedsRelay": "A fájlmegosztáshoz az átjátszó kell; a peer-to-peer beállításod: {{mode}}.",

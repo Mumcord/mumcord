@@ -287,6 +287,13 @@ pub(crate) fn mode_and_consent(store: &Store, server_id: ServerId) -> (P2pMode, 
     })
 }
 
+impl Engine {
+    /// The effective P2P mode of `server_id` ("off" when it cannot be read).
+    pub(crate) fn p2p_mode_of(&self, server_id: ServerId) -> P2pMode {
+        mode_and_consent(&lock(&self.store_handle()), server_id).0
+    }
+}
+
 /// The [`plan`] for `server_id` from the stored settings.
 pub(crate) fn plan_for(
     store: &Store,

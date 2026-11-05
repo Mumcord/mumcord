@@ -26,6 +26,7 @@
     "noRelay": "Dan is-server m'għandux relay, għalhekk il-qsim tal-fajls mhuwiex disponibbli.",
     "filesDisallowed": "Ir-relay ta' dan is-server ma jippermettix il-qsim tal-fajls.",
     "screenDisallowed": "Ir-relay ta' dan is-server ma jippermettix il-qsim tal-iskrin.",
+    "camerasDisallowed": "Ir-relay ta' dan is-server ma jippermettix il-qsim tal-kamera.",
     "imagesDisallowed": "Id-daqs sħiħ mhuwiex disponibbli: ir-relay ta' dan is-server ma jippermettix stampi",
     "noCertificate": "Il-qsim tal-fajls jeħtieġ ċertifikat tal-klijent.",
     "modeNeedsRelay": "Il-qsim tal-fajls jeħtieġ ir-relay; is-setting peer-to-peer tiegħek huwa {{mode}}.",
