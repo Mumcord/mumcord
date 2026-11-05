@@ -14,12 +14,12 @@ pub(crate) mod select;
 mod selftest;
 
 use std::sync::mpsc;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, Once};
 use std::thread;
 
 use mumcord_screenshare::{
     Av1Encoder, Av1Options, Codec, Encoder, EncoderConfig, I420Frame, VideoEncoder,
-    open_hardware_encoder,
+    av1_cpu_supported, open_hardware_encoder,
 };
 use mumcord_store::{
     EncoderCache, EncoderEntry, ScreenCodec, ScreenOptimize, Settings, Store,
@@ -251,6 +251,19 @@ fn selftest_passed(cached: &[CachedSelftest], key: TestKey) -> Option<bool> {
     if let Some(forced) = test_hooks::svt_selftest() {
         return Some(forced == ForcedSelftest::Pass);
     }
+    cached_selftest_passed(cached, key, av1_cpu_supported())
+}
+
+/// A CPU SVT-AV1 can't run on (no AVX2) fails every test without running it, so it never
+/// starts the encoder that would crash there and software AV1 shows as too heavy.
+fn cached_selftest_passed(
+    cached: &[CachedSelftest],
+    key: TestKey,
+    cpu_supported: bool,
+) -> Option<bool> {
+    if !cpu_supported {
+        return Some(false);
+    }
     let (height, fps, optimize) = key;
     cached
         .iter()
@@ -359,6 +372,12 @@ impl Worker<'_> {
             state.selftests = selftests;
             drop(state);
             self.save();
+        }
+        if !av1_cpu_supported() {
+            static LOGGED: Once = Once::new();
+            LOGGED.call_once(|| {
+                tracing::info!("software AV1 unavailable: CPU without AVX2, self-test skipped");
+            });
         }
         for key in startup_tests(&self.settings()) {
             self.selftest(key);
@@ -631,9 +650,9 @@ mod tests {
         let key = (1080, 30, ScreenOptimize::Balanced);
         let mut tests = vec![cached(720, 30, ScreenOptimize::Balanced, 5)];
         record_selftest(&mut tests, key, FAILED_SELFTEST);
-        assert_eq!(selftest_passed(&tests, key), Some(false));
+        assert_eq!(cached_selftest_passed(&tests, key, true), Some(false));
         record_selftest(&mut tests, key, 5);
-        assert_eq!(selftest_passed(&tests, key), Some(true));
+        assert_eq!(cached_selftest_passed(&tests, key, true), Some(true));
         assert_eq!(tests.len(), 2);
     }
 
@@ -645,15 +664,15 @@ mod tests {
             cached(720, 30, ScreenOptimize::Text, 10),
         ];
         assert_eq!(
-            selftest_passed(&tests, (1080, 30, ScreenOptimize::Balanced)),
+            cached_selftest_passed(&tests, (1080, 30, ScreenOptimize::Balanced), true),
             Some(true)
         );
         assert_eq!(
-            selftest_passed(&tests, (1080, 30, ScreenOptimize::Text)),
+            cached_selftest_passed(&tests, (1080, 30, ScreenOptimize::Text), true),
             Some(false)
         );
         assert_eq!(
-            selftest_passed(&tests, (720, 15, ScreenOptimize::Text)),
+            cached_selftest_passed(&tests, (720, 15, ScreenOptimize::Text), true),
             None
         );
         assert_eq!(
@@ -664,6 +683,14 @@ mod tests {
             })
         );
         assert_eq!(software_limit(&tests, ScreenOptimize::Motion), None);
+    }
+
+    #[test]
+    fn a_cpu_without_avx2_fails_every_selftest_without_running_it() {
+        let key = (1080, 30, ScreenOptimize::Balanced);
+        let passed = [cached(1080, 30, ScreenOptimize::Balanced, 5)];
+        assert_eq!(cached_selftest_passed(&passed, key, false), Some(false));
+        assert_eq!(cached_selftest_passed(&[], key, false), Some(false));
     }
 
     #[test]
