@@ -14,6 +14,12 @@ export interface TestApp {
   /** `application.name` PipeWire shows; also the app hint for `hookEnv({ sharePick })`. */
   readonly name: string;
   readonly hz: number;
+  /** The app's binary name (what PipeWire reports as `application.process.binary`). */
+  readonly binary: string;
+  /** Process ids of the app's players right now. */
+  pids(): number[];
+  /** Opens one more playback stream of the same app (same name and binary) playing `hz`. */
+  addStream(hz: number): void;
   stop(): void;
 }
 
@@ -43,37 +49,47 @@ export function pipewireRunning(): boolean {
 export function startTestApp(name: string, hz: number): TestApp {
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const dir = workDir();
-  const binary = join(dir, `testapp-${slug}-play`);
-  const wav = join(dir, `${slug}-${String(hz)}.wav`);
-  const sine = new Float32Array(RATE * 30);
-  for (let i = 0; i < sine.length; i++) sine[i] = 0.5 * Math.sin((2 * Math.PI * hz * i) / RATE);
-  writeWav(wav, sine);
+  const binaryName = `testapp-${slug}-play`;
+  const binary = join(dir, binaryName);
   const pwCat = execFileSync("which", ["pw-cat"], { encoding: "utf8" }).trim();
   mkdirSync(dir, { recursive: true });
   copyFileSync(pwCat, binary);
   execFileSync("chmod", ["755", binary]);
 
-  let child: ChildProcess | undefined;
+  const players: ChildProcess[] = [];
   let stopped = false;
-  // 30 s per run; start again when it ends so a long spec never goes silent.
-  const play = (): void => {
-    if (stopped) return;
-    const started = Date.now();
-    child = spawn(binary, ["--playback", "-P", `application.name=${name}`, wav], {
-      stdio: "ignore",
-    });
-    child.on("exit", () => {
-      // A player that dies at once (no daemon) must not turn into a busy loop.
-      if (Date.now() - started > 1000) play();
-    });
+  const stream = (tone: number): void => {
+    const wav = join(dir, `${slug}-${String(tone)}.wav`);
+    const sine = new Float32Array(RATE * 30);
+    for (let i = 0; i < sine.length; i++) sine[i] = 0.5 * Math.sin((2 * Math.PI * tone * i) / RATE);
+    writeWav(wav, sine);
+    let slot = -1;
+    // 30 s per run; start again when it ends so a long spec never goes silent.
+    const play = (): void => {
+      if (stopped) return;
+      const started = Date.now();
+      const child = spawn(binary, ["--playback", "-P", `{ application.name = "${name}" }`, wav], {
+        stdio: "ignore",
+      });
+      if (slot < 0) slot = players.push(child) - 1;
+      else players[slot] = child;
+      child.on("exit", () => {
+        // A player that dies at once (no daemon) must not turn into a busy loop.
+        if (Date.now() - started > 1000) play();
+      });
+    };
+    play();
   };
-  play();
+  stream(hz);
   const app: TestApp = {
     name,
     hz,
+    binary: binaryName,
+    pids: () => players.flatMap((p) => (p.pid === undefined || p.exitCode !== null ? [] : [p.pid])),
+    addStream: stream,
     stop() {
       stopped = true;
-      child?.kill();
+      for (const p of players) p.kill();
       apps.delete(app);
     },
   };
