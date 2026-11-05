@@ -297,7 +297,9 @@ describe("sharer live bar", () => {
       choice = next;
       return Promise.resolve(null);
     });
-    const bar = await sharing(quality(), { screenResolution: "720", screenFps: "30" });
+    // The first read happens as the bar mounts, so it must already see the share's own pick;
+    // waiting for the next poll instead is a race against waitFor's timeout under load.
+    const bar = await sharing(quality({ choice }), { screenResolution: "720", screenFps: "30" });
     vi.spyOn(api, "screenShareQuality").mockImplementation(() =>
       Promise.resolve(quality({ choice })),
     );
