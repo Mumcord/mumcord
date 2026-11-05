@@ -28,16 +28,21 @@ pub fn locations(app: &AppHandle) -> Result<CacheLocations, tauri::Error> {
 /// Deletes a web cache that the last "Clear cache" scheduled. Called before Tauri starts, so
 /// no web view has the files open.
 pub fn apply_pending(identifier: &str) {
-    let dirs = match portable::dirs() {
+    if let Some(dirs) = before_start(identifier) {
+        apply_pending_web_clear(&locations_in(&dirs));
+    }
+}
+
+/// The app's directories before Tauri starts (portable or Tauri's usual ones), or `None` if
+/// the system does not say where they are.
+pub fn before_start(identifier: &str) -> Option<AppDirs> {
+    match portable::dirs() {
         Some(p) => Some(AppDirs {
             data: p.data.clone(),
             local_data: p.local_data.clone(),
             cache: p.cache.clone(),
         }),
         None => startup_dirs(identifier),
-    };
-    if let Some(dirs) = dirs {
-        apply_pending_web_clear(&locations_in(&dirs));
     }
 }
 

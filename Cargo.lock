@@ -4067,6 +4067,7 @@ dependencies = [
  "notify-rust",
  "open",
  "rand 0.10.3",
+ "rfd",
  "semver",
  "serde",
  "serde_json",

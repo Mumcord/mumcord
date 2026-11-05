@@ -32,6 +32,8 @@ base64 = "0.23"
 tauri = { version = "2.12", features = ["tray-icon", "macos-private-api"] }
 tauri-plugin-deep-link.workspace = true
 tauri-plugin-dialog.workspace = true
+# Native message when the profile is too new to start the app (issue #510).
+rfd.workspace = true
 tauri-plugin-clipboard-manager.workspace = true
 image.workspace = true
 tauri-specta.workspace = true
