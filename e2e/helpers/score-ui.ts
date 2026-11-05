@@ -110,17 +110,26 @@ export const promptInstall = () =>
   prompt().$(`.//div[${cls("plugin-prompt-actions")}]//button[${cls("settings-button--primary")}]`);
 
 /**
- * Opens the install prompt from a Browse card and waits until the package was checked: a score
- * (unofficial), the permission intro (official plugins have no score), a refusal or an error.
+ * What a finished package check leaves in the prompt, one element per outcome: the permission intro
+ * (a package that can be installed; it follows the score card of an unofficial one, so waiting for
+ * the intro also covers the score), the refusal of a hard stop, or the error of a failed check.
+ * Each is matched on its own because the strict `$()` refuses a selector that matches two elements.
  */
+const CHECK_DONE = [
+  `.//p[${cls("plugin-prompt-subtitle")}]`,
+  `.//div[${cls("plugin-prompt-refused")}]`,
+  `.//p[${cls("settings-error")}]`,
+];
+
+/** Opens the install prompt from a Browse card and waits until the package was checked. */
 export async function openPrompt(name: string): Promise<void> {
   await card(name).$(`button[aria-label='Install ${name}']`).click();
   await prompt().waitForDisplayed({ timeout: 30_000 });
   await browser.waitUntil(
-    async () =>
-      (await prompt()
-        .$(".plugin-prompt-score, .plugin-prompt-subtitle, .plugin-prompt-refused")
-        .isExisting()) || (await prompt().$("[role='alert']").isExisting()),
+    async () => {
+      for (const outcome of CHECK_DONE) if (await prompt().$(outcome).isExisting()) return true;
+      return false;
+    },
     { timeout: 60_000, timeoutMsg: `the install prompt of ${name} never finished its check` },
   );
 }

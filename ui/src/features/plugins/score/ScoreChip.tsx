@@ -22,7 +22,9 @@ export interface ScoreChipProps {
 
 /**
  * The security score label (FR-9.71, §5.6): colour, icon, word and number together, text first.
- * The visible words are hidden from screen readers in favour of one complete sentence.
+ * The visible words are hidden from screen readers in favour of one complete sentence. A real space
+ * separates word and number so the text reads "Low risk · 1" when copied; the flex gap spaces them
+ * on screen and ignores that space.
  */
 export function ScoreChip({
   scored,
@@ -64,7 +66,7 @@ export function ScoreChip({
   const chip = (
     <span className="risk-chip" data-level={band}>
       <ShieldIcon kind={BAND_SHIELD[band]} size={iconSize} />
-      <span aria-hidden="true">{bandText}</span>
+      <span aria-hidden="true">{bandText}</span>{" "}
       <span className="risk-chip__score" aria-hidden="true">
         · {value}
       </span>

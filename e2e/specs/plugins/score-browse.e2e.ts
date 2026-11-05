@@ -155,6 +155,12 @@ describe("plugins: security score in Browse, details and the install prompt (AC-
     await pluginenv.stopPluginFixtures();
   });
 
+  // A test that fails with its install prompt open would leave the modal over Browse, and every later
+  // test would then fail on that overlay instead of on its own check.
+  afterEach(async () => {
+    if (await prompt().isExisting()) await cancelPrompt();
+  });
+
   it("AC-9.31: every unofficial card shows its chip with the expected score and band", async () => {
     for (const { name, score, band, word } of EXPECTED) {
       await waitForCard(name);
