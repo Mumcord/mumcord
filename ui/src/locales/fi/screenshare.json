@@ -80,7 +80,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Jaa sovelluksen ääni",
+    "sound": "Ääni",
+    "soundInfo": "Koko näyttö: tietokoneen ääni ilman Mumcordia. Yksi ikkuna: vain kyseisen sovelluksen ääni.",
+    "soundNeeds": {
+      "windows": "Ei ääntä: vaatii Windows 10 -version 2004 tai uudemman",
+      "macos": "Ei ääntä: vaatii macOS 13:n tai uudemman",
+      "pipewire": "Ei ääntä: vaatii PipeWiren"
+    },
     "viewersGet": "Katsojat saavat:",
     "viewersGetSummary": "enintään {{resolution}} · {{fps}} kuvaa/s · {{codec}} · noin {{mbit}} Mbit/s",
     "pathRelay": "Lähetetään kerran palvelimen välityspalvelimen kautta, joka välittää sen enintään {{count}} katsojalle.",

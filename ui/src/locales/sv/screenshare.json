@@ -80,7 +80,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Dela appens ljud",
+    "sound": "Ljud",
+    "soundInfo": "Hela skärmen: datorns ljud utan Mumcord. Ett fönster: bara ljudet från den appen.",
+    "soundNeeds": {
+      "windows": "Inget ljud: kräver Windows 10 version 2004 eller senare",
+      "macos": "Inget ljud: kräver macOS 13 eller senare",
+      "pipewire": "Inget ljud: kräver PipeWire"
+    },
     "viewersGet": "Tittarna får:",
     "viewersGetSummary": "upp till {{resolution}} · {{fps}} bilder/s · {{codec}} · cirka {{mbit}} Mbit/s",
     "pathRelay": "Skickas en gång via serverns relä, som vidarebefordrar det till upp till {{count}} tittare.",

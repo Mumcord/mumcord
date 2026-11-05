@@ -1098,6 +1098,7 @@
     "useGpuHint": "Enkoodaa AV1:n näytönohjaimella, joten jakaminen ei juuri kuormita suoritinta. Pois: AV1 käyttää suoritinta.",
     "statusList": "Enkooderin tila",
     "av1Encode": "AV1-enkoodaus",
+    "sound": "Ääni",
     "askEachTime": "Kysy nämä asetukset joka kerta, kun jaan",
     "av1Playback": "AV1-toisto",
     "vp9Playback": "VP9-toisto",

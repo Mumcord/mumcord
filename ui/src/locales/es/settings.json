@@ -1106,6 +1106,7 @@
     "useGpuHint": "Codifica AV1 en tu tarjeta gráfica, así compartir casi no consume CPU. Desactivado: AV1 usa el procesador.",
     "statusList": "Estado del codificador",
     "av1Encode": "Codificación AV1",
+    "sound": "Sonido",
     "askEachTime": "Preguntar por estos ajustes cada vez que comparta",
     "av1Playback": "Reproducción AV1",
     "vp9Playback": "Reproducción VP9",

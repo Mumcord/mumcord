@@ -80,7 +80,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Az alkalmazás hangjának megosztása",
+    "sound": "Hang",
+    "soundInfo": "Teljes képernyő: a számítógép hangja Mumcord nélkül. Egy ablak: csak az adott alkalmazás hangja.",
+    "soundNeeds": {
+      "windows": "Nincs hang: szükséges hozzá Windows 10 2004-es vagy újabb verziója",
+      "macos": "Nincs hang: szükséges hozzá macOS 13 vagy újabb",
+      "pipewire": "Nincs hang: szükséges hozzá PipeWire"
+    },
     "viewersGet": "A nézők ezt kapják:",
     "viewersGetSummary": "legfeljebb {{resolution}} · {{fps}} kép/s · {{codec}} · kb. {{mbit}} Mbit/s",
     "pathRelay": "A szerver átjátszóján keresztül egyszer kerül elküldésre, az pedig továbbítja legfeljebb {{count}} nézőnek.",

@@ -1098,6 +1098,7 @@
     "useGpuHint": "Kodiert AV1 auf deiner Grafikkarte, sodass die Freigabe fast keine CPU-Leistung kostet. Aus: AV1 nutzt den Prozessor.",
     "statusList": "Encoder-Status",
     "av1Encode": "AV1-Kodierung",
+    "sound": "Ton",
     "askEachTime": "Bei jeder Freigabe nach diesen Einstellungen fragen",
     "av1Playback": "AV1-Wiedergabe",
     "vp9Playback": "VP9-Wiedergabe",

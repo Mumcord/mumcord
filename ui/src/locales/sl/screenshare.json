@@ -84,7 +84,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Deli zvok aplikacije",
+    "sound": "Zvok",
+    "soundInfo": "Cel zaslon: zvok računalnika brez Mumcorda. Eno okno: samo zvok te aplikacije.",
+    "soundNeeds": {
+      "windows": "Brez zvoka: zahteva Windows 10 različice 2004 ali novejše",
+      "macos": "Brez zvoka: zahteva macOS 13 ali novejši",
+      "pipewire": "Brez zvoka: zahteva PipeWire"
+    },
     "viewersGet": "Gledalci dobijo:",
     "viewersGetSummary": "do {{resolution}} · {{fps}} sl./s · {{codec}} · približno {{mbit}} Mbit/s",
     "pathRelay": "Poslano enkrat prek releja strežnika, ki ga posreduje do {{count}} gledalcem.",

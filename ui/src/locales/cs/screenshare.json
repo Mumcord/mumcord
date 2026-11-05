@@ -84,7 +84,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Sdílet zvuk aplikace",
+    "sound": "Zvuk",
+    "soundInfo": "Celá obrazovka: zvuk počítače bez Mumcordu. Jedno okno: jen zvuk dané aplikace.",
+    "soundNeeds": {
+      "windows": "Bez zvuku: vyžaduje Windows 10 verze 2004 nebo novější",
+      "macos": "Bez zvuku: vyžaduje macOS 13 nebo novější",
+      "pipewire": "Bez zvuku: vyžaduje PipeWire"
+    },
     "viewersGet": "Diváci dostanou:",
     "viewersGetSummary": "až {{resolution}} · {{fps}} sn./s · {{codec}} · asi {{mbit}} Mbit/s",
     "pathRelay": "Odesláno jednou přes relay serveru, který ho předá až {{count}} divákům.",

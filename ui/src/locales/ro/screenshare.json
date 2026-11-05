@@ -82,7 +82,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Partajează sunetul aplicației",
+    "sound": "Sunet",
+    "soundInfo": "Tot ecranul: sunetul computerului fără Mumcord. O fereastră: doar sunetul acelei aplicații.",
+    "soundNeeds": {
+      "windows": "Fără sunet: necesită Windows 10 versiunea 2004 sau mai nouă",
+      "macos": "Fără sunet: necesită macOS 13 sau mai nou",
+      "pipewire": "Fără sunet: necesită PipeWire"
+    },
     "viewersGet": "Spectatorii primesc:",
     "viewersGetSummary": "până la {{resolution}} · {{fps}} cadre/s · {{codec}} · aproximativ {{mbit}} Mbit/s",
     "pathRelay": "Trimis o singură dată prin releul serverului, care îl transmite mai departe la până la {{count}} spectatori.",

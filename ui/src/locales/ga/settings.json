@@ -1122,6 +1122,7 @@
     "useGpuHint": "Ionchódaíonn AV1 ar do chárta grafaicí, mar sin is beag ualach a chuireann an chomhroinnt ar an LAP. As: úsáideann AV1 an próiseálaí.",
     "statusList": "Stádas an ionchódóra",
     "av1Encode": "Ionchódú AV1",
+    "sound": "Fuaim",
     "askEachTime": "Fiafraigh díom faoi na socruithe seo gach uair a chomhroinnim",
     "av1Playback": "Seinm AV1",
     "vp9Playback": "Seinm VP9",

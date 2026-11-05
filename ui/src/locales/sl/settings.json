@@ -1114,6 +1114,7 @@
     "useGpuHint": "AV1 kodira na grafični kartici, zato deljenje skoraj ne obremenjuje procesorja. Izklopljeno: AV1 uporablja procesor.",
     "statusList": "Stanje kodirnika",
     "av1Encode": "Kodiranje AV1",
+    "sound": "Zvok",
     "askEachTime": "Vprašaj za te nastavitve ob vsakem deljenju",
     "av1Playback": "Predvajanje AV1",
     "vp9Playback": "Predvajanje VP9",

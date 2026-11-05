@@ -82,7 +82,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Partilhar o som da aplicação",
+    "sound": "Som",
+    "soundInfo": "Ecrã inteiro: o som do computador sem o Mumcord. Uma janela: apenas o som dessa aplicação.",
+    "soundNeeds": {
+      "windows": "Sem som: requer Windows 10 versão 2004 ou posterior",
+      "macos": "Sem som: requer macOS 13 ou posterior",
+      "pipewire": "Sem som: requer PipeWire"
+    },
     "viewersGet": "Os espetadores recebem:",
     "viewersGetSummary": "até {{resolution}} · {{fps}} imagens/s · {{codec}} · cerca de {{mbit}} Mbit/s",
     "pathRelay": "Enviado uma só vez pelo retransmissor do servidor, que o passa a até {{count}} espetadores.",

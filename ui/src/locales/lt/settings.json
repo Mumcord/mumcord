@@ -1114,6 +1114,7 @@
     "useGpuHint": "AV1 koduojamas vaizdo plokštėje, todėl bendrinimas beveik neapkrauna procesoriaus. Išjungus AV1 naudoja procesorių.",
     "statusList": "Kodavimo įrenginio būsena",
     "av1Encode": "AV1 kodavimas",
+    "sound": "Garsas",
     "askEachTime": "Klausti šių nustatymų kiekvieną kartą, kai bendrinu",
     "av1Playback": "AV1 atkūrimas",
     "vp9Playback": "VP9 atkūrimas",
