@@ -23,6 +23,8 @@ export function indexed(id: string, overrides: Partial<IndexedPlugin> = {}): Ind
     version: "1.0.0",
     size: 4096,
     permissions: [],
+    needsMumcord: null,
+    origins: [],
     ...overrides,
   };
 }

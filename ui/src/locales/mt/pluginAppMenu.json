@@ -1,9 +1,9 @@
 {
   "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "moreItems": "Aktar plugins…",
+  "subline": "{{plugin}} · Mhux uffiċjali",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "L-elementi tal-plugins dejjem juru isem il-plugin. Immaniġjahom f'Settings → Plugins.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Qed jerġa' jibda wara problema, erġa' pprova mal-ewwel"
 }

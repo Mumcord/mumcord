@@ -19,6 +19,7 @@ import { useServerStateOf } from "../channels";
 const DOCKED: MediaPopoutState = {
   watch: { target: null, onTop: false },
   share: { target: null, onTop: false },
+  stage: { target: null, onTop: false },
 };
 
 let state: MediaPopoutState = DOCKED;
@@ -77,8 +78,15 @@ export function usePopouts(): MediaPopoutState {
   return useSyncExternalStore(subscribe, popouts);
 }
 
-export function sameTarget(a: MediaPopoutTarget | null, b: MediaPopoutTarget | null): boolean {
-  return a?.serverId === b?.serverId && a?.session === b?.session;
+/** A pop-out target; a watched share has no `plugin`. */
+type TargetLike = Pick<MediaPopoutTarget, "serverId" | "session"> & { plugin?: string | null };
+
+export function sameTarget(a: TargetLike | null, b: TargetLike | null): boolean {
+  return (
+    a?.serverId === b?.serverId &&
+    a?.session === b?.session &&
+    (a?.plugin ?? null) === (b?.plugin ?? null)
+  );
 }
 
 /** Whether `kind` shows exactly this party (`session` `null`) or share in its own window. */
@@ -88,7 +96,7 @@ export function isPoppedOut(
   serverId: number,
   session: number | null,
 ): boolean {
-  return sameTarget(current[kind].target, { serverId, session });
+  return sameTarget(current[kind].target, { serverId, session, plugin: null });
 }
 
 function report(message: string, error: unknown): void {
@@ -137,10 +145,15 @@ export function useInPopout(): boolean {
   return useContext(InPopout);
 }
 
+/** Whether the stage pop-out shows the activity of `plugin`. */
+export function isStagePoppedOut(current: MediaPopoutState, plugin: string): boolean {
+  return current.stage.target?.plugin === plugin;
+}
+
 /** The kind of pop-out this window is, from its address (`?window=media-popout&kind=…`). */
 export function popoutKindOf(search: string): MediaPopoutKind | null {
   const kind = new URLSearchParams(search).get("kind");
-  return kind === "watch" || kind === "share" ? kind : null;
+  return kind === "watch" || kind === "share" || kind === "stage" ? kind : null;
 }
 
 /**
@@ -155,7 +168,7 @@ export function usePopoutTitle(serverId: number, content: string): string {
   return channel === undefined ? content : t("media.windowTitle", { title: content, channel });
 }
 
-/** Test helper: forgets the binding and docks both views. */
+/** Test helper: forgets the binding and docks every view. */
 export function resetPopoutStore(): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   unsubscribers = [];

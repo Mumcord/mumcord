@@ -27,13 +27,16 @@
     "chatPatterns": "Jagħraf ċerti messaġġi taċ-chat, bħal konfigurazzjonijiet ta' logħob imwaħħlin",
     "netHttp": "Kellem server li tagħżel int",
     "secrets": "Żomm sigriet (eż. ċavetta API) fil-keychain tas-sistema tiegħek",
-    "uiWebview": "Uri l-kontenut tal-web tiegħu stess f'qafas issiġillat (mingħajr internet)",
-    "uiStage": "Show an activity in the media area",
-    "uiSidePanel": "Show its own content in a side panel",
-    "uiAppMenu": "Add items to the Apps menu",
-    "netOrigins": "Talk to these websites",
-    "peersRelay": "Send data through the server's relay",
-    "audioEffects": "Play short sounds that come with the plugin"
+    "uiWebview": "Uri l-kontenut tal-web tiegħu stess f'qafas issiġillat",
+    "uiStage": "Uri attività fiż-żona tal-midja",
+    "uiSidePanel": "Uri l-kontenut tiegħu stess f'pannell laterali",
+    "uiAppMenu": "Żid elementi mal-menu tal-Apps",
+    "netOrigins": "Ikellem dawn is-siti web",
+    "peersRelay": "Ibgħat data permezz tar-relay tas-server",
+    "audioEffects": "Irrepeti ħsejjes qosra li jiġu mal-plugin",
+    "filesSave": "Issejvja fajls li tagħżel",
+    "chatPostImage": "Ibgħat stampa fiċ-chat wara li tikklikkja",
+    "filesImportPicture": "Iftaħ stampi li tagħżel"
   },
   "explanations": {
     "uiPanel": "Pannell żgħir ta' dan il-plugin jidher fil-linja tal-plugins.",
@@ -56,13 +59,16 @@
     "chatPatterns": "Jirċievi biss il-messaġġi taċ-chat fil-kanal tiegħek li jibdew kif iddikjara, bħal konfigurazzjoni ta' logħba mwaħħla. L-ebda test ieħor taċ-chat ma jaslilu.",
     "netHttp": "Jista' jkellem server wieħed li tagħżel int, u dak biss.",
     "secrets": "Jista' jżomm sigriet, bħal ċavetta API, fil-keychain tas-sistema tiegħek.",
-    "uiWebview": "Jista' juri kontenut tal-web tiegħu stess f'qafas issiġillat mingħajr aċċess għall-internet.",
-    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
-    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
-    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
-    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
-    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
-    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
+    "uiWebview": "Ma jistax jara Mumcord, il-fajls, il-mikrofonu, il-kamera jew il-clipboard tiegħek.",
+    "uiStage": "Biss meta tibdieh jew tingħaqad miegħu. In-nies fil-kanal tiegħek li għandhom {{plugin}} jistgħu jingħaqdu.",
+    "uiSidePanel": "Il-kontenut tiegħu jidher f'kolonna ħdejn iċ-chat, biss meta tiftaħha.",
+    "uiAppMenu": "Sa {{count}} elementi, murija taħt “Plugins”.",
+    "netOrigins": "{{plugin}} u l-paġna tiegħu jistgħu jibagħtu u jirċievu data biss mas-siti web elenkati hawn taħt.",
+    "peersRelay": "Mozzjonijiet aktar veloċi u akbar. Ikkriptat minn tarf sa tarf; ir-relay ma jistax jaqrah.",
+    "audioEffects": "Ħsejjes qosra li jiġu mal-plugin. Tista' tbaxxihom jew ttisskitthom f'Settings → Plugins.",
+    "filesSave": "Mumcord jistaqsik fejn issejvja kull fajl wara li tikklikkja; il-plugin qatt ma jara l-folders tiegħek.",
+    "chatPostImage": "Wara li tikklikkja fil-plugin, jista' jibgħat stampa waħda fil-kanal attwali tiegħek, immarkata bl-isem tiegħu.",
+    "filesImportPicture": "Mumcord iħallik tagħżel stampa wara li tikklikkja; il-plugin jikseb biss dik l-istampa, qatt il-folders tiegħek."
   },
   "listLabel": "Permessi"
 }

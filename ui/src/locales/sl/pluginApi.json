@@ -1,7 +1,7 @@
 {
-  "tooNew": "Needs Mumcord {{version}} or newer",
-  "heldForApi": "Update available after updating Mumcord",
-  "updateMumcord": "Update Mumcord",
-  "oldMajor": "Built for an older Mumcord – may not work",
-  "deprecated": "{{plugin}} uses an older plugin interface that Mumcord still supports."
+  "tooNew": "Potrebuje Mumcord {{version}} ali novejši",
+  "heldForApi": "Posodobitev je na voljo po posodobitvi Mumcorda",
+  "updateMumcord": "Posodobi Mumcord",
+  "oldMajor": "Izdelan za starejši Mumcord – morda ne bo deloval",
+  "deprecated": "{{plugin}} uporablja starejši vmesnik vtičnikov, ki ga Mumcord še podpira."
 }

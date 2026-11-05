@@ -24,7 +24,8 @@
   "pill": {
     "none": "Fără permisiuni noi",
     "permission": "Necesită o permisiune nouă",
-    "author": "Autor nou"
+    "author": "Autor nou",
+    "websites": "Comunică cu site-uri web noi"
   },
   "newPermissions": "Permisiuni noi",
   "revoked": {
@@ -45,5 +46,66 @@
     "save": "Salvează",
     "notNow": "Nu acum",
     "failed": "Permisiunile pentru {{name}} nu au putut fi modificate. Încearcă din nou."
+  },
+  "waitingHeading": "Actualizări în așteptare",
+  "autoNote": "Actualizările automate se instalează doar când pluginul nu cere nimic nou, iar scorul rămâne în aceeași categorie sau scade. Restul așteaptă aici.",
+  "needsMumcord": "Actualizare disponibilă după actualizarea Mumcord",
+  "band": {
+    "low": "Scăzut",
+    "medium": "Mediu",
+    "high": "Ridicat"
+  },
+  "hold": {
+    "newWebsites_one": "Această actualizare dorește să comunice cu {{count}} site web nou. {{name}} rămâne pe {{version}} până decizi tu.",
+    "newWebsites_few": "Această actualizare dorește să comunice cu {{count}} site-uri web noi. {{name}} rămâne pe {{version}} până decizi tu.",
+    "newWebsites_other": "Această actualizare dorește să comunice cu {{count}} de site-uri web noi. {{name}} rămâne pe {{version}} până decizi tu.",
+    "riskUp": "Nu se instalează automat: riscul a crescut de la {{from}} la {{to}}. Verifică-l mai întâi.",
+    "scoreUp": "Nu se instalează automat: scorul a crescut de la {{from}} la {{to}}. Verifică-l mai întâi.",
+    "blockedBySafety": "Nu se instalează: această versiune are risc ridicat, iar „Nu permite pluginuri cu risc ridicat” este activată.",
+    "scoreUnknown": "Nu se instalează automat: scorul de securitate al acestei versiuni nu a putut fi calculat. Verifică-l mai întâi."
+  },
+  "score": {
+    "label": "Scor de securitate:",
+    "unchanged": "neschimbat",
+    "points": "puncte",
+    "goesUp": ", riscul crește",
+    "goesDown": ", riscul scade"
+  },
+  "dialog": {
+    "title": "Actualizezi {{name}} la {{version}}?",
+    "now": "acum {{version}}",
+    "sameKey": "aceeași cheie de autor",
+    "newKey": "cheie nouă de autor",
+    "newWebsites_one": "Această actualizare dorește să comunice cu {{count}} site web nou.",
+    "newWebsites_few": "Această actualizare dorește să comunice cu {{count}} site-uri web noi.",
+    "newWebsites_other": "Această actualizare dorește să comunice cu {{count}} de site-uri web noi.",
+    "staysOn": "{{name}} rămâne pe {{version}} până decizi tu.",
+    "otherDomain": "Unul dintre ele nu se află pe domeniul propriu al pluginului.",
+    "whatsNew": "Ce este nou în versiunea {{version}}",
+    "websitesLead": "{{name}} și pagina sa ar putea accesa apoi:",
+    "websitesWarning": "Aceste site-uri web îți pot vedea adresa IP și tot ce le trimite {{name}}.",
+    "websitesLabel": "Site-uri web",
+    "new": "Nou",
+    "changed": "Modificat",
+    "noOtherPermissions": "Nicio altă permisiune nu se modifică.",
+    "scoreNow": "Acum ({{version}})",
+    "scoreAfter": "După actualizare ({{version}})",
+    "meterNow": "Scorul de securitate acum",
+    "meterAfter": "Scorul de securitate după actualizare",
+    "riskUpBy_one": "Riscul crește cu {{count}} punct",
+    "riskUpBy_few": "Riscul crește cu {{count}} puncte",
+    "riskUpBy_other": "Riscul crește cu {{count}} de puncte",
+    "asksForMore": "pentru că această versiune cere mai mult:",
+    "permissionsLabel": "Permisiuni noi",
+    "recentChange": "Se consideră și o modificare recentă: permisiunile noi din ultimele {{versions}} versiuni adaugă încă +{{recent}} puncte. Împreună cu +{{permissions}} de mai sus (× {{multiplier}}), rezultă +{{total}}.",
+    "highTitle": "Această actualizare ar face pluginul cu risc ridicat",
+    "highText": "Nu va fi instalat automat. Dacă rămâi pe {{version}}, scorul actual se păstrează; poți fixa versiunea în Instalate.",
+    "highTick": "Am înțeles că riscul a crescut și tot am încredere în autor",
+    "skipHint": "Dacă sari peste ea, {{version}} continuă să funcționeze.",
+    "skip": "Sari peste această versiune",
+    "notNow": "Nu acum",
+    "allow": "Permite și actualizează",
+    "updateAnyway": "Actualizează oricum",
+    "failed": "{{name}} nu a putut fi actualizat. Încearcă din nou."
   }
 }

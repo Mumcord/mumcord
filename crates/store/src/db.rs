@@ -432,6 +432,29 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (resolution, fps, optimize)
     );
     ",
+    // v27: whether the "Expected key" entered when a repository was added matched the pinned
+    // key (FR-6.74), for the security score's trust factor. Existing repositories default to 0.
+    r"
+    ALTER TABLE plugin_repository ADD COLUMN expected_key_matched INTEGER NOT NULL DEFAULT 0;
+    ",
+    // v28: "Skip this version" in the plugin Updates tab (FR-9.83): the newest version the user
+    // skipped per plugin. That version and older ones are no longer offered; a newer one is.
+    r"
+    CREATE TABLE plugin_skipped_update (
+        plugin_id  TEXT PRIMARY KEY,
+        version    TEXT NOT NULL,
+        skipped_at INTEGER NOT NULL
+    );
+    ",
+    // v29: plugins whose web content was turned off because Mumcord's window stopped answering
+    // while one of their frames was open (FR-9.42). It stays off across restarts until the user
+    // turns it on again in Settings → Plugins; the row is deleted then.
+    r"
+    CREATE TABLE plugin_web_disabled (
+        plugin_id   TEXT PRIMARY KEY,
+        disabled_at INTEGER NOT NULL
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -808,6 +831,14 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
     }
 
+    /// The repository "Expected key" flag (v27) defaults to false for existing rows.
+    #[test]
+    fn expected_key_migration_defaults_to_false() {
+        assert!(MIGRATIONS.len() >= 27);
+        assert!(MIGRATIONS[26].contains("expected_key_matched"));
+        assert!(MIGRATIONS[26].contains("DEFAULT 0"));
+    }
+
     /// The plugin trust tables (v25) come right after the file-card table (v24).
     #[test]
     fn plugin_trust_migration_creates_its_five_tables() {
@@ -854,6 +885,50 @@ pub(crate) mod tests {
             .query_row("SELECT COUNT(*) FROM relay_pin", [], |r| r.get(0))
             .expect("count");
         assert_eq!(pins, 0);
+    }
+
+    /// A v25 database gets both later migrations: the AV1 self-test rebuild and the
+    /// repository "Expected key" flag, which defaults to false for existing rows.
+    #[test]
+    fn version_25_database_upgrades_through_v26_and_v27() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        {
+            let mut conn = Connection::open(dir.path().join(DB_FILE_NAME)).expect("open");
+            let tx = conn.transaction().expect("tx");
+            for sql in &MIGRATIONS[..25] {
+                tx.execute_batch(sql).expect("migration");
+            }
+            tx.pragma_update(None, "user_version", 25).expect("pragma");
+            tx.execute(
+                "INSERT INTO plugin_repository (url, name, public_key, pinned_at)
+                 VALUES ('https://example.invalid/r', 'Repo', 'key', 0)",
+                [],
+            )
+            .expect("insert");
+            tx.commit().expect("commit");
+        }
+        let store = Store::open(dir.path()).expect("upgrade");
+        assert_eq!(
+            store.schema_version().expect("version"),
+            MIGRATIONS.len() as i64
+        );
+        let matched: i64 = store
+            .conn
+            .query_row(
+                "SELECT expected_key_matched FROM plugin_repository",
+                [],
+                |r| r.get(0),
+            )
+            .expect("flag");
+        assert_eq!(matched, 0);
+        store
+            .conn
+            .execute(
+                "INSERT INTO encoder_selftest (resolution, fps, optimize, svt_selftest_ms)
+                 VALUES (1080, 30, 'text', 5)",
+                [],
+            )
+            .expect("selftest table has the optimize key");
     }
 
     #[test]

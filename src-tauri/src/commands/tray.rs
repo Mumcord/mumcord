@@ -35,6 +35,24 @@ pub struct TrayAttention {
 #[serde(rename_all = "camelCase")]
 pub struct TraySettingsRequested {}
 
+/// A pop-out window asked for the installed plugins' settings; the main window is already in
+/// front.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginDetailsRequested {}
+
+/// Brings the main window to the front and tells it to open Settings → Plugins → Installed, for
+/// the "Details" button of the stage pop-out's no-relay banner.
+#[tauri::command]
+#[specta::specta]
+pub fn plugin_details_open(app: AppHandle) -> ApiResult<()> {
+    crate::window::show(&app);
+    if let Err(e) = (PluginDetailsRequested {}).emit(&app) {
+        tracing::warn!(error = %e, "telling the UI to open the plugin details failed");
+    }
+    Ok(())
+}
+
 /// Replaces the tray's unread summary and recent chats.
 #[tauri::command]
 #[specta::specta]

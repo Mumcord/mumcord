@@ -52,7 +52,13 @@ async function overview(): Promise<Overview> {
 
 async function install(id: string): Promise<{ error?: string }> {
   await invokeOk("plugins_index", { language: "en" });
-  return call("plugin_install", { id, version: null, optional: [], visibility: "nobody" });
+  return call("plugin_install", {
+    id,
+    version: null,
+    optional: [],
+    visibility: "nobody",
+    confirmed: true,
+  });
 }
 
 async function openInstalled(): Promise<void> {

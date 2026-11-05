@@ -75,7 +75,11 @@
   "unofficialText": "Ní athbhreithníonn Mumcord {{repository}}. Ritheann sé sa bhosca gainimh fós agus faigheann sé na ceadanna a cheadaíonn tú amháin.",
   "checksTitle": "Baineann seiceálacha oifigiúla fós",
   "checksText": "Is féidir le liosta cúlghairme Mumcord é a dhíchumasú. Tá ainmneacha breiseán oifigiúil in áirithe.",
-  "metaPermissions": "Ceadanna: {{count}}",
+  "metaPermissions_one": "{{count}} ceadú",
+  "metaPermissions_two": "{{count}} cheadú",
+  "metaPermissions_few": "{{count}} cheadanna",
+  "metaPermissions_many": "{{count}} gceadú",
+  "metaPermissions_other": "{{count}} ceadú",
   "footer": "Stór oifigiúil · liosta sínithe seiceáilte · ní sheoltar aon ní fút",
   "factSource": "Foinse: {{url}}",
   "factLicence": "Ceadúnas: {{license}}",
@@ -96,5 +100,7 @@
     "unpacking": "Á dhíphacáil…",
     "starting": "Á thosú…",
     "announce": "{{name}}: {{percent}}% íoslódáilte"
-  }
+  },
+  "needsMumcord": "Teastaíonn Mumcord {{version}} nó níos nuaí",
+  "updateMumcord": "Nuashonraigh Mumcord"
 }

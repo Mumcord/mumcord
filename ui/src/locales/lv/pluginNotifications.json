@@ -5,6 +5,10 @@
     "body": "Izslēgts pēc atkārtotām avārijām",
     "open": "Rādīt sadaļā Spraudņi"
   },
+  "pictureRefused": {
+    "title": "{{name}} nevarēja izmantot attēlu",
+    "body": "Šo attēlu nevar izmantot. Izmanto PNG, JPEG vai WebP failu līdz 10 MB."
+  },
   "update": {
     "title": "Atjauninājums: {{name}}",
     "body": "Versija {{version}} gaida cilnē Atjauninājumi",

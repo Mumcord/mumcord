@@ -25,7 +25,8 @@ import { ChannelAudioHost } from "../features/channelaudio";
 import { ChannelHeader, ChannelTreeMenu } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { Updater } from "../features/updates";
-import { PluginsHost } from "../features/plugins";
+import { PluginActivityLines, PluginMiniBars, PluginsHost } from "../features/plugins";
+import { SidePanelHost } from "../features/plugins/sidepanel";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
 import {
@@ -44,6 +45,7 @@ import {
 import { MediaArea } from "../features/media/MediaArea";
 import { MediaPopoutHost } from "../features/media/MediaPopoutHost";
 import { useMediaView } from "../features/media/mediaView";
+import { StagePanel } from "../features/media/StagePanel";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
 import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
@@ -175,21 +177,27 @@ export function ChatMount() {
   const view = useMediaView();
   if (requests)
     return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
-  // One resizable media area for whichever view is big (spec 07 §4.9).
+  // One resizable media area for every item of the stage (spec 07 §4.9, FR-9.44). All of them
+  // stay mounted while the area is open, so switching tabs never stops one.
   const media =
-    serverId === null ? null : view.cinema === "watch" ? (
+    serverId === null || view.cinema === null ? null : (
       <MediaArea>
-        <LazyBoundary>
-          <WatchTogetherView serverId={serverId} />
-        </LazyBoundary>
+        {view.stage.includes("watch") && (
+          <StagePanel id="watch">
+            <LazyBoundary>
+              <WatchTogetherView serverId={serverId} />
+            </LazyBoundary>
+          </StagePanel>
+        )}
+        {view.stage.includes("share") && (
+          <StagePanel id="share">
+            <LazyBoundary>
+              <ScreenShareView />
+            </LazyBoundary>
+          </StagePanel>
+        )}
       </MediaArea>
-    ) : view.cinema === "share" ? (
-      <MediaArea>
-        <LazyBoundary>
-          <ScreenShareView />
-        </LazyBoundary>
-      </MediaArea>
-    ) : null;
+    );
   // The channel header always stays at the very top (issue #163): the sharer bar, the mini bars
   // and the cinema view all sit below it, and focus keeps it while hiding the messages.
   const bars =
@@ -198,6 +206,8 @@ export function ChatMount() {
         <SharerBar />
         {view.mini.watch && <WatchMiniBar serverId={serverId} />}
         {view.mini.share && <ShareMiniBar serverId={serverId} />}
+        <PluginMiniBars />
+        <PluginActivityLines />
       </>
     );
   return (
@@ -264,6 +274,13 @@ export function MediaWidgetsMount() {
 /** Member list (B20) with the friends list below (FR-1.64); the party's panel takes the column
 while its cinema view is open (issue #163). */
 export function MembersMount() {
+  return (
+    <SidePanelHost>
+      <MembersColumn />
+    </SidePanelHost>
+  );
+}
+function MembersColumn() {
   const view = useMediaView();
   const serverId = useVoiceServerId();
   const { users, selfSession } = useServerStateOf(serverId);

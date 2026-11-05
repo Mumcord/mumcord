@@ -320,9 +320,9 @@ fn world_1_1_imports_1_0_plus_the_new_interfaces() {
     assert_eq!(
         imports,
         [
-            "app-menu", "audio", "chat", "clock", "events", "http", "log", "notify", "peers",
-            "random", "relay", "secrets", "stage", "storage", "theme", "timers", "types", "ui",
-            "webview"
+            "app-menu", "audio", "chat", "clock", "events", "files", "http", "log", "notify",
+            "peers", "random", "relay", "secrets", "stage", "storage", "theme", "timers", "types",
+            "ui", "webview"
         ]
     );
     assert_eq!(exports, ["on-event", "start", "stop"]);
@@ -409,6 +409,7 @@ fn webview_1_1_gains_side_panel_stage_and_size_hint() {
         ["panel-popover", "dialog", "side-panel", "stage"]
     );
     assert!(has_function(&resolve, "webview", "set-size-hint"));
+    assert!(has_function(&resolve, "webview", "set-status"));
     let (resolve, slot) = type_in_1_1("ui", "slot");
     assert_eq!(
         case_names(&resolve, slot).last().map(String::as_str),
@@ -440,4 +441,19 @@ fn new_1_1_interfaces_have_the_functions_of_fr_9_24() {
         case_names(&resolve, status),
         ["available", "not-allowed", "no-relay", "switched-off"]
     );
+}
+
+/// W1x addendum (FR-9.103 … FR-9.105, FR-9.107): Whiteboard's host-owned calls.
+#[test]
+fn files_and_post_image_are_in_1_1_only() {
+    let (resolve, _) = package_of("1.1.0");
+    assert!(has_function(&resolve, "files", "save"));
+    assert!(has_function(&resolve, "files", "import-picture"));
+    assert!(has_function(&resolve, "chat", "post-image"));
+    let (resolve, picture) = type_in_1_1("files", "picture");
+    assert_eq!(field_names(&resolve, picture), ["name", "data"]);
+    let (resolve, outcome) = type_in_1_1("chat", "post-outcome");
+    assert_eq!(case_names(&resolve, outcome), ["image", "file-offer"]);
+    let (resolve, _) = package();
+    assert!(!has_function(&resolve, "chat", "post-image"));
 }

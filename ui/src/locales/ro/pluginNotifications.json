@@ -5,6 +5,10 @@
     "body": "Dezactivat după blocări repetate",
     "open": "Afișează în Pluginuri"
   },
+  "pictureRefused": {
+    "title": "{{name}} nu a putut folosi imaginea",
+    "body": "Această imagine nu poate fi folosită. Folosește un fișier PNG, JPEG sau WebP de până la 10 MB."
+  },
   "update": {
     "title": "Actualizare pentru {{name}}",
     "body": "Versiunea {{version}} așteaptă în fila Actualizări",

@@ -1,0 +1,23 @@
+{
+  "manifest": 1,
+  "id": "test-stop-http",
+  "name": "Fixture stop-http",
+  "description": "E2E hard-stop test plugin: declares a website that is not encrypted; must never install.",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "net.origins"]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "http://fixture-a.example",
+        "purpose": "origin_0"
+      }
+    ]
+  }
+}

@@ -22,7 +22,7 @@
   "logEmpty": "Aún no hay líneas de registro.",
   "level": {
     "debug": "Depuración",
-    "info": "Info",
+    "info": "Información",
     "warn": "Aviso",
     "error": "Error"
   },

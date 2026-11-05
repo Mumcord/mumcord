@@ -1,28 +1,55 @@
-# Plugin registry wire format (v1)
+# Plugin registry wire format (v1 and v1.1)
 
 This is the reference for the files a plugin registry publishes and Mumcord reads: the
 official registry (`Mumcord/plugins`, built by its publish workflow) and third-party
 repositories (for example served with `mumcord-plugin serve-registry`). The client side lives in
 `crates/plugins/src/registry/`. Spec: `specs/06-plugin-system-specification.md`, FR-6.49 … FR-6.57,
-FR-6.70, FR-6.74 … FR-6.76, FR-6.80.
+FR-6.70, FR-6.74 … FR-6.76, FR-6.80, and `specs/09-plugin-platform-1-1-specification.md`, FR-9.13 …
+FR-9.19.
 
 All files are UTF-8 JSON. Unknown fields are ignored, so new optional fields can be added
 without a format change. A change that old clients would misread needs a new `format` number.
 
 ## Files and locations
 
-| File             | Official registry                                      | Third-party repository                                 |
-| ---------------- | ------------------------------------------------------ | ------------------------------------------------------ |
-| Index            | `https://mumcord.github.io/plugins/v1/index.json`      | Any URL the user adds (the address _is_ the index URL) |
-| Index signature  | `…/v1/index.json.minisig`                              | Index URL + `.minisig`                                 |
-| Revocation list  | `…/v1/revoked.json` + `.minisig`                       | – (only the official list exists)                      |
-| Permission texts | `…/v1/permissions.json`                                | –                                                      |
-| Package          | GitHub release asset `<id>-v<ver>/<id>-<ver>.mcplugin` | Any URL listed in the index                            |
-| Author signature | Package URL + `.minisig`                               | Package URL + `.minisig`                               |
+| File             | Official registry                                                      | Third-party repository                                 |
+| ---------------- | ---------------------------------------------------------------------- | ------------------------------------------------------ |
+| Index (format 1) | `https://mumcord.github.io/plugins/v1/index.json`                      | Any URL the user adds (the address _is_ the index URL) |
+| Index (format 2) | `…/v1.1/index.json`                                                    | `…/v1.1/index.json` next to an added `…/v1/index.json` |
+| Index signature  | Index URL + `.minisig`                                                 | Index URL + `.minisig`                                 |
+| Revocation list  | `…/v1/revoked.json` + `.minisig`                                       | – (only the official list exists)                      |
+| Permission texts | `…/v1/permissions.json` (API 1.0), `…/v1.1/permissions.json` (API 1.1) | –                                                      |
+| Package          | GitHub release asset `<id>-v<ver>/<id>-<ver>.mcplugin`                 | Any URL listed in the index                            |
+| Author signature | Package URL + `.minisig`                                               | Package URL + `.minisig`                               |
 
 The official base (`https://mumcord.github.io/plugins/v1/`) can be replaced by a mirror in
 Settings → Plugins → Repositories → Advanced. A mirror serves the same signed files; Mumcord still
 checks them with the official keys.
+
+### Two indexes: `v1` and `v1.1`
+
+The official registry publishes both indexes from the same sources, signed with the same key and
+with the same `sequence` (FR-9.14):
+
+- `v1/index.json` (format 1) is read by Mumcord 0.6.x. It lists **only versions with API 1.0**; a
+  plugin whose newest version needs API 1.1 keeps its last 1.0 version there, or is left out if it
+  never had one.
+- `v1.1/index.json` (format 2) is read by Mumcord 0.7.0 and newer. It lists every version.
+- `v1/revoked.json` stays the one kill-switch list for both.
+
+Mumcord 0.7.0 reads the official index from `v1.1/index.json` whenever the official base (or the
+mirror) ends in `/v1/`; any other mirror base is read as `<base>/index.json`.
+
+**Third-party repositories** (FR-9.19): when the added address ends in `/v1/index.json`, Mumcord
+0.7.0 first fetches the sibling `…/v1.1/index.json`. It must be signed with the same pinned key and
+follows the same size, signature, key-rotation and rollback rules, with its own `sequence`. Only an
+HTTP 404 for the sibling makes Mumcord use the added address; if the sibling is unreachable or
+fails a check, the last verified copy of the sibling is shown, as for any index. Repository owners
+should publish API 1.1 versions **only** in the `v1.1` index: a 0.6.x client reading `v1` would
+install a 1.1 package and fail when loading it. `mumcord-plugin site-data` writes both files.
+
+Mumcord keeps the offline copy and rollback state per source and path (`v1` and `v1.1`): a
+`sequence` is only compared with earlier copies of the same file.
 
 ### Transport rules
 
@@ -138,20 +165,60 @@ Plugin entry:
 
 Version entry:
 
-| Field         | Type         | Required | Meaning                                                                                                         |
-| ------------- | ------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `version`     | semver       | yes      | Must equal the manifest version.                                                                                |
-| `api`         | int          | yes      | Plugin API major version (`1`).                                                                                 |
-| `url`         | URL          | yes      | Package download; author signature at `url` + `.minisig`.                                                       |
-| `size`        | int          | yes      | Exact package size in bytes, 1 … 5 MiB (official index: 64 MiB).                                                |
-| `sha256`      | hex          | yes      | Lower-case hex SHA-256 of the package (64 digits).                                                              |
-| `permissions` | array of ids | yes      | Every permission, required or optional, the reviewed version may request. A package asking for more is refused. |
+| Field          | Type             | Required | Meaning                                                                                                                                                                                             |
+| -------------- | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`      | semver           | yes      | Must equal the manifest version.                                                                                                                                                                    |
+| `api`          | int / string     | yes      | Plugin API the package is built for. Format 1: the integer major `1` (read as `"1.0"`). Format 2: `"major.minor"`, e.g. `"1.0"`, `"1.1"`.                                                           |
+| `url`          | URL              | yes      | Package download; author signature at `url` + `.minisig`.                                                                                                                                           |
+| `size`         | int              | yes      | Exact package size in bytes, 1 … 5 MiB (official index: 64 MiB).                                                                                                                                    |
+| `sha256`       | hex              | yes      | Lower-case hex SHA-256 of the package (64 digits).                                                                                                                                                  |
+| `permissions`  | array of ids     | yes      | Every permission, required or optional, the reviewed version may request. A package asking for more is refused.                                                                                     |
+| `min_mumcord`  | string           | no       | Format 2. Lowest Mumcord release, `"0.7"` or `"0.7.3"`; only major.minor counts. Default: the plugin's `min_mumcord`, and never below the first release with this `api` (`1.0` → 0.6, `1.1` → 0.7). |
+| `origins`      | array of strings | no       | Format 2. The web origins the version's manifest declares (at most 8); a score input.                                                                                                               |
+| `modules`      | int              | no       | Format 2. Number of WASM modules in the package; a score input.                                                                                                                                     |
+| `reproducible` | bool             | no       | Format 2. The author claims a reproducible build; a score input.                                                                                                                                    |
+| `notes_url`    | URL              | no       | Format 2. Where the author explains what changed in this version. `https` only, at most 512 characters; anything else is ignored. Shown as "What's new in <version>" in the update review.          |
+
+**Format 2** (`"format": 2`, the `v1.1` index) equals format 1 except for the version entry fields
+marked above (`min_mumcord`, `origins`, `modules`, `reproducible`, `notes_url`). The plugin-level
+`min_mumcord` stays as a fallback for versions without their own. Mumcord 0.7.0 reads both formats;
+a format 1 `api: 1` counts as `"1.0"`. Fields Mumcord does not know are ignored.
+
+A format 2 version entry:
+
+```json
+{
+  "version": "1.3.0",
+  "api": "1.1",
+  "min_mumcord": "0.7",
+  "url": "https://github.com/Mumcord/plugins/releases/download/board-v1.3.0/board-1.3.0.mcplugin",
+  "size": 182044,
+  "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+  "permissions": ["ui.stage", "ui.webview", "net.origins", "peers.relay"],
+  "origins": ["https://api.example"],
+  "modules": 1,
+  "reproducible": true,
+  "notes_url": "https://example.org/board/releases/1.3.0"
+}
+```
+
+`origins`, `modules` and `reproducible` are inputs of the [security score](plugin-score.md). The
+index can only repeat what the package's manifest says: the install prompt scores the verified
+package, and says so when it scores higher than the listing. A missing field counts as zero extra
+points. `reproducible` is shown as "claimed by the repository".
+
+### Version choice
+
+Versions compare by major.minor only: `min_mumcord` `"0.7.3"` is met by Mumcord 0.7.0 (FR-9.13).
+For every plugin Mumcord offers the newest version whose `api` it supports and whose
+`min_mumcord` is at most its own release. If none fits, the plugin shows "Needs Mumcord 0.7.0 or
+newer" with the lowest release that would run one of its versions (FR-9.16).
 
 ### Invalid and forbidden entries
 
 An index is accepted or rejected as a whole only for its signature, `format`, `sequence`, the
 `repository` block and the 500-plugin limit. A single bad plugin entry (missing field, bad id,
-hash, version or key, duplicate id) is dropped and reported as a note, so one broken entry does
+hash, version, `api`, `min_mumcord`, origin list or key, duplicate id) is dropped and reported as a note, so one broken entry does
 not hide the others. Third-party indexes additionally may not list official plugin ids or ids with
 a reserved prefix (`mumcord-`, `core-`); such entries are dropped with a note as well.
 
@@ -239,6 +306,10 @@ the website (FR-6.80). It is generated from the client's permission catalogue an
 `risk` is `green`, `yellow` or `red`; `text` maps language tags to the text shown in the install
 prompt (English only for now).
 
+`v1.1/permissions.json` holds the full API 1.1 catalogue, including `ui.stage`, `ui.side-panel`,
+`ui.app-menu`, `net.origins`, `peers.relay`, `audio.effects`, `files.save`, `files.import-picture`
+and `chat.post-image`; `v1/permissions.json` stays unchanged for older clients.
+
 ## Registry source
 
 The official registry is generated from files in `Mumcord/plugins` (FR-6.54) by
@@ -311,12 +382,17 @@ commit = "4f1c…"
 path = "dice"
 ```
 
-| Field                                             | Meaning                                                                                                                         |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `version`, `api`, `size`, `sha256`, `permissions` | Become the version entry of the index. `permissions` is every permission the manifest asks for.                                 |
-| `published`                                       | `YYYY-MM-DD`; the newest version's date becomes `updated`.                                                                      |
-| `signature`                                       | The author's detached minisign signature over the package; published as the release asset `<id>-<ver>.mcplugin.minisig`.        |
-| `source`                                          | Git repository, commit and folder the package is rebuilt from with `mumcord-plugin build --reproducible`; CI compares the hash. |
+| Field                                             | Meaning                                                                                                                                                      |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `version`, `api`, `size`, `sha256`, `permissions` | Become the version entry of the index. `permissions` is every permission the manifest asks for.                                                              |
+| `api`                                             | `1` (API 1.0, listed in both indexes) or `"1.1"` (listed only in `v1.1/index.json`). `mumcord-plugin check` compares it with the package imports.            |
+| `min_mumcord`                                     | Optional, e.g. `"0.7"`. Must not be lower than the first release with the API (0.6 for `1`, 0.7 for `"1.1"`). Written into the `v1.1` index only.            |
+| `origins`                                         | Optional; the origins the manifest declares. Written into the `v1.1` index only.                                                                             |
+| `modules`, `reproducible`                         | Not written by `mumcord-plugin site-data` yet: a registry that wants these score inputs adds them to its index by other means. Absent means no extra points. |
+| `notes_url`                                       | Optional `https` link to release notes (at most 512 characters). Written into the `v1.1` index only.                                                         |
+| `published`                                       | `YYYY-MM-DD`; the newest version's date becomes `updated`.                                                                                                   |
+| `signature`                                       | The author's detached minisign signature over the package; published as the release asset `<id>-<ver>.mcplugin.minisig`.                                     |
+| `source`                                          | Git repository, commit and folder the package is rebuilt from with `mumcord-plugin build --reproducible`; CI compares the hash.                              |
 
 The package itself is not in the repository: the publish workflow rebuilds it from `source` and
 attaches it to the release `<id>-v<ver>`, so the index URL is

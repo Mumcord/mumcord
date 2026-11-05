@@ -1,0 +1,29 @@
+/// Since 1.1. Files the user saves or opens through Mumcord's own dialogs (FR-9.103, FR-9.105).
+///
+/// Mumcord owns the dialog and reads or writes the file itself: the plugin hands over or
+/// receives bytes, never a path or folder. Each call is allowed only within 8 s after a user
+/// gesture for this plugin (a button click or Apps-menu click in its own surface), one dialog
+/// per gesture; without a fresh gesture or the permission the call returns `not-permitted` and
+/// nothing opens.
+interface files {
+  use types.{error};
+
+  /// A picture the user picked.
+  record picture {
+    /// The file name only, e.g. 'sketch.png'; never a path.
+    name: string,
+    /// The file's bytes: PNG, JPEG or WebP, at most 10 MB.
+    data: list<u8>,
+  }
+
+  /// Opens the save dialog with `suggested-name` and writes `data` to the file the user chooses.
+  /// Needs `files.save`. The name is reduced to a plain file name (no folders, no '..', at most
+  /// 120 bytes); `data` is at most 32 MiB. True = saved, false = the user cancelled.
+  /// Errors: `not-permitted`, `invalid`, `too-large`.
+  save: func(suggested-name: string, data: list<u8>) -> result<bool, error>;
+
+  /// Opens the picker for a PNG, JPEG or WebP picture. Needs `files.import-picture`. None = the
+  /// user cancelled. Errors: `not-permitted`, `too-large` (above 10 MB), `invalid` (another
+  /// type).
+  import-picture: func() -> result<option<picture>, error>;
+}

@@ -5,6 +5,10 @@
     "body": "Desactivado tras fallos repetidos",
     "open": "Mostrar en Complementos"
   },
+  "pictureRefused": {
+    "title": "{{name}} no pudo usar la imagen",
+    "body": "Esta imagen no se puede usar. Usa un archivo PNG, JPEG o WebP de hasta 10 MB."
+  },
   "update": {
     "title": "Actualización de {{name}}",
     "body": "La versión {{version}} espera en la pestaña Actualizaciones",

@@ -10,7 +10,9 @@ use super::cache::Cache;
 use super::fetch::{Client, UrlPolicy};
 use super::index::{Ignored, Index, IndexKind, RepositoryInfo, declared_key};
 use super::keys::{key_fingerprint, normalize_key};
-use super::sync::{Freshness, Loaded, fetch_signed};
+use super::sync::{
+    Freshness, Loaded, Missing, fetch_signed, path_cache_dir, path_floor, v1_1_sibling,
+};
 use super::{INDEX_FILE, MAX_REPOSITORY_INDEX_BYTES, RegistryError};
 use crate::verify::{RegistryKeys, check_sequence};
 use mumcord_store::PluginRepository;
@@ -88,21 +90,81 @@ pub enum RepoOutcome {
 }
 
 /// Refreshes `repository`. `cache_dir` is this repository's own offline copy directory.
+///
+/// FR-9.19: an address ending in `/v1/index.json` is first tried as the sibling
+/// `/v1.1/index.json` (same pinned key, limits and rollback rules, its own `sequence`); only an
+/// HTTP 404 there falls back to the added address. Other sibling failures keep the sibling's
+/// cached copy, like any index. `repository.last_sequence` seeds the rollback floor of the added
+/// address until a sibling was seen; each path then keeps its own floor with its cached copy.
 pub async fn fetch_repository(
     client: &Client,
     cache_dir: &Path,
     repository: &PluginRepository,
     is_official_id: &(dyn Fn(&str) -> bool + Sync),
 ) -> Result<RepoOutcome, RegistryError> {
-    let url = check_repository_url(&repository.url, client.policy().allow_localhost_http)?;
+    let added = check_repository_url(&repository.url, client.policy().allow_localhost_http)?;
     let pinned = normalize_key(&repository.public_key)
         .ok_or_else(|| RegistryError::Format("the pinned key is not a minisign key".into()))?;
-    let last_seen = u64::try_from(repository.last_sequence).ok();
-    let accept = |bytes: &[u8], signature: &str| {
-        accept_repository(bytes, signature, &pinned, last_seen, is_official_id)
+    let mut last_seen = u64::try_from(repository.last_sequence).ok();
+    if let Some(sibling) = v1_1_sibling(&added, INDEX_FILE) {
+        let cache = Cache::new(&path_cache_dir(cache_dir, true), INDEX_FILE);
+        if cache.load().is_some() {
+            last_seen = None;
+        }
+        let sibling = fetch_path(
+            client,
+            is_official_id,
+            &sibling,
+            &cache,
+            &pinned,
+            None,
+            Missing::Error,
+        );
+        match sibling.await {
+            Err(RegistryError::Status(404)) => {}
+            result => return result,
+        }
+    }
+    let cache = Cache::new(&path_cache_dir(cache_dir, false), INDEX_FILE);
+    let path = fetch_path(
+        client,
+        is_official_id,
+        &added,
+        &cache,
+        &pinned,
+        last_seen,
+        Missing::Offline,
+    );
+    path.await
+}
+
+/// Fetches one path of a repository. `stored` is the remembered sequence for this path, if any.
+async fn fetch_path(
+    client: &Client,
+    is_official_id: &(dyn Fn(&str) -> bool + Sync),
+    url: &Url,
+    cache: &Cache,
+    pinned: &str,
+    stored: Option<u64>,
+    missing: Missing,
+) -> Result<RepoOutcome, RegistryError> {
+    let read = |bytes: &[u8], signature: &str| {
+        accept_repository(bytes, signature, pinned, None, is_official_id)
+            .map(|(index, _)| index.sequence)
     };
-    let cache = Cache::new(cache_dir, INDEX_FILE);
-    let result = fetch_signed(client, &url, MAX_REPOSITORY_INDEX_BYTES, &cache, accept).await;
+    let floor = path_floor(cache, read, stored);
+    let accept = |bytes: &[u8], signature: &str| {
+        accept_repository(bytes, signature, pinned, floor, is_official_id)
+    };
+    let result = fetch_signed(
+        client,
+        url,
+        MAX_REPOSITORY_INDEX_BYTES,
+        cache,
+        missing,
+        accept,
+    )
+    .await;
     let key_changed = |new_key: String| RepoOutcome::KeyChanged {
         fingerprint: key_fingerprint(&new_key).unwrap_or_default(),
         new_key,

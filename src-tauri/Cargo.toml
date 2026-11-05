@@ -91,6 +91,10 @@ windows-sys = { workspace = true, features = [
 windows = { version = "0.62", features = ["Foundation", "Media_Control"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
+# `unstable`: plugin frames as child web views of the main window (plugins/child_webview.rs).
+tauri = { version = "2.12", features = ["macos-private-api", "unstable"] }
+# WKWebView runtime features (plugin frame measures, see plugins/webview.rs).
+objc2.workspace = true
 # Mouse-button push-to-talk: listen-only event tap and the Accessibility check.
 core-graphics.workspace = true
 core-foundation.workspace = true

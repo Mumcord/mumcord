@@ -70,7 +70,7 @@ function MainScreen() {
     <>
       <AppShell
         inert={overlay !== null && !previewing}
-        mediaPanel={media.cinema !== null}
+        mediaPanel={media.cinema === "watch" || media.cinema === "share"}
         slots={{
           servers: <ServersMount />,
           channels: <ChannelsMount />,

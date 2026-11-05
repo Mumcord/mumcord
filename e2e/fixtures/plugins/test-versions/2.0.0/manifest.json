@@ -1,0 +1,15 @@
+{
+  "manifest": 1,
+  "id": "test-versions",
+  "name": "Fixture versions",
+  "description": "E2E test plugin: version 2.0.0, built for API 1.1 (version choice).",
+  "version": "2.0.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel"]
+  }
+}

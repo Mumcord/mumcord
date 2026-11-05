@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Pluginuri",
+  "moreItems": "Mai multe pluginuri…",
+  "subline": "{{plugin}} · Neoficial",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Intrările de plugin afișează întotdeauna numele pluginului. Gestionează-le în Setări → Pluginuri.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Se repornește după o problemă, încearcă din nou într-o clipă"
 }

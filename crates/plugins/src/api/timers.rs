@@ -187,6 +187,7 @@ fn run(shared: &Shared) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::api::v1_1::Down;
     use crate::diag::Diagnostics;
     use crate::runtime::Next;
 
@@ -196,8 +197,8 @@ mod tests {
 
     fn next_timer(queue: &EventQueue) -> TimerId {
         match queue.pop() {
-            Next::Event(event, _) => match *event {
-                Event::Timer(id) => id,
+            Next::Event(event, _) => match event.down() {
+                Some(Event::Timer(id)) => id,
                 _ => panic!("expected a timer event"),
             },
             _ => panic!("expected a timer event"),

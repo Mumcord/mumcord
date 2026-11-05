@@ -24,7 +24,8 @@
   "pill": {
     "none": "Keine neuen Berechtigungen",
     "permission": "Braucht eine neue Berechtigung",
-    "author": "Neuer Autor"
+    "author": "Neuer Autor",
+    "websites": "Kommuniziert mit neuen Websites"
   },
   "newPermissions": "Neue Berechtigungen",
   "revoked": {
@@ -45,5 +46,63 @@
     "save": "Speichern",
     "notNow": "Nicht jetzt",
     "failed": "Die Berechtigungen von {{name}} konnten nicht geändert werden. Bitte versuche es erneut."
+  },
+  "waitingHeading": "Wartende Updates",
+  "autoNote": "Automatische Updates werden nur installiert, wenn das Plugin nichts Neues anfragt und seine Bewertung in derselben Stufe bleibt oder sinkt. Alles andere wartet hier.",
+  "needsMumcord": "Update verfügbar, sobald Mumcord aktualisiert ist",
+  "band": {
+    "low": "Gering",
+    "medium": "Mittel",
+    "high": "Hoch"
+  },
+  "hold": {
+    "newWebsites_one": "Dieses Update möchte mit {{count}} neuer Website kommunizieren. {{name}} bleibt auf {{version}}, bis du dich entscheidest.",
+    "newWebsites_other": "Dieses Update möchte mit {{count}} neuen Websites kommunizieren. {{name}} bleibt auf {{version}}, bis du dich entscheidest.",
+    "riskUp": "Nicht automatisch installiert: Das Risiko ist von {{from}} auf {{to}} gestiegen. Prüfe es zuerst.",
+    "scoreUp": "Nicht automatisch installiert: Die Bewertung ist von {{from}} auf {{to}} gestiegen. Prüfe sie zuerst.",
+    "blockedBySafety": "Nicht installiert: Diese Version hat ein hohes Risiko, und „Plugins mit hohem Risiko nicht erlauben“ ist eingeschaltet.",
+    "scoreUnknown": "Nicht automatisch installiert: Die Sicherheitsbewertung dieser Version konnte nicht berechnet werden. Prüfe sie zuerst."
+  },
+  "score": {
+    "label": "Sicherheitsbewertung:",
+    "unchanged": "unverändert",
+    "points": "Punkte",
+    "goesUp": ", das Risiko steigt",
+    "goesDown": ", das Risiko sinkt"
+  },
+  "dialog": {
+    "title": "{{name}} auf {{version}} aktualisieren?",
+    "now": "jetzt {{version}}",
+    "sameKey": "gleicher Autorenschlüssel",
+    "newKey": "neuer Autorenschlüssel",
+    "newWebsites_one": "Dieses Update möchte mit {{count}} neuer Website kommunizieren.",
+    "newWebsites_other": "Dieses Update möchte mit {{count}} neuen Websites kommunizieren.",
+    "staysOn": "{{name}} bleibt auf {{version}}, bis du dich entscheidest.",
+    "otherDomain": "Eine davon liegt nicht auf der eigenen Domain des Plugins.",
+    "whatsNew": "Neuerungen in {{version}}",
+    "websitesLead": "{{name}} und seine Seite könnten dann diese erreichen:",
+    "websitesWarning": "Diese Websites können deine IP-Adresse und alles sehen, was {{name}} ihnen sendet.",
+    "websitesLabel": "Websites",
+    "new": "Neu",
+    "changed": "Geändert",
+    "noOtherPermissions": "Keine anderen Berechtigungen ändern sich.",
+    "scoreNow": "Jetzt ({{version}})",
+    "scoreAfter": "Nach dem Update ({{version}})",
+    "meterNow": "Sicherheitsbewertung jetzt",
+    "meterAfter": "Sicherheitsbewertung nach dem Update",
+    "riskUpBy_one": "Das Risiko steigt um {{count}} Punkt",
+    "riskUpBy_other": "Das Risiko steigt um {{count}} Punkte",
+    "asksForMore": "weil diese Version um mehr bittet:",
+    "permissionsLabel": "Neue Berechtigungen",
+    "recentChange": "Es zählt außerdem als jüngste Änderung: Neue Berechtigungen in den letzten {{versions}} Versionen bringen weitere +{{recent}} Punkte. Zusammen mit den +{{permissions}} oben (× {{multiplier}}) ergibt das die +{{total}}.",
+    "highTitle": "Dieses Update würde das Plugin zu einem Plugin mit hohem Risiko machen",
+    "highText": "Es wird nicht automatisch installiert. Bleibst du bei {{version}}, bleibt die aktuelle Bewertung bestehen; du kannst die Version unter „Installiert“ festsetzen.",
+    "highTick": "Ich weiß, dass das Risiko gestiegen ist, und vertraue dem Autor trotzdem",
+    "skipHint": "Wenn du überspringst, funktioniert {{version}} weiter.",
+    "skip": "Diese Version überspringen",
+    "notNow": "Nicht jetzt",
+    "allow": "Erlauben und aktualisieren",
+    "updateAnyway": "Trotzdem aktualisieren",
+    "failed": "{{name}} konnte nicht aktualisiert werden. Bitte versuche es erneut."
   }
 }

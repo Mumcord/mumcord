@@ -1,0 +1,4 @@
+{
+  "manifest.name": "Test Stage Official",
+  "manifest.description": "E2E test plugin: Test Stage served by the official fixture registry (Get plugin notice)."
+}

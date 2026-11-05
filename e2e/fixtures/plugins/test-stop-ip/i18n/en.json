@@ -1,0 +1,5 @@
+{
+  "manifest.description": "E2E hard-stop test plugin: declares an IP address; must never install.",
+  "manifest.name": "Fixture stop-ip",
+  "origin_0": "Loads the fixture content"
+}

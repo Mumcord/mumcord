@@ -5,6 +5,9 @@
 
 use super::PluginService;
 use super::plugin_io::{PeerInfo, PeersState, wit_peer};
+use crate::api::app_menu::{self, AppMenuEntry};
+use crate::api::webview::WebviewPlace;
+use crate::host::RunState;
 use crate::wit::events::{ActionSource, ActionValue, Event, PanelVisibility, UiAction};
 
 /// One user input for a plugin's UI.
@@ -27,15 +30,91 @@ pub enum UiInput {
     UserMenuRequested(u32),
     /// The user closed the plugin's dialog.
     DialogClosed,
-    /// A bridge message from the plugin's web view page (untrusted, never logged). Dropped
-    /// unless the web view is open and the message fits the size and rate limits.
-    WebviewMessage(String),
+    /// A bridge message from the plugin's page in `place` (untrusted, never logged). Dropped
+    /// unless that frame is open and the message fits its size limit and the rate. The plugin
+    /// gets the text only: `webview-message` carries no place (pages that share one plugin tell
+    /// themselves apart in their own payload).
+    WebviewMessage { place: WebviewPlace, text: String },
+    /// A genuine click or key press inside the plugin's page in `place`, reported by the page's
+    /// bootstrap with its frame key (checked by the app). Counts as a user gesture for the plugin
+    /// (FR-9.45) while that frame is open, at most every [`MIN_GESTURE_INTERVAL`]; the plugin
+    /// gets no event.
+    ///
+    /// [`MIN_GESTURE_INTERVAL`]: crate::api::webview::MIN_GESTURE_INTERVAL
+    WebviewGesture(WebviewPlace),
+    /// The user closed the plugin's frame in `place` (its close button), or another plugin's
+    /// side panel replaced it ([`super::ServiceEvent::SurfaceClosed`]). The frame closes; a
+    /// plugin built for API 1.1 gets `surface-closed`.
+    SurfaceClosed(WebviewPlace),
 }
 
 impl PluginService {
     /// The web view state, shared with the app's `mumcord-web` protocol and bridge (FR-6.47).
     pub fn webviews(&self) -> std::sync::Arc<crate::api::webview::Webviews> {
         std::sync::Arc::clone(self.io.webviews())
+    }
+
+    /// The Apps-menu items of the running plugins that hold `ui.app-menu`, in menu order
+    /// (plugins by id, items as in the manifest). The UI shows the first 8 and puts the rest
+    /// under "More plugins…" (FR-9.53).
+    pub fn app_menu(&self) -> Vec<AppMenuEntry> {
+        let shown = self
+            .loaded_ids()
+            .into_iter()
+            .filter(|id| self.menu_shown(id))
+            .filter_map(|id| {
+                let name = self.host.manifest(&id)?.name.clone();
+                Some((id, name))
+            })
+            .collect();
+        self.io.app_menus().entries(&shown)
+    }
+
+    fn menu_shown(&self, id: &str) -> bool {
+        matches!(self.host.state(id), Some(RunState::Running))
+            && self.ctx.grants.allows(id, app_menu::PERMISSION)
+    }
+
+    /// The user chose Apps-menu item `item` of plugin `id`: opens the 8 s chat gesture window
+    /// and sends `app-menu-activated` (FR-9.55). Returns false, sending nothing, when the item
+    /// is unknown or disabled, or the plugin is not running or lacks `ui.app-menu`.
+    pub fn app_menu_activate(&self, id: &str, item: &str) -> bool {
+        if !self.menu_shown(id) || !self.io.app_menus().is_enabled(id, item) {
+            return false;
+        }
+        self.command_gesture(id);
+        self.host.send_app_menu_activated(id, item)
+    }
+
+    /// The plugin's stage tab became visible or hidden (`stage-visibility-changed`, FR-9.46).
+    /// Returns false when the plugin is not running or lacks `ui.stage`.
+    pub fn stage_visibility(&self, id: &str, visible: bool) -> bool {
+        self.host.send_stage(
+            id,
+            crate::runtime::PluginEvent::StageVisibilityChanged(visible),
+        )
+    }
+
+    /// The user acted in the plugin's stage tree: a `ui-action` from the `stage` slot (a 1.1
+    /// slot, so it skips the 1.0 path of [`Self::ui_input`]). Opens the chat gesture window.
+    pub fn stage_action(&self, id: &str, action: String, value: ActionValue) -> bool {
+        use crate::api::v1_1::wit::{events as v1_1, ui::Slot};
+        self.gesture(id);
+        self.host.send_stage(
+            id,
+            crate::runtime::PluginEvent::UiAction(v1_1::UiAction {
+                source: v1_1::ActionSource::Slot(Slot::Stage),
+                action,
+                value: match value {
+                    ActionValue::None => v1_1::ActionValue::None,
+                    ActionValue::Boolean(v) => v1_1::ActionValue::Boolean(v),
+                    ActionValue::Number(v) => v1_1::ActionValue::Number(v),
+                    ActionValue::Text(v) => v1_1::ActionValue::Text(v),
+                    ActionValue::Reorder(v) => v1_1::ActionValue::Reorder(v),
+                    ActionValue::File(v) => v1_1::ActionValue::File(v),
+                },
+            }),
+        )
     }
 
     /// Delivers a UI input to a running plugin. Returns false when the plugin is not running,
@@ -74,15 +153,29 @@ impl PluginService {
                 None => return false,
             },
             UiInput::DialogClosed => Event::DialogClosed,
-            UiInput::WebviewMessage(text) => {
+            UiInput::WebviewMessage { place, text } => {
                 if !self
                     .io
                     .webviews()
-                    .accept_from_page(id, &text, std::time::Instant::now())
+                    .accept_from_page(id, place, &text, std::time::Instant::now())
                 {
                     return false;
                 }
                 Event::WebviewMessage(text)
+            }
+            UiInput::WebviewGesture(place) => {
+                let counted =
+                    self.io
+                        .webviews()
+                        .accept_gesture(id, place, std::time::Instant::now());
+                if counted {
+                    self.gesture(id);
+                }
+                return counted;
+            }
+            UiInput::SurfaceClosed(place) => {
+                self.io.webviews().close(id, place);
+                return self.host.send_surface_closed(id, place);
             }
         };
         self.host.send_chat(id, event, chat)

@@ -1,0 +1,95 @@
+MIT License
+
+Copyright (c) 2026 Janos Sonntag
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+NOTE: the grant above is not the whole of this file, and this distribution is
+not MIT-only.  It contains third-party material that is licensed to you by its
+own publishers and not by the copyright holder named above — see clauses 4 and
+5 below, and THIRD_PARTY_NOTICES.md, which must accompany any redistribution.
+
+==============================================================================
+
+This project contains multiple components that are distributed under separate
+licenses.  Unless otherwise specified in a file’s header, the following rules
+apply.  Clauses 1 to 3 are subject to clauses 4 and 5, which govern material
+this project did not author and cannot license.
+
+1. Source Code
+   All source code files (including but not limited to C, Python, CMake, and
+   build‑system files) are licensed under the MIT License shown above.
+
+2. Documentation
+   All files inside the doc/ directory and any other Markdown files that serve
+   as documentation are licensed under the Creative Commons Attribution 4.0
+   International License (CC BY 4.0).
+   To view a copy of this license, visit:
+   https://creativecommons.org/licenses/by/4.0/
+
+3. Example Files
+   All files inside the examples/ directory are dedicated to the public domain
+   via the Creative Commons CC0 1.0 Universal (CC0) license.
+   To view a copy of this dedication, visit:
+   https://creativecommons.org/publicdomain/zero/1.0/
+
+4. Third‑Party Vocabulary Data
+   The unit‑profile tables in src/gendata/ — and the C tables generated from
+   them, which are compiled into the library, the single‑file amalgamation, the
+   WebAssembly build and the Python wheel — incorporate identifier strings from
+   six external vocabularies: UCUM, QUDT, OM 2, UDUNITS‑2, the CF standard name
+   table, and UN/ECE Recommendations 20 and 21.  Documentation under doc/ that
+   tabulates those identifiers incorporates them likewise.
+
+   Those identifiers remain the property of their publishers and are used under
+   the licenses recorded, in full and per vocabulary, in THIRD_PARTY_NOTICES.md
+   in the root of this distribution.  Some of those licenses impose conditions —
+   attribution in particular — that the MIT License does not; one of them (UCUM)
+   is more restrictive than the MIT License and its position is stated openly in
+   that file.
+
+   The grants in clauses 1 and 2 extend to this project's own contribution: the
+   native unit registry, the translation targets, the refusal rationales, the
+   generators, and the surrounding code and prose.  They do not extend to the
+   third‑party identifiers, and nothing here grants a right in them that this
+   project does not hold.  Anyone redistributing this software, in source or
+   binary form, must carry THIRD_PARTY_NOTICES.md with it.
+
+   No upstream artefact is redistributed by this project.  The publishers' own
+   machine‑readable definitions are fetched only into a git‑ignored build
+   directory, where they serve to verify the tables, and are never packaged.
+
+5. Other Third‑Party Material
+   This project ships further material it did not author, of several kinds: the
+   webfonts under web/fonts/ (SIL Open Font License 1.1 — the licence text is
+   served beside them, in web/fonts/OFL.txt, because that licence requires it to
+   accompany every copy); the vendored JavaScript libraries under web/
+   (highlight.js, BSD‑3‑Clause; marked, MIT); the NASA earth imagery; the
+   Emscripten runtime code inside the committed WebAssembly artifacts; an
+   algorithm the date routines are derived from; and the adapted text of
+   CODE_OF_CONDUCT.md.
+
+   PART 2 OF THIRD_PARTY_NOTICES.md IS THE AUTHORITATIVE LIST, not the sentence
+   above, which is a summary and has twice been found out of date.  Clauses 1 to
+   3 do not extend to any material recorded there, whether or not this clause
+   names it.
+
+   Most of that material is permissively licensed and asks only to be
+   attributed.  Not all of it: THIRD_PARTY_NOTICES.md marks the exceptions, and
+   marks them as open questions rather than settled ones.

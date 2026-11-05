@@ -34,6 +34,7 @@ world plugin {
   import app-menu;
   import relay;
   import audio;
+  import files;
 
   /// Called once after the plugin is enabled. An error keeps the plugin off and is shown to the
   /// user.

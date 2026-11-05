@@ -78,6 +78,16 @@
       "keys": "↑ ↓ Größe ändern · Bild↑/Bild↓ rasten ein · Pos1/Ende · Eingabe setzt zurück",
       "releaseHint": "Loslassen, um auf die Minileiste zu verkleinern",
       "minimised": "Medienbereich verkleinert"
+    },
+    "stage": {
+      "tabs": "Was der Medienbereich zeigt",
+      "hint": "Umschalten beendet nichts",
+      "share": "Bildschirmfreigabe",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, Tab {{index}} von {{count}}",
+      "tabNameNew": "{{label}}, neu, Tab {{index}} von {{count}}",
+      "pluginTabName": "{{label}}, Plugin-Aktivität, Tab {{index}} von {{count}}",
+      "pluginTabNameNew": "{{label}}, Plugin-Aktivität, neu, Tab {{index}} von {{count}}"
     }
   }
 }

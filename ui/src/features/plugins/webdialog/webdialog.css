@@ -1,0 +1,111 @@
+/* The plugin web dialog (mockup 05): 46 rem wide, frame 26 rem high by default, never above
+   34 rem in total (FR-9.35). A plugin's size hint can only make the frame taller. */
+.settings-dialog.plugin-web-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-sizing: border-box;
+  width: min(46rem, calc(100vw - 2 * var(--space-4)));
+  max-width: none;
+  max-height: min(34rem, calc(100vh - 2 * var(--space-4)));
+  overflow: hidden;
+}
+
+.plugin-web-dialog__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.plugin-web-dialog__head h3 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plugin-web-dialog__icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent, #fff);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  object-fit: cover;
+}
+
+/* Dashed like the other "Unofficial" chips: the plugin is not from Mumcord's own list. */
+.plugin-web-dialog__chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  max-width: 14rem;
+  padding: 1px var(--space-2);
+  overflow: hidden;
+  border: 1px dashed color-mix(in srgb, var(--color-warning) 60%, transparent);
+  border-radius: var(--radius-full);
+  color: var(--color-warning);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plugin-web-dialog__close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.plugin-web-dialog__close:hover {
+  background: var(--color-bg-hover);
+}
+
+.plugin-web-dialog__close:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.plugin-web-dialog__body {
+  display: flex;
+  flex: 1;
+  min-height: min(var(--plugin-dialog-min-height, 26rem), 26rem);
+  /* Wins over the default only when the plugin asked for more, up to what fits. */
+  height: max(26rem, var(--plugin-dialog-min-height, 0px));
+  max-height: 100%;
+}
+
+.plugin-web-dialog__body .plugin-frame {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
+.plugin-web-dialog__footer {
+  margin: 0;
+}
+
+@media (forced-colors: active) {
+  .plugin-web-dialog__chip {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+
+  .plugin-web-dialog__close {
+    border: 1px solid ButtonText;
+    color: ButtonText;
+  }
+}

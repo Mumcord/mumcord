@@ -37,7 +37,7 @@ export function PopoutButtons({
         aria-label={t("media.popOut")}
         data-tooltip={t("media.popOut")}
         onClick={() => {
-          popOut(kind, { serverId, session }, title, t("media.popOutFailed"));
+          popOut(kind, { serverId, session, plugin: null }, title, t("media.popOutFailed"));
         }}
       >
         <MediaIcon name="open" />

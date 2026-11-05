@@ -180,7 +180,7 @@ jobs:
       # tar keeps the CLI's executable bit that artifacts would drop.
       - name: Package plugin CLI and packages
         if: github.event_name != 'push'
-        run: tar -C "$RUNNER_TEMP/plugins" -cf - bin staged | zstd -T0 -3 -q -o e2e-plugins.tar.zst
+        run: tar -C "$RUNNER_TEMP/plugins" -cf - bin staged packages | zstd -T0 -3 -q -o e2e-plugins.tar.zst
 
       - if: github.event_name != 'push'
         uses: actions/upload-artifact@v7

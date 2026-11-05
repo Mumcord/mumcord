@@ -24,7 +24,8 @@
   "pill": {
     "none": "Nėra naujų leidimų",
     "permission": "Reikia naujo leidimo",
-    "author": "Naujas autorius"
+    "author": "Naujas autorius",
+    "websites": "Jungiasi prie naujų svetainių"
   },
   "newPermissions": "Nauji leidimai",
   "revoked": {
@@ -45,5 +46,69 @@
     "save": "Išsaugoti",
     "notNow": "Ne dabar",
     "failed": "Nepavyko pakeisti {{name}} leidimų. Bandykite dar kartą."
+  },
+  "waitingHeading": "Laukiantys naujinimai",
+  "autoNote": "Automatiniai naujinimai įdiegiami tik tada, kai papildinys neprašo nieko naujo, o jo balas lieka toje pačioje grupėje arba sumažėja. Visa kita laukia čia.",
+  "needsMumcord": "Atnaujinus Mumcord bus galima atnaujinti",
+  "band": {
+    "low": "Maža",
+    "medium": "Vidutinė",
+    "high": "Didelė"
+  },
+  "hold": {
+    "newWebsites_one": "Šis naujinimas nori jungtis prie {{count}} naujos svetainės. {{name}} lieka ties {{version}}, kol nuspręsi.",
+    "newWebsites_few": "Šis naujinimas nori jungtis prie {{count}} naujų svetainių. {{name}} lieka ties {{version}}, kol nuspręsi.",
+    "newWebsites_many": "Šis naujinimas nori jungtis prie {{count}} naujų svetainių. {{name}} lieka ties {{version}}, kol nuspręsi.",
+    "newWebsites_other": "Šis naujinimas nori jungtis prie {{count}} naujų svetainių. {{name}} lieka ties {{version}}, kol nuspręsi.",
+    "riskUp": "Neįdiegta automatiškai: rizika išaugo nuo {{from}} iki {{to}}. Pirmiausia peržiūrėk.",
+    "scoreUp": "Neįdiegta automatiškai: balas išaugo nuo {{from}} iki {{to}}. Pirmiausia peržiūrėk.",
+    "blockedBySafety": "Neįdiegta: ši versija yra didelės rizikos, o „Neleisti didelės rizikos papildinių“ įjungta.",
+    "scoreUnknown": "Neįdiegta automatiškai: šios versijos saugumo balo apskaičiuoti nepavyko. Pirmiausia peržiūrėk."
+  },
+  "score": {
+    "label": "Saugumo balas:",
+    "unchanged": "nepakito",
+    "points": "taškų",
+    "goesUp": ", rizika didėja",
+    "goesDown": ", rizika mažėja"
+  },
+  "dialog": {
+    "title": "Atnaujinti {{name}} į {{version}}?",
+    "now": "dabar {{version}}",
+    "sameKey": "tas pats autoriaus raktas",
+    "newKey": "naujas autoriaus raktas",
+    "newWebsites_one": "Šis naujinimas nori jungtis prie {{count}} naujos svetainės.",
+    "newWebsites_few": "Šis naujinimas nori jungtis prie {{count}} naujų svetainių.",
+    "newWebsites_many": "Šis naujinimas nori jungtis prie {{count}} naujų svetainių.",
+    "newWebsites_other": "Šis naujinimas nori jungtis prie {{count}} naujų svetainių.",
+    "staysOn": "{{name}} lieka ties {{version}}, kol nuspręsi.",
+    "otherDomain": "Viena iš jų nėra paties papildinio domene.",
+    "whatsNew": "Kas naujo {{version}} versijoje",
+    "websitesLead": "{{name}} ir jo puslapis tada galėtų pasiekti:",
+    "websitesWarning": "Šios svetainės gali matyti tavo IP adresą ir viską, ką {{name}} joms siunčia.",
+    "websitesLabel": "Svetainės",
+    "new": "Nauja",
+    "changed": "Pakeista",
+    "noOtherPermissions": "Kiti leidimai nesikeičia.",
+    "scoreNow": "Dabar ({{version}})",
+    "scoreAfter": "Po naujinimo ({{version}})",
+    "meterNow": "Saugumo balas dabar",
+    "meterAfter": "Saugumo balas po naujinimo",
+    "riskUpBy_one": "Rizika didėja {{count}} tašku",
+    "riskUpBy_few": "Rizika didėja {{count}} taškais",
+    "riskUpBy_many": "Rizika didėja {{count}} taško",
+    "riskUpBy_other": "Rizika didėja {{count}} taškų",
+    "asksForMore": "nes ši versija prašo daugiau:",
+    "permissionsLabel": "Nauji leidimai",
+    "recentChange": "Tai taip pat laikoma naujausiu pakeitimu: nauji leidimai per paskutines {{versions}} versijų prideda dar +{{recent}} taškų. Kartu su aukščiau esančiais +{{permissions}} (× {{multiplier}}) tai sudaro +{{total}}.",
+    "highTitle": "Dėl šio naujinimo papildinys taptų didelės rizikos",
+    "highText": "Automatiškai jis neįdiegiamas. Likus prie {{version}}, dabartinis balas nesikeičia; versiją gali prisegti skiltyje Įdiegti.",
+    "highTick": "Suprantu, kad rizika padidėjo, ir vis tiek pasitikiu autoriumi",
+    "skipHint": "Praleidus {{version}} toliau veiks.",
+    "skip": "Praleisti šią versiją",
+    "notNow": "Ne dabar",
+    "allow": "Leisti ir atnaujinti",
+    "updateAnyway": "Vis tiek atnaujinti",
+    "failed": "Nepavyko atnaujinti {{name}}. Bandyk dar kartą."
   }
 }

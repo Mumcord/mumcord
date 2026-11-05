@@ -30,6 +30,8 @@ function plugin(id: string, name: string, enabled = true): InstalledPlugin {
     authors: [],
     chatPatterns: [],
     offered: [],
+    appMenuItems: 0,
+    webSize: null,
   };
 }
 
@@ -47,7 +49,7 @@ vi.mock("../webview", () => ({
     webviewMock.open && place === "panelPopover"
       ? { place, url: "mumcord-web://x/index.html", seq: 1 }
       : undefined,
-  PluginWebView: ({ plugin }: { plugin: string }) => <div data-testid="wv">{plugin}</div>,
+  PluginFrame: ({ plugin }: { plugin: string }) => <div data-testid="wv">{plugin}</div>,
 }));
 
 vi.mock("../render/usePluginIcon", () => ({

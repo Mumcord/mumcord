@@ -594,6 +594,20 @@ pub enum EngineEvent {
     ScreenEncoderStatusChanged(crate::screen_share::EncoderStatus),
     /// What the server info panel shows about the server's relay changed (FR-4.20).
     RelayChanged(crate::peer::RelayInfo),
+    /// A plugin message from `session` through the relay (spec 09 FR-9.62): new, in order per
+    /// sender. `api` is the sender plugin's API major.minor; `data` stays opaque (FR-9.94).
+    PluginRelayData {
+        session: u32,
+        plugin: String,
+        api: (u8, u8),
+        data: crate::plugin_relay::Opaque,
+    },
+    /// The receivers in the own plugin-data broadcast changed (spec 09 FR-9.59, FR-9.61): the
+    /// plugin service sends fallback-sized channel messages through Mumble plugin data to the
+    /// members that are not in `joined`.
+    PluginRelayJoined {
+        joined: Vec<u32>,
+    },
     /// A P2P connection to `session` opened (`Some`, with how it travels) or closed (`None`)
     /// (FR-4.19).
     P2pLinkChanged {

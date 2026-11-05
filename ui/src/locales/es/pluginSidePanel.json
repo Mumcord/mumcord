@@ -1,0 +1,9 @@
+{
+  "region": "Panel lateral de {{plugin}}",
+  "close": "Cerrar el panel lateral de {{plugin}}",
+  "resize": "Cambiar el tamaño del panel lateral de {{plugin}}",
+  "failed": "No se pudo cerrar el panel lateral de {{plugin}}. Inténtalo de nuevo.",
+  "options": "Opciones de {{plugin}}",
+  "details": "Detalles del complemento",
+  "closePanel": "Cerrar el panel"
+}

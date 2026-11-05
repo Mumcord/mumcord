@@ -1,0 +1,48 @@
+{
+  "manifest": 1,
+  "id": "test-score-high",
+  "name": "Fixture score-high",
+  "description": "E2E test plugin that scores High risk: three websites, web surfaces and many yellow permissions.",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": [
+      "ui.panel",
+      "ui.stage",
+      "ui.side-panel",
+      "ui.webview",
+      "net.origins",
+      "peers.relay",
+      "peers.messages",
+      "chat.send",
+      "events.voice",
+      "events.presence"
+    ]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "https://fixture-a.example",
+        "purpose": "origin_0"
+      },
+      {
+        "origin": "https://fixture-b.example",
+        "purpose": "origin_1"
+      },
+      {
+        "origin": "wss://fixture-c.example",
+        "purpose": "origin_2"
+      }
+    ]
+  },
+  "stage": {
+    "title": "Fixture stage"
+  },
+  "webview": {
+    "places": ["stage", "side-panel"]
+  }
+}

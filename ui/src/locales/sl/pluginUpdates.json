@@ -24,7 +24,8 @@
   "pill": {
     "none": "Brez novih dovoljenj",
     "permission": "Potrebuje novo dovoljenje",
-    "author": "Nov avtor"
+    "author": "Nov avtor",
+    "websites": "Komunicira z novimi spletnimi mesti"
   },
   "newPermissions": "Nova dovoljenja",
   "revoked": {
@@ -45,5 +46,69 @@
     "save": "Shrani",
     "notNow": "Ne zdaj",
     "failed": "Dovoljenj za {{name}} ni bilo mogoče spremeniti. Poskusite znova."
+  },
+  "waitingHeading": "Posodobitve čakajo",
+  "autoNote": "Samodejne posodobitve se namestijo samo, če vtičnik ne zahteva ničesar novega in njegova ocena ostane v istem razredu ali pade. Vse ostalo čaka tukaj.",
+  "needsMumcord": "Posodobitev je na voljo po posodobitvi Mumcorda",
+  "band": {
+    "low": "Nizko",
+    "medium": "Srednje",
+    "high": "Visoko"
+  },
+  "hold": {
+    "newWebsites_one": "Ta posodobitev želi komunicirati z {{count}} novim spletnim mestom. {{name}} ostane na {{version}}, dokler se ne odločiš.",
+    "newWebsites_two": "Ta posodobitev želi komunicirati z {{count}} novima spletnima mestoma. {{name}} ostane na {{version}}, dokler se ne odločiš.",
+    "newWebsites_few": "Ta posodobitev želi komunicirati s {{count}} novimi spletnimi mesti. {{name}} ostane na {{version}}, dokler se ne odločiš.",
+    "newWebsites_other": "Ta posodobitev želi komunicirati s {{count}} novimi spletnimi mesti. {{name}} ostane na {{version}}, dokler se ne odločiš.",
+    "riskUp": "Ni nameščeno samodejno: tveganje se je povečalo z {{from}} na {{to}}. Najprej ga preglej.",
+    "scoreUp": "Ni nameščeno samodejno: ocena se je povečala z {{from}} na {{to}}. Najprej jo preglej.",
+    "blockedBySafety": "Ni nameščeno: ta različica ima visoko tveganje, »Ne dovoli vtičnikov z visokim tveganjem« pa je vklopljeno.",
+    "scoreUnknown": "Ni nameščeno samodejno: varnostne ocene te različice ni bilo mogoče izračunati. Najprej jo preglej."
+  },
+  "score": {
+    "label": "Varnostna ocena:",
+    "unchanged": "nespremenjeno",
+    "points": "točk",
+    "goesUp": ", tveganje se poveča",
+    "goesDown": ", tveganje se zmanjša"
+  },
+  "dialog": {
+    "title": "Posodobim {{name}} na {{version}}?",
+    "now": "zdaj {{version}}",
+    "sameKey": "isti ključ avtorja",
+    "newKey": "nov ključ avtorja",
+    "newWebsites_one": "Ta posodobitev želi komunicirati z {{count}} novim spletnim mestom.",
+    "newWebsites_two": "Ta posodobitev želi komunicirati z {{count}} novima spletnima mestoma.",
+    "newWebsites_few": "Ta posodobitev želi komunicirati s {{count}} novimi spletnimi mesti.",
+    "newWebsites_other": "Ta posodobitev želi komunicirati s {{count}} novimi spletnimi mesti.",
+    "staysOn": "{{name}} ostane na {{version}}, dokler se ne odločiš.",
+    "otherDomain": "Eno od njih ni na lastni domeni vtičnika.",
+    "whatsNew": "Kaj je novega v različici {{version}}",
+    "websitesLead": "{{name}} in njegova stran bi potem lahko dosegla:",
+    "websitesWarning": "Ta spletna mesta vidijo tvoj naslov IP in vse, kar jim pošlje {{name}}.",
+    "websitesLabel": "Spletna mesta",
+    "new": "Novo",
+    "changed": "Spremenjeno",
+    "noOtherPermissions": "Druga dovoljenja se ne spremenijo.",
+    "scoreNow": "Zdaj ({{version}})",
+    "scoreAfter": "Po posodobitvi ({{version}})",
+    "meterNow": "Varnostna ocena zdaj",
+    "meterAfter": "Varnostna ocena po posodobitvi",
+    "riskUpBy_one": "Tveganje se poveča za {{count}} točko",
+    "riskUpBy_two": "Tveganje se poveča za {{count}} točki",
+    "riskUpBy_few": "Tveganje se poveča za {{count}} točke",
+    "riskUpBy_other": "Tveganje se poveča za {{count}} točk",
+    "asksForMore": "ker ta različica zahteva več:",
+    "permissionsLabel": "Nova dovoljenja",
+    "recentChange": "Šteje tudi kot nedavna sprememba: nova dovoljenja v zadnjih {{versions}} različicah dodajo še +{{recent}} točk. Skupaj z zgornjimi +{{permissions}} (× {{multiplier}}) je to +{{total}}.",
+    "highTitle": "Ta posodobitev bi vtičnik spremenila v vtičnik z visokim tveganjem",
+    "highText": "Ne bo se namestila samodejno. Če ostaneš na {{version}}, ostane trenutna ocena; različico lahko pripneš v Nameščeni.",
+    "highTick": "Razumem, da se je tveganje povečalo, in avtorju še vedno zaupam",
+    "skipHint": "Če preskočiš, {{version}} še naprej deluje.",
+    "skip": "Preskoči to različico",
+    "notNow": "Ne zdaj",
+    "allow": "Dovoli in posodobi",
+    "updateAnyway": "Vseeno posodobi",
+    "failed": "{{name}} ni bilo mogoče posodobiti. Poskusi znova."
   }
 }

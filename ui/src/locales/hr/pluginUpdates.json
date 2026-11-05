@@ -24,7 +24,8 @@
   "pill": {
     "none": "Nema novih dopuštenja",
     "permission": "Treba novo dopuštenje",
-    "author": "Novi autor"
+    "author": "Novi autor",
+    "websites": "Komunicira s novim web stranicama"
   },
   "newPermissions": "Nova dopuštenja",
   "revoked": {
@@ -45,5 +46,66 @@
     "save": "Spremi",
     "notNow": "Ne sada",
     "failed": "Dopuštenja za {{name}} nije bilo moguće promijeniti. Pokušajte ponovno."
+  },
+  "waitingHeading": "Ažuriranja na čekanju",
+  "autoNote": "Automatska ažuriranja instaliraju se samo kad dodatak ne traži ništa novo, a ocjena ostaje u istoj razini ili pada. Sve ostalo čeka ovdje.",
+  "needsMumcord": "Ažuriranje je dostupno nakon ažuriranja Mumcorda",
+  "band": {
+    "low": "Nizak",
+    "medium": "Srednji",
+    "high": "Visok"
+  },
+  "hold": {
+    "newWebsites_one": "Ovo ažuriranje želi komunicirati s {{count}} novom web stranicom. {{name}} ostaje na {{version}} dok ne odlučiš.",
+    "newWebsites_few": "Ovo ažuriranje želi komunicirati s {{count}} nove web stranice. {{name}} ostaje na {{version}} dok ne odlučiš.",
+    "newWebsites_other": "Ovo ažuriranje želi komunicirati s {{count}} novih web stranica. {{name}} ostaje na {{version}} dok ne odlučiš.",
+    "riskUp": "Ne instalira se automatski: rizik je porastao s {{from}} na {{to}}. Prvo ga pregledaj.",
+    "scoreUp": "Ne instalira se automatski: ocjena je porasla s {{from}} na {{to}}. Prvo je pregledaj.",
+    "blockedBySafety": "Nije instalirano: ova je verzija visokog rizika, a uključeno je „Ne dopuštaj dodatke visokog rizika”.",
+    "scoreUnknown": "Ne instalira se automatski: sigurnosna ocjena ove verzije nije se mogla izračunati. Prvo je pregledaj."
+  },
+  "score": {
+    "label": "Sigurnosna ocjena:",
+    "unchanged": "nepromijenjeno",
+    "points": "bodova",
+    "goesUp": ", rizik raste",
+    "goesDown": ", rizik pada"
+  },
+  "dialog": {
+    "title": "Ažurirati {{name}} na {{version}}?",
+    "now": "sada {{version}}",
+    "sameKey": "isti ključ autora",
+    "newKey": "novi ključ autora",
+    "newWebsites_one": "Ovo ažuriranje želi komunicirati s {{count}} novom web stranicom.",
+    "newWebsites_few": "Ovo ažuriranje želi komunicirati s {{count}} nove web stranice.",
+    "newWebsites_other": "Ovo ažuriranje želi komunicirati s {{count}} novih web stranica.",
+    "staysOn": "{{name}} ostaje na {{version}} dok ne odlučiš.",
+    "otherDomain": "Jedna od njih nije na vlastitoj domeni dodatka.",
+    "whatsNew": "Što je novo u verziji {{version}}",
+    "websitesLead": "{{name}} i njegova stranica tada bi mogli doseći:",
+    "websitesWarning": "Ove web stranice vide tvoju IP adresu i sve što im {{name}} pošalje.",
+    "websitesLabel": "Web stranice",
+    "new": "Novo",
+    "changed": "Promijenjeno",
+    "noOtherPermissions": "Nijedna druga dozvola se ne mijenja.",
+    "scoreNow": "Sada ({{version}})",
+    "scoreAfter": "Nakon ažuriranja ({{version}})",
+    "meterNow": "Sigurnosna ocjena sada",
+    "meterAfter": "Sigurnosna ocjena nakon ažuriranja",
+    "riskUpBy_one": "Rizik raste za {{count}} bod",
+    "riskUpBy_few": "Rizik raste za {{count}} boda",
+    "riskUpBy_other": "Rizik raste za {{count}} bodova",
+    "asksForMore": "jer ova verzija traži više:",
+    "permissionsLabel": "Nove dozvole",
+    "recentChange": "Ovo se računa i kao nedavna promjena: nove dozvole u zadnjih {{versions}} verzija dodaju još +{{recent}} bodova. Zajedno s gornjih +{{permissions}} (× {{multiplier}}) to je +{{total}}.",
+    "highTitle": "Ovo ažuriranje učinilo bi dodatak visokorizičnim",
+    "highText": "Neće se instalirati automatski. Ako ostaneš na {{version}}, trenutna ocjena ostaje; verziju možeš zamrznuti u Instalirano.",
+    "highTick": "Razumijem da je rizik porastao i i dalje vjerujem autoru",
+    "skipHint": "Preskakanjem {{version}} nastavlja raditi.",
+    "skip": "Preskoči ovu verziju",
+    "notNow": "Ne sada",
+    "allow": "Dopusti i ažuriraj",
+    "updateAnyway": "Ipak ažuriraj",
+    "failed": "{{name}} nije bilo moguće ažurirati. Pokušaj ponovno."
   }
 }

@@ -5,6 +5,10 @@
     "body": "Curtha as feidhm tar éis tuairteanna arís agus arís eile",
     "open": "Taispeáin sna Breiseáin"
   },
+  "pictureRefused": {
+    "title": "Níorbh fhéidir le {{name}} an pictiúr a úsáid",
+    "body": "Ní féidir an pictiúr seo a úsáid. Úsáid comhad PNG, JPEG nó WebP suas le 10 MB."
+  },
   "update": {
     "title": "Nuashonrú do {{name}}",
     "body": "Tá leagan {{version}} ag fanacht sa chluaisín Nuashonruithe",

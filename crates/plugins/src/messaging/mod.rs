@@ -140,6 +140,53 @@ impl Messenger {
         })
     }
 
+    /// A host frame of `plugin` (built by the caller, at most 999 bytes) under the same
+    /// visibility, recipient and rate rules as [`Self::send`]; it counts as a sent message.
+    pub fn send_host(
+        &mut self,
+        plugin: &PluginRef<'_>,
+        target: Target,
+        members: &[Member<'_>],
+        bytes: Vec<u8>,
+        now: Instant,
+    ) -> Result<Outgoing, SendError> {
+        let receivers = recipients::select(plugin, target, members)?;
+        let counters = self.counters.entry(plugin.id.to_owned()).or_default();
+        if let Err(e) = self.rate.try_send(plugin.id, now) {
+            counters.rate_limited += 1;
+            return Err(e);
+        }
+        counters.sent += 1;
+        Ok(Outgoing {
+            data_id: envelope::data_id(plugin.id),
+            receivers,
+            bytes,
+            direct: matches!(target, Target::Direct(_)),
+        })
+    }
+
+    /// Whether a received host frame of `plugin` from `sender_session` passes the same
+    /// visibility and flood rules as a plugin message ([`Self::receive`]); counted alike.
+    pub fn admit_host(
+        &mut self,
+        plugin: &PluginRef<'_>,
+        sender_session: u32,
+        sender: Option<&Member<'_>>,
+        now: Instant,
+    ) -> bool {
+        let counters = self.counters.entry(plugin.id.to_owned()).or_default();
+        if recipients::accept(plugin, sender).is_err() {
+            counters.incoming_refused += 1;
+            return false;
+        }
+        if !self.incoming.admit(sender_session, plugin.id, now) {
+            counters.incoming_rate_dropped += 1;
+            return false;
+        }
+        counters.received += 1;
+        true
+    }
+
     /// `peers.start-game-burst`.
     pub fn start_game_burst(
         &mut self,

@@ -24,7 +24,7 @@ vi.mock("@tauri-apps/api/core", () => ({
 }));
 
 const ANNA = 2;
-const SHARE = { serverId: 1, session: ANNA };
+const SHARE = { serverId: 1, session: ANNA, plugin: null };
 
 function party(): WatchParty {
   return {
@@ -202,7 +202,7 @@ describe("media pop-out", () => {
     fireEvent.click(screen.getByRole("button", { name: "Pop out" }));
     expect(open).toHaveBeenCalledWith(
       "watch",
-      { serverId: 1, session: null },
+      { serverId: 1, session: null, plugin: null },
       expect.stringContaining("Watch party"),
       null,
     );
@@ -218,7 +218,12 @@ describe("media pop-out", () => {
     setWatchParty(1, party());
     render(<MediaPopoutHost />);
     await act(async () => {
-      await api.mediaPopoutOpen("watch", { serverId: 1, session: null }, "title", null);
+      await api.mediaPopoutOpen(
+        "watch",
+        { serverId: 1, session: null, plugin: null },
+        "title",
+        null,
+      );
     });
     act(() => {
       setWatchParty(1, null);

@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Papildiniai",
+  "moreItems": "Daugiau papildinių…",
+  "subline": "{{plugin}} · Neoficialus",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Papildinių elementai visada rodo papildinio pavadinimą. Tvarkyk juos skiltyje Nustatymai → Papildiniai.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Paleidžiama iš naujo po sutrikimo, pabandyk po akimirkos"
 }

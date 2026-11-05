@@ -1054,6 +1054,19 @@
     "hint": "Lisää Lisäosiin Kehittäjä-välilehden, jolla voit ladata allekirjoittamattomia lisäosia kansiosta. Ota se käyttöön vain, jos teet itse lisäosia."
   },
   "newBadge": "Uusi",
+  "pluginSafety": {
+    "title": "Lisäosien turvallisuus",
+    "blockHighRisk": "Älä salli korkean riskin lisäosia",
+    "hint": "Piilottaa Asenna-painikkeen lisäosilta, joiden pistemäärä on 60 tai enemmän, ja estää päivitykset, jotka nostaisivat asennetun lisäosan sille tasolle. Jo asentamasi lisäosat toimivat edelleen.",
+    "note": "Pois päältä oletuksena. Virallisiin lisäosiin ja kehittäjien lisäosiin tämä ei koskaan vaikuta. Pisteet ovat arvioita, eivät takuu."
+  },
+  "pluginSounds": {
+    "title": "Lisäosien äänet",
+    "volume": "Lisäosien äänenvoimakkuus",
+    "mute": "Mykistä lisäosien äänet",
+    "hint": "Koskee kaikkia ääniä, joita lisäosa toistaa. Lisäosien äänet ovat hiljaisempia, kun ihmiset puhuvat.",
+    "meter": "Lähtötaso (vianetsintä)"
+  },
   "screenShare": {
     "newBadge": "Uusi",
     "qualityTitle": "Laadun oletukset",

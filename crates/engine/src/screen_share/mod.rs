@@ -457,7 +457,7 @@ pub(crate) fn on_plugin_data(
             engine.admit_to_broadcast(ctx.server_id, id, sender);
         }
         if let Some(id) = kick {
-            engine.relay_broadcast_kick(ctx.server_id, id, sender);
+            engine.relay_broadcast_kick(ctx.server_id, RelayUse::ScreenShare, id, sender);
         }
         if relink {
             engine.screen_share_relink(ctx.server_id, sender);
@@ -599,7 +599,7 @@ fn forget(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, session: 
         (forgot, left.flatten(), engine)
     };
     if let (Some(id), Some(engine)) = (kick, engine) {
-        engine.relay_broadcast_kick(ctx.server_id, id, session);
+        engine.relay_broadcast_kick(ctx.server_id, RelayUse::ScreenShare, id, session);
     }
     if forgot.own_viewers
         && let Some(here) = here(&ctx.handle)

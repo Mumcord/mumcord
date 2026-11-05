@@ -22,8 +22,8 @@ mod test_server;
 
 pub use fetch::{Client, Download, UrlPolicy};
 pub use index::{
-    IGNORED_PREFIX_TEXT, Ignored, IgnoredReason, Index, IndexKind, IndexPlugin, IndexVersion,
-    KeyRotation, RepositoryInfo, Screenshot,
+    Choice, IGNORED_PREFIX_TEXT, Ignored, IgnoredReason, Index, IndexKind, IndexPlugin,
+    IndexVersion, KeyRotation, MAX_NOTES_URL_LEN, RepositoryInfo, Screenshot, is_notes_url,
 };
 pub use keys::{key_fingerprint, key_fingerprint_prefix, normalize_key};
 pub use media::{Image, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES, sniff_image};
@@ -31,7 +31,9 @@ pub use repo::{
     RepoOutcome, RepoPreview, check_repository_url, fetch_repository, preview_repository,
 };
 pub use revoked::{Revocation, RevocationList, Severity};
-pub use sync::{Freshness, Loaded, RevokedLoaded, fetch_official, fetch_revoked, official_base};
+pub use sync::{
+    Freshness, Loaded, RevokedLoaded, fetch_official, fetch_revoked, note_index, official_base,
+};
 
 use crate::verify::VerifyFailure;
 
@@ -41,8 +43,10 @@ pub const INDEX_FILE: &str = "index.json";
 pub const REVOKED_FILE: &str = "revoked.json";
 /// Detached minisign signatures sit next to the signed file under this suffix.
 pub const SIGNATURE_SUFFIX: &str = ".minisig";
-/// The only wire format version this client reads.
+/// Index format 1 (`v1/index.json`, read by 0.6.x).
 pub const FORMAT_VERSION: u32 = 1;
+/// Index format 2 (`v1.1/index.json`, FR-9.15). This client reads both.
+pub const FORMAT_VERSION_2: u32 = 2;
 
 /// The official index lists every reviewed plugin; generous, but bounded.
 pub const MAX_OFFICIAL_INDEX_BYTES: usize = 8 * 1024 * 1024;

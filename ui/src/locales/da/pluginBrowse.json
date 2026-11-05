@@ -75,7 +75,8 @@
   "unofficialText": "{{repository}} er ikke gennemgået af Mumcord. Pluginnet kører stadig i sandkassen og får kun de tilladelser, du giver.",
   "checksTitle": "Officielle kontroller gælder stadig",
   "checksText": "Mumcords spærreliste kan slå det fra. Navne brugt af officielle plugins er reserverede.",
-  "metaPermissions": "Tilladelser: {{count}}",
+  "metaPermissions_one": "{{count}} tilladelse",
+  "metaPermissions_other": "{{count}} tilladelser",
   "footer": "Officielt lager · signeret liste kontrolleret · intet om dig sendes",
   "factSource": "Kilde: {{url}}",
   "factLicence": "Licens: {{license}}",
@@ -96,5 +97,7 @@
     "unpacking": "Udpakker…",
     "starting": "Starter…",
     "announce": "{{name}}: {{percent}} % downloadet"
-  }
+  },
+  "needsMumcord": "Kræver Mumcord {{version}} eller nyere",
+  "updateMumcord": "Opdatér Mumcord"
 }

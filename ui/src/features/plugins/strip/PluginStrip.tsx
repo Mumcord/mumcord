@@ -6,7 +6,7 @@ import { usePluginUi } from "../render/pluginUiStore";
 import { usePluginIcon } from "../render/usePluginIcon";
 import { useSharedSupported } from "./useSharedSupported";
 import { usePlugins } from "../pluginStore";
-import { PluginWebView, usePluginWebView } from "../webview";
+import { PluginFrame, usePluginWebView } from "../webview";
 import { loadOpen, saveOpen } from "./stripMemory";
 import "./strip.css";
 
@@ -17,11 +17,11 @@ function initials(name: string): string {
 }
 
 /** The side sheet shows the plugin's web view when it opened one there, else its panel. */
-function PopoverBody({ id, name, children }: { id: string; name: string; children: ReactNode }) {
+function PopoverBody({ id, children }: { id: string; children: ReactNode }) {
   const webview = usePluginWebView(id, "panelPopover");
   return (
     <div className="pstrip-popover-body">
-      {webview ? <PluginWebView plugin={id} webview={webview} title={name} /> : children}
+      {webview ? <PluginFrame plugin={id} webview={webview} /> : children}
     </div>
   );
 }
@@ -242,9 +242,7 @@ export function PluginStrip() {
               <span aria-hidden="true">✕</span>
             </button>
           </div>
-          <PopoverBody id={active.id} name={active.name}>
-            {body}
-          </PopoverBody>
+          <PopoverBody id={active.id}>{body}</PopoverBody>
         </div>
       )}
     </section>

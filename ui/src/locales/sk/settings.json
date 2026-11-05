@@ -1070,6 +1070,19 @@
     "hint": "Pridá k doplnkom kartu Vývojár, kde môžete načítať nepodpísané doplnky z priečinka. Zapnite ho, len ak doplnky sami vytvárate."
   },
   "newBadge": "Nové",
+  "pluginSafety": {
+    "title": "Bezpečnosť pluginov",
+    "blockHighRisk": "Nepovoliť vysoko rizikové pluginy",
+    "hint": "Skryje tlačidlo Nainštalovať pri pluginoch so skóre 60 alebo vyšším a zablokuje aktualizácie, ktoré by nainštalovaný plugin dostali na túto úroveň. Už nainštalované pluginy fungujú ďalej.",
+    "note": "Predvolene vypnuté. Oficiálnych pluginov a pluginov pre vývojárov sa to nikdy netýka. Skóre sú odhady, nie záruka."
+  },
+  "pluginSounds": {
+    "title": "Zvuky pluginov",
+    "volume": "Hlasitosť zvukov pluginov",
+    "mute": "Stlmiť zvuky pluginov",
+    "hint": "Platí pre každý zvuk, ktorý plugin prehrá. Zvuky pluginov sú tichšie, keď ľudia hovoria.",
+    "meter": "Výstupná úroveň (ladenie)"
+  },
   "screenShare": {
     "newBadge": "Nové",
     "qualityTitle": "Predvolená kvalita",

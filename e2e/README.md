@@ -185,8 +185,10 @@ image (minutes). `relayenv.relayStatus()` reads the relay's `/v1/status`.
   (helpers/x11-drop.py), the same GTK path as a file manager; `files.pickInFileDialog` drives the system
   file picker. Every client has its own Downloads folder (`app.downloadsDir(id)`).
 - **Test hooks:** `env: relayenv.hookEnv({ fileExpirySeconds, fileCorrupt, fileStallAfterBytes,
-encoderProbe, svtSelftest, encodeDelayMs, onBattery, noWebcodecsAv1, keepOldKey })` for
-  `app.restart`/`startB`/`startC`; debug builds only.
+encoderProbe, svtSelftest, encodeDelayMs, onBattery, noWebcodecsAv1, keepOldKey, pluginSavePath,
+pluginPickPath })` for `app.restart`/`startB`/`startC`; debug builds only. `pluginSavePath` /
+  `pluginPickPath` answer the plugin save dialog and picture picker (spec 09 `files.save`,
+  `files.import-picture`) with a path or `"cancel"`.
 
 ## Plugin test environment
 

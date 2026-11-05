@@ -1054,6 +1054,19 @@
     "hint": "Fejlesztő lapot ad a bővítményekhez, ahol aláíratlan bővítményeket tölthetsz be egy mappából. Csak akkor kapcsold be, ha magad készítesz bővítményeket."
   },
   "newBadge": "Új",
+  "pluginSafety": {
+    "title": "Bővítmények biztonsága",
+    "blockHighRisk": "Magas kockázatú bővítmények tiltása",
+    "hint": "Elrejti a Telepítés gombot a 60 vagy magasabb pontszámú bővítményeknél, és megállítja azokat a frissítéseket, amelyek egy telepített bővítményt odáig emelnének. A már telepített bővítmények továbbra is működnek.",
+    "note": "Alapértelmezés szerint ki van kapcsolva. A hivatalos és a fejlesztői bővítményeket ez soha nem érinti. A pontszámok becslések, nem garanciák."
+  },
+  "pluginSounds": {
+    "title": "Bővítményhangok",
+    "volume": "Bővítményhangok hangereje",
+    "mute": "Bővítményhangok némítása",
+    "hint": "Minden hangra vonatkozik, amelyet egy bővítmény lejátszik. A bővítményhangok halkabbak, amíg az emberek beszélnek.",
+    "meter": "Kimeneti szint (hibakeresés)"
+  },
   "screenShare": {
     "newBadge": "Új",
     "qualityTitle": "Alapértelmezett minőség",

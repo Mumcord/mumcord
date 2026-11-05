@@ -75,7 +75,10 @@
   "unofficialText": "{{repository}} nie jest sprawdzane przez Mumcord. Wtyczka nadal działa w piaskownicy i dostaje tylko uprawnienia, na które pozwolisz.",
   "checksTitle": "Oficjalne kontrole nadal obowiązują",
   "checksText": "Lista unieważnień Mumcord może ją wyłączyć. Nazwy oficjalnych wtyczek są zarezerwowane.",
-  "metaPermissions": "Uprawnienia: {{count}}",
+  "metaPermissions_one": "{{count}} uprawnienie",
+  "metaPermissions_few": "{{count}} uprawnienia",
+  "metaPermissions_many": "{{count}} uprawnień",
+  "metaPermissions_other": "{{count}} uprawnienia",
   "footer": "Oficjalne repozytorium · podpisana lista sprawdzona · nic o tobie nie jest wysyłane",
   "factSource": "Źródło: {{url}}",
   "factLicence": "Licencja: {{license}}",
@@ -96,5 +99,7 @@
     "unpacking": "Rozpakowywanie…",
     "starting": "Uruchamianie…",
     "announce": "{{name}}: pobrano {{percent}}%"
-  }
+  },
+  "needsMumcord": "Wymaga Mumcord {{version}} lub nowszego",
+  "updateMumcord": "Zaktualizuj Mumcord"
 }
