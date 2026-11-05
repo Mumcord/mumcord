@@ -123,7 +123,12 @@ describe("plugins: websites and net.http (AC-9.7 … AC-9.10)", function () {
   before(async function () {
     this.timeout(20 * 60_000);
     await testenv.up("v15");
-    fixtures = await pluginenv.startPluginFixtures({ thirdParty: {}, https: true });
+    // test-surface 1.1.1 (one more website) is for the update gate (AC-9.36). Holding it back
+    // makes the install pick 1.1.0 (FR-9.16), so AC-9.8 sees exactly the one declared website.
+    fixtures = await pluginenv.startPluginFixtures({
+      thirdParty: { scenarios: ["min-mumcord:test-surface@1.1.1=99.0"] },
+      https: true,
+    });
     await app.restart({ env: pluginenv.appEnv() });
     await completeWizard("Alice");
     // The Plugins strip lives in the channel panel, so the app is connected.
