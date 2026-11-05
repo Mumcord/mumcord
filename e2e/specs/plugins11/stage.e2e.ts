@@ -78,7 +78,7 @@ async function install(id: string): Promise<void> {
     id,
     version: null,
     optional: [],
-    visibility: "nobody",
+    visibility: "everyone",
     confirmed: true,
   });
   await browser.waitUntil(
