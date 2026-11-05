@@ -170,7 +170,8 @@
     "miniBar_few": "{{count}} cheamara ar siúl",
     "miniBar_many": "{{count}} gceamara ar siúl",
     "miniBar_other": "{{count}} ceamara ar siúl",
-    "fullTitle": "Tá an seomra lán ag 9 gceamara"
+    "fullTitle": "Tá an seomra lán ag 9 gceamara",
+    "backgroundPicker": "Athraigh an cúlra"
   },
   "position": {
     "label": "Ceamaraí",
@@ -194,7 +195,8 @@
     "hidden": "Físeán folaithe",
     "showVideo": "Taispeáin an físeán",
     "viewing": "Ag féachaint",
-    "weak": "Nasc lag"
+    "weak": "Nasc lag",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Greamaigh dom",

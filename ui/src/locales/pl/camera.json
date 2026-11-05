@@ -163,7 +163,8 @@
     "miniBar_many": "{{count}} kamer włączonych",
     "miniBar_other": "{{count}} kamery włączone",
     "cameras": "Kamery",
-    "fullTitle": "Pokój jest pełny przy 9 kamerach"
+    "fullTitle": "Pokój jest pełny przy 9 kamerach",
+    "backgroundPicker": "Zmień tło"
   },
   "position": {
     "label": "Kamery",
@@ -187,7 +188,8 @@
     "hidden": "Wideo ukryte",
     "showVideo": "Pokaż wideo",
     "viewing": "Oglądasz",
-    "weak": "Słabe połączenie"
+    "weak": "Słabe połączenie",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Przypnij dla mnie",

@@ -7,6 +7,7 @@ import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll } from "../../channels/testUtils";
 import { mediaView, resetMediaView } from "../../media/mediaView";
 import { resetPopoutStore } from "../../media/popoutStore";
+import { resetLiveBackground } from "../preview/liveBackground";
 import { resetCameraDecode } from "./cameraDecode";
 import { CameraMiniBar } from "./CameraMiniBar";
 import { CameraRoom } from "./CameraRoom";
@@ -63,6 +64,7 @@ describe("camera room", () => {
     resetMediaView();
     resetPopoutStore();
     resetRoomChoices();
+    resetLiveBackground();
   });
 
   afterEach(() => {
@@ -190,5 +192,27 @@ describe("camera room", () => {
     expect(spoken).toContain("Anna turned off their camera");
     stop();
     vi.useRealTimers();
+  });
+
+  it("changes the background while on air without saving it", async () => {
+    onAir(api);
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    const setBackground = vi.spyOn(api, "cameraSetBackground");
+    const saved = vi.spyOn(api, "settingsUpdate");
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    const button = await screen.findByRole("button", { name: /^Background: / });
+    await act(async () => {
+      fireEvent.click(button);
+      await Promise.resolve();
+    });
+    const picker = screen.getByRole("dialog", { name: "Change background" });
+    await act(async () => {
+      fireEvent.click(within(picker).getByRole("radio", { name: "None" }));
+      await Promise.resolve();
+    });
+    expect(setBackground).toHaveBeenCalledWith({ kind: "none" }, expect.any(Number));
+    expect(saved).not.toHaveBeenCalled();
+    expect(button).toHaveTextContent("Background: None");
+    expect(await axeViolations(picker)).toEqual([]);
   });
 });

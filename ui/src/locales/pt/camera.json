@@ -156,7 +156,8 @@
     "miniBar_many": "{{count}} de câmaras ligadas",
     "cameras": "Câmaras",
     "miniBar_other": "{{count}} câmaras ligadas",
-    "fullTitle": "A sala está cheia com 9 câmaras"
+    "fullTitle": "A sala está cheia com 9 câmaras",
+    "backgroundPicker": "Alterar fundo"
   },
   "position": {
     "label": "Câmaras",
@@ -180,7 +181,8 @@
     "hidden": "Vídeo oculto",
     "showVideo": "Mostrar vídeo",
     "viewing": "A ver",
-    "weak": "Ligação fraca"
+    "weak": "Ligação fraca",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Fixar para mim",

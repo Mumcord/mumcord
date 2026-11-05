@@ -149,7 +149,8 @@
     "cameras": "Camera's",
     "label_other": "Cameraruimte, {{count}} camera's aan",
     "miniBar_other": "{{count}} camera's aan",
-    "fullTitle": "De ruimte is vol bij 9 camera’s"
+    "fullTitle": "De ruimte is vol bij 9 camera’s",
+    "backgroundPicker": "Achtergrond wijzigen"
   },
   "position": {
     "label": "Camera's",
@@ -173,7 +174,8 @@
     "hidden": "Video verborgen",
     "showVideo": "Video tonen",
     "viewing": "Kijkt mee",
-    "weak": "Zwakke verbinding"
+    "weak": "Zwakke verbinding",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Vastzetten voor mij",

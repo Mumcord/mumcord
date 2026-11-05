@@ -170,7 +170,8 @@
     "miniBar_few": "{{count}} kameras mixgħula",
     "miniBar_many": "{{count}} kamera mixgħula",
     "miniBar_other": "{{count}} kamera mixgħula",
-    "fullTitle": "Il-kamra hija mimlija b’9 kameras"
+    "fullTitle": "Il-kamra hija mimlija b’9 kameras",
+    "backgroundPicker": "Ibdel l-isfond"
   },
   "position": {
     "label": "Kameras",
@@ -194,7 +195,8 @@
     "hidden": "Vidjo moħbi",
     "showVideo": "Uri l-vidjo",
     "viewing": "Qed tara",
-    "weak": "Konnessjoni dgħajfa"
+    "weak": "Konnessjoni dgħajfa",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Waħħal għalija",

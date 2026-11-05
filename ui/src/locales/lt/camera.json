@@ -163,7 +163,8 @@
     "miniBar_few": "{{count}} kameros įjungtos",
     "miniBar_many": "{{count}} kameros įjungtos",
     "miniBar_other": "{{count}} kamerų įjungta",
-    "fullTitle": "Kambarys pilnas, kai įjungta 9 kameros"
+    "fullTitle": "Kambarys pilnas, kai įjungta 9 kameros",
+    "backgroundPicker": "Keisti foną"
   },
   "position": {
     "label": "Kameros",
@@ -187,7 +188,8 @@
     "hidden": "Vaizdas paslėptas",
     "showVideo": "Rodyti vaizdą",
     "viewing": "Žiūri",
-    "weak": "Silpnas ryšys"
+    "weak": "Silpnas ryšys",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Prisegti man",

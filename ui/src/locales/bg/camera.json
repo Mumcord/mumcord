@@ -149,7 +149,8 @@
     "cameras": "Камери",
     "label_other": "Стая с камери, {{count}} камери са включени",
     "miniBar_other": "{{count}} камери са включени",
-    "fullTitle": "Стаята е пълна при 9 камери"
+    "fullTitle": "Стаята е пълна при 9 камери",
+    "backgroundPicker": "Смяна на фона"
   },
   "position": {
     "label": "Камери",
@@ -173,7 +174,8 @@
     "hidden": "Видеото е скрито",
     "showVideo": "Покажи видеото",
     "viewing": "Гледаш",
-    "weak": "Слаба връзка"
+    "weak": "Слаба връзка",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Закачи за мен",
