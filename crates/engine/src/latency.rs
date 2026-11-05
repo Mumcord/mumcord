@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use mumcord_audio::SAMPLE_RATE;
 use mumcord_audio::io::{DevicePeriods, LOW_LATENCY_BUFFER_FRAMES};
-use mumcord_audio::mixer::{LOW_LATENCY_QUEUE_MS, PlaybackConfig};
+use mumcord_audio::mixer::{LOW_LATENCY_QUEUE_MS, PERIOD_HEADROOM_MS, PlaybackConfig};
 
 /// Opus look-ahead: SILK and hybrid modes (VoIP and audio application) need 6.5 ms, the
 /// CELT-only restricted low-delay application 2.5 ms.
@@ -15,9 +15,6 @@ const LOOKAHEAD_MS: f32 = 6.5;
 const LOW_DELAY_LOOKAHEAD_MS: f32 = 2.5;
 /// Device period assumed for normal mode while none has been measured.
 const ASSUMED_PERIOD_MS: f32 = 10.0;
-/// Headroom of the output queue above one device period: the playback thread polls every 2 ms
-/// and must refill before the device takes the next period.
-const QUEUE_MARGIN_MS: f32 = 3.0;
 /// The output queue holds between its target and one 10 ms frame more, so on average half a
 /// frame above the target.
 const QUEUE_HALF_FRAME_MS: f32 = 5.0;
@@ -57,17 +54,21 @@ pub(crate) struct LatencyInputs {
 }
 
 /// Output queue target of the playback thread: the normal default, or in low-latency mode one
-/// output period plus headroom, at least [`LOW_LATENCY_QUEUE_MS`]. Stays at the default until
-/// the period is known, so a device that refused the small buffer never runs dry.
+/// output period plus [`PERIOD_HEADROOM_MS`], at least [`LOW_LATENCY_QUEUE_MS`]. Stays at the
+/// default until the period is known, so a device that refused the small buffer never runs dry.
+/// A period larger than the default raises the target: a queue below one device period cannot
+/// cover a callback, and the rest of that buffer stays silent, which is heard as stutter.
 pub(crate) fn queue_target_ms(low_latency: bool, output_period: Option<Duration>) -> u32 {
     let normal = PlaybackConfig::default().target_queue_ms;
-    match output_period {
-        Some(period) if low_latency => {
-            let wanted = (ms(period) + QUEUE_MARGIN_MS).ceil() as u32;
-            wanted.clamp(LOW_LATENCY_QUEUE_MS, normal)
-        }
-        _ => normal,
-    }
+    let Some(period) = output_period else {
+        return normal;
+    };
+    let base = if low_latency {
+        LOW_LATENCY_QUEUE_MS
+    } else {
+        normal
+    };
+    base.max(ms(period).ceil() as u32 + PERIOD_HEADROOM_MS)
 }
 
 pub(crate) fn estimate(inputs: &LatencyInputs) -> LatencyEstimateView {
@@ -224,6 +225,9 @@ mod tests {
         assert_eq!(queue_target_ms(true, period(128)), 6);
         assert_eq!(queue_target_ms(true, period(480)), 13);
         // A device that kept a large default buffer gets no less than normal mode.
-        assert_eq!(queue_target_ms(true, period(2048)), 25);
+        assert_eq!(queue_target_ms(true, period(2048)), 46);
+        // A sound server running the graph with a quantum another application grew must still be
+        // coverable by one queue level, otherwise part of every callback stays silent.
+        assert_eq!(queue_target_ms(false, period(2048)), 46);
     }
 }

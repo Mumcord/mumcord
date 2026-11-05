@@ -6,9 +6,9 @@ use std::time::{Duration, Instant};
 
 use rtrb::{Consumer, Producer};
 
-use super::IoError;
 use super::resample::Resampler;
 use super::ring::Counters;
+use super::{Direction, IoError};
 use crate::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 
 /// Capture side of an opened input stream, handed to [`FrameSource`].
@@ -224,9 +224,49 @@ impl FrameSink {
         })
     }
 
+    /// Samples the device takes per callback, in 48 kHz samples; 0 until a stream has run. On a
+    /// sound server this is the graph quantum, which another application can grow past the small
+    /// buffer we requested: the mixer must keep at least one of these queued, otherwise part of
+    /// the buffer stays silent.
+    pub fn device_period_samples(&mut self) -> usize {
+        self.apply_updates();
+        let Some(endpoint) = &self.endpoint else {
+            return 0;
+        };
+        let frames = self.counters.delivered_period(Direction::Output) as usize;
+        frames * SAMPLE_RATE as usize / endpoint.device_rate as usize
+    }
+
     fn apply_updates(&mut self) {
         while let Ok(endpoint) = self.updates.try_recv() {
             self.endpoint = Some(endpoint);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::ring::stereo_ring;
+    use super::*;
+
+    #[test]
+    fn the_mixer_sees_the_period_the_device_delivers() {
+        let counters = Arc::new(Counters::default());
+        let (producer, mut consumer) = stereo_ring(44_100);
+        let (tx, rx) = std::sync::mpsc::channel();
+        tx.send(PlaybackEndpoint::new(producer, 44_100).expect("endpoint"))
+            .expect("send");
+        let mut sink = FrameSink::new(rx, counters.clone());
+        assert_eq!(sink.device_period_samples(), 0, "no stream has run yet");
+
+        // A callback of 1024 frames at 44.1 kHz, as the sound server delivers it when another
+        // application makes the graph quantum grow.
+        let mut buffer = vec![0.0f32; 2 * 1024];
+        super::super::ring::playback(&mut buffer, 2, &mut consumer, &counters);
+        assert_eq!(
+            sink.device_period_samples(),
+            1024 * SAMPLE_RATE as usize / 44_100,
+            "reported in 48 kHz samples, as the mixer counts its queue"
+        );
     }
 }

@@ -111,6 +111,10 @@ impl PlaybackSink for SharedSink {
     fn queued_samples(&mut self) -> usize {
         self.with(|sink| sink.as_mut().map_or(0, FrameSink::queued_samples))
     }
+
+    fn device_period_samples(&mut self) -> usize {
+        self.with(|sink| sink.as_mut().map_or(0, FrameSink::device_period_samples))
+    }
 }
 
 /// Running audio devices; started on first use and kept for the app's lifetime.

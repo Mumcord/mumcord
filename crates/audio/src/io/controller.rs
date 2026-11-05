@@ -143,6 +143,7 @@ impl AudioIo {
                     input: Slot::new(input),
                     output: Slot::new(output),
                     known_devices: None,
+                    last_periods: DevicePeriods::default(),
                     low_latency: false,
                 };
                 control.run(command_rx);
@@ -299,6 +300,9 @@ struct Control<'a> {
     output: Slot,
     /// Last seen device list (ids and default flags), to detect hot-plug.
     known_devices: Option<Vec<(String, bool)>>,
+    /// Last device period per direction, to notice the delivered buffer changing (see
+    /// [`Control::notice_period`]).
+    last_periods: DevicePeriods,
     low_latency: bool,
 }
 
@@ -385,6 +389,31 @@ impl Control<'_> {
                 Action::Reopen => self.reopen(direction, now),
                 Action::TryChosen => self.try_chosen(direction, now),
             }
+            self.notice_period(direction);
+        }
+    }
+
+    /// Logs a device period that changed. On a sound server the period is the quantum of the
+    /// whole graph, which another application playing sound can grow past the small buffer we
+    /// requested; the playback queue has to cover a full one of these, so a growth explains
+    /// dropouts that would otherwise look like a failing device.
+    fn notice_period(&mut self, direction: Direction) {
+        let periods = self.counters.periods();
+        let (now, last) = match direction {
+            Direction::Input => (periods.input, self.last_periods.input),
+            Direction::Output => (periods.output, self.last_periods.output),
+        };
+        if now == last {
+            return;
+        }
+        self.last_periods = periods;
+        if let (Some(now), Some(last)) = (now, last) {
+            tracing::info!(
+                ?direction,
+                from_ms = last.as_secs_f32() * 1000.0,
+                to_ms = now.as_secs_f32() * 1000.0,
+                "device period changed",
+            );
         }
     }
 
@@ -942,9 +971,10 @@ mod tests {
         let low = measure("low latency");
         assert!(low.input.is_some() && normal.input.is_some());
         assert!(low.input <= normal.input);
-        // The engine's low-latency output queue: one period plus 3 ms, at least 5 ms.
+        // The engine's low-latency output queue: one period plus headroom, at least 5 ms.
         let period_ms = low.output.expect("output period").as_secs_f32() * 1000.0;
-        let queue_ms = ((period_ms + 3.0).ceil() as u32).max(crate::mixer::LOW_LATENCY_QUEUE_MS);
+        let queue_ms = ((period_ms + crate::mixer::PERIOD_HEADROOM_MS as f32).ceil() as u32)
+            .max(crate::mixer::LOW_LATENCY_QUEUE_MS);
         let low_glitches = play_quietly(&sink, &handles.io, queue_ms);
         eprintln!(
             "underruns, late wake-ups: normal {normal_glitches:?}, low latency ({queue_ms} ms queue) {low_glitches:?}"
@@ -1158,6 +1188,7 @@ mod tests {
                 input: Slot::new(Some(CHOSEN.to_owned())),
                 output: Slot::new(None),
                 known_devices: None,
+                last_periods: DevicePeriods::default(),
                 low_latency: false,
             };
             (control, events_rx)
