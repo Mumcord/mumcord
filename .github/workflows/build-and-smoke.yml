@@ -193,6 +193,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
           key: release
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
@@ -604,6 +605,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
           key: smoke
           save-if: ${{ github.ref == 'refs/heads/main' }}
           workspaces: |
