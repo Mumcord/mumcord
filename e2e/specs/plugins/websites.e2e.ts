@@ -75,6 +75,13 @@ async function openPanel(plugin: string): Promise<void> {
   throw new Error(`the ${plugin} panel did not open`);
 }
 
+/** Closes the plugin panel so nothing from it can sit over the Settings dialog opened next. */
+async function closePanel(plugin: string): Promise<void> {
+  const icon = $(`.pstrip-icons button[aria-label='${plugin}']`);
+  if ((await icon.getAttribute("aria-pressed")) === "true") await icon.click();
+  await panel().waitForDisplayed({ reverse: true, timeout: 10_000 });
+}
+
 /** Clicks a button of the open plugin panel and waits for `line` in the panel. */
 async function panelAction(label: string, line: string): Promise<void> {
   const button = panel().$(`button=${label}`);
