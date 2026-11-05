@@ -387,14 +387,21 @@ function hog() {
 
 // Frame audio is allowed only after a click inside the frame (AC-9.24): the button plays a tone,
 // the plugin's "tone" command tries the same without a click and reports the context state.
+// The context is shared and resumed on every call, so a context that a call without a click
+// created (suspended) still sounds after a later click, as a real page would do it.
 let audio;
-function tone() {
+async function tone() {
   audio ??= new AudioContext();
   const oscillator = audio.createOscillator();
   oscillator.frequency.value = 440;
   oscillator.connect(audio.destination);
   oscillator.start();
-  oscillator.stop(audio.currentTime + 1);
+  oscillator.stop(audio.currentTime + 2);
+  try {
+    await audio.resume();
+  } catch {
+    // Refused without a click inside the frame: the state below says "blocked".
+  }
   return audio.state === "running" ? "ok" : "blocked";
 }
 
@@ -411,12 +418,14 @@ function build() {
   }
   document.getElementById("run-all").addEventListener("click", runAll);
   document.getElementById("busy").addEventListener("click", busy);
-  document.getElementById("tone").addEventListener("click", () => show("tone-click", tone()));
   // A gesture-bound host call asked for from inside the page (FR-9.45): it works only after a
   // trusted click here, never after a script-made one.
   document
     .getElementById("start-stage")
     ?.addEventListener("click", () => send(`start-stage:${PLACE}`));
+  document.getElementById("tone").addEventListener("click", () => {
+    void tone().then((status) => show("tone-click", status));
+  });
 }
 
 window.addEventListener("message", (event) => {
@@ -427,7 +436,7 @@ window.addEventListener("message", (event) => {
   else if (command === "run" && Object.hasOwn(PROBES, probe)) run(probe);
   else if (command === "busy") busy();
   else if (command === "hog") hog();
-  else if (command === "tone") show("tone-auto", tone());
+  else if (command === "tone") void tone().then((status) => show("tone-auto", status));
 });
 
 build();
