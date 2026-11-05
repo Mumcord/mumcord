@@ -115,10 +115,11 @@ fi
 
 # The test plugins and fx-webview-probe (the one safety fixture signed as official) go to the
 # official registry, the other fixtures to the repository; fx-update-v2 stays staged until a spec
-# publishes it.
+# publishes it. test-badlabel stays staged too: its manifest fails to parse (reserved Apps-menu
+# label), so no registry index can list it.
 for f in "$work"/staged/*.mcplugin; do
   case "$(basename "$f")" in
-    fx-update-v2-fails.mcplugin) ;;
+    fx-update-v2-fails.mcplugin | test-badlabel*.mcplugin) ;;
     fx-webview-probe.mcplugin | fx-strip-*.mcplugin) cp "$f" "$work/packages/official/" ;;
     fx-*) cp "$f" "$work/packages/repo/" ;;
     *)
