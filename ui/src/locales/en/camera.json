@@ -176,6 +176,7 @@
     "weak": "Weak connection"
   },
   "tileMenu": {
+    "options": "Options for {{name}}",
     "pin": "Pin for me",
     "unpin": "Unpin",
     "showLarge": "Show large",

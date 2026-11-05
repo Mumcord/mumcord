@@ -25,6 +25,8 @@ export interface CameraTileProps {
   avatar: string | null;
   /** The tile menu button (U-5); placed in the tile's top-left corner. */
   menu?: ReactNode;
+  /** Roving focus of the tiles (spec 08 §5.5): only one tile is a Tab stop. */
+  tabIndex?: 0 | -1;
 }
 
 export function CameraTile({
@@ -34,6 +36,7 @@ export function CameraTile({
   mirror,
   avatar,
   menu,
+  tabIndex = 0,
 }: CameraTileProps) {
   const { t } = useTranslation("camera");
   const label = tileLabel(tile, t);
@@ -63,14 +66,13 @@ export function CameraTile({
       });
   };
 
-  /* eslint-disable jsx-a11y/no-noninteractive-tabindex -- the tile itself takes focus: its keys
-     (menu, pin, show large, hide; spec 08 §5.5) act on the person. */
+   
   return (
     <div
       ref={tileRef}
       className="cam-tile"
       role="group"
-      tabIndex={0}
+      tabIndex={tabIndex}
       aria-label={label}
       data-speaking={tile.speaking || undefined}
       data-tile={String(tile.key)}
@@ -90,7 +92,13 @@ export function CameraTile({
             {status ?? t("tile.joining", { name: tile.name })}
           </span>
           {tile.state === "hidden" && (
-            <button type="button" className="cam-btn cam-btn--small" onClick={showVideo}>
+            <button
+              type="button"
+              className="cam-btn cam-btn--small"
+              // The tile is the Tab stop; H on it shows the video again.
+              tabIndex={-1}
+              onClick={showVideo}
+            >
               <RoomIcon name="eye" />
               {t("tile.showVideo")}
             </button>
@@ -128,7 +136,7 @@ export function CameraTile({
       </span>
     </div>
   );
-  /* eslint-enable jsx-a11y/no-noninteractive-tabindex */
+   
 }
 
 /** The screen-reader name of a tile (spec 08 §5.7). */

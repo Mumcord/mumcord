@@ -1,0 +1,145 @@
+/* The tile menu (spec 08 §5.3, mockup 10): the ⋯ button in the tile's top-left corner and the
+   menu below it. The menu lives inside the camera room, so it keeps the room's dark colours in
+   both themes and stays visible in full screen. */
+
+.cam-tile__more {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  cursor: pointer;
+  opacity: 0;
+}
+
+/* Shown on the tile under the pointer or with the focus, and while its menu is open. */
+.cam-tile:hover .cam-tile__more,
+.cam-tile:focus-within .cam-tile__more,
+.cam-tile__more[aria-expanded="true"] {
+  opacity: 1;
+}
+
+/* Touch screens have no hover: the button stays visible. */
+@media (hover: none) {
+  .cam-tile__more {
+    opacity: 1;
+  }
+}
+
+.cam-tile__more:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cam-menu {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: 17.5rem;
+  max-width: calc(100vw - 1rem);
+  padding: var(--space-2);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-lg);
+  background: rgb(16 12 36 / 96%);
+  box-shadow: var(--shadow-raised);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-sm);
+}
+
+.cam-menu:focus {
+  outline: none;
+}
+
+.cam-menu__group {
+  display: flex;
+  flex-direction: column;
+}
+
+.cam-menu__title {
+  margin: var(--space-1) var(--space-2);
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cam-menu__item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cam-menu__item:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+.cam-menu__item:focus-visible,
+.cam-menu__item:focus {
+  background: rgb(255 255 255 / 14%);
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.cam-menu__item kbd {
+  margin-left: auto;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--media-glass-border);
+  border-radius: 4px;
+  color: var(--media-on-scrim-muted);
+  font: inherit;
+  font-size: 0.6875rem;
+}
+
+.cam-menu__item[aria-checked="true"] {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Unchecked choices line up with the checked one's text behind its check mark. */
+.cam-menu__item[aria-checked="false"] {
+  padding-left: 1.85rem;
+}
+
+.cam-menu__hint {
+  margin-left: auto;
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+  font-weight: normal;
+}
+
+.cam-menu__sep {
+  width: 100%;
+  margin: var(--space-1) 0;
+  border: 0;
+  border-top: 1px solid var(--media-glass-border);
+}
+
+.cam-menu__foot {
+  margin: var(--space-1) var(--space-2);
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (forced-colors: active) {
+  .cam-tile__more,
+  .cam-menu {
+    border-color: CanvasText;
+  }
+}

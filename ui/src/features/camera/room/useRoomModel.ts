@@ -44,6 +44,8 @@ export interface RoomModel {
   tiles: TileModel[];
   /** The Speaker layout's large tile (FR-8.64). */
   speaker: TileKey | null;
+  /** The tile shown large by the tile menu ("Show large"), while it is shown. */
+  large: TileKey | null;
   layout: RoomLayout;
   selfHidden: boolean;
   own: CameraView | null;
@@ -166,6 +168,7 @@ export function useRoomModel(serverId: number): RoomModel {
     channelName: channelId === undefined ? "" : (channels.get(channelId)?.name ?? ""),
     tiles: models,
     speaker,
+    large: choices.large !== null && shownKeys.includes(choices.large) ? choices.large : null,
     layout: choices.layout,
     selfHidden: choices.selfHidden,
     own,
