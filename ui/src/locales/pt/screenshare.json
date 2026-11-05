@@ -18,8 +18,6 @@
   "pause": "Pausar",
   "resume": "Retomar",
   "sound": "Partilhar som",
-  "noSound": "O Linux não partilha som: os espectadores só veem a imagem.",
-  "noSoundForShare": "Esta partilha não tem som (ecrã inteiro ou versão do sistema não suportada).",
   "viewersNone": "Ainda ninguém está a ver",
   "viewers_one": "{{count}} a ver: {{names}}",
   "viewers_many": "{{count}} a ver: {{names}}",

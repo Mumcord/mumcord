@@ -18,8 +18,6 @@
   "pause": "Pausieren",
   "resume": "Fortsetzen",
   "sound": "Ton teilen",
-  "noSound": "Unter Linux wird kein Ton geteilt: Zuschauer sehen nur das Bild.",
-  "noSoundForShare": "Diese Freigabe hat keinen Ton (ganzer Bildschirm oder nicht unterstützte Systemversion).",
   "viewersNone": "Noch schaut niemand zu",
   "viewers_one": "{{count}} schaut zu: {{names}}",
   "viewers_other": "{{count}} schauen zu: {{names}}",

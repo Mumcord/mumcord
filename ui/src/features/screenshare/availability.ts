@@ -48,21 +48,15 @@ export function shareBlockText(
 export interface SharePlatform {
   /** Mumcord can capture the screen here. */
   supported: boolean;
-  /** The shared app's sound can be sent (FR-2.42); Linux never sends sound. */
-  sound: boolean;
 }
 
 /**
- * What this OS supports, from the backend's OS description ("linux x86_64"). macOS sends the
- * shared app's sound from macOS 13 on; older versions are below the supported range (current and
- * previous major), and the engine sends no sound there. Windows sends the picked app's sound from
- * Windows 10 2004 on, for a window of a single app; the engine leaves it out otherwise.
+ * What this OS supports, from the backend's OS description ("linux x86_64"). Whether a share
+ * can carry sound is the engine's answer (`screenShareSoundSupport`, FR-7.84).
  */
 export function platformOf(os: string): SharePlatform {
   const name = os.toLowerCase();
-  if (name.startsWith("macos")) return { supported: true, sound: true };
-  if (name.startsWith("windows")) return { supported: true, sound: true };
-  return { supported: name.startsWith("linux"), sound: false };
+  return { supported: ["macos", "windows", "linux"].some((p) => name.startsWith(p)) };
 }
 
 /** The platform support, `null` until the app info arrived. */

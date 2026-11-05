@@ -69,6 +69,7 @@ import type {
   ActiveEncoder,
   LoweredReason,
   ScreenShare,
+  SoundApp,
   ShareStartBlock,
   ServerSnapshot,
   ViewerQuality,
@@ -855,6 +856,10 @@ function demoPicture(): string {
     `<path d="M0 160 L110 132 L210 158 L320 136 V180 H0Z" fill="#0f172a"/></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
+
+/** A made-up app icon for the mock's "Which app's sound?" list; the browser app has none. */
+const MOCK_MUSIC_ICON =
+  "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='5' fill='%237c5cff'/><path d='M10 17V7l8-2v10' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/><circle cx='8' cy='17' r='2' fill='white'/><circle cx='16' cy='15' r='2' fill='white'/></svg>";
 
 /**
  * The landscape of `demoPicture` as a WebP (640×360): inline images only accept raster pictures,
@@ -2202,9 +2207,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
 
   /** Apps "Which app's sound?" offers in the browser mock. */
-  const MOCK_SOUND_APPS = [
-    { id: "music", name: "Music Player" },
-    { id: "browser", name: "Web Browser" },
+  const MOCK_SOUND_APPS: SoundApp[] = [
+    { id: "music", name: "Music Player", icon: MOCK_MUSIC_ICON },
+    { id: "browser", name: "Web Browser", icon: null },
   ];
 
   const commands: EngineCommands = {
@@ -3747,7 +3752,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         soundAvailable: withSound,
         soundMode: withSound ? "desktop" : "none",
         soundApp: null,
-        soundReason: null,
+        soundReason: withSound ? null : "off",
         soundChoice: null,
         kind: null,
         elapsedMs: 0,
@@ -3780,14 +3785,17 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         soundAvailable: chosen !== undefined,
         soundMode: chosen === undefined ? "none" : "app",
         soundApp: chosen?.name ?? null,
+        soundReason: chosen === undefined ? "notChosen" : null,
         soundChoice: null,
       });
       return Promise.resolve(null);
     },
     screenShareSetSound: (serverId, enabled) => {
+      const own = requireOwnShare(serverId);
       changeOwnShare(serverId, {
-        ...requireOwnShare(serverId),
-        sound: enabled && requireOwnShare(serverId).soundAvailable,
+        ...own,
+        sound: enabled && own.soundAvailable,
+        soundReason: own.soundAvailable ? (enabled ? null : "off") : own.soundReason,
       });
       return Promise.resolve(null);
     },

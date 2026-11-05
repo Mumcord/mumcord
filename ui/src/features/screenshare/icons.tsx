@@ -22,9 +22,20 @@ function Icon({ size = 14, children }: { size?: number; children: ReactNode }) {
 
 /** The "No sound" row of the app picker. */
 export function NoSoundIcon({ size = 14 }: { size?: number }) {
+  return <SpeakerIcon muted size={size} />;
+}
+
+/** The outlined speaker of the live bar's sound line and Sound button (mockup 10). */
+export function SpeakerIcon({ muted, size = 14 }: { muted: boolean; size?: number }) {
   return (
     <Icon size={size}>
-      <path d="M11 5 6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6" />
+      <path
+        d={
+          muted
+            ? "M11 5 6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6"
+            : "M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"
+        }
+      />
     </Icon>
   );
 }

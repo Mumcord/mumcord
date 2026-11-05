@@ -56,6 +56,12 @@
   background: hsl(var(--hue, 0) 55% 45%);
 }
 
+/* The app's own icon (Linux icon theme) in place of the coloured square. */
+.sound-picker__icon--app {
+  background: none;
+  object-fit: contain;
+}
+
 .sound-picker__icon--none {
   border: 1px dashed var(--color-border-strong);
   background: transparent;

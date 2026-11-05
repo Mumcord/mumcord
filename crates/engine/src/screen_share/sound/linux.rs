@@ -60,6 +60,8 @@ struct Playback {
     app_name: Option<String>,
     binary: Option<String>,
     desktop_id: Option<String>,
+    /// The freedesktop icon name the app gives its streams.
+    icon_name: Option<String>,
     /// The process id the app reports for itself.
     app_pid: Option<u32>,
     /// The process id PipeWire read from the connection. For apps that play through the
@@ -81,6 +83,7 @@ impl Playback {
             app_name: text("application.name"),
             binary: text("application.process.binary"),
             desktop_id: text("application.id").or_else(|| text("pipewire.access.portal.app_id")),
+            icon_name: text("application.icon-name"),
             app_pid: pid("application.process.id"),
             socket_pid: pid("pipewire.sec.pid"),
         }
@@ -97,6 +100,7 @@ impl Playback {
             app_name: self.app_name.or_else(|| client.app_name.clone()),
             binary: self.binary.or_else(|| client.binary.clone()),
             desktop_id: self.desktop_id.or_else(|| client.desktop_id.clone()),
+            icon_name: self.icon_name.or_else(|| client.icon_name.clone()),
             app_pid: self.app_pid.or(client.app_pid),
             socket_pid: self.socket_pid.or(client.socket_pid),
         }
@@ -114,6 +118,7 @@ impl Playback {
             app_name: self.app_name.clone(),
             binary: self.binary.clone(),
             desktop_id: self.desktop_id.clone(),
+            icon_name: self.icon_name.clone(),
             pid: self.pid(),
         }
     }
@@ -875,6 +880,7 @@ mod tests {
             ("pipewire.sec.pid", "17"),
             ("application.id", " "),
             ("pipewire.access.portal.app_id", "org.mozilla.firefox"),
+            ("application.icon-name", "firefox"),
         ];
         let get = |key: &str| props.iter().find(|(k, _)| *k == key).map(|(_, v)| *v);
         let playback = Playback::from_props(get);
@@ -884,6 +890,7 @@ mod tests {
         let stream = playback.stream();
         assert_eq!(stream.pid, Some(4242), "the app's own pid wins");
         assert_eq!(stream.binary.as_deref(), Some("firefox"));
+        assert_eq!(stream.icon_name.as_deref(), Some("firefox"));
     }
 
     #[test]
@@ -936,6 +943,7 @@ mod tests {
         let app = SoundTarget::App(MatchedApp {
             app_name: Some("Firefox".into()),
             binary: Some("firefox".into()),
+            icon_name: None,
             pids: vec![10, 11],
         });
         let own = [100];
@@ -1202,6 +1210,7 @@ mod tests {
                 SoundTarget::App(MatchedApp {
                     app_name: Some("mumcord-test-low".into()),
                     binary: None,
+                    icon_name: None,
                     pids: vec![low],
                 }),
                 || {},

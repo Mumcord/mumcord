@@ -18,8 +18,6 @@
   "pause": "Pause",
   "resume": "Reprendre",
   "sound": "Partager le son",
-  "noSound": "Sous Linux, aucun son n’est partagé : les spectateurs ne voient que l’image.",
-  "noSoundForShare": "Ce partage n’a pas de son (écran entier ou version du système non prise en charge).",
   "viewersNone": "Personne ne regarde encore",
   "viewers_one": "{{count}} regarde : {{names}}",
   "viewers_many": "{{count}} regardent : {{names}}",

@@ -18,8 +18,6 @@
   "pause": "Pristabdyti",
   "resume": "Tęsti",
   "sound": "Bendrinti garsą",
-  "noSound": "Linux nebendrina garso: žiūrovai mato tik vaizdą.",
-  "noSoundForShare": "Šis bendrinimas neturi garso (visas ekranas arba nepalaikoma sistemos versija).",
   "viewersNone": "Kol kas niekas nežiūri",
   "viewers_one": "{{count}} žiūri: {{names}}",
   "viewers_few": "{{count}} žiūri: {{names}}",

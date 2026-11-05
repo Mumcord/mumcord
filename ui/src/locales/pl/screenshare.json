@@ -18,8 +18,6 @@
   "pause": "Wstrzymaj",
   "resume": "Wznów",
   "sound": "Udostępniaj dźwięk",
-  "noSound": "Linux nie udostępnia dźwięku: widzowie widzą tylko obraz.",
-  "noSoundForShare": "To udostępnianie nie ma dźwięku (cały ekran lub nieobsługiwana wersja systemu).",
   "viewersNone": "Nikt jeszcze nie ogląda",
   "viewers_one": "{{count}} ogląda: {{names}}",
   "viewers_few": "{{count}} oglądają: {{names}}",
