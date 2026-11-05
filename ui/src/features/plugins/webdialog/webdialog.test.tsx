@@ -121,6 +121,26 @@ describe("web dialog", () => {
     opener.remove();
   });
 
+  it("returns focus to what had it before when the plugin opened its dialog from its panel", () => {
+    // The fixture's "Open dialog": the dialog tree first, then the web view replaces it.
+    const panelButton = document.createElement("button");
+    document.body.append(panelButton);
+    panelButton.focus();
+    open();
+    const ui = store.usePluginUi();
+    const mocked = vi.mocked(store.usePluginUi);
+    mocked.mockReturnValue({ ...ui, webviews: new Map() });
+    const { rerender } = render(<PluginDialogHost />);
+    expect(document.activeElement).not.toBe(panelButton);
+    mocked.mockReturnValue(ui);
+    rerender(<PluginDialogHost />);
+    expect(document.activeElement).toHaveClass("plugin-webview");
+    mocked.mockReturnValue({ ...ui, dialogs: new Map(), webviews: new Map() });
+    rerender(<PluginDialogHost />);
+    expect(document.activeElement).toBe(panelButton);
+    panelButton.remove();
+  });
+
   it("has no accessibility violations", async () => {
     open();
     render(<PluginDialogHost />);

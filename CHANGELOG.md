@@ -77,6 +77,7 @@
 
 ### Fixed
 
+- Closing a plugin's web dialog with Esc or ✕ now ends the whole dialog: it could come back as an empty dialog a moment later and cover the app. Focus also returns to the button that opened the dialog instead of getting lost
 - Settings → Plugins → Diagnostics now says why a plugin was refused at load, for example "an Apps-menu label is the same as one of Mumcord's own", instead of showing nothing.
 - A plugin that talks to websites could not reach them right after it was installed, updated or loaded from a developer folder: its requests were refused until Mumcord was restarted
 - Plugin SDK: a Bovnar document with one text of 64 KB or more is now refused as `too-large` instead of `malformed`, so plugins can tell the player the message is too big.

@@ -4,7 +4,7 @@
  * inside, Escape or ✕ ends it at once on the host side and then tells the plugin with
  * `dialog-closed`; the user is always in control.
  */
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../../a11y";
 import { getApi, toEngineError } from "../../../api";
@@ -29,11 +29,35 @@ export function PluginDialogHost() {
   const [plugin, header] = open;
   // An open web view replaces the dialog tree (FR-6.46) and gets its own dialog (FR-9.40).
   const webview = webviews.get(plugin)?.get("dialog");
-  return webview ? (
-    <WebDialog key={plugin} plugin={plugin} title={header.title} webview={webview} />
-  ) : (
-    <PluginDialog key={plugin} plugin={plugin} header={header} />
+  return (
+    <ReturnFocus key={plugin} plugin={plugin}>
+      {webview ? (
+        <WebDialog plugin={plugin} title={header.title} webview={webview} />
+      ) : (
+        <PluginDialog plugin={plugin} header={header} />
+      )}
+    </ReturnFocus>
   );
+}
+
+/**
+ * Gives focus back once the plugin's dialog is gone: to the user-menu entry that opened it, else
+ * to whatever had focus before (e.g. a button in the plugin's panel). It outlives a switch
+ * between the dialog tree and a web view in the dialog, so that switch does not lose the opener.
+ */
+function ReturnFocus({ plugin, children }: { plugin: string; children: ReactNode }) {
+  // Read while rendering, before the dialog's own effects move focus into it.
+  const [before] = useState(() =>
+    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+  );
+  useEffect(
+    () => () => {
+      const opener = takeDialogOpener(plugin) ?? before;
+      if (opener?.isConnected) opener.focus();
+    },
+    [plugin, before],
+  );
+  return children;
 }
 
 function PluginDialog({ plugin, header }: { plugin: string; header: PluginDialogHeader }) {
@@ -52,15 +76,6 @@ function PluginDialog({ plugin, header }: { plugin: string; header: PluginDialog
         announce(t("failed"), "assertive");
       });
   }, [plugin, t]);
-
-  // Focus goes back to whatever opened the dialog once it is gone.
-  useEffect(
-    () => () => {
-      const opener = takeDialogOpener(plugin);
-      if (opener?.isConnected) opener.focus();
-    },
-    [plugin],
-  );
 
   return (
     <Modal
