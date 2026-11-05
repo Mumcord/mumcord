@@ -84,20 +84,30 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   in parallel jobs (`MUMCORD_E2E_STEP=test MUMCORD_E2E_SHARD=<n>`, each runner with its own test
   servers). The "Linux E2E" job fails if the build or any shard failed. A push to main runs only
   the build job, to keep its caches warm for pull requests (which only restore caches).
-- **Shard balance:** eight shards, balanced by the measured CI duration of each spec file
+- **Shard balance:** ten shards, balanced by the measured CI duration of each spec file
   (`e2e/spec-durations.json`). The longest spec (network resilience, ~5 min in CI) is pinned alone
-  to shard 1 and sets the floor; the others are spread longest-first onto the emptiest shard.
-  `scripts/e2e-shards.js` rewrites `shards.json`:
+  to shard 1 and sets the floor. The relay specs (the ones that call `relayenv.startRelay`) go to as
+  few shards as the balance allows, first in their shard and ordered by relay profile, because only
+  those shards load the relay images and the specs share one relay environment there. The others
+  are spread longest-first onto the emptiest shard. `scripts/e2e-shards.js` rewrites `shards.json`:
 
       node scripts/e2e-shards.js                                 # rebalance (e.g. after adding a spec)
-      node scripts/e2e-shards.js --measure <run-id> [<run-id>…]  # re-measure from passed CI runs first
+      node scripts/e2e-shards.js --measure <run-id> [<run-id>…]  # re-measure from CI runs first
       node scripts/e2e-shards.js --shards 12                     # change the number of shards
 
-  `--measure` reads the shard logs with the `gh` CLI (take ~10 recent passed E2E runs from
-  `gh run list --workflow e2e.yml --status success`). A spec without a measured duration counts with
-  the median. A run with `MUMCORD_E2E_SHARD` set fails while `shards.json` and the spec files
-  disagree. When changing the number of shards, also change the job matrix in `e2e.yml` (the script
-  warns).
+  Every shard job uploads the durations of its passed spec files (`e2e-durations-shard-<n>`,
+  written by `wdio.conf.ts`); `--measure` downloads them with the `gh` CLI and keeps the median per
+  spec (take ~5 recent passed E2E runs from `gh run list --workflow e2e.yml --status success`). A
+  spec without a measured duration counts with the median. A run with `MUMCORD_E2E_SHARD` set fails
+  while `shards.json` and the spec files disagree. When changing the number of shards, also change
+  the job matrix in `e2e.yml` (the script warns).
+
+- **Relay environment:** `relayenv.startRelay(profile)` starts the mumpeer testenv or switches the
+  running one to the profile; the spec files of a run share it, and `wdio.conf.ts` stops it at the
+  end. An idle environment with the same profile is reused as is. Registering a user
+  (`files.registerOnServer`) marks the server dirty, and the next `startRelay` wipes its data first,
+  so every spec file starts on an empty server and still runs alone. CI builds the mumpeer and
+  relay bot images once per pinned commit pair (job "E2E relay images") instead of in every shard.
 
 - **Failures:** screenshot + page source of the app go to `e2e/artifacts/` (git-ignored); CI uploads
   them (instance B: same name with `-B`). axe reports land there too.

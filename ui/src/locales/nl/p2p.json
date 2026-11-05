@@ -26,6 +26,7 @@
     "noRelay": "Deze server heeft geen relay, dus bestanden delen is niet beschikbaar.",
     "filesDisallowed": "De relay van deze server staat bestanden delen niet toe.",
     "screenDisallowed": "De relay van deze server staat schermdelen niet toe.",
+    "camerasDisallowed": "Het relay van deze server staat het delen van de camera niet toe.",
     "imagesDisallowed": "Volledige grootte niet beschikbaar: de relay van deze server staat geen afbeeldingen toe",
     "noCertificate": "Bestanden delen vereist een clientcertificaat.",
     "modeNeedsRelay": "Bestanden delen heeft de relay nodig; je peer-to-peer-instelling is {{mode}}.",

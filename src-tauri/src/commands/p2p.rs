@@ -1,6 +1,7 @@
 //! Direct connections between Mumcord users (FR-2.35, FR-2.36).
 
 use mumcord_engine::Engine;
+use mumcord_engine::camera;
 use mumcord_engine::p2p::{self as engine_p2p, ConnectionPath, RelayTransport};
 use mumcord_engine::peer;
 use mumcord_engine::peer::RelayRefusal as EngineRefusal;
@@ -104,13 +105,14 @@ pub enum RelayRefusal {
     BroadcastFull,
 }
 
-/// What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing".
+/// What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing", "Cameras".
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum RelayUse {
     Images,
     Files,
     ScreenShare,
+    Cameras,
 }
 
 /// Why the relay cannot be used; the UI shows the text of FR-4.4, FR-4.11 or FR-4.14.
@@ -219,11 +221,9 @@ impl From<peer::RelayUse> for RelayUse {
     fn from(u: peer::RelayUse) -> Self {
         match u {
             peer::RelayUse::Images => Self::Images,
-            // Plugin data has no UI variant until the plugin host lands (spec 09, R3a); cameras
-            // get theirs with the availability task (spec 08, C-7).
-            peer::RelayUse::Files | peer::RelayUse::PluginData | peer::RelayUse::Camera => {
-                Self::Files
-            }
+            // Plugin data has no UI variant until the plugin host lands (spec 09, R3a).
+            peer::RelayUse::Files | peer::RelayUse::PluginData => Self::Files,
+            peer::RelayUse::Camera => Self::Cameras,
             peer::RelayUse::ScreenShare => Self::ScreenShare,
         }
     }
@@ -282,6 +282,51 @@ impl From<peer::RelayInfo> for RelayInfo {
             broadcast_max: i.broadcast_max,
         }
     }
+}
+
+/// Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum CameraUnavailable {
+    NoRelay,
+    RelayTooOld,
+    RelayDisallows,
+    NeedsRelayMode,
+    NoCertificate,
+}
+
+impl From<camera::avail::CameraUnavailable> for CameraUnavailable {
+    fn from(r: camera::avail::CameraUnavailable) -> Self {
+        use camera::avail::CameraUnavailable as R;
+        match r {
+            R::NoRelay => Self::NoRelay,
+            R::RelayTooOld => Self::RelayTooOld,
+            R::RelayDisallows => Self::RelayDisallows,
+            R::NeedsRelayMode => Self::NeedsRelayMode,
+            R::NoCertificate => Self::NoCertificate,
+        }
+    }
+}
+
+/// Camera sharing became available or unavailable on a server (FR-8.2); `reason` is `null`
+/// when it is available.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct CameraAvailabilityChanged {
+    pub server_id: ServerId,
+    pub reason: Option<CameraUnavailable>,
+}
+
+/// Why camera sharing is unavailable on a connected server; `null` when it is available.
+#[tauri::command]
+#[specta::specta]
+pub fn camera_unavailable(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<CameraUnavailable>> {
+    Ok(engine
+        .camera_unavailable(to_engine_server_id(server_id))
+        .map(Into::into))
 }
 
 /// The relay of a server for the server info panel; "no relay" when not connected.

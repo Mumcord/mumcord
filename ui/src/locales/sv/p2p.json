@@ -26,6 +26,7 @@
     "noRelay": "Den här servern har inget relä, så fildelning är inte tillgänglig.",
     "filesDisallowed": "Den här serverns relä tillåter inte fildelning.",
     "screenDisallowed": "Den här serverns relä tillåter inte skärmdelning.",
+    "camerasDisallowed": "Den här serverns relä tillåter inte kameradelning.",
     "imagesDisallowed": "Full storlek är inte tillgänglig: den här serverns relä tillåter inte bilder",
     "noCertificate": "Fildelning kräver ett klientcertifikat.",
     "modeNeedsRelay": "Fildelning kräver reläet; din peer-to-peer-inställning är {{mode}}.",

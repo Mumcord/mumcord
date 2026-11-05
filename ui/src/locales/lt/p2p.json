@@ -26,6 +26,7 @@
     "noRelay": "Šis serveris neturi perdavimo mazgo, todėl failų bendrinimas nepasiekiamas.",
     "filesDisallowed": "Šio serverio perdavimo mazgas neleidžia bendrinti failų.",
     "screenDisallowed": "Šio serverio perdavimo mazgas neleidžia bendrinti ekrano.",
+    "camerasDisallowed": "Šio serverio perdavimo mazgas neleidžia bendrinti kameros.",
     "imagesDisallowed": "Visas dydis nepasiekiamas: šio serverio perdavimo mazgas neleidžia paveikslėlių",
     "noCertificate": "Failų bendrinimui reikalingas kliento sertifikatas.",
     "modeNeedsRelay": "Failų bendrinimui reikalingas perdavimo mazgas; tavo peer-to-peer nustatymas yra {{mode}}.",

@@ -594,6 +594,8 @@ pub enum EngineEvent {
     ScreenEncoderStatusChanged(crate::screen_share::EncoderStatus),
     /// What the server info panel shows about the server's relay changed (FR-4.20).
     RelayChanged(crate::peer::RelayInfo),
+    /// Camera sharing became available (`None`) or unavailable, with the reason (FR-8.2, FR-8.4).
+    CameraAvailabilityChanged(Option<crate::camera::avail::CameraUnavailable>),
     /// A plugin message from `session` through the relay (spec 09 FR-9.62): new, in order per
     /// sender. `api` is the sender plugin's API major.minor; `data` stays opaque (FR-9.94).
     PluginRelayData {

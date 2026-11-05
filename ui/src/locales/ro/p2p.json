@@ -26,6 +26,7 @@
     "noRelay": "Acest server nu are releu, deci partajarea fișierelor nu este disponibilă.",
     "filesDisallowed": "Releul acestui server nu permite partajarea fișierelor.",
     "screenDisallowed": "Releul acestui server nu permite partajarea ecranului.",
+    "camerasDisallowed": "Releul acestui server nu permite partajarea camerei.",
     "imagesDisallowed": "Dimensiunea completă nu este disponibilă: releul acestui server nu permite imagini",
     "noCertificate": "Partajarea fișierelor necesită un certificat de client.",
     "modeNeedsRelay": "Partajarea fișierelor are nevoie de releu; setarea ta peer-to-peer este {{mode}}.",

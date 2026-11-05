@@ -26,6 +26,7 @@
     "noRelay": "Šim serverim nav releja, tāpēc failu kopīgošana nav pieejama.",
     "filesDisallowed": "Šī servera relejs neatļauj failu kopīgošanu.",
     "screenDisallowed": "Šī servera relejs neatļauj ekrāna kopīgošanu.",
+    "camerasDisallowed": "Šī servera relejs neļauj kopīgot kameru.",
     "imagesDisallowed": "Pilns izmērs nav pieejams: šī servera relejs neatļauj attēlus",
     "noCertificate": "Failu kopīgošanai nepieciešams klienta sertifikāts.",
     "modeNeedsRelay": "Failu kopīgošanai nepieciešams relejs; tavs peer-to-peer iestatījums ir {{mode}}.",

@@ -2,11 +2,11 @@ name: E2E
 
 # UI end-to-end tests in the e2e/ Docker image (WebKitWebDriver + tauri-driver, Xvfb) against
 # the local testenv Mumble servers. Slow, so separate from CI: on pull requests to main and manual
-# runs. One job builds the image and the debug binaries once, one the fixture plugin packages,
-# twelve shard jobs run the spec files of e2e/shards.json in parallel (each runner has its own test
-# servers), and "Linux E2E" (the check main's branch protection requires) passes only when all of
-# them passed.
-# A push to main runs only the two build jobs, to save the build caches there: pull requests can read
+# runs. One job builds the image and the debug binaries once, one the fixture plugin packages, one
+# the relay testenv images, ten shard jobs run the spec files of e2e/shards.json in parallel (each
+# runner has its own test servers), and "Linux E2E" (the check main's branch protection requires)
+# passes only when all of them passed.
+# A push to main runs only the build jobs, to save the build caches there: pull requests can read
 # main's caches but not each other's, and they only restore, because one ~2 GB copy per pull
 # request filled the 10 GB repository cache and evicted everything else.
 on:
@@ -22,6 +22,12 @@ concurrency:
 
 env:
   MUMCORD_E2E_CACHE: /home/runner/.cache/mumcord-e2e
+  # The relay testenv (mumpeer) and the relay bot (`mumbot peer`) at fixed commits, so a change
+  # there cannot break unrelated pull requests. The published mumbot image predates the peer
+  # module, so the bot is built from a commit of Mumcord/mumbot main until a release has it. To bump
+  # one: git ls-remote https://github.com/Mumcord/mumpeer main (or .../mumbot main).
+  MUMPEER_REF: c42aa1072cfec9b4d06d2853e459af44ad8bdf92
+  MUMBOT_REF: 62b3d263490158097e2a8f538436d42f0eb62c90
 
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
@@ -192,9 +198,69 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  # The mumpeer and relay bot images for the relay specs, built once per pinned pair of commits
+  # (~8 min) instead of in every relay shard; the images are small (~50 MB), so the cache holds them
+  # whole. Runs next to the build job; the relay shards load the result.
+  relay-images:
+    name: E2E relay images
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - id: cache
+        uses: actions/cache/restore@v6
+        with:
+          path: e2e-relay-images.tar.zst
+          key: e2e-relay-images-${{ env.MUMPEER_REF }}-${{ env.MUMBOT_REF }}
+
+      - name: Check out mumpeer
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: Mumcord/mumpeer
+          ref: ${{ env.MUMPEER_REF }}
+          path: mumpeer
+          persist-credentials: false
+
+      - name: Check out mumbot
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: Mumcord/mumbot
+          ref: ${{ env.MUMBOT_REF }}
+          path: mumbot
+          persist-credentials: false
+
+      # bash enables pipefail, so a failing build or save fails the step.
+      - name: Build and package the images
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          docker build -q -t mumpeer:testenv mumpeer
+          docker build -q -t mumbot:peer-e2e mumbot
+          docker save mumpeer:testenv mumbot:peer-e2e | zstd -T0 -3 -q -o e2e-relay-images.tar.zst
+          ls -lh e2e-relay-images.tar.zst
+
+      - if: github.ref == 'refs/heads/main' && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: e2e-relay-images.tar.zst
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+
+      - if: github.event_name != 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-relay-images
+          overwrite: true
+          path: e2e-relay-images.tar.zst
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
+
   shard:
     name: E2E shard ${{ matrix.shard }}
-    needs: [build, plugins]
+    needs: [build, plugins, relay-images]
     if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -206,7 +272,7 @@ jobs:
       fail-fast: false
       matrix:
         # Must match the number of shards in e2e/shards.json (scripts/e2e-shards.js).
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
       - uses: actions/checkout@v7
 
@@ -229,23 +295,23 @@ jobs:
           zstd -dc e2e-plugins.tar.zst | tar -C "$MUMCORD_E2E_PLUGIN_PACKAGES" -xf -
           rm e2e-image.tar.zst e2e-bin.tar.zst e2e-plugins.tar.zst
 
-      # The relay specs (spec 07: p2p/relay-*, files/*) need the mumpeer testenv; only the shards
-      # that run them pay for the checkout and the image build. shards.json is rebalanced from time
-      # to time, so look the specs of this shard up instead of hard-coding the number.
+      # The relay specs (the ones that start the mumpeer testenv) need the testenv scripts and the
+      # relay images; scripts/e2e-shards.js puts them into as few shards as it can, and only those
+      # pay for the checkout and the image load. Look the specs of this shard up instead of
+      # hard-coding the numbers, which change with every rebalance.
       - name: Does this shard run relay specs
         id: relay
         run: |
           node -e '
-            const { shards } = JSON.parse(require("fs").readFileSync("e2e/shards.json", "utf8"));
+            const fs = require("fs");
+            const { shards } = JSON.parse(fs.readFileSync("e2e/shards.json", "utf8"));
             const specs = shards[Number(process.env.SHARD) - 1] ?? [];
-            console.log("needed=" + specs.some((s) => /\/relay-|\/files\//.test(s)));
+            const relay = specs.some((s) => /relayenv\.startRelay\(/.test(fs.readFileSync("e2e/" + s, "utf8")));
+            console.log("needed=" + relay);
           ' >> "$GITHUB_OUTPUT"
         env:
           SHARD: ${{ matrix.shard }}
 
-      # To bump the pinned mumpeer: take the SHA of the new commit on Mumcord/mumpeer main
-      # (git ls-remote https://github.com/Mumcord/mumpeer main) and put it into `ref` below.
-      # A fixed commit keeps a mumpeer change from breaking unrelated pull requests.
       # The checkout lives inside the workspace (actions/checkout cannot leave it); run.sh mounts
       # it into the E2E container through MUMPEER_DIR.
       - name: Check out mumpeer (relay testenv)
@@ -253,47 +319,21 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: Mumcord/mumpeer
-          ref: c42aa1072cfec9b4d06d2853e459af44ad8bdf92
+          ref: ${{ env.MUMPEER_REF }}
           path: mumpeer
           persist-credentials: false
 
-      # Built once with the layer cache and handed to testenv/up.sh as MUMPEER_IMAGE, which then
-      # skips its own (uncached) docker compose build.
-      - name: Set up buildx for mumpeer
-        if: steps.relay.outputs.needed == 'true'
-        uses: docker/setup-buildx-action@v4
-
-      - name: Build mumpeer image
-        if: steps.relay.outputs.needed == 'true'
-        uses: docker/build-push-action@v7
+      - if: steps.relay.outputs.needed == 'true'
+        uses: actions/download-artifact@v8
         with:
-          context: mumpeer
-          tags: mumpeer:testenv
-          load: true
-          cache-from: type=gha,scope=e2e-mumpeer
-          cache-to: type=gha,mode=max,scope=e2e-mumpeer
+          name: e2e-relay-images
 
-      # The relay bot is `mumbot peer`. The published mumbot image predates that module, so build
-      # the bot from a pinned commit of Mumcord/mumbot main until a mumbot release has it. To bump
-      # it: git ls-remote https://github.com/Mumcord/mumbot main
-      - name: Check out mumbot (relay bot)
+      # testenv/up.sh runs the loaded images (MUMPEER_IMAGE, MUMBOT_IMAGE) instead of building.
+      - name: Load relay images
         if: steps.relay.outputs.needed == 'true'
-        uses: actions/checkout@v7
-        with:
-          repository: Mumcord/mumbot
-          ref: 62b3d263490158097e2a8f538436d42f0eb62c90
-          path: mumbot
-          persist-credentials: false
-
-      - name: Build mumbot image
-        if: steps.relay.outputs.needed == 'true'
-        uses: docker/build-push-action@v7
-        with:
-          context: mumbot
-          tags: mumbot:peer-e2e
-          load: true
-          cache-from: type=gha,scope=e2e-mumbot
-          cache-to: type=gha,mode=max,scope=e2e-mumbot
+        run: |
+          zstd -dc e2e-relay-images.tar.zst | docker load -q
+          rm e2e-relay-images.tar.zst
 
       - name: Point the E2E run at mumpeer
         if: steps.relay.outputs.needed == 'true'
@@ -315,6 +355,17 @@ jobs:
           MUMCORD_E2E_OLD_MUMPEER_IMAGE: ghcr.io/mumcord/mumpeer:0.1.0
           MUMCORD_E2E_OLD_MUMBOT_IMAGE: ghcr.io/mumcord/mumbot:0.4.1
 
+      # Per-spec durations for scripts/e2e-shards.js --measure (written by wdio.conf.ts).
+      - name: Upload spec durations
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-durations-shard-${{ matrix.shard }}
+          overwrite: true
+          path: e2e/artifacts/spec-durations.json
+          retention-days: 30
+          if-no-files-found: ignore
+
       - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v7
@@ -327,20 +378,21 @@ jobs:
   # this job must run and fail when the build failed and the shards were skipped.
   e2e:
     name: Linux E2E
-    needs: [changes, build, plugins, shard]
+    needs: [changes, build, plugins, relay-images, shard]
     if: always() && github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Check build and shard results
         run: |
-          echo "changes: $CHANGES, build: $BUILD, plugins: $PLUGINS, shards: $SHARDS"
+          echo "changes: $CHANGES, build: $BUILD, plugins: $PLUGINS, relay images: $RELAY, shards: $SHARDS"
           [ "$CHANGES" = success ] || exit 1
           # No code change: build and shards are skipped on purpose.
-          if [ "$BUILD" = skipped ] && [ "$PLUGINS" = skipped ] && [ "$SHARDS" = skipped ]; then exit 0; fi
-          [ "$BUILD" = success ] && [ "$PLUGINS" = success ] && [ "$SHARDS" = success ]
+          if [ "$BUILD" = skipped ] && [ "$PLUGINS" = skipped ] && [ "$RELAY" = skipped ] && [ "$SHARDS" = skipped ]; then exit 0; fi
+          [ "$BUILD" = success ] && [ "$PLUGINS" = success ] && [ "$RELAY" = success ] && [ "$SHARDS" = success ]
         env:
           CHANGES: ${{ needs.changes.result }}
           BUILD: ${{ needs.build.result }}
           PLUGINS: ${{ needs.plugins.result }}
+          RELAY: ${{ needs.relay-images.result }}
           SHARDS: ${{ needs.shard.result }}

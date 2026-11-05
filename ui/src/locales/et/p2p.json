@@ -26,6 +26,7 @@
     "noRelay": "Sellel serveril pole releeserverit, seega failide jagamine pole saadaval.",
     "filesDisallowed": "Selle serveri releeserver ei luba failide jagamist.",
     "screenDisallowed": "Selle serveri releeserver ei luba ekraani jagamist.",
+    "camerasDisallowed": "Selle serveri releeserver ei luba kaamera jagamist.",
     "imagesDisallowed": "Täissuurus pole saadaval: selle serveri releeserver ei luba pilte",
     "noCertificate": "Failide jagamiseks on vaja kliendisertifikaati.",
     "modeNeedsRelay": "Failide jagamiseks on vaja releeserverit; sinu peer-to-peer seade on {{mode}}.",
