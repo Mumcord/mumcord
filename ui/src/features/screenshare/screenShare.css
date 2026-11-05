@@ -461,6 +461,9 @@
 
 /* The sharer's control bar, floating at the top of the chat (issue #163, FR-3.127). */
 .sharer-bar {
+  /* The bar's own width decides whether the buttons show their labels (members panel, narrow
+     window), not the window's width. */
+  container: sharer-bar / inline-size;
   position: relative;
   /* Above the chat below it, so the viewers popover is not covered. */
   z-index: 5;
@@ -546,6 +549,37 @@
   padding: var(--space-1) var(--space-3);
   font-size: var(--font-size-sm);
   white-space: nowrap;
+}
+
+.sharer-bar__count {
+  display: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Too narrow for the labelled buttons of the mockup: icons only, so the buttons stay on one row.
+   The labels stay for screen readers and show as tooltips. */
+@container sharer-bar (max-width: 44rem) {
+  .sharer-bar__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .button.sharer-bar__button {
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .sharer-bar__stack {
+    display: none;
+  }
+
+  .sharer-bar__count {
+    display: inline;
+  }
 }
 
 .button.sharer-bar__button[aria-pressed="true"] {
