@@ -53,18 +53,29 @@
     "effectsUnavailable": "Fono efektai šiame kompiuteryje negalimi: {{reason}}",
     "levelBest": "Geriausia",
     "levelLight": "Lengva",
-    "blurStrengthValue": "{{value}} iš 100",
     "imageYoursNumbered": "Tavo vaizdas {{number}}",
     "errorUseNotAllowed": "Šio serverio perdavimo mazgas neleidžia bendrinti kameros.",
     "errorRelayDown": "Kameros nepavyko paleisti: perdavimo mazgas nepasiekiamas."
   },
   "backgrounds": {
-    "beach": "Paplūdimys",
-    "mountains": "Kalnai",
-    "nightCity": "Naktinis miestas",
-    "softLight": "Švelni šviesa",
-    "studio": "Studija",
-    "library": "Biblioteka"
+    "abstractWarmWaves": "Šiltos šviesos bangos",
+    "blueMagentaWaves": "Mėlynos ir purpurinės bangos",
+    "glossyWavesOrb": "Blizgios bangos",
+    "pixelMountainSunset": "Pikselinis saulėlydis kalnuose",
+    "cityBalconyNight": "Miesto balkonas naktį",
+    "modernWc": "Modernus WC",
+    "electronicsLab": "Elektronikos laboratorija",
+    "serverCorridor": "Serverių koridorius",
+    "neonGamingRoom": "Neoninis žaidimų kambarys",
+    "neonNerdRoom": "Neoninis entuziasto kambarys",
+    "pixelGamingRoomCat": "Pikselinis žaidimų kambarys su kate",
+    "reefAquariumRoom": "Kambarys su rifo akvariumu",
+    "nightModelRailway": "Geležinkelio maketas naktį",
+    "modelRailwayViaduct": "Geležinkelio viaduko diorama",
+    "spaceshipBridgeCat": "Erdvėlaivio tiltelis su kate",
+    "spaceStationEarth": "Kosminė stotis virš Žemės",
+    "scifiRoomGoldenValley": "Mokslinės fantastikos kambarys su auksiniu slėniu",
+    "underwaterBaseWhale": "Povandeninė bazė su banginiu"
   },
   "noCameraFound": "Kameros nerasta. Prijunk kamerą ir ji pasirodys čia.",
   "imageImportFailed": "Šio vaizdo naudoti negalima. Naudok PNG, JPEG arba WebP failą iki 10 MB.",
@@ -100,7 +111,15 @@
     "live": "Tavo kamera transliuoja tiesiogiai",
     "stopped": "Tavo kamera sustojo",
     "joined": "{{name}} įjungė kamerą",
-    "left": "{{name}} išjungė kamerą"
+    "left": "{{name}} išjungė kamerą",
+    "turnedOn_one": "{{names}} įjungė savo kamerą",
+    "turnedOn_few": "{{names}} įjungė savo kameras",
+    "turnedOn_many": "{{names}} įjungė savo kameras",
+    "turnedOn_other": "{{names}} įjungė savo kameras",
+    "turnedOff_one": "{{names}} išjungė savo kamerą",
+    "turnedOff_few": "{{names}} išjungė savo kameras",
+    "turnedOff_many": "{{names}} išjungė savo kameras",
+    "turnedOff_other": "{{names}} išjungė savo kameras"
   },
   "room": {
     "title": "Kamerų kambarys",
@@ -143,7 +162,8 @@
     "label_other": "Kamerų kambarys, {{count}} kamerų įjungta",
     "miniBar_few": "{{count}} kameros įjungtos",
     "miniBar_many": "{{count}} kameros įjungtos",
-    "miniBar_other": "{{count}} kamerų įjungta"
+    "miniBar_other": "{{count}} kamerų įjungta",
+    "fullTitle": "Kambarys pilnas, kai įjungta 9 kameros"
   },
   "position": {
     "label": "Kameros",
@@ -166,7 +186,8 @@
     "retry": "Bandyti dar kartą",
     "hidden": "Vaizdas paslėptas",
     "showVideo": "Rodyti vaizdą",
-    "viewing": "Žiūri"
+    "viewing": "Žiūri",
+    "weak": "Silpnas ryšys"
   },
   "tileMenu": {
     "pin": "Prisegti man",

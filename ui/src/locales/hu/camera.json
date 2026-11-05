@@ -53,18 +53,29 @@
     "effectsUnavailable": "A háttéreffektek nem érhetők el ezen a gépen: {{reason}}",
     "levelBest": "Legjobb",
     "levelLight": "Könnyű",
-    "blurStrengthValue": "{{value}} / 100",
     "imageYoursNumbered": "A te képed: {{number}}",
     "errorUseNotAllowed": "Ennek a szervernek az átjátszója nem engedi a kamera megosztását.",
     "errorRelayDown": "A kamera nem indulhatott el: az átjátszó nem érhető el."
   },
   "backgrounds": {
-    "beach": "Tengerpart",
-    "mountains": "Hegyek",
-    "nightCity": "Éjszakai város",
-    "softLight": "Lágy fény",
-    "studio": "Stúdió",
-    "library": "Könyvtár"
+    "abstractWarmWaves": "Meleg fényhullámok",
+    "blueMagentaWaves": "Kék és bíbor hullámok",
+    "glossyWavesOrb": "Fényes hullámok",
+    "pixelMountainSunset": "Pixeles naplemente a hegyekben",
+    "cityBalconyNight": "Városi erkély éjjel",
+    "modernWc": "Modern WC",
+    "electronicsLab": "Elektronikai labor",
+    "serverCorridor": "Szerverfolyosó",
+    "neonGamingRoom": "Neon gamerszoba",
+    "neonNerdRoom": "Neon kockaszoba",
+    "pixelGamingRoomCat": "Pixeles gamerszoba macskával",
+    "reefAquariumRoom": "Szoba korallzátony-akváriummal",
+    "nightModelRailway": "Terepasztal éjjel",
+    "modelRailwayViaduct": "Vasúti viadukt dioráma",
+    "spaceshipBridgeCat": "Űrhajóhíd macskával",
+    "spaceStationEarth": "Űrállomás a Föld felett",
+    "scifiRoomGoldenValley": "Sci-fi szoba aranyló völggyel",
+    "underwaterBaseWhale": "Víz alatti bázis bálnával"
   },
   "noCameraFound": "Nem található kamera. Csatlakoztass egy kamerát, és itt megjelenik.",
   "imageImportFailed": "Ez a kép nem használható. Használj legfeljebb 10 MB-os PNG, JPEG vagy WebP fájlt.",
@@ -100,7 +111,11 @@
     "live": "A kamerád élő",
     "stopped": "A kamerád leállt",
     "joined": "{{name}} bekapcsolta a kameráját",
-    "left": "{{name}} kikapcsolta a kameráját"
+    "left": "{{name}} kikapcsolta a kameráját",
+    "turnedOn_one": "{{names}} bekapcsolta a kameráját",
+    "turnedOn_other": "{{names}} bekapcsolták a kamerájukat",
+    "turnedOff_one": "{{names}} kikapcsolta a kameráját",
+    "turnedOff_other": "{{names}} kikapcsolták a kamerájukat"
   },
   "room": {
     "title": "Kameraszoba",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} kamera bekapcsolva",
     "cameras": "Kamerák",
     "label_other": "Kameraszoba, {{count}} kamera bekapcsolva",
-    "miniBar_other": "{{count}} kamera bekapcsolva"
+    "miniBar_other": "{{count}} kamera bekapcsolva",
+    "fullTitle": "A szoba 9 kamerával megtelt"
   },
   "position": {
     "label": "Kamerák",
@@ -156,7 +172,8 @@
     "retry": "Újra",
     "hidden": "Videó elrejtve",
     "showVideo": "Videó megjelenítése",
-    "viewing": "Nézed"
+    "viewing": "Nézed",
+    "weak": "Gyenge kapcsolat"
   },
   "tileMenu": {
     "pin": "Kitűzés nekem",

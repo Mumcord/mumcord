@@ -53,18 +53,29 @@
     "effectsUnavailable": "Gli effetti di sfondo non sono disponibili su questo PC: {{reason}}",
     "levelBest": "Massima",
     "levelLight": "Leggera",
-    "blurStrengthValue": "{{value}} su 100",
     "imageYoursNumbered": "La tua immagine {{number}}",
     "errorUseNotAllowed": "Il relay di questo server non consente la condivisione della fotocamera.",
     "errorRelayDown": "Impossibile avviare la fotocamera: il relay non è raggiungibile."
   },
   "backgrounds": {
-    "beach": "Spiaggia",
-    "mountains": "Montagne",
-    "nightCity": "Città di notte",
-    "softLight": "Luce soffusa",
-    "studio": "Studio",
-    "library": "Biblioteca"
+    "abstractWarmWaves": "Onde di luce calde",
+    "blueMagentaWaves": "Onde blu e magenta",
+    "glossyWavesOrb": "Onde lucide",
+    "pixelMountainSunset": "Tramonto in montagna in pixel art",
+    "cityBalconyNight": "Balcone in città di notte",
+    "modernWc": "Bagno moderno",
+    "electronicsLab": "Laboratorio di elettronica",
+    "serverCorridor": "Corridoio dei server",
+    "neonGamingRoom": "Stanza da gaming al neon",
+    "neonNerdRoom": "Stanza nerd al neon",
+    "pixelGamingRoomCat": "Stanza da gaming in pixel art con gatto",
+    "reefAquariumRoom": "Stanza con acquario di barriera",
+    "nightModelRailway": "Plastico ferroviario di notte",
+    "modelRailwayViaduct": "Diorama con viadotto ferroviario",
+    "spaceshipBridgeCat": "Ponte di comando di un’astronave con gatto",
+    "spaceStationEarth": "Stazione spaziale sopra la Terra",
+    "scifiRoomGoldenValley": "Stanza fantascientifica con valle dorata",
+    "underwaterBaseWhale": "Base sottomarina con balena"
   },
   "noCameraFound": "Nessuna fotocamera trovata. Collega una fotocamera e apparirà qui.",
   "imageImportFailed": "Questa immagine non può essere usata. Usa un file PNG, JPEG o WebP fino a 10 MB.",
@@ -100,7 +111,13 @@
     "live": "La tua fotocamera è in diretta",
     "stopped": "La tua fotocamera si è interrotta",
     "joined": "{{name}} ha attivato la fotocamera",
-    "left": "{{name}} ha disattivato la fotocamera"
+    "left": "{{name}} ha disattivato la fotocamera",
+    "turnedOn_one": "{{names}} ha acceso la videocamera",
+    "turnedOn_many": "{{names}} hanno acceso le videocamere",
+    "turnedOn_other": "{{names}} hanno acceso le videocamere",
+    "turnedOff_one": "{{names}} ha spento la videocamera",
+    "turnedOff_many": "{{names}} hanno spento le videocamere",
+    "turnedOff_other": "{{names}} hanno spento le videocamere"
   },
   "room": {
     "title": "Stanza delle fotocamere",
@@ -138,7 +155,8 @@
     "miniBar_many": "{{count}} di fotocamere attive",
     "cameras": "Fotocamere",
     "label_other": "Stanza delle fotocamere, {{count}} fotocamere attive",
-    "miniBar_other": "{{count}} fotocamere attive"
+    "miniBar_other": "{{count}} fotocamere attive",
+    "fullTitle": "La stanza è piena con 9 videocamere"
   },
   "position": {
     "label": "Fotocamere",
@@ -161,7 +179,8 @@
     "retry": "Riprova",
     "hidden": "Video nascosto",
     "showVideo": "Mostra video",
-    "viewing": "In visione"
+    "viewing": "In visione",
+    "weak": "Connessione debole"
   },
   "tileMenu": {
     "pin": "Fissa per me",

@@ -53,18 +53,29 @@
     "effectsUnavailable": "Los efectos de fondo no están disponibles en este PC: {{reason}}",
     "levelBest": "Máxima",
     "levelLight": "Ligera",
-    "blurStrengthValue": "{{value}} de 100",
     "imageYoursNumbered": "Tu imagen {{number}}",
     "errorUseNotAllowed": "El relé de este servidor no permite compartir la cámara.",
     "errorRelayDown": "No se pudo iniciar la cámara: el relé no está accesible."
   },
   "backgrounds": {
-    "beach": "Playa",
-    "mountains": "Montañas",
-    "nightCity": "Ciudad de noche",
-    "softLight": "Luz suave",
-    "studio": "Estudio",
-    "library": "Biblioteca"
+    "abstractWarmWaves": "Ondas de luz cálidas",
+    "blueMagentaWaves": "Ondas azules y magenta",
+    "glossyWavesOrb": "Ondas brillantes",
+    "pixelMountainSunset": "Atardecer pixelado en la montaña",
+    "cityBalconyNight": "Balcón urbano de noche",
+    "modernWc": "Baño moderno",
+    "electronicsLab": "Laboratorio de electrónica",
+    "serverCorridor": "Pasillo de servidores",
+    "neonGamingRoom": "Sala gamer de neón",
+    "neonNerdRoom": "Cuarto friki de neón",
+    "pixelGamingRoomCat": "Sala gamer pixelada con gato",
+    "reefAquariumRoom": "Sala con acuario de arrecife",
+    "nightModelRailway": "Maqueta de tren de noche",
+    "modelRailwayViaduct": "Diorama de viaducto ferroviario",
+    "spaceshipBridgeCat": "Puente de nave espacial con gato",
+    "spaceStationEarth": "Estación espacial sobre la Tierra",
+    "scifiRoomGoldenValley": "Sala de ciencia ficción con valle dorado",
+    "underwaterBaseWhale": "Base submarina con ballena"
   },
   "noCameraFound": "No se encontró ninguna cámara. Conecta una cámara y aparecerá aquí.",
   "imageImportFailed": "Esta imagen no se puede usar. Usa un archivo PNG, JPEG o WebP de hasta 10 MB.",
@@ -100,7 +111,13 @@
     "live": "Tu cámara está en directo",
     "stopped": "Tu cámara se detuvo",
     "joined": "{{name}} activó su cámara",
-    "left": "{{name}} desactivó su cámara"
+    "left": "{{name}} desactivó su cámara",
+    "turnedOn_one": "{{names}} encendió su cámara",
+    "turnedOn_many": "{{names}} encendieron sus cámaras",
+    "turnedOn_other": "{{names}} encendieron sus cámaras",
+    "turnedOff_one": "{{names}} apagó su cámara",
+    "turnedOff_many": "{{names}} apagaron sus cámaras",
+    "turnedOff_other": "{{names}} apagaron sus cámaras"
   },
   "room": {
     "title": "Sala de cámaras",
@@ -138,7 +155,8 @@
     "miniBar_many": "{{count}} de cámaras activadas",
     "cameras": "Cámaras",
     "label_other": "Sala de cámaras, {{count}} cámaras activadas",
-    "miniBar_other": "{{count}} cámaras activadas"
+    "miniBar_other": "{{count}} cámaras activadas",
+    "fullTitle": "La sala está llena con 9 cámaras"
   },
   "position": {
     "label": "Cámaras",
@@ -161,7 +179,8 @@
     "retry": "Intentar de nuevo",
     "hidden": "Vídeo oculto",
     "showVideo": "Mostrar vídeo",
-    "viewing": "Viendo"
+    "viewing": "Viendo",
+    "weak": "Conexión débil"
   },
   "tileMenu": {
     "pin": "Fijar para mí",

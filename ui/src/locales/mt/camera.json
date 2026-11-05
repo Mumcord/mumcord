@@ -53,18 +53,29 @@
     "effectsUnavailable": "L-effetti tal-isfond mhumiex disponibbli fuq dan il-PC: {{reason}}",
     "levelBest": "L-aħjar",
     "levelLight": "Ħafif",
-    "blurStrengthValue": "{{value}} minn 100",
     "imageYoursNumbered": "L-immaġni tiegħek {{number}}",
     "errorUseNotAllowed": "Ir-relay ta' dan is-server ma jippermettix il-qsim tal-kamera.",
     "errorRelayDown": "Il-kamera ma setgħetx tibda: ir-relay mhuwiex jintlaħaq."
   },
   "backgrounds": {
-    "beach": "Bajja",
-    "mountains": "Muntanji",
-    "nightCity": "Belt bil-lejl",
-    "softLight": "Dawl artab",
-    "studio": "Studio",
-    "library": "Librerija"
+    "abstractWarmWaves": "Mewġ sħun ta’ dawl",
+    "blueMagentaWaves": "Mewġ blu u maġenta",
+    "glossyWavesOrb": "Mewġ tleqq",
+    "pixelMountainSunset": "Nżul ix-xemx fuq il-muntanji f’pixels",
+    "cityBalconyNight": "Gallarija tal-belt bil-lejl",
+    "modernWc": "WC modern",
+    "electronicsLab": "Laboratorju tal-elettronika",
+    "serverCorridor": "Kuritur tas-servers",
+    "neonGamingRoom": "Kamra tal-gaming bin-neon",
+    "neonNerdRoom": "Kamra nerd bin-neon",
+    "pixelGamingRoomCat": "Kamra tal-gaming f’pixels b’qattus",
+    "reefAquariumRoom": "Kamra b’akkwarju tas-sikka",
+    "nightModelRailway": "Ferrovija mudell bil-lejl",
+    "modelRailwayViaduct": "Diorama ta’ vijadott tal-ferrovija",
+    "spaceshipBridgeCat": "Pont ta’ vapur spazjali b’qattus",
+    "spaceStationEarth": "Stazzjon spazjali fuq id-Dinja",
+    "scifiRoomGoldenValley": "Kamra tax-xjenza fantastika b’wied tad-deheb",
+    "underwaterBaseWhale": "Bażi taħt l-ilma b’balena"
   },
   "noCameraFound": "Ma nstabet l-ebda kamera. Qabbad kamera u tidher hawn.",
   "imageImportFailed": "Din l-immaġni ma tistax tintuża. Uża fajl PNG, JPEG jew WebP sa 10 MB.",
@@ -100,7 +111,17 @@
     "live": "Il-kamera tiegħek hija live",
     "stopped": "Il-kamera tiegħek waqfet",
     "joined": "{{name}} xegħel il-kamera tiegħu",
-    "left": "{{name}} tefa l-kamera tiegħu"
+    "left": "{{name}} tefa l-kamera tiegħu",
+    "turnedOn_one": "{{names}} xegħel il-kamera",
+    "turnedOn_two": "{{names}} xegħlu l-kameras tagħhom",
+    "turnedOn_few": "{{names}} xegħlu l-kameras tagħhom",
+    "turnedOn_many": "{{names}} xegħlu l-kameras tagħhom",
+    "turnedOn_other": "{{names}} xegħlu l-kameras tagħhom",
+    "turnedOff_one": "{{names}} tefa’ l-kamera",
+    "turnedOff_two": "{{names}} tfew il-kameras tagħhom",
+    "turnedOff_few": "{{names}} tfew il-kameras tagħhom",
+    "turnedOff_many": "{{names}} tfew il-kameras tagħhom",
+    "turnedOff_other": "{{names}} tfew il-kameras tagħhom"
   },
   "room": {
     "title": "Kamera room",
@@ -148,7 +169,8 @@
     "miniBar_two": "{{count}} kameras mixgħula",
     "miniBar_few": "{{count}} kameras mixgħula",
     "miniBar_many": "{{count}} kamera mixgħula",
-    "miniBar_other": "{{count}} kamera mixgħula"
+    "miniBar_other": "{{count}} kamera mixgħula",
+    "fullTitle": "Il-kamra hija mimlija b’9 kameras"
   },
   "position": {
     "label": "Kameras",
@@ -171,7 +193,8 @@
     "retry": "Erġa' pprova",
     "hidden": "Vidjo moħbi",
     "showVideo": "Uri l-vidjo",
-    "viewing": "Qed tara"
+    "viewing": "Qed tara",
+    "weak": "Konnessjoni dgħajfa"
   },
   "tileMenu": {
     "pin": "Waħħal għalija",

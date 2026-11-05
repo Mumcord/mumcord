@@ -53,18 +53,29 @@
     "effectsUnavailable": "Taustaefektid pole sellel arvutil saadaval: {{reason}}",
     "levelBest": "Parim",
     "levelLight": "Kerge",
-    "blurStrengthValue": "{{value}} / 100",
     "imageYoursNumbered": "Sinu pilt {{number}}",
     "errorUseNotAllowed": "Selle serveri releeserver ei luba kaamera jagamist.",
     "errorRelayDown": "Kaamerat ei saanud käivitada: releeserver pole kättesaadav."
   },
   "backgrounds": {
-    "beach": "Rand",
-    "mountains": "Mäed",
-    "nightCity": "Öine linn",
-    "softLight": "Pehme valgus",
-    "studio": "Stuudio",
-    "library": "Raamatukogu"
+    "abstractWarmWaves": "Soojad valguslained",
+    "blueMagentaWaves": "Sinised ja magenta lained",
+    "glossyWavesOrb": "Läikivad lained",
+    "pixelMountainSunset": "Pikslitega mägede päikeseloojang",
+    "cityBalconyNight": "Linnarõdu öösel",
+    "modernWc": "Moodne WC",
+    "electronicsLab": "Elektroonikalabor",
+    "serverCorridor": "Serverikoridor",
+    "neonGamingRoom": "Neoonvalgusega mängutuba",
+    "neonNerdRoom": "Neoonvalgusega nohikutuba",
+    "pixelGamingRoomCat": "Pikslitega mängutuba kassiga",
+    "reefAquariumRoom": "Rifiakvaariumiga tuba",
+    "nightModelRailway": "Mudelraudtee öösel",
+    "modelRailwayViaduct": "Raudteeviadukti dioraam",
+    "spaceshipBridgeCat": "Kosmoselaeva sild kassiga",
+    "spaceStationEarth": "Kosmosejaam Maa kohal",
+    "scifiRoomGoldenValley": "Ulmetuba kuldse oruga",
+    "underwaterBaseWhale": "Veealune baas vaalaga"
   },
   "noCameraFound": "Kaamerat ei leitud. Ühenda kaamera ja see ilmub siia.",
   "imageImportFailed": "Seda pilti ei saa kasutada. Kasuta PNG-, JPEG- või WebP-faili kuni 10 MB.",
@@ -100,7 +111,11 @@
     "live": "Sinu kaamera on otse",
     "stopped": "Sinu kaamera peatus",
     "joined": "{{name}} lülitas oma kaamera sisse",
-    "left": "{{name}} lülitas oma kaamera välja"
+    "left": "{{name}} lülitas oma kaamera välja",
+    "turnedOn_one": "{{names}} lülitas kaamera sisse",
+    "turnedOn_other": "{{names}} lülitasid kaamerad sisse",
+    "turnedOff_one": "{{names}} lülitas kaamera välja",
+    "turnedOff_other": "{{names}} lülitasid kaamerad välja"
   },
   "room": {
     "title": "Kaameraruum",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} kaamera sees",
     "cameras": "Kaamerad",
     "label_other": "Kaameraruum, {{count}} kaamerat sees",
-    "miniBar_other": "{{count}} kaamerat sees"
+    "miniBar_other": "{{count}} kaamerat sees",
+    "fullTitle": "Ruum on 9 kaameraga täis"
   },
   "position": {
     "label": "Kaamerad",
@@ -156,7 +172,8 @@
     "retry": "Proovi uuesti",
     "hidden": "Video peidetud",
     "showVideo": "Näita videot",
-    "viewing": "Vaatad"
+    "viewing": "Vaatad",
+    "weak": "Nõrk ühendus"
   },
   "tileMenu": {
     "pin": "Kinnita mulle",

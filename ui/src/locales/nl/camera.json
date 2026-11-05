@@ -53,18 +53,29 @@
     "effectsUnavailable": "Achtergrondeffecten zijn niet beschikbaar op deze pc: {{reason}}",
     "levelBest": "Beste",
     "levelLight": "Licht",
-    "blurStrengthValue": "{{value}} van 100",
     "imageYoursNumbered": "Jouw afbeelding {{number}}",
     "errorUseNotAllowed": "De relay van deze server staat camera delen niet toe.",
     "errorRelayDown": "Camera kon niet starten: de relay is niet bereikbaar."
   },
   "backgrounds": {
-    "beach": "Strand",
-    "mountains": "Bergen",
-    "nightCity": "Stad bij nacht",
-    "softLight": "Zacht licht",
-    "studio": "Studio",
-    "library": "Bibliotheek"
+    "abstractWarmWaves": "Warme lichtgolven",
+    "blueMagentaWaves": "Blauwe en magenta golven",
+    "glossyWavesOrb": "Glanzende golven",
+    "pixelMountainSunset": "Pixelzonsondergang in de bergen",
+    "cityBalconyNight": "Stadsbalkon bij nacht",
+    "modernWc": "Modern toilet",
+    "electronicsLab": "Elektronicalab",
+    "serverCorridor": "Servergang",
+    "neonGamingRoom": "Neon-gamekamer",
+    "neonNerdRoom": "Neon-nerdkamer",
+    "pixelGamingRoomCat": "Pixel-gamekamer met kat",
+    "reefAquariumRoom": "Kamer met rifaquarium",
+    "nightModelRailway": "Modelspoorbaan bij nacht",
+    "modelRailwayViaduct": "Diorama met spoorwegviaduct",
+    "spaceshipBridgeCat": "Ruimteschipbrug met kat",
+    "spaceStationEarth": "Ruimtestation boven de aarde",
+    "scifiRoomGoldenValley": "Sciencefictionkamer met gouden vallei",
+    "underwaterBaseWhale": "Onderwaterbasis met walvis"
   },
   "noCameraFound": "Geen camera gevonden. Sluit een camera aan en hij verschijnt hier.",
   "imageImportFailed": "Deze afbeelding kan niet worden gebruikt. Gebruik een PNG-, JPEG- of WebP-bestand tot 10 MB.",
@@ -100,7 +111,11 @@
     "live": "Je camera is live",
     "stopped": "Je camera is gestopt",
     "joined": "{{name}} heeft de camera aangezet",
-    "left": "{{name}} heeft de camera uitgezet"
+    "left": "{{name}} heeft de camera uitgezet",
+    "turnedOn_one": "{{names}} heeft de camera aangezet",
+    "turnedOn_other": "{{names}} hebben hun camera’s aangezet",
+    "turnedOff_one": "{{names}} heeft de camera uitgezet",
+    "turnedOff_other": "{{names}} hebben hun camera’s uitgezet"
   },
   "room": {
     "title": "Cameraruimte",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} camera aan",
     "cameras": "Camera's",
     "label_other": "Cameraruimte, {{count}} camera's aan",
-    "miniBar_other": "{{count}} camera's aan"
+    "miniBar_other": "{{count}} camera's aan",
+    "fullTitle": "De ruimte is vol bij 9 camera’s"
   },
   "position": {
     "label": "Camera's",
@@ -156,7 +172,8 @@
     "retry": "Opnieuw proberen",
     "hidden": "Video verborgen",
     "showVideo": "Video tonen",
-    "viewing": "Kijkt mee"
+    "viewing": "Kijkt mee",
+    "weak": "Zwakke verbinding"
   },
   "tileMenu": {
     "pin": "Vastzetten voor mij",

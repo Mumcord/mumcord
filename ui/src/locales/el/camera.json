@@ -53,18 +53,29 @@
     "effectsUnavailable": "Τα εφέ φόντου δεν είναι διαθέσιμα σε αυτόν τον υπολογιστή: {{reason}}",
     "levelBest": "Βέλτιστη",
     "levelLight": "Ελαφριά",
-    "blurStrengthValue": "{{value}} από 100",
     "imageYoursNumbered": "Η εικόνα σου {{number}}",
     "errorUseNotAllowed": "Το ρελέ αυτού του διακομιστή δεν επιτρέπει την κοινή χρήση κάμερας.",
     "errorRelayDown": "Η κάμερα δεν μπόρεσε να ξεκινήσει: το ρελέ δεν είναι προσβάσιμο."
   },
   "backgrounds": {
-    "beach": "Παραλία",
-    "mountains": "Βουνά",
-    "nightCity": "Νυχτερινή πόλη",
-    "softLight": "Απαλό φως",
-    "studio": "Στούντιο",
-    "library": "Βιβλιοθήκη"
+    "abstractWarmWaves": "Ζεστά κύματα φωτός",
+    "blueMagentaWaves": "Μπλε και ματζέντα κύματα",
+    "glossyWavesOrb": "Γυαλιστερά κύματα",
+    "pixelMountainSunset": "Pixel ηλιοβασίλεμα στα βουνά",
+    "cityBalconyNight": "Μπαλκόνι πόλης τη νύχτα",
+    "modernWc": "Μοντέρνο WC",
+    "electronicsLab": "Εργαστήριο ηλεκτρονικών",
+    "serverCorridor": "Διάδρομος διακομιστών",
+    "neonGamingRoom": "Νέον δωμάτιο gaming",
+    "neonNerdRoom": "Νέον δωμάτιο nerd",
+    "pixelGamingRoomCat": "Pixel δωμάτιο gaming με γάτα",
+    "reefAquariumRoom": "Δωμάτιο με ενυδρείο υφάλου",
+    "nightModelRailway": "Μακέτα σιδηροδρόμου τη νύχτα",
+    "modelRailwayViaduct": "Διόραμα με σιδηροδρομική γέφυρα",
+    "spaceshipBridgeCat": "Γέφυρα διαστημόπλοιου με γάτα",
+    "spaceStationEarth": "Διαστημικός σταθμός πάνω από τη Γη",
+    "scifiRoomGoldenValley": "Δωμάτιο επιστημονικής φαντασίας με χρυσή κοιλάδα",
+    "underwaterBaseWhale": "Υποβρύχια βάση με φάλαινα"
   },
   "noCameraFound": "Δεν βρέθηκε κάμερα. Σύνδεσε μια κάμερα και θα εμφανιστεί εδώ.",
   "imageImportFailed": "Αυτή η εικόνα δεν μπορεί να χρησιμοποιηθεί. Χρησιμοποίησε αρχείο PNG, JPEG ή WebP έως 10 MB.",
@@ -100,7 +111,11 @@
     "live": "Η κάμερά σου μεταδίδει ζωντανά",
     "stopped": "Η κάμερά σου σταμάτησε",
     "joined": "Ο/Η {{name}} άνοιξε την κάμερά του/της",
-    "left": "Ο/Η {{name}} έκλεισε την κάμερά του/της"
+    "left": "Ο/Η {{name}} έκλεισε την κάμερά του/της",
+    "turnedOn_one": "{{names}} άνοιξε την κάμερά του/της",
+    "turnedOn_other": "{{names}} άνοιξαν τις κάμερές τους",
+    "turnedOff_one": "{{names}} έκλεισε την κάμερά του/της",
+    "turnedOff_other": "{{names}} έκλεισαν τις κάμερές τους"
   },
   "room": {
     "title": "Δωμάτιο καμερών",
@@ -133,7 +148,8 @@
     "miniBar_one": "{{count}} κάμερα ανοιχτή",
     "cameras": "Κάμερες",
     "label_other": "Δωμάτιο καμερών, {{count}} κάμερες ανοιχτές",
-    "miniBar_other": "{{count}} κάμερες ανοιχτές"
+    "miniBar_other": "{{count}} κάμερες ανοιχτές",
+    "fullTitle": "Το δωμάτιο είναι γεμάτο με 9 κάμερες"
   },
   "position": {
     "label": "Κάμερες",
@@ -156,7 +172,8 @@
     "retry": "Δοκίμασε ξανά",
     "hidden": "Το βίντεο είναι κρυφό",
     "showVideo": "Εμφάνιση βίντεο",
-    "viewing": "Παρακολούθηση"
+    "viewing": "Παρακολούθηση",
+    "weak": "Αδύναμη σύνδεση"
   },
   "tileMenu": {
     "pin": "Καρφίτσωμα για μένα",
