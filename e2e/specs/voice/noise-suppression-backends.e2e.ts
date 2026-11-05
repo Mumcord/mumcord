@@ -163,14 +163,19 @@ async function record(
   botTimeout = 120,
 ): Promise<{ received: Float32Array; lag: number }> {
   writeWav(f(`${label}-in.wav`), sample);
+  let recordingEnded = 0;
   const recording = bot(["record", f(`${label}.wav`), "--seconds", String(seconds)], {
     name: "Measure",
     timeout: botTimeout,
+  }).then((result) => {
+    recordingEnded = Date.now();
+    return result;
   });
   await app.restart({ audio: `file:${f(`${label}-in.wav`)}:${f(`${label}-out.wav`)}` });
   const restarted = Date.now();
   await reconnectApp();
-  const connected = Date.now() - restarted;
+  const reconnected = Date.now();
+  const connected = reconnected - restarted;
   if (connected > PREFIX * 1000 - 1000) {
     throw new Error(
       `"${label}": the app connected ${String(connected)} ms after the restart, later than the ` +
@@ -181,11 +186,15 @@ async function record(
   await recording;
   const received = readWav(f(`${label}.wav`));
   const lag = align(received, noisy);
-  const earliest = PREFIX * 100 + Math.round(connected / 10);
+  // The bot records for exactly `seconds` from when it is in, and exits right after: its end gives
+  // its start. The restart alone is no clock for it: a restart that waited for the old app to quit
+  // took seconds longer than the bot needed to connect (CI: 5 s, the copy 526 windows "late").
+  const recordingStarted = recordingEnded - seconds * 1000;
+  const earliest = PREFIX * 100 + Math.round((reconnected - recordingStarted) / 10);
   if (lag < earliest - ALIGN_EARLY_GRACE_WINDOWS || lag > earliest + ALIGN_LATE_SLACK_WINDOWS) {
     throw new Error(
       `"${label}": the copy cannot start before the end of the ${String(PREFIX * 100)} windows prefix ` +
-        `and the app connected ${String(connected)} ms after the restart, so window ${String(earliest)} ` +
+        `and the app connected ${String(reconnected - recordingStarted)} ms into the recording, so window ${String(earliest)} ` +
         `(up to ${String(ALIGN_LATE_SLACK_WINDOWS)} windows later for the app's startup) is where it ` +
         `has to be; the alignment put it at window ${String(lag)}, so it matched a shifted part of the ` +
         `clip and this run measures nothing`,
