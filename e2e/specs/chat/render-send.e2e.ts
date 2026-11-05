@@ -369,6 +369,11 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
       await runOk("xdotool", ["search", "--onlyvisible", "--name", "^Mumcord$"])
     ).stdout.split("\n")[0];
     await runOk("xdotool", ["windowfocus", "--sync", mainWindow]);
+    // X has given the window the focus now, but the page learns it later (GTK, then the web
+    // process): a key sent before then is dropped and nothing is copied.
+    await browser.waitUntil(() => browser.execute(() => document.hasFocus()), {
+      timeoutMsg: "the page never got the keyboard focus",
+    });
     await browser.keys(["Control", "c"]);
     await copied("words please");
   });
