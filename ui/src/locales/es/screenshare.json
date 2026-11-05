@@ -107,7 +107,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relé",
-    "pathDirect": "Directo"
+    "pathDirect": "Directo",
+    "soundDesktop": "Sonido: escritorio",
+    "soundApp": "Sonido: {{app}}",
+    "noSound": "Sin sonido",
+    "tipDesktop": "Pantalla completa: sonido del escritorio sin Mumcord.",
+    "tipApp": "Una ventana: solo el sonido de esa aplicación.",
+    "tipOff": "El interruptor de sonido está apagado.",
+    "tipNone": "Se eligió «Sin sonido» para esta ventana.",
+    "tipOldWindows": "Sin sonido: requiere Windows 10 versión 2004 o posterior",
+    "tipOldMacos": "Sin sonido: requiere macOS 13 o posterior",
+    "tipNoPipeWire": "Sin sonido: requiere PipeWire",
+    "tipCaptureFailed": "Falló la captura de audio. La imagen sigue compartiéndose."
   },
   "qualityMenu": {
     "title": "Calidad",

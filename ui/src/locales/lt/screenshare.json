@@ -109,7 +109,18 @@
     "codecBadgeHardware": "{{codec}} · aparatinis",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Perdavimo mazgas",
-    "pathDirect": "Tiesiogiai"
+    "pathDirect": "Tiesiogiai",
+    "soundDesktop": "Garsas: darbalaukis",
+    "soundApp": "Garsas: {{app}}",
+    "noSound": "Be garso",
+    "tipDesktop": "Visas ekranas: darbalaukio garsas be Mumcord.",
+    "tipApp": "Vienas langas: tik tos programos garsas.",
+    "tipOff": "Garso jungiklis išjungtas.",
+    "tipNone": "Šiam langui pasirinkta „Be garso“.",
+    "tipOldWindows": "Be garso: reikia Windows 10 2004 ar naujesnės versijos",
+    "tipOldMacos": "Be garso: reikia macOS 13 ar naujesnės versijos",
+    "tipNoPipeWire": "Be garso: reikia PipeWire",
+    "tipCaptureFailed": "Nepavyko užfiksuoti garso. Vaizdo bendrinimas tęsiasi."
   },
   "qualityMenu": {
     "title": "Kokybė",

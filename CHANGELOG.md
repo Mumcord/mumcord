@@ -4,6 +4,7 @@
 
 ### Added
 
+- The live bar of your screen share says what its sound carries ("Sound: desktop", "Sound: Firefox") or "No sound" with the reason in a tooltip that screen readers read as well (#435)
 - Screen sharing can include sound: sharing a whole screen shares all sound except Mumcord's own, sharing a window shares that app's sound. Works on Windows 10 (2004+), macOS 13+ and Linux with PipeWire; where it is unclear which app you mean (always on Wayland), Mumcord asks "Which app's sound?". There is no sound without PipeWire or on older systems.
 - Bots are shown apart from people (#458): a new "Bots on this server" section below the channel tree lists every bot with what it does (e.g. Relay · Chat history · Webhooks), and its profile and menu, private messages included, work from there. Bots that never talk, like the relay, no longer appear in the channel tree, the member list, @mention suggestions or people pickers; bots with voice, like a music bot, stay in their channel. Bots carry a BOT badge instead of the Mumcord badge
 - Settings → Screen sharing has an "Ask for these settings each time I share" switch and shows whether this computer plays AV1 and VP9 with hardware or software
