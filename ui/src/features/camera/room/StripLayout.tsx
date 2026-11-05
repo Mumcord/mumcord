@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { useVoiceServerId } from "../../channels";
 import { CombinedHeaderContext, type CombinedHeaderSlots } from "../../media/combinedHeader";
 import { useStageEntries } from "../../media/stageRegistry";
+import { useRoomChoices } from "./roomChoices";
 import { useStripMain, useStripState } from "./StripState";
 
 const StripRoom = lazy(() => import("./StripRoom").then((m) => ({ default: m.StripRoom })));
@@ -21,7 +22,8 @@ const StripRoom = lazy(() => import("./StripRoom").then((m) => ({ default: m.Str
 export function StripLayout({ children }: { children: ReactNode }) {
   const serverId = useVoiceServerId();
   const main = useStripMain(serverId);
-  const { position, large } = useStripState();
+  const { position } = useStripState();
+  const { large } = useRoomChoices();
   const { t } = useTranslation("camera");
   const { t: tc } = useTranslation("common");
   const { labels } = useStageEntries();

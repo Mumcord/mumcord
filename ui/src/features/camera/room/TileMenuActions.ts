@@ -7,7 +7,8 @@ import { useSyncExternalStore } from "react";
 import { getApi, type CameraTileQuality } from "../../../api";
 import type { TileKey } from "./layout";
 import { setLargeTile, setPinned, setSelfHidden } from "./roomChoices";
-import type { TileModel } from "./useRoomModel";
+import type { TileCommand } from "./useGridKeys";
+import type { RoomModel, TileModel } from "./useRoomModel";
 
 export function togglePin(tile: TileModel): void {
   setPinned(tile.key, !tile.pinned);
@@ -29,6 +30,35 @@ export function toggleHidden(serverId: number, tile: TileModel): void {
     .catch((error: unknown) => {
       console.error("Hiding or showing a camera failed", error);
     });
+}
+
+/** Runs a tile key (spec 08 §5.5); `false` when it had nothing to do. */
+export function runTileCommand(
+  model: RoomModel,
+  key: TileKey,
+  command: TileCommand,
+  element: HTMLElement,
+): boolean {
+  const tile = model.tiles.find((candidate) => candidate.key === key);
+  if (tile === undefined) return false;
+  switch (command) {
+    case "menu":
+      openTileMenu(key, element);
+      return true;
+    case "pin":
+      togglePin(tile);
+      return true;
+    case "large":
+      toggleLarge(tile, model.large);
+      return true;
+    case "hide":
+      toggleHidden(model.serverId, tile);
+      return true;
+    case "escape":
+      if (model.large === null) return false;
+      setLargeTile(null);
+      return true;
+  }
 }
 
 export function setQuality(serverId: number, tile: TileModel, quality: CameraTileQuality): void {

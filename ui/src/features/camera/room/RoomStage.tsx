@@ -14,10 +14,9 @@ import {
   type RefObject,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { fitGridWidth, gridShape, presetWidthRem, type TileKey } from "./layout";
-import { setLargeTile } from "./roomChoices";
-import { openTileMenu, toggleHidden, toggleLarge, togglePin } from "./TileMenuActions";
-import { useGridKeys, type TileCommand } from "./useGridKeys";
+import { fitGridWidth, gridShape, presetWidthRem } from "./layout";
+import { runTileCommand } from "./TileMenuActions";
+import { useGridKeys } from "./useGridKeys";
 import type { RoomModel, TileModel } from "./useRoomModel";
 
 /** Gap between tiles (`--space-2`) in rem. */
@@ -75,35 +74,6 @@ function useBox(ref: RefObject<HTMLElement | null>): Box | null {
 export interface RoomStageProps {
   model: RoomModel;
   renderTile: (tile: TileModel, place: "grid" | "large" | "strip", tabIndex: 0 | -1) => ReactNode;
-}
-
-/** Runs a tile key (spec 08 §5.5); `false` when it had nothing to do. */
-function runTileCommand(
-  model: RoomModel,
-  key: TileKey,
-  command: TileCommand,
-  element: HTMLElement,
-): boolean {
-  const tile = model.tiles.find((candidate) => candidate.key === key);
-  if (tile === undefined) return false;
-  switch (command) {
-    case "menu":
-      openTileMenu(key, element);
-      return true;
-    case "pin":
-      togglePin(tile);
-      return true;
-    case "large":
-      toggleLarge(tile, model.large);
-      return true;
-    case "hide":
-      toggleHidden(model.serverId, tile);
-      return true;
-    case "escape":
-      if (model.large === null) return false;
-      setLargeTile(null);
-      return true;
-  }
 }
 
 export function RoomStage({ model, renderTile }: RoomStageProps) {

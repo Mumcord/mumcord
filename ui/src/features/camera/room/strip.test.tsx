@@ -10,16 +10,10 @@ import { useCombinedHeader } from "../../media/combinedHeader";
 import { resetPopoutStore } from "../../media/popoutStore";
 import { StageTabs } from "../../media/StageTabs";
 import { resetCameraDecode } from "./cameraDecode";
-import { resetRoomChoices } from "./roomChoices";
+import { resetRoomChoices, setLargeTile, useRoomChoices } from "./roomChoices";
 import { resetCameraRoomStore } from "./roomStore";
 import { StripLayout } from "./StripLayout";
-import {
-  leaveLarge,
-  resetStripState,
-  setStripPosition,
-  showLarge,
-  useStripState,
-} from "./StripState";
+import { resetStripState, setStripPosition, useStripState } from "./StripState";
 
 // jsdom has no Tauri runtime; the frame channels only need an id.
 vi.mock("@tauri-apps/api/core", () => {
@@ -77,7 +71,8 @@ function HeaderShare() {
 }
 
 function Position() {
-  const { position, large } = useStripState();
+  const { position } = useStripState();
+  const { large } = useRoomChoices();
   return <output data-testid="state">{`${position} ${String(large)}`}</output>;
 }
 
@@ -269,10 +264,55 @@ describe("camera strip", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("gives the strip tiles one Tab stop, the arrow keys and the tile menu, like the room", async () => {
+    const { container } = render(
+      <StripLayout>
+        <FakeShare />
+      </StripLayout>,
+    );
+    combined();
+    await screen.findByRole("list", { name: "Cameras" });
+    const tileOf = (key: number) =>
+      container.querySelector<HTMLElement>(`.cam-strip [data-tile="${String(key)}"]`);
+    expect(tileOf(ANNA)).toHaveAttribute("tabindex", "0");
+    expect(tileOf(BEN)).toHaveAttribute("tabindex", "-1");
+    act(() => {
+      tileOf(ANNA)?.focus();
+    });
+    fireEvent.keyDown(tileOf(ANNA) as HTMLElement, { key: "ArrowDown" });
+    expect(tileOf(BEN)).toHaveFocus();
+    expect(tileOf(BEN)).toHaveAttribute("tabindex", "0");
+    // Each tile has the room's ⋯ menu; Enter on a tile opens the same menu.
+    expect(screen.getByRole("button", { name: /^Options for Ben/ })).toBeInTheDocument();
+    fireEvent.keyDown(tileOf(BEN) as HTMLElement, { key: "Enter" });
+    expect(await screen.findByRole("menu")).toBeInTheDocument();
+  });
+
+  it("shares Show large with the room: one choice, set from either place", async () => {
+    const { container } = render(
+      <StripLayout>
+        <FakeShare />
+      </StripLayout>,
+    );
+    combined();
+    await screen.findByRole("list", { name: "Cameras" });
+    act(() => {
+      setLargeTile(BEN);
+    });
+    expect(container.querySelector(`.cam-combined__large [data-tile="${String(BEN)}"]`)).not.toBe(
+      null,
+    );
+    fireEvent.keyDown(
+      container.querySelector(`.cam-combined__large [data-tile="${String(BEN)}"]`) as HTMLElement,
+      { key: "f" },
+    );
+    expect(container.querySelector(".cam-combined")).not.toHaveAttribute("data-large");
+  });
+
   it("forgets the large tile when the strip is hidden", () => {
     render(<Position />);
     act(() => {
-      showLarge(BEN);
+      setLargeTile(BEN);
     });
     expect(screen.getByTestId("state")).toHaveTextContent(`beside ${String(BEN)}`);
     act(() => {
@@ -281,8 +321,8 @@ describe("camera strip", () => {
     expect(screen.getByTestId("state")).toHaveTextContent("hidden null");
     act(() => {
       setStripPosition("beside");
-      showLarge("self");
-      leaveLarge();
+      setLargeTile("self");
+      setLargeTile(null);
     });
     expect(screen.getByTestId("state")).toHaveTextContent("beside null");
   });

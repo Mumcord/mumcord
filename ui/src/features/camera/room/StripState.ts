@@ -1,21 +1,19 @@
 /**
  * The camera strip next to a screen share or watch party (spec 08 §5.4, FR-8.71–8.74): where it
- * sits (Cameras beside / Above / Hidden, remembered per device as `camera_strip_position`) and
- * which strip tile Show large swapped into the main picture until Escape.
+ * sits (Cameras beside / Above / Hidden, remembered per device as `camera_strip_position`). Which
+ * tile is shown large is the room's own choice (`roomChoices.large`), the same in room and strip.
  */
 import { useSyncExternalStore } from "react";
 import { getApi, type CameraStripPosition } from "../../../api";
 import { useMediaView, type StageId } from "../../media/mediaView";
 import { usePopouts } from "../../media/popoutStore";
-import type { TileKey } from "./layout";
+import { setLargeTile } from "./roomChoices";
 
 export interface StripState {
   position: CameraStripPosition;
-  /** The strip tile shown in place of the main picture (FR-8.73); `null` shows the main picture. */
-  large: TileKey | null;
 }
 
-const initial: StripState = { position: "beside", large: null };
+const initial: StripState = { position: "beside" };
 let state = initial;
 let loaded = false;
 const listeners = new Set<() => void>();
@@ -70,7 +68,8 @@ export function useStripState(): StripState {
 export function setStripPosition(position: CameraStripPosition): void {
   if (state.position === position) return;
   // Hidden shows no tiles, so nothing can stay large.
-  change({ ...state, position, large: position === "hidden" ? null : state.large });
+  if (position === "hidden") setLargeTile(null);
+  change({ ...state, position });
   const api = getApi();
   api
     .settingsGet()
@@ -78,16 +77,6 @@ export function setStripPosition(position: CameraStripPosition): void {
     .catch((error: unknown) => {
       console.error("Saving the camera strip position failed", error);
     });
-}
-
-/** Show large (F) on a strip tile: it takes the main picture's place (FR-8.73). */
-export function showLarge(key: TileKey): void {
-  if (state.large !== key) change({ ...state, large: key });
-}
-
-/** Escape, the tile going away or the strip ending: the main picture comes back. */
-export function leaveLarge(): void {
-  if (state.large !== null) change({ ...state, large: null });
 }
 
 /** Test helper: back to the start, the saved position unread. */

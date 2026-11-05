@@ -4,7 +4,7 @@
  * place, and the room bar. They are grid items of the card `StripLayout` draws around the main
  * item, so the stylesheet places them by the strip position.
  */
-import { useCallback, useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
 import { useAvatars } from "../../members/useAvatars";
@@ -14,13 +14,16 @@ import { useFullscreen } from "../../media/useFullscreen";
 import { CameraTile } from "./CameraTile";
 import { RoomBar } from "./RoomBar";
 import type { TileKey } from "./layout";
-import { forgetTileChoices } from "./roomChoices";
+import { forgetTileChoices, setLargeTile, useRoomChoices } from "./roomChoices";
 import { StripHeader } from "./StripHeader";
 import type { StripMain } from "./StripState";
-import { leaveLarge, useStripState } from "./StripState";
+import { useStripState } from "./StripState";
 import { StripTiles } from "./StripTiles";
+import { TileMenu } from "./TileMenu";
+import { runTileCommand } from "./TileMenuActions";
 import { useCameraAnnouncements } from "./useCameraAnnouncements";
 import { useCameraLook } from "./useCameraLook";
+import { useGridKeys } from "./useGridKeys";
 import { useRoomModel, type TileModel } from "./useRoomModel";
 import "./camera.css";
 
@@ -33,8 +36,6 @@ export interface StripRoomProps {
   /** Receive the header places the main item draws into (see `combinedHeader`). */
   subSlot: (element: HTMLElement | null) => void;
   chipsSlot: (element: HTMLElement | null) => void;
-  /** The tile menu button of a tile (spec 08 §5.3), as in the room. */
-  renderTileMenu?: (tile: TileModel) => ReactNode;
 }
 
 export function StripRoom({
@@ -44,12 +45,15 @@ export function StripRoom({
   frame,
   subSlot,
   chipsSlot,
-  renderTileMenu,
 }: StripRoomProps) {
   const { t } = useTranslation("camera");
   const { t: tc } = useTranslation("common");
   const model = useRoomModel(serverId);
-  const { position, large } = useStripState();
+  const { position } = useStripState();
+  // The room's own "Show large" choice, the only one (spec 08 §5.3); `model.large` is it while
+  // that tile is still there.
+  const chosenLarge = useRoomChoices().large;
+  const large = model.large;
   const { mirror } = useCameraLook();
   const { fullscreen, toggle } = useFullscreen(frame);
   const avatarOf = useAvatars(
@@ -77,7 +81,7 @@ export function StripRoom({
   // Leaving the combined layout shows every camera again.
   useEffect(
     () => () => {
-      leaveLarge();
+      setLargeTile(null);
       getApi()
         .cameraRoomSetVideosHidden(serverId, false)
         .catch((error: unknown) => {
@@ -89,15 +93,15 @@ export function StripRoom({
 
   // The large tile's camera went off: the main picture comes back.
   useEffect(() => {
-    if (large !== null && largeTile === undefined) leaveLarge();
-  }, [large, largeTile]);
+    if (chosenLarge !== null && largeTile === undefined) setLargeTile(null);
+  }, [chosenLarge, largeTile]);
 
   // Escape leaves Show large (spec 08 §5.5); an open menu takes its own Escape first. Focus goes
   // back to the tile once it is in the strip again.
   const refocus = useRef<TileKey | null>(null);
   const leave = useCallback(() => {
     refocus.current = large;
-    leaveLarge();
+    setLargeTile(null);
   }, [large]);
   useEffect(() => {
     const element = frame.current;
@@ -119,6 +123,16 @@ export function StripRoom({
     frame.current?.querySelector<HTMLElement>(`.cam-strip [data-tile="${String(key)}"]`)?.focus();
   }, [frame, large]);
 
+  // One Tab stop over the large tile and the strip, the large one first (spec 08 §5.5).
+  const stripTiles = largeTile === undefined ? tiles : tiles.filter((tile) => tile !== largeTile);
+  const gridKeys = useGridKeys(
+    largeTile === undefined
+      ? stripTiles.map((tile) => tile.key)
+      : [largeTile.key, ...stripTiles.map((tile) => tile.key)],
+    position === "above" ? stripTiles.length : 1,
+    (key, command, element) => runTileCommand(model, key, command, element),
+  );
+
   const renderTile = (tile: TileModel) => (
     <CameraTile
       serverId={serverId}
@@ -126,7 +140,8 @@ export function StripRoom({
       backgrounded={false}
       mirror={mirror}
       avatar={tile.user === undefined ? null : avatarOf(tile.user)}
-      menu={renderTileMenu?.(tile)}
+      tabIndex={gridKeys.tabIndexOf(tile.key)}
+      menu={<TileMenu serverId={serverId} tile={tile} large={large} onBackground={null} />}
     />
   );
 
@@ -142,14 +157,22 @@ export function StripRoom({
       />
       {!hidden && (
         <StripTiles
-          tiles={largeTile === undefined ? tiles : tiles.filter((tile) => tile !== largeTile)}
+          tiles={stripTiles}
           position={position}
+          keys={gridKeys}
           renderTile={renderTile}
         />
       )}
       {!hidden && largeTile !== undefined && (
         <>
-          <div className="cam-combined__large">{renderTile(largeTile)}</div>
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- the keys belong to the focused tile inside. */}
+          <div
+            className="cam-combined__large"
+            onKeyDown={gridKeys.onKeyDown}
+            onFocus={gridKeys.onFocus}
+          >
+            {renderTile(largeTile)}
+          </div>
           <button type="button" className="cam-combined__back" onClick={leave}>
             {t("tileMenu.leaveLarge")}
           </button>
