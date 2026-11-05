@@ -10,6 +10,25 @@ const CA_VAR: &str = "MUMCORD_TEST_CA";
 const PUBLIC_ADDR_VAR: &str = "MUMCORD_TEST_PUBLIC_ADDR";
 const RESOLVE_VAR: &str = "MUMCORD_TEST_RESOLVE";
 const KEY_AGE_VAR: &str = "MUMCORD_TEST_KEY_AGE";
+const PLUGIN_SAVE_VAR: &str = "MUMCORD_TEST_PLUGIN_SAVE";
+const PLUGIN_PICK_VAR: &str = "MUMCORD_TEST_PLUGIN_PICK";
+
+/// What a native dialog of a plugin host call answers in a test run instead of opening.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DialogAnswer {
+    /// The user cancelled.
+    Cancel,
+    /// The user chose this path.
+    Path(PathBuf),
+}
+
+fn parse_dialog(value: String) -> DialogAnswer {
+    if value == "cancel" {
+        DialogAnswer::Cancel
+    } else {
+        DialogAnswer::Path(PathBuf::from(value))
+    }
+}
 
 /// Reads a hook variable; always `None` in release builds.
 fn var(name: &str) -> Option<String> {
@@ -56,9 +75,30 @@ pub fn key_age(key: &str) -> Option<u32> {
     parse_key_age(&var(KEY_AGE_VAR)?, key)
 }
 
+/// `files.save` (FR-9.103) answers with this instead of the save dialog: a path to write to,
+/// or `cancel`.
+pub fn plugin_save_dialog() -> Option<DialogAnswer> {
+    var(PLUGIN_SAVE_VAR).map(parse_dialog)
+}
+
+/// `files.import-picture` (FR-9.105) answers with this instead of the picker: the path of the
+/// picked file, or `cancel`.
+pub fn plugin_pick_dialog() -> Option<DialogAnswer> {
+    var(PLUGIN_PICK_VAR).map(parse_dialog)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn dialog_answers_are_cancel_or_a_path() {
+        assert_eq!(parse_dialog("cancel".into()), DialogAnswer::Cancel);
+        assert_eq!(
+            parse_dialog("/tmp/a.png".into()),
+            DialogAnswer::Path(PathBuf::from("/tmp/a.png"))
+        );
+    }
 
     #[test]
     fn resolve_matches_only_the_named_host() {

@@ -1,0 +1,138 @@
+/* Relay plugin data (surfaces mockups 07 and 08). Colours come from theme tokens only. */
+.relay-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.relay-chip--ok {
+  border-color: color-mix(in srgb, var(--color-success) 60%, transparent);
+  color: var(--color-success);
+}
+
+.relay-chip--warn {
+  border-color: color-mix(in srgb, var(--color-warning) 60%, transparent);
+  color: var(--color-warning);
+}
+
+.relay-label {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.relay-servers,
+.relay-plugins {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+
+.relay-servers {
+  gap: 6px;
+}
+
+.relay-servers li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.relay-dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+}
+
+.relay-dot[data-tone="ok"] {
+  background: var(--color-success);
+}
+
+.relay-dot[data-tone="warn"] {
+  background: var(--color-warning);
+}
+
+.relay-usage {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.relay-plugin {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.relay-plugin:first-child {
+  border-top: 0;
+}
+
+.relay-plugin__icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg-selected);
+  color: var(--color-accent-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.relay-plugin__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.relay-plugin__text small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.relay-plugin .settings-switch__input {
+  margin-left: auto;
+}
+
+/* Forced colours: dots and chips lose their colour, so they keep a visible outline. */
+@media (forced-colors: active) {
+  .relay-chip {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+
+  .relay-dot,
+  .relay-dot[data-tone="ok"],
+  .relay-dot[data-tone="warn"] {
+    background: CanvasText;
+  }
+
+  .relay-dot[data-tone="none"] {
+    background: transparent;
+    outline: 1px solid CanvasText;
+  }
+
+  .relay-plugin__icon {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}

@@ -865,3 +865,134 @@
   background: var(--color-accent);
   opacity: 1;
 }
+
+/*
+ * Stage switcher (FR-9.44, mockup surfaces 03): the tab row above the main item. It sits on the
+ * media chrome, so it stays dark in every theme like the frame below it.
+ */
+.media-stage__row {
+  --media-on-scrim-muted: rgb(255 255 255 / 72%);
+  --media-glass: rgb(16 12 36 / 62%);
+  --media-glass-border: rgb(255 255 255 / 16%);
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  width: 100%;
+  max-width: calc(58vh * 16 / 9);
+  margin: 0 auto var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  background: #100c24;
+  box-shadow: var(--shadow-raised);
+}
+
+/* Each stage item lays out like the area itself did before it had tabs. */
+.media-stage__panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.media-stage__panel[hidden] {
+  display: none;
+}
+
+.media-area[data-sized] .media-stage__row {
+  max-width: none;
+}
+
+.media-stage__tabs {
+  flex-wrap: wrap;
+  min-width: 0;
+  background: var(--media-glass);
+}
+
+.media-stage__tab {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--media-on-scrim-muted);
+}
+
+.media-stage__tab:hover {
+  color: #fff;
+}
+
+.media-stage__tab[aria-selected="true"] {
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px var(--media-glass-border);
+}
+
+/* The dark theme's focus colour, since the row is dark in every theme. */
+.media-stage__tab:focus-visible {
+  outline: 2px solid #ffb08a;
+  outline-offset: 2px;
+}
+
+.media-stage__icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.media-stage__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-stage__chip {
+  flex: none;
+  padding: 1px var(--space-2);
+  border: 1px solid rgb(201 182 255 / 55%);
+  border-radius: var(--radius-full);
+  color: #c9b6ff;
+  font-size: var(--font-size-xs);
+}
+
+.media-stage__dot {
+  flex: none;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: #ff5c61;
+}
+
+.media-stage__hint {
+  margin-left: auto;
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Windows high contrast: the tabs keep a border and the chosen one the system highlight. */
+@media (forced-colors: active) {
+  .media-stage__tab {
+    border: 1px solid ButtonText;
+  }
+
+  .media-stage__tab {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  /* System colours on the tab and every child, so the name cannot inherit a colour that
+     matches the highlight. The thick underline and bold weight keep the selected state
+     visible without relying on colour alone. */
+  .media-stage__tab[aria-selected="true"],
+  .media-stage__tab[aria-selected="true"] > * {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  .media-stage__tab[aria-selected="true"] {
+    border-bottom: 4px solid HighlightText;
+    box-shadow: 0 0 0 2px Highlight;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .media-stage__dot {
+    background: CanvasText;
+  }
+}

@@ -1,5 +1,6 @@
 {
   "share": "Sdílet obrazovku",
+  "shareYourScreen": "Sdílet vlastní obrazovku",
   "choosing": "Vybírá se, co sdílet…",
   "stop": "Ukončit sdílení",
   "startFailed": "Sdílení obrazovky se nepodařilo spustit.",
@@ -18,8 +19,6 @@
   "pause": "Pozastavit",
   "resume": "Pokračovat",
   "sound": "Sdílet zvuk",
-  "noSound": "Linux nesdílí zvuk: diváci vidí jen obraz.",
-  "noSoundForShare": "Toto sdílení nemá zvuk (celá obrazovka nebo nepodporovaná verze systému).",
   "viewersNone": "Zatím se nikdo nedívá",
   "viewers_one": "{{count}} sleduje: {{names}}",
   "viewers_few": "{{count}} sledují: {{names}}",
@@ -83,7 +82,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Sdílet zvuk aplikace",
+    "sound": "Zvuk",
+    "soundInfo": "Celá obrazovka: zvuk počítače bez Mumcordu. Jedno okno: jen zvuk dané aplikace.",
+    "soundNeeds": {
+      "windows": "Bez zvuku: vyžaduje Windows 10 verze 2004 nebo novější",
+      "macos": "Bez zvuku: vyžaduje macOS 13 nebo novější",
+      "pipewire": "Bez zvuku: vyžaduje PipeWire"
+    },
     "viewersGet": "Diváci dostanou:",
     "viewersGetSummary": "až {{resolution}} · {{fps}} sn./s · {{codec}} · asi {{mbit}} Mbit/s",
     "pathRelay": "Odesláno jednou přes relay serveru, který ho předá až {{count}} divákům.",
@@ -109,7 +114,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Přímo"
+    "pathDirect": "Přímo",
+    "soundDesktop": "Zvuk: plocha",
+    "soundApp": "Zvuk: {{app}}",
+    "noSound": "Bez zvuku",
+    "tipDesktop": "Celá obrazovka: zvuk plochy bez Mumcordu.",
+    "tipApp": "Jedno okno: pouze zvuk této aplikace.",
+    "tipOff": "Přepínač zvuku je vypnutý.",
+    "tipNone": "Pro toto okno bylo zvoleno „Bez zvuku“.",
+    "tipOldWindows": "Bez zvuku: vyžaduje Windows 10 verze 2004 nebo novější",
+    "tipOldMacos": "Bez zvuku: vyžaduje macOS 13 nebo novější",
+    "tipNoPipeWire": "Bez zvuku: vyžaduje PipeWire",
+    "tipCaptureFailed": "Zachytávání zvuku selhalo. Sdílení videa pokračuje."
   },
   "qualityMenu": {
     "title": "Kvalita",
@@ -226,5 +242,14 @@
     "valueUnavailable": "Není k dispozici",
     "checkAgain": "Zkontrolovat znovu",
     "checking": "Kontroluji…"
+  },
+  "soundPicker": {
+    "title": "Zvuk které aplikace?",
+    "noSound": "Bez zvuku",
+    "share": "Sdílet zvuk",
+    "cancel": "Zrušit",
+    "empty": "Právě nehraje žádná aplikace",
+    "gone": "Tato aplikace už nepřehrává zvuk. Vyberte jinou.",
+    "failed": "Váš výběr se nepodařilo použít."
   }
 }

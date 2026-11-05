@@ -35,17 +35,10 @@ function previewWith(patch: Partial<SharePreview>) {
   return vi.spyOn(api, "screenSharePreview").mockResolvedValue({ ...PREVIEW, ...patch });
 }
 
-async function open({ soundAvailable = true } = {}) {
+async function open() {
   const onCancel = vi.fn();
   const onConfirm = vi.fn();
-  const view = render(
-    <ShareStartDialog
-      serverId={1}
-      soundAvailable={soundAvailable}
-      onCancel={onCancel}
-      onConfirm={onConfirm}
-    />,
-  );
+  const view = render(<ShareStartDialog serverId={1} onCancel={onCancel} onConfirm={onConfirm} />);
   const dialog = await screen.findByRole(
     "dialog",
     { name: "Share your screen" },
@@ -73,13 +66,57 @@ describe("ShareStartDialog", () => {
     expect(screen.getByRole("radio", { name: /Sharp text/ })).toBeChecked();
     expect(screen.getByRole("combobox", { name: "Codec" })).toHaveValue("vp9");
     expect(screen.getByRole("combobox", { name: "Upload limit" })).toHaveValue("10");
-    expect(screen.getByRole("switch", { name: "Share the app's sound" })).not.toBeChecked();
+    expect(screen.getByRole("switch", { name: "Sound" })).not.toBeChecked();
   });
 
-  it("hides the 4K option and the sound switch where the platform has no app sound", async () => {
-    await open({ soundAvailable: false });
+  it("hides the 4K option", async () => {
+    await open();
     expect(screen.queryByRole("button", { name: "Source" })).toBeNull();
-    expect(screen.queryByRole("switch")).toBeNull();
+  });
+
+  it("shows the Sound switch with its info line on every system", async () => {
+    vi.spyOn(api, "screenShareSoundSupport").mockResolvedValue(null);
+    await open();
+    const sound = screen.getByRole("switch", { name: "Sound" });
+    expect(sound).toBeEnabled();
+    expect(sound).toHaveAccessibleDescription(
+      "Whole screen: desktop sound without Mumcord. One window: only that app's sound.",
+    );
+    expect(screen.queryByText(/^No sound:/)).toBeNull();
+  });
+
+  it.each([
+    ["osTooOld", "windows x86_64", "No sound: needs Windows 10 version 2004 or newer"],
+    ["osTooOld", "macos aarch64", "No sound: needs macOS 13 or newer"],
+    ["noPipeWire", "linux x86_64", "No sound: needs PipeWire"],
+  ] as const)(
+    "shows the switch off and disabled with a note for %s on %s",
+    async (reason, os, note) => {
+      vi.spyOn(api, "screenShareSoundSupport").mockResolvedValue(reason);
+      const info = await api.appInfo();
+      vi.spyOn(api, "appInfo").mockResolvedValue({ ...info, os });
+      const { view } = await open();
+      const sound = screen.getByRole("switch", { name: "Sound" });
+      expect(sound).toBeDisabled();
+      expect(sound).not.toBeChecked();
+      expect(sound).toHaveAccessibleDescription(expect.stringContaining(note));
+      expect(screen.getByText(note)).toBeInTheDocument();
+      expect(await axeViolations(view.container)).toEqual([]);
+    },
+  );
+
+  it("keeps the stored sound choice when sound is unavailable", async () => {
+    vi.spyOn(api, "screenShareSoundSupport").mockResolvedValue("noPipeWire");
+    previewWith({});
+    const { onConfirm } = await open();
+    fireEvent.click(screen.getByRole("button", { name: "Choose what to share" }));
+    expect(onConfirm).toHaveBeenCalledWith(expect.objectContaining({ sound: true }));
+  });
+
+  it("does not treat a failed capture as missing support", async () => {
+    vi.spyOn(api, "screenShareSoundSupport").mockResolvedValue("captureFailed");
+    await open();
+    expect(screen.getByRole("switch", { name: "Sound" })).toBeEnabled();
   });
 
   it("shows what viewers get and sends it once through the relay", async () => {

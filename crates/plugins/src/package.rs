@@ -18,8 +18,10 @@ use zip::CompressionMethod;
 
 use crate::i18n::MAX_I18N_BYTES;
 use crate::manifest::{
-    Manifest, ManifestError, RESERVED_ID_PREFIXES, Source, is_language_tag, relative_path,
+    Manifest, ManifestError, RESERVED_ID_PREFIXES, SOUNDS_DIR, Source, is_language_tag,
+    relative_path,
 };
+use crate::sounds::{self, SoundError};
 
 pub const MANIFEST_FILE: &str = "manifest.json";
 pub const WASM_FILE: &str = "plugin.wasm";
@@ -147,6 +149,8 @@ pub enum PackageError {
     WebWithoutWebview,
     #[error(transparent)]
     Manifest(#[from] ManifestError),
+    #[error(transparent)]
+    Sound(#[from] SoundError),
     #[error("The package could not be verified: {0}")]
     Verification(#[from] VerifyError),
     #[error(
@@ -266,6 +270,14 @@ impl Package {
                 return Err(PackageError::MissingFile(path.to_owned()));
             }
         }
+        if let Some(audio) = &manifest.audio {
+            for sound in &audio.sounds {
+                let data = files
+                    .get(sound)
+                    .ok_or_else(|| SoundError::Missing(sound.clone()))?;
+                sounds::check(sound, data)?;
+            }
+        }
         if files.keys().any(|name| name.starts_with("web/"))
             && !manifest.has_permission("ui.webview")
         {
@@ -340,6 +352,8 @@ enum FileKind {
     Fixed,
     Translation,
     Asset,
+    /// A bundled sound effect (FR-9.65); its limits are checked once the manifest is read.
+    Sound,
     Web,
 }
 
@@ -359,6 +373,8 @@ impl FileKind {
             } else {
                 Err(PackageError::BadAsset(name.to_owned()))
             }
+        } else if name.starts_with(SOUNDS_DIR) && has_ext(&[".ogg", ".wav"]) {
+            Ok(Self::Sound)
         } else if name.starts_with("web/") && has_ext(WEB_EXTENSIONS) {
             Ok(Self::Web)
         } else {

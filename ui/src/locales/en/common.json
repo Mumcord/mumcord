@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "What the media area shows",
+      "hint": "Switching never stops anything",
+      "share": "Screen share",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, tab {{index}} of {{count}}",
+      "tabNameNew": "{{label}}, new, tab {{index}} of {{count}}",
+      "pluginTabName": "{{label}}, plugin activity, tab {{index}} of {{count}}",
+      "pluginTabNameNew": "{{label}}, plugin activity, new, tab {{index}} of {{count}}"
     }
   }
 }

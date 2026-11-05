@@ -1,5 +1,6 @@
 {
   "share": "Partager l’écran",
+  "shareYourScreen": "Partager votre écran",
   "choosing": "Choix de ce qu’il faut partager…",
   "stop": "Arrêter le partage",
   "startFailed": "Le partage d’écran n’a pas pu démarrer.",
@@ -18,8 +19,6 @@
   "pause": "Pause",
   "resume": "Reprendre",
   "sound": "Partager le son",
-  "noSound": "Sous Linux, aucun son n’est partagé : les spectateurs ne voient que l’image.",
-  "noSoundForShare": "Ce partage n’a pas de son (écran entier ou version du système non prise en charge).",
   "viewersNone": "Personne ne regarde encore",
   "viewers_one": "{{count}} regarde : {{names}}",
   "viewers_many": "{{count}} regardent : {{names}}",
@@ -81,7 +80,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Partager le son de l’application",
+    "sound": "Son",
+    "soundInfo": "Tout l'écran : le son de l'ordinateur sans Mumcord. Une fenêtre : uniquement le son de cette application.",
+    "soundNeeds": {
+      "windows": "Pas de son : nécessite Windows 10 version 2004 ou plus récente",
+      "macos": "Pas de son : nécessite macOS 13 ou plus récent",
+      "pipewire": "Pas de son : nécessite PipeWire"
+    },
     "viewersGet": "Les spectateurs reçoivent :",
     "viewersGetSummary": "jusqu’à {{resolution}} · {{fps}} i/s · {{codec}} · environ {{mbit}} Mbit/s",
     "pathRelay": "Envoyé une seule fois via le relais du serveur, qui le transmet à {{count}} spectateurs au maximum.",
@@ -107,7 +112,18 @@
     "codecBadgeHardware": "{{codec}} · matériel",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relais",
-    "pathDirect": "Direct"
+    "pathDirect": "Direct",
+    "soundDesktop": "Son : bureau",
+    "soundApp": "Son : {{app}}",
+    "noSound": "Pas de son",
+    "tipDesktop": "Écran entier : le son du bureau, sans Mumcord.",
+    "tipApp": "Une fenêtre : uniquement le son de cette application.",
+    "tipOff": "Le commutateur du son est désactivé.",
+    "tipNone": "« Pas de son » a été choisi pour cette fenêtre.",
+    "tipOldWindows": "Pas de son : nécessite Windows 10 version 2004 ou plus récent",
+    "tipOldMacos": "Pas de son : nécessite macOS 13 ou plus récent",
+    "tipNoPipeWire": "Pas de son : nécessite PipeWire",
+    "tipCaptureFailed": "La capture audio a échoué. Le partage vidéo continue."
   },
   "qualityMenu": {
     "title": "Qualité",
@@ -222,5 +238,14 @@
     "valueUnavailable": "Non disponible",
     "checkAgain": "Vérifier à nouveau",
     "checking": "Vérification…"
+  },
+  "soundPicker": {
+    "title": "Le son de quelle application ?",
+    "noSound": "Pas de son",
+    "share": "Partager le son",
+    "cancel": "Annuler",
+    "empty": "Aucune application ne joue de son pour le moment",
+    "gone": "Cette application ne joue plus de son. Choisissez-en une autre.",
+    "failed": "Votre choix n’a pas pu être appliqué."
   }
 }

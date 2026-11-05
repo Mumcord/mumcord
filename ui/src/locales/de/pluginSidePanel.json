@@ -1,0 +1,9 @@
+{
+  "region": "Seitenleiste von {{plugin}}",
+  "close": "Seitenleiste von {{plugin}} schließen",
+  "resize": "Größe der Seitenleiste von {{plugin}} ändern",
+  "failed": "Die Seitenleiste von {{plugin}} konnte nicht geschlossen werden. Bitte versuche es erneut.",
+  "options": "Optionen für {{plugin}}",
+  "details": "Plugin-Details",
+  "closePanel": "Seitenleiste schließen"
+}

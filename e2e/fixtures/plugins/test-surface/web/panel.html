@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Test Surface (panel)</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Test Surface: <span id="place"></span></h1>
+      <button id="run-all" type="button">Run all probes</button>
+      <button id="tone" type="button">Play frame tone</button>
+      <button id="busy" type="button">Busy loop</button>
+      <div id="probes" role="group" aria-label="Probes"></div>
+      <ul id="results" aria-live="polite" aria-label="Probe results"></ul>
+      <div id="css-url"></div>
+    </main>
+    <script src="probe.js" data-place="panel"></script>
+  </body>
+</html>

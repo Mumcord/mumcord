@@ -5,6 +5,10 @@
     "body": "Poistettu käytöstä toistuvien kaatumisten jälkeen",
     "open": "Näytä Laajennuksissa"
   },
+  "pictureRefused": {
+    "title": "{{name}} ei voinut käyttää kuvaa",
+    "body": "Tätä kuvaa ei voi käyttää. Käytä PNG-, JPEG- tai WebP-tiedostoa, enintään 10 Mt."
+  },
   "update": {
     "title": "Päivitys: {{name}}",
     "body": "Versio {{version}} odottaa Päivitykset-välilehdellä",

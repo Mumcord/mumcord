@@ -1,0 +1,23 @@
+{
+  "manifest": 1,
+  "id": "test-stop-private",
+  "name": "Fixture stop-private",
+  "description": "E2E hard-stop test plugin: declares a private name; must never install.",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel", "net.origins"]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "https://nas.local",
+        "purpose": "origin_0"
+      }
+    ]
+  }
+}

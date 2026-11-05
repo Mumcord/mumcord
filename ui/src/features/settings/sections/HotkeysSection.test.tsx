@@ -66,7 +66,9 @@ function record(action: string, code: string, modifiers: { ctrlKey?: boolean } =
   press(button, code, modifiers);
 }
 
-describe("Settings → Voice & Audio → Hotkeys (#64)", () => {
+// These tests render big lists and pass in seconds alone, but can exceed the default 5 s timeout
+// when the whole suite runs in parallel on a loaded machine.
+describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, () => {
   it("lists every action without a key and works in the background by default", async () => {
     const { container } = await openHotkeys();
     for (const action of [

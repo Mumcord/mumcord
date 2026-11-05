@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type Settings } from "../../../api";
 import { applyLanguage } from "../../../i18n";
@@ -30,6 +30,30 @@ function Page({ update }: { update: (patch: Partial<Settings>) => void }) {
 }
 
 describe("Screen sharing settings (FR-7.60)", () => {
+  it("sets the default of the Sound switch", async () => {
+    const update = vi.fn();
+    render(<Page update={update} />);
+    const sound = screen.getByRole("switch", { name: "Sound" });
+    await waitFor(() => {
+      expect(sound).toBeEnabled();
+    });
+    fireEvent.click(sound);
+    expect(update).toHaveBeenCalledWith({ screenSound: !settings.screenSound });
+  });
+
+  it("shows the Sound switch off and disabled with the note where sound is unavailable", async () => {
+    const api = createMockApi();
+    vi.spyOn(api, "screenShareSoundSupport").mockResolvedValue("noPipeWire");
+    setApi(api);
+    const update = vi.fn();
+    render(<Page update={update} />);
+    const sound = screen.getByRole("switch", { name: "Sound" });
+    expect(await screen.findByText("No sound: needs PipeWire")).toBeInTheDocument();
+    expect(sound).toBeDisabled();
+    expect(sound).not.toBeChecked();
+    expect(sound).toHaveAccessibleDescription("No sound: needs PipeWire");
+  });
+
   it("saves the quality defaults and hides the 4K option", () => {
     const update = vi.fn();
     render(<Page update={update} />);

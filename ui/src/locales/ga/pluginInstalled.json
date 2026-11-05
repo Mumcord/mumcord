@@ -55,6 +55,10 @@
     "messagesExpired": "Teachtaireachtaí a chuaigh as feidhm",
     "incomingRateDropped": "Teachtaireachtaí isteach a scaoileadh ag an teorainn ráta",
     "incomingInvalid": "Teachtaireachtaí isteach neamhbhailí",
+    "uiFreezes": "Líon na n-uaireanta a reoigh Mumcord agus a ábhar gréasáin oscailte",
+    "webDisabled": "Tá a ábhar gréasáin múchta mar gur stop Mumcord ag freagairt agus é oscailte.",
+    "reenableWeb": "Cas air an t-ábhar gréasáin",
+    "reenableFailed": "Níorbh fhéidir an t-ábhar gréasáin a chasadh air.",
     "log": "Logchomhad",
     "logEmpty": "Tá an logchomhad folamh.",
     "level": {

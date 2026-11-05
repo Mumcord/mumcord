@@ -24,7 +24,8 @@
   "pill": {
     "none": "Sin permisos nuevos",
     "permission": "Necesita un permiso nuevo",
-    "author": "Autor nuevo"
+    "author": "Autor nuevo",
+    "websites": "Se comunica con sitios web nuevos"
   },
   "newPermissions": "Permisos nuevos",
   "revoked": {
@@ -45,5 +46,66 @@
     "save": "Guardar",
     "notNow": "Ahora no",
     "failed": "No se pudieron cambiar los permisos de {{name}}. Inténtalo de nuevo."
+  },
+  "waitingHeading": "Actualizaciones pendientes",
+  "autoNote": "Las actualizaciones automáticas solo se instalan cuando el plugin no pide nada nuevo y su puntuación se mantiene en el mismo nivel o baja. Todo lo demás espera aquí.",
+  "needsMumcord": "Actualización disponible tras actualizar Mumcord",
+  "band": {
+    "low": "Bajo",
+    "medium": "Medio",
+    "high": "Alto"
+  },
+  "hold": {
+    "newWebsites_one": "Esta actualización quiere comunicarse con {{count}} sitio web nuevo. {{name}} se queda en {{version}} hasta que decidas.",
+    "newWebsites_many": "Esta actualización quiere comunicarse con {{count}} sitios web nuevos. {{name}} se queda en {{version}} hasta que decidas.",
+    "newWebsites_other": "Esta actualización quiere comunicarse con {{count}} sitios web nuevos. {{name}} se queda en {{version}} hasta que decidas.",
+    "riskUp": "No se instala automáticamente: el riesgo pasó de {{from}} a {{to}}. Revísala primero.",
+    "scoreUp": "No se instala automáticamente: la puntuación pasó de {{from}} a {{to}}. Revísala primero.",
+    "blockedBySafety": "No se instala: esta versión es de alto riesgo y «No permitir plugins de alto riesgo» está activado.",
+    "scoreUnknown": "No se instala automáticamente: no se pudo calcular la puntuación de seguridad de esta versión. Revísala primero."
+  },
+  "score": {
+    "label": "Puntuación de seguridad:",
+    "unchanged": "sin cambios",
+    "points": "puntos",
+    "goesUp": ", el riesgo aumenta",
+    "goesDown": ", el riesgo disminuye"
+  },
+  "dialog": {
+    "title": "¿Actualizar {{name}} a {{version}}?",
+    "now": "ahora {{version}}",
+    "sameKey": "misma clave de autor",
+    "newKey": "nueva clave de autor",
+    "newWebsites_one": "Esta actualización quiere comunicarse con {{count}} sitio web nuevo.",
+    "newWebsites_many": "Esta actualización quiere comunicarse con {{count}} sitios web nuevos.",
+    "newWebsites_other": "Esta actualización quiere comunicarse con {{count}} sitios web nuevos.",
+    "staysOn": "{{name}} se queda en {{version}} hasta que decidas.",
+    "otherDomain": "Uno de ellos no está en el dominio propio del plugin.",
+    "whatsNew": "Novedades de la {{version}}",
+    "websitesLead": "{{name}} y su página podrían entonces acceder a:",
+    "websitesWarning": "Estos sitios web pueden ver tu dirección IP y todo lo que {{name}} les envíe.",
+    "websitesLabel": "Sitios web",
+    "new": "Nuevo",
+    "changed": "Modificado",
+    "noOtherPermissions": "No cambia ningún otro permiso.",
+    "scoreNow": "Ahora ({{version}})",
+    "scoreAfter": "Tras la actualización ({{version}})",
+    "meterNow": "Puntuación de seguridad actual",
+    "meterAfter": "Puntuación de seguridad tras la actualización",
+    "riskUpBy_one": "El riesgo aumenta en {{count}} punto",
+    "riskUpBy_many": "El riesgo aumenta en {{count}} puntos",
+    "riskUpBy_other": "El riesgo aumenta en {{count}} puntos",
+    "asksForMore": "porque esta versión pide más:",
+    "permissionsLabel": "Permisos nuevos",
+    "recentChange": "También cuenta como cambio reciente: los permisos nuevos de las últimas {{versions}} versiones suman otros +{{recent}} puntos. Junto con los +{{permissions}} de arriba (× {{multiplier}}) son los +{{total}}.",
+    "highTitle": "Esta actualización convertiría el plugin en uno de alto riesgo",
+    "highText": "No se instalará automáticamente. Quedarte en {{version}} mantiene la puntuación actual; puedes fijar la versión en Instalados.",
+    "highTick": "Entiendo que el riesgo ha aumentado y sigo confiando en el autor",
+    "skipHint": "Si la omites, {{version}} sigue funcionando.",
+    "skip": "Omitir esta versión",
+    "notNow": "Ahora no",
+    "allow": "Permitir y actualizar",
+    "updateAnyway": "Actualizar de todos modos",
+    "failed": "No se pudo actualizar {{name}}. Inténtalo de nuevo."
   }
 }

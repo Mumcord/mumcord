@@ -1,0 +1,4 @@
+{
+  "manifest.description": "E2E test plugin declaring api ^1.2, newer than this Mumcord; an install must be refused.",
+  "manifest.name": "Fixture API 1.2"
+}

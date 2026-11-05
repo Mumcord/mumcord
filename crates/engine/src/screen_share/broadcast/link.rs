@@ -77,7 +77,7 @@ fn frame_of(plain: &[u8]) -> Option<Frame> {
 }
 
 /// Sends `message` as `key`/`keyreq` chunks; `slot` is set for `key` (publisher side).
-async fn send_chunks(
+pub(crate) async fn send_chunks(
     units: &mpsc::Sender<Vec<u8>>,
     kind: ControlKind,
     slot: Option<u16>,

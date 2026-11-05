@@ -111,6 +111,8 @@ pub struct PluginRepository {
     pub paused_reason: Option<String>,
     pub last_sequence: i64,
     pub last_checked: Option<UnixMillis>,
+    /// An "Expected key" was entered when adding the repository and matched its key.
+    pub expected_key_matched: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -334,7 +336,7 @@ impl Store {
     pub fn plugin_repositories(&self) -> Result<Vec<PluginRepository>> {
         let mut stmt = self.conn.prepare(
             "SELECT id, url, name, public_key, pinned_at, enabled, paused_reason,
-                    last_sequence, last_checked
+                    last_sequence, last_checked, expected_key_matched
              FROM plugin_repository ORDER BY id",
         )?;
         let rows = stmt
@@ -349,6 +351,7 @@ impl Store {
                     paused_reason: row.get(6)?,
                     last_sequence: row.get(7)?,
                     last_checked: row.get(8)?,
+                    expected_key_matched: row.get(9)?,
                 })
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -385,6 +388,15 @@ impl Store {
             }
             Err(error) => Err(error.into()),
         }
+    }
+
+    /// Records that the "Expected key" entered when adding the repository matched (FR-6.74).
+    pub fn set_plugin_repository_expected_key_matched(&self, id: i64, matched: bool) -> Result<()> {
+        self.conn.execute(
+            "UPDATE plugin_repository SET expected_key_matched = ?2 WHERE id = ?1",
+            params![id, matched],
+        )?;
+        Ok(())
     }
 
     /// Turns a repository on or off; `paused_reason` is cleared when it is turned on.
@@ -712,6 +724,28 @@ mod tests {
         store
             .add_plugin_repository(&new(99), 5)
             .expect("room again");
+    }
+
+    #[test]
+    fn expected_key_flag_defaults_to_false_and_can_be_set() {
+        let (_dir, store) = temp_store();
+        let new = |n: usize| NewPluginRepository {
+            url: format!("https://r{n}.example.org/"),
+            name: format!("Repo {n}"),
+            public_key: "key".into(),
+        };
+        let plain = store.add_plugin_repository(&new(1), 5).expect("add");
+        let keyed = store.add_plugin_repository(&new(2), 5).expect("add");
+        store
+            .set_plugin_repository_expected_key_matched(keyed, true)
+            .expect("set");
+        let flags: Vec<(i64, bool)> = store
+            .plugin_repositories()
+            .expect("list")
+            .iter()
+            .map(|r| (r.id, r.expected_key_matched))
+            .collect();
+        assert_eq!(flags, vec![(plain, false), (keyed, true)]);
     }
 
     #[test]

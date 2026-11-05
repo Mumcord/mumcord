@@ -55,6 +55,10 @@
     "messagesExpired": "Abgelaufene Nachrichten",
     "incomingRateDropped": "Durch das Ratenlimit verworfene eingehende Nachrichten",
     "incomingInvalid": "Ungültige eingehende Nachrichten",
+    "uiFreezes": "Wie oft Mumcord bei geöffnetem Webinhalt eingefroren ist",
+    "webDisabled": "Der Webinhalt ist ausgeschaltet, weil Mumcord nicht mehr reagiert hat, während er geöffnet war.",
+    "reenableWeb": "Webinhalt einschalten",
+    "reenableFailed": "Der Webinhalt konnte nicht eingeschaltet werden.",
     "log": "Protokoll",
     "logEmpty": "Das Protokoll ist leer.",
     "level": {
@@ -100,7 +104,7 @@
   "visibilityChip": "Spricht mit anderen Mumcord-Nutzern · {{visibility}}",
   "chips": {
     "label": "Genutzte Berechtigungen",
-    "uiPanel": "Panel",
+    "uiPanel": "Leiste",
     "uiMemberBadge": "Mitglieder-Abzeichen",
     "uiProfileCard": "Profilkarte",
     "uiChatCard": "Chat-Karten",

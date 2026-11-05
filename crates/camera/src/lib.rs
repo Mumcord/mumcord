@@ -9,16 +9,51 @@
 //! [`TestCamera`] is the debug-build `MUMCORD_TEST_CAMERA` fixture (FR-8.31); it implements the
 //! same trait, so all later pipeline stages run unchanged.
 
+// Format choice, 16:9 crop, conversion to NV12 and MJPEG decoding for the backends that
+// negotiate camera formats themselves. AVFoundation converts and scales on its own, so macOS
+// only uses the crop geometry and the NV12 path.
+#[cfg(any(target_os = "linux", windows, target_os = "macos"))]
+#[cfg_attr(
+    target_os = "macos",
+    allow(dead_code, reason = "macOS only reads NV12")
+)]
+mod convert;
 mod device;
+// The pure helpers in `macos::mode` are unit tested on every platform.
+#[cfg(any(target_os = "macos", test))]
+mod macos;
+
+#[cfg(target_os = "linux")]
+mod linux;
+#[cfg(any(target_os = "linux", windows))]
+mod mjpeg;
+#[cfg(any(target_os = "linux", windows, target_os = "macos"))]
+#[cfg_attr(
+    target_os = "macos",
+    allow(dead_code, reason = "macOS only uses the crop geometry")
+)]
+mod mode;
 mod pool;
+#[cfg(any(target_os = "linux", windows))]
+mod pump;
 mod testcam;
+// The plain-Rust Media Foundation helpers in `windows::media_type` are unit tested on Linux too.
+#[cfg(any(windows, all(test, target_os = "linux")))]
+mod windows;
 
 use std::sync::Arc;
 use std::time::Duration;
 
 pub use device::{CameraDevice, DeviceEvent, DeviceId, DeviceList};
+#[cfg(target_os = "macos")]
+pub use macos::{MacCamera, PRIVACY_SETTINGS_URL};
+
+#[cfg(target_os = "linux")]
+pub use linux::LinuxCamera;
 pub use pool::{FramePool, PooledBuffer};
 pub use testcam::{TEST_CAMERA_NAME, TestCamera, TestCameraMode};
+#[cfg(windows)]
+pub use windows::{PRIVACY_SETTINGS_URL, WindowsCamera};
 
 /// Largest frame a backend delivers (FR-8.26).
 pub const MAX_WIDTH: u32 = 1280;

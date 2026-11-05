@@ -1,5 +1,6 @@
 {
   "share": "Jaga ekraani",
+  "shareYourScreen": "Jaga oma ekraani",
   "choosing": "Jagatava valimine…",
   "stop": "Lõpeta jagamine",
   "startFailed": "Ekraani jagamist ei õnnestunud alustada.",
@@ -18,8 +19,6 @@
   "pause": "Peata",
   "resume": "Jätka",
   "sound": "Jaga heli",
-  "noSound": "Linux ei jaga heli: vaatajad näevad ainult pilti.",
-  "noSoundForShare": "Sellel jagamisel pole heli (kogu ekraan või toetamata süsteemiversioon).",
   "viewersNone": "Keegi ei vaata veel",
   "viewers_one": "{{count}} vaatab: {{names}}",
   "viewers_other": "{{count}} vaatavad: {{names}}",
@@ -79,7 +78,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Jaga rakenduse heli",
+    "sound": "Heli",
+    "soundInfo": "Terve ekraan: arvuti heli ilma Mumcordita. Üks aken: ainult selle rakenduse heli.",
+    "soundNeeds": {
+      "windows": "Heli puudub: nõuab Windows 10 versiooni 2004 või uuemat",
+      "macos": "Heli puudub: nõuab macOS 13 või uuemat",
+      "pipewire": "Heli puudub: nõuab PipeWire'i"
+    },
     "viewersGet": "Vaatajad saavad:",
     "viewersGetSummary": "kuni {{resolution}} · {{fps}} kaadrit/s · {{codec}} · umbes {{mbit}} Mbit/s",
     "pathRelay": "Saadetakse korra serveri releeserveri kaudu, mis edastab selle kuni {{count}} vaatajale.",
@@ -105,7 +110,18 @@
     "codecBadgeHardware": "{{codec}} · riistvara",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Releeserver",
-    "pathDirect": "Otse"
+    "pathDirect": "Otse",
+    "soundDesktop": "Heli: töölaud",
+    "soundApp": "Heli: {{app}}",
+    "noSound": "Heli puudub",
+    "tipDesktop": "Terve ekraan: töölaua heli ilma Mumcordita.",
+    "tipApp": "Üks aken: ainult selle rakenduse heli.",
+    "tipOff": "Heli lüliti on väljas.",
+    "tipNone": "Selle akna jaoks valiti „Helita“.",
+    "tipOldWindows": "Heli puudub: vajab Windows 10 versiooni 2004 või uuemat",
+    "tipOldMacos": "Heli puudub: vajab macOS 13 või uuemat",
+    "tipNoPipeWire": "Heli puudub: vajab PipeWire’i",
+    "tipCaptureFailed": "Heli jäädvustamine ebaõnnestus. Video jagamine jätkub."
   },
   "qualityMenu": {
     "title": "Kvaliteet",
@@ -218,5 +234,14 @@
     "valueUnavailable": "Pole saadaval",
     "checkAgain": "Kontrolli uuesti",
     "checking": "Kontrollin…"
+  },
+  "soundPicker": {
+    "title": "Millise rakenduse heli?",
+    "noSound": "Heli pole",
+    "share": "Jaga heli",
+    "cancel": "Tühista",
+    "empty": "Praegu ei esita ükski rakendus heli",
+    "gone": "See rakendus lõpetas heli esitamise. Vali teine.",
+    "failed": "Sinu valikut ei õnnestunud rakendada."
   }
 }

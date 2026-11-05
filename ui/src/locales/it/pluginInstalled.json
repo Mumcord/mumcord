@@ -55,6 +55,10 @@
     "messagesExpired": "Messaggi scaduti",
     "incomingRateDropped": "Messaggi in arrivo scartati dal limite di frequenza",
     "incomingInvalid": "Messaggi in arrivo non validi",
+    "uiFreezes": "Volte in cui Mumcord si è bloccato con il suo contenuto web aperto",
+    "webDisabled": "Il suo contenuto web è disattivato perché Mumcord ha smesso di rispondere mentre era aperto.",
+    "reenableWeb": "Attiva il contenuto web",
+    "reenableFailed": "Impossibile attivare il contenuto web.",
     "log": "Registro",
     "logEmpty": "Il registro è vuoto.",
     "level": {

@@ -1,0 +1,24 @@
+:root {
+  color-scheme: light dark;
+}
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0.75rem;
+}
+#probes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+#results {
+  columns: 2 14rem;
+  padding-left: 1.25rem;
+}
+#results [data-status="leaked"] {
+  font-weight: bold;
+}
+#css-url {
+  width: 1px;
+  height: 1px;
+}

@@ -5,6 +5,10 @@
     "body": "Izklopljen po ponavljajočih se zrušitvah",
     "open": "Pokaži v Vtičnikih"
   },
+  "pictureRefused": {
+    "title": "{{name}} ni mogel uporabiti slike",
+    "body": "Te slike ni mogoče uporabiti. Uporabi datoteko PNG, JPEG ali WebP do 10 MB."
+  },
   "update": {
     "title": "Posodobitev za {{name}}",
     "body": "Različica {{version}} čaka v zavihku Posodobitve",

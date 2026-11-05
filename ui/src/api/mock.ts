@@ -69,6 +69,7 @@ import type {
   ActiveEncoder,
   LoweredReason,
   ScreenShare,
+  SoundApp,
   ShareStartBlock,
   ServerSnapshot,
   ViewerQuality,
@@ -76,6 +77,7 @@ import type {
   ShareFanout,
   Settings,
   User,
+  PluginPlatformSettings,
   RepositoryPreview,
   RepositoryView,
   WatchParty,
@@ -856,6 +858,10 @@ function demoPicture(): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+/** A made-up app icon for the mock's "Which app's sound?" list; the browser app has none. */
+const MOCK_MUSIC_ICON =
+  "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='5' fill='%237c5cff'/><path d='M10 17V7l8-2v10' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/><circle cx='8' cy='17' r='2' fill='white'/><circle cx='16' cy='15' r='2' fill='white'/></svg>";
+
 /**
  * The landscape of `demoPicture` as a WebP (640×360): inline images only accept raster pictures,
  * like the engine delivers them.
@@ -993,6 +999,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           paused: false,
           sound: false,
           soundAvailable: false,
+          soundMode: "none",
+          soundApp: null,
+          soundReason: null,
+          soundChoice: null,
           kind: "window",
           elapsedMs: 126000,
           viewers: [1, 2, 5],
@@ -1089,6 +1099,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
   // plugin repositories (spec 06): addresses under example.org work; a "bad" address fails.
   let repositories: RepositoryView[] = [];
+  let platformSettings: PluginPlatformSettings = {
+    blockHighRisk: false,
+    relayDataEnabled: true,
+    soundVolume: 70,
+    soundMuted: false,
+  };
+  const sidePanelWidths = new Map<string, number>();
   let nextRepositoryId = 1;
   function previewRepository(url: string, expectedKey: string | null): RepositoryPreview {
     if (!url.startsWith("https://"))
@@ -1113,9 +1130,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   // for trying and photographing the updater.
   const mockUpdate = demo && new URLSearchParams(window.location.search).has("mockUpdate");
   const inspector = createMockInspector();
-  const popouts = createMockPopouts((state) => {
-    emit("mediaPopoutChanged", { state });
-  });
+  // `?window=media-popout&kind=stage&plugin=<id>`: the stage pop-out page of that plugin.
+  const popoutQuery = new URLSearchParams(
+    typeof window === "undefined" ? "" : window.location.search,
+  );
+  const popouts = createMockPopouts(
+    (state) => {
+      emit("mediaPopoutChanged", { state });
+    },
+    popoutQuery.get("kind") === "stage" ? popoutQuery.get("plugin") : null,
+  );
   const updater = createMockUpdater({
     demo,
     startupCheck: mockUpdate,
@@ -1247,6 +1271,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let activeAudio: ActiveAudioProfile | null = null;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
+  // Like Rust: the frame mute state a later window reads.
+  const frameMute = { all: false, plugins: new Set<string>() };
+  function applyFrameMute(plugin: string | null, muted: boolean): void {
+    if (plugin === null) frameMute.all = muted;
+    else if (muted) frameMute.plugins.add(plugin);
+    else frameMute.plugins.delete(plugin);
+  }
   // Like the engine (QA.7): the forced read-only state of a fresh connect, and the user's last
   // own mute/deafen choice while joined for voice, which a join restores.
   let ownVoice = { mute: false, deaf: false };
@@ -2196,6 +2227,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       },
     ];
   }
+
+  /** Apps "Which app's sound?" offers in the browser mock. */
+  const MOCK_SOUND_APPS: SoundApp[] = [
+    { id: "music", name: "Music Player", icon: MOCK_MUSIC_ICON },
+    { id: "browser", name: "Web Browser", icon: null },
+  ];
 
   const commands: EngineCommands = {
     // identity
@@ -3148,6 +3185,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // Servers older than 1.4 pass no plugin data (FR-6.38).
     pluginsSharedSupported: () =>
       Promise.resolve(!serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2")),
+    pluginRelayAvailability: () => Promise.resolve({ kind: "available", kbps: 64 }),
+    pluginRelayUsage: () => Promise.resolve([]),
     pluginsIndex: () => Promise.resolve({ freshness: "fresh", notice: null, plugins: [] }),
     pluginReposList: () => Promise.resolve(repositories.map((r) => ({ ...r }))),
     pluginRepoPreview: (url, expectedKey) => Promise.resolve(previewRepository(url, expectedKey)),
@@ -3210,8 +3249,26 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginSetPinned: () => fail("notFound", "no such plugin"),
     pluginRemove: () => fail("notFound", "no such plugin"),
     pluginUpdates: () => Promise.resolve([]),
+    pluginUpdateReviewPrepare: () => fail("notFound", "no update for this plugin"),
     pluginCheckNow: () => Promise.resolve(null),
     pluginApplyUpdate: () => fail("notFound", "no update for this plugin"),
+    pluginScore: () => fail("notFound", "plugin not in the list"),
+    pluginConfirmUpdateHighRisk: () => fail("notFound", "no update for this plugin"),
+    pluginSkipUpdateVersion: () => fail("notFound", "no update for this plugin"),
+    pluginWebsites: () => fail("notFound", "no such plugin"),
+    pluginPlatformSettings: () => Promise.resolve(platformSettings),
+    pluginSoundMeter: () => Promise.resolve(0),
+    pluginSetPlatformSettings: (settings) => {
+      platformSettings = { ...settings };
+      return Promise.resolve(null);
+    },
+    pluginSidePanelWidth: (plugin) => Promise.resolve(sidePanelWidths.get(plugin) ?? null),
+    pluginSetSidePanelWidth: (plugin, width) => {
+      // null resets to the default width, like the real command.
+      if (width === null) sidePanelWidths.delete(plugin);
+      else sidePanelWidths.set(plugin, Math.min(32, Math.max(18, width)));
+      return Promise.resolve(null);
+    },
     pluginExportData: () => fail("notFound", "no such plugin"),
     pluginResetData: () => fail("notFound", "no such plugin"),
     pluginDevLoad: () => notImplemented("pluginDevLoad"),
@@ -3224,6 +3281,26 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginAsset: () => fail("notFound", "no such asset"),
     pluginsSetAppearance: () => Promise.resolve(null),
     pluginUiAction: () => fail("invalidInput", "no such action on screen"),
+    pluginReenableWeb: () => Promise.resolve(null),
+    pluginFramesMute: (plugin, muted) => {
+      applyFrameMute(plugin, muted);
+      emit("pluginFrameMute", { plugin, muted });
+      return Promise.resolve(null);
+    },
+    pluginFramesMuteState: () =>
+      Promise.resolve({ all: frameMute.all, plugins: [...frameMute.plugins].sort() }),
+    // Child web view frames exist only in the macOS app; the mock always uses iframes.
+    pluginFrameOpen: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFrameBounds: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFramePost: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFrameFocus: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFrameClose: () => fail("notImplemented", "plugin frames are iframes here"),
+    stageActivities: () => Promise.resolve([]),
+    stageJoin: () => Promise.resolve(null),
+    stageLeave: () => Promise.resolve(null),
+    stageVisibility: () => Promise.resolve(null),
+    appMenu: () => Promise.resolve([]),
+    appMenuActivate: () => Promise.resolve(null),
     pluginUiEvent: () => fail("invalidInput", "the plugin is not running"),
     pluginsMentioned: () => Promise.resolve(null),
     pluginsReplayChat: () => Promise.resolve(null),
@@ -3325,6 +3402,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     notificationDismiss: () => Promise.resolve(null),
     trayAttentionSet: () => Promise.resolve(null),
+    pluginDetailsOpen: () => Promise.resolve(null),
     dndState: () => Promise.resolve(dnd),
     dndSet: (on) => setDnd({ ...dnd, manual: on }),
     dndSetFollowSystem: (on) => setDnd({ ...dnd, followSystem: on }),
@@ -3735,6 +3813,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         paused: false,
         sound: withSound,
         soundAvailable: withSound,
+        soundMode: withSound ? "desktop" : "none",
+        soundApp: null,
+        soundReason: withSound ? null : "off",
+        soundChoice: null,
         kind: null,
         elapsedMs: 0,
         viewers: [],
@@ -3753,10 +3835,30 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     screenShareSetSoundLevel: () => Promise.resolve(null),
-    screenShareSetSound: (serverId, enabled) => {
+    screenShareSoundSupport: () => Promise.resolve(null),
+    screenShareSoundApps: () => Promise.resolve(MOCK_SOUND_APPS.map((a) => ({ ...a }))),
+    screenShareChooseSound: (serverId, app) => {
+      const own = requireOwnShare(serverId);
+      if (own.soundChoice === null) fail("invalidInput", "no sound choice is asked");
+      const chosen = app === null ? undefined : MOCK_SOUND_APPS.find((a) => a.id === app);
+      if (app !== null && chosen === undefined) fail("notFound", "that app no longer plays sound");
       changeOwnShare(serverId, {
-        ...requireOwnShare(serverId),
-        sound: enabled && requireOwnShare(serverId).soundAvailable,
+        ...own,
+        sound: chosen !== undefined,
+        soundAvailable: chosen !== undefined,
+        soundMode: chosen === undefined ? "none" : "app",
+        soundApp: chosen?.name ?? null,
+        soundReason: chosen === undefined ? "notChosen" : null,
+        soundChoice: null,
+      });
+      return Promise.resolve(null);
+    },
+    screenShareSetSound: (serverId, enabled) => {
+      const own = requireOwnShare(serverId);
+      changeOwnShare(serverId, {
+        ...own,
+        sound: enabled && own.soundAvailable,
+        soundReason: own.soundAvailable ? (enabled ? null : "off") : own.soundReason,
       });
       return Promise.resolve(null);
     },
@@ -3805,6 +3907,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     windowOverlayNoticeDismiss: () => Promise.resolve(null),
     audioDeviceNoticePending: () => Promise.resolve(false),
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
+    cameraUnavailable: () => Promise.resolve(null),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.

@@ -84,10 +84,10 @@ describe("visibility", () => {
 });
 
 describe("menu", () => {
-  it("offers Share screen and Watch together", () => {
+  it("offers Share your screen and Watch together", () => {
     render(<ChatActionRow />);
     openMenu();
-    expect(screen.getByRole("menuitem", { name: /^Share screen/ })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: /^Share your screen/ })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "Watch together" })).toBeInTheDocument();
   });
 
@@ -96,7 +96,7 @@ describe("menu", () => {
     const start = vi.spyOn(api, "screenShareStart");
     render(<ChatActionRow />);
     openMenu();
-    const share = screen.getByRole("menuitem", { name: /^Share screen/ });
+    const share = screen.getByRole("menuitem", { name: /^Share your screen/ });
     await waitFor(() => {
       expect(share).toHaveAttribute("aria-disabled", "true");
     });
@@ -136,7 +136,7 @@ describe("share toggle", () => {
     render(<ChatActionRow />);
     expect(appsButton()).toHaveAccessibleName("Apps");
     openMenu();
-    const share = screen.getByRole("menuitem", { name: /^Share screen/ });
+    const share = screen.getByRole("menuitem", { name: /^Share your screen/ });
     await waitFor(() => {
       expect(share).not.toHaveAttribute("aria-disabled");
     });
@@ -147,7 +147,7 @@ describe("share toggle", () => {
     });
     expect(appsButton()?.querySelector(".chat-apps__live")).not.toBeNull();
     openMenu();
-    expect(screen.queryByRole("menuitem", { name: /^Share screen/ })).toBeNull();
+    expect(screen.queryByRole("menuitem", { name: /^Share your screen/ })).toBeNull();
     expect(screen.getByRole("menuitem", { name: "Pause sharing" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Who is watching" })).toHaveTextContent(
       "Nobody is watching yet",
@@ -162,7 +162,7 @@ describe("share toggle", () => {
 describe("share entry", () => {
   const shareItem = () => {
     openMenu();
-    return screen.getByRole("menuitem", { name: /^Share screen/ });
+    return screen.getByRole("menuitem", { name: /^Share your screen/ });
   };
   const ready = async () => {
     const item = shareItem();

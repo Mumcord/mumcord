@@ -217,3 +217,33 @@
     animation-duration: 2.4s;
   }
 }
+
+.plugin-card-needs {
+  margin: var(--space-1) 0 0;
+  color: var(--color-warning, var(--color-text));
+  font-size: 0.8rem;
+}
+
+/* The card's open-details button covers the card; the link has to stay above it. */
+.plugin-card-needs-link {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.plugin-browse-scorenote {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md, 8px);
+}
+
+/* The chip is as wide as its text, not as wide as the card. */
+.plugin-card-body > .risk-chip {
+  align-self: flex-start;
+}

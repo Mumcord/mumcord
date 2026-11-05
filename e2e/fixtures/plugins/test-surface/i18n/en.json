@@ -1,0 +1,6 @@
+{
+  "manifest.name": "Test Surface",
+  "manifest.description": "E2E test plugin: web content in the stage, side panel and dialog, with isolation probes.",
+  "origins.declared": "Probe target that the page and net.http may reach",
+  "origins.update": "New website added in 1.1.1 (update gate)"
+}

@@ -3,7 +3,7 @@
 use mumcord_engine::{Engine, PasswordChange, ServerFields, ServerView, TestConnectionView};
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::State;
+use tauri::{AppHandle, State};
 use tauri_specta::Event;
 
 use super::settings::P2pMode;
@@ -321,14 +321,16 @@ pub async fn server_set_group_mentions_muted(
 #[tauri::command]
 #[specta::specta]
 pub async fn server_set_p2p_mode_override(
+    app: AppHandle,
     engine: State<'_, Engine>,
     server_id: ServerId,
     mode: Option<P2pMode>,
 ) -> ApiResult<SavedServer> {
-    Ok(engine
+    let saved = engine
         .server_set_p2p_mode_override(to_engine_server_id(server_id), mode.map(Into::into))
-        .await?
-        .into())
+        .await?;
+    crate::plugins::refresh_all_relay_availability(&app);
+    Ok(saved.into())
 }
 
 /// Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17).

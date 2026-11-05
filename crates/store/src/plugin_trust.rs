@@ -1,6 +1,7 @@
 //! Local trust data of the plugin platform (spec 09, section 7.1): approved origins, daily
 //! request counters, when a registry key was first seen, the permission history per plugin
-//! version and the high-risk plugins the user confirmed. Nothing here leaves the device.
+//! version, the high-risk plugins the user confirmed and the plugins whose web content is off.
+//! Nothing here leaves the device.
 
 use rusqlite::{OptionalExtension, params};
 
@@ -206,6 +207,65 @@ impl Store {
         Ok(())
     }
 
+    /// Remembers that the user skipped this version of a plugin ("Skip this version").
+    pub fn skip_plugin_update(&self, plugin_id: &str, version: &str, at: UnixMillis) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO plugin_skipped_update (plugin_id, version, skipped_at)
+             VALUES (?1, ?2, ?3)
+             ON CONFLICT (plugin_id) DO UPDATE SET
+                 version = excluded.version, skipped_at = excluded.skipped_at",
+            params![plugin_id, version, at],
+        )?;
+        Ok(())
+    }
+
+    /// The version the user skipped last for this plugin, if any.
+    pub fn plugin_skipped_update(&self, plugin_id: &str) -> Result<Option<String>> {
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT version FROM plugin_skipped_update WHERE plugin_id = ?1",
+                params![plugin_id],
+                |row| row.get(0),
+            )
+            .optional()?)
+    }
+
+    /// Turns a plugin's web content off (`disabled`) or on again.
+    pub fn set_plugin_web_disabled(
+        &self,
+        plugin_id: &str,
+        disabled: bool,
+        at: UnixMillis,
+    ) -> Result<()> {
+        if disabled {
+            self.conn.execute(
+                "INSERT INTO plugin_web_disabled (plugin_id, disabled_at) VALUES (?1, ?2)
+                 ON CONFLICT (plugin_id) DO NOTHING",
+                params![plugin_id, at],
+            )?;
+        } else {
+            self.conn.execute(
+                "DELETE FROM plugin_web_disabled WHERE plugin_id = ?1",
+                params![plugin_id],
+            )?;
+        }
+        Ok(())
+    }
+
+    /// Whether the plugin's web content is turned off.
+    pub fn plugin_web_disabled(&self, plugin_id: &str) -> Result<bool> {
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT 1 FROM plugin_web_disabled WHERE plugin_id = ?1",
+                params![plugin_id],
+                |_| Ok(()),
+            )
+            .optional()?
+            .is_some())
+    }
+
     /// When the user confirmed this version as high risk, if they did.
     pub fn plugin_high_risk_confirmed_at(
         &self,
@@ -334,6 +394,35 @@ mod tests {
         assert_eq!(
             store.plugin_version_history("p").expect("read"),
             vec![first, second]
+        );
+    }
+
+    #[test]
+    fn web_content_stays_off_until_turned_on_again() {
+        let (_dir, store) = temp_store();
+        assert!(!store.plugin_web_disabled("p").expect("store"));
+        store.set_plugin_web_disabled("p", true, 1).expect("store");
+        store.set_plugin_web_disabled("p", true, 2).expect("store");
+        assert!(store.plugin_web_disabled("p").expect("store"));
+        assert!(!store.plugin_web_disabled("q").expect("store"));
+        store.set_plugin_web_disabled("p", false, 3).expect("store");
+        assert!(!store.plugin_web_disabled("p").expect("store"));
+    }
+
+    #[test]
+    fn skipped_update_is_remembered_per_plugin_and_replaced() {
+        let (_dir, store) = temp_store();
+        assert_eq!(store.plugin_skipped_update("p").expect("store"), None);
+        store.skip_plugin_update("p", "1.1.0", 1).expect("store");
+        store.skip_plugin_update("q", "2.0.0", 2).expect("store");
+        store.skip_plugin_update("p", "1.2.0", 3).expect("store");
+        assert_eq!(
+            store.plugin_skipped_update("p").expect("store").as_deref(),
+            Some("1.2.0")
+        );
+        assert_eq!(
+            store.plugin_skipped_update("q").expect("store").as_deref(),
+            Some("2.0.0")
         );
     }
 

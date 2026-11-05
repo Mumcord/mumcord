@@ -55,6 +55,10 @@
     "messagesExpired": "Verlopen berichten",
     "incomingRateDropped": "Inkomende berichten weggegooid door de snelheidslimiet",
     "incomingInvalid": "Ongeldige inkomende berichten",
+    "uiFreezes": "Aantal keren dat Mumcord vastliep terwijl de webinhoud open was",
+    "webDisabled": "De webinhoud is uitgeschakeld omdat Mumcord niet meer reageerde terwijl deze open was.",
+    "reenableWeb": "Webinhoud inschakelen",
+    "reenableFailed": "De webinhoud kon niet worden ingeschakeld.",
     "log": "Logboek",
     "logEmpty": "Het logboek is leeg.",
     "level": {

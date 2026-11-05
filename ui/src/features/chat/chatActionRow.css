@@ -33,6 +33,20 @@
 
 .chat-apps__item {
   display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.chat-apps__builtin {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.25rem;
+  color: var(--color-text-secondary);
+}
+
+.chat-apps__text {
+  display: flex;
   flex-direction: column;
   gap: 0.125rem;
 }

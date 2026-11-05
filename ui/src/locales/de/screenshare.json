@@ -1,5 +1,6 @@
 {
   "share": "Bildschirm teilen",
+  "shareYourScreen": "Eigenen Bildschirm teilen",
   "choosing": "Auswahl, was geteilt wird …",
   "stop": "Teilen beenden",
   "startFailed": "Die Bildschirmfreigabe konnte nicht starten.",
@@ -18,8 +19,6 @@
   "pause": "Pausieren",
   "resume": "Fortsetzen",
   "sound": "Ton teilen",
-  "noSound": "Unter Linux wird kein Ton geteilt: Zuschauer sehen nur das Bild.",
-  "noSoundForShare": "Diese Freigabe hat keinen Ton (ganzer Bildschirm oder nicht unterstützte Systemversion).",
   "viewersNone": "Noch schaut niemand zu",
   "viewers_one": "{{count}} schaut zu: {{names}}",
   "viewers_other": "{{count}} schauen zu: {{names}}",
@@ -79,7 +78,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Ton der App teilen",
+    "sound": "Ton",
+    "soundInfo": "Ganzer Bildschirm: Ton des Computers ohne Mumcord. Ein Fenster: nur der Ton dieser App.",
+    "soundNeeds": {
+      "windows": "Kein Ton: erfordert Windows 10 Version 2004 oder neuer",
+      "macos": "Kein Ton: erfordert macOS 13 oder neuer",
+      "pipewire": "Kein Ton: erfordert PipeWire"
+    },
     "viewersGet": "Zuschauer erhalten:",
     "viewersGetSummary": "bis zu {{resolution}} · {{fps}} fps · {{codec}} · etwa {{mbit}} Mbit/s",
     "pathRelay": "Wird einmal über das Relay des Servers gesendet, das es an bis zu {{count}} Zuschauer weitergibt.",
@@ -105,7 +110,18 @@
     "codecBadgeHardware": "{{codec}} · Hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Direkt"
+    "pathDirect": "Direkt",
+    "soundDesktop": "Ton: Desktop",
+    "soundApp": "Ton: {{app}}",
+    "noSound": "Kein Ton",
+    "tipDesktop": "Ganzer Bildschirm: Desktop-Ton ohne Mumcord.",
+    "tipApp": "Ein Fenster: nur der Ton dieser App.",
+    "tipOff": "Der Ton-Schalter ist aus.",
+    "tipNone": "Für dieses Fenster wurde „Kein Ton“ gewählt.",
+    "tipOldWindows": "Kein Ton: benötigt Windows 10 Version 2004 oder neuer",
+    "tipOldMacos": "Kein Ton: benötigt macOS 13 oder neuer",
+    "tipNoPipeWire": "Kein Ton: benötigt PipeWire",
+    "tipCaptureFailed": "Die Tonaufnahme ist fehlgeschlagen. Die Bildfreigabe läuft weiter."
   },
   "qualityMenu": {
     "title": "Qualität",
@@ -218,5 +234,14 @@
     "valueUnavailable": "Nicht verfügbar",
     "checkAgain": "Erneut prüfen",
     "checking": "Prüfe…"
+  },
+  "soundPicker": {
+    "title": "Welche App soll zu hören sein?",
+    "noSound": "Kein Ton",
+    "share": "Ton teilen",
+    "cancel": "Abbrechen",
+    "empty": "Gerade gibt keine App Ton wieder",
+    "gone": "Diese App gibt keinen Ton mehr wieder. Wähle eine andere.",
+    "failed": "Deine Auswahl konnte nicht übernommen werden."
   }
 }

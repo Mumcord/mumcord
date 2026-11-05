@@ -1,0 +1,5 @@
+{
+  "manifest.description": "E2E test plugin, version 1.0.0: scores Medium risk (update hold, before).",
+  "manifest.name": "Fixture growth",
+  "origin_0": "Loads the fixture content"
+}

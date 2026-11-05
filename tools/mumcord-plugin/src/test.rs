@@ -513,6 +513,16 @@ impl MockIo {
 }
 
 impl PluginIo for MockIo {
+    fn app_menu_set_state(
+        &self,
+        _plugin: &str,
+        _item: &str,
+        _enabled: bool,
+        _reason: Option<String>,
+    ) -> Result<(), Error> {
+        Ok(())
+    }
+
     fn set_tree(
         &self,
         _plugin: &str,

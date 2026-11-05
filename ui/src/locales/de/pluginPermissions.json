@@ -27,13 +27,16 @@
     "chatPatterns": "Bestimmte Chatnachrichten erkennen, z. B. eingefügte Spiel-Fittings",
     "netHttp": "Mit einem Server deiner Wahl kommunizieren",
     "secrets": "Ein Geheimnis (z. B. einen API-Schlüssel) im Schlüsselbund deines Systems speichern",
-    "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen (ohne Internet)",
-    "uiStage": "Show an activity in the media area",
-    "uiSidePanel": "Show its own content in a side panel",
-    "uiAppMenu": "Add items to the Apps menu",
-    "netOrigins": "Talk to these websites",
-    "peersRelay": "Send data through the server's relay",
-    "audioEffects": "Play short sounds that come with the plugin"
+    "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen",
+    "uiStage": "Eine Aktivität im Medienbereich anzeigen",
+    "uiSidePanel": "Eigene Inhalte in einer Seitenleiste anzeigen",
+    "uiAppMenu": "Einträge zum Apps-Menü hinzufügen",
+    "netOrigins": "Mit diesen Websites kommunizieren",
+    "peersRelay": "Daten über das Relay des Servers senden",
+    "audioEffects": "Kurze Töne abspielen, die zum Plugin gehören",
+    "filesSave": "Von dir gewählte Dateien speichern",
+    "chatPostImage": "Nach deinem Klick ein Bild im Chat posten",
+    "filesImportPicture": "Von dir gewählte Bilder öffnen"
   },
   "explanations": {
     "uiPanel": "Ein kleines Panel dieses Plugins erscheint in der Plugin-Leiste.",
@@ -56,13 +59,16 @@
     "chatPatterns": "Es erhält nur Chatnachrichten in deinem Kanal, die so beginnen, wie es angegeben hat, etwa ein eingefügtes Spiel-Fitting. Kein anderer Chattext erreicht es.",
     "netHttp": "Es kann mit einem Server sprechen, den du wählst, und nur mit diesem.",
     "secrets": "Es kann ein Geheimnis, etwa einen API-Schlüssel, in deinem System-Schlüsselbund aufbewahren.",
-    "uiWebview": "Es kann eigene Webinhalte in einem abgeschotteten Rahmen ohne Internetzugang zeigen.",
-    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
-    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
-    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
-    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
-    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
-    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
+    "uiWebview": "Es kann weder Mumcord noch deine Dateien, dein Mikrofon, deine Kamera oder die Zwischenablage sehen.",
+    "uiStage": "Nur wenn du sie startest oder ihr beitrittst. Personen in deinem Kanal, die {{plugin}} haben, können beitreten.",
+    "uiSidePanel": "Der Inhalt erscheint in einer Spalte neben dem Chat, nur wenn du sie öffnest.",
+    "uiAppMenu": "Bis zu {{count}} Einträge, angezeigt unter „Plugins“.",
+    "netOrigins": "{{plugin}} und seine Seite dürfen nur mit den unten aufgeführten Websites Daten senden und empfangen.",
+    "peersRelay": "Schnellere und größere Züge. Ende-zu-Ende-verschlüsselt; das Relay kann nichts lesen.",
+    "audioEffects": "Kurze Töne, die zum Plugin gehören. Du kannst sie unter Einstellungen → Plugins leiser stellen oder stummschalten.",
+    "filesSave": "Mumcord fragt dich nach deinem Klick, wo jede Datei gespeichert werden soll; das Plugin sieht deine Ordner nie.",
+    "chatPostImage": "Nach deinem Klick im Plugin kann es ein Bild in deinen aktuellen Kanal posten, mit seinem Namen gekennzeichnet.",
+    "filesImportPicture": "Mumcord lässt dich nach deinem Klick ein Bild auswählen; das Plugin erhält nur dieses Bild, nie deine Ordner."
   },
   "listLabel": "Berechtigungen"
 }

@@ -32,6 +32,9 @@ export const PERMISSION_RISK = {
   "net.origins": "red",
   "peers.relay": "yellow",
   "audio.effects": "green",
+  "files.save": "green",
+  "chat.post-image": "yellow",
+  "files.import-picture": "green",
 } as const satisfies Record<string, PermissionRisk>;
 
 export type PermissionId = keyof typeof PERMISSION_RISK;

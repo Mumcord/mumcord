@@ -55,6 +55,10 @@
     "messagesExpired": "Aegunud sõnumid",
     "incomingRateDropped": "Kiiruspiiranguga kaotsi läinud sissetulevad sõnumid",
     "incomingInvalid": "Kehtetud sissetulevad sõnumid",
+    "uiFreezes": "Mitu korda Mumcord hangus, kui veebisisu oli avatud",
+    "webDisabled": "Veebisisu on välja lülitatud, sest Mumcord lakkas vastamast, kui see oli avatud.",
+    "reenableWeb": "Lülita veebisisu sisse",
+    "reenableFailed": "Veebisisu ei õnnestunud sisse lülitada.",
     "log": "Logi",
     "logEmpty": "Logi on tühi.",
     "level": {

@@ -26,6 +26,7 @@
     "noRelay": "Ce serveur n’a pas de relais, le partage de fichiers n’est donc pas disponible.",
     "filesDisallowed": "Le relais de ce serveur n’autorise pas le partage de fichiers.",
     "screenDisallowed": "Le relais de ce serveur n’autorise pas le partage d’écran.",
+    "camerasDisallowed": "Le relais de ce serveur n’autorise pas le partage de caméra.",
     "imagesDisallowed": "Taille réelle indisponible : le relais de ce serveur n’autorise pas les images",
     "noCertificate": "Le partage de fichiers nécessite un certificat client.",
     "modeNeedsRelay": "Le partage de fichiers nécessite le relais ; votre réglage pair à pair est {{mode}}.",

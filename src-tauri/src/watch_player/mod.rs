@@ -93,7 +93,7 @@ struct Running {
 
 /// The two pages the server knows.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Page {
+pub(crate) enum Page {
     /// The watch party's YouTube player, driven by play/pause/seek messages.
     Party,
     /// A YouTube or Twitch player opened from a chat card.
@@ -109,7 +109,7 @@ impl Page {
     }
 
     /// The player origins the page may frame.
-    fn frame_src(self) -> &'static str {
+    pub(crate) fn frame_src(self) -> &'static str {
         match self {
             Self::Party => "https://www.youtube-nocookie.com",
             Self::Embed => {

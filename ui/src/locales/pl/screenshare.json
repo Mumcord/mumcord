@@ -1,5 +1,6 @@
 {
   "share": "Udostępnij ekran",
+  "shareYourScreen": "Udostępnij swój ekran",
   "choosing": "Wybieranie, co udostępnić…",
   "stop": "Zakończ udostępnianie",
   "startFailed": "Nie udało się uruchomić udostępniania ekranu.",
@@ -18,8 +19,6 @@
   "pause": "Wstrzymaj",
   "resume": "Wznów",
   "sound": "Udostępniaj dźwięk",
-  "noSound": "Linux nie udostępnia dźwięku: widzowie widzą tylko obraz.",
-  "noSoundForShare": "To udostępnianie nie ma dźwięku (cały ekran lub nieobsługiwana wersja systemu).",
   "viewersNone": "Nikt jeszcze nie ogląda",
   "viewers_one": "{{count}} ogląda: {{names}}",
   "viewers_few": "{{count}} oglądają: {{names}}",
@@ -83,7 +82,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Udostępnij dźwięk aplikacji",
+    "sound": "Dźwięk",
+    "soundInfo": "Cały ekran: dźwięk komputera bez Mumcorda. Jedno okno: tylko dźwięk tej aplikacji.",
+    "soundNeeds": {
+      "windows": "Brak dźwięku: wymaga Windows 10 w wersji 2004 lub nowszej",
+      "macos": "Brak dźwięku: wymaga macOS 13 lub nowszego",
+      "pipewire": "Brak dźwięku: wymaga PipeWire"
+    },
     "viewersGet": "Widzowie dostaną:",
     "viewersGetSummary": "do {{resolution}} · {{fps}} kl./s · {{codec}} · ok. {{mbit}} Mbit/s",
     "pathRelay": "Wysyłane raz przez przekaźnik serwera, który przekazuje je dalej do maks. {{count}} widzów.",
@@ -109,7 +114,18 @@
     "codecBadgeHardware": "{{codec}} · sprzętowo",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Przekaźnik",
-    "pathDirect": "Bezpośrednio"
+    "pathDirect": "Bezpośrednio",
+    "soundDesktop": "Dźwięk: pulpit",
+    "soundApp": "Dźwięk: {{app}}",
+    "noSound": "Bez dźwięku",
+    "tipDesktop": "Cały ekran: dźwięk pulpitu bez Mumcorda.",
+    "tipApp": "Jedno okno: tylko dźwięk tej aplikacji.",
+    "tipOff": "Przełącznik dźwięku jest wyłączony.",
+    "tipNone": "Dla tego okna wybrano „Bez dźwięku”.",
+    "tipOldWindows": "Bez dźwięku: wymaga Windows 10 w wersji 2004 lub nowszej",
+    "tipOldMacos": "Bez dźwięku: wymaga macOS 13 lub nowszego",
+    "tipNoPipeWire": "Bez dźwięku: wymaga PipeWire",
+    "tipCaptureFailed": "Przechwytywanie dźwięku nie powiodło się. Udostępnianie obrazu trwa dalej."
   },
   "qualityMenu": {
     "title": "Jakość",
@@ -226,5 +242,14 @@
     "valueUnavailable": "Niedostępne",
     "checkAgain": "Sprawdź ponownie",
     "checking": "Sprawdzanie…"
+  },
+  "soundPicker": {
+    "title": "Dźwięk której aplikacji?",
+    "noSound": "Bez dźwięku",
+    "share": "Udostępnij dźwięk",
+    "cancel": "Anuluj",
+    "empty": "Żadna aplikacja nie odtwarza teraz dźwięku",
+    "gone": "Ta aplikacja przestała odtwarzać dźwięk. Wybierz inną.",
+    "failed": "Nie udało się zastosować Twojego wyboru."
   }
 }

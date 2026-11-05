@@ -123,6 +123,7 @@ function PersonMenu({
   // The "Admin ▸" sub-menu (FR-10.6): it opens from its item and keeps the person menu open.
   const [adminMenu, setAdminMenu] = useState<MenuPosition | null>(null);
   const tAdmin = useTranslation("admin").t;
+  const submenuOpen = adminMenu !== null;
 
   const close = (returnFocus: boolean) => {
     closePersonMenu();
@@ -140,7 +141,12 @@ function PersonMenu({
       closePersonMenu();
     };
     const onPointerDown = (event: PointerEvent) => {
-      if (!(event.target instanceof Node && ref.current?.contains(event.target))) dismiss();
+      if (event.target instanceof Node && ref.current?.contains(event.target)) return;
+      // The Admin sub-menu sits in its own portal; a press on it must not close the person menu,
+      // or the sub-menu unmounts before its click and Kick… or Ban… does nothing (issue #507).
+      if (submenuOpen && event.target instanceof Element && event.target.closest(".server-menu"))
+        return;
+      dismiss();
     };
     // Containers scrolling by themselves (the chat list following a new message) keep it open;
     // the page scrolling or the user using the wheel elsewhere closes it.
@@ -162,7 +168,7 @@ function PersonMenu({
       window.removeEventListener("blur", dismiss);
       window.removeEventListener("resize", dismiss);
     };
-  }, []);
+  }, [submenuOpen]);
 
   // Clamp to the viewport once the size is known; focus the first item.
   useLayoutEffect(() => {

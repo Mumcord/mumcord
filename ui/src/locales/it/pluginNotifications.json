@@ -5,6 +5,10 @@
     "body": "Disattivato dopo arresti anomali ripetuti",
     "open": "Mostra in Plugin"
   },
+  "pictureRefused": {
+    "title": "{{name}} non ha potuto usare l'immagine",
+    "body": "Questa immagine non può essere usata. Usa un file PNG, JPEG o WebP fino a 10 MB."
+  },
   "update": {
     "title": "Aggiornamento per {{name}}",
     "body": "La versione {{version}} è in attesa nella scheda Aggiornamenti",

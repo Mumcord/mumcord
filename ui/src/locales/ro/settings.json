@@ -1062,6 +1062,19 @@
     "hint": "Adaugă o filă Dezvoltator la Pluginuri, unde poți încărca pluginuri nesemnate dintr-un dosar. Activează-l doar dacă îți creezi singur pluginurile."
   },
   "newBadge": "Nou",
+  "pluginSafety": {
+    "title": "Siguranța pluginurilor",
+    "blockHighRisk": "Nu permite pluginuri cu risc ridicat",
+    "hint": "Ascunde butonul Instalează pentru pluginurile cu scor de 60 sau mai mare și oprește actualizările care ar duce un plugin instalat acolo. Pluginurile pe care le-ai instalat deja continuă să funcționeze.",
+    "note": "Dezactivat implicit. Pluginurile oficiale și cele pentru dezvoltatori nu sunt niciodată afectate. Scorurile sunt estimări, nu o garanție."
+  },
+  "pluginSounds": {
+    "title": "Sunetele pluginurilor",
+    "volume": "Volumul sunetelor pluginurilor",
+    "mute": "Oprește sunetul pluginurilor",
+    "hint": "Se aplică fiecărui sunet redat de un plugin. Sunetele pluginurilor sunt mai încet cât timp vorbesc oamenii.",
+    "meter": "Nivel de ieșire (depanare)"
+  },
   "screenShare": {
     "newBadge": "Nou",
     "qualityTitle": "Calitate implicită",
@@ -1093,6 +1106,7 @@
     "useGpuHint": "Codifică AV1 pe placa video, deci partajarea consumă aproape deloc CPU. Dezactivat: AV1 folosește procesorul.",
     "statusList": "Starea encoderului",
     "av1Encode": "Codificare AV1",
+    "sound": "Sunet",
     "askEachTime": "Întreabă-mă aceste setări la fiecare partajare",
     "av1Playback": "Redare AV1",
     "vp9Playback": "Redare VP9",

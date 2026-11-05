@@ -27,9 +27,10 @@ interface stage {
   /// channel has 3), `invalid` (bad title, tree or entry).
   start: func(title: string, content: stage-content) -> result<activity-id, error>;
 
-  /// Joins an activity announced by `stage-activity-started`, after the user clicked Join.
-  /// Errors: `not-permitted`, `quota-exceeded` (the activity is full), `invalid` (unknown or
-  /// ended activity).
+  /// Joins an activity announced by `stage-activity-started` from the plugin's own Join button.
+  /// Mumcord's Join (activity line, stage) joins by itself and needs no call. Only within 8 s
+  /// of a user gesture for this plugin (FR-9.45). Errors: `not-permitted` (no permission or
+  /// gesture), `quota-exceeded` (the activity is full), `invalid` (unknown or ended activity).
   join: func(activity: activity-id) -> result<_, error>;
 
   /// Leaves the current activity; it keeps running for the others.

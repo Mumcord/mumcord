@@ -12,6 +12,7 @@ members = [
     "crates/p2p",
     "crates/screenshare",
     "crates/camera",
+    "crates/effects",
     "crates/plugins",
     "crates/plugin-sdk",
     "tools/netsim",
@@ -39,6 +40,7 @@ mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
 mumcord-screenshare = { path = "crates/screenshare" }
 mumcord-camera = { path = "crates/camera" }
+mumcord-effects = { path = "crates/effects" }
 mumcord-plugins = { path = "crates/plugins", version = "0.7.0-dev" }
 mumcord-plugin-sdk = { path = "crates/plugin-sdk", version = "0.7.0-dev" }
 
@@ -116,6 +118,11 @@ rtrb = "0.4"
 # Lock-free bounded queue: the camera frame pool hands buffers between capture and consumer
 # threads without locks or allocation.
 crossbeam-queue = "0.3"
+
+# Camera background effects (spec 08, FR-8.33): ONNX Runtime through `ort`, loaded at run time
+# (`load-dynamic`) so a missing or broken runtime library disables the effects instead of
+# stopping Mumcord. The runtime library itself is fetched by crates/effects/build.rs.
+ort = { version = "=2.0.0-rc.13", default-features = false, features = ["std", "load-dynamic"] }
 rubato = "5.0"
 # Lists the sound server's sinks and sources with their default flags (issue #183). Pure Rust
 # PulseAudio protocol client; PipeWire answers it through pipewire-pulse.
@@ -141,6 +148,8 @@ objc2-core-media = { version = "0.3", default-features = false, features = ["std
 objc2-core-video = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-graphics = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-audio-types = { version = "0.3", default-features = false, features = ["std"] }
+# macOS camera capture (spec 08, FR-8.25): AVFoundation capture session and device list.
+objc2-av-foundation = { version = "0.3", default-features = false, features = ["std"] }
 
 # Plugins (Epic 3.1, #268): WebAssembly components run in wasmtime without WASI, so a plugin can
 # only call what Mumcord defines. Only the runtime, the Cranelift compiler and the component model:
@@ -239,6 +248,8 @@ tauri-plugin-single-instance = { version = "2.5", features = ["deep-link"] }
 tauri-plugin-deep-link = "2.6"
 tauri-plugin-global-shortcut = "2.4"
 tauri-plugin-dialog = "2.8"
+# The same build tauri-plugin-dialog uses, for a message before Tauri starts.
+rfd = { version = "0.17", default-features = false, features = ["gtk3", "common-controls-v6"] }
 tauri-plugin-opener = "2.7"
 tauri-plugin-clipboard-manager = "2.5"
 tauri-plugin-updater = { version = "2.10", default-features = false, features = ["rustls-tls", "zip"] }
@@ -303,6 +314,11 @@ opt-level = 3
 opt-level = 3
 
 [profile.dev.package.opusic-sys]
+opt-level = 3
+
+# Camera background effects run per 720p frame; unoptimised they would miss the frame budget in
+# the debug builds the E2E tests use.
+[profile.dev.package.mumcord-effects]
 opt-level = 3
 
 # mumbot (dev-dependency of the engine's live tests) depends on the published protocol and codec

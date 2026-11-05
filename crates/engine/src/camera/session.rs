@@ -415,7 +415,7 @@ impl Engine {
             .ok_or(CameraFailure::NoCertificate)?;
         let me = cert_key(&identity).ok_or(CameraFailure::NoCertificate)?;
         let (ann, id, token) = self
-            .relay_broadcast_request(server_id, limit, RelayUse::Camera)
+            .relay_broadcast_request(server_id, RelayUse::Camera, limit)
             .await
             .map_err(CameraFailure::from_fanout)?;
         let link = p2p
@@ -574,7 +574,7 @@ impl Engine {
         let server_id = ctx.server_id;
         self.runtime().spawn(async move {
             let Err(reason) = engine
-                .relay_broadcast_admit(server_id, broadcast, viewer, RelayUse::Camera)
+                .relay_broadcast_admit(server_id, RelayUse::Camera, broadcast, viewer)
                 .await
             else {
                 engine.emit_camera(server_id, engine.camera_view());
@@ -614,7 +614,7 @@ impl Engine {
             return;
         }
         if kick {
-            self.relay_broadcast_kick(server_id, id, viewer, RelayUse::Camera);
+            self.relay_broadcast_kick(server_id, RelayUse::Camera, id, viewer);
         }
         self.emit_camera(server_id, self.camera_view());
     }

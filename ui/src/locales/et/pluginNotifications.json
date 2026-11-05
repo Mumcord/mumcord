@@ -5,6 +5,10 @@
     "body": "Välja lülitatud korduvate kokkujooksmiste tõttu",
     "open": "Näita Pluginates"
   },
+  "pictureRefused": {
+    "title": "{{name}} ei saanud pilti kasutada",
+    "body": "Seda pilti ei saa kasutada. Kasuta PNG-, JPEG- või WebP-faili kuni 10 MB."
+  },
   "update": {
     "title": "Uuendus: {{name}}",
     "body": "Versioon {{version}} ootab vahekaardil Uuendused",

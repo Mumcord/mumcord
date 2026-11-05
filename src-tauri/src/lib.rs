@@ -17,6 +17,7 @@ mod ingame_overlay;
 mod kde;
 #[cfg(target_os = "linux")]
 mod kde_x11;
+mod newer_profile;
 mod notifications;
 mod now_gaming;
 mod now_playing;
@@ -243,7 +244,19 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_set_pinned,
             commands::plugins::plugin_remove,
             commands::plugins::plugin_updates,
+            commands::plugins::plugin_update_review_prepare,
             commands::plugins::plugin_apply_update,
+            commands::plugins::plugin_score,
+            commands::plugins::plugin_confirm_update_high_risk,
+            commands::plugins::plugin_skip_update_version,
+            commands::plugins::plugin_websites,
+            commands::plugins::plugin_platform_settings,
+            commands::plugins::plugin_sound_meter,
+            commands::plugins::plugin_set_platform_settings,
+            commands::plugins::plugin_side_panel_width,
+            commands::plugins::plugin_set_side_panel_width,
+            commands::plugins::plugin_relay_availability,
+            commands::plugins::plugin_relay_usage,
             commands::plugins::plugin_check_now,
             commands::plugins::plugin_export_data,
             commands::plugins::plugin_reset_data,
@@ -253,6 +266,20 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugins_set_all_off,
             commands::plugins::plugin_set_badge,
             commands::plugins::plugin_diagnostics,
+            commands::plugins::plugin_reenable_web,
+            commands::plugins::plugin_frames_mute,
+            commands::plugins::plugin_frames_mute_state,
+            plugins::child_webview::plugin_frame_open,
+            plugins::child_webview::plugin_frame_bounds,
+            plugins::child_webview::plugin_frame_post,
+            plugins::child_webview::plugin_frame_focus,
+            plugins::child_webview::plugin_frame_close,
+            commands::plugins::stage_activities,
+            commands::plugins::stage_join,
+            commands::plugins::stage_leave,
+            commands::plugins::stage_visibility,
+            commands::plugins::app_menu,
+            commands::plugins::app_menu_activate,
             commands::plugins::plugin_asset,
             commands::plugins::plugins_ui_trees,
             commands::plugins::plugins_set_appearance,
@@ -296,6 +323,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::dnd::dnd_set_follow_system,
             notify::notification_dismiss,
             commands::tray::tray_attention_set,
+            commands::tray::plugin_details_open,
             commands::now_playing::now_playing_status,
             commands::now_playing::now_playing_cover,
             commands::now_gaming::now_gaming_status,
@@ -311,6 +339,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::user_stats::user_stats_watch,
             commands::p2p::p2p_consent_decide,
             commands::p2p::relay_info,
+            commands::p2p::camera_unavailable,
             commands::p2p::p2p_link,
             commands::p2p::relay_trust_new,
             commands::p2p::relay_keep_blocked,
@@ -332,6 +361,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_paused,
             commands::screen_share::screen_share_set_sound,
             commands::screen_share::screen_share_set_sound_level,
+            commands::screen_share::screen_share_sound_support,
+            commands::screen_share::screen_share_sound_apps,
+            commands::screen_share::screen_share_choose_sound,
             commands::screen_share::screen_share_watch,
             commands::screen_share::screen_share_unwatch,
             commands::screen_share::screen_share_set_decode_codecs,
@@ -413,6 +445,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::user_stats::UserStatsChanged,
             commands::p2p::DirectConsentRequired,
             commands::p2p::RelayChanged,
+            commands::p2p::CameraAvailabilityChanged,
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
@@ -422,12 +455,19 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::licences::WindowLookChanged,
             commands::media_popout::MediaPopoutChanged,
             commands::tray::TraySettingsRequested,
+            commands::tray::PluginDetailsRequested,
             commands::hotkeys::HotkeyPressed,
             plugins::PluginsChanged,
+            plugins::AppMenuChanged,
+            plugins::StageChanged,
+            plugins::StageRefused,
             plugins::PluginsSharedState,
+            plugins::PluginRelayAvailabilityChanged,
             deeplink::PluginsOpenDetails,
             plugins::PluginInstallProgress,
             plugins::ui::PluginUi,
+            plugins::ui::PluginFrameMute,
+            plugins::child_webview::PluginFrameEvent,
             plugins::PluginNotification,
             plugins::PluginSupersede,
             plugins::suggestions::PluginSuggestion,
@@ -446,6 +486,8 @@ pub fn run() {
         std::process::exit(1);
     }
     let context = tauri::generate_context!();
+    // Before anything opens the database: a profile from a newer Mumcord must stay untouched.
+    newer_profile::stop_if_newer(&context.config().identifier);
     // Before anything else starts a thread or GTK: it may switch to XWayland (FR-1.48).
     display::prepare(&context.config().identifier);
     // Before any web view holds the web cache files open.
@@ -493,7 +535,10 @@ pub fn run() {
         )
         .invoke_handler(move |call| {
             let label = call.message.webview_ref().label().to_owned();
-            if !aux_window::command_allowed(&label, call.message.command()) {
+            // Plugin frame web views (macOS) get no command at all, whatever their page tries.
+            if !aux_window::command_allowed(&label, call.message.command())
+                || !plugins::child_webview::command_allowed(&label)
+            {
                 call.resolver.reject(commands::types::ApiError::new(
                     commands::types::ErrorCode::PermissionDenied,
                     "this command is not available in this window",
@@ -505,6 +550,8 @@ pub fn run() {
         .manage(window::StartReveal::default())
         .manage(dropped::DroppedFiles::default())
         .manage(aux_window::OpenLock::default())
+        .manage(plugins::ui::FrameMuteStore::default())
+        .manage(plugins::child_webview::Frames::default())
         .manage(commands::inspector::SharedView::default())
         .manage(commands::inspector::CaptureMode::default())
         .manage(commands::licences::SharedLook::default())
@@ -534,17 +581,20 @@ pub fn run() {
             }
             Ok(())
         })
-        .run(context);
+        .build(context);
 
-    if let Err(err) = app {
-        eprintln!("error while running Mumcord: {err}");
-        std::process::exit(1);
+    match app {
+        Ok(app) => app.run(plugins::watchdog::on_run_event),
+        Err(err) => {
+            eprintln!("error while running Mumcord: {err}");
+            std::process::exit(1);
+        }
     }
 }
 
 /// Creates the main window from its entry in tauri.conf.json (`create: false` there), so that
 /// portable mode can point the web view's data at the portable folder.
-fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
+pub(crate) fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
     let config = app
         .config()
         .app
@@ -553,12 +603,15 @@ fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
         .find(|w| w.label == "main")
         .ok_or(tauri::Error::WindowNotFound)?
         .clone();
-    let mut builder =
-        crate::browser::deny_new_windows(tauri::WebviewWindowBuilder::from_config(app, &config)?);
+    let mut builder = plugins::webview::harden_builder(
+        app,
+        crate::browser::deny_new_windows(tauri::WebviewWindowBuilder::from_config(app, &config)?),
+    );
     if let Some(dir) = portable::webview_data_dir() {
         builder = builder.data_directory(dir);
     }
-    builder.build()?;
+    let window = builder.build()?;
+    plugins::webview::harden_window(&window);
     Ok(())
 }
 
@@ -950,11 +1003,20 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        // The plugin service takes it (`plugins::on_engine_event`); the UI never sees payloads.
+        EngineEvent::PluginRelayData { .. } | EngineEvent::PluginRelayJoined { .. } => Ok(()),
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),
         }
         .emit(app),
+        EngineEvent::CameraAvailabilityChanged(reason) => {
+            commands::p2p::CameraAvailabilityChanged {
+                server_id,
+                reason: reason.map(Into::into),
+            }
+            .emit(app)
+        }
         EngineEvent::P2pLinkChanged { session, link } => commands::p2p::P2pLinkChanged {
             server_id,
             session,

@@ -24,7 +24,8 @@
   "pill": {
     "none": "Nav jaunu atļauju",
     "permission": "Nepieciešama jauna atļauja",
-    "author": "Jauns autors"
+    "author": "Jauns autors",
+    "websites": "Sazinās ar jaunām vietnēm"
   },
   "newPermissions": "Jaunas atļaujas",
   "revoked": {
@@ -45,5 +46,66 @@
     "save": "Saglabāt",
     "notNow": "Ne tagad",
     "failed": "Neizdevās mainīt {{name}} atļaujas. Lūdzu, mēģiniet vēlreiz."
+  },
+  "waitingHeading": "Atjauninājumi gaida",
+  "autoNote": "Automātiskie atjauninājumi tiek instalēti tikai tad, ja spraudnis nepieprasa neko jaunu un tā vērtējums paliek tajā pašā līmenī vai samazinās. Viss pārējais gaida šeit.",
+  "needsMumcord": "Atjauninājums būs pieejams pēc Mumcord atjaunināšanas",
+  "band": {
+    "low": "Zems",
+    "medium": "Vidējs",
+    "high": "Augsts"
+  },
+  "hold": {
+    "newWebsites_zero": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm. {{name}} paliek pie {{version}}, līdz izlemsi.",
+    "newWebsites_one": "Šis atjauninājums vēlas sazināties ar {{count}} jaunu tīmekļa vietni. {{name}} paliek pie {{version}}, līdz izlemsi.",
+    "newWebsites_other": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm. {{name}} paliek pie {{version}}, līdz izlemsi.",
+    "riskUp": "Netiek instalēts automātiski: risks pieauga no {{from}} līdz {{to}}. Vispirms pārskati to.",
+    "scoreUp": "Netiek instalēts automātiski: vērtējums pieauga no {{from}} līdz {{to}}. Vispirms pārskati to.",
+    "blockedBySafety": "Netiek instalēts: šī versija ir augsta riska un ir ieslēgts “Neatļaut augsta riska spraudņus”.",
+    "scoreUnknown": "Netiek instalēts automātiski: šīs versijas drošības vērtējumu nevarēja aprēķināt. Vispirms pārskati to."
+  },
+  "score": {
+    "label": "Drošības vērtējums:",
+    "unchanged": "nemainīgs",
+    "points": "punkti",
+    "goesUp": ", risks pieaug",
+    "goesDown": ", risks samazinās"
+  },
+  "dialog": {
+    "title": "Atjaunināt {{name}} uz {{version}}?",
+    "now": "tagad {{version}}",
+    "sameKey": "tā pati autora atslēga",
+    "newKey": "jauna autora atslēga",
+    "newWebsites_zero": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm.",
+    "newWebsites_one": "Šis atjauninājums vēlas sazināties ar {{count}} jaunu tīmekļa vietni.",
+    "newWebsites_other": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm.",
+    "staysOn": "{{name}} paliek pie {{version}}, līdz izlemsi.",
+    "otherDomain": "Viena no tām nav paša spraudņa domēnā.",
+    "whatsNew": "Kas jauns versijā {{version}}",
+    "websitesLead": "{{name}} un tā lapa tad varētu sazināties ar:",
+    "websitesWarning": "Šīs vietnes var redzēt tavu IP adresi un visu, ko {{name}} tām sūta.",
+    "websitesLabel": "Vietnes",
+    "new": "Jauna",
+    "changed": "Mainīta",
+    "noOtherPermissions": "Citas atļaujas nemainās.",
+    "scoreNow": "Tagad ({{version}})",
+    "scoreAfter": "Pēc atjaunināšanas ({{version}})",
+    "meterNow": "Drošības vērtējums tagad",
+    "meterAfter": "Drošības vērtējums pēc atjaunināšanas",
+    "riskUpBy_zero": "Risks pieaug par {{count}} punktiem",
+    "riskUpBy_one": "Risks pieaug par {{count}} punktu",
+    "riskUpBy_other": "Risks pieaug par {{count}} punktiem",
+    "asksForMore": "jo šī versija pieprasa vairāk:",
+    "permissionsLabel": "Jaunas atļaujas",
+    "recentChange": "Tas arī skaitās kā nesena izmaiņa: jaunas atļaujas pēdējās {{versions}} versijās pievieno vēl +{{recent}} punktus. Kopā ar augstāk minētajiem +{{permissions}} (× {{multiplier}}) tie ir +{{total}}.",
+    "highTitle": "Šis atjauninājums padarītu spraudni par augsta riska spraudni",
+    "highText": "Tas netiks instalēts automātiski. Palikšana pie {{version}} saglabā pašreizējo vērtējumu; versiju vari piespraust sadaļā Instalētie.",
+    "highTick": "Es saprotu, ka risks ir pieaudzis, un joprojām uzticos autoram",
+    "skipHint": "Izlaižot, {{version}} turpina darboties.",
+    "skip": "Izlaist šo versiju",
+    "notNow": "Ne tagad",
+    "allow": "Atļaut un atjaunināt",
+    "updateAnyway": "Tomēr atjaunināt",
+    "failed": "{{name}} nevarēja atjaunināt. Lūdzu, mēģini vēlreiz."
   }
 }

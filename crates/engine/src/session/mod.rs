@@ -1526,6 +1526,11 @@ impl Engine {
         }
     }
 
+    /// The notification-sound hub; the client reaches the plugin-sound mixer through it.
+    pub fn sound_hub(&self) -> Arc<SoundHub> {
+        Arc::clone(self.inner.events.sounds())
+    }
+
     /// Plays a short sound on the output device, for the "Test sound" button. Only audible
     /// while voice audio runs (the popover is only reachable then).
     pub fn audio_test_sound(&self) {
@@ -2764,6 +2769,9 @@ impl Inner {
                         ctx,
                         user.session,
                     );
+                }
+                if change.moved_from.is_some() {
+                    self.direct.moved(ctx, user.session, own);
                 }
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);

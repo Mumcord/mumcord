@@ -127,8 +127,15 @@ export function UpdatesTab({
         </section>
       )}
       <section aria-labelledby="plugin-updates-waiting">
-        <h3 id="plugin-updates-waiting" className="plugin-update__sr-only">
-          {t("waiting")}
+        <h3
+          id="plugin-updates-waiting"
+          className={
+            updates !== null && updates.length > 0
+              ? "plugin-updates__heading"
+              : "plugin-update__sr-only"
+          }
+        >
+          {updates !== null && updates.length > 0 ? t("waitingHeading") : t("waiting")}
         </h3>
         {loadFailed && (
           <p role="alert" className="settings-error">
@@ -149,6 +156,9 @@ export function UpdatesTab({
               />
             ))}
           </ul>
+        )}
+        {updates !== null && updates.length > 0 && (
+          <p className="plugin-updates__note">{t("autoNote")}</p>
         )}
       </section>
       <div className="plugin-updates__footer">

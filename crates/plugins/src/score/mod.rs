@@ -5,6 +5,7 @@
 //! `Score = min(100, round(E x F) + H)`, raised to the network floor when the plugin holds a
 //! network permission.
 
+pub mod facts;
 mod weights;
 
 use std::collections::BTreeSet;

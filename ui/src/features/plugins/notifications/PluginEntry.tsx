@@ -161,6 +161,7 @@ export function PluginActions({ item }: { item: PluginItem }) {
         </div>
       );
     case "message":
+    case "pictureRefused":
       return null;
   }
 }

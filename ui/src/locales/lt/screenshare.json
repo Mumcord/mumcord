@@ -1,5 +1,6 @@
 {
   "share": "Bendrinti ekraną",
+  "shareYourScreen": "Bendrinti savo ekraną",
   "choosing": "Renkamasi, ką bendrinti…",
   "stop": "Baigti bendrinti",
   "startFailed": "Nepavyko pradėti ekrano bendrinimo.",
@@ -18,8 +19,6 @@
   "pause": "Pristabdyti",
   "resume": "Tęsti",
   "sound": "Bendrinti garsą",
-  "noSound": "Linux nebendrina garso: žiūrovai mato tik vaizdą.",
-  "noSoundForShare": "Šis bendrinimas neturi garso (visas ekranas arba nepalaikoma sistemos versija).",
   "viewersNone": "Kol kas niekas nežiūri",
   "viewers_one": "{{count}} žiūri: {{names}}",
   "viewers_few": "{{count}} žiūri: {{names}}",
@@ -83,7 +82,13 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "sound": "Bendrinti programos garsą",
+    "sound": "Garsas",
+    "soundInfo": "Visas ekranas: kompiuterio garsas be Mumcord. Vienas langas: tik tos programos garsas.",
+    "soundNeeds": {
+      "windows": "Be garso: reikia Windows 10 2004 ar naujesnės versijos",
+      "macos": "Be garso: reikia macOS 13 ar naujesnės versijos",
+      "pipewire": "Be garso: reikia PipeWire"
+    },
     "viewersGet": "Žiūrovai gauna:",
     "viewersGetSummary": "iki {{resolution}} · {{fps}} k/s · {{codec}} · apie {{mbit}} Mbit/s",
     "pathRelay": "Siunčiama vieną kartą per serverio perdavimo mazgą, kuris perduoda ją iki {{count}} žiūrovų.",
@@ -109,7 +114,18 @@
     "codecBadgeHardware": "{{codec}} · aparatinis",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Perdavimo mazgas",
-    "pathDirect": "Tiesiogiai"
+    "pathDirect": "Tiesiogiai",
+    "soundDesktop": "Garsas: darbalaukis",
+    "soundApp": "Garsas: {{app}}",
+    "noSound": "Be garso",
+    "tipDesktop": "Visas ekranas: darbalaukio garsas be Mumcord.",
+    "tipApp": "Vienas langas: tik tos programos garsas.",
+    "tipOff": "Garso jungiklis išjungtas.",
+    "tipNone": "Šiam langui pasirinkta „Be garso“.",
+    "tipOldWindows": "Be garso: reikia Windows 10 2004 ar naujesnės versijos",
+    "tipOldMacos": "Be garso: reikia macOS 13 ar naujesnės versijos",
+    "tipNoPipeWire": "Be garso: reikia PipeWire",
+    "tipCaptureFailed": "Nepavyko užfiksuoti garso. Vaizdo bendrinimas tęsiasi."
   },
   "qualityMenu": {
     "title": "Kokybė",
@@ -226,5 +242,14 @@
     "valueUnavailable": "Nepasiekiama",
     "checkAgain": "Patikrinti dar kartą",
     "checking": "Tikrinama…"
+  },
+  "soundPicker": {
+    "title": "Kurios programos garsas?",
+    "noSound": "Be garso",
+    "share": "Bendrinti garsą",
+    "cancel": "Atšaukti",
+    "empty": "Šiuo metu jokia programa negroja garso",
+    "gone": "Ši programa nebegroja garso. Pasirinkite kitą.",
+    "failed": "Jūsų pasirinkimo nepavyko pritaikyti."
   }
 }

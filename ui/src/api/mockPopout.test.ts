@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { MediaPopoutState } from "../bindings/commands";
 import { createMockPopouts } from "./mockPopout";
 
-const party = { serverId: 1, session: null };
-const share = { serverId: 1, session: 7 };
+const party = { serverId: 1, session: null, plugin: null };
+const share = { serverId: 1, session: 7, plugin: null };
 
 function setup() {
   const seen: MediaPopoutState[] = [];
@@ -17,6 +17,7 @@ describe("mock media pop-outs", () => {
     expect(popouts.state()).toEqual({
       watch: { target: null, onTop: false },
       share: { target: null, onTop: false },
+      stage: { target: null, onTop: false },
     });
   });
 
@@ -48,6 +49,23 @@ describe("mock media pop-outs", () => {
     expect(popouts.state()).toEqual({
       watch: { target: null, onTop: false },
       share: { target: null, onTop: true },
+      stage: { target: null, onTop: false },
     });
+  });
+  it("starts with the stage popped out when asked for a plugin", () => {
+    const popouts = createMockPopouts(() => undefined, "board-brawl");
+    expect(popouts.state().stage.target).toEqual({
+      serverId: 1,
+      session: null,
+      plugin: "board-brawl",
+    });
+  });
+
+  it("tells two plugins' activities apart", () => {
+    const { popouts, seen } = setup();
+    popouts.open("stage", { serverId: 1, session: null, plugin: "dice" }, null);
+    popouts.open("stage", { serverId: 1, session: null, plugin: "poll" }, null);
+    expect(seen).toHaveLength(2);
+    expect(popouts.state().stage.target?.plugin).toBe("poll");
   });
 });

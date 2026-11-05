@@ -1,0 +1,13 @@
+MediaPipe Selfie Segmenter (square 256x256 and landscape 144x256 models)
+
+Copyright 2023 The MediaPipe Authors.
+Licensed under the Apache License, Version 2.0 (full text below).
+
+Model card and downloads: https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter#selfie-model
+Source project: https://github.com/google-ai-edge/mediapipe
+
+Mumcord uses the ONNX conversions of these models published by onnx-community on Hugging Face
+(https://huggingface.co/onnx-community/mediapipe_selfie_segmentation and
+https://huggingface.co/onnx-community/mediapipe_selfie_segmentation_landscape, Apache-2.0),
+pinned to a fixed revision and checked by SHA-256 when Mumcord is built. The models are not
+modified.

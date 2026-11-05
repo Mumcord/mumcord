@@ -75,7 +75,9 @@
   "unofficialText": "Mumcord no revisa {{repository}}. Aun así se ejecuta en el entorno aislado y solo recibe los permisos que tú permitas.",
   "checksTitle": "Las comprobaciones oficiales siguen aplicándose",
   "checksText": "La lista de revocación de Mumcord puede desactivarlo. Los nombres de los plugins oficiales están reservados.",
-  "metaPermissions": "Permisos: {{count}}",
+  "metaPermissions_one": "{{count}} permiso",
+  "metaPermissions_many": "{{count}} de permisos",
+  "metaPermissions_other": "{{count}} permisos",
   "footer": "Repositorio oficial · lista firmada comprobada · no se envía nada sobre ti",
   "factSource": "Origen: {{url}}",
   "factLicence": "Licencia: {{license}}",
@@ -96,5 +98,7 @@
     "unpacking": "Descomprimiendo…",
     "starting": "Iniciando…",
     "announce": "{{name}}: {{percent}} % descargado"
-  }
+  },
+  "needsMumcord": "Requiere Mumcord {{version}} o posterior",
+  "updateMumcord": "Actualizar Mumcord"
 }

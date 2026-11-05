@@ -1,0 +1,21 @@
+[package]
+name = "fx-test-stop-ip"
+version = "1.0.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+# Manifest-only fixture: the code is shared with the strip plugin; only the manifest differs.
+path = "../strip/src/lib.rs"
+
+[dependencies]
+mumcord-plugin-sdk = { path = "../../../../crates/plugin-sdk", features = ["1.1"] }
+
+[profile.release]
+opt-level = "s"
+codegen-units = 1
+
+# A plugin is its own workspace, also inside the Mumcord tree.
+[workspace]

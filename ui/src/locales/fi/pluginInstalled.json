@@ -55,6 +55,10 @@
     "messagesExpired": "Vanhentuneet viestit",
     "incomingRateDropped": "Nopeusrajoituksen pudottamat saapuvat viestit",
     "incomingInvalid": "Virheelliset saapuvat viestit",
+    "uiFreezes": "Kuinka monta kertaa Mumcord jumittui verkkosisällön ollessa auki",
+    "webDisabled": "Verkkosisältö on poistettu käytöstä, koska Mumcord lakkasi vastaamasta sen ollessa auki.",
+    "reenableWeb": "Ota verkkosisältö käyttöön",
+    "reenableFailed": "Verkkosisältöä ei voitu ottaa käyttöön.",
     "log": "Loki",
     "logEmpty": "Loki on tyhjä.",
     "level": {

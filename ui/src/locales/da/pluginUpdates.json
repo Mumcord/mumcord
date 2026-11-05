@@ -24,7 +24,8 @@
   "pill": {
     "none": "Ingen nye tilladelser",
     "permission": "Kræver en ny tilladelse",
-    "author": "Ny udvikler"
+    "author": "Ny udvikler",
+    "websites": "Kontakter nye websteder"
   },
   "newPermissions": "Nye tilladelser",
   "revoked": {
@@ -45,5 +46,63 @@
     "save": "Gem",
     "notNow": "Ikke nu",
     "failed": "Tilladelserne for {{name}} kunne ikke ændres. Prøv igen."
+  },
+  "waitingHeading": "Ventende opdateringer",
+  "autoNote": "Automatiske opdateringer installeres kun, når pluginet ikke beder om noget nyt, og dets score forbliver i samme niveau eller falder. Alt andet venter her.",
+  "needsMumcord": "Opdatering tilgængelig, når Mumcord er opdateret",
+  "band": {
+    "low": "Lav",
+    "medium": "Middel",
+    "high": "Høj"
+  },
+  "hold": {
+    "newWebsites_one": "Denne opdatering vil kontakte {{count}} nyt websted. {{name}} bliver på {{version}}, indtil du beslutter dig.",
+    "newWebsites_other": "Denne opdatering vil kontakte {{count}} nye websteder. {{name}} bliver på {{version}}, indtil du beslutter dig.",
+    "riskUp": "Installeres ikke automatisk: Risikoen steg fra {{from}} til {{to}}. Gennemgå det først.",
+    "scoreUp": "Installeres ikke automatisk: Scoren steg fra {{from}} til {{to}}. Gennemgå det først.",
+    "blockedBySafety": "Ikke installeret: Denne version har høj risiko, og “Tillad ikke plugins med høj risiko” er slået til.",
+    "scoreUnknown": "Installeres ikke automatisk: Sikkerhedsscoren for denne version kunne ikke beregnes. Gennemgå det først."
+  },
+  "score": {
+    "label": "Sikkerhedsscore:",
+    "unchanged": "uændret",
+    "points": "point",
+    "goesUp": ", risikoen stiger",
+    "goesDown": ", risikoen falder"
+  },
+  "dialog": {
+    "title": "Opdatér {{name}} til {{version}}?",
+    "now": "nu {{version}}",
+    "sameKey": "samme ophavsnøgle",
+    "newKey": "ny ophavsnøgle",
+    "newWebsites_one": "Denne opdatering vil kontakte {{count}} nyt websted.",
+    "newWebsites_other": "Denne opdatering vil kontakte {{count}} nye websteder.",
+    "staysOn": "{{name}} bliver på {{version}}, indtil du beslutter dig.",
+    "otherDomain": "Et af dem ligger ikke på pluginets eget domæne.",
+    "whatsNew": "Nyt i {{version}}",
+    "websitesLead": "{{name}} og dets side kunne så nå:",
+    "websitesWarning": "Disse websteder kan se din IP-adresse og alt, hvad {{name}} sender dem.",
+    "websitesLabel": "Websteder",
+    "new": "Ny",
+    "changed": "Ændret",
+    "noOtherPermissions": "Ingen andre tilladelser ændres.",
+    "scoreNow": "Nu ({{version}})",
+    "scoreAfter": "Efter opdateringen ({{version}})",
+    "meterNow": "Sikkerhedsscore nu",
+    "meterAfter": "Sikkerhedsscore efter opdateringen",
+    "riskUpBy_one": "Risikoen stiger med {{count}} point",
+    "riskUpBy_other": "Risikoen stiger med {{count}} point",
+    "asksForMore": "fordi denne version beder om mere:",
+    "permissionsLabel": "Nye tilladelser",
+    "recentChange": "Det tæller også som en nylig ændring: Nye tilladelser i de seneste {{versions}} versioner giver yderligere +{{recent}} point. Sammen med de +{{permissions}} ovenfor (× {{multiplier}}) bliver det til +{{total}}.",
+    "highTitle": "Denne opdatering ville give pluginet høj risiko",
+    "highText": "Det installeres ikke automatisk. Hvis du bliver på {{version}}, beholder du den nuværende score; du kan fastholde versionen under Installerede.",
+    "highTick": "Jeg forstår, at risikoen er steget, og stoler stadig på ophavsmanden",
+    "skipHint": "Hvis du springer over, virker {{version}} stadig.",
+    "skip": "Spring denne version over",
+    "notNow": "Ikke nu",
+    "allow": "Tillad og opdatér",
+    "updateAnyway": "Opdatér alligevel",
+    "failed": "{{name}} kunne ikke opdateres. Prøv igen."
   }
 }

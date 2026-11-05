@@ -31,6 +31,8 @@ export function pluginNoticeId(notice: PluginNotice): string {
       return `plugin/autoOff/${notice.plugin}`;
     case "update":
       return `plugin/update/${notice.plugin}`;
+    case "pictureRefused":
+      return `plugin/pictureRefused/${notice.plugin}`;
     case "suggestion":
       return `plugin/suggestion/${String(notice.serverId)}/${notice.plugin}`;
   }
@@ -63,6 +65,9 @@ export function bindPluginNotices(api: MumcordApi): Unsubscribe {
             return;
           case "autoOff":
             recordPluginNotice({ kind: "autoOff", plugin, name: shown });
+            return;
+          case "pictureRefused":
+            recordPluginNotice({ kind: "pictureRefused", plugin, name: shown });
             return;
           case "updateAvailable":
             recordPluginNotice({

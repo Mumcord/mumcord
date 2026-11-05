@@ -1,0 +1,9 @@
+{
+  "region": "Boční panel {{plugin}}",
+  "close": "Zavřít boční panel {{plugin}}",
+  "resize": "Změnit velikost bočního panelu {{plugin}}",
+  "failed": "Boční panel {{plugin}} se nepodařilo zavřít. Zkus to prosím znovu.",
+  "options": "Možnosti {{plugin}}",
+  "details": "Podrobnosti o doplňku",
+  "closePanel": "Zavřít panel"
+}

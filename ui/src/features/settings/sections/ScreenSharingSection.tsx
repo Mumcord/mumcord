@@ -17,6 +17,7 @@ import { Group } from "../components/Section";
 import { SettingsIcon } from "../components/SettingsIcon";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
+import { SOUND_NEEDS_KEYS, useSoundBlock } from "../../screenshare/soundSupport";
 import type { SettingsSectionProps } from "./types";
 
 // The 4K option stays hidden (mockup 05), so the engine's list is not offered as a whole.
@@ -82,6 +83,8 @@ export function QualityDefaultsCard({ settings, update }: SettingsSectionProps) 
   const { t } = useTranslation("settings");
   const resolutionHint = useId();
   const uploadHint = useId();
+  const soundBlock = useSoundBlock();
+  const { t: tShare } = useTranslation("screenshare");
   return (
     <Group title={t("screenShare.qualityTitle")} icon="gauge">
       <SelectRow
@@ -133,6 +136,15 @@ export function QualityDefaultsCard({ settings, update }: SettingsSectionProps) 
       <p id={uploadHint} className="settings-hint">
         {t("screenShare.uploadHint")}
       </p>
+      <Switch
+        label={t("screenShare.sound")}
+        checked={soundBlock === null && settings.screenSound}
+        disabled={soundBlock !== null}
+        {...(soundBlock !== null && { status: tShare(`start.${SOUND_NEEDS_KEYS[soundBlock]}`) })}
+        onChange={(screenSound) => {
+          update({ screenSound });
+        }}
+      />
       <Switch
         label={t("screenShare.askEachTime")}
         checked={settings.screenAskEachTime}

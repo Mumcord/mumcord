@@ -7,6 +7,8 @@ import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { takeConnectionExpandedRequest } from "../connection/connectionExpanded";
 import { MembersPanel } from "./MembersPanel";
 import { joinTarget } from "./joinTarget";
+import { PersonActionHost } from "../admin/PersonActionHost";
+import { resetPersonAction } from "../admin/personActionStore";
 import { PersonMenuHost } from "./PersonMenu";
 import { closePersonMenu, openPersonMenu } from "./personMenuStore";
 import { ProfilePreviewHost } from "./ProfilePreview";
@@ -338,6 +340,35 @@ describe("PersonMenu", () => {
       clientY: 1,
     });
     expect(screen.queryByRole("menuitem", { name: "Admin" })).not.toBeInTheDocument();
+  });
+
+  it("opens the kick and ban dialogs from a real pointer press on the Admin sub-menu (issue #507)", async () => {
+    await renderPanel();
+    render(<PersonActionHost />);
+    const root = getServerState().channels.get(0);
+    if (!root) throw new Error("seed channel missing");
+    act(() => {
+      api.mock.updateChannel(0, {
+        ...root,
+        permissions: { ...root.permissions, kick: true, ban: true },
+      });
+    });
+
+    for (const [item, title] of [
+      ["Kick…", /^Kick Anna\?/],
+      ["Ban…", /^Ban Anna/],
+    ] as const) {
+      fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+      fireEvent.click(screen.getByRole("menuitem", { name: "Admin" }));
+      const entry = screen.getByRole("menuitem", { name: item });
+      // A mouse press reaches the document before the click; it must not close the menus first.
+      fireEvent.pointerDown(entry);
+      fireEvent.click(entry);
+      expect(await screen.findByRole("dialog", { name: title })).toBeInTheDocument();
+      act(() => {
+        resetPersonAction();
+      });
+    }
   });
 
   it("closes on outside click and replaces an open menu with the next", async () => {

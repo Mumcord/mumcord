@@ -78,6 +78,16 @@
       "keys": "↑ ↓ zmiana rozmiaru · PageUp/PageDown przeskok · Home/End · Enter przywraca",
       "releaseHint": "Puść, aby zwinąć do małego paska",
       "minimised": "Obszar mediów zwinięty"
+    },
+    "stage": {
+      "tabs": "Co pokazuje obszar multimediów",
+      "hint": "Przełączanie niczego nie zatrzymuje",
+      "share": "Udostępnianie ekranu",
+      "plugin": "Wtyczka",
+      "tabName": "{{label}}, karta {{index}} z {{count}}",
+      "tabNameNew": "{{label}}, nowe, karta {{index}} z {{count}}",
+      "pluginTabName": "{{label}}, aktywność wtyczki, karta {{index}} z {{count}}",
+      "pluginTabNameNew": "{{label}}, aktywność wtyczki, nowe, karta {{index}} z {{count}}"
     }
   }
 }
