@@ -13,7 +13,7 @@ use std::collections::{BTreeMap, HashMap, VecDeque};
 
 use mumcord_plugin_sdk::events::Event;
 use mumcord_plugin_sdk::http::{Body, HttpRequest, Method};
-use mumcord_plugin_sdk::types::StartInfo;
+use mumcord_plugin_sdk::types::{Error, StartInfo};
 use mumcord_plugin_sdk::ui::{self, Slot};
 use mumcord_plugin_sdk::webview::{self, Place};
 use mumcord_plugin_sdk::{Plugin, app_menu, audio, http, log, stage};
@@ -50,10 +50,11 @@ fn note(line: String) {
 }
 
 /// Records the outcome of a host call under the action's name, e.g. `play-missing: not-found`.
-fn outcome<T, E: std::fmt::Debug>(action: &str, result: Result<T, E>) {
+/// Only the WIT error name: its documentation text would make the line too long for the panel.
+fn outcome<T>(action: &str, result: Result<T, Error>) {
     match result {
         Ok(_) => note(format!("{action}: ok")),
-        Err(e) => note(format!("{action}: {}", kebab(&format!("{e:?}")))),
+        Err(e) => note(format!("{action}: {}", e.name())),
     }
 }
 
@@ -129,7 +130,7 @@ fn get(action: &str, url: &str) {
         Ok(id) => {
             STATE.with_borrow_mut(|s| s.requests.insert(id, action.to_owned()));
         }
-        Err(e) => outcome::<(), _>(action, Err(e)),
+        Err(e) => outcome::<()>(action, Err(e)),
     }
 }
 
@@ -211,7 +212,12 @@ impl Plugin for TestSurface {
                 let Some(action) = action else { return };
                 match result.outcome {
                     Ok(response) => note(format!("{action}: {}", response.status)),
-                    Err(e) => note(format!("{action}: {}", kebab(&format!("{e:?}")))),
+                    // `HttpError::HostNotAllowed` → `host-not-allowed`, the WIT case name.
+                    Err(e) => {
+                        let case = format!("{e:?}");
+                        let case = case.trim_start_matches("HttpError::");
+                        note(format!("{action}: {}", kebab(case)));
+                    }
                 }
             }
             Event::SurfaceClosed(place) => {

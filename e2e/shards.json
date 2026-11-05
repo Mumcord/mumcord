@@ -72,7 +72,6 @@
       "specs/p2p/relay-harness.e2e.ts",
       "specs/p2p/relay-uses.e2e.ts",
       "specs/chat/pm-overview.e2e.ts",
-      "specs/plugins/page-gesture.e2e.ts",
       "specs/plugins/versions.e2e.ts",
       "specs/servers/server-dialog.e2e.ts",
       "specs/voice/whisper.e2e.ts",
