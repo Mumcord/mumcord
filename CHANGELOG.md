@@ -64,6 +64,7 @@
 
 ### Changed
 
+- An older Mumcord can now open a profile that a newer Mumcord already used, as long as the newer version only added things: your servers, history, identities and settings work, and the newer version later finds its own data unchanged. Settings the older version does not know are kept as they are. Only when a newer version changed the profile in a way an older one cannot handle do you still see the "made by a newer Mumcord" message.
 - The third-party notices (About → Licences) name the exact Bovnar release and upstream commit the app is built from (Bovnar 2.0.2). The notices are only generated when every file of the Bovnar crate matches the provenance manifest it ships, so the library in the app and its licence notices are tied to one upstream release
 - Catching up on a channel's history with other Mumcord 0.7.0 users is much smaller and faster when it has pictures: each picture travels once, as itself, instead of inside every message, and pictures you already have are not downloaded again. Until a picture arrives its message shows a box of the right size; if it cannot be loaded the box says so, and with "Load full-size images from others" off it offers "Load image". Pictures from locked channels still only reach people inside them, and older Mumcord versions keep getting the full messages as before (#402)
 - The diagnostic file (Settings → Advanced & Developer → Save diagnostic file) is now a Bovnar document: the same facts as before, still readable in any text editor, in a structured form (#400)
