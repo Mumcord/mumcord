@@ -52,10 +52,13 @@ async function describeTabHit(group: SettingsGroup): Promise<string> {
 export async function openSettingsGroup(group: SettingsGroup): Promise<void> {
   await openAllSettings();
   const tab = settingsTab(group);
-  await tab.waitForClickable({
-    timeout: 10_000,
-    timeoutMsg: `settings tab ${group} not clickable: ${await describeTabHit(group)}`,
-  });
+  try {
+    await tab.waitForClickable({ timeout: 10_000 });
+  } catch (error) {
+    throw new Error(`settings tab ${group} not clickable: ${await describeTabHit(group)}`, {
+      cause: error,
+    });
+  }
   await tab.click();
   await browser.waitUntil(async () => (await tab.getAttribute("aria-selected")) === "true", {
     timeout: 10_000,
