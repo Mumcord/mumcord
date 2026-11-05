@@ -313,6 +313,7 @@
     "line": "El relé permite: {{uses}}",
     "images": "Imágenes",
     "files": "Archivos",
-    "screen": "Compartir pantalla"
+    "screen": "Compartir pantalla",
+    "cameras": "Cámaras"
   }
 }

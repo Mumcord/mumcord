@@ -26,6 +26,7 @@
     "noRelay": "Tällä palvelimella ei ole relettä, joten tiedostojen jako ei ole käytettävissä.",
     "filesDisallowed": "Tämän palvelimen rele ei salli tiedostojen jakoa.",
     "screenDisallowed": "Tämän palvelimen rele ei salli näytön jakoa.",
+    "camerasDisallowed": "Tämän palvelimen rele ei salli kameran jakamista.",
     "imagesDisallowed": "Täysikokoinen kuva ei ole käytettävissä: tämän palvelimen rele ei salli kuvia",
     "noCertificate": "Tiedostojen jako vaatii asiakasvarmenteen.",
     "modeNeedsRelay": "Tiedostojen jako vaatii releen; peer-to-peer-asetuksesi on {{mode}}.",

@@ -313,6 +313,7 @@
     "line": "Ir-relay jippermetti: {{uses}}",
     "images": "Stampi",
     "files": "Fajls",
-    "screen": "Qsim tal-iskrin"
+    "screen": "Qsim tal-iskrin",
+    "cameras": "Kameras"
   }
 }

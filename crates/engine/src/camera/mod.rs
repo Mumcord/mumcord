@@ -1,3 +1,4 @@
 //! Camera sharing (spec 08): the engine side of the camera room.
 
+pub mod avail;
 pub mod signal;
