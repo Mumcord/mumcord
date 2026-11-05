@@ -101,6 +101,11 @@ pub fn keep_old_key() -> bool {
     flag("MUMCORD_TEST_KEEP_OLD_KEY")
 }
 
+/// Enables the `lockScreen` test command, which simulates a screen lock (spec 08, AC-8.18).
+pub fn screen_lock() -> bool {
+    flag("MUMCORD_TEST_SCREEN_LOCK")
+}
+
 /// The pick the test backend pretends the user made: `MUMCORD_TEST_SHARE_PICK=screen`,
 /// `window` or `window:<app hint>`. `None` keeps the plain test share without sound capture.
 pub fn share_pick() -> Option<SharePick> {
