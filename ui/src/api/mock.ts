@@ -3908,6 +3908,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticePending: () => Promise.resolve(false),
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
+    lockScreen: () => Promise.resolve(null),
     // The browser mock has no camera; the camera UI shows "no camera" (spec 08).
     cameraDevices: () => Promise.resolve([]),
     cameraView: () => Promise.resolve(null),

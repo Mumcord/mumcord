@@ -64,6 +64,8 @@ pub enum CameraFailure {
     UseNotAllowed,
     Denied,
     RelayDown,
+    /// The relay ended the broadcast ("Camera stopped by the server's relay").
+    RelayEnded,
     RateLimited,
     /// The P2P mode leaves the relay out.
     Mode,
@@ -86,6 +88,7 @@ impl From<&EngineFailure> for CameraFailure {
             EngineFailure::UseNotAllowed => Self::UseNotAllowed,
             EngineFailure::Refused => Self::Denied,
             EngineFailure::RelayDown => Self::RelayDown,
+            EngineFailure::RelayEnded => Self::RelayEnded,
             EngineFailure::RateLimited => Self::RateLimited,
             EngineFailure::Mode => Self::Mode,
             EngineFailure::NoCertificate => Self::NoCertificate,

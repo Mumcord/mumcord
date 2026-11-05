@@ -954,6 +954,12 @@ export const commands = {
 	relayInfo: (serverId: number) => typedError<RelayInfo, ApiError>(__TAURI_INVOKE("relay_info", { serverId })),
 	/**  Why camera sharing is unavailable on a connected server; `null` when it is available. */
 	cameraUnavailable: (serverId: number) => typedError<CameraUnavailable | null, ApiError>(__TAURI_INVOKE("camera_unavailable", { serverId })),
+	/**
+	 *  Test command `lockScreen` (spec 08, section 10.3): simulates a screen lock, which turns the
+	 *  camera off when "Turn my camera off when my screen locks" is on. Inert (`notImplemented`)
+	 *  unless a debug build runs with `MUMCORD_TEST_SCREEN_LOCK=1`.
+	 */
+	lockScreen: () => typedError<null, ApiError>(__TAURI_INVOKE("lock_screen")),
 	/**  The cameras of this computer, in OS order (FR-8.11 picker, Settings → Camera). */
 	cameraDevices: () => typedError<CameraDevice[], ApiError>(__TAURI_INVOKE("camera_devices")),
 	/**  The own camera now; `null` while it is off. */
@@ -1628,7 +1634,9 @@ export type CameraFailure = "notConnected" |
  *  Another camera runs already (one per Mumcord instance, FR-8.29), or the step does not fit
  *  the camera's state.
  */
-"busy" | "noCamera" | "permissionDenied" | "deviceGone" | "unreadable" | "cameraFailed" | "roomFull" | "relayFull" | "useNotAllowed" | "denied" | "relayDown" | "rateLimited" | 
+"busy" | "noCamera" | "permissionDenied" | "deviceGone" | "unreadable" | "cameraFailed" | "roomFull" | "relayFull" | "useNotAllowed" | "denied" | "relayDown" | 
+/**  The relay ended the broadcast ("Camera stopped by the server's relay"). */
+"relayEnded" | "rateLimited" | 
 /**  The P2P mode leaves the relay out. */
 "mode" | "noCertificate";
 
