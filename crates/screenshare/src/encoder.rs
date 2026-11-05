@@ -48,6 +48,8 @@ pub struct Encoder {
     ctx: Box<ffi::vpx_codec_ctx_t>,
     cfg: Box<ffi::vpx_codec_enc_cfg_t>,
     fps: u32,
+    /// The size libvpx was opened at; a running encoder must never grow past it.
+    opened: (u32, u32),
 }
 
 // SAFETY: the libvpx context is owned exclusively by this value and only used through `&mut self`;
@@ -128,6 +130,7 @@ impl Encoder {
                 ctx,
                 cfg,
                 fps: config.fps,
+                opened: (config.width, config.height),
             };
             encoder.configure_controls(screen_content)?;
             Ok(encoder)
@@ -219,12 +222,23 @@ impl Encoder {
         }
     }
 
-    /// Changes the output size (the 720p ↔ 480p quality steps). Frames passed to
-    /// [`Self::encode`] afterwards must have the new size. Growing beyond the initial size makes
-    /// libvpx start with a keyframe; shrinking reuses the scaled previous frames.
+    /// Changes the output size (the 720p ↔ 480p quality steps, a shared window that is resized).
+    /// Frames passed to [`Self::encode`] afterwards must have the new size. Shrinking, and
+    /// growing back up to the opened size, reuses the scaled previous frames.
     pub fn set_resolution(&mut self, width: u32, height: u32) -> Result<()> {
         if width == 0 || height == 0 {
             return Err(Error::InvalidConfig(format!("size {width}x{height}")));
+        }
+        if width > self.opened.0 || height > self.opened.1 {
+            // libvpx corrupts its heap when a running VP9 encoder grows past the size it was
+            // opened at, so a new one is opened. Its first frame is a keyframe, which the size
+            // change needs anyway; bitrate and frame rate carry over.
+            *self = Self::new(EncoderConfig {
+                width,
+                height,
+                ..self.config()
+            })?;
+            return Ok(());
         }
         self.cfg.g_w = width;
         self.cfg.g_h = height;
