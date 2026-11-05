@@ -37,6 +37,7 @@
     "imageYoursLabel": "La tua immagine: {{name}}",
     "addImage": "Aggiungi immagine",
     "addImageLabel": "Aggiungi una tua immagine",
+    "imageFilter": "Immagini",
     "effectsLoad": "Gli effetti vengono eseguiti su questo dispositivo. Carico: {{load}} ({{unit}})",
     "loadLow": "basso",
     "loadMedium": "medio",

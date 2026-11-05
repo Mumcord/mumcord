@@ -37,6 +37,7 @@
     "imageYoursLabel": "A te képed: {{name}}",
     "addImage": "Kép hozzáadása",
     "addImageLabel": "Saját kép hozzáadása",
+    "imageFilter": "Képek",
     "effectsLoad": "Az effektek ezen az eszközön futnak. Terhelés: {{load}} ({{unit}})",
     "loadLow": "alacsony",
     "loadMedium": "közepes",

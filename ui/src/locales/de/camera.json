@@ -37,6 +37,7 @@
     "imageYoursLabel": "Dein Bild: {{name}}",
     "addImage": "Bild hinzufügen",
     "addImageLabel": "Eigenes Bild hinzufügen",
+    "imageFilter": "Bilder",
     "effectsLoad": "Effekte laufen auf diesem Gerät. Auslastung: {{load}} ({{unit}})",
     "loadLow": "niedrig",
     "loadMedium": "mittel",
