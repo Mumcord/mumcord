@@ -561,16 +561,20 @@ impl Engine {
                 return;
             };
             match live.viewers.join(viewer, &hash, codecs) {
-                Join::Full => {
-                    tracing::debug!("camera viewer not admitted: the broadcast is full");
-                    return;
-                }
+                Join::Full => None,
                 Join::Admit => {
                     live.publisher.admit(&hash);
                     send.set_vp9_only(live.viewers.needs_vp9());
+                    Some(live.id)
                 }
             }
-            live.id
+        };
+        let Some(broadcast) = broadcast else {
+            tracing::debug!("camera viewer not admitted: the broadcast is full");
+            // Told, so the viewer shows "Too many people are watching" instead of waiting for a
+            // token that never comes (FR-8.52).
+            signal::send(ctx, &[viewer], &CameraMessage::Full { id: id.to_owned() });
+            return;
         };
         let engine = self.clone();
         let server_id = ctx.server_id;
@@ -586,6 +590,14 @@ impl Engine {
                 reason = reason.as_str(),
                 "camera viewer not admitted by the bot"
             );
+            if reason == BroadcastErrorReason::Full
+                && let Ok(ctx) = engine.session_ctx_for(server_id)
+            {
+                let full = CameraMessage::Full {
+                    id: broadcast_hex(broadcast),
+                };
+                signal::send(&ctx, &[viewer], &full);
+            }
             engine.camera_remove_viewer(server_id, broadcast, viewer, false);
         });
     }
@@ -601,19 +613,33 @@ impl Engine {
             let on_air = own.server_id == server_id && own.state == CameraState::OnAir;
             let send = &own.send;
             match own.live.as_mut().filter(|l| on_air && l.id == id) {
-                Some(live) => match live.viewers.leave(viewer) {
-                    Some(hash) => {
-                        live.publisher.remove(&hash);
-                        send.set_vp9_only(live.viewers.needs_vp9());
-                        true
+                Some(live) => {
+                    let was_full = live.viewers.is_full();
+                    match live.viewers.leave(viewer) {
+                        Some(hash) => {
+                            live.publisher.remove(&hash);
+                            send.set_vp9_only(live.viewers.needs_vp9());
+                            Some(was_full)
+                        }
+                        None => None,
                     }
-                    None => false,
-                },
-                None => false,
+                }
+                None => None,
             }
         };
-        if !removed {
+        let Some(was_full) = removed else {
             return;
+        };
+        // A freed slot is announced again, so viewers turned away as full ask anew (FR-8.52).
+        if was_full && let Ok(ctx) = self.session_ctx_for(server_id) {
+            let peers = signal::channel_peers(&ctx, self.mumcord_state());
+            signal::send(
+                &ctx,
+                &peers,
+                &CameraMessage::On {
+                    id: broadcast_hex(id),
+                },
+            );
         }
         if kick {
             self.relay_broadcast_kick(server_id, RelayUse::Camera, id, viewer);
@@ -738,6 +764,7 @@ pub(crate) fn on_plugin_data(
             }
         }
         CameraMessage::On { id } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
+        CameraMessage::Full { id } => super::recv::on_camera_full(&engine, ctx, event.sender, &id),
         CameraMessage::Off => super::recv::on_camera_gone(&engine, ctx, event.sender),
     }
 }

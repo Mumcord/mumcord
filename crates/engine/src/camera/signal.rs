@@ -72,11 +72,14 @@ pub enum CameraMessage {
     CamJoin { id: String, codecs: Vec<Codec> },
     /// Viewer to camera owner: I stopped watching broadcast `id`.
     CamLeave { id: String },
+    /// Camera owner to one viewer: broadcast `id` has no room for you (FR-8.52); ask again on
+    /// the next `on`.
+    Full { id: String },
 }
 
 impl CameraMessage {
-    /// Whether the message goes to the whole channel (`on`, `off`) or only to the camera owner
-    /// (`cam-join`, `cam-leave`).
+    /// Whether the message goes to the whole channel (`on`, `off`) or to one person (`cam-join`,
+    /// `cam-leave` to the camera owner, `full` to the viewer).
     pub const fn to_channel(&self) -> bool {
         matches!(self, Self::On { .. } | Self::Off)
     }
@@ -135,6 +138,7 @@ pub fn encode(message: &CameraMessage) -> Option<Vec<u8>> {
             ("cam-join", Some(id), Some(names.join(",")))
         }
         CameraMessage::CamLeave { id } => ("cam-leave", Some(id), None),
+        CameraMessage::Full { id } => ("full", Some(id), None),
     };
     if id.is_some_and(|id| !is_broadcast_id(id)) {
         return None;
@@ -162,6 +166,7 @@ pub fn decode(data: &[u8]) -> Result<CameraMessage, Refused> {
         "off" => CameraMessage::Off,
         "on" => CameraMessage::On { id: id_of(&doc)? },
         "cam-leave" => CameraMessage::CamLeave { id: id_of(&doc)? },
+        "full" => CameraMessage::Full { id: id_of(&doc)? },
         "cam-join" => {
             let id = id_of(&doc)?;
             // Names this client cannot play are skipped, so a newer client may list more; a
@@ -363,6 +368,7 @@ mod tests {
                 codecs: vec![Codec::Av1, Codec::Vp9],
             },
             CameraMessage::CamLeave { id: ID.into() },
+            CameraMessage::Full { id: ID.into() },
         ]
     }
 
@@ -396,7 +402,7 @@ mod tests {
     #[test]
     fn direction_follows_the_table() {
         let to_channel: Vec<_> = all().iter().map(CameraMessage::to_channel).collect();
-        assert_eq!(to_channel, [true, true, false, false]);
+        assert_eq!(to_channel, [true, true, false, false, false]);
     }
 
     #[test]

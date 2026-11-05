@@ -10,10 +10,11 @@
 //! the sender kicks and rekeys (FR-8.57).
 //!
 //! The session tick (once a second) drives the rest: `want` reports of the drawn tile height
-//! (FR-8.55), the "{n} fps" badge (FR-8.58) and the `cam-join` retries of a full camera
-//! (FR-8.52). The viewer cannot see "broadcast full" directly (the sender drops the join and
-//! only the sender hears the bot), so a join that brings no token within [`FULL_AFTER`] counts
-//! as full and is retried at the sender's join limit of once per [`JOIN_EVERY`].
+//! (FR-8.55), the "{n} fps" badge (FR-8.58) and the `cam-join` retries. A sender without room
+//! answers `full` (FR-8.52): the tile shows "Too many people are watching {name}" and joins
+//! again on the sender's next `on`, which it sends when a slot frees up, at most once per
+//! [`JOIN_EVERY`]. A join that brings neither a token nor `full` within [`FAILED_AFTER`] failed
+//! for another reason and is retried once per [`JOIN_EVERY`].
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::Arc;
@@ -41,8 +42,9 @@ use crate::session::{Engine, EngineEvent, SessionCtx, lock};
 
 /// The sender takes at most one `cam-join` per viewer in this time (section 6.5).
 const JOIN_EVERY: Duration = Duration::from_secs(10);
-/// A join without a token after this long means the camera has no room for this viewer.
-const FULL_AFTER: Duration = Duration::from_secs(10);
+/// A join without a token or `full` after this long failed (the sender or the bot never
+/// answered).
+const FAILED_AFTER: Duration = Duration::from_secs(10);
 /// Below this many frames per second over the last [`FPS_SAMPLES`] seconds a tile shows the
 /// "{n} fps" badge (FR-8.58).
 const WEAK_FPS: u32 = 25;
@@ -64,6 +66,8 @@ pub enum TileState {
     Playing,
     /// No room for this viewer: "Too many people are watching {name}" (FR-8.52).
     Full,
+    /// The join brought no answer: "Couldn't join {name}'s camera"; retried once per 10 s.
+    Failed,
     /// Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never.
     Hidden,
 }
@@ -193,6 +197,8 @@ struct Tile {
     joining_since: Option<Instant>,
     /// Tells a bind apart from an earlier, cancelled one.
     attempt: u64,
+    /// A full camera was announced again: join once more (FR-8.52).
+    retry: bool,
     watch: Option<TileWatch>,
     fps: FpsMeter,
     badge: Option<u32>,
@@ -210,6 +216,7 @@ impl Tile {
             last_join: None,
             joining_since: None,
             attempt: 0,
+            retry: false,
             watch: None,
             fps: FpsMeter::default(),
             badge: None,
@@ -220,12 +227,16 @@ impl Tile {
     fn step(&mut self, wants: bool, now: Instant) -> Option<Act> {
         if !wants {
             let act = match self.state {
-                TileState::Joining | TileState::Playing => Some(Act::Unbind { leave: true }),
+                // A failed join may still have been admitted by the sender.
+                TileState::Joining | TileState::Playing | TileState::Failed => {
+                    Some(Act::Unbind { leave: true })
+                }
                 TileState::Full => Some(Act::Unbind { leave: false }),
                 TileState::Announced | TileState::Hidden => None,
             };
             self.state = TileState::Hidden;
             self.joining_since = None;
+            self.retry = false;
             if act.is_some() {
                 self.attempt += 1;
             }
@@ -239,14 +250,20 @@ impl Tile {
             }
             TileState::Joining => match self.joining_since {
                 None => self.try_join(now),
-                Some(since) if now.saturating_duration_since(since) >= FULL_AFTER => {
-                    self.state = TileState::Full;
+                Some(since) if now.saturating_duration_since(since) >= FAILED_AFTER => {
+                    self.state = TileState::Failed;
                     None
                 }
                 Some(_) => None,
             },
             // "Retry on the next state announcement", within the sender's join limit.
-            TileState::Full => self.try_join(now),
+            TileState::Full if self.retry => {
+                let act = self.try_join(now);
+                self.retry = act.is_none();
+                act
+            }
+            TileState::Full => None,
+            TileState::Failed => self.try_join(now),
             TileState::Playing => None,
         }
     }
@@ -264,6 +281,22 @@ impl Tile {
         }
         self.attempt += 1;
         Some(Act::Join)
+    }
+
+    /// The sender answered `full` for broadcast `id`; `false` if that changes nothing.
+    fn full(&mut self, id: &str) -> bool {
+        if self.id != id
+            || !matches!(
+                self.state,
+                TileState::Joining | TileState::Failed | TileState::Full
+            )
+        {
+            return false;
+        }
+        self.state = TileState::Full;
+        self.joining_since = None;
+        self.retry = false;
+        true
     }
 
     fn data_saver(&self, everyone: bool) -> bool {
@@ -734,7 +767,11 @@ impl Engine {
                 .get_mut(&server_id)
                 .and_then(|r| r.tiles.get_mut(&sharer))
                 .filter(|t| {
-                    t.attempt == attempt && matches!(t.state, TileState::Joining | TileState::Full)
+                    t.attempt == attempt
+                        && matches!(
+                            t.state,
+                            TileState::Joining | TileState::Full | TileState::Failed
+                        )
                 }) {
                 Some(tile) => {
                     tile.state = TileState::Playing;
@@ -796,7 +833,10 @@ pub(crate) fn on_camera_on(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: S
             room.open = true;
         }
         match room.tiles.get_mut(&sharer) {
-            Some(tile) if tile.id == id => None,
+            Some(tile) if tile.id == id => {
+                tile.retry = tile.state == TileState::Full;
+                None
+            }
             Some(tile) => {
                 let old = std::mem::replace(tile, Tile::new(id));
                 // The choices made on the tile stay with the person.
@@ -815,6 +855,19 @@ pub(crate) fn on_camera_on(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: S
     };
     drop(replaced);
     engine.camera_sync(ctx, false);
+}
+
+/// `full` from `sharer` (FR-8.52): its camera has no room for this client.
+pub(crate) fn on_camera_full(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: &str) {
+    let changed = lock(engine.camera_state())
+        .recv
+        .rooms
+        .get_mut(&ctx.server_id)
+        .and_then(|r| r.tiles.get_mut(&sharer))
+        .is_some_and(|t| t.full(id));
+    if changed {
+        engine.camera_sync(ctx, false);
+    }
 }
 
 /// `sharer`'s camera is gone from the own channel: `off`, the person left or moved away.
@@ -908,22 +961,63 @@ mod tests {
     }
 
     #[test]
-    fn a_join_without_a_token_is_full_and_retries_every_ten_seconds() {
+    fn a_join_without_any_answer_fails_and_retries_every_ten_seconds() {
         let now = Instant::now();
         let mut tile = Tile::new(ID.into());
         tile.step(true, now);
         assert_eq!(tile.step(true, later(now, 9)), None);
         assert_eq!(tile.step(true, later(now, 10)), None);
-        assert_eq!(tile.state, TileState::Full);
+        assert_eq!(tile.state, TileState::Failed);
         assert_eq!(tile.step(true, later(now, 11)), Some(Act::Join));
-        assert_eq!(tile.state, TileState::Full);
+        assert_eq!(tile.state, TileState::Failed);
         assert_eq!(tile.step(true, later(now, 15)), None);
         assert_eq!(tile.step(true, later(now, 21)), Some(Act::Join));
-        // Hiding a full camera unbinds without cam-leave: the sender never admitted it.
+        // The sender may have admitted one of the joins.
         assert_eq!(
             tile.step(false, later(now, 22)),
+            Some(Act::Unbind { leave: true })
+        );
+    }
+
+    #[test]
+    fn full_waits_for_the_next_announcement_and_the_join_limit() {
+        let now = Instant::now();
+        let mut tile = Tile::new(ID.into());
+        assert_eq!(tile.step(true, now), Some(Act::Join));
+        assert!(
+            !tile.full("ffffffffffffffff"),
+            "another broadcast's full is ignored"
+        );
+        assert!(tile.full(ID));
+        assert_eq!(tile.state, TileState::Full);
+        // Neither the old join's timeout nor the ticks retry without an announcement.
+        assert_eq!(tile.step(true, later(now, 30)), None);
+        assert_eq!(tile.state, TileState::Full);
+        // `on` again: retried at once, as the last join is old enough.
+        tile.retry = true;
+        assert_eq!(tile.step(true, later(now, 31)), Some(Act::Join));
+        assert_eq!(tile.step(true, later(now, 32)), None);
+        // Full again, announced again 3 s later: the retry waits for the join limit.
+        assert!(tile.full(ID));
+        tile.retry = true;
+        assert_eq!(tile.step(true, later(now, 34)), None);
+        assert_eq!(tile.step(true, later(now, 40)), None);
+        assert_eq!(tile.step(true, later(now, 41)), Some(Act::Join));
+        assert_eq!(tile.state, TileState::Full);
+        // A failed join turns full when the sender answers late.
+        let mut late = Tile::new(ID.into());
+        late.step(true, now);
+        late.step(true, later(now, 10));
+        assert_eq!(late.state, TileState::Failed);
+        assert!(late.full(ID));
+        // Hiding a full camera unbinds without cam-leave: the sender never admitted it.
+        assert_eq!(
+            tile.step(false, later(now, 42)),
             Some(Act::Unbind { leave: false })
         );
+        // A playing tile ignores a stray full.
+        tile.state = TileState::Playing;
+        assert!(!tile.full(ID));
     }
 
     #[test]
