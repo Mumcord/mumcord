@@ -311,6 +311,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::user_stats::user_stats_watch,
             commands::p2p::p2p_consent_decide,
             commands::p2p::relay_info,
+            commands::p2p::camera_unavailable,
             commands::p2p::p2p_link,
             commands::p2p::relay_trust_new,
             commands::p2p::relay_keep_blocked,
@@ -413,6 +414,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::user_stats::UserStatsChanged,
             commands::p2p::DirectConsentRequired,
             commands::p2p::RelayChanged,
+            commands::p2p::CameraAvailabilityChanged,
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
@@ -955,6 +957,13 @@ fn emit_engine_event(
             info: info.into(),
         }
         .emit(app),
+        EngineEvent::CameraAvailabilityChanged(reason) => {
+            commands::p2p::CameraAvailabilityChanged {
+                server_id,
+                reason: reason.map(Into::into),
+            }
+            .emit(app)
+        }
         EngineEvent::P2pLinkChanged { session, link } => commands::p2p::P2pLinkChanged {
             server_id,
             session,

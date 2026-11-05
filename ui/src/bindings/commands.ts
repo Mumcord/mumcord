@@ -839,6 +839,8 @@ export const commands = {
 	p2pConsentDecide: (allow: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("p2p_consent_decide", { allow })),
 	/**  The relay of a server for the server info panel; "no relay" when not connected. */
 	relayInfo: (serverId: number) => typedError<RelayInfo, ApiError>(__TAURI_INVOKE("relay_info", { serverId })),
+	/**  Why camera sharing is unavailable on a connected server; `null` when it is available. */
+	cameraUnavailable: (serverId: number) => typedError<CameraUnavailable | null, ApiError>(__TAURI_INVOKE("camera_unavailable", { serverId })),
 	/**
 	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
 	 *  `p2pLinkChanged`.
@@ -1013,6 +1015,7 @@ export const events = {
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
+	cameraAvailabilityChanged: makeEvent<CameraAvailabilityChanged, CameraAvailabilityChanged>("camera-availability-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
@@ -1355,6 +1358,18 @@ export type CacheSizes = {
 	webKib: number,
 	tempKib: number,
 };
+
+/**
+ *  Camera sharing became available or unavailable on a server (FR-8.2); `reason` is `null`
+ *  when it is available.
+ */
+export type CameraAvailabilityChanged = {
+	serverId: number,
+	reason: CameraUnavailable | null,
+};
+
+/**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
 export type CertTrustRequired = {
@@ -3439,8 +3454,8 @@ export type RelayUnavailable =
 /**  "This server's relay doesn't allow {images / file sharing / screen sharing}" (FR-7.7). */
 { kind: "useNotAllowed"; use: RelayUse };
 
-/**  What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing". */
-export type RelayUse = "images" | "files" | "screenShare";
+/**  What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing", "Cameras". */
+export type RelayUse = "images" | "files" | "screenShare" | "cameras";
 
 /**  The changes of one release between the installed and the offered version. */
 export type ReleaseNote = {

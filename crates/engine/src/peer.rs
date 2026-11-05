@@ -26,6 +26,7 @@ use mumcord_store::{IdentityId, RelayPin, ServerId, Store, UnixMillis};
 use tokio::sync::oneshot;
 use tokio::time::Instant;
 
+use crate::camera::avail::CameraUnavailable;
 use crate::inspector::Inspector;
 use crate::screen_share::broadcast::FanoutUnavailable;
 use crate::session::{
@@ -95,7 +96,12 @@ impl RelayUnavailable {
 }
 
 /// Every use, in the order the server info panel lists them (FR-7.7).
-const ALL_USES: [RelayUse; 3] = [RelayUse::Images, RelayUse::Files, RelayUse::ScreenShare];
+const ALL_USES: [RelayUse; 4] = [
+    RelayUse::Images,
+    RelayUse::Files,
+    RelayUse::ScreenShare,
+    RelayUse::Camera,
+];
 
 /// State of the server's relay for the server info panel (FR-4.20).
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -175,6 +181,18 @@ struct Announcer {
     name: String,
     pair: Pair,
     ann: RelayAnnouncement,
+}
+
+impl Announcer {
+    /// Whether the announcement allows `relay_use`. Cameras are the exception to "no `u` allows
+    /// all" (FR-7.6): a bot without `u` predates them and can't handle camera broadcasts
+    /// (FR-8.2).
+    fn allows(&self, relay_use: RelayUse) -> bool {
+        if relay_use == RelayUse::Camera && self.ann.uses.is_none() {
+            return false;
+        }
+        self.ann.allows(relay_use)
+    }
 }
 
 /// What became of an announcement.
@@ -294,7 +312,7 @@ impl ServerRelay {
             first_seen,
             uses: ALL_USES
                 .into_iter()
-                .filter(|u| announcer.ann.allows(*u))
+                .filter(|u| announcer.allows(*u))
                 .collect(),
             broadcast_max: announcer.ann.broadcast,
         }
@@ -324,7 +342,7 @@ impl ServerRelay {
     /// [`Self::usable`] for `relay_use`: the announcement must allow it (FR-7.6).
     fn usable_for(&self, relay_use: RelayUse) -> Result<&Announcer, RelayUnavailable> {
         let announcer = self.usable()?;
-        if !announcer.ann.allows(relay_use) {
+        if !announcer.allows(relay_use) {
             return Err(RelayUnavailable::UseNotAllowed(relay_use));
         }
         Ok(announcer)
@@ -416,6 +434,8 @@ struct State {
 pub(crate) struct Relays {
     engine: OnceLock<WeakEngine>,
     state: Mutex<State>,
+    /// The camera availability last reported per server (FR-8.2), to emit only changes.
+    camera: Mutex<HashMap<ServerId, Option<CameraUnavailable>>>,
     timings: Mutex<RelayTimings>,
 }
 
@@ -430,7 +450,7 @@ impl Relays {
         *lock(&self.timings)
     }
 
-    fn info(&self, server_id: ServerId) -> RelayInfo {
+    pub(crate) fn info(&self, server_id: ServerId) -> RelayInfo {
         lock(&self.state)
             .servers
             .get(&server_id)
@@ -471,6 +491,23 @@ impl Relays {
             .get(&server_id)
             .and_then(ServerRelay::single)
             .is_none_or(|a| a.ann.allows(relay_use))
+    }
+
+    /// Reports the camera availability of `server_id` after the relay changed.
+    fn refresh_camera(&self, server_id: ServerId) {
+        if let Some(engine) = self.engine.get().and_then(WeakEngine::upgrade) {
+            engine.camera_availability_refresh(server_id);
+        }
+    }
+
+    /// Remembers `reason` as the camera availability of `server_id`; whether it differs from the
+    /// one reported before (the first report always counts).
+    pub(crate) fn camera_changed(
+        &self,
+        server_id: ServerId,
+        reason: Option<CameraUnavailable>,
+    ) -> bool {
+        lock(&self.camera).insert(server_id, reason) != Some(reason)
     }
 
     /// Runs `change` on the server's relay; returns the new info if the panel changes.
@@ -620,6 +657,7 @@ impl Relays {
         }
         if let Some(info) = changed {
             ctx.events.emit(EngineEvent::RelayChanged(info));
+            self.refresh_camera(ctx.server_id);
         }
     }
 
@@ -868,6 +906,7 @@ impl Relays {
         }
         if let Some(info) = changed {
             ctx.events.emit(EngineEvent::RelayChanged(info));
+            self.refresh_camera(ctx.server_id);
         }
     }
 
@@ -884,6 +923,7 @@ impl Relays {
             };
             if let Some(info) = engine.relays().expire(server_id, generation) {
                 events.emit(EngineEvent::RelayChanged(info));
+                engine.camera_availability_refresh(server_id);
             }
         });
     }
@@ -1086,6 +1126,7 @@ impl Engine {
         tracing::info!("changed relay trusted by the user");
         if let Some(info) = changed {
             ctx.events.emit(EngineEvent::RelayChanged(info));
+            self.camera_availability_refresh(ctx.server_id);
         }
         Ok(())
     }
@@ -1100,6 +1141,7 @@ impl Engine {
         });
         if let Some(info) = changed {
             ctx.events.emit(EngineEvent::RelayChanged(info));
+            self.camera_availability_refresh(ctx.server_id);
         }
         Ok(())
     }
@@ -1126,6 +1168,7 @@ impl Engine {
             .change(server_id, |relay| *relay = ServerRelay::default());
         if let (Some(info), Ok(ctx)) = (changed, self.session_ctx_for(server_id)) {
             ctx.events.emit(EngineEvent::RelayChanged(info));
+            self.camera_availability_refresh(server_id);
         }
         Ok(())
     }
@@ -1827,15 +1870,43 @@ mod tests {
     }
 
     #[test]
-    fn an_announcement_without_uses_allows_everything() {
+    fn an_announcement_without_uses_allows_everything_but_cameras() {
         let relays = relays_with_uses(None, None);
-        for relay_use in ALL_USES {
+        for relay_use in ALL_USES.into_iter().filter(|u| *u != RelayUse::Camera) {
             assert_eq!(relays.availability_for(1, relay_use), Ok(()));
             assert!(relays.allows(1, relay_use));
         }
+        // A bot without `u` predates cameras and can't handle their broadcasts (FR-8.2).
+        assert_eq!(
+            relays.availability_for(1, RelayUse::Camera),
+            Err(RelayUnavailable::UseNotAllowed(RelayUse::Camera))
+        );
         let info = relays.info(1);
-        assert_eq!(info.uses, ALL_USES);
+        assert_eq!(
+            info.uses,
+            [RelayUse::Images, RelayUse::Files, RelayUse::ScreenShare]
+        );
         assert_eq!(info.broadcast_max, None);
+    }
+
+    #[test]
+    fn cam_in_uses_makes_the_relay_usable_for_cameras() {
+        let relays = relays_with_uses(Some(vec![RelayUse::Camera]), Some(10));
+        assert_eq!(relays.availability_for(1, RelayUse::Camera), Ok(()));
+        assert_eq!(relays.info(1).uses, [RelayUse::Camera]);
+    }
+
+    #[test]
+    fn the_camera_availability_is_reported_only_when_it_changes() {
+        let relays = Relays::default();
+        let none = None;
+        let old = Some(CameraUnavailable::RelayTooOld);
+        assert!(relays.camera_changed(1, none), "first report counts");
+        assert!(!relays.camera_changed(1, none));
+        assert!(relays.camera_changed(1, old));
+        assert!(!relays.camera_changed(1, old));
+        assert!(relays.camera_changed(1, none));
+        assert!(relays.camera_changed(2, none), "servers are independent");
     }
 
     #[test]
