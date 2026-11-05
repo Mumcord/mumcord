@@ -35,6 +35,14 @@
     "category": "SocialNetworking",
     "shortDescription": "Voice chat client compatible with Mumble",
     "longDescription": "Mumcord is a modern voice chat client compatible with Mumble. It is not affiliated with the Mumble project.",
+    "resources": {
+      "../assets/backgrounds/soft-light.jpg": "camera-backgrounds/soft-light.jpg",
+      "../assets/backgrounds/library.jpg": "camera-backgrounds/library.jpg",
+      "../assets/backgrounds/mountains.jpg": "camera-backgrounds/mountains.jpg",
+      "../assets/backgrounds/studio.jpg": "camera-backgrounds/studio.jpg",
+      "../assets/backgrounds/night-city.jpg": "camera-backgrounds/night-city.jpg",
+      "../assets/backgrounds/beach.jpg": "camera-backgrounds/beach.jpg"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

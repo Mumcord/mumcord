@@ -257,7 +257,6 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: ${{ matrix.task }}
-          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - uses: ./.github/actions/npm-ci
 
