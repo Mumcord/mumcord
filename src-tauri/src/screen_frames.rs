@@ -180,6 +180,22 @@ fn picture_message(codec: Codec, frame: &I420Frame) -> Option<Vec<u8>> {
     Some(out)
 }
 
+/// A picture made in Rust (the own camera's preview, spec 08) in the same layout, so the UI
+/// draws it like a decoded share picture. `None` for a picture too large for the header.
+pub fn rgba_message(width: u32, height: u32, rgba: &[u8]) -> Option<FrameMessage> {
+    let mut out = header(&Header {
+        kind: KIND_RGBA,
+        flags: 0,
+        layer: 0,
+        codec: Codec::Vp9,
+        timestamp_us: 0,
+        width: u16::try_from(width).ok()?,
+        height: u16::try_from(height).ok()?,
+    });
+    out.extend_from_slice(rgba);
+    Some(FrameMessage(out))
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {

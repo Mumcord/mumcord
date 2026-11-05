@@ -3909,6 +3909,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
     lockScreen: () => Promise.resolve(null),
+    // The browser mock has no camera; the camera UI shows "no camera" (spec 08).
+    cameraDevices: () => Promise.resolve([]),
+    cameraView: () => Promise.resolve(null),
+    cameraPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
+    cameraTurnOn: () => Promise.reject(new EngineError("camera", "busy")),
+    cameraTurnOff: () => Promise.resolve(),
+    cameraLocalPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
+    cameraLocalPreviewStop: () => Promise.resolve(),
+    cameraSetDevice: () => Promise.resolve(null),
+    cameraSetBackground: () => Promise.resolve(null),
+    cameraSetEffectQuality: () => Promise.resolve(),
+    cameraEffects: () =>
+      Promise.resolve({ unavailable: null, level: null, load: null, tooBusy: false }),
+    cameraPreviewAttach: () => Promise.resolve(),
+    cameraPreviewDetach: () => Promise.resolve(),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
