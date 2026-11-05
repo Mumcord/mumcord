@@ -22,8 +22,9 @@ export interface MiniBarProps {
   actions?: ReactNode;
   openLabel: string;
   onOpen: () => void;
-  closeLabel: string;
-  onClose: () => void;
+  /** Without it the bar has no close button (the camera room's bar only opens the room). */
+  closeLabel?: string;
+  onClose?: () => void;
 }
 
 export function MiniBar({
@@ -71,15 +72,17 @@ export function MiniBar({
         <MediaIcon name="open" size={14} />
         {openLabel}
       </button>
-      <button
-        type="button"
-        className="button mini-bar__icon"
-        aria-label={closeLabel}
-        data-tooltip={closeLabel}
-        onClick={onClose}
-      >
-        <MediaIcon name="close" size={14} />
-      </button>
+      {onClose !== undefined && (
+        <button
+          type="button"
+          className="button mini-bar__icon"
+          aria-label={closeLabel}
+          data-tooltip={closeLabel}
+          onClick={onClose}
+        >
+          <MediaIcon name="close" size={14} />
+        </button>
+      )}
     </div>
   );
 }

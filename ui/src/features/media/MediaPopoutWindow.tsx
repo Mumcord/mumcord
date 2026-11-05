@@ -1,6 +1,6 @@
 /**
  * Root of a media pop-out window (issue #164, FR-9.48): the watch party player, a watched screen
- * share or a plugin activity with the same overlay and keys as in the main window. The window only
+ * share, a plugin activity or the camera room (spec 08 FR-8.68) with the same overlay and keys as in the main window. The window only
  * renders: the party, the watch, the activity and the connection stay in the main window, this one reads their state from the engine and
  * sends its button presses back. Theme and language follow the main window; Ctrl+W, closing the
  * window and "Pop back in" dock the view again.
@@ -11,6 +11,7 @@ import { LiveRegions } from "../../a11y";
 import { getApi, type MediaPopoutKind, type MediaPopoutTarget, type WindowLook } from "../../api";
 import { applyLanguage, resolveLanguage } from "../../i18n";
 import { applyRootLook, isCloseShortcut } from "../inspector/inspectorView";
+import { CameraRoom } from "../camera/room/CameraRoom";
 import { useStageActivities } from "../plugins/stage/activityStore";
 import { PluginStage } from "../plugins/stage/PluginStage";
 import { Viewer } from "../screenshare/ScreenShareView";
@@ -45,6 +46,9 @@ export function MediaPopoutWindow({ kind }: { kind: MediaPopoutKind }): ReactNod
             <WatchTogetherView serverId={target.serverId} />
           ) : kind === "stage" ? (
             target.plugin !== null && <StagePopout plugin={target.plugin} />
+          ) : kind === "camera" ? (
+            // The preview dialog to turn the camera on stays in the main window.
+            <CameraRoom serverId={target.serverId} onTurnOn={null} />
           ) : (
             target.session !== null && (
               <Viewer serverId={target.serverId} session={target.session} />
@@ -102,7 +106,8 @@ function useMainWindowLook(): void {
 function useSeed(kind: MediaPopoutKind, target: MediaPopoutTarget | null): void {
   const serverId = target?.serverId ?? null;
   useEffect(() => {
-    if (serverId === null || kind === "stage") return;
+    // The activity store and the camera room store read their own state.
+    if (serverId === null || kind === "stage" || kind === "camera") return;
     const api = getApi();
     let current = true;
     if (kind === "watch") {

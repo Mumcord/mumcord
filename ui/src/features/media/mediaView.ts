@@ -9,7 +9,12 @@
  */
 import { useSyncExternalStore } from "react";
 
-export type MediaKind = "watch" | "share";
+export type MediaKind = "watch" | "share" | "camera";
+/**
+ * The views that turn into their own mini bar when the area is left. The camera room has its own
+ * bar instead, shown whenever cameras are on and the room does not show (spec 08 FR-8.61).
+ */
+export type MiniKind = "watch" | "share";
 /** One item of the media area: a built-in feature or a plugin activity (`plugin:<id>`). */
 export type StageId = MediaKind | `plugin:${string}`;
 /** How the shared picture is shown (issue #163). */
@@ -25,7 +30,7 @@ export interface MediaView {
   /** Items that came while another one was the main item and were not looked at yet (the dot). */
   unseen: readonly StageId[];
   /** Which features show as the mini bar at the top of the chat. */
-  mini: Record<MediaKind, boolean>;
+  mini: Record<MiniKind, boolean>;
   fit: FitMode;
   tab: MediaTab;
 }
@@ -54,7 +59,7 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
-const isKind = (id: StageId): id is MediaKind => id === "watch" || id === "share";
+const isKind = (id: StageId): id is MiniKind => id === "watch" || id === "share";
 
 /** The area shows `main`: no item of it stays a mini bar, and its dot is gone. */
 function showing(stage: readonly StageId[], main: StageId): MediaView {
