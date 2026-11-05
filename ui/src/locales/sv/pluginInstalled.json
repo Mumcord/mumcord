@@ -127,5 +127,9 @@
     "netHttp": "Internetåtkomst",
     "secrets": "Nyckelring"
   },
-  "offerBadge": "Nya behörigheter"
+  "offerBadge": "Nya behörigheter",
+  "refused": {
+    "title": "Avvisade tillägg",
+    "when": "Avvisad {{time}}"
+  }
 }

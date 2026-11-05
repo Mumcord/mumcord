@@ -127,5 +127,9 @@
     "netHttp": "Internettoegang",
     "secrets": "Sleutelhanger"
   },
-  "offerBadge": "Nieuwe machtigingen"
+  "offerBadge": "Nieuwe machtigingen",
+  "refused": {
+    "title": "Geweigerde plugins",
+    "when": "Geweigerd op {{time}}"
+  }
 }

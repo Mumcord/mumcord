@@ -8,7 +8,7 @@
 //   AC-9.17  plugin items under "Plugins" with icon and name, in the command palette as
 //            "<plugin>: <label>"; choosing one delivers app-menu-activated; set-state disables an
 //            item and shows the reason; test-badlabel (an Apps-menu label equal to a built-in one)
-//            does not load.
+//            does not load and is listed as refused (Diagnostics).
 //
 // Manual: the frame chrome on Windows and macOS (native child webviews there).
 import { $, $$, browser, expect } from "@wdio/globals";
@@ -324,5 +324,11 @@ describe("plugins 1.1: Apps menu, command palette and web frames (AC-9.16, AC-9.
     const result = await install("test-badlabel");
     expect(result.error).toBeDefined();
     expect(await pluginStatus("test-badlabel")).not.toBe("running");
+    // A plugin refused at its first load has no record, so Diagnostics lists it from memory.
+    const overview = (await invokeOk("plugins_list")) as {
+      refused: { name: string; issue: { kind: string } }[];
+    };
+    const entry = overview.refused.find((refused) => refused.name === "test-badlabel");
+    expect(entry?.issue.kind).toBe("refused_app_menu_label");
   });
 });

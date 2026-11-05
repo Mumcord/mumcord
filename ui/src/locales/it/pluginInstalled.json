@@ -127,5 +127,9 @@
     "netHttp": "Accesso a internet",
     "secrets": "Portachiavi"
   },
-  "offerBadge": "Nuove autorizzazioni"
+  "offerBadge": "Nuove autorizzazioni",
+  "refused": {
+    "title": "Plugin rifiutati",
+    "when": "Rifiutato il {{time}}"
+  }
 }

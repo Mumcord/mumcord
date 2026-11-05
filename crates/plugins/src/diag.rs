@@ -31,6 +31,16 @@ pub enum LoadIssue {
     RefusedAppMenuLabel,
 }
 
+/// A plugin that was refused before it had a stored record (at install, or when a developer
+/// folder was loaded), kept in memory for this run so Diagnostics can still list it (FR-9.90).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RefusedPlugin {
+    /// The plugin id, or the folder name of a developer plugin whose manifest could not be read.
+    pub name: String,
+    pub issue: LoadIssue,
+    pub at_millis: i64,
+}
+
 /// The counters at one moment. `cpu_time_ms` is the time spent inside calls into the plugin.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize)]
 pub struct DiagSnapshot {

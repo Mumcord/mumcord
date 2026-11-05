@@ -127,5 +127,9 @@
     "netHttp": "Internetzugriff",
     "secrets": "Schlüsselbund"
   },
-  "offerBadge": "Neue Berechtigungen"
+  "offerBadge": "Neue Berechtigungen",
+  "refused": {
+    "title": "Abgelehnte Plugins",
+    "when": "Abgelehnt um {{time}}"
+  }
 }

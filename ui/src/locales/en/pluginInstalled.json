@@ -127,5 +127,9 @@
     "netHttp": "Internet access",
     "secrets": "Keychain"
   },
-  "offerBadge": "New permissions"
+  "offerBadge": "New permissions",
+  "refused": {
+    "title": "Refused plugins",
+    "when": "Refused at {{time}}"
+  }
 }

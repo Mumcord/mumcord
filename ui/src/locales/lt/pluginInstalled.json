@@ -127,5 +127,9 @@
     "netHttp": "Prieiga prie interneto",
     "secrets": "Raktų pakabukas"
   },
-  "offerBadge": "Nauji leidimai"
+  "offerBadge": "Nauji leidimai",
+  "refused": {
+    "title": "Atmesti papildiniai",
+    "when": "Atmesta {{time}}"
+  }
 }
