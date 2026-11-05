@@ -6,6 +6,7 @@ pub mod audio_rating;
 pub mod banlist;
 mod blocking;
 pub mod cache;
+pub mod camera;
 pub mod chat;
 pub mod diag;
 pub mod files;

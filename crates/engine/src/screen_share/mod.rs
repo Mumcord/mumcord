@@ -1549,7 +1549,10 @@ fn chosen_sound(id: &str) -> EngineResult<SoundOutcome> {
     {
         match sound::pick::start_chosen(id) {
             Ok(Some(outcome)) => Ok(outcome),
-            Ok(None) => Err(EngineError::invalid("that app no longer plays sound")),
+            Ok(None) => Err(EngineError::new(
+                ErrorKind::NotFound,
+                "that app no longer plays sound",
+            )),
             Err(reason) => Ok(SoundOutcome::Unavailable(reason)),
         }
     }

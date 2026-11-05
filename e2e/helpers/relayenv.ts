@@ -152,6 +152,12 @@ export interface TestHooks {
   onBattery?: boolean;
   /** Pretend WebCodecs cannot decode AV1 (AC-7.41). */
   noWebcodecsAv1?: boolean;
+  /**
+   * Pretend picker result of the test share (spec 07 §4.10, AC-7.61 to 7.64): `"screen"`, or
+   * `"window"` with the app hint the portal would report, e.g. `"window:Test App A"`. With
+   * PipeWire running the share carries the real captured sound (see `pwapps.ts`).
+   */
+  sharePick?: "screen" | "window" | `window:${string}`;
   /** Keep the previous broadcast key after a rotation (AC-7.30). */
   keepOldKey?: boolean;
   /**
@@ -182,6 +188,7 @@ export function hookEnv(h: TestHooks): Record<string, string> {
   if (h.encodeDelayMs !== undefined) env.MUMCORD_TEST_ENCODE_DELAY_MS = String(h.encodeDelayMs);
   if (h.onBattery) env.MUMCORD_TEST_ON_BATTERY = "1";
   if (h.noWebcodecsAv1) env.MUMCORD_TEST_NO_WEBCODECS_AV1 = "1";
+  if (h.sharePick !== undefined) env.MUMCORD_TEST_SHARE_PICK = h.sharePick;
   if (h.keepOldKey) env.MUMCORD_TEST_KEEP_OLD_KEY = "1";
   if (h.pluginSavePath !== undefined) env.MUMCORD_TEST_PLUGIN_SAVE = h.pluginSavePath;
   if (h.pluginPickPath !== undefined) env.MUMCORD_TEST_PLUGIN_PICK = h.pluginPickPath;

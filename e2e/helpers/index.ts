@@ -4,6 +4,7 @@ export * as apps from "./apps.ts";
 export * as axe from "./axe.ts";
 export * as netsim from "./netsim.ts";
 export * as pluginenv from "./pluginenv.ts";
+export * as pwapps from "./pwapps.ts";
 export * as registry from "./registry.ts";
 export * as relayenv from "./relayenv.ts";
 export * as testenv from "./testenv.ts";

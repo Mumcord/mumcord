@@ -108,7 +108,18 @@
     "codecBadgeHardware": "{{codec}} · aparatūra",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relejs",
-    "pathDirect": "Tiešais"
+    "pathDirect": "Tiešais",
+    "soundDesktop": "Skaņa: darbvirsma",
+    "soundApp": "Skaņa: {{app}}",
+    "noSound": "Bez skaņas",
+    "tipDesktop": "Viss ekrāns: darbvirsmas skaņa bez Mumcord.",
+    "tipApp": "Viens logs: tikai šīs lietotnes skaņa.",
+    "tipOff": "Skaņas slēdzis ir izslēgts.",
+    "tipNone": "Šim logam izvēlēts „Bez skaņas“.",
+    "tipOldWindows": "Bez skaņas: nepieciešama Windows 10 versija 2004 vai jaunāka",
+    "tipOldMacos": "Bez skaņas: nepieciešama macOS 13 vai jaunāka",
+    "tipNoPipeWire": "Bez skaņas: nepieciešams PipeWire",
+    "tipCaptureFailed": "Skaņas tveršana neizdevās. Video kopīgošana turpinās."
   },
   "qualityMenu": {
     "title": "Kvalitāte",

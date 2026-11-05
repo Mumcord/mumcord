@@ -30,6 +30,23 @@ it, so a build (from another checkout, too) waits until they are done instead of
 binaries under them. A run id needs `MUMCORD_E2E_STEP=test`. 2–3 parallel runs work on a 16-core
 machine; more invite timing flakes in the voice and packet-loss specs.
 
+### Sound for the share-sound specs (spec 07, AC-7.61 to 7.66)
+
+The container starts a sound daemon per run, in the run's own `XDG_RUNTIME_DIR`:
+`MUMCORD_E2E_AUDIO=pipewire` (default) runs PipeWire and WirePlumber with a null sink `e2e-sink` as
+the output; `pulse` runs only PulseAudio (no PipeWire: AC-7.66); `none` starts nothing.
+
+- `helpers/pwapps.ts`: `startTestApp("Test App A", 440)` plays a tone under that
+  `application.name`. Each app is its own copy of `pw-cat` (own binary), so apps differ in name
+  and binary like real ones. `stopTestApps()` cleans up. `tonePower`, `dominantFrequencies` and
+  `receivedFrequencies(outWav, [440, 880, 1000])` report which tones are audible in the receiving
+  app's file-backend output (`audio: "file:<in>:<out>"`); this is the receiving-side report.
+- Test hook `sharePick` of `hookEnv` (`MUMCORD_TEST_SHARE_PICK`, debug builds only): the test
+  backend has no window picker, so the spec feeds the pick: `"screen"` (desktop sound without
+  Mumcord), `"window:Test App A"` (app hint; a clear match shares only that app and the streams it
+  opens later) or `"window"` (no hint: no sound, the app list is not part of this hook). The sound
+  is the real PipeWire capture. Without the hook a test share has no sound capture.
+
 Requires only Docker (user in the `docker` group) and `npm ci` on the host. Everything else runs
 in the `mumcord-e2e` image, because Arch's webkit2gtk ships without `WebKitWebDriver`.
 

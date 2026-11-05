@@ -1007,6 +1007,18 @@ export const commands = {
 	/**  Level of watched shares' sound, 0.0–1.0, while people talk (auto-ducking, FR-2.76). */
 	screenShareSetSoundLevel: (level: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_sound_level", { level })),
 	/**
+	 *  The apps playing sound now, for "Which app's sound?" while the own share waits for the
+	 *  pick (`soundChoice` is set). Call it again to refresh the open list; empty where the
+	 *  system has no per-app choice.
+	 */
+	screenShareSoundApps: () => typedError<SoundApp[], ApiError>(__TAURI_INVOKE("screen_share_sound_apps")),
+	/**
+	 *  Answers "Which app's sound?": an app id shares that app's sound, `null` ("No sound" or
+	 *  Cancel) keeps the share silent. Errors: `notFound` when the app stopped playing (keep the
+	 *  dialog open and refresh the list), `invalidInput` when nothing is asked.
+	 */
+	screenShareChooseSound: (serverId: number, app: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_choose_sound", { serverId, app })),
+	/**
 	 *  Starts watching a person's share; its frames arrive on `frames` as binary messages (layout
 	 *  in `screen_frames`). Errors: `shareFull` when 8 people already watch, `directUnavailable`
 	 *  (reason in `message`) when no direct connection can be made.
@@ -4038,6 +4050,14 @@ export type ScreenShare = {
 	sound: boolean,
 	/**  The own share has a sound source; always `false` for the shares of others. */
 	soundAvailable: boolean,
+	/**  What the own share's sound carries; `none` for the shares of others. */
+	soundMode: ShareSoundMode,
+	/**  The app whose sound is shared, when `soundMode` is `app` (stays on the sharer's device). */
+	soundApp: string | null,
+	/**  Why the share has no sound although the user wanted it (FR-7.85). */
+	soundReason: SoundUnavailableReason | null,
+	/**  Set while the share waits for "Which app's sound?" (FR-7.83); the list to offer. */
+	soundChoice: SoundApp[] | null,
 	/**  Who is watching (up to 8). */
 	viewers: number[],
 	/**  Why the user cannot watch; always `null` for the own share. */
@@ -4449,6 +4469,9 @@ export type ShareQuality = {
 	fanout: ShareFanout | null,
 };
 
+/**  What the own share's sound carries (FR-7.76). */
+export type ShareSoundMode = "desktop" | "app" | "none";
+
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
 export type ShareStartBlock = {
 	blocked: WatchBlock,
@@ -4468,6 +4491,13 @@ export type ShareThumbnail = {
 export type SoftwareLimit = {
 	height: number,
 	fps: number,
+};
+
+/**  One app offered in "Which app's sound?" (FR-7.83). */
+export type SoundApp = {
+	/**  What `screenShareChooseSound` takes. */
+	id: string,
+	name: string,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -4507,6 +4537,15 @@ export type SoundTheme =
 "classic" | 
 /**  Fuller sounds made with ElevenLabs (default). */
 "rich";
+
+/**  Why there is no sound to share (FR-7.84, FR-7.85). */
+export type SoundUnavailableReason = 
+/**  The system is too old (Windows before 10 version 2004, macOS before 13). */
+"osTooOld" | 
+/**  Linux without a running PipeWire. */
+"noPipeWire" | 
+/**  The sound capture could not start or stopped. */
+"captureFailed";
 
 export type StageActivityKind = 
 /**  "<name> started <plugin> · Join". */
