@@ -37,6 +37,7 @@
 
 ### Fixed
 
+- Opening a profile that a newer Mumcord already upgraded no longer ends start-up with a bare error: Mumcord now explains that the profile is from a newer version, shows both profile versions and offers "Download the latest version" and "Quit". The profile is left exactly as it is (#510)
 - The download confirmation no longer lets you press Download before it shows the folder the file will be saved to
 - Joining a screen share no longer picks up the relay access meant for another broadcast of the same person (such as a camera or plugin data), so watching works while they share several things at once
 - If you are not registered on a server whose relay only serves registered users, file sharing and other relay features now say "This server's relay is only available to registered users. Register on this server to use it." instead of claiming the relay could not be reached (#406)
