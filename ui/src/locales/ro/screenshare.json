@@ -113,7 +113,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Releu",
-    "pathDirect": "Direct"
+    "pathDirect": "Direct",
+    "soundDesktop": "Sunet: desktop",
+    "soundApp": "Sunet: {{app}}",
+    "noSound": "Fără sunet",
+    "tipDesktop": "Tot ecranul: sunetul desktopului, fără Mumcord.",
+    "tipApp": "O fereastră: doar sunetul acelei aplicații.",
+    "tipOff": "Comutatorul de sunet este oprit.",
+    "tipNone": "Pentru această fereastră a fost aleasă opțiunea „Fără sunet”.",
+    "tipOldWindows": "Fără sunet: necesită Windows 10 versiunea 2004 sau mai nouă",
+    "tipOldMacos": "Fără sunet: necesită macOS 13 sau mai nou",
+    "tipNoPipeWire": "Fără sunet: necesită PipeWire",
+    "tipCaptureFailed": "Captarea sunetului a eșuat. Partajarea video continuă."
   },
   "qualityMenu": {
     "title": "Calitate",

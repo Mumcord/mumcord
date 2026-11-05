@@ -111,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · υλικό",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Ρελέ",
-    "pathDirect": "Άμεσα"
+    "pathDirect": "Άμεσα",
+    "soundDesktop": "Ήχος: επιφάνεια εργασίας",
+    "soundApp": "Ήχος: {{app}}",
+    "noSound": "Χωρίς ήχο",
+    "tipDesktop": "Ολόκληρη η οθόνη: ο ήχος της επιφάνειας εργασίας χωρίς το Mumcord.",
+    "tipApp": "Ένα παράθυρο: μόνο ο ήχος αυτής της εφαρμογής.",
+    "tipOff": "Ο διακόπτης ήχου είναι απενεργοποιημένος.",
+    "tipNone": "Για αυτό το παράθυρο επιλέχθηκε «Χωρίς ήχο».",
+    "tipOldWindows": "Χωρίς ήχο: απαιτείται Windows 10 έκδοση 2004 ή νεότερη",
+    "tipOldMacos": "Χωρίς ήχο: απαιτείται macOS 13 ή νεότερο",
+    "tipNoPipeWire": "Χωρίς ήχο: απαιτείται το PipeWire",
+    "tipCaptureFailed": "Η λήψη ήχου απέτυχε. Η κοινή χρήση βίντεο συνεχίζεται."
   },
   "qualityMenu": {
     "title": "Ποιότητα",

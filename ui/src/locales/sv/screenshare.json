@@ -111,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · maskinvara",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relä",
-    "pathDirect": "Direkt"
+    "pathDirect": "Direkt",
+    "soundDesktop": "Ljud: skrivbord",
+    "soundApp": "Ljud: {{app}}",
+    "noSound": "Inget ljud",
+    "tipDesktop": "Hela skärmen: skrivbordets ljud utan Mumcord.",
+    "tipApp": "Ett fönster: bara den appens ljud.",
+    "tipOff": "Ljudomkopplaren är avstängd.",
+    "tipNone": "”Inget ljud” valdes för det här fönstret.",
+    "tipOldWindows": "Inget ljud: kräver Windows 10 version 2004 eller senare",
+    "tipOldMacos": "Inget ljud: kräver macOS 13 eller senare",
+    "tipNoPipeWire": "Inget ljud: kräver PipeWire",
+    "tipCaptureFailed": "Ljudinspelningen misslyckades. Videodelningen fortsätter."
   },
   "qualityMenu": {
     "title": "Kvalitet",

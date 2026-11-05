@@ -117,7 +117,18 @@
     "codecBadgeHardware": "{{codec}} · ħardwer",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Dirett"
+    "pathDirect": "Dirett",
+    "soundDesktop": "Ħoss: desktop",
+    "soundApp": "Ħoss: {{app}}",
+    "noSound": "Ebda ħoss",
+    "tipDesktop": "L-iskrin kollu: il-ħoss tad-desktop mingħajr Mumcord.",
+    "tipApp": "Tieqa waħda: il-ħoss ta' dik l-app biss.",
+    "tipOff": "L-iswiċċ tal-ħoss huwa mitfi.",
+    "tipNone": "“Ebda ħoss” intgħażel għal din it-tieqa.",
+    "tipOldWindows": "Ebda ħoss: teħtieġ Windows 10 verżjoni 2004 jew aktar ġdida",
+    "tipOldMacos": "Ebda ħoss: teħtieġ macOS 13 jew aktar ġdid",
+    "tipNoPipeWire": "Ebda ħoss: teħtieġ PipeWire",
+    "tipCaptureFailed": "Il-qbid tal-ħoss falla. It-tqassim tal-vidjo jkompli."
   },
   "qualityMenu": {
     "title": "Kwalità",

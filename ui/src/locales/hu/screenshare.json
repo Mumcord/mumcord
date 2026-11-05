@@ -111,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · hardveres",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Átjátszó",
-    "pathDirect": "Közvetlen"
+    "pathDirect": "Közvetlen",
+    "soundDesktop": "Hang: asztal",
+    "soundApp": "Hang: {{app}}",
+    "noSound": "Nincs hang",
+    "tipDesktop": "Teljes képernyő: az asztal hangja a Mumcord nélkül.",
+    "tipApp": "Egy ablak: csak az adott alkalmazás hangja.",
+    "tipOff": "A hangkapcsoló ki van kapcsolva.",
+    "tipNone": "Ehhez az ablakhoz a „Nincs hang” lett kiválasztva.",
+    "tipOldWindows": "Nincs hang: Windows 10 2004-es vagy újabb verziója szükséges",
+    "tipOldMacos": "Nincs hang: macOS 13 vagy újabb szükséges",
+    "tipNoPipeWire": "Nincs hang: PipeWire szükséges",
+    "tipCaptureFailed": "A hangrögzítés sikertelen. A videómegosztás folytatódik."
   },
   "qualityMenu": {
     "title": "Minőség",

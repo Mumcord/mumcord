@@ -117,7 +117,18 @@
     "codecBadgeHardware": "{{codec}} · crua-earraí",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Athsheachadán",
-    "pathDirect": "Díreach"
+    "pathDirect": "Díreach",
+    "soundDesktop": "Fuaim: deasc",
+    "soundApp": "Fuaim: {{app}}",
+    "noSound": "Gan fuaim",
+    "tipDesktop": "An scáileán iomlán: fuaim an deisce gan Mumcord.",
+    "tipApp": "Fuinneog amháin: fuaim na haipe sin amháin.",
+    "tipOff": "Tá lasc na fuaime múchta.",
+    "tipNone": "Roghnaíodh “Gan fuaim” don fhuinneog seo.",
+    "tipOldWindows": "Gan fuaim: teastaíonn Windows 10 leagan 2004 nó níos nuaí",
+    "tipOldMacos": "Gan fuaim: teastaíonn macOS 13 nó níos nuaí",
+    "tipNoPipeWire": "Gan fuaim: teastaíonn PipeWire",
+    "tipCaptureFailed": "Theip ar thaifeadadh na fuaime. Leanann comhroinnt an fhíseáin ar aghaidh."
   },
   "qualityMenu": {
     "title": "Cáilíocht",

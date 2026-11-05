@@ -123,6 +123,28 @@
       "texts": ["licenses/dav1d.txt"]
     },
     {
+      "name": "MediaPipe Selfie Segmenter",
+      "version": "2023 (ONNX conversion by onnx-community)",
+      "license": "Apache-2.0",
+      "repository": "https://github.com/google-ai-edge/mediapipe",
+      "description": [
+        "The person segmentation models behind the camera background effects (crates/effects),",
+        "embedded into every Mumcord build."
+      ],
+      "texts": ["licenses/mediapipe-selfie-segmenter.txt", "licenses/apache-2.0.txt"]
+    },
+    {
+      "name": "ONNX Runtime",
+      "version": "1.23.2",
+      "license": "MIT",
+      "repository": "https://github.com/microsoft/onnxruntime",
+      "description": [
+        "Runs the segmentation models for the camera background effects. The official CPU",
+        "build is shipped next to Mumcord and loaded at run time."
+      ],
+      "texts": ["licenses/onnxruntime.txt", "licenses/onnxruntime-third-party.txt"]
+    },
+    {
       "name": "SQLite",
       "version": "@sqlite",
       "license": "blessing",

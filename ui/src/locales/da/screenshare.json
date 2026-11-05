@@ -111,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relæ",
-    "pathDirect": "Direkte"
+    "pathDirect": "Direkte",
+    "soundDesktop": "Lyd: skrivebord",
+    "soundApp": "Lyd: {{app}}",
+    "noSound": "Ingen lyd",
+    "tipDesktop": "Hele skærmen: skrivebordets lyd uden Mumcord.",
+    "tipApp": "Ét vindue: kun denne apps lyd.",
+    "tipOff": "Lydkontakten er slået fra.",
+    "tipNone": "„Ingen lyd“ blev valgt til dette vindue.",
+    "tipOldWindows": "Ingen lyd: kræver Windows 10 version 2004 eller nyere",
+    "tipOldMacos": "Ingen lyd: kræver macOS 13 eller nyere",
+    "tipNoPipeWire": "Ingen lyd: kræver PipeWire",
+    "tipCaptureFailed": "Lydoptagelsen mislykkedes. Videodelingen fortsætter."
   },
   "qualityMenu": {
     "title": "Kvalitet",

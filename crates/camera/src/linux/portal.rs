@@ -33,8 +33,9 @@ use pw::spa::pod::{
 use pw::spa::utils::{Choice, ChoiceEnum, Fraction, Id, Rectangle, SpaTypes};
 use pw::stream::{StreamFlags, StreamState};
 
-use super::mode::{self, Geometry, Mode, PixelFormat, Rate};
-use super::pump::{Pump, Raw};
+use super::ranges;
+use crate::mode::{self, Geometry, Mode, PixelFormat, Rate};
+use crate::pump::{Pump, Raw};
 use crate::{
     CameraDevice, CameraError, CaptureRequest, CaptureSession, DeviceId, FrameSink, HotplugCallback,
 };
@@ -903,7 +904,7 @@ impl ChoiceOf<Fraction> for ChoiceValue {
 
 fn sizes(value: Option<&Value>) -> Vec<(u32, u32)> {
     let range = |min: &Rectangle, max: &Rectangle, step: (u32, u32)| {
-        mode::sizes_in_range((min.width, min.height), (max.width, max.height), step).collect()
+        ranges::sizes_in_range((min.width, min.height), (max.width, max.height), step).collect()
     };
     if let Some(Value::Choice(choice)) = value {
         match ChoiceOf::<Rectangle>::choice(choice) {
@@ -932,7 +933,7 @@ fn rates(value: Option<&Value>) -> Vec<Rate> {
         && let Some(ChoiceEnum::Range { min, max, .. } | ChoiceEnum::Step { min, max, .. }) =
             ChoiceOf::<Fraction>::choice(choice)
     {
-        return vec![mode::rate_in_range(rate(min), rate(max), crate::MAX_FPS)];
+        return vec![ranges::rate_in_range(rate(min), rate(max), crate::MAX_FPS)];
     }
     choices(value, |v| match v {
         Value::Fraction(f) => Some(*f),

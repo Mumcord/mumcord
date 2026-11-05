@@ -115,7 +115,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Přímo"
+    "pathDirect": "Přímo",
+    "soundDesktop": "Zvuk: plocha",
+    "soundApp": "Zvuk: {{app}}",
+    "noSound": "Bez zvuku",
+    "tipDesktop": "Celá obrazovka: zvuk plochy bez Mumcordu.",
+    "tipApp": "Jedno okno: pouze zvuk této aplikace.",
+    "tipOff": "Přepínač zvuku je vypnutý.",
+    "tipNone": "Pro toto okno bylo zvoleno „Bez zvuku“.",
+    "tipOldWindows": "Bez zvuku: vyžaduje Windows 10 verze 2004 nebo novější",
+    "tipOldMacos": "Bez zvuku: vyžaduje macOS 13 nebo novější",
+    "tipNoPipeWire": "Bez zvuku: vyžaduje PipeWire",
+    "tipCaptureFailed": "Zachytávání zvuku selhalo. Sdílení videa pokračuje."
   },
   "qualityMenu": {
     "title": "Kvalita",

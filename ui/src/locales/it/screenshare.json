@@ -113,7 +113,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Diretto"
+    "pathDirect": "Diretto",
+    "soundDesktop": "Audio: desktop",
+    "soundApp": "Audio: {{app}}",
+    "noSound": "Nessun audio",
+    "tipDesktop": "Schermo intero: l'audio del desktop senza Mumcord.",
+    "tipApp": "Una finestra: solo l'audio di quell'app.",
+    "tipOff": "L'interruttore dell'audio è disattivato.",
+    "tipNone": "Per questa finestra è stato scelto «Nessun audio».",
+    "tipOldWindows": "Nessun audio: richiede Windows 10 versione 2004 o successiva",
+    "tipOldMacos": "Nessun audio: richiede macOS 13 o successivo",
+    "tipNoPipeWire": "Nessun audio: richiede PipeWire",
+    "tipCaptureFailed": "Acquisizione audio non riuscita. La condivisione video continua."
   },
   "qualityMenu": {
     "title": "Qualità",

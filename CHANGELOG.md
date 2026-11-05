@@ -5,6 +5,8 @@
 ### Added
 
 - The Sound switch in the screen share dialog and in Settings → Screen sharing is now shown on every system, with a line saying what is shared (whole screen: desktop sound without Mumcord; one window: only that app's sound). Where sound cannot be shared, the switch is off and disabled with a note: "No sound: needs Windows 10 version 2004 or newer", "…macOS 13 or newer" or "…PipeWire" (#435)
+- The live bar of your screen share says what its sound carries ("Sound: desktop", "Sound: Firefox") or "No sound" with the reason in a tooltip that screen readers read as well (#435)
+- Screen sharing can include sound: sharing a whole screen shares all sound except Mumcord's own, sharing a window shares that app's sound. Works on Windows 10 (2004+), macOS 13+ and Linux with PipeWire; where it is unclear which app you mean (always on Wayland), Mumcord asks "Which app's sound?". There is no sound without PipeWire or on older systems.
 - Bots are shown apart from people (#458): a new "Bots on this server" section below the channel tree lists every bot with what it does (e.g. Relay · Chat history · Webhooks), and its profile and menu, private messages included, work from there. Bots that never talk, like the relay, no longer appear in the channel tree, the member list, @mention suggestions or people pickers; bots with voice, like a music bot, stay in their channel. Bots carry a BOT badge instead of the Mumcord badge
 - Settings → Screen sharing has an "Ask for these settings each time I share" switch and shows whether this computer plays AV1 and VP9 with hardware or software
 - Kick… and Ban… in the Admin ▸ sub-menu of a person (issue #253): the kick dialog asks with the reason, the ban dialog with the reason, the length (1 hour, 1 day, 7 days, 30 days, permanent, a custom date), the targets (certificate and IP address with its mask, the address stays because a standard server matches it) and "Remove from server now". A precise ban adds one entry to the server's ban list with the safe save and then removes the person; a server that will not show its list only allows its own default length, and the dialog says so. The items show only with the Kick or Ban right on the root channel, never for yourself, and a refusal appears inside the open dialog.
@@ -34,9 +36,10 @@
 
 ### Fixed
 
+- The download confirmation no longer lets you press Download before it shows the folder the file will be saved to
 - Joining a screen share no longer picks up the relay access meant for another broadcast of the same person (such as a camera or plugin data), so watching works while they share several things at once
 - If you are not registered on a server whose relay only serves registered users, file sharing and other relay features now say "This server's relay is only available to registered users. Register on this server to use it." instead of claiming the relay could not be reached (#406)
-- Switches stay visible in high-contrast (forced-colours) mode: the knob and track are drawn in system colours, and on and off differ by shape as well as colour
+- Switches stay visible in high-contrast (forced-colours) mode: the knob and track are drawn in system colours, and on and off differ by shape as well as col
 - Screen sharing now speaks your language: the share dialog, the live bar with its quality menu, the viewer list, the stream viewer, the encoder and relay notices and the media area resize hints were still shown in English in all languages other than English.
 - Starting a watch party or adding a video from the Apps menu no longer reloads the app when you confirm the link
 - A mumbot shows as "Mumbot <version>" in the profile preview and the connection details instead of "Mumcord <version>", from what it announces about itself; older mumbots get the same label from their name and version (#459)

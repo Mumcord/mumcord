@@ -111,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · hardware",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Relay",
-    "pathDirect": "Direct"
+    "pathDirect": "Direct",
+    "soundDesktop": "Geluid: bureaublad",
+    "soundApp": "Geluid: {{app}}",
+    "noSound": "Geen geluid",
+    "tipDesktop": "Heel scherm: geluid van het bureaublad zonder Mumcord.",
+    "tipApp": "Eén venster: alleen het geluid van die app.",
+    "tipOff": "De geluidsschakelaar staat uit.",
+    "tipNone": "Voor dit venster is “Geen geluid” gekozen.",
+    "tipOldWindows": "Geen geluid: vereist Windows 10 versie 2004 of nieuwer",
+    "tipOldMacos": "Geen geluid: vereist macOS 13 of nieuwer",
+    "tipNoPipeWire": "Geen geluid: vereist PipeWire",
+    "tipCaptureFailed": "Geluidsopname mislukt. Het delen van beeld gaat door."
   },
   "qualityMenu": {
     "title": "Kwaliteit",

@@ -111,7 +111,18 @@
     "codecBadgeHardware": "{{codec}} · riistvara",
     "codecBadgeSoftware": "{{codec}}",
     "pathRelay": "Releeserver",
-    "pathDirect": "Otse"
+    "pathDirect": "Otse",
+    "soundDesktop": "Heli: töölaud",
+    "soundApp": "Heli: {{app}}",
+    "noSound": "Heli puudub",
+    "tipDesktop": "Terve ekraan: töölaua heli ilma Mumcordita.",
+    "tipApp": "Üks aken: ainult selle rakenduse heli.",
+    "tipOff": "Heli lüliti on väljas.",
+    "tipNone": "Selle akna jaoks valiti „Helita“.",
+    "tipOldWindows": "Heli puudub: vajab Windows 10 versiooni 2004 või uuemat",
+    "tipOldMacos": "Heli puudub: vajab macOS 13 või uuemat",
+    "tipNoPipeWire": "Heli puudub: vajab PipeWire’i",
+    "tipCaptureFailed": "Heli jäädvustamine ebaõnnestus. Video jagamine jätkub."
   },
   "qualityMenu": {
     "title": "Kvaliteet",
