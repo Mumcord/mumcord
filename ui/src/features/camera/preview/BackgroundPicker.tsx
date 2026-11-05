@@ -4,7 +4,10 @@ import { useTranslation } from "react-i18next";
 import type { CameraBackground, CameraBackgroundLibrary } from "../../../api";
 import { BlurIcon, CheckIcon, ImageIcon, LockIcon, NoneIcon, UploadIcon } from "./previewIcons";
 import {
+  BLUR_LIGHT,
+  BLUR_STRONG,
   BUILTIN_BACKGROUNDS,
+  isStrongBlur,
   backgroundForMode,
   backgroundMode,
   sameBackground,
@@ -81,30 +84,34 @@ export function BackgroundPicker(props: BackgroundPickerProps) {
   );
 }
 
+/** Light / Strong as two buttons (mockup 03); each maps to a fixed engine strength. */
 function BlurStrength({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   const { t } = useTranslation("camera");
   const id = useId();
+  const strong = isStrongBlur(value);
+  const choices = [
+    { strength: BLUR_LIGHT, pressed: !strong, key: "preview.blurLight" },
+    { strength: BLUR_STRONG, pressed: strong, key: "preview.blurStrong" },
+  ];
   return (
     <div className="cam-field">
-      <label className="cam-field__label" htmlFor={id}>
+      <span className="cam-field__label" id={id}>
         {t("preview.blurStrength")}
-      </label>
-      <input
-        id={id}
-        className="cam-strength"
-        type="range"
-        min={0}
-        max={100}
-        step={1}
-        value={value}
-        aria-valuetext={t("preview.blurStrengthValue", { value })}
-        onChange={(event) => {
-          onChange(Number(event.target.value));
-        }}
-      />
-      <span className="cam-strength__ends" aria-hidden="true">
-        <span>{t("preview.blurLight")}</span>
-        <span>{t("preview.blurStrong")}</span>
+      </span>
+      <span className="cam-seg" role="group" aria-labelledby={id}>
+        {choices.map((choice) => (
+          <button
+            key={choice.key}
+            type="button"
+            className="cam-seg__button"
+            aria-pressed={choice.pressed}
+            onClick={() => {
+              onChange(choice.strength);
+            }}
+          >
+            {t(choice.key)}
+          </button>
+        ))}
       </span>
     </div>
   );

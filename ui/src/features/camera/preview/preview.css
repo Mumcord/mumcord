@@ -145,16 +145,38 @@
   outline-offset: 2px;
 }
 
-.cam-strength {
-  width: 100%;
-  accent-color: var(--color-accent);
+.cam-seg {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-chat);
 }
 
-.cam-strength__ends {
-  display: flex;
-  justify-content: space-between;
+.cam-seg__button {
+  min-width: 4rem;
+  height: 2rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.cam-seg__button[aria-pressed="true"] {
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.cam-seg__button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .bg-images {

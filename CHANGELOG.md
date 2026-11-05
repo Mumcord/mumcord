@@ -4,7 +4,7 @@
 
 ### Added
 
-- Turning your camera on starts with a preview that nobody else sees: pick the camera, a background (None, Blur with a strength slider, or one of six built-in images or your own), see the effect load, and choose whether to keep the background for next time. Turn on camera waits until the camera is live and shows the reason if it can't start; Cancel or Esc turns the camera off again.
+- Turning your camera on starts with a preview that nobody else sees: pick the camera, a background (None, Blur, Light or Strong, or one of six built-in images or your own), see the effect load, and choose whether to keep the background for next time. Turn on camera waits until the camera is live and shows the reason if it can't start; Cancel or Esc turns the camera off again.
 - New documents for plugin authors and users: the API 1.1 author guide, how the plugin security score is calculated (and what it cannot tell you), and the updated registry format. The privacy policy now covers plugin websites, relay plugin data and plugin sounds.
 - The plugin update review shows a "What's new in <version>" link when the plugin author gave release notes for that version; it opens in your browser.
 - The Apps menu now shows icons for "Share your screen" and "Watch together", and plugins without an icon get a coloured tile of their own, also in the side panel, dialogs, the media area, plugin details and the relay data card
