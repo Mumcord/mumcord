@@ -1531,12 +1531,18 @@ mod tests {
         let ca_key = rcgen::KeyPair::generate().expect("key");
         let mut ca_params = rcgen::CertificateParams::new(Vec::<String>::new()).expect("params");
         ca_params.is_ca = rcgen::IsCa::Ca(rcgen::BasicConstraints::Unconstrained);
+        // rcgen gives every certificate the same default subject; Windows then takes the leaf
+        // for a self-issued root and never builds the chain to the CA.
+        ca_params
+            .distinguished_name
+            .push(rcgen::DnType::CommonName, "Mumcord test CA");
         let ca = rcgen::CertifiedIssuer::self_signed(ca_params, ca_key).expect("ca");
         let leaf_key = rcgen::KeyPair::generate().expect("key");
-        let leaf = rcgen::CertificateParams::new(vec![name.to_owned()])
-            .expect("params")
-            .signed_by(&leaf_key, &ca)
-            .expect("leaf");
+        let mut leaf_params = rcgen::CertificateParams::new(vec![name.to_owned()]).expect("params");
+        leaf_params
+            .distinguished_name
+            .push(rcgen::DnType::CommonName, name);
+        let leaf = leaf_params.signed_by(&leaf_key, &ca).expect("leaf");
         let mut ca_file = tempfile::NamedTempFile::new().expect("temp file");
         ca_file.write_all(ca.pem().as_bytes()).expect("write ca");
 
