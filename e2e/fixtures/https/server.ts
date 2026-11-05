@@ -5,6 +5,7 @@
 import { createHash } from "node:crypto";
 import { createServer, type Server } from "node:https";
 import { createSocket, type Socket } from "node:dgram";
+import type { TLSSocket } from "node:tls";
 import { readFileSync } from "node:fs";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -33,7 +34,25 @@ export interface HttpsFixture {
   caFile: string;
   /** UDP port of the STUN listener on 127.0.0.1. */
   stunPort: number;
+  /**
+   * Everything that reached the fixture since the start or the last `clearLog()`, oldest first:
+   * TLS connections by the name they asked for (SNI; also failed handshakes, which a client that
+   * does not trust the CA still opens), HTTP requests, and STUN binding requests. A frame probe
+   * that leaks shows up here even when the page cannot tell (spec 09 §13.1: "leaks" means a
+   * connection reached the collector).
+   */
+  log(): FixtureHit[];
+  clearLog(): void;
   stop(): Promise<void>;
+}
+
+/** One thing that reached the fixture. */
+export interface FixtureHit {
+  kind: "tls" | "http" | "stun";
+  /** The host name asked for (SNI or Host header); empty when the client sent none. */
+  host: string;
+  /** The request path for `http`, else empty. */
+  path: string;
 }
 
 async function makeCertificates(dir: string): Promise<{ key: Buffer; cert: Buffer; ca: string }> {
@@ -65,6 +84,12 @@ async function makeCertificates(dir: string): Promise<{ key: Buffer; cert: Buffe
   };
 }
 
+/** The SNI name of a TLS connection; `servername` is `false` when the client sent none. */
+function sniName(socket: TLSSocket): string {
+  const name = (socket as TLSSocket & { servername?: string | false }).servername;
+  return typeof name === "string" ? name : "";
+}
+
 /** Echoes unmasked text frames back; enough for a plugin to see a working socket. */
 function echoWebSocket(server: Server): void {
   server.on("upgrade", (request, socket) => {
@@ -94,10 +119,11 @@ function echoWebSocket(server: Server): void {
 }
 
 /** Answers every STUN binding request with 127.0.0.1:<client port> as XOR-MAPPED-ADDRESS. */
-function startStun(): Promise<Socket> {
+function startStun(onRequest: () => void): Promise<Socket> {
   const socket = createSocket("udp4");
   socket.on("message", (message, remote) => {
     if (message.length < 20 || message.readUInt16BE(0) !== 0x0001) return;
+    onRequest();
     const attribute = Buffer.alloc(12);
     attribute.writeUInt16BE(0x0020, 0);
     attribute.writeUInt16BE(8, 2);
@@ -126,8 +152,10 @@ function startStun(): Promise<Socket> {
 export async function startHttpsFixture(): Promise<HttpsFixture> {
   const dir = mkdtempSync(join(tmpdir(), "mumcord-https-"));
   const { key, cert, ca } = await makeCertificates(dir);
+  const hits: FixtureHit[] = [];
   const server = createServer({ key, cert }, (request, response) => {
     const host = (request.headers.host ?? "").split(":")[0] ?? "";
+    hits.push({ kind: "http", host, path: request.url ?? "" });
     if (request.url === "/redirect") {
       const other = host === DECLARED_HOST ? UNDECLARED_HOST : DECLARED_HOST;
       response.writeHead(302, { location: `https://${other}:${String(HTTPS_PORT)}/` });
@@ -137,18 +165,28 @@ export async function startHttpsFixture(): Promise<HttpsFixture> {
     response.writeHead(200, { "content-type": "text/plain" });
     response.end(`ok ${host}`);
   });
+  server.on("secureConnection", (socket: TLSSocket) => {
+    hits.push({ kind: "tls", host: sniName(socket), path: "" });
+  });
+  server.on("tlsClientError", (_error, socket: TLSSocket) => {
+    hits.push({ kind: "tls", host: sniName(socket), path: "" });
+  });
   echoWebSocket(server);
   await new Promise<void>((resolvePromise, reject) => {
     server.once("error", reject);
     server.listen(HTTPS_PORT, "127.0.0.1", resolvePromise);
   });
-  const stun = await startStun();
+  const stun = await startStun(() => hits.push({ kind: "stun", host: "", path: "" }));
   return {
     declaredOrigin: `https://${DECLARED_HOST}:${String(HTTPS_PORT)}`,
     undeclaredOrigin: `https://${UNDECLARED_HOST}:${String(HTTPS_PORT)}`,
     updateOrigin: `https://${UPDATE_HOST}:${String(HTTPS_PORT)}`,
     caFile: ca,
     stunPort: stun.address().port,
+    log: () => [...hits],
+    clearLog() {
+      hits.length = 0;
+    },
     stop() {
       stun.close();
       server.closeAllConnections();
