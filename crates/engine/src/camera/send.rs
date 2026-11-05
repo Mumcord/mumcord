@@ -168,10 +168,12 @@ pub(crate) struct Stages {
 pub enum SendEnded {
     /// The camera was unplugged or vanished (FR-8.21 "device lost").
     DeviceGone,
-    /// The camera sent unreadable pictures, or the backend failed.
+    /// The backend failed.
     CameraFailed,
     /// No encoder could be opened.
     EncoderFailed,
+    /// More than 30 frames in a row could not be decoded (FR-8.26).
+    Unreadable,
 }
 
 impl SendEnded {
@@ -180,6 +182,7 @@ impl SendEnded {
             Self::DeviceGone => 1,
             Self::CameraFailed => 2,
             Self::EncoderFailed => 3,
+            Self::Unreadable => 4,
         }
     }
 
@@ -188,6 +191,7 @@ impl SendEnded {
             1 => Some(Self::DeviceGone),
             2 => Some(Self::CameraFailed),
             3 => Some(Self::EncoderFailed),
+            4 => Some(Self::Unreadable),
             _ => None,
         }
     }
@@ -272,7 +276,8 @@ impl FrameSink for QueueSink {
     fn ended(&mut self, reason: CameraError) {
         self.control.end(match reason {
             CameraError::DeviceGone | CameraError::NoCamera => SendEnded::DeviceGone,
-            _ => SendEnded::CameraFailed,
+            CameraError::Unreadable => SendEnded::Unreadable,
+            CameraError::PermissionDenied | CameraError::Backend(_) => SendEnded::CameraFailed,
         });
     }
 }
