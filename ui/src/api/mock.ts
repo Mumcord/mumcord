@@ -3924,6 +3924,18 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve({ unavailable: null, level: null, load: null, tooBusy: false }),
     cameraPreviewAttach: () => Promise.resolve(),
     cameraPreviewDetach: () => Promise.resolve(),
+    // Nobody else has a camera in the browser mock: the room stays empty.
+    cameraRoom: (serverId) =>
+      Promise.resolve({ serverId, open: false, videosHidden: false, tiles: [] }),
+    cameraRoomSetOpen: () => Promise.resolve(),
+    cameraRoomSetVideosHidden: () => Promise.resolve(),
+    cameraTileSetHidden: () => Promise.resolve(),
+    cameraTileSetQuality: () => Promise.resolve(),
+    cameraTileSetHeight: () => Promise.resolve(),
+    cameraRequestKeyframe: () => Promise.resolve(),
+    cameraFramesAttach: () => Promise.resolve(),
+    cameraFramesDetach: () => Promise.resolve(),
+    cameraSetDecodeCodecs: () => Promise.resolve(),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
