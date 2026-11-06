@@ -294,6 +294,24 @@ export async function pickImage(name: string): Promise<void> {
   });
 }
 
+/** Waits until every built-in background tile shows its decoded thumbnail. */
+export async function waitBuiltinThumbnails(count: number): Promise<void> {
+  await browser.waitUntil(
+    async () =>
+      browser.execute(
+        (expected) =>
+          [
+            ...document.querySelectorAll<HTMLImageElement>("dialog.cam-dialog .bg-thumb img"),
+          ].filter((img) => img.complete && img.naturalWidth > 0).length >= expected,
+        count,
+      ),
+    {
+      timeout: 3_000,
+      timeoutMsg: `the ${String(count)} background thumbnails did not show within 3 s`,
+    },
+  );
+}
+
 /** The "Background effects are not available …" line of the open preview, `null` without one. */
 export async function effectsUnavailable(): Promise<string | null> {
   // Matches the load line itself; `normalize-space()` on `*` would also match its ancestors.
