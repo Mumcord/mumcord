@@ -149,21 +149,22 @@ export async function waitResults(
   await openPanel();
   let results: Record<string, string> = {};
   let lines: string[] = [];
-  await browser.waitUntil(
-    async () => {
-      results = {};
-      lines = await panelLines();
-      for (const line of lines) {
-        const match = /^([a-z-]+)\/([a-z-]+): ([a-z-]+)$/.exec(line.trim());
-        if (match?.[1] === place) results[match[2]] = match[3];
-      }
-      return probes.every((p) => p in results && results[p] !== "running");
-    },
-    {
-      timeout,
-      interval: 500,
-      timeoutMsg: `${place} did not report every probe: ${JSON.stringify(results)}; the panel shows:\n${lines.join("\n")}`,
-    },
-  );
+  const done = async () => {
+    results = {};
+    lines = await panelLines();
+    for (const line of lines) {
+      const match = /^([a-z-]+)\/([a-z-]+): ([a-z-]+)$/.exec(line.trim());
+      if (match?.[1] === place) results[match[2]] = match[3];
+    }
+    return probes.every((p) => p in results && results[p] !== "running");
+  };
+  try {
+    await browser.waitUntil(done, { timeout, interval: 500 });
+  } catch {
+    // Built here, not as `timeoutMsg`, which wdio reads before the first try.
+    throw new Error(
+      `${place} did not report every probe: ${JSON.stringify(results)}; the panel shows:\n${lines.join("\n")}`,
+    );
+  }
   return results;
 }

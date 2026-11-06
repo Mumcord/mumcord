@@ -10,7 +10,9 @@ patterned body, built with the SDK's `bovnar` helpers) through `relay`.
   or 900 B (fallback on) to the last peer that announced this plugin. That peer comes from `peer-ready`, which needs
   `peers.messages` (spec 06 F45), so the manifest requires it next to the optional `peers.relay`.
   When that peer leaves the channel (`left`, which needs `events.presence`) the panel shows
-  `Peer: none` and logs `gone: <name>`, so a spec knows nobody can receive until the next `peer-ready`. "Channel malformed bytes"
+  `Peer: none` and logs `gone: <name>`, so a spec knows nobody can receive until the next `peer-ready`.
+  The panel line is `Peer: <name> (<n>)`, `<n>` counting the `peer-ready` events, so a spec can wait
+  for a new one after a reconnect (the old peer stays shown until then). "Channel malformed bytes"
   sends 300 raw bytes that are no Bovnar document (AC-9.42): the receiver's SDK drops them and
   logs the reason and size, the host delivers them unchanged. "Channel oversized document" sends a
   document above the relay limit, which the SDK refuses with `too-large` before anything leaves

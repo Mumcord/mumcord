@@ -38,6 +38,25 @@ export function rateLimiter(now: () => number = () => performance.now()): () => 
   };
 }
 
+/**
+ * Wraps `send` so each call starts only after the previous one settled. Every backend call may run
+ * on its own thread, so two messages sent at once could reach the plugin in either order (a probe's
+ * "running" after its result); one frame's messages must arrive in the order the page sent them.
+ */
+export function inOrder<T>(send: (value: T) => Promise<unknown>): (value: T) => void {
+  const waiting: T[] = [];
+  let busy = false;
+  const next = () => {
+    busy = waiting.length > 0;
+    if (!busy) return;
+    send(waiting.shift() as T).then(next, next);
+  };
+  return (value) => {
+    waiting.push(value);
+    if (!busy) next();
+  };
+}
+
 /** Whether `data` is a bridge message the plugin may get. */
 export function fitsBridge(data: unknown): data is string {
   return typeof data === "string" && encoder.encode(data).length <= MAX_MESSAGE_BYTES;

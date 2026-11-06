@@ -1793,6 +1793,40 @@ fn a_peer_newly_announcing_a_plugin_makes_it_ready_once() {
 }
 
 #[test]
+fn an_announce_before_the_focus_or_the_join_still_makes_the_peer_ready() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    let poll = service
+        .load_dev(&ready_folder(fx.root.path(), "poll"))
+        .expect("loads");
+    let wait = std::time::Duration::from_millis(300);
+    let runs_poll = br#"{"v":1,"p":["poll@1~dev"]}"#;
+
+    // After a reconnect Bob's announce can arrive before he shows up in the channel, and both
+    // before the server is the voice server again: Poll hears he is ready once it can reach him.
+    service.peer_data(1, &bob(), "mumcord.plugins", runs_poll);
+    service.peer_joined(1, bob());
+    assert!(echoed(&mut service, &mut host_events, &mut events, wait).is_empty());
+    service.set_focused_server(Some(1));
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll.clone(), b"Bob".to_vec())]
+    );
+
+    // Leaving and joining again with the announce already known: ready again on the join.
+    service.peer_left(1, &bob());
+    service.peer_joined(1, bob());
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll, b"Bob".to_vec())]
+    );
+}
+
+#[test]
 fn installing_a_plugin_announces_at_once_despite_the_interval() {
     let fx = Fixture::new();
     fx.set_developer_mode(true);
