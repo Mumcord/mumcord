@@ -41,7 +41,7 @@ describe("crash reports (#568, #573)", () => {
       target: { value: "watching a VP9 share" },
     });
     await waitFor(() => {
-      expect((screen.getByLabelText("Report text") as HTMLTextAreaElement).value).toContain(
+      expect(screen.getByLabelText<HTMLTextAreaElement>("Report text").value).toContain(
         "comment:\nwatching a VP9 share",
       );
     });
