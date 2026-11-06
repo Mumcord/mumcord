@@ -21,9 +21,8 @@ import { join } from "node:path";
 import { browser, $, expect } from "@wdio/globals";
 import { app, apps, relayenv, repoRoot } from "../../helpers/index.ts";
 import * as camera from "../../helpers/camera.ts";
-import { reconnectSaved } from "../../helpers/chat-ui.ts";
 import { pickInFileDialog } from "../../helpers/files-ui.ts";
-import { personRow } from "../../helpers/voice-ui.ts";
+import { personRow, reconnect } from "../../helpers/voice-ui.ts";
 
 const BUILTIN = "Warm light waves";
 const OWN_NAME = "secret-holiday.jpg";
@@ -151,7 +150,8 @@ function distanceTo(regions: Regions, colour: camera.Rgb): number {
 
   it("AC-8.5: with the real model the preview's background still changes", async () => {
     await app.restart({ env: camera.CAMERA_ENV });
-    await reconnectSaved();
+    // The relay server's root channel is not "Lobby": reconnect without naming a channel.
+    await reconnect();
     await camera.joinVoice();
     await camera.expectCameraBlock(null, 90_000);
     await camera.openPreview();
