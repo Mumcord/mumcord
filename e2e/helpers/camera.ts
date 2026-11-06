@@ -502,11 +502,17 @@ export async function sampleRegions(
 export async function waitBackgroundChanged(
   selector: string,
   baseline: { person: Rgb[]; background: Rgb[] },
-  opts: { minBackground?: number; maxPerson?: number; timeout?: number } = {},
+  opts: {
+    minBackground?: number;
+    maxPerson?: number;
+    timeout?: number;
+    /** The background must also come within `max` of this solid colour (an image fixture). */
+    near?: { colour: Rgb; max: number };
+  } = {},
 ): Promise<{ person: Rgb[]; background: Rgb[] }> {
-  const { minBackground = 12, maxPerson = 25, timeout = 20_000 } = opts;
+  const { minBackground = 12, maxPerson = 25, timeout = 20_000, near } = opts;
   let last = baseline;
-  let diffs = { background: 0, person: 0 };
+  let diffs = { background: 0, person: 0, near: 0 };
   try {
     await browser.waitUntil(
       async () => {
@@ -514,14 +520,24 @@ export async function waitBackgroundChanged(
         diffs = {
           background: meanDiff(last.background, baseline.background),
           person: meanDiff(last.person, baseline.person),
+          near: near
+            ? meanDiff(
+                last.background,
+                last.background.map(() => near.colour),
+              )
+            : 0,
         };
-        return diffs.background > minBackground && diffs.person <= maxPerson;
+        return (
+          diffs.background > minBackground &&
+          diffs.person <= maxPerson &&
+          (near === undefined || diffs.near < near.max)
+        );
       },
       { timeout, interval: 500 },
     );
   } catch {
     throw new Error(
-      `${selector}: background diff ${diffs.background.toFixed(1)} (want > ${String(minBackground)}), person diff ${diffs.person.toFixed(1)} (want ≤ ${String(maxPerson)})`,
+      `${selector}: background diff ${diffs.background.toFixed(1)} (want > ${String(minBackground)}), person diff ${diffs.person.toFixed(1)} (want ≤ ${String(maxPerson)})${near ? `, distance to the image colour ${diffs.near.toFixed(1)} (want < ${String(near.max)})` : ""}`,
     );
   }
   return last;
