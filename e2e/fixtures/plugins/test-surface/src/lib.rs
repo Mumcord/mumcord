@@ -16,7 +16,7 @@ use mumcord_plugin_sdk::http::{Body, HttpRequest, Method};
 use mumcord_plugin_sdk::types::{Error, StartInfo};
 use mumcord_plugin_sdk::ui::{self, Slot};
 use mumcord_plugin_sdk::webview::{self, Place};
-use mumcord_plugin_sdk::{Plugin, app_menu, audio, http, log, stage};
+use mumcord_plugin_sdk::{Plugin, app_menu, audio, http, log, stage, timers};
 
 use bridge::PageMessage;
 
@@ -25,6 +25,8 @@ const DECLARED: &str = "https://declared.plugins.test:47443";
 const UNDECLARED: &str = "https://undeclared.plugins.test:47443";
 const SOUND: &str = "sounds/beep.wav";
 const MAX_LOG: usize = 12;
+/// The host draws at most 20 panel updates per second; a refused redraw is retried after this.
+const REDRAW_RETRY_MS: u32 = 300;
 
 #[derive(Default)]
 struct State {
@@ -33,6 +35,8 @@ struct State {
     /// Pending `net.http` requests and the panel action that sent them.
     requests: HashMap<u32, String>,
     log: VecDeque<String>,
+    /// The timer that redraws the panel after the host refused an update.
+    redraw_timer: Option<u32>,
 }
 
 thread_local! {
@@ -115,8 +119,20 @@ fn panel() -> ui::El {
 }
 
 fn redraw() {
-    if let Err(e) = ui::show(Slot::Panel, panel()) {
-        log::warn(&format!("could not draw the panel: {e:?}"));
+    match ui::show(Slot::Panel, panel()) {
+        Ok(()) => {}
+        // A burst of page messages (a probe run) easily passes the limit; without a later redraw
+        // the panel would keep showing a stale "running" for the last probe.
+        Err(Error::RateLimited) => {
+            if STATE.with_borrow(|s| s.redraw_timer.is_some()) {
+                return;
+            }
+            match timers::start(REDRAW_RETRY_MS, false) {
+                Ok(id) => STATE.with_borrow_mut(|s| s.redraw_timer = Some(id)),
+                Err(e) => log::warn(&format!("could not schedule a panel redraw: {e:?}")),
+            }
+        }
+        Err(e) => log::warn(&format!("could not draw the panel: {e:?}")),
     }
 }
 
@@ -153,7 +169,10 @@ fn act(action: &str) {
         "open-fourth" => {
             outcome("open-dialog-tree", ui::open_dialog(TITLE));
             outcome("open-dialog", webview::show(Place::Dialog, "dialog.html"));
-            outcome("open-popover", webview::show(Place::PanelPopover, "panel.html"));
+            outcome(
+                "open-popover",
+                webview::show(Place::PanelPopover, "panel.html"),
+            );
         }
         "close-web" => {
             webview::hide();
@@ -233,6 +252,14 @@ impl Plugin for TestSurface {
             }
             Event::DialogClosed => note("closed: dialog-tree".to_owned()),
             Event::StageActivityEnded(_) => note("stage: ended".to_owned()),
+            Event::Timer(id) => {
+                if STATE
+                    .with_borrow_mut(|s| s.redraw_timer.take_if(|t| *t == id))
+                    .is_none()
+                {
+                    return;
+                }
+            }
             _ => return,
         }
         redraw();
