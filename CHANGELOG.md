@@ -81,6 +81,7 @@
 
 ### Fixed
 
+- The camera room now follows Settings → Camera: "Mirror my self-view" and "Reduce motion" (System, On or Off) take effect in the room and the strip; before, the self-view was always mirrored and the app's Reduce motion switch did nothing
 - When a screen share you watch ends, its empty picture no longer stays behind: the media area goes back to what else is open, and cameras shown as a strip next to it return to the camera room grid
 - When your camera stops by itself (the relay can't be reached, the camera is unplugged or taken by another app, or the server's relay ends it), Mumcord now says why: "Camera stopped: …" shows in the camera room bar, or below the camera bar above the chat when the room is closed, and screen readers read it. Dismiss hides it; turning the camera on again clears it
 - Security: a plugin can no longer open its web dialog on its own. Like the side panel, it now opens only within 8 seconds after you click or type something for that plugin, and only once per click; a new page in a dialog that is already open still works

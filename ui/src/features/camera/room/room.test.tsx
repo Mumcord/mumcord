@@ -14,6 +14,7 @@ import { CameraRoom } from "./CameraRoom";
 import { CameraRoomSync } from "./CameraRoomSync";
 import { resetRoomChoices } from "./roomChoices";
 import { resetCameraRoomStore } from "./roomStore";
+import { resetCameraLook, setCameraLookSettings } from "./useCameraLook";
 
 // jsdom has no Tauri runtime; the frame channels only need an id.
 vi.mock("@tauri-apps/api/core", () => {
@@ -69,6 +70,7 @@ describe("camera room", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    resetCameraLook();
     resetCameraRoomStore();
     resetAll();
   });
@@ -97,6 +99,21 @@ describe("camera room", () => {
     expect(room).toHaveTextContent("Ben is here without a camera");
     expect(screen.getByRole("radio", { name: "Grid" })).toBeChecked();
     expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("follows the Mirror and Reduce motion settings", async () => {
+    onAir(api);
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    const { container } = render(<CameraRoom serverId={1} onTurnOn={null} />);
+    await screen.findByRole("group", { name: "You, camera on, live" });
+    const room = screen.getByRole("region", { name: "Camera room, 2 cameras on" });
+    expect(room).not.toHaveAttribute("data-reduce-motion");
+    expect(container.querySelector(".cam-video[data-mirror]")).not.toBeNull();
+    act(() => {
+      setCameraLookSettings({ cameraMirrorSelf: false, cameraReduceMotion: "on" });
+    });
+    expect(room).toHaveAttribute("data-reduce-motion");
+    expect(container.querySelector(".cam-video[data-mirror]")).toBeNull();
   });
 
   it("says why a tile has no picture", async () => {
