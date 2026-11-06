@@ -69,6 +69,7 @@ async function onAirWith(choose: () => Promise<void>): Promise<void> {
     await camera.pickBlurStrength("Strong");
     await camera.waitBackgroundChanged(camera.PREVIEW_CANVAS, previewNone);
     await camera.pickBackgroundMode("Image");
+    await camera.waitBuiltinThumbnails(18);
     await camera.pickImage(BUILTIN);
     await camera.waitBackgroundChanged(camera.PREVIEW_CANVAS, previewNone, { minBackground: 25 });
     await camera.pickBackgroundMode("None");

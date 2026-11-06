@@ -322,6 +322,17 @@ opt-level = 3
 [profile.dev.package.opusic-sys]
 opt-level = 3
 
+# The camera picker's built-in background thumbnails are decoded from WebP; unoptimised this took
+# about ten seconds in the debug builds the E2E tests use.
+[profile.dev.package.image]
+opt-level = 3
+
+[profile.dev.package.image-webp]
+opt-level = 3
+
+[profile.dev.package.zune-jpeg]
+opt-level = 3
+
 # Camera background effects run per 720p frame; unoptimised they would miss the frame budget in
 # the debug builds the E2E tests use.
 [profile.dev.package.mumcord-effects]

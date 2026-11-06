@@ -6,6 +6,7 @@
 
 - Cameras that list a mode they never send pictures in (for example a Logitech StreamCam at 720p and 30 fps) now start: Mumcord tries a lower frame rate or a smaller picture instead of stopping with "the camera sends no pictures"
 - Cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when PipeWire leaves the row length unset or fills only the first picture plane
+- Camera preview: the built-in background images now show right away when you choose Image, instead of leaving the tiles empty for a moment every time the preview opens
 
 ## [0.7.0] - Unreleased
 
