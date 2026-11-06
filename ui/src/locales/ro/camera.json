@@ -37,6 +37,7 @@
     "imageYoursLabel": "Imaginea ta: {{name}}",
     "addImage": "Adaugă imagine",
     "addImageLabel": "Adaugă o imagine proprie",
+    "imageFilter": "Imagini",
     "effectsLoad": "Efectele rulează pe acest dispozitiv. Încărcare: {{load}} ({{unit}})",
     "loadLow": "mică",
     "loadMedium": "medie",
@@ -95,7 +96,8 @@
     "rateLimited": "Camera nu a putut porni: prea multe încercări. Încearcă din nou peste un minut.",
     "mode": "Partajarea camerei are nevoie de releu. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
-    "endedByRelay": "Camera a fost oprită de releul serverului"
+    "endedByRelay": "Camera a fost oprită de releul serverului",
+    "dismissStopped": "Închide"
   },
   "privacy": {
     "windows": "Windows blochează accesul la cameră pentru aplicațiile desktop",
@@ -156,7 +158,8 @@
     "label_few": "Camera de grup, {{count}} camere pornite",
     "label_other": "Camera de grup, {{count}} de camere pornite",
     "miniBar_other": "{{count}} de camere pornite",
-    "fullTitle": "Camera este plină la 9 camere video"
+    "fullTitle": "Camera este plină la 9 camere video",
+    "backgroundPicker": "Schimbă fundalul"
   },
   "position": {
     "label": "Camere",
@@ -180,9 +183,11 @@
     "hidden": "Video ascuns",
     "showVideo": "Arată video",
     "viewing": "Vizionezi",
-    "weak": "Conexiune slabă"
+    "weak": "Conexiune slabă",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opțiuni pentru {{name}}",
     "pin": "Fixează pentru mine",
     "unpin": "Anulează fixarea",
     "showLarge": "Arată mare",
@@ -203,7 +208,8 @@
     "screenTitle": "Ecranul lui {{name}}",
     "screenLive": "Live",
     "partyTitle": "Vizionare comună",
-    "partyStarted": "Pornită de {{name}}"
+    "partyStarted": "Pornită de {{name}}",
+    "label": "{{title}} cu camera de camere"
   },
   "settings": {
     "title": "Cameră",

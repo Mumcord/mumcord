@@ -127,5 +127,9 @@
     "netHttp": "Rochtain idirlín",
     "secrets": "Eochairshlabhra"
   },
-  "offerBadge": "Ceadanna nua"
+  "offerBadge": "Ceadanna nua",
+  "refused": {
+    "title": "Breiseáin diúltaithe",
+    "when": "Diúltaíodh ag {{time}}"
+  }
 }

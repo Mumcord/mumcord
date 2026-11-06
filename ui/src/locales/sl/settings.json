@@ -1193,7 +1193,7 @@
     "close": "Zapri",
     "privacyTitle": "Zasebnost",
     "lockOff": "Izklopi mojo kamero, ko se zaslon zaklene",
-    "privacyNote": "Vaša kamera se vedno zažene izklopljena in najprej pokaže predogled. Izklopi se, ko zapustite kanal ali prekinete povezavo. Vidijo jo samo osebe v vašem glasovnem kanalu, prek releja tega strežnika in s šifriranjem od konca do konca. Mumcord kamer nikoli ne snema.",
+    "privacyNote": "Vaša kamera se vedno zažene izklopljena in najprej pokaže predogled. Izklopi se, ko zapustite kanal ali prekinete povezavo. Vidijo jo samo osebe v vašem glasovnem kanalu, prek releja tega strežnika in s šifriranjem od konca do konca. Mumcord kamer nikoli ne snema. Mumcord gledalcev tvoje slike nikoli ne shrani na disk, vendar ne more preprečiti, da bi kdo naredil posnetek zaslona s svojim operacijskim sistemom.",
     "othersTitle": "Kamere drugih",
     "showCameras": "Prikaži kamere",
     "showAlways": "Vedno",

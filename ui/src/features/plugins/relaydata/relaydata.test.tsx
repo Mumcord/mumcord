@@ -86,7 +86,12 @@ describe("RelayDataChip", () => {
 
 describe("RelayDataGroup", () => {
   function setup(plugins: InstalledPlugin[]): void {
-    vi.spyOn(api, "pluginsList").mockResolvedValue({ noPlugins: false, allOff: false, plugins });
+    vi.spyOn(api, "pluginsList").mockResolvedValue({
+      noPlugins: false,
+      allOff: false,
+      plugins,
+      refused: [],
+    });
     vi.spyOn(api, "pluginRelayUsage").mockResolvedValue([
       { pluginId: "board-brawl", bytes: 3_400_000 },
     ]);

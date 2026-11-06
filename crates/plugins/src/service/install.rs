@@ -130,6 +130,9 @@ impl PluginService {
     ) -> Result<(), ServiceError> {
         let id = request.entry.id.clone();
         let result = self.install_inner(request, download);
+        if let Err(error) = &result {
+            self.note_refused(&id, error);
+        }
         let stage = match &result {
             Ok(()) => InstallStage::Done,
             Err(error) => InstallStage::Failed {
@@ -258,6 +261,7 @@ impl PluginService {
         let verified = match self.verified(source, entry, download) {
             Ok(verified) => verified,
             Err(error) => {
+                self.note_refused(&entry.id, &error);
                 return match gates::refusal_of(&error) {
                     Some(refusal) => Ok(InstallCheck::Refused { refusal }),
                     None => Err(error),

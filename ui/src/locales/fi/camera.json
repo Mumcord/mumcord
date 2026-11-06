@@ -37,6 +37,7 @@
     "imageYoursLabel": "Oma kuvasi: {{name}}",
     "addImage": "Lisää kuva",
     "addImageLabel": "Lisää oma kuvasi",
+    "imageFilter": "Kuvat",
     "effectsLoad": "Tehosteet toimivat tällä laitteella. Kuormitus: {{load}} ({{unit}})",
     "loadLow": "pieni",
     "loadMedium": "keskitasoinen",
@@ -95,7 +96,8 @@
     "rateLimited": "Kameraa ei voitu käynnistää: liian monta yritystä. Yritä uudelleen minuutin kuluttua.",
     "mode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
-    "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran"
+    "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran",
+    "dismissStopped": "Ohita"
   },
   "privacy": {
     "windows": "Windows estää työpöytäsovellusten pääsyn kameraan",
@@ -149,7 +151,8 @@
     "cameras": "Kamerat",
     "label_other": "Kamerahuone, {{count}} kameraa päällä",
     "miniBar_other": "{{count}} kameraa päällä",
-    "fullTitle": "Huone on täynnä 9 kameralla"
+    "fullTitle": "Huone on täynnä 9 kameralla",
+    "backgroundPicker": "Vaihda tausta"
   },
   "position": {
     "label": "Kamerat",
@@ -173,9 +176,11 @@
     "hidden": "Video piilotettu",
     "showVideo": "Näytä video",
     "viewing": "Katselet",
-    "weak": "Heikko yhteys"
+    "weak": "Heikko yhteys",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Asetukset: {{name}}",
     "pin": "Kiinnitä minulle",
     "unpin": "Poista kiinnitys",
     "showLarge": "Näytä suurena",
@@ -196,7 +201,8 @@
     "screenTitle": "Käyttäjän {{name}} näyttö",
     "screenLive": "Livenä",
     "partyTitle": "Yhteiskatselu",
-    "partyStarted": "Aloittanut {{name}}"
+    "partyStarted": "Aloittanut {{name}}",
+    "label": "{{title}} ja kamerahuone"
   },
   "settings": {
     "title": "Kamera",

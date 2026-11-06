@@ -15,6 +15,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { getApi, type P2pLink, type WatchStats } from "../../api";
@@ -22,6 +23,7 @@ import { useServerStateOf } from "../channels";
 import { VolumeIcon } from "../chat/mediaIcons";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
+import { useCombinedHeader } from "../media/combinedHeader";
 import { bitrate, dimension } from "../media/format";
 import { MediaFrame } from "../media/MediaFrame";
 import { VolumeControl } from "../media/VolumeControl";
@@ -94,6 +96,10 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
   const paused = share?.paused ?? false;
   const inPopout = useInPopout();
   const windowTitle = usePopoutTitle(serverId, t("title", { name }));
+  // Next to the camera strip the card's one header carries the line and the chips; the frame's
+  // own overlay header only comes back in the frame's full screen (mockup 08).
+  const slots = useCombinedHeader();
+  const combined = slots !== null && !fullscreen;
 
   const closeDetails = useCallback(() => {
     setDetails(false);
@@ -145,111 +151,133 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
   });
 
   const shown = meter.snapshot();
-  const what = [
-    t(
-      share?.kind === "window"
-        ? "sharedWindow"
-        : share?.kind === "screen"
-          ? "sharedScreen"
-          : "sharedUnknown",
-    ),
-    t(sound ? "soundOnShort" : "soundOffShort"),
-  ];
-  if (share !== null) {
-    what.push(t("since", { time: clockOf(shareStartedAt(share), i18n.language) }));
-  }
+  const kind = t(
+    share?.kind === "window"
+      ? "sharedWindow"
+      : share?.kind === "screen"
+        ? "sharedScreen"
+        : "sharedUnknown",
+  );
+  const since =
+    share === null ? [] : [t("since", { time: clockOf(shareStartedAt(share), i18n.language) })];
+  const what = [kind, t(sound ? "soundOnShort" : "soundOffShort"), ...since];
+
+  const chips = (
+    <Chips
+      t={t}
+      shown={shown}
+      link={link}
+      stats={stats}
+      watch={watch}
+      name={name}
+      sound={sound}
+      compact={combined}
+      details={details}
+      detailsButton={detailsButton}
+      onDetails={() => {
+        setDetails((open) => !open);
+      }}
+    />
+  );
 
   return (
-    <MediaFrame
-      ref={frameRef}
-      label={t("label", { name })}
-      paused={paused}
-      toolbarLabel={t("controls")}
-      header={
-        <>
-          <span className="media-frame__mark">
-            <Avatar name={name} src={user === undefined ? null : avatarOf(user)} size="sm" live />
-          </span>
-          <span className="media-frame__titles">
-            <span className="media-frame__title">{t("title", { name })}</span>
-            <span className="media-frame__sub">{what.join(" · ")}</span>
-          </span>
-          <span className="live-badge live-badge--large" data-paused={paused || undefined}>
-            {t(paused ? "pausedShort" : "live")}
-          </span>
-          <Chips
-            t={t}
-            shown={shown}
-            link={link}
-            stats={stats}
-            watch={watch}
-            name={name}
-            sound={sound}
-            details={details}
-            detailsButton={detailsButton}
-            onDetails={() => {
-              setDetails((open) => !open);
-            }}
-          />
-        </>
-      }
-      picture={
-        <div className={`share-screen share-screen--${view.fit}`} data-fit={view.fit}>
-          <ScreenStage
-            serverId={serverId}
-            session={session}
-            name={name}
-            paused={paused}
-            meter={meter}
-            onWatch={setWatch}
-          />
-          {details && (
-            <StreamDetails
-              t={t}
-              shown={shown}
-              link={link}
-              codec={codecName(watch?.codec ?? null)}
-              panelRef={detailsPanel}
-            />
-          )}
-        </div>
-      }
-      controls={
-        <>
-          {sound && (
+    <>
+      {combined && createPortal(`${[kind, ...since].join(" · ")} · `, slots.sub)}
+      {combined && createPortal(chips, slots.chips)}
+      <MediaFrame
+        ref={frameRef}
+        label={t("label", { name })}
+        paused={paused}
+        toolbarLabel={t("controls")}
+        header={
+          combined ? undefined : (
             <>
-              <VolumeControl
-                label={t("volume")}
-                level={level / 100}
-                onSet={(fraction) => {
-                  setVolume(Math.round(fraction * 100));
-                }}
-              />
-              <SoundLevel label={t("soundOf", { name })} rms={stats?.rms ?? null} />
+              <span className="media-frame__mark">
+                <Avatar
+                  name={name}
+                  src={user === undefined ? null : avatarOf(user)}
+                  size="sm"
+                  live
+                />
+              </span>
+              <span className="media-frame__titles">
+                <span className="media-frame__title">{t("title", { name })}</span>
+                <span className="media-frame__sub">{what.join(" · ")}</span>
+              </span>
+              <span className="live-badge live-badge--large" data-paused={paused || undefined}>
+                {t(paused ? "pausedShort" : "live")}
+              </span>
+              {chips}
             </>
-          )}
-          <FitButtons t={t} fit={view.fit} />
-          <PopoutButtons kind="share" serverId={serverId} session={session} title={windowTitle} />
-          {/* The main window owns the watch, so only it can stop watching (issue #164). */}
-          {!inPopout && (
-            <button
-              type="button"
-              className="button share-stop"
-              onClick={() => {
-                stopWatching();
-                setDetails(false);
-              }}
-            >
-              {t("stop")}
-            </button>
-          )}
-        </>
-      }
-      fullscreen={fullscreen}
-      onFullscreen={toggle}
-      fullscreenLabel={t("fullscreen")}
-      exitFullscreenLabel={t("exitFullscreen")}
-    />
+          )
+        }
+        picture={
+          <div className={`share-screen share-screen--${view.fit}`} data-fit={view.fit}>
+            {combined && (
+              <span className="cam-main__label">
+                <Avatar name={name} src={user === undefined ? null : avatarOf(user)} size="sm" />
+                {t("title", { name })}
+                <span className="live-badge" data-paused={paused || undefined}>
+                  {t(paused ? "pausedShort" : "live")}
+                </span>
+              </span>
+            )}
+            <ScreenStage
+              serverId={serverId}
+              session={session}
+              name={name}
+              paused={paused}
+              meter={meter}
+              onWatch={setWatch}
+            />
+            {details && (
+              <StreamDetails
+                t={t}
+                shown={shown}
+                link={link}
+                codec={codecName(watch?.codec ?? null)}
+                panelRef={detailsPanel}
+              />
+            )}
+          </div>
+        }
+        controls={
+          <>
+            {sound && (
+              <>
+                <VolumeControl
+                  label={t("volume")}
+                  level={level / 100}
+                  onSet={(fraction) => {
+                    setVolume(Math.round(fraction * 100));
+                  }}
+                />
+                <SoundLevel label={t("soundOf", { name })} rms={stats?.rms ?? null} />
+              </>
+            )}
+            <FitButtons t={t} fit={view.fit} />
+            <PopoutButtons kind="share" serverId={serverId} session={session} title={windowTitle} />
+            {/* The main window owns the watch, so only it can stop watching (issue #164). */}
+            {!inPopout && (
+              <button
+                type="button"
+                className="button share-stop"
+                onClick={() => {
+                  stopWatching();
+                  setDetails(false);
+                }}
+              >
+                {t("stop")}
+              </button>
+            )}
+          </>
+        }
+        fullscreen={fullscreen}
+        onFullscreen={toggle}
+        fullscreenLabel={t("fullscreen")}
+        exitFullscreenLabel={t("exitFullscreen")}
+      />
+    </>
   );
 }
 
@@ -262,6 +290,7 @@ function Chips({
   watch,
   name,
   sound,
+  compact,
   details,
   detailsButton,
   onDetails,
@@ -273,6 +302,8 @@ function Chips({
   watch: Pick<ScreenWatch, "codec" | "maxFps" | "setMaxFps"> | null;
   name: string;
   sound: boolean;
+  /** In the combined header: "1080p · 30 fps" and the path as one row with the switch. */
+  compact: boolean;
   details: boolean;
   detailsButton: RefObject<HTMLButtonElement | null>;
   onDetails: () => void;
@@ -283,6 +314,50 @@ function Chips({
   const codec = codecName(watch?.codec ?? null);
   const how =
     codec === null ? null : t(relayed ? "header.codecViaRelay" : "header.codecDirect", { codec });
+  const qualityMenu = watch !== null && (
+    <ViewerQualityMenu
+      name={name}
+      summary={
+        live
+          ? [`${String(shown.height)}p`, `${String(shown.fps)} fps`, codec]
+              .filter((part) => part !== null)
+              .join(" · ")
+          : null
+      }
+      maxFps={watch.maxFps}
+      onMaxFps={watch.setMaxFps}
+    />
+  );
+  const detailsToggle = (
+    <button
+      ref={detailsButton}
+      type="button"
+      className="share-chip share-chip--button"
+      aria-expanded={details}
+      aria-label={t("streamDetails")}
+      data-tooltip={t("streamDetails")}
+      onClick={onDetails}
+    >
+      <InfoCircleIcon />
+    </button>
+  );
+  if (compact)
+    return (
+      <>
+        {live && (
+          <span className="cam-chip" data-tooltip={`${t("resolution")} · ${t("frameRate")}`}>
+            {`${String(shown.height)}p · ${String(shown.fps)} fps`}
+          </span>
+        )}
+        {link !== null && (
+          <span className="cam-chip" data-tone="ok">
+            <PathTag path={relayed ? "relayUdp" : link.path} />
+          </span>
+        )}
+        {detailsToggle}
+        {qualityMenu}
+      </>
+    );
   return (
     <span className="share-chips">
       {live && (
@@ -312,31 +387,8 @@ function Chips({
         <VolumeIcon muted={!sound} size={14} />
         {t(sound ? "soundOn" : "soundOff")}
       </span>
-      <button
-        ref={detailsButton}
-        type="button"
-        className="share-chip share-chip--button"
-        aria-expanded={details}
-        aria-label={t("streamDetails")}
-        data-tooltip={t("streamDetails")}
-        onClick={onDetails}
-      >
-        <InfoCircleIcon />
-      </button>
-      {watch !== null && (
-        <ViewerQualityMenu
-          name={name}
-          summary={
-            live
-              ? [`${String(shown.height)}p`, `${String(shown.fps)} fps`, codec]
-                  .filter((part) => part !== null)
-                  .join(" · ")
-              : null
-          }
-          maxFps={watch.maxFps}
-          onMaxFps={watch.setMaxFps}
-        />
-      )}
+      {detailsToggle}
+      {qualityMenu}
     </span>
   );
 }

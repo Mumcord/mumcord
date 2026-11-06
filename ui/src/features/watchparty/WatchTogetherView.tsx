@@ -5,12 +5,14 @@
  * Leaving the view keeps the party as the mini bar at the top of the chat.
  */
 import { useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { User, WatchCommand } from "../../api";
 import { openInBrowser } from "../chat/openLink";
 import { useServerStateOf } from "../channels";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
+import { useCombinedHeader } from "../media/combinedHeader";
 import { clockTime } from "../media/format";
 import { MediaIcon, type MediaIconName } from "../media/icons";
 import { MediaFrame } from "../media/MediaFrame";
@@ -93,6 +95,7 @@ function Icon({
 export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }): ReactNode {
   const { t: tc } = useTranslation("common");
   const { t } = useTranslation("watchparty");
+  const { t: tCam } = useTranslation("camera");
   const party = live.party;
   const { users, selfSession } = useServerStateOf(serverId);
   const frameRef = useRef<HTMLElement | null>(null);
@@ -105,6 +108,10 @@ export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }
   const inPopout = useInPopout();
 
   const { player, frameRef: embedRef } = usePartyPlayer(serverId, live);
+  // Next to the camera strip the card's one header says who started the party; the frame's own
+  // overlay header only comes back in its full screen (mockup 09).
+  const slots = useCombinedHeader();
+  const combined = slots !== null && !fullscreen;
 
   useMediaKeys({
     // The party says whether it plays, as on the Play/Pause button, so Space never starts it twice.
@@ -153,6 +160,11 @@ export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }
 
   return (
     <div className="watch-cinema">
+      {combined &&
+        createPortal(
+          `${tCam("combined.partyStarted", { name: nameOf(party.host) })} · `,
+          slots.sub,
+        )}
       <MediaFrame
         ref={frameRef}
         label={`${t("title")} – ${title}`}
@@ -160,24 +172,32 @@ export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }
         toolbarLabel={tc("media.controls")}
         hint={first ? <ShortcutHint keys={t("keys")} /> : undefined}
         header={
-          <>
-            <span className="media-frame__mark">
-              <Avatar name={adderName ?? nameOf(party.host)} src={null} size="sm" />
-            </span>
-            <span className="media-frame__titles">
-              <span className="media-frame__title">{title}</span>
-              <span className="media-frame__sub">
-                {adderName !== null && <span>{t("playlist.addedBy", { name: adderName })}</span>}
-                {adderName !== null && <span aria-hidden="true">·</span>}
-                <MediaIcon name="crown" size={12} />
-                <span>{tc("media.inControl", { name: nameOf(party.host) })}</span>
+          combined ? undefined : (
+            <>
+              <span className="media-frame__mark">
+                <Avatar name={adderName ?? nameOf(party.host)} src={null} size="sm" />
               </span>
-            </span>
-            <SyncPill states={states} />
-          </>
+              <span className="media-frame__titles">
+                <span className="media-frame__title">{title}</span>
+                <span className="media-frame__sub">
+                  {adderName !== null && <span>{t("playlist.addedBy", { name: adderName })}</span>}
+                  {adderName !== null && <span aria-hidden="true">·</span>}
+                  <MediaIcon name="crown" size={12} />
+                  <span>{tc("media.inControl", { name: nameOf(party.host) })}</span>
+                </span>
+              </span>
+              <SyncPill states={states} />
+            </>
+          )
         }
         picture={
           <div className="media-frame__screen">
+            {combined && (
+              <span className="cam-main__label">
+                <MediaIcon name="play" size={12} />
+                {`${tCam("combined.partyTitle")} · ${title}`}
+              </span>
+            )}
             {mockPlaceholder() !== null && <MockPicture label={title} />}
             {mockPlaceholder() === null && (
               <PartyPlayerFrame
@@ -272,7 +292,8 @@ export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }
         exitFullscreenLabel={tc("media.exitFullscreen")}
       />
       {/* The pop-out shows only the picture (issue #164). */}
-      {!inPopout && (
+      {/* The combined card shows only the picture between strip and room bar (mockup 09). */}
+      {!inPopout && !combined && (
         <WatchingStrip
           serverId={serverId}
           users={users}

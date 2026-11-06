@@ -37,6 +37,7 @@
     "imageYoursLabel": "L-immaġni tiegħek: {{name}}",
     "addImage": "Żid immaġni",
     "addImageLabel": "Żid l-immaġni tiegħek stess",
+    "imageFilter": "Stampi",
     "effectsLoad": "L-effetti jaħdmu fuq dan l-apparat. Tagħbija: {{load}} ({{unit}})",
     "loadLow": "baxxa",
     "loadMedium": "medja",
@@ -95,7 +96,8 @@
     "rateLimited": "Il-kamera ma setgħetx tibda: wisq tentattivi. Erġa' pprova wara minuta.",
     "mode": "Il-qsim tal-kamera jeħtieġ ir-relay. Biddlu f'Privatezza u konnessjonijiet.",
     "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
-    "endedByRelay": "Il-kamera twaqqfet mir-relay tas-server"
+    "endedByRelay": "Il-kamera twaqqfet mir-relay tas-server",
+    "dismissStopped": "Neħħi"
   },
   "privacy": {
     "windows": "Windows qed jibblokka l-aċċess għall-kamera għall-apps tad-desktop",
@@ -170,7 +172,8 @@
     "miniBar_few": "{{count}} kameras mixgħula",
     "miniBar_many": "{{count}} kamera mixgħula",
     "miniBar_other": "{{count}} kamera mixgħula",
-    "fullTitle": "Il-kamra hija mimlija b’9 kameras"
+    "fullTitle": "Il-kamra hija mimlija b’9 kameras",
+    "backgroundPicker": "Ibdel l-isfond"
   },
   "position": {
     "label": "Kameras",
@@ -194,9 +197,11 @@
     "hidden": "Vidjo moħbi",
     "showVideo": "Uri l-vidjo",
     "viewing": "Qed tara",
-    "weak": "Konnessjoni dgħajfa"
+    "weak": "Konnessjoni dgħajfa",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Għażliet għal {{name}}",
     "pin": "Waħħal għalija",
     "unpin": "Neħħi t-twaħħil",
     "showLarge": "Uri kbir",
@@ -217,7 +222,8 @@
     "screenTitle": "L-iskrin ta' {{name}}",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Beda {{name}}"
+    "partyStarted": "Beda {{name}}",
+    "label": "{{title}} mal-kamra tal-kameras"
   },
   "settings": {
     "title": "Kamera",

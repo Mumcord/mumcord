@@ -37,6 +37,7 @@
     "imageYoursLabel": "Dit billede: {{name}}",
     "addImage": "Tilføj billede",
     "addImageLabel": "Tilføj dit eget billede",
+    "imageFilter": "Billeder",
     "effectsLoad": "Effekter kører på denne enhed. Belastning: {{load}} ({{unit}})",
     "loadLow": "lav",
     "loadMedium": "middel",
@@ -95,7 +96,8 @@
     "rateLimited": "Kameraet kunne ikke starte: for mange forsøg. Prøv igen om et minut.",
     "mode": "Kameradeling kræver relæet. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
-    "endedByRelay": "Kameraet blev stoppet af serverens relæ"
+    "endedByRelay": "Kameraet blev stoppet af serverens relæ",
+    "dismissStopped": "Luk"
   },
   "privacy": {
     "windows": "Windows blokerer kameraadgang for skrivebordsapps",
@@ -149,7 +151,8 @@
     "cameras": "Kameraer",
     "label_other": "Kamerarum, {{count}} kameraer tændt",
     "miniBar_other": "{{count}} kameraer tændt",
-    "fullTitle": "Rummet er fuldt ved 9 kameraer"
+    "fullTitle": "Rummet er fuldt ved 9 kameraer",
+    "backgroundPicker": "Skift baggrund"
   },
   "position": {
     "label": "Kameraer",
@@ -173,9 +176,11 @@
     "hidden": "Video skjult",
     "showVideo": "Vis video",
     "viewing": "Ser med",
-    "weak": "Svag forbindelse"
+    "weak": "Svag forbindelse",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Indstillinger for {{name}}",
     "pin": "Fastgør for mig",
     "unpin": "Frigør",
     "showLarge": "Vis stort",
@@ -196,7 +201,8 @@
     "screenTitle": "{{name}}s skærm",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Startet af {{name}}"
+    "partyStarted": "Startet af {{name}}",
+    "label": "{{title}} med kamerarummet"
   },
   "settings": {
     "title": "Kamera",

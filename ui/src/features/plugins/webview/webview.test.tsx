@@ -380,6 +380,19 @@ describe("PluginFrame", () => {
     expect(document.activeElement).toBe(wrapper);
     expect(onEscape).toHaveBeenCalledTimes(1);
   });
+
+  it("takes the keyboard back from the page's frame on Escape and F6", () => {
+    const windowFocus = vi.spyOn(window, "focus").mockImplementation(() => {});
+    const { container } = render(
+      <PluginFrame plugin="snacks" webview={viewIn("stage")} onEscape={vi.fn()} />,
+    );
+    const page = pageOf(container);
+    fromPage(page, { mumcordWebview: "escape" });
+    expect(windowFocus).toHaveBeenCalledTimes(1);
+    fromPage(page, { mumcordWebview: "f6" });
+    expect(windowFocus).toHaveBeenCalledTimes(2);
+    windowFocus.mockRestore();
+  });
 });
 
 describe("PluginFrame heartbeat", () => {

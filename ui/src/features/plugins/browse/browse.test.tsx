@@ -126,6 +126,16 @@ describe("BrowseTab", () => {
     expect(screen.queryByRole("button", { name: "Install Dice" })).toBeNull();
   });
 
+  it("returns focus to the plugin's card when going back from its details", async () => {
+    withIndex([dice]);
+    render(<BrowseTab />, { wrapper: Wrapper });
+    fireEvent.click(await screen.findByRole("button", { name: "Details of Dice" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Browse" }));
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole("button", { name: "Details of Dice" }));
+    });
+  });
+
   it("opens the details of a requested official plugin and ignores unknown ids", async () => {
     withIndex();
     routePluginRequest({ kind: "details", plugin: "someone-elses" });

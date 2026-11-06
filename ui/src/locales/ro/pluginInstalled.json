@@ -127,5 +127,9 @@
     "netHttp": "Acces la internet",
     "secrets": "Breloc de chei"
   },
-  "offerBadge": "Permisiuni noi"
+  "offerBadge": "Permisiuni noi",
+  "refused": {
+    "title": "Pluginuri refuzate",
+    "when": "Refuzat la {{time}}"
+  }
 }

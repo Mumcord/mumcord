@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tvoja slika: {{name}}",
     "addImage": "Dodaj sliku",
     "addImageLabel": "Dodaj vlastitu sliku",
+    "imageFilter": "Slike",
     "effectsLoad": "Efekti se izvode na ovom uređaju. Opterećenje: {{load}} ({{unit}})",
     "loadLow": "nisko",
     "loadMedium": "srednje",
@@ -95,7 +96,8 @@
     "rateLimited": "Kamera se nije mogla pokrenuti: previše pokušaja. Pokušaj ponovno za minutu.",
     "mode": "Dijeljenje kamere treba relej. Promijeni to u Privatnost i veze.",
     "noCertificate": "Dijeljenje kamere treba klijentski certifikat.",
-    "endedByRelay": "Kameru je zaustavio relej poslužitelja"
+    "endedByRelay": "Kameru je zaustavio relej poslužitelja",
+    "dismissStopped": "Odbaci"
   },
   "privacy": {
     "windows": "Windows blokira pristup kameri za desktop aplikacije",
@@ -156,7 +158,8 @@
     "label_few": "Soba kamera, {{count}} kamere uključene",
     "label_other": "Soba kamera, {{count}} kamera uključeno",
     "miniBar_other": "{{count}} kamera uključeno",
-    "fullTitle": "Soba je puna s 9 kamera"
+    "fullTitle": "Soba je puna s 9 kamera",
+    "backgroundPicker": "Promijeni pozadinu"
   },
   "position": {
     "label": "Kamere",
@@ -180,9 +183,11 @@
     "hidden": "Video skriven",
     "showVideo": "Prikaži video",
     "viewing": "Gledaš",
-    "weak": "Slaba veza"
+    "weak": "Slaba veza",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opcije za {{name}}",
     "pin": "Prikvači za mene",
     "unpin": "Otkvači",
     "showLarge": "Prikaži veliko",
@@ -203,7 +208,8 @@
     "screenTitle": "Zaslon korisnika {{name}}",
     "screenLive": "Uživo",
     "partyTitle": "Zajedničko gledanje",
-    "partyStarted": "Pokrenuo/pokrenula {{name}}"
+    "partyStarted": "Pokrenuo/pokrenula {{name}}",
+    "label": "{{title}} s kamerama u sobi"
   },
   "settings": {
     "title": "Kamera",

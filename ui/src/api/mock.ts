@@ -3200,10 +3200,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
             ? { kind: "pushToTalk" }
             : index >= 0
               ? { kind: "hotkey", index }
-              : null;
+              : slot.kind !== "camera" && same(settings.cameraHotkey)
+                ? { kind: "camera" }
+                : null;
       return Promise.resolve({ key: canonical, conflict });
     },
-    hotkeysStatus: () => Promise.resolve<HotkeysStatus>({ mode: "global", failed: [] }),
+    hotkeysStatus: () =>
+      Promise.resolve<HotkeysStatus>({ mode: "global", failed: [], cameraFailed: false }),
     pttSession: () =>
       Promise.resolve({ waylandDesktop: false, compatibilityActive: false, kde: false }),
     pttOpenKdeX11Settings: () => Promise.resolve(null),
@@ -3229,7 +3232,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginsTakePendingLink: () => Promise.resolve(null),
 
     // plugins (spec 06): no plugin is installed in the mock; UI tasks extend this.
-    pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: [] }),
+    pluginsList: () =>
+      Promise.resolve({ noPlugins: false, allOff: false, plugins: [], refused: [] }),
     // Servers older than 1.4 pass no plugin data (FR-6.38).
     pluginsSharedSupported: () =>
       Promise.resolve(!serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2")),
@@ -3974,7 +3978,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       });
       return Promise.resolve();
     },
-    cameraTileSetQuality: () => Promise.resolve(),
+    cameraTileSetQuality: (serverId, sharer, quality) => {
+      const room = cameraRoomOf(serverId);
+      setCameraRoomView({
+        ...room,
+        tiles: room.tiles.map((tile) => (tile.sharer === sharer ? { ...tile, quality } : tile)),
+      });
+      return Promise.resolve();
+    },
     cameraTileSetHeight: () => Promise.resolve(),
     cameraRequestKeyframe: () => Promise.resolve(),
     cameraFramesAttach: () => Promise.resolve(),

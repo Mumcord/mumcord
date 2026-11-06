@@ -16,7 +16,8 @@ vi.mock("../../../api", async (orig) => {
   const mocked = {
     stageActivities: () => Promise.resolve(api.activities),
     stageJoin: api.join,
-    pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: [] }),
+    pluginsList: () =>
+      Promise.resolve({ noPlugins: false, allOff: false, plugins: [], refused: [] }),
     on: () => () => undefined,
   };
   return { ...(await orig<typeof import("../../../api")>()), getApi: () => mocked };

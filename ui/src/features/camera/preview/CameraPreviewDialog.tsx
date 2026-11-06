@@ -14,6 +14,7 @@ import { DevicePicker } from "./DevicePicker";
 import { CameraIcon, CheckIcon, LoadIcon } from "./previewIcons";
 import { canRetryAccess, desktopOs, failureText, loadLine, loadLineText } from "./previewLogic";
 import { PreviewPicture } from "./PreviewPicture";
+import { applyLiveBackground, setLiveBackground } from "./liveBackground";
 import { useEffectsLoad } from "./useEffectsLoad";
 import { useBackgroundLibrary } from "./useBackgroundLibrary";
 import { useCameraDevices } from "./useCameraDevices";
@@ -118,11 +119,7 @@ function DialogContent({
   const applyBackground = (next: CameraBackground, strength: number) => {
     setBackground(next);
     setBlurStrength(strength);
-    getApi()
-      .cameraSetBackground(next, strength)
-      .catch((error: unknown) => {
-        console.error("Changing the camera background failed", error);
-      });
+    applyLiveBackground({ background: next, blurStrength: strength });
   };
 
   const turnOn = () => {
@@ -134,6 +131,8 @@ function DialogContent({
         console.error("Saving the default camera background failed", error);
       });
     }
+    // The room bar's picker starts from what the camera goes on air with.
+    setLiveBackground({ background, blurStrength });
     session.turnOn();
   };
 

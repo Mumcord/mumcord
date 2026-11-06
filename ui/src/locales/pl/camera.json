@@ -37,6 +37,7 @@
     "imageYoursLabel": "Twój obraz: {{name}}",
     "addImage": "Dodaj obraz",
     "addImageLabel": "Dodaj własny obraz",
+    "imageFilter": "Obrazy",
     "effectsLoad": "Efekty działają na tym urządzeniu. Obciążenie: {{load}} ({{unit}})",
     "loadLow": "niskie",
     "loadMedium": "średnie",
@@ -95,7 +96,8 @@
     "rateLimited": "Nie udało się uruchomić kamery: zbyt wiele prób. Spróbuj ponownie za minutę.",
     "mode": "Udostępnianie kamery wymaga przekaźnika. Zmień to w Prywatność i połączenia.",
     "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta.",
-    "endedByRelay": "Kamera zatrzymana przez przekaźnik serwera"
+    "endedByRelay": "Kamera zatrzymana przez przekaźnik serwera",
+    "dismissStopped": "Zamknij"
   },
   "privacy": {
     "windows": "Windows blokuje dostęp do kamery dla aplikacji desktopowych",
@@ -163,7 +165,8 @@
     "miniBar_many": "{{count}} kamer włączonych",
     "miniBar_other": "{{count}} kamery włączone",
     "cameras": "Kamery",
-    "fullTitle": "Pokój jest pełny przy 9 kamerach"
+    "fullTitle": "Pokój jest pełny przy 9 kamerach",
+    "backgroundPicker": "Zmień tło"
   },
   "position": {
     "label": "Kamery",
@@ -187,9 +190,11 @@
     "hidden": "Wideo ukryte",
     "showVideo": "Pokaż wideo",
     "viewing": "Oglądasz",
-    "weak": "Słabe połączenie"
+    "weak": "Słabe połączenie",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opcje dla {{name}}",
     "pin": "Przypnij dla mnie",
     "unpin": "Odepnij",
     "showLarge": "Pokaż w dużym rozmiarze",
@@ -210,7 +215,8 @@
     "screenTitle": "Ekran użytkownika {{name}}",
     "screenLive": "Na żywo",
     "partyTitle": "Wspólne oglądanie",
-    "partyStarted": "Rozpoczęte przez {{name}}"
+    "partyStarted": "Rozpoczęte przez {{name}}",
+    "label": "{{title}} z pokojem kamer"
   },
   "settings": {
     "title": "Kamera",

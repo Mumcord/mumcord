@@ -1184,7 +1184,7 @@
     "close": "Fechar",
     "privacyTitle": "Privacidade",
     "lockOff": "Desligar a minha câmara quando o ecrã bloquear",
-    "privacyNote": "A sua câmara começa sempre desligada e mostra primeiro uma pré-visualização. Desliga-se quando sai do canal ou se desliga. Só as pessoas no seu canal de voz a podem ver, através do relay deste servidor, com encriptação ponto a ponto. O Mumcord nunca grava câmaras.",
+    "privacyNote": "A sua câmara começa sempre desligada e mostra primeiro uma pré-visualização. Desliga-se quando sai do canal ou se desliga. Só as pessoas no seu canal de voz a podem ver, através do relay deste servidor, com encriptação ponto a ponto. O Mumcord nunca grava câmaras. O Mumcord de quem assiste nunca guarda a sua imagem no disco, mas não pode impedir que alguém faça uma captura de ecrã com o seu sistema operativo.",
     "othersTitle": "Câmaras dos outros",
     "showCameras": "Mostrar câmaras",
     "showAlways": "Sempre",

@@ -1184,7 +1184,7 @@
     "close": "Chiudi",
     "privacyTitle": "Privacy",
     "lockOff": "Spegni la mia fotocamera quando lo schermo si blocca",
-    "privacyNote": "La tua fotocamera parte sempre spenta e mostra prima un'anteprima. Si spegne quando lasci il canale o ti disconnetti. Solo le persone nel tuo canale vocale possono vederla, tramite il relay di questo server, con crittografia end-to-end. Mumcord non registra mai le fotocamere.",
+    "privacyNote": "La tua fotocamera parte sempre spenta e mostra prima un'anteprima. Si spegne quando lasci il canale o ti disconnetti. Solo le persone nel tuo canale vocale possono vederla, tramite il relay di questo server, con crittografia end-to-end. Mumcord non registra mai le fotocamere. Il Mumcord di chi guarda non salva mai la tua immagine sul disco, ma non può impedire a qualcuno di fare uno screenshot con il proprio sistema operativo.",
     "othersTitle": "Fotocamere degli altri",
     "showCameras": "Mostra fotocamere",
     "showAlways": "Sempre",

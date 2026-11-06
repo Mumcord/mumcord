@@ -37,6 +37,7 @@
     "imageYoursLabel": "A te képed: {{name}}",
     "addImage": "Kép hozzáadása",
     "addImageLabel": "Saját kép hozzáadása",
+    "imageFilter": "Képek",
     "effectsLoad": "Az effektek ezen az eszközön futnak. Terhelés: {{load}} ({{unit}})",
     "loadLow": "alacsony",
     "loadMedium": "közepes",
@@ -95,7 +96,8 @@
     "rateLimited": "A kamera nem indulhatott el: túl sok próbálkozás. Próbáld újra egy perc múlva.",
     "mode": "A kamera megosztásához az átjátszó kell. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
-    "endedByRelay": "A kamerát a szerver átjátszója leállította"
+    "endedByRelay": "A kamerát a szerver átjátszója leállította",
+    "dismissStopped": "Elvetés"
   },
   "privacy": {
     "windows": "A Windows blokkolja a kamera elérését az asztali alkalmazások elől",
@@ -149,7 +151,8 @@
     "cameras": "Kamerák",
     "label_other": "Kameraszoba, {{count}} kamera bekapcsolva",
     "miniBar_other": "{{count}} kamera bekapcsolva",
-    "fullTitle": "A szoba 9 kamerával megtelt"
+    "fullTitle": "A szoba 9 kamerával megtelt",
+    "backgroundPicker": "Háttér módosítása"
   },
   "position": {
     "label": "Kamerák",
@@ -173,9 +176,11 @@
     "hidden": "Videó elrejtve",
     "showVideo": "Videó megjelenítése",
     "viewing": "Nézed",
-    "weak": "Gyenge kapcsolat"
+    "weak": "Gyenge kapcsolat",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "{{name}} beállításai",
     "pin": "Kitűzés nekem",
     "unpin": "Kitűzés megszüntetése",
     "showLarge": "Megjelenítés nagyban",
@@ -196,7 +201,8 @@
     "screenTitle": "{{name}} képernyője",
     "screenLive": "Élő",
     "partyTitle": "Közös nézés",
-    "partyStarted": "Indította: {{name}}"
+    "partyStarted": "Indította: {{name}}",
+    "label": "{{title}} a kameraszobával"
   },
   "settings": {
     "title": "Kamera",

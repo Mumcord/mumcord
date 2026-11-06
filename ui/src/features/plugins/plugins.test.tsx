@@ -49,7 +49,12 @@ describe("PluginsSection", () => {
   });
 
   it("shows the --no-plugins banner", async () => {
-    vi.spyOn(api, "pluginsList").mockResolvedValue({ noPlugins: true, allOff: false, plugins: [] });
+    vi.spyOn(api, "pluginsList").mockResolvedValue({
+      noPlugins: true,
+      allOff: false,
+      plugins: [],
+      refused: [],
+    });
     render(<PluginsSection developerMode={false} />);
     expect(await screen.findByText(/started with --no-plugins/)).toBeInTheDocument();
   });
@@ -58,11 +63,11 @@ describe("PluginsSection", () => {
     const setAllOff = vi.spyOn(api, "pluginsSetAllOff");
     const list = vi
       .spyOn(api, "pluginsList")
-      .mockResolvedValue({ noPlugins: false, allOff: false, plugins: [] });
+      .mockResolvedValue({ noPlugins: false, allOff: false, plugins: [], refused: [] });
     render(<PluginsSection developerMode={false} />);
     fireEvent.click(await screen.findByRole("switch", { name: "Turn off all plugins" }));
     expect(setAllOff).toHaveBeenCalledWith(true);
-    list.mockResolvedValue({ noPlugins: false, allOff: true, plugins: [] });
+    list.mockResolvedValue({ noPlugins: false, allOff: true, plugins: [], refused: [] });
     await act(async () => {
       api.mock.emit("pluginsChanged", {});
       await Promise.resolve();

@@ -37,6 +37,7 @@
     "imageYoursLabel": "D'íomhá: {{name}}",
     "addImage": "Cuir íomhá leis",
     "addImageLabel": "Cuir d'íomhá féin leis",
+    "imageFilter": "Íomhánna",
     "effectsLoad": "Ritheann éifeachtaí ar an ngléas seo. Ualach: {{load}} ({{unit}})",
     "loadLow": "íseal",
     "loadMedium": "meánach",
@@ -95,7 +96,8 @@
     "rateLimited": "Níor tosaíodh an ceamara: an iomarca iarrachtaí. Bain triail eile as i gceann nóiméid.",
     "mode": "Teastaíonn an t-athsheachadán ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc.",
     "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
-    "endedByRelay": "Stop athsheachadán an fhreastalaí an ceamara"
+    "endedByRelay": "Stop athsheachadán an fhreastalaí an ceamara",
+    "dismissStopped": "Cuir ar leataobh"
   },
   "privacy": {
     "windows": "Blocálann Windows rochtain ar an gceamara d'aipeanna deisce",
@@ -170,7 +172,8 @@
     "miniBar_few": "{{count}} cheamara ar siúl",
     "miniBar_many": "{{count}} gceamara ar siúl",
     "miniBar_other": "{{count}} ceamara ar siúl",
-    "fullTitle": "Tá an seomra lán ag 9 gceamara"
+    "fullTitle": "Tá an seomra lán ag 9 gceamara",
+    "backgroundPicker": "Athraigh an cúlra"
   },
   "position": {
     "label": "Ceamaraí",
@@ -194,9 +197,11 @@
     "hidden": "Físeán folaithe",
     "showVideo": "Taispeáin an físeán",
     "viewing": "Ag féachaint",
-    "weak": "Nasc lag"
+    "weak": "Nasc lag",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Roghanna do {{name}}",
     "pin": "Greamaigh dom",
     "unpin": "Díghreamaigh",
     "showLarge": "Taispeáin mór",
@@ -217,7 +222,8 @@
     "screenTitle": "Scáileán {{name}}",
     "screenLive": "Beo",
     "partyTitle": "Féachaint le chéile",
-    "partyStarted": "Tosaithe ag {{name}}"
+    "partyStarted": "Tosaithe ag {{name}}",
+    "label": "{{title}} le seomra na ceamaraí"
   },
   "settings": {
     "title": "Ceamara",

@@ -73,6 +73,18 @@ export function failureText(
   }
 }
 
+/** The "Camera stopped: …" notice of a camera that was on and stopped by itself (section 5.6). */
+export function stoppedText(t: TFunction<"camera">, failure: CameraFailure): string {
+  switch (failure) {
+    case "relayDown":
+      return t("errors.relayDown");
+    case "relayEnded":
+      return t("errors.endedByRelay");
+    default:
+      return failureText(t, failure, null);
+  }
+}
+
 /** Only the Linux portal can simply be asked again; the others need the OS settings. */
 export function canRetryAccess(failure: CameraFailure, os: DesktopOs | null): boolean {
   return failure === "permissionDenied" && (os === "linux" || os === null);

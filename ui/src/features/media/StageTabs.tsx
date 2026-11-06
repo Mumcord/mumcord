@@ -5,7 +5,9 @@
  */
 import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { useVoiceServerId } from "../channels";
 import { RoomIcon } from "../camera/room/icons";
+import { useStripMain } from "../camera/room/StripState";
 import { MonitorIcon } from "../screenshare/icons";
 import { MediaIcon } from "./icons";
 import { selectStage, useMediaView, type StageId } from "./mediaView";
@@ -61,13 +63,16 @@ function shortcutText(count: number): string {
 export function StageTabs() {
   const { t } = useTranslation("common", { keyPrefix: "media.stage" });
   const view = useMediaView();
-  const tabs = useTabs(view.stage, useStageEntries());
+  // While the cameras are a strip in the share's or party's card, the camera room has no tab of
+  // its own (mockups 08–09).
+  const combined = useStripMain(useVoiceServerId()) !== null;
+  const stage = combined ? view.stage.filter((id) => id !== "camera") : view.stage;
+  const tabs = useTabs(stage, useStageEntries());
   const row = useRef<HTMLDivElement>(null);
   const shown = tabs.length > 1;
 
   // Alt+1 … Alt+9 work wherever focus is while the row is there (FR-9.50). The physical key
   // counts, since Alt with a digit types another character on some layouts.
-  const stage = view.stage;
   useEffect(() => {
     if (!shown) return;
     const onKey = (event: globalThis.KeyboardEvent) => {
@@ -150,6 +155,9 @@ export function StageTabs() {
                 </span>
               )}
               <span className="media-stage__label">{tab.label}</span>
+              {/* Keeps the visible text "Test Stage Plugin" instead of "Test StagePlugin", so it
+                  stays part of the accessible name for voice control (WCAG 2.5.3). */}
+              {tab.plugin && " "}
               {tab.plugin && (
                 <span className="media-stage__chip" aria-hidden="true">
                   {t("plugin")}

@@ -1184,7 +1184,7 @@
     "close": "Închide",
     "privacyTitle": "Confidențialitate",
     "lockOff": "Oprește camera mea când ecranul se blochează",
-    "privacyNote": "Camera ta pornește întotdeauna oprită și arată mai întâi o previzualizare. Se oprește când părăsești canalul sau te deconectezi. Doar persoanele din canalul tău vocal o pot vedea, prin releul acestui server, criptată end-to-end. Mumcord nu înregistrează niciodată camerele.",
+    "privacyNote": "Camera ta pornește întotdeauna oprită și arată mai întâi o previzualizare. Se oprește când părăsești canalul sau te deconectezi. Doar persoanele din canalul tău vocal o pot vedea, prin releul acestui server, criptată end-to-end. Mumcord nu înregistrează niciodată camerele. Mumcord-ul celor care te privesc nu salvează niciodată imaginea ta pe disc, dar nu poate împiedica pe cineva să facă o captură de ecran cu sistemul său de operare.",
     "othersTitle": "Camerele celorlalți",
     "showCameras": "Afișează camerele",
     "showAlways": "Întotdeauna",

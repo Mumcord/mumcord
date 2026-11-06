@@ -127,5 +127,9 @@
     "netHttp": "Piekļuve internetam",
     "secrets": "Atslēgu piekariņš"
   },
-  "offerBadge": "Jaunas atļaujas"
+  "offerBadge": "Jaunas atļaujas",
+  "refused": {
+    "title": "Noraidītie spraudņi",
+    "when": "Noraidīts {{time}}"
+  }
 }
