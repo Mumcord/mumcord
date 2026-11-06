@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Camera preview: the built-in background images now show right away when you choose Image, instead of leaving the tiles empty for a moment every time the preview opens
+
 ## [0.7.0] - Unreleased
 
 ### Added
