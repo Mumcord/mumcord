@@ -393,7 +393,9 @@ mod linux {
                 }
                 g_list_free(list);
             }
-            tracing::warn!("MUMCORD_TEST_CA: the web view accepts the fixture certificate for {allowed} names");
+            tracing::warn!(
+                "MUMCORD_TEST_CA: the web view accepts the fixture certificate for {allowed} names"
+            );
         }
     }
 }
