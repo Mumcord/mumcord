@@ -274,24 +274,18 @@ const PROBES = {
     }
     return Promise.resolve(reached ? "leaked" : "blocked");
   },
-  storage: async () => {
+  storage: () => {
     try {
       window.localStorage.setItem("probe", "1");
-      return "leaked";
+      return Promise.resolve("leaked");
     } catch {
       // fall through to the next store
     }
     try {
       window.sessionStorage.setItem("probe", "1");
-      return "leaked";
+      return Promise.resolve("leaked");
     } catch {
-      // fall through to the next store
-    }
-    try {
-      const request = window.indexedDB.open("probe");
-      return await race(request, "success", "error", () => {});
-    } catch {
-      return "blocked";
+      return Promise.resolve("blocked");
     }
   },
   cookies: () => {
@@ -315,6 +309,14 @@ const PROBES = {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
       stream.getTracks().forEach((track) => track.stop());
       return "leaked";
+    } catch {
+      return "blocked";
+    }
+  },
+  indexeddb: async () => {
+    try {
+      const request = window.indexedDB.open("probe");
+      return await race(request, "success", "error", () => {});
     } catch {
       return "blocked";
     }

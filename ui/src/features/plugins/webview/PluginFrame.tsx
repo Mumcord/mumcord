@@ -24,7 +24,7 @@ import { getApi, toEngineError, type PluginWebviewPlace, type Unsubscribe } from
 import { useStageShown } from "../../media/stageContext";
 import { usePlugins } from "../pluginStore";
 import type { PluginWebview } from "../render/pluginUiStore";
-import { createBridge, newGestureKey, type Bridge, type FrameTarget } from "./bridge";
+import { createBridge, inOrder, newGestureKey, type Bridge, type FrameTarget } from "./bridge";
 import {
   childFramesUsed,
   listenFrame,
@@ -258,16 +258,17 @@ interface FrameBridgeArgs {
 function frameBridge(args: FrameBridgeArgs): Bridge {
   const { plugin, place, callbacks, watch, focusApp } = args;
   let warned = false;
+  const toPlugin = inOrder((text: string) =>
+    getApi()
+      .pluginUiEvent(plugin, { type: "webviewMessage", place, text })
+      .catch((error: unknown) => {
+        // Dropped by the limits or the plugin stopped; the text is never logged.
+        console.debug("A web view message was not delivered", toEngineError(error).code);
+      }),
+  );
   return createBridge({
     frame: args.frame,
-    toPlugin: (text) => {
-      getApi()
-        .pluginUiEvent(plugin, { type: "webviewMessage", place, text })
-        .catch((error: unknown) => {
-          // Dropped by the limits or the plugin stopped; the text is never logged.
-          console.debug("A web view message was not delivered", toEngineError(error).code);
-        });
-    },
+    toPlugin,
     onEscape: () => {
       focusApp();
       callbacks.current.onEscape?.();

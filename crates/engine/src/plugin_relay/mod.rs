@@ -67,6 +67,16 @@ struct State {
     order: Order,
 }
 
+impl State {
+    /// Drops the streams and sequences on `server_id`: of one `session`, or of all.
+    fn forget(&mut self, server_id: ServerId, session: Option<u32>) {
+        let gone = |key: &Key| key.0 == server_id && session.is_none_or(|s| key.1 == s);
+        self.queues.retain(|key, _| !gone(key));
+        self.seqs.retain(|(key, _), _| !gone(key));
+        self.order.forget_where(gone);
+    }
+}
+
 impl PluginRelay {
     pub(crate) fn enabled(&self) -> bool {
         !self.off.load(Ordering::Relaxed)
@@ -177,12 +187,49 @@ impl Engine {
         }
     }
 
-    /// `session` left `server_id`: its stream and sequence state go.
-    pub fn plugin_relay_forget(&self, server_id: ServerId, session: u32) {
-        let key = (server_id, session);
-        let mut state = lock(&self.direct().plugin_relay().state);
-        state.queues.remove(&key);
-        state.seqs.retain(|(k, _), _| *k != key);
-        state.order.forget(key);
+    /// `session` left `server_id`: its 1:1 stream and sequence state go, so its next session
+    /// starts counting anew on both ends.
+    pub(crate) fn plugin_relay_forget(&self, server_id: ServerId, session: u32) {
+        lock(&self.direct().plugin_relay().state).forget(server_id, Some(session));
+    }
+
+    /// The connection to `server_id` (re)synced or ended: every session there is new, so the
+    /// 1:1 streams and sequences of the old ones go. Otherwise a person who sent to us before
+    /// would have their first messages to our new session dropped as repeats.
+    pub(crate) fn plugin_relay_pairs_reset(&self, server_id: ServerId) {
+        lock(&self.direct().plugin_relay().state).forget(server_id, None);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_new_connection_accepts_a_sender_counting_from_one_again() {
+        let mut state = State::default();
+        let alice = (1, 5);
+        assert!(state.order.admit(alice, "dice", 1));
+        assert!(!state.order.admit(alice, "dice", 1), "a repeat is dropped");
+        state.forget(2, None);
+        assert!(
+            !state.order.admit(alice, "dice", 1),
+            "another server keeps its order"
+        );
+        state.forget(1, None);
+        assert!(state.order.admit(alice, "dice", 1));
+    }
+
+    #[test]
+    fn a_person_who_left_starts_counting_anew() {
+        let mut state = State::default();
+        let (bob, carol) = ((1, 6), (1, 7));
+        *state.seqs.entry((bob, "dice".into())).or_insert(0) += 3;
+        *state.seqs.entry((carol, "dice".into())).or_insert(0) += 2;
+        assert!(state.order.admit(bob, "dice", 3));
+        state.forget(1, Some(6));
+        assert!(!state.seqs.contains_key(&(bob, "dice".into())));
+        assert_eq!(state.seqs.get(&(carol, "dice".into())), Some(&2));
+        assert!(state.order.admit(bob, "dice", 1));
     }
 }
