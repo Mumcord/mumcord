@@ -296,8 +296,9 @@ export async function pickImage(name: string): Promise<void> {
 
 /** The "Background effects are not available …" line of the open preview, `null` without one. */
 export async function effectsUnavailable(): Promise<string | null> {
+  // Matches the load line itself; `normalize-space()` on `*` would also match its ancestors.
   const line = previewDialog().$(
-    ".//*[contains(normalize-space(),'Background effects are not available')]",
+    ".//p[contains(@class,'cam-load')][contains(normalize-space(),'Background effects are not available')]",
   );
   return (await line.isExisting()) ? (await line.getText()).trim() : null;
 }
