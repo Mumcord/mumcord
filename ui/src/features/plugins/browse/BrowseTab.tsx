@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { IndexedPlugin } from "../../../api";
 import { consumePluginRequest, usePendingPluginRequest } from "../pluginRequestStore";
@@ -28,6 +28,17 @@ export function BrowseTab() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category>("all");
   const [detailsId, setDetailsId] = useState<string | null>(null);
+  // Back from the details unmounts the page that had focus; focus returns to the card it came from.
+  const browseRef = useRef<HTMLDivElement>(null);
+  const backTo = useRef<string | null>(null);
+  useEffect(() => {
+    if (detailsId !== null || backTo.current === null) return;
+    const id = backTo.current;
+    backTo.current = null;
+    browseRef.current
+      ?.querySelector<HTMLElement>(`[data-plugin-id="${CSS.escape(id)}"] .plugin-card-open`)
+      ?.focus();
+  }, [detailsId]);
   const [promptId, setPromptId] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<SuggestedBy | null>(null);
   const searchId = useId();
@@ -112,7 +123,7 @@ export function BrowseTab() {
   const details = find(detailsId);
 
   return (
-    <div className="plugin-browse">
+    <div className="plugin-browse" ref={browseRef}>
       {notice !== null && (
         <p role="status" className="plugin-browse-notice">
           {notice}
@@ -123,6 +134,7 @@ export function BrowseTab() {
           plugin={details}
           installed={isInstalled(details.id)}
           onBack={() => {
+            backTo.current = details.id;
             setDetailsId(null);
           }}
           onInstall={() => {
