@@ -300,6 +300,15 @@ fn specta_builder() -> Builder<tauri::Wry> {
             plugins::suggestions::plugin_suggestion_installed,
             plugins::suggestions::plugin_suggestions_dismiss_server,
             diagnostics::diagnostics_save,
+            commands::crash::crash_list,
+            commands::crash::crash_take_unseen,
+            commands::crash::crash_read,
+            commands::crash::crash_delete,
+            commands::crash::crash_delete_all,
+            commands::crash::crash_export,
+            commands::crash::crash_open_folder,
+            commands::crash::log_open_folder,
+            commands::crash::log_text,
             diagnostics::app_info,
             commands::inspector::packet_capture_set,
             commands::inspector::packet_capture_background,
@@ -617,7 +626,12 @@ pub fn run() {
         .build(context);
 
     match app {
-        Ok(app) => app.run(plugins::watchdog::on_run_event),
+        Ok(app) => app.run(|app, event| {
+            if matches!(event, tauri::RunEvent::Exit) {
+                mumcord_engine::crash::clean_exit();
+            }
+            plugins::watchdog::on_run_event(app, event);
+        }),
         Err(err) => {
             eprintln!("error while running Mumcord: {err}");
             std::process::exit(1);
@@ -653,6 +667,8 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let data_dir = portable::data_dir(app)?;
     let logs_dir = portable::log_dir(app)?;
     std::fs::create_dir_all(&data_dir)?;
+    // Before anything else, so a crash while the engine opens leaves a report too (#568).
+    commands::crash::install(&logs_dir, version::DISPLAY);
 
     // Engine start-up already logs (e.g. the encoder probe), but the log level lives in the
     // profile and a too-new profile must be rejected before anything is written: keep lines in

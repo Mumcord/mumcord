@@ -843,6 +843,23 @@ export const commands = {
 	pluginSuggestionsDismissServer: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestions_dismiss_server", { serverId })),
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
+	/**  The saved crash reports, newest first. */
+	crashList: () => typedError<CrashReport[], ApiError>(__TAURI_INVOKE("crash_list")),
+	/**  Reports from crashes the user has not been told about yet (the notice at start-up). */
+	crashTakeUnseen: () => typedError<CrashReport[], ApiError>(__TAURI_INVOKE("crash_take_unseen")),
+	/**  The full text of one report, for the details view and "Copy". */
+	crashRead: (id: string) => typedError<string, ApiError>(__TAURI_INVOKE("crash_read", { id })),
+	crashDelete: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("crash_delete", { id })),
+	crashDeleteAll: () => typedError<null, ApiError>(__TAURI_INVOKE("crash_delete_all")),
+	/**  Saves the given reports (all when `ids` is empty) as a zip file at `path`. */
+	crashExport: (ids: string[], path: string) => typedError<null, ApiError>(__TAURI_INVOKE("crash_export", { ids, path })),
+	crashOpenFolder: () => typedError<null, ApiError>(__TAURI_INVOKE("crash_open_folder")),
+	logOpenFolder: () => typedError<null, ApiError>(__TAURI_INVOKE("log_open_folder")),
+	/**
+	 *  The current log for "Copy": the last lines, or all of today's file. Lines are redacted the
+	 *  same way as in the log file.
+	 */
+	logText: (whole: boolean) => typedError<string, ApiError>(__TAURI_INVOKE("log_text", { whole })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
 	/**
 	 *  The developer tools were unlocked (`true`) or hidden again (`false`). Hiding them stops any
@@ -2029,6 +2046,19 @@ export type CpuCores = {
 	total: number,
 };
 
+export type CrashKind = "panic" | "signal" | "unexpected";
+
+export type CrashReport = {
+	id: string,
+	/**  Seconds since 1970. */
+	created: number | null,
+	version: string,
+	kind: CrashKind,
+	/**  The signal name for [`CrashKind::Signal`], e.g. `SIGSEGV`. */
+	signal: string | null,
+	cause: string,
+};
+
 /**  A `mumble://` link was opened from outside (startup argument or second launch). */
 export type DeepLinkOpened = {
 	link: MumbleLink,
@@ -2767,7 +2797,10 @@ export type LatencyEstimate = {
 	processingUs: number,
 	/**  Output queue and speaker device buffer. */
 	outputBufferUs: number,
-	/**  The block the sound server delivers when it is larger than the buffer Mumcord asks for in low-latency mode; `null` when the period matches the request or is not measured yet. */
+	/**
+	 *  The block the sound server delivers when it is larger than the buffer Mumcord asks for in
+	 *  low-latency mode; `null` when the period matches the request or is not measured yet.
+	 */
 	soundServerBlockUs: number | null,
 	/**  Sum of the parts (without the network while it is unknown). */
 	totalUs: number,

@@ -8,6 +8,7 @@ import type {
   CameraRoomView,
   CameraTile,
   CameraView,
+  CrashReport,
   DndState,
   FileCard,
   FileChip,
@@ -102,6 +103,8 @@ import { createMockPopouts } from "./mockPopout";
 import { createMockUpdater } from "./mockUpdater";
 
 export interface MockOptions {
+  /** Saved crash reports the mock starts with (#568). */
+  crashReports?: CrashReport[];
   /**
    * "fresh" simulates the first start (no identity, no servers, wizard pending); "demo" fills
    * the "ready" state with richer fictional data for screenshots, "demoFresh" is the first start
@@ -1005,6 +1008,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
+  const crashReports: CrashReport[] = [...(options.crashReports ?? [])];
+  const crashSeen = new Set<string>();
   /** What the mock answered for each `mumble://` link in this run (issue #175). */
   const queryAnswers = new Map<string, MumbleLinkStats>();
   const serverVersion = options.serverVersion ?? "1.5.735";
@@ -3419,6 +3424,35 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),
+    // Crash reports (#568), seeded through `MockOptions.crashReports`.
+    crashList: () => Promise.resolve([...crashReports]),
+    crashTakeUnseen: () => {
+      const unseen = crashReports.filter((r) => !crashSeen.has(r.id));
+      for (const r of crashReports) crashSeen.add(r.id);
+      return Promise.resolve(unseen);
+    },
+    crashRead: (id: string) => {
+      const report = crashReports.find((r) => r.id === id);
+      if (report === undefined)
+        return Promise.reject(new EngineError("notFound", "no such crash report"));
+      return Promise.resolve(
+        `Mumcord crash report\nversion: ${report.version}\ncause: ${report.cause}\n`,
+      );
+    },
+    crashDelete: (id: string) => {
+      const at = crashReports.findIndex((r) => r.id === id);
+      if (at >= 0) crashReports.splice(at, 1);
+      return Promise.resolve(null);
+    },
+    crashDeleteAll: () => {
+      crashReports.length = 0;
+      return Promise.resolve(null);
+    },
+    crashExport: () => Promise.resolve(null),
+    crashOpenFolder: () => Promise.resolve(null),
+    logOpenFolder: () => Promise.resolve(null),
+    logText: (whole: boolean) =>
+      Promise.resolve(whole ? "mock log line 1\nmock log line 2" : "mock log line 2"),
     appInfo: () =>
       Promise.resolve(
         demo
