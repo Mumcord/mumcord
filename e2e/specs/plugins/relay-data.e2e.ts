@@ -370,10 +370,39 @@ async function pluginLog(): Promise<string[]> {
   return diag.log.map((line) => line.text);
 }
 
-/** Waits until both clients see each other and the plugin on A knows Bob as its peer. */
-async function bothInChannel(): Promise<void> {
+/** How many `peer-ready` events the plugin on the current client got (its "Peer:" line). */
+async function readyCount(): Promise<number> {
+  await openPanel();
+  const match = /^Peer: .* \((\d+)\)$/m.exec(await panelText());
+  return Number(match?.[1] ?? 0);
+}
+
+type ReadyCounts = { a: number; b: number };
+
+async function readyCounts(): Promise<ReadyCounts> {
+  return { a: await readyCount(), b: await apps.onB(readyCount) };
+}
+
+async function waitReady(after: number, who: string): Promise<void> {
+  await browser.waitUntil(async () => (await readyCount()) > after, {
+    timeout: 60_000,
+    interval: 500,
+    timeoutMsg: `the plugin on ${who} got no new peer-ready`,
+  });
+}
+
+/**
+ * Waits until both clients see each other and the plugin on A knows Bob as its peer. After a
+ * reconnect the old peer stays shown, so with `before` each plugin must also have had a new
+ * `peer-ready`: only then do messages pass its checks (FR-6.35), in both directions.
+ */
+async function bothInChannel(before?: ReadyCounts): Promise<void> {
   await personRow("Bob").waitForDisplayed({ timeout: 60_000, timeoutMsg: "A never saw Bob" });
   await waitPanel("Peer: Bob", 60_000);
+  if (before) {
+    await waitReady(before.a, "A");
+    await apps.onB(() => waitReady(before.b, "B"));
+  }
 }
 
 (relayenv.relayAvailable() ? describe : describe.skip)(
@@ -484,6 +513,7 @@ async function bothInChannel(): Promise<void> {
     });
 
     it("AC-9.18: B out of the channel gets nothing; back in, it receives again", async () => {
+      const before = await readyCounts();
       const serverId = await apps.onB(() => invokeOk<number>("voice_server_get"));
       await apps.onB(() => invokeOk("disconnect", { serverId }));
       await personRow("Bob").waitForExist({ reverse: true, timeout: 30_000 });
@@ -496,8 +526,8 @@ async function bothInChannel(): Promise<void> {
         await invokeOk("connect", { serverId, channelPath: null, password: null });
         await joinVoice();
       });
-      // "Peer: Bob" again only comes with B's new announce, so A's next send has B as recipient.
-      await bothInChannel();
+      // New announces both ways, so A's next send has B as recipient and B accepts it.
+      await bothInChannel(before);
       // Back in the channel, B is admitted to the broadcast again with A's next send and gets it.
       const back = await send("Channel 64 KiB", "channel-big", BIG);
       await bReceives(back, BIG);
@@ -539,8 +569,8 @@ async function bothInChannel(): Promise<void> {
      * AC-9.19 and AC-9.41 without a relay for plugin data: after the switch both clients
      * reconnect to the recreated server (registrations are kept).
      */
-    async function withoutRelayData(): Promise<void> {
-      await bothInChannel();
+    async function withoutRelayData(before: ReadyCounts): Promise<void> {
+      await bothInChannel(before);
       await waitPanel(status("NotAllowed"), 60_000);
       await expectChip(MUMBLE_CHIP);
       const small = await send("Channel small, fallback", "channel-small-fallback", SMALL);
@@ -554,14 +584,16 @@ async function bothInChannel(): Promise<void> {
     }
 
     it("AC-9.19, AC-9.41: profile no-plugin-data falls back to Mumble plugin data", async () => {
+      const before = await readyCounts();
       await relayenv.startRelay("no-plugin-data");
       expect((await relayenv.relayStatus()).uses).not.toContain("plugin_data");
-      await withoutRelayData();
+      await withoutRelayData(before);
     });
 
     (oldImage ? it : it.skip)("AC-9.19: an old relay without plugin data falls back the same way", async () => {
+      const before = await readyCounts();
       await relayenv.startRelay("old", { image: oldImage, botImage: oldBotImage });
-      await withoutRelayData();
+      await withoutRelayData(before);
     });
   },
 );
