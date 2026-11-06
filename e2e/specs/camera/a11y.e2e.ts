@@ -96,11 +96,24 @@ function liveText(): Promise<string> {
   );
 }
 
-/** The running CSS animations and transitions in the camera room (tiles and layout). */
-function roomAnimations(): Promise<number> {
+/**
+ * The running CSS animations and transitions of the room's layout and tiles (the stage, not the
+ * header's or bar's buttons), as "<class> <name> <ms>". The app's reduce-motion rule leaves
+ * 0.01 ms ones that end at once; only those of a millisecond or more count.
+ */
+function stageAnimations(): Promise<string[]> {
   return browser.execute(() => {
-    const room = document.querySelector(".cam-room");
-    return room ? room.getAnimations({ subtree: true }).length : -1;
+    const stage = document.querySelector(".cam-room .cam-room__stage");
+    if (!stage) return ["no stage"];
+    return stage
+      .getAnimations({ subtree: true })
+      .filter((a) => Number(a.effect?.getComputedTiming().duration ?? 0) >= 1)
+      .map((a) => {
+        const target = (a.effect as KeyframeEffect | null)?.target;
+        const name =
+          a instanceof CSSAnimation ? a.animationName : a instanceof CSSTransition ? a.transitionProperty : "";
+        return `${target?.className ?? ""} ${name} ${String(a.effect?.getComputedTiming().duration)}`;
+      });
   });
 }
 
@@ -136,9 +149,9 @@ function speakingStyle(
 async function switchLayoutWithoutAnimation(): Promise<void> {
   const speaker = $("//span[@role='radiogroup'][@aria-label='Layout']//*[@role='radio'][normalize-space()='Speaker']");
   await speaker.click();
-  expect(await roomAnimations()).toBe(0);
+  expect(await stageAnimations()).toEqual([]);
   await $("//span[@role='radiogroup'][@aria-label='Layout']//*[@role='radio'][normalize-space()='Grid']").click();
-  expect(await roomAnimations()).toBe(0);
+  expect(await stageAnimations()).toEqual([]);
 }
 
 (relayenv.relayAvailable() ? describe : describe.skip)("camera room keyboard, screen reader and reduced motion (AC-8.15, 8.16)", function () {
@@ -159,6 +172,13 @@ async function switchLayoutWithoutAnimation(): Promise<void> {
     }
     await turnCameraOn();
     await on("b", () => waitTile(NAMES.a));
+    // The tests below start from B's open room: a camera turned on later is announced there.
+    await on("b", () =>
+      $(`//section[contains(@class,'cam-room')]//div[contains(@class,'cam-tile')][starts-with(@aria-label,'${NAMES.a},')]`).waitForDisplayed({
+        timeout: 20_000,
+        timeoutMsg: "B's camera room never showed A's camera",
+      }),
+    );
   });
 
   after(async () => {
