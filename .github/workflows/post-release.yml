@@ -76,8 +76,11 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           current=$(node -p 'require("./package.json").version')
-          newest=$(printf '%s\n%s\n' "$current" "$VERSION" | sort -V | tail -n 1)
-          if [[ "$current" != "$VERSION" && "$newest" == "$current" ]]; then
+          # A pre-release of a version (0.7.0-dev) comes before that version, but `sort -V` puts
+          # it after: compare without the suffix, so 0.7.0-dev counts as older than 0.7.0.
+          base=${current%%-*}
+          newest=$(printf '%s\n%s\n' "$base" "$VERSION" | sort -V | tail -n 1)
+          if [[ "$base" != "$VERSION" && "$newest" == "$base" ]]; then
             echo "main is already at $current, newer than $VERSION; nothing to do."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
