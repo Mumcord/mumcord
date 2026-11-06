@@ -488,7 +488,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
       timeoutMsg: "push-to-talk key not captured",
     });
     log(`ptt key: ${await pttKey.getText()}`);
-    const panel = await $("[role='tabpanel']").getText();
+    const panel = await $(".settings__panel").getText();
     log(`voice settings notes: ${panel.split("\n").filter((l) => /not available|cannot|could not/i.test(l)).join(" | ") || "none"}`);
     await browser.keys("Escape");
 

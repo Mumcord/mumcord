@@ -426,7 +426,7 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     await waitGone("[role='listbox']");
     await waitFor(".overlay__dialog"); // Escape closed only the list
     // Every settings tab: no native <select>, every themed one has an accessible name.
-    const names = await $$('[role="tab"]').map((t) => t.getText());
+    const names = await $$('.settings__nav [role="tab"]').map((t) => t.getText());
     const bad: string[] = [];
     for (const name of names) {
       await $(`[role="tab"]=${name}`).click();
@@ -447,7 +447,7 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
 
   it("AC-2.16: controls sit right-aligned in every section card of every settings group", async () => {
     await appearance();
-    const names = await $$('[role="tab"]').map((t) => t.getText());
+    const names = await $$('.settings__nav [role="tab"]').map((t) => t.getText());
     // The thirteen top-level groups: the ten of #161 plus Plugins, Screen sharing and Camera.
     expect(names).toHaveLength(13);
     const off: string[] = [];
@@ -456,7 +456,7 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       await browser.pause(150);
       off.push(
         ...(await browser.execute((section: string) => {
-          const panel = document.querySelector("[role='tabpanel']:not([hidden])") ?? document.body;
+          const panel = document.querySelector(".settings__panel") ?? document.body;
           const out: string[] = [];
           // Every page is a grid of section cards (#161); the check runs inside each of them.
           if (panel.querySelector(".settings-group") === null) out.push(`${section}: no section cards`);
