@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use mumcord_audio::SAMPLE_RATE;
 use mumcord_audio::io::{DevicePeriods, LOW_LATENCY_BUFFER_FRAMES};
-use mumcord_audio::mixer::{LOW_LATENCY_QUEUE_MS, PlaybackConfig};
+use mumcord_audio::mixer::{LOW_LATENCY_QUEUE_MS, PERIOD_HEADROOM_MS, PlaybackConfig};
 
 /// Opus look-ahead: SILK and hybrid modes (VoIP and audio application) need 6.5 ms, the
 /// CELT-only restricted low-delay application 2.5 ms.
@@ -15,9 +15,6 @@ const LOOKAHEAD_MS: f32 = 6.5;
 const LOW_DELAY_LOOKAHEAD_MS: f32 = 2.5;
 /// Device period assumed for normal mode while none has been measured.
 const ASSUMED_PERIOD_MS: f32 = 10.0;
-/// Headroom of the output queue above one device period: the playback thread polls every 2 ms
-/// and must refill before the device takes the next period.
-const QUEUE_MARGIN_MS: f32 = 3.0;
 /// The output queue holds between its target and one 10 ms frame more, so on average half a
 /// frame above the target.
 const QUEUE_HALF_FRAME_MS: f32 = 5.0;
@@ -41,6 +38,11 @@ pub struct LatencyEstimateView {
     pub processing_ms: f32,
     /// Output queue and speaker device buffer.
     pub output_buffer_ms: f32,
+    /// The block the sound server actually delivers, when it is larger than the buffer Mumcord
+    /// asks for in low-latency mode: another application on the same server can make the graph
+    /// run with a bigger quantum, and no client can lower it. `None` while the period is unknown
+    /// or matches the request.
+    pub sound_server_block_ms: Option<f32>,
     pub total_ms: f32,
     /// The same estimate for the other mode, for comparison.
     pub other_mode_total_ms: f32,
@@ -57,17 +59,21 @@ pub(crate) struct LatencyInputs {
 }
 
 /// Output queue target of the playback thread: the normal default, or in low-latency mode one
-/// output period plus headroom, at least [`LOW_LATENCY_QUEUE_MS`]. Stays at the default until
-/// the period is known, so a device that refused the small buffer never runs dry.
+/// output period plus [`PERIOD_HEADROOM_MS`], at least [`LOW_LATENCY_QUEUE_MS`]. Stays at the
+/// default until the period is known, so a device that refused the small buffer never runs dry.
+/// A period larger than the default raises the target: a queue below one device period cannot
+/// cover a callback, and the rest of that buffer stays silent, which is heard as stutter.
 pub(crate) fn queue_target_ms(low_latency: bool, output_period: Option<Duration>) -> u32 {
     let normal = PlaybackConfig::default().target_queue_ms;
-    match output_period {
-        Some(period) if low_latency => {
-            let wanted = (ms(period) + QUEUE_MARGIN_MS).ceil() as u32;
-            wanted.clamp(LOW_LATENCY_QUEUE_MS, normal)
-        }
-        _ => normal,
-    }
+    let Some(period) = output_period else {
+        return normal;
+    };
+    let base = if low_latency {
+        LOW_LATENCY_QUEUE_MS
+    } else {
+        normal
+    };
+    base.max(ms(period).ceil() as u32 + PERIOD_HEADROOM_MS)
 }
 
 pub(crate) fn estimate(inputs: &LatencyInputs) -> LatencyEstimateView {
@@ -118,6 +124,7 @@ fn mode_estimate(
         Some(Duration::from_secs_f32(assumed(periods.output) / 1000.0)),
     );
     let output_buffer_ms = queue as f32 + QUEUE_HALF_FRAME_MS + assumed(periods.output);
+    let sound_server_block_ms = sound_server_block(low_latency, periods.output);
     let total_ms = input_buffer_ms
         + encode_ms
         + network_ms.unwrap_or(0.0)
@@ -133,6 +140,7 @@ fn mode_estimate(
         jitter_ms,
         processing_ms,
         output_buffer_ms,
+        sound_server_block_ms,
         total_ms,
         other_mode_total_ms: 0.0,
     }
@@ -140,6 +148,27 @@ fn mode_estimate(
 
 fn ms(duration: Duration) -> f32 {
     duration.as_secs_f32() * 1000.0
+}
+
+/// The block the sound server actually delivers, when it is bigger than the buffer Mumcord asks
+/// for in low-latency mode. Only on Linux does the server run one graph for all applications, so
+/// there another application can make the block larger than what Mumcord requested and no client
+/// can lower it; elsewhere the device keeps the size it was given. `None` while the period is not
+/// measured yet or matches the request.
+fn sound_server_block(low_latency: bool, period: Option<Duration>) -> Option<f32> {
+    if !cfg!(target_os = "linux") {
+        return None;
+    }
+    // Whole microseconds: a measured period is a whole number of frames, so the smallest step
+    // above the request is one frame (about 20.8 µs) and rounding cannot hide or invent it. The
+    // rounding is only there so a period of exactly the requested size is not read as larger by
+    // the nanosecond rounding of a Duration.
+    let requested_us = f64::from(LOW_LATENCY_BUFFER_FRAMES) * 1_000_000.0 / f64::from(SAMPLE_RATE);
+    low_latency
+        .then_some(period)
+        .flatten()
+        .filter(|period| (period.as_secs_f64() * 1_000_000.0).round() > requested_us.round())
+        .map(ms)
 }
 
 #[cfg(test)]
@@ -217,6 +246,65 @@ mod tests {
     }
 
     #[test]
+    fn the_sound_server_block_is_named_only_when_it_is_bigger_than_the_request() {
+        let view = estimate(&LatencyInputs {
+            low_latency: true,
+            periods: DevicePeriods {
+                input: period(128),
+                output: period(1024),
+            },
+            ..LatencyInputs::default()
+        });
+        // The gate is the sound server, which only Linux runs for every application.
+        if cfg!(target_os = "linux") {
+            assert!(
+                close(view.sound_server_block_ms.expect("block"), 21.333),
+                "{view:?}"
+            );
+        } else {
+            assert_eq!(view.sound_server_block_ms, None);
+        }
+
+        // One frame above the request is shown; the requested size itself is not.
+        let one_frame_more = estimate(&LatencyInputs {
+            low_latency: true,
+            periods: DevicePeriods {
+                input: period(128),
+                output: period(129),
+            },
+            ..LatencyInputs::default()
+        });
+        if cfg!(target_os = "linux") {
+            assert!(
+                close(one_frame_more.sound_server_block_ms.expect("block"), 2.688),
+                "{one_frame_more:?}"
+            );
+        }
+
+        // The buffer Mumcord asked for: nothing to explain.
+        let requested = estimate(&LatencyInputs {
+            low_latency: true,
+            periods: DevicePeriods {
+                input: period(128),
+                output: period(128),
+            },
+            ..LatencyInputs::default()
+        });
+        assert_eq!(requested.sound_server_block_ms, None);
+
+        // Normal mode requests no size, so a large default period is not a contradiction.
+        let normal = estimate(&LatencyInputs {
+            low_latency: false,
+            periods: DevicePeriods {
+                input: None,
+                output: period(1024),
+            },
+            ..LatencyInputs::default()
+        });
+        assert_eq!(normal.sound_server_block_ms, None);
+    }
+
+    #[test]
     fn queue_target_follows_the_output_period() {
         assert_eq!(queue_target_ms(false, period(128)), 25);
         assert_eq!(queue_target_ms(true, None), 25, "unknown period: stay safe");
@@ -224,6 +312,9 @@ mod tests {
         assert_eq!(queue_target_ms(true, period(128)), 6);
         assert_eq!(queue_target_ms(true, period(480)), 13);
         // A device that kept a large default buffer gets no less than normal mode.
-        assert_eq!(queue_target_ms(true, period(2048)), 25);
+        assert_eq!(queue_target_ms(true, period(2048)), 46);
+        // A sound server running the graph with a quantum another application grew must still be
+        // coverable by one queue level, otherwise part of every callback stays silent.
+        assert_eq!(queue_target_ms(false, period(2048)), 46);
     }
 }

@@ -35,7 +35,8 @@
     "processing": "Ipproċessar",
     "output": "Buffer tal-ispiker",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Is-server tal-ħoss jagħti blokk ta' {{value}} ms għax applikazzjoni oħra titlobhom; Mumcord ma jistax jagħhom iżgħar."
   },
   "media": {
     "controls": "Kontrolli tal-playback",

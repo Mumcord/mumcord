@@ -35,7 +35,8 @@
     "processing": "Obdelava",
     "output": "Medpomnilnik zvočnika",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Zvočni server dobavlja bloke {{value}} ms, ker jih drug program zahteva; Mumcord jih ne more narediti manjše."
   },
   "media": {
     "controls": "Kontrole predvajalnika",

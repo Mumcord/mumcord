@@ -35,7 +35,8 @@
     "processing": "Processamento",
     "output": "Buffer das colunas",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "O servidor de som entrega blocos de {{value}} ms porque outra aplicação os pede; o Mumcord não pode torná-los menores."
   },
   "media": {
     "controls": "Controlos do leitor",

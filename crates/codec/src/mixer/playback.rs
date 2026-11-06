@@ -26,11 +26,15 @@ const POLL_INTERVAL: Duration = Duration::from_millis(2);
 const MAX_FRAMES_PER_POLL: u32 = 4;
 const FRAME_DURATION: Duration = Duration::from_millis(10);
 /// Smallest output queue target for low-latency mode (issue #156). A 10 ms frame is written
-/// whenever the queue drops below the target, so the queue holds between it and 10 ms more;
-/// the target must also cover one device period, which only the caller knows.
+/// whenever the queue drops below the target, so the queue holds between it and 10 ms more.
+/// The target is never below one device period plus [`PERIOD_HEADROOM_MS`].
 pub const LOW_LATENCY_QUEUE_MS: u32 = 5;
-/// Device queue below which a wake-up counts as late (5 ms), or below a quarter of a smaller
-/// queue target (low-latency mode), which normally dips under 5 ms between two polls.
+/// Headroom above one device period: the playback thread must refill before the device takes
+/// the next buffer, so the queue has to cover a whole period plus this.
+pub const PERIOD_HEADROOM_MS: u32 = 3;
+/// Device queue below which a wake-up counts as late: 5 ms, or below what a normal drain of one
+/// device period leaves behind (the headroom) when the period is known, which is where the queue
+/// sits between two polls.
 const LATE_QUEUE_SAMPLES: usize = FRAME_SAMPLES / 2;
 
 /// Where mixed frames go; implemented by the device `FrameSink` of `mumcord-audio` and by test doubles.
@@ -45,6 +49,12 @@ pub trait PlaybackSink: Send + 'static {
     }
     /// Audio queued but not yet played, in 48 kHz samples.
     fn queued_samples(&mut self) -> usize;
+    /// Samples the device takes per callback, in 48 kHz samples; 0 while unknown. The sound
+    /// server can hand a whole quantum larger than the buffer we requested, so the queue target
+    /// must cover one of these, otherwise part of the buffer stays silent (stutter).
+    fn device_period_samples(&mut self) -> usize {
+        0
+    }
 }
 
 /// The mono mix of a stereo frame.
@@ -389,15 +399,25 @@ impl<S: PlaybackSink> Worker<S> {
 
         while !self.stop.load(Ordering::Relaxed) {
             self.apply_commands();
-            let target_samples = self.queue_target_ms as usize * SAMPLE_RATE as usize / 1000;
+            // A device takes a whole period per callback. On a sound server the period is the
+            // graph quantum, which another application can grow well past the buffer we asked
+            // for; a queue that cannot cover one period leaves part of the buffer silent, so
+            // the target always holds one period plus headroom.
+            let period_samples = self.sink.device_period_samples();
+            let headroom_samples = PERIOD_HEADROOM_MS as usize * SAMPLE_RATE as usize / 1000;
+            let target_samples = (self.queue_target_ms as usize * SAMPLE_RATE as usize / 1000)
+                .max(period_samples + headroom_samples);
             self.shares.update();
             while let Ok(packet) = self.packets.pop() {
                 let arrival_ms = millis_since(epoch, packet.arrival);
                 self.mixer.push_packet(&packet, arrival_ms);
             }
             if !sink_refusing {
+                // A wake-up is late if it finds less than what a normal drain of one period
+                // leaves behind, which is the headroom itself.
+                let late_below = target_samples.saturating_sub(period_samples);
                 let queued = self.sink.queued_samples();
-                if primed && audible && queued < LATE_QUEUE_SAMPLES.min(target_samples / 4) {
+                if primed && audible && queued < late_below.min(LATE_QUEUE_SAMPLES) {
                     self.counters.late_wakeups.fetch_add(1, Ordering::Relaxed);
                 }
             }

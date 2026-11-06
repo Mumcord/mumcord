@@ -86,6 +86,15 @@ impl Counters {
         }
     }
 
+    /// Frames the last callback delivered for `direction`; 0 while no stream has run.
+    pub(crate) fn delivered_period(&self, direction: Direction) -> u32 {
+        let period = match direction {
+            Direction::Input => &self.input_period,
+            Direction::Output => &self.output_period,
+        };
+        period.load(Ordering::Relaxed)
+    }
+
     pub(crate) fn snapshot(&self) -> IoStats {
         IoStats {
             capture_overruns: self.capture_overruns.load(Ordering::Relaxed),

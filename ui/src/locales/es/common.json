@@ -35,7 +35,8 @@
     "processing": "Procesamiento",
     "output": "Búfer del altavoz",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "El servidor de sonido entrega bloques de {{value}} ms porque otra aplicación los pide; Mumcord no puede hacerlos más pequeños."
   },
   "media": {
     "controls": "Controles del reproductor",

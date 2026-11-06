@@ -35,7 +35,8 @@
     "processing": "Apstrāde",
     "output": "Skaļruņa buferis",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Skaņas serveris nodod {{value}} ms blokus, jo otra lietotne to prasa; Mumcord nevar tos padarīt mazākus."
   },
   "media": {
     "controls": "Atskaņotāja kontroles",

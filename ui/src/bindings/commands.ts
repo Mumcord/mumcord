@@ -2766,6 +2766,8 @@ export type LatencyEstimate = {
 	processingUs: number,
 	/**  Output queue and speaker device buffer. */
 	outputBufferUs: number,
+	/**  The block the sound server delivers when it is larger than the buffer Mumcord asks for in low-latency mode; `null` when the period matches the request or is not measured yet. */
+	soundServerBlockUs: number | null,
 	/**  Sum of the parts (without the network while it is unknown). */
 	totalUs: number,
 	/**  The same estimate for the other mode. */

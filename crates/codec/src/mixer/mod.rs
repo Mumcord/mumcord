@@ -14,8 +14,8 @@ pub mod share;
 mod tests;
 
 pub use playback::{
-    FrameTime, LOW_LATENCY_QUEUE_MS, PacketSender, Playback, PlaybackConfig, PlaybackError,
-    PlaybackPorts, PlaybackSink, PlaybackStats, ThreadStart, downmix,
+    FrameTime, LOW_LATENCY_QUEUE_MS, PERIOD_HEADROOM_MS, PacketSender, Playback, PlaybackConfig,
+    PlaybackError, PlaybackPorts, PlaybackSink, PlaybackStats, ThreadStart, downmix,
 };
 
 use std::sync::Arc;

@@ -35,7 +35,8 @@
     "processing": "Apdorojimas",
     "output": "Garsiakalbio buferis",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Garsonų serveris pateikia {{value}} ms blokus, nes kita programa jų prašo; Mumcord negali jų sumažinti."
   },
   "media": {
     "controls": "Grotuvo valdikliai",
