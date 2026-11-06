@@ -102,16 +102,11 @@ impl V4l2 {
                 .ok_or(CameraError::NoCamera)?
         };
         let device = Device::with_path(&path).map_err(open_error)?;
-        let mode = mode::choose(&modes(&device), &request).ok_or_else(|| {
+        let candidates = mode::candidates(&modes(&device), &request);
+        let mode = *candidates.first().ok_or_else(|| {
             CameraError::Backend("the camera offers no usable picture format".to_owned())
         })?;
-        let geometry = Geometry::new(
-            mode.width,
-            mode.height,
-            request.max_width,
-            request.max_height,
-        )
-        .ok_or_else(|| CameraError::Backend("the camera picture is too small".to_owned()))?;
+        let geometry = geometry_for(mode, request)?;
         let stride = configure(&device, mode)?;
         tracing::debug!(?mode, "v4l2 camera mode");
 
@@ -122,9 +117,31 @@ impl V4l2 {
                 .name("camera-v4l2".to_owned())
                 .spawn(move || {
                     let mut pump = Pump::new(mode, geometry, sink);
-                    let reason = capture(&device, mode, stride, &mut pump, &stop);
-                    if let Some(reason) = reason {
-                        pump.end(reason);
+                    let mut outcome = capture(&device, mode, stride, &mut pump, &stop);
+                    // A mode that stays silent: try the next one with the same sink.
+                    for &next in candidates.iter().skip(1) {
+                        if !matches!(outcome, Run::NoFirstPicture) {
+                            break;
+                        }
+                        tracing::info!(
+                            silent = ?pump.mode(),
+                            ?next,
+                            "camera sent no picture, trying another mode"
+                        );
+                        let (Ok(geometry), Ok(stride)) =
+                            (geometry_for(next, request), configure(&device, next))
+                        else {
+                            continue;
+                        };
+                        pump = Pump::new(next, geometry, pump.into_sink());
+                        outcome = capture(&device, next, stride, &mut pump, &stop);
+                    }
+                    match outcome {
+                        Run::Stopped => {}
+                        Run::NoFirstPicture => pump.end(CameraError::Backend(
+                            "the camera sends no pictures".to_owned(),
+                        )),
+                        Run::Failed(reason) => pump.end(reason),
                     }
                 })
                 .map_err(|err| CameraError::Backend(format!("camera thread: {err}")))?
@@ -277,17 +294,30 @@ fn open_error(err: io::Error) -> CameraError {
     }
 }
 
-/// Streams until `stop` is set or the camera fails; the reason is `None` after a stop.
-fn capture(
-    device: &Device,
-    mode: Mode,
-    stride: usize,
-    pump: &mut Pump,
-    stop: &AtomicBool,
-) -> Option<CameraError> {
+/// How a capture run ended.
+enum Run {
+    /// The owner stopped the session (or the pump ended it).
+    Stopped,
+    /// The first picture never came; another mode may work.
+    NoFirstPicture,
+    Failed(CameraError),
+}
+
+fn geometry_for(mode: Mode, request: CaptureRequest) -> Result<Geometry, CameraError> {
+    Geometry::new(
+        mode.width,
+        mode.height,
+        request.max_width,
+        request.max_height,
+    )
+    .ok_or_else(|| CameraError::Backend("the camera picture is too small".to_owned()))
+}
+
+/// Streams until `stop` is set or the camera fails.
+fn capture(device: &Device, mode: Mode, stride: usize, pump: &mut Pump, stop: &AtomicBool) -> Run {
     let mut stream = match Stream::with_buffers(device, Type::VideoCapture, DRIVER_BUFFERS) {
         Ok(stream) => stream,
-        Err(err) => return Some(open_error(err)),
+        Err(err) => return Run::Failed(open_error(err)),
     };
     // `next` re-queues the previous buffer before it waits, so it must not time out after the
     // first picture (the buffer would be queued twice). The first wait has a deadline; later
@@ -301,22 +331,25 @@ fn capture(
                 Ok(0) => continue,
                 Ok(_) => {}
                 Err(err) if err.kind() == io::ErrorKind::Interrupted => continue,
-                Err(err) => return Some(stream_error(err)),
+                Err(err) => return Run::Failed(stream_error(err)),
             }
         }
-        first = false;
         match stream.next() {
             Ok((data, meta)) => {
                 let used = (meta.bytesused as usize).min(data.len());
                 pump.push(raw(mode, &data[..used], stride));
                 if pump.ended() {
-                    return None;
+                    return Run::Stopped;
                 }
             }
-            Err(err) => return Some(stream_error(err)),
+            Err(err) if first && err.kind() == io::ErrorKind::TimedOut => {
+                return Run::NoFirstPicture;
+            }
+            Err(err) => return Run::Failed(stream_error(err)),
         }
+        first = false;
     }
-    None
+    Run::Stopped
 }
 
 /// One driver buffer as the pump reads it. Single-planar NV12 has the chroma rows right after

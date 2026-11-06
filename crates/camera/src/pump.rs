@@ -47,6 +47,15 @@ impl Pump {
         }
     }
 
+    pub fn mode(&self) -> Mode {
+        self.mode
+    }
+
+    /// Gives the sink back, e.g. to start over with another mode before any picture arrived.
+    pub fn into_sink(self) -> Box<dyn FrameSink> {
+        self.sink
+    }
+
     pub fn ended(&self) -> bool {
         self.ended
     }
