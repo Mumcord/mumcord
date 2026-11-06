@@ -81,6 +81,7 @@
 
 ### Fixed
 
+- Voice control can pick a plugin's tab in the media area by what it shows ("Test Stage Plugin"): the visible text is now part of the tab's accessible name
 - Going back from a plugin's details in Settings → Plugins → Browse puts the keyboard focus back on that plugin in the list instead of losing it
 - With "Show cameras: Always", the camera room opens again when the first camera in your channel turns on; it could stay closed behind "{n} cameras on · Open room" when the room had been opened before any camera was on
 - The camera room now follows Settings → Camera: "Mirror my self-view" and "Reduce motion" (System, On or Off) take effect in the room and the strip; before, the self-view was always mirrored and the app's Reduce motion switch did nothing
