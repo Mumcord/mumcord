@@ -847,18 +847,12 @@ export const commands = {
 	crashList: () => typedError<CrashReport[], ApiError>(__TAURI_INVOKE("crash_list")),
 	/**  Reports from crashes the user has not been told about yet (the notice at start-up). */
 	crashTakeUnseen: () => typedError<CrashReport[], ApiError>(__TAURI_INVOKE("crash_take_unseen")),
-	/**
-	 *  The full text of one report, for the details view and "Copy"; `with_system` false leaves
-	 *  out the system details (hardware, kernel, desktop, screens).
-	 */
-	crashRead: (id: string, withSystem: boolean) => typedError<string, ApiError>(__TAURI_INVOKE("crash_read", { id, withSystem })),
+	/**  The full text of one report, for the details view and "Copy". */
+	crashRead: (id: string) => typedError<string, ApiError>(__TAURI_INVOKE("crash_read", { id })),
 	crashDelete: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("crash_delete", { id })),
 	crashDeleteAll: () => typedError<null, ApiError>(__TAURI_INVOKE("crash_delete_all")),
-	/**
-	 *  Saves the given reports (all when `ids` is empty) as a zip file at `path`; without the
-	 *  system details unless `with_system`.
-	 */
-	crashExport: (ids: string[], path: string, withSystem: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("crash_export", { ids, path, withSystem })),
+	/**  Saves the given reports (all when `ids` is empty) as a zip file at `path`. */
+	crashExport: (ids: string[], path: string) => typedError<null, ApiError>(__TAURI_INVOKE("crash_export", { ids, path })),
 	crashOpenFolder: () => typedError<null, ApiError>(__TAURI_INVOKE("crash_open_folder")),
 	logOpenFolder: () => typedError<null, ApiError>(__TAURI_INVOKE("log_open_folder")),
 	/**
