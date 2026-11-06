@@ -27,6 +27,8 @@ struct State {
     seq: u32,
     /// The person direct messages go to: the last one who showed they run this plugin.
     peer: Option<(Session, String)>,
+    /// How many `peer-ready` events came, so a spec can wait for a new one after a reconnect.
+    ready: u32,
     received: u32,
     log: VecDeque<String>,
 }
@@ -63,8 +65,9 @@ fn view(with_buttons: bool) -> ui::El {
             .child(ui::text(&format!("Relay: {:?}", relay::status())))
             .child(ui::text(&format!("Received: {}", s.received)))
             .child(ui::text(&format!(
-                "Peer: {}",
-                s.peer.as_ref().map_or("none", |(_, name)| name.as_str())
+                "Peer: {} ({})",
+                s.peer.as_ref().map_or("none", |(_, name)| name.as_str()),
+                s.ready
             )));
         if with_buttons {
             column = column.child(ui::button("start", "Start stage"));
@@ -188,7 +191,10 @@ impl Plugin for TestRelay {
             Event::AppMenuActivated(item) => act(&item),
             Event::PeerReady(peer) => {
                 note(format!("peer: {}", peer.name));
-                STATE.with_borrow_mut(|s| s.peer = Some((peer.session, peer.name)));
+                STATE.with_borrow_mut(|s| {
+                    s.peer = Some((peer.session, peer.name));
+                    s.ready += 1;
+                });
             }
             // The peer left the channel: until a new `peer-ready`, nobody here runs this plugin.
             Event::Left(peer) => {
