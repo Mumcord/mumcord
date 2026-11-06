@@ -81,6 +81,7 @@
 
 ### Fixed
 
+- With "Show cameras: Always", the camera room opens again when the first camera in your channel turns on; it could stay closed behind "{n} cameras on · Open room" when the room had been opened before any camera was on
 - The camera room now follows Settings → Camera: "Mirror my self-view" and "Reduce motion" (System, On or Off) take effect in the room and the strip; before, the self-view was always mirrored and the app's Reduce motion switch did nothing
 - When a screen share you watch ends, its empty picture no longer stays behind: the media area goes back to what else is open, and cameras shown as a strip next to it return to the camera room grid
 - When your camera stops by itself (the relay can't be reached, the camera is unplugged or taken by another app, or the server's relay ends it), Mumcord now says why: "Camera stopped: …" shows in the camera room bar, or below the camera bar above the chat when the room is closed, and screen readers read it. Dismiss hides it; turning the camera on again clears it
