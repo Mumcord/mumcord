@@ -68,23 +68,42 @@ struct State {
 }
 
 static STATE: OnceLock<State> = OnceLock::new();
+/// Gathered once in the background at start, so a panic report needs no tools of its own.
+static SYSTEM: OnceLock<Vec<String>> = OnceLock::new();
+
+fn system_lines() -> &'static [String] {
+    SYSTEM.get().map(Vec::as_slice).unwrap_or_default()
+}
 
 /// Sets up crash reporting for this run: records a report for an unclean previous run, installs
 /// the panic hook and the native signal handler, and leaves a marker until [`clean_exit`].
 pub fn install(dir: &Path, version: &str) -> io::Result<()> {
     fs::create_dir_all(dir)?;
     let marker = dir.join(MARKER);
-    if let Ok(left) = fs::read_to_string(&marker) {
-        let kind = match left.trim() {
+    let unclean = fs::read_to_string(&marker)
+        .ok()
+        .map(|left| match left.trim() {
             "" => CrashKind::Unexpected,
             signal => CrashKind::Signal(signal.to_owned()),
-        };
-        let previous = previous_log_tail(dir);
-        let cause = match &kind {
-            CrashKind::Signal(name) => format!("Mumcord was stopped by {name}"),
-            _ => "Mumcord closed without shutting down".to_owned(),
-        };
-        write_report(dir, version, &kind, "-", &cause, "", &previous)?;
+        });
+    let previous = unclean.as_ref().map(|_| previous_log_tail(dir));
+    {
+        // The system details take a few tool calls; the report of an unclean previous run waits
+        // for them, the start does not.
+        let (dir, version) = (dir.to_path_buf(), version.to_owned());
+        let _ = std::thread::Builder::new()
+            .name("crash-sysinfo".to_owned())
+            .spawn(move || {
+                let _ = SYSTEM.set(crate::sysinfo::collect());
+                if let (Some(kind), Some(previous)) = (unclean, previous) {
+                    let cause = match &kind {
+                        CrashKind::Signal(name) => format!("Mumcord was stopped by {name}"),
+                        _ => "Mumcord closed without shutting down".to_owned(),
+                    };
+                    let _ = write_report(&dir, &version, &kind, "-", &cause, "", &previous);
+                    let _ = prune(&dir);
+                }
+            });
     }
     fs::write(&marker, b"")?;
     prune(dir)?;
@@ -197,6 +216,13 @@ fn write_report(
     text.push_str(&format!("kind: {}\n", kind.as_str()));
     text.push_str(&format!("thread: {thread}\n"));
     text.push_str(&format!("cause: {}\n", cause.replace(['\n', '\r'], " ")));
+    if !system_lines().is_empty() {
+        text.push_str("\nsystem:\n");
+        for line in system_lines() {
+            text.push_str(line);
+            text.push('\n');
+        }
+    }
     if !backtrace.is_empty() {
         text.push_str("\nbacktrace:\n");
         text.push_str(backtrace);

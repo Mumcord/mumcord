@@ -41,6 +41,7 @@ pub mod server_query;
 pub mod session;
 pub mod sounds;
 pub mod stats;
+pub mod sysinfo;
 pub mod test_hooks;
 pub mod voice;
 pub mod watch_party;
