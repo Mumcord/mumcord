@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Kolonna tal-Membri",
+    "members": "Membri",
+    "activity": "Attività"
+  },
+  "you": "Int",
+  "selfName": "tiegħek",
+  "someone": "xi ħadd",
+  "verb": {
+    "connected": "ikkonnettja",
+    "disconnected": "iskonnettja",
+    "moved": "biddel kanal",
+    "screenShareStarted": "beda qsim tal-iskrin",
+    "screenShareStopped": "waqqaf il-qsim tal-iskrin",
+    "watchPartyStarted": "beda watch party",
+    "watchPartyStopped": "waqqaf il-watch party",
+    "pluginActivityStarted": "beda {{plugin}}",
+    "pluginActivityStopped": "waqqaf {{plugin}}",
+    "pluginEvent": "“{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "plugin",
+  "live": "live",
+  "watch": "Ara",
+  "join": "Ingħaqad",
+  "today": "Illum",
+  "yesterday": "Ilbieraħ",
+  "empty": "Għad m'hemm l-ebda attività.",
+  "rowLabel": {
+    "screenShare": "{{action}} il-qsim tal-iskrin {{name}}",
+    "watchParty": "{{action}} il-watch party {{name}}",
+    "pluginActivity": "{{action}} {{plugin}} {{name}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Ma stajtx tingħaqad mal-watch party.",
+  "joinActivityFailed": "Ma stajtx tingħaqad mal-attività tal-plugin."
+}

@@ -36,7 +36,8 @@
     "audioEffects": "Kurze Töne abspielen, die zum Plugin gehören",
     "filesSave": "Von dir gewählte Dateien speichern",
     "chatPostImage": "Nach deinem Klick ein Bild im Chat posten",
-    "filesImportPicture": "Von dir gewählte Bilder öffnen"
+    "filesImportPicture": "Von dir gewählte Bilder öffnen",
+    "activity": "Eigene Ereignisse zur Aktivitätsliste hinzufügen"
   },
   "explanations": {
     "uiPanel": "Ein kleines Panel dieses Plugins erscheint in der Plugin-Leiste.",
@@ -68,7 +69,8 @@
     "audioEffects": "Kurze Töne, die zum Plugin gehören. Du kannst sie unter Einstellungen → Plugins leiser stellen oder stummschalten.",
     "filesSave": "Mumcord fragt dich nach deinem Klick, wo jede Datei gespeichert werden soll; das Plugin sieht deine Ordner nie.",
     "chatPostImage": "Nach deinem Klick im Plugin kann es ein Bild in deinen aktuellen Kanal posten, mit seinem Namen gekennzeichnet.",
-    "filesImportPicture": "Mumcord lässt dich nach deinem Klick ein Bild auswählen; das Plugin erhält nur dieses Bild, nie deine Ordner."
+    "filesImportPicture": "Mumcord lässt dich nach deinem Klick ein Bild auswählen; das Plugin erhält nur dieses Bild, nie deine Ordner.",
+    "activity": "Seine Ereignisse erscheinen im Tab „Aktivität“ des Servers, mit dem du verbunden bist, neben dem, was Mumcord dort schon zeigt."
   },
   "listLabel": "Berechtigungen"
 }

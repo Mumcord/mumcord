@@ -36,7 +36,8 @@
     "audioEffects": "Korte geluiden afspelen die bij de plug-in horen",
     "filesSave": "Bestanden opslaan die je kiest",
     "chatPostImage": "Na je klik een afbeelding in de chat plaatsen",
-    "filesImportPicture": "Afbeeldingen openen die je kiest"
+    "filesImportPicture": "Afbeeldingen openen die je kiest",
+    "activity": "Eigen gebeurtenissen aan de activiteitenlijst toevoegen"
   },
   "explanations": {
     "uiPanel": "Een klein paneel van deze plugin verschijnt in de pluginbalk.",
@@ -68,7 +69,8 @@
     "audioEffects": "Korte geluiden die bij de plug-in horen. Je kunt ze zachter zetten of dempen via Instellingen → Plug-ins.",
     "filesSave": "Mumcord vraagt na je klik waar elk bestand moet worden opgeslagen; de plug-in ziet je mappen nooit.",
     "chatPostImage": "Na je klik in de plug-in kan die één afbeelding in je huidige kanaal plaatsen, voorzien van zijn naam.",
-    "filesImportPicture": "Mumcord laat je na je klik een afbeelding kiezen; de plug-in krijgt alleen die afbeelding, nooit je mappen."
+    "filesImportPicture": "Mumcord laat je na je klik een afbeelding kiezen; de plug-in krijgt alleen die afbeelding, nooit je mappen.",
+    "activity": "De gebeurtenissen verschijnen op het tabblad Activiteit van de server waarmee je verbonden bent, naast wat Mumcord daar al toont."
   },
   "listLabel": "Rechten"
 }

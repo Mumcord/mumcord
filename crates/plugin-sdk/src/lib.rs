@@ -105,6 +105,8 @@ pub use bindings::mumcord::plugin::{
 struct PeerDataGuide;
 
 #[cfg(feature = "1.1")]
+pub mod activity;
+#[cfg(feature = "1.1")]
 pub mod app_menu;
 #[cfg(feature = "1.1")]
 pub mod audio;

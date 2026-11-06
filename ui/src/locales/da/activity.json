@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Medlemskolonne",
+    "members": "Medlemmer",
+    "activity": "Aktivitet"
+  },
+  "you": "Dig",
+  "selfName": "din",
+  "someone": "nogen",
+  "verb": {
+    "connected": "tilsluttet",
+    "disconnected": "koblet fra",
+    "moved": "skiftede kanal",
+    "screenShareStarted": "begyndte at dele skærm",
+    "screenShareStopped": "stoppede med at dele skærm",
+    "watchPartyStarted": "startede en watch party",
+    "watchPartyStopped": "afsluttede watch partyen",
+    "pluginActivityStarted": "startede {{plugin}}",
+    "pluginActivityStopped": "stoppede {{plugin}}",
+    "pluginEvent": "»{{text}}«"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "plugin",
+  "live": "live",
+  "watch": "Se",
+  "join": "Deltag",
+  "today": "I dag",
+  "yesterday": "I går",
+  "empty": "Ingen aktivitet endnu.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}}'s skærmdeling",
+    "watchParty": "{{action}} {{name}}'s watch party",
+    "pluginActivity": "{{action}} {{name}}'s {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Kunne ikke deltage i watch partyen.",
+  "joinActivityFailed": "Kunne ikke deltage i plugin-aktiviteten."
+}

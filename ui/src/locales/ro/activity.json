@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Coloana de membri",
+    "members": "Membri",
+    "activity": "Activitate"
+  },
+  "you": "Tu",
+  "selfName": "ta",
+  "someone": "cineva",
+  "verb": {
+    "connected": "s-a conectat",
+    "disconnected": "s-a deconectat",
+    "moved": "a schimbat canalul",
+    "screenShareStarted": "a început partajarea ecranului",
+    "screenShareStopped": "a oprit partajarea ecranului",
+    "watchPartyStarted": "a început vizionarea comună",
+    "watchPartyStopped": "a oprit vizionarea comună",
+    "pluginActivityStarted": "a pornit {{plugin}}",
+    "pluginActivityStopped": "a oprit {{plugin}}",
+    "pluginEvent": "„{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "plugin",
+  "live": "live",
+  "watch": "Urmărește",
+  "join": "Alătură-te",
+  "today": "Azi",
+  "yesterday": "Ieri",
+  "empty": "Încă nu există activitate.",
+  "rowLabel": {
+    "screenShare": "{{action}} partajarea {{name}} de ecran",
+    "watchParty": "{{action}} vizionarea {{name}} comună",
+    "pluginActivity": "{{action}} {{plugin}} {{name}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Nu te-ai putut alătura vizionării comune.",
+  "joinActivityFailed": "Nu te-ai putut alătura activității pluginului."
+}

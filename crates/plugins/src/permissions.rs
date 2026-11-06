@@ -261,6 +261,12 @@ pub const CATALOGUE: &[Permission] = &[
         "Open pictures you choose",
         "Mumcord lets you pick a picture after you click; the plugin gets only that picture, never your folders.",
     ),
+    all_1_1(
+        "activity",
+        Risk::Green,
+        "Add its own events to the activity log",
+        "Its events appear in the Activity tab of the server you are on, next to what Mumcord already shows there.",
+    ),
 ];
 
 /// Looks up a permission by id.
@@ -274,11 +280,11 @@ mod tests {
 
     #[test]
     fn catalogue_is_closed_and_unique() {
-        assert_eq!(CATALOGUE.len(), 30);
+        assert_eq!(CATALOGUE.len(), 31);
         let mut ids: Vec<_> = CATALOGUE.iter().map(|p| p.id).collect();
         ids.sort_unstable();
         ids.dedup();
-        assert_eq!(ids.len(), 30);
+        assert_eq!(ids.len(), 31);
         assert!(get("files").is_none());
     }
 
@@ -313,6 +319,7 @@ mod tests {
                 ("files.save", Risk::Green, false),
                 ("chat.post-image", Risk::Yellow, false),
                 ("files.import-picture", Risk::Green, false),
+                ("activity", Risk::Green, false),
             ]
         );
         assert!(

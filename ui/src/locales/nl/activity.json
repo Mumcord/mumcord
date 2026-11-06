@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Ledenkolom",
+    "members": "Leden",
+    "activity": "Activiteit"
+  },
+  "you": "Jij",
+  "selfName": "jou",
+  "someone": "iemand",
+  "verb": {
+    "connected": "verbond",
+    "disconnected": "verbreek de verbinding",
+    "moved": "wisselde van kanaal",
+    "screenShareStarted": "begon het scherm te delen",
+    "screenShareStopped": "stopte met het delen van het scherm",
+    "watchPartyStarted": "begon een watchparty",
+    "watchPartyStopped": "stopde de watchparty",
+    "pluginActivityStarted": "startte {{plugin}}",
+    "pluginActivityStopped": "stopte {{plugin}}",
+    "pluginEvent": "„{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "plug-in",
+  "live": "live",
+  "watch": "Kijken",
+  "join": "Deelnemen",
+  "today": "Vandaag",
+  "yesterday": "Gisteren",
+  "empty": "Nog geen activiteit.",
+  "rowLabel": {
+    "screenShare": "{{action}} de schermdeling van {{name}}",
+    "watchParty": "{{action}} de watchparty van {{name}}",
+    "pluginActivity": "{{action}} de {{plugin}} van {{name}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Deelnemen aan de watchparty is mislukt.",
+  "joinActivityFailed": "Deelnemen aan de plug-in-activiteit is mislukt."
+}

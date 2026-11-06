@@ -32,7 +32,12 @@ export async function refreshActivities(): Promise<void> {
   }
 }
 
-function subscribe(listener: () => void): () => void {
+/**
+ * Listens for activity changes. Exported for code outside React (the activity log), which has to
+ * follow the activities while its tab is closed and no component is mounted; the first listener
+ * binds the host events and triggers the first load.
+ */
+export function subscribeStageActivities(listener: () => void): () => void {
   listeners.add(listener);
   if (listeners.size === 1) {
     const api = getApi();
@@ -50,6 +55,11 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
+/** The current plugin activities, for code outside React. */
+export function stageActivities(): readonly StageActivityView[] {
+  return activities;
+}
+
 /** Whether the list came from the host yet; read next to `useStageActivities`. */
 export function activitiesLoaded(): boolean {
   return loaded;
@@ -61,7 +71,7 @@ export function joinedActivityOf(plugin: string): StageActivityView | undefined 
 }
 
 export function useStageActivities(): readonly StageActivityView[] {
-  return useSyncExternalStore(subscribe, () => activities);
+  return useSyncExternalStore(subscribeStageActivities, () => activities);
 }
 
 const JOIN_ERRORS: readonly StageJoinError[] = ["gone", "full", "notPermitted", "failed"];

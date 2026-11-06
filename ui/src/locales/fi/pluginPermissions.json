@@ -36,7 +36,8 @@
     "audioEffects": "Toista lisäosan mukana tulevia lyhyitä ääniä",
     "filesSave": "Tallenna valitsemiasi tiedostoja",
     "chatPostImage": "Lähetä kuva chattiin napsautuksesi jälkeen",
-    "filesImportPicture": "Avaa valitsemiasi kuvia"
+    "filesImportPicture": "Avaa valitsemiasi kuvia",
+    "activity": "Lisää omat tapahtumat tapahtumalokiin"
   },
   "explanations": {
     "uiPanel": "Tämän lisäosan pieni paneeli näkyy lisäosapalkissa.",
@@ -68,7 +69,8 @@
     "audioEffects": "Lisäosan mukana tulevia lyhyitä ääniä. Voit hiljentää tai mykistää ne kohdassa Asetukset → Lisäosat.",
     "filesSave": "Mumcord kysyy, minne kukin tiedosto tallennetaan, napsautuksesi jälkeen; lisäosa ei koskaan näe kansioitasi.",
     "chatPostImage": "Kun napsautat lisäosassa, se voi lähettää yhden kuvan nykyiselle kanavallesi, merkittynä sen nimellä.",
-    "filesImportPicture": "Mumcord antaa sinun valita kuvan napsautuksesi jälkeen; lisäosa saa vain sen kuvan, ei koskaan kansioitasi."
+    "filesImportPicture": "Mumcord antaa sinun valita kuvan napsautuksesi jälkeen; lisäosa saa vain sen kuvan, ei koskaan kansioitasi.",
+    "activity": "Sen tapahtumat näkyvät Toiminta-välilehdellä palvelimella, johon olet yhteydessä, vieressä sitä, mitä Mumcord jo näyttää siellä."
   },
   "listLabel": "Oikeudet"
 }

@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Jäsensarake",
+    "members": "Jäsenet",
+    "activity": "Toiminto"
+  },
+  "you": "Sinä",
+  "selfName": "sinun",
+  "someone": "joku",
+  "verb": {
+    "connected": "yhdisti palvelimeen",
+    "disconnected": "katkaisi yhteyden",
+    "moved": "vaihtoi kanavan",
+    "screenShareStarted": "aloitti näytön jakamisen",
+    "screenShareStopped": "lopetti näytön jakamisen",
+    "watchPartyStarted": "aloitti yhteiskatselun",
+    "watchPartyStopped": "lopetti yhteiskatselun",
+    "pluginActivityStarted": "aloitti {{plugin}}",
+    "pluginActivityStopped": "lopetti {{plugin}}",
+    "pluginEvent": "”{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "laajennus",
+  "live": "livenä",
+  "watch": "Katso",
+  "join": "Liity",
+  "today": "Tänään",
+  "yesterday": "Eilen",
+  "empty": "Ei vielä toimintoja.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} näytön jako",
+    "watchParty": "{{action}} {{name}} yhteiskatselu",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Yhteiskatseluun liittyminen epäonnistui.",
+  "joinActivityFailed": "Laajennuksen toimintoon liittyminen epäonnistui."
+}

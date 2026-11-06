@@ -20,6 +20,7 @@ use wasmtime::{
 };
 
 use crate::api;
+use crate::api::activity::Activity;
 use crate::api::files::Files;
 use crate::api::http::{Http, HttpSet};
 use crate::api::io::PluginIo;
@@ -106,6 +107,7 @@ const ALLOWED_IMPORTS: &[&str] = &[
     "mumcord:plugin/relay",
     "mumcord:plugin/audio",
     "mumcord:plugin/files",
+    "mumcord:plugin/activity",
 ];
 
 /// One 1.0 WIT interface the host serves. Each `api/*` module implements the generated `Host`
@@ -146,6 +148,8 @@ pub struct HostContext {
     pub grants: Grants,
     pub timers: Timers,
     pub notify: Notify,
+    /// `activity` (1.1, FR-11.9): the per-plugin rate limits and the server a push belongs to.
+    pub activity: Activity,
     pub theme: Theme,
     /// `None` until the service has loaded the per-install secret; peers then get no key.
     pub peer_keys: Option<PeerKeys>,

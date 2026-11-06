@@ -1,3 +1,12 @@
+== activity.wit
+interface activity {
+use types.{error};
+record action {
+label: string,
+id: string,
+}
+push: func(text: string, action: option<action>) -> result<_, error>;
+}
 == app-menu.wit
 interface app-menu {
 use types.{error};
@@ -595,6 +604,7 @@ import app-menu;
 import relay;
 import audio;
 import files;
+import activity;
 export start: func(info: start-info) -> result<_, string>;
 export on-event: func(event: event);
 export stop: func();

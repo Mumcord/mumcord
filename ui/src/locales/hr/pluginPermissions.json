@@ -36,7 +36,8 @@
     "audioEffects": "Puštati kratke zvukove koji dolaze s dodatkom",
     "filesSave": "Spremati datoteke koje odabereš",
     "chatPostImage": "Objaviti sliku u chatu nakon tvog klika",
-    "filesImportPicture": "Otvarati slike koje odabereš"
+    "filesImportPicture": "Otvarati slike koje odabereš",
+    "activity": "Dodati vlastite događaje u dnevnik aktivnosti"
   },
   "explanations": {
     "uiPanel": "Mali panel ovog dodatka pojavljuje se u traci dodataka.",
@@ -68,7 +69,8 @@
     "audioEffects": "Kratki zvukovi koji dolaze s dodatkom. Možeš ih stišati ili utišati u Postavke → Dodaci.",
     "filesSave": "Mumcord te nakon klika pita gdje spremiti svaku datoteku; dodatak nikad ne vidi tvoje mape.",
     "chatPostImage": "Nakon tvog klika u dodatku, može objaviti jednu sliku u tvoj trenutni kanal, s oznakom svog naziva.",
-    "filesImportPicture": "Mumcord ti nakon klika dopušta odabir slike; dodatak dobiva samo tu sliku, nikad tvoje mape."
+    "filesImportPicture": "Mumcord ti nakon klika dopušta odabir slike; dodatak dobiva samo tu sliku, nikad tvoje mape.",
+    "activity": "Njegovi događaji prikazuju se na kartici Aktivnost poslužitelja na koji si povezan, uz ono što Mumcord već prikazuje tamo."
   },
   "listLabel": "Dozvole"
 }

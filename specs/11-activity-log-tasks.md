@@ -39,9 +39,10 @@
 - Feed component: newest first, day groups, two-line no-icon rows (FR-11.11), green **live** marker, clickable live rows (Watch/Join) vs plain ended rows (FR-11.12), plugin action routing via `pluginUiAction` (FR-11.13), empty state "No activity yet." (FR-11.14).
 - Tests: tab switching, ordering, day grouping, clickable vs plain, plugin action, empty state.
 
-## T6 – Languages
+## T6 – Languages & permission mirror
 
 - New `activity` namespace with every string in all 24 locales; locale parity test passes; spot-check two languages.
+- Permission mirror for `activity` (deferred from T1): entry in `ui/src/features/plugins/permissions/permissionIcons.ts`, the count in `permissions.test.tsx`, and the name + explanation in `pluginPermissions.json` for all 24 locales (risk tier low, same as `notify`).
 
 ## T7 – Verification
 

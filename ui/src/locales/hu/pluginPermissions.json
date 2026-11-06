@@ -36,7 +36,8 @@
     "audioEffects": "A bővítménnyel érkező rövid hangok lejátszása",
     "filesSave": "Általad választott fájlok mentése",
     "chatPostImage": "Kép küldése a csevegésbe kattintás után",
-    "filesImportPicture": "Általad választott képek megnyitása"
+    "filesImportPicture": "Általad választott képek megnyitása",
+    "activity": "Saját események hozzáadása a tevékenységnaplóhoz"
   },
   "explanations": {
     "uiPanel": "A bővítmény egy kis panelt jelenít meg a bővítménysávban.",
@@ -68,7 +69,8 @@
     "audioEffects": "A bővítménnyel érkező rövid hangok. A Beállítások → Bővítmények alatt halkíthatod vagy elnémíthatod őket.",
     "filesSave": "A Mumcord minden fájlnál megkérdezi, hova mentsen, miután kattintasz; a bővítmény sosem látja a mappáidat.",
     "chatPostImage": "Miután a bővítményben kattintasz, egy képet küldhet az aktuális csatornádra a nevével megjelölve.",
-    "filesImportPicture": "A Mumcord kattintás után kiválaszthatsz egy képet; a bővítmény csak azt a képet kapja meg, a mappáidat soha."
+    "filesImportPicture": "A Mumcord kattintás után kiválaszthatsz egy képet; a bővítmény csak azt a képet kapja meg, a mappáidat soha.",
+    "activity": "Az eseményei megjelennek a Tevékenység fülön azon a szerveren, amelyhez csatlakozol, mellettük azok, amiket a Mumcord már ott mutat."
   },
   "listLabel": "Engedélyek"
 }

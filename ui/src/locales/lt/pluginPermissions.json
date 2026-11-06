@@ -36,7 +36,8 @@
     "audioEffects": "Leisti trumpus papildinio garsus",
     "filesSave": "Įrašyti pasirinktus failus",
     "chatPostImage": "Paskelbti paveikslėlį pokalbyje po tavo paspaudimo",
-    "filesImportPicture": "Atverti pasirinktus paveikslėlius"
+    "filesImportPicture": "Atverti pasirinktus paveikslėlius",
+    "activity": "Pridėti savo įvykius į veiklos žurnalą"
   },
   "explanations": {
     "uiPanel": "Nedidelė šio įskiepio plokštė rodoma įskiepių juostoje.",
@@ -68,7 +69,8 @@
     "audioEffects": "Trumpi garsai, kurie ateina kartu su papildiniu. Juos galima patildyti ar nutildyti skiltyje Nustatymai → Papildiniai.",
     "filesSave": "Prieš kiekvieną failą Mumcord paklausia, kur jį įrašyti; papildinys tavo aplankų nemato.",
     "chatPostImage": "Paspaudus papildinyje, jis gali paskelbti vieną paveikslėlį tavo dabartiniame kanale su savo pavadinimu.",
-    "filesImportPicture": "Mumcord leidžia pasirinkti paveikslėlį po tavo paspaudimo; papildinys gauna tik tą paveikslėlį, bet ne tavo aplankus."
+    "filesImportPicture": "Mumcord leidžia pasirinkti paveikslėlį po tavo paspaudimo; papildinys gauna tik tą paveikslėlį, bet ne tavo aplankus.",
+    "activity": "Jo įvykiai rodomi skirtuke Veikla serveryje, prie kurio esi prisijungęs, šalia to, ką Mumcord jau rodo ten."
   },
   "listLabel": "Leidimai"
 }

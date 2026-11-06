@@ -67,7 +67,11 @@ function ensureBound(): void {
   if (api !== boundApi) bind(api);
 }
 
-function subscribe(listener: () => void): () => void {
+/**
+ * Listens for party changes. Exported for code outside React (the activity log), which has to
+ * follow the party while its tab is closed and no component is mounted.
+ */
+export function subscribeWatchParty(listener: () => void): () => void {
   ensureBound();
   listeners.add(listener);
   return () => {
@@ -89,7 +93,7 @@ export function watchPartyOf(serverId: number | null): LiveParty | null {
 
 /** The party in the user's channel on `serverId`, or `null`. */
 export function useWatchParty(serverId: number | null): LiveParty | null {
-  return useSyncExternalStore(subscribe, () => watchPartyOf(serverId));
+  return useSyncExternalStore(subscribeWatchParty, () => watchPartyOf(serverId));
 }
 
 /** Where a party is at `nowMs`, in milliseconds into the video. */

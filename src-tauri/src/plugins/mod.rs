@@ -557,6 +557,27 @@ async fn on_service_event(
             }
             Err(e) => tracing::info!(plugin, error = %e, "plugin chat line not posted"),
         },
+        ServiceEvent::Activity {
+            plugin,
+            server,
+            text,
+            action,
+        } => {
+            // The Activity tab is the UI's (FR-11.6): the app only carries the already cleaned
+            // push out, one row per event.
+            let (action_label, action_id) = match action {
+                Some((label, id)) => (Some(label), Some(id)),
+                None => (None, None),
+            };
+            PluginActivityEvent {
+                server_id: server.map(crate::commands::types::to_api_server_id),
+                plugin_id: plugin,
+                text,
+                action_label,
+                action_id,
+            }
+            .emit(app)?;
+        }
         ServiceEvent::HostCall { plugin, request } => {
             host_calls::handle(app, engine, plugin, request);
         }
@@ -608,6 +629,21 @@ pub struct PluginSupersede {
     pub plugin: String,
     pub card: Option<String>,
     pub message_id: String,
+}
+
+/// `activity-event` / `activityEvent`: the line a plugin pushed with `activity.push` (FR-11.9),
+/// for the Activity tab. `text` and `actionLabel` were cleaned and capped by the host, so they
+/// are shown as they come. `serverId` is `null` when no server is focused; both action fields are
+/// `null` for a push without an action, which is a plain row (FR-11.13).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "activity-event")]
+pub struct PluginActivityEvent {
+    pub server_id: Option<crate::commands::types::ServerId>,
+    pub plugin_id: String,
+    pub text: String,
+    pub action_label: Option<String>,
+    pub action_id: Option<String>,
 }
 
 /// Engine events the plugins care about besides their own stream: the focused server and

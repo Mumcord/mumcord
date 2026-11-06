@@ -36,7 +36,8 @@
     "audioEffects": "Esita pluginaga kaasas olevaid lühikesi helisid",
     "filesSave": "Salvesta sinu valitud faile",
     "chatPostImage": "Postita vestlusesse pilt pärast sinu klõpsu",
-    "filesImportPicture": "Ava sinu valitud pilte"
+    "filesImportPicture": "Ava sinu valitud pilte",
+    "activity": "Lisada oma sündmed tegevuslogi"
   },
   "explanations": {
     "uiPanel": "Selle plugina väike paneel ilmub pluginate ribale.",
@@ -68,7 +69,8 @@
     "audioEffects": "Pluginaga kaasas olevad lühikesed helid. Saad neid vaiksemaks keerata või vaigistada jaotises Seaded → Pluginad.",
     "filesSave": "Mumcord küsib pärast sinu klõpsu, kuhu iga fail salvestada; plugin ei näe kunagi sinu kaustu.",
     "chatPostImage": "Pärast sinu klõpsu pluginas saab see postitada sinu praegusesse kanalisse ühe pildi, mis on märgitud selle nimega.",
-    "filesImportPicture": "Mumcord laseb sul pärast klõpsu pildi valida; plugin saab ainult selle pildi, mitte kunagi sinu kaustu."
+    "filesImportPicture": "Mumcord laseb sul pärast klõpsu pildi valida; plugin saab ainult selle pildi, mitte kunagi sinu kaustu.",
+    "activity": "Selle sündused ilmuvad vahekaardil Tegevus serveril, millega sa oled ühendatud, kõrval see, mida Mumcord seal juba näitab."
   },
   "listLabel": "Õigused"
 }

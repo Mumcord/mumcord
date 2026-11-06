@@ -5,6 +5,7 @@ import type { PermissionId } from "./catalogue";
  * the record is typed against the catalogue: a new permission id fails to compile until it has one.
  */
 export const PERMISSION_ICONS: Record<PermissionId, string> = {
+  activity: "◷",
   "ui.panel": "▥",
   "ui.member-badge": "◉",
   "ui.profile-card": "☷",

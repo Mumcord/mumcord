@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Colún na mBall",
+    "members": "Baill",
+    "activity": "Gníomhaíocht"
+  },
+  "you": "Tusa",
+  "selfName": "do",
+  "someone": "duine éigin",
+  "verb": {
+    "connected": "d’cheangail",
+    "disconnected": "dichasc",
+    "moved": "bhog cainéal",
+    "screenShareStarted": "thosaigh comhroinnt scáileáin",
+    "screenShareStopped": "stop comhroinnt scáileáin",
+    "watchPartyStarted": "thosaigh féachaint le chéile",
+    "watchPartyStopped": "stop féachaint le chéile",
+    "pluginActivityStarted": "thosaigh {{plugin}}",
+    "pluginActivityStopped": "stop {{plugin}}",
+    "pluginEvent": "“{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "breiseán",
+  "live": "beo",
+  "watch": "Féach",
+  "join": "Glac páirt",
+  "today": "Inniu",
+  "yesterday": "Inné",
+  "empty": "Níl aon ghníomhaíocht fós.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} comhroinnt scáileáin",
+    "watchParty": "{{action}} {{name}} féachaint le chéile",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Níorbh fhéidir páirt a ghlacadh san fhéachaint le chéile.",
+  "joinActivityFailed": "Níorbh fhéidir páirt a ghlacadh i ngníomhaíocht an bhreiseáin."
+}

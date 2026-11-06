@@ -36,7 +36,8 @@
     "audioEffects": "Spela korta ljud som följer med tillägget",
     "filesSave": "Spara filer som du väljer",
     "chatPostImage": "Skicka en bild i chatten efter att du klickat",
-    "filesImportPicture": "Öppna bilder som du väljer"
+    "filesImportPicture": "Öppna bilder som du väljer",
+    "activity": "Lägga till egenta händelser i aktivitetslistan"
   },
   "explanations": {
     "uiPanel": "En liten panel för detta plugin visas i plugin-listen.",
@@ -68,7 +69,8 @@
     "audioEffects": "Korta ljud som följer med tillägget. Du kan sänka volymen eller stänga av dem under Inställningar → Tillägg.",
     "filesSave": "Mumcord frågar var varje fil ska sparas efter att du klickat; tillägget ser aldrig dina mappar.",
     "chatPostImage": "När du klickat i tillägget kan det skicka en bild till din nuvarande kanal, märkt med tilläggets namn.",
-    "filesImportPicture": "Mumcord låter dig välja en bild efter att du klickat; tillägget får bara den bilden, aldrig dina mappar."
+    "filesImportPicture": "Mumcord låter dig välja en bild efter att du klickat; tillägget får bara den bilden, aldrig dina mappar.",
+    "activity": "Händelserna visas i fliken Aktivitet på servern du är ansluten till, bredvid det Mumcord redan visar där."
   },
   "listLabel": "Behörigheter"
 }

@@ -502,6 +502,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             plugins::child_webview::PluginFrameEvent,
             plugins::PluginNotification,
             plugins::PluginSupersede,
+            plugins::PluginActivityEvent,
             plugins::suggestions::PluginSuggestion,
         ])
 }

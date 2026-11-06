@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Coluna de membros",
+    "members": "Membros",
+    "activity": "Atividade"
+  },
+  "you": "Você",
+  "selfName": "a tua",
+  "someone": "alguém",
+  "verb": {
+    "connected": "se conectou",
+    "disconnected": "se desligou",
+    "moved": "mudou de canal",
+    "screenShareStarted": "começou a partilhar o ecrã",
+    "screenShareStopped": "parou de partilhar o ecrã",
+    "watchPartyStarted": "começou uma watch party",
+    "watchPartyStopped": "terminou a watch party",
+    "pluginActivityStarted": "iniciou {{plugin}}",
+    "pluginActivityStopped": "parou {{plugin}}",
+    "pluginEvent": "«{{text}}»"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "plugin",
+  "live": "em direto",
+  "watch": "Ver",
+  "join": "Entrar",
+  "today": "Hoje",
+  "yesterday": "Ontem",
+  "empty": "Ainda não há atividade.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} partilha de ecrã",
+    "watchParty": "{{action}} {{name}} watch party",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Não foi possível entrar na watch party.",
+  "joinActivityFailed": "Não foi possível entrar na atividade do plugin."
+}

@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Narių stulpelis",
+    "members": "Nariai",
+    "activity": "Veikla"
+  },
+  "you": "Jūs",
+  "selfName": "tavo",
+  "someone": "kažkas",
+  "verb": {
+    "connected": "prisijungė",
+    "disconnected": "atsijungė",
+    "moved": "pakeitė kanalą",
+    "screenShareStarted": "pradėjo bendrinti ekraną",
+    "screenShareStopped": "baigė bendrinti ekraną",
+    "watchPartyStarted": "pradėjo bendrą peržiūrą",
+    "watchPartyStopped": "baigė bendrą peržiūrą",
+    "pluginActivityStarted": "pradėjo {{plugin}}",
+    "pluginActivityStopped": "baigė {{plugin}}",
+    "pluginEvent": "„{{text}}“"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "papildinys",
+  "live": "tiesiogiai",
+  "watch": "Žiūrėti",
+  "join": "Prisijungti",
+  "today": "Šiandien",
+  "yesterday": "Vakar",
+  "empty": "Veiklos dar nėra.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} ekrano bendrinimas",
+    "watchParty": "{{action}} {{name}} bendra peržiūra",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Nepavyko prisijungti prie bendros peržiūros.",
+  "joinActivityFailed": "Nepavyko prisijungti prie papildinio veiklos."
+}

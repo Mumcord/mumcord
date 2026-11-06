@@ -36,7 +36,8 @@
     "audioEffects": "Afspille korte lyde, der følger med pluginet",
     "filesSave": "Gemme filer, du vælger",
     "chatPostImage": "Sende et billede i chatten, efter du har klikket",
-    "filesImportPicture": "Åbne billeder, du vælger"
+    "filesImportPicture": "Åbne billeder, du vælger",
+    "activity": "Tilføje sine egne begivenheder til aktivitetslisten"
   },
   "explanations": {
     "uiPanel": "Et lille panel fra dette plugin vises i plugin-linjen.",
@@ -68,7 +69,8 @@
     "audioEffects": "Korte lyde, der følger med pluginet. Du kan skrue ned eller slå dem fra under Indstillinger → Plugins.",
     "filesSave": "Mumcord spørger, hvor hver fil skal gemmes, efter du har klikket; pluginet ser aldrig dine mapper.",
     "chatPostImage": "Når du klikker i pluginet, kan det sende ét billede til din nuværende kanal, mærket med sit navn.",
-    "filesImportPicture": "Mumcord lader dig vælge et billede, efter du har klikket; pluginet får kun det billede, aldrig dine mapper."
+    "filesImportPicture": "Mumcord lader dig vælge et billede, efter du har klikket; pluginet får kun det billede, aldrig dine mapper.",
+    "activity": "Dens begivenheder vises i fanen Aktivitet på den server, du er tilsluttet, ved siden af det, Mumcord allerede viser der."
   },
   "listLabel": "Tilladelser"
 }

@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Tagoszlop",
+    "members": "Tagok",
+    "activity": "Tevékenység"
+  },
+  "you": "Te",
+  "selfName": "saját",
+  "someone": "valaki",
+  "verb": {
+    "connected": "csatlakozott",
+    "disconnected": "bontotta a kapcsolatot",
+    "moved": "megváltoztatta a csatornát",
+    "screenShareStarted": "elindította a képernyőmegosztást",
+    "screenShareStopped": "leállította a képernyőmegosztást",
+    "watchPartyStarted": "elindította a közös nézést",
+    "watchPartyStopped": "leállította a közös nézést",
+    "pluginActivityStarted": "elindította {{plugin}}",
+    "pluginActivityStopped": "leállította {{plugin}}",
+    "pluginEvent": "„{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "bővítmény",
+  "live": "élő",
+  "watch": "Nézés",
+  "join": "Csatlakozás",
+  "today": "Ma",
+  "yesterday": "Tegnap",
+  "empty": "Még nincs tevékenység.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} képernyőmegosztása",
+    "watchParty": "{{action}} {{name}} közös nézése",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Nem sikerült csatlakozni a közös nézéshez.",
+  "joinActivityFailed": "Nem sikerült csatlakozni a bővítmény tevékenységéhez."
+}

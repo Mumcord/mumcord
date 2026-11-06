@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Medlemskolumn",
+    "members": "Medlemmar",
+    "activity": "Aktivitet"
+  },
+  "you": "Du",
+  "selfName": "din",
+  "someone": "någon",
+  "verb": {
+    "connected": "anslöt",
+    "disconnected": "kopplade från",
+    "moved": "bytte kanal",
+    "screenShareStarted": "började dela skärm",
+    "screenShareStopped": "slutade dela skärm",
+    "watchPartyStarted": "startade ett watch party",
+    "watchPartyStopped": "avslutade watch partyt",
+    "pluginActivityStarted": "startade {{plugin}}",
+    "pluginActivityStopped": "stoppade {{plugin}}",
+    "pluginEvent": "”{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "tillägg",
+  "live": "live",
+  "watch": "Titta",
+  "join": "Gå med",
+  "today": "Idag",
+  "yesterday": "Igår",
+  "empty": "Ingen aktivitet än.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} skärmdelning",
+    "watchParty": "{{action}} {{name}} watch party",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Kunde inte gå med i watch partyt.",
+  "joinActivityFailed": "Kunde inte gå med i tilläggsaktiviteten."
+}
