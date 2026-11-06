@@ -10,6 +10,7 @@ use mumcord_store::{PluginRecord, PluginVisibility};
 use super::{Origin, PluginService, ServiceError, allowed_grants, now_millis, with_required};
 use crate::manifest::{Manifest, ManifestError, Source, Visibility};
 use crate::package::MANIFEST_FILE;
+use crate::score::Scored;
 
 impl PluginService {
     /// Loads an unpacked plugin folder and starts it. Returns the plugin id. The id must not
@@ -79,6 +80,22 @@ impl PluginService {
         self.default_badge(&id)?;
         self.changed();
         Ok(id)
+    }
+
+    /// The security score of a loaded developer plugin, from its folder as it is now (FR-9.77).
+    /// For information only: nothing is ever blocked because of it.
+    pub fn dev_score(&self, id: &str) -> Result<Scored, ServiceError> {
+        let record = self.record(id)?;
+        let Some(Origin::Dev(folder)) = Origin::parse(&record.source) else {
+            return Err(ServiceError::NotDeveloper(id.to_owned()));
+        };
+        let manifest = read_dev_manifest(&folder)?;
+        let (bytes, wasm_modules) = folder_size(&folder)?;
+        Ok(crate::score::score(&crate::score::facts::from_dev(
+            &manifest,
+            bytes,
+            wasm_modules,
+        )))
     }
 
     /// Loads a developer plugin's folder again (after the developer rebuilt it). Permissions it
@@ -180,4 +197,27 @@ fn read_dev_manifest(folder: &Path) -> Result<Manifest, ServiceError> {
     let manifest = Manifest::parse(&std::fs::read(&path)?)?;
     manifest.validate(Source::Dev)?;
     Ok(manifest)
+}
+
+/// The total size of the files below `folder` and how many of them are WebAssembly modules: what
+/// a package's size and module count are for a packed plugin.
+fn folder_size(folder: &Path) -> Result<(u64, usize), ServiceError> {
+    let mut bytes = 0;
+    let mut wasm_modules = 0;
+    let mut pending = vec![folder.to_path_buf()];
+    while let Some(dir) = pending.pop() {
+        for entry in std::fs::read_dir(&dir)? {
+            let entry = entry?;
+            let kind = entry.file_type()?;
+            if kind.is_dir() {
+                pending.push(entry.path());
+            } else if kind.is_file() {
+                bytes += entry.metadata()?.len();
+                if entry.path().extension().is_some_and(|ext| ext == "wasm") {
+                    wasm_modules += 1;
+                }
+            }
+        }
+    }
+    Ok((bytes, wasm_modules))
 }

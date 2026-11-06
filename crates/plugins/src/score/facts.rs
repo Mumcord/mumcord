@@ -9,7 +9,7 @@ use mumcord_store::{Store, UnixMillis, VersionHistoryEntry};
 use semver::Version;
 
 use super::{Facts, HistoryEntry, Licence, PluginKind};
-use crate::manifest::Source;
+use crate::manifest::{Manifest, Source};
 use crate::package::Package;
 use crate::registry::{IndexPlugin, IndexVersion};
 use crate::test_hooks;
@@ -217,6 +217,25 @@ pub fn from_package(
             &manifest.version,
             plugin.map_or(&[][..], |p| p.versions.as_slice()),
         ),
+        hard_stop: None,
+    }
+}
+
+/// A developer folder (FR-9.77): scored from its manifest and files for information only. It has
+/// no signature, listing or history, so only the capability facts count.
+pub fn from_dev(manifest: &Manifest, folder_bytes: u64, wasm_modules: usize) -> Facts {
+    Facts {
+        kind: PluginKind::Developer,
+        permissions: manifest.all_permissions().map(str::to_owned).collect(),
+        origins: count(manifest.net.as_ref().map_or(0, |net| net.origins.len())),
+        package_bytes: folder_bytes,
+        wasm_modules: count(wasm_modules).max(1),
+        source_link: false,
+        licence: licence_of(Some(&manifest.license)),
+        reproducible: false,
+        key_age_days: None,
+        expected_key_matched: false,
+        history: None,
         hard_stop: None,
     }
 }
@@ -442,6 +461,18 @@ mod tests {
         let history = facts.history.expect("history");
         assert_eq!(history.len(), 1);
         assert_eq!(history[0].age_days, 100);
+    }
+
+    #[test]
+    fn a_developer_folder_counts_its_capabilities_and_files_only() {
+        let package = package("", false);
+        let facts = from_dev(&package.manifest, 5_000, 2);
+        assert_eq!(facts.kind, PluginKind::Developer);
+        assert_eq!(facts.package_bytes, 5_000);
+        assert_eq!(facts.wasm_modules, 2);
+        assert_eq!(from_dev(&package.manifest, 0, 0).wasm_modules, 1);
+        assert!(!facts.source_link && !facts.reproducible && !facts.expected_key_matched);
+        assert_eq!((facts.key_age_days, facts.history), (None, None));
     }
 
     #[test]

@@ -928,6 +928,30 @@ impl PluginService {
         Ok(())
     }
 
+    /// The newest listing of `id` and where it comes from: the official index first, then the
+    /// switched-on repositories (a removed, off or paused one lists nothing, as in Browse). Kept
+    /// current by every index load, also the update check's, so a version an update just
+    /// installed is found even when Browse was not refreshed since.
+    pub fn find_listed(&self, id: &str) -> Result<Option<(Source, IndexPlugin)>, ServiceError> {
+        let usable: Vec<i64> = self
+            .store()
+            .plugin_repositories()?
+            .into_iter()
+            .filter(|r| r.enabled && r.paused_reason.is_none())
+            .map(|r| r.id)
+            .collect();
+        let official = self
+            .listings
+            .iter()
+            .filter(|(source, _)| *source == Source::Official);
+        let repositories = self.listings.iter().filter(|(source, _)| {
+            matches!(source, Source::Repo { repository_id } if usable.contains(repository_id))
+        });
+        Ok(official
+            .chain(repositories)
+            .find_map(|(source, index)| index.plugin(id).map(|plugin| (*source, plugin.clone()))))
+    }
+
     fn listed(&self, source: &Source, id: &str) -> Option<&IndexPlugin> {
         self.listings
             .iter()
