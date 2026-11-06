@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.7.0] - Unreleased
+
 ### Added
 
 - Settings → Plugins → Installed lists plugins that were refused when they were first loaded (for example an Apps-menu label equal to one of Mumcord's own, or a manifest field used without its permission), with the reason and the time, until Mumcord is closed
