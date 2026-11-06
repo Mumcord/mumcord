@@ -56,6 +56,8 @@
     "incomingRateDropped": "Incoming messages dropped by the rate limit",
     "incomingInvalid": "Invalid incoming messages",
     "uiFreezes": "Times Mumcord froze while its web content was open",
+    "refusedAppMenuLabel": "This plugin was refused: an Apps-menu label is the same as one of Mumcord's own or starts with \"Mumcord\".",
+    "fieldWithoutPermission": "This plugin was refused: it uses \"{{field}}\" without the permission \"{{permission}}\".",
     "webDisabled": "Its web content is turned off because Mumcord stopped responding while it was open.",
     "reenableWeb": "Turn web content on",
     "reenableFailed": "Web content could not be turned on.",

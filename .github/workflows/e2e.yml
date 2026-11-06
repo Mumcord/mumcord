@@ -26,8 +26,8 @@ env:
   # there cannot break unrelated pull requests. The published mumbot image predates the peer
   # module, so the bot is built from a commit of Mumcord/mumbot main until a release has it. To bump
   # one: git ls-remote https://github.com/Mumcord/mumpeer main (or .../mumbot main).
-  MUMPEER_REF: c42aa1072cfec9b4d06d2853e459af44ad8bdf92
-  MUMBOT_REF: 62b3d263490158097e2a8f538436d42f0eb62c90
+  MUMPEER_REF: 703cd3d67ade93e7fd1901c4af8c65275308402e
+  MUMBOT_REF: f320522a87505cd73e6d9d0cb608c07847868928
 
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
@@ -364,6 +364,17 @@ jobs:
           overwrite: true
           path: e2e/artifacts/spec-durations.json
           retention-days: 30
+          if-no-files-found: ignore
+
+      # Screenshots for the side-by-side check against the mockups (AC-7.71); the repo has no
+      # image diff, so a person compares them.
+      - name: Upload mockup screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-mockup-shots-shard-${{ matrix.shard }}
+          path: e2e/artifacts/mockup-shots/
+          retention-days: 14
           if-no-files-found: ignore
 
       - name: Upload failure artifacts

@@ -3,6 +3,7 @@
 
 use std::collections::{HashMap, HashSet};
 
+use mumcord_engine::camera::CameraState;
 use mumcord_engine::{ChannelView, ConnState, EngineEvent, UserView};
 
 use crate::commands::tray::TrayAttention;
@@ -125,6 +126,8 @@ pub struct IconState {
     pub unread: bool,
     pub mentions: u32,
     pub dnd: bool,
+    /// The own camera is on air (FR-8.22).
+    pub camera: bool,
 }
 
 /// What an update changed, so only that part of the tray is redrawn.
@@ -142,6 +145,8 @@ pub struct TrayState {
     pub voice: Option<ServerId>,
     pub dnd: Dnd,
     pub attention: TrayAttention,
+    /// The server the own camera is on air on (FR-8.22); there is only one camera at a time.
+    pub camera: Option<ServerId>,
 }
 
 impl TrayState {
@@ -155,6 +160,20 @@ impl TrayState {
     ) -> Change {
         if let EngineEvent::StateChanged(state) = event {
             self.set_conn(server_id, state, name);
+            return Change::Menu;
+        }
+        if let EngineEvent::CameraChanged(view) = event {
+            let camera = if view.state == CameraState::OnAir {
+                Some(server_id)
+            } else if self.camera == Some(server_id) {
+                None
+            } else {
+                self.camera
+            };
+            if camera == self.camera {
+                return Change::None;
+            }
+            self.camera = camera;
             return Change::Menu;
         }
         if let EngineEvent::VoiceServerChanged(voice) = event {
@@ -304,6 +323,7 @@ impl TrayState {
             unread: self.attention.unread > 0,
             mentions: self.attention.mentions,
             dnd: self.dnd.active(),
+            camera: self.camera.is_some(),
         }
     }
 }
@@ -570,5 +590,28 @@ mod tests {
         let icon = state.icon();
         assert!(icon.unread && icon.dnd);
         assert_eq!(icon.mentions, 2);
+    }
+
+    fn camera(state: &mut TrayState, id: ServerId, on: CameraState) -> Change {
+        let mut view = mumcord_engine::camera::CameraView::off(id.into());
+        view.state = on;
+        state.apply(id, &EngineEvent::CameraChanged(view), String::new)
+    }
+
+    #[test]
+    fn camera_counts_only_while_on_air() {
+        let mut state = TrayState::default();
+        synced(&mut state, 1);
+        assert_eq!(camera(&mut state, 1, CameraState::Preview), Change::None);
+        assert_eq!(camera(&mut state, 1, CameraState::Requesting), Change::None);
+        assert!(!state.icon().camera);
+        assert_eq!(camera(&mut state, 1, CameraState::OnAir), Change::Menu);
+        assert_eq!(state.camera, Some(1));
+        assert!(state.icon().camera);
+        assert_eq!(camera(&mut state, 1, CameraState::OnAir), Change::None);
+        // Another server's "off" does not end this camera.
+        assert_eq!(camera(&mut state, 2, CameraState::Off), Change::None);
+        assert_eq!(camera(&mut state, 1, CameraState::Off), Change::Menu);
+        assert_eq!(state.camera, None);
     }
 }

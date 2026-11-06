@@ -71,11 +71,50 @@ for lib in SVTAV1_STATIC_DIR DAV1D_STATIC_DIR; do
     extra+=(-v "${!lib}:${!lib}:ro" -e "$lib")
   fi
 done
-# The mumpeer checkout (testenv for the relay specs): MUMPEER_DIR, else a sibling folder. Mounted
-# read-write at its host path, like the repo, so docker compose resolves its volumes on the host.
-mumpeer="$(realpath -m "${MUMPEER_DIR:-$repo/../mumpeer}")"
-if [ -f "$mumpeer/testenv/up.sh" ]; then
+# The relay specs run the mumpeer testenv and the relay bot (`mumbot peer`) at the commits CI pins
+# (MUMPEER_REF, MUMBOT_REF in .github/workflows/e2e.yml), so a local run tests what CI tests.
+# MUMPEER_DIR (a checkout) and MUMBOT_IMAGE override them; without network the relay specs skip.
+pinned_ref() { sed -n "s/^  $1: \([0-9a-f]\{40\}\)\$/\1/p" "$repo/.github/workflows/e2e.yml"; }
+# A shallow clone of one commit into $cache/<name>-<ref>, once; parallel runs race harmlessly.
+pinned_checkout() {
+  local name="$1" ref="$2" dir="$cache/$1-$2"
+  if [ ! -d "$dir" ]; then
+    local tmp
+    tmp="$(mktemp -d "$cache/.$name-XXXXXX")"
+    if git -C "$tmp" init -q && git -C "$tmp" fetch -q --depth 1 "https://github.com/Mumcord/$name" "$ref" \
+      && git -C "$tmp" checkout -q FETCH_HEAD; then
+      mv -T "$tmp" "$dir" 2>/dev/null || rm -rf "$tmp"
+    else
+      rm -rf "$tmp"
+      echo "could not fetch Mumcord/$name at $ref: the relay specs will skip" >&2
+      return 1
+    fi
+  fi
+  echo "$dir"
+}
+if [ -n "${MUMPEER_DIR:-}" ]; then
+  mumpeer="$(realpath -m "$MUMPEER_DIR")"
+else
+  mumpeer="$(pinned_checkout mumpeer "$(pinned_ref MUMPEER_REF)")" || mumpeer=""
+fi
+# Mounted read-write at its host path, like the repo, so docker compose resolves its volumes on the host.
+if [ -n "$mumpeer" ] && [ -f "$mumpeer/testenv/up.sh" ]; then
   extra+=(-v "$mumpeer:$mumpeer" -e "MUMPEER_DIR=$mumpeer")
+  if [ -z "${MUMBOT_IMAGE:-}" ]; then
+    bot_ref="$(pinned_ref MUMBOT_REF)"
+    export MUMBOT_IMAGE="mumbot:peer-${bot_ref:0:12}"
+    if ! docker image inspect "$MUMBOT_IMAGE" >/dev/null 2>&1; then
+      if mumbot="$(pinned_checkout mumbot "$bot_ref")"; then
+        echo "building the relay bot image $MUMBOT_IMAGE (once per pinned commit)" >&2
+        docker build -q -t "$MUMBOT_IMAGE" "$mumbot" >/dev/null
+      else
+        unset MUMBOT_IMAGE
+      fi
+    fi
+  fi
+  # The old relay of AC-7.5 and AC-9.19, as in CI; docker pulls them only when a spec uses them.
+  export MUMCORD_E2E_OLD_MUMPEER_IMAGE="${MUMCORD_E2E_OLD_MUMPEER_IMAGE:-ghcr.io/mumcord/mumpeer:0.1.0}"
+  export MUMCORD_E2E_OLD_MUMBOT_IMAGE="${MUMCORD_E2E_OLD_MUMBOT_IMAGE:-ghcr.io/mumcord/mumbot:0.4.1}"
 fi
 # Host network: the app, bots and netsim reach the testenv servers on localhost:64738-64741 and
 # netsim on 64800/64801. The repo is mounted at its host path so docker compose (via the host

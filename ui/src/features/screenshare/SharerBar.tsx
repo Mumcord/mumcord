@@ -166,12 +166,13 @@ export function SharerBar(): ReactNode {
             type="button"
             className="button sharer-bar__button"
             aria-pressed={own.paused}
+            data-tooltip={own.paused ? t("resume") : t("pause")}
             onClick={() => {
               run(getApi().screenShareSetPaused(serverId, !own.paused), "pause");
             }}
           >
             {own.paused ? <PlayIcon size={14} /> : <PauseIcon size={14} />}
-            {own.paused ? t("resume") : t("pause")}
+            <span className="sharer-bar__label">{own.paused ? t("resume") : t("pause")}</span>
           </button>
           <button
             type="button"
@@ -186,7 +187,7 @@ export function SharerBar(): ReactNode {
             }}
           >
             <SpeakerIcon muted={!own.sound} size={14} />
-            {tv("sound")}
+            <span className="sharer-bar__label">{tv("sound")}</span>
           </button>
           {!own.soundAvailable && (
             <span id={noSoundId} className="visually-hidden">
@@ -194,9 +195,14 @@ export function SharerBar(): ReactNode {
             </span>
           )}
           <QualityMenu serverId={serverId} current={quality?.choice ?? null} />
-          <button type="button" className="button sharer-bar__button" onClick={changeWindow}>
+          <button
+            type="button"
+            className="button sharer-bar__button"
+            data-tooltip={t("changeWindow")}
+            onClick={changeWindow}
+          >
             <WindowIcon />
-            {t("changeWindow")}
+            <span className="sharer-bar__label">{t("changeWindow")}</span>
           </button>
           <span className="sharer-bar__viewers">
             <button
@@ -205,6 +211,7 @@ export function SharerBar(): ReactNode {
               className="button sharer-bar__button sharer-bar__viewers-button"
               aria-expanded={open}
               aria-controls={open ? popoverId : undefined}
+              data-tooltip={t("viewerCount", { count })}
               onClick={() => {
                 setOpen((value) => !value);
               }}
@@ -216,7 +223,10 @@ export function SharerBar(): ReactNode {
                   ))}
                 </span>
               )}
-              {t("viewerCount", { count })}
+              <span className="sharer-bar__label">{t("viewerCount", { count })}</span>
+              <span className="sharer-bar__count" aria-hidden="true">
+                {count}
+              </span>
               <ChevronDownIcon />
             </button>
             {open && (
@@ -245,7 +255,7 @@ export function SharerBar(): ReactNode {
             onClick={stop}
           >
             <StopIcon size={12} />
-            {t("stopShort")}
+            <span className="sharer-bar__label">{t("stopShort")}</span>
           </button>
         </span>
       </div>

@@ -6,6 +6,7 @@ import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
 import { ChatRequestDialogHost, RevokeConsentDialogHost } from "../features/requests";
 import { BlockDialogHost } from "../features/blocking";
+import { CameraPreviewHost } from "../features/camera/preview";
 import { TraySync } from "../features/tray";
 import { GlobalHotkeys } from "../features/hotkeys";
 import { AppShell } from "./AppShell";
@@ -106,6 +107,8 @@ function MainScreen() {
       {overlay === null && <ChatRequestDialogHost />}
       {overlay === null && <RevokeConsentDialogHost />}
       {overlay === null && <BlockDialogHost />}
+      {/* Also above Settings: the camera hotkey may open it from anywhere (FR-8.20). */}
+      <CameraPreviewHost />
       {overlay === null && (
         <LazyBoundary>
           <ServerAdminWindowHost />

@@ -364,6 +364,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::camera::camera_frames_attach,
             commands::camera::camera_frames_detach,
             commands::camera::camera_set_decode_codecs,
+            commands::camera_settings::camera_backgrounds,
+            commands::camera_settings::camera_own_background_add,
+            commands::camera_settings::camera_own_background_remove,
+            commands::camera_settings::camera_devices_watch_start,
+            commands::camera_settings::camera_devices_watch_stop,
             commands::p2p::p2p_link,
             commands::p2p::relay_trust_new,
             commands::p2p::relay_keep_blocked,
@@ -472,6 +477,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::CameraAvailabilityChanged,
             commands::camera::CameraChanged,
             commands::camera::CameraRoomChanged,
+            commands::camera_settings::CameraDevicesChanged,
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
@@ -691,6 +697,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let camera_frames = commands::camera::CameraFrames::default();
     engine.camera_set_frame_sink(camera_frames.0.clone());
     app.manage(camera_frames);
+    app.manage(commands::camera_settings::CameraDeviceWatch::default());
     match app.path().resource_dir() {
         Ok(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
         Err(e) => tracing::warn!(error = %e, "no resource folder for the camera backgrounds"),
@@ -1045,7 +1052,9 @@ fn emit_engine_event(
             .emit(app)
         }
         // The plugin service takes it (`plugins::on_engine_event`); the UI never sees payloads.
-        EngineEvent::PluginRelayData { .. } | EngineEvent::PluginRelayJoined { .. } => Ok(()),
+        EngineEvent::PluginRelayData { .. }
+        | EngineEvent::PluginRelayJoined { .. }
+        | EngineEvent::PluginRelayBroadcast(_) => Ok(()),
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),

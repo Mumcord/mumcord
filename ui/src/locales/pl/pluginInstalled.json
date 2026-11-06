@@ -56,6 +56,8 @@
     "incomingRateDropped": "Przychodzące wiadomości odrzucone przez limit częstotliwości",
     "incomingInvalid": "Nieprawidłowe wiadomości przychodzące",
     "uiFreezes": "Ile razy Mumcord się zawiesił przy otwartej treści internetowej",
+    "refusedAppMenuLabel": "Ta wtyczka została odrzucona: etykieta w menu Aplikacje jest taka sama jak jedna z własnych etykiet Mumcord albo zaczyna się od „Mumcord”.",
+    "fieldWithoutPermission": "Ta wtyczka została odrzucona: używa „{{field}}” bez uprawnienia „{{permission}}”.",
     "webDisabled": "Treść internetowa jest wyłączona, ponieważ Mumcord przestał odpowiadać, gdy była otwarta.",
     "reenableWeb": "Włącz treść internetową",
     "reenableFailed": "Nie udało się włączyć treści internetowej.",

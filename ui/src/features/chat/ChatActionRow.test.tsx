@@ -109,14 +109,17 @@ describe("menu", () => {
   it("moves with the arrow keys and closes with Escape, returning the focus", () => {
     render(<ChatActionRow />);
     const menu = openMenu();
-    const [first, second] = screen.getAllByRole("menuitem");
+    // Share screen, Watch together, Turn on camera.
+    const [first, second, third] = screen.getAllByRole("menuitem");
     expect(first).toHaveFocus();
     fireEvent.keyDown(menu, { key: "ArrowDown" });
     expect(second).toHaveFocus();
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    expect(third).toHaveFocus();
     fireEvent.keyDown(menu, { key: "ArrowDown" });
     expect(first).toHaveFocus();
     fireEvent.keyDown(menu, { key: "ArrowUp" });
-    expect(second).toHaveFocus();
+    expect(third).toHaveFocus();
     fireEvent.keyDown(menu, { key: "Escape" });
     expect(screen.queryByRole("menu")).toBeNull();
     expect(appsButton()).toHaveFocus();

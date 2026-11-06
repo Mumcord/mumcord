@@ -17,7 +17,8 @@
     "packetInspector": "Inšpektor paketov",
     "hotkeys": "Klávesové skratky",
     "plugins": "Doplnky",
-    "screenSharing": "Zdieľanie obrazovky"
+    "screenSharing": "Zdieľanie obrazovky",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Spúšťanie, jazyk, aktualizácie a prístupnosť.",
@@ -31,7 +32,8 @@
     "advanced": "Nástroje pre vývojárov, diagnostika, úložisko a licencie.",
     "about": "Verzia, podpora a sprievodca nastavením.",
     "plugins": "Pluginy bežia v izolovanom prostredí a dostanú len to, čo povolíte. Nikdy nevidia váš zvuk, súbory ani certifikát.",
-    "screenSharing": "Kvalita, kodek a hardvér na zdieľanie obrazovky. Diváci vždy vidia to, čo si vyberieš pred začatím."
+    "screenSharing": "Kvalita, kodek a hardvér na zdieľanie obrazovky. Diváci vždy vidia to, čo si vyberieš pred začatím.",
+    "camera": "Vaša kamera, efekty pozadia a spôsob, akým vidíte kamery ostatných. Zdieľanie kamery vyžaduje server s relay mumpeer."
   },
   "breadcrumb": "Nastavenia / {{section}}",
   "moreInfo": "Viac informácií: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "upozornenia vyskakovacie okná",
     "externalContent": "vložený obsah obrázky náhľady",
     "fileSharing": "súbory odoslať prijať stiahnuť uložiť priečinok príloha zip",
-    "screenSharing": "zdieľanie obrazovky kvalita rozlíšenie fps kodek AV1 VP9 enkodér grafická karta"
+    "screenSharing": "zdieľanie obrazovky kvalita rozlíšenie fps kodek AV1 VP9 enkodér grafická karta",
+    "camera": "kamera webkamera video pozadie rozmazanie virtuálne pozadie zrkadliť vlastný náhľad"
   },
   "search": {
     "label": "Hľadať v nastaveniach",
@@ -1062,7 +1065,9 @@
     "addNone": "Pripoj sa k serveru a vyber jeden z jeho kanálov.",
     "addConfirm": "Pridať",
     "reset": "Obnoviť všetky skratky",
-    "resetHint": "Odstráni všetky skratky okrem push-to-talk; predvolene nie je nastavené nič."
+    "resetHint": "Odstráni všetky skratky okrem push-to-talk; predvolene nie je nastavené nič.",
+    "camera": "Zapnúť / vypnúť kameru",
+    "cameraHint": "Otvorí náhľad, keď je kamera vypnutá, a vypne ju, keď je zapnutá."
   },
   "developerMode": {
     "title": "Režim vývojára",
@@ -1140,5 +1145,72 @@
     "skippedAboveLimit": "VP9 (tvoj obraz presahuje to, čo AV1 tu zvláda)",
     "softwareWarning": "AV1 pobeží na procesore bez úspešnej kontroly a môže byť pre tento počítač príliš náročné.",
     "checkAgain": "Skontrolovať znova"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Náhľad vašej kamery",
+    "previewName": "Vy",
+    "previewNote": "Náhľad len na tomto zariadení. Zastaví sa, keď stránku opustíte.",
+    "device": "Kamera",
+    "deviceDefault": "Predvolená v systéme",
+    "noDevice": "Nenašla sa žiadna kamera",
+    "sendQuality": "Kvalita odosielania",
+    "sendQualityAuto": "Automaticky",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (do 720p · 30 fps) posiela len toľko, koľko diváci potrebujú: menšie vo veľkej mriežke, ostrejšie, keď vás niekto pripne.",
+    "mirror": "Zrkadliť môj vlastný náhľad",
+    "mirrorHint": "Zrkadlí sa len váš vlastný pohľad. Ostatní vás vidia správne.",
+    "backgroundTitle": "Pozadie",
+    "defaultBackground": "Predvolené pozadie",
+    "backgroundNone": "Žiadne",
+    "backgroundBlur": "Rozmazanie",
+    "backgroundLibrary": "Obrázok: knižnica",
+    "backgroundOwn": "Obrázok: {{name}} (váš)",
+    "blurStrength": "Sila rozmazania",
+    "blurLight": "Slabé",
+    "blurStrong": "Silné",
+    "effectQuality": "Kvalita efektov",
+    "effectAuto": "Automaticky",
+    "effectBest": "Najlepšia (grafická karta)",
+    "effectLight": "Nízka (šetrí batériu)",
+    "effectHint": "Auto používa grafickú kartu, keď sa dá, a na batérii alebo pri vyťaženom počítači prepne na Nízku.",
+    "ownImages_one": "Vaše vlastné obrázky pozadia zostávajú v tomto zariadení (uložené: {{count}}). Odosiela sa len hotový obraz.",
+    "ownImages_few": "Vaše vlastné obrázky pozadia zostávajú v tomto zariadení (uložené: {{count}}). Odosiela sa len hotový obraz.",
+    "ownImages_many": "Vaše vlastné obrázky pozadia zostávajú v tomto zariadení (uložené: {{count}}). Odosiela sa len hotový obraz.",
+    "ownImages_other": "Vaše vlastné obrázky pozadia zostávajú v tomto zariadení (uložené: {{count}}). Odosiela sa len hotový obraz.",
+    "manageImages": "Spravovať obrázky",
+    "imagesTitle": "Vaše obrázky pozadia",
+    "imagesEmpty": "Zatiaľ žiadne obrázky. Pridajte obrázok PNG, JPEG alebo WebP a použite ho ako pozadie.",
+    "imageName": "Obrázok {{number}}",
+    "imageDelete": "Odstrániť",
+    "imageDeleteLabel": "Odstrániť {{name}}",
+    "imageDeleted": "{{name}} odstránený",
+    "imageAdded": "{{name}} pridaný",
+    "addImage": "Pridať obrázok",
+    "addImageTitle": "Vyberte obrázok pozadia",
+    "imageFilter": "Obrázky",
+    "close": "Zavrieť",
+    "privacyTitle": "Súkromie",
+    "lockOff": "Vypnúť moju kameru pri zamknutí obrazovky",
+    "privacyNote": "Vaša kamera sa vždy spúšťa vypnutá a najprv ukáže náhľad. Vypne sa, keď opustíte kanál alebo sa odpojíte. Vidia ju len ľudia vo vašom hlasovom kanáli, cez relay tohto servera a s end-to-end šifrovaním. Mumcord kamery nikdy nenahráva.",
+    "othersTitle": "Kamery ostatných",
+    "showCameras": "Zobrazovať kamery",
+    "showAlways": "Vždy",
+    "showOnOpen": "Keď otvorím miestnosť",
+    "showNever": "Nikdy",
+    "showHint": "Vždy otvorí miestnosť s kamerami, keď niekto vo vašom kanáli zapne kameru. Nikdy vás nechá len pri hlase a nesťahuje žiadne video.",
+    "dataSaver": "Šetrenie dát: najviac 15 fps pre všetkých",
+    "reduceMotion": "Obmedziť pohyb: žiadna žiara ani animácia na rámčeku hovoriaceho",
+    "reduceMotionHint": "V predvolenom nastavení sa riadi systémovým nastavením obmedzenia pohybu.",
+    "errors": {
+      "busy": "Kamera sa zastavila: vašu kameru používa iná aplikácia.",
+      "noCamera": "Nenašla sa žiadna kamera. Pripojte kameru a zobrazí sa tu.",
+      "permissionDenied": "Prístup ku kamere bol odmietnutý",
+      "deviceGone": "Kamera sa zastavila: kamera bola odpojená.",
+      "unreadable": "Kamera sa zastavila: kamera posiela nečitateľný obraz.",
+      "cameraFailed": "Kameru sa nepodarilo spustiť."
+    },
+    "imageImportFailed": "Tento obrázok sa nedá použiť. Použite súbor PNG, JPEG alebo WebP do 10 MB."
   }
 }

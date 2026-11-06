@@ -53,7 +53,7 @@
   width: 1.5rem;
   height: 1.5rem;
   border-radius: var(--radius-sm);
-  background: hsl(var(--hue, 0) 55% 45%);
+  background: var(--app-colour);
 }
 
 /* The app's own icon (Linux icon theme) in place of the coloured square. */

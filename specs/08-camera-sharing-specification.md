@@ -24,7 +24,7 @@ People in a voice channel want to see each other, the way they do in Teams or Me
 - On-air state everywhere (user panel, under the own name, self-view, channel tree, room bar, system camera light, tray, screen reader); stop rules (channel change, server switch, disconnect, quit, screen lock).
 - Settings → Camera tab (mockup 11); global hotkey to toggle the camera.
 - Limits: 9 cameras per channel (mumbot), 25 viewers per camera, 18 camera broadcasts per relay, 2.5 Mbit/s per camera (mumpeer).
-- Six built-in background images made for Mumcord.
+- 18 built-in background images made for Mumcord.
 - mumpeer: `camera` use, `use` on broadcasts, camera limits, `want` control, testenv profile `no-camera`. mumbot: `cam` in the announcement, kind on `bcast-req`, broadcasts per session and kind, per-channel limit, camera ends on channel change.
 - Test hooks for a simulated camera, a forced segmentation mask, screen lock and effect timing; `bcast-sim` camera publishers.
 
@@ -125,7 +125,7 @@ The client only displays availability; the bot and relay decide who may create o
 - **FR-8.36** The preview shows the current load: low (< 50 % of the frame budget), medium (50–100 %), high (> 100 %, Auto is stepping down), and which level runs (Best or Light). Effects always run on the CPU.
 - **FR-8.37** Frame budget: there is no fixed per-frame time. The budget is the frame interval at the target frame rate (about 33 ms at 30 fps) minus headroom for capture and encoding; the level that fits is chosen at camera start (FR-8.35). Spike CA0 measured about 10–14 ms per 720p frame for the full level on a 2020 reference laptop, so a fixed 8 ms limit is not reachable with full post-processing. If even Light can't hold 30 fps, the camera keeps running at the frame rate the effects can deliver (min 15 fps); below that, the preview shows "Your PC is too busy for this background effect. Try None." and the effect stays on.
 - **FR-8.38** Effects run on a dedicated effects thread, never on the audio thread or the UI thread. Background None skips the model entirely.
-- **FR-8.39** Built-in background images: six images made for Mumcord (our own work), each ≤ 300 KB, shipped with the app, source recorded in the third-party notices.
+- **FR-8.39** Built-in background images: 18 images made for Mumcord (our own work), each ≤ 300 KB, shipped with the app, source recorded in the third-party notices.
 - **FR-8.40** The background choice can be changed while the camera is on (room bar "Background: {name}" opens the same picker as a popover, without stopping the broadcast).
 - **FR-8.41** Debug test hook `MUMCORD_TEST_SEGMENT_MASK` (debug builds only) replaces the model output with the fixture's known person mask, so compositing can be checked pixel-exactly in E2E. A second hook `MUMCORD_TEST_EFFECT_STATS` exposes the median effect time per frame in the debug panel.
 
@@ -247,7 +247,7 @@ flowchart LR
 └────────────────────────────────────────────────────┘
 ```
 
-With Image selected, the blur slider is replaced by the image grid (six built-in, own images marked "Yours", **Add image**) and the line "Your own images stay on this device. Only the finished picture is sent." Focus starts on **Turn on camera**; Escape = Cancel.
+With Image selected, the blur slider is replaced by the image grid (18 built-in, own images marked "Yours", **Add image**) and the line "Your own images stay on this device. Only the finished picture is sent." Focus starts on **Turn on camera**; Escape = Cancel.
 
 ### 5.3 Camera room (mockups 05–07, 10)
 
@@ -497,7 +497,7 @@ stateDiagram-v2
 
 - macOS: `NSCameraUsageDescription` in `Info.plist` and the `com.apple.security.device.camera` entitlement for the hardened runtime.
 - Linux: the Flatpak build uses only the portal path (no extra device permission); `.deb` and AppImage need no new system packages.
-- Bundled assets: the two Selfie Segmenter ONNX files (square 256×256 and landscape 144×256) and six background images (≤ 300 KB each); ONNX Runtime's native library (≈ 10–20 MB per platform) ships with the app. MediaPipe Selfie Multiclass (≈ 16.5 MB) is not bundled.
+- Bundled assets: the two Selfie Segmenter ONNX files (square 256×256 and landscape 144×256) and 18 background images (≤ 300 KB each); ONNX Runtime's native library (≈ 10–20 MB per platform) ships with the app. MediaPipe Selfie Multiclass (≈ 16.5 MB) is not bundled.
 - Licences: third-party notices and the licences window list MediaPipe Selfie Segmenter (Apache-2.0, model card), `ort` + ONNX Runtime (MIT), `zune-jpeg` (MIT/Apache/Zlib), `v4l` (MIT), `objc2-av-foundation` (MIT), and the source of the built-in background images (own work).
 
 ### 10.2 Releases

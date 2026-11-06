@@ -19,5 +19,7 @@
   "channelsOf": "Csatornák · {server}",
   "moreChannels": "További csatornák a Mumcordban…",
   "recentChats": "Legutóbbi csevegések",
-  "chatUnread": "{name} – {count} olvasatlan"
+  "chatUnread": "{name} – {count} olvasatlan",
+  "cameraOn": "Kamera bekapcsolva",
+  "turnOffCamera": "Kamera kikapcsolása"
 }

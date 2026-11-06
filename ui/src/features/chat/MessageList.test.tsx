@@ -612,17 +612,34 @@ describe("MessageList replies", () => {
       expect(screen.getAllByRole("menuitem").map((item) => item.textContent)).toEqual(["Copy"]);
     });
 
-    it("Ctrl+C copies plain text with line breaks and without hidden labels", () => {
+    it("Ctrl+C copies plain text with line breaks and without hidden labels, once", () => {
       const copy = vi.spyOn(getApi(), "copyText").mockResolvedValue(null);
+      renderReplies(MESSAGES);
+      select(bodyText("first"), 0, bodyText("second"), 6);
+      // Only the engine writes: a second writer, the webview's own copy, can empty the X11 clipboard.
+      const key = fireEvent.keyDown(screen.getByText("first"), { key: "c", ctrlKey: true });
+      expect(key).toBe(false);
+      expect(copy).toHaveBeenCalledTimes(1);
+      expect(copy).toHaveBeenCalledWith("first\nsecond");
+      copy.mockRestore();
+    });
+
+    it("leaves Ctrl+C to the webview without a chat selection", () => {
+      const copy = vi.spyOn(getApi(), "copyText").mockResolvedValue(null);
+      renderReplies(MESSAGES);
+      window.getSelection()?.removeAllRanges();
+      expect(fireEvent.keyDown(screen.getByText("first"), { key: "c", ctrlKey: true })).toBe(true);
+      expect(copy).not.toHaveBeenCalled();
+      copy.mockRestore();
+    });
+
+    it("a copy from elsewhere, such as the Edit menu, gets the plain text", () => {
       renderReplies(MESSAGES);
       select(bodyText("first"), 0, bodyText("second"), 6);
       const setData = vi.fn();
       const event = fireEvent.copy(screen.getByText("first"), { clipboardData: { setData } });
       expect(event).toBe(false);
       expect(setData).toHaveBeenCalledWith("text/plain", "first\nsecond");
-      // Also through the engine's clipboard, which reaches the desktop where the webview's does not.
-      expect(copy).toHaveBeenCalledWith("first\nsecond");
-      copy.mockRestore();
     });
   });
 

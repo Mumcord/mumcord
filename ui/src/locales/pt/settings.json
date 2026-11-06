@@ -17,7 +17,8 @@
     "packetInspector": "Inspetor de pacotes",
     "hotkeys": "Atalhos",
     "plugins": "Plugins",
-    "screenSharing": "Partilha de ecrã"
+    "screenSharing": "Partilha de ecrã",
+    "camera": "Câmara"
   },
   "sectionDescriptions": {
     "general": "Arranque, idioma, atualizações e acessibilidade.",
@@ -31,7 +32,8 @@
     "advanced": "Ferramentas de programador, diagnóstico, armazenamento e licenças.",
     "about": "Versão, suporte e o assistente de configuração.",
     "plugins": "Os plugins são executados num ambiente isolado e só recebem o que permitir. Nunca veem o seu áudio, ficheiros ou certificado.",
-    "screenSharing": "Qualidade, codec e hardware para partilhares o teu ecrã. Os espectadores veem sempre o que escolhes antes de começares."
+    "screenSharing": "Qualidade, codec e hardware para partilhares o teu ecrã. Os espectadores veem sempre o que escolhes antes de começares.",
+    "camera": "A sua câmara, os efeitos de fundo e como vê as câmaras dos outros. A partilha de câmara precisa de um servidor com um relay mumpeer."
   },
   "breadcrumb": "Definições / {{section}}",
   "moreInfo": "Mais informações: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "alertas pop-ups",
     "externalContent": "conteúdo incorporado imagens pré-visualizações",
     "fileSharing": "ficheiros enviar receber descarregar guardar pasta anexo zip",
-    "screenSharing": "partilha ecrã qualidade resolução fps codec AV1 VP9 codificador placa gráfica"
+    "screenSharing": "partilha ecrã qualidade resolução fps codec AV1 VP9 codificador placa gráfica",
+    "camera": "câmara webcam vídeo fundo desfocar fundo virtual espelho autovisualização"
   },
   "search": {
     "label": "Pesquisar definições",
@@ -1054,7 +1057,9 @@
     "addNone": "Liga-te a um servidor para escolheres um dos seus canais.",
     "addConfirm": "Adicionar",
     "reset": "Repor todos os atalhos",
-    "resetHint": "Remove todos os atalhos exceto push-to-talk; por predefinição, nenhum está definido."
+    "resetHint": "Remove todos os atalhos exceto push-to-talk; por predefinição, nenhum está definido.",
+    "camera": "Ligar / desligar a câmara",
+    "cameraHint": "Abre a pré-visualização quando a câmara está desligada e desliga-a quando está ligada."
   },
   "developerMode": {
     "title": "Modo de programador",
@@ -1132,5 +1137,71 @@
     "skippedAboveLimit": "VP9 (a tua imagem excede o que o AV1 gere aqui)",
     "softwareWarning": "O AV1 vai correr no processador sem um teste aprovado e pode ser demasiado pesado para este PC.",
     "checkAgain": "Verificar novamente"
+  },
+  "camera": {
+    "cameraTitle": "Câmara",
+    "previewLabel": "Pré-visualização da sua câmara",
+    "previewName": "Você",
+    "previewNote": "Pré-visualização, só neste dispositivo. Pára quando sair desta página.",
+    "device": "Câmara",
+    "deviceDefault": "Predefinição do sistema",
+    "noDevice": "Nenhuma câmara encontrada",
+    "sendQuality": "Qualidade de envio",
+    "sendQualityAuto": "Automático",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (até 720p · 30 fps) envia só o que quem está a ver precisa: mais pequeno numa grelha grande, mais nítido quando alguém o fixa.",
+    "mirror": "Espelhar a minha própria imagem",
+    "mirrorHint": "Só a sua própria imagem é espelhada. Os outros veem-no no sentido certo.",
+    "backgroundTitle": "Fundo",
+    "defaultBackground": "Fundo predefinido",
+    "backgroundNone": "Nenhum",
+    "backgroundBlur": "Desfocar",
+    "backgroundLibrary": "Imagem: biblioteca",
+    "backgroundOwn": "Imagem: {{name}} (sua)",
+    "blurStrength": "Intensidade do desfoque",
+    "blurLight": "Suave",
+    "blurStrong": "Forte",
+    "effectQuality": "Qualidade dos efeitos",
+    "effectAuto": "Automático",
+    "effectBest": "Máxima (placa gráfica)",
+    "effectLight": "Leve (poupa bateria)",
+    "effectHint": "Auto usa a placa gráfica quando pode e muda para Leve com bateria ou quando o PC está ocupado.",
+    "ownImages_one": "As suas próprias imagens de fundo ficam neste dispositivo (guardadas: {{count}}). Só a imagem final é enviada.",
+    "ownImages_many": "As suas próprias imagens de fundo ficam neste dispositivo (guardadas: {{count}}). Só a imagem final é enviada.",
+    "ownImages_other": "As suas próprias imagens de fundo ficam neste dispositivo (guardadas: {{count}}). Só a imagem final é enviada.",
+    "manageImages": "Gerir imagens",
+    "imagesTitle": "As suas imagens de fundo",
+    "imagesEmpty": "Ainda não há imagens. Adicione uma imagem PNG, JPEG ou WebP para a usar como fundo.",
+    "imageName": "Imagem {{number}}",
+    "imageDelete": "Eliminar",
+    "imageDeleteLabel": "Eliminar {{name}}",
+    "imageDeleted": "{{name}} eliminada",
+    "imageAdded": "{{name}} adicionada",
+    "addImage": "Adicionar imagem",
+    "addImageTitle": "Escolher uma imagem de fundo",
+    "imageFilter": "Imagens",
+    "close": "Fechar",
+    "privacyTitle": "Privacidade",
+    "lockOff": "Desligar a minha câmara quando o ecrã bloquear",
+    "privacyNote": "A sua câmara começa sempre desligada e mostra primeiro uma pré-visualização. Desliga-se quando sai do canal ou se desliga. Só as pessoas no seu canal de voz a podem ver, através do relay deste servidor, com encriptação ponto a ponto. O Mumcord nunca grava câmaras.",
+    "othersTitle": "Câmaras dos outros",
+    "showCameras": "Mostrar câmaras",
+    "showAlways": "Sempre",
+    "showOnOpen": "Quando abro a sala",
+    "showNever": "Nunca",
+    "showHint": "Sempre abre a sala de câmaras quando alguém no seu canal liga uma câmara. Nunca deixa-o só com voz e não transfere vídeo.",
+    "dataSaver": "Poupança de dados: até 15 fps para todos",
+    "reduceMotion": "Reduzir movimento: sem brilho nem animação na moldura de quem fala",
+    "reduceMotionHint": "Por predefinição segue a definição de redução de movimento do sistema.",
+    "errors": {
+      "busy": "Câmara parada: outra aplicação está a usar a sua câmara.",
+      "noCamera": "Nenhuma câmara encontrada. Ligue uma câmara e ela aparece aqui.",
+      "permissionDenied": "O acesso à câmara foi negado",
+      "deviceGone": "Câmara parada: a câmara foi desligada.",
+      "unreadable": "Câmara parada: a câmara envia imagens ilegíveis.",
+      "cameraFailed": "Não foi possível iniciar a câmara."
+    },
+    "imageImportFailed": "Não é possível usar esta imagem. Use um ficheiro PNG, JPEG ou WebP até 10 MB."
   }
 }

@@ -255,24 +255,37 @@ const PROBES = {
       return Promise.resolve("blocked");
     }
   },
-  storage: async () => {
+  // Other frames in the app window (this plugin's other places, other plugins): reading their
+  // document must fail like the parent's.
+  "other-frames": () => {
+    let reached = false;
+    try {
+      const frames = window.parent.frames;
+      for (let i = 0; i < frames.length; i++) {
+        if (frames[i] === window) continue;
+        try {
+          if (frames[i].document.body) reached = true;
+        } catch {
+          // a cross-origin frame: blocked, as expected
+        }
+      }
+    } catch {
+      return Promise.resolve("blocked");
+    }
+    return Promise.resolve(reached ? "leaked" : "blocked");
+  },
+  storage: () => {
     try {
       window.localStorage.setItem("probe", "1");
-      return "leaked";
+      return Promise.resolve("leaked");
     } catch {
       // fall through to the next store
     }
     try {
       window.sessionStorage.setItem("probe", "1");
-      return "leaked";
+      return Promise.resolve("leaked");
     } catch {
-      // fall through to the next store
-    }
-    try {
-      const request = window.indexedDB.open("probe");
-      return await race(request, "success", "error", () => {});
-    } catch {
-      return "blocked";
+      return Promise.resolve("blocked");
     }
   },
   cookies: () => {
@@ -300,6 +313,14 @@ const PROBES = {
       return "blocked";
     }
   },
+  indexeddb: async () => {
+    try {
+      const request = window.indexedDB.open("probe");
+      return await race(request, "success", "error", () => {});
+    } catch {
+      return "blocked";
+    }
+  },
   navigation: () => stillHere(() => window.location.assign(target("nav"))),
   "top-navigation": () => stillHere(() => window.top.location.assign(target("top-nav"))),
   "meta-refresh": () =>
@@ -319,7 +340,9 @@ const PROBES = {
     }),
 };
 
-const NAVIGATING = new Set(["navigation", "top-navigation", "meta-refresh", "form"]);
+// A download link to another origin is one too: WebKitGTK ignores `download` across origins and
+// follows the link, and the host closes a frame that loads a second page.
+const NAVIGATING = new Set(["navigation", "top-navigation", "meta-refresh", "form", "download"]);
 
 function resultItem(probe) {
   const item = document.createElement("li");
@@ -368,14 +391,21 @@ function hog() {
 
 // Frame audio is allowed only after a click inside the frame (AC-9.24): the button plays a tone,
 // the plugin's "tone" command tries the same without a click and reports the context state.
+// The context is shared and resumed on every call, so a context that a call without a click
+// created (suspended) still sounds after a later click, as a real page would do it.
 let audio;
-function tone() {
+async function tone() {
   audio ??= new AudioContext();
   const oscillator = audio.createOscillator();
   oscillator.frequency.value = 440;
   oscillator.connect(audio.destination);
   oscillator.start();
-  oscillator.stop(audio.currentTime + 1);
+  oscillator.stop(audio.currentTime + 2);
+  try {
+    await audio.resume();
+  } catch {
+    // Refused without a click inside the frame: the state below says "blocked".
+  }
   return audio.state === "running" ? "ok" : "blocked";
 }
 
@@ -392,7 +422,14 @@ function build() {
   }
   document.getElementById("run-all").addEventListener("click", runAll);
   document.getElementById("busy").addEventListener("click", busy);
-  document.getElementById("tone").addEventListener("click", () => show("tone-click", tone()));
+  // A gesture-bound host call asked for from inside the page (FR-9.45): it works only after a
+  // trusted click here, never after a script-made one.
+  document
+    .getElementById("start-stage")
+    ?.addEventListener("click", () => send(`start-stage:${PLACE}`));
+  document.getElementById("tone").addEventListener("click", () => {
+    void tone().then((status) => show("tone-click", status));
+  });
 }
 
 window.addEventListener("message", (event) => {
@@ -403,7 +440,7 @@ window.addEventListener("message", (event) => {
   else if (command === "run" && Object.hasOwn(PROBES, probe)) run(probe);
   else if (command === "busy") busy();
   else if (command === "hog") hog();
-  else if (command === "tone") show("tone-auto", tone());
+  else if (command === "tone") void tone().then((status) => show("tone-auto", status));
 });
 
 build();

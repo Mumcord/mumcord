@@ -5,6 +5,9 @@
  */
 import { mockPublicServerPing, mockPublicServers } from "./mockPublicServers";
 import type {
+  CameraRoomView,
+  CameraTile,
+  CameraView,
   DndState,
   FileCard,
   FileChip,
@@ -92,6 +95,7 @@ import {
   type ServerEventName,
   type Unsubscribe,
 } from "./client";
+import { createMockCamera } from "./mockCamera";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
 import { createMockInspector } from "./mockInspector";
 import { createMockPopouts } from "./mockPopout";
@@ -202,6 +206,13 @@ export interface MockControls {
    * server that connected last.
    */
   focusServer(serverId: number): void;
+  /**
+   * Other people's cameras in the room of `serverId` (spec 08): `camera_room` answers with it and
+   * `cameraRoomChanged` reports it. The room's `open` follows `camera_room_set_open`.
+   */
+  setCameraRoom(serverId: number, tiles: CameraTile[], open?: boolean): void;
+  /** The own camera as `camera_view` and `cameraChanged` report it; `null` is off. */
+  setCameraView(view: CameraView | null): void;
 }
 
 export type MockApi = MumcordApi & {
@@ -402,6 +413,18 @@ const DEFAULT_SETTINGS: Settings = {
   screenSound: true,
   screenAskEachTime: true,
   screenUseGpu: true,
+  cameraDeviceId: null,
+  cameraSendQuality: "auto",
+  cameraMirrorSelf: true,
+  cameraDefaultBackground: { kind: "blur" },
+  cameraBlurStrength: 50,
+  cameraEffectQuality: "auto",
+  cameraOffOnLock: true,
+  cameraShow: "always",
+  cameraDataSaver: false,
+  cameraReduceMotion: "system",
+  cameraStripPosition: "beside",
+  cameraHotkey: null,
 };
 
 /** Fictional titles and covers for the demo party's videos (issue #163). */
@@ -1438,6 +1461,24 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     emit("relayChanged", { serverId, info });
   }
 
+  /** The camera rooms the tests and the demo set (spec 08); empty and closed otherwise. */
+  const cameraRooms = new Map<number, CameraRoomView>();
+  let ownCamera: CameraView | null = null;
+  const offCamera: CameraView = {
+    serverId: 1,
+    state: "off",
+    error: null,
+    broadcast: null,
+    viewers: [],
+  };
+  function cameraRoomOf(serverId: number): CameraRoomView {
+    return cameraRooms.get(serverId) ?? { serverId, open: false, videosHidden: false, tiles: [] };
+  }
+  function setCameraRoomView(view: CameraRoomView): void {
+    cameraRooms.set(view.serverId, view);
+    emit("cameraRoomChanged", { view });
+  }
+
   function emit<K extends EventName>(event: K, payload: EventPayloads[K]): void {
     dispatch(event, payload);
     if (
@@ -2234,6 +2275,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     { id: "browser", name: "Web Browser", icon: null },
   ];
 
+  const camera = createMockCamera(
+    emit,
+    () => settings,
+    (next) => {
+      settings = next;
+    },
+  );
   const commands: EngineCommands = {
     // identity
     identityGet: () => Promise.resolve(defaultIdentity()),
@@ -3909,33 +3957,39 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     audioDeviceNoticeDismiss: () => Promise.resolve(null),
     cameraUnavailable: () => Promise.resolve(null),
     lockScreen: () => Promise.resolve(null),
-    // The browser mock has no camera; the camera UI shows "no camera" (spec 08).
-    cameraDevices: () => Promise.resolve([]),
-    cameraView: () => Promise.resolve(null),
-    cameraPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
-    cameraTurnOn: () => Promise.reject(new EngineError("camera", "busy")),
-    cameraTurnOff: () => Promise.resolve(),
-    cameraLocalPreviewStart: () => Promise.reject(new EngineError("camera", "noCamera")),
-    cameraLocalPreviewStop: () => Promise.resolve(),
-    cameraSetDevice: () => Promise.resolve(null),
-    cameraSetBackground: () => Promise.resolve(null),
-    cameraSetEffectQuality: () => Promise.resolve(),
-    cameraEffects: () =>
-      Promise.resolve({ unavailable: null, level: null, load: null, tooBusy: false }),
-    cameraPreviewAttach: () => Promise.resolve(),
-    cameraPreviewDetach: () => Promise.resolve(),
-    // Nobody else has a camera in the browser mock: the room stays empty.
-    cameraRoom: (serverId) =>
-      Promise.resolve({ serverId, open: false, videosHidden: false, tiles: [] }),
-    cameraRoomSetOpen: () => Promise.resolve(),
+    // Nobody else has a camera in the browser mock until a test or the demo sets the room.
+    cameraRoom: (serverId) => Promise.resolve(cameraRoomOf(serverId)),
+    cameraRoomSetOpen: (serverId, open) => {
+      setCameraRoomView({ ...cameraRoomOf(serverId), open });
+      return Promise.resolve();
+    },
     cameraRoomSetVideosHidden: () => Promise.resolve(),
-    cameraTileSetHidden: () => Promise.resolve(),
+    cameraTileSetHidden: (serverId, sharer, hidden) => {
+      const room = cameraRoomOf(serverId);
+      setCameraRoomView({
+        ...room,
+        tiles: room.tiles.map((tile) =>
+          tile.sharer === sharer ? { ...tile, hidden, state: hidden ? "hidden" : "playing" } : tile,
+        ),
+      });
+      return Promise.resolve();
+    },
     cameraTileSetQuality: () => Promise.resolve(),
     cameraTileSetHeight: () => Promise.resolve(),
     cameraRequestKeyframe: () => Promise.resolve(),
     cameraFramesAttach: () => Promise.resolve(),
     cameraFramesDetach: () => Promise.resolve(),
     cameraSetDecodeCodecs: () => Promise.resolve(),
+    ...camera,
+    // A camera view set by a test (`mock.setCameraView`) wins over the camera mock's own state.
+    cameraView: () => (ownCamera !== null ? Promise.resolve(ownCamera) : camera.cameraView()),
+    cameraTurnOff: (serverId) => {
+      if (ownCamera === null) return camera.cameraTurnOff(serverId);
+      const own = ownCamera;
+      ownCamera = null;
+      emit("cameraChanged", { view: { ...offCamera, serverId: own.serverId } });
+      return Promise.resolve();
+    },
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
@@ -3981,6 +4035,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   const mock: MockControls = {
     emit,
+    setCameraRoom: (serverId, tiles, open) => {
+      const room = cameraRoomOf(serverId);
+      setCameraRoomView({ ...room, open: open ?? room.open, tiles });
+    },
+    setCameraView: (view) => {
+      ownCamera = view;
+      emit("cameraChanged", { view: view ?? { ...offCamera } });
+    },
     failNext: (command, code, message = "injected failure") => {
       failures.set(command, { code, message });
     },

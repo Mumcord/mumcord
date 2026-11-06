@@ -489,6 +489,7 @@ impl Direct {
         drop(state);
         if let Some(engine) = self.engine() {
             engine.plugin_relay_left(server_id, session);
+            engine.plugin_relay_forget(server_id, session);
         }
     }
 
@@ -497,6 +498,7 @@ impl Direct {
         self.close_where(|(id, _)| *id == server_id);
         if let Some(engine) = self.engine() {
             engine.plugin_relay_reset(server_id);
+            engine.plugin_relay_pairs_reset(server_id);
         }
     }
 

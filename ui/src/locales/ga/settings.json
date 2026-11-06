@@ -17,7 +17,8 @@
     "packetInspector": "Cigire paicéad",
     "hotkeys": "Aicearraí",
     "plugins": "Breiseáin",
-    "screenSharing": "Comhroinnt scáileáin"
+    "screenSharing": "Comhroinnt scáileáin",
+    "camera": "Ceamara"
   },
   "sectionDescriptions": {
     "general": "Tosú, teanga, nuashonruithe agus inrochtaineacht.",
@@ -31,7 +32,8 @@
     "advanced": "Uirlisí forbróra, diagnóisic, stóras agus ceadúnais.",
     "about": "Leagan, tacaíocht agus an draoi socraithe.",
     "plugins": "Ritheann breiseáin i bhfianán gainimh agus ní fhaigheann siad ach an méid a cheadaíonn tú. Ní fheiceann siad d'fhuaim, do chomhaid ná do theastas riamh.",
-    "screenSharing": "Cáilíocht, códác agus crua-earraí chun do scáileán a chomhroinnt. Feiceann lucht féachana i gcónaí an rud a roghnaíonn tú sula dtosaíonn tú."
+    "screenSharing": "Cáilíocht, códác agus crua-earraí chun do scáileán a chomhroinnt. Feiceann lucht féachana i gcónaí an rud a roghnaíonn tú sula dtosaíonn tú.",
+    "camera": "Do cheamara, éifeachtaí cúlra agus an chaoi a bhfeiceann tú ceamaraí daoine eile. Teastaíonn freastalaí le athsheachadán mumpeer chun ceamara a roinnt."
   },
   "breadcrumb": "Socruithe / {{section}}",
   "moreInfo": "Tuilleadh eolais: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "foláirimh preabfhuinneoga",
     "externalContent": "leabaithe íomhánna réamhamharcanna",
     "fileSharing": "comhaid seol faigh íoslódáil sábháil fillteán ceangaltán zip",
-    "screenSharing": "comhroinnt scáileáin cáilíocht taifeach fps códác AV1 VP9 ionchódóir cárta grafaicí"
+    "screenSharing": "comhroinnt scáileáin cáilíocht taifeach fps códác AV1 VP9 ionchódóir cárta grafaicí",
+    "camera": "ceamara webcam físeán cúlra doiléiriú cúlra fíorúil scáthánú m'amharc féin"
   },
   "search": {
     "label": "Cuardaigh socruithe",
@@ -1070,7 +1073,9 @@
     "addNone": "Ceangail le freastalaí chun ceann dá chainéil a roghnú.",
     "addConfirm": "Cuir leis",
     "reset": "Athshocraigh gach aicearra",
-    "resetHint": "Baintear gach aicearra seachas brúigh-chun-cainte; níl aon cheann socraithe de réir réamhshocraithe."
+    "resetHint": "Baintear gach aicearra seachas brúigh-chun-cainte; níl aon cheann socraithe de réir réamhshocraithe.",
+    "camera": "Cas ceamara air / as",
+    "cameraHint": "Osclaíonn sé an réamhamharc nuair atá do cheamara as agus casann sé as é nuair atá sé air."
   },
   "developerMode": {
     "title": "Mód forbróra",
@@ -1148,5 +1153,73 @@
     "skippedAboveLimit": "VP9 (tá do phictiúr os cionn an méid a láimhseálann AV1 anseo)",
     "softwareWarning": "Rithfidh AV1 ar an bpróiseálaí gan seiceáil rathúil agus d'fhéadfadh sé a bheith róthrom don ríomhaire seo.",
     "checkAgain": "Seiceáil arís"
+  },
+  "camera": {
+    "cameraTitle": "Ceamara",
+    "previewLabel": "Réamhamharc ar do cheamara",
+    "previewName": "Tusa",
+    "previewNote": "Réamhamharc, ar an ngléas seo amháin. Stopann sé nuair a fhágann tú an leathanach seo.",
+    "device": "Ceamara",
+    "deviceDefault": "Réamhshocrú an chórais",
+    "noDevice": "Níor aimsíodh aon cheamara",
+    "sendQuality": "Cáilíocht seolta",
+    "sendQualityAuto": "Uath",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Seolann Uath (suas le 720p · 30 fps) an méid atá de dhíth ar lucht féachana amháin: níos lú i ngreille mhór, níos géire nuair a phionnálann duine thú.",
+    "mirror": "Scáthánaigh m'amharc féin",
+    "mirrorHint": "Ní scáthánaítear ach d'amharc féin. Feiceann daoine eile thú an ceart bealaigh.",
+    "backgroundTitle": "Cúlra",
+    "defaultBackground": "Cúlra réamhshocraithe",
+    "backgroundNone": "Aon cheann",
+    "backgroundBlur": "Doiléiriú",
+    "backgroundLibrary": "Íomhá: leabharlann",
+    "backgroundOwn": "Íomhá: {{name}} (do cheann féin)",
+    "blurStrength": "Neart an doiléirithe",
+    "blurLight": "Éadrom",
+    "blurStrong": "Láidir",
+    "effectQuality": "Cáilíocht na n-éifeachtaí",
+    "effectAuto": "Uath",
+    "effectBest": "Is fearr (cárta grafaice)",
+    "effectLight": "Éadrom (sábhálann ceallraí)",
+    "effectHint": "Úsáideann Uath an cárta grafaice nuair is féidir agus aistríonn sé go Éadrom ar cheallraí nó nuair atá an ríomhaire gnóthach.",
+    "ownImages_one": "Fanann do chuid íomhánna cúlra féin ar an ngléas seo (sábháilte: {{count}}). Ní sheoltar ach an íomhá chríochnaithe.",
+    "ownImages_two": "Fanann do chuid íomhánna cúlra féin ar an ngléas seo (sábháilte: {{count}}). Ní sheoltar ach an íomhá chríochnaithe.",
+    "ownImages_few": "Fanann do chuid íomhánna cúlra féin ar an ngléas seo (sábháilte: {{count}}). Ní sheoltar ach an íomhá chríochnaithe.",
+    "ownImages_many": "Fanann do chuid íomhánna cúlra féin ar an ngléas seo (sábháilte: {{count}}). Ní sheoltar ach an íomhá chríochnaithe.",
+    "ownImages_other": "Fanann do chuid íomhánna cúlra féin ar an ngléas seo (sábháilte: {{count}}). Ní sheoltar ach an íomhá chríochnaithe.",
+    "manageImages": "Bainistigh íomhánna",
+    "imagesTitle": "Do chuid íomhánna cúlra",
+    "imagesEmpty": "Níl aon íomhá ann fós. Cuir íomhá PNG, JPEG nó WebP leis le húsáid mar chúlra.",
+    "imageName": "Íomhá {{number}}",
+    "imageDelete": "Scrios",
+    "imageDeleteLabel": "Scrios {{name}}",
+    "imageDeleted": "Scriosadh {{name}}",
+    "imageAdded": "Cuireadh {{name}} leis",
+    "addImage": "Cuir íomhá leis",
+    "addImageTitle": "Roghnaigh íomhá chúlra",
+    "imageFilter": "Íomhánna",
+    "close": "Dún",
+    "privacyTitle": "Príobháideacht",
+    "lockOff": "Cas mo cheamara as nuair a ghlasálann an scáileán",
+    "privacyNote": "Tosaíonn do cheamara as i gcónaí agus taispeánann sé réamhamharc ar dtús. Casann sé as nuair a fhágann tú an cainéal nó nuair a dhínascann tú. Ní fheiceann ach daoine i do chainéal gutha é, trí athsheachadán an fhreastalaí seo, criptithe ó cheann go ceann. Ní thaifeadann Mumcord ceamaraí riamh.",
+    "othersTitle": "Ceamaraí daoine eile",
+    "showCameras": "Taispeáin ceamaraí",
+    "showAlways": "I gcónaí",
+    "showOnOpen": "Nuair a osclaím an seomra",
+    "showNever": "Choíche",
+    "showHint": "Osclaíonn I gcónaí seomra na gceamaraí nuair a chasann duine i do chainéal ceamara air. Coinníonn Choíche ar ghuth amháin thú agus ní íoslódálann sé físeán.",
+    "dataSaver": "Sábháil sonraí: suas le 15 fps do chách",
+    "reduceMotion": "Laghdaigh gluaiseacht: gan glóthacht ná beochan ar fhráma an chainteora",
+    "reduceMotionHint": "Leanann sé socrú laghdaithe gluaiseachta do chórais de réir réamhshocraithe.",
+    "errors": {
+      "busy": "Stop an ceamara: tá aip eile ag úsáid do cheamara.",
+      "noCamera": "Níor aimsíodh aon cheamara. Ceangail ceamara agus beidh sé le feiceáil anseo.",
+      "permissionDenied": "Diúltaíodh rochtain ar an gceamara",
+      "deviceGone": "Stop an ceamara: dínascadh an ceamara.",
+      "unreadable": "Stop an ceamara: seolann an ceamara íomhánna nach féidir a léamh.",
+      "cameraFailed": "Níorbh fhéidir an ceamara a thosú."
+    },
+    "imageImportFailed": "Ní féidir an íomhá seo a úsáid. Úsáid comhad PNG, JPEG nó WebP suas le 10 MB."
   }
 }

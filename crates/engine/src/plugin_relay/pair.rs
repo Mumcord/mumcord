@@ -55,7 +55,12 @@ impl Order {
 
     /// The person left: their next session starts counting anew.
     pub(super) fn forget(&mut self, key: Key) {
-        self.last.retain(|(k, _), _| *k != key);
+        self.forget_where(|k| *k == key);
+    }
+
+    /// Forgets every sender `gone` matches.
+    pub(super) fn forget_where(&mut self, gone: impl Fn(&Key) -> bool) {
+        self.last.retain(|(k, _), _| !gone(k));
     }
 }
 

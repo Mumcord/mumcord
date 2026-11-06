@@ -19,5 +19,7 @@
   "channelsOf": "Salons · {server}",
   "moreChannels": "Plus de salons dans Mumcord…",
   "recentChats": "Discussions récentes",
-  "chatUnread": "{name} – {count} non lus"
+  "chatUnread": "{name} – {count} non lus",
+  "cameraOn": "Caméra activée",
+  "turnOffCamera": "Désactiver la caméra"
 }

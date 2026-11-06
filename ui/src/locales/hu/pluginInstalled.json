@@ -56,6 +56,8 @@
     "incomingRateDropped": "A sebességkorlát által eldobott bejövő üzenetek",
     "incomingInvalid": "Érvénytelen bejövő üzenetek",
     "uiFreezes": "Hányszor fagyott le a Mumcord, miközben a webes tartalma nyitva volt",
+    "refusedAppMenuLabel": "Ez a bővítmény vissza lett utasítva: az Alkalmazások menü egyik címkéje megegyezik a Mumcord saját címkéjével, vagy „Mumcord”-dal kezdődik.",
+    "fieldWithoutPermission": "Ez a bővítmény vissza lett utasítva: a(z) „{{field}}” mezőt használja a(z) „{{permission}}” engedély nélkül.",
     "webDisabled": "A webes tartalma ki van kapcsolva, mert a Mumcord nem válaszolt, amíg nyitva volt.",
     "reenableWeb": "Webes tartalom bekapcsolása",
     "reenableFailed": "A webes tartalmat nem sikerült bekapcsolni.",

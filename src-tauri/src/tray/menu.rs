@@ -17,6 +17,8 @@ pub enum Action {
     Mute,
     Deafen,
     Dnd,
+    /// Turns the own camera off on this server (FR-8.19, FR-8.22).
+    TurnOffCamera(ServerId),
     /// Moves voice to this server, into the channel the user is in there.
     VoiceServer(ServerId),
     Join {
@@ -116,6 +118,15 @@ pub fn menu_model(state: &TrayState, labels: &Labels) -> Vec<Entry> {
             enabled: !(state.dnd.system && !state.dnd.manual),
             checked: state.dnd.active(),
         },
+    ]);
+    if let Some(server_id) = state.camera {
+        menu.push(Entry::Button {
+            action: Action::TurnOffCamera(server_id),
+            label: labels.turn_off_camera.clone(),
+            dot: None,
+        });
+    }
+    menu.extend([
         Entry::Separator,
         Entry::Submenu {
             label: labels.voice_menu.clone(),
@@ -641,6 +652,22 @@ mod tests {
             }
         );
         assert!(matches!(&chats[1], Entry::Button { label, dot: None, .. } if label == "Leo · S2"));
+    }
+
+    #[test]
+    fn turn_off_camera_shows_only_while_on_air() {
+        let labels = labels_en();
+        let mut state = TrayState::default();
+        synced(&mut state, 4);
+        let has = |state: &TrayState| {
+            menu_model(state, &labels).iter().any(|e| {
+                matches!(e, Entry::Button { action: Action::TurnOffCamera(4), label, .. }
+                    if label == "Turn off camera")
+            })
+        };
+        assert!(!has(&state));
+        state.camera = Some(4);
+        assert!(has(&state));
     }
 
     #[test]

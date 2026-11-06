@@ -56,6 +56,8 @@
     "incomingRateDropped": "Kiiruspiiranguga kaotsi läinud sissetulevad sõnumid",
     "incomingInvalid": "Kehtetud sissetulevad sõnumid",
     "uiFreezes": "Mitu korda Mumcord hangus, kui veebisisu oli avatud",
+    "refusedAppMenuLabel": "See plugin lükati tagasi: menüü Rakendused silt on sama mis Mumcordi enda oma või algab sõnaga „Mumcord“.",
+    "fieldWithoutPermission": "See plugin lükati tagasi: see kasutab välja „{{field}}“ ilma loata „{{permission}}“.",
     "webDisabled": "Veebisisu on välja lülitatud, sest Mumcord lakkas vastamast, kui see oli avatud.",
     "reenableWeb": "Lülita veebisisu sisse",
     "reenableFailed": "Veebisisu ei õnnestunud sisse lülitada.",

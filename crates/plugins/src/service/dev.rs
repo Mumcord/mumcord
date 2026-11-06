@@ -10,6 +10,7 @@ use mumcord_store::{PluginRecord, PluginVisibility};
 use super::{Origin, PluginService, ServiceError, allowed_grants, now_millis, with_required};
 use crate::manifest::{Manifest, ManifestError, Source, Visibility};
 use crate::package::MANIFEST_FILE;
+use crate::score::Scored;
 
 impl PluginService {
     /// Loads an unpacked plugin folder and starts it. Returns the plugin id. The id must not
@@ -48,7 +49,7 @@ impl PluginService {
             id: id.clone(),
             version: manifest.version.to_string(),
             previous_version: None,
-            source: Origin::Dev(folder).to_db(),
+            source: Origin::Dev(folder.clone()).to_db(),
             sha256: None,
             author_key: None,
             enabled: true,
@@ -66,6 +67,8 @@ impl PluginService {
             return Err(error.into());
         }
         self.ctx.grants.set(&id, &record.granted);
+        self.set_origins(&id, Source::Dev);
+        self.set_webview_root(&id, Source::Dev, &folder, &record.granted);
         self.ctx.notify.set_enabled(&id, true);
         self.sync_peers();
         // A developer wants to see a failing start in the log, so the plugin stays loaded.
@@ -77,6 +80,22 @@ impl PluginService {
         self.default_badge(&id)?;
         self.changed();
         Ok(id)
+    }
+
+    /// The security score of a loaded developer plugin, from its folder as it is now (FR-9.77).
+    /// For information only: nothing is ever blocked because of it.
+    pub fn dev_score(&self, id: &str) -> Result<Scored, ServiceError> {
+        let record = self.record(id)?;
+        let Some(Origin::Dev(folder)) = Origin::parse(&record.source) else {
+            return Err(ServiceError::NotDeveloper(id.to_owned()));
+        };
+        let manifest = read_dev_manifest(&folder)?;
+        let (bytes, wasm_modules) = folder_size(&folder)?;
+        Ok(crate::score::score(&crate::score::facts::from_dev(
+            &manifest,
+            bytes,
+            wasm_modules,
+        )))
     }
 
     /// Loads a developer plugin's folder again (after the developer rebuilt it). Permissions it
@@ -99,6 +118,9 @@ impl PluginService {
             Ok(manifest) => manifest,
             Err(error) => {
                 self.load_errors.insert(id.to_owned(), error.to_string());
+                if let Some(issue) = error.load_issue() {
+                    self.load_issues.insert(id.to_owned(), issue);
+                }
                 self.changed();
                 return Err(error);
             }
@@ -175,4 +197,27 @@ fn read_dev_manifest(folder: &Path) -> Result<Manifest, ServiceError> {
     let manifest = Manifest::parse(&std::fs::read(&path)?)?;
     manifest.validate(Source::Dev)?;
     Ok(manifest)
+}
+
+/// The total size of the files below `folder` and how many of them are WebAssembly modules: what
+/// a package's size and module count are for a packed plugin.
+fn folder_size(folder: &Path) -> Result<(u64, usize), ServiceError> {
+    let mut bytes = 0;
+    let mut wasm_modules = 0;
+    let mut pending = vec![folder.to_path_buf()];
+    while let Some(dir) = pending.pop() {
+        for entry in std::fs::read_dir(&dir)? {
+            let entry = entry?;
+            let kind = entry.file_type()?;
+            if kind.is_dir() {
+                pending.push(entry.path());
+            } else if kind.is_file() {
+                bytes += entry.metadata()?.len();
+                if entry.path().extension().is_some_and(|ext| ext == "wasm") {
+                    wasm_modules += 1;
+                }
+            }
+        }
+    }
+    Ok((bytes, wasm_modules))
 }

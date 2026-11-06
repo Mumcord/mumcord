@@ -16,7 +16,7 @@ use mumcord_plugins::service::{
     ServiceError, ServiceEvent, Status, StoredLine,
 };
 use mumcord_plugins::verify::IndexEntry;
-use mumcord_plugins::{Digest, HostEvent};
+use mumcord_plugins::{Digest, HostEvent, LoadIssue};
 use mumcord_store::{NewPluginRepository, PluginVisibility, Store};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -105,8 +105,12 @@ fn signed(id: &str, start: &str, extra: &str, optional: &[&str]) -> Signed {
 }
 
 fn signed_wasm(id: &str, wasm: &[u8], extra: &str, optional: &[&str]) -> Signed {
+    signed_package(id, &manifest(id, "1.0.0", extra), wasm, optional)
+}
+
+fn signed_package(id: &str, manifest: &str, wasm: &[u8], optional: &[&str]) -> Signed {
     let author = KeyPair::generate_unencrypted_keypair().expect("keypair");
-    let bytes = package(&manifest(id, "1.0.0", extra), wasm);
+    let bytes = package(manifest, wasm);
     let signature = minisign::sign(Some(&author.pk), &author.sk, &bytes[..], None, None)
         .expect("sign")
         .into_string();
@@ -605,6 +609,89 @@ fn developer_folders_follow_developer_mode() {
     service.developer_mode_changed(false).expect("unloads");
     assert!(service.list().expect("list").iter().all(|p| p.id != id));
     assert!(service.dir(&id).is_none());
+}
+
+#[test]
+fn a_refused_apps_menu_label_is_kept_for_diagnostics() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, _events) = fx.service();
+    let folder = dev_folder(fx.root.path(), "badlabel", "");
+    let id = service.load_dev(&folder).expect("loads");
+    assert_eq!(service.load_issue(&id), None);
+
+    std::fs::write(
+        folder.join("manifest.json"),
+        manifest(
+            "badlabel",
+            "0.1.0",
+            r#","permissions":{"required":["ui.app-menu"]},"app_menu":[{"id":"open","label":"Settings"}]"#,
+        )
+        .replace("^1.0", "^1.1"),
+    )
+    .expect("manifest");
+    let error = service.reload_dev(&id).expect_err("refused");
+    assert_eq!(
+        error.load_issue(),
+        Some(LoadIssue::RefusedAppMenuLabel),
+        "{error:?}"
+    );
+    assert_eq!(
+        service.load_issue(&id),
+        Some(LoadIssue::RefusedAppMenuLabel)
+    );
+}
+
+/// A 1.1 plugin declaring one website (FR-9.23), and that website as the frame policy lists it.
+const WEBSITE: &str = r#","permissions":{"required":["net.origins"]},"net":{"origins":[{"origin":"https://api.example.org","purpose":"origins.api"}]}"#;
+const DECLARED: &str = "https://api.example.org";
+
+fn manifest_1_1(id: &str, extra: &str) -> String {
+    manifest(id, "1.0.0", extra).replace("\"^1.0\"", "\"^1.1\"")
+}
+
+fn component_1_1() -> Vec<u8> {
+    let core = include_str!("fixtures/plugin.wat")
+        .replace("@1.0.0", "@1.1.0")
+        .replace("{{START}}", OK_START)
+        .replace("{{EVENT}}", "")
+        .replace("{{STOP}}", "");
+    encode_for(&core, "1.1.0")
+}
+
+fn declared_websites(service: &PluginService, id: &str) -> Vec<String> {
+    service
+        .webviews()
+        .origins(id)
+        .iter()
+        .map(|origin| origin.ascii())
+        .collect()
+}
+
+#[test]
+fn declared_websites_apply_right_after_install_and_developer_load() {
+    let fx = Fixture::new();
+    let (mut service, _events) = fx.service();
+    let mut weather = signed_package(
+        "weather",
+        &manifest_1_1("weather", WEBSITE),
+        &component_1_1(),
+        &[],
+    );
+    weather.request.entry.permissions = vec!["net.origins".into()];
+    service
+        .install(&weather.request, &weather.download)
+        .expect("installs");
+    assert_eq!(declared_websites(&service, "weather"), [DECLARED]);
+
+    fx.set_developer_mode(true);
+    let dir = fx.root.path().join("src-radar");
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(dir.join("manifest.json"), manifest_1_1("radar", WEBSITE)).expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), component_1_1()).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    let id = service.load_dev(&dir).expect("loads");
+    assert_eq!(declared_websites(&service, &id), [DECLARED]);
 }
 
 /// Core module: `start` sends "hi" (kind 5) to the channel with `peers.send`. On an error it
@@ -1671,6 +1758,40 @@ fn a_peer_newly_announcing_a_plugin_makes_it_ready_once() {
         ..bob()
     };
     service.peer_data(1, &eve, "mumcord.plugins", runs_poll);
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll, b"Bob".to_vec())]
+    );
+}
+
+#[test]
+fn an_announce_before_the_focus_or_the_join_still_makes_the_peer_ready() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    let poll = service
+        .load_dev(&ready_folder(fx.root.path(), "poll"))
+        .expect("loads");
+    let wait = std::time::Duration::from_millis(300);
+    let runs_poll = br#"{"v":1,"p":["poll@1~dev"]}"#;
+
+    // After a reconnect Bob's announce can arrive before he shows up in the channel, and both
+    // before the server is the voice server again: Poll hears he is ready once it can reach him.
+    service.peer_data(1, &bob(), "mumcord.plugins", runs_poll);
+    service.peer_joined(1, bob());
+    assert!(echoed(&mut service, &mut host_events, &mut events, wait).is_empty());
+    service.set_focused_server(Some(1));
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll.clone(), b"Bob".to_vec())]
+    );
+
+    // Leaving and joining again with the announce already known: ready again on the join.
+    service.peer_left(1, &bob());
+    service.peer_joined(1, bob());
     assert_eq!(
         echoed(&mut service, &mut host_events, &mut events, wait),
         [(poll, b"Bob".to_vec())]

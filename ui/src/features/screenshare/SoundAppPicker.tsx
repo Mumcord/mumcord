@@ -30,14 +30,17 @@ export interface SoundAppPickerProps {
   apps: SoundApp[];
 }
 
+/** The square colours of the "Which app's sound?" mockup (08), in both themes. */
+const APP_COLOURS = ["#e66000", "#1db954", "#ff8800", "#e53935"] as const;
+
 /**
  * A stable colour per app without an icon of its own, so the rows stay recognisable while the
  * list refreshes.
  */
-function appHue(name: string): number {
+function appColour(name: string): string {
   let hash = 0;
   for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 360;
-  return hash;
+  return APP_COLOURS[hash % APP_COLOURS.length] ?? APP_COLOURS[0];
 }
 
 type Problem = "gone" | "failed";
@@ -173,7 +176,7 @@ export function SoundAppPicker({ serverId, apps: offered }: SoundAppPickerProps)
             ) : (
               <span
                 className="sound-picker__icon"
-                style={{ "--hue": appHue(app.name) } as CSSProperties}
+                style={{ "--app-colour": appColour(app.name) } as CSSProperties}
                 aria-hidden="true"
               />
             ),

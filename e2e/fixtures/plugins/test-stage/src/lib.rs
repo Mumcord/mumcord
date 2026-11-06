@@ -9,7 +9,7 @@ use std::cell::RefCell;
 use std::collections::{BTreeSet, VecDeque};
 
 use mumcord_plugin_sdk::events::Event;
-use mumcord_plugin_sdk::types::StartInfo;
+use mumcord_plugin_sdk::types::{Error, StartInfo};
 use mumcord_plugin_sdk::ui::{self, Slot};
 use mumcord_plugin_sdk::{Plugin, log, stage, timers};
 
@@ -48,14 +48,16 @@ fn note(line: String) {
     });
 }
 
-fn outcome<T, E: std::fmt::Debug>(action: &str, result: Result<T, E>) -> Option<T> {
+/// Logs a host call's result; an error by its WIT name, as its debug text carries the whole
+/// description, longer than a panel text node may be.
+fn outcome<T>(action: &str, result: Result<T, Error>) -> Option<T> {
     match result {
         Ok(value) => {
             note(format!("{action}: ok"));
             Some(value)
         }
         Err(e) => {
-            note(format!("{action}: {e:?}"));
+            note(format!("{action}: {}", e.name()));
             None
         }
     }

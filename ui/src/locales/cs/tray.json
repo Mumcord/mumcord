@@ -19,5 +19,7 @@
   "channelsOf": "Kanály · {server}",
   "moreChannels": "Další kanály v Mumcordu…",
   "recentChats": "Nedávné chaty",
-  "chatUnread": "{name} – {count} nepřečtené"
+  "chatUnread": "{name} – {count} nepřečtené",
+  "cameraOn": "Kamera zapnutá",
+  "turnOffCamera": "Vypnout kameru"
 }

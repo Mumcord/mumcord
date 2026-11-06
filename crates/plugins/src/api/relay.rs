@@ -7,7 +7,7 @@
 //! carries 1:1 messages through a relay pair session. Payloads are opaque bytes: never parsed,
 //! rewritten or logged (FR-9.94).
 
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use crate::messaging::Target;
 use crate::messaging::envelope::MAX_PAYLOAD;
@@ -91,6 +91,96 @@ pub fn path(status: RelayStatus, target: Target, len: usize, fallback: bool) -> 
     }
 }
 
+/// Channel messages a sender's relay broadcast holds while it starts (FR-9.60); the engine keeps
+/// the same limits. Only messages that reached nobody through Mumble count.
+pub const START_QUEUE_MESSAGES: usize = 8;
+/// Plugin data bytes the start queue holds.
+pub const START_QUEUE_BYTES: usize = 256 * 1024;
+/// How long the engine waits for a broadcast to start before the queued messages fail.
+pub const START_TIMEOUT: Duration = Duration::from_secs(8);
+
+/// The sender's relay broadcast as the engine reports it (mirrors the engine's
+/// `PluginBroadcastState`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BroadcastState {
+    Live,
+    /// Could not start or was lost; the engine tries again after `retry_in`.
+    Down {
+        retry_in: Duration,
+    },
+    /// Ended; the next channel send starts anew.
+    Ended,
+}
+
+/// What the service knows about the sender's relay broadcast on one server, so a channel
+/// message that cannot arrive returns an error instead of "sent".
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Broadcast {
+    /// Not started; the next channel send starts it.
+    #[default]
+    Idle,
+    /// The engine is starting it and queues the messages sent meanwhile.
+    Starting {
+        since: Instant,
+        messages: usize,
+        bytes: usize,
+    },
+    Live,
+    /// Down until `until`; the engine drops channel sends until then.
+    Down {
+        until: Instant,
+    },
+}
+
+impl Broadcast {
+    /// What the engine reported, at `now`.
+    pub fn reported(state: BroadcastState, now: Instant) -> Self {
+        match state {
+            BroadcastState::Live => Self::Live,
+            BroadcastState::Down { retry_in } => Self::Down {
+                until: now + retry_in,
+            },
+            BroadcastState::Ended => Self::Idle,
+        }
+    }
+
+    /// Takes a channel message of `len` bytes; `fell_back` when every receiver outside the
+    /// broadcast got it through Mumble plugin data. Refused when it would reach nobody: the
+    /// broadcast is down or did not start in time (`relay-unavailable`), or the start queue is
+    /// full (`rate-limited`).
+    pub fn accept(&mut self, len: usize, fell_back: bool, now: Instant) -> Result<(), SendError> {
+        let queued = usize::from(!fell_back);
+        let queued_bytes = if fell_back { 0 } else { len };
+        match self {
+            Self::Idle => {}
+            Self::Down { until } if *until <= now => {}
+            Self::Live => return Ok(()),
+            Self::Down { .. } if fell_back => return Ok(()),
+            Self::Down { .. } => return Err(SendError::Unavailable),
+            Self::Starting { .. } if fell_back => return Ok(()),
+            Self::Starting { since, .. } if now.duration_since(*since) >= START_TIMEOUT => {
+                return Err(SendError::Unavailable);
+            }
+            Self::Starting {
+                messages, bytes, ..
+            } => {
+                if *messages >= START_QUEUE_MESSAGES || *bytes + len > START_QUEUE_BYTES {
+                    return Err(SendError::Error(Error::RateLimited));
+                }
+                *messages += 1;
+                *bytes += len;
+                return Ok(());
+            }
+        }
+        *self = Self::Starting {
+            since: now,
+            messages: queued,
+            bytes: queued_bytes,
+        };
+        Ok(())
+    }
+}
+
 /// Why a `relay` send was refused: a 1.0 error or the 1.1 `relay-unavailable`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SendError {
@@ -151,11 +241,15 @@ pub(crate) fn send(
     data: Vec<u8>,
     fallback: bool,
 ) -> Result<(), SendError> {
-    state.ctx.grants.check(&state.id, PERMISSION)?;
+    // Without `peers.relay` the send is not refused outright: it behaves as with the relay
+    // switched off, so small messages still take the Mumble fallback (FR-9.63).
+    let permitted = state.ctx.grants.allows(&state.id, PERMISSION);
     if data.len() > MAX_MESSAGE {
         return Err(Error::TooLarge.into());
     }
-    state.io()?.relay_send(&state.id, target, data, fallback)
+    state
+        .io()?
+        .relay_send(&state.id, target, data, fallback, permitted)
 }
 
 #[cfg(test)]
@@ -189,6 +283,61 @@ mod tests {
                 "{availability:?} switch={switch} permitted={permitted}"
             );
         }
+    }
+
+    #[test]
+    fn channel_sends_queue_while_the_broadcast_starts_up_to_eight_messages() {
+        let now = Instant::now();
+        let mut broadcast = Broadcast::default();
+        for _ in 0..START_QUEUE_MESSAGES {
+            assert_eq!(broadcast.accept(10, false, now), Ok(()));
+        }
+        assert_eq!(
+            broadcast.accept(10, false, now),
+            Err(SendError::Error(Error::RateLimited))
+        );
+        // A message every receiver got through Mumble is not queued.
+        assert_eq!(broadcast.accept(10, true, now), Ok(()));
+        broadcast = Broadcast::reported(BroadcastState::Live, now);
+        assert_eq!(broadcast.accept(MAX_MESSAGE, false, now), Ok(()));
+    }
+
+    #[test]
+    fn the_start_queue_holds_at_most_256_kib() {
+        let now = Instant::now();
+        let mut broadcast = Broadcast::default();
+        for _ in 0..4 {
+            assert_eq!(broadcast.accept(MAX_MESSAGE, false, now), Ok(()));
+        }
+        assert_eq!(
+            broadcast.accept(1, false, now),
+            Err(SendError::Error(Error::RateLimited))
+        );
+    }
+
+    #[test]
+    fn a_broadcast_that_does_not_start_or_is_down_refuses_relay_only_messages() {
+        let now = Instant::now();
+        let mut broadcast = Broadcast::default();
+        assert_eq!(broadcast.accept(10, false, now), Ok(()));
+        let late = now + START_TIMEOUT;
+        assert_eq!(
+            broadcast.accept(10, false, late),
+            Err(SendError::Unavailable)
+        );
+        let retry_in = Duration::from_secs(30);
+        broadcast = Broadcast::reported(BroadcastState::Down { retry_in }, now);
+        assert_eq!(
+            broadcast.accept(10, false, now),
+            Err(SendError::Unavailable)
+        );
+        // The fallback reached everyone: sent.
+        assert_eq!(broadcast.accept(10, true, now), Ok(()));
+        // Time to try again: the send starts the broadcast anew.
+        assert_eq!(broadcast.accept(10, false, now + retry_in), Ok(()));
+        assert!(matches!(broadcast, Broadcast::Starting { messages: 1, .. }));
+        broadcast = Broadcast::reported(BroadcastState::Ended, now);
+        assert_eq!(broadcast, Broadcast::Idle);
     }
 
     #[test]

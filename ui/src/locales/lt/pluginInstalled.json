@@ -56,6 +56,8 @@
     "incomingRateDropped": "Dažnio ribos atmesti gaunami pranešimai",
     "incomingInvalid": "Netinkami gaunami pranešimai",
     "uiFreezes": "Kiek kartų Mumcord užstrigo, kai buvo atidarytas žiniatinklio turinys",
+    "refusedAppMenuLabel": "Šis papildinys atmestas: Programų meniu etiketė sutampa su „Mumcord“ pačios arba prasideda žodžiu „Mumcord“.",
+    "fieldWithoutPermission": "Šis papildinys atmestas: jis naudoja „{{field}}“ neturėdamas leidimo „{{permission}}“.",
     "webDisabled": "Žiniatinklio turinys išjungtas, nes Mumcord nustojo reaguoti, kol jis buvo atidarytas.",
     "reenableWeb": "Įjungti žiniatinklio turinį",
     "reenableFailed": "Nepavyko įjungti žiniatinklio turinio.",

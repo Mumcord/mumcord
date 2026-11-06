@@ -115,6 +115,10 @@ fn limits_are_enforced() {
         decode::<Board>(&vec![b' '; RELAY_LIMIT + 1]),
         Err(Error::TooLarge)
     );
+    // One string longer than the whole limit is too large, not malformed (#400).
+    big.title = "z".repeat(RELAY_LIMIT);
+    assert_eq!(encode(&big, RELAY_LIMIT), Err(Error::TooLarge));
+    assert_eq!(encode(&big, MUMBLE_LIMIT), Err(Error::TooLarge));
 }
 
 #[test]

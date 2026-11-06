@@ -8,6 +8,7 @@ import { applyChange, type PluginUiState, type PluginWebview } from "../render/p
 import {
   createBridge,
   fitsBridge,
+  inOrder,
   isGestureReport,
   MAX_MESSAGE_BYTES,
   newGestureKey,
@@ -193,6 +194,39 @@ describe("bridge limits", () => {
     report({ mumcordWebview: "gesture", key });
     expect(onGesture).toHaveBeenCalledTimes(1);
     expect(isGestureReport({ mumcordWebview: "escape", key }, key)).toBe(false);
+  });
+});
+
+describe("page messages to the plugin", () => {
+  it("go out one after the other, so the plugin gets them in the page's order", async () => {
+    const started: string[] = [];
+    const finish: (() => void)[] = [];
+    const send = inOrder(
+      (text: string) =>
+        new Promise<void>((resolve, reject) => {
+          started.push(text);
+          // The first call fails: the next one must still go out.
+          finish.push(
+            text === "running"
+              ? () => {
+                  reject(new Error("dropped"));
+                }
+              : resolve,
+          );
+        }),
+    );
+    send("running");
+    send("blocked");
+    send("next");
+    expect(started).toEqual(["running"]);
+    finish[0]?.();
+    await vi.waitFor(() => {
+      expect(started).toEqual(["running", "blocked"]);
+    });
+    finish[1]?.();
+    await vi.waitFor(() => {
+      expect(started).toEqual(["running", "blocked", "next"]);
+    });
   });
 });
 

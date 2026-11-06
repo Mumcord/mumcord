@@ -56,6 +56,8 @@
     "incomingRateDropped": "Messaġġi dieħla mwaqqgħa mil-limitu tar-rata",
     "incomingInvalid": "Messaġġi dieħla invalidi",
     "uiFreezes": "Kemm-il darba Mumcord iffriża waqt li l-kontenut tal-web tiegħu kien miftuħ",
+    "refusedAppMenuLabel": "Dan il-plugin ġie miċħud: tikketta fil-menu tal-Apps hija l-istess bħal waħda ta' Mumcord stess jew tibda b'\"Mumcord\".",
+    "fieldWithoutPermission": "Dan il-plugin ġie miċħud: juża \"{{field}}\" mingħajr il-permess \"{{permission}}\".",
     "webDisabled": "Il-kontenut tal-web tiegħu huwa mitfi għax Mumcord waqaf iwieġeb waqt li kien miftuħ.",
     "reenableWeb": "Ixgħel il-kontenut tal-web",
     "reenableFailed": "Il-kontenut tal-web ma setax jinxtegħel.",

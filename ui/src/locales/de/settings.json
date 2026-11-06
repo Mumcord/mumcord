@@ -17,7 +17,8 @@
     "packetInspector": "Paketinspektor",
     "hotkeys": "Tastenkürzel",
     "plugins": "Plugins",
-    "screenSharing": "Bildschirmfreigabe"
+    "screenSharing": "Bildschirmfreigabe",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Start, Sprache, Updates und Barrierefreiheit.",
@@ -31,7 +32,8 @@
     "advanced": "Entwicklerwerkzeuge, Diagnose, Speicher und Lizenzen.",
     "about": "Version, Support und der Einrichtungsassistent.",
     "plugins": "Plugins laufen in einer Sandbox und bekommen nur, was du erlaubst. Sie sehen nie dein Audio, deine Dateien oder dein Zertifikat.",
-    "screenSharing": "Qualität, Codec und Hardware für die Freigabe deines Bildschirms. Zuschauer sehen immer das, was du auswählst, bevor du startest."
+    "screenSharing": "Qualität, Codec und Hardware für die Freigabe deines Bildschirms. Zuschauer sehen immer das, was du auswählst, bevor du startest.",
+    "camera": "Deine Kamera, Hintergrundeffekte und wie du die Kameras anderer siehst. Kamera-Teilen braucht einen Server mit mumpeer-Relay."
   },
   "breadcrumb": "Einstellungen / {{section}}",
   "moreInfo": "Mehr Informationen: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "Hinweise Pop-ups",
     "externalContent": "Einbettungen Bilder Vorschauen",
     "fileSharing": "dateien senden empfangen herunterladen speichern ordner anhang zip",
-    "screenSharing": "Bildschirmfreigabe Qualität Auflösung fps Videocodec AV1 VP9 Encoder Grafikkarte"
+    "screenSharing": "Bildschirmfreigabe Qualität Auflösung fps Videocodec AV1 VP9 Encoder Grafikkarte",
+    "camera": "kamera webcam video hintergrund unschärfe virtueller hintergrund spiegeln selbstansicht"
   },
   "search": {
     "label": "Einstellungen durchsuchen",
@@ -1046,7 +1049,9 @@
     "addNone": "Verbinde dich mit einem Server, um einen seiner Kanäle auszuwählen.",
     "addConfirm": "Hinzufügen",
     "reset": "Alle Tastenkürzel zurücksetzen",
-    "resetHint": "Entfernt alle Tastenkürzel außer Push-to-Talk; standardmäßig ist nichts festgelegt."
+    "resetHint": "Entfernt alle Tastenkürzel außer Push-to-Talk; standardmäßig ist nichts festgelegt.",
+    "camera": "Kamera ein-/ausschalten",
+    "cameraHint": "Öffnet die Vorschau, wenn deine Kamera aus ist, und schaltet sie aus, wenn sie an ist."
   },
   "developerMode": {
     "title": "Entwicklermodus",
@@ -1124,5 +1129,70 @@
     "skippedAboveLimit": "VP9 (dein Bild liegt über dem, was AV1 hier schafft)",
     "softwareWarning": "AV1 läuft ohne bestandenen Test auf dem Prozessor und ist für diesen PC möglicherweise zu schwer.",
     "checkAgain": "Erneut prüfen"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Deine Kameravorschau",
+    "previewName": "Du",
+    "previewNote": "Vorschau, nur auf diesem Gerät. Sie stoppt, wenn du diese Seite verlässt.",
+    "device": "Kamera",
+    "deviceDefault": "Systemstandard",
+    "noDevice": "Keine Kamera gefunden",
+    "sendQuality": "Sendequalität",
+    "sendQualityAuto": "Automatisch",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (bis zu 720p · 30 fps) sendet nur so viel, wie die Zuschauenden brauchen: kleiner in einem großen Raster, schärfer, wenn dich jemand anheftet.",
+    "mirror": "Meine Selbstansicht spiegeln",
+    "mirrorHint": "Nur deine eigene Ansicht wird gespiegelt. Andere sehen dich seitenrichtig.",
+    "backgroundTitle": "Hintergrund",
+    "defaultBackground": "Standardhintergrund",
+    "backgroundNone": "Keiner",
+    "backgroundBlur": "Weichzeichnen",
+    "backgroundLibrary": "Bild: Bibliothek",
+    "backgroundOwn": "Bild: {{name}} (deins)",
+    "blurStrength": "Stärke der Unschärfe",
+    "blurLight": "Leicht",
+    "blurStrong": "Stark",
+    "effectQuality": "Effektqualität",
+    "effectAuto": "Automatisch",
+    "effectBest": "Beste (Grafikkarte)",
+    "effectLight": "Leicht (spart Akku)",
+    "effectHint": "Auto nutzt die Grafikkarte, wenn möglich, und wechselt bei Akkubetrieb oder ausgelastetem PC zu Leicht.",
+    "ownImages_one": "Deine eigenen Hintergrundbilder bleiben auf diesem Gerät (gespeichert: {{count}}). Nur das fertige Bild wird gesendet.",
+    "ownImages_other": "Deine eigenen Hintergrundbilder bleiben auf diesem Gerät (gespeichert: {{count}}). Nur das fertige Bild wird gesendet.",
+    "manageImages": "Bilder verwalten",
+    "imagesTitle": "Deine Hintergrundbilder",
+    "imagesEmpty": "Noch keine Bilder. Füge ein PNG-, JPEG- oder WebP-Bild hinzu, um es als Hintergrund zu nutzen.",
+    "imageName": "Bild {{number}}",
+    "imageDelete": "Löschen",
+    "imageDeleteLabel": "{{name}} löschen",
+    "imageDeleted": "{{name}} gelöscht",
+    "imageAdded": "{{name}} hinzugefügt",
+    "addImage": "Bild hinzufügen",
+    "addImageTitle": "Hintergrundbild auswählen",
+    "imageFilter": "Bilder",
+    "close": "Schließen",
+    "privacyTitle": "Datenschutz",
+    "lockOff": "Meine Kamera ausschalten, wenn der Bildschirm gesperrt wird",
+    "privacyNote": "Deine Kamera startet immer ausgeschaltet und zeigt zuerst eine Vorschau. Sie schaltet sich aus, wenn du den Kanal verlässt oder die Verbindung trennst. Nur Personen in deinem Sprachkanal sehen sie, über das Relay dieses Servers und Ende-zu-Ende-verschlüsselt. Mumcord zeichnet Kameras nie auf.",
+    "othersTitle": "Kameras anderer",
+    "showCameras": "Kameras anzeigen",
+    "showAlways": "Immer",
+    "showOnOpen": "Wenn ich den Raum öffne",
+    "showNever": "Nie",
+    "showHint": "Immer öffnet den Kameraraum, sobald jemand in deinem Kanal eine Kamera einschaltet. Nie lässt dich nur im Sprachmodus und lädt kein Video herunter.",
+    "dataSaver": "Datensparmodus: höchstens 15 fps für alle",
+    "reduceMotion": "Bewegung reduzieren: kein Leuchten und keine Animation am Sprecherrahmen",
+    "reduceMotionHint": "Folgt standardmäßig der Systemeinstellung für reduzierte Bewegung.",
+    "errors": {
+      "busy": "Kamera gestoppt: Eine andere App verwendet deine Kamera.",
+      "noCamera": "Keine Kamera gefunden. Schließe eine Kamera an, dann erscheint sie hier.",
+      "permissionDenied": "Kamerazugriff wurde verweigert",
+      "deviceGone": "Kamera gestoppt: Die Kamera wurde getrennt.",
+      "unreadable": "Kamera gestoppt: Die Kamera sendet unlesbare Bilder.",
+      "cameraFailed": "Die Kamera konnte nicht gestartet werden."
+    },
+    "imageImportFailed": "Dieses Bild kann nicht verwendet werden. Nutze eine PNG-, JPEG- oder WebP-Datei bis 10 MB."
   }
 }

@@ -472,6 +472,31 @@ pub struct PluginLogLine {
     pub text: String,
 }
 
+/// Why a plugin was refused at load, as Diagnostics lists it (FR-9.90). Only fixed names, never
+/// the plugin's own text.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum PluginLoadIssue {
+    /// A manifest field was used without the permission it needs.
+    FieldWithoutPermission { field: String, permission: String },
+    /// An Apps-menu label equal to a built-in one or starting with "Mumcord".
+    RefusedAppMenuLabel,
+}
+
+impl From<mumcord_plugins::LoadIssue> for PluginLoadIssue {
+    fn from(issue: mumcord_plugins::LoadIssue) -> Self {
+        match issue {
+            mumcord_plugins::LoadIssue::FieldWithoutPermission { field, permission } => {
+                Self::FieldWithoutPermission {
+                    field: field.to_owned(),
+                    permission: permission.to_owned(),
+                }
+            }
+            mumcord_plugins::LoadIssue::RefusedAppMenuLabel => Self::RefusedAppMenuLabel,
+        }
+    }
+}
+
 /// The Diagnostics section of a plugin (counts only, never payloads).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -492,6 +517,8 @@ pub struct PluginDiagnostics {
     pub ui_freezes: f64,
     /// The plugin's web content is turned off after a freeze, until the user re-enables it.
     pub web_disabled: bool,
+    /// Why the plugin was refused at load, when Diagnostics lists that reason.
+    pub load_issue: Option<PluginLoadIssue>,
     /// The plugin's own log lines (in memory only).
     pub log: Vec<PluginLogLine>,
 }
@@ -1148,8 +1175,9 @@ pub async fn plugin_update_review_prepare(
 
 /// The security score of a store plugin version (FR-9.72). `listing` scores the signed index
 /// entry, as Browse shows it; `package` scores the package the install prompt downloaded for
-/// this version (so `plugin_install_prepare` ran first), as the prompt shows it. `version`
-/// defaults to the one the store offers. Never scored in the UI.
+/// this version (so `plugin_install_prepare` ran first), as the prompt shows it; `developer`
+/// scores a loaded developer plugin's folder (`version` is ignored). `version` defaults to the
+/// one the store offers. Never scored in the UI.
 #[tauri::command]
 #[specta::specta]
 pub async fn plugin_score(
@@ -1159,7 +1187,21 @@ pub async fn plugin_score(
     from: PluginScoreSource,
 ) -> ApiResult<PluginScored> {
     let plugins = plugins_of(&app)?;
-    let (source, plugin) = find_indexed(&plugins, &id)?;
+    let from_listing = match from {
+        PluginScoreSource::Developer => {
+            let scored = plugins.call(move |service| service.dev_score(&id)).await?;
+            return Ok(scored.into());
+        }
+        PluginScoreSource::Listing => true,
+        PluginScoreSource::Package => false,
+    };
+    // The service's listings, not Browse's catalogue: the update check refreshes only the former,
+    // and the Installed list asks for the version an update just installed.
+    let wanted = id.clone();
+    let (source, plugin) = plugins
+        .call(move |service| service.find_listed(&wanted))
+        .await?
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
     let chosen = match &version {
         Some(v) => plugin
             .version(v)
@@ -1174,37 +1216,34 @@ pub async fn plugin_score(
     };
     let parsed = semver::Version::parse(&chosen.version)
         .map_err(|e| ApiError::new(ErrorCode::InvalidInput, e.to_string()))?;
-    let scored = match from {
-        PluginScoreSource::Listing => {
-            let target = id.clone();
-            plugins
-                .call(move |service| {
-                    service.plugin_score(&source, &target, &parsed, ScoreFrom::Listing)
-                })
-                .await?
-        }
-        PluginScoreSource::Package => {
-            let entry = plugin.entry(chosen);
-            let download = {
-                let prepared = plugins.prepared();
-                let prepared = prepared
-                    .as_ref()
-                    .filter(|p| p.id == id && p.version == entry.version)
-                    .ok_or_else(|| {
-                        ApiError::new(ErrorCode::NotFound, "the package was not downloaded yet")
-                    })?;
-                Download {
-                    bytes: prepared.download.bytes.clone(),
-                    signature: prepared.download.signature.clone(),
-                }
-            };
-            let check = plugins
-                .call(move |service| service.install_check(source, &entry, &download))
-                .await?;
-            match check {
-                InstallCheck::Ready { score, .. } => score.score,
-                InstallCheck::Refused { refusal } => Scored::Refused(refusal.stop),
+    let scored = if from_listing {
+        let target = id.clone();
+        plugins
+            .call(move |service| {
+                service.plugin_score(&source, &target, &parsed, ScoreFrom::Listing)
+            })
+            .await?
+    } else {
+        let entry = plugin.entry(chosen);
+        let download = {
+            let prepared = plugins.prepared();
+            let prepared = prepared
+                .as_ref()
+                .filter(|p| p.id == id && p.version == entry.version)
+                .ok_or_else(|| {
+                    ApiError::new(ErrorCode::NotFound, "the package was not downloaded yet")
+                })?;
+            Download {
+                bytes: prepared.download.bytes.clone(),
+                signature: prepared.download.signature.clone(),
             }
+        };
+        let check = plugins
+            .call(move |service| service.install_check(source, &entry, &download))
+            .await?;
+        match check {
+            InstallCheck::Ready { score, .. } => score.score,
+            InstallCheck::Refused { refusal } => Scored::Refused(refusal.stop),
         }
     };
     Ok(scored.into())
@@ -1611,6 +1650,7 @@ pub async fn plugin_diagnostics(app: AppHandle, id: String) -> ApiResult<PluginD
                 incoming_invalid: m.incoming_invalid as f64,
                 ui_freezes: d.ui_freezes as f64,
                 web_disabled: service.web_disabled(&id),
+                load_issue: service.load_issue(&id).map(PluginLoadIssue::from),
                 log,
             })
         })
@@ -1915,9 +1955,10 @@ pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -
         },
         PluginUiInput::WebviewGesture { place } => UiInput::WebviewGesture(place.into()),
         PluginUiInput::SurfaceClosed { place } => {
-            plugins
-                .trees()
-                .apply(&id, &PluginUiChange::WebviewHide { place });
+            plugins.trees().surface_closed(&id, place);
+            if place == PluginWebviewPlace::Dialog {
+                plugins.webviews().dialog_closed(&id);
+            }
             UiInput::SurfaceClosed(place.into())
         }
     };

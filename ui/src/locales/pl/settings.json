@@ -17,7 +17,8 @@
     "packetInspector": "Inspektor pakietów",
     "hotkeys": "Skróty klawiszowe",
     "plugins": "Wtyczki",
-    "screenSharing": "Udostępnianie ekranu"
+    "screenSharing": "Udostępnianie ekranu",
+    "camera": "Kamera"
   },
   "sectionDescriptions": {
     "general": "Uruchamianie, język, aktualizacje i dostępność.",
@@ -31,7 +32,8 @@
     "advanced": "Narzędzia deweloperskie, diagnostyka, pamięć i licencje.",
     "about": "Wersja, pomoc i kreator konfiguracji.",
     "plugins": "Wtyczki działają w piaskownicy i dostają tylko to, na co pozwolisz. Nigdy nie widzą twojego dźwięku, plików ani certyfikatu.",
-    "screenSharing": "Jakość, kodek i sprzęt do udostępniania ekranu. Widzowie zawsze widzą to, co wybierzesz, zanim zaczniesz."
+    "screenSharing": "Jakość, kodek i sprzęt do udostępniania ekranu. Widzowie zawsze widzą to, co wybierzesz, zanim zaczniesz.",
+    "camera": "Twoja kamera, efekty tła i sposób, w jaki widzisz kamery innych. Udostępnianie kamery wymaga serwera z przekaźnikiem mumpeer."
   },
   "breadcrumb": "Ustawienia / {{section}}",
   "moreInfo": "Więcej informacji: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "powiadomienia wyskakujące okna",
     "externalContent": "osadzone treści obrazy podglądy",
     "fileSharing": "pliki wyślij odbierz pobierz zapisz folder załącznik zip",
-    "screenSharing": "udostępnianie ekranu jakość rozdzielczość fps kodek AV1 VP9 enkoder karta graficzna"
+    "screenSharing": "udostępnianie ekranu jakość rozdzielczość fps kodek AV1 VP9 enkoder karta graficzna",
+    "camera": "kamera kamerka wideo tło rozmycie wirtualne tło lustro podgląd własny"
   },
   "search": {
     "label": "Szukaj w ustawieniach",
@@ -1062,7 +1065,9 @@
     "addNone": "Połącz się z serwerem, aby wybrać jeden z jego kanałów.",
     "addConfirm": "Dodaj",
     "reset": "Zresetuj wszystkie skróty",
-    "resetHint": "Usuwa wszystkie skróty oprócz push-to-talk; domyślnie nic nie jest ustawione."
+    "resetHint": "Usuwa wszystkie skróty oprócz push-to-talk; domyślnie nic nie jest ustawione.",
+    "camera": "Włącz / wyłącz kamerę",
+    "cameraHint": "Otwiera podgląd, gdy kamera jest wyłączona, i wyłącza ją, gdy jest włączona."
   },
   "developerMode": {
     "title": "Tryb dewelopera",
@@ -1140,5 +1145,72 @@
     "skippedAboveLimit": "VP9 (Twój obraz przekracza to, z czym AV1 tu sobie radzi)",
     "softwareWarning": "AV1 będzie działać na procesorze bez zaliczonego testu i może być zbyt ciężki dla tego komputera.",
     "checkAgain": "Sprawdź ponownie"
+  },
+  "camera": {
+    "cameraTitle": "Kamera",
+    "previewLabel": "Podgląd Twojej kamery",
+    "previewName": "Ty",
+    "previewNote": "Podgląd tylko na tym urządzeniu. Zatrzymuje się po opuszczeniu tej strony.",
+    "device": "Kamera",
+    "deviceDefault": "Domyślna systemowa",
+    "noDevice": "Nie znaleziono kamery",
+    "sendQuality": "Jakość wysyłania",
+    "sendQualityAuto": "Automatyczny",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (do 720p · 30 fps) wysyła tylko tyle, ile potrzebują oglądający: mniejszy obraz w dużej siatce, ostrzejszy, gdy ktoś Cię przypnie.",
+    "mirror": "Odbij mój własny podgląd",
+    "mirrorHint": "Odbity jest tylko Twój własny widok. Inni widzą Cię prawidłowo.",
+    "backgroundTitle": "Tło",
+    "defaultBackground": "Tło domyślne",
+    "backgroundNone": "Brak",
+    "backgroundBlur": "Rozmycie",
+    "backgroundLibrary": "Obraz: biblioteka",
+    "backgroundOwn": "Obraz: {{name}} (Twój)",
+    "blurStrength": "Siła rozmycia",
+    "blurLight": "Lekkie",
+    "blurStrong": "Mocne",
+    "effectQuality": "Jakość efektów",
+    "effectAuto": "Automatyczny",
+    "effectBest": "Najlepsza (karta graficzna)",
+    "effectLight": "Lekka (oszczędza baterię)",
+    "effectHint": "Auto używa karty graficznej, gdy to możliwe, i przełącza się na Lekką na baterii lub gdy komputer jest obciążony.",
+    "ownImages_one": "Twoje własne obrazy tła zostają na tym urządzeniu (zapisane: {{count}}). Wysyłany jest tylko gotowy obraz.",
+    "ownImages_few": "Twoje własne obrazy tła zostają na tym urządzeniu (zapisane: {{count}}). Wysyłany jest tylko gotowy obraz.",
+    "ownImages_many": "Twoje własne obrazy tła zostają na tym urządzeniu (zapisane: {{count}}). Wysyłany jest tylko gotowy obraz.",
+    "ownImages_other": "Twoje własne obrazy tła zostają na tym urządzeniu (zapisane: {{count}}). Wysyłany jest tylko gotowy obraz.",
+    "manageImages": "Zarządzaj obrazami",
+    "imagesTitle": "Twoje obrazy tła",
+    "imagesEmpty": "Brak obrazów. Dodaj obraz PNG, JPEG lub WebP, aby użyć go jako tła.",
+    "imageName": "Obraz {{number}}",
+    "imageDelete": "Usuń",
+    "imageDeleteLabel": "Usuń {{name}}",
+    "imageDeleted": "Usunięto {{name}}",
+    "imageAdded": "Dodano {{name}}",
+    "addImage": "Dodaj obraz",
+    "addImageTitle": "Wybierz obraz tła",
+    "imageFilter": "Obrazy",
+    "close": "Zamknij",
+    "privacyTitle": "Prywatność",
+    "lockOff": "Wyłącz moją kamerę po zablokowaniu ekranu",
+    "privacyNote": "Kamera zawsze startuje wyłączona i najpierw pokazuje podgląd. Wyłącza się, gdy opuścisz kanał lub się rozłączysz. Widzą ją tylko osoby z Twojego kanału głosowego, przez przekaźnik tego serwera, z szyfrowaniem end-to-end. Mumcord nigdy nie nagrywa kamer.",
+    "othersTitle": "Kamery innych",
+    "showCameras": "Pokazuj kamery",
+    "showAlways": "Zawsze",
+    "showOnOpen": "Gdy otworzę pokój",
+    "showNever": "Nigdy",
+    "showHint": "Zawsze otwiera pokój kamer, gdy ktoś z Twojego kanału włączy kamerę. Nigdy zostawia Cię tylko z głosem i nie pobiera wideo.",
+    "dataSaver": "Oszczędzanie danych: do 15 fps dla wszystkich",
+    "reduceMotion": "Ogranicz ruch: bez poświaty i animacji na ramce mówiącego",
+    "reduceMotionHint": "Domyślnie zgodnie z systemowym ustawieniem ograniczenia ruchu.",
+    "errors": {
+      "busy": "Kamera zatrzymana: inna aplikacja używa Twojej kamery.",
+      "noCamera": "Nie znaleziono kamery. Podłącz kamerę, a pojawi się tutaj.",
+      "permissionDenied": "Odmówiono dostępu do kamery",
+      "deviceGone": "Kamera zatrzymana: kamera została odłączona.",
+      "unreadable": "Kamera zatrzymana: kamera wysyła nieczytelny obraz.",
+      "cameraFailed": "Nie udało się uruchomić kamery."
+    },
+    "imageImportFailed": "Tego obrazu nie można użyć. Użyj pliku PNG, JPEG lub WebP do 10 MB."
   }
 }

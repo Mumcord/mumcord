@@ -56,6 +56,8 @@
     "incomingRateDropped": "Indkommende beskeder droppet af hastighedsgrænsen",
     "incomingInvalid": "Ugyldige indkommende beskeder",
     "uiFreezes": "Antal gange Mumcord frøs, mens webindholdet var åbent",
+    "refusedAppMenuLabel": "Dette plugin blev afvist: en etiket i Apps-menuen er den samme som en af Mumcords egne eller begynder med \"Mumcord\".",
+    "fieldWithoutPermission": "Dette plugin blev afvist: det bruger \"{{field}}\" uden tilladelsen \"{{permission}}\".",
     "webDisabled": "Webindholdet er slået fra, fordi Mumcord holdt op med at svare, mens det var åbent.",
     "reenableWeb": "Slå webindhold til",
     "reenableFailed": "Webindholdet kunne ikke slås til.",

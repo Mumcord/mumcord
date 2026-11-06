@@ -18,9 +18,14 @@ export const SETTINGS_GROUPS = [
 ] as const;
 export type SettingsGroup = (typeof SETTINGS_GROUPS)[number];
 
-/** The sidebar tab of `group`. */
+/**
+ * The sidebar tab of `group`, found by its label: badges (the Plugins update count, "New") add
+ * their own text to the tab.
+ */
 export function settingsTab(group: SettingsGroup) {
-  return $(`//button[@role='tab'][normalize-space(.)='${group}']`);
+  return $(
+    `//button[@role='tab'][.//span[contains(@class,'settings__tab-label')][normalize-space(.)='${group}']]`,
+  );
 }
 
 /** Opens Settings through Quick settings → "All settings…" (no-op when it is already open). */
@@ -35,11 +40,31 @@ export async function openAllSettings(): Promise<void> {
   await $(".settings__nav").waitForExist({ timeout: 15_000 });
 }
 
+/** What sits on top of the tab's centre, for the failure message when it cannot be clicked. */
+async function describeTabHit(group: SettingsGroup): Promise<string> {
+  return browser.execute((label: string) => {
+    const tab = [...document.querySelectorAll("button[role='tab']")].find(
+      (el) => el.querySelector(".settings__tab-label")?.textContent.trim() === label,
+    );
+    if (!tab) return "tab missing";
+    const r = tab.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+    const n = (value: number) => String(Math.round(value));
+    return `viewport ${n(innerWidth)}x${n(innerHeight)}, tab ${n(r.x)},${n(r.y)} ${n(r.width)}x${n(r.height)}, hit ${hit?.tagName ?? ""}.${hit?.className ?? ""}`;
+  }, group);
+}
+
 /** Opens Settings (if needed) and selects `group`; waits until its page shows. */
 export async function openSettingsGroup(group: SettingsGroup): Promise<void> {
   await openAllSettings();
   const tab = settingsTab(group);
-  await tab.waitForClickable({ timeout: 10_000 });
+  try {
+    await tab.waitForClickable({ timeout: 10_000 });
+  } catch (error) {
+    throw new Error(`settings tab ${group} not clickable: ${await describeTabHit(group)}`, {
+      cause: error,
+    });
+  }
   await tab.click();
   await browser.waitUntil(async () => (await tab.getAttribute("aria-selected")) === "true", {
     timeout: 10_000,

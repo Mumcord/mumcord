@@ -1,6 +1,6 @@
 //! Tray icon and menu (FR-1.37, FR-1.45, FR-3.132): the state of every server, Mute, Deafen,
-//! Do Not Disturb, voice server and channel, recent chats, Open, Settings and Quit; the icon
-//! shows talking, muted, unread and mentions. On Linux it is our own StatusNotifierItem (see
+//! Do Not Disturb, Turn off camera, voice server and channel, recent chats, Open, Settings and
+//! Quit; the icon shows talking, muted, unread, mentions and the camera on air (FR-8.22). On Linux it is our own StatusNotifierItem (see
 //! `linux`), with the Tauri tray as fallback when no StatusNotifierWatcher runs. Without any
 //! tray (GNOME without the AppIndicator extension) there is no menu and closing the window
 //! follows the close setting.
@@ -61,6 +61,8 @@ struct Labels {
     more_channels: String,
     recent_chats: String,
     chat_unread: String,
+    camera_on: String,
+    turn_off_camera: String,
 }
 const LOCALES: [(&str, &str); 24] = [
     ("bg", include_str!("../../ui/src/locales/bg/tray.json")),
@@ -117,9 +119,13 @@ impl Labels {
     }
 }
 
-/// Tooltip text shown when hovering the tray icon.
-fn tooltip(status: &str) -> String {
-    format!("Mumcord – {status}")
+/// Tooltip text shown when hovering the tray icon; `camera` is "Camera on" while the own camera
+/// is on air (FR-8.22).
+fn tooltip(status: &str, camera: Option<&str>) -> String {
+    match camera {
+        Some(camera) => format!("Mumcord – {status} · {camera}"),
+        None => format!("Mumcord – {status}"),
+    }
 }
 
 /// Everything a backend draws, taken from the state under one lock.
@@ -318,6 +324,10 @@ fn perform(app: &AppHandle, action: Action) {
             });
             Ok(())
         }
+        Action::TurnOffCamera(server_id) => {
+            engine.camera_turn_off(to_engine_server_id(server_id));
+            Ok(())
+        }
         Action::VoiceServer(server_id) => match state
             .connected()
             .find(|s| s.id == server_id)
@@ -430,7 +440,10 @@ fn view(app: &AppHandle, tray: &Tray, change: Change) -> View {
     let state = lock(&tray.state);
     View {
         icon: compose(&tray.base, state.icon()),
-        tooltip: tooltip(labels.status(state.look())),
+        tooltip: tooltip(
+            labels.status(state.look()),
+            state.camera.map(|_| labels.camera_on.as_str()),
+        ),
         menu: (change == Change::Menu).then(|| menu_model(&state, &labels)),
     }
 }
@@ -681,6 +694,10 @@ mod tests {
 
     #[test]
     fn tooltip_names_app_and_status() {
-        assert_eq!(tooltip("Connected"), "Mumcord – Connected");
+        assert_eq!(tooltip("Connected", None), "Mumcord – Connected");
+        assert_eq!(
+            tooltip("Connected", Some("Camera on")),
+            "Mumcord – Connected · Camera on"
+        );
     }
 }

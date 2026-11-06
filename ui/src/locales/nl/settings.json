@@ -17,7 +17,8 @@
     "packetInspector": "Pakketinspecteur",
     "hotkeys": "Sneltoetsen",
     "plugins": "Plug-ins",
-    "screenSharing": "Scherm delen"
+    "screenSharing": "Scherm delen",
+    "camera": "Camera"
   },
   "sectionDescriptions": {
     "general": "Opstarten, taal, updates en toegankelijkheid.",
@@ -31,7 +32,8 @@
     "advanced": "Ontwikkelaarstools, diagnostiek, opslag en licenties.",
     "about": "Versie, ondersteuning en de installatiewizard.",
     "plugins": "Plugins draaien in een sandbox en krijgen alleen wat jij toestaat. Ze zien nooit je audio, bestanden of certificaat.",
-    "screenSharing": "Kwaliteit, codec en hardware voor het delen van je scherm. Kijkers zien altijd wat je kiest voordat je begint."
+    "screenSharing": "Kwaliteit, codec en hardware voor het delen van je scherm. Kijkers zien altijd wat je kiest voordat je begint.",
+    "camera": "Je camera, achtergrondeffecten en hoe je de camera's van anderen ziet. Camera delen heeft een server met een mumpeer-relay nodig."
   },
   "breadcrumb": "Instellingen / {{section}}",
   "moreInfo": "Meer informatie: {{topic}}",
@@ -49,7 +51,8 @@
     "notifications": "meldingen pop-ups",
     "externalContent": "insluitingen afbeeldingen voorbeelden",
     "fileSharing": "bestanden versturen ontvangen downloaden opslaan map bijlage zip",
-    "screenSharing": "scherm delen kwaliteit resolutie fps videocodec AV1 VP9 encoder videokaart"
+    "screenSharing": "scherm delen kwaliteit resolutie fps videocodec AV1 VP9 encoder videokaart",
+    "camera": "camera webcam video achtergrond vervagen virtuele achtergrond spiegelen zelfbeeld"
   },
   "search": {
     "label": "Instellingen zoeken",
@@ -1046,7 +1049,9 @@
     "addNone": "Maak verbinding met een server om een van de kanalen te kiezen.",
     "addConfirm": "Toevoegen",
     "reset": "Alle sneltoetsen resetten",
-    "resetHint": "Verwijdert alle sneltoetsen behalve push-to-talk; standaard is er niets ingesteld."
+    "resetHint": "Verwijdert alle sneltoetsen behalve push-to-talk; standaard is er niets ingesteld.",
+    "camera": "Camera aan / uit zetten",
+    "cameraHint": "Opent het voorbeeld als je camera uit staat en zet hem uit als hij aan staat."
   },
   "developerMode": {
     "title": "Ontwikkelaarsmodus",
@@ -1124,5 +1129,70 @@
     "skippedAboveLimit": "VP9 (je beeld is hoger dan wat AV1 hier aankan)",
     "softwareWarning": "AV1 draait op de processor zonder geslaagde test en kan te zwaar zijn voor deze pc.",
     "checkAgain": "Opnieuw controleren"
+  },
+  "camera": {
+    "cameraTitle": "Camera",
+    "previewLabel": "Voorbeeld van je camera",
+    "previewName": "Jij",
+    "previewNote": "Voorbeeld, alleen op dit apparaat. Het stopt als je deze pagina verlaat.",
+    "device": "Camera",
+    "deviceDefault": "Systeemstandaard",
+    "noDevice": "Geen camera gevonden",
+    "sendQuality": "Verzendkwaliteit",
+    "sendQualityAuto": "Automatisch",
+    "sendQuality720": "720p · 15 fps",
+    "sendQuality360": "360p · 30 fps",
+    "sendQualityHint": "Auto (tot 720p · 30 fps) verstuurt alleen wat de kijkers nodig hebben: kleiner in een groot raster, scherper wanneer iemand je vastzet.",
+    "mirror": "Mijn eigen beeld spiegelen",
+    "mirrorHint": "Alleen jouw eigen beeld wordt gespiegeld. Anderen zien je de goede kant op.",
+    "backgroundTitle": "Achtergrond",
+    "defaultBackground": "Standaardachtergrond",
+    "backgroundNone": "Geen",
+    "backgroundBlur": "Vervagen",
+    "backgroundLibrary": "Afbeelding: bibliotheek",
+    "backgroundOwn": "Afbeelding: {{name}} (van jou)",
+    "blurStrength": "Sterkte van vervaging",
+    "blurLight": "Licht",
+    "blurStrong": "Sterk",
+    "effectQuality": "Effectkwaliteit",
+    "effectAuto": "Automatisch",
+    "effectBest": "Beste (grafische kaart)",
+    "effectLight": "Licht (spaart accu)",
+    "effectHint": "Auto gebruikt de grafische kaart als het kan en schakelt over op Licht op de accu of als de pc het druk heeft.",
+    "ownImages_one": "Je eigen achtergrondafbeeldingen blijven op dit apparaat (opgeslagen: {{count}}). Alleen het eindbeeld wordt verstuurd.",
+    "ownImages_other": "Je eigen achtergrondafbeeldingen blijven op dit apparaat (opgeslagen: {{count}}). Alleen het eindbeeld wordt verstuurd.",
+    "manageImages": "Afbeeldingen beheren",
+    "imagesTitle": "Je achtergrondafbeeldingen",
+    "imagesEmpty": "Nog geen afbeeldingen. Voeg een PNG-, JPEG- of WebP-afbeelding toe om die als achtergrond te gebruiken.",
+    "imageName": "Afbeelding {{number}}",
+    "imageDelete": "Verwijderen",
+    "imageDeleteLabel": "{{name}} verwijderen",
+    "imageDeleted": "{{name}} verwijderd",
+    "imageAdded": "{{name}} toegevoegd",
+    "addImage": "Afbeelding toevoegen",
+    "addImageTitle": "Kies een achtergrondafbeelding",
+    "imageFilter": "Afbeeldingen",
+    "close": "Sluiten",
+    "privacyTitle": "Privacy",
+    "lockOff": "Mijn camera uitzetten als mijn scherm vergrendelt",
+    "privacyNote": "Je camera start altijd uit en toont eerst een voorbeeld. Hij gaat uit als je het kanaal verlaat of de verbinding verbreekt. Alleen mensen in je spraakkanaal kunnen hem zien, via de relay van deze server en end-to-end versleuteld. Mumcord neemt camera's nooit op.",
+    "othersTitle": "Camera's van anderen",
+    "showCameras": "Camera's tonen",
+    "showAlways": "Altijd",
+    "showOnOpen": "Als ik de ruimte open",
+    "showNever": "Nooit",
+    "showHint": "Altijd opent de cameraruimte zodra iemand in je kanaal een camera aanzet. Nooit houdt je alleen op spraak en downloadt geen video.",
+    "dataSaver": "Databesparing: maximaal 15 fps voor iedereen",
+    "reduceMotion": "Minder beweging: geen gloed of animatie op het kader van wie spreekt",
+    "reduceMotionHint": "Volgt standaard de systeeminstelling voor minder beweging.",
+    "errors": {
+      "busy": "Camera gestopt: een andere app gebruikt je camera.",
+      "noCamera": "Geen camera gevonden. Sluit een camera aan en hij verschijnt hier.",
+      "permissionDenied": "Cameratoegang is geweigerd",
+      "deviceGone": "Camera gestopt: de camera is losgekoppeld.",
+      "unreadable": "Camera gestopt: de camera stuurt onleesbare beelden.",
+      "cameraFailed": "De camera kon niet worden gestart."
+    },
+    "imageImportFailed": "Deze afbeelding kan niet worden gebruikt. Gebruik een PNG-, JPEG- of WebP-bestand tot 10 MB."
   }
 }

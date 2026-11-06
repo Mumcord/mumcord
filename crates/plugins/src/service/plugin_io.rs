@@ -244,6 +244,18 @@ impl ServiceIo {
         self.chat().gate.command_gesture(plugin, Instant::now());
     }
 
+    /// A trusted click or key press reported from the plugin's page in `place` (FR-9.45). The
+    /// app passes it on only with the frame's secret key, so a page cannot forge it; it counts as
+    /// a gesture like a panel click (same 8 s window, each host call once) when that frame is
+    /// open and the report is not too soon after the last one. Returns whether it counted.
+    pub fn page_gesture(&self, plugin: &str, place: WebviewPlace, now: Instant) -> bool {
+        let counted = self.webviews.accept_gesture(plugin, place, now);
+        if counted {
+            self.chat().gate.gesture(plugin, now);
+        }
+        counted
+    }
+
     /// A channel text line on `server` (plain text, as other clients see it), incoming or the
     /// user's own copy; pairs it with a pending card and hides it live (FR-6.45). Only its hash
     /// is kept.
@@ -362,8 +374,9 @@ impl PluginIo for ServiceIo {
         target: crate::messaging::Target,
         data: Vec<u8>,
         fallback: bool,
+        permitted: bool,
     ) -> Result<(), crate::api::relay::SendError> {
-        self.relay_send_to(plugin, target, data, fallback)
+        self.relay_send_to(plugin, target, data, fallback, permitted)
     }
 
     fn set_tree(
@@ -841,6 +854,8 @@ fn wit_error(error: SendError) -> Error {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use tokio::sync::mpsc::unbounded_channel;
 
     use super::*;
@@ -1188,6 +1203,74 @@ mod tests {
                 ..
             })
         ));
+    }
+
+    #[test]
+    fn a_trusted_page_click_is_a_gesture_with_the_same_rules() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
+        let (io, mut rx) = io_with("board", "Board");
+        let side = WebviewPlace::SidePanel;
+        io.webviews()
+            .set_root("board", Some(dir.path().to_path_buf()), vec![side]);
+        let now = Instant::now();
+        assert!(
+            !io.page_gesture("board", side, now),
+            "no frame is open, so the report is forged"
+        );
+        io.webviews()
+            .show("board", side, "index.html", now)
+            .expect("side panel frame");
+        assert!(
+            !io.page_gesture("board", WebviewPlace::Dialog, now),
+            "a report for a frame that is not open does not count"
+        );
+        assert!(matches!(
+            io.files_save("board", "a.png".into(), vec![1]),
+            Err(Error::NotPermitted)
+        ));
+        if let Some(stale) = now.checked_sub(chat::GESTURE_WINDOW + Duration::from_secs(1)) {
+            let (old, _old_rx) = io_with("old", "Old");
+            old.webviews()
+                .set_root("old", Some(dir.path().to_path_buf()), vec![side]);
+            old.webviews()
+                .show("old", side, "index.html", stale)
+                .expect("frame");
+            assert!(old.page_gesture("old", side, stale));
+            assert!(
+                matches!(
+                    old.files_save("old", "a.png".into(), vec![1]),
+                    Err(Error::NotPermitted)
+                ),
+                "the gesture window is 8 s"
+            );
+        }
+        assert!(io.page_gesture("board", side, now));
+        assert!(io.files_save("board", "a.png".into(), vec![1]).is_ok());
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::HostCall {
+                request: HostRequest::Save { .. },
+                ..
+            })
+        ));
+        assert!(
+            matches!(
+                io.files_save("board", "b.png".into(), vec![1]),
+                Err(Error::NotPermitted)
+            ),
+            "one save per gesture"
+        );
+        assert!(
+            !io.page_gesture("board", side, now + Duration::from_millis(50)),
+            "reports right after another do not count"
+        );
+        assert!(matches!(
+            io.files_save("board", "b.png".into(), vec![1]),
+            Err(Error::NotPermitted)
+        ));
+        assert!(io.page_gesture("board", side, Instant::now() + Duration::from_secs(1)));
+        assert!(io.files_save("board", "b.png".into(), vec![1]).is_ok());
     }
 
     #[test]

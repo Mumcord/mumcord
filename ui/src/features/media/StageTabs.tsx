@@ -5,6 +5,7 @@
  */
 import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { RoomIcon } from "../camera/room/icons";
 import { MonitorIcon } from "../screenshare/icons";
 import { MediaIcon } from "./icons";
 import { selectStage, useMediaView, type StageId } from "./mediaView";
@@ -23,7 +24,15 @@ interface Tab {
 function useTabs(stage: readonly StageId[], entries: StageEntries): Tab[] {
   const { t: tShare } = useTranslation("common", { keyPrefix: "media.stage" });
   const { t: tWatch } = useTranslation("watchparty");
+  const { t: tCamera } = useTranslation("camera");
   return stage.map((id): Tab => {
+    if (id === "camera")
+      return {
+        id,
+        label: entries.labels.camera ?? tCamera("room.title"),
+        icon: <RoomIcon name="camera" size={16} />,
+        plugin: false,
+      };
     if (id === "share")
       return {
         id,

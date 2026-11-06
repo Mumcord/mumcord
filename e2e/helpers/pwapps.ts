@@ -2,7 +2,7 @@
 // the measurement of what arrives on the receiving side. The container starts PipeWire with a
 // null sink (see container-run.sh); outside it these helpers do not apply.
 import { type ChildProcess, execFileSync, spawn } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { RATE, readWav, writeWav } from "./voice-audio.ts";
@@ -39,6 +39,75 @@ export function pipewireRunning(): boolean {
   } catch {
     return false;
   }
+}
+
+const daemons: ChildProcess[] = [];
+
+function quiet(cmd: string, args: string[]): void {
+  try {
+    execFileSync(cmd, args, { stdio: "ignore", timeout: 10_000 });
+  } catch {
+    // Not running: nothing to stop.
+  }
+}
+
+async function waitFor(check: () => boolean, what: string): Promise<void> {
+  const until = Date.now() + 15_000;
+  while (!check()) {
+    if (Date.now() > until) throw new Error(what);
+    await new Promise((r) => setTimeout(r, 200));
+  }
+}
+
+/**
+ * Leaves only PulseAudio: stops PipeWire and WirePlumber and starts PulseAudio with the null sink
+ * `e2e-sink` (AC-7.66, and WebKit's sound, which needs a PulseAudio server). Undo with
+ * `pipewireBack()`.
+ */
+export async function pulseOnly(): Promise<void> {
+  quiet("pkill", ["-x", "wireplumber"]);
+  quiet("pkill", ["-x", "pipewire"]);
+  await waitFor(() => !pipewireRunning(), "PipeWire did not stop");
+  daemons.push(
+    spawn(
+      "pulseaudio",
+      ["--daemonize=no", "--exit-idle-time=-1", "--load=module-null-sink sink_name=e2e-sink"],
+      { stdio: "ignore" },
+    ),
+  );
+  await waitFor(pulseRunning, "PulseAudio did not start");
+}
+
+function pulseRunning(): boolean {
+  try {
+    execFileSync("pactl", ["info"], { stdio: "ignore", timeout: 5000 });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Stops PulseAudio and starts PipeWire as container-run.sh does. */
+export async function pipewireBack(): Promise<void> {
+  for (const d of daemons.splice(0)) d.kill();
+  quiet("pkill", ["-x", "pulseaudio"]);
+  spawn("pipewire", [], { stdio: "ignore", detached: true }).unref();
+  await waitFor(() => pipewireRunning(), "PipeWire did not come back");
+  const runtime = process.env.XDG_RUNTIME_DIR ?? "";
+  const conf = join(runtime, "wireplumber.conf");
+  spawn("wireplumber", existsSync(conf) ? ["-c", conf] : [], {
+    stdio: "ignore",
+    detached: true,
+  }).unref();
+  execFileSync(
+    "pw-cli",
+    [
+      "create-node",
+      "adapter",
+      "{ factory.name=support.null-audio-sink node.name=e2e-sink media.class=Audio/Sink object.linger=true audio.position=[FL FR] }",
+    ],
+    { stdio: "ignore", timeout: 10_000 },
+  );
 }
 
 /**

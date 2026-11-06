@@ -35,6 +35,7 @@ use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
 use crate::api::secrets::PluginSecrets;
 use crate::api::storage::{DataError, Storage};
+use crate::diag::LoadIssue;
 use crate::host::{HostError, HostEvent, LoadError, PluginHost, RunState};
 use crate::manifest::{ManifestError, OptionalPermission, Source};
 use crate::package::{Package, PackageError};
@@ -110,13 +111,16 @@ pub enum ServiceEvent {
     },
     /// A `relay` message to the channel through the sender's relay broadcast
     /// (`Engine::plugin_relay_broadcast`): `receivers` are the members that may get it (they
-    /// announced the plugin), to be admitted when not yet. `data` stays opaque: never log it.
+    /// announced the plugin), to be admitted when not yet; `fell_back` when the members
+    /// outside the broadcast got it through Mumble plugin data. `data` stays opaque: never log
+    /// it.
     RelayBroadcast {
         server: mumcord_store::ServerId,
         plugin: String,
         api: (u8, u8),
         data: Vec<u8>,
         receivers: Vec<u32>,
+        fell_back: bool,
     },
     /// An Apps-menu item was enabled or disabled: list the items again with
     /// [`PluginService::app_menu`].
@@ -290,6 +294,18 @@ fn installed_manifest(dir: &Path, id: &str) -> Option<crate::manifest::Manifest>
     }
 }
 
+impl ServiceError {
+    /// The Diagnostics entry (FR-9.90) this load failure leaves, if it is one of the listed kinds.
+    pub fn load_issue(&self) -> Option<LoadIssue> {
+        match self {
+            ServiceError::Manifest(error) | ServiceError::Load(LoadError::Manifest(error)) => {
+                error.diagnostic()
+            }
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum ServiceError {
     #[error(transparent)]
@@ -416,6 +432,8 @@ pub struct PluginService {
     quiet: bool,
     /// Why an installed plugin could not be loaded in this run.
     load_errors: BTreeMap<String, String>,
+    /// The Diagnostics entry (FR-9.90) of a plugin that was refused at load, if it has one.
+    load_issues: BTreeMap<String, LoadIssue>,
     events: UnboundedSender<ServiceEvent>,
     /// Available updates and rollback reasons (FR-6.66–6.69).
     updates: updates::Updates,
@@ -483,6 +501,7 @@ impl PluginService {
             language: "en".into(),
             quiet: false,
             load_errors: BTreeMap::new(),
+            load_issues: BTreeMap::new(),
             events,
             updates: updates::Updates::default(),
             revoked: crate::registry::RevocationList::bundled(),
@@ -537,6 +556,11 @@ impl PluginService {
     /// The plugin's own log lines, oldest first (Developer tab, FR-6.73).
     pub fn log_lines(&self, id: &str) -> Vec<(crate::Level, String)> {
         self.host.log_lines(id)
+    }
+
+    /// Why the plugin was refused at load, when Diagnostics lists that reason (FR-9.90).
+    pub fn load_issue(&self, id: &str) -> Option<LoadIssue> {
+        self.load_issues.get(id).copied()
     }
 
     pub fn diagnostics(&self, id: &str) -> Option<crate::DiagSnapshot> {
@@ -902,6 +926,30 @@ impl PluginService {
         self.listings.retain(|(known, _)| *known != source);
         self.listings.push((source, index.clone()));
         Ok(())
+    }
+
+    /// The newest listing of `id` and where it comes from: the official index first, then the
+    /// switched-on repositories (a removed, off or paused one lists nothing, as in Browse). Kept
+    /// current by every index load, also the update check's, so a version an update just
+    /// installed is found even when Browse was not refreshed since.
+    pub fn find_listed(&self, id: &str) -> Result<Option<(Source, IndexPlugin)>, ServiceError> {
+        let usable: Vec<i64> = self
+            .store()
+            .plugin_repositories()?
+            .into_iter()
+            .filter(|r| r.enabled && r.paused_reason.is_none())
+            .map(|r| r.id)
+            .collect();
+        let official = self
+            .listings
+            .iter()
+            .filter(|(source, _)| *source == Source::Official);
+        let repositories = self.listings.iter().filter(|(source, _)| {
+            matches!(source, Source::Repo { repository_id } if usable.contains(repository_id))
+        });
+        Ok(official
+            .chain(repositories)
+            .find_map(|(source, index)| index.plugin(id).map(|plugin| (*source, plugin.clone()))))
     }
 
     fn listed(&self, source: &Source, id: &str) -> Option<&IndexPlugin> {

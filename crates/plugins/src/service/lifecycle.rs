@@ -239,10 +239,14 @@ impl PluginService {
     /// list; they never stop the other plugins.
     pub(super) fn load_record(&mut self, record: &PluginRecord) {
         self.load_errors.remove(&record.id);
+        self.load_issues.remove(&record.id);
         if let Err(error) = self.try_load(record) {
             tracing::warn!(plugin = record.id.as_str(), %error, "could not load a plugin");
             self.load_errors
                 .insert(record.id.clone(), error.to_string());
+            if let Some(issue) = error.load_issue() {
+                self.load_issues.insert(record.id.clone(), issue);
+            }
             return;
         }
         self.start_if_on(record);
@@ -278,12 +282,7 @@ impl PluginService {
             origin.source(),
             record.granted.iter().map(String::as_str),
         );
-        // `validate` above already accepted these origins, so this cannot fail here.
-        let origins = manifest
-            .validate_origins(origin.source() == Source::Dev)
-            .unwrap_or_default();
-        self.io.webviews().set_origins(&record.id, origins.clone());
-        self.ctx.http.set_origins(&record.id, origins);
+        self.set_origins(&record.id, origin.source());
         self.set_webview_root(&record.id, origin.source(), &dir, &granted);
         self.ctx.grants.set(&record.id, granted);
         self.ctx
@@ -320,6 +319,7 @@ impl PluginService {
             tracing::warn!(plugin = id, %error, "plugin failed while unloading");
         }
         self.load_errors.remove(id);
+        self.load_issues.remove(id);
         self.forget_runtime(id);
     }
 
@@ -336,6 +336,19 @@ impl PluginService {
         self.host
             .manifest(id)
             .ok_or_else(|| ServiceError::NotInstalled(id.to_owned()))
+    }
+
+    /// Hands the declared websites (FR-9.25) of a just loaded plugin to `net.http` and to its web
+    /// pages' frame policy. Every path that loads a plugin calls this, or its requests are refused.
+    pub(super) fn set_origins(&self, id: &str, source: Source) {
+        // Loading validated the manifest, so its origins are already accepted here.
+        let origins = self
+            .host
+            .manifest(id)
+            .and_then(|manifest| manifest.validate_origins(source == Source::Dev).ok())
+            .unwrap_or_default();
+        self.io.webviews().set_origins(id, origins.clone());
+        self.ctx.http.set_origins(id, origins);
     }
 
     /// Lets a plugin with `ui.webview` serve its `web/` folder in the places its manifest allows

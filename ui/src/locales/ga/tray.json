@@ -19,5 +19,7 @@
   "channelsOf": "Cainéil · {server}",
   "moreChannels": "Tuilleadh cainéal in Mumcord…",
   "recentChats": "Comhráite le déanaí",
-  "chatUnread": "{name} – {count} gan léamh"
+  "chatUnread": "{name} – {count} gan léamh",
+  "cameraOn": "Ceamara ar siúl",
+  "turnOffCamera": "Múch an ceamara"
 }

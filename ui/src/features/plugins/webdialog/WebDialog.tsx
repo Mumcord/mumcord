@@ -12,7 +12,6 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../../a11y";
 import { getApi, toEngineError } from "../../../api";
-import { takeDialogOpener } from "../dialog/pluginDialogStore";
 import { usePlugins } from "../pluginStore";
 import { closePluginDialog, usePluginUi, type PluginWebview } from "../render/pluginUiStore";
 import { PluginTile } from "../render/PluginTile";
@@ -57,14 +56,10 @@ export function WebDialog({ plugin, title, webview }: Props) {
       });
   }, [plugin, tDialog]);
 
-  // Focus starts on the content and goes back to whatever opened the dialog.
+  // Focus starts on the content; the dialog host gives it back on close.
   useEffect(() => {
     box.current?.querySelector<HTMLElement>(".plugin-webview")?.focus();
-    return () => {
-      const opener = takeDialogOpener(plugin);
-      if (opener?.isConnected) opener.focus();
-    };
-  }, [plugin]);
+  }, []);
 
   useEffect(() => {
     const dialog = box.current;

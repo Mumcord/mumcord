@@ -2,8 +2,8 @@
 // environment (helpers/relayenv.ts). Client A is the one under test; B is the other Mumcord user in
 // the same channel (sharer, image sender).
 //
-//   AC-7.1  default relay: the server info panel says "Relay allows: Images · Files · Screen sharing"
-//           and /v1/status lists the three uses with a broadcast limit.
+//   AC-7.1  default relay: the server info panel says "Relay allows: Images · Files · Screen sharing
+//           · Cameras" and /v1/status lists those uses with a broadcast limit.
 //   AC-7.2  files off: the info row drops "Files". (The paperclip and the offer card with their
 //           reason come with the file sharing UI, which has its own specs in specs/files.)
 //   AC-7.3  screen sharing off: A in "Relay only" cannot share and cannot watch B, both with the
@@ -28,7 +28,10 @@ const oldImage = process.env.MUMCORD_E2E_OLD_MUMPEER_IMAGE;
 const oldBotImage = process.env.MUMCORD_E2E_OLD_MUMBOT_IMAGE;
 
 const SCREEN_REASON = "This server's relay doesn't allow screen sharing.";
-const ALL_USES = "Images · Files · Screen sharing";
+// Since mumpeer has the camera use (spec 08) the default relay allows cameras as well; an old relay
+// without allowed uses keeps the three older ones (cameras need a relay that announces them).
+const ALL_USES = "Images · Files · Screen sharing · Cameras";
+const OLD_USES = "Images · Files · Screen sharing";
 
 type Mode = "directRelay" | "relayOnly";
 
@@ -208,7 +211,7 @@ async function expectFullSizeNote(expected: string): Promise<void> {
     await addAndConnect(`localhost:${String(port)}`);
     await joinVoice();
     const status = await relayenv.relayStatus();
-    expect(status.uses).toEqual(expect.arrayContaining(["images", "files", "screen_share"]));
+    expect(status.uses).toEqual(expect.arrayContaining(["images", "files", "screen_share", "camera"]));
     expect(status.broadcast?.max_viewers).toBe(25);
     await expectRelayAllows(ALL_USES);
     await setMode("relayOnly");
@@ -229,7 +232,7 @@ async function expectFullSizeNote(expected: string): Promise<void> {
   it("AC-7.3: with screen sharing off, a direct connection still works", async () => {
     const relay = await relayenv.startRelay("no-screen");
     port = relay.port;
-    await expectRelayAllows("Images · Files");
+    await expectRelayAllows("Images · Files · Cameras");
     await setMode("directRelay");
     await startB("Bob", port);
     await personRow("Bob").waitForDisplayed({ timeout: 30_000 });
@@ -251,7 +254,7 @@ async function expectFullSizeNote(expected: string): Promise<void> {
     await apps.stopB();
     const relay = await relayenv.startRelay("no-images");
     port = relay.port;
-    await expectRelayAllows("Files · Screen sharing");
+    await expectRelayAllows("Files · Screen sharing · Cameras");
     await startB("Bob", port);
     await personRow("Bob").waitForDisplayed({ timeout: 30_000 });
     await expectFullSizeNote("Full size not available: this server's relay doesn't allow images");
@@ -260,13 +263,13 @@ async function expectFullSizeNote(expected: string): Promise<void> {
   it("AC-7.2: with files off, server info drops Files", async () => {
     const relay = await relayenv.startRelay("no-files");
     port = relay.port;
-    await expectRelayAllows("Images · Screen sharing");
+    await expectRelayAllows("Images · Screen sharing · Cameras");
   });
 
   (oldImage ? it : it.skip)("AC-7.5: an old relay without allowed uses behaves as all allowed", async () => {
     const relay = await relayenv.startRelay("old", { image: oldImage, botImage: oldBotImage });
     port = relay.port;
-    await expectRelayAllows(ALL_USES);
+    await expectRelayAllows(OLD_USES);
     await expectShareReason(null);
     await startB("Bob", port);
     await personRow("Bob").waitForDisplayed({ timeout: 30_000 });

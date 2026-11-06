@@ -514,6 +514,7 @@ describe("UserPanel", () => {
       "Microphone options",
       "Deafen",
       "Speaker options",
+      "Turn on camera",
       expect.stringMatching(/^Disconnect from /),
       "More disconnect options",
     ]);

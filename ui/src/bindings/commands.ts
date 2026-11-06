@@ -652,8 +652,9 @@ export const commands = {
 	/**
 	 *  The security score of a store plugin version (FR-9.72). `listing` scores the signed index
 	 *  entry, as Browse shows it; `package` scores the package the install prompt downloaded for
-	 *  this version (so `plugin_install_prepare` ran first), as the prompt shows it. `version`
-	 *  defaults to the one the store offers. Never scored in the UI.
+	 *  this version (so `plugin_install_prepare` ran first), as the prompt shows it; `developer`
+	 *  scores a loaded developer plugin's folder (`version` is ignored). `version` defaults to the
+	 *  one the store offers. Never scored in the UI.
 	 */
 	pluginScore: (id: string, version: string | null, from: PluginScoreSource) => typedError<PluginScored, ApiError>(__TAURI_INVOKE("plugin_score", { id, version, from })),
 	/**
@@ -1048,6 +1049,26 @@ export const commands = {
 	 *  webview's WebCodecs cannot decode (FR-8.54). Replaces the earlier list; for every camera.
 	 */
 	cameraSetDecodeCodecs: (codecs: VideoCodec[]) => __TAURI_INVOKE<void>("camera_set_decode_codecs", { codecs }),
+	/**  The background library with thumbnails. */
+	cameraBackgrounds: () => typedError<CameraBackgroundLibrary, ApiError>(__TAURI_INVOKE("camera_backgrounds")),
+	/**
+	 *  Adds an own image from the file the user picked (PNG, JPEG or WebP up to 10 MB). Only a
+	 *  scaled, re-encoded copy without metadata is kept; `path` is not stored (FR-8.14). Error
+	 *  `invalidInput` → "This image can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+	 */
+	cameraOwnBackgroundAdd: (path: string) => typedError<CameraBackgroundImage, ApiError>(__TAURI_INVOKE("camera_own_background_add", { path })),
+	/**
+	 *  Deletes an own image. When it was the default background, the stored default becomes Blur
+	 *  (FR-8.15); the UI reloads the settings afterwards. Error `notFound` for an unknown id.
+	 */
+	cameraOwnBackgroundRemove: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("camera_own_background_remove", { id })),
+	/**
+	 *  Starts sending `cameraDevicesChanged` while the preview dialog or Settings → Camera is open.
+	 *  Every call needs a matching [`camera_devices_watch_stop`].
+	 */
+	cameraDevicesWatchStart: () => __TAURI_INVOKE<void>("camera_devices_watch_start"),
+	/**  Ends one [`camera_devices_watch_start`]; the watch stops when no caller is left. */
+	cameraDevicesWatchStop: () => __TAURI_INVOKE<void>("camera_devices_watch_stop"),
 	/**
 	 *  The open P2P connection to `session`, or `null` without one; changes arrive as
 	 *  `p2pLinkChanged`.
@@ -1242,6 +1263,7 @@ export const events = {
 	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
 	cameraAvailabilityChanged: makeEvent<CameraAvailabilityChanged, CameraAvailabilityChanged>("camera-availability-changed"),
 	cameraChanged: makeEvent<CameraChanged, CameraChanged>("camera-changed"),
+	cameraDevicesChanged: makeEvent<CameraDevicesChanged, CameraDevicesChanged>("camera-devices-changed"),
 	cameraRoomChanged: makeEvent<CameraRoomChanged, CameraRoomChanged>("camera-room-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
 	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
@@ -1619,6 +1641,25 @@ export type CameraAvailabilityChanged = {
 /**  A background choice (FR-8.11): none, blur, a built-in image or an own image. */
 export type CameraBackground = { kind: "none" } | { kind: "blur" } | { kind: "builtin"; id: string } | { kind: "own"; id: string };
 
+/**
+ *  One background image of the library. The id goes into
+ *  `CameraBackground { kind: "builtin" | "own", id }`.
+ */
+export type CameraBackgroundImage = {
+	id: string,
+	/**  `data:image/jpeg;base64,…`, at most 320 × 180 px; `None` when the file can't be read. */
+	thumbnail: string | null,
+};
+
+/**
+ *  The library: the six built-in images (sorted by id; the UI names them) and the user's own
+ *  images, oldest first ("Yours").
+ */
+export type CameraBackgroundLibrary = {
+	builtin: CameraBackgroundImage[],
+	own: CameraBackgroundImage[],
+};
+
 /**  The own camera changed (state, error, viewers). `state: "off"` once it is off. */
 export type CameraChanged = {
 	view: CameraView,
@@ -1630,6 +1671,14 @@ export type CameraDevice = {
 	id: string,
 	name: string,
 	isDefault: boolean,
+};
+
+/**
+ *  The cameras changed (plugged in, removed, renamed or a new default); sent only while a
+ *  device watch runs.
+ */
+export type CameraDevicesChanged = {
+	devices: CameraDevice[],
 };
 
 /**  The effect level that runs: "Best" or "Light" (FR-8.36). */
@@ -1671,6 +1720,9 @@ export type CameraFailure = "notConnected" |
 /**  The P2P mode leaves the relay out. */
 "mode" | "noCertificate";
 
+/**  "Reduce motion" for the speaking frame; `system` follows the operating system. */
+export type CameraReduceMotion = "system" | "on" | "off";
+
 /**  The camera room of a server changed (tiles, their states, open, hidden). */
 export type CameraRoomChanged = {
 	view: CameraRoomView,
@@ -1687,6 +1739,12 @@ export type CameraRoomView = {
 	tiles: CameraTile[],
 };
 
+/**  Own camera send quality (FR-8.45). */
+export type CameraSendQuality = "auto" | "720p15" | "360p30";
+
+/**  When other people's cameras are shown (FR-8.75). */
+export type CameraShow = "always" | "onOpen" | "never";
+
 /**  Where the own camera is (spec 08, section 6.4). */
 export type CameraState = "off" | 
 /**  The preview runs locally; nothing is sent (FR-8.10). */
@@ -1695,6 +1753,9 @@ export type CameraState = "off" |
 "requesting" | 
 /**  The camera is on air. */
 "onAir";
+
+/**  Where the camera strip sits while something is shared (FR-8.72). */
+export type CameraStripPosition = "beside" | "above" | "hidden";
 
 /**  One camera of another person in the room. */
 export type CameraTile = {
@@ -3336,6 +3397,8 @@ export type PluginDiagnostics = {
 	uiFreezes: number | null,
 	/**  The plugin's web content is turned off after a freeze, until the user re-enables it. */
 	webDisabled: boolean,
+	/**  Why the plugin was refused at load, when Diagnostics lists that reason. */
+	loadIssue: PluginLoadIssue | null,
 	/**  The plugin's own log lines (in memory only). */
 	log: PluginLogLine[],
 };
@@ -3503,6 +3566,16 @@ export type PluginJustify = "start" | "end" | "spaceBetween" |
 /**  Rows: the first child takes the free width, the others keep their natural width. */
 "fillFirst";
 
+/**
+ *  Why a plugin was refused at load, as Diagnostics lists it (FR-9.90). Only fixed names, never
+ *  the plugin's own text.
+ */
+export type PluginLoadIssue = 
+/**  A manifest field was used without the permission it needs. */
+{ kind: "field_without_permission"; field: string; permission: string } | 
+/**  An Apps-menu label equal to a built-in one or starting with "Mumcord". */
+{ kind: "refused_app_menu_label" };
+
 export type PluginLogLevel = "debug" | "info" | "warn" | "error";
 
 export type PluginLogLine = {
@@ -3661,7 +3734,9 @@ export type PluginScoreSource =
 /**  The signed index entry, as Browse shows it. */
 "listing" | 
 /**  The package the install prompt downloaded and verified. */
-"package";
+"package" | 
+/**  The folder of a loaded developer plugin, for information only. */
+"developer";
 
 /**  The score of a plugin version, or why there is none. */
 export type PluginScored = 
@@ -4653,6 +4728,28 @@ export type Settings = {
 	screenAskEachTime: boolean,
 	screenSound: boolean,
 	screenUseGpu: boolean,
+	/**  Last used camera (`CameraDevice.id`); `None` uses the system default (FR-8.27). */
+	cameraDeviceId: string | null,
+	cameraSendQuality: CameraSendQuality,
+	/**  "Mirror my self-view". */
+	cameraMirrorSelf: boolean,
+	/**
+	 *  Default background of the next preview; "Use this background next time" writes it
+	 *  (FR-8.11, FR-8.75).
+	 */
+	cameraDefaultBackground: CameraBackground,
+	/**  Blur strength 0 (Light) … 100 (Strong); clamped when stored. */
+	cameraBlurStrength: number,
+	cameraEffectQuality: CameraEffectQuality,
+	/**  "Turn my camera off when my screen locks". */
+	cameraOffOnLock: boolean,
+	cameraShow: CameraShow,
+	/**  "Data saver: up to 15 fps for everyone". */
+	cameraDataSaver: boolean,
+	cameraReduceMotion: CameraReduceMotion,
+	cameraStripPosition: CameraStripPosition,
+	/**  Global camera hotkey (FR-8.20); `None` is unset. */
+	cameraHotkey: string | null,
 };
 
 /**  The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom. */

@@ -19,5 +19,7 @@
   "channelsOf": "Kanali · {server}",
   "moreChannels": "Več kanalov v Mumcordu…",
   "recentChats": "Nedavni klepeti",
-  "chatUnread": "{name} – {count} neprebranih"
+  "chatUnread": "{name} – {count} neprebranih",
+  "cameraOn": "Kamera vklopljena",
+  "turnOffCamera": "Izklopi kamero"
 }

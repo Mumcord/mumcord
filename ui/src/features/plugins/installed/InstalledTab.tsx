@@ -203,8 +203,13 @@ function PluginRow({
   const unofficial = plugin.source.kind === "repo";
   const official = plugin.source.kind === "official";
   const authors = plugin.authors.join(", ");
-  // Only unofficial plugins from a repository have a listing to score (FR-9.77).
-  const scored = useListingScore(plugin.id, plugin.version, unofficial);
+  // Unofficial plugins show their listing's score, developer plugins their folder's (FR-9.77).
+  const scored = useListingScore(
+    plugin.id,
+    plugin.version,
+    unofficial || dev,
+    dev ? "developer" : "listing",
+  );
   // A revoked plugin cannot be turned on again (the service refuses it).
   const locked = noPlugins || plugin.disabledReason === "revoked";
   const source = sourceLabel(plugin);
@@ -241,7 +246,7 @@ function PluginRow({
               <span aria-hidden="true">{official ? "✓" : dev ? "" : "⚠"}</span>{" "}
               {t(source.key, source.values ?? {})}
             </span>
-            {scored !== null && <ScoreChip scored={scored} />}
+            {scored !== null && <ScoreChip scored={scored} developer={dev} />}
             <span className="plugins-installed-version">
               {plugin.version}
               {authors !== "" && ` · ${authors}`}

@@ -19,5 +19,7 @@
   "channelsOf": "Canales · {server}",
   "moreChannels": "Más canales en Mumcord…",
   "recentChats": "Chats recientes",
-  "chatUnread": "{name} – {count} sin leer"
+  "chatUnread": "{name} – {count} sin leer",
+  "cameraOn": "Cámara activada",
+  "turnOffCamera": "Desactivar cámara"
 }

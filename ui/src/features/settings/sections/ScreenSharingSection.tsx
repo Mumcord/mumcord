@@ -47,7 +47,7 @@ const GPU_KEYS = {
 } as const;
 
 /** Select with a visible label, as the other settings rows. */
-function SelectRow<T extends string>({
+export function SelectRow<T extends string>({
   label,
   value,
   options,

@@ -1,8 +1,9 @@
 //! E2E test plugin for web content (spec 09 §10.2): pages in the stage, side panel, dialog and
 //! panel popover with one probe per isolation check (AC-9.2, AC-9.3, S0), busy-loop and
-//! memory-hog modes (AC-9.4), a bundled sound (AC-9.23), `net.http` calls (AC-9.7) and two
-//! Apps-menu items (AC-9.17). The panel is the control surface: its buttons are user gestures, and
-//! it shows every result so the E2E test can read them without entering a frame.
+//! memory-hog modes (AC-9.4), a bundled sound (AC-9.23), `net.http` calls (AC-9.7), two
+//! Apps-menu items (AC-9.17) and a side-panel page button that starts the stage (AC-9.13). The
+//! panel is the control surface: its buttons are user gestures, and it shows every result so the
+//! E2E test can read them without entering a frame.
 
 mod bridge;
 mod messages;
@@ -12,10 +13,10 @@ use std::collections::{BTreeMap, HashMap, VecDeque};
 
 use mumcord_plugin_sdk::events::Event;
 use mumcord_plugin_sdk::http::{Body, HttpRequest, Method};
-use mumcord_plugin_sdk::types::StartInfo;
+use mumcord_plugin_sdk::types::{Error, StartInfo};
 use mumcord_plugin_sdk::ui::{self, Slot};
 use mumcord_plugin_sdk::webview::{self, Place};
-use mumcord_plugin_sdk::{Plugin, app_menu, audio, http, log, stage};
+use mumcord_plugin_sdk::{Plugin, app_menu, audio, http, log, stage, timers};
 
 use bridge::PageMessage;
 
@@ -24,6 +25,8 @@ const DECLARED: &str = "https://declared.plugins.test:47443";
 const UNDECLARED: &str = "https://undeclared.plugins.test:47443";
 const SOUND: &str = "sounds/beep.wav";
 const MAX_LOG: usize = 12;
+/// The host draws at most 20 panel updates per second; a refused redraw is retried after this.
+const REDRAW_RETRY_MS: u32 = 300;
 
 #[derive(Default)]
 struct State {
@@ -32,6 +35,8 @@ struct State {
     /// Pending `net.http` requests and the panel action that sent them.
     requests: HashMap<u32, String>,
     log: VecDeque<String>,
+    /// The timer that redraws the panel after the host refused an update.
+    redraw_timer: Option<u32>,
 }
 
 thread_local! {
@@ -49,10 +54,11 @@ fn note(line: String) {
 }
 
 /// Records the outcome of a host call under the action's name, e.g. `play-missing: not-found`.
-fn outcome<T, E: std::fmt::Debug>(action: &str, result: Result<T, E>) {
+/// Only the WIT error name: its documentation text would make the line too long for the panel.
+fn outcome<T>(action: &str, result: Result<T, Error>) {
     match result {
         Ok(_) => note(format!("{action}: ok")),
-        Err(e) => note(format!("{action}: {}", kebab(&format!("{e:?}")))),
+        Err(e) => note(format!("{action}: {}", e.name())),
     }
 }
 
@@ -78,6 +84,7 @@ fn panel() -> ui::El {
         ("open-side", "Open side panel"),
         ("open-dialog", "Open dialog"),
         ("open-popover", "Open popover"),
+        ("open-fourth", "Open dialog and popover"),
         ("close-web", "Close web view"),
         ("run-all", "Run all probes"),
         ("busy", "Busy loop"),
@@ -112,8 +119,20 @@ fn panel() -> ui::El {
 }
 
 fn redraw() {
-    if let Err(e) = ui::show(Slot::Panel, panel()) {
-        log::warn(&format!("could not draw the panel: {e:?}"));
+    match ui::show(Slot::Panel, panel()) {
+        Ok(()) => {}
+        // A burst of page messages (a probe run) easily passes the limit; without a later redraw
+        // the panel would keep showing a stale "running" for the last probe.
+        Err(Error::RateLimited) => {
+            if STATE.with_borrow(|s| s.redraw_timer.is_some()) {
+                return;
+            }
+            match timers::start(REDRAW_RETRY_MS, false) {
+                Ok(id) => STATE.with_borrow_mut(|s| s.redraw_timer = Some(id)),
+                Err(e) => log::warn(&format!("could not schedule a panel redraw: {e:?}")),
+            }
+        }
+        Err(e) => log::warn(&format!("could not draw the panel: {e:?}")),
     }
 }
 
@@ -128,7 +147,7 @@ fn get(action: &str, url: &str) {
         Ok(id) => {
             STATE.with_borrow_mut(|s| s.requests.insert(id, action.to_owned()));
         }
-        Err(e) => outcome::<(), _>(action, Err(e)),
+        Err(e) => outcome::<()>(action, Err(e)),
     }
 }
 
@@ -145,6 +164,16 @@ fn act(action: &str) {
             outcome(action, webview::show(Place::Dialog, "dialog.html"));
         }
         "open-popover" => outcome(action, webview::show(Place::PanelPopover, "panel.html")),
+        // The popover shares the dialog's slot, so with the dialog page up it is a fourth frame
+        // (FR-9.38). Both in one gesture, because the modal dialog covers the panel's buttons.
+        "open-fourth" => {
+            outcome("open-dialog-tree", ui::open_dialog(TITLE));
+            outcome("open-dialog", webview::show(Place::Dialog, "dialog.html"));
+            outcome(
+                "open-popover",
+                webview::show(Place::PanelPopover, "panel.html"),
+            );
+        }
         "close-web" => {
             webview::hide();
             note(format!("{action}: ok"));
@@ -169,6 +198,13 @@ fn act(action: &str) {
 fn on_page(message: &str) {
     match bridge::parse(message) {
         Some(PageMessage::Ready(place)) => note(format!("ready: {place}")),
+        // Gesture-bound: it works only within 8 s of a trusted click (here: in the page).
+        Some(PageMessage::StartStage(place)) => {
+            outcome(
+                &format!("{place}-start-stage"),
+                stage::start_web(TITLE, "stage.html"),
+            );
+        }
         Some(PageMessage::Result {
             place,
             probe,
@@ -203,7 +239,12 @@ impl Plugin for TestSurface {
                 let Some(action) = action else { return };
                 match result.outcome {
                     Ok(response) => note(format!("{action}: {}", response.status)),
-                    Err(e) => note(format!("{action}: {}", kebab(&format!("{e:?}")))),
+                    // `HttpError::HostNotAllowed` → `host-not-allowed`, the WIT case name.
+                    Err(e) => {
+                        let case = format!("{e:?}");
+                        let case = case.trim_start_matches("HttpError::");
+                        note(format!("{action}: {}", kebab(case)));
+                    }
                 }
             }
             Event::SurfaceClosed(place) => {
@@ -211,6 +252,14 @@ impl Plugin for TestSurface {
             }
             Event::DialogClosed => note("closed: dialog-tree".to_owned()),
             Event::StageActivityEnded(_) => note("stage: ended".to_owned()),
+            Event::Timer(id) => {
+                if STATE
+                    .with_borrow_mut(|s| s.redraw_timer.take_if(|t| *t == id))
+                    .is_none()
+                {
+                    return;
+                }
+            }
             _ => return,
         }
         redraw();
