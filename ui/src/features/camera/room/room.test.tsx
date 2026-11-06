@@ -5,7 +5,7 @@ import type { CameraTile, CameraView, MockApi } from "../../../api";
 import { subscribeAnnouncements } from "../../../a11y/announcer";
 import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll } from "../../channels/testUtils";
-import { mediaView, resetMediaView } from "../../media/mediaView";
+import { mediaView, openMedia, resetMediaView, selectStage } from "../../media/mediaView";
 import { resetPopoutStore } from "../../media/popoutStore";
 import { resetLiveBackground } from "../preview/liveBackground";
 import { resetCameraDecode } from "./cameraDecode";
@@ -188,6 +188,9 @@ describe("camera room", () => {
   it("says why the camera stopped in the room bar", async () => {
     onAir(api);
     api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    act(() => {
+      openMedia("camera");
+    });
     const { container } = render(<CameraRoom serverId={1} onTurnOn={null} />);
     await screen.findByRole("group", { name: "You, camera on, live" });
     act(() => {
@@ -198,6 +201,37 @@ describe("camera room", () => {
       "Camera stopped by the server's relay",
     );
     expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("shows the notice once: below the mini bar while another item hides the open room", async () => {
+    onAir(api);
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    act(() => {
+      openMedia("camera");
+      openMedia("plugin:board");
+      selectStage("plugin:board");
+    });
+    render(
+      <>
+        <CameraMiniBar serverId={1} />
+        <CameraRoom serverId={1} onTurnOn={null} />
+      </>,
+    );
+    await screen.findByRole("group", { name: "You, camera on, live" });
+    act(() => {
+      stopped(api, "relayDown");
+    });
+    const bar = screen.getByRole("toolbar", { name: "Camera room controls" });
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
+    expect(within(bar).queryByRole("alert")).toBeNull();
+
+    act(() => {
+      selectStage("camera");
+    });
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
+    expect(within(bar).getByRole("alert")).toHaveTextContent(
+      "Camera stopped: the relay isn't reachable",
+    );
   });
 
   it("closes to the mini bar and stops the downloads; Open room joins again", async () => {
