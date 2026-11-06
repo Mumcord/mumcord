@@ -94,6 +94,7 @@ impl ServiceIo {
         target: Target,
         data: Vec<u8>,
         fallback: bool,
+        permitted: bool,
     ) -> Result<(), SendError> {
         let mut peers = self.peers();
         let PeersState {
@@ -131,7 +132,13 @@ impl ServiceIo {
         // Reach first (FR-9.58): the same rules and errors as `peers.send`.
         let receivers = crate::messaging::recipients::select(&plugin_ref, target, &members)
             .map_err(super::wit_error)?;
-        let status = self.relay().status(Some(server));
+        // Without `peers.relay` the plugin's sends behave as with the relay switched off
+        // (FR-9.63): small ones take the Mumble fallback, the rest are `relay-unavailable`.
+        let status = if permitted {
+            self.relay().status(Some(server))
+        } else {
+            RelayStatus::SwitchedOff
+        };
         let path =
             relay::path(status, target, data.len(), fallback).ok_or(SendError::Unavailable)?;
         let now = Instant::now();
@@ -473,7 +480,7 @@ mod tests {
         let (io, mut rx) = io();
         available(&io);
         let data: Vec<u8> = (0..=255u8).cycle().take(MAX_MESSAGE).collect();
-        io.relay_send_to("dice", Target::Direct(2), data.clone(), false)
+        io.relay_send_to("dice", Target::Direct(2), data.clone(), false, true)
             .expect("sent");
         let events = drain(&mut rx);
         assert!(
@@ -494,7 +501,7 @@ mod tests {
         // Session 3 does not run the plugin; 9 is not in the channel.
         for session in [3, 9] {
             assert_eq!(
-                io.relay_send_to("dice", Target::Direct(session), vec![1], true),
+                io.relay_send_to("dice", Target::Direct(session), vec![1], true, true),
                 Err(SendError::Error(Error::NoRecipients))
             );
         }
@@ -505,7 +512,7 @@ mod tests {
             .expect("meta")
             .visibility = Visibility::Nobody;
         assert_eq!(
-            io.relay_send_to("dice", Target::Direct(2), vec![1], true),
+            io.relay_send_to("dice", Target::Direct(2), vec![1], true, true),
             Err(SendError::Error(Error::Hidden))
         );
     }
@@ -515,11 +522,11 @@ mod tests {
         let (io, _rx) = io();
         available(&io);
         for _ in 0..16 {
-            io.relay_send_to("dice", Target::Direct(2), vec![0; MAX_MESSAGE], false)
+            io.relay_send_to("dice", Target::Direct(2), vec![0; MAX_MESSAGE], false, true)
                 .expect("within the burst");
         }
         assert_eq!(
-            io.relay_send_to("dice", Target::Direct(2), vec![0; MAX_MESSAGE], false),
+            io.relay_send_to("dice", Target::Direct(2), vec![0; MAX_MESSAGE], false, true),
             Err(SendError::Error(Error::RateLimited))
         );
     }
@@ -528,7 +535,7 @@ mod tests {
     fn without_the_relay_small_messages_fall_back_to_mumble_plugin_data() {
         let (io, mut rx) = io();
         let data = vec![7; MAX_FALLBACK];
-        io.relay_send_to("dice", Target::Direct(2), data.clone(), true)
+        io.relay_send_to("dice", Target::Direct(2), data.clone(), true, true)
             .expect("fallback");
         let events = drain(&mut rx);
         let [ServiceEvent::PeerSend { outgoing, .. }] = events.as_slice() else {
@@ -543,11 +550,17 @@ mod tests {
         assert!(outgoing.bytes.len() <= 1000, "fits Mumble plugin data");
         // Larger, or no fallback allowed: relay-unavailable.
         assert_eq!(
-            io.relay_send_to("dice", Target::Direct(2), vec![7; MAX_FALLBACK + 1], true),
+            io.relay_send_to(
+                "dice",
+                Target::Direct(2),
+                vec![7; MAX_FALLBACK + 1],
+                true,
+                true
+            ),
             Err(SendError::Unavailable)
         );
         assert_eq!(
-            io.relay_send_to("dice", Target::Direct(2), vec![7], false),
+            io.relay_send_to("dice", Target::Direct(2), vec![7], false, true),
             Err(SendError::Unavailable)
         );
     }
@@ -558,10 +571,26 @@ mod tests {
         available(&io);
         io.relay().switch_on = false;
         assert_eq!(
-            io.relay_send_to("dice", Target::Direct(2), vec![1; 2000], true),
+            io.relay_send_to("dice", Target::Direct(2), vec![1; 2000], true, true),
             Err(SendError::Unavailable)
         );
-        io.relay_send_to("dice", Target::Direct(2), vec![1; 10], true)
+        io.relay_send_to("dice", Target::Direct(2), vec![1; 10], true, true)
+            .expect("fallback");
+        assert!(matches!(
+            drain(&mut rx).as_slice(),
+            [ServiceEvent::PeerSend { .. }]
+        ));
+    }
+
+    #[test]
+    fn without_the_permission_sends_behave_as_switched_off() {
+        let (io, mut rx) = io();
+        available(&io);
+        assert_eq!(
+            io.relay_send_to("dice", Target::Channel, vec![1; 2000], true, false),
+            Err(SendError::Unavailable)
+        );
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true, false)
             .expect("fallback");
         assert!(matches!(
             drain(&mut rx).as_slice(),
@@ -593,24 +622,30 @@ mod tests {
         let (io, mut rx) = io();
         available(&io);
         // Nobody joined yet: everyone with the plugin gets the fallback too.
-        io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true, true)
             .expect("sent");
         assert_eq!(split(&mut rx), (vec![2, 4], vec![2, 4]));
         // Only the member outside the broadcast gets the fallback.
         io.relay().joined.insert(SERVER, vec![2]);
-        io.relay_send_to("dice", Target::Channel, vec![1; MAX_FALLBACK], true)
+        io.relay_send_to("dice", Target::Channel, vec![1; MAX_FALLBACK], true, true)
             .expect("sent");
         assert_eq!(split(&mut rx), (vec![4], vec![2, 4]));
         // Too large for Mumble plugin data, or no fallback allowed: the broadcast only.
-        io.relay_send_to("dice", Target::Channel, vec![1; MAX_FALLBACK + 1], true)
-            .expect("sent");
+        io.relay_send_to(
+            "dice",
+            Target::Channel,
+            vec![1; MAX_FALLBACK + 1],
+            true,
+            true,
+        )
+        .expect("sent");
         assert_eq!(split(&mut rx), (vec![], vec![2, 4]));
-        io.relay_send_to("dice", Target::Channel, vec![1; 10], false)
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], false, true)
             .expect("sent");
         assert_eq!(split(&mut rx), (vec![], vec![2, 4]));
         // Everyone joined: no fallback.
         io.relay().joined.insert(SERVER, vec![2, 4]);
-        io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true, true)
             .expect("sent");
         assert_eq!(split(&mut rx), (vec![], vec![2, 4]));
         assert_eq!(
@@ -625,11 +660,11 @@ mod tests {
         available(&io);
         // The first send starts the broadcast; it and the next ones wait in its start queue.
         for _ in 0..8 {
-            io.relay_send_to("dice", Target::Channel, vec![1; 10], false)
+            io.relay_send_to("dice", Target::Channel, vec![1; 10], false, true)
                 .expect("queued");
         }
         assert_eq!(
-            io.relay_send_to("dice", Target::Channel, vec![1; 10], false),
+            io.relay_send_to("dice", Target::Channel, vec![1; 10], false, true),
             Err(SendError::Error(Error::RateLimited))
         );
         assert_eq!(split(&mut rx), (vec![], [2, 4].repeat(8)));
@@ -644,11 +679,11 @@ mod tests {
             ),
         );
         assert_eq!(
-            io.relay_send_to("dice", Target::Channel, vec![1; 10], false),
+            io.relay_send_to("dice", Target::Channel, vec![1; 10], false, true),
             Err(SendError::Unavailable)
         );
         // With the fallback everyone got it through Mumble.
-        io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true, true)
             .expect("fallback");
         assert_eq!(split(&mut rx), (vec![2, 4], vec![2, 4]));
     }
@@ -660,11 +695,11 @@ mod tests {
         io.relay().joined.insert(SERVER, vec![2, 4]);
         io.relay().broadcast.insert(SERVER, Broadcast::Live);
         for _ in 0..16 {
-            io.relay_send_to("dice", Target::Channel, vec![0; MAX_MESSAGE], false)
+            io.relay_send_to("dice", Target::Channel, vec![0; MAX_MESSAGE], false, true)
                 .expect("within the burst");
         }
         assert_eq!(
-            io.relay_send_to("dice", Target::Channel, vec![0; MAX_MESSAGE], false),
+            io.relay_send_to("dice", Target::Channel, vec![0; MAX_MESSAGE], false, true),
             Err(SendError::Error(Error::RateLimited))
         );
         assert_eq!(drain(&mut rx).len(), 16);
@@ -673,11 +708,11 @@ mod tests {
     #[test]
     fn without_the_relay_channel_sends_fall_back_when_they_fit() {
         let (io, mut rx) = io();
-        io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true, true)
             .expect("fallback");
         assert_eq!(split(&mut rx), (vec![2, 4], vec![]));
         assert_eq!(
-            io.relay_send_to("dice", Target::Channel, vec![1; 2000], true),
+            io.relay_send_to("dice", Target::Channel, vec![1; 2000], true, true),
             Err(SendError::Unavailable)
         );
     }

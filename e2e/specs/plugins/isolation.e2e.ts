@@ -46,7 +46,6 @@ const UNOBSERVABLE = [
   "dns-prefetch",
   "css-url",
   "a-ping",
-  "download",
 ] as const;
 const ESCAPES = [
   "ipc",
@@ -62,8 +61,9 @@ const ESCAPES = [
 ] as const;
 const ALLOWED = ["fetch-declared", "csp-wasm"] as const;
 const ALL = [...ALLOWED, ...NETWORK, ...UNOBSERVABLE, ...ESCAPES];
-/** Probes that navigate the frame; each is sent on its own. */
-const NAVIGATING = ["navigation", "top-navigation", "meta-refresh", "form"] as const;
+/** Probes that navigate the frame (a download link to another origin does on WebKitGTK); each is
+ * sent on its own. */
+const NAVIGATING = ["navigation", "top-navigation", "meta-refresh", "form", "download"] as const;
 
 const DECLARED_HOST = "declared.plugins.test";
 
@@ -223,8 +223,11 @@ describe("plugins 1.1: web frame isolation and keyboard (AC-9.2, AC-9.3, AC-9.5)
       await ensureStage();
       await ensureSide();
       pluginenv.clearHttpsLog();
-      await surface.panelButton("Run all probes");
+      // One frame after the other: WebKitGTK never settles WebAssembly.compile when two frames
+      // call it at the same moment, so "Run all probes" (both frames at once) stalls at csp-wasm.
+      await postToFrame(STAGE_FRAME, "run:stage:all");
       stage = await surface.waitResults("stage", ALL);
+      await postToFrame(SIDE_FRAME, "run:side:all");
       side = await surface.waitResults("side", ALL);
     });
 
@@ -256,7 +259,7 @@ describe("plugins 1.1: web frame isolation and keyboard (AC-9.2, AC-9.3, AC-9.5)
   describe("navigation in the side panel", () => {
     before(ensureSide);
 
-    it("AC-9.2: navigation, top navigation, meta refresh and form submission go nowhere", async function () {
+    it("AC-9.2: navigation, top navigation, meta refresh, form submission and download go nowhere", async function () {
       this.timeout(5 * 60_000);
       pluginenv.clearHttpsLog();
       for (const probe of NAVIGATING) {
@@ -274,7 +277,9 @@ describe("plugins 1.1: web frame isolation and keyboard (AC-9.2, AC-9.3, AC-9.5)
           },
           { timeout: 20_000, interval: 250, timeoutMsg: `side/${probe} neither reported nor closed` },
         );
-        expect([`side/${probe}: blocked`, "removed"]).toContain(outcome);
+        // A download the page cannot observe reports "sent"; the HTTPS fixture decides.
+        const sent = probe === "download" ? [`side/${probe}: sent`] : [];
+        expect([`side/${probe}: blocked`, "removed", ...sent]).toContain(outcome);
         if (outcome === "removed") await reopenSide();
       }
       // The main window never left the app either.

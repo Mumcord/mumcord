@@ -652,8 +652,9 @@ export const commands = {
 	/**
 	 *  The security score of a store plugin version (FR-9.72). `listing` scores the signed index
 	 *  entry, as Browse shows it; `package` scores the package the install prompt downloaded for
-	 *  this version (so `plugin_install_prepare` ran first), as the prompt shows it. `version`
-	 *  defaults to the one the store offers. Never scored in the UI.
+	 *  this version (so `plugin_install_prepare` ran first), as the prompt shows it; `developer`
+	 *  scores a loaded developer plugin's folder (`version` is ignored). `version` defaults to the
+	 *  one the store offers. Never scored in the UI.
 	 */
 	pluginScore: (id: string, version: string | null, from: PluginScoreSource) => typedError<PluginScored, ApiError>(__TAURI_INVOKE("plugin_score", { id, version, from })),
 	/**
@@ -3737,7 +3738,9 @@ export type PluginScoreSource =
 /**  The signed index entry, as Browse shows it. */
 "listing" | 
 /**  The package the install prompt downloaded and verified. */
-"package";
+"package" | 
+/**  The folder of a loaded developer plugin, for information only. */
+"developer";
 
 /**  The score of a plugin version, or why there is none. */
 export type PluginScored = 

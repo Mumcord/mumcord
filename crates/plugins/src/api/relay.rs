@@ -241,11 +241,15 @@ pub(crate) fn send(
     data: Vec<u8>,
     fallback: bool,
 ) -> Result<(), SendError> {
-    state.ctx.grants.check(&state.id, PERMISSION)?;
+    // Without `peers.relay` the send is not refused outright: it behaves as with the relay
+    // switched off, so small messages still take the Mumble fallback (FR-9.63).
+    let permitted = state.ctx.grants.allows(&state.id, PERMISSION);
     if data.len() > MAX_MESSAGE {
         return Err(Error::TooLarge.into());
     }
-    state.io()?.relay_send(&state.id, target, data, fallback)
+    state
+        .io()?
+        .relay_send(&state.id, target, data, fallback, permitted)
 }
 
 #[cfg(test)]

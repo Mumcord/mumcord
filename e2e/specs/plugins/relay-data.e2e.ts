@@ -41,7 +41,7 @@ import { app, apps, pluginenv, relayenv } from "../../helpers/index.ts";
 import { registerOnServer } from "../../helpers/files-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { run } from "../../helpers/run.ts";
-import { addAndConnect, completeWizard, personRow } from "../../helpers/voice-ui.ts";
+import { addAndConnect, completeWizard, personRow, waitConnected } from "../../helpers/voice-ui.ts";
 
 const ID = "test-relay";
 const PLUGIN = "Test Relay";
@@ -75,10 +75,19 @@ async function invokeOk<T>(command: string, args: object = {}): Promise<T> {
 
 /** Joins the shown server's channel when its read-only notice offers it. */
 async function joinVoice(): Promise<void> {
+  // Plugins only see the voice server, so this waits until the server is it. A reconnect comes
+  // back read-only, and the "Join voice" button only shows once the connection has synced.
+  await waitConnected();
   const join = $(".userpanel-readonly__join");
-  if (!(await join.isDisplayed())) return;
-  await join.click();
-  await $(".userpanel-readonly").waitForExist({ reverse: true, timeout: 15_000 });
+  const voice = async () => (await invokeOk<number | null>("voice_server_get")) !== null;
+  await browser.waitUntil(async () => (await voice()) || (await join.isDisplayed()), {
+    timeout: 15_000,
+    timeoutMsg: "the server is neither the voice server nor offers Join voice",
+  });
+  if (!(await voice())) {
+    await join.click();
+    await browser.waitUntil(voice, { timeout: 15_000, timeoutMsg: "Join voice did not take voice" });
+  }
 }
 
 /** Settings → Privacy & Connections: "Relay only", so plugin data has no direct path to take. */
@@ -478,11 +487,16 @@ async function bothInChannel(): Promise<void> {
       const serverId = await apps.onB(() => invokeOk<number>("voice_server_get"));
       await apps.onB(() => invokeOk("disconnect", { serverId }));
       await personRow("Bob").waitForExist({ reverse: true, timeout: 30_000 });
-      const missed = await send("Channel 64 KiB", "channel-big", BIG);
+      // Once A's plugin has seen B leave, nobody in the channel runs it: the send is refused
+      // (FR-9.58: the same reach rules as peers.send), and it takes a sequence number B never gets.
+      await waitPanel("Peer: none");
+      const missed = (await lastSeq()) + 1;
+      await refused("Channel 64 KiB", "channel-big", "no-recipients");
       await apps.onB(async () => {
         await invokeOk("connect", { serverId, channelPath: null, password: null });
         await joinVoice();
       });
+      // "Peer: Bob" again only comes with B's new announce, so A's next send has B as recipient.
       await bothInChannel();
       // Back in the channel, B is admitted to the broadcast again with A's next send and gets it.
       const back = await send("Channel 64 KiB", "channel-big", BIG);
