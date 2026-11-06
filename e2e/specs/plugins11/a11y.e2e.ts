@@ -147,9 +147,17 @@ async function expectFocusSomewhere(what: string): Promise<void> {
   if (lost) findings.push(`${what}: focus was dropped to the page body`);
 }
 
-/** The first text line of the focused element (a menu item's label without its plugin line). */
+/**
+ * The first text line of the focused menu item's label (without its plugin line). Read from the
+ * label span, because a plugin without an icon shows a letter tile (aria-hidden) before it.
+ */
 async function focusedFirstLine(): Promise<string> {
-  return ((await focus()).text.split("\n")[0] ?? "").trim();
+  const text = await browser.execute(() => {
+    const e = document.activeElement as HTMLElement | null;
+    const label = e?.querySelector<HTMLElement>(".appmenu__text, .chat-apps__text") ?? e;
+    return label?.innerText ?? "";
+  });
+  return (text.split("\n")[0] ?? "").trim();
 }
 
 /**
@@ -218,7 +226,8 @@ async function openPluginSettings(): Promise<void> {
   await openSettings();
   await pressUntil(
     "ArrowDown",
-    (f) => f.role === "tab" && f.text === "Plugins",
+    // By id, not text: the tab also shows the pending-updates count ("Plugins 1").
+    (f) => f.role === "tab" && f.id.endsWith("-tab-plugins"),
     "the Plugins settings group",
   );
   await $("//h2[contains(@class,'settings-page__title')][normalize-space(.)='Plugins']").waitForDisplayed({
@@ -317,10 +326,10 @@ async function settingsScreens(theme: Theme): Promise<void> {
   await browser.keys("Enter");
   const score = $("section.pd-score");
   await score.waitForDisplayed({ timeout: 30_000, timeoutMsg: "the details page did not open" });
-  // The breakdown is a real table with header cells, which a screen reader reads as one.
-  const table = score.$("table.risk-table");
-  await expect(table).toBeExisting();
-  expect((await table.$$("th")).length).toBeGreaterThan(0);
+  // Each group of the breakdown is a real table with header cells, which a screen reader reads as one.
+  const tables = await score.$$("table.risk-table");
+  expect(tables.length).toBeGreaterThan(0);
+  for (const table of tables) expect((await table.$$("th")).length).toBeGreaterThan(0);
   await check(`${theme}-details`, [".overlay__dialog"]);
   const summary = score.$("details.risk-details > summary");
   await tabToEl(summary, "the score breakdown disclosure");
@@ -403,7 +412,8 @@ async function appsMenuAndStageTabs(theme: Theme): Promise<void> {
   await expect(appsButton()).toBeFocused();
 
   await chooseAppByKey(`Start ${STAGE}`);
-  await stageTab(STAGE).waitForExist({ timeout: 20_000, timeoutMsg: "Test Stage did not start" });
+  // A single item has no tab row (the tabs appear from two items on), only its stage.
+  await stageFrame(STAGE).waitForExist({ timeout: 20_000, timeoutMsg: "Test Stage did not start" });
   await chooseAppByKey(`Start ${SURFACE}`);
   await stageTab(SURFACE).waitForExist({ timeout: 20_000, timeoutMsg: "Test Surface did not start" });
 
