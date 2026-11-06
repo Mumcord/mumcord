@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Crash reports",
-    "info": "When Mumcord closes unexpectedly it saves a short report: time, version, system, what went wrong and the last log lines. Reports stay on this computer and are never uploaded. Mumcord keeps the last 10.",
+    "info": "When Mumcord closes unexpectedly it saves a short report: time, version, system, what went wrong and the last log lines. Reports stay on this computer and are only sent when you upload one yourself. Mumcord keeps the last 10.",
     "listLabel": "Saved crash reports",
     "emptyTitle": "No crash reports",
     "emptyText": "Mumcord has not closed unexpectedly.",

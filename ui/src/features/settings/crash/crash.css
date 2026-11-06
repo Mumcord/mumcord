@@ -81,7 +81,7 @@
 }
 .cr-row {
   display: grid;
-  grid-template-columns: 20.5rem 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: center;
   padding: var(--space-2) var(--space-3);
@@ -91,16 +91,19 @@
   border-top: 0;
 }
 .cr-row__main {
+  flex-wrap: nowrap;
+  white-space: nowrap;
   display: flex;
   gap: var(--space-2);
   align-items: center;
 }
 .cr-row__when {
-  min-width: 9.5rem;
+  
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
 }
 .cr-row__cause {
+  min-width: 0;
   overflow: hidden;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
