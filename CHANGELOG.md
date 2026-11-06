@@ -79,6 +79,7 @@
 
 - Ctrl+C on selected chat text could leave the clipboard empty on Linux (X11): the web engine and the app both took the clipboard at once, and the app could then drop the text it had just been given. Ctrl+C now copies through the app alone, like the right-click Copy (#114)
 - A plugin's first messages to the channel through the relay (for example the first strokes on the Whiteboard) were lost while the relay connection was being set up, even though the plugin was told they were sent. They now wait briefly and arrive once the connection is up, also for people who join right then; if they cannot be delivered, the plugin gets an error instead
+- Messages from a plugin's web page now reach the plugin in the order the page sent them; two quick messages could arrive swapped, so a plugin could act on stale information
 - Closing a plugin's web dialog with Esc or ✕ now ends the whole dialog: it could come back as an empty dialog a moment later and cover the app. Focus also returns to the button that opened the dialog instead of getting lost
 - The plugin install prompt no longer warns that a repository is one you added once you have already installed a plugin from it
 - Settings → Plugins → Installed shows the security score chip of developer plugins (for information only), and keeps showing an unofficial plugin's chip after it was updated

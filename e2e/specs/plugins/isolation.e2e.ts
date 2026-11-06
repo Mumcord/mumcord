@@ -52,6 +52,7 @@ const ESCAPES = [
   "parent-dom",
   "other-frames",
   "storage",
+  "indexeddb",
   "cookies",
   "window-open",
   "modals",
