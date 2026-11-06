@@ -96,7 +96,8 @@
     "rateLimited": "Kamera se nije mogla pokrenuti: previše pokušaja. Pokušaj ponovno za minutu.",
     "mode": "Dijeljenje kamere treba relej. Promijeni to u Privatnost i veze.",
     "noCertificate": "Dijeljenje kamere treba klijentski certifikat.",
-    "endedByRelay": "Kameru je zaustavio relej poslužitelja"
+    "endedByRelay": "Kameru je zaustavio relej poslužitelja",
+    "dismissStopped": "Odbaci"
   },
   "privacy": {
     "windows": "Windows blokira pristup kameri za desktop aplikacije",

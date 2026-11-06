@@ -96,7 +96,8 @@
     "rateLimited": "Camera couldn't start: too many attempts. Try again in a minute.",
     "mode": "Camera sharing needs the relay. Change it in Privacy & Connections.",
     "noCertificate": "Camera sharing needs a client certificate.",
-    "endedByRelay": "Camera stopped by the server's relay"
+    "endedByRelay": "Camera stopped by the server's relay",
+    "dismissStopped": "Dismiss"
   },
   "privacy": {
     "windows": "Windows blocks camera access for desktop apps",

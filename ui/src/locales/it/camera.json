@@ -96,7 +96,8 @@
     "rateLimited": "Impossibile avviare la fotocamera: troppi tentativi. Riprova tra un minuto.",
     "mode": "La condivisione della fotocamera richiede il relay. Modificalo in Privacy e connessioni.",
     "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
-    "endedByRelay": "Fotocamera interrotta dal relay del server"
+    "endedByRelay": "Fotocamera interrotta dal relay del server",
+    "dismissStopped": "Ignora"
   },
   "privacy": {
     "windows": "Windows blocca l'accesso alla fotocamera per le app desktop",

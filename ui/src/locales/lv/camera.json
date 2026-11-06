@@ -96,7 +96,8 @@
     "rateLimited": "Kameru neizdevās startēt: pārāk daudz mēģinājumu. Mēģini vēlreiz pēc minūtes.",
     "mode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
-    "endedByRelay": "Servera relejs apturēja kameru"
+    "endedByRelay": "Servera relejs apturēja kameru",
+    "dismissStopped": "Aizvērt"
   },
   "privacy": {
     "windows": "Windows bloķē piekļuvi kamerai darbvirsmas lietotnēm",

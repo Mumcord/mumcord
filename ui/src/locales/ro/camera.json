@@ -96,7 +96,8 @@
     "rateLimited": "Camera nu a putut porni: prea multe încercări. Încearcă din nou peste un minut.",
     "mode": "Partajarea camerei are nevoie de releu. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
-    "endedByRelay": "Camera a fost oprită de releul serverului"
+    "endedByRelay": "Camera a fost oprită de releul serverului",
+    "dismissStopped": "Închide"
   },
   "privacy": {
     "windows": "Windows blochează accesul la cameră pentru aplicațiile desktop",

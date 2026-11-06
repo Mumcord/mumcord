@@ -96,7 +96,8 @@
     "rateLimited": "A kamera nem indulhatott el: túl sok próbálkozás. Próbáld újra egy perc múlva.",
     "mode": "A kamera megosztásához az átjátszó kell. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
-    "endedByRelay": "A kamerát a szerver átjátszója leállította"
+    "endedByRelay": "A kamerát a szerver átjátszója leállította",
+    "dismissStopped": "Elvetés"
   },
   "privacy": {
     "windows": "A Windows blokkolja a kamera elérését az asztali alkalmazások elől",

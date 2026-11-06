@@ -96,7 +96,8 @@
     "rateLimited": "Camera kon niet starten: te veel pogingen. Probeer het over een minuut opnieuw.",
     "mode": "Camera delen heeft de relay nodig. Wijzig dit in Privacy en verbindingen.",
     "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
-    "endedByRelay": "Camera gestopt door de relay van de server"
+    "endedByRelay": "Camera gestopt door de relay van de server",
+    "dismissStopped": "Sluiten"
   },
   "privacy": {
     "windows": "Windows blokkeert cameratoegang voor desktop-apps",

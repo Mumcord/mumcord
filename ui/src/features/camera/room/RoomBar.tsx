@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
 import { popIn, setPopoutOnTop, useInPopout, usePopouts } from "../../media/popoutStore";
+import { CameraStoppedNotice } from "./CameraStoppedNotice";
 import { RoomIcon } from "./icons";
 import { setSelfHidden } from "./roomChoices";
 
@@ -50,6 +51,7 @@ export function RoomBar({
 
   return (
     <div className="cam-room__bar" role="toolbar" aria-label={t("room.controls")}>
+      <CameraStoppedNotice serverId={serverId} />
       {onAir ? (
         <button
           type="button"

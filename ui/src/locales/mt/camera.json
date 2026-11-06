@@ -96,7 +96,8 @@
     "rateLimited": "Il-kamera ma setgħetx tibda: wisq tentattivi. Erġa' pprova wara minuta.",
     "mode": "Il-qsim tal-kamera jeħtieġ ir-relay. Biddlu f'Privatezza u konnessjonijiet.",
     "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
-    "endedByRelay": "Il-kamera twaqqfet mir-relay tas-server"
+    "endedByRelay": "Il-kamera twaqqfet mir-relay tas-server",
+    "dismissStopped": "Neħħi"
   },
   "privacy": {
     "windows": "Windows qed jibblokka l-aċċess għall-kamera għall-apps tad-desktop",

@@ -96,7 +96,8 @@
     "rateLimited": "Kameros nepavyko paleisti: per daug bandymų. Pabandyk dar kartą po minutės.",
     "mode": "Kameros bendrinimui reikia perdavimo mazgo. Pakeisk tai skiltyje Privatumas ir ryšiai.",
     "noCertificate": "Kameros bendrinimui reikia kliento sertifikato.",
-    "endedByRelay": "Kamerą sustabdė serverio perdavimo mazgas"
+    "endedByRelay": "Kamerą sustabdė serverio perdavimo mazgas",
+    "dismissStopped": "Paslėpti"
   },
   "privacy": {
     "windows": "Windows blokuoja darbalaukio programų prieigą prie kameros",
