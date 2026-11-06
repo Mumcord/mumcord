@@ -155,6 +155,9 @@ export function StageTabs() {
                 </span>
               )}
               <span className="media-stage__label">{tab.label}</span>
+              {/* Keeps the visible text "Test Stage Plugin" instead of "Test StagePlugin", so it
+                  stays part of the accessible name for voice control (WCAG 2.5.3). */}
+              {tab.plugin && " "}
               {tab.plugin && (
                 <span className="media-stage__chip" aria-hidden="true">
                   {t("plugin")}
