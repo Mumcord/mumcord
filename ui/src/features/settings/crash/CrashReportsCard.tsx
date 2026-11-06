@@ -4,6 +4,7 @@ import { getApi, type CrashReport } from "../../../api";
 import { Group } from "../components/Section";
 import { errorText } from "../errors";
 import { pickSavePath } from "../fileDialogs";
+import { UploadDialog } from "./UploadDialog";
 import { formatWhen, kindKey, useCrashReports } from "./useCrashReports";
 import "./crash.css";
 
@@ -50,6 +51,7 @@ export function CrashReportsCard() {
   const [status, setStatus] = useState<Status>(null);
   const [details, setDetails] = useState<{ report: CrashReport; text: string } | null>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
+  const [uploadFor, setUploadFor] = useState<CrashReport | null>(null);
   const reports = crashes.reports ?? [];
   const when = (report: CrashReport) => formatWhen(report, i18n.language);
 
@@ -162,6 +164,9 @@ export function CrashReportsCard() {
                 >
                   {t(`crashReports.${kindKey(report)}`)}
                 </span>
+                {report.uploaded && (
+                  <span className="cr-chip cr-chip--ok">{t("crashReports.uploaded")}</span>
+                )}
               </div>
               <span className="cr-row__cause">{report.cause}</span>
               <div className="cr-row__actions">
@@ -181,6 +186,16 @@ export function CrashReportsCard() {
                   onClick={() => void showDetails(report)}
                 >
                   {t("crashReports.details")}
+                </button>
+                <button
+                  type="button"
+                  className="settings-button cr-small"
+                  aria-label={t("crashReports.uploadLabel", { when: when(report) })}
+                  onClick={() => {
+                    setUploadFor(report);
+                  }}
+                >
+                  {t("crashReports.upload")}
                 </button>
                 <button
                   type="button"
@@ -237,6 +252,16 @@ export function CrashReportsCard() {
               </button>
               <button
                 type="button"
+                className="settings-button"
+                onClick={() => {
+                  setUploadFor(details.report);
+                  close();
+                }}
+              >
+                {t("crashReports.upload")}
+              </button>
+              <button
+                type="button"
                 className="settings-button settings-button--primary cr-iconbtn"
                 onClick={() => void copy(details.report)}
               >
@@ -254,6 +279,20 @@ export function CrashReportsCard() {
           />
           <p className="settings-hint">{t("crashReports.privacy")}</p>
         </CrashDialog>
+      )}
+
+      {uploadFor !== null && (
+        <UploadDialog
+          report={uploadFor}
+          onClose={() => {
+            setUploadFor(null);
+          }}
+          onSent={() => {
+            setUploadFor(null);
+            setStatus({ kind: "success", text: t("crashReports.uploadDone") });
+            void crashes.reload();
+          }}
+        />
       )}
 
       {confirm !== null && (

@@ -208,3 +208,37 @@
 .cr-confirm {
   width: min(26rem, calc(100vw - 2rem));
 }
+
+/* --- Upload confirmation (#573) ------------------------------------------------------------ */
+.cr-pre--short {
+  min-height: 9rem;
+  max-height: 9rem;
+}
+.cr-comment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+}
+.cr-textarea {
+  width: 100%;
+  resize: vertical;
+}
+.cr-privacy {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: var(--space-3);
+}
+.cr-shared {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  font-size: 0.9em;
+  line-height: 1.45;
+}
+.cr-chip--ok {
+  color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 60%, transparent);
+}

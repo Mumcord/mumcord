@@ -1241,6 +1241,20 @@
     "copyForBug": "Copy for a bug report",
     "noticeCopied": "Copied. Paste it into the bug report.",
     "actionFailed": "That did not work. Try again or open the folder.",
-    "reportText": "Report text"
+    "reportText": "Report text",
+    "upload": "Upload…",
+    "uploadLabel": "Upload report from {{when}} to the Mumcord team",
+    "uploaded": "Uploaded",
+    "uploadTitle": "Send crash report to the Mumcord team?",
+    "uploadWhat": "What will be sent",
+    "uploadComment": "What were you doing? (optional)",
+    "uploadCommentPlaceholder": "For example: I was watching a shared screen when the app closed.",
+    "uploadWhere": "Sent to crash.mumcord.app over an encrypted connection. Kept for 90 days.",
+    "uploadSharedLabel": "Shared:",
+    "uploadShared": "the Mumcord version, what went wrong, which features were in use, the last log lines and your system details (operating system, kernel, desktop, processor, graphics card, memory, screen resolutions). None of this names you, but together these details can identify this computer.",
+    "uploadSend": "Send report",
+    "uploadSending": "Sending…",
+    "uploadDone": "Report sent. Thank you!",
+    "uploadFailed": "The report could not be sent. Check your connection and try again; it stays on this computer."
   }
 }

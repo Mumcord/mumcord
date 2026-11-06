@@ -34,6 +34,7 @@ export function useCrashReports() {
 
   return {
     reports,
+    reload,
     read: (id: string) => getApi().crashRead(id),
     remove: async (id: string) => {
       await getApi().crashDelete(id);

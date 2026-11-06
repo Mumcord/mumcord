@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type CrashReport } from "../../api";
 import { CrashDialog } from "../settings/crash/CrashReportsCard";
+import { UploadDialog } from "../settings/crash/UploadDialog";
 import { kindKey } from "../settings/crash/useCrashReports";
 import "../settings/crash/crash.css";
 
@@ -12,6 +13,7 @@ export function CrashNotice() {
   const { t } = useTranslation("settings");
   const [report, setReport] = useState<CrashReport | null>(null);
   const [status, setStatus] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -32,6 +34,20 @@ export function CrashNotice() {
   }, []);
 
   if (report === null) return null;
+  if (uploading) {
+    return (
+      <UploadDialog
+        report={report}
+        onClose={() => {
+          setUploading(false);
+        }}
+        onSent={() => {
+          setUploading(false);
+          setStatus({ kind: "success", text: t("crashReports.uploadDone") });
+        }}
+      />
+    );
+  }
   const fail = (what: string) => (error: unknown) => {
     console.error(`${what} failed`, error);
     setStatus({ kind: "error", text: t("crashReports.actionFailed") });
@@ -67,6 +83,15 @@ export function CrashNotice() {
             }}
           >
             {t("crashReports.reportBug")}
+          </button>
+          <button
+            type="button"
+            className="settings-button"
+            onClick={() => {
+              setUploading(true);
+            }}
+          >
+            {t("crashReports.upload")}
           </button>
           <button
             type="button"

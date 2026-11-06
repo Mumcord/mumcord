@@ -3449,6 +3449,18 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     crashExport: () => Promise.resolve(null),
+    crashUpload: (id: string) => {
+      const report = crashReports.find((r) => r.id === id);
+      if (report !== undefined) report.uploaded = true;
+      return Promise.resolve(null);
+    },
+    crashUploadPreview: (id: string, comment: string) => {
+      const report = crashReports.find((r) => r.id === id);
+      const base = `Mumcord crash report\nversion: ${report?.version ?? ""}\n`;
+      return Promise.resolve(
+        comment.trim() === "" ? base : `${base}\ncomment:\n${comment.trim()}\n`,
+      );
+    },
     crashOpenFolder: () => Promise.resolve(null),
     logOpenFolder: () => Promise.resolve(null),
     logText: (whole: boolean) =>
