@@ -533,7 +533,9 @@ async function sidePanelScreen(theme: Theme): Promise<void> {
   await expectFocusSomewhere("after closing the side panel's options");
 
   const handle = $(`.resize-handle[role='separator'][aria-label='Resize ${SURFACE} side panel']`);
-  await tabToEl(handle, "the side panel's resize handle");
+  // The handle sits just before the panel, whose page (about 40 probe buttons) is the last stop of
+  // the window: Shift+Tab from the options button reaches it directly.
+  await tabToEl(handle, "the side panel's resize handle", true);
   const width = Number(await handle.getAttribute("aria-valuenow"));
   await browser.keys("ArrowLeft");
   await browser.waitUntil(async () => Number(await handle.getAttribute("aria-valuenow")) !== width, {
@@ -581,13 +583,22 @@ async function dialogScreen(theme: Theme): Promise<void> {
       throw new Error(`Shift+Tab left the web dialog: ${JSON.stringify(await focus())}`);
     }
   }
-  await tabToEl(dialog.$(`button[aria-label='Close ${SURFACE}']`), "the dialog's close button", true, 20);
+  // Back through the page (about 40 probe buttons) to the close button above it.
+  await tabToEl(dialog.$(`button[aria-label='Close ${SURFACE}']`), "the dialog's close button", true, 60);
   await browser.keys("Escape");
   await dialog.waitForExist({ reverse: true, timeout: 10_000 });
   await browser.waitUntil(() => opener.isFocused(), {
     timeout: 5_000,
     timeoutMsg: "closing the web dialog did not return focus to Open dialog",
   });
+}
+
+/** A fresh connect is read-only (AC-1.35); join, because a stage activity needs a joined channel. */
+async function joinChannel(): Promise<void> {
+  const join = $(".userpanel-readonly__join");
+  await join.waitForClickable({ timeout: 15_000 });
+  await join.click();
+  await $(".userpanel-readonly").waitForExist({ reverse: true, timeout: 15_000 });
 }
 
 // ---------------------------------------------------------------- the spec
@@ -604,11 +615,7 @@ describe("plugins 1.1: keyboard and themes over the new plugin UI (AC-9.39)", fu
     await app.restart({ env: themeEnv("light") });
     await finishWizard("Alice");
     await addFirstServer(testenv.ports.v15);
-    // A fresh connect is read-only (AC-1.35); join so the Apps menu shows.
-    const join = $(".userpanel-readonly__join");
-    await join.waitForClickable({ timeout: 15_000 });
-    await join.click();
-    await $(".userpanel-readonly").waitForExist({ reverse: true, timeout: 15_000 });
+    await joinChannel();
     // The fixture repository is plain http on localhost, which only Developer mode accepts.
     await openSettingsGroup("Advanced & Developer");
     const developer = $("//input[@role='switch'][@id=//label[.='Developer mode']/@for]");
@@ -635,6 +642,7 @@ describe("plugins 1.1: keyboard and themes over the new plugin UI (AC-9.39)", fu
       if (theme === "dark") {
         await app.restart({ env: themeEnv("dark") });
         await reconnectSaved();
+        await joinChannel();
         await waitTheme("dark");
       }
       await settingsScreens(theme);

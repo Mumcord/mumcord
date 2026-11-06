@@ -183,7 +183,12 @@ function SealedFrame(props: FrameProps) {
       place,
       gestureKey,
       frame: () => frame.current?.contentWindow ?? null,
-      focusApp: () => wrapper.current?.focus(),
+      focusApp: () => {
+        // WebKit keeps sending keys to the page after a click inside it, even once the wrapper
+        // holds DOM focus; focusing the app's window first takes the keyboard back (FR-9.41).
+        window.focus();
+        wrapper.current?.focus();
+      },
       callbacks,
       watch,
     });
