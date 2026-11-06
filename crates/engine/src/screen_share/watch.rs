@@ -600,17 +600,20 @@ mod tests {
             .await
             .expect("the first request");
         let asked = lock(&control.asked).expect("waiting for a keyframe");
-        let notified = |control: &Control| {
-            let wait = control.keyframe.notified();
-            futures_util::FutureExt::now_or_never(wait).is_some()
-        };
+        // The clock is paused, so the timeout only expires once nothing else can run: a stored
+        // request answers at once, a missing one times out.
+        async fn notified(control: &Control) -> bool {
+            tokio::time::timeout(Duration::from_millis(1), control.keyframe.notified())
+                .await
+                .is_ok()
+        }
         control.frame_arrived(false, asked + Duration::from_secs(1));
-        assert!(!notified(&control), "not before the retry time");
+        assert!(!notified(&control).await, "not before the retry time");
         control.frame_arrived(false, asked + KEYFRAME_RETRY);
-        assert!(notified(&control), "asked again");
+        assert!(notified(&control).await, "asked again");
         control.frame_arrived(true, asked + KEYFRAME_RETRY * 2);
         control.frame_arrived(false, asked + KEYFRAME_RETRY * 4);
-        assert!(!notified(&control), "the keyframe came");
+        assert!(!notified(&control).await, "the keyframe came");
     }
 
     struct Pictures(Mutex<mpsc::Sender<(Codec, u32, u32)>>);
