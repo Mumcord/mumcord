@@ -200,14 +200,16 @@ pub trait PluginIo: Send + Sync + Debug {
     fn relay_status(&self, _plugin: &str) -> RelayStatus {
         RelayStatus::NoRelay
     }
-    /// `relay.send-channel` / `relay.send-direct`: the caller checked `peers.relay` and the
-    /// 64 KiB limit. Checks reach, the plugin's rate and the path (relay or Mumble fallback).
+    /// `relay.send-channel` / `relay.send-direct`: the caller checked the 64 KiB limit;
+    /// `permitted` tells whether the plugin holds `peers.relay`. Checks reach, the plugin's rate
+    /// and the path (relay or Mumble fallback).
     fn relay_send(
         &self,
         _plugin: &str,
         _target: crate::messaging::Target,
         _data: Vec<u8>,
         _fallback: bool,
+        _permitted: bool,
     ) -> Result<(), RelaySendError> {
         Err(RelaySendError::Unavailable)
     }
