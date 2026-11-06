@@ -4194,6 +4194,7 @@ dependencies = [
  "html5ever 0.40.1",
  "image",
  "lewton",
+ "libc",
  "mumbot",
  "mumcord-audio",
  "mumcord-camera",

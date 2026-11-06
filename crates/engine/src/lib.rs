@@ -8,6 +8,7 @@ mod blocking;
 pub mod cache;
 pub mod camera;
 pub mod chat;
+pub mod crash;
 pub mod diag;
 pub mod files;
 pub mod follow;
