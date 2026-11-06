@@ -703,7 +703,10 @@ impl Engine {
             let link = p2p
                 .broadcast(&ann, &token, BindRole::Subscriber)
                 .await
-                .map_err(|_| "the relay refused the bind")?;
+                .map_err(|e| {
+                    tracing::info!(error = %e, "camera bind refused");
+                    "the relay refused the bind"
+                })?;
             Ok::<_, &'static str>((me, hash, link))
         }
         .await;
