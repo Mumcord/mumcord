@@ -1261,6 +1261,20 @@
     "copyForBug": "Skopiuj do zgłoszenia błędu",
     "noticeCopied": "Skopiowano. Wklej do zgłoszenia błędu.",
     "actionFailed": "To się nie udało. Spróbuj ponownie lub otwórz folder.",
-    "reportText": "Tekst raportu"
+    "reportText": "Tekst raportu",
+    "upload": "Prześlij…",
+    "uploadLabel": "Prześlij raport z {{when}} zespołowi Mumcord",
+    "uploaded": "Przesłano",
+    "uploadTitle": "Wysłać raport o awarii zespołowi Mumcord?",
+    "uploadWhat": "Co zostanie wysłane",
+    "uploadComment": "Co robiłeś(-aś)? (opcjonalnie)",
+    "uploadCommentPlaceholder": "Na przykład: oglądałem udostępniony ekran, gdy aplikacja się zamknęła.",
+    "uploadWhere": "Wysyłane na crash.mumcord.app szyfrowanym połączeniem. Przechowywane przez 90 dni.",
+    "uploadSharedLabel": "Udostępniane:",
+    "uploadShared": "wersja Mumcorda, co poszło nie tak, jakie funkcje były używane, ostatnie wiersze dziennika oraz dane Twojego systemu (system operacyjny, jądro, pulpit, procesor, karta graficzna, pamięć, rozdzielczości ekranów). Żadne z nich nie podaje Twojego imienia i nazwiska, ale razem te dane mogą zidentyfikować ten komputer.",
+    "uploadSend": "Wyślij raport",
+    "uploadSending": "Wysyłanie…",
+    "uploadDone": "Raport wysłany. Dziękujemy!",
+    "uploadFailed": "Nie udało się wysłać raportu. Sprawdź połączenie i spróbuj ponownie; raport pozostaje na tym komputerze."
   }
 }

@@ -1251,6 +1251,20 @@
     "copyForBug": "Copia per una segnalazione di bug",
     "noticeCopied": "Copiato. Incollalo nella segnalazione di bug.",
     "actionFailed": "Non ha funzionato. Riprova o apri la cartella.",
-    "reportText": "Testo del rapporto"
+    "reportText": "Testo del rapporto",
+    "upload": "Carica…",
+    "uploadLabel": "Carica la segnalazione del {{when}} per il team di Mumcord",
+    "uploaded": "Caricata",
+    "uploadTitle": "Inviare la segnalazione di arresto anomalo al team di Mumcord?",
+    "uploadWhat": "Cosa verrà inviato",
+    "uploadComment": "Cosa stavi facendo? (facoltativo)",
+    "uploadCommentPlaceholder": "Per esempio: stavo guardando uno schermo condiviso quando l'app si è chiusa.",
+    "uploadWhere": "Inviata a crash.mumcord.app tramite una connessione cifrata. Conservata per 90 giorni.",
+    "uploadSharedLabel": "Condiviso:",
+    "uploadShared": "la versione di Mumcord, cosa è andato storto, quali funzioni erano in uso, le ultime righe del registro e i dettagli del tuo sistema (sistema operativo, kernel, desktop, processore, scheda grafica, memoria, risoluzioni dello schermo). Nulla di tutto ciò riporta il tuo nome, ma insieme questi dettagli possono identificare questo computer.",
+    "uploadSend": "Invia segnalazione",
+    "uploadSending": "Invio in corso…",
+    "uploadDone": "Segnalazione inviata. Grazie!",
+    "uploadFailed": "Impossibile inviare la segnalazione. Controlla la connessione e riprova; resta su questo computer."
   }
 }

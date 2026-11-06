@@ -1251,6 +1251,20 @@
     "copyForBug": "Copier pour un signalement de bug",
     "noticeCopied": "Copié. Collez-le dans le signalement de bug.",
     "actionFailed": "Cela n'a pas fonctionné. Réessayez ou ouvrez le dossier.",
-    "reportText": "Texte du rapport"
+    "reportText": "Texte du rapport",
+    "upload": "Envoyer…",
+    "uploadLabel": "Envoyer le rapport du {{when}} à l'équipe Mumcord",
+    "uploaded": "Envoyé",
+    "uploadTitle": "Envoyer le rapport de plantage à l'équipe Mumcord ?",
+    "uploadWhat": "Ce qui sera envoyé",
+    "uploadComment": "Que faisiez-vous ? (facultatif)",
+    "uploadCommentPlaceholder": "Par exemple : je regardais un écran partagé quand l'application s'est fermée.",
+    "uploadWhere": "Envoyé à crash.mumcord.app par une connexion chiffrée. Conservé 90 jours.",
+    "uploadSharedLabel": "Partagé :",
+    "uploadShared": "la version de Mumcord, ce qui s'est mal passé, les fonctionnalités utilisées, les dernières lignes du journal et les détails de votre système (système d'exploitation, noyau, bureau, processeur, carte graphique, mémoire, résolutions d'écran). Rien de tout cela ne vous nomme, mais ensemble, ces détails peuvent identifier cet ordinateur.",
+    "uploadSend": "Envoyer le rapport",
+    "uploadSending": "Envoi…",
+    "uploadDone": "Rapport envoyé. Merci !",
+    "uploadFailed": "Le rapport n'a pas pu être envoyé. Vérifiez votre connexion et réessayez ; il reste sur cet ordinateur."
   }
 }

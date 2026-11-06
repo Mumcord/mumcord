@@ -1241,6 +1241,20 @@
     "copyForBug": "Für eine Fehlermeldung kopieren",
     "noticeCopied": "Kopiert. Füge es in die Fehlermeldung ein.",
     "actionFailed": "Das hat nicht geklappt. Versuche es erneut oder öffne den Ordner.",
-    "reportText": "Berichtstext"
+    "reportText": "Berichtstext",
+    "upload": "Hochladen…",
+    "uploadLabel": "Bericht vom {{when}} an das Mumcord-Team hochladen",
+    "uploaded": "Hochgeladen",
+    "uploadTitle": "Absturzbericht an das Mumcord-Team senden?",
+    "uploadWhat": "Was gesendet wird",
+    "uploadComment": "Was hast du gerade gemacht? (optional)",
+    "uploadCommentPlaceholder": "Zum Beispiel: Ich habe einen geteilten Bildschirm angesehen, als die App beendet wurde.",
+    "uploadWhere": "Wird verschlüsselt an crash.mumcord.app gesendet. Wird 90 Tage aufbewahrt.",
+    "uploadSharedLabel": "Geteilt:",
+    "uploadShared": "die Mumcord-Version, was schiefgelaufen ist, welche Funktionen genutzt wurden, die letzten Protokollzeilen und deine Systemdetails (Betriebssystem, Kernel, Desktop, Prozessor, Grafikkarte, Arbeitsspeicher, Bildschirmauflösungen). Nichts davon nennt deinen Namen, aber zusammen können diese Angaben diesen Computer identifizieren.",
+    "uploadSend": "Bericht senden",
+    "uploadSending": "Wird gesendet…",
+    "uploadDone": "Bericht gesendet. Danke!",
+    "uploadFailed": "Der Bericht konnte nicht gesendet werden. Prüfe deine Verbindung und versuche es erneut; er bleibt auf diesem Computer."
   }
 }

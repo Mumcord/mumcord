@@ -1241,6 +1241,20 @@
     "copyForBug": "Kopiér til en fejlrapport",
     "noticeCopied": "Kopieret. Indsæt det i fejlrapporten.",
     "actionFailed": "Det virkede ikke. Prøv igen, eller åbn mappen.",
-    "reportText": "Rapporttekst"
+    "reportText": "Rapporttekst",
+    "upload": "Upload…",
+    "uploadLabel": "Upload rapporten fra {{when}} til Mumcord-teamet",
+    "uploaded": "Uploadet",
+    "uploadTitle": "Send nedbrudsrapport til Mumcord-teamet?",
+    "uploadWhat": "Hvad der sendes",
+    "uploadComment": "Hvad lavede du? (valgfrit)",
+    "uploadCommentPlaceholder": "For eksempel: Jeg så en delt skærm, da appen lukkede.",
+    "uploadWhere": "Sendes til crash.mumcord.app over en krypteret forbindelse. Gemmes i 90 dage.",
+    "uploadSharedLabel": "Delt:",
+    "uploadShared": "Mumcord-versionen, hvad der gik galt, hvilke funktioner der var i brug, de sidste logliner og dine systemoplysninger (operativsystem, kerne, skrivebord, processor, grafikkort, hukommelse, skærmopløsninger). Intet af dette nævner dit navn, men tilsammen kan oplysningerne identificere denne computer.",
+    "uploadSend": "Send rapport",
+    "uploadSending": "Sender…",
+    "uploadDone": "Rapporten er sendt. Tak!",
+    "uploadFailed": "Rapporten kunne ikke sendes. Tjek din forbindelse og prøv igen; den bliver på denne computer."
   }
 }

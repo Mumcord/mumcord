@@ -1241,6 +1241,20 @@
     "copyForBug": "Kopiera till en felrapport",
     "noticeCopied": "Kopierat. Klistra in det i felrapporten.",
     "actionFailed": "Det fungerade inte. Försök igen eller öppna mappen.",
-    "reportText": "Rapporttext"
+    "reportText": "Rapporttext",
+    "upload": "Ladda upp…",
+    "uploadLabel": "Ladda upp rapporten från {{when}} till Mumcord-teamet",
+    "uploaded": "Uppladdad",
+    "uploadTitle": "Skicka kraschrapporten till Mumcord-teamet?",
+    "uploadWhat": "Vad som skickas",
+    "uploadComment": "Vad gjorde du? (valfritt)",
+    "uploadCommentPlaceholder": "Till exempel: Jag tittade på en delad skärm när appen stängdes.",
+    "uploadWhere": "Skickas till crash.mumcord.app över en krypterad anslutning. Sparas i 90 dagar.",
+    "uploadSharedLabel": "Delas:",
+    "uploadShared": "Mumcord-versionen, vad som gick fel, vilka funktioner som användes, de sista loggraderna och dina systemuppgifter (operativsystem, kärna, skrivbord, processor, grafikkort, minne, skärmupplösningar). Inget av detta nämner ditt namn, men tillsammans kan uppgifterna identifiera den här datorn.",
+    "uploadSend": "Skicka rapport",
+    "uploadSending": "Skickar…",
+    "uploadDone": "Rapporten skickades. Tack!",
+    "uploadFailed": "Rapporten kunde inte skickas. Kontrollera anslutningen och försök igen; den ligger kvar på den här datorn."
   }
 }

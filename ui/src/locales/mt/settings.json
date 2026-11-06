@@ -1271,6 +1271,20 @@
     "copyForBug": "Ikkopja għal rapport tal-bug",
     "noticeCopied": "Ikkopjat. Waħħlu fir-rapport tal-bug.",
     "actionFailed": "Dan ma ħadimx. Erġa' pprova jew iftaħ il-folder.",
-    "reportText": "Test tar-rapport"
+    "reportText": "Test tar-rapport",
+    "upload": "Tella'…",
+    "uploadLabel": "Tella' r-rapport tal-{{when}} lit-tim ta' Mumcord",
+    "uploaded": "Mtella'",
+    "uploadTitle": "Tibgħat ir-rapport tal-ħabta lit-tim ta' Mumcord?",
+    "uploadWhat": "X'se jintbagħat",
+    "uploadComment": "X'kont qed tagħmel? (mhux obbligatorju)",
+    "uploadCommentPlaceholder": "Pereżempju: Kont qed nara skrin maqsum meta l-app magħluqa.",
+    "uploadWhere": "Jintbagħat lil crash.mumcord.app permezz ta' konnessjoni kriptata. Jinżamm għal 90 jum.",
+    "uploadSharedLabel": "Maqsum:",
+    "uploadShared": "il-verżjoni ta' Mumcord, x'żbalja, liema funzjonijiet kienu qed jintużaw, l-aħħar linji tal-log u d-dettalji tas-sistema tiegħek (sistema operattiva, kernel, desktop, proċessur, karta grafika, memorja, riżoluzzjonijiet tal-iskrins). L-ebda wieħed minn dawn ma jsemmi ismek, imma flimkien dawn id-dettalji jistgħu jidentifikaw dan il-kompjuter.",
+    "uploadSend": "Ibgħat ir-rapport",
+    "uploadSending": "Qed jintbagħat…",
+    "uploadDone": "Ir-rapport intbagħat. Grazzi!",
+    "uploadFailed": "Ir-rapport ma setax jintbagħat. Iċċekkja l-konnessjoni tiegħek u erġa' pprova; jibqa' fuq dan il-kompjuter."
   }
 }

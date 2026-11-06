@@ -1241,6 +1241,20 @@
     "copyForBug": "Másolás hibajelentéshez",
     "noticeCopied": "Másolva. Illeszd be a hibajelentésbe.",
     "actionFailed": "Ez nem sikerült. Próbáld újra, vagy nyisd meg a mappát.",
-    "reportText": "Jelentés szövege"
+    "reportText": "Jelentés szövege",
+    "upload": "Feltöltés…",
+    "uploadLabel": "A(z) {{when}} jelentés feltöltése a Mumcord csapatának",
+    "uploaded": "Feltöltve",
+    "uploadTitle": "Elküldi az összeomlási jelentést a Mumcord csapatának?",
+    "uploadWhat": "Mi lesz elküldve",
+    "uploadComment": "Mit csinált éppen? (nem kötelező)",
+    "uploadCommentPlaceholder": "Például: Egy megosztott képernyőt néztem, amikor az alkalmazás bezárult.",
+    "uploadWhere": "Titkosított kapcsolaton keresztül a crash.mumcord.app címre kerül. 90 napig őrizzük meg.",
+    "uploadSharedLabel": "Megosztott adatok:",
+    "uploadShared": "a Mumcord verziója, mi ment félre, mely funkciókat használta, a napló utolsó sorai és a rendszere adatai (operációs rendszer, kernel, asztali környezet, processzor, videokártya, memória, képernyőfelbontások). Ezek egyike sem tartalmazza a nevét, de együtt azonosíthatják ezt a számítógépet.",
+    "uploadSend": "Jelentés küldése",
+    "uploadSending": "Küldés…",
+    "uploadDone": "A jelentés elküldve. Köszönjük!",
+    "uploadFailed": "A jelentést nem sikerült elküldeni. Ellenőrizze a kapcsolatot, és próbálja újra; a jelentés ezen a számítógépen marad."
   }
 }

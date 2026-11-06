@@ -1271,6 +1271,20 @@
     "copyForBug": "Cóipeáil le haghaidh tuairisce fabht",
     "noticeCopied": "Cóipeáilte. Greamaigh sa tuairisc fabht é.",
     "actionFailed": "Níor oibrigh sé sin. Bain triail eile as nó oscail an fillteán.",
-    "reportText": "Téacs na tuairisce"
+    "reportText": "Téacs na tuairisce",
+    "upload": "Uaslódáil…",
+    "uploadLabel": "Uaslódáil an tuairisc ó {{when}} chuig foireann Mumcord",
+    "uploaded": "Uaslódáilte",
+    "uploadTitle": "An bhfuil tú ag iarraidh tuairisc tuairteála a sheoladh chuig foireann Mumcord?",
+    "uploadWhat": "Cad a sheolfar",
+    "uploadComment": "Cad a bhí ar siúl agat? (roghnach)",
+    "uploadCommentPlaceholder": "Mar shampla: Bhí mé ag féachaint ar scáileán comhroinnte nuair a dhún an aip.",
+    "uploadWhere": "Seolta chuig crash.mumcord.app thar nasc criptithe. Coinnithe ar feadh 90 lá.",
+    "uploadSharedLabel": "Comhroinnte:",
+    "uploadShared": "leagan Mumcord, cad a chuaigh i bhfeidhm, na gnéithe a bhí in úsáid, na línte deireanacha den log agus sonraí do chórais (córas oibriúcháin, eithne, deasc, próiseálaí, cárta grafaicí, cuimhne, taifeach scáileán). Ní luann aon cheann díobh d'ainm, ach le chéile is féidir leis na sonraí seo an ríomhaire seo a aithint.",
+    "uploadSend": "Seol an tuairisc",
+    "uploadSending": "Á sheoladh…",
+    "uploadDone": "Seoladh an tuairisc. Go raibh maith agat!",
+    "uploadFailed": "Níorbh fhéidir an tuairisc a sheoladh. Seiceáil do nasc agus bain triail eile as; fanann sí ar an ríomhaire seo."
   }
 }

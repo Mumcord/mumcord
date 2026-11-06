@@ -1251,6 +1251,20 @@
     "copyForBug": "Copiar para un informe de error",
     "noticeCopied": "Copiado. Pégalo en el informe de error.",
     "actionFailed": "No ha funcionado. Inténtalo de nuevo o abre la carpeta.",
-    "reportText": "Texto del informe"
+    "reportText": "Texto del informe",
+    "upload": "Subir…",
+    "uploadLabel": "Subir el informe del {{when}} al equipo de Mumcord",
+    "uploaded": "Subido",
+    "uploadTitle": "¿Enviar el informe de fallo al equipo de Mumcord?",
+    "uploadWhat": "Qué se enviará",
+    "uploadComment": "¿Qué estabas haciendo? (opcional)",
+    "uploadCommentPlaceholder": "Por ejemplo: Estaba viendo una pantalla compartida cuando se cerró la aplicación.",
+    "uploadWhere": "Se envía a crash.mumcord.app mediante una conexión cifrada. Se conserva 90 días.",
+    "uploadSharedLabel": "Se comparte:",
+    "uploadShared": "la versión de Mumcord, qué salió mal, qué funciones se estaban usando, las últimas líneas del registro y los datos de tu sistema (sistema operativo, kernel, escritorio, procesador, tarjeta gráfica, memoria, resoluciones de pantalla). Nada de esto indica tu nombre, pero en conjunto estos datos pueden identificar este equipo.",
+    "uploadSend": "Enviar informe",
+    "uploadSending": "Enviando…",
+    "uploadDone": "Informe enviado. ¡Gracias!",
+    "uploadFailed": "No se pudo enviar el informe. Comprueba tu conexión e inténtalo de nuevo; se queda en este equipo."
   }
 }

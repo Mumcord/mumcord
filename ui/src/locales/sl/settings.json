@@ -1261,6 +1261,20 @@
     "copyForBug": "Kopiraj za prijavo napake",
     "noticeCopied": "Kopirano. Prilepite v prijavo napake.",
     "actionFailed": "To ni uspelo. Poskusite znova ali odprite mapo.",
-    "reportText": "Besedilo poročila"
+    "reportText": "Besedilo poročila",
+    "upload": "Naloži …",
+    "uploadLabel": "Naloži poročilo z {{when}} ekipi Mumcord",
+    "uploaded": "Naloženo",
+    "uploadTitle": "Poslati poročilo o zrušitvi ekipi Mumcord?",
+    "uploadWhat": "Kaj bo poslano",
+    "uploadComment": "Kaj ste počeli? (neobvezno)",
+    "uploadCommentPlaceholder": "Na primer: Gledal sem deljeni zaslon, ko se je aplikacija zaprla.",
+    "uploadWhere": "Pošlje se na crash.mumcord.app prek šifrirane povezave. Hrani se 90 dni.",
+    "uploadSharedLabel": "Deljeno:",
+    "uploadShared": "različica Mumcorda, kaj je šlo narobe, katere funkcije so bile v uporabi, zadnje vrstice dnevnika in podatki o vašem sistemu (operacijski sistem, jedro, namizje, procesor, grafična kartica, pomnilnik, ločljivosti zaslonov). Nič od tega ne navaja vašega imena, vendar lahko ti podatki skupaj identificirajo ta računalnik.",
+    "uploadSend": "Pošlji poročilo",
+    "uploadSending": "Pošiljanje …",
+    "uploadDone": "Poročilo je poslano. Hvala!",
+    "uploadFailed": "Poročila ni bilo mogoče poslati. Preverite povezavo in poskusite znova; ostane v tem računalniku."
   }
 }

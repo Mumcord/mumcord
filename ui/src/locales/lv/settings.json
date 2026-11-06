@@ -1251,6 +1251,20 @@
     "copyForBug": "Kopēt kļūdas pārskatam",
     "noticeCopied": "Nokopēts. Ielīmējiet to kļūdas pārskatā.",
     "actionFailed": "Neizdevās. Mēģiniet vēlreiz vai atveriet mapi.",
-    "reportText": "Ziņojuma teksts"
+    "reportText": "Ziņojuma teksts",
+    "upload": "Augšupielādēt…",
+    "uploadLabel": "Augšupielādēt {{when}} ziņojumu Mumcord komandai",
+    "uploaded": "Augšupielādēts",
+    "uploadTitle": "Vai nosūtīt avārijas ziņojumu Mumcord komandai?",
+    "uploadWhat": "Kas tiks nosūtīts",
+    "uploadComment": "Ko jūs darījāt? (neobligāti)",
+    "uploadCommentPlaceholder": "Piemēram: skatījos koplietotu ekrānu, kad lietotne aizvērās.",
+    "uploadWhere": "Tiek nosūtīts uz crash.mumcord.app, izmantojot šifrētu savienojumu. Glabā 90 dienas.",
+    "uploadSharedLabel": "Tiek kopīgots:",
+    "uploadShared": "Mumcord versija, kas noticis nepareizi, kuras funkcijas tika izmantotas, pēdējās žurnāla rindas un jūsu sistēmas dati (operētājsistēma, kodols, darbvirsma, procesors, grafikas karte, atmiņa, ekrānu izšķirtspējas). Neviens no tiem nenorāda jūsu vārdu, taču kopā šie dati var identificēt šo datoru.",
+    "uploadSend": "Nosūtīt ziņojumu",
+    "uploadSending": "Notiek sūtīšana…",
+    "uploadDone": "Ziņojums nosūtīts. Paldies!",
+    "uploadFailed": "Ziņojumu neizdevās nosūtīt. Pārbaudiet savienojumu un mēģiniet vēlreiz; tas paliek šajā datorā."
   }
 }

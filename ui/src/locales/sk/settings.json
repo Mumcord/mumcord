@@ -1261,6 +1261,20 @@
     "copyForBug": "Skopírovať pre nahlásenie chyby",
     "noticeCopied": "Skopírované. Vložte to do nahlásenia chyby.",
     "actionFailed": "Nepodarilo sa. Skúste to znova alebo otvorte priečinok.",
-    "reportText": "Text hlásenia"
+    "reportText": "Text hlásenia",
+    "upload": "Nahrať…",
+    "uploadLabel": "Nahrať hlásenie z {{when}} tímu Mumcord",
+    "uploaded": "Nahrané",
+    "uploadTitle": "Odoslať hlásenie o páde tímu Mumcord?",
+    "uploadWhat": "Čo sa odošle",
+    "uploadComment": "Čo ste robili? (voliteľné)",
+    "uploadCommentPlaceholder": "Napríklad: Pozeral som zdieľanú obrazovku, keď sa aplikácia zatvorila.",
+    "uploadWhere": "Odosiela sa na crash.mumcord.app šifrovaným spojením. Uchováva sa 90 dní.",
+    "uploadSharedLabel": "Zdieľané:",
+    "uploadShared": "verzia Mumcordu, čo sa pokazilo, ktoré funkcie sa používali, posledné riadky denníka a údaje o vašom systéme (operačný systém, jadro, pracovné prostredie, procesor, grafická karta, pamäť, rozlíšenia obrazoviek). Nič z toho neuvádza vaše meno, ale spolu môžu tieto údaje identifikovať tento počítač.",
+    "uploadSend": "Odoslať hlásenie",
+    "uploadSending": "Odosiela sa…",
+    "uploadDone": "Hlásenie bolo odoslané. Ďakujeme!",
+    "uploadFailed": "Hlásenie sa nepodarilo odoslať. Skontrolujte pripojenie a skúste to znova; zostáva v tomto počítači."
   }
 }

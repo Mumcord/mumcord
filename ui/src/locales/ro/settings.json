@@ -1251,6 +1251,20 @@
     "copyForBug": "Copiază pentru o raportare de eroare",
     "noticeCopied": "Copiat. Lipește-l în raportarea de eroare.",
     "actionFailed": "Nu a funcționat. Încearcă din nou sau deschide folderul.",
-    "reportText": "Textul raportului"
+    "reportText": "Textul raportului",
+    "upload": "Încarcă…",
+    "uploadLabel": "Încarcă raportul din {{when}} la echipa Mumcord",
+    "uploaded": "Încărcat",
+    "uploadTitle": "Trimiți raportul de blocare echipei Mumcord?",
+    "uploadWhat": "Ce va fi trimis",
+    "uploadComment": "Ce făceai? (opțional)",
+    "uploadCommentPlaceholder": "De exemplu: Mă uitam la un ecran partajat când aplicația s-a închis.",
+    "uploadWhere": "Trimis la crash.mumcord.app printr-o conexiune criptată. Păstrat 90 de zile.",
+    "uploadSharedLabel": "Partajat:",
+    "uploadShared": "versiunea Mumcord, ce a mers prost, ce funcții erau în uz, ultimele linii din jurnal și detaliile sistemului tău (sistem de operare, nucleu, mediu desktop, procesor, placă video, memorie, rezoluțiile ecranelor). Nimic din acestea nu îți menționează numele, dar împreună, aceste detalii pot identifica acest computer.",
+    "uploadSend": "Trimite raportul",
+    "uploadSending": "Se trimite…",
+    "uploadDone": "Raport trimis. Mulțumim!",
+    "uploadFailed": "Raportul nu a putut fi trimis. Verifică conexiunea și încearcă din nou; rămâne pe acest computer."
   }
 }

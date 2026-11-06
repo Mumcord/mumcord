@@ -1251,6 +1251,20 @@
     "copyForBug": "Copiar para um relatório de erro",
     "noticeCopied": "Copiado. Cole-o no relatório de erro.",
     "actionFailed": "Não funcionou. Tente novamente ou abra a pasta.",
-    "reportText": "Texto do relatório"
+    "reportText": "Texto do relatório",
+    "upload": "Enviar…",
+    "uploadLabel": "Enviar o relatório de {{when}} à equipa do Mumcord",
+    "uploaded": "Enviado",
+    "uploadTitle": "Enviar o relatório de falha à equipa do Mumcord?",
+    "uploadWhat": "O que será enviado",
+    "uploadComment": "O que estava a fazer? (opcional)",
+    "uploadCommentPlaceholder": "Por exemplo: Estava a ver um ecrã partilhado quando a aplicação fechou.",
+    "uploadWhere": "Enviado para crash.mumcord.app através de uma ligação cifrada. Guardado durante 90 dias.",
+    "uploadSharedLabel": "Partilhado:",
+    "uploadShared": "a versão do Mumcord, o que correu mal, que funcionalidades estavam em uso, as últimas linhas do registo e os detalhes do seu sistema (sistema operativo, kernel, ambiente de trabalho, processador, placa gráfica, memória, resoluções de ecrã). Nada disto indica o seu nome, mas, em conjunto, estes detalhes podem identificar este computador.",
+    "uploadSend": "Enviar relatório",
+    "uploadSending": "A enviar…",
+    "uploadDone": "Relatório enviado. Obrigado!",
+    "uploadFailed": "Não foi possível enviar o relatório. Verifique a ligação e tente novamente; ele permanece neste computador."
   }
 }

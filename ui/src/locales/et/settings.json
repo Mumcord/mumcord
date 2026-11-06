@@ -1241,6 +1241,20 @@
     "copyForBug": "Kopeeri veateate jaoks",
     "noticeCopied": "Kopeeritud. Kleebi see veateatesse.",
     "actionFailed": "See ei õnnestunud. Proovi uuesti või ava kaust.",
-    "reportText": "Aruande tekst"
+    "reportText": "Aruande tekst",
+    "upload": "Laadi üles…",
+    "uploadLabel": "Laadi {{when}} aruanne Mumcordi meeskonnale üles",
+    "uploaded": "Üles laaditud",
+    "uploadTitle": "Kas saata kokkuvarisemise aruanne Mumcordi meeskonnale?",
+    "uploadWhat": "Mida saadetakse",
+    "uploadComment": "Mida sa tegid? (valikuline)",
+    "uploadCommentPlaceholder": "Näiteks: Vaatasin jagatud ekraani, kui rakendus sulgus.",
+    "uploadWhere": "Saadetakse krüpteeritud ühenduse kaudu aadressile crash.mumcord.app. Säilitatakse 90 päeva.",
+    "uploadSharedLabel": "Jagatakse:",
+    "uploadShared": "Mumcordi versioon, mis valesti läks, milliseid funktsioone kasutati, viimased logiread ja sinu süsteemi andmed (operatsioonisüsteem, tuum, töölaud, protsessor, graafikakaart, mälu, ekraanide eraldusvõimed). Mitte ükski neist ei nimeta sind, kuid koos võivad need andmed seda arvutit tuvastada.",
+    "uploadSend": "Saada aruanne",
+    "uploadSending": "Saatmine…",
+    "uploadDone": "Aruanne saadetud. Aitäh!",
+    "uploadFailed": "Aruannet ei õnnestunud saata. Kontrolli ühendust ja proovi uuesti; aruanne jääb sellesse arvutisse."
   }
 }

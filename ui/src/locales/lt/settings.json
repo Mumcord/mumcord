@@ -1261,6 +1261,20 @@
     "copyForBug": "Kopijuoti klaidos pranešimui",
     "noticeCopied": "Nukopijuota. Įklijuokite į klaidos pranešimą.",
     "actionFailed": "Nepavyko. Bandykite dar kartą arba atidarykite aplanką.",
-    "reportText": "Ataskaitos tekstas"
+    "reportText": "Ataskaitos tekstas",
+    "upload": "Įkelti…",
+    "uploadLabel": "Įkelti {{when}} ataskaitą Mumcord komandai",
+    "uploaded": "Įkelta",
+    "uploadTitle": "Siųsti strigties ataskaitą Mumcord komandai?",
+    "uploadWhat": "Kas bus išsiųsta",
+    "uploadComment": "Ką darėte? (neprivaloma)",
+    "uploadCommentPlaceholder": "Pavyzdžiui: žiūrėjau bendrinamą ekraną, kai programa užsidarė.",
+    "uploadWhere": "Siunčiama į crash.mumcord.app šifruotu ryšiu. Saugoma 90 dienų.",
+    "uploadSharedLabel": "Bendrinama:",
+    "uploadShared": "Mumcord versija, kas nutiko, kokios funkcijos buvo naudojamos, paskutinės žurnalo eilutės ir jūsų sistemos duomenys (operacinė sistema, branduolys, darbalaukis, procesorius, vaizdo plokštė, atmintis, ekranų raiška). Nė vienas jų nenurodo jūsų vardo, bet kartu šie duomenys gali identifikuoti šį kompiuterį.",
+    "uploadSend": "Siųsti ataskaitą",
+    "uploadSending": "Siunčiama…",
+    "uploadDone": "Ataskaita išsiųsta. Ačiū!",
+    "uploadFailed": "Ataskaitos išsiųsti nepavyko. Patikrinkite ryšį ir bandykite dar kartą; ji lieka šiame kompiuteryje."
   }
 }

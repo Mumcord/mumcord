@@ -1241,6 +1241,20 @@
     "copyForBug": "Kopioi virheilmoitusta varten",
     "noticeCopied": "Kopioitu. Liitä se virheilmoitukseen.",
     "actionFailed": "Se ei onnistunut. Yritä uudelleen tai avaa kansio.",
-    "reportText": "Raportin teksti"
+    "reportText": "Raportin teksti",
+    "upload": "Lähetä…",
+    "uploadLabel": "Lähetä raportti ajalta {{when}} Mumcord-tiimille",
+    "uploaded": "Lähetetty",
+    "uploadTitle": "Lähetetäänkö kaatumisraportti Mumcord-tiimille?",
+    "uploadWhat": "Mitä lähetetään",
+    "uploadComment": "Mitä olit tekemässä? (valinnainen)",
+    "uploadCommentPlaceholder": "Esimerkiksi: Katsoin jaettua näyttöä, kun sovellus sulkeutui.",
+    "uploadWhere": "Lähetetään osoitteeseen crash.mumcord.app salatun yhteyden kautta. Säilytetään 90 päivää.",
+    "uploadSharedLabel": "Jaetaan:",
+    "uploadShared": "Mumcordin versio, mikä meni pieleen, mitä toimintoja oli käytössä, lokin viimeiset rivit ja järjestelmäsi tiedot (käyttöjärjestelmä, ydin, työpöytä, suoritin, näytönohjain, muisti, näyttöjen tarkkuudet). Mikään näistä ei kerro nimeäsi, mutta yhdessä nämä tiedot voivat tunnistaa tämän tietokoneen.",
+    "uploadSend": "Lähetä raportti",
+    "uploadSending": "Lähetetään…",
+    "uploadDone": "Raportti lähetetty. Kiitos!",
+    "uploadFailed": "Raporttia ei voitu lähettää. Tarkista yhteytesi ja yritä uudelleen; raportti säilyy tällä tietokoneella."
   }
 }

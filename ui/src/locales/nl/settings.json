@@ -1241,6 +1241,20 @@
     "copyForBug": "Kopiëren voor een bugmelding",
     "noticeCopied": "Gekopieerd. Plak het in de bugmelding.",
     "actionFailed": "Dat is niet gelukt. Probeer het opnieuw of open de map.",
-    "reportText": "Rapporttekst"
+    "reportText": "Rapporttekst",
+    "upload": "Uploaden…",
+    "uploadLabel": "Rapport van {{when}} uploaden naar het Mumcord-team",
+    "uploaded": "Geüpload",
+    "uploadTitle": "Crashrapport naar het Mumcord-team sturen?",
+    "uploadWhat": "Wat wordt verzonden",
+    "uploadComment": "Wat was je aan het doen? (optioneel)",
+    "uploadCommentPlaceholder": "Bijvoorbeeld: ik keek naar een gedeeld scherm toen de app sloot.",
+    "uploadWhere": "Verzonden naar crash.mumcord.app via een versleutelde verbinding. 90 dagen bewaard.",
+    "uploadSharedLabel": "Gedeeld:",
+    "uploadShared": "de Mumcord-versie, wat er misging, welke functies in gebruik waren, de laatste logregels en je systeemgegevens (besturingssysteem, kernel, desktop, processor, videokaart, geheugen, schermresoluties). Niets hiervan noemt je naam, maar samen kunnen deze gegevens deze computer identificeren.",
+    "uploadSend": "Rapport verzenden",
+    "uploadSending": "Verzenden…",
+    "uploadDone": "Rapport verzonden. Bedankt!",
+    "uploadFailed": "Het rapport kon niet worden verzonden. Controleer je verbinding en probeer het opnieuw; het blijft op deze computer."
   }
 }
