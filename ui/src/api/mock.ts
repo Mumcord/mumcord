@@ -1020,7 +1020,8 @@ const DEMO_CRASH_REPORTS: CrashReport[] = [
     version: "0.7.0",
     kind: "panic",
     signal: null,
-    cause: "decoder returned no frame for a keyframe at crates/engine/src/screen_share/watch.rs:412",
+    cause:
+      "decoder returned no frame for a keyframe at crates/engine/src/screen_share/watch.rs:412",
     uploaded: true,
   },
 ];
