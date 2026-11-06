@@ -77,10 +77,18 @@ let state:
   | undefined;
 let current: PluginFixtures = {};
 
-/** The CLI: `MUMCORD_PLUGIN_CLI`, else the debug build (built on first use). */
+/**
+ * The CLI: `MUMCORD_PLUGIN_CLI`, else the one the plugin packages ship (CI shards run in an image
+ * without Rust, #562), else the debug build (built on first use).
+ */
 async function cliPath(): Promise<string> {
   const given = process.env.MUMCORD_PLUGIN_CLI;
   if (given !== undefined && given !== "") return given;
+  const packages = process.env.MUMCORD_E2E_PLUGIN_PACKAGES;
+  if (packages !== undefined && packages !== "") {
+    const shipped = join(packages, "bin", "mumcord-plugin");
+    if (existsSync(shipped)) return shipped;
+  }
   const target = process.env.CARGO_TARGET_DIR ?? join(repoRoot, "target");
   const path = join(target, "debug", "mumcord-plugin");
   if (!existsSync(path)) {
