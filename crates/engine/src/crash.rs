@@ -547,7 +547,9 @@ pub fn export(dir: &Path, ids: &[String], dest: &Path) -> io::Result<()> {
     Ok(())
 }
 
-/// Reports not shown in the crash notice yet; they count as shown afterwards.
+/// Crashes the notice has not told about yet; all reports count as shown afterwards. An
+/// unexpected exit without a signal (killed, power loss) is listed in Settings but brings no
+/// notice: it is mostly not Mumcord's fault, and a notice after every forced quit would mislead.
 pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
     let seen_path = dir.join(SEEN);
     let seen = fs::read_to_string(&seen_path).unwrap_or_default();
@@ -555,6 +557,7 @@ pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
     let unseen: Vec<CrashSummary> = all
         .iter()
         .filter(|s| !seen.lines().any(|l| l == s.id))
+        .filter(|s| s.kind != CrashKind::Unexpected)
         .cloned()
         .collect();
     let ids: Vec<&str> = all.iter().map(|s| s.id.as_str()).collect();
@@ -576,6 +579,24 @@ mod native {
     pub const MAX_FRAMES: usize = 64;
     static MARKER_FD: AtomicI32 = AtomicI32::new(-1);
     static MAPS_FD: AtomicI32 = AtomicI32::new(-1);
+    static MARKER_PATH: std::sync::OnceLock<std::ffi::CString> = std::sync::OnceLock::new();
+    /// Asked to quit (the system shuts down, the session ends, Ctrl+C): not a crash.
+    const QUIT_SIGNALS: [libc::c_int; 3] = [libc::SIGTERM, libc::SIGINT, libc::SIGHUP];
+
+    /// A quit request: the run ends on purpose, so its marker goes and the next start reports
+    /// nothing; then the default action ends the process as before.
+    extern "C" fn quit(signal: libc::c_int) {
+        if let Some(path) = MARKER_PATH.get() {
+            // SAFETY: unlink(2) is async-signal-safe; the path was set before the handler.
+            unsafe {
+                libc::unlink(path.as_ptr());
+            }
+        }
+        // SAFETY: raise(3) is async-signal-safe; SA_RESETHAND restored the default action.
+        unsafe {
+            libc::raise(signal);
+        }
+    }
     const SIGNALS: [(libc::c_int, &[u8]); 5] = [
         (libc::SIGSEGV, b"SIGSEGV"),
         (libc::SIGILL, b"SIGILL"),
@@ -588,6 +609,19 @@ mod native {
         let Ok(file) = std::fs::OpenOptions::new().write(true).open(marker) else {
             return;
         };
+        if let Ok(path) = std::ffi::CString::new(marker.as_os_str().as_encoded_bytes()) {
+            let _ = MARKER_PATH.set(path);
+        }
+        for signal in QUIT_SIGNALS {
+            // SAFETY: as below; the handler only calls unlink and raise.
+            unsafe {
+                let mut action: libc::sigaction = std::mem::zeroed();
+                action.sa_sigaction = quit as extern "C" fn(libc::c_int) as libc::sighandler_t;
+                action.sa_flags = libc::SA_RESETHAND;
+                libc::sigemptyset(&mut action.sa_mask);
+                libc::sigaction(signal, &action, std::ptr::null_mut());
+            }
+        }
         MARKER_FD.store(file.into_raw_fd(), Ordering::Release);
         if let Ok(file) = std::fs::File::create(maps) {
             MAPS_FD.store(file.into_raw_fd(), Ordering::Release);
@@ -971,6 +1005,14 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         assert!(read(dir.path(), "../secret.txt").is_err());
         assert!(delete(dir.path(), "running").is_err());
+    }
+
+    #[test]
+    fn an_unexpected_exit_is_listed_but_brings_no_notice() {
+        let dir = tempfile::tempdir().unwrap();
+        test_report(dir.path(), CrashKind::Unexpected, "closed", &[]).unwrap();
+        assert!(take_unseen(dir.path()).is_empty());
+        assert_eq!(list(dir.path()).len(), 1);
     }
 
     #[test]
