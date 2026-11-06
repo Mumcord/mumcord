@@ -16,7 +16,7 @@ use mumcord_plugins::service::{
 };
 use mumcord_plugins::verify::IndexEntry;
 use mumcord_plugins::{Digest, Source};
-use mumcord_store::{PluginUpdates, PluginVisibility, Store};
+use mumcord_store::{NewPluginRepository, PluginUpdates, PluginVisibility, Store};
 use semver::Version;
 use serde_json::json;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -973,4 +973,56 @@ fn a_revoked_package_is_a_hard_stop() {
         service.install(&request, &v1.download),
         Err(ServiceError::Revoked(_))
     ));
+}
+
+/// The Installed list scores the version an update just installed. The update check refreshes the
+/// service's listings (not Browse's catalogue), so the lookup must use them, and a repository that
+/// is switched off lists nothing.
+#[test]
+fn the_listing_of_a_version_an_update_check_found_is_known() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let repository = fx
+        .store
+        .lock()
+        .expect("lock")
+        .add_plugin_repository(
+            &NewPluginRepository {
+                url: "https://plugins.example.test".into(),
+                name: "Test".into(),
+                public_key: key.pk.to_base64(),
+            },
+            0,
+        )
+        .expect("repository");
+    assert_eq!(
+        REPO,
+        Source::Repo {
+            repository_id: repository
+        }
+    );
+    let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
+    let v11 = Release::new("poll", "1.1.0", OK_START, PERMISSIONS, &key);
+    let (mut service, _events) = fx.service();
+    for (source, index) in &index(&[&v1]) {
+        service.note_index(*source, index).expect("browse load");
+    }
+    service
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Notify)
+        .expect("update check");
+
+    let (source, plugin) = service
+        .find_listed("poll")
+        .expect("lookup")
+        .expect("poll is listed");
+    assert_eq!(source, REPO);
+    assert!(plugin.versions.iter().any(|v| v.version == "1.1.0"));
+    assert!(service.find_listed("other").expect("lookup").is_none());
+
+    fx.store
+        .lock()
+        .expect("lock")
+        .set_plugin_repository_enabled(repository, false)
+        .expect("switch off");
+    assert!(service.find_listed("poll").expect("lookup").is_none());
 }

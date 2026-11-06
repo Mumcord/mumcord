@@ -10,7 +10,7 @@
   "categories": ["tools"],
   "icon": "assets/icon.svg",
   "permissions": {
-    "required": ["ui.panel", "ui.stage", "ui.app-menu", "peers.messages"],
+    "required": ["ui.panel", "ui.stage", "ui.app-menu", "peers.messages", "events.presence"],
     "optional": [
       {
         "id": "peers.relay",

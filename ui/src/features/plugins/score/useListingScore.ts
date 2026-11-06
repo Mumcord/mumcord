@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getApi, type PluginScored } from "../../../api";
+import type { PluginScoreSource } from "../../../bindings/commands";
 
 /** Listing scores never change while the index stays the same; keep one answer per plugin. */
 const cache = new Map<string, PluginScored | null>();
@@ -11,21 +12,23 @@ export function forgetListingScores(): void {
 
 /**
  * The listing score of an unofficial plugin, as the engine worked it out (the UI never computes
- * one). `null` while loading, and when the engine has none (e.g. a developer plugin).
+ * one); with `from = "developer"` the score of a loaded developer plugin's folder. `null` while
+ * loading, and when the engine has none.
  */
 export function useListingScore(
   id: string,
   version: string | null,
   enabled: boolean,
+  from: Extract<PluginScoreSource, "listing" | "developer"> = "listing",
 ): PluginScored | null {
-  const key = `${id}@${version ?? ""}`;
+  const key = `${from}:${id}@${version ?? ""}`;
   // Re-renders when an answer arrives; the answer itself is read from the cache.
   const [, setArrived] = useState(0);
   useEffect(() => {
     if (!enabled || cache.has(key)) return;
     let cancelled = false;
     getApi()
-      .pluginScore(id, version, "listing")
+      .pluginScore(id, version, from)
       .then(
         (result) => {
           cache.set(key, result);
@@ -41,6 +44,6 @@ export function useListingScore(
     return () => {
       cancelled = true;
     };
-  }, [id, version, key, enabled]);
+  }, [id, version, key, enabled, from]);
   return enabled ? (cache.get(key) ?? null) : null;
 }

@@ -208,6 +208,8 @@ pub enum PluginScoreSource {
     Listing,
     /// The package the install prompt downloaded and verified.
     Package,
+    /// The folder of a loaded developer plugin, for information only.
+    Developer,
 }
 
 /// The package score of the install prompt next to what the listing promised.

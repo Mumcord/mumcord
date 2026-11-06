@@ -190,6 +190,16 @@ impl Plugin for TestRelay {
                 note(format!("peer: {}", peer.name));
                 STATE.with_borrow_mut(|s| s.peer = Some((peer.session, peer.name)));
             }
+            // The peer left the channel: until a new `peer-ready`, nobody here runs this plugin.
+            Event::Left(peer) => {
+                let ours = STATE
+                    .with_borrow(|s| s.peer.as_ref().is_some_and(|(id, _)| *id == peer.session));
+                if !ours {
+                    return;
+                }
+                STATE.with_borrow_mut(|s| s.peer = None);
+                note(format!("gone: {}", peer.name));
+            }
             Event::RelayMessage((peer, data)) => match messages::decode(&data) {
                 Some(m) => {
                     let check = if m.intact { "intact" } else { "damaged" };
