@@ -77,6 +77,18 @@ async function arrowTo(name: string): Promise<void> {
   throw new Error(`the arrow keys never reached ${name}'s tile`);
 }
 
+/** From a focused tile, Shift+Tab back to the layout switch and arrow to Speaker. */
+async function speakerLayoutByKeyboard(): Promise<void> {
+  const inSwitch = () =>
+    browser.execute(
+      () => (document.activeElement?.closest("[role='radiogroup'][aria-label='Layout']") ?? null) !== null,
+    );
+  for (let i = 0; i < 20 && !(await inSwitch()); i++) await browser.keys(["Shift", "Tab"]);
+  if (!(await inSwitch())) throw new Error("Shift+Tab never reached the layout switch");
+  await browser.keys("ArrowRight");
+  await $("//span[@role='radiogroup'][@aria-label='Layout']//*[@role='radio'][normalize-space()='Speaker'][@aria-checked='true']").waitForExist({ timeout: 5_000 });
+}
+
 /** What the live regions of the window say right now. */
 function liveText(): Promise<string> {
   return browser.execute(() =>
@@ -175,11 +187,13 @@ async function switchLayoutWithoutAnimation(): Promise<void> {
       await browser.keys("Escape");
       await menu.waitForExist({ reverse: true });
 
-      // P pins: the Speaker layout with A large.
-      await arrowTo(NAMES.a);
+      // P pins, and the Speaker layout shows the pinned tile large (FR-8.64). C is pinned, so
+      // the large tile is the pin and not A, who speaks the whole time.
+      await speakerLayoutByKeyboard();
+      await tabToRoom();
+      await arrowTo(NAMES.c);
       await browser.keys("p");
-      await $("//span[@role='radiogroup'][@aria-label='Layout']//*[@role='radio'][normalize-space()='Speaker'][@aria-checked='true']").waitForExist({ timeout: 5_000 });
-      await $(`//*[contains(@class,'cam-speaker__large')]//div[contains(@class,'cam-tile')][starts-with(@aria-label,'${NAMES.a},')]`).waitForExist({ timeout: 5_000 });
+      await $(`//*[contains(@class,'cam-speaker__large')]//div[contains(@class,'cam-tile')][starts-with(@aria-label,'${NAMES.c},')]`).waitForExist({ timeout: 5_000 });
 
       // Quality → Data saver on C's tile, through the menu.
       await tabToRoom();
