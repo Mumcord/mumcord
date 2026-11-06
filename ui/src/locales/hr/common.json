@@ -35,7 +35,8 @@
     "processing": "Obrada",
     "output": "Međuspremnik zvučnika",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Zvučni server isporučuje blokove od {{value}} ms jer ih druga aplikacija zahtijeva; Mumcord ih ne može smanjiti."
   },
   "media": {
     "controls": "Kontrole playera",

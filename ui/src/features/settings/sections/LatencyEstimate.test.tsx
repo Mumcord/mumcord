@@ -14,6 +14,7 @@ const ESTIMATE: LatencyEstimate = {
   jitterUs: 10000,
   processingUs: 1100,
   outputBufferUs: 5300,
+  soundServerBlockUs: null,
   totalUs: 38000,
   otherModeTotalUs: 92000,
 };
@@ -59,5 +60,19 @@ describe("LatencyEstimate", () => {
     render(<LatencyBreakdown estimate={{ ...ESTIMATE, networkUs: null }} />);
     const bar = screen.getByRole("group", { name: /Network \(half of the ping\) not connected/ });
     expect(within(bar).getAllByRole("img")).toHaveLength(5);
+  });
+
+  it("names the block the sound server delivers instead of the buffer asked for", () => {
+    render(<LatencyBreakdown estimate={{ ...ESTIMATE, soundServerBlockUs: 21333 }} />);
+    expect(
+      screen.getByText(
+        "The sound server delivers 21.3 ms blocks because another application asks for them; Mumcord cannot make them smaller.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says nothing while the delivered block is the one asked for", () => {
+    render(<LatencyBreakdown estimate={ESTIMATE} />);
+    expect(screen.queryByText(/sound server/i)).not.toBeInTheDocument();
   });
 });

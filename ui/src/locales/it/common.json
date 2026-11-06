@@ -35,7 +35,8 @@
     "processing": "Elaborazione",
     "output": "Buffer degli altoparlanti",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Il server audio consegna blocchi da {{value}} ms perché un'altra applicazione li richiede; Mumcord non può renderli più piccoli."
   },
   "media": {
     "controls": "Comandi del lettore",

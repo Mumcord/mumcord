@@ -649,6 +649,7 @@ function mockLatencyEstimate(lowLatency: boolean): LatencyEstimate {
         jitterUs: 10000,
         processingUs: 100,
         outputBufferUs: 13667,
+        soundServerBlockUs: null,
         totalUs: 47934,
         otherModeTotalUs: 107134,
       }
@@ -661,6 +662,7 @@ function mockLatencyEstimate(lowLatency: boolean): LatencyEstimate {
         jitterUs: 20000,
         processingUs: 300,
         outputBufferUs: 40667,
+        soundServerBlockUs: null,
         totalUs: 107134,
         otherModeTotalUs: 47934,
       };

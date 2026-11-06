@@ -35,7 +35,8 @@
     "processing": "Processing",
     "output": "Speaker buffer",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "The sound server delivers {{value}} ms blocks because another application asks for them; Mumcord cannot make them smaller."
   },
   "media": {
     "controls": "Player controls",

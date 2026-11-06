@@ -35,7 +35,8 @@
     "processing": "Traitement",
     "output": "Tampon des haut-parleurs",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Le serveur audio livre des blocs de {{value}} ms parce qu'une autre application les demande ; Mumcord ne peut pas les réduire."
   },
   "media": {
     "controls": "Commandes du lecteur",

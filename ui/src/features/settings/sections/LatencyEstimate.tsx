@@ -48,28 +48,39 @@ export function LatencyBreakdown({ estimate }: { estimate: Estimate }) {
     `${part.label} ${part.us === null ? t("latency.notConnected") : ms(part.us)}`;
   const label = `${t("latency.breakdown")}: ${parts.map(describe).join(", ")}`;
   return (
-    <div className="latency-bar-row">
-      <div role="group" aria-label={label} className="latency-bar">
-        {parts.map((part) =>
-          part.us === null ? null : (
-            <span
-              key={part.key}
-              // Focusable so keyboard users get the same tooltip as on hover.
-              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-              tabIndex={0}
-              role="img"
-              aria-label={describe(part)}
-              data-tooltip={describe(part)}
-              data-tooltip-placement="bottom"
-              className={`latency-bar__segment latency-bar__segment--${part.key}`}
-              style={{ flexGrow: part.us }}
-            />
-          ),
-        )}
+    <>
+      <div className="latency-bar-row">
+        <div role="group" aria-label={label} className="latency-bar">
+          {parts.map((part) =>
+            part.us === null ? null : (
+              <span
+                key={part.key}
+                // Focusable so keyboard users get the same tooltip as on hover.
+                // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                tabIndex={0}
+                role="img"
+                aria-label={describe(part)}
+                data-tooltip={describe(part)}
+                data-tooltip-placement="bottom"
+                className={`latency-bar__segment latency-bar__segment--${part.key}`}
+                style={{ flexGrow: part.us }}
+              />
+            ),
+          )}
+        </div>
+        <span className="latency-bar__total" aria-hidden="true">
+          {t("latency.total", { value: formatMs(estimate.totalUs, i18n.language) })}
+        </span>
       </div>
-      <span className="latency-bar__total" aria-hidden="true">
-        {t("latency.total", { value: formatMs(estimate.totalUs, i18n.language) })}
-      </span>
-    </div>
+      {/* On a sound server the block is the largest request of any application on it, which no
+          client can lower, so the user sees why low-latency mode cannot be faster. */}
+      {estimate.soundServerBlockUs === null ? null : (
+        <p className="latency-note">
+          {t("latency.soundServerBlock", {
+            value: formatMs(estimate.soundServerBlockUs, i18n.language),
+          })}
+        </p>
+      )}
+    </>
   );
 }

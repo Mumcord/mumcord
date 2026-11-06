@@ -67,6 +67,7 @@
 - Screen sharing through the relay: when the server's relay offers it, your share is uploaded once and the relay sends it to every viewer, so up to the relay's limit (25 by default) can watch without costing you more upload. The picture is end-to-end encrypted, so the relay can't see it, and viewers who stop watching can't read what comes after. Viewers on older Mumcord versions still get their own copy, and if the relay goes away during a share, the first 8 viewers continue on their own copies without interruption
 - A real click or key press inside a plugin's own web page now counts as a user gesture for that plugin, so it can open its side panel, dialog or activity, save a file or post to chat right after you click in its page. Clicks or key presses that the page fakes never count.
 - Six built-in camera background images (Soft light, Library, Mountains, Studio, Night city, Beach) ship with the app for camera sharing's background effects; the privacy policy gains a camera section
+- The latency card in Settings → Audio and in the connection panel now says why the time is longer than low-latency mode asks for: when the sound server runs with blocks larger than the buffer Mumcord requested because another application needs them, the card names the block and says Mumcord cannot make it smaller. This is Linux only, where one sound server graph serves every application.
 
 ### Changed
 
