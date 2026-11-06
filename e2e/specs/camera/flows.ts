@@ -115,7 +115,10 @@ export async function serverId(): Promise<number> {
   return id;
 }
 
-/** The own camera as the engine reports it (`null` before the camera was ever used). */
+/**
+ * The own camera as the engine reports it; `null` while it is off. The "Camera stopped" reason of
+ * an off camera only goes to the UI (its notice), never to this view.
+ */
 export function cameraView(): Promise<CameraView | null> {
   return app.invoke<CameraView | null>("camera_view");
 }
@@ -156,12 +159,12 @@ export async function ownSession(): Promise<number> {
 
 /** Waits until the own camera is in `state`; returns the view. */
 export async function waitCameraState(state: CameraState, timeout = 20_000): Promise<CameraView> {
-  // A view of "off" for a camera the engine has never used.
-  let view: CameraView = { serverId: 0, state: "off", error: null, broadcast: null, viewers: [] };
+  const off: CameraView = { serverId: 0, state: "off", error: null, broadcast: null, viewers: [] };
+  let view = off;
   await browser
     .waitUntil(
       async () => {
-        view = (await cameraView()) ?? view;
+        view = (await cameraView()) ?? off;
         return view.state === state;
       },
       { timeout, interval: 100 },
