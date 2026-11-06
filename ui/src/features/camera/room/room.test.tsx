@@ -83,6 +83,19 @@ describe("camera room", () => {
     expect(mediaView().cinema).toBe("camera");
   });
 
+  it("keeps the engine's room open while it comes into the media area", async () => {
+    // Closing it on the way would leave every camera and join again, which the sender's join
+    // limit holds back for 10 s (spec 08 §6.5).
+    const setOpen = vi.spyOn(api, "cameraRoomSetOpen");
+    render(<CameraRoomSync serverId={1} />);
+    await act(async () => {
+      api.mock.setCameraRoom(1, [tile(ANNA)], true);
+      await Promise.resolve();
+    });
+    expect(mediaView().cinema).toBe("camera");
+    expect(setOpen).not.toHaveBeenCalledWith(1, false);
+  });
+
   it("shows the header, the tiles, the self-view and who has no camera", async () => {
     onAir(api);
     api.mock.setCameraRoom(1, [tile(ANNA, { fpsBadge: 7 })], true);

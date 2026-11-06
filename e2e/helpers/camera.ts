@@ -167,7 +167,7 @@ async function buttonReason(): Promise<string | null> {
 
 /** The camera entry of the composer's Apps menu (the menu must be open). */
 export function cameraMenuItem() {
-  return $("//div[contains(@class,'chat-apps__menu')]//*[contains(@class,'camera-menu-item')]");
+  return $(".chat-apps__menu .camera-menu-item");
 }
 
 /** Opens the composer's Apps menu. */
