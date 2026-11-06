@@ -36,7 +36,7 @@ import {
   turnCameraOn,
   waitCameraState,
   waitNoTile,
-  waitText,
+  waitStoppedNotice,
   waitTile,
 } from "./flows.ts";
 
@@ -122,7 +122,7 @@ const STOP_MS = 1_500;
     ]);
     await runOk("docker", ["stop", "-t", "1", relayContainer.stdout.trim()]);
     await waitCameraState("off", 60_000);
-    await waitText("Camera stopped: the relay isn't reachable");
+    await waitStoppedNotice("Camera stopped: the relay isn't reachable");
     // No pair request for a direct connection went out after the relay was gone.
     const peerRequests = (await captured()).filter(
       (p) => p.direction === "sent" && p.kind === "mumcord.peer" && (p.decoded ?? "").includes("\"pair"),

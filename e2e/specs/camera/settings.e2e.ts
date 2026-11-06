@@ -36,7 +36,7 @@ import {
   turnCameraOn,
   updateSettings,
   waitCameraState,
-  waitText,
+  waitStoppedNotice,
   waitTile,
 } from "./flows.ts";
 
@@ -265,7 +265,7 @@ async function minimiseA(): Promise<void> {
     await on("c", async () => {
       await turnCameraOn();
       await waitCameraState("off", 20_000);
-      await waitText("Camera stopped: the camera was disconnected.");
+      await waitStoppedNotice("Camera stopped: the camera was disconnected.");
     });
     await on("b", () => browser.waitUntil(async () => (await tileOf("Carol")) === undefined, {
       timeout: 15_000,

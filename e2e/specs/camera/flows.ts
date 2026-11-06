@@ -274,6 +274,16 @@ export async function waitText(text: string, timeout = 15_000): Promise<void> {
   });
 }
 
+/**
+ * Waits for the "Camera stopped: …" notice (section 5.6): an alert in the room bar or below the
+ * camera mini bar, with a Dismiss button.
+ */
+export async function waitStoppedNotice(text: string, timeout = 15_000): Promise<void> {
+  const notice = $(`//*[@role='alert'][contains(@class,'cam-stopped')][contains(., "${text}")]`);
+  await notice.waitForDisplayed({ timeout, timeoutMsg: `the notice "${text}" never showed` });
+  await notice.$(".//button[@aria-label='Dismiss']").waitForExist();
+}
+
 /** Changes settings of the current client through the settings command. */
 export async function updateSettings(patch: Record<string, unknown>): Promise<void> {
   const settings = await app.invoke<Record<string, unknown>>("settings_get");
