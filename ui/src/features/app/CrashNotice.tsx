@@ -73,7 +73,7 @@ export function CrashNotice() {
             className="settings-button settings-button--primary cr-iconbtn"
             onClick={() => {
               getApi()
-                .crashRead(report.id)
+                .crashRead(report.id, true)
                 .then((text) => getApi().copyText(text))
                 .then(() => {
                   setStatus({ kind: "success", text: t("crashReports.noticeCopied") });

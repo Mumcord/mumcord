@@ -34,7 +34,7 @@ export function useCrashReports() {
 
   return {
     reports,
-    read: (id: string) => getApi().crashRead(id),
+    read: (id: string, withSystem = true) => getApi().crashRead(id, withSystem),
     remove: async (id: string) => {
       await getApi().crashDelete(id);
       await reload();
@@ -43,7 +43,8 @@ export function useCrashReports() {
       await getApi().crashDeleteAll();
       await reload();
     },
-    exportTo: (ids: string[], path: string) => getApi().crashExport(ids, path),
+    exportTo: (ids: string[], path: string, withSystem = true) =>
+      getApi().crashExport(ids, path, withSystem),
     openFolder: () => getApi().crashOpenFolder(),
   };
 }

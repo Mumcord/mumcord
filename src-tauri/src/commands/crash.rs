@@ -105,11 +105,13 @@ pub fn crash_take_unseen() -> ApiResult<Vec<CrashReport>> {
         .collect())
 }
 
-/// The full text of one report, for the details view and "Copy".
+/// The full text of one report, for the details view and "Copy"; `with_system` false leaves
+/// out the system details (hardware, kernel, desktop, screens).
 #[tauri::command]
 #[specta::specta]
-pub fn crash_read(id: String) -> ApiResult<String> {
-    crash::read(&dirs()?.crash, &id).map_err(|e| io_error("reading the crash report failed", &e))
+pub fn crash_read(id: String, with_system: bool) -> ApiResult<String> {
+    crash::read(&dirs()?.crash, &id, with_system)
+        .map_err(|e| io_error("reading the crash report failed", &e))
 }
 
 #[tauri::command]
@@ -124,11 +126,12 @@ pub fn crash_delete_all() -> ApiResult<()> {
     crash::delete_all(&dirs()?.crash).map_err(|e| io_error("deleting crash reports failed", &e))
 }
 
-/// Saves the given reports (all when `ids` is empty) as a zip file at `path`.
+/// Saves the given reports (all when `ids` is empty) as a zip file at `path`; without the
+/// system details unless `with_system`.
 #[tauri::command]
 #[specta::specta]
-pub fn crash_export(ids: Vec<String>, path: String) -> ApiResult<()> {
-    crash::export(&dirs()?.crash, &ids, Path::new(&path))
+pub fn crash_export(ids: Vec<String>, path: String, with_system: bool) -> ApiResult<()> {
+    crash::export(&dirs()?.crash, &ids, Path::new(&path), with_system)
         .map_err(|e| io_error("exporting crash reports failed", &e))
 }
 

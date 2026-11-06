@@ -439,9 +439,40 @@ fn report_path(dir: &Path, id: &str) -> io::Result<PathBuf> {
     Ok(path)
 }
 
-/// The full text of one report.
-pub fn read(dir: &Path, id: &str) -> io::Result<String> {
-    fs::read_to_string(report_path(dir, id)?)
+/// The full text of one report; `with_system` false leaves the `system:` section out.
+pub fn read(dir: &Path, id: &str, with_system: bool) -> io::Result<String> {
+    let text = fs::read_to_string(report_path(dir, id)?)?;
+    Ok(if with_system {
+        text
+    } else {
+        without_system(&text)
+    })
+}
+
+/// The report without its `system:` section (hardware, kernel, desktop, screens), which
+/// together can identify a computer. The screens line under `running:` goes too.
+pub fn without_system(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut skipping = false;
+    for line in text.lines() {
+        if line == "system:" {
+            skipping = true;
+            continue;
+        }
+        if skipping {
+            if line.is_empty() {
+                skipping = false;
+            } else {
+                continue;
+            }
+        }
+        if line.starts_with("screens: ") {
+            continue;
+        }
+        out.push_str(line);
+        out.push('\n');
+    }
+    out
 }
 
 pub fn delete(dir: &Path, id: &str) -> io::Result<()> {
@@ -457,7 +488,7 @@ pub fn delete_all(dir: &Path) -> io::Result<()> {
 }
 
 /// Writes the given reports (all when `ids` is empty) into one zip file.
-pub fn export(dir: &Path, ids: &[String], dest: &Path) -> io::Result<()> {
+pub fn export(dir: &Path, ids: &[String], dest: &Path, with_system: bool) -> io::Result<()> {
     let paths: Vec<PathBuf> = if ids.is_empty() {
         report_files(dir)
     } else {
@@ -473,7 +504,13 @@ pub fn export(dir: &Path, ids: &[String], dest: &Path) -> io::Result<()> {
             .and_then(|n| n.to_str())
             .unwrap_or("crash.txt");
         zip.start_file(name, options).map_err(io::Error::other)?;
-        zip.write_all(&fs::read(&path)?)?;
+        let text = fs::read_to_string(&path)?;
+        let text = if with_system {
+            text
+        } else {
+            without_system(&text)
+        };
+        zip.write_all(text.as_bytes())?;
     }
     zip.finish().map_err(io::Error::other)?;
     Ok(())
@@ -822,7 +859,7 @@ mod tests {
         assert_eq!(reports.len(), 1);
         assert_eq!(reports[0].kind, CrashKind::Signal("SIGSEGV".to_owned()));
         assert_eq!(reports[0].version, "0.7.1");
-        let text = read(&dir, &reports[0].id).unwrap();
+        let text = read(&dir, &reports[0].id, true).unwrap();
         assert!(text.contains("last line"));
         assert!(text.contains("running:\ncamera: on\n"));
         assert!(text.contains("uptime: 0h 00m 42s"));
@@ -837,6 +874,16 @@ mod tests {
             context_text(&running),
             "camera: on\nscreen share: sending, AV1 1080p\n"
         );
+    }
+
+    #[test]
+    fn system_details_can_be_left_out() {
+        let text = "Mumcord crash report\nkind: panic\n\nrunning:\ncamera: on\nscreens: 2560x1440 @1x\n\nsystem:\nos: X\ncpu: Y\n\nlast log lines:\na\n";
+        let short = without_system(text);
+        assert!(!short.contains("cpu: Y"));
+        assert!(!short.contains("screens:"));
+        assert!(short.contains("camera: on"));
+        assert!(short.contains("last log lines:\na\n"));
     }
 
     #[test]
@@ -889,7 +936,7 @@ mod tests {
     #[test]
     fn ids_outside_the_folder_are_refused() {
         let dir = tempfile::tempdir().unwrap();
-        assert!(read(dir.path(), "../secret.txt").is_err());
+        assert!(read(dir.path(), "../secret.txt", true).is_err());
         assert!(delete(dir.path(), "running").is_err());
     }
 
@@ -906,7 +953,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         test_report(dir.path(), CrashKind::Panic, "boom", &[]).unwrap();
         let dest = dir.path().join("out.zip");
-        export(dir.path(), &[], &dest).unwrap();
+        export(dir.path(), &[], &dest, false).unwrap();
         let zip = zip::ZipArchive::new(fs::File::open(&dest).unwrap()).unwrap();
         assert_eq!(zip.len(), 1);
         delete_all(dir.path()).unwrap();
