@@ -872,6 +872,27 @@ impl wit::files::Host for PluginState {
     }
 }
 
+impl wit::activity::Host for PluginState {
+    fn push(&mut self, text: String, action: Option<wit::activity::Action>) -> Result<(), Error> {
+        let event = self
+            .ctx
+            .activity
+            .push(
+                &self.ctx.grants,
+                &self.id,
+                &text,
+                action
+                    .as_ref()
+                    .map(|action| (action.label.as_str(), action.id.as_str())),
+                std::time::Instant::now(),
+            )
+            .map_err(Up::up)?;
+        // The service is gone only while Mumcord shuts down.
+        let _ = self.outbox.send(event);
+        Ok(())
+    }
+}
+
 impl PluginState {
     /// Waits for the user in a host dialog (FR-9.103, FR-9.105). The plugin handles no events
     /// meanwhile; its queue stays bounded and drops the oldest, so only their count is logged.

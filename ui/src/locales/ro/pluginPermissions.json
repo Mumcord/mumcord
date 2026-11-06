@@ -36,7 +36,8 @@
     "audioEffects": "Redă sunete scurte care vin cu pluginul",
     "filesSave": "Salvează fișierele pe care le alegi",
     "chatPostImage": "Postează o imagine în chat după ce faci clic",
-    "filesImportPicture": "Deschide imaginile pe care le alegi"
+    "filesImportPicture": "Deschide imaginile pe care le alegi",
+    "activity": "Adaugă evenimentele sale în registrul de activitate"
   },
   "explanations": {
     "uiPanel": "Un mic panou al acestui plugin apare în bara de pluginuri.",
@@ -68,7 +69,8 @@
     "audioEffects": "Sunete scurte care vin cu pluginul. Le poți reduce sau dezactiva în Setări → Pluginuri.",
     "filesSave": "Mumcord te întreabă unde să salveze fiecare fișier după ce faci clic; pluginul nu îți vede niciodată dosarele.",
     "chatPostImage": "După ce faci clic în plugin, acesta poate posta o imagine pe canalul tău curent, etichetată cu numele său.",
-    "filesImportPicture": "Mumcord te lasă să alegi o imagine după ce faci clic; pluginul primește doar acea imagine, niciodată dosarele tale."
+    "filesImportPicture": "Mumcord te lasă să alegi o imagine după ce faci clic; pluginul primește doar acea imagine, niciodată dosarele tale.",
+    "activity": "Evenimentele lui apar în fila Activitate a serverului la care ești conectat, lângă ce afișează deja Mumcord acolo."
   },
   "listLabel": "Permisiuni"
 }

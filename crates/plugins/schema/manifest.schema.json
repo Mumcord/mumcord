@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Mumcord/mumcord/blob/main/crates/plugins/schema/manifest.schema.json",
   "title": "Mumcord plugin manifest",
-  "description": "manifest.json at the root of a .mcplugin package (format 1, plugin API 1.x, at most 16 KiB). Unknown fields are ignored by the app; the app's parser in crates/plugins is the reference. Rules the schema cannot express: a permission appears only once across required and optional; commands need the permission \"commands\"; triggers need the permission \"chat.triggers\" and are unique; chat_patterns need the permission \"chat.patterns\", must be anchored at the message start (^ or \\A, not in multi-line mode), must compile in Rust's regex crate within its size limits and are unique; net.hosts and the permission \"net.http\" go together; net.http and secrets are only available to official plugins; since API 1.1 each of the fields net.origins, app_menu, stage, webview and audio needs its permission (net.origins, ui.app-menu, ui.stage, ui.webview, audio.effects), and the permissions ui.stage, ui.side-panel, ui.app-menu, net.origins, peers.relay, audio.effects, files.save, chat.post-image and files.import-picture need api ^1.1; ids starting with mumcord- or core- are reserved for official plugins.",
+  "description": "manifest.json at the root of a .mcplugin package (format 1, plugin API 1.x, at most 16 KiB). Unknown fields are ignored by the app; the app's parser in crates/plugins is the reference. Rules the schema cannot express: a permission appears only once across required and optional; commands need the permission \"commands\"; triggers need the permission \"chat.triggers\" and are unique; chat_patterns need the permission \"chat.patterns\", must be anchored at the message start (^ or \\A, not in multi-line mode), must compile in Rust's regex crate within its size limits and are unique; net.hosts and the permission \"net.http\" go together; net.http and secrets are only available to official plugins; since API 1.1 each of the fields net.origins, app_menu, stage, webview and audio needs its permission (net.origins, ui.app-menu, ui.stage, ui.webview, audio.effects), and the permissions ui.stage, ui.side-panel, ui.app-menu, net.origins, peers.relay, audio.effects, files.save, chat.post-image, files.import-picture and activity need api ^1.1; ids starting with mumcord- or core- are reserved for official plugins.",
   "type": "object",
   "required": [
     "manifest",
@@ -328,7 +328,8 @@
         "audio.effects",
         "files.save",
         "chat.post-image",
-        "files.import-picture"
+        "files.import-picture",
+        "activity"
       ]
     }
   }

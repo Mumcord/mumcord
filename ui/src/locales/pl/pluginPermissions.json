@@ -36,7 +36,8 @@
     "audioEffects": "Odtwarzanie krótkich dźwięków dołączonych do wtyczki",
     "filesSave": "Zapisywanie wybranych przez Ciebie plików",
     "chatPostImage": "Wysyłanie obrazu na czat po kliknięciu",
-    "filesImportPicture": "Otwieranie wybranych przez Ciebie obrazów"
+    "filesImportPicture": "Otwieranie wybranych przez Ciebie obrazów",
+    "activity": "Dodawać własne zdarzenia do dziennika aktywności"
   },
   "explanations": {
     "uiPanel": "Mały panel tej wtyczki pojawia się na pasku wtyczek.",
@@ -68,7 +69,8 @@
     "audioEffects": "Krótkie dźwięki dołączone do wtyczki. Możesz je ściszyć lub wyciszyć w Ustawienia → Wtyczki.",
     "filesSave": "Po kliknięciu Mumcord pyta, gdzie zapisać każdy plik; wtyczka nigdy nie widzi Twoich folderów.",
     "chatPostImage": "Po kliknięciu w wtyczce może wysłać jeden obraz na Twój bieżący kanał, podpisany jej nazwą.",
-    "filesImportPicture": "Po kliknięciu Mumcord pozwala Ci wybrać obraz; wtyczka dostaje tylko ten obraz, nigdy Twoje foldery."
+    "filesImportPicture": "Po kliknięciu Mumcord pozwala Ci wybrać obraz; wtyczka dostaje tylko ten obraz, nigdy Twoje foldery.",
+    "activity": "Jej zdarzenia pojawiają się na karcie Aktywność serwera, z którym jesteś połączony, obok tego, co Mumcord już tam pokazuje."
   },
   "listLabel": "Uprawnienia"
 }

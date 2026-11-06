@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Στήλη μελών",
+    "members": "Μέλη",
+    "activity": "Δραστηριότητα"
+  },
+  "you": "Εσείς",
+  "selfName": "σου",
+  "someone": "κάποιος",
+  "verb": {
+    "connected": "συνδέθηκε",
+    "disconnected": "αποσυνδέθηκε",
+    "moved": "άλλαξε κανάλι",
+    "screenShareStarted": "ξεκίνησε κοινή χρήση οθόνης",
+    "screenShareStopped": "σταμάτησε την κοινή χρήση οθόνης",
+    "watchPartyStarted": "ξεκίνησε κοινή προβολή",
+    "watchPartyStopped": "ολοκλήρωσε την κοινή προβολή",
+    "pluginActivityStarted": "ξεκίνησε το {{plugin}}",
+    "pluginActivityStopped": "σταμάτησε το {{plugin}}",
+    "pluginEvent": "«{{text}}»"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "πρόσθετο",
+  "live": "ζωντανά",
+  "watch": "Παρακολούθηση",
+  "join": "Συμμετοχή",
+  "today": "Σήμερα",
+  "yesterday": "Χθες",
+  "empty": "Δεν υπάρχει δραστηριότητα ακόμη.",
+  "rowLabel": {
+    "screenShare": "{{action}} κοινή χρήση οθόνης {{name}}",
+    "watchParty": "{{action}} κοινή προβολή {{name}}",
+    "pluginActivity": "{{action}} {{plugin}} {{name}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Η συμμετοχή στην κοινή προβολή απέτυχε.",
+  "joinActivityFailed": "Η συμμετοχή στη δραστηριότητα του πρόσθετου απέτυχε."
+}

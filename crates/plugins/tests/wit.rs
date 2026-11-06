@@ -320,9 +320,9 @@ fn world_1_1_imports_1_0_plus_the_new_interfaces() {
     assert_eq!(
         imports,
         [
-            "app-menu", "audio", "chat", "clock", "events", "files", "http", "log", "notify",
-            "peers", "random", "relay", "secrets", "stage", "storage", "theme", "timers", "types",
-            "ui", "webview"
+            "activity", "app-menu", "audio", "chat", "clock", "events", "files", "http", "log",
+            "notify", "peers", "random", "relay", "secrets", "stage", "storage", "theme", "timers",
+            "types", "ui", "webview"
         ]
     );
     assert_eq!(exports, ["on-event", "start", "stop"]);

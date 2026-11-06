@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Liikmete veerg",
+    "members": "Liikmed",
+    "activity": "Tegevus"
+  },
+  "you": "Sina",
+  "selfName": "sinu",
+  "someone": "keegi",
+  "verb": {
+    "connected": "ühendas",
+    "disconnected": "katkestas ühenduse",
+    "moved": "vahetas kanali",
+    "screenShareStarted": "alustas ekraani jagamist",
+    "screenShareStopped": "lõpetas ekraani jagamise",
+    "watchPartyStarted": "alustas ühisvaatamist",
+    "watchPartyStopped": "lõpetas ühisvaatamise",
+    "pluginActivityStarted": "käivitas {{plugin}}",
+    "pluginActivityStopped": "lõpetas {{plugin}}",
+    "pluginEvent": "„{{text}}“"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "pistikprogramm",
+  "live": "otse",
+  "watch": "Vaata",
+  "join": "Liitu",
+  "today": "Täna",
+  "yesterday": "Eile",
+  "empty": "Tegevust pole veel.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} ekraani jagamine",
+    "watchParty": "{{action}} {{name}} ühisvaatamine",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Ühisvaatamisega liitumine ebaõnnestus.",
+  "joinActivityFailed": "Plugina tegevusega liitumine ebaõnnestus."
+}

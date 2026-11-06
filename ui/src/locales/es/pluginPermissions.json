@@ -36,7 +36,8 @@
     "audioEffects": "Reproducir sonidos breves incluidos en el plugin",
     "filesSave": "Guardar los archivos que elijas",
     "chatPostImage": "Publicar una imagen en el chat después de que hagas clic",
-    "filesImportPicture": "Abrir las imágenes que elijas"
+    "filesImportPicture": "Abrir las imágenes que elijas",
+    "activity": "Añadir sus propios eventos al registro de actividad"
   },
   "explanations": {
     "uiPanel": "Un pequeño panel de este plugin aparece en la barra de plugins.",
@@ -68,7 +69,8 @@
     "audioEffects": "Sonidos breves incluidos en el plugin. Puedes bajarles el volumen o silenciarlos en Ajustes → Plugins.",
     "filesSave": "Mumcord te pregunta dónde guardar cada archivo después de que hagas clic; el plugin nunca ve tus carpetas.",
     "chatPostImage": "Después de que hagas clic en el plugin, este puede publicar una imagen en tu canal actual, con su nombre como etiqueta.",
-    "filesImportPicture": "Mumcord te deja elegir una imagen después de que hagas clic; el plugin recibe solo esa imagen, nunca tus carpetas."
+    "filesImportPicture": "Mumcord te deja elegir una imagen después de que hagas clic; el plugin recibe solo esa imagen, nunca tus carpetas.",
+    "activity": "Sus eventos aparecen en la pestaña Actividad del servidor al que estás conectado, junto a lo que Mumcord ya muestra ahí."
   },
   "listLabel": "Permisos"
 }

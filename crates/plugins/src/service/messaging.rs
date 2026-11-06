@@ -36,6 +36,8 @@ impl PluginService {
     /// The server the user looks at changed (`None`: none). Plugins get `self-changed`.
     pub fn set_focused_server(&mut self, server: Option<ServerId>) {
         let changed = std::mem::replace(&mut self.io.peers().focused, server) != server;
+        // A push belongs to the server the user is on, so the host API needs it too.
+        self.ctx.activity.set_server(server);
         if changed {
             self.io.menu_forget_sessions(None);
             self.io.refresh_menus();

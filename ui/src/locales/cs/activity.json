@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Sloupec členů",
+    "members": "Členové",
+    "activity": "Aktivita"
+  },
+  "you": "Vy",
+  "selfName": "tvé",
+  "someone": "někdo",
+  "verb": {
+    "connected": "se připojil",
+    "disconnected": "se odpojil",
+    "moved": "změnil kanál",
+    "screenShareStarted": "začal sdílet obrazovku",
+    "screenShareStopped": "přestal sdílet obrazovku",
+    "watchPartyStarted": "začal společné sledování",
+    "watchPartyStopped": "ukončil společné sledování",
+    "pluginActivityStarted": "spustil {{plugin}}",
+    "pluginActivityStopped": "ukončil {{plugin}}",
+    "pluginEvent": "„{{text}}“"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "plugin",
+  "live": "živě",
+  "watch": "Sledovat",
+  "join": "Připojit se",
+  "today": "Dnes",
+  "yesterday": "Včera",
+  "empty": "Zatím žádná aktivita.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} sdílení obrazovky",
+    "watchParty": "{{action}} {{name}} společné sledování",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Ke společnému sledování se nepodařilo připojit.",
+  "joinActivityFailed": "K aktivitě doplňku se nepodařilo připojit."
+}

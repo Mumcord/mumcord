@@ -50,6 +50,17 @@ pub enum HostEvent {
         title: String,
         body: String,
     },
+    /// The plugin's `activity.push` passed the limits: one event in the activity log of `server`
+    /// (FR-11.9). `text` and the action label are untrusted plugin text, cleaned by
+    /// [`crate::api::activity`]. T2 of the epic forwards it to the UI; clicking the action goes
+    /// back to the plugin through the existing `ui-action` path, so nothing here acts on it.
+    Activity {
+        server: Option<mumcord_store::ServerId>,
+        plugin: String,
+        text: String,
+        /// The plugin's action as `(label, id)`.
+        action: Option<(String, String)>,
+    },
 }
 
 /// The runtime part of the plugin lifecycle (spec §7.2).

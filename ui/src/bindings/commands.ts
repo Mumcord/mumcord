@@ -1257,6 +1257,7 @@ export const commands = {
 export const events = {
 	acceptedConversationsChanged: makeEvent<AcceptedConversationsChanged, AcceptedConversationsChanged>("accepted-conversations-changed"),
 	activeAudioProfileChanged: makeEvent<ActiveAudioProfileChanged, ActiveAudioProfileChanged>("active-audio-profile-changed"),
+	activityEvent: makeEvent<PluginActivityEvent, PluginActivityEvent>("activity-event"),
 	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
@@ -3310,6 +3311,20 @@ export type PluginActionValue = { type: "none" } | { type: "boolean"; value: boo
 { type: "reorder"; from: number; to: number } | 
 /**  The path the user picked in a file picker. */
 { type: "file"; path: string };
+
+/**
+ *  `activity-event` / `activityEvent`: the line a plugin pushed with `activity.push` (FR-11.9),
+ *  for the Activity tab. `text` and `actionLabel` were cleaned and capped by the host, so they
+ *  are shown as they come. `serverId` is `null` when no server is focused; both action fields are
+ *  `null` for a push without an action, which is a plain row (FR-11.13).
+ */
+export type PluginActivityEvent = {
+	serverId: number | null,
+	pluginId: string,
+	text: string,
+	actionLabel: string | null,
+	actionId: string | null,
+};
 
 export type PluginAlign = "start" | "center" | "end" | "stretch";
 

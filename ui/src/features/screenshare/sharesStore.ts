@@ -55,7 +55,11 @@ function ensureBound(): void {
   if (api !== boundApi) bind(api);
 }
 
-function subscribe(listener: () => void): () => void {
+/**
+ * Listens for share changes. Exported for code outside React (the activity log), which has to
+ * follow the shares while its tab is closed and no component is mounted.
+ */
+export function subscribeShares(listener: () => void): () => void {
   ensureBound();
   listeners.add(listener);
   return () => {
@@ -63,7 +67,8 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
-function sharesOf(serverId: number | null): readonly ScreenShare[] {
+/** The shares on `serverId` for code outside React. */
+export function sharesOf(serverId: number | null): readonly ScreenShare[] {
   ensureBound();
   return (serverId === null ? undefined : shares.get(serverId)) ?? NONE;
 }
@@ -79,7 +84,7 @@ export function seedScreenShares(serverId: number, list: readonly ScreenShare[])
 
 /** Every share in the user's voice channel on `serverId`, including the own one. */
 export function useScreenShares(serverId: number | null): readonly ScreenShare[] {
-  return useSyncExternalStore(subscribe, () => sharesOf(serverId));
+  return useSyncExternalStore(subscribeShares, () => sharesOf(serverId));
 }
 
 /** The share of `session` on `serverId`, or `null` when that person isn't sharing. */
@@ -88,14 +93,14 @@ export function useScreenShareOf(
   session: number | null,
 ): ScreenShare | null {
   return useSyncExternalStore(
-    subscribe,
+    subscribeShares,
     () => sharesOf(serverId).find((share) => share.session === session) ?? null,
   );
 }
 
 /** Whether `session` is sharing on `serverId`; cheap enough for every tree and member row. */
 export function useIsLive(serverId: number | null, session: number): boolean {
-  return useSyncExternalStore(subscribe, () =>
+  return useSyncExternalStore(subscribeShares, () =>
     sharesOf(serverId).some((share) => share.session === session),
   );
 }

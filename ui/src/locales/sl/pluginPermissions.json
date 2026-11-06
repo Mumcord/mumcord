@@ -36,7 +36,8 @@
     "audioEffects": "Predvajaj kratke zvoke, ki jih prinaša vtičnik",
     "filesSave": "Shrani datoteke, ki jih izbereš",
     "chatPostImage": "Objavi sliko v klepetu po tvojem kliku",
-    "filesImportPicture": "Odpri slike, ki jih izbereš"
+    "filesImportPicture": "Odpri slike, ki jih izbereš",
+    "activity": "Dodaj svoje dogodke v dnevnik dejavnosti"
   },
   "explanations": {
     "uiPanel": "Majhna plošča tega vtičnika se prikaže v vrstici vtičnikov.",
@@ -68,7 +69,8 @@
     "audioEffects": "Kratki zvoki, ki jih prinaša vtičnik. Utišaš ali izklopiš jih lahko v Nastavitve → Vtičniki.",
     "filesSave": "Mumcord te po kliku vpraša, kam shraniti posamezno datoteko; vtičnik nikoli ne vidi tvojih map.",
     "chatPostImage": "Ko klikneš v vtičniku, lahko v trenutni kanal objavi eno sliko, označeno z njegovim imenom.",
-    "filesImportPicture": "Mumcord ti po kliku omogoči izbiro slike; vtičnik dobi samo to sliko, nikoli tvojih map."
+    "filesImportPicture": "Mumcord ti po kliku omogoči izbiro slike; vtičnik dobi samo to sliko, nikoli tvojih map.",
+    "activity": "Njegovi dogodki se prikažejo na zavihku Dejavnost strežnika, na kateri si povezan, poleg tega, kar Mumcord že prikazuje tam."
   },
   "listLabel": "Dovoljenja"
 }

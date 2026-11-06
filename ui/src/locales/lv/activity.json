@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Dalībnieku kolonna",
+    "members": "Dalībnieki",
+    "activity": "Aktivitāte"
+  },
+  "you": "Jūs",
+  "selfName": "tava",
+  "someone": "kāds",
+  "verb": {
+    "connected": "pieslēgās",
+    "disconnected": "atslēdzās",
+    "moved": "mainīja kanālu",
+    "screenShareStarted": "sāka ekrāna kopīgošanu",
+    "screenShareStopped": "pārtrauca ekrāna kopīgošanu",
+    "watchPartyStarted": "sāka kopīgu skatīšanos",
+    "watchPartyStopped": "pārtrauca kopīgu skatīšanos",
+    "pluginActivityStarted": "sāka {{plugin}}",
+    "pluginActivityStopped": "pārtrauca {{plugin}}",
+    "pluginEvent": "„{{text}}“"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "spraudnis",
+  "live": "tiešraide",
+  "watch": "Skatīties",
+  "join": "Pievienoties",
+  "today": "Šodien",
+  "yesterday": "Vakar",
+  "empty": "Vēl nav aktivitāšu.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} ekrāna kopīgošana",
+    "watchParty": "{{action}} {{name}} kopīga skatīšanās",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Neizdevās pievienoties kopīgajai skatīšanai.",
+  "joinActivityFailed": "Neizdevās pievienoties spraudņa aktivitātei."
+}

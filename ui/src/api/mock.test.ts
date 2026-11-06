@@ -95,6 +95,40 @@ describe("mock engine", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it("delivers a plugin-pushed activity event to the listener (FR-11.9)", async () => {
+    const api = await connected();
+    const pushed = record(api, "activityEvent");
+    api.mock.emit("activityEvent", {
+      serverId: 1,
+      pluginId: "fit",
+      text: "hydration ready",
+      actionLabel: "Notify me",
+      actionId: "notify",
+    });
+    expect(pushed.at(-1)).toEqual({
+      serverId: 1,
+      pluginId: "fit",
+      text: "hydration ready",
+      actionLabel: "Notify me",
+      actionId: "notify",
+    });
+    // A push without an action is a plain row, and one before any server is focused has no server.
+    api.mock.emit("activityEvent", {
+      serverId: null,
+      pluginId: "fit",
+      text: "no action",
+      actionLabel: null,
+      actionId: null,
+    });
+    expect(pushed.at(-1)).toEqual({
+      serverId: null,
+      pluginId: "fit",
+      text: "no action",
+      actionLabel: null,
+      actionId: null,
+    });
+  });
+
   it("rejects commands that need a connection", async () => {
     const api = createMockApi();
     await expectCode(api.channelJoin(1, 1), "notConnected");

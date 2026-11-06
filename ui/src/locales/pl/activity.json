@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Kolumna członków",
+    "members": "Członkowie",
+    "activity": "Aktywność"
+  },
+  "you": "Ty",
+  "selfName": "Twoje",
+  "someone": "ktoś",
+  "verb": {
+    "connected": "połączył",
+    "disconnected": "rozłączył",
+    "moved": "zmienił kanał",
+    "screenShareStarted": "zaczął udostępniać ekran",
+    "screenShareStopped": "zakończył udostępnianie ekranu",
+    "watchPartyStarted": "zaczął wspólne oglądanie",
+    "watchPartyStopped": "zakończył wspólne oglądanie",
+    "pluginActivityStarted": "uruchomił {{plugin}}",
+    "pluginActivityStopped": "zakończył {{plugin}}",
+    "pluginEvent": "„{{text}}”"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "wtyczka",
+  "live": "na żywo",
+  "watch": "Oglądaj",
+  "join": "Dołącz",
+  "today": "Dziś",
+  "yesterday": "Wczoraj",
+  "empty": "Brak aktywności.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} udostępnianie ekranu",
+    "watchParty": "{{action}} {{name}} wspólne oglądanie",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Nie udało się dołączyć do wspólnego oglądania.",
+  "joinActivityFailed": "Nie udało się dołączyć do aktywności wtyczki."
+}

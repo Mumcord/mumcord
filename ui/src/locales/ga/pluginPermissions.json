@@ -36,7 +36,8 @@
     "audioEffects": "Seinn fuaimeanna gearra a thagann leis an mbreiseán",
     "filesSave": "Sábháil comhaid a roghnaíonn tú",
     "chatPostImage": "Postáil íomhá sa chomhrá tar éis duit cliceáil",
-    "filesImportPicture": "Oscail pictiúir a roghnaíonn tú"
+    "filesImportPicture": "Oscail pictiúir a roghnaíonn tú",
+    "activity": "Cur a ghníomhaíochtaí féin leis an taifead gníomhaíochta"
   },
   "explanations": {
     "uiPanel": "Taispeántar painéal beag den bhreiseán seo i stiall na mbreiseán.",
@@ -68,7 +69,8 @@
     "audioEffects": "Fuaimeanna gearra a thagann leis an mbreiseán. Is féidir leat iad a ísliú nó a mhúchadh in Socruithe → Breiseáin.",
     "filesSave": "Fiafraíonn Mumcord díot cá bhfuil gach comhad le sábháil tar éis duit cliceáil; ní fheiceann an breiseán do fhillteáin choíche.",
     "chatPostImage": "Tar éis duit cliceáil sa bhreiseán, is féidir leis pictiúr amháin a phostáil i do chainéal reatha, agus a ainm leis.",
-    "filesImportPicture": "Ligeann Mumcord duit pictiúr a roghnú tar éis duit cliceáil; ní fhaigheann an breiseán ach an pictiúr sin, ní fhaigheann sé do fhillteáin choíche."
+    "filesImportPicture": "Ligeann Mumcord duit pictiúr a roghnú tar éis duit cliceáil; ní fhaigheann an breiseán ach an pictiúr sin, ní fhaigheann sé do fhillteáin choíche.",
+    "activity": "Feictear a ghníomhaíochtaí sa chluaisín Gníomhaíocht ar an bhreastalaí a bhfuil tú ceangailte leis, in aice leis an méid a thaispeánann Mumcord ann cheana."
   },
   "listLabel": "Ceadanna"
 }

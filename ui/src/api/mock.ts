@@ -3234,6 +3234,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginsTakePendingLink: () => Promise.resolve(null),
 
     // plugins (spec 06): no plugin is installed in the mock; UI tasks extend this.
+    // A plugin activity line (FR-11.9) needs a running plugin, so the mock has none: a mock client
+    // drives `activityEvent` with `mock.emit` instead.
     pluginsList: () =>
       Promise.resolve({ noPlugins: false, allOff: false, plugins: [], refused: [] }),
     // Servers older than 1.4 pass no plugin data (FR-6.38).

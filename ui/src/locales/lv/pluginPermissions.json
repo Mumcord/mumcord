@@ -36,7 +36,8 @@
     "audioEffects": "Atskaņot īsas skaņas, kas nāk kopā ar spraudni",
     "filesSave": "Saglabāt tevis izvēlētus failus",
     "chatPostImage": "Ievietot tērzēšanā attēlu pēc tava klikšķa",
-    "filesImportPicture": "Atvērt tevis izvēlētus attēlus"
+    "filesImportPicture": "Atvērt tevis izvēlētus attēlus",
+    "activity": "Pievienot savus notikumus aktivitāžu žurnālā"
   },
   "explanations": {
     "uiPanel": "Neliels šī spraudņa panelis parādās spraudņu joslā.",
@@ -68,7 +69,8 @@
     "audioEffects": "Īsas skaņas, kas nāk kopā ar spraudni. Vari tās pazemināt vai izslēgt sadaļā Iestatījumi → Spraudņi.",
     "filesSave": "Pēc tava klikšķa Mumcord vaicā, kur saglabāt katru failu; spraudnis nekad neredz tavas mapes.",
     "chatPostImage": "Pēc tava klikšķa spraudnī tas var ievietot vienu attēlu tavā pašreizējā kanālā ar savu nosaukumu.",
-    "filesImportPicture": "Pēc tava klikšķa Mumcord ļauj izvēlēties attēlu; spraudnis saņem tikai šo attēlu, nekad tavas mapes."
+    "filesImportPicture": "Pēc tava klikšķa Mumcord ļauj izvēlēties attēlu; spraudnis saņem tikai šo attēlu, nekad tavas mapes.",
+    "activity": "Tā notikumi parādās cilnē Aktivitāte serverī, pie kura tu esi pieslēgts, blakus tam, ko Mumcord tur jau rāda."
   },
   "listLabel": "Atļaujas"
 }

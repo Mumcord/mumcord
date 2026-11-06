@@ -1,0 +1,25 @@
+/// Since 1.1. The activity log (FR-11.9): one event per call in the Activity tab of the server
+/// the user is on. Needs the `activity` permission.
+///
+/// A pushed event shows as '<plugin> "<text>"' with the plugin's action right-aligned on its meta
+/// line. Clicking that action reaches the plugin through the existing `ui-action` path with this
+/// `id`, so there is no separate callback. Limits per plugin: 1 push per 10 seconds and 50 per
+/// hour; text at most 128 characters, action label at most 24 characters.
+interface activity {
+  use types.{error};
+
+  /// The action shown on the event.
+  record action {
+    /// What the user sees, e.g. 'Notify me'; at most 24 characters.
+    label: string,
+    /// The plugin's own id, sent back in the `ui-action` when the event is clicked.
+    id: string,
+  }
+
+  /// Pushes one event into the activity log. `text` is untrusted: control characters become
+  /// spaces before it is shown.
+  ///
+  /// Errors: `not-permitted`, `too-large`, `rate-limited`. Nothing is stored: the log lives in
+  /// memory only and is discarded when the connection ends (FR-11.4).
+  push: func(text: string, action: option<action>) -> result<_, error>;
+}

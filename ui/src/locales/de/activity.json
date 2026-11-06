@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Mitgliederspalte",
+    "members": "Mitglieder",
+    "activity": "Aktivität"
+  },
+  "you": "Du",
+  "selfName": "deine",
+  "someone": "jemand",
+  "verb": {
+    "connected": "hat sich verbunden",
+    "disconnected": "hat die Verbindung beendet",
+    "moved": "hat den Kanal gewechselt",
+    "screenShareStarted": "hat die Bildschirmfreigabe gestartet",
+    "screenShareStopped": "hat die Bildschirmfreigabe beendet",
+    "watchPartyStarted": "hat eine Watch-Party gestartet",
+    "watchPartyStopped": "hat die Watch-Party beendet",
+    "pluginActivityStarted": "hat {{plugin}} gestartet",
+    "pluginActivityStopped": "hat {{plugin}} beendet",
+    "pluginEvent": "„{{text}}“"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "Plugin",
+  "live": "live",
+  "watch": "Ansehen",
+  "join": "Beitreten",
+  "today": "Heute",
+  "yesterday": "Gestern",
+  "empty": "Noch keine Aktivität.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} Bildschirmfreigabe",
+    "watchParty": "{{action}} {{name}} Watch-Party",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Beitritt zur Watch-Party fehlgeschlagen.",
+  "joinActivityFailed": "Beitritt zur Plugin-Aktivität fehlgeschlagen."
+}

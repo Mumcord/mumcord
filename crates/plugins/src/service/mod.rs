@@ -141,6 +141,17 @@ pub enum ServiceEvent {
         server: mumcord_store::ServerId,
         line: String,
     },
+    /// `activity.push` passed its permission, caps and rate limit (FR-11.9): one line for the
+    /// Activity tab. `text` and the action label are already cleaned by the host, so the UI shows
+    /// them as they are. `action` is the plugin's `(label, id)` and is `None` for a plain row;
+    /// clicking it goes back to the plugin through the existing `ui-action` path (FR-11.13).
+    /// `server` is `None` when no server is focused.
+    Activity {
+        plugin: String,
+        server: Option<mumcord_store::ServerId>,
+        text: String,
+        action: Option<(String, String)>,
+    },
     /// A plugin's `files.save`, `files.import-picture` or `chat.post-image` passed its permission
     /// and gesture checks (FR-9.103 … FR-9.105): the app carries it out and answers.
     HostCall {
@@ -710,6 +721,20 @@ impl PluginService {
             }
             HostEvent::Notify { id, title, body } => {
                 self.emit(ServiceEvent::Notify { id, title, body });
+            }
+            HostEvent::Activity {
+                server,
+                plugin,
+                text,
+                action,
+            } => {
+                // The log itself is the UI's (FR-11.6): the service only forwards the push.
+                self.emit(ServiceEvent::Activity {
+                    plugin,
+                    server,
+                    text,
+                    action,
+                });
             }
         }
         Ok(())

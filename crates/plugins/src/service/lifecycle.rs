@@ -327,6 +327,7 @@ impl PluginService {
     pub(super) fn forget_runtime(&self, id: &str) {
         self.ctx.grants.forget(id);
         self.ctx.notify.forget(id);
+        self.ctx.activity.forget(id);
         self.ctx.http.forget(id);
         self.ctx.audio.forget(id);
         self.io.forget(id);

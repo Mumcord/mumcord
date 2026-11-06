@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Stolpec članov",
+    "members": "Člani",
+    "activity": "Dejavnost"
+  },
+  "you": "Vi",
+  "selfName": "tvoje",
+  "someone": "nekdo",
+  "verb": {
+    "connected": "povezal",
+    "disconnected": "prekinil povezavo",
+    "moved": "spremenil kanal",
+    "screenShareStarted": "začel deliti zaslon",
+    "screenShareStopped": "ustavil deljenje zaslona",
+    "watchPartyStarted": "začel skupno gledanje",
+    "watchPartyStopped": "ustavil skupno gledanje",
+    "pluginActivityStarted": "začel {{plugin}}",
+    "pluginActivityStopped": "ustavil {{plugin}}",
+    "pluginEvent": "„{{text}}“"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "vtičnik",
+  "live": "v živo",
+  "watch": "Glej",
+  "join": "Pridruži se",
+  "today": "Danes",
+  "yesterday": "Včeraj",
+  "empty": "Še ni dejavnosti.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} deljenje zaslona",
+    "watchParty": "{{action}} {{name}} skupno gledanje",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Pridružitev skupnemu gledanju ni uspela.",
+  "joinActivityFailed": "Pridružitev dejavnosti vtičnika ni uspela."
+}

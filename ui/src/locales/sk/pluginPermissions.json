@@ -36,7 +36,8 @@
     "audioEffects": "Prehrávať krátke zvuky, ktoré sú súčasťou doplnku",
     "filesSave": "Ukladať súbory, ktoré vyberieš",
     "chatPostImage": "Po kliknutí odoslať obrázok do chatu",
-    "filesImportPicture": "Otvárať obrázky, ktoré vyberieš"
+    "filesImportPicture": "Otvárať obrázky, ktoré vyberieš",
+    "activity": "Pridať vlastné udalosti do zoznamu aktivít"
   },
   "explanations": {
     "uiPanel": "Malý panel tohto pluginu sa zobrazí v lište pluginov.",
@@ -68,7 +69,8 @@
     "audioEffects": "Krátke zvuky, ktoré sú súčasťou doplnku. Môžeš ich stíšiť alebo vypnúť v Nastaveniach → Doplnky.",
     "filesSave": "Mumcord sa po kliknutí opýta, kam každý súbor uložiť; doplnok tvoje priečinky nikdy nevidí.",
     "chatPostImage": "Po kliknutí v doplnku môže do tvojho aktuálneho kanála odoslať jeden obrázok označený svojím názvom.",
-    "filesImportPicture": "Mumcord ťa po kliknutí nechá vybrať obrázok; doplnok dostane iba tento obrázok, nikdy tvoje priečinky."
+    "filesImportPicture": "Mumcord ťa po kliknutí nechá vybrať obrázok; doplnok dostane iba tento obrázok, nikdy tvoje priečinky.",
+    "activity": "Jeho udalosti sa zobrazia na karte Aktivity servera, ku ktorému si pripojený, vedľa toho, čo Mumcord tam už ukazuje."
   },
   "listLabel": "Oprávnenia"
 }

@@ -1,7 +1,8 @@
 //! The plugin service end to end with real (tiny) plugins, a real store and packages signed
 //! with keys generated per test run: install, restore after remove, permission revokes,
 //! Turn off all, `--no-plugins`, developer folders, badge default and the integrity re-check;
-//! plugin messaging with its rate rules, visibility and the voice-server-only rule.
+//! plugin messaging with its rate rules, visibility and the voice-server-only rule, and what each
+//! host event forwards to the UI (the `activity.push` row for the Activity tab).
 
 use std::collections::HashSet;
 use std::io::Write;
@@ -17,7 +18,7 @@ use mumcord_plugins::service::{
 };
 use mumcord_plugins::verify::IndexEntry;
 use mumcord_plugins::{Digest, HostEvent, LoadIssue};
-use mumcord_store::{NewPluginRepository, PluginVisibility, Store};
+use mumcord_store::{NewPluginRepository, PluginVisibility, ServerId, Store};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedReceiver;
 use zip::write::SimpleFileOptions;
@@ -1963,4 +1964,65 @@ fn choosing_an_apps_menu_item_activates_the_plugin_with_a_gesture() {
         "a stopped plugin has no items"
     );
     assert!(!service.app_menu_activate(&id, "roll"));
+}
+
+/// The fields of the next [`ServiceEvent::Activity`], so the test can check them one by one.
+fn next_activity(
+    events: &mut UnboundedReceiver<ServiceEvent>,
+) -> (String, Option<ServerId>, String, Option<(String, String)>) {
+    let event = events.try_recv().expect("the push reaches the UI");
+    match event {
+        ServiceEvent::Activity {
+            plugin,
+            server,
+            text,
+            action,
+        } => (plugin, server, text, action),
+        other => panic!("expected the activity event, got {other:?}"),
+    }
+}
+
+#[test]
+fn a_plugin_activity_push_is_forwarded_to_the_ui_as_one_event() {
+    let fx = Fixture::new();
+    let (mut service, _host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    // `start()` reported the service state once; only the forwarded pushes matter here.
+    while events.try_recv().is_ok() {}
+
+    service
+        .handle_host_event(HostEvent::Activity {
+            server: Some(1),
+            plugin: "fit".into(),
+            text: "hydration ready".into(),
+            action: Some(("Notify me".into(), "notify".into())),
+        })
+        .expect("handled");
+    let (plugin, server, text, action) = next_activity(&mut events);
+    assert_eq!(
+        (plugin.as_str(), server, text.as_str()),
+        ("fit", Some(1), "hydration ready")
+    );
+    assert_eq!(action, Some(("Notify me".to_owned(), "notify".to_owned())));
+
+    // A push without an action is the same event with `action: None` (a plain row), and `server`
+    // stays `None` while no server is focused (FR-11.7).
+    service
+        .handle_host_event(HostEvent::Activity {
+            server: None,
+            plugin: "fit".into(),
+            text: "no action".into(),
+            action: None,
+        })
+        .expect("handled");
+    let (plugin, server, text, action) = next_activity(&mut events);
+    assert_eq!(
+        (plugin.as_str(), server, text.as_str()),
+        ("fit", None, "no action")
+    );
+    assert_eq!(action, None);
+    assert!(
+        events.try_recv().is_err(),
+        "the service forwards nothing else"
+    );
 }

@@ -36,7 +36,8 @@
     "audioEffects": "Irrepeti ħsejjes qosra li jiġu mal-plugin",
     "filesSave": "Issejvja fajls li tagħżel",
     "chatPostImage": "Ibgħat stampa fiċ-chat wara li tikklikkja",
-    "filesImportPicture": "Iftaħ stampi li tagħżel"
+    "filesImportPicture": "Iftaħ stampi li tagħżel",
+    "activity": "Iżid l-avvenimenti tiegħu fir-reġistru tal-attività"
   },
   "explanations": {
     "uiPanel": "Pannell żgħir ta' dan il-plugin jidher fil-linja tal-plugins.",
@@ -68,7 +69,8 @@
     "audioEffects": "Ħsejjes qosra li jiġu mal-plugin. Tista' tbaxxihom jew ttisskitthom f'Settings → Plugins.",
     "filesSave": "Mumcord jistaqsik fejn issejvja kull fajl wara li tikklikkja; il-plugin qatt ma jara l-folders tiegħek.",
     "chatPostImage": "Wara li tikklikkja fil-plugin, jista' jibgħat stampa waħda fil-kanal attwali tiegħek, immarkata bl-isem tiegħu.",
-    "filesImportPicture": "Mumcord iħallik tagħżel stampa wara li tikklikkja; il-plugin jikseb biss dik l-istampa, qatt il-folders tiegħek."
+    "filesImportPicture": "Mumcord iħallik tagħżel stampa wara li tikklikkja; il-plugin jikseb biss dik l-istampa, qatt il-folders tiegħek.",
+    "activity": "L-avvenimenti tiegħu jidhru fit-tab Attività tas-server li int konness miegħu, ħdejn dak li Mumcord diġà juri hemm."
   },
   "listLabel": "Permessi"
 }

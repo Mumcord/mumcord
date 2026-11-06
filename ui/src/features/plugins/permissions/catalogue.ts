@@ -5,6 +5,7 @@ export type PermissionRisk = "green" | "yellow" | "red";
  * FR-6.27); the Rust side stays the source of truth for what a manifest may ask for.
  */
 export const PERMISSION_RISK = {
+  activity: "green",
   "ui.panel": "green",
   "ui.member-badge": "green",
   "ui.profile-card": "green",

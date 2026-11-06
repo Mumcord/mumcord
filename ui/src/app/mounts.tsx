@@ -8,7 +8,7 @@ import { LazyBoundary } from "../components/LazyBoundary";
 import { getApi } from "../api";
 import { useIsMacos } from "../api/useIsMacos";
 import { useView } from "./view";
-import { useServerStateOf, useVoiceServerId } from "../features/channels";
+import { useServerStateOf, useShownServerId, useVoiceServerId } from "../features/channels";
 import { useMembersColumn } from "./membersCollapse";
 import { NotificationBell } from "../features/notifications";
 import { UserPanel } from "../features/userpanel";
@@ -29,6 +29,7 @@ import { PluginActivityLines, PluginMiniBars, PluginsHost } from "../features/pl
 import { SidePanelHost } from "../features/plugins/sidepanel";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
+import { MembersTabs } from "../features/activity/MembersTabs";
 import {
   MembersPanel,
   MembersToggle,
@@ -285,7 +286,8 @@ export function MediaWidgetsMount() {
   );
 }
 /** Member list (B20) with the friends list below (FR-1.64); the party's panel takes the column
-while its cinema view is open (issue #163). */
+while its cinema view is open (issue #163). Without cinema the column is the Members | Activity
+tab strip of the activity log (FR-11.1). */
 export function MembersMount() {
   return (
     <SidePanelHost>
@@ -296,6 +298,7 @@ export function MembersMount() {
 function MembersColumn() {
   const view = useMediaView();
   const serverId = useVoiceServerId();
+  const shown = useShownServerId();
   const { users, selfSession } = useServerStateOf(serverId);
   const own = selfSession === null ? undefined : users.get(selfSession);
   if (view.cinema === "watch" && serverId !== null && own !== undefined) {
@@ -313,10 +316,16 @@ function MembersColumn() {
     );
   }
   return (
-    <>
-      <MembersPanel onSendPrivateMessage={openPrivateConversation} />
-      <FriendsList />
-    </>
+    <MembersTabs
+      // The column lists the people of the server it shows, so the feed belongs to that server.
+      serverId={shown}
+      members={
+        <>
+          <MembersPanel onSendPrivateMessage={openPrivateConversation} />
+          <FriendsList />
+        </>
+      }
+    />
   );
 }
 /** First-start wizard content (B18); calls `useView().finishWizard()` when done. */

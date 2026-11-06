@@ -1,0 +1,38 @@
+{
+  "tab": {
+    "tabsLabel": "Колона с членове",
+    "members": "Участници",
+    "activity": "Активност"
+  },
+  "you": "Вие",
+  "selfName": "твоето",
+  "someone": "някой",
+  "verb": {
+    "connected": "се свърза",
+    "disconnected": "прекъсна връзката",
+    "moved": "смени канала",
+    "screenShareStarted": "започна споделяне на екрана",
+    "screenShareStopped": "спря споделянето на екрана",
+    "watchPartyStarted": "започна общо гледане",
+    "watchPartyStopped": "спря общото гледане",
+    "pluginActivityStarted": "стартира {{plugin}}",
+    "pluginActivityStopped": "спря {{plugin}}",
+    "pluginEvent": "„{{text}}“"
+  },
+  "channel": "# {{channel}}",
+  "plugin": "плъгин",
+  "live": "на живо",
+  "watch": "Гледай",
+  "join": "Влез",
+  "today": "Днес",
+  "yesterday": "Вчера",
+  "empty": "Все още няма активност.",
+  "rowLabel": {
+    "screenShare": "{{action}} {{name}} споделяне на екрана",
+    "watchParty": "{{action}} {{name}} общо гледане",
+    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "pluginEvent": "{{action}} {{plugin}}"
+  },
+  "joinPartyFailed": "Неуспешно влизане в общото гледане.",
+  "joinActivityFailed": "Неуспешно влизане в активността на добавката."
+}
