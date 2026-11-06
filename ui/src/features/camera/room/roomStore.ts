@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import {
   getApi,
+  type CameraFailure,
   type CameraRoomView,
   type CameraView,
   type MumcordApi,
@@ -15,6 +16,8 @@ import {
 
 let rooms: ReadonlyMap<number, CameraRoomView> = new Map();
 let own: CameraView | null = null;
+/** The off view whose "Camera stopped" notice the user dismissed. */
+let dismissed: CameraView | null = null;
 /** Servers whose room was read or changed since binding, so the read is not repeated. */
 const known = new Set<number>();
 let ownChanged = false;
@@ -39,6 +42,7 @@ function bind(api: MumcordApi): void {
   boundApi = api;
   rooms = new Map();
   own = null;
+  dismissed = null;
   known.clear();
   ownChanged = false;
   unsubscribers = [
@@ -104,6 +108,23 @@ export function useCameraRoom(serverId: number | null): CameraRoomView | null {
   return useSyncExternalStore(subscribe, get);
 }
 
+/**
+ * Whether the person with `session` on `serverId` has their camera on (FR-8.18): they have a tile
+ * in the camera room, whether or not it is downloaded.
+ */
+export function usePersonCameraOn(serverId: number | null, session: number): boolean {
+  useEffect(() => {
+    if (serverId !== null) load(serverId);
+  }, [serverId]);
+  const get = useCallback(
+    () =>
+      serverId !== null &&
+      (rooms.get(serverId)?.tiles.some((tile) => tile.sharer === session) ?? false),
+    [serverId, session],
+  );
+  return useSyncExternalStore(subscribe, get);
+}
+
 /** The own camera when it belongs to `serverId`; `null` while it is off or on another server. */
 export function useOwnCamera(serverId: number | null): CameraView | null {
   const get = useCallback(() => {
@@ -113,6 +134,28 @@ export function useOwnCamera(serverId: number | null): CameraView | null {
   return useSyncExternalStore(subscribe, get);
 }
 
+/**
+ * Why the own camera on `serverId` stopped by itself (FR-8.23, FR-8.24: relay lost, device gone,
+ * ended by the relay), until the user dismisses it or the camera starts again; `null` otherwise.
+ * The user's own Turn off carries no reason.
+ */
+export function useCameraStopped(serverId: number | null): CameraFailure | null {
+  const get = useCallback(() => {
+    ensureBound();
+    if (own === null || own === dismissed || own.serverId !== serverId || own.state !== "off")
+      return null;
+    return own.error;
+  }, [serverId]);
+  return useSyncExternalStore(subscribe, get);
+}
+
+/** Hides the current "Camera stopped" notice. */
+export function dismissCameraStopped(): void {
+  if (own === null || own === dismissed) return;
+  dismissed = own;
+  notify();
+}
+
 /** Test helper: forgets the binding and every room. */
 export function resetCameraRoomStore(): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
@@ -120,6 +163,7 @@ export function resetCameraRoomStore(): void {
   boundApi = undefined;
   rooms = new Map();
   own = null;
+  dismissed = null;
   known.clear();
   ownChanged = false;
 }

@@ -1175,7 +1175,7 @@
     "close": "Sluiten",
     "privacyTitle": "Privacy",
     "lockOff": "Mijn camera uitzetten als mijn scherm vergrendelt",
-    "privacyNote": "Je camera start altijd uit en toont eerst een voorbeeld. Hij gaat uit als je het kanaal verlaat of de verbinding verbreekt. Alleen mensen in je spraakkanaal kunnen hem zien, via de relay van deze server en end-to-end versleuteld. Mumcord neemt camera's nooit op.",
+    "privacyNote": "Je camera start altijd uit en toont eerst een voorbeeld. Hij gaat uit als je het kanaal verlaat of de verbinding verbreekt. Alleen mensen in je spraakkanaal kunnen hem zien, via de relay van deze server en end-to-end versleuteld. Mumcord neemt camera's nooit op. Mumcord slaat je beeld bij kijkers nooit op schijf op, maar kan niet voorkomen dat iemand met zijn besturingssysteem een schermafbeelding maakt.",
     "othersTitle": "Camera's van anderen",
     "showCameras": "Camera's tonen",
     "showAlways": "Altijd",

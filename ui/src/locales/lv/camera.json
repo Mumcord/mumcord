@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tavs attēls: {{name}}",
     "addImage": "Pievienot attēlu",
     "addImageLabel": "Pievienot savu attēlu",
+    "imageFilter": "Attēli",
     "effectsLoad": "Efekti darbojas šajā ierīcē. Slodze: {{load}} ({{unit}})",
     "loadLow": "zema",
     "loadMedium": "vidēja",
@@ -95,7 +96,8 @@
     "rateLimited": "Kameru neizdevās startēt: pārāk daudz mēģinājumu. Mēģini vēlreiz pēc minūtes.",
     "mode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
-    "endedByRelay": "Servera relejs apturēja kameru"
+    "endedByRelay": "Servera relejs apturēja kameru",
+    "dismissStopped": "Aizvērt"
   },
   "privacy": {
     "windows": "Windows bloķē piekļuvi kamerai darbvirsmas lietotnēm",
@@ -156,7 +158,8 @@
     "cameras": "Kameras",
     "label_other": "Kameru istaba, {{count}} kameras ieslēgtas",
     "miniBar_other": "{{count}} kameras ieslēgtas",
-    "fullTitle": "Telpa ir pilna ar 9 kamerām"
+    "fullTitle": "Telpa ir pilna ar 9 kamerām",
+    "backgroundPicker": "Mainīt fonu"
   },
   "position": {
     "label": "Kameras",
@@ -180,9 +183,11 @@
     "hidden": "Video paslēpts",
     "showVideo": "Rādīt video",
     "viewing": "Skaties",
-    "weak": "Vājš savienojums"
+    "weak": "Vājš savienojums",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "{{name}} opcijas",
     "pin": "Piespraust man",
     "unpin": "Atspraust",
     "showLarge": "Rādīt lielu",
@@ -203,7 +208,8 @@
     "screenTitle": "Lietotāja {{name}} ekrāns",
     "screenLive": "Tiešraide",
     "partyTitle": "Kopīga skatīšanās",
-    "partyStarted": "Sāka {{name}}"
+    "partyStarted": "Sāka {{name}}",
+    "label": "{{title}} ar kameru istabu"
   },
   "settings": {
     "title": "Kamera",

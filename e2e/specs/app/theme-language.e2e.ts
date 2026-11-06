@@ -105,8 +105,10 @@ const gameTitles = new Set(
 const neutral = (t: string) =>
   gameTitles.has(t) ||
   /^[\d\s.,:%/#()+–\-·…★☆×▾▸○?]*$/.test(t) ||
-  // Size values ("500 MB") and file-system paths (the save folder) are not words.
+  // Size values ("500 MB"), estimated durations ("≈ 98 ms", the same SI symbol in every locale)
+  // and file-system paths (the save folder) are not words.
   /^\d+(\.\d+)? ?(B|KB|MB|GB)$/.test(t) ||
+  /^≈ \d+ ms$/.test(t) ||
   /^(\/|[A-Za-z]:\\)\S*$/.test(t) ||
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||

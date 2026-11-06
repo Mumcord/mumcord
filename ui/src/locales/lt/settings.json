@@ -1193,7 +1193,7 @@
     "close": "Uždaryti",
     "privacyTitle": "Privatumas",
     "lockOff": "Išjungti mano kamerą, kai užrakinamas ekranas",
-    "privacyNote": "Jūsų kamera visada startuoja išjungta ir pirmiausia rodo peržiūrą. Ji išsijungia, kai paliekate kanalą arba atsijungiate. Ją mato tik jūsų balso kanalo žmonės per šio serverio relay, su visapusiu šifravimu. Mumcord niekada neįrašo kamerų.",
+    "privacyNote": "Jūsų kamera visada startuoja išjungta ir pirmiausia rodo peržiūrą. Ji išsijungia, kai paliekate kanalą arba atsijungiate. Ją mato tik jūsų balso kanalo žmonės per šio serverio relay, su visapusiu šifravimu. Mumcord niekada neįrašo kamerų. Žiūrinčiųjų Mumcord niekada neįrašo tavo vaizdo į diską, bet negali sutrukdyti niekam padaryti ekrano kopijos savo operacine sistema.",
     "othersTitle": "Kitų kameros",
     "showCameras": "Rodyti kameras",
     "showAlways": "Visada",

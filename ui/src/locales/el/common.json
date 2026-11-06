@@ -35,7 +35,8 @@
     "processing": "Επεξεργασία",
     "output": "Ενταμιευτής ηχείων",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Ο διακομιστής ήχου αποδίδει μπλοκ {{value}} ms, επειδή μια άλλη εφαρμογή τα ζητά· το Mumcord δεν μπορεί να τα κάνει μικρότερα."
   },
   "media": {
     "controls": "Χειριστήρας αναπαραγωγής",

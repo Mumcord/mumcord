@@ -9,7 +9,7 @@ import {
 } from "../../../api";
 import { pickOpenPath } from "../../settings/fileDialogs";
 
-const IMAGE_FILTER = { name: "Images", extensions: ["png", "jpg", "jpeg", "webp"] };
+const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "webp"];
 
 export interface BackgroundLibrary {
   library: CameraBackgroundLibrary;
@@ -47,7 +47,10 @@ export function useBackgroundLibrary(): BackgroundLibrary {
 
   const add = async (): Promise<CameraBackgroundImage | null> => {
     setAddFailed(false);
-    const path = await pickOpenPath(IMAGE_FILTER, t("preview.addImageLabel"));
+    const path = await pickOpenPath(
+      { name: t("preview.imageFilter"), extensions: IMAGE_EXTENSIONS },
+      t("preview.addImageLabel"),
+    );
     if (path === null) return null;
     setAdding(true);
     try {

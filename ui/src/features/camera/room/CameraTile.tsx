@@ -1,6 +1,7 @@
 /**
  * One camera tile (FR-8.65, spec 08 §5.3): the video, the name tag with the microphone icon, the
- * green speaking frame, "● Live" on the self-view and the "{n} fps" badge of a weak connection.
+ * green speaking frame, "● Live" on the self-view, the "{n} fps" badge of a weak connection and,
+ * with the tile under the pointer or focused, the height and codec it arrives in (mockup 10).
  * Without a picture it shows who it is and why: joining, full, couldn't join or hidden (§7.2).
  * Names come from the server and are rendered as text only.
  */
@@ -11,9 +12,13 @@ import { getApi } from "../../../api";
 import { MockPicture } from "../../media/MockPicture";
 import { mockPlaceholder } from "../../media/mockPlaceholder";
 import { Avatar } from "../../members/Avatar";
+import { codecName } from "../../screenshare/shareFormat";
 import { RoomIcon } from "./icons";
 import type { TileModel } from "./useRoomModel";
-import { useTileFrames, useTileHeight } from "./useTileFrames";
+import { useTileFrames, useTileHeight, type TileFormat } from "./useTileFrames";
+
+/** Mock mode draws no frames; its tiles show the format a real 720p AV1 camera would. */
+const MOCK_FORMAT: TileFormat = { height: 720, codec: "av1" };
 
 export interface CameraTileProps {
   serverId: number;
@@ -25,6 +30,8 @@ export interface CameraTileProps {
   avatar: string | null;
   /** The tile menu button (U-5); placed in the tile's top-left corner. */
   menu?: ReactNode;
+  /** Roving focus of the tiles (spec 08 §5.5): only one tile is a Tab stop. */
+  tabIndex?: 0 | -1;
 }
 
 export function CameraTile({
@@ -34,12 +41,14 @@ export function CameraTile({
   mirror,
   avatar,
   menu,
+  tabIndex = 0,
 }: CameraTileProps) {
   const { t } = useTranslation("camera");
   const label = tileLabel(tile, t);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tileRef = useRef<HTMLDivElement>(null);
   const [pictured, setPictured] = useState(false);
+  const [received, setReceived] = useState<TileFormat | null>(null);
   const self = tile.state === "self";
   const video = self || tile.state === "playing";
   const mock = mockPlaceholder() !== null;
@@ -50,8 +59,11 @@ export function CameraTile({
     backgrounded,
     useCallback((shown: boolean) => {
       setPictured(shown);
+      if (!shown) setReceived(null);
     }, []),
+    setReceived,
   );
+  const format = self || tile.state !== "playing" ? null : mock ? MOCK_FORMAT : received;
   useTileHeight(tileRef, serverId, self || !video ? null : tile.session);
 
   const status = statusText(tile, t);
@@ -63,14 +75,12 @@ export function CameraTile({
       });
   };
 
-  /* eslint-disable jsx-a11y/no-noninteractive-tabindex -- the tile itself takes focus: its keys
-     (menu, pin, show large, hide; spec 08 §5.5) act on the person. */
   return (
     <div
       ref={tileRef}
       className="cam-tile"
       role="group"
-      tabIndex={0}
+      tabIndex={tabIndex}
       aria-label={label}
       data-speaking={tile.speaking || undefined}
       data-tile={String(tile.key)}
@@ -90,7 +100,13 @@ export function CameraTile({
             {status ?? t("tile.joining", { name: tile.name })}
           </span>
           {tile.state === "hidden" && (
-            <button type="button" className="cam-btn cam-btn--small" onClick={showVideo}>
+            <button
+              type="button"
+              className="cam-btn cam-btn--small"
+              // The tile is the Tab stop; H on it shows the video again.
+              tabIndex={-1}
+              onClick={showVideo}
+            >
               <RoomIcon name="eye" />
               {t("tile.showVideo")}
             </button>
@@ -102,6 +118,11 @@ export function CameraTile({
         {self && (
           <span className="cam-tile__badge" data-tone="live">
             ● {t("room.live")}
+          </span>
+        )}
+        {format !== null && (
+          <span className="cam-tile__badge" data-tone="format">
+            {t("tile.format", { height: format.height, codec: codecName(format.codec) })}
           </span>
         )}
         {tile.fpsBadge !== null && video && (
@@ -128,7 +149,6 @@ export function CameraTile({
       </span>
     </div>
   );
-  /* eslint-enable jsx-a11y/no-noninteractive-tabindex */
 }
 
 /** The screen-reader name of a tile (spec 08 §5.7). */

@@ -37,6 +37,7 @@
     "imageYoursLabel": "Your image: {{name}}",
     "addImage": "Add image",
     "addImageLabel": "Add your own image",
+    "imageFilter": "Images",
     "effectsLoad": "Effects run on this device. Load: {{load}} ({{unit}})",
     "loadLow": "low",
     "loadMedium": "medium",
@@ -95,7 +96,8 @@
     "rateLimited": "Camera couldn't start: too many attempts. Try again in a minute.",
     "mode": "Camera sharing needs the relay. Change it in Privacy & Connections.",
     "noCertificate": "Camera sharing needs a client certificate.",
-    "endedByRelay": "Camera stopped by the server's relay"
+    "endedByRelay": "Camera stopped by the server's relay",
+    "dismissStopped": "Dismiss"
   },
   "privacy": {
     "windows": "Windows blocks camera access for desktop apps",
@@ -149,7 +151,8 @@
     "cameras": "Cameras",
     "label_other": "Camera room, {{count}} cameras on",
     "miniBar_other": "{{count}} cameras on",
-    "fullTitle": "The room is full at 9 cameras"
+    "fullTitle": "The room is full at 9 cameras",
+    "backgroundPicker": "Change background"
   },
   "position": {
     "label": "Cameras",
@@ -173,9 +176,11 @@
     "hidden": "Video hidden",
     "showVideo": "Show video",
     "viewing": "Viewing",
-    "weak": "Weak connection"
+    "weak": "Weak connection",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Options for {{name}}",
     "pin": "Pin for me",
     "unpin": "Unpin",
     "showLarge": "Show large",
@@ -196,7 +201,8 @@
     "screenTitle": "{{name}}'s screen",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Started by {{name}}"
+    "partyStarted": "Started by {{name}}",
+    "label": "{{title}} with the camera room"
   },
   "settings": {
     "title": "Camera",

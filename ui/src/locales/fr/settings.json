@@ -1184,7 +1184,7 @@
     "close": "Fermer",
     "privacyTitle": "Confidentialité",
     "lockOff": "Éteindre ma caméra quand mon écran se verrouille",
-    "privacyNote": "Votre caméra démarre toujours éteinte et affiche d'abord un aperçu. Elle s'éteint quand vous quittez le salon ou vous déconnectez. Seules les personnes de votre salon vocal peuvent la voir, via le relais de ce serveur, chiffrée de bout en bout. Mumcord n'enregistre jamais les caméras.",
+    "privacyNote": "Votre caméra démarre toujours éteinte et affiche d'abord un aperçu. Elle s'éteint quand vous quittez le salon ou vous déconnectez. Seules les personnes de votre salon vocal peuvent la voir, via le relais de ce serveur, chiffrée de bout en bout. Mumcord n'enregistre jamais les caméras. Le Mumcord des spectateurs n'enregistre jamais votre image sur le disque, mais il ne peut pas empêcher quelqu'un de faire une capture d'écran avec son système d'exploitation.",
     "othersTitle": "Caméras des autres",
     "showCameras": "Afficher les caméras",
     "showAlways": "Toujours",

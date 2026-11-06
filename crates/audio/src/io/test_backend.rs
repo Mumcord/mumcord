@@ -15,11 +15,19 @@ use super::ring::{self, Counters};
 use super::{DeviceInfo, Direction, IoError};
 use crate::SAMPLE_RATE;
 
-const TICK: Duration = Duration::from_millis(10);
+/// The device period the stand-in threads deliver: 10 ms at 48 kHz, as a usual device callback.
+/// A test can ask for a larger one, which is what a sound server runs the graph with when
+/// another application requests a bigger quantum.
+pub const DEFAULT_PERIOD_FRAMES: u32 = 480;
 /// Refresh the WAV header once per second so a killed process leaves a valid file.
 const FLUSH_EVERY_TICKS: u32 = 100;
 
 static INPUT_OPENS: AtomicUsize = AtomicUsize::new(0);
+
+/// How long one device callback of `frames` frames at `rate` takes in real time.
+fn frame_duration(frames: u32, rate: u32) -> Duration {
+    Duration::from_secs_f64(f64::from(frames) / f64::from(rate))
+}
 
 /// How many input streams the test backend opened in this process, for tests that check the
 /// microphone (and with it the OS permission prompt) is opened only once.
@@ -28,7 +36,10 @@ pub fn input_opens() -> usize {
 }
 
 pub(crate) enum TestBackend {
-    Null,
+    Null {
+        /// Frames one stand-in callback delivers.
+        period_frames: u32,
+    },
     File {
         input: PathBuf,
         output: PathBuf,
@@ -38,9 +49,16 @@ pub(crate) enum TestBackend {
 }
 
 impl TestBackend {
+    fn period_frames(&self) -> u32 {
+        match self {
+            TestBackend::Null { period_frames } => *period_frames,
+            TestBackend::File { .. } => DEFAULT_PERIOD_FRAMES,
+        }
+    }
+
     fn device(&self, direction: Direction) -> DeviceInfo {
         let id = match (self, direction) {
-            (TestBackend::Null, _) => "null".to_owned(),
+            (TestBackend::Null { .. }, _) => "null".to_owned(),
             (TestBackend::File { input, .. }, Direction::Input) => {
                 format!("file:{}", input.display())
             }
@@ -76,15 +94,17 @@ impl Backend for TestBackend {
         // input file (E2E runs use minutes of silence) would otherwise hold up the control
         // thread for seconds and with it the output stream, which opens right after this one.
         let mut wav = match self {
-            TestBackend::Null => None,
+            TestBackend::Null { .. } => None,
             TestBackend::File { input, .. } => Some(WavInput::open(input)?),
         };
         let rate = wav.as_ref().map_or(SAMPLE_RATE, WavInput::rate);
+        let frames = usize::try_from(self.period_frames()).unwrap_or(rate as usize);
+        let period = frame_duration(self.period_frames(), rate);
         let (producer, consumer) = ring::ring(rate);
         let counters = counters.clone();
-        let guard = TickThread::spawn("audio-test-capture", move |_| {
+        let guard = TickThread::spawn("audio-test-capture", period, move |_| {
             let mut producer = producer;
-            let mut block = vec![0.0f32; rate as usize / 100];
+            let mut block = vec![0.0f32; frames];
             move || {
                 let filled = wav.as_mut().map_or(0, |w| w.read(&mut block));
                 block[filled..].fill(0.0);
@@ -107,17 +127,19 @@ impl Backend for TestBackend {
         _low_latency: bool,
     ) -> Result<Opened<Producer<f32>>, IoError> {
         let (mut writer, channels) = match self {
-            TestBackend::Null => (None, 1),
+            TestBackend::Null { .. } => (None, 1),
             TestBackend::File { output, stereo, .. } => {
                 let channels = if *stereo { 2 } else { 1 };
                 (Some(open_output_wav(output, channels)?), channels)
             }
         };
+        let frames = usize::try_from(self.period_frames()).unwrap_or(SAMPLE_RATE as usize);
+        let period = frame_duration(self.period_frames(), SAMPLE_RATE);
         let (producer, consumer) = ring::stereo_ring(SAMPLE_RATE);
         let counters = counters.clone();
-        let guard = TickThread::spawn("audio-test-playback", move |stop| {
+        let guard = TickThread::spawn("audio-test-playback", period, move |stop| {
             let mut consumer = consumer;
-            let mut block = vec![0.0f32; usize::from(channels) * SAMPLE_RATE as usize / 100];
+            let mut block = vec![0.0f32; usize::from(channels) * frames];
             let mut ticks = 0u32;
             move || {
                 ring::playback(&mut block, usize::from(channels), &mut consumer, &counters);
@@ -142,7 +164,7 @@ impl Backend for TestBackend {
     }
 }
 
-/// A thread that calls a tick function once per 10 ms of elapsed wall-clock
+/// A thread that calls a tick function once per device callback of elapsed wall-clock
 /// time, like a device callback. Sleeps may overshoot (Windows timers tick at
 /// ~15.6 ms, loaded machines preempt), so every wake-up runs all ticks that
 /// came due meanwhile instead of assuming one tick per sleep.
@@ -153,7 +175,7 @@ struct TickThread {
 }
 
 impl TickThread {
-    fn spawn<F, T>(name: &str, make_tick: F) -> Result<Self, IoError>
+    fn spawn<F, T>(name: &str, period: Duration, make_tick: F) -> Result<Self, IoError>
     where
         F: FnOnce(Arc<AtomicBool>) -> T + Send + 'static,
         T: FnMut() -> Result<(), IoError>,
@@ -170,7 +192,7 @@ impl TickThread {
                     .then(crate::rt::promote_current_thread)
                     .and_then(Result::ok);
                 let mut tick = make_tick(thread_stop.clone());
-                let mut schedule = Schedule::new(Instant::now());
+                let mut schedule = Schedule::new(Instant::now(), period);
                 loop {
                     // One last tick after the stop request lets it flush.
                     let stopping = thread_stop.load(Ordering::Relaxed);
@@ -204,21 +226,30 @@ impl TickThread {
     }
 }
 
-/// Fixed 10 ms tick grid anchored at the start time; tick `n` is due at
-/// `start + n * TICK`.
+/// Tick grid anchored at the start time; tick `n` is due at `start + n * period`.
 struct Schedule {
     start: Instant,
+    /// One device callback.
+    period: Duration,
     done: u64,
 }
 
 impl Schedule {
-    fn new(start: Instant) -> Self {
-        Self { start, done: 0 }
+    fn new(start: Instant, period: Duration) -> Self {
+        Self {
+            start,
+            period,
+            done: 0,
+        }
     }
 
     /// Ticks due by `now` that have not run yet (0 after an early wake-up).
     fn due(&self, now: Instant) -> u64 {
-        let elapsed = now.saturating_duration_since(self.start).as_nanos() / TICK.as_nanos();
+        let elapsed = now
+            .saturating_duration_since(self.start)
+            .as_nanos()
+            .checked_div(self.period.as_nanos())
+            .unwrap_or(0);
         u64::try_from(elapsed + 1)
             .unwrap_or(u64::MAX)
             .saturating_sub(self.done)
@@ -230,7 +261,7 @@ impl Schedule {
 
     /// When the next tick is due.
     fn next_at(&self) -> Instant {
-        let nanos = u64::try_from(TICK.as_nanos())
+        let nanos = u64::try_from(self.period.as_nanos())
             .unwrap_or(u64::MAX)
             .saturating_mul(self.done);
         self.start + Duration::from_nanos(nanos)
@@ -391,7 +422,7 @@ mod tests {
     #[test]
     fn schedule_keeps_real_time_pace_with_coarse_sleeps() {
         let start = Instant::now();
-        let mut schedule = Schedule::new(start);
+        let mut schedule = Schedule::new(start, frame_duration(DEFAULT_PERIOD_FRAMES, SAMPLE_RATE));
         // A producer queues one 10 ms block per 10 ms; the tick drains one
         // block per due tick, as the playback thread does.
         let mut produced = 0u64;
@@ -422,12 +453,13 @@ mod tests {
     #[test]
     fn schedule_catches_up_after_a_long_stall_and_ignores_early_wakes() {
         let start = Instant::now();
-        let mut schedule = Schedule::new(start);
+        let period = frame_duration(DEFAULT_PERIOD_FRAMES, SAMPLE_RATE);
+        let mut schedule = Schedule::new(start, period);
         assert_eq!(schedule.due(start), 1);
         schedule.complete(1);
         // Woken before the next tick: nothing to do yet.
         assert_eq!(schedule.due(start + Duration::from_millis(9)), 0);
-        assert_eq!(schedule.next_at(), start + TICK);
+        assert_eq!(schedule.next_at(), start + period);
         // Descheduled for a second: all 100 missed ticks run at once.
         let late = start + Duration::from_millis(1_000);
         assert_eq!(schedule.due(late), 100);

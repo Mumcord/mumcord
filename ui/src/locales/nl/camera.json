@@ -37,6 +37,7 @@
     "imageYoursLabel": "Jouw afbeelding: {{name}}",
     "addImage": "Afbeelding toevoegen",
     "addImageLabel": "Voeg je eigen afbeelding toe",
+    "imageFilter": "Afbeeldingen",
     "effectsLoad": "Effecten draaien op dit apparaat. Belasting: {{load}} ({{unit}})",
     "loadLow": "laag",
     "loadMedium": "gemiddeld",
@@ -95,7 +96,8 @@
     "rateLimited": "Camera kon niet starten: te veel pogingen. Probeer het over een minuut opnieuw.",
     "mode": "Camera delen heeft de relay nodig. Wijzig dit in Privacy en verbindingen.",
     "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
-    "endedByRelay": "Camera gestopt door de relay van de server"
+    "endedByRelay": "Camera gestopt door de relay van de server",
+    "dismissStopped": "Sluiten"
   },
   "privacy": {
     "windows": "Windows blokkeert cameratoegang voor desktop-apps",
@@ -149,7 +151,8 @@
     "cameras": "Camera's",
     "label_other": "Cameraruimte, {{count}} camera's aan",
     "miniBar_other": "{{count}} camera's aan",
-    "fullTitle": "De ruimte is vol bij 9 camera’s"
+    "fullTitle": "De ruimte is vol bij 9 camera’s",
+    "backgroundPicker": "Achtergrond wijzigen"
   },
   "position": {
     "label": "Camera's",
@@ -173,9 +176,11 @@
     "hidden": "Video verborgen",
     "showVideo": "Video tonen",
     "viewing": "Kijkt mee",
-    "weak": "Zwakke verbinding"
+    "weak": "Zwakke verbinding",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opties voor {{name}}",
     "pin": "Vastzetten voor mij",
     "unpin": "Losmaken",
     "showLarge": "Groot tonen",
@@ -196,7 +201,8 @@
     "screenTitle": "Scherm van {{name}}",
     "screenLive": "Live",
     "partyTitle": "Watchparty",
-    "partyStarted": "Gestart door {{name}}"
+    "partyStarted": "Gestart door {{name}}",
+    "label": "{{title}} met de cameraruimte"
   },
   "settings": {
     "title": "Camera",

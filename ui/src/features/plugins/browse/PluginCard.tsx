@@ -34,7 +34,7 @@ export function PluginCard({ plugin, installed, onDetails, onInstall }: PluginCa
     settings?.blockHighRisk === true && scored?.kind === "scored" && scored.score.band === "high";
   const needsMumcord = plugin.needsMumcord;
   return (
-    <li className="plugin-card">
+    <li className="plugin-card" data-plugin-id={plugin.id}>
       <PluginIcon id={plugin.id} name={name} hasIcon={plugin.icon !== null} />
       <div className="plugin-card-body">
         <div className="plugin-card-title">

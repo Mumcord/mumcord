@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, ScreenShare } from "../../api";
 import { connectedMock, resetAll } from "../channels/testUtils";
+import { CombinedHeaderContext } from "../media/combinedHeader";
 import { leaveCinema, mediaView, resetMediaView } from "../media/mediaView";
 import { Viewer } from "./ScreenShareView";
 import { ShareMiniBar } from "./ShareMiniBar";
@@ -84,6 +85,33 @@ describe("watched share", () => {
     expect(screen.queryByRole("group", { name: "Stream details" })).toBeNull();
   });
 
+  it("puts its line and chips into the combined card's header (mockup 08)", async () => {
+    vi.spyOn(api, "p2pLink").mockResolvedValue({ path: "relayUdp", ipHidden: false });
+    const sub = document.createElement("span");
+    const chips = document.createElement("span");
+    document.body.append(sub, chips);
+    const { container } = render(
+      <CombinedHeaderContext value={{ sub, chips }}>
+        <Viewer serverId={1} session={ANNA} />
+      </CombinedHeaderContext>,
+    );
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [annaShares()] });
+    });
+    // One header: the frame draws none of its own, the card's header gets the line and chips.
+    expect(container.querySelector(".media-frame__top")).toBeNull();
+    expect(sub.textContent).toMatch(/^Window · since \d{1,2}:\d{2}.* · $/);
+    await vi.waitFor(() => {
+      expect(chips.querySelector(".cam-chip[data-tone='ok']")).toHaveTextContent("Relay");
+    });
+    expect(container.querySelector(".cam-main__label")).toHaveTextContent("Anna's screenLive");
+    // The chips stay the view's own controls.
+    fireEvent.click(screen.getByRole("button", { name: "Stream details" }));
+    expect(screen.getByRole("group", { name: "Stream details" })).toBeInTheDocument();
+    sub.remove();
+    chips.remove();
+  });
+
   it("shows no path line while no connection to the sharer is open", async () => {
     const link = vi.spyOn(api, "p2pLink").mockResolvedValue(null);
     const { container } = render(<Viewer serverId={1} session={ANNA} />);
@@ -100,6 +128,16 @@ describe("watched share", () => {
     fireEvent.click(screen.getByRole("button", { name: "Stop watching" }));
     expect(mediaView().cinema).toBeNull();
     expect(screen.queryByRole("group")).toBeNull();
+  });
+
+  it("closes the share's tab when the share ends, so the media area shows the rest", () => {
+    startWatching(1, ANNA);
+    expect(mediaView().cinema).toBe("share");
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [] });
+    });
+    expect(mediaView().stage).not.toContain("share");
+    expect(mediaView().cinema).toBeNull();
   });
 
   it("starts the share's clock when its announcement arrived", () => {

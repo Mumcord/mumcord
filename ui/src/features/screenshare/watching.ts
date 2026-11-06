@@ -31,8 +31,14 @@ function set(next: WatchedShare | null): void {
   for (const listener of listeners) listener();
 }
 
+/** The watched share is over: its tab goes with it, so the media area falls back to the rest. */
+function ended(): void {
+  closeMedia("share");
+  set(null);
+}
+
 function closeOn(serverId: number): void {
-  if (watched?.serverId === serverId) set(null);
+  if (watched?.serverId === serverId) ended();
 }
 
 function bind(api: MumcordApi): void {
@@ -43,7 +49,7 @@ function bind(api: MumcordApi): void {
     api.on("screenSharesChanged", ({ serverId, shares }) => {
       if (watched?.serverId !== serverId) return;
       const { session } = watched;
-      if (!shares.some((share) => share.session === session)) set(null);
+      if (!shares.some((share) => share.session === session)) ended();
     }),
     api.on("serverSynced", ({ snapshot }) => {
       closeOn(snapshot.serverId);

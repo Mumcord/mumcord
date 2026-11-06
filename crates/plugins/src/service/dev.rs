@@ -17,6 +17,17 @@ impl PluginService {
     /// belong to an installed plugin (nor one removed with its data kept, whose data must not
     /// reach another plugin). Granted: the required and the suggested optional permissions.
     pub fn load_dev(&mut self, folder: &Path) -> Result<String, ServiceError> {
+        let result = self.load_dev_inner(folder);
+        if let Err(error) = &result {
+            let name = folder
+                .file_name()
+                .map_or_else(String::new, |n| n.to_string_lossy().into_owned());
+            self.note_refused(&name, error);
+        }
+        result
+    }
+
+    fn load_dev_inner(&mut self, folder: &Path) -> Result<String, ServiceError> {
         self.check_developer_mode()?;
         let folder = folder.canonicalize()?;
         let manifest = read_dev_manifest(&folder)?;

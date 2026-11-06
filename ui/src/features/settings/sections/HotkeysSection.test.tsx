@@ -151,6 +151,44 @@ describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, ()
     });
   });
 
+  it("reports the camera hotkey as a conflict and frees it on Assign here", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openHotkeys();
+    record("Turn camera on / off", "F9", { ctrlKey: true });
+    await waitFor(() => {
+      expect(update).toHaveBeenCalledTimes(1);
+    });
+    record("Mute / unmute microphone", "F9", { ctrlKey: true });
+    const alert = (await screen.findByText("Conflict.")).closest<HTMLElement>("[role='alert']");
+    if (alert === null) throw new Error("conflict is not announced");
+    expect(alert).toHaveTextContent(
+      'Conflict. This combination is already used by "Turn camera on / off".',
+    );
+    fireEvent.click(within(alert).getByRole("button", { name: "Assign here" }));
+    await waitFor(() => {
+      expect(update).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          cameraHotkey: null,
+          hotkeys: [{ key: "Ctrl+F9", action: { kind: "toggleMute" } }],
+        }),
+      );
+    });
+  });
+
+  it("warns when the camera hotkey could not be registered", async () => {
+    vi.spyOn(api, "hotkeysStatus").mockResolvedValue({
+      mode: "global",
+      failed: [],
+      cameraFailed: true,
+    });
+    await openHotkeys();
+    expect(
+      await screen.findByText(
+        "This shortcut could not be registered. Another app or your desktop may already use it.",
+      ),
+    ).toBeVisible();
+  });
+
   it("refuses Mumcord's own shortcuts without an assign button", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openHotkeys();
@@ -217,7 +255,11 @@ describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, ()
   });
 
   it("links to the compatibility mode switch when the desktop offers no global shortcuts", async () => {
-    vi.spyOn(api, "hotkeysStatus").mockResolvedValue({ mode: "unavailable", failed: [] });
+    vi.spyOn(api, "hotkeysStatus").mockResolvedValue({
+      mode: "unavailable",
+      failed: [],
+      cameraFailed: false,
+    });
     vi.spyOn(api, "pttSession").mockResolvedValue({
       waylandDesktop: true,
       compatibilityActive: false,

@@ -37,6 +37,7 @@
     "imageYoursLabel": "Votre image : {{name}}",
     "addImage": "Ajouter une image",
     "addImageLabel": "Ajouter votre propre image",
+    "imageFilter": "Images",
     "effectsLoad": "Les effets s'exécutent sur cet appareil. Charge : {{load}} ({{unit}})",
     "loadLow": "faible",
     "loadMedium": "moyenne",
@@ -95,7 +96,8 @@
     "rateLimited": "La caméra n'a pas pu démarrer : trop de tentatives. Réessayez dans une minute.",
     "mode": "Le partage de caméra nécessite le relais. Modifiez-le dans Confidentialité et connexions.",
     "noCertificate": "Le partage de caméra nécessite un certificat client.",
-    "endedByRelay": "Caméra arrêtée par le relais du serveur"
+    "endedByRelay": "Caméra arrêtée par le relais du serveur",
+    "dismissStopped": "Ignorer"
   },
   "privacy": {
     "windows": "Windows bloque l'accès à la caméra pour les applications de bureau",
@@ -156,7 +158,8 @@
     "cameras": "Caméras",
     "label_other": "Salle des caméras, {{count}} caméras activées",
     "miniBar_other": "{{count}} caméras activées",
-    "fullTitle": "La salle est pleine à 9 caméras"
+    "fullTitle": "La salle est pleine à 9 caméras",
+    "backgroundPicker": "Changer d’arrière-plan"
   },
   "position": {
     "label": "Caméras",
@@ -180,9 +183,11 @@
     "hidden": "Vidéo masquée",
     "showVideo": "Afficher la vidéo",
     "viewing": "Visionnage",
-    "weak": "Connexion faible"
+    "weak": "Connexion faible",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Options pour {{name}}",
     "pin": "Épingler pour moi",
     "unpin": "Désépingler",
     "showLarge": "Afficher en grand",
@@ -203,7 +208,8 @@
     "screenTitle": "Écran de {{name}}",
     "screenLive": "En direct",
     "partyTitle": "Watch party",
-    "partyStarted": "Lancée par {{name}}"
+    "partyStarted": "Lancée par {{name}}",
+    "label": "{{title}} avec la salle des caméras"
   },
   "settings": {
     "title": "Caméra",

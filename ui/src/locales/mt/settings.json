@@ -1202,7 +1202,7 @@
     "close": "Agħlaq",
     "privacyTitle": "Privatezza",
     "lockOff": "Itfi l-kamera tiegħi meta l-iskrin jissakkar",
-    "privacyNote": "Il-kamera tiegħek dejjem tibda mitfija u l-ewwel turi previżjoni. Titfi meta titlaq mill-kanal jew tiskonnettja. Jarawha biss in-nies fil-kanal tal-leħen tiegħek, permezz tar-relay ta' dan is-server, imkriptjata minn tarf sa tarf. Mumcord qatt ma jirrekordja kameras.",
+    "privacyNote": "Il-kamera tiegħek dejjem tibda mitfija u l-ewwel turi previżjoni. Titfi meta titlaq mill-kanal jew tiskonnettja. Jarawha biss in-nies fil-kanal tal-leħen tiegħek, permezz tar-relay ta' dan is-server, imkriptjata minn tarf sa tarf. Mumcord qatt ma jirrekordja kameras. Il-Mumcord ta' min qed jara qatt ma jsalva l-istampa tiegħek fuq id-diska, iżda ma jistax iwaqqaf lil xi ħadd milli jieħu screenshot bis-sistema operattiva tiegħu.",
     "othersTitle": "Kameras tal-oħrajn",
     "showCameras": "Uri l-kameras",
     "showAlways": "Dejjem",

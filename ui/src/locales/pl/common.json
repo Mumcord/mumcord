@@ -35,7 +35,8 @@
     "processing": "Przetwarzanie",
     "output": "Bufor głośników",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Serwer dźwiękowy dostarcza bloki po {{value}} ms, ponieważ inna aplikacja ich żąda; Mumcord nie może ich zmniejszyć."
   },
   "media": {
     "controls": "Sterowanie odtwarzacza",

@@ -33,21 +33,29 @@ export function CameraRoomSync({ serverId }: { serverId: number }): null {
   const wasOpen = useRef<boolean | null>(null);
   const wasOnAir = useRef(false);
   const wasPopped = useRef(false);
+  /** The media area was just asked to show the room the engine opened. */
+  const opening = useRef(false);
 
-  // The engine opened the room, or the own camera went on air (spec 08 §5.1).
+  // The engine opened the room, or the own camera went on air (spec 08 §5.1). A room without a
+  // camera has nothing to show and is closed below; it counts as opened once a camera is on.
   useEffect(() => {
-    const opened = engineOpen === true && wasOpen.current !== true;
+    const opened = engineOpen === true && cameras > 0 && wasOpen.current !== true;
     const wentOnAir = onAir && !wasOnAir.current;
-    if (engineOpen !== null) wasOpen.current = engineOpen;
+    if (engineOpen === false || (engineOpen === true && cameras > 0)) wasOpen.current = engineOpen;
     wasOnAir.current = onAir;
     if ((opened || wentOnAir) && !view.stage.includes("camera") && popout === null) {
+      opening.current = true;
       openMedia("camera");
     }
-  }, [engineOpen, onAir, view.stage, popout]);
+  }, [engineOpen, cameras, onAir, view.stage, popout]);
 
   // The room downloads exactly while it shows (FR-8.57).
   useEffect(() => {
+    if (shown) opening.current = false;
     if (engineOpen === null || engineOpen === shown) return;
+    // The room the engine opened is on its way into the media area. Closing it until it shows
+    // would leave every camera and join again, which the senders' join limit holds back for 10 s.
+    if (engineOpen && opening.current) return;
     getApi()
       .cameraRoomSetOpen(serverId, shown)
       .catch((error: unknown) => {

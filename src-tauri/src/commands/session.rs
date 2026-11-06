@@ -151,6 +151,9 @@ pub struct LatencyEstimate {
     pub processing_us: u32,
     /// Output queue and speaker device buffer.
     pub output_buffer_us: u32,
+    /// The block the sound server delivers when it is larger than the buffer Mumcord asks for in
+    /// low-latency mode; `null` when the period matches the request or is not measured yet.
+    pub sound_server_block_us: Option<u32>,
     /// Sum of the parts (without the network while it is unknown).
     pub total_us: u32,
     /// The same estimate for the other mode.
@@ -169,6 +172,7 @@ impl From<mumcord_engine::LatencyEstimateView> for LatencyEstimate {
             jitter_us: us(v.jitter_ms),
             processing_us: us(v.processing_ms),
             output_buffer_us: us(v.output_buffer_ms),
+            sound_server_block_us: v.sound_server_block_ms.map(us),
             total_us: us(v.total_ms),
             other_mode_total_us: us(v.other_mode_total_ms),
         }

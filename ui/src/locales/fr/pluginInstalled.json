@@ -127,5 +127,9 @@
     "netHttp": "Accès à internet",
     "secrets": "Trousseau"
   },
-  "offerBadge": "Nouvelles autorisations"
+  "offerBadge": "Nouvelles autorisations",
+  "refused": {
+    "title": "Modules refusés",
+    "when": "Refusé le {{time}}"
+  }
 }

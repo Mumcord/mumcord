@@ -35,7 +35,8 @@
     "processing": "Käsittely",
     "output": "Kaiuttimen puskuri",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Äänipalvelin toimittaa {{value}} ms:n lohkot, koska toinen sovellus pyytää niitä; Mumcord ei voi tehdä niitä pienemmiksi."
   },
   "media": {
     "controls": "Soittimen valitsimet",

@@ -35,7 +35,8 @@
     "processing": "Verarbeitung",
     "output": "Lautsprecherpuffer",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Der Soundserver liefert Blöcke von {{value}} ms, weil eine andere Anwendung sie verlangt; Mumcord kann sie nicht kleiner machen."
   },
   "media": {
     "controls": "Player-Steuerung",

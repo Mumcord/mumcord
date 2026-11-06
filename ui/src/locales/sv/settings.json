@@ -1175,7 +1175,7 @@
     "close": "Stäng",
     "privacyTitle": "Integritet",
     "lockOff": "Stäng av min kamera när skärmen låses",
-    "privacyNote": "Din kamera startar alltid avstängd och visar först en förhandsvisning. Den stängs av när du lämnar kanalen eller kopplar från. Bara personer i din röstkanal kan se den, via den här serverns relä och end-to-end-krypterad. Mumcord spelar aldrig in kameror.",
+    "privacyNote": "Din kamera startar alltid avstängd och visar först en förhandsvisning. Den stängs av när du lämnar kanalen eller kopplar från. Bara personer i din röstkanal kan se den, via den här serverns relä och end-to-end-krypterad. Mumcord spelar aldrig in kameror. Tittarnas Mumcord sparar aldrig din bild på disken, men kan inte hindra någon från att ta en skärmbild med sitt operativsystem.",
     "othersTitle": "Andras kameror",
     "showCameras": "Visa kameror",
     "showAlways": "Alltid",

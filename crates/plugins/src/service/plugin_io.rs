@@ -640,7 +640,23 @@ impl PluginIo for ServiceIo {
         {
             return Err(Error::NotPermitted);
         }
+        // A new web dialog uses up the gesture (once per gesture, FR-9.40/FR-9.45); a new page
+        // in an open one does not. Taken only after it opened, so a refused show keeps it.
+        let new_dialog = place == WebviewPlace::Dialog && !self.webviews.is_open(plugin, place);
+        if new_dialog
+            && !self
+                .chat()
+                .gate
+                .host_call_allowed(plugin, HostCall::OpenDialog, now)
+        {
+            return Err(Error::NotPermitted);
+        }
         let shown = self.webviews.show(plugin, place, &entry, now)?;
+        if new_dialog {
+            self.chat()
+                .gate
+                .take_host_call(plugin, HostCall::OpenDialog, now);
+        }
         self.shown(plugin, shown);
         Ok(())
     }
@@ -893,6 +909,7 @@ mod tests {
             Ok(ServiceEvent::Ui { update, .. }) => Some(update),
             _ => None,
         };
+        io.gesture("snacks");
         assert_eq!(
             io.webview_show("snacks", WebviewPlace::Dialog, "index.html".into()),
             Err(Error::Invalid)
@@ -921,6 +938,41 @@ mod tests {
         ));
         assert!(matches!(next(), Some(UiUpdate::CloseDialog)));
         assert_eq!(io.webview_post("snacks", "hi".into()), Err(Error::Invalid));
+    }
+
+    #[test]
+    fn a_web_dialog_opens_once_per_gesture_within_the_window() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        io.webviews().set_root(
+            "snacks",
+            Some(dir.path().to_path_buf()),
+            vec![WebviewPlace::Dialog],
+        );
+        let dialog = WebviewPlace::Dialog;
+        let open = |io: &ServiceIo| {
+            io.open_dialog("snacks", "Snacks".into(), None)
+                .expect("dialog opens");
+            io.webview_show("snacks", dialog, "index.html".into())
+        };
+        assert_eq!(open(&io), Err(Error::NotPermitted), "no gesture");
+
+        io.gesture("snacks");
+        assert_eq!(open(&io), Ok(()), "within the window");
+        assert_eq!(
+            io.webview_show("snacks", dialog, "index.html?page=2".into()),
+            Ok(()),
+            "a new page in the open dialog needs no gesture"
+        );
+        io.close_dialog("snacks");
+        assert_eq!(open(&io), Err(Error::NotPermitted), "once per gesture");
+
+        let stale = Instant::now() - chat::GESTURE_WINDOW - Duration::from_secs(1);
+        io.chat().gate.gesture("snacks", stale);
+        assert_eq!(open(&io), Err(Error::NotPermitted), "the window is 8 s");
+        while rx.try_recv().is_ok() {}
     }
 
     #[test]

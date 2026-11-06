@@ -537,13 +537,13 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
             <MemberBadge session={session} />
             {!isSelf && <BlockedBadge user={user} />}
             <LiveBadge session={session} />
-            <CameraTreeLabel self={isSelf} name={user.name} />
+            <CameraTreeLabel self={isSelf} session={session} name={user.name} />
             <WhisperBadge session={session} self={isSelf} />
             {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
           </span>
         </ProfilePreviewTrigger>
         <StatusIcons user={user} />
-        <CameraTreeIcon self={isSelf} />
+        <CameraTreeIcon self={isSelf} session={session} />
       </span>
     </div>
   );

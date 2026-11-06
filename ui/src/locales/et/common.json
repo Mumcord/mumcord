@@ -35,7 +35,8 @@
     "processing": "Töötlemine",
     "output": "Kõlari puhver",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Helistserver toimetab {{value}} ms plokse, sest teine rakendus nõuab neid; Mumcord ei saa neid väiksemaks teha."
   },
   "media": {
     "controls": "Meelerduri juhtimine",

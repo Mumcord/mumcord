@@ -37,6 +37,10 @@ impl mixer::PlaybackSink for io::FrameSink {
     fn queued_samples(&mut self) -> usize {
         io::FrameSink::queued_samples(self)
     }
+
+    fn device_period_samples(&mut self) -> usize {
+        io::FrameSink::device_period_samples(self)
+    }
 }
 
 // Compiles the README example as a doctest so it cannot rot.

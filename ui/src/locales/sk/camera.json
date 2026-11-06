@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tvoj obrázok: {{name}}",
     "addImage": "Pridať obrázok",
     "addImageLabel": "Pridať vlastný obrázok",
+    "imageFilter": "Obrázky",
     "effectsLoad": "Efekty bežia v tomto zariadení. Zaťaženie: {{load}} ({{unit}})",
     "loadLow": "nízke",
     "loadMedium": "stredné",
@@ -95,7 +96,8 @@
     "rateLimited": "Kameru sa nepodarilo spustiť: príliš veľa pokusov. Skús to znova o minútu.",
     "mode": "Zdieľanie kamery potrebuje relay. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
-    "endedByRelay": "Kameru zastavil relay servera"
+    "endedByRelay": "Kameru zastavil relay servera",
+    "dismissStopped": "Zavrieť"
   },
   "privacy": {
     "windows": "Windows blokuje prístup ku kamere desktopovým aplikáciám",
@@ -163,7 +165,8 @@
     "miniBar_many": "{{count}} zapnutej kamery",
     "miniBar_other": "{{count}} zapnutých kamier",
     "cameras": "Kamery",
-    "fullTitle": "Miestnosť je plná pri 9 kamerách"
+    "fullTitle": "Miestnosť je plná pri 9 kamerách",
+    "backgroundPicker": "Zmeniť pozadie"
   },
   "position": {
     "label": "Kamery",
@@ -187,9 +190,11 @@
     "hidden": "Video skryté",
     "showVideo": "Zobraziť video",
     "viewing": "Sleduješ",
-    "weak": "Slabé pripojenie"
+    "weak": "Slabé pripojenie",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Možnosti pre {{name}}",
     "pin": "Pripnúť pre mňa",
     "unpin": "Odopnúť",
     "showLarge": "Zobraziť veľké",
@@ -210,7 +215,8 @@
     "screenTitle": "Obrazovka používateľa {{name}}",
     "screenLive": "Naživo",
     "partyTitle": "Spoločné sledovanie",
-    "partyStarted": "Spustil(a) {{name}}"
+    "partyStarted": "Spustil(a) {{name}}",
+    "label": "{{title}} s miestnosťou s kamerami"
   },
   "settings": {
     "title": "Kamera",

@@ -1175,7 +1175,7 @@
     "close": "Sulje",
     "privacyTitle": "Yksityisyys",
     "lockOff": "Sammuta kamerani, kun näyttö lukittuu",
-    "privacyNote": "Kamerasi alkaa aina pois päältä ja näyttää ensin esikatselun. Se sammuu, kun poistut kanavalta tai katkaiset yhteyden. Vain puhekanavasi jäsenet näkevät sen tämän palvelimen välityksen kautta, päästä päähän salattuna. Mumcord ei koskaan tallenna kameroita.",
+    "privacyNote": "Kamerasi alkaa aina pois päältä ja näyttää ensin esikatselun. Se sammuu, kun poistut kanavalta tai katkaiset yhteyden. Vain puhekanavasi jäsenet näkevät sen tämän palvelimen välityksen kautta, päästä päähän salattuna. Mumcord ei koskaan tallenna kameroita. Katsojien Mumcord ei koskaan tallenna kuvaasi levylle, mutta se ei voi estää ketään ottamasta kuvakaappausta käyttöjärjestelmällään.",
     "othersTitle": "Muiden kamerat",
     "showCameras": "Näytä kamerat",
     "showAlways": "Aina",

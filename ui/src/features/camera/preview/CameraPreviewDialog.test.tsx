@@ -7,7 +7,8 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../../api";
 import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll, stubDialog } from "../../channels/testUtils";
-import { CameraPreviewHost, closeCameraPreview, openCameraPreview } from ".";
+import { CameraPreviewHost, openCameraPreview } from ".";
+import { resetCameraPreview } from "../previewStore";
 
 let api: MockApi;
 
@@ -19,7 +20,7 @@ beforeAll(() => {
 
 afterEach(() => {
   act(() => {
-    closeCameraPreview();
+    resetCameraPreview();
   });
   resetAll();
 });
@@ -28,7 +29,7 @@ async function openDialog() {
   api = await connectedMock({ bindStore: true });
   const view = render(<CameraPreviewHost />);
   act(() => {
-    openCameraPreview(1);
+    openCameraPreview(1, null);
   });
   const dialog = await screen.findByRole("dialog", { name: "Turn on your camera" });
   const turnOn = within(dialog).getByRole("button", { name: /Turn on camera/ });
@@ -122,12 +123,26 @@ describe("CameraPreviewDialog", () => {
     });
   });
 
-  it("turns the camera off on Escape", async () => {
+  it("closes the dialog before turning the camera off on Escape", async () => {
     const { dialog } = await openDialog();
-    const off = vi.spyOn(api, "cameraTurnOff");
+    const openWhenTurnedOff: boolean[] = [];
+    const turnOff = api.cameraTurnOff.bind(api);
+    const off = vi.spyOn(api, "cameraTurnOff").mockImplementation((serverId) => {
+      openWhenTurnedOff.push(dialog.isConnected);
+      return turnOff(serverId);
+    });
     act(() => {
       dialog.dispatchEvent(new Event("cancel", { cancelable: true }));
     });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(off).toHaveBeenCalledWith(1);
+    expect(openWhenTurnedOff).toEqual([false]);
+  });
+
+  it("closes the dialog before turning the camera off on Cancel", async () => {
+    const { dialog } = await openDialog();
+    const off = vi.spyOn(api, "cameraTurnOff");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(off).toHaveBeenCalledWith(1);
   });

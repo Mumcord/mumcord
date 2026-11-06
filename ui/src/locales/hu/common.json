@@ -35,7 +35,8 @@
     "processing": "Feldolgozás",
     "output": "Hangszórópuffer",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Az audioszerver {{value}} ms-es blokkokat szolgáltat, mert egy másik alkalmazás kéri őket; a Mumcord nem tudja őket kisebbre állítani."
   },
   "media": {
     "controls": "Lejátszó vezérlői",

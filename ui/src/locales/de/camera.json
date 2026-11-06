@@ -37,6 +37,7 @@
     "imageYoursLabel": "Dein Bild: {{name}}",
     "addImage": "Bild hinzufügen",
     "addImageLabel": "Eigenes Bild hinzufügen",
+    "imageFilter": "Bilder",
     "effectsLoad": "Effekte laufen auf diesem Gerät. Auslastung: {{load}} ({{unit}})",
     "loadLow": "niedrig",
     "loadMedium": "mittel",
@@ -95,7 +96,8 @@
     "rateLimited": "Die Kamera konnte nicht gestartet werden: zu viele Versuche. Versuche es in einer Minute erneut.",
     "mode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
-    "endedByRelay": "Kamera vom Relay des Servers angehalten"
+    "endedByRelay": "Kamera vom Relay des Servers angehalten",
+    "dismissStopped": "Verwerfen"
   },
   "privacy": {
     "windows": "Windows blockiert den Kamerazugriff für Desktop-Apps",
@@ -149,7 +151,8 @@
     "cameras": "Kameras",
     "label_other": "Kameraraum, {{count}} Kameras an",
     "miniBar_other": "{{count}} Kameras an",
-    "fullTitle": "Der Raum ist mit 9 Kameras voll"
+    "fullTitle": "Der Raum ist mit 9 Kameras voll",
+    "backgroundPicker": "Hintergrund ändern"
   },
   "position": {
     "label": "Kameras",
@@ -173,9 +176,11 @@
     "hidden": "Video ausgeblendet",
     "showVideo": "Video anzeigen",
     "viewing": "Ansicht",
-    "weak": "Schwache Verbindung"
+    "weak": "Schwache Verbindung",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Optionen für {{name}}",
     "pin": "Für mich anheften",
     "unpin": "Lösen",
     "showLarge": "Groß anzeigen",
@@ -196,7 +201,8 @@
     "screenTitle": "Bildschirm von {{name}}",
     "screenLive": "Live",
     "partyTitle": "Watch Party",
-    "partyStarted": "Gestartet von {{name}}"
+    "partyStarted": "Gestartet von {{name}}",
+    "label": "{{title}} mit dem Kameraraum"
   },
   "settings": {
     "title": "Kamera",

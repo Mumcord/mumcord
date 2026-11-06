@@ -103,7 +103,7 @@ impl From<Hotkey> for store::Hotkey {
 }
 
 /// The key being set: push-to-talk, an existing hotkey (index into `hotkeys`), a whisper
-/// target's key (#67), or a new hotkey.
+/// target's key (#67), the camera hotkey (FR-8.20), or a new hotkey.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum HotkeySlot {
@@ -115,6 +115,7 @@ pub enum HotkeySlot {
     Whisper {
         target_id: String,
     },
+    Camera,
     New,
 }
 
@@ -141,6 +142,8 @@ pub enum HotkeyConflict {
         index: u32,
     },
     PushToTalk,
+    /// The camera hotkey (FR-8.20).
+    Camera,
     /// The hold-to-talk key of a whisper target (#67), named by the user.
     #[serde(rename_all = "camelCase")]
     Whisper {
@@ -180,6 +183,8 @@ pub struct HotkeysStatus {
     /// Indices into `hotkeys` whose key could not be registered (taken by another app, or the
     /// desktop assigned none).
     pub failed: Vec<u32>,
+    /// The camera hotkey (FR-8.20) could not be registered.
+    pub camera_failed: bool,
 }
 
 /// A global hotkey was pressed; the UI runs its action. "Open Mumcord" never arrives here.
@@ -203,12 +208,21 @@ pub fn hotkey_check(
         HotkeySlot::Whisper { target_id } => Some(target_id.clone()),
         _ => None,
     };
+    let slot_kind = slot.clone();
     let (key, conflict) =
         crate::hotkeys::check(&key, slot, &settings.hotkeys, settings.ptt_key.as_deref())
             .map(|(key, conflict)| {
-                let conflict = conflict.or_else(|| {
-                    crate::hotkeys::whisper_conflict(&key, &settings, own_target.as_deref())
-                });
+                let conflict = conflict
+                    .or_else(|| {
+                        crate::hotkeys::camera_conflict(
+                            &key,
+                            &slot_kind,
+                            settings.camera_hotkey.as_deref(),
+                        )
+                    })
+                    .or_else(|| {
+                        crate::hotkeys::whisper_conflict(&key, &settings, own_target.as_deref())
+                    });
                 (key, conflict)
             })
             .map_err(|err| ApiError::new(ErrorCode::InvalidInput, err.to_string()))?;
@@ -228,6 +242,7 @@ pub async fn hotkeys_status(engine: State<'_, Engine>) -> ApiResult<HotkeysStatu
     Ok(HotkeysStatus {
         mode,
         failed: crate::hotkeys::failed(&hotkeys),
+        camera_failed: crate::hotkeys::camera_failed(),
     })
 }
 

@@ -5,10 +5,11 @@
 //! layers before either decoder sees them. Sound packets go to the share's own source of the
 //! playback mix ([`ShareSound`]).
 
-use std::sync::Arc;
 use std::sync::atomic::{AtomicU8, AtomicU32, Ordering};
 use std::sync::mpsc::{self, SyncSender, TrySendError};
+use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::{Duration, Instant};
 
 use mumcord_audio::mixer::share::{ShareSoundStats, ShareStats, ShareVolume};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
@@ -24,6 +25,7 @@ use super::broadcast::link::{MaxFps, Subscriber};
 use super::sound::ShareSound;
 use super::wire::{self, Codec, Frame, FrameHeader, FrameKind};
 use crate::ServerId;
+use crate::session::lock;
 
 /// Receives the frames of every watched share. Called from engine tasks and threads: forward the
 /// frame and return quickly, since a slow sink holds up that share's stream.
@@ -39,6 +41,11 @@ pub trait ScreenFrameSink: Send + Sync {
 /// Encoded frames waiting for the decode thread; a full queue drops frames until a keyframe.
 const DECODE_QUEUE: usize = 4;
 
+/// A keyframe request that brought no keyframe is repeated after this long. The relay drops a
+/// subscriber's requests that come within 2 s of its previous one, and a camera sends keyframes
+/// only on request, so a lost request would otherwise leave the picture frozen for good.
+const KEYFRAME_RETRY: Duration = Duration::from_millis(2500);
+
 struct Control {
     /// Codecs decoded here instead of in the webview, as [`codec_bit`] flags.
     decode_here: AtomicU8,
@@ -47,11 +54,36 @@ struct Control {
     /// The viewer's frame-rate cap; 0 means the sharer's rate.
     max_fps: AtomicU32,
     keyframe: Notify,
+    /// When the keyframe still awaited was last asked for; `None` while none is awaited.
+    asked: Mutex<Option<Instant>>,
 }
 
 impl Control {
+    fn new(decode_here: u8, forced_here: u8) -> Self {
+        Self {
+            decode_here: AtomicU8::new(decode_here),
+            forced_here,
+            max_fps: AtomicU32::new(0),
+            keyframe: Notify::new(),
+            asked: Mutex::new(None),
+        }
+    }
+
     fn request_keyframe(&self) {
+        *lock(&self.asked) = Some(Instant::now());
         self.keyframe.notify_one();
+    }
+
+    /// A video frame arrived at `now`: a keyframe ends the wait for one, any other frame asks
+    /// again once the last request is [`KEYFRAME_RETRY`] old.
+    fn frame_arrived(&self, keyframe: bool, now: Instant) {
+        let mut asked = lock(&self.asked);
+        if keyframe {
+            *asked = None;
+        } else if asked.is_some_and(|at| now.saturating_duration_since(at) >= KEYFRAME_RETRY) {
+            *asked = Some(now);
+            self.keyframe.notify_one();
+        }
     }
 
     fn decodes_here(&self, codec: Codec) -> bool {
@@ -167,12 +199,7 @@ impl WatchLink {
         } else {
             0
         };
-        let control = Arc::new(Control {
-            decode_here: AtomicU8::new(0),
-            forced_here,
-            max_fps: AtomicU32::new(0),
-            keyframe: Notify::new(),
-        });
+        let control = Arc::new(Control::new(0, forced_here));
         let reader = rt.spawn(read_frames(source, sink, sound, control.clone(), frames));
         let requests = rt.spawn(send_requests(control.clone(), requests));
         Self {
@@ -278,6 +305,7 @@ async fn read_frames(
         if !layers.keep(&frame.header, control.max_fps.load(Ordering::Relaxed)) {
             continue;
         }
+        control.frame_arrived(frame.header.keyframe, Instant::now());
         if control.decodes_here(codec) {
             if decoder.as_ref().is_none_or(|d| d.codec != codec) {
                 decoder = Some(DecodeThread::start(
@@ -472,9 +500,6 @@ impl DecodeThread {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Mutex;
-    use std::time::Duration;
-
     use mumcord_screenshare::{Av1Encoder, Av1Options, EncoderConfig};
 
     use super::*;
@@ -556,21 +581,39 @@ mod tests {
 
     #[test]
     fn decodes_here_per_codec_and_with_the_test_hook() {
-        let control = Control {
-            decode_here: AtomicU8::new(codec_bits(&[Codec::Vp9])),
-            forced_here: 0,
-            max_fps: AtomicU32::new(0),
-            keyframe: Notify::new(),
-        };
+        let control = Control::new(codec_bits(&[Codec::Vp9]), 0);
         assert!(control.decodes_here(Codec::Vp9));
         assert!(!control.decodes_here(Codec::Av1));
-        let forced = Control {
-            decode_here: AtomicU8::new(0),
-            forced_here: codec_bit(Codec::Av1),
-            ..control
-        };
+        let forced = Control::new(0, codec_bit(Codec::Av1));
         assert!(forced.decodes_here(Codec::Av1));
         assert!(!forced.decodes_here(Codec::Vp9));
+    }
+
+    /// The relay drops a request that comes too soon after the previous one; the camera sends
+    /// keyframes only on request. Without a keyframe the request is repeated, never sooner than
+    /// the retry time; a keyframe ends it.
+    #[tokio::test(start_paused = true)]
+    async fn an_unanswered_keyframe_request_is_repeated() {
+        let control = Control::new(0, 0);
+        control.request_keyframe();
+        tokio::time::timeout(Duration::from_millis(1), control.keyframe.notified())
+            .await
+            .expect("the first request");
+        let asked = lock(&control.asked).expect("waiting for a keyframe");
+        // The clock is paused, so the timeout only expires once nothing else can run: a stored
+        // request answers at once, a missing one times out.
+        async fn notified(control: &Control) -> bool {
+            tokio::time::timeout(Duration::from_millis(1), control.keyframe.notified())
+                .await
+                .is_ok()
+        }
+        control.frame_arrived(false, asked + Duration::from_secs(1));
+        assert!(!notified(&control).await, "not before the retry time");
+        control.frame_arrived(false, asked + KEYFRAME_RETRY);
+        assert!(notified(&control).await, "asked again");
+        control.frame_arrived(true, asked + KEYFRAME_RETRY * 2);
+        control.frame_arrived(false, asked + KEYFRAME_RETRY * 4);
+        assert!(!notified(&control).await, "the keyframe came");
     }
 
     struct Pictures(Mutex<mpsc::Sender<(Codec, u32, u32)>>);
@@ -603,12 +646,7 @@ mod tests {
         )
         .expect("SVT-AV1 encoder");
         let (tx, rx) = mpsc::channel();
-        let control = Arc::new(Control {
-            decode_here: AtomicU8::new(codec_bit(Codec::Av1)),
-            forced_here: 0,
-            max_fps: AtomicU32::new(0),
-            keyframe: Notify::new(),
-        });
+        let control = Arc::new(Control::new(codec_bit(Codec::Av1), 0));
         let mut thread = DecodeThread::start(
             Source {
                 server_id: 1,

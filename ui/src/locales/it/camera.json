@@ -37,6 +37,7 @@
     "imageYoursLabel": "La tua immagine: {{name}}",
     "addImage": "Aggiungi immagine",
     "addImageLabel": "Aggiungi una tua immagine",
+    "imageFilter": "Immagini",
     "effectsLoad": "Gli effetti vengono eseguiti su questo dispositivo. Carico: {{load}} ({{unit}})",
     "loadLow": "basso",
     "loadMedium": "medio",
@@ -95,7 +96,8 @@
     "rateLimited": "Impossibile avviare la fotocamera: troppi tentativi. Riprova tra un minuto.",
     "mode": "La condivisione della fotocamera richiede il relay. Modificalo in Privacy e connessioni.",
     "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
-    "endedByRelay": "Fotocamera interrotta dal relay del server"
+    "endedByRelay": "Fotocamera interrotta dal relay del server",
+    "dismissStopped": "Ignora"
   },
   "privacy": {
     "windows": "Windows blocca l'accesso alla fotocamera per le app desktop",
@@ -156,7 +158,8 @@
     "cameras": "Fotocamere",
     "label_other": "Stanza delle fotocamere, {{count}} fotocamere attive",
     "miniBar_other": "{{count}} fotocamere attive",
-    "fullTitle": "La stanza è piena con 9 videocamere"
+    "fullTitle": "La stanza è piena con 9 videocamere",
+    "backgroundPicker": "Cambia sfondo"
   },
   "position": {
     "label": "Fotocamere",
@@ -180,9 +183,11 @@
     "hidden": "Video nascosto",
     "showVideo": "Mostra video",
     "viewing": "In visione",
-    "weak": "Connessione debole"
+    "weak": "Connessione debole",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opzioni per {{name}}",
     "pin": "Fissa per me",
     "unpin": "Sblocca",
     "showLarge": "Mostra in grande",
@@ -203,7 +208,8 @@
     "screenTitle": "Schermo di {{name}}",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Avviata da {{name}}"
+    "partyStarted": "Avviata da {{name}}",
+    "label": "{{title}} con la stanza delle videocamere"
   },
   "settings": {
     "title": "Fotocamera",

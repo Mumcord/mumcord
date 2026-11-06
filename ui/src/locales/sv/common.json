@@ -35,7 +35,8 @@
     "processing": "Bearbetning",
     "output": "Högtalarbuffert",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Ljudservern levererar block på {{value}} ms eftersom ett annat program begär dem; Mumcord kan inte göra dem mindre."
   },
   "media": {
     "controls": "Playerkontroller",

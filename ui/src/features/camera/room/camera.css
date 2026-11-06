@@ -268,6 +268,37 @@
   color: #fff;
 }
 
+/* The received format shows with the tile's controls: under the pointer, with the focus or the menu open. */
+.cam-tile__badge[data-tone="format"] {
+  display: none;
+}
+
+.cam-tile:hover .cam-tile__badge[data-tone="format"],
+.cam-tile:focus-within .cam-tile__badge[data-tone="format"],
+.cam-tile:has(.cam-tile__more[aria-expanded="true"]) .cam-tile__badge[data-tone="format"] {
+  display: inline-flex;
+}
+
+/* The room bar's background picker (FR-8.40): the preview's picker in a popover, in the app theme. */
+.cam-bg-popover {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 22rem;
+  max-width: calc(100vw - 1rem);
+  max-height: calc(100vh - 1rem);
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
 /* A tile without a picture: who it is and why (joining, full, couldn't join, hidden). */
 .cam-tile__off {
   position: absolute;
@@ -417,4 +448,236 @@
   .cam-seg button[aria-checked="true"] {
     border: 1px solid ButtonText;
   }
+}
+
+/* --- Combined layout: the strip next to a screen share or watch party (FR-8.71–8.74) ------- */
+/* Without cameras next to it the main item renders as if the wrapper were not there. */
+.cam-combined-off,
+.cam-combined-off > .cam-combined__main {
+  display: contents;
+}
+
+.cam-combined {
+  display: grid;
+  grid-template-areas:
+    "head head"
+    "main strip"
+    "bar bar";
+  grid-template-columns: minmax(0, 1fr) 13.5rem;
+  gap: var(--space-3) var(--space-2);
+  align-items: start;
+}
+
+.cam-combined[data-position="above"] {
+  grid-template-areas:
+    "head"
+    "strip"
+    "main"
+    "bar";
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cam-combined[data-position="hidden"] {
+  grid-template-areas:
+    "head"
+    "main"
+    "bar";
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Show large: the camera takes the main picture's place, the picture goes small (FR-8.73). */
+.cam-combined[data-large][data-position="beside"] {
+  grid-template-areas:
+    "head head"
+    "large small"
+    "large strip"
+    "bar bar";
+}
+
+.cam-combined[data-large][data-position="above"] {
+  grid-template-areas:
+    "head head"
+    "small strip"
+    "large large"
+    "bar bar";
+  grid-template-columns: 11rem minmax(0, 1fr);
+}
+
+.cam-combined > .cam-combined__head {
+  grid-area: head;
+}
+
+.cam-combined > .cam-combined__main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.cam-combined > .cam-strip {
+  grid-area: strip;
+}
+
+.cam-combined > .cam-room__bar {
+  grid-area: bar;
+}
+
+.cam-combined .media-frame {
+  box-shadow: none;
+}
+
+.cam-combined[data-position="above"] .media-frame:not([data-fullscreen]) {
+  max-width: min(100%, calc((58vh - 7rem) * 16 / 9));
+}
+
+.cam-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.cam-strip.cam-strip--row {
+  flex-direction: row;
+}
+
+/* Only the picture shows small; what the view has below it stays out of sight. */
+.cam-combined[data-large] > .cam-combined__main {
+  grid-area: small;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.cam-combined[data-large] .media-frame {
+  max-width: none;
+}
+
+/* The small main picture only shows; it comes back large with Escape or a click on it. */
+.cam-combined[data-large] .media-frame__top,
+.cam-combined[data-large] .media-frame__bottom,
+.cam-combined[data-large] .media-frame__hint {
+  display: none;
+}
+
+.cam-combined__large {
+  grid-area: large;
+  width: 100%;
+  max-width: calc(58vh * 16 / 9);
+  margin-inline: auto;
+}
+
+.cam-combined__back {
+  z-index: 1;
+  display: flex;
+  grid-area: small;
+  align-items: flex-end;
+  justify-content: center;
+  align-self: start;
+  aspect-ratio: 16 / 9;
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--media-on-scrim);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
+  cursor: pointer;
+}
+
+.cam-combined__back:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+.cam-combined__back:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.cam-combined:fullscreen {
+  height: 100%;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* The share or party view draws its line and chips into these places of the one header. */
+.cam-combined__slot {
+  display: contents;
+}
+
+/* Who or what the main picture is, always on it in the combined card (mockups 08–09). */
+.cam-main__label {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 2;
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--media-scrim);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  pointer-events: none;
+}
+
+.cam-combined[data-large] .cam-main__label {
+  display: none;
+}
+
+/* The share's own buttons among the header chips take the chips' size (mockup 08). */
+.cam-room__chips .share-chip {
+  height: 1.5rem;
+  font-size: var(--font-size-xs);
+}
+
+.cam-room__chips .share-chip--button {
+  width: 1.5rem;
+}
+
+.cam-room__chips .viewer-quality__button {
+  width: auto;
+  padding: 0 var(--space-2);
+}
+
+/* The party sits in the card without its own padding and rule (mockup 09). */
+.cam-combined .watch-cinema {
+  padding: 0;
+  border-bottom: 0;
+}
+
+/* Above the picture the cameras stay one row and shrink to fit it (mockup 09). */
+.cam-combined > .cam-strip--row {
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.cam-combined > .cam-strip--row > .cam-strip__item {
+  flex: 0 1 11rem;
+  min-width: 0;
+}
+
+.cam-combined > .cam-strip--row .cam-tile {
+  width: 100%;
+}
+
+.cam-chip .share-path {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* The room's own segmented control is dark glass; inside the popover the picker keeps its theme. */
+.cam-bg-popover .cam-seg {
+  border-color: var(--color-border);
+  background: var(--color-bg-chat);
+}
+
+.cam-bg-popover .cam-seg__button:not([aria-pressed="true"]) {
+  color: var(--color-text-secondary);
 }

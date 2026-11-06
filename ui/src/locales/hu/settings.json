@@ -1175,7 +1175,7 @@
     "close": "Bezárás",
     "privacyTitle": "Adatvédelem",
     "lockOff": "Kamerám kikapcsolása, ha a képernyő zárolódik",
-    "privacyNote": "A kamerád mindig kikapcsolva indul, és először előnézetet mutat. Kikapcsol, ha elhagyod a csatornát vagy bontod a kapcsolatot. Csak a hangcsatornád tagjai látják, a szerver relén keresztül, végpontok közötti titkosítással. A Mumcord soha nem rögzít kamerákat.",
+    "privacyNote": "A kamerád mindig kikapcsolva indul, és először előnézetet mutat. Kikapcsol, ha elhagyod a csatornát vagy bontod a kapcsolatot. Csak a hangcsatornád tagjai látják, a szerver relén keresztül, végpontok közötti titkosítással. A Mumcord soha nem rögzít kamerákat. A nézők Mumcordja soha nem menti lemezre a képedet, de nem tudja megakadályozni, hogy valaki képernyőképet készítsen az operációs rendszerével.",
     "othersTitle": "Mások kamerái",
     "showCameras": "Kamerák megjelenítése",
     "showAlways": "Mindig",

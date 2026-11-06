@@ -74,6 +74,7 @@ done
 # The relay specs run the mumpeer testenv and the relay bot (`mumbot peer`) at the commits CI pins
 # (MUMPEER_REF, MUMBOT_REF in .github/workflows/e2e.yml), so a local run tests what CI tests.
 # MUMPEER_DIR (a checkout) and MUMBOT_IMAGE override them; without network the relay specs skip.
+# MUMCORD_E2E_NO_RELAY=1 skips the fetch and the image build (CI sets it in shards without relay specs).
 pinned_ref() { sed -n "s/^  $1: \([0-9a-f]\{40\}\)\$/\1/p" "$repo/.github/workflows/e2e.yml"; }
 # A shallow clone of one commit into $cache/<name>-<ref>, once; parallel runs race harmlessly.
 pinned_checkout() {
@@ -92,7 +93,9 @@ pinned_checkout() {
   fi
   echo "$dir"
 }
-if [ -n "${MUMPEER_DIR:-}" ]; then
+if [ -n "${MUMCORD_E2E_NO_RELAY:-}" ]; then
+  mumpeer=""
+elif [ -n "${MUMPEER_DIR:-}" ]; then
   mumpeer="$(realpath -m "$MUMPEER_DIR")"
 else
   mumpeer="$(pinned_checkout mumpeer "$(pinned_ref MUMPEER_REF)")" || mumpeer=""

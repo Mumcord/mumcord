@@ -35,7 +35,8 @@
     "processing": "Verwerking",
     "output": "Luidsprekerbuffer",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "De soundserver levert blokken van {{value}} ms omdat een andere applicatie ze vraagt; Mumcord kan ze niet kleiner maken."
   },
   "media": {
     "controls": "Player-bediening",

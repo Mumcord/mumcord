@@ -643,6 +643,34 @@ fn a_refused_apps_menu_label_is_kept_for_diagnostics() {
     );
 }
 
+#[test]
+fn a_plugin_refused_at_its_first_load_is_listed_for_diagnostics() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, _events) = fx.service();
+    assert!(service.refused_plugins().is_empty());
+
+    let folder = dev_folder(fx.root.path(), "firstbad", "");
+    std::fs::write(
+        folder.join("manifest.json"),
+        manifest(
+            "firstbad",
+            "0.1.0",
+            r#","permissions":{"required":["ui.app-menu"]},"app_menu":[{"id":"open","label":"Settings"}]"#,
+        )
+        .replace("^1.0", "^1.1"),
+    )
+    .expect("manifest");
+    let error = service.load_dev(&folder).expect_err("refused");
+    assert_eq!(error.load_issue(), Some(LoadIssue::RefusedAppMenuLabel));
+
+    let refused = service.refused_plugins();
+    assert_eq!(refused.len(), 1);
+    assert_eq!(refused[0].name, "src-firstbad");
+    assert_eq!(refused[0].issue, LoadIssue::RefusedAppMenuLabel);
+    assert!(service.list().expect("list").is_empty());
+}
+
 /// A 1.1 plugin declaring one website (FR-9.23), and that website as the frame policy lists it.
 const WEBSITE: &str = r#","permissions":{"required":["net.origins"]},"net":{"origins":[{"origin":"https://api.example.org","purpose":"origins.api"}]}"#;
 const DECLARED: &str = "https://api.example.org";

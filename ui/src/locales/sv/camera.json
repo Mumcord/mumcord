@@ -37,6 +37,7 @@
     "imageYoursLabel": "Din bild: {{name}}",
     "addImage": "Lägg till bild",
     "addImageLabel": "Lägg till din egen bild",
+    "imageFilter": "Bilder",
     "effectsLoad": "Effekter körs på den här enheten. Belastning: {{load}} ({{unit}})",
     "loadLow": "låg",
     "loadMedium": "medel",
@@ -95,7 +96,8 @@
     "rateLimited": "Kameran kunde inte startas: för många försök. Försök igen om en minut.",
     "mode": "Kameradelning kräver reläet. Ändra det under Integritet och anslutningar.",
     "noCertificate": "Kameradelning kräver ett klientcertifikat.",
-    "endedByRelay": "Kameran stoppades av serverns relä"
+    "endedByRelay": "Kameran stoppades av serverns relä",
+    "dismissStopped": "Avfärda"
   },
   "privacy": {
     "windows": "Windows blockerar kameraåtkomst för skrivbordsappar",
@@ -149,7 +151,8 @@
     "cameras": "Kameror",
     "label_other": "Kamerarum, {{count}} kameror på",
     "miniBar_other": "{{count}} kameror på",
-    "fullTitle": "Rummet är fullt vid 9 kameror"
+    "fullTitle": "Rummet är fullt vid 9 kameror",
+    "backgroundPicker": "Byt bakgrund"
   },
   "position": {
     "label": "Kameror",
@@ -173,9 +176,11 @@
     "hidden": "Video dold",
     "showVideo": "Visa video",
     "viewing": "Tittar",
-    "weak": "Svag anslutning"
+    "weak": "Svag anslutning",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Alternativ för {{name}}",
     "pin": "Fäst för mig",
     "unpin": "Lossa",
     "showLarge": "Visa stort",
@@ -196,7 +201,8 @@
     "screenTitle": "{{name}}s skärm",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Startad av {{name}}"
+    "partyStarted": "Startad av {{name}}",
+    "label": "{{title}} med kamerarummet"
   },
   "settings": {
     "title": "Kamera",

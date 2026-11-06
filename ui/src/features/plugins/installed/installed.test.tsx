@@ -87,7 +87,12 @@ afterEach(() => {
 });
 
 function withPlugins(plugins: InstalledPlugin[]): void {
-  vi.spyOn(api, "pluginsList").mockResolvedValue({ noPlugins: false, allOff: false, plugins });
+  vi.spyOn(api, "pluginsList").mockResolvedValue({
+    noPlugins: false,
+    allOff: false,
+    plugins,
+    refused: [],
+  });
 }
 
 describe("labels", () => {

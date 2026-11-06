@@ -35,7 +35,8 @@
     "processing": "Обработка",
     "output": "Буфер на високоговорителя",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Звуковият сървър доставя блокове от {{value}} ms, защото друго приложение ги иска; Mumcord не може да ги направи по-малки."
   },
   "media": {
     "controls": "Контроли на плейъра",

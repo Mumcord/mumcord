@@ -35,7 +35,8 @@
     "processing": "Spracovanie",
     "output": "Vyrovnávacia pamäť reproduktorov",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Zvukový server dodáva bloky {{value}} ms, pretože iná aplikácia ich vyžaduje; Mumcord ich nemôže zmenšiť."
   },
   "media": {
     "controls": "Ovládanie prehrávača",

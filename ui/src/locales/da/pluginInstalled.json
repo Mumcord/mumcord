@@ -127,5 +127,9 @@
     "netHttp": "Internetadgang",
     "secrets": "Nøglering"
   },
-  "offerBadge": "Nye tilladelser"
+  "offerBadge": "Nye tilladelser",
+  "refused": {
+    "title": "Afviste plugins",
+    "when": "Afvist {{time}}"
+  }
 }

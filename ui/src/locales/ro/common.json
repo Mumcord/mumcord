@@ -35,7 +35,8 @@
     "processing": "Procesare",
     "output": "Buffer difuzor",
     "value": "{{value}} ms",
-    "total": "≈ {{value}} ms"
+    "total": "≈ {{value}} ms",
+    "soundServerBlock": "Serverul de sunet furnizează blocuri de {{value}} ms pentru că o altă aplicație le cere; Mumcord nu le poate face mai mici."
   },
   "media": {
     "controls": "Comenzi player",

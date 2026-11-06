@@ -1193,7 +1193,7 @@
     "close": "Zavřít",
     "privacyTitle": "Soukromí",
     "lockOff": "Vypnout mou kameru při zamknutí obrazovky",
-    "privacyNote": "Vaše kamera se vždy spouští vypnutá a nejdřív ukáže náhled. Vypne se, když opustíte kanál nebo se odpojíte. Vidí ji jen lidé ve vašem hlasovém kanálu, přes relay tohoto serveru a s end-to-end šifrováním. Mumcord kamery nikdy nenahrává.",
+    "privacyNote": "Vaše kamera se vždy spouští vypnutá a nejdřív ukáže náhled. Vypne se, když opustíte kanál nebo se odpojíte. Vidí ji jen lidé ve vašem hlasovém kanálu, přes relay tohoto serveru a s end-to-end šifrováním. Mumcord kamery nikdy nenahrává. Mumcord diváků nikdy neukládá tvůj obraz na disk, ale nemůže nikomu zabránit pořídit snímek obrazovky pomocí operačního systému.",
     "othersTitle": "Kamery ostatních",
     "showCameras": "Zobrazovat kamery",
     "showAlways": "Vždy",
