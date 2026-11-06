@@ -347,9 +347,11 @@ jobs:
       # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
       # The old relay of AC-7.5 is the published mumpeer 0.1.0 with the mumbot 0.4.1 image (the
       # last releases before the allowed-uses and broadcast changes); docker pulls them on use.
+      # Without relay specs run.sh must not fetch mumpeer/mumbot and build the relay bot image.
       - name: Run E2E shard
         run: npm run e2e
         env:
+          MUMCORD_E2E_NO_RELAY: ${{ steps.relay.outputs.needed == 'true' && '' || '1' }}
           MUMCORD_E2E_STEP: test
           MUMCORD_E2E_SHARD: ${{ matrix.shard }}
           MUMCORD_E2E_OLD_MUMPEER_IMAGE: ghcr.io/mumcord/mumpeer:0.1.0
