@@ -644,34 +644,28 @@ fn stream(
                 let Some((first, rest)) = buffer.datas_mut().split_first_mut() else {
                     return;
                 };
-                let Some(first_plane) = plane(first) else {
+                let Some(first) = plane(first) else {
                     return;
                 };
                 let raw = match mode.format {
                     PixelFormat::Nv12 => {
-                        let (data, stride) = first_plane;
-                        match rest.first_mut().and_then(plane) {
-                            Some((uv, uv_stride)) => Raw::Nv12 {
-                                y: data,
-                                y_stride: stride,
-                                uv,
-                                uv_stride,
-                            },
-                            None => {
-                                let split = (stride * mode.height as usize).min(data.len());
-                                let (y, uv) = data.split_at(split);
-                                Raw::Nv12 {
-                                    y,
-                                    y_stride: stride,
-                                    uv,
-                                    uv_stride: stride,
-                                }
-                            }
-                        }
+                        let uv = rest.first_mut().and_then(plane);
+                        let Some(raw) =
+                            nv12_raw(first, uv, mode.width as usize, mode.height as usize)
+                        else {
+                            return;
+                        };
+                        raw
                     }
                     PixelFormat::Yuy2 | PixelFormat::Mjpeg => {
-                        let (data, stride) = first_plane;
-                        Raw::Packed { data, stride }
+                        if first.size == 0 {
+                            return;
+                        }
+                        let row = mode.width as usize * 2;
+                        Raw::Packed {
+                            data: first.filled(),
+                            stride: first.stride_or(row),
+                        }
                     }
                 };
                 pump.borrow_mut().push(raw);
@@ -689,17 +683,87 @@ fn stream(
     Ok((stream, listener))
 }
 
-/// The filled part of one buffer plane and its stride. `None` for an empty chunk (no picture).
-fn plane(data: &mut spa::buffer::Data) -> Option<(&[u8], usize)> {
+/// One mapped buffer plane and the part of it PipeWire says it filled.
+struct PlaneView<'a> {
+    mapped: &'a [u8],
+    offset: usize,
+    size: usize,
+    /// 0 when the producer leaves it unset; the callers then use the tight row length.
+    stride: usize,
+}
+
+impl<'a> PlaneView<'a> {
+    /// The filled bytes, or everything after the offset when the chunk size is unset.
+    fn filled(&self) -> &'a [u8] {
+        let start = self.offset.min(self.mapped.len());
+        let end = if self.size == 0 {
+            self.mapped.len()
+        } else {
+            start.saturating_add(self.size).min(self.mapped.len())
+        };
+        &self.mapped[start..end]
+    }
+
+    fn stride_or(&self, tight: usize) -> usize {
+        if self.stride == 0 { tight } else { self.stride }
+    }
+}
+
+/// A buffer plane with mapped memory. `None` when it has none (no picture).
+fn plane(data: &mut spa::buffer::Data) -> Option<PlaneView<'_>> {
     let chunk = data.chunk();
     let (offset, size) = (chunk.offset() as usize, chunk.size() as usize);
     let stride = usize::try_from(chunk.stride()).unwrap_or(0);
-    if size == 0 {
+    let mapped: &[u8] = data.data()?;
+    if mapped.is_empty() {
         return None;
     }
-    let bytes = data.data()?;
-    let bytes: &[u8] = bytes.get(offset..offset.checked_add(size)?)?;
-    Some((bytes, stride))
+    Some(PlaneView {
+        mapped,
+        offset,
+        size,
+        stride,
+    })
+}
+
+/// NV12 from one plane (Y followed by UV) or two (Y, UV). PipeWire producers differ: some leave
+/// the stride at 0 and some fill only the first chunk's size, so both fall back to the tight
+/// layout instead of reporting every picture as unreadable. `None` when the first plane has no
+/// picture.
+fn nv12_raw<'a>(
+    y: PlaneView<'a>,
+    uv: Option<PlaneView<'a>>,
+    width: usize,
+    height: usize,
+) -> Option<Raw<'a>> {
+    if y.size == 0 && uv.is_none() {
+        return None;
+    }
+    let y_stride = y.stride_or(width);
+    let luma = y.filled();
+    Some(match uv {
+        Some(uv) => {
+            let uv_stride = uv.stride_or(y_stride);
+            let chroma = uv.filled();
+            let chroma = &chroma[..chroma.len().min(uv_stride * height.div_ceil(2))];
+            Raw::Nv12 {
+                y: luma,
+                y_stride,
+                uv: chroma,
+                uv_stride,
+            }
+        }
+        None => {
+            let split = (y_stride * height).min(luma.len());
+            let (y, uv) = luma.split_at(split);
+            Raw::Nv12 {
+                y,
+                y_stride,
+                uv,
+                uv_stride: y_stride,
+            }
+        }
+    })
 }
 
 fn serialize(object: Object) -> Option<Vec<u8>> {
@@ -948,6 +1012,86 @@ fn rates(value: Option<&Value>) -> Vec<Rate> {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    fn view(mapped: &[u8], offset: usize, size: usize, stride: usize) -> PlaneView<'_> {
+        PlaneView {
+            mapped,
+            offset,
+            size,
+            stride,
+        }
+    }
+
+    fn nv12_parts<'a>(raw: Raw<'a>) -> (&'a [u8], usize, &'a [u8], usize) {
+        match raw {
+            Raw::Nv12 {
+                y,
+                y_stride,
+                uv,
+                uv_stride,
+            } => (y, y_stride, uv, uv_stride),
+            Raw::Packed { .. } => panic!("expected NV12"),
+        }
+    }
+
+    // 8×4 NV12: 32 bytes of Y, then 16 bytes of interleaved UV.
+    const W: usize = 8;
+    const H: usize = 4;
+
+    #[test]
+    fn one_plane_without_a_stride_uses_the_tight_row() {
+        let frame = [7u8; W * H * 3 / 2];
+        let raw = nv12_raw(view(&frame, 0, frame.len(), 0), None, W, H).unwrap();
+        let (y, y_stride, uv, uv_stride) = nv12_parts(raw);
+        assert_eq!(
+            (y.len(), y_stride, uv.len(), uv_stride),
+            (W * H, W, W * H / 2, W)
+        );
+    }
+
+    #[test]
+    fn a_second_plane_without_a_chunk_size_still_gives_the_chroma() {
+        let luma = [1u8; W * H];
+        let chroma = [2u8; W * H / 2];
+        let raw = nv12_raw(
+            view(&luma, 0, luma.len(), W),
+            Some(view(&chroma, 0, 0, 0)),
+            W,
+            H,
+        )
+        .unwrap();
+        let (y, y_stride, uv, uv_stride) = nv12_parts(raw);
+        assert_eq!(
+            (y.len(), y_stride, uv.len(), uv_stride),
+            (W * H, W, W * H / 2, W)
+        );
+        assert!(uv.iter().all(|&b| b == 2));
+    }
+
+    #[test]
+    fn a_padded_two_plane_frame_keeps_its_strides() {
+        let stride = 16;
+        let luma = [1u8; 16 * H];
+        let chroma = [2u8; 16 * H / 2];
+        let raw = nv12_raw(
+            view(&luma, 0, luma.len(), stride),
+            Some(view(&chroma, 0, chroma.len(), stride)),
+            W,
+            H,
+        )
+        .unwrap();
+        let (_, y_stride, uv, uv_stride) = nv12_parts(raw);
+        assert_eq!(
+            (y_stride, uv_stride, uv.len()),
+            (stride, stride, 16 * H / 2)
+        );
+    }
+
+    #[test]
+    fn an_empty_single_plane_is_no_picture() {
+        let frame = [0u8; W * H * 3 / 2];
+        assert!(nv12_raw(view(&frame, 0, 0, W), None, W, H).is_none());
+    }
 
     fn enum_format(subtype: MediaSubtype, extra: Vec<Property>) -> Vec<u8> {
         let mut properties = vec![
