@@ -85,6 +85,20 @@ describe("camera room", () => {
     expect(mediaView().cinema).toBe("camera");
   });
 
+  it("shows a room the engine opened before any camera once the first camera is on", async () => {
+    render(<CameraRoomSync serverId={1} />);
+    await act(async () => {
+      api.mock.setCameraRoom(1, [], true);
+      await Promise.resolve();
+    });
+    expect(mediaView().stage).not.toContain("camera");
+    await act(async () => {
+      api.mock.setCameraRoom(1, [tile(ANNA)], true);
+      await Promise.resolve();
+    });
+    expect(mediaView().cinema).toBe("camera");
+  });
+
   it("keeps the engine's room open while it comes into the media area", async () => {
     // Closing it on the way would leave every camera and join again, which the sender's join
     // limit holds back for 10 s (spec 08 §6.5).
