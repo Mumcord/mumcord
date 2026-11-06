@@ -492,6 +492,7 @@ impl Engine {
                     own.state = next_state(own.state, Step::Ready).unwrap_or(CameraState::OnAir);
                     own.send.set_on_air(true);
                     tracing::info!("camera on air");
+                    crate::crash::set_context("camera", "on air");
                     (Ok(()), own.view(), Some(id))
                 }
                 Err(failure) => {
@@ -553,6 +554,7 @@ impl Engine {
             reason = error.as_ref().map(CameraFailure::code),
             "camera off"
         );
+        crate::crash::clear_context("camera");
         self.emit_camera(
             server_id,
             Some(CameraView {
@@ -930,6 +932,7 @@ pub(crate) fn on_connection_reset(
     let was_on = own.is_some();
     if was_on {
         tracing::info!("camera off: the connection ended");
+        crate::crash::clear_context("camera");
     }
     drop(own);
     was_on

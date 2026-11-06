@@ -662,6 +662,30 @@ pub(crate) fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
     Ok(())
 }
 
+/// How Mumcord runs and on which screens, for crash reports (#568).
+fn set_crash_context(app: &AppHandle) {
+    let install = if portable::is_active() {
+        "portable"
+    } else if desktop_entry::is_appimage() {
+        "AppImage"
+    } else if std::path::Path::new("/.flatpak-info").exists() {
+        "Flatpak"
+    } else {
+        "installed package or build"
+    };
+    mumcord_engine::crash::set_context("install", install);
+    if let Ok(monitors) = app.available_monitors() {
+        let screens: Vec<String> = monitors
+            .iter()
+            .map(|m| {
+                let size = m.size();
+                format!("{}x{} @{}x", size.width, size.height, m.scale_factor())
+            })
+            .collect();
+        mumcord_engine::crash::set_context("screens", screens.join(", "));
+    }
+}
+
 /// Opens the engine, starts logging and wires engine events, diagnostics and push-to-talk.
 fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let data_dir = portable::data_dir(app)?;
@@ -688,6 +712,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         "Mumcord starting"
     );
     gst_fallback::log_h264_status(&app.config().identifier);
+    set_crash_context(app);
     mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
 
     let info_engine = engine.clone();

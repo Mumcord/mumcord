@@ -94,6 +94,7 @@ pub fn log_h264_status(identifier: &str) {
         .iter()
         .any(|dir| Path::new(dir).join("libgstlibav.so").is_file());
     let status = h264_status(registry.as_deref(), host_libav);
+    mumcord_engine::crash::set_context("h264 (AppImage)", format!("{status:?}"));
     match status {
         H264Status::HostPluginNotLoaded => tracing::warn!(
             ?status,

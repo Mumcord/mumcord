@@ -192,6 +192,7 @@ impl WatchLink {
         requests: RequestSink,
         broadcast: Option<Subscriber>,
     ) -> Self {
+        crate::crash::set_context("watching a screen share", "yes");
         let sound_stats = sound.stats();
         let volume = sound.volume();
         let forced_here = if crate::test_hooks::no_webcodecs_av1() {
@@ -265,6 +266,7 @@ impl WatchLink {
 
 impl Drop for WatchLink {
     fn drop(&mut self) {
+        crate::crash::clear_context("watching a screen share");
         for task in &self.tasks {
             task.abort();
         }

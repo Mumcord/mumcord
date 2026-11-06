@@ -4,10 +4,12 @@
 //! [`MAX_REPORTS`] kept. They hold the version, OS, cause, backtrace and the last log lines,
 //! which are redacted like the log itself; the home folder is shortened to `~`.
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::sync::OnceLock;
+use std::sync::{Mutex, OnceLock};
+use std::time::Instant;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::diag;
@@ -18,6 +20,10 @@ pub const MAX_REPORTS: usize = 10;
 const LOG_LINES: usize = 200;
 const MARKER: &str = "running";
 const SEEN: &str = "seen";
+/// What was running, kept on disk too so the report of a native crash can show it next start.
+const CONTEXT: &str = "context";
+/// The loaded libraries at a fatal signal, for naming the native stack at the next start.
+const MAPS: &str = "maps";
 const PREFIX: &str = "crash-";
 const SUFFIX: &str = ".txt";
 
@@ -65,11 +71,55 @@ pub struct CrashSummary {
 struct State {
     dir: PathBuf,
     version: String,
+    started: Instant,
 }
 
 static STATE: OnceLock<State> = OnceLock::new();
 /// Gathered once in the background at start, so a panic report needs no tools of its own.
 static SYSTEM: OnceLock<Vec<String>> = OnceLock::new();
+
+/// What is running right now (camera, screen share, install type, …), see [`set_context`].
+static RUNNING: Mutex<BTreeMap<&'static str, String>> = Mutex::new(BTreeMap::new());
+
+/// Records what is going on, e.g. `set_context("camera", "on, NV12 1280x720@15")`, so a crash
+/// report can say what was running. Values must hold nothing personal (no names, URLs, paths).
+pub fn set_context(key: &'static str, value: impl Into<String>) {
+    let value = value.into();
+    if let Ok(mut running) = RUNNING.lock() {
+        running.insert(key, value);
+        persist_context(&running);
+    }
+}
+
+pub fn clear_context(key: &'static str) {
+    if let Ok(mut running) = RUNNING.lock()
+        && running.remove(key).is_some()
+    {
+        persist_context(&running);
+    }
+}
+
+fn persist_context(running: &BTreeMap<&'static str, String>) {
+    if let Some(state) = STATE.get() {
+        let _ = fs::write(state.dir.join(CONTEXT), context_text(running));
+    }
+}
+
+fn context_text(running: &BTreeMap<&'static str, String>) -> String {
+    running
+        .iter()
+        .map(|(k, v)| format!("{k}: {}\n", v.replace(['\n', '\r'], " ")))
+        .collect()
+}
+
+/// The context lines for a report. The panic hook must not block: a panic while the lock is
+/// held leaves the section out.
+fn context_now() -> String {
+    RUNNING
+        .try_lock()
+        .map(|r| context_text(&r))
+        .unwrap_or_default()
+}
 
 fn system_lines() -> &'static [String] {
     SYSTEM.get().map(Vec::as_slice).unwrap_or_default()
@@ -80,13 +130,33 @@ fn system_lines() -> &'static [String] {
 pub fn install(dir: &Path, version: &str) -> io::Result<()> {
     fs::create_dir_all(dir)?;
     let marker = dir.join(MARKER);
-    let unclean = fs::read_to_string(&marker)
-        .ok()
-        .map(|left| match left.trim() {
-            "" => CrashKind::Unexpected,
-            signal => CrashKind::Signal(signal.to_owned()),
-        });
+    let left = fs::read_to_string(&marker).ok();
+    let native = left.as_deref().and_then(parse_marker);
+    let unclean = left.map(|_| match &native {
+        Some(crash) => CrashKind::Signal(crash.signal.clone()),
+        None => CrashKind::Unexpected,
+    });
     let previous = unclean.as_ref().map(|_| previous_log_tail(dir));
+    let thread = native
+        .as_ref()
+        .and_then(|crash| crash.thread.clone())
+        .unwrap_or_else(|| "-".to_owned());
+    let previous_context = fs::read_to_string(dir.join(CONTEXT)).unwrap_or_default();
+    let _ = fs::remove_file(dir.join(CONTEXT));
+    // The libraries still sit where the crashed run had them on disk, so the stack can be
+    // named now; the mapping file is reused for this run's handler.
+    let stack = native
+        .as_ref()
+        .map(|crash| {
+            let maps = fs::read_to_string(dir.join(MAPS)).unwrap_or_default();
+            let mut lines = Vec::new();
+            if let Some(fault) = crash.fault {
+                lines.push(format!("faulting address: 0x{fault:x}"));
+            }
+            lines.extend(symbolize(&crash.ips, &maps));
+            lines.join("\n")
+        })
+        .unwrap_or_default();
     {
         // The system details take a few tool calls; the report of an unclean previous run waits
         // for them, the start does not.
@@ -100,7 +170,16 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
                         CrashKind::Signal(name) => format!("Mumcord was stopped by {name}"),
                         _ => "Mumcord closed without shutting down".to_owned(),
                     };
-                    let _ = write_report(&dir, &version, &kind, "-", &cause, "", &previous);
+                    let report = Report {
+                        kind,
+                        thread: &thread,
+                        cause: &cause,
+                        backtrace: &stack,
+                        log: &previous,
+                        context: &previous_context,
+                        uptime_secs: None,
+                    };
+                    let _ = write_report(&dir, &version, &report);
                     let _ = prune(&dir);
                 }
             });
@@ -110,9 +189,10 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
     let _ = STATE.set(State {
         dir: dir.to_path_buf(),
         version: version.to_owned(),
+        started: Instant::now(),
     });
     install_panic_hook();
-    native::install(&marker);
+    native::install(&marker, &dir.join(MAPS));
     Ok(())
 }
 
@@ -120,6 +200,8 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
 pub fn clean_exit() {
     if let Some(state) = STATE.get() {
         let _ = fs::remove_file(state.dir.join(MARKER));
+        let _ = fs::remove_file(state.dir.join(CONTEXT));
+        let _ = fs::remove_file(state.dir.join(MAPS));
     }
 }
 
@@ -141,15 +223,19 @@ fn install_panic_hook() {
                 .map(|l| format!(" at {}:{}", l.file(), l.line()))
                 .unwrap_or_default();
             let backtrace = std::backtrace::Backtrace::force_capture().to_string();
-            let _ = write_report(
-                &state.dir,
-                &state.version,
-                &CrashKind::Panic,
-                thread.name().unwrap_or("unnamed"),
-                &format!("{message}{location}"),
-                &backtrace,
-                &diag::recent_log_lines(),
-            );
+            let cause = format!("{message}{location}");
+            let log = diag::recent_log_lines();
+            let context = context_now();
+            let report = Report {
+                kind: CrashKind::Panic,
+                thread: thread.name().unwrap_or("unnamed"),
+                cause: &cause,
+                backtrace: &backtrace,
+                log: &log,
+                context: &context,
+                uptime_secs: Some(state.started.elapsed().as_secs()),
+            };
+            let _ = write_report(&state.dir, &state.version, &report);
         }
         previous(info);
     }));
@@ -184,6 +270,23 @@ fn now_unix() -> u64 {
         .unwrap_or_default()
 }
 
+/// `2026-11-06 21:51 UTC` from seconds since 1970 (the civil-from-days algorithm by Howard
+/// Hinnant), so a report reads the same in every time zone.
+fn utc(secs: u64) -> String {
+    let days = i64::try_from(secs / 86_400).unwrap_or_default();
+    let (hour, minute) = (secs % 86_400 / 3600, secs % 3600 / 60);
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z - era * 146_097;
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let day = doy - (153 * mp + 2) / 5 + 1;
+    let month = if mp < 10 { mp + 3 } else { mp - 9 };
+    let year = yoe + era * 400 + i64::from(month <= 2);
+    format!("{year:04}-{month:02}-{day:02} {hour:02}:{minute:02} UTC")
+}
+
 /// Replaces the home folder with `~`, so user names in paths stay out of reports.
 fn shorten_home(text: &str) -> String {
     match std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")) {
@@ -192,15 +295,28 @@ fn shorten_home(text: &str) -> String {
     }
 }
 
-fn write_report(
-    dir: &Path,
-    version: &str,
-    kind: &CrashKind,
-    thread: &str,
-    cause: &str,
-    backtrace: &str,
-    log: &[String],
-) -> io::Result<PathBuf> {
+/// What goes into one report besides the version and the system details.
+struct Report<'a> {
+    kind: CrashKind,
+    thread: &'a str,
+    cause: &'a str,
+    backtrace: &'a str,
+    log: &'a [String],
+    /// What was running, one `key: value` per line.
+    context: &'a str,
+    uptime_secs: Option<u64>,
+}
+
+fn write_report(dir: &Path, version: &str, report: &Report<'_>) -> io::Result<PathBuf> {
+    let Report {
+        kind,
+        thread,
+        cause,
+        backtrace,
+        log,
+        context,
+        uptime_secs,
+    } = report;
     let created = now_unix();
     let mut path = dir.join(format!("{PREFIX}{created}{SUFFIX}"));
     let mut n = 1;
@@ -211,11 +327,22 @@ fn write_report(
     let mut text = String::new();
     text.push_str("Mumcord crash report\n");
     text.push_str(&format!("version: {version}\n"));
-    text.push_str(&format!("os: {}\n", diag::os_description()));
-    text.push_str(&format!("time: {created}\n"));
+    text.push_str(&format!("time: {created} ({})\n", utc(created)));
     text.push_str(&format!("kind: {}\n", kind.as_str()));
     text.push_str(&format!("thread: {thread}\n"));
     text.push_str(&format!("cause: {}\n", cause.replace(['\n', '\r'], " ")));
+    if let Some(secs) = *uptime_secs {
+        text.push_str(&format!(
+            "uptime: {}h {:02}m {:02}s\n",
+            secs / 3600,
+            secs / 60 % 60,
+            secs % 60
+        ));
+    }
+    if !context.is_empty() {
+        text.push_str("\nrunning:\n");
+        text.push_str(context);
+    }
     if !system_lines().is_empty() {
         text.push_str("\nsystem:\n");
         for line in system_lines() {
@@ -279,7 +406,11 @@ fn summary(path: &Path) -> Option<CrashSummary> {
     };
     Some(CrashSummary {
         id: path.file_name()?.to_str()?.to_owned(),
-        created_unix: field("time").parse().unwrap_or_default(),
+        created_unix: field("time")
+            .split_whitespace()
+            .next()
+            .and_then(|t| t.parse().ok())
+            .unwrap_or_default(),
         version: field("version"),
         kind: CrashKind::parse(&field("kind")),
         cause: field("cause"),
@@ -363,15 +494,20 @@ pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
     unseen
 }
 
-/// The native handler: writes the signal name into the marker with async-signal-safe calls
-/// only, then lets the default action end the process.
+/// The native handler (Unix). At a fatal signal it writes, with async-signal-safe calls only
+/// (no allocation, no locks), into the marker: the signal name, the faulting address and up to
+/// [`native::MAX_FRAMES`] return addresses; and it copies `/proc/self/maps` next to it. The next
+/// start turns the addresses into library and symbol names ([`symbolize`]). Then the default
+/// action ends the process as before.
 #[cfg(unix)]
 mod native {
     use std::os::fd::IntoRawFd;
     use std::path::Path;
     use std::sync::atomic::{AtomicI32, Ordering};
 
+    pub const MAX_FRAMES: usize = 64;
     static MARKER_FD: AtomicI32 = AtomicI32::new(-1);
+    static MAPS_FD: AtomicI32 = AtomicI32::new(-1);
     const SIGNALS: [(libc::c_int, &[u8]); 5] = [
         (libc::SIGSEGV, b"SIGSEGV"),
         (libc::SIGILL, b"SIGILL"),
@@ -380,33 +516,92 @@ mod native {
         (libc::SIGABRT, b"SIGABRT"),
     ];
 
-    pub fn install(marker: &Path) {
+    pub fn install(marker: &Path, maps: &Path) {
         let Ok(file) = std::fs::OpenOptions::new().write(true).open(marker) else {
             return;
         };
         MARKER_FD.store(file.into_raw_fd(), Ordering::Release);
+        if let Ok(file) = std::fs::File::create(maps) {
+            MAPS_FD.store(file.into_raw_fd(), Ordering::Release);
+        }
         for (signal, _) in SIGNALS {
-            // SAFETY: a plain C handler installed with sigaction; the handler only uses
-            // async-signal-safe functions (write, signal, raise).
+            // SAFETY: a plain C handler installed with sigaction; it only uses async-signal-safe
+            // calls (write, open, read, close, raise) plus the unwinder, which crash reporters
+            // commonly call from such handlers. SA_ONSTACK uses the alternate stack the Rust
+            // runtime gives each of its threads, so a stack overflow is reported as well.
             unsafe {
                 let mut action: libc::sigaction = std::mem::zeroed();
-                action.sa_sigaction = handler as extern "C" fn(libc::c_int) as libc::sighandler_t;
-                action.sa_flags = libc::SA_RESETHAND;
+                action.sa_sigaction = handler
+                    as extern "C" fn(libc::c_int, *mut libc::siginfo_t, *mut libc::c_void)
+                    as libc::sighandler_t;
+                action.sa_flags = libc::SA_RESETHAND | libc::SA_SIGINFO | libc::SA_ONSTACK;
                 libc::sigemptyset(&mut action.sa_mask);
                 libc::sigaction(signal, &action, std::ptr::null_mut());
             }
         }
     }
 
-    extern "C" fn handler(signal: libc::c_int) {
+    fn put(fd: libc::c_int, bytes: &[u8]) {
+        // SAFETY: write(2) is async-signal-safe; the buffer is valid for its length.
+        unsafe {
+            libc::write(fd, bytes.as_ptr().cast(), bytes.len());
+        }
+    }
+
+    /// `prefix 0x<hex>\n` without allocating.
+    fn put_hex(fd: libc::c_int, prefix: &[u8], value: usize) {
+        let mut buf = [0u8; 64];
+        let mut n = 0;
+        for &b in prefix.iter().chain(b" 0x") {
+            buf[n] = b;
+            n += 1;
+        }
+        let digits = b"0123456789abcdef";
+        let mut started = false;
+        for shift in (0..usize::BITS).step_by(4).rev() {
+            let d = (value >> shift) & 0xf;
+            if d != 0 || started || shift == 0 {
+                started = true;
+                buf[n] = digits[d];
+                n += 1;
+            }
+        }
+        buf[n] = b'\n';
+        put(fd, &buf[..=n]);
+    }
+
+    extern "C" fn handler(
+        signal: libc::c_int,
+        info: *mut libc::siginfo_t,
+        _ctx: *mut libc::c_void,
+    ) {
         let fd = MARKER_FD.load(Ordering::Acquire);
         if fd >= 0
             && let Some((_, name)) = SIGNALS.iter().find(|(s, _)| *s == signal)
         {
-            // SAFETY: write(2) is async-signal-safe; the buffer is a static string.
-            unsafe {
-                libc::write(fd, name.as_ptr().cast(), name.len());
+            put(fd, name);
+            put(fd, b"\n");
+            thread_name(fd);
+            if !info.is_null() {
+                // SAFETY: the kernel passes a valid siginfo for SA_SIGINFO handlers.
+                let address = unsafe { (*info).si_addr() } as usize;
+                put_hex(fd, b"fault", address);
             }
+            let mut frames = [0usize; MAX_FRAMES];
+            let mut count = 0;
+            // SAFETY: no other thread unwinds through this one while it is stopped in a fatal
+            // signal; the closure only stores into a stack array.
+            unsafe {
+                backtrace::trace_unsynchronized(|frame| {
+                    frames[count] = frame.ip() as usize;
+                    count += 1;
+                    count < MAX_FRAMES
+                });
+            }
+            for &ip in &frames[..count] {
+                put_hex(fd, b"ip", ip);
+            }
+            copy_maps();
         }
         // SA_RESETHAND restored the default action: raising again ends the process as before.
         // SAFETY: raise(3) is async-signal-safe.
@@ -414,18 +609,196 @@ mod native {
             libc::raise(signal);
         }
     }
+
+    /// `thread <name>` of the crashing thread. Linux names threads through prctl, a plain
+    /// system call; elsewhere the line is left out.
+    fn thread_name(fd: libc::c_int) {
+        #[cfg(target_os = "linux")]
+        {
+            let mut name = [0u8; 16];
+            // SAFETY: PR_GET_NAME writes at most 16 bytes into the buffer.
+            let ok = unsafe { libc::prctl(libc::PR_GET_NAME, name.as_mut_ptr()) } == 0;
+            if ok {
+                let len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+                put(fd, b"thread ");
+                put(fd, &name[..len]);
+                put(fd, b"\n");
+            }
+        }
+        #[cfg(not(target_os = "linux"))]
+        let _ = fd;
+    }
+
+    /// Copies `/proc/self/maps` (which library sits where) for the symbol lookup at the next
+    /// start, using only open/read/write/close.
+    fn copy_maps() {
+        let out = MAPS_FD.load(Ordering::Acquire);
+        if out < 0 {
+            return;
+        }
+        // SAFETY: open/read/close are async-signal-safe; the path is a static C string.
+        unsafe {
+            let input = libc::open(c"/proc/self/maps".as_ptr(), libc::O_RDONLY);
+            if input < 0 {
+                return;
+            }
+            let mut buf = [0u8; 4096];
+            loop {
+                let n = libc::read(input, buf.as_mut_ptr().cast(), buf.len());
+                if n <= 0 {
+                    break;
+                }
+                put(out, &buf[..n as usize]);
+            }
+            libc::close(input);
+        }
+    }
 }
 
 /// Without a native handler the marker alone tells an unclean exit at the next start.
 #[cfg(not(unix))]
 mod native {
-    pub fn install(_marker: &std::path::Path) {}
+    pub fn install(_marker: &std::path::Path, _maps: &std::path::Path) {}
+}
+
+/// One mapping line of `/proc/self/maps`: address range, file offset and path.
+struct Mapping<'a> {
+    start: usize,
+    end: usize,
+    offset: usize,
+    path: &'a str,
+}
+
+fn mappings(maps: &str) -> Vec<Mapping<'_>> {
+    maps.lines()
+        .filter_map(|line| {
+            let mut fields = line.split_whitespace();
+            let (start, end) = fields.next()?.split_once('-')?;
+            let _perms = fields.next()?;
+            let offset = fields.next()?;
+            let _dev = fields.next()?;
+            let _inode = fields.next()?;
+            let path = fields.next().filter(|p| p.starts_with('/'))?;
+            Some(Mapping {
+                start: usize::from_str_radix(start, 16).ok()?,
+                end: usize::from_str_radix(end, 16).ok()?,
+                offset: usize::from_str_radix(offset, 16).ok()?,
+                path,
+            })
+        })
+        .collect()
+}
+
+/// The nearest symbol at or below `file_offset` in an ELF file, with the distance to it.
+fn symbol_at(data: &[u8], file_offset: usize) -> Option<(String, u64)> {
+    use object::{Object, ObjectSegment, ObjectSymbol};
+    let file = object::File::parse(data).ok()?;
+    let offset = file_offset as u64;
+    let address = file.segments().find_map(|segment| {
+        let (seg_offset, size) = segment.file_range();
+        (seg_offset..seg_offset + size)
+            .contains(&offset)
+            .then(|| segment.address() + (offset - seg_offset))
+    })?;
+    let best = file
+        .symbols()
+        .chain(file.dynamic_symbols())
+        .filter(|s| s.is_definition() && s.address() <= address && s.address() != 0)
+        .filter(|s| s.size() == 0 || address < s.address() + s.size())
+        .max_by_key(|s| s.address())?;
+    let name = best.name().ok()?;
+    Some((
+        format!("{:#}", rustc_demangle::demangle(name)),
+        address - best.address(),
+    ))
+}
+
+/// Turns the addresses the native handler wrote into `library symbol+offset` lines. Addresses
+/// outside any file (JIT code, the stack) stay as they are.
+fn symbolize(ips: &[usize], maps: &str) -> Vec<String> {
+    let maps = mappings(maps);
+    let mut files: BTreeMap<&str, Option<Vec<u8>>> = BTreeMap::new();
+    ips.iter()
+        .enumerate()
+        .map(|(i, &ip)| {
+            let Some(map) = maps.iter().find(|m| m.start <= ip && ip < m.end) else {
+                return format!("{i:>3}: 0x{ip:x}");
+            };
+            let file_offset = ip - map.start + map.offset;
+            let library = Path::new(map.path)
+                .file_name()
+                .map_or(map.path.to_owned(), |n| n.to_string_lossy().into_owned());
+            let data = files
+                .entry(map.path)
+                .or_insert_with(|| fs::read(map.path).ok());
+            match data.as_deref().and_then(|d| symbol_at(d, file_offset)) {
+                Some((name, delta)) => format!("{i:>3}: {library} {name}+0x{delta:x}"),
+                None => format!("{i:>3}: {library} +0x{file_offset:x}"),
+            }
+        })
+        .collect()
+}
+
+/// The marker a fatal signal left: the signal name, the faulting address and the stack.
+struct NativeCrash {
+    signal: String,
+    thread: Option<String>,
+    fault: Option<usize>,
+    ips: Vec<usize>,
+}
+
+fn parse_marker(text: &str) -> Option<NativeCrash> {
+    let mut lines = text.lines();
+    let signal = lines.next()?.trim().to_owned();
+    if signal.is_empty() {
+        return None;
+    }
+    let hex = |s: &str| usize::from_str_radix(s.trim().trim_start_matches("0x"), 16).ok();
+    let mut fault = None;
+    let mut thread = None;
+    let mut ips = Vec::new();
+    for line in lines {
+        if let Some(v) = line.strip_prefix("thread ") {
+            thread = Some(v.trim().to_owned());
+        } else if let Some(v) = line.strip_prefix("fault ") {
+            fault = hex(v);
+        } else if let Some(v) = line.strip_prefix("ip ") {
+            ips.extend(hex(v));
+        }
+    }
+    Some(NativeCrash {
+        signal,
+        thread,
+        fault,
+        ips,
+    })
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    fn test_report(
+        dir: &Path,
+        kind: CrashKind,
+        cause: &str,
+        log: &[String],
+    ) -> io::Result<PathBuf> {
+        write_report(
+            dir,
+            "0.7.1",
+            &Report {
+                kind,
+                thread: "main",
+                cause,
+                backtrace: "",
+                log,
+                context: "camera: on\n",
+                uptime_secs: Some(42),
+            },
+        )
+    }
 
     #[test]
     fn a_marker_left_behind_becomes_a_report_and_a_clean_run_does_not() {
@@ -443,22 +816,58 @@ mod tests {
         // `install` would also set process-wide hooks, so the start-up check is tested directly.
         let left = fs::read_to_string(dir.join(MARKER)).unwrap();
         let kind = CrashKind::Signal(left);
-        write_report(
-            &dir,
-            "0.7.1",
-            &kind,
-            "-",
-            "stopped",
-            "",
-            &previous_log_tail(&dir),
-        )
-        .unwrap();
+        test_report(&dir, kind, "stopped", &previous_log_tail(&dir)).unwrap();
 
         let reports = list(&dir);
         assert_eq!(reports.len(), 1);
         assert_eq!(reports[0].kind, CrashKind::Signal("SIGSEGV".to_owned()));
         assert_eq!(reports[0].version, "0.7.1");
-        assert!(read(&dir, &reports[0].id).unwrap().contains("last line"));
+        let text = read(&dir, &reports[0].id).unwrap();
+        assert!(text.contains("last line"));
+        assert!(text.contains("running:\ncamera: on\n"));
+        assert!(text.contains("uptime: 0h 00m 42s"));
+    }
+
+    #[test]
+    fn context_lines_are_one_per_key_without_line_breaks() {
+        let mut running = BTreeMap::new();
+        running.insert("screen share", "sending, AV1\n1080p".to_owned());
+        running.insert("camera", "on".to_owned());
+        assert_eq!(
+            context_text(&running),
+            "camera: on\nscreen share: sending, AV1 1080p\n"
+        );
+    }
+
+    #[test]
+    fn times_are_written_in_utc() {
+        assert_eq!(utc(0), "1970-01-01 00:00 UTC");
+        assert_eq!(utc(1_794_001_864), "2026-11-06 21:51 UTC");
+        assert_eq!(utc(951_782_400), "2000-02-29 00:00 UTC");
+    }
+
+    #[test]
+    fn the_signal_marker_is_parsed() {
+        let crash =
+            parse_marker("SIGSEGV\nthread screen-decode\nfault 0x10\nip 0x7f00aa\nip 0x7f00bb\n")
+                .unwrap();
+        assert_eq!(crash.signal, "SIGSEGV");
+        assert_eq!(crash.thread.as_deref(), Some("screen-decode"));
+        assert_eq!(crash.fault, Some(0x10));
+        assert_eq!(crash.ips, vec![0x7f00aa, 0x7f00bb]);
+        assert!(parse_marker("").is_none());
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn an_address_in_libc_gets_a_symbol_name() {
+        // This process's own libc: `getpid` must resolve to a name in it.
+        let maps = fs::read_to_string("/proc/self/maps").unwrap();
+        let getpid = libc::getpid as unsafe extern "C" fn() -> libc::pid_t as usize;
+        let lines = symbolize(&[getpid, 0x10], &maps);
+        assert!(lines[0].contains("libc"), "{lines:?}");
+        assert!(lines[0].contains("getpid"), "{lines:?}");
+        assert_eq!(lines[1], "  1: 0x10");
     }
 
     #[test]
@@ -487,16 +896,7 @@ mod tests {
     #[test]
     fn unseen_reports_are_shown_once() {
         let dir = tempfile::tempdir().unwrap();
-        write_report(
-            dir.path(),
-            "0.7.1",
-            &CrashKind::Panic,
-            "main",
-            "boom",
-            "",
-            &[],
-        )
-        .unwrap();
+        test_report(dir.path(), CrashKind::Panic, "boom", &[]).unwrap();
         assert_eq!(take_unseen(dir.path()).len(), 1);
         assert!(take_unseen(dir.path()).is_empty());
     }
@@ -504,16 +904,7 @@ mod tests {
     #[test]
     fn export_zips_the_reports_and_delete_all_empties_the_folder() {
         let dir = tempfile::tempdir().unwrap();
-        write_report(
-            dir.path(),
-            "0.7.1",
-            &CrashKind::Panic,
-            "main",
-            "boom",
-            "",
-            &[],
-        )
-        .unwrap();
+        test_report(dir.path(), CrashKind::Panic, "boom", &[]).unwrap();
         let dest = dir.path().join("out.zip");
         export(dir.path(), &[], &dest).unwrap();
         let zip = zip::ZipArchive::new(fs::File::open(&dest).unwrap()).unwrap();
