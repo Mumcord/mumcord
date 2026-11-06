@@ -42,6 +42,9 @@ impl PluginService {
             // A server switch leaves the activities on the old one, which stays connected.
             self.stage_sync_place(true);
             self.relay_refresh();
+            if let Some(server) = server {
+                self.ready_by_announce(server, None);
+            }
         }
         self.broadcast_self();
     }
@@ -100,6 +103,43 @@ impl PluginService {
             self.stage_member_announced(peer.session);
         }
         self.dispatch(server, |keys, id| Event::Joined(wit_peer(keys, id, &peer)));
+        self.ready_by_announce(server, Some(peer.session));
+    }
+
+    /// `peer-ready` for each plugin that a member (`only`, or everyone in the channel) reaches by
+    /// their last announce. The announce path only covers members already in the channel of the
+    /// focused server; after a reconnect it often comes before their join or before the focus,
+    /// and then their plugins would never hear that they can be reached (FR-6.35).
+    fn ready_by_announce(&mut self, server: ServerId, only: Option<u32>) {
+        let ready: Vec<(String, PeerInfo)> = {
+            let state = self.io.peers();
+            if state.focused != Some(server) {
+                return;
+            }
+            let Some(connection) = state.connections.get(&server) else {
+                return;
+            };
+            connection
+                .members
+                .values()
+                .filter(|peer| only.is_none_or(|session| session == peer.session))
+                .flat_map(|peer| {
+                    let entries = connection
+                        .announced
+                        .get(&peer.session)
+                        .map(Vec::as_slice)
+                        .unwrap_or_default();
+                    newly_reachable(&state.plugins, peer, None, entries)
+                        .into_iter()
+                        .map(|id| (id, peer.clone()))
+                })
+                .collect()
+        };
+        let keys = self.ctx.peer_keys.as_ref();
+        for (id, peer) in ready {
+            self.host
+                .send(&id, Event::PeerReady(wit_peer(keys, &id, &peer)));
+        }
     }
 
     /// The friends list changed (`friends`: cert hashes). People already in the channel take
