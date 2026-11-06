@@ -41,11 +41,6 @@ async function onAirWith(choose: () => Promise<void>): Promise<void> {
   });
 }
 
-/** Mean distance of the background samples to a solid colour. */
-function distanceTo(regions: Regions, colour: camera.Rgb): number {
-  return camera.meanDiff(regions.background, regions.background.map(() => colour));
-}
-
 (relayenv.relayAvailable() ? describe : describe.skip)("camera effects and own images (spec 08, AC-8.5, 8.6)", function () {
   this.timeout(900_000);
   this.bail(true);
@@ -132,18 +127,20 @@ function distanceTo(regions: Regions, colour: camera.Rgb): number {
     expect(bytes.includes("Exif")).toBe(false);
     expect(bytes.includes(EXIF_MARKER)).toBe(false);
 
-    const preview = await camera.waitBackgroundChanged(camera.PREVIEW_CANVAS, previewNone, {
+    // Choosing "Image" first shows the last built-in image, which already differs from "None":
+    // wait for the own image's colour, not just for any change.
+    await camera.waitBackgroundChanged(camera.PREVIEW_CANVAS, previewNone, {
       minBackground: 25,
+      near: { colour: ORANGE, max: 30 },
     });
-    expect(distanceTo(preview, ORANGE)).toBeLessThan(30);
     await camera.turnOnFromPreview();
     await apps.onB(async () => {
       await camera.openRoom();
       await camera.waitTilePicture("Alice");
-      const tile = await camera.waitBackgroundChanged(camera.tileCanvas("Alice"), tileNone, {
+      await camera.waitBackgroundChanged(camera.tileCanvas("Alice"), tileNone, {
         minBackground: 25,
+        near: { colour: ORANGE, max: 40 },
       });
-      expect(distanceTo(tile, ORANGE)).toBeLessThan(40);
     });
     await camera.turnOff();
   });
