@@ -292,6 +292,109 @@ mod linux {
         if disabled < DISABLED.len() {
             tracing::warn!("this WebKitGTK lacks a feature switch; link preconnect may stay on");
         }
+        #[cfg(debug_assertions)]
+        if let Some(file) = mumcord_plugins::test_hooks::test_ca() {
+            test_ca::allow_fixture_certificates(view, &file);
+        }
+    }
+
+    /// E2E hook `MUMCORD_TEST_CA`, compiled into debug builds only: the plugin frames must reach
+    /// the HTTPS fixture, whose certificates are made per run. WebKitGTK cannot add a CA from the
+    /// app (its network process uses the system store), but it can accept one exact server
+    /// certificate for a host. So every certificate in the file is accepted for the DNS names it
+    /// names, and nothing else; the frames' CSP still decides which origins they may reach.
+    #[cfg(debug_assertions)]
+    mod test_ca {
+        use std::ffi::{CString, c_char, c_uint, c_void};
+        use std::path::Path;
+        use std::ptr;
+
+        use gtk::glib::object::ObjectType;
+
+        #[repr(C)]
+        struct GList {
+            data: *mut c_void,
+            next: *mut GList,
+            prev: *mut GList,
+        }
+
+        #[repr(C)]
+        struct GPtrArray {
+            pdata: *mut *mut c_void,
+            len: c_uint,
+        }
+
+        #[repr(C)]
+        struct GError {
+            domain: u32,
+            code: i32,
+            message: *mut c_char,
+        }
+
+        unsafe extern "C" {
+            fn webkit_web_view_get_context(view: *mut c_void) -> *mut c_void;
+            fn webkit_web_context_allow_tls_certificate_for_host(
+                context: *mut c_void,
+                certificate: *mut c_void,
+                host: *const c_char,
+            );
+            fn g_tls_certificate_list_new_from_file(
+                file: *const c_char,
+                error: *mut *mut GError,
+            ) -> *mut GList;
+            fn g_tls_certificate_get_dns_names(certificate: *mut c_void) -> *mut GPtrArray;
+            fn g_bytes_get_data(bytes: *mut c_void, size: *mut usize) -> *const u8;
+            fn g_ptr_array_unref(array: *mut GPtrArray);
+            fn g_object_unref(object: *mut c_void);
+            fn g_list_free(list: *mut GList);
+            fn g_error_free(error: *mut GError);
+        }
+
+        pub(super) fn allow_fixture_certificates(view: &impl ObjectType, file: &Path) {
+            let Some(path) = file.to_str().and_then(|p| CString::new(p).ok()) else {
+                tracing::error!("MUMCORD_TEST_CA is not a usable path");
+                return;
+            };
+            let mut allowed = 0;
+            // SAFETY: `view` is a live WebKitWebView; the certificate list, each certificate,
+            // the name array and the error are owned here and released before returning; the
+            // name bytes are read only while the array holds them.
+            unsafe {
+                let context = webkit_web_view_get_context(view.as_ptr().cast());
+                let mut error: *mut GError = ptr::null_mut();
+                let list = g_tls_certificate_list_new_from_file(path.as_ptr(), &raw mut error);
+                if !error.is_null() {
+                    tracing::error!("MUMCORD_TEST_CA is unreadable for the web view");
+                    g_error_free(error);
+                    return;
+                }
+                let mut node = list;
+                while !node.is_null() {
+                    let certificate = (*node).data;
+                    let names = g_tls_certificate_get_dns_names(certificate);
+                    if !names.is_null() {
+                        for index in 0..(*names).len as usize {
+                            let mut size = 0;
+                            let data = g_bytes_get_data(*(*names).pdata.add(index), &raw mut size);
+                            let name = std::slice::from_raw_parts(data, size);
+                            if let Ok(host) = CString::new(name) {
+                                webkit_web_context_allow_tls_certificate_for_host(
+                                    context,
+                                    certificate,
+                                    host.as_ptr(),
+                                );
+                                allowed += 1;
+                            }
+                        }
+                        g_ptr_array_unref(names);
+                    }
+                    g_object_unref(certificate);
+                    node = (*node).next;
+                }
+                g_list_free(list);
+            }
+            tracing::warn!("MUMCORD_TEST_CA: the web view accepts the fixture certificate for {allowed} names");
+        }
     }
 }
 
