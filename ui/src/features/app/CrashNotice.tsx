@@ -4,6 +4,7 @@ import { getApi, type CrashReport } from "../../api";
 import { CrashDialog } from "../settings/crash/CrashReportsCard";
 import { UploadDialog } from "../settings/crash/UploadDialog";
 import { kindKey } from "../settings/crash/useCrashReports";
+import { takeUnseenOnce } from "./crashNoticeOnce";
 import "../settings/crash/crash.css";
 
 const BUG_REPORT_URL = "https://github.com/Mumcord/mumcord/issues/new";
@@ -17,17 +18,15 @@ export function CrashNotice() {
 
   useEffect(() => {
     let active = true;
-    getApi()
-      .crashTakeUnseen()
-      .then(
-        (unseen) => {
-          // The newest one speaks for all; the others are in Settings.
-          if (active) setReport(unseen[0] ?? null);
-        },
-        (error: unknown) => {
-          console.error("Reading new crash reports failed", error);
-        },
-      );
+    takeUnseenOnce().then(
+      (unseen) => {
+        // The newest one speaks for all; the others are in Settings.
+        if (active) setReport(unseen[0] ?? null);
+      },
+      (error: unknown) => {
+        console.error("Reading new crash reports failed", error);
+      },
+    );
     return () => {
       active = false;
     };

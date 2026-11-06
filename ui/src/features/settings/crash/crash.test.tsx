@@ -1,8 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { StrictMode } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createMockApi, setApi, type CrashReport } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { stubDialog } from "../../channels/testUtils";
+import { CrashNotice } from "../../app/CrashNotice";
+import { resetUnseenOnce } from "../../app/crashNoticeOnce";
 import { CrashReportsCard } from "./CrashReportsCard";
 
 const report = (): CrashReport => ({
@@ -58,5 +61,16 @@ describe("crash reports (#568, #573)", () => {
     fireEvent.click(await screen.findByRole("button", { name: /Delete report from/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Delete" }));
     expect(await screen.findByText("No crash reports")).toBeTruthy();
+  });
+
+  it("shows the crash notice once, also when React runs effects twice", async () => {
+    resetUnseenOnce();
+    setApi(createMockApi({ crashReports: [report()] }));
+    render(
+      <StrictMode>
+        <CrashNotice />
+      </StrictMode>,
+    );
+    expect(await screen.findByText("Mumcord closed unexpectedly")).toBeTruthy();
   });
 });

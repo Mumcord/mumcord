@@ -1003,12 +1003,36 @@ function parseLink(url: string): MumbleLink {
 /** Length of each mic-test phase (recording, playback) in the mock. */
 const MIC_TEST_PHASE_MS = 5000;
 
+/** Fictional crash reports for screenshots of the crash UI (#568). */
+const DEMO_CRASH_REPORTS: CrashReport[] = [
+  {
+    id: "crash-1794001864.txt",
+    created: 1794001864,
+    version: "0.7.1",
+    kind: "signal",
+    signal: "SIGSEGV",
+    cause: "Mumcord was stopped by SIGSEGV",
+    uploaded: false,
+  },
+  {
+    id: "crash-1793830000.txt",
+    created: 1793830000,
+    version: "0.7.0",
+    kind: "panic",
+    signal: null,
+    cause: "decoder returned no frame for a keyframe at crates/engine/src/screen_share/watch.rs:412",
+    uploaded: true,
+  },
+];
+
 export function createMockApi(options: MockOptions = {}): MockApi {
   const seed = options.seed ?? import.meta.env.VITE_MUMCORD_MOCK_SEED ?? "ready";
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
-  const crashReports: CrashReport[] = [...(options.crashReports ?? [])];
+  const crashReports: CrashReport[] = [
+    ...(options.crashReports ?? (seed === "demo" ? DEMO_CRASH_REPORTS : [])),
+  ];
   const crashSeen = new Set<string>();
   /** What the mock answered for each `mumble://` link in this run (issue #175). */
   const queryAnswers = new Map<string, MumbleLinkStats>();
