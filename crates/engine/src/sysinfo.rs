@@ -2,7 +2,9 @@
 //! instruction sets, graphics cards with driver versions and memory. Read from files and a few
 //! `--version` style tools; nothing personal (no host name, user name or serial numbers).
 
+#[cfg(target_os = "linux")]
 use std::process::Command;
+#[cfg(target_os = "linux")]
 use std::time::Duration;
 
 /// One line per fact, e.g. `cpu: …`. Missing facts are left out.
@@ -71,6 +73,7 @@ pub fn instruction_sets() -> Vec<&'static str> {
 }
 
 /// Runs a version tool briefly; `None` when it is missing, fails or takes too long.
+#[cfg(target_os = "linux")]
 fn tool(program: &str, args: &[&str]) -> Option<String> {
     let mut child = Command::new(program)
         .args(args)
@@ -295,6 +298,7 @@ mod tests {
         assert!(instruction_sets().contains(&"sse2"));
     }
 
+    #[cfg(target_os = "linux")]
     #[test]
     fn a_missing_tool_is_none() {
         assert!(tool("mumcord-no-such-tool", &["--version"]).is_none());
