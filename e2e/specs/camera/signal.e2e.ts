@@ -73,9 +73,10 @@ const MARK = "fuzzmark";
       );
       expect(onMsg).toBeDefined();
       expect(onMsg?.fields).toEqual({ t: "on", id: view.broadcast });
-      // Bovnar text, never JSON (§6.5): `.v = 1; .t = "on"; .id = "…"`.
+      // Bovnar text, never JSON (§6.5): `.v=<uint:8>1;.t="on";.id="…";`; the encoder writes the
+      // integer's Bovnar type, a hand-written document may leave it out.
       expect(onMsg?.raw.trimStart().startsWith("{")).toBe(false);
-      expect(onMsg?.raw).toMatch(/\.v\s*=\s*1\b/);
+      expect(onMsg?.raw).toMatch(/\.v\s*=\s*(<uint:\d+>)?\s*1\b/);
       expect(onMsg?.raw).toMatch(/\.t\s*=\s*"on"/);
     });
 
