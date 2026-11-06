@@ -96,7 +96,8 @@
     "rateLimited": "No se pudo iniciar la cámara: demasiados intentos. Inténtalo de nuevo en un minuto.",
     "mode": "Compartir la cámara necesita el relé. Cámbialo en Privacidad y conexiones.",
     "noCertificate": "Compartir la cámara necesita un certificado de cliente.",
-    "endedByRelay": "Cámara detenida por el relé del servidor"
+    "endedByRelay": "Cámara detenida por el relé del servidor",
+    "dismissStopped": "Descartar"
   },
   "privacy": {
     "windows": "Windows bloquea el acceso a la cámara a las aplicaciones de escritorio",

@@ -115,7 +115,10 @@ export async function serverId(): Promise<number> {
   return id;
 }
 
-/** The own camera as the engine reports it (`null` before the camera was ever used). */
+/**
+ * The own camera as the engine reports it; `null` while it is off. The "Camera stopped" reason of
+ * an off camera only goes to the UI (its notice), never to this view.
+ */
 export function cameraView(): Promise<CameraView | null> {
   return app.invoke<CameraView | null>("camera_view");
 }
@@ -156,12 +159,12 @@ export async function ownSession(): Promise<number> {
 
 /** Waits until the own camera is in `state`; returns the view. */
 export async function waitCameraState(state: CameraState, timeout = 20_000): Promise<CameraView> {
-  // A view of "off" for a camera the engine has never used.
-  let view: CameraView = { serverId: 0, state: "off", error: null, broadcast: null, viewers: [] };
+  const off: CameraView = { serverId: 0, state: "off", error: null, broadcast: null, viewers: [] };
+  let view = off;
   await browser
     .waitUntil(
       async () => {
-        view = (await cameraView()) ?? view;
+        view = (await cameraView()) ?? off;
         return view.state === state;
       },
       { timeout, interval: 100 },
@@ -269,6 +272,16 @@ export async function waitText(text: string, timeout = 15_000): Promise<void> {
     timeout,
     timeoutMsg: `"${text}" never showed`,
   });
+}
+
+/**
+ * Waits for the "Camera stopped: …" notice (section 5.6): an alert in the room bar or below the
+ * camera mini bar, with a Dismiss button.
+ */
+export async function waitStoppedNotice(text: string, timeout = 15_000): Promise<void> {
+  const notice = $(`//*[@role='alert'][contains(@class,'cam-stopped')][contains(., "${text}")]`);
+  await notice.waitForDisplayed({ timeout, timeoutMsg: `the notice "${text}" never showed` });
+  await notice.$(".//button[@aria-label='Dismiss']").waitForExist();
 }
 
 /** Changes settings of the current client through the settings command. */

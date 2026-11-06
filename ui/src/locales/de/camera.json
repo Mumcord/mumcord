@@ -96,7 +96,8 @@
     "rateLimited": "Die Kamera konnte nicht gestartet werden: zu viele Versuche. Versuche es in einer Minute erneut.",
     "mode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
-    "endedByRelay": "Kamera vom Relay des Servers angehalten"
+    "endedByRelay": "Kamera vom Relay des Servers angehalten",
+    "dismissStopped": "Verwerfen"
   },
   "privacy": {
     "windows": "Windows blockiert den Kamerazugriff für Desktop-Apps",

@@ -96,7 +96,8 @@
     "rateLimited": "Níor tosaíodh an ceamara: an iomarca iarrachtaí. Bain triail eile as i gceann nóiméid.",
     "mode": "Teastaíonn an t-athsheachadán ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc.",
     "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
-    "endedByRelay": "Stop athsheachadán an fhreastalaí an ceamara"
+    "endedByRelay": "Stop athsheachadán an fhreastalaí an ceamara",
+    "dismissStopped": "Cuir ar leataobh"
   },
   "privacy": {
     "windows": "Blocálann Windows rochtain ar an gceamara d'aipeanna deisce",

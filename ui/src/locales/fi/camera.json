@@ -96,7 +96,8 @@
     "rateLimited": "Kameraa ei voitu käynnistää: liian monta yritystä. Yritä uudelleen minuutin kuluttua.",
     "mode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
-    "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran"
+    "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran",
+    "dismissStopped": "Ohita"
   },
   "privacy": {
     "windows": "Windows estää työpöytäsovellusten pääsyn kameraan",

@@ -96,7 +96,8 @@
     "rateLimited": "Kameru se nepodařilo spustit: příliš mnoho pokusů. Zkus to znovu za minutu.",
     "mode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
-    "endedByRelay": "Kameru zastavil relay serveru"
+    "endedByRelay": "Kameru zastavil relay serveru",
+    "dismissStopped": "Zavřít"
   },
   "privacy": {
     "windows": "Windows blokuje přístup ke kameře desktopovým aplikacím",

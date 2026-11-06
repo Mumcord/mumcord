@@ -96,7 +96,8 @@
     "rateLimited": "Nie udało się uruchomić kamery: zbyt wiele prób. Spróbuj ponownie za minutę.",
     "mode": "Udostępnianie kamery wymaga przekaźnika. Zmień to w Prywatność i połączenia.",
     "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta.",
-    "endedByRelay": "Kamera zatrzymana przez przekaźnik serwera"
+    "endedByRelay": "Kamera zatrzymana przez przekaźnik serwera",
+    "dismissStopped": "Zamknij"
   },
   "privacy": {
     "windows": "Windows blokuje dostęp do kamery dla aplikacji desktopowych",

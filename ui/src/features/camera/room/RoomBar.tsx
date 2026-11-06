@@ -7,8 +7,10 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
 import { popIn, setPopoutOnTop, useInPopout, usePopouts } from "../../media/popoutStore";
+import { CameraStoppedNotice } from "./CameraStoppedNotice";
 import { RoomIcon } from "./icons";
 import { setSelfHidden } from "./roomChoices";
+import { useRoomBarOnScreen } from "./useCameraRoomShown";
 
 export interface RoomBarProps {
   serverId: number;
@@ -39,6 +41,8 @@ export function RoomBar({
   const { t: tc } = useTranslation("common");
   const inPopout = useInPopout();
   const onTop = usePopouts().camera.onTop;
+  // A room that is open behind another item leaves the notice to the mini bar's place.
+  const barOnScreen = useRoomBarOnScreen(serverId);
 
   const turnOff = () => {
     getApi()
@@ -50,6 +54,7 @@ export function RoomBar({
 
   return (
     <div className="cam-room__bar" role="toolbar" aria-label={t("room.controls")}>
+      {(inPopout || barOnScreen) && <CameraStoppedNotice serverId={serverId} />}
       {onAir ? (
         <button
           type="button"

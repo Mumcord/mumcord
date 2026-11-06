@@ -36,7 +36,7 @@ import {
   turnCameraOn,
   updateSettings,
   waitCameraState,
-  waitText,
+  waitStoppedNotice,
   waitTile,
 } from "./flows.ts";
 
@@ -81,7 +81,8 @@ async function clickTrayEntry(label: string): Promise<void> {
     async () => {
       const layout = await gdbus(
         "--dest", dest, "--object-path", "/MenuBar",
-        "--method", "com.canonical.dbusmenu.GetLayout", "0", "-1", "[]",
+        // `--` ends gdbus's own options, so the depth `-1` is read as an argument.
+        "--method", "com.canonical.dbusmenu.GetLayout", "--", "0", "-1", "[]",
       );
       // Each entry: `(<id>, {'label': <'…'>, …}, [...])`.
       id = new RegExp(`\\((\\d+), \\{[^}]*'label': <'${label}'>`).exec(layout)?.[1];
@@ -263,9 +264,8 @@ async function minimiseA(): Promise<void> {
     await startCamClient("c", port, { camera: "unplug_after=5s", name: "Carol" });
     await on("c", async () => {
       await turnCameraOn();
-      const view = await waitCameraState("off", 20_000);
-      expect(view.error).toBe("deviceGone");
-      await waitText("Camera stopped: the camera was disconnected.");
+      await waitCameraState("off", 20_000);
+      await waitStoppedNotice("Camera stopped: the camera was disconnected.");
     });
     await on("b", () => browser.waitUntil(async () => (await tileOf("Carol")) === undefined, {
       timeout: 15_000,

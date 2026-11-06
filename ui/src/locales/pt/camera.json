@@ -96,7 +96,8 @@
     "rateLimited": "Não foi possível iniciar a câmara: demasiadas tentativas. Tenta novamente dentro de um minuto.",
     "mode": "A partilha de câmara precisa do retransmissor. Altera-o em Privacidade e ligações.",
     "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
-    "endedByRelay": "Câmara parada pelo retransmissor do servidor"
+    "endedByRelay": "Câmara parada pelo retransmissor do servidor",
+    "dismissStopped": "Dispensar"
   },
   "privacy": {
     "windows": "O Windows bloqueia o acesso à câmara para aplicações de ambiente de trabalho",

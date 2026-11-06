@@ -96,7 +96,8 @@
     "rateLimited": "Kaamerat ei saanud käivitada: liiga palju katseid. Proovi minuti pärast uuesti.",
     "mode": "Kaamera jagamine vajab releeserverit. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
-    "endedByRelay": "Serveri releeserver peatas kaamera"
+    "endedByRelay": "Serveri releeserver peatas kaamera",
+    "dismissStopped": "Sulge"
   },
   "privacy": {
     "windows": "Windows blokeerib töölauarakenduste juurdepääsu kaamerale",

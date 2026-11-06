@@ -96,7 +96,8 @@
     "rateLimited": "Kamere ni bilo mogoče zagnati: preveč poskusov. Poskusi znova čez minuto.",
     "mode": "Deljenje kamere potrebuje relej. Spremeni to v Zasebnost in povezave.",
     "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo.",
-    "endedByRelay": "Kamero je ustavil relej strežnika"
+    "endedByRelay": "Kamero je ustavil relej strežnika",
+    "dismissStopped": "Opusti"
   },
   "privacy": {
     "windows": "Windows blokira dostop do kamere za namizne aplikacije",

@@ -96,7 +96,8 @@
     "rateLimited": "La caméra n'a pas pu démarrer : trop de tentatives. Réessayez dans une minute.",
     "mode": "Le partage de caméra nécessite le relais. Modifiez-le dans Confidentialité et connexions.",
     "noCertificate": "Le partage de caméra nécessite un certificat client.",
-    "endedByRelay": "Caméra arrêtée par le relais du serveur"
+    "endedByRelay": "Caméra arrêtée par le relais du serveur",
+    "dismissStopped": "Ignorer"
   },
   "privacy": {
     "windows": "Windows bloque l'accès à la caméra pour les applications de bureau",

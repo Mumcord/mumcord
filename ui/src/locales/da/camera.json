@@ -96,7 +96,8 @@
     "rateLimited": "Kameraet kunne ikke starte: for mange forsøg. Prøv igen om et minut.",
     "mode": "Kameradeling kræver relæet. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
-    "endedByRelay": "Kameraet blev stoppet af serverens relæ"
+    "endedByRelay": "Kameraet blev stoppet af serverens relæ",
+    "dismissStopped": "Luk"
   },
   "privacy": {
     "windows": "Windows blokerer kameraadgang for skrivebordsapps",
