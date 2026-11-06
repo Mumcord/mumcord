@@ -1267,7 +1267,6 @@
     "confirmDeleteAllText_other": "Bainfear {{count}} tuairisc den ríomhaire seo.",
     "noticeTitle": "Dhún Mumcord gan choinne",
     "noticeText": "Sábháladh tuairisc tuairteála. Fanann sí ar an ríomhaire seo; ní uaslódáiltear aon rud. Cuidíonn sé linn an fhadhb a réiteach má chóipeálann tú í i dtuairisc fabht.",
-    "reportBug": "Tuairiscigh fabht",
     "copyForBug": "Cóipeáil le haghaidh tuairisce fabht",
     "noticeCopied": "Cóipeáilte. Greamaigh sa tuairisc fabht é.",
     "actionFailed": "Níor oibrigh sé sin. Bain triail eile as nó oscail an fillteán.",

@@ -1237,7 +1237,6 @@
     "confirmDeleteAllText_other": "{{count}} rapporter tas bort från den här datorn.",
     "noticeTitle": "Mumcord stängdes oväntat",
     "noticeText": "En kraschrapport har sparats. Den stannar på den här datorn; ingenting laddas upp. Om du kopierar in den i en felrapport hjälper du oss att åtgärda problemet.",
-    "reportBug": "Rapportera ett fel",
     "copyForBug": "Kopiera till en felrapport",
     "noticeCopied": "Kopierat. Klistra in det i felrapporten.",
     "actionFailed": "Det fungerade inte. Försök igen eller öppna mappen.",

@@ -1237,7 +1237,6 @@
     "confirmDeleteAllText_other": "{{count}} rapporten worden van deze computer verwijderd.",
     "noticeTitle": "Mumcord is onverwacht gesloten",
     "noticeText": "Er is een crashrapport opgeslagen. Het blijft op deze computer; er wordt niets geüpload. Als je het in een bugmelding kopieert, helpt dat ons het probleem op te lossen.",
-    "reportBug": "Bug melden",
     "copyForBug": "Kopiëren voor een bugmelding",
     "noticeCopied": "Gekopieerd. Plak het in de bugmelding.",
     "actionFailed": "Dat is niet gelukt. Probeer het opnieuw of open de map.",

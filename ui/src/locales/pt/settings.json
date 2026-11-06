@@ -1247,7 +1247,6 @@
     "confirmDeleteAllText_other": "{{count}} relatórios serão removidos deste computador.",
     "noticeTitle": "O Mumcord fechou inesperadamente",
     "noticeText": "Foi guardado um relatório de falha. Fica neste computador; nada é enviado. Copiá-lo para um relatório de erro ajuda-nos a corrigir o problema.",
-    "reportBug": "Comunicar um erro",
     "copyForBug": "Copiar para um relatório de erro",
     "noticeCopied": "Copiado. Cole-o no relatório de erro.",
     "actionFailed": "Não funcionou. Tente novamente ou abra a pasta.",

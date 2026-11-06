@@ -1237,7 +1237,6 @@
     "confirmDeleteAllText_other": "{{count}} jelentés eltávolításra kerül erről a számítógépről.",
     "noticeTitle": "A Mumcord váratlanul bezárult",
     "noticeText": "Összeomlási jelentés mentve. Ezen a számítógépen marad; semmi sem kerül feltöltésre. Ha egy hibajelentésbe másolod, segítesz a hiba javításában.",
-    "reportBug": "Hiba jelentése",
     "copyForBug": "Másolás hibajelentéshez",
     "noticeCopied": "Másolva. Illeszd be a hibajelentésbe.",
     "actionFailed": "Ez nem sikerült. Próbáld újra, vagy nyisd meg a mappát.",

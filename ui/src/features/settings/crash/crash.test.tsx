@@ -33,7 +33,7 @@ describe("crash reports (#568, #573)", () => {
   it("uploads one report only after the confirmation, with the comment, and marks it", async () => {
     setApi(createMockApi({ crashReports: [report()] }));
     render(<CrashReportsCard />);
-    fireEvent.click(await screen.findByRole("button", { name: /Upload report from/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Report the crash from/ }));
 
     // The confirmation says plainly what is shared.
     expect(await screen.findByRole("note")).toHaveProperty(

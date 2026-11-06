@@ -98,7 +98,6 @@
   align-items: center;
 }
 .cr-row__when {
-  
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
 }
@@ -144,7 +143,16 @@
 
 /* --- Crash notice at the next start -------------------------------------------------------- */
 .cr-notice {
-  width: min(32rem, calc(100vw - 2rem));
+  width: min(38rem, calc(100vw - 2rem));
+}
+.cr-notice .app-dialog__actions,
+.cr-dialog .app-dialog__actions {
+  flex-wrap: wrap;
+}
+.cr-notice .app-dialog__actions .settings-button,
+.cr-dialog .app-dialog__actions .settings-button,
+.cr-confirm .app-dialog__actions .settings-button {
+  white-space: nowrap;
 }
 .cr-file {
   display: flex;

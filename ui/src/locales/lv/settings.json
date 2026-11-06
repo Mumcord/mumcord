@@ -1247,7 +1247,6 @@
     "confirmDeleteAllText_other": "{{count}} ziņojumi tiks noņemti no šī datora.",
     "noticeTitle": "Mumcord negaidīti aizvērās",
     "noticeText": "Avārijas ziņojums ir saglabāts. Tas paliek šajā datorā; nekas netiek augšupielādēts. Ja to nokopēsiet kļūdas pārskatā, tas palīdzēs mums novērst problēmu.",
-    "reportBug": "Ziņot par kļūdu",
     "copyForBug": "Kopēt kļūdas pārskatam",
     "noticeCopied": "Nokopēts. Ielīmējiet to kļūdas pārskatā.",
     "actionFailed": "Neizdevās. Mēģiniet vēlreiz vai atveriet mapi.",

@@ -1257,7 +1257,6 @@
     "confirmDeleteAllText_other": "{{count}} ataskaitų bus pašalinta iš šio kompiuterio.",
     "noticeTitle": "Mumcord netikėtai užsidarė",
     "noticeText": "Strigties ataskaita išsaugota. Ji lieka šiame kompiuteryje; niekas nesiunčiama. Jei ją nukopijuosite į klaidos pranešimą, padėsite mums išspręsti problemą.",
-    "reportBug": "Pranešti apie klaidą",
     "copyForBug": "Kopijuoti klaidos pranešimui",
     "noticeCopied": "Nukopijuota. Įklijuokite į klaidos pranešimą.",
     "actionFailed": "Nepavyko. Bandykite dar kartą arba atidarykite aplanką.",

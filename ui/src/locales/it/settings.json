@@ -1247,7 +1247,6 @@
     "confirmDeleteAllText_other": "{{count}} rapporti verranno rimossi da questo computer.",
     "noticeTitle": "Mumcord si è chiuso in modo imprevisto",
     "noticeText": "È stato salvato un rapporto di arresto anomalo. Resta su questo computer; non viene caricato nulla. Copiarlo in una segnalazione di bug ci aiuta a risolvere il problema.",
-    "reportBug": "Segnala un bug",
     "copyForBug": "Copia per una segnalazione di bug",
     "noticeCopied": "Copiato. Incollalo nella segnalazione di bug.",
     "actionFailed": "Non ha funzionato. Riprova o apri la cartella.",

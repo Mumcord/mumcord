@@ -1257,7 +1257,6 @@
     "confirmDeleteAllText_other": "{{count}} raportu zostanie usunięte z tego komputera.",
     "noticeTitle": "Mumcord zamknął się nieoczekiwanie",
     "noticeText": "Raport o awarii został zapisany. Zostaje na tym komputerze; nic nie jest wysyłane. Skopiowanie go do zgłoszenia błędu pomoże nam naprawić problem.",
-    "reportBug": "Zgłoś błąd",
     "copyForBug": "Skopiuj do zgłoszenia błędu",
     "noticeCopied": "Skopiowano. Wklej do zgłoszenia błędu.",
     "actionFailed": "To się nie udało. Spróbuj ponownie lub otwórz folder.",

@@ -1237,7 +1237,6 @@
     "confirmDeleteAllText_other": "{{count}} aruannet eemaldatakse sellest arvutist.",
     "noticeTitle": "Mumcord sulgus ootamatult",
     "noticeText": "Kokkuvarisemise aruanne salvestati. See jääb sellesse arvutisse; midagi ei laadita üles. Kui kopeerid selle veateatesse, aitab see meil probleemi parandada.",
-    "reportBug": "Teata veast",
     "copyForBug": "Kopeeri veateate jaoks",
     "noticeCopied": "Kopeeritud. Kleebi see veateatesse.",
     "actionFailed": "See ei õnnestunud. Proovi uuesti või ava kaust.",

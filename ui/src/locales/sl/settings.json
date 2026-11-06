@@ -1257,7 +1257,6 @@
     "confirmDeleteAllText_other": "{{count}} poročil bo odstranjenih iz tega računalnika.",
     "noticeTitle": "Mumcord se je nepričakovano zaprl",
     "noticeText": "Poročilo o zrušitvi je shranjeno. Ostane v tem računalniku; nič se ne naloži. Če ga kopirate v prijavo napake, nam pomagate odpraviti težavo.",
-    "reportBug": "Prijavi napako",
     "copyForBug": "Kopiraj za prijavo napake",
     "noticeCopied": "Kopirano. Prilepite v prijavo napake.",
     "actionFailed": "To ni uspelo. Poskusite znova ali odprite mapo.",

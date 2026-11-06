@@ -1247,7 +1247,6 @@
     "confirmDeleteAllText_other": "{{count}} izvješća bit će uklonjeno s ovog računala.",
     "noticeTitle": "Mumcord se neočekivano zatvorio",
     "noticeText": "Izvješće o rušenju je spremljeno. Ostaje na ovom računalu; ništa se ne šalje. Ako ga kopiraš u prijavu pogreške, pomažeš nam riješiti problem.",
-    "reportBug": "Prijavi pogrešku",
     "copyForBug": "Kopiraj za prijavu pogreške",
     "noticeCopied": "Kopirano. Zalijepi u prijavu pogreške.",
     "actionFailed": "To nije uspjelo. Pokušaj ponovno ili otvori mapu.",

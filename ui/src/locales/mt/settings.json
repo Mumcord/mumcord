@@ -1267,7 +1267,6 @@
     "confirmDeleteAllText_other": "{{count}} rapport se jitneħħew minn dan il-kompjuter.",
     "noticeTitle": "Mumcord għalaq mhux mistenni",
     "noticeText": "Ġie ffrankat rapport tal-ħabta. Jibqa' fuq dan il-kompjuter; xejn ma jinbagħat. Jekk tikkopjah f'rapport tal-bug, tgħinna nsewwu l-problema.",
-    "reportBug": "Irrapporta bug",
     "copyForBug": "Ikkopja għal rapport tal-bug",
     "noticeCopied": "Ikkopjat. Waħħlu fir-rapport tal-bug.",
     "actionFailed": "Dan ma ħadimx. Erġa' pprova jew iftaħ il-folder.",

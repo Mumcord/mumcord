@@ -1237,7 +1237,6 @@
     "confirmDeleteAllText_other": "{{count}} raporttia poistetaan tästä tietokoneesta.",
     "noticeTitle": "Mumcord sulkeutui odottamatta",
     "noticeText": "Kaatumisraportti tallennettiin. Se pysyy tässä tietokoneessa, mitään ei lähetetä. Kun kopioit sen virheilmoitukseen, autat meitä korjaamaan ongelman.",
-    "reportBug": "Ilmoita virheestä",
     "copyForBug": "Kopioi virheilmoitusta varten",
     "noticeCopied": "Kopioitu. Liitä se virheilmoitukseen.",
     "actionFailed": "Se ei onnistunut. Yritä uudelleen tai avaa kansio.",

@@ -1237,7 +1237,6 @@
     "confirmDeleteAllText_other": "{{count}} rapporter fjernes fra denne computer.",
     "noticeTitle": "Mumcord lukkede uventet",
     "noticeText": "En nedbrudsrapport er gemt. Den bliver på denne computer; intet uploades. Hvis du kopierer den ind i en fejlrapport, hjælper det os med at rette problemet.",
-    "reportBug": "Rapportér en fejl",
     "copyForBug": "Kopiér til en fejlrapport",
     "noticeCopied": "Kopieret. Indsæt det i fejlrapporten.",
     "actionFailed": "Det virkede ikke. Prøv igen, eller åbn mappen.",

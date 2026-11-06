@@ -1247,7 +1247,6 @@
     "confirmDeleteAllText_other": "{{count}} rapports seront retirés de cet ordinateur.",
     "noticeTitle": "Mumcord s'est fermé de façon inattendue",
     "noticeText": "Un rapport de plantage a été enregistré. Il reste sur cet ordinateur ; rien n'est envoyé. Le copier dans un signalement de bug nous aide à corriger le problème.",
-    "reportBug": "Signaler un bug",
     "copyForBug": "Copier pour un signalement de bug",
     "noticeCopied": "Copié. Collez-le dans le signalement de bug.",
     "actionFailed": "Cela n'a pas fonctionné. Réessayez ou ouvrez le dossier.",

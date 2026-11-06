@@ -1257,7 +1257,6 @@
     "confirmDeleteAllText_other": "{{count}} hlásení sa z tohto počítača odstráni.",
     "noticeTitle": "Mumcord sa neočakávane zavrel",
     "noticeText": "Hlásenie o páde bolo uložené. Zostáva v tomto počítači, nič sa nenahráva. Ak ho skopírujete do nahlásenia chyby, pomôžete nám problém opraviť.",
-    "reportBug": "Nahlásiť chybu",
     "copyForBug": "Skopírovať pre nahlásenie chyby",
     "noticeCopied": "Skopírované. Vložte to do nahlásenia chyby.",
     "actionFailed": "Nepodarilo sa. Skúste to znova alebo otvorte priečinok.",

@@ -1237,7 +1237,6 @@
     "confirmDeleteAllText_other": "{{count}} Berichte werden von diesem Computer entfernt.",
     "noticeTitle": "Mumcord wurde unerwartet beendet",
     "noticeText": "Ein Absturzbericht wurde gespeichert. Er bleibt auf diesem Computer; nichts wird hochgeladen. Wenn du ihn in eine Fehlermeldung kopierst, hilft uns das, das Problem zu beheben.",
-    "reportBug": "Fehler melden",
     "copyForBug": "Für eine Fehlermeldung kopieren",
     "noticeCopied": "Kopiert. Füge es in die Fehlermeldung ein.",
     "actionFailed": "Das hat nicht geklappt. Versuche es erneut oder öffne den Ordner.",

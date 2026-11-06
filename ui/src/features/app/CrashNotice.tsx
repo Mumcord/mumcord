@@ -7,8 +7,6 @@ import { kindKey } from "../settings/crash/useCrashReports";
 import { takeUnseenOnce } from "./crashNoticeOnce";
 import "../settings/crash/crash.css";
 
-const BUG_REPORT_URL = "https://github.com/Mumcord/mumcord/issues/new";
-
 /** "Mumcord closed unexpectedly" after a crash in an earlier run (#568). Shown once per report. */
 export function CrashNotice() {
   const { t } = useTranslation("settings");
@@ -69,33 +67,6 @@ export function CrashNotice() {
             type="button"
             className="settings-button"
             onClick={() => {
-              getApi().crashOpenFolder().catch(fail("Opening the crash folder"));
-            }}
-          >
-            {t("crashReports.openFolder")}
-          </button>
-          <button
-            type="button"
-            className="settings-button"
-            onClick={() => {
-              getApi().openLink(BUG_REPORT_URL).catch(fail("Opening the bug report page"));
-            }}
-          >
-            {t("crashReports.reportBug")}
-          </button>
-          <button
-            type="button"
-            className="settings-button"
-            onClick={() => {
-              setUploading(true);
-            }}
-          >
-            {t("crashReports.upload")}
-          </button>
-          <button
-            type="button"
-            className="settings-button settings-button--primary cr-iconbtn"
-            onClick={() => {
               getApi()
                 .crashRead(report.id)
                 .then((text) => getApi().copyText(text))
@@ -105,7 +76,16 @@ export function CrashNotice() {
                 .catch(fail("Copying the crash report"));
             }}
           >
-            {t("crashReports.copyForBug")}
+            {t("crashReports.copy")}
+          </button>
+          <button
+            type="button"
+            className="settings-button settings-button--primary"
+            onClick={() => {
+              setUploading(true);
+            }}
+          >
+            {t("crashReports.upload")}
           </button>
         </>
       )}

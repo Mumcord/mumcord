@@ -1247,7 +1247,6 @@
     "confirmDeleteAllText_other": "Se eliminarán {{count}} informes de este equipo.",
     "noticeTitle": "Mumcord se cerró inesperadamente",
     "noticeText": "Se ha guardado un informe de fallo. Se queda en este equipo; no se sube nada. Copiarlo en un informe de error nos ayuda a solucionar el problema.",
-    "reportBug": "Informar de un error",
     "copyForBug": "Copiar para un informe de error",
     "noticeCopied": "Copiado. Pégalo en el informe de error.",
     "actionFailed": "No ha funcionado. Inténtalo de nuevo o abre la carpeta.",
