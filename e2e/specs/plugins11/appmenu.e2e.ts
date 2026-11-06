@@ -7,13 +7,18 @@
 //            after a restart.
 //   AC-9.17  plugin items under "Plugins" with icon and name, in the command palette as
 //            "<plugin>: <label>"; choosing one delivers app-menu-activated; set-state disables an
-//            item and shows the reason; test-badlabel (an Apps-menu label equal to a built-in one)
-//            does not load and is listed as refused (Diagnostics).
+//            item and shows the reason; test-badlabel (an Apps-menu label equal to a built-in one,
+//            loaded unpacked in Developer mode because no index can list it) does not load and is
+//            listed as refused (Diagnostics).
 //
 // Manual: the frame chrome on Windows and macOS (native child webviews there).
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join as joinPath } from "node:path";
 import { $, $$, browser, expect } from "@wdio/globals";
 import { app, pluginenv, testenv } from "../../helpers/index.ts";
 import { addFirstServer, finishWizard, reconnectSaved } from "../../helpers/chat-ui.ts";
+import { runOk } from "../../helpers/run.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 const SURFACE = "Test Surface";
@@ -321,8 +326,18 @@ describe("plugins 1.1: Apps menu, command palette and web frames (AC-9.16, AC-9.
   });
 
   it("AC-9.17: a plugin with a built-in Apps-menu label does not load", async () => {
-    const result = await install("test-badlabel");
-    expect(result.error).toBeDefined();
+    // No registry index can list test-badlabel (its manifest does not parse), so it is loaded the
+    // only way it can reach the client: unpacked, in Developer mode. The folder name is what
+    // Diagnostics shows for a developer plugin whose manifest is refused.
+    const root = mkdtempSync(joinPath(tmpdir(), "mumcord-badlabel-"));
+    const folder = joinPath(root, "test-badlabel");
+    try {
+      await runOk("python3", ["-I", "-m", "zipfile", "-e", pluginenv.stagedPackage("test-badlabel-1.0.0.mcplugin"), folder]);
+      const result = await call("plugin_dev_load", { folder });
+      expect(result.error).toBeDefined();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
     expect(await pluginStatus("test-badlabel")).not.toBe("running");
     // A plugin refused at its first load has no record, so Diagnostics lists it from memory.
     const overview = (await invokeOk("plugins_list")) as {

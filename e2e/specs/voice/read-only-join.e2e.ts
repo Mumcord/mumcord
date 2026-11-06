@@ -278,6 +278,12 @@ describe("read-only connect and explicit join (AC-1.35)", () => {
   });
 
   it("muted before the restart: join from read-only keeps the mute, not deafened (QA.7)", async () => {
+    // The button toggles the UI's own mute state, which arrives from the server echo and can
+    // trail the bot's view of the previous unmute; clicking earlier would send "unmute" again.
+    await browser.waitUntil(async () => !(await pressed(muteButton())), {
+      timeout: 15_000,
+      timeoutMsg: "user panel still shows muted before muting",
+    });
     await muteButton().click();
     await bot(["expect", "user", ME, "--in", "Raid", "--muted", "true", "--deaf", "false"], WATCH);
     await app.restart();

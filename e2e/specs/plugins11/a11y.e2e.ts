@@ -12,8 +12,9 @@
 //     its tick;
 //   - the Apps menu (arrow keys, Enter) starting two stage activities, the stage tabs (arrow keys,
 //     Home/End, "<label>, plugin activity, tab n of 2");
-//   - the frame chrome: Tab into the stage page, a key press there plays its tone, Escape and F6
-//     inside the page return focus to the frame, the mute button appears and toggles by keyboard;
+//   - the frame chrome: Tab into the stage page and press its tone button, Escape and F6 inside
+//     the page return focus to the frame; after a click inside the page (frame sound needs one,
+//     FR-9.43) the mute button appears and toggles by keyboard;
 //   - the side panel (options menu, resize separator, close, focus return);
 //   - the web dialog (focus starts on its content, Shift+Tab stays inside, Escape closes, focus
 //     returns to its opener).
@@ -62,6 +63,15 @@ const stageFrame = (plugin: string) => $(`.plugin-stage[aria-label='Media area: 
 const sidePanel = () => $(`.plugin-sidepanel[aria-label='${SURFACE} side panel']`);
 const webDialog = () => $("div.plugin-web-dialog[role='dialog']");
 const stripIcon = () => $(`button.pstrip-icon[aria-label='${SURFACE}']`);
+
+/**
+ * The text of a `.visually-hidden` span, which only screen readers get. WebDriver's element text
+ * is the rendered text and is empty for such a clipped 1 px span, so read its text content.
+ */
+async function screenReaderText(el: El): Promise<string> {
+  await el.waitForExist({ timeout: 10_000 });
+  return String(await el.getProperty("textContent"));
+}
 
 /** Serious and critical violations and missing focus rings, collected so one run reports all. */
 const findings: string[] = [];
@@ -300,9 +310,8 @@ async function settingsScreens(theme: Theme): Promise<void> {
   await pluginsTab("Browse");
   await waitForCard(HIGH);
   await check(`${theme}-browse`, [".overlay__dialog"]);
-  const chipName = card(HIGH).$(".risk-chip .visually-hidden");
-  await expect(chipName).toHaveText(
-    expect.stringMatching(/^Security score \d+ out of 100\. High risk\. Higher means more risk\.$/),
+  expect(await screenReaderText(card(HIGH).$(".risk-chip .visually-hidden"))).toMatch(
+    /^Security score \d+ out of 100\. High risk\. Higher means more risk\.$/,
   );
   await tabToEl(card(HIGH).$(`button[aria-label='Details of ${HIGH}']`), `Details of ${HIGH}`);
   await browser.keys("Enter");
@@ -337,8 +346,8 @@ async function settingsScreens(theme: Theme): Promise<void> {
     timeout: 5_000,
     timeoutMsg: "the install prompt did not take focus",
   });
-  await expect(prompt().$(".risk-chip .visually-hidden")).toHaveText(
-    expect.stringMatching(/out of 100\. High risk\. Higher means more risk\.$/),
+  expect(await screenReaderText(prompt().$(".risk-chip .visually-hidden"))).toMatch(
+    /out of 100\. High risk\. Higher means more risk\.$/,
   );
   await check(`${theme}-prompt`, [".plugin-prompt"]);
   const tick = prompt().$(".plugin-prompt-confirm input[type='checkbox']");
@@ -440,7 +449,8 @@ async function frameChrome(theme: Theme): Promise<void> {
   await expect(page).toHaveAttribute("title", `${SURFACE}, plugin content`);
   await expect(frame.$(".plugin-frame__tag")).toHaveText(`Plugin content · ${SURFACE} · Unofficial`);
 
-  // Tab into the page and press Enter on its tone button: a key press inside is a gesture.
+  // Tab into the page and press Enter on its tone button: a key press inside is a gesture
+  // (FR-9.45), though only a click unlocks frame sound (FR-9.43), see the mute button below.
   await tabTo(() => page.isFocused(), "the stage page", false, 250);
   await browser.switchFrame(page);
   try {
@@ -469,7 +479,22 @@ async function frameChrome(theme: Theme): Promise<void> {
     timeoutMsg: "F6 inside the page did not return focus to the frame",
   });
 
-  // The page played sound, so the chrome shows the mute button; it toggles by keyboard.
+  // Frame sound starts only after a click inside the page (FR-9.43, AC-9.24), so a mouse click on
+  // the tone button makes the chrome show the mute button; Escape brings focus back to the frame
+  // and the button then toggles by keyboard.
+  await browser.switchFrame(page);
+  try {
+    const tone = $("#tone");
+    await tone.waitForClickable({ timeout: 10_000 });
+    await tone.click();
+    await browser.keys("Escape");
+  } finally {
+    await browser.switchFrame(null);
+  }
+  await browser.waitUntil(() => wrapper.isFocused(), {
+    timeout: 5_000,
+    timeoutMsg: "Escape inside the page did not return focus to the frame",
+  });
   const mute = frame.$(`button[aria-label='Mute sounds from ${SURFACE}']`);
   await mute.waitForExist({ timeout: 15_000, timeoutMsg: "the frame chrome shows no mute button" });
   await tabToEl(mute, "the frame's mute button", true);
