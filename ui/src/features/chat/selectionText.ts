@@ -85,3 +85,12 @@ export function selectedText(selection: Selection | null, root: Node | null): st
     .replace(new RegExp(`^${BREAK}|${BREAK}$`, "g"), "")
     .replaceAll(BREAK, "\n");
 }
+
+type ShortcutEvent = Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "shiftKey" | "altKey">;
+
+/** The copy shortcuts: Ctrl+C (Cmd+C on macOS) and Ctrl+Insert. */
+export function isCopyShortcut(event: ShortcutEvent): boolean {
+  if (event.shiftKey || event.altKey) return false;
+  if (event.ctrlKey && event.key === "Insert") return true;
+  return (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c";
+}

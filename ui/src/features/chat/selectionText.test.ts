@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { selectedText } from "./selectionText";
+import { isCopyShortcut, selectedText } from "./selectionText";
 
 function selectAll(html: string): HTMLElement {
   const root = document.createElement("div");
@@ -73,5 +73,34 @@ describe("selectedText", () => {
     expect(selectedText(window.getSelection(), root)).toBe("");
     window.getSelection()?.removeAllRanges();
     expect(selectedText(window.getSelection(), root)).toBe("");
+  });
+});
+
+describe("isCopyShortcut", () => {
+  const key = (
+    key: string,
+    mods: Partial<Record<"ctrlKey" | "metaKey" | "shiftKey" | "altKey", boolean>> = {},
+  ) => ({
+    key,
+    ctrlKey: false,
+    metaKey: false,
+    shiftKey: false,
+    altKey: false,
+    ...mods,
+  });
+
+  it("knows Ctrl+C, Cmd+C and Ctrl+Insert", () => {
+    expect(isCopyShortcut(key("c", { ctrlKey: true }))).toBe(true);
+    expect(isCopyShortcut(key("C", { ctrlKey: true }))).toBe(true);
+    expect(isCopyShortcut(key("c", { metaKey: true }))).toBe(true);
+    expect(isCopyShortcut(key("Insert", { ctrlKey: true }))).toBe(true);
+  });
+
+  it("leaves other keys alone", () => {
+    expect(isCopyShortcut(key("c"))).toBe(false);
+    expect(isCopyShortcut(key("c", { ctrlKey: true, shiftKey: true }))).toBe(false);
+    expect(isCopyShortcut(key("c", { ctrlKey: true, altKey: true }))).toBe(false);
+    expect(isCopyShortcut(key("v", { ctrlKey: true }))).toBe(false);
+    expect(isCopyShortcut(key("Insert", { shiftKey: true }))).toBe(false);
   });
 });

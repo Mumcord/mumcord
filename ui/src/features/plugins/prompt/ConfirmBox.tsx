@@ -33,7 +33,11 @@ export function ConfirmBox({
   const { t: tBrowse } = useTranslation("pluginBrowse");
   const titleId = useId();
   const ownCode = reasons.includes("ownCodeAndWebsites");
-  const repositoryText = repository === null ? null : t("trustRepository", { repository });
+  // The engine decides whether the first-install warning (FR-6.61) still applies.
+  const repositoryText =
+    repository === null || !reasons.includes("repositoryWarning")
+      ? null
+      : t("trustRepository", { repository });
   const high = confirm === "highRisk";
 
   let title: string;

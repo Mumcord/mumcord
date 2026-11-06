@@ -30,7 +30,7 @@ export interface HttpsFixture {
   undeclaredOrigin: string;
   /** `https://update.plugins.test:<port>`, the origin an updated plugin version declares. */
   updateOrigin: string;
-  /** PEM file of the local CA, for MUMCORD_TEST_CA. */
+  /** PEM file of the local CA and the server certificate, for MUMCORD_TEST_CA. */
   caFile: string;
   /** UDP port of the STUN listener on 127.0.0.1. */
   stunPort: number;
@@ -77,11 +77,11 @@ async function makeCertificates(dir: string): Promise<{ key: Buffer; cert: Buffe
     ...["x509", "-req", "-in", file("server.csr"), "-CA", file("ca.pem"), "-CAkey", file("ca.key")],
     ...["-CAcreateserial", "-out", file("server.pem"), "-days", "2", "-extfile", file("san.ext")],
   ]);
-  return {
-    key: readFileSync(file("server.key")),
-    cert: readFileSync(file("server.pem")),
-    ca: file("ca.pem"),
-  };
+  // MUMCORD_TEST_CA gets the CA and the server certificate: Rust trusts the CA, while WebKitGTK
+  // can only accept the exact server certificate for the names it carries.
+  const cert = readFileSync(file("server.pem"));
+  writeFileSync(file("trust.pem"), Buffer.concat([readFileSync(file("ca.pem")), cert]));
+  return { key: readFileSync(file("server.key")), cert, ca: file("trust.pem") };
 }
 
 /** The SNI name of a TLS connection; `servername` is `false` when the client sent none. */
@@ -162,7 +162,9 @@ export async function startHttpsFixture(): Promise<HttpsFixture> {
       response.end();
       return;
     }
-    response.writeHead(200, { "content-type": "text/plain" });
+    // Like a public API: plugin frames have an opaque origin, so a fetch needs CORS to read the
+    // answer. Undeclared hosts never get this far from a frame (its CSP blocks them first).
+    response.writeHead(200, { "content-type": "text/plain", "access-control-allow-origin": "*" });
     response.end(`ok ${host}`);
   });
   server.on("secureConnection", (socket: TLSSocket) => {

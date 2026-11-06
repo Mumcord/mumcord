@@ -878,6 +878,18 @@ pub struct Trees {
 }
 
 impl Trees {
+    /// The user closed a plugin's web view. A web view in the dialog is the whole dialog to the
+    /// user (Esc or ✕ closes it), so the dialog ends with it; otherwise a later snapshot would
+    /// bring the dialog's tree back as a modal nobody opened.
+    pub fn surface_closed(&mut self, plugin: &str, place: PluginWebviewPlace) {
+        let change = if place == PluginWebviewPlace::Dialog {
+            PluginUiChange::CloseDialog
+        } else {
+            PluginUiChange::WebviewHide { place }
+        };
+        self.apply(plugin, &change);
+    }
+
     pub fn apply(&mut self, plugin: &str, change: &PluginUiChange) {
         match change {
             PluginUiChange::SetTree { slot, nodes, .. } => {
@@ -1393,6 +1405,35 @@ mod tests {
         assert!(trees.snapshot().is_empty());
         trees.apply("snacks", &show(PluginWebviewPlace::PanelPopover));
         trees.retain(|_| false);
+        assert!(trees.snapshot().is_empty());
+    }
+
+    #[test]
+    fn closing_the_dialog_web_view_ends_the_dialog_but_not_other_frames() {
+        let mut trees = Trees::default();
+        let show = |place| PluginUiChange::WebviewShow {
+            place,
+            url: "mumcord-web://localhost/snacks/index.html".into(),
+        };
+        trees.apply(
+            "snacks",
+            &PluginUiChange::OpenDialog {
+                title: "Snacks".into(),
+                subtitle: None,
+            },
+        );
+        trees.apply("snacks", &show(PluginWebviewPlace::Dialog));
+        trees.apply("snacks", &show(PluginWebviewPlace::SidePanel));
+        trees.surface_closed("snacks", PluginWebviewPlace::Dialog);
+        assert_eq!(
+            trees
+                .snapshot()
+                .into_iter()
+                .map(|ui| ui.change)
+                .collect::<Vec<_>>(),
+            vec![show(PluginWebviewPlace::SidePanel)]
+        );
+        trees.surface_closed("snacks", PluginWebviewPlace::SidePanel);
         assert!(trees.snapshot().is_empty());
     }
 
