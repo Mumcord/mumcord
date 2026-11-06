@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Nedbrudsrapporter",
-    "info": "Når Mumcord lukker uventet, gemmer den en kort rapport: tidspunkt, version, system, hvad der gik galt og de seneste logliner. Rapporterne bliver på denne computer og uploades aldrig. Mumcord beholder de seneste 10.",
+    "info": "Når Mumcord lukker uventet, gemmer den en kort rapport: tidspunkt, version, system, hvad der gik galt og de seneste logliner. Rapporterne bliver på denne computer og sendes kun, når du selv uploader en. Mumcord beholder de seneste 10.",
     "listLabel": "Gemte nedbrudsrapporter",
     "emptyTitle": "Ingen nedbrudsrapporter",
     "emptyText": "Mumcord er ikke lukket uventet.",

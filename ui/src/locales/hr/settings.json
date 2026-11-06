@@ -1213,7 +1213,7 @@
   },
   "crashReports": {
     "title": "Izvješća o rušenju",
-    "info": "Kada se Mumcord neočekivano zatvori, sprema kratko izvješće: vrijeme, verziju, sustav, što je pošlo po zlu i zadnje retke zapisnika. Izvješća ostaju na ovom računalu i nikada se ne šalju. Mumcord čuva zadnjih 10.",
+    "info": "Kada se Mumcord neočekivano zatvori, sprema kratko izvješće: vrijeme, verziju, sustav, što je pošlo po zlu i zadnje retke zapisnika. Izvješća ostaju na ovom računalu i šalju se samo kada ih sami prenesete. Mumcord čuva zadnjih 10.",
     "listLabel": "Spremljena izvješća o rušenju",
     "emptyTitle": "Nema izvješća o rušenju",
     "emptyText": "Mumcord se nije neočekivano zatvorio.",

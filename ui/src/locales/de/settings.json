@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Absturzberichte",
-    "info": "Wenn Mumcord unerwartet beendet wird, speichert es einen kurzen Bericht: Zeitpunkt, Version, System, was schiefgelaufen ist und die letzten Protokollzeilen. Die Berichte bleiben auf diesem Computer und werden nie hochgeladen. Mumcord behält die letzten 10.",
+    "info": "Wenn Mumcord unerwartet beendet wird, speichert es einen kurzen Bericht: Zeitpunkt, Version, System, was schiefgelaufen ist und die letzten Protokollzeilen. Die Berichte bleiben auf diesem Computer und werden nur gesendet, wenn du selbst einen hochlädst. Mumcord behält die letzten 10.",
     "listLabel": "Gespeicherte Absturzberichte",
     "emptyTitle": "Keine Absturzberichte",
     "emptyText": "Mumcord wurde nicht unerwartet beendet.",

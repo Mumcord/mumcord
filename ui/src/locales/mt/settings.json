@@ -1231,7 +1231,7 @@
   },
   "crashReports": {
     "title": "Rapporti tal-ħabta",
-    "info": "Meta Mumcord jagħlaq mhux mistenni, jiffranka rapport qasir: ħin, verżjoni, sistema, x'mar ħażin u l-aħħar linji tal-log. Ir-rapporti jibqgħu fuq dan il-kompjuter u qatt ma jinbagħtu. Mumcord iżomm l-aħħar 10.",
+    "info": "Meta Mumcord jagħlaq mhux mistenni, jiffranka rapport qasir: ħin, verżjoni, sistema, x'mar ħażin u l-aħħar linji tal-log. Ir-rapporti jibqgħu fuq dan il-kompjuter u jinbagħtu biss meta int stess ittella' wieħed. Mumcord iżomm l-aħħar 10.",
     "listLabel": "Rapporti tal-ħabta ffrankati",
     "emptyTitle": "L-ebda rapport tal-ħabta",
     "emptyText": "Mumcord ma għalaqx mhux mistenni.",

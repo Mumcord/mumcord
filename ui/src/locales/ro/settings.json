@@ -1213,7 +1213,7 @@
   },
   "crashReports": {
     "title": "Rapoarte de blocare",
-    "info": "Când Mumcord se închide neașteptat, salvează un raport scurt: ora, versiunea, sistemul, ce a mers prost și ultimele linii din jurnal. Rapoartele rămân pe acest computer și nu sunt încărcate niciodată. Mumcord le păstrează pe ultimele 10.",
+    "info": "Când Mumcord se închide neașteptat, salvează un raport scurt: ora, versiunea, sistemul, ce a mers prost și ultimele linii din jurnal. Rapoartele rămân pe acest computer și sunt trimise doar când încarci tu însuți unul. Mumcord le păstrează pe ultimele 10.",
     "listLabel": "Rapoarte de blocare salvate",
     "emptyTitle": "Niciun raport de blocare",
     "emptyText": "Mumcord nu s-a închis neașteptat.",

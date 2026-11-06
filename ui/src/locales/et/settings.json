@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Kokkuvarisemise aruanded",
-    "info": "Kui Mumcord ootamatult sulgub, salvestab ta lühikese aruande: aja, versiooni, süsteemi, mis valesti läks, ja logi viimased read. Aruanded jäävad sellesse arvutisse ega laadita kunagi üles. Mumcord hoiab viimast 10.",
+    "info": "Kui Mumcord ootamatult sulgub, salvestab ta lühikese aruande: aja, versiooni, süsteemi, mis valesti läks, ja logi viimased read. Aruanded jäävad sellesse arvutisse ja neid saadetakse ainult siis, kui laed mõne ise üles. Mumcord hoiab viimast 10.",
     "listLabel": "Salvestatud kokkuvarisemise aruanded",
     "emptyTitle": "Kokkuvarisemise aruandeid pole",
     "emptyText": "Mumcord pole ootamatult sulgunud.",

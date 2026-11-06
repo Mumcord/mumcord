@@ -1213,7 +1213,7 @@
   },
   "crashReports": {
     "title": "Relatórios de falhas",
-    "info": "Quando o Mumcord fecha inesperadamente, guarda um relatório curto: hora, versão, sistema, o que correu mal e as últimas linhas do registo. Os relatórios ficam neste computador e nunca são enviados. O Mumcord guarda os últimos 10.",
+    "info": "Quando o Mumcord fecha inesperadamente, guarda um relatório curto: hora, versão, sistema, o que correu mal e as últimas linhas do registo. Os relatórios ficam neste computador e só são enviados quando você mesmo envia um. O Mumcord guarda os últimos 10.",
     "listLabel": "Relatórios de falhas guardados",
     "emptyTitle": "Sem relatórios de falhas",
     "emptyText": "O Mumcord não fechou inesperadamente.",

@@ -1222,7 +1222,7 @@
   },
   "crashReports": {
     "title": "Strigčių ataskaitos",
-    "info": "Kai Mumcord netikėtai užsidaro, išsaugoma trumpa ataskaita: laikas, versija, sistema, kas nutiko ir paskutinės žurnalo eilutės. Ataskaitos lieka šiame kompiuteryje ir niekada nesiunčiamos. Mumcord išsaugo paskutines 10.",
+    "info": "Kai Mumcord netikėtai užsidaro, išsaugoma trumpa ataskaita: laikas, versija, sistema, kas nutiko ir paskutinės žurnalo eilutės. Ataskaitos lieka šiame kompiuteryje ir siunčiamos tik tada, kai pats ją įkeliate. Mumcord išsaugo paskutines 10.",
     "listLabel": "Išsaugotos strigčių ataskaitos",
     "emptyTitle": "Strigčių ataskaitų nėra",
     "emptyText": "Mumcord netikėtai neužsidarė.",

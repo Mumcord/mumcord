@@ -1213,7 +1213,7 @@
   },
   "crashReports": {
     "title": "Informes de fallos",
-    "info": "Cuando Mumcord se cierra inesperadamente, guarda un informe breve: hora, versión, sistema, qué salió mal y las últimas líneas del registro. Los informes se quedan en este equipo y nunca se suben. Mumcord conserva los últimos 10.",
+    "info": "Cuando Mumcord se cierra inesperadamente, guarda un informe breve: hora, versión, sistema, qué salió mal y las últimas líneas del registro. Los informes se quedan en este equipo y solo se envían cuando subes uno tú mismo. Mumcord conserva los últimos 10.",
     "listLabel": "Informes de fallos guardados",
     "emptyTitle": "Sin informes de fallos",
     "emptyText": "Mumcord no se ha cerrado inesperadamente.",

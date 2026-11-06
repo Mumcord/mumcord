@@ -1213,7 +1213,7 @@
   },
   "crashReports": {
     "title": "Avāriju ziņojumi",
-    "info": "Kad Mumcord negaidīti aizveras, tas saglabā īsu ziņojumu: laiku, versiju, sistēmu, kas noticis, un žurnāla pēdējās rindas. Ziņojumi paliek šajā datorā un nekad netiek augšupielādēti. Mumcord glabā pēdējos 10.",
+    "info": "Kad Mumcord negaidīti aizveras, tas saglabā īsu ziņojumu: laiku, versiju, sistēmu, kas noticis, un žurnāla pēdējās rindas. Ziņojumi paliek šajā datorā un tiek nosūtīti tikai tad, kad paši augšupielādējat kādu. Mumcord glabā pēdējos 10.",
     "listLabel": "Saglabātie avāriju ziņojumi",
     "emptyTitle": "Nav avāriju ziņojumu",
     "emptyText": "Mumcord nav negaidīti aizvēries.",

@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Crashrapporten",
-    "info": "Wanneer Mumcord onverwacht sluit, slaat het een kort rapport op: tijd, versie, systeem, wat er misging en de laatste logregels. Rapporten blijven op deze computer en worden nooit geüpload. Mumcord bewaart de laatste 10.",
+    "info": "Wanneer Mumcord onverwacht sluit, slaat het een kort rapport op: tijd, versie, systeem, wat er misging en de laatste logregels. Rapporten blijven op deze computer en worden alleen verzonden als je er zelf een uploadt. Mumcord bewaart de laatste 10.",
     "listLabel": "Opgeslagen crashrapporten",
     "emptyTitle": "Geen crashrapporten",
     "emptyText": "Mumcord is niet onverwacht gesloten.",

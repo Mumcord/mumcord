@@ -1222,7 +1222,7 @@
   },
   "crashReports": {
     "title": "Poročila o zrušitvah",
-    "info": "Ko se Mumcord nepričakovano zapre, shrani kratko poročilo: čas, različico, sistem, kaj je šlo narobe in zadnje vrstice dnevnika. Poročila ostanejo v tem računalniku in se nikoli ne naložijo. Mumcord hrani zadnjih 10.",
+    "info": "Ko se Mumcord nepričakovano zapre, shrani kratko poročilo: čas, različico, sistem, kaj je šlo narobe in zadnje vrstice dnevnika. Poročila ostanejo v tem računalniku in se pošljejo samo, ko jih sami naložite. Mumcord hrani zadnjih 10.",
     "listLabel": "Shranjena poročila o zrušitvah",
     "emptyTitle": "Ni poročil o zrušitvah",
     "emptyText": "Mumcord se ni nepričakovano zaprl.",

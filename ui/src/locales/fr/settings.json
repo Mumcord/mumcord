@@ -1213,7 +1213,7 @@
   },
   "crashReports": {
     "title": "Rapports de plantage",
-    "info": "Lorsque Mumcord se ferme de façon inattendue, il enregistre un court rapport : heure, version, système, ce qui s'est mal passé et les dernières lignes du journal. Les rapports restent sur cet ordinateur et ne sont jamais envoyés. Mumcord conserve les 10 derniers.",
+    "info": "Lorsque Mumcord se ferme de façon inattendue, il enregistre un court rapport : heure, version, système, ce qui s'est mal passé et les dernières lignes du journal. Les rapports restent sur cet ordinateur et ne sont envoyés que lorsque vous en envoyez un vous-même. Mumcord conserve les 10 derniers.",
     "listLabel": "Rapports de plantage enregistrés",
     "emptyTitle": "Aucun rapport de plantage",
     "emptyText": "Mumcord ne s'est pas fermé de façon inattendue.",

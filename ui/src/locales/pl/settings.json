@@ -1222,7 +1222,7 @@
   },
   "crashReports": {
     "title": "Raporty o awariach",
-    "info": "Gdy Mumcord zamknie się nieoczekiwanie, zapisuje krótki raport: czas, wersję, system, co poszło nie tak i ostatnie wiersze logu. Raporty zostają na tym komputerze i nigdy nie są wysyłane. Mumcord przechowuje 10 ostatnich.",
+    "info": "Gdy Mumcord zamknie się nieoczekiwanie, zapisuje krótki raport: czas, wersję, system, co poszło nie tak i ostatnie wiersze logu. Raporty zostają na tym komputerze i są wysyłane tylko wtedy, gdy sam je prześlesz. Mumcord przechowuje 10 ostatnich.",
     "listLabel": "Zapisane raporty o awariach",
     "emptyTitle": "Brak raportów o awariach",
     "emptyText": "Mumcord nie zamknął się nieoczekiwanie.",

@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Kaatumisraportit",
-    "info": "Kun Mumcord sulkeutuu odottamatta, se tallentaa lyhyen raportin: ajan, version, järjestelmän, mitä meni pieleen ja lokin viimeiset rivit. Raportit pysyvät tässä tietokoneessa, eikä niitä koskaan lähetetä. Mumcord säilyttää 10 viimeisintä.",
+    "info": "Kun Mumcord sulkeutuu odottamatta, se tallentaa lyhyen raportin: ajan, version, järjestelmän, mitä meni pieleen ja lokin viimeiset rivit. Raportit pysyvät tässä tietokoneessa, ja ne lähetetään vain, kun lähetät sellaisen itse. Mumcord säilyttää 10 viimeisintä.",
     "listLabel": "Tallennetut kaatumisraportit",
     "emptyTitle": "Ei kaatumisraportteja",
     "emptyText": "Mumcord ei ole sulkeutunut odottamatta.",

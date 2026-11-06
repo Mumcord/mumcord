@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Összeomlási jelentések",
-    "info": "Amikor a Mumcord váratlanul bezárul, rövid jelentést ment: időpont, verzió, rendszer, mi ment félre és a napló utolsó sorai. A jelentések ezen a számítógépen maradnak, és soha nem kerülnek feltöltésre. A Mumcord az utolsó 10-et őrzi meg.",
+    "info": "Amikor a Mumcord váratlanul bezárul, rövid jelentést ment: időpont, verzió, rendszer, mi ment félre és a napló utolsó sorai. A jelentések ezen a számítógépen maradnak, és csak akkor kerülnek elküldésre, ha te magad feltöltesz egyet. A Mumcord az utolsó 10-et őrzi meg.",
     "listLabel": "Mentett összeomlási jelentések",
     "emptyTitle": "Nincs összeomlási jelentés",
     "emptyText": "A Mumcord nem záródott be váratlanul.",

@@ -1222,7 +1222,7 @@
   },
   "crashReports": {
     "title": "Hlášení o pádech",
-    "info": "Když se Mumcord neočekávaně zavře, uloží krátké hlášení: čas, verzi, systém, co se stalo a poslední řádky protokolu. Hlášení zůstávají v tomto počítači a nikdy se nenahrávají. Mumcord uchovává posledních 10.",
+    "info": "Když se Mumcord neočekávaně zavře, uloží krátké hlášení: čas, verzi, systém, co se stalo a poslední řádky protokolu. Hlášení zůstávají v tomto počítači a odesílají se, jen když nějaké sami nahrajete. Mumcord uchovává posledních 10.",
     "listLabel": "Uložená hlášení o pádech",
     "emptyTitle": "Žádná hlášení o pádech",
     "emptyText": "Mumcord se neočekávaně nezavřel.",

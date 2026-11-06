@@ -1204,7 +1204,7 @@
   },
   "crashReports": {
     "title": "Kraschrapporter",
-    "info": "När Mumcord stängs oväntat sparas en kort rapport: tid, version, system, vad som gick fel och de sista raderna i loggen. Rapporterna stannar på den här datorn och laddas aldrig upp. Mumcord sparar de 10 senaste.",
+    "info": "När Mumcord stängs oväntat sparas en kort rapport: tid, version, system, vad som gick fel och de sista raderna i loggen. Rapporterna stannar på den här datorn och skickas bara när du själv laddar upp en. Mumcord sparar de 10 senaste.",
     "listLabel": "Sparade kraschrapporter",
     "emptyTitle": "Inga kraschrapporter",
     "emptyText": "Mumcord har inte stängts oväntat.",

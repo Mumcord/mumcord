@@ -1231,7 +1231,7 @@
   },
   "crashReports": {
     "title": "Tuairiscí tuairteála",
-    "info": "Nuair a dhúnann Mumcord gan choinne, sábhálann sé tuairisc ghearr: am, leagan, córas, cad a chuaigh i gcontúirt agus na línte deireanacha den logchomhad. Fanann na tuairiscí ar an ríomhaire seo agus ní uaslódáiltear iad choíche. Coinníonn Mumcord an 10 is déanaí.",
+    "info": "Nuair a dhúnann Mumcord gan choinne, sábhálann sé tuairisc ghearr: am, leagan, córas, cad a chuaigh i gcontúirt agus na línte deireanacha den logchomhad. Fanann na tuairiscí ar an ríomhaire seo agus ní sheoltar iad ach nuair a uaslódálann tú ceann tú féin. Coinníonn Mumcord an 10 is déanaí.",
     "listLabel": "Tuairiscí tuairteála sábháilte",
     "emptyTitle": "Gan tuairiscí tuairteála",
     "emptyText": "Níor dhún Mumcord gan choinne.",

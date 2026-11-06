@@ -1213,7 +1213,7 @@
   },
   "crashReports": {
     "title": "Segnalazioni di arresto anomalo",
-    "info": "Quando Mumcord si chiude in modo imprevisto, salva un breve rapporto: ora, versione, sistema, cosa è andato storto e le ultime righe del registro. I rapporti restano su questo computer e non vengono mai caricati. Mumcord conserva gli ultimi 10.",
+    "info": "Quando Mumcord si chiude in modo imprevisto, salva un breve rapporto: ora, versione, sistema, cosa è andato storto e le ultime righe del registro. I rapporti restano su questo computer e vengono inviati solo quando ne carichi uno tu stesso. Mumcord conserva gli ultimi 10.",
     "listLabel": "Rapporti di arresto anomalo salvati",
     "emptyTitle": "Nessun rapporto di arresto anomalo",
     "emptyText": "Mumcord non si è chiuso in modo imprevisto.",
