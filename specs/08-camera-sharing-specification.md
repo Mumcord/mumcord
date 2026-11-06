@@ -77,7 +77,7 @@ The client only displays availability; the bot and relay decide who may create o
 
 - **FR-8.9** Entry points: the Apps-menu entry **Turn on camera** (subtitle "You see a preview first. Only people in {channel} can see you.", mockup 01), the camera button in the user panel next to mute and deafen, the room bar's camera button, and a configurable global hotkey (FR-8.20). The camera always starts off; nothing turns it on by itself.
 - **FR-8.10** Turning the camera on **always** opens the preview dialog first (mockups 03–04); it can't be skipped or disabled. While the dialog is open the local camera runs but **nothing is sent**: no `bcast-req`, no broadcast, no state announcement. The dialog subtitle reads "Preview · nobody sees this yet" and the info line "Only people in {channel} see your camera, and only after you press Turn on camera. Mumcord never records cameras."
-- **FR-8.11** Preview contents: the live mirrored (per setting) picture with the chosen effect; **Camera** device picker; **Background** None / Blur / Image; for Blur a **Blur strength** slider Light … Strong; for Image the library (six built-in images, the user's own images marked "Yours", and **Add image**); the line "Effects run on this device. Load: {low|medium|high}"; the checkbox **Use this background next time** (saves the choice as the default background, FR-8.75); **Cancel** and **Turn on camera**.
+- **FR-8.11** Preview contents: the live mirrored (per setting) picture with the chosen effect; **Camera** device picker; **Background** None / Blur / Image; for Blur a **Blur strength** choice of two buttons, **Light** and **Strong** (no slider; Light = strength 50, Strong = 100); for Image the library (six built-in images, the user's own images marked "Yours", and **Add image**); the line "Effects run on this device. Load: {low|medium|high}"; the checkbox **Use this background next time** (saves the choice as the default background, FR-8.75); **Cancel** and **Turn on camera**.
 - **FR-8.12** **Cancel**, Escape or closing the dialog turns the camera off and releases the device (camera light off within 1 s).
 - **FR-8.13** **Turn on camera** sends `bcast-req` with kind `cam` (section 6.6). The dialog stays open with a busy state until the broadcast exists; then it closes and the camera is on air. Errors keep the dialog open with the reason text (section 5.6) and the button enabled for a retry.
 - **FR-8.14** **Add image** opens the system file picker for PNG, JPEG or WebP up to 10 MB. The image is decoded, scaled to at most 1920 px wide, re-encoded (which strips all metadata) and copied into Mumcord's data folder; the original path is not kept. Unsupported or larger files show "This image can't be used. Use a PNG, JPEG or WebP file up to 10 MB." Own images are never uploaded, synced, sent or logged; only the finished composited picture is sent (info line in the dialog, mockup 04).
@@ -93,7 +93,7 @@ The client only displays availability; the bot and relay decide who may create o
 - **FR-8.21** The camera turns off within 1 s, releases the device, ends the broadcast and announces "off" when the user: leaves or is moved out of the voice channel, switches the voice server, disconnects or loses the connection, quits Mumcord, or locks the screen while "Turn my camera off when my screen locks" is on (default on). It never turns back on by itself afterwards.
 - **FR-8.22** Minimised or hidden window: the camera keeps sending. The tray icon gains a red camera badge and the tooltip "Camera on"; the tray menu gains "Turn off camera".
 - **FR-8.23** The camera device disappears (unplugged) while on: the camera turns off with "Camera stopped: the camera was disconnected." Another app takes the device exclusively: "Camera stopped: another app is using your camera."
-- **FR-8.24** The relay becomes unavailable, the broadcast ends from the relay side (`end` reason `deleted`, `revoked`, `idle`, `closed`) or the bot announces the relay down: the camera turns off with "Camera stopped: the relay isn't reachable" (for `end` with `deleted`/`revoked`: "Camera stopped by the server's relay").
+- **FR-8.24** The relay becomes unavailable, the broadcast ends from the relay side (`end` reason `deleted`, `revoked`, `idle`, `closed`) or the bot announces the relay down: the camera turns off with "Camera stopped: the relay isn't reachable" (for `end` with `deleted`/`revoked`: "Camera stopped by the server's relay"). Placement of every "Camera stopped: …" notice (FR-8.23, FR-8.24): it appears in the camera room's bar; if the room is not on screen (closed, or open behind another item), it appears below the mini bar. It stays until the user dismisses it or turns the camera on again.
 
 ### 4.4 Camera capture
 
@@ -110,7 +110,7 @@ The client only displays availability; the bot and relay decide who may create o
 
 ### 4.5 Background effects
 
-- **FR-8.32** Backgrounds: **None**, **Blur** (strength slider Light … Strong, two blur radii and a blend in between), **Image** (built-in or own). The effect is applied before encoding; viewers receive only the finished picture.
+- **FR-8.32** Backgrounds: **None**, **Blur** (strength **Light** = 50 or **Strong** = 100 as two buttons, no slider; two blur radii and a blend in between; a stored value above 50 counts as Strong), **Image** (built-in or own). The effect is applied before encoding; viewers receive only the finished picture.
 - **FR-8.33** Segmentation model: MediaPipe **Selfie Segmenter** (Apache-2.0), converted once to ONNX and shipped with the app, run with ONNX Runtime through the `ort` crate on the CPU (spike CA0, section 13: about 4× faster than `tract` with identical masks). Two model shapes are shipped: the **square 256×256** model for the full level ("Best", FR-8.35) and the **landscape 144×256** model for the light level. There is no `tract` fallback and no graphics-card path. If ONNX Runtime is not available on a system (library missing or fails to load), background effects are disabled with a clear reason ("Background effects are not available on this PC: {reason}"); the camera itself still works with Background None. MediaPipe Selfie Multiclass is not used (its file is about 16.5 MB).
 - **FR-8.34** Quality pipeline per frame (#388 §2), at the **full** level; the **light** level (FR-8.35) replaces step 2 with a simpler edge cleanup (plain bilinear upsampling of the mask plus a small edge blur) and step 5 with a coarser blur:
   1. run the model on a downscaled frame (256×256 at the full level, 144×256 at the light level);
@@ -182,7 +182,7 @@ The client only displays availability; the bot and relay decide who may create o
 
 ### 4.10 Settings → Camera
 
-- **FR-8.75** New tab **Camera** (marked "New" until opened once) between Screen sharing and Chat & Notifications (mockup 11) with: intro "Your camera, background effects and how you see other people's cameras. Camera sharing needs a server with a mumpeer relay."; local preview (FR-8.30); **Camera** device; **Send quality** (FR-8.45); **Mirror my self-view**; **Default background** (None / Blur / Image: Library / own images); **Blur strength**; **Effect quality** (FR-8.35); own images count and **Manage images**; **Privacy**: "Turn my camera off when my screen locks" (default on) and the privacy text of mockup 11; **Other people's cameras**: **Show cameras** Always / When I open the room / Never, "Data saver: up to 15 fps for everyone", "Reduce motion: no glow or animation on the speaking frame" (follows the system setting by default).
+- **FR-8.75** New tab **Camera** (marked "New" until opened once) between Screen sharing and Chat & Notifications (mockup 11) with: intro "Your camera, background effects and how you see other people's cameras. Camera sharing needs a server with a mumpeer relay."; local preview (FR-8.30); **Camera** device; **Send quality** (FR-8.45); **Mirror my self-view**; **Default background** (None / Blur / Image: Library / own images); **Blur strength** (Light / Strong buttons); **Effect quality** (FR-8.35); own images count and **Manage images**; **Privacy**: "Turn my camera off when my screen locks" (default on) and the privacy text of mockup 11; **Other people's cameras**: **Show cameras** Always / When I open the room / Never, "Data saver: up to 15 fps for everyone", "Reduce motion: no glow or animation on the speaking frame" (follows the system setting by default).
 - **FR-8.76** All camera settings persist across restarts and apply to the next preview (default background, blur strength, device).
 - **FR-8.77** The privacy text explains honestly that Mumcord never records cameras and viewers' clients never write camera frames to disk, but that Mumcord can't stop someone from taking a screenshot with their operating system.
 - **FR-8.78** No recording: there is no record function, and no camera frame (sent or received) is ever written to disk, cache or logs.
@@ -237,7 +237,7 @@ flowchart LR
 │ │                            │ Background          │
 │ │      (live preview)        │ (None)(Blur)(Image) │
 │ │                            │ Blur strength       │
-│ └────────────────────────────┘ Light ──●── Strong  │
+│ └────────────────────────────┘ (Light) (Strong)    │
 │ Only people in Lobby see your camera, and only     │
 │ after you press Turn on camera. Mumcord never      │
 │ records cameras.                                   │
@@ -247,7 +247,7 @@ flowchart LR
 └────────────────────────────────────────────────────┘
 ```
 
-With Image selected, the blur slider is replaced by the image grid (18 built-in, own images marked "Yours", **Add image**) and the line "Your own images stay on this device. Only the finished picture is sent." Focus starts on **Turn on camera**; Escape = Cancel.
+With Image selected, the blur strength buttons are replaced by the image grid (18 built-in, own images marked "Yours", **Add image**) and the line "Your own images stay on this device. Only the finished picture is sent." Focus starts on **Turn on camera**; Escape = Cancel.
 
 ### 5.3 Camera room (mockups 05–07, 10)
 
@@ -439,7 +439,7 @@ Mumble server ≥ 1.4, unmodified; only PluginDataTransmission and the messages 
 | | `camera_send_quality` | enum auto/720p15/360p30 | yes | default auto |
 | | `camera_mirror_self` | bool | yes | default true |
 | | `camera_default_background` | enum none/blur/builtin:{id}/own:{id} | yes | default blur |
-| | `camera_blur_strength` | u8 0–100 | yes | default 50 |
+| | `camera_blur_strength` | u8 0–100 (the UI writes 50 = Light or 100 = Strong; any stored value above 50 counts as Strong) | yes | default 50 (Light) |
 | | `camera_effect_quality` | enum auto/best/light | yes | default auto |
 | | `camera_off_on_lock` | bool | yes | default true |
 | | `camera_show` | enum always/on_open/never | yes | default always |
@@ -548,7 +548,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 16. **AC-8.16** (AC-C16) Reduce motion on (system, then the app switch) → the speaking frame is a static border (no CSS animation or transition on the tile) and switching layouts doesn't animate.
 17. **AC-8.17** (AC-C17, automated part) `netns.sh` throttles B to 1 Mbit/s → B's tiles drop to 15 or 7.5 fps with the fps badge while C keeps 30 fps. Manual checklist part: on a 4-core 2020 laptop, blur at 720p30 runs at 30 fps with the level Auto picked (effect time per frame in the debug panel).
 18. **AC-8.18** (AC-C18) "Turn my camera off when my screen locks" on → screen-lock test hook turns A's camera off; with the setting off it stays on.
-19. **AC-8.19** (AC-C19) Change every Settings → Camera value, restart → values kept; the next preview starts with the default background and blur strength.
+19. **AC-8.19** (AC-C19) Change every Settings → Camera value, restart → values kept; the next preview starts with the default background and blur strength (Light or Strong).
 20. **AC-8.20** A minimises the window while on air → B keeps receiving frames; the tray shows the camera badge and "Camera on"; the tray entry "Turn off camera" stops it.
 21. **AC-8.21** The global hotkey with the camera off opens the preview (nothing sent); with the camera on turns it off at once.
 22. **AC-8.22** Test camera `unplug_after=5s` while on air → camera off with "Camera stopped: the camera was disconnected."; `denied` → the platform's permission text and button in the preview.
@@ -593,6 +593,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Viewer full and failed join (2026-11-05) | Explicit `full` message from the sender shows "Too many people are watching {name}"; no answer to `cam-join` within 10 s shows "Couldn't join {name}'s camera" and retries every 10 s | Product owner decision 2026-11-05; FR-8.52, §5.6, §6.5, §7.2 |
 | Pure client | Works against an unmodified Mumble server; mumpeer and mumbot are the user's own projects and are extended | Project rule |
 | Camera signalling format (#400) | `mumcord.camera` uses **Bovnar** from the start (thin Rust wrapper around the upstream C library; decided as a pinned git dependency on the fork Mumcord/bovnar, since 12b34052 the published crates.io crate `bovnar`; building needs a C compiler). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-8.91, §6.5 |
+| Blur strength control and "Camera stopped" placement | Blur strength is two buttons, **Light** (50) and **Strong** (100), not a slider; a stored value above 50 counts as Strong. The "Camera stopped: …" notice appears in the camera room's bar, or below the mini bar when the room is not on screen | User decision 2026-11-06, decided during implementation (0.7.0) |
 
 ## 13. Open points & risks
 
