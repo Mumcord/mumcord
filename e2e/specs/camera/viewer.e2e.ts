@@ -150,7 +150,7 @@ async function waitViewer(session: number, present: boolean, timeout = 15_000): 
         },
         { timeout: 20_000, interval: 500, timeoutMsg: "B's tile of A never showed the capped fps badge" },
       );
-      await $(`//div[contains(@class,'cam-tile')][starts-with(@aria-label,'${NAMES.a}')]//*[contains(@class,'cam-tile__badge')][contains(.,'fps')]`).waitForDisplayed({ timeout: 10_000 });
+      await $(`//div[contains(@class,'cam-tile')][starts-with(@aria-label,'${NAMES.a}')]//*[contains(concat(' ',@class,' '),' cam-tile__badge ')][contains(.,'fps')]`).waitForDisplayed({ timeout: 10_000 });
     });
     await on("c", async () => {
       const tile = await waitTile(NAMES.a);
