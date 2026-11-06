@@ -687,6 +687,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         portable = portable::is_active(),
         "Mumcord starting"
     );
+    gst_fallback::log_h264_status(&app.config().identifier);
     mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
 
     let info_engine = engine.clone();

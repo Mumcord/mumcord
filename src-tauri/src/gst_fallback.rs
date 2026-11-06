@@ -58,6 +58,67 @@ pub fn prepare(identifier: &str) {
     }
 }
 
+/// What the AppImage's last GStreamer scan says about H.264 (#567). The host's gst-libav only
+/// helps when the bundled GStreamer can load it; a host plugin built for a newer GStreamer is
+/// skipped without a message, so the hint "install gst-libav" would be wrong.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum H264Status {
+    /// The decoder is in the registry.
+    Available,
+    /// The host has gst-libav, but the registry lacks its decoder: it failed to load.
+    HostPluginNotLoaded,
+    /// No gst-libav on the host.
+    HostPluginMissing,
+    /// No registry yet (no video played since the cache was cleared) or not an AppImage.
+    Unknown,
+}
+
+/// Logs [`H264Status`] once at start; outside an AppImage GStreamer is the system's own.
+pub fn log_h264_status(identifier: &str) {
+    if !crate::desktop_entry::is_appimage() {
+        return;
+    }
+    let var = |name: &str| std::env::var_os(name);
+    let registry = REGISTRY_VARS
+        .iter()
+        .find_map(|name| var(name).map(PathBuf::from))
+        .or_else(|| {
+            registry_file(
+                var("XDG_CACHE_HOME").as_deref(),
+                var("HOME").as_deref(),
+                identifier,
+            )
+        });
+    let registry = registry.and_then(|file| std::fs::read(file).ok());
+    let host_libav = HOST_PLUGIN_DIRS
+        .iter()
+        .any(|dir| Path::new(dir).join("libgstlibav.so").is_file());
+    let status = h264_status(registry.as_deref(), host_libav);
+    match status {
+        H264Status::HostPluginNotLoaded => tracing::warn!(
+            ?status,
+            "the system's gst-libav is installed but the AppImage's GStreamer cannot load it \
+             (it is built for a newer GStreamer); H.264 videos such as Twitch need the \
+             distribution package of Mumcord"
+        ),
+        _ => tracing::info!(?status, "AppImage H.264 support"),
+    }
+}
+
+fn h264_status(registry: Option<&[u8]>, host_libav: bool) -> H264Status {
+    let Some(registry) = registry else {
+        return H264Status::Unknown;
+    };
+    let has = |needle: &[u8]| registry.windows(needle.len()).any(|w| w == needle);
+    if has(b"avdec_h264") {
+        H264Status::Available
+    } else if host_libav {
+        H264Status::HostPluginNotLoaded
+    } else {
+        H264Status::HostPluginMissing
+    }
+}
+
 /// The variables to set, read from the environment through `var`.
 fn changes(
     appimage: bool,
@@ -151,6 +212,23 @@ mod tests {
                 .find(|(known, _)| known == name)
                 .map(|(_, value)| value.clone())
         }
+    }
+
+    #[test]
+    fn h264_status_tells_a_host_plugin_that_did_not_load() {
+        assert_eq!(h264_status(None, true), H264Status::Unknown);
+        assert_eq!(
+            h264_status(Some(b"..avdec_h264.."), true),
+            H264Status::Available
+        );
+        assert_eq!(
+            h264_status(Some(b"..vp9dec.."), true),
+            H264Status::HostPluginNotLoaded
+        );
+        assert_eq!(
+            h264_status(Some(b"..vp9dec.."), false),
+            H264Status::HostPluginMissing
+        );
     }
 
     #[test]
