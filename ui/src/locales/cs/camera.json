@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tvůj obrázek: {{name}}",
     "addImage": "Přidat obrázek",
     "addImageLabel": "Přidat vlastní obrázek",
+    "imageFilter": "Obrázky",
     "effectsLoad": "Efekty běží v tomto zařízení. Zatížení: {{load}} ({{unit}})",
     "loadLow": "nízké",
     "loadMedium": "střední",
@@ -192,6 +193,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Možnosti pro {{name}}",
     "pin": "Připnout pro mě",
     "unpin": "Odepnout",
     "showLarge": "Zobrazit velké",

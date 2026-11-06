@@ -37,6 +37,7 @@
     "imageYoursLabel": "D'íomhá: {{name}}",
     "addImage": "Cuir íomhá leis",
     "addImageLabel": "Cuir d'íomhá féin leis",
+    "imageFilter": "Íomhánna",
     "effectsLoad": "Ritheann éifeachtaí ar an ngléas seo. Ualach: {{load}} ({{unit}})",
     "loadLow": "íseal",
     "loadMedium": "meánach",
@@ -199,6 +200,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Roghanna do {{name}}",
     "pin": "Greamaigh dom",
     "unpin": "Díghreamaigh",
     "showLarge": "Taispeáin mór",

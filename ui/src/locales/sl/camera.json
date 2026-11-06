@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tvoja slika: {{name}}",
     "addImage": "Dodaj sliko",
     "addImageLabel": "Dodaj svojo sliko",
+    "imageFilter": "Slike",
     "effectsLoad": "Učinki se izvajajo na tej napravi. Obremenitev: {{load}} ({{unit}})",
     "loadLow": "nizka",
     "loadMedium": "srednja",
@@ -192,6 +193,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Možnosti za {{name}}",
     "pin": "Pripni zame",
     "unpin": "Odpni",
     "showLarge": "Pokaži veliko",

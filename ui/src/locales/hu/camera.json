@@ -37,6 +37,7 @@
     "imageYoursLabel": "A te képed: {{name}}",
     "addImage": "Kép hozzáadása",
     "addImageLabel": "Saját kép hozzáadása",
+    "imageFilter": "Képek",
     "effectsLoad": "Az effektek ezen az eszközön futnak. Terhelés: {{load}} ({{unit}})",
     "loadLow": "alacsony",
     "loadMedium": "közepes",
@@ -178,6 +179,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "{{name}} beállításai",
     "pin": "Kitűzés nekem",
     "unpin": "Kitűzés megszüntetése",
     "showLarge": "Megjelenítés nagyban",

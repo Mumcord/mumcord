@@ -37,6 +37,7 @@
     "imageYoursLabel": "Tavo vaizdas: {{name}}",
     "addImage": "Pridėti vaizdą",
     "addImageLabel": "Pridėti savo vaizdą",
+    "imageFilter": "Vaizdai",
     "effectsLoad": "Efektai vykdomi šiame įrenginyje. Apkrova: {{load}} ({{unit}})",
     "loadLow": "maža",
     "loadMedium": "vidutinė",
@@ -192,6 +193,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "{{name}} parinktys",
     "pin": "Prisegti man",
     "unpin": "Atsegti",
     "showLarge": "Rodyti didelį",

@@ -37,6 +37,7 @@
     "imageYoursLabel": "Η εικόνα σου: {{name}}",
     "addImage": "Προσθήκη εικόνας",
     "addImageLabel": "Πρόσθεσε τη δική σου εικόνα",
+    "imageFilter": "Εικόνες",
     "effectsLoad": "Τα εφέ εκτελούνται σε αυτή τη συσκευή. Φορτίο: {{load}} ({{unit}})",
     "loadLow": "χαμηλό",
     "loadMedium": "μεσαίο",
@@ -178,6 +179,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Επιλογές για {{name}}",
     "pin": "Καρφίτσωμα για μένα",
     "unpin": "Ξεκαρφίτσωμα",
     "showLarge": "Μεγάλη προβολή",

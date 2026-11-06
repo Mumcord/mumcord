@@ -37,6 +37,7 @@
     "imageYoursLabel": "A tua imagem: {{name}}",
     "addImage": "Adicionar imagem",
     "addImageLabel": "Adicionar uma imagem tua",
+    "imageFilter": "Imagens",
     "effectsLoad": "Os efeitos correm neste dispositivo. Carga: {{load}} ({{unit}})",
     "loadLow": "baixa",
     "loadMedium": "média",
@@ -185,6 +186,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Opções para {{name}}",
     "pin": "Fixar para mim",
     "unpin": "Desafixar",
     "showLarge": "Mostrar grande",

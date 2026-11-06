@@ -37,6 +37,7 @@
     "imageYoursLabel": "L-immaġni tiegħek: {{name}}",
     "addImage": "Żid immaġni",
     "addImageLabel": "Żid l-immaġni tiegħek stess",
+    "imageFilter": "Stampi",
     "effectsLoad": "L-effetti jaħdmu fuq dan l-apparat. Tagħbija: {{load}} ({{unit}})",
     "loadLow": "baxxa",
     "loadMedium": "medja",
@@ -199,6 +200,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Għażliet għal {{name}}",
     "pin": "Waħħal għalija",
     "unpin": "Neħħi t-twaħħil",
     "showLarge": "Uri kbir",

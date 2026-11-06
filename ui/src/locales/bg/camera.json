@@ -37,6 +37,7 @@
     "imageYoursLabel": "Твоето изображение: {{name}}",
     "addImage": "Добави изображение",
     "addImageLabel": "Добави свое изображение",
+    "imageFilter": "Изображения",
     "effectsLoad": "Ефектите работят на това устройство. Натоварване: {{load}} ({{unit}})",
     "loadLow": "ниско",
     "loadMedium": "средно",
@@ -178,6 +179,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Опции за {{name}}",
     "pin": "Закачи за мен",
     "unpin": "Откачи",
     "showLarge": "Покажи голямо",

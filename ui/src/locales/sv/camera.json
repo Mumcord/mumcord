@@ -37,6 +37,7 @@
     "imageYoursLabel": "Din bild: {{name}}",
     "addImage": "Lägg till bild",
     "addImageLabel": "Lägg till din egen bild",
+    "imageFilter": "Bilder",
     "effectsLoad": "Effekter körs på den här enheten. Belastning: {{load}} ({{unit}})",
     "loadLow": "låg",
     "loadMedium": "medel",
@@ -178,6 +179,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Alternativ för {{name}}",
     "pin": "Fäst för mig",
     "unpin": "Lossa",
     "showLarge": "Visa stort",

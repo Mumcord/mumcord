@@ -37,6 +37,7 @@
     "imageYoursLabel": "Dit billede: {{name}}",
     "addImage": "Tilføj billede",
     "addImageLabel": "Tilføj dit eget billede",
+    "imageFilter": "Billeder",
     "effectsLoad": "Effekter kører på denne enhed. Belastning: {{load}} ({{unit}})",
     "loadLow": "lav",
     "loadMedium": "middel",
@@ -178,6 +179,7 @@
     "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
+    "options": "Indstillinger for {{name}}",
     "pin": "Fastgør for mig",
     "unpin": "Frigør",
     "showLarge": "Vis stort",
