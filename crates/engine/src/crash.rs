@@ -20,6 +20,10 @@ pub const MAX_REPORTS: usize = 10;
 const LOG_LINES: usize = 200;
 const MARKER: &str = "running";
 const SEEN: &str = "seen";
+/// Ids of reports the user uploaded.
+const UPLOADED: &str = "uploaded";
+/// Where the Upload button sends one report (#573); the server keeps it for 90 days.
+pub const UPLOAD_URL: &str = "https://crash.mumcord.app/api/v1/reports";
 /// What was running, kept on disk too so the report of a native crash can show it next start.
 const CONTEXT: &str = "context";
 /// The loaded libraries at a fatal signal, for naming the native stack at the next start.
@@ -66,6 +70,8 @@ pub struct CrashSummary {
     pub kind: CrashKind,
     /// First line of the cause, e.g. the panic message.
     pub cause: String,
+    /// Sent with the Upload button.
+    pub uploaded: bool,
 }
 
 struct State {
@@ -414,14 +420,20 @@ fn summary(path: &Path) -> Option<CrashSummary> {
         version: field("version"),
         kind: CrashKind::parse(&field("kind")),
         cause: field("cause"),
+        uploaded: false,
     })
 }
 
 /// The saved reports, newest first.
 pub fn list(dir: &Path) -> Vec<CrashSummary> {
+    let uploaded = fs::read_to_string(dir.join(UPLOADED)).unwrap_or_default();
     let mut all: Vec<CrashSummary> = report_files(dir)
         .iter()
         .filter_map(|p| summary(p))
+        .map(|mut s| {
+            s.uploaded = uploaded.lines().any(|l| l == s.id);
+            s
+        })
         .collect();
     all.sort_by(|a, b| b.created_unix.cmp(&a.created_unix).then(b.id.cmp(&a.id)));
     all
@@ -453,6 +465,62 @@ pub fn delete_all(dir: &Path) -> io::Result<()> {
         fs::remove_file(path)?;
     }
     let _ = fs::remove_file(dir.join(SEEN));
+    Ok(())
+}
+
+/// What the Upload button sends: the report unchanged, plus the user's comment as a last
+/// `comment:` section when there is one.
+pub fn upload_body(dir: &Path, id: &str, comment: &str) -> io::Result<String> {
+    let mut body = read(dir, id)?;
+    let comment = comment.trim();
+    if !comment.is_empty() {
+        if !body.ends_with('\n') {
+            body.push('\n');
+        }
+        body.push_str("\ncomment:\n");
+        body.push_str(&shorten_home(comment));
+        body.push('\n');
+    }
+    Ok(body)
+}
+
+/// Sends one report after the user confirmed it (#573). Only this function uploads, and only
+/// the report it is given; nothing is sent in the background.
+pub async fn upload(dir: &Path, id: &str, comment: &str) -> Result<(), String> {
+    let body = upload_body(dir, id, comment).map_err(|e| e.to_string())?;
+    let provider = std::sync::Arc::new(rustls::crypto::ring::default_provider());
+    let tls = {
+        use rustls_platform_verifier::BuilderVerifierExt;
+        rustls::ClientConfig::builder_with_provider(provider)
+            .with_safe_default_protocol_versions()
+            .and_then(|b| b.with_platform_verifier())
+            .map_err(|e| e.to_string())?
+            .with_no_client_auth()
+    };
+    let client = reqwest::Client::builder()
+        .tls_backend_preconfigured(tls)
+        .https_only(true)
+        .redirect(reqwest::redirect::Policy::none())
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| e.to_string())?;
+    let response = client
+        .post(UPLOAD_URL)
+        .header(reqwest::header::CONTENT_TYPE, "text/plain; charset=utf-8")
+        .body(body)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+    if !response.status().is_success() {
+        return Err(format!("the crash server answered {}", response.status()));
+    }
+    let path = dir.join(UPLOADED);
+    let mut ids = fs::read_to_string(&path).unwrap_or_default();
+    if !ids.lines().any(|l| l == id) {
+        ids.push_str(id);
+        ids.push('\n');
+        fs::write(path, ids).map_err(|e| e.to_string())?;
+    }
     Ok(())
 }
 
@@ -837,6 +905,18 @@ mod tests {
             context_text(&running),
             "camera: on\nscreen share: sending, AV1 1080p\n"
         );
+    }
+
+    #[test]
+    fn the_upload_is_the_report_plus_an_optional_comment() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = test_report(dir.path(), CrashKind::Panic, "boom", &[]).unwrap();
+        let id = path.file_name().unwrap().to_str().unwrap();
+        let report = read(dir.path(), id).unwrap();
+        assert_eq!(upload_body(dir.path(), id, "  ").unwrap(), report);
+        let body = upload_body(dir.path(), id, "watched a VP9 share in full screen").unwrap();
+        assert!(body.starts_with(&report));
+        assert!(body.ends_with("\ncomment:\nwatched a VP9 share in full screen\n"));
     }
 
     #[test]

@@ -306,6 +306,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::crash::crash_delete,
             commands::crash::crash_delete_all,
             commands::crash::crash_export,
+            commands::crash::crash_upload,
+            commands::crash::crash_upload_preview,
             commands::crash::crash_open_folder,
             commands::crash::log_open_folder,
             commands::crash::log_text,

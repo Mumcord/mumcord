@@ -65,6 +65,8 @@ pub struct CrashReport {
     /// The signal name for [`CrashKind::Signal`], e.g. `SIGSEGV`.
     pub signal: Option<String>,
     pub cause: String,
+    /// Sent with the Upload button.
+    pub uploaded: bool,
 }
 
 impl From<crash::CrashSummary> for CrashReport {
@@ -81,6 +83,7 @@ impl From<crash::CrashSummary> for CrashReport {
             kind,
             signal,
             cause: s.cause,
+            uploaded: s.uploaded,
         }
     }
 }
@@ -130,6 +133,28 @@ pub fn crash_delete_all() -> ApiResult<()> {
 pub fn crash_export(ids: Vec<String>, path: String) -> ApiResult<()> {
     crash::export(&dirs()?.crash, &ids, Path::new(&path))
         .map_err(|e| io_error("exporting crash reports failed", &e))
+}
+
+/// Sends one report to crash.mumcord.app after the user confirmed it in the upload dialog
+/// (#573); `comment` is added as a last section when not empty. Never called by anything else.
+#[tauri::command]
+#[specta::specta]
+pub async fn crash_upload(id: String, comment: String) -> ApiResult<()> {
+    let dir = dirs()?.crash.clone();
+    crash::upload(&dir, &id, &comment).await.map_err(|e| {
+        ApiError::new(
+            ErrorCode::ServerUnreachable,
+            format!("uploading the crash report failed: {e}"),
+        )
+    })
+}
+
+/// The exact text the upload would send, for the preview in the confirmation.
+#[tauri::command]
+#[specta::specta]
+pub fn crash_upload_preview(id: String, comment: String) -> ApiResult<String> {
+    crash::upload_body(&dirs()?.crash, &id, &comment)
+        .map_err(|e| io_error("reading the crash report failed", &e))
 }
 
 #[tauri::command]

@@ -853,6 +853,13 @@ export const commands = {
 	crashDeleteAll: () => typedError<null, ApiError>(__TAURI_INVOKE("crash_delete_all")),
 	/**  Saves the given reports (all when `ids` is empty) as a zip file at `path`. */
 	crashExport: (ids: string[], path: string) => typedError<null, ApiError>(__TAURI_INVOKE("crash_export", { ids, path })),
+	/**
+	 *  Sends one report to crash.mumcord.app after the user confirmed it in the upload dialog
+	 *  (#573); `comment` is added as a last section when not empty. Never called by anything else.
+	 */
+	crashUpload: (id: string, comment: string) => typedError<null, ApiError>(__TAURI_INVOKE("crash_upload", { id, comment })),
+	/**  The exact text the upload would send, for the preview in the confirmation. */
+	crashUploadPreview: (id: string, comment: string) => typedError<string, ApiError>(__TAURI_INVOKE("crash_upload_preview", { id, comment })),
 	crashOpenFolder: () => typedError<null, ApiError>(__TAURI_INVOKE("crash_open_folder")),
 	logOpenFolder: () => typedError<null, ApiError>(__TAURI_INVOKE("log_open_folder")),
 	/**
@@ -2057,6 +2064,8 @@ export type CrashReport = {
 	/**  The signal name for [`CrashKind::Signal`], e.g. `SIGSEGV`. */
 	signal: string | null,
 	cause: string,
+	/**  Sent with the Upload button. */
+	uploaded: boolean,
 };
 
 /**  A `mumble://` link was opened from outside (startup argument or second launch). */
