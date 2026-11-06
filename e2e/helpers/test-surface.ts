@@ -148,10 +148,12 @@ export async function waitResults(
 ): Promise<Record<string, string>> {
   await openPanel();
   let results: Record<string, string> = {};
+  let lines: string[] = [];
   await browser.waitUntil(
     async () => {
       results = {};
-      for (const line of await panelLines()) {
+      lines = await panelLines();
+      for (const line of lines) {
         const match = /^([a-z-]+)\/([a-z-]+): ([a-z-]+)$/.exec(line.trim());
         if (match?.[1] === place) results[match[2]] = match[3];
       }
@@ -160,7 +162,7 @@ export async function waitResults(
     {
       timeout,
       interval: 500,
-      timeoutMsg: `${place} did not report every probe: ${JSON.stringify(results)}`,
+      timeoutMsg: `${place} did not report every probe: ${JSON.stringify(results)}; the panel shows:\n${lines.join("\n")}`,
     },
   );
   return results;

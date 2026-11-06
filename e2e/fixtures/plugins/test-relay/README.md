@@ -8,7 +8,9 @@ patterned body, built with the SDK's `bovnar` helpers) through `relay`.
   relay connection chip (AC-9.18, AC-9.19).
 - Panel buttons: 64 KiB or 900 B to the channel, with the fallback on or off; 64 KiB (fallback off)
   or 900 B (fallback on) to the last peer that announced this plugin. That peer comes from `peer-ready`, which needs
-  `peers.messages` (spec 06 F45), so the manifest requires it next to the optional `peers.relay`. "Channel malformed bytes"
+  `peers.messages` (spec 06 F45), so the manifest requires it next to the optional `peers.relay`.
+  When that peer leaves the channel (`left`, which needs `events.presence`) the panel shows
+  `Peer: none` and logs `gone: <name>`, so a spec knows nobody can receive until the next `peer-ready`. "Channel malformed bytes"
   sends 300 raw bytes that are no Bovnar document (AC-9.42): the receiver's SDK drops them and
   logs the reason and size, the host delivers them unchanged. "Channel oversized document" sends a
   document above the relay limit, which the SDK refuses with `too-large` before anything leaves

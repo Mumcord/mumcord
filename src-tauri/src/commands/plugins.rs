@@ -1198,8 +1198,9 @@ pub async fn plugin_update_review_prepare(
 
 /// The security score of a store plugin version (FR-9.72). `listing` scores the signed index
 /// entry, as Browse shows it; `package` scores the package the install prompt downloaded for
-/// this version (so `plugin_install_prepare` ran first), as the prompt shows it. `version`
-/// defaults to the one the store offers. Never scored in the UI.
+/// this version (so `plugin_install_prepare` ran first), as the prompt shows it; `developer`
+/// scores a loaded developer plugin's folder (`version` is ignored). `version` defaults to the
+/// one the store offers. Never scored in the UI.
 #[tauri::command]
 #[specta::specta]
 pub async fn plugin_score(
@@ -1209,7 +1210,21 @@ pub async fn plugin_score(
     from: PluginScoreSource,
 ) -> ApiResult<PluginScored> {
     let plugins = plugins_of(&app)?;
-    let (source, plugin) = find_indexed(&plugins, &id)?;
+    let from_listing = match from {
+        PluginScoreSource::Developer => {
+            let scored = plugins.call(move |service| service.dev_score(&id)).await?;
+            return Ok(scored.into());
+        }
+        PluginScoreSource::Listing => true,
+        PluginScoreSource::Package => false,
+    };
+    // The service's listings, not Browse's catalogue: the update check refreshes only the former,
+    // and the Installed list asks for the version an update just installed.
+    let wanted = id.clone();
+    let (source, plugin) = plugins
+        .call(move |service| service.find_listed(&wanted))
+        .await?
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
     let chosen = match &version {
         Some(v) => plugin
             .version(v)
@@ -1224,37 +1239,34 @@ pub async fn plugin_score(
     };
     let parsed = semver::Version::parse(&chosen.version)
         .map_err(|e| ApiError::new(ErrorCode::InvalidInput, e.to_string()))?;
-    let scored = match from {
-        PluginScoreSource::Listing => {
-            let target = id.clone();
-            plugins
-                .call(move |service| {
-                    service.plugin_score(&source, &target, &parsed, ScoreFrom::Listing)
-                })
-                .await?
-        }
-        PluginScoreSource::Package => {
-            let entry = plugin.entry(chosen);
-            let download = {
-                let prepared = plugins.prepared();
-                let prepared = prepared
-                    .as_ref()
-                    .filter(|p| p.id == id && p.version == entry.version)
-                    .ok_or_else(|| {
-                        ApiError::new(ErrorCode::NotFound, "the package was not downloaded yet")
-                    })?;
-                Download {
-                    bytes: prepared.download.bytes.clone(),
-                    signature: prepared.download.signature.clone(),
-                }
-            };
-            let check = plugins
-                .call(move |service| service.install_check(source, &entry, &download))
-                .await?;
-            match check {
-                InstallCheck::Ready { score, .. } => score.score,
-                InstallCheck::Refused { refusal } => Scored::Refused(refusal.stop),
+    let scored = if from_listing {
+        let target = id.clone();
+        plugins
+            .call(move |service| {
+                service.plugin_score(&source, &target, &parsed, ScoreFrom::Listing)
+            })
+            .await?
+    } else {
+        let entry = plugin.entry(chosen);
+        let download = {
+            let prepared = plugins.prepared();
+            let prepared = prepared
+                .as_ref()
+                .filter(|p| p.id == id && p.version == entry.version)
+                .ok_or_else(|| {
+                    ApiError::new(ErrorCode::NotFound, "the package was not downloaded yet")
+                })?;
+            Download {
+                bytes: prepared.download.bytes.clone(),
+                signature: prepared.download.signature.clone(),
             }
+        };
+        let check = plugins
+            .call(move |service| service.install_check(source, &entry, &download))
+            .await?;
+        match check {
+            InstallCheck::Ready { score, .. } => score.score,
+            InstallCheck::Refused { refusal } => Scored::Refused(refusal.stop),
         }
     };
     Ok(scored.into())

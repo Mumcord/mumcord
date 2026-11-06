@@ -285,6 +285,19 @@ describe("InstallPrompt gate", () => {
     });
   });
 
+  it("leaves out the repository warning once a plugin from that repository is installed", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(
+      gated(scored(41, "medium"), { confirm: "understand", reasons: ["ownCodeAndWebsites"] }),
+    );
+    render(<InstallPrompt plugin={brawl} onClose={vi.fn()} />);
+    expect(
+      await screen.findByRole("group", {
+        name: "This plugin brings its own code and talks to websites.",
+      }),
+    ).toBeTruthy();
+    expect(screen.queryByText(/is a repository you added/)).toBeNull();
+  });
+
   it("asks a High plugin to be installed anyway, explained from its real facts", async () => {
     vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(
       gated(scored(72, "high", true), {

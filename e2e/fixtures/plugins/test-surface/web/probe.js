@@ -338,7 +338,9 @@ const PROBES = {
     }),
 };
 
-const NAVIGATING = new Set(["navigation", "top-navigation", "meta-refresh", "form"]);
+// A download link to another origin is one too: WebKitGTK ignores `download` across origins and
+// follows the link, and the host closes a frame that loads a second page.
+const NAVIGATING = new Set(["navigation", "top-navigation", "meta-refresh", "form", "download"]);
 
 function resultItem(probe) {
   const item = document.createElement("li");

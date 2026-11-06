@@ -374,8 +374,9 @@ impl PluginIo for ServiceIo {
         target: crate::messaging::Target,
         data: Vec<u8>,
         fallback: bool,
+        permitted: bool,
     ) -> Result<(), crate::api::relay::SendError> {
-        self.relay_send_to(plugin, target, data, fallback)
+        self.relay_send_to(plugin, target, data, fallback, permitted)
     }
 
     fn set_tree(

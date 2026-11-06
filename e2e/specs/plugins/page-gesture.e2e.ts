@@ -50,6 +50,11 @@ describe("plugins: a trusted click in the plugin's page is a gesture (FR-9.45, A
     await app.restart({ env: pluginenv.appEnv() });
     await finishWizard();
     await addFirstServer(testenv.ports.v15);
+    // `stage.start` also answers not-permitted outside a channel, so join one: otherwise the real
+    // click's request would be refused for that reason and the gesture never be tested.
+    const join = $(".userpanel-readonly__join");
+    await join.waitForClickable({ timeout: 15_000 });
+    await join.click();
     // The fixture repository serves plain http on 127.0.0.1, which the client only accepts in
     // Developer mode (FR-6.74).
     await openSettingsGroup("Advanced & Developer");
