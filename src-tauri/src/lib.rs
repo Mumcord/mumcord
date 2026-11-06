@@ -664,13 +664,25 @@ pub(crate) fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
     Ok(())
 }
 
+#[cfg(target_os = "linux")]
+fn linux_appimage() -> bool {
+    desktop_entry::is_appimage()
+}
+
+#[cfg(not(target_os = "linux"))]
+fn linux_appimage() -> bool {
+    false
+}
+
 /// How Mumcord runs and on which screens, for crash reports (#568).
 fn set_crash_context(app: &AppHandle) {
+    // AppImage and Flatpak exist only on Linux.
+    let appimage = cfg!(target_os = "linux") && linux_appimage();
     let install = if portable::is_active() {
         "portable"
-    } else if desktop_entry::is_appimage() {
+    } else if appimage {
         "AppImage"
-    } else if std::path::Path::new("/.flatpak-info").exists() {
+    } else if cfg!(target_os = "linux") && std::path::Path::new("/.flatpak-info").exists() {
         "Flatpak"
     } else {
         "installed package or build"
@@ -713,6 +725,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         portable = portable::is_active(),
         "Mumcord starting"
     );
+    #[cfg(target_os = "linux")]
     gst_fallback::log_h264_status(&app.config().identifier);
     set_crash_context(app);
     mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
