@@ -1,7 +1,7 @@
 # Mumcord · Epic 11 – Activity log (server event feed) · Specification
 
 > Status: Draft for review · As of: 2026-11-06
-> Sources: `specs/11-activity-log-brainstorming.md` (scope, the five proposals and the chosen one), the final mockup `docs/images/screenshots/activity-log-p2-twoline-dark.png` / `-light.png`, and the answers given in chat on 2026-11-06 (event scope, visibility, unread hint, cap, condensed two-line no-icon look, clickable events, plugin-pushed events).
+> Sources: `specs/11-activity-log-brainstorming.md` (scope, the five proposals and the chosen one), the screenshots `docs/images/screenshots/activity-log-dark.png` / `-light.png`, and the answers given in chat on 2026-11-06 (event scope, visibility, unread hint, cap, condensed two-line no-icon look, clickable events, plugin-pushed events).
 > Builds on: `specs/01-foundation-specification.md` (stack, design system, accessibility, 24 locales), `specs/02-multi-server-themes-specification.md` (several servers at once, shown/voice server), `specs/03-163-watch-together-and-screen-share-implementation.md` (watch together), `specs/06-plugin-system-specification.md` and `specs/09-plugin-platform-1-1-specification.md` (plugin API, permissions, `ui-action`), `specs/07-file-sharing-screenshare-specification.md` (screen share), issue #165 (members column overlay). All decisions there stay valid unless this spec names a change.
 > Numbering: file number 11 → requirement IDs `FR-11.x` and `AC-11.x`.
 

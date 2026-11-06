@@ -1,8 +1,8 @@
 # Epic 11 — Activity log (server event feed) · Brainstorming draft
 
 > Status: decisions recorded — the specification is `specs/11-activity-log-specification.md`.
-> Nothing committed. The exploratory proposal mockups were removed; only the final mockup is kept
-> (`docs/images/screenshots/activity-log-p2-twoline-dark.png` / `-light.png`).
+> Nothing committed. The exploratory proposal mockups were removed; the real screenshots of the
+> implemented feed are `docs/images/screenshots/activity-log-dark.png` / `-light.png`.
 
 ## 1. What this is
 
@@ -43,7 +43,7 @@ after two refinement rounds the final look settled as:
 - live events are clickable rows; ended events become plain rows,
 - plugin events show a plugin-provided action that is routed back to the plugin.
 
-Final mockup: `docs/images/screenshots/activity-log-p2-twoline-dark.png` and
+Final screenshots: `docs/images/screenshots/activity-log-dark.png` and
 `-light.png`.
 
 ## 4. Recommendation
