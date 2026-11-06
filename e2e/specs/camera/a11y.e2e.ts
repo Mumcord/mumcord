@@ -121,9 +121,11 @@ function speakingStyle(
     const shadows = getComputedStyle(tile).boxShadow.split(/,(?![^(]*\))/);
     return {
       animation: styles.map((s) => s.animationName).filter((n) => n !== "none").join(","),
+      // The app's reduce-motion rule leaves 0.01 ms transitions, which end at once; only a
+      // transition of a millisecond or more is one the eye can see.
       transition: styles
         .map((s) => s.transitionDuration)
-        .filter((d) => d.split(",").some((part) => parseFloat(part) > 0))
+        .filter((d) => d.split(",").some((part) => parseFloat(part) >= 0.001))
         .join(","),
       glow: shadows.length > 1,
     };
