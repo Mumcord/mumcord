@@ -106,6 +106,19 @@ async function minimiseA(): Promise<void> {
   for (const id of ids) await runOk("xdotool", ["windowminimize", "--sync", id]);
 }
 
+/**
+ * Brings A's minimised window back. Mapping an iconified window restores it (ICCCM); the test
+ * display's window manager has no `_NET_ACTIVE_WINDOW`, so `windowactivate` is refused there.
+ */
+async function restoreA(): Promise<void> {
+  const ids = (await run("xdotool", ["search", "--pid", String(app.appPid("a")), "--name", "^Mumcord$"])).stdout
+    .trim()
+    .split("\n")
+    .filter(Boolean);
+  if (ids.length === 0) throw new Error("A's window not found");
+  for (const id of ids) await runOk("xdotool", ["windowmap", "--sync", id]);
+}
+
 (relayenv.relayAvailable() ? describe : describe.skip)("camera settings, lock, tray, hotkey and device loss (AC-8.18 to 8.22)", function () {
   this.timeout(900_000);
   this.bail(true);
@@ -225,7 +238,7 @@ async function minimiseA(): Promise<void> {
     });
     // The badge goes with the camera.
     expect(await trayProperty("IconPixmap")).not.toBe(iconOn);
-    await runOk("xdotool", ["search", "--pid", String(app.appPid("a")), "--name", "^Mumcord$", "windowactivate"]);
+    await restoreA();
   });
 
   it("AC-8.21: the hotkey opens the preview when off and turns the camera off when on", async () => {

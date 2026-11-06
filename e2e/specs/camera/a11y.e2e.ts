@@ -104,20 +104,28 @@ function roomAnimations(): Promise<number> {
   });
 }
 
-/** The speaking frame of `name`'s tile: its animation and transition, as computed. */
-function speakingStyle(name: string): Promise<{ animation: string; transition: string } | null> {
+/**
+ * The speaking frame of `name`'s tile, as computed: its animations and transitions, and whether
+ * the green border has its glow (a second, blurred shadow) or is the plain static border.
+ */
+function speakingStyle(
+  name: string,
+): Promise<{ animation: string; transition: string; glow: boolean } | null> {
   return browser.execute((who: string) => {
     const tile = [...document.querySelectorAll<HTMLElement>(".cam-tile[data-speaking]")].find((el) =>
       (el.getAttribute("aria-label") ?? "").startsWith(`${who},`),
     );
     if (!tile) return null;
     const styles = [tile, ...tile.querySelectorAll<HTMLElement>("*")].map((el) => getComputedStyle(el));
+    // Shadows are separated by commas outside of the colour functions.
+    const shadows = getComputedStyle(tile).boxShadow.split(/,(?![^(]*\))/);
     return {
       animation: styles.map((s) => s.animationName).filter((n) => n !== "none").join(","),
       transition: styles
         .map((s) => s.transitionDuration)
         .filter((d) => d.split(",").some((part) => parseFloat(part) > 0))
         .join(","),
+      glow: shadows.length > 1,
     };
   }, name);
 }
@@ -231,7 +239,7 @@ async function switchLayoutWithoutAnimation(): Promise<void> {
         timeout: 15_000,
         timeoutMsg: "A's tile never showed the speaking frame",
       });
-      expect(await speakingStyle(NAMES.a)).toEqual({ animation: "", transition: "" });
+      expect(await speakingStyle(NAMES.a)).toEqual({ animation: "", transition: "", glow: false });
       await switchLayoutWithoutAnimation();
     });
   });
@@ -239,17 +247,16 @@ async function switchLayoutWithoutAnimation(): Promise<void> {
   it("AC-8.16: the app's switch does the same without the system setting", async () => {
     await on("c", async () => {
       await waitTile(NAMES.a);
-      // Without reduce motion the speaking frame moves, so the check below means something.
+      // Without reduce motion the speaking frame glows, so the check below means something.
       await browser.waitUntil(async () => (await speakingStyle(NAMES.a)) !== null, { timeout: 15_000 });
-      const moving = await speakingStyle(NAMES.a);
-      expect(`${moving?.animation ?? ""}${moving?.transition ?? ""}`).not.toBe("");
+      expect((await speakingStyle(NAMES.a))?.glow).toBe(true);
 
       await openCameraSettings();
       const reduce = settingsSwitch("Reduce motion");
       if (!(await reduce.isSelected())) await reduce.click();
       await browser.keys("Escape");
       await $(".cam-room[data-reduce-motion]").waitForExist({ timeout: 10_000 });
-      expect(await speakingStyle(NAMES.a)).toEqual({ animation: "", transition: "" });
+      expect(await speakingStyle(NAMES.a)).toEqual({ animation: "", transition: "", glow: false });
       await switchLayoutWithoutAnimation();
     });
   });

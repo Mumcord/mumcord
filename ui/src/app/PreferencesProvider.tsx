@@ -6,6 +6,7 @@ import { applyShownTheme, resolveShownTheme } from "../theme/appTheme";
 import { osPrefersDark, resolveTheme, watchOsTheme } from "../theme/theme";
 import { setAppThemes, useThemeChoice } from "../theme/themeStore";
 import { ducker } from "../features/watchparty/ducking";
+import { setCameraLookSettings } from "../features/camera/room/useCameraLook";
 import { setHotkeySettings } from "../features/hotkeys";
 import { PreferencesContext, type Preferences } from "./preferences";
 import { rememberStartTheme } from "./startScreen";
@@ -79,11 +80,14 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         | "videoDuckingPercent"
         | "globalHotkeys"
         | "hotkeys"
+        | "cameraMirrorSelf"
+        | "cameraReduceMotion"
         | HintPreference
       >,
     ) => {
       applyHintPreferences(settings);
       setHotkeySettings(settings);
+      setCameraLookSettings(settings);
       setAppThemes(settings.appThemeId, settings.customThemes);
       ducker.setSettings(settings);
       rememberStartTheme(settings.theme);

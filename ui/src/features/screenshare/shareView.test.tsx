@@ -130,6 +130,16 @@ describe("watched share", () => {
     expect(screen.queryByRole("group")).toBeNull();
   });
 
+  it("closes the share's tab when the share ends, so the media area shows the rest", () => {
+    startWatching(1, ANNA);
+    expect(mediaView().cinema).toBe("share");
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [] });
+    });
+    expect(mediaView().stage).not.toContain("share");
+    expect(mediaView().cinema).toBeNull();
+  });
+
   it("starts the share's clock when its announcement arrived", () => {
     vi.useFakeTimers({ now: 1_000_000 });
     let started = 0;
