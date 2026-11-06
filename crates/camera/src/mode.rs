@@ -162,6 +162,8 @@ pub fn choose(modes: &[Mode], request: &CaptureRequest) -> Option<Mode> {
 /// The modes to try, best first (FR-8.26): [`choose`] for the request, then the same at a lower
 /// frame rate, then a smaller picture. Some cameras list modes they never deliver pictures in
 /// (seen: 720p and 1080p at 30 fps over NV12), so a backend moves on when one stays silent.
+/// Only the V4L2 backend can tell a silent mode apart; the others pick with [`choose`].
+#[cfg(target_os = "linux")]
 pub fn candidates(modes: &[Mode], request: &CaptureRequest) -> Vec<Mode> {
     let lower_fps = CaptureRequest {
         max_fps: (request.max_fps / 2).max(1),
@@ -201,6 +203,7 @@ mod tests {
         }
     }
 
+    #[cfg(target_os = "linux")]
     #[test]
     fn candidates_fall_back_to_a_lower_frame_rate_then_a_smaller_picture() {
         // The modes a Logitech StreamCam lists: only 720p at 15 fps actually delivers.

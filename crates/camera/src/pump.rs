@@ -47,11 +47,14 @@ impl Pump {
         }
     }
 
+    /// The V4L2 backend's mode fallback (Linux) reads it.
+    #[cfg(target_os = "linux")]
     pub fn mode(&self) -> Mode {
         self.mode
     }
 
     /// Gives the sink back, e.g. to start over with another mode before any picture arrived.
+    #[cfg(target_os = "linux")]
     pub fn into_sink(self) -> Box<dyn FrameSink> {
         self.sink
     }
