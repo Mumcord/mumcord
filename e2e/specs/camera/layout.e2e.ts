@@ -33,6 +33,16 @@ const combined = () => $("section.cam-combined");
 const position = (label: string) =>
   $(`//section[contains(@class,'cam-combined')]//*[@role='radiogroup'][@aria-label='Cameras']//*[@role='radio'][normalize-space()='${label}']`);
 
+/**
+ * Makes `id` the main item of the media area through its stage tab. A new item never takes the
+ * stage from the open camera room; it waits as a tab with a dot (spec 09 FR-9.44).
+ */
+async function pickStage(id: "share" | "watch"): Promise<void> {
+  const tab = $(`#stage-tab-${id}`);
+  await tab.waitForClickable({ timeout: 20_000, timeoutMsg: `no stage tab for ${id}` });
+  await tab.click();
+}
+
 /** Strip tiles in the combined view. */
 function stripTiles(): Promise<number> {
   return browser.execute(() => document.querySelectorAll("section.cam-combined .cam-strip [data-tile]").length);
@@ -131,6 +141,7 @@ async function expectGrid(): Promise<void> {
       );
       await watch.waitForClickable({ timeout: 30_000, timeoutMsg: "B never saw C's share" });
       await watch.click();
+      await pickStage("share");
       await combined().waitForDisplayed({ timeout: 30_000 });
       expect(await combined().getAttribute("aria-label")).toContain("with the camera room");
     });
@@ -155,6 +166,7 @@ async function expectGrid(): Promise<void> {
       await link.waitForDisplayed();
       await link.setValue(VIDEO);
       await $("//button[normalize-space()='Start']").click();
+      await pickStage("watch");
       await combined().waitForDisplayed({ timeout: 30_000 });
       expect(await combined().getAttribute("aria-label")).toBe("Watch party with the camera room");
     });
