@@ -122,4 +122,15 @@ mod tests {
     fn hooks_are_inert_without_variables() {
         assert_eq!(var("MUMCORD_TEST_NOT_SET_ANYWHERE"), None);
     }
+
+    /// Every hook, `MUMCORD_TEST_CA` included, reads its variable through `var`: a release build
+    /// ignores a variable that is set (this test asserts that when run with `--release`).
+    #[test]
+    fn hooks_read_variables_only_in_debug_builds() {
+        const PROBE: &str = "MUMCORD_TEST_HOOK_GATE_PROBE";
+        // SAFETY: no other test reads or writes this variable.
+        unsafe { std::env::set_var(PROBE, "set") };
+        assert_eq!(var(PROBE).is_some(), cfg!(debug_assertions));
+        unsafe { std::env::remove_var(PROBE) };
+    }
 }
