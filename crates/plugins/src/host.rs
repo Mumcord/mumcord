@@ -375,9 +375,10 @@ impl PluginHost {
     }
 
     /// Queues a relay event (`relay-message`, `relay-status-changed`) for plugin `id` if it is
-    /// running and holds `peers.relay` (1.1 events, past the 1.0 path).
+    /// running and may get it (1.1 events, past the 1.0 path): see [`relay_event_allowed`].
     pub fn send_relay(&self, id: &str, event: crate::runtime::PluginEvent) -> bool {
-        if !self.ctx.grants.allows(id, crate::api::relay::PERMISSION) {
+        let granted = self.ctx.grants.allows(id, crate::api::relay::PERMISSION);
+        if !relay_event_allowed(&event, granted) {
             return false;
         }
         self.plugins
@@ -567,4 +568,33 @@ fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 
 fn not_loaded(id: &str) -> HostError {
     HostError::NotLoaded(id.to_owned())
+}
+
+/// Relay messages need `peers.relay`; `relay-status-changed` does not, because revoking the
+/// permission is itself a change to `switched-off` the plugin must hear (FR-9.63).
+fn relay_event_allowed(event: &crate::runtime::PluginEvent, granted: bool) -> bool {
+    granted || matches!(event, crate::runtime::PluginEvent::RelayStatusChanged(_))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::relay_event_allowed;
+    use crate::api::v1_1::wit::relay::RelayStatus;
+    use crate::api::v1_1::wit::types::Peer;
+    use crate::runtime::PluginEvent;
+
+    #[test]
+    fn a_revoked_relay_permission_still_reports_switched_off() {
+        let switched_off = PluginEvent::RelayStatusChanged(RelayStatus::SwitchedOff);
+        assert!(relay_event_allowed(&switched_off, false));
+        assert!(relay_event_allowed(&switched_off, true));
+        let peer = Peer {
+            session: 3,
+            name: "Ada".into(),
+            key: None,
+        };
+        let message = PluginEvent::RelayMessage((peer, vec![1]));
+        assert!(!relay_event_allowed(&message, false));
+        assert!(relay_event_allowed(&message, true));
+    }
 }
