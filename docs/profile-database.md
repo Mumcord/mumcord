@@ -93,3 +93,7 @@ Removing a settings key is safe for older apps, but its value stays in the recor
 ## Released history
 
 Of the migrations v1–v30, only v26 is breaking: it rebuilt `encoder_selftest` with a new `NOT NULL` key column (`optimize`), which an app from before v26 cannot insert. So the minimum reader version of current profiles is 26. Every Mumcord that includes #521 (0.7.0 and later) can therefore open profiles from later versions as long as those only add things; versions before it cannot, because they do not know the minimum reader version. Rolling back works between versions that both include v30 (the stored down steps).
+
+### 0.7.0 and 0.6.2
+
+A profile that Mumcord 0.7.0 has opened can't be opened by 0.6.2 or older. 0.7.0 adds migrations v23–v30 (0.6.2 knows v1–v22), and 0.6.2 refuses any profile with a newer schema version ("schema too new"); it predates #521, so it can't read the minimum reader version. Issue #400 (Bovnar) keeps the data that 0.6.2 reads from other clients unchanged (chat, history sync, poll and dice data, peer messages); it does not cover the profile. To go back from 0.7.0 to 0.6.2, keep a copy of `mumcord.sqlite3` from before the update and put it back.
