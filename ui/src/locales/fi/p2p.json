@@ -49,7 +49,9 @@
     "denied": "Rele-botti hylkäsi pyynnön.",
     "notRegistered": "Tämän palvelimen rele on vain rekisteröityneiden käyttäjien käytettävissä. Rekisteröidy tälle palvelimelle käyttääksesi sitä.",
     "peerGone": "Toinen henkilö poistui palvelimelta.",
-    "rateLimited": "Liian monta relepyyntöä. Yritä minuutin kuluttua uudelleen."
+    "rateLimited": "Liian monta relepyyntöä. Yritä minuutin kuluttua uudelleen.",
+    "groupNotAllowed": "Palvelimen välitin on vain tiettyjen ryhmien käytössä. Pyydä ylläpitoa lisäämään sinut.",
+    "noHello": "Välitinbotti ei vielä tunne tätä sovellusta. Yhdistä uudelleen korjataksesi."
   },
   "refusal": {
     "unknownToken": "tuntematon käyttöoikeustunniste",
@@ -61,6 +63,11 @@
     "rateLimited": "liian monta yritystä",
     "version": "versiota ei tueta",
     "badRequest": "virheellinen pyyntö"
+  },
+  "refusalAction": {
+    "howToRegister": "Näin rekisteröidyt",
+    "reconnect": "Yhdistä uudelleen",
+    "filesRegisteredOnly": "Tiedostojen jakaminen on tällä palvelimella vain rekisteröityneille käyttäjille."
   },
   "trust": {
     "title": "Välitin vaihtui palvelimella {{server}}",

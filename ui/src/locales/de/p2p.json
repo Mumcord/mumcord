@@ -49,7 +49,9 @@
     "denied": "Der Relay-Bot hat die Anfrage abgelehnt.",
     "notRegistered": "Das Relay dieses Servers steht nur registrierten Benutzern zur Verfügung. Registriere dich auf diesem Server, um es zu nutzen.",
     "peerGone": "Die andere Person hat den Server verlassen.",
-    "rateLimited": "Zu viele Relay-Anfragen. Versuche es in einer Minute erneut."
+    "rateLimited": "Zu viele Relay-Anfragen. Versuche es in einer Minute erneut.",
+    "groupNotAllowed": "Das Relay dieses Servers ist nur für bestimmte Gruppen verfügbar. Bitte einen Admin, dich hinzuzufügen.",
+    "noHello": "Der Relay-Bot kennt diese App noch nicht. Verbinde dich neu, um das zu beheben."
   },
   "refusal": {
     "unknownToken": "unbekanntes Zugriffstoken",
@@ -61,6 +63,11 @@
     "rateLimited": "zu viele Versuche",
     "version": "nicht unterstützte Version",
     "badRequest": "ungültige Anfrage"
+  },
+  "refusalAction": {
+    "howToRegister": "So registrierst du dich",
+    "reconnect": "Neu verbinden",
+    "filesRegisteredOnly": "Dateifreigabe ist auf diesem Server nur für registrierte Nutzer verfügbar."
   },
   "trust": {
     "title": "Relay auf {{server}} geändert",

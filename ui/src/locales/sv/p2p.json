@@ -49,7 +49,9 @@
     "denied": "Relä-boten avvisade begäran.",
     "notRegistered": "Den här serverns relä är bara tillgängligt för registrerade användare. Registrera dig på den här servern för att använda det.",
     "peerGone": "Den andra personen lämnade servern.",
-    "rateLimited": "För många relä-begäranden. Försök igen om en minut."
+    "rateLimited": "För många relä-begäranden. Försök igen om en minut.",
+    "groupNotAllowed": "Serverns relä är bara tillgängligt för vissa grupper. Be en administratör lägga till dig.",
+    "noHello": "Reläboten känner inte till appen än. Anslut igen för att åtgärda det."
   },
   "refusal": {
     "unknownToken": "okänd åtkomsttoken",
@@ -61,6 +63,11 @@
     "rateLimited": "för många försök",
     "version": "version stöds inte",
     "badRequest": "ogiltig begäran"
+  },
+  "refusalAction": {
+    "howToRegister": "Så registrerar du dig",
+    "reconnect": "Anslut igen",
+    "filesRegisteredOnly": "Fildelning är bara tillgänglig för registrerade användare på den här servern."
   },
   "trust": {
     "title": "Reläet på {{server}} har ändrats",

@@ -15,6 +15,7 @@ import { ProfileDialog } from "./ProfileDialog";
 import { joinChannel } from "./readOnly";
 import { QuickSettings, type QuickSettingsState } from "./QuickSettings";
 import { RegisterDialog } from "./RegisterDialog";
+import { useRegisterRequests } from "./registerPrompt";
 import { ArrowIcon, AudioArrow } from "./AudioArrow";
 import { StatusStrip } from "./StatusStrip";
 import { stripMessage } from "./stripMessage";
@@ -55,6 +56,9 @@ export function UserPanel() {
   const avatarSrc = self ? avatarOf(self) : null;
   const [quick, setQuick] = useState<QuickSettingsState | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
+  // "Register" asked for from elsewhere, e.g. a relay hint for guests (#601).
+  const registerRequests = useRegisterRequests();
+  const [registerHandled, setRegisterHandled] = useState(registerRequests);
   const [error, setError] = useState<string | null>(null);
   const servers = useServers();
   const serverStates = useServerStates();
@@ -143,6 +147,7 @@ export function UserPanel() {
 
   const closeDialog = () => {
     setDialog(null);
+    setRegisterHandled(registerRequests);
     settingsButton.current?.focus();
   };
 
@@ -446,7 +451,9 @@ export function UserPanel() {
           onClose={closeDialog}
         />
       ) : null}
-      {dialog === "register" ? <RegisterDialog onClose={closeDialog} /> : null}
+      {dialog === "register" || registerRequests !== registerHandled ? (
+        <RegisterDialog onClose={closeDialog} />
+      ) : null}
     </div>
   );
 }

@@ -20,6 +20,7 @@ function info(status: RelayInfo["status"]): RelayInfo {
     broadcastMax: null,
     fingerprint: "AA:BB",
     previousFingerprint: "CC:DD",
+    registeredOnly: false,
   };
 }
 

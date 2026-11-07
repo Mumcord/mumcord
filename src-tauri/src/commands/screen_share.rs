@@ -251,6 +251,12 @@ pub enum FanoutReason {
     NoCertificate,
     /// The relay can't be used right now for another reason (not reachable, bot gone, …).
     Unavailable,
+    /// The relay only serves registered users (#601).
+    NotRegistered,
+    /// The relay only serves members of certain groups (#601).
+    GroupNotAllowed,
+    /// The relay bot doesn't know this client yet; reconnecting fixes it (#601).
+    NoHello,
 }
 
 impl From<engine_share::FanoutView> for ShareFanout {
@@ -274,6 +280,11 @@ impl From<engine_share::FanoutUnavailable> for FanoutReason {
             F::Relay(R::NoRelay) => Self::NoRelay,
             F::Relay(R::UseNotAllowed(_)) | F::Refused(Bcast::UseNotAllowed) => Self::Disallowed,
             F::Relay(R::RelayFull) | F::Refused(Bcast::RelayFull | Bcast::Full) => Self::Full,
+            F::Relay(R::NotRegistered) | F::Refused(Bcast::NotRegistered) => Self::NotRegistered,
+            F::Relay(R::GroupNotAllowed) | F::Refused(Bcast::GroupNotAllowed) => {
+                Self::GroupNotAllowed
+            }
+            F::Relay(R::NoHello) | F::Refused(Bcast::NoHello) => Self::NoHello,
             F::Relay(R::Denied) | F::Refused(_) => Self::Refused,
             F::Relay(_) => Self::Unavailable,
             F::NotOffered => Self::OldRelay,

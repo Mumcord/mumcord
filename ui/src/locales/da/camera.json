@@ -13,7 +13,8 @@
     "relayTooOld": "Denne servers relæ er for gammelt til kameradeling.",
     "relayDisallows": "Denne servers relæ tillader ikke kameradeling.",
     "needsRelayMode": "Kameradeling kræver relæet. Ændr det under Privatliv og forbindelser.",
-    "noCertificate": "Kameradeling kræver et klientcertifikat."
+    "noCertificate": "Kameradeling kræver et klientcertifikat.",
+    "registeredOnly": "Kun registrerede brugere må bruge kameraet på denne server."
   },
   "cameraOnTray": "Kamera tændt",
   "turnOffTray": "Sluk kamera",
@@ -97,7 +98,12 @@
     "mode": "Kameradeling kræver relæet. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
     "endedByRelay": "Kameraet blev stoppet af serverens relæ",
-    "dismissStopped": "Luk"
+    "dismissStopped": "Luk",
+    "notRegistered": "Kameraet kunne ikke starte: kun registrerede brugere må bruge kameraet på denne server.",
+    "groupNotAllowed": "Kameraet kunne ikke starte: serverens relæ betjener kun bestemte grupper. Bed en administrator om at tilføje dig.",
+    "notSameChannel": "Kameraet kunne ikke starte: du og dine seere skal være i samme kanal.",
+    "notInChannel": "Kameraet kunne ikke starte: gå ind i en kanal først.",
+    "noHello": "Kameraet kunne ikke starte: relæbotten kender ikke appen endnu. Forbind igen for at løse det."
   },
   "privacy": {
     "windows": "Windows blokerer kameraadgang for skrivebordsapps",

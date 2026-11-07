@@ -13,7 +13,8 @@
     "relayTooOld": "Serverns relä är för gammalt för kameradelning.",
     "relayDisallows": "Serverns relä tillåter inte kameradelning.",
     "needsRelayMode": "Kameradelning kräver reläet. Ändra det under Integritet och anslutningar.",
-    "noCertificate": "Kameradelning kräver ett klientcertifikat."
+    "noCertificate": "Kameradelning kräver ett klientcertifikat.",
+    "registeredOnly": "Bara registrerade användare får använda kameran på den här servern."
   },
   "cameraOnTray": "Kameran på",
   "turnOffTray": "Stäng av kameran",
@@ -97,7 +98,12 @@
     "mode": "Kameradelning kräver reläet. Ändra det under Integritet och anslutningar.",
     "noCertificate": "Kameradelning kräver ett klientcertifikat.",
     "endedByRelay": "Kameran stoppades av serverns relä",
-    "dismissStopped": "Avfärda"
+    "dismissStopped": "Avfärda",
+    "notRegistered": "Kameran kunde inte starta: bara registrerade användare får använda kameran på den här servern.",
+    "groupNotAllowed": "Kameran kunde inte starta: serverns relä betjänar bara vissa grupper. Be en administratör lägga till dig.",
+    "notSameChannel": "Kameran kunde inte starta: du och dina tittare måste vara i samma kanal.",
+    "notInChannel": "Kameran kunde inte starta: gå med i en kanal först.",
+    "noHello": "Kameran kunde inte starta: reläboten känner inte till appen än. Anslut igen för att åtgärda det."
   },
   "privacy": {
     "windows": "Windows blockerar kameraåtkomst för skrivbordsappar",

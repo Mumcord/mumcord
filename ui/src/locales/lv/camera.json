@@ -13,7 +13,8 @@
     "relayTooOld": "Šī servera relejs ir pārāk vecs kameras kopīgošanai.",
     "relayDisallows": "Šī servera relejs neļauj kopīgot kameru.",
     "needsRelayMode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
-    "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts."
+    "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
+    "registeredOnly": "Šajā serverī kameru drīkst izmantot tikai reģistrēti lietotāji."
   },
   "cameraOnTray": "Kamera ieslēgta",
   "turnOffTray": "Izslēgt kameru",
@@ -97,7 +98,12 @@
     "mode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
     "endedByRelay": "Servera relejs apturēja kameru",
-    "dismissStopped": "Aizvērt"
+    "dismissStopped": "Aizvērt",
+    "notRegistered": "Kamera nesāka darboties: šajā serverī kameru drīkst izmantot tikai reģistrēti lietotāji.",
+    "groupNotAllowed": "Kamera nesāka darboties: šī servera retranslators apkalpo tikai noteiktas grupas. Palūdz administratoram tevi pievienot.",
+    "notSameChannel": "Kamera nesāka darboties: tev un taviem skatītājiem jābūt vienā kanālā.",
+    "notInChannel": "Kamera nesāka darboties: vispirms pievienojies kanālam.",
+    "noHello": "Kamera nesāka darboties: retranslatora bots vēl nepazīst šo lietotni. Pievienojies vēlreiz."
   },
   "privacy": {
     "windows": "Windows bloķē piekļuvi kamerai darbvirsmas lietotnēm",

@@ -49,7 +49,9 @@
     "denied": "Perdavimo mazgo botas atmetė užklausą.",
     "notRegistered": "Šio serverio perdavimo mazgas prieinamas tik registruotiems naudotojams. Norėdamas (-a) juo naudotis, užsiregistruok šiame serveryje.",
     "peerGone": "Kitas asmuo paliko serverį.",
-    "rateLimited": "Per daug perdavimo mazgo užklausų. Bandyk dar kartą po minutės."
+    "rateLimited": "Per daug perdavimo mazgo užklausų. Bandyk dar kartą po minutės.",
+    "groupNotAllowed": "Šio serverio retransliatorius prieinamas tik tam tikroms grupėms. Paprašyk administratoriaus tave pridėti.",
+    "noHello": "Retransliatoriaus botas dar nepažįsta šios programėlės. Prisijunk iš naujo."
   },
   "refusal": {
     "unknownToken": "nežinomas prieigos raktas",
@@ -61,6 +63,11 @@
     "rateLimited": "per daug bandymų",
     "version": "nepalaikoma versija",
     "badRequest": "netinkama užklausa"
+  },
+  "refusalAction": {
+    "howToRegister": "Kaip užsiregistruoti",
+    "reconnect": "Prisijungti iš naujo",
+    "filesRegisteredOnly": "Failų bendrinimas šiame serveryje prieinamas tik registruotiems naudotojams."
   },
   "trust": {
     "title": "Serverio {{server}} retransliatorius pasikeitė",

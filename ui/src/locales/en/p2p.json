@@ -49,7 +49,9 @@
     "denied": "The relay bot refused the request.",
     "notRegistered": "This server's relay is only available to registered users. Register on this server to use it.",
     "peerGone": "The other person left the server.",
-    "rateLimited": "Too many relay requests. Try again in a minute."
+    "rateLimited": "Too many relay requests. Try again in a minute.",
+    "groupNotAllowed": "This server's relay is only available to certain groups. Ask an admin to add you.",
+    "noHello": "The relay bot doesn't know this app yet. Reconnect to fix it."
   },
   "refusal": {
     "unknownToken": "unknown access token",
@@ -61,6 +63,11 @@
     "rateLimited": "too many attempts",
     "version": "unsupported version",
     "badRequest": "invalid request"
+  },
+  "refusalAction": {
+    "howToRegister": "How to register",
+    "reconnect": "Reconnect",
+    "filesRegisteredOnly": "File sharing is only available to registered users on this server."
   },
   "trust": {
     "title": "Relay changed on {{server}}",

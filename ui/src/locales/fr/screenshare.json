@@ -186,7 +186,10 @@
     "detailsDropped": "Images perdues",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Non mesuré",
-    "close": "Fermer"
+    "close": "Fermer",
+    "reasonNotRegistered": "seuls les utilisateurs enregistrés peuvent utiliser le relais de ce serveur",
+    "reasonGroupNotAllowed": "le relais ne sert que certains groupes",
+    "reasonNoHello": "le bot du relais ne connaît pas encore cette app, reconnecte-toi"
   },
   "settings": {
     "title": "Partage d'écran",

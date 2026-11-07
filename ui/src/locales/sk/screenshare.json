@@ -190,7 +190,10 @@
     "detailsDropped": "Vynechané snímky",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nezmerané",
-    "close": "Zavrieť"
+    "close": "Zavrieť",
+    "reasonNotRegistered": "relay tohto servera môžu používať len registrovaní používatelia",
+    "reasonGroupNotAllowed": "relay obsluhuje len určité skupiny",
+    "reasonNoHello": "bot relaya túto aplikáciu ešte nepozná, pripoj sa znova"
   },
   "settings": {
     "title": "Zdieľanie obrazovky",

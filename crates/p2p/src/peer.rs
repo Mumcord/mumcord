@@ -156,6 +156,9 @@ pub struct RelayAnnouncement {
     /// Most kilobits per second one sender may send as plugin data (wire `pk`); `None` means the
     /// relay announces no limit (an older bot, or plugin data is off).
     pub plugin_data_kbps: Option<u32>,
+    /// The relay only serves registered users (wire `reg`, #601), so a guest's client can say so
+    /// before trying. `false` when not announced.
+    pub registered_only: bool,
 }
 
 impl RelayAnnouncement {
@@ -215,9 +218,13 @@ pub enum TokenErrorReason {
     RelayFull,
     /// The relay does not allow the requested use (spec 07, FR-7.5).
     UseNotAllowed,
-    /// The relay only serves registered users and the requester is a guest (#406). Current
-    /// bots answer `denied` instead; this code is accepted so a bot that names it is understood.
+    /// The relay only serves registered users and the requester is a guest (#406).
     NotRegistered,
+    /// The relay only serves members of certain groups, and the requester is in none (#601).
+    GroupNotAllowed,
+    /// The bot has not seen this client's hello (for example after the bot restarted); the
+    /// client says hello again by reconnecting (#601).
+    NoHello,
 }
 
 impl TokenErrorReason {
@@ -231,6 +238,8 @@ impl TokenErrorReason {
             Self::RelayFull => "relay-full",
             Self::UseNotAllowed => "use-not-allowed",
             Self::NotRegistered => "not-registered",
+            Self::GroupNotAllowed => "group-not-allowed",
+            Self::NoHello => "no-hello",
         }
     }
 
@@ -244,7 +253,10 @@ impl TokenErrorReason {
             "relay-full" => Self::RelayFull,
             "use-not-allowed" => Self::UseNotAllowed,
             "not-registered" => Self::NotRegistered,
-            _ => return Err(PeerError::BadReason),
+            "group-not-allowed" => Self::GroupNotAllowed,
+            "no-hello" => Self::NoHello,
+            // A reason a newer bot names is still a refusal (#601).
+            _ => Self::Denied,
         })
     }
 }
@@ -266,6 +278,14 @@ pub enum BroadcastErrorReason {
     /// The sender's channel already has as many camera broadcasts as the bot allows (only for
     /// `k = cam`).
     RoomFull,
+    /// The relay only serves registered users and the sender or viewer is a guest (#601).
+    NotRegistered,
+    /// The relay only serves members of certain groups (#601).
+    GroupNotAllowed,
+    /// The sender is in no channel the bot can see (#601).
+    NotInChannel,
+    /// The bot has not seen this client's hello; reconnecting sends it again (#601).
+    NoHello,
 }
 
 impl BroadcastErrorReason {
@@ -279,6 +299,10 @@ impl BroadcastErrorReason {
             Self::UseNotAllowed => "use-not-allowed",
             Self::RateLimited => "rate-limited",
             Self::RoomFull => "room-full",
+            Self::NotRegistered => "not-registered",
+            Self::GroupNotAllowed => "group-not-allowed",
+            Self::NotInChannel => "not-in-channel",
+            Self::NoHello => "no-hello",
         }
     }
 
@@ -292,7 +316,12 @@ impl BroadcastErrorReason {
             "use-not-allowed" => Self::UseNotAllowed,
             "rate-limited" => Self::RateLimited,
             "room-full" => Self::RoomFull,
-            _ => return Err(PeerError::BadReason),
+            "not-registered" => Self::NotRegistered,
+            "group-not-allowed" => Self::GroupNotAllowed,
+            "not-in-channel" => Self::NotInChannel,
+            "no-hello" => Self::NoHello,
+            // A reason a newer bot names is still a refusal (#601).
+            _ => Self::Denied,
         })
     }
 }
@@ -388,6 +417,8 @@ pub enum PeerError {
     BadSession,
     #[error("invalid token")]
     BadToken,
+    /// No longer produced: an unknown reason now reads as `denied` (#601). Kept so code that
+    /// matches on it still builds.
     #[error("unknown error reason")]
     BadReason,
     #[error("invalid broadcast id")]
@@ -426,6 +457,8 @@ struct RelayWire {
     bc: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pk: Option<u32>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    reg: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -521,6 +554,7 @@ impl PeerMessage {
                             .map(|uses| uses.iter().map(|u| u.as_str().to_owned()).collect()),
                         bc: relay.broadcast,
                         pk: relay.plugin_data_kbps,
+                        reg: relay.registered_only,
                     },
                 )?
             }
@@ -674,6 +708,7 @@ impl PeerMessage {
                     broadcast: wire.bc.filter(|&max| max > 0),
                     // A limit of zero kbit/s would allow nothing; treat it as not announced.
                     plugin_data_kbps: wire.pk.filter(|&kbps| kbps > 0),
+                    registered_only: wire.reg,
                 }))
             }
             "token-req" => {
@@ -893,6 +928,7 @@ mod tests {
             uses: None,
             broadcast: None,
             plugin_data_kbps: None,
+            registered_only: false,
         })
     }
 
@@ -919,6 +955,7 @@ mod tests {
                 uses: Some(vec![RelayUse::Images, RelayUse::ScreenShare]),
                 broadcast: Some(25),
                 plugin_data_kbps: Some(512),
+                registered_only: false,
             }),
             PeerMessage::Token {
                 rid: RequestId(1),
@@ -1045,6 +1082,7 @@ mod tests {
             ]),
             broadcast: Some(u16::MAX),
             plugin_data_kbps: Some(u32::MAX),
+            registered_only: false,
         });
         let bytes = message.encode().expect("encode");
         assert_eq!(PeerMessage::decode(&bytes).expect("decode"), message);
@@ -1170,10 +1208,6 @@ mod tests {
                 PeerError::BadSession,
             ),
             (
-                r#"{"v":1,"t":"token-err","rid":"0000000000000001","r":"nope"}"#.into(),
-                PeerError::BadReason,
-            ),
-            (
                 r#"{"v":1,"t":"token-req","rid":"0000000000000001","peer":2,"use":"music"}"#
                     .into(),
                 PeerError::BadUse,
@@ -1211,10 +1245,6 @@ mod tests {
                 r#"{"v":1,"t":"bcast-admit","rid":"0000000000000001","id":"0000000000000001"}"#
                     .into(),
                 PeerError::Malformed,
-            ),
-            (
-                r#"{"v":1,"t":"bcast-err","rid":"0000000000000001","r":"peer-gone"}"#.into(),
-                PeerError::BadReason,
             ),
         ];
         for (input, expected) in cases {
@@ -1462,5 +1492,47 @@ mod tests {
         let none = decode(r#","u":[],"bc":4"#);
         assert!(!none.allows(RelayUse::Images));
         assert_eq!(none.broadcast, Some(4));
+    }
+
+    #[test]
+    fn refusal_reasons_round_trip_and_unknown_ones_read_as_denied() {
+        // #601
+        for reason in [
+            BroadcastErrorReason::NotRegistered,
+            BroadcastErrorReason::GroupNotAllowed,
+            BroadcastErrorReason::NotInChannel,
+            BroadcastErrorReason::NoHello,
+        ] {
+            assert_eq!(BroadcastErrorReason::parse(reason.as_str()), Ok(reason));
+        }
+        for reason in [TokenErrorReason::GroupNotAllowed, TokenErrorReason::NoHello] {
+            assert_eq!(TokenErrorReason::parse(reason.as_str()), Ok(reason));
+        }
+        assert_eq!(
+            BroadcastErrorReason::parse("later"),
+            Ok(BroadcastErrorReason::Denied)
+        );
+        assert_eq!(
+            TokenErrorReason::parse("later"),
+            Ok(TokenErrorReason::Denied)
+        );
+    }
+
+    #[test]
+    fn the_registered_only_flag_is_announced_only_when_set() {
+        // #601
+        let plain = r#"{"v":1,"t":"relay","host":"r.example","udp":1,"tcp":2,"fp":"0000000000000000000000000000000000000000000000000000000000000000","state":"up","seq":1}"#;
+        let Ok(PeerMessage::Relay(relay)) = PeerMessage::decode(plain.as_bytes()) else {
+            panic!("relay");
+        };
+        assert!(!relay.registered_only);
+        let flagged = plain.replace(r#""seq":1"#, r#""seq":1,"reg":true"#);
+        let Ok(PeerMessage::Relay(relay)) = PeerMessage::decode(flagged.as_bytes()) else {
+            panic!("relay");
+        };
+        assert!(relay.registered_only);
+        let encoded =
+            String::from_utf8(PeerMessage::Relay(relay).encode().expect("encode")).expect("utf8");
+        assert!(encoded.contains(r#""reg":true"#));
     }
 }

@@ -49,7 +49,9 @@
     "denied": "Releja bots noraidīja pieprasījumu.",
     "notRegistered": "Šī servera relejs ir pieejams tikai reģistrētiem lietotājiem. Lai to izmantotu, reģistrējies šajā serverī.",
     "peerGone": "Otra persona atstāja serveri.",
-    "rateLimited": "Pārāk daudz releja pieprasījumu. Mēģini vēlreiz pēc minūtes."
+    "rateLimited": "Pārāk daudz releja pieprasījumu. Mēģini vēlreiz pēc minūtes.",
+    "groupNotAllowed": "Šī servera retranslators pieejams tikai noteiktām grupām. Palūdz administratoram tevi pievienot.",
+    "noHello": "Retranslatora bots vēl nepazīst šo lietotni. Pievienojies vēlreiz."
   },
   "refusal": {
     "unknownToken": "nezināms piekļuves marķieris",
@@ -61,6 +63,11 @@
     "rateLimited": "pārāk daudz mēģinājumu",
     "version": "neatbalstīta versija",
     "badRequest": "nederīgs pieprasījums"
+  },
+  "refusalAction": {
+    "howToRegister": "Kā reģistrēties",
+    "reconnect": "Pievienoties vēlreiz",
+    "filesRegisteredOnly": "Failu kopīgošana šajā serverī pieejama tikai reģistrētiem lietotājiem."
   },
   "trust": {
     "title": "Retranslators serverī {{server}} mainījies",

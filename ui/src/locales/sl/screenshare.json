@@ -190,7 +190,10 @@
     "detailsDropped": "Izpuščene sličice",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Ni izmerjeno",
-    "close": "Zapri"
+    "close": "Zapri",
+    "reasonNotRegistered": "rele tega strežnika lahko uporabljajo le registrirani uporabniki",
+    "reasonGroupNotAllowed": "rele streže le določenim skupinam",
+    "reasonNoHello": "bot releja te aplikacije še ne pozna, znova se poveži"
   },
   "settings": {
     "title": "Deljenje zaslona",

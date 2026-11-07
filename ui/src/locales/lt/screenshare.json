@@ -190,7 +190,10 @@
     "detailsDropped": "Praleisti kadrai",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Neišmatuota",
-    "close": "Uždaryti"
+    "close": "Uždaryti",
+    "reasonNotRegistered": "šio serverio retransliatorių gali naudoti tik registruoti naudotojai",
+    "reasonGroupNotAllowed": "retransliatorius aptarnauja tik tam tikras grupes",
+    "reasonNoHello": "retransliatoriaus botas dar nepažįsta programėlės, prisijunk iš naujo"
   },
   "settings": {
     "title": "Ekrano bendrinimas",

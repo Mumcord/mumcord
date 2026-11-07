@@ -13,7 +13,8 @@
     "relayTooOld": "Releul acestui server este prea vechi pentru partajarea camerei.",
     "relayDisallows": "Releul acestui server nu permite partajarea camerei.",
     "needsRelayMode": "Partajarea camerei are nevoie de releu. Schimbă asta în Confidențialitate și conexiuni.",
-    "noCertificate": "Partajarea camerei are nevoie de un certificat de client."
+    "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
+    "registeredOnly": "Pe acest server doar utilizatorii înregistrați pot folosi camera."
   },
   "cameraOnTray": "Cameră pornită",
   "turnOffTray": "Oprește camera",
@@ -97,7 +98,12 @@
     "mode": "Partajarea camerei are nevoie de releu. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
     "endedByRelay": "Camera a fost oprită de releul serverului",
-    "dismissStopped": "Închide"
+    "dismissStopped": "Închide",
+    "notRegistered": "Camera nu a pornit: pe acest server doar utilizatorii înregistrați pot folosi camera.",
+    "groupNotAllowed": "Camera nu a pornit: releul acestui server servește doar anumite grupuri. Roagă un administrator să te adauge.",
+    "notSameChannel": "Camera nu a pornit: tu și spectatorii tăi trebuie să fiți în același canal.",
+    "notInChannel": "Camera nu a pornit: intră mai întâi într-un canal.",
+    "noHello": "Camera nu a pornit: botul releului nu cunoaște încă această aplicație. Reconectează-te pentru a rezolva."
   },
   "privacy": {
     "windows": "Windows blochează accesul la cameră pentru aplicațiile desktop",

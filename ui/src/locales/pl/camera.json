@@ -13,7 +13,8 @@
     "relayTooOld": "Przekaźnik tego serwera jest zbyt stary do udostępniania kamery.",
     "relayDisallows": "Przekaźnik tego serwera nie pozwala na udostępnianie kamery.",
     "needsRelayMode": "Udostępnianie kamery wymaga przekaźnika. Zmień to w Prywatność i połączenia.",
-    "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta."
+    "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta.",
+    "registeredOnly": "Na tym serwerze kamery mogą używać tylko zarejestrowani użytkownicy."
   },
   "cameraOnTray": "Kamera włączona",
   "turnOffTray": "Wyłącz kamerę",
@@ -97,7 +98,12 @@
     "mode": "Udostępnianie kamery wymaga przekaźnika. Zmień to w Prywatność i połączenia.",
     "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta.",
     "endedByRelay": "Kamera zatrzymana przez przekaźnik serwera",
-    "dismissStopped": "Zamknij"
+    "dismissStopped": "Zamknij",
+    "notRegistered": "Nie udało się włączyć kamery: na tym serwerze kamery mogą używać tylko zarejestrowani użytkownicy.",
+    "groupNotAllowed": "Nie udało się włączyć kamery: przekaźnik tego serwera obsługuje tylko wybrane grupy. Poproś administratora o dodanie.",
+    "notSameChannel": "Nie udało się włączyć kamery: ty i widzowie musicie być na tym samym kanale.",
+    "notInChannel": "Nie udało się włączyć kamery: najpierw dołącz do kanału.",
+    "noHello": "Nie udało się włączyć kamery: bot przekaźnika nie zna jeszcze tej aplikacji. Połącz się ponownie, aby to naprawić."
   },
   "privacy": {
     "windows": "Windows blokuje dostęp do kamery dla aplikacji desktopowych",

@@ -13,7 +13,8 @@
     "relayTooOld": "This server's relay is too old for camera sharing.",
     "relayDisallows": "This server's relay doesn't allow camera sharing.",
     "needsRelayMode": "Camera sharing needs the relay. Change it in Privacy & Connections.",
-    "noCertificate": "Camera sharing needs a client certificate."
+    "noCertificate": "Camera sharing needs a client certificate.",
+    "registeredOnly": "Only registered users can use the camera on this server."
   },
   "cameraOnTray": "Camera on",
   "turnOffTray": "Turn off camera",
@@ -97,7 +98,12 @@
     "mode": "Camera sharing needs the relay. Change it in Privacy & Connections.",
     "noCertificate": "Camera sharing needs a client certificate.",
     "endedByRelay": "Camera stopped by the server's relay",
-    "dismissStopped": "Dismiss"
+    "dismissStopped": "Dismiss",
+    "notRegistered": "Camera couldn't start: only registered users can use the camera on this server.",
+    "groupNotAllowed": "Camera couldn't start: this server's relay only serves certain groups. Ask an admin to add you.",
+    "notSameChannel": "Camera couldn't start: you and your viewers need to be in the same channel.",
+    "notInChannel": "Camera couldn't start: join a channel first.",
+    "noHello": "Camera couldn't start: the relay bot doesn't know this app yet. Reconnect to fix it."
   },
   "privacy": {
     "windows": "Windows blocks camera access for desktop apps",
