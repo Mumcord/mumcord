@@ -62,6 +62,15 @@ function ToastItem({
         <span className="toast__title">{toast.title}</span>
         {toast.text && <span className="toast__text">{toast.text}</span>}
       </button>
+      <button
+        type="button"
+        className="toast__close"
+        aria-label={t("close")}
+        onKeyDown={closeOnEscape}
+        onClick={close}
+      >
+        <span aria-hidden="true">×</span>
+      </button>
       {toast.actions && toast.actions.length > 0 && (
         <div className="toast__actions">
           {toast.actions.map((action) => (
@@ -84,15 +93,6 @@ function ToastItem({
           ))}
         </div>
       )}
-      <button
-        type="button"
-        className="toast__close"
-        aria-label={t("close")}
-        onKeyDown={closeOnEscape}
-        onClick={close}
-      >
-        <span aria-hidden="true">×</span>
-      </button>
     </div>
   );
 }
