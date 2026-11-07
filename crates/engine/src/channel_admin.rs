@@ -310,9 +310,10 @@ pub(crate) fn on_removed(hub: &Mutex<ChannelAdmin>, server_id: ServerId, channel
 pub(crate) fn on_denied(
     hub: &Mutex<ChannelAdmin>,
     server_id: ServerId,
+    own_session: Option<u32>,
     denied: &PermissionDenied,
 ) -> bool {
-    if !is_channel_refusal(denied) {
+    if !is_channel_refusal(denied, own_session) {
         return false;
     }
     let outcome = ChannelOutcome::Refused {
@@ -324,10 +325,14 @@ pub(crate) fn on_denied(
 }
 
 /// Refusals a channel change gets: a missing channel right, or a rule about channels (name,
-/// nesting, count, temporary). Joining (Enter), speaking or kicking are someone else's.
-fn is_channel_refusal(denied: &PermissionDenied) -> bool {
+/// nesting, count, temporary). Joining (Enter), speaking or kicking are someone else's. A refusal of
+/// your own request names your own session, or none.
+fn is_channel_refusal(denied: &PermissionDenied, own_session: Option<u32>) -> bool {
     use mumcord_protocol::DenyKind;
-    if denied.session.is_some() {
+    if denied
+        .session
+        .is_some_and(|session| Some(session) != own_session)
+    {
         return false;
     }
     match denied.kind {
@@ -422,10 +427,16 @@ mod tests {
         assert!(!on_denied(
             &hub,
             1,
+            None,
             &denial(DenyKind::Permission, Some(permissions::ENTER))
         ));
         assert!(rx.try_recv().is_err());
-        assert!(on_denied(&hub, 1, &denial(DenyKind::ChannelName, None)));
+        assert!(on_denied(
+            &hub,
+            1,
+            None,
+            &denial(DenyKind::ChannelName, None)
+        ));
         assert_eq!(
             rx.try_recv().expect("answer"),
             ChannelOutcome::Refused {
@@ -435,9 +446,25 @@ mod tests {
             }
         );
         assert!(
-            !on_denied(&hub, 1, &denial(DenyKind::ChannelName, None)),
+            !on_denied(&hub, 1, None, &denial(DenyKind::ChannelName, None)),
             "nothing waits any more, so the usual notice shows"
         );
+    }
+
+    #[test]
+    fn the_server_names_your_own_session_in_a_refusal() {
+        let hub = Mutex::new(ChannelAdmin::default());
+        let mut rx = lock(&hub).expect(1, Target::Updated(3));
+        let mut other = denial(DenyKind::Permission, Some(permissions::MAKE_CHANNEL));
+        other.session = Some(8);
+        assert!(
+            !on_denied(&hub, 1, Some(7), &other),
+            "someone else's refusal"
+        );
+        let mut own = other.clone();
+        own.session = Some(7);
+        assert!(on_denied(&hub, 1, Some(7), &own));
+        assert!(matches!(rx.try_recv(), Ok(ChannelOutcome::Refused { .. })));
     }
 
     #[test]
@@ -447,6 +474,7 @@ mod tests {
         assert!(on_denied(
             &hub,
             1,
+            None,
             &denial(DenyKind::Permission, Some(permissions::WRITE))
         ));
         assert!(matches!(

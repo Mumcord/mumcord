@@ -2913,8 +2913,12 @@ impl Inner {
                 }
                 let password = self.on_channel_denied(ctx, denied);
                 // A refused create, edit, link or delete answers the channel dialog (#250).
-                let channel_change =
-                    crate::channel_admin::on_denied(&self.channel_admin, ctx.server_id, denied);
+                let channel_change = crate::channel_admin::on_denied(
+                    &self.channel_admin,
+                    ctx.server_id,
+                    ctx.handle.with_state(|state| state.session),
+                    denied,
+                );
                 ctx.events.emit(EngineEvent::ServerDenied {
                     error: convert::denial_error(denied),
                     channel_id: denied.channel_id,
