@@ -175,6 +175,54 @@ describe("Channel window (FR-10.21–FR-10.24)", () => {
   });
 });
 
+describe("Password tab (FR-10.28, #251)", () => {
+  async function openPassword() {
+    fireEvent.keyDown(row(/^Raid/), { key: "F2" });
+    const dialog = screen.getByRole("dialog", { name: "Edit channel" });
+    fireEvent.click(within(dialog).getByRole("tab", { name: "Password" }));
+    return {
+      dialog,
+      field: await within(dialog).findByLabelText("Password", { selector: "input" }),
+    };
+  }
+
+  it("sets a password with the official client's two rules and locks the channel", async () => {
+    await renderTree({ 2: ADMIN });
+    const { dialog, field } = await openPassword();
+    expect(field).toHaveValue("");
+    fireEvent.change(field, { target: { value: "secret" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    const serverId = 1;
+    const acl = await api.channelAclRead(serverId, 2);
+    expect(acl.password).toEqual({ kind: "set", password: "secret" });
+    expect(acl.rules.filter((r) => !r.inherited).map((r) => r.group)).toEqual(["all", "#secret"]);
+  });
+
+  it("asks when someone changed the rules meanwhile", async () => {
+    await renderTree({ 2: ADMIN });
+    const { dialog, field } = await openPassword();
+    const serverId = 1;
+    // Another admin saves a password while this window is open.
+    const before = await api.channelAclRead(serverId, 2);
+    await act(() => api.channelPasswordSave(serverId, 2, "theirs", before, false));
+    fireEvent.change(field, { target: { value: "mine" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    const ask = await screen.findByRole("alertdialog", {
+      name: "Someone changed these permissions while you were editing",
+    });
+    fireEvent.click(within(ask).getByRole("button", { name: "Save mine anyway" }));
+    await waitFor(async () => {
+      expect((await api.channelAclRead(serverId, 2)).password).toEqual({
+        kind: "set",
+        password: "mine",
+      });
+    });
+  });
+});
+
 describe("Delete channel (FR-10.25, FR-10.10)", () => {
   it("opens from the Delete key with counts and deletes", async () => {
     await renderTree({ 1: ADMIN });

@@ -165,8 +165,6 @@
     "createTempTitle": "Opret midlertidig kanal",
     "editTitle": "Rediger kanal",
     "close": "Luk",
-    "tabGeneral": "Generelt",
-    "tabLinks": "Links",
     "name": "Navn",
     "parent": "Overordnet kanal",
     "parentSearch": "Søg i kanaler…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 person flyttes til {{parent}}.",
     "moveWith_other": "{{count}} underkanaler flyttes med.",
     "deleteSubs_other": "{{count}} underkanaler slettes også.",
-    "deletePeople_other": "{{count}} personer flyttes til {{parent}}."
+    "deletePeople_other": "{{count}} personer flyttes til {{parent}}.",
+    "tab": {
+      "general": "Generelt",
+      "links": "Links"
+    }
   }
 }

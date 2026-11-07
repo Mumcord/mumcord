@@ -165,8 +165,6 @@
     "createTempTitle": "Izveidot pagaidu kanālu",
     "editTitle": "Rediģēt kanālu",
     "close": "Aizvērt",
-    "tabGeneral": "Vispārīgi",
-    "tabLinks": "Saites",
     "name": "Nosaukums",
     "parent": "Vecākkanāls",
     "parentSearch": "Meklēt kanālus…",
@@ -205,6 +203,10 @@
     "deletePeople_one": "{{count}} cilvēks tiek pārvietots uz {{parent}}.",
     "moveWith_other": "{{count}} apakškanāli tiek pārvietoti līdzi.",
     "deleteSubs_other": "Tiek dzēsti arī {{count}} apakškanāli.",
-    "deletePeople_other": "{{count}} cilvēki tiek pārvietoti uz {{parent}}."
+    "deletePeople_other": "{{count}} cilvēki tiek pārvietoti uz {{parent}}.",
+    "tab": {
+      "general": "Vispārīgi",
+      "links": "Saites"
+    }
   }
 }

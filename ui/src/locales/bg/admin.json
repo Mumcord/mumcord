@@ -165,8 +165,6 @@
     "createTempTitle": "Създай временен канал",
     "editTitle": "Редактирай канала",
     "close": "Затвори",
-    "tabGeneral": "Общи",
-    "tabLinks": "Връзки",
     "name": "Име",
     "parent": "Родителски канал",
     "parentSearch": "Търсене на канали…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 човек се премества в {{parent}}.",
     "moveWith_other": "{{count}} подканала се преместват заедно с него.",
     "deleteSubs_other": "Изтриват се и {{count}} подканала.",
-    "deletePeople_other": "{{count}} души се преместват в {{parent}}."
+    "deletePeople_other": "{{count}} души се преместват в {{parent}}.",
+    "tab": {
+      "general": "Общи",
+      "links": "Връзки"
+    }
   }
 }

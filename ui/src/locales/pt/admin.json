@@ -165,8 +165,6 @@
     "createTempTitle": "Criar canal temporário",
     "editTitle": "Editar canal",
     "close": "Fechar",
-    "tabGeneral": "Geral",
-    "tabLinks": "Ligações",
     "name": "Nome",
     "parent": "Canal superior",
     "parentSearch": "Procurar canais…",
@@ -205,6 +203,10 @@
     "deletePeople_many": "{{count}} pessoas são movidas para {{parent}}.",
     "moveWith_other": "{{count}} subcanais são movidos com ele.",
     "deleteSubs_other": "{{count}} subcanais também são eliminados.",
-    "deletePeople_other": "{{count}} pessoas são movidas para {{parent}}."
+    "deletePeople_other": "{{count}} pessoas são movidas para {{parent}}.",
+    "tab": {
+      "general": "Geral",
+      "links": "Ligações"
+    }
   }
 }

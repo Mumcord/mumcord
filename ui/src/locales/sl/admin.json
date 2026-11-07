@@ -165,8 +165,6 @@
     "createTempTitle": "Ustvari začasni kanal",
     "editTitle": "Uredi kanal",
     "close": "Zapri",
-    "tabGeneral": "Splošno",
-    "tabLinks": "Povezave",
     "name": "Ime",
     "parent": "Nadrejeni kanal",
     "parentSearch": "Išči kanale…",
@@ -208,6 +206,10 @@
     "deletePeople_few": "{{count}} osebe bodo premaknjene v {{parent}}.",
     "moveWith_other": "{{count}} podkanalov se premakne z njim.",
     "deleteSubs_other": "Izbriše se tudi {{count}} podkanalov.",
-    "deletePeople_other": "{{count}} oseb bo premaknjenih v {{parent}}."
+    "deletePeople_other": "{{count}} oseb bo premaknjenih v {{parent}}.",
+    "tab": {
+      "general": "Splošno",
+      "links": "Povezave"
+    }
   }
 }

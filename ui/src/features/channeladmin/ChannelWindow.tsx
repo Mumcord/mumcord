@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, type ChannelResult } from "../../api";
+import { getApi, type AclSaveResult, type ChannelAclView, type ChannelResult } from "../../api";
 import { SearchableSelect } from "../../components/SearchableSelect";
 import { useServerState } from "../channels";
 import { channelPath } from "../channelheader/channelModel";
@@ -22,12 +22,14 @@ import {
 import "../admin/admin.css";
 import "../settings/settings.css";
 import "../userpanel/userpanel.css";
+import { PasswordTab } from "./PasswordTab";
+import { useChannelAcl } from "./useChannelAcl";
 import "./channeladmin.css";
 
 export type ChannelWindowMode =
   { kind: "create"; parentId: number; temporary: boolean } | { kind: "edit"; channelId: number };
 
-type Tab = "general" | "links";
+type Tab = "general" | "password" | "links";
 
 interface ChannelWindowProps {
   mode: ChannelWindowMode;
@@ -73,6 +75,11 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmMove, setConfirmMove] = useState(false);
+  // The password being typed; `null` while untouched (FR-10.28).
+  const [password, setPassword] = useState<string | null>(null);
+  // Someone else changed the rules while the user edited the password (FR-10.43).
+  const [conflict, setConflict] = useState<ChannelAclView | null>(null);
+  const rules = useChannelAcl(server.serverId, mode.kind === "edit" ? mode.channelId : null);
 
   const serverId = server.serverId;
   // The root channel has no path of its own; it shows under its name.
@@ -84,7 +91,13 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
   };
 
   const change = changeOf(original, { ...draft, description: commentToSend(draft.description) });
-  const dirty = editing ? hasChanges(change) : true;
+  const savedPassword =
+    rules.load.status === "loaded" && rules.load.acl.password.kind === "set"
+      ? rules.load.acl.password.password
+      : "";
+  const passwordChanged =
+    password !== null && rules.load.status === "loaded" && password.trim() !== savedPassword;
+  const dirty = editing ? hasChanges(change) || passwordChanged : true;
   const nameMissing = draft.name.trim() === "";
 
   const finish = (result: ChannelResult) => {
@@ -114,7 +127,19 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
           }),
         );
       } else {
-        finish(await getApi().channelEdit(serverId, mode.channelId, change));
+        if (hasChanges(change)) {
+          const result = await getApi().channelEdit(serverId, mode.channelId, change);
+          const refusal = refusalText(t, result);
+          if (refusal !== null) {
+            setError(refusal);
+            return;
+          }
+        }
+        if (passwordChanged && rules.load.status === "loaded") {
+          await savePassword(rules.load.acl, false);
+          return;
+        }
+        onClose();
       }
     } catch (failure) {
       console.error("Saving the channel failed", failure);
@@ -122,6 +147,23 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
     } finally {
       setBusy(false);
     }
+  };
+
+  const savePassword = async (startedFrom: ChannelAclView, force: boolean) => {
+    if (serverId === null || mode.kind !== "edit") return;
+    const result: AclSaveResult = await getApi().channelPasswordSave(
+      serverId,
+      mode.channelId,
+      password?.trim() ?? null,
+      startedFrom,
+      force,
+    );
+    if (result.kind === "conflict") {
+      setConflict(result.acl);
+      return;
+    }
+    rules.replace(result.acl);
+    onClose();
   };
 
   const save = () => {
@@ -150,6 +192,58 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
       window.removeEventListener("keydown", onKey);
     };
   }, []);
+
+  if (conflict !== null) {
+    const fresh = conflict;
+    return (
+      <Dialog
+        role="alertdialog"
+        className="channel-confirm"
+        title={t("channel.conflictTitle")}
+        onClose={() => {
+          setConflict(null);
+        }}
+      >
+        <p>{t("channel.conflictBody")}</p>
+        <div className="servers-dialog__actions">
+          <button
+            type="button"
+            className="button"
+            onClick={() => {
+              setConflict(null);
+            }}
+          >
+            {t("channel.conflictBack")}
+          </button>
+          <button
+            type="button"
+            className="button"
+            onClick={() => {
+              // Their rules win: the editor starts again from them, own password typing dropped.
+              rules.replace(fresh);
+              setPassword(null);
+              setConflict(null);
+            }}
+          >
+            {t("channel.conflictReload")}
+          </button>
+          <button
+            type="button"
+            className="button button--primary"
+            onClick={() => {
+              setConflict(null);
+              void savePassword(fresh, true).catch((failure: unknown) => {
+                console.error("Saving the channel password failed", failure);
+                setError(t("channel.failed"));
+              });
+            }}
+          >
+            {t("channel.conflictMine")}
+          </button>
+        </div>
+      </Dialog>
+    );
+  }
 
   if (confirmMove && mode.kind === "edit") {
     const moving = descendants(server.channels, mode.channelId).size;
@@ -222,7 +316,7 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
       <p className="channel-window__path">{where.filter((part) => part !== "").join(" › ")}</p>
       {editing && (
         <div role="tablist" aria-label={title} className="channel-window__tabs">
-          {(["general", "links"] as const).map((name) => (
+          {(["general", "password", "links"] as const).map((name) => (
             <button
               key={name}
               type="button"
@@ -233,9 +327,11 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
               className="channel-window__tab"
               onClick={() => {
                 setTab(name);
+                // The rules are read when a tab that needs them first opens (FR-10.36).
+                if (name === "password" && rules.load.status === "idle") void rules.reload();
               }}
             >
-              {name === "general" ? t("channel.tabGeneral") : t("channel.tabLinks")}
+              {t(`channel.tab.${name}`)}
             </button>
           ))}
         </div>
@@ -250,7 +346,20 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
             }
           : {})}
       >
-        {tab === "general" ? (
+        {tab === "password" ? (
+          <PasswordTab
+            load={rules.load}
+            value={password}
+            disabled={busy}
+            onChange={(value) => {
+              setPassword(value);
+              setError(null);
+            }}
+            onRetry={() => {
+              void rules.reload();
+            }}
+          />
+        ) : tab === "general" ? (
           <>
             <div className="channel-window__row">
               <div className="channel-window__field admin-field">

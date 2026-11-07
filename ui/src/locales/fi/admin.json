@@ -165,8 +165,6 @@
     "createTempTitle": "Luo väliaikainen kanava",
     "editTitle": "Muokkaa kanavaa",
     "close": "Sulje",
-    "tabGeneral": "Yleiset",
-    "tabLinks": "Linkit",
     "name": "Nimi",
     "parent": "Yläkanava",
     "parentSearch": "Hae kanavia…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 henkilö siirretään kanavalle {{parent}}.",
     "moveWith_other": "{{count}} alikanavaa siirtyy mukana.",
     "deleteSubs_other": "Myös {{count}} alikanavaa poistetaan.",
-    "deletePeople_other": "{{count}} henkilöä siirretään kanavalle {{parent}}."
+    "deletePeople_other": "{{count}} henkilöä siirretään kanavalle {{parent}}.",
+    "tab": {
+      "general": "Yleiset",
+      "links": "Linkit"
+    }
   }
 }

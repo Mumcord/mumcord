@@ -165,8 +165,6 @@
     "createTempTitle": "Créer un salon temporaire",
     "editTitle": "Modifier le salon",
     "close": "Fermer",
-    "tabGeneral": "Général",
-    "tabLinks": "Liens",
     "name": "Nom",
     "parent": "Salon parent",
     "parentSearch": "Rechercher des salons…",
@@ -205,6 +203,10 @@
     "deletePeople_many": "{{count}} personnes sont déplacées vers {{parent}}.",
     "moveWith_other": "{{count}} sous-salons sont déplacés avec lui.",
     "deleteSubs_other": "{{count}} sous-salons sont aussi supprimés.",
-    "deletePeople_other": "{{count}} personnes sont déplacées vers {{parent}}."
+    "deletePeople_other": "{{count}} personnes sont déplacées vers {{parent}}.",
+    "tab": {
+      "general": "Général",
+      "links": "Liens"
+    }
   }
 }

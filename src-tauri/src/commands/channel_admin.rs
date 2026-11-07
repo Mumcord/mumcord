@@ -135,3 +135,228 @@ pub async fn channel_remove(
         .await?;
     Ok(outcome.into())
 }
+
+/// One permission rule (FR-10.37). `grant` and `deny` are Mumble permission bits.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AclRuleView {
+    pub inherited: bool,
+    pub apply_here: bool,
+    pub apply_subs: bool,
+    /// One registered user, or else `group`.
+    pub user_id: Option<u32>,
+    pub group: Option<String>,
+    pub grant: u32,
+    pub deny: u32,
+}
+
+/// One group as this channel sees it (FR-10.38).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AclGroupView {
+    pub name: String,
+    pub inherited: bool,
+    pub inherit: bool,
+    pub inheritable: bool,
+    pub add: Vec<u32>,
+    pub remove: Vec<u32>,
+    pub inherited_members: Vec<u32>,
+}
+
+/// A registered user's name, as the server told it (untrusted).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UserName {
+    pub id: u32,
+    pub name: String,
+}
+
+/// The channel password as the Password tab shows it (FR-10.28).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum PasswordView {
+    None,
+    Set {
+        password: String,
+    },
+    /// The Join rules are more than a password; they are edited under Permissions.
+    Custom,
+}
+
+/// A channel's rules and groups (FR-10.36).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ChannelAclView {
+    pub channel_id: ChannelId,
+    pub inherit_acls: bool,
+    pub groups: Vec<AclGroupView>,
+    /// Inherited rules first, then the channel's own ones; later rules win.
+    pub rules: Vec<AclRuleView>,
+    pub user_names: Vec<UserName>,
+    /// Worked out from the rules; ignored when saving.
+    pub password: PasswordView,
+}
+
+/// What a save produced (FR-10.43).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum AclSaveResult {
+    Saved {
+        acl: ChannelAclView,
+    },
+    /// Someone changed the rules since they were read; nothing was sent.
+    Conflict {
+        acl: ChannelAclView,
+    },
+}
+
+fn acl_view(acl: mumcord_engine::ChannelAcl) -> ChannelAclView {
+    let password = match mumcord_engine::password_of(&acl) {
+        mumcord_engine::PasswordState::None => PasswordView::None,
+        mumcord_engine::PasswordState::Set(password) => PasswordView::Set { password },
+        mumcord_engine::PasswordState::Custom => PasswordView::Custom,
+    };
+    ChannelAclView {
+        channel_id: acl.channel_id,
+        inherit_acls: acl.inherit_acls,
+        groups: acl
+            .groups
+            .into_iter()
+            .map(|g| AclGroupView {
+                name: g.name,
+                inherited: g.inherited,
+                inherit: g.inherit,
+                inheritable: g.inheritable,
+                add: g.add,
+                remove: g.remove,
+                inherited_members: g.inherited_members,
+            })
+            .collect(),
+        rules: acl
+            .rules
+            .into_iter()
+            .map(|r| AclRuleView {
+                inherited: r.inherited,
+                apply_here: r.apply_here,
+                apply_subs: r.apply_subs,
+                user_id: r.user_id,
+                group: r.group,
+                grant: r.grant,
+                deny: r.deny,
+            })
+            .collect(),
+        user_names: acl
+            .user_names
+            .into_iter()
+            .map(|(id, name)| UserName { id, name })
+            .collect(),
+        password,
+    }
+}
+
+fn acl_of(view: ChannelAclView) -> mumcord_engine::ChannelAcl {
+    mumcord_engine::ChannelAcl {
+        channel_id: view.channel_id,
+        inherit_acls: view.inherit_acls,
+        groups: view
+            .groups
+            .into_iter()
+            .map(|g| mumcord_engine::AclGroup {
+                name: g.name,
+                inherited: g.inherited,
+                inherit: g.inherit,
+                inheritable: g.inheritable,
+                add: g.add,
+                remove: g.remove,
+                inherited_members: g.inherited_members,
+            })
+            .collect(),
+        rules: view
+            .rules
+            .into_iter()
+            .map(|r| mumcord_engine::AclRule {
+                inherited: r.inherited,
+                apply_here: r.apply_here,
+                apply_subs: r.apply_subs,
+                user_id: r.user_id,
+                group: r.group,
+                grant: r.grant,
+                deny: r.deny,
+            })
+            .collect(),
+        user_names: view
+            .user_names
+            .into_iter()
+            .map(|u| (u.id, u.name))
+            .collect(),
+    }
+}
+
+fn save_result(outcome: mumcord_engine::AclSaveOutcome) -> AclSaveResult {
+    match outcome {
+        mumcord_engine::AclSaveOutcome::Saved(acl) => AclSaveResult::Saved { acl: acl_view(acl) },
+        mumcord_engine::AclSaveOutcome::Conflict(acl) => {
+            AclSaveResult::Conflict { acl: acl_view(acl) }
+        }
+    }
+}
+
+/// Reads a channel's rules and groups (FR-10.36). Fails with `permissionDenied` without the right
+/// to edit them, and `serverUnreachable` without an answer within 5 s (FR-10.43).
+#[tauri::command]
+#[specta::specta]
+pub async fn channel_acl_read(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<ChannelAclView> {
+    let acl = engine
+        .channel_acl_read(to_engine_server_id(server_id), channel_id)
+        .await?;
+    Ok(acl_view(acl))
+}
+
+/// Saves the channel's own rules and groups; `started_from` is what the editor read, so a change by
+/// someone else meanwhile comes back as a conflict unless `force` (FR-10.43).
+#[tauri::command]
+#[specta::specta]
+pub async fn channel_acl_save(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    acl: ChannelAclView,
+    started_from: ChannelAclView,
+    force: bool,
+) -> ApiResult<AclSaveResult> {
+    let outcome = engine
+        .channel_acl_save(
+            to_engine_server_id(server_id),
+            &acl_of(acl),
+            &acl_of(started_from),
+            force,
+        )
+        .await?;
+    Ok(save_result(outcome))
+}
+
+/// Sets or clears the channel password (FR-10.28); `None` or an empty text clears it.
+#[tauri::command]
+#[specta::specta]
+pub async fn channel_password_save(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+    password: Option<String>,
+    started_from: ChannelAclView,
+    force: bool,
+) -> ApiResult<AclSaveResult> {
+    let outcome = engine
+        .channel_password_save(
+            to_engine_server_id(server_id),
+            channel_id,
+            password.as_deref(),
+            &acl_of(started_from),
+            force,
+        )
+        .await?;
+    Ok(save_result(outcome))
+}

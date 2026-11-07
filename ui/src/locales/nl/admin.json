@@ -165,8 +165,6 @@
     "createTempTitle": "Tijdelijk kanaal maken",
     "editTitle": "Kanaal bewerken",
     "close": "Sluiten",
-    "tabGeneral": "Algemeen",
-    "tabLinks": "Koppelingen",
     "name": "Naam",
     "parent": "Bovenliggend kanaal",
     "parentSearch": "Kanalen zoeken…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 persoon wordt naar {{parent}} verplaatst.",
     "moveWith_other": "{{count}} subkanalen gaan mee.",
     "deleteSubs_other": "{{count}} subkanalen worden ook verwijderd.",
-    "deletePeople_other": "{{count}} personen worden naar {{parent}} verplaatst."
+    "deletePeople_other": "{{count}} personen worden naar {{parent}} verplaatst.",
+    "tab": {
+      "general": "Algemeen",
+      "links": "Koppelingen"
+    }
   }
 }

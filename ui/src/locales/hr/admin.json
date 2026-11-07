@@ -165,8 +165,6 @@
     "createTempTitle": "Stvori privremeni kanal",
     "editTitle": "Uredi kanal",
     "close": "Zatvori",
-    "tabGeneral": "Općenito",
-    "tabLinks": "Veze",
     "name": "Naziv",
     "parent": "Nadređeni kanal",
     "parentSearch": "Traži kanale…",
@@ -205,6 +203,10 @@
     "deletePeople_few": "{{count}} osobe premještaju se u {{parent}}.",
     "moveWith_other": "{{count}} podkanala premješta se s njim.",
     "deleteSubs_other": "Briše se i {{count}} podkanala.",
-    "deletePeople_other": "{{count}} osoba premješta se u {{parent}}."
+    "deletePeople_other": "{{count}} osoba premješta se u {{parent}}.",
+    "tab": {
+      "general": "Općenito",
+      "links": "Veze"
+    }
   }
 }

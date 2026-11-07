@@ -165,8 +165,6 @@
     "createTempTitle": "Creează canal temporar",
     "editTitle": "Editează canalul",
     "close": "Închide",
-    "tabGeneral": "General",
-    "tabLinks": "Legături",
     "name": "Nume",
     "parent": "Canal părinte",
     "parentSearch": "Caută canale…",
@@ -205,6 +203,10 @@
     "deletePeople_few": "{{count}} persoane sunt mutate în {{parent}}.",
     "moveWith_other": "{{count}} de subcanale se mută odată cu el.",
     "deleteSubs_other": "Se șterg și {{count}} de subcanale.",
-    "deletePeople_other": "{{count}} de persoane sunt mutate în {{parent}}."
+    "deletePeople_other": "{{count}} de persoane sunt mutate în {{parent}}.",
+    "tab": {
+      "general": "General",
+      "links": "Legături"
+    }
   }
 }

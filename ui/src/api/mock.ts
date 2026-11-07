@@ -39,6 +39,8 @@ import type {
   AudioDevices,
   ChannelAudioProfile,
   ChannelInfo,
+  AclRuleView,
+  ChannelAclView,
   ChannelResult,
   DenialKind,
   Right,
@@ -743,6 +745,50 @@ const allow = {
   register: false,
   resetUserContent: false,
 };
+
+const ENTER_BIT = 0x4;
+const WRITE_BIT = 0x1;
+const MAKE_TEMP_BIT = 0x400;
+
+function isDenyAll(rule: AclRuleView): boolean {
+  return (
+    rule.userId === null && rule.group === "all" && rule.grant === 0 && rule.deny === ENTER_BIT
+  );
+}
+
+function isTokenAllow(rule: AclRuleView): boolean {
+  return (
+    rule.userId === null &&
+    rule.group !== null &&
+    rule.group.startsWith("#") &&
+    rule.group.length > 1 &&
+    rule.grant === ENTER_BIT &&
+    rule.deny === 0
+  );
+}
+
+/** The channel's own part, as a save compares it (FR-10.43). */
+function ownRules(acl: ChannelAclView): unknown {
+  return {
+    inheritAcls: acl.inheritAcls,
+    rules: acl.rules.filter((r) => !r.inherited),
+    groups: acl.groups.filter((g) => !g.inherited || g.add.length > 0 || g.remove.length > 0),
+  };
+}
+
+/** The password the engine reads from the official client's two rules (FR-10.28). */
+function withPasswordView(acl: ChannelAclView): ChannelAclView {
+  const join = acl.rules.filter((r) => !r.inherited && ((r.grant | r.deny) & ENTER_BIT) !== 0);
+  const tokens = join.filter(isTokenAllow);
+  let password: ChannelAclView["password"] = { kind: "none" };
+  if (join.length > 0) {
+    password =
+      join.length === 2 && join.some(isDenyAll) && tokens.length === 1
+        ? { kind: "set", password: (tokens[0]?.group ?? "#").slice(1) }
+        : { kind: "custom" };
+  }
+  return { ...acl, password };
+}
 
 function seedChannels(): ChannelInfo[] {
   return [
@@ -1550,6 +1596,54 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
 
   /** Emits an event of the server the running command or control addresses. */
+  // Channel rules and groups (issues #251, #252): every channel inherits the Root rules of a
+  // fresh standard server until the editor saves its own.
+  const channelAcls = new Map<number, ChannelAclView>();
+  function aclOf(channelId: number): ChannelAclView {
+    const known = channelAcls.get(channelId);
+    if (known) return known;
+    const inherited = channelId !== 0;
+    const fresh: ChannelAclView = withPasswordView({
+      channelId,
+      inheritAcls: true,
+      groups: [
+        {
+          name: "admin",
+          inherited,
+          inherit: true,
+          inheritable: true,
+          add: inherited ? [] : [1],
+          remove: [],
+          inheritedMembers: inherited ? [1] : [],
+        },
+      ],
+      rules: [
+        {
+          inherited,
+          applyHere: true,
+          applySubs: true,
+          userId: null,
+          group: "admin",
+          grant: WRITE_BIT,
+          deny: 0,
+        },
+        {
+          inherited,
+          applyHere: true,
+          applySubs: true,
+          userId: null,
+          group: "auth",
+          grant: MAKE_TEMP_BIT,
+          deny: 0,
+        },
+      ],
+      userNames: [{ id: 1, name: "Zoe" }],
+      password: { kind: "none" },
+    });
+    channelAcls.set(channelId, fresh);
+    return fresh;
+  }
+
   /** A refused channel change, as the engine reports the server's answer (issue #250). */
   function refusedChannel(denial: DenialKind, permission: Right | null): ChannelResult {
     return { kind: "refused", denial, permission, reason: null };
@@ -2726,6 +2820,52 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         emitServer("channelUpserted", { channel: c });
       });
       return Promise.resolve({ kind: "confirmed", channelId });
+    },
+    channelAclRead: (serverId, channelId) => {
+      requireSession(serverId);
+      const channel = requireChannel(channelId);
+      if (!channel.permissions.write) return fail("permissionDenied", "write");
+      return Promise.resolve(structuredClone(aclOf(channelId)));
+    },
+    channelAclSave: (serverId, acl, startedFrom, force) => {
+      requireSession(serverId);
+      const current = aclOf(acl.channelId);
+      if (!force && JSON.stringify(ownRules(current)) !== JSON.stringify(ownRules(startedFrom))) {
+        return Promise.resolve({ kind: "conflict", acl: structuredClone(current) });
+      }
+      const saved = withPasswordView({ ...structuredClone(acl) });
+      channelAcls.set(acl.channelId, saved);
+      return Promise.resolve({ kind: "saved", acl: structuredClone(saved) });
+    },
+    channelPasswordSave: (serverId, channelId, password, startedFrom, force) => {
+      requireSession(serverId);
+      const current = aclOf(channelId);
+      if (!force && JSON.stringify(ownRules(current)) !== JSON.stringify(ownRules(startedFrom))) {
+        return Promise.resolve({ kind: "conflict", acl: structuredClone(current) });
+      }
+      if (current.password.kind === "custom") {
+        return fail("invalidInput", "the Join rules are custom; edit them under Permissions");
+      }
+      const keep = current.rules.filter((r) => r.inherited || !(isDenyAll(r) || isTokenAllow(r)));
+      const value = password?.trim() ?? "";
+      const rule = (group: string, grant: number, deny: number): AclRuleView => ({
+        inherited: false,
+        applyHere: true,
+        applySubs: false,
+        userId: null,
+        group,
+        grant,
+        deny,
+      });
+      const rules =
+        value === "" ? keep : [...keep, rule("all", 0, ENTER_BIT), rule(`#${value}`, ENTER_BIT, 0)];
+      const saved = withPasswordView({ ...current, rules });
+      channelAcls.set(channelId, saved);
+      const snap = requireSnapshot();
+      const locked = { ...requireChannel(channelId), enterRestricted: value !== "" };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
+      emitServer("channelUpserted", { channel: locked });
+      return Promise.resolve({ kind: "saved", acl: structuredClone(saved) });
     },
     channelRemove: (serverId, channelId) => {
       requireSession(serverId);

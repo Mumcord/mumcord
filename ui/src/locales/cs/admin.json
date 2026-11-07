@@ -165,8 +165,6 @@
     "createTempTitle": "Vytvořit dočasný kanál",
     "editTitle": "Upravit kanál",
     "close": "Zavřít",
-    "tabGeneral": "Obecné",
-    "tabLinks": "Propojení",
     "name": "Název",
     "parent": "Nadřazený kanál",
     "parentSearch": "Hledat kanály…",
@@ -208,6 +206,10 @@
     "deletePeople_many": "{{count}} člověka bude přesunuto do {{parent}}.",
     "moveWith_other": "{{count}} podkanálů se přesune s ním.",
     "deleteSubs_other": "Smaže se i {{count}} podkanálů.",
-    "deletePeople_other": "{{count}} lidí bude přesunuto do {{parent}}."
+    "deletePeople_other": "{{count}} lidí bude přesunuto do {{parent}}.",
+    "tab": {
+      "general": "Obecné",
+      "links": "Propojení"
+    }
   }
 }

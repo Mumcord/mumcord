@@ -165,8 +165,6 @@
     "createTempTitle": "Utwórz kanał tymczasowy",
     "editTitle": "Edytuj kanał",
     "close": "Zamknij",
-    "tabGeneral": "Ogólne",
-    "tabLinks": "Połączenia",
     "name": "Nazwa",
     "parent": "Kanał nadrzędny",
     "parentSearch": "Szukaj kanałów…",
@@ -208,6 +206,10 @@
     "deletePeople_many": "{{count}} osób zostanie przeniesionych do {{parent}}.",
     "moveWith_other": "{{count}} podkanału zostanie przeniesione razem z nim.",
     "deleteSubs_other": "Zostanie też usunięte {{count}} podkanału.",
-    "deletePeople_other": "{{count}} osoby zostanie przeniesione do {{parent}}."
+    "deletePeople_other": "{{count}} osoby zostanie przeniesione do {{parent}}.",
+    "tab": {
+      "general": "Ogólne",
+      "links": "Połączenia"
+    }
   }
 }

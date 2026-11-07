@@ -165,8 +165,6 @@
     "createTempTitle": "Create temporary channel",
     "editTitle": "Edit channel",
     "close": "Close",
-    "tabGeneral": "General",
-    "tabLinks": "Links",
     "name": "Name",
     "parent": "Parent channel",
     "parentSearch": "Search channels…",
@@ -180,7 +178,7 @@
     "positionHint": "lower = higher in the list",
     "temporary": "Temporary channel",
     "temporaryHint": "Only when creating a channel. The server deletes it when the last person leaves.",
-    "linksNote": "Linked channels are set on the Links tab.",
+    "linksNote": "Other options of this channel: the password on the Password tab, links on Links.",
     "linksSearch": "Search channels",
     "linksLabel": "Linked with (they hear each other)",
     "linkNotAllowed": "You can't link this one",
@@ -202,6 +200,25 @@
     "deletePeople_one": "1 person is moved to {{parent}}.",
     "moveWith_other": "{{count}} sub-channels move with it.",
     "deleteSubs_other": "{{count}} sub-channels are deleted too.",
-    "deletePeople_other": "{{count}} people are moved to {{parent}}."
+    "deletePeople_other": "{{count}} people are moved to {{parent}}.",
+    "tab": {
+      "general": "General",
+      "password": "Password",
+      "links": "Links",
+      "permissions": "Permissions"
+    },
+    "rulesLoading": "Reading the channel's rules…",
+    "retry": "Try again",
+    "password": "Password",
+    "passwordShow": "Show",
+    "passwordHide": "Hide",
+    "passwordHint": "Empty = no password. People who know it can join; it does not work for sub-channels.",
+    "passwordVisible": "Visible to everyone who can edit this channel's permissions.",
+    "passwordCustom": "This channel has custom access rules. Change who may join under Permissions.",
+    "conflictTitle": "Someone changed these permissions while you were editing",
+    "conflictBody": "Reload to start from their version, or save yours and replace theirs.",
+    "conflictBack": "Back",
+    "conflictReload": "Reload",
+    "conflictMine": "Save mine anyway"
   }
 }

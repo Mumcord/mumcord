@@ -165,8 +165,6 @@
     "createTempTitle": "Crea canale temporaneo",
     "editTitle": "Modifica canale",
     "close": "Chiudi",
-    "tabGeneral": "Generale",
-    "tabLinks": "Collegamenti",
     "name": "Nome",
     "parent": "Canale superiore",
     "parentSearch": "Cerca canali…",
@@ -205,6 +203,10 @@
     "deletePeople_many": "{{count}} persone vengono spostate in {{parent}}.",
     "moveWith_other": "{{count}} sottocanali vengono spostati con esso.",
     "deleteSubs_other": "Vengono eliminati anche {{count}} sottocanali.",
-    "deletePeople_other": "{{count}} persone vengono spostate in {{parent}}."
+    "deletePeople_other": "{{count}} persone vengono spostate in {{parent}}.",
+    "tab": {
+      "general": "Generale",
+      "links": "Collegamenti"
+    }
   }
 }

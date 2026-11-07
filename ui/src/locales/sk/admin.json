@@ -165,8 +165,6 @@
     "createTempTitle": "Vytvoriť dočasný kanál",
     "editTitle": "Upraviť kanál",
     "close": "Zavrieť",
-    "tabGeneral": "Všeobecné",
-    "tabLinks": "Prepojenia",
     "name": "Názov",
     "parent": "Nadradený kanál",
     "parentSearch": "Hľadať kanály…",
@@ -208,6 +206,10 @@
     "deletePeople_many": "{{count}} človeka bude presunutých do {{parent}}.",
     "moveWith_other": "{{count}} podkanálov sa presunie s ním.",
     "deleteSubs_other": "Odstráni sa aj {{count}} podkanálov.",
-    "deletePeople_other": "{{count}} ľudí bude presunutých do {{parent}}."
+    "deletePeople_other": "{{count}} ľudí bude presunutých do {{parent}}.",
+    "tab": {
+      "general": "Všeobecné",
+      "links": "Prepojenia"
+    }
   }
 }

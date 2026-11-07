@@ -165,8 +165,6 @@
     "createTempTitle": "Kurti laikiną kanalą",
     "editTitle": "Redaguoti kanalą",
     "close": "Uždaryti",
-    "tabGeneral": "Bendra",
-    "tabLinks": "Sąsajos",
     "name": "Pavadinimas",
     "parent": "Tėvinis kanalas",
     "parentSearch": "Ieškoti kanalų…",
@@ -208,6 +206,10 @@
     "deletePeople_many": "{{count}} žmogaus perkeliama į {{parent}}.",
     "moveWith_other": "{{count}} pokanalių perkeliama kartu.",
     "deleteSubs_other": "Ištrinama ir {{count}} pokanalių.",
-    "deletePeople_other": "{{count}} žmonių perkeliama į {{parent}}."
+    "deletePeople_other": "{{count}} žmonių perkeliama į {{parent}}.",
+    "tab": {
+      "general": "Bendra",
+      "links": "Sąsajos"
+    }
   }
 }

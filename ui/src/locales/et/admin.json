@@ -165,8 +165,6 @@
     "createTempTitle": "Loo ajutine kanal",
     "editTitle": "Muuda kanalit",
     "close": "Sulge",
-    "tabGeneral": "Üldine",
-    "tabLinks": "Seosed",
     "name": "Nimi",
     "parent": "Ülemkanal",
     "parentSearch": "Otsi kanaleid…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 inimene viiakse kanalisse {{parent}}.",
     "moveWith_other": "{{count}} alamkanalit liiguvad kaasa.",
     "deleteSubs_other": "Kustutatakse ka {{count}} alamkanalit.",
-    "deletePeople_other": "{{count}} inimest viiakse kanalisse {{parent}}."
+    "deletePeople_other": "{{count}} inimest viiakse kanalisse {{parent}}.",
+    "tab": {
+      "general": "Üldine",
+      "links": "Seosed"
+    }
   }
 }

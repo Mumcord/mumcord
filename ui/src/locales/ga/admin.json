@@ -165,8 +165,6 @@
     "createTempTitle": "Cruthaigh cainéal sealadach",
     "editTitle": "Cuir an cainéal in eagar",
     "close": "Dún",
-    "tabGeneral": "Ginearálta",
-    "tabLinks": "Naisc",
     "name": "Ainm",
     "parent": "Máthairchainéal",
     "parentSearch": "Cuardaigh cainéil…",
@@ -211,6 +209,10 @@
     "deletePeople_many": "Bogfar {{count}} duine go {{parent}}.",
     "moveWith_other": "{{count}} fochainéal ag bogadh leis.",
     "deleteSubs_other": "Scriosfar {{count}} fochainéal freisin.",
-    "deletePeople_other": "Bogfar {{count}} duine go {{parent}}."
+    "deletePeople_other": "Bogfar {{count}} duine go {{parent}}.",
+    "tab": {
+      "general": "Ginearálta",
+      "links": "Naisc"
+    }
   }
 }

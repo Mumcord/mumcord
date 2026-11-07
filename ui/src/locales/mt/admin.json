@@ -165,8 +165,6 @@
     "createTempTitle": "Oħloq kanal temporanju",
     "editTitle": "Editja l-kanal",
     "close": "Agħlaq",
-    "tabGeneral": "Ġenerali",
-    "tabLinks": "Rabtiet",
     "name": "Isem",
     "parent": "Kanal ġenitur",
     "parentSearch": "Fittex kanali…",
@@ -211,6 +209,10 @@
     "deletePeople_many": "{{count}} persuni jitmexxew għal {{parent}}.",
     "moveWith_other": "{{count}} sottokanali jitmexxew miegħu.",
     "deleteSubs_other": "Jitħassru wkoll {{count}} sottokanali.",
-    "deletePeople_other": "{{count}} persuni jitmexxew għal {{parent}}."
+    "deletePeople_other": "{{count}} persuni jitmexxew għal {{parent}}.",
+    "tab": {
+      "general": "Ġenerali",
+      "links": "Rabtiet"
+    }
   }
 }

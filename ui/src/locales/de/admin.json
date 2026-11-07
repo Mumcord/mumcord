@@ -165,8 +165,6 @@
     "createTempTitle": "Temporären Kanal erstellen",
     "editTitle": "Kanal bearbeiten",
     "close": "Schließen",
-    "tabGeneral": "Allgemein",
-    "tabLinks": "Verbindungen",
     "name": "Name",
     "parent": "Übergeordneter Kanal",
     "parentSearch": "Kanäle suchen…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 Person wird nach {{parent}} verschoben.",
     "moveWith_other": "{{count}} Unterkanäle werden mit verschoben.",
     "deleteSubs_other": "{{count}} Unterkanäle werden ebenfalls gelöscht.",
-    "deletePeople_other": "{{count}} Personen werden nach {{parent}} verschoben."
+    "deletePeople_other": "{{count}} Personen werden nach {{parent}} verschoben.",
+    "tab": {
+      "general": "Allgemein",
+      "links": "Verbindungen"
+    }
   }
 }

@@ -165,8 +165,6 @@
     "createTempTitle": "Skapa tillfällig kanal",
     "editTitle": "Redigera kanal",
     "close": "Stäng",
-    "tabGeneral": "Allmänt",
-    "tabLinks": "Länkar",
     "name": "Namn",
     "parent": "Överordnad kanal",
     "parentSearch": "Sök kanaler…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 person flyttas till {{parent}}.",
     "moveWith_other": "{{count}} underkanaler flyttas med.",
     "deleteSubs_other": "{{count}} underkanaler tas också bort.",
-    "deletePeople_other": "{{count}} personer flyttas till {{parent}}."
+    "deletePeople_other": "{{count}} personer flyttas till {{parent}}.",
+    "tab": {
+      "general": "Allmänt",
+      "links": "Länkar"
+    }
   }
 }

@@ -165,8 +165,6 @@
     "createTempTitle": "Crear canal temporal",
     "editTitle": "Editar canal",
     "close": "Cerrar",
-    "tabGeneral": "General",
-    "tabLinks": "Enlaces",
     "name": "Nombre",
     "parent": "Canal superior",
     "parentSearch": "Buscar canales…",
@@ -205,6 +203,10 @@
     "deletePeople_many": "{{count}} personas se mueven a {{parent}}.",
     "moveWith_other": "{{count}} subcanales se mueven con él.",
     "deleteSubs_other": "También se eliminan {{count}} subcanales.",
-    "deletePeople_other": "{{count}} personas se mueven a {{parent}}."
+    "deletePeople_other": "{{count}} personas se mueven a {{parent}}.",
+    "tab": {
+      "general": "General",
+      "links": "Enlaces"
+    }
   }
 }

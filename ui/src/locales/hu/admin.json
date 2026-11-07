@@ -165,8 +165,6 @@
     "createTempTitle": "Ideiglenes csatorna létrehozása",
     "editTitle": "Csatorna szerkesztése",
     "close": "Bezárás",
-    "tabGeneral": "Általános",
-    "tabLinks": "Kapcsolatok",
     "name": "Név",
     "parent": "Szülőcsatorna",
     "parentSearch": "Csatornák keresése…",
@@ -202,6 +200,10 @@
     "deletePeople_one": "1 embert áthelyezünk ide: {{parent}}.",
     "moveWith_other": "{{count}} alcsatorna vele együtt költözik.",
     "deleteSubs_other": "{{count}} alcsatorna is törlődik.",
-    "deletePeople_other": "{{count}} embert áthelyezünk ide: {{parent}}."
+    "deletePeople_other": "{{count}} embert áthelyezünk ide: {{parent}}.",
+    "tab": {
+      "general": "Általános",
+      "links": "Kapcsolatok"
+    }
   }
 }

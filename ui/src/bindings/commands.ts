@@ -179,6 +179,18 @@ export const commands = {
 	channelEdit: (serverId: number, channelId: number, change: ChannelChangeInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_edit", { serverId, channelId, change })),
 	/**  Deletes a channel with its sub-channels; the people in them go to the parent (FR-10.25). */
 	channelRemove: (serverId: number, channelId: number) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_remove", { serverId, channelId })),
+	/**
+	 *  Reads a channel's rules and groups (FR-10.36). Fails with `permissionDenied` without the right
+	 *  to edit them, and `serverUnreachable` without an answer within 5 s (FR-10.43).
+	 */
+	channelAclRead: (serverId: number, channelId: number) => typedError<ChannelAclView, ApiError>(__TAURI_INVOKE("channel_acl_read", { serverId, channelId })),
+	/**
+	 *  Saves the channel's own rules and groups; `started_from` is what the editor read, so a change by
+	 *  someone else meanwhile comes back as a conflict unless `force` (FR-10.43).
+	 */
+	channelAclSave: (serverId: number, acl: ChannelAclView, startedFrom: ChannelAclView, force: boolean) => typedError<AclSaveResult, ApiError>(__TAURI_INVOKE("channel_acl_save", { serverId, acl, startedFrom, force })),
+	/**  Sets or clears the channel password (FR-10.28); `None` or an empty text clears it. */
+	channelPasswordSave: (serverId: number, channelId: number, password: string | null, startedFrom: ChannelAclView, force: boolean) => typedError<AclSaveResult, ApiError>(__TAURI_INVOKE("channel_password_save", { serverId, channelId, password, startedFrom, force })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -1392,6 +1404,34 @@ export type AcceptedConversationsChanged = {
 	conversations: AcceptedConversation[],
 };
 
+/**  One group as this channel sees it (FR-10.38). */
+export type AclGroupView = {
+	name: string,
+	inherited: boolean,
+	inherit: boolean,
+	inheritable: boolean,
+	add: number[],
+	remove: number[],
+	inheritedMembers: number[],
+};
+
+/**  One permission rule (FR-10.37). `grant` and `deny` are Mumble permission bits. */
+export type AclRuleView = {
+	inherited: boolean,
+	applyHere: boolean,
+	applySubs: boolean,
+	/**  One registered user, or else `group`. */
+	userId: number | null,
+	group: string | null,
+	grant: number,
+	deny: number,
+};
+
+/**  What a save produced (FR-10.43). */
+export type AclSaveResult = { kind: "saved"; acl: ChannelAclView } | 
+/**  Someone changed the rules since they were read; nothing was sent. */
+{ kind: "conflict"; acl: ChannelAclView };
+
 /**  The profile in effect: the own channel's on the server that carries voice. */
 export type ActiveAudioProfile = {
 	serverId: number,
@@ -1891,6 +1931,18 @@ export type CertTrustRequired = {
 
 /**  How a tested server certificate relates to the saved trust decision. */
 export type CertificateState = "trusted" | "unknown" | "changed";
+
+/**  A channel's rules and groups (FR-10.36). */
+export type ChannelAclView = {
+	channelId: number,
+	inheritAcls: boolean,
+	groups: AclGroupView[],
+	/**  Inherited rules first, then the channel's own ones; later rules win. */
+	rules: AclRuleView[],
+	userNames: UserName[],
+	/**  Worked out from the rules; ignored when saving. */
+	password: PasswordView,
+};
 
 /**  A channel of the server that has a profile. */
 export type ChannelAudioEntry = {
@@ -3412,6 +3464,11 @@ export type ParticipantPosition = {
 export type PasswordUpdate = 
 /**  Leave the stored password as it is (on add: no password). */
 { kind: "keep" } | { kind: "clear" } | { kind: "set"; value: string };
+
+/**  The channel password as the Password tab shows it (FR-10.28). */
+export type PasswordView = { kind: "none" } | { kind: "set"; password: string } | 
+/**  The Join rules are more than a password; they are edited under Permissions. */
+{ kind: "custom" };
 
 /**  Comment, avatar and private note, fetched on demand when the profile card opens. */
 export type PersonProfile = {
@@ -5398,6 +5455,12 @@ export type UserBot = {
 	voice: boolean,
 	/**  What it runs, e.g. `history`, `peer`, `webhook`, `music`; sorted. */
 	modules: string[],
+};
+
+/**  A registered user's name, as the server told it (untrusted). */
+export type UserName = {
+	id: number,
+	name: string,
 };
 
 export type UserRemoved = {
