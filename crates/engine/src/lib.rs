@@ -7,6 +7,7 @@ pub mod banlist;
 mod blocking;
 pub mod cache;
 pub mod camera;
+pub mod channel_admin;
 pub mod chat;
 pub mod crash;
 pub mod diag;
@@ -50,6 +51,7 @@ pub mod whisper;
 
 pub use admin::{BanOutcome, BanRequest, KickOutcome, PersonView};
 pub use banlist::{BanChange, BanSaveOutcome, BanView};
+pub use channel_admin::{ChannelChange, ChannelCreate, ChannelOutcome};
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
 pub use friends::{FriendPresence, FriendView};

@@ -1519,6 +1519,13 @@ impl Handle {
         self.send(Frame::from_message(MessageType::ChannelState, &state))
     }
 
+    /// Deletes a channel with its sub-channels; the server moves the people in them to the parent
+    /// (needs the Write permission on the channel).
+    pub fn send_channel_remove(&self, channel_id: u32) -> Result<(), CommandError> {
+        let m = proto::ChannelRemove { channel_id };
+        self.send(Frame::from_message(MessageType::ChannelRemove, &m))
+    }
+
     /// Defines (or replaces) voice target `target.id` (1..=[`VOICE_TARGET_MAX`]) for whisper and
     /// shout. Audio sent to that id afterwards reaches its receivers; the server silently leaves
     /// out receivers the Whisper permission does not allow.

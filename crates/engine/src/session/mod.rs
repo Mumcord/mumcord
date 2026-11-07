@@ -258,6 +258,7 @@ struct Inner {
     ban_lists: Mutex<crate::banlist::BanLists>,
     /// What the open kick and ban dialogs hold per connection (issue #253).
     admin: Mutex<crate::admin::Admin>,
+    channel_admin: Mutex<crate::channel_admin::ChannelAdmin>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
     /// Chat and message requests per server (issue #141).
@@ -608,6 +609,7 @@ impl Engine {
             user_stats: Mutex::default(),
             ban_lists: Mutex::default(),
             admin: Mutex::default(),
+            channel_admin: Mutex::default(),
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
@@ -910,6 +912,10 @@ impl Engine {
     }
 
     /// What the open kick and ban dialogs hold (issue #253).
+    pub(crate) fn channel_admin_state(&self) -> &Mutex<crate::channel_admin::ChannelAdmin> {
+        &self.inner.channel_admin
+    }
+
     pub(crate) fn admin_state(&self) -> &Mutex<crate::admin::Admin> {
         &self.inner.admin
     }
@@ -1922,6 +1928,7 @@ impl Inner {
             self.history_images.reset(server_id);
             crate::banlist::on_disconnect(&self.ban_lists, server_id);
             crate::admin::on_disconnect(&self.admin, server_id);
+            crate::channel_admin::on_disconnect(&self.channel_admin, server_id);
             self.forget_password_attempt(server_id);
             self.files.on_connection_reset(server_id);
             self.full_images.reset(server_id);
@@ -2757,6 +2764,7 @@ impl Inner {
                     )
                 });
                 ctx.events.emit(EngineEvent::ChannelUpserted(view));
+                crate::channel_admin::on_channel(&self.channel_admin, server_id, channel);
                 // A channel created after the sync has no known rights yet. Asking also makes the
                 // server include it when it later flushes the rights (#248).
                 if unknown {
@@ -2764,6 +2772,7 @@ impl Inner {
                 }
             }
             Event::ChannelRemoved(channel) => {
+                crate::channel_admin::on_removed(&self.channel_admin, ctx.server_id, channel.id);
                 ctx.events.emit(EngineEvent::ChannelRemoved(channel.id));
             }
             Event::UserUpdated(change) => {
@@ -2903,13 +2912,16 @@ impl Inner {
                     );
                 }
                 let password = self.on_channel_denied(ctx, denied);
+                // A refused create, edit, link or delete answers the channel dialog (#250).
+                let channel_change =
+                    crate::channel_admin::on_denied(&self.channel_admin, ctx.server_id, denied);
                 ctx.events.emit(EngineEvent::ServerDenied {
                     error: convert::denial_error(denied),
                     channel_id: denied.channel_id,
                     kind: convert::denial_kind(denied),
                     permission: denied.permission.and_then(convert::right_of),
                     // Shown by the dialog that asked; the UI adds no second notice (#248).
-                    handled: kick_or_ban || ban_list || password,
+                    handled: kick_or_ban || ban_list || password || channel_change,
                 });
             }
             // Collected by the session loop and emitted in batches (`emit_permissions`); history

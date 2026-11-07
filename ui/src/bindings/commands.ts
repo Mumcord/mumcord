@@ -170,6 +170,15 @@ export const commands = {
 	personBan: (serverId: number, session: number, input: BanInput) => typedError<BanResult, ApiError>(__TAURI_INVOKE("person_ban", { serverId, session, input })),
 	/**  The dialog closed: what it held is dropped (FR-10.63). */
 	personActionClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_action_close", { serverId })),
+	/**  Creates a channel (FR-10.21, FR-10.22). A temporary channel moves you into it. */
+	channelCreate: (serverId: number, input: ChannelCreateInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_create", { serverId, input })),
+	/**
+	 *  Edits, moves or links a channel (FR-10.23, FR-10.24, FR-10.27); also the menu's quick "Link with
+	 *  my channel" and "Unlink all".
+	 */
+	channelEdit: (serverId: number, channelId: number, change: ChannelChangeInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_edit", { serverId, channelId, change })),
+	/**  Deletes a channel with its sub-channels; the people in them go to the parent (FR-10.25). */
+	channelRemove: (serverId: number, channelId: number) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_remove", { serverId, channelId })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -1903,6 +1912,31 @@ export type ChannelAudioProfilesChanged = {
 	profiles: ChannelAudioEntry[],
 };
 
+/**  What the Channel window changed; unset fields stay as they are (FR-10.23, FR-10.24, FR-10.27). */
+export type ChannelChangeInput = {
+	name: string | null,
+	/**  An empty string removes the description. */
+	description: string | null,
+	/**  A new parent moves the channel with all its sub-channels. */
+	parentId: number | null,
+	position: number | null,
+	maxUsers: number | null,
+	linksAdd: number[],
+	linksRemove: number[],
+};
+
+/**  A new channel from the Channel window's General tab (FR-10.21, FR-10.22). */
+export type ChannelCreateInput = {
+	parentId: number,
+	name: string,
+	/**  Clean HTML from the description editor; `None` for none. */
+	description: string | null,
+	position: number,
+	/**  0 is the server's own limit. */
+	maxUsers: number,
+	temporary: boolean,
+};
+
 export type ChannelInfo = {
 	id: number,
 	/**  `null` for the root channel. */
@@ -1986,6 +2020,15 @@ export type ChannelRemoved = {
 	serverId: number,
 	channelId: number,
 };
+
+/**  The server's answer to a channel change. */
+export type ChannelResult = 
+/**  Applied; `channelId` is the new channel after a create. */
+{ kind: "confirmed"; channelId: number } | 
+/**  No answer within 5 s; the change was written to the server. */
+{ kind: "unconfirmed" } | 
+/**  Refused, with the kind, the missing right and the server's own text (untrusted). */
+{ kind: "refused"; denial: DenialKind; permission: Right | null; reason: string | null };
 
 /**  A channel was added or changed. */
 export type ChannelUpserted = {
