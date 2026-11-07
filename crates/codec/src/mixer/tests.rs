@@ -1,3 +1,4 @@
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -730,16 +731,23 @@ fn queue_target_can_be_lowered_while_playing() {
 /// playing sound makes the sound server run a larger quantum than the small buffer we asked
 /// for. A queue below one period leaves part of the buffer silent: the gap that is heard as
 /// stutter.
+///
+/// The device runs on a simulated clock that advances one poll interval per pass of the
+/// playback loop, so a slow or busy test runner cannot fake a gap by waking the thread late.
 struct PeriodSink {
     written: usize,
     played: usize,
     /// Samples the device takes per callback.
     period: usize,
-    /// When the next callback is due.
-    next_callback: Instant,
+    /// Simulated time, in samples.
+    now: usize,
+    /// Simulated time of the next callback, in samples.
+    next_callback: usize,
     /// Whether the queued frames carry sound; silence running dry is not heard.
     sound: bool,
     gaps: Arc<Mutex<usize>>,
+    /// Simulated time shared with the test, in samples.
+    clock: Arc<AtomicUsize>,
 }
 
 impl PlaybackSink for PeriodSink {
@@ -750,20 +758,22 @@ impl PlaybackSink for PeriodSink {
     }
 
     fn queued_samples(&mut self) -> usize {
-        let callback = Duration::from_micros(1_000_000 * self.period as u64 / SAMPLE_RATE as u64);
-        let now = Instant::now();
-        while self.next_callback <= now {
+        while self.next_callback <= self.now {
             let taken = (self.written - self.played).min(self.period);
             if taken < self.period && self.sound {
                 *self.gaps.lock().expect("gaps") += self.period - taken;
             }
             self.played += taken;
-            self.next_callback += callback;
+            self.next_callback += self.period;
         }
         self.written - self.played
     }
 
+    /// Called once at the start of every pass of the playback loop: one pass is one tick.
     fn device_period_samples(&mut self) -> usize {
+        // The playback loop sleeps 2 ms between passes.
+        self.now += 2 * SAMPLE_RATE as usize / 1000;
+        self.clock.store(self.now, Ordering::Relaxed);
         self.period
     }
 }
@@ -773,13 +783,16 @@ fn output_queue_covers_one_device_period() {
     // PipeWire runs the graph at quantum 1024 while another app plays: 21 ms per callback.
     let period = 1024;
     let gaps = Arc::new(Mutex::new(0usize));
+    let clock = Arc::new(AtomicUsize::new(0));
     let sink = PeriodSink {
         written: 0,
         played: 0,
         period,
-        next_callback: Instant::now(),
+        now: 0,
+        next_callback: 0,
         sound: false,
         gaps: Arc::clone(&gaps),
+        clock: Arc::clone(&clock),
     };
     let config = PlaybackConfig {
         target_queue_ms: LOW_LATENCY_QUEUE_MS,
@@ -789,15 +802,15 @@ fn output_queue_covers_one_device_period() {
     for p in tone_packets(120, 0) {
         assert!(ports.packets.push(packet(0, &p, false)));
     }
-    std::thread::sleep(Duration::from_millis(1500));
+    // 1.5 s of simulated device time, while the 2.4 s of speech is still playing.
+    let deadline = Instant::now() + Duration::from_secs(60);
+    while clock.load(Ordering::Relaxed) < SAMPLE_RATE as usize * 3 / 2 {
+        assert!(Instant::now() < deadline, "playback loop stalled");
+        std::thread::sleep(Duration::from_millis(10));
+    }
     let stats = playback.stats();
     drop(playback);
 
     assert_eq!(stats.frames_refused, 0, "{stats:?}");
-    // One callback's worth is allowed for scheduling noise on a loaded runner; before the fix
-    // this test lost most of the audio.
-    assert!(
-        *gaps.lock().expect("gaps") <= period,
-        "{stats:?} gaps: {gaps:?}"
-    );
+    assert_eq!(*gaps.lock().expect("gaps"), 0, "{stats:?}");
 }
