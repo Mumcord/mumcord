@@ -98,11 +98,10 @@
     "title": "Tinstema' tajjeb?",
     "subtitle": "Agħżel l-apparati tiegħek u għid xi ħaġa. Il-bar għandu jiċċaqlaq waqt li titkellem.",
     "talkLegend": "Kif trid titkellem?",
-    "tipLabel": "Dwar {{mode}}",
-    "voiceActivationHint": "Tkellem liberament. Mumcord jibgħat l-awdjo meta titkellem.",
-    "pushToTalkHint": "Żomm ċavetta waqt li titkellem. L-aħjar f'postijiet storbjużi.",
-    "keyRequired": "Agħżel ċavetta push-to-talk jew aqleb għall-attivazzjoni bil-vuċi.",
-    "notSure": "Mhux ċert? Ibda bl-attivazzjoni bil-vuċi. Tista' tbiddel meta trid mis-settings rapidi."
+    "voiceActivationDesc": "Il-mikrofonu jinfetaħ meta titkellem. M'hemm xejn x'iżżomm jew tagħfas.",
+    "pushToTalkDesc": "L-aħjar għal kmamar storbjużi. Int tagħżel il-buttuna.",
+    "sensitivity": "Sensittività",
+    "changeLater": "Tista' tibdel dan kollu aktar tard f'Settings → Vuċi u awdjo."
   },
   "style": {
     "title": "Kemm trid taqsam?",

@@ -27,6 +27,8 @@ interface StepFrameProps {
   subtitle?: string;
   /** Saving or validating: the primary button does nothing until it is done. */
   busy?: boolean;
+  /** Something is missing (the step says what): the primary button is unavailable. */
+  blocked?: boolean;
   onSubmit: () => void;
   /** Extra footer content next to the buttons, e.g. "Next: add your first server". */
   footerNote?: ReactNode;
@@ -41,6 +43,7 @@ export function StepFrame({
   titleText,
   subtitle,
   busy = false,
+  blocked = false,
   onSubmit,
   footerNote,
   badge,
@@ -67,7 +70,7 @@ export function StepFrame({
 
   function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!busy) onSubmit();
+    if (!busy && !blocked) onSubmit();
   }
 
   // Enter on a radio or switch continues, as on a text field. A native listener, since the
@@ -146,7 +149,7 @@ export function StepFrame({
         <button
           type="submit"
           className="button button--primary"
-          aria-disabled={busy}
+          aria-disabled={busy || blocked}
           aria-busy={busy}
         >
           {t(PRIMARY_LABELS[nav.primary])}

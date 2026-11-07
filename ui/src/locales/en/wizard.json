@@ -98,11 +98,10 @@
     "title": "Sound good?",
     "subtitle": "Pick your devices and say something. The bar should move while you talk.",
     "talkLegend": "How do you want to talk?",
-    "tipLabel": "About {{mode}}",
-    "voiceActivationHint": "Talk freely. Mumcord sends audio when you speak.",
-    "pushToTalkHint": "Hold a key while you speak. Best in noisy places.",
-    "keyRequired": "Choose a push-to-talk key or switch to voice activation.",
-    "notSure": "Not sure? Start with voice activation. You can switch any time from the quick settings."
+    "voiceActivationDesc": "Your microphone opens when you talk. Nothing to hold or press.",
+    "pushToTalkDesc": "Best for noisy rooms. You choose the key.",
+    "sensitivity": "Sensitivity",
+    "changeLater": "You can change all of this later in Settings → Voice & Audio."
   },
   "style": {
     "title": "How much do you want to share?",

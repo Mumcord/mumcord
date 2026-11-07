@@ -98,11 +98,10 @@
     "title": "Zvuči li dobro?",
     "subtitle": "Odaberite uređaje i recite nešto. Traka bi se trebala pomicati dok govorite.",
     "talkLegend": "Kako želite govoriti?",
-    "tipLabel": "O načinu {{mode}}",
-    "voiceActivationHint": "Govorite slobodno. Mumcord šalje zvuk kad progovorite.",
-    "pushToTalkHint": "Držite tipku dok govorite. Najbolje na bučnim mjestima.",
-    "keyRequired": "Odaberite tipku za push-to-talk ili prijeđite na glasovnu aktivaciju.",
-    "notSure": "Niste sigurni? Počnite s glasovnom aktivacijom. Možete promijeniti u bilo kojem trenutku iz brzih postavki."
+    "voiceActivationDesc": "Mikrofon se otvara kad govoriš. Ništa za držati ni pritiskati.",
+    "pushToTalkDesc": "Najbolje za bučne prostorije. Ti biraš tipku.",
+    "sensitivity": "Osjetljivost",
+    "changeLater": "Sve ovo možeš kasnije promijeniti u Postavke → Glas i zvuk."
   },
   "style": {
     "title": "Koliko želite dijeliti?",

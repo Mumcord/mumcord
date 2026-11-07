@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Radio buttons and checkboxes have Mumcord's own design everywhere: a ring with a lilac dot and a rounded box with a lilac check, with a clear focus ring and high-contrast support. Option cards such as "Private messages from" highlight the whole card
+- Setup wizard, "How do you want to talk?": two clear cards with a short explanation, the sensitivity choice nested under voice activation, and the push-to-talk key right in its card; Continue waits until a key is set
 - Peer-to-peer: "Direct + relay (always relay, hides my IP)" is now the recommended mode and the default for new installs, and the Balanced setup style uses it. A mode you already use stays as it is
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
 

@@ -98,11 +98,10 @@
     "title": "Skan labi?",
     "subtitle": "Izvēlieties ierīces un pasakiet kaut ko. Joslai jākustas, kamēr runājat.",
     "talkLegend": "Kā vēlaties runāt?",
-    "tipLabel": "Par režīmu “{{mode}}”",
-    "voiceActivationHint": "Runājiet brīvi. Mumcord sūta skaņu, kad runājat.",
-    "pushToTalkHint": "Runājot turiet nospiestu taustiņu. Vislabāk trokšņainās vietās.",
-    "keyRequired": "Izvēlieties push-to-talk taustiņu vai pārslēdzieties uz balss aktivizēšanu.",
-    "notSure": "Neesat pārliecināts? Sāciet ar balss aktivizēšanu. Jebkurā laikā varat pārslēgt ātrajos iestatījumos."
+    "voiceActivationDesc": "Mikrofons ieslēdzas, kad runā. Nekas nav jātur vai jāspiež.",
+    "pushToTalkDesc": "Labākais trokšņainām telpām. Taustiņu izvēlies pats.",
+    "sensitivity": "Jutība",
+    "changeLater": "To visu vēlāk vari mainīt sadaļā Iestatījumi → Balss un skaņa."
   },
   "style": {
     "title": "Cik daudz vēlaties kopīgot?",

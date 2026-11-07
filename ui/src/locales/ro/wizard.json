@@ -98,11 +98,10 @@
     "title": "Sună bine?",
     "subtitle": "Alege-ți dispozitivele și spune ceva. Bara ar trebui să se miște cât vorbești.",
     "talkLegend": "Cum vrei să vorbești?",
-    "tipLabel": "Despre {{mode}}",
-    "voiceActivationHint": "Vorbește liber. Mumcord trimite audio când vorbești.",
-    "pushToTalkHint": "Ține apăsată o tastă cât vorbești. Cel mai bine în locuri zgomotoase.",
-    "keyRequired": "Alege o tastă push-to-talk sau treci la activarea vocală.",
-    "notSure": "Nu ești sigur? Începe cu activarea vocală. Poți schimba oricând din setările rapide."
+    "voiceActivationDesc": "Microfonul se deschide când vorbești. Nimic de ținut sau apăsat.",
+    "pushToTalkDesc": "Cel mai bun pentru încăperi zgomotoase. Tu alegi tasta.",
+    "sensitivity": "Sensibilitate",
+    "changeLater": "Poți schimba toate acestea mai târziu în Setări → Voce și audio."
   },
   "style": {
     "title": "Cât vrei să partajezi?",

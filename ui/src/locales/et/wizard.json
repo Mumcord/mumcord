@@ -98,11 +98,10 @@
     "title": "Kõlab hästi?",
     "subtitle": "Vali oma seadmed ja ütle midagi. Riba peaks rääkimise ajal liikuma.",
     "talkLegend": "Kuidas soovid rääkida?",
-    "tipLabel": "Teave: {{mode}}",
-    "voiceActivationHint": "Räägi vabalt. Mumcord saadab heli, kui sa räägid.",
-    "pushToTalkHint": "Hoia rääkimise ajal klahvi all. Parim lärmakates kohtades.",
-    "keyRequired": "Vali räägi-vajutades klahv või lülitu häälaktiveerimisele.",
-    "notSure": "Pole kindel? Alusta häälaktiveerimisega. Saad igal ajal kiirseadetest vahetada."
+    "voiceActivationDesc": "Mikrofon avaneb, kui räägid. Midagi pole vaja all hoida ega vajutada.",
+    "pushToTalkDesc": "Parim mürarikastesse ruumidesse. Klahvi valid ise.",
+    "sensitivity": "Tundlikkus",
+    "changeLater": "Saad seda kõike hiljem muuta: Seaded → Hääl ja heli."
   },
   "style": {
     "title": "Kui palju soovid jagada?",
