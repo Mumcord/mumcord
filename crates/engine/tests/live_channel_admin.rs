@@ -452,3 +452,158 @@ async fn channel_password_and_rule_conflicts() {
             .expect("delete room"),
     );
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs the local test server (testenv/up.sh v15) and MUMCORD_LIVE=1"]
+async fn the_core_works_out_rights_like_the_server() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("live_channel_eval");
+
+    let (engine, mut rx) = Engine::new(
+        &dir.join("data"),
+        SecretStore::in_memory(),
+        tokio::runtime::Handle::current(),
+    )
+    .expect("engine");
+    let server_id = connect(&engine, &mut rx).await;
+
+    // A SuperUser bot makes a room in which everyone may create, edit and link channels.
+    let admin = Bot::connect(BotConfig::superuser(common::v15()))
+        .await
+        .expect("SuperUser bot (SUPERUSER_PASSWORD in testenv/.env)");
+    let room = unique("mc-chadm-room");
+    admin
+        .handle()
+        .send_channel_state(proto::ChannelState {
+            parent: Some(0),
+            name: Some(room.clone()),
+            ..Default::default()
+        })
+        .expect("create room");
+    let deadline = tokio::time::Instant::now() + WAIT;
+    let room_id = loop {
+        if let Ok(id) = admin.channel_id(&room) {
+            break id;
+        }
+        assert!(tokio::time::Instant::now() < deadline, "room not created");
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    };
+    let rights = bot_protocol::permissions::WRITE
+        | bot_protocol::permissions::MAKE_CHANNEL
+        | bot_protocol::permissions::LINK_CHANNEL;
+    admin
+        .handle()
+        .send_acl(proto::Acl {
+            channel_id: room_id,
+            inherit_acls: Some(true),
+            groups: Vec::new(),
+            acls: vec![proto::acl::ChanAcl {
+                apply_here: Some(true),
+                apply_subs: Some(true),
+                inherited: Some(false),
+                user_id: None,
+                group: Some("all".to_owned()),
+                grant: Some(rights),
+                deny: Some(0),
+            }],
+            query: Some(false),
+        })
+        .expect("grant rights");
+    wait_channel(&mut rx, "the rights in the room", &room, |v| {
+        v.permissions.make_channel && v.permissions.write && v.permissions.link_channel
+    })
+    .await;
+
+    let name = unique("mc-eval");
+    let channel = confirmed(
+        engine
+            .channel_create(server_id, &create(room_id, &name))
+            .await
+            .expect("create channel"),
+    );
+
+    // Deny Speak for everyone here, with Mumcord's own editor path.
+    let start = engine
+        .channel_acl_read(server_id, channel)
+        .await
+        .expect("read rules");
+    let mut next = start.clone();
+    next.rules.push(mumcord_engine::AclRule {
+        inherited: false,
+        apply_here: true,
+        apply_subs: false,
+        user_id: None,
+        group: Some("all".into()),
+        grant: 0,
+        deny: bot_protocol::permissions::SPEAK,
+    });
+    let AclSaveOutcome::Saved(saved) = engine
+        .channel_acl_save(server_id, &next, &start, false)
+        .await
+        .expect("save rules")
+    else {
+        panic!("no conflict expected");
+    };
+
+    // The server's own answer for this (unregistered) user, after it flushed the rights.
+    let view = wait_channel(&mut rx, "speak denied by the server", &name, |v| {
+        !v.permissions.speak
+    })
+    .await;
+    // A guest matches only "all", which is the Everyone row.
+    let rows = engine
+        .channel_acl_evaluate(
+            server_id,
+            &saved,
+            &[mumcord_engine::acl_eval::RowSubject::Everyone],
+        )
+        .expect("evaluate");
+    let verdict = |bit: u32| {
+        rows[0]
+            .iter()
+            .find(|c| c.permission == bit)
+            .map(|c| c.verdict)
+            .expect("cell")
+    };
+    use mumcord_engine::acl_eval::Verdict;
+    let as_server = |allowed: bool| {
+        if allowed {
+            Verdict::Allowed
+        } else {
+            Verdict::Denied
+        }
+    };
+    let p = bot_protocol::permissions::SPEAK;
+    assert_eq!(verdict(p), as_server(view.permissions.speak), "Speak");
+    let p = bot_protocol::permissions::ENTER;
+    assert_eq!(verdict(p), as_server(view.permissions.enter), "Join");
+    let p = bot_protocol::permissions::MAKE_CHANNEL;
+    assert_eq!(
+        verdict(p),
+        as_server(view.permissions.make_channel),
+        "Create channels"
+    );
+    let p = bot_protocol::permissions::WRITE;
+    assert_eq!(
+        verdict(p),
+        as_server(view.permissions.write),
+        "Edit permissions"
+    );
+    let p = bot_protocol::permissions::MOVE;
+    assert_eq!(
+        verdict(p),
+        as_server(view.permissions.move_users),
+        "Move people"
+    );
+
+    confirmed(
+        engine
+            .channel_remove(server_id, room_id)
+            .await
+            .expect("delete room"),
+    );
+}
