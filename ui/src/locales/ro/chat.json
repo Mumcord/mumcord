@@ -42,6 +42,7 @@
     "label": "Scrie către {{name}}",
     "hint": "Apasă Enter ca să trimiți și Shift+Enter pentru un rând nou. Merge Markdown: **aldin**, *cursiv*, `cod`, [link](https://…).",
     "addImage": "Adaugă imagine",
+    "optionalMessage": "Adaugă un mesaj (opțional)",
     "removeImage": "Elimină imaginea {{name}}",
     "imagePreview": "Imagine de trimis: {{name}}",
     "send": "Trimite",

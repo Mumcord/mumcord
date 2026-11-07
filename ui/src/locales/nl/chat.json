@@ -40,6 +40,7 @@
     "label": "Bericht aan {{name}}",
     "hint": "Druk op Enter om te verzenden en op Shift+Enter voor een nieuwe regel. Markdown werkt: **vet**, *cursief*, `code`, [link](https://…).",
     "addImage": "Afbeelding toevoegen",
+    "optionalMessage": "Bericht toevoegen (optioneel)",
     "removeImage": "Afbeelding {{name}} verwijderen",
     "imagePreview": "Afbeelding om te verzenden: {{name}}",
     "send": "Verzenden",

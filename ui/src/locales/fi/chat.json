@@ -40,6 +40,7 @@
     "label": "Viesti: {{name}}",
     "hint": "Lähetä painamalla Enter, uusi rivi Shift+Enterillä. Markdown toimii: **lihavointi**, *kursivointi*, `koodi`, [linkki](https://…).",
     "addImage": "Lisää kuva",
+    "optionalMessage": "Lisää viesti (valinnainen)",
     "removeImage": "Poista kuva {{name}}",
     "imagePreview": "Lähetettävä kuva: {{name}}",
     "send": "Lähetä",

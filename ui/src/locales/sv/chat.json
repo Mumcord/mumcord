@@ -40,6 +40,7 @@
     "label": "Meddelande till {{name}}",
     "hint": "Tryck på Enter för att skicka och Skift+Enter för ny rad. Markdown fungerar: **fet**, *kursiv*, `kod`, [länk](https://…).",
     "addImage": "Lägg till bild",
+    "optionalMessage": "Lägg till ett meddelande (valfritt)",
     "removeImage": "Ta bort bilden {{name}}",
     "imagePreview": "Bild att skicka: {{name}}",
     "send": "Skicka",

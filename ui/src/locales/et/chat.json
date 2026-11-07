@@ -40,6 +40,7 @@
     "label": "Sõnum: {{name}}",
     "hint": "Saatmiseks vajuta Enter, uue rea jaoks Shift+Enter. Markdown töötab: **paks**, *kursiiv*, `kood`, [link](https://…).",
     "addImage": "Lisa pilt",
+    "optionalMessage": "Lisa sõnum (valikuline)",
     "removeImage": "Eemalda pilt {{name}}",
     "imagePreview": "Saadetav pilt: {{name}}",
     "send": "Saada",

@@ -42,6 +42,7 @@
     "label": "Mensagem para {{name}}",
     "hint": "Prime Enter para enviar e Shift+Enter para uma nova linha. Markdown funciona: **negrito**, *itálico*, `código`, [ligação](https://…).",
     "addImage": "Adicionar imagem",
+    "optionalMessage": "Adicionar uma mensagem (opcional)",
     "removeImage": "Remover imagem {{name}}",
     "imagePreview": "Imagem a enviar: {{name}}",
     "send": "Enviar",

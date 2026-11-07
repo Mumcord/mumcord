@@ -42,6 +42,7 @@
     "label": "Message à {{name}}",
     "hint": "Appuyez sur Entrée pour envoyer et sur Maj+Entrée pour un retour à la ligne. Le Markdown fonctionne : **gras**, *italique*, `code`, [lien](https://…).",
     "addImage": "Ajouter une image",
+    "optionalMessage": "Ajouter un message (facultatif)",
     "removeImage": "Retirer l’image {{name}}",
     "imagePreview": "Image à envoyer : {{name}}",
     "send": "Envoyer",

@@ -40,6 +40,7 @@
     "label": "Message {{name}}",
     "hint": "Press Enter to send and Shift+Enter for a new line. Markdown works: **bold**, *italic*, `code`, [link](https://…).",
     "addImage": "Add image",
+    "optionalMessage": "Add a message (optional)",
     "removeImage": "Remove image {{name}}",
     "imagePreview": "Image to send: {{name}}",
     "send": "Send",

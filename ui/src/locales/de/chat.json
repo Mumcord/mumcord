@@ -40,6 +40,7 @@
     "label": "Nachricht an {{name}}",
     "hint": "Enter sendet, Umschalt+Enter fügt eine neue Zeile ein. Markdown funktioniert: **fett**, *kursiv*, `Code`, [Link](https://…).",
     "addImage": "Bild hinzufügen",
+    "optionalMessage": "Nachricht hinzufügen (optional)",
     "removeImage": "Bild {{name}} entfernen",
     "imagePreview": "Zu sendendes Bild: {{name}}",
     "send": "Senden",

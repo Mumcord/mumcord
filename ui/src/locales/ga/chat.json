@@ -46,6 +46,7 @@
     "label": "Seol teachtaireacht chuig {{name}}",
     "hint": "Brúigh Enter chun seoladh agus Shift+Enter le haghaidh líne nua. Oibríonn Markdown: **trom**, *iodálach*, `cód`, [nasc](https://…).",
     "addImage": "Cuir íomhá leis",
+    "optionalMessage": "Cuir teachtaireacht leis (roghnach)",
     "removeImage": "Bain an íomhá {{name}}",
     "imagePreview": "Íomhá le seoladh: {{name}}",
     "send": "Seol",

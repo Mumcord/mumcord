@@ -44,6 +44,7 @@
     "label": "Správa pre {{name}}",
     "hint": "Enter odošle, Shift+Enter vloží nový riadok. Funguje Markdown: **tučné**, *kurzíva*, `kód`, [odkaz](https://…).",
     "addImage": "Pridať obrázok",
+    "optionalMessage": "Pridať správu (voliteľné)",
     "removeImage": "Odstrániť obrázok {{name}}",
     "imagePreview": "Obrázok na odoslanie: {{name}}",
     "send": "Odoslať",

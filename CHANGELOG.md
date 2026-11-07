@@ -15,11 +15,12 @@
 - The hint "This server has no relay, so file sharing isn't available." can be closed per server; it comes back when the server gets a relay and loses it again
 - "Bots on this server" starts collapsed; once you open or close it, Mumcord remembers that
 - Plugins strip: plugin icons have no frame anymore; a plugin's own image or its colour tile is the whole icon, with a ring on hover, focus and when open
-- Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
+- Chat message bar (issue #596, mockup approved): the typed text now starts at the bar's left edge on one line, grows with the text up to about six lines and scrolls from there, without a resize handle. The Apps, file, picture and GIF icons are one consistent set, and the send button is a labelled pill that stays muted while there is nothing to send and becomes the primary button as soon as text, a picture or a file is ready; with only a picture or a file in the tray the field asks for "Add a message (optional)". The formatting buttons (bold, italic, strikethrough, inline code, code block, link, quote) now sit in a small pill on the bar's top edge while the cursor is in the input, and the bar carries the single focus ring instead of a second frame around the text field. A channel you may not write in shows a locked note instead of an empty field, and its Apps button (screen share, watch together, camera) still works when you are in that channel by voice.
 
 ### Fixed
 
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
+- Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
 - Settings: cards side by side are equally tall, and a "?" stays next to its long label instead of wrapping onto its own line
 - Settings → Screen sharing → Hardware acceleration: a long status such as "Software, keeps up to 1080p30" stays right-aligned
 - Camera and screen share dialogs: the dropdowns use the app's own design like in Settings, and the codec note ends its sentence before the next one starts

@@ -40,6 +40,7 @@
     "label": "Üzenet neki: {{name}}",
     "hint": "Enter: küldés, Shift+Enter: új sor. Markdown is működik: **félkövér**, *dőlt*, `kód`, [link](https://…).",
     "addImage": "Kép hozzáadása",
+    "optionalMessage": "Adjon hozzá üzenetet (nem kötelező)",
     "removeImage": "Kép eltávolítása: {{name}}",
     "imagePreview": "Küldendő kép: {{name}}",
     "send": "Küldés",

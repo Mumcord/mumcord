@@ -44,6 +44,7 @@
     "label": "Wiadomość do {{name}}",
     "hint": "Naciśnij Enter, aby wysłać, a Shift+Enter, aby przejść do nowej linii. Działa Markdown: **pogrubienie**, *kursywa*, `kod`, [link](https://…).",
     "addImage": "Dodaj obraz",
+    "optionalMessage": "Dodaj wiadomość (opcjonalnie)",
     "removeImage": "Usuń obraz {{name}}",
     "imagePreview": "Obraz do wysłania: {{name}}",
     "send": "Wyślij",

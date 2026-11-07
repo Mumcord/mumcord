@@ -42,6 +42,7 @@
     "label": "Scrivi a {{name}}",
     "hint": "Premi Invio per inviare e Maiusc+Invio per andare a capo. Markdown funziona: **grassetto**, *corsivo*, `codice`, [link](https://…).",
     "addImage": "Aggiungi immagine",
+    "optionalMessage": "Aggiungi un messaggio (facoltativo)",
     "removeImage": "Rimuovi immagine {{name}}",
     "imagePreview": "Immagine da inviare: {{name}}",
     "send": "Invia",

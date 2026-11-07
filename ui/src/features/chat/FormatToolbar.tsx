@@ -1,9 +1,12 @@
 /**
- * Formatting buttons above the message input (FR-1.54). One Tab stop with arrow-key navigation
- * (WAI-ARIA toolbar pattern); clicking a button never takes the focus away from the input.
+ * Formatting buttons of the message input (FR-1.54, issue #596): a small pill on the bar's
+ * top-left edge, shown while the input has focus (CSS in chat.css). One Tab stop with arrow-key
+ * navigation (WAI-ARIA toolbar pattern); clicking a button never takes the focus away from the
+ * input. Only rendered when writing is possible, so it has no disabled state.
  */
-import { useRef, useState, type KeyboardEvent } from "react";
+import { Fragment, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { ComposerIcon } from "../../components/ComposerIcon";
 import { FORMATS, SHORTCUTS, type Format } from "./formatting";
 
 const ICONS: Record<Format, string> = {
@@ -17,15 +20,17 @@ const ICONS: Record<Format, string> = {
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
 };
 
+/** The mockup groups the buttons: text, code, and reference. */
+const DIVIDER_AFTER: ReadonlySet<Format> = new Set<Format>(["strike", "codeBlock"]);
+
 /** "Control+Shift+E" → "Ctrl+Shift+E" for tooltips. */
 const shortcutLabel = (shortcut: string) => shortcut.replace("Control", "Ctrl");
 
 export interface FormatToolbarProps {
   onFormat: (format: Format) => void;
-  disabled: boolean;
 }
 
-export function FormatToolbar({ onFormat, disabled }: FormatToolbarProps) {
+export function FormatToolbar({ onFormat }: FormatToolbarProps) {
   const { t } = useTranslation("chat");
   const [active, setActive] = useState(0);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -58,38 +63,32 @@ export function FormatToolbar({ onFormat, disabled }: FormatToolbarProps) {
       {FORMATS.map((format, index) => {
         const label = t(`format.${format}`);
         return (
-          <button
-            key={format}
-            ref={(element) => {
-              buttons.current[index] = element;
-            }}
-            type="button"
-            className="chat-format__button"
-            aria-label={label}
-            aria-keyshortcuts={SHORTCUTS[format]}
-            data-tooltip={`${label} (${shortcutLabel(SHORTCUTS[format])})`}
-            tabIndex={index === active ? 0 : -1}
-            disabled={disabled}
-            // Keeps the caret and selection in the input while clicking.
-            onMouseDown={(event) => {
-              event.preventDefault();
-            }}
-            onClick={() => {
-              setActive(index);
-              onFormat(format);
-            }}
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
-              <path
-                d={ICONS[format]}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          <Fragment key={format}>
+            <button
+              ref={(element) => {
+                buttons.current[index] = element;
+              }}
+              type="button"
+              className="chat-format__button"
+              aria-label={label}
+              aria-keyshortcuts={SHORTCUTS[format]}
+              data-tooltip={`${label} (${shortcutLabel(SHORTCUTS[format])})`}
+              tabIndex={index === active ? 0 : -1}
+              // Keeps the caret and selection in the input while clicking.
+              onMouseDown={(event) => {
+                event.preventDefault();
+              }}
+              onClick={() => {
+                setActive(index);
+                onFormat(format);
+              }}
+            >
+              <ComposerIcon d={ICONS[format]} size={14} />
+            </button>
+            {DIVIDER_AFTER.has(format) && (
+              <span className="chat-format__divider" aria-hidden="true" />
+            )}
+          </Fragment>
         );
       })}
     </div>

@@ -10,6 +10,7 @@ import { useSelectedConversation, useServerState, useShownServerId } from "../ch
 import { useEmbedsAllowed } from "../../app/preferences";
 import { useOpenPrivacySettings } from "../../app/view";
 import { getApi } from "../../api";
+import { ComposerIcon } from "../../components/ComposerIcon";
 import {
   ShareStartDialog,
   Viewers,
@@ -155,9 +156,7 @@ export function ChatActionRow() {
           setMenuOpen((open) => !open);
         }}
       >
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-          <path d={APPS_ICON} fill="none" stroke="currentColor" strokeWidth="2" />
-        </svg>
+        <ComposerIcon d={APPS_ICON} />
         {sharing !== null && <span className="chat-apps__live" aria-hidden="true" />}
       </button>
       {menuOpen && (
