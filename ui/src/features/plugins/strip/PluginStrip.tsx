@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { getApi, type PluginPanelVisibility, type PluginSlot } from "../../../api";
 import { useT } from "../../../i18n/useT";
+import { PluginTile } from "../render/PluginTile";
 import { PluginTree } from "../render/PluginTree";
 import { usePluginUi } from "../render/pluginUiStore";
 import { usePluginIcon } from "../render/usePluginIcon";
@@ -11,10 +12,6 @@ import { loadOpen, saveOpen } from "./stripMemory";
 import "./strip.css";
 
 const PANEL: PluginSlot = { kind: "panel" };
-
-function initials(name: string): string {
-  return Array.from(name.trim()).slice(0, 2).join("").toUpperCase();
-}
 
 /** The side sheet shows the plugin's web view when it opened one there, else its panel. */
 function PopoverBody({ id, children }: { id: string; children: ReactNode }) {
@@ -29,9 +26,9 @@ function PopoverBody({ id, children }: { id: string; children: ReactNode }) {
 function PluginIcon({ id, name }: { id: string; name: string }) {
   const url = usePluginIcon(id);
   return url === null ? (
-    <span aria-hidden="true">{initials(name)}</span>
+    <PluginTile id={id} name={name} className="pstrip-tile" />
   ) : (
-    <img className="pstrip-icon-img" src={url} alt="" width={28} height={28} />
+    <img className="pstrip-icon-img" src={url} alt="" width={36} height={36} />
   );
 }
 

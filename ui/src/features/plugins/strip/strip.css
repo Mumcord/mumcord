@@ -23,6 +23,8 @@
   gap: var(--space-1);
 }
 
+/* Frameless (#598): the plugin's own image or its gradient tile is the whole icon; hover, open
+   and focus draw rings around it instead of a border. */
 .pstrip-icon {
   /* Flex rather than grid, and a fixed square rather than aspect-ratio: WebKitGTK ignores both on
      <button>, which left the glyph on the first line box at the top-left of the tile. */
@@ -33,29 +35,59 @@
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  border-color: var(--color-border);
-  font-size: var(--font-size-xs);
+  border: 0;
+  border-radius: var(--radius-md);
   line-height: 1;
 }
 
-/* About 70 % of the tile. Plugin icons are 128 px PNGs, so this always scales down and stays sharp
-   on high-DPI screens. Block display drops the inline baseline gap that pushed the image upwards. */
-.pstrip-icon-img {
+/* Plugin icons are 128 px PNGs, so this always scales down and stays sharp on high-DPI screens.
+   Block display drops the inline baseline gap that pushed the image upwards. */
+.pstrip-icon-img,
+span.plugin-tile.pstrip-tile {
   display: block;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+}
+
+.pstrip-icon-img {
   object-fit: contain;
 }
 
-.pstrip-icon[aria-pressed="true"] {
-  background: var(--color-bg-selected);
-  border-color: var(--color-accent, var(--color-border));
+span.plugin-tile.pstrip-tile {
+  display: inline-grid;
+  font-size: var(--font-size-sm);
 }
 
-.pstrip-icon:focus-visible,
+.pstrip-icon:hover {
+  box-shadow: 0 0 0 4px var(--color-bg-hover);
+}
+
+.pstrip-icon:hover .pstrip-icon-img,
+.pstrip-icon:hover .pstrip-tile {
+  filter: brightness(1.12);
+}
+
+.pstrip-icon[aria-pressed="true"] {
+  box-shadow:
+    0 0 0 2px var(--color-bg-sidebar),
+    0 0 0 4px var(--color-accent);
+}
+
+.pstrip-icon:focus-visible {
+  outline: 2px solid var(--color-focus, var(--color-accent));
+  outline-offset: 2px;
+}
+
 .pstrip-expand:focus-visible {
   outline: 2px solid var(--color-focus, var(--color-accent));
   outline-offset: 1px;
+}
+
+@media (forced-colors: active) {
+  .pstrip-icon[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+  }
 }
 
 .pstrip-panel,
