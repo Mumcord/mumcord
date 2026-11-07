@@ -419,12 +419,12 @@ describe("MessageList replies", () => {
   describe("link menu", () => {
     const LINK = '<a href="https://example.test/page">site</a>';
 
-    function renderLinks() {
+    function renderLinks(body: string = LINK, linkPreviews = false) {
       const onReply = vi.fn();
       render(
         <MessageList
           log={{
-            messages: [message("1", "Maya", 30, LINK), message("2", "Jonas", 29, "plain")],
+            messages: [message("1", "Maya", 30, body), message("2", "Jonas", 29, "plain")],
             loaded: true,
             loading: false,
             hasMore: false,
@@ -436,6 +436,7 @@ describe("MessageList replies", () => {
           label="Messages in #Lobby"
           onLoadOlder={() => undefined}
           onReply={onReply}
+          linkPreviews={linkPreviews}
         />,
       );
     }
@@ -452,6 +453,17 @@ describe("MessageList replies", () => {
       fireEvent.click(screen.getByRole("menuitem", { name: "Copy link" }));
       expect(writeText).toHaveBeenCalledWith("https://example.test/page");
       expect(await screen.findByText("Link copied")).toBeTruthy();
+    });
+
+    // Issue #419: the player cannot copy from the page it runs in, so the card carries the link.
+    it("copies the card link, canonical for a video embed", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+      renderLinks('<a href="https://youtu.be/dQw4w9WgXcQ?si=abc">video</a>', true);
+      const card = await screen.findByRole("article");
+      fireEvent.contextMenu(card, { clientX: 10, clientY: 10 });
+      fireEvent.click(screen.getByRole("menuitem", { name: "Copy link" }));
+      expect(writeText).toHaveBeenCalledWith("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
     });
 
     it("opens the link through the safe path", () => {

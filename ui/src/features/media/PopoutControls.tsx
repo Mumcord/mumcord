@@ -33,7 +33,7 @@ export function PopoutButtons({
     return (
       <button
         type="button"
-        className="button media-frame__icon"
+        className="button media-overlay__icon"
         aria-label={t("media.popOut")}
         data-tooltip={t("media.popOut")}
         onClick={() => {
@@ -48,7 +48,7 @@ export function PopoutButtons({
     <>
       <button
         type="button"
-        className="button media-frame__icon"
+        className="button media-overlay__icon"
         aria-label={t("media.onTop")}
         data-tooltip={t("media.onTop")}
         aria-pressed={onTop}
@@ -60,7 +60,7 @@ export function PopoutButtons({
       </button>
       <button
         type="button"
-        className="button media-frame__icon"
+        className="button media-overlay__icon"
         aria-label={t("media.popIn")}
         data-tooltip={t("media.popIn")}
         aria-keyshortcuts="Control+W"

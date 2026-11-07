@@ -81,7 +81,7 @@ function Icon({
   return (
     <button
       type="button"
-      className="button media-frame__icon"
+      className="button media-overlay__icon"
       aria-label={label}
       data-tooltip={label}
       disabled={disabled}
@@ -256,7 +256,7 @@ export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }
             <PlayPause
               serverId={serverId}
               live={live}
-              className="button media-frame__icon media-frame__icon--main"
+              className="button media-overlay__icon media-overlay__icon--main"
             />
             <Icon
               label={tc("media.next")}

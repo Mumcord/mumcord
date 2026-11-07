@@ -129,6 +129,9 @@ describe("plugins: websites and net.http (AC-9.7 … AC-9.10)", function () {
 
   before(async function () {
     this.timeout(20 * 60_000);
+    // Bound first: the fixtures and registries below take free ports from the same range, and the
+    // dev plugin's port is fixed by its manifest, so it cannot move out of the way.
+    devServer = await startDevServer();
     await testenv.up("v15");
     // test-surface 1.1.1 (one more website) is for the update gate (AC-9.36). Holding it back
     // makes the install pick 1.1.0 (FR-9.16), so AC-9.8 sees exactly the one declared website.
@@ -235,7 +238,6 @@ describe("plugins: websites and net.http (AC-9.7 … AC-9.10)", function () {
   });
 
   it("AC-9.10: an unpacked developer plugin reaches http://localhost in Developer mode", async () => {
-    devServer = await startDevServer();
     devFolder = await unpackDevPlugin();
     const id = await browser.execute((folder: string) => {
       const w = window as unknown as {

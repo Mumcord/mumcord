@@ -12,4 +12,5 @@ export { videoIdOfLink } from "./youtube";
 export { WatchLinkDialog } from "./WatchLinkDialog";
 export { parseBridgeReport, playerOrigin, type BridgeCommand } from "./playerBridge";
 export { CodecHint } from "./CodecHint";
-export { isTwitchPlayer, type PlaybackFailure } from "./codecSupport";
+export { isTwitchPlayer, twitchNeedsBrowser, type PlaybackFailure } from "./codecSupport";
+export { useLinux } from "./useLinux";

@@ -1,0 +1,120 @@
+/*
+ * The media overlay, the look every Mumcord picture shares (issue #163): a dark picture, a controls
+ * bar that lies on it and fades in on hover, keyboard focus or pause, and the same icon buttons on
+ * it. The watch party, the screen share, the pop-out windows and a chat card's player all use these
+ * classes, so they cannot drift apart (issue #419).
+ */
+
+/* The overlay's colours are the app's documented exception to the theme tokens: the picture looks the
+   same in every theme, so its scrim and the text on it stay dark and light everywhere too. */
+:root {
+  --media-scrim: rgb(8 6 20 / 78%);
+  --media-on-scrim: #fff;
+  --media-on-scrim-muted: rgb(255 255 255 / 72%);
+  --media-on-scrim-faint: rgb(255 255 255 / 30%);
+  --media-hover: rgb(255 255 255 / 14%);
+  --media-ink: rgb(8 6 20);
+  --media-glass: rgb(16 12 36 / 62%);
+  --media-glass-border: rgb(255 255 255 / 16%);
+}
+
+.media-overlay {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  color: var(--media-on-scrim);
+}
+
+/* The bars lie on the picture: the top says what is playing, the bottom carries the controls. They
+   fade in on hover, keyboard focus or pause. */
+.media-overlay__top,
+.media-overlay__bar {
+  position: absolute;
+  inset-inline: 0;
+  display: flex;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.media-overlay__top {
+  top: 0;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  background: linear-gradient(to bottom, var(--media-scrim), transparent);
+}
+
+.media-overlay__bar {
+  bottom: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4) var(--space-3);
+  background: linear-gradient(to top, var(--media-scrim), transparent);
+}
+
+.media-overlay:hover .media-overlay__top,
+.media-overlay:hover .media-overlay__bar,
+.media-overlay:focus-within .media-overlay__top,
+.media-overlay:focus-within .media-overlay__bar,
+.media-overlay[data-paused] .media-overlay__top,
+.media-overlay[data-paused] .media-overlay__bar {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-overlay__top,
+  .media-overlay__bar {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+.media-overlay__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Ordinary buttons on a picture keep their theme surface, so they need the theme's text colour back
+   instead of the light text the overlay passes down. */
+.media-overlay .button:not(.media-overlay__icon) {
+  color: var(--color-text);
+}
+
+/* Icon buttons on the picture: no frame until hovered, the usual focus ring for the keyboard.
+   Doubled class: they have to win over the app-wide `.button`. Grid rather than flex, because
+   WebKitGTK gives an svg flex item no width of its own and the icon collapses to zero. */
+.button.media-overlay__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--media-on-scrim);
+  cursor: pointer;
+  /* A card lets clicks through its scrim to the player underneath, so its buttons have to catch
+     the click themselves (chat.css). */
+  pointer-events: auto;
+}
+
+.button.media-overlay__icon:hover:not(:disabled) {
+  background: var(--media-hover);
+}
+
+.button.media-overlay__icon:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* The main play button stands out from the others on the picture. */
+.button.media-overlay__icon--main {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--media-glass-border);
+  background: rgb(255 255 255 / 12%);
+}

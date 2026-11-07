@@ -116,6 +116,7 @@
       "show": "Podcast"
     },
     "inBrowser": "Wird im Browser abgespielt",
+    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
     "card": "Linkvorschau: {{title}}",
     "dismiss": "Vorschau ausblenden"
   },

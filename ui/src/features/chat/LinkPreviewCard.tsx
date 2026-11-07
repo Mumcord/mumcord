@@ -6,7 +6,7 @@
  * rendered as such; images are `data:` URLs from the engine, so the webview never contacts the
  * linked site.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { LinkPreview, VideoEmbed } from "../../api";
 import { dismissPreview, useDismissedPreviews } from "./dismissedPreviews";
@@ -25,13 +25,18 @@ import { credentialLinks, mumbleLinks } from "./mumbleLink";
 
 import { MumbleLinkCard } from "./MumbleLinkCard";
 import { openInBrowser } from "./openLink";
-import { DismissButton, OpenButton } from "./cardButtons";
+import { canonicalVideoUrl } from "./videoLink";
+import { ControlButton, DismissButton, OpenButton } from "./cardButtons";
 import { EmbedHiddenHint } from "./EmbedHiddenHint";
 import { hiddenEmbedKind } from "./embedHint";
 import { InlineImageCard } from "./InlineImageCard";
 import { AudioCard } from "./AudioCard";
 import { MusicCard } from "./MusicCard";
 import { useExclusivePlayback } from "./playback";
+import { useFullscreen } from "../media/useFullscreen";
+import { twitchNeedsBrowser } from "../watchparty";
+import { appPageIsWebPage } from "./embedWindow";
+import "../media/mediaOverlay.css";
 import { PagePlayer } from "./PagePlayer";
 import { WatchTogetherButton } from "../watchparty";
 
@@ -51,6 +56,8 @@ interface LinkPreviewsProps {
   tabIndex: number;
   /** Click on an inline image; without it the image opens in the browser. */
   onImageClick?: ImageClickHandler | undefined;
+  /** The message's copy path, so "Link copied" shows in the chat's live region (issue #419). */
+  onCopy: (text: string) => void;
 }
 
 /**
@@ -65,6 +72,7 @@ export function LinkPreviews({
   linkPreviews,
   tabIndex,
   onImageClick,
+  onCopy,
 }: LinkPreviewsProps) {
   const links = useMemo(() => previewableLinks(html), [html]);
   const images = useMemo(() => externalImages(body), [body]);
@@ -120,6 +128,7 @@ export function LinkPreviews({
             messageId={messageId}
             tabIndex={tabIndex}
             onImageClick={onImageClick}
+            onCopy={onCopy}
           />
         ),
       )}
@@ -132,9 +141,10 @@ interface CardProps {
   messageId: string;
   tabIndex: number;
   onImageClick: ImageClickHandler | undefined;
+  onCopy: (text: string) => void;
 }
 
-function LinkPreviewCard({ url, messageId, tabIndex, onImageClick }: CardProps) {
+function LinkPreviewCard({ url, messageId, tabIndex, onImageClick, onCopy }: CardProps) {
   const [preview, setPreview] = useState<LinkPreview | null>(null);
   useEffect(() => {
     let active = true;
@@ -167,7 +177,13 @@ function LinkPreviewCard({ url, messageId, tabIndex, onImageClick }: CardProps) 
     );
   }
   return preview.video ? (
-    <VideoCard preview={preview} video={preview.video} tabIndex={tabIndex} onDismiss={dismiss} />
+    <VideoCard
+      preview={preview}
+      video={preview.video}
+      tabIndex={tabIndex}
+      onDismiss={dismiss}
+      onCopy={onCopy}
+    />
   ) : (
     <PageCard preview={preview} tabIndex={tabIndex} onDismiss={dismiss} />
   );
@@ -209,57 +225,120 @@ interface VideoCardProps {
   video: VideoEmbed;
   tabIndex: number;
   onDismiss: () => void;
+  onCopy: (text: string) => void;
 }
 
-function VideoCard({ preview, video, tabIndex, onDismiss }: VideoCardProps) {
+function VideoCard({ preview, video, tabIndex, onDismiss, onCopy }: VideoCardProps) {
   const { t } = useTranslation("chat");
+  const { t: tc } = useTranslation("common");
   const [playing, setPlaying] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  const { fullscreen, toggle } = useFullscreen(box);
   const stop = useCallback(() => {
     setPlaying(false);
   }, []);
   useExclusivePlayback(playing, stop);
   const player = cardPlayer(video);
+  // Twitch's player refuses to run under the app's own page unless it is a website (`tauri://` on
+  // Linux and macOS), so its card stays a picture and Play hands the stream to the browser instead
+  // of showing a box that stays black (#419).
+  const inBrowser = twitchNeedsBrowser(video.playerUrl, appPageIsWebPage());
+  const embedded = player !== null && !inBrowser;
   const site = preview.siteName ?? SITE_NAMES[video.site];
   const title = preview.title ?? t("preview.videoTitle", { site });
   const thumbnail = safeImage(preview.image);
+  const copy = () => {
+    onCopy(canonicalVideoUrl(preview.url));
+  };
+  const open = () => {
+    openInBrowser(preview.url);
+  };
+  const start = () => {
+    if (!embedded) open();
+    else setPlaying(true);
+  };
+  // The controls are the watch party's media overlay (issue #163): they lie on the picture and fade
+  // in on hover or keyboard focus, and the card counts as paused until it plays, so before the first
+  // click the bar stays visible. The bar is inside the element that goes full screen, so a click can
+  // leave it again (issue #419); Escape does the same.
+  const controls = (
+    <div className="media-overlay__bar">
+      <div
+        className="media-overlay__controls"
+        role="toolbar"
+        aria-label={tc("media.controls")}
+        onKeyDown={(event) => {
+          // F toggles full screen while the toolbar has the focus.
+          if (event.key === "f" || event.key === "F") {
+            event.preventDefault();
+            toggle();
+          }
+        }}
+      >
+        {playing && embedded ? (
+          <ControlButton
+            label={fullscreen ? tc("media.exitFullscreen") : tc("media.fullscreen")}
+            icon={fullscreen ? "exitFullscreen" : "fullscreen"}
+            onClick={toggle}
+            tabIndex={tabIndex}
+            pressed={fullscreen}
+            keyShortcuts="F"
+          />
+        ) : (
+          <ControlButton
+            label={t("preview.play", { title })}
+            icon="play"
+            main
+            tooltip={embedded ? undefined : t("preview.inBrowser")}
+            onClick={start}
+            tabIndex={tabIndex}
+          />
+        )}
+        <ControlButton label={t("linkMenu.copy")} icon="link" onClick={copy} tabIndex={tabIndex} />
+        <ControlButton
+          label={t("preview.openLabel", { title })}
+          icon="open"
+          onClick={open}
+          tabIndex={tabIndex}
+        />
+      </div>
+    </div>
+  );
   return (
-    <article className="link-card link-card--video" aria-label={t("preview.card", { title })}>
+    <article
+      className="link-card link-card--video"
+      data-link-url={preview.url}
+      aria-label={t("preview.card", { title })}
+    >
       <div className="link-card__text">
         <p className="link-card__site">{site}</p>
         <p className="link-card__title">{title}</p>
         {video.channel !== null && <p className="link-card__description">{video.channel}</p>}
       </div>
-      {playing && player !== null ? (
-        <PagePlayer
-          playerUrl={player.url}
-          title={t("preview.player", { title })}
-          onFailed={() => {
-            setPlaying(false);
-            openInBrowser(preview.url);
-          }}
-        />
-      ) : (
-        <button
-          type="button"
-          className="link-card__play"
-          tabIndex={tabIndex}
-          aria-label={t("preview.play", { title })}
-          data-tooltip={player === null ? t("preview.inBrowser") : undefined}
-          onClick={() => {
-            if (player === null) openInBrowser(preview.url);
-            else setPlaying(true);
-          }}
-        >
-          {thumbnail !== null && <img className="link-card__thumbnail" src={thumbnail} alt="" />}
-          <span className="link-card__play-icon" aria-hidden="true">
-            ▶
-          </span>
-        </button>
-      )}
+      <div
+        className="link-card__player-box media-overlay"
+        ref={box}
+        data-paused={!playing || undefined}
+        data-fullscreen={fullscreen || undefined}
+      >
+        {playing && embedded ? (
+          <PagePlayer
+            playerUrl={player.url}
+            title={t("preview.player", { title })}
+            onFailed={() => {
+              setPlaying(false);
+              openInBrowser(preview.url);
+            }}
+          />
+        ) : (
+          thumbnail !== null && <img className="link-card__thumbnail" src={thumbnail} alt="" />
+        )}
+        {controls}
+      </div>
+      {inBrowser && <p className="link-card__browser-hint">{t("preview.inBrowserOnly")}</p>}
       {video.site === "youtube" && (
         <WatchTogetherButton playerUrl={video.playerUrl} title={title} tabIndex={tabIndex} />
       )}
-      <OpenButton url={preview.url} title={title} tabIndex={tabIndex} />
       <DismissButton onDismiss={onDismiss} tabIndex={tabIndex} />
     </article>
   );

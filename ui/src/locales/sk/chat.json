@@ -124,6 +124,7 @@
       "show": "Relácia"
     },
     "inBrowser": "Prehrá sa v tvojom prehliadači",
+    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
     "card": "Náhľad odkazu: {{title}}",
     "dismiss": "Skryť náhľad"
   },
