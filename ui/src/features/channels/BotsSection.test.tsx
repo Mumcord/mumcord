@@ -46,7 +46,7 @@ function addBots() {
   });
 }
 
-async function renderPanel() {
+async function renderPanel({ expanded = true } = {}) {
   api = await connectedMock({ bindStore: true });
   const view = render(
     <>
@@ -56,22 +56,35 @@ async function renderPanel() {
   );
   await screen.findByRole("tree", { name: "Channels" });
   addBots();
+  if (expanded) expand();
   return view;
 }
 
 const section = () => screen.getByRole("region", { name: /Bots on this server/ });
+const toggle = () => screen.getByRole("button", { name: /^Bots on this server \(\d+\)$/ });
+
+/** The section starts collapsed; the open state is remembered, so expand only when needed. */
+function expand() {
+  if (toggle().getAttribute("aria-expanded") === "false") fireEvent.click(toggle());
+}
 const botButton = (name: RegExp) => within(section()).getByRole("button", { name });
 
 beforeEach(stubDialog);
 afterEach(resetAll);
 
 describe("BotsSection", () => {
-  it("lists every bot with what it does, the tester not", async () => {
-    await renderPanel();
+  it("starts collapsed, with the number of bots in the heading", async () => {
+    localStorage.removeItem("mumcord.section.open.server-bots");
+    await renderPanel({ expanded: false });
     expect(screen.getByRole("button", { name: "Bots on this server (2)" })).toHaveAttribute(
       "aria-expanded",
-      "true",
+      "false",
     );
+    expect(within(section()).queryByRole("button", { name: /DJ Byte/ })).toBeNull();
+  });
+
+  it("lists every bot with what it does, the tester not", async () => {
+    await renderPanel();
     expect(botButton(/^Night Owls Relay Bot, Relay · Chat history · Webhooks$/)).toBeVisible();
     expect(botButton(/^DJ Byte Bot, Plays music · in Lobby$/)).toBeVisible();
     expect(within(section()).queryByRole("button", { name: /Testy/ })).toBeNull();
@@ -95,12 +108,11 @@ describe("BotsSection", () => {
 
   it("collapses and expands like the member sections", async () => {
     await renderPanel();
-    const toggle = screen.getByRole("button", { name: "Bots on this server (2)" });
-    fireEvent.click(toggle);
-    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle());
+    expect(toggle()).toHaveAttribute("aria-expanded", "false");
     expect(within(section()).queryByRole("button", { name: /DJ Byte/ })).toBeNull();
-    fireEvent.click(toggle);
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(toggle());
+    expect(toggle()).toHaveAttribute("aria-expanded", "true");
   });
 
   it("moves focus with the arrow keys behind one Tab stop", async () => {

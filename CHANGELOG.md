@@ -4,6 +4,12 @@
 
 ### Changed
 
+- "Bots on this server" starts collapsed; once you open or close it, Mumcord remembers that
+- Plugins strip: plugin icons have no frame anymore; a plugin's own image or its colour tile is the whole icon, with a ring on hover, focus and when open
+
+### Fixed
+
+- "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
 
 ## [0.7.1] - 2026-11-07

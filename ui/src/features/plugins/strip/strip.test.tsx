@@ -126,17 +126,18 @@ describe("PluginStrip", () => {
     expect(screen.queryByText("poll panel")).toBeNull();
   });
 
-  it("renders the plugin icon as a sized, centred image and falls back to initials", async () => {
+  it("renders the plugin icon as a sized image and falls back to the gradient tile", async () => {
     setup([plugin("pets", "Pets"), plugin("poll", "Poll")], ["pets", "poll"]);
     render(<PluginStrip />);
     const pets = await screen.findByRole("button", { name: "Pets" });
     const img = pets.querySelector("img");
     expect(img).toHaveClass("pstrip-icon-img");
-    expect(img).toHaveAttribute("width", "28");
-    expect(img).toHaveAttribute("height", "28");
+    expect(img).toHaveAttribute("width", "36");
+    expect(img).toHaveAttribute("height", "36");
     const poll = screen.getByRole("button", { name: "Poll" });
     expect(poll.querySelector("img")).toBeNull();
-    expect(poll).toHaveTextContent("PO");
+    expect(poll.querySelector(".plugin-tile")).toHaveClass("pstrip-tile");
+    expect(poll).toHaveTextContent("P");
   });
 
   it("moves between icons with the arrow keys", async () => {
