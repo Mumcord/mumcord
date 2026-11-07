@@ -2,11 +2,14 @@
  * One row of the feed (FR-11.11, §7, #594): the kind's icon, then two lines. Line one is the title
  * with the actor's name in bold, line two the muted meta — time, then the channel and the live marker — with the
  * action right-aligned. A row whose share, party or activity still exists, or a plugin event with
- * an action, is a button whose accessible name combines the action and the event; anything else is
- * a plain list item. The feed is not a live region (FR-11.15): rows simply appear in the list.
+ * an action, has an action button whose accessible name combines the action and the event, and a
+ * click anywhere on the row does the same. The person's name behaves as in the chat (#605): click
+ * for the profile preview and menu, double-click for a private message. The feed is not a live
+ * region (FR-11.15): rows simply appear in the list.
  */
 import type { TFunction } from "i18next";
 import { useT } from "../../i18n/useT";
+import { clickPerson, doubleClickPerson, ProfilePreviewTrigger } from "../members";
 import { ActivityIcon } from "./ActivityIcon";
 import type { ActivityEvent } from "./activityStore";
 
@@ -18,6 +21,46 @@ export interface ActivityRowProps {
   live: boolean;
   /** What a click on the row opens; nothing for a plain row. */
   onActivate: (() => void) | undefined;
+}
+
+/**
+ * The actor's name, as in the chat (#605): a button with the profile preview while the session is
+ * known, else the preview by name only. Events from before this connection only know the name,
+ * because their session may belong to someone else by now.
+ */
+function Actor({ event, text }: { event: ActivityEvent; text: string }) {
+  if (event.kind === "pluginEvent") {
+    return <strong className="activity-row__actor">{text}</strong>;
+  }
+  const session = event.earlier === true ? null : (event.session ?? null);
+  const name = event.name ?? undefined;
+  const named = name === undefined ? {} : { name };
+  if (session === null) {
+    return (
+      <ProfilePreviewTrigger session={null} {...named}>
+        <strong className="activity-row__actor">{text}</strong>
+      </ProfilePreviewTrigger>
+    );
+  }
+  return (
+    <ProfilePreviewTrigger session={session} {...named}>
+      <button
+        type="button"
+        className="activity-row__actor activity-row__actor--button"
+        onClick={(clicked) => {
+          // The name opens the person, not the row's action.
+          clicked.stopPropagation();
+          clickPerson(clicked.detail, session, clicked.currentTarget, name);
+        }}
+        onDoubleClick={(clicked) => {
+          clicked.stopPropagation();
+          doubleClickPerson(session, name);
+        }}
+      >
+        {text}
+      </button>
+    </ProfilePreviewTrigger>
+  );
 }
 
 /** Line one's bold part: the actor, "You" for the own session, or the plugin id. */
@@ -84,7 +127,7 @@ export function ActivityRow({ event, time, live, onActivate }: ActivityRowProps)
   const icon = <ActivityIcon event={event} ended={ended} />;
   const title = (
     <span className="activity-row__title">
-      <strong className="activity-row__actor">{actor(event, t)}</strong>{" "}
+      <Actor event={event} text={actor(event, t)} />{" "}
       <span className={event.kind === "pluginEvent" ? "activity-row__text" : undefined}>
         {verb(event, t)}
       </span>
@@ -96,10 +139,18 @@ export function ActivityRow({ event, time, live, onActivate }: ActivityRowProps)
       {channelText !== null && <span>{`· ${channelText}`}</span>}
       {live && <span className="activity-row__live">{`· ${t("live")}`}</span>}
       {actionText !== null && (
-        <span className="activity-row__action">
+        <button
+          type="button"
+          className="activity-row__action"
+          aria-label={label(event, t, actionText)}
+          onClick={(clicked) => {
+            clicked.stopPropagation();
+            onActivate?.();
+          }}
+        >
           {actionText}
           <span aria-hidden="true">›</span>
-        </span>
+        </button>
       )}
     </span>
   );
@@ -115,23 +166,12 @@ export function ActivityRow({ event, time, live, onActivate }: ActivityRowProps)
   if (ended) className.push("activity-row--ended");
 
   return (
-    <li className={className.join(" ")}>
-      {actionText === null ? (
-        <>
-          {icon}
-          {body}
-        </>
-      ) : (
-        <button
-          type="button"
-          className="activity-row__button"
-          aria-label={label(event, t, actionText)}
-          onClick={onActivate}
-        >
-          {icon}
-          {body}
-        </button>
-      )}
+    // A click anywhere on an actionable row does what its action button does; keyboard users reach
+    // that button, so the row itself is not focusable.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+    <li className={className.join(" ")} onClick={actionText === null ? undefined : onActivate}>
+      {icon}
+      {body}
     </li>
   );
 }

@@ -177,6 +177,22 @@ describe("activity log", () => {
     expect(result.current).toEqual([]);
   });
 
+  it("makes no entries for bots joining, moving or leaving (#605)", async () => {
+    const { result } = renderHook(() => useActivityLog(SERVER));
+    await settle();
+    const bot = { ...person(77, "Mumbot", 1), bot: { voice: true, modules: ["music"] } };
+    act(() => {
+      api.mock.emit("userUpserted", { serverId: SERVER, user: bot });
+    });
+    act(() => {
+      api.mock.emit("userUpserted", { serverId: SERVER, user: { ...bot, channelId: 2 } });
+    });
+    act(() => {
+      api.mock.emit("userRemoved", { serverId: SERVER, session: 77 });
+    });
+    expect(result.current.map((event) => event.kind)).toEqual(["connected"]);
+  });
+
   it("derives connected, moved and disconnected from the people changes (FR-11.6)", async () => {
     const { result } = renderHook(() => useActivityLog(SERVER));
     await settle();

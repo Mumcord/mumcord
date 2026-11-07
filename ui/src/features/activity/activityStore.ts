@@ -24,6 +24,7 @@ import {
   type ServerChange,
   type ServerState,
 } from "../channels/serverStore";
+import { isBot } from "../channels/mumcord";
 import {
   activitiesLoaded,
   stageActivities,
@@ -67,32 +68,40 @@ interface EventBase {
 }
 
 /**
+ * The person an event is about. `session` lets the feed open the same profile preview and menu as
+ * the chat (#605); it is missing in history saved before it was recorded.
+ */
+interface PersonBase {
+  name: string | null;
+  self: boolean;
+  session?: number | null;
+}
+
+/**
  * One event of the feed (FR-11.6). `name` is the actor's display name as it was known at event
  * time, `null` when the person is not in the state any more, and `self` marks the user's own
  * session so the text is localized as "You …" (T6).
  */
 export type ActivityEvent =
-  | (EventBase & { kind: "connected" | "disconnected"; name: string | null; self: boolean })
-  | (EventBase & { kind: "moved"; name: string | null; self: boolean; channelName: string | null })
-  | (EventBase & {
-      kind: "screenShare" | "watchParty";
-      name: string | null;
-      self: boolean;
-      /** `true` for "started", `false` for "stopped". */
-      started: boolean;
-      channelName: string | null;
-      live: LiveReference;
-    })
-  | (EventBase & {
-      kind: "pluginActivity";
-      name: string | null;
-      self: boolean;
-      started: boolean;
-      /** Held with the event: the stage's activity object is gone once it stops. */
-      pluginName: string;
-      channelName: string | null;
-      live: LiveReference;
-    })
+  | (EventBase & PersonBase & { kind: "connected" | "disconnected" })
+  | (EventBase & PersonBase & { kind: "moved"; channelName: string | null })
+  | (EventBase &
+      PersonBase & {
+        kind: "screenShare" | "watchParty";
+        /** `true` for "started", `false` for "stopped". */
+        started: boolean;
+        channelName: string | null;
+        live: LiveReference;
+      })
+  | (EventBase &
+      PersonBase & {
+        kind: "pluginActivity";
+        started: boolean;
+        /** Held with the event: the stage's activity object is gone once it stops. */
+        pluginName: string;
+        channelName: string | null;
+        live: LiveReference;
+      })
   | (EventBase & { kind: "pluginEvent"; plugin: PluginEventInfo });
 
 /**
@@ -193,13 +202,26 @@ function isSelf(state: ServerState, session: number | null): boolean {
 function record(
   serverId: number,
   kind: "screenShare" | "watchParty",
+  session: number | null,
   name: string | null,
   self: boolean,
   channelName: string | null,
   started: boolean,
   live: LiveReference,
 ): void {
-  add(serverId, { serverId, at: Date.now(), kind, name, self, channelName, started, live });
+  // Bots make no activity entries (#605).
+  if (session !== null && isBot(getServerStateOf(serverId).users.get(session))) return;
+  add(serverId, {
+    serverId,
+    at: Date.now(),
+    kind,
+    session,
+    name,
+    self,
+    channelName,
+    started,
+    live,
+  });
 }
 
 /**
@@ -265,16 +287,26 @@ function diffShares(serverId: number, baseline: Baseline): void {
   for (const share of sharesOf(serverId)) now.set(share.session, nameOf(state, share.session));
   for (const [session, name] of now) {
     if (baseline.shares.has(session)) continue;
-    record(serverId, "screenShare", name, isSelf(state, session), voiceChannelName(state), true, {
-      kind: "screenShare",
+    record(
+      serverId,
+      "screenShare",
       session,
-    });
+      name,
+      isSelf(state, session),
+      voiceChannelName(state),
+      true,
+      {
+        kind: "screenShare",
+        session,
+      },
+    );
   }
   for (const [session, remembered] of baseline.shares) {
     if (now.has(session)) continue;
     record(
       serverId,
       "screenShare",
+      session,
       nameOf(state, session) ?? remembered,
       isSelf(state, session),
       voiceChannelName(state),
@@ -297,6 +329,7 @@ function diffParty(serverId: number, baseline: Baseline): void {
   record(
     serverId,
     "watchParty",
+    person,
     nameOf(state, person),
     isSelf(state, person),
     live === null ? voiceChannelName(state) : channelNameOf(state, live.party.channelId),
@@ -348,6 +381,7 @@ function recordStage(
     serverId,
     at: Date.now(),
     kind: "pluginActivity",
+    session: activity.starter,
     name: nameOf(state, activity.starter) ?? activity.starterName,
     self: isSelf(state, activity.starter),
     // The feed shows the plugin's name even after its activity left the stage (FR-11.11).
@@ -381,6 +415,7 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
         serverId,
         at: Date.now(),
         kind: "connected",
+        session: state.selfSession,
         name: nameOf(state, state.selfSession),
         self: true,
       });
@@ -388,6 +423,8 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
       break;
     }
     case "userUpserted": {
+      // Bots make no activity entries (#605); what a plugin pushes through one stays.
+      if (isBot(change.user)) break;
       if (change.previous === undefined) {
         // The own session is the "You connected" entry of this connection.
         if (isSelf(state, change.user.session)) break;
@@ -395,6 +432,7 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
           serverId,
           at: Date.now(),
           kind: "connected",
+          session: change.user.session,
           name: change.user.name,
           self: false,
         });
@@ -403,6 +441,7 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
           serverId,
           at: Date.now(),
           kind: "moved",
+          session: change.user.session,
           name: change.user.name,
           self: isSelf(state, change.user.session),
           channelName: channelNameOf(state, change.user.channelId),
@@ -411,10 +450,12 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
       break;
     }
     case "userRemoved": {
+      if (isBot(change.user)) break;
       add(serverId, {
         serverId,
         at: Date.now(),
         kind: "disconnected",
+        session: change.user.session,
         name: change.user.name,
         self: isSelf(state, change.user.session),
       });
