@@ -229,6 +229,25 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
     };
   }, []);
 
+  // The channel was deleted while the window was open (FR-10.43).
+  if (mode.kind === "edit" && channel === undefined) {
+    return (
+      <Dialog
+        role="alertdialog"
+        className="channel-confirm"
+        title={t("channel.goneTitle")}
+        onClose={onClose}
+      >
+        <p>{t("channel.goneBody")}</p>
+        <div className="servers-dialog__actions">
+          <button type="button" className="button button--primary" onClick={onClose}>
+            {t("channel.close")}
+          </button>
+        </div>
+      </Dialog>
+    );
+  }
+
   if (confirmRules !== null) {
     const lost = confirmRules.lost
       .map((bit) => nameOfBit(bit))

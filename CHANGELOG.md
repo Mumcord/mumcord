@@ -4,6 +4,8 @@
 
 ### Added
 
+- Channel password: the channel window's Password tab sets or clears the password for joining a channel, written the same way as the official Mumble client; channels with more complex access rules point to Permissions instead
+- Channel permissions: the channel window's Permissions tab shows who can do what in the channel (✓, ✗ or ? per group and person), lets admins edit its rules and groups, and explains any answer in a "Why?" panel. Mumcord warns before you would lock yourself out, asks before changing the whole server's rules, and never overwrites a change someone else made meanwhile
 - Channel management for admins: the channel menu's "Admin ▸" can create a sub-channel or a temporary channel, edit a channel (name, description with bold, italic, underline and links, parent, position, user limit) and its links, link it with your channel, unlink all, and delete it after a confirmation that names the sub-channels and people affected. F2 edits and Delete deletes the selected channel. Only what the server allows is shown, and a refusal shows the server's reason
 - Menus can open sub-menus: admin actions in the server ⋯ menu now sit under "Admin ▸" ("Ban list…" for now), shown only when you have a right in it, with red actions last behind a divider. → opens a sub-menu, ← or Escape goes back
 - When a server's relay changes, Mumcord says so in the notification centre and as a notification (in-app or system), with "Trust new relay" and "Details"; the details compare the old and new fingerprint and say when to trust it. The chat's file sharing hint names the changed relay and links there instead of saying there is no relay
