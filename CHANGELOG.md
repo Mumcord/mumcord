@@ -17,7 +17,7 @@
 - Cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when PipeWire leaves the row length unset or fills only the first picture plane
 - Camera preview: the built-in background images now show right away when you choose Image, instead of leaving the tiles empty for a moment every time the preview opens
 
-## [0.7.0] - Unreleased
+## [0.7.0] - 2026-11-06
 
 ### Added
 
@@ -615,6 +615,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.7.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.0
 [0.6.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.2
 [0.6.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.1
 [0.6.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.0

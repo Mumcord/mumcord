@@ -4076,7 +4076,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "ashpd",
  "base64 0.23.1",
@@ -4093,7 +4093,7 @@ dependencies = [
  "mumcord-engine",
  "mumcord-overlay-ipc",
  "mumcord-plugins",
- "mumcord-protocol 0.7.0-dev",
+ "mumcord-protocol 0.7.0",
  "notify-rust",
  "objc2",
  "open",
@@ -4126,14 +4126,14 @@ dependencies = [
 
 [[package]]
 name = "mumcord-audio"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "audio_thread_priority",
  "cpal",
  "futures",
  "hound",
  "libc",
- "mumcord-codec 0.7.0-dev",
+ "mumcord-codec 0.7.0",
  "pulseaudio",
  "rtrb",
  "rubato",
@@ -4143,7 +4143,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-camera"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "ashpd",
  "block2",
@@ -4181,7 +4181,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-codec"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "hound",
  "nnnoiseless",
@@ -4194,7 +4194,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-effects"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "image",
  "mumcord-camera",
@@ -4208,7 +4208,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-engine"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "ammonia",
  "anyhow",
@@ -4230,10 +4230,10 @@ dependencies = [
  "mumcord-audio",
  "mumcord-camera",
  "mumcord-effects",
- "mumcord-p2p 0.7.0-dev",
+ "mumcord-p2p 0.7.0",
  "mumcord-positional",
  "mumcord-protocol 0.5.0",
- "mumcord-protocol 0.7.0-dev",
+ "mumcord-protocol 0.7.0",
  "mumcord-screenshare",
  "mumcord-store",
  "netsim",
@@ -4284,7 +4284,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-overlay-ipc"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "ab_glyph",
  "libc",
@@ -4292,7 +4292,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-overlay-layer"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "ash",
  "libc",
@@ -4325,12 +4325,12 @@ dependencies = [
 
 [[package]]
 name = "mumcord-p2p"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "bytes",
  "crab_nat",
  "igd-next",
- "mumcord-protocol 0.7.0-dev",
+ "mumcord-protocol 0.7.0",
  "mumcord-store",
  "netdev",
  "quinn",
@@ -4349,7 +4349,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-plugin"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -4372,7 +4372,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-plugin-sdk"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "bovnar",
  "serde",
@@ -4382,7 +4382,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-plugins"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "ammonia",
  "base64 0.23.1",
@@ -4422,7 +4422,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-positional"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "libc",
  "libloading 0.9.0",
@@ -4455,7 +4455,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-protocol"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "aes",
  "base64 0.23.1",
@@ -4476,7 +4476,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-screenshare"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "bindgen 0.72.1",
  "libloading 0.8.9",
@@ -4486,7 +4486,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-store"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "chrono",
  "image",
@@ -4605,7 +4605,7 @@ dependencies = [
 
 [[package]]
 name = "netsim"
-version = "0.7.0-dev"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "clap",
