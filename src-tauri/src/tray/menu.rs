@@ -393,7 +393,7 @@ mod tests {
                 },
                 Entry::Button {
                     action: Action::Settings,
-                    label: "Settings…".into(),
+                    label: "Settings".into(),
                     dot: None
                 },
                 Entry::Button {
