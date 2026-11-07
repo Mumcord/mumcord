@@ -139,11 +139,27 @@ function store(serverId: number, log: readonly ActivityEvent[]): void {
   notify();
 }
 
+/** Who hears about each new event (#597: activity notifications). */
+const addedListeners = new Set<(event: ActivityEvent) => void>();
+
 /** Newest first, so the feed renders the list as it gets it (FR-11.10, FR-11.8). */
 function add(serverId: number, event: ActivityEvent): void {
   const next = [event, ...current(serverId)];
   if (next.length > MAX_EVENTS) next.length = MAX_EVENTS;
   store(serverId, next);
+  for (const listener of addedListeners) listener(event);
+}
+
+/**
+ * Calls `listener` with every event recorded from now on (#597). Binds the log, so events are
+ * collected even while the feed is not shown.
+ */
+export function subscribeActivityAdded(listener: (event: ActivityEvent) => void): () => void {
+  ensureBound();
+  addedListeners.add(listener);
+  return () => {
+    addedListeners.delete(listener);
+  };
 }
 
 /** The end of a connection ends the diffing; its events stay in the log and in the history. */
@@ -479,6 +495,7 @@ export function resetActivityLogStore(): void {
   unsubscribers = [];
   boundApi = undefined;
   listeners.clear();
+  addedListeners.clear();
   logs = new Map();
   baselines = new Map();
 }

@@ -36,5 +36,9 @@
   "joinPartyFailed": "Could not join the watch party.",
   "joinActivityFailed": "Could not join the plugin activity.",
   "earlier": "Earlier",
-  "earlierLabel": "Earlier, from before this session"
+  "earlierLabel": "Earlier, from before this session",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} in #{{channel}}"
+  }
 }

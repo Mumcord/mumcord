@@ -449,7 +449,15 @@
     "inApp": "In-app: a small pop-up inside Mumcord while it is in front",
     "desktop": "Desktop: a system notification",
     "both": "Both: pop-up while Mumcord is in front, system notification otherwise",
-    "off": "Off"
+    "off": "Off",
+    "activityTitle": "Activity notifications",
+    "activity": {
+      "screenShare": "Someone starts a screen share",
+      "watchParty": "Someone starts a watch party",
+      "pluginActivity": "Someone starts a plugin activity",
+      "pluginEvent": "Plugin events",
+      "joins": "Someone connects, leaves or moves channel"
+    }
   },
   "overlay": {
     "corner": {
