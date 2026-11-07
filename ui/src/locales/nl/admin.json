@@ -114,5 +114,44 @@
   "quickFixed": "de server beslist beide",
   "noCertificate": "Deze persoon heeft geen certificaat, dus alleen zijn adres kan verbannen worden.",
   "certRegisteredHint": "de server vergelijkt het certificaat alleen van een geregistreerd persoon",
-  "ipAlwaysOnHint": "de server vergelijkt het adres, dus Mumcord houdt het altijd in de vermelding"
+  "ipAlwaysOnHint": "de server vergelijkt het adres, dus Mumcord houdt het altijd in de vermelding",
+  "denied": {
+    "title": "De server stond dit niet toe",
+    "titleOn": "{{server}} stond dit niet toe",
+    "permission": "Je hebt hier geen recht op.",
+    "unknown": "De server weigerde dit.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} in {{channel}}.",
+    "kind": {
+      "superUser": "Alleen de SuperUser van de server mag dit.",
+      "channelName": "Deze kanaalnaam is niet toegestaan.",
+      "textTooLong": "De tekst is langer dan de server toestaat.",
+      "temporaryChannel": "Dit kan niet in een tijdelijk kanaal.",
+      "missingCertificate": "Hiervoor is een clientcertificaat nodig.",
+      "userName": "Deze naam is niet toegestaan of al in gebruik.",
+      "channelFull": "Het kanaal is vol.",
+      "nestingLimit": "Kanalen kunnen hier niet dieper genest worden.",
+      "channelCountLimit": "De server heeft al zoveel kanalen als hij toestaat.",
+      "listenerLimit": "Er zijn al zoveel luisteraars als de server toestaat."
+    },
+    "right": {
+      "write": "Je mag de rechten niet wijzigen",
+      "traverse": "Je mag dit kanaal niet openen",
+      "enter": "Je mag niet binnengaan",
+      "speak": "Je mag niet spreken",
+      "muteDeafen": "Je mag niemand dempen of doof zetten",
+      "move": "Je mag niemand verplaatsen",
+      "makeChannel": "Je mag geen kanalen maken",
+      "linkChannel": "Je mag geen kanalen koppelen",
+      "whisper": "Je mag niet fluisteren",
+      "textMessage": "Je mag geen berichten schrijven",
+      "makeTempChannel": "Je mag geen tijdelijke kanalen maken",
+      "listen": "Je mag niet luisteren",
+      "kick": "Je mag niemand eruit zetten",
+      "ban": "Je mag niemand bannen",
+      "register": "Je mag niemand registreren",
+      "selfRegister": "Je mag je niet registreren",
+      "resetUserContent": "Je mag opmerkingen en avatars niet resetten"
+    }
+  }
 }

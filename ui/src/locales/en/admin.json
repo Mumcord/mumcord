@@ -114,5 +114,44 @@
   "quickFixed": "the server decides both",
   "noCertificate": "This person has no certificate, so only their address can be banned.",
   "certRegisteredHint": "the server compares the certificate only for a registered person",
-  "ipAlwaysOnHint": "the server matches the address, so Mumcord always keeps it on the entry"
+  "ipAlwaysOnHint": "the server matches the address, so Mumcord always keeps it on the entry",
+  "denied": {
+    "title": "The server did not allow this",
+    "titleOn": "{{server}} did not allow this",
+    "permission": "You don't have the right for this.",
+    "unknown": "The server refused this.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} in {{channel}}.",
+    "kind": {
+      "superUser": "Only the server's SuperUser can do this.",
+      "channelName": "This channel name is not allowed.",
+      "textTooLong": "The text is longer than the server allows.",
+      "temporaryChannel": "This isn't possible in a temporary channel.",
+      "missingCertificate": "This needs a client certificate.",
+      "userName": "This name is not allowed or already in use.",
+      "channelFull": "The channel is full.",
+      "nestingLimit": "Channels can't be nested any deeper here.",
+      "channelCountLimit": "The server has as many channels as it allows.",
+      "listenerLimit": "There are already as many listeners as the server allows."
+    },
+    "right": {
+      "write": "You may not change the permissions",
+      "traverse": "You may not open this channel",
+      "enter": "You may not join",
+      "speak": "You may not speak",
+      "muteDeafen": "You may not mute or deafen people",
+      "move": "You may not move people",
+      "makeChannel": "You may not create channels",
+      "linkChannel": "You may not link channels",
+      "whisper": "You may not whisper",
+      "textMessage": "You may not write messages",
+      "makeTempChannel": "You may not create temporary channels",
+      "listen": "You may not listen",
+      "kick": "You may not kick people",
+      "ban": "You may not ban people",
+      "register": "You may not register people",
+      "selfRegister": "You may not register yourself",
+      "resetUserContent": "You may not reset comments and avatars"
+    }
+  }
 }

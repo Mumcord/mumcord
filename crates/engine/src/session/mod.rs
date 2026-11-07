@@ -2475,8 +2475,22 @@ impl Inner {
                         Event::ServerConfigUpdated(info) => {
                             bitrate.set_server_max_bandwidth(info.max_bandwidth);
                         }
-                        Event::PermissionsUpdated { channel_id } => {
+                        Event::PermissionsUpdated { channel_id, flush } => {
                             permissions.add(*channel_id, tokio::time::Instant::now());
+                            // A flush (ACL or group change, a move, a registration) drops every
+                            // cached right: ask again for all channels, as after the sync (#248).
+                            if *flush {
+                                for id in handle
+                                    .with_state(|s| s.channels.keys().copied().collect::<Vec<_>>())
+                                {
+                                    if let Some(channel) = channel_id
+                                        && *channel == id
+                                    {
+                                        continue;
+                                    }
+                                    let _ = handle.query_permissions(id);
+                                }
+                            }
                         }
                         _ => {}
                     }
@@ -2736,8 +2750,18 @@ impl Inner {
         let server_id = ctx.server_id;
         match &event {
             Event::ChannelUpdated(channel) => {
-                let view = ctx.handle.with_state(|s| channel_view(s, channel));
+                let (view, unknown) = ctx.handle.with_state(|s| {
+                    (
+                        channel_view(s, channel),
+                        !s.permissions.contains_key(&channel.id),
+                    )
+                });
                 ctx.events.emit(EngineEvent::ChannelUpserted(view));
+                // A channel created after the sync has no known rights yet. Asking also makes the
+                // server include it when it later flushes the rights (#248).
+                if unknown {
+                    let _ = ctx.handle.query_permissions(channel.id);
+                }
             }
             Event::ChannelRemoved(channel) => {
                 ctx.events.emit(EngineEvent::ChannelRemoved(channel.id));
@@ -2862,23 +2886,35 @@ impl Inner {
             Event::PermissionDenied(denied) => {
                 // A refusal answers the open kick or ban dialog (issue #253, FR-10.59).
                 crate::admin::on_denied(&self.admin, ctx.server_id, denied);
+                let kick_or_ban = denied.session.is_some()
+                    && denied.permission.is_some_and(|bits| {
+                        bits & (mumcord_protocol::permissions::KICK
+                            | mumcord_protocol::permissions::BAN)
+                            != 0
+                    });
                 // A ban-list query is refused with the Ban permission (issue #254).
-                if denied.permission == Some(mumcord_protocol::permissions::BAN) {
+                let ban_list = denied.session.is_none()
+                    && denied.permission == Some(mumcord_protocol::permissions::BAN);
+                if ban_list {
                     crate::banlist::on_denied(
                         &self.ban_lists,
                         ctx.server_id,
                         convert::denial_error(denied),
                     );
                 }
+                let password = self.on_channel_denied(ctx, denied);
                 ctx.events.emit(EngineEvent::ServerDenied {
                     error: convert::denial_error(denied),
                     channel_id: denied.channel_id,
+                    kind: convert::denial_kind(denied),
+                    permission: denied.permission.and_then(convert::right_of),
+                    // Shown by the dialog that asked; the UI adds no second notice (#248).
+                    handled: kick_or_ban || ban_list || password,
                 });
-                self.on_channel_denied(ctx, denied);
             }
             // Collected by the session loop and emitted in batches (`emit_permissions`); history
             // sync needs each answer at once for its password check (issue #382).
-            Event::PermissionsUpdated { channel_id } => {
+            Event::PermissionsUpdated { channel_id, .. } => {
                 if let Some(channel_id) = channel_id {
                     crate::history_sync::on_permissions(&self.history_sync, ctx, *channel_id);
                 }

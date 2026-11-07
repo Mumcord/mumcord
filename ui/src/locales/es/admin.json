@@ -114,5 +114,44 @@
   "quickFixed": "el servidor decide ambos",
   "noCertificate": "Esta persona no tiene certificado, así que solo se puede banear su dirección.",
   "certRegisteredHint": "el servidor compara el certificado solo de una persona registrada",
-  "ipAlwaysOnHint": "el servidor compara la dirección, así que Mumcord siempre la mantiene en la entrada"
+  "ipAlwaysOnHint": "el servidor compara la dirección, así que Mumcord siempre la mantiene en la entrada",
+  "denied": {
+    "title": "El servidor no lo permitió",
+    "titleOn": "{{server}} no lo permitió",
+    "permission": "No tienes permiso para esto.",
+    "unknown": "El servidor lo rechazó.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} en {{channel}}.",
+    "kind": {
+      "superUser": "Solo el SuperUser del servidor puede hacer esto.",
+      "channelName": "Este nombre de canal no está permitido.",
+      "textTooLong": "El texto es más largo de lo que permite el servidor.",
+      "temporaryChannel": "No es posible en un canal temporal.",
+      "missingCertificate": "Hace falta un certificado de cliente.",
+      "userName": "Este nombre no está permitido o ya está en uso.",
+      "channelFull": "El canal está lleno.",
+      "nestingLimit": "Aquí no se pueden anidar más canales.",
+      "channelCountLimit": "El servidor tiene tantos canales como permite.",
+      "listenerLimit": "Ya hay tantos oyentes como permite el servidor."
+    },
+    "right": {
+      "write": "No puedes cambiar los permisos",
+      "traverse": "No puedes abrir este canal",
+      "enter": "No puedes entrar",
+      "speak": "No puedes hablar",
+      "muteDeafen": "No puedes silenciar ni ensordecer a nadie",
+      "move": "No puedes mover a nadie",
+      "makeChannel": "No puedes crear canales",
+      "linkChannel": "No puedes enlazar canales",
+      "whisper": "No puedes susurrar",
+      "textMessage": "No puedes escribir mensajes",
+      "makeTempChannel": "No puedes crear canales temporales",
+      "listen": "No puedes escuchar",
+      "kick": "No puedes expulsar a nadie",
+      "ban": "No puedes banear a nadie",
+      "register": "No puedes registrar a nadie",
+      "selfRegister": "No puedes registrarte",
+      "resetUserContent": "No puedes restablecer comentarios ni avatares"
+    }
+  }
 }

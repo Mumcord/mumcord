@@ -114,5 +114,44 @@
   "quickFixed": "server odlučuje o oba",
   "noCertificate": "Ova osoba nema certifikat, pa se može zabraniti samo njezina adresa.",
   "certRegisteredHint": "server uspoređuje certifikat samo kod registrirane osobe",
-  "ipAlwaysOnHint": "server uspoređuje adresu, pa Mumcord uvijek zadržava unos"
+  "ipAlwaysOnHint": "server uspoređuje adresu, pa Mumcord uvijek zadržava unos",
+  "denied": {
+    "title": "Poslužitelj to nije dopustio",
+    "titleOn": "{{server}} to nije dopustio",
+    "permission": "Za ovo nemaš pravo.",
+    "unknown": "Poslužitelj je to odbio.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} u kanalu {{channel}}.",
+    "kind": {
+      "superUser": "To smije samo SuperUser poslužitelja.",
+      "channelName": "Ovaj naziv kanala nije dopušten.",
+      "textTooLong": "Tekst je duži nego što poslužitelj dopušta.",
+      "temporaryChannel": "U privremenom kanalu to nije moguće.",
+      "missingCertificate": "Za to je potreban klijentski certifikat.",
+      "userName": "Ovo ime nije dopušteno ili je zauzeto.",
+      "channelFull": "Kanal je pun.",
+      "nestingLimit": "Kanali se ovdje ne mogu dublje ugnijezditi.",
+      "channelCountLimit": "Poslužitelj ima onoliko kanala koliko dopušta.",
+      "listenerLimit": "Slušatelja je već onoliko koliko poslužitelj dopušta."
+    },
+    "right": {
+      "write": "Ne smiješ mijenjati dozvole",
+      "traverse": "Ne smiješ otvoriti ovaj kanal",
+      "enter": "Ne smiješ ući",
+      "speak": "Ne smiješ govoriti",
+      "muteDeafen": "Ne smiješ nikoga utišati ni zaglušiti",
+      "move": "Ne smiješ nikoga premještati",
+      "makeChannel": "Ne smiješ stvarati kanale",
+      "linkChannel": "Ne smiješ povezivati kanale",
+      "whisper": "Ne smiješ šaptati",
+      "textMessage": "Ne smiješ pisati poruke",
+      "makeTempChannel": "Ne smiješ stvarati privremene kanale",
+      "listen": "Ne smiješ slušati",
+      "kick": "Ne smiješ nikoga izbaciti",
+      "ban": "Ne smiješ nikoga zabraniti",
+      "register": "Ne smiješ nikoga registrirati",
+      "selfRegister": "Ne smiješ se registrirati",
+      "resetUserContent": "Ne smiješ resetirati komentare i avatare"
+    }
+  }
 }

@@ -114,5 +114,44 @@
   "quickFixed": "der Server entscheidet beides",
   "noCertificate": "Diese Person hat kein Zertifikat, daher kann nur ihre Adresse gesperrt werden.",
   "certRegisteredHint": "der Server vergleicht das Zertifikat nur bei registrierten Personen",
-  "ipAlwaysOnHint": "der Server vergleicht die Adresse, daher behält Mumcord sie immer im Eintrag"
+  "ipAlwaysOnHint": "der Server vergleicht die Adresse, daher behält Mumcord sie immer im Eintrag",
+  "denied": {
+    "title": "Der Server hat das nicht erlaubt",
+    "titleOn": "{{server}} hat das nicht erlaubt",
+    "permission": "Dafür fehlt dir das Recht.",
+    "unknown": "Der Server hat das abgelehnt.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} in {{channel}}.",
+    "kind": {
+      "superUser": "Das darf nur der SuperUser des Servers.",
+      "channelName": "Dieser Kanalname ist nicht erlaubt.",
+      "textTooLong": "Der Text ist länger, als der Server erlaubt.",
+      "temporaryChannel": "In einem temporären Kanal ist das nicht möglich.",
+      "missingCertificate": "Dafür ist ein Client-Zertifikat nötig.",
+      "userName": "Dieser Name ist nicht erlaubt oder schon vergeben.",
+      "channelFull": "Der Kanal ist voll.",
+      "nestingLimit": "Kanäle lassen sich hier nicht tiefer verschachteln.",
+      "channelCountLimit": "Der Server hat schon so viele Kanäle, wie er erlaubt.",
+      "listenerLimit": "Es gibt schon so viele Zuhörer, wie der Server erlaubt."
+    },
+    "right": {
+      "write": "Du darfst die Rechte nicht ändern",
+      "traverse": "Du darfst diesen Kanal nicht öffnen",
+      "enter": "Du darfst nicht beitreten",
+      "speak": "Du darfst nicht sprechen",
+      "muteDeafen": "Du darfst niemanden stumm- oder taubschalten",
+      "move": "Du darfst niemanden verschieben",
+      "makeChannel": "Du darfst keine Kanäle anlegen",
+      "linkChannel": "Du darfst keine Kanäle verknüpfen",
+      "whisper": "Du darfst nicht flüstern",
+      "textMessage": "Du darfst keine Nachrichten schreiben",
+      "makeTempChannel": "Du darfst keine temporären Kanäle anlegen",
+      "listen": "Du darfst nicht zuhören",
+      "kick": "Du darfst niemanden kicken",
+      "ban": "Du darfst niemanden bannen",
+      "register": "Du darfst niemanden registrieren",
+      "selfRegister": "Du darfst dich nicht registrieren",
+      "resetUserContent": "Du darfst Kommentare und Avatare nicht zurücksetzen"
+    }
+  }
 }

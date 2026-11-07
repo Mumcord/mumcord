@@ -10,6 +10,7 @@
 
 ### Changed
 
+- When the server refuses something, Mumcord says what and where in plain words, e.g. "You may not move people in Raid.", unless the dialog that asked shows it already. Rights changed by an admin while you are connected now take effect without reconnecting
 - When the relay refuses the camera, screen sharing or file sharing, Mumcord names the reason (not registered, not in an allowed group, not in the same channel, reconnect needed) with a way out: "How to register" or "Reconnect". On a relay for registered users only, guests see why the camera and the paperclip are unavailable before trying
 - Radio buttons and checkboxes have Mumcord's own design everywhere: a ring with a lilac dot and a rounded box with a lilac check, with a clear focus ring and high-contrast support. Option cards such as "Private messages from" highlight the whole card
 - Setup wizard, "How do you want to talk?": two clear cards with a short explanation, the sensitivity choice nested under voice activation, and the push-to-talk key right in its card; Continue waits until a key is set

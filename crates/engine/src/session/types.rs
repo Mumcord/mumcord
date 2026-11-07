@@ -129,6 +129,71 @@ pub struct ChannelPermissions {
     /// Kick right (issue #253), granted on the root channel; decides whether "Kick…" shows in a
     /// person's menu (FR-10.1, FR-10.11).
     pub kick: bool,
+    /// Server-mute, deafen or un-suppress people here; only true once the server confirmed it (#248).
+    pub mute_deafen: bool,
+    /// Create channels below this one (#248).
+    pub make_channel: bool,
+    /// Create temporary channels below this one (#248).
+    pub make_temp_channel: bool,
+    /// Link and unlink this channel (#248).
+    pub link_channel: bool,
+    /// Register other people (root channel, #248).
+    pub register: bool,
+    /// Reset other people's comment and avatar (root channel, #248).
+    pub reset_user_content: bool,
+}
+
+/// Why the server refused something (`PermissionDenied`), in the words the UI uses (#248).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DenialKind {
+    /// The server's own text.
+    Text,
+    /// A right was missing (see `Right`).
+    Permission,
+    /// Only the SuperUser account may do this.
+    SuperUser,
+    /// The channel name is not allowed.
+    ChannelName,
+    /// The text is longer than the server allows.
+    TextTooLong,
+    /// Not allowed in a temporary channel.
+    TemporaryChannel,
+    /// It needs a client certificate.
+    MissingCertificate,
+    /// The user name is not allowed or taken.
+    UserName,
+    /// The channel is full.
+    ChannelFull,
+    /// Channels may not be nested this deep.
+    NestingLimit,
+    /// The server has as many channels as it allows.
+    ChannelCountLimit,
+    /// Too many listeners in the channel or for the user.
+    ListenerLimit,
+    /// A reason this version doesn't know.
+    Unknown,
+}
+
+/// A Mumble permission, as named in refusals (#248).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Right {
+    Write,
+    Traverse,
+    Enter,
+    Speak,
+    MuteDeafen,
+    Move,
+    MakeChannel,
+    LinkChannel,
+    Whisper,
+    TextMessage,
+    MakeTempChannel,
+    Listen,
+    Kick,
+    Ban,
+    Register,
+    SelfRegister,
+    ResetUserContent,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -466,6 +531,12 @@ pub enum EngineEvent {
     ServerDenied {
         error: EngineError,
         channel_id: Option<u32>,
+        /// What kind of refusal it is, so the UI words it (#248).
+        kind: DenialKind,
+        /// The right that was missing, for a permission refusal.
+        permission: Option<Right>,
+        /// A dialog that asked shows it already (kick, ban, ban list, channel password).
+        handled: bool,
     },
     /// The channel-password dialog for a refused join changes (FR-2.78).
     ChannelPassword {

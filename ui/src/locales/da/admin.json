@@ -114,5 +114,44 @@
   "quickFixed": "serveren afgør begge",
   "noCertificate": "Denne person har intet certifikat, så kun adressen kan bandlyses.",
   "certRegisteredHint": "serveren sammenligner certifikatet kun for en registreret person",
-  "ipAlwaysOnHint": "serveren sammenligner adressen, så Mumcord beholder den altid i indlægget"
+  "ipAlwaysOnHint": "serveren sammenligner adressen, så Mumcord beholder den altid i indlægget",
+  "denied": {
+    "title": "Serveren tillod ikke dette",
+    "titleOn": "{{server}} tillod ikke dette",
+    "permission": "Du har ikke ret til dette.",
+    "unknown": "Serveren afviste dette.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} i {{channel}}.",
+    "kind": {
+      "superUser": "Kun serverens SuperUser kan gøre dette.",
+      "channelName": "Dette kanalnavn er ikke tilladt.",
+      "textTooLong": "Teksten er længere, end serveren tillader.",
+      "temporaryChannel": "Det er ikke muligt i en midlertidig kanal.",
+      "missingCertificate": "Det kræver et klientcertifikat.",
+      "userName": "Navnet er ikke tilladt eller allerede i brug.",
+      "channelFull": "Kanalen er fuld.",
+      "nestingLimit": "Kanaler kan ikke indlejres dybere her.",
+      "channelCountLimit": "Serveren har så mange kanaler, som den tillader.",
+      "listenerLimit": "Der er allerede så mange lyttere, som serveren tillader."
+    },
+    "right": {
+      "write": "Du må ikke ændre rettighederne",
+      "traverse": "Du må ikke åbne denne kanal",
+      "enter": "Du må ikke gå ind",
+      "speak": "Du må ikke tale",
+      "muteDeafen": "Du må ikke gøre nogen stum eller døv",
+      "move": "Du må ikke flytte nogen",
+      "makeChannel": "Du må ikke oprette kanaler",
+      "linkChannel": "Du må ikke linke kanaler",
+      "whisper": "Du må ikke hviske",
+      "textMessage": "Du må ikke skrive beskeder",
+      "makeTempChannel": "Du må ikke oprette midlertidige kanaler",
+      "listen": "Du må ikke lytte",
+      "kick": "Du må ikke smide nogen ud",
+      "ban": "Du må ikke banne nogen",
+      "register": "Du må ikke registrere nogen",
+      "selfRegister": "Du må ikke registrere dig",
+      "resetUserContent": "Du må ikke nulstille kommentarer og avatarer"
+    }
+  }
 }
