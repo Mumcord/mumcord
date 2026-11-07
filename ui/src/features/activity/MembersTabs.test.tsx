@@ -22,6 +22,8 @@ describe("members column tabs", () => {
   let api: MockApi;
 
   beforeEach(async () => {
+    // The saved history (#594) would carry events from one test into the next.
+    localStorage.clear();
     resetActivityLogStore();
     resetMembersTabStore();
     resetScreenShareStore();

@@ -314,6 +314,20 @@
   color: var(--color-text-secondary);
 }
 
+.settings-hint--muted {
+  color: var(--color-text-muted);
+}
+
+.settings-control-row__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.settings-control-row__title {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+
 .settings-value {
   margin: var(--space-1) 0;
 }

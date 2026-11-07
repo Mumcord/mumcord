@@ -1255,5 +1255,14 @@
     "uploadSending": "Sending…",
     "uploadDone": "Report sent. Thank you!",
     "uploadFailed": "The report could not be sent. Check your connection and try again; it stays on this computer."
+  },
+  "activityHistory": {
+    "title": "Activity history",
+    "clear": "Clear activity history",
+    "hint": "Removes the saved feed for all servers.",
+    "local": "Saved only on this device.",
+    "button": "Clear history",
+    "confirm": "Clear the activity history of all servers? This cannot be undone.",
+    "confirmButton": "Clear"
   }
 }

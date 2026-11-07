@@ -3,8 +3,9 @@
  * Plain data module, no rendering (that is the feed in T5): it follows the stores that already
  * hold the information, turns their changes into per-server events and hands them out newest first.
  *
- * In memory only, capped at `MAX_EVENTS` per server, and discarded when a connection ends —
- * nothing is written anywhere. What `serverSynced` delivers is the baseline (FR-11.5): the log
+ * Capped at `MAX_EVENTS` per server and saved on this device only (#594, `activityHistory.ts`), so
+ * the feed survives a reconnect or a restart; events from before the current connection are marked
+ * `earlier` and never count as live. What `serverSynced` delivers is the baseline (FR-11.5): the log
  * keeps what it last saw per source and only diffs later changes, so a share, party or activity
  * that was already running when we connected is never an event.
  */
@@ -30,6 +31,7 @@ import {
 } from "../plugins/stage/activityStore";
 import { sharesOf, subscribeShares } from "../screenshare/sharesStore";
 import { subscribeWatchParty, watchPartyOf } from "../watchparty/watchPartyStore";
+import { clearSavedHistory, loadHistory, saveHistory } from "./activityHistory";
 
 /** Cap per server (FR-11.8); the 201st event drops the oldest. */
 export const MAX_EVENTS = 200;
@@ -56,6 +58,12 @@ interface EventBase {
   serverId: number;
   /** `Date.now()` milliseconds; the feed groups the rows by day from it (FR-11.10). */
   at: number;
+  /**
+   * Set on events from before the current connection (#594): saved ones after a restart and the
+   * previous connection's after a reconnect. Their live references may point at anything now, so
+   * they are always shown as ended.
+   */
+  earlier?: true;
 }
 
 /**
@@ -115,20 +123,32 @@ function notify(): void {
   for (const listener of listeners) listener();
 }
 
-/** Newest first, so the feed renders the list as it gets it (FR-11.10, FR-11.8). */
-function add(serverId: number, event: ActivityEvent): void {
-  const next = [event, ...(logs.get(serverId) ?? EMPTY_LOG)];
-  if (next.length > MAX_EVENTS) next.length = MAX_EVENTS;
-  logs.set(serverId, next);
+/** The server's log, loaded from the saved history the first time it is needed. */
+function current(serverId: number): readonly ActivityEvent[] {
+  let log = logs.get(serverId);
+  if (log === undefined) {
+    log = loadHistory(serverId);
+    logs.set(serverId, log);
+  }
+  return log;
+}
+
+function store(serverId: number, log: readonly ActivityEvent[]): void {
+  logs.set(serverId, log);
+  saveHistory(serverId, log);
   notify();
 }
 
-/** FR-11.4: nothing survives the end of a connection, and nothing is written anywhere. */
-function discard(serverId: number): void {
-  if (!logs.has(serverId) && !baselines.has(serverId)) return;
-  logs.delete(serverId);
+/** Newest first, so the feed renders the list as it gets it (FR-11.10, FR-11.8). */
+function add(serverId: number, event: ActivityEvent): void {
+  const next = [event, ...current(serverId)];
+  if (next.length > MAX_EVENTS) next.length = MAX_EVENTS;
+  store(serverId, next);
+}
+
+/** The end of a connection ends the diffing; its events stay in the log and in the history. */
+function forgetBaseline(serverId: number): void {
   baselines.delete(serverId);
-  notify();
 }
 
 function nameOf(state: ServerState, session: number | null): string | null {
@@ -333,8 +353,14 @@ function rememberActivities(baseline: Baseline, list: readonly StageActivityView
 function onServerChange(serverId: number, change: ServerChange, state: ServerState): void {
   switch (change.kind) {
     case "synced": {
-      // FR-11.5: the snapshot is the baseline; only the start of the session is recorded.
-      logs.set(serverId, []);
+      // FR-11.5: the snapshot is the baseline; only the start of the session is recorded. What
+      // the log already holds is from before this connection (#594).
+      logs.set(
+        serverId,
+        current(serverId).map((event) =>
+          event.earlier === true ? event : { ...event, earlier: true },
+        ),
+      );
       add(serverId, {
         serverId,
         at: Date.now(),
@@ -411,7 +437,7 @@ function bind(api: MumcordApi): void {
       });
     }),
     api.on("connectionStateChanged", ({ serverId, state: connection }) => {
-      if (connection.state !== "connected") discard(serverId);
+      if (connection.state !== "connected") forgetBaseline(serverId);
     }),
   ];
 }
@@ -431,10 +457,17 @@ function subscribe(listener: () => void): () => void {
 
 function logOf(serverId: number | null): readonly ActivityEvent[] {
   ensureBound();
-  return (serverId === null ? undefined : logs.get(serverId)) ?? EMPTY_LOG;
+  return serverId === null ? EMPTY_LOG : current(serverId);
 }
 
-/** The events of one server, newest first (FR-11.10); empty for `null` (FR-11.4). */
+/** Settings → Privacy (#594): empties the feed of every server and its saved history. */
+export function clearActivityHistory(): void {
+  clearSavedHistory();
+  logs = new Map(Array.from(logs.keys(), (serverId) => [serverId, EMPTY_LOG]));
+  notify();
+}
+
+/** The events of one server, newest first (FR-11.10); empty for `null`. */
 export function useActivityLog(serverId: number | null): readonly ActivityEvent[] {
   const get = useCallback(() => logOf(serverId), [serverId]);
   return useSyncExternalStore(subscribe, get);

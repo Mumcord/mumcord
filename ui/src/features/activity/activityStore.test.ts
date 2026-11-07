@@ -12,7 +12,12 @@ import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetActivityStore } from "../plugins/stage/activityStore";
 import { resetScreenShareStore } from "../screenshare/sharesStore";
 import { resetWatchPartyStore } from "../watchparty/watchPartyStore";
-import { MAX_EVENTS, resetActivityLogStore, useActivityLog } from "./activityStore";
+import {
+  MAX_EVENTS,
+  clearActivityHistory,
+  resetActivityLogStore,
+  useActivityLog,
+} from "./activityStore";
 
 /** The default mock seed: server 1, Lobby is channel 1 and "Raid" channel 2, the own session is 1. */
 const SERVER = 1;
@@ -118,6 +123,8 @@ describe("activity log", () => {
   let api: MockApi;
 
   beforeEach(async () => {
+    // The saved history (#594) would carry events from one test into the next.
+    localStorage.clear();
     resetActivityLogStore();
     resetScreenShareStore();
     resetWatchPartyStore();
@@ -346,7 +353,7 @@ describe("activity log", () => {
     expect(result.current.some((event) => event.kind === "connected" && event.self)).toBe(false);
   });
 
-  it("discards the log and the baseline when the connection ends (FR-11.4)", async () => {
+  it("keeps the log but stops diffing when the connection ends (#594)", async () => {
     const { result } = renderHook(() => useActivityLog(SERVER));
     await settle();
     expect(result.current).toHaveLength(1);
@@ -357,13 +364,50 @@ describe("activity log", () => {
         state: { state: "disconnected", error: null },
       });
     });
-    expect(result.current).toEqual([]);
+    expect(result.current).toHaveLength(1);
 
     // Without a baseline nothing is collected any more, until the next sync.
     act(() => {
       api.mock.emit("screenSharesChanged", { serverId: SERVER, shares: [share(ANNA)] });
     });
+    expect(result.current).toHaveLength(1);
+  });
+
+  it("saves the log on this device and loads it as earlier after a restart (#594)", async () => {
+    const { result, unmount } = renderHook(() => useActivityLog(SERVER));
+    await settle();
+    expect(result.current).toHaveLength(1);
+    const saved: unknown = JSON.parse(
+      localStorage.getItem(`mumcord.activity.${String(SERVER)}`) ?? "null",
+    );
+    expect(saved).toEqual([expect.objectContaining({ kind: "connected", self: true })]);
+    unmount();
+
+    // A restart: the in-memory log is gone, the saved one is still there.
+    resetActivityLogStore();
+    const reloaded = renderHook(() => useActivityLog(SERVER));
+    expect(reloaded.result.current).toEqual([
+      expect.objectContaining({ kind: "connected", self: true, earlier: true }),
+    ]);
+  });
+
+  it("ignores an unreadable saved history (#594)", () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    localStorage.setItem(`mumcord.activity.${String(SERVER)}`, "{not json");
+    resetActivityLogStore();
+    const { result } = renderHook(() => useActivityLog(SERVER));
     expect(result.current).toEqual([]);
+  });
+
+  it("clears the feed and the saved history of every server (#594)", async () => {
+    const { result } = renderHook(() => useActivityLog(SERVER));
+    await settle();
+    expect(result.current).toHaveLength(1);
+    act(() => {
+      clearActivityHistory();
+    });
+    expect(result.current).toEqual([]);
+    expect(localStorage.getItem(`mumcord.activity.${String(SERVER)}`)).toBeNull();
   });
 
   it("appends plugin-pushed events and ignores a push without a server (FR-11.9)", async () => {

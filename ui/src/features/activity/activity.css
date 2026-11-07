@@ -1,6 +1,7 @@
 /* The member column's Members | Activity tab strip and the feed (FR-11.1, FR-11.11): quiet
-   underline tabs like the settings navigation, two-line rows with no icons. Colours come from
-   theme tokens only, so both themes and forced colours keep working. */
+   underline tabs like the settings navigation, two-line rows behind an icon tinted per kind
+   (#594, style B). Colours come from theme tokens only, so both themes and forced colours keep
+   working. */
 .activity-tabs {
   display: flex;
   flex-direction: column;
@@ -59,10 +60,18 @@
 
 .activity-row {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  align-items: flex-start;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
+}
+
+.activity-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
 }
 
 /* Only the rows that can be opened are highlighted (mockup §6). */
@@ -74,8 +83,8 @@
 /* The whole clickable row is one button, so it keeps the row's own look. */
 .activity-row__button {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  align-items: flex-start;
   width: 100%;
   padding: 0;
   border: 0;
@@ -104,6 +113,79 @@
   font-size: var(--font-size-xs);
 }
 
+/* The kind's line icon in a circle tinted with the kind's colour; the shapes differ too, so the
+   colour is never the only cue. */
+.activity-icon {
+  --activity-tint: var(--color-accent-text);
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--activity-tint) 16%, transparent);
+  color: var(--activity-tint);
+}
+
+.activity-icon svg {
+  width: 0.9375rem;
+  height: 0.9375rem;
+}
+
+.activity-icon--connected,
+.activity-icon--screenShare {
+  --activity-tint: var(--color-success);
+}
+
+.activity-icon--disconnected {
+  --activity-tint: var(--color-text-secondary);
+}
+
+.activity-icon--watchParty {
+  --activity-tint: var(--color-warning);
+}
+
+.activity-icon[data-ended] {
+  --activity-tint: var(--color-text-muted);
+}
+
+/* A plugin's own icon stays unframed so its colours stay intact. */
+.activity-icon--plugin {
+  background: transparent;
+}
+
+.activity-icon__image,
+span.activity-icon__tile {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 3px;
+  object-fit: contain;
+  font-size: var(--font-size-xs);
+}
+
+.activity-row--ended .activity-row__title,
+.activity-row--ended .activity-icon {
+  opacity: 0.75;
+}
+
+/* Where this connection's events end and the ones from before it start (#594). */
+.activity-feed__earlier {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.activity-feed__earlier::before,
+.activity-feed__earlier::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--color-border-strong);
+  opacity: 0.6;
+}
+
 .activity-row__live {
   color: var(--color-success);
 }
@@ -125,5 +207,9 @@
   .activity-row__live,
   .activity-row__action {
     color: LinkText;
+  }
+
+  .activity-icon {
+    color: CanvasText;
   }
 }
