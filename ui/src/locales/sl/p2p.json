@@ -49,7 +49,9 @@
     "denied": "Bot releja je zavrnil zahtevo.",
     "notRegistered": "Relej tega strežnika je na voljo samo registriranim uporabnikom. Za uporabo se registriraj na tem strežniku.",
     "peerGone": "Druga oseba je zapustila strežnik.",
-    "rateLimited": "Preveč zahtev za relej. Poskusi znova čez minuto."
+    "rateLimited": "Preveč zahtev za relej. Poskusi znova čez minuto.",
+    "groupNotAllowed": "Rele tega strežnika je na voljo le določenim skupinam. Prosi skrbnika, da te doda.",
+    "noHello": "Bot releja te aplikacije še ne pozna. Znova se poveži."
   },
   "refusal": {
     "unknownToken": "neznan dostopni žeton",
@@ -61,5 +63,10 @@
     "rateLimited": "preveč poskusov",
     "version": "nepodprta različica",
     "badRequest": "neveljavna zahteva"
+  },
+  "refusalAction": {
+    "howToRegister": "Kako se registrirati",
+    "reconnect": "Znova poveži",
+    "filesRegisteredOnly": "Deljenje datotek je na tem strežniku na voljo le registriranim uporabnikom."
   }
 }

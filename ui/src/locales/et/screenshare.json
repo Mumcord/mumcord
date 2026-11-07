@@ -182,7 +182,10 @@
     "detailsDropped": "Vahele jäänud kaadrid",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Mõõtmata",
-    "close": "Sulge"
+    "close": "Sulge",
+    "reasonNotRegistered": "selle serveri releed tohivad kasutada ainult registreeritud kasutajad",
+    "reasonGroupNotAllowed": "relee teenindab ainult teatud gruppe",
+    "reasonNoHello": "relee bot ei tunne seda rakendust veel, ühenda uuesti"
   },
   "settings": {
     "title": "Ekraani jagamine",

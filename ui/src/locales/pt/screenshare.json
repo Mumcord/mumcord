@@ -186,7 +186,10 @@
     "detailsDropped": "Imagens perdidas",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Não medido",
-    "close": "Fechar"
+    "close": "Fechar",
+    "reasonNotRegistered": "só utilizadores registados podem usar o relay deste servidor",
+    "reasonGroupNotAllowed": "o relay só serve certos grupos",
+    "reasonNoHello": "o bot do relay ainda não conhece esta app, volta a ligar"
   },
   "settings": {
     "title": "Partilha de ecrã",

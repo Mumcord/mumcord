@@ -13,7 +13,8 @@
     "relayTooOld": "Šio serverio perdavimo mazgas per senas kameros bendrinimui.",
     "relayDisallows": "Šio serverio perdavimo mazgas neleidžia bendrinti kameros.",
     "needsRelayMode": "Kameros bendrinimui reikia perdavimo mazgo. Pakeisk tai skiltyje Privatumas ir ryšiai.",
-    "noCertificate": "Kameros bendrinimui reikia kliento sertifikato."
+    "noCertificate": "Kameros bendrinimui reikia kliento sertifikato.",
+    "registeredOnly": "Šiame serveryje kamerą gali naudoti tik registruoti naudotojai."
   },
   "cameraOnTray": "Kamera įjungta",
   "turnOffTray": "Išjungti kamerą",
@@ -97,7 +98,12 @@
     "mode": "Kameros bendrinimui reikia perdavimo mazgo. Pakeisk tai skiltyje Privatumas ir ryšiai.",
     "noCertificate": "Kameros bendrinimui reikia kliento sertifikato.",
     "endedByRelay": "Kamerą sustabdė serverio perdavimo mazgas",
-    "dismissStopped": "Paslėpti"
+    "dismissStopped": "Paslėpti",
+    "notRegistered": "Kamera nepasileido: šiame serveryje kamerą gali naudoti tik registruoti naudotojai.",
+    "groupNotAllowed": "Kamera nepasileido: šio serverio retransliatorius aptarnauja tik tam tikras grupes. Paprašyk administratoriaus tave pridėti.",
+    "notSameChannel": "Kamera nepasileido: tu ir tavo žiūrovai turite būti tame pačiame kanale.",
+    "notInChannel": "Kamera nepasileido: pirmiausia prisijunk prie kanalo.",
+    "noHello": "Kamera nepasileido: retransliatoriaus botas dar nepažįsta šios programėlės. Prisijunk iš naujo."
   },
   "privacy": {
     "windows": "Windows blokuoja darbalaukio programų prieigą prie kameros",

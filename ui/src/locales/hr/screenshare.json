@@ -186,7 +186,10 @@
     "detailsDropped": "Ispušteni kadrovi",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nije izmjereno",
-    "close": "Zatvori"
+    "close": "Zatvori",
+    "reasonNotRegistered": "relej ovog poslužitelja smiju koristiti samo registrirani korisnici",
+    "reasonGroupNotAllowed": "relej služi samo određenim grupama",
+    "reasonNoHello": "bot releja još ne poznaje ovu aplikaciju, ponovno se poveži"
   },
   "settings": {
     "title": "Dijeljenje ekrana",

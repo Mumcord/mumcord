@@ -49,7 +49,9 @@
     "denied": "Botul releului a refuzat cererea.",
     "notRegistered": "Releul acestui server este disponibil doar pentru utilizatorii înregistrați. Înregistrează-te pe acest server ca să-l folosești.",
     "peerGone": "Cealaltă persoană a părăsit serverul.",
-    "rateLimited": "Prea multe cereri către releu. Încearcă din nou peste un minut."
+    "rateLimited": "Prea multe cereri către releu. Încearcă din nou peste un minut.",
+    "groupNotAllowed": "Releul acestui server e disponibil doar pentru anumite grupuri. Roagă un administrator să te adauge.",
+    "noHello": "Botul releului nu cunoaște încă această aplicație. Reconectează-te pentru a rezolva."
   },
   "refusal": {
     "unknownToken": "token de acces necunoscut",
@@ -61,5 +63,10 @@
     "rateLimited": "prea multe încercări",
     "version": "versiune neacceptată",
     "badRequest": "cerere invalidă"
+  },
+  "refusalAction": {
+    "howToRegister": "Cum te înregistrezi",
+    "reconnect": "Reconectează",
+    "filesRegisteredOnly": "Partajarea fișierelor e disponibilă pe acest server doar pentru utilizatorii înregistrați."
   }
 }

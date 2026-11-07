@@ -186,7 +186,10 @@
     "detailsDropped": "Cadre pierdute",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nemăsurat",
-    "close": "Închide"
+    "close": "Închide",
+    "reasonNotRegistered": "doar utilizatorii înregistrați pot folosi releul acestui server",
+    "reasonGroupNotAllowed": "releul servește doar anumite grupuri",
+    "reasonNoHello": "botul releului nu cunoaște încă această aplicație, reconectează-te"
   },
   "settings": {
     "title": "Partajarea ecranului",

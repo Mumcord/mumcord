@@ -49,7 +49,9 @@
     "denied": "Releebot keeldus päringust.",
     "notRegistered": "Selle serveri releeserver on saadaval ainult registreeritud kasutajatele. Selle kasutamiseks registreeru sellel serveril.",
     "peerGone": "Teine inimene lahkus serverist.",
-    "rateLimited": "Liiga palju releepäringuid. Proovi minuti pärast uuesti."
+    "rateLimited": "Liiga palju releepäringuid. Proovi minuti pärast uuesti.",
+    "groupNotAllowed": "Selle serveri relee on saadaval ainult teatud gruppidele. Palu halduril sind lisada.",
+    "noHello": "Relee bot ei tunne seda rakendust veel. Ühenda uuesti."
   },
   "refusal": {
     "unknownToken": "tundmatu pääsutõend",
@@ -61,5 +63,10 @@
     "rateLimited": "liiga palju katseid",
     "version": "toetamata versioon",
     "badRequest": "vigane päring"
+  },
+  "refusalAction": {
+    "howToRegister": "Kuidas registreeruda",
+    "reconnect": "Ühenda uuesti",
+    "filesRegisteredOnly": "Failide jagamine on selles serveris saadaval ainult registreeritud kasutajatele."
   }
 }

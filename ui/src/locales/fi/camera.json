@@ -13,7 +13,8 @@
     "relayTooOld": "Tämän palvelimen välityspalvelin on liian vanha kameran jakamiseen.",
     "relayDisallows": "Tämän palvelimen välityspalvelin ei salli kameran jakamista.",
     "needsRelayMode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
-    "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen."
+    "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
+    "registeredOnly": "Vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella."
   },
   "cameraOnTray": "Kamera päällä",
   "turnOffTray": "Sammuta kamera",
@@ -97,7 +98,12 @@
     "mode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
     "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran",
-    "dismissStopped": "Ohita"
+    "dismissStopped": "Ohita",
+    "notRegistered": "Kamera ei käynnistynyt: vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella.",
+    "groupNotAllowed": "Kamera ei käynnistynyt: palvelimen välitin palvelee vain tiettyjä ryhmiä. Pyydä ylläpitoa lisäämään sinut.",
+    "notSameChannel": "Kamera ei käynnistynyt: sinun ja katsojiesi pitää olla samalla kanavalla.",
+    "notInChannel": "Kamera ei käynnistynyt: liity ensin kanavalle.",
+    "noHello": "Kamera ei käynnistynyt: välitinbotti ei vielä tunne tätä sovellusta. Yhdistä uudelleen korjataksesi."
   },
   "privacy": {
     "windows": "Windows estää työpöytäsovellusten pääsyn kameraan",

@@ -49,7 +49,9 @@
     "denied": "Bot releja odbio je zahtjev.",
     "notRegistered": "Relej ovog poslužitelja dostupan je samo registriranim korisnicima. Registriraj se na ovom poslužitelju da bi ga koristio.",
     "peerGone": "Druga osoba napustila je poslužitelj.",
-    "rateLimited": "Previše zahtjeva za relej. Pokušaj ponovno za minutu."
+    "rateLimited": "Previše zahtjeva za relej. Pokušaj ponovno za minutu.",
+    "groupNotAllowed": "Relej ovog poslužitelja dostupan je samo određenim grupama. Zamoli administratora da te doda.",
+    "noHello": "Bot releja još ne poznaje ovu aplikaciju. Ponovno se poveži."
   },
   "refusal": {
     "unknownToken": "nepoznat pristupni token",
@@ -61,5 +63,10 @@
     "rateLimited": "previše pokušaja",
     "version": "nepodržana verzija",
     "badRequest": "neispravan zahtjev"
+  },
+  "refusalAction": {
+    "howToRegister": "Kako se registrirati",
+    "reconnect": "Ponovno poveži",
+    "filesRegisteredOnly": "Dijeljenje datoteka na ovom poslužitelju dostupno je samo registriranim korisnicima."
   }
 }

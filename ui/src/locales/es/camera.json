@@ -13,7 +13,8 @@
     "relayTooOld": "El relé de este servidor es demasiado antiguo para compartir la cámara.",
     "relayDisallows": "El relé de este servidor no permite compartir la cámara.",
     "needsRelayMode": "Compartir la cámara necesita el relé. Cámbialo en Privacidad y conexiones.",
-    "noCertificate": "Compartir la cámara necesita un certificado de cliente."
+    "noCertificate": "Compartir la cámara necesita un certificado de cliente.",
+    "registeredOnly": "Solo los usuarios registrados pueden usar la cámara en este servidor."
   },
   "cameraOnTray": "Cámara activada",
   "turnOffTray": "Desactivar la cámara",
@@ -97,7 +98,12 @@
     "mode": "Compartir la cámara necesita el relé. Cámbialo en Privacidad y conexiones.",
     "noCertificate": "Compartir la cámara necesita un certificado de cliente.",
     "endedByRelay": "Cámara detenida por el relé del servidor",
-    "dismissStopped": "Descartar"
+    "dismissStopped": "Descartar",
+    "notRegistered": "La cámara no pudo iniciarse: solo los usuarios registrados pueden usar la cámara en este servidor.",
+    "groupNotAllowed": "La cámara no pudo iniciarse: el relé de este servidor solo sirve a ciertos grupos. Pide a un administrador que te añada.",
+    "notSameChannel": "La cámara no pudo iniciarse: tú y tus espectadores tenéis que estar en el mismo canal.",
+    "notInChannel": "La cámara no pudo iniciarse: entra primero en un canal.",
+    "noHello": "La cámara no pudo iniciarse: el bot del relé aún no conoce esta app. Vuelve a conectarte para solucionarlo."
   },
   "privacy": {
     "windows": "Windows bloquea el acceso a la cámara a las aplicaciones de escritorio",

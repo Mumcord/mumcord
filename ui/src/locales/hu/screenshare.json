@@ -182,7 +182,10 @@
     "detailsDropped": "Kihagyott képkockák",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nincs mérve",
-    "close": "Bezárás"
+    "close": "Bezárás",
+    "reasonNotRegistered": "a szerver relay-ét csak regisztrált felhasználók használhatják",
+    "reasonGroupNotAllowed": "a relay csak bizonyos csoportokat szolgál ki",
+    "reasonNoHello": "a relay bot még nem ismeri ezt az alkalmazást, csatlakozz újra"
   },
   "settings": {
     "title": "Képernyőmegosztás",

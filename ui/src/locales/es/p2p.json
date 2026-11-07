@@ -49,7 +49,9 @@
     "denied": "El bot del relé rechazó la solicitud.",
     "notRegistered": "El relé de este servidor solo está disponible para usuarios registrados. Regístrate en este servidor para usarlo.",
     "peerGone": "La otra persona salió del servidor.",
-    "rateLimited": "Demasiadas solicitudes al relé. Inténtalo de nuevo en un minuto."
+    "rateLimited": "Demasiadas solicitudes al relé. Inténtalo de nuevo en un minuto.",
+    "groupNotAllowed": "El relé de este servidor solo está disponible para ciertos grupos. Pide a un administrador que te añada.",
+    "noHello": "El bot del relé aún no conoce esta app. Vuelve a conectarte para solucionarlo."
   },
   "refusal": {
     "unknownToken": "token de acceso desconocido",
@@ -61,5 +63,10 @@
     "rateLimited": "demasiados intentos",
     "version": "versión no compatible",
     "badRequest": "solicitud no válida"
+  },
+  "refusalAction": {
+    "howToRegister": "Cómo registrarse",
+    "reconnect": "Reconectar",
+    "filesRegisteredOnly": "Compartir archivos solo está disponible para usuarios registrados en este servidor."
   }
 }

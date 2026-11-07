@@ -49,7 +49,9 @@
     "denied": "De relaybot heeft het verzoek geweigerd.",
     "notRegistered": "De relay van deze server is alleen beschikbaar voor geregistreerde gebruikers. Registreer je op deze server om hem te gebruiken.",
     "peerGone": "De ander heeft de server verlaten.",
-    "rateLimited": "Te veel relayverzoeken. Probeer het over een minuut opnieuw."
+    "rateLimited": "Te veel relayverzoeken. Probeer het over een minuut opnieuw.",
+    "groupNotAllowed": "De relay van deze server is alleen beschikbaar voor bepaalde groepen. Vraag een beheerder je toe te voegen.",
+    "noHello": "De relaybot kent deze app nog niet. Maak opnieuw verbinding om dit op te lossen."
   },
   "refusal": {
     "unknownToken": "onbekend toegangstoken",
@@ -61,5 +63,10 @@
     "rateLimited": "te veel pogingen",
     "version": "niet-ondersteunde versie",
     "badRequest": "ongeldig verzoek"
+  },
+  "refusalAction": {
+    "howToRegister": "Zo registreer je je",
+    "reconnect": "Opnieuw verbinden",
+    "filesRegisteredOnly": "Bestanden delen is op deze server alleen beschikbaar voor geregistreerde gebruikers."
   }
 }
