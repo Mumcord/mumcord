@@ -124,6 +124,7 @@
       "show": "Oddaja"
     },
     "inBrowser": "Predvaja se v tvojem brskalniku",
+    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
     "card": "Predogled povezave: {{title}}",
     "dismiss": "Skrij predogled"
   },

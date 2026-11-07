@@ -63,6 +63,8 @@ futures-util.workspace = true
 # Opens links through the desktop launchers (see browser.rs).
 open.workspace = true
 gtk.workspace = true
+# Full-screen requests from the pages Mumcord shows (see fullscreen.rs, issue #419).
+webkit2gtk.workspace = true
 # Mouse-button push-to-talk: evdev reads on Wayland, XInput2 raw button events on X11.
 libc.workspace = true
 x11rb = { workspace = true, features = ["xinput"] }

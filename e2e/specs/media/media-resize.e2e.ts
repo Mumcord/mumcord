@@ -180,7 +180,7 @@ describe("resizable media area (#386)", () => {
     // WebKit does not focus buttons on click, so focus the last media control directly.
     await browser.execute(() => {
       const buttons = [
-        ...document.querySelectorAll<HTMLElement>("#media-area .media-frame__controls button"),
+        ...document.querySelectorAll<HTMLElement>("#media-area .media-overlay__controls button"),
       ];
       buttons.at(-1)?.focus();
     });

@@ -10,6 +10,7 @@
 ### Fixed
 
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
+- Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
 
 ## [0.7.1] - 2026-11-07
 

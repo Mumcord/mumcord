@@ -124,6 +124,7 @@
       "show": "Pořad"
     },
     "inBrowser": "Přehraje se v prohlížeči",
+    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
     "card": "Náhled odkazu: {{title}}",
     "dismiss": "Skrýt náhled"
   },

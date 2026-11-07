@@ -9,10 +9,11 @@ export function useFullscreen(ref: RefObject<HTMLElement | null>): {
   const [fullscreen, setFullscreen] = useState(false);
 
   useEffect(() => {
+    // A player element can mount later than this effect (a card player starts on play), so the
+    // state is read from the ref at the event instead of being captured here.
     const element = ref.current;
-    // The browser also leaves full screen by itself (Escape), so follow its state.
     const onChange = () => {
-      setFullscreen(element !== null && document.fullscreenElement === element);
+      setFullscreen(document.fullscreenElement === (ref.current ?? element));
     };
     document.addEventListener("fullscreenchange", onChange);
     return () => {

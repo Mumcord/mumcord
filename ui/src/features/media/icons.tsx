@@ -18,6 +18,8 @@ const PATHS = {
   grip: "M6 3.5h.01M10 3.5h.01M6 8h.01M10 8h.01M6 12.5h.01M10 12.5h.01",
   mini: "M2 3.5h12v9H2zM8.5 8h4v3h-4z",
   open: "M9.5 2.5h4v4M13.5 2.5L8 8M7 3.5H3.5v9h9V9",
+  fullscreen: "M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4",
+  exitFullscreen: "M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4",
   leave: "M6.5 2.5h-3v11h3M10 5l3 3-3 3M13 8H6.5",
   popIn: "M13.5 2.5L8 8M8 4.5V8h3.5M7 3.5H3.5v9h9V9",
   pin: "M6 2.5h4M7 2.5v4L4.5 9h7L9 6.5v-4M8 9v4.5",

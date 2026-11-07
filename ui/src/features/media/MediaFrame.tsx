@@ -1,11 +1,13 @@
 /**
- * The frame the two media views of issue #163 share: a rounded card with the picture, a top overlay
- * saying who and what, and a bottom overlay with the seek bar and the controls in the same order for
- * both. The overlays sit on the picture and fade in on hover, keyboard focus or pause; with reduced
- * motion they stay visible (`media.css`).
+ * The frame the media views share: a rounded card with the picture, a top overlay saying who and what,
+ * and a bottom overlay with the seek bar and the controls in the same order for both. The overlays are
+ * the shared media overlay look (`mediaOverlay.css`), so a chat card's player looks the same (issue
+ * #419): they sit on the picture and fade in on hover, keyboard focus or pause.
  */
 import type { ReactNode, RefObject } from "react";
+import { MediaIcon } from "./icons";
 import "./media.css";
+import "./mediaOverlay.css";
 
 export interface MediaFrameProps {
   /** Element that full screen takes (F). */
@@ -53,41 +55,28 @@ export function MediaFrame({
   return (
     <section
       ref={ref}
-      className="media-frame"
+      className="media-frame media-overlay"
       aria-label={label}
       data-paused={paused || undefined}
       data-fullscreen={fullscreen || undefined}
     >
       <div className="media-frame__picture">{picture}</div>
-      {header !== undefined && <header className="media-frame__top">{header}</header>}
+      {header !== undefined && <header className="media-overlay__top">{header}</header>}
       {hint !== undefined && <p className="media-frame__hint">{hint}</p>}
-      <div className="media-frame__bottom">
+      <div className="media-overlay__bar">
         {seek !== undefined && <div className="media-frame__seek">{seek}</div>}
-        <div className="media-frame__controls" role="toolbar" aria-label={toolbarLabel}>
+        <div className="media-overlay__controls" role="toolbar" aria-label={toolbarLabel}>
           {controls}
           <button
             type="button"
-            className="button media-frame__icon"
+            className="button media-overlay__icon"
             aria-label={fullscreen ? exitFullscreenLabel : fullscreenLabel}
             data-tooltip={fullscreen ? exitFullscreenLabel : fullscreenLabel}
             aria-pressed={fullscreen}
             aria-keyshortcuts="F"
             onClick={onFullscreen}
           >
-            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
-              <path
-                d={
-                  fullscreen
-                    ? "M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4"
-                    : "M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4"
-                }
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <MediaIcon name={fullscreen ? "exitFullscreen" : "fullscreen"} />
           </button>
         </div>
       </div>

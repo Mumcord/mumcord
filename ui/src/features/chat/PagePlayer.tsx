@@ -99,6 +99,8 @@ export function PagePlayer({ playerUrl, title, onFailed }: PagePlayerProps) {
         className="link-card__player"
         src={pageUrl}
         title={title}
+        // The player's own full-screen button needs this permission (issue #419): only the frame
+        // Mumcord shows as a player may ask, so a plugin page never can.
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
         allowFullScreen
         referrerPolicy="no-referrer"

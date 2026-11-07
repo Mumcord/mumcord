@@ -915,50 +915,56 @@
   background: var(--color-bg-hover);
 }
 
-.link-card__play {
-  position: relative;
-  display: grid;
-  place-items: center;
+/* A chat card's picture and its controls bar are the shared media overlay (`mediaOverlay.css`), so an
+   embedded YouTube or Twitch player looks like the watch party (issue #163, issue #419). Only the card's
+   own geometry is here: its smaller radius, the 16:9 the message list gives it, and the bar lying over
+   the bottom of the picture instead of taking a row of its own - a second row would grow the card past
+   that height. The bar sits inside the element that goes full screen, so full screen can be left from
+   there as well, and the card counts as paused until it plays, which keeps its controls visible before
+   the first click. */
+.link-card__player-box {
   width: 100%;
   aspect-ratio: 16 / 9;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
   border-radius: var(--radius-md);
-  background: #000;
-  cursor: pointer;
+}
+
+.link-card__player-box:fullscreen {
+  aspect-ratio: auto;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* The picture: the player's page, or the thumbnail before anything plays. */
+.link-card__player,
+.link-card__thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
 }
 
 .link-card__thumbnail {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   object-fit: cover;
 }
 
-.link-card__play-icon {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--radius-full);
-  background: rgb(0 0 0 / 70%);
-  color: #fff;
-  font-size: 1.5rem;
+/* The card's scrim must not swallow the player's own controls: the bar lets the click through and
+   only its buttons catch it. The picture underneath is not clickable, so its play control lives in
+   the bar. */
+.link-card__player-box .media-overlay__bar {
+  pointer-events: none;
 }
 
-.link-card__play:hover .link-card__play-icon,
-.link-card__play:focus-visible .link-card__play-icon {
-  background: rgb(0 0 0 / 90%);
-}
-
-.link-card__player {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 0;
-  border-radius: var(--radius-md);
+/* Why a Twitch card's Play button hands the stream to the browser (issue #419): its player
+   refuses to run under the app's own page on Linux. */
+.link-card__browser-hint {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 /* Missing-codec hint under a chat card's player (FR-2.41a). */

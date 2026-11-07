@@ -116,6 +116,7 @@
       "show": "Show"
     },
     "inBrowser": "Plays in your browser",
+    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
     "card": "Link preview: {{title}}",
     "dismiss": "Hide preview"
   },
