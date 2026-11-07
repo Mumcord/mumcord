@@ -1,0 +1,67 @@
+/*
+ * Shared look for the share images. Colours and fonts follow ui/src/theme/tokens.css and the
+ * GitHub social preview (../social-preview.svg). Each HTML file sets its canvas size and layout;
+ * render.mjs exports them to PNG.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Instrument+Sans:wght@500;600&display=block");
+
+:root {
+  --bg-1: #11012f;
+  --bg-2: #241068;
+  --text-soft: #d8d0fa;
+  --gradient-accent: linear-gradient(90deg, #ffb08a, #ff6fa8 50%, #9b7bff);
+  --font-display: "Bricolage Grotesque", "Noto Sans", sans-serif;
+  --font-body: "Instrument Sans", "Noto Sans", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { width: var(--w); height: var(--h); overflow: hidden; }
+
+body {
+  position: relative;
+  color: #fff;
+  font-family: var(--font-body);
+  background:
+    radial-gradient(60% 60% at 95% 0%, rgb(155 123 255 / 30%), transparent 70%),
+    radial-gradient(50% 50% at 0% 100%, rgb(255 140 120 / 14%), transparent 70%),
+    linear-gradient(135deg, var(--bg-1), var(--bg-2));
+}
+
+.brand { position: absolute; display: flex; flex-direction: column; }
+
+.lockup { display: flex; align-items: center; }
+
+.logo { display: block; flex: none; filter: drop-shadow(0 1rem 2.5rem rgb(0 0 0 / 40%)); }
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.bar { height: 8px; border-radius: 8px; background: var(--gradient-accent); }
+
+.tagline { color: var(--text-soft); font-weight: 500; line-height: 1.2; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.5em; list-style: none; }
+.chips li {
+  padding: 0.3em 0.8em;
+  border: 2px solid rgb(167 139 255 / 55%);
+  border-radius: 999px;
+  background: rgb(35 27 85 / 75%);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* A rounded app window holding a real screenshot (docs/images/screenshots). */
+.shot {
+  position: absolute;
+  overflow: hidden;
+  border: 2px solid rgb(167 139 255 / 45%);
+  border-radius: 24px;
+  box-shadow: 0 2rem 5rem -1rem rgb(0 0 0 / 60%), 0 0 4rem -1rem rgb(155 123 255 / 50%);
+  background: #1a1342;
+}
+.shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left top; }
