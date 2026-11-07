@@ -36,5 +36,9 @@
   "joinPartyFailed": "Níorbh fhéidir páirt a ghlacadh san fhéachaint le chéile.",
   "joinActivityFailed": "Níorbh fhéidir páirt a ghlacadh i ngníomhaíocht an bhreiseáin.",
   "earlier": "Níos luaithe",
-  "earlierLabel": "Níos luaithe, ó roimh an seisiún seo"
+  "earlierLabel": "Níos luaithe, ó roimh an seisiún seo",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} i #{{channel}}"
+  }
 }

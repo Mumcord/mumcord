@@ -36,5 +36,9 @@
   "joinPartyFailed": "Neizdevās pievienoties kopīgajai skatīšanai.",
   "joinActivityFailed": "Neizdevās pievienoties spraudņa aktivitātei.",
   "earlier": "Agrāk",
-  "earlierLabel": "Agrāk, pirms šīs sesijas"
+  "earlierLabel": "Agrāk, pirms šīs sesijas",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} kanālā #{{channel}}"
+  }
 }

@@ -449,7 +449,15 @@
     "inApp": "Rakenduses: väike hüpikaken Mumcordi sees, kui see on esiplaanil",
     "desktop": "Töölaual: süsteemi teavitus",
     "both": "Mõlemad: hüpikaken, kui Mumcord on esiplaanil, muidu süsteemi teavitus",
-    "off": "Väljas"
+    "off": "Väljas",
+    "activityTitle": "Tegevuste teavitused",
+    "activity": {
+      "screenShare": "Keegi alustab ekraani jagamist",
+      "watchParty": "Keegi alustab ühist vaatamist",
+      "pluginActivity": "Keegi alustab pistikprogrammi tegevust",
+      "pluginEvent": "Pistikprogrammide sündmused",
+      "joins": "Keegi ühendub, lahkub või vahetab kanalit"
+    }
   },
   "overlay": {
     "corner": {

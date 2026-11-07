@@ -36,5 +36,9 @@
   "joinPartyFailed": "Nem sikerült csatlakozni a közös nézéshez.",
   "joinActivityFailed": "Nem sikerült csatlakozni a bővítmény tevékenységéhez.",
   "earlier": "Korábban",
-  "earlierLabel": "Korábban, a munkamenet előttről"
+  "earlierLabel": "Korábban, a munkamenet előttről",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} itt: #{{channel}}"
+  }
 }

@@ -36,5 +36,9 @@
   "joinPartyFailed": "K spoločnému sledovaniu sa nepodarilo pripojiť.",
   "joinActivityFailed": "K aktivite doplnku sa nepodarilo pripojiť.",
   "earlier": "Skôr",
-  "earlierLabel": "Skôr, spred tejto relácie"
+  "earlierLabel": "Skôr, spred tejto relácie",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} v #{{channel}}"
+  }
 }

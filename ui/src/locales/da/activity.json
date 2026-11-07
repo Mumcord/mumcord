@@ -36,5 +36,9 @@
   "joinPartyFailed": "Kunne ikke deltage i watch partyen.",
   "joinActivityFailed": "Kunne ikke deltage i plugin-aktiviteten.",
   "earlier": "Tidligere",
-  "earlierLabel": "Tidligere, fra før denne session"
+  "earlierLabel": "Tidligere, fra før denne session",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} i #{{channel}}"
+  }
 }

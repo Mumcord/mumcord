@@ -452,7 +452,15 @@
     "inApp": "Dans l’app : une petite fenêtre contextuelle dans Mumcord quand il est au premier plan",
     "desktop": "Bureau : une notification système",
     "both": "Les deux : fenêtre contextuelle quand Mumcord est au premier plan, notification système sinon",
-    "off": "Désactivées"
+    "off": "Désactivées",
+    "activityTitle": "Notifications d'activité",
+    "activity": {
+      "screenShare": "Quelqu'un lance un partage d'écran",
+      "watchParty": "Quelqu'un lance une watch party",
+      "pluginActivity": "Quelqu'un lance une activité de plugin",
+      "pluginEvent": "Événements des plugins",
+      "joins": "Quelqu'un se connecte, part ou change de salon"
+    }
   },
   "overlay": {
     "corner": {

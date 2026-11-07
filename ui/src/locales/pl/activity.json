@@ -36,5 +36,9 @@
   "joinPartyFailed": "Nie udało się dołączyć do wspólnego oglądania.",
   "joinActivityFailed": "Nie udało się dołączyć do aktywności wtyczki.",
   "earlier": "Wcześniej",
-  "earlierLabel": "Wcześniej, sprzed tej sesji"
+  "earlierLabel": "Wcześniej, sprzed tej sesji",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} na kanale #{{channel}}"
+  }
 }

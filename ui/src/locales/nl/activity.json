@@ -36,5 +36,9 @@
   "joinPartyFailed": "Deelnemen aan de watchparty is mislukt.",
   "joinActivityFailed": "Deelnemen aan de plug-in-activiteit is mislukt.",
   "earlier": "Eerder",
-  "earlierLabel": "Eerder, van vóór deze sessie"
+  "earlierLabel": "Eerder, van vóór deze sessie",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} in #{{channel}}"
+  }
 }

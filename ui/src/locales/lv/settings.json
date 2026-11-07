@@ -452,7 +452,15 @@
     "inApp": "Lietotnē: neliels uznirstošs logs Mumcord iekšienē, kamēr tas ir priekšplānā",
     "desktop": "Darbvirsmā: sistēmas paziņojums",
     "both": "Abi: uznirstošs logs, kamēr Mumcord ir priekšplānā, citādi sistēmas paziņojums",
-    "off": "Izslēgts"
+    "off": "Izslēgts",
+    "activityTitle": "Darbību paziņojumi",
+    "activity": {
+      "screenShare": "Kāds sāk ekrāna kopīgošanu",
+      "watchParty": "Kāds sāk kopīgu skatīšanos",
+      "pluginActivity": "Kāds sāk spraudņa darbību",
+      "pluginEvent": "Spraudņu notikumi",
+      "joins": "Kāds pievienojas, aiziet vai maina kanālu"
+    }
   },
   "overlay": {
     "corner": {

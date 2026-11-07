@@ -36,5 +36,9 @@
   "joinPartyFailed": "Pridružitev skupnemu gledanju ni uspela.",
   "joinActivityFailed": "Pridružitev dejavnosti vtičnika ni uspela.",
   "earlier": "Prej",
-  "earlierLabel": "Prej, pred to sejo"
+  "earlierLabel": "Prej, pred to sejo",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} v #{{channel}}"
+  }
 }

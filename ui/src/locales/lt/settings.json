@@ -455,7 +455,15 @@
     "inApp": "Programoje: nedidelis iššokantis langelis Mumcord viduje, kol jis priekyje",
     "desktop": "Darbalaukyje: sistemos pranešimas",
     "both": "Abu: iššokantis langelis, kol Mumcord priekyje, kitu atveju – sistemos pranešimas",
-    "off": "Išjungta"
+    "off": "Išjungta",
+    "activityTitle": "Veiklos pranešimai",
+    "activity": {
+      "screenShare": "Kas nors pradeda bendrinti ekraną",
+      "watchParty": "Kas nors pradeda bendrą žiūrėjimą",
+      "pluginActivity": "Kas nors pradeda papildinio veiklą",
+      "pluginEvent": "Papildinių įvykiai",
+      "joins": "Kas nors prisijungia, išeina ar pakeičia kanalą"
+    }
   },
   "overlay": {
     "corner": {

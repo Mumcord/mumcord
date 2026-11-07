@@ -455,7 +455,15 @@
     "inApp": "V aplikaci: malé vyskakovací okno v Mumcordu, když je v popředí",
     "desktop": "Na ploše: systémové oznámení",
     "both": "Obojí: vyskakovací okno, když je Mumcord v popředí, jinak systémové oznámení",
-    "off": "Vypnuto"
+    "off": "Vypnuto",
+    "activityTitle": "Oznámení o aktivitě",
+    "activity": {
+      "screenShare": "Někdo začne sdílet obrazovku",
+      "watchParty": "Někdo spustí společné sledování",
+      "pluginActivity": "Někdo spustí aktivitu pluginu",
+      "pluginEvent": "Události pluginů",
+      "joins": "Někdo se připojí, odejde nebo změní kanál"
+    }
   },
   "overlay": {
     "corner": {

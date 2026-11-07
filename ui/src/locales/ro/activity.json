@@ -36,5 +36,9 @@
   "joinPartyFailed": "Nu te-ai putut alătura vizionării comune.",
   "joinActivityFailed": "Nu te-ai putut alătura activității pluginului.",
   "earlier": "Mai devreme",
-  "earlierLabel": "Mai devreme, dinaintea acestei sesiuni"
+  "earlierLabel": "Mai devreme, dinaintea acestei sesiuni",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} în #{{channel}}"
+  }
 }

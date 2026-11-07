@@ -455,7 +455,15 @@
     "inApp": "W aplikacji: małe okienko w Mumcord, gdy jest na wierzchu",
     "desktop": "Pulpit: powiadomienie systemowe",
     "both": "Oba: okienko, gdy Mumcord jest na wierzchu, w przeciwnym razie powiadomienie systemowe",
-    "off": "Wyłączone"
+    "off": "Wyłączone",
+    "activityTitle": "Powiadomienia o aktywności",
+    "activity": {
+      "screenShare": "Ktoś rozpoczyna udostępnianie ekranu",
+      "watchParty": "Ktoś rozpoczyna wspólne oglądanie",
+      "pluginActivity": "Ktoś rozpoczyna aktywność wtyczki",
+      "pluginEvent": "Zdarzenia wtyczek",
+      "joins": "Ktoś łączy się, wychodzi lub zmienia kanał"
+    }
   },
   "overlay": {
     "corner": {

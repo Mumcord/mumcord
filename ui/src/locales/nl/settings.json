@@ -449,7 +449,15 @@
     "inApp": "In de app: een kleine pop-up in Mumcord zolang het op de voorgrond staat",
     "desktop": "Desktop: een systeemmelding",
     "both": "Beide: pop-up zolang Mumcord op de voorgrond staat, anders een systeemmelding",
-    "off": "Uit"
+    "off": "Uit",
+    "activityTitle": "Activiteitsmeldingen",
+    "activity": {
+      "screenShare": "Iemand start een schermdeling",
+      "watchParty": "Iemand start een watchparty",
+      "pluginActivity": "Iemand start een plug-inactiviteit",
+      "pluginEvent": "Plug-ingebeurtenissen",
+      "joins": "Iemand verbindt, vertrekt of wisselt van kanaal"
+    }
   },
   "overlay": {
     "corner": {

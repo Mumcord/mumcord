@@ -452,7 +452,15 @@
     "inApp": "U aplikaciji: mali skočni prozor unutar Mumcorda dok je u prvom planu",
     "desktop": "Desktop: obavijest sustava",
     "both": "Oboje: skočni prozor dok je Mumcord u prvom planu, inače obavijest sustava",
-    "off": "Isključeno"
+    "off": "Isključeno",
+    "activityTitle": "Obavijesti o aktivnosti",
+    "activity": {
+      "screenShare": "Netko pokrene dijeljenje zaslona",
+      "watchParty": "Netko pokrene zajedničko gledanje",
+      "pluginActivity": "Netko pokrene aktivnost dodatka",
+      "pluginEvent": "Događaji dodataka",
+      "joins": "Netko se spoji, ode ili promijeni kanal"
+    }
   },
   "overlay": {
     "corner": {

@@ -452,7 +452,15 @@
     "inApp": "Nell'app: un piccolo pop-up dentro Mumcord quando è in primo piano",
     "desktop": "Desktop: una notifica di sistema",
     "both": "Entrambe: pop-up quando Mumcord è in primo piano, altrimenti notifica di sistema",
-    "off": "Disattivate"
+    "off": "Disattivate",
+    "activityTitle": "Notifiche di attività",
+    "activity": {
+      "screenShare": "Qualcuno avvia una condivisione schermo",
+      "watchParty": "Qualcuno avvia un watch party",
+      "pluginActivity": "Qualcuno avvia un'attività di un plugin",
+      "pluginEvent": "Eventi dei plugin",
+      "joins": "Qualcuno si connette, esce o cambia canale"
+    }
   },
   "overlay": {
     "corner": {

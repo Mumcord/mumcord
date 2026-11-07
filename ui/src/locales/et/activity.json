@@ -36,5 +36,9 @@
   "joinPartyFailed": "Ühisvaatamisega liitumine ebaõnnestus.",
   "joinActivityFailed": "Plugina tegevusega liitumine ebaõnnestus.",
   "earlier": "Varem",
-  "earlierLabel": "Varem, enne seda seanssi"
+  "earlierLabel": "Varem, enne seda seanssi",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} kanalis #{{channel}}"
+  }
 }

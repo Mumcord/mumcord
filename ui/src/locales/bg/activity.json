@@ -36,5 +36,9 @@
   "joinPartyFailed": "Неуспешно влизане в общото гледане.",
   "joinActivityFailed": "Неуспешно влизане в активността на добавката.",
   "earlier": "По-рано",
-  "earlierLabel": "По-рано, отпреди тази сесия"
+  "earlierLabel": "По-рано, отпреди тази сесия",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} в #{{channel}}"
+  }
 }

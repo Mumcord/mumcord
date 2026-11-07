@@ -455,7 +455,15 @@
     "inApp": "V aplikácii: malé okno v Mumcorde, keď je v popredí",
     "desktop": "Desktop: systémové upozornenie",
     "both": "Oboje: okno, keď je Mumcord v popredí, inak systémové upozornenie",
-    "off": "Vypnuté"
+    "off": "Vypnuté",
+    "activityTitle": "Upozornenia na aktivitu",
+    "activity": {
+      "screenShare": "Niekto začne zdieľať obrazovku",
+      "watchParty": "Niekto spustí spoločné sledovanie",
+      "pluginActivity": "Niekto spustí aktivitu doplnku",
+      "pluginEvent": "Udalosti doplnkov",
+      "joins": "Niekto sa pripojí, odíde alebo zmení kanál"
+    }
   },
   "overlay": {
     "corner": {

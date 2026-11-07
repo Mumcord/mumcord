@@ -449,7 +449,15 @@
     "inApp": "Alkalmazáson belül: kis felugró ablak a Mumcordban, amíg előtérben van",
     "desktop": "Asztali: rendszerértesítés",
     "both": "Mindkettő: felugró ablak, amíg a Mumcord előtérben van, egyébként rendszerértesítés",
-    "off": "Ki"
+    "off": "Ki",
+    "activityTitle": "Tevékenységi értesítések",
+    "activity": {
+      "screenShare": "Valaki képernyőmegosztást indít",
+      "watchParty": "Valaki közös nézést indít",
+      "pluginActivity": "Valaki bővítménytevékenységet indít",
+      "pluginEvent": "Bővítményesemények",
+      "joins": "Valaki csatlakozik, kilép vagy csatornát vált"
+    }
   },
   "overlay": {
     "corner": {

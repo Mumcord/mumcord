@@ -36,5 +36,9 @@
   "joinPartyFailed": "Η συμμετοχή στην κοινή προβολή απέτυχε.",
   "joinActivityFailed": "Η συμμετοχή στη δραστηριότητα του πρόσθετου απέτυχε.",
   "earlier": "Νωρίτερα",
-  "earlierLabel": "Νωρίτερα, πριν από αυτήν τη συνεδρία"
+  "earlierLabel": "Νωρίτερα, πριν από αυτήν τη συνεδρία",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} στο #{{channel}}"
+  }
 }

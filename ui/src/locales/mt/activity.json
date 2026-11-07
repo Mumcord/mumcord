@@ -36,5 +36,9 @@
   "joinPartyFailed": "Ma stajtx tingħaqad mal-watch party.",
   "joinActivityFailed": "Ma stajtx tingħaqad mal-attività tal-plugin.",
   "earlier": "Qabel",
-  "earlierLabel": "Qabel, minn qabel din is-sessjoni"
+  "earlierLabel": "Qabel, minn qabel din is-sessjoni",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} f'#{{channel}}"
+  }
 }

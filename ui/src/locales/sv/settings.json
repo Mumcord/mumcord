@@ -449,7 +449,15 @@
     "inApp": "I appen: en liten pop-up i Mumcord när det är i förgrunden",
     "desktop": "Skrivbord: en systemavisering",
     "both": "Båda: pop-up när Mumcord är i förgrunden, annars systemavisering",
-    "off": "Av"
+    "off": "Av",
+    "activityTitle": "Aktivitetsaviseringar",
+    "activity": {
+      "screenShare": "Någon startar en skärmdelning",
+      "watchParty": "Någon startar en watch party",
+      "pluginActivity": "Någon startar en plugin-aktivitet",
+      "pluginEvent": "Plugin-händelser",
+      "joins": "Någon ansluter, lämnar eller byter kanal"
+    }
   },
   "overlay": {
     "corner": {

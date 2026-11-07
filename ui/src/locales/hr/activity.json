@@ -36,5 +36,9 @@
   "joinPartyFailed": "Pridruživanje zajedničkom gledanju nije uspjelo.",
   "joinActivityFailed": "Pridruživanje aktivnosti dodatka nije uspjelo.",
   "earlier": "Ranije",
-  "earlierLabel": "Ranije, prije ove sesije"
+  "earlierLabel": "Ranije, prije ove sesije",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} u #{{channel}}"
+  }
 }
