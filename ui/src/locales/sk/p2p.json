@@ -68,5 +68,23 @@
     "howToRegister": "Ako sa zaregistrovať",
     "reconnect": "Pripojiť znova",
     "filesRegisteredOnly": "Zdieľanie súborov je na tomto serveri dostupné len registrovaným používateľom."
+  },
+  "trust": {
+    "title": "Relay na {{server}} sa zmenil",
+    "body": "Zdieľanie obrazovky a súborov je pozastavené, kým novému relayu nebudeš dôverovať.",
+    "details": "Podrobnosti",
+    "trustedTitle": "Novému relayu dôveruješ",
+    "trustedBody": "Zdieľanie obrazovky a súborov na {{server}} opäť funguje.",
+    "dialogBody": "Relay tohto servera teraz používa iný certifikát. Kým mu nebudeš dôverovať, je zdieľanie obrazovky, súborov a obrázky v plnej veľkosti pozastavené.",
+    "previous": "Doteraz dôveryhodný relay",
+    "current": "Nový relay",
+    "unknown": "Neznámy",
+    "trustIf": "Dôveruj mu, ak",
+    "trustIfText": "správcovia servera oznámili nový relay alebo presun a môžeš si to u nich overiť.",
+    "dontTrustIf": "Nedôveruj mu, ak",
+    "dontTrustIfText": "nikto zmenu neoznámil alebo si nie si istý. Niekto sa môže za relay vydávať.",
+    "notNow": "Teraz nie",
+    "review": "Relay zmenený – skontrolovať",
+    "filesBlocked": "Zdieľanie súborov nie je dostupné: relay tohto servera sa zmenil a zatiaľ mu nedôveruješ."
   }
 }

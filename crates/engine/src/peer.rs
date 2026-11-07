@@ -146,6 +146,11 @@ pub struct RelayInfo {
     pub broadcast_max: Option<u16>,
     /// The relay only serves registered users (announced `reg`, #601).
     pub registered_only: bool,
+    /// The announced relay's certificate fingerprint.
+    pub fingerprint: Option<String>,
+    /// The trusted relay's fingerprint while a changed relay waits for trust (#600), so the user
+    /// can compare the two before trusting the new one.
+    pub previous_fingerprint: Option<String>,
 }
 
 /// Waiting times of the relay logic; shorter in tests.
@@ -306,7 +311,8 @@ impl ServerRelay {
                 ..RelayInfo::default()
             };
         };
-        let status = if !self.trusted(&announcer.pair) {
+        let untrusted = !self.trusted(&announcer.pair);
+        let status = if untrusted {
             RelayStatus::Untrusted {
                 kept_blocked: self.kept_blocked.as_ref() == Some(&announcer.pair),
             }
@@ -326,6 +332,12 @@ impl ServerRelay {
                 .collect(),
             broadcast_max: announcer.ann.broadcast,
             registered_only: announcer.ann.registered_only,
+            fingerprint: Some(announcer.pair.fp.clone()),
+            previous_fingerprint: if untrusted {
+                self.pin.as_ref().map(|p| p.relay_fp.clone())
+            } else {
+                None
+            },
         }
     }
 

@@ -81,6 +81,11 @@
       "body": "Atosaigh chun nuashonrú",
       "restart": "Atosaigh chun nuashonrú",
       "whatsNew": "Cad atá nua"
+    },
+    "relay": {
+      "title": "Athraíodh an athsheachadán ar {{server}}",
+      "body": "Tá comhroinnt scáileáin agus comhad ar sos go dtí go mbíonn muinín agat as an athsheachadán nua.",
+      "decision": "Teastaíonn do chinneadh"
     }
   }
 }

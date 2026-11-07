@@ -4,6 +4,7 @@
 
 ### Added
 
+- When a server's relay changes, Mumcord says so in the notification centre and as a notification (in-app or system), with "Trust new relay" and "Details"; the details compare the old and new fingerprint and say when to trust it. The chat's file sharing hint names the changed relay and links there instead of saying there is no relay
 - Activity feed: an icon for each kind of event, and the feed is saved on this device, so it is still there after a reconnect or a restart (an "Earlier" line marks where this session starts). Settings → Privacy → "Clear activity history" removes it for all servers
 - Activity notifications: when someone starts a screen share, a watch party or a plugin activity, or a plugin posts an event, Mumcord notifies like for messages (in-app toast or system notification, following Do Not Disturb and muted servers). Settings → Chat & Notifications has a switch per kind; joins, leaves and moves are off by default
 
@@ -20,6 +21,7 @@
 
 ### Fixed
 
+- Activity feed: names work like in the chat (click opens the profile and menu, double-click a private message), and bots no longer show up with joins, leaves and moves
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
 - Settings: cards side by side are equally tall, and a "?" stays next to its long label instead of wrapping onto its own line

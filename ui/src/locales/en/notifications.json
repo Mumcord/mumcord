@@ -69,6 +69,11 @@
       "body": "Restart to update",
       "restart": "Restart to update",
       "whatsNew": "What's new"
+    },
+    "relay": {
+      "title": "Relay changed on {{server}}",
+      "body": "Screen and file sharing are paused until you trust the new relay.",
+      "decision": "Needs your decision"
     }
   }
 }

@@ -23,6 +23,8 @@ const RELAY: RelayInfo = {
   uses: ["images", "files", "screenShare"],
   broadcastMax: 25,
   registeredOnly: false,
+  fingerprint: null,
+  previousFingerprint: null,
 };
 
 function view(info: RelayInfo, onAction = vi.fn()) {
@@ -63,6 +65,8 @@ describe("RelayRowsView", () => {
       uses: [],
       broadcastMax: null,
       registeredOnly: false,
+      fingerprint: null,
+      previousFingerprint: null,
     });
     expect(valueOf("Mumbot")).toBe("No");
     expect(valueOf("Mumpeer relay")).toBe("No");
@@ -111,6 +115,8 @@ describe("RelayRowsView", () => {
       uses: [],
       broadcastMax: null,
       registeredOnly: false,
+      fingerprint: null,
+      previousFingerprint: null,
     });
     expect(valueOf("Mumbot")).toBe("Yes (BotA, BotB)");
     expect(valueOf("Mumpeer relay")).toBe("Two relays are announced on this server; none is used.");

@@ -69,6 +69,11 @@
       "body": "Starta om för att uppdatera",
       "restart": "Starta om och uppdatera",
       "whatsNew": "Nyheter"
+    },
+    "relay": {
+      "title": "Reläet på {{server}} har ändrats",
+      "body": "Skärm- och fildelning är pausade tills du litar på det nya reläet.",
+      "decision": "Kräver ditt beslut"
     }
   }
 }

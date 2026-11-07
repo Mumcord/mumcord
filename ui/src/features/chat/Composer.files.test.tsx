@@ -10,6 +10,7 @@ import { i18n } from "../../i18n";
 import { conversationMessages } from "./chatStore";
 import { Composer } from "./Composer";
 import { getServerState } from "../channels/serverStore";
+import { closeRelayDetails, getRelayDetails } from "../p2p/relayTrust";
 
 const dropHandlers = vi.hoisted(() => new Set<(event: { payload: DragDropEvent }) => void>());
 vi.mock("@tauri-apps/api/webview", () => ({
@@ -78,6 +79,19 @@ function setup(
 }
 
 const CHANNEL = { kind: "channel", channelId: 1 } as const;
+
+/** A relay announcement change; the composer re-reads the availability on any of them. */
+const RELAY_NONE: RelayInfo = {
+  bots: [],
+  host: null,
+  status: { kind: "none" },
+  firstSeen: null,
+  uses: [],
+  broadcastMax: null,
+  fingerprint: null,
+  previousFingerprint: null,
+  registeredOnly: false,
+};
 
 describe("chipStatus", () => {
   const t = i18n.getFixedT("en", "files");
@@ -151,7 +165,7 @@ describe("Composer file sharing", () => {
 
     relay = true;
     act(() => {
-      api.mock.emit("relayChanged", { serverId: 1, info: {} as RelayInfo });
+      api.mock.emit("relayChanged", { serverId: 1, info: RELAY_NONE });
     });
     await waitFor(() => {
       expect(paperclip()).not.toHaveAttribute("aria-disabled", "true");
@@ -159,7 +173,7 @@ describe("Composer file sharing", () => {
 
     relay = false;
     act(() => {
-      api.mock.emit("relayChanged", { serverId: 1, info: {} as RelayInfo });
+      api.mock.emit("relayChanged", { serverId: 1, info: RELAY_NONE });
     });
     expect(await screen.findByText(reason)).toBeTruthy();
     localStorage.clear();
@@ -174,6 +188,8 @@ describe("Composer file sharing", () => {
       firstSeen: null,
       uses: ["files"],
       broadcastMax: null,
+      fingerprint: null,
+      previousFingerprint: null,
       registeredOnly: true,
     });
     setup(CHANNEL);
@@ -190,6 +206,20 @@ describe("Composer file sharing", () => {
       await screen.findByText(/File sharing is only available to registered users/),
     ).toBeTruthy();
     expect(screen.getByRole("button", { name: "How to register" })).toBeTruthy();
+  });
+
+  it("names a changed relay and links to its details instead of saying there is none (#600)", async () => {
+    vi.spyOn(api, "filesAvailability").mockResolvedValue({ kind: "noRelay" });
+    vi.spyOn(api, "relayInfo").mockResolvedValue({
+      ...RELAY_NONE,
+      status: { kind: "untrusted", keptBlocked: false },
+    });
+    setup(CHANNEL);
+    expect(await screen.findByText(/the relay of this server changed/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /^Hide this hint for/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Relay changed – review" }));
+    expect(getRelayDetails()).toBe(1);
+    closeRelayDetails();
   });
 
   it("reads the availability again when the relay changes or the settings close", async () => {
@@ -215,7 +245,7 @@ describe("Composer file sharing", () => {
       expect(availability).toHaveBeenCalledTimes(1);
     });
     act(() => {
-      api.mock.emit("relayChanged", { serverId: 1, info: {} as RelayInfo });
+      api.mock.emit("relayChanged", { serverId: 1, info: RELAY_NONE });
     });
     expect(
       await screen.findByText("This server has no relay, so file sharing isn't available."),

@@ -201,13 +201,14 @@ describe("activity feed", () => {
       api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 2) });
     });
     const row = rowWith("Nia moved channel");
-    expect(within(row).getByText("Nia").tagName).toBe("STRONG");
+    // The name is a button that opens the person, as in the chat (#605).
+    expect(within(row).getByRole("button", { name: "Nia" })).toHaveClass("activity-row__actor");
     expect(within(row).getByText("moved channel")).toBeInTheDocument();
     expect(within(row).getByText(timeOf(TODAY))).toBeInTheDocument();
     expect(within(row).getByText("· # Raid")).toBeInTheDocument();
     // The own session reads as "You", not as its display name (FR-11.7).
     const own = rowWith("You connected");
-    expect(within(own).getByText("You").tagName).toBe("STRONG");
+    expect(within(own).getByRole("button", { name: "You" })).toHaveClass("activity-row__actor");
   });
 
   it("keeps a live row clickable and turns it into a plain row once it ended (FR-11.12)", async () => {
@@ -217,7 +218,9 @@ describe("activity feed", () => {
       api.mock.emit("screenSharesChanged", { serverId: SERVER, shares: [share(BEN)] });
     });
     const live = rowWith("Ben started a screen share");
-    expect(within(live).getByRole("button")).toHaveAccessibleName("Watch Ben's screen share");
+    expect(
+      within(live).getByRole("button", { name: "Watch Ben's screen share" }),
+    ).toBeInTheDocument();
     expect(within(live).getByText("· live")).toBeInTheDocument();
     expect(within(live).getByText(/^Watch/)).toBeInTheDocument();
 
@@ -225,9 +228,21 @@ describe("activity feed", () => {
       api.mock.emit("screenSharesChanged", { serverId: SERVER, shares: [] });
     });
     const ended = rowWith("Ben started a screen share");
-    expect(within(ended).queryByRole("button")).toBeNull();
+    expect(within(ended).queryByRole("button", { name: /^Watch/ })).toBeNull();
     expect(within(ended).queryByText("· live")).toBeNull();
     expect(rowWith("Ben stopped a screen share")).not.toHaveAccessibleName(/^Watch/);
+  });
+
+  it("opens the person from the name without running the row's action (#605)", async () => {
+    render(<ActivityFeed serverId={SERVER} />);
+    await settle();
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: SERVER, shares: [share(BEN)] });
+    });
+    fireEvent.click(
+      within(rowWith("Ben started a screen share")).getByRole("button", { name: "Ben" }),
+    );
+    expect(watchedShare()).toBeNull();
   });
 
   it("opens the flow of a live share, party or activity", async () => {
@@ -239,13 +254,17 @@ describe("activity feed", () => {
     act(() => {
       api.mock.emit("screenSharesChanged", { serverId: SERVER, shares: [share(BEN)] });
     });
-    fireEvent.click(within(rowWith("Ben started a screen share")).getByRole("button"));
+    fireEvent.click(
+      within(rowWith("Ben started a screen share")).getByRole("button", { name: /^(Watch|Join)/ }),
+    );
     expect(watchedShare()).toEqual({ serverId: SERVER, session: BEN });
 
     act(() => {
       api.mock.emit("watchPartyChanged", { serverId: SERVER, party: party(BEN, 2) });
     });
-    fireEvent.click(within(rowWith("Ben started a watch party")).getByRole("button"));
+    fireEvent.click(
+      within(rowWith("Ben started a watch party")).getByRole("button", { name: /^(Watch|Join)/ }),
+    );
     expect(joinParty).toHaveBeenCalledWith(SERVER);
 
     // The stage's first answer is the baseline; the second one is the change (FR-11.5), and the
@@ -261,8 +280,8 @@ describe("activity feed", () => {
     });
     await settle();
     const row = rowWith("Ben started Board Brawl");
-    expect(within(row).getByRole("button")).toHaveAccessibleName("Join Ben's Board Brawl");
-    fireEvent.click(within(row).getByRole("button"));
+    const join = within(row).getByRole("button", { name: "Join Ben's Board Brawl" });
+    fireEvent.click(join);
     expect(joinStage).toHaveBeenCalledWith("a2");
   });
 

@@ -68,5 +68,23 @@
     "howToRegister": "Sådan registrerer du dig",
     "reconnect": "Forbind igen",
     "filesRegisteredOnly": "Fildeling er kun tilgængelig for registrerede brugere på denne server."
+  },
+  "trust": {
+    "title": "Relæet på {{server}} er ændret",
+    "body": "Skærm- og fildeling er sat på pause, indtil du stoler på det nye relæ.",
+    "details": "Detaljer",
+    "trustedTitle": "Nyt relæ betroet",
+    "trustedBody": "Skærm- og fildeling på {{server}} virker igen.",
+    "dialogBody": "Relæet på denne server bruger nu et andet certifikat. Indtil du stoler på det, er skærmdeling, fildeling og billeder i fuld størrelse sat på pause.",
+    "previous": "Tidligere betroet relæ",
+    "current": "Nyt relæ",
+    "unknown": "Ukendt",
+    "trustIf": "Stol på det, hvis",
+    "trustIfText": "serverens administratorer har annonceret et nyt relæ eller en flytning, og du kan bekræfte det med dem.",
+    "dontTrustIf": "Stol ikke på det, hvis",
+    "dontTrustIfText": "ingen har annonceret en ændring, eller du er i tvivl. Nogen kan udgive sig for at være relæet.",
+    "notNow": "Ikke nu",
+    "review": "Relæ ændret – gennemse",
+    "filesBlocked": "Fildeling er ikke tilgængelig: relæet på denne server er ændret og endnu ikke betroet."
   }
 }

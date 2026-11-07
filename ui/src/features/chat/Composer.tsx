@@ -28,6 +28,8 @@ import { selfUser, useServerSelector } from "../channels";
 import { useNoRelayHint } from "../files/composer/noRelayHint";
 import { RefusalAction } from "../p2p/RefusalAction";
 import { useGuestRelayBlock } from "../p2p/useGuestRelayBlock";
+import { needsDecision, openRelayDetails } from "../p2p/relayTrust";
+import { useRelayInfo } from "../p2p/useRelayInfo";
 import { useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
@@ -151,9 +153,15 @@ export function Composer({
   const { servers } = useServers();
   const server = servers.find((entry) => entry.id === serverId);
   const serverName = server ? server.label || server.address : "";
+  const relayInfo = useRelayInfo(inChannelTarget ? serverId : null);
+  // A changed relay that waits for trust blocks files like a missing one, but says so (#600).
+  const relayWaiting =
+    fileChips.unavailable?.kind === "noRelay" && relayInfo !== null && needsDecision(relayInfo);
   const noRelayHint = useNoRelayHint(
     serverId,
-    fileChips.unavailable === null ? false : fileChips.unavailable.kind === "noRelay",
+    fileChips.unavailable === null
+      ? false
+      : fileChips.unavailable.kind === "noRelay" && !relayWaiting,
   );
   // A guest on a relay for registered users only is told before trying (#601).
   const guestBlocked = useGuestRelayBlock(inChannelTarget ? serverId : null);
@@ -162,10 +170,12 @@ export function Composer({
     inChannelTarget &&
     ((fileChips.unavailable === null && guestBlocked) ||
       (fileChips.unavailable !== null &&
-        !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden)));
+        (relayWaiting || !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden))));
   const reasonText =
     fileChips.unavailable !== null
-      ? unavailableText(tP2p, fileChips.unavailable)
+      ? relayWaiting
+        ? tP2p("trust.filesBlocked")
+        : unavailableText(tP2p, fileChips.unavailable)
       : guestBlocked
         ? tP2p("refusalAction.filesRegisteredOnly")
         : null;
@@ -537,8 +547,22 @@ export function Composer({
                   <RefusalAction hint="register" serverId={serverId} />
                 </>
               )}
+              {relayWaiting && serverId !== null && (
+                <>
+                  {" "}
+                  <button
+                    type="button"
+                    className="chat-composer__hint-link"
+                    onClick={() => {
+                      openRelayDetails(serverId);
+                    }}
+                  >
+                    {tP2p("trust.review")}
+                  </button>
+                </>
+              )}
             </p>
-            {fileChips.unavailable?.kind === "noRelay" && (
+            {fileChips.unavailable?.kind === "noRelay" && !relayWaiting && (
               <button
                 type="button"
                 className="chat-composer__hint-close"

@@ -113,9 +113,15 @@ export type UpdateItem = Base & {
  */
 export type PluginItem = Base & { kind: "plugin"; notice: PluginNotice };
 
+/**
+ * The relay of a server changed and waits for the user's decision (#600). At most one per server;
+ * it goes away once the relay is trusted or kept blocked.
+ */
+export type RelayItem = Base & OnServer & { kind: "relay" };
+
 /** Everything the centre stores itself. */
 export type StoredItem =
-  MentionItem | ReplyItem | InviteItem | ConnectionItem | UpdateItem | PluginItem;
+  MentionItem | ReplyItem | InviteItem | ConnectionItem | UpdateItem | PluginItem | RelayItem;
 
 /** A held chat or message request (#141), built from the requests store on every render. */
 export type RequestItem = Base & OnServer & { kind: "request"; request: MessageRequest };
@@ -141,6 +147,10 @@ export function requestItemId(serverId: number, requestId: number): string {
 
 /** The one update entry: a newer version replaces it. */
 export const UPDATE_ITEM_ID = "update";
+
+export function relayItemId(serverId: number): string {
+  return `relay:${String(serverId)}`;
+}
 
 /** The server an entry belongs to; `null` for app-wide entries such as an update. */
 export function serverOf(item: CentreItem): number | null {
@@ -172,6 +182,7 @@ export function filterOf(item: CentreItem): Exclude<CentreFilter, "all"> | null 
       return "plugins";
     case "connection":
     case "update":
+    case "relay":
       return null;
   }
 }
@@ -199,6 +210,7 @@ export function buildItems(
     (item) =>
       item.kind === "connection" ||
       item.kind === "update" ||
+      item.kind === "relay" ||
       item.kind === "plugin" ||
       !isBlocked(item.serverId, item.senderCertHash ?? null, item.sender),
   );

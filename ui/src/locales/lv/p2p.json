@@ -68,5 +68,23 @@
     "howToRegister": "Kā reģistrēties",
     "reconnect": "Pievienoties vēlreiz",
     "filesRegisteredOnly": "Failu kopīgošana šajā serverī pieejama tikai reģistrētiem lietotājiem."
+  },
+  "trust": {
+    "title": "Retranslators serverī {{server}} mainījies",
+    "body": "Ekrāna un failu kopīgošana ir apturēta, līdz uzticēsies jaunajam retranslatoram.",
+    "details": "Sīkāk",
+    "trustedTitle": "Jaunajam retranslatoram uzticas",
+    "trustedBody": "Ekrāna un failu kopīgošana serverī {{server}} atkal darbojas.",
+    "dialogBody": "Šī servera retranslators tagad izmanto citu sertifikātu. Kamēr tam neuzticēsies, ekrāna, failu kopīgošana un pilna izmēra attēli ir apturēti.",
+    "previous": "Iepriekš uzticamais retranslators",
+    "current": "Jauns retranslators",
+    "unknown": "Nezināms",
+    "trustIf": "Uzticies, ja",
+    "trustIfText": "servera administratori paziņoja par jaunu retranslatoru vai pārcelšanu un vari to ar viņiem apstiprināt.",
+    "dontTrustIf": "Neuzticies, ja",
+    "dontTrustIfText": "neviens nepaziņoja par izmaiņām vai neesi pārliecināts. Kāds var uzdoties par retranslatoru.",
+    "notNow": "Ne tagad",
+    "review": "Retranslators mainījies – pārskatīt",
+    "filesBlocked": "Failu kopīgošana nav pieejama: šī servera retranslators ir mainījies un vēl nav uzticams."
   }
 }

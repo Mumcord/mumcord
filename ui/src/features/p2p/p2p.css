@@ -47,3 +47,59 @@
 .p2p-link {
   font-family: var(--font-family);
 }
+
+/* "Relay changed" details (#600). */
+.relay-trust__fingerprints {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-3) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-chat);
+}
+
+.relay-trust__fingerprints dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.relay-trust__fingerprints dd {
+  margin: 0 0 var(--space-2);
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+}
+
+.relay-trust__advice {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-2);
+}
+
+.relay-trust__advice section {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.relay-trust__advice h3 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.relay-trust__advice p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.relay-trust__yes {
+  color: var(--color-success);
+}
+
+.relay-trust__no {
+  color: var(--color-danger);
+}

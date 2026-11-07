@@ -68,5 +68,23 @@
     "howToRegister": "Conas clárú",
     "reconnect": "Ceangail arís",
     "filesRegisteredOnly": "Níl comhroinnt comhad ar fáil ach d'úsáideoirí cláraithe ar an bhfreastalaí seo."
+  },
+  "trust": {
+    "title": "Athraíodh an athsheachadán ar {{server}}",
+    "body": "Tá comhroinnt scáileáin agus comhad ar sos go dtí go mbíonn muinín agat as an athsheachadán nua.",
+    "details": "Sonraí",
+    "trustedTitle": "Muinín as an athsheachadán nua",
+    "trustedBody": "Oibríonn comhroinnt scáileáin agus comhad ar {{server}} arís.",
+    "dialogBody": "Úsáideann athsheachadán an fhreastalaí seo teastas eile anois. Go dtí go mbíonn muinín agat as, tá comhroinnt scáileáin, comhad agus íomhánna lánmhéide ar sos.",
+    "previous": "Athsheachadán iontaofa roimhe seo",
+    "current": "Athsheachadán nua",
+    "unknown": "Anaithnid",
+    "trustIf": "Bíodh muinín agat as má",
+    "trustIfText": "d'fhógair riarthóirí an fhreastalaí athsheachadán nua nó aistriú agus is féidir leat é sin a dheimhniú leo.",
+    "dontTrustIf": "Ná bíodh muinín agat as má",
+    "dontTrustIfText": "nár fhógair aon duine athrú nó mura bhfuil tú cinnte. D'fhéadfadh duine a bheith ag ligean air gurb é an t-athsheachadán é.",
+    "notNow": "Ní anois",
+    "review": "Athraíodh an t-athsheachadán – athbhreithnigh",
+    "filesBlocked": "Níl comhroinnt comhad ar fáil: athraíodh athsheachadán an fhreastalaí seo agus níl muinín as fós."
   }
 }

@@ -73,6 +73,11 @@
       "body": "Reinicia para actualizar",
       "restart": "Reiniciar para actualizar",
       "whatsNew": "Novedades"
+    },
+    "relay": {
+      "title": "El relé de {{server}} ha cambiado",
+      "body": "Compartir pantalla y archivos está en pausa hasta que confíes en el nuevo relé.",
+      "decision": "Requiere tu decisión"
     }
   }
 }

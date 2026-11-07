@@ -73,6 +73,11 @@
       "body": "Restartējiet, lai atjauninātu",
       "restart": "Restartēt un atjaunināt",
       "whatsNew": "Jaunumi"
+    },
+    "relay": {
+      "title": "Retranslators serverī {{server}} mainījies",
+      "body": "Ekrāna un failu kopīgošana ir apturēta, līdz uzticēsies jaunajam retranslatoram.",
+      "decision": "Nepieciešams tavs lēmums"
     }
   }
 }

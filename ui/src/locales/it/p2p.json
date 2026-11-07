@@ -68,5 +68,23 @@
     "howToRegister": "Come registrarsi",
     "reconnect": "Riconnetti",
     "filesRegisteredOnly": "La condivisione di file è disponibile solo per gli utenti registrati su questo server."
+  },
+  "trust": {
+    "title": "Relay cambiato su {{server}}",
+    "body": "La condivisione di schermo e file è in pausa finché non ti fidi del nuovo relay.",
+    "details": "Dettagli",
+    "trustedTitle": "Nuovo relay attendibile",
+    "trustedBody": "La condivisione di schermo e file su {{server}} funziona di nuovo.",
+    "dialogBody": "Il relay di questo server ora usa un altro certificato. Finché non ti fidi, condivisione schermo, file e immagini a grandezza piena sono in pausa.",
+    "previous": "Relay attendibile finora",
+    "current": "Nuovo relay",
+    "unknown": "Sconosciuto",
+    "trustIf": "Fidati se",
+    "trustIfText": "gli admin del server hanno annunciato un nuovo relay o un trasferimento e puoi confermarlo con loro.",
+    "dontTrustIf": "Non fidarti se",
+    "dontTrustIfText": "nessuno ha annunciato un cambiamento o non sei sicuro. Qualcuno potrebbe fingersi il relay.",
+    "notNow": "Non ora",
+    "review": "Relay cambiato – verifica",
+    "filesBlocked": "La condivisione file non è disponibile: il relay di questo server è cambiato e non è ancora attendibile."
   }
 }

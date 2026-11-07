@@ -195,6 +195,10 @@ pub struct RelayInfo {
     pub broadcast_max: Option<u16>,
     /// The relay only serves registered users (#601), so a guest sees why before trying.
     pub registered_only: bool,
+    /// The announced relay's certificate fingerprint.
+    pub fingerprint: Option<String>,
+    /// The trusted relay's fingerprint while a changed relay waits for trust (#600).
+    pub previous_fingerprint: Option<String>,
 }
 
 /// The relay of a server changed (FR-4.20).
@@ -289,6 +293,8 @@ impl From<peer::RelayInfo> for RelayInfo {
             uses: i.uses.into_iter().map(Into::into).collect(),
             broadcast_max: i.broadcast_max,
             registered_only: i.registered_only,
+            fingerprint: i.fingerprint,
+            previous_fingerprint: i.previous_fingerprint,
         }
     }
 }

@@ -4348,6 +4348,10 @@ export type RelayInfo = {
 	broadcastMax: number | null,
 	/**  The relay only serves registered users (#601), so a guest sees why before trying. */
 	registeredOnly: boolean,
+	/**  The announced relay's certificate fingerprint. */
+	fingerprint: string | null,
+	/**  The trusted relay's fingerprint while a changed relay waits for trust (#600). */
+	previousFingerprint: string | null,
 };
 
 /**  Why the relay refused a connection (spec 04 section 6.5). */

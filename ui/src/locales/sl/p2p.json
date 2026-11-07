@@ -68,5 +68,23 @@
     "howToRegister": "Kako se registrirati",
     "reconnect": "Znova poveži",
     "filesRegisteredOnly": "Deljenje datotek je na tem strežniku na voljo le registriranim uporabnikom."
+  },
+  "trust": {
+    "title": "Rele na {{server}} se je spremenil",
+    "body": "Deljenje zaslona in datotek je zaustavljeno, dokler novemu releju ne zaupaš.",
+    "details": "Podrobnosti",
+    "trustedTitle": "Novemu releju zaupaš",
+    "trustedBody": "Deljenje zaslona in datotek na {{server}} spet deluje.",
+    "dialogBody": "Rele tega strežnika zdaj uporablja drugo potrdilo. Dokler mu ne zaupaš, so deljenje zaslona, datotek in slike v polni velikosti zaustavljeni.",
+    "previous": "Doslej zaupanja vreden rele",
+    "current": "Nov rele",
+    "unknown": "Neznano",
+    "trustIf": "Zaupaj mu, če",
+    "trustIfText": "so skrbniki strežnika napovedali nov rele ali selitev in lahko to preveriš pri njih.",
+    "dontTrustIf": "Ne zaupaj mu, če",
+    "dontTrustIfText": "nihče ni napovedal spremembe ali nisi prepričan. Nekdo se lahko predstavlja kot rele.",
+    "notNow": "Ne zdaj",
+    "review": "Rele spremenjen – preveri",
+    "filesBlocked": "Deljenje datotek ni na voljo: rele tega strežnika se je spremenil in mu še ne zaupaš."
   }
 }

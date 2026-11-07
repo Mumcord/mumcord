@@ -68,5 +68,23 @@
     "howToRegister": "Cum te înregistrezi",
     "reconnect": "Reconectează",
     "filesRegisteredOnly": "Partajarea fișierelor e disponibilă pe acest server doar pentru utilizatorii înregistrați."
+  },
+  "trust": {
+    "title": "Releul de pe {{server}} s-a schimbat",
+    "body": "Partajarea ecranului și a fișierelor e în pauză până când ai încredere în noul releu.",
+    "details": "Detalii",
+    "trustedTitle": "Ai încredere în noul releu",
+    "trustedBody": "Partajarea ecranului și a fișierelor pe {{server}} funcționează din nou.",
+    "dialogBody": "Releul acestui server folosește acum alt certificat. Până când ai încredere în el, partajarea ecranului, a fișierelor și imaginile la dimensiune completă sunt în pauză.",
+    "previous": "Releu de încredere până acum",
+    "current": "Releu nou",
+    "unknown": "Necunoscut",
+    "trustIf": "Ai încredere dacă",
+    "trustIfText": "administratorii serverului au anunțat un releu nou sau o mutare și poți confirma asta cu ei.",
+    "dontTrustIf": "Nu avea încredere dacă",
+    "dontTrustIfText": "nimeni nu a anunțat o schimbare sau nu ești sigur. Cineva s-ar putea da drept releu.",
+    "notNow": "Nu acum",
+    "review": "Releu schimbat – verifică",
+    "filesBlocked": "Partajarea fișierelor nu e disponibilă: releul acestui server s-a schimbat și nu e încă de încredere."
   }
 }

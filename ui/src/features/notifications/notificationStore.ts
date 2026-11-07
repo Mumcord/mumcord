@@ -26,6 +26,16 @@ export interface Toast {
   text: string;
   /** Grows with every update, so the toast restarts its timer. */
   version: number;
+  /** Replaces opening the chat, for toasts that are not about a message (#600). */
+  open?: (() => void) | undefined;
+  /** Buttons below the text, e.g. "Trust new relay" and "Details" (#600). */
+  actions?: readonly ToastAction[] | undefined;
+}
+
+export interface ToastAction {
+  label: string;
+  primary?: boolean;
+  run: () => void;
 }
 
 let toasts: readonly Toast[] = [];
@@ -114,6 +124,11 @@ function subscribe(listener: () => void): () => void {
 }
 
 /** Visible toasts, oldest first. */
+/** The toasts shown now, outside React (tests and the relay notices). */
+export function getToasts(): readonly Toast[] {
+  return toasts;
+}
+
 export function useToasts(): readonly Toast[] {
   return useSyncExternalStore(subscribe, () => toasts);
 }

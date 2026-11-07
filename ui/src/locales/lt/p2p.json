@@ -68,5 +68,23 @@
     "howToRegister": "Kaip užsiregistruoti",
     "reconnect": "Prisijungti iš naujo",
     "filesRegisteredOnly": "Failų bendrinimas šiame serveryje prieinamas tik registruotiems naudotojams."
+  },
+  "trust": {
+    "title": "Serverio {{server}} retransliatorius pasikeitė",
+    "body": "Ekrano ir failų bendrinimas sustabdytas, kol pasitikėsi nauju retransliatoriumi.",
+    "details": "Išsamiau",
+    "trustedTitle": "Naujuoju retransliatoriumi pasitikima",
+    "trustedBody": "Ekrano ir failų bendrinimas serveryje {{server}} vėl veikia.",
+    "dialogBody": "Šio serverio retransliatorius dabar naudoja kitą sertifikatą. Kol juo nepasitikėsi, ekrano, failų bendrinimas ir viso dydžio paveikslėliai sustabdyti.",
+    "previous": "Anksčiau patikimas retransliatorius",
+    "current": "Naujas retransliatorius",
+    "unknown": "Nežinoma",
+    "trustIf": "Pasitikėk, jei",
+    "trustIfText": "serverio administratoriai paskelbė apie naują retransliatorių ar perkėlimą ir gali tai su jais patvirtinti.",
+    "dontTrustIf": "Nepasitikėk, jei",
+    "dontTrustIfText": "niekas nepaskelbė apie pakeitimą arba nesi tikras. Kažkas gali apsimesti retransliatoriumi.",
+    "notNow": "Ne dabar",
+    "review": "Retransliatorius pasikeitė – peržiūrėti",
+    "filesBlocked": "Failų bendrinimas negalimas: šio serverio retransliatorius pasikeitė ir dar nėra patikimas."
   }
 }

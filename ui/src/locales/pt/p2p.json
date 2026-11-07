@@ -68,5 +68,23 @@
     "howToRegister": "Como registar",
     "reconnect": "Voltar a ligar",
     "filesRegisteredOnly": "A partilha de ficheiros só está disponível para utilizadores registados neste servidor."
+  },
+  "trust": {
+    "title": "Relay alterado em {{server}}",
+    "body": "A partilha de ecrã e ficheiros está em pausa até confiares no novo relay.",
+    "details": "Detalhes",
+    "trustedTitle": "Novo relay de confiança",
+    "trustedBody": "A partilha de ecrã e ficheiros em {{server}} volta a funcionar.",
+    "dialogBody": "O relay deste servidor usa agora outro certificado. Até confiares nele, a partilha de ecrã, de ficheiros e as imagens em tamanho real estão em pausa.",
+    "previous": "Relay de confiança anterior",
+    "current": "Novo relay",
+    "unknown": "Desconhecido",
+    "trustIf": "Confia se",
+    "trustIfText": "os administradores anunciaram um novo relay ou uma mudança e podes confirmar isso com eles.",
+    "dontTrustIf": "Não confies se",
+    "dontTrustIfText": "ninguém anunciou uma alteração ou não tens a certeza. Alguém pode estar a fazer-se passar pelo relay.",
+    "notNow": "Agora não",
+    "review": "Relay alterado – rever",
+    "filesBlocked": "A partilha de ficheiros não está disponível: o relay deste servidor mudou e ainda não é de confiança."
   }
 }

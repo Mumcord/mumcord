@@ -68,5 +68,23 @@
     "howToRegister": "Zo registreer je je",
     "reconnect": "Opnieuw verbinden",
     "filesRegisteredOnly": "Bestanden delen is op deze server alleen beschikbaar voor geregistreerde gebruikers."
+  },
+  "trust": {
+    "title": "Relay gewijzigd op {{server}}",
+    "body": "Scherm- en bestandsdeling zijn gepauzeerd tot je de nieuwe relay vertrouwt.",
+    "details": "Details",
+    "trustedTitle": "Nieuwe relay vertrouwd",
+    "trustedBody": "Scherm- en bestandsdeling op {{server}} werken weer.",
+    "dialogBody": "De relay van deze server gebruikt nu een ander certificaat. Tot je hem vertrouwt, zijn schermdeling, bestandsdeling en afbeeldingen op volle grootte gepauzeerd.",
+    "previous": "Eerder vertrouwde relay",
+    "current": "Nieuwe relay",
+    "unknown": "Onbekend",
+    "trustIf": "Vertrouw hem als",
+    "trustIfText": "de serverbeheerders een nieuwe relay of verhuizing hebben aangekondigd en je dat bij hen kunt nagaan.",
+    "dontTrustIf": "Vertrouw hem niet als",
+    "dontTrustIfText": "niemand een wijziging heeft aangekondigd of je twijfelt. Iemand kan zich als de relay voordoen.",
+    "notNow": "Niet nu",
+    "review": "Relay gewijzigd – bekijken",
+    "filesBlocked": "Bestanden delen is niet beschikbaar: de relay van deze server is gewijzigd en nog niet vertrouwd."
   }
 }

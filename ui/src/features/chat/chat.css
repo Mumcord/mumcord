@@ -713,6 +713,16 @@
   flex: 1;
 }
 
+.chat-composer__hint-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .chat-composer__hint-close {
   display: inline-grid;
   flex: none;

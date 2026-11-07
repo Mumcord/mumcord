@@ -14,6 +14,8 @@ import { markConversationRead } from "./centreStore";
 import { handleIncoming } from "./incoming";
 import { handleActivity } from "../activity/activityNotify";
 import { subscribeActivityAdded } from "../activity/activityStore";
+import { bindRelayTrustNotices } from "../p2p/relayTrust";
+import { RelayTrustDialog } from "../p2p/RelayTrustDialog";
 import { NotificationCentre } from "./NotificationCentre";
 import { clearServerNotifications, markSeen, noticeKey } from "./notificationStore";
 import { Toasts } from "./Toasts";
@@ -57,6 +59,7 @@ function focusChat(): void {
 export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHostProps) {
   const { t } = useTranslation("notifications");
   const { t: tActivity } = useTranslation("activity");
+  const { t: tP2p } = useTranslation("p2p");
   const { conversation: selected } = useSelectedConversation();
   const shown = useShownServerId();
   const { servers } = useServers();
@@ -76,6 +79,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
   const live = useRef({
     t,
     tActivity,
+    tP2p,
     overlayOpen,
     onOpenChat,
     selected,
@@ -84,7 +88,17 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     muted,
   });
   useEffect(() => {
-    live.current = { t, tActivity, overlayOpen, onOpenChat, selected, shown, serverName, muted };
+    live.current = {
+      t,
+      tActivity,
+      tP2p,
+      overlayOpen,
+      onOpenChat,
+      selected,
+      shown,
+      serverName,
+      muted,
+    };
   });
 
   // Shows the chat's server first (FR-2.10); the selection is remembered per server.
@@ -121,6 +135,11 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
           serverName: (id) => live.current.serverName(id),
         });
       }),
+      // A changed relay waits for the user's decision (#600).
+      bindRelayTrustNotices(getApi(), () => ({
+        t: live.current.tP2p,
+        serverName: (id) => live.current.serverName(id),
+      })),
       getApi().on("notificationActivated", ({ serverId, conversation }) => {
         open(serverId, conversation);
       }),
@@ -149,6 +168,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     <>
       <Toasts onOpen={open} />
       <NotificationCentre overlayOpen={overlayOpen} />
+      <RelayTrustDialog />
     </>
   );
 }

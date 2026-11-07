@@ -265,6 +265,8 @@ const NO_RELAY: RelayInfo = {
   uses: [],
   broadcastMax: null,
   registeredOnly: false,
+  fingerprint: null,
+  previousFingerprint: null,
 };
 
 /** A relay announced by a bot and trusted since the first visit (spec 04, FR-4.20). */
@@ -276,6 +278,8 @@ const MOCK_RELAY: RelayInfo = {
   uses: ["images", "files", "screenShare"],
   broadcastMax: 25,
   registeredOnly: false,
+  fingerprint: null,
+  previousFingerprint: null,
 };
 
 /** Per-server switches of a server that was just added. */
