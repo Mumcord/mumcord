@@ -463,7 +463,7 @@
 /* A long label wraps its own text and leaves room for the "?" after it, instead of pushing the
    "?" onto a line of its own (#585). */
 .settings-switch__text > label {
-  max-width: calc(100% - 2 * var(--space-2) - 1.25rem);
+  max-width: calc(100% - 3 * var(--space-2) - 1.25rem);
 }
 
 .settings-control-row > .select,
