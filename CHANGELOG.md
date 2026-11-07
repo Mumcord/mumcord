@@ -19,6 +19,7 @@
 
 ### Fixed
 
+- The channel search field at the top of the sidebar lines up with the channel name in the chat header
 - Activity feed: names work like in the chat (click opens the profile and menu, double-click a private message), and bots no longer show up with joins, leaves and moves
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
