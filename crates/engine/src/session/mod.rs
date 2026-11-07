@@ -259,6 +259,7 @@ struct Inner {
     /// What the open kick and ban dialogs hold per connection (issue #253).
     admin: Mutex<crate::admin::Admin>,
     channel_admin: Mutex<crate::channel_admin::ChannelAdmin>,
+    channel_acls: Mutex<crate::channel_acl::ChannelAcls>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
     /// Chat and message requests per server (issue #141).
@@ -610,6 +611,7 @@ impl Engine {
             ban_lists: Mutex::default(),
             admin: Mutex::default(),
             channel_admin: Mutex::default(),
+            channel_acls: Mutex::default(),
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
@@ -912,6 +914,10 @@ impl Engine {
     }
 
     /// What the open kick and ban dialogs hold (issue #253).
+    pub(crate) fn channel_acl_state(&self) -> &Mutex<crate::channel_acl::ChannelAcls> {
+        &self.inner.channel_acls
+    }
+
     pub(crate) fn channel_admin_state(&self) -> &Mutex<crate::channel_admin::ChannelAdmin> {
         &self.inner.channel_admin
     }
@@ -1929,6 +1935,7 @@ impl Inner {
             crate::banlist::on_disconnect(&self.ban_lists, server_id);
             crate::admin::on_disconnect(&self.admin, server_id);
             crate::channel_admin::on_disconnect(&self.channel_admin, server_id);
+            crate::channel_acl::on_disconnect(&self.channel_acls, server_id);
             self.forget_password_attempt(server_id);
             self.files.on_connection_reset(server_id);
             self.full_images.reset(server_id);
@@ -2912,11 +2919,18 @@ impl Inner {
                     );
                 }
                 let password = self.on_channel_denied(ctx, denied);
-                // A refused create, edit, link or delete answers the channel dialog (#250).
-                let channel_change = crate::channel_admin::on_denied(
+                // A refused rules read answers the Permissions tab (#252); otherwise a refused
+                // create, edit, link or delete answers the channel dialog (#250).
+                let own_session = ctx.handle.with_state(|state| state.session);
+                let channel_change = crate::channel_acl::on_denied(
+                    &self.channel_acls,
+                    ctx.server_id,
+                    own_session,
+                    denied,
+                ) || crate::channel_admin::on_denied(
                     &self.channel_admin,
                     ctx.server_id,
-                    ctx.handle.with_state(|state| state.session),
+                    own_session,
                     denied,
                 );
                 ctx.events.emit(EngineEvent::ServerDenied {
@@ -2935,9 +2949,11 @@ impl Inner {
                     crate::history_sync::on_permissions(&self.history_sync, ctx, *channel_id);
                 }
             }
-            // The ACL editor (Epic 4, issue #252) is the consumer of the query answer; nothing here
-            // needs it yet, so the event stays in the protocol layer.
-            Event::Acl(_) => {}
+            // The Permissions and Password tabs read the rules (Epic 4, #251, #252).
+            Event::Acl(acl) => crate::channel_acl::on_acl(&self.channel_acls, ctx.server_id, acl),
+            Event::UsersQueried(users) => {
+                crate::channel_acl::on_users(&self.channel_acls, ctx.server_id, users);
+            }
             Event::CryptSetup(setup) => {
                 if let Some(t) = transport {
                     t.on_crypt_setup(setup.clone());

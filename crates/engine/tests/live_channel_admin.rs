@@ -12,8 +12,9 @@ use std::time::Duration;
 
 use mumbot::{Bot, BotConfig, env};
 use mumcord_engine::{
-    ChannelChange, ChannelCreate, ChannelOutcome, ChannelView, DenialKind, Engine, EngineEvent,
-    EventReceiver, PasswordChange, Right, SecretStore, ServerFields,
+    AclSaveOutcome, ChannelChange, ChannelCreate, ChannelOutcome, ChannelView, DenialKind, Engine,
+    EngineEvent, EventReceiver, PasswordChange, PasswordState, Right, SecretStore, ServerFields,
+    password_of,
 };
 
 // mumbot pins its own mumcord-protocol release (the `bot_protocol` alias), so bot-side messages use its types.
@@ -317,6 +318,133 @@ async fn create_edit_move_link_and_delete_channels() {
         !s.channels.contains_key(&officers) && !s.channels.contains_key(&raid)
     })
     .await;
+    confirmed(
+        engine
+            .channel_remove(server_id, room_id)
+            .await
+            .expect("delete room"),
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs the local test server (testenv/up.sh v15) and MUMCORD_LIVE=1"]
+async fn channel_password_and_rule_conflicts() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("live_channel_acl");
+
+    let (engine, mut rx) = Engine::new(
+        &dir.join("data"),
+        SecretStore::in_memory(),
+        tokio::runtime::Handle::current(),
+    )
+    .expect("engine");
+    let server_id = connect(&engine, &mut rx).await;
+
+    // A SuperUser bot makes a room in which everyone may create, edit and link channels.
+    let admin = Bot::connect(BotConfig::superuser(common::v15()))
+        .await
+        .expect("SuperUser bot (SUPERUSER_PASSWORD in testenv/.env)");
+    let room = unique("mc-chadm-room");
+    admin
+        .handle()
+        .send_channel_state(proto::ChannelState {
+            parent: Some(0),
+            name: Some(room.clone()),
+            ..Default::default()
+        })
+        .expect("create room");
+    let deadline = tokio::time::Instant::now() + WAIT;
+    let room_id = loop {
+        if let Ok(id) = admin.channel_id(&room) {
+            break id;
+        }
+        assert!(tokio::time::Instant::now() < deadline, "room not created");
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    };
+    let rights = bot_protocol::permissions::WRITE
+        | bot_protocol::permissions::MAKE_CHANNEL
+        | bot_protocol::permissions::LINK_CHANNEL;
+    admin
+        .handle()
+        .send_acl(proto::Acl {
+            channel_id: room_id,
+            inherit_acls: Some(true),
+            groups: Vec::new(),
+            acls: vec![proto::acl::ChanAcl {
+                apply_here: Some(true),
+                apply_subs: Some(true),
+                inherited: Some(false),
+                user_id: None,
+                group: Some("all".to_owned()),
+                grant: Some(rights),
+                deny: Some(0),
+            }],
+            query: Some(false),
+        })
+        .expect("grant rights");
+    wait_channel(&mut rx, "the rights in the room", &room, |v| {
+        v.permissions.make_channel && v.permissions.write && v.permissions.link_channel
+    })
+    .await;
+
+    let raid_name = unique("mc-acl");
+    let raid = confirmed(
+        engine
+            .channel_create(server_id, &create(room_id, &raid_name))
+            .await
+            .expect("create Raid"),
+    );
+
+    // Set the password: the official client's two rules appear, and only those.
+    let start = engine
+        .channel_acl_read(server_id, raid)
+        .await
+        .expect("read rules");
+    assert_eq!(password_of(&start), PasswordState::None);
+    let AclSaveOutcome::Saved(saved) = engine
+        .channel_password_save(server_id, raid, Some("secret"), &start, false)
+        .await
+        .expect("set password")
+    else {
+        panic!("no conflict expected");
+    };
+    assert_eq!(password_of(&saved), PasswordState::Set("secret".into()));
+    let read = engine
+        .channel_acl_read(server_id, raid)
+        .await
+        .expect("read again");
+    assert_eq!(password_of(&read), PasswordState::Set("secret".into()));
+
+    // Someone else changes the rules meanwhile: the save stops and hands back theirs.
+    bot_sees(&admin, "the bot to see the channel", |s| {
+        s.channels.contains_key(&raid)
+    })
+    .await;
+    admin
+        .deny_speak(&raid_name)
+        .await
+        .expect("bot changes the rules");
+    let outcome = engine
+        .channel_password_save(server_id, raid, None, &read, false)
+        .await
+        .expect("clear password");
+    let AclSaveOutcome::Conflict(fresh) = outcome else {
+        panic!("expected a conflict, got {outcome:?}");
+    };
+    // "Save mine anyway" replaces theirs.
+    let AclSaveOutcome::Saved(cleared) = engine
+        .channel_password_save(server_id, raid, None, &fresh, true)
+        .await
+        .expect("clear password anyway")
+    else {
+        panic!("no conflict expected");
+    };
+    assert_eq!(password_of(&cleared), PasswordState::None);
+
     confirmed(
         engine
             .channel_remove(server_id, room_id)
