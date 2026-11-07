@@ -17,12 +17,45 @@ exported PNG with the same name. The app screenshot comes from
 
 All text is sized to stay readable when the image is shown at phone width.
 
+## Style sets: neon, light and glass
+
+Three more sets that lead with what Mumcord is for (voice chat for friends, gaming groups and
+communities) and mention Mumble only in a small line. Each folder holds an HTML source and a PNG
+for all seven formats above, with the same file names, sizes and safe zones.
+
+| Folder | Look | Headline | Small line |
+| --- | --- | --- | --- |
+| `neon/` | Dark synthwave: neon glow, perspective grid, tilted dark-theme screenshot | "Talk. Share. Play together." | Works with any Mumble server |
+| `light/` | Clean editorial: off-white, lots of space, light-theme screenshot | "Voice chat for your crew. Crystal clear." | Works with any Mumble server |
+| `glass/` | 3D glass: gradient, glossy orbs, floating cards (screen share, chat, cameras) | "Crystal-clear voice for your community." | Built on the open Mumble protocol |
+
+Which file goes where (same in every set):
+
+| File | Use it for |
+| --- | --- |
+| `og-1200x630.png` | Facebook and LinkedIn link/post image, Open Graph (`og:image`) |
+| `instagram-square-1080x1080.png` | Instagram square post |
+| `instagram-portrait-1080x1350.png` | Instagram portrait post |
+| `story-1080x1920.png` | Instagram/Facebook Story, Reel or TikTok cover |
+| `x-post-1600x900.png` | X/Twitter post image |
+| `facebook-cover-1640x624.png` | Facebook page cover |
+| `linkedin-banner-1584x396.png` | LinkedIn page or profile banner |
+
+- `shared/` holds what the sets share: `base.css` (colours, fonts, common text styles) and two
+  crops of the app screenshots (`crop-chat.png` from `chat-images.png`, `crop-share.png` from
+  `screen-share-viewer.png`). Each set's look lives in its own `style.css`.
+- The full screenshots come from `docs/images/screenshots/main-dark.png` (neon) and
+  `main-light.png` (light).
+- The webcam pictures in `glass/cameras/` show fictional people, not real persons. They are
+  licensed for commercial use without attribution.
+
 ## Editing and exporting
 
 - `social.css` holds the shared look (colours from `ui/src/theme/tokens.css`, the Bricolage
   Grotesque and Instrument Sans fonts from Google Fonts).
 - Each `*-<width>x<height>.html` file sets its own layout. Open it in a browser to preview.
-- `render.mjs` exports every HTML file to a PNG with headless Chromium:
+- `render.mjs` exports every HTML file in this folder and in the set folders to a PNG with headless
+  Chromium (pass folder names, e.g. `node render.mjs glass`, to render only those):
 
   ```sh
   PLAYWRIGHT_CORE=/path/to/playwright-core/index.mjs CHROMIUM=/path/to/chrome node render.mjs
