@@ -556,6 +556,18 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* The bots section and the plugins strip reach the column's edges (#595): they bleed over the
+   channel column's padding (.shell__channels, var(--space-2)), so both lines run edge to edge
+   and the strip has the same space below its icons as above them. */
+.channels-panel > .bots-section,
+.channels-panel > .pstrip {
+  margin-inline: calc(-1 * var(--space-2));
+}
+
+.channels-panel > .pstrip {
+  margin-bottom: calc(-1 * var(--space-2));
+}
+
 .bots-section.collapsible-section h2 {
   margin: 0;
 }
