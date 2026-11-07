@@ -22,6 +22,7 @@ const RELAY: RelayInfo = {
   firstSeen: "2026-09-01T18:00:00Z",
   uses: ["images", "files", "screenShare"],
   broadcastMax: 25,
+  registeredOnly: false,
 };
 
 function view(info: RelayInfo, onAction = vi.fn()) {
@@ -61,6 +62,7 @@ describe("RelayRowsView", () => {
       firstSeen: null,
       uses: [],
       broadcastMax: null,
+      registeredOnly: false,
     });
     expect(valueOf("Mumbot")).toBe("No");
     expect(valueOf("Mumpeer relay")).toBe("No");
@@ -108,6 +110,7 @@ describe("RelayRowsView", () => {
       firstSeen: null,
       uses: [],
       broadcastMax: null,
+      registeredOnly: false,
     });
     expect(valueOf("Mumbot")).toBe("Yes (BotA, BotB)");
     expect(valueOf("Mumpeer relay")).toBe("Two relays are announced on this server; none is used.");

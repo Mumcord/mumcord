@@ -13,7 +13,7 @@ import {
 } from "../../api";
 
 /** Why the camera can't be turned on: not in a voice channel there, or an FR-8.4 reason. */
-export type CameraBlock = "notInChannel" | CameraUnavailable;
+export type CameraBlock = "notInChannel" | "registeredOnly" | CameraUnavailable;
 
 // A server missing from the map has not been read yet; it counts as available until it is.
 let unavailable = new Map<number, CameraUnavailable | null>();

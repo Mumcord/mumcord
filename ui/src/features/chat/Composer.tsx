@@ -26,6 +26,8 @@ import { ComposerIcon } from "../../components/ComposerIcon";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useNoRelayHint } from "../files/composer/noRelayHint";
+import { RefusalAction } from "../p2p/RefusalAction";
+import { useGuestRelayBlock } from "../p2p/useGuestRelayBlock";
 import { useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
@@ -153,11 +155,20 @@ export function Composer({
     serverId,
     fileChips.unavailable === null ? false : fileChips.unavailable.kind === "noRelay",
   );
+  // A guest on a relay for registered users only is told before trying (#601).
+  const guestBlocked = useGuestRelayBlock(inChannelTarget ? serverId : null);
   // Only the plain "no relay" hint can be closed (#579); the others ask for an action.
   const reasonShown =
     inChannelTarget &&
-    fileChips.unavailable !== null &&
-    !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden);
+    ((fileChips.unavailable === null && guestBlocked) ||
+      (fileChips.unavailable !== null &&
+        !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden)));
+  const reasonText =
+    fileChips.unavailable !== null
+      ? unavailableText(tP2p, fileChips.unavailable)
+      : guestBlocked
+        ? tP2p("refusalAction.filesRegisteredOnly")
+        : null;
   const reasonId = useId();
   // A `mumble://` link the user typed is shown as its card before sending (issue #175).
   const previewLinks = useMemo(() => mumbleLinks(composer.text), [composer.text]);
@@ -516,12 +527,18 @@ export function Composer({
           if (!slash.run(composer.text)) submitAll();
         }}
       >
-        {reasonShown && fileChips.unavailable !== null ? (
+        {reasonShown && reasonText !== null ? (
           <div className="chat-composer__hint">
             <p id={reasonId} className="chat-composer__blocked">
-              {unavailableText(tP2p, fileChips.unavailable)}
+              {reasonText}
+              {fileChips.unavailable === null && serverId !== null && (
+                <>
+                  {" "}
+                  <RefusalAction hint="register" serverId={serverId} />
+                </>
+              )}
             </p>
-            {fileChips.unavailable.kind === "noRelay" && (
+            {fileChips.unavailable?.kind === "noRelay" && (
               <button
                 type="button"
                 className="chat-composer__hint-close"
@@ -651,11 +668,7 @@ export function Composer({
               {inChannelTarget ? (
                 <PaperclipButton
                   disabled={disabled}
-                  reason={
-                    fileChips.unavailable === null
-                      ? null
-                      : unavailableText(tP2p, fileChips.unavailable)
-                  }
+                  reason={reasonText}
                   describedBy={reasonShown ? reasonId : undefined}
                   onPick={(paths) => {
                     void fileChips.addPaths(paths);

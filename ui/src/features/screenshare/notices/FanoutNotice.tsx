@@ -12,6 +12,7 @@ import { MAX_VIEWERS } from "../Viewers";
 import { WarningIcon } from "../quality/qualityIcons";
 import { useStepText } from "../quality/useStepText";
 import { useAnnounceChange } from "./useAnnounceChange";
+import { RefusalAction } from "../../p2p/RefusalAction";
 import "./notices.css";
 
 const REASON_KEY: Record<FanoutReason, string> = {
@@ -24,6 +25,9 @@ const REASON_KEY: Record<FanoutReason, string> = {
   mode: "notices.reasonMode",
   noCertificate: "notices.reasonNoCertificate",
   unavailable: "notices.reasonUnavailable",
+  notRegistered: "notices.reasonNotRegistered",
+  groupNotAllowed: "notices.reasonGroupNotAllowed",
+  noHello: "notices.reasonNoHello",
 };
 
 export function FanoutNotice({
@@ -80,6 +84,12 @@ export function FanoutNotice({
         {body !== null && <p>{body}</p>}
       </div>
       <span className="share-notice__actions">
+        {(reason === "notRegistered" || reason === "noHello") && (
+          <RefusalAction
+            hint={reason === "notRegistered" ? "register" : "reconnect"}
+            serverId={serverId}
+          />
+        )}
         <button
           type="button"
           className="button"

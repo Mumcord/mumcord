@@ -182,7 +182,10 @@
     "detailsDropped": "Dropped frames",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Not measured",
-    "close": "Close"
+    "close": "Close",
+    "reasonNotRegistered": "only registered users can use this server's relay",
+    "reasonGroupNotAllowed": "the relay only serves certain groups",
+    "reasonNoHello": "the relay bot doesn't know this app yet, reconnect to fix it"
   },
   "settings": {
     "title": "Screen sharing",
