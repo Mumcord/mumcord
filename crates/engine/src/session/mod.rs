@@ -2750,8 +2750,18 @@ impl Inner {
         let server_id = ctx.server_id;
         match &event {
             Event::ChannelUpdated(channel) => {
-                let view = ctx.handle.with_state(|s| channel_view(s, channel));
+                let (view, unknown) = ctx.handle.with_state(|s| {
+                    (
+                        channel_view(s, channel),
+                        !s.permissions.contains_key(&channel.id),
+                    )
+                });
                 ctx.events.emit(EngineEvent::ChannelUpserted(view));
+                // A channel created after the sync has no known rights yet. Asking also makes the
+                // server include it when it later flushes the rights (#248).
+                if unknown {
+                    let _ = ctx.handle.query_permissions(channel.id);
+                }
             }
             Event::ChannelRemoved(channel) => {
                 ctx.events.emit(EngineEvent::ChannelRemoved(channel.id));
