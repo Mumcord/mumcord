@@ -449,7 +449,15 @@
     "inApp": "Alkalmazáson belül: kis felugró ablak a Mumcordban, amíg előtérben van",
     "desktop": "Asztali: rendszerértesítés",
     "both": "Mindkettő: felugró ablak, amíg a Mumcord előtérben van, egyébként rendszerértesítés",
-    "off": "Ki"
+    "off": "Ki",
+    "activityTitle": "Tevékenységi értesítések",
+    "activity": {
+      "screenShare": "Valaki képernyőmegosztást indít",
+      "watchParty": "Valaki közös nézést indít",
+      "pluginActivity": "Valaki bővítménytevékenységet indít",
+      "pluginEvent": "Bővítményesemények",
+      "joins": "Valaki csatlakozik, kilép vagy csatornát vált"
+    }
   },
   "overlay": {
     "corner": {
@@ -1255,5 +1263,14 @@
     "uploadSending": "Küldés…",
     "uploadDone": "A jelentés elküldve. Köszönjük!",
     "uploadFailed": "A jelentést nem sikerült elküldeni. Ellenőrizze a kapcsolatot, és próbálja újra; a jelentés ezen a számítógépen marad."
+  },
+  "activityHistory": {
+    "title": "Tevékenységi előzmények",
+    "clear": "Tevékenységi előzmények törlése",
+    "hint": "Törli az összes szerver mentett hírfolyamát.",
+    "local": "Csak ezen az eszközön tárolva.",
+    "button": "Előzmények törlése",
+    "confirm": "Törlöd az összes szerver tevékenységi előzményeit? Ez nem vonható vissza.",
+    "confirmButton": "Törlés"
   }
 }

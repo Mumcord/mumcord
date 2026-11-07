@@ -455,7 +455,15 @@
     "inApp": "V aplikaciji: majhno pojavno okno v Mumcordu, ko je v ospredju",
     "desktop": "Namizje: sistemsko obvestilo",
     "both": "Oboje: pojavno okno, ko je Mumcord v ospredju, sicer sistemsko obvestilo",
-    "off": "Izklopljeno"
+    "off": "Izklopljeno",
+    "activityTitle": "Obvestila o dejavnosti",
+    "activity": {
+      "screenShare": "Nekdo začne deliti zaslon",
+      "watchParty": "Nekdo začne skupni ogled",
+      "pluginActivity": "Nekdo začne dejavnost vtičnika",
+      "pluginEvent": "Dogodki vtičnikov",
+      "joins": "Nekdo se poveže, odide ali zamenja kanal"
+    }
   },
   "overlay": {
     "corner": {
@@ -1275,5 +1283,14 @@
     "uploadSending": "Pošiljanje …",
     "uploadDone": "Poročilo je poslano. Hvala!",
     "uploadFailed": "Poročila ni bilo mogoče poslati. Preverite povezavo in poskusite znova; ostane v tem računalniku."
+  },
+  "activityHistory": {
+    "title": "Zgodovina dejavnosti",
+    "clear": "Počisti zgodovino dejavnosti",
+    "hint": "Odstrani shranjen vir za vse strežnike.",
+    "local": "Shranjeno samo v tej napravi.",
+    "button": "Počisti zgodovino",
+    "confirm": "Želite počistiti zgodovino dejavnosti vseh strežnikov? Tega ni mogoče razveljaviti.",
+    "confirmButton": "Počisti"
   }
 }

@@ -452,7 +452,15 @@
     "inApp": "Nell'app: un piccolo pop-up dentro Mumcord quando è in primo piano",
     "desktop": "Desktop: una notifica di sistema",
     "both": "Entrambe: pop-up quando Mumcord è in primo piano, altrimenti notifica di sistema",
-    "off": "Disattivate"
+    "off": "Disattivate",
+    "activityTitle": "Notifiche di attività",
+    "activity": {
+      "screenShare": "Qualcuno avvia una condivisione schermo",
+      "watchParty": "Qualcuno avvia un watch party",
+      "pluginActivity": "Qualcuno avvia un'attività di un plugin",
+      "pluginEvent": "Eventi dei plugin",
+      "joins": "Qualcuno si connette, esce o cambia canale"
+    }
   },
   "overlay": {
     "corner": {
@@ -1265,5 +1273,14 @@
     "uploadSending": "Invio in corso…",
     "uploadDone": "Segnalazione inviata. Grazie!",
     "uploadFailed": "Impossibile inviare la segnalazione. Controlla la connessione e riprova; resta su questo computer."
+  },
+  "activityHistory": {
+    "title": "Cronologia attività",
+    "clear": "Cancella cronologia attività",
+    "hint": "Rimuove il feed salvato di tutti i server.",
+    "local": "Salvato solo su questo dispositivo.",
+    "button": "Cancella cronologia",
+    "confirm": "Cancellare la cronologia attività di tutti i server? L'operazione non può essere annullata.",
+    "confirmButton": "Cancella"
   }
 }

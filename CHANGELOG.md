@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Activity feed: an icon for each kind of event, and the feed is saved on this device, so it is still there after a reconnect or a restart (an "Earlier" line marks where this session starts). Settings → Privacy → "Clear activity history" removes it for all servers
+- Activity notifications: when someone starts a screen share, a watch party or a plugin activity, or a plugin posts an event, Mumcord notifies like for messages (in-app toast or system notification, following Do Not Disturb and muted servers). Settings → Chat & Notifications has a switch per kind; joins, leaves and moves are off by default
+
 ### Changed
 
 - "Bots on this server" starts collapsed; once you open or close it, Mumcord remembers that
@@ -11,6 +16,10 @@
 
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
+
+### Fixed
+
+- The Members / Activity tabs now stay in place at the top of the right column when a long list scrolls
 
 ## [0.7.1] - 2026-11-07
 

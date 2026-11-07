@@ -15,6 +15,7 @@ import type {
   InspectorView,
   LinkOutcome,
   MessageNotice,
+  ActivityNotice,
   MumbleImportDone,
   MumbleImportFound,
   MumbleLinkStats,
@@ -175,6 +176,8 @@ export interface MockControls {
   setSystemDnd(system: SystemDnd): void;
   /** System notifications `notifyMessage` "showed", oldest first. */
   desktopNotices(): readonly MessageNotice[];
+  /** System notifications `notifyActivity` "showed", oldest first (#597). */
+  activityNotices(): readonly ActivityNotice[];
   /** Sounds `notifyMessage` played for incoming messages, oldest first (QA.41). */
   messageSounds(): readonly ("message" | "mention")[];
   /** Simulates a person leaving the server. */
@@ -357,6 +360,13 @@ const DEFAULT_SETTINGS: Settings = {
   chatDisplay: "cozy",
   soundTheme: "classic",
   notifications: "both",
+  activityNotify: {
+    joins: false,
+    screenShare: true,
+    watchParty: true,
+    pluginActivity: true,
+    pluginEvent: true,
+  },
   logLevel: "info",
   sendDefaultAvatar: true,
   autostart: false,
@@ -1375,6 +1385,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       ? a.value === (b as { value: number }).value
       : a.value.toLowerCase() === (b as { value: string }).value.toLowerCase());
   const desktopNotices: MessageNotice[] = [];
+  const activityNotices: ActivityNotice[] = [];
   const messageSounds: ("message" | "mention")[] = [];
   const rejoinOffers = new Map<number, string[]>();
   // History per server id, keyed by conversation.
@@ -3527,6 +3538,17 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       if (outcome === "desktop") desktopNotices.push(notice);
       return Promise.resolve(outcome);
     },
+    notifyActivity: (notice) => {
+      if (dndActive()) return Promise.resolve("none");
+      const mode = settings.notifications;
+      let outcome: NotifyOutcome;
+      if (mode === "off") outcome = "none";
+      else if (mode === "desktop") outcome = "desktop";
+      else if (windowFocused) outcome = "toast";
+      else outcome = mode === "both" ? "desktop" : "none";
+      if (outcome === "desktop") activityNotices.push(notice);
+      return Promise.resolve(outcome);
+    },
     notificationDismiss: () => Promise.resolve(null),
     trayAttentionSet: () => Promise.resolve(null),
     pluginDetailsOpen: () => Promise.resolve(null),
@@ -4249,6 +4271,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       void setDnd({ ...dnd, system });
     },
     desktopNotices: () => desktopNotices,
+    activityNotices: () => activityNotices,
     messageSounds: () => messageSounds,
     removeUser: (session) => {
       focused();

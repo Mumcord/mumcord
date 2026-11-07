@@ -330,6 +330,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::changelog::changelog_close,
             commands::changelog::whats_new_mark_seen,
             notify::notify_message,
+            notify::notify_activity,
             commands::dnd::dnd_state,
             commands::dnd::dnd_set,
             commands::dnd::dnd_set_follow_system,

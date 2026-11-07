@@ -449,7 +449,15 @@
     "inApp": "I appen: en lille pop-up i Mumcord, mens det er forrest",
     "desktop": "Skrivebord: en systemnotifikation",
     "both": "Begge: pop-up, mens Mumcord er forrest, ellers systemnotifikation",
-    "off": "Fra"
+    "off": "Fra",
+    "activityTitle": "Aktivitetsnotifikationer",
+    "activity": {
+      "screenShare": "Nogen starter en skærmdeling",
+      "watchParty": "Nogen starter en watch party",
+      "pluginActivity": "Nogen starter en plugin-aktivitet",
+      "pluginEvent": "Plugin-hændelser",
+      "joins": "Nogen forbinder, går eller skifter kanal"
+    }
   },
   "overlay": {
     "corner": {
@@ -1255,5 +1263,14 @@
     "uploadSending": "Sender…",
     "uploadDone": "Rapporten er sendt. Tak!",
     "uploadFailed": "Rapporten kunne ikke sendes. Tjek din forbindelse og prøv igen; den bliver på denne computer."
+  },
+  "activityHistory": {
+    "title": "Aktivitetshistorik",
+    "clear": "Ryd aktivitetshistorik",
+    "hint": "Fjerner det gemte feed for alle servere.",
+    "local": "Gemmes kun på denne enhed.",
+    "button": "Ryd historik",
+    "confirm": "Vil du rydde aktivitetshistorikken for alle servere? Det kan ikke fortrydes.",
+    "confirmButton": "Ryd"
   }
 }

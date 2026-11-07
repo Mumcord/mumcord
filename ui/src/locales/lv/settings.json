@@ -452,7 +452,15 @@
     "inApp": "Lietotnē: neliels uznirstošs logs Mumcord iekšienē, kamēr tas ir priekšplānā",
     "desktop": "Darbvirsmā: sistēmas paziņojums",
     "both": "Abi: uznirstošs logs, kamēr Mumcord ir priekšplānā, citādi sistēmas paziņojums",
-    "off": "Izslēgts"
+    "off": "Izslēgts",
+    "activityTitle": "Darbību paziņojumi",
+    "activity": {
+      "screenShare": "Kāds sāk ekrāna kopīgošanu",
+      "watchParty": "Kāds sāk kopīgu skatīšanos",
+      "pluginActivity": "Kāds sāk spraudņa darbību",
+      "pluginEvent": "Spraudņu notikumi",
+      "joins": "Kāds pievienojas, aiziet vai maina kanālu"
+    }
   },
   "overlay": {
     "corner": {
@@ -1265,5 +1273,14 @@
     "uploadSending": "Notiek sūtīšana…",
     "uploadDone": "Ziņojums nosūtīts. Paldies!",
     "uploadFailed": "Ziņojumu neizdevās nosūtīt. Pārbaudiet savienojumu un mēģiniet vēlreiz; tas paliek šajā datorā."
+  },
+  "activityHistory": {
+    "title": "Darbību vēsture",
+    "clear": "Notīrīt darbību vēsturi",
+    "hint": "Noņem saglabāto plūsmu visiem serveriem.",
+    "local": "Saglabāts tikai šajā ierīcē.",
+    "button": "Notīrīt vēsturi",
+    "confirm": "Vai notīrīt visu serveru darbību vēsturi? To nevar atsaukt.",
+    "confirmButton": "Notīrīt"
   }
 }

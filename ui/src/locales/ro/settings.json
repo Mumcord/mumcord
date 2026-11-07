@@ -452,7 +452,15 @@
     "inApp": "În aplicație: un mic pop-up în Mumcord cât timp e în prim-plan",
     "desktop": "Desktop: o notificare de sistem",
     "both": "Ambele: pop-up cât timp Mumcord e în prim-plan, altfel notificare de sistem",
-    "off": "Oprit"
+    "off": "Oprit",
+    "activityTitle": "Notificări de activitate",
+    "activity": {
+      "screenShare": "Cineva începe o partajare de ecran",
+      "watchParty": "Cineva începe o vizionare comună",
+      "pluginActivity": "Cineva începe o activitate de plugin",
+      "pluginEvent": "Evenimente ale pluginurilor",
+      "joins": "Cineva se conectează, pleacă sau schimbă canalul"
+    }
   },
   "overlay": {
     "corner": {
@@ -1265,5 +1273,14 @@
     "uploadSending": "Se trimite…",
     "uploadDone": "Raport trimis. Mulțumim!",
     "uploadFailed": "Raportul nu a putut fi trimis. Verifică conexiunea și încearcă din nou; rămâne pe acest computer."
+  },
+  "activityHistory": {
+    "title": "Istoricul activității",
+    "clear": "Șterge istoricul activității",
+    "hint": "Elimină fluxul salvat pentru toate serverele.",
+    "local": "Salvat doar pe acest dispozitiv.",
+    "button": "Șterge istoricul",
+    "confirm": "Ștergi istoricul activității tuturor serverelor? Acțiunea nu poate fi anulată.",
+    "confirmButton": "Șterge"
   }
 }

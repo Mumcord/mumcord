@@ -449,7 +449,15 @@
     "inApp": "In der App: ein kleines Pop-up in Mumcord, solange es im Vordergrund ist",
     "desktop": "Desktop: eine Systembenachrichtigung",
     "both": "Beides: Pop-up, solange Mumcord im Vordergrund ist, sonst Systembenachrichtigung",
-    "off": "Aus"
+    "off": "Aus",
+    "activityTitle": "Aktivitäts-Benachrichtigungen",
+    "activity": {
+      "screenShare": "Jemand startet eine Bildschirmübertragung",
+      "watchParty": "Jemand startet eine Watch-Party",
+      "pluginActivity": "Jemand startet eine Plugin-Aktivität",
+      "pluginEvent": "Plugin-Ereignisse",
+      "joins": "Jemand verbindet sich, geht oder wechselt den Kanal"
+    }
   },
   "overlay": {
     "corner": {
@@ -1255,5 +1263,14 @@
     "uploadSending": "Wird gesendet…",
     "uploadDone": "Bericht gesendet. Danke!",
     "uploadFailed": "Der Bericht konnte nicht gesendet werden. Prüfe deine Verbindung und versuche es erneut; er bleibt auf diesem Computer."
+  },
+  "activityHistory": {
+    "title": "Aktivitätsverlauf",
+    "clear": "Aktivitätsverlauf löschen",
+    "hint": "Entfernt den gespeicherten Verlauf aller Server.",
+    "local": "Nur auf diesem Gerät gespeichert.",
+    "button": "Verlauf löschen",
+    "confirm": "Den Aktivitätsverlauf aller Server löschen? Das kann nicht rückgängig gemacht werden.",
+    "confirmButton": "Löschen"
   }
 }

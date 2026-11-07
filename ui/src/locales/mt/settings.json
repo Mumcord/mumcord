@@ -458,7 +458,15 @@
     "inApp": "Fl-app: pop-up żgħir ġewwa Mumcord waqt li jkun quddiem",
     "desktop": "Desktop: notifika tas-sistema",
     "both": "It-tnejn: pop-up waqt li Mumcord ikun quddiem, inkella notifika tas-sistema",
-    "off": "Mitfi"
+    "off": "Mitfi",
+    "activityTitle": "Notifiki tal-attività",
+    "activity": {
+      "screenShare": "Xi ħadd jibda jaqsam l-iskrin",
+      "watchParty": "Xi ħadd jibda watch party",
+      "pluginActivity": "Xi ħadd jibda attività ta' plugin",
+      "pluginEvent": "Avvenimenti tal-plugins",
+      "joins": "Xi ħadd jikkonnettja, jitlaq jew ibiddel il-kanal"
+    }
   },
   "overlay": {
     "corner": {
@@ -1285,5 +1293,14 @@
     "uploadSending": "Qed jintbagħat…",
     "uploadDone": "Ir-rapport intbagħat. Grazzi!",
     "uploadFailed": "Ir-rapport ma setax jintbagħat. Iċċekkja l-konnessjoni tiegħek u erġa' pprova; jibqa' fuq dan il-kompjuter."
+  },
+  "activityHistory": {
+    "title": "Storja tal-attività",
+    "clear": "Ħassar l-istorja tal-attività",
+    "hint": "Tneħħi l-feed issejvjat tas-servers kollha.",
+    "local": "Issejvjat biss fuq dan it-tagħmir.",
+    "button": "Ħassar l-istorja",
+    "confirm": "Tħassar l-istorja tal-attività tas-servers kollha? Dan ma jistax jitreġġa' lura.",
+    "confirmButton": "Ħassar"
   }
 }

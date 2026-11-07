@@ -458,7 +458,15 @@
     "inApp": "San aip: preabfhuinneog bheag laistigh de Mumcord agus é chun tosaigh",
     "desktop": "Deasc: fógra córais",
     "both": "An dá cheann: preabfhuinneog agus Mumcord chun tosaigh, fógra córais seachas sin",
-    "off": "As"
+    "off": "As",
+    "activityTitle": "Fógraí gníomhaíochta",
+    "activity": {
+      "screenShare": "Tosaíonn duine éigin comhroinnt scáileáin",
+      "watchParty": "Tosaíonn duine éigin cóisir féachana",
+      "pluginActivity": "Tosaíonn duine éigin gníomhaíocht breiseáin",
+      "pluginEvent": "Imeachtaí breiseán",
+      "joins": "Ceanglaíonn, fágann nó athraíonn duine éigin cainéal"
+    }
   },
   "overlay": {
     "corner": {
@@ -1285,5 +1293,14 @@
     "uploadSending": "Á sheoladh…",
     "uploadDone": "Seoladh an tuairisc. Go raibh maith agat!",
     "uploadFailed": "Níorbh fhéidir an tuairisc a sheoladh. Seiceáil do nasc agus bain triail eile as; fanann sí ar an ríomhaire seo."
+  },
+  "activityHistory": {
+    "title": "Stair ghníomhaíochta",
+    "clear": "Glan an stair ghníomhaíochta",
+    "hint": "Baintear an fotha sábháilte do gach freastalaí.",
+    "local": "Sábháilte ar an ngléas seo amháin.",
+    "button": "Glan an stair",
+    "confirm": "An bhfuil tú ag iarraidh stair ghníomhaíochta gach freastalaí a ghlanadh? Ní féidir é seo a chealú.",
+    "confirmButton": "Glan"
   }
 }

@@ -911,6 +911,12 @@ export const commands = {
 	whatsNewMarkSeen: () => typedError<null, ApiError>(__TAURI_INVOKE("whats_new_mark_seen")),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
+	/**
+	 *  Like `notify_message`, without a sound: Do Not Disturb, a muted server, the window focus and
+	 *  the notification setting decide between nothing, the in-app toast and a system notification.
+	 *  Which kinds notify at all is the UI's part (Settings → activity notifications).
+	 */
+	notifyActivity: (notice: ActivityNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_activity", { notice })),
 	dndState: () => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_state")),
 	/**  Turns the Mumcord switch on or off; it is saved and applies to all servers at once. */
 	dndSet: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set", { on })),
@@ -1397,6 +1403,32 @@ export type ActiveEncoder = {
 	codec: VideoCodec,
 	/**  `null` when it runs on the processor. */
 	gpu: GpuVendor | null,
+};
+
+/**  One new activity-feed event as the UI would announce it (#597). Texts are translated and plain. */
+export type ActivityNotice = {
+	serverId: number,
+	/**
+	 *  The channel the event happened in; clicking the notification opens its chat, where the
+	 *  share, party or activity is shown.
+	 */
+	channelId: number,
+	/**  E.g. "Night Owls". */
+	summary: string,
+	/**  E.g. "Ben started a screen share in #Lobby". */
+	body: string,
+	actionLabel: string,
+};
+
+/**  Activity-feed events that notify like messages (#597). */
+export type ActivityNotifySettings = {
+	/**  Someone connected, left or moved channel. Off by default. */
+	joins: boolean,
+	screenShare: boolean,
+	watchParty: boolean,
+	pluginActivity: boolean,
+	/**  Events a plugin pushes to the feed. */
+	pluginEvent: boolean,
 };
 
 /**  Error returned by every failing command. */
@@ -4675,6 +4707,8 @@ export type Settings = {
 	sounds: SoundSettings,
 	/**  "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c). */
 	notifications: NotificationMode,
+	/**  Activity events that notify (#597). */
+	activityNotify: ActivityNotifySettings,
 	closeBehaviour: CloseBehaviour,
 	chatDisplay: ChatDisplay,
 	logLevel: LogLevel,

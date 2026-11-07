@@ -1,7 +1,9 @@
 /**
  * The activity feed (FR-11.10 – FR-11.14): the events of one server newest first, grouped by day,
  * each as a two-line row. A row whose share, party or activity still exists opens that flow, and a
- * plugin event with an action routes the action back to the plugin; ended rows are plain.
+ * plugin event with an action routes the action back to the plugin; ended rows are plain. When the
+ * log also holds events from before this connection (#594), an "Earlier" divider marks where this
+ * session starts.
  */
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
@@ -13,7 +15,7 @@ import { useWatchParty } from "../watchparty";
 import { joinWatchParty } from "../watchparty/startParty";
 import { useActivityLog, type ActivityEvent } from "./activityStore";
 import { ActivityRow } from "./ActivityRow";
-import { dayLabel, groupByDay } from "./dayGroups";
+import { dayLabel, groupByDay, splitAtEarlier } from "./dayGroups";
 import "./activity.css";
 
 export function ActivityFeed({ serverId }: { serverId: number | null }) {
@@ -32,7 +34,8 @@ export function ActivityFeed({ serverId }: { serverId: number | null }) {
     activities.filter((activity) => activity.kind === "activity").map((activity) => activity.id),
   );
   const liveOf = (event: ActivityEvent): boolean => {
-    if (!("live" in event) || !event.started) return false;
+    // Events from before this connection point at sessions and ids that may be reused by now.
+    if (!("live" in event) || !event.started || event.earlier === true) return false;
     switch (event.live.kind) {
       case "screenShare":
         return shareSessions.has(event.live.session);
@@ -86,28 +89,42 @@ export function ActivityFeed({ serverId }: { serverId: number | null }) {
   const time = new Intl.DateTimeFormat(i18n.language, { timeStyle: "short" });
   const now = new Date();
 
+  const list = (part: readonly ActivityEvent[]) => (
+    <ul className="activity-group__list">
+      {part.map((event, index) => {
+        const live = liveOf(event);
+        // A plugin event of this connection is clickable through its own action even though
+        // nothing of it is still running; one from before it may name an action the plugin no
+        // longer knows. The other kinds are clickable only while their target exists.
+        const pluginAction = event.kind === "pluginEvent" && event.earlier !== true;
+        const run = live || pluginAction ? clickOf(event) : undefined;
+        return (
+          <ActivityRow
+            key={index}
+            event={event}
+            time={time.format(event.at)}
+            live={live}
+            onActivate={run}
+          />
+        );
+      })}
+    </ul>
+  );
+  const divider = (
+    <div className="activity-feed__earlier" role="separator" aria-label={t("earlierLabel")}>
+      {t("earlier")}
+    </div>
+  );
+
   return (
     <div className="activity-feed">
-      {groupByDay(events).map((group) => (
+      {splitAtEarlier(groupByDay(events)).map(({ group, before, current, earlier }) => (
         <div className="activity-group" key={group.day}>
+          {before && divider}
           <h3 className="activity-group__day">{dayLabel(group.day, now, i18n.language, t)}</h3>
-          <ul className="activity-group__list">
-            {group.events.map((event, index) => {
-              const live = liveOf(event);
-              // A plugin event is clickable through its own action even though nothing of it is
-              // still running; the other kinds are clickable only while their target exists.
-              const run = live || event.kind === "pluginEvent" ? clickOf(event) : undefined;
-              return (
-                <ActivityRow
-                  key={index}
-                  event={event}
-                  time={time.format(event.at)}
-                  live={live}
-                  onActivate={run}
-                />
-              );
-            })}
-          </ul>
+          {current.length > 0 && list(current)}
+          {current.length > 0 && earlier.length > 0 && divider}
+          {earlier.length > 0 && list(earlier)}
         </div>
       ))}
     </div>

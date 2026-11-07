@@ -452,7 +452,15 @@
     "inApp": "Dans l’app : une petite fenêtre contextuelle dans Mumcord quand il est au premier plan",
     "desktop": "Bureau : une notification système",
     "both": "Les deux : fenêtre contextuelle quand Mumcord est au premier plan, notification système sinon",
-    "off": "Désactivées"
+    "off": "Désactivées",
+    "activityTitle": "Notifications d'activité",
+    "activity": {
+      "screenShare": "Quelqu'un lance un partage d'écran",
+      "watchParty": "Quelqu'un lance une watch party",
+      "pluginActivity": "Quelqu'un lance une activité de plugin",
+      "pluginEvent": "Événements des plugins",
+      "joins": "Quelqu'un se connecte, part ou change de salon"
+    }
   },
   "overlay": {
     "corner": {
@@ -1265,5 +1273,14 @@
     "uploadSending": "Envoi…",
     "uploadDone": "Rapport envoyé. Merci !",
     "uploadFailed": "Le rapport n'a pas pu être envoyé. Vérifiez votre connexion et réessayez ; il reste sur cet ordinateur."
+  },
+  "activityHistory": {
+    "title": "Historique d'activité",
+    "clear": "Effacer l'historique d'activité",
+    "hint": "Supprime le fil enregistré de tous les serveurs.",
+    "local": "Enregistré uniquement sur cet appareil.",
+    "button": "Effacer l'historique",
+    "confirm": "Effacer l'historique d'activité de tous les serveurs ? Cette action est irréversible.",
+    "confirmButton": "Effacer"
   }
 }

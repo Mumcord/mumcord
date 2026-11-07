@@ -455,7 +455,15 @@
     "inApp": "Programoje: nedidelis iššokantis langelis Mumcord viduje, kol jis priekyje",
     "desktop": "Darbalaukyje: sistemos pranešimas",
     "both": "Abu: iššokantis langelis, kol Mumcord priekyje, kitu atveju – sistemos pranešimas",
-    "off": "Išjungta"
+    "off": "Išjungta",
+    "activityTitle": "Veiklos pranešimai",
+    "activity": {
+      "screenShare": "Kas nors pradeda bendrinti ekraną",
+      "watchParty": "Kas nors pradeda bendrą žiūrėjimą",
+      "pluginActivity": "Kas nors pradeda papildinio veiklą",
+      "pluginEvent": "Papildinių įvykiai",
+      "joins": "Kas nors prisijungia, išeina ar pakeičia kanalą"
+    }
   },
   "overlay": {
     "corner": {
@@ -1275,5 +1283,14 @@
     "uploadSending": "Siunčiama…",
     "uploadDone": "Ataskaita išsiųsta. Ačiū!",
     "uploadFailed": "Ataskaitos išsiųsti nepavyko. Patikrinkite ryšį ir bandykite dar kartą; ji lieka šiame kompiuteryje."
+  },
+  "activityHistory": {
+    "title": "Veiklos istorija",
+    "clear": "Išvalyti veiklos istoriją",
+    "hint": "Pašalina išsaugotą visų serverių sklaidą.",
+    "local": "Saugoma tik šiame įrenginyje.",
+    "button": "Išvalyti istoriją",
+    "confirm": "Išvalyti visų serverių veiklos istoriją? To atšaukti negalima.",
+    "confirmButton": "Išvalyti"
   }
 }
