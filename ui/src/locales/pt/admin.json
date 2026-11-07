@@ -178,7 +178,7 @@
     "positionHint": "menor = mais acima na lista",
     "temporary": "Canal temporário",
     "temporaryHint": "Só ao criar. O servidor elimina-o quando sai a última pessoa.",
-    "linksNote": "Os canais ligados definem-se no separador Ligações.",
+    "linksNote": "Outras opções deste canal: a palavra-passe no separador Palavra-passe, as ligações em Ligações.",
     "linksSearch": "Procurar canais",
     "linksLabel": "Ligado a (ouvem-se uns aos outros)",
     "linkNotAllowed": "Não podes ligar este",
@@ -206,7 +206,171 @@
     "deletePeople_other": "{{count}} pessoas são movidas para {{parent}}.",
     "tab": {
       "general": "Geral",
-      "links": "Ligações"
-    }
+      "password": "Palavra-passe",
+      "links": "Ligações",
+      "permissions": "Permissões"
+    },
+    "rulesLoading": "A ler as regras do canal…",
+    "retry": "Tentar de novo",
+    "password": "Palavra-passe",
+    "passwordShow": "Mostrar",
+    "passwordHide": "Ocultar",
+    "passwordHint": "Vazio = sem palavra-passe. Quem a souber pode entrar; não funciona para subcanais.",
+    "passwordVisible": "Visível para todos os que podem editar as permissões deste canal.",
+    "passwordCustom": "Este canal tem regras de acesso próprias. Altera quem pode entrar em Permissões.",
+    "conflictTitle": "Alguém alterou estas permissões enquanto as editavas",
+    "conflictBody": "Recarrega para partir da versão dessa pessoa, ou guarda a tua e substitui a dela.",
+    "conflictBack": "Voltar",
+    "conflictReload": "Recarregar",
+    "conflictMine": "Guardar a minha mesmo assim",
+    "goneTitle": "Este canal foi eliminado",
+    "goneBody": "Alguém eliminou este canal enquanto a janela estava aberta. As tuas alterações não foram guardadas."
+  },
+  "perm": {
+    "everyone": "Todos",
+    "gridCaption": "Quem pode fazer o quê em {{channel}}",
+    "who": "Quem",
+    "group": {
+      "basics": "Básico",
+      "moderation": "Moderação",
+      "channelAdmin": "Gestão do canal",
+      "server": "Servidor"
+    },
+    "name": {
+      "enter": "Entrar",
+      "traverse": "Atravessar",
+      "speak": "Falar",
+      "whisper": "Sussurrar",
+      "textMessage": "Escrever mensagens",
+      "listen": "Ouvir",
+      "muteDeafen": "Silenciar outros",
+      "move": "Mover pessoas",
+      "write": "Editar permissões",
+      "makeChannel": "Criar canais",
+      "makeTempChannel": "Criar canais temporários",
+      "linkChannel": "Ligar canais",
+      "kick": "Expulsar",
+      "ban": "Banir",
+      "register": "Registar outros",
+      "selfRegister": "Registar-se",
+      "resetUserContent": "Repor perfis"
+    },
+    "cellLabel": "{{who}}, {{permission}}: {{verdict}}",
+    "verdict": {
+      "allowed": "permitido",
+      "denied": "negado",
+      "depends": "depende"
+    },
+    "legend": "✓ permitido · ✗ negado · ? depende. Tracejado: herdado ou predefinição do servidor. Seleciona uma célula para ver porquê.",
+    "why": {
+      "title": "Porquê?",
+      "headline": {
+        "allowed": "{{who}} pode em {{channel}}: {{permission}}",
+        "denied": "{{who}} não pode em {{channel}}: {{permission}}",
+        "depends": "{{permission}} para {{who}} em {{channel}}: depende"
+      },
+      "ruleHere": "regra {{n}} aqui ({{who}})",
+      "ruleInherited": "regra {{n}}, herdada ({{who}})",
+      "decidedBy": "Decidido pela {{rule}}.",
+      "overrides": "Prevalece sobre a {{rule}}.",
+      "default": "Nenhuma regra menciona isto, por isso aplica-se a predefinição do servidor.",
+      "viaWrite": "Permitido porque pode editar as permissões aqui, o que inclui esta permissão.",
+      "superuser": "O SuperUser ignora todas as regras.",
+      "reason": {
+        "everyone": "A regra aplica-se a todos.",
+        "registered": "{{who}} conta como \"auth\" porque está registado.",
+        "inChannel": "{{who}} conta como \"in\" porque está em {{channel}} neste momento.",
+        "notInChannel": "{{who}} conta como \"out\" porque não está em {{channel}} neste momento.",
+        "member": "{{who}} está no grupo \"{{group}}\".",
+        "thisPerson": "A regra nomeia {{who}} diretamente."
+      },
+      "condition": {
+        "password": "Permitido se introduziu a palavra-passe do canal.",
+        "presence": "Permitido só enquanto estiver em {{channel}}.",
+        "serverGroup": "Depende de um grupo gerido pelo servidor."
+      },
+      "goTo": "Ir para a regra {{n}}",
+      "footer": "Calculado pelo Mumcord a partir das regras; o servidor tem a última palavra."
+    },
+    "rules": {
+      "whoGroup": "Grupo {{name}}",
+      "whoPerson": "Pessoa {{name}}",
+      "inherit": "Herdar regras de {{parent}}",
+      "inheritHint": "As regras dos canais superiores também se aplicam aqui",
+      "order": "Regras, de cima para baixo",
+      "fromParent": "do canal superior",
+      "kind": {
+        "person": "pessoa",
+        "token": "palavra-passe",
+        "builtIn": "incorporado",
+        "group": "grupo"
+      },
+      "add": "Adicionar regra",
+      "up": "Subir regra",
+      "down": "Descer regra",
+      "remove": "Remover",
+      "note": "As regras posteriores prevalecem sobre as anteriores. As regras herdadas são só de leitura aqui; edita-as no canal superior.",
+      "pick": "Seleciona uma regra para a ver ou alterar.",
+      "appliesTo": "Aplica-se a",
+      "whoSearch": "Procurar grupos e pessoas…",
+      "scope": "Âmbito",
+      "applyHere": "Este canal",
+      "applySubs": "Subcanais",
+      "permission": "Permissão",
+      "result": "Resultado aqui",
+      "allow": "Permitir",
+      "deny": "Negar",
+      "allowOf": "Permitir {{permission}}",
+      "denyOf": "Negar {{permission}}"
+    },
+    "groups": {
+      "here": "Grupos neste canal",
+      "builtIn": "Incorporados",
+      "explain": {
+        "all": "todos",
+        "auth": "registados",
+        "in": "neste canal",
+        "out": "fora deste canal",
+        "sub": "num subcanal",
+        "token": "introduziu uma palavra-passe"
+      },
+      "newName": "Novo grupo",
+      "create": "Criar",
+      "pick": "Seleciona um grupo para ver os membros.",
+      "inherit": "Herdar membros",
+      "inheritable": "Herdável",
+      "members": "Membros",
+      "state": {
+        "added": "adicionado aqui",
+        "inherited": "herdado",
+        "removed": "herdado, removido aqui"
+      },
+      "action": {
+        "added": "Remover {{name}}",
+        "inherited": "Remover {{name}} aqui",
+        "removed": "Restaurar {{name}}"
+      },
+      "add": "Adicionar um utilizador registado",
+      "addSearch": "Procurar pessoas registadas…",
+      "noPeople": "Ninguém corresponde.",
+      "guests": "Não é possível adicionar convidados. Regista-os primeiro.",
+      "summary": "Quem pode fazer o quê em {{channel}}"
+    },
+    "readOnly": "Já não podes editar estas permissões.",
+    "views": "Vistas de permissões",
+    "view": {
+      "who": "Quem pode fazer o quê",
+      "rules": "Regras",
+      "groups": "Grupos"
+    },
+    "check": "Verificar uma pessoa",
+    "checkSearch": "Procurar pessoas online…",
+    "refresh": "Atualizar",
+    "lockoutTitle": "Perderias permissões aqui",
+    "lockoutBody": "Depois de guardar, já não poderás: {{rights}}.",
+    "rootTitle": "Guardar permissões para todo o servidor?",
+    "rootBody": "Estas são as regras do canal Root; todos os canais as herdam.",
+    "backToEditing": "Voltar à edição",
+    "saveAnyway": "Guardar mesmo assim"
   }
 }

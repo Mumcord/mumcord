@@ -178,7 +178,7 @@
     "positionHint": "níos ísle = níos airde sa liosta",
     "temporary": "Cainéal sealadach",
     "temporaryHint": "Agus é á chruthú amháin. Scriosann an freastalaí é nuair a imíonn an duine deireanach.",
-    "linksNote": "Socraítear cainéil nasctha ar an gcluaisín Naisc.",
+    "linksNote": "Roghanna eile don chainéal seo: an pasfhocal ar an gcluaisín Pasfhocal, naisc ar Naisc.",
     "linksSearch": "Cuardaigh cainéil",
     "linksLabel": "Nasctha le (cloiseann siad a chéile)",
     "linkNotAllowed": "Ní féidir leat an ceann seo a nascadh",
@@ -212,7 +212,171 @@
     "deletePeople_other": "Bogfar {{count}} duine go {{parent}}.",
     "tab": {
       "general": "Ginearálta",
-      "links": "Naisc"
-    }
+      "password": "Pasfhocal",
+      "links": "Naisc",
+      "permissions": "Ceadanna"
+    },
+    "rulesLoading": "Rialacha an chainéil á léamh…",
+    "retry": "Bain triail eile as",
+    "password": "Pasfhocal",
+    "passwordShow": "Taispeáin",
+    "passwordHide": "Folaigh",
+    "passwordHint": "Folamh = gan pasfhocal. Is féidir le daoine a bhfuil sé ar eolas acu dul isteach; ní oibríonn sé d'fhochainéil.",
+    "passwordVisible": "Le feiceáil ag gach duine atá in ann ceadanna an chainéil seo a chur in eagar.",
+    "passwordCustom": "Tá rialacha rochtana féin ag an gcainéal seo. Athraigh cé a fhéadann dul isteach faoi Ceadanna.",
+    "conflictTitle": "D'athraigh duine éigin na ceadanna seo agus tú á gcur in eagar",
+    "conflictBody": "Athlódáil chun tosú óna leagan siúd, nó sábháil do leagan féin agus cuir in áit a gceann siúd é.",
+    "conflictBack": "Siar",
+    "conflictReload": "Athlódáil",
+    "conflictMine": "Sábháil mo cheann mar sin féin",
+    "goneTitle": "Scriosadh an cainéal seo",
+    "goneBody": "Scrios duine éigin an cainéal agus an fhuinneog ar oscailt. Níor sábháladh d'athruithe."
+  },
+  "perm": {
+    "everyone": "Gach duine",
+    "gridCaption": "Cé a fhéadann céard a dhéanamh i {{channel}}",
+    "who": "Cé",
+    "group": {
+      "basics": "Bunghnéithe",
+      "moderation": "Modhnóireacht",
+      "channelAdmin": "Riar an chainéil",
+      "server": "Freastalaí"
+    },
+    "name": {
+      "enter": "Dul isteach",
+      "traverse": "Dul tríd",
+      "speak": "Labhairt",
+      "whisper": "Cogarnach",
+      "textMessage": "Teachtaireachtaí a scríobh",
+      "listen": "Éisteacht isteach",
+      "muteDeafen": "Daoine eile a bhalbhú",
+      "move": "Daoine a bhogadh",
+      "write": "Ceadanna a chur in eagar",
+      "makeChannel": "Cainéil a chruthú",
+      "makeTempChannel": "Cainéil shealadacha a chruthú",
+      "linkChannel": "Cainéil a nascadh",
+      "kick": "Ciceáil",
+      "ban": "Cosc",
+      "register": "Daoine eile a chlárú",
+      "selfRegister": "Tú féin a chlárú",
+      "resetUserContent": "Próifílí a athshocrú"
+    },
+    "cellLabel": "{{who}}, {{permission}}: {{verdict}}",
+    "verdict": {
+      "allowed": "ceadaithe",
+      "denied": "diúltaithe",
+      "depends": "braitheann sé"
+    },
+    "legend": "✓ ceadaithe · ✗ diúltaithe · ? braitheann sé. Briste: oidhreacht nó réamhshocrú an fhreastalaí. Roghnaigh cill chun an chúis a fheiceáil.",
+    "why": {
+      "title": "Cén fáth?",
+      "headline": {
+        "allowed": "{{who}} i {{channel}} – ceadaithe: {{permission}}",
+        "denied": "{{who}} i {{channel}} – diúltaithe: {{permission}}",
+        "depends": "{{who}} i {{channel}} – {{permission}}: braitheann sé"
+      },
+      "ruleHere": "riail {{n}} anseo ({{who}})",
+      "ruleInherited": "riail {{n}}, faighte le hoidhreacht ({{who}})",
+      "decidedBy": "Socraithe ag {{rule}}.",
+      "overrides": "Sáraíonn sí {{rule}}.",
+      "default": "Ní luann aon riail é seo, mar sin tá réamhshocrú an fhreastalaí i bhfeidhm.",
+      "viaWrite": "Ceadaithe mar gur féidir leo ceadanna a chur in eagar anseo, rud a thugann an ceart seo leis.",
+      "superuser": "Déanann SuperUser neamhaird de gach riail.",
+      "reason": {
+        "everyone": "Baineann an riail le gach duine.",
+        "registered": "Tá {{who}} faoi \"auth\" mar go bhfuil siad cláraithe.",
+        "inChannel": "Tá {{who}} faoi \"in\" mar go bhfuil siad i {{channel}} faoi láthair.",
+        "notInChannel": "Tá {{who}} faoi \"out\" mar nach bhfuil siad i {{channel}} faoi láthair.",
+        "member": "Tá {{who}} sa ghrúpa \"{{group}}\".",
+        "thisPerson": "Ainmníonn an riail {{who}} go díreach."
+      },
+      "condition": {
+        "password": "Ceadaithe má cuireadh pasfhocal an chainéil isteach.",
+        "presence": "Ceadaithe fad atá siad i {{channel}} amháin.",
+        "serverGroup": "Braitheann sé ar ghrúpa a bhainistíonn an freastalaí."
+      },
+      "goTo": "Téigh go riail {{n}}",
+      "footer": "Oibrithe amach ag Mumcord ó na rialacha; is ag an bhfreastalaí atá an focal deiridh."
+    },
+    "rules": {
+      "whoGroup": "Grúpa {{name}}",
+      "whoPerson": "Duine {{name}}",
+      "inherit": "Faigh rialacha le hoidhreacht ó {{parent}}",
+      "inheritHint": "Baineann rialacha ó mháthairchainéil leis seo freisin",
+      "order": "Rialacha, ó bharr go bun",
+      "fromParent": "ón máthairchainéal",
+      "kind": {
+        "person": "duine",
+        "token": "pasfhocal",
+        "builtIn": "ionsuite",
+        "group": "grúpa"
+      },
+      "add": "Cuir riail leis",
+      "up": "Bog an riail suas",
+      "down": "Bog an riail síos",
+      "remove": "Bain",
+      "note": "Sáraíonn rialacha níos déanaí na cinn roimhe. Is inléite amháin atá rialacha oidhreachta anseo; cuir in eagar iad sa mháthairchainéal.",
+      "pick": "Roghnaigh riail chun í a fheiceáil nó a athrú.",
+      "appliesTo": "Baineann le",
+      "whoSearch": "Cuardaigh grúpaí agus daoine…",
+      "scope": "Raon",
+      "applyHere": "An cainéal seo",
+      "applySubs": "Fochainéil",
+      "permission": "Cead",
+      "result": "Toradh anseo",
+      "allow": "Ceadaigh",
+      "deny": "Diúltaigh",
+      "allowOf": "Ceadaigh: {{permission}}",
+      "denyOf": "Diúltaigh: {{permission}}"
+    },
+    "groups": {
+      "here": "Grúpaí sa chainéal seo",
+      "builtIn": "Ionsuite",
+      "explain": {
+        "all": "gach duine",
+        "auth": "cláraithe",
+        "in": "sa chainéal seo",
+        "out": "nach bhfuil sa chainéal seo",
+        "sub": "i bhfochainéal",
+        "token": "chuir pasfhocal isteach"
+      },
+      "newName": "Grúpa nua",
+      "create": "Cruthaigh",
+      "pick": "Roghnaigh grúpa chun a bhaill a fheiceáil.",
+      "inherit": "Faigh baill le hoidhreacht",
+      "inheritable": "Inoidhreachta",
+      "members": "Baill",
+      "state": {
+        "added": "curtha leis anseo",
+        "inherited": "oidhreacht",
+        "removed": "oidhreacht, bainte anseo"
+      },
+      "action": {
+        "added": "Bain {{name}}",
+        "inherited": "Bain {{name}} anseo",
+        "removed": "Athchuir {{name}}"
+      },
+      "add": "Cuir úsáideoir cláraithe leis",
+      "addSearch": "Cuardaigh daoine cláraithe…",
+      "noPeople": "Níl aon duine ag teacht leis.",
+      "guests": "Ní féidir aíonna a chur leis. Cláraigh iad ar dtús.",
+      "summary": "Cé a fhéadann céard a dhéanamh i {{channel}}"
+    },
+    "readOnly": "Ní féidir leat na ceadanna seo a chur in eagar a thuilleadh.",
+    "views": "Amharcanna ceadanna",
+    "view": {
+      "who": "Cé a fhéadann céard",
+      "rules": "Rialacha",
+      "groups": "Grúpaí"
+    },
+    "check": "Seiceáil duine",
+    "checkSearch": "Cuardaigh daoine ar líne…",
+    "refresh": "Athnuachan",
+    "lockoutTitle": "Chaillfeá cearta anseo",
+    "lockoutBody": "Tar éis duit sábháil, ní bheidh tú in ann: {{rights}}.",
+    "rootTitle": "Ceadanna a shábháil don fhreastalaí ar fad?",
+    "rootBody": "Seo iad rialacha an chainéil Root; faigheann gach cainéal le hoidhreacht iad.",
+    "backToEditing": "Ar ais chuig an eagarthóireacht",
+    "saveAnyway": "Sábháil mar sin féin"
   }
 }

@@ -178,7 +178,7 @@
     "positionHint": "lägre = högre upp i listan",
     "temporary": "Tillfällig kanal",
     "temporaryHint": "Bara när kanalen skapas. Servern tar bort den när sista personen lämnar.",
-    "linksNote": "Länkade kanaler ställs in på fliken Länkar.",
+    "linksNote": "Andra alternativ för den här kanalen: lösenordet på fliken Lösenord, länkar under Länkar.",
     "linksSearch": "Sök kanaler",
     "linksLabel": "Länkad med (de hör varandra)",
     "linkNotAllowed": "Du kan inte länka den här",
@@ -203,7 +203,171 @@
     "deletePeople_other": "{{count}} personer flyttas till {{parent}}.",
     "tab": {
       "general": "Allmänt",
-      "links": "Länkar"
-    }
+      "password": "Lösenord",
+      "links": "Länkar",
+      "permissions": "Behörigheter"
+    },
+    "rulesLoading": "Läser kanalens regler…",
+    "retry": "Försök igen",
+    "password": "Lösenord",
+    "passwordShow": "Visa",
+    "passwordHide": "Dölj",
+    "passwordHint": "Tomt = inget lösenord. Den som kan det kan gå in; det gäller inte underkanaler.",
+    "passwordVisible": "Synligt för alla som kan redigera den här kanalens behörigheter.",
+    "passwordCustom": "Den här kanalen har egna åtkomstregler. Ändra vem som får gå in under Behörigheter.",
+    "conflictTitle": "Någon ändrade de här behörigheterna medan du redigerade",
+    "conflictBody": "Ladda om för att utgå från deras version, eller spara din och ersätt deras.",
+    "conflictBack": "Tillbaka",
+    "conflictReload": "Ladda om",
+    "conflictMine": "Spara min ändå",
+    "goneTitle": "Kanalen har tagits bort",
+    "goneBody": "Någon tog bort kanalen medan fönstret var öppet. Dina ändringar sparades inte."
+  },
+  "perm": {
+    "everyone": "Alla",
+    "gridCaption": "Vem får göra vad i {{channel}}",
+    "who": "Vem",
+    "group": {
+      "basics": "Grunder",
+      "moderation": "Moderering",
+      "channelAdmin": "Kanaladministration",
+      "server": "Server"
+    },
+    "name": {
+      "enter": "Gå in",
+      "traverse": "Passera",
+      "speak": "Tala",
+      "whisper": "Viska",
+      "textMessage": "Skriva meddelanden",
+      "listen": "Lyssna in",
+      "muteDeafen": "Tysta andra",
+      "move": "Flytta personer",
+      "write": "Redigera behörigheter",
+      "makeChannel": "Skapa kanaler",
+      "makeTempChannel": "Skapa tillfälliga kanaler",
+      "linkChannel": "Länka kanaler",
+      "kick": "Sparka ut",
+      "ban": "Banna",
+      "register": "Registrera andra",
+      "selfRegister": "Registrera sig själv",
+      "resetUserContent": "Återställ profiler"
+    },
+    "cellLabel": "{{who}}, {{permission}}: {{verdict}}",
+    "verdict": {
+      "allowed": "tillåtet",
+      "denied": "nekat",
+      "depends": "beror på"
+    },
+    "legend": "✓ tillåtet · ✗ nekat · ? beror på. Streckat: ärvt eller serverns standard. Välj en cell för att se varför.",
+    "why": {
+      "title": "Varför?",
+      "headline": {
+        "allowed": "{{who}} får i {{channel}}: {{permission}}",
+        "denied": "{{who}} får inte i {{channel}}: {{permission}}",
+        "depends": "{{permission}} för {{who}} i {{channel}}: beror på"
+      },
+      "ruleHere": "regel {{n}} här ({{who}})",
+      "ruleInherited": "regel {{n}}, ärvd ({{who}})",
+      "decidedBy": "Avgjort av {{rule}}.",
+      "overrides": "Den går före {{rule}}.",
+      "default": "Ingen regel nämner detta, så serverns standard gäller.",
+      "viaWrite": "Tillåtet eftersom personen får redigera behörigheter här, vilket ger den här rätten.",
+      "superuser": "SuperUser ignorerar alla regler.",
+      "reason": {
+        "everyone": "Regeln gäller alla.",
+        "registered": "{{who}} tillhör \"auth\" eftersom personen är registrerad.",
+        "inChannel": "{{who}} tillhör \"in\" eftersom personen är i {{channel}} just nu.",
+        "notInChannel": "{{who}} tillhör \"out\" eftersom personen inte är i {{channel}} just nu.",
+        "member": "{{who}} är med i gruppen \"{{group}}\".",
+        "thisPerson": "Regeln nämner {{who}} direkt."
+      },
+      "condition": {
+        "password": "Tillåtet om kanalens lösenord har angetts.",
+        "presence": "Tillåtet bara medan personen är i {{channel}}.",
+        "serverGroup": "Beror på en grupp som servern hanterar."
+      },
+      "goTo": "Gå till regel {{n}}",
+      "footer": "Beräknat av Mumcord utifrån reglerna; servern har sista ordet."
+    },
+    "rules": {
+      "whoGroup": "Grupp {{name}}",
+      "whoPerson": "Person {{name}}",
+      "inherit": "Ärv regler från {{parent}}",
+      "inheritHint": "Regler från överordnade kanaler gäller även här",
+      "order": "Regler, uppifrån och ned",
+      "fromParent": "från överordnad",
+      "kind": {
+        "person": "person",
+        "token": "lösenord",
+        "builtIn": "inbyggd",
+        "group": "grupp"
+      },
+      "add": "Lägg till regel",
+      "up": "Flytta upp regel",
+      "down": "Flytta ned regel",
+      "remove": "Ta bort",
+      "note": "Senare regler går före tidigare. Ärvda regler är skrivskyddade här; redigera dem i den överordnade kanalen.",
+      "pick": "Välj en regel för att se eller ändra den.",
+      "appliesTo": "Gäller",
+      "whoSearch": "Sök grupper och personer…",
+      "scope": "Omfång",
+      "applyHere": "Den här kanalen",
+      "applySubs": "Underkanaler",
+      "permission": "Behörighet",
+      "result": "Resultat här",
+      "allow": "Tillåt",
+      "deny": "Neka",
+      "allowOf": "Tillåt {{permission}}",
+      "denyOf": "Neka {{permission}}"
+    },
+    "groups": {
+      "here": "Grupper i den här kanalen",
+      "builtIn": "Inbyggda",
+      "explain": {
+        "all": "alla",
+        "auth": "registrerade",
+        "in": "i den här kanalen",
+        "out": "inte i den här kanalen",
+        "sub": "i en underkanal",
+        "token": "har angett ett lösenord"
+      },
+      "newName": "Ny grupp",
+      "create": "Skapa",
+      "pick": "Välj en grupp för att se dess medlemmar.",
+      "inherit": "Ärv medlemmar",
+      "inheritable": "Ärvbar",
+      "members": "Medlemmar",
+      "state": {
+        "added": "tillagd här",
+        "inherited": "ärvd",
+        "removed": "ärvd, borttagen här"
+      },
+      "action": {
+        "added": "Ta bort {{name}}",
+        "inherited": "Ta bort {{name}} här",
+        "removed": "Återställ {{name}}"
+      },
+      "add": "Lägg till en registrerad användare",
+      "addSearch": "Sök registrerade personer…",
+      "noPeople": "Ingen matchar.",
+      "guests": "Gäster kan inte läggas till. Registrera dem först.",
+      "summary": "Vem får göra vad i {{channel}}"
+    },
+    "readOnly": "Du kan inte längre redigera de här behörigheterna.",
+    "views": "Behörighetsvyer",
+    "view": {
+      "who": "Vem får göra vad",
+      "rules": "Regler",
+      "groups": "Grupper"
+    },
+    "check": "Kontrollera en person",
+    "checkSearch": "Sök personer online…",
+    "refresh": "Uppdatera",
+    "lockoutTitle": "Du skulle förlora rättigheter här",
+    "lockoutBody": "Efter att du sparat kan du inte längre: {{rights}}.",
+    "rootTitle": "Spara behörigheter för hela servern?",
+    "rootBody": "Det här är Root-kanalens regler; alla kanaler ärver dem.",
+    "backToEditing": "Tillbaka till redigering",
+    "saveAnyway": "Spara ändå"
   }
 }

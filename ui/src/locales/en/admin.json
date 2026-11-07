@@ -219,7 +219,9 @@
     "conflictBody": "Reload to start from their version, or save yours and replace theirs.",
     "conflictBack": "Back",
     "conflictReload": "Reload",
-    "conflictMine": "Save mine anyway"
+    "conflictMine": "Save mine anyway",
+    "goneTitle": "This channel was deleted",
+    "goneBody": "Someone deleted this channel while the window was open. Your changes were not saved."
   },
   "perm": {
     "everyone": "Everyone",

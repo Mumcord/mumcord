@@ -178,7 +178,7 @@
     "positionHint": "nižšia = vyššie v zozname",
     "temporary": "Dočasný kanál",
     "temporaryHint": "Len pri vytváraní. Server ho odstráni, keď odíde posledný človek.",
-    "linksNote": "Prepojené kanály nastavíte na karte Prepojenia.",
+    "linksNote": "Ďalšie možnosti tohto kanála: heslo na karte Heslo, prepojenia na karte Prepojenia.",
     "linksSearch": "Hľadať kanály",
     "linksLabel": "Prepojené s (počujú sa navzájom)",
     "linkNotAllowed": "Tento nemôžete prepojiť",
@@ -209,7 +209,171 @@
     "deletePeople_other": "{{count}} ľudí bude presunutých do {{parent}}.",
     "tab": {
       "general": "Všeobecné",
-      "links": "Prepojenia"
-    }
+      "password": "Heslo",
+      "links": "Prepojenia",
+      "permissions": "Oprávnenia"
+    },
+    "rulesLoading": "Načítavanie pravidiel kanála…",
+    "retry": "Skúsiť znova",
+    "password": "Heslo",
+    "passwordShow": "Zobraziť",
+    "passwordHide": "Skryť",
+    "passwordHint": "Prázdne = bez hesla. Kto ho pozná, môže vstúpiť; pre podkanály neplatí.",
+    "passwordVisible": "Viditeľné pre každého, kto môže upravovať oprávnenia tohto kanála.",
+    "passwordCustom": "Tento kanál má vlastné pravidlá prístupu. Kto smie vstúpiť, zmeníte v Oprávneniach.",
+    "conflictTitle": "Niekto zmenil tieto oprávnenia, kým ste ich upravovali",
+    "conflictBody": "Načítajte znova a začnite z jeho verzie, alebo uložte svoju a nahraďte jeho.",
+    "conflictBack": "Späť",
+    "conflictReload": "Znovu načítať",
+    "conflictMine": "Uložiť moju aj tak",
+    "goneTitle": "Tento kanál bol odstránený",
+    "goneBody": "Niekto kanál odstránil, kým bolo okno otvorené. Vaše zmeny sa neuložili."
+  },
+  "perm": {
+    "everyone": "Všetci",
+    "gridCaption": "Kto čo smie v {{channel}}",
+    "who": "Kto",
+    "group": {
+      "basics": "Základy",
+      "moderation": "Moderovanie",
+      "channelAdmin": "Správa kanála",
+      "server": "Server"
+    },
+    "name": {
+      "enter": "Vstúpiť",
+      "traverse": "Prechádzať",
+      "speak": "Hovoriť",
+      "whisper": "Šepkať",
+      "textMessage": "Písať správy",
+      "listen": "Počúvať",
+      "muteDeafen": "Stlmiť ostatných",
+      "move": "Presúvať ľudí",
+      "write": "Upravovať oprávnenia",
+      "makeChannel": "Vytvárať kanály",
+      "makeTempChannel": "Vytvárať dočasné kanály",
+      "linkChannel": "Prepájať kanály",
+      "kick": "Vyhodiť",
+      "ban": "Zabanovať",
+      "register": "Registrovať ostatných",
+      "selfRegister": "Registrovať seba",
+      "resetUserContent": "Resetovať profily"
+    },
+    "cellLabel": "{{who}}, {{permission}}: {{verdict}}",
+    "verdict": {
+      "allowed": "povolené",
+      "denied": "zakázané",
+      "depends": "závisí"
+    },
+    "legend": "✓ povolené · ✗ zakázané · ? závisí. Prerušovane: zdedené alebo predvolené nastavenie servera. Vyberte bunku a uvidíte prečo.",
+    "why": {
+      "title": "Prečo?",
+      "headline": {
+        "allowed": "{{who}} v {{channel}} smie: {{permission}}",
+        "denied": "{{who}} v {{channel}} nesmie: {{permission}}",
+        "depends": "{{who}} v {{channel}} – {{permission}}: závisí"
+      },
+      "ruleHere": "pravidlo {{n}} tu ({{who}})",
+      "ruleInherited": "pravidlo {{n}}, zdedené ({{who}})",
+      "decidedBy": "Rozhodlo: {{rule}}.",
+      "overrides": "Má prednosť pred: {{rule}}.",
+      "default": "Žiadne pravidlo to nespomína, takže platí predvolené nastavenie servera.",
+      "viaWrite": "Povolené, pretože tu smie upravovať oprávnenia, čo toto právo zahŕňa.",
+      "superuser": "SuperUser ignoruje všetky pravidlá.",
+      "reason": {
+        "everyone": "Pravidlo platí pre všetkých.",
+        "registered": "{{who}} patrí do \"auth\", pretože je registrovaný.",
+        "inChannel": "{{who}} patrí do \"in\", pretože je práve v {{channel}}.",
+        "notInChannel": "{{who}} patrí do \"out\", pretože práve nie je v {{channel}}.",
+        "member": "{{who}} je v skupine \"{{group}}\".",
+        "thisPerson": "Pravidlo menuje priamo: {{who}}."
+      },
+      "condition": {
+        "password": "Povolené, ak bolo zadané heslo kanála.",
+        "presence": "Povolené, len kým je v {{channel}}.",
+        "serverGroup": "Závisí od skupiny, ktorú spravuje server."
+      },
+      "goTo": "Prejsť na pravidlo {{n}}",
+      "footer": "Odvodené Mumcordom z pravidiel; posledné slovo má server."
+    },
+    "rules": {
+      "whoGroup": "Skupina {{name}}",
+      "whoPerson": "Osoba {{name}}",
+      "inherit": "Dediť pravidlá z {{parent}}",
+      "inheritHint": "Pravidlá z nadradených kanálov platia aj tu",
+      "order": "Pravidlá zhora nadol",
+      "fromParent": "z nadradeného",
+      "kind": {
+        "person": "osoba",
+        "token": "heslo",
+        "builtIn": "vstavaná",
+        "group": "skupina"
+      },
+      "add": "Pridať pravidlo",
+      "up": "Posunúť pravidlo nahor",
+      "down": "Posunúť pravidlo nadol",
+      "remove": "Odstrániť",
+      "note": "Neskoršie pravidlá majú prednosť pred skoršími. Zdedené pravidlá sú tu len na čítanie; upravte ich v nadradenom kanáli.",
+      "pick": "Vyberte pravidlo, aby ste ho videli alebo zmenili.",
+      "appliesTo": "Platí pre",
+      "whoSearch": "Hľadať skupiny a osoby…",
+      "scope": "Rozsah",
+      "applyHere": "Tento kanál",
+      "applySubs": "Podkanály",
+      "permission": "Oprávnenie",
+      "result": "Výsledok tu",
+      "allow": "Povoliť",
+      "deny": "Zakázať",
+      "allowOf": "Povoliť: {{permission}}",
+      "denyOf": "Zakázať: {{permission}}"
+    },
+    "groups": {
+      "here": "Skupiny v tomto kanáli",
+      "builtIn": "Vstavané",
+      "explain": {
+        "all": "všetci",
+        "auth": "registrovaní",
+        "in": "v tomto kanáli",
+        "out": "mimo tohto kanála",
+        "sub": "v podkanáli",
+        "token": "zadal heslo"
+      },
+      "newName": "Nová skupina",
+      "create": "Vytvoriť",
+      "pick": "Vyberte skupinu a uvidíte jej členov.",
+      "inherit": "Dediť členov",
+      "inheritable": "Dediteľná",
+      "members": "Členovia",
+      "state": {
+        "added": "pridaný tu",
+        "inherited": "zdedený",
+        "removed": "zdedený, odstránený tu"
+      },
+      "action": {
+        "added": "Odstrániť {{name}}",
+        "inherited": "Odstrániť {{name}} tu",
+        "removed": "Obnoviť {{name}}"
+      },
+      "add": "Pridať registrovaného používateľa",
+      "addSearch": "Hľadať registrované osoby…",
+      "noPeople": "Nikto nevyhovuje.",
+      "guests": "Hostí nemožno pridať. Najprv ich zaregistrujte.",
+      "summary": "Kto čo smie v {{channel}}"
+    },
+    "readOnly": "Tieto oprávnenia už nemôžete upravovať.",
+    "views": "Zobrazenia oprávnení",
+    "view": {
+      "who": "Kto čo smie",
+      "rules": "Pravidlá",
+      "groups": "Skupiny"
+    },
+    "check": "Skontrolovať osobu",
+    "checkSearch": "Hľadať osoby online…",
+    "refresh": "Obnoviť",
+    "lockoutTitle": "Prišli by ste tu o práva",
+    "lockoutBody": "Po uložení už nebudete môcť: {{rights}}.",
+    "rootTitle": "Uložiť oprávnenia pre celý server?",
+    "rootBody": "Toto sú pravidlá kanála Root; dedí ich každý kanál.",
+    "backToEditing": "Späť na úpravy",
+    "saveAnyway": "Aj tak uložiť"
   }
 }

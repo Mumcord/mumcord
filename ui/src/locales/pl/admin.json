@@ -178,7 +178,7 @@
     "positionHint": "niższa = wyżej na liście",
     "temporary": "Kanał tymczasowy",
     "temporaryHint": "Tylko przy tworzeniu. Serwer usuwa go, gdy wyjdzie ostatnia osoba.",
-    "linksNote": "Połączone kanały ustawiasz na karcie Połączenia.",
+    "linksNote": "Inne opcje tego kanału: hasło na karcie Hasło, połączenia na karcie Połączenia.",
     "linksSearch": "Szukaj kanałów",
     "linksLabel": "Połączony z (słyszą się nawzajem)",
     "linkNotAllowed": "Tego nie możesz połączyć",
@@ -209,7 +209,171 @@
     "deletePeople_other": "{{count}} osoby zostanie przeniesione do {{parent}}.",
     "tab": {
       "general": "Ogólne",
-      "links": "Połączenia"
-    }
+      "password": "Hasło",
+      "links": "Połączenia",
+      "permissions": "Uprawnienia"
+    },
+    "rulesLoading": "Odczytywanie reguł kanału…",
+    "retry": "Spróbuj ponownie",
+    "password": "Hasło",
+    "passwordShow": "Pokaż",
+    "passwordHide": "Ukryj",
+    "passwordHint": "Puste = brak hasła. Kto je zna, może dołączyć; nie działa dla podkanałów.",
+    "passwordVisible": "Widoczne dla wszystkich, którzy mogą edytować uprawnienia tego kanału.",
+    "passwordCustom": "Ten kanał ma własne reguły dostępu. Kto może dołączyć, zmienisz w Uprawnieniach.",
+    "conflictTitle": "Ktoś zmienił te uprawnienia, gdy je edytowałeś",
+    "conflictBody": "Wczytaj ponownie, aby zacząć od tamtej wersji, albo zapisz swoją i zastąp tamtą.",
+    "conflictBack": "Wstecz",
+    "conflictReload": "Wczytaj ponownie",
+    "conflictMine": "Zapisz moją mimo to",
+    "goneTitle": "Ten kanał został usunięty",
+    "goneBody": "Ktoś usunął ten kanał, gdy okno było otwarte. Twoje zmiany nie zostały zapisane."
+  },
+  "perm": {
+    "everyone": "Wszyscy",
+    "gridCaption": "Kto co może w {{channel}}",
+    "who": "Kto",
+    "group": {
+      "basics": "Podstawy",
+      "moderation": "Moderacja",
+      "channelAdmin": "Zarządzanie kanałem",
+      "server": "Serwer"
+    },
+    "name": {
+      "enter": "Dołączanie",
+      "traverse": "Przechodzenie",
+      "speak": "Mówienie",
+      "whisper": "Szeptanie",
+      "textMessage": "Pisanie wiadomości",
+      "listen": "Podsłuch",
+      "muteDeafen": "Wyciszanie innych",
+      "move": "Przenoszenie osób",
+      "write": "Edycja uprawnień",
+      "makeChannel": "Tworzenie kanałów",
+      "makeTempChannel": "Tworzenie kanałów tymczasowych",
+      "linkChannel": "Łączenie kanałów",
+      "kick": "Wyrzucanie",
+      "ban": "Banowanie",
+      "register": "Rejestrowanie innych",
+      "selfRegister": "Rejestracja siebie",
+      "resetUserContent": "Resetowanie profili"
+    },
+    "cellLabel": "{{who}}, {{permission}}: {{verdict}}",
+    "verdict": {
+      "allowed": "dozwolone",
+      "denied": "zabronione",
+      "depends": "zależy"
+    },
+    "legend": "✓ dozwolone · ✗ zabronione · ? zależy. Przerywana linia: odziedziczone lub domyślne ustawienie serwera. Wybierz komórkę, aby zobaczyć dlaczego.",
+    "why": {
+      "title": "Dlaczego?",
+      "headline": {
+        "allowed": "{{who}} w {{channel}} – dozwolone: {{permission}}",
+        "denied": "{{who}} w {{channel}} – zabronione: {{permission}}",
+        "depends": "{{who}} w {{channel}} – {{permission}}: zależy"
+      },
+      "ruleHere": "reguła {{n}} tutaj ({{who}})",
+      "ruleInherited": "reguła {{n}}, odziedziczona ({{who}})",
+      "decidedBy": "Rozstrzyga: {{rule}}.",
+      "overrides": "Ma pierwszeństwo przed: {{rule}}.",
+      "default": "Żadna reguła o tym nie mówi, więc obowiązuje ustawienie domyślne serwera.",
+      "viaWrite": "Dozwolone, bo ta osoba może tu edytować uprawnienia, co obejmuje też to uprawnienie.",
+      "superuser": "SuperUser ignoruje wszystkie reguły.",
+      "reason": {
+        "everyone": "Reguła dotyczy wszystkich.",
+        "registered": "{{who}} należy do \"auth\", bo jest zarejestrowany.",
+        "inChannel": "{{who}} należy do \"in\", bo jest teraz w {{channel}}.",
+        "notInChannel": "{{who}} należy do \"out\", bo nie jest teraz w {{channel}}.",
+        "member": "{{who}} jest w grupie \"{{group}}\".",
+        "thisPerson": "Reguła wymienia bezpośrednio: {{who}}."
+      },
+      "condition": {
+        "password": "Dozwolone, jeśli podano hasło kanału.",
+        "presence": "Dozwolone tylko podczas pobytu w {{channel}}.",
+        "serverGroup": "Zależy od grupy zarządzanej przez serwer."
+      },
+      "goTo": "Przejdź do reguły {{n}}",
+      "footer": "Wyliczone przez Mumcord na podstawie reguł; ostatnie słowo należy do serwera."
+    },
+    "rules": {
+      "whoGroup": "Grupa {{name}}",
+      "whoPerson": "Osoba {{name}}",
+      "inherit": "Dziedzicz reguły z {{parent}}",
+      "inheritHint": "Reguły z kanałów nadrzędnych obowiązują też tutaj",
+      "order": "Reguły, od góry do dołu",
+      "fromParent": "z nadrzędnego",
+      "kind": {
+        "person": "osoba",
+        "token": "hasło",
+        "builtIn": "wbudowana",
+        "group": "grupa"
+      },
+      "add": "Dodaj regułę",
+      "up": "Przesuń regułę w górę",
+      "down": "Przesuń regułę w dół",
+      "remove": "Usuń",
+      "note": "Późniejsze reguły mają pierwszeństwo przed wcześniejszymi. Reguły odziedziczone są tu tylko do odczytu; edytuj je w kanale nadrzędnym.",
+      "pick": "Wybierz regułę, aby ją zobaczyć lub zmienić.",
+      "appliesTo": "Dotyczy",
+      "whoSearch": "Szukaj grup i osób…",
+      "scope": "Zakres",
+      "applyHere": "Ten kanał",
+      "applySubs": "Podkanały",
+      "permission": "Uprawnienie",
+      "result": "Wynik tutaj",
+      "allow": "Zezwól",
+      "deny": "Zabroń",
+      "allowOf": "Zezwól: {{permission}}",
+      "denyOf": "Zabroń: {{permission}}"
+    },
+    "groups": {
+      "here": "Grupy w tym kanale",
+      "builtIn": "Wbudowane",
+      "explain": {
+        "all": "wszyscy",
+        "auth": "zarejestrowani",
+        "in": "w tym kanale",
+        "out": "poza tym kanałem",
+        "sub": "w podkanale",
+        "token": "podał hasło"
+      },
+      "newName": "Nowa grupa",
+      "create": "Utwórz",
+      "pick": "Wybierz grupę, aby zobaczyć jej członków.",
+      "inherit": "Dziedzicz członków",
+      "inheritable": "Dziedziczna",
+      "members": "Członkowie",
+      "state": {
+        "added": "dodany tutaj",
+        "inherited": "odziedziczony",
+        "removed": "odziedziczony, usunięty tutaj"
+      },
+      "action": {
+        "added": "Usuń {{name}}",
+        "inherited": "Usuń {{name}} tutaj",
+        "removed": "Przywróć {{name}}"
+      },
+      "add": "Dodaj zarejestrowanego użytkownika",
+      "addSearch": "Szukaj zarejestrowanych osób…",
+      "noPeople": "Brak wyników.",
+      "guests": "Nie można dodać gości. Najpierw ich zarejestruj.",
+      "summary": "Kto co może w {{channel}}"
+    },
+    "readOnly": "Nie możesz już edytować tych uprawnień.",
+    "views": "Widoki uprawnień",
+    "view": {
+      "who": "Kto co może",
+      "rules": "Reguły",
+      "groups": "Grupy"
+    },
+    "check": "Sprawdź osobę",
+    "checkSearch": "Szukaj osób online…",
+    "refresh": "Odśwież",
+    "lockoutTitle": "Stracisz tu uprawnienia",
+    "lockoutBody": "Po zapisaniu nie będziesz już mógł: {{rights}}.",
+    "rootTitle": "Zapisać uprawnienia dla całego serwera?",
+    "rootBody": "To reguły kanału Root; dziedziczy je każdy kanał.",
+    "backToEditing": "Wróć do edycji",
+    "saveAnyway": "Zapisz mimo to"
   }
 }

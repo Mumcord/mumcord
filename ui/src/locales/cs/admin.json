@@ -178,7 +178,7 @@
     "positionHint": "nižší = výš v seznamu",
     "temporary": "Dočasný kanál",
     "temporaryHint": "Jen při vytváření. Server ho smaže, když odejde poslední člověk.",
-    "linksNote": "Propojené kanály nastavíte na kartě Propojení.",
+    "linksNote": "Další možnosti tohoto kanálu: heslo na kartě Heslo, propojení na kartě Propojení.",
     "linksSearch": "Hledat kanály",
     "linksLabel": "Propojeno s (slyší se navzájem)",
     "linkNotAllowed": "Tento nemůžete propojit",
@@ -209,7 +209,171 @@
     "deletePeople_other": "{{count}} lidí bude přesunuto do {{parent}}.",
     "tab": {
       "general": "Obecné",
-      "links": "Propojení"
-    }
+      "password": "Heslo",
+      "links": "Propojení",
+      "permissions": "Oprávnění"
+    },
+    "rulesLoading": "Načítání pravidel kanálu…",
+    "retry": "Zkusit znovu",
+    "password": "Heslo",
+    "passwordShow": "Zobrazit",
+    "passwordHide": "Skrýt",
+    "passwordHint": "Prázdné = bez hesla. Kdo ho zná, může vstoupit; pro podkanály neplatí.",
+    "passwordVisible": "Viditelné pro každého, kdo může upravovat oprávnění tohoto kanálu.",
+    "passwordCustom": "Tento kanál má vlastní pravidla přístupu. Kdo smí vstoupit, změníte v Oprávněních.",
+    "conflictTitle": "Někdo změnil tato oprávnění, zatímco jste je upravovali",
+    "conflictBody": "Načtěte znovu a začněte z jeho verze, nebo uložte svou a nahraďte jeho.",
+    "conflictBack": "Zpět",
+    "conflictReload": "Znovu načíst",
+    "conflictMine": "Přesto uložit moji",
+    "goneTitle": "Tento kanál byl smazán",
+    "goneBody": "Někdo kanál smazal, zatímco bylo okno otevřené. Vaše změny se neuložily."
+  },
+  "perm": {
+    "everyone": "Všichni",
+    "gridCaption": "Kdo co smí v {{channel}}",
+    "who": "Kdo",
+    "group": {
+      "basics": "Základy",
+      "moderation": "Moderování",
+      "channelAdmin": "Správa kanálu",
+      "server": "Server"
+    },
+    "name": {
+      "enter": "Vstoupit",
+      "traverse": "Procházet",
+      "speak": "Mluvit",
+      "whisper": "Šeptat",
+      "textMessage": "Psát zprávy",
+      "listen": "Poslouchat",
+      "muteDeafen": "Ztlumit ostatní",
+      "move": "Přesouvat lidi",
+      "write": "Upravovat oprávnění",
+      "makeChannel": "Vytvářet kanály",
+      "makeTempChannel": "Vytvářet dočasné kanály",
+      "linkChannel": "Propojovat kanály",
+      "kick": "Vyhodit",
+      "ban": "Zabanovat",
+      "register": "Registrovat ostatní",
+      "selfRegister": "Registrovat sebe",
+      "resetUserContent": "Resetovat profily"
+    },
+    "cellLabel": "{{who}}, {{permission}}: {{verdict}}",
+    "verdict": {
+      "allowed": "povoleno",
+      "denied": "zakázáno",
+      "depends": "záleží"
+    },
+    "legend": "✓ povoleno · ✗ zakázáno · ? záleží. Přerušovaně: zděděno nebo výchozí nastavení serveru. Vyberte buňku a uvidíte proč.",
+    "why": {
+      "title": "Proč?",
+      "headline": {
+        "allowed": "{{who}} v {{channel}} smí: {{permission}}",
+        "denied": "{{who}} v {{channel}} nesmí: {{permission}}",
+        "depends": "{{who}} v {{channel}} – {{permission}}: záleží"
+      },
+      "ruleHere": "pravidlo {{n}} zde ({{who}})",
+      "ruleInherited": "pravidlo {{n}}, zděděné ({{who}})",
+      "decidedBy": "Rozhodlo: {{rule}}.",
+      "overrides": "Má přednost před: {{rule}}.",
+      "default": "Žádné pravidlo to nezmiňuje, takže platí výchozí nastavení serveru.",
+      "viaWrite": "Povoleno, protože tu smí upravovat oprávnění, což toto právo zahrnuje.",
+      "superuser": "SuperUser ignoruje všechna pravidla.",
+      "reason": {
+        "everyone": "Pravidlo platí pro všechny.",
+        "registered": "{{who}} patří do \"auth\", protože je registrován.",
+        "inChannel": "{{who}} patří do \"in\", protože je právě v {{channel}}.",
+        "notInChannel": "{{who}} patří do \"out\", protože právě není v {{channel}}.",
+        "member": "{{who}} je ve skupině \"{{group}}\".",
+        "thisPerson": "Pravidlo jmenuje přímo: {{who}}."
+      },
+      "condition": {
+        "password": "Povoleno, pokud bylo zadáno heslo kanálu.",
+        "presence": "Povoleno, jen dokud je v {{channel}}.",
+        "serverGroup": "Záleží na skupině, kterou spravuje server."
+      },
+      "goTo": "Přejít na pravidlo {{n}}",
+      "footer": "Odvozeno Mumcordem z pravidel; poslední slovo má server."
+    },
+    "rules": {
+      "whoGroup": "Skupina {{name}}",
+      "whoPerson": "Osoba {{name}}",
+      "inherit": "Dědit pravidla z {{parent}}",
+      "inheritHint": "Pravidla z nadřazených kanálů platí i zde",
+      "order": "Pravidla shora dolů",
+      "fromParent": "z nadřazeného",
+      "kind": {
+        "person": "osoba",
+        "token": "heslo",
+        "builtIn": "vestavěná",
+        "group": "skupina"
+      },
+      "add": "Přidat pravidlo",
+      "up": "Posunout pravidlo nahoru",
+      "down": "Posunout pravidlo dolů",
+      "remove": "Odebrat",
+      "note": "Pozdější pravidla mají přednost před dřívějšími. Zděděná pravidla jsou zde jen pro čtení; upravte je v nadřazeném kanálu.",
+      "pick": "Vyberte pravidlo, abyste ho viděli nebo změnili.",
+      "appliesTo": "Platí pro",
+      "whoSearch": "Hledat skupiny a osoby…",
+      "scope": "Rozsah",
+      "applyHere": "Tento kanál",
+      "applySubs": "Podkanály",
+      "permission": "Oprávnění",
+      "result": "Výsledek zde",
+      "allow": "Povolit",
+      "deny": "Zakázat",
+      "allowOf": "Povolit: {{permission}}",
+      "denyOf": "Zakázat: {{permission}}"
+    },
+    "groups": {
+      "here": "Skupiny v tomto kanálu",
+      "builtIn": "Vestavěné",
+      "explain": {
+        "all": "všichni",
+        "auth": "registrovaní",
+        "in": "v tomto kanálu",
+        "out": "mimo tento kanál",
+        "sub": "v podkanálu",
+        "token": "zadal heslo"
+      },
+      "newName": "Nová skupina",
+      "create": "Vytvořit",
+      "pick": "Vyberte skupinu a uvidíte její členy.",
+      "inherit": "Dědit členy",
+      "inheritable": "Dědičná",
+      "members": "Členové",
+      "state": {
+        "added": "přidán zde",
+        "inherited": "zděděn",
+        "removed": "zděděn, odebrán zde"
+      },
+      "action": {
+        "added": "Odebrat {{name}}",
+        "inherited": "Odebrat {{name}} zde",
+        "removed": "Obnovit {{name}}"
+      },
+      "add": "Přidat registrovaného uživatele",
+      "addSearch": "Hledat registrované osoby…",
+      "noPeople": "Nikdo neodpovídá.",
+      "guests": "Hosty nelze přidat. Nejdřív je zaregistrujte.",
+      "summary": "Kdo co smí v {{channel}}"
+    },
+    "readOnly": "Tato oprávnění už nemůžete upravovat.",
+    "views": "Zobrazení oprávnění",
+    "view": {
+      "who": "Kdo co smí",
+      "rules": "Pravidla",
+      "groups": "Skupiny"
+    },
+    "check": "Zkontrolovat osobu",
+    "checkSearch": "Hledat osoby online…",
+    "refresh": "Obnovit",
+    "lockoutTitle": "Přišli byste tu o práva",
+    "lockoutBody": "Po uložení už nebudete moct: {{rights}}.",
+    "rootTitle": "Uložit oprávnění pro celý server?",
+    "rootBody": "Toto jsou pravidla kanálu Root; dědí je každý kanál.",
+    "backToEditing": "Zpět k úpravám",
+    "saveAnyway": "Přesto uložit"
   }
 }
