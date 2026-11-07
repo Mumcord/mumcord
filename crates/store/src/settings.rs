@@ -1473,11 +1473,12 @@ mod tests {
     }
 
     #[test]
-    fn p2p_mode_defaults_to_direct_relay_and_round_trips() {
+    fn p2p_mode_defaults_to_relay_first_and_round_trips() {
+        // A new install has no saved settings yet (#590).
         let (_dir, store) = temp_store();
         assert_eq!(
             store.settings().expect("load").p2p_mode,
-            P2pMode::DirectRelay
+            P2pMode::RelayFirst
         );
         for mode in [
             P2pMode::DirectRelay,
