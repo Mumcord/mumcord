@@ -182,7 +182,10 @@
     "detailsDropped": "Καρέ που χάθηκαν",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Δεν μετρήθηκε",
-    "close": "Κλείσιμο"
+    "close": "Κλείσιμο",
+    "reasonNotRegistered": "μόνο εγγεγραμμένοι χρήστες μπορούν να χρησιμοποιούν το relay αυτού του διακομιστή",
+    "reasonGroupNotAllowed": "το relay εξυπηρετεί μόνο ορισμένες ομάδες",
+    "reasonNoHello": "το bot του relay δεν γνωρίζει ακόμη την εφαρμογή, συνδέσου ξανά"
   },
   "settings": {
     "title": "Κοινή χρήση οθόνης",

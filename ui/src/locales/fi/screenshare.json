@@ -182,7 +182,10 @@
     "detailsDropped": "Pudonneet kuvat",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Ei mitattu",
-    "close": "Sulje"
+    "close": "Sulje",
+    "reasonNotRegistered": "vain rekisteröityneet käyttäjät voivat käyttää palvelimen välitintä",
+    "reasonGroupNotAllowed": "välitin palvelee vain tiettyjä ryhmiä",
+    "reasonNoHello": "välitinbotti ei vielä tunne tätä sovellusta, yhdistä uudelleen"
   },
   "settings": {
     "title": "Näytönjako",

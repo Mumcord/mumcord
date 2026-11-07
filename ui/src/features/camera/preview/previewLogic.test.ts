@@ -13,6 +13,7 @@ import {
   loadLine,
   loadLineText,
   sameBackground,
+  refusalHint,
 } from "./previewLogic";
 
 const t = () => i18n.getFixedT("en", "camera");
@@ -155,5 +156,14 @@ describe("isStrongBlur", () => {
     expect(isStrongBlur(0)).toBe(false);
     expect(isStrongBlur(100)).toBe(true);
     expect(isStrongBlur(75)).toBe(true);
+  });
+});
+
+describe("refusal hints (#601)", () => {
+  it("offers registering to a guest and a reconnect when the bot lost the hello", () => {
+    expect(refusalHint("notRegistered")).toBe("register");
+    expect(refusalHint("noHello")).toBe("reconnect");
+    expect(refusalHint("groupNotAllowed")).toBeNull();
+    expect(refusalHint("denied")).toBeNull();
   });
 });

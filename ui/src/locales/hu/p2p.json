@@ -49,7 +49,9 @@
     "denied": "Az átjátszó botja elutasította a kérést.",
     "notRegistered": "Ennek a szervernek az átjátszója csak regisztrált felhasználók számára érhető el. Használatához regisztrálj ezen a szerveren.",
     "peerGone": "A másik fél elhagyta a szervert.",
-    "rateLimited": "Túl sok átjátszókérés. Próbáld újra egy perc múlva."
+    "rateLimited": "Túl sok átjátszókérés. Próbáld újra egy perc múlva.",
+    "groupNotAllowed": "A szerver relay-e csak bizonyos csoportoknak érhető el. Kérj meg egy admint, hogy adjon hozzá.",
+    "noHello": "A relay bot még nem ismeri ezt az alkalmazást. Csatlakozz újra a javításhoz."
   },
   "refusal": {
     "unknownToken": "ismeretlen hozzáférési token",
@@ -61,6 +63,11 @@
     "rateLimited": "túl sok próbálkozás",
     "version": "nem támogatott verzió",
     "badRequest": "érvénytelen kérés"
+  },
+  "refusalAction": {
+    "howToRegister": "Hogyan regisztrálj",
+    "reconnect": "Újracsatlakozás",
+    "filesRegisteredOnly": "A fájlmegosztás ezen a szerveren csak regisztrált felhasználóknak érhető el."
   },
   "trust": {
     "title": "Megváltozott a relay ezen: {{server}}",

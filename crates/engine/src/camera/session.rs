@@ -76,6 +76,16 @@ pub enum CameraFailure {
     RateLimited,
     /// The P2P mode leaves the relay out.
     Mode,
+    /// The relay only serves registered users and this client is a guest (#601).
+    NotRegistered,
+    /// The relay only serves members of certain groups (#601).
+    GroupNotAllowed,
+    /// Only people in the same channel can see each other's camera (#601).
+    NotSameChannel,
+    /// This client is in no channel the bot can see (#601).
+    NotInChannel,
+    /// The bot doesn't know this client yet (e.g. it restarted); reconnecting fixes it (#601).
+    NoHello,
     /// No client certificate to bind with and sign the key exchange.
     NoCertificate,
 }
@@ -99,6 +109,11 @@ impl CameraFailure {
             Self::RateLimited => "rate-limited",
             Self::Mode => "mode",
             Self::NoCertificate => "no-certificate",
+            Self::NotRegistered => "not-registered",
+            Self::GroupNotAllowed => "group-not-allowed",
+            Self::NotSameChannel => "not-same-channel",
+            Self::NotInChannel => "not-in-channel",
+            Self::NoHello => "no-hello",
         }
     }
 
@@ -107,7 +122,12 @@ impl CameraFailure {
             BroadcastErrorReason::RoomFull => Self::RoomFull,
             BroadcastErrorReason::RelayFull | BroadcastErrorReason::Full => Self::RelayFull,
             BroadcastErrorReason::UseNotAllowed => Self::UseNotAllowed,
-            BroadcastErrorReason::Denied | BroadcastErrorReason::NotSameChannel => Self::Refused,
+            BroadcastErrorReason::Denied => Self::Refused,
+            BroadcastErrorReason::NotSameChannel => Self::NotSameChannel,
+            BroadcastErrorReason::NotRegistered => Self::NotRegistered,
+            BroadcastErrorReason::GroupNotAllowed => Self::GroupNotAllowed,
+            BroadcastErrorReason::NotInChannel => Self::NotInChannel,
+            BroadcastErrorReason::NoHello => Self::NoHello,
             BroadcastErrorReason::RelayDown => Self::RelayDown,
             BroadcastErrorReason::RateLimited => Self::RateLimited,
         }
@@ -119,9 +139,10 @@ impl CameraFailure {
             RelayUnavailable::UseNotAllowed(_) => Self::UseNotAllowed,
             RelayUnavailable::RelayFull => Self::RelayFull,
             RelayUnavailable::RateLimited => Self::RateLimited,
-            RelayUnavailable::Denied
-            | RelayUnavailable::NotRegistered
-            | RelayUnavailable::Refused(_) => Self::Refused,
+            RelayUnavailable::Denied | RelayUnavailable::Refused(_) => Self::Refused,
+            RelayUnavailable::NotRegistered => Self::NotRegistered,
+            RelayUnavailable::GroupNotAllowed => Self::GroupNotAllowed,
+            RelayUnavailable::NoHello => Self::NoHello,
             _ => Self::RelayDown,
         }
     }
@@ -972,8 +993,13 @@ mod tests {
             (BroadcastErrorReason::RoomFull, "room-full"),
             (BroadcastErrorReason::RelayFull, "relay-full"),
             (BroadcastErrorReason::UseNotAllowed, "use-not-allowed"),
-            (BroadcastErrorReason::NotSameChannel, "denied"),
+            (BroadcastErrorReason::NotSameChannel, "not-same-channel"),
             (BroadcastErrorReason::Denied, "denied"),
+            // #601: each refusal keeps its own reason.
+            (BroadcastErrorReason::NotRegistered, "not-registered"),
+            (BroadcastErrorReason::GroupNotAllowed, "group-not-allowed"),
+            (BroadcastErrorReason::NotInChannel, "not-in-channel"),
+            (BroadcastErrorReason::NoHello, "no-hello"),
             (BroadcastErrorReason::RelayDown, "relay-down"),
             (BroadcastErrorReason::RateLimited, "rate-limited"),
         ];

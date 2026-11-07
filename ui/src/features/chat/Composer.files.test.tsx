@@ -9,6 +9,7 @@ import { connectedMock, resetAll } from "../channels/testUtils";
 import { i18n } from "../../i18n";
 import { conversationMessages } from "./chatStore";
 import { Composer } from "./Composer";
+import { getServerState } from "../channels/serverStore";
 import { closeRelayDetails, getRelayDetails } from "../p2p/relayTrust";
 
 const dropHandlers = vi.hoisted(() => new Set<(event: { payload: DragDropEvent }) => void>());
@@ -89,6 +90,7 @@ const RELAY_NONE: RelayInfo = {
   broadcastMax: null,
   fingerprint: null,
   previousFingerprint: null,
+  registeredOnly: false,
 };
 
 describe("chipStatus", () => {
@@ -175,6 +177,35 @@ describe("Composer file sharing", () => {
     });
     expect(await screen.findByText(reason)).toBeTruthy();
     localStorage.clear();
+  });
+
+  it("tells a guest on a registered-only relay why files can't be shared (#601)", async () => {
+    vi.spyOn(api, "filesAvailability").mockResolvedValue(null);
+    vi.spyOn(api, "relayInfo").mockResolvedValue({
+      bots: ["Mumbot"],
+      host: "relay.example.org",
+      status: { kind: "available" },
+      firstSeen: null,
+      uses: ["files"],
+      broadcastMax: null,
+      fingerprint: null,
+      previousFingerprint: null,
+      registeredOnly: true,
+    });
+    setup(CHANNEL);
+    await waitFor(() => {
+      expect(getServerState().selfSession).not.toBeNull();
+    });
+    const state = getServerState();
+    const self = state.selfSession === null ? undefined : state.users.get(state.selfSession);
+    if (self)
+      act(() => {
+        api.mock.upsertUser({ ...self, registered: false });
+      });
+    expect(
+      await screen.findByText(/File sharing is only available to registered users/),
+    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "How to register" })).toBeTruthy();
   });
 
   it("names a changed relay and links to its details instead of saying there is none (#600)", async () => {

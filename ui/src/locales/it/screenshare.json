@@ -186,7 +186,10 @@
     "detailsDropped": "Fotogrammi persi",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Non misurato",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "reasonNotRegistered": "solo gli utenti registrati possono usare il relay di questo server",
+    "reasonGroupNotAllowed": "il relay serve solo alcuni gruppi",
+    "reasonNoHello": "il bot del relay non conosce ancora questa app, riconnettiti"
   },
   "settings": {
     "title": "Condivisione schermo",

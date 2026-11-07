@@ -49,7 +49,9 @@
     "denied": "Dhiúltaigh bot an athsheachadáin don iarratas.",
     "notRegistered": "Níl athsheachadán an fhreastalaí seo ar fáil ach d'úsáideoirí cláraithe. Cláraigh ar an bhfreastalaí seo chun é a úsáid.",
     "peerGone": "D’fhág an duine eile an freastalaí.",
-    "rateLimited": "An iomarca iarratas athsheachadáin. Bain triail eile as i gceann nóiméid."
+    "rateLimited": "An iomarca iarratas athsheachadáin. Bain triail eile as i gceann nóiméid.",
+    "groupNotAllowed": "Níl athsheachadán an fhreastalaí ar fáil ach do ghrúpaí áirithe. Iarr ar riarthóir tú a chur leis.",
+    "noHello": "Níl aithne fós ag bot an athsheachadáin ar an aip seo. Ceangail arís."
   },
   "refusal": {
     "unknownToken": "comhartha rochtana anaithnid",
@@ -61,6 +63,11 @@
     "rateLimited": "an iomarca iarrachtaí",
     "version": "leagan gan tacaíocht",
     "badRequest": "iarratas neamhbhailí"
+  },
+  "refusalAction": {
+    "howToRegister": "Conas clárú",
+    "reconnect": "Ceangail arís",
+    "filesRegisteredOnly": "Níl comhroinnt comhad ar fáil ach d'úsáideoirí cláraithe ar an bhfreastalaí seo."
   },
   "trust": {
     "title": "Athraíodh an athsheachadán ar {{server}}",

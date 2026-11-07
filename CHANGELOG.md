@@ -11,6 +11,7 @@
 ### Changed
 
 - When the server refuses something, Mumcord says what and where in plain words, e.g. "You may not move people in Raid.", unless the dialog that asked shows it already. Rights changed by an admin while you are connected now take effect without reconnecting
+- When the relay refuses the camera, screen sharing or file sharing, Mumcord names the reason (not registered, not in an allowed group, not in the same channel, reconnect needed) with a way out: "How to register" or "Reconnect". On a relay for registered users only, guests see why the camera and the paperclip are unavailable before trying
 - Radio buttons and checkboxes have Mumcord's own design everywhere: a ring with a lilac dot and a rounded box with a lilac check, with a clear focus ring and high-contrast support. Option cards such as "Private messages from" highlight the whole card
 - Setup wizard, "How do you want to talk?": two clear cards with a short explanation, the sensitivity choice nested under voice activation, and the push-to-talk key right in its card; Continue waits until a key is set
 - Peer-to-peer: "Direct + relay (always relay, hides my IP)" is now the recommended mode and the default for new installs, and the Balanced setup style uses it. A mode you already use stays as it is
@@ -21,6 +22,7 @@
 
 ### Fixed
 
+- The channel search field at the top of the sidebar lines up with the channel name in the chat header
 - Activity feed: names work like in the chat (click opens the profile and menu, double-click a private message), and bots no longer show up with joins, leaves and moves
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)

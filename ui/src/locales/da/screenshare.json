@@ -182,7 +182,10 @@
     "detailsDropped": "Droppede billeder",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Ikke målt",
-    "close": "Luk"
+    "close": "Luk",
+    "reasonNotRegistered": "kun registrerede brugere må bruge serverens relæ",
+    "reasonGroupNotAllowed": "relæet betjener kun bestemte grupper",
+    "reasonNoHello": "relæbotten kender ikke appen endnu, forbind igen"
   },
   "settings": {
     "title": "Skærmdeling",

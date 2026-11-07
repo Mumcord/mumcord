@@ -13,7 +13,8 @@
     "relayTooOld": "O retransmissor deste servidor é demasiado antigo para a partilha de câmara.",
     "relayDisallows": "O retransmissor deste servidor não permite a partilha de câmara.",
     "needsRelayMode": "A partilha de câmara precisa do retransmissor. Altera-o em Privacidade e ligações.",
-    "noCertificate": "A partilha de câmara precisa de um certificado de cliente."
+    "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
+    "registeredOnly": "Neste servidor só utilizadores registados podem usar a câmara."
   },
   "cameraOnTray": "Câmara ligada",
   "turnOffTray": "Desligar a câmara",
@@ -97,7 +98,12 @@
     "mode": "A partilha de câmara precisa do retransmissor. Altera-o em Privacidade e ligações.",
     "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
     "endedByRelay": "Câmara parada pelo retransmissor do servidor",
-    "dismissStopped": "Dispensar"
+    "dismissStopped": "Dispensar",
+    "notRegistered": "A câmara não arrancou: neste servidor só utilizadores registados podem usar a câmara.",
+    "groupNotAllowed": "A câmara não arrancou: o relay deste servidor só serve certos grupos. Pede a um administrador para te adicionar.",
+    "notSameChannel": "A câmara não arrancou: tu e os teus espectadores têm de estar no mesmo canal.",
+    "notInChannel": "A câmara não arrancou: entra primeiro num canal.",
+    "noHello": "A câmara não arrancou: o bot do relay ainda não conhece esta app. Volta a ligar para resolver."
   },
   "privacy": {
     "windows": "O Windows bloqueia o acesso à câmara para aplicações de ambiente de trabalho",

@@ -13,7 +13,8 @@
     "relayTooOld": "Das Relay dieses Servers ist für die Kamerafreigabe zu alt.",
     "relayDisallows": "Das Relay dieses Servers erlaubt keine Kamerafreigabe.",
     "needsRelayMode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
-    "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat."
+    "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
+    "registeredOnly": "Auf diesem Server dürfen nur registrierte Nutzer die Kamera verwenden."
   },
   "cameraOnTray": "Kamera an",
   "turnOffTray": "Kamera ausschalten",
@@ -97,7 +98,12 @@
     "mode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
     "endedByRelay": "Kamera vom Relay des Servers angehalten",
-    "dismissStopped": "Verwerfen"
+    "dismissStopped": "Verwerfen",
+    "notRegistered": "Kamera konnte nicht starten: Auf diesem Server dürfen nur registrierte Nutzer die Kamera verwenden.",
+    "groupNotAllowed": "Kamera konnte nicht starten: Das Relay dieses Servers bedient nur bestimmte Gruppen. Bitte einen Admin, dich hinzuzufügen.",
+    "notSameChannel": "Kamera konnte nicht starten: Du und deine Zuschauer müsst im selben Kanal sein.",
+    "notInChannel": "Kamera konnte nicht starten: Tritt zuerst einem Kanal bei.",
+    "noHello": "Kamera konnte nicht starten: Der Relay-Bot kennt diese App noch nicht. Verbinde dich neu, um das zu beheben."
   },
   "privacy": {
     "windows": "Windows blockiert den Kamerazugriff für Desktop-Apps",

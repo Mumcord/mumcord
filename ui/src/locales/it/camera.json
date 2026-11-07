@@ -13,7 +13,8 @@
     "relayTooOld": "Il relay di questo server è troppo vecchio per la condivisione della fotocamera.",
     "relayDisallows": "Il relay di questo server non consente la condivisione della fotocamera.",
     "needsRelayMode": "La condivisione della fotocamera richiede il relay. Modificalo in Privacy e connessioni.",
-    "noCertificate": "La condivisione della fotocamera richiede un certificato client."
+    "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
+    "registeredOnly": "Su questo server solo gli utenti registrati possono usare la fotocamera."
   },
   "cameraOnTray": "Fotocamera attiva",
   "turnOffTray": "Disattiva la fotocamera",
@@ -97,7 +98,12 @@
     "mode": "La condivisione della fotocamera richiede il relay. Modificalo in Privacy e connessioni.",
     "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
     "endedByRelay": "Fotocamera interrotta dal relay del server",
-    "dismissStopped": "Ignora"
+    "dismissStopped": "Ignora",
+    "notRegistered": "La fotocamera non è partita: su questo server solo gli utenti registrati possono usare la fotocamera.",
+    "groupNotAllowed": "La fotocamera non è partita: il relay di questo server serve solo alcuni gruppi. Chiedi a un admin di aggiungerti.",
+    "notSameChannel": "La fotocamera non è partita: tu e i tuoi spettatori dovete essere nello stesso canale.",
+    "notInChannel": "La fotocamera non è partita: entra prima in un canale.",
+    "noHello": "La fotocamera non è partita: il bot del relay non conosce ancora questa app. Riconnettiti per risolvere."
   },
   "privacy": {
     "windows": "Windows blocca l'accesso alla fotocamera per le app desktop",

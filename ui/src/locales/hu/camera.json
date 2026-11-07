@@ -13,7 +13,8 @@
     "relayTooOld": "Ennek a szervernek az átjátszója túl régi a kamera megosztásához.",
     "relayDisallows": "Ennek a szervernek az átjátszója nem engedi a kamera megosztását.",
     "needsRelayMode": "A kamera megosztásához az átjátszó kell. Módosítsd az Adatvédelem és kapcsolatok alatt.",
-    "noCertificate": "A kamera megosztásához kliens tanúsítvány kell."
+    "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
+    "registeredOnly": "Ezen a szerveren csak regisztrált felhasználók használhatják a kamerát."
   },
   "cameraOnTray": "Kamera bekapcsolva",
   "turnOffTray": "Kamera kikapcsolása",
@@ -97,7 +98,12 @@
     "mode": "A kamera megosztásához az átjátszó kell. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
     "endedByRelay": "A kamerát a szerver átjátszója leállította",
-    "dismissStopped": "Elvetés"
+    "dismissStopped": "Elvetés",
+    "notRegistered": "A kamera nem indult el: ezen a szerveren csak regisztrált felhasználók használhatják a kamerát.",
+    "groupNotAllowed": "A kamera nem indult el: a szerver relay-e csak bizonyos csoportokat szolgál ki. Kérj meg egy admint, hogy adjon hozzá.",
+    "notSameChannel": "A kamera nem indult el: neked és a nézőidnek ugyanabban a csatornában kell lennetek.",
+    "notInChannel": "A kamera nem indult el: előbb lépj be egy csatornába.",
+    "noHello": "A kamera nem indult el: a relay bot még nem ismeri ezt az alkalmazást. Csatlakozz újra a javításhoz."
   },
   "privacy": {
     "windows": "A Windows blokkolja a kamera elérését az asztali alkalmazások elől",

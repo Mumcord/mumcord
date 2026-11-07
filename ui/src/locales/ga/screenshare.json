@@ -194,7 +194,10 @@
     "detailsDropped": "Frámaí caillte",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Gan tomhas",
-    "close": "Dún"
+    "close": "Dún",
+    "reasonNotRegistered": "ní féidir ach le húsáideoirí cláraithe athsheachadán an fhreastalaí a úsáid",
+    "reasonGroupNotAllowed": "ní fhreastalaíonn an t-athsheachadán ach ar ghrúpaí áirithe",
+    "reasonNoHello": "níl aithne ag bot an athsheachadáin ar an aip fós, ceangail arís"
   },
   "settings": {
     "title": "Comhroinnt scáileáin",

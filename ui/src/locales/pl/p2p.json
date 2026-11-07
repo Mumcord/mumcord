@@ -49,7 +49,9 @@
     "denied": "Bot przekaźnika odrzucił prośbę.",
     "notRegistered": "Przekaźnik tego serwera jest dostępny tylko dla zarejestrowanych użytkowników. Zarejestruj się na tym serwerze, aby z niego korzystać.",
     "peerGone": "Druga osoba opuściła serwer.",
-    "rateLimited": "Zbyt wiele próśb do przekaźnika. Spróbuj ponownie za minutę."
+    "rateLimited": "Zbyt wiele próśb do przekaźnika. Spróbuj ponownie za minutę.",
+    "groupNotAllowed": "Przekaźnik tego serwera jest dostępny tylko dla wybranych grup. Poproś administratora o dodanie.",
+    "noHello": "Bot przekaźnika nie zna jeszcze tej aplikacji. Połącz się ponownie, aby to naprawić."
   },
   "refusal": {
     "unknownToken": "nieznany token dostępu",
@@ -61,6 +63,11 @@
     "rateLimited": "zbyt wiele prób",
     "version": "nieobsługiwana wersja",
     "badRequest": "nieprawidłowe żądanie"
+  },
+  "refusalAction": {
+    "howToRegister": "Jak się zarejestrować",
+    "reconnect": "Połącz ponownie",
+    "filesRegisteredOnly": "Udostępnianie plików jest na tym serwerze dostępne tylko dla zarejestrowanych użytkowników."
   },
   "trust": {
     "title": "Przekaźnik na {{server}} się zmienił",

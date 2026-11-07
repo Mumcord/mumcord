@@ -13,7 +13,8 @@
     "relayTooOld": "Selle serveri releeserver on kaamera jagamiseks liiga vana.",
     "relayDisallows": "Selle serveri releeserver ei luba kaamera jagamist.",
     "needsRelayMode": "Kaamera jagamine vajab releeserverit. Muuda seda jaotises Privaatsus ja ühendused.",
-    "noCertificate": "Kaamera jagamine vajab kliendisertifikaati."
+    "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
+    "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad."
   },
   "cameraOnTray": "Kaamera sees",
   "turnOffTray": "Lülita kaamera välja",
@@ -97,7 +98,12 @@
     "mode": "Kaamera jagamine vajab releeserverit. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
     "endedByRelay": "Serveri releeserver peatas kaamera",
-    "dismissStopped": "Sulge"
+    "dismissStopped": "Sulge",
+    "notRegistered": "Kaamera ei käivitunud: selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad.",
+    "groupNotAllowed": "Kaamera ei käivitunud: selle serveri relee teenindab ainult teatud gruppe. Palu halduril sind lisada.",
+    "notSameChannel": "Kaamera ei käivitunud: sina ja su vaatajad peate olema samas kanalis.",
+    "notInChannel": "Kaamera ei käivitunud: liitu esmalt kanaliga.",
+    "noHello": "Kaamera ei käivitunud: relee bot ei tunne seda rakendust veel. Ühenda uuesti."
   },
   "privacy": {
     "windows": "Windows blokeerib töölauarakenduste juurdepääsu kaamerale",

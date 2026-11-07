@@ -24,7 +24,19 @@ const FAILURES: readonly CameraFailure[] = [
   "rateLimited",
   "mode",
   "noCertificate",
+  "notRegistered",
+  "groupNotAllowed",
+  "notSameChannel",
+  "notInChannel",
+  "noHello",
 ];
+
+/** The way out a refusal offers (#601), or `null`. */
+export function refusalHint(failure: CameraFailure): "register" | "reconnect" | null {
+  if (failure === "notRegistered") return "register";
+  if (failure === "noHello") return "reconnect";
+  return null;
+}
 
 function isFailure(value: string): value is CameraFailure {
   return (FAILURES as readonly string[]).includes(value);

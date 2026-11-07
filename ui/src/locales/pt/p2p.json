@@ -49,7 +49,9 @@
     "denied": "O bot do retransmissor recusou o pedido.",
     "notRegistered": "O retransmissor deste servidor só está disponível para utilizadores registados. Regista-te neste servidor para o usar.",
     "peerGone": "A outra pessoa saiu do servidor.",
-    "rateLimited": "Demasiados pedidos ao retransmissor. Tenta novamente dentro de um minuto."
+    "rateLimited": "Demasiados pedidos ao retransmissor. Tenta novamente dentro de um minuto.",
+    "groupNotAllowed": "O relay deste servidor só está disponível para certos grupos. Pede a um administrador para te adicionar.",
+    "noHello": "O bot do relay ainda não conhece esta app. Volta a ligar para resolver."
   },
   "refusal": {
     "unknownToken": "token de acesso desconhecido",
@@ -61,6 +63,11 @@
     "rateLimited": "demasiadas tentativas",
     "version": "versão não suportada",
     "badRequest": "pedido inválido"
+  },
+  "refusalAction": {
+    "howToRegister": "Como registar",
+    "reconnect": "Voltar a ligar",
+    "filesRegisteredOnly": "A partilha de ficheiros só está disponível para utilizadores registados neste servidor."
   },
   "trust": {
     "title": "Relay alterado em {{server}}",

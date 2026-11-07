@@ -392,14 +392,18 @@
   top: calc(-1 * var(--space-2));
   display: flex;
   align-items: center;
-  margin: var(--space-1) 0 var(--space-2);
-  padding: var(--space-1) 0;
+  /* Starts at the column's padding and is as tall as the chat header's row, so the field and the
+     channel name share one centre line (#599). */
+  margin: 0 0 var(--space-2);
+  padding: 0 0 var(--space-1);
   background: var(--color-bg-sidebar);
 }
 
 .channel-search__input {
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
+  height: 2.5rem;
   padding: var(--space-2) 3.25rem var(--space-2) calc(var(--space-2) + 16px + var(--space-2));
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);

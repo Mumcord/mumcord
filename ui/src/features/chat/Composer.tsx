@@ -26,6 +26,8 @@ import { ComposerIcon } from "../../components/ComposerIcon";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useNoRelayHint } from "../files/composer/noRelayHint";
+import { RefusalAction } from "../p2p/RefusalAction";
+import { useGuestRelayBlock } from "../p2p/useGuestRelayBlock";
 import { needsDecision, openRelayDetails } from "../p2p/relayTrust";
 import { useRelayInfo } from "../p2p/useRelayInfo";
 import { useServers } from "../servers";
@@ -161,17 +163,22 @@ export function Composer({
       ? false
       : fileChips.unavailable.kind === "noRelay" && !relayWaiting,
   );
+  // A guest on a relay for registered users only is told before trying (#601).
+  const guestBlocked = useGuestRelayBlock(inChannelTarget ? serverId : null);
   // Only the plain "no relay" hint can be closed (#579); the others ask for an action.
   const reasonShown =
     inChannelTarget &&
-    fileChips.unavailable !== null &&
-    (relayWaiting || !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden));
+    ((fileChips.unavailable === null && guestBlocked) ||
+      (fileChips.unavailable !== null &&
+        (relayWaiting || !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden))));
   const reasonText =
-    fileChips.unavailable === null
-      ? null
-      : relayWaiting
+    fileChips.unavailable !== null
+      ? relayWaiting
         ? tP2p("trust.filesBlocked")
-        : unavailableText(tP2p, fileChips.unavailable);
+        : unavailableText(tP2p, fileChips.unavailable)
+      : guestBlocked
+        ? tP2p("refusalAction.filesRegisteredOnly")
+        : null;
   const reasonId = useId();
   // A `mumble://` link the user typed is shown as its card before sending (issue #175).
   const previewLinks = useMemo(() => mumbleLinks(composer.text), [composer.text]);
@@ -530,10 +537,16 @@ export function Composer({
           if (!slash.run(composer.text)) submitAll();
         }}
       >
-        {reasonShown && fileChips.unavailable !== null ? (
+        {reasonShown && reasonText !== null ? (
           <div className="chat-composer__hint">
             <p id={reasonId} className="chat-composer__blocked">
               {reasonText}
+              {fileChips.unavailable === null && serverId !== null && (
+                <>
+                  {" "}
+                  <RefusalAction hint="register" serverId={serverId} />
+                </>
+              )}
               {relayWaiting && serverId !== null && (
                 <>
                   {" "}
@@ -549,7 +562,7 @@ export function Composer({
                 </>
               )}
             </p>
-            {fileChips.unavailable.kind === "noRelay" && !relayWaiting && (
+            {fileChips.unavailable?.kind === "noRelay" && !relayWaiting && (
               <button
                 type="button"
                 className="chat-composer__hint-close"

@@ -194,7 +194,10 @@
     "detailsDropped": "Frejms imwaqqgħin",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Ma twettaqx qisien",
-    "close": "Agħlaq"
+    "close": "Agħlaq",
+    "reasonNotRegistered": "biss utenti rreġistrati jistgħu jużaw ir-relay ta' dan is-server",
+    "reasonGroupNotAllowed": "ir-relay iservi biss ċerti gruppi",
+    "reasonNoHello": "il-bot tar-relay għadu ma jafx l-app, erġa' kkonnettja"
   },
   "settings": {
     "title": "Qsim tal-iskrin",
