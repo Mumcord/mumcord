@@ -146,10 +146,13 @@ describe("activity feed", () => {
     vi.spyOn(api, "screenShareList").mockResolvedValue([]);
     vi.spyOn(api, "watchPartyGet").mockResolvedValue(null);
     vi.spyOn(api, "stageActivities").mockResolvedValue([]);
-    vi.spyOn(Date, "now").mockReturnValue(TODAY);
+    // Only the clock: `new Date()` and `Date.now()` then agree on the pinned day.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(TODAY);
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
     resetActivityLogStore();
     resetMembersTabStore();
@@ -168,10 +171,10 @@ describe("activity feed", () => {
   });
 
   it("lists the newest event first and groups the rows by day (FR-11.10)", async () => {
-    vi.spyOn(Date, "now").mockReturnValue(YESTERDAY);
+    vi.setSystemTime(YESTERDAY);
     render(<ActivityFeed serverId={SERVER} />);
     await settle();
-    vi.spyOn(Date, "now").mockReturnValue(TODAY);
+    vi.setSystemTime(TODAY);
     act(() => {
       api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 1) });
     });
