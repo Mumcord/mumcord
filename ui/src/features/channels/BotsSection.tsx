@@ -20,7 +20,7 @@ import type { ServerState } from "./serverStore";
 
 export function BotsSection({ state }: { state: ServerState }) {
   const t = useT("channels");
-  const [open, setOpen] = useSectionOpen("server-bots", true);
+  const [open, setOpen] = useSectionOpen("server-bots", false);
   const listRef = useRef<HTMLUListElement>(null);
   const [focused, setFocused] = useState<number | null>(null);
   const bots = serverBots(state.users);

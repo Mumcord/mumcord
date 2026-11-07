@@ -4,6 +4,7 @@
 
 ### Changed
 
+- "Bots on this server" starts collapsed; once you open or close it, Mumcord remembers that
 - Plugins strip: plugin icons have no frame anymore; a plugin's own image or its colour tile is the whole icon, with a ring on hover, focus and when open
 
 ### Fixed

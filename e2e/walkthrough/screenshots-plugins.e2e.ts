@@ -250,6 +250,9 @@ async function openScoreDetails(): Promise<void> {
     await $("//*[contains(@class,'bots-section')][contains(.,'(3)')]").waitForDisplayed({
       timeout: 60_000,
     });
+    // The section starts collapsed; the shot shows the bots in it.
+    const toggle = $(".bots-section .collapsible-section__toggle");
+    if ((await toggle.getAttribute("aria-expanded")) === "false") await toggle.click();
     await both("bots-on-server");
   });
 
