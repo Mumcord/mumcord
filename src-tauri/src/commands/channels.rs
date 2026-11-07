@@ -31,6 +31,18 @@ pub struct ChannelPermissions {
     /// Kick right, granted on the root channel; decides whether "Kick…" shows in a person's menu
     /// (Epic 4, issue #253).
     pub kick: bool,
+    /// Server-mute, deafen or un-suppress people here; only true once the server confirmed it (#248).
+    pub mute_deafen: bool,
+    /// Create channels below this one (#248).
+    pub make_channel: bool,
+    /// Create temporary channels below this one (#248).
+    pub make_temp_channel: bool,
+    /// Link and unlink this channel (#248).
+    pub link_channel: bool,
+    /// Register other people (root channel, #248).
+    pub register: bool,
+    /// Reset other people's comment and avatar (root channel, #248).
+    pub reset_user_content: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -169,6 +181,12 @@ impl From<ChannelView> for ChannelInfo {
                 move_users: v.permissions.move_users,
                 ban: v.permissions.ban,
                 kick: v.permissions.kick,
+                mute_deafen: v.permissions.mute_deafen,
+                make_channel: v.permissions.make_channel,
+                make_temp_channel: v.permissions.make_temp_channel,
+                link_channel: v.permissions.link_channel,
+                register: v.permissions.register,
+                reset_user_content: v.permissions.reset_user_content,
             },
             description: v.description,
             has_description: v.has_description,

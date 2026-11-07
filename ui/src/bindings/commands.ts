@@ -1958,6 +1958,18 @@ export type ChannelPermissions = {
 	 *  (Epic 4, issue #253).
 	 */
 	kick: boolean,
+	/**  Server-mute, deafen or un-suppress people here; only true once the server confirmed it (#248). */
+	muteDeafen: boolean,
+	/**  Create channels below this one (#248). */
+	makeChannel: boolean,
+	/**  Create temporary channels below this one (#248). */
+	makeTempChannel: boolean,
+	/**  Link and unlink this channel (#248). */
+	linkChannel: boolean,
+	/**  Register other people (root channel, #248). */
+	register: boolean,
+	/**  Reset other people's comment and avatar (root channel, #248). */
+	resetUserContent: boolean,
 };
 
 export type ChannelRemoved = {
@@ -2113,6 +2125,9 @@ export type DeepLinkOpened = {
 export type DefaultAvatarSkipped = {
 	serverId: number,
 };
+
+/**  Why the server refused something; the UI words each kind (#248). */
+export type DenialKind = "text" | "permission" | "superUser" | "channelName" | "textTooLong" | "temporaryChannel" | "missingCertificate" | "userName" | "channelFull" | "nestingLimit" | "channelCountLimit" | "listenerLimit" | "unknown";
 
 /**
  *  A direct connection would be used for the first time while `allowDirectConnections` is
@@ -4423,6 +4438,9 @@ export type RepositoryView = {
 	installedPlugins: number,
 };
 
+/**  A Mumble permission, as named in a refusal (#248). */
+export type Right = "write" | "traverse" | "enter" | "speak" | "muteDeafen" | "move" | "makeChannel" | "linkChannel" | "whisper" | "textMessage" | "makeTempChannel" | "listen" | "kick" | "ban" | "register" | "selfRegister" | "resetUserContent";
+
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
 	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
@@ -4549,6 +4567,11 @@ export type ServerDenied = {
 	serverId: number,
 	error: ApiError,
 	channelId: number | null,
+	kind: DenialKind,
+	/**  The missing right of a permission refusal. */
+	permission: Right | null,
+	/**  A dialog that asked shows the refusal already; the UI adds no notice of its own. */
+	handled: boolean,
 };
 
 /**  An identity whose key material could not be read, so a server fell back to the default. */

@@ -894,10 +894,19 @@ fn emit_engine_event(
             transport: transport.into(),
         }
         .emit(app),
-        EngineEvent::ServerDenied { error, channel_id } => session::ServerDenied {
+        EngineEvent::ServerDenied {
+            error,
+            channel_id,
+            kind,
+            permission,
+            handled,
+        } => session::ServerDenied {
             server_id,
             error: error.into(),
             channel_id,
+            kind: kind.into(),
+            permission: permission.map(Into::into),
+            handled,
         }
         .emit(app),
         EngineEvent::ChannelPassword { channel_id, state } => channels::ChannelPasswordPrompt {
