@@ -146,7 +146,7 @@ export function PluginsSection({
       {active === "installed" && <RelayDataGroup />}
       {active === "installed" && <PluginSoundsGroup />}
       {active === "installed" && (
-        <Group title={t("tabs.installed")}>
+        <Group title={t("tabs.installed")} icon="puzzle">
           <Switch
             label={t("turnOffAll")}
             checked={allOff}

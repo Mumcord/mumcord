@@ -7,6 +7,10 @@
 - Peer-to-peer: "Direct + relay (always relay, hides my IP)" is now the recommended mode and the default for new installs, and the Balanced setup style uses it. A mode you already use stays as it is
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
 
+### Fixed
+
+- Settings → Plugins: the cards have the same gap as on the other pages, every card has its icon, and the "Output level (debug)" meter only shows in development builds
+
 ## [0.7.1] - 2026-11-07
 
 ### Added

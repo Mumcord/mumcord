@@ -46,7 +46,8 @@ export function PluginSoundsGroup() {
         onChange={(soundMuted) => void updatePlatformSettings({ soundMuted })}
       />
       <p className="plugins-safety-note">{t("pluginSounds.hint")}</p>
-      <PluginSoundMeter label={t("pluginSounds.meter")} />
+      {/* A debugging aid (#587): only in development builds, not in a release. */}
+      {import.meta.env.DEV && <PluginSoundMeter label={t("pluginSounds.meter")} />}
     </Group>
   );
 }
