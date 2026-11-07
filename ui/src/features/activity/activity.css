@@ -3,12 +3,36 @@
    theme tokens only, so both themes and forced colours keep working. */
 .activity-tabs {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--space-2);
+  min-height: 0;
+}
+
+/* The tab row stays put; only the panel below it scrolls. The column itself must not scroll,
+   otherwise the row would scroll away with a long list. */
+.shell__members:has(.activity-tabs) {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
+.shell__members:has(.activity-tabs) > .plugin-sidepanel__members:not([hidden]) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.activity-tabs > [role="tabpanel"] {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .activity-tabs__row {
   display: flex;
+  flex: none;
   gap: var(--space-1);
   border-bottom: 1px solid var(--color-border);
 }
