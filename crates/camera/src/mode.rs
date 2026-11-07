@@ -159,6 +159,36 @@ pub fn choose(modes: &[Mode], request: &CaptureRequest) -> Option<Mode> {
     }
 }
 
+/// The modes to try, best first (FR-8.26): [`choose`] for the request, then the same at a lower
+/// frame rate, then a smaller picture. Some cameras list modes they never deliver pictures in
+/// (seen: 720p and 1080p at 30 fps over NV12), so a backend moves on when one stays silent.
+/// Only the V4L2 backend can tell a silent mode apart; the others pick with [`choose`].
+#[cfg(target_os = "linux")]
+pub fn candidates(modes: &[Mode], request: &CaptureRequest) -> Vec<Mode> {
+    let lower_fps = CaptureRequest {
+        max_fps: (request.max_fps / 2).max(1),
+        ..*request
+    };
+    let smaller = CaptureRequest {
+        max_width: request.max_width.min(640),
+        max_height: request.max_height.min(360),
+        ..*request
+    };
+    let smaller_lower_fps = CaptureRequest {
+        max_fps: lower_fps.max_fps,
+        ..smaller
+    };
+    let mut out: Vec<Mode> = Vec::new();
+    for attempt in [*request, lower_fps, smaller, smaller_lower_fps] {
+        if let Some(mode) = choose(modes, &attempt)
+            && !out.contains(&mode)
+        {
+            out.push(mode);
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
@@ -171,6 +201,30 @@ mod tests {
             height,
             rate: Rate::fps(fps),
         }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn candidates_fall_back_to_a_lower_frame_rate_then_a_smaller_picture() {
+        // The modes a Logitech StreamCam lists: only 720p at 15 fps actually delivers.
+        let modes = [
+            mode(PixelFormat::Nv12, 1920, 1080, 30),
+            mode(PixelFormat::Nv12, 1920, 1080, 15),
+            mode(PixelFormat::Nv12, 1280, 720, 30),
+            mode(PixelFormat::Nv12, 1280, 720, 15),
+            mode(PixelFormat::Nv12, 640, 360, 30),
+        ];
+        let request = CaptureRequest::default();
+        let list = candidates(&modes, &request);
+        assert_eq!(list.first(), choose(&modes, &request).as_ref());
+        assert_eq!(list.first().map(|m| m.rate.rounded()), Some(30));
+        assert!(list.contains(&mode(PixelFormat::Nv12, 1280, 720, 15)));
+        assert!(list.contains(&mode(PixelFormat::Nv12, 640, 360, 30)));
+        let unique: std::collections::HashSet<_> = list
+            .iter()
+            .map(|m| (m.width, m.height, m.rate.rounded()))
+            .collect();
+        assert_eq!(unique.len(), list.len(), "no mode is tried twice");
     }
 
     fn request() -> CaptureRequest {

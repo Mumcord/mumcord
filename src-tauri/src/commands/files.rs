@@ -438,13 +438,13 @@ fn downloads_or_home(downloads: Option<PathBuf>, home: Option<PathBuf>) -> Optio
 /// through the launchers of `browser`, which repair the environment inside an AppImage. Nothing
 /// touches the file's mark-of-the-web, so the system's own warning still applies.
 #[cfg(not(target_os = "linux"))]
-fn open_file(path: &Path) -> ApiResult<()> {
+pub(crate) fn open_file(path: &Path) -> ApiResult<()> {
     tauri_plugin_opener::open_path(path, None::<&str>)
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }
 
 #[cfg(target_os = "linux")]
-fn open_file(path: &Path) -> ApiResult<()> {
+pub(crate) fn open_file(path: &Path) -> ApiResult<()> {
     crate::browser::open_url(&path_text(path))
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }

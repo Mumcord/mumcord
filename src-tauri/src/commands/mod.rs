@@ -15,6 +15,7 @@ pub mod changelog;
 pub mod channel_audio;
 pub mod channels;
 pub mod chat;
+pub mod crash;
 pub mod diagnostics;
 pub mod dnd;
 pub mod dropped;

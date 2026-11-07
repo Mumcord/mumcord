@@ -8,6 +8,7 @@ import type {
   CameraRoomView,
   CameraTile,
   CameraView,
+  CrashReport,
   DndState,
   FileCard,
   FileChip,
@@ -102,6 +103,8 @@ import { createMockPopouts } from "./mockPopout";
 import { createMockUpdater } from "./mockUpdater";
 
 export interface MockOptions {
+  /** Saved crash reports the mock starts with (#568). */
+  crashReports?: CrashReport[];
   /**
    * "fresh" simulates the first start (no identity, no servers, wizard pending); "demo" fills
    * the "ready" state with richer fictional data for screenshots, "demoFresh" is the first start
@@ -1000,11 +1003,38 @@ function parseLink(url: string): MumbleLink {
 /** Length of each mic-test phase (recording, playback) in the mock. */
 const MIC_TEST_PHASE_MS = 5000;
 
+/** Fictional crash reports for screenshots of the crash UI (#568). */
+const DEMO_CRASH_REPORTS: CrashReport[] = [
+  {
+    id: "crash-1794001864.txt",
+    created: 1794001864,
+    version: "0.7.1",
+    kind: "signal",
+    signal: "SIGSEGV",
+    cause: "Mumcord was stopped by SIGSEGV",
+    uploaded: false,
+  },
+  {
+    id: "crash-1793830000.txt",
+    created: 1793830000,
+    version: "0.7.0",
+    kind: "panic",
+    signal: null,
+    cause:
+      "decoder returned no frame for a keyframe at crates/engine/src/screen_share/watch.rs:412",
+    uploaded: true,
+  },
+];
+
 export function createMockApi(options: MockOptions = {}): MockApi {
   const seed = options.seed ?? import.meta.env.VITE_MUMCORD_MOCK_SEED ?? "ready";
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
+  const crashReports: CrashReport[] = [
+    ...(options.crashReports ?? (seed === "demo" ? DEMO_CRASH_REPORTS : [])),
+  ];
+  const crashSeen = new Set<string>();
   /** What the mock answered for each `mumble://` link in this run (issue #175). */
   const queryAnswers = new Map<string, MumbleLinkStats>();
   const serverVersion = options.serverVersion ?? "1.5.735";
@@ -3419,6 +3449,47 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // diagnostics
     diagnosticsSave: () => Promise.resolve(null),
+    // Crash reports (#568), seeded through `MockOptions.crashReports`.
+    crashList: () => Promise.resolve([...crashReports]),
+    crashTakeUnseen: () => {
+      const unseen = crashReports.filter((r) => !crashSeen.has(r.id));
+      for (const r of crashReports) crashSeen.add(r.id);
+      return Promise.resolve(unseen);
+    },
+    crashRead: (id: string) => {
+      const report = crashReports.find((r) => r.id === id);
+      if (report === undefined)
+        return Promise.reject(new EngineError("notFound", "no such crash report"));
+      return Promise.resolve(
+        `Mumcord crash report\nversion: ${report.version}\ncause: ${report.cause}\n`,
+      );
+    },
+    crashDelete: (id: string) => {
+      const at = crashReports.findIndex((r) => r.id === id);
+      if (at >= 0) crashReports.splice(at, 1);
+      return Promise.resolve(null);
+    },
+    crashDeleteAll: () => {
+      crashReports.length = 0;
+      return Promise.resolve(null);
+    },
+    crashExport: () => Promise.resolve(null),
+    crashUpload: (id: string) => {
+      const report = crashReports.find((r) => r.id === id);
+      if (report !== undefined) report.uploaded = true;
+      return Promise.resolve(null);
+    },
+    crashUploadPreview: (id: string, comment: string) => {
+      const report = crashReports.find((r) => r.id === id);
+      const base = `Mumcord crash report\nversion: ${report?.version ?? ""}\n`;
+      return Promise.resolve(
+        comment.trim() === "" ? base : `${base}\ncomment:\n${comment.trim()}\n`,
+      );
+    },
+    crashOpenFolder: () => Promise.resolve(null),
+    logOpenFolder: () => Promise.resolve(null),
+    logText: (whole: boolean) =>
+      Promise.resolve(whole ? "mock log line 1\nmock log line 2" : "mock log line 2"),
     appInfo: () =>
       Promise.resolve(
         demo

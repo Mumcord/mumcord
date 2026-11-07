@@ -110,6 +110,15 @@ Your camera is used only when you turn it on yourself, and always after a previe
 - **No recording:** Mumcord never records cameras, and other people's Mumcord clients never write your camera picture to disk. Mumcord cannot stop someone from taking a screenshot or screen recording with their operating system or another program.
 - **Logs** never contain camera frames, device names, background image names or paths; only counts, the chosen codec, resolution and effect level.
 
+### Crash reports
+
+When Mumcord closes unexpectedly, it saves a short report on your computer (in the `crash-reports` folder next to `logs`) and tells you at the next start. Mumcord keeps the last 10 reports; you can delete one or all of them in _Settings → Advanced & Developer → Crash reports_.
+
+- **What a report contains:** the Mumcord version, the time, what went wrong (the error message, the program and library functions on the stack), how long Mumcord had been running, which features were in use (for example "camera on", "watching a screen share", the install type) and the last 200 log lines. Logs never contain chat messages, names, passwords or audio (see above).
+- **System details:** a report also lists your operating system and its version, the kernel, the desktop and its version, the processor and its instruction sets, the graphics card with its driver, the amount of memory and your screen resolutions. None of this names you, but together these details are an exact **fingerprint of your computer**. The upload confirmation lists them before anything is sent.
+- **Your home folder** is shortened to `~` in every report, so your user name does not appear in paths.
+- **Nothing is sent automatically.** A report leaves your computer only when you copy it, export it or, once available, upload it yourself with the _Upload_ button. Uploading sends exactly the report you see, after you confirm it, to `crash.mumcord.app` over an encrypted connection.
+
 ### Links you open
 
 Links in chat, the website, changelog and issue links in _Settings → About_, and "Join game" (a `steam://` link) are handed to your browser or the operating system only when you click them.

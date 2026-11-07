@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [0.7.1] - Unreleased
+
+### Added
+
+- Crash reports: when Mumcord closes unexpectedly it saves a short report on this computer (what went wrong with the program and library functions involved, which features were in use, the system details and the last log lines) and says so at the next start, with Open folder, Copy for a bug report, Report a bug and Upload. Settings → Advanced & Developer → Crash reports lists the last 10 reports with Copy, Details, Export, Upload and Delete
+- Upload a single crash report to the Mumcord team: the confirmation shows exactly what is sent, says which system details are included, and takes an optional comment. Nothing is ever sent without pressing Send
+- Settings → Advanced & Developer → Diagnostics: copy the last 200 log lines or the whole log, or open the log folder
+- The log now names more causes: which camera modes were tried, whether the AppImage can play H.264 (Twitch) with the system's gst-libav, and when background effects find no person in the picture
+
+### Fixed
+
+- Cameras that list a mode they never send pictures in (for example a Logitech StreamCam at 720p and 30 fps) now start: Mumcord tries a lower frame rate or a smaller picture instead of stopping with "the camera sends no pictures"
+- Cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when PipeWire leaves the row length unset or fills only the first picture plane
+- Camera preview: the built-in background images now show right away when you choose Image, instead of leaving the tiles empty for a moment every time the preview opens
+
 ## [0.7.0] - Unreleased
 
 ### Added

@@ -67,6 +67,7 @@ import {
   AudioDeviceNotice,
   type AudioDeviceNoticeApi,
 } from "../features/app";
+import { CrashNotice } from "../features/app/CrashNotice";
 import { WhisperBanner } from "../features/whisper/WhisperBanner";
 
 // Screens the first frame does not need load as chunks of their own (issue #323).
@@ -167,6 +168,7 @@ export function ChatStatusMount() {
       <ChannelAudioHost />
       <WindowOverlayNotice api={windowOverlayNoticeApi} onOpenSettings={openOverlaySettings} />
       <AudioDeviceNotice api={audioDeviceNoticeApi} onOpenSettings={openAudioSettings} />
+      <CrashNotice />
       <Updater />
       <PluginsHost />
       <UpdateCheckPrompt />

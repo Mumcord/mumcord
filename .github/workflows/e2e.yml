@@ -52,6 +52,12 @@ jobs:
     name: E2E build
     needs: changes
     if: needs.changes.outputs.code == 'true'
+    permissions:
+      contents: read
+      # Pushes the slim test image to GHCR for the shards (#562).
+      packages: write
+    outputs:
+      image: ${{ steps.registry.outputs.image }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -108,6 +114,30 @@ jobs:
           cache-from: type=gha,scope=e2e-image-${{ steps.keys.outputs.month }}
           cache-to: ${{ github.ref == 'refs/heads/main' && format('type=gha,mode=max,scope=e2e-image-{0}', steps.keys.outputs.month) || '' }}
 
+      # The shards only run tests: they pull the slim `runtime` stage (no compiler or headers)
+      # from GHCR instead of downloading and loading the whole image as an artifact (#562). Pull
+      # requests from forks cannot push to the registry and keep the artifact.
+      - name: Registry image name
+        id: registry
+        if: github.event_name != 'push' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/mumcord-e2e:run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        if: steps.registry.outputs.image
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
+        run: echo "$TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+
+      - if: steps.registry.outputs.image
+        uses: docker/build-push-action@v7
+        with:
+          context: e2e
+          target: runtime
+          push: true
+          tags: ${{ steps.registry.outputs.image }}
+          cache-from: type=gha,scope=e2e-image-${{ steps.keys.outputs.month }}
+
       # No debug info and no incremental data: faster links and a smaller target cache.
       - name: Build image and binaries
         run: npm run e2e
@@ -127,15 +157,19 @@ jobs:
       # executable bits that artifacts would drop.
       - name: Package image and binaries
         if: github.event_name != 'push'
+        env:
+          IMAGE: ${{ steps.registry.outputs.image }}
         # bash enables pipefail, so a failing docker save (e.g. disk full) fails the step.
         shell: bash
         run: |
           df -h /
-          docker save mumcord-e2e | zstd -T0 -3 -q -o e2e-image.tar.zst
+          if [ -z "$IMAGE" ]; then
+            docker save mumcord-e2e | zstd -T0 -3 -q -o e2e-image.tar.zst
+          fi
           tar -C "$MUMCORD_E2E_CACHE/target/debug" -cf - mumcord mumbot netsim examples/libtest_plugin.so \
             examples/headless_check libmumcord_overlay_layer.so libonnxruntime.so.1.23.2 \
             | zstd -T0 -3 -q -o e2e-bin.tar.zst
-          ls -lh e2e-image.tar.zst e2e-bin.tar.zst
+          ls -lh e2e-*.tar.zst
 
       - if: github.event_name != 'push'
         uses: actions/upload-artifact@v7
@@ -264,7 +298,12 @@ jobs:
     if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
     env:
+      # The slim test image in GHCR; empty for pull requests from forks (artifact instead).
+      E2E_IMAGE: ${{ needs.build.outputs.image }}
       # The plugins job's CLI and packages; e2e/run.sh mounts them into the container, where
       # scripts/e2e-plugin-registry.sh takes them instead of building.
       MUMCORD_E2E_PLUGIN_PACKAGES: /home/runner/.cache/mumcord-e2e-plugins
@@ -288,12 +327,21 @@ jobs:
 
       - name: Load image and binaries
         shell: bash
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
         run: |
-          zstd -dc e2e-image.tar.zst | docker load -q
+          if [ -n "$E2E_IMAGE" ]; then
+            echo "$TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+            docker pull -q "$E2E_IMAGE"
+            docker tag "$E2E_IMAGE" mumcord-e2e
+          else
+            zstd -dc e2e-image.tar.zst | docker load -q
+          fi
           mkdir -p "$MUMCORD_E2E_CACHE/target/debug" "$MUMCORD_E2E_PLUGIN_PACKAGES"
           zstd -dc e2e-bin.tar.zst | tar -C "$MUMCORD_E2E_CACHE/target/debug" -xf -
           zstd -dc e2e-plugins.tar.zst | tar -C "$MUMCORD_E2E_PLUGIN_PACKAGES" -xf -
-          rm e2e-image.tar.zst e2e-bin.tar.zst e2e-plugins.tar.zst
+          rm -f e2e-image.tar.zst e2e-bin.tar.zst e2e-plugins.tar.zst
 
       # The relay specs (the ones that start the mumpeer testenv) need the testenv scripts and the
       # relay images; scripts/e2e-shards.js puts them into as few shards as it can, and only those

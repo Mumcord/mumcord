@@ -291,6 +291,7 @@ impl Media {
             stats: Mutex::new(ScreenMediaStats::default()),
             thumbnail: Mutex::new(None),
         });
+        crate::crash::set_context("screen share", "sending");
         let thread_hub = hub.clone();
         let spawned = thread::Builder::new()
             .name("screen-encode".into())
@@ -457,6 +458,7 @@ impl Media {
 
 impl Drop for Media {
     fn drop(&mut self) {
+        crate::crash::clear_context("screen share");
         self.hub.stop.store(true, Ordering::Relaxed);
     }
 }

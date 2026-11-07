@@ -206,6 +206,10 @@ ash = { version = "0.38", default-features = false, features = ["std"] }
 # Positional audio / plugin host
 libloading = "0.9"
 libc = "0.2"
+# Crash reports: the native stack at a fatal signal and its symbols at the next start (#568).
+backtrace = "0.3"
+object = { version = "0.40", default-features = false, features = ["read", "std"] }
+rustc-demangle = "0.1"
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Memory", "Win32_System_Diagnostics_ToolHelp"] }
 
 # Linux desktop portals (Wayland global shortcuts)
@@ -316,6 +320,17 @@ opt-level = 3
 opt-level = 3
 
 [profile.dev.package.opusic-sys]
+opt-level = 3
+
+# The camera picker's built-in background thumbnails are decoded from WebP; unoptimised this took
+# about ten seconds in the debug builds the E2E tests use.
+[profile.dev.package.image]
+opt-level = 3
+
+[profile.dev.package.image-webp]
+opt-level = 3
+
+[profile.dev.package.zune-jpeg]
 opt-level = 3
 
 # Camera background effects run per 720p frame; unoptimised they would miss the frame budget in

@@ -31,6 +31,11 @@ use crate::ops::{
 };
 use crate::segmenter::{ModelShape, Segmenter};
 
+/// A mask with less than this share of person (or of background) looks wrong.
+const IMPLAUSIBLE_SHARE: f32 = 0.01;
+/// Model runs in a row with such a mask before it is logged (about two seconds).
+const IMPLAUSIBLE_RUNS: u32 = 30;
+
 /// Light level: the model runs at 15 fps; frames in between reuse the smoothed mask.
 const LIGHT_MODEL_INTERVAL: Duration = Duration::from_millis(62);
 /// Mask remap: values up to `LO` are background, from `HI` person. The model leaves a soft
@@ -119,6 +124,8 @@ pub struct Pipeline {
     v8: Vec<f32>,
     model_in: Vec<f32>,
     model_mask: Vec<f32>,
+    implausible_run: u32,
+    mask_warned: bool,
     model_shape: Option<ModelShape>,
     gf: GuidedFilter,
     kernel_light: [f32; KERNEL_LEN],
@@ -179,6 +186,8 @@ impl Pipeline {
             v8: vec![0.0; n8],
             model_in: Vec::new(),
             model_mask: Vec::new(),
+            implausible_run: 0,
+            mask_warned: false,
             model_shape: None,
             gf: GuidedFilter::new(w4, h4),
             kernel_light,
@@ -327,8 +336,34 @@ impl Pipeline {
             b[i] = (y + 1.772 * u).clamp(0.0, 1.0);
         }
         segmenter.segment(&self.model_in, timestamp, &mut self.model_mask)?;
+        self.check_mask();
         resize_bilinear(&self.model_mask, mw, mh, &mut self.mask4, self.w4, self.h4);
         Ok(())
+    }
+
+    /// Logs once per session when the model sees no person (or only person) for a while: then
+    /// blur covers the person too, and a picture of that is the only hint (#568).
+    fn check_mask(&mut self) {
+        if self.mask_warned || self.model_mask.is_empty() {
+            return;
+        }
+        let person = self.model_mask.iter().filter(|&&m| m > 0.5).count();
+        let share = person as f32 / self.model_mask.len() as f32;
+        if (IMPLAUSIBLE_SHARE..=1.0 - IMPLAUSIBLE_SHARE).contains(&share) {
+            self.implausible_run = 0;
+            return;
+        }
+        self.implausible_run += 1;
+        if self.implausible_run >= IMPLAUSIBLE_RUNS {
+            self.mask_warned = true;
+            tracing::warn!(
+                person_share = share,
+                runs = self.implausible_run,
+                width = self.width,
+                height = self.height,
+                "background effects find no person in the camera picture"
+            );
+        }
     }
 
     /// Steps 2 and 3: edge refinement and motion-weighted temporal smoothing.

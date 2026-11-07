@@ -3,10 +3,11 @@
 //! updates for their device pickers (FR-8.27). The camera settings themselves are fields of the
 //! settings record (`settings_get` / `settings_update`).
 
+use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{self, RecvTimeoutError, Sender};
-use std::sync::{Arc, Mutex, PoisonError};
+use std::sync::{Arc, LazyLock, Mutex, PoisonError};
 use std::time::Duration;
 
 use base64::Engine as _;
@@ -77,6 +78,41 @@ pub struct CameraDevicesChanged {
     pub devices: Vec<CameraDevice>,
 }
 
+/// Thumbnails of the built-in images, made once per app run: decoding all of them took about a
+/// second in release builds (several in debug builds), and the picker showed empty tiles that long
+/// on every open. The shipped files never change while the app runs; own images are few and
+/// can be replaced, so they are not cached.
+static BUILTIN_THUMBNAILS: LazyLock<ThumbnailCache> = LazyLock::new(ThumbnailCache::default);
+
+#[derive(Default)]
+struct ThumbnailCache(Mutex<HashMap<PathBuf, String>>);
+
+impl ThumbnailCache {
+    /// The cached thumbnail of `path`, else the one `make` returns. A failure is not cached, so a
+    /// later open tries again.
+    fn get_or_make(
+        &self,
+        path: &Path,
+        make: impl FnOnce(&Path) -> Option<String>,
+    ) -> Option<String> {
+        if let Some(hit) = self
+            .0
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .get(path)
+        {
+            return Some(hit.clone());
+        }
+        // Decoded without the lock, so parallel opens don't wait on each other's decoding.
+        let made = make(path)?;
+        self.0
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .insert(path.to_path_buf(), made.clone());
+        Some(made)
+    }
+}
+
 fn thumbnail(path: &Path) -> Option<String> {
     let picture = image::open(path)
         .inspect_err(|e| tracing::warn!(error = %e, "a camera background thumbnail failed"))
@@ -110,7 +146,10 @@ pub async fn camera_backgrounds(engine: State<'_, Engine>) -> ApiResult<CameraBa
         let builtin = engine
             .camera_builtin_backgrounds()
             .into_iter()
-            .map(|b| library_image(b.id, &b.path))
+            .map(|b| CameraBackgroundImage {
+                thumbnail: BUILTIN_THUMBNAILS.get_or_make(&b.path, thumbnail),
+                id: b.id,
+            })
             .collect();
         let own = engine
             .camera_own_backgrounds()?
@@ -312,6 +351,46 @@ mod tests {
             .expect("test setup");
         let small = image::load_from_memory(&bytes).expect("test setup");
         assert_eq!((small.width(), small.height()), (320, 180));
+    }
+
+    #[test]
+    fn every_built_in_background_has_a_thumbnail() {
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../assets/backgrounds");
+        let mut count = 0;
+        for entry in std::fs::read_dir(&dir).expect("test setup") {
+            let path = entry.expect("test setup").path();
+            assert!(
+                thumbnail(&path).is_some(),
+                "no thumbnail for {}",
+                path.display()
+            );
+            count += 1;
+        }
+        assert_eq!(count, 18);
+    }
+
+    #[test]
+    fn a_cached_thumbnail_is_made_only_once() {
+        let cache = ThumbnailCache::default();
+        let path = Path::new("beach.webp");
+        let mut made = 0;
+        for _ in 0..3 {
+            let url = cache.get_or_make(path, |_| {
+                made += 1;
+                Some("data:image/jpeg;base64,AA==".to_owned())
+            });
+            assert_eq!(url.as_deref(), Some("data:image/jpeg;base64,AA=="));
+        }
+        assert_eq!(made, 1);
+    }
+
+    #[test]
+    fn a_failed_thumbnail_is_tried_again() {
+        let cache = ThumbnailCache::default();
+        let path = Path::new("broken.webp");
+        assert_eq!(cache.get_or_make(path, |_| None), None);
+        let url = cache.get_or_make(path, |_| Some("data:image/jpeg;base64,AA==".to_owned()));
+        assert_eq!(url.as_deref(), Some("data:image/jpeg;base64,AA=="));
     }
 
     #[test]

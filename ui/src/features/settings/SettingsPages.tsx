@@ -15,6 +15,7 @@ import {
   PerServerHistoryCard,
 } from "./sections/ChatHistorySection";
 import { DefaultAvatarGroup } from "./sections/DefaultAvatarGroup";
+import { CrashReportsCard } from "./crash/CrashReportsCard";
 import { DiagnosticsCard } from "./sections/DiagnosticsSection";
 import { DndGroup } from "./sections/DndGroup";
 import { DuckingGroup } from "./sections/DuckingGroup";
@@ -180,6 +181,7 @@ export function SettingsPageCards({
           <BetaFeaturesCard {...props} />
           <DeveloperModeCard {...props} />
           {devTools && <DeveloperToolsCard />}
+          <CrashReportsCard />
           <DiagnosticsCard {...props} />
           <CacheGroup />
           <LicencesCard />

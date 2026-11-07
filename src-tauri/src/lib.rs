@@ -300,6 +300,17 @@ fn specta_builder() -> Builder<tauri::Wry> {
             plugins::suggestions::plugin_suggestion_installed,
             plugins::suggestions::plugin_suggestions_dismiss_server,
             diagnostics::diagnostics_save,
+            commands::crash::crash_list,
+            commands::crash::crash_take_unseen,
+            commands::crash::crash_read,
+            commands::crash::crash_delete,
+            commands::crash::crash_delete_all,
+            commands::crash::crash_export,
+            commands::crash::crash_upload,
+            commands::crash::crash_upload_preview,
+            commands::crash::crash_open_folder,
+            commands::crash::log_open_folder,
+            commands::crash::log_text,
             diagnostics::app_info,
             commands::inspector::packet_capture_set,
             commands::inspector::packet_capture_background,
@@ -617,7 +628,12 @@ pub fn run() {
         .build(context);
 
     match app {
-        Ok(app) => app.run(plugins::watchdog::on_run_event),
+        Ok(app) => app.run(|app, event| {
+            if matches!(event, tauri::RunEvent::Exit) {
+                mumcord_engine::crash::clean_exit();
+            }
+            plugins::watchdog::on_run_event(app, event);
+        }),
         Err(err) => {
             eprintln!("error while running Mumcord: {err}");
             std::process::exit(1);
@@ -648,11 +664,49 @@ pub(crate) fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
     Ok(())
 }
 
+#[cfg(target_os = "linux")]
+fn linux_appimage() -> bool {
+    desktop_entry::is_appimage()
+}
+
+#[cfg(not(target_os = "linux"))]
+fn linux_appimage() -> bool {
+    false
+}
+
+/// How Mumcord runs and on which screens, for crash reports (#568).
+fn set_crash_context(app: &AppHandle) {
+    // AppImage and Flatpak exist only on Linux.
+    let appimage = cfg!(target_os = "linux") && linux_appimage();
+    let install = if portable::is_active() {
+        "portable"
+    } else if appimage {
+        "AppImage"
+    } else if cfg!(target_os = "linux") && std::path::Path::new("/.flatpak-info").exists() {
+        "Flatpak"
+    } else {
+        "installed package or build"
+    };
+    mumcord_engine::crash::set_context("install", install);
+    if let Ok(monitors) = app.available_monitors() {
+        let screens: Vec<String> = monitors
+            .iter()
+            .map(|m| {
+                let size = m.size();
+                format!("{}x{} @{}x", size.width, size.height, m.scale_factor())
+            })
+            .collect();
+        mumcord_engine::crash::set_context("screens", screens.join(", "));
+    }
+}
+
 /// Opens the engine, starts logging and wires engine events, diagnostics and push-to-talk.
 fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let data_dir = portable::data_dir(app)?;
     let logs_dir = portable::log_dir(app)?;
     std::fs::create_dir_all(&data_dir)?;
+    // Before anything else, so a crash while the engine opens leaves a report too (#568).
+    commands::crash::install(&logs_dir, version::DISPLAY);
 
     // Engine start-up already logs (e.g. the encoder probe), but the log level lives in the
     // profile and a too-new profile must be rejected before anything is written: keep lines in
@@ -671,6 +725,9 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         portable = portable::is_active(),
         "Mumcord starting"
     );
+    #[cfg(target_os = "linux")]
+    gst_fallback::log_h264_status(&app.config().identifier);
+    set_crash_context(app);
     mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
 
     let info_engine = engine.clone();

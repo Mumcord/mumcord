@@ -6,6 +6,7 @@ import { Group } from "../components/Section";
 import { errorText } from "../errors";
 import { pickSavePath } from "../fileDialogs";
 import type { SettingsSectionProps } from "./types";
+import "../crash/crash.css";
 
 const LEVELS: LogLevel[] = ["error", "warn", "info", "debug"];
 
@@ -34,6 +35,26 @@ export function DiagnosticsCard({ settings, update }: SettingsSectionProps) {
     }
   };
 
+  const copyLog = async (whole: boolean) => {
+    setStatus(null);
+    try {
+      await getApi().copyText(await getApi().logText(whole));
+      setStatus({ kind: "success", text: t("diagnostics.logCopied") });
+    } catch (error: unknown) {
+      console.error("Copying the log failed", error);
+      setStatus({ kind: "error", text: errorText(t, error) });
+    }
+  };
+
+  const openLogFolder = async () => {
+    try {
+      await getApi().logOpenFolder();
+    } catch (error: unknown) {
+      console.error("Opening the log folder failed", error);
+      setStatus({ kind: "error", text: errorText(t, error) });
+    }
+  };
+
   return (
     <Group title={t("diagnostics.title")} icon="file" info={t("diagnostics.fileHint")}>
       <div className="settings-control-row">
@@ -50,7 +71,25 @@ export function DiagnosticsCard({ settings, update }: SettingsSectionProps) {
           }}
         />
       </div>
-      <div className="settings-actions">
+      <p className="cr-section-label cr-label">{t("diagnostics.currentLog")}</p>
+      <p className="settings-hint cr-tight">{t("diagnostics.logHint")}</p>
+      <div className="settings-actions cr-actions">
+        <button
+          type="button"
+          className="settings-button cr-iconbtn"
+          onClick={() => void copyLog(false)}
+        >
+          {t("diagnostics.copyTail")}
+        </button>
+        <button type="button" className="settings-button" onClick={() => void copyLog(true)}>
+          {t("diagnostics.copyWhole")}
+        </button>
+        <button type="button" className="settings-button" onClick={() => void openLogFolder()}>
+          {t("diagnostics.openLogFolder")}
+        </button>
+      </div>
+      <p className="cr-section-label cr-label">{t("diagnostics.fileLabel")}</p>
+      <div className="settings-actions cr-actions">
         <button type="button" className="settings-button" onClick={() => void save()}>
           {t("diagnostics.save")}
         </button>
