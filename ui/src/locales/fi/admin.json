@@ -114,5 +114,44 @@
   "quickFixed": "palvelin päättää molemmat",
   "noCertificate": "Tällä henkilöllä ei ole varennetta, joten vain hänen osoitteensa voidaan estää.",
   "certRegisteredHint": "palvelin vertaa varmennetta vain rekisteröidyllä henkilöllä",
-  "ipAlwaysOnHint": "palvelin vertaa osoitetta, joten Mumcord pitää sen aina merkinnässä"
+  "ipAlwaysOnHint": "palvelin vertaa osoitetta, joten Mumcord pitää sen aina merkinnässä",
+  "denied": {
+    "title": "Palvelin ei sallinut tätä",
+    "titleOn": "{{server}} ei sallinut tätä",
+    "permission": "Sinulla ei ole oikeutta tähän.",
+    "unknown": "Palvelin hylkäsi tämän.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} kanavalla {{channel}}.",
+    "kind": {
+      "superUser": "Vain palvelimen SuperUser voi tehdä tämän.",
+      "channelName": "Tämä kanavan nimi ei ole sallittu.",
+      "textTooLong": "Teksti on pidempi kuin palvelin sallii.",
+      "temporaryChannel": "Tämä ei onnistu väliaikaisella kanavalla.",
+      "missingCertificate": "Tähän tarvitaan asiakasvarmenne.",
+      "userName": "Nimi ei ole sallittu tai on jo käytössä.",
+      "channelFull": "Kanava on täynnä.",
+      "nestingLimit": "Kanavia ei voi sisäkkäistää tätä syvemmälle.",
+      "channelCountLimit": "Palvelimella on jo niin monta kanavaa kuin se sallii.",
+      "listenerLimit": "Kuuntelijoita on jo niin monta kuin palvelin sallii."
+    },
+    "right": {
+      "write": "Et saa muuttaa oikeuksia",
+      "traverse": "Et saa avata tätä kanavaa",
+      "enter": "Et saa liittyä",
+      "speak": "Et saa puhua",
+      "muteDeafen": "Et saa mykistää etkä kuurouttaa ketään",
+      "move": "Et saa siirtää ketään",
+      "makeChannel": "Et saa luoda kanavia",
+      "linkChannel": "Et saa linkittää kanavia",
+      "whisper": "Et saa kuiskata",
+      "textMessage": "Et saa kirjoittaa viestejä",
+      "makeTempChannel": "Et saa luoda väliaikaisia kanavia",
+      "listen": "Et saa kuunnella",
+      "kick": "Et saa potkia ketään",
+      "ban": "Et saa bannata ketään",
+      "register": "Et saa rekisteröidä ketään",
+      "selfRegister": "Et saa rekisteröityä",
+      "resetUserContent": "Et saa nollata kommentteja ja avatareja"
+    }
+  }
 }

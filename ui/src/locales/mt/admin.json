@@ -114,5 +114,44 @@
   "quickFixed": "is-server iddeċidi t-tnejn",
   "noCertificate": "Din il-persuna m'għandhiex iċ-ċertifikat, għalhekk jista' jiġi bannat biss l-indirizz tagħha.",
   "certRegisteredHint": "is-server iqabbel iċ-ċertifikat biss ta' persuna reġistrata",
-  "ipAlwaysOnHint": "is-server iqabbel l-indirizz, għalhekk Mumcord dejjem iżommu fid-daħla"
+  "ipAlwaysOnHint": "is-server iqabbel l-indirizz, għalhekk Mumcord dejjem iżommu fid-daħla",
+  "denied": {
+    "title": "Is-server ma ħalliex dan",
+    "titleOn": "{{server}} ma ħalliex dan",
+    "permission": "M'għandekx id-dritt għal dan.",
+    "unknown": "Is-server irrifjuta dan.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} f'{{channel}}.",
+    "kind": {
+      "superUser": "Dan jista' jagħmlu biss is-SuperUser tas-server.",
+      "channelName": "Dan l-isem tal-kanal mhux permess.",
+      "textTooLong": "It-test huwa itwal milli jippermetti s-server.",
+      "temporaryChannel": "Dan mhux possibbli f'kanal temporanju.",
+      "missingCertificate": "Dan jeħtieġ ċertifikat tal-klijent.",
+      "userName": "Dan l-isem mhux permess jew diġà qed jintuża.",
+      "channelFull": "Il-kanal huwa mimli.",
+      "nestingLimit": "Il-kanali ma jistgħux jitpoġġew aktar fil-fond hawn.",
+      "channelCountLimit": "Is-server għandu daqstant kanali kemm jippermetti.",
+      "listenerLimit": "Diġà hemm daqstant semmiegħa kemm jippermetti s-server."
+    },
+    "right": {
+      "write": "Ma tistax tbiddel il-permessi",
+      "traverse": "Ma tistax tiftaħ dan il-kanal",
+      "enter": "Ma tistax tidħol",
+      "speak": "Ma tistax titkellem",
+      "muteDeafen": "Ma tistax tiskot jew torox lil ħadd",
+      "move": "Ma tistax tmexxi lil ħadd",
+      "makeChannel": "Ma tistax toħloq kanali",
+      "linkChannel": "Ma tistax torbot kanali",
+      "whisper": "Ma tistax tlissen",
+      "textMessage": "Ma tistax tikteb messaġġi",
+      "makeTempChannel": "Ma tistax toħloq kanali temporanji",
+      "listen": "Ma tistax tisma'",
+      "kick": "Ma tistax tkeċċi lil ħadd",
+      "ban": "Ma tistax tibbannja lil ħadd",
+      "register": "Ma tistax tirreġistra lil ħadd",
+      "selfRegister": "Ma tistax tirreġistra lilek innifsek",
+      "resetUserContent": "Ma tistax tirrisettja kummenti u avatars"
+    }
+  }
 }

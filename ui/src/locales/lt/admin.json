@@ -114,5 +114,44 @@
   "quickFixed": "serveris nusprendžia abu",
   "noCertificate": "Šis žmogus neturi sertifikato, todėl galima drausti tik jo adresą.",
   "certRegisteredHint": "serveris palygina sertifikatą tik registruoto asmens",
-  "ipAlwaysOnHint": "serveris palygina adresą, todėl „Mumcord“ jį visada palieka įraše"
+  "ipAlwaysOnHint": "serveris palygina adresą, todėl „Mumcord“ jį visada palieka įraše",
+  "denied": {
+    "title": "Serveris to neleido",
+    "titleOn": "{{server}} to neleido",
+    "permission": "Neturi tam teisės.",
+    "unknown": "Serveris atsisakė.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} kanale {{channel}}.",
+    "kind": {
+      "superUser": "Tai gali padaryti tik serverio SuperUser.",
+      "channelName": "Šis kanalo pavadinimas neleidžiamas.",
+      "textTooLong": "Tekstas ilgesnis, nei leidžia serveris.",
+      "temporaryChannel": "Laikiname kanale tai neįmanoma.",
+      "missingCertificate": "Tam reikia kliento sertifikato.",
+      "userName": "Šis vardas neleidžiamas arba jau užimtas.",
+      "channelFull": "Kanalas pilnas.",
+      "nestingLimit": "Kanalų čia negalima įdėti giliau.",
+      "channelCountLimit": "Serveryje jau tiek kanalų, kiek jis leidžia.",
+      "listenerLimit": "Klausytojų jau tiek, kiek leidžia serveris."
+    },
+    "right": {
+      "write": "Negali keisti teisių",
+      "traverse": "Negali atidaryti šio kanalo",
+      "enter": "Negali prisijungti",
+      "speak": "Negali kalbėti",
+      "muteDeafen": "Negali nieko nutildyti ar apkurtinti",
+      "move": "Negali nieko perkelti",
+      "makeChannel": "Negali kurti kanalų",
+      "linkChannel": "Negali susieti kanalų",
+      "whisper": "Negali šnibždėti",
+      "textMessage": "Negali rašyti žinučių",
+      "makeTempChannel": "Negali kurti laikinų kanalų",
+      "listen": "Negali klausytis",
+      "kick": "Negali nieko išmesti",
+      "ban": "Negali nieko užblokuoti",
+      "register": "Negali nieko registruoti",
+      "selfRegister": "Negali užsiregistruoti",
+      "resetUserContent": "Negali atstatyti komentarų ir avatarų"
+    }
+  }
 }

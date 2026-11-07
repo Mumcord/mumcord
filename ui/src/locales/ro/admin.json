@@ -114,5 +114,44 @@
   "quickFixed": "serverul decide ambele",
   "noCertificate": "Această persoană nu are certificat, deci poate fi interzis doar prin adresă.",
   "certRegisteredHint": "serverul compară certificatul doar pentru o persoană înregistrată",
-  "ipAlwaysOnHint": "serverul compară adresa, deci Mumcord o păstrează mereu în intrare"
+  "ipAlwaysOnHint": "serverul compară adresa, deci Mumcord o păstrează mereu în intrare",
+  "denied": {
+    "title": "Serverul nu a permis asta",
+    "titleOn": "{{server}} nu a permis asta",
+    "permission": "Nu ai dreptul să faci asta.",
+    "unknown": "Serverul a refuzat.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} în {{channel}}.",
+    "kind": {
+      "superUser": "Doar SuperUser-ul serverului poate face asta.",
+      "channelName": "Acest nume de canal nu este permis.",
+      "textTooLong": "Textul este mai lung decât permite serverul.",
+      "temporaryChannel": "Nu este posibil într-un canal temporar.",
+      "missingCertificate": "Este nevoie de un certificat de client.",
+      "userName": "Acest nume nu este permis sau este deja folosit.",
+      "channelFull": "Canalul este plin.",
+      "nestingLimit": "Canalele nu pot fi imbricate mai adânc aici.",
+      "channelCountLimit": "Serverul are atâtea canale câte permite.",
+      "listenerLimit": "Sunt deja atâția ascultători câți permite serverul."
+    },
+    "right": {
+      "write": "Nu poți modifica permisiunile",
+      "traverse": "Nu poți deschide acest canal",
+      "enter": "Nu poți intra",
+      "speak": "Nu poți vorbi",
+      "muteDeafen": "Nu poți amuți sau asurzi pe nimeni",
+      "move": "Nu poți muta pe nimeni",
+      "makeChannel": "Nu poți crea canale",
+      "linkChannel": "Nu poți lega canale",
+      "whisper": "Nu poți șopti",
+      "textMessage": "Nu poți scrie mesaje",
+      "makeTempChannel": "Nu poți crea canale temporare",
+      "listen": "Nu poți asculta",
+      "kick": "Nu poți da afară pe nimeni",
+      "ban": "Nu poți bana pe nimeni",
+      "register": "Nu poți înregistra pe nimeni",
+      "selfRegister": "Nu te poți înregistra",
+      "resetUserContent": "Nu poți reseta comentarii și avataruri"
+    }
+  }
 }

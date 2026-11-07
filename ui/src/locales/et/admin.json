@@ -114,5 +114,44 @@
   "quickFixed": "server otsustab mõlema",
   "noCertificate": "Sellel inimesel pole sertifikaati, seega saab keelustada ainult tema aadressi.",
   "certRegisteredHint": "server võrdleb sertifikaati ainult registreeritud kasutajal",
-  "ipAlwaysOnHint": "server võrdleb aadressi, seega jätab Mumcord selle alati kirjeisse"
+  "ipAlwaysOnHint": "server võrdleb aadressi, seega jätab Mumcord selle alati kirjeisse",
+  "denied": {
+    "title": "Server ei lubanud seda",
+    "titleOn": "{{server}} ei lubanud seda",
+    "permission": "Sul pole selleks õigust.",
+    "unknown": "Server keeldus.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} kanalis {{channel}}.",
+    "kind": {
+      "superUser": "Seda saab teha ainult serveri SuperUser.",
+      "channelName": "See kanali nimi pole lubatud.",
+      "textTooLong": "Tekst on pikem, kui server lubab.",
+      "temporaryChannel": "Ajutises kanalis pole see võimalik.",
+      "missingCertificate": "Selleks on vaja kliendisertifikaati.",
+      "userName": "See nimi pole lubatud või on juba kasutusel.",
+      "channelFull": "Kanal on täis.",
+      "nestingLimit": "Kanaleid ei saa siin sügavamale pesastada.",
+      "channelCountLimit": "Serveris on juba nii palju kanaleid, kui ta lubab.",
+      "listenerLimit": "Kuulajaid on juba nii palju, kui server lubab."
+    },
+    "right": {
+      "write": "Sa ei tohi õigusi muuta",
+      "traverse": "Sa ei tohi seda kanalit avada",
+      "enter": "Sa ei tohi siseneda",
+      "speak": "Sa ei tohi rääkida",
+      "muteDeafen": "Sa ei tohi kedagi vaigistada ega kurdistada",
+      "move": "Sa ei tohi kedagi teisaldada",
+      "makeChannel": "Sa ei tohi kanaleid luua",
+      "linkChannel": "Sa ei tohi kanaleid linkida",
+      "whisper": "Sa ei tohi sosistada",
+      "textMessage": "Sa ei tohi sõnumeid kirjutada",
+      "makeTempChannel": "Sa ei tohi ajutisi kanaleid luua",
+      "listen": "Sa ei tohi kuulata",
+      "kick": "Sa ei tohi kedagi välja visata",
+      "ban": "Sa ei tohi kedagi keelata",
+      "register": "Sa ei tohi kedagi registreerida",
+      "selfRegister": "Sa ei tohi end registreerida",
+      "resetUserContent": "Sa ei tohi kommentaare ja avatare lähtestada"
+    }
+  }
 }

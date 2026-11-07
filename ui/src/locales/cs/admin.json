@@ -114,5 +114,44 @@
   "quickFixed": "server rozhodne obojí",
   "noCertificate": "Tenhle člověk nemá certifikát, takže blokovat lze jen jeho adresu.",
   "certRegisteredHint": "server porovnává certifikát jen u registrovaného uživatele",
-  "ipAlwaysOnHint": "server porovnává adresu, takže Mumcord ji v záznamu vždy ponechává"
+  "ipAlwaysOnHint": "server porovnává adresu, takže Mumcord ji v záznamu vždy ponechává",
+  "denied": {
+    "title": "Server to nepovolil",
+    "titleOn": "{{server}} to nepovolil",
+    "permission": "Na tohle nemáš právo.",
+    "unknown": "Server to odmítl.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} v kanálu {{channel}}.",
+    "kind": {
+      "superUser": "To smí jen SuperUser serveru.",
+      "channelName": "Tento název kanálu není povolen.",
+      "textTooLong": "Text je delší, než server dovoluje.",
+      "temporaryChannel": "V dočasném kanálu to nejde.",
+      "missingCertificate": "Je k tomu potřeba klientský certifikát.",
+      "userName": "Toto jméno není povoleno nebo je obsazené.",
+      "channelFull": "Kanál je plný.",
+      "nestingLimit": "Kanály tu nelze vnořit hlouběji.",
+      "channelCountLimit": "Server má tolik kanálů, kolik dovoluje.",
+      "listenerLimit": "Posluchačů je už tolik, kolik server dovoluje."
+    },
+    "right": {
+      "write": "Nesmíš měnit oprávnění",
+      "traverse": "Nesmíš otevřít tento kanál",
+      "enter": "Nesmíš vstoupit",
+      "speak": "Nesmíš mluvit",
+      "muteDeafen": "Nesmíš nikoho ztlumit ani ohlušit",
+      "move": "Nesmíš nikoho přesouvat",
+      "makeChannel": "Nesmíš vytvářet kanály",
+      "linkChannel": "Nesmíš propojovat kanály",
+      "whisper": "Nesmíš šeptat",
+      "textMessage": "Nesmíš psát zprávy",
+      "makeTempChannel": "Nesmíš vytvářet dočasné kanály",
+      "listen": "Nesmíš poslouchat",
+      "kick": "Nesmíš nikoho vyhodit",
+      "ban": "Nesmíš nikoho zabanovat",
+      "register": "Nesmíš nikoho registrovat",
+      "selfRegister": "Nesmíš se registrovat",
+      "resetUserContent": "Nesmíš resetovat komentáře a avatary"
+    }
+  }
 }

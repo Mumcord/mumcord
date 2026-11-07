@@ -114,5 +114,44 @@
   "quickFixed": "socraíonn an freastalaí an dá rud",
   "noCertificate": "Níl deimhne ag an duine seo, mar sin ní coscáinte ach a sheoladh.",
   "certRegisteredHint": "déanann an freastalaí comparáid leis an deimhne ach amháin do duine cláraithe",
-  "ipAlwaysOnHint": "déanann an freastalaí comparáid leis an seoladh, mar sin coinníonn Mumcord é sa taifead i gcónaí"
+  "ipAlwaysOnHint": "déanann an freastalaí comparáid leis an seoladh, mar sin coinníonn Mumcord é sa taifead i gcónaí",
+  "denied": {
+    "title": "Níor cheadaigh an freastalaí é seo",
+    "titleOn": "Níor cheadaigh {{server}} é seo",
+    "permission": "Níl an ceart agat chuige seo.",
+    "unknown": "Dhiúltaigh an freastalaí é seo.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} in {{channel}}.",
+    "kind": {
+      "superUser": "Ní féidir ach le SuperUser an fhreastalaí é seo a dhéanamh.",
+      "channelName": "Níl an t-ainm cainéil seo ceadaithe.",
+      "textTooLong": "Tá an téacs níos faide ná mar a cheadaíonn an freastalaí.",
+      "temporaryChannel": "Ní féidir é seo i gcainéal sealadach.",
+      "missingCertificate": "Teastaíonn teastas cliaint.",
+      "userName": "Níl an t-ainm seo ceadaithe nó tá sé in úsáid cheana.",
+      "channelFull": "Tá an cainéal lán.",
+      "nestingLimit": "Ní féidir cainéil a neadú níos doimhne anseo.",
+      "channelCountLimit": "Tá an oiread cainéal ag an bhfreastalaí agus a cheadaíonn sé.",
+      "listenerLimit": "Tá an oiread éisteoirí ann agus a cheadaíonn an freastalaí."
+    },
+    "right": {
+      "write": "Ní cheadaítear duit na ceadanna a athrú",
+      "traverse": "Ní cheadaítear duit an cainéal seo a oscailt",
+      "enter": "Ní cheadaítear duit dul isteach",
+      "speak": "Ní cheadaítear duit labhairt",
+      "muteDeafen": "Ní cheadaítear duit daoine a bhalbhú ná a bhodhrú",
+      "move": "Ní cheadaítear duit daoine a bhogadh",
+      "makeChannel": "Ní cheadaítear duit cainéil a chruthú",
+      "linkChannel": "Ní cheadaítear duit cainéil a nascadh",
+      "whisper": "Ní cheadaítear duit cogar a dhéanamh",
+      "textMessage": "Ní cheadaítear duit teachtaireachtaí a scríobh",
+      "makeTempChannel": "Ní cheadaítear duit cainéil shealadacha a chruthú",
+      "listen": "Ní cheadaítear duit éisteacht",
+      "kick": "Ní cheadaítear duit daoine a chiceáil",
+      "ban": "Ní cheadaítear duit daoine a choisc",
+      "register": "Ní cheadaítear duit daoine a chlárú",
+      "selfRegister": "Ní cheadaítear duit clárú",
+      "resetUserContent": "Ní cheadaítear duit tráchtanna agus abhatáir a athshocrú"
+    }
+  }
 }

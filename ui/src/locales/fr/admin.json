@@ -114,5 +114,44 @@
   "quickFixed": "le serveur décide des deux",
   "noCertificate": "Cette personne n'a pas de certificat, donc seule son adresse peut être bannie.",
   "certRegisteredHint": "le serveur ne compare le certificat que d'une personne enregistrée",
-  "ipAlwaysOnHint": "le serveur compare l'adresse, donc Mumcord la garde toujours dans l'entrée"
+  "ipAlwaysOnHint": "le serveur compare l'adresse, donc Mumcord la garde toujours dans l'entrée",
+  "denied": {
+    "title": "Le serveur ne l'a pas permis",
+    "titleOn": "{{server}} ne l'a pas permis",
+    "permission": "Tu n'as pas le droit de faire cela.",
+    "unknown": "Le serveur a refusé.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} dans {{channel}}.",
+    "kind": {
+      "superUser": "Seul le SuperUser du serveur peut faire cela.",
+      "channelName": "Ce nom de salon n'est pas autorisé.",
+      "textTooLong": "Le texte est plus long que ce que le serveur autorise.",
+      "temporaryChannel": "Ce n'est pas possible dans un salon temporaire.",
+      "missingCertificate": "Il faut un certificat client.",
+      "userName": "Ce nom n'est pas autorisé ou déjà pris.",
+      "channelFull": "Le salon est plein.",
+      "nestingLimit": "Les salons ne peuvent pas être imbriqués plus profondément ici.",
+      "channelCountLimit": "Le serveur a autant de salons qu'il le permet.",
+      "listenerLimit": "Il y a déjà autant d'auditeurs que le serveur le permet."
+    },
+    "right": {
+      "write": "Tu ne peux pas modifier les droits",
+      "traverse": "Tu ne peux pas ouvrir ce salon",
+      "enter": "Tu ne peux pas rejoindre",
+      "speak": "Tu ne peux pas parler",
+      "muteDeafen": "Tu ne peux pas rendre muet ou sourd quelqu'un",
+      "move": "Tu ne peux pas déplacer des personnes",
+      "makeChannel": "Tu ne peux pas créer de salons",
+      "linkChannel": "Tu ne peux pas lier de salons",
+      "whisper": "Tu ne peux pas chuchoter",
+      "textMessage": "Tu ne peux pas écrire de messages",
+      "makeTempChannel": "Tu ne peux pas créer de salons temporaires",
+      "listen": "Tu ne peux pas écouter",
+      "kick": "Tu ne peux pas expulser des personnes",
+      "ban": "Tu ne peux pas bannir des personnes",
+      "register": "Tu ne peux pas enregistrer des personnes",
+      "selfRegister": "Tu ne peux pas t'enregistrer",
+      "resetUserContent": "Tu ne peux pas réinitialiser commentaires et avatars"
+    }
+  }
 }

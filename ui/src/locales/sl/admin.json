@@ -114,5 +114,44 @@
   "quickFixed": "strežnik odloči o obojem",
   "noCertificate": "Ta oseba nima potrdila, zato lahko prepoveš samo njen naslov.",
   "certRegisteredHint": "strežnik primerja potrdilo samo registrirane osebe",
-  "ipAlwaysOnHint": "strežnik primerja naslov, zato Mumcord ga vedno obdrži v vnosu"
+  "ipAlwaysOnHint": "strežnik primerja naslov, zato Mumcord ga vedno obdrži v vnosu",
+  "denied": {
+    "title": "Strežnik tega ni dovolil",
+    "titleOn": "{{server}} tega ni dovolil",
+    "permission": "Za to nimaš pravice.",
+    "unknown": "Strežnik je to zavrnil.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} v kanalu {{channel}}.",
+    "kind": {
+      "superUser": "To lahko stori le SuperUser strežnika.",
+      "channelName": "To ime kanala ni dovoljeno.",
+      "textTooLong": "Besedilo je daljše, kot dovoli strežnik.",
+      "temporaryChannel": "V začasnem kanalu to ni mogoče.",
+      "missingCertificate": "Za to je potrebno odjemalsko potrdilo.",
+      "userName": "To ime ni dovoljeno ali je že zasedeno.",
+      "channelFull": "Kanal je poln.",
+      "nestingLimit": "Kanalov tu ni mogoče gnezditi globlje.",
+      "channelCountLimit": "Strežnik ima toliko kanalov, kot jih dovoli.",
+      "listenerLimit": "Poslušalcev je že toliko, kot jih dovoli strežnik."
+    },
+    "right": {
+      "write": "Ne smeš spreminjati dovoljenj",
+      "traverse": "Ne smeš odpreti tega kanala",
+      "enter": "Ne smeš vstopiti",
+      "speak": "Ne smeš govoriti",
+      "muteDeafen": "Ne smeš nikogar utišati ali oglušiti",
+      "move": "Ne smeš nikogar premikati",
+      "makeChannel": "Ne smeš ustvarjati kanalov",
+      "linkChannel": "Ne smeš povezovati kanalov",
+      "whisper": "Ne smeš šepetati",
+      "textMessage": "Ne smeš pisati sporočil",
+      "makeTempChannel": "Ne smeš ustvarjati začasnih kanalov",
+      "listen": "Ne smeš poslušati",
+      "kick": "Ne smeš nikogar odstraniti",
+      "ban": "Ne smeš nikogar izključiti",
+      "register": "Ne smeš nikogar registrirati",
+      "selfRegister": "Ne smeš se registrirati",
+      "resetUserContent": "Ne smeš ponastaviti komentarjev in avatarjev"
+    }
+  }
 }
