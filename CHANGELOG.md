@@ -5,6 +5,7 @@
 ### Added
 
 - Activity feed: an icon for each kind of event, and the feed is saved on this device, so it is still there after a reconnect or a restart (an "Earlier" line marks where this session starts). Settings → Privacy → "Clear activity history" removes it for all servers
+- Activity notifications: when someone starts a screen share, a watch party or a plugin activity, or a plugin posts an event, Mumcord notifies like for messages (in-app toast or system notification, following Do Not Disturb and muted servers). Settings → Chat & Notifications has a switch per kind; joins, leaves and moves are off by default
 
 ### Changed
 
