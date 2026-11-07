@@ -7,6 +7,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useHintPreferences } from "../../a11y/hintPreferences";
+import { ComposerIcon } from "../../components/ComposerIcon";
 import type { InlineImage } from "../../api";
 import { GifAttribution } from "./GifAttribution";
 import { markFavoriteUsed, removeFavorite, useGifFavorites } from "./favorites";
@@ -199,16 +200,7 @@ export function GifPicker({ onSend, disabled, linkPreviews }: GifPickerProps) {
           setOpen(!open);
         }}
       >
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-          <path
-            d={GIF_ICON}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <ComposerIcon d={GIF_ICON} />
       </button>
       {open ? (
         // Keys are handled on the dialog; every control inside is a real button.

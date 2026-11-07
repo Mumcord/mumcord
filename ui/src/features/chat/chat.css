@@ -486,80 +486,102 @@
 
 .chat-composer {
   position: relative;
-  padding: var(--space-2) var(--space-4) var(--space-4);
+  /* Room above the bar for the formatting pill, which sits on the bar's top edge (#596). */
+  padding: var(--space-4);
 }
 
-.chat-format {
-  display: flex;
-  gap: 0.125rem;
-  margin-bottom: var(--space-1);
-}
-
-.chat-format__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.75rem;
-  min-height: 1.75rem;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-
-.chat-format__button:hover:not(:disabled) {
-  background: var(--color-bg-hover);
-  color: var(--color-text);
-}
-
-.chat-format__button:disabled {
-  cursor: not-allowed;
-}
-
-.chat-composer__row {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--space-1);
-  padding: var(--space-1);
-  border-radius: var(--radius-md);
+/* The bar (#596): the text field on top, the icon row below it, one frame around both. */
+.chat-composer__bar {
+  position: relative;
+  /* The icon row never wraps: a narrow bar drops the word "Send" instead (see below). */
+  container-type: inline-size;
+  /* Room under what sits above the bar (a note, a reply, the tray) for the formatting pill, which
+     hangs over the bar's top edge. */
+  margin-top: 0.625rem;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   background: var(--color-bg-elevated);
-  /* Inset line, not a border: the composer keeps its height. */
-  box-shadow: inset 0 0 0 1px var(--color-border);
-  transition: box-shadow var(--duration-fast);
+  transition:
+    border-color var(--duration-fast),
+    box-shadow var(--duration-fast);
 }
 
-.chat-composer__row:focus-within {
-  box-shadow: inset 0 0 0 1px var(--color-accent);
+/* One focus ring for the whole bar; the field inside it draws none of its own (#596). */
+.chat-composer__bar:has(.chat-composer__input:focus) {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 var(--focus-ring-width) color-mix(in srgb, var(--color-focus) 45%, transparent);
 }
 
+/* One line when empty and growing with the text (Composer measures and sets the height) up to
+   about six lines, then the text scrolls. No resize handle: the bar is the frame (#596). */
 .chat-composer__input {
-  flex: 1;
-  min-height: 2rem;
-  max-height: 10rem;
-  padding: var(--space-1) var(--space-2);
+  display: block;
+  width: 100%;
+  /* Top padding grows while the formatting pill is over the bar, so the first line stays clear. */
+  --composer-pad-top: var(--space-1);
+  min-height: calc(var(--line-height) * 1em);
+  max-height: calc(6 * var(--line-height) * 1em + var(--composer-pad-top) + var(--space-1));
+  padding: var(--composer-pad-top) 0 var(--space-1);
   border: 0;
   background: transparent;
   color: var(--color-text);
   font: inherit;
-  resize: vertical;
+  line-height: var(--line-height);
+  overflow-wrap: anywhere;
+  overflow-y: auto;
+  /* The ring is on the bar, so the field keeps the plain caret instead of a second frame. */
+  outline: none;
+  resize: none;
 }
 
+.chat-composer__bar:focus-within .chat-composer__input {
+  --composer-pad-top: 1.125rem;
+}
+
+/* The placeholder starts at the left edge of the bar, like the typed text (#596). */
 .chat-composer__input::placeholder {
   color: var(--color-text-muted);
   opacity: 1;
 }
 
-.chat-composer__icon {
-  display: inline-flex;
+/* A thin scroll bar, only visible once the text is taller than the cap (#596). */
+.chat-composer__input::-webkit-scrollbar {
+  width: 0.375rem;
+}
+
+.chat-composer__input::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong);
+}
+
+.chat-composer__input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Icon row under the field: every button gets the same box, colour and round hover (#596). */
+.chat-composer__tools {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 2rem;
-  min-height: 2rem;
-  padding: var(--space-1);
+  gap: var(--space-1);
+  /* Pulls the first icon into line with the text above it: the icon sits centred in its box. */
+  margin-inline-start: -0.375rem;
+}
+
+/* The row of a locked bar only holds the Apps button, and only where there is one. */
+.chat-composer__tools:empty {
+  display: none;
+}
+
+.chat-composer__icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -570,19 +592,114 @@
   color: var(--color-text);
 }
 
-.chat-composer__icon:disabled,
-.chat-composer__input:disabled {
+.chat-composer__icon:disabled {
   cursor: not-allowed;
 }
 
-.chat-composer__blocked,
-.chat-composer__error {
-  margin: 0 0 var(--space-2);
+/* Send (#596): the primary pill, muted while the input has nothing to send. */
+.chat-composer__send {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+  height: 1.875rem;
+  margin-inline-start: auto;
+  padding: 0 var(--space-3) 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-bg);
+  color: var(--color-primary-text);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
 }
 
-.chat-composer__blocked {
+.chat-composer__send[aria-disabled="true"] {
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+/* Too little room for icon row and word: the arrow alone says it, the name stays in a11y. */
+@container (max-width: 18rem) {
+  .chat-composer__send-label {
+    display: none;
+  }
+}
+
+/* No text-message permission: no field to grey out but a locked note in the bar's place (#596).
+   Starting a share still works by voice, so the Apps button keeps a row of its own. */
+.chat-composer__bar--locked {
+  padding: var(--space-3) var(--space-4);
+  border-style: dashed;
+  border-color: var(--color-border-strong);
+  background: transparent;
+}
+
+.chat-composer__bar--locked .chat-composer__tools {
+  margin-top: var(--space-2);
+  margin-inline-start: -0.25rem;
+}
+
+.chat-composer__locked {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
   color: var(--color-text-secondary);
+}
+
+/* Formatting toolbar (FR-1.54, #596): a small pill on the bar's top-left edge, half over the
+   border, shown whenever the cursor is anywhere in the bar so keyboard focus is never spent on a
+   hidden control. */
+.chat-format {
+  position: absolute;
+  top: -0.875rem;
+  left: 0.625rem;
+  z-index: 1;
+  display: none;
+  align-items: center;
+  padding: 0.125rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+}
+
+.chat-composer__bar:focus-within .chat-format {
+  display: flex;
+}
+
+/* While a picker or the Apps menu opens over the bar, the pill makes way for it: the menu would
+   otherwise cut across it, and neither is about typing at that moment. */
+.chat-composer__bar:has(.gif-picker__popover, .chat-apps__menu) .chat-format {
+  display: none;
+}
+
+.chat-format__button {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.chat-format__button:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.chat-format__divider {
+  flex: none;
+  width: 1px;
+  height: 0.75rem;
+  margin: 0 0.1875rem;
+  background: var(--color-border);
 }
 
 /* A hint with its close button (#579). */
@@ -618,7 +735,15 @@
 }
 
 .chat-composer__error {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
   color: var(--color-danger);
+}
+
+.chat-composer__blocked {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 /* Pinned channel info (FR-1.48b): description and welcome text above the messages. */
@@ -1423,8 +1548,9 @@
 }
 
 /* Attachment tray and drop highlight for images (FR-1.30). */
-.chat-composer[data-dragging="true"] .chat-composer__row {
-  box-shadow: inset 0 0 0 2px var(--color-accent);
+.chat-composer[data-dragging="true"] .chat-composer__bar {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 var(--focus-ring-width) color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .chat-tray {
@@ -1868,11 +1994,16 @@
   align-items: center;
   gap: var(--space-2);
   margin: 0 0 var(--space-2);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  border-left: 3px solid var(--color-accent);
   border-radius: var(--radius-sm);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+.chat-composer__reply .chat-reply__name {
+  color: var(--color-accent-text);
 }
 
 .chat-composer__reply-text {

@@ -283,10 +283,18 @@ describe("Composer file sharing", () => {
     // Removing the chip stops zipping; add it again to test the send path.
     emit({ type: "drop", paths: ["/tmp/dir"], position: at(100, 100) });
     await screen.findByText("Zipping folder… 0 %");
+    // Nothing can go out while the file is still zipped (issue #596).
+    expect(screen.getByRole("button", { name: "Send" })).toHaveAttribute("aria-disabled", "true");
     act(() => {
       api.mock.emit("fileChipChanged", { chip: chip(1, { state: { kind: "ready" } }) });
     });
     expect(await screen.findByText("18.4 MB · peer-to-peer")).toBeTruthy();
+    // A ready file alone is enough to send, and the text field only asks for a comment.
+    expect(screen.getByRole("textbox", { name: "Message #General" })).toHaveAttribute(
+      "placeholder",
+      "Add a message (optional)",
+    );
+    expect(screen.getByRole("button", { name: "Send" }).getAttribute("aria-disabled")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Send" }));
     await waitFor(() => {
       expect(send).toHaveBeenCalledWith(expect.any(Number), 1, [1]);

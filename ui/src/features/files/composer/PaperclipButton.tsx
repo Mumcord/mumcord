@@ -1,5 +1,6 @@
 /** The paperclip next to the message input: opens the file picker, or says why it cannot. */
 import { useTranslation } from "react-i18next";
+import { ComposerIcon } from "../../../components/ComposerIcon";
 import { pickFiles } from "./pickFiles";
 
 const PAPERCLIP =
@@ -36,16 +37,7 @@ export function PaperclipButton({
         });
       }}
     >
-      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-        <path
-          d={PAPERCLIP}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <ComposerIcon d={PAPERCLIP} />
     </button>
   );
 }

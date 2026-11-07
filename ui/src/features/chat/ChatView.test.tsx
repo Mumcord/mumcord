@@ -116,14 +116,14 @@ describe("ChatView", () => {
     expect(failed.closest("p")).toHaveTextContent("at most 5000 characters");
   });
 
-  it("disables the input without the text message permission", async () => {
+  it("replaces the input with a locked note without the text message permission", async () => {
     await renderChat();
     act(() => {
       selectConversation({ kind: "channel", channelId: 3 });
     });
-    const input = await screen.findByRole("textbox", { name: "Message #AFK" });
-    expect(input).toBeDisabled();
-    expect(screen.getByText(/don't have permission to write/)).toBeInTheDocument();
+    expect(await screen.findByText(/don't have permission to write/)).toBeInTheDocument();
+    // Issue #596: nothing to type in instead of a disabled field; only the note stays.
+    expect(screen.queryByRole("textbox", { name: "Message #AFK" })).toBeNull();
   });
 
   it("opens links only on click, through the engine's system opener", async () => {

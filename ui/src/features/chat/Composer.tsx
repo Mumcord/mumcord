@@ -1,7 +1,14 @@
 /**
- * Message input: Markdown with a formatting toolbar and shortcuts, Enter to send (Shift+Enter for a new line), images (one or
- * several) by button, paste or drop into an attachment tray, and inline errors such as a denied permission or a too-large image.
- * While replying (FR-2.60) a preview of the quoted message sits above the input; × or Escape cancels it.
+ * Message input (issue #596): one compact bar with the text field on top and the icon row below.
+ * The bar starts on a single line, grows with the text up to about six lines and scrolls from
+ * there; the formatting toolbar is a pill on its top-left edge while the cursor is inside and the
+ * bar carries the only focus ring. The send button is muted until there is anything to send, and
+ * without the text-message permission the bar becomes a locked note instead of an input.
+ *
+ * Markdown with shortcuts, Enter to send (Shift+Enter for a new line), images (one or several) by
+ * button, paste or drop into an attachment tray, and inline errors such as a denied permission or
+ * a too-large image. While replying (FR-2.60) a preview of the quoted message sits above the bar;
+ * × or Escape cancels it.
  */
 import {
   useEffect,
@@ -15,6 +22,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { ComposerIcon } from "../../components/ComposerIcon";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useNoRelayHint } from "../files/composer/noRelayHint";
@@ -66,17 +74,11 @@ export interface ComposerProps {
   onCancelReply?: () => void;
 }
 
-function Icon({ d }: { d: string }) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <path d={d} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
+// Up arrow, as in the mockup: sending is a plain "send", not a paper plane.
 const IMAGE_ICON = "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01";
-const SEND_ICON = "M4 12l16-8-6 16-2-7z";
+const SEND_ICON = "M12 19V5M5 12l7-7 7 7";
 const CANCEL_ICON = "M6 6l12 12M18 6L6 18";
+const LOCK_ICON = ["M5 11h14v9H5z", "M8 11V8a4 4 0 0 1 8 0v3"];
 
 /** `DataTransferItemList` is a list, not an iterable, so it is read by index. */
 function clipboardItems(data: DataTransfer): DataTransferItem[] {
@@ -305,12 +307,38 @@ export function Composer({
     element.setSelectionRange(pending.selectionStart, pending.selectionEnd);
   }, [composer.text]);
 
+  // One line when empty, growing with the text; chat.css caps the height, from where the text
+  // scrolls (issue #596). Measuring after every text change keeps the caret in view. `pillShown`
+  // mirrors the CSS rule that shows the formatting pill: while it is over the bar, the field has
+  // more top padding and its height has to be measured again.
+  const [pillShown, setPillShown] = useState(false);
+  useLayoutEffect(() => {
+    const element = input.current;
+    if (element === null) return;
+    element.style.height = "auto";
+    // jsdom reports no layout at all, so there a measured height of 0 would shrink the field.
+    if (element.scrollHeight > 0) element.style.height = `${String(element.scrollHeight)}px`;
+  }, [composer.text, pillShown]);
+
   /** Sends the typed text and images, then one offer per ready file chip. */
   function submitAll() {
     if (fileChips.busy) return;
     composer.submit();
     if (target?.kind === "channel" && fileChips.hasSendable) void fileChips.send(target.channelId);
   }
+
+  // The send button shows whether there is anything to send (issue #596): muted while the input
+  // is empty and no picture or file is ready, and while one is still worked on (sending then does
+  // nothing, so an enabled button would only lead to a dead Enter).
+  const waiting =
+    target === null ||
+    fileChips.busy ||
+    composer.attachments.some((item) => item.status === "processing");
+  const hasReadyAttachment = composer.attachments.length > 0 || fileChips.hasSendable;
+  const canSend = !waiting && (composer.text.trim() !== "" || hasReadyAttachment);
+  // With a picture or a file already in the tray, the typed text is only a comment on it.
+  const placeholder =
+    composer.text === "" && hasReadyAttachment ? t("composer.optionalMessage") : label;
 
   function format(kind: Format) {
     const element = input.current;
@@ -488,7 +516,6 @@ export function Composer({
           if (!slash.run(composer.text)) submitAll();
         }}
       >
-        {blockedReason ? <p className="chat-composer__blocked">{blockedReason}</p> : null}
         {reasonShown && fileChips.unavailable !== null ? (
           <div className="chat-composer__hint">
             <p id={reasonId} className="chat-composer__blocked">
@@ -540,7 +567,7 @@ export function Composer({
                   input.current?.focus();
                 }}
               >
-                <Icon d={CANCEL_ICON} />
+                <ComposerIcon d={CANCEL_ICON} size={18} />
               </button>
             ) : null}
           </div>
@@ -574,84 +601,117 @@ export function Composer({
         <p className="visually-hidden" role="status">
           {pickerOpen ? t("mention.found", { count: options.length }) : ""}
         </p>
-        <FormatToolbar onFormat={format} disabled={disabled} />
-        <div className="chat-composer__row">
-          <ChatActionRow />
-          {inChannelTarget ? (
-            <PaperclipButton
-              disabled={disabled}
-              reason={
-                fileChips.unavailable === null ? null : unavailableText(tP2p, fileChips.unavailable)
+        {blockedReason === null ? (
+          // The handlers only watch where the focus is, so the field can be measured again once
+          // the pill's padding appears; the div itself is not interactive.
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+          <div
+            className="chat-composer__bar"
+            onFocus={() => {
+              setPillShown(true);
+            }}
+            onBlur={(event) => {
+              const to = event.relatedTarget;
+              if (!(to instanceof Node) || !event.currentTarget.contains(to)) setPillShown(false);
+            }}
+          >
+            <FormatToolbar onFormat={format} />
+            <textarea
+              ref={input}
+              role={pickerOpen || slash.open ? "combobox" : undefined}
+              aria-expanded={pickerOpen || slash.open ? true : undefined}
+              aria-controls={pickerOpen ? pickerId : slash.open ? commandListId : undefined}
+              aria-activedescendant={
+                pickerOpen
+                  ? optionId(pickerId, activeIndex)
+                  : slash.open
+                    ? commandOptionId(commandListId, slash.active)
+                    : undefined
               }
-              describedBy={reasonShown ? reasonId : undefined}
-              onPick={(paths) => {
-                void fileChips.addPaths(paths);
+              aria-autocomplete={pickerOpen || slash.open ? "list" : undefined}
+              className="chat-composer__input"
+              rows={1}
+              aria-label={label}
+              aria-describedby={composer.error ? `${hintId} ${errorId}` : hintId}
+              placeholder={placeholder}
+              value={composer.text}
+              onChange={(event) => {
+                composer.setText(event.target.value);
+                setCaret(event.target.selectionStart);
+                setActive(0);
               }}
+              onSelect={(event) => {
+                setCaret(event.currentTarget.selectionStart);
+              }}
+              onKeyDown={onKeyDown}
+              onPaste={onPaste}
             />
-          ) : null}
-          <button
-            type="button"
-            className="chat-composer__icon"
-            aria-label={t("composer.addImage")}
-            data-tooltip={t("composer.addImage")}
-            disabled={disabled}
-            onClick={() => fileInput.current?.click()}
-          >
-            <Icon d={IMAGE_ICON} />
-          </button>
-          <GifPicker onSend={composer.sendLink} disabled={disabled} linkPreviews={linkPreviews} />
-          <input
-            ref={fileInput}
-            type="file"
-            accept="image/png,image/jpeg,image/gif,image/webp"
-            hidden
-            multiple
-            onChange={(event) => {
-              composer.addFiles(Array.from(event.currentTarget.files ?? []));
-              event.currentTarget.value = "";
-            }}
-          />
-          <textarea
-            ref={input}
-            role={pickerOpen || slash.open ? "combobox" : undefined}
-            aria-expanded={pickerOpen || slash.open ? true : undefined}
-            aria-controls={pickerOpen ? pickerId : slash.open ? commandListId : undefined}
-            aria-activedescendant={
-              pickerOpen
-                ? optionId(pickerId, activeIndex)
-                : slash.open
-                  ? commandOptionId(commandListId, slash.active)
-                  : undefined
-            }
-            aria-autocomplete={pickerOpen || slash.open ? "list" : undefined}
-            className="chat-composer__input"
-            rows={1}
-            aria-label={label}
-            aria-describedby={composer.error ? `${hintId} ${errorId}` : hintId}
-            placeholder={label}
-            value={composer.text}
-            disabled={disabled}
-            onChange={(event) => {
-              composer.setText(event.target.value);
-              setCaret(event.target.selectionStart);
-              setActive(0);
-            }}
-            onSelect={(event) => {
-              setCaret(event.currentTarget.selectionStart);
-            }}
-            onKeyDown={onKeyDown}
-            onPaste={onPaste}
-          />
-          <button
-            type="submit"
-            className="chat-composer__icon"
-            aria-label={t("composer.send")}
-            data-tooltip={t("composer.send")}
-            disabled={disabled}
-          >
-            <Icon d={SEND_ICON} />
-          </button>
-        </div>
+            <div className="chat-composer__tools">
+              <ChatActionRow />
+              {inChannelTarget ? (
+                <PaperclipButton
+                  disabled={disabled}
+                  reason={
+                    fileChips.unavailable === null
+                      ? null
+                      : unavailableText(tP2p, fileChips.unavailable)
+                  }
+                  describedBy={reasonShown ? reasonId : undefined}
+                  onPick={(paths) => {
+                    void fileChips.addPaths(paths);
+                  }}
+                />
+              ) : null}
+              <button
+                type="button"
+                className="chat-composer__icon"
+                aria-label={t("composer.addImage")}
+                data-tooltip={t("composer.addImage")}
+                disabled={disabled}
+                onClick={() => fileInput.current?.click()}
+              >
+                <ComposerIcon d={IMAGE_ICON} />
+              </button>
+              <GifPicker
+                onSend={composer.sendLink}
+                disabled={disabled}
+                linkPreviews={linkPreviews}
+              />
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                hidden
+                multiple
+                onChange={(event) => {
+                  composer.addFiles(Array.from(event.currentTarget.files ?? []));
+                  event.currentTarget.value = "";
+                }}
+              />
+              <button
+                type="submit"
+                className="chat-composer__send"
+                aria-label={t("composer.send")}
+                // Stays focusable when there is nothing to send, so its state can be discovered.
+                aria-disabled={canSend ? undefined : true}
+              >
+                <ComposerIcon d={SEND_ICON} size={16} />
+                <span className="chat-composer__send-label">{t("composer.send")}</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          // Without the text-message permission there is no field to disable but a note: the
+          // bar turns into a locked line. Starting a share still works by voice, so the Apps
+          // button keeps its row (issue #596).
+          <div className="chat-composer__bar chat-composer__bar--locked">
+            <p className="chat-composer__locked">
+              <ComposerIcon d={LOCK_ICON} />
+              {blockedReason}
+            </p>
+            <div className="chat-composer__tools">{inChannelTarget ? <ChatActionRow /> : null}</div>
+          </div>
+        )}
         <p id={hintId} className="visually-hidden">
           {t("composer.hint")}
         </p>
