@@ -44,7 +44,9 @@ describe("CameraPreviewDialog", () => {
     const { dialog } = await openDialog();
     expect(within(dialog).getByText("Preview · nobody sees this yet")).toBeInTheDocument();
     expect(dialog).toHaveTextContent(/Only people in .+ see your camera/);
-    expect(within(dialog).getByRole("combobox", { name: "Camera" })).toHaveValue("mock-integrated");
+    expect(within(dialog).getByRole("combobox", { name: "Camera" })).toHaveTextContent(
+      "Integrated Webcam (720p)",
+    );
     expect((await api.cameraView())?.state).toBe("preview");
     expect(within(dialog).getByRole("radio", { name: "Blur" })).toBeChecked();
     const strength = within(dialog).getByRole("group", { name: "Blur strength" });

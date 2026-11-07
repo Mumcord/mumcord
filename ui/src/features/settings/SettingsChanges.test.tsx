@@ -191,7 +191,8 @@ describe("Privacy summary", () => {
     renderScreen();
     await openSection("Privacy & Connections");
     const card = screen.getByRole("region", { name: /^Privacy summary/ });
-    expect(card).toHaveTextContent("Direct connections can show your IP address");
+    // New installs go through the relay first (#590).
+    expect(card).toHaveTextContent("Your IP address stays hidden");
     expect(card).toHaveTextContent("History sync is");
     fireEvent.click(within(card).getByRole("button", { name: "Change: Private messages" }));
     expect(await screen.findByRole("tab", { name: "Chat & Notifications" })).toHaveAttribute(

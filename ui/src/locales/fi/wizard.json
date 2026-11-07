@@ -98,11 +98,10 @@
     "title": "Kuulostaako hyvältä?",
     "subtitle": "Valitse laitteesi ja sano jotain. Palkin pitäisi liikkua puhuessasi.",
     "talkLegend": "Miten haluat puhua?",
-    "tipLabel": "Tietoa: {{mode}}",
-    "voiceActivationHint": "Puhu vapaasti. Mumcord lähettää ääntä, kun puhut.",
-    "pushToTalkHint": "Pidä näppäintä painettuna puhuessasi. Paras meluisissa paikoissa.",
-    "keyRequired": "Valitse painapuhu-näppäin tai vaihda äänenaktivointiin.",
-    "notSure": "Etkö ole varma? Aloita äänenaktivoinnilla. Voit vaihtaa milloin tahansa pika-asetuksista."
+    "voiceActivationDesc": "Mikrofoni aukeaa, kun puhut. Ei mitään pidettävää tai painettavaa.",
+    "pushToTalkDesc": "Paras meluisiin tiloihin. Valitset näppäimen itse.",
+    "sensitivity": "Herkkyys",
+    "changeLater": "Voit muuttaa kaiken tämän myöhemmin kohdassa Asetukset → Puhe ja ääni."
   },
   "style": {
     "title": "Kuinka paljon haluat jakaa?",

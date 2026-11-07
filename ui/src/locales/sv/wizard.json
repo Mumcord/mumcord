@@ -98,11 +98,10 @@
     "title": "Låter det bra?",
     "subtitle": "Välj dina enheter och säg något. Stapeln ska röra sig medan du pratar.",
     "talkLegend": "Hur vill du prata?",
-    "tipLabel": "Om {{mode}}",
-    "voiceActivationHint": "Prata fritt. Mumcord skickar ljud när du talar.",
-    "pushToTalkHint": "Håll ned en tangent medan du talar. Bäst på bullriga platser.",
-    "keyRequired": "Välj en push-to-talk-tangent eller byt till röstaktivering.",
-    "notSure": "Osäker? Börja med röstaktivering. Du kan byta när som helst i snabbinställningarna."
+    "voiceActivationDesc": "Mikrofonen öppnas när du pratar. Inget att hålla in eller trycka på.",
+    "pushToTalkDesc": "Bäst i bullriga rum. Du väljer tangenten.",
+    "sensitivity": "Känslighet",
+    "changeLater": "Du kan ändra allt detta senare under Inställningar → Röst och ljud."
   },
   "style": {
     "title": "Hur mycket vill du dela?",

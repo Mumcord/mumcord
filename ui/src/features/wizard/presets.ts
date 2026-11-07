@@ -83,7 +83,7 @@ export const PRESETS: Readonly<Record<PresetId, Readonly<PresetValues>>> = {
     "privateMessages.allowCurrentChannel": true,
     "privateMessages.allowAccepted": true,
     "privateMessages.keepRequests": true,
-    p2pMode: "directRelay",
+    p2pMode: "relayFirst",
     linkPreviews: true,
     offerFullImages: true,
     loadFullImages: true,

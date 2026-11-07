@@ -98,11 +98,10 @@
     "title": "Zní to dobře?",
     "subtitle": "Vyberte svá zařízení a něco řekněte. Ukazatel by se měl při mluvení hýbat.",
     "talkLegend": "Jak chcete mluvit?",
-    "tipLabel": "O režimu {{mode}}",
-    "voiceActivationHint": "Mluvte volně. Mumcord vysílá zvuk, když mluvíte.",
-    "pushToTalkHint": "Při mluvení držte klávesu. Nejlepší na hlučných místech.",
-    "keyRequired": "Vyberte klávesu pro push-to-talk, nebo přepněte na aktivaci hlasem.",
-    "notSure": "Nejste si jistí? Začněte s aktivací hlasem. Kdykoli můžete přepnout v rychlém nastavení."
+    "voiceActivationDesc": "Mikrofon se otevře, když mluvíš. Nic nedržíš ani nemačkáš.",
+    "pushToTalkDesc": "Nejlepší do hlučných místností. Klávesu si vybereš.",
+    "sensitivity": "Citlivost",
+    "changeLater": "Vše můžeš později změnit v Nastavení → Hlas a zvuk."
   },
   "style": {
     "title": "Kolik chcete sdílet?",

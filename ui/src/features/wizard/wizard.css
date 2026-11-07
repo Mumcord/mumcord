@@ -554,3 +554,98 @@
     padding-inline: var(--space-4);
   }
 }
+
+/* ---- How do you want to talk? (#589): option cards with the chosen mode's choices nested ---- */
+
+.wizard-talk__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.wizard-talk__card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.wizard-talk__card[data-selected="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-bg-selected);
+  box-shadow: var(--shadow-glow);
+}
+
+/* The focus ring goes around the card, not the small radio inside it. */
+.wizard-talk__card:has(.wizard-talk__head input:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.wizard-talk__head input:focus-visible {
+  outline: none;
+}
+
+.wizard-talk__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.wizard-talk__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wizard-talk__desc {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Indented under the card's title, with a line marking what belongs to the chosen mode. */
+.wizard-talk__nested {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-inline-start: calc(1.25rem + var(--space-3));
+  padding-inline-start: var(--space-3);
+  border-inline-start: 2px solid var(--color-accent);
+}
+
+.wizard-talk__nested--plain {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+}
+
+.wizard-talk__nested .settings-radios__legend {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wizard-step .button--primary[aria-disabled="true"]:not([aria-busy="true"]) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (forced-colors: active) {
+  .wizard-talk__card[data-selected="true"] {
+    outline: 2px solid Highlight;
+  }
+
+  .wizard-talk__nested {
+    border-color: CanvasText;
+  }
+}

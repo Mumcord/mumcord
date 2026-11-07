@@ -8,6 +8,7 @@ import type { TFunction } from "i18next";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, type Settings, type SharePreview } from "../../../api";
+import { Select } from "../../../components/Select";
 import { loadSoundBlock, SOUND_NEEDS_KEYS, type SoundBlock } from "../soundSupport";
 import {
   CODECS,
@@ -28,6 +29,14 @@ import { useSharePreviews } from "./useSharePreviews";
 import "../../app/app.css";
 import "../../settings/settings.css";
 import "./shareStart.css";
+
+/** Joins the codec note and hint as sentences: the note texts carry no closing full stop (#591). */
+function sentences(lines: readonly (string | null)[]): string {
+  return lines
+    .filter((line) => line !== null)
+    .map((line) => (/[.!?]$/.test(line) ? line : `${line}.`))
+    .join(" ");
+}
 
 /** FR-7.35's defaults, used when the settings could not be read. */
 const DEFAULT_PICKS: StartPicks = {
@@ -217,26 +226,24 @@ function StartDialogContent({
             <label className="share-start__label" htmlFor={codecId}>
               {t("start.codec")}
             </label>
-            <select
+            <Select
               id={codecId}
-              className="settings-input settings-input--compact"
+              className="share-start__select"
               value={picks.codec}
-              aria-describedby={note !== null || hint !== null ? codecHintId : undefined}
-              onChange={(event) => {
-                const codec = CODECS.find((value) => value === event.target.value);
+              describedBy={note !== null || hint !== null ? codecHintId : undefined}
+              options={CODECS.map((value) => ({
+                value,
+                label: codecOptionLabel(t, value, previews[value]),
+              }))}
+              onChange={(next) => {
+                const codec = CODECS.find((value) => value === next);
                 if (codec !== undefined) setPicks((now) => ({ ...now, codec }));
               }}
-            >
-              {CODECS.map((value) => (
-                <option key={value} value={value}>
-                  {codecOptionLabel(t, value, previews[value])}
-                </option>
-              ))}
-            </select>
+            />
             {(note !== null || hint !== null) && (
               <span id={codecHintId} className="share-start__hint share-start__note">
                 <InfoIcon />
-                <span>{[note, hint].filter((line) => line !== null).join(" ")}</span>
+                <span>{sentences([note, hint])}</span>
               </span>
             )}
           </div>
@@ -244,21 +251,20 @@ function StartDialogContent({
             <label className="share-start__label" htmlFor={uploadId}>
               {t("start.uploadLimit")}
             </label>
-            <select
+            <Select
               id={uploadId}
-              className="settings-input settings-input--compact"
+              className="share-start__select"
               value={picks.choice.uploadLimit}
-              onChange={(event) => {
-                const uploadLimit = UPLOAD_LIMITS.find((value) => value === event.target.value);
+              options={UPLOAD_LIMITS.map((value) => ({
+                value,
+                label:
+                  value === "auto" ? t("start.uploadAuto") : t(`start.upload${value}` as const),
+              }))}
+              onChange={(next) => {
+                const uploadLimit = UPLOAD_LIMITS.find((value) => value === next);
                 if (uploadLimit !== undefined) pick({ uploadLimit });
               }}
-            >
-              {UPLOAD_LIMITS.map((value) => (
-                <option key={value} value={value}>
-                  {value === "auto" ? t("start.uploadAuto") : t(`start.upload${value}` as const)}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
         <div className="settings-switch share-start__switch">

@@ -114,7 +114,7 @@ export function RelayDataGroup() {
     (plugin) => asksForRelay(plugin) || plugin.source.kind === "official",
   );
   return (
-    <Group title={t("title")}>
+    <Group title={t("title")} icon="share">
       <Switch
         label={t("switchLabel")}
         checked={settings?.relayDataEnabled ?? true}

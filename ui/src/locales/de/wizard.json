@@ -98,11 +98,10 @@
     "title": "Klingt gut?",
     "subtitle": "Wähle deine Geräte und sag etwas. Der Balken sollte sich bewegen, während du sprichst.",
     "talkLegend": "Wie möchtest du sprechen?",
-    "tipLabel": "Über {{mode}}",
-    "voiceActivationHint": "Sprich einfach los. Mumcord sendet Audio, sobald du sprichst.",
-    "pushToTalkHint": "Halte eine Taste, während du sprichst. Am besten an lauten Orten.",
-    "keyRequired": "Wähle eine Push-to-Talk-Taste oder wechsle zur Sprachaktivierung.",
-    "notSure": "Unsicher? Beginne mit der Sprachaktivierung. Über die Schnelleinstellungen kannst du jederzeit wechseln."
+    "voiceActivationDesc": "Dein Mikrofon öffnet sich, wenn du sprichst. Nichts zu halten oder zu drücken.",
+    "pushToTalkDesc": "Am besten für laute Umgebungen. Du wählst die Taste.",
+    "sensitivity": "Empfindlichkeit",
+    "changeLater": "Du kannst all das später unter Einstellungen → Sprache & Audio ändern."
   },
   "style": {
     "title": "Wie viel möchtest du teilen?",

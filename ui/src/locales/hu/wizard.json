@@ -98,11 +98,10 @@
     "title": "Jól hangzik?",
     "subtitle": "Válaszd ki az eszközeidet, és mondj valamit. A csíknak mozognia kell, amíg beszélsz.",
     "talkLegend": "Hogyan szeretnél beszélni?",
-    "tipLabel": "Tudnivalók: {{mode}}",
-    "voiceActivationHint": "Beszélj szabadon. A Mumcord akkor küld hangot, amikor megszólalsz.",
-    "pushToTalkHint": "Beszéd közben tartsd lenyomva egy billentyűt. Zajos helyeken a legjobb.",
-    "keyRequired": "Válassz push-to-talk billentyűt, vagy válts hangaktiválásra.",
-    "notSure": "Nem vagy biztos benne? Kezdd a hangaktiválással. Bármikor válthatsz a gyorsbeállításokban."
+    "voiceActivationDesc": "A mikrofon akkor nyílik meg, amikor beszélsz. Nem kell semmit nyomva tartani.",
+    "pushToTalkDesc": "Zajos helyekre a legjobb. Te választod a billentyűt.",
+    "sensitivity": "Érzékenység",
+    "changeLater": "Mindezt később módosíthatod a Beállítások → Hang és audió menüben."
   },
   "style": {
     "title": "Mennyit szeretnél megosztani?",

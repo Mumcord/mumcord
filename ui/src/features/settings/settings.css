@@ -244,7 +244,8 @@
 .settings-page__cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
-  align-items: start;
+  /* Cards side by side are equally tall; their content stays at the top (#585). */
+  align-items: stretch;
   gap: var(--space-4);
 }
 
@@ -471,6 +472,12 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+}
+
+/* A long label wraps its own text and leaves room for the "?" after it, instead of pushing the
+   "?" onto a line of its own (#585). */
+.settings-switch__text > label {
+  max-width: calc(100% - 3 * var(--space-2) - 1.25rem);
 }
 
 .settings-control-row > .select,
@@ -1224,10 +1231,13 @@
   font-size: var(--font-size-sm);
 }
 
+/* Label left, status right. A long status keeps to the right edge: it wraps right-aligned, or
+   moves below the label when the row is too narrow for both (#583). */
 .settings-hwlist__row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-1) var(--space-3);
   color: var(--color-text-secondary);
 }
 
@@ -1235,7 +1245,10 @@
   display: inline-flex;
   gap: var(--space-1);
   align-items: center;
+  justify-content: flex-end;
+  margin-inline-start: auto;
   color: var(--color-text-muted);
+  text-align: end;
 }
 
 .settings-hwlist__value[data-ok] {

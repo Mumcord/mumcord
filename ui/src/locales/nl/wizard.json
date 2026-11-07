@@ -98,11 +98,10 @@
     "title": "Klinkt het goed?",
     "subtitle": "Kies je apparaten en zeg iets. De balk moet bewegen terwijl je praat.",
     "talkLegend": "Hoe wil je praten?",
-    "tipLabel": "Over {{mode}}",
-    "voiceActivationHint": "Praat vrijuit. Mumcord verstuurt audio zodra je spreekt.",
-    "pushToTalkHint": "Houd een toets ingedrukt terwijl je spreekt. Het best op rumoerige plekken.",
-    "keyRequired": "Kies een push-to-talk-toets of schakel over op spraakactivering.",
-    "notSure": "Niet zeker? Begin met spraakactivering. Je kunt altijd wisselen via de snelle instellingen."
+    "voiceActivationDesc": "Je microfoon gaat open als je praat. Niets vast te houden of in te drukken.",
+    "pushToTalkDesc": "Het beste voor lawaaiige ruimtes. Jij kiest de toets.",
+    "sensitivity": "Gevoeligheid",
+    "changeLater": "Je kunt dit allemaal later wijzigen in Instellingen → Spraak en audio."
   },
   "style": {
     "title": "Hoeveel wil je delen?",

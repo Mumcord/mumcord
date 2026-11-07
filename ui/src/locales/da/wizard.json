@@ -98,11 +98,10 @@
     "title": "Lyder det godt?",
     "subtitle": "Vælg dine enheder og sig noget. Bjælken bør bevæge sig, mens du taler.",
     "talkLegend": "Hvordan vil du tale?",
-    "tipLabel": "Om {{mode}}",
-    "voiceActivationHint": "Tal frit. Mumcord sender lyd, når du taler.",
-    "pushToTalkHint": "Hold en tast nede, mens du taler. Bedst på støjende steder.",
-    "keyRequired": "Vælg en push-to-talk-tast, eller skift til stemmeaktivering.",
-    "notSure": "Er du i tvivl? Start med stemmeaktivering. Du kan til enhver tid skifte fra hurtigindstillingerne."
+    "voiceActivationDesc": "Din mikrofon åbner, når du taler. Intet at holde eller trykke på.",
+    "pushToTalkDesc": "Bedst til larmende rum. Du vælger tasten.",
+    "sensitivity": "Følsomhed",
+    "changeLater": "Du kan ændre alt dette senere under Indstillinger → Tale og lyd."
   },
   "style": {
     "title": "Hvor meget vil du dele?",

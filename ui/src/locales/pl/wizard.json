@@ -98,11 +98,10 @@
     "title": "Brzmi dobrze?",
     "subtitle": "Wybierz urządzenia i powiedz coś. Pasek powinien się poruszać, gdy mówisz.",
     "talkLegend": "Jak chcesz mówić?",
-    "tipLabel": "O: {{mode}}",
-    "voiceActivationHint": "Mów swobodnie. Mumcord wysyła dźwięk, gdy zaczynasz mówić.",
-    "pushToTalkHint": "Przytrzymaj klawisz, gdy mówisz. Najlepsze w hałaśliwych miejscach.",
-    "keyRequired": "Wybierz klawisz push-to-talk albo przełącz się na aktywację głosem.",
-    "notSure": "Nie masz pewności? Zacznij od aktywacji głosem. W każdej chwili możesz to zmienić w szybkich ustawieniach."
+    "voiceActivationDesc": "Mikrofon włącza się, gdy mówisz. Nic nie trzeba trzymać ani naciskać.",
+    "pushToTalkDesc": "Najlepsze do głośnych miejsc. Klawisz wybierasz sam.",
+    "sensitivity": "Czułość",
+    "changeLater": "Wszystko to możesz później zmienić w Ustawienia → Głos i dźwięk."
   },
   "style": {
     "title": "Ile chcesz udostępniać?",

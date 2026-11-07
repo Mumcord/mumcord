@@ -9,6 +9,9 @@
 
 ### Changed
 
+- Radio buttons and checkboxes have Mumcord's own design everywhere: a ring with a lilac dot and a rounded box with a lilac check, with a clear focus ring and high-contrast support. Option cards such as "Private messages from" highlight the whole card
+- Setup wizard, "How do you want to talk?": two clear cards with a short explanation, the sensitivity choice nested under voice activation, and the push-to-talk key right in its card; Continue waits until a key is set
+- Peer-to-peer: "Direct + relay (always relay, hides my IP)" is now the recommended mode and the default for new installs, and the Balanced setup style uses it. A mode you already use stays as it is
 - The hint "This server has no relay, so file sharing isn't available." can be closed per server; it comes back when the server gets a relay and loses it again
 - "Bots on this server" starts collapsed; once you open or close it, Mumcord remembers that
 - Plugins strip: plugin icons have no frame anymore; a plugin's own image or its colour tile is the whole icon, with a ring on hover, focus and when open
@@ -18,9 +21,10 @@
 
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
-
-### Fixed
-
+- Settings: cards side by side are equally tall, and a "?" stays next to its long label instead of wrapping onto its own line
+- Settings → Screen sharing → Hardware acceleration: a long status such as "Software, keeps up to 1080p30" stays right-aligned
+- Camera and screen share dialogs: the dropdowns use the app's own design like in Settings, and the codec note ends its sentence before the next one starts
+- Settings → Plugins: the cards have the same gap as on the other pages, every card has its icon, and the "Output level (debug)" meter only shows in development builds
 - The Members / Activity tabs now stay in place at the top of the right column when a long list scrolls
 
 ## [0.7.1] - 2026-11-07

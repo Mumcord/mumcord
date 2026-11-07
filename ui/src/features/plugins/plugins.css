@@ -77,6 +77,11 @@
   width: 100%;
 }
 
+/* The cards below the tabs keep the gap of every other Settings page (#587). */
+.plugins-section > .settings-group {
+  margin-top: var(--space-4);
+}
+
 .plugins-tab {
   display: inline-flex;
   align-items: center;
