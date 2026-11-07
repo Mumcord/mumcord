@@ -1,6 +1,7 @@
 @import "@fontsource-variable/instrument-sans";
 @import "@fontsource-variable/bricolage-grotesque";
 @import "./tokens.css";
+@import "./controls.css";
 
 /* Root size stays at the browser default (100%) so the OS/user font size scales every rem. */
 html {

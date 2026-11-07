@@ -98,11 +98,10 @@
     "title": "An bhfuil sé go maith?",
     "subtitle": "Roghnaigh do ghléasanna agus abair rud éigin. Ba chóir don bharra bogadh agus tú ag labhairt.",
     "talkLegend": "Cén chaoi a bhfuil tú ag iarraidh labhairt?",
-    "tipLabel": "Maidir le {{mode}}",
-    "voiceActivationHint": "Labhair go saor. Seolann Mumcord fuaim nuair a labhraíonn tú.",
-    "pushToTalkHint": "Coinnigh eochair síos agus tú ag labhairt. Is fearr in áiteanna torannacha.",
-    "keyRequired": "Roghnaigh eochair brúigh-chun-labhairt nó athraigh go gníomhachtú gutha.",
-    "notSure": "Gan bheith cinnte? Tosaigh le gníomhachtú gutha. Is féidir leat athrú am ar bith ó na socruithe tapa."
+    "voiceActivationDesc": "Osclaíonn do mhicreafón nuair a labhraíonn tú. Níl aon rud le coinneáil ná le brú.",
+    "pushToTalkDesc": "Is fearr do sheomraí glórmhara. Roghnaíonn tú an eochair.",
+    "sensitivity": "Íogaireacht",
+    "changeLater": "Is féidir leat é seo go léir a athrú níos déanaí i Socruithe → Guth agus fuaim."
   },
   "style": {
     "title": "Cé mhéad atá tú ag iarraidh a chomhroinnt?",

@@ -98,11 +98,10 @@
     "title": "Soa bem?",
     "subtitle": "Escolhe os teus dispositivos e diz alguma coisa. A barra deve mexer-se enquanto falas.",
     "talkLegend": "Como queres falar?",
-    "tipLabel": "Sobre {{mode}}",
-    "voiceActivationHint": "Fala à vontade. O Mumcord envia áudio quando falas.",
-    "pushToTalkHint": "Mantém uma tecla premida enquanto falas. O melhor em sítios ruidosos.",
-    "keyRequired": "Escolhe uma tecla de push-to-talk ou muda para a ativação por voz.",
-    "notSure": "Não tens a certeza? Começa com a ativação por voz. Podes mudar a qualquer momento nas definições rápidas."
+    "voiceActivationDesc": "O teu microfone abre quando falas. Nada para manter ou premir.",
+    "pushToTalkDesc": "Ideal para sítios barulhentos. Tu escolhes a tecla.",
+    "sensitivity": "Sensibilidade",
+    "changeLater": "Podes alterar tudo isto mais tarde em Definições → Voz e áudio."
   },
   "style": {
     "title": "Quanto queres partilhar?",

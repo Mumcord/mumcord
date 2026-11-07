@@ -98,11 +98,10 @@
     "title": "Znie to dobre?",
     "subtitle": "Vyber si zariadenia a niečo povedz. Pruh by sa mal pohybovať, keď hovoríš.",
     "talkLegend": "Ako chceš hovoriť?",
-    "tipLabel": "O: {{mode}}",
-    "voiceActivationHint": "Hovor voľne. Mumcord odosiela zvuk, keď hovoríš.",
-    "pushToTalkHint": "Pri hovorení drž stlačený kláves. Najlepšie na hlučných miestach.",
-    "keyRequired": "Vyber kláves push to talk alebo prepni na aktiváciu hlasom.",
-    "notSure": "Nie si si istý? Začni s aktiváciou hlasom. Kedykoľvek ju môžeš prepnúť v rýchlych nastaveniach."
+    "voiceActivationDesc": "Mikrofón sa otvorí, keď hovoríš. Nič nedržíš ani nestláčaš.",
+    "pushToTalkDesc": "Najlepšie do hlučných miestností. Kláves si vyberieš sám.",
+    "sensitivity": "Citlivosť",
+    "changeLater": "Všetko to môžeš neskôr zmeniť v Nastavenia → Hlas a zvuk."
   },
   "style": {
     "title": "Koľko chceš zdieľať?",

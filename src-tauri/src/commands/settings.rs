@@ -1571,7 +1571,7 @@ mod tests {
         assert!(ui.visual_effects && ui.show_weak_connection_icon);
         assert!(!ui.hide_empty_channels && !ui.talking_first);
         assert_eq!(ui.allow_direct_connections, Consent::Unset);
-        assert_eq!(ui.p2p_mode, P2pMode::DirectRelay);
+        assert_eq!(ui.p2p_mode, P2pMode::RelayFirst);
         assert_eq!(ui.update_check, Consent::Unset);
 
         ui.max_connected_servers = 40;

@@ -502,9 +502,10 @@ pub enum Consent {
 #[serde(rename_all = "snake_case")]
 pub enum P2pMode {
     /// Direct first, relay when direct fails.
-    #[default]
     DirectRelay,
     /// Always the relay when one is announced, so the other person never sees this IP address.
+    /// The default for new installs (#590).
+    #[default]
     RelayFirst,
     DirectOnly,
     RelayOnly,
@@ -1072,7 +1073,7 @@ impl Default for Settings {
             talking_first: false,
             show_weak_connection_icon: true,
             allow_direct_connections: Consent::Unset,
-            p2p_mode: P2pMode::DirectRelay,
+            p2p_mode: P2pMode::default(),
             update_check: Consent::Unset,
             update_auto_download: false,
             update_interval_hours: DEFAULT_UPDATE_INTERVAL_HOURS,
@@ -1197,10 +1198,15 @@ impl Store {
             Some(json) => {
                 let mut settings: Settings = settings_compat::decode(&json)?;
                 settings.legacy_window_overlay_enabled |= legacy_window_overlay_enabled(&json);
-                if !has_key(&json, "p2p_mode") && settings.allow_direct_connections == Consent::No {
+                if !has_key(&json, "p2p_mode") {
                     // FR-4.6: whoever refused direct connections before the relay existed keeps
-                    // their IP address hidden; `yes` and unset stay on the default.
-                    settings.p2p_mode = P2pMode::RelayOnly;
+                    // their IP address hidden. Everyone else keeps "direct first", the default
+                    // when they installed; only new installs start with "relay first" (#590).
+                    settings.p2p_mode = if settings.allow_direct_connections == Consent::No {
+                        P2pMode::RelayOnly
+                    } else {
+                        P2pMode::DirectRelay
+                    };
                 }
                 if settings.music_quality && !has_key(&json, "bitrate_kbps") {
                     // Music quality used to lift the cap; keep those users at "Max".
@@ -1495,11 +1501,12 @@ mod tests {
     }
 
     #[test]
-    fn p2p_mode_defaults_to_direct_relay_and_round_trips() {
+    fn p2p_mode_defaults_to_relay_first_and_round_trips() {
+        // A new install has no saved settings yet (#590).
         let (_dir, store) = temp_store();
         assert_eq!(
             store.settings().expect("load").p2p_mode,
-            P2pMode::DirectRelay
+            P2pMode::RelayFirst
         );
         for mode in [
             P2pMode::DirectRelay,
@@ -1554,6 +1561,12 @@ mod tests {
         assert_eq!(unset.p2p_mode, P2pMode::DirectRelay);
         assert_eq!(unset.allow_direct_connections, Consent::Unset);
         assert_eq!(load_raw("{}").p2p_mode, P2pMode::DirectRelay);
+    }
+
+    #[test]
+    fn new_installs_start_with_relay_first() {
+        // #590
+        assert_eq!(Settings::default().p2p_mode, P2pMode::RelayFirst);
     }
 
     #[test]

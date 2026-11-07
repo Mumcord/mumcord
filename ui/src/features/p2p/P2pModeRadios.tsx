@@ -5,7 +5,7 @@ import { useIsChanged } from "../settings/components/changedSettings";
 import { ChangedBadge, RecommendedBadge } from "../settings/components/SettingBadges";
 import "./p2p.css";
 
-/** The five modes in the order of FR-4.1; the first one is the default. */
+/** The five modes in the order of FR-4.1; "relay first" is the default for new installs (#590). */
 const P2P_MODES: readonly P2pMode[] = [
   "directRelay",
   "relayFirst",
@@ -14,7 +14,7 @@ const P2P_MODES: readonly P2pMode[] = [
   "off",
 ];
 
-const RECOMMENDED: P2pMode = "directRelay";
+const RECOMMENDED: P2pMode = "relayFirst";
 const GLOBAL = "global";
 
 interface P2pModeRadiosProps {

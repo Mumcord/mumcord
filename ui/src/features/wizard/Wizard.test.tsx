@@ -259,8 +259,11 @@ describe("Wizard (first start)", () => {
     renderInWizard(harness, <Wizard />);
     await toVoice();
     fireEvent.click(screen.getByRole("radio", { name: /Push-to-talk/ }));
+    // Without a key the card says why and Next does nothing (#589).
+    expect(screen.getByText(/Set a key, otherwise nobody can hear you/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Next/ })).toHaveAttribute("aria-disabled", "true");
     click("Next");
-    expect(await screen.findByText(/Choose a push-to-talk key/)).toHaveAttribute("role", "alert");
+    expect(screen.getByRole("heading", { name: /Sound good/ })).toBeInTheDocument();
     const capture = screen.getByRole("button", { name: "Set key" });
     fireEvent.click(capture);
     fireEvent.keyDown(capture, { key: "F8", code: "F8", shiftKey: true });

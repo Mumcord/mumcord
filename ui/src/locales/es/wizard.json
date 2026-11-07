@@ -98,11 +98,10 @@
     "title": "¿Suena bien?",
     "subtitle": "Elige tus dispositivos y di algo. La barra debería moverse mientras hablas.",
     "talkLegend": "¿Cómo quieres hablar?",
-    "tipLabel": "Acerca de {{mode}}",
-    "voiceActivationHint": "Habla con libertad. Mumcord envía audio cuando hablas.",
-    "pushToTalkHint": "Mantén pulsada una tecla mientras hablas. Lo mejor en lugares ruidosos.",
-    "keyRequired": "Elige una tecla de pulsar para hablar o cambia a activación por voz.",
-    "notSure": "¿No estás seguro? Empieza con la activación por voz. Puedes cambiar en cualquier momento desde los ajustes rápidos."
+    "voiceActivationDesc": "Tu micrófono se abre cuando hablas. Nada que mantener ni pulsar.",
+    "pushToTalkDesc": "Lo mejor para sitios ruidosos. Tú eliges la tecla.",
+    "sensitivity": "Sensibilidad",
+    "changeLater": "Puedes cambiar todo esto más tarde en Ajustes → Voz y audio."
   },
   "style": {
     "title": "¿Cuánto quieres compartir?",

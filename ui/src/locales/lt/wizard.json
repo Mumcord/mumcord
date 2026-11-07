@@ -98,11 +98,10 @@
     "title": "Skamba gerai?",
     "subtitle": "Pasirinkite įrenginius ir ką nors pasakykite. Kalbant juosta turėtų judėti.",
     "talkLegend": "Kaip norite kalbėti?",
-    "tipLabel": "Apie režimą „{{mode}}“",
-    "voiceActivationHint": "Kalbėkite laisvai. „Mumcord“ siunčia garsą, kai kalbate.",
-    "pushToTalkHint": "Kalbėdami laikykite nuspaudę klavišą. Geriausia triukšmingose vietose.",
-    "keyRequired": "Pasirinkite „push-to-talk“ klavišą arba perjunkite į balso aktyvavimą.",
-    "notSure": "Nesate tikri? Pradėkite nuo balso aktyvavimo. Bet kada galite perjungti sparčiuosiuose nustatymuose."
+    "voiceActivationDesc": "Mikrofonas įsijungia, kai kalbi. Nieko nereikia laikyti ar spausti.",
+    "pushToTalkDesc": "Geriausia triukšmingoms patalpoms. Klavišą pasirenki pats.",
+    "sensitivity": "Jautrumas",
+    "changeLater": "Visa tai vėliau gali pakeisti: Nustatymai → Balsas ir garsas."
   },
   "style": {
     "title": "Kiek norite bendrinti?",

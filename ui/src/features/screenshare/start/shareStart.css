@@ -235,3 +235,9 @@
     border-color: CanvasText;
   }
 }
+
+/* The themed dropdown fills its field like the other inputs (#591). */
+.share-start__select {
+  width: 100%;
+  min-width: 0;
+}
