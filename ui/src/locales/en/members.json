@@ -103,8 +103,7 @@
     "talkingOne": "{{name}} is talking",
     "talkingTwo": "{{first}} and {{second}} are talking",
     "talkingMore_one": "{{name}} and {{count}} other are talking",
-    "talkingMore_other": "{{name}} and {{count}} others are talking",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} and {{count}} others are talking"
   },
   "revokeConsent": {
     "title": "Revoke chat consent for {{name}}?",

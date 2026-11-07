@@ -103,8 +103,7 @@
     "talkingOne": "{{name}} beszél",
     "talkingTwo": "{{first}} és {{second}} beszél",
     "talkingMore_one": "{{name}} és még {{count}} fő beszél",
-    "talkingMore_other": "{{name}} és még {{count}} fő beszél",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} és még {{count}} fő beszél"
   },
   "revokeConsent": {
     "title": "Visszavonod a csevegési hozzájárulást {{name}} számára?",

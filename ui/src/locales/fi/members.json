@@ -103,8 +103,7 @@
     "talkingOne": "{{name}} puhuu",
     "talkingTwo": "{{first}} ja {{second}} puhuvat",
     "talkingMore_one": "{{name}} ja {{count}} muu puhuvat",
-    "talkingMore_other": "{{name}} ja {{count}} muuta puhuvat",
-    "shortcut": "Ctrl+Vaihto+M"
+    "talkingMore_other": "{{name}} ja {{count}} muuta puhuvat"
   },
   "revokeConsent": {
     "title": "Perutaanko keskustelusuostumus käyttäjältä {{name}}?",

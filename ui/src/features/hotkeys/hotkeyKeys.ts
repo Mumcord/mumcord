@@ -14,9 +14,40 @@ export function canonicalCombo(combo: string): string {
   return [...parts, single ? single[1] : key].join("+");
 }
 
+/** Named keys that read better as their symbol than as their name. */
+const KEY_SYMBOLS: Partial<Record<string, string>> = { Comma: "," };
+
 /** The parts of a stored key for one `<kbd>` each; "Super" reads as "Cmd" on macOS. */
 export function keyParts(key: string, macos: boolean): string[] {
-  return key.split("+").map((part) => (macos && part === "Super" ? "Cmd" : part));
+  return key
+    .split("+")
+    .map((part) => (macos && part === "Super" ? "Cmd" : (KEY_SYMBOLS[part] ?? part)));
+}
+
+/** Modifier symbols of macOS shortcut hints, as the menus and tooltips write them. */
+const MACOS_SYMBOLS: Partial<Record<string, string>> = {
+  Ctrl: "⌃",
+  Alt: "⌥",
+  Shift: "⇧",
+  Super: "⌘",
+};
+
+/** A stored key as one line of text: "Ctrl+Shift+M", or "⌘⇧M" on macOS. */
+export function keyHint(key: string, macos: boolean): string {
+  if (!macos) return keyParts(key, false).join("+");
+  return key
+    .split("+")
+    .map((part) => MACOS_SYMBOLS[part] ?? KEY_SYMBOLS[part] ?? part)
+    .join("");
+}
+
+/** A stored key as `aria-keyshortcuts` writes it ("Ctrl+Shift+M" → "Control+Shift+M"). */
+export function ariaShortcut(key: string): string {
+  const names: Partial<Record<string, string>> = { Ctrl: "Control", Super: "Meta" };
+  return key
+    .split("+")
+    .map((part) => names[part] ?? KEY_SYMBOLS[part] ?? part)
+    .join("+");
 }
 
 /** Two actions are the same hotkey row (a "switch to channel" row per channel). */

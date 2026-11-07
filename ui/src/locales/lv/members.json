@@ -107,8 +107,7 @@
     "talkingTwo": "{{first}} un {{second}} runā",
     "talkingMore_zero": "{{name}} un vēl {{count}} runā",
     "talkingMore_one": "{{name}} un vēl {{count}} runā",
-    "talkingMore_other": "{{name}} un vēl {{count}} runā",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} un vēl {{count}} runā"
   },
   "revokeConsent": {
     "title": "Atsaukt tērzēšanas piekrišanu lietotājam {{name}}?",

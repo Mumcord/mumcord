@@ -107,8 +107,7 @@
     "talkingTwo": "{{first}} și {{second}} vorbesc",
     "talkingMore_one": "{{name}} și încă {{count}} persoană vorbesc",
     "talkingMore_few": "{{name}} și încă {{count}} persoane vorbesc",
-    "talkingMore_other": "{{name}} și încă {{count}} de persoane vorbesc",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} și încă {{count}} de persoane vorbesc"
   },
   "revokeConsent": {
     "title": "Retragi acordul pentru chat cu {{name}}?",

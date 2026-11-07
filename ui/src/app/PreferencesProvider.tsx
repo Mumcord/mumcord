@@ -80,6 +80,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         | "videoDuckingPercent"
         | "globalHotkeys"
         | "hotkeys"
+        | "pttKey"
+        | "cameraHotkey"
         | "cameraMirrorSelf"
         | "cameraReduceMotion"
         | HintPreference

@@ -111,8 +111,7 @@
     "talkingMore_one": "{{name}} a {{count}} ďalší hovoria",
     "talkingMore_few": "{{name}} a {{count}} ďalší hovoria",
     "talkingMore_many": "{{name}} a {{count}} ďalších hovorí",
-    "talkingMore_other": "{{name}} a {{count}} ďalších hovorí",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} a {{count}} ďalších hovorí"
   },
   "revokeConsent": {
     "title": "Odvolať súhlas s četom pre {{name}}?",

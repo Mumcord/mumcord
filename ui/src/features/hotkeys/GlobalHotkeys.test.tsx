@@ -16,7 +16,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  setHotkeySettings({ globalHotkeys: true, hotkeys: [] });
+  setHotkeySettings({ globalHotkeys: true, hotkeys: [], pttKey: null, cameraHotkey: null });
   setApi(undefined);
 });
 
@@ -40,6 +40,8 @@ describe("global hotkeys (#64)", () => {
     setHotkeySettings({
       globalHotkeys: false,
       hotkeys: [{ key: "Ctrl+F7", action: { kind: "toggleDnd" } }],
+      pttKey: null,
+      cameraHotkey: null,
     });
     const { container, rerender } = render(
       <>
@@ -67,10 +69,68 @@ describe("global hotkeys (#64)", () => {
     setHotkeySettings({
       globalHotkeys: true,
       hotkeys: [{ key: "Ctrl+F7", action: { kind: "toggleDnd" } }],
+      pttKey: null,
+      cameraHotkey: null,
     });
     render(<GlobalHotkeys overlayOpen={false} />);
     fireEvent.keyDown(document.body, { code: "F7", key: "F7", ctrlKey: true });
     expect(dndSet).not.toHaveBeenCalled();
+  });
+
+  it("runs a default in the window while the engine holds the user's own keys (#584)", async () => {
+    const toggleColumn = vi.fn();
+    const dndSet = vi.spyOn(api, "dndSet");
+    const off = onUiHotkey("toggleMemberColumn", toggleColumn);
+    setHotkeySettings({
+      globalHotkeys: true,
+      hotkeys: [{ key: "Ctrl+F7", action: { kind: "toggleDnd" } }],
+      pttKey: null,
+      cameraHotkey: null,
+    });
+    render(<GlobalHotkeys overlayOpen={false} />);
+    fireEvent.keyDown(document.body, { code: "KeyU", key: "u", ctrlKey: true, shiftKey: true });
+    await waitFor(() => {
+      expect(toggleColumn).toHaveBeenCalledTimes(1);
+    });
+    // The user's own key stays with the engine: pressed here, it does nothing twice.
+    fireEvent.keyDown(document.body, { code: "F7", key: "F7", ctrlKey: true });
+    expect(dndSet).not.toHaveBeenCalled();
+    off();
+  });
+
+  it("runs only defaults that no other key uses (#584)", async () => {
+    const toggleColumn = vi.fn();
+    const dndSet = vi.spyOn(api, "dndSet");
+    const off = onUiHotkey("toggleMemberColumn", toggleColumn);
+    // Ctrl+Shift+U is the member column's default, but the user gave it to Do Not Disturb.
+    setHotkeySettings({
+      globalHotkeys: false,
+      hotkeys: [{ key: "Ctrl+Shift+U", action: { kind: "toggleDnd" } }],
+      pttKey: null,
+      cameraHotkey: null,
+    });
+    render(<GlobalHotkeys overlayOpen={false} />);
+    fireEvent.keyDown(document.body, { code: "KeyU", key: "u", ctrlKey: true, shiftKey: true });
+    await waitFor(() => {
+      expect(dndSet).toHaveBeenCalledTimes(1);
+    });
+    expect(toggleColumn).not.toHaveBeenCalled();
+    off();
+  });
+
+  it("hands the camera default to the engine's camera (#584)", async () => {
+    const view = vi.spyOn(api, "cameraView");
+    setHotkeySettings({
+      globalHotkeys: true,
+      hotkeys: [],
+      pttKey: null,
+      cameraHotkey: null,
+    });
+    render(<GlobalHotkeys overlayOpen={false} />);
+    fireEvent.keyDown(document.body, { code: "KeyC", key: "c", ctrlKey: true, shiftKey: true });
+    await waitFor(() => {
+      expect(view).toHaveBeenCalled();
+    });
   });
 
   it("turns key presses into the stored key form", () => {

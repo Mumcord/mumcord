@@ -115,8 +115,7 @@
     "talkingMore_two": "Tá {{name}} agus {{count}} eile ag caint",
     "talkingMore_few": "Tá {{name}} agus {{count}} eile ag caint",
     "talkingMore_many": "Tá {{name}} agus {{count}} eile ag caint",
-    "talkingMore_other": "Tá {{name}} agus {{count}} eile ag caint",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "Tá {{name}} agus {{count}} eile ag caint"
   },
   "revokeConsent": {
     "title": "An gcúlghairfear an toiliú comhrá do {{name}}?",

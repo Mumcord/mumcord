@@ -2736,7 +2736,7 @@ export type Identity = {
 
 /**  Mumcord's own window shortcuts, which a global hotkey would swallow. */
 export type InAppShortcut = 
-/**  Ctrl+Shift+M: show or hide the member column. */
+/**  Ctrl+Shift+U: show or hide the member column. */
 "memberColumn" | 
 /**  Ctrl+Shift+N: the notification centre. */
 "notificationCentre" | 

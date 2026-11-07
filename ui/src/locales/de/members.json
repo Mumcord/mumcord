@@ -103,8 +103,7 @@
     "talkingOne": "{{name}} spricht",
     "talkingTwo": "{{first}} und {{second}} sprechen",
     "talkingMore_one": "{{name}} und {{count}} weitere sprechen",
-    "talkingMore_other": "{{name}} und {{count}} weitere sprechen",
-    "shortcut": "Strg+Umschalt+M"
+    "talkingMore_other": "{{name}} und {{count}} weitere sprechen"
   },
   "revokeConsent": {
     "title": "Chat-Zustimmung für {{name}} widerrufen?",

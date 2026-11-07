@@ -111,8 +111,7 @@
     "talkingMore_one": "{{name}} i {{count}} inna osoba mówią",
     "talkingMore_few": "{{name}} i {{count}} inne osoby mówią",
     "talkingMore_many": "{{name}} i {{count}} innych osób mówi",
-    "talkingMore_other": "{{name}} i {{count}} innych osób mówi",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} i {{count}} innych osób mówi"
   },
   "revokeConsent": {
     "title": "Cofnąć zgodę na czat dla {{name}}?",

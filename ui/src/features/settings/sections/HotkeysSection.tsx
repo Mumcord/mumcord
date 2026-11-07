@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   getApi,
@@ -12,8 +12,16 @@ import {
   type WhisperSetup,
   type WhisperTarget,
 } from "../../../api";
+import { useIsMacos } from "../../../api/useIsMacos";
 import { Select } from "../../../components/Select";
 import { useServers as useConnectedServers } from "../../channels/serverStore";
+import {
+  CAMERA_ACTION,
+  defaultKey,
+  resolveDefaults,
+  type DefaultBlock,
+  type DefaultableAction,
+} from "../../hotkeys/defaultHotkeys";
 import { channelPath } from "../../hotkeys/runHotkey";
 import { sameAction } from "../../hotkeys/hotkeyKeys";
 import { displayName } from "../../servers/format";
@@ -58,9 +66,20 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
   const [adding, setAdding] = useState<HotkeyAction | null>(null);
   const [whisper, setWhisper] = useState<WhisperSetup | null>(null);
   const navigation = useSettingsNavigation();
+  const macos = useIsMacos();
   /** Conflicts waiting for "Assign here", by key. */
   const [pending] = useState(() => new Map<string, HotkeyConflict>());
   const { hotkeys, globalHotkeys } = settings;
+  const defaults = useMemo(
+    () =>
+      resolveDefaults({
+        macos,
+        hotkeys,
+        pttKey: settings.pttKey,
+        cameraHotkey: settings.cameraHotkey,
+      }),
+    [macos, hotkeys, settings.pttKey, settings.cameraHotkey],
+  );
 
   useEffect(() => {
     getApi()
@@ -92,6 +111,32 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
   }, [hotkeys, globalHotkeys]);
 
   const actionName = (action: HotkeyAction) => t(`hotkeys.action.${action.kind}`);
+  /** What already has the key of an off default, in words. */
+  const blockOwner = (reason: DefaultBlock): string => {
+    switch (reason.kind) {
+      case "inApp":
+        return t(`hotkeys.inAppShortcut.${reason.shortcut}`);
+      case "pushToTalk":
+        return t("hotkeys.action.pushToTalk");
+      case "camera":
+        return t("hotkeys.camera");
+      case "other":
+        return actionName(reason.action);
+    }
+  };
+  /** The row props of an action's default (issue #584): its key, or "Default: none", and why it is off. */
+  const defaultProps = (action: DefaultableAction) => {
+    const note = defaults.blocked.get(action);
+    return {
+      defaultKey: defaultKey(action, macos),
+      defaultNote:
+        note === undefined
+          ? null
+          : note.reason.kind === "inApp"
+            ? t("hotkeys.defaultBlockedInApp", { shortcut: blockOwner(note.reason) })
+            : t("hotkeys.defaultBlockedOther", { other: blockOwner(note.reason) }),
+    };
+  };
   const conflictName = (conflict: HotkeyConflict): PendingConflict["other"] => {
     switch (conflict.kind) {
       case "pushToTalk":
@@ -239,6 +284,7 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
         label={target.name}
         description={whisperSummary(target)}
         value={target.hotkey}
+        own={target.hotkey !== null}
         warning={
           whisper?.failedKeys.includes(target.id) === true ? t("voice.whisper.keyFailed") : null
         }
@@ -260,6 +306,10 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
     const index = hotkeys.findIndex((h) => sameAction(h.action, action));
     const slot: HotkeySlot = index >= 0 ? { kind: "hotkey", index } : { kind: "new" };
     const assign = assignAction(action);
+    const own = hotkeys[index]?.key ?? null;
+    const kind = action.kind;
+    // A "switch to channel" row is an extra action of the user's: it has no default.
+    const fallback = kind === "switchChannel" ? null : defaults.active.get(kind);
     return (
       <HotkeyRow
         key={
@@ -269,13 +319,18 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
         }
         label={actionName(action)}
         description={description}
-        value={hotkeys[index]?.key ?? null}
+        value={own ?? fallback ?? null}
+        own={own !== null}
+        {...(kind === "switchChannel" ? {} : defaultProps(kind))}
         warning={index >= 0 ? failedWarning(index) : null}
         onCapture={(combo) => capture(combo, slot, assign)}
         onAssign={(conflict) => {
           assignPending(assign, conflict);
         }}
         onClear={() => {
+          update({ hotkeys: hotkeys.filter((_, i) => i !== index) });
+        }}
+        onUseDefault={() => {
           update({ hotkeys: hotkeys.filter((_, i) => i !== index) });
         }}
       />
@@ -345,6 +400,8 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
             : t("hotkeys.pushToTalkOff")
         }
         value={settings.pttKey}
+        own={settings.pttKey !== null}
+        {...defaultProps("pushToTalk")}
         onCapture={(combo) => capture(combo, { kind: "pushToTalk" }, assignPtt)}
         onAssign={(conflict) => {
           assignPending(assignPtt, conflict);
@@ -377,13 +434,18 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
       <HotkeyRow
         label={t("hotkeys.camera")}
         description={t("hotkeys.cameraHint")}
-        value={settings.cameraHotkey}
+        value={settings.cameraHotkey ?? defaults.active.get(CAMERA_ACTION) ?? null}
+        own={settings.cameraHotkey !== null}
+        {...defaultProps(CAMERA_ACTION)}
         warning={status?.cameraFailed === true && globalHotkeys ? t("hotkeys.failed") : null}
         onCapture={(combo) => capture(combo, { kind: "camera" }, assignCamera)}
         onAssign={(conflict) => {
           assignPending(assignCamera, conflict);
         }}
         onClear={() => {
+          update({ cameraHotkey: null });
+        }}
+        onUseDefault={() => {
           update({ cameraHotkey: null });
         }}
       />
@@ -398,9 +460,9 @@ export function HotkeysCard({ settings, update }: SettingsSectionProps) {
         <button
           type="button"
           className="settings-button"
-          disabled={hotkeys.length === 0}
+          disabled={hotkeys.length === 0 && settings.cameraHotkey === null}
           onClick={() => {
-            update({ hotkeys: [] });
+            update({ hotkeys: [], cameraHotkey: null });
           }}
         >
           {t("hotkeys.reset")}

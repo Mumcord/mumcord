@@ -8,7 +8,7 @@ function renderToggle(change: Partial<MembersToggleProps> = {}) {
     expanded: false,
     controls: "members",
     presence: { count: 6, talkers: [] },
-    shortcut: "Ctrl+Shift+M",
+    shortcut: "Ctrl+Shift+U",
     onToggle: vi.fn(),
     ...change,
   };
@@ -22,10 +22,10 @@ describe("MembersToggle", () => {
     expect(button).toHaveAccessibleName("Show members (6)");
     expect(button).toHaveAttribute("aria-expanded", "false");
     expect(button).toHaveAttribute("aria-controls", "members");
-    expect(button).toHaveAttribute("aria-keyshortcuts", "Control+Shift+M Meta+Shift+M");
+    expect(button).toHaveAttribute("aria-keyshortcuts", "Control+Shift+U");
     expect(button).toHaveTextContent("6");
     expect(button.dataset.tooltip).toBe("Show members");
-    expect(button.dataset.tooltipShortcut).toBe("Ctrl+Shift+M");
+    expect(button.dataset.tooltipShortcut).toBe("Ctrl+Shift+U");
     expect(button.querySelector(".members-toggle__talking")).toBeNull();
     expect(button.dataset.tooltipDetail).toBe("");
   });

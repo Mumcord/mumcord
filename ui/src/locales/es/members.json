@@ -107,8 +107,7 @@
     "talkingTwo": "{{first}} y {{second}} están hablando",
     "talkingMore_one": "{{name}} y {{count}} persona más están hablando",
     "talkingMore_many": "{{name}} y {{count}} más están hablando",
-    "talkingMore_other": "{{name}} y {{count}} más están hablando",
-    "shortcut": "Ctrl+Mayús+M"
+    "talkingMore_other": "{{name}} y {{count}} más están hablando"
   },
   "revokeConsent": {
     "title": "¿Retirar el consentimiento de chat de {{name}}?",
