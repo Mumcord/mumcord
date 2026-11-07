@@ -144,6 +144,10 @@ pub enum RelayUnavailable {
     /// "This server's relay is only available to registered users. Register on this server to
     /// use it."
     NotRegistered,
+    /// "This server's relay is only available to certain groups." (#601)
+    GroupNotAllowed,
+    /// The relay bot doesn't know this client yet; reconnecting fixes it (#601).
+    NoHello,
     PeerGone,
     RateLimited,
     RelayFull,
@@ -189,6 +193,8 @@ pub struct RelayInfo {
     pub uses: Vec<RelayUse>,
     /// Most viewers per broadcast; `null` when the relay offers no broadcasts.
     pub broadcast_max: Option<u16>,
+    /// The relay only serves registered users (#601), so a guest sees why before trying.
+    pub registered_only: bool,
 }
 
 /// The relay of a server changed (FR-4.20).
@@ -247,6 +253,8 @@ impl From<peer::RelayUnavailable> for RelayUnavailable {
             R::PeerCannotRelay => Self::PeerCannotRelay,
             R::Denied => Self::Denied,
             R::NotRegistered => Self::NotRegistered,
+            R::GroupNotAllowed => Self::GroupNotAllowed,
+            R::NoHello => Self::NoHello,
             R::PeerGone => Self::PeerGone,
             R::RateLimited => Self::RateLimited,
             R::RelayFull => Self::RelayFull,
@@ -280,6 +288,7 @@ impl From<peer::RelayInfo> for RelayInfo {
             first_seen: i.first_seen.map(rfc3339),
             uses: i.uses.into_iter().map(Into::into).collect(),
             broadcast_max: i.broadcast_max,
+            registered_only: i.registered_only,
         }
     }
 }

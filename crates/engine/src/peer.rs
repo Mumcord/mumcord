@@ -66,6 +66,11 @@ pub enum RelayUnavailable {
     /// `not-registered` answer, or its `denied` while this client is a guest (`denied` is then
     /// almost always the default `registered_only` rule).
     NotRegistered,
+    /// The relay only serves members of certain groups, and this client is in none (#601).
+    GroupNotAllowed,
+    /// The bot has not seen this client's hello, e.g. after the bot restarted; reconnecting
+    /// sends it again (#601).
+    NoHello,
     /// The other person left the server before the bot answered (`peer-gone`).
     PeerGone,
     /// Too many token requests (`rate-limited`).
@@ -85,6 +90,8 @@ impl RelayUnavailable {
             TokenErrorReason::Denied if !registered => Self::NotRegistered,
             TokenErrorReason::Denied => Self::Denied,
             TokenErrorReason::NotRegistered => Self::NotRegistered,
+            TokenErrorReason::GroupNotAllowed => Self::GroupNotAllowed,
+            TokenErrorReason::NoHello => Self::NoHello,
             TokenErrorReason::UseNotAllowed => Self::UseNotAllowed(relay_use),
             TokenErrorReason::PeerGone => Self::PeerGone,
             TokenErrorReason::PeerNotMumcord => Self::PeerCannotRelay,
@@ -137,6 +144,8 @@ pub struct RelayInfo {
     pub uses: Vec<RelayUse>,
     /// Most viewers per broadcast (`bc`, FR-7.3); `None` when the relay offers no broadcasts.
     pub broadcast_max: Option<u16>,
+    /// The relay only serves registered users (announced `reg`, #601).
+    pub registered_only: bool,
 }
 
 /// Waiting times of the relay logic; shorter in tests.
@@ -316,6 +325,7 @@ impl ServerRelay {
                 .filter(|u| announcer.allows(*u))
                 .collect(),
             broadcast_max: announcer.ann.broadcast,
+            registered_only: announcer.ann.registered_only,
         }
     }
 
@@ -1386,6 +1396,7 @@ mod tests {
             uses: None,
             broadcast: None,
             plugin_data_kbps: None,
+            registered_only: false,
         }
     }
 
