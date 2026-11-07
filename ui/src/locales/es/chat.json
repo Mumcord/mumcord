@@ -42,6 +42,7 @@
     "label": "Mensaje a {{name}}",
     "hint": "Pulsa Intro para enviar y Mayús+Intro para una nueva línea. Funciona Markdown: **negrita**, *cursiva*, `código`, [enlace](https://…).",
     "addImage": "Añadir imagen",
+    "optionalMessage": "Añadir un mensaje (opcional)",
     "removeImage": "Quitar la imagen {{name}}",
     "imagePreview": "Imagen para enviar: {{name}}",
     "send": "Enviar",

@@ -44,6 +44,7 @@
     "label": "Sporočilo za {{name}}",
     "hint": "Pritisni Enter za pošiljanje in Shift+Enter za novo vrstico. Markdown deluje: **krepko**, *ležeče*, `koda`, [povezava](https://…).",
     "addImage": "Dodaj sliko",
+    "optionalMessage": "Dodaj sporočilo (neobvezno)",
     "removeImage": "Odstrani sliko {{name}}",
     "imagePreview": "Slika za pošiljanje: {{name}}",
     "send": "Pošlji",

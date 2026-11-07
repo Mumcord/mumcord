@@ -46,6 +46,7 @@
     "label": "Messaġġ lil {{name}}",
     "hint": "Agħfas Enter biex tibgħat u Shift+Enter għal linja ġdida. Markdown jaħdem: **bold**, *italic*, `code`, [link](https://…).",
     "addImage": "Żid stampa",
+    "optionalMessage": "Żid messaġġ (mhux obbligatorju)",
     "removeImage": "Neħħi l-istampa {{name}}",
     "imagePreview": "Stampa li se tintbagħat: {{name}}",
     "send": "Ibgħat",

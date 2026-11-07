@@ -42,6 +42,7 @@
     "label": "Rakstīt ziņu: {{name}}",
     "hint": "Nospied Enter, lai nosūtītu, un Shift+Enter jaunai rindai. Darbojas Markdown: **treknraksts**, *slīpraksts*, `kods`, [saite](https://…).",
     "addImage": "Pievienot attēlu",
+    "optionalMessage": "Pievienot ziņu (pēc izvēles)",
     "removeImage": "Noņemt attēlu {{name}}",
     "imagePreview": "Sūtāmais attēls: {{name}}",
     "send": "Sūtīt",

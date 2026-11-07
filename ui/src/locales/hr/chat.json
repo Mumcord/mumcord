@@ -42,6 +42,7 @@
     "label": "Poruka za {{name}}",
     "hint": "Pritisni Enter za slanje i Shift+Enter za novi redak. Markdown radi: **podebljano**, *kurziv*, `kod`, [poveznica](https://…).",
     "addImage": "Dodaj sliku",
+    "optionalMessage": "Dodaj poruku (neobavezno)",
     "removeImage": "Ukloni sliku {{name}}",
     "imagePreview": "Slika za slanje: {{name}}",
     "send": "Pošalji",

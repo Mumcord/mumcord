@@ -40,6 +40,7 @@
     "label": "Besked til {{name}}",
     "hint": "Tryk på Enter for at sende og Shift+Enter for en ny linje. Markdown virker: **fed**, *kursiv*, `kode`, [link](https://…).",
     "addImage": "Tilføj billede",
+    "optionalMessage": "Tilføj en besked (valgfri)",
     "removeImage": "Fjern billedet {{name}}",
     "imagePreview": "Billede, der skal sendes: {{name}}",
     "send": "Send",

@@ -44,6 +44,7 @@
     "label": "Rašyti: {{name}}",
     "hint": "Spausk Enter, kad išsiųstum, ir Shift+Enter, kad pereitum į naują eilutę. Veikia Markdown: **pusjuodis**, *kursyvas*, `kodas`, [nuoroda](https://…).",
     "addImage": "Pridėti paveikslėlį",
+    "optionalMessage": "Įrašykite žinutę (nebūtina)",
     "removeImage": "Pašalinti paveikslėlį {{name}}",
     "imagePreview": "Siunčiamas paveikslėlis: {{name}}",
     "send": "Siųsti",
