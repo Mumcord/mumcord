@@ -13,6 +13,10 @@
   await attempt("parent-document", () => window.parent.document.title);
   await attempt("top-location", () => window.top.location.href);
   await attempt("local-storage", () => localStorage.getItem("x"));
+  // Only the frames the host app grants the permission may go full screen or use the clipboard
+  // (issue #419, FR-9.34).
+  await attempt("fullscreen", () => document.documentElement.requestFullscreen());
+  await attempt("clipboard", () => navigator.clipboard.writeText("probe"));
   // The Tauri IPC must not exist inside the frame, neither as the injected global nor as the
   // raw platform handlers (WebKitGTK / macOS and WebView2).
   results["tauri-internals"] = typeof window.__TAURI_INTERNALS__;

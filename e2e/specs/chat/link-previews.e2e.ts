@@ -149,22 +149,29 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
 
     // FR-2.41a: play runs the video inline through the app's loopback player page; nothing is
     // handed to the system browser.
-    await yt.$("button.link-card__play").click();
+    await yt.$("button[aria-label^='Play']").click();
     await $("iframe[title^='Video player']").waitForExist({ timeout: 15_000 });
     expect(readFileSync(opener.log, "utf8")).not.toContain(youtube);
+
+    // Twitch never plays inside Mumcord's own page unless it is a website (its player needs an
+    // http(s) parent), so the card says that and hands the stream to the browser (#419).
+    await expect(tw.$("p.link-card__browser-hint")).toHaveText(
+      expect.stringContaining("does not run inside Mumcord's window"),
+    );
     // The player iframe appearing above shifts the Twitch card, so a single click can land
     // on the old position; click again until the opener sees the link.
     await browser.waitUntil(
       async () => {
-        await tw.$("button.link-card__open").click();
+        await tw.$("button[aria-label^='Play']").click();
         return readFileSync(opener.log, "utf8").includes(twitch);
       },
       {
         interval: 1_000,
         timeout: 10_000,
-        timeoutMsg: "Open in browser did not hand the Twitch link to the system browser",
+        timeoutMsg: "Play did not hand the Twitch link to the system browser",
       },
     );
+    // Only YouTube's player is framed: the Twitch card keeps its picture.
     await expect($$("iframe")).toBeElementsArrayOfSize(1);
   });
 

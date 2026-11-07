@@ -2,9 +2,10 @@
 // - AC-6.17: plugins still run; the strip says the shared parts are unavailable.
 // - AC-6.15: fx-notify-flood calls `notify` five times at start. In Do Not Disturb no entry
 //   appears; afterwards one start gives exactly one entry.
-// - AC-6.16: fx-webview-probe's sealed page tries fetch, parent/top access, storage and the Tauri
-//   IPC. Nothing may be reachable, its probe request must never reach the local listener that
-//   stands in for a proxy log, and the message bridge must still work both ways.
+// - AC-6.16: fx-webview-probe's sealed page tries fetch, parent/top access, storage, full screen,
+//   the clipboard and the Tauri IPC. Nothing may be reachable, its probe request must never reach
+//   the local listener that stands in for a proxy log, and the message bridge must still work both
+//   ways (issue #419: only the frames Mumcord allows may use full screen or the clipboard).
 import { createServer, type Server } from "node:http";
 import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, registry, testenv } from "../../helpers/index.ts";

@@ -120,6 +120,7 @@
       "show": "Raidījums"
     },
     "inBrowser": "Atskaņo tavā pārlūkā",
+    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
     "card": "Saites priekšskatījums: {{title}}",
     "dismiss": "Slēpt priekšskatījumu"
   },

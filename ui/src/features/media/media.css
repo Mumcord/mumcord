@@ -1,20 +1,13 @@
 /*
  * The media frame, the mini bar and the right column panel that both media views share
- * (issue #163). Theme tokens only, so light and dark and every custom theme work. The one exception
- * is the overlay on the picture: the picture looks the same in every theme, so its scrim and the
- * text on it stay dark and light in every theme too (as the image viewer in `chat.css` does).
+ * (issue #163). Theme tokens only, so light and dark and every custom theme work. The overlay look is
+ * the shared one in `mediaOverlay.css`, which every picture uses, a chat card's player included
+ * (issue #419).
  */
-.media-frame {
-  --media-scrim: rgb(8 6 20 / 78%);
-  --media-on-scrim: #fff;
-  --media-on-scrim-muted: rgb(255 255 255 / 72%);
-  --media-on-scrim-faint: rgb(255 255 255 / 30%);
-  --media-hover: rgb(255 255 255 / 14%);
-  --media-ink: rgb(8 6 20);
-  --media-glass: rgb(16 12 36 / 62%);
-  --media-glass-border: rgb(255 255 255 / 16%);
 
-  position: relative;
+/* Only the frame's own geometry here: the dark picture, its bars and its icon buttons come from the
+   shared overlay classes. */
+.media-frame {
   width: 100%;
   /* The picture keeps 16:9 and leaves room for the chat under it on short windows. */
   max-width: calc(58vh * 16 / 9);
@@ -52,56 +45,6 @@
   border: 0;
   /* Only the app's controls drive the party, and hovering the picture must show them. */
   pointer-events: none;
-}
-
-/* The overlays sit on the picture and fade in on hover, keyboard focus or pause. */
-.media-frame__top,
-.media-frame__bottom {
-  position: absolute;
-  inset-inline: 0;
-  display: flex;
-  opacity: 0;
-  transition: opacity var(--duration-normal) var(--ease-out);
-}
-
-.media-frame__top {
-  top: 0;
-  gap: var(--space-3);
-  align-items: center;
-  padding: var(--space-4) var(--space-4) var(--space-6);
-  background: linear-gradient(to bottom, var(--media-scrim), transparent);
-}
-
-.media-frame__bottom {
-  bottom: 0;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-6) var(--space-4) var(--space-3);
-  background: linear-gradient(to top, var(--media-scrim), transparent);
-}
-
-.media-frame:hover .media-frame__top,
-.media-frame:hover .media-frame__bottom,
-.media-frame:focus-within .media-frame__top,
-.media-frame:focus-within .media-frame__bottom,
-.media-frame[data-paused] .media-frame__top,
-.media-frame[data-paused] .media-frame__bottom {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .media-frame__top,
-  .media-frame__bottom {
-    opacity: 1;
-    transition: none;
-  }
-}
-
-.media-frame__controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: center;
 }
 
 .media-frame__seek {
@@ -165,45 +108,6 @@
   font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Ordinary buttons on the picture (retry, codec hint) keep their theme surface, so they need the
-   theme's text colour back instead of the light text the overlay passes down. */
-.media-frame .button {
-  color: var(--color-text);
-}
-
-/* Icon buttons on the picture: no frame until hovered, the usual focus ring for the keyboard.
-   Doubled class: it has to win over the app-wide `.button`. */
-.button.media-frame__icon {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--media-on-scrim);
-}
-
-.button.media-frame__icon:hover:not(:disabled) {
-  background: var(--media-hover);
-}
-
-.button.media-frame__icon:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-/* The play button stands out from the others. */
-.button.media-frame__icon--main {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid var(--media-glass-border);
-  background: rgb(255 255 255 / 12%);
 }
 
 /* The key hint: a small chip on the picture on first use, gone after a while. */

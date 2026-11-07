@@ -34,6 +34,17 @@ export function isTwitchPlayer(playerUrl: string): boolean {
   }
 }
 
+/**
+ * Whether a card's player belongs to the browser instead of the card (issue #419). Twitch's embed
+ * only runs when every page above it is http(s), and it refuses the whole chain otherwise, showing
+ * nothing at all. Mumcord's own page is `tauri://localhost` on Linux and macOS, so a Twitch card
+ * there hands the stream to the browser; on Windows (`http(s)://tauri.localhost`) and under
+ * `npm run tauri dev` (http) it plays in the card. YouTube's player has no such check.
+ */
+export function twitchNeedsBrowser(playerUrl: string, appPageIsWeb: boolean): boolean {
+  return !appPageIsWeb && isTwitchPlayer(playerUrl);
+}
+
 export interface H264Probe {
   /** `MediaSource.isTypeSupported`, which YouTube and Twitch use; absent without MSE. */
   mse: ((type: string) => boolean) | null;

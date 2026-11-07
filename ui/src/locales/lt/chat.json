@@ -124,6 +124,7 @@
       "show": "Laida"
     },
     "inBrowser": "Groja tavo naršyklėje",
+    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
     "card": "Nuorodos peržiūra: {{title}}",
     "dismiss": "Slėpti peržiūrą"
   },

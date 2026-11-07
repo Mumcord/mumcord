@@ -10,6 +10,7 @@ mod deeplink;
 mod desktop_entry;
 mod display;
 mod dnd;
+mod fullscreen;
 #[cfg(target_os = "linux")]
 mod gst_fallback;
 mod hotkeys;
@@ -661,6 +662,8 @@ pub(crate) fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
     }
     let window = builder.build()?;
     plugins::webview::harden_window(&window);
+    // The chat cards run their players in this window (issue #419).
+    fullscreen::allow(&window);
     Ok(())
 }
 

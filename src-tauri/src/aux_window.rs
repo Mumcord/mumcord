@@ -23,6 +23,9 @@ pub struct Spec {
     /// Commands the window may call. Every other command is refused for it, so the window
     /// cannot connect, send messages or change settings even if its page misbehaves.
     allowed_commands: &'static [&'static str],
+    /// A player can run in this window, so a page's full-screen request is answered for it;
+    /// every other window refuses one (issue #419).
+    player_window: bool,
 }
 
 pub const INSPECTOR: Spec = Spec {
@@ -41,6 +44,7 @@ pub const INSPECTOR: Spec = Spec {
         "packet_inspector_view",
         "packet_inspector_close",
     ],
+    player_window: false,
 };
 
 pub const LICENCES: Spec = Spec {
@@ -51,6 +55,7 @@ pub const LICENCES: Spec = Spec {
     min_size: (480.0, 360.0),
     geometry_file: "licences-window.json",
     allowed_commands: &["window_look", "licences_close", "copy_text", "open_link"],
+    player_window: false,
 };
 
 pub const CHANGELOG: Spec = Spec {
@@ -68,6 +73,7 @@ pub const CHANGELOG: Spec = Spec {
         "open_link",
         "app_info",
     ],
+    player_window: false,
 };
 
 /// What both media pop-outs need: their own window state, the main window's look, and the
@@ -110,6 +116,7 @@ pub const WATCH_POPOUT: Spec = Spec {
         "watch_party_next",
         "watch_party_previous",
     ],
+    player_window: true,
 };
 
 /// A watched screen share in its own window (issue #164). It takes over the frames of the
@@ -132,6 +139,7 @@ pub const SHARE_POPOUT: Spec = Spec {
         "screen_share_watch_stats",
         "person_set_share_volume",
     ],
+    player_window: true,
 };
 
 /// A plugin activity in its own window (FR-9.48). It shows the plugin's stage tree or web page and
@@ -160,6 +168,8 @@ pub const STAGE_POPOUT: Spec = Spec {
         "stage_visibility",
         "plugin_details_open",
     ],
+    // A stage window shows a plugin's tree or page, never a player Mumcord grants full screen to.
+    player_window: false,
 };
 
 /// The camera room in its own window (FR-8.68 **Pop out**). It shows the own camera's picture
@@ -189,6 +199,9 @@ pub const CAMERA_POPOUT: Spec = Spec {
         "camera_frames_detach",
         "camera_set_decode_codecs",
     ],
+    // A camera window shows frames Mumcord decoded, not a player page, so it never gets a
+    // full-screen request (issue #419).
+    player_window: false,
 };
 
 const ALL: [&Spec; 7] = [
@@ -277,6 +290,9 @@ pub fn open_with(
     }
     let window = builder.build()?;
     crate::plugins::webview::harden_window(&window);
+    if spec.player_window {
+        crate::fullscreen::allow(&window);
+    }
     if let Some(geometry) = load_geometry(app, spec) {
         restore(&window, geometry);
     }
@@ -396,6 +412,14 @@ fn contains(rect: (i32, i32, u32, u32), point: (i32, i32)) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn only_the_media_popouts_answer_a_full_screen_request() {
+        for spec in ALL {
+            let popout = spec.label == WATCH_POPOUT.label || spec.label == SHARE_POPOUT.label;
+            assert_eq!(spec.player_window, popout, "window {}", spec.label);
+        }
+    }
 
     #[test]
     fn the_inspector_window_gets_only_its_commands() {

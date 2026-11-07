@@ -11,8 +11,16 @@ import {
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { clearDismissedPreviews } from "./dismissedPreviews";
+import { appPage } from "./embedWindow.testState";
 import { cardPlayer, clearPreviews, previewableLinks } from "./links";
 import { MessageList } from "./MessageList";
+
+// Which page Mumcord's own window is: a website page (the development server, Windows) or the
+// app's own scheme (macOS and Linux). Twitch's player only runs under a website page (#419).
+vi.mock("./embedWindow", async () => {
+  const { appPage } = await import("./embedWindow.testState");
+  return { appPageIsWebPage: () => appPage.web };
+});
 
 const IMAGE = "data:image/jpeg;base64,/9j/4AAQ";
 
@@ -108,6 +116,7 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  appPage.web = true;
   clearPreviews();
   clearDismissedPreviews();
   api = createMockApi();
@@ -233,6 +242,130 @@ describe("link preview cards", () => {
       { type: "embed", url: TWITCH.playerUrl },
       "http://localhost:43215",
     );
+  });
+
+  // Issue #419: Twitch's player refuses to run under the app's own page unless that page is a
+  // website, which `tauri://localhost` on Linux and macOS is not, so the card names that and hands
+  // the stream to the browser instead of showing a picture that stays black.
+  it("hands a Twitch card to the browser when the app's own page is no website", async () => {
+    appPage.web = false;
+    vi.spyOn(api, "linkPreview").mockResolvedValue({
+      ...VIDEO,
+      url: "https://www.twitch.tv/someone",
+      siteName: "Twitch",
+      title: "Live stream",
+      video: TWITCH,
+    });
+    const openLink = vi.spyOn(api, "openLink").mockResolvedValue(null);
+    const openPage = vi.spyOn(api, "embedPlayerOpen");
+    const { container } = renderMessage('<a href="https://www.twitch.tv/someone">stream</a>', true);
+    const play = await screen.findByRole("button", { name: "Play Live stream" });
+    expect(
+      await screen.findByText(/does not run inside Mumcord's window on this system/),
+    ).toBeTruthy();
+
+    fireEvent.click(play);
+    await waitFor(() => {
+      expect(openLink).toHaveBeenCalledWith("https://www.twitch.tv/someone");
+    });
+    expect(openPage).not.toHaveBeenCalled();
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  // The Twitch card on the same overlay as the watch party (issue #163), with the card's own
+  // full-screen control inside the element that goes full screen (issue #419). Twitch needs the
+  // permission because its embed plays on the page of its own.
+  it("keeps the Twitch card on the shared overlay and lets it go full screen", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue({
+      ...VIDEO,
+      url: "https://www.twitch.tv/someone",
+      siteName: "Twitch",
+      title: "Live stream",
+      video: TWITCH,
+    });
+    const { container } = renderMessage('<a href="https://www.twitch.tv/someone">stream</a>', true);
+    const play = await screen.findByRole("button", { name: "Play Live stream" });
+    const bar = play.closest(".media-overlay__bar");
+    const box = play.closest(".media-overlay");
+    if (bar === null || box === null) throw new Error("the Twitch card has no media overlay");
+    expect(bar.contains(play)).toBe(true);
+    expect(box).toHaveAttribute("data-paused");
+    expect(await axeViolations(container)).toEqual([]);
+    fireEvent.click(play);
+    const frame = await screen.findByTitle<HTMLIFrameElement>("Video player: Live stream");
+    expect(frame.getAttribute("allow")).toContain("fullscreen");
+    expect(frame.hasAttribute("allowfullscreen")).toBe(true);
+    const toolbar = box.querySelector("[role='toolbar']");
+    if (toolbar === null) throw new Error("no toolbar in the Twitch card overlay");
+    const fullScreen = screen.getByRole("button", { name: "Full screen" });
+    expect(toolbar.contains(fullScreen)).toBe(true);
+    expect(box).not.toHaveAttribute("data-paused");
+    const request = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(box, "requestFullscreen", { value: request, configurable: true });
+    fireEvent.click(fullScreen);
+    expect(request).toHaveBeenCalledTimes(1);
+  });
+
+  it("copies the canonical video address with Mumcord's own control (issue #419)", async () => {
+    const embed = "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1";
+    vi.spyOn(api, "linkPreview").mockResolvedValue({ ...VIDEO, url: embed });
+    const copy = vi.spyOn(api, "copyText").mockResolvedValue(null);
+    const { container } = renderMessage(`<a href="${embed}">video</a>`, true);
+    await screen.findByRole("article", { name: "Link preview: Never gonna" });
+    fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
+    expect(copy).toHaveBeenCalledWith("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    expect(await screen.findByText("Link copied")).toBeTruthy();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  // Issue #419: the player's own button needs the permission, and the card's toolbar lives inside
+  // the element that goes full screen, so a click can leave it as well.
+  it("keeps the card toolbar inside the full-screen element and clicks it back out", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue(VIDEO);
+    renderMessage(`<a href="${VIDEO.url}">video</a>`, true);
+    fireEvent.click(await screen.findByRole("button", { name: "Play Never gonna" }));
+    const frame = await screen.findByTitle<HTMLIFrameElement>("Video player: Never gonna");
+    expect(frame.getAttribute("allow")).toContain("fullscreen");
+    expect(frame.hasAttribute("allowfullscreen")).toBe(true);
+    const box = frame.closest(".link-card__player-box");
+    const toolbar = box === null ? null : box.querySelector("[role='toolbar']");
+    if (box === null || toolbar === null) throw new Error("no player box or toolbar");
+    const fullScreen = screen.getByRole("button", { name: "Full screen" });
+    expect(toolbar.contains(fullScreen)).toBe(true);
+    const request = vi.fn().mockResolvedValue(undefined);
+    const exit = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(box, "requestFullscreen", { value: request, configurable: true });
+    Object.defineProperty(document, "exitFullscreen", { value: exit, configurable: true });
+    fireEvent.click(fullScreen);
+    expect(request).toHaveBeenCalledTimes(1);
+    // The web view reports the state through an event; the same button then offers the way back.
+    Object.defineProperty(document, "fullscreenElement", { value: box, configurable: true });
+    document.dispatchEvent(new Event("fullscreenchange"));
+    const leave = await waitFor(() => screen.getByRole("button", { name: "Leave full screen" }));
+    expect(leave).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(leave);
+    expect(exit).toHaveBeenCalledTimes(1);
+  });
+
+  // Issue #163: the card uses the same overlay as the watch party, so the two read as the same
+  // control. The card counts as paused until it plays, which keeps its bar visible before the first
+  // click; while a player runs the bar fades in on hover or keyboard focus.
+  it("uses the watch party's media overlay for the card's controls", async () => {
+    vi.spyOn(api, "linkPreview").mockResolvedValue(VIDEO);
+    renderMessage(`<a href="${VIDEO.url}">video</a>`, true);
+    const play = await screen.findByRole("button", { name: "Play Never gonna" });
+    const bar = play.closest(".media-overlay__bar");
+    const box = play.closest(".media-overlay");
+    if (bar === null || box === null) throw new Error("the card has no media overlay");
+    expect(bar.contains(play)).toBe(true);
+    expect(box).toHaveAttribute("data-paused");
+    expect(play.classList.contains("media-overlay__icon--main")).toBe(true);
+    fireEvent.click(play);
+    const frame = await screen.findByTitle<HTMLIFrameElement>("Video player: Never gonna");
+    const running = frame.closest(".media-overlay");
+    if (running === null) throw new Error("no overlay while the player runs");
+    expect(running.hasAttribute("data-paused")).toBe(false);
   });
 
   it("opens the browser when the player page cannot be opened", async () => {
