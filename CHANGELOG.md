@@ -10,6 +10,7 @@
 
 ### Changed
 
+- When the server refuses something, Mumcord says what and where in plain words, e.g. "You may not move people in Raid.", unless the dialog that asked shows it already. Rights changed by an admin while you are connected now take effect without reconnecting
 - Radio buttons and checkboxes have Mumcord's own design everywhere: a ring with a lilac dot and a rounded box with a lilac check, with a clear focus ring and high-contrast support. Option cards such as "Private messages from" highlight the whole card
 - Setup wizard, "How do you want to talk?": two clear cards with a short explanation, the sensitivity choice nested under voice activation, and the push-to-talk key right in its card; Continue waits until a key is set
 - Peer-to-peer: "Direct + relay (always relay, hides my IP)" is now the recommended mode and the default for new installs, and the Balanced setup style uses it. A mode you already use stays as it is
