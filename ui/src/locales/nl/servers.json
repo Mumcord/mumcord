@@ -38,9 +38,9 @@
     "alwaysConnect": "Altijd verbinden bij opstarten",
     "muteNotifications": "Meldingen dempen",
     "muteGroupMentions": "@all en @channel dempen",
-    "theme": "Thema…",
+    "theme": "Thema",
     "showWelcome": "Welkomstbericht tonen",
-    "identity": "Identiteit…"
+    "identity": "Identiteit"
   },
   "theme": {
     "title": "Thema voor {{server}}",

@@ -8,15 +8,15 @@
     "unfollow": "Ne sledi več kanalu",
     "following": "Slediš",
     "copyLink": "Kopiraj povezavo do kanala",
-    "password": "Geslo kanala…",
+    "password": "Geslo kanala",
     "info": "Podatki o kanalu",
-    "clear": "Počisti zgodovino klepeta…",
-    "audio": "Zvok za ta kanal…",
+    "clear": "Počisti zgodovino klepeta",
+    "audio": "Zvok za ta kanal",
     "audioHint": {
       "music": "♪ Glasba",
       "jam": "⚡ Jam"
     },
-    "move": "Premakni uporabnike sem…"
+    "move": "Premakni uporabnike sem"
   },
   "info": {
     "title": "Podatki o kanalu: {{channel}}",

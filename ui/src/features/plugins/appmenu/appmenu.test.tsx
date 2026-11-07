@@ -88,7 +88,7 @@ describe("PluginMenuItems", () => {
     await screen.findByRole("menuitem", { name: /a 1/ });
     expect(screen.queryByRole("menuitem", { name: /a 3/ })).toBeNull();
     expect(screen.getAllByRole("menuitem")).toHaveLength(9);
-    fireEvent.click(screen.getByRole("menuitem", { name: "More plugins…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "More plugins" }));
     expect(screen.getAllByRole("menuitem")).toHaveLength(12);
   });
 

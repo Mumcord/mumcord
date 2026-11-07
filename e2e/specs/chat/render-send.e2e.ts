@@ -395,7 +395,7 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     const items = await browser.execute(() =>
       Array.from(document.querySelectorAll('[role="menu"] [role="menuitem"]')).map((item) => item.textContent),
     );
-    expect(items).toEqual(["Copy image", "Save image…", "Open in image viewer"]);
+    expect(items).toEqual(["Copy image", "Save image", "Open in image viewer"]);
     await $('[role="menuitem"]=Copy image').click();
     await $("p.chat-link-copied=Image copied").waitForExist();
     await browser.waitUntil(async () => (await readClipboard("png")).startsWith("png "), {

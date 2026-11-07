@@ -38,9 +38,9 @@
     "alwaysConnect": "Conectează mereu la pornire",
     "muteNotifications": "Dezactivează notificările",
     "muteGroupMentions": "Dezactivează @all și @channel",
-    "theme": "Temă…",
+    "theme": "Temă",
     "showWelcome": "Arată mesajul de bun venit",
-    "identity": "Identitate…"
+    "identity": "Identitate"
   },
   "theme": {
     "title": "Temă pentru {{server}}",

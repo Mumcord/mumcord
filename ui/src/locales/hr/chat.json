@@ -176,7 +176,7 @@
   "imageMenu": {
     "label": "Slika {{name}}",
     "copy": "Kopiraj sliku",
-    "save": "Spremi sliku…",
+    "save": "Spremi sliku",
     "copyAddress": "Kopiraj adresu slike",
     "openViewer": "Otvori u pregledniku slika",
     "copied": "Slika kopirana",
@@ -354,7 +354,7 @@
       "muteEightHours": "na 8 sati",
       "muteForever": "Dok ga ponovno ne uključim",
       "profile": "Prikaži profil",
-      "block": "Blokiraj korisnika {{name}}…",
+      "block": "Blokiraj korisnika {{name}}",
       "deleteHistory": "Izbriši povijest",
       "deleteHint": "Samo ovaj uređaj · {{name}} zadržava svoju kopiju"
     }

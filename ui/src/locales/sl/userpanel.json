@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Nehaj govoriti in poslušati, ostani povezan za klepet",
     "disconnectHint": "Zapri povezavo s tem strežnikom",
     "switchTo": "Premakni glas na {{server}}",
-    "all": "Prekini povezavo z vsemi strežniki …",
+    "all": "Prekini povezavo z vsemi strežniki",
     "allHint": "Zapri vse povezave s strežniki"
   },
   "disconnectAll": {

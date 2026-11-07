@@ -59,9 +59,9 @@
     "joinFull": "Dit kanaal is vol.",
     "joinLocked": "Je mag dit kanaal niet betreden, of het vraagt om een wachtwoord.",
     "mute": "Voor mij dempen",
-    "connectionInfo": "Verbindingsinfo…",
+    "connectionInfo": "Verbindingsinfo",
     "chatRequestPending": "Chatverzoek in behandeling",
-    "revokeConsent": "Chattoestemming intrekken…"
+    "revokeConsent": "Chattoestemming intrekken"
   },
   "nowPlaying": {
     "label": "Speelt nu",
@@ -113,7 +113,7 @@
     "failed": "Het intrekken van de chattoestemming is mislukt. Probeer het opnieuw."
   },
   "block": {
-    "menu": "Blokkeren…",
+    "menu": "Blokkeren",
     "unblock": "Deblokkeren",
     "title": "{{name}} blokkeren?",
     "onServer": "op {{server}}",

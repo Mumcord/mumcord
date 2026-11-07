@@ -1,6 +1,6 @@
 {
   "pluginsGroup": "Plugins",
-  "moreItems": "Plus de plugins…",
+  "moreItems": "Plus de plugins",
   "subline": "{{plugin}} · Non officiel",
   "sublineOfficial": "{{plugin}}",
   "footer": "Les éléments des plugins affichent toujours le nom du plugin. Gérez-les dans Paramètres → Plugins.",

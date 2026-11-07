@@ -1,6 +1,6 @@
 {
   "show": "Atidaryti Mumcord",
-  "settings": "Nustatymai…",
+  "settings": "Nustatymai",
   "mute": "Nutildyti mikrofoną",
   "deafen": "Išjungti garsą",
   "dnd": "Netrukdyti",
@@ -17,7 +17,7 @@
   "voiceMenu": "Balso serveris ir kanalas",
   "voiceServer": "Balso serveris",
   "channelsOf": "Kanalai · {server}",
-  "moreChannels": "Daugiau kanalų Mumcord…",
+  "moreChannels": "Daugiau kanalų Mumcord",
   "recentChats": "Naujausi pokalbiai",
   "chatUnread": "{name} – {count} neperskaityti",
   "cameraOn": "Kamera įjungta",

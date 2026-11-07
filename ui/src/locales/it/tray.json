@@ -1,6 +1,6 @@
 {
   "show": "Apri Mumcord",
-  "settings": "Impostazioni…",
+  "settings": "Impostazioni",
   "mute": "Disattiva microfono",
   "deafen": "Disattiva audio",
   "dnd": "Non disturbare",
@@ -17,7 +17,7 @@
   "voiceMenu": "Server vocale e canale",
   "voiceServer": "Server vocale",
   "channelsOf": "Canali · {server}",
-  "moreChannels": "Altri canali in Mumcord…",
+  "moreChannels": "Altri canali in Mumcord",
   "recentChats": "Chat recenti",
   "chatUnread": "{name} – {count} non letti",
   "cameraOn": "Fotocamera attiva",

@@ -172,7 +172,7 @@
   "imageMenu": {
     "label": "Kép: {{name}}",
     "copy": "Kép másolása",
-    "save": "Kép mentése…",
+    "save": "Kép mentése",
     "copyAddress": "Képcím másolása",
     "openViewer": "Megnyitás a képnézegetőben",
     "copied": "Kép másolva",
@@ -346,7 +346,7 @@
       "muteEightHours": "8 órára",
       "muteForever": "Amíg vissza nem kapcsolom",
       "profile": "Profil megtekintése",
-      "block": "{{name}} letiltása…",
+      "block": "{{name}} letiltása",
       "deleteHistory": "Előzmények törlése",
       "deleteHint": "Csak ez az eszköz · {{name}} megtartja a saját másolatát"
     }

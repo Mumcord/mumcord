@@ -10,6 +10,7 @@
 
 ### Changed
 
+- Menu entries no longer end in "…" (for example "Identity", "Ban list", "Whisper to"), in every language
 - Radio buttons and checkboxes have Mumcord's own design everywhere: a ring with a lilac dot and a rounded box with a lilac check, with a clear focus ring and high-contrast support. Option cards such as "Private messages from" highlight the whole card
 - Setup wizard, "How do you want to talk?": two clear cards with a short explanation, the sensitivity choice nested under voice activation, and the push-to-talk key right in its card; Continue waits until a key is set
 - Peer-to-peer: "Direct + relay (always relay, hides my IP)" is now the recommended mode and the default for new installs, and the Balanced setup style uses it. A mode you already use stays as it is

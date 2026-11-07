@@ -8,15 +8,15 @@
     "unfollow": "Prestani pratiti kanal",
     "following": "Pratiš",
     "copyLink": "Kopiraj poveznicu kanala",
-    "password": "Lozinka kanala…",
+    "password": "Lozinka kanala",
     "info": "Informacije o kanalu",
-    "clear": "Očisti povijest chata…",
-    "audio": "Zvuk za ovaj kanal…",
+    "clear": "Očisti povijest chata",
+    "audio": "Zvuk za ovaj kanal",
     "audioHint": {
       "music": "♪ Glazba",
       "jam": "⚡ Jam"
     },
-    "move": "Premjesti korisnike ovamo…"
+    "move": "Premjesti korisnike ovamo"
   },
   "info": {
     "title": "Informacije o kanalu: {{channel}}",

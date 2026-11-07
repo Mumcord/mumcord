@@ -204,7 +204,7 @@ async function setMode(mode: "directRelay" | "relayOnly" | "directOnly"): Promis
   it("AC-7.20: once Bob blocks Alice, her new offers are not shown to him", async () => {
     await apps.onB(async () => {
       await personRow("Alice").click({ button: "right" });
-      await $("//*[@role='menuitem'][normalize-space()='Block…']").click();
+      await $("//*[@role='menuitem'][normalize-space()='Block']").click();
       await $("[data-testid='block-confirm']").click();
     });
     await offer([files.randomFile(dir, "after-block.txt", 1024)]);

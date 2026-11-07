@@ -59,9 +59,9 @@
     "joinFull": "Denne kanal er fuld.",
     "joinLocked": "Du må ikke gå ind i denne kanal, eller den kræver en adgangskode.",
     "mute": "Slå lyden fra for mig",
-    "connectionInfo": "Forbindelsesinfo…",
+    "connectionInfo": "Forbindelsesinfo",
     "chatRequestPending": "Chatanmodning afventer",
-    "revokeConsent": "Tilbagekald chatsamtykke …"
+    "revokeConsent": "Tilbagekald chatsamtykke"
   },
   "nowPlaying": {
     "label": "Spiller nu",
@@ -113,7 +113,7 @@
     "failed": "Tilbagekaldelsen af chatsamtykket mislykkedes. Prøv igen."
   },
   "block": {
-    "menu": "Bloker…",
+    "menu": "Bloker",
     "unblock": "Fjern blokering",
     "title": "Vil du blokere {{name}}?",
     "onServer": "på {{server}}",

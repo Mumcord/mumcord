@@ -62,9 +62,9 @@
     "joinFull": "Dan il-kanal huwa mimli.",
     "joinLocked": "M’għandekx permess tidħol f’dan il-kanal, jew jeħtieġ password.",
     "mute": "Mutja għalija",
-    "connectionInfo": "Informazzjoni dwar il-konnessjoni…",
+    "connectionInfo": "Informazzjoni dwar il-konnessjoni",
     "chatRequestPending": "Talba għal chat pendenti",
-    "revokeConsent": "Irtira l-kunsens għaċ-chat…"
+    "revokeConsent": "Irtira l-kunsens għaċ-chat"
   },
   "nowPlaying": {
     "label": "Qed jindaqq issa",
@@ -125,7 +125,7 @@
     "failed": "L-irtirar tal-kunsens għaċ-chat ma rnexxiex. Erġa’ pprova."
   },
   "block": {
-    "menu": "Imblokka…",
+    "menu": "Imblokka",
     "unblock": "Neħħi l-blokk",
     "title": "Timblokka lil {{name}}?",
     "onServer": "fuq {{server}}",

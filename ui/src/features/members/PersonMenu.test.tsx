@@ -48,9 +48,9 @@ describe("PersonMenu", () => {
       "Send message",
       "Add friend",
       "View profile",
-      "Connection info…",
-      "Whisper to…",
-      "Block…",
+      "Connection info",
+      "Whisper to",
+      "Block",
     ]);
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
       "aria-checked",
@@ -85,9 +85,9 @@ describe("PersonMenu", () => {
     expect(entries[0]).toHaveTextContent("Send message");
     expect(entries[1]).toHaveTextContent("Add friend");
     expect(entries[2]).toHaveTextContent("View profile");
-    expect(entries[3]).toHaveTextContent("Connection info…");
-    expect(entries[4]).toHaveTextContent("Whisper to…");
-    expect(entries[9]).toHaveTextContent("Block…");
+    expect(entries[3]).toHaveTextContent("Connection info");
+    expect(entries[4]).toHaveTextContent("Whisper to");
+    expect(entries[9]).toHaveTextContent("Block");
   });
 
   it("shows a decorative icon on every entry", async () => {
@@ -119,15 +119,15 @@ describe("PersonMenu", () => {
     keys("ArrowDown");
     expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Connection info…" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Connection info" })).toHaveFocus();
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Whisper to…" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Whisper to" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("slider")).toHaveFocus();
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Block…" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Block" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitem", { name: "Send message" })).toHaveFocus();
   });
@@ -225,7 +225,7 @@ describe("PersonMenu", () => {
       });
     });
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
-    fireEvent.click(screen.getByRole("menuitem", { name: "Connection info…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Connection info" }));
     expect(menu()).not.toBeInTheDocument();
     const section = document.querySelector("dialog.profile-card [data-connection-section]");
     expect(section).toBeInTheDocument();
@@ -298,7 +298,7 @@ describe("PersonMenu", () => {
     expect(screen.queryByRole("slider")).not.toBeInTheDocument();
   });
 
-  it("offers Kick… and Ban… only with the right on the root channel, and never for yourself (FR-10.6, FR-10.2, FR-10.11, issue #253)", async () => {
+  it("offers Kick and Ban only with the right on the root channel, and never for yourself (FR-10.6, FR-10.2, FR-10.11, issue #253)", async () => {
     await renderPanel();
     const grant = (patch: { kick?: boolean; ban?: boolean }) => {
       const root = getServerState().channels.get(0);
@@ -321,7 +321,7 @@ describe("PersonMenu", () => {
       within(submenu)
         .getAllByRole("menuitem")
         .map((item) => item.textContent),
-    ).toEqual(["Kick…"]);
+    ).toEqual(["Kick"]);
 
     // A red item still says what it is by its label, and the right decides what shows (FR-10.2).
     grant({ ban: true });
@@ -329,8 +329,8 @@ describe("PersonMenu", () => {
       within(submenu)
         .getAllByRole("menuitem")
         .map((item) => item.textContent),
-    ).toEqual(["Kick…", "Ban…"]);
-    expect(within(submenu).getByRole("menuitem", { name: "Kick…" })).toHaveTextContent("Kick…");
+    ).toEqual(["Kick", "Ban"]);
+    expect(within(submenu).getByRole("menuitem", { name: "Kick" })).toHaveTextContent("Kick");
 
     act(() => {
       closePersonMenu();
@@ -355,8 +355,8 @@ describe("PersonMenu", () => {
     });
 
     for (const [item, title] of [
-      ["Kick…", /^Kick Anna\?/],
-      ["Ban…", /^Ban Anna/],
+      ["Kick", /^Kick Anna\?/],
+      ["Ban", /^Ban Anna/],
     ] as const) {
       fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
       fireEvent.click(screen.getByRole("menuitem", { name: "Admin" }));
@@ -435,9 +435,9 @@ describe("PersonMenu", () => {
         "Join Raid",
         "Add friend",
         "View profile",
-        "Connection info…",
-        "Whisper to…",
-        "Block…",
+        "Connection info",
+        "Whisper to",
+        "Block",
       ]);
       fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
       expect(join).toHaveBeenCalledWith(1, 2);

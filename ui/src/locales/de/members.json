@@ -59,9 +59,9 @@
     "joinFull": "Dieser Kanal ist voll.",
     "joinLocked": "Du darfst diesen Kanal nicht betreten, oder er braucht ein Passwort.",
     "mute": "Für mich stummschalten",
-    "connectionInfo": "Verbindungsinfo …",
+    "connectionInfo": "Verbindungsinfo",
     "chatRequestPending": "Chatanfrage ausstehend",
-    "revokeConsent": "Chat-Zustimmung widerrufen …"
+    "revokeConsent": "Chat-Zustimmung widerrufen"
   },
   "nowPlaying": {
     "label": "Läuft gerade",
@@ -113,7 +113,7 @@
     "failed": "Das Widerrufen der Chat-Zustimmung hat nicht geklappt. Bitte versuche es noch einmal."
   },
   "block": {
-    "menu": "Blockieren…",
+    "menu": "Blockieren",
     "unblock": "Blockierung aufheben",
     "title": "{{name}} blockieren?",
     "onServer": "auf {{server}}",

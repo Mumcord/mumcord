@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Waqqaf it-tkellim u l-ismigħ, ibqa' konness għaċ-chat",
     "disconnectHint": "Agħlaq il-konnessjoni ma' dan is-server",
     "switchTo": "Ibdel il-vuċi għal {{server}}",
-    "all": "Skonnettja mis-servers kollha…",
+    "all": "Skonnettja mis-servers kollha",
     "allHint": "Agħlaq il-konnessjonijiet kollha tas-servers"
   },
   "disconnectAll": {

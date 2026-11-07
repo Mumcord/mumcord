@@ -60,9 +60,9 @@
     "joinFull": "Este canal está cheio.",
     "joinLocked": "Não podes entrar neste canal ou ele precisa de uma palavra-passe.",
     "mute": "Silenciar para mim",
-    "connectionInfo": "Informações da ligação…",
+    "connectionInfo": "Informações da ligação",
     "chatRequestPending": "Pedido de chat pendente",
-    "revokeConsent": "Revogar consentimento de chat…"
+    "revokeConsent": "Revogar consentimento de chat"
   },
   "nowPlaying": {
     "label": "A reproduzir",
@@ -117,7 +117,7 @@
     "failed": "Não foi possível revogar o consentimento de chat. Tenta novamente."
   },
   "block": {
-    "menu": "Bloquear…",
+    "menu": "Bloquear",
     "unblock": "Desbloquear",
     "title": "Bloquear {{name}}?",
     "onServer": "em {{server}}",

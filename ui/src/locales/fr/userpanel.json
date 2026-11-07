@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Ne plus parler ni écouter, rester connecté pour le chat",
     "disconnectHint": "Fermer la connexion à ce serveur",
     "switchTo": "Passer le vocal sur {{server}}",
-    "all": "Se déconnecter de tous les serveurs…",
+    "all": "Se déconnecter de tous les serveurs",
     "allHint": "Fermer toutes les connexions aux serveurs"
   },
   "disconnectAll": {

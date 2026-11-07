@@ -59,9 +59,9 @@
     "joinFull": "Ez a csatorna megtelt.",
     "joinLocked": "Nem léphetsz be ebbe a csatornába, vagy jelszó kell hozzá.",
     "mute": "Némítás nálam",
-    "connectionInfo": "Kapcsolati adatok…",
+    "connectionInfo": "Kapcsolati adatok",
     "chatRequestPending": "Csevegési kérés függőben",
-    "revokeConsent": "Csevegési hozzájárulás visszavonása…"
+    "revokeConsent": "Csevegési hozzájárulás visszavonása"
   },
   "nowPlaying": {
     "label": "Most szól",
@@ -113,7 +113,7 @@
     "failed": "A csevegési hozzájárulás visszavonása nem sikerült. Próbáld újra."
   },
   "block": {
-    "menu": "Letiltás…",
+    "menu": "Letiltás",
     "unblock": "Letiltás feloldása",
     "title": "Letiltod {{name}} felhasználót?",
     "onServer": "a(z) {{server}} szerveren",

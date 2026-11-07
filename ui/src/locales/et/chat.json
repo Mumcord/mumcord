@@ -172,7 +172,7 @@
   "imageMenu": {
     "label": "Pilt {{name}}",
     "copy": "Kopeeri pilt",
-    "save": "Salvesta pilt…",
+    "save": "Salvesta pilt",
     "copyAddress": "Kopeeri pildi aadress",
     "openViewer": "Ava pildivaaturis",
     "copied": "Pilt kopeeritud",
@@ -346,7 +346,7 @@
       "muteEightHours": "8 tunniks",
       "muteForever": "Kuni lülitan tagasi",
       "profile": "Vaata profiili",
-      "block": "Blokeeri {{name}}…",
+      "block": "Blokeeri {{name}}",
       "deleteHistory": "Kustuta vestluslugu",
       "deleteHint": "Ainult see seade · {{name}} säilitab oma koopia"
     }

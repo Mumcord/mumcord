@@ -38,9 +38,9 @@
     "alwaysConnect": "Vedno poveži ob zagonu",
     "muteNotifications": "Utišaj obvestila",
     "muteGroupMentions": "Utišaj @all in @channel",
-    "theme": "Tema…",
+    "theme": "Tema",
     "showWelcome": "Pokaži pozdravno sporočilo",
-    "identity": "Identiteta…"
+    "identity": "Identiteta"
   },
   "theme": {
     "title": "Tema za {{server}}",

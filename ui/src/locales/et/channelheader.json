@@ -8,15 +8,15 @@
     "unfollow": "Lõpeta kanali jälgimine",
     "following": "Jälgin",
     "copyLink": "Kopeeri kanali link",
-    "password": "Kanali parool…",
+    "password": "Kanali parool",
     "info": "Kanali info",
-    "clear": "Tühjenda vestluse ajalugu…",
-    "audio": "Selle kanali heli…",
+    "clear": "Tühjenda vestluse ajalugu",
+    "audio": "Selle kanali heli",
     "audioHint": {
       "music": "♪ Muusika",
       "jam": "⚡ Jam"
     },
-    "move": "Teisalda kasutajad siia…"
+    "move": "Teisalda kasutajad siia"
   },
   "info": {
     "title": "Kanali info: {{channel}}",

@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Nustoti kalbėti ir klausyti, likti prisijungus pokalbiams",
     "disconnectHint": "Uždaryti ryšį su šiuo serveriu",
     "switchTo": "Perkelti balsą į {{server}}",
-    "all": "Atsijungti nuo visų serverių…",
+    "all": "Atsijungti nuo visų serverių",
     "allHint": "Uždaryti visus ryšius su serveriais"
   },
   "disconnectAll": {

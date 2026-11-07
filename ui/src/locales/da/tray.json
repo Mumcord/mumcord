@@ -1,6 +1,6 @@
 {
   "show": "Åbn Mumcord",
-  "settings": "Indstillinger…",
+  "settings": "Indstillinger",
   "mute": "Slå mikrofonen fra",
   "deafen": "Slå lyden fra",
   "dnd": "Forstyr ikke",
@@ -17,7 +17,7 @@
   "voiceMenu": "Stemmeserver og kanal",
   "voiceServer": "Stemmeserver",
   "channelsOf": "Kanaler · {server}",
-  "moreChannels": "Flere kanaler i Mumcord…",
+  "moreChannels": "Flere kanaler i Mumcord",
   "recentChats": "Seneste chats",
   "chatUnread": "{name} – {count} ulæste",
   "cameraOn": "Kamera tændt",

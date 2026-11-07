@@ -8,15 +8,15 @@
     "unfollow": "Unfollow channel",
     "following": "Following",
     "copyLink": "Copy channel link",
-    "password": "Channel password…",
+    "password": "Channel password",
     "info": "Channel info",
-    "clear": "Clear chat history…",
-    "audio": "Audio for this channel…",
+    "clear": "Clear chat history",
+    "audio": "Audio for this channel",
     "audioHint": {
       "music": "♪ Music",
       "jam": "⚡ Jam"
     },
-    "move": "Move users here…"
+    "move": "Move users here"
   },
   "info": {
     "title": "Channel info: {{channel}}",

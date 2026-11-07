@@ -110,7 +110,7 @@ describe("image context menu (#115)", () => {
     rightClick(image);
     const menu = screen.getByRole("menu", { name: "Image image" });
     expect(await axeViolations(menu)).toEqual([]);
-    expect(menuItems()).toEqual(["Copy image", "Save image…", "Open in image viewer"]);
+    expect(menuItems()).toEqual(["Copy image", "Save image", "Open in image viewer"]);
     fireEvent.click(screen.getByRole("menuitem", { name: "Open in image viewer" }));
     expect(screen.getByRole("dialog", { name: "Image viewer" })).toBeInTheDocument();
   });
@@ -146,7 +146,7 @@ describe("image context menu (#115)", () => {
     const save = vi.spyOn(api, "saveImage");
     renderMessage(`<img src="${PNG}">`);
     rightClick(screen.getByRole("button", { name: /image from Maya/i }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Save image…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Save image" }));
     expect(await screen.findByText("Image saved")).toBeInTheDocument();
     expect(dialogs.pickSavePath).toHaveBeenCalledWith(
       expect.stringMatching(/^image-\d{4}-\d{2}-\d{2}\.png$/),
@@ -198,13 +198,13 @@ describe("image context menu (#115)", () => {
     rightClick(figure);
     expect(menuItems()).toEqual([
       "Copy image",
-      "Save image…",
+      "Save image",
       "Copy image address",
       "Open in image viewer",
       "Save as favorite",
       "Open in browser",
     ]);
-    fireEvent.click(screen.getByRole("menuitem", { name: "Save image…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Save image" }));
     await waitFor(() => {
       expect(save).toHaveBeenCalledWith("/tmp/cat.gif", GIF.src);
     });

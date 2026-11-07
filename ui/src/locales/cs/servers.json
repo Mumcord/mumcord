@@ -38,9 +38,9 @@
     "alwaysConnect": "Vždy připojit při spuštění",
     "muteNotifications": "Ztlumit oznámení",
     "muteGroupMentions": "Ztlumit @all a @channel",
-    "theme": "Motiv…",
+    "theme": "Motiv",
     "showWelcome": "Zobrazit uvítací zprávu",
-    "identity": "Identita…"
+    "identity": "Identita"
   },
   "theme": {
     "title": "Motiv pro {{server}}",

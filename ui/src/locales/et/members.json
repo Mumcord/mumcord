@@ -59,9 +59,9 @@
     "joinFull": "See kanal on täis.",
     "joinLocked": "Sa ei tohi sellesse kanalisse siseneda või see vajab parooli.",
     "mute": "Vaigista minu jaoks",
-    "connectionInfo": "Ühenduse teave…",
+    "connectionInfo": "Ühenduse teave",
     "chatRequestPending": "Vestlustaotlus ootel",
-    "revokeConsent": "Võta vestlusnõusolek tagasi…"
+    "revokeConsent": "Võta vestlusnõusolek tagasi"
   },
   "nowPlaying": {
     "label": "Praegu mängib",
@@ -113,7 +113,7 @@
     "failed": "Vestlusnõusoleku tagasivõtmine ebaõnnestus. Proovi uuesti."
   },
   "block": {
-    "menu": "Blokeeri…",
+    "menu": "Blokeeri",
     "unblock": "Eemalda blokeering",
     "title": "Kas blokeerida {{name}}?",
     "onServer": "serveris {{server}}",

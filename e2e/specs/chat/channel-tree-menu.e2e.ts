@@ -39,7 +39,7 @@ async function rightClick(name: string): Promise<void> {
 }
 
 // AC-3.65 (issue #172): right-click on a channel opens the shared channel menu; items the user
-// may not use (Move users here… without the move permission) are left out; the menu key opens
+// may not use (Move users here without the move permission) are left out; the menu key opens
 // it from the keyboard and "Join channel" joins.
 describe("chat: channel tree right-click menu (AC-3.65)", () => {
   before(async () => {
@@ -50,17 +50,17 @@ describe("chat: channel tree right-click menu (AC-3.65)", () => {
     await joinChannel("Lobby");
   });
 
-  it("offers the channel actions and hides Move users here… without the move permission", async () => {
+  it("offers the channel actions and hides Move users here without the move permission", async () => {
     await rightClick("Raid");
     const items = await menuItems();
     expect(items).toEqual([
       "Join channel",
       "Follow channel",
-      "Audio for this channel…",
-      "Whisper to…",
+      "Audio for this channel",
+      "Whisper to",
       "Copy channel link",
       "Channel info",
-      "Clear chat history…",
+      "Clear chat history",
     ]);
     await browser.keys("Escape");
     await expect(menu()).not.toExist();

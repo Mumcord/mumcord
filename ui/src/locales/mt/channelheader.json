@@ -8,15 +8,15 @@
     "unfollow": "Waqqaf is-segwiment tal-kanal",
     "following": "Qed issegwi",
     "copyLink": "Ikkopja r-rabta tal-kanal",
-    "password": "Il-password tal-kanal…",
+    "password": "Il-password tal-kanal",
     "info": "Informazzjoni dwar il-kanal",
-    "clear": "Neħħi l-istorja taċ-chat…",
-    "audio": "Awdjo għal dan il-kanal…",
+    "clear": "Neħħi l-istorja taċ-chat",
+    "audio": "Awdjo għal dan il-kanal",
     "audioHint": {
       "music": "♪ Mużika",
       "jam": "⚡ Jam"
     },
-    "move": "Mexxi utenti hawn…"
+    "move": "Mexxi utenti hawn"
   },
   "info": {
     "title": "Informazzjoni dwar il-kanal: {{channel}}",

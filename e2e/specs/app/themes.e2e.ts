@@ -298,7 +298,7 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
       await waitGone("dialog[open]");
       await serverB().click({ button: "right" });
     }
-    await $('[role="menuitem"]=Theme…').click();
+    await $('[role="menuitem"]=Theme').click();
     await expect($(`.theme-picker__circle[aria-label^="QA Plum,"]`)).toBeDisplayed();
     expect(await $('.theme-picker__circle[aria-label*="selected"]').getAttribute("aria-label")).toContain("QA Plum");
     await button("Cancel").click();

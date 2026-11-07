@@ -172,7 +172,7 @@
   "imageMenu": {
     "label": "Billede {{name}}",
     "copy": "Kopiér billede",
-    "save": "Gem billede…",
+    "save": "Gem billede",
     "copyAddress": "Kopiér billedadresse",
     "openViewer": "Åbn i billedfremviser",
     "copied": "Billede kopieret",
@@ -346,7 +346,7 @@
       "muteEightHours": "I 8 timer",
       "muteForever": "Indtil jeg slår den til igen",
       "profile": "Se profil",
-      "block": "Bloker {{name}}…",
+      "block": "Bloker {{name}}",
       "deleteHistory": "Slet historik",
       "deleteHint": "Kun denne enhed · {{name}} beholder sin kopi"
     }

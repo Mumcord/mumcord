@@ -120,7 +120,7 @@ describe("chat: private message rules and message requests (#141)", () => {
     const person = $(`//div[contains(@class,'tree-person') and contains(.,'${BOT}')]`);
     await person.waitForDisplayed({ timeout: 10_000 });
     await person.click({ button: "right" });
-    const revoke = $("//*[@role='menuitem'][normalize-space()='Revoke chat consent…']");
+    const revoke = $("//*[@role='menuitem'][normalize-space()='Revoke chat consent']");
     await revoke.waitForClickable();
     await revoke.click();
     const dialog = $(`//dialog[.//*[contains(.,'Revoke chat consent for ${BOT}?')]]`);

@@ -223,8 +223,8 @@ describe("ServerBar", () => {
       "Always connect at start",
       "Mute notifications",
       "Mute @all and @channel",
-      "Identity…",
-      "Theme…",
+      "Identity",
+      "Theme",
       "Edit server",
       "Move down",
       "Remove server",
@@ -481,7 +481,7 @@ describe("ServerBar with several servers (spec §5.2)", () => {
     await renderAll();
     const [server] = await api.serversList();
     if (!server) throw new Error("no server");
-    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Theme…" }));
+    fireEvent.click(within(openMenuOf(0)).getByRole("menuitem", { name: "Theme" }));
     const themes = within(dialog()).getByRole("group", { name: "Theme" });
     const circle = (name: string) =>
       within(themes).getByRole("button", { name: new RegExp(`^${name}, theme`) });

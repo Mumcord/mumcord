@@ -38,9 +38,9 @@
     "alwaysConnect": "Yhdistä aina käynnistettäessä",
     "muteNotifications": "Mykistä ilmoitukset",
     "muteGroupMentions": "Mykistä @all ja @channel",
-    "theme": "Teema…",
+    "theme": "Teema",
     "showWelcome": "Näytä tervetuloviesti",
-    "identity": "Identiteetti…"
+    "identity": "Identiteetti"
   },
   "theme": {
     "title": "Teema palvelimelle {{server}}",

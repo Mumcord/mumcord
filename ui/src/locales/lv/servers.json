@@ -38,9 +38,9 @@
     "alwaysConnect": "Vienmēr savienot palaišanas laikā",
     "muteNotifications": "Apklusināt paziņojumus",
     "muteGroupMentions": "Apklusināt @all un @channel",
-    "theme": "Motīvs…",
+    "theme": "Motīvs",
     "showWelcome": "Rādīt sveiciena ziņu",
-    "identity": "Identitāte…"
+    "identity": "Identitāte"
   },
   "theme": {
     "title": "Motīvs serverim {{server}}",

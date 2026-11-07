@@ -60,9 +60,9 @@
     "joinFull": "Ovaj kanal je pun.",
     "joinLocked": "Ne smiješ ući u ovaj kanal ili je potrebna lozinka.",
     "mute": "Utišaj za mene",
-    "connectionInfo": "Informacije o vezi…",
+    "connectionInfo": "Informacije o vezi",
     "chatRequestPending": "Zahtjev za razgovor na čekanju",
-    "revokeConsent": "Opozovi pristanak na chat…"
+    "revokeConsent": "Opozovi pristanak na chat"
   },
   "nowPlaying": {
     "label": "Trenutno svira",
@@ -117,7 +117,7 @@
     "failed": "Opoziv pristanka na chat nije uspio. Pokušaj ponovno."
   },
   "block": {
-    "menu": "Blokiraj…",
+    "menu": "Blokiraj",
     "unblock": "Odblokiraj",
     "title": "Blokirati korisnika {{name}}?",
     "onServer": "na poslužitelju {{server}}",

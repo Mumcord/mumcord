@@ -38,9 +38,9 @@
     "alwaysConnect": "Винаги свързвай при стартиране",
     "muteNotifications": "Заглуши известията",
     "muteGroupMentions": "Заглуши @all и @channel",
-    "theme": "Тема…",
+    "theme": "Тема",
     "showWelcome": "Покажи приветственото съобщение",
-    "identity": "Идентичност…"
+    "identity": "Идентичност"
   },
   "theme": {
     "title": "Тема за {{server}}",

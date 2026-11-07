@@ -1,6 +1,6 @@
 {
   "show": "Atvērt Mumcord",
-  "settings": "Iestatījumi…",
+  "settings": "Iestatījumi",
   "mute": "Izslēgt mikrofonu",
   "deafen": "Izslēgt skaņu",
   "dnd": "Netraucēt",
@@ -17,7 +17,7 @@
   "voiceMenu": "Balss serveris un kanāls",
   "voiceServer": "Balss serveris",
   "channelsOf": "Kanāli · {server}",
-  "moreChannels": "Vairāk kanālu Mumcord…",
+  "moreChannels": "Vairāk kanālu Mumcord",
   "recentChats": "Nesenās tērzēšanas",
   "chatUnread": "{name} – {count} nelasīti",
   "cameraOn": "Kamera ieslēgta",

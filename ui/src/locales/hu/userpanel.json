@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Beszéd és hallgatás leállítása, csevegéshez kapcsolatban marad",
     "disconnectHint": "A kapcsolat bontása ezzel a szerverrel",
     "switchTo": "Hang áthelyezése ide: {{server}}",
-    "all": "Lekapcsolódás az összes szerverről…",
+    "all": "Lekapcsolódás az összes szerverről",
     "allHint": "Minden szerverkapcsolat bontása"
   },
   "disconnectAll": {

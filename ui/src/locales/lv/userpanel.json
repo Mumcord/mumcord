@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Pārtraukt runāt un klausīties, palikt savienotam čatam",
     "disconnectHint": "Aizvērt savienojumu ar šo serveri",
     "switchTo": "Pārvietot balsi uz {{server}}",
-    "all": "Atvienoties no visiem serveriem…",
+    "all": "Atvienoties no visiem serveriem",
     "allHint": "Aizvērt visus savienojumus ar serveriem"
   },
   "disconnectAll": {

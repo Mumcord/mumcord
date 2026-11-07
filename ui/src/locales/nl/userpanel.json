@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Stop met praten en luisteren, blijf verbonden voor de chat",
     "disconnectHint": "De verbinding met deze server sluiten",
     "switchTo": "Spraak overzetten naar {{server}}",
-    "all": "Verbinding met alle servers verbreken…",
+    "all": "Verbinding met alle servers verbreken",
     "allHint": "Alle serververbindingen sluiten"
   },
   "disconnectAll": {

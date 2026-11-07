@@ -59,9 +59,9 @@
     "joinFull": "This channel is full.",
     "joinLocked": "You may not enter this channel, or it needs a password.",
     "mute": "Mute for me",
-    "connectionInfo": "Connection info…",
+    "connectionInfo": "Connection info",
     "chatRequestPending": "Chat request pending",
-    "revokeConsent": "Revoke chat consent…"
+    "revokeConsent": "Revoke chat consent"
   },
   "nowPlaying": {
     "label": "Now playing",
@@ -113,7 +113,7 @@
     "failed": "Revoking the chat consent failed. Please try again."
   },
   "block": {
-    "menu": "Block…",
+    "menu": "Block",
     "unblock": "Unblock",
     "title": "Block {{name}}?",
     "onServer": "on {{server}}",

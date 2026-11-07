@@ -61,9 +61,9 @@
     "joinFull": "Tento kanál je plný.",
     "joinLocked": "Do tohoto kanálu nesmíš vstoupit, nebo vyžaduje heslo.",
     "mute": "Ztlumit pro mě",
-    "connectionInfo": "Informace o připojení…",
+    "connectionInfo": "Informace o připojení",
     "chatRequestPending": "Žádost o chat čeká na vyřízení",
-    "revokeConsent": "Odvolat souhlas s chatem…"
+    "revokeConsent": "Odvolat souhlas s chatem"
   },
   "nowPlaying": {
     "label": "Právě hraje",
@@ -121,7 +121,7 @@
     "failed": "Odvolání souhlasu s chatem se nezdařilo. Zkus to prosím znovu."
   },
   "block": {
-    "menu": "Blokovat…",
+    "menu": "Blokovat",
     "unblock": "Odblokovat",
     "title": "Blokovat uživatele {{name}}?",
     "onServer": "na serveru {{server}}",

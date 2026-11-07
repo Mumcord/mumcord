@@ -1,6 +1,6 @@
 {
   "show": "Ouvrir Mumcord",
-  "settings": "Paramètres…",
+  "settings": "Paramètres",
   "mute": "Couper le micro",
   "deafen": "Couper le son",
   "dnd": "Ne pas déranger",
@@ -17,7 +17,7 @@
   "voiceMenu": "Serveur vocal et salon",
   "voiceServer": "Serveur vocal",
   "channelsOf": "Salons · {server}",
-  "moreChannels": "Plus de salons dans Mumcord…",
+  "moreChannels": "Plus de salons dans Mumcord",
   "recentChats": "Discussions récentes",
   "chatUnread": "{name} – {count} non lus",
   "cameraOn": "Caméra activée",

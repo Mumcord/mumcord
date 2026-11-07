@@ -8,15 +8,15 @@
     "unfollow": "Ne plus suivre le canal",
     "following": "Suivi",
     "copyLink": "Copier le lien du canal",
-    "password": "Mot de passe du canal…",
+    "password": "Mot de passe du canal",
     "info": "Infos du canal",
-    "clear": "Effacer l'historique du chat…",
-    "audio": "Audio de ce canal…",
+    "clear": "Effacer l'historique du chat",
+    "audio": "Audio de ce canal",
     "audioHint": {
       "music": "♪ Musique",
       "jam": "⚡ Jam"
     },
-    "move": "Déplacer des utilisateurs ici…"
+    "move": "Déplacer des utilisateurs ici"
   },
   "info": {
     "title": "Infos du canal : {{channel}}",

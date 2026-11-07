@@ -38,9 +38,9 @@
     "alwaysConnect": "Zawsze łącz przy starcie",
     "muteNotifications": "Wycisz powiadomienia",
     "muteGroupMentions": "Wycisz @all i @channel",
-    "theme": "Motyw…",
+    "theme": "Motyw",
     "showWelcome": "Pokaż wiadomość powitalną",
-    "identity": "Tożsamość…"
+    "identity": "Tożsamość"
   },
   "theme": {
     "title": "Motyw dla {{server}}",

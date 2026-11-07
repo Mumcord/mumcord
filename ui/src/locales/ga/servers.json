@@ -38,9 +38,9 @@
     "alwaysConnect": "Ceangail i gcónaí ag an tús",
     "muteNotifications": "Balbhaigh fógraí",
     "muteGroupMentions": "Balbhaigh @all agus @channel",
-    "theme": "Téama…",
+    "theme": "Téama",
     "showWelcome": "Taispeáin an teachtaireacht fáilte",
-    "identity": "Aitheantas…"
+    "identity": "Aitheantas"
   },
   "theme": {
     "title": "Téama do {{server}}",

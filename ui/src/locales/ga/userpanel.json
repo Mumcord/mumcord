@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Stop de bheith ag caint agus ag éisteacht, fan ceangailte don chomhrá",
     "disconnectHint": "Dún an nasc leis an bhfreastalaí seo",
     "switchTo": "Aistrigh an guth go {{server}}",
-    "all": "Dícheangail ó gach freastalaí…",
+    "all": "Dícheangail ó gach freastalaí",
     "allHint": "Dún gach nasc freastalaí"
   },
   "disconnectAll": {

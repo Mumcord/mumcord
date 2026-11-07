@@ -176,7 +176,7 @@
   "imageMenu": {
     "label": "Imagine {{name}}",
     "copy": "Copiază imaginea",
-    "save": "Salvează imaginea…",
+    "save": "Salvează imaginea",
     "copyAddress": "Copiază adresa imaginii",
     "openViewer": "Deschide în vizualizatorul de imagini",
     "copied": "Imagine copiată",
@@ -354,7 +354,7 @@
       "muteEightHours": "Pentru 8 ore",
       "muteForever": "Până o reactivez",
       "profile": "Vezi profilul",
-      "block": "Blochează-l pe {{name}}…",
+      "block": "Blochează-l pe {{name}}",
       "deleteHistory": "Șterge istoricul",
       "deleteHint": "Doar acest dispozitiv · {{name}} își păstrează copia"
     }

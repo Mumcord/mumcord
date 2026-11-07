@@ -8,15 +8,15 @@
     "unfollow": "Nu mai urmări canalul",
     "following": "Urmărești",
     "copyLink": "Copiază linkul canalului",
-    "password": "Parola canalului…",
+    "password": "Parola canalului",
     "info": "Informații despre canal",
-    "clear": "Șterge istoricul conversației…",
-    "audio": "Audio pentru acest canal…",
+    "clear": "Șterge istoricul conversației",
+    "audio": "Audio pentru acest canal",
     "audioHint": {
       "music": "♪ Muzică",
       "jam": "⚡ Jam"
     },
-    "move": "Mută utilizatori aici…"
+    "move": "Mută utilizatori aici"
   },
   "info": {
     "title": "Informații despre canal: {{channel}}",

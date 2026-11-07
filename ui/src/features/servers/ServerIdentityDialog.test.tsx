@@ -140,7 +140,7 @@ describe("server menu", () => {
       <ServerMenu
         label="Options"
         items={[
-          { id: "identity", label: "Identity…", onSelect },
+          { id: "identity", label: "Identity", onSelect },
           { id: "edit", label: "Edit server", onSelect: vi.fn() },
         ]}
         position={{ x: 0, y: 0 }}
@@ -148,7 +148,7 @@ describe("server menu", () => {
       />,
     );
     expect(server.identityId).toBeNull();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Identity…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Identity" }));
     expect(onSelect).toHaveBeenCalled();
   });
 });
