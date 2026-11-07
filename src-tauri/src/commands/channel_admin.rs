@@ -360,3 +360,137 @@ pub async fn channel_password_save(
         .await?;
     Ok(save_result(outcome))
 }
+
+/// A row of the "Who can do what" grid (FR-10.40).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum AclRowInput {
+    Everyone,
+    Group {
+        name: String,
+    },
+    /// Someone online.
+    Session {
+        session: u32,
+    },
+    /// A registered user, online or not.
+    User {
+        user_id: u32,
+    },
+}
+
+/// One cell's answer (FR-10.45–FR-10.47).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum AclVerdict {
+    Allowed,
+    Denied,
+    Depends,
+}
+
+/// Why a rule matched the row.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum AclMatchReason {
+    Everyone,
+    Registered,
+    InChannel,
+    NotInChannel,
+    Member { group: String },
+    ThisPerson,
+}
+
+/// Why a cell depends (FR-10.47).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum AclCondition {
+    Password { token: String },
+    Presence,
+    ServerGroup { group: String },
+}
+
+/// One cell of the grid with what the "Why?" panel shows (FR-10.46).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AclCell {
+    /// The permission bit.
+    pub permission: u32,
+    pub verdict: AclVerdict,
+    /// Index into the rules of the rule that decided it; `null` for the default rights.
+    pub rule: Option<u32>,
+    pub overrides: Option<u32>,
+    pub reason: Option<AclMatchReason>,
+    pub condition: Option<AclCondition>,
+    pub via_write: bool,
+    pub superuser: bool,
+}
+
+/// Works out the grid rows for the editor's (possibly unsaved) rules (FR-10.40, FR-10.45). Runs in
+/// the core, on the open channel only.
+#[tauri::command]
+#[specta::specta]
+pub fn channel_acl_evaluate(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    acl: ChannelAclView,
+    rows: Vec<AclRowInput>,
+) -> ApiResult<Vec<Vec<AclCell>>> {
+    use mumcord_engine::acl_eval::{Condition, MatchReason, RowSubject, Verdict};
+    let rows: Vec<RowSubject> = rows
+        .into_iter()
+        .map(|row| match row {
+            AclRowInput::Everyone => RowSubject::Everyone,
+            AclRowInput::Group { name } => RowSubject::Group(name),
+            AclRowInput::Session { session } => RowSubject::Session(session),
+            AclRowInput::User { user_id } => RowSubject::UserId(user_id),
+        })
+        .collect();
+    let index = |i: usize| u32::try_from(i).unwrap_or(u32::MAX);
+    let result =
+        engine.channel_acl_evaluate(to_engine_server_id(server_id), &acl_of(acl), &rows)?;
+    Ok(result
+        .into_iter()
+        .map(|cells| {
+            cells
+                .into_iter()
+                .map(|cell| AclCell {
+                    permission: cell.permission,
+                    verdict: match cell.verdict {
+                        Verdict::Allowed => AclVerdict::Allowed,
+                        Verdict::Denied => AclVerdict::Denied,
+                        Verdict::Depends => AclVerdict::Depends,
+                    },
+                    rule: cell.rule.map(index),
+                    overrides: cell.overrides.map(index),
+                    reason: cell.reason.map(|reason| match reason {
+                        MatchReason::Everyone => AclMatchReason::Everyone,
+                        MatchReason::Registered => AclMatchReason::Registered,
+                        MatchReason::InChannel => AclMatchReason::InChannel,
+                        MatchReason::NotInChannel => AclMatchReason::NotInChannel,
+                        MatchReason::Member(group) => AclMatchReason::Member { group },
+                        MatchReason::ThisPerson => AclMatchReason::ThisPerson,
+                    }),
+                    condition: cell.condition.map(|condition| match condition {
+                        Condition::Password(token) => AclCondition::Password { token },
+                        Condition::Presence => AclCondition::Presence,
+                        Condition::ServerGroup(group) => AclCondition::ServerGroup { group },
+                    }),
+                    via_write: cell.via_write,
+                    superuser: cell.superuser,
+                })
+                .collect()
+        })
+        .collect())
+}
+
+/// The rights the user would lose here with these rules, as permission bits (FR-10.41); empty for
+/// the SuperUser.
+#[tauri::command]
+#[specta::specta]
+pub fn channel_acl_lockout(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    acl: ChannelAclView,
+) -> ApiResult<Vec<u32>> {
+    Ok(engine.channel_acl_lockout(to_engine_server_id(server_id), &acl_of(acl))?)
+}

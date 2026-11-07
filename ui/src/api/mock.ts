@@ -40,6 +40,7 @@ import type {
   ChannelAudioProfile,
   ChannelInfo,
   AclRuleView,
+  AclVerdict,
   ChannelAclView,
   ChannelResult,
   DenialKind,
@@ -2866,6 +2867,44 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
       emitServer("channelUpserted", { channel: locked });
       return Promise.resolve({ kind: "saved", acl: structuredClone(saved) });
+    },
+    channelAclEvaluate: (serverId, acl, rows) => {
+      requireSession(serverId);
+      // A small stand-in for the core's evaluation: rules for "all" and the row's own group, the
+      // last one winning; enough for the editor's tests and screenshots.
+      const grid = [0x4, 0x2, 0x8, 0x100, 0x200, 0x800, 0x10, 0x20, 0x1, 0x40, 0x400, 0x80];
+      const defaults = 0x2 | 0x4 | 0x8 | 0x100 | 0x200 | 0x800;
+      return Promise.resolve(
+        rows.map((row) =>
+          grid.map((permission) => {
+            let verdict: AclVerdict = (defaults & permission) !== 0 ? "allowed" : "denied";
+            let rule: number | null = null;
+            let overrides: number | null = null;
+            for (const [index, r] of acl.rules.entries()) {
+              const who = r.group ?? "";
+              const hit = who === "all" || (row.kind === "group" && row.name === who);
+              if (!hit || ((r.grant | r.deny) & permission) === 0) continue;
+              overrides = rule;
+              rule = index;
+              verdict = (r.deny & permission) !== 0 ? "denied" : "allowed";
+            }
+            return {
+              permission,
+              verdict,
+              rule,
+              overrides,
+              reason: rule === null ? null : { kind: "everyone" as const },
+              condition: null,
+              viaWrite: false,
+              superuser: false,
+            };
+          }),
+        ),
+      );
+    },
+    channelAclLockout: (serverId) => {
+      requireSession(serverId);
+      return Promise.resolve([]);
     },
     channelRemove: (serverId, channelId) => {
       requireSession(serverId);

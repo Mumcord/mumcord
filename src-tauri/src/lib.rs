@@ -122,6 +122,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channel_admin::channel_acl_read,
             channel_admin::channel_acl_save,
             channel_admin::channel_password_save,
+            channel_admin::channel_acl_evaluate,
+            channel_admin::channel_acl_lockout,
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,

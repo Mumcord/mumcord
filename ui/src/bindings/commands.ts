@@ -191,6 +191,16 @@ export const commands = {
 	channelAclSave: (serverId: number, acl: ChannelAclView, startedFrom: ChannelAclView, force: boolean) => typedError<AclSaveResult, ApiError>(__TAURI_INVOKE("channel_acl_save", { serverId, acl, startedFrom, force })),
 	/**  Sets or clears the channel password (FR-10.28); `None` or an empty text clears it. */
 	channelPasswordSave: (serverId: number, channelId: number, password: string | null, startedFrom: ChannelAclView, force: boolean) => typedError<AclSaveResult, ApiError>(__TAURI_INVOKE("channel_password_save", { serverId, channelId, password, startedFrom, force })),
+	/**
+	 *  Works out the grid rows for the editor's (possibly unsaved) rules (FR-10.40, FR-10.45). Runs in
+	 *  the core, on the open channel only.
+	 */
+	channelAclEvaluate: (serverId: number, acl: ChannelAclView, rows: AclRowInput[]) => typedError<AclCell[][], ApiError>(__TAURI_INVOKE("channel_acl_evaluate", { serverId, acl, rows })),
+	/**
+	 *  The rights the user would lose here with these rules, as permission bits (FR-10.41); empty for
+	 *  the SuperUser.
+	 */
+	channelAclLockout: (serverId: number, acl: ChannelAclView) => typedError<number[], ApiError>(__TAURI_INVOKE("channel_acl_lockout", { serverId, acl })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -1404,6 +1414,23 @@ export type AcceptedConversationsChanged = {
 	conversations: AcceptedConversation[],
 };
 
+/**  One cell of the grid with what the "Why?" panel shows (FR-10.46). */
+export type AclCell = {
+	/**  The permission bit. */
+	permission: number,
+	verdict: AclVerdict,
+	/**  Index into the rules of the rule that decided it; `null` for the default rights. */
+	rule: number | null,
+	overrides: number | null,
+	reason: AclMatchReason | null,
+	condition: AclCondition | null,
+	viaWrite: boolean,
+	superuser: boolean,
+};
+
+/**  Why a cell depends (FR-10.47). */
+export type AclCondition = { kind: "password"; token: string } | { kind: "presence" } | { kind: "serverGroup"; group: string };
+
 /**  One group as this channel sees it (FR-10.38). */
 export type AclGroupView = {
 	name: string,
@@ -1414,6 +1441,16 @@ export type AclGroupView = {
 	remove: number[],
 	inheritedMembers: number[],
 };
+
+/**  Why a rule matched the row. */
+export type AclMatchReason = { kind: "everyone" } | { kind: "registered" } | { kind: "inChannel" } | { kind: "notInChannel" } | { kind: "member"; group: string } | { kind: "thisPerson" };
+
+/**  A row of the "Who can do what" grid (FR-10.40). */
+export type AclRowInput = { kind: "everyone" } | { kind: "group"; name: string } | 
+/**  Someone online. */
+{ kind: "session"; session: number } | 
+/**  A registered user, online or not. */
+{ kind: "user"; user_id: number };
 
 /**  One permission rule (FR-10.37). `grant` and `deny` are Mumble permission bits. */
 export type AclRuleView = {
@@ -1431,6 +1468,9 @@ export type AclRuleView = {
 export type AclSaveResult = { kind: "saved"; acl: ChannelAclView } | 
 /**  Someone changed the rules since they were read; nothing was sent. */
 { kind: "conflict"; acl: ChannelAclView };
+
+/**  One cell's answer (FR-10.45–FR-10.47). */
+export type AclVerdict = "allowed" | "denied" | "depends";
 
 /**  The profile in effect: the own channel's on the server that carries voice. */
 export type ActiveAudioProfile = {
