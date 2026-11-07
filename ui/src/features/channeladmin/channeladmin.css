@@ -160,3 +160,19 @@
   color: var(--color-text);
   font-size: inherit;
 }
+
+/* Password field with its Show/Hide button on the same line. */
+.channel-window__password {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.channel-window__password input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Edit mode keeps one height across tabs, so switching tabs does not make the window jump. */
+.channel-window [role="tabpanel"] {
+  min-height: 30rem;
+}
