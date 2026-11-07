@@ -31,7 +31,8 @@
     "noCertificate": "Failide jagamiseks on vaja kliendisertifikaati.",
     "modeNeedsRelay": "Failide jagamiseks on vaja releeserverit; sinu peer-to-peer seade on {{mode}}.",
     "modeOff": "Väljas",
-    "modeDirectOnly": "Ainult otse"
+    "modeDirectOnly": "Ainult otse",
+    "hideNoRelay": "Peida see vihje serveri {{server}} jaoks"
   },
   "reason": {
     "p2pOff": "Peer-to-peer on välja lülitatud.",

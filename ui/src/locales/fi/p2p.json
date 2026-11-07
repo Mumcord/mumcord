@@ -31,7 +31,8 @@
     "noCertificate": "Tiedostojen jako vaatii asiakasvarmenteen.",
     "modeNeedsRelay": "Tiedostojen jako vaatii releen; peer-to-peer-asetuksesi on {{mode}}.",
     "modeOff": "Pois",
-    "modeDirectOnly": "Vain suora"
+    "modeDirectOnly": "Vain suora",
+    "hideNoRelay": "Piilota tämä vihje palvelimelta {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer on pois päältä.",

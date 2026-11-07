@@ -585,6 +585,38 @@
   color: var(--color-text-secondary);
 }
 
+/* A hint with its close button (#579). */
+.chat-composer__hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.chat-composer__hint .chat-composer__blocked {
+  flex: 1;
+}
+
+.chat-composer__hint-close {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chat-composer__hint-close:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
 .chat-composer__error {
   color: var(--color-danger);
 }

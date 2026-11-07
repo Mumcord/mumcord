@@ -31,7 +31,8 @@
     "noCertificate": "A partilha de ficheiros precisa de um certificado de cliente.",
     "modeNeedsRelay": "A partilha de ficheiros precisa do retransmissor; a tua definição peer-to-peer é {{mode}}.",
     "modeOff": "Desativado",
-    "modeDirectOnly": "Apenas direto"
+    "modeDirectOnly": "Apenas direto",
+    "hideNoRelay": "Ocultar esta dica para {{server}}"
   },
   "reason": {
     "p2pOff": "O peer-to-peer está desativado.",

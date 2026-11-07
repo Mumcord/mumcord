@@ -64,7 +64,7 @@ afterEach(() => {
 function setup(
   target: { kind: "channel"; channelId: number } | { kind: "private"; session: number },
 ) {
-  render(
+  return render(
     <div className="chat">
       <Composer
         target={target}
@@ -107,6 +107,61 @@ describe("Composer file sharing", () => {
     const button = screen.getByRole("button", { name: "Share files in this channel" });
     expect(button.getAttribute("aria-disabled")).toBe("true");
     expect(button.getAttribute("data-tooltip")).toBe(reason);
+  });
+
+  it("closes the no-relay hint for this server and keeps the reason on the paperclip (#579)", async () => {
+    localStorage.clear();
+    const availability = vi.spyOn(api, "filesAvailability").mockResolvedValue({ kind: "noRelay" });
+    const reason = "This server has no relay, so file sharing isn't available.";
+    const { unmount } = setup(CHANNEL);
+    expect(await screen.findByText(reason)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /^Hide this hint for/ }));
+    expect(screen.queryByText(reason)).toBeNull();
+    const button = screen.getByRole("button", { name: "Share files in this channel" });
+    expect(button.getAttribute("data-tooltip")).toBe(reason);
+    unmount();
+
+    // Still hidden after a restart.
+    const before = availability.mock.calls.length;
+    setup(CHANNEL);
+    await waitFor(() => {
+      expect(availability.mock.calls.length).toBeGreaterThan(before);
+    });
+    expect(screen.getByRole("button", { name: "Share files in this channel" })).toHaveAttribute(
+      "data-tooltip",
+      reason,
+    );
+    expect(screen.queryByText(reason)).toBeNull();
+    localStorage.clear();
+  });
+
+  it("shows the closed no-relay hint again after a relay came and went (#579)", async () => {
+    localStorage.clear();
+    let relay = false;
+    vi.spyOn(api, "filesAvailability").mockImplementation(() =>
+      Promise.resolve(relay ? null : { kind: "noRelay" }),
+    );
+    const reason = "This server has no relay, so file sharing isn't available.";
+    const paperclip = () => screen.getByRole("button", { name: "Share files in this channel" });
+    setup(CHANNEL);
+    expect(await screen.findByText(reason)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /^Hide this hint for/ }));
+    expect(screen.queryByText(reason)).toBeNull();
+
+    relay = true;
+    act(() => {
+      api.mock.emit("relayChanged", { serverId: 1, info: {} as RelayInfo });
+    });
+    await waitFor(() => {
+      expect(paperclip()).not.toHaveAttribute("aria-disabled", "true");
+    });
+
+    relay = false;
+    act(() => {
+      api.mock.emit("relayChanged", { serverId: 1, info: {} as RelayInfo });
+    });
+    expect(await screen.findByText(reason)).toBeTruthy();
+    localStorage.clear();
   });
 
   it("reads the availability again when the relay changes or the settings close", async () => {

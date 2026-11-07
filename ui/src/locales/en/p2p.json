@@ -31,7 +31,8 @@
     "noCertificate": "File sharing needs a client certificate.",
     "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
     "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "modeDirectOnly": "Direct only",
+    "hideNoRelay": "Hide this hint for {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer is off.",

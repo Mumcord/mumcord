@@ -15,7 +15,7 @@ export function PaperclipButton({
   /** Why sharing is unavailable; shown as the tooltip and description of the disabled button. */
   reason: string | null;
   /** Id of the visible line that states the reason. */
-  describedBy?: string;
+  describedBy?: string | undefined;
   onPick: (paths: string[]) => void;
 }) {
   const { t } = useTranslation("files");

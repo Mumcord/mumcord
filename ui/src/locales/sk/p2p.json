@@ -31,7 +31,8 @@
     "noCertificate": "Zdieľanie súborov vyžaduje klientsky certifikát.",
     "modeNeedsRelay": "Zdieľanie súborov potrebuje relay; tvoje nastavenie peer-to-peer je {{mode}}.",
     "modeOff": "Vypnuté",
-    "modeDirectOnly": "Iba priame"
+    "modeDirectOnly": "Iba priame",
+    "hideNoRelay": "Skryť tento tip pre {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer je vypnuté.",
