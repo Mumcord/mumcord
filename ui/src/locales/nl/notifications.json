@@ -69,6 +69,11 @@
       "body": "Herstart om bij te werken",
       "restart": "Herstarten en bijwerken",
       "whatsNew": "Wat is er nieuw"
+    },
+    "relay": {
+      "title": "Relay gewijzigd op {{server}}",
+      "body": "Scherm- en bestandsdeling zijn gepauzeerd tot je de nieuwe relay vertrouwt.",
+      "decision": "Jouw beslissing nodig"
     }
   }
 }

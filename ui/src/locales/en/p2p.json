@@ -61,5 +61,23 @@
     "rateLimited": "too many attempts",
     "version": "unsupported version",
     "badRequest": "invalid request"
+  },
+  "trust": {
+    "title": "Relay changed on {{server}}",
+    "body": "Screen and file sharing are paused until you trust the new relay.",
+    "details": "Details",
+    "trustedTitle": "New relay trusted",
+    "trustedBody": "Screen and file sharing on {{server}} work again.",
+    "dialogBody": "The relay of this server now uses a different certificate. Until you trust it, screen sharing, file sharing and full-size images are paused.",
+    "previous": "Previously trusted relay",
+    "current": "New relay",
+    "unknown": "Unknown",
+    "trustIf": "Trust it if",
+    "trustIfText": "the server admins announced a new relay or moved it, and you can confirm that with them.",
+    "dontTrustIf": "Do not trust it if",
+    "dontTrustIfText": "nobody announced a change, or you are not sure. Someone could be impersonating the relay.",
+    "notNow": "Not now",
+    "review": "Relay changed – review",
+    "filesBlocked": "File sharing isn't available: the relay of this server changed and is not trusted yet."
   }
 }

@@ -73,6 +73,11 @@
       "body": "Reinicie para atualizar",
       "restart": "Reiniciar para atualizar",
       "whatsNew": "Novidades"
+    },
+    "relay": {
+      "title": "Relay alterado em {{server}}",
+      "body": "A partilha de ecrã e ficheiros está em pausa até confiares no novo relay.",
+      "decision": "Precisa da tua decisão"
     }
   }
 }

@@ -69,6 +69,11 @@
       "body": "Indítsa újra a frissítéshez",
       "restart": "Újraindítás és frissítés",
       "whatsNew": "Újdonságok"
+    },
+    "relay": {
+      "title": "Megváltozott a relay ezen: {{server}}",
+      "body": "A képernyő- és fájlmegosztás szünetel, amíg meg nem bízol az új relayben.",
+      "decision": "A döntésedre vár"
     }
   }
 }

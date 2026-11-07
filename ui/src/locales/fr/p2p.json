@@ -61,5 +61,23 @@
     "rateLimited": "trop de tentatives",
     "version": "version non prise en charge",
     "badRequest": "demande invalide"
+  },
+  "trust": {
+    "title": "Relais modifié sur {{server}}",
+    "body": "Le partage d'écran et de fichiers est en pause jusqu'à ce que tu fasses confiance au nouveau relais.",
+    "details": "Détails",
+    "trustedTitle": "Nouveau relais approuvé",
+    "trustedBody": "Le partage d'écran et de fichiers fonctionne à nouveau sur {{server}}.",
+    "dialogBody": "Le relais de ce serveur utilise maintenant un autre certificat. Tant que tu ne lui fais pas confiance, le partage d'écran, de fichiers et les images en taille réelle sont en pause.",
+    "previous": "Relais approuvé jusqu'ici",
+    "current": "Nouveau relais",
+    "unknown": "Inconnu",
+    "trustIf": "Fais-lui confiance si",
+    "trustIfText": "les admins du serveur ont annoncé un nouveau relais ou un déménagement et que tu peux le confirmer avec eux.",
+    "dontTrustIf": "Ne lui fais pas confiance si",
+    "dontTrustIfText": "personne n'a annoncé de changement ou si tu n'es pas sûr. Quelqu'un pourrait se faire passer pour le relais.",
+    "notNow": "Pas maintenant",
+    "review": "Relais modifié – vérifier",
+    "filesBlocked": "Le partage de fichiers n'est pas disponible : le relais de ce serveur a changé et n'est pas encore approuvé."
   }
 }

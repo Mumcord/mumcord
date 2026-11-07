@@ -69,6 +69,11 @@
       "body": "Värskendamiseks taaskäivita",
       "restart": "Taaskäivita ja värskenda",
       "whatsNew": "Mis on uut"
+    },
+    "relay": {
+      "title": "Relee serveris {{server}} muutus",
+      "body": "Ekraani ja failide jagamine on peatatud, kuni usaldad uut releed.",
+      "decision": "Vajab sinu otsust"
     }
   }
 }

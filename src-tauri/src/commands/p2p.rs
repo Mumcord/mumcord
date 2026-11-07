@@ -189,6 +189,10 @@ pub struct RelayInfo {
     pub uses: Vec<RelayUse>,
     /// Most viewers per broadcast; `null` when the relay offers no broadcasts.
     pub broadcast_max: Option<u16>,
+    /// The announced relay's certificate fingerprint.
+    pub fingerprint: Option<String>,
+    /// The trusted relay's fingerprint while a changed relay waits for trust (#600).
+    pub previous_fingerprint: Option<String>,
 }
 
 /// The relay of a server changed (FR-4.20).
@@ -280,6 +284,8 @@ impl From<peer::RelayInfo> for RelayInfo {
             first_seen: i.first_seen.map(rfc3339),
             uses: i.uses.into_iter().map(Into::into).collect(),
             broadcast_max: i.broadcast_max,
+            fingerprint: i.fingerprint,
+            previous_fingerprint: i.previous_fingerprint,
         }
     }
 }

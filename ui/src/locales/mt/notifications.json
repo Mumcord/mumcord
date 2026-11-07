@@ -81,6 +81,11 @@
       "body": "Erġa' ibda biex taġġorna",
       "restart": "Erġa' ibda biex taġġorna",
       "whatsNew": "X'hemm ġdid"
+    },
+    "relay": {
+      "title": "Ir-relay fuq {{server}} inbidel",
+      "body": "Il-qsim tal-iskrin u tal-fajls huwa mwaqqaf sakemm tafda r-relay il-ġdid.",
+      "decision": "Jeħtieġ id-deċiżjoni tiegħek"
     }
   }
 }

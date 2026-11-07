@@ -61,5 +61,23 @@
     "rateLimited": "zbyt wiele prób",
     "version": "nieobsługiwana wersja",
     "badRequest": "nieprawidłowe żądanie"
+  },
+  "trust": {
+    "title": "Przekaźnik na {{server}} się zmienił",
+    "body": "Udostępnianie ekranu i plików jest wstrzymane, dopóki nie zaufasz nowemu przekaźnikowi.",
+    "details": "Szczegóły",
+    "trustedTitle": "Zaufano nowemu przekaźnikowi",
+    "trustedBody": "Udostępnianie ekranu i plików na {{server}} znowu działa.",
+    "dialogBody": "Przekaźnik tego serwera używa teraz innego certyfikatu. Dopóki mu nie zaufasz, udostępnianie ekranu, plików i obrazy w pełnym rozmiarze są wstrzymane.",
+    "previous": "Dotychczas zaufany przekaźnik",
+    "current": "Nowy przekaźnik",
+    "unknown": "Nieznany",
+    "trustIf": "Zaufaj, jeśli",
+    "trustIfText": "administratorzy ogłosili nowy przekaźnik lub przeprowadzkę i możesz to z nimi potwierdzić.",
+    "dontTrustIf": "Nie ufaj, jeśli",
+    "dontTrustIfText": "nikt nie ogłosił zmiany lub nie masz pewności. Ktoś może podszywać się pod przekaźnik.",
+    "notNow": "Nie teraz",
+    "review": "Przekaźnik zmieniony – sprawdź",
+    "filesBlocked": "Udostępnianie plików jest niedostępne: przekaźnik tego serwera się zmienił i nie jest jeszcze zaufany."
   }
 }

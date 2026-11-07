@@ -77,6 +77,11 @@
       "body": "Za posodobitev znova zaženite",
       "restart": "Znova zaženi in posodobi",
       "whatsNew": "Kaj je novega"
+    },
+    "relay": {
+      "title": "Rele na {{server}} se je spremenil",
+      "body": "Deljenje zaslona in datotek je zaustavljeno, dokler novemu releju ne zaupaš.",
+      "decision": "Potrebna je tvoja odločitev"
     }
   }
 }

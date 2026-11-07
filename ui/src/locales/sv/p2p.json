@@ -61,5 +61,23 @@
     "rateLimited": "för många försök",
     "version": "version stöds inte",
     "badRequest": "ogiltig begäran"
+  },
+  "trust": {
+    "title": "Reläet på {{server}} har ändrats",
+    "body": "Skärm- och fildelning är pausade tills du litar på det nya reläet.",
+    "details": "Detaljer",
+    "trustedTitle": "Nytt relä betrott",
+    "trustedBody": "Skärm- och fildelning på {{server}} fungerar igen.",
+    "dialogBody": "Reläet på den här servern använder nu ett annat certifikat. Tills du litar på det är skärmdelning, fildelning och bilder i full storlek pausade.",
+    "previous": "Tidigare betrott relä",
+    "current": "Nytt relä",
+    "unknown": "Okänt",
+    "trustIf": "Lita på det om",
+    "trustIfText": "serveradministratörerna har meddelat ett nytt relä eller en flytt och du kan bekräfta det med dem.",
+    "dontTrustIf": "Lita inte på det om",
+    "dontTrustIfText": "ingen har meddelat en ändring eller du är osäker. Någon kan utge sig för att vara reläet.",
+    "notNow": "Inte nu",
+    "review": "Relä ändrat – granska",
+    "filesBlocked": "Fildelning är inte tillgänglig: reläet på den här servern har ändrats och är inte betrott än."
   }
 }

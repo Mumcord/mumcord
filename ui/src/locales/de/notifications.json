@@ -69,6 +69,11 @@
       "body": "Zum Aktualisieren neu starten",
       "restart": "Neu starten und aktualisieren",
       "whatsNew": "Was ist neu"
+    },
+    "relay": {
+      "title": "Relay auf {{server}} geändert",
+      "body": "Bildschirm- und Dateifreigabe sind pausiert, bis du dem neuen Relay vertraust.",
+      "decision": "Deine Entscheidung nötig"
     }
   }
 }

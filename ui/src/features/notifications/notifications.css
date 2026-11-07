@@ -15,6 +15,7 @@
 
 .toast {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   pointer-events: auto;
   background: var(--color-bg-elevated);
@@ -23,6 +24,15 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-raised);
   animation: toast-in var(--duration-normal) var(--ease-out);
+}
+
+/* Buttons of a toast that asks for a decision (#600), on their own row below the text. */
+.toast__actions {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-3);
 }
 
 .toast__open {

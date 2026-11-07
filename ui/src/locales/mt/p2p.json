@@ -61,5 +61,23 @@
     "rateLimited": "wisq tentattivi",
     "version": "verżjoni mhux appoġġjata",
     "badRequest": "talba invalida"
+  },
+  "trust": {
+    "title": "Ir-relay fuq {{server}} inbidel",
+    "body": "Il-qsim tal-iskrin u tal-fajls huwa mwaqqaf sakemm tafda r-relay il-ġdid.",
+    "details": "Dettalji",
+    "trustedTitle": "Ir-relay il-ġdid huwa fdat",
+    "trustedBody": "Il-qsim tal-iskrin u tal-fajls fuq {{server}} jerġa' jaħdem.",
+    "dialogBody": "Ir-relay ta' dan is-server issa juża ċertifikat ieħor. Sakemm tafdah, il-qsim tal-iskrin, tal-fajls u l-immaġini f'daqs sħiħ huma mwaqqfa.",
+    "previous": "Relay fdat qabel",
+    "current": "Relay ġdid",
+    "unknown": "Mhux magħruf",
+    "trustIf": "Afdah jekk",
+    "trustIfText": "l-amministraturi tas-server ħabbru relay ġdid jew ċaqliq u tista' tikkonferma dan magħhom.",
+    "dontTrustIf": "Tafdahx jekk",
+    "dontTrustIfText": "ħadd ma ħabbar bidla jew m'intix ċert. Xi ħadd jista' jkun qed jippretendi li hu r-relay.",
+    "notNow": "Mhux issa",
+    "review": "Relay inbidel – irrevedi",
+    "filesBlocked": "Il-qsim tal-fajls mhux disponibbli: ir-relay ta' dan is-server inbidel u għadu mhux fdat."
   }
 }

@@ -73,6 +73,11 @@
       "body": "Ponovno pokrenite za ažuriranje",
       "restart": "Ponovno pokreni i ažuriraj",
       "whatsNew": "Što je novo"
+    },
+    "relay": {
+      "title": "Relej na {{server}} se promijenio",
+      "body": "Dijeljenje zaslona i datoteka pauzirano je dok ne vjeruješ novom releju.",
+      "decision": "Potrebna je tvoja odluka"
     }
   }
 }

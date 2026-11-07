@@ -69,6 +69,11 @@
       "body": "Päivitä käynnistämällä uudelleen",
       "restart": "Käynnistä uudelleen ja päivitä",
       "whatsNew": "Uutta"
+    },
+    "relay": {
+      "title": "Välitin vaihtui palvelimella {{server}}",
+      "body": "Näytön ja tiedostojen jakaminen on tauolla, kunnes luotat uuteen välittimeen.",
+      "decision": "Vaatii päätöksesi"
     }
   }
 }

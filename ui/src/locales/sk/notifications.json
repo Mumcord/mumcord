@@ -77,6 +77,11 @@
       "body": "Reštartujte na aktualizáciu",
       "restart": "Reštartovať a aktualizovať",
       "whatsNew": "Čo je nové"
+    },
+    "relay": {
+      "title": "Relay na {{server}} sa zmenil",
+      "body": "Zdieľanie obrazovky a súborov je pozastavené, kým novému relayu nebudeš dôverovať.",
+      "decision": "Vyžaduje tvoje rozhodnutie"
     }
   }
 }
