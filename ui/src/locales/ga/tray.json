@@ -1,6 +1,6 @@
 {
   "show": "Oscail Mumcord",
-  "settings": "Socruithe…",
+  "settings": "Socruithe",
   "mute": "Balbhaigh an micreafón",
   "deafen": "Bodhraigh",
   "dnd": "Ná Cuir Isteach",
@@ -17,7 +17,7 @@
   "voiceMenu": "Freastalaí gutha agus cainéal",
   "voiceServer": "Freastalaí gutha",
   "channelsOf": "Cainéil · {server}",
-  "moreChannels": "Tuilleadh cainéal in Mumcord…",
+  "moreChannels": "Tuilleadh cainéal in Mumcord",
   "recentChats": "Comhráite le déanaí",
   "chatUnread": "{name} – {count} gan léamh",
   "cameraOn": "Ceamara ar siúl",

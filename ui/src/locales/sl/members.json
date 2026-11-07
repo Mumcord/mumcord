@@ -61,9 +61,9 @@
     "joinFull": "Ta kanal je poln.",
     "joinLocked": "V ta kanal ne smeš vstopiti ali pa zahteva geslo.",
     "mute": "Utišaj zame",
-    "connectionInfo": "Podatki o povezavi…",
+    "connectionInfo": "Podatki o povezavi",
     "chatRequestPending": "Prošnja za klepet čaka",
-    "revokeConsent": "Prekliči soglasje za klepet…"
+    "revokeConsent": "Prekliči soglasje za klepet"
   },
   "nowPlaying": {
     "label": "Zdaj se predvaja",
@@ -121,7 +121,7 @@
     "failed": "Preklic soglasja za klepet ni uspel. Poskusi znova."
   },
   "block": {
-    "menu": "Blokiraj…",
+    "menu": "Blokiraj",
     "unblock": "Odblokiraj",
     "title": "Blokiram uporabnika {{name}}?",
     "onServer": "na strežniku {{server}}",

@@ -65,11 +65,11 @@ describe("channel header", () => {
     const items = within(menu).getAllByRole("menuitem");
     expect(items.map((item) => item.textContent)).toEqual([
       "Follow channel",
-      "Audio for this channel…",
-      "Whisper to…",
+      "Audio for this channel",
+      "Whisper to",
       "Copy channel linkmumble://",
       "Channel info",
-      "Clear chat history…",
+      "Clear chat history",
     ]);
     expect(items[0]).toHaveFocus();
     fireEvent.keyDown(menu, { key: "ArrowDown" });
@@ -103,7 +103,7 @@ describe("channel header", () => {
   it("clears the chat history after confirmation", async () => {
     const { name } = await setup();
     const clear = vi.spyOn(api, "historyClear");
-    fireEvent.click(within(openMenu(name)).getByRole("menuitem", { name: "Clear chat history…" }));
+    fireEvent.click(within(openMenu(name)).getByRole("menuitem", { name: "Clear chat history" }));
     const dialog = screen.getByRole("alertdialog");
     fireEvent.click(within(dialog).getByRole("button", { name: "Clear history" }));
     await waitFor(() => {
@@ -125,7 +125,7 @@ describe("channel header", () => {
       api.mock.lockChannel(2);
     });
     const join = vi.spyOn(api, "channelJoin");
-    fireEvent.click(within(openMenu(name)).getByRole("menuitem", { name: "Channel password…" }));
+    fireEvent.click(within(openMenu(name)).getByRole("menuitem", { name: "Channel password" }));
     expect(join).toHaveBeenCalledWith(1, 2);
   });
 

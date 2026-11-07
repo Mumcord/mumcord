@@ -1,6 +1,6 @@
 {
   "show": "Deschide Mumcord",
-  "settings": "Setări…",
+  "settings": "Setări",
   "mute": "Oprește microfonul",
   "deafen": "Oprește sunetul",
   "dnd": "Nu deranja",
@@ -17,7 +17,7 @@
   "voiceMenu": "Server vocal și canal",
   "voiceServer": "Server vocal",
   "channelsOf": "Canale · {server}",
-  "moreChannels": "Mai multe canale în Mumcord…",
+  "moreChannels": "Mai multe canale în Mumcord",
   "recentChats": "Conversații recente",
   "chatUnread": "{name} – {count} necitite",
   "cameraOn": "Cameră pornită",

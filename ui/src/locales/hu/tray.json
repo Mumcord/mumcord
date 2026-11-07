@@ -1,6 +1,6 @@
 {
   "show": "Mumcord megnyitása",
-  "settings": "Beállítások…",
+  "settings": "Beállítások",
   "mute": "Mikrofon némítása",
   "deafen": "Süketítés",
   "dnd": "Ne zavarjanak",
@@ -17,7 +17,7 @@
   "voiceMenu": "Hangszerver és csatorna",
   "voiceServer": "Hangszerver",
   "channelsOf": "Csatornák · {server}",
-  "moreChannels": "További csatornák a Mumcordban…",
+  "moreChannels": "További csatornák a Mumcordban",
   "recentChats": "Legutóbbi csevegések",
   "chatUnread": "{name} – {count} olvasatlan",
   "cameraOn": "Kamera bekapcsolva",

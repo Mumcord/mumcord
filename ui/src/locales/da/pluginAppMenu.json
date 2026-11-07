@@ -1,6 +1,6 @@
 {
   "pluginsGroup": "Plugins",
-  "moreItems": "Flere plugins…",
+  "moreItems": "Flere plugins",
   "subline": "{{plugin}} · Uofficielt",
   "sublineOfficial": "{{plugin}}",
   "footer": "Plugin-punkter viser altid pluginets navn. Administrér dem under Indstillinger → Plugins.",

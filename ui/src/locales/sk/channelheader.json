@@ -8,15 +8,15 @@
     "unfollow": "Prestať sledovať kanál",
     "following": "Sleduješ",
     "copyLink": "Kopírovať odkaz na kanál",
-    "password": "Heslo kanála…",
+    "password": "Heslo kanála",
     "info": "Informácie o kanáli",
-    "clear": "Vymazať históriu četu…",
-    "audio": "Zvuk pre tento kanál…",
+    "clear": "Vymazať históriu četu",
+    "audio": "Zvuk pre tento kanál",
     "audioHint": {
       "music": "♪ Hudba",
       "jam": "⚡ Jam"
     },
-    "move": "Presunúť používateľov sem…"
+    "move": "Presunúť používateľov sem"
   },
   "info": {
     "title": "Informácie o kanáli: {{channel}}",

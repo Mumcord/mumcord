@@ -1,6 +1,6 @@
 {
   "show": "Odpri Mumcord",
-  "settings": "Nastavitve…",
+  "settings": "Nastavitve",
   "mute": "Utišaj mikrofon",
   "deafen": "Izklopi zvok",
   "dnd": "Ne moti",
@@ -17,7 +17,7 @@
   "voiceMenu": "Glasovni strežnik in kanal",
   "voiceServer": "Glasovni strežnik",
   "channelsOf": "Kanali · {server}",
-  "moreChannels": "Več kanalov v Mumcordu…",
+  "moreChannels": "Več kanalov v Mumcordu",
   "recentChats": "Nedavni klepeti",
   "chatUnread": "{name} – {count} neprebranih",
   "cameraOn": "Kamera vklopljena",

@@ -16,7 +16,7 @@ describe("the ban list entry", () => {
       channel: { ...root, permissions: { ...root.permissions, ban: true } },
     });
     expect(canBan(1)).toBe(true);
-    // Kick… is a root-channel right, so the same answer decides the person menu (FR-10.11).
+    // Kick is a root-channel right, so the same answer decides the person menu (FR-10.11).
     expect(canKick(1)).toBe(false);
     api.mock.updateChannel(0, { ...root, permissions: { ...root.permissions, kick: true } });
     expect(canKick(1)).toBe(true);

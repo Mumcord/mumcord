@@ -62,9 +62,9 @@
     "joinFull": "Tá an cainéal seo lán.",
     "joinLocked": "Níl cead agat dul isteach sa chainéal seo, nó teastaíonn pasfhocal uaidh.",
     "mute": "Balbhaigh dom",
-    "connectionInfo": "Faisnéis cheangail…",
+    "connectionInfo": "Faisnéis cheangail",
     "chatRequestPending": "Iarratas comhrá ar feitheamh",
-    "revokeConsent": "Cúlghair toiliú comhrá…"
+    "revokeConsent": "Cúlghair toiliú comhrá"
   },
   "nowPlaying": {
     "label": "Ag seinm anois",
@@ -125,7 +125,7 @@
     "failed": "Theip ar chúlghairm an toilithe comhrá. Bain triail eile as."
   },
   "block": {
-    "menu": "Bac…",
+    "menu": "Bac",
     "unblock": "Díbhac",
     "title": "An bhfuil tú ag iarraidh {{name}} a bhacadh?",
     "onServer": "ar {{server}}",

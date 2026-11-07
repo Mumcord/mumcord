@@ -1,6 +1,6 @@
 {
   "show": "Mumcord openen",
-  "settings": "Instellingen…",
+  "settings": "Instellingen",
   "mute": "Microfoon dempen",
   "deafen": "Doof zetten",
   "dnd": "Niet storen",
@@ -17,7 +17,7 @@
   "voiceMenu": "Spraakserver en kanaal",
   "voiceServer": "Spraakserver",
   "channelsOf": "Kanalen · {server}",
-  "moreChannels": "Meer kanalen in Mumcord…",
+  "moreChannels": "Meer kanalen in Mumcord",
   "recentChats": "Recente chats",
   "chatUnread": "{name} – {count} ongelezen",
   "cameraOn": "Camera aan",

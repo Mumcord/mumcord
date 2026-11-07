@@ -8,15 +8,15 @@
     "unfollow": "Følg ikke kanalen længere",
     "following": "Følger",
     "copyLink": "Kopiér kanallink",
-    "password": "Kanaladgangskode…",
+    "password": "Kanaladgangskode",
     "info": "Kanalinfo",
-    "clear": "Ryd chathistorik…",
-    "audio": "Lyd til denne kanal…",
+    "clear": "Ryd chathistorik",
+    "audio": "Lyd til denne kanal",
     "audioHint": {
       "music": "♪ Musik",
       "jam": "⚡ Jam"
     },
-    "move": "Flyt brugere hertil…"
+    "move": "Flyt brugere hertil"
   },
   "info": {
     "title": "Kanalinfo: {{channel}}",

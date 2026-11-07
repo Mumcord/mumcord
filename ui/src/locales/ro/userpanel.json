@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Nu mai vorbi și nu mai asculta, rămâi conectat pentru chat",
     "disconnectHint": "Închide conexiunea la acest server",
     "switchTo": "Mută vocea pe {{server}}",
-    "all": "Deconectează de la toate serverele…",
+    "all": "Deconectează de la toate serverele",
     "allHint": "Închide toate conexiunile la servere"
   },
   "disconnectAll": {

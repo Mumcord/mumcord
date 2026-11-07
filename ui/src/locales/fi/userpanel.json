@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Lopeta puhuminen ja kuuntelu, pysy yhteydessä chattia varten",
     "disconnectHint": "Sulje yhteys tähän palvelimeen",
     "switchTo": "Siirrä ääni palvelimelle {{server}}",
-    "all": "Katkaise yhteys kaikkiin palvelimiin…",
+    "all": "Katkaise yhteys kaikkiin palvelimiin",
     "allHint": "Sulje kaikki palvelinyhteydet"
   },
   "disconnectAll": {

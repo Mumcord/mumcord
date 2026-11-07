@@ -8,15 +8,15 @@
     "unfollow": "Éirigh as an gcainéal a leanúint",
     "following": "Ag leanúint",
     "copyLink": "Cóipeáil nasc an chainéil",
-    "password": "Pasfhocal an chainéil…",
+    "password": "Pasfhocal an chainéil",
     "info": "Eolas faoin gcainéal",
-    "clear": "Glan stair an chomhrá…",
-    "audio": "Fuaim don chainéal seo…",
+    "clear": "Glan stair an chomhrá",
+    "audio": "Fuaim don chainéal seo",
     "audioHint": {
       "music": "♪ Ceol",
       "jam": "⚡ Jam"
     },
-    "move": "Bog úsáideoirí anseo…"
+    "move": "Bog úsáideoirí anseo"
   },
   "info": {
     "title": "Eolas faoin gcainéal: {{channel}}",

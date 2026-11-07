@@ -38,9 +38,9 @@
     "alwaysConnect": "Visada jungtis paleidžiant",
     "muteNotifications": "Nutildyti pranešimus",
     "muteGroupMentions": "Nutildyti @all ir @channel",
-    "theme": "Tema…",
+    "theme": "Tema",
     "showWelcome": "Rodyti pasveikinimo žinutę",
-    "identity": "Tapatybė…"
+    "identity": "Tapatybė"
   },
   "theme": {
     "title": "Tema serveriui {{server}}",

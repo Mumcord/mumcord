@@ -86,9 +86,9 @@ describe("voice: whisper and shout (#67)", () => {
     (bystander as ScriptBot | undefined)?.bg.stop();
   });
 
-  it("creates a whisper target with “Whisper to…” in the person menu", async () => {
+  it("creates a whisper target with “Whisper to” in the person menu", async () => {
     await personRow("Hearer").click({ button: "right" });
-    await $("//button[@role='menuitem'][contains(., 'Whisper to…')]").click();
+    await $("//button[@role='menuitem'][contains(., 'Whisper to')]").click();
     const name = $("//input[@placeholder='Name']");
     await name.waitForDisplayed({ timeout: 10_000 });
     await expect(name).toHaveValue("Hearer");

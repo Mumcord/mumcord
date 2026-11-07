@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Stop talking and listening, stay connected for chat",
     "disconnectHint": "Close the connection to this server",
     "switchTo": "Switch voice to {{server}}",
-    "all": "Disconnect from all servers…",
+    "all": "Disconnect from all servers",
     "allHint": "Close every server connection"
   },
   "disconnectAll": {

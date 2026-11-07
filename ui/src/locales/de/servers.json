@@ -38,9 +38,9 @@
     "alwaysConnect": "Beim Start immer verbinden",
     "muteNotifications": "Benachrichtigungen stummschalten",
     "muteGroupMentions": "@all und @channel stummschalten",
-    "theme": "Design …",
+    "theme": "Design",
     "showWelcome": "Willkommensnachricht anzeigen",
-    "identity": "Identität…"
+    "identity": "Identität"
   },
   "theme": {
     "title": "Design für {{server}}",

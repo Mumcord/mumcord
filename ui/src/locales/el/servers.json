@@ -38,9 +38,9 @@
     "alwaysConnect": "Πάντα σύνδεση κατά την εκκίνηση",
     "muteNotifications": "Σίγαση ειδοποιήσεων",
     "muteGroupMentions": "Σίγαση @all και @channel",
-    "theme": "Θέμα…",
+    "theme": "Θέμα",
     "showWelcome": "Εμφάνιση μηνύματος καλωσορίσματος",
-    "identity": "Ταυτότητα…"
+    "identity": "Ταυτότητα"
   },
   "theme": {
     "title": "Θέμα για {{server}}",

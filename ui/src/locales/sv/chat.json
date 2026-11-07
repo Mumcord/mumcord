@@ -172,7 +172,7 @@
   "imageMenu": {
     "label": "Bilden {{name}}",
     "copy": "Kopiera bild",
-    "save": "Spara bild…",
+    "save": "Spara bild",
     "copyAddress": "Kopiera bildadress",
     "openViewer": "Öppna i bildvisaren",
     "copied": "Bild kopierad",
@@ -346,7 +346,7 @@
       "muteEightHours": "I 8 timmar",
       "muteForever": "Tills jag slår på det igen",
       "profile": "Visa profil",
-      "block": "Blockera {{name}}…",
+      "block": "Blockera {{name}}",
       "deleteHistory": "Ta bort historik",
       "deleteHint": "Bara den här enheten · {{name}} behåller sin kopia"
     }

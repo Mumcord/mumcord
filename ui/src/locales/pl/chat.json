@@ -180,7 +180,7 @@
   "imageMenu": {
     "label": "Obraz {{name}}",
     "copy": "Kopiuj obraz",
-    "save": "Zapisz obraz…",
+    "save": "Zapisz obraz",
     "copyAddress": "Kopiuj adres obrazu",
     "openViewer": "Otwórz w przeglądarce obrazów",
     "copied": "Skopiowano obraz",
@@ -362,7 +362,7 @@
       "muteEightHours": "Na 8 godzin",
       "muteForever": "Dopóki nie włączę z powrotem",
       "profile": "Zobacz profil",
-      "block": "Zablokuj użytkownika {{name}}…",
+      "block": "Zablokuj użytkownika {{name}}",
       "deleteHistory": "Usuń historię",
       "deleteHint": "Tylko to urządzenie · {{name}} zachowa swoją kopię"
     }

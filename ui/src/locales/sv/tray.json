@@ -1,6 +1,6 @@
 {
   "show": "Öppna Mumcord",
-  "settings": "Inställningar…",
+  "settings": "Inställningar",
   "mute": "Stäng av mikrofonen",
   "deafen": "Stäng av ljudet",
   "dnd": "Stör ej",
@@ -17,7 +17,7 @@
   "voiceMenu": "Röstserver och kanal",
   "voiceServer": "Röstserver",
   "channelsOf": "Kanaler · {server}",
-  "moreChannels": "Fler kanaler i Mumcord…",
+  "moreChannels": "Fler kanaler i Mumcord",
   "recentChats": "Senaste chattar",
   "chatUnread": "{name} – {count} olästa",
   "cameraOn": "Kamera på",

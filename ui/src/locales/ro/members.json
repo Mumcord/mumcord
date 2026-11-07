@@ -60,9 +60,9 @@
     "joinFull": "Acest canal este plin.",
     "joinLocked": "Nu ai voie să intri pe acest canal sau acesta necesită o parolă.",
     "mute": "Fără sunet pentru mine",
-    "connectionInfo": "Informații conexiune…",
+    "connectionInfo": "Informații conexiune",
     "chatRequestPending": "Cerere de chat în așteptare",
-    "revokeConsent": "Retrage acordul pentru chat…"
+    "revokeConsent": "Retrage acordul pentru chat"
   },
   "nowPlaying": {
     "label": "Ascultă acum",
@@ -117,7 +117,7 @@
     "failed": "Retragerea acordului pentru chat a eșuat. Încearcă din nou."
   },
   "block": {
-    "menu": "Blochează…",
+    "menu": "Blochează",
     "unblock": "Deblochează",
     "title": "Blochezi pe {{name}}?",
     "onServer": "pe {{server}}",

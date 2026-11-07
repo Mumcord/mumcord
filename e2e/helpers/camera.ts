@@ -106,7 +106,7 @@ export async function blockPerson(name: string): Promise<void> {
   const row = personRow(name);
   await row.waitForDisplayed({ timeout: 30_000 });
   await row.click({ button: "right" });
-  const item = $("//*[@role='menuitem'][normalize-space()='Block…']");
+  const item = $("//*[@role='menuitem'][normalize-space()='Block']");
   await item.waitForClickable();
   await item.click();
   await $(`//dialog[.//h2[normalize-space()='Block ${name}?']]`).waitForDisplayed();

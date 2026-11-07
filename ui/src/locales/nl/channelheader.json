@@ -8,15 +8,15 @@
     "unfollow": "Kanaal niet meer volgen",
     "following": "Volgend",
     "copyLink": "Kanaallink kopiëren",
-    "password": "Kanaalwachtwoord…",
+    "password": "Kanaalwachtwoord",
     "info": "Kanaalinfo",
-    "clear": "Chatgeschiedenis wissen…",
-    "audio": "Audio voor dit kanaal…",
+    "clear": "Chatgeschiedenis wissen",
+    "audio": "Audio voor dit kanaal",
     "audioHint": {
       "music": "♪ Muziek",
       "jam": "⚡ Jam"
     },
-    "move": "Gebruikers hierheen verplaatsen…"
+    "move": "Gebruikers hierheen verplaatsen"
   },
   "info": {
     "title": "Kanaalinfo: {{channel}}",

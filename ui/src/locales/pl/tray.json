@@ -1,6 +1,6 @@
 {
   "show": "Otwórz Mumcord",
-  "settings": "Ustawienia…",
+  "settings": "Ustawienia",
   "mute": "Wycisz mikrofon",
   "deafen": "Ogłusz",
   "dnd": "Nie przeszkadzać",
@@ -17,7 +17,7 @@
   "voiceMenu": "Serwer głosowy i kanał",
   "voiceServer": "Serwer głosowy",
   "channelsOf": "Kanały · {server}",
-  "moreChannels": "Więcej kanałów w Mumcordzie…",
+  "moreChannels": "Więcej kanałów w Mumcordzie",
   "recentChats": "Ostatnie czaty",
   "chatUnread": "{name} – {count} nieprzeczytane",
   "cameraOn": "Kamera włączona",

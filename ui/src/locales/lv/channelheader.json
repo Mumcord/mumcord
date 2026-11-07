@@ -8,15 +8,15 @@
     "unfollow": "Pārtraukt sekot kanālam",
     "following": "Seko",
     "copyLink": "Kopēt kanāla saiti",
-    "password": "Kanāla parole…",
+    "password": "Kanāla parole",
     "info": "Kanāla informācija",
-    "clear": "Notīrīt tērzēšanas vēsturi…",
-    "audio": "Šī kanāla audio…",
+    "clear": "Notīrīt tērzēšanas vēsturi",
+    "audio": "Šī kanāla audio",
     "audioHint": {
       "music": "♪ Mūzika",
       "jam": "⚡ Jam"
     },
-    "move": "Pārvietot lietotājus šeit…"
+    "move": "Pārvietot lietotājus šeit"
   },
   "info": {
     "title": "Kanāla informācija: {{channel}}",

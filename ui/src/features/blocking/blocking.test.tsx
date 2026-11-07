@@ -134,13 +134,13 @@ describe("person menu and dialog", () => {
   }
   const member = (name: RegExp) => screen.getByRole("button", { name });
 
-  it("offers Block… last, confirms, marks the person and then offers Unblock", async () => {
+  it("offers Block last, confirms, marks the person and then offers Unblock", async () => {
     await renderPanel();
     const blockUser = vi.spyOn(api, "blockUser");
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
     const items = screen.getAllByRole("menuitem");
-    expect(items.at(-1)).toHaveTextContent("Block…");
-    fireEvent.click(screen.getByRole("menuitem", { name: "Block…" }));
+    expect(items.at(-1)).toHaveTextContent("Block");
+    fireEvent.click(screen.getByRole("menuitem", { name: "Block" }));
 
     const dialog = screen.getByRole("dialog", { name: "Block Anna?" });
     expect(dialog).toHaveTextContent("on Local test server");
@@ -172,7 +172,7 @@ describe("person menu and dialog", () => {
   it("does not offer Block for yourself", async () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Zoe/), { clientX: 1, clientY: 1 });
-    expect(screen.queryByRole("menuitem", { name: "Block…" })).toBeNull();
+    expect(screen.queryByRole("menuitem", { name: "Block" })).toBeNull();
   });
 
   it("says a block without certificate covers this name on this server", async () => {

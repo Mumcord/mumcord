@@ -1,6 +1,6 @@
 {
   "show": "Avaa Mumcord",
-  "settings": "Asetukset…",
+  "settings": "Asetukset",
   "mute": "Mykistä mikrofoni",
   "deafen": "Mykistä kuulokkeet",
   "dnd": "Älä häiritse",
@@ -17,7 +17,7 @@
   "voiceMenu": "Puhepalvelin ja kanava",
   "voiceServer": "Puhepalvelin",
   "channelsOf": "Kanavat · {server}",
-  "moreChannels": "Lisää kanavia Mumcordissa…",
+  "moreChannels": "Lisää kanavia Mumcordissa",
   "recentChats": "Viimeisimmät keskustelut",
   "chatUnread": "{name} – {count} lukematonta",
   "cameraOn": "Kamera päällä",

@@ -8,15 +8,15 @@
     "unfollow": "Sluta följa kanalen",
     "following": "Följer",
     "copyLink": "Kopiera kanallänk",
-    "password": "Kanallösenord…",
+    "password": "Kanallösenord",
     "info": "Kanalinfo",
-    "clear": "Rensa chatthistorik…",
-    "audio": "Ljud för den här kanalen…",
+    "clear": "Rensa chatthistorik",
+    "audio": "Ljud för den här kanalen",
     "audioHint": {
       "music": "♪ Musik",
       "jam": "⚡ Jam"
     },
-    "move": "Flytta användare hit…"
+    "move": "Flytta användare hit"
   },
   "info": {
     "title": "Kanalinfo: {{channel}}",

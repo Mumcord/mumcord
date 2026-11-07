@@ -38,9 +38,9 @@
     "alwaysConnect": "Ligar sempre ao iniciar",
     "muteNotifications": "Silenciar notificações",
     "muteGroupMentions": "Silenciar @all e @channel",
-    "theme": "Tema…",
+    "theme": "Tema",
     "showWelcome": "Mostrar mensagem de boas-vindas",
-    "identity": "Identidade…"
+    "identity": "Identidade"
   },
   "theme": {
     "title": "Tema para {{server}}",

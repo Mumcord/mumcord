@@ -59,9 +59,9 @@
     "joinFull": "Den här kanalen är full.",
     "joinLocked": "Du får inte gå in i den här kanalen, eller så kräver den ett lösenord.",
     "mute": "Stäng av för mig",
-    "connectionInfo": "Anslutningsinfo…",
+    "connectionInfo": "Anslutningsinfo",
     "chatRequestPending": "Chattförfrågan väntar",
-    "revokeConsent": "Återkalla chattsamtycke …"
+    "revokeConsent": "Återkalla chattsamtycke"
   },
   "nowPlaying": {
     "label": "Spelas nu",
@@ -113,7 +113,7 @@
     "failed": "Det gick inte att återkalla chattsamtycket. Försök igen."
   },
   "block": {
-    "menu": "Blockera…",
+    "menu": "Blockera",
     "unblock": "Avblockera",
     "title": "Blockera {{name}}?",
     "onServer": "på {{server}}",

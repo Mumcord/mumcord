@@ -8,15 +8,15 @@
     "unfollow": "Nebesekti kanalo",
     "following": "Sekama",
     "copyLink": "Kopijuoti kanalo nuorodą",
-    "password": "Kanalo slaptažodis…",
+    "password": "Kanalo slaptažodis",
     "info": "Kanalo informacija",
-    "clear": "Išvalyti pokalbių istoriją…",
-    "audio": "Šio kanalo garsas…",
+    "clear": "Išvalyti pokalbių istoriją",
+    "audio": "Šio kanalo garsas",
     "audioHint": {
       "music": "♪ Muzika",
       "jam": "⚡ Jam"
     },
-    "move": "Perkelti naudotojus čia…"
+    "move": "Perkelti naudotojus čia"
   },
   "info": {
     "title": "Kanalo informacija: {{channel}}",

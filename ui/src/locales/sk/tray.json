@@ -1,6 +1,6 @@
 {
   "show": "Otvoriť Mumcord",
-  "settings": "Nastavenia…",
+  "settings": "Nastavenia",
   "mute": "Stlmiť mikrofón",
   "deafen": "Stlmiť zvuk",
   "dnd": "Nerušiť",
@@ -17,7 +17,7 @@
   "voiceMenu": "Hlasový server a kanál",
   "voiceServer": "Hlasový server",
   "channelsOf": "Kanály · {server}",
-  "moreChannels": "Ďalšie kanály v Mumcorde…",
+  "moreChannels": "Ďalšie kanály v Mumcorde",
   "recentChats": "Nedávne chaty",
   "chatUnread": "{name} – {count} neprečítané",
   "cameraOn": "Kamera zapnutá",

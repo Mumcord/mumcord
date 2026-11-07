@@ -176,7 +176,7 @@
   "imageMenu": {
     "label": "Attēls {{name}}",
     "copy": "Kopēt attēlu",
-    "save": "Saglabāt attēlu…",
+    "save": "Saglabāt attēlu",
     "copyAddress": "Kopēt attēla adresi",
     "openViewer": "Atvērt attēlu skatītājā",
     "copied": "Attēls nokopēts",
@@ -354,7 +354,7 @@
       "muteEightHours": "Uz 8 stundām",
       "muteForever": "Līdz es to atkal ieslēgšu",
       "profile": "Skatīt profilu",
-      "block": "Bloķēt {{name}}…",
+      "block": "Bloķēt {{name}}",
       "deleteHistory": "Dzēst vēsturi",
       "deleteHint": "Tikai šī ierīce · {{name}} paturēs savu kopiju"
     }

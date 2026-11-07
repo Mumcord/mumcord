@@ -172,7 +172,7 @@
   "imageMenu": {
     "label": "Afbeelding {{name}}",
     "copy": "Afbeelding kopiëren",
-    "save": "Afbeelding opslaan…",
+    "save": "Afbeelding opslaan",
     "copyAddress": "Afbeeldingsadres kopiëren",
     "openViewer": "Openen in afbeeldingsviewer",
     "copied": "Afbeelding gekopieerd",
@@ -346,7 +346,7 @@
       "muteEightHours": "Voor 8 uur",
       "muteForever": "Tot ik het weer inschakel",
       "profile": "Profiel bekijken",
-      "block": "{{name}} blokkeren…",
+      "block": "{{name}} blokkeren",
       "deleteHistory": "Geschiedenis verwijderen",
       "deleteHint": "Alleen dit apparaat · {{name}} houdt een eigen kopie"
     }

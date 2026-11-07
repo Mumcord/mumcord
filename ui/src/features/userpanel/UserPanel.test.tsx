@@ -1090,9 +1090,7 @@ describe("quick settings (FR-1.66)", () => {
       await connectSecond();
       const spy = vi.spyOn(api, "disconnect");
       fireEvent.contextMenu(phone());
-      fireEvent.click(
-        await screen.findByRole("menuitem", { name: "Disconnect from all servers…" }),
-      );
+      fireEvent.click(await screen.findByRole("menuitem", { name: "Disconnect from all servers" }));
       const dialog = await screen.findByRole("dialog");
       expect(dialog).toHaveTextContent("Disconnect from all 2 servers?");
       const cancel = within(dialog).getByRole("button", { name: "Cancel" });
@@ -1104,9 +1102,7 @@ describe("quick settings (FR-1.66)", () => {
       expect(spy).not.toHaveBeenCalled();
 
       fireEvent.contextMenu(phone());
-      fireEvent.click(
-        await screen.findByRole("menuitem", { name: "Disconnect from all servers…" }),
-      );
+      fireEvent.click(await screen.findByRole("menuitem", { name: "Disconnect from all servers" }));
       fireEvent.click(
         within(await screen.findByRole("dialog")).getByRole("button", { name: "Disconnect" }),
       );

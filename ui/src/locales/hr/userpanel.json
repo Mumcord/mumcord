@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Prestani govoriti i slušati, ostani povezan za chat",
     "disconnectHint": "Zatvori vezu s ovim poslužiteljem",
     "switchTo": "Prebaci glas na {{server}}",
-    "all": "Prekini vezu sa svim poslužiteljima…",
+    "all": "Prekini vezu sa svim poslužiteljima",
     "allHint": "Zatvori sve veze s poslužiteljima"
   },
   "disconnectAll": {

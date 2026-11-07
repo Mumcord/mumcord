@@ -184,7 +184,7 @@
   "imageMenu": {
     "label": "Stampa {{name}}",
     "copy": "Ikkopja l-istampa",
-    "save": "Issejvja l-istampa…",
+    "save": "Issejvja l-istampa",
     "copyAddress": "Ikkopja l-indirizz tal-istampa",
     "openViewer": "Iftaħ fil-viewer tal-istampi",
     "copied": "L-istampa ġiet ikkupjata",
@@ -370,7 +370,7 @@
       "muteEightHours": "Għal 8 sigħat",
       "muteForever": "Sakemm nerġa’ nixgħelha",
       "profile": "Ara l-profil",
-      "block": "Imblokka {{name}}…",
+      "block": "Imblokka {{name}}",
       "deleteHistory": "Ħassar l-istorja",
       "deleteHint": "Dan l-apparat biss · {{name}} iżomm il-kopja tiegħu"
     }

@@ -38,9 +38,9 @@
     "alwaysConnect": "Forbind altid ved start",
     "muteNotifications": "Slå notifikationer fra",
     "muteGroupMentions": "Slå @all og @channel fra",
-    "theme": "Tema…",
+    "theme": "Tema",
     "showWelcome": "Vis velkomstbesked",
-    "identity": "Identitet…"
+    "identity": "Identitet"
   },
   "theme": {
     "title": "Tema for {{server}}",

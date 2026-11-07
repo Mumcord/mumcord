@@ -184,7 +184,7 @@
   "imageMenu": {
     "label": "Íomhá {{name}}",
     "copy": "Cóipeáil an íomhá",
-    "save": "Sábháil an íomhá…",
+    "save": "Sábháil an íomhá",
     "copyAddress": "Cóipeáil seoladh na híomhá",
     "openViewer": "Oscail san amharcán íomhánna",
     "copied": "Cóipeáladh an íomhá",
@@ -370,7 +370,7 @@
       "muteEightHours": "ar feadh 8 n-uaire",
       "muteForever": "Go dtí go gcuirim ar ais é",
       "profile": "Féach ar an bpróifíl",
-      "block": "Bac {{name}}…",
+      "block": "Bac {{name}}",
       "deleteHistory": "Scrios an stair",
       "deleteHint": "An gléas seo amháin · coinníonn {{name}} a chóip féin"
     }

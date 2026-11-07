@@ -180,7 +180,7 @@
   "imageMenu": {
     "label": "Paveikslėlis {{name}}",
     "copy": "Kopijuoti paveikslėlį",
-    "save": "Įrašyti paveikslėlį…",
+    "save": "Įrašyti paveikslėlį",
     "copyAddress": "Kopijuoti paveikslėlio adresą",
     "openViewer": "Atverti paveikslėlių peržiūroje",
     "copied": "Paveikslėlis nukopijuotas",
@@ -362,7 +362,7 @@
       "muteEightHours": "8 valandoms",
       "muteForever": "Kol vėl įjungsiu",
       "profile": "Peržiūrėti profilį",
-      "block": "Blokuoti {{name}}…",
+      "block": "Blokuoti {{name}}",
       "deleteHistory": "Ištrinti istoriją",
       "deleteHint": "Tik šis įrenginys · {{name}} pasilieka savo kopiją"
     }

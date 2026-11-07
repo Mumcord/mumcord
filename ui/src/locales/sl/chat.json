@@ -180,7 +180,7 @@
   "imageMenu": {
     "label": "Slika {{name}}",
     "copy": "Kopiraj sliko",
-    "save": "Shrani sliko…",
+    "save": "Shrani sliko",
     "copyAddress": "Kopiraj naslov slike",
     "openViewer": "Odpri v pregledovalniku slik",
     "copied": "Slika kopirana",
@@ -362,7 +362,7 @@
       "muteEightHours": "Za 8 ur",
       "muteForever": "Dokler ga ne vklopim znova",
       "profile": "Poglej profil",
-      "block": "Blokiraj uporabnika {{name}}…",
+      "block": "Blokiraj uporabnika {{name}}",
       "deleteHistory": "Izbriši zgodovino",
       "deleteHint": "Samo ta naprava · {{name}} obdrži svojo kopijo"
     }

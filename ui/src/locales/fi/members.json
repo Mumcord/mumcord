@@ -59,9 +59,9 @@
     "joinFull": "Tämä kanava on täynnä.",
     "joinLocked": "Et voi liittyä tälle kanavalle, tai se vaatii salasanan.",
     "mute": "Mykistä minulta",
-    "connectionInfo": "Yhteyden tiedot…",
+    "connectionInfo": "Yhteyden tiedot",
     "chatRequestPending": "Keskustelupyyntö odottaa",
-    "revokeConsent": "Peru keskustelusuostumus…"
+    "revokeConsent": "Peru keskustelusuostumus"
   },
   "nowPlaying": {
     "label": "Nyt soi",
@@ -113,7 +113,7 @@
     "failed": "Keskustelusuostumuksen peruminen epäonnistui. Yritä uudelleen."
   },
   "block": {
-    "menu": "Estä…",
+    "menu": "Estä",
     "unblock": "Poista esto",
     "title": "Estetäänkö {{name}}?",
     "onServer": "palvelimella {{server}}",

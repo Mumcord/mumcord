@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Přestat mluvit a poslouchat, zůstat připojen kvůli chatu",
     "disconnectHint": "Zavřít připojení k tomuto serveru",
     "switchTo": "Přepnout hlas na {{server}}",
-    "all": "Odpojit od všech serverů…",
+    "all": "Odpojit od všech serverů",
     "allHint": "Zavřít všechna připojení k serverům"
   },
   "disconnectAll": {

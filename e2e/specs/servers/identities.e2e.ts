@@ -462,7 +462,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
   it("AC-3.10: changing a connected server's identity reconnects only that server", async () => {
     const imported = await identityRow(IMPORTED);
     await openServerMenu(SERVER_B);
-    await menuItem(SERVER_B, "Identity…").click();
+    await menuItem(SERVER_B, "Identity").click();
     await dialogTitle(`Identity for ${SERVER_B}`).waitForDisplayed({ timeout: 10_000 });
     await pickOption("Identity for this server", `${IMPORTED} (${IMPORTED})`);
     await button("Save and reconnect").click();
@@ -496,7 +496,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
     const work = await identityRow(WORK);
     const imported = await identityRow(IMPORTED);
     await openServerMenu(SERVER_B);
-    await menuItem(SERVER_B, "Identity…").click();
+    await menuItem(SERVER_B, "Identity").click();
     await dialogTitle(`Identity for ${SERVER_B}`).waitForDisplayed();
     await pickOption("Identity for this server", `${WORK} (${WORK_NAME})`);
     await button("Save and reconnect").click();

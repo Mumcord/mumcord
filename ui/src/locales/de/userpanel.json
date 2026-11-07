@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Nicht mehr sprechen und hören, für den Chat verbunden bleiben",
     "disconnectHint": "Die Verbindung zu diesem Server schließen",
     "switchTo": "Sprache zu {{server}} wechseln",
-    "all": "Von allen Servern trennen…",
+    "all": "Von allen Servern trennen",
     "allHint": "Alle Serververbindungen schließen"
   },
   "disconnectAll": {

@@ -85,7 +85,7 @@ describe("chat: block users (AC-3.71)", () => {
   it("blocks from the person menu after the confirmation", async () => {
     await treePerson("BlockBot").waitForDisplayed({ timeout: 10_000 });
     await treePerson("BlockBot").click({ button: "right" });
-    const item = $("//*[@role='menuitem'][normalize-space()='Block…']");
+    const item = $("//*[@role='menuitem'][normalize-space()='Block']");
     await item.waitForClickable();
     await item.click();
     const dialog = $("//dialog[.//h2[normalize-space()='Block BlockBot?']]");

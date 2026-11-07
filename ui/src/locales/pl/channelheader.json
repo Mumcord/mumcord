@@ -8,15 +8,15 @@
     "unfollow": "Przestań obserwować kanał",
     "following": "Obserwujesz",
     "copyLink": "Kopiuj link do kanału",
-    "password": "Hasło kanału…",
+    "password": "Hasło kanału",
     "info": "Informacje o kanale",
-    "clear": "Wyczyść historię czatu…",
-    "audio": "Dźwięk dla tego kanału…",
+    "clear": "Wyczyść historię czatu",
+    "audio": "Dźwięk dla tego kanału",
     "audioHint": {
       "music": "♪ Muzyka",
       "jam": "⚡ Jam"
     },
-    "move": "Przenieś użytkowników tutaj…"
+    "move": "Przenieś użytkowników tutaj"
   },
   "info": {
     "title": "Informacje o kanale: {{channel}}",

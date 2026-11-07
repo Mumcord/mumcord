@@ -300,7 +300,7 @@ describe("revoke chat consent", () => {
     act(() => {
       openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
     });
-    expect(screen.queryByRole("menuitem", { name: "Revoke chat consent…" })).toBeNull();
+    expect(screen.queryByRole("menuitem", { name: "Revoke chat consent" })).toBeNull();
   });
 
   it("revokes from the person menu after a confirmation", async () => {
@@ -315,7 +315,7 @@ describe("revoke chat consent", () => {
     act(() => {
       openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
     });
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke chat consent…" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke chat consent" }));
     expect(screen.queryByRole("menu")).toBeNull();
     const dialog = screen.getByRole("dialog", { name: "Revoke chat consent for Anna?" });
     fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
@@ -327,7 +327,7 @@ describe("revoke chat consent", () => {
       openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
     });
     // The saved identities load again for the fresh menu.
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke chat consent…" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Revoke chat consent" }));
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Revoke" }));
     expect(revoke).toHaveBeenCalledWith(expect.any(String), "annahash");
     await waitFor(() => {
@@ -351,7 +351,7 @@ describe("revoke chat consent", () => {
     const row = await screen.findByTestId("pm-row");
     fireEvent.keyDown(row, { key: "F10", shiftKey: true });
     fireEvent.click(
-      within(screen.getByRole("menu")).getByRole("menuitem", { name: "Revoke chat consent…" }),
+      within(screen.getByRole("menu")).getByRole("menuitem", { name: "Revoke chat consent" }),
     );
     const dialog = screen.getByRole("dialog", { name: "Revoke chat consent for Anna?" });
     fireEvent.click(within(dialog).getByRole("button", { name: "Revoke" }));

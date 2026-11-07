@@ -1,6 +1,6 @@
 {
   "show": "Отвори Mumcord",
-  "settings": "Настройки…",
+  "settings": "Настройки",
   "mute": "Заглуши микрофона",
   "deafen": "Оглуши",
   "dnd": "Не безпокойте",
@@ -17,7 +17,7 @@
   "voiceMenu": "Гласов сървър и канал",
   "voiceServer": "Гласов сървър",
   "channelsOf": "Канали · {server}",
-  "moreChannels": "Още канали в Mumcord…",
+  "moreChannels": "Още канали в Mumcord",
   "recentChats": "Последни чатове",
   "chatUnread": "{name} – {count} непрочетени",
   "cameraOn": "Камерата е включена",

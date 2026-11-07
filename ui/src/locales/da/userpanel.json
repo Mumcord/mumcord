@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Stop med at tale og lytte, forbliv forbundet til chatten",
     "disconnectHint": "Luk forbindelsen til denne server",
     "switchTo": "Flyt stemmen til {{server}}",
-    "all": "Afbryd forbindelsen til alle servere…",
+    "all": "Afbryd forbindelsen til alle servere",
     "allHint": "Luk alle serverforbindelser"
   },
   "disconnectAll": {

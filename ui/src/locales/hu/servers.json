@@ -38,9 +38,9 @@
     "alwaysConnect": "Mindig csatlakozzon indításkor",
     "muteNotifications": "Értesítések némítása",
     "muteGroupMentions": "@all és @channel némítása",
-    "theme": "Téma…",
+    "theme": "Téma",
     "showWelcome": "Üdvözlő üzenet megjelenítése",
-    "identity": "Identitás…"
+    "identity": "Identitás"
   },
   "theme": {
     "title": "Téma ehhez: {{server}}",

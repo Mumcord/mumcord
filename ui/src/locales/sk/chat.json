@@ -180,7 +180,7 @@
   "imageMenu": {
     "label": "Obrázok {{name}}",
     "copy": "Kopírovať obrázok",
-    "save": "Uložiť obrázok…",
+    "save": "Uložiť obrázok",
     "copyAddress": "Kopírovať adresu obrázka",
     "openViewer": "Otvoriť v prehliadači obrázkov",
     "copied": "Obrázok skopírovaný",
@@ -362,7 +362,7 @@
       "muteEightHours": "Na 8 hodín",
       "muteForever": "Kým ho znova nezapnem",
       "profile": "Zobraziť profil",
-      "block": "Blokovať používateľa {{name}}…",
+      "block": "Blokovať používateľa {{name}}",
       "deleteHistory": "Odstrániť históriu",
       "deleteHint": "Iba toto zariadenie · {{name}} si ponechá svoju kópiu"
     }

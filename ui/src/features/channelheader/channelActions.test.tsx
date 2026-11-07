@@ -109,17 +109,17 @@ describe("shared channel actions (issue #172)", () => {
 
     expect(header).toEqual([
       "Follow channel",
-      "Audio for this channel…",
-      "Whisper to…",
+      "Audio for this channel",
+      "Whisper to",
       "Copy channel link",
       "Channel info",
-      "Clear chat history…",
+      "Clear chat history",
     ]);
     expect(tree).toEqual([
       "Join channel",
       ...header.slice(0, -1),
-      "Move users here…",
-      "Clear chat history…",
+      "Move users here",
+      "Clear chat history",
     ]);
   });
 
@@ -127,8 +127,8 @@ describe("shared channel actions (issue #172)", () => {
     await renderTree();
     const menu = openTreeMenu(/^Raid/);
     const shown = itemLabels(menu);
-    expect(shown).not.toContain("Move users here…");
-    expect(shown).not.toContain("Channel password…");
+    expect(shown).not.toContain("Move users here");
+    expect(shown).not.toContain("Channel password");
     expect(within(menu).queryAllByRole("menuitem", { hidden: true })).toHaveLength(shown.length);
     fireEvent.keyDown(menu, { key: "Escape" });
 
@@ -139,7 +139,7 @@ describe("shared channel actions (issue #172)", () => {
     act(() => {
       api.mock.lockChannel(2);
     });
-    expect(itemLabels(openTreeMenu(/^Raid/))).toContain("Channel password…");
+    expect(itemLabels(openTreeMenu(/^Raid/))).toContain("Channel password");
   });
 
   it("shows Shift+Enter as the hint of Join channel and joins from the menu", async () => {
@@ -271,7 +271,7 @@ describe("moving people (issue #172)", () => {
     });
   });
 
-  it("moves the chosen people from Move users here…", async () => {
+  it("moves the chosen people from Move users here", async () => {
     await renderTree();
     act(() => {
       for (const id of [1, 2]) {
@@ -293,7 +293,7 @@ describe("moving people (issue #172)", () => {
     });
     const move = vi.spyOn(api, "personMove");
     fireEvent.click(
-      within(openTreeMenu(/^Raid/)).getByRole("menuitem", { name: "Move users here…" }),
+      within(openTreeMenu(/^Raid/)).getByRole("menuitem", { name: "Move users here" }),
     );
     const dialog = screen.getByRole("dialog", { name: "Move people to Raid" });
     // Not oneself, and not Carla, who is already in Raid.

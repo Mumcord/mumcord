@@ -8,15 +8,15 @@
     "unfollow": "Csatorna követésének leállítása",
     "following": "Követed",
     "copyLink": "Csatornahivatkozás másolása",
-    "password": "Csatorna jelszava…",
+    "password": "Csatorna jelszava",
     "info": "Csatorna adatai",
-    "clear": "Csevegési előzmények törlése…",
-    "audio": "Hang ehhez a csatornához…",
+    "clear": "Csevegési előzmények törlése",
+    "audio": "Hang ehhez a csatornához",
     "audioHint": {
       "music": "♪ Zene",
       "jam": "⚡ Jam"
     },
-    "move": "Felhasználók áthelyezése ide…"
+    "move": "Felhasználók áthelyezése ide"
   },
   "info": {
     "title": "Csatorna adatai: {{channel}}",

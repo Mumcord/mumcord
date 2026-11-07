@@ -61,9 +61,9 @@
     "joinFull": "Ten kanał jest pełny.",
     "joinLocked": "Nie możesz wejść na ten kanał albo wymaga on hasła.",
     "mute": "Wycisz dla mnie",
-    "connectionInfo": "Informacje o połączeniu…",
+    "connectionInfo": "Informacje o połączeniu",
     "chatRequestPending": "Prośba o czat oczekuje",
-    "revokeConsent": "Cofnij zgodę na czat…"
+    "revokeConsent": "Cofnij zgodę na czat"
   },
   "nowPlaying": {
     "label": "Teraz gra",
@@ -121,7 +121,7 @@
     "failed": "Nie udało się cofnąć zgody na czat. Spróbuj ponownie."
   },
   "block": {
-    "menu": "Zablokuj…",
+    "menu": "Zablokuj",
     "unblock": "Odblokuj",
     "title": "Zablokować użytkownika {{name}}?",
     "onServer": "na serwerze {{server}}",

@@ -61,9 +61,9 @@
     "joinFull": "Šis kanalas pilnas.",
     "joinLocked": "Tau negalima įeiti į šį kanalą arba jam reikia slaptažodžio.",
     "mute": "Nutildyti man",
-    "connectionInfo": "Ryšio informacija…",
+    "connectionInfo": "Ryšio informacija",
     "chatRequestPending": "Pokalbio prašymas laukia",
-    "revokeConsent": "Atšaukti pokalbio sutikimą…"
+    "revokeConsent": "Atšaukti pokalbio sutikimą"
   },
   "nowPlaying": {
     "label": "Dabar groja",
@@ -121,7 +121,7 @@
     "failed": "Nepavyko atšaukti pokalbio sutikimo. Bandyk dar kartą."
   },
   "block": {
-    "menu": "Blokuoti…",
+    "menu": "Blokuoti",
     "unblock": "Atblokuoti",
     "title": "Blokuoti {{name}}?",
     "onServer": "serveryje {{server}}",

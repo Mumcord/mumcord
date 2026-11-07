@@ -8,15 +8,15 @@
     "unfollow": "Lopeta kanavan seuraaminen",
     "following": "Seurataan",
     "copyLink": "Kopioi kanavan linkki",
-    "password": "Kanavan salasana…",
+    "password": "Kanavan salasana",
     "info": "Kanavan tiedot",
-    "clear": "Tyhjennä keskusteluhistoria…",
-    "audio": "Tämän kanavan ääni…",
+    "clear": "Tyhjennä keskusteluhistoria",
+    "audio": "Tämän kanavan ääni",
     "audioHint": {
       "music": "♪ Musiikki",
       "jam": "⚡ Jam"
     },
-    "move": "Siirrä käyttäjiä tänne…"
+    "move": "Siirrä käyttäjiä tänne"
   },
   "info": {
     "title": "Kanavan tiedot: {{channel}}",

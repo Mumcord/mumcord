@@ -118,7 +118,7 @@
     "leaveVoiceHint": "Sluta prata och lyssna, men förbli ansluten för chatten",
     "disconnectHint": "Stäng anslutningen till den här servern",
     "switchTo": "Flytta rösten till {{server}}",
-    "all": "Koppla från alla servrar…",
+    "all": "Koppla från alla servrar",
     "allHint": "Stäng alla serveranslutningar"
   },
   "disconnectAll": {

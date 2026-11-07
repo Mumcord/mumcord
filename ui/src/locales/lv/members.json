@@ -60,9 +60,9 @@
     "joinFull": "Šis kanāls ir pilns.",
     "joinLocked": "Tev nav atļauts ieiet šajā kanālā, vai tam vajag paroli.",
     "mute": "Izslēgt man",
-    "connectionInfo": "Savienojuma informācija…",
+    "connectionInfo": "Savienojuma informācija",
     "chatRequestPending": "Tērzēšanas pieprasījums gaida",
-    "revokeConsent": "Atsaukt tērzēšanas piekrišanu…"
+    "revokeConsent": "Atsaukt tērzēšanas piekrišanu"
   },
   "nowPlaying": {
     "label": "Tagad skan",
@@ -117,7 +117,7 @@
     "failed": "Neizdevās atsaukt tērzēšanas piekrišanu. Mēģini vēlreiz."
   },
   "block": {
-    "menu": "Bloķēt…",
+    "menu": "Bloķēt",
     "unblock": "Atbloķēt",
     "title": "Vai bloķēt {{name}}?",
     "onServer": "serverī {{server}}",

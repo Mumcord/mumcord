@@ -1,6 +1,6 @@
 {
   "show": "Άνοιγμα του Mumcord",
-  "settings": "Ρυθμίσεις…",
+  "settings": "Ρυθμίσεις",
   "mute": "Σίγαση μικροφώνου",
   "deafen": "Κλείσιμο ήχου",
   "dnd": "Μην ενοχλείτε",
@@ -17,7 +17,7 @@
   "voiceMenu": "Διακομιστής φωνής και κανάλι",
   "voiceServer": "Διακομιστής φωνής",
   "channelsOf": "Κανάλια · {server}",
-  "moreChannels": "Περισσότερα κανάλια στο Mumcord…",
+  "moreChannels": "Περισσότερα κανάλια στο Mumcord",
   "recentChats": "Πρόσφατες συνομιλίες",
   "chatUnread": "{name} – {count} μη αναγνωσμένα",
   "cameraOn": "Κάμερα ενεργή",

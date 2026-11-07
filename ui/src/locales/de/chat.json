@@ -172,7 +172,7 @@
   "imageMenu": {
     "label": "Bild {{name}}",
     "copy": "Bild kopieren",
-    "save": "Bild speichern…",
+    "save": "Bild speichern",
     "copyAddress": "Bildadresse kopieren",
     "openViewer": "In der Bildansicht öffnen",
     "copied": "Bild kopiert",
@@ -346,7 +346,7 @@
       "muteEightHours": "Für 8 Stunden",
       "muteForever": "Bis ich es wieder einschalte",
       "profile": "Profil ansehen",
-      "block": "{{name}} blockieren…",
+      "block": "{{name}} blockieren",
       "deleteHistory": "Verlauf löschen",
       "deleteHint": "Nur dieses Gerät · {{name}} behält die eigene Kopie"
     }

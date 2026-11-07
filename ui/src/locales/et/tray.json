@@ -1,6 +1,6 @@
 {
   "show": "Ava Mumcord",
-  "settings": "Seaded…",
+  "settings": "Seaded",
   "mute": "Vaigista mikrofon",
   "deafen": "Kurdista",
   "dnd": "Ära sega",
@@ -17,7 +17,7 @@
   "voiceMenu": "Häälserver ja kanal",
   "voiceServer": "Häälserver",
   "channelsOf": "Kanalid · {server}",
-  "moreChannels": "Rohkem kanaleid Mumcordis…",
+  "moreChannels": "Rohkem kanaleid Mumcordis",
   "recentChats": "Viimased vestlused",
   "chatUnread": "{name} – {count} lugemata",
   "cameraOn": "Kaamera sees",

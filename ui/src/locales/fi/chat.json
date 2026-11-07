@@ -172,7 +172,7 @@
   "imageMenu": {
     "label": "Kuva {{name}}",
     "copy": "Kopioi kuva",
-    "save": "Tallenna kuva…",
+    "save": "Tallenna kuva",
     "copyAddress": "Kopioi kuvan osoite",
     "openViewer": "Avaa kuvankatseluohjelmassa",
     "copied": "Kuva kopioitu",
@@ -346,7 +346,7 @@
       "muteEightHours": "8 tunniksi",
       "muteForever": "Kunnes otan sen takaisin käyttöön",
       "profile": "Näytä profiili",
-      "block": "Estä {{name}}…",
+      "block": "Estä {{name}}",
       "deleteHistory": "Poista historia",
       "deleteHint": "Vain tämä laite · {{name}} säilyttää oman kopionsa"
     }
