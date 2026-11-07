@@ -31,7 +31,8 @@
     "noCertificate": "Le partage de fichiers nécessite un certificat client.",
     "modeNeedsRelay": "Le partage de fichiers nécessite le relais ; votre réglage pair à pair est {{mode}}.",
     "modeOff": "Désactivé",
-    "modeDirectOnly": "Direct uniquement"
+    "modeDirectOnly": "Direct uniquement",
+    "hideNoRelay": "Masquer ce conseil pour {{server}}"
   },
   "reason": {
     "p2pOff": "Le pair à pair est désactivé.",

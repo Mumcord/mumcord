@@ -31,7 +31,8 @@
     "noCertificate": "A fájlmegosztáshoz ügyféltanúsítvány kell.",
     "modeNeedsRelay": "A fájlmegosztáshoz az átjátszó kell; a peer-to-peer beállításod: {{mode}}.",
     "modeOff": "Ki",
-    "modeDirectOnly": "Csak közvetlen"
+    "modeDirectOnly": "Csak közvetlen",
+    "hideNoRelay": "Tipp elrejtése ennél: {{server}}"
   },
   "reason": {
     "p2pOff": "A peer-to-peer ki van kapcsolva.",

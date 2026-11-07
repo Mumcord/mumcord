@@ -17,6 +17,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
+import { useNoRelayHint } from "../files/composer/noRelayHint";
+import { useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
 import { ChatActionRow } from "./ChatActionRow";
@@ -141,6 +143,19 @@ export function Composer({
   const composer = useComposer(target, limits, reply, onCancelReply);
   const inChannelTarget = target?.kind === "channel";
   const fileChips = useFileChips(inChannelTarget);
+  const serverId = useServerSelector((state) => state.serverId);
+  const { servers } = useServers();
+  const server = servers.find((entry) => entry.id === serverId);
+  const serverName = server ? server.label || server.address : "";
+  const noRelayHint = useNoRelayHint(
+    serverId,
+    fileChips.unavailable === null ? false : fileChips.unavailable.kind === "noRelay",
+  );
+  // Only the plain "no relay" hint can be closed (#579); the others ask for an action.
+  const reasonShown =
+    inChannelTarget &&
+    fileChips.unavailable !== null &&
+    !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden);
   const reasonId = useId();
   // A `mumble://` link the user typed is shown as its card before sending (issue #175).
   const previewLinks = useMemo(() => mumbleLinks(composer.text), [composer.text]);
@@ -474,10 +489,23 @@ export function Composer({
         }}
       >
         {blockedReason ? <p className="chat-composer__blocked">{blockedReason}</p> : null}
-        {inChannelTarget && fileChips.unavailable !== null ? (
-          <p id={reasonId} className="chat-composer__blocked">
-            {unavailableText(tP2p, fileChips.unavailable)}
-          </p>
+        {reasonShown && fileChips.unavailable !== null ? (
+          <div className="chat-composer__hint">
+            <p id={reasonId} className="chat-composer__blocked">
+              {unavailableText(tP2p, fileChips.unavailable)}
+            </p>
+            {fileChips.unavailable.kind === "noRelay" && (
+              <button
+                type="button"
+                className="chat-composer__hint-close"
+                aria-label={tP2p("relay.hideNoRelay", { server: serverName })}
+                data-tooltip={tP2p("relay.hideNoRelay", { server: serverName })}
+                onClick={noRelayHint.hide}
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            )}
+          </div>
         ) : null}
         {fileChips.error ? (
           <p className="chat-composer__error" role="alert">
@@ -555,7 +583,7 @@ export function Composer({
               reason={
                 fileChips.unavailable === null ? null : unavailableText(tP2p, fileChips.unavailable)
               }
-              describedBy={reasonId}
+              describedBy={reasonShown ? reasonId : undefined}
               onPick={(paths) => {
                 void fileChips.addPaths(paths);
               }}

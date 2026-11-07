@@ -9,6 +9,7 @@
 
 ### Changed
 
+- The hint "This server has no relay, so file sharing isn't available." can be closed per server; it comes back when the server gets a relay and loses it again
 - "Bots on this server" starts collapsed; once you open or close it, Mumcord remembers that
 - Plugins strip: plugin icons have no frame anymore; a plugin's own image or its colour tile is the whole icon, with a ring on hover, focus and when open
 

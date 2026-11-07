@@ -31,7 +31,8 @@
     "noCertificate": "Partajarea fișierelor necesită un certificat de client.",
     "modeNeedsRelay": "Partajarea fișierelor are nevoie de releu; setarea ta peer-to-peer este {{mode}}.",
     "modeOff": "Dezactivat",
-    "modeDirectOnly": "Doar direct"
+    "modeDirectOnly": "Doar direct",
+    "hideNoRelay": "Ascunde acest indiciu pentru {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer este dezactivat.",

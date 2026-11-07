@@ -31,7 +31,8 @@
     "noCertificate": "Teastaíonn teastas cliaint le haghaidh comhroinnte comhad.",
     "modeNeedsRelay": "Teastaíonn an t-athsheachadán le haghaidh comhroinnte comhad; is é {{mode}} do shocrú peer-to-peer.",
     "modeOff": "As",
-    "modeDirectOnly": "Díreach amháin"
+    "modeDirectOnly": "Díreach amháin",
+    "hideNoRelay": "Folaigh an leid seo do {{server}}"
   },
   "reason": {
     "p2pOff": "Tá piarbhrearthóireacht múchta.",

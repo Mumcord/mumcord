@@ -31,7 +31,8 @@
     "noCertificate": "Failu kopīgošanai nepieciešams klienta sertifikāts.",
     "modeNeedsRelay": "Failu kopīgošanai nepieciešams relejs; tavs peer-to-peer iestatījums ir {{mode}}.",
     "modeOff": "Izslēgts",
-    "modeDirectOnly": "Tikai tiešais"
+    "modeDirectOnly": "Tikai tiešais",
+    "hideNoRelay": "Paslēpt šo padomu serverim {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer ir izslēgts.",

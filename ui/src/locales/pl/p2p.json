@@ -31,7 +31,8 @@
     "noCertificate": "Udostępnianie plików wymaga certyfikatu klienta.",
     "modeNeedsRelay": "Udostępnianie plików wymaga przekaźnika; Twoje ustawienie peer-to-peer to {{mode}}.",
     "modeOff": "Wyłączone",
-    "modeDirectOnly": "Tylko bezpośrednio"
+    "modeDirectOnly": "Tylko bezpośrednio",
+    "hideNoRelay": "Ukryj tę wskazówkę dla {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer jest wyłączone.",
