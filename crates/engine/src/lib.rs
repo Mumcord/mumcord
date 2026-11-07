@@ -78,7 +78,7 @@ pub use session::{
     ServerFields, ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot, TaggedEvent,
     TestConnectionView, UnreadView, UserView, VoiceTransportKind,
 };
-pub use session::{MumbleImportChoice, MumbleImportPreview, MumbleImportResult};
+pub use session::{DenialKind, MumbleImportChoice, MumbleImportPreview, MumbleImportResult, Right};
 pub use stats::UserStatsView;
 pub use watch_party::{
     HISTORY_MAX, HistoryItem, PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand,

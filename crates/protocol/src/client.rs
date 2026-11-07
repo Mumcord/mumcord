@@ -164,6 +164,9 @@ pub enum Event {
     /// Effective permissions changed (see `ServerState::permissions`).
     PermissionsUpdated {
         channel_id: Option<u32>,
+        /// The server dropped every cached permission (`flush`), e.g. after an ACL or group
+        /// change: the client asks again for the channels it needs (#248).
+        flush: bool,
     },
     /// A channel's groups and ACL entries, the answer to [`Handle::query_acl`]. Standard servers
     /// send it only to users with the Write permission; a refusal arrives as
@@ -1118,6 +1121,7 @@ impl Dispatcher {
                 shared.state().apply_permission_query(&m);
                 self.emit_synced(Event::PermissionsUpdated {
                     channel_id: m.channel_id,
+                    flush: m.flush == Some(true),
                 });
             }
             MessageType::Acl => {
