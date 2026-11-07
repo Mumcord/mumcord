@@ -248,6 +248,12 @@
   color: inherit;
 }
 
+.server-menu__item[aria-haspopup="menu"] {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
 .server-menu__end {
   margin-inline-start: auto;
   padding-inline-start: var(--space-4);

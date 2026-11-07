@@ -15,6 +15,7 @@ import { showInfo, useHiddenHash, welcomeKey } from "../chat/hiddenInfo";
 import { useFollowStates } from "../follow/followStore";
 import { displayName, initials } from "./format";
 import { openServerAdmin } from "../admin";
+import { adminEntry } from "../admin/adminMenu";
 import { canBan } from "../admin/permissions";
 import { mentionCount, useMentions } from "./mentions";
 import { ServerMenu, type MenuItem } from "./ServerMenu";
@@ -145,17 +146,22 @@ function ServerOptions({
       }),
     });
   }
-  // Epic 4, issue #254: the window is only reachable with the Ban right on the root channel.
-  if (canBan(server.id)) {
-    items.push({
-      id: "banList",
-      label: t("admin:banList"),
-      separatorBefore: true,
-      onSelect: act(() => {
-        openServerAdmin(server.id);
-      }),
-    });
-  }
+  // Epic 4: the Admin ▸ sub-menu (FR-10.6, FR-10.9, #249). The ban list window is only reachable
+  // with the Ban right on the root channel (#254).
+  const admin = adminEntry(t("admin:menuAdmin"), [
+    ...(canBan(server.id)
+      ? [
+          {
+            id: "banList",
+            label: t("admin:banList"),
+            onSelect: act(() => {
+              openServerAdmin(server.id);
+            }),
+          },
+        ]
+      : []),
+  ]);
+  if (admin !== null) items.push(admin);
   items.push({
     id: "remove",
     label: t("menu.remove"),
