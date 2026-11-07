@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "K spoločnému sledovaniu sa nepodarilo pripojiť.",
-  "joinActivityFailed": "K aktivite doplnku sa nepodarilo pripojiť."
+  "joinActivityFailed": "K aktivite doplnku sa nepodarilo pripojiť.",
+  "earlier": "Skôr",
+  "earlierLabel": "Skôr, spred tejto relácie"
 }

@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Неуспешно влизане в общото гледане.",
-  "joinActivityFailed": "Неуспешно влизане в активността на добавката."
+  "joinActivityFailed": "Неуспешно влизане в активността на добавката.",
+  "earlier": "По-рано",
+  "earlierLabel": "По-рано, отпреди тази сесия"
 }

@@ -1255,5 +1255,14 @@
     "uploadSending": "Lähetetään…",
     "uploadDone": "Raportti lähetetty. Kiitos!",
     "uploadFailed": "Raporttia ei voitu lähettää. Tarkista yhteytesi ja yritä uudelleen; raportti säilyy tällä tietokoneella."
+  },
+  "activityHistory": {
+    "title": "Toimintahistoria",
+    "clear": "Tyhjennä toimintahistoria",
+    "hint": "Poistaa kaikkien palvelimien tallennetun syötteen.",
+    "local": "Tallennetaan vain tälle laitteelle.",
+    "button": "Tyhjennä historia",
+    "confirm": "Tyhjennetäänkö kaikkien palvelimien toimintahistoria? Tätä ei voi perua.",
+    "confirmButton": "Tyhjennä"
   }
 }

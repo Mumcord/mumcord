@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Yhteiskatseluun liittyminen epäonnistui.",
-  "joinActivityFailed": "Laajennuksen toimintoon liittyminen epäonnistui."
+  "joinActivityFailed": "Laajennuksen toimintoon liittyminen epäonnistui.",
+  "earlier": "Aiemmin",
+  "earlierLabel": "Aiemmin, ennen tätä istuntoa"
 }

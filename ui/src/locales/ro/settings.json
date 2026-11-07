@@ -1265,5 +1265,14 @@
     "uploadSending": "Se trimite…",
     "uploadDone": "Raport trimis. Mulțumim!",
     "uploadFailed": "Raportul nu a putut fi trimis. Verifică conexiunea și încearcă din nou; rămâne pe acest computer."
+  },
+  "activityHistory": {
+    "title": "Istoricul activității",
+    "clear": "Șterge istoricul activității",
+    "hint": "Elimină fluxul salvat pentru toate serverele.",
+    "local": "Salvat doar pe acest dispozitiv.",
+    "button": "Șterge istoricul",
+    "confirm": "Ștergi istoricul activității tuturor serverelor? Acțiunea nu poate fi anulată.",
+    "confirmButton": "Șterge"
   }
 }

@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Beitritt zur Watch-Party fehlgeschlagen.",
-  "joinActivityFailed": "Beitritt zur Plugin-Aktivität fehlgeschlagen."
+  "joinActivityFailed": "Beitritt zur Plugin-Aktivität fehlgeschlagen.",
+  "earlier": "Früher",
+  "earlierLabel": "Früher, aus der Zeit vor dieser Sitzung"
 }

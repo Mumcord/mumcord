@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Ke společnému sledování se nepodařilo připojit.",
-  "joinActivityFailed": "K aktivitě doplňku se nepodařilo připojit."
+  "joinActivityFailed": "K aktivitě doplňku se nepodařilo připojit.",
+  "earlier": "Dříve",
+  "earlierLabel": "Dříve, z doby před touto relací"
 }

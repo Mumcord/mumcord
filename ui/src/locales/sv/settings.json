@@ -1255,5 +1255,14 @@
     "uploadSending": "Skickar…",
     "uploadDone": "Rapporten skickades. Tack!",
     "uploadFailed": "Rapporten kunde inte skickas. Kontrollera anslutningen och försök igen; den ligger kvar på den här datorn."
+  },
+  "activityHistory": {
+    "title": "Aktivitetshistorik",
+    "clear": "Rensa aktivitetshistorik",
+    "hint": "Tar bort det sparade flödet för alla servrar.",
+    "local": "Sparas bara på den här enheten.",
+    "button": "Rensa historik",
+    "confirm": "Vill du rensa aktivitetshistoriken för alla servrar? Det går inte att ångra.",
+    "confirmButton": "Rensa"
   }
 }

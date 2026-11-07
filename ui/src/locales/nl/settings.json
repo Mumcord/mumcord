@@ -1255,5 +1255,14 @@
     "uploadSending": "Verzenden…",
     "uploadDone": "Rapport verzonden. Bedankt!",
     "uploadFailed": "Het rapport kon niet worden verzonden. Controleer je verbinding en probeer het opnieuw; het blijft op deze computer."
+  },
+  "activityHistory": {
+    "title": "Activiteitengeschiedenis",
+    "clear": "Activiteitengeschiedenis wissen",
+    "hint": "Verwijdert de opgeslagen feed van alle servers.",
+    "local": "Alleen op dit apparaat opgeslagen.",
+    "button": "Geschiedenis wissen",
+    "confirm": "De activiteitengeschiedenis van alle servers wissen? Dit kan niet ongedaan worden gemaakt.",
+    "confirmButton": "Wissen"
   }
 }

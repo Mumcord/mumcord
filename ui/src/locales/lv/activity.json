@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Neizdevās pievienoties kopīgajai skatīšanai.",
-  "joinActivityFailed": "Neizdevās pievienoties spraudņa aktivitātei."
+  "joinActivityFailed": "Neizdevās pievienoties spraudņa aktivitātei.",
+  "earlier": "Agrāk",
+  "earlierLabel": "Agrāk, pirms šīs sesijas"
 }

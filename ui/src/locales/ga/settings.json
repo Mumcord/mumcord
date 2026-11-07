@@ -1285,5 +1285,14 @@
     "uploadSending": "Á sheoladh…",
     "uploadDone": "Seoladh an tuairisc. Go raibh maith agat!",
     "uploadFailed": "Níorbh fhéidir an tuairisc a sheoladh. Seiceáil do nasc agus bain triail eile as; fanann sí ar an ríomhaire seo."
+  },
+  "activityHistory": {
+    "title": "Stair ghníomhaíochta",
+    "clear": "Glan an stair ghníomhaíochta",
+    "hint": "Baintear an fotha sábháilte do gach freastalaí.",
+    "local": "Sábháilte ar an ngléas seo amháin.",
+    "button": "Glan an stair",
+    "confirm": "An bhfuil tú ag iarraidh stair ghníomhaíochta gach freastalaí a ghlanadh? Ní féidir é seo a chealú.",
+    "confirmButton": "Glan"
   }
 }

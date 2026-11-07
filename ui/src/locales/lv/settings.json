@@ -1265,5 +1265,14 @@
     "uploadSending": "Notiek sūtīšana…",
     "uploadDone": "Ziņojums nosūtīts. Paldies!",
     "uploadFailed": "Ziņojumu neizdevās nosūtīt. Pārbaudiet savienojumu un mēģiniet vēlreiz; tas paliek šajā datorā."
+  },
+  "activityHistory": {
+    "title": "Darbību vēsture",
+    "clear": "Notīrīt darbību vēsturi",
+    "hint": "Noņem saglabāto plūsmu visiem serveriem.",
+    "local": "Saglabāts tikai šajā ierīcē.",
+    "button": "Notīrīt vēsturi",
+    "confirm": "Vai notīrīt visu serveru darbību vēsturi? To nevar atsaukt.",
+    "confirmButton": "Notīrīt"
   }
 }

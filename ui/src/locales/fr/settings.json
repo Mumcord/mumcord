@@ -1265,5 +1265,14 @@
     "uploadSending": "Envoi…",
     "uploadDone": "Rapport envoyé. Merci !",
     "uploadFailed": "Le rapport n'a pas pu être envoyé. Vérifiez votre connexion et réessayez ; il reste sur cet ordinateur."
+  },
+  "activityHistory": {
+    "title": "Historique d'activité",
+    "clear": "Effacer l'historique d'activité",
+    "hint": "Supprime le fil enregistré de tous les serveurs.",
+    "local": "Enregistré uniquement sur cet appareil.",
+    "button": "Effacer l'historique",
+    "confirm": "Effacer l'historique d'activité de tous les serveurs ? Cette action est irréversible.",
+    "confirmButton": "Effacer"
   }
 }

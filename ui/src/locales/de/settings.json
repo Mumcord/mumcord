@@ -1255,5 +1255,14 @@
     "uploadSending": "Wird gesendet…",
     "uploadDone": "Bericht gesendet. Danke!",
     "uploadFailed": "Der Bericht konnte nicht gesendet werden. Prüfe deine Verbindung und versuche es erneut; er bleibt auf diesem Computer."
+  },
+  "activityHistory": {
+    "title": "Aktivitätsverlauf",
+    "clear": "Aktivitätsverlauf löschen",
+    "hint": "Entfernt den gespeicherten Verlauf aller Server.",
+    "local": "Nur auf diesem Gerät gespeichert.",
+    "button": "Verlauf löschen",
+    "confirm": "Den Aktivitätsverlauf aller Server löschen? Das kann nicht rückgängig gemacht werden.",
+    "confirmButton": "Löschen"
   }
 }

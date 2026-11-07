@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Nem sikerült csatlakozni a közös nézéshez.",
-  "joinActivityFailed": "Nem sikerült csatlakozni a bővítmény tevékenységéhez."
+  "joinActivityFailed": "Nem sikerült csatlakozni a bővítmény tevékenységéhez.",
+  "earlier": "Korábban",
+  "earlierLabel": "Korábban, a munkamenet előttről"
 }

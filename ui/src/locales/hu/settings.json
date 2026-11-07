@@ -1255,5 +1255,14 @@
     "uploadSending": "Küldés…",
     "uploadDone": "A jelentés elküldve. Köszönjük!",
     "uploadFailed": "A jelentést nem sikerült elküldeni. Ellenőrizze a kapcsolatot, és próbálja újra; a jelentés ezen a számítógépen marad."
+  },
+  "activityHistory": {
+    "title": "Tevékenységi előzmények",
+    "clear": "Tevékenységi előzmények törlése",
+    "hint": "Törli az összes szerver mentett hírfolyamát.",
+    "local": "Csak ezen az eszközön tárolva.",
+    "button": "Előzmények törlése",
+    "confirm": "Törlöd az összes szerver tevékenységi előzményeit? Ez nem vonható vissza.",
+    "confirmButton": "Törlés"
   }
 }

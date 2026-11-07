@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Kunde inte gå med i watch partyt.",
-  "joinActivityFailed": "Kunde inte gå med i tilläggsaktiviteten."
+  "joinActivityFailed": "Kunde inte gå med i tilläggsaktiviteten.",
+  "earlier": "Tidigare",
+  "earlierLabel": "Tidigare, från före den här sessionen"
 }

@@ -1275,5 +1275,14 @@
     "uploadSending": "Odesílání…",
     "uploadDone": "Hlášení odesláno. Děkujeme!",
     "uploadFailed": "Hlášení se nepodařilo odeslat. Zkontrolujte připojení a zkuste to znovu; zůstává v tomto počítači."
+  },
+  "activityHistory": {
+    "title": "Historie aktivity",
+    "clear": "Vymazat historii aktivity",
+    "hint": "Odstraní uložený přehled pro všechny servery.",
+    "local": "Uloženo jen v tomto zařízení.",
+    "button": "Vymazat historii",
+    "confirm": "Vymazat historii aktivity všech serverů? Tuto akci nelze vrátit.",
+    "confirmButton": "Vymazat"
   }
 }

@@ -1265,5 +1265,14 @@
     "uploadSending": "A enviar…",
     "uploadDone": "Relatório enviado. Obrigado!",
     "uploadFailed": "Não foi possível enviar o relatório. Verifique a ligação e tente novamente; ele permanece neste computador."
+  },
+  "activityHistory": {
+    "title": "Histórico de atividade",
+    "clear": "Limpar histórico de atividade",
+    "hint": "Remove o feed guardado de todos os servidores.",
+    "local": "Guardado apenas neste dispositivo.",
+    "button": "Limpar histórico",
+    "confirm": "Limpar o histórico de atividade de todos os servidores? Esta ação não pode ser anulada.",
+    "confirmButton": "Limpar"
   }
 }

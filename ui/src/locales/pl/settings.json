@@ -1275,5 +1275,14 @@
     "uploadSending": "Wysyłanie…",
     "uploadDone": "Raport wysłany. Dziękujemy!",
     "uploadFailed": "Nie udało się wysłać raportu. Sprawdź połączenie i spróbuj ponownie; raport pozostaje na tym komputerze."
+  },
+  "activityHistory": {
+    "title": "Historia aktywności",
+    "clear": "Wyczyść historię aktywności",
+    "hint": "Usuwa zapisany kanał wszystkich serwerów.",
+    "local": "Zapisywane tylko na tym urządzeniu.",
+    "button": "Wyczyść historię",
+    "confirm": "Wyczyścić historię aktywności wszystkich serwerów? Tej operacji nie można cofnąć.",
+    "confirmButton": "Wyczyść"
   }
 }

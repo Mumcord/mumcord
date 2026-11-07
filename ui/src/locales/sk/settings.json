@@ -1275,5 +1275,14 @@
     "uploadSending": "Odosiela sa…",
     "uploadDone": "Hlásenie bolo odoslané. Ďakujeme!",
     "uploadFailed": "Hlásenie sa nepodarilo odoslať. Skontrolujte pripojenie a skúste to znova; zostáva v tomto počítači."
+  },
+  "activityHistory": {
+    "title": "História aktivity",
+    "clear": "Vymazať históriu aktivity",
+    "hint": "Odstráni uložený prehľad všetkých serverov.",
+    "local": "Uložené len v tomto zariadení.",
+    "button": "Vymazať históriu",
+    "confirm": "Vymazať históriu aktivity všetkých serverov? Túto akciu nie je možné vrátiť.",
+    "confirmButton": "Vymazať"
   }
 }

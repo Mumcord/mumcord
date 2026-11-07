@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "No se pudo unir a la watch party.",
-  "joinActivityFailed": "No se pudo unir a la actividad del plugin."
+  "joinActivityFailed": "No se pudo unir a la actividad del plugin.",
+  "earlier": "Anterior",
+  "earlierLabel": "Anterior, de antes de esta sesión"
 }

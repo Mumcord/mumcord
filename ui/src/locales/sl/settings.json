@@ -1275,5 +1275,14 @@
     "uploadSending": "Pošiljanje …",
     "uploadDone": "Poročilo je poslano. Hvala!",
     "uploadFailed": "Poročila ni bilo mogoče poslati. Preverite povezavo in poskusite znova; ostane v tem računalniku."
+  },
+  "activityHistory": {
+    "title": "Zgodovina dejavnosti",
+    "clear": "Počisti zgodovino dejavnosti",
+    "hint": "Odstrani shranjen vir za vse strežnike.",
+    "local": "Shranjeno samo v tej napravi.",
+    "button": "Počisti zgodovino",
+    "confirm": "Želite počistiti zgodovino dejavnosti vseh strežnikov? Tega ni mogoče razveljaviti.",
+    "confirmButton": "Počisti"
   }
 }

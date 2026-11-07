@@ -1275,5 +1275,14 @@
     "uploadSending": "Siunčiama…",
     "uploadDone": "Ataskaita išsiųsta. Ačiū!",
     "uploadFailed": "Ataskaitos išsiųsti nepavyko. Patikrinkite ryšį ir bandykite dar kartą; ji lieka šiame kompiuteryje."
+  },
+  "activityHistory": {
+    "title": "Veiklos istorija",
+    "clear": "Išvalyti veiklos istoriją",
+    "hint": "Pašalina išsaugotą visų serverių sklaidą.",
+    "local": "Saugoma tik šiame įrenginyje.",
+    "button": "Išvalyti istoriją",
+    "confirm": "Išvalyti visų serverių veiklos istoriją? To atšaukti negalima.",
+    "confirmButton": "Išvalyti"
   }
 }

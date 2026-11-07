@@ -1265,5 +1265,14 @@
     "uploadSending": "Invio in corso…",
     "uploadDone": "Segnalazione inviata. Grazie!",
     "uploadFailed": "Impossibile inviare la segnalazione. Controlla la connessione e riprova; resta su questo computer."
+  },
+  "activityHistory": {
+    "title": "Cronologia attività",
+    "clear": "Cancella cronologia attività",
+    "hint": "Rimuove il feed salvato di tutti i server.",
+    "local": "Salvato solo su questo dispositivo.",
+    "button": "Cancella cronologia",
+    "confirm": "Cancellare la cronologia attività di tutti i server? L'operazione non può essere annullata.",
+    "confirmButton": "Cancella"
   }
 }

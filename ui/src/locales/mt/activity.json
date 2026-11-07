@@ -34,5 +34,7 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Ma stajtx tingħaqad mal-watch party.",
-  "joinActivityFailed": "Ma stajtx tingħaqad mal-attività tal-plugin."
+  "joinActivityFailed": "Ma stajtx tingħaqad mal-attività tal-plugin.",
+  "earlier": "Qabel",
+  "earlierLabel": "Qabel, minn qabel din is-sessjoni"
 }
