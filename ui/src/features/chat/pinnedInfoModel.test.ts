@@ -14,6 +14,12 @@ const allow = {
   moveUsers: false,
   ban: false,
   kick: false,
+  muteDeafen: false,
+  makeChannel: false,
+  makeTempChannel: false,
+  linkChannel: false,
+  register: false,
+  resetUserContent: false,
 };
 
 function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {
