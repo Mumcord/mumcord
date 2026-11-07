@@ -10,6 +10,7 @@ import { openUpdateDialog, requestUpdateRestart } from "../updates/dialogRequest
 import { setWatchParty } from "../watchparty/watchPartyStore";
 import type { CentreItem, UpdateItem } from "./centreModel";
 import { dismissItem, markRead, setCentreOpen } from "./centreStore";
+import { openRelayDetails } from "../p2p/relayTrust";
 
 /** Marks the entry read, closes the panel and shows its server and chat, message or request. */
 export function openItem(item: CentreItem): void {
@@ -21,6 +22,11 @@ export function openItem(item: CentreItem): void {
   setCentreOpen(false);
   if (item.kind === "update") {
     openUpdateDialog();
+    return;
+  }
+  if (item.kind === "relay") {
+    // The details compare the fingerprints before anything is trusted (#600).
+    openRelayDetails(item.serverId);
     return;
   }
   showServer(item.serverId);

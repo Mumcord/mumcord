@@ -26,6 +26,8 @@ import { ComposerIcon } from "../../components/ComposerIcon";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useNoRelayHint } from "../files/composer/noRelayHint";
+import { needsDecision, openRelayDetails } from "../p2p/relayTrust";
+import { useRelayInfo } from "../p2p/useRelayInfo";
 import { useServers } from "../servers";
 import { useAvatars } from "../members/useAvatars";
 import type { SendTarget } from "./conversationInfo";
@@ -149,15 +151,27 @@ export function Composer({
   const { servers } = useServers();
   const server = servers.find((entry) => entry.id === serverId);
   const serverName = server ? server.label || server.address : "";
+  const relayInfo = useRelayInfo(inChannelTarget ? serverId : null);
+  // A changed relay that waits for trust blocks files like a missing one, but says so (#600).
+  const relayWaiting =
+    fileChips.unavailable?.kind === "noRelay" && relayInfo !== null && needsDecision(relayInfo);
   const noRelayHint = useNoRelayHint(
     serverId,
-    fileChips.unavailable === null ? false : fileChips.unavailable.kind === "noRelay",
+    fileChips.unavailable === null
+      ? false
+      : fileChips.unavailable.kind === "noRelay" && !relayWaiting,
   );
   // Only the plain "no relay" hint can be closed (#579); the others ask for an action.
   const reasonShown =
     inChannelTarget &&
     fileChips.unavailable !== null &&
-    !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden);
+    (relayWaiting || !(fileChips.unavailable.kind === "noRelay" && noRelayHint.hidden));
+  const reasonText =
+    fileChips.unavailable === null
+      ? null
+      : relayWaiting
+        ? tP2p("trust.filesBlocked")
+        : unavailableText(tP2p, fileChips.unavailable);
   const reasonId = useId();
   // A `mumble://` link the user typed is shown as its card before sending (issue #175).
   const previewLinks = useMemo(() => mumbleLinks(composer.text), [composer.text]);
@@ -519,9 +533,23 @@ export function Composer({
         {reasonShown && fileChips.unavailable !== null ? (
           <div className="chat-composer__hint">
             <p id={reasonId} className="chat-composer__blocked">
-              {unavailableText(tP2p, fileChips.unavailable)}
+              {reasonText}
+              {relayWaiting && serverId !== null && (
+                <>
+                  {" "}
+                  <button
+                    type="button"
+                    className="chat-composer__hint-link"
+                    onClick={() => {
+                      openRelayDetails(serverId);
+                    }}
+                  >
+                    {tP2p("trust.review")}
+                  </button>
+                </>
+              )}
             </p>
-            {fileChips.unavailable.kind === "noRelay" && (
+            {fileChips.unavailable.kind === "noRelay" && !relayWaiting && (
               <button
                 type="button"
                 className="chat-composer__hint-close"
@@ -651,11 +679,7 @@ export function Composer({
               {inChannelTarget ? (
                 <PaperclipButton
                   disabled={disabled}
-                  reason={
-                    fileChips.unavailable === null
-                      ? null
-                      : unavailableText(tP2p, fileChips.unavailable)
-                  }
+                  reason={reasonText}
                   describedBy={reasonShown ? reasonId : undefined}
                   onPick={(paths) => {
                     void fileChips.addPaths(paths);

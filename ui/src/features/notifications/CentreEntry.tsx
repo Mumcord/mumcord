@@ -15,8 +15,9 @@ import {
   showWhatsNew,
   watchShare,
 } from "./centreActions";
-import type { CentreItem, InviteItem, RequestItem, UpdateItem } from "./centreModel";
-import { dismissItem, setCentreOpen } from "./centreStore";
+import type { CentreItem, InviteItem, RelayItem, RequestItem, UpdateItem } from "./centreModel";
+import { dismissItem, markRead, setCentreOpen } from "./centreStore";
+import { openRelayDetails, trustNewRelay } from "../p2p/relayTrust";
 import { usePluginIcon } from "../plugins/render/usePluginIcon";
 import { PluginActions, usePluginEntryText } from "../plugins/notifications";
 
@@ -30,6 +31,7 @@ function senderOf(item: CentreItem): string {
     case "connection":
     case "update":
     case "plugin":
+    case "relay":
       return "";
     default:
       return item.sender;
@@ -55,6 +57,8 @@ function titleOf(item: CentreItem, t: T, server: string): string {
       return t("centre.update.title", { version: item.version });
     case "plugin":
       return "";
+    case "relay":
+      return t("centre.relay.title", { server });
   }
 }
 
@@ -71,6 +75,8 @@ function bodyOf(item: CentreItem, t: T): string {
       return t("centre.update.body");
     case "plugin":
       return "";
+    case "relay":
+      return t("centre.relay.body");
     case "invite":
       if (item.invite === "watchParty" || item.invite === "screenShare") return "";
       return item.excerpt ? t("centre.quoted", { text: item.excerpt }) : "";
@@ -89,6 +95,7 @@ function whereOf(item: CentreItem, t: T): string {
   if (item.kind === "connection") return t("centre.type.connection");
   if (item.kind === "update") return t("centre.type.update");
   if (item.kind === "plugin") return "";
+  if (item.kind === "relay") return t("centre.relay.decision");
   if (item.kind === "invite") return t("centre.type.invite");
   if (item.conversation.kind !== "channel") return t("centre.type.private");
   const channel = getServerStateOf(item.serverId).channels.get(item.conversation.channelId);
@@ -235,6 +242,37 @@ function InviteActions({ item }: { item: InviteItem }) {
 }
 
 /** "Restart to update" (same rule as the update toast) and "What's new" (#168). */
+/** "Trust new relay" / "Details" (#600); trusting is always this deliberate click. */
+function RelayActions({ item }: { item: RelayItem }) {
+  const { t } = useTranslation("p2p");
+  return (
+    <>
+      <button
+        type="button"
+        className="button button--primary centre-entry__action"
+        onClick={() => {
+          markRead(item.id);
+          trustNewRelay(item.serverId).catch((error: unknown) => {
+            console.error("Trusting the new relay failed", error);
+            openRelayDetails(item.serverId);
+          });
+        }}
+      >
+        {t("relay.trustNew")}
+      </button>
+      <button
+        type="button"
+        className="button centre-entry__action"
+        onClick={() => {
+          openItem(item);
+        }}
+      >
+        {t("trust.details")}
+      </button>
+    </>
+  );
+}
+
 function UpdateActions({ item }: { item: UpdateItem }) {
   const { t } = useTranslation("notifications");
   return (
@@ -334,6 +372,11 @@ export function CentreEntry({
         {item.kind === "update" && (
           <div className="centre-entry__actions">
             <UpdateActions item={item} />
+          </div>
+        )}
+        {item.kind === "relay" && (
+          <div className="centre-entry__actions">
+            <RelayActions item={item} />
           </div>
         )}
         {item.kind === "plugin" && <PluginActions item={item} />}

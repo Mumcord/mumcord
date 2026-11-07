@@ -54,12 +54,36 @@ function ToastItem({
         className="toast__open"
         onKeyDown={closeOnEscape}
         onClick={() => {
-          onOpen(toast.serverId, toast.conversation);
+          if (toast.open) toast.open();
+          else onOpen(toast.serverId, toast.conversation);
+          if (toast.actions) removeToast(toast.key);
         }}
       >
         <span className="toast__title">{toast.title}</span>
         {toast.text && <span className="toast__text">{toast.text}</span>}
       </button>
+      {toast.actions && toast.actions.length > 0 && (
+        <div className="toast__actions">
+          {toast.actions.map((action) => (
+            <button
+              key={action.label}
+              type="button"
+              className={
+                action.primary === true
+                  ? "button button--primary toast__action"
+                  : "button toast__action"
+              }
+              onKeyDown={closeOnEscape}
+              onClick={() => {
+                removeToast(toast.key);
+                action.run();
+              }}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
       <button
         type="button"
         className="toast__close"
