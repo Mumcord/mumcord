@@ -3,6 +3,7 @@
 # software Vulkan driver for the in-game overlay check (AC-1.33, AC-1.34b).
 # pipewire, wireplumber and pipewire-bin (pw-cat): the share-sound specs (AC-7.61 to 7.66) need a real
 # PipeWire graph with a null sink; pulseaudio is the daemon of the PulseAudio-only variant (AC-7.66).
+# libglib2.0-bin (gdbus): the tray and camera-portal specs talk to the session bus with it.
 # Ubuntu because Arch's webkit2gtk ships without WebKitWebDriver.
 #
 # Stages (#562): `runtime` has only what the test shards run (no compiler, headers or Rust), so
@@ -25,7 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       xvfb xauth dbus dbus-x11 libnss-wrapper gnome-keyring libsecret-tools xdotool \
       sqlite3 openssl \
       openbox libvulkan1 mesa-vulkan-drivers \
-      pipewire pipewire-bin wireplumber pulseaudio \
+      pipewire pipewire-bin wireplumber pulseaudio libglib2.0-bin \
     && rm -rf /var/lib/apt/lists/*
 
 # Docker CLI + compose plugin: helpers run testenv/up.sh and reset.sh through the host's socket.
