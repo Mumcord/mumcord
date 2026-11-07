@@ -11,6 +11,10 @@
 
 - Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)
 
+### Fixed
+
+- The Members / Activity tabs now stay in place at the top of the right column when a long list scrolls
+
 ## [0.7.1] - 2026-11-07
 
 ### Added
@@ -22,7 +26,6 @@
 
 ### Fixed
 
-- The Members / Activity tabs now stay in place at the top of the right column when a long list scrolls.
 - Cameras that list a mode they never send pictures in (for example a Logitech StreamCam at 720p and 30 fps) now start: Mumcord tries a lower frame rate or a smaller picture instead of stopping with "the camera sends no pictures"
 - Cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when PipeWire leaves the row length unset or fills only the first picture plane
 - Camera preview: the built-in background images now show right away when you choose Image, instead of leaving the tiles empty for a moment every time the preview opens
