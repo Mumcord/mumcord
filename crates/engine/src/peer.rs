@@ -137,6 +137,11 @@ pub struct RelayInfo {
     pub uses: Vec<RelayUse>,
     /// Most viewers per broadcast (`bc`, FR-7.3); `None` when the relay offers no broadcasts.
     pub broadcast_max: Option<u16>,
+    /// The announced relay's certificate fingerprint.
+    pub fingerprint: Option<String>,
+    /// The trusted relay's fingerprint while a changed relay waits for trust (#600), so the user
+    /// can compare the two before trusting the new one.
+    pub previous_fingerprint: Option<String>,
 }
 
 /// Waiting times of the relay logic; shorter in tests.
@@ -297,7 +302,8 @@ impl ServerRelay {
                 ..RelayInfo::default()
             };
         };
-        let status = if !self.trusted(&announcer.pair) {
+        let untrusted = !self.trusted(&announcer.pair);
+        let status = if untrusted {
             RelayStatus::Untrusted {
                 kept_blocked: self.kept_blocked.as_ref() == Some(&announcer.pair),
             }
@@ -316,6 +322,12 @@ impl ServerRelay {
                 .filter(|u| announcer.allows(*u))
                 .collect(),
             broadcast_max: announcer.ann.broadcast,
+            fingerprint: Some(announcer.pair.fp.clone()),
+            previous_fingerprint: if untrusted {
+                self.pin.as_ref().map(|p| p.relay_fp.clone())
+            } else {
+                None
+            },
         }
     }
 

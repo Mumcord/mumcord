@@ -4330,6 +4330,10 @@ export type RelayInfo = {
 	uses: RelayUse[],
 	/**  Most viewers per broadcast; `null` when the relay offers no broadcasts. */
 	broadcastMax: number | null,
+	/**  The announced relay's certificate fingerprint. */
+	fingerprint: string | null,
+	/**  The trusted relay's fingerprint while a changed relay waits for trust (#600). */
+	previousFingerprint: string | null,
 };
 
 /**  Why the relay refused a connection (spec 04 section 6.5). */
