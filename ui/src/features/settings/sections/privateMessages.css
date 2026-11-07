@@ -14,33 +14,46 @@
   font-weight: var(--font-weight-bold);
 }
 
+/* Option cards (#586, variant C): the whole card is the target; border and tint mark the choice. */
 .pm-rules__card {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
   cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
 }
 
 .pm-rules__card:hover {
+  border-color: var(--color-border-strong);
   background: var(--color-bg-hover);
 }
 
 .pm-rules__card:has(input:checked) {
   border-color: var(--color-accent);
   background: var(--color-bg-selected);
+  box-shadow: var(--shadow-glow);
 }
 
+/* The focus ring goes around the card, not the small radio inside it. */
 .pm-rules__card:has(input:focus-visible) {
-  outline: 2px solid var(--color-focus);
+  outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: 2px;
 }
 
-.pm-rules__card input {
-  margin-top: 0.2em;
-  accent-color: var(--color-accent);
+.pm-rules__card input:focus-visible {
+  outline: none;
+}
+
+@media (forced-colors: active) {
+  .pm-rules__card:has(input:checked) {
+    outline: 2px solid Highlight;
+  }
 }
 
 .pm-rules__text {

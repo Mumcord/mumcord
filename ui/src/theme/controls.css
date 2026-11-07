@@ -1,0 +1,118 @@
+/*
+ * The app's own radio buttons and checkboxes (#586, #592; approved mockups, variant A): a ring
+ * with an accent centre and a rounded square with an accent check, both 1.25rem with a 2px
+ * border. `:where()` keeps the specificity at zero, so a component's own class (hidden radios
+ * behind segmented controls, preset cards) still wins. Switches are checkboxes with
+ * role="switch" and keep their own look.
+ */
+:where(input[type="radio"], input[type="checkbox"]:not([role="switch"])) {
+  appearance: none;
+  display: inline-grid;
+  flex: none;
+  place-content: center;
+  box-sizing: border-box;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 1px 0 0;
+  border: 2px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-accent);
+  vertical-align: middle;
+  cursor: inherit;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+:where(input[type="radio"]) {
+  border-radius: 50%;
+}
+
+:where(input[type="checkbox"]:not([role="switch"])) {
+  border-radius: 4px;
+}
+
+:where(input[type="radio"]:checked, input[type="checkbox"]:not([role="switch"]):checked),
+:where(input[type="checkbox"]:not([role="switch"]):indeterminate) {
+  border-color: var(--color-accent);
+}
+
+:where(input[type="radio"]:checked) {
+  background: radial-gradient(circle, var(--color-accent) 0 38%, transparent 42%);
+}
+
+/* The check is a mask over the accent colour, so it follows every theme's accent. */
+:where(input[type="checkbox"]:not([role="switch"]))::before {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  background: currentcolor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3.2L15 6.8' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: scale(0);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+:where(input[type="checkbox"]:not([role="switch"]):indeterminate)::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10h9' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+:where(
+  input[type="checkbox"]:not([role="switch"]):checked,
+  input[type="checkbox"]:not([role="switch"]):indeterminate
+)::before {
+  transform: scale(1);
+}
+
+/* Hovering the control or its row hints at the click target. */
+:where(label, .settings-radios__option):hover
+  > :where(input[type="radio"], input[type="checkbox"]:not([role="switch"])):not(:disabled),
+:where(input[type="radio"], input[type="checkbox"]:not([role="switch"])):hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+:where(input[type="radio"], input[type="checkbox"]:not([role="switch"])):focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+:where(input[type="radio"], input[type="checkbox"]:not([role="switch"])):disabled {
+  opacity: 0.45;
+}
+
+/* High contrast: the drawn controls must survive without author colours. */
+@media (forced-colors: active) {
+  :where(input[type="radio"], input[type="checkbox"]:not([role="switch"])) {
+    forced-color-adjust: none;
+    border-color: ButtonText;
+    background-color: Canvas;
+    color: Highlight;
+  }
+
+  :where(input[type="radio"]:checked) {
+    border-color: Highlight;
+    background: radial-gradient(circle, Highlight 0 38%, Canvas 42%);
+  }
+
+  :where(input[type="checkbox"]:not([role="switch"]):checked),
+  :where(input[type="checkbox"]:not([role="switch"]):indeterminate) {
+    border-color: Highlight;
+  }
+
+  :where(input[type="radio"], input[type="checkbox"]:not([role="switch"])):disabled {
+    border-color: GrayText;
+    color: GrayText;
+    opacity: 1;
+  }
+
+  :where(input[type="radio"], input[type="checkbox"]:not([role="switch"])):focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(input[type="radio"], input[type="checkbox"]:not([role="switch"])),
+  :where(input[type="checkbox"]:not([role="switch"]))::before {
+    transition: none;
+  }
+}
