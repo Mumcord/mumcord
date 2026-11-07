@@ -13,7 +13,8 @@
     "relayTooOld": "Tá athsheachadán an fhreastalaí seo ró-shean le haghaidh comhroinnt ceamara.",
     "relayDisallows": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt ceamara.",
     "needsRelayMode": "Teastaíonn an t-athsheachadán ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc.",
-    "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara."
+    "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
+    "registeredOnly": "Ar an bhfreastalaí seo ní féidir ach le húsáideoirí cláraithe an ceamara a úsáid."
   },
   "cameraOnTray": "Ceamara ar siúl",
   "turnOffTray": "Cas ceamara as",
@@ -97,7 +98,12 @@
     "mode": "Teastaíonn an t-athsheachadán ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc.",
     "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
     "endedByRelay": "Stop athsheachadán an fhreastalaí an ceamara",
-    "dismissStopped": "Cuir ar leataobh"
+    "dismissStopped": "Cuir ar leataobh",
+    "notRegistered": "Níor thosaigh an ceamara: ar an bhfreastalaí seo ní féidir ach le húsáideoirí cláraithe an ceamara a úsáid.",
+    "groupNotAllowed": "Níor thosaigh an ceamara: ní fhreastalaíonn athsheachadán an fhreastalaí ach ar ghrúpaí áirithe. Iarr ar riarthóir tú a chur leis.",
+    "notSameChannel": "Níor thosaigh an ceamara: caithfidh tú féin agus do lucht féachana a bheith sa chainéal céanna.",
+    "notInChannel": "Níor thosaigh an ceamara: téigh isteach i gcainéal ar dtús.",
+    "noHello": "Níor thosaigh an ceamara: níl aithne fós ag bot an athsheachadáin ar an aip seo. Ceangail arís."
   },
   "privacy": {
     "windows": "Blocálann Windows rochtain ar an gceamara d'aipeanna deisce",

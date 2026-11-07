@@ -13,7 +13,8 @@
     "relayTooOld": "Relay tohoto serveru je pro sdílení kamery příliš starý.",
     "relayDisallows": "Relay tohoto serveru sdílení kamery nepovoluje.",
     "needsRelayMode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
-    "noCertificate": "Sdílení kamery potřebuje klientský certifikát."
+    "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
+    "registeredOnly": "Na tomto serveru mohou kameru používat jen registrovaní uživatelé."
   },
   "cameraOnTray": "Kamera zapnutá",
   "turnOffTray": "Vypnout kameru",
@@ -97,7 +98,12 @@
     "mode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
     "endedByRelay": "Kameru zastavil relay serveru",
-    "dismissStopped": "Zavřít"
+    "dismissStopped": "Zavřít",
+    "notRegistered": "Kamera se nespustila: na tomto serveru mohou kameru používat jen registrovaní uživatelé.",
+    "groupNotAllowed": "Kamera se nespustila: relay tohoto serveru obsluhuje jen určité skupiny. Požádej správce, ať tě přidá.",
+    "notSameChannel": "Kamera se nespustila: ty a tví diváci musíte být ve stejném kanálu.",
+    "notInChannel": "Kamera se nespustila: nejdřív se připoj do kanálu.",
+    "noHello": "Kamera se nespustila: bot relaye tuto aplikaci ještě nezná. Připoj se znovu."
   },
   "privacy": {
     "windows": "Windows blokuje přístup ke kameře desktopovým aplikacím",

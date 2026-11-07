@@ -15,6 +15,7 @@ import {
   type CameraBlock,
 } from "./availability";
 import { openCameraPreview } from "./previewStore";
+import { useGuestRelayBlock } from "../p2p/useGuestRelayBlock";
 
 export interface CameraEntry {
   onAir: boolean;
@@ -35,7 +36,11 @@ export function useCameraEntry(serverId: number | null): CameraEntry {
   const voiceServerId = useVoiceServerId();
   const reason = useCameraUnavailable(serverId);
   const onAir = own?.state === "onAir";
-  const block = onAir ? null : cameraBlock(serverId, voiceServerId, reason);
+  // A guest on a relay for registered users only is told before trying (#601).
+  const guestBlocked = useGuestRelayBlock(serverId);
+  const block = onAir
+    ? null
+    : (cameraBlock(serverId, voiceServerId, reason) ?? (guestBlocked ? "registeredOnly" : null));
   const toggle = (opener: HTMLElement | null) => {
     if (onAir) {
       getApi()

@@ -13,7 +13,8 @@
     "relayTooOld": "Relej tega strežnika je za deljenje kamere prestar.",
     "relayDisallows": "Relej tega strežnika ne dovoljuje deljenja kamere.",
     "needsRelayMode": "Deljenje kamere potrebuje relej. Spremeni to v Zasebnost in povezave.",
-    "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo."
+    "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo.",
+    "registeredOnly": "Na tem strežniku lahko kamero uporabljajo le registrirani uporabniki."
   },
   "cameraOnTray": "Kamera vklopljena",
   "turnOffTray": "Izklopi kamero",
@@ -97,7 +98,12 @@
     "mode": "Deljenje kamere potrebuje relej. Spremeni to v Zasebnost in povezave.",
     "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo.",
     "endedByRelay": "Kamero je ustavil relej strežnika",
-    "dismissStopped": "Opusti"
+    "dismissStopped": "Opusti",
+    "notRegistered": "Kamera se ni zagnala: na tem strežniku lahko kamero uporabljajo le registrirani uporabniki.",
+    "groupNotAllowed": "Kamera se ni zagnala: rele tega strežnika streže le določenim skupinam. Prosi skrbnika, da te doda.",
+    "notSameChannel": "Kamera se ni zagnala: ti in tvoji gledalci morate biti v istem kanalu.",
+    "notInChannel": "Kamera se ni zagnala: najprej se pridruži kanalu.",
+    "noHello": "Kamera se ni zagnala: bot releja te aplikacije še ne pozna. Znova se poveži."
   },
   "privacy": {
     "windows": "Windows blokira dostop do kamere za namizne aplikacije",

@@ -190,7 +190,10 @@
     "detailsDropped": "Zgubione klatki",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nie zmierzono",
-    "close": "Zamknij"
+    "close": "Zamknij",
+    "reasonNotRegistered": "tylko zarejestrowani użytkownicy mogą korzystać z przekaźnika tego serwera",
+    "reasonGroupNotAllowed": "przekaźnik obsługuje tylko wybrane grupy",
+    "reasonNoHello": "bot przekaźnika nie zna jeszcze tej aplikacji, połącz się ponownie"
   },
   "settings": {
     "title": "Udostępnianie ekranu",

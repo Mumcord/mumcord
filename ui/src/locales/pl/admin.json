@@ -114,5 +114,44 @@
   "quickFixed": "serwer decyduje o obu",
   "noCertificate": "Ta osoba nie ma certyfikatu, więc można zbanować tylko jej adres.",
   "certRegisteredHint": "serwer porównuje certyfikat tylko osoby zarejestrowanej",
-  "ipAlwaysOnHint": "serwer porównuje adres, więc Mumcord zawsze zostawia go w wpisie"
+  "ipAlwaysOnHint": "serwer porównuje adres, więc Mumcord zawsze zostawia go w wpisie",
+  "denied": {
+    "title": "Serwer na to nie pozwolił",
+    "titleOn": "{{server}} na to nie pozwolił",
+    "permission": "Nie masz do tego uprawnień.",
+    "unknown": "Serwer odmówił.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} na kanale {{channel}}.",
+    "kind": {
+      "superUser": "Tylko SuperUser serwera może to zrobić.",
+      "channelName": "Ta nazwa kanału jest niedozwolona.",
+      "textTooLong": "Tekst jest dłuższy, niż pozwala serwer.",
+      "temporaryChannel": "Na kanale tymczasowym nie jest to możliwe.",
+      "missingCertificate": "Wymaga to certyfikatu klienta.",
+      "userName": "Ta nazwa jest niedozwolona lub zajęta.",
+      "channelFull": "Kanał jest pełny.",
+      "nestingLimit": "Nie można tu bardziej zagnieżdżać kanałów.",
+      "channelCountLimit": "Serwer ma już tyle kanałów, ile pozwala.",
+      "listenerLimit": "Jest już tylu słuchaczy, ilu pozwala serwer."
+    },
+    "right": {
+      "write": "Nie możesz zmieniać uprawnień",
+      "traverse": "Nie możesz otworzyć tego kanału",
+      "enter": "Nie możesz dołączyć",
+      "speak": "Nie możesz mówić",
+      "muteDeafen": "Nie możesz wyciszać ani ogłuszać innych",
+      "move": "Nie możesz przenosić innych",
+      "makeChannel": "Nie możesz tworzyć kanałów",
+      "linkChannel": "Nie możesz łączyć kanałów",
+      "whisper": "Nie możesz szeptać",
+      "textMessage": "Nie możesz pisać wiadomości",
+      "makeTempChannel": "Nie możesz tworzyć kanałów tymczasowych",
+      "listen": "Nie możesz słuchać",
+      "kick": "Nie możesz wyrzucać innych",
+      "ban": "Nie możesz banować innych",
+      "register": "Nie możesz rejestrować innych",
+      "selfRegister": "Nie możesz się zarejestrować",
+      "resetUserContent": "Nie możesz resetować komentarzy i awatarów"
+    }
+  }
 }

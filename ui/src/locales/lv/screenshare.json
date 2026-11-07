@@ -186,7 +186,10 @@
     "detailsDropped": "Izlaistie kadri",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nav mērīts",
-    "close": "Aizvērt"
+    "close": "Aizvērt",
+    "reasonNotRegistered": "šī servera retranslatoru drīkst izmantot tikai reģistrēti lietotāji",
+    "reasonGroupNotAllowed": "retranslators apkalpo tikai noteiktas grupas",
+    "reasonNoHello": "retranslatora bots vēl nepazīst lietotni, pievienojies vēlreiz"
   },
   "settings": {
     "title": "Ekrāna kopīgošana",

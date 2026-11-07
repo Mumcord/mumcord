@@ -182,7 +182,10 @@
     "detailsDropped": "Tappade bildrutor",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Inte uppmätt",
-    "close": "Stäng"
+    "close": "Stäng",
+    "reasonNotRegistered": "bara registrerade användare får använda serverns relä",
+    "reasonGroupNotAllowed": "reläet betjänar bara vissa grupper",
+    "reasonNoHello": "reläboten känner inte till appen än, anslut igen"
   },
   "settings": {
     "title": "Skärmdelning",

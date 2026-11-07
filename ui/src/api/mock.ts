@@ -264,6 +264,7 @@ const NO_RELAY: RelayInfo = {
   firstSeen: null,
   uses: [],
   broadcastMax: null,
+  registeredOnly: false,
   fingerprint: null,
   previousFingerprint: null,
 };
@@ -276,6 +277,7 @@ const MOCK_RELAY: RelayInfo = {
   firstSeen: "2026-09-01T18:00:00Z",
   uses: ["images", "files", "screenShare"],
   broadcastMax: 25,
+  registeredOnly: false,
   fingerprint: null,
   previousFingerprint: null,
 };
@@ -731,6 +733,12 @@ const allow = {
   moveUsers: false,
   ban: false,
   kick: false,
+  muteDeafen: false,
+  makeChannel: false,
+  makeTempChannel: false,
+  linkChannel: false,
+  register: false,
+  resetUserContent: false,
 };
 
 function seedChannels(): ChannelInfo[] {

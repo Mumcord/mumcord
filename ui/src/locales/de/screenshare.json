@@ -182,7 +182,10 @@
     "detailsDropped": "Verworfene Bilder",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nicht gemessen",
-    "close": "Schließen"
+    "close": "Schließen",
+    "reasonNotRegistered": "nur registrierte Nutzer dürfen das Relay dieses Servers verwenden",
+    "reasonGroupNotAllowed": "das Relay bedient nur bestimmte Gruppen",
+    "reasonNoHello": "der Relay-Bot kennt diese App noch nicht, verbinde dich neu"
   },
   "settings": {
     "title": "Bildschirmfreigabe",

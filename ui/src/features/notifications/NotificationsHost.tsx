@@ -15,6 +15,7 @@ import { handleIncoming } from "./incoming";
 import { handleActivity } from "../activity/activityNotify";
 import { subscribeActivityAdded } from "../activity/activityStore";
 import { bindRelayTrustNotices } from "../p2p/relayTrust";
+import { bindDeniedNotices } from "../admin/deniedNotice";
 import { RelayTrustDialog } from "../p2p/RelayTrustDialog";
 import { NotificationCentre } from "./NotificationCentre";
 import { clearServerNotifications, markSeen, noticeKey } from "./notificationStore";
@@ -60,6 +61,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
   const { t } = useTranslation("notifications");
   const { t: tActivity } = useTranslation("activity");
   const { t: tP2p } = useTranslation("p2p");
+  const { t: tAdmin } = useTranslation("admin");
   const { conversation: selected } = useSelectedConversation();
   const shown = useShownServerId();
   const { servers } = useServers();
@@ -80,6 +82,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     t,
     tActivity,
     tP2p,
+    tAdmin,
     overlayOpen,
     onOpenChat,
     selected,
@@ -92,6 +95,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
       t,
       tActivity,
       tP2p,
+      tAdmin,
       overlayOpen,
       onOpenChat,
       selected,
@@ -135,6 +139,11 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
           serverName: (id) => live.current.serverName(id),
         });
       }),
+      // The server's refusals in plain words, unless a dialog shows them (#248).
+      bindDeniedNotices(getApi(), () => ({
+        t: live.current.tAdmin,
+        serverName: (id) => live.current.serverName(id),
+      })),
       // A changed relay waits for the user's decision (#600).
       bindRelayTrustNotices(getApi(), () => ({
         t: live.current.tP2p,

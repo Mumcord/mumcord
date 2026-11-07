@@ -74,6 +74,16 @@ pub enum CameraFailure {
     /// The P2P mode leaves the relay out.
     Mode,
     NoCertificate,
+    /// The relay only serves registered users (#601).
+    NotRegistered,
+    /// The relay only serves members of certain groups (#601).
+    GroupNotAllowed,
+    /// Camera sharing works within one channel (#601).
+    NotSameChannel,
+    /// Join a channel first (#601).
+    NotInChannel,
+    /// The relay bot doesn't know this client yet; reconnect (#601).
+    NoHello,
 }
 
 impl From<&EngineFailure> for CameraFailure {
@@ -96,6 +106,11 @@ impl From<&EngineFailure> for CameraFailure {
             EngineFailure::RateLimited => Self::RateLimited,
             EngineFailure::Mode => Self::Mode,
             EngineFailure::NoCertificate => Self::NoCertificate,
+            EngineFailure::NotRegistered => Self::NotRegistered,
+            EngineFailure::GroupNotAllowed => Self::GroupNotAllowed,
+            EngineFailure::NotSameChannel => Self::NotSameChannel,
+            EngineFailure::NotInChannel => Self::NotInChannel,
+            EngineFailure::NoHello => Self::NoHello,
         }
     }
 }

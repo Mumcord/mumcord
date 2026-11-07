@@ -351,6 +351,94 @@ pub struct TransportChanged {
     pub transport: Transport,
 }
 
+/// Why the server refused something; the UI words each kind (#248).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum DenialKind {
+    Text,
+    Permission,
+    SuperUser,
+    ChannelName,
+    TextTooLong,
+    TemporaryChannel,
+    MissingCertificate,
+    UserName,
+    ChannelFull,
+    NestingLimit,
+    ChannelCountLimit,
+    ListenerLimit,
+    Unknown,
+}
+
+impl From<mumcord_engine::DenialKind> for DenialKind {
+    fn from(value: mumcord_engine::DenialKind) -> Self {
+        use mumcord_engine::DenialKind as E;
+        match value {
+            E::Text => Self::Text,
+            E::Permission => Self::Permission,
+            E::SuperUser => Self::SuperUser,
+            E::ChannelName => Self::ChannelName,
+            E::TextTooLong => Self::TextTooLong,
+            E::TemporaryChannel => Self::TemporaryChannel,
+            E::MissingCertificate => Self::MissingCertificate,
+            E::UserName => Self::UserName,
+            E::ChannelFull => Self::ChannelFull,
+            E::NestingLimit => Self::NestingLimit,
+            E::ChannelCountLimit => Self::ChannelCountLimit,
+            E::ListenerLimit => Self::ListenerLimit,
+            E::Unknown => Self::Unknown,
+        }
+    }
+}
+
+/// A Mumble permission, as named in a refusal (#248).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum Right {
+    Write,
+    Traverse,
+    Enter,
+    Speak,
+    MuteDeafen,
+    Move,
+    MakeChannel,
+    LinkChannel,
+    Whisper,
+    TextMessage,
+    MakeTempChannel,
+    Listen,
+    Kick,
+    Ban,
+    Register,
+    SelfRegister,
+    ResetUserContent,
+}
+
+impl From<mumcord_engine::Right> for Right {
+    fn from(value: mumcord_engine::Right) -> Self {
+        use mumcord_engine::Right as E;
+        match value {
+            E::Write => Self::Write,
+            E::Traverse => Self::Traverse,
+            E::Enter => Self::Enter,
+            E::Speak => Self::Speak,
+            E::MuteDeafen => Self::MuteDeafen,
+            E::Move => Self::Move,
+            E::MakeChannel => Self::MakeChannel,
+            E::LinkChannel => Self::LinkChannel,
+            E::Whisper => Self::Whisper,
+            E::TextMessage => Self::TextMessage,
+            E::MakeTempChannel => Self::MakeTempChannel,
+            E::Listen => Self::Listen,
+            E::Kick => Self::Kick,
+            E::Ban => Self::Ban,
+            E::Register => Self::Register,
+            E::SelfRegister => Self::SelfRegister,
+            E::ResetUserContent => Self::ResetUserContent,
+        }
+    }
+}
+
 /// The server denied an action asynchronously (PermissionDenied message).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
@@ -358,6 +446,11 @@ pub struct ServerDenied {
     pub server_id: ServerId,
     pub error: ApiError,
     pub channel_id: Option<ChannelId>,
+    pub kind: DenialKind,
+    /// The missing right of a permission refusal.
+    pub permission: Option<Right>,
+    /// A dialog that asked shows the refusal already; the UI adds no notice of its own.
+    pub handled: bool,
 }
 
 impl From<ConnState> for ConnectionState {

@@ -12,7 +12,15 @@ import { BackgroundPicker } from "./BackgroundPicker";
 import { saveCameraSettings } from "./cameraSettings";
 import { DevicePicker } from "./DevicePicker";
 import { CameraIcon, CheckIcon, LoadIcon } from "./previewIcons";
-import { canRetryAccess, desktopOs, failureText, loadLine, loadLineText } from "./previewLogic";
+import {
+  canRetryAccess,
+  desktopOs,
+  failureText,
+  loadLine,
+  loadLineText,
+  refusalHint,
+} from "./previewLogic";
+import { RefusalAction } from "../../p2p/RefusalAction";
 import { PreviewPicture } from "./PreviewPicture";
 import { applyLiveBackground, setLiveBackground } from "./liveBackground";
 import { useEffectsLoad } from "./useEffectsLoad";
@@ -141,6 +149,7 @@ function DialogContent({
   const line = loadLine(effects);
   // An empty device list already says "No camera found" at the picker.
   const failure = session.failure === "noCamera" && cameras.length === 0 ? null : session.failure;
+  const hint = failure === null ? null : refusalHint(failure);
 
   return createPortal(
     <dialog
@@ -224,6 +233,7 @@ function DialogContent({
                 {t("privacy.linuxAction")}
               </button>
             )}
+            {hint !== null && <RefusalAction hint={hint} serverId={serverId} />}
           </span>
         )}
         {deviceFailure !== null && <span className="app-dialog__error">{deviceFailure}</span>}

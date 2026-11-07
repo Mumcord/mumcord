@@ -114,5 +114,44 @@
   "quickFixed": "decide il server per entrambi",
   "noCertificate": "Questa persona non ha un certificato, quindi si può bandire solo il suo indirizzo.",
   "certRegisteredHint": "il server confronta il certificato solo di una persona registrata",
-  "ipAlwaysOnHint": "il server confronta l'indirizzo, quindi Mumcord lo mantiene sempre nella voce"
+  "ipAlwaysOnHint": "il server confronta l'indirizzo, quindi Mumcord lo mantiene sempre nella voce",
+  "denied": {
+    "title": "Il server non l'ha permesso",
+    "titleOn": "{{server}} non l'ha permesso",
+    "permission": "Non hai il permesso per farlo.",
+    "unknown": "Il server ha rifiutato.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} in {{channel}}.",
+    "kind": {
+      "superUser": "Solo il SuperUser del server può farlo.",
+      "channelName": "Questo nome di canale non è consentito.",
+      "textTooLong": "Il testo è più lungo di quanto il server consenta.",
+      "temporaryChannel": "Non è possibile in un canale temporaneo.",
+      "missingCertificate": "Serve un certificato client.",
+      "userName": "Questo nome non è consentito o è già in uso.",
+      "channelFull": "Il canale è pieno.",
+      "nestingLimit": "Qui i canali non si possono annidare ulteriormente.",
+      "channelCountLimit": "Il server ha già tanti canali quanti ne consente.",
+      "listenerLimit": "Ci sono già tanti ascoltatori quanti il server consente."
+    },
+    "right": {
+      "write": "Non puoi cambiare i permessi",
+      "traverse": "Non puoi aprire questo canale",
+      "enter": "Non puoi entrare",
+      "speak": "Non puoi parlare",
+      "muteDeafen": "Non puoi silenziare o assordare nessuno",
+      "move": "Non puoi spostare nessuno",
+      "makeChannel": "Non puoi creare canali",
+      "linkChannel": "Non puoi collegare canali",
+      "whisper": "Non puoi sussurrare",
+      "textMessage": "Non puoi scrivere messaggi",
+      "makeTempChannel": "Non puoi creare canali temporanei",
+      "listen": "Non puoi ascoltare",
+      "kick": "Non puoi espellere nessuno",
+      "ban": "Non puoi bannare nessuno",
+      "register": "Non puoi registrare nessuno",
+      "selfRegister": "Non puoi registrarti",
+      "resetUserContent": "Non puoi reimpostare commenti e avatar"
+    }
+  }
 }

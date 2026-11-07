@@ -114,5 +114,44 @@
   "quickFixed": "a szerver dönt mindkettőről",
   "noCertificate": "Ennek a személynek nincs tanúsítványa, ezért csak a címe tiltható ki.",
   "certRegisteredHint": "a szerver a tanúsítványt csak regisztrált személlyel hasonlítja össze",
-  "ipAlwaysOnHint": "a szerver a címet hasonlítja össze, ezért a Mumcord mindig megtartja a bejegyzésben"
+  "ipAlwaysOnHint": "a szerver a címet hasonlítja össze, ezért a Mumcord mindig megtartja a bejegyzésben",
+  "denied": {
+    "title": "A szerver ezt nem engedte",
+    "titleOn": "{{server}} ezt nem engedte",
+    "permission": "Ehhez nincs jogod.",
+    "unknown": "A szerver ezt elutasította.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} itt: {{channel}}.",
+    "kind": {
+      "superUser": "Ezt csak a szerver SuperUser fiókja teheti meg.",
+      "channelName": "Ez a csatornanév nem engedélyezett.",
+      "textTooLong": "A szöveg hosszabb, mint amit a szerver enged.",
+      "temporaryChannel": "Ideiglenes csatornában ez nem lehetséges.",
+      "missingCertificate": "Ehhez kliens-tanúsítvány kell.",
+      "userName": "Ez a név nem engedélyezett vagy már foglalt.",
+      "channelFull": "A csatorna megtelt.",
+      "nestingLimit": "A csatornák itt nem ágyazhatók mélyebbre.",
+      "channelCountLimit": "A szerveren már annyi csatorna van, amennyit enged.",
+      "listenerLimit": "Már annyi hallgató van, amennyit a szerver enged."
+    },
+    "right": {
+      "write": "Nem módosíthatod a jogosultságokat",
+      "traverse": "Nem nyithatod meg ezt a csatornát",
+      "enter": "Nem léphetsz be",
+      "speak": "Nem beszélhetsz",
+      "muteDeafen": "Senkit sem némíthatsz vagy süketíthetsz",
+      "move": "Senkit sem helyezhetsz át",
+      "makeChannel": "Nem hozhatsz létre csatornát",
+      "linkChannel": "Nem kapcsolhatsz össze csatornákat",
+      "whisper": "Nem suttoghatsz",
+      "textMessage": "Nem írhatsz üzenetet",
+      "makeTempChannel": "Nem hozhatsz létre ideiglenes csatornát",
+      "listen": "Nem hallgathatsz",
+      "kick": "Senkit sem rúghatsz ki",
+      "ban": "Senkit sem tilthatsz ki",
+      "register": "Senkit sem regisztrálhatsz",
+      "selfRegister": "Nem regisztrálhatsz",
+      "resetUserContent": "Nem állíthatod vissza a megjegyzéseket és avatarokat"
+    }
+  }
 }

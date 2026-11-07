@@ -49,7 +49,9 @@
     "denied": "Le bot du relais a refusé la demande.",
     "notRegistered": "Le relais de ce serveur est réservé aux utilisateurs enregistrés. Enregistrez-vous sur ce serveur pour l’utiliser.",
     "peerGone": "L’autre personne a quitté le serveur.",
-    "rateLimited": "Trop de demandes de relais. Réessayez dans une minute."
+    "rateLimited": "Trop de demandes de relais. Réessayez dans une minute.",
+    "groupNotAllowed": "Le relais de ce serveur n'est disponible que pour certains groupes. Demande à un admin de t'ajouter.",
+    "noHello": "Le bot du relais ne connaît pas encore cette app. Reconnecte-toi pour corriger cela."
   },
   "refusal": {
     "unknownToken": "jeton d’accès inconnu",
@@ -61,6 +63,11 @@
     "rateLimited": "trop de tentatives",
     "version": "version non prise en charge",
     "badRequest": "demande invalide"
+  },
+  "refusalAction": {
+    "howToRegister": "Comment s'enregistrer",
+    "reconnect": "Se reconnecter",
+    "filesRegisteredOnly": "Le partage de fichiers n'est disponible que pour les utilisateurs enregistrés sur ce serveur."
   },
   "trust": {
     "title": "Relais modifié sur {{server}}",

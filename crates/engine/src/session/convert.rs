@@ -9,7 +9,8 @@ use mumcord_store::PersonSetting;
 
 use super::machine::Failure;
 use super::types::{
-    ChannelPermissions, ChannelView, EngineError, ErrorKind, ServerInfoView, UserView,
+    ChannelPermissions, ChannelView, DenialKind, EngineError, ErrorKind, Right, ServerInfoView,
+    UserView,
 };
 
 /// The root channel always has id 0 in Mumble.
@@ -84,6 +85,18 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             kick: bits
                 .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
                 .is_some_and(|b| b & permissions::KICK != 0),
+            // Admin rights show only once the server confirmed them for this channel (#248).
+            mute_deafen: bits.is_some_and(|b| b & permissions::MUTE_DEAFEN != 0),
+            make_channel: bits.is_some_and(|b| b & permissions::MAKE_CHANNEL != 0),
+            make_temp_channel: bits.is_some_and(|b| b & permissions::MAKE_TEMP_CHANNEL != 0),
+            link_channel: bits.is_some_and(|b| b & permissions::LINK_CHANNEL != 0),
+            // Root-only rights: the root channel's answer stands in, like for Kick.
+            register: bits
+                .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
+                .is_some_and(|b| b & permissions::REGISTER != 0),
+            reset_user_content: bits
+                .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
+                .is_some_and(|b| b & permissions::RESET_USER_CONTENT != 0),
         },
         description: channel
             .description
@@ -308,9 +321,68 @@ pub fn denial_error(denied: &PermissionDenied) -> EngineError {
     EngineError::new(kind, message)
 }
 
+/// The kind of a refusal as the UI words it (#248).
+pub fn denial_kind(denied: &PermissionDenied) -> DenialKind {
+    match denied.kind {
+        DenyKind::Text => DenialKind::Text,
+        DenyKind::Permission => DenialKind::Permission,
+        DenyKind::SuperUser => DenialKind::SuperUser,
+        DenyKind::ChannelName => DenialKind::ChannelName,
+        DenyKind::TextTooLong => DenialKind::TextTooLong,
+        DenyKind::TemporaryChannel => DenialKind::TemporaryChannel,
+        DenyKind::MissingCertificate => DenialKind::MissingCertificate,
+        DenyKind::UserName => DenialKind::UserName,
+        DenyKind::ChannelFull => DenialKind::ChannelFull,
+        DenyKind::NestingLimit => DenialKind::NestingLimit,
+        DenyKind::ChannelCountLimit => DenialKind::ChannelCountLimit,
+        DenyKind::ChannelListenerLimit | DenyKind::UserListenerLimit => DenialKind::ListenerLimit,
+        DenyKind::H9K | DenyKind::Unknown(_) => DenialKind::Unknown,
+    }
+}
+
+/// The single right a refusal names; `None` for none or a combination.
+pub fn right_of(bits: u32) -> Option<Right> {
+    Some(match bits {
+        permissions::WRITE => Right::Write,
+        permissions::TRAVERSE => Right::Traverse,
+        permissions::ENTER => Right::Enter,
+        permissions::SPEAK => Right::Speak,
+        permissions::MUTE_DEAFEN => Right::MuteDeafen,
+        permissions::MOVE => Right::Move,
+        permissions::MAKE_CHANNEL => Right::MakeChannel,
+        permissions::LINK_CHANNEL => Right::LinkChannel,
+        permissions::WHISPER => Right::Whisper,
+        permissions::TEXT_MESSAGE => Right::TextMessage,
+        permissions::MAKE_TEMP_CHANNEL => Right::MakeTempChannel,
+        permissions::LISTEN => Right::Listen,
+        permissions::KICK => Right::Kick,
+        permissions::BAN => Right::Ban,
+        permissions::REGISTER => Right::Register,
+        permissions::SELF_REGISTER => Right::SelfRegister,
+        permissions::RESET_USER_CONTENT => Right::ResetUserContent,
+        _ => return None,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_refusal_names_its_kind_and_right() {
+        // #248
+        assert_eq!(right_of(permissions::MOVE), Some(Right::Move));
+        assert_eq!(right_of(permissions::MOVE | permissions::KICK), None);
+        let denied = PermissionDenied {
+            kind: DenyKind::ChannelFull,
+            permission: None,
+            channel_id: None,
+            session: None,
+            reason: None,
+            name: None,
+        };
+        assert_eq!(denial_kind(&denied), DenialKind::ChannelFull);
+    }
 
     fn tree() -> ServerState {
         let mut state = ServerState::default();

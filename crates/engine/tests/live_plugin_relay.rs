@@ -231,6 +231,7 @@ impl Mumpeer {
             uses: Some(uses.to_vec()),
             broadcast: None,
             plugin_data_kbps: uses.contains(&RelayUse::PluginData).then_some(512),
+            registered_only: false,
         }
     }
 }

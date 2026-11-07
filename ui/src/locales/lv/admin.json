@@ -114,5 +114,44 @@
   "quickFixed": "serveris izlem abus",
   "noCertificate": "Šai personai nav sertifikata, tāpēc var bloķēt tikai viņa adresi.",
   "certRegisteredHint": "serveris salīdzina sertifikātu tikai reģistrētam lietotājam",
-  "ipAlwaysOnHint": "serveris salīdzina adresi, tāpēc Mumcord to vienmēr saglabā ierakstā"
+  "ipAlwaysOnHint": "serveris salīdzina adresi, tāpēc Mumcord to vienmēr saglabā ierakstā",
+  "denied": {
+    "title": "Serveris to neatļāva",
+    "titleOn": "{{server}} to neatļāva",
+    "permission": "Tev nav tiesību to darīt.",
+    "unknown": "Serveris atteica.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} kanālā {{channel}}.",
+    "kind": {
+      "superUser": "To var darīt tikai servera SuperUser.",
+      "channelName": "Šis kanāla nosaukums nav atļauts.",
+      "textTooLong": "Teksts ir garāks, nekā serveris atļauj.",
+      "temporaryChannel": "Pagaidu kanālā tas nav iespējams.",
+      "missingCertificate": "Tam vajag klienta sertifikātu.",
+      "userName": "Šis vārds nav atļauts vai jau ir aizņemts.",
+      "channelFull": "Kanāls ir pilns.",
+      "nestingLimit": "Kanālus šeit nevar ligzdot dziļāk.",
+      "channelCountLimit": "Serverim jau ir tik kanālu, cik tas atļauj.",
+      "listenerLimit": "Klausītāju jau ir tik, cik serveris atļauj."
+    },
+    "right": {
+      "write": "Tu nedrīksti mainīt atļaujas",
+      "traverse": "Tu nedrīksti atvērt šo kanālu",
+      "enter": "Tu nedrīksti pievienoties",
+      "speak": "Tu nedrīksti runāt",
+      "muteDeafen": "Tu nedrīksti nevienu apklusināt vai apkurlināt",
+      "move": "Tu nedrīksti nevienu pārvietot",
+      "makeChannel": "Tu nedrīksti veidot kanālus",
+      "linkChannel": "Tu nedrīksti saistīt kanālus",
+      "whisper": "Tu nedrīksti čukstēt",
+      "textMessage": "Tu nedrīksti rakstīt ziņas",
+      "makeTempChannel": "Tu nedrīksti veidot pagaidu kanālus",
+      "listen": "Tu nedrīksti klausīties",
+      "kick": "Tu nedrīksti nevienu izmest",
+      "ban": "Tu nedrīksti nevienu bloķēt",
+      "register": "Tu nedrīksti nevienu reģistrēt",
+      "selfRegister": "Tu nedrīksti reģistrēties",
+      "resetUserContent": "Tu nedrīksti atiestatīt komentārus un avatārus"
+    }
+  }
 }

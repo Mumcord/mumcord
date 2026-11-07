@@ -61,7 +61,18 @@ describe("shared channel actions (issue #172)", () => {
     await renderTree();
     act(() => {
       api.mock.updateChannel(2, {
-        permissions: { ...permissionsOf(2), moveUsers: true, ban: false, kick: false },
+        permissions: {
+          ...permissionsOf(2),
+          moveUsers: true,
+          ban: false,
+          kick: false,
+          muteDeafen: false,
+          makeChannel: false,
+          makeTempChannel: false,
+          linkChannel: false,
+          register: false,
+          resetUserContent: false,
+        },
       });
     });
     const tree = itemLabels(openTreeMenu(/^Raid/));
@@ -74,7 +85,18 @@ describe("shared channel actions (issue #172)", () => {
     resetChatStore();
     act(() => {
       api.mock.updateChannel(2, {
-        permissions: { ...permissionsOf(2), moveUsers: true, ban: false, kick: false },
+        permissions: {
+          ...permissionsOf(2),
+          moveUsers: true,
+          ban: false,
+          kick: false,
+          muteDeafen: false,
+          makeChannel: false,
+          makeTempChannel: false,
+          linkChannel: false,
+          register: false,
+          resetUserContent: false,
+        },
       });
     });
     render(<ChatView renderChannelTitle={(id) => <ChannelHeader channelId={id} />} />);
@@ -210,7 +232,18 @@ describe("moving people (issue #172)", () => {
     act(() => {
       for (const id of [1, 2]) {
         api.mock.updateChannel(id, {
-          permissions: { ...permissionsOf(id), moveUsers: true, ban: false, kick: false },
+          permissions: {
+            ...permissionsOf(id),
+            moveUsers: true,
+            ban: false,
+            kick: false,
+            muteDeafen: false,
+            makeChannel: false,
+            makeTempChannel: false,
+            linkChannel: false,
+            register: false,
+            resetUserContent: false,
+          },
         });
       }
     });
@@ -243,7 +276,18 @@ describe("moving people (issue #172)", () => {
     act(() => {
       for (const id of [1, 2]) {
         api.mock.updateChannel(id, {
-          permissions: { ...permissionsOf(id), moveUsers: true, ban: false, kick: false },
+          permissions: {
+            ...permissionsOf(id),
+            moveUsers: true,
+            ban: false,
+            kick: false,
+            muteDeafen: false,
+            makeChannel: false,
+            makeTempChannel: false,
+            linkChannel: false,
+            register: false,
+            resetUserContent: false,
+          },
         });
       }
     });

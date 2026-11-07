@@ -114,5 +114,44 @@
   "quickFixed": "servern bestämmer båda",
   "noCertificate": "Den här personen har inget certifikat, så bara deras adress kan bannlysas.",
   "certRegisteredHint": "servern jämför certifikatet bara för en registrerad person",
-  "ipAlwaysOnHint": "servern jämför adressen, så Mumcord behåller den alltid i posten"
+  "ipAlwaysOnHint": "servern jämför adressen, så Mumcord behåller den alltid i posten",
+  "denied": {
+    "title": "Servern tillät inte detta",
+    "titleOn": "{{server}} tillät inte detta",
+    "permission": "Du har inte rätt till detta.",
+    "unknown": "Servern nekade detta.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} i {{channel}}.",
+    "kind": {
+      "superUser": "Bara serverns SuperUser kan göra detta.",
+      "channelName": "Det här kanalnamnet är inte tillåtet.",
+      "textTooLong": "Texten är längre än servern tillåter.",
+      "temporaryChannel": "Det går inte i en tillfällig kanal.",
+      "missingCertificate": "Det kräver ett klientcertifikat.",
+      "userName": "Namnet är inte tillåtet eller används redan.",
+      "channelFull": "Kanalen är full.",
+      "nestingLimit": "Kanaler kan inte nästlas djupare här.",
+      "channelCountLimit": "Servern har så många kanaler som den tillåter.",
+      "listenerLimit": "Det finns redan så många lyssnare som servern tillåter."
+    },
+    "right": {
+      "write": "Du får inte ändra behörigheterna",
+      "traverse": "Du får inte öppna den här kanalen",
+      "enter": "Du får inte gå in",
+      "speak": "Du får inte prata",
+      "muteDeafen": "Du får inte tysta eller döva någon",
+      "move": "Du får inte flytta någon",
+      "makeChannel": "Du får inte skapa kanaler",
+      "linkChannel": "Du får inte länka kanaler",
+      "whisper": "Du får inte viska",
+      "textMessage": "Du får inte skriva meddelanden",
+      "makeTempChannel": "Du får inte skapa tillfälliga kanaler",
+      "listen": "Du får inte lyssna",
+      "kick": "Du får inte sparka ut någon",
+      "ban": "Du får inte banna någon",
+      "register": "Du får inte registrera någon",
+      "selfRegister": "Du får inte registrera dig",
+      "resetUserContent": "Du får inte återställa kommentarer och avatarer"
+    }
+  }
 }

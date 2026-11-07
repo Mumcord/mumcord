@@ -186,7 +186,10 @@
     "detailsDropped": "Fotogramas perdidos",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "No medido",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "reasonNotRegistered": "solo los usuarios registrados pueden usar el relé de este servidor",
+    "reasonGroupNotAllowed": "el relé solo sirve a ciertos grupos",
+    "reasonNoHello": "el bot del relé aún no conoce esta app, vuelve a conectarte"
   },
   "settings": {
     "title": "Compartir pantalla",

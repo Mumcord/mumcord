@@ -127,18 +127,20 @@ fn refused_entry(denied: &PermissionDenied, own_session: Option<u32>) -> bool {
 }
 
 impl Inner {
-    pub(super) fn on_channel_denied(&self, ctx: &SessionCtx, denied: &PermissionDenied) {
+    /// True when the refusal answered a join the password dialog shows (#248: no second notice).
+    pub(super) fn on_channel_denied(&self, ctx: &SessionCtx, denied: &PermissionDenied) -> bool {
         let own = ctx.handle.with_state(|s| s.session);
         let Some((channel_id, state, wrong)) =
             lock(&self.password_attempts).on_denied(ctx.server_id, denied, own)
         else {
-            return;
+            return false;
         };
         if let Some(token) = wrong {
             self.remove_token(ctx, token);
         }
         ctx.events
             .emit(EngineEvent::ChannelPassword { channel_id, state });
+        true
     }
 
     pub(super) fn on_own_channel(&self, ctx: &SessionCtx, channel_id: u32) {

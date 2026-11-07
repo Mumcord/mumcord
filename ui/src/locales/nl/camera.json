@@ -13,7 +13,8 @@
     "relayTooOld": "De relay van deze server is te oud voor camera delen.",
     "relayDisallows": "De relay van deze server staat camera delen niet toe.",
     "needsRelayMode": "Camera delen heeft de relay nodig. Wijzig dit in Privacy en verbindingen.",
-    "noCertificate": "Camera delen heeft een clientcertificaat nodig."
+    "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
+    "registeredOnly": "Alleen geregistreerde gebruikers mogen de camera op deze server gebruiken."
   },
   "cameraOnTray": "Camera aan",
   "turnOffTray": "Camera uitzetten",
@@ -97,7 +98,12 @@
     "mode": "Camera delen heeft de relay nodig. Wijzig dit in Privacy en verbindingen.",
     "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
     "endedByRelay": "Camera gestopt door de relay van de server",
-    "dismissStopped": "Sluiten"
+    "dismissStopped": "Sluiten",
+    "notRegistered": "Camera kon niet starten: alleen geregistreerde gebruikers mogen de camera op deze server gebruiken.",
+    "groupNotAllowed": "Camera kon niet starten: de relay van deze server bedient alleen bepaalde groepen. Vraag een beheerder je toe te voegen.",
+    "notSameChannel": "Camera kon niet starten: jij en je kijkers moeten in hetzelfde kanaal zitten.",
+    "notInChannel": "Camera kon niet starten: ga eerst een kanaal in.",
+    "noHello": "Camera kon niet starten: de relaybot kent deze app nog niet. Maak opnieuw verbinding om dit op te lossen."
   },
   "privacy": {
     "windows": "Windows blokkeert cameratoegang voor desktop-apps",

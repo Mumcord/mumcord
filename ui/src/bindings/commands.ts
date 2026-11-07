@@ -1775,7 +1775,17 @@ export type CameraFailure = "notConnected" |
 /**  The relay ended the broadcast ("Camera stopped by the server's relay"). */
 "relayEnded" | "rateLimited" | 
 /**  The P2P mode leaves the relay out. */
-"mode" | "noCertificate";
+"mode" | "noCertificate" | 
+/**  The relay only serves registered users (#601). */
+"notRegistered" | 
+/**  The relay only serves members of certain groups (#601). */
+"groupNotAllowed" | 
+/**  Camera sharing works within one channel (#601). */
+"notSameChannel" | 
+/**  Join a channel first (#601). */
+"notInChannel" | 
+/**  The relay bot doesn't know this client yet; reconnect (#601). */
+"noHello";
 
 /**  "Reduce motion" for the speaking frame; `system` follows the operating system. */
 export type CameraReduceMotion = "system" | "on" | "off";
@@ -1958,6 +1968,18 @@ export type ChannelPermissions = {
 	 *  (Epic 4, issue #253).
 	 */
 	kick: boolean,
+	/**  Server-mute, deafen or un-suppress people here; only true once the server confirmed it (#248). */
+	muteDeafen: boolean,
+	/**  Create channels below this one (#248). */
+	makeChannel: boolean,
+	/**  Create temporary channels below this one (#248). */
+	makeTempChannel: boolean,
+	/**  Link and unlink this channel (#248). */
+	linkChannel: boolean,
+	/**  Register other people (root channel, #248). */
+	register: boolean,
+	/**  Reset other people's comment and avatar (root channel, #248). */
+	resetUserContent: boolean,
 };
 
 export type ChannelRemoved = {
@@ -2113,6 +2135,9 @@ export type DeepLinkOpened = {
 export type DefaultAvatarSkipped = {
 	serverId: number,
 };
+
+/**  Why the server refused something; the UI words each kind (#248). */
+export type DenialKind = "text" | "permission" | "superUser" | "channelName" | "textTooLong" | "temporaryChannel" | "missingCertificate" | "userName" | "channelFull" | "nestingLimit" | "channelCountLimit" | "listenerLimit" | "unknown";
 
 /**
  *  A direct connection would be used for the first time while `allowDirectConnections` is
@@ -2280,7 +2305,13 @@ export type FanoutReason =
 /**  The user has no client certificate. */
 "noCertificate" | 
 /**  The relay can't be used right now for another reason (not reachable, bot gone, …). */
-"unavailable";
+"unavailable" | 
+/**  The relay only serves registered users (#601). */
+"notRegistered" | 
+/**  The relay only serves members of certain groups (#601). */
+"groupNotAllowed" | 
+/**  The relay bot doesn't know this client yet; reconnecting fixes it (#601). */
+"noHello";
 
 /**  A file card in the chat. Sizes and times are plain numbers (bytes, Unix seconds). */
 export type FileCard = {
@@ -4330,6 +4361,8 @@ export type RelayInfo = {
 	uses: RelayUse[],
 	/**  Most viewers per broadcast; `null` when the relay offers no broadcasts. */
 	broadcastMax: number | null,
+	/**  The relay only serves registered users (#601), so a guest sees why before trying. */
+	registeredOnly: boolean,
 	/**  The announced relay's certificate fingerprint. */
 	fingerprint: string | null,
 	/**  The trusted relay's fingerprint while a changed relay waits for trust (#600). */
@@ -4379,7 +4412,11 @@ export type RelayUnavailable =
  *  "This server's relay is only available to registered users. Register on this server to
  *  use it."
  */
-{ kind: "notRegistered" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" } | 
+{ kind: "notRegistered" } | 
+/**  "This server's relay is only available to certain groups." (#601) */
+{ kind: "groupNotAllowed" } | 
+/**  The relay bot doesn't know this client yet; reconnecting fixes it (#601). */
+{ kind: "noHello" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" } | 
 /**  "This server's relay doesn't allow {images / file sharing / screen sharing}" (FR-7.7). */
 { kind: "useNotAllowed"; use: RelayUse };
 
@@ -4422,6 +4459,9 @@ export type RepositoryView = {
 	/**  Plugins installed from this repository. */
 	installedPlugins: number,
 };
+
+/**  A Mumble permission, as named in a refusal (#248). */
+export type Right = "write" | "traverse" | "enter" | "speak" | "muteDeafen" | "move" | "makeChannel" | "linkChannel" | "whisper" | "textMessage" | "makeTempChannel" | "listen" | "kick" | "ban" | "register" | "selfRegister" | "resetUserContent";
 
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
@@ -4549,6 +4589,11 @@ export type ServerDenied = {
 	serverId: number,
 	error: ApiError,
 	channelId: number | null,
+	kind: DenialKind,
+	/**  The missing right of a permission refusal. */
+	permission: Right | null,
+	/**  A dialog that asked shows the refusal already; the UI adds no notice of its own. */
+	handled: boolean,
 };
 
 /**  An identity whose key material could not be read, so a server fell back to the default. */

@@ -114,5 +114,44 @@
   "quickFixed": "server rozhodne o oboch",
   "noCertificate": "Tento človek nemá certifikát, preto sa dá blokovať len jeho adresa.",
   "certRegisteredHint": "server porovnáva certifikát len u registrovaného človeka",
-  "ipAlwaysOnHint": "server porovnáva adresu, preto Mumcord ju vždy ponechá v zázname"
+  "ipAlwaysOnHint": "server porovnáva adresu, preto Mumcord ju vždy ponechá v zázname",
+  "denied": {
+    "title": "Server to nepovolil",
+    "titleOn": "{{server}} to nepovolil",
+    "permission": "Na toto nemáš právo.",
+    "unknown": "Server to odmietol.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} v kanáli {{channel}}.",
+    "kind": {
+      "superUser": "To smie len SuperUser servera.",
+      "channelName": "Tento názov kanála nie je povolený.",
+      "textTooLong": "Text je dlhší, než server dovoľuje.",
+      "temporaryChannel": "V dočasnom kanáli to nejde.",
+      "missingCertificate": "Je na to potrebný klientsky certifikát.",
+      "userName": "Toto meno nie je povolené alebo je obsadené.",
+      "channelFull": "Kanál je plný.",
+      "nestingLimit": "Kanály tu nemožno vnoriť hlbšie.",
+      "channelCountLimit": "Server má toľko kanálov, koľko dovoľuje.",
+      "listenerLimit": "Poslucháčov je už toľko, koľko server dovoľuje."
+    },
+    "right": {
+      "write": "Nesmieš meniť oprávnenia",
+      "traverse": "Nesmieš otvoriť tento kanál",
+      "enter": "Nesmieš vstúpiť",
+      "speak": "Nesmieš hovoriť",
+      "muteDeafen": "Nesmieš nikoho stlmiť ani ohlušiť",
+      "move": "Nesmieš nikoho presúvať",
+      "makeChannel": "Nesmieš vytvárať kanály",
+      "linkChannel": "Nesmieš prepájať kanály",
+      "whisper": "Nesmieš šepkať",
+      "textMessage": "Nesmieš písať správy",
+      "makeTempChannel": "Nesmieš vytvárať dočasné kanály",
+      "listen": "Nesmieš počúvať",
+      "kick": "Nesmieš nikoho vyhodiť",
+      "ban": "Nesmieš nikoho zabanovať",
+      "register": "Nesmieš nikoho registrovať",
+      "selfRegister": "Nesmieš sa registrovať",
+      "resetUserContent": "Nesmieš resetovať komentáre a avatary"
+    }
+  }
 }

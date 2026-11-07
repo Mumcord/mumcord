@@ -218,6 +218,7 @@ impl Mumpeer {
             uses: None,
             broadcast: None,
             plugin_data_kbps: None,
+            registered_only: false,
         }
     }
 }

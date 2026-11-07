@@ -182,7 +182,10 @@
     "detailsDropped": "Overgeslagen frames",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Niet gemeten",
-    "close": "Sluiten"
+    "close": "Sluiten",
+    "reasonNotRegistered": "alleen geregistreerde gebruikers mogen de relay van deze server gebruiken",
+    "reasonGroupNotAllowed": "de relay bedient alleen bepaalde groepen",
+    "reasonNoHello": "de relaybot kent deze app nog niet, maak opnieuw verbinding"
   },
   "settings": {
     "title": "Scherm delen",

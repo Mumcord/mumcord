@@ -13,7 +13,8 @@
     "relayTooOld": "Le relais de ce serveur est trop ancien pour le partage de caméra.",
     "relayDisallows": "Le relais de ce serveur n'autorise pas le partage de caméra.",
     "needsRelayMode": "Le partage de caméra nécessite le relais. Modifiez-le dans Confidentialité et connexions.",
-    "noCertificate": "Le partage de caméra nécessite un certificat client."
+    "noCertificate": "Le partage de caméra nécessite un certificat client.",
+    "registeredOnly": "Seuls les utilisateurs enregistrés peuvent utiliser la caméra sur ce serveur."
   },
   "cameraOnTray": "Caméra activée",
   "turnOffTray": "Désactiver la caméra",
@@ -97,7 +98,12 @@
     "mode": "Le partage de caméra nécessite le relais. Modifiez-le dans Confidentialité et connexions.",
     "noCertificate": "Le partage de caméra nécessite un certificat client.",
     "endedByRelay": "Caméra arrêtée par le relais du serveur",
-    "dismissStopped": "Ignorer"
+    "dismissStopped": "Ignorer",
+    "notRegistered": "La caméra n'a pas pu démarrer : seuls les utilisateurs enregistrés peuvent utiliser la caméra sur ce serveur.",
+    "groupNotAllowed": "La caméra n'a pas pu démarrer : le relais de ce serveur ne sert que certains groupes. Demande à un admin de t'ajouter.",
+    "notSameChannel": "La caméra n'a pas pu démarrer : toi et tes spectateurs devez être dans le même salon.",
+    "notInChannel": "La caméra n'a pas pu démarrer : rejoins d'abord un salon.",
+    "noHello": "La caméra n'a pas pu démarrer : le bot du relais ne connaît pas encore cette app. Reconnecte-toi pour corriger cela."
   },
   "privacy": {
     "windows": "Windows bloque l'accès à la caméra pour les applications de bureau",

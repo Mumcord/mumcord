@@ -190,7 +190,10 @@
     "detailsDropped": "Zahozené snímky",
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Neměřeno",
-    "close": "Zavřít"
+    "close": "Zavřít",
+    "reasonNotRegistered": "relay tohoto serveru mohou používat jen registrovaní uživatelé",
+    "reasonGroupNotAllowed": "relay obsluhuje jen určité skupiny",
+    "reasonNoHello": "bot relaye tuto aplikaci ještě nezná, připoj se znovu"
   },
   "settings": {
     "title": "Sdílení obrazovky",

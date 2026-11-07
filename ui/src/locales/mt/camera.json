@@ -13,7 +13,8 @@
     "relayTooOld": "Ir-relay ta' dan is-server huwa qadim wisq għall-qsim tal-kamera.",
     "relayDisallows": "Ir-relay ta' dan is-server ma jippermettix il-qsim tal-kamera.",
     "needsRelayMode": "Il-qsim tal-kamera jeħtieġ ir-relay. Biddlu f'Privatezza u konnessjonijiet.",
-    "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent."
+    "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
+    "registeredOnly": "Fuq dan is-server biss utenti rreġistrati jistgħu jużaw il-kamera."
   },
   "cameraOnTray": "Kamera mixgħula",
   "turnOffTray": "Itfi l-kamera",
@@ -97,7 +98,12 @@
     "mode": "Il-qsim tal-kamera jeħtieġ ir-relay. Biddlu f'Privatezza u konnessjonijiet.",
     "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
     "endedByRelay": "Il-kamera twaqqfet mir-relay tas-server",
-    "dismissStopped": "Neħħi"
+    "dismissStopped": "Neħħi",
+    "notRegistered": "Il-kamera ma bdietx: fuq dan is-server biss utenti rreġistrati jistgħu jużaw il-kamera.",
+    "groupNotAllowed": "Il-kamera ma bdietx: ir-relay ta' dan is-server iservi biss ċerti gruppi. Itlob lil amministratur iżżidek.",
+    "notSameChannel": "Il-kamera ma bdietx: int u t-telespettaturi tiegħek għandkom tkunu fl-istess kanal.",
+    "notInChannel": "Il-kamera ma bdietx: l-ewwel daħħal f'kanal.",
+    "noHello": "Il-kamera ma bdietx: il-bot tar-relay għadu ma jafx din l-app. Erġa' kkonnettja."
   },
   "privacy": {
     "windows": "Windows qed jibblokka l-aċċess għall-kamera għall-apps tad-desktop",

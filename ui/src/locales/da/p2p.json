@@ -49,7 +49,9 @@
     "denied": "Relæ-botten afviste anmodningen.",
     "notRegistered": "Denne servers relæ er kun tilgængeligt for registrerede brugere. Registrér dig på denne server for at bruge det.",
     "peerGone": "Den anden person forlod serveren.",
-    "rateLimited": "For mange relæanmodninger. Prøv igen om et minut."
+    "rateLimited": "For mange relæanmodninger. Prøv igen om et minut.",
+    "groupNotAllowed": "Serverens relæ er kun tilgængeligt for bestemte grupper. Bed en administrator om at tilføje dig.",
+    "noHello": "Relæbotten kender ikke appen endnu. Forbind igen for at løse det."
   },
   "refusal": {
     "unknownToken": "ukendt adgangstoken",
@@ -61,6 +63,11 @@
     "rateLimited": "for mange forsøg",
     "version": "version understøttes ikke",
     "badRequest": "ugyldig anmodning"
+  },
+  "refusalAction": {
+    "howToRegister": "Sådan registrerer du dig",
+    "reconnect": "Forbind igen",
+    "filesRegisteredOnly": "Fildeling er kun tilgængelig for registrerede brugere på denne server."
   },
   "trust": {
     "title": "Relæet på {{server}} er ændret",

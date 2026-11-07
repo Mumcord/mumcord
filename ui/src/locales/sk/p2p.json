@@ -49,7 +49,9 @@
     "denied": "Bot relay požiadavku odmietol.",
     "notRegistered": "Relay tohto servera je dostupný len registrovaným používateľom. Ak ho chceš používať, zaregistruj sa na tomto serveri.",
     "peerGone": "Druhá osoba opustila server.",
-    "rateLimited": "Príliš veľa požiadaviek na relay. Skús to o minútu."
+    "rateLimited": "Príliš veľa požiadaviek na relay. Skús to o minútu.",
+    "groupNotAllowed": "Relay tohto servera je dostupný len určitým skupinám. Požiadaj správcu, nech ťa pridá.",
+    "noHello": "Bot relaya túto aplikáciu ešte nepozná. Pripoj sa znova."
   },
   "refusal": {
     "unknownToken": "neznámy prístupový token",
@@ -61,6 +63,11 @@
     "rateLimited": "príliš veľa pokusov",
     "version": "nepodporovaná verzia",
     "badRequest": "neplatná požiadavka"
+  },
+  "refusalAction": {
+    "howToRegister": "Ako sa zaregistrovať",
+    "reconnect": "Pripojiť znova",
+    "filesRegisteredOnly": "Zdieľanie súborov je na tomto serveri dostupné len registrovaným používateľom."
   },
   "trust": {
     "title": "Relay na {{server}} sa zmenil",

@@ -22,6 +22,7 @@ const RELAY: RelayInfo = {
   firstSeen: "2026-09-01T18:00:00Z",
   uses: ["images", "files", "screenShare"],
   broadcastMax: 25,
+  registeredOnly: false,
   fingerprint: null,
   previousFingerprint: null,
 };
@@ -63,6 +64,7 @@ describe("RelayRowsView", () => {
       firstSeen: null,
       uses: [],
       broadcastMax: null,
+      registeredOnly: false,
       fingerprint: null,
       previousFingerprint: null,
     });
@@ -112,6 +114,7 @@ describe("RelayRowsView", () => {
       firstSeen: null,
       uses: [],
       broadcastMax: null,
+      registeredOnly: false,
       fingerprint: null,
       previousFingerprint: null,
     });

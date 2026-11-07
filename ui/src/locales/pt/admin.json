@@ -114,5 +114,44 @@
   "quickFixed": "o servidor decide ambos",
   "noCertificate": "Esta pessoa não tem certificado, então só o endereço dela pode ser banido.",
   "certRegisteredHint": "o servidor compara o certificado apenas de uma pessoa registrada",
-  "ipAlwaysOnHint": "o servidor compara o endereço, então o Mumcord sempre o mantém na entrada"
+  "ipAlwaysOnHint": "o servidor compara o endereço, então o Mumcord sempre o mantém na entrada",
+  "denied": {
+    "title": "O servidor não permitiu isto",
+    "titleOn": "{{server}} não permitiu isto",
+    "permission": "Não tens permissão para isto.",
+    "unknown": "O servidor recusou.",
+    "sentence": "{{action}}.",
+    "sentenceIn": "{{action}} em {{channel}}.",
+    "kind": {
+      "superUser": "Só o SuperUser do servidor pode fazer isto.",
+      "channelName": "Este nome de canal não é permitido.",
+      "textTooLong": "O texto é mais longo do que o servidor permite.",
+      "temporaryChannel": "Não é possível num canal temporário.",
+      "missingCertificate": "É preciso um certificado de cliente.",
+      "userName": "Este nome não é permitido ou já está em uso.",
+      "channelFull": "O canal está cheio.",
+      "nestingLimit": "Aqui não é possível aninhar mais canais.",
+      "channelCountLimit": "O servidor já tem tantos canais quantos permite.",
+      "listenerLimit": "Já há tantos ouvintes quantos o servidor permite."
+    },
+    "right": {
+      "write": "Não podes alterar as permissões",
+      "traverse": "Não podes abrir este canal",
+      "enter": "Não podes entrar",
+      "speak": "Não podes falar",
+      "muteDeafen": "Não podes silenciar nem ensurdecer ninguém",
+      "move": "Não podes mover ninguém",
+      "makeChannel": "Não podes criar canais",
+      "linkChannel": "Não podes ligar canais",
+      "whisper": "Não podes sussurrar",
+      "textMessage": "Não podes escrever mensagens",
+      "makeTempChannel": "Não podes criar canais temporários",
+      "listen": "Não podes ouvir",
+      "kick": "Não podes expulsar ninguém",
+      "ban": "Não podes banir ninguém",
+      "register": "Não podes registar ninguém",
+      "selfRegister": "Não te podes registar",
+      "resetUserContent": "Não podes repor comentários e avatares"
+    }
+  }
 }
