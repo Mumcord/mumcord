@@ -1,0 +1,148 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.7.1-1.aarch64.rpm",
+      "sha256": "fc6a224f5a010c9c8f617bea057637747c7830e6178a3df311e33c18373b8b9f",
+      "size": 67850007
+    },
+    {
+      "name": "Mumcord-0.7.1-1.x86_64.rpm",
+      "sha256": "1d409a6b6199b1082224bc4956de6f229f949e832e05313ee5bd2099c6e0dd5d",
+      "size": 68916568
+    },
+    {
+      "name": "Mumcord_0.7.1_aarch64.AppImage",
+      "sha256": "4666d1c946fcf2e4626fbc7837718215c589d3ada919b1e395c4df40c4d6a27f",
+      "size": 147397128
+    },
+    {
+      "name": "Mumcord_0.7.1_aarch64.AppImage.sig",
+      "sha256": "cfd05c7df7c61a6ac1ce13aaf7e25603bcbd37ec4c93f736e04d50b75bdf0243",
+      "size": 440
+    },
+    {
+      "name": "Mumcord_0.7.1_amd64.AppImage",
+      "sha256": "4663c662265d86d43e64a9925805f6efe7aa44a645406c021e701515a3fbef02",
+      "size": 150931960
+    },
+    {
+      "name": "Mumcord_0.7.1_amd64.AppImage.sig",
+      "sha256": "1c00ee21dd70bc9ba30c4702c64c0013838972f5a266dd41ffee4b61e848ddda",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.7.1_amd64.deb",
+      "sha256": "37c5c08c926a5146d93e4c27061ee5669a0555953c1e31d8a0784cebd213df0f",
+      "size": 68911790
+    },
+    {
+      "name": "Mumcord_0.7.1_arm64.deb",
+      "sha256": "0c329749c6b701d08d720a5564935217fbb546516d3df2951925b5ff3a9fda84",
+      "size": 67837606
+    },
+    {
+      "name": "Mumcord_0.7.1_universal.app.tar.gz",
+      "sha256": "a5a8d6b171e26d54efd181289346ad8e53344f4b7358f35ff1c9bb6eb887b25b",
+      "size": 116766413
+    },
+    {
+      "name": "Mumcord_0.7.1_universal.app.tar.gz.sig",
+      "sha256": "1bf9b0b63ce1c3e0c4827508ca01a3aa23efd86ea459472457ccb2e4e14182d6",
+      "size": 444
+    },
+    {
+      "name": "Mumcord_0.7.1_universal.dmg",
+      "sha256": "45bfa804ca6e4bbc977e093a9014b95bec7c5a20e59aae43c47ff556baebec14",
+      "size": 116967751
+    },
+    {
+      "name": "Mumcord_0.7.1_x64-portable.zip",
+      "sha256": "f937d2e6eefa31779b158007eb51b44f4b826ed141b6d1fd389644c565769475",
+      "size": 52583831
+    },
+    {
+      "name": "Mumcord_0.7.1_x64-setup.exe",
+      "sha256": "1da58380ec90fc375729529166f8690aa4d4b76b50a2a398a37d18cec9194120",
+      "size": 42251696
+    },
+    {
+      "name": "Mumcord_0.7.1_x64-setup.exe.sig",
+      "sha256": "1173b9e85aaf6402078a3eeba1238c8ffe8eec0268a19a8a7480e7175b4bb2ed",
+      "size": 436
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "838be70730a1ee24e659b608b4b8ee86084c2e92908fd2026a1b38720018416d",
+      "size": 2132
+    },
+    {
+      "name": "install.sh",
+      "sha256": "02f9c7658b0800b17742fd44b3c9d79338612918a3fe74424364e79654ebcb73",
+      "size": 23508
+    },
+    {
+      "name": "latest.json",
+      "sha256": "2bcdcd980af640dbd5c7ac188c6977a57a29a4e565a17d4bebb6eb517cc03eea",
+      "size": 3129
+    },
+    {
+      "name": "mumcord-0.7.1-appimage-aarch64.cdx.json",
+      "sha256": "d7244c309cc2b09f1495291f3a5a91a785a584e77621b09da6ef767ab4877ca7",
+      "size": 953311
+    },
+    {
+      "name": "mumcord-0.7.1-appimage-x86_64.cdx.json",
+      "sha256": "a03cea5596f2a4105c5f9def77967ebc82755e17c3ad9bb08fe7c8236775cbbe",
+      "size": 954375
+    },
+    {
+      "name": "mumcord-0.7.1-deb-rpm-aarch64.cdx.json",
+      "sha256": "2de729c19787fc2ccd12c92e300d1f6ff1d1a1914372d476dfaabeca2c41031a",
+      "size": 903360
+    },
+    {
+      "name": "mumcord-0.7.1-deb-rpm-x86_64.cdx.json",
+      "sha256": "45e1567dc29ae6bb982e961d921e8afd430b8b64a496e482674bf12532e96f89",
+      "size": 904424
+    },
+    {
+      "name": "mumcord-0.7.1-macos-universal.cdx.json",
+      "sha256": "a162da2a44ef9f83121fb5d45076a546963303a270c6ed5e5a8137937ec959ef",
+      "size": 772550
+    },
+    {
+      "name": "mumcord-0.7.1-windows-x86_64.cdx.json",
+      "sha256": "63e3850df6fcc31a292b9e746a4ba2ec8285fa25ba6bcdd3390d6a43db8a3d44",
+      "size": 738288
+    }
+  ],
+  "changelog": {
+    "sha256": "72808a3fec4bcb2a91e7cef87bf87a9abca7a0cc8835316c6cf28b426c11dce3",
+    "text": "## [0.7.1] - 2026-11-07\n\n### Added\n\n- Crash reports: when Mumcord closes unexpectedly it saves a short report on this computer (what went wrong with the program and library functions involved, which features were in use, the system details and the last log lines) and says so at the next start, with Open folder, Copy for a bug report, Report a bug and Upload. Settings → Advanced & Developer → Crash reports lists the last 10 reports with Copy, Details, Export, Upload and Delete\n- Upload a single crash report to the Mumcord team: the confirmation shows exactly what is sent, says which system details are included, and takes an optional comment. Nothing is ever sent without pressing Send\n- Settings → Advanced & Developer → Diagnostics: copy the last 200 log lines or the whole log, or open the log folder\n- The log now names more causes: which camera modes were tried, whether the AppImage can play H.264 (Twitch) with the system's gst-libav, and when background effects find no person in the picture\n\n### Fixed\n\n- Cameras that list a mode they never send pictures in (for example a Logitech StreamCam at 720p and 30 fps) now start: Mumcord tries a lower frame rate or a smaller picture instead of stopping with \"the camera sends no pictures\"\n- Cameras through the desktop camera portal no longer stop with \"the camera sends unreadable pictures\" when PipeWire leaves the row length unset or fills only the first picture plane\n- Camera preview: the built-in background images now show right away when you choose Image, instead of leaving the tiles empty for a moment every time the preview opens"
+  },
+  "commit": "405b2d615f11fa118af66a5014bb6247e318d517",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "c4c19fb12bc0e604bec2f87b1c346fc2dfaa17e82cf0cd28d6a19925e87297ec",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "30364fa52bf25e9a391d17e411b6c40cccfe43743ea45719e21778dac837cbe1",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "931104b0172c1a459be8f407f9c16d4aa62baed09f17e147d1a82441c83bab51",
+      "yanked": false
+    },
+    "mumcord-protocol": {
+      "cksum": "c17b1937045d020e38dcbb789750115c7bc45c1a33d5bec0dfd8f88162bd9d30",
+      "yanked": false
+    },
+    "mumcord-store": {
+      "cksum": "07089591e43eeb88df60dd0601567e52947e279a75a337f7ee222c4b201816b3",
+      "yanked": false
+    }
+  },
+  "sha256sums": "838be70730a1ee24e659b608b4b8ee86084c2e92908fd2026a1b38720018416d",
+  "tag": "v0.7.1"
+}
