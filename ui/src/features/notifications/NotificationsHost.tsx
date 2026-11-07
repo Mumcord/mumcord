@@ -12,6 +12,8 @@ import { isConversationMuted } from "../messages/conversationsStore";
 import { useServers } from "../servers";
 import { markConversationRead } from "./centreStore";
 import { handleIncoming } from "./incoming";
+import { handleActivity } from "../activity/activityNotify";
+import { subscribeActivityAdded } from "../activity/activityStore";
 import { NotificationCentre } from "./NotificationCentre";
 import { clearServerNotifications, markSeen, noticeKey } from "./notificationStore";
 import { Toasts } from "./Toasts";
@@ -54,6 +56,7 @@ function focusChat(): void {
  */
 export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHostProps) {
   const { t } = useTranslation("notifications");
+  const { t: tActivity } = useTranslation("activity");
   const { conversation: selected } = useSelectedConversation();
   const shown = useShownServerId();
   const { servers } = useServers();
@@ -70,9 +73,18 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
       isConversationMuted(id, conversation),
     [servers],
   );
-  const live = useRef({ t, overlayOpen, onOpenChat, selected, shown, serverName, muted });
+  const live = useRef({
+    t,
+    tActivity,
+    overlayOpen,
+    onOpenChat,
+    selected,
+    shown,
+    serverName,
+    muted,
+  });
   useEffect(() => {
-    live.current = { t, overlayOpen, onOpenChat, selected, shown, serverName, muted };
+    live.current = { t, tActivity, overlayOpen, onOpenChat, selected, shown, serverName, muted };
   });
 
   // Shows the chat's server first (FR-2.10); the selection is remembered per server.
@@ -99,6 +111,14 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
           overlayOpen: live.current.overlayOpen,
           serverName: (id) => live.current.serverName(id),
           muted: (id, conversation) => live.current.muted(id, conversation),
+        });
+      }),
+      // Activity events notify like messages (#597).
+      subscribeActivityAdded((event) => {
+        void handleActivity(event, {
+          t: live.current.tActivity,
+          openLabel: live.current.t("open"),
+          serverName: (id) => live.current.serverName(id),
         });
       }),
       getApi().on("notificationActivated", ({ serverId, conversation }) => {

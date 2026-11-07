@@ -34,5 +34,11 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Nu te-ai putut alătura vizionării comune.",
-  "joinActivityFailed": "Nu te-ai putut alătura activității pluginului."
+  "joinActivityFailed": "Nu te-ai putut alătura activității pluginului.",
+  "earlier": "Mai devreme",
+  "earlierLabel": "Mai devreme, dinaintea acestei sesiuni",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} în #{{channel}}"
+  }
 }

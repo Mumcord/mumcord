@@ -31,7 +31,8 @@
     "noCertificate": "Dijeljenje datoteka zahtijeva klijentski certifikat.",
     "modeNeedsRelay": "Dijeljenje datoteka treba relej; tvoja peer-to-peer postavka je {{mode}}.",
     "modeOff": "Isključeno",
-    "modeDirectOnly": "Samo izravno"
+    "modeDirectOnly": "Samo izravno",
+    "hideNoRelay": "Sakrij ovaj savjet za {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer je isključen.",

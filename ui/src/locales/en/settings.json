@@ -449,7 +449,15 @@
     "inApp": "In-app: a small pop-up inside Mumcord while it is in front",
     "desktop": "Desktop: a system notification",
     "both": "Both: pop-up while Mumcord is in front, system notification otherwise",
-    "off": "Off"
+    "off": "Off",
+    "activityTitle": "Activity notifications",
+    "activity": {
+      "screenShare": "Someone starts a screen share",
+      "watchParty": "Someone starts a watch party",
+      "pluginActivity": "Someone starts a plugin activity",
+      "pluginEvent": "Plugin events",
+      "joins": "Someone connects, leaves or moves channel"
+    }
   },
   "overlay": {
     "corner": {
@@ -1255,5 +1263,14 @@
     "uploadSending": "Sending…",
     "uploadDone": "Report sent. Thank you!",
     "uploadFailed": "The report could not be sent. Check your connection and try again; it stays on this computer."
+  },
+  "activityHistory": {
+    "title": "Activity history",
+    "clear": "Clear activity history",
+    "hint": "Removes the saved feed for all servers.",
+    "local": "Saved only on this device.",
+    "button": "Clear history",
+    "confirm": "Clear the activity history of all servers? This cannot be undone.",
+    "confirmButton": "Clear"
   }
 }

@@ -267,6 +267,31 @@ pub enum SoundTheme {
     Rich,
 }
 
+/// Which activity-feed events also notify (#597), like messages: a toast or a system
+/// notification. Joins, leaves and moves are off by default because they are noisy on busy
+/// servers; starts of shared things are on.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ActivityNotifySettings {
+    pub joins: bool,
+    pub screen_share: bool,
+    pub watch_party: bool,
+    pub plugin_activity: bool,
+    pub plugin_event: bool,
+}
+
+impl Default for ActivityNotifySettings {
+    fn default() -> Self {
+        Self {
+            joins: false,
+            screen_share: true,
+            watch_party: true,
+            plugin_activity: true,
+            plugin_event: true,
+        }
+    }
+}
+
 /// Per-event sound toggles (FR-1.27) and the sound theme.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
@@ -697,6 +722,8 @@ pub struct Settings {
     pub video_ducking_percent: u8,
     pub sounds: SoundSettings,
     pub notifications: NotificationMode,
+    /// Activity events that notify (#597).
+    pub activity_notify: ActivityNotifySettings,
     /// The Mumcord "Do Not Disturb" switch (FR-3.111): no notification sounds and no toasts or
     /// system notifications on any server. Badges still count. Off by default.
     pub do_not_disturb: bool,
@@ -1006,6 +1033,7 @@ impl Default for Settings {
             video_ducking_percent: DEFAULT_VIDEO_DUCKING_PERCENT,
             sounds: SoundSettings::default(),
             notifications: NotificationMode::default(),
+            activity_notify: ActivityNotifySettings::default(),
             do_not_disturb: false,
             follow_system_dnd: true,
             close_behaviour: CloseBehaviour::default(),

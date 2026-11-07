@@ -462,6 +462,43 @@ impl From<SoundTheme> for store::SoundTheme {
     }
 }
 
+/// Activity-feed events that notify like messages (#597).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivityNotifySettings {
+    /// Someone connected, left or moved channel. Off by default.
+    pub joins: bool,
+    pub screen_share: bool,
+    pub watch_party: bool,
+    pub plugin_activity: bool,
+    /// Events a plugin pushes to the feed.
+    pub plugin_event: bool,
+}
+
+impl From<store::ActivityNotifySettings> for ActivityNotifySettings {
+    fn from(s: store::ActivityNotifySettings) -> Self {
+        Self {
+            joins: s.joins,
+            screen_share: s.screen_share,
+            watch_party: s.watch_party,
+            plugin_activity: s.plugin_activity,
+            plugin_event: s.plugin_event,
+        }
+    }
+}
+
+impl From<ActivityNotifySettings> for store::ActivityNotifySettings {
+    fn from(s: ActivityNotifySettings) -> Self {
+        Self {
+            joins: s.joins,
+            screen_share: s.screen_share,
+            watch_party: s.watch_party,
+            plugin_activity: s.plugin_activity,
+            plugin_event: s.plugin_event,
+        }
+    }
+}
+
 /// Notification sound toggles per event (FR-1.27).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -682,6 +719,8 @@ pub struct Settings {
     pub sounds: SoundSettings,
     /// "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c).
     pub notifications: NotificationMode,
+    /// Activity events that notify (#597).
+    pub activity_notify: ActivityNotifySettings,
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
@@ -877,6 +916,7 @@ impl Settings {
             },
             sound_theme: s.sounds.theme.into(),
             notifications: s.notifications.into(),
+            activity_notify: s.activity_notify.into(),
             close_behaviour: match s.close_behaviour {
                 store::CloseBehaviour::Ask => CloseBehaviour::Ask,
                 store::CloseBehaviour::MinimizeToTray => CloseBehaviour::MinimizeToTray,
@@ -1041,6 +1081,7 @@ impl Settings {
         s.sounds.kicked = self.sounds.kicked;
         s.sounds.banned = self.sounds.banned;
         s.notifications = self.notifications.into();
+        s.activity_notify = self.activity_notify.into();
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
             CloseBehaviour::MinimizeToTray => store::CloseBehaviour::MinimizeToTray,

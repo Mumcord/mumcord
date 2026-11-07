@@ -31,7 +31,8 @@
     "noCertificate": "Il-qsim tal-fajls jeħtieġ ċertifikat tal-klijent.",
     "modeNeedsRelay": "Il-qsim tal-fajls jeħtieġ ir-relay; is-setting peer-to-peer tiegħek huwa {{mode}}.",
     "modeOff": "Mitfi",
-    "modeDirectOnly": "Dirett biss"
+    "modeDirectOnly": "Dirett biss",
+    "hideNoRelay": "Aħbi dan il-ħjiel għal {{server}}"
   },
   "reason": {
     "p2pOff": "Il-peer-to-peer mitfi.",

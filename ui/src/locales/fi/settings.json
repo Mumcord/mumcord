@@ -449,7 +449,15 @@
     "inApp": "Sovelluksessa: pieni ponnahdusikkuna Mumcordissa, kun se on edessä",
     "desktop": "Työpöydällä: järjestelmän ilmoitus",
     "both": "Molemmat: ponnahdusikkuna, kun Mumcord on edessä, muuten järjestelmän ilmoitus",
-    "off": "Pois"
+    "off": "Pois",
+    "activityTitle": "Toimintailmoitukset",
+    "activity": {
+      "screenShare": "Joku aloittaa näytön jakamisen",
+      "watchParty": "Joku aloittaa yhteiskatselun",
+      "pluginActivity": "Joku aloittaa laajennuksen toiminnan",
+      "pluginEvent": "Laajennusten tapahtumat",
+      "joins": "Joku yhdistää, poistuu tai vaihtaa kanavaa"
+    }
   },
   "overlay": {
     "corner": {
@@ -1255,5 +1263,14 @@
     "uploadSending": "Lähetetään…",
     "uploadDone": "Raportti lähetetty. Kiitos!",
     "uploadFailed": "Raporttia ei voitu lähettää. Tarkista yhteytesi ja yritä uudelleen; raportti säilyy tällä tietokoneella."
+  },
+  "activityHistory": {
+    "title": "Toimintahistoria",
+    "clear": "Tyhjennä toimintahistoria",
+    "hint": "Poistaa kaikkien palvelimien tallennetun syötteen.",
+    "local": "Tallennetaan vain tälle laitteelle.",
+    "button": "Tyhjennä historia",
+    "confirm": "Tyhjennetäänkö kaikkien palvelimien toimintahistoria? Tätä ei voi perua.",
+    "confirmButton": "Tyhjennä"
   }
 }

@@ -31,7 +31,8 @@
     "noCertificate": "Compartir archivos requiere un certificado de cliente.",
     "modeNeedsRelay": "Compartir archivos requiere el relé; tu ajuste de peer-to-peer es {{mode}}.",
     "modeOff": "Desactivado",
-    "modeDirectOnly": "Solo directo"
+    "modeDirectOnly": "Solo directo",
+    "hideNoRelay": "Ocultar este aviso para {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer está desactivado.",

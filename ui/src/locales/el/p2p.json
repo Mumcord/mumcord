@@ -31,7 +31,8 @@
     "noCertificate": "Η κοινή χρήση αρχείων απαιτεί πιστοποιητικό πελάτη.",
     "modeNeedsRelay": "Η κοινή χρήση αρχείων χρειάζεται το ρελέ· η ρύθμισή σου peer-to-peer είναι {{mode}}.",
     "modeOff": "Ανενεργό",
-    "modeDirectOnly": "Μόνο άμεσα"
+    "modeDirectOnly": "Μόνο άμεσα",
+    "hideNoRelay": "Απόκρυψη αυτής της υπόδειξης για {{server}}"
   },
   "reason": {
     "p2pOff": "Το peer-to-peer είναι απενεργοποιημένο.",

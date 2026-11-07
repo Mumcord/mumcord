@@ -452,7 +452,15 @@
     "inApp": "U aplikaciji: mali skočni prozor unutar Mumcorda dok je u prvom planu",
     "desktop": "Desktop: obavijest sustava",
     "both": "Oboje: skočni prozor dok je Mumcord u prvom planu, inače obavijest sustava",
-    "off": "Isključeno"
+    "off": "Isključeno",
+    "activityTitle": "Obavijesti o aktivnosti",
+    "activity": {
+      "screenShare": "Netko pokrene dijeljenje zaslona",
+      "watchParty": "Netko pokrene zajedničko gledanje",
+      "pluginActivity": "Netko pokrene aktivnost dodatka",
+      "pluginEvent": "Događaji dodataka",
+      "joins": "Netko se spoji, ode ili promijeni kanal"
+    }
   },
   "overlay": {
     "corner": {
@@ -1265,5 +1273,14 @@
     "uploadSending": "Slanje…",
     "uploadDone": "Izvješće je poslano. Hvala!",
     "uploadFailed": "Izvješće nije moglo biti poslano. Provjerite vezu i pokušajte ponovno; ostaje na ovom računalu."
+  },
+  "activityHistory": {
+    "title": "Povijest aktivnosti",
+    "clear": "Očisti povijest aktivnosti",
+    "hint": "Uklanja spremljeni feed za sve poslužitelje.",
+    "local": "Sprema se samo na ovom uređaju.",
+    "button": "Očisti povijest",
+    "confirm": "Očistiti povijest aktivnosti svih poslužitelja? To se ne može poništiti.",
+    "confirmButton": "Očisti"
   }
 }

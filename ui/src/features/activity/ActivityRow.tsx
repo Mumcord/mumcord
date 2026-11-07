@@ -1,12 +1,13 @@
 /**
- * One row of the feed (FR-11.11, §7): two lines, no icon. Line one is the title with the actor's
- * name in bold, line two the muted meta — time, then the channel and the live marker — with the
+ * One row of the feed (FR-11.11, §7, #594): the kind's icon, then two lines. Line one is the title
+ * with the actor's name in bold, line two the muted meta — time, then the channel and the live marker — with the
  * action right-aligned. A row whose share, party or activity still exists, or a plugin event with
  * an action, is a button whose accessible name combines the action and the event; anything else is
  * a plain list item. The feed is not a live region (FR-11.15): rows simply appear in the list.
  */
 import type { TFunction } from "i18next";
 import { useT } from "../../i18n/useT";
+import { ActivityIcon } from "./ActivityIcon";
 import type { ActivityEvent } from "./activityStore";
 
 export interface ActivityRowProps {
@@ -77,7 +78,10 @@ function label(event: ActivityEvent, t: TFunction, actionText: string): string {
 export function ActivityRow({ event, time, live, onActivate }: ActivityRowProps) {
   const t = useT("activity");
   const actionText = onActivate === undefined ? null : action(event, t);
+  // A share, party or activity that is over: its "stopped" row, or a "started" one no longer live.
+  const ended = "live" in event && !live;
   const channelText = middle(event, t);
+  const icon = <ActivityIcon event={event} ended={ended} />;
   const title = (
     <span className="activity-row__title">
       <strong className="activity-row__actor">{actor(event, t)}</strong>{" "}
@@ -100,14 +104,22 @@ export function ActivityRow({ event, time, live, onActivate }: ActivityRowProps)
     </span>
   );
 
+  const body = (
+    <span className="activity-row__body">
+      {title}
+      {meta}
+    </span>
+  );
+  const className = ["activity-row"];
+  if (onActivate !== undefined) className.push("activity-row--clickable");
+  if (ended) className.push("activity-row--ended");
+
   return (
-    <li
-      className={onActivate === undefined ? "activity-row" : "activity-row activity-row--clickable"}
-    >
+    <li className={className.join(" ")}>
       {actionText === null ? (
         <>
-          {title}
-          {meta}
+          {icon}
+          {body}
         </>
       ) : (
         <button
@@ -116,8 +128,8 @@ export function ActivityRow({ event, time, live, onActivate }: ActivityRowProps)
           aria-label={label(event, t, actionText)}
           onClick={onActivate}
         >
-          {title}
-          {meta}
+          {icon}
+          {body}
         </button>
       )}
     </li>

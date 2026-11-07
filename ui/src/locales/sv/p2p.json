@@ -31,7 +31,8 @@
     "noCertificate": "Fildelning kräver ett klientcertifikat.",
     "modeNeedsRelay": "Fildelning kräver reläet; din peer-to-peer-inställning är {{mode}}.",
     "modeOff": "Av",
-    "modeDirectOnly": "Endast direkt"
+    "modeDirectOnly": "Endast direkt",
+    "hideNoRelay": "Dölj det här tipset för {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer är avstängt.",

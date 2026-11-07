@@ -28,7 +28,7 @@ const BALANCED = {
   "privateMessages.allowCurrentChannel": true,
   "privateMessages.allowAccepted": true,
   "privateMessages.keepRequests": true,
-  p2pMode: "directRelay",
+  p2pMode: "relayFirst",
   linkPreviews: true,
   offerFullImages: true,
   loadFullImages: true,
@@ -84,7 +84,7 @@ describe("AC-3.78 setup wizard with presets", () => {
     await expect($(".active-preset__name")).toHaveText("Balanced");
     // The count covers the in-game overlay and Do Not Disturb as well.
     await expect($(".active-preset__count")).toHaveText("No changes since setup");
-    await expect($("fieldset.p2p-modes input[value='directRelay']")).toBeSelected();
+    await expect($("fieldset.p2p-modes input[value='relayFirst']")).toBeSelected();
     await openSettingsGroup("Chat & Notifications");
     await expect($("input[type='radio'][value='friendsOnly']")).toBeSelected();
     await browser.keys(["Escape"]);

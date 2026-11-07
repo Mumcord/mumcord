@@ -455,7 +455,15 @@
     "inApp": "V aplikaci: malé vyskakovací okno v Mumcordu, když je v popředí",
     "desktop": "Na ploše: systémové oznámení",
     "both": "Obojí: vyskakovací okno, když je Mumcord v popředí, jinak systémové oznámení",
-    "off": "Vypnuto"
+    "off": "Vypnuto",
+    "activityTitle": "Oznámení o aktivitě",
+    "activity": {
+      "screenShare": "Někdo začne sdílet obrazovku",
+      "watchParty": "Někdo spustí společné sledování",
+      "pluginActivity": "Někdo spustí aktivitu pluginu",
+      "pluginEvent": "Události pluginů",
+      "joins": "Někdo se připojí, odejde nebo změní kanál"
+    }
   },
   "overlay": {
     "corner": {
@@ -1275,5 +1283,14 @@
     "uploadSending": "Odesílání…",
     "uploadDone": "Hlášení odesláno. Děkujeme!",
     "uploadFailed": "Hlášení se nepodařilo odeslat. Zkontrolujte připojení a zkuste to znovu; zůstává v tomto počítači."
+  },
+  "activityHistory": {
+    "title": "Historie aktivity",
+    "clear": "Vymazat historii aktivity",
+    "hint": "Odstraní uložený přehled pro všechny servery.",
+    "local": "Uloženo jen v tomto zařízení.",
+    "button": "Vymazat historii",
+    "confirm": "Vymazat historii aktivity všech serverů? Tuto akci nelze vrátit.",
+    "confirmButton": "Vymazat"
   }
 }

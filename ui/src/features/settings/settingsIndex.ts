@@ -342,6 +342,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["historySharing.hint"],
   },
   {
+    section: "privacy",
+    group: "activityHistory.title",
+    control: "activityHistory.button",
+    terms: ["activityHistory.clear", "activityHistory.hint", "activityHistory.local"],
+  },
+  {
     section: "chatNotifications",
     group: "history.title",
     control: "history.autoDelete",

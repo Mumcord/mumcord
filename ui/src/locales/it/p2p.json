@@ -31,7 +31,8 @@
     "noCertificate": "La condivisione file richiede un certificato client.",
     "modeNeedsRelay": "La condivisione file richiede il relay; la tua impostazione peer-to-peer è {{mode}}.",
     "modeOff": "Disattivato",
-    "modeDirectOnly": "Solo diretto"
+    "modeDirectOnly": "Solo diretto",
+    "hideNoRelay": "Nascondi questo suggerimento per {{server}}"
   },
   "reason": {
     "p2pOff": "Il peer-to-peer è disattivato.",

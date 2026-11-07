@@ -31,7 +31,8 @@
     "noCertificate": "Für den Dateiaustausch ist ein Client-Zertifikat nötig.",
     "modeNeedsRelay": "Der Dateiaustausch braucht das Relay; deine Peer-to-Peer-Einstellung ist {{mode}}.",
     "modeOff": "Aus",
-    "modeDirectOnly": "Nur direkt"
+    "modeDirectOnly": "Nur direkt",
+    "hideNoRelay": "Diesen Hinweis für {{server}} ausblenden"
   },
   "reason": {
     "p2pOff": "Peer-to-Peer ist aus.",

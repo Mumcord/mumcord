@@ -31,7 +31,8 @@
     "noCertificate": "Failų bendrinimui reikalingas kliento sertifikatas.",
     "modeNeedsRelay": "Failų bendrinimui reikalingas perdavimo mazgas; tavo peer-to-peer nustatymas yra {{mode}}.",
     "modeOff": "Išjungta",
-    "modeDirectOnly": "Tik tiesiogiai"
+    "modeDirectOnly": "Tik tiesiogiai",
+    "hideNoRelay": "Slėpti šį patarimą serveriui {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer išjungtas.",

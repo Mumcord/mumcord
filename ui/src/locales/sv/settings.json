@@ -449,7 +449,15 @@
     "inApp": "I appen: en liten pop-up i Mumcord när det är i förgrunden",
     "desktop": "Skrivbord: en systemavisering",
     "both": "Båda: pop-up när Mumcord är i förgrunden, annars systemavisering",
-    "off": "Av"
+    "off": "Av",
+    "activityTitle": "Aktivitetsaviseringar",
+    "activity": {
+      "screenShare": "Någon startar en skärmdelning",
+      "watchParty": "Någon startar en watch party",
+      "pluginActivity": "Någon startar en plugin-aktivitet",
+      "pluginEvent": "Plugin-händelser",
+      "joins": "Någon ansluter, lämnar eller byter kanal"
+    }
   },
   "overlay": {
     "corner": {
@@ -1255,5 +1263,14 @@
     "uploadSending": "Skickar…",
     "uploadDone": "Rapporten skickades. Tack!",
     "uploadFailed": "Rapporten kunde inte skickas. Kontrollera anslutningen och försök igen; den ligger kvar på den här datorn."
+  },
+  "activityHistory": {
+    "title": "Aktivitetshistorik",
+    "clear": "Rensa aktivitetshistorik",
+    "hint": "Tar bort det sparade flödet för alla servrar.",
+    "local": "Sparas bara på den här enheten.",
+    "button": "Rensa historik",
+    "confirm": "Vill du rensa aktivitetshistoriken för alla servrar? Det går inte att ångra.",
+    "confirmButton": "Rensa"
   }
 }

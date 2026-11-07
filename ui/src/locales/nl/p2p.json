@@ -31,7 +31,8 @@
     "noCertificate": "Bestanden delen vereist een clientcertificaat.",
     "modeNeedsRelay": "Bestanden delen heeft de relay nodig; je peer-to-peer-instelling is {{mode}}.",
     "modeOff": "Uit",
-    "modeDirectOnly": "Alleen direct"
+    "modeDirectOnly": "Alleen direct",
+    "hideNoRelay": "Deze tip verbergen voor {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer staat uit.",

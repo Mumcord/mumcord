@@ -31,7 +31,8 @@
     "noCertificate": "Sdílení souborů vyžaduje klientský certifikát.",
     "modeNeedsRelay": "Sdílení souborů potřebuje relay; tvé nastavení peer-to-peer je {{mode}}.",
     "modeOff": "Vypnuto",
-    "modeDirectOnly": "Pouze přímé"
+    "modeDirectOnly": "Pouze přímé",
+    "hideNoRelay": "Skrýt tento tip pro {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer je vypnuto.",

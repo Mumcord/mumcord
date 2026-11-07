@@ -6,7 +6,7 @@ use specta::Type;
 use tauri::{AppHandle, State};
 use tauri_specta::Event;
 
-use super::types::{ApiResult, Conversation, ServerId, to_engine_server_id};
+use super::types::{ApiResult, ChannelId, Conversation, ServerId, to_engine_server_id};
 use crate::notifications;
 
 /// One new message as the UI would announce it. Texts are translated and plain (no HTML).
@@ -71,6 +71,49 @@ pub async fn notify_message(
         tracing::debug!(error = %e, "message sound skipped");
     }
     Ok(notifications::notify(&app, mode, notice).await)
+}
+
+/// One new activity-feed event as the UI would announce it (#597). Texts are translated and plain.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivityNotice {
+    pub server_id: ServerId,
+    /// The channel the event happened in; clicking the notification opens its chat, where the
+    /// share, party or activity is shown.
+    pub channel_id: ChannelId,
+    /// E.g. "Night Owls".
+    pub summary: String,
+    /// E.g. "Ben started a screen share in #Lobby".
+    pub body: String,
+    pub action_label: String,
+}
+
+/// Like `notify_message`, without a sound: Do Not Disturb, a muted server, the window focus and
+/// the notification setting decide between nothing, the in-app toast and a system notification.
+/// Which kinds notify at all is the UI's part (Settings → activity notifications).
+#[tauri::command]
+#[specta::specta]
+pub async fn notify_activity(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    notice: ActivityNotice,
+) -> ApiResult<NotifyOutcome> {
+    if crate::dnd::active(&app) || notifications::server_muted(&app, notice.server_id).await {
+        return Ok(NotifyOutcome::None);
+    }
+    let mode = engine.settings()?.notifications;
+    let message = MessageNotice {
+        server_id: notice.server_id,
+        conversation: Conversation::Channel {
+            channel_id: notice.channel_id,
+        },
+        on_screen: false,
+        summary: notice.summary,
+        body: notice.body,
+        action_label: notice.action_label,
+        mention: false,
+    };
+    Ok(notifications::notify(&app, mode, message).await)
 }
 
 /// The user opened this chat: its system notification is outdated.

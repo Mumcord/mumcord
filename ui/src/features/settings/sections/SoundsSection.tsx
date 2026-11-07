@@ -1,6 +1,12 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, type NotificationMode, type SoundSettings, type SoundTheme } from "../../../api";
+import {
+  getApi,
+  type ActivityNotifySettings,
+  type NotificationMode,
+  type SoundSettings,
+  type SoundTheme,
+} from "../../../api";
 import { RadioGroup } from "../components/RadioGroup";
 import { Group } from "../components/Section";
 import { ChangedBadge } from "../components/SettingBadges";
@@ -30,6 +36,14 @@ const EVENTS: (keyof SoundSettings)[] = [
   "viewerStopped",
 ];
 const NOTIFICATION_MODES: NotificationMode[] = ["both", "inApp", "desktop", "off"];
+/** Activity events that notify like messages (#597), in the order of the feed's kinds. */
+const ACTIVITY_KINDS: (keyof ActivityNotifySettings)[] = [
+  "screenShare",
+  "watchParty",
+  "pluginActivity",
+  "pluginEvent",
+  "joins",
+];
 const SOUND_THEMES: SoundTheme[] = ["rich", "classic"];
 const THEME_LABELS: Record<SoundTheme, string> = {
   classic: "sounds.themeClassic",
@@ -134,6 +148,19 @@ export function NotificationsCard({ settings, update }: SettingsSectionProps) {
           update({ notifications });
         }}
       />
+      <fieldset className="settings-radios">
+        <legend className="settings-radios__legend">{t("notifications.activityTitle")}</legend>
+        {ACTIVITY_KINDS.map((kind) => (
+          <Switch
+            key={kind}
+            label={t(`notifications.activity.${kind}`)}
+            checked={settings.activityNotify[kind]}
+            onChange={(enabled) => {
+              update({ activityNotify: { ...settings.activityNotify, [kind]: enabled } });
+            }}
+          />
+        ))}
+      </fieldset>
     </Group>
   );
 }

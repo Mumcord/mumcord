@@ -34,5 +34,11 @@
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Nepavyko prisijungti prie bendros peržiūros.",
-  "joinActivityFailed": "Nepavyko prisijungti prie papildinio veiklos."
+  "joinActivityFailed": "Nepavyko prisijungti prie papildinio veiklos.",
+  "earlier": "Anksčiau",
+  "earlierLabel": "Anksčiau, prieš šią sesiją",
+  "notice": {
+    "body": "{{name}} {{action}}",
+    "bodyInChannel": "{{name}} {{action}} kanale #{{channel}}"
+  }
 }

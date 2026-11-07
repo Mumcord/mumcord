@@ -31,7 +31,8 @@
     "noCertificate": "Fildeling kræver et klientcertifikat.",
     "modeNeedsRelay": "Fildeling kræver relæet; din peer-to-peer-indstilling er {{mode}}.",
     "modeOff": "Fra",
-    "modeDirectOnly": "Kun direkte"
+    "modeDirectOnly": "Kun direkte",
+    "hideNoRelay": "Skjul dette tip for {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer er slået fra.",

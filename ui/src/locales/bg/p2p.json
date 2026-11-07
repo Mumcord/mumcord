@@ -31,7 +31,8 @@
     "noCertificate": "Споделянето на файлове изисква клиентски сертификат.",
     "modeNeedsRelay": "Споделянето на файлове изисква релето; настройката ти за peer-to-peer е {{mode}}.",
     "modeOff": "Изкл.",
-    "modeDirectOnly": "Само директно"
+    "modeDirectOnly": "Само директно",
+    "hideNoRelay": "Скрий тази подсказка за {{server}}"
   },
   "reason": {
     "p2pOff": "Peer-to-peer е изключено.",
