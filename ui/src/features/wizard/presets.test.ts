@@ -52,7 +52,7 @@ describe("PRESETS", () => {
         "privateMessages.allowCurrentChannel": true,
         "privateMessages.allowAccepted": true,
         "privateMessages.keepRequests": true,
-        p2pMode: "directRelay",
+        p2pMode: "relayFirst",
         linkPreviews: true,
         offerFullImages: true,
         loadFullImages: true,
@@ -123,7 +123,7 @@ describe("presetDifferences", () => {
     const balanced = applyPreset(draft(), "balanced");
     const changed: PresetDraft = {
       ...balanced,
-      settings: { ...balanced.settings, nowGaming: true, p2pMode: "relayFirst" },
+      settings: { ...balanced.settings, nowGaming: true, p2pMode: "directOnly" },
       dndFollowSystem: false,
     };
     expect(presetDifferences(changed, "balanced")).toEqual([
@@ -156,6 +156,7 @@ describe("presetDifferences", () => {
   it("lists the differences between two presets", () => {
     expect(presetDifferences(applyPreset(draft(), "everythingOn"), "balanced")).toEqual([
       "privateMessages.rule",
+      "p2pMode",
       "nowPlaying",
       "nowGaming",
     ]);

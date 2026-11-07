@@ -382,7 +382,7 @@ const DEFAULT_SETTINGS: Settings = {
   talkingFirst: false,
   showWeakConnectionIcon: true,
   allowDirectConnections: "unset",
-  p2pMode: "directRelay",
+  p2pMode: "relayFirst",
   updateCheck: "unset",
   updateAutoDownload: false,
   pluginsUpdates: "auto",

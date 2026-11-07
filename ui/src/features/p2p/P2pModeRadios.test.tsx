@@ -6,17 +6,17 @@ import { P2pModeRadios } from "./P2pModeRadios";
 
 describe("P2pModeRadios", () => {
   it("lists the five modes with the default recommended and the explanation", async () => {
-    const { container } = render(<P2pModeRadios value="directRelay" onChange={vi.fn()} />);
+    const { container } = render(<P2pModeRadios value="relayFirst" onChange={vi.fn()} />);
     const group = screen.getByRole("group", { name: "Peer-to-peer mode" });
     const radios = within(group).getAllByRole("radio");
     expect(radios.map((radio) => radio.closest("label")?.textContent)).toEqual([
-      "Direct + relay (direct first) Recommended",
-      "Direct + relay (always relay, hides my IP)",
+      "Direct + relay (direct first)",
+      "Direct + relay (always relay, hides my IP) Recommended",
       "Direct only",
       "Relay only",
       "Off",
     ]);
-    expect(within(group).getByRole("radio", { name: /direct first.*Recommended/ })).toBeChecked();
+    expect(within(group).getByRole("radio", { name: /always relay.*Recommended/ })).toBeChecked();
     expect(group).toHaveAccessibleDescription(/Direct shows your IP address to the other person/);
     expect(await axeViolations(container)).toEqual([]);
   });
