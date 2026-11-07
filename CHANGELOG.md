@@ -9,6 +9,8 @@
 
 ### Fixed
 
+- Settings: cards side by side are equally tall, and a "?" stays next to its long label instead of wrapping onto its own line
+- Settings → Screen sharing → Hardware acceleration: a long status such as "Software, keeps up to 1080p30" stays right-aligned
 - Camera and screen share dialogs: the dropdowns use the app's own design like in Settings, and the codec note ends its sentence before the next one starts
 - Settings → Plugins: the cards have the same gap as on the other pages, every card has its icon, and the "Output level (debug)" meter only shows in development builds
 
