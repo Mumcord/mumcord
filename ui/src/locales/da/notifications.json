@@ -69,6 +69,11 @@
       "body": "Genstart for at opdatere",
       "restart": "Genstart for at opdatere",
       "whatsNew": "Nyheder"
+    },
+    "relay": {
+      "title": "Relæet på {{server}} er ændret",
+      "body": "Skærm- og fildeling er sat på pause, indtil du stoler på det nye relæ.",
+      "decision": "Kræver din beslutning"
     }
   }
 }

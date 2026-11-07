@@ -61,5 +61,23 @@
     "rateLimited": "zu viele Versuche",
     "version": "nicht unterstützte Version",
     "badRequest": "ungültige Anfrage"
+  },
+  "trust": {
+    "title": "Relay auf {{server}} geändert",
+    "body": "Bildschirm- und Dateifreigabe sind pausiert, bis du dem neuen Relay vertraust.",
+    "details": "Details",
+    "trustedTitle": "Neuem Relay vertraut",
+    "trustedBody": "Bildschirm- und Dateifreigabe auf {{server}} funktionieren wieder.",
+    "dialogBody": "Das Relay dieses Servers nutzt jetzt ein anderes Zertifikat. Bis du ihm vertraust, sind Bildschirmfreigabe, Dateifreigabe und Bilder in voller Größe pausiert.",
+    "previous": "Bisher vertrautes Relay",
+    "current": "Neues Relay",
+    "unknown": "Unbekannt",
+    "trustIf": "Vertrau ihm, wenn",
+    "trustIfText": "die Server-Admins ein neues Relay oder einen Umzug angekündigt haben und du das bei ihnen bestätigen kannst.",
+    "dontTrustIf": "Vertrau ihm nicht, wenn",
+    "dontTrustIfText": "niemand eine Änderung angekündigt hat oder du unsicher bist. Jemand könnte sich als das Relay ausgeben.",
+    "notNow": "Nicht jetzt",
+    "review": "Relay geändert – prüfen",
+    "filesBlocked": "Dateifreigabe ist nicht verfügbar: Das Relay dieses Servers hat sich geändert und ist noch nicht vertraut."
   }
 }

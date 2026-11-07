@@ -77,6 +77,11 @@
       "body": "Paleiskite iš naujo, kad atnaujintumėte",
       "restart": "Paleisti iš naujo ir atnaujinti",
       "whatsNew": "Kas naujo"
+    },
+    "relay": {
+      "title": "Serverio {{server}} retransliatorius pasikeitė",
+      "body": "Ekrano ir failų bendrinimas sustabdytas, kol pasitikėsi nauju retransliatoriumi.",
+      "decision": "Reikia tavo sprendimo"
     }
   }
 }

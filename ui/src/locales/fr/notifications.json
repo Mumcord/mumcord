@@ -73,6 +73,11 @@
       "body": "Redémarrez pour mettre à jour",
       "restart": "Redémarrer pour mettre à jour",
       "whatsNew": "Nouveautés"
+    },
+    "relay": {
+      "title": "Relais modifié sur {{server}}",
+      "body": "Le partage d'écran et de fichiers est en pause jusqu'à ce que tu fasses confiance au nouveau relais.",
+      "decision": "Décision requise"
     }
   }
 }

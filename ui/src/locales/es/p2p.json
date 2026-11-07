@@ -61,5 +61,23 @@
     "rateLimited": "demasiados intentos",
     "version": "versión no compatible",
     "badRequest": "solicitud no válida"
+  },
+  "trust": {
+    "title": "El relé de {{server}} ha cambiado",
+    "body": "Compartir pantalla y archivos está en pausa hasta que confíes en el nuevo relé.",
+    "details": "Detalles",
+    "trustedTitle": "Nuevo relé de confianza",
+    "trustedBody": "Compartir pantalla y archivos en {{server}} vuelve a funcionar.",
+    "dialogBody": "El relé de este servidor usa ahora otro certificado. Hasta que confíes en él, compartir pantalla, archivos e imágenes a tamaño completo están en pausa.",
+    "previous": "Relé de confianza anterior",
+    "current": "Nuevo relé",
+    "unknown": "Desconocido",
+    "trustIf": "Confía si",
+    "trustIfText": "los administradores anunciaron un relé nuevo o un traslado y puedes confirmarlo con ellos.",
+    "dontTrustIf": "No confíes si",
+    "dontTrustIfText": "nadie anunció un cambio o no estás seguro. Alguien podría hacerse pasar por el relé.",
+    "notNow": "Ahora no",
+    "review": "Relé cambiado – revisar",
+    "filesBlocked": "Compartir archivos no está disponible: el relé de este servidor cambió y aún no es de confianza."
   }
 }

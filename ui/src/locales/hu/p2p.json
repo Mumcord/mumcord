@@ -61,5 +61,23 @@
     "rateLimited": "túl sok próbálkozás",
     "version": "nem támogatott verzió",
     "badRequest": "érvénytelen kérés"
+  },
+  "trust": {
+    "title": "Megváltozott a relay ezen: {{server}}",
+    "body": "A képernyő- és fájlmegosztás szünetel, amíg meg nem bízol az új relayben.",
+    "details": "Részletek",
+    "trustedTitle": "Az új relay megbízható",
+    "trustedBody": "A képernyő- és fájlmegosztás ismét működik ezen: {{server}}.",
+    "dialogBody": "A szerver relay-e mostantól másik tanúsítványt használ. Amíg meg nem bízol benne, a képernyő- és fájlmegosztás és a teljes méretű képek szünetelnek.",
+    "previous": "Eddig megbízható relay",
+    "current": "Új relay",
+    "unknown": "Ismeretlen",
+    "trustIf": "Bízz meg benne, ha",
+    "trustIfText": "a szerver adminjai új relayt vagy költözést jelentettek be, és ezt meg tudod erősíteni velük.",
+    "dontTrustIf": "Ne bízz meg benne, ha",
+    "dontTrustIfText": "senki nem jelentett be változást, vagy bizonytalan vagy. Valaki kiadhatja magát a relaynek.",
+    "notNow": "Most nem",
+    "review": "Relay megváltozott – ellenőrzés",
+    "filesBlocked": "A fájlmegosztás nem érhető el: a szerver relay-e megváltozott, és még nem megbízható."
   }
 }

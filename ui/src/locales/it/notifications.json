@@ -73,6 +73,11 @@
       "body": "Riavvia per aggiornare",
       "restart": "Riavvia per aggiornare",
       "whatsNew": "Novità"
+    },
+    "relay": {
+      "title": "Relay cambiato su {{server}}",
+      "body": "La condivisione di schermo e file è in pausa finché non ti fidi del nuovo relay.",
+      "decision": "Serve la tua decisione"
     }
   }
 }

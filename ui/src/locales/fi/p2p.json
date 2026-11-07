@@ -61,5 +61,23 @@
     "rateLimited": "liian monta yritystä",
     "version": "versiota ei tueta",
     "badRequest": "virheellinen pyyntö"
+  },
+  "trust": {
+    "title": "Välitin vaihtui palvelimella {{server}}",
+    "body": "Näytön ja tiedostojen jakaminen on tauolla, kunnes luotat uuteen välittimeen.",
+    "details": "Tiedot",
+    "trustedTitle": "Uusi välitin luotettu",
+    "trustedBody": "Näytön ja tiedostojen jakaminen palvelimella {{server}} toimii taas.",
+    "dialogBody": "Tämän palvelimen välitin käyttää nyt eri varmennetta. Kunnes luotat siihen, näytön ja tiedostojen jakaminen sekä täysikokoiset kuvat ovat tauolla.",
+    "previous": "Aiemmin luotettu välitin",
+    "current": "Uusi välitin",
+    "unknown": "Tuntematon",
+    "trustIf": "Luota siihen, jos",
+    "trustIfText": "palvelimen ylläpito ilmoitti uudesta välittimestä tai muutosta ja voit varmistaa sen heiltä.",
+    "dontTrustIf": "Älä luota siihen, jos",
+    "dontTrustIfText": "kukaan ei ilmoittanut muutoksesta tai olet epävarma. Joku voi esiintyä välittimenä.",
+    "notNow": "Ei nyt",
+    "review": "Välitin vaihtui – tarkista",
+    "filesBlocked": "Tiedostojen jakaminen ei ole käytettävissä: tämän palvelimen välitin vaihtui eikä siihen vielä luoteta."
   }
 }

@@ -77,6 +77,11 @@
       "body": "Uruchom ponownie, aby zaktualizować",
       "restart": "Uruchom ponownie i zaktualizuj",
       "whatsNew": "Co nowego"
+    },
+    "relay": {
+      "title": "Przekaźnik na {{server}} się zmienił",
+      "body": "Udostępnianie ekranu i plików jest wstrzymane, dopóki nie zaufasz nowemu przekaźnikowi.",
+      "decision": "Wymaga twojej decyzji"
     }
   }
 }

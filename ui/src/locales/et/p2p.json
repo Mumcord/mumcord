@@ -61,5 +61,23 @@
     "rateLimited": "liiga palju katseid",
     "version": "toetamata versioon",
     "badRequest": "vigane päring"
+  },
+  "trust": {
+    "title": "Relee serveris {{server}} muutus",
+    "body": "Ekraani ja failide jagamine on peatatud, kuni usaldad uut releed.",
+    "details": "Üksikasjad",
+    "trustedTitle": "Uut releed usaldatakse",
+    "trustedBody": "Ekraani ja failide jagamine serveris {{server}} töötab jälle.",
+    "dialogBody": "Selle serveri relee kasutab nüüd teist sertifikaati. Kuni sa seda ei usalda, on ekraani ja failide jagamine ning täissuuruses pildid peatatud.",
+    "previous": "Varem usaldatud relee",
+    "current": "Uus relee",
+    "unknown": "Tundmatu",
+    "trustIf": "Usalda seda, kui",
+    "trustIfText": "serveri haldurid teatasid uuest releest või kolimisest ja saad seda nendega kinnitada.",
+    "dontTrustIf": "Ära usalda seda, kui",
+    "dontTrustIfText": "keegi ei teatanud muutusest või sa pole kindel. Keegi võib releena esineda.",
+    "notNow": "Mitte praegu",
+    "review": "Relee muutus – vaata üle",
+    "filesBlocked": "Failide jagamine pole saadaval: selle serveri relee muutus ega ole veel usaldatud."
   }
 }

@@ -61,5 +61,23 @@
     "rateLimited": "previše pokušaja",
     "version": "nepodržana verzija",
     "badRequest": "neispravan zahtjev"
+  },
+  "trust": {
+    "title": "Relej na {{server}} se promijenio",
+    "body": "Dijeljenje zaslona i datoteka pauzirano je dok ne vjeruješ novom releju.",
+    "details": "Detalji",
+    "trustedTitle": "Novom releju vjeruješ",
+    "trustedBody": "Dijeljenje zaslona i datoteka na {{server}} ponovno radi.",
+    "dialogBody": "Relej ovog poslužitelja sada koristi drugi certifikat. Dok mu ne vjeruješ, dijeljenje zaslona, datoteka i slike pune veličine su pauzirani.",
+    "previous": "Dosad pouzdan relej",
+    "current": "Novi relej",
+    "unknown": "Nepoznato",
+    "trustIf": "Vjeruj mu ako",
+    "trustIfText": "su administratori poslužitelja najavili novi relej ili selidbu i to možeš potvrditi s njima.",
+    "dontTrustIf": "Ne vjeruj mu ako",
+    "dontTrustIfText": "nitko nije najavio promjenu ili nisi siguran. Netko se može predstavljati kao relej.",
+    "notNow": "Ne sada",
+    "review": "Relej promijenjen – provjeri",
+    "filesBlocked": "Dijeljenje datoteka nije dostupno: relej ovog poslužitelja se promijenio i još mu ne vjeruješ."
   }
 }
