@@ -43,7 +43,8 @@
     "linkAddress": "Lingi aadress",
     "linkApply": "Lisa link",
     "bulletList": "Täpploend",
-    "numberedList": "Nummerdatud loend"
+    "numberedList": "Nummerdatud loend",
+    "underline": "Allajoonitud"
   },
   "register": {
     "title": "Registreeru sellel serveril",

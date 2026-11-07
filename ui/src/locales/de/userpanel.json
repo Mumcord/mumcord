@@ -43,7 +43,8 @@
     "linkAddress": "Linkadresse",
     "linkApply": "Link hinzufügen",
     "bulletList": "Aufzählung",
-    "numberedList": "Nummerierte Liste"
+    "numberedList": "Nummerierte Liste",
+    "underline": "Unterstrichen"
   },
   "register": {
     "title": "Auf diesem Server registrieren",

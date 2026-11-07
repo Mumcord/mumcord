@@ -43,7 +43,8 @@
     "linkAddress": "Linkadres",
     "linkApply": "Link toevoegen",
     "bulletList": "Lijst met opsommingstekens",
-    "numberedList": "Genummerde lijst"
+    "numberedList": "Genummerde lijst",
+    "underline": "Onderstrepen"
   },
   "register": {
     "title": "Registreren op deze server",

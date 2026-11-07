@@ -43,7 +43,8 @@
     "linkAddress": "Link címe",
     "linkApply": "Link hozzáadása",
     "bulletList": "Felsorolás",
-    "numberedList": "Számozott lista"
+    "numberedList": "Számozott lista",
+    "underline": "Aláhúzott"
   },
   "register": {
     "title": "Regisztráció ezen a szerveren",

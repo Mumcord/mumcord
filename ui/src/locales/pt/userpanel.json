@@ -43,7 +43,8 @@
     "linkAddress": "Endereço da ligação",
     "linkApply": "Adicionar ligação",
     "bulletList": "Lista com marcas",
-    "numberedList": "Lista numerada"
+    "numberedList": "Lista numerada",
+    "underline": "Sublinhado"
   },
   "register": {
     "title": "Registar neste servidor",
