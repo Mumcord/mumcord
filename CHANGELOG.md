@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Plugins strip: plugin icons have no frame anymore; a plugin's own image or its colour tile is the whole icon, with a ring on hover, focus and when open
+
+### Fixed
+
+- "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it
+
 ## [0.7.1] - 2026-11-07
 
 ### Added
