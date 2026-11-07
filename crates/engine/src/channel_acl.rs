@@ -69,7 +69,8 @@ pub struct ChannelAcl {
     pub groups: Vec<AclGroup>,
     /// Inherited rules first, then the channel's own ones.
     pub rules: Vec<AclRule>,
-    /// Names of the registered users named in rules and groups, where the server told them.
+    /// Names of the registered users named in rules and groups, where the server told them, and
+    /// of everyone online who is registered.
     pub user_names: BTreeMap<u32, String>,
 }
 
@@ -293,6 +294,12 @@ impl Engine {
         // People online are known already; only the others are asked for.
         let mut missing = Vec::new();
         ctx.handle.with_state(|state| {
+            // Everyone online who is registered can be added to a group or a rule (FR-10.38).
+            for user in state.users.values() {
+                if let Some(id) = user.user_id {
+                    acl.user_names.insert(id, user.name.clone());
+                }
+            }
             for id in &ids {
                 match state.users.values().find(|u| u.user_id == Some(*id)) {
                     Some(user) => {

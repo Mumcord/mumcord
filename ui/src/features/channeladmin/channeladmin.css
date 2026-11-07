@@ -176,3 +176,294 @@
 .channel-window [role="tabpanel"] {
   min-height: 30rem;
 }
+
+/* Permissions tab (issue #252, mockups "acl-rules" and "acl-groups"): wider, as the grid needs. */
+.channel-window.servers-dialog:has(.permissions-tab) {
+  width: min(66rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.permissions-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.permissions-tab__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.permissions-tab__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: auto;
+}
+
+.who-grid {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.who-grid__table-wrap {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.who-grid__table,
+.rule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.who-grid__table th,
+.who-grid__table td,
+.rule-table th,
+.rule-table td {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.who-grid__table th[scope="row"],
+.rule-table th[scope="row"] {
+  text-align: start;
+  font-weight: 500;
+}
+
+.who-grid__table thead th {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.who-grid__table th[data-group-start] {
+  border-inline-start: 1px solid var(--color-border);
+}
+
+.who-grid__group {
+  display: block;
+  color: var(--color-text);
+  font-weight: 600;
+  text-align: start;
+}
+
+/* ✓ green, ✗ red, ? amber; inherited or default answers are drawn dashed, like the mockup. */
+.who-grid__cell {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+button.who-grid__cell {
+  cursor: pointer;
+}
+
+.who-grid__cell[data-verdict="allowed"] {
+  border-color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+
+.who-grid__cell[data-verdict="denied"] {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+}
+
+.who-grid__cell[data-verdict="depends"] {
+  border-color: var(--color-warning);
+}
+
+.who-grid__cell[data-inherited] {
+  border-style: dashed;
+  background: transparent;
+}
+
+.who-grid__cell[aria-pressed="true"] {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.why-panel {
+  flex: 0 0 16rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  font-size: var(--font-size-sm);
+}
+
+.why-panel h3 {
+  margin: 0 0 var(--space-2);
+}
+
+.why-panel p {
+  margin: 0 0 var(--space-2);
+}
+
+.why-panel__headline {
+  font-weight: 600;
+}
+
+.rules-view,
+.groups-view {
+  display: grid;
+  grid-template-columns: 18rem 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 48rem) {
+  .rules-view,
+  .groups-view,
+  .who-grid {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}
+
+.rules-view__list,
+.groups-view__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-inline-end: var(--space-3);
+  border-inline-end: 1px solid var(--color-border);
+}
+
+.rules-view__heading {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rules-view__rules,
+.groups-view__list ul,
+.groups-view__members {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rules-view__rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  text-align: start;
+  cursor: pointer;
+}
+
+.rules-view__rule:hover {
+  background: var(--color-bg-hover);
+}
+
+.rules-view__rule[aria-current="true"] {
+  border-color: var(--color-accent);
+}
+
+.rules-view__rule[data-inherited] {
+  color: var(--color-text-muted);
+}
+
+.rules-view__n {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.rules-view__who {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.rules-view__badge {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.rules-view__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.rules-view__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.rules-view__scope {
+  align-items: center;
+}
+
+.groups-view__builtins {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.groups-view__builtins div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.groups-view__builtins dd {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.groups-view__new {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.groups-view__options {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.groups-view__members li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.groups-view__members li span:first-child {
+  flex: 1;
+}
+
+.groups-view__members li[data-removed] span:first-child {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.rules-view__heading,
+.why-panel h3 {
+  font-size: var(--font-size-sm);
+}

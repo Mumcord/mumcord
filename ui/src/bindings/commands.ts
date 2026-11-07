@@ -1450,7 +1450,7 @@ export type AclRowInput = { kind: "everyone" } | { kind: "group"; name: string }
 /**  Someone online. */
 { kind: "session"; session: number } | 
 /**  A registered user, online or not. */
-{ kind: "user"; user_id: number };
+{ kind: "user"; userId: number };
 
 /**  One permission rule (FR-10.37). `grant` and `deny` are Mumble permission bits. */
 export type AclRuleView = {

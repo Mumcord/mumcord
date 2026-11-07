@@ -374,6 +374,7 @@ pub enum AclRowInput {
         session: u32,
     },
     /// A registered user, online or not.
+    #[serde(rename_all = "camelCase")]
     User {
         user_id: u32,
     },

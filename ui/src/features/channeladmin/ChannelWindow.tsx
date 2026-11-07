@@ -23,13 +23,15 @@ import "../admin/admin.css";
 import "../settings/settings.css";
 import "../userpanel/userpanel.css";
 import { PasswordTab } from "./PasswordTab";
+import { PermissionsTab } from "./PermissionsTab";
+import { aclChanged, nameOfBit } from "./permissionsModel";
 import { useChannelAcl } from "./useChannelAcl";
 import "./channeladmin.css";
 
 export type ChannelWindowMode =
   { kind: "create"; parentId: number; temporary: boolean } | { kind: "edit"; channelId: number };
 
-type Tab = "general" | "password" | "links";
+type Tab = "general" | "password" | "links" | "permissions";
 
 interface ChannelWindowProps {
   mode: ChannelWindowMode;
@@ -79,6 +81,10 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
   const [password, setPassword] = useState<string | null>(null);
   // Someone else changed the rules while the user edited the password (FR-10.43).
   const [conflict, setConflict] = useState<ChannelAclView | null>(null);
+  // The Permissions tab's unsaved rules; `null` while untouched (FR-10.36).
+  const [aclDraft, setAclDraft] = useState<ChannelAclView | null>(null);
+  // Losing own rights or saving for the whole server asks first (FR-10.41, FR-10.42).
+  const [confirmRules, setConfirmRules] = useState<{ lost: number[]; root: boolean } | null>(null);
   const rules = useChannelAcl(server.serverId, mode.kind === "edit" ? mode.channelId : null);
 
   const serverId = server.serverId;
@@ -97,7 +103,12 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
       : "";
   const passwordChanged =
     password !== null && rules.load.status === "loaded" && password.trim() !== savedPassword;
-  const dirty = editing ? hasChanges(change) || passwordChanged : true;
+  const loadedAcl = rules.load.status === "loaded" ? rules.load.acl : null;
+  const permissionsChanged =
+    aclDraft !== null && loadedAcl !== null && aclChanged(loadedAcl, aclDraft);
+  // The user's right to edit the rules dropped while the window is open (FR-10.43).
+  const rulesReadOnly = !(channel?.permissions.write ?? false);
+  const dirty = editing ? hasChanges(change) || passwordChanged || permissionsChanged : true;
   const nameMissing = draft.name.trim() === "";
 
   const finish = (result: ChannelResult) => {
@@ -135,9 +146,8 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
             return;
           }
         }
-        if (passwordChanged && rules.load.status === "loaded") {
-          await savePassword(rules.load.acl, false);
-          return;
+        if ((passwordChanged || permissionsChanged) && loadedAcl !== null) {
+          if (!(await saveRules(loadedAcl, false))) return;
         }
         onClose();
       }
@@ -149,21 +159,47 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
     }
   };
 
-  const savePassword = async (startedFrom: ChannelAclView, force: boolean) => {
-    if (serverId === null || mode.kind !== "edit") return;
-    const result: AclSaveResult = await getApi().channelPasswordSave(
-      serverId,
-      mode.channelId,
-      password?.trim() ?? null,
-      startedFrom,
-      force,
-    );
-    if (result.kind === "conflict") {
-      setConflict(result.acl);
-      return;
+  /** Saves the rules, then the password, each from the rules it started from (FR-10.43). */
+  const saveRules = async (startedFrom: ChannelAclView, force: boolean): Promise<boolean> => {
+    if (serverId === null || mode.kind !== "edit") return false;
+    let base = startedFrom;
+    if (permissionsChanged) {
+      const result: AclSaveResult = await getApi().channelAclSave(serverId, aclDraft, base, force);
+      if (result.kind === "conflict") {
+        setConflict(result.acl);
+        return false;
+      }
+      rules.replace(result.acl);
+      setAclDraft(null);
+      base = result.acl;
     }
-    rules.replace(result.acl);
-    onClose();
+    if (passwordChanged) {
+      const result: AclSaveResult = await getApi().channelPasswordSave(
+        serverId,
+        mode.channelId,
+        password.trim(),
+        base,
+        force && !permissionsChanged,
+      );
+      if (result.kind === "conflict") {
+        setConflict(result.acl);
+        return false;
+      }
+      rules.replace(result.acl);
+    }
+    return true;
+  };
+
+  const confirmThenSend = async () => {
+    if (permissionsChanged && serverId !== null) {
+      const lost = await getApi().channelAclLockout(serverId, aclDraft);
+      const root = aclDraft.channelId === 0;
+      if (lost.length > 0 || root) {
+        setConfirmRules({ lost, root });
+        return;
+      }
+    }
+    await send();
   };
 
   const save = () => {
@@ -172,7 +208,7 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
       setConfirmMove(true);
       return;
     }
-    void send();
+    void confirmThenSend();
   };
 
   // Ctrl+Enter saves from any field, as the mockup's keyboard note says.
@@ -192,6 +228,47 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
       window.removeEventListener("keydown", onKey);
     };
   }, []);
+
+  if (confirmRules !== null) {
+    const lost = confirmRules.lost
+      .map((bit) => nameOfBit(bit))
+      .filter((name) => name !== undefined)
+      .map((name) => t(`perm.name.${name}`));
+    return (
+      <Dialog
+        role="alertdialog"
+        className="channel-confirm"
+        title={lost.length > 0 ? t("perm.lockoutTitle") : t("perm.rootTitle")}
+        onClose={() => {
+          setConfirmRules(null);
+        }}
+      >
+        {lost.length > 0 && <p>{t("perm.lockoutBody", { rights: lost.join(", ") })}</p>}
+        {confirmRules.root && <p>{t("perm.rootBody")}</p>}
+        <div className="servers-dialog__actions">
+          <button
+            type="button"
+            className="button"
+            onClick={() => {
+              setConfirmRules(null);
+            }}
+          >
+            {t("perm.backToEditing")}
+          </button>
+          <button
+            type="button"
+            className="button button--primary"
+            onClick={() => {
+              setConfirmRules(null);
+              void send();
+            }}
+          >
+            {t("perm.saveAnyway")}
+          </button>
+        </div>
+      </Dialog>
+    );
+  }
 
   if (conflict !== null) {
     const fresh = conflict;
@@ -222,6 +299,7 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
               // Their rules win: the editor starts again from them, own password typing dropped.
               rules.replace(fresh);
               setPassword(null);
+              setAclDraft(null);
               setConflict(null);
             }}
           >
@@ -232,10 +310,14 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
             className="button button--primary"
             onClick={() => {
               setConflict(null);
-              void savePassword(fresh, true).catch((failure: unknown) => {
-                console.error("Saving the channel password failed", failure);
-                setError(t("channel.failed"));
-              });
+              void saveRules(fresh, true)
+                .then((done) => {
+                  if (done) onClose();
+                })
+                .catch((failure: unknown) => {
+                  console.error("Saving the channel password failed", failure);
+                  setError(t("channel.failed"));
+                });
             }}
           >
             {t("channel.conflictMine")}
@@ -275,7 +357,7 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
             className="button button--primary"
             onClick={() => {
               setConfirmMove(false);
-              void send();
+              void confirmThenSend();
             }}
           >
             {t("channel.moveConfirm")}
@@ -316,7 +398,7 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
       <p className="channel-window__path">{where.filter((part) => part !== "").join(" › ")}</p>
       {editing && (
         <div role="tablist" aria-label={title} className="channel-window__tabs">
-          {(["general", "password", "links"] as const).map((name) => (
+          {(["general", "password", "links", "permissions"] as const).map((name) => (
             <button
               key={name}
               type="button"
@@ -328,7 +410,9 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
               onClick={() => {
                 setTab(name);
                 // The rules are read when a tab that needs them first opens (FR-10.36).
-                if (name === "password" && rules.load.status === "idle") void rules.reload();
+                if (name !== "general" && name !== "links" && rules.load.status === "idle") {
+                  void rules.reload();
+                }
               }}
             >
               {t(`channel.tab.${name}`)}
@@ -346,7 +430,23 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
             }
           : {})}
       >
-        {tab === "password" ? (
+        {tab === "permissions" && serverId !== null && mode.kind === "edit" ? (
+          <PermissionsTab
+            serverId={serverId}
+            channelId={mode.channelId}
+            load={rules.load}
+            draft={aclDraft ?? loadedAcl}
+            readOnly={rulesReadOnly || busy}
+            onChange={(acl) => {
+              setAclDraft(acl);
+              setError(null);
+            }}
+            onRefresh={() => {
+              setAclDraft(null);
+              void rules.reload();
+            }}
+          />
+        ) : tab === "password" ? (
           <PasswordTab
             load={rules.load}
             value={password}

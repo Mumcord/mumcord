@@ -223,6 +223,72 @@ describe("Password tab (FR-10.28, #251)", () => {
   });
 });
 
+describe("Permissions tab (#252)", () => {
+  async function openPermissions(name: RegExp) {
+    fireEvent.keyDown(row(name), { key: "F2" });
+    const dialog = screen.getByRole("dialog", { name: "Edit channel" });
+    fireEvent.click(within(dialog).getByRole("tab", { name: "Permissions" }));
+    await within(dialog).findByRole("table");
+    return dialog;
+  }
+
+  it("shows who can do what and explains a cell", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    const cell = within(dialog).getByRole("button", { name: "Everyone, Speak: allowed" });
+    fireEvent.click(cell);
+    const why = within(dialog).getByRole("complementary", { name: "Why?" });
+    expect(why).toHaveTextContent("Everyone can Speak in Raid");
+    expect(why).toHaveTextContent(
+      "Worked out by Mumcord from the rules; the server has the final say.",
+    );
+    expect(await axeViolations(dialog)).toEqual([]);
+  });
+
+  it("adds a rule that denies Speak and saves it", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Rules" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Add rule" }));
+    fireEvent.click(within(dialog).getByRole("checkbox", { name: "Deny Speak" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+    const acl = await api.channelAclRead(1, 2);
+    expect(acl.rules.filter((r) => !r.inherited)).toEqual([
+      expect.objectContaining({ group: "all", grant: 0, deny: 0x8 }),
+    ]);
+  });
+
+  it("asks before saving the Root channel's rules", async () => {
+    await renderTree({ 0: ADMIN });
+    const dialog = await openPermissions(/^Root/);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Rules" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Add rule" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    const ask = await screen.findByRole("alertdialog", {
+      name: "Save permissions for the whole server?",
+    });
+    fireEvent.click(within(ask).getByRole("button", { name: "Back to editing" }));
+    expect(screen.getByRole("dialog", { name: "Edit channel" })).toBeInTheDocument();
+  });
+
+  it("creates a group and adds a registered member", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Groups" }));
+    fireEvent.change(within(dialog).getByLabelText("New group"), { target: { value: "raiders" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Create" }));
+    const picker = within(dialog).getByLabelText("Add a registered user");
+    fireEvent.change(picker, { target: { value: "Zoe" } });
+    fireEvent.keyDown(picker, { key: "Enter" });
+    const list = within(dialog).getByRole("list", { name: "Members" });
+    expect(list).toHaveTextContent("Zoe");
+    expect(list).toHaveTextContent("added here");
+  });
+});
+
 describe("Delete channel (FR-10.25, FR-10.10)", () => {
   it("opens from the Delete key with counts and deletes", async () => {
     await renderTree({ 1: ADMIN });
