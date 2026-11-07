@@ -292,3 +292,9 @@
 .cam-dialog .button--primary svg {
   vertical-align: -2px;
 }
+
+/* The themed dropdown fills its field like the other inputs (#591). */
+.cam-field__select {
+  width: 100%;
+  min-width: 0;
+}

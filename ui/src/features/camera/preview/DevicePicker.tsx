@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { getApi, type CameraDevice } from "../../../api";
 import { saveCameraSettings } from "./cameraSettings";
 import { cameraFailureOf, failureText, initialDevice, type DesktopOs } from "./previewLogic";
+import { Select } from "../../../components/Select";
 
 export interface DevicePickerProps {
   devices: readonly CameraDevice[];
@@ -46,21 +47,14 @@ export function DevicePicker({ devices, initialId, os, disabled, onFailure }: De
       {devices.length === 0 ? (
         <p className="cam-field__empty">{t("noCameraFound")}</p>
       ) : (
-        <select
+        <Select
           id={id}
-          className="settings-input settings-input--compact"
+          className="cam-field__select"
           value={selected}
           disabled={disabled}
-          onChange={(event) => {
-            choose(event.target.value);
-          }}
-        >
-          {devices.map((device) => (
-            <option key={device.id} value={device.id}>
-              {device.name}
-            </option>
-          ))}
-        </select>
+          options={devices.map((device) => ({ value: device.id, label: device.name }))}
+          onChange={choose}
+        />
       )}
     </div>
   );

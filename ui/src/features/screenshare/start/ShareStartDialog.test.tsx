@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi, type SharePreview } from "../../../api";
 import { applyLanguage } from "../../../i18n";
@@ -49,6 +49,12 @@ async function open() {
 
 const viewersGet = () => screen.getByRole("status");
 
+/** Picks an option of one of the dialog's themed dropdowns (#591). */
+function choose(name: string, option: string | RegExp): void {
+  fireEvent.click(screen.getByRole("combobox", { name }));
+  fireEvent.click(screen.getByRole("option", { name: option }));
+}
+
 describe("ShareStartDialog", () => {
   it("opens with the defaults of Settings → Screen sharing", async () => {
     await api.settingsUpdate({
@@ -64,8 +70,8 @@ describe("ShareStartDialog", () => {
     expect(screen.getByRole("button", { name: "1440p" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: "60 fps" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("radio", { name: /Sharp text/ })).toBeChecked();
-    expect(screen.getByRole("combobox", { name: "Codec" })).toHaveValue("vp9");
-    expect(screen.getByRole("combobox", { name: "Upload limit" })).toHaveValue("10");
+    expect(screen.getByRole("combobox", { name: "Codec" })).toHaveTextContent("VP9");
+    expect(screen.getByRole("combobox", { name: "Upload limit" })).toHaveTextContent("10 Mbit/s");
     expect(screen.getByRole("switch", { name: "Sound" })).not.toBeChecked();
   });
 
@@ -160,11 +166,11 @@ describe("ShareStartDialog", () => {
     await open();
     const codec = screen.getByRole("combobox", { name: "Codec" });
     await waitFor(() => {
-      expect(
-        within(codec).getByRole("option", { name: "Auto: AV1 (graphics card)" }),
-      ).toBeVisible();
+      expect(codec).toHaveTextContent("Auto: AV1 (graphics card)");
     });
-    expect(within(codec).getByRole("option", { name: "VP9" })).toBeInTheDocument();
+    fireEvent.click(codec);
+    expect(screen.getByRole("option", { name: "VP9" })).toBeInTheDocument();
+    fireEvent.keyDown(codec, { key: "Escape" });
     fireEvent.click(screen.getByRole("button", { name: "720p" }));
     fireEvent.click(screen.getByRole("radio", { name: /Smooth motion/ }));
     await waitFor(() => {
@@ -220,12 +226,12 @@ describe("ShareStartDialog", () => {
   it("notes the software limit for a manual AV1 pick above 1080p30", async () => {
     previewWith({});
     await open();
-    fireEvent.change(screen.getByRole("combobox", { name: "Codec" }), {
-      target: { value: "av1" },
-    });
+    // The options are Auto, AV1 and VP9, in that order; the fixture names every encoder AV1.
+    fireEvent.click(screen.getByRole("combobox", { name: "Codec" }));
+    fireEvent.click(screen.getAllByRole("option")[1] as HTMLElement);
     fireEvent.click(screen.getByRole("button", { name: "60 fps" }));
     expect(
-      await screen.findByText("AV1 in software is limited to 1080p30 on this PC"),
+      await screen.findByText(/AV1 in software is limited to 1080p30 on this PC\./),
     ).toBeVisible();
   });
 
@@ -233,9 +239,7 @@ describe("ShareStartDialog", () => {
     const save = vi.spyOn(api, "settingsUpdate");
     const { onConfirm } = await open();
     fireEvent.click(screen.getByRole("button", { name: "1080p" }));
-    fireEvent.change(screen.getByRole("combobox", { name: "Upload limit" }), {
-      target: { value: "5" },
-    });
+    choose("Upload limit", "5 Mbit/s");
     fireEvent.click(screen.getByRole("button", { name: "Choose what to share" }));
     expect(onConfirm).toHaveBeenCalledWith({
       choice: { resolution: "1080", fps: "30", optimize: "balanced", uploadLimit: "5" },

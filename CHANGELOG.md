@@ -9,6 +9,7 @@
 
 ### Fixed
 
+- Camera and screen share dialogs: the dropdowns use the app's own design like in Settings, and the codec note ends its sentence before the next one starts
 - Settings → Plugins: the cards have the same gap as on the other pages, every card has its icon, and the "Output level (debug)" meter only shows in development builds
 
 ## [0.7.1] - 2026-11-07
