@@ -43,7 +43,8 @@
     "linkAddress": "Linkin osoite",
     "linkApply": "Lisää linkki",
     "bulletList": "Luettelomerkit",
-    "numberedList": "Numeroitu luettelo"
+    "numberedList": "Numeroitu luettelo",
+    "underline": "Alleviivaus"
   },
   "register": {
     "title": "Rekisteröidy tälle palvelimelle",

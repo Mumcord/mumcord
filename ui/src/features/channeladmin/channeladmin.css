@@ -1,0 +1,162 @@
+/* Channel window (Epic 4, issue #250, mockup "Edit channel"). */
+
+.channel-window.servers-dialog {
+  width: min(46rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.channel-window__path {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.channel-window__tabs {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.channel-window__tab {
+  padding: var(--space-2) var(--space-1);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.channel-window__tab[aria-selected="true"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.channel-window__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.channel-window__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 40rem) {
+  .channel-window__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.channel-window__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.channel-window__label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.channel-window__preview {
+  min-height: 7em;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
+}
+
+/* The hint sits inside the field, at its end, as in the mockup ("0 = server default"). */
+.channel-window__number {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.channel-window__number input {
+  flex: 1;
+  min-width: 0;
+}
+
+.channel-window__number span {
+  position: absolute;
+  inset-inline-end: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
+}
+
+.channel-window__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.channel-window__note {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  font-size: var(--font-size-sm);
+}
+
+.channel-window__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 20rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+}
+
+.channel-window__links legend {
+  margin-bottom: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.channel-window__link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.channel-window__link[data-disabled] {
+  color: var(--color-text-muted);
+}
+
+.channel-window__error {
+  margin: var(--space-3) 0 0;
+  color: var(--color-danger);
+}
+
+.channel-window__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.channel-window__status {
+  flex: 1;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* The shared field grows in a row; in this column it takes only its own height. */
+.channel-window__body > .admin-field {
+  flex: none;
+}
+
+/* "Description" names an editor, not an input, so it is a span; it reads like the other labels. */
+.channel-window__label-row > span {
+  color: var(--color-text);
+  font-size: inherit;
+}

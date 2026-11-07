@@ -43,7 +43,8 @@
     "linkAddress": "Linkadresse",
     "linkApply": "Tilføj link",
     "bulletList": "Punktopstilling",
-    "numberedList": "Nummereret liste"
+    "numberedList": "Nummereret liste",
+    "underline": "Understreget"
   },
   "register": {
     "title": "Registrér på denne server",

@@ -4,6 +4,7 @@
 
 ### Added
 
+- Channel management for admins: the channel menu's "Admin ▸" can create a sub-channel or a temporary channel, edit a channel (name, description with bold, italic, underline and links, parent, position, user limit) and its links, link it with your channel, unlink all, and delete it after a confirmation that names the sub-channels and people affected. F2 edits and Delete deletes the selected channel. Only what the server allows is shown, and a refusal shows the server's reason
 - Menus can open sub-menus: admin actions in the server ⋯ menu now sit under "Admin ▸" ("Ban list…" for now), shown only when you have a right in it, with red actions last behind a divider. → opens a sub-menu, ← or Escape goes back
 - When a server's relay changes, Mumcord says so in the notification centre and as a notification (in-app or system), with "Trust new relay" and "Details"; the details compare the old and new fingerprint and say when to trust it. The chat's file sharing hint names the changed relay and links there instead of saying there is no relay
 - Activity feed: an icon for each kind of event, and the feed is saved on this device, so it is still there after a reconnect or a restart (an "Earlier" line marks where this session starts). Settings → Privacy → "Clear activity history" removes it for all servers

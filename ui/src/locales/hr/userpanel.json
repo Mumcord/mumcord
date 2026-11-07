@@ -43,7 +43,8 @@
     "linkAddress": "Adresa poveznice",
     "linkApply": "Dodaj poveznicu",
     "bulletList": "Popis s grafičkim oznakama",
-    "numberedList": "Numerirani popis"
+    "numberedList": "Numerirani popis",
+    "underline": "Podcrtano"
   },
   "register": {
     "title": "Registriraj se na ovom poslužitelju",

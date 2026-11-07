@@ -6,6 +6,10 @@ import { ChannelAudioDialog, profileKind, useChannelAudioProfile } from "../chan
 import { ClearHistoryDialog } from "../chat/history/ClearHistory";
 import { useFollowControl, type FollowControl } from "../follow";
 import { EyeIcon } from "../follow/EyeIcon";
+import { adminEntry } from "../admin/adminMenu";
+import { refusalText } from "../channeladmin/channelAdminModel";
+import { ChannelWindow } from "../channeladmin/ChannelWindow";
+import { DeleteChannelDialog } from "../channeladmin/DeleteChannelDialog";
 import type { MenuItem } from "../servers/ServerMenu";
 import { ChannelInfoDialog } from "./ChannelInfoDialog";
 import { channelLink, channelPath } from "./channelModel";
@@ -36,6 +40,9 @@ export interface ChannelActionsOptions {
   onStatus: (text: string) => void;
   /** Joins the channel (tree only); left out while the user is already in it. */
   join?: (() => void) | undefined;
+  /** F2 or Delete (tree only): starts with "Edit channel…" or "Delete channel?" open when the user
+   * has the right (FR-10.10). */
+  shortcut?: "edit" | "delete" | undefined;
 }
 
 export interface ChannelActions {
@@ -47,7 +54,7 @@ export interface ChannelActions {
   follow: FollowControl;
 }
 
-type DialogKind = "info" | "audio" | "clear" | "move";
+type DialogKind = "info" | "audio" | "clear" | "move" | "create" | "createTemp" | "edit" | "delete";
 
 /**
  * The one list of channel actions (issues #170, #172), shared by the channel-name menu in the
@@ -57,14 +64,23 @@ type DialogKind = "info" | "audio" | "clear" | "move";
  */
 export function useChannelActions(
   channelId: number,
-  { context, closeMenu, restoreFocus, onStatus, join }: ChannelActionsOptions,
+  { context, closeMenu, restoreFocus, onStatus, join, shortcut }: ChannelActionsOptions,
 ): ChannelActions {
   const { t } = useTranslation("channelheader");
   const { t: tWhisper } = useTranslation("whisper");
+  const { t: tAdmin } = useTranslation("admin");
   const server = useServerState();
   const follow = useFollowControl(channelId);
   const audioKind = profileKind(useChannelAudioProfile(server.serverId, channelId));
-  const [dialog, setDialog] = useState<DialogKind | null>(null);
+  const [dialog, setDialog] = useState<DialogKind | null>(() => {
+    const rights = server.channels.get(channelId);
+    const allowed =
+      server.serverId !== null &&
+      rights !== undefined &&
+      rights.permissions.write &&
+      (shortcut === "edit" || rights.parentId !== null);
+    return shortcut !== undefined && allowed ? shortcut : null;
+  });
 
   const channel = server.channels.get(channelId);
   const name = channel?.name ?? "";
@@ -102,6 +118,101 @@ export function useChannelActions(
         console.error("Joining a protected channel failed", error);
       });
   };
+
+  const quickLink = async (change: { linksAdd: number[]; linksRemove: number[] }) => {
+    if (server.serverId === null) return;
+    try {
+      const result = await getApi().channelEdit(server.serverId, channelId, {
+        name: null,
+        description: null,
+        parentId: null,
+        position: null,
+        maxUsers: null,
+        ...change,
+      });
+      const refusal = refusalText(tAdmin, result);
+      if (refusal !== null) onStatus(refusal);
+    } catch (error) {
+      console.error("Changing the channel links failed", error);
+      onStatus(tAdmin("channel.failed"));
+    }
+  };
+
+  /** "Admin ▸" (FR-10.8): only what the server allows here, red items last (FR-10.6). */
+  function adminItems(): MenuItem | null {
+    if (!connected || channel === undefined) return null;
+    const rights = channel.permissions;
+    const own = server.selfSession === null ? undefined : server.users.get(server.selfSession);
+    const ownChannel = own === undefined ? undefined : server.channels.get(own.channelId);
+    const items: MenuItem[] = [];
+    // A temporary channel cannot hold sub-channels.
+    if (rights.makeChannel && !channel.temporary) {
+      items.push({
+        id: "createChannel",
+        label: tAdmin("channel.menuCreate"),
+        onSelect: () => {
+          openDialog("create");
+        },
+      });
+    }
+    if (rights.makeTempChannel && !channel.temporary) {
+      items.push({
+        id: "createTempChannel",
+        label: tAdmin("channel.menuCreateTemp"),
+        onSelect: () => {
+          openDialog("createTemp");
+        },
+      });
+    }
+    if (rights.write) {
+      items.push({
+        id: "editChannel",
+        label: tAdmin("channel.menuEdit"),
+        onSelect: () => {
+          openDialog("edit");
+        },
+      });
+    }
+    if (
+      rights.linkChannel &&
+      ownChannel !== undefined &&
+      ownChannel.id !== channelId &&
+      ownChannel.permissions.linkChannel &&
+      !channel.links.includes(ownChannel.id)
+    ) {
+      const mine = ownChannel.id;
+      items.push({
+        id: "linkChannel",
+        label: tAdmin("channel.menuLink"),
+        onSelect: () => {
+          closeMenu(true);
+          void quickLink({ linksAdd: [mine], linksRemove: [] });
+        },
+      });
+    }
+    if (rights.linkChannel && channel.links.length > 0) {
+      const links = channel.links;
+      items.push({
+        id: "unlinkAll",
+        label: tAdmin("channel.menuUnlinkAll"),
+        onSelect: () => {
+          closeMenu(true);
+          void quickLink({ linksAdd: [], linksRemove: links });
+        },
+      });
+    }
+    if (rights.write && channel.parentId !== null) {
+      items.push({
+        id: "deleteChannel",
+        label: tAdmin("channel.menuDelete"),
+        danger: true,
+        onSelect: () => {
+          openDialog("delete");
+        },
+      });
+    }
+    return adminEntry(tAdmin("menuAdmin"), items);
+  }
 
   const joinItem: MenuItem | null = join
     ? {
@@ -222,6 +333,8 @@ export function useChannelActions(
       }
     : null;
 
+  const admin = adminItems();
+
   const ordered = [
     joinItem,
     followItem,
@@ -232,6 +345,7 @@ export function useChannelActions(
     infoItem,
     moveItem,
     clearItem,
+    admin,
   ].filter((item): item is MenuItem => item !== null);
   // "Join channel" stands apart from the rest, like in the mockup.
   const items = ordered.map((item, index) =>
@@ -259,7 +373,35 @@ export function useChannelActions(
     );
   } else if (dialog === "move") {
     dialogNode = <MoveUsersDialog channelId={channelId} onClose={closeDialog} />;
+  } else if (dialog === "create" || dialog === "createTemp") {
+    dialogNode = (
+      <ChannelWindow
+        mode={{ kind: "create", parentId: channelId, temporary: dialog === "createTemp" }}
+        onClose={closeDialog}
+      />
+    );
+  } else if (dialog === "edit") {
+    dialogNode = (
+      <ChannelWindow
+        mode={{ kind: "edit", channelId }}
+        onClose={closeDialog}
+        onDelete={
+          channel?.permissions.write && channel.parentId !== null
+            ? () => {
+                setDialog("delete");
+              }
+            : undefined
+        }
+      />
+    );
+  } else if (dialog === "delete") {
+    dialogNode = <DeleteChannelDialog channelId={channelId} onClose={closeDialog} />;
   }
 
-  return { label: t("menu.label", { channel: name }), items, dialog: dialogNode, follow };
+  return {
+    label: t("menu.label", { channel: name }),
+    items,
+    dialog: dialogNode,
+    follow,
+  };
 }

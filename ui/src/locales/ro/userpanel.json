@@ -43,7 +43,8 @@
     "linkAddress": "Adresa linkului",
     "linkApply": "Adaugă link",
     "bulletList": "Listă cu marcatori",
-    "numberedList": "Listă numerotată"
+    "numberedList": "Listă numerotată",
+    "underline": "Subliniat"
   },
   "register": {
     "title": "Înregistrează-te pe acest server",

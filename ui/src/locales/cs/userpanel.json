@@ -43,7 +43,8 @@
     "linkAddress": "Adresa odkazu",
     "linkApply": "Přidat odkaz",
     "bulletList": "Odrážkový seznam",
-    "numberedList": "Číslovaný seznam"
+    "numberedList": "Číslovaný seznam",
+    "underline": "Podtržení"
   },
   "register": {
     "title": "Registrovat se na tomto serveru",

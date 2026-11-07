@@ -43,7 +43,8 @@
     "linkAddress": "Naslov povezave",
     "linkApply": "Dodaj povezavo",
     "bulletList": "Seznam z oznakami",
-    "numberedList": "Oštevilčen seznam"
+    "numberedList": "Oštevilčen seznam",
+    "underline": "Podčrtano"
   },
   "register": {
     "title": "Registriraj se na tem strežniku",

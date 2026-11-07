@@ -43,7 +43,8 @@
     "linkAddress": "Адрес на връзката",
     "linkApply": "Добави връзка",
     "bulletList": "Списък с водачи",
-    "numberedList": "Номериран списък"
+    "numberedList": "Номериран списък",
+    "underline": "Подчертан"
   },
   "register": {
     "title": "Регистрирай се на този сървър",

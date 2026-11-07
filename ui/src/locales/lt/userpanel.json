@@ -43,7 +43,8 @@
     "linkAddress": "Nuorodos adresas",
     "linkApply": "Pridėti nuorodą",
     "bulletList": "Sąrašas su ženkleliais",
-    "numberedList": "Numeruotas sąrašas"
+    "numberedList": "Numeruotas sąrašas",
+    "underline": "Pabraukta"
   },
   "register": {
     "title": "Registruotis šiame serveryje",

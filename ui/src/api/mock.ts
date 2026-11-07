@@ -39,6 +39,9 @@ import type {
   AudioDevices,
   ChannelAudioProfile,
   ChannelInfo,
+  ChannelResult,
+  DenialKind,
+  Right,
   ChatMessage,
   ConnectionState,
   ConnectionStats,
@@ -1547,6 +1550,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
 
   /** Emits an event of the server the running command or control addresses. */
+  /** A refused channel change, as the engine reports the server's answer (issue #250). */
+  function refusedChannel(denial: DenialKind, permission: Right | null): ChannelResult {
+    return { kind: "refused", denial, permission, reason: null };
+  }
+
   function emitServer<K extends ServerEventName>(
     event: K,
     payload: Omit<EventPayloads[K], "serverId">,
@@ -2636,6 +2644,119 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
 
     // people
+    channelCreate: (serverId, input) => {
+      requireSession(serverId);
+      const snap = requireSnapshot();
+      const parent = requireChannel(input.parentId);
+      const allowed = input.temporary
+        ? parent.permissions.makeTempChannel
+        : parent.permissions.makeChannel;
+      if (!allowed) {
+        return Promise.resolve(
+          refusedChannel("permission", input.temporary ? "makeTempChannel" : "makeChannel"),
+        );
+      }
+      const name = input.name.trim();
+      if (snap.channels.some((c) => c.parentId === parent.id && c.name === name)) {
+        return Promise.resolve(refusedChannel("channelName", null));
+      }
+      const id = Math.max(...snap.channels.map((c) => c.id)) + 1;
+      const channel: ChannelInfo = {
+        id,
+        parentId: parent.id,
+        name,
+        position: input.position,
+        permissions: parent.permissions,
+        description: input.description,
+        hasDescription: input.description !== null,
+        maxUsers: input.maxUsers === 0 ? null : input.maxUsers,
+        temporary: input.temporary,
+        links: [],
+        enterRestricted: false,
+      };
+      snap.channels = [...snap.channels, channel];
+      emitServer("channelUpserted", { channel });
+      // The server moves the creator into a new temporary channel.
+      if (input.temporary) updateUser(SELF_SESSION, { channelId: id });
+      return Promise.resolve({ kind: "confirmed", channelId: id });
+    },
+    channelEdit: (serverId, channelId, change) => {
+      requireSession(serverId);
+      const snap = requireSnapshot();
+      const channel = requireChannel(channelId);
+      const linking = change.linksAdd.length > 0 || change.linksRemove.length > 0;
+      if (linking && !channel.permissions.linkChannel) {
+        return Promise.resolve(refusedChannel("permission", "linkChannel"));
+      }
+      const editing =
+        change.name !== null ||
+        change.description !== null ||
+        change.parentId !== null ||
+        change.position !== null ||
+        change.maxUsers !== null;
+      if (editing && !channel.permissions.write) {
+        return Promise.resolve(refusedChannel("permission", "write"));
+      }
+      const links = new Set(channel.links);
+      change.linksAdd.forEach((id) => links.add(id));
+      change.linksRemove.forEach((id) => links.delete(id));
+      const updated: ChannelInfo = {
+        ...channel,
+        name: change.name ?? channel.name,
+        parentId: change.parentId ?? channel.parentId,
+        position: change.position ?? channel.position,
+        maxUsers: change.maxUsers === null ? channel.maxUsers : change.maxUsers || null,
+        description: change.description === null ? channel.description : change.description || null,
+        hasDescription:
+          change.description === null ? channel.hasDescription : change.description !== "",
+        links: [...links].sort((a, b) => a - b),
+      };
+      // Links go both ways, so the other channels change too.
+      const others = snap.channels
+        .filter((c) => change.linksAdd.includes(c.id) || change.linksRemove.includes(c.id))
+        .map((c) => ({
+          ...c,
+          links: change.linksAdd.includes(c.id)
+            ? [...new Set([...c.links, channelId])].sort((a, b) => a - b)
+            : c.links.filter((id) => id !== channelId),
+        }));
+      const changed = new Map([updated, ...others].map((c) => [c.id, c]));
+      snap.channels = snap.channels.map((c) => changed.get(c.id) ?? c);
+      changed.forEach((c) => {
+        emitServer("channelUpserted", { channel: c });
+      });
+      return Promise.resolve({ kind: "confirmed", channelId });
+    },
+    channelRemove: (serverId, channelId) => {
+      requireSession(serverId);
+      const snap = requireSnapshot();
+      const channel = requireChannel(channelId);
+      if (!channel.permissions.write) {
+        return Promise.resolve(refusedChannel("permission", "write"));
+      }
+      const gone = new Set([channelId]);
+      for (let grew = true; grew;) {
+        grew = false;
+        for (const c of snap.channels) {
+          if (c.parentId !== null && gone.has(c.parentId) && !gone.has(c.id)) {
+            gone.add(c.id);
+            grew = true;
+          }
+        }
+      }
+      // The server moves the people in deleted channels to the parent.
+      snap.users
+        .filter((u) => gone.has(u.channelId))
+        .forEach((u) => {
+          updateUser(u.session, { channelId: channel.parentId ?? 0 });
+        });
+      snap.channels = snap.channels.filter((c) => !gone.has(c.id));
+      gone.forEach((id) => {
+        emitServer("channelRemoved", { channelId: id });
+      });
+      return Promise.resolve({ kind: "confirmed", channelId });
+    },
+
     personSetVolume: (serverId, session, volume) => {
       requireSession(serverId);
       if (!Number.isInteger(volume) || volume < 0 || volume > 200) {

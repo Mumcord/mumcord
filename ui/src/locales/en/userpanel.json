@@ -43,7 +43,8 @@
     "linkAddress": "Link address",
     "linkApply": "Add link",
     "bulletList": "Bulleted list",
-    "numberedList": "Numbered list"
+    "numberedList": "Numbered list",
+    "underline": "Underline"
   },
   "register": {
     "title": "Register on this server",
