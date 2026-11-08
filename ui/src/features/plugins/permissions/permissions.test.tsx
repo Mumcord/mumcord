@@ -139,8 +139,11 @@ describe("PermissionList", () => {
 });
 
 describe("permission catalogue helpers", () => {
-  it("has a glyph for every permission", () => {
+  it("has a drawn icon for every permission, no text glyph (#588)", () => {
     expect(Object.keys(PERMISSION_ICONS).sort()).toEqual(Object.keys(PERMISSION_RISK).sort());
+    for (const path of Object.values(PERMISSION_ICONS)) {
+      expect(path).toMatch(/^M[\d.\s,a-zA-Z-]+$/);
+    }
   });
 
   it("names permissions in plain language and shows unknown ids as they are", () => {

@@ -29,7 +29,7 @@ const STREAM: u32 = MF_SOURCE_READER_FIRST_VIDEO_STREAM.0 as u32;
 const ALL_STREAMS: u32 = MF_SOURCE_READER_ALL_STREAMS.0 as u32;
 
 /// Handed to the pump when a sample cannot be read; it counts as an unreadable frame.
-const UNREADABLE: Raw<'static> = Raw::Packed {
+pub(super) const UNREADABLE: Raw<'static> = Raw::Packed {
     data: &[],
     stride: 0,
 };

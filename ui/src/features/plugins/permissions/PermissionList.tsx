@@ -55,7 +55,19 @@ function Row({
   const content = (
     <>
       <span className={`perm-icon perm-risk-${risk}`} aria-hidden="true">
-        {known ? PERMISSION_ICONS[id] : UNKNOWN_PERMISSION_ICON}
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          focusable="false"
+        >
+          <path d={known ? PERMISSION_ICONS[id] : UNKNOWN_PERMISSION_ICON} />
+        </svg>
       </span>
       <span className="perm-body">
         <span className="perm-text">
