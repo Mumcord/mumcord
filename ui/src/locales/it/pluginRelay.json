@@ -17,7 +17,7 @@
   "sounds": {
     "title": "Suoni dei plugin",
     "volume": "Volume dei suoni dei plugin",
-    "mute": "Silenzia i suoni dei plugin",
+    "mute": "Disattiva i suoni dei plugin",
     "text": "Brevi suoni inclusi nei plugin. Volume e silenziamento valgono per tutti i plugin."
   }
 }

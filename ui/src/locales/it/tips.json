@@ -15,7 +15,7 @@
   "tips": {
     "servers": {
       "title": "I tuoi server",
-      "body": "La barra all'estrema sinistra contiene i tuoi server. Aggiungine uno con + o sfoglia i server pubblici con la lente d'ingrandimento. Puoi connetterti a più server contemporaneamente."
+      "body": "La barra all'estrema sinistra contiene i tuoi server. Aggiungine uno con + o cerca server pubblici con la lente d'ingrandimento. Puoi restare connesso a più server contemporaneamente."
     },
     "channels": {
       "title": "Canali",
@@ -43,7 +43,7 @@
     },
     "themes": {
       "title": "Il tuo stile",
-      "body": "L’ingranaggio in basso a sinistra passa dal tema scuro a quello chiaro. In Impostazioni → Aspetto trovi altri temi, e un server può averne uno tutto suo: fai clic con il tasto destro e scegli Tema."
+      "body": "L'ingranaggio in basso a sinistra passa dal tema scuro a quello chiaro. In Impostazioni → Aspetto trovi altri temi, e un server può averne uno tutto suo: fai clic destro sul server e scegli Tema."
     },
     "end": {
       "title": "Ecco fatto!",

@@ -9,7 +9,7 @@
     "unmuted": "Microfono attivato",
     "deafened": "Audio disattivato. Non senti gli altri e il tuo microfono è disattivato",
     "undeafened": "Audio attivato",
-    "leftVoice": "Voce lasciata su {{server}}",
+    "leftVoice": "Sei uscito dalla voce su {{server}}",
     "disconnected": "Disconnesso da {{server}}",
     "disconnectedAll": "Disconnesso da tutti i server"
   },
@@ -23,8 +23,8 @@
     "connected": "Connesso",
     "readOnly": "Sola lettura",
     "disconnected": "Non connesso",
-    "playing": "Gioca a {{game}}",
-    "listening": "Ascolta {{track}}"
+    "playing": "Sta giocando a {{game}}",
+    "listening": "Sta ascoltando {{track}}"
   },
   "profile": {
     "title": "Modifica profilo",
@@ -108,7 +108,7 @@
   "disconnectMenu": {
     "label": "Opzioni di disconnessione",
     "open": "Altre opzioni di disconnessione",
-    "leaveVoice": "Lascia la voce",
+    "leaveVoice": "Esci dalla voce",
     "leaveVoiceHint": "Smetti di parlare e ascoltare, resta connesso per la chat",
     "disconnectHint": "Chiudi la connessione a questo server",
     "switchTo": "Sposta la voce su {{server}}",
@@ -116,8 +116,8 @@
     "allHint": "Chiudi tutte le connessioni ai server"
   },
   "disconnectAll": {
-    "title": "Disconnettere da tutti i server?",
-    "message": "Disconnettere da tutti i {{total}} server?",
+    "title": "Disconnetterti da tutti i server?",
+    "message": "Disconnetterti da tutti i {{total}} server?",
     "confirm": "Disconnetti"
   },
   "audio": {
@@ -127,7 +127,7 @@
     "outputDevices": "Dispositivo di uscita",
     "systemDefault": "Predefinito di sistema",
     "noDevices": "Nessun dispositivo trovato",
-    "noiseSuppression": "Riduzione del rumore",
+    "noiseSuppression": "Soppressione del rumore",
     "testSound": "Prova suono",
     "voiceSettings": "Impostazioni vocali…",
     "fallbackInput": "Microfono scollegato. Viene usato il predefinito di sistema.",
@@ -186,7 +186,7 @@
     "imageBusy": "Adattamento dell'immagine al limite del server…",
     "imageScaled": "Immagine ridotta a {{width}} × {{height}} per rispettare il limite del server",
     "imageTooLarge": "Questa immagine non rientra nel limite del server, nemmeno ridotta. Usa un'immagine più piccola o accorcia il testo.",
-    "imageNotImage": "Si possono aggiungere solo immagini PNG, JPEG, GIF or WebP.",
+    "imageNotImage": "Puoi aggiungere solo immagini PNG, JPEG, GIF o WebP.",
     "imageUnreadable": "Impossibile leggere l'immagine. Prova con un altro file.",
     "imageSourceTooLarge": "Questo file è troppo grande (oltre 25 MB).",
     "overText": "Troppo lungo per questo server: {{used}} di {{limit}} caratteri. Accorcia il testo.",

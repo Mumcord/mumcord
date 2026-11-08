@@ -46,7 +46,7 @@
     "next": "Successivo",
     "seek": "Vai a",
     "volume": "Volume",
-    "syncedPlay": "Sincronizzato",
+    "syncedPlay": "Riproduzione sincronizzata",
     "keys": "Spazio · ← → · M · F · Esc",
     "inControl": "{{name}} ha il controllo",
     "inSync": "Sincronizzato",
@@ -71,13 +71,13 @@
     "onTopFailed": "Impossibile modificare «Sempre in primo piano»",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Ridimensiona l’area multimediale",
-      "valueText": "{{percent}}% dell’altezza della finestra",
-      "ofWindow": "dell’altezza della finestra",
+      "label": "Ridimensiona l'area multimediale",
+      "valueText": "{{percent}}% dell'altezza della finestra",
+      "ofWindow": "dell'altezza della finestra",
       "chatMinimum": "la chat mantiene il suo minimo",
       "release": "rilascia per comprimere",
       "keys": "↑ ↓ ridimensiona · PagSù/PagGiù aggancia · Home/Fine · Invio ripristina",
-      "releaseHint": "Rilascia per ridurre a mini barra",
+      "releaseHint": "Rilascia per ridurre alla mini barra",
       "minimised": "Area multimediale ridotta"
     },
     "stage": {

@@ -4,8 +4,8 @@
     "noPermission": "Il server non permette di sussurrare qui"
   },
   "banner": {
-    "whisper": "Sussurri a {{target}}",
-    "shout": "Gridi a {{target}}",
+    "whisper": "Stai sussurrando a {{target}}",
+    "shout": "Stai gridando a {{target}}",
     "releaseKey": "Solo le persone lì ti sentono. Rilascia <key>{{key}}</key> per parlare di nuovo in {{channel}}.",
     "stopToReturn": "Solo le persone lì ti sentono. Interrompi per parlare di nuovo in {{channel}}.",
     "onlyThere": "Solo le persone lì ti sentono.",
@@ -37,8 +37,8 @@
     "menu": "Destinatari di sussurri e grida",
     "manage": "Gestisci destinatari…",
     "none": "Ancora nessun destinatario",
-    "indicatorWhisper": "Sussurri a {{target}}",
-    "indicatorShout": "Gridi a {{target}}",
+    "indicatorWhisper": "Stai sussurrando a {{target}}",
+    "indicatorShout": "Stai gridando a {{target}}",
     "stop": "Interrompi"
   }
 }
