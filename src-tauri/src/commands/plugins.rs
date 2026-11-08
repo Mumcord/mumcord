@@ -591,9 +591,15 @@ pub async fn plugins_index(
     let last_seen = u64::try_from(settings.plugins_last_official_sequence)
         .ok()
         .filter(|s| *s > 0);
-    let loaded = fetch_official(&client, &cache, &base, last_seen)
-        .await
-        .map_err(registry_error)?;
+    let loaded = fetch_official(
+        &client,
+        &cache,
+        &base,
+        last_seen,
+        settings.plugin_registry_cache,
+    )
+    .await
+    .map_err(registry_error)?;
     let (freshness, notice) = match &loaded.freshness {
         Freshness::Fresh => (IndexFreshness::Fresh, None),
         Freshness::NotModified => (IndexFreshness::NotModified, None),
@@ -635,6 +641,7 @@ pub async fn plugins_index(
             plugins.registry_cache(),
             repository,
             &is_official_id,
+            settings.plugin_registry_cache,
         )
         .await
         .map_err(plugins::service_error)?;

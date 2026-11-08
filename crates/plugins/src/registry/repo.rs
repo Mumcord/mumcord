@@ -101,13 +101,21 @@ pub async fn fetch_repository(
     cache_dir: &Path,
     repository: &PluginRepository,
     is_official_id: &(dyn Fn(&str) -> bool + Sync),
+    cache_enabled: bool,
 ) -> Result<RepoOutcome, RegistryError> {
+    let cache = |dir: &Path| {
+        if cache_enabled {
+            Cache::new(dir, INDEX_FILE)
+        } else {
+            Cache::disabled(dir, INDEX_FILE)
+        }
+    };
     let added = check_repository_url(&repository.url, client.policy().allow_localhost_http)?;
     let pinned = normalize_key(&repository.public_key)
         .ok_or_else(|| RegistryError::Format("the pinned key is not a minisign key".into()))?;
     let mut last_seen = u64::try_from(repository.last_sequence).ok();
     if let Some(sibling) = v1_1_sibling(&added, INDEX_FILE) {
-        let cache = Cache::new(&path_cache_dir(cache_dir, true), INDEX_FILE);
+        let cache = cache(&path_cache_dir(cache_dir, true));
         if cache.load().is_some() {
             last_seen = None;
         }
@@ -125,7 +133,7 @@ pub async fn fetch_repository(
             result => return result,
         }
     }
-    let cache = Cache::new(&path_cache_dir(cache_dir, false), INDEX_FILE);
+    let cache = cache(&path_cache_dir(cache_dir, false));
     let path = fetch_path(
         client,
         is_official_id,

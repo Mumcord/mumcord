@@ -596,7 +596,9 @@ impl Engine {
             password_overrides: Mutex::new(HashMap::new()),
             password_attempts: Mutex::default(),
             previews: Arc::new(crate::web::LinkPreviews::new(
-                Some(data_dir.join("link-previews")),
+                settings
+                    .link_previews_on_disk
+                    .then(|| data_dir.join("link-previews")),
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
             )),
