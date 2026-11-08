@@ -9,12 +9,12 @@
     "developer": "Programer"
   },
   "turnOffAll": "Isključi sve dodatke",
-  "allOff": "Svi su dodaci isključeni. Ostat će isključeni i nakon ponovnog pokretanja dok ih ne uključite.",
+  "allOff": "Svi su dodaci isključeni. Ostat će isključeni i nakon ponovnog pokretanja dok ih ne uključiš.",
   "noPlugins": "Dodaci su isključeni za ovu sesiju (pokrenuto s --no-plugins).",
   "loadFailed": "Dodatke nije bilo moguće učitati.",
   "palette": {
     "label": "Paleta naredbi",
-    "placeholder": "Upišite naredbu",
+    "placeholder": "Upiši naredbu",
     "empty": "Nema odgovarajuće naredbe",
     "openPlugins": "Dodaci",
     "turnOffAll": "Isključi sve dodatke"

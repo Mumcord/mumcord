@@ -1,11 +1,11 @@
 {
   "composer": {
-    "attach": "Dijeli datoteke",
-    "attachLabel": "Dijeli datoteke u ovom kanalu",
-    "dropTitle": "Ispusti za dijeljenje s #{{channel}}",
+    "attach": "Podijeli datoteke",
+    "attachLabel": "Podijeli datoteke u ovom kanalu",
+    "dropTitle": "Ispusti za dijeljenje u #{{channel}}",
     "dropChoiceTitle": "Neke od njih su slike. Što učiniti s njima?",
     "sendAsImage": "Pošalji kao sliku",
-    "shareAsFile": "Dijeli kao datoteku",
+    "shareAsFile": "Podijeli kao datoteku",
     "dropChoiceCancel": "Odustani",
     "dropHint": "Datoteke idu izravno onima koji ih preuzimaju, nikada preko poslužitelja. Mape se prvo komprimiraju.",
     "privateChat": "Datoteke se za sada mogu dijeliti samo u kanalima",
@@ -14,7 +14,7 @@
     "unreadable": "Nije moguće pročitati {{path}}",
     "serverRefused": "Poslužitelj je odbio poruku: {{reason}}",
     "trayLabel": "Datoteke za dijeljenje",
-    "chipPeerToPeer": "{{size}} · peer-to-peer",
+    "chipPeerToPeer": "{{size}} · P2P",
     "zipping": "Komprimiranje mape… {{percent}} %",
     "checking": "Provjera…",
     "checkingPercent": "Provjera… {{percent}} %",
@@ -41,7 +41,7 @@
     "tomorrow": "sutra u {{time}}"
   },
   "card": {
-    "label": "{{name}}, {{size}}, od {{sender}}, {{state}}",
+    "label": "{{name}}, {{size}}, pošiljatelj {{sender}}, {{state}}",
     "labelOwn": "{{name}}, {{size}}, dijeliš ti, {{state}}",
     "meta": "{{size}} · {{type}}",
     "metaOwn": "{{size}} · {{type}} · dijeliš ti",
@@ -58,22 +58,22 @@
     "progressLabel": "Preuzimanje: {{name}}",
     "progressValue": "{{percent}} %",
     "progress": "{{percent}} % · {{received}} od {{size}} · {{speed}} · preostalo još oko {{left}}",
-    "transport": "Peer-to-peer · enkripcija s kraja na kraj",
+    "transport": "P2P · sveobuhvatno šifrirano",
     "checking": "Provjera…",
     "done": "✓ Preuzeto",
     "matches": "✓ Odgovara ponudi",
-    "savedTo": "Spremljeno u {{folder}}",
+    "savedTo": "Spremljeno u mapu {{folder}}",
     "openFolder": "Otvori mapu",
     "open": "Otvori",
-    "gone": "Datoteke više nema u {{folder}}",
-    "mismatchTitle": "Hash se ne podudara – datoteka je izbrisana",
+    "gone": "Datoteke više nema u mapi {{folder}}",
+    "mismatchTitle": "Kontrolni zbroj se ne podudara – datoteka je izbrisana",
     "mismatch": "Datoteka se promijenila u prijenosu ili ne odgovara ponudi pa je izbrisana. Ništa nije spremljeno niti otvoreno. Zamoli korisnika {{sender}} da je ponovno podijeli.",
     "failed": "Preuzimanje nije uspjelo: {{reason}}",
     "cancelled": "Preuzimanje otkazano",
     "busy": "{{sender}} je zauzet, pokušaj kasnije",
-    "noSpace": "Nema dovoljno prostora na disku u {{folder}}",
+    "noSpace": "Nema dovoljno prostora na disku u mapi {{folder}}",
     "reason": {
-      "noAnswer": "{{sender}} nije odgovorio",
+      "noAnswer": "{{sender}} nije odgovorio/la",
       "connect": "Povezivanje preko releja nije uspjelo: {{reason}}",
       "connectUnknown": "Povezivanje preko releja nije uspjelo",
       "stalled": "Prijenos je zapeo",
@@ -85,13 +85,13 @@
       "downloading": "preuzima se",
       "checking": "provjerava se",
       "done": "preuzeto",
-      "mismatch": "hash se ne podudara, datoteka izbrisana",
+      "mismatch": "kontrolni zbroj se ne podudara, datoteka izbrisana",
       "failed": "preuzimanje nije uspjelo",
       "cancelled": "otkazano",
       "unavailable": "nedostupno"
     },
     "unavailable": {
-      "offline": "{{sender}} je otišao izvan mreže. Datoteka više nije dostupna.",
+      "offline": "{{sender}} više nije na mreži. Datoteka više nije dostupna.",
       "ended": "Ovo dijeljenje je završilo. Dijeljenja završavaju nakon 24 sata.",
       "askAgain": "Zamoli korisnika {{sender}} da je ponovno podijeli."
     },
@@ -118,7 +118,7 @@
     "ended": "Dijeljenje završeno",
     "endedStopped": "Dijeljenje je zaustavljeno",
     "endedExpired": "24 sata su prošla",
-    "endedLeft": "Poslužitelj je napušten",
+    "endedLeft": "Više nisi na poslužitelju",
     "endedChanged": "Datoteka se promijenila na disku pa je dijeljenje zaustavljeno"
   },
   "dialog": {
@@ -131,12 +131,12 @@
     "confirm": "Preuzmi",
     "cancel": "Odustani",
     "riskyTitle": "Ova datoteka mogla bi naškoditi tvom računalu",
-    "riskyFile": "{{name}} · {{size}} · od {{sender}}",
+    "riskyFile": "{{name}} · {{size}} · pošiljatelj {{sender}}",
     "riskyBody": "Ovo je program. Programi mogu mijenjati tvoje računalo i čitati tvoje datoteke. Preuzmi ga samo ako vjeruješ korisniku {{sender}} i očekuješ ovu datoteku.",
     "riskyNote": "Mumcord provjerava stiže li datoteka nepromijenjena, ali ne može znati je li sigurna.",
     "riskyConfirm": "Ipak preuzmi",
     "riskyCancel": "Ne preuzimaj",
-    "riskyOpenBody": "{{name}} je program ili skripta. Otvori je samo ako vjeruješ korisniku {{sender}}.",
+    "riskyOpenBody": "{{name}} je program ili skripta. Otvori samo ako vjeruješ korisniku {{sender}}.",
     "riskyOpenConfirm": "Ipak otvori"
   },
   "settings": {
@@ -153,6 +153,6 @@
     "saveTo": "Spremaj datoteke u",
     "change": "Promijeni…",
     "relayNote": "Datoteke uvijek putuju preko releja poslužitelja pa nitko ne vidi tvoju IP adresu. Poslužitelji bez releja ne mogu dijeliti datoteke. Ništa se ne preuzima bez tvog klika i potvrde.",
-    "encryptionNote": "Datoteke su enkriptirane s kraja na kraj i provjeravaju se nakon preuzimanja."
+    "encryptionNote": "Datoteke su sveobuhvatno šifrirane i provjeravaju se nakon preuzimanja."
   }
 }

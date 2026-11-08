@@ -7,10 +7,10 @@
     "title": "Omiljeni poslužitelji",
     "found_one": "{{count}} pronađen",
     "found_few": "{{count}} pronađena",
-    "found_other": "{{count}} pronađenih",
+    "found_other": "{{count}} pronađeno",
     "duplicates_one": "{{count}} već u Mumcordu (preskočen)",
     "duplicates_few": "{{count}} već u Mumcordu (preskočena)",
-    "duplicates_other": "{{count}} već u Mumcordu (preskočenih)",
+    "duplicates_other": "{{count}} već u Mumcordu (preskočeno)",
     "failed": "Popis poslužitelja iz Mumblea nije se mogao pročitati.",
     "review": "Pregledaj popis",
     "hide": "Sakrij popis",
@@ -22,11 +22,11 @@
     "count_one": "{{count}} omiljeni poslužitelj ima spremljenu lozinku",
     "count_few": "{{count}} omiljena poslužitelja imaju spremljenu lozinku",
     "count_other": "{{count}} omiljenih poslužitelja ima spremljenu lozinku",
-    "keychain": "Pohranjeno u sistemskom privjesku za ključeve"
+    "keychain": "Pohranjeno u privjesku ključeva sustava"
   },
   "identity": {
     "title": "Identitet (klijentski certifikat)",
-    "keeps": "Zadržava tvoje registrirano ime i dozvole",
+    "keeps": "Zadržava tvoje registrirano ime i dopuštenja",
     "locked": "zaštićen lozinkom u Mumbleu",
     "named": "Certifikat za „{{name}}“",
     "validUntil": "vrijedi do {{date}}",
@@ -43,7 +43,7 @@
     "missing": "Uređaji iz Mumblea nisu spojeni na ovo računalo."
   },
   "ptt": {
-    "title": "Tipka push-to-talk",
+    "title": "Tipka Push-to-talk",
     "modifierOnly": "Tipka u Mumbleu je samo modifikatorska tipka koju Mumcord ne može koristiti. Tipku možeš odabrati kasnije.",
     "tooManyKeys": "Prečac u Mumbleu ima više od jedne tipke, što Mumcord ne može koristiti. Tipku možeš odabrati kasnije.",
     "unknown": "Prečac u Mumbleu koristi tipku ili uređaj koji Mumcord ne poznaje. Tipku možeš odabrati kasnije."
@@ -79,13 +79,13 @@
     "passwords_one": "{{count}} lozinka spremljena",
     "passwords_few": "{{count}} lozinke spremljene",
     "passwords_other": "{{count}} lozinki spremljeno",
-    "passwordsDetail": "Pohranjeno u sistemskom privjesku za ključeve, a ne u datoteci",
+    "passwordsDetail": "Pohranjeno u privjesku ključeva sustava, a ne u datoteci",
     "identity": "Identitet uvezen",
     "identityDefault": "Mumcord ga sada koristi",
     "identityServers": "Koristi se za kopirane poslužitelje",
     "identitySkipped": "Identitet je već u Mumcordu",
     "identitySkippedDetail": "Ovaj certifikat već je jedan od tvojih identiteta",
-    "devicesAndPtt": "Audio uređaji i tipka push-to-talk",
+    "devicesAndPtt": "Audio uređaji i tipka Push-to-talk",
     "done": "Gotovo",
     "undo": "Poništi uvoz",
     "undone": "Uvoz je poništen.",

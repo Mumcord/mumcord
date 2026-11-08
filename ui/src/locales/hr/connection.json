@@ -2,10 +2,10 @@
   "open": "Podaci o vezi",
   "title": "Podaci o vezi",
   "loading": "Učitavanje…",
-  "notConnected": "Nisi povezan.",
+  "notConnected": "Nisi povezan/a.",
   "error": "Podaci o vezi trenutno nisu dostupni.",
   "none": "–",
-  "transport": "Prijenos",
+  "transport": "Protokol",
   "transportValue": {
     "udp": "UDP",
     "tcp": "TCP (tunelirano)"
@@ -41,18 +41,18 @@
     "good_few": "Bez problema u posljednje {{count}} minute",
     "good_other": "Bez problema u posljednjih {{count}} minuta",
     "network": "Dio glasa drugih je prikriven: gubitak u mreži",
-    "cpu": "Obrada vašeg zvuka kasni: visoko opterećenje procesora",
-    "device": "Vaš zvučni uređaj imao je prekide"
+    "cpu": "Obrada tvog zvuka kasni: visoko opterećenje procesora",
+    "device": "Tvoj zvučni uređaj imao je prekide"
   },
   "details": "Pojedinosti",
-  "sinceConnected": "Brojači od spajanja. Grafovi: posljednjih {{minutes}} min.",
+  "sinceConnected": "Brojači od povezivanja. Grafovi: posljednjih {{minutes}} min.",
   "about": "O stavci {{label}}",
   "help": {
     "dropouts": "Praznine kad zvučni uređaj nije stizao (preljev, podljev ili ponovno pokretanje). Normalno: 0.",
     "late": "Zvučni okviri koje je računalo obradilo prekasno, obično zbog visokog opterećenja procesora. Normalno: 0 ili blizu 0.",
     "concealed": "Glasovni okviri drugih koji nisu stigli na vrijeme pa je klijent popunio prazninu. Uzrok: gubitak u mreži. Normalno: blizu 0.",
     "jitter": "Kašnjenje koje izravnava glasovne pakete drugih koji stižu neravnomjerno. Normalno: 20–60 ms.",
-    "processing": "Vrijeme obrade jednog okvira od 10 ms s vašeg mikrofona. Normalno: znatno ispod 10 ms.",
+    "processing": "Vrijeme obrade jednog okvira od 10 ms s tvog mikrofona. Normalno: znatno ispod 10 ms.",
     "realtime": "Dobivaju li zvučne niti od sustava prioritet u stvarnom vremenu. Uključeno pomaže protiv prekida pod opterećenjem."
   },
   "recent": {
@@ -65,9 +65,9 @@
     "title": "Kvaliteta glasa",
     "status": "Ping {{latency}}, gubitak {{loss}}",
     "lowLatency": "Način niske latencije",
-    "lowLatencyHint": "Za zajedničko sviranje u stvarnom vremenu. Najbolje radi s funkcijom pritisni za govor.",
+    "lowLatencyHint": "Za zajedničko sviranje u stvarnom vremenu. Najbolje radi s Push-to-talkom.",
     "voiceSettings": "Postavke glasa…",
-    "applies": "Primjenjuje se odmah, sprema se kao u Postavke → Zvuk",
+    "applies": "Primjenjuje se odmah, sprema se kao u odjeljku Postavke → Zvuk",
     "keys": "Esc zatvara · ↑↓ pomiče · ← → podešava",
     "bandwidthLabel": "Procijenjena propusnost sa zaglavljima",
     "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
@@ -81,11 +81,11 @@
     "moreInfo": "Više informacija: {{topic}}",
     "effectiveShort": "Trenutno se šalje",
     "effectiveTip": "Brzina prijenosa koja se trenutno šalje, nakon prilagodbe gubitku paketa.",
-    "musicIncluded": "Uključeno dok je način niske latencije aktivan: suzbijanje šuma i automatska glasnoća su isključeni, a koder radi u postavci za glazbu s malim kašnjenjem.",
+    "musicIncluded": "Uključeno dok je način niske latencije aktivan: potiskivanje šuma i automatska glasnoća su isključeni, a koder radi u postavci za glazbu s malim kašnjenjem.",
     "warningBandwidth": "Troši više propusnosti: ≈ {{on}} kbit/s umjesto ≈ {{off}}.",
     "warningWifi": "Može zapinjati na Wi-Fi mreži ili opterećenoj vezi.",
     "warningHeadphones": "Koristi slušalice: poništavanje jeke je isključeno.",
-    "warningPtt": "Najbolje radi s funkcijom pritisni za govor.",
+    "warningPtt": "Najbolje radi s Push-to-talkom.",
     "bandwidthLowLatencyWithin": "Paketi od 10 ms dodaju opterećenje zaglavlja; unutar ograničenja. Isključi način da uštediš ≈ {{value}} kbit/s.",
     "bandwidthLowLatencyOver": "Paketi od 10 ms dodaju opterećenje zaglavlja; iznad ograničenja. Isključi način da uštediš ≈ {{value}} kbit/s.",
     "bandwidthLowLatencyNoLimit": "Paketi od 10 ms dodaju opterećenje zaglavlja. Isključi način da uštediš ≈ {{value}} kbit/s."

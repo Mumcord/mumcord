@@ -2,7 +2,7 @@
   "label": "Aaron, pomoćnik za savjete",
   "greeting": {
     "title": "Bok, ja sam Aaron!",
-    "body": "Ja sam aksolotl i Mumcord poznajem kao svoj džep. Želiš li kratak obilazak? Traje otprilike minutu. Ako ne sada, naći ćeš me u Postavke → O aplikaciji → Savjeti.",
+    "body": "Ja sam aksolotl i Mumcord poznajem kao svoj džep. Želiš li kratak obilazak? Traje otprilike minutu. Ako ne sada, naći ćeš me u odjeljku Postavke → O aplikaciji → Savjeti.",
     "start": "Pokaži mi",
     "later": "Ne sada"
   },
@@ -23,7 +23,7 @@
     },
     "talk": {
       "title": "Kako govoriš",
-      "body": "„Pritisni za govor” ili glasovna aktivacija? Odaberi u Postavke → Glas i zvuk ili otvori Postavke glasa… malom strelicom pored mikrofona. „Pritisni za govor” radi i s tipkama miša."
+      "body": "Push-to-talk ili glasovna aktivacija? Odaberi u odjeljku Postavke → Glas i zvuk ili otvori Postavke glasa… malom strelicom pokraj mikrofona. Push-to-talk radi i s tipkama miša."
     },
     "panel": {
       "title": "Tvoja korisnička ploča",
@@ -43,11 +43,11 @@
     },
     "themes": {
       "title": "Tvoj stil",
-      "body": "Zupčanik dolje lijevo prebacuje između tamne i svijetle teme. U Postavke → Izgled ima još tema, a poslužitelj može dobiti svoju: klikni ga desnom tipkom i odaberi Tema."
+      "body": "Zupčanik dolje lijevo prebacuje između tamne i svijetle teme. U odjeljku Postavke → Izgled ima još tema, a poslužitelj može dobiti svoju: klikni ga desnom tipkom i odaberi Tema."
     },
     "end": {
       "title": "To je to!",
-      "body": "Zabavi se u Mumcordu. Možeš me ponovno pozvati bilo kada u Postavke → O aplikaciji → Savjeti."
+      "body": "Zabavi se u Mumcordu. Možeš me ponovno pozvati bilo kada u odjeljku Postavke → O aplikaciji → Savjeti."
     }
   }
 }

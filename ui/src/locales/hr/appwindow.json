@@ -1,12 +1,12 @@
 {
   "close": {
-    "title": "Smanjiti u traku ili izaći?",
-    "description": "Još si povezan. Kad je smanjen, Mumcord te drži u glasovnom kanalu i ostaje u traci sustava.",
+    "title": "Smanjiti u područje obavijesti ili izaći?",
+    "description": "Još si povezan/a. Kad je smanjen, Mumcord te drži u glasovnom kanalu i ostaje u području obavijesti.",
     "remember": "Zapamti moj izbor",
-    "minimize": "Smanji u traku",
+    "minimize": "Smanji u područje obavijesti",
     "quit": "Izađi",
     "failed": "To nije uspjelo. Pokušaj ponovno.",
-    "descriptionServers": "Još si povezan s {{count}} poslužitelja. Minimiziran te Mumcord drži u glasovnom kanalu i ostaje u sistemskoj traci."
+    "descriptionServers": "Još si povezan/a s poslužiteljima ({{count}}). Kad je smanjen, Mumcord te drži u glasovnom kanalu i ostaje u području obavijesti."
   },
   "windowOverlay": {
     "title": "Overlay u prozoru je uklonjen",
@@ -15,14 +15,14 @@
     "openSettings": "Otvori postavke overlaya"
   },
   "audioDevice": {
-    "title": "Ponovno odaberite audiouređaje",
-    "description": "Mumcord sada zasebno prikazuje svaki ulaz i izlaz vaših audiouređaja. Spremljeni uređaj nije bilo moguće povezati ni s jednim od njih pa se zasad koristi zadani uređaj sustava. Uređaj možete odabrati u postavkama zvuka.",
+    "title": "Ponovno odaberi audiouređaje",
+    "description": "Mumcord sada zasebno prikazuje svaki ulaz i izlaz tvojih audiouređaja. Spremljeni uređaj nije bilo moguće povezati ni s jednim od njih pa se zasad koristi zadani uređaj sustava. Uređaj možeš odabrati u postavkama zvuka.",
     "dismiss": "Razumijem",
     "openSettings": "Otvori postavke zvuka"
   },
   "appImageMenu": {
     "title": "Dodati Mumcord u izbornik aplikacija?",
-    "description": "Tako se Mumcord pojavljuje u izborniku aplikacija. Ikona i pritisni za govor ispravno rade na Waylandu, a poveznice mumble:// otvaraju Mumcord. To možeš kasnije promijeniti u Postavkama.",
+    "description": "Tako se Mumcord pojavljuje u izborniku aplikacija. Ikona i Push-to-talk tada ispravno rade na Waylandu, a poveznice mumble:// otvaraju Mumcord. To možeš kasnije promijeniti u Postavkama.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Nije uspjelo. Pokušaj ponovno."
@@ -36,7 +36,7 @@
   },
   "directConsent": {
     "title": "Dopustiti izravne veze?",
-    "description": "Izravne veze su brže, ali druga osoba može vidjeti vašu IP adresu. Mumcord ih koristi za slike pune veličine i dijeljenje zaslona s drugim korisnicima Mumcorda te za njih može otvoriti port na vašem usmjerivaču. Ako odbijete, slike i dalje stižu preko poslužitelja, a dijeljenje zaslona nije dostupno. To možete promijeniti kasnije u Postavke → Privatnost. Ako ovaj poslužitelj nudi relej, Mumcord ga može koristiti umjesto toga; tada druga osoba ne vidi tvoju IP adresu.",
+    "description": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Mumcord ih koristi za slike pune veličine i dijeljenje zaslona s drugim korisnicima Mumcorda te za njih može otvoriti port na tvom usmjerivaču. Ako odbiješ, slike i dalje stižu preko poslužitelja, a dijeljenje zaslona nije dostupno. To možeš kasnije promijeniti u odjeljku Postavke → Privatnost. Ako ovaj poslužitelj nudi relej, Mumcord ga može koristiti umjesto toga; tada druga osoba ne vidi tvoju IP adresu.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Nije uspjelo. Pokušaj ponovno."
@@ -95,9 +95,9 @@
       "checked": "Potpis i kontrolni zbroj provjereni",
       "installed": "Instalirano",
       "installsOnRestart": "Instalira se kad se Mumcord ponovno pokrene",
-      "connected_one": "Povezan si s {{count}} poslužiteljem. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
-      "connected_few": "Povezan si s {{count}} poslužitelja. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
-      "connected_other": "Povezan si s {{count}} poslužitelja. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
+      "connected_one": "Povezan/a si s {{count}} poslužiteljem. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
+      "connected_few": "Povezan/a si s {{count}} poslužitelja. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
+      "connected_other": "Povezan/a si s {{count}} poslužitelja. Nakon ponovnog pokretanja Mumcord će se ponovno povezati i vratiti u tvoje kanale.",
       "later": "Kasnije",
       "restart": "Ponovno pokreni za ažuriranje",
       "announce": "Mumcord {{version}} je spreman. Ponovno pokreni za ažuriranje."
