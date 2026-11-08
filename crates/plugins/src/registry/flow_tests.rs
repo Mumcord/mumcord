@@ -57,11 +57,11 @@ async fn official_index_cache_offline_rollback_and_wrong_key() {
     let client = client();
     let root = base(&server.base);
 
-    let none = fetch_official_with(&client, cache.path(), &root, None, &keys).await;
+    let none = fetch_official_with(&client, cache.path(), &root, None, true, &keys).await;
     assert!(matches!(none, Err(RegistryError::Status(404))));
 
     publish(&server, "index.json", &official, &official_index(7));
-    let loaded = fetch_official_with(&client, cache.path(), &root, None, &keys)
+    let loaded = fetch_official_with(&client, cache.path(), &root, None, true, &keys)
         .await
         .expect("test step");
     assert!(matches!(loaded.freshness, Freshness::Fresh));
@@ -70,7 +70,7 @@ async fn official_index_cache_offline_rollback_and_wrong_key() {
     assert!(first.contains("user-agent: Mumcord\r\n"), "{first}");
     assert!(!first.contains("cookie") && !first.contains("referer"));
 
-    let again = fetch_official_with(&client, cache.path(), &root, Some(7), &keys)
+    let again = fetch_official_with(&client, cache.path(), &root, Some(7), true, &keys)
         .await
         .expect("test step");
     assert!(matches!(again.freshness, Freshness::NotModified));
@@ -85,7 +85,7 @@ async fn official_index_cache_offline_rollback_and_wrong_key() {
 
     // AC-6.18: a lower sequence is rejected and the cached list kept.
     publish(&server, "index.json", &official, &official_index(6));
-    let rolled = fetch_official_with(&client, cache.path(), &root, Some(7), &keys)
+    let rolled = fetch_official_with(&client, cache.path(), &root, Some(7), true, &keys)
         .await
         .expect("test step");
     assert!(matches!(
@@ -96,7 +96,7 @@ async fn official_index_cache_offline_rollback_and_wrong_key() {
 
     // AC-6.18: signed with a wrong key → "Signature check failed", cached list kept.
     publish(&server, "index.json", &keypair(), &official_index(8));
-    let forged = fetch_official_with(&client, cache.path(), &root, Some(7), &keys)
+    let forged = fetch_official_with(&client, cache.path(), &root, Some(7), true, &keys)
         .await
         .expect("test step");
     match forged.freshness {
@@ -105,14 +105,14 @@ async fn official_index_cache_offline_rollback_and_wrong_key() {
     }
     assert_eq!(forged.index.sequence, 7);
 
-    let offline = fetch_official_with(&client, cache.path(), &base(&dead_base()), Some(7), &keys)
+    let offline = fetch_official_with(&client, cache.path(), &base(&dead_base()), Some(7), true, &keys)
         .await
         .expect("test step");
     assert!(matches!(offline.freshness, Freshness::Offline));
     assert_eq!(offline.index.plugins[0].id, "dice");
 
     let empty = tempfile::tempdir().expect("test step");
-    let never = fetch_official_with(&client, empty.path(), &base(&dead_base()), None, &keys).await;
+    let never = fetch_official_with(&client, empty.path(), &base(&dead_base()), None, true, &keys).await;
     assert_eq!(never.expect_err("must fail").to_string(), UNREACHABLE_TEXT);
 }
 
@@ -124,6 +124,7 @@ async fn release_policy_refuses_plain_http() {
         Path::new("/nonexistent"),
         &base(&dead_base()),
         None,
+        true,
     )
     .await;
     assert!(matches!(result, Err(RegistryError::InsecureUrl)));
@@ -142,20 +143,20 @@ async fn revoked_merges_with_bundled_and_survives_offline() {
     .expect("test step");
     publish(&server, "revoked.json", &official, &list);
 
-    let loaded = fetch_revoked_with(&client, cache.path(), &base(&server.base), &keys)
+    let loaded = fetch_revoked_with(&client, cache.path(), &base(&server.base), true, &keys)
         .await
         .expect("test step");
     assert!(matches!(loaded.freshness, Freshness::Fresh));
     assert!(loaded.list.find("echolings", "1.0.0", "", None).is_some());
 
-    let offline = fetch_revoked_with(&client, cache.path(), &base(&dead_base()), &keys)
+    let offline = fetch_revoked_with(&client, cache.path(), &base(&dead_base()), true, &keys)
         .await
         .expect("test step");
     assert!(matches!(offline.freshness, Freshness::Offline));
     assert!(offline.list.find("echolings", "1.0.0", "", None).is_some());
 
     let fresh_dir = tempfile::tempdir().expect("test step");
-    let bundled = fetch_revoked_with(&client, fresh_dir.path(), &base(&dead_base()), &keys)
+    let bundled = fetch_revoked_with(&client, fresh_dir.path(), &base(&dead_base()), true, &keys)
         .await
         .expect("test step");
     assert_eq!(bundled.list, RevocationList::bundled());
@@ -219,7 +220,7 @@ async fn third_party_preview_fetch_key_change_and_rotation() {
 
     let cache = tempfile::tempdir().expect("test step");
     let repository = record(url.clone(), &old);
-    match fetch_repository(&client, cache.path(), &repository, &is_official)
+    match fetch_repository(&client, cache.path(), &repository, &is_official, true)
         .await
         .expect("test step")
     {
@@ -230,7 +231,7 @@ async fn third_party_preview_fetch_key_change_and_rotation() {
     // AC-6.22: a new key without a rotation entry pauses the repository.
     let body = serde_json::to_vec(&repo_index(&new, 2, vec![plugin("foo")])).expect("test step");
     publish(&server, "repo/index.json", &new, &body);
-    match fetch_repository(&client, cache.path(), &repository, &is_official)
+    match fetch_repository(&client, cache.path(), &repository, &is_official, true)
         .await
         .expect("test step")
     {
@@ -257,7 +258,7 @@ async fn third_party_preview_fetch_key_change_and_rotation() {
         &new,
         &serde_json::to_vec(&rotated).expect("test step"),
     );
-    match fetch_repository(&client, cache.path(), &repository, &is_official)
+    match fetch_repository(&client, cache.path(), &repository, &is_official, true)
         .await
         .expect("test step")
     {
@@ -278,7 +279,7 @@ async fn third_party_preview_fetch_key_change_and_rotation() {
     );
     let fresh = tempfile::tempdir().expect("test step");
     assert!(matches!(
-        fetch_repository(&client, fresh.path(), &repository, &is_official)
+        fetch_repository(&client, fresh.path(), &repository, &is_official, true)
             .await
             .expect("test step"),
         RepoOutcome::KeyChanged { .. }
@@ -318,7 +319,7 @@ async fn official_index_is_read_from_the_v1_1_folder() {
     publish(&server, "v1.1/index.json", &official, &body);
 
     let root = base(&format!("{}v1/", server.base));
-    let loaded = fetch_official_with(&client(), cache.path(), &root, Some(5), &keys)
+    let loaded = fetch_official_with(&client(), cache.path(), &root, Some(5), true, &keys)
         .await
         .expect("test step");
     let dice = loaded.index.plugin("dice").expect("test step");
@@ -349,7 +350,7 @@ async fn third_party_sibling_v1_1_index_with_404_fallback() {
     publish(&server, "repo/v1.1/index.json", &key, &v1_1(1));
     let mut repository = record(format!("{}repo/v1/index.json", server.base), &key);
     repository.last_sequence = 3;
-    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official, true)
         .await
         .expect("test step");
     let (version, sequence, freshness) = listed_version(outcome);
@@ -361,7 +362,7 @@ async fn third_party_sibling_v1_1_index_with_404_fallback() {
 
     // Rollback is checked per path: an older sibling is refused and its cached copy kept.
     publish(&server, "repo/v1.1/index.json", &key, &v1_1(0));
-    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official, true)
         .await
         .expect("test step");
     let (version, sequence, freshness) = listed_version(outcome);
@@ -373,7 +374,7 @@ async fn third_party_sibling_v1_1_index_with_404_fallback() {
 
     // Offline is not a 404: the sibling's cached copy is shown.
     repository.url = format!("{}repo/v1/index.json", dead_base());
-    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official, true)
         .await
         .expect("test step");
     let (version, _, freshness) = listed_version(outcome);
@@ -384,7 +385,7 @@ async fn third_party_sibling_v1_1_index_with_404_fallback() {
     let plain = TestServer::start();
     publish(&plain, "repo/v1/index.json", &key, &v1(3));
     repository.url = format!("{}repo/v1/index.json", plain.base);
-    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official, true)
         .await
         .expect("test step");
     let (version, sequence, freshness) = listed_version(outcome);
