@@ -1,7 +1,8 @@
 //! Hello requests (issue #647): someone who never says hello is asked for one three times, then
 //! counts as a plain Mumble client. Against the local test server; `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_hello_requests -- --ignored --test-threads=1`
-#![cfg(feature = "test-backend")]
+// FreeBSD: see the note on the mumbot dev-dependency in Cargo.toml.
+#![cfg(all(feature = "test-backend", not(target_os = "freebsd")))]
 
 mod common;
 

@@ -27,7 +27,8 @@ mod macos;
 mod linux;
 #[cfg(any(target_os = "linux", windows))]
 mod mjpeg;
-#[cfg(any(target_os = "linux", windows, target_os = "macos"))]
+// Also built for tests everywhere: `macos::mode`'s pure helpers are unit tested on all platforms.
+#[cfg(any(target_os = "linux", windows, target_os = "macos", test))]
 #[cfg_attr(
     target_os = "macos",
     allow(dead_code, reason = "macOS only uses the crop geometry")

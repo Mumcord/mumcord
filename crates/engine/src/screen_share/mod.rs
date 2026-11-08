@@ -20,7 +20,7 @@ pub mod capture_macos;
 pub mod capture_wayland;
 #[cfg(windows)]
 pub mod capture_windows;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 pub mod capture_x11;
 mod convert;
 pub(crate) mod encoder;

@@ -90,6 +90,13 @@ mod tests {
     fn finds_the_library_where_the_packages_put_it() {
         #[cfg(target_os = "linux")]
         let (exe_dir, bundled) = ("/usr/bin", "/usr/lib/mumcord/libonnxruntime.so.1.23.2");
+        // FreeBSD has no ONNX Runtime build, so background effects stay off there; the search
+        // order below is the same as on Linux.
+        #[cfg(target_os = "freebsd")]
+        let (exe_dir, bundled) = (
+            "/usr/local/bin",
+            "/usr/local/lib/mumcord/libonnxruntime.so.1.23.2",
+        );
         #[cfg(target_os = "macos")]
         let (exe_dir, bundled) = (
             "/Applications/Mumcord.app/Contents/MacOS",
