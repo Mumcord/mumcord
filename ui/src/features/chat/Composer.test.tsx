@@ -394,3 +394,42 @@ describe("Composer Apps button", () => {
     expect(screen.queryByRole("button", { name: "Apps" })).toBeNull();
   });
 });
+
+describe("# channel suggestions (issue #643)", () => {
+  async function setupChannels() {
+    await connectedMock();
+    const view = renderComposer();
+    await waitFor(() => {
+      expect(view.input).toBeEnabled();
+    });
+    await act(() => Promise.resolve());
+    return view;
+  }
+
+  it("suggests the server's channels for # and inserts the full name", async () => {
+    const { input } = await setupChannels();
+    type(input, "see #", 5);
+    const list = await screen.findByRole("listbox", { name: "Channel suggestions" });
+    // Root carries the server's name and is not offered.
+    expect(
+      within(list)
+        .getAllByRole("option")
+        .map((o) => o.textContent),
+    ).toEqual(["#AFK", "#Lobby", "#Raid"]);
+    type(input, "see #ra", 7);
+    // A browser reports the moved caret at once; the test environment only on the next key.
+    fireEvent.select(input);
+    await waitFor(() => {
+      expect(screen.getAllByRole("option").map((o) => o.textContent)).toEqual(["#Raid"]);
+    });
+    fireEvent.keyDown(input, { key: "Tab" });
+    expect(input.value).toBe("see #Raid ");
+    expect(screen.queryByRole("listbox")).toBeNull();
+  });
+
+  it("keeps @ for people when the @ is nearer the caret", async () => {
+    const { input } = await setupChannels();
+    type(input, "#Lobby @", 8);
+    expect(await screen.findByRole("listbox", { name: /mention/i })).toBeInTheDocument();
+  });
+});

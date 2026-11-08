@@ -10,9 +10,14 @@ import type { User } from "../../api";
 import { Avatar } from "../members/Avatar";
 import { BotBadge } from "../channels/BotBadge";
 import { isBot } from "../channels/mumcord";
+import type { ChannelChoice } from "./channelMentions";
 import { optionId, type GroupMention } from "./mentions";
 
-export type MentionOption = { kind: "group"; group: GroupMention } | { kind: "user"; user: User };
+export type MentionOption =
+  | { kind: "group"; group: GroupMention }
+  | { kind: "user"; user: User }
+  /** A channel of the server, for `#` (issue #643). */
+  | { kind: "channel"; channel: ChannelChoice };
 
 export interface MentionPickerProps {
   id: string;
@@ -47,6 +52,7 @@ export function MentionPicker({
   const indexed = options.map((option, index) => ({ option, index }));
   const groups = indexed.filter(({ option }) => option.kind === "group");
   const people = indexed.filter(({ option }) => option.kind === "user");
+  const channels = indexed.filter(({ option }) => option.kind === "channel");
 
   function row({ option, index }: Indexed): ReactNode {
     return (
@@ -54,7 +60,13 @@ export function MentionPicker({
       // the mouse path to the same action.
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events
       <div
-        key={option.kind === "group" ? option.group : option.user.session}
+        key={
+          option.kind === "group"
+            ? option.group
+            : option.kind === "channel"
+              ? `channel-${String(option.channel.id)}`
+              : option.user.session
+        }
         ref={index === active ? activeRef : undefined}
         id={optionId(id, index)}
         className="mention-picker__option"
@@ -77,6 +89,16 @@ export function MentionPicker({
                 ? t("mention.channelHint", { channel: channel.name, count: channel.members })
                 : t("mention.allHint", { count: channel.readers })}
             </span>
+          </>
+        ) : option.kind === "channel" ? (
+          <>
+            <span className="mention-picker__keyword" aria-hidden="true">
+              #
+            </span>
+            <span className="mention-picker__name">{option.channel.name}</span>
+            {option.channel.path !== option.channel.name && (
+              <span className="mention-picker__hint">{option.channel.path}</span>
+            )}
           </>
         ) : (
           <>
@@ -103,14 +125,23 @@ export function MentionPicker({
 
   return (
     <div className="mention-picker">
-      <div id={id} className="mention-picker__list" role="listbox" aria-label={t("mention.list")}>
+      <div
+        id={id}
+        className="mention-picker__list"
+        role="listbox"
+        aria-label={t(
+          indexed.some(({ option }) => option.kind === "channel")
+            ? "mention.channelList"
+            : "mention.list",
+        )}
+      >
         {groups.length > 0 ? (
           <>
             {section("groups", t("mention.groupsHeading"), groups)}
             {people.length > 0 ? section("people", t("mention.peopleHeading"), people) : null}
           </>
         ) : (
-          people.map(row)
+          [...people, ...channels].map(row)
         )}
       </div>
       {/* Screen readers already know how to use a combobox; this is for the eyes. */}

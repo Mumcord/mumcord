@@ -100,7 +100,8 @@
     "peopleHeading": "Ihmiset",
     "channelHint": "Ilmoita kaikille kanavalla {{channel}} ({{count}})",
     "allHint": "Ilmoita kaikille, jotka voivat lukea tätä kanavaa ({{count}})",
-    "keys": "↑↓ valitse · Enter lisää · Esc sulje"
+    "keys": "↑↓ valitse · Enter lisää · Esc sulje",
+    "channelList": "Kanavaehdotukset"
   },
   "preview": {
     "open": "Avaa selaimessa",
@@ -408,5 +409,14 @@
   },
   "slash": {
     "list": "Kauttaviivakomennot"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanava – avaa valikko",
+    "join": "Liity kanavalle",
+    "joinPath": "Liity kanavalle {{path}}",
+    "show": "Näytä kanavaluettelossa",
+    "showPath": "Näytä {{path}} kanavaluettelossa",
+    "copy": "Kopioi nimi",
+    "menu": "Kanava {{channel}}"
   }
 }

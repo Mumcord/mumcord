@@ -112,7 +112,8 @@
     "peopleHeading": "Daoine",
     "channelHint": "Cuir gach duine in {{channel}} ar an eolas ({{count}})",
     "allHint": "Cuir gach duine atá in ann an cainéal seo a léamh ar an eolas ({{count}})",
-    "keys": "↑↓ roghnaigh · Enter cuir isteach · Esc dún"
+    "keys": "↑↓ roghnaigh · Enter cuir isteach · Esc dún",
+    "channelList": "Moltaí cainéal"
   },
   "preview": {
     "open": "Oscail sa bhrabhsálaí",
@@ -435,5 +436,14 @@
   },
   "slash": {
     "list": "Orduithe le /"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, cainéal – oscail a roghchlár",
+    "join": "Téigh isteach sa chainéal",
+    "joinPath": "Téigh isteach i {{path}}",
+    "show": "Taispeáin i liosta na gcainéal",
+    "showPath": "Taispeáin {{path}} i liosta na gcainéal",
+    "copy": "Cóipeáil an t-ainm",
+    "menu": "Cainéal {{channel}}"
   }
 }

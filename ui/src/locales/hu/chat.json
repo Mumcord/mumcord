@@ -100,7 +100,8 @@
     "peopleHeading": "Személyek",
     "channelHint": "Mindenki értesítése itt: {{channel}} ({{count}})",
     "allHint": "Mindenki értesítése, aki olvashatja ezt a csatornát ({{count}})",
-    "keys": "↑↓ választás · Enter beszúrás · Esc bezárás"
+    "keys": "↑↓ választás · Enter beszúrás · Esc bezárás",
+    "channelList": "Csatornajavaslatok"
   },
   "preview": {
     "open": "Megnyitás böngészőben",
@@ -408,5 +409,14 @@
   },
   "slash": {
     "list": "Parancsok / jellel"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, csatorna – menü megnyitása",
+    "join": "Belépés a csatornába",
+    "joinPath": "Belépés ide: {{path}}",
+    "show": "Megjelenítés a csatornalistában",
+    "showPath": "{{path}} megjelenítése a csatornalistában",
+    "copy": "Név másolása",
+    "menu": "Csatorna: {{channel}}"
   }
 }

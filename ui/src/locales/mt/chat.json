@@ -112,7 +112,8 @@
     "peopleHeading": "Nies",
     "channelHint": "Avża lil kulħadd f'{{channel}} ({{count}})",
     "allHint": "Avża lil kull min jista' jaqra dan il-kanal ({{count}})",
-    "keys": "↑↓ agħżel · Enter daħħal · Esc agħlaq"
+    "keys": "↑↓ agħżel · Enter daħħal · Esc agħlaq",
+    "channelList": "Suġġerimenti tal-kanali"
   },
   "preview": {
     "open": "Iftaħ fil-browser",
@@ -435,5 +436,14 @@
   },
   "slash": {
     "list": "Kmandi b’“/“"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanal – iftaħ il-menu",
+    "join": "Idħol fil-kanal",
+    "joinPath": "Idħol f'{{path}}",
+    "show": "Uri fil-lista tal-kanali",
+    "showPath": "Uri {{path}} fil-lista tal-kanali",
+    "copy": "Ikkopja l-isem",
+    "menu": "Kanal {{channel}}"
   }
 }

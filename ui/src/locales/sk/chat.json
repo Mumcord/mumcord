@@ -108,7 +108,8 @@
     "peopleHeading": "Ľudia",
     "channelHint": "Upozorniť všetkých v {{channel}} ({{count}})",
     "allHint": "Upozorniť všetkých, ktorí môžu čítať tento kanál ({{count}})",
-    "keys": "↑↓ vybrať · Enter vložiť · Esc zavrieť"
+    "keys": "↑↓ vybrať · Enter vložiť · Esc zavrieť",
+    "channelList": "Návrhy kanálov"
   },
   "preview": {
     "open": "Otvoriť v prehliadači",
@@ -426,5 +427,14 @@
   },
   "slash": {
     "list": "Príkazy s lomítkom"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanál – otvoriť ponuku",
+    "join": "Vstúpiť do kanála",
+    "joinPath": "Vstúpiť do {{path}}",
+    "show": "Zobraziť v zozname kanálov",
+    "showPath": "Zobraziť {{path}} v zozname kanálov",
+    "copy": "Kopírovať názov",
+    "menu": "Kanál {{channel}}"
   }
 }
