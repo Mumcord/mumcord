@@ -66,18 +66,35 @@ More in the wiki: [Features](https://github.com/Mumcord/mumcord/wiki/Features). 
 
 ## Quick start
 
-1. **Install Mumcord**
-   - **Windows 10/11:** download `Mumcord_<version>_x64-setup.exe` from the [latest release](https://github.com/Mumcord/mumcord/releases/latest) and run it.
-   - **macOS:** `brew install --cask mumcord/tap/mumcord`, or download the `.dmg` from the [latest release](https://github.com/Mumcord/mumcord/releases/latest), open it and drag Mumcord into Applications.
-   - **Linux:** run the one-line installer, which picks the right package for your distribution:
-     ```sh
-     curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
-     ```
-2. **Start Mumcord.** The setup wizard creates your identity (your Mumble certificate), tests your microphone and asks a few privacy questions. Every choice can be changed later in Settings.
-3. **Add a server:** press **+** in the server bar, enter the address of any Mumble server (port 64738 unless your server uses another one) and connect. Coming from Mumble? The wizard can import your certificate and favourite servers.
-4. **Allow access when asked:** microphone (all systems), and on macOS also Local Network and, for push-to-talk with a mouse button, Accessibility.
+### 1. Install
 
-More options (portable Windows build, `.deb`, `.rpm`, AppImage, AUR, Homebrew on Linux) are listed below.
+**🪟 Windows 10/11:** download the `…_x64-setup.exe` from the **[latest release](https://github.com/Mumcord/mumcord/releases/latest)** and run it.
+
+**🍎 macOS:**
+
+```sh
+brew install --cask mumcord/tap/mumcord
+```
+
+No Homebrew? Download the `.dmg` from the **[latest release](https://github.com/Mumcord/mumcord/releases/latest)**, open it and drag Mumcord into Applications.
+
+**🐧 Linux:**
+
+```sh
+curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
+```
+
+### 2. Set up
+
+Start Mumcord. The setup wizard walks you through your identity and your microphone. Click **Next** until the end; everything can be changed later.
+
+### 3. Connect
+
+Click **+** (Add a server) in the server bar, enter your Mumble server's address and click **Save and connect**.
+
+> **Allow access when asked:** microphone, and on macOS also Local Network. Coming from Mumble? The wizard can import your certificate and servers.
+
+Other packages (portable Windows, `.deb`, `.rpm`, AppImage, AUR, Homebrew on Linux) are listed under [Download](#download).
 
 ## Download
 
