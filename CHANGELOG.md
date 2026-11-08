@@ -5,6 +5,7 @@
 ### Added
 
 - Homebrew (issue #662): `brew install --cask mumcord/tap/mumcord` on macOS and `brew install mumcord/tap/mumcord` on Linux, from the new tap `Mumcord/homebrew-tap`, which follows new releases by itself
+- Release candidates (issue #686): coming versions can be tried early as pre-releases (e.g. "Mumcord 0.8.0 RC 1") on the Releases page, with every package; the in-app updater, Homebrew and the AUR keep offering only final releases, and the final release installs over a release candidate
 
 ### Fixed
 

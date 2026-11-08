@@ -10,7 +10,7 @@ Builds are unsigned until code signing is set up (Windows via a Certum code sign
 - Bug fixes, security and crash fixes, CI and dependency updates target `main` and ship as patch releases (`0.7.2`, `0.7.3`, …) tagged on `main`.
 - After a fix lands on `main`, `main` is merged into the milestone branch (pull request "chore: sync main into milestone/0.8.0"; a merge, not a rebase).
 - Releasing the milestone: merge `milestone/0.8.0` into `main` with a pull request, wait for green CI/E2E on `main`, then tag `v0.8.0` on `main` as below. Delete the milestone branch and create the next one from `main`.
-- Every release tag points to a commit on `main` (the Release workflow checks it), so a milestone branch is never tagged.
+- Every release tag points to a commit on `main` (the Release workflow checks it). The only tags on a milestone branch are release candidates (`v0.8.0-rc.1`), which become GitHub pre-releases for testing, never final releases (see [Release candidates](#release-candidates)).
 
 ## Versions
 
@@ -19,6 +19,7 @@ The version is set at build time from git; nobody bumps it in the manifests by h
 | Build                                | Version shown in the app (About, diagnostics, log, server) | Package version of the bundles   |
 | ------------------------------------ | ---------------------------------------------------------- | -------------------------------- |
 | Release tag `vX.Y.Z` (`release.yml`) | `X.Y.Z`                                                    | `X.Y.Z`                          |
+| Release candidate `vX.Y.Z-rc.N`      | `X.Y.Z-rc.N`                                               | see [Release candidates](#release-candidates) |
 | CI build of `main` or a pull request | `dev~<short commit>`, e.g. `dev~a1b2c3d`                   | test builds: the latest `v*` tag |
 | Local build                          | `dev~YYYYMMDD`, plus `-dirty` with uncommitted changes     | the version in `Cargo.toml`      |
 
@@ -43,13 +44,13 @@ git tag -a v0.4.3 -m "Mumcord 0.4.3"
 git push origin v0.4.3
 ```
 
-The tag must be `v` plus a version (`X.Y.Z`, optionally with a pre-release suffix such as `-rc.1`) and must point to a commit on `main`. The tag alone decides the version.
+The tag must be `v` plus a version `X.Y.Z` and must point to a commit on `main`. The tag alone decides the version. A tag with a suffix is only accepted as a release candidate on its milestone branch (see [Release candidates](#release-candidates)).
 
 ## 3. Wait for the workflow
 
 Open the **Actions** tab and follow the **Release** run for the tag. It takes roughly as long as the Test builds workflow (up to about an hour). It runs:
 
-1. **Check tag**: the tag is a version, the commit is on `main`, and a dry run of `scripts/set-version.sh` works.
+1. **Check tag** (`scripts/release-tag.sh`): the tag is a version, the commit is on `main` (a release candidate: on its milestone branch), and a dry run of `scripts/set-version.sh` works.
 2. **Generate third-party notices** from the tagged commit (see [Third-party notices](#third-party-notices)); the builds bundle them. It fails when a dependency has a licence that is not allowed.
 3. **Build** on Linux, Windows and macOS. Each build job first sets the tag's version in all manifests and lock files, so the bundles, the app's About page and the diagnostics all say `X.Y.Z`. With signing set up, the Windows app and installer and the macOS app are signed automatically; nothing needs your approval.
 4. **Smoke** test: each build is installed on a fresh machine and connects to a local test server.
@@ -64,6 +65,51 @@ Open the **Actions** tab and follow the **Release** run for the tag. It takes ro
 3. Check that the `.exe`, `-portable.zip`, `.dmg`, `.AppImage`, `.cdx.json`, the updater files (`.app.tar.gz`, `.sig`, `latest.json`; see `docs/release-signing.md`) and `SHA256SUMS` files are attached. Optionally download one and try it.
 4. Click **Publish release**.
 5. Publishing starts `.github/workflows/post-release.yml`, which opens the pull request "chore: sync version X.Y.Z and third-party notices" (branch `chore/sync-version-X.Y.Z`) with the released version in the manifests and lock files, the regenerated notices and the finalised `CHANGELOG.md` (the version's heading gets the tag's date, a link is added at the bottom, and an empty `## [Unreleased]` section is added on top; a section that is already dated is left alone, and running it again changes nothing), and starts CI and E2E on it. Merge it once the checks are green. It runs on publishing, not when the build finishes, so a draft you discard changes nothing; pre-releases (`-rc.1` and the like) are not synced. If it did not run, start it by hand: **Actions → Post-release sync → Run workflow** with the version. Opening the pull request needs **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**; without it the run pushes the branch and shows a warning with a link to open the pull request by hand. While the sync pull request is open, `notices.yml` does nothing (the sync contains fresh notices) and closes nothing; the sync closes an open notices pull request.
+
+## Release candidates
+
+A release candidate (RC) is a full release build of a coming version, made from its milestone branch before the branch is merged into `main`, so testers can install real, signed packages.
+
+1. Make sure `milestone/0.8.0` is green in CI and E2E and that `main` is synced into it. Its `CHANGELOG.md` `## [Unreleased]` section becomes the RC's "What's new".
+2. Tag the tip of the milestone branch and push the tag:
+
+   ```sh
+   git switch milestone/0.8.0
+   git pull
+   git tag -a v0.8.0-rc.1 -m "Mumcord 0.8.0 RC 1"
+   git push origin v0.8.0-rc.1
+   ```
+
+3. The **Release** workflow runs exactly as for a release (steps 3 and 4 above): same builds, signing, notarisation, smoke tests, SBOMs, `SHA256SUMS` and attestation. It creates a **draft pre-release** named "Mumcord 0.8.0 RC 1" with a note at the top that it is a release candidate. Publish it by hand; it is marked **Pre-release** and never becomes **Latest**.
+4. Fix what testers find on the milestone branch, then tag `v0.8.0-rc.2`, and so on. When the milestone is merged into `main`, release `v0.8.0` from `main` as usual.
+
+Rules the **Check tag** step enforces before anything is built:
+
+- `vX.Y.Z-rc.N` (N from 1) only on a commit of `milestone/X.Y.Z` that is not on `main` yet. `v0.8.0-rc.1` on `main`, `v0.9.0-rc.1` on `milestone/0.8.0` or any other suffix (`-beta.1`, `-rc.0`) fails with a message that says where the tag belongs.
+- `vX.Y.Z` only on `main`, as before.
+
+The release workflow file comes from the tagged commit, so the milestone branch must contain this workflow (sync `main` into it first).
+
+**Who sees an RC.** Only people who download it from the Releases page.
+
+- The in-app updater skips pre-releases unless the running app is one itself (`src-tauri/src/updater/release.rs`, tested): an RC is offered the next RC and the final release; a final release is never offered an RC. The RC has its own `latest.json` in its release folder; the final release's `latest.json` is not touched.
+- The curl installer (`releases/latest/download/install.sh`) and the Homebrew tap (`Mumcord/homebrew-tap`, `gh release view` = Latest) follow **Latest**, which an RC never becomes.
+- The AUR workflow, the post-release sync and the crates.io publishing skip pre-releases. The website is not changed.
+
+**Package versions.** One source version, mapped so every package accepts it and sorts the RC before the final release:
+
+| Package | `0.8.0-rc.1` becomes | Why |
+| --- | --- | --- |
+| App (About, diagnostics), Cargo, npm, updater | `0.8.0-rc.1` | SemVer; `0.8.0-rc.1` < `0.8.0` |
+| AppImage, `.dmg`, `-setup.exe`, `.deb` file names | `Mumcord_0.8.0-rc.1_…` | |
+| `.deb` package version | `0.8.0~rc.1` | `~` sorts before `0.8.0`; Tauri's `0.8.0-rc.1` would sort after it. `scripts/deb-set-version.sh` rewrites it after the build. |
+| `.rpm` | version `0.8.0`, release `0.rc.1` (`Mumcord-0.8.0-0.rc.1.x86_64.rpm`) | RPM rejects `-`, and Tauri accepts only SemVer, so `0.8.0~rc.1` is not possible; Fedora's pre-release scheme `0.rc.N` sorts below the final's release `1`. Bundled with `tauri bundle` from the same binary. |
+| Windows NSIS installer | `0.8.0-rc.1` (file properties `0.8.0.0`) | The installer compares versions as SemVer, so the final installs over the RC as an upgrade. |
+| macOS `CFBundleShortVersionString` / `CFBundleVersion` | `0.8.0` / `0.8.0` | Apple allows digits and dots only; `scripts/set-version.sh` writes both into `src-tauri/Info.plist`. Finder shows `0.8.0`, the app's About shows `0.8.0-rc.1`. Installing the final replaces the app. |
+
+There is no MSI: Windows ships only the NSIS installer and the portable zip.
+
+Upgrading from an RC to the final release: `.deb` (`apt install ./Mumcord_0.8.0_amd64.deb`) and `.rpm` (`dnf install`/`zypper install`) see a newer version, NSIS installs over it, macOS and AppImage replace the file, and the in-app updater offers the final release.
 
 ## Release integrity
 
