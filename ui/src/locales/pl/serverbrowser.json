@@ -1,7 +1,7 @@
 {
   "title": "Serwery publiczne",
   "loading": "Wczytywanie listy…",
-  "subtitle": "Wczytano, bo otworzono tę stronę · pokazano {{shown}} z {{total}}",
+  "subtitle": "Wczytano po otwarciu tej strony · pokazano {{shown}} z {{total}}",
   "search": "Szukaj po nazwie, adresie lub kraju",
   "refresh": "Odśwież",
   "retry": "Spróbuj ponownie",
@@ -37,12 +37,12 @@
   "ms": "{{ms}} ms",
   "connect": "Połącz",
   "connectTo": "Połącz z {{server}}",
-  "favourite": "Ulubiony",
+  "favourite": "Do ulubionych",
   "favouriteServer": "Dodaj {{server}} do swoich serwerów",
   "saved": "Zapisany",
-  "savedAs": "{{server}} jest na liście Twoich serwerów",
+  "savedAs": "{{server}} jest na liście twoich serwerów",
   "announce": {
-    "saved": "Dodano {{server}} do Twoich serwerów"
+    "saved": "Dodano {{server}} do twoich serwerów"
   },
   "note": "Pingowane są tylko widoczne wiersze, po kilka naraz. Nic więcej nie jest wysyłane do serwera, dopóki się nie połączysz."
 }

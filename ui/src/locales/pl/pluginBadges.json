@@ -1,4 +1,4 @@
 {
-  "label": "Odznaka z {{plugin}}",
-  "section": "Sekcja z {{plugin}}"
+  "label": "Odznaka wtyczki {{plugin}}",
+  "section": "Sekcja wtyczki {{plugin}}"
 }

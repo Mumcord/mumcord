@@ -77,7 +77,7 @@
   },
   "audio": {
     "title": "Dźwięk dla tego kanału",
-    "presets": "Ustawienia wstępne",
+    "presets": "Presety",
     "preset": {
       "voice": "Głos",
       "voiceHint": "Domyślne",
@@ -87,7 +87,7 @@
       "jamHint": "Niskie opóźnienie"
     },
     "musicQuality": "Jakość muzyki",
-    "musicQualityHint": "Koder dostrojony do muzyki; redukcja szumów wyłączona.",
+    "musicQualityHint": "Koder dostrojony do muzyki; tłumienie szumów wyłączone.",
     "musicIncluded": "Uwzględnione, gdy tryb niskich opóźnień jest włączony.",
     "lowLatency": "Tryb niskich opóźnień",
     "lowLatencyHint": "Najmniejsze pakiety. Większe zużycie pasma, mniejsza odporność.",
@@ -102,7 +102,7 @@
     "bitrateDefault": "Domyślnie, {{value}}",
     "serverLimit": "Limit serwera {{kbps}} kbit/s",
     "noServerLimit": "Brak limitu serwera",
-    "note": "Obowiązuje po wejściu na ten kanał, tylko na tym urządzeniu. Inne osoby nie są dotknięte. Informacje o połączeniu oznaczają te wartości tekstem „(profil kanału)”.",
+    "note": "Obowiązuje po dołączeniu do tego kanału, tylko na tym urządzeniu. Nie wpływa na inne osoby. Informacje o połączeniu oznaczają te wartości dopiskiem „(profil kanału)”.",
     "saveFailed": "Nie udało się zapisać profilu dźwięku.",
     "remove": "Usuń profil",
     "cancel": "Anuluj",

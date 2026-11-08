@@ -1,14 +1,14 @@
 {
   "card": {
-    "label": "Karta od {{plugin}}",
+    "label": "Karta z wtyczki {{plugin}}",
     "showMore": "Pokaż więcej",
     "showLess": "Pokaż mniej"
   },
-  "via": "przez {{plugin}}",
+  "via": "przez wtyczkę {{plugin}}",
   "supersede": {
     "showText": "Pokaż oryginalny tekst",
     "hideText": "Ukryj oryginalny tekst",
-    "hiddenBy": "Ukryte przez {{plugin}}"
+    "hiddenBy": "Ukryte przez wtyczkę {{plugin}}"
   },
   "command": {
     "group": "Polecenia wtyczek",

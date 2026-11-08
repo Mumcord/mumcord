@@ -29,7 +29,7 @@
     "camerasDisallowed": "Przekaźnik tego serwera nie zezwala na udostępnianie kamery.",
     "imagesDisallowed": "Pełny rozmiar niedostępny: przekaźnik tego serwera nie zezwala na obrazy",
     "noCertificate": "Udostępnianie plików wymaga certyfikatu klienta.",
-    "modeNeedsRelay": "Udostępnianie plików wymaga przekaźnika; Twoje ustawienie peer-to-peer to {{mode}}.",
+    "modeNeedsRelay": "Udostępnianie plików wymaga przekaźnika; twoje ustawienie peer-to-peer to {{mode}}.",
     "modeOff": "Wyłączone",
     "modeDirectOnly": "Tylko bezpośrednio",
     "hideNoRelay": "Ukryj tę wskazówkę dla {{server}}"
@@ -50,7 +50,7 @@
     "notRegistered": "Przekaźnik tego serwera jest dostępny tylko dla zarejestrowanych użytkowników. Zarejestruj się na tym serwerze, aby z niego korzystać.",
     "peerGone": "Druga osoba opuściła serwer.",
     "rateLimited": "Zbyt wiele próśb do przekaźnika. Spróbuj ponownie za minutę.",
-    "groupNotAllowed": "Przekaźnik tego serwera jest dostępny tylko dla wybranych grup. Poproś administratora o dodanie.",
+    "groupNotAllowed": "Przekaźnik tego serwera jest dostępny tylko dla wybranych grup. Poproś administratora, aby cię dodał.",
     "noHello": "Bot przekaźnika nie zna jeszcze tej aplikacji. Połącz się ponownie, aby to naprawić."
   },
   "refusal": {
@@ -70,7 +70,7 @@
     "filesRegisteredOnly": "Udostępnianie plików jest na tym serwerze dostępne tylko dla zarejestrowanych użytkowników."
   },
   "trust": {
-    "title": "Przekaźnik na {{server}} się zmienił",
+    "title": "Zmieniono przekaźnik na serwerze {{server}}",
     "body": "Udostępnianie ekranu i plików jest wstrzymane, dopóki nie zaufasz nowemu przekaźnikowi.",
     "details": "Szczegóły",
     "trustedTitle": "Zaufano nowemu przekaźnikowi",
@@ -80,7 +80,7 @@
     "current": "Nowy przekaźnik",
     "unknown": "Nieznany",
     "trustIf": "Zaufaj, jeśli",
-    "trustIfText": "administratorzy ogłosili nowy przekaźnik lub przeprowadzkę i możesz to z nimi potwierdzić.",
+    "trustIfText": "administratorzy serwera ogłosili nowy przekaźnik lub jego przeniesienie i możesz to z nimi potwierdzić.",
     "dontTrustIf": "Nie ufaj, jeśli",
     "dontTrustIfText": "nikt nie ogłosił zmiany lub nie masz pewności. Ktoś może podszywać się pod przekaźnik.",
     "notNow": "Nie teraz",
