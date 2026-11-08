@@ -534,7 +534,9 @@
     "copyWhole": "Copier tout le journal",
     "openLogFolder": "Ouvrir le dossier des journaux",
     "logCopied": "Journal copié.",
-    "fileLabel": "Fichier de diagnostic"
+    "fileLabel": "Fichier de diagnostic",
+    "writeToDisk": "Écrire les journaux sur le disque",
+    "writeToDiskHint": "Désactivé garde le journal uniquement en mémoire pour cette session — rien n'est écrit sur le disque."
   },
   "about": {
     "version": "Version",
@@ -1293,5 +1295,15 @@
     "button": "Effacer l'historique",
     "confirm": "Effacer l'historique d'activité de tous les serveurs ? Cette action est irréversible.",
     "confirmButton": "Effacer"
+  },
+  "diskWrites": {
+    "title": "Réduire les écritures sur disque",
+    "hint": "Moins d'écritures use moins les disques SSD. Chaque interrupteur conserve le comportement actuel lorsqu'il est activé.",
+    "durableSaves": "Attendre le disque à chaque enregistrement",
+    "durableSavesHint": "Désactivé écrit moins, mais une coupure de courant peut perdre les dernières secondes d'historique et de réglages.",
+    "linkPreviewsOnDisk": "Garder les aperçus de liens sur le disque",
+    "linkPreviewsOnDiskHint": "Désactivé garde les aperçus uniquement en mémoire pour cette session.",
+    "pluginRegistryCache": "Garder une copie du registre des extensions sur le disque",
+    "pluginRegistryCacheHint": "Désactivé retélécharge toujours le registre."
   }
 }

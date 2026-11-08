@@ -531,7 +531,9 @@
     "copyWhole": "Kopeeri kogu logi",
     "openLogFolder": "Ava logikaust",
     "logCopied": "Logi kopeeritud.",
-    "fileLabel": "Diagnostikafail"
+    "fileLabel": "Diagnostikafail",
+    "writeToDisk": "Kirjuta logid kettale",
+    "writeToDiskHint": "Väljas hoiab logi ainult mälus selle seansi jooksul — kettale ei kirjutata midagi."
   },
   "about": {
     "version": "Versioon",
@@ -1283,5 +1285,15 @@
     "button": "Kustuta ajalugu",
     "confirm": "Kas kustutada kõigi serverite tegevuste ajalugu? Seda ei saa tagasi võtta.",
     "confirmButton": "Kustuta"
+  },
+  "diskWrites": {
+    "title": "Vähem kettakirjutusi",
+    "hint": "Vähem kirjutusi kulutab SSD-ketasid vähem. Iga lüliti säilitab praeguse käitumise, kui see on sees.",
+    "durableSaves": "Oota ketast igal salvestamisel",
+    "durableSavesHint": "Väljas kirjutab vähem, kuid voolukatkestus võib kaotada viimased sekundid ajaloost ja seadetest.",
+    "linkPreviewsOnDisk": "Hoia lingi eelvaateid kettal",
+    "linkPreviewsOnDiskHint": "Väljas hoiab eelvaateid ainult mälus selle seansi jooksul.",
+    "pluginRegistryCache": "Hoia lisamoodulite registri koopiat kettal",
+    "pluginRegistryCacheHint": "Väljas laadib registri alati uuesti."
   }
 }

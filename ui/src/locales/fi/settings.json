@@ -531,7 +531,9 @@
     "copyWhole": "Kopioi koko loki",
     "openLogFolder": "Avaa lokikansio",
     "logCopied": "Loki kopioitu.",
-    "fileLabel": "Diagnostiikkatiedosto"
+    "fileLabel": "Diagnostiikkatiedosto",
+    "writeToDisk": "Kirjoita lokit levylle",
+    "writeToDiskHint": "Pois päältä pitää lokin vain muistissa tämän istunnon ajan — levylle ei kirjoiteta mitään."
   },
   "about": {
     "version": "Versio",
@@ -1283,5 +1285,15 @@
     "button": "Tyhjennä historia",
     "confirm": "Tyhjennetäänkö kaikkien palvelimien toimintahistoria? Tätä ei voi perua.",
     "confirmButton": "Tyhjennä"
+  },
+  "diskWrites": {
+    "title": "Vähemmän levykirjoituksia",
+    "hint": "Vähemmät kirjoitukset kuluttavat SSD-levyjä vähemmän. Jokainen kytkin säilyttää nykyisen toiminnan, kun se on päällä.",
+    "durableSaves": "Odota levyä jokaisessa tallennuksessa",
+    "durableSavesHint": "Pois päältä kirjoittaa vähemmän, mutta sähkökatko voi kadottaa viimeiset sekunnit historiaa ja asetuksia.",
+    "linkPreviewsOnDisk": "Pidä linkkien esikatselut levyllä",
+    "linkPreviewsOnDiskHint": "Pois päältä pitää esikatselut vain muistissa tämän istunnon ajan.",
+    "pluginRegistryCache": "Pidä liitännäisrekisterin kopio levyllä",
+    "pluginRegistryCacheHint": "Pois päältä hakee rekisterin aina uudelleen."
   }
 }

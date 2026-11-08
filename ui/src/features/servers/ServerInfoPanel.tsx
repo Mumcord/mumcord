@@ -4,6 +4,7 @@ import { getApi } from "../../api";
 import type { ServerState } from "../channels/serverStore";
 import { useConnectionStats, type StatsState } from "../connection/useConnectionStats";
 import { sanitizeHtml } from "../chat/sanitize";
+import { editorLimits } from "../userpanel/richEditorModel";
 import { openServerAdmin } from "../admin";
 import { hasAdminRight, rootAdminRights } from "../admin/permissions";
 import { ServerNoticeDialog } from "../admin/ServerNoticeDialog";
@@ -498,6 +499,7 @@ export function ServerInfoPanel({ serverState, onClose }: ServerInfoPanelProps) 
         <ServerNoticeDialog
           serverId={serverId}
           initialHtml={noticeHtml}
+          limits={editorLimits(info)}
           onClose={() => {
             setNoticeOpen(false);
           }}

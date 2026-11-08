@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getApi, type LogLevel } from "../../../api";
 import { Select } from "../../../components/Select";
 import { Group } from "../components/Section";
+import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
 import { pickSavePath } from "../fileDialogs";
 import type { SettingsSectionProps } from "./types";
@@ -57,6 +58,14 @@ export function DiagnosticsCard({ settings, update }: SettingsSectionProps) {
 
   return (
     <Group title={t("diagnostics.title")} icon="file" info={t("diagnostics.fileHint")}>
+      <Switch
+        label={t("diagnostics.writeToDisk")}
+        description={t("diagnostics.writeToDiskHint")}
+        checked={settings.logToDisk}
+        onChange={(logToDisk) => {
+          update({ logToDisk });
+        }}
+      />
       <div className="settings-control-row">
         <label htmlFor={id}>{t("diagnostics.logLevel")}</label>
         <Select

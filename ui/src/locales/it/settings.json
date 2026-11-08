@@ -534,7 +534,9 @@
     "copyWhole": "Copia tutto il registro",
     "openLogFolder": "Apri la cartella dei registri",
     "logCopied": "Registro copiato.",
-    "fileLabel": "File di diagnostica"
+    "fileLabel": "File di diagnostica",
+    "writeToDisk": "Scrivi i registri su disco",
+    "writeToDiskHint": "Disattivato tiene il registro solo in memoria per questa sessione: non viene scritto nulla su disco."
   },
   "about": {
     "version": "Versione",
@@ -1293,5 +1295,15 @@
     "button": "Cancella cronologia",
     "confirm": "Cancellare la cronologia attività di tutti i server? L'operazione non può essere annullata.",
     "confirmButton": "Cancella"
+  },
+  "diskWrites": {
+    "title": "Riduci le scritture su disco",
+    "hint": "Meno scritture usurano meno gli SSD. Ogni interruttore mantiene il comportamento attuale quando è attivo.",
+    "durableSaves": "Attendi il disco a ogni salvataggio",
+    "durableSavesHint": "Disattivato scrive meno, ma un'interruzione di corrente può perdere gli ultimi secondi di cronologia e impostazioni.",
+    "linkPreviewsOnDisk": "Tieni le anteprime dei link su disco",
+    "linkPreviewsOnDiskHint": "Disattivato tiene le anteprime solo in memoria per questa sessione.",
+    "pluginRegistryCache": "Tieni una copia del registro dei plugin su disco",
+    "pluginRegistryCacheHint": "Disattivato scarica sempre di nuovo il registro."
   }
 }

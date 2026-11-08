@@ -534,7 +534,9 @@
     "copyWhole": "Kopēt visu žurnālu",
     "openLogFolder": "Atvērt žurnālu mapi",
     "logCopied": "Žurnāls nokopēts.",
-    "fileLabel": "Diagnostikas fails"
+    "fileLabel": "Diagnostikas fails",
+    "writeToDisk": "Rakstīt žurnālus diskā",
+    "writeToDiskHint": "Izslēgts žurnālu glabā tikai atmiņā šai sesijai — diskā nekas netiek rakstīts."
   },
   "about": {
     "version": "Versija",
@@ -1293,5 +1295,15 @@
     "button": "Notīrīt vēsturi",
     "confirm": "Vai notīrīt visu serveru darbību vēsturi? To nevar atsaukt.",
     "confirmButton": "Notīrīt"
+  },
+  "diskWrites": {
+    "title": "Mazāk ierakstu diskā",
+    "hint": "Mazāk ierakstu mazāk nodilst SSD diski. Katrs slēdzis saglabā pašreizējo uzvedību, kad ieslēgts.",
+    "durableSaves": "Gaidīt disku katrā saglabāšanā",
+    "durableSavesHint": "Izslēgts raksta mazāk, bet strāvas pārrāvums var zaudēt pēdējās sekundes vēstures un iestatījumu.",
+    "linkPreviewsOnDisk": "Glabāt saišu priekšskatījumus diskā",
+    "linkPreviewsOnDiskHint": "Izslēgts priekšskatījumus glabā tikai atmiņā šai sesijai.",
+    "pluginRegistryCache": "Glabāt spraudņu reģistra kopiju diskā",
+    "pluginRegistryCacheHint": "Izslēgts reģistru vienmēr ielādē no jauna."
   }
 }

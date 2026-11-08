@@ -534,7 +534,9 @@
     "copyWhole": "Kopiraj cijeli zapisnik",
     "openLogFolder": "Otvori mapu zapisnika",
     "logCopied": "Zapisnik je kopiran.",
-    "fileLabel": "Dijagnostička datoteka"
+    "fileLabel": "Dijagnostička datoteka",
+    "writeToDisk": "Zapisuj zapise na disk",
+    "writeToDiskHint": "Isključeno drži zapis samo u memoriji za ovu sesiju — ništa se ne zapisuje na disk."
   },
   "about": {
     "version": "Verzija",
@@ -1293,5 +1295,15 @@
     "button": "Očisti povijest",
     "confirm": "Očistiti povijest aktivnosti svih poslužitelja? To se ne može poništiti.",
     "confirmButton": "Očisti"
+  },
+  "diskWrites": {
+    "title": "Manje zapisa na disk",
+    "hint": "Manje zapisa manje troši SSD diskove. Svaki prekidač zadržava današnje ponašanje dok je uključen.",
+    "durableSaves": "Čekaj disk pri svakom spremanju",
+    "durableSavesHint": "Isključeno zapisuje manje, ali nestanak struje može izgubiti posljednjih nekoliko sekundi povijesti i postavki.",
+    "linkPreviewsOnDisk": "Drži preglede poveznica na disku",
+    "linkPreviewsOnDiskHint": "Isključeno drži preglede samo u memoriji za ovu sesiju.",
+    "pluginRegistryCache": "Drži kopiju registra dodataka na disku",
+    "pluginRegistryCacheHint": "Isključeno uvijek iznova dohvaća registar."
   }
 }

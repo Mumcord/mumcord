@@ -96,6 +96,7 @@
     [
       "specs/app/keyboard-a11y.e2e.ts",
       "specs/app/theme-language.e2e.ts",
+      "specs/disk-writes/app.e2e.ts",
       "specs/chat/follow-limit.e2e.ts",
       "specs/chat/pm-overview.e2e.ts",
       "specs/chat/pm-rules.e2e.ts",

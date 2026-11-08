@@ -534,7 +534,9 @@
     "copyWhole": "Copiază tot jurnalul",
     "openLogFolder": "Deschide folderul jurnalelor",
     "logCopied": "Jurnal copiat.",
-    "fileLabel": "Fișier de diagnosticare"
+    "fileLabel": "Fișier de diagnosticare",
+    "writeToDisk": "Scrie jurnalele pe disc",
+    "writeToDiskHint": "Dezactivat păstrează jurnalul doar în memorie pentru această sesiune — nu se scrie nimic pe disc."
   },
   "about": {
     "version": "Versiune",
@@ -1293,5 +1295,15 @@
     "button": "Șterge istoricul",
     "confirm": "Ștergi istoricul activității tuturor serverelor? Acțiunea nu poate fi anulată.",
     "confirmButton": "Șterge"
+  },
+  "diskWrites": {
+    "title": "Mai puține scrieri pe disc",
+    "hint": "Mai puține scrieri uzează mai puțin discurile SSD. Fiecare comutator păstrează comportamentul actual când este activ.",
+    "durableSaves": "Așteaptă discul la fiecare salvare",
+    "durableSavesHint": "Dezactivat scrie mai puțin, dar o pană de curent poate pierde ultimele secunde de istoric și setări.",
+    "linkPreviewsOnDisk": "Păstrează previzualizările linkurilor pe disc",
+    "linkPreviewsOnDiskHint": "Dezactivat păstrează previzualizările doar în memorie pentru această sesiune.",
+    "pluginRegistryCache": "Păstrează o copie a registrului de pluginuri pe disc",
+    "pluginRegistryCacheHint": "Dezactivat descarcă întotdeauna registrul din nou."
   }
 }
