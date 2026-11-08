@@ -39,7 +39,7 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-curl -fsSL "https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v$SVT_AV1_VERSION/SVT-AV1-v$SVT_AV1_VERSION.tar.gz" \
+curl -fsSL --retry 5 --retry-delay 5 "https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v$SVT_AV1_VERSION/SVT-AV1-v$SVT_AV1_VERSION.tar.gz" \
   | tar -xz -C "$work"
 src="$work/SVT-AV1-v$SVT_AV1_VERSION"
 
