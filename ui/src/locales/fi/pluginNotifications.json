@@ -1,9 +1,9 @@
 {
-  "type": "Laajennus",
+  "type": "Lisäosa",
   "autoOff": {
     "title": "{{name}} poistettiin käytöstä",
     "body": "Poistettu käytöstä toistuvien kaatumisten jälkeen",
-    "open": "Näytä Laajennuksissa"
+    "open": "Näytä lisäosissa"
   },
   "pictureRefused": {
     "title": "{{name}} ei voinut käyttää kuvaa",
@@ -24,7 +24,7 @@
     "detailsLabel": "Tiedot: {{name}}",
     "notNow": "Ei nyt",
     "notNowLabel": "Piilota {{name}} toistaiseksi",
-    "dontAsk": "Älä kysy enää tästä palvelimesta",
+    "dontAsk": "Älä kysy enää tällä palvelimella",
     "recommended": "Suositeltu",
     "official": "Virallinen",
     "unofficial": "Epävirallinen · {{host}}",

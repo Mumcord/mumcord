@@ -39,10 +39,10 @@
   "mumcordBadge": "Kasutab Mumcordi",
   "botBadge": "Bot",
   "bots": {
-    "title": "Botid selles serveris ({{total}})",
+    "title": "Botid sellel serveril ({{total}})",
     "inChannel": "kanalis {{channel}}",
     "modules": {
-      "peer": "Relee",
+      "peer": "Releeserver",
       "music": "Mängib muusikat",
       "history": "Vestluse ajalugu",
       "webhook": "Veebihaagid"
@@ -53,8 +53,8 @@
     "listening": "Ainult kuulab",
     "muted": "Vaigistatud",
     "deafened": "Kurdistatud",
-    "serverMuted": "Server vaigistas",
-    "serverDeafened": "Server kurdistas",
+    "serverMuted": "Serveri poolt vaigistatud",
+    "serverDeafened": "Serveri poolt kurdistatud",
     "suppressed": "Summutatud – ei saa selles kanalis rääkida",
     "localMuted": "Sinu jaoks vaigistatud",
     "unregistered": "Sellel serveril registreerimata (külaline)",
@@ -70,7 +70,7 @@
     "talking": "{{name}} räägib"
   },
   "errors": {
-    "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
+    "joinDenied": "Sul pole õigust sellesse kanalisse siseneda.",
     "joinFailed": "Kanaliga liitumine ei õnnestunud. Proovi palun uuesti.",
     "notConnected": "Serveriga pole ühendatud.",
     "moveFailed": "Seda inimest ei õnnestunud teisaldada."
@@ -94,8 +94,8 @@
   "section": {
     "state": {
       "connected": "Ühendatud",
-      "connecting": "Ühendamine",
-      "reconnecting": "Ühendan uuesti…",
+      "connecting": "Ühendumine",
+      "reconnecting": "Ühendun uuesti…",
       "disconnected": "Ühendus katkenud"
     },
     "online": "{{count}} võrgus",
@@ -106,7 +106,7 @@
     "channel": "Kanal",
     "search": "Otsi kanaleid",
     "noMatch": "Ükski kanal ei vasta.",
-    "hint": "Vali kanal, kuhu inimesed peaksid minema.",
+    "hint": "Vali kanal, kuhu inimesed teisaldada.",
     "from": "Kanalist {{channel}}",
     "question": "Kas teisaldada {{people}} kanalist {{from}} kanalisse {{to}}?",
     "questionNoSource": "Kas teisaldada {{people}} kanalisse {{to}}?",
@@ -114,13 +114,13 @@
     "failed": "Mõnda inimest ei õnnestunud teisaldada.",
     "resultTitle": "Inimeste teisaldamine",
     "resultAll": "Teisaldati {{people}} kanalisse {{channel}}.",
-    "resultSome": "Teisaldati {{moved}} / {{people}} kanalisse {{channel}}. Ülejäänutest keelduti.",
+    "resultSome": "Teisaldati {{moved}} / {{people}} kanalisse {{channel}}. Ülejäänute puhul server keeldus.",
     "busy": "Inimesi juba teisaldatakse…"
   },
   "drag": {
     "into": "Teisalda kanalisse {{channel}}",
-    "above": "Paiguta {{channel}} kohale",
-    "below": "Paiguta {{channel}} alla",
+    "above": "Paiguta kanali {{channel}} kohale",
+    "below": "Paiguta kanali {{channel}} alla",
     "self": "Ei saa iseenda sisse",
     "subChannel": "Ei saa oma alamkanalisse",
     "confirmTitle": "Kas teisaldada „{{channel}}“?",

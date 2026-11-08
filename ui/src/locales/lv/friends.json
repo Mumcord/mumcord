@@ -8,11 +8,11 @@
   "offline": "Bezsaistē",
   "lastSeen": "Bezsaistē, pēdējoreiz redzēts {{when}}",
   "friend": "Draugs",
-  "friendHint": "Rāda, kad viņi ir tiešsaistē, un saglabā tavu privāto čatu ar viņiem.",
+  "friendHint": "Rāda, kad viņi ir tiešsaistē, un saglabā tavu privāto tērzēšanu ar viņiem.",
   "noCertificate": "Cilvēki bez sertifikāta nevar būt draugi, jo Mumcord nespētu viņus atpazīt nākamreiz.",
   "add": "Pievienot draugu",
   "remove": "Noņemt draugu",
-  "failed": "Drauga izmaiņas neizdevās. Lūdzu, mēģini vēlreiz.",
+  "failed": "Neizdevās mainīt drauga statusu. Lūdzu, mēģini vēlreiz.",
   "join": "Pievienoties",
-  "joinFriend": "Pievienoties {{name}} kanālam"
+  "joinFriend": "Pievienoties lietotāja {{name}} kanālam"
 }

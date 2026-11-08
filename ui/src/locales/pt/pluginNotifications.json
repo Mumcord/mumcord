@@ -28,7 +28,7 @@
     "recommended": "Recomendado",
     "official": "Oficial",
     "unofficial": "Não oficial · {{host}}",
-    "footer": "As sugestões nunca instalam nada sozinhas. O servidor não sabe o que você instala."
+    "footer": "As sugestões nunca instalam nada sozinhas. O servidor não sabe o que instalas."
   },
-  "failed": "Isso não funcionou. Tente novamente."
+  "failed": "Não funcionou. Tenta novamente."
 }

@@ -1,11 +1,11 @@
 {
   "title": "Plug-ins",
-  "tabsLabel": "Plug-in-onderdelen",
+  "tabsLabel": "Plug-inonderdelen",
   "tabs": {
     "installed": "Geïnstalleerd",
     "browse": "Ontdekken",
     "updates": "Updates",
-    "repositories": "Bronnen",
+    "repositories": "Repository's",
     "developer": "Ontwikkelaar"
   },
   "turnOffAll": "Alle plug-ins uitschakelen",

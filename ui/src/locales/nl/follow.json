@@ -16,8 +16,8 @@
   "notify": {
     "channel": "{{name}} in {{channel}}: {{text}}",
     "private": "{{name}} (privé): {{text}}",
-    "more_one": "{{count}} nieuw bericht meer",
-    "more_other": "{{count}} nieuwe berichten meer",
+    "more_one": "Nog {{count}} nieuw bericht",
+    "more_other": "Nog {{count}} nieuwe berichten",
     "channelOn": "{{name}} in {{channel}} op {{server}}: {{text}}",
     "privateOn": "{{name}} (privé, {{server}}): {{text}}"
   },
@@ -31,13 +31,13 @@
   },
   "star": {
     "follow": "{{channel}} volgen",
-    "unfollow": "{{channel}} ontvolgen"
+    "unfollow": "{{channel}} niet meer volgen"
   },
   "all": {
     "menu": "Serveropties voor {{server}}",
     "menuLabel": "Serveropties",
     "follow": "Alle kanalen volgen",
-    "unfollow": "Alle kanalen ontvolgen",
+    "unfollow": "Alle kanalen niet meer volgen",
     "working": "Kanalen volgen…",
     "followed_one": "{{count}} kanaal gevolgd.",
     "followed_other": "{{count}} kanalen gevolgd.",
@@ -46,14 +46,14 @@
     "limit": "limiet bereikt",
     "notAllowed": "niet toegestaan",
     "noAnswer": "geen antwoord van de server",
-    "unfollowed": "Alle kanalen ontvolgd.",
+    "unfollowed": "Je volgt geen kanalen meer.",
     "failed": "Alle kanalen volgen is mislukt. Probeer het opnieuw.",
     "dismiss": "Sluiten",
-    "unfollowFailed": "Alle kanalen ontvolgen is mislukt. Probeer het opnieuw."
+    "unfollowFailed": "Het stoppen met volgen van alle kanalen is mislukt. Probeer het opnieuw."
   },
   "mention": "bevat een vermelding van jou",
   "header": {
     "follow": "Kanaal volgen",
-    "unfollow": "Volgend, klik om te ontvolgen"
+    "unfollow": "Gevolgd, klik om niet meer te volgen"
   }
 }

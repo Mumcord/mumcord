@@ -14,7 +14,7 @@
     "disconnectedAll": "Desconectado de todos los servidores"
   },
   "readOnly": {
-    "text": "Estás leyendo sin participar: únete a un canal para hablar.",
+    "text": "Solo lectura: únete a un canal para hablar.",
     "join": "Unirse a {{channel}}"
   },
   "status": {
@@ -60,8 +60,8 @@
     "file": "No se pudo leer o escribir el archivo.",
     "generic": "Algo salió mal. Inténtalo de nuevo."
   },
-  "ptt": "Pulsar para hablar: mantén {{key}} para hablar",
-  "pttNoKey": "Pulsar para hablar: sin tecla asignada",
+  "ptt": "Push-to-talk: mantén {{key}} para hablar",
+  "pttNoKey": "Push-to-talk: sin tecla asignada",
   "quickSettings": {
     "linkPreviews": "Vistas previas de enlaces y contenido incrustado",
     "linkPreviewsHint": "Los sitios ven tu dirección IP",
@@ -186,7 +186,7 @@
     "imageBusy": "Ajustando la imagen al límite del servidor…",
     "imageScaled": "Imagen reducida a {{width}} × {{height}} para ajustarse al límite del servidor",
     "imageTooLarge": "Esta imagen no cabe en el límite del servidor ni reducida. Usa una imagen más pequeña o acorta el texto.",
-    "imageNotImage": "Solo se pueden añadir imágenes PNG, JPEG, GIF or WebP.",
+    "imageNotImage": "Solo se pueden añadir imágenes PNG, JPEG, GIF o WebP.",
     "imageUnreadable": "No se pudo leer la imagen. Prueba con otro archivo.",
     "imageSourceTooLarge": "Este archivo es demasiado grande (más de 25 MB).",
     "overText": "Demasiado largo para este servidor: {{used}} de {{limit}} caracteres. Acorta el texto.",

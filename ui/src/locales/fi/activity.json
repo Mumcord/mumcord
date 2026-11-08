@@ -2,7 +2,7 @@
   "tab": {
     "tabsLabel": "Jäsensarake",
     "members": "Jäsenet",
-    "activity": "Toiminto"
+    "activity": "Toiminta"
   },
   "you": "Sinä",
   "selfName": "sinun",
@@ -15,26 +15,26 @@
     "screenShareStopped": "lopetti näytön jakamisen",
     "watchPartyStarted": "aloitti yhteiskatselun",
     "watchPartyStopped": "lopetti yhteiskatselun",
-    "pluginActivityStarted": "aloitti {{plugin}}",
-    "pluginActivityStopped": "lopetti {{plugin}}",
+    "pluginActivityStarted": "käynnisti lisäosan {{plugin}}",
+    "pluginActivityStopped": "lopetti lisäosan {{plugin}}",
     "pluginEvent": "”{{text}}”"
   },
   "channel": "# {{channel}}",
-  "plugin": "laajennus",
-  "live": "livenä",
+  "plugin": "lisäosa",
+  "live": "suorana",
   "watch": "Katso",
   "join": "Liity",
   "today": "Tänään",
   "yesterday": "Eilen",
-  "empty": "Ei vielä toimintoja.",
+  "empty": "Ei vielä toimintaa.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} näytön jako",
-    "watchParty": "{{action}} {{name}} yhteiskatselu",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
-    "pluginEvent": "{{action}} {{plugin}}"
+    "screenShare": "{{action}}: {{name}}, näytön jako",
+    "watchParty": "{{action}}: {{name}}, yhteiskatselu",
+    "pluginActivity": "{{action}}: {{name}}, {{plugin}}",
+    "pluginEvent": "{{action}}: {{plugin}}"
   },
   "joinPartyFailed": "Yhteiskatseluun liittyminen epäonnistui.",
-  "joinActivityFailed": "Laajennuksen toimintoon liittyminen epäonnistui.",
+  "joinActivityFailed": "Lisäosan toimintaan liittyminen epäonnistui.",
   "earlier": "Aiemmin",
   "earlierLabel": "Aiemmin, ennen tätä istuntoa",
   "notice": {

@@ -2,7 +2,7 @@
   "composer": {
     "attach": "Udostępnij pliki",
     "attachLabel": "Udostępnij pliki na tym kanale",
-    "dropTitle": "Upuść, aby udostępnić na #{{channel}}",
+    "dropTitle": "Upuść, aby udostępnić na kanale #{{channel}}",
     "dropChoiceTitle": "Niektóre z nich to obrazy. Co z nimi zrobić?",
     "sendAsImage": "Wyślij jako obraz",
     "shareAsFile": "Udostępnij jako plik",
@@ -42,9 +42,9 @@
   },
   "card": {
     "label": "{{name}}, {{size}}, od: {{sender}}, {{state}}",
-    "labelOwn": "{{name}}, {{size}}, udostępnione przez Ciebie, {{state}}",
+    "labelOwn": "{{name}}, {{size}}, udostępnione przez ciebie, {{state}}",
     "meta": "{{size}} · {{type}}",
-    "metaOwn": "{{size}} · {{type}} · udostępnione przez Ciebie",
+    "metaOwn": "{{size}} · {{type}} · udostępnione przez ciebie",
     "checksum": "SHA-256",
     "checksumLabel": "Suma kontrolna SHA-256 {{hash}}",
     "copy": "Kopiuj",
@@ -67,13 +67,13 @@
     "open": "Otwórz",
     "gone": "Pliku nie ma już w {{folder}}",
     "mismatchTitle": "Niezgodna suma kontrolna – plik usunięty",
-    "mismatch": "Plik zmienił się w drodze lub nie zgadza się z ofertą, więc został usunięty. Nic nie zapisano ani nie otwarto. Poproś użytkownika {{sender}}, aby udostępnił go ponownie.",
+    "mismatch": "Plik zmienił się w drodze lub nie zgadza się z ofertą, więc został usunięty. Nic nie zapisano ani nie otwarto. Poproś użytkownika {{sender}} o ponowne udostępnienie.",
     "failed": "Pobieranie nie powiodło się: {{reason}}",
     "cancelled": "Pobieranie anulowane",
-    "busy": "{{sender}} jest zajęty, spróbuj później",
+    "busy": "{{sender}} jest zajęty(-a), spróbuj później",
     "noSpace": "Za mało miejsca na dysku w {{folder}}",
     "reason": {
-      "noAnswer": "{{sender}} nie odpowiedział",
+      "noAnswer": "{{sender}} nie odpowiada",
       "connect": "Nie udało się połączyć przez przekaźnik: {{reason}}",
       "connectUnknown": "Nie udało się połączyć przez przekaźnik",
       "stalled": "Transfer utknął",
@@ -91,20 +91,20 @@
       "unavailable": "niedostępne"
     },
     "unavailable": {
-      "offline": "{{sender}} przeszedł w tryb offline. Plik nie jest już dostępny.",
+      "offline": "{{sender}} jest offline. Plik nie jest już dostępny.",
       "ended": "To udostępnianie dobiegło końca. Udostępnianie kończy się po 24 godzinach.",
-      "askAgain": "Poproś użytkownika {{sender}}, aby udostępnił go ponownie."
+      "askAgain": "Poproś użytkownika {{sender}} o ponowne udostępnienie."
     },
     "disabled": {
       "receiveOff": "Odbieranie plików jest wyłączone",
       "receiveOffLink": "Otwórz ustawienia udostępniania plików",
-      "tooLarge": "Większy niż Twój limit {{limit}}",
+      "tooLarge": "Większy niż twój limit ({{limit}})",
       "tooLargeLink": "Zmień limit",
       "anotherDownload": "Trwa inne pobieranie"
     }
   },
   "sender": {
-    "downloadedBy": "Pobrali: {{names}}",
+    "downloadedBy": "Pobrane przez: {{names}}",
     "inProgress_one": "{{count}} pobieranie w toku · {{details}}",
     "inProgress_few": "{{count}} pobrania w toku · {{details}}",
     "inProgress_many": "{{count}} pobrań w toku · {{details}}",
@@ -114,13 +114,13 @@
     "waiting_few": "{{count}} oczekują",
     "waiting_many": "{{count}} oczekuje",
     "waiting_other": "{{count}} oczekuje",
-    "sharing": "Udostępnione, dopóki jesteś online · kończy się {{when}}",
+    "sharing": "Udostępniane, dopóki jesteś online · kończy się {{when}}",
     "stop": "Zakończ udostępnianie",
     "stopFailed": "Nie udało się zakończyć udostępniania: {{reason}}. Plik jest nadal udostępniony.",
     "ended": "Udostępnianie zakończone",
-    "endedStopped": "Udostępnianie zostało przez Ciebie zakończone",
+    "endedStopped": "Zatrzymano udostępnianie",
     "endedExpired": "Minęły 24 godziny",
-    "endedLeft": "Serwer został opuszczony",
+    "endedLeft": "Opuszczono serwer",
     "endedChanged": "Plik zmienił się na dysku, więc udostępnianie zatrzymano"
   },
   "dialog": {
@@ -132,9 +132,9 @@
     "confirmFolder": "Zapisz w",
     "confirm": "Pobierz",
     "cancel": "Anuluj",
-    "riskyTitle": "Ten plik może zaszkodzić Twojemu komputerowi",
+    "riskyTitle": "Ten plik może zaszkodzić twojemu komputerowi",
     "riskyFile": "{{name}} · {{size}} · od: {{sender}}",
-    "riskyBody": "To jest program. Programy mogą zmieniać Twój komputer i czytać Twoje pliki. Pobierz go tylko wtedy, gdy ufasz użytkownikowi {{sender}} i spodziewasz się tego pliku.",
+    "riskyBody": "To jest program. Programy mogą zmieniać twój komputer i czytać twoje pliki. Pobierz go tylko wtedy, gdy ufasz użytkownikowi {{sender}} i spodziewasz się tego pliku.",
     "riskyNote": "Mumcord sprawdza, czy plik dotarł bez zmian, ale nie potrafi ocenić, czy jest bezpieczny.",
     "riskyConfirm": "Pobierz mimo to",
     "riskyCancel": "Nie pobieraj",
@@ -144,8 +144,8 @@
   "settings": {
     "title": "Udostępnianie plików",
     "new": "Nowość",
-    "receive": "Odbieraj pliki od innych użytkowników Mumcord",
-    "receiveHint": "Pliki pochodzą od nadawcy, dopóki jest online. Zablokowane osoby nie mogą wysyłać Ci plików.",
+    "receive": "Odbieraj pliki od innych użytkowników Mumcorda",
+    "receiveHint": "Pliki są pobierane od nadawcy, dopóki jest online. Zablokowane osoby nie mogą wysyłać ci plików.",
     "maxSize": "Maksymalny rozmiar pliku",
     "maxSizeHint": "Można udostępniać pliki do 2 GB. Domyślnie 1 GB. Nic większego nie jest możliwe.",
     "size100mb": "100 MB",
@@ -154,7 +154,7 @@
     "size2gb": "2 GB",
     "saveTo": "Zapisuj pliki w",
     "change": "Zmień…",
-    "relayNote": "Pliki zawsze przechodzą przez przekaźnik serwera, więc nikt nie widzi Twojego adresu IP. Serwery bez przekaźnika nie mogą udostępniać plików. Nic nie jest pobierane bez Twojego kliknięcia i potwierdzenia.",
+    "relayNote": "Pliki zawsze przechodzą przez przekaźnik serwera, więc nikt nie widzi twojego adresu IP. Serwery bez przekaźnika nie mogą udostępniać plików. Nic nie jest pobierane bez twojego kliknięcia i potwierdzenia.",
     "encryptionNote": "Pliki są szyfrowane end-to-end i sprawdzane po pobraniu."
   }
 }

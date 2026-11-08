@@ -46,7 +46,7 @@
     "subtitle": "Mumcord hovorí po Mumble, takže funguje s každým serverom Mumble, a pridáva k nemu moderný chat. Nastavme ho podľa tvojho gusta. Trvá to asi dve minúty.",
     "voice": {
       "title": "Krištáľovo čistý hlas",
-      "text": "Zvuk s nízkou latenciou a vstavaným potlačením hluku."
+      "text": "Zvuk s nízkou latenciou a vstavaným potlačením šumu."
     },
     "servers": {
       "title": "Funguje s každým serverom Mumble",
@@ -90,9 +90,9 @@
     "idle": "Stlač Test, niečo povedz a budeš sa počuť.",
     "recording": "Hovor teraz…",
     "playing": "Prehrávam tvoj hlas…",
-    "devicesFailed": "Tvoje zvukové zariadenia sa nepodarilo zistiť. Môžeš pokračovať a vybrať ich neskôr v nastaveniach.",
+    "devicesFailed": "Tvoje zvukové zariadenia sa nepodarilo zistiť. Môžeš pokračovať a vybrať ich neskôr v Nastaveniach.",
     "testFailed": "Test sa nepodarilo spustiť. Skontroluj, či je mikrofón pripojený.",
-    "test": "Vypočuj sa",
+    "test": "Vypočuť sa",
     "stop": "Zastaviť"
   },
   "voice": {
@@ -120,13 +120,13 @@
       "title": "Vyvážené",
       "subtitle": "Medzi súkromím a pohodlím",
       "p1": "Písať ti môžu len priatelia a ľudia z tvojho kanála",
-      "p2": "Priame pripojenie, s relay ako záložným riešením",
+      "p2": "Priame pripojenie, s relayom ako záložným riešením",
       "p3": "Náhľady odkazov a obrázky v plnej veľkosti sú zapnuté",
       "p4": "To, čo hráš a čo počúvaš, zostáva súkromné"
     },
     "maximumPrivacy": {
       "title": "Maximálne súkromie",
-      "subtitle": "Zdieľaj čo najmenej",
+      "subtitle": "Zdieľať čo najmenej",
       "p1": "Písať ti môžu len priatelia, bez výnimiek",
       "p2": "Tvoja IP adresa je skrytá; všetko ide cez relay",
       "p3": "Žiadny externý obsah, žiadna synchronizácia histórie, žiadne zdieľanie",
@@ -148,8 +148,8 @@
     "local": "Filtrovanie prebieha na tvojom počítači. Odosielatelia sa o ňom nedozvedia. Neskôr môžeš nastaviť iné pravidlo pre každý server."
   },
   "notifications": {
-    "title": "Ako vás má Mumcord upozorňovať?",
-    "subtitle": "Vyberte, ako sa k vám má dostať každý druh noviniek. Neskôr to môžete zmeniť v Nastaveniach → Upozornenia."
+    "title": "Ako ťa má Mumcord upozorňovať?",
+    "subtitle": "Vyber, ako sa k tebe má dostať každý druh noviniek. Neskôr to môžeš zmeniť v Nastaveniach → Upozornenia."
   },
   "connections": {
     "title": "Pripojenia a obsah",
@@ -159,14 +159,14 @@
   },
   "features": {
     "title": "Prispôsob si ho",
-    "subtitle": "Zapni doplnky, ktoré chceš. Pri každom je uvedené, kto čo vidí.",
+    "subtitle": "Zapni funkcie navyše, ktoré chceš. Pri každej je uvedené, kto čo vidí.",
     "seenByMumcordUsers": "Viditeľné pre používateľov Mumcordu na tom istom serveri.",
     "onlyYou": "Vidíš to len ty.",
     "ingameOverlayAlt": "Príklad prekrytia v hre, ktoré ukazuje, kto hovorí"
   },
   "appearance": {
     "title": "Vyber si vzhľad",
-    "subtitle": "Okno sa mení podľa tvojho výberu. V Nastaveniach nájdeš viac tém a môžeš si vytvoriť aj vlastnú."
+    "subtitle": "Okno sa mení podľa tvojho výberu. V Nastaveniach nájdeš viac motívov a môžeš si vytvoriť aj vlastný."
   },
   "startup": {
     "title": "Spúšťanie a aktualizácie",
@@ -180,7 +180,7 @@
   "summary": {
     "title": "Všetko je pripravené",
     "titleNamed": "Všetko je pripravené, {{name}}",
-    "subtitle": "Toto si vybral. Pred spustením môžeš čokoľvek zmeniť pomocou Upraviť na ktorejkoľvek karte.",
+    "subtitle": "Toto je tvoj výber. Pred spustením môžeš čokoľvek zmeniť pomocou Upraviť na ktorejkoľvek karte.",
     "on": "zapnuté",
     "off": "vypnuté",
     "unavailable": "tu nie je dostupné",
@@ -199,14 +199,14 @@
       "updates": "Aktualizácie"
     },
     "identityDetail": "Uložená v systémovej kľúčenke",
-    "voiceDetail": "Potlačenie hluku: {{noise}}",
+    "voiceDetail": "Potlačenie šumu: {{noise}}",
     "pmDetail": "Môj kanál {{channel}} · prijaté chaty {{accepted}} · žiadosti {{requests}}",
     "notificationsTitle": "Nové správy: {{mode}}",
     "notificationsDetail": "Upozornenia na aktivitu: zapnuté {{on}} z {{total}}",
     "contentTitle": "Náhľady odkazov {{previews}}",
     "contentDetail": "Obrázky v plnej veľkosti {{images}} · synchronizácia histórie {{sync}}",
     "featuresTitle": "Prekrytie v hre {{overlay}}",
-    "featuresDetail": "Sledovať systémový režim Nerušiť {{dnd}} · práve hrá {{playing}} · práve hrám {{gaming}} · história aktivity {{history}}",
+    "featuresDetail": "Sledovať systémový režim Nerušiť {{dnd}} · práve počúvam {{playing}} · práve hrám {{gaming}} · história aktivity {{history}}",
     "effectsDetail": "Vizuálne efekty {{effects}}",
     "startupTitle": "Spustiť pri prihlásení {{login}}",
     "startupDetail": "Spustiť minimalizovaný {{minimized}} · odkazy mumble:// {{links}}",
@@ -218,7 +218,7 @@
     "updatesDetail": "Aktualizácie sa pred inštaláciou vždy kontrolujú a overujú.",
     "backup": "Tvoja identita {{name}} je uložená v systémovej kľúčenke. Zálohuj ju v Nastavenia → Identita, aby si nikdy neprišiel o registrované meno.",
     "nextServer": "Ďalej: pridaj svoj prvý server",
-    "rerunNote": "Ukladajú sa iba hodnoty, ktoré si zmenil."
+    "rerunNote": "Ukladajú sa iba zmenené hodnoty."
   },
   "rerun": {
     "title": "Sprievodca nastavením",
@@ -243,7 +243,7 @@
       "privateMessages": "Kto ti smie písať",
       "notifications": "Tvoje upozornenia",
       "connections": "Priame spojenia",
-      "features": "Vyber si doplnky",
+      "features": "Vyber si funkcie navyše",
       "appearance": "Vyber si vzhľad",
       "startup": "Spúšťanie Mumcordu",
       "summary": "Skontroluj svoje voľby"
@@ -257,7 +257,7 @@
       "privateMessages": "Vyber, kto ti môže posielať súkromné správy. Odosielatelia sa to nikdy nedozvedia.",
       "notifications": "Vyber, ako sa k tebe dostane každý druh noviniek, alebo ho vypni.",
       "connections": "Vyber, či ťa môže Mumcord prepojiť priamo s ďalšími používateľmi Mumcordu.",
-      "features": "Zapni len doplnky, ktoré sa ti páčia. Každá karta hovorí, kto ju vidí.",
+      "features": "Zapni len funkcie navyše, ktoré sa ti páčia. Na každej karte je uvedené, kto ju vidí.",
       "appearance": "Svetlý, tmavý alebo podľa systému: tu si vyber vzhľad.",
       "startup": "Vyber, ako sa Mumcord spustí, keď sa prihlásiš do počítača.",
       "summary": "Hotovo! Tu skontroluj svoje voľby; tlačidlom Upraviť sa vrátiš k ľubovoľnému kroku."

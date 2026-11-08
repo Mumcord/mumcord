@@ -1,6 +1,6 @@
 {
   "turnOn": "Laita kamera päälle",
-  "turnOnHint": "Näet ensin esikatselun. Vain kanavan {{channel}} jäsenet näkevät sinut.",
+  "turnOnHint": "Näet ensin esikatselun. Vain kanavalla {{channel}} olevat näkevät sinut.",
   "turnOff": "Sammuta kamera",
   "turnOffLabel": "Sammuta kamera. Kamerasi on päällä.",
   "cameraOn": "Kamera päällä",
@@ -23,7 +23,7 @@
     "title": "Laita kamera päälle",
     "subtitle": "Esikatselu · kukaan ei näe tätä vielä",
     "previewLabel": "Kameran esikatselu",
-    "privacy": "Vain kanavan {{channel}} jäsenet näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
+    "privacy": "Vain kanavalla {{channel}} olevat näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
     "camera": "Kamera",
     "background": "Tausta",
     "backgroundNone": "Ei mitään",
@@ -49,7 +49,7 @@
     "cancel": "Peruuta",
     "turnOn": "Laita kamera päälle",
     "starting": "Käynnistetään kameraa …",
-    "privacyNote": "Vain kanavan <channel/> jäsenet näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
+    "privacyNote": "Vain kanavalla <channel/> olevat näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
     "effectsLoadOnly": "Tehosteet toimivat tällä laitteella. Kuormitus: {{load}}",
     "effectsIdle": "Tehosteet toimivat tällä laitteella.",
     "effectsUnavailable": "Taustatehosteet eivät ole käytettävissä tällä tietokoneella: {{reason}}",
@@ -100,10 +100,10 @@
     "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran",
     "dismissStopped": "Ohita",
     "notRegistered": "Kamera ei käynnistynyt: vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella.",
-    "groupNotAllowed": "Kamera ei käynnistynyt: palvelimen välitin palvelee vain tiettyjä ryhmiä. Pyydä ylläpitoa lisäämään sinut.",
+    "groupNotAllowed": "Kamera ei käynnistynyt: palvelimen välityspalvelin palvelee vain tiettyjä ryhmiä. Pyydä ylläpitäjää lisäämään sinut.",
     "notSameChannel": "Kamera ei käynnistynyt: sinun ja katsojiesi pitää olla samalla kanavalla.",
     "notInChannel": "Kamera ei käynnistynyt: liity ensin kanavalle.",
-    "noHello": "Kamera ei käynnistynyt: välitinbotti ei vielä tunne tätä sovellusta. Yhdistä uudelleen korjataksesi."
+    "noHello": "Kamera ei käynnistynyt: välityspalvelimen botti ei vielä tunne tätä sovellusta. Korjaa yhdistämällä uudelleen."
   },
   "privacy": {
     "windows": "Windows estää työpöytäsovellusten pääsyn kameraan",
@@ -116,14 +116,14 @@
   "announce": {
     "on": "Kamera päällä",
     "off": "Kamera pois päältä",
-    "live": "Kamerasi on livenä",
+    "live": "Kamerasi lähettää nyt suorana",
     "stopped": "Kamerasi pysähtyi",
     "joined": "{{name}} laittoi kameransa päälle",
     "left": "{{name}} sammutti kameransa",
     "turnedOn_one": "{{names}} laittoi kameransa päälle",
     "turnedOn_other": "{{names}} laittoivat kameransa päälle",
-    "turnedOff_one": "{{names}} sulki kameransa",
-    "turnedOff_other": "{{names}} sulkivat kameransa"
+    "turnedOff_one": "{{names}} sammutti kameransa",
+    "turnedOff_other": "{{names}} sammuttivat kameransa"
   },
   "room": {
     "title": "Kamerahuone",
@@ -142,9 +142,9 @@
     "controls": "Kamerahuoneen hallinta",
     "without_one": "{{names}} on täällä ilman kameraa",
     "without_other": "{{names}} ovat täällä ilman kameraa",
-    "live": "Livenä",
+    "live": "Suorana",
     "you": "Sinä",
-    "selfLabel": "Sinä, kamera päällä, livenä",
+    "selfLabel": "Sinä, kamera päällä, suorana",
     "selfLabelPlain": "Sinä, kamera päällä",
     "background": "Tausta: {{name}}",
     "hideSelf": "Piilota oma kuva",
@@ -205,7 +205,7 @@
   },
   "combined": {
     "screenTitle": "Käyttäjän {{name}} näyttö",
-    "screenLive": "Livenä",
+    "screenLive": "Suorana",
     "partyTitle": "Yhteiskatselu",
     "partyStarted": "Aloittanut {{name}}",
     "label": "{{title}} ja kamerahuone"
@@ -245,7 +245,7 @@
     "showAlways": "Aina",
     "showOnOpen": "Kun avaan huoneen",
     "showNever": "Ei koskaan",
-    "showHint": "Aina avaa kamerahuoneen, kun joku kanavallasi laittaa kameran päälle. Ei koskaan pitää sinut vain äänessä eikä lataa videota.",
+    "showHint": "Aina: kamerahuone avautuu, kun joku kanavallasi laittaa kameran päälle. Ei koskaan: kuulet vain äänen, eikä videota ladata.",
     "dataSaver": "Datansäästö: enintään 15 fps kaikille",
     "reduceMotion": "Vähennä liikettä: ei hehkua tai animaatiota puhujan kehyksessä",
     "reduceMotionHint": "Noudattaa oletuksena järjestelmäsi liikkeen vähennys -asetusta."

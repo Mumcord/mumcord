@@ -1,5 +1,5 @@
 {
-  "title": "Kontakt disse websteder",
+  "title": "Kontakt til disse websteder",
   "intro": "{{plugin}} og dets side kan kun sende og modtage data med:",
   "introUpdate": "{{plugin}} og dets side kunne så nå:",
   "privacy": "Disse websteder kan se din IP-adresse og alt, hvad {{plugin}} sender dem.",
@@ -45,10 +45,10 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Denne opdatering vil kontakte {{count}} nyt websted.",
     "wantsNew_other": "Denne opdatering vil kontakte {{count}} nye websteder.",
     "staysOn": "{{plugin}} bliver på {{version}}, indtil du beslutter dig.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} opdatering venter på dig. Opdateringer, der tilføjer tilladelser eller websteder, installeres aldrig automatisk.",
     "banner_other": "{{count}} opdateringer venter på dig. Opdateringer, der tilføjer tilladelser eller websteder, installeres aldrig automatisk.",
     "noOther": "Ingen andre tilladelser ændres.",
     "whatsNew": "Nyt i {{version}}",

@@ -4,6 +4,6 @@
   "resize": "Cambiar el tamaño del panel lateral de {{plugin}}",
   "failed": "No se pudo cerrar el panel lateral de {{plugin}}. Inténtalo de nuevo.",
   "options": "Opciones de {{plugin}}",
-  "details": "Detalles del complemento",
+  "details": "Detalles del plugin",
   "closePanel": "Cerrar el panel"
 }

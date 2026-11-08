@@ -10,7 +10,7 @@
   },
   "relay": {
     "mumbot": "Mumbot",
-    "relay": "Retransmissor Mumpeer",
+    "relay": "Retransmissor mumpeer",
     "yes": "Sim",
     "yesNamed": "Sim ({{names}})",
     "no": "Não",
@@ -50,8 +50,8 @@
     "notRegistered": "O retransmissor deste servidor só está disponível para utilizadores registados. Regista-te neste servidor para o usar.",
     "peerGone": "A outra pessoa saiu do servidor.",
     "rateLimited": "Demasiados pedidos ao retransmissor. Tenta novamente dentro de um minuto.",
-    "groupNotAllowed": "O relay deste servidor só está disponível para certos grupos. Pede a um administrador para te adicionar.",
-    "noHello": "O bot do relay ainda não conhece esta app. Volta a ligar para resolver."
+    "groupNotAllowed": "O retransmissor deste servidor só está disponível para certos grupos. Pede a um administrador para te adicionar.",
+    "noHello": "O bot do retransmissor ainda não conhece esta app. Volta a ligar-te para resolver."
   },
   "refusal": {
     "unknownToken": "token de acesso desconhecido",
@@ -70,21 +70,21 @@
     "filesRegisteredOnly": "A partilha de ficheiros só está disponível para utilizadores registados neste servidor."
   },
   "trust": {
-    "title": "Relay alterado em {{server}}",
-    "body": "A partilha de ecrã e ficheiros está em pausa até confiares no novo relay.",
+    "title": "Retransmissor alterado em {{server}}",
+    "body": "A partilha de ecrã e de ficheiros está em pausa até confiares no novo retransmissor.",
     "details": "Detalhes",
-    "trustedTitle": "Novo relay de confiança",
+    "trustedTitle": "Novo retransmissor de confiança",
     "trustedBody": "A partilha de ecrã e ficheiros em {{server}} volta a funcionar.",
-    "dialogBody": "O relay deste servidor usa agora outro certificado. Até confiares nele, a partilha de ecrã, de ficheiros e as imagens em tamanho real estão em pausa.",
-    "previous": "Relay de confiança anterior",
-    "current": "Novo relay",
+    "dialogBody": "O retransmissor deste servidor usa agora outro certificado. Até confiares nele, a partilha de ecrã, a partilha de ficheiros e as imagens em tamanho real estão em pausa.",
+    "previous": "Retransmissor de confiança anterior",
+    "current": "Novo retransmissor",
     "unknown": "Desconhecido",
     "trustIf": "Confia se",
-    "trustIfText": "os administradores anunciaram um novo relay ou uma mudança e podes confirmar isso com eles.",
+    "trustIfText": "os administradores do servidor anunciaram um novo retransmissor ou mudaram-no, e podes confirmar isso com eles.",
     "dontTrustIf": "Não confies se",
-    "dontTrustIfText": "ninguém anunciou uma alteração ou não tens a certeza. Alguém pode estar a fazer-se passar pelo relay.",
+    "dontTrustIfText": "ninguém anunciou uma alteração ou não tens a certeza. Alguém pode estar a fazer-se passar pelo retransmissor.",
     "notNow": "Agora não",
-    "review": "Relay alterado – rever",
-    "filesBlocked": "A partilha de ficheiros não está disponível: o relay deste servidor mudou e ainda não é de confiança."
+    "review": "Retransmissor alterado – rever",
+    "filesBlocked": "A partilha de ficheiros não está disponível: o retransmissor deste servidor mudou e ainda não é de confiança."
   }
 }

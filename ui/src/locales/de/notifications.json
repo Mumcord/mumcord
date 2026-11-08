@@ -42,7 +42,7 @@
     "messageRequestBody_other": "{{count}} Nachrichten von einem Standard-Mumble-Client",
     "invite": {
       "watchParty": "{{name}} hat dich zu einer Watch-Party eingeladen",
-      "screenShare": "{{name}} teilt den Bildschirm",
+      "screenShare": "{{name}} gibt den Bildschirm frei",
       "card": "{{name}} hat dir eine Karte gesendet",
       "theme": "{{name}} hat ein Design mit dir geteilt"
     },
@@ -51,7 +51,7 @@
       "chatRequest": "Chatanfrage",
       "messageRequest": "Nachrichtenanfrage",
       "invite": "Einladung",
-      "private": "Private Nachricht",
+      "private": "Privatnachricht",
       "connection": "Verbindung",
       "update": "Update"
     },
@@ -60,8 +60,8 @@
     "join": "Beitreten",
     "watch": "Ansehen",
     "open": "Öffnen",
-    "dismiss": "Verwerfen",
-    "dismissItem": "Verwerfen: {{title}}",
+    "dismiss": "Ausblenden",
+    "dismissItem": "Ausblenden: {{title}}",
     "failed": "Das hat nicht geklappt. Bitte versuche es erneut.",
     "block": "Blockieren",
     "update": {
@@ -73,7 +73,7 @@
     "relay": {
       "title": "Relay auf {{server}} geändert",
       "body": "Bildschirm- und Dateifreigabe sind pausiert, bis du dem neuen Relay vertraust.",
-      "decision": "Deine Entscheidung nötig"
+      "decision": "Deine Entscheidung ist gefragt"
     }
   }
 }

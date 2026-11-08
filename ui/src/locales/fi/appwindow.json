@@ -22,21 +22,21 @@
   },
   "appImageMenu": {
     "title": "Lisätäänkö Mumcord sovellusvalikkoon?",
-    "description": "Näin Mumcord näkyy sovellusvalikossasi. Kuvake ja puhu painamalla toimivat oikein Waylandissa, ja mumble://-linkit avaavat Mumcordin. Voit muuttaa tätä myöhemmin asetuksista.",
+    "description": "Näin Mumcord näkyy sovellusvalikossasi. Kuvake ja Push-to-talk toimivat silloin oikein Waylandissa, ja mumble://-linkit avaavat Mumcordin. Voit muuttaa tätä myöhemmin asetuksista.",
     "no": "Ei",
     "yes": "Kyllä",
     "failed": "Se ei onnistunut. Yritä uudelleen."
   },
   "updateCheck": {
     "title": "Etsitäänkö uusia versioita?",
-    "description": "Mumcord voi kysyä GitHubilta säännöllisesti, onko uudempaa versiota, ja kertoa siitä sinulle. Mitään ei ladata tai asenneta kysymättä, eikä mitään lähetetä itse pyynnön sekä sovelluksen nimen ja version lisäksi. Voit muuttaa tätä myöhemmin Asetuksissa.",
+    "description": "Mumcord voi kysyä GitHubilta säännöllisesti, onko uudempaa versiota, ja kertoa siitä sinulle. Mitään ei ladata tai asenneta kysymättä, eikä mitään lähetetä itse pyynnön sekä sovelluksen nimen ja version lisäksi. Voit muuttaa tätä myöhemmin asetuksista.",
     "no": "Ei",
     "yes": "Kyllä",
     "failed": "Se ei onnistunut. Yritä uudelleen."
   },
   "directConsent": {
     "title": "Sallitaanko suorat yhteydet?",
-    "description": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Mumcord käyttää niitä täysikokoisiin kuviin ja näytön jakamiseen muiden Mumcord-käyttäjien kanssa ja voi avata niitä varten portin reitittimeesi. Jos vastaat ei, kuvat tulevat edelleen palvelimen kautta eikä näytön jakaminen ole käytettävissä. Voit muuttaa tätä myöhemmin kohdassa Asetukset → Yksityisyys. Jos tämä palvelin tarjoaa releen, Mumcord voi käyttää sitä; silloin toinen henkilö ei näe IP-osoitettasi.",
+    "description": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Mumcord käyttää niitä täysikokoisiin kuviin ja näytön jakamiseen muiden Mumcord-käyttäjien kanssa ja voi avata niitä varten portin reitittimeesi. Jos vastaat ei, kuvat tulevat edelleen palvelimen kautta eikä näytön jakaminen ole käytettävissä. Voit muuttaa tätä myöhemmin kohdassa Asetukset → Yksityisyys. Jos tämä palvelin tarjoaa välityspalvelimen, Mumcord voi käyttää sitä; silloin toinen henkilö ei näe IP-osoitettasi.",
     "no": "Ei",
     "yes": "Kyllä",
     "failed": "Se ei onnistunut. Yritä uudelleen."
@@ -73,7 +73,7 @@
       "pending": "ei vielä alkanut"
     },
     "progress": {
-      "title": "Ladataan Mumcord {{version}}",
+      "title": "Ladataan: Mumcord {{version}}",
       "subtitle": "Voit jatkaa Mumcordin käyttöä tämän aikana.",
       "label": "Päivityksen edistyminen",
       "unknown": "Kokoa ei vielä tiedetä",

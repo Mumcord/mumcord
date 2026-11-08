@@ -1,6 +1,6 @@
 {
   "hint": "Lade einen entpackten Plugin-Ordner, um ihn zu testen. Entwickler-Plugins sind nicht signiert, nie offiziell und können weder net.http, secrets noch ui.webview erhalten. Sie werden entladen, wenn der Entwicklermodus ausgeschaltet wird.",
-  "load": "Plugin-Ordner laden …",
+  "load": "Plugin-Ordner laden…",
   "pickFolder": "Plugin-Ordner auswählen",
   "empty": "Es ist kein Entwickler-Plugin geladen.",
   "listLabel": "Entwickler-Plugins",

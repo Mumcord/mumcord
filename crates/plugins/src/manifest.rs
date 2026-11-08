@@ -1835,6 +1835,10 @@ pub(crate) mod tests {
         let mut locales = 0;
         for dir in std::fs::read_dir(root.join("ui/src/locales")).expect("locales") {
             let dir = dir.expect("entry").path();
+            // GLOSSARY.md lives next to the language folders.
+            if !dir.is_dir() {
+                continue;
+            }
             locales += 1;
             for entry in keys["keys"].as_array().expect("keys") {
                 let file = dir.join(format!("{}.json", entry["namespace"].as_str().expect("ns")));

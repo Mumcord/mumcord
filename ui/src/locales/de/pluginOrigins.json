@@ -1,7 +1,7 @@
 {
   "title": "Kommuniziert mit diesen Websites",
   "intro": "{{plugin}} und seine Seite dürfen nur mit diesen Websites Daten senden und empfangen:",
-  "introUpdate": "{{plugin}} und seine Seite könnten dann diese erreichen:",
+  "introUpdate": "{{plugin}} und seine Seite könnten dann diese Websites erreichen:",
   "privacy": "Diese Websites können deine IP-Adresse und alles sehen, was {{plugin}} ihnen sendet.",
   "includesNames": "Das können auch Namen von Personen in deinem Kanal sein.",
   "listLabel": "Websites",
@@ -45,10 +45,10 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Dieses Update möchte mit {{count}} neuen Website kommunizieren.",
     "wantsNew_other": "Dieses Update möchte mit {{count}} neuen Websites kommunizieren.",
     "staysOn": "{{plugin}} bleibt auf {{version}}, bis du dich entscheidest.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} Update wartet auf dich. Updates, die Berechtigungen oder Websites hinzufügen, werden nie automatisch installiert.",
     "banner_other": "{{count}} Updates warten auf dich. Updates, die Berechtigungen oder Websites hinzufügen, werden nie automatisch installiert.",
     "noOther": "Keine anderen Berechtigungen ändern sich.",
     "whatsNew": "Neu in {{version}}",

@@ -23,7 +23,7 @@
     },
     "talk": {
       "title": "Cómo hablas",
-      "body": "¿Pulsar para hablar o activación por voz? Elígelo en Ajustes → Voz y audio, o abre Ajustes de voz… con la flechita junto al micrófono. Pulsar para hablar también funciona con los botones del ratón."
+      "body": "¿Push-to-talk o activación por voz? Elígelo en Ajustes → Voz y audio, o abre Ajustes de voz… con la flechita junto al micrófono. Push-to-talk también funciona con los botones del ratón."
     },
     "panel": {
       "title": "Tu panel de usuario",
@@ -39,7 +39,7 @@
     },
     "apps": {
       "title": "Apps",
-      "body": "Con el botón Apps de la barra de mensajes puedes compartir pantalla, empezar una watch party o activar tu cámara. Los plugins añaden más."
+      "body": "Con el botón Apps de la barra de mensajes puedes compartir pantalla, empezar una sesión de visionado o activar tu cámara. Los plugins añaden más."
     },
     "themes": {
       "title": "Tu estilo",

@@ -13,7 +13,7 @@
     "listLabel": "Servidores guardados",
     "add": "Añadir un servidor",
     "browse": "Explorar servidores públicos",
-    "keyboardHint": "Intro conecta. Alt más flecha arriba o abajo mueve el servidor. Mayúsculas más F10 abre más opciones.",
+    "keyboardHint": "Intro conecta. Alt más flecha arriba o abajo mueve el servidor. Mayús más F10 abre más opciones.",
     "label": "{{server}} ({{state}})",
     "state": {
       "connected": "conectado",
@@ -81,7 +81,7 @@
     "channelPassword": "Contraseña {{number}}",
     "channelPasswordChannel": "{{name}} ({{parent}})",
     "channelPasswordNotFound": "(no encontrado)",
-    "channelPasswordLastUsed": "Último uso {{when}}",
+    "channelPasswordLastUsed": "Último uso: {{when}}",
     "channelPasswordName": "Nombre para {{name}}",
     "renameChannelPassword": "Renombrar {{name}}",
     "rename": "Renombrar",
@@ -211,7 +211,7 @@
     "failed": "No se pudo enviar la contraseña. Inténtalo de nuevo.",
     "cancel": "Cancelar",
     "join": "Unirse",
-    "joining": "Uniéndose…"
+    "joining": "Entrando…"
   },
   "serverInfo": {
     "title": "Información del servidor",
@@ -283,9 +283,9 @@
     "permissionMakeTempChannel": "Crear canal temporal",
     "permissionListen": "Escuchar",
     "permissionKick": "Expulsar",
-    "permissionBan": "Vetar",
+    "permissionBan": "Banear",
     "permissionRegister": "Registrar usuarios",
-    "permissionSelfRegister": "Registrarse a sí mismo",
+    "permissionSelfRegister": "Registrarse",
     "permissionResetUserContent": "Restablecer contenido de usuario",
     "characters": "{{value}} caracteres"
   },

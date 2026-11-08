@@ -1,34 +1,34 @@
 {
   "installTitle": "Nainstalovat {{plugin}}?",
   "updateTitle": "Aktualizovat {{plugin}} na {{version}}?",
-  "asks": "{{plugin}} žádá o toto. Volitelná oprávnění můžeš vypnout hned nebo později.",
-  "asksShort": "Tento doplněk žádá o:",
-  "scoreCountsOptional": "Skóre počítá všechna oprávnění, o která může doplněk požádat, včetně volitelných.",
+  "asks": "{{plugin}} žádá o tato oprávnění. Volitelná můžeš vypnout hned nebo později.",
+  "asksShort": "Tento plugin žádá o:",
+  "scoreCountsOptional": "Skóre počítá všechna oprávnění, o která může plugin požádat, včetně volitelných.",
   "required": "Povinné",
   "optional": "Volitelné",
-  "runsCode": "Spouští kód, který vytvořil {{author}}. Mumcord ho nezkontroloval.",
+  "runsCode": "Spouští kód od autora {{author}}. Mumcord ho nezkontroloval.",
   "sealedFrame": "Nevidí Mumcord, tvoje soubory, mikrofon, kameru ani schránku. Zobrazuje se jen v: {{places}}.",
-  "ownCodeAndWebsites": "Tento doplněk přináší vlastní kód a komunikuje s webovými stránkami.",
-  "trustRepository": "{{repository}} je repozitář, který byl přidán. Instaluj z něj jen tehdy, pokud mu důvěřuješ.",
+  "ownCodeAndWebsites": "Tento plugin přináší vlastní kód a komunikuje s weby.",
+  "trustRepository": "{{repository}} je repozitář, který jsi přidal(a). Instaluj z něj jen tehdy, když mu důvěřuješ.",
   "understand": "Rozumím",
-  "trustAuthor": "Rozumím riziku a důvěřuji autorovi doplňku {{plugin}}",
+  "trustAuthor": "Rozumím riziku a důvěřuji autorovi pluginu {{plugin}}",
   "understandUpdate": "Rozumím, že riziko vzrostlo, a autorovi přesto důvěřuji",
-  "changeLater": "Později to změníš v Nastavení → Doplňky.",
+  "changeLater": "Změnit to můžeš později v Nastavení → Pluginy.",
   "cancel": "Zrušit",
   "notNow": "Teď ne",
   "install": "Nainstalovat",
   "installAnyway": "Přesto nainstalovat",
   "updateAnyway": "Přesto aktualizovat",
-  "highRiskTitle": "Toto je doplněk s vysokým rizikem",
-  "highRiskText": "Může otevírat vlastní webové stránky a komunikovat s weby (počet: {{count}}), které nemůžeš ověřit. Mumcord nevidí, co tyto stránky doplňku posílají ani co jim doplněk posílá. Publikoval ho někdo, kdo je na tomto počítači nový. Instaluj ho jen tehdy, pokud autora znáš a důvěřuješ mu.",
-  "highRiskWouldBecome": "Tato aktualizace by z doplňku udělala doplněk s vysokým rizikem",
-  "highRiskNotAutomatic": "Neinstaluje se automaticky. Zůstaneš-li na verzi {{version}}, zůstane současné skóre; verzi můžeš připnout v části Nainstalované.",
+  "highRiskTitle": "Toto je vysoce rizikový plugin",
+  "highRiskText": "Může otevírat vlastní webové stránky a komunikovat s weby (počet: {{count}}), které nemůžeš ověřit. Mumcord nevidí, co tyto weby pluginu posílají ani co jim plugin posílá. Publikoval ho někdo, kdo je na tomto počítači nový. Instaluj ho jen tehdy, když autora znáš a důvěřuješ mu.",
+  "highRiskWouldBecome": "Po této aktualizaci by byl plugin vysoce rizikový",
+  "highRiskNotAutomatic": "Automaticky se nenainstaluje. Když zůstaneš na verzi {{version}}, skóre se nezmění; verzi můžeš připnout v části Nainstalované.",
   "sameAuthorKey": "stejný klíč autora",
   "places": {
     "stage": "oblast médií",
     "side-panel": "boční panel",
     "dialog": "dialog",
-    "panel": "pruh doplňků"
+    "panel": "pruh pluginů"
   },
   "highRiskParts": {
     "webPagesAndWebsites_one": "Může otevírat vlastní webové stránky a komunikovat s {{count}} webem, který nemůžeš ověřit.",
@@ -40,8 +40,8 @@
     "websites_many": "Může komunikovat s {{count}} webu, který nemůžeš ověřit.",
     "websites_other": "Může komunikovat s {{count}} weby, které nemůžeš ověřit.",
     "webPages": "Může otevírat vlastní webové stránky.",
-    "cantSee": "Mumcord nevidí, co tyto weby doplňku posílají ani co jim doplněk posílá.",
+    "cantSee": "Mumcord nevidí, co tyto weby pluginu posílají ani co jim plugin posílá.",
     "newAuthor": "Publikoval ho někdo, kdo je na tomto počítači nový.",
-    "trust": "Instaluj ho jen tehdy, pokud autora znáš a důvěřuješ mu."
+    "trust": "Instaluj ho jen tehdy, když autora znáš a důvěřuješ mu."
   }
 }

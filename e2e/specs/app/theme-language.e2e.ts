@@ -117,9 +117,10 @@ const neutral = (t: string) =>
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
   // "Beta" is the same word in English, German and Spanish; "Details" is the German one.
   /^(Beta|Details)$/.test(t) ||
-  // "Apps" and "Plugins" are also the German and Spanish words, "Bitrate", "Status" and "Updates" the German ones;
+  // "Apps" and "Plugin(s)" are also the German and Spanish words, "Bitrate", "Status" and "Updates" the German ones;
+  // "Push-to-talk" stays English in every language (ui/src/locales/GLOSSARY.md);
   // preset theme names are names, not translated.
-  /^(Apps|Plugins|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  /^(Apps|Plugins?|Push-to-talk|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
   // "Standard" is the German default-identity badge ("Default"), which only matches the English
   // noise suppression level by chance.
   /^Standard$/.test(t) ||

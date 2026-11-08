@@ -50,7 +50,7 @@
     "notRegistered": "Relej tega strežnika je na voljo samo registriranim uporabnikom. Za uporabo se registriraj na tem strežniku.",
     "peerGone": "Druga oseba je zapustila strežnik.",
     "rateLimited": "Preveč zahtev za relej. Poskusi znova čez minuto.",
-    "groupNotAllowed": "Rele tega strežnika je na voljo le določenim skupinam. Prosi skrbnika, da te doda.",
+    "groupNotAllowed": "Relej tega strežnika je na voljo le določenim skupinam. Prosi skrbnika, da te doda.",
     "noHello": "Bot releja te aplikacije še ne pozna. Znova se poveži."
   },
   "refusal": {
@@ -70,21 +70,21 @@
     "filesRegisteredOnly": "Deljenje datotek je na tem strežniku na voljo le registriranim uporabnikom."
   },
   "trust": {
-    "title": "Rele na {{server}} se je spremenil",
+    "title": "Relej na {{server}} se je spremenil",
     "body": "Deljenje zaslona in datotek je zaustavljeno, dokler novemu releju ne zaupaš.",
     "details": "Podrobnosti",
     "trustedTitle": "Novemu releju zaupaš",
     "trustedBody": "Deljenje zaslona in datotek na {{server}} spet deluje.",
-    "dialogBody": "Rele tega strežnika zdaj uporablja drugo potrdilo. Dokler mu ne zaupaš, so deljenje zaslona, datotek in slike v polni velikosti zaustavljeni.",
-    "previous": "Doslej zaupanja vreden rele",
-    "current": "Nov rele",
+    "dialogBody": "Relej tega strežnika zdaj uporablja drugo potrdilo. Dokler mu ne zaupaš, so deljenje zaslona, datotek in slike v polni velikosti zaustavljeni.",
+    "previous": "Doslej zaupanja vreden relej",
+    "current": "Nov relej",
     "unknown": "Neznano",
     "trustIf": "Zaupaj mu, če",
-    "trustIfText": "so skrbniki strežnika napovedali nov rele ali selitev in lahko to preveriš pri njih.",
+    "trustIfText": "so skrbniki strežnika napovedali nov relej ali selitev in lahko to preveriš pri njih.",
     "dontTrustIf": "Ne zaupaj mu, če",
-    "dontTrustIfText": "nihče ni napovedal spremembe ali nisi prepričan. Nekdo se lahko predstavlja kot rele.",
+    "dontTrustIfText": "nihče ni napovedal spremembe ali nisi prepričan. Nekdo se lahko predstavlja kot relej.",
     "notNow": "Ne zdaj",
-    "review": "Rele spremenjen – preveri",
-    "filesBlocked": "Deljenje datotek ni na voljo: rele tega strežnika se je spremenil in mu še ne zaupaš."
+    "review": "Relej spremenjen – preveri",
+    "filesBlocked": "Deljenje datotek ni na voljo: relej tega strežnika se je spremenil in mu še ne zaupaš."
   }
 }

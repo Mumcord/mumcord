@@ -15,11 +15,11 @@
   "tips": {
     "servers": {
       "title": "Twoje serwery",
-      "body": "Na pasku po lewej stronie są Twoje serwery. Dodaj serwer przyciskiem +, a serwery publiczne przeglądaj za pomocą lupy. Możesz łączyć się z kilkoma serwerami naraz."
+      "body": "Na pasku po lewej stronie są twoje serwery. Dodaj serwer przyciskiem +, a serwery publiczne przeglądaj za pomocą lupy. Możesz łączyć się z kilkoma serwerami naraz."
     },
     "channels": {
       "title": "Kanały",
-      "body": "Kliknij dwukrotnie kanał, aby dołączyć i mówić. Pojedyncze kliknięcie pokazuje jego czat bez dołączania, a przycisk Obserwuj informuje Cię na bieżąco."
+      "body": "Kliknij dwukrotnie kanał, aby dołączyć i mówić. Pojedyncze kliknięcie pokazuje jego czat bez dołączania, a przycisk Obserwuj informuje cię na bieżąco."
     },
     "talk": {
       "title": "Jak mówisz",
@@ -39,11 +39,11 @@
     },
     "apps": {
       "title": "Aplikacje",
-      "body": "Przycisk Aplikacje na pasku wiadomości uruchamia udostępnianie ekranu, wspólne oglądanie lub Twoją kamerę. Wtyczki dodają więcej."
+      "body": "Przycisk Aplikacje na pasku wiadomości uruchamia udostępnianie ekranu, wspólne oglądanie lub kamerę. Wtyczki dodają więcej."
     },
     "themes": {
       "title": "Twój styl",
-      "body": "Koło zębate w lewym dolnym rogu przełącza między ciemnym a jasnym. W Ustawienia → Wygląd znajdziesz więcej motywów, a serwer może mieć własny: kliknij go prawym przyciskiem i wybierz Motyw."
+      "body": "Koło zębate w lewym dolnym rogu przełącza między motywem ciemnym a jasnym. W Ustawienia → Wygląd znajdziesz więcej motywów, a serwer może mieć własny: kliknij go prawym przyciskiem i wybierz Motyw."
     },
     "end": {
       "title": "To wszystko!",

@@ -15,7 +15,7 @@
   "tips": {
     "servers": {
       "title": "Serverele tale",
-      "body": "Bara din extrema stângă conține serverele tale. Adaugă unul cu + sau răsfoiește serverele publice cu lupa. Te poți conecta la mai multe servere deodată."
+      "body": "Bara din extrema stângă conține serverele tale. Adaugă unul cu + sau găsește servere publice cu lupa. Poți rămâne conectat la mai multe servere deodată."
     },
     "channels": {
       "title": "Canale",
@@ -27,7 +27,7 @@
     },
     "panel": {
       "title": "Panoul tău de utilizator",
-      "body": "Stânga jos îți oprești microfonul sau sunetul, pornești camera sau te deconectezi. Săgețile mici de lângă ele deschid mai multe opțiuni."
+      "body": "Din stânga jos îți oprești microfonul sau sunetul, pornești camera sau închizi apelul. Săgețile mici de lângă ele deschid mai multe opțiuni."
     },
     "search": {
       "title": "Găsește orice",

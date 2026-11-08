@@ -4,7 +4,7 @@
   "header": {
     "channel": "#{{name}}",
     "channelPrefix": "Csatorna",
-    "privatePrefix": "Privát chat vele:",
+    "privatePrefix": "Privát csevegés vele:",
     "unknownPerson": "Ismeretlen személy"
   },
   "list": {
@@ -31,22 +31,22 @@
     "bold": "Félkövér",
     "italic": "Dőlt",
     "strike": "Áthúzott",
-    "code": "Beágyazott kód",
+    "code": "Soron belüli kód",
     "codeBlock": "Kódblokk",
     "link": "Link",
     "quote": "Idézet"
   },
   "composer": {
-    "label": "Üzenet neki: {{name}}",
+    "label": "Üzenet: {{name}}",
     "hint": "Enter: küldés, Shift+Enter: új sor. Markdown is működik: **félkövér**, *dőlt*, `kód`, [link](https://…).",
     "addImage": "Kép hozzáadása",
-    "optionalMessage": "Adjon hozzá üzenetet (nem kötelező)",
+    "optionalMessage": "Üzenet hozzáadása (nem kötelező)",
     "removeImage": "Kép eltávolítása: {{name}}",
     "imagePreview": "Küldendő kép: {{name}}",
     "send": "Küldés",
     "noPermission": "Nincs jogosultságod írni ebbe a csatornába.",
     "unavailable": "Ez a csatorna már nem érhető el.",
-    "offline": "{{name}} offline. Akkor írhatsz újra, ha visszajött.",
+    "offline": "{{name}} offline. Akkor írhatsz neki, ha visszajön.",
     "unnamedImage": "Beillesztett kép",
     "attachFiles": "Fájlok megosztása"
   },
@@ -64,7 +64,7 @@
     "imageUnreadable": "A képet nem sikerült beolvasni. Próbálj egy másik fájlt.",
     "denied": "A szerver nem engedélyezte ezt az üzenetet.",
     "deniedWithReason": "A szerver nem engedélyezte ezt az üzenetet: {{reason}}",
-    "notConnected": "Nincs kapcsolat. Csatlakozz újra, és próbáld újra.",
+    "notConnected": "Nem vagy csatlakozva. Csatlakozz újra, és próbáld meg ismét.",
     "generic": "Az üzenetet nem sikerült elküldeni. Próbáld újra.",
     "onlyImages": "Csak képek küldhetők.",
     "sourceTooLarge": "Ez a fájl túl nagy a küldéshez (több mint 25 MB).",
@@ -72,7 +72,7 @@
   },
   "failed": {
     "notSent": "Nincs elküldve.",
-    "retry": "Újra",
+    "retry": "Újrapróbálás",
     "remove": "Törlés",
     "announce": "Egy üzenetet nem sikerült elküldeni."
   },
@@ -118,7 +118,7 @@
       "show": "Műsor"
     },
     "inBrowser": "A böngésződben szól",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "A Twitch lejátszója ezen a rendszeren nem fut a Mumcord ablakában, ezért a Lejátszás a böngésződben nyitja meg a közvetítést.",
     "card": "Linkelőnézet: {{title}}",
     "dismiss": "Előnézet elrejtése"
   },
@@ -157,7 +157,7 @@
     "removeNamed": "{{name}} eltávolítása a kedvencek közül",
     "send": "{{name}} küldése",
     "hint": "Nyílbillentyűk: mozgás, Enter: küldés, Delete: eltávolítás, Escape: bezárás.",
-    "empty": "Még nincsenek kedvenceid. Kattints jobb gombbal egy GIF-re a chatben, vagy használd rajta a csillagot, és válaszd a „Mentés kedvencként” lehetőséget. Itt fog megjelenni."
+    "empty": "Még nincsenek kedvenceid. Kattints jobb gombbal egy GIF-re a csevegésben, vagy használd rajta a csillagot, és válaszd a „Mentés kedvencként” lehetőséget. Itt fog megjelenni."
   },
   "linkMenu": {
     "label": "Link",
@@ -208,7 +208,7 @@
   "actions": {
     "label": "Közös indítás",
     "notConnected": "Nincs kapcsolat a szerverrel.",
-    "invalidLink": "Ez nem YouTube-videó linkje.",
+    "invalidLink": "Ez nem YouTube-videólink.",
     "linkLabel": "YouTube-link",
     "linkPlaceholder": "Illessz be egy YouTube-linket",
     "confirm": "Indítás",
@@ -254,22 +254,22 @@
     "plainText": "Egyszerű szöveg"
   },
   "mumbleCard": {
-    "addServer": "Hozzáadás a kiszolgálókhoz",
+    "addServer": "Hozzáadás a szerverekhez",
     "channel": "Csatorna: {{channel}}",
     "copy": "Link másolása",
     "copyLabel": "Link másolása: {{server}}",
-    "figures": "Ping {{ping}} ms · {{users}}/{{max}} felhasználó · kiszolgáló {{version}}",
+    "figures": "Ping {{ping}} ms · {{users}}/{{max}} felhasználó · szerver {{version}}",
     "goToChannel": "Ugrás a csatornához",
     "join": "Csatlakozás",
     "joinLabel": "Csatlakozás: {{server}}",
-    "joined": "Csatlakoztál",
-    "label": "Kiszolgálókártya: {{server}}",
-    "privacyOff": "A kiszolgáló értékei ki vannak kapcsolva a beállításokban",
-    "querying": "Kiszolgáló ellenőrzése…",
-    "retry": "Ellenőrizd újra",
-    "retryLabel": "Ellenőrizd újra {{server}}",
+    "joined": "Csatlakozva",
+    "label": "Szerverkártya: {{server}}",
+    "privacyOff": "A szerveradatok ki vannak kapcsolva a beállításokban",
+    "querying": "Szerver ellenőrzése…",
+    "retry": "Újraellenőrzés",
+    "retryLabel": "{{server}} újraellenőrzése",
     "server": "{{server}}",
-    "unreachable": "A kiszolgáló nem érhető el",
+    "unreachable": "A szerver nem érhető el",
     "warning_one": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat",
     "warning_other": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat"
   },
@@ -303,12 +303,12 @@
     "search": "Beszélgetések keresése",
     "searchKey": "Ctrl K",
     "filterLabel": "Beszélgetések megjelenítése",
-    "filterAll": "Mind",
+    "filterAll": "Összes",
     "filterUnread": "Olvasatlan",
     "filterRequests": "Kérések",
     "requestsTitle": "Üzenetkérések",
-    "requestsNote": "Nincs az ismerőseid között",
-    "requestMetaChat": "{{server}} · beszélgetni szeretne veled · {{time}}",
+    "requestsNote": "Nincs a barátlistádon",
+    "requestMetaChat": "{{server}} · csevegni szeretne veled · {{time}}",
     "requestMetaMessages": "{{server}} · üzeneteket küldött neked · {{time}}",
     "quote": "„{{text}}”",
     "block": "Letiltás",
@@ -327,13 +327,13 @@
     "image": "Képet küldött",
     "yesterday": "Tegnap",
     "emptyTitle": "Még nincsenek beszélgetések",
-    "emptyText": "Az összes csatlakoztatott szerver privát üzenetei itt jelennek meg.",
+    "emptyText": "Az összes szerver privát üzenetei, amelyekhez csatlakozol, itt jelennek meg.",
     "noMatch": "Nem található beszélgetés.",
     "noRequests": "Nincsenek üzenetkérések.",
     "failed": "Ez nem sikerült. Próbáld újra.",
     "newTitle": "Új beszélgetés indítása",
     "newSearch": "Személyek keresése a szervereiden",
-    "newEmpty": "Nem található senki a csatlakoztatott szervereiden.",
+    "newEmpty": "Nem található senki a szervereken, amelyekhez csatlakozol.",
     "deleteTitle": "Törlöd az előzményeket vele: {{name}}?",
     "deleteMessage": "Az üzenetek csak erről az eszközről törlődnek. {{name}} megtartja a saját másolatát.",
     "menu": {
@@ -373,7 +373,7 @@
     "saveFailed": "A fájlt nem sikerült menteni.",
     "errorTitle": "Ez a fájl nem játszható le",
     "errorText": "A fájl hiányzik, túl nagy, vagy a Mumcord nem tudja lejátszani a formátumát.",
-    "retry": "Újra"
+    "retry": "Újrapróbálás"
   },
   "music": {
     "card": "{{service}}: {{title}}",
@@ -395,7 +395,7 @@
   "embedHint": {
     "image": "Kép elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
     "gif": "GIF elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
-    "video": "Videolejátszó elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
+    "video": "Videólejátszó elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
     "audio": "Hanglejátszó elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
     "music": "Zenelejátszó elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
     "link": "Linkelőnézet elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
@@ -408,7 +408,7 @@
     "load": "Kép betöltése"
   },
   "slash": {
-    "list": "Parancsok / jellel"
+    "list": "Perjeles parancsok"
   },
   "channelMention": {
     "chipLabel": "#{{name}}, csatorna – menü megnyitása",

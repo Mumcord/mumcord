@@ -1,22 +1,22 @@
 {
   "close": {
     "title": "Minimalizovať do lišty alebo ukončiť?",
-    "description": "Stále si pripojený. Po minimalizácii ťa Mumcord nechá v hlasovom kanáli a zostane v systémovej lište.",
+    "description": "Stále máš pripojenie. Po minimalizácii ťa Mumcord nechá v hlasovom kanáli a zostane v systémovej lište.",
     "remember": "Zapamätať si moju voľbu",
     "minimize": "Minimalizovať do lišty",
     "quit": "Ukončiť",
     "failed": "Nepodarilo sa. Skús to znova.",
-    "descriptionServers": "Stále si pripojený k {{count}} serverom. Minimalizovaný Mumcord ťa drží v hlasovom kanáli a zostáva v oblasti oznámení."
+    "descriptionServers": "Stále máš pripojenie k {{count}} serverom. Po minimalizácii ťa Mumcord nechá v hlasovom kanáli a zostane v systémovej lište."
   },
   "windowOverlay": {
-    "title": "Okenný overlay bol odstránený",
-    "description": "Plávajúce okno overlayu už neexistuje. Namiesto neho overlay v hre ukazuje, kto vo tvojich hrách hovorí. Môžeš ho zapnúť v nastaveniach overlayu.",
+    "title": "Okenné prekrytie bolo odstránené",
+    "description": "Plávajúce okno prekrytia už neexistuje. Namiesto neho teraz prekrytie v hre ukazuje, kto vo tvojich hrách hovorí. Môžeš ho zapnúť v nastaveniach prekrytia.",
     "dismiss": "Rozumiem",
-    "openSettings": "Otvoriť nastavenia overlayu"
+    "openSettings": "Otvoriť nastavenia prekrytia"
   },
   "audioDevice": {
-    "title": "Vyberte znova zvukové zariadenia",
-    "description": "Mumcord teraz zobrazuje každý vstup a výstup vašich zvukových zariadení samostatne. Uložené zariadenie sa nepodarilo priradiť k žiadnemu z nich, preto sa zatiaľ používa predvolené zariadenie systému. Zariadenie môžete vybrať v nastaveniach zvuku.",
+    "title": "Vyber znova zvukové zariadenia",
+    "description": "Mumcord teraz zobrazuje každý vstup a výstup tvojich zvukových zariadení samostatne. Uložené zariadenie sa nepodarilo priradiť k žiadnemu z nich, preto sa zatiaľ používa predvolené zariadenie systému. Zariadenie môžeš vybrať v nastaveniach zvuku.",
     "dismiss": "Rozumiem",
     "openSettings": "Otvoriť nastavenia zvuku"
   },
@@ -36,7 +36,7 @@
   },
   "directConsent": {
     "title": "Povoliť priame spojenia?",
-    "description": "Priame spojenia sú rýchlejšie, ale druhá osoba uvidí vašu IP adresu. Mumcord ich používa na obrázky v plnej veľkosti a zdieľanie obrazovky s ostatnými používateľmi Mumcordu a môže pre ne otvoriť port na vašom smerovači. Ak odmietnete, obrázky prídu cez server a zdieľanie obrazovky nebude dostupné. Neskôr to môžete zmeniť v Nastavenia → Súkromie. Ak tento server ponúka relay, Mumcord ho môže použiť namiesto toho; druhá osoba potom tvoju IP adresu neuvidí.",
+    "description": "Priame spojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Mumcord ich používa na obrázky v plnej veľkosti a zdieľanie obrazovky s ostatnými používateľmi Mumcordu a môže pre ne otvoriť port na tvojom smerovači. Ak odmietneš, obrázky prídu cez server a zdieľanie obrazovky nebude dostupné. Neskôr to môžeš zmeniť v Nastavenia → Súkromie. Ak tento server ponúka relay, Mumcord ho môže použiť namiesto toho; druhá osoba potom tvoju IP adresu neuvidí.",
     "no": "Nie",
     "yes": "Áno",
     "failed": "Nepodarilo sa. Skús to znova."
@@ -97,10 +97,10 @@
       "checked": "Podpis a kontrolný súčet boli overené",
       "installed": "Nainštalované",
       "installsOnRestart": "Nainštaluje sa pri reštarte Mumcordu",
-      "connected_one": "Si pripojený k {{count}} serveru. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
-      "connected_few": "Si pripojený k {{count}} serverom. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
-      "connected_many": "Si pripojený k {{count}} serveru. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
-      "connected_other": "Si pripojený k {{count}} serverom. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "connected_one": "Máš pripojenie k {{count}} serveru. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "connected_few": "Máš pripojenie k {{count}} serverom. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "connected_many": "Máš pripojenie k {{count}} serveru. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
+      "connected_other": "Máš pripojenie k {{count}} serverom. Po reštarte sa Mumcord znova pripojí a vráti sa do tvojich kanálov.",
       "later": "Neskôr",
       "restart": "Reštartovať a aktualizovať",
       "announce": "Mumcord {{version}} je pripravený. Reštartuj a aktualizuj."

@@ -1,9 +1,9 @@
 {
-  "label": "Aaron, padomu palīgs",
+  "label": "Aarons, padomu palīgs",
   "greeting": {
-    "title": "Sveiki, es esmu Aaron!",
+    "title": "Sveiks, es esmu Aarons!",
     "body": "Es esmu aksolotls un Mumcord pazīstu kā savus piecus pirkstus. Gribi ātru ekskursiju? Tā aizņem apmēram minūti. Ja ne tagad, atradīsi mani sadaļā Iestatījumi → Par lietotni → Padomi.",
-    "start": "Parādi",
+    "start": "Rādīt",
     "later": "Ne tagad"
   },
   "progress": "{{current}}. padoms no {{total}}",
@@ -15,26 +15,26 @@
   "tips": {
     "servers": {
       "title": "Tavi serveri",
-      "body": "Joslā pašā kreisajā malā ir tavi serveri. Pievieno serveri ar +, bet publiskos serverus pārlūko ar palielināmo stiklu. Vari vienlaikus savienoties ar vairākiem serveriem."
+      "body": "Joslā pašā kreisajā malā ir tavi serveri. Pievieno serveri ar +, bet publiskos serverus atrodi ar palielināmo stiklu. Vienlaikus vari uzturēt savienojumu ar vairākiem serveriem."
     },
     "channels": {
       "title": "Kanāli",
-      "body": "Veic dubultklikšķi uz kanāla, lai pievienotos un runātu. Viens klikšķis parāda tā čatu, nepievienojoties, bet ar pogu Sekot tu būsi lietas kursā."
+      "body": "Veic dubultklikšķi uz kanāla, lai pievienotos balss sarunai. Viens klikšķis parāda tā tērzēšanu, nepievienojoties, bet poga Sekot ziņos tev par jaunumiem tajā."
     },
     "talk": {
       "title": "Kā tu runā",
-      "body": "Push-to-talk vai balss aktivizācija? Izvēlies sadaļā Iestatījumi → Balss un skaņa vai atver Balss iestatījumi… ar mazo bultiņu blakus mikrofonam. Push-to-talk darbojas arī ar peles pogām."
+      "body": "Push-to-talk vai balss aktivizācija? Izvēlies sadaļā Iestatījumi → Balss un skaņa vai atver „Balss iestatījumi…” ar mazo bultiņu blakus mikrofonam. Push-to-talk darbojas arī ar peles pogām."
     },
     "panel": {
       "title": "Tavs lietotāja panelis",
-      "body": "Apakšā pa kreisi tu izslēdz mikrofonu vai skaņu, ieslēdz kameru vai atvienojies. Mazās bultiņas blakus atver vairāk iespēju."
+      "body": "Apakšā pa kreisi tu vari apklusināt mikrofonu, izslēgt skaņu, ieslēgt kameru vai atvienoties. Mazās bultiņas blakus tiem atver vairāk iespēju."
     },
     "search": {
       "title": "Atrodi jebko",
       "body": "Nospied {{key}}, lai atrastu cilvēkus un kanālus, pat lielos serveros."
     },
     "chat": {
-      "title": "Čats",
+      "title": "Tērzēšana",
       "body": "Atbildi uz ziņu, citē to, piemini cilvēkus ar @ un kopīgo attēlus un failus. Formatēšanas pogas parādās, kamēr raksti."
     },
     "apps": {

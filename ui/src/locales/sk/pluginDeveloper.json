@@ -1,7 +1,7 @@
 {
-  "hint": "Načítajte rozbalený priečinok doplnku a vyskúšajte ho. Vývojárske doplnky nie sú podpísané, nikdy nie sú oficiálne a nemôžu získať net.http, secrets ani ui.webview. Po vypnutí vývojárskeho režimu sa uvoľnia.",
+  "hint": "Načítaj rozbalený priečinok doplnku a vyskúšaj ho. Vývojárske doplnky nie sú podpísané, nikdy nie sú oficiálne a nemôžu získať net.http, secrets ani ui.webview. Po vypnutí vývojárskeho režimu sa uvoľnia.",
   "load": "Načítať priečinok doplnku…",
-  "pickFolder": "Vyberte priečinok doplnku",
+  "pickFolder": "Vyber priečinok doplnku",
   "empty": "Nie je načítaný žiadny vývojársky doplnok.",
   "listLabel": "Vývojárske doplnky",
   "label": "Vývojársky doplnok",
@@ -23,7 +23,7 @@
   "level": {
     "debug": "Ladenie",
     "info": "Info",
-    "warn": "Upozornenie",
+    "warn": "Varovanie",
     "error": "Chyba"
   },
   "errors": {

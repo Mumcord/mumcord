@@ -1,7 +1,7 @@
 {
   "tree": {
-    "empty": "Deze plugin toont hier nog niets.",
-    "actionFailed": "De plugin kon dit niet verwerken. Probeer het opnieuw."
+    "empty": "Deze plug-in toont hier nog niets.",
+    "actionFailed": "De plug-in kon dit niet verwerken. Probeer het opnieuw."
   },
   "progress": {
     "working": "Bezig"

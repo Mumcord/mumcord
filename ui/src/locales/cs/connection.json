@@ -42,8 +42,8 @@
     "good_many": "Žádné problémy za posledních {{count}} minuty",
     "good_other": "Žádné problémy za posledních {{count}} minut",
     "network": "Část hlasu ostatních byla maskována: ztráta v síti",
-    "cpu": "Zpracování vašeho zvuku se opožďuje: vysoké zatížení procesoru",
-    "device": "Vaše zvukové zařízení mělo výpadky"
+    "cpu": "Zpracování tvého zvuku se opožďuje: vysoké zatížení procesoru",
+    "device": "Tvoje zvukové zařízení mělo výpadky"
   },
   "details": "Podrobnosti",
   "sinceConnected": "Počty od připojení. Grafy: posledních {{minutes}} min.",
@@ -53,7 +53,7 @@
     "late": "Zvukové rámce, které počítač zpracoval pozdě, obvykle při vysokém zatížení procesoru. Normálně: 0 nebo téměř 0.",
     "concealed": "Hlasové rámce od ostatních, které nedorazily včas, takže klient mezeru vyplnil. Příčina: ztráta v síti. Normálně: téměř 0.",
     "jitter": "Zpoždění, které vyrovnává nepravidelně přicházející hlasové pakety ostatních. Normálně: 20–60 ms.",
-    "processing": "Čas na zpracování jednoho 10ms rámce z vašeho mikrofonu. Normálně: výrazně pod 10 ms.",
+    "processing": "Čas na zpracování jednoho 10ms rámce z tvého mikrofonu. Normálně: výrazně pod 10 ms.",
     "realtime": "Zda zvuková vlákna dostávají od systému prioritu v reálném čase. Zapnuto pomáhá proti výpadkům při zátěži."
   },
   "recent": {
@@ -66,11 +66,11 @@
     "title": "Kvalita hlasu",
     "status": "Ping {{latency}}, ztráty {{loss}}",
     "lowLatency": "Režim nízké latence",
-    "lowLatencyHint": "Pro společné hraní hudby v reálném čase. Nejlépe funguje s push-to-talk.",
+    "lowLatencyHint": "Pro společné hraní hudby v reálném čase. Nejlépe funguje s Push-to-talk.",
     "voiceSettings": "Nastavení hlasu…",
     "applies": "Platí ihned, ukládá se jako v Nastavení → Zvuk",
     "keys": "Esc zavře · ↑↓ přesouvá · ← → upravuje",
-    "bandwidthLabel": "Odhadovaná šířka pásma vč. hlaviček",
+    "bandwidthLabel": "Odhadovaná šířka pásma",
     "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
     "bandwidthMeterText": "{{value}} z {{limit}} kbit/s ({{percent}} %)",
@@ -81,12 +81,12 @@
     "beta": "Beta",
     "moreInfo": "Další informace: {{topic}}",
     "effectiveShort": "Právě se odesílá",
-    "effectiveTip": "Bitrate odesílaná právě teď po přizpůsobení ztrátě paketů.",
+    "effectiveTip": "Datový tok odesílaný právě teď, po přizpůsobení ztrátě paketů.",
     "musicIncluded": "Zahrnuto při zapnutém režimu nízké latence: potlačení šumu a automatická hlasitost jsou vypnuté, kodér běží v nastavení pro hudbu s nízkým zpožděním.",
     "warningBandwidth": "Využívá více pásma: ≈ {{on}} kbit/s místo ≈ {{off}}.",
     "warningWifi": "Na Wi-Fi nebo vytížené síti může docházet k výpadkům.",
     "warningHeadphones": "Použij sluchátka: potlačení ozvěny je vypnuté.",
-    "warningPtt": "Nejlépe funguje s push-to-talk.",
+    "warningPtt": "Nejlépe funguje s Push-to-talk.",
     "bandwidthLowLatencyWithin": "Pakety po 10 ms přidávají režii hlaviček; v limitu. Vypnutím režimu ušetříš ≈ {{value}} kbit/s.",
     "bandwidthLowLatencyOver": "Pakety po 10 ms přidávají režii hlaviček; nad limitem. Vypnutím režimu ušetříš ≈ {{value}} kbit/s.",
     "bandwidthLowLatencyNoLimit": "Pakety po 10 ms přidávají režii hlaviček. Vypnutím režimu ušetříš ≈ {{value}} kbit/s."

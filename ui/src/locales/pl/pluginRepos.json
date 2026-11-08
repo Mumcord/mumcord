@@ -5,7 +5,7 @@
     "title": "Dodaj repozytorium",
     "address": "Adres repozytorium",
     "expectedKey": "Oczekiwany klucz (opcjonalnie)",
-    "expectedKeyHint": "Jeśli właściciel podał Ci klucz, wklej go tutaj. Repozytorium musi wtedy używać dokładnie tego klucza.",
+    "expectedKeyHint": "Jeśli właściciel podał ci klucz, wklej go tutaj. Repozytorium musi wtedy używać dokładnie tego klucza.",
     "check": "Sprawdź repozytorium",
     "found": "Oto co znaleźliśmy",
     "confirm": "Dodaj repozytorium",
@@ -38,7 +38,7 @@
     "confirm": "Usuń"
   },
   "keyChange": {
-    "title": "{{name}} zmieniło klucz",
+    "title": "Repozytorium {{name}} zmieniło klucz",
     "message": "To repozytorium podpisuje teraz listę wtyczek innym kluczem. Pozostaje wstrzymane, dopóki nie zdecydujesz. Zaufaj nowemu kluczowi tylko wtedy, gdy właściciel zapowiedział zmianę.",
     "oldKey": "Dotąd zaufany klucz",
     "newKey": "Nowy klucz",
@@ -49,12 +49,12 @@
   "mirror": {
     "title": "Zaawansowane",
     "label": "Serwer lustrzany oficjalnej listy wtyczek (opcjonalnie)",
-    "hint": "Zmień to tylko wtedy, gdy dostałeś adres serwera lustrzanego. Serwer musi udostępniać te same podpisane pliki; Mumcord i tak sprawdza każdy podpis.",
+    "hint": "Zmień to tylko wtedy, gdy masz adres serwera lustrzanego. Serwer musi udostępniać te same podpisane pliki; Mumcord i tak sprawdza każdy podpis.",
     "save": "Zapisz",
     "reset": "Użyj domyślnego"
   },
   "official": {
-    "name": "Oficjalne wtyczki Mumcord",
+    "name": "Oficjalne wtyczki Mumcorda",
     "alwaysOn": "Zawsze włączone"
   }
 }

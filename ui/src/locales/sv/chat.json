@@ -21,7 +21,7 @@
     "syncAdded_other": "{{count}} tidigare meddelanden har lagts till från andra Mumcord-användare.",
     "syncNone": "Inga tidigare meddelanden hittades.",
     "syncFailed": "Tidigare meddelanden kan inte läsas in här.",
-    "syncedFrom": "från {{name}}s historik",
+    "syncedFrom": "från historiken hos {{name}}",
     "jumpToNewest": "Hoppa till senaste",
     "jumpToNewestUnseen_one": "Hoppa till senaste, {{count}} nytt meddelande",
     "jumpToNewestUnseen_other": "Hoppa till senaste, {{count}} nya meddelanden"
@@ -95,7 +95,7 @@
     "found_other": "Förslag: {{count}}. Använd piltangenterna och sedan Enter för att infoga.",
     "none": "Ingen hittades",
     "mentionsYou": "Omnämner dig",
-    "chipLabel": "{{name}}, omnämning",
+    "chipLabel": "{{name}}, omnämnande",
     "groupsHeading": "Omnämnanden",
     "peopleHeading": "Personer",
     "channelHint": "Meddela alla i {{channel}} ({{count}})",
@@ -106,7 +106,7 @@
   "preview": {
     "open": "Öppna i webbläsaren",
     "openLabel": "Öppna {{title}} i webbläsaren",
-    "play": "Spela {{title}}",
+    "play": "Spela upp {{title}}",
     "player": "Videospelare: {{title}}",
     "videoTitle": "{{site}}-video",
     "kind": {
@@ -118,7 +118,7 @@
       "show": "Program"
     },
     "inBrowser": "Spelas upp i din webbläsare",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Twitch-spelaren kan inte köras i Mumcords fönster på det här systemet, så Spela upp öppnar sändningen i din webbläsare.",
     "card": "Länkförhandsvisning: {{title}}",
     "dismiss": "Dölj förhandsvisning"
   },
@@ -157,7 +157,7 @@
     "removeNamed": "Ta bort {{name}} från favoriter",
     "send": "Skicka {{name}}",
     "hint": "Piltangenter flyttar, Enter skickar, Delete tar bort, Escape stänger.",
-    "empty": "Inga favoriter än. Högerklicka på en GIF i chatten, eller använd stjärnan på den, och välj \"Spara som favorit\". Då dyker den upp här."
+    "empty": "Inga favoriter än. Högerklicka på en GIF i chatten, eller använd stjärnan på den, och välj ”Spara som favorit”. Då dyker den upp här."
   },
   "linkMenu": {
     "label": "Länk",
@@ -254,24 +254,24 @@
     "plainText": "Ren text"
   },
   "mumbleCard": {
-    "addServer": "Lägg till servrar",
+    "addServer": "Lägg till i servrar",
     "channel": "Kanal {{channel}}",
-    "copy": "Kopiera link",
-    "copyLabel": "Kopiera linken till {{server}}",
+    "copy": "Kopiera länk",
+    "copyLabel": "Kopiera länken till {{server}}",
     "figures": "Ping {{ping}} ms · {{users}} av {{max}} användare · server {{version}}",
     "goToChannel": "Gå till kanalen",
     "join": "Gå med",
     "joinLabel": "Gå med i {{server}}",
     "joined": "Ansluten",
     "label": "Serverkort för {{server}}",
-    "privacyOff": "Servervärden är avslagna i inställningarna",
+    "privacyOff": "Serveruppgifter är avstängda i inställningarna",
     "querying": "Kontrollerar servern…",
     "retry": "Kontrollera igen",
-    "retryLabel": "Kontrollera igen {{server}}",
+    "retryLabel": "Kontrollera {{server}} igen",
     "server": "{{server}}",
     "unreachable": "Servern kan inte nås",
-    "warning_one": "{{count}} link i det här meddelandet visar inlogguppgifter",
-    "warning_other": "{{count}} länkar i det här meddelandet visar inlogguppgifter"
+    "warning_one": "{{count}} länk i det här meddelandet visar inloggningsuppgifter",
+    "warning_other": "{{count}} länkar i det här meddelandet visar inloggningsuppgifter"
   },
   "requests": {
     "entry": "Meddelandeförfrågningar",
@@ -322,7 +322,7 @@
     "offline": "offline",
     "unreadCount": "{{count}} olästa",
     "pinned": "fäst",
-    "muted": "ljudlös",
+    "muted": "tystad",
     "you": "Du: {{text}}",
     "image": "Skickade en bild",
     "yesterday": "Igår",
@@ -364,7 +364,7 @@
     "seek": "Position",
     "position": "{{time}} av {{length}}",
     "volume": "Volym",
-    "mute": "Ljud av",
+    "mute": "Stäng av ljudet",
     "open": "Öppna {{name}} i webbläsaren",
     "save": "Spara {{name}}",
     "saveShort": "Spara fil",
@@ -379,7 +379,7 @@
     "card": "{{service}}: {{title}}",
     "title": "{{service}}-länk",
     "other": "Musiklänk",
-    "thirdParty": "Innehåll från tredje part från {{host}}",
+    "thirdParty": "Innehåll från tredje part ({{host}})",
     "thirdPartyShort": "Innehåll från tredje part",
     "embedded": "Inbäddad spelare · {{service}} · {{host}}",
     "player": "{{service}}-spelare: {{title}}",
@@ -408,7 +408,7 @@
     "load": "Läs in bild"
   },
   "slash": {
-    "list": "Kommandon med snedsteg"
+    "list": "Snedstreckskommandon"
   },
   "channelMention": {
     "chipLabel": "#{{name}}, kanal – öppna menyn",

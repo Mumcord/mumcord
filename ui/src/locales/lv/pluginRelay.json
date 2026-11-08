@@ -1,7 +1,7 @@
 {
   "title": "Spraudņu dati caur releju",
   "switchLabel": "Ļaut spraudņiem izmantot servera releju",
-  "switchText": "Spraudņi, kurus atļauj, var ātrāk sūtīt lielākus datus (spēļu gājienus, zīmējumus) caur servera kopienas releju. Šifrēts no gala līdz galam: relejs to nevar nolasīt. Bez releja tie izmanto lēnāko Mumble savienojumu.",
+  "switchText": "Spraudņi, kurus tu atļauj, var ātrāk sūtīt lielākus datus (spēļu gājienus, zīmējumus) caur servera kopienas releju. Šifrēts no gala līdz galam: relejs to nevar nolasīt. Bez releja tie izmanto lēnāko Mumble savienojumu.",
   "servers": "Tavi serveri",
   "serverAllows": "{{server}} · relejs atļauj spraudņu datus",
   "serverAllowsRate": "līdz {{rate}} kbit/s katram spraudnim",
@@ -17,7 +17,7 @@
   "sounds": {
     "title": "Spraudņu skaņas",
     "volume": "Spraudņu skaņu skaļums",
-    "mute": "Izslēgt spraudņu skaņas",
-    "text": "Īsas skaņas, kas nāk kopā ar spraudņiem. Skaļums un izslēgšana attiecas uz visiem spraudņiem."
+    "mute": "Apklusināt spraudņu skaņas",
+    "text": "Īsas skaņas, kas nāk kopā ar spraudņiem. Skaļums un apklusināšana attiecas uz visiem spraudņiem."
   }
 }

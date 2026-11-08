@@ -3,7 +3,7 @@
   "moreItems": "Več vtičnikov",
   "subline": "{{plugin}} · Neuradni",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Vnosi vtičnikov vedno prikazujejo ime vtičnika. Upravljaj jih v Nastavitve → Vtičniki.",
+  "footer": "Vnosi vtičnikov vedno prikazujejo ime vtičnika. Upravljaš jih v razdelku Nastavitve → Vtičniki.",
   "paletteItem": "{{plugin}}: {{label}}",
   "disabledRestarting": "Po težavi se znova zaganja, poskusi čez trenutek"
 }

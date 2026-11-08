@@ -16,9 +16,9 @@
     "loading": "Nachrichten werden geladen…",
     "loadFailed": "Ältere Nachrichten konnten nicht geladen werden. Scrolle nach oben, um es erneut zu versuchen.",
     "loadEarlier": "Frühere Nachrichten laden",
-    "syncing": "Suche frühere Nachrichten bei anderen Mumcord-Nutzern…",
-    "syncAdded_one": "{{count}} frühere Nachricht von anderen Mumcord-Nutzern hinzugefügt.",
-    "syncAdded_other": "{{count}} frühere Nachrichten von anderen Mumcord-Nutzern hinzugefügt.",
+    "syncing": "Frühere Nachrichten werden bei anderen Mumcord-Benutzern gesucht…",
+    "syncAdded_one": "{{count}} frühere Nachricht von anderen Mumcord-Benutzern hinzugefügt.",
+    "syncAdded_other": "{{count}} frühere Nachrichten von anderen Mumcord-Benutzern hinzugefügt.",
     "syncNone": "Keine früheren Nachrichten gefunden.",
     "syncFailed": "Frühere Nachrichten können hier nicht geladen werden.",
     "syncedFrom": "aus dem Verlauf von {{name}}",
@@ -31,7 +31,7 @@
     "bold": "Fett",
     "italic": "Kursiv",
     "strike": "Durchgestrichen",
-    "code": "Code im Text",
+    "code": "Inline-Code",
     "codeBlock": "Codeblock",
     "link": "Link",
     "quote": "Zitat"
@@ -118,7 +118,7 @@
       "show": "Podcast"
     },
     "inBrowser": "Wird im Browser abgespielt",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Der Twitch-Player läuft auf diesem System nicht in Mumcords Fenster, daher öffnet „Abspielen“ den Stream in deinem Browser.",
     "card": "Linkvorschau: {{title}}",
     "dismiss": "Vorschau ausblenden"
   },
@@ -126,7 +126,7 @@
     "loading": "Bild {{name}} wird geladen",
     "label": "Bild: {{name}}",
     "view": "Bild {{name}} ansehen",
-    "viewMessage": "Bild von {{name}}, im Betrachter öffnen",
+    "viewMessage": "Bild von {{name}}, im Bildbetrachter öffnen",
     "failed": "Das Bild kann nicht angezeigt werden (zu groß oder nicht erreichbar)."
   },
   "viewer": {
@@ -143,7 +143,7 @@
     "close": "Schließen",
     "previous": "Vorheriges Bild",
     "next": "Nächstes Bild",
-    "unnamed": "bild",
+    "unnamed": "Bild",
     "fullLoading": "Volle Größe wird geladen…",
     "fullCancel": "Download in voller Größe abbrechen",
     "fullProgress": "Volle Größe wird geladen… {{percent}} %",
@@ -156,8 +156,8 @@
     "remove": "Aus Favoriten entfernen",
     "removeNamed": "{{name}} aus den Favoriten entfernen",
     "send": "{{name}} senden",
-    "hint": "Pfeiltasten bewegen, Eingabe sendet, Entf entfernt, Escape schließt.",
-    "empty": "Noch keine Favoriten. Rechtsklick auf ein GIF im Chat oder der Stern darauf, dann \"Als Favorit speichern\". Es erscheint dann hier."
+    "hint": "Pfeiltasten bewegen, Enter sendet, Entf entfernt, Esc schließt.",
+    "empty": "Noch keine Favoriten. Klicke im Chat mit der rechten Maustaste auf ein GIF oder nutze den Stern darauf und wähle „Als Favorit speichern“. Es erscheint dann hier."
   },
   "linkMenu": {
     "label": "Link",
@@ -175,7 +175,7 @@
     "copy": "Bild kopieren",
     "save": "Bild speichern",
     "copyAddress": "Bildadresse kopieren",
-    "openViewer": "In der Bildansicht öffnen",
+    "openViewer": "Im Bildbetrachter öffnen",
     "copied": "Bild kopiert",
     "addressCopied": "Bildadresse kopiert",
     "copyFailed": "Das Bild konnte nicht kopiert werden",
@@ -217,10 +217,10 @@
     "addToPlaylist": "Zur Playlist hinzufügen",
     "addConfirm": "Hinzufügen",
     "apps": "Apps",
-    "appsLive": "Apps (du teilst deinen Bildschirm)"
+    "appsLive": "Apps (du gibst deinen Bildschirm frei)"
   },
   "activity": {
-    "share": "{{name}} teilt den Bildschirm",
+    "share": "{{name}} gibt den Bildschirm frei",
     "watch": "Ansehen",
     "party": "Watch-Party: {{title}}",
     "join": "Beitreten",
@@ -251,10 +251,10 @@
     "saveFailed": "Der Code konnte nicht gespeichert werden.",
     "tooLarge": "Der Code ist zu groß zum Herunterladen.",
     "fileType": "Code-Datei",
-    "plainText": "Klartext"
+    "plainText": "Nur-Text"
   },
   "mumbleCard": {
-    "addServer": "Zu Server hinzufügen",
+    "addServer": "Zur Serverliste hinzufügen",
     "channel": "Kanal {{channel}}",
     "copy": "Link kopieren",
     "copyLabel": "Link zu {{server}} kopieren",
@@ -267,7 +267,7 @@
     "privacyOff": "Serverwerte sind in den Einstellungen ausgeschaltet",
     "querying": "Server wird geprüft…",
     "retry": "Erneut prüfen",
-    "retryLabel": "Erneut prüfen {{server}}",
+    "retryLabel": "{{server}} erneut prüfen",
     "server": "{{server}}",
     "unreachable": "Server nicht erreichbar",
     "warning_one": "{{count}} Link in dieser Nachricht zeigt Anmeldedaten",
@@ -282,10 +282,10 @@
     "chatRequestTag": "Chatanfrage",
     "messageRequestTag": "Nachrichtenanfrage",
     "wantsToChat": "{{name}} möchte mit dir chatten",
-    "metaMumcord": "Mumcord-Nutzer · {{server}} · {{time}}",
+    "metaMumcord": "Mumcord-Benutzer · {{server}} · {{time}}",
     "metaStandard": "{{server}} · {{time}}",
     "noteFrom": "Notiz von {{name}}",
-    "explain": "Du hast private Nachrichten auf „Nur Freunde“ gestellt. Wenn du annimmst, kann {{name}} dir schreiben. Ablehnen geschieht still: {{name}} sieht nur „Ausstehend“. Anfragen werden gelöscht, wenn du Mumcord beendest.",
+    "explain": "Du hast private Nachrichten auf „Nur Freunde“ gestellt. Wenn du annimmst, kann {{name}} dir schreiben. Ablehnen bleibt unbemerkt: {{name}} sieht nur „Ausstehend“. Anfragen werden gelöscht, wenn du Mumcord beendest.",
     "sentMessages_one": "{{name}} hat dir {{count}} Nachricht geschickt",
     "sentMessages_other": "{{name}} hat dir {{count}} Nachrichten geschickt",
     "messagesLabel": "Nachrichten von {{name}}",
@@ -327,7 +327,7 @@
     "image": "Hat ein Bild gesendet",
     "yesterday": "Gestern",
     "emptyTitle": "Noch keine Unterhaltungen",
-    "emptyText": "Private Nachrichten von allen verbundenen Servern erscheinen hier.",
+    "emptyText": "Privatnachrichten von allen verbundenen Servern erscheinen hier.",
     "noMatch": "Keine Unterhaltungen gefunden.",
     "noRequests": "Keine Nachrichtenanfragen.",
     "failed": "Das hat nicht geklappt. Bitte versuche es erneut.",
@@ -379,13 +379,13 @@
     "card": "{{service}}: {{title}}",
     "title": "{{service}}-Link",
     "other": "Musiklink",
-    "thirdParty": "Inhalt von Drittanbietern von {{host}}",
-    "thirdPartyShort": "Inhalt von Drittanbietern",
+    "thirdParty": "Drittanbieter-Inhalt von {{host}}",
+    "thirdPartyShort": "Drittanbieter-Inhalt",
     "embedded": "Eingebetteter Player · {{service}} · {{host}}",
     "player": "{{service}}-Player: {{title}}",
     "play": "Abspielen",
     "playLabel": "{{title}} auf {{service}} abspielen",
-    "stop": "Stopp",
+    "stop": "Stoppen",
     "stopLabel": "{{title}} stoppen",
     "openIn": "In {{service}} öffnen",
     "limits": "Wiedergabegrenzen legt der Dienst fest",
@@ -408,12 +408,12 @@
     "load": "Bild laden"
   },
   "slash": {
-    "list": "Schrägstrich-Befehle"
+    "list": "Slash-Befehle"
   },
   "channelMention": {
     "chipLabel": "#{{name}}, Kanal – Menü öffnen",
-    "join": "Kanal betreten",
-    "joinPath": "{{path}} betreten",
+    "join": "Kanal beitreten",
+    "joinPath": "{{path}} beitreten",
     "show": "In der Kanalliste zeigen",
     "showPath": "{{path}} in der Kanalliste zeigen",
     "copy": "Namen kopieren",

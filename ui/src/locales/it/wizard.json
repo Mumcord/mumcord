@@ -24,7 +24,7 @@
     "custom": "Personalizzato",
     "done": "(fatto)",
     "progress": "Avanzamento della configurazione",
-    "later": "Tutto ciò che è qui può essere modificato in seguito nelle Impostazioni."
+    "later": "Puoi modificare tutto questo in seguito nelle Impostazioni."
   },
   "steps": {
     "welcome": "Benvenuto",
@@ -46,14 +46,14 @@
     "subtitle": "Mumcord parla Mumble, quindi funziona con ogni server Mumble, e aggiunge una chat moderna. Configuriamolo come piace a te. Ci vogliono circa due minuti.",
     "voice": {
       "title": "Voce cristallina",
-      "text": "Audio a bassa latenza con riduzione del rumore integrata."
+      "text": "Audio a bassa latenza con soppressione del rumore integrata."
     },
     "servers": {
       "title": "Funziona con qualsiasi server Mumble",
       "text": "Nessun account, nessuna registrazione. Entra nei server che già usi."
     },
     "private": {
-      "title": "Privato per progetto",
+      "title": "Privacy fin dalla progettazione",
       "text": "Nessuna telemetria. Ciò che Mumcord memorizza resta sul tuo computer."
     }
   },
@@ -71,7 +71,7 @@
     "chosenFile": "File scelto: {{file}}",
     "password": "Password del file",
     "passwordHint": "La password resta su questo computer e non viene mai inviata da nessuna parte.",
-    "existing": "Uso l'identità {{name}}.",
+    "existing": "Stai usando l'identità {{name}}.",
     "backup": "Eseguine il backup più tardi nelle Impostazioni. Un backup ti permette di ripristinare la tua identità su un nuovo computer.",
     "nameRequired": "Inserisci un nome.",
     "fileRequired": "Scegli un file di identità (.p12 o .pfx).",
@@ -96,7 +96,7 @@
     "stop": "Ferma"
   },
   "voice": {
-    "title": "Suona bene?",
+    "title": "L'audio va bene?",
     "subtitle": "Scegli i tuoi dispositivi e di' qualcosa. La barra dovrebbe muoversi mentre parli.",
     "talkLegend": "Come vuoi parlare?",
     "voiceActivationDesc": "Il microfono si apre quando parli. Niente da tenere premuto.",
@@ -111,7 +111,7 @@
     "everythingOn": {
       "title": "Tutto attivo",
       "subtitle": "Tutte le funzioni",
-      "p1": "Gli altri vedono cosa giochi e cosa ascolti",
+      "p1": "Gli altri vedono a cosa giochi e cosa ascolti",
       "p2": "Il tuo IP è visibile alle persone a cui ti connetti direttamente",
       "p3": "Chiunque può scriverti; link e immagini vengono caricati dal web",
       "p4": "Overlay, sincronizzazione della cronologia e immagini a dimensione intera sono attivi"
@@ -122,7 +122,7 @@
       "p1": "Solo gli amici e le persone nel tuo canale possono scriverti",
       "p2": "Connessione diretta, con un relay come alternativa",
       "p3": "Anteprime dei link e immagini a dimensione intera sono attive",
-      "p4": "Ciò che giochi e ascolti resta privato"
+      "p4": "A cosa giochi e cosa ascolti resta privato"
     },
     "maximumPrivacy": {
       "title": "Privacy massima",
@@ -135,7 +135,7 @@
     "custom": {
       "title": "Personalizzato",
       "subtitle": "Passa in rassegna ogni scelta",
-      "p1": "Percorri tu stesso ogni passaggio",
+      "p1": "Segui tu ogni passaggio",
       "p2": "Scopri cosa fa ogni impostazione e chi la vede",
       "p3": "Ideale se sai cosa vuoi"
     },
@@ -165,14 +165,14 @@
     "ingameOverlayAlt": "Esempio dell'overlay in gioco che mostra chi sta parlando"
   },
   "appearance": {
-    "title": "Scegli il tuo aspetto",
+    "title": "Scegli l'aspetto",
     "subtitle": "La finestra si aggiorna mentre scegli. Altri temi, e i tuoi, sono nelle Impostazioni."
   },
   "startup": {
     "title": "Avvio e aggiornamenti",
     "subtitle": "Come si avvia Mumcord e cosa fa con le nuove versioni.",
     "linkHandler": "Apri i link mumble:// con Mumcord",
-    "linkHandlerHint": "Facendo clic su un link a un server in un sito web, questo si apre qui.",
+    "linkHandlerHint": "Così i link ai server sui siti web si aprono qui.",
     "linkHandlerActive": "Mumcord apre già i link mumble://.",
     "linkHandlerFailed": "Non è stato possibile impostare Mumcord per aprire i link mumble://. Puoi riprovare nelle Impostazioni.",
     "autostartFailed": "Non è stato possibile impostare Mumcord per l'avvio all'accesso. Puoi riprovare nelle Impostazioni."
@@ -181,7 +181,7 @@
     "title": "Tutto pronto",
     "titleNamed": "Tutto pronto, {{name}}",
     "subtitle": "Ecco cosa hai scelto. Usa Modifica su qualsiasi scheda per cambiarla prima di iniziare.",
-    "on": "attivo",
+    "on": "attivato",
     "off": "disattivato",
     "unavailable": "non disponibile qui",
     "editShort": "Modifica",
@@ -199,7 +199,7 @@
       "updates": "Aggiornamenti"
     },
     "identityDetail": "Salvata nel portachiavi del sistema",
-    "voiceDetail": "Riduzione del rumore: {{noise}}",
+    "voiceDetail": "Soppressione del rumore: {{noise}}",
     "pmDetail": "Il mio canale {{channel}} · chat accettate {{accepted}} · richieste {{requests}}",
     "notificationsTitle": "Nuovi messaggi: {{mode}}",
     "notificationsDetail": "Notifiche di attività: {{on}} su {{total}} attive",
@@ -244,7 +244,7 @@
       "notifications": "Le tue notifiche",
       "connections": "Connessioni dirette",
       "features": "Scegli i tuoi extra",
-      "appearance": "Scegli il tuo aspetto",
+      "appearance": "Scegli l'aspetto",
       "startup": "Avvio di Mumcord",
       "summary": "Controlla le tue scelte"
     },
@@ -258,7 +258,7 @@
       "notifications": "Scegli come ti arriva ogni tipo di novità, oppure disattivala.",
       "connections": "Scegli se Mumcord può collegarti direttamente ad altri utenti Mumcord.",
       "features": "Attiva solo gli extra che ti piacciono. Ogni scheda dice chi può vederlo.",
-      "appearance": "Chiaro, scuro o come il tuo sistema: scegli qui il tuo aspetto.",
+      "appearance": "Chiaro, scuro o come il tuo sistema: scegli qui l'aspetto.",
       "startup": "Scegli come si avvia Mumcord quando accedi al computer.",
       "summary": "Tutto pronto! Controlla qui le tue scelte; Modifica ti riporta a qualsiasi passaggio."
     }

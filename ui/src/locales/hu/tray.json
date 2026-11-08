@@ -1,7 +1,7 @@
 {
   "show": "Mumcord megnyitása",
   "settings": "Beállítások",
-  "mute": "Mikrofon némítása",
+  "mute": "Némítás",
   "deafen": "Süketítés",
   "dnd": "Ne zavarjanak",
   "dndSystem": "Ne zavarjanak (rendszer)",
@@ -12,7 +12,7 @@
   "connected": "Csatlakozva",
   "connectedIn": "Csatlakozva · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Csatlakozva – beszél",
+  "talking": "Csatlakozva – beszélsz",
   "muted": "Csatlakozva – némítva",
   "voiceMenu": "Hangszerver és csatorna",
   "voiceServer": "Hangszerver",

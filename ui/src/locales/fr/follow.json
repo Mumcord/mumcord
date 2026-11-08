@@ -1,35 +1,35 @@
 {
   "follow": "Suivre",
-  "unsupported": "Le suivi des canaux nécessite un serveur en version 1.4 ou plus récente.",
+  "unsupported": "Le suivi des salons nécessite un serveur en version 1.4 ou plus récente.",
   "unread_one": "{{count}} message non lu",
   "unread_many": "{{count}} messages non lus",
   "unread_other": "{{count}} messages non lus",
   "errors": {
-    "denied": "Le serveur ne vous autorise pas à suivre ce canal.",
-    "limit": "Vous ne pouvez plus suivre de canaux sur ce serveur. Ne suivez plus un autre canal d’abord.",
-    "tooOld": "Ce serveur est trop ancien pour le suivi des canaux (version 1.4 ou plus récente requise).",
-    "notConnected": "Vous n’êtes pas connecté au serveur.",
-    "generic": "Le suivi de ce canal n’a pas fonctionné. Veuillez réessayer."
+    "denied": "Le serveur ne t’autorise pas à suivre ce salon.",
+    "limit": "Tu ne peux pas suivre plus de salons sur ce serveur. Arrête d’abord d’en suivre un autre.",
+    "tooOld": "Ce serveur est trop ancien pour le suivi des salons (version 1.4 ou plus récente requise).",
+    "notConnected": "Tu n’es pas connecté au serveur.",
+    "generic": "Le suivi de ce salon n’a pas fonctionné. Réessaie."
   },
   "dm": {
     "unknown": "Personne inconnue"
   },
   "notify": {
-    "channel": "{{name}} dans {{channel}} : {{text}}",
-    "private": "{{name}} (privé) : {{text}}",
+    "channel": "{{name}} dans {{channel}} : {{text}}",
+    "private": "{{name}} (privé) : {{text}}",
     "more_one": "{{count}} autre nouveau message",
     "more_many": "{{count}} autres nouveaux messages",
     "more_other": "{{count}} autres nouveaux messages",
-    "channelOn": "{{name}} dans {{channel}} sur {{server}} : {{text}}",
-    "privateOn": "{{name}} (privé, {{server}}) : {{text}}"
+    "channelOn": "{{name}} dans {{channel}} sur {{server}} : {{text}}",
+    "privateOn": "{{name}} (privé, {{server}}) : {{text}}"
   },
   "history": {
     "clear": "Effacer l’historique",
-    "title": "Effacer l’historique ?",
+    "title": "Effacer l’historique ?",
     "body": "Cela supprime définitivement de cet ordinateur les messages enregistrés de cette conversation. Les autres personnes conservent leurs copies. Leurs copies ne seront pas resynchronisées sur cet ordinateur.",
     "confirm": "Effacer l’historique",
     "cancel": "Annuler",
-    "failed": "L’historique n’a pas pu être effacé. Veuillez réessayer."
+    "failed": "L’historique n’a pas pu être effacé. Réessaie."
   },
   "star": {
     "follow": "Suivre {{channel}}",
@@ -38,26 +38,26 @@
   "all": {
     "menu": "Options du serveur {{server}}",
     "menuLabel": "Options du serveur",
-    "follow": "Suivre tous les canaux",
-    "unfollow": "Ne plus suivre aucun canal",
-    "working": "Suivi des canaux…",
-    "followed_one": "{{count}} canal suivi.",
-    "followed_many": "{{count}} canaux suivis.",
-    "followed_other": "{{count}} canaux suivis.",
-    "skipped_one": "{{count}} ignoré : {{reasons}}.",
-    "skipped_many": "{{count}} ignorés : {{reasons}}.",
-    "skipped_other": "{{count}} ignorés : {{reasons}}.",
+    "follow": "Suivre tous les salons",
+    "unfollow": "Ne plus suivre aucun salon",
+    "working": "Suivi des salons…",
+    "followed_one": "{{count}} salon suivi.",
+    "followed_many": "{{count}} salons suivis.",
+    "followed_other": "{{count}} salons suivis.",
+    "skipped_one": "{{count}} ignoré : {{reasons}}.",
+    "skipped_many": "{{count}} ignorés : {{reasons}}.",
+    "skipped_other": "{{count}} ignorés : {{reasons}}.",
     "limit": "limite atteinte",
     "notAllowed": "non autorisé",
     "noAnswer": "pas de réponse du serveur",
-    "unfollowed": "Vous ne suivez plus aucun canal.",
-    "failed": "Le suivi de tous les canaux n’a pas fonctionné. Veuillez réessayer.",
-    "dismiss": "Ignorer",
-    "unfollowFailed": "L’arrêt du suivi de tous les canaux n’a pas fonctionné. Veuillez réessayer."
+    "unfollowed": "Tu ne suis plus aucun salon.",
+    "failed": "Le suivi de tous les salons n’a pas fonctionné. Réessaie.",
+    "dismiss": "Fermer",
+    "unfollowFailed": "L’arrêt du suivi de tous les salons n’a pas fonctionné. Réessaie."
   },
-  "mention": "contient une mention de vous",
+  "mention": "te mentionne",
   "header": {
-    "follow": "Suivre le canal",
-    "unfollow": "Suivi, cliquer pour ne plus suivre"
+    "follow": "Suivre le salon",
+    "unfollow": "Suivi, clique pour ne plus suivre"
   }
 }

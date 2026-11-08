@@ -12,7 +12,7 @@
   "connected": "Conectat",
   "connectedIn": "Conectat · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Conectat – vorbește",
+  "talking": "Conectat – vorbești",
   "muted": "Conectat – microfon oprit",
   "voiceMenu": "Server vocal și canal",
   "voiceServer": "Server vocal",

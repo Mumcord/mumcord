@@ -1,25 +1,25 @@
 {
-  "intro": "Repositórios são listas de plugins extra geridas por outras pessoas. O Mumcord não analisa os plugins deles. Adicione apenas repositórios em que confia.",
+  "intro": "Os repositórios são listas de plugins extra geridas por outras pessoas. O Mumcord não analisa os plugins deles. Adiciona apenas repositórios em que confias.",
   "add": {
     "button": "Adicionar repositório",
     "title": "Adicionar repositório",
     "address": "Endereço do repositório",
     "expectedKey": "Chave esperada (opcional)",
-    "expectedKeyHint": "Se o proprietário lhe deu uma chave, cole-a aqui. O repositório terá de usar exatamente essa chave.",
+    "expectedKeyHint": "Se o proprietário te deu uma chave, cola-a aqui. O repositório terá de usar exatamente essa chave.",
     "check": "Verificar repositório",
     "found": "O que encontrámos",
     "confirm": "Adicionar repositório",
-    "subtitle": "Adicione apenas repositórios de pessoas em quem confia.",
+    "subtitle": "Adiciona apenas repositórios de pessoas em quem confias.",
     "signatureValid": "assinatura válida",
     "contactLine": "contacto: {{contact}}",
     "pluginsLine": "Plugins: {{number}}",
     "signingKey": "Chave de assinatura",
     "warningTitle": "Repositório não oficial",
-    "warningBody": "O Mumcord não analisa estes plugins. Esta chave fica memorizada: se mudar, o repositório fica em pausa até a verificar. Ao navegar nele, o seu endereço IP é visível para o anfitrião. Plugins com nomes oficiais nunca são obtidos daqui."
+    "warningBody": "O Mumcord não analisa estes plugins. Esta chave fica memorizada: se mudar, o repositório fica em pausa até a verificares. Ao navegar nele, o teu endereço IP fica visível para o anfitrião. Plugins com nomes oficiais nunca são obtidos daqui."
   },
-  "limit": "Pode adicionar até {{max}} repositórios.",
+  "limit": "Podes adicionar até {{max}} repositórios.",
   "limitReached": "Foi atingido o limite de {{max}} repositórios.",
-  "empty": "Ainda não adicionou repositórios.",
+  "empty": "Ainda não adicionaste repositórios.",
   "listLabel": "Repositórios adicionados",
   "loadFailed": "Não foi possível carregar os repositórios.",
   "status": {
@@ -39,8 +39,8 @@
   },
   "keyChange": {
     "title": "{{name}} alterou a chave",
-    "message": "Este repositório passou a assinar a sua lista de plugins com outra chave. Fica em pausa até decidir. Confie na nova chave só se o proprietário o avisou da alteração.",
-    "oldKey": "Chave em que confiava",
+    "message": "Este repositório passou a assinar a sua lista de plugins com outra chave. Fica em pausa até decidires. Confia na nova chave só se o proprietário te avisou da alteração.",
+    "oldKey": "Chave em que confiavas",
     "newKey": "Nova chave",
     "keepPaused": "Manter em pausa",
     "trust": "Confiar na nova chave",
@@ -49,7 +49,7 @@
   "mirror": {
     "title": "Avançado",
     "label": "Espelho da lista oficial de plugins (opcional)",
-    "hint": "Altere isto apenas se lhe deram o endereço de um espelho. O espelho tem de servir os mesmos ficheiros assinados; o Mumcord continua a verificar cada assinatura.",
+    "hint": "Altera isto apenas se te deram o endereço de um espelho. O espelho tem de servir os mesmos ficheiros assinados; o Mumcord continua a verificar cada assinatura.",
     "save": "Guardar",
     "reset": "Usar o predefinido"
   },

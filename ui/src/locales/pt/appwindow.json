@@ -1,22 +1,22 @@
 {
   "close": {
-    "title": "Minimizar para a bandeja ou sair?",
-    "description": "Ainda estás ligado. Se minimizares, o Mumcord mantém-te na voz e fica na bandeja do sistema.",
+    "title": "Minimizar para a área de notificação ou sair?",
+    "description": "Ainda estás ligado. Se minimizares, o Mumcord mantém-te na voz e fica na área de notificação.",
     "remember": "Lembrar a minha escolha",
-    "minimize": "Minimizar para a bandeja",
+    "minimize": "Minimizar",
     "quit": "Sair",
     "failed": "Não funcionou. Tenta novamente.",
-    "descriptionServers": "Ainda estás ligado a {{count}} servidores. Minimizado, o Mumcord mantém-te na voz e fica na área de notificação."
+    "descriptionServers": "Ainda estás ligado a {{count}} servidores. Se minimizares, o Mumcord mantém-te na voz e fica na área de notificação."
   },
   "windowOverlay": {
-    "title": "O overlay em janela foi removido",
-    "description": "A janela de overlay flutuante deixou de existir. Em vez disso, o overlay no jogo mostra quem está a falar dentro dos teus jogos. Podes ativá-lo nas definições do overlay.",
+    "title": "A sobreposição em janela foi removida",
+    "description": "A janela de sobreposição flutuante deixou de existir. Em vez disso, a sobreposição no jogo mostra quem está a falar dentro dos teus jogos. Podes ativá-la nas definições da sobreposição.",
     "dismiss": "Entendido",
-    "openSettings": "Abrir definições do overlay"
+    "openSettings": "Abrir definições da sobreposição"
   },
   "audioDevice": {
-    "title": "Escolha novamente os seus dispositivos de áudio",
-    "description": "O Mumcord agora lista separadamente cada entrada e saída dos seus dispositivos de áudio. Não foi possível associar o dispositivo guardado a nenhuma delas, por isso é usado, por agora, o predefinido do sistema. Pode escolher um dispositivo nas definições de áudio.",
+    "title": "Escolhe novamente os teus dispositivos de áudio",
+    "description": "O Mumcord agora lista separadamente cada entrada e saída dos teus dispositivos de áudio. Não foi possível associar o dispositivo guardado a nenhuma delas, por isso, por agora, é usado o predefinido do sistema. Podes escolher um dispositivo nas definições de áudio.",
     "dismiss": "Entendido",
     "openSettings": "Abrir definições de áudio"
   },
@@ -36,7 +36,7 @@
   },
   "directConsent": {
     "title": "Permitir ligações diretas?",
-    "description": "As ligações diretas são mais rápidas, mas a outra pessoa pode ver o seu endereço IP. O Mumcord usa-as para imagens em tamanho real e partilha de ecrã com outros utilizadores do Mumcord e pode abrir uma porta no seu router para elas. Se disser que não, as imagens continuam a chegar através do servidor e a partilha de ecrã fica indisponível. Pode alterar isto mais tarde em Definições → Privacidade. Se este servidor oferecer um retransmissor, o Mumcord pode usá-lo em vez disso; assim a outra pessoa não vê o teu endereço IP.",
+    "description": "As ligações diretas são mais rápidas, mas a outra pessoa pode ver o teu endereço IP. O Mumcord usa-as para imagens em tamanho real e partilha de ecrã com outros utilizadores do Mumcord e pode abrir uma porta no teu router para elas. Se disseres que não, as imagens continuam a chegar através do servidor e a partilha de ecrã fica indisponível. Podes alterar isto mais tarde em Definições → Privacidade. Se este servidor oferecer um retransmissor, o Mumcord pode usá-lo em vez disso; assim a outra pessoa não vê o teu endereço IP.",
     "no": "Não",
     "yes": "Sim",
     "failed": "Não funcionou. Tenta novamente."
@@ -80,10 +80,10 @@
       "size": "{{received}} de {{total}} MB",
       "received": "{{received}} MB",
       "secondsLeft_one": "falta cerca de {{count}} segundo",
-      "secondsLeft_many": "faltam cerca de {{count}} de segundos",
+      "secondsLeft_many": "faltam cerca de {{count}} segundos",
       "secondsLeft_other": "faltam cerca de {{count}} segundos",
       "minutesLeft_one": "falta cerca de {{count}} minuto",
-      "minutesLeft_many": "faltam cerca de {{count}} de minutos",
+      "minutesLeft_many": "faltam cerca de {{count}} minutos",
       "minutesLeft_other": "faltam cerca de {{count}} minutos",
       "cancel": "Cancelar"
     },
@@ -96,7 +96,7 @@
       "installed": "Instalada",
       "installsOnRestart": "Instala-se quando o Mumcord reiniciar",
       "connected_one": "Estás ligado a {{count}} servidor. Depois de reiniciar, o Mumcord volta a ligar-se e a entrar nos teus canais.",
-      "connected_many": "Estás ligado a {{count}} de servidores. Depois de reiniciar, o Mumcord volta a ligar-se e a entrar nos teus canais.",
+      "connected_many": "Estás ligado a {{count}} servidores. Depois de reiniciar, o Mumcord volta a ligar-se e a entrar nos teus canais.",
       "connected_other": "Estás ligado a {{count}} servidores. Depois de reiniciar, o Mumcord volta a ligar-se e a entrar nos teus canais.",
       "later": "Mais tarde",
       "restart": "Reiniciar para atualizar",

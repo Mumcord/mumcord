@@ -50,7 +50,7 @@
     },
     "servers": {
       "title": "Virker med enhver Mumble-server",
-      "text": "Ingen konto, ingen tilmelding. Deltag på de servere, du allerede bruger."
+      "text": "Ingen konto, ingen tilmelding. Forbind til de servere, du allerede bruger."
     },
     "private": {
       "title": "Privat fra grunden",
@@ -62,7 +62,7 @@
     "intro": "Din identitet er den måde, servere genkender dig på. Opret en ny, eller tag den med, du allerede bruger.",
     "legend": "Din identitet",
     "create": "Opret en ny identitet",
-    "createText": "Din identitet er et certifikat, der beviser, hvem du er på Mumble-servere. Det bevarer dit registrerede navn og dine rettigheder, så du er den samme person, hver gang du deltager.",
+    "createText": "Din identitet er et certifikat, der beviser, hvem du er på Mumble-servere. Det bevarer dit registrerede navn og dine tilladelser, så du er den samme person, hver gang du forbinder.",
     "import": "Importér en eksisterende identitet",
     "name": "Standardvisningsnavn",
     "nameHint": "Bruges på servere, der ikke kender dig endnu. Du kan ændre det pr. server.",
@@ -87,7 +87,7 @@
     "systemDefault": "Systemstandard",
     "defaultVia": "Systemstandard ({{backend}})",
     "level": "Mikrofonniveau",
-    "idle": "Tryk på Test, sig noget, og du hører dig selv igen.",
+    "idle": "Tryk på Test, sig noget, og så får du det afspillet.",
     "recording": "Tal nu…",
     "playing": "Afspiller din stemme…",
     "devicesFailed": "Dine lydenheder kunne ikke vises. Du kan fortsætte og vælge dem senere i Indstillinger.",
@@ -120,7 +120,7 @@
       "title": "Afbalanceret",
       "subtitle": "Mellem privatliv og komfort",
       "p1": "Kun venner og personer i din kanal kan skrive til dig",
-      "p2": "Direkte forbindelse med et relay som reserve",
+      "p2": "Direkte forbindelse med et relæ som reserve",
       "p3": "Linkforhåndsvisninger og billeder i fuld størrelse er slået til",
       "p4": "Det, du spiller og lytter til, forbliver privat"
     },
@@ -128,7 +128,7 @@
       "title": "Maksimalt privatliv",
       "subtitle": "Del så lidt som muligt",
       "p1": "Kun venner kan skrive til dig, uden undtagelser",
-      "p2": "Din IP er skjult; alt går gennem relayet",
+      "p2": "Din IP er skjult; alt går gennem relæet",
       "p3": "Intet eksternt indhold, ingen historiksynkronisering, ingen deling",
       "p4": "Opdateringer giver dig kun besked; intet deles om, hvad du foretager dig"
     },
@@ -170,9 +170,9 @@
   },
   "startup": {
     "title": "Start og opdateringer",
-    "subtitle": "Hvordan Mumcord starter, og hvad det gør ved nye versioner.",
+    "subtitle": "Hvordan Mumcord starter, og hvad det gør med nye versioner.",
     "linkHandler": "Åbn mumble://-links med Mumcord",
-    "linkHandlerHint": "Hvis du klikker på et serverlink på et websted, åbnes det så her.",
+    "linkHandlerHint": "Så åbnes serverlinks fra websteder her, når du klikker på dem.",
     "linkHandlerActive": "Mumcord åbner allerede mumble://-links.",
     "linkHandlerFailed": "Mumcord kunne ikke sættes op til at åbne mumble://-links. Du kan prøve igen i Indstillinger.",
     "autostartFailed": "Mumcord kunne ikke indstilles til at starte, når du logger ind. Du kan prøve igen i Indstillinger."
@@ -180,12 +180,12 @@
   "summary": {
     "title": "Alt er klart",
     "titleNamed": "Alt er klart, {{name}}",
-    "subtitle": "Her er, hvad du har valgt. Brug Rediger på et kort for at ændre det, før du starter.",
+    "subtitle": "Her er, hvad du har valgt. Brug Redigér på et kort for at ændre det, før du starter.",
     "on": "til",
     "off": "fra",
     "unavailable": "ikke tilgængelig her",
-    "editShort": "Rediger",
-    "edit": "Rediger {{card}}",
+    "editShort": "Redigér",
+    "edit": "Redigér {{card}}",
     "cards": {
       "identity": "Identitet",
       "voice": "Tale",
@@ -206,7 +206,7 @@
     "contentTitle": "Linkforhåndsvisninger {{previews}}",
     "contentDetail": "Billeder i fuld størrelse {{images}} · historiksynkronisering {{sync}}",
     "featuresTitle": "Overlay i spillet {{overlay}}",
-    "featuresDetail": "Følg systemets Forstyr ikke {{dnd}} · spiller nu {{playing}} · gamer nu {{gaming}} · aktivitetshistorik {{history}}",
+    "featuresDetail": "Følg systemets Forstyr ikke {{dnd}} · afspilles nu {{playing}} · spiller nu {{gaming}} · aktivitetshistorik {{history}}",
     "effectsDetail": "Visuelle effekter {{effects}}",
     "startupTitle": "Start ved login {{login}}",
     "startupDetail": "Start minimeret {{minimized}} · mumble://-links {{links}}",
@@ -258,9 +258,9 @@
       "notifications": "Vælg, hvordan hver slags nyheder når dig, eller slå dem fra.",
       "connections": "Vælg, om Mumcord må forbinde dig direkte med andre Mumcord-brugere.",
       "features": "Slå kun de ekstra funktioner til, du kan lide. Hvert kort viser, hvem der kan se det.",
-      "appearance": "Lyst, mørkt eller som dit system: Vælg dit udseende her.",
+      "appearance": "Lyst, mørkt eller som dit system: vælg dit udseende her.",
       "startup": "Vælg, hvordan Mumcord starter, når du logger ind på din computer.",
-      "summary": "Så er alt klar! Tjek dine valg her; Rediger tager dig tilbage til et hvilket som helst trin."
+      "summary": "Så er alt klar! Tjek dine valg her; Redigér tager dig tilbage til et hvilket som helst trin."
     }
   }
 }

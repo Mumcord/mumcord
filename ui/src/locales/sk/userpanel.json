@@ -2,24 +2,24 @@
   "unknownName": "Ty",
   "mute": "Stlmiť mikrofón",
   "deafen": "Stlmiť zvuk",
-  "disconnect": "Odpojiť sa od {{server}}",
+  "disconnect": "Odpojiť sa od servera {{server}}",
   "settings": "Rýchle nastavenia",
   "announce": {
     "muted": "Mikrofón stlmený",
     "unmuted": "Mikrofón zapnutý",
     "deafened": "Zvuk stlmený. Nepočuješ ostatných a tvoj mikrofón je stlmený",
     "undeafened": "Zvuk zapnutý",
-    "leftVoice": "Hlas na serveri {{server}} opustený",
+    "leftVoice": "Hlas na serveri {{server}} si opustil(a)",
     "disconnected": "Odpojené od servera {{server}}",
     "disconnectedAll": "Odpojené od všetkých serverov"
   },
   "readOnly": {
     "text": "Len čítaš – ak chceš hovoriť, pripoj sa do kanála.",
-    "join": "Pripojiť sa do {{channel}}"
+    "join": "Pripojiť sa do kanála {{channel}}"
   },
   "status": {
-    "connecting": "Pripájam sa…",
-    "reconnecting": "Znova sa pripájam…",
+    "connecting": "Pripája sa…",
+    "reconnecting": "Znova sa pripája…",
     "connected": "Pripojené",
     "readOnly": "Len na čítanie",
     "disconnected": "Nepripojené",
@@ -36,8 +36,8 @@
     "avatarChosen": "Vybrané: {{name}}",
     "avatarRemoved": "Obrázok sa odstráni po uložení.",
     "comment": "O tebe",
-    "tooLong": "Nedá sa uložiť: váš komentár je pre tento server príliš dlhý",
-    "tooLongTip": "Váš komentár je pre tento server príliš dlhý"
+    "tooLong": "Nedá sa uložiť: tvoj komentár je pre tento server príliš dlhý",
+    "tooLongTip": "Tvoj komentár je pre tento server príliš dlhý"
   },
   "register": {
     "title": "Registrovať sa na tomto serveri",
@@ -50,13 +50,13 @@
     "exported": "Záloha identity uložená.",
     "confirm": "Registrovať",
     "done": "Registrovaný na tomto serveri",
-    "identity": "Registrovaný názov patrí identite {{identity}}."
+    "identity": "Registrované meno patrí identite {{identity}}."
   },
   "errors": {
     "tooLarge": "Toto je pre server príliš veľké. Vyber menší obrázok alebo napíš kratší text.",
     "denied": "Server to nepovoľuje.",
     "deniedWithReason": "Server to nepovoľuje: {{reason}}",
-    "notConnected": "Nie si pripojený k serveru.",
+    "notConnected": "Nemáš pripojenie k serveru.",
     "file": "Súbor sa nepodarilo prečítať ani zapísať.",
     "generic": "Niečo sa pokazilo. Skús to znova."
   },
@@ -90,7 +90,7 @@
     "loadImagesHint": "Sťahovať originálne obrázky od ostatných",
     "dnd": "Nerušiť",
     "dndHint": "Stlmí zvuky a bannery upozornení",
-    "dndSystemHint": "Zapnuté cez režim Nerušiť vášho prostredia",
+    "dndSystemHint": "Zapnuté cez režim Nerušiť tvojho prostredia",
     "privateMessages": "Správy od",
     "pm_everyone": "Všetci",
     "pm_friendsOnly": "Priatelia",
@@ -111,13 +111,13 @@
     "leaveVoice": "Opustiť hlas",
     "leaveVoiceHint": "Prestať hovoriť a počúvať, zostať pripojený kvôli chatu",
     "disconnectHint": "Zavrieť pripojenie k tomuto serveru",
-    "switchTo": "Prepnúť hlas na {{server}}",
-    "all": "Odpojiť od všetkých serverov",
+    "switchTo": "Prepnúť hlas na server {{server}}",
+    "all": "Odpojiť sa od všetkých serverov",
     "allHint": "Zavrieť všetky pripojenia k serverom"
   },
   "disconnectAll": {
-    "title": "Odpojiť od všetkých serverov?",
-    "message": "Odpojiť od všetkých {{total}} serverov?",
+    "title": "Odpojiť sa od všetkých serverov?",
+    "message": "Odpojiť sa od všetkých serverov ({{total}})?",
     "confirm": "Odpojiť"
   },
   "audio": {
@@ -139,7 +139,7 @@
     "label": "Nerušiť",
     "manual": "ručne",
     "system": "Nerušiť (systém)",
-    "systemHint": "Vypnite ho v nastaveniach upozornení vášho prostredia.",
+    "systemHint": "Vypni ho v nastaveniach upozornení svojho prostredia.",
     "short": "Nerušiť"
   },
   "dismissError": "Zavrieť",
@@ -171,7 +171,7 @@
     "editLink": "Upraviť odkaz",
     "linkText": "Text",
     "linkAddress": "Adresa odkazu",
-    "linkInvalid": "Zadajte webovú alebo e-mailovú adresu (https:// alebo mailto:).",
+    "linkInvalid": "Zadaj webovú alebo e-mailovú adresu (https:// alebo mailto:).",
     "removeLink": "Odstrániť odkaz",
     "apply": "Použiť",
     "image": "Vložiť obrázok",
@@ -180,17 +180,17 @@
     "source": "Zdroj",
     "sourceShow": "Upraviť zdroj HTML",
     "sourceHide": "Späť na formátované zobrazenie",
-    "hintComment": "Ostatní to uvidia vo vašom profile",
+    "hintComment": "Ostatní to uvidia v tvojom profile",
     "hintDescription": "Zobrazí sa každému, kto otvorí informácie o kanáli",
     "hintSource": "HTML sa vyčistí pri prepnutí späť a pri uložení",
     "imageBusy": "Obrázok sa prispôsobuje limitu servera…",
     "imageScaled": "Obrázok bol zmenšený na {{width}} × {{height}}, aby vyhovoval limitu servera",
-    "imageTooLarge": "Tento obrázok nevyhovuje limitu servera ani po zmenšení. Použite menší obrázok alebo skráťte text.",
-    "imageNotImage": "Pridať možno iba obrázky PNG, JPEG, GIF or WebP.",
-    "imageUnreadable": "Obrázok sa nepodarilo prečítať. Skúste iný súbor.",
+    "imageTooLarge": "Tento obrázok sa do limitu servera nezmestí ani po zmenšení. Použi menší obrázok alebo skráť text.",
+    "imageNotImage": "Pridať možno iba obrázky PNG, JPEG, GIF alebo WebP.",
+    "imageUnreadable": "Obrázok sa nepodarilo prečítať. Skús iný súbor.",
     "imageSourceTooLarge": "Tento súbor je príliš veľký (nad 25 MB).",
-    "overText": "Príliš dlhé pre tento server: {{used}} z {{limit}} znakov. Skráťte text.",
-    "overImage": "Príliš dlhé pre tento server o {{size}}, aj so zmenšeným obrázkom. Použite menší obrázok alebo skráťte text.",
+    "overText": "Príliš dlhé pre tento server: {{used}} z {{limit}} znakov. Skráť text.",
+    "overImage": "Pre tento server o {{size}} príliš dlhé, aj so zmenšeným obrázkom. Použi menší obrázok alebo skráť text.",
     "sizeKb": "{{size}} KB",
     "meterText": "{{used}} / {{limit}}",
     "meterKb": "{{used}} / {{limit}} KB",

@@ -1,13 +1,13 @@
 {
   "title": "Javni strežniki",
   "loading": "Nalaganje seznama …",
-  "subtitle": "Naloženo, ker ste odprli to stran · prikazano {{shown}} od {{total}}",
+  "subtitle": "Naloženo, ker si odprl to stran · prikazano {{shown}} od {{total}}",
   "search": "Iskanje po imenu, naslovu ali državi",
   "refresh": "Osveži",
   "retry": "Poskusi znova",
-  "loadFailed": "Seznama javnih strežnikov ni bilo mogoče naložiti. Preverite internetno povezavo in poskusite znova.",
+  "loadFailed": "Seznama javnih strežnikov ni bilo mogoče naložiti. Preveri internetno povezavo in poskusi znova.",
   "noMatch": "Iskanju in filtrom ne ustreza noben strežnik.",
-  "saveFailed": "Strežnika ni bilo mogoče dodati. Poskusite znova.",
+  "saveFailed": "Strežnika ni bilo mogoče dodati. Poskusi znova.",
   "filters": {
     "label": "Filtri",
     "country": "Država",
@@ -40,9 +40,9 @@
   "favourite": "Priljubljen",
   "favouriteServer": "Dodaj {{server}} med svoje strežnike",
   "saved": "Shranjeno",
-  "savedAs": "{{server}} je med vašimi strežniki",
+  "savedAs": "{{server}} je med tvojimi strežniki",
   "announce": {
-    "saved": "{{server}} je dodan med vaše strežnike"
+    "saved": "{{server}} je dodan med tvoje strežnike"
   },
-  "note": "Pingajo se le vidne vrstice, nekaj naenkrat. Nič drugega se strežniku ne pošlje, dokler se ne povežete."
+  "note": "Pingajo se le vidne vrstice, nekaj naenkrat. Nič drugega se strežniku ne pošlje, dokler se ne povežeš."
 }

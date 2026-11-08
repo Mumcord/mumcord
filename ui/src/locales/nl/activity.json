@@ -8,16 +8,16 @@
   "selfName": "jou",
   "someone": "iemand",
   "verb": {
-    "connected": "verbond",
-    "disconnected": "verbreek de verbinding",
+    "connected": "maakte verbinding",
+    "disconnected": "verbrak de verbinding",
     "moved": "wisselde van kanaal",
     "screenShareStarted": "begon het scherm te delen",
     "screenShareStopped": "stopte met het delen van het scherm",
     "watchPartyStarted": "begon een watchparty",
-    "watchPartyStopped": "stopde de watchparty",
+    "watchPartyStopped": "stopte de watchparty",
     "pluginActivityStarted": "startte {{plugin}}",
     "pluginActivityStopped": "stopte {{plugin}}",
-    "pluginEvent": "„{{text}}”"
+    "pluginEvent": "“{{text}}”"
   },
   "channel": "# {{channel}}",
   "plugin": "plug-in",

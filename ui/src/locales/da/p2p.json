@@ -26,8 +26,8 @@
     "noRelay": "Denne server har intet relæ, så fildeling er ikke tilgængelig.",
     "filesDisallowed": "Denne servers relæ tillader ikke fildeling.",
     "screenDisallowed": "Denne servers relæ tillader ikke skærmdeling.",
-    "camerasDisallowed": "Dette servers relæ tillader ikke deling af kamera.",
-    "imagesDisallowed": "Fuld størrelse er ikke tilgængelig: Denne servers relæ tillader ikke billeder",
+    "camerasDisallowed": "Denne servers relæ tillader ikke kameradeling.",
+    "imagesDisallowed": "Fuld størrelse er ikke tilgængelig: denne servers relæ tillader ikke billeder",
     "noCertificate": "Fildeling kræver et klientcertifikat.",
     "modeNeedsRelay": "Fildeling kræver relæet; din peer-to-peer-indstilling er {{mode}}.",
     "modeOff": "Fra",
@@ -51,7 +51,7 @@
     "peerGone": "Den anden person forlod serveren.",
     "rateLimited": "For mange relæanmodninger. Prøv igen om et minut.",
     "groupNotAllowed": "Serverens relæ er kun tilgængeligt for bestemte grupper. Bed en administrator om at tilføje dig.",
-    "noHello": "Relæbotten kender ikke appen endnu. Forbind igen for at løse det."
+    "noHello": "Relæ-botten kender ikke denne app endnu. Forbind igen for at løse det."
   },
   "refusal": {
     "unknownToken": "ukendt adgangstoken",

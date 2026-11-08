@@ -6,30 +6,30 @@
     "relayTcp": "Via relais (TCP 443)",
     "ipHidden": "IP masquée",
     "ipVisible": "IP visible",
-    "ipHiddenHint": "L’autre personne voit l’adresse du relais, pas la vôtre."
+    "ipHiddenHint": "L’autre personne voit l’adresse du relais, pas la tienne."
   },
   "relay": {
     "mumbot": "Mumbot",
-    "relay": "Relais Mumpeer",
+    "relay": "Relais mumpeer",
     "yes": "Oui",
     "yesNamed": "Oui ({{names}})",
     "no": "Non",
     "available": "Disponible",
     "availableAt": "Disponible · {{host}}",
-    "unavailable": "Indisponible : {{reason}}",
+    "unavailable": "Indisponible : {{reason}}",
     "untrusted": "Modifié, non approuvé",
     "changed": "Le relais de ce serveur a changé.",
     "trustNew": "Approuver le nouveau relais",
     "keepBlocked": "Garder bloqué",
     "forget": "Oublier le relais",
-    "actionFailed": "Cela n’a pas fonctionné. Veuillez réessayer.",
+    "actionFailed": "Cela n’a pas fonctionné. Réessaie.",
     "noRelay": "Ce serveur n’a pas de relais, le partage de fichiers n’est donc pas disponible.",
     "filesDisallowed": "Le relais de ce serveur n’autorise pas le partage de fichiers.",
     "screenDisallowed": "Le relais de ce serveur n’autorise pas le partage d’écran.",
     "camerasDisallowed": "Le relais de ce serveur n’autorise pas le partage de caméra.",
-    "imagesDisallowed": "Taille réelle indisponible : le relais de ce serveur n’autorise pas les images",
+    "imagesDisallowed": "Taille réelle indisponible : le relais de ce serveur n’autorise pas les images",
     "noCertificate": "Le partage de fichiers nécessite un certificat client.",
-    "modeNeedsRelay": "Le partage de fichiers nécessite le relais ; votre réglage pair à pair est {{mode}}.",
+    "modeNeedsRelay": "Le partage de fichiers nécessite le relais ; ton paramètre pair à pair est {{mode}}.",
     "modeOff": "Désactivé",
     "modeDirectOnly": "Direct uniquement",
     "hideNoRelay": "Masquer ce conseil pour {{server}}"
@@ -39,19 +39,19 @@
     "noRelay": "Ce serveur n’a pas de relais.",
     "notConnected": "Non connecté à ce serveur.",
     "untrusted": "Le relais de ce serveur a changé et n’est pas approuvé.",
-    "conflict": "Deux relais sont annoncés sur ce serveur ; aucun n’est utilisé.",
+    "conflict": "Deux relais sont annoncés sur ce serveur ; aucun n’est utilisé.",
     "botLeft": "Le bot du relais a quitté le serveur.",
     "relayDown": "Le relais est injoignable pour le moment (signalé par le bot du relais).",
     "botNoAnswer": "Le bot du relais n’a pas répondu.",
-    "refused": "Le relais a refusé la connexion : {{reason}}",
+    "refused": "Le relais a refusé la connexion : {{reason}}",
     "unreachable": "Le relais est injoignable en UDP comme en TCP 443.",
     "peerCannotRelay": "L’autre personne ne peut pas utiliser le relais (Mumcord plus ancien ou relais désactivé).",
     "denied": "Le bot du relais a refusé la demande.",
-    "notRegistered": "Le relais de ce serveur est réservé aux utilisateurs enregistrés. Enregistrez-vous sur ce serveur pour l’utiliser.",
+    "notRegistered": "Le relais de ce serveur est réservé aux utilisateurs enregistrés. Enregistre-toi sur ce serveur pour l’utiliser.",
     "peerGone": "L’autre personne a quitté le serveur.",
-    "rateLimited": "Trop de demandes de relais. Réessayez dans une minute.",
-    "groupNotAllowed": "Le relais de ce serveur n'est disponible que pour certains groupes. Demande à un admin de t'ajouter.",
-    "noHello": "Le bot du relais ne connaît pas encore cette app. Reconnecte-toi pour corriger cela."
+    "rateLimited": "Trop de demandes de relais. Réessaie dans une minute.",
+    "groupNotAllowed": "Le relais de ce serveur n’est disponible que pour certains groupes. Demande à un administrateur de t’ajouter.",
+    "noHello": "Le bot du relais ne connaît pas encore cette application. Reconnecte-toi pour corriger cela."
   },
   "refusal": {
     "unknownToken": "jeton d’accès inconnu",
@@ -65,26 +65,26 @@
     "badRequest": "demande invalide"
   },
   "refusalAction": {
-    "howToRegister": "Comment s'enregistrer",
+    "howToRegister": "Comment s’enregistrer",
     "reconnect": "Se reconnecter",
-    "filesRegisteredOnly": "Le partage de fichiers n'est disponible que pour les utilisateurs enregistrés sur ce serveur."
+    "filesRegisteredOnly": "Le partage de fichiers n’est disponible que pour les utilisateurs enregistrés sur ce serveur."
   },
   "trust": {
     "title": "Relais modifié sur {{server}}",
-    "body": "Le partage d'écran et de fichiers est en pause jusqu'à ce que tu fasses confiance au nouveau relais.",
+    "body": "Le partage d’écran et de fichiers est en pause jusqu’à ce que tu fasses confiance au nouveau relais.",
     "details": "Détails",
     "trustedTitle": "Nouveau relais approuvé",
-    "trustedBody": "Le partage d'écran et de fichiers fonctionne à nouveau sur {{server}}.",
-    "dialogBody": "Le relais de ce serveur utilise maintenant un autre certificat. Tant que tu ne lui fais pas confiance, le partage d'écran, de fichiers et les images en taille réelle sont en pause.",
-    "previous": "Relais approuvé jusqu'ici",
+    "trustedBody": "Le partage d’écran et de fichiers fonctionne à nouveau sur {{server}}.",
+    "dialogBody": "Le relais de ce serveur utilise maintenant un autre certificat. Tant que tu ne lui fais pas confiance, le partage d’écran, de fichiers et les images en taille réelle sont en pause.",
+    "previous": "Relais approuvé jusqu’ici",
     "current": "Nouveau relais",
     "unknown": "Inconnu",
     "trustIf": "Fais-lui confiance si",
-    "trustIfText": "les admins du serveur ont annoncé un nouveau relais ou un déménagement et que tu peux le confirmer avec eux.",
+    "trustIfText": "les administrateurs du serveur ont annoncé un nouveau relais ou un déménagement, et tu peux le confirmer avec eux.",
     "dontTrustIf": "Ne lui fais pas confiance si",
-    "dontTrustIfText": "personne n'a annoncé de changement ou si tu n'es pas sûr. Quelqu'un pourrait se faire passer pour le relais.",
+    "dontTrustIfText": "personne n’a annoncé de changement, ou tu n’es pas sûr. Quelqu’un pourrait se faire passer pour le relais.",
     "notNow": "Pas maintenant",
     "review": "Relais modifié – vérifier",
-    "filesBlocked": "Le partage de fichiers n'est pas disponible : le relais de ce serveur a changé et n'est pas encore approuvé."
+    "filesBlocked": "Le partage de fichiers n’est pas disponible : le relais de ce serveur a changé et n’est pas encore approuvé."
   }
 }

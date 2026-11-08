@@ -1,12 +1,12 @@
 {
   "close": {
     "title": "In den Infobereich minimieren oder beenden?",
-    "description": "Du bist noch verbunden. Minimiert bleibt Mumcord im Sprachkanal und im Infobereich der Taskleiste.",
+    "description": "Du bist noch verbunden. Wenn du minimierst, bleibst du im Sprachkanal und Mumcord bleibt im Infobereich.",
     "remember": "Auswahl merken",
     "minimize": "In den Infobereich",
     "quit": "Beenden",
     "failed": "Das hat nicht geklappt. Bitte versuche es erneut.",
-    "descriptionServers": "Du bist noch mit {{count}} Servern verbunden. Minimiert hält dich Mumcord im Sprachkanal und bleibt im Systembereich."
+    "descriptionServers": "Du bist noch mit {{count}} Servern verbunden. Wenn du minimierst, bleibst du im Sprachkanal und Mumcord bleibt im Infobereich."
   },
   "windowOverlay": {
     "title": "Das Fenster-Overlay wurde entfernt",
@@ -36,7 +36,7 @@
   },
   "directConsent": {
     "title": "Direkte Verbindungen erlauben?",
-    "description": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Mumcord nutzt sie für Bilder in voller Größe und Bildschirmfreigabe mit anderen Mumcord-Nutzern und öffnet dafür eventuell einen Port an deinem Router. Wenn du Nein sagst, kommen Bilder weiterhin über den Server und Bildschirmfreigabe ist nicht verfügbar. Du kannst das später unter Einstellungen → Datenschutz ändern. Wenn dieser Server ein Relay anbietet, kann Mumcord stattdessen dieses nutzen; dann sieht die andere Person deine IP-Adresse nicht.",
+    "description": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Mumcord nutzt sie für Bilder in voller Größe und die Bildschirmfreigabe mit anderen Mumcord-Benutzern und öffnet dafür eventuell einen Port an deinem Router. Wenn du Nein sagst, kommen Bilder weiterhin über den Server, und die Bildschirmfreigabe ist nicht verfügbar. Du kannst das später unter Einstellungen → Datenschutz ändern. Wenn dieser Server ein Relay anbietet, kann Mumcord stattdessen dieses nutzen; dann sieht die andere Person deine IP-Adresse nicht.",
     "no": "Nein",
     "yes": "Ja",
     "failed": "Das hat nicht geklappt. Bitte versuche es erneut."

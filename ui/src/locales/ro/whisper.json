@@ -1,7 +1,7 @@
 {
   "menu": {
     "whisper": "Șoptește către",
-    "noPermission": "Serverul nu permite șoptitul aici"
+    "noPermission": "Serverul nu permite șoaptele aici"
   },
   "banner": {
     "whisper": "Șoptești către {{target}}",
@@ -15,7 +15,7 @@
     "title": "Nu s-a putut șopti către {{target}}",
     "noVoiceServer": "Intră mai întâi într-un canal: șoaptele trec prin serverul pe care vorbești.",
     "muted": "Pornește microfonul ca să șoptești.",
-    "serverMuted": "Serverul ți-a dezactivat sunetul, deci nu transmite vocea ta.",
+    "serverMuted": "Serverul ți-a oprit microfonul, deci nu îți transmite vocea.",
     "nobodyHere": "Niciuna dintre aceste persoane nu este acum pe acest server.",
     "channelNotFound": "Acest canal nu există pe acest server.",
     "noPermission": "Serverul nu îți permite să șoptești în {{channel}}.",

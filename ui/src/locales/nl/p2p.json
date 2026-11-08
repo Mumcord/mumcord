@@ -9,8 +9,8 @@
     "ipHiddenHint": "De ander ziet het adres van de relay, niet het jouwe."
   },
   "relay": {
-    "mumbot": "Mumbot",
-    "relay": "Mumpeer-relay",
+    "mumbot": "mumbot",
+    "relay": "mumpeer-relay",
     "yes": "Ja",
     "yesNamed": "Ja ({{names}})",
     "no": "Nee",
@@ -25,8 +25,8 @@
     "actionFailed": "Dat is niet gelukt. Probeer het opnieuw.",
     "noRelay": "Deze server heeft geen relay, dus bestanden delen is niet beschikbaar.",
     "filesDisallowed": "De relay van deze server staat bestanden delen niet toe.",
-    "screenDisallowed": "De relay van deze server staat schermdelen niet toe.",
-    "camerasDisallowed": "Het relay van deze server staat het delen van de camera niet toe.",
+    "screenDisallowed": "De relay van deze server staat schermdeling niet toe.",
+    "camerasDisallowed": "De relay van deze server staat het delen van de camera niet toe.",
     "imagesDisallowed": "Volledige grootte niet beschikbaar: de relay van deze server staat geen afbeeldingen toe",
     "noCertificate": "Bestanden delen vereist een clientcertificaat.",
     "modeNeedsRelay": "Bestanden delen heeft de relay nodig; je peer-to-peer-instelling is {{mode}}.",

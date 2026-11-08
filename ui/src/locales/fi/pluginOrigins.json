@@ -18,7 +18,7 @@
     "none": "Ei vielä",
     "wherePlace": "Missä se näkyy",
     "places": {
-      "stage": "Mediaalue",
+      "stage": "Media-alue",
       "side-panel": "Sivupaneeli",
       "dialog": "Valintaikkuna",
       "panel": "Lisäosapalkki",
@@ -31,28 +31,28 @@
     "sealedPageTextNoSize": "{{entry}} · ei pääsyä Mumcordiin, tiedostoihin, mikrofoniin, kameraan eikä leikepöydälle",
     "relayAsks": "Pyytää lupaa käyttää sitä · päätät asennuksen yhteydessä",
     "securityTitle": "Turvallisuus",
-    "relayData": "Rele-data",
+    "relayData": "Välityspalvelimen data",
     "relayOff": "Pois ·",
     "relayOn": "Päällä",
     "turnOnInPermissions": "Ota käyttöön oikeuksissa",
     "tags": {
       "webview": "Oma verkkosisältö",
       "origins": "{{count}} verkkosivustoa",
-      "stage": "Mediaalue",
+      "stage": "Media-alue",
       "sidePanel": "Sivupaneeli",
-      "relay": "Rele-data",
+      "relay": "Välityspalvelimen data",
       "appMenu": "Sovellusvalikko"
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Tämä päivitys haluaa ottaa yhteyttä {{count}} uuteen verkkosivustoon.",
     "wantsNew_other": "Tämä päivitys haluaa ottaa yhteyttä {{count}} uuteen verkkosivustoon.",
     "staysOn": "{{plugin}} pysyy versiossa {{version}}, kunnes päätät.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} päivitys odottaa sinua. Päivityksiä, jotka lisäävät oikeuksia tai verkkosivustoja, ei koskaan asenneta automaattisesti.",
     "banner_other": "{{count}} päivitystä odottaa sinua. Päivityksiä, jotka lisäävät oikeuksia tai verkkosivustoja, ei koskaan asenneta automaattisesti.",
     "noOther": "Muut oikeudet eivät muutu.",
-    "whatsNew": "Versiossa {{version}} uutta",
-    "skipKeeps": "Ohittaminen pitää version {{version}} toimivana.",
+    "whatsNew": "Uutta versiossa {{version}}",
+    "skipKeeps": "Jos ohitat, versio {{version}} pysyy käytössä.",
     "skip": "Ohita tämä versio",
     "allow": "Salli ja päivitä"
   }

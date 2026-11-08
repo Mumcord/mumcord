@@ -13,7 +13,7 @@
   },
   "denied": {
     "title": "Nepodarilo sa pošepkať: {{target}}",
-    "noVoiceServer": "Najprv vstúp do kanála: šepot ide cez server, na ktorom hovoríš.",
+    "noVoiceServer": "Najprv vstúp do kanála: šepkanie ide cez server, na ktorom hovoríš.",
     "muted": "Na šepkanie zapni mikrofón.",
     "serverMuted": "Server ťa stlmil, preto neprenáša tvoj hlas.",
     "nobodyHere": "Nikto z týchto ľudí teraz nie je na serveri.",

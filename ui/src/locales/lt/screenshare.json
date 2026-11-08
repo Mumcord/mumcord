@@ -24,7 +24,7 @@
   "viewers_few": "{{count}} žiūri: {{names}}",
   "viewers_many": "{{count}} žiūri: {{names}}",
   "viewers_other": "{{count}} žiūri: {{names}}",
-  "full": "Bendrinimas pilnas: {{max}} iš {{max}} žiūri: {{names}}",
+  "full": "Visos vietos užimtos: {{max}} iš {{max}} žiūri: {{names}}",
   "someone": "Kažkas",
   "stopped": "Baigei bendrinti savo ekraną.",
   "pauseSharing": "Pristabdyti bendrinimą",
@@ -33,10 +33,10 @@
   "changeWindow": "Keisti langą",
   "viewersTitle": "Žiūrovai",
   "thumbnail": "Bendrinamo turinio peržiūra",
-  "youAreSharing": "Bendrinate",
+  "youAreSharing": "Bendrini",
   "ofMax": "{{count}} iš {{max}}",
   "fullShort": "Visos vietos užimtos.",
-  "stopShort": "Stabdyti",
+  "stopShort": "Sustabdyti",
   "viewerCount_one": "{{count}} žiūrovas",
   "viewerCount_few": "{{count}} žiūrovai",
   "viewerCount_many": "{{count}} žiūrovo",
@@ -90,8 +90,8 @@
       "pipewire": "Be garso: reikia PipeWire"
     },
     "viewersGet": "Žiūrovai gauna:",
-    "viewersGetSummary": "iki {{resolution}} · {{fps}} k/s · {{codec}} · apie {{mbit}} Mbit/s",
-    "pathRelay": "Siunčiama vieną kartą per serverio perdavimo mazgą, kuris perduoda ją iki {{count}} žiūrovų.",
+    "viewersGetSummary": "iki {{resolution}} · {{fps}} fps · {{codec}} · apie {{mbit}} Mbit/s",
+    "pathRelay": "Siunčiama vieną kartą per serverio perdavimo mazgą, kuris persiunčia vaizdą iki {{count}} žiūrovų.",
     "pathDirect": "Viena kopija kiekvienam žiūrovui, iki {{count}}.",
     "olderMumcord": "Žiūrovai su senesniu Mumcord gauna VP9.",
     "remember": "Kitą kartą naudoti šiuos nustatymus",
@@ -139,7 +139,7 @@
     "note": "Pakeitimai įsigalioja per sekundę, bendrinimo nereikia paleisti iš naujo.",
     "lowered": "Sumažinta iki {{step}}: {{reason}}",
     "reasonUpload": "išsiuntimas per lėtas",
-    "reasonEncoder": "kodavimo įrenginys per lėtas",
+    "reasonEncoder": "koduotuvas per lėtas",
     "reasonViewers": "daug žiūrovų"
   },
   "viewerList": {
@@ -156,7 +156,7 @@
     "more_few": "ir dar {{count}}",
     "more_many": "ir dar {{count}}",
     "more_other": "ir dar {{count}}",
-    "layerNote": "{{name}} gauna {{fps}} k/s: jo ryšys neatlaiko {{target}}."
+    "layerNote": "{{name}} gauna {{fps}} fps: ryšys neatlaiko {{target}}."
   },
   "notices": {
     "noFanoutTitle": "Šis serveris neturi perdavimo mazgo dideliems bendrinimams",
@@ -169,7 +169,7 @@
     "reasonOldRelay": "perdavimo mazgas per senas",
     "reasonDisallowed": "perdavimo mazgas neleidžia bendrinti ekrano",
     "reasonRefused": "perdavimo mazgas atmetė transliaciją",
-    "reasonFull": "perdavimo mazgas pilnas",
+    "reasonFull": "perdavimo mazgas perpildytas",
     "reasonLost": "perdavimo mazgas buvo prarastas",
     "reasonMode": "tavo P2P nustatymas apeina perdavimo mazgą",
     "reasonNoCertificate": "neturi kliento sertifikato",
@@ -182,8 +182,8 @@
     "undo": "Atšaukti",
     "details": "Išsami informacija",
     "undoFailed": "Atšaukti nepavyko. Tavo bendrinimas toliau veikia su {{codec}}.",
-    "detailsTitle": "Kodėl tavo bendrinimas pakeitė kodavimo įrenginį",
-    "detailsEncoder": "Kodavimo įrenginys",
+    "detailsTitle": "Kodėl tavo bendrinimas pakeitė koduotuvą",
+    "detailsEncoder": "Koduotuvas",
     "detailsFromTo": "{{from}} → {{to}}",
     "detailsEncodeTime": "Kodavimo trukmė vienam kadrui",
     "detailsBudget": "Laikas, skirtas vienam kadrui",
@@ -191,14 +191,14 @@
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Neišmatuota",
     "close": "Uždaryti",
-    "reasonNotRegistered": "šio serverio retransliatorių gali naudoti tik registruoti naudotojai",
-    "reasonGroupNotAllowed": "retransliatorius aptarnauja tik tam tikras grupes",
-    "reasonNoHello": "retransliatoriaus botas dar nepažįsta programėlės, prisijunk iš naujo"
+    "reasonNotRegistered": "šio serverio perdavimo mazgą gali naudoti tik registruoti naudotojai",
+    "reasonGroupNotAllowed": "perdavimo mazgas aptarnauja tik tam tikras grupes",
+    "reasonNoHello": "perdavimo mazgo botas dar nepažįsta šios programos, prisijunk iš naujo"
   },
   "settings": {
     "title": "Ekrano bendrinimas",
     "new": "Nauja",
-    "intro": "Ekrano bendrinimo kokybė, kodekas ir aparatinė įranga. Žiūrovai visada mato tai, ką pasirinkai prieš pradėdamas.",
+    "intro": "Ekrano bendrinimo kokybė, kodekas ir aparatinė įranga. Žiūrovai visada mato tai, ką pasirenki prieš pradėdamas bendrinti.",
     "qualityDefaults": "Numatytoji kokybė",
     "resolution": "Skiriamoji geba",
     "resolutionAuto": "Automatinė",
@@ -252,7 +252,7 @@
     "share": "Bendrinti garsą",
     "cancel": "Atšaukti",
     "empty": "Šiuo metu jokia programa negroja garso",
-    "gone": "Ši programa nebegroja garso. Pasirinkite kitą.",
-    "failed": "Jūsų pasirinkimo nepavyko pritaikyti."
+    "gone": "Ši programa nebegroja garso. Pasirink kitą.",
+    "failed": "Tavo pasirinkimo nepavyko pritaikyti."
   }
 }

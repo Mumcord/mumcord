@@ -1,13 +1,13 @@
 {
   "title": "Javni poslužitelji",
   "loading": "Učitavanje popisa…",
-  "subtitle": "Učitano jer ste otvorili ovu stranicu · prikazano {{shown}} od {{total}}",
+  "subtitle": "Učitano jer si otvorio/la ovu stranicu · prikazano {{shown}} od {{total}}",
   "search": "Pretraži po nazivu, adresi ili državi",
   "refresh": "Osvježi",
   "retry": "Pokušaj ponovno",
-  "loadFailed": "Popis javnih poslužitelja nije moguće učitati. Provjerite internetsku vezu i pokušajte ponovno.",
+  "loadFailed": "Popis javnih poslužitelja nije moguće učitati. Provjeri internetsku vezu i pokušaj ponovno.",
   "noMatch": "Nijedan poslužitelj ne odgovara pretrazi i filtrima.",
-  "saveFailed": "Poslužitelj nije moguće dodati. Pokušajte ponovno.",
+  "saveFailed": "Poslužitelj nije moguće dodati. Pokušaj ponovno.",
   "filters": {
     "label": "Filtri",
     "country": "Država",
@@ -35,14 +35,14 @@
   "measuring": "Mjerenje",
   "noAnswer": "Nema odgovora",
   "ms": "{{ms}} ms",
-  "connect": "Poveži",
+  "connect": "Poveži se",
   "connectTo": "Poveži se s {{server}}",
-  "favourite": "Omiljeni",
+  "favourite": "Dodaj u omiljene",
   "favouriteServer": "Dodaj {{server}} u svoje poslužitelje",
   "saved": "Spremljeno",
-  "savedAs": "{{server}} je među vašim poslužiteljima",
+  "savedAs": "{{server}} je među tvojim poslužiteljima",
   "announce": {
-    "saved": "{{server}} dodan među vaše poslužitelje"
+    "saved": "{{server}} dodan među tvoje poslužitelje"
   },
-  "note": "Pingaju se samo vidljivi retci, nekoliko odjednom. Ništa drugo ne šalje se poslužitelju dok se ne povežete."
+  "note": "Pingaju se samo vidljivi retci, nekoliko odjednom. Ništa drugo ne šalje se poslužitelju dok se ne povežeš."
 }

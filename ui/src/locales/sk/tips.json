@@ -2,7 +2,7 @@
   "label": "Aaron, pomocník s tipmi",
   "greeting": {
     "title": "Ahoj, ja som Aaron!",
-    "body": "Som axolotl a Mumcord poznám ako vlastnú dlaň. Chceš rýchlu prehliadku? Zaberie asi minútu. Ak nie teraz, nájdeš ma v Nastavenia → O aplikácii → Tipy.",
+    "body": "Som axolotl a Mumcord poznám ako vlastnú dlaň. Chceš rýchlu prehliadku? Zaberie asi minútu. Ak nie teraz, nájdeš ma v Nastaveniach → O aplikácii → Tipy.",
     "start": "Ukáž mi to",
     "later": "Teraz nie"
   },
@@ -23,7 +23,7 @@
     },
     "talk": {
       "title": "Ako hovoríš",
-      "body": "Push-to-talk alebo aktivácia hlasom? Vyber si v Nastavenia → Hlas a zvuk, alebo otvor Nastavenia hlasu… malou šípkou vedľa mikrofónu. Push-to-talk funguje aj s tlačidlami myši."
+      "body": "Push-to-talk alebo aktivácia hlasom? Vyber si v Nastaveniach → Hlas a zvuk, alebo otvor Nastavenia hlasu… malou šípkou vedľa mikrofónu. Push-to-talk funguje aj s tlačidlami myši."
     },
     "panel": {
       "title": "Tvoj panel používateľa",
@@ -43,11 +43,11 @@
     },
     "themes": {
       "title": "Tvoj štýl",
-      "body": "Ozubené koliesko vľavo dole prepína medzi tmavým a svetlým vzhľadom. V Nastavenia → Vzhľad nájdeš ďalšie motívy a server môže mať vlastný: klikni naň pravým tlačidlom a vyber Motív."
+      "body": "Ozubené koliesko vľavo dole prepína medzi tmavým a svetlým vzhľadom. V Nastaveniach → Vzhľad nájdeš ďalšie motívy a server môže mať vlastný: klikni naň pravým tlačidlom a vyber Motív."
     },
     "end": {
       "title": "To je všetko!",
-      "body": "Uži si Mumcord. Kedykoľvek ma znova privoláš v Nastavenia → O aplikácii → Tipy."
+      "body": "Uži si Mumcord. Kedykoľvek ma znova privoláš v Nastaveniach → O aplikácii → Tipy."
     }
   }
 }

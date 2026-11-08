@@ -43,7 +43,7 @@
   "welcome": {
     "title": "Äänichat, joka tuntuu",
     "titleAccent": "omalta paikaltasi.",
-    "subtitle": "Mumcord puhuu Mumblea, joten se toimii jokaisen Mumble-palvelimen kanssa, ja tuo päälle modernin keskustelun. Säädetään se sinun makusi mukaan. Siihen menee noin kaksi minuuttia.",
+    "subtitle": "Mumcord puhuu Mumblea, joten se toimii jokaisen Mumble-palvelimen kanssa, ja tuo päälle modernin chatin. Säädetään se sinun makusi mukaan. Siihen menee noin kaksi minuuttia.",
     "voice": {
       "title": "Kristallinkirkas puhe",
       "text": "Pienen viiveen ääni ja sisäänrakennettu kohinanvaimennus."
@@ -119,7 +119,7 @@
     "balanced": {
       "title": "Tasapainoinen",
       "subtitle": "Yksityisyyden ja mukavuuden välillä",
-      "p1": "Vain ystävät ja kanavasi jäsenet voivat lähettää sinulle viestin",
+      "p1": "Vain kaverit ja kanavallasi olevat voivat lähettää sinulle viestin",
       "p2": "Suora yhteys, varana välityspalvelin",
       "p3": "Linkkien esikatselut ja täysikokoiset kuvat ovat päällä",
       "p4": "Se, mitä pelaat ja kuuntelet, pysyy yksityisenä"
@@ -127,7 +127,7 @@
     "maximumPrivacy": {
       "title": "Maksimaalinen yksityisyys",
       "subtitle": "Jaa mahdollisimman vähän",
-      "p1": "Vain ystävät voivat lähettää sinulle viestin, ei poikkeuksia",
+      "p1": "Vain kaverit voivat lähettää sinulle viestin, ei poikkeuksia",
       "p2": "IP-osoitteesi on piilotettu; kaikki kulkee välityspalvelimen kautta",
       "p3": "Ei ulkoista sisältöä, ei historian synkronointia, ei jakamista",
       "p4": "Päivitykset vain ilmoittavat sinulle; toiminnastasi ei jaeta mitään"
@@ -144,7 +144,7 @@
   },
   "pm": {
     "title": "Kuka voi lähettää sinulle viestin?",
-    "subtitle": "Yksityisviestit ovat kahdenkeskisiä keskusteluja. Kanavan keskustelu ei muutu tämän valinnan myötä.",
+    "subtitle": "Yksityisviestit ovat kahdenkeskisiä keskusteluja. Tämä valinta ei vaikuta kanavan chattiin.",
     "local": "Suodatus tapahtuu tietokoneellasi. Lähettäjille ei kerrota. Voit asettaa eri säännön palvelinkohtaisesti myöhemmin."
   },
   "notifications": {
@@ -153,8 +153,8 @@
   },
   "connections": {
     "title": "Yhteydet ja sisältö",
-    "subtitle": "Jotkin ominaisuudet yhdistävät sinut suoraan muihin Mumcord-käyttäjiin, ja osa keskustelun sisällöstä ladataan muilta verkkosivuilta. Valitse, mikä sopii sinulle.",
-    "chatContent": "Keskustelun sisältö",
+    "subtitle": "Jotkin ominaisuudet yhdistävät sinut suoraan muihin Mumcord-käyttäjiin, ja osa chatin sisällöstä ladataan muilta verkkosivustoilta. Valitse, mikä sopii sinulle.",
+    "chatContent": "Chatin sisältö",
     "sharing": "Jakaminen Mumcord-käyttäjien kanssa"
   },
   "features": {
@@ -162,7 +162,7 @@
     "subtitle": "Ota käyttöön haluamasi lisäominaisuudet. Jokaisessa kerrotaan, kuka näkee mitä.",
     "seenByMumcordUsers": "Näkyy saman palvelimen Mumcord-käyttäjille.",
     "onlyYou": "Vain sinä näet sen.",
-    "ingameOverlayAlt": "Esimerkki pelinaikaisesta peittokuvasta, joka näyttää kuka puhuu"
+    "ingameOverlayAlt": "Esimerkki pelinsisäisestä peittokuvasta, joka näyttää, kuka puhuu"
   },
   "appearance": {
     "title": "Valitse ulkoasusi",
@@ -192,7 +192,7 @@
       "privateMessages": "Yksityisviestit",
       "notifications": "Ilmoitukset",
       "connections": "Yhteydet",
-      "chatContent": "Keskustelun sisältö",
+      "chatContent": "Chatin sisältö",
       "features": "Ominaisuudet",
       "appearance": "Ulkoasu",
       "startup": "Käynnistys",
@@ -205,7 +205,7 @@
     "notificationsDetail": "Toimintailmoitukset: {{on}} / {{total}} päällä",
     "contentTitle": "Linkkien esikatselut {{previews}}",
     "contentDetail": "Täysikokoiset kuvat {{images}} · historian synkronointi {{sync}}",
-    "featuresTitle": "Pelinaikainen peittokuva {{overlay}}",
+    "featuresTitle": "Pelinsisäinen peittokuva {{overlay}}",
     "featuresDetail": "Seuraa järjestelmän Älä häiritse -tilaa {{dnd}} · nyt soi {{playing}} · nyt pelataan {{gaming}} · toimintahistoria {{history}}",
     "effectsDetail": "Visuaaliset tehosteet {{effects}}",
     "startupTitle": "Käynnistä kirjautuessa {{login}}",
@@ -221,8 +221,8 @@
     "rerunNote": "Vain muuttamasi arvot tallennetaan."
   },
   "rerun": {
-    "title": "Asennusvelho",
-    "note": "Käyt asetusta uudelleen läpi. Identiteettisi ei muutu.",
+    "title": "Ohjattu käyttöönotto",
+    "note": "Käyt käyttöönoton uudelleen läpi. Identiteettisi ei muutu.",
     "manageIdentities": "Hallitse identiteettejä",
     "discardTitle": "Hylätäänkö muutokset?",
     "discardBody": "Mitään ei tallenneta ennen lopetusta. Jos peruutat nyt, kaikki pysyy ennallaan.",
@@ -243,13 +243,13 @@
       "privateMessages": "Kuka saa viestiä sinulle",
       "notifications": "Ilmoituksesi",
       "connections": "Suorat yhteydet",
-      "features": "Valitse lisäosasi",
+      "features": "Valitse lisäominaisuudet",
       "appearance": "Valitse ulkoasusi",
       "startup": "Mumcordin käynnistys",
       "summary": "Tarkista valintasi"
     },
     "hints": {
-      "welcome": "Hei, olen Aaron! Opastan sinut asetusten läpi. Se vie vain minuutin.",
+      "welcome": "Hei, olen Aaron! Opastan sinut käyttöönoton läpi. Se vie vain minuutin.",
       "import": "Nämä ovat Mumblesta löytyneet palvelimet ja asetukset. Valitse, mitä haluat säilyttää.",
       "identity": "Identiteettisi on nimesi palvelimilla. Luo uusi tai tuo olemassa oleva.",
       "voice": "Valitse tässä mikrofoni, johon puhut, ja sano sitten hei: vihreän palkin pitäisi tanssia.",

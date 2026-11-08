@@ -31,8 +31,8 @@
     },
     "empty": "Ești la zi.",
     "unread": "Necitite",
-    "dndOn": "Nu deranja este activat",
-    "dndOff": "Nu deranja este dezactivat",
+    "dndOn": "„Nu deranja” este activat",
+    "dndOff": "„Nu deranja” este dezactivat",
     "settings": "Setări notificări",
     "someone": "Cineva",
     "quoted": "„{{text}}”",
@@ -61,7 +61,7 @@
     },
     "accept": "Acceptă",
     "decline": "Refuză",
-    "join": "Alătură-te",
+    "join": "Intră",
     "watch": "Urmărește",
     "open": "Deschide",
     "dismiss": "Închide",
@@ -70,7 +70,7 @@
     "block": "Blochează",
     "update": {
       "title": "Mumcord {{version}} este gata",
-      "body": "Reporniți pentru a actualiza",
+      "body": "Repornește pentru a actualiza",
       "restart": "Repornește pentru actualizare",
       "whatsNew": "Ce este nou"
     },

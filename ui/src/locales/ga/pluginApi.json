@@ -2,6 +2,6 @@
   "tooNew": "Teastaíonn Mumcord {{version}} nó níos nuaí",
   "heldForApi": "Tá nuashonrú ar fáil tar éis Mumcord a nuashonrú",
   "updateMumcord": "Nuashonraigh Mumcord",
-  "oldMajor": "Déanta do leagan níos sine de Mumcord – b'fhéidir nach n-oibreoidh sé",
+  "oldMajor": "Déanta do leagan níos sine de Mumcord – b’fhéidir nach n-oibreoidh sé",
   "deprecated": "Úsáideann {{plugin}} comhéadan breiseáin níos sine a thacaíonn Mumcord leis fós."
 }

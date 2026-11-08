@@ -1,25 +1,25 @@
 {
-  "listLabel": "Installitud pistikprogrammid",
-  "empty": "Pistikprogramme veel pole.",
-  "browse": "Sirvi pistikprogramme",
+  "listLabel": "Paigaldatud pluginad",
+  "empty": "Pluginaid veel pole.",
+  "browse": "Sirvi pluginaid",
   "enable": "{{name}} sees",
   "labels": {
     "official": "Ametlik",
     "unofficial": "Mitteametlik · {{repository}}",
     "unofficialUnknown": "Mitteametlik",
-    "developer": "Arendaja pistikprogramm",
+    "developer": "Arendaja plugin",
     "autoOff": "Välja lülitatud korduvate kokkujooksmiste järel",
     "backingOff": "Taaskäivitub kokkujooksmise järel",
     "notLoaded": "Laadimine ei õnnestunud",
     "revoked": "Mumcord lülitas välja: {{reason}}",
     "revocationWarning": "Mumcordi hoiatus: {{reason}}",
-    "tampered": "Selle pistikprogrammi faile on muudetud",
-    "permission": "Välja lülitatud, sest vajalik luba on välja lülitatud"
+    "tampered": "Selle plugina faile on muudetud",
+    "permission": "Välja lülitatud, sest vajalik õigus on välja lülitatud"
   },
   "details": {
     "open": "{{name}} üksikasjad",
-    "permissions": "Load",
-    "visibility": "Kes näevad selle pistikprogrammi tegevust",
+    "permissions": "Õigused",
+    "visibility": "Kes näevad selle plugina tegevust",
     "visibilityOptions": {
       "everyone": "Kõik",
       "friends": "Ainult sõbrad",
@@ -27,12 +27,12 @@
     },
     "notifications": "Teavitused",
     "pin": "Kinnita versioon {{version}} (ilma automaatsete uuendusteta)",
-    "settings": "Pistikprogrammi seaded",
+    "settings": "Plugina seaded",
     "diagnostics": "Diagnostika",
     "export": "Ekspordi andmed",
     "reset": "Lähtesta andmed",
     "remove": "Eemalda",
-    "commandTaken": "/{{command}}: Käsk on hõivatud pistikprogrammiga {{plugin}}"
+    "commandTaken": "/{{command}}: käsk on juba pluginal {{plugin}}"
   },
   "badge": {
     "label": "Nimede kõrval kuvatav märk",
@@ -54,10 +54,10 @@
     "messagesRateLimited": "Kiiruspiiranguga edasi lükatud sõnumid",
     "messagesExpired": "Aegunud sõnumid",
     "incomingRateDropped": "Kiiruspiiranguga kaotsi läinud sissetulevad sõnumid",
-    "incomingInvalid": "Kehtetud sissetulevad sõnumid",
-    "uiFreezes": "Mitu korda Mumcord hangus, kui veebisisu oli avatud",
+    "incomingInvalid": "Vigased sissetulevad sõnumid",
+    "uiFreezes": "Mitu korda Mumcord hangus, kui plugina veebisisu oli avatud",
     "refusedAppMenuLabel": "See plugin lükati tagasi: menüü Rakendused silt on sama mis Mumcordi enda oma või algab sõnaga „Mumcord“.",
-    "fieldWithoutPermission": "See plugin lükati tagasi: see kasutab välja „{{field}}“ ilma loata „{{permission}}“.",
+    "fieldWithoutPermission": "See plugin lükati tagasi: see kasutab välja „{{field}}“ ilma õiguseta „{{permission}}“.",
     "webDisabled": "Veebisisu on välja lülitatud, sest Mumcord lakkas vastamast, kui see oli avatud.",
     "reenableWeb": "Lülita veebisisu sisse",
     "reenableFailed": "Veebisisu ei õnnestunud sisse lülitada.",
@@ -77,51 +77,51 @@
   },
   "reset": {
     "title": "Kas lähtestada {{name}} andmed?",
-    "message": "Kõik, mida see pistikprogramm on salvestanud, kustutatakse. Seda ei saa tagasi võtta.",
+    "message": "Kõik, mida see plugin on salvestanud, kustutatakse. Seda ei saa tagasi võtta.",
     "confirm": "Lähtesta andmed",
     "done": "Andmed lähtestatud."
   },
   "remove": {
     "title": "Kas eemaldada {{name}}?",
     "deleteData": "Kustuta ka selle andmed",
-    "hint": "Alles jäetud andmed kustutatakse 30 päeva pärast. Installi pistikprogramm enne seda uuesti, et need tagasi saada.",
+    "hint": "Alles jäetud andmed kustutatakse 30 päeva pärast. Nende tagasisaamiseks paigalda plugin enne seda uuesti.",
     "confirm": "Eemalda"
   },
   "errors": {
-    "enable": "Pistikprogrammi ümberlülitamine ei õnnestunud.",
-    "permissions": "Loa muutmine ei õnnestunud.",
+    "enable": "Plugina sisse- või väljalülitamine ei õnnestunud.",
+    "permissions": "Õiguse muutmine ei õnnestunud.",
     "visibility": "Nähtavuse muutmine ei õnnestunud.",
     "notifications": "Teavituste muutmine ei õnnestunud.",
     "pin": "Versiooni kinnitamine ei õnnestunud.",
     "export": "Andmete eksportimine ei õnnestunud.",
     "reset": "Andmete lähtestamine ei õnnestunud.",
-    "remove": "Pistikprogrammi eemaldamine ei õnnestunud.",
+    "remove": "Plugina eemaldamine ei õnnestunud.",
     "badge": "Märgi muutmine ei õnnestunud.",
-    "update": "Pluginat ei saanud värskendada."
+    "update": "Pluginat ei õnnestunud uuendada."
   },
   "update": {
-    "hint": "Värskendus {{version}}",
-    "button": "Värskenda"
+    "hint": "Uuendus {{version}}",
+    "button": "Uuenda"
   },
   "visibilityChip": "Suhtleb teiste Mumcordi kasutajatega · {{visibility}}",
   "chips": {
-    "label": "Kasutatavad load",
+    "label": "Kasutatavad õigused",
     "uiPanel": "Paneel",
     "uiMemberBadge": "Liikme märk",
     "uiProfileCard": "Profiilikaart",
     "uiChatCard": "Vestluskaardid",
-    "uiUserMenu": "Kasutaja menüü",
+    "uiUserMenu": "Kasutajamenüü",
     "uiDialog": "Oma aken",
     "uiWebview": "Veebisisu",
     "eventsSelf": "Sinu olek",
-    "eventsVoice": "Hääletegevus",
+    "eventsVoice": "Hääleaktiivsus",
     "eventsPresence": "Liitumised ja lahkumised",
     "eventsChatActivity": "Vestlustegevus",
     "notify": "Teavitused",
     "randomBytes": "Juhuarvud",
     "commands": "Käsud",
     "chatSend": "Kirjutab vestlusesse",
-    "chatSupersedes": "Asendab oma tekstirea",
+    "chatSupersedes": "Asendab oma teksti",
     "chatTriggers": "Käivitussõnad",
     "chatPatterns": "Vestlusmustrid",
     "netHttp": "Internetijuurdepääs",
@@ -129,7 +129,7 @@
   },
   "offerBadge": "Uued õigused",
   "refused": {
-    "title": "Tagasi lükatud pistikprogrammid",
+    "title": "Tagasi lükatud pluginad",
     "when": "Tagasi lükatud: {{time}}"
   }
 }

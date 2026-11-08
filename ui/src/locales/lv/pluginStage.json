@@ -9,8 +9,8 @@
   "unofficial": "Neoficiāls",
   "unofficialRepository": "Neoficiāls · {{repository}}",
   "official": "Oficiāls",
-  "startedBy": "Sācis {{name}} · {{count}} spēlē",
-  "startedByYou": "Sāki tu · {{count}} spēlē",
+  "startedBy": "Sāka {{name}} · spēlē: {{count}}",
+  "startedByYou": "Sāki tu · spēlē: {{count}}",
   "pluginBy": "spraudņa autors: {{author}}",
   "connection": {
     "relay": "Relejs · šifrēts no gala līdz galam",
@@ -35,9 +35,9 @@
   "tooMany": "Šajā kanālā ir pārāk daudz aktivitāšu",
   "full": "Šī aktivitāte ir pilna",
   "joinGone": "Šī aktivitāte ir beigusies",
-  "joinNotPermitted": "Pašlaik nevarat pievienoties: {{plugin}}",
+  "joinNotPermitted": "Pašlaik nevari pievienoties: {{plugin}}",
   "joinFailed": "Neizdevās pievienoties: {{plugin}}",
-  "leaveFailed": "Neizdevās iziet: {{plugin}}",
+  "leaveFailed": "Neizdevās pamest: {{plugin}}",
   "fullScreenBanner": "{{plugin}} ir pilnekrānā · Esc, lai izietu",
   "frame": {
     "tag": "Spraudņa saturs · {{plugin}}",
@@ -45,8 +45,8 @@
     "label": "{{plugin}}, spraudņa saturs",
     "stopped": "{{plugin}} pārstāja reaģēt",
     "reload": "Ielādēt vēlreiz",
-    "mute": "Izslēgt {{plugin}} skaņas",
-    "unmute": "Ieslēgt {{plugin}} skaņas"
+    "mute": "Apklusināt {{plugin}} skaņas",
+    "unmute": "Atcelt {{plugin}} skaņu apklusināšanu"
   },
   "sidePanel": {
     "label": "{{plugin}} sānu panelis",

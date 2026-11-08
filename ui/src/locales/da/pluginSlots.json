@@ -1,7 +1,7 @@
 {
   "tree": {
     "empty": "Dette plugin viser ikke noget her endnu.",
-    "actionFailed": "Pluginnet kunne ikke håndtere det. Prøv igen."
+    "actionFailed": "Pluginet kunne ikke håndtere det. Prøv igen."
   },
   "progress": {
     "working": "I gang"
@@ -10,7 +10,7 @@
     "done": "Tiden er gået"
   },
   "select": {
-    "refresh": "Opdater {{label}}"
+    "refresh": "Opdatér {{label}}"
   },
   "input": {
     "chars": "{{used}} / {{max}} tegn"

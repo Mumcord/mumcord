@@ -20,7 +20,7 @@
     "places": {
       "stage": "Área multimedia",
       "side-panel": "Panel lateral",
-      "dialog": "Diálogo",
+      "dialog": "Cuadro de diálogo",
       "panel": "Barra de plugins",
       "appMenu": "Menú de aplicaciones · {{count}} elementos",
       "chat": "Tarjetas de chat"
@@ -45,11 +45,11 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Esta actualización quiere comunicarse con {{count}} sitio web nuevo.",
     "wantsNew_many": "Esta actualización quiere comunicarse con {{count}} sitios web nuevos.",
     "wantsNew_other": "Esta actualización quiere comunicarse con {{count}} sitios web nuevos.",
     "staysOn": "{{plugin}} se queda en {{version}} hasta que decidas.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "Tienes {{count}} actualización pendiente. Las actualizaciones que añaden permisos o sitios web nunca se instalan automáticamente.",
     "banner_many": "Tienes {{count}} actualizaciones pendientes. Las actualizaciones que añaden permisos o sitios web nunca se instalan automáticamente.",
     "banner_other": "Tienes {{count}} actualizaciones pendientes. Las actualizaciones que añaden permisos o sitios web nunca se instalan automáticamente.",
     "noOther": "No cambia ningún otro permiso.",

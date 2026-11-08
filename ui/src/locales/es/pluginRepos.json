@@ -15,7 +15,7 @@
     "pluginsLine": "Plugins: {{number}}",
     "signingKey": "Clave de firma",
     "warningTitle": "Repositorio no oficial",
-    "warningBody": "Mumcord no revisa estos plugins. Esta clave se recuerda: si alguna vez cambia, el repositorio se pausa hasta que lo compruebes. Al explorarlo, su anfitrión ve tu dirección IP. Nunca se toman de él plugins con nombres oficiales."
+    "warningBody": "Mumcord no revisa estos plugins. Esta clave se recuerda: si alguna vez cambia, el repositorio se pausa hasta que lo compruebes. Al explorarlo, el servidor que lo aloja ve tu dirección IP. Nunca se toman de él plugins con nombres oficiales."
   },
   "limit": "Puedes añadir hasta {{max}} repositorios.",
   "limitReached": "Se alcanzó el límite de {{max}} repositorios.",

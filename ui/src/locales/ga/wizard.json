@@ -1,11 +1,11 @@
 {
   "progress": "Céim {{current}} as {{total}}",
-  "loadFailed": "Níorbh fhéidir an socrú a luchtú.",
+  "loadFailed": "Níorbh fhéidir an socrú a lódáil.",
   "recommended": "Molta",
   "tipLabel": "Maidir le {{name}}",
   "errors": {
     "generic": "Chuaigh rud éigin amú. Bain triail eile as.",
-    "secureStorageUnavailable": "Ní féidir le Mumcord stóras slán do chórais a shroicheadh. Díghlasáil do heochairlann nó do bhainisteoir pasfhocal agus bain triail eile as.",
+    "secureStorageUnavailable": "Ní féidir le Mumcord stóras slán do chórais a shroicheadh. Díghlasáil d’eochairfháinne nó do bhainisteoir pasfhocal agus bain triail eile as.",
     "saveFailed": "Níorbh fhéidir do shocruithe a shábháil. Bain triail eile as."
   },
   "nav": {
@@ -13,7 +13,7 @@
     "finishSetup": "Críochnaigh an socrú",
     "startMumcord": "Tosaigh Mumcord",
     "finish": "Críochnaigh",
-    "skip": "Scipeáil faoi láthair",
+    "skip": "Scipeáil go fóill",
     "enterKey": "Enter",
     "enterHint": "chun leanúint ar aghaidh"
   },
@@ -29,12 +29,12 @@
   "steps": {
     "welcome": "Fáilte",
     "import": "Iompórtáil ó Mumble",
-    "identity": "Féiniúlacht",
+    "identity": "Aitheantas",
     "voice": "Guth",
     "setupStyle": "Stíl socraithe",
     "privateMessages": "Teachtaireachtaí príobháideacha",
     "notifications": "Fógraí",
-    "connections": "Naisc",
+    "connections": "Ceangail",
     "features": "Gnéithe",
     "appearance": "Cuma",
     "startup": "Tosú agus nuashonruithe",
@@ -45,25 +45,25 @@
     "titleAccent": "do spás féin.",
     "subtitle": "Labhraíonn Mumcord Mumble, mar sin oibríonn sé le gach freastalaí Mumble, agus cuireann sé comhrá nua-aimseartha leis. Socraimis é mar is maith leat. Tógann sé thart ar dhá nóiméad.",
     "voice": {
-      "title": "Guth cinnte glan",
+      "title": "Guth glé soiléir",
       "text": "Fuaim le moill íseal agus laghdú torainn ionsuite."
     },
     "servers": {
       "title": "Oibríonn le haon fhreastalaí Mumble",
-      "text": "Gan cuntas, gan clárú. Téigh isteach sna freastalaithe a úsáideann tú cheana."
+      "text": "Gan chuntas, gan chlárú. Téigh isteach sna freastalaithe a úsáideann tú cheana."
     },
     "private": {
       "title": "Príobháideach dá dhearadh",
-      "text": "Gan telemetry. An méid a stórálann Mumcord, fanann sé ar do ríomhaire."
+      "text": "Gan teiliméadracht. An méid a stórálann Mumcord, fanann sé ar do ríomhaire."
     }
   },
   "identity": {
     "title": "Cé thú féin ar Mumble?",
-    "intro": "Is í do fhéiniúlacht an chaoi a n-aithníonn freastalaithe thú. Cruthaigh ceann nua, nó tabhair leat an ceann a úsáideann tú cheana.",
-    "legend": "Do fhéiniúlacht",
-    "create": "Cruthaigh féiniúlacht nua",
-    "createText": "Is teastas í do fhéiniúlacht a chruthaíonn cé thú ar fhreastalaithe Mumble. Coimeádann sí d'ainm cláraithe agus do chuid ceadanna, ionas gur tú an duine céanna gach uair a théann tú isteach.",
-    "import": "Iompórtáil féiniúlacht atá ann cheana",
+    "intro": "Is é d’aitheantas an chaoi a n-aithníonn freastalaithe thú. Cruthaigh ceann nua, nó tabhair leat an ceann a úsáideann tú cheana.",
+    "legend": "D’aitheantas",
+    "create": "Cruthaigh aitheantas nua",
+    "createText": "Is teastas é d’aitheantas a chruthaíonn cé thú ar fhreastalaithe Mumble. Coinníonn sé d’ainm cláraithe agus do chuid ceadanna, ionas gur tú an duine céanna gach uair a théann tú isteach.",
+    "import": "Iompórtáil aitheantas atá ann cheana",
     "name": "Ainm taispeána réamhshocraithe",
     "nameHint": "Úsáidtear é ar fhreastalaithe nach n-aithníonn thú go fóill. Is féidir leat é a athrú do gach freastalaí.",
     "chooseFile": "Roghnaigh comhad…",
@@ -72,7 +72,7 @@
     "password": "Pasfhocal an chomhaid",
     "passwordHint": "Fanann an pasfhocal ar an ríomhaire seo agus ní sheoltar áit ar bith é.",
     "existing": "Ag úsáid an aitheantais {{name}}.",
-    "backup": "Cúltaca a dhéanamh de níos déanaí i Socruithe. Ligeann cúltaca duit do fhéiniúlacht a athchóiriú ar ríomhaire nua.",
+    "backup": "Déan cúltaca de níos déanaí i Socruithe. Ligeann cúltaca duit d’aitheantas a athchóiriú ar ríomhaire nua.",
     "nameRequired": "Cuir ainm isteach.",
     "fileRequired": "Roghnaigh comhad aitheantais (.p12 nó .pfx).",
     "fileType": "Comhad aitheantais",
@@ -90,13 +90,13 @@
     "idle": "Brúigh Tástáil, abair rud éigin, agus cloisfidh tú thú féin ar ais.",
     "recording": "Labhair anois…",
     "playing": "Ag seinm do ghutha ar ais…",
-    "devicesFailed": "Níorbh fhéidir do fheistí fuaime a liostú. Is féidir leat leanúint ar aghaidh agus iad a roghnú níos déanaí i Socruithe.",
+    "devicesFailed": "Níorbh fhéidir do ghléasanna fuaime a liostú. Is féidir leat leanúint ar aghaidh agus iad a roghnú níos déanaí i Socruithe.",
     "testFailed": "Níorbh fhéidir an tástáil a thosú. Seiceáil go bhfuil an micreafón ceangailte.",
     "test": "Éist leat féin",
     "stop": "Stop"
   },
   "voice": {
-    "title": "An bhfuil sé go maith?",
+    "title": "An bhfuil an fhuaim go maith?",
     "subtitle": "Roghnaigh do ghléasanna agus abair rud éigin. Ba chóir don bharra bogadh agus tú ag labhairt.",
     "talkLegend": "Cén chaoi a bhfuil tú ag iarraidh labhairt?",
     "voiceActivationDesc": "Osclaíonn do mhicreafón nuair a labhraíonn tú. Níl aon rud le coinneáil ná le brú.",
@@ -111,16 +111,16 @@
     "everythingOn": {
       "title": "Gach rud ar siúl",
       "subtitle": "An tacar iomlán gnéithe",
-      "p1": "Feiceann daoine eile an méid a imrítear agus a éisteann tú leis",
-      "p2": "Tá do sheoladh IP le feiceáil ag daoine a nascann tú leo go díreach",
-      "p3": "Féadfaidh duine ar bith teachtaireacht a chur chugat; luchtaítear naisc agus íomhánna ón ngréasán",
+      "p1": "Feiceann daoine eile an méid a imríonn tú agus a éisteann tú leis",
+      "p2": "Tá do sheoladh IP le feiceáil ag daoine a gceanglaíonn tú leo go díreach",
+      "p3": "Is féidir le duine ar bith teachtaireacht a chur chugat; lódáiltear naisc agus íomhánna ón ngréasán",
       "p4": "Tá an forleagan, sioncronú staire agus íomhánna lán-mhéide ar siúl"
     },
     "balanced": {
       "title": "Cothromaithe",
       "subtitle": "Idir phríobháideachas agus compord",
       "p1": "Ní féidir ach le cairde agus daoine i do chainéal teachtaireacht a chur chugat",
-      "p2": "Nasc díreach, le hathsheachadán mar chúltaca",
+      "p2": "Ceangal díreach, le hathsheachadán mar chúltaca",
       "p3": "Tá réamhamharcanna naisc agus íomhánna lán-mhéide ar siúl",
       "p4": "Fanann an méid a imríonn tú agus a éisteann tú leis príobháideach"
     },
@@ -139,7 +139,7 @@
       "p2": "Féach cad a dhéanann gach socrú agus cé a fheiceann é",
       "p3": "Is fearr é más eol duit cad atá uait"
     },
-    "presetSelected": "Roghnaíodh {{preset}}: scipeálann tú na céimeanna mionsonraithe príobháideachais. Roghnaigh Saincheaptha chun gach ceann acu a rith.",
+    "presetSelected": "Roghnaíodh {{preset}}: scipeálann tú na céimeanna mionsonraithe príobháideachais. Roghnaigh Saincheaptha chun dul trí gach ceann acu.",
     "customSelected": "Roghnaíodh Saincheaptha: téann na céimeanna eile trí gach rogha."
   },
   "pm": {
@@ -149,17 +149,17 @@
   },
   "notifications": {
     "title": "Conas ba cheart do Mumcord fógra a thabhairt duit?",
-    "subtitle": "Roghnaigh conas a shroicheann gach cineál nuachta thú. Is féidir leat é a athrú ar ball in Socruithe → Fógraí."
+    "subtitle": "Roghnaigh conas a shroicheann gach cineál nuachta thú. Is féidir leat é a athrú níos déanaí i Socruithe → Fógraí."
   },
   "connections": {
-    "title": "Naisc agus ábhar",
-    "subtitle": "Nascann roinnt gnéithe thú go díreach le húsáideoirí Mumcord eile, agus luchtaítear roinnt ábhair chomhrá ó shuíomhanna gréasáin eile. Roghnaigh cad atá ceart duit.",
+    "title": "Ceangail agus ábhar",
+    "subtitle": "Ceanglaíonn roinnt gnéithe thú go díreach le húsáideoirí Mumcord eile, agus lódáiltear roinnt ábhair chomhrá ó shuíomhanna gréasáin eile. Roghnaigh cad atá ceart duit.",
     "chatContent": "Ábhar comhrá",
     "sharing": "Comhroinnt le húsáideoirí Mumcord"
   },
   "features": {
-    "title": "Déan leatsa é",
-    "subtitle": "Cuir na breiseanna atá uait ar siúl. Insíonn gach ceann acu cé a fheiceann cad.",
+    "title": "Déan do chuid féin de",
+    "subtitle": "Cas air na gnéithe breise atá uait. Insíonn gach ceann acu cé a fheiceann cad.",
     "seenByMumcordUsers": "Infheicthe ag úsáideoirí Mumcord ar an bhfreastalaí céanna.",
     "onlyYou": "Ní fheiceann ach tusa é.",
     "ingameOverlayAlt": "Sampla den fhorleagan sa chluiche ag taispeáint cé atá ag labhairt"
@@ -187,18 +187,18 @@
     "editShort": "Cuir in eagar",
     "edit": "Cuir {{card}} in eagar",
     "cards": {
-      "identity": "Féiniúlacht",
+      "identity": "Aitheantas",
       "voice": "Guth",
       "privateMessages": "Teachtaireachtaí príobháideacha",
       "notifications": "Fógraí",
-      "connections": "Naisc",
+      "connections": "Ceangail",
       "chatContent": "Ábhar comhrá",
       "features": "Gnéithe",
       "appearance": "Cuma",
       "startup": "Tosú",
       "updates": "Nuashonruithe"
     },
-    "identityDetail": "Sábháilte i dtaisceadán eochracha do chórais",
+    "identityDetail": "Sábháilte in eochairfháinne do chórais",
     "voiceDetail": "Laghdú torainn: {{noise}}",
     "pmDetail": "Mo chainéal {{channel}} · comhráite glactha {{accepted}} · iarratais {{requests}}",
     "notificationsTitle": "Teachtaireachtaí nua: {{mode}}",
@@ -206,7 +206,7 @@
     "contentTitle": "Réamhamharcanna naisc {{previews}}",
     "contentDetail": "Íomhánna lán-mhéide {{images}} · sioncronú staire {{sync}}",
     "featuresTitle": "Forleagan sa chluiche {{overlay}}",
-    "featuresDetail": "Lean Ná Cuir Isteach Orm an chórais {{dnd}} · ag seinm anois {{playing}} · ag imirt anois {{gaming}} · stair ghníomhaíochta {{history}}",
+    "featuresDetail": "Lean Ná Cuir Isteach an chórais {{dnd}} · á sheinm anois {{playing}} · ag imirt anois {{gaming}} · stair ghníomhaíochta {{history}}",
     "effectsDetail": "Éifeachtaí amhairc {{effects}}",
     "startupTitle": "Tosú ag logáil isteach {{login}}",
     "startupDetail": "Tosú íoslaghdaithe {{minimized}} · naisc mumble:// {{links}}",
@@ -216,18 +216,18 @@
       "off": "As"
     },
     "updatesDetail": "Seiceáiltear agus fíoraítear nuashonruithe i gcónaí sula suiteáiltear iad.",
-    "backup": "Tá do fhéiniúlacht {{name}} sábháilte i dtaisceadán eochracha do chórais. Déan cúltaca di ó Socruithe → Féiniúlacht, ionas nach gcaillfidh tú d'ainm cláraithe go deo.",
+    "backup": "Tá d’aitheantas {{name}} sábháilte in eochairfháinne do chórais. Déan cúltaca de ó Socruithe → Aitheantas, ionas nach gcaillfidh tú d’ainm cláraithe go deo.",
     "nextServer": "Ar aghaidh: cuir do chéad fhreastalaí leis",
-    "rerunNote": "Ní shábháiltear ach na luachanna a d'athraigh tú."
+    "rerunNote": "Ní shábháiltear ach na luachanna a d’athraigh tú."
   },
   "rerun": {
     "title": "Treoraí socraithe",
-    "note": "Tá tú ag rith an tsocraithe arís. Ní athraítear do chéannacht.",
-    "manageIdentities": "Bainistigh céannachtaí",
-    "discardTitle": "An bhfuil tú ag iarraidh do chuid athruithe a chaitheamh amach?",
+    "note": "Tá tú ag rith an tsocraithe arís. Ní athraítear d’aitheantas.",
+    "manageIdentities": "Bainistigh aitheantais",
+    "discardTitle": "Caith uait d’athruithe?",
     "discardBody": "Ní shábháiltear aon rud sula gcríochnaíonn tú. Má chealaíonn tú anois, fanfaidh gach rud mar atá.",
     "discardKeep": "Lean leis an eagarthóireacht",
-    "discardConfirm": "Caith athruithe amach"
+    "discardConfirm": "Caith uait na hathruithe"
   },
   "guide": {
     "label": "Leid ó Aaron",
@@ -237,13 +237,13 @@
     "titles": {
       "welcome": "Fáilte ar bord",
       "import": "Tabhair leat do chuid ó Mumble",
-      "identity": "D'ainm ar fhreastalaithe",
+      "identity": "D’ainm ar fhreastalaithe",
       "voice": "Roghnaigh do mhicreafón",
       "setupStyle": "Roghnaigh stíl",
       "privateMessages": "Cé a fhéadann scríobh chugat",
       "notifications": "Do chuid fógraí",
-      "connections": "Naisc dhíreacha",
-      "features": "Roghnaigh do bhreiseáin",
+      "connections": "Ceangail dhíreacha",
+      "features": "Roghnaigh na gnéithe breise",
       "appearance": "Roghnaigh do chuma",
       "startup": "Mumcord a thosú",
       "summary": "Seiceáil do roghanna"
@@ -255,11 +255,11 @@
       "voice": "Roghnaigh anseo an micreafón a labhraíonn tú isteach ann, ansin abair haigh: ba cheart don bharra glas rince.",
       "setupStyle": "Roghnaigh stíl. Is féidir leat gach socrú a athrú ar ball.",
       "privateMessages": "Roghnaigh cé a fhéadfaidh teachtaireachtaí príobháideacha a sheoladh chugat. Ní insítear do sheoltóirí go deo.",
-      "notifications": "Roghnaigh conas a shroicheann gach cineál nuachta thú, nó múch é.",
-      "connections": "Roghnaigh an bhfuil cead ag Mumcord tú a nascadh go díreach le húsáideoirí Mumcord eile.",
-      "features": "Cuir air na breiseanna is maith leat amháin. Insíonn gach cárta cé a fheiceann é.",
-      "appearance": "Geal, dorcha nó mar a bhfuil do chóras: roghnaigh do chuma anseo.",
-      "startup": "Roghnaigh conas a thosaíonn Mumcord nuair a logálann tú isteach ar doríomhaire.",
+      "notifications": "Roghnaigh conas a shroicheann gach cineál nuachta thú, nó cas as é.",
+      "connections": "Roghnaigh an bhfuil cead ag Mumcord tú a cheangal go díreach le húsáideoirí Mumcord eile.",
+      "features": "Ná cas air ach na gnéithe breise is maith leat. Insíonn gach cárta cé a fheiceann é.",
+      "appearance": "Geal, dorcha nó de réir do chórais: roghnaigh do chuma anseo.",
+      "startup": "Roghnaigh conas a thosaíonn Mumcord nuair a logálann tú isteach ar do ríomhaire.",
       "summary": "Réidh! Seiceáil do roghanna anseo; tugann Cuir in eagar ar ais tú chuig aon chéim."
     }
   }

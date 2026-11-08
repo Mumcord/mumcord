@@ -2,7 +2,7 @@
   "label": "Aaron, patarimų pagalbininkas",
   "greeting": {
     "title": "Labas, aš Aaron!",
-    "body": "Aš esu aksolotlis ir „Mumcord“ žinau kaip savo penkis pirštus. Nori trumpos ekskursijos? Ji užtrunka maždaug minutę. Jei ne dabar, mane rasi skiltyje Nustatymai → Apie → Patarimai.",
+    "body": "Aš esu aksolotlis ir Mumcord žinau kaip savo penkis pirštus. Nori trumpos ekskursijos? Ji užtrunka maždaug minutę. Jei ne dabar, mane rasi skiltyje Nustatymai → Apie → Patarimai.",
     "start": "Parodyk",
     "later": "Ne dabar"
   },
@@ -23,7 +23,7 @@
     },
     "talk": {
       "title": "Kaip kalbi",
-      "body": "„Spausk ir kalbėk“ ar aktyvinimas balsu? Pasirink skiltyje Nustatymai → Balsas ir garsas arba atverk Balso nustatymai… mažąja rodykle šalia mikrofono. „Spausk ir kalbėk“ veikia ir su pelės mygtukais."
+      "body": "Push-to-talk ar balso aktyvumas? Pasirink skiltyje Nustatymai → Balsas ir garsas arba atverk Balso nustatymai… mažąja rodykle šalia mikrofono. Push-to-talk veikia ir su pelės mygtukais."
     },
     "panel": {
       "title": "Tavo naudotojo skydelis",
@@ -47,7 +47,7 @@
     },
     "end": {
       "title": "Tai viskas!",
-      "body": "Smagiai leisk laiką su „Mumcord“. Mane bet kada vėl pasikviesi skiltyje Nustatymai → Apie → Patarimai."
+      "body": "Smagiai leisk laiką su Mumcord. Mane bet kada vėl pasikviesi skiltyje Nustatymai → Apie → Patarimai."
     }
   }
 }

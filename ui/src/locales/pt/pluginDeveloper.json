@@ -1,7 +1,7 @@
 {
-  "hint": "Carregue uma pasta de plugin não empacotada para a testar. Os plugins de programador não são assinados, nunca são oficiais e não podem obter net.http, secrets nem ui.webview. São descarregados quando o modo de programador é desativado.",
+  "hint": "Carrega uma pasta de plugin não empacotada para a testar. Os plugins de programador não são assinados, nunca são oficiais e não podem obter net.http, secrets nem ui.webview. São descarregados quando o modo de programador é desativado.",
   "load": "Carregar pasta do plugin…",
-  "pickFolder": "Escolha a pasta do plugin",
+  "pickFolder": "Escolhe a pasta do plugin",
   "empty": "Nenhum plugin de programador carregado.",
   "listLabel": "Plugins de programador",
   "label": "Plugin de programador",

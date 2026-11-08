@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Csatornák",
-    "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás · Menübillentyű: csatorna beállításai · Ctrl+kattintás vagy Ctrl+szóköz: személyek kijelölése",
+    "hint": "Enter: csevegés megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás · Menübillentyű: csatorna beállításai · Ctrl+kattintás vagy Ctrl+szóköz: személyek kijelölése",
     "join": "Belépés",
     "you": "(te)",
     "youAreHere": "itt vagy",
@@ -96,7 +96,7 @@
       "connected": "Csatlakozva",
       "connecting": "Csatlakozás",
       "reconnecting": "Újracsatlakozás…",
-      "disconnected": "Nincs kapcsolat"
+      "disconnected": "Lecsatlakozva"
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
@@ -119,20 +119,20 @@
   },
   "drag": {
     "into": "Áthelyezés ide: {{channel}}",
-    "above": "Elhelyezés fölé: {{channel}}",
-    "below": "Elhelyezés alá: {{channel}}",
+    "above": "Elhelyezés {{channel}} fölé",
+    "below": "Elhelyezés {{channel}} alá",
     "self": "Nem kerülhet önmagába",
     "subChannel": "Nem kerülhet a saját alcsatornájába",
     "confirmTitle": "Áthelyezed: „{{channel}}”?",
-    "alongAll": "A(z) {{channel}} csatornával együtt mozog: {{subChannels}} és {{people}}.",
-    "alongSubChannels": "A(z) {{channel}} csatornával együtt mozog: {{subChannels}}.",
-    "alongPeople": "A(z) {{channel}} csatornával együtt mozog: {{people}}.",
-    "alongNone": "Csak a(z) {{channel}} mozog; üres.",
+    "alongAll": "A(z) {{channel}} csatornával együtt átkerül: {{subChannels}} és {{people}}.",
+    "alongSubChannels": "A(z) {{channel}} csatornával együtt átkerül: {{subChannels}}.",
+    "alongPeople": "A(z) {{channel}} csatornával együtt átkerül: {{people}}.",
+    "alongNone": "Csak a(z) {{channel}} csatorna kerül át; üres.",
     "subChannels_one": "{{count}} alcsatorna",
     "subChannels_other": "{{count}} alcsatorna",
     "pathTo": "ide:",
     "confirm": "Áthelyezés",
     "failedTitle": "Nem sikerült áthelyezni: {{channel}}",
-    "refusedParent": "Nincs jogod csatornákat áthelyezni ide: {{channel}}."
+    "refusedParent": "Nincs jogosultságod csatornákat áthelyezni ide: {{channel}}."
   }
 }

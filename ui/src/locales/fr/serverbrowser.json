@@ -1,24 +1,24 @@
 {
   "title": "Serveurs publics",
   "loading": "Chargement de la liste…",
-  "subtitle": "Chargée parce que vous avez ouvert cette page · {{shown}} sur {{total}} affichés",
+  "subtitle": "Chargée parce que tu as ouvert cette page · {{shown}} sur {{total}} affichés",
   "search": "Rechercher par nom, adresse ou pays",
   "refresh": "Actualiser",
   "retry": "Réessayer",
-  "loadFailed": "La liste des serveurs publics n’a pas pu être chargée. Vérifiez votre connexion Internet et réessayez.",
-  "noMatch": "Aucun serveur ne correspond à votre recherche et à vos filtres.",
-  "saveFailed": "Le serveur n’a pas pu être ajouté. Veuillez réessayer.",
+  "loadFailed": "La liste des serveurs publics n’a pas pu être chargée. Vérifie ta connexion Internet et réessaie.",
+  "noMatch": "Aucun serveur ne correspond à ta recherche et à tes filtres.",
+  "saveFailed": "Le serveur n’a pas pu être ajouté. Réessaie.",
   "filters": {
     "label": "Filtres",
     "country": "Pays",
     "anyCountry": "Tous les pays",
     "ping": "Ping",
-    "anyPing": "Tout ping",
+    "anyPing": "Tous les pings",
     "pingBelow": "Moins de {{ms}} ms",
     "hideEmpty": "Masquer les vides",
     "hideFull": "Masquer les pleins"
   },
-  "sortedBy": "Tri : {{column}}",
+  "sortedBy": "Tri : {{column}}",
   "columns": {
     "name": "Nom",
     "country": "Pays",
@@ -38,11 +38,11 @@
   "connect": "Se connecter",
   "connectTo": "Se connecter à {{server}}",
   "favourite": "Favori",
-  "favouriteServer": "Ajouter {{server}} à vos serveurs",
+  "favouriteServer": "Ajouter {{server}} à tes serveurs",
   "saved": "Enregistré",
-  "savedAs": "{{server}} est dans vos serveurs",
+  "savedAs": "{{server}} est dans tes serveurs",
   "announce": {
-    "saved": "{{server}} ajouté à vos serveurs"
+    "saved": "{{server}} ajouté à tes serveurs"
   },
-  "note": "Seules les lignes visibles sont pinguées, quelques-unes à la fois. Rien d’autre n’est envoyé à un serveur avant que vous ne vous connectiez."
+  "note": "Seules les lignes visibles reçoivent un ping, quelques-unes à la fois. Rien d’autre n’est envoyé à un serveur avant que tu ne te connectes."
 }

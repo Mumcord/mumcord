@@ -1,14 +1,14 @@
 {
   "title": "Données des plugins via le relais",
-  "switchLabel": "Laisser les plugins utiliser le relais d'un serveur",
-  "switchText": "Les plugins que vous autorisez peuvent envoyer plus rapidement des données plus volumineuses (coups de jeu, dessins) via le relais de la communauté du serveur. Chiffrées de bout en bout : le relais ne peut pas les lire. Sans relais, ils passent par la connexion Mumble, plus lente.",
-  "servers": "Vos serveurs",
+  "switchLabel": "Laisser les plugins utiliser le relais d’un serveur",
+  "switchText": "Les plugins que tu autorises peuvent envoyer plus rapidement des données plus volumineuses (coups de jeu, dessins) via le relais de la communauté du serveur. Chiffrées de bout en bout : le relais ne peut pas les lire. Sans relais, ils passent par la connexion Mumble, plus lente.",
+  "servers": "Tes serveurs",
   "serverAllows": "{{server}} · le relais autorise les données des plugins",
-  "serverAllowsRate": "jusqu'à {{rate}} kbit/s par plugin",
-  "serverDenies": "{{server}} · le relais n'autorise pas les données des plugins",
+  "serverAllowsRate": "jusqu’à {{rate}} kbit/s par plugin",
+  "serverDenies": "{{server}} · le relais n’autorise pas les données des plugins",
   "serverNone": "{{server}} · pas de relais",
   "mumbleOnly": "Connexion Mumble uniquement",
-  "plugins": "Plugins autorisés à l'utiliser",
+  "plugins": "Plugins autorisés à l’utiliser",
   "pluginUsed": "Non officiel · {{size}} pendant cette session",
   "pluginUsedOfficial": "Officiel · {{size}} pendant cette session",
   "mayUse": "{{plugin}} peut utiliser le relais",
@@ -18,6 +18,6 @@
     "title": "Sons des plugins",
     "volume": "Volume des sons des plugins",
     "mute": "Couper les sons des plugins",
-    "text": "De courts sons fournis avec les plugins. Le volume et la coupure s'appliquent à tous les plugins."
+    "text": "De courts sons fournis avec les plugins. Le volume et la coupure du son s’appliquent à tous les plugins."
   }
 }

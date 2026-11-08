@@ -14,7 +14,7 @@
     "relayDisallows": "Das Relay dieses Servers erlaubt keine Kamerafreigabe.",
     "needsRelayMode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
-    "registeredOnly": "Auf diesem Server dürfen nur registrierte Nutzer die Kamera verwenden."
+    "registeredOnly": "Auf diesem Server dürfen nur registrierte Benutzer die Kamera verwenden."
   },
   "cameraOnTray": "Kamera an",
   "turnOffTray": "Kamera ausschalten",
@@ -23,7 +23,7 @@
     "title": "Kamera einschalten",
     "subtitle": "Vorschau · noch sieht dich niemand",
     "previewLabel": "Kameravorschau",
-    "privacy": "Nur Personen in {{channel}} sehen deine Kamera, und erst nachdem du auf Kamera einschalten drückst. Mumcord zeichnet Kameras nie auf.",
+    "privacy": "Nur Personen in {{channel}} sehen deine Kamera, und erst nachdem du auf „Kamera einschalten“ klickst. Mumcord zeichnet Kameras nie auf.",
     "camera": "Kamera",
     "background": "Hintergrund",
     "backgroundNone": "Keiner",
@@ -48,8 +48,8 @@
     "remember": "Diesen Hintergrund beim nächsten Mal verwenden",
     "cancel": "Abbrechen",
     "turnOn": "Kamera einschalten",
-    "starting": "Kamera startet …",
-    "privacyNote": "Nur Personen in <channel/> sehen deine Kamera, und erst nachdem du auf Kamera einschalten drückst. Mumcord zeichnet Kameras nie auf.",
+    "starting": "Kamera startet…",
+    "privacyNote": "Nur Personen in <channel/> sehen deine Kamera, und erst nachdem du auf „Kamera einschalten“ klickst. Mumcord zeichnet Kameras nie auf.",
     "effectsLoadOnly": "Effekte laufen auf diesem Gerät. Auslastung: {{load}}",
     "effectsIdle": "Effekte laufen auf diesem Gerät.",
     "effectsUnavailable": "Hintergrundeffekte sind auf diesem PC nicht verfügbar: {{reason}}",
@@ -81,7 +81,7 @@
   },
   "noCameraFound": "Keine Kamera gefunden. Schließe eine Kamera an, dann erscheint sie hier.",
   "imageImportFailed": "Dieses Bild kann nicht verwendet werden. Nutze eine PNG-, JPEG- oder WebP-Datei bis 10 MB.",
-  "effectsTooHeavy": "Dein PC ist für diesen Hintergrundeffekt zu ausgelastet. Probiere Keiner.",
+  "effectsTooHeavy": "Dein PC ist für diesen Hintergrundeffekt zu ausgelastet. Wähle „Keiner“.",
   "errors": {
     "busy": "Kamera angehalten: Eine andere App verwendet deine Kamera.",
     "noCamera": "Keine Kamera gefunden. Schließe eine Kamera an, dann erscheint sie hier.",
@@ -98,12 +98,12 @@
     "mode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
     "endedByRelay": "Kamera vom Relay des Servers angehalten",
-    "dismissStopped": "Verwerfen",
-    "notRegistered": "Kamera konnte nicht starten: Auf diesem Server dürfen nur registrierte Nutzer die Kamera verwenden.",
+    "dismissStopped": "Schließen",
+    "notRegistered": "Kamera konnte nicht starten: Auf diesem Server dürfen nur registrierte Benutzer die Kamera verwenden.",
     "groupNotAllowed": "Kamera konnte nicht starten: Das Relay dieses Servers bedient nur bestimmte Gruppen. Bitte einen Admin, dich hinzuzufügen.",
     "notSameChannel": "Kamera konnte nicht starten: Du und deine Zuschauer müsst im selben Kanal sein.",
     "notInChannel": "Kamera konnte nicht starten: Tritt zuerst einem Kanal bei.",
-    "noHello": "Kamera konnte nicht starten: Der Relay-Bot kennt diese App noch nicht. Verbinde dich neu, um das zu beheben."
+    "noHello": "Kamera konnte nicht starten: Der Relay-Bot kennt diese App noch nicht. Verbinde dich erneut, um das zu beheben."
   },
   "privacy": {
     "windows": "Windows blockiert den Kamerazugriff für Desktop-Apps",
@@ -175,7 +175,7 @@
     "fpsLabel": "{{fps}} Bilder pro Sekunde",
     "quality": "{{resolution}} · {{codec}}",
     "menu": "Weitere Aktionen für {{name}}",
-    "joining": "Verbinde mit der Kamera von {{name}} …",
+    "joining": "Verbindung zur Kamera von {{name}}…",
     "full": "Zu viele Personen schauen {{name}} zu",
     "failed": "Verbindung zur Kamera von {{name}} fehlgeschlagen",
     "retry": "Erneut versuchen",
@@ -206,7 +206,7 @@
   "combined": {
     "screenTitle": "Bildschirm von {{name}}",
     "screenLive": "Live",
-    "partyTitle": "Watch Party",
+    "partyTitle": "Watch-Party",
     "partyStarted": "Gestartet von {{name}}",
     "label": "{{title}} mit dem Kameraraum"
   },
@@ -221,7 +221,7 @@
     "sendQualityAuto": "Automatisch",
     "sendQuality720": "720p · 15 fps",
     "sendQuality360": "360p · 30 fps",
-    "sendQualityHint": "Auto (bis zu 720p · 30 fps) sendet nur so viel, wie die Zuschauer brauchen: kleiner in einem großen Raster, schärfer, wenn dich jemand anheftet.",
+    "sendQualityHint": "Automatisch (bis zu 720p · 30 fps) sendet nur so viel, wie die Zuschauer brauchen: kleiner in einem großen Raster, schärfer, wenn dich jemand anheftet.",
     "mirror": "Meine Eigenansicht spiegeln",
     "mirrorHint": "Nur deine eigene Ansicht wird gespiegelt. Andere sehen dich seitenrichtig.",
     "backgroundSection": "Hintergrund",
@@ -233,7 +233,7 @@
     "effectAuto": "Automatisch",
     "effectBest": "Beste (Grafikkarte)",
     "effectLight": "Leicht (spart Akku)",
-    "effectHint": "Auto nutzt die Grafikkarte, wenn möglich, und wechselt bei Akkubetrieb oder ausgelastetem PC auf Leicht.",
+    "effectHint": "„Automatisch“ nutzt die Grafikkarte, wenn möglich, und wechselt bei Akkubetrieb oder ausgelastetem PC auf „Leicht“.",
     "ownImages_one": "Deine eigenen Hintergrundbilder bleiben auf diesem Gerät ({{count}} gespeichert). Gesendet wird nur das fertige Bild.",
     "ownImages_other": "Deine eigenen Hintergrundbilder bleiben auf diesem Gerät ({{count}} gespeichert). Gesendet wird nur das fertige Bild.",
     "manageImages": "Bilder verwalten",
@@ -245,7 +245,7 @@
     "showAlways": "Immer",
     "showOnOpen": "Wenn ich den Raum öffne",
     "showNever": "Nie",
-    "showHint": "Immer öffnet den Kameraraum, sobald jemand in deinem Kanal eine Kamera einschaltet. Nie hält dich im reinen Sprachmodus und lädt kein Video herunter.",
+    "showHint": "„Immer“ öffnet den Kameraraum, sobald jemand in deinem Kanal eine Kamera einschaltet. „Nie“ hält dich im reinen Sprachmodus und lädt kein Video herunter.",
     "dataSaver": "Datensparmodus: bis zu 15 fps für alle",
     "reduceMotion": "Weniger Bewegung: kein Leuchten und keine Animation am Sprecherrahmen",
     "reduceMotionHint": "Folgt standardmäßig der Systemeinstellung für weniger Bewegung."

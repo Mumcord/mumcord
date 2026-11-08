@@ -13,7 +13,7 @@
     "listLabel": "Server salvati",
     "add": "Aggiungi un server",
     "browse": "Sfoglia i server pubblici",
-    "keyboardHint": "Invio per connettersi. Alt più freccia su o giù sposta il server. Maiusc più F10 apre altre opzioni.",
+    "keyboardHint": "Invio connette. Alt più freccia su o giù sposta il server. Maiusc più F10 apre altre opzioni.",
     "label": "{{server}} ({{state}})",
     "state": {
       "connected": "connesso",
@@ -115,7 +115,7 @@
   "errors": {
     "serverUnreachable": "Il server non è raggiungibile. Controlla indirizzo e porta e che tu sia online.",
     "localNetwork": "Il server non è raggiungibile. Se è nella tua rete locale, consenti Mumcord in Impostazioni di sistema → Privacy e sicurezza → Rete locale, poi riprova.",
-    "serverTooOld": "Il server non accetta questa versione di Mumcord. Controlla se c’è un aggiornamento di Mumcord o chiedi al gestore del server.",
+    "serverTooOld": "Il server non accetta questa versione di Mumcord. Controlla se c'è un aggiornamento di Mumcord o chiedi al proprietario del server.",
     "wrongPassword": "La password del server è sbagliata. Modifica il server e inserisci quella giusta.",
     "nameInUse": "Il tuo nome è già in uso o registrato da qualcun altro su questo server. Modifica il server e scegli un altro nome.",
     "certificateRejected": "Il controllo del certificato non è riuscito: il certificato del server non è stato considerato attendibile oppure il server non ha accettato la tua identità. Riprova o chiedi al proprietario del server.",
@@ -141,7 +141,7 @@
     "newIntro": "Mumcord non ha mai visto il certificato di {{server}}. Se il proprietario del server ti ha dato un'impronta digitale, controlla che corrisponda. La tua scelta viene ricordata.",
     "fingerprint": "Impronta digitale del certificato",
     "changedTitle": "Attenzione: il certificato del server è cambiato",
-    "changedWarning": "Il certificato di {{server}} è diverso da quello di cui ti eri fidato prima.",
+    "changedWarning": "Il certificato di {{server}} è diverso da quello che avevi considerato attendibile.",
     "changedAdvice": "Può succedere dopo che il server è stato rinnovato, ma può anche significare che qualcuno sta intercettando la tua connessione. Continua solo se il proprietario del server ha confermato la modifica.",
     "previousFingerprint": "Impronta digitale attendibile in precedenza",
     "newFingerprint": "Nuova impronta digitale",
@@ -274,7 +274,7 @@
     "permissionTraverse": "Attraversare",
     "permissionEnter": "Entrare",
     "permissionSpeak": "Parlare",
-    "permissionMuteDeafen": "Silenziare/assordare altri",
+    "permissionMuteDeafen": "Silenziare/disattivare l'audio di altri",
     "permissionMove": "Spostare utenti",
     "permissionMakeChannel": "Creare canale",
     "permissionLinkChannel": "Collegare canale",
@@ -283,7 +283,7 @@
     "permissionMakeTempChannel": "Creare canale temporaneo",
     "permissionListen": "Ascoltare",
     "permissionKick": "Espellere",
-    "permissionBan": "Bannare",
+    "permissionBan": "Bandire",
     "permissionRegister": "Registrare utenti",
     "permissionSelfRegister": "Registrare sé stessi",
     "permissionResetUserContent": "Reimpostare contenuto utente",
@@ -306,14 +306,14 @@
     "nextConnect": "Ha effetto alla prossima connessione di questo server.",
     "badge": "Identità: {{identity}}",
     "badgeTitle": "Connesso con l'identità {{identity}}",
-    "missingNotice": "{{server}} si è connesso con l'identità predefinita perché la sua manca."
+    "missingNotice": "{{server}} si è connesso con l'identità predefinita perché la sua identità manca."
   },
   "relayAllows": {
     "label": "Il relay consente",
     "line": "Il relay consente: {{uses}}",
     "images": "Immagini",
     "files": "File",
-    "screen": "Condivisione dello schermo",
+    "screen": "Condivisione schermo",
     "cameras": "Fotocamere"
   }
 }

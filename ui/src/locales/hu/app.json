@@ -2,13 +2,13 @@
   "regions": {
     "servers": "Szerverek",
     "channels": "Csatornák",
-    "chat": "Chat",
+    "chat": "Csevegés",
     "members": "Tagok",
     "userPanel": "Állapotod"
   },
   "skipLinks": {
-    "label": "Ugrás linkek",
-    "chat": "Ugrás a chathez",
+    "label": "Ugrási hivatkozások",
+    "chat": "Ugrás a csevegéshez",
     "channels": "Ugrás a csatornákhoz"
   },
   "resize": {

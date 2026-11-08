@@ -1,12 +1,12 @@
 {
   "close": {
     "title": "Samazināt uz paplāti vai iziet?",
-    "description": "Tu joprojām esi savienots. Samazināts Mumcord paturēs tevi balss kanālā un paliks sistēmas paplātē.",
+    "description": "Savienojums joprojām ir aktīvs. Samazināts Mumcord paturēs tevi balss kanālā un paliks sistēmas paplātē.",
     "remember": "Atcerēties manu izvēli",
     "minimize": "Samazināt uz paplāti",
     "quit": "Iziet",
     "failed": "Tas neizdevās. Lūdzu, mēģini vēlreiz.",
-    "descriptionServers": "Tu joprojām esi savienots ar {{count}} serveriem. Minimizēts Mumcord tevi patur balss kanālā un paliek sistēmas teknē."
+    "descriptionServers": "Joprojām ir aktīvi savienojumi ar {{count}} serveriem. Samazināts Mumcord paturēs tevi balss kanālā un paliks sistēmas paplātē."
   },
   "windowOverlay": {
     "title": "Loga pārklājums ir noņemts",
@@ -15,14 +15,14 @@
     "openSettings": "Atvērt pārklājuma iestatījumus"
   },
   "audioDevice": {
-    "title": "Atkārtoti izvēlieties audio ierīces",
-    "description": "Mumcord tagad katru jūsu audio ierīču ieeju un izeju rāda atsevišķi. Saglabāto ierīci neizdevās saskaņot ne ar vienu no tām, tāpēc pagaidām tiek izmantota sistēmas noklusējuma ierīce. Ierīci varat izvēlēties audio iestatījumos.",
+    "title": "Vēlreiz izvēlies audio ierīces",
+    "description": "Mumcord tagad katru tavu audio ierīču ieeju un izeju rāda atsevišķi. Saglabāto ierīci neizdevās saskaņot ne ar vienu no tām, tāpēc pagaidām tiek izmantota sistēmas noklusējuma ierīce. Ierīci vari izvēlēties audio iestatījumos.",
     "dismiss": "Skaidrs",
     "openSettings": "Atvērt audio iestatījumus"
   },
   "appImageMenu": {
     "title": "Pievienot Mumcord lietotņu izvēlnei?",
-    "description": "Tā Mumcord parādās tavā lietotņu izvēlnē. Ikona un push-to-talk Wayland vidē darbojas pareizi, un mumble:// saites atver Mumcord. To vari vēlāk mainīt iestatījumos.",
+    "description": "Tā Mumcord parādīsies tavā lietotņu izvēlnē. Ikona un Push-to-talk Wayland vidē darbosies pareizi, un mumble:// saites atvērs Mumcord. To vari vēlāk mainīt iestatījumos.",
     "no": "Nē",
     "yes": "Jā",
     "failed": "Neizdevās. Mēģini vēlreiz."
@@ -36,7 +36,7 @@
   },
   "directConsent": {
     "title": "Atļaut tiešos savienojumus?",
-    "description": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt jūsu IP adresi. Mumcord tos izmanto pilna izmēra attēliem un ekrāna kopīgošanai ar citiem Mumcord lietotājiem un var to dēļ atvērt portu jūsu maršrutētājā. Ja atteiksiet, attēli joprojām pienāks caur serveri, bet ekrāna kopīgošana nebūs pieejama. To varat mainīt vēlāk sadaļā Iestatījumi → Privātums. Ja šis serveris piedāvā releju, Mumcord var izmantot to; tad otra persona neredz tavu IP adresi.",
+    "description": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Mumcord tos izmanto pilna izmēra attēliem un ekrāna kopīgošanai ar citiem Mumcord lietotājiem un var to dēļ atvērt portu tavā maršrutētājā. Ja atteiksies, attēli joprojām pienāks caur serveri, bet ekrāna kopīgošana nebūs pieejama. To vari vēlāk mainīt sadaļā Iestatījumi → Privātums. Ja šis serveris piedāvā releju, Mumcord var izmantot to; tad otra persona neredz tavu IP adresi.",
     "no": "Nē",
     "yes": "Jā",
     "failed": "Neizdevās. Mēģini vēlreiz."
@@ -48,7 +48,7 @@
       "subtitle": "Mumcord {{version}} ir gatavs lejupielādei. Tev ir {{current}}.",
       "subtitleManual": "Iznācis Mumcord {{version}}. Tev ir {{current}}.",
       "whatsNew": "Kas jauns kopš {{current}}",
-      "trust": "Lejupielādē tikai no github.com, izmantojot HTTPS, un pirms instalēšanas pārbauda pēc paraksta un kontrolsummas.",
+      "trust": "Tiek lejupielādēts tikai no github.com, izmantojot HTTPS, un pirms instalēšanas pārbaudīts ar parakstu un kontrolsummu.",
       "skip": "Izlaist šo versiju",
       "later": "Atgādināt vēlāk",
       "download": "Lejupielādēt un instalēt",
@@ -95,9 +95,9 @@
       "checked": "Paraksts un kontrolsumma pārbaudīti",
       "installed": "Instalēts",
       "installsOnRestart": "Instalēsies, kad Mumcord restartēsies",
-      "connected_zero": "Tu esi savienots ar {{count}} serveriem. Pēc restartēšanas Mumcord atkal pieslēgsies un atgriezīsies tavos kanālos.",
-      "connected_one": "Tu esi savienots ar {{count}} serveri. Pēc restartēšanas Mumcord atkal pieslēgsies un atgriezīsies tavos kanālos.",
-      "connected_other": "Tu esi savienots ar {{count}} serveriem. Pēc restartēšanas Mumcord atkal pieslēgsies un atgriezīsies tavos kanālos.",
+      "connected_zero": "Ir aktīvi savienojumi ar {{count}} serveriem. Pēc restartēšanas Mumcord atkal savienosies un atgriezīsies tavos kanālos.",
+      "connected_one": "Ir aktīvs savienojums ar {{count}} serveri. Pēc restartēšanas Mumcord atkal savienosies un atgriezīsies tavos kanālos.",
+      "connected_other": "Ir aktīvi savienojumi ar {{count}} serveriem. Pēc restartēšanas Mumcord atkal savienosies un atgriezīsies tavos kanālos.",
       "later": "Vēlāk",
       "restart": "Restartēt un atjaunināt",
       "announce": "Mumcord {{version}} ir gatavs. Restartē, lai atjauninātu."

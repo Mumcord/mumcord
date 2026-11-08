@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanāli",
-    "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut · Izvēlnes taustiņš: kanāla opcijas · Ctrl+klikšķis vai Ctrl+atstarpe: izvēlēties cilvēkus",
+    "hint": "Enter: rādīt tērzēšanu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut · Izvēlnes taustiņš: kanāla opcijas · Ctrl+klikšķis vai Ctrl+atstarpe: izvēlēties cilvēkus",
     "join": "Pievienoties",
     "you": "(tu)",
     "youAreHere": "tu esi šeit",
@@ -18,7 +18,7 @@
     "showAll": "Rādīt visus ({{total}})",
     "showFewer": "Rādīt mazāk",
     "jump": "Pāriet uz manu kanālu",
-    "locked": "slēgts",
+    "locked": "aizslēgts",
     "temporary": "pagaidu",
     "linked": "saistīts",
     "full": "Kanāls ir pilns",
@@ -30,12 +30,12 @@
   "status": {
     "listening": "tikai klausās",
     "talking": "runā",
-    "muted": "izslēgts mikrofons",
-    "deafened": "izslēgta skaņa",
-    "serverMuted": "servera izslēgts mikrofons",
-    "serverDeafened": "servera izslēgta skaņa",
-    "suppressed": "apspiests (šeit nevar runāt)",
-    "localMuted": "izslēgts tev",
+    "muted": "apklusināts",
+    "deafened": "skaņa izslēgta",
+    "serverMuted": "apklusināts serverī",
+    "serverDeafened": "skaņa izslēgta serverī",
+    "suppressed": "apslāpēts (šeit nevar runāt)",
+    "localMuted": "tev apklusināts",
     "unregistered": "nereģistrēts",
     "prioritySpeaker": "prioritārs runātājs"
   },
@@ -54,12 +54,12 @@
   "statusTip": {
     "registered": "Reģistrēts šajā serverī",
     "listening": "Tikai klausās",
-    "muted": "Mikrofons izslēgts",
+    "muted": "Apklusināts",
     "deafened": "Skaņa izslēgta",
-    "serverMuted": "Servera izslēgts mikrofons",
-    "serverDeafened": "Servera izslēgta skaņa",
-    "suppressed": "Apspiests – šajā kanālā nevar runāt",
-    "localMuted": "Izslēgts tev",
+    "serverMuted": "Apklusinājis serveris",
+    "serverDeafened": "Skaņu izslēdzis serveris",
+    "suppressed": "Apslāpēts – šajā kanālā nevar runāt",
+    "localMuted": "Tev apklusināts",
     "unregistered": "Nav reģistrēts šajā serverī (viesis)",
     "nowPlaying": "Klausās {{track}}",
     "nowGaming": "Spēlē {{game}}",
@@ -73,7 +73,7 @@
     "talking": "{{name}} runā"
   },
   "errors": {
-    "joinDenied": "Tev nav atļaujas ieiet šajā kanālā.",
+    "joinDenied": "Tev nav atļaujas pievienoties šim kanālam.",
     "joinFailed": "Neizdevās pievienoties kanālam. Lūdzu, mēģini vēlreiz.",
     "notConnected": "Nav savienojuma ar serveri.",
     "moveFailed": "Šo personu neizdevās pārvietot."
@@ -86,7 +86,7 @@
   "search": {
     "label": "Meklēt kanālus un cilvēkus",
     "clear": "Notīrīt meklēšanu",
-    "empty": "Neviens kanāls vai cilvēks neatbilst “{{query}}”.",
+    "empty": "Neviens kanāls vai cilvēks neatbilst „{{query}}”.",
     "count": "{{channels}}, {{people}}",
     "channels_zero": "{{count}} kanālu",
     "channels_one": "{{count}} kanāls",
@@ -111,7 +111,7 @@
     "channel": "Kanāls",
     "search": "Meklēt kanālus",
     "noMatch": "Neviens kanāls neatbilst.",
-    "hint": "Izvēlies kanālu, uz kuru cilvēkiem jāpāriet.",
+    "hint": "Izvēlies kanālu, uz kuru pārvietot cilvēkus.",
     "from": "No {{channel}}",
     "question": "Pārvietot {{people}} no {{from}} uz {{to}}?",
     "questionNoSource": "Pārvietot {{people}} uz {{to}}?",
@@ -119,7 +119,7 @@
     "failed": "Dažus cilvēkus neizdevās pārvietot.",
     "resultTitle": "Pārvieto cilvēkus",
     "resultAll": "Pārvietoti {{people}} uz {{channel}}.",
-    "resultSome": "Pārvietoti {{moved}} no {{people}} uz {{channel}}. Pārējie tika atteikti.",
+    "resultSome": "Pārvietoti {{moved}} no {{people}} uz {{channel}}. Pārējiem serveris atteica.",
     "busy": "Cilvēki jau tiek pārvietoti…"
   },
   "drag": {
@@ -128,7 +128,7 @@
     "below": "Novietot zem {{channel}}",
     "self": "Nevar ievietot pašu sevī",
     "subChannel": "Nevar ievietot savā apakškanālā",
-    "confirmTitle": "Pārvietot “{{channel}}”?",
+    "confirmTitle": "Pārvietot „{{channel}}”?",
     "alongAll": "Kopā ar {{channel}} tiek pārvietoti: {{subChannels}} un {{people}}.",
     "alongSubChannels": "Kopā ar {{channel}} tiek pārvietoti: {{subChannels}}.",
     "alongPeople": "Kopā ar {{channel}} tiek pārvietoti: {{people}}.",

@@ -29,7 +29,7 @@
       "invites": "Inviti",
       "plugins": "Plugin"
     },
-    "empty": "Sei in pari.",
+    "empty": "Hai letto tutto.",
     "unread": "Non lette",
     "dndOn": "Non disturbare è attivo",
     "dndOff": "Non disturbare è disattivato",
@@ -45,7 +45,7 @@
     "messageRequestBody_many": "{{count}} di messaggi da un client Mumble standard",
     "messageRequestBody_other": "{{count}} messaggi da un client Mumble standard",
     "invite": {
-      "watchParty": "{{name}} ti ha invitato a un watch party",
+      "watchParty": "{{name}} ti ha invitato a una watch party",
       "screenShare": "{{name}} sta condividendo lo schermo",
       "card": "{{name}} ti ha inviato una card",
       "theme": "{{name}} ha condiviso un tema con te"
@@ -61,7 +61,7 @@
     },
     "accept": "Accetta",
     "decline": "Rifiuta",
-    "join": "Partecipa",
+    "join": "Entra",
     "watch": "Guarda",
     "open": "Apri",
     "dismiss": "Ignora",

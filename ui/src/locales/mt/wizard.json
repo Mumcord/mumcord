@@ -5,8 +5,8 @@
   "tipLabel": "Dwar {{name}}",
   "errors": {
     "generic": "Xi ħaġa marret ħażin. Erġa' pprova.",
-    "secureStorageUnavailable": "Mumcord ma jistax jilħaq l-ħażna sigura tas-sistema tiegħek. Ħoll il-keyring jew il-password manager tiegħek u erġa' pprova.",
-    "saveFailed": "Is-settings tiegħek ma setgħux jiġu ssejvjati. Erġa' pprova."
+    "secureStorageUnavailable": "Mumcord ma jistax jilħaq il-ħażna sigura tas-sistema tiegħek. Iftaħ il-keyring jew il-maniġer tal-passwords tiegħek u erġa' pprova.",
+    "saveFailed": "L-issettjar tiegħek ma setax jiġi ssejvjat. Erġa' pprova."
   },
   "nav": {
     "getStarted": "Ejja nibdew",
@@ -23,8 +23,8 @@
     "setup": "Setup",
     "custom": "Personalizzat",
     "done": "(lest)",
-    "progress": "Progress tas-setup",
-    "later": "Dak kollu hawnhekk jista' jinbidel aktar tard fis-Settings."
+    "progress": "Avvanz tas-setup",
+    "later": "Dak kollu hawnhekk jista' jinbidel aktar tard fl-Issettjar."
   },
   "steps": {
     "welcome": "Merħba",
@@ -72,7 +72,7 @@
     "password": "Password tal-fajl",
     "passwordHint": "Il-password tibqa' fuq dan il-kompjuter u qatt ma tintbagħat imkien.",
     "existing": "Qed tuża l-identità {{name}}.",
-    "backup": "Agħmel backup tagħha aktar tard fis-Settings. Backup jippermettilek tirrestawra l-identità tiegħek fuq kompjuter ġdid.",
+    "backup": "Agħmel backup tagħha aktar tard fl-Issettjar. Backup jippermettilek tirrestawra l-identità tiegħek fuq kompjuter ġdid.",
     "nameRequired": "Jekk jogħġbok daħħal isem.",
     "fileRequired": "Jekk jogħġbok agħżel fajl tal-identità (.p12 jew .pfx).",
     "fileType": "Fajl tal-identità",
@@ -87,22 +87,22 @@
     "systemDefault": "Default tas-sistema",
     "defaultVia": "Default tas-sistema ({{backend}})",
     "level": "Livell tal-mikrofonu",
-    "idle": "Agħfas Ittestja, ikkellem xi ħaġa, u tisma' lilek innifsek.",
+    "idle": "Agħfas Ittestja, għid xi ħaġa, u tisma' lilek innifsek.",
     "recording": "Tkellem issa…",
-    "playing": "Qed jindaqq il-vuċi tiegħek…",
-    "devicesFailed": "L-apparati tal-awdjo tiegħek ma setgħux jiġu elenkati. Tista' tkompli u tagħżilhom aktar tard f'Settings.",
+    "playing": "Qed tindaqq il-vuċi tiegħek…",
+    "devicesFailed": "L-apparati tal-awdjo tiegħek ma setgħux jiġu elenkati. Tista' tkompli u tagħżilhom aktar tard fl-Issettjar.",
     "testFailed": "It-test ma setax jibda. Iċċekkja li l-mikrofonu huwa konness.",
     "test": "Isma' lilek innifsek",
     "stop": "Waqqaf"
   },
   "voice": {
-    "title": "Tinstema' tajjeb?",
+    "title": "Jinstema' tajjeb?",
     "subtitle": "Agħżel l-apparati tiegħek u għid xi ħaġa. Il-bar għandu jiċċaqlaq waqt li titkellem.",
     "talkLegend": "Kif trid titkellem?",
     "voiceActivationDesc": "Il-mikrofonu jinfetaħ meta titkellem. M'hemm xejn x'iżżomm jew tagħfas.",
     "pushToTalkDesc": "L-aħjar għal kmamar storbjużi. Int tagħżel il-buttuna.",
     "sensitivity": "Sensittività",
-    "changeLater": "Tista' tibdel dan kollu aktar tard f'Settings → Vuċi u awdjo."
+    "changeLater": "Tista' tbiddel dan kollu aktar tard fl-Issettjar → Vuċi u awdjo."
   },
   "style": {
     "title": "Kemm trid taqsam?",
@@ -113,21 +113,21 @@
       "subtitle": "Is-sett sħiħ tal-karatteristiċi",
       "p1": "L-oħrajn jaraw x'tilgħab u x'tisma'",
       "p2": "L-IP tiegħek jidher għal persuni li tikkonnettja magħhom direttament",
-      "p3": "Kulħadd jista' jibgħatlek messaġġ; links u immaġini jitgħabbew mill-web",
+      "p3": "Kulħadd jista' jibgħatlek messaġġ; links u stampi jitgħabbew mill-web",
       "p4": "L-overlay, is-sinkronizzazzjoni tal-istorja u l-immaġini bid-daqs sħiħ huma mixgħula"
     },
     "balanced": {
       "title": "Bilanċjat",
       "subtitle": "Bejn il-privatezza u l-kumdità",
-      "p1": "Biss l-ħbieb u n-nies fil-kanal tiegħek jistgħu jibagħtulek messaġġ",
+      "p1": "Il-ħbieb biss u n-nies fil-kanal tiegħek jistgħu jibagħtulek messaġġ",
       "p2": "Konnessjoni diretta, b'relay bħala riserva",
-      "p3": "Il-previews tal-links u l-immaġini bid-daqs sħiħ huma mixgħula",
+      "p3": "Id-dehriet minn qabel tal-links u l-istampi bid-daqs sħiħ huma mixgħula",
       "p4": "Dak li tilgħab u tisma' jibqa' privat"
     },
     "maximumPrivacy": {
       "title": "Privatezza massima",
       "subtitle": "Aqsam l-inqas possibbli",
-      "p1": "Biss l-ħbieb jistgħu jibagħtulek messaġġ, mingħajr eċċezzjonijiet",
+      "p1": "Il-ħbieb biss jistgħu jibagħtulek messaġġ, mingħajr eċċezzjonijiet",
       "p2": "L-IP tiegħek huwa moħbi; kollox jgħaddi mir-relay",
       "p3": "L-ebda kontenut minn barra, l-ebda sinkronizzazzjoni tal-istorja, l-ebda qsim",
       "p4": "L-aġġornamenti jgħarrfuk biss; xejn ma jinqasam dwar dak li tagħmel"
@@ -136,7 +136,7 @@
       "title": "Personalizzat",
       "subtitle": "Għaddi minn kull għażla",
       "p1": "Għaddi int stess minn kull pass",
-      "p2": "Ara x'jagħmel kull setting u min jarah",
+      "p2": "Ara x'jagħmel kull issettjar u min jarah",
       "p3": "L-aħjar jekk taf x'trid"
     },
     "presetSelected": "{{preset}} magħżul: qed taqbeż il-passi dettaljati tal-privatezza. Agħżel Personalizzat biex tgħaddi minn kull wieħed.",
@@ -144,43 +144,43 @@
   },
   "pm": {
     "title": "Min jista' jibgħatlek messaġġ?",
-    "subtitle": "Il-messaġġi privati huma chats wieħed-għal-wieħed. Iċ-chat tal-kanal ma jaffettwax din l-għażla.",
+    "subtitle": "Il-messaġġi privati huma chats wieħed-għal-wieħed. Din l-għażla ma taffettwax iċ-chat tal-kanal.",
     "local": "Il-filtrar isir fuq il-kompjuter tiegħek. Dawk li jibagħtu ma jiġux infurmati. Tista' tissettja regola differenti għal kull server aktar tard."
   },
   "notifications": {
     "title": "Kif għandu Mumcord jgħarrfek?",
-    "subtitle": "Agħżel kif kull tip ta' aħbar tasal għandek. Tista' tbiddlu aktar tard f'Settings → Notifiki."
+    "subtitle": "Agħżel kif kull tip ta' aħbar tasal għandek. Tista' tbiddlu aktar tard fl-Issettjar → Notifiki."
   },
   "connections": {
     "title": "Konnessjonijiet u kontenut",
-    "subtitle": "Xi karatteristiċi jikkonnettjawk direttament ma' utenti oħra ta' Mumcord, u xi kontenut taċ-chat jitgħabba minn websites oħra. Agħżel dak li jaqbillek.",
+    "subtitle": "Xi karatteristiċi jikkonnettjawk direttament ma' utenti oħra ta' Mumcord, u xi kontenut taċ-chat jitgħabba minn siti web oħra. Agħżel dak li jaqbillek.",
     "chatContent": "Kontenut taċ-chat",
     "sharing": "Qsim ma' utenti ta' Mumcord"
   },
   "features": {
     "title": "Agħmilha tiegħek",
-    "subtitle": "Qabbad l-extras li trid. Kull waħda tgħid min jista' jara xiex.",
+    "subtitle": "Ixgħel l-extras li trid. Kull waħda tgħid min jista' jara xiex.",
     "seenByMumcordUsers": "Jidher għall-utenti ta' Mumcord fuq l-istess server.",
     "onlyYou": "Int biss tarah.",
     "ingameOverlayAlt": "Eżempju tal-overlay fil-logħba li juri min qed jitkellem"
   },
   "appearance": {
     "title": "Agħżel id-dehra tiegħek",
-    "subtitle": "It-tieqa tiġi aġġornata hekk kif tagħżel. Hemm aktar temi, u tiegħek stess, fis-Settings."
+    "subtitle": "It-tieqa tiġi aġġornata hekk kif tagħżel. Hemm aktar temi, u tiegħek stess, fl-Issettjar."
   },
   "startup": {
     "title": "Tnedija u aġġornamenti",
     "subtitle": "Kif jibda Mumcord u x'jagħmel dwar verżjonijiet ġodda.",
     "linkHandler": "Iftaħ links mumble:// b'Mumcord",
-    "linkHandlerHint": "Meta tikklikkja link ta' server fuq website, jinfetaħ hawnhekk.",
+    "linkHandlerHint": "Meta tikklikkja link ta' server fuq sit web, jinfetaħ hawnhekk.",
     "linkHandlerActive": "Mumcord diġà jiftaħ links mumble://.",
-    "linkHandlerFailed": "Mumcord ma setax jiġi ssettjat biex jiftaħ links mumble://. Tista' terġa' tipprova fis-Settings.",
-    "autostartFailed": "Mumcord ma setax jiġi ssettjat biex jibda meta tidħol. Tista' terġa' tipprova fis-Settings."
+    "linkHandlerFailed": "Mumcord ma setax jiġi ssettjat biex jiftaħ links mumble://. Tista' terġa' tipprova fl-Issettjar.",
+    "autostartFailed": "Mumcord ma setax jiġi ssettjat biex jibda meta tidħol. Tista' terġa' tipprova fl-Issettjar."
   },
   "summary": {
     "title": "Kollox lest",
     "titleNamed": "Kollox lest, {{name}}",
-    "subtitle": "Hawn dak li għażilt. Uża Editja fuq kwalunkwe karta biex tibdilha qabel tibda.",
+    "subtitle": "Hawn dak li għażilt. Uża Editja fuq kwalunkwe karta biex tbiddilha qabel tibda.",
     "on": "mixgħul",
     "off": "mitfi",
     "unavailable": "mhux disponibbli hawnhekk",
@@ -198,15 +198,15 @@
       "startup": "Tnedija",
       "updates": "Aġġornamenti"
     },
-    "identityDetail": "Salvata fil-keychain tas-sistema tiegħek",
+    "identityDetail": "Issejvjata fil-keychain tas-sistema tiegħek",
     "voiceDetail": "Tnaqqis tal-istorbju: {{noise}}",
     "pmDetail": "Il-kanal tiegħi {{channel}} · chats aċċettati {{accepted}} · talbiet {{requests}}",
     "notificationsTitle": "Messaġġi ġodda: {{mode}}",
     "notificationsDetail": "Notifiki tal-attività: {{on}} minn {{total}} mixgħula",
-    "contentTitle": "Previews tal-links {{previews}}",
+    "contentTitle": "Dehriet minn qabel tal-links {{previews}}",
     "contentDetail": "Immaġini bid-daqs sħiħ {{images}} · sinkronizzazzjoni tal-istorja {{sync}}",
     "featuresTitle": "Overlay fil-logħba {{overlay}}",
-    "featuresDetail": "Segwi Do Not Disturb tas-sistema {{dnd}} · qed jindaqq issa {{playing}} · qed jilgħab issa {{gaming}} · storja tal-attività {{history}}",
+    "featuresDetail": "Segwi Tiddisturbax tas-sistema {{dnd}} · qed jindaqq issa {{playing}} · qed jilgħab issa {{gaming}} · storja tal-attività {{history}}",
     "effectsDetail": "Effetti viżwali {{effects}}",
     "startupTitle": "Ibda meta tidħol {{login}}",
     "startupDetail": "Ibda minimizzat {{minimized}} · links mumble:// {{links}}",
@@ -216,18 +216,18 @@
       "off": "Mitfi"
     },
     "updatesDetail": "L-aġġornamenti dejjem jiġu ċċekkjati u vverifikati qabel jiġu installati.",
-    "backup": "L-identità tiegħek {{name}} hija salvata fil-keychain tas-sistema tiegħek. Agħmel backup tagħha minn Settings → Identità, biex qatt ma titlef l-isem reġistrat tiegħek.",
+    "backup": "L-identità tiegħek {{name}} hija ssejvjata fil-keychain tas-sistema tiegħek. Agħmel backup tagħha mill-Issettjar → Identità, biex qatt ma titlef l-isem reġistrat tiegħek.",
     "nextServer": "Li jmiss: żid l-ewwel server tiegħek",
-    "rerunNote": "Jiġu salvati biss il-valuri li biddilt."
+    "rerunNote": "Jiġu ssejvjati biss il-valuri li biddilt."
   },
   "rerun": {
     "title": "Wiżard tas-setup",
     "note": "Qed terġa' tgħaddi mis-setup. L-identità tiegħek ma tinbidilx.",
     "manageIdentities": "Immaniġġja l-identitajiet",
-    "discardTitle": "Tarmi l-bidliet?",
-    "discardBody": "Xejn mhu jiġi salvat qabel ma tispiċċa. Jekk tikkanċella issa, kollox jibqa' kif inhu.",
+    "discardTitle": "Twarrab il-bidliet?",
+    "discardBody": "Xejn minn dak li biddilt ma jiġi ssejvjat qabel ma tispiċċa. Jekk tikkanċella issa, kollox jibqa' kif inhu.",
     "discardKeep": "Kompli teditja",
-    "discardConfirm": "Armi l-bidliet"
+    "discardConfirm": "Warrab il-bidliet"
   },
   "guide": {
     "label": "Suġġeriment minn Aaron",
@@ -252,11 +252,11 @@
       "welcome": "Merħba, jien Aaron! Se nwassalk matul is-setup. Jieħu minuta biss.",
       "import": "Dawn huma s-servers u l-issettjar misjuba f'Mumble. Agħżel x'trid iżżomm.",
       "identity": "L-identità tiegħek hija ismek fuq is-servers. Oħloq waħda ġdida jew importa waħda eżistenti.",
-      "voice": "Agħżel hawnhekk il-mikrofonu li titkellem fih, imbagħad għid ħello: il-bar ħadra għandha tiżfen.",
+      "voice": "Agħżel hawnhekk il-mikrofonu li titkellem fih, imbagħad għid ħello: il-bar l-aħdar għandu jiżfen.",
       "setupStyle": "Agħżel stil. Tista' tbiddel kull issettjar aktar tard.",
       "privateMessages": "Agħżel min jista' jibgħatlek messaġġi privati. Min jibgħat qatt ma jiġi mgħarraf.",
       "notifications": "Agħżel kif kull tip ta' aħbarijiet jilħqek, jew itfih.",
-      "connections": "Agħżel jekk Mumcord jistax jgħaqqdek direttament ma' utenti oħra ta' Mumcord.",
+      "connections": "Agħżel jekk Mumcord jistax jikkonnettjak direttament ma' utenti oħra ta' Mumcord.",
       "features": "Ixgħel biss l-extras li togħġob. Kull karta tgħid min jista' jarha.",
       "appearance": "Ċar, skur jew bħas-sistema tiegħek: agħżel id-dehra tiegħek hawnhekk.",
       "startup": "Agħżel kif jibda Mumcord meta tidħol fil-kompjuter tiegħek.",

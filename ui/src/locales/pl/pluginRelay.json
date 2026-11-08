@@ -8,7 +8,7 @@
   "serverDenies": "{{server}} · przekaźnik nie zezwala na dane wtyczek",
   "serverNone": "{{server}} · brak przekaźnika",
   "mumbleOnly": "Tylko połączenie Mumble",
-  "plugins": "Wtyczki z prawem użycia",
+  "plugins": "Wtyczki, które mogą go używać",
   "pluginUsed": "Nieoficjalna · {{size}} w tej sesji",
   "pluginUsedOfficial": "Oficjalna · {{size}} w tej sesji",
   "mayUse": "{{plugin}} może używać przekaźnika",

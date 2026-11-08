@@ -1,7 +1,7 @@
 {
   "tree": {
-    "empty": "Det här pluginet visar inget här ännu.",
-    "actionFailed": "Pluginet kunde inte hantera det. Försök igen."
+    "empty": "Det här tillägget visar inget här ännu.",
+    "actionFailed": "Tillägget kunde inte hantera det. Försök igen."
   },
   "progress": {
     "working": "Pågår"

@@ -5,10 +5,10 @@
   "line": "{{sender}}: {{preview}}",
   "groupedChannel_one": "{{count}} új üzenet itt: {{name}}",
   "groupedChannel_other": "{{count}} új üzenet itt: {{name}}",
-  "groupedPrivate_one": "{{count}} új üzenet tőle: {{name}}",
-  "groupedPrivate_other": "{{count}} új üzenet tőle: {{name}}",
+  "groupedPrivate_one": "{{count}} új üzenet {{name}} felhasználótól",
+  "groupedPrivate_other": "{{count}} új üzenet {{name}} felhasználótól",
   "image": "Képet küldött",
-  "open": "Chat megnyitása",
+  "open": "Csevegés megnyitása",
   "close": "Értesítés elvetése",
   "mentionLine": "{{sender}} megemlített: {{preview}}",
   "withServer": "{{server}} · {{what}}",
@@ -37,7 +37,7 @@
     "mentionGroup": "{{name}} mindenkit megemlített",
     "reply": "{{name}} válaszolt az üzenetedre",
     "chatRequest": "{{name}} csevegni szeretne veled",
-    "messageRequest": "Üzenetkérés tőle: {{name}}",
+    "messageRequest": "Üzenetkérés {{name}} felhasználótól",
     "messageRequestBody_one": "{{count}} üzenet egy szabványos Mumble-klienstől",
     "messageRequestBody_other": "{{count}} üzenet egy szabványos Mumble-klienstől",
     "invite": {
@@ -66,13 +66,13 @@
     "block": "Letiltás",
     "update": {
       "title": "A Mumcord {{version}} készen áll",
-      "body": "Indítsa újra a frissítéshez",
+      "body": "Indítsd újra a frissítéshez",
       "restart": "Újraindítás és frissítés",
       "whatsNew": "Újdonságok"
     },
     "relay": {
-      "title": "Megváltozott a relay ezen: {{server}}",
-      "body": "A képernyő- és fájlmegosztás szünetel, amíg meg nem bízol az új relayben.",
+      "title": "Megváltozott az átjátszó ezen a szerveren: {{server}}",
+      "body": "A képernyő- és fájlmegosztás szünetel, amíg meg nem bízol az új átjátszóban.",
       "decision": "A döntésedre vár"
     }
   }

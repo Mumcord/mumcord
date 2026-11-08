@@ -1,44 +1,44 @@
 {
   "menu": {
-    "whisper": "Súgás",
-    "noPermission": "A szerver itt nem engedi a súgást"
+    "whisper": "Suttogás",
+    "noPermission": "A szerver itt nem engedi a suttogást"
   },
   "banner": {
-    "whisper": "Súgsz neki: {{target}}",
-    "shout": "Kiabálsz ide: {{target}}",
+    "whisper": "Suttogsz: {{target}}",
+    "shout": "Kiabálsz: {{target}}",
     "releaseKey": "Csak az ott lévők hallanak. Engedd el a(z) <key>{{key}}</key> billentyűt, hogy újra a(z) {{channel}} csatornában beszélj.",
     "stopToReturn": "Csak az ott lévők hallanak. Állítsd le, hogy újra a(z) {{channel}} csatornában beszélj.",
     "onlyThere": "Csak az ott lévők hallanak.",
     "stop": "Leállítás"
   },
   "denied": {
-    "title": "Nem sikerült súgni: {{target}}",
-    "noVoiceServer": "Előbb lépj be egy csatornába: a súgás azon a szerveren megy át, amelyen beszélsz.",
-    "muted": "A súgáshoz kapcsold be a mikrofont.",
+    "title": "Nem sikerült suttogni: {{target}}",
+    "noVoiceServer": "Előbb lépj be egy csatornába: a suttogás azon a szerveren megy át, amelyen beszélsz.",
+    "muted": "A suttogáshoz oldd fel a mikrofon némítását.",
     "serverMuted": "A szerver elnémított, ezért nem továbbítja a hangodat.",
     "nobodyHere": "Ezek közül senki sincs most ezen a szerveren.",
     "channelNotFound": "Ez a csatorna nem létezik ezen a szerveren.",
-    "noPermission": "A szerver nem engedi, hogy a(z) {{channel}} csatornába súgj.",
+    "noPermission": "A szerver nem engedi, hogy a(z) {{channel}} csatornába suttogj.",
     "unknownTarget": "Ez a cél már nem létezik.",
     "dismiss": "Bezárás"
   },
   "badge": {
-    "whisper": "súg",
+    "whisper": "suttog",
     "shout": "kiabál",
-    "whisperLabel": "Neked súg",
+    "whisperLabel": "Neked suttog",
     "shoutLabel": "A csatornádba kiabál",
-    "ownWhisper": "súgsz",
+    "ownWhisper": "suttogsz",
     "ownShout": "kiabálsz",
-    "ownWhisperLabel": "Súgsz",
+    "ownWhisperLabel": "Suttogsz",
     "ownShoutLabel": "Kiabálsz"
   },
   "panel": {
-    "open": "Súgás vagy kiabálás",
-    "menu": "Súgás és kiabálás céljai",
+    "open": "Suttogás vagy kiabálás",
+    "menu": "Suttogás és kiabálás céljai",
     "manage": "Célok kezelése…",
     "none": "Még nincs cél",
-    "indicatorWhisper": "Súgsz neki: {{target}}",
-    "indicatorShout": "Kiabálsz ide: {{target}}",
+    "indicatorWhisper": "Suttogsz: {{target}}",
+    "indicatorShout": "Kiabálsz: {{target}}",
     "stop": "Leállítás"
   }
 }

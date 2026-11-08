@@ -35,7 +35,7 @@
   "tooMany": "Preveč dejavnosti v tem kanalu",
   "full": "Ta dejavnost je polna",
   "joinGone": "Ta dejavnost se je končala",
-  "joinNotPermitted": "Trenutno se ne morete pridružiti {{plugin}}",
+  "joinNotPermitted": "Trenutno se ne moreš pridružiti: {{plugin}}",
   "joinFailed": "Pridružitev {{plugin}} ni uspela",
   "leaveFailed": "Zapustitev {{plugin}} ni uspela",
   "fullScreenBanner": "{{plugin}} je v celozaslonskem načinu · Esc za izhod",

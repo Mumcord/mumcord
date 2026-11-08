@@ -1,7 +1,7 @@
 {
   "menu": {
     "whisper": "Шепни на",
-    "noPermission": "Сървърът не позволява шепнене тук"
+    "noPermission": "Сървърът не позволява шепот тук"
   },
   "banner": {
     "whisper": "Шепнеш на {{target}}",
@@ -12,7 +12,7 @@
     "stop": "Спри"
   },
   "denied": {
-    "title": "Не може да се шепне на {{target}}",
+    "title": "Шепотът до {{target}} не успя",
     "noVoiceServer": "Първо влез в канал: шепотът минава през сървъра, на който говориш.",
     "muted": "Включи микрофона си, за да шепнеш.",
     "serverMuted": "Сървърът те е заглушил и не предава гласа ти.",
@@ -29,8 +29,8 @@
     "shoutLabel": "Вика към твоя канал",
     "ownWhisper": "шепнеш",
     "ownShout": "викаш",
-    "ownWhisperLabel": "Шепнеш",
-    "ownShoutLabel": "Викаш"
+    "ownWhisperLabel": "Ти шепнеш",
+    "ownShoutLabel": "Ти викаш"
   },
   "panel": {
     "open": "Шепни или викай",

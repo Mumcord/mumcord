@@ -1,14 +1,14 @@
 {
   "follow": "Sekot",
-  "unsupported": "Kanālu sekošanai nepieciešams serveris ar versiju 1.4 vai jaunāku.",
+  "unsupported": "Lai sekotu kanāliem, nepieciešams serveris ar versiju 1.4 vai jaunāku.",
   "unread_zero": "{{count}} nelasītu ziņu",
   "unread_one": "{{count}} nelasīta ziņa",
   "unread_other": "{{count}} nelasītas ziņas",
   "errors": {
     "denied": "Serveris neļauj tev sekot šim kanālam.",
     "limit": "Šajā serverī vairs nevari sekot citiem kanāliem. Vispirms pārtrauc sekot kādam citam kanālam.",
-    "tooOld": "Šis serveris ir pārāk vecs kanālu sekošanai (nepieciešama versija 1.4 vai jaunāka).",
-    "notConnected": "Tu neesi savienots ar serveri.",
+    "tooOld": "Šis serveris ir pārāk vecs, lai sekotu kanāliem (nepieciešama versija 1.4 vai jaunāka).",
+    "notConnected": "Nav savienojuma ar serveri.",
     "generic": "Sekošana šim kanālam neizdevās. Lūdzu, mēģini vēlreiz."
   },
   "dm": {
@@ -24,12 +24,12 @@
     "privateOn": "{{name}} (privāti, {{server}}): {{text}}"
   },
   "history": {
-    "clear": "Dzēst vēsturi",
-    "title": "Dzēst vēsturi?",
-    "body": "Tas neatgriezeniski izdzēsīs šīs sarakstes saglabātās ziņas no šī datora. Citiem cilvēkiem paliek viņu kopijas. Viņu kopijas netiks atkal sinhronizētas uz šo datoru.",
-    "confirm": "Dzēst vēsturi",
+    "clear": "Notīrīt vēsturi",
+    "title": "Notīrīt vēsturi?",
+    "body": "Tas neatgriezeniski izdzēsīs šīs sarakstes saglabātās ziņas no šī datora. Citiem cilvēkiem paliek savas kopijas. Viņu kopijas netiks atkal sinhronizētas uz šo datoru.",
+    "confirm": "Notīrīt vēsturi",
     "cancel": "Atcelt",
-    "failed": "Vēsturi neizdevās izdzēst. Lūdzu, mēģini vēlreiz."
+    "failed": "Vēsturi neizdevās notīrīt. Lūdzu, mēģini vēlreiz."
   },
   "star": {
     "follow": "Sekot kanālam {{channel}}",
@@ -40,10 +40,10 @@
     "menuLabel": "Servera opcijas",
     "follow": "Sekot visiem kanāliem",
     "unfollow": "Pārtraukt sekot visiem kanāliem",
-    "working": "Seko kanāliem…",
-    "followed_zero": "Seko {{count}} kanālu.",
-    "followed_one": "Seko {{count}} kanālam.",
-    "followed_other": "Seko {{count}} kanāliem.",
+    "working": "Notiek sekošanas ieslēgšana…",
+    "followed_zero": "Sekošana ieslēgta {{count}} kanāliem.",
+    "followed_one": "Sekošana ieslēgta {{count}} kanālam.",
+    "followed_other": "Sekošana ieslēgta {{count}} kanāliem.",
     "skipped_zero": "{{count}} izlaisti: {{reasons}}.",
     "skipped_one": "{{count}} izlaists: {{reasons}}.",
     "skipped_other": "{{count}} izlaisti: {{reasons}}.",
@@ -58,6 +58,6 @@
   "mention": "ietver tavu pieminējumu",
   "header": {
     "follow": "Sekot kanālam",
-    "unfollow": "Seko, noklikšķini, lai pārtrauktu"
+    "unfollow": "Tu seko; noklikšķini, lai pārtrauktu"
   }
 }

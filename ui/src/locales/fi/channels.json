@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanavat",
-    "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista · Valikkonäppäin: kanavan asetukset · Ctrl+klikkaus tai Ctrl+välilyönti: valitse henkilöt",
+    "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista · Valikkonäppäin: kanavan asetukset · Ctrl+napsautus tai Ctrl+välilyönti: valitse henkilöt",
     "join": "Liity",
     "you": "(sinä)",
     "youAreHere": "olet täällä",
@@ -28,11 +28,11 @@
     "listening": "vain kuuntelee",
     "talking": "puhuu",
     "muted": "mykistetty",
-    "deafened": "kuulokkeet mykistetty",
+    "deafened": "kuulokkeet hiljennetty",
     "serverMuted": "palvelimen mykistämä",
-    "serverDeafened": "palvelimen kuurouttama",
+    "serverDeafened": "palvelin hiljensi kuulokkeet",
     "suppressed": "vaimennettu (ei voi puhua täällä)",
-    "localMuted": "mykistetty sinulta",
+    "localMuted": "mykistetty sinulle",
     "unregistered": "ei rekisteröitynyt",
     "prioritySpeaker": "etusijapuhuja"
   },
@@ -42,7 +42,7 @@
     "title": "Botit tällä palvelimella ({{total}})",
     "inChannel": "kanavalla {{channel}}",
     "modules": {
-      "peer": "Rele",
+      "peer": "Välityspalvelin",
       "music": "Soittaa musiikkia",
       "history": "Keskusteluhistoria",
       "webhook": "Webhookit"
@@ -52,11 +52,11 @@
     "registered": "Rekisteröitynyt tälle palvelimelle",
     "listening": "Vain kuuntelee",
     "muted": "Mykistetty",
-    "deafened": "Kuulokkeet mykistetty",
+    "deafened": "Kuulokkeet hiljennetty",
     "serverMuted": "Palvelimen mykistämä",
-    "serverDeafened": "Palvelimen kuurouttama",
+    "serverDeafened": "Palvelin hiljensi kuulokkeet",
     "suppressed": "Vaimennettu – ei voi puhua tällä kanavalla",
-    "localMuted": "Mykistetty sinulta",
+    "localMuted": "Mykistetty sinulle",
     "unregistered": "Ei rekisteröitynyt tälle palvelimelle (vieras)",
     "nowPlaying": "Kuuntelee: {{track}}",
     "nowGaming": "Pelaa: {{game}}",
@@ -70,7 +70,7 @@
     "talking": "{{name}} puhuu"
   },
   "errors": {
-    "joinDenied": "Sinulla ei ole lupaa liittyä tälle kanavalle.",
+    "joinDenied": "Sinulla ei ole oikeutta liittyä tälle kanavalle.",
     "joinFailed": "Kanavalle liittyminen epäonnistui. Yritä uudelleen.",
     "notConnected": "Ei yhteyttä palvelimeen.",
     "moveFailed": "Henkilön siirtäminen epäonnistui."
@@ -118,7 +118,7 @@
     "busy": "Henkilöitä siirretään jo…"
   },
   "drag": {
-    "into": "Siirrä kanavaan {{channel}}",
+    "into": "Siirrä kanavan {{channel}} alle",
     "above": "Sijoita kanavan {{channel}} yläpuolelle",
     "below": "Sijoita kanavan {{channel}} alapuolelle",
     "self": "Ei voi siirtää itsensä sisään",
@@ -133,6 +133,6 @@
     "pathTo": "uusi sijainti:",
     "confirm": "Siirrä",
     "failedTitle": "Kanavaa {{channel}} ei voitu siirtää",
-    "refusedParent": "Sinulla ei ole oikeutta siirtää kanavia kanavaan {{channel}}."
+    "refusedParent": "Sinulla ei ole oikeutta siirtää kanavia kanavan {{channel}} alle."
   }
 }

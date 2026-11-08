@@ -1,23 +1,23 @@
 {
-  "title": "Data tal-plugins permezz tar-relay",
+  "title": "Dejta tal-plugins permezz tar-relay",
   "switchLabel": "Ħalli l-plugins jużaw ir-relay ta' server",
-  "switchText": "Il-plugins li tippermetti jistgħu jibagħtu data akbar (mozzjonijiet tal-logħob, tpinġijiet) aktar malajr permezz tar-relay tal-komunità tas-server. Ikkriptat minn tarf sa tarf: ir-relay ma jistax jaqrah. Mingħajr relay jaqgħu lura fuq il-konnessjoni Mumble l-aktar bil-mod.",
+  "switchText": "Il-plugins li tippermetti jistgħu jibagħtu dejta akbar (mossi fil-logħob, tpinġijiet) aktar malajr permezz tar-relay tal-komunità tas-server. Ikkriptat minn tarf sa tarf: ir-relay ma jistax jaqrah. Mingħajr relay jużaw il-konnessjoni Mumble, li hija aktar bil-mod.",
   "servers": "Is-servers tiegħek",
-  "serverAllows": "{{server}} · ir-relay jippermetti data tal-plugins",
+  "serverAllows": "{{server}} · ir-relay jippermetti dejta tal-plugins",
   "serverAllowsRate": "sa {{rate}} kbit/s għal kull plugin",
-  "serverDenies": "{{server}} · ir-relay ma jippermettix data tal-plugins",
+  "serverDenies": "{{server}} · ir-relay ma jippermettix dejta tal-plugins",
   "serverNone": "{{server}} · l-ebda relay",
   "mumbleOnly": "Konnessjoni Mumble biss",
-  "plugins": "Plugins permessi li jużawh",
+  "plugins": "Plugins li jistgħu jużawh",
   "pluginUsed": "Mhux uffiċjali · {{size}} f'din is-sessjoni",
   "pluginUsedOfficial": "Uffiċjali · {{size}} f'din is-sessjoni",
   "mayUse": "{{plugin}} jista' juża r-relay",
-  "officialNone": "Uffiċjali · ma jitlobx data tar-relay",
-  "noPlugins": "L-ebda plugin ma jitlob data tar-relay.",
+  "officialNone": "Uffiċjali · ma jitlobx dejta tar-relay",
+  "noPlugins": "L-ebda plugin ma jitlob dejta tar-relay.",
   "sounds": {
     "title": "Ħsejjes tal-plugins",
     "volume": "Volum tal-ħsejjes tal-plugins",
-    "mute": "Skuta l-ħsejjes tal-plugins",
+    "mute": "Sikket il-ħsejjes tal-plugins",
     "text": "Ħsejjes qosra li jiġu mal-plugins. Il-volum u s-skiet japplikaw għall-plugins kollha."
   }
 }

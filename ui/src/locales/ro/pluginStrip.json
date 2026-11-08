@@ -3,5 +3,5 @@
   "list": "Panouri de pluginuri",
   "expand": "Extinde {{name}}",
   "close": "Închide",
-  "unsupported": "Acest server nu acceptă funcțiile comune ale pluginurilor"
+  "unsupported": "Acest server nu acceptă funcțiile partajate ale pluginurilor"
 }

@@ -13,7 +13,7 @@
   "startedByYou": "Te indítottad · {{count}} résztvevő a játékban",
   "pluginBy": "bővítmény: {{author}}",
   "connection": {
-    "relay": "Továbbító · végpontok közötti titkosítással",
+    "relay": "Átjátszó · végpontok közötti titkosítással",
     "mumble": "Mumble-kapcsolat · lassabb"
   },
   "controlsLabel": "{{plugin}} vezérlői",
@@ -29,8 +29,8 @@
   "activityStarted": "{{name}} elindította: {{plugin}}",
   "activityPlaying": "{{name}} ezzel játszik: {{plugin}}",
   "activitiesLabel": "Bővítménytevékenységek",
-  "noRelayTitle": "Ezen a szerveren nincs továbbító a bővítményadatokhoz.",
-  "noRelayText": "A(z) {{server}} továbbítója nem engedi a bővítményadatokat, ezért a(z) {{plugin}} a lassabb Mumble-kapcsolatot használja: a lépések késhetnek, a nagy táblák pedig ki vannak kapcsolva.",
+  "noRelayTitle": "Ezen a szerveren nincs átjátszó a bővítményadatokhoz.",
+  "noRelayText": "A(z) {{server}} szerver átjátszója nem engedi a bővítményadatokat, ezért a(z) {{plugin}} a lassabb Mumble-kapcsolatot használja: a lépések késhetnek, a nagy táblák pedig ki vannak kapcsolva.",
   "noRelayDetails": "Részletek",
   "tooMany": "Túl sok tevékenység ezen a csatornán",
   "full": "Ez a tevékenység betelt",
@@ -49,10 +49,10 @@
     "unmute": "{{plugin}} hangjainak visszakapcsolása"
   },
   "sidePanel": {
-    "label": "{{plugin}} oldalsó panelje",
+    "label": "{{plugin}} oldalpanelje",
     "options": "{{plugin}} beállításai",
-    "close": "{{plugin}} oldalsó panelének bezárása",
-    "resize": "{{plugin}} oldalsó panelének átméretezése"
+    "close": "{{plugin}} oldalpanelének bezárása",
+    "resize": "{{plugin}} oldalpanelének átméretezése"
   },
   "dialog": {
     "close": "{{plugin}} bezárása",

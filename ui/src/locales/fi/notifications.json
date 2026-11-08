@@ -9,7 +9,7 @@
   "groupedPrivate_other": "{{count}} uutta viestiä käyttäjältä {{name}}",
   "image": "Lähetti kuvan",
   "open": "Avaa chat",
-  "close": "Hylkää ilmoitus",
+  "close": "Ohita ilmoitus",
   "mentionLine": "{{sender}} mainitsi sinut: {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
@@ -24,7 +24,7 @@
       "mentions": "Maininnat",
       "requests": "Pyynnöt",
       "invites": "Kutsut",
-      "plugins": "Laajennukset"
+      "plugins": "Lisäosat"
     },
     "empty": "Kaikki on luettu.",
     "unread": "Lukemattomat",
@@ -71,8 +71,8 @@
       "whatsNew": "Uutta"
     },
     "relay": {
-      "title": "Välitin vaihtui palvelimella {{server}}",
-      "body": "Näytön ja tiedostojen jakaminen on tauolla, kunnes luotat uuteen välittimeen.",
+      "title": "Välityspalvelin vaihtui palvelimella {{server}}",
+      "body": "Näytön ja tiedostojen jakaminen on tauolla, kunnes luotat uuteen välityspalvelimeen.",
       "decision": "Vaatii päätöksesi"
     }
   }

@@ -45,11 +45,11 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Questo aggiornamento vuole comunicare con {{count}} nuovo sito web.",
     "wantsNew_many": "Questo aggiornamento vuole comunicare con {{count}} nuovi siti web.",
     "wantsNew_other": "Questo aggiornamento vuole comunicare con {{count}} nuovi siti web.",
     "staysOn": "{{plugin}} resta sulla {{version}} finché non decidi.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} aggiornamento in attesa. Gli aggiornamenti che aggiungono permessi o siti web non vengono mai installati automaticamente.",
     "banner_many": "{{count}} aggiornamenti in attesa. Gli aggiornamenti che aggiungono permessi o siti web non vengono mai installati automaticamente.",
     "banner_other": "{{count}} aggiornamenti in attesa. Gli aggiornamenti che aggiungono permessi o siti web non vengono mai installati automaticamente.",
     "noOther": "Nessun altro permesso cambia.",

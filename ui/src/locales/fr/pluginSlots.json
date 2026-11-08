@@ -1,7 +1,7 @@
 {
   "tree": {
-    "empty": "Ce plugin n'affiche encore rien ici.",
-    "actionFailed": "Le plugin n'a pas pu traiter cela. Veuillez réessayer."
+    "empty": "Ce plugin n’affiche encore rien ici.",
+    "actionFailed": "Le plugin n’a pas pu traiter cela. Réessaie."
   },
   "progress": {
     "working": "En cours"

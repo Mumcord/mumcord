@@ -2,7 +2,7 @@
   "title": "Neem je Mumble-instellingen mee",
   "intro": "We hebben de officiële Mumble-client op deze computer gevonden. Kies wat je wilt kopiëren. Er wordt niets aangepast in Mumble en er verlaat niets je computer.",
   "optional": "{{progress}} · optioneel",
-  "listLabel": "Wat uit Mumble te kopiëren",
+  "listLabel": "Wat je uit Mumble wilt kopiëren",
   "favourites": {
     "title": "Serverfavorieten",
     "found_one": "{{count}} gevonden",
@@ -41,7 +41,7 @@
   },
   "ptt": {
     "title": "Push-to-talk-toets",
-    "modifierOnly": "De toets in Mumble is alleen een modifier-toets, die Mumcord niet kan gebruiken. Je kunt later een toets kiezen.",
+    "modifierOnly": "De toets in Mumble is een losse modificatietoets (zoals Ctrl of Shift), die Mumcord niet kan gebruiken. Je kunt later een toets kiezen.",
     "tooManyKeys": "De sneltoets in Mumble bestaat uit meer dan één toets, wat Mumcord niet kan gebruiken. Je kunt later een toets kiezen.",
     "unknown": "De sneltoets in Mumble gebruikt een toets of apparaat dat Mumcord niet kent. Je kunt later een toets kiezen."
   },

@@ -3,23 +3,23 @@
   "addVideo": "Pridėti vaizdo įrašą",
   "beta": "Beta",
   "join": "Prisijungti prie bendros peržiūros",
-  "leave": "Palikti peržiūrą",
+  "leave": "Išeiti iš peržiūros",
   "watching": "{{count}} žiūri: {{names}}",
   "player": "Bendros peržiūros grotuvas",
   "watchTogether": "Žiūrėti kartu",
   "watchTogetherFor": "Žiūrėti {{title}} kartu su šiuo kanalu",
-  "embedsOff": "Įjunkite įterptuosius grotuvus privatumo nustatymuose, kad galėtumėte žiūrėti kartu",
-  "embedsOffJoin": "Vyksta bendras žiūrėjimas: norėdami prisijungti, įjunkite įterptuosius grotuvus",
+  "embedsOff": "Įjunk įterptuosius grotuvus privatumo nustatymuose, kad galėtum žiūrėti kartu",
+  "embedsOffJoin": "Vyksta bendra peržiūra: įjunk įterptuosius grotuvus, kad prisijungtum",
   "openPrivacy": "Atidaryti privatumo nustatymus",
   "cantPlay": "Grotuvas čia negali veikti.",
   "openInBrowser": "Atidaryti naršyklėje",
   "startFailed": "Nepavyko pradėti bendros peržiūros.",
   "joinFailed": "Nepavyko prisijungti prie bendros peržiūros.",
-  "leaveFailed": "Nepavyko palikti bendros peržiūros.",
+  "leaveFailed": "Nepavyko išeiti iš bendros peržiūros.",
   "commandFailed": "Bendra peržiūra negavo tavo pakeitimo.",
   "someone": "Kažkas",
   "other": {
-    "play": "{{name}} paspaudė leisti",
+    "play": "{{name}} paleido",
     "pause": "{{name}} pristabdė",
     "seek": "{{name}} peršoko į priekį",
     "skipped": "{{name}} praleido"
@@ -45,12 +45,12 @@
     "move": "Perkelti {{title}}",
     "upNext": "Toliau: {{title}}",
     "upNextNone": "Toliau nieko nėra",
-    "paste": "Įklijuokite YouTube nuorodą",
+    "paste": "Įklijuok YouTube nuorodą",
     "notALink": "Tai nėra YouTube nuoroda",
     "more": "Daugiau: {{title}}",
-    "playNext": "Groti kitą",
+    "playNext": "Leisti kitą",
     "removeShort": "Pašalinti iš grojaraščio",
-    "emptyPaste": "Toliau nieko nėra. Įklijuokite „YouTube“ nuorodą aukščiau."
+    "emptyPaste": "Toliau nieko nėra. Įklijuok YouTube nuorodą aukščiau."
   },
   "widget": {
     "play": "Leisti",
@@ -61,14 +61,14 @@
     "generic": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav (GStreamer libav papildinį) savo sistemos paketų tvarkykle.",
     "rpmFusion": "Fedora sistemoje gst-libav gaunamas iš RPM Fusion saugyklos; pirmiausia įjunk RPM Fusion."
   },
-  "keys": "Tarpas groti/pristabdyti · ← → peršokti 5 s · M nutildyti · F visas ekranas",
-  "headerPill": "Žiūrėkite kartu · {{count}}",
+  "keys": "Tarpas leisti/pristabdyti · ← → peršokti 5 s · M nutildyti · F visas ekranas",
+  "headerPill": "Žiūrėti kartu · {{count}}",
   "miniPlayer": "Mini grotuvas",
   "tabs": {
     "playlist": "Grojaraštis"
   },
-  "upNextHeading": "Toliau · vilkite, kad pakeistumėte tvarką",
+  "upNextHeading": "Toliau · vilk, kad pakeistum tvarką",
   "whoIsWatching": "Kas žiūri",
   "pasteKey": "Ctrl V",
-  "you": "Jūs"
+  "you": "Tu"
 }

@@ -19,11 +19,11 @@
     "title": "Ustawienia"
   },
   "wizard": {
-    "title": "Witaj w Mumcord"
+    "title": "Witaj w Mumcordzie"
   },
   "placeholder": "Wkrótce",
   "startupError": {
-    "title": "Nie udało się uruchomić Mumcord",
-    "description": "Aplikacja nie mogła wczytać Twoich ustawień. Spróbuj ponownie; jeśli to nie pomoże, uruchom Mumcord ponownie."
+    "title": "Nie udało się uruchomić Mumcorda",
+    "description": "Aplikacja nie mogła wczytać twoich ustawień. Spróbuj ponownie; jeśli to nie pomoże, uruchom Mumcorda ponownie."
   }
 }

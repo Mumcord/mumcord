@@ -1,7 +1,7 @@
 {
   "tree": {
     "empty": "Ovaj dodatak ovdje još ništa ne prikazuje.",
-    "actionFailed": "Dodatak to nije mogao obraditi. Pokušajte ponovno."
+    "actionFailed": "Dodatak to nije mogao obraditi. Pokušaj ponovno."
   },
   "progress": {
     "working": "U tijeku"

@@ -83,7 +83,7 @@
   },
   "mic": {
     "input": "Microfone",
-    "output": "Colunas ou auscultadores",
+    "output": "Altifalantes ou auscultadores",
     "systemDefault": "Predefinição do sistema",
     "defaultVia": "Predefinição do sistema ({{backend}})",
     "level": "Nível do microfone",
@@ -120,7 +120,7 @@
       "title": "Equilibrado",
       "subtitle": "Entre privacidade e conforto",
       "p1": "Só amigos e pessoas do teu canal podem enviar-te mensagens",
-      "p2": "Ligação direta, com um relay como alternativa",
+      "p2": "Ligação direta, com um retransmissor como alternativa",
       "p3": "Pré-visualizações de ligações e imagens em tamanho real estão ativadas",
       "p4": "O que jogas e o que ouves permanece privado"
     },
@@ -128,7 +128,7 @@
       "title": "Privacidade máxima",
       "subtitle": "Partilhar o mínimo possível",
       "p1": "Só amigos podem enviar-te mensagens, sem exceções",
-      "p2": "O teu IP está oculto; tudo passa pelo relay",
+      "p2": "O teu IP está oculto; tudo passa pelo retransmissor",
       "p3": "Sem conteúdo externo, sem sincronização do histórico, sem partilha",
       "p4": "As atualizações só te notificam; nada é partilhado sobre o que fazes"
     },
@@ -222,10 +222,10 @@
   },
   "rerun": {
     "title": "Assistente de configuração",
-    "note": "Está a repetir a configuração. A sua identidade não é alterada.",
+    "note": "Estás a repetir a configuração. A tua identidade não é alterada.",
     "manageIdentities": "Gerir identidades",
     "discardTitle": "Descartar as alterações?",
-    "discardBody": "Nada é guardado antes de terminar. Se cancelar agora, tudo fica como está.",
+    "discardBody": "Nada é guardado antes de terminares. Se cancelares agora, tudo fica como está.",
     "discardKeep": "Continuar a editar",
     "discardConfirm": "Descartar alterações"
   },

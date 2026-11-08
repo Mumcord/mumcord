@@ -8,19 +8,19 @@
     "denied": "Poslužitelj ti ne dopušta praćenje ovog kanala.",
     "limit": "Na ovom poslužitelju ne možeš pratiti više kanala. Najprije prestani pratiti neki drugi kanal.",
     "tooOld": "Ovaj poslužitelj je prestar za praćenje kanala (potrebna je verzija 1.4 ili novija).",
-    "notConnected": "Nisi povezan s poslužiteljem.",
+    "notConnected": "Nisi povezan/a s poslužiteljem.",
     "generic": "Praćenje ovog kanala nije uspjelo. Pokušaj ponovno."
   },
   "dm": {
     "unknown": "Nepoznata osoba"
   },
   "notify": {
-    "channel": "{{name}} u {{channel}}: {{text}}",
+    "channel": "{{name}} u kanalu {{channel}}: {{text}}",
     "private": "{{name}} (privatno): {{text}}",
     "more_one": "Još {{count}} nova poruka",
     "more_few": "Još {{count}} nove poruke",
     "more_other": "Još {{count}} novih poruka",
-    "channelOn": "{{name}} u {{channel}} na {{server}}: {{text}}",
+    "channelOn": "{{name}} u kanalu {{channel}} na poslužitelju {{server}}: {{text}}",
     "privateOn": "{{name}} (privatno, {{server}}): {{text}}"
   },
   "history": {
@@ -36,8 +36,8 @@
     "unfollow": "Prestani pratiti {{channel}}"
   },
   "all": {
-    "menu": "Opcije poslužitelja za {{server}}",
-    "menuLabel": "Opcije poslužitelja",
+    "menu": "Mogućnosti poslužitelja {{server}}",
+    "menuLabel": "Mogućnosti poslužitelja",
     "follow": "Prati sve kanale",
     "unfollow": "Prestani pratiti sve kanale",
     "working": "Praćenje kanala…",
@@ -55,9 +55,9 @@
     "dismiss": "Odbaci",
     "unfollowFailed": "Prestanak praćenja svih kanala nije uspio. Pokušaj ponovno."
   },
-  "mention": "sadrži spominjanje tebe",
+  "mention": "spominje te",
   "header": {
     "follow": "Prati kanal",
-    "unfollow": "Pratiš, klikni za prestanak"
+    "unfollow": "Pratiš – klikni za prestanak praćenja"
   }
 }

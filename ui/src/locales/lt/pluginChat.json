@@ -1,6 +1,6 @@
 {
   "card": {
-    "label": "Kortelė iš {{plugin}}",
+    "label": "{{plugin}} kortelė",
     "showMore": "Rodyti daugiau",
     "showLess": "Rodyti mažiau"
   },
@@ -14,6 +14,6 @@
     "group": "Papildinių komandos",
     "keys": "↑↓ rinktis · Tab užbaigti · Enter vykdyti · Esc uždaryti",
     "unavailable": "Ši komanda šiuo metu nepasiekiama.",
-    "failed": "Komandos įvykdyti nepavyko. Bandykite dar kartą."
+    "failed": "Komandos įvykdyti nepavyko. Bandyk dar kartą."
   }
 }

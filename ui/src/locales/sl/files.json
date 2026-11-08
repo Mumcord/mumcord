@@ -2,7 +2,7 @@
   "composer": {
     "attach": "Deli datoteke",
     "attachLabel": "Deli datoteke v tem kanalu",
-    "dropTitle": "Spusti za skupno rabo z #{{channel}}",
+    "dropTitle": "Spusti, da deliš v #{{channel}}",
     "dropChoiceTitle": "Nekatere od teh so slike. Kaj naj se zgodi z njimi?",
     "sendAsImage": "Pošlji kot sliko",
     "shareAsFile": "Deli kot datoteko",
@@ -49,7 +49,7 @@
     "checksumLabel": "Nadzorna vsota SHA-256 {{hash}}",
     "copy": "Kopiraj",
     "copied": "Kopirano",
-    "available": "Na voljo, dokler je {{sender}} na spletu · preneha {{when}}",
+    "available": "Na voljo, dokler je {{sender}} povezan · poteče {{when}}",
     "download": "Prenesi",
     "cancel": "Prekliči",
     "retry": "Poskusi znova",
@@ -91,7 +91,7 @@
       "unavailable": "ni na voljo"
     },
     "unavailable": {
-      "offline": "{{sender}} je šel brez povezave. Datoteka ni več na voljo.",
+      "offline": "{{sender}} ni več povezan. Datoteka ni več na voljo.",
       "ended": "To deljenje se je končalo. Deljenje se konča po 24 urah.",
       "askAgain": "Prosi uporabnika {{sender}}, naj jo deli znova."
     },
@@ -114,13 +114,13 @@
     "waiting_two": "{{count}} čakata",
     "waiting_few": "{{count}} čakajo",
     "waiting_other": "{{count}} jih čaka",
-    "sharing": "Deljeno, dokler si na spletu · preneha {{when}}",
+    "sharing": "Deljeno, dokler si povezan · poteče {{when}}",
     "stop": "Prenehaj deliti",
     "stopFailed": "Deljenja ni bilo mogoče ustaviti: {{reason}}. Datoteka je še vedno deljena.",
     "ended": "Deljenje končano",
-    "endedStopped": "Deljenje je bilo ustavljeno",
+    "endedStopped": "Deljenje si ustavil",
     "endedExpired": "24 ur je minilo",
-    "endedLeft": "Strežnik je bil zapuščen",
+    "endedLeft": "Zapustil si strežnik",
     "endedChanged": "Datoteka se je na disku spremenila, zato se je deljenje ustavilo"
   },
   "dialog": {
@@ -145,7 +145,7 @@
     "title": "Deljenje datotek",
     "new": "Novo",
     "receive": "Prejemaj datoteke od drugih uporabnikov Mumcorda",
-    "receiveHint": "Datoteke prihajajo od pošiljatelja, dokler je ta na spletu. Blokirane osebe ti ne morejo pošiljati datotek.",
+    "receiveHint": "Datoteke prihajajo od pošiljatelja, dokler je ta povezan. Blokirane osebe ti ne morejo pošiljati datotek.",
     "maxSize": "Največja velikost datoteke",
     "maxSizeHint": "Deliti je mogoče datoteke do 2 GB. Privzeto 1 GB. Nič večjega ni mogoče.",
     "size100mb": "100 MB",

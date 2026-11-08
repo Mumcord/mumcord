@@ -9,7 +9,7 @@
   "runsCode": "{{author}} által készített kódot futtat. A Mumcord nem ellenőrizte.",
   "sealedFrame": "Nem látja a Mumcordot, a fájljaidat, a mikrofonodat, a kamerádat és a vágólapodat. Csak itt jelenik meg: {{places}}.",
   "ownCodeAndWebsites": "Ez a bővítmény saját kódot hoz magával, és weboldalakkal kommunikál.",
-  "trustRepository": "A(z) {{repository}} egy általad hozzáadott tároló. Csak akkor telepítsd, ha megbízol bennük.",
+  "trustRepository": "A(z) {{repository}} egy általad hozzáadott tároló. Csak akkor telepíts belőle, ha megbízol benne.",
   "understand": "Megértettem",
   "trustAuthor": "Megértem a kockázatot, és megbízom a(z) {{plugin}} szerzőjében",
   "understandUpdate": "Megértettem, hogy nőtt a kockázat, és továbbra is megbízom a szerzőben",
@@ -20,7 +20,7 @@
   "installAnyway": "Telepítés mindenképp",
   "updateAnyway": "Frissítés mindenképp",
   "highRiskTitle": "Ez egy nagy kockázatú bővítmény",
-  "highRiskText": "Saját weboldalakat nyithat meg, és {{count}} olyan weboldallal kommunikálhat, amelyeket nem tudsz ellenőrizni. A Mumcord nem látja, mit küldenek ezek a weboldalak a bővítménynek, és mit küld nekik a bővítmény. Olyan valaki tette közzé, aki új ezen a számítógépen. Csak akkor telepítsd, ha ismered és megbízol a szerzőjében.",
+  "highRiskText": "Saját weboldalakat nyithat meg, és {{count}} olyan weboldallal kommunikálhat, amelyeket nem tudsz ellenőrizni. A Mumcord nem látja, mit küldenek ezek a weboldalak a bővítménynek, és mit küld nekik a bővítmény. Olyan valaki tette közzé, aki új ezen a számítógépen. Csak akkor telepítsd, ha ismered a szerzőjét, és megbízol benne.",
   "highRiskWouldBecome": "Ez a frissítés nagy kockázatúvá tenné a bővítményt",
   "highRiskNotAutomatic": "Nem települ automatikusan. A(z) {{version}} verzión maradva a jelenlegi pontszám megmarad; a verziót a Telepítve fülön rögzítheted.",
   "sameAuthorKey": "ugyanaz a szerzői kulcs",
@@ -38,6 +38,6 @@
     "webPages": "Saját weboldalakat nyithat meg.",
     "cantSee": "A Mumcord nem látja, mit küldenek ezek a weboldalak a bővítménynek, és mit küld nekik a bővítmény.",
     "newAuthor": "Olyan valaki tette közzé, aki új ezen a számítógépen.",
-    "trust": "Csak akkor telepítsd, ha ismered és megbízol a szerzőjében."
+    "trust": "Csak akkor telepítsd, ha ismered a szerzőjét, és megbízol benne."
   }
 }

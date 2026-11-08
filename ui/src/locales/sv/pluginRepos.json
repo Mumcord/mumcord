@@ -1,5 +1,5 @@
 {
-  "intro": "Förråd är extra pluginlistor som andra människor driver. Mumcord granskar inte deras plugin. Lägg bara till förråd du litar på.",
+  "intro": "Förråd är extra tilläggslistor som andra personer driver. Mumcord granskar inte deras tillägg. Lägg bara till förråd du litar på.",
   "add": {
     "button": "Lägg till förråd",
     "title": "Lägg till förråd",
@@ -9,13 +9,13 @@
     "check": "Kontrollera förrådet",
     "found": "Det här hittade vi",
     "confirm": "Lägg till förråd",
-    "subtitle": "Lägg bara till arkiv från personer du litar på.",
+    "subtitle": "Lägg bara till förråd från personer du litar på.",
     "signatureValid": "signaturen är giltig",
     "contactLine": "kontakt: {{contact}}",
     "pluginsLine": "Tillägg: {{number}}",
     "signingKey": "Signeringsnyckel",
-    "warningTitle": "Inofficiellt arkiv",
-    "warningBody": "Mumcord granskar inte dessa tillägg. Nyckeln kommer ihåg: om den ändras pausas arkivet tills du har kontrollerat det. När du bläddrar visas din IP-adress för värden. Tillägg med officiella namn hämtas aldrig härifrån."
+    "warningTitle": "Inofficiellt förråd",
+    "warningBody": "Mumcord granskar inte dessa tillägg. Nyckeln sparas: om den någon gång ändras pausas förrådet tills du har kontrollerat det. När du bläddrar i det ser värden din IP-adress. Tillägg med officiella namn hämtas aldrig härifrån."
   },
   "limit": "Du kan lägga till upp till {{max}} förråd.",
   "limitReached": "Gränsen på {{max}} förråd är nådd.",
@@ -28,27 +28,27 @@
   "fingerprintLine": "Nyckelns fingeravtryck: {{fingerprint}}",
   "neverChecked": "Inte kontrollerat ännu",
   "lastChecked": "Senast kontrollerat: {{when}}",
-  "installedCount": "Installerade plugin: {{number}}",
+  "installedCount": "Installerade tillägg: {{number}}",
   "toggle": "Använd {{name}}",
   "remove": {
     "button": "Ta bort",
     "label": "Ta bort {{name}}",
     "title": "Ta bort {{name}}?",
-    "message": "Förrådet tas bort och dess plugin stängs av. De ligger kvar installerade med sina data men får inga fler uppdateringar.",
+    "message": "Förrådet tas bort och dess tillägg stängs av. De ligger kvar installerade med sina data men får inga fler uppdateringar.",
     "confirm": "Ta bort"
   },
   "keyChange": {
     "title": "{{name}} har bytt nyckel",
-    "message": "Det här förrådet signerar nu sin pluginlista med en annan nyckel. Det förblir pausat tills du bestämmer dig. Lita bara på den nya nyckeln om ägaren har meddelat ändringen.",
+    "message": "Det här förrådet signerar nu sin tilläggslista med en annan nyckel. Det förblir pausat tills du bestämmer dig. Lita bara på den nya nyckeln om ägaren har meddelat ändringen.",
     "oldKey": "Nyckel du litat på hittills",
     "newKey": "Ny nyckel",
     "keepPaused": "Behåll pausat",
-    "trust": "Lita på nya nyckeln",
+    "trust": "Lita på den nya nyckeln",
     "review": "Granska nyckelbytet"
   },
   "mirror": {
     "title": "Avancerat",
-    "label": "Spegel för den officiella pluginlistan (valfritt)",
+    "label": "Spegel för den officiella tilläggslistan (valfritt)",
     "hint": "Ändra bara detta om du fått en spegeladress. Spegeln måste leverera samma signerade filer; Mumcord kontrollerar ändå varje signatur.",
     "save": "Spara",
     "reset": "Använd standard"

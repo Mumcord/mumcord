@@ -5,7 +5,7 @@
     "activity": "Attività"
   },
   "you": "Tu",
-  "selfName": "la tua",
+  "selfName": "tu",
   "someone": "qualcuno",
   "verb": {
     "connected": "si è connesso",
@@ -13,28 +13,28 @@
     "moved": "ha cambiato canale",
     "screenShareStarted": "ha iniziato la condivisione schermo",
     "screenShareStopped": "ha interrotto la condivisione schermo",
-    "watchPartyStarted": "ha avviato un watch party",
-    "watchPartyStopped": "ha interrotto il watch party",
+    "watchPartyStarted": "ha avviato una watch party",
+    "watchPartyStopped": "ha interrotto la watch party",
     "pluginActivityStarted": "ha avviato {{plugin}}",
     "pluginActivityStopped": "ha interrotto {{plugin}}",
     "pluginEvent": "«{{text}}»"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",
-  "live": "live",
+  "live": "in diretta",
   "watch": "Guarda",
   "join": "Entra",
   "today": "Oggi",
   "yesterday": "Ieri",
   "empty": "Ancora nessuna attività.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} condivisione schermo",
-    "watchParty": "{{action}} {{name}} watch party",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
-    "pluginEvent": "{{action}} {{plugin}}"
+    "screenShare": "{{action}}: condivisione schermo ({{name}})",
+    "watchParty": "{{action}}: watch party ({{name}})",
+    "pluginActivity": "{{action}}: {{plugin}} ({{name}})",
+    "pluginEvent": "{{action}}: {{plugin}}"
   },
-  "joinPartyFailed": "Impossibile entrare nel watch party.",
-  "joinActivityFailed": "Impossibile entrare nell’attività del plugin.",
+  "joinPartyFailed": "Impossibile entrare nella watch party.",
+  "joinActivityFailed": "Impossibile entrare nell'attività del plugin.",
   "earlier": "In precedenza",
   "earlierLabel": "In precedenza, prima di questa sessione",
   "notice": {

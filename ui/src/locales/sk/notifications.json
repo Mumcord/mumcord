@@ -52,7 +52,7 @@
       "watchParty": "{{name}} ťa pozval(a) na spoločné sledovanie",
       "screenShare": "{{name}} zdieľa obrazovku",
       "card": "{{name}} ti poslal(a) kartu",
-      "theme": "{{name}} s tebou zdieľal(a) tému"
+      "theme": "{{name}} s tebou zdieľal(a) motív"
     },
     "connection": "{{server}} je nedostupný",
     "type": {
@@ -71,16 +71,16 @@
     "dismiss": "Zavrieť",
     "dismissItem": "Zavrieť: {{title}}",
     "failed": "Nepodarilo sa. Skús to znova.",
-    "block": "Blokovať",
+    "block": "Zablokovať",
     "update": {
       "title": "Mumcord {{version}} je pripravený",
-      "body": "Reštartujte na aktualizáciu",
+      "body": "Na aktualizáciu reštartuj aplikáciu",
       "restart": "Reštartovať a aktualizovať",
       "whatsNew": "Čo je nové"
     },
     "relay": {
-      "title": "Relay na {{server}} sa zmenil",
-      "body": "Zdieľanie obrazovky a súborov je pozastavené, kým novému relayu nebudeš dôverovať.",
+      "title": "Relay na serveri {{server}} sa zmenil",
+      "body": "Zdieľanie obrazovky a súborov je pozastavené, kým nezačneš dôverovať novému relayu.",
       "decision": "Vyžaduje tvoje rozhodnutie"
     }
   }

@@ -1,23 +1,23 @@
 {
-  "title": "Data doplňků přes relay",
-  "switchLabel": "Nechat doplňky používat relay serveru",
-  "switchText": "Doplňky, které povolíš, mohou rychleji posílat větší data (tahy ve hře, kresby) přes relay komunity serveru. Koncově šifrováno: relay to nepřečte. Bez relay se vrátí k pomalejšímu spojení Mumble.",
+  "title": "Data pluginů přes relay",
+  "switchLabel": "Povolit pluginům relay serveru",
+  "switchText": "Pluginy, které povolíš, mohou rychleji posílat větší data (tahy ve hře, kresby) přes relay komunity serveru. Koncově šifrováno: relay je nepřečte. Bez relay se vrátí k pomalejšímu spojení Mumble.",
   "servers": "Tvoje servery",
-  "serverAllows": "{{server}} · relay povoluje data doplňků",
-  "serverAllowsRate": "až {{rate}} kbit/s na doplněk",
-  "serverDenies": "{{server}} · relay nepovoluje data doplňků",
+  "serverAllows": "{{server}} · relay povoluje data pluginů",
+  "serverAllowsRate": "až {{rate}} kbit/s na plugin",
+  "serverDenies": "{{server}} · relay nepovoluje data pluginů",
   "serverNone": "{{server}} · žádný relay",
   "mumbleOnly": "Jen spojení Mumble",
-  "plugins": "Doplňky s povolením k použití",
+  "plugins": "Pluginy, které ho smí používat",
   "pluginUsed": "Neoficiální · {{size}} v této relaci",
   "pluginUsedOfficial": "Oficiální · {{size}} v této relaci",
   "mayUse": "{{plugin}} smí používat relay",
   "officialNone": "Oficiální · nežádá o data přes relay",
-  "noPlugins": "Žádný doplněk nežádá o data přes relay.",
+  "noPlugins": "Žádný plugin nežádá o data přes relay.",
   "sounds": {
-    "title": "Zvuky doplňků",
-    "volume": "Hlasitost zvuků doplňků",
-    "mute": "Ztlumit zvuky doplňků",
-    "text": "Krátké zvuky dodávané s doplňky. Hlasitost a ztlumení platí pro všechny doplňky."
+    "title": "Zvuky pluginů",
+    "volume": "Hlasitost zvuků pluginů",
+    "mute": "Ztlumit zvuky pluginů",
+    "text": "Krátké zvuky dodávané s pluginy. Hlasitost a ztlumení platí pro všechny pluginy."
   }
 }

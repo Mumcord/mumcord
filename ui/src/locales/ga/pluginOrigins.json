@@ -1,7 +1,7 @@
 {
   "title": "Labhair leis na suíomhanna gréasáin seo",
   "intro": "Ní féidir le {{plugin}} agus a leathanach sonraí a sheoladh ná a fháil ach leis na suíomhanna seo:",
-  "introUpdate": "Ina dhiaidh sin, d'fhéadfadh {{plugin}} agus a leathanach teacht ar:",
+  "introUpdate": "Ina dhiaidh sin, d’fhéadfadh {{plugin}} agus a leathanach teacht ar:",
   "privacy": "Is féidir leis na suíomhanna gréasáin seo do sheoladh IP agus aon rud a sheolann {{plugin}} chucu a fheiceáil.",
   "includesNames": "Is féidir ainmneacha daoine i do chainéal a bheith san áireamh.",
   "listLabel": "Suíomhanna gréasáin",
@@ -12,17 +12,17 @@
   "details": {
     "title": "Suíomhanna gréasáin a labhraíonn sé leo",
     "text": "Ní féidir le {{plugin}} agus a leathanach teacht ach ar na cinn seo. Cheadaigh tú iad ar {{date}}; fanann nuashonrú a chuireann ceann leis le do cheadú.",
-    "lastRequest": "An iarratas deireanach",
+    "lastRequest": "An t-iarratas deireanach",
     "requestsToday": "Iarratais inniu",
-    "requestsTodayValue": "{{count}} (blocáilte: {{blocked}})",
-    "none": "Aon cheann go fóill",
+    "requestsTodayValue": "{{count}} (bactha: {{blocked}})",
+    "none": "Ceann ar bith fós",
     "wherePlace": "Cá dtaispeántar é",
     "places": {
       "stage": "Limistéar na meán",
       "side-panel": "Painéal taoibh",
       "dialog": "Dialóg",
       "panel": "Stiall na mbreiseán",
-      "appMenu": "Roghchlár na bhfeidhmchlár · {{count}} mír",
+      "appMenu": "Roghchlár na nAipeanna · {{count}} mír",
       "chat": "Cártaí comhrá"
     },
     "ownCode": "Cód féin",
@@ -32,7 +32,7 @@
     "relayAsks": "Iarrann sé é a úsáid · socraíonn tú nuair a shuiteálann tú",
     "securityTitle": "Slándáil",
     "relayData": "Sonraí athsheachadáin",
-    "relayOff": "Múchta ·",
+    "relayOff": "As ·",
     "relayOn": "Ar siúl",
     "turnOnInPermissions": "Cuir ar siúl sna ceadanna",
     "tags": {
@@ -41,17 +41,17 @@
       "stage": "Limistéar na meán",
       "sidePanel": "Painéal taoibh",
       "relay": "Sonraí athsheachadáin",
-      "appMenu": "Roghchlár na bhfeidhmchlár"
+      "appMenu": "Roghchlár na nAipeanna"
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
-    "wantsNew_two": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} suíomh gréasáin nua.",
-    "wantsNew_few": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} suíomh gréasáin nua.",
+    "wantsNew_one": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} suíomh gréasáin nua.",
+    "wantsNew_two": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} shuíomh gréasáin nua.",
+    "wantsNew_few": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} shuíomh gréasáin nua.",
     "wantsNew_many": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} suíomh gréasáin nua.",
     "wantsNew_other": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} suíomh gréasáin nua.",
     "staysOn": "Fanann {{plugin}} ar {{version}} go gcinnfidh tú.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "Tá {{count}} nuashonrú ag fanacht leat. Ní shuiteáiltear nuashonruithe a chuireann ceadanna nó suíomhanna gréasáin leis go huathoibríoch riamh.",
     "banner_two": "Tá {{count}} nuashonrú ag fanacht leat. Ní shuiteáiltear nuashonruithe a chuireann ceadanna nó suíomhanna gréasáin leis go huathoibríoch riamh.",
     "banner_few": "Tá {{count}} nuashonrú ag fanacht leat. Ní shuiteáiltear nuashonruithe a chuireann ceadanna nó suíomhanna gréasáin leis go huathoibríoch riamh.",
     "banner_many": "Tá {{count}} nuashonrú ag fanacht leat. Ní shuiteáiltear nuashonruithe a chuireann ceadanna nó suíomhanna gréasáin leis go huathoibríoch riamh.",

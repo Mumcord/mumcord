@@ -2,7 +2,7 @@
   "label": "Aaron, a tippsegéd",
   "greeting": {
     "title": "Szia, Aaron vagyok!",
-    "body": "Axolotl vagyok, és úgy ismerem a Mumcordot, mint a tenyeremet. Jöhet egy gyors körbevezetés? Nagyjából egy percig tart. Ha most nem, a Beállítások → Névjegy → Tippek alatt megtalálsz.",
+    "body": "Axolotl vagyok, és úgy ismerem a Mumcordot, mint a tenyeremet. Jöhet egy gyors bemutató? Nagyjából egy percig tart. Ha most nem, a Beállítások → Névjegy → Tippek alatt megtalálsz.",
     "start": "Mutasd",
     "later": "Most nem"
   },
@@ -10,7 +10,7 @@
   "back": "Vissza",
   "next": "Tovább",
   "done": "Kész",
-  "skip": "Túra kihagyása",
+  "skip": "Bemutató kihagyása",
   "close": "Tippek bezárása",
   "tips": {
     "servers": {
@@ -19,11 +19,11 @@
     },
     "channels": {
       "title": "Csatornák",
-      "body": "Dupla kattintással belépsz egy csatornába, és beszélhetsz. Egy kattintás belépés nélkül mutatja meg a csatorna chatjét, a Követés gombbal pedig mindenről értesülsz."
+      "body": "Dupla kattintással csatlakozol egy csatornához, és beszélhetsz. Egy kattintás csatlakozás nélkül mutatja meg a csatorna csevegését, a Követés gombbal pedig mindenről értesülsz."
     },
     "talk": {
       "title": "Így beszélsz",
-      "body": "Push-to-talk vagy hangaktiválás? Válassz a Beállítások → Hang és audió menüben, vagy nyisd meg a Hangbeállítások… lehetőséget a mikrofon melletti kis nyíllal. A push-to-talk egérgombokkal is működik."
+      "body": "Push-to-talk vagy hangaktiválás? Válassz a Beállítások → Beszéd és hang részben, vagy nyisd meg a Hangbeállítások… lehetőséget a mikrofon melletti kis nyíllal. A Push-to-talk egérgombokkal is működik."
     },
     "panel": {
       "title": "A felhasználói paneled",
@@ -34,7 +34,7 @@
       "body": "A {{key}} lenyomásával személyeket és csatornákat találsz, nagy szervereken is."
     },
     "chat": {
-      "title": "Chat",
+      "title": "Csevegés",
       "body": "Válaszolj egy üzenetre, idézd, említs meg másokat a @ jellel, és ossz meg képeket és fájlokat. A formázógombok gépelés közben jelennek meg."
     },
     "apps": {

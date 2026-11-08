@@ -8,9 +8,9 @@
   "unread_other": "{{count}} messaġġ mhux moqri",
   "errors": {
     "denied": "Is-server ma jħallikx issegwi dan il-kanal.",
-    "limit": "Ma tistax issegwi aktar kanali fuq dan is-server. Ieqaf segwi kanal ieħor l-ewwel.",
+    "limit": "Ma tistax issegwi aktar kanali fuq dan is-server. L-ewwel ieqaf milli ssegwi kanal ieħor.",
     "tooOld": "Dan is-server huwa qadim wisq għas-segwiment tal-kanali (meħtieġa verżjoni 1.4 jew aktar ġdida).",
-    "notConnected": "Mhux konness mas-server.",
+    "notConnected": "M'intix konness mas-server.",
     "generic": "Is-segwiment ta' dan il-kanal ma ħadimx. Erġa' pprova."
   },
   "dm": {
@@ -37,19 +37,19 @@
   },
   "star": {
     "follow": "Segwi {{channel}}",
-    "unfollow": "Ieqaf segwi {{channel}}"
+    "unfollow": "Ieqaf milli ssegwi {{channel}}"
   },
   "all": {
     "menu": "Għażliet tas-server għal {{server}}",
     "menuLabel": "Għażliet tas-server",
     "follow": "Segwi l-kanali kollha",
-    "unfollow": "Ieqaf segwi l-kanali kollha",
+    "unfollow": "Ieqaf milli ssegwi l-kanali kollha",
     "working": "Qed jiġu segwiti l-kanali…",
-    "followed_one": "Qed issegwi {{count}} kanal.",
-    "followed_two": "Qed issegwi {{count}} kanali.",
-    "followed_few": "Qed issegwi {{count}} kanali.",
-    "followed_many": "Qed issegwi {{count}} kanal.",
-    "followed_other": "Qed issegwi {{count}} kanal.",
+    "followed_one": "Bdejt issegwi {{count}} kanal.",
+    "followed_two": "Bdejt issegwi {{count}} kanali.",
+    "followed_few": "Bdejt issegwi {{count}} kanali.",
+    "followed_many": "Bdejt issegwi {{count}} kanal.",
+    "followed_other": "Bdejt issegwi {{count}} kanal.",
     "skipped_one": "{{count}} maqbuż: {{reasons}}.",
     "skipped_two": "{{count}} maqbużin: {{reasons}}.",
     "skipped_few": "{{count}} maqbużin: {{reasons}}.",
@@ -60,12 +60,12 @@
     "noAnswer": "l-ebda tweġiba mis-server",
     "unfollowed": "Ma għadekx issegwi l-kanali kollha.",
     "failed": "Is-segwiment tal-kanali kollha ma ħadimx. Erġa' pprova.",
-    "dismiss": "Ormi",
+    "dismiss": "Agħlaq",
     "unfollowFailed": "It-twaqqif tas-segwiment tal-kanali kollha ma ħadimx. Erġa' pprova."
   },
-  "mention": "jinkludi semmija tiegħek",
+  "mention": "fih referenza għalik",
   "header": {
     "follow": "Segwi l-kanal",
-    "unfollow": "Qed issegwi, ikklikkja biex twaqqaf"
+    "unfollow": "Qed issegwi, ikklikkja biex tieqaf"
   }
 }

@@ -42,8 +42,8 @@
   "notReviewedText": "Šis papildinys yra iš trečiosios šalies saugyklos „{{repository}}“. Mumcord patikrina, ar jis nepakeistas, bet niekas Mumcord komandoje nežiūrėjo, ką jis daro.",
   "biggestReasons": "Pagrindinės priežastys",
   "reasonWorse": "{{factor}}: blogiau nei vidutiniškai",
-  "showBreakdown": "Rodyti pilną išklotinę",
-  "hideBreakdown": "Slėpti pilną išklotinę",
+  "showBreakdown": "Rodyti visą išklotinę",
+  "hideBreakdown": "Slėpti visą išklotinę",
   "breakdown": {
     "title": "Kodėl toks balas",
     "caption": "Kaip sudarytas {{plugin}} saugumo balas",
@@ -63,17 +63,17 @@
     "formulaVersion": "Formulės versija {{version}}",
     "howCalculated": "Kaip skaičiuojamas balas",
     "firstWebSurface": "pirmasis žiniatinklio paviršius",
-    "websitesCount_one": "{{count}} websites",
+    "websitesCount_one": "{{count}} svetainė",
     "websitesCount_few": "{{count}} svetainės",
     "websitesCount_many": "{{count}} svetainės",
     "websitesCount_other": "{{count}} svetainių",
     "moreThanOneWebsite": "Daugiau nei viena svetainė",
-    "websitesDeclared_one": "{{count}} websites declared",
+    "websitesDeclared_one": "Deklaruota svetainių: {{count}}",
     "websitesDeclared_few": "Deklaruota svetainių: {{count}}",
     "websitesDeclared_many": "Deklaruota svetainių: {{count}}",
     "websitesDeclared_other": "Deklaruota svetainių: {{count}}",
     "packageSize": "Paketo dydis ir kodo moduliai",
-    "packageSizeValue_one": "{{size}} · {{count}} WASM modules",
+    "packageSizeValue_one": "{{size}} · WASM modulių: {{count}}",
     "packageSizeValue_few": "{{size}} · WASM modulių: {{count}}",
     "packageSizeValue_many": "{{size}} · WASM modulių: {{count}}",
     "packageSizeValue_other": "{{size}} · WASM modulių: {{count}}",
@@ -83,12 +83,12 @@
     "licence": "Licencija",
     "licenceNone": "Nedeklaruota",
     "licenceOpen": "Atvirojo kodo licencija",
-    "licenceProprietary": "Uždara",
+    "licenceProprietary": "Nuosavybinė",
     "reproducible": "Atkartojamas surinkimas",
     "reproducibleClaimed": "Teigia saugykla",
     "reproducibleNone": "Nenurodyta",
     "authorKey": "Šiam įrenginiui žinomas autoriaus raktas",
-    "authorKeyDays_one": "{{count}} days",
+    "authorKeyDays_one": "{{count}} diena",
     "authorKeyDays_few": "{{count}} dienos",
     "authorKeyDays_many": "{{count}} dienos",
     "authorKeyDays_other": "{{count}} dienų",
@@ -113,7 +113,7 @@
     "screenReader": "Kaip skaito ekrano skaitytuvas",
     "blockedSetting": "Užblokuota dėl tavo nustatymo",
     "cannotInstall": "Negalima įdiegti",
-    "colourNote": "Kiekviena žyma turi spalvą, piktogramą ir žodžius, todėl ji veikia ir pilkais atspalviais bei žmonėms, nesiskiriantiems raudonos ir žalios. Po skaičiaus ekrano skaitytuvams visada sakoma „didesnis reiškia didesnę riziką“."
+    "colourNote": "Kiekviena žyma turi spalvą, piktogramą ir žodžius, todėl ji veikia ir pilkais atspalviais, ir žmonėms, kurie neskiria raudonos ir žalios spalvų. Po skaičiaus ekrano skaitytuvams visada sakoma „didesnis reiškia didesnę riziką“."
   },
   "blocked": {
     "setting": "Užblokuota dėl tavo saugos nustatymo",
@@ -133,12 +133,12 @@
     "revoked": "Negalima įdiegti: Mumcord atšaukė šį papildinį.",
     "noScore": "Balas nerodomas; rodoma priežastis."
   },
-  "higherThanListing": "Šis papildinys įvertintas aukščiau, nei nurodyta jo sąraše",
+  "higherThanListing": "Šio papildinio balas didesnis, nei nurodyta sąraše",
   "safety": {
     "title": "Papildinių sauga",
     "label": "Neleisti didelės rizikos papildinių",
-    "description": "Paslepia diegimo mygtuką papildiniams, kurių balas 60 ar daugiau, ir sustabdo naujinimus, dėl kurių įdiegtas papildinys ten patektų. Jau įdiegti papildiniai veikia toliau.",
-    "note": "Pagal numatymą išjungta. Oficialių ir kūrėjo papildinių tai neliečia. Balai yra įverčiai, o ne garantija.",
+    "description": "Paslepia diegimo mygtuką papildiniams, kurių balas 60 ar daugiau, ir sustabdo naujinius, dėl kurių įdiegtas papildinys ten patektų. Jau įdiegti papildiniai veikia toliau.",
+    "note": "Pagal numatytuosius nustatymus išjungta. Oficialių ir kūrėjo papildinių tai neliečia. Balai yra įverčiai, o ne garantija.",
     "highConfirmed": "Didelė rizika: patvirtinai tai {{date}}."
   },
   "update": {
@@ -146,7 +146,7 @@
     "unchanged": "nepakito",
     "up": "▲ +{{count}} taškų, rizika didėja",
     "down": "▼ −{{count}} taškų, rizika mažėja",
-    "upText_one": "The risk goes up by {{count}} points",
+    "upText_one": "Rizika didėja {{count}} tašku",
     "upText_few": "Rizika didėja {{count}} taškais",
     "upText_many": "Rizika didėja {{count}} taško",
     "upText_other": "Rizika didėja {{count}} taškų",
@@ -162,6 +162,6 @@
     "noNew": "Naujų leidimų nėra",
     "reviewAndUpdate": "Peržiūrėti ir atnaujinti",
     "update": "Atnaujinti",
-    "waitingNote": "Automatiniai naujinimai įdiegiami tik tada, kai papildinys neprašo nieko naujo, o jo balas lieka toje pačioje grupėje arba sumažėja. Visa kita laukia čia."
+    "waitingNote": "Automatiniai naujiniai įdiegiami tik tada, kai papildinys neprašo nieko naujo, o jo balas lieka toje pačioje grupėje arba sumažėja. Visa kita laukia čia."
   }
 }

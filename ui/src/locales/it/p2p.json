@@ -25,7 +25,7 @@
     "actionFailed": "Non ha funzionato. Riprova.",
     "noRelay": "Questo server non ha un relay, quindi la condivisione file non è disponibile.",
     "filesDisallowed": "Il relay di questo server non consente la condivisione file.",
-    "screenDisallowed": "Il relay di questo server non consente la condivisione dello schermo.",
+    "screenDisallowed": "Il relay di questo server non consente la condivisione schermo.",
     "camerasDisallowed": "Il relay di questo server non consente la condivisione della fotocamera.",
     "imagesDisallowed": "Dimensione intera non disponibile: il relay di questo server non consente le immagini",
     "noCertificate": "La condivisione file richiede un certificato client.",
@@ -50,7 +50,7 @@
     "notRegistered": "Il relay di questo server è disponibile solo per gli utenti registrati. Registrati su questo server per usarlo.",
     "peerGone": "L'altra persona ha lasciato il server.",
     "rateLimited": "Troppe richieste al relay. Riprova tra un minuto.",
-    "groupNotAllowed": "Il relay di questo server è disponibile solo per alcuni gruppi. Chiedi a un admin di aggiungerti.",
+    "groupNotAllowed": "Il relay di questo server è disponibile solo per alcuni gruppi. Chiedi a un amministratore di aggiungerti.",
     "noHello": "Il bot del relay non conosce ancora questa app. Riconnettiti per risolvere."
   },
   "refusal": {
@@ -65,9 +65,9 @@
     "badRequest": "richiesta non valida"
   },
   "refusalAction": {
-    "howToRegister": "Come registrarsi",
+    "howToRegister": "Come registrarti",
     "reconnect": "Riconnetti",
-    "filesRegisteredOnly": "La condivisione di file è disponibile solo per gli utenti registrati su questo server."
+    "filesRegisteredOnly": "La condivisione file è disponibile solo per gli utenti registrati su questo server."
   },
   "trust": {
     "title": "Relay cambiato su {{server}}",
@@ -80,7 +80,7 @@
     "current": "Nuovo relay",
     "unknown": "Sconosciuto",
     "trustIf": "Fidati se",
-    "trustIfText": "gli admin del server hanno annunciato un nuovo relay o un trasferimento e puoi confermarlo con loro.",
+    "trustIfText": "gli amministratori del server hanno annunciato un nuovo relay o un trasferimento e puoi confermarlo con loro.",
     "dontTrustIf": "Non fidarti se",
     "dontTrustIfText": "nessuno ha annunciato un cambiamento o non sei sicuro. Qualcuno potrebbe fingersi il relay.",
     "notNow": "Non ora",

@@ -1,7 +1,7 @@
 {
-  "hint": "Ielādējiet izpakotu spraudņa mapi, lai to pārbaudītu. Izstrādātāja spraudņi nav parakstīti, nekad nav oficiāli un nevar saņemt net.http, secrets vai ui.webview. Tie tiek izslēgti, kad izstrādātāja režīms tiek izslēgts.",
+  "hint": "Ielādē izpakotu spraudņa mapi, lai to pārbaudītu. Izstrādātāja spraudņi nav parakstīti, nekad nav oficiāli un nevar saņemt net.http, secrets vai ui.webview. Tie tiek noņemti, kad izslēdz izstrādātāja režīmu.",
   "load": "Ielādēt spraudņa mapi…",
-  "pickFolder": "Izvēlieties spraudņa mapi",
+  "pickFolder": "Izvēlies spraudņa mapi",
   "empty": "Nav ielādēts neviens izstrādātāja spraudnis.",
   "listLabel": "Izstrādātāja spraudņi",
   "label": "Izstrādātāja spraudnis",
@@ -16,7 +16,7 @@
   },
   "showLog": "Rādīt {{name}} žurnālu",
   "reload": "Pārlādēt {{name}}",
-  "unload": "Izslēgt {{name}}",
+  "unload": "Noņemt {{name}}",
   "logLabel": "{{name}} žurnāls",
   "logTitle": "{{name}} žurnāls",
   "logEmpty": "Žurnāla ierakstu vēl nav.",
@@ -29,7 +29,7 @@
   "errors": {
     "load": "Spraudņa mapi neizdevās ielādēt.",
     "reload": "Spraudni neizdevās pārlādēt.",
-    "unload": "Spraudni neizdevās izslēgt.",
+    "unload": "Spraudni neizdevās noņemt.",
     "log": "Žurnālu neizdevās nolasīt."
   }
 }

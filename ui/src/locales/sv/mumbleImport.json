@@ -1,5 +1,5 @@
 {
-  "title": "Ta med din Mumble-inställning",
+  "title": "Ta med dina Mumble-inställningar",
   "intro": "Vi hittade den officiella Mumble-klienten på den här datorn. Välj vad som ska kopieras. Inget ändras i Mumble och inget lämnar din dator.",
   "optional": "{{progress}} · valfritt",
   "listLabel": "Vad som ska kopieras från Mumble",
@@ -42,8 +42,8 @@
   "ptt": {
     "title": "Push-to-talk-tangent",
     "modifierOnly": "Tangenten i Mumble är bara en modifierartangent, som Mumcord inte kan använda. Du kan välja en tangent senare.",
-    "tooManyKeys": "Genvägen i Mumble har fler än en tangent, vilket Mumcord inte kan använda. Du kan välja en tangent senare.",
-    "unknown": "Genvägen i Mumble använder en tangent eller enhet som Mumcord inte känner till. Du kan välja en tangent senare."
+    "tooManyKeys": "Kortkommandot i Mumble har fler än en tangent, vilket Mumcord inte kan använda. Du kan välja en tangent senare.",
+    "unknown": "Kortkommandot i Mumble använder en tangent eller enhet som Mumcord inte känner till. Du kan välja en tangent senare."
   },
   "volume": {
     "title": "Volym och röstinställningar",
@@ -54,7 +54,7 @@
   "selected_other": "{{count}} objekt valda",
   "import": "Importera",
   "importing": "Importerar…",
-  "skip": "Hoppa över just nu",
+  "skip": "Hoppa över tills vidare",
   "cancel": "Avbryt",
   "failed": "Importen kunde inte slutföras. Försök igen.",
   "secureStorage": "Mumcord når inte systemets säkra lagring. Lås upp din nyckelring eller lösenordshanterare och försök igen.",
@@ -77,7 +77,7 @@
     "identityServers": "Används för de kopierade servrarna",
     "identitySkipped": "Identiteten finns redan i Mumcord",
     "identitySkippedDetail": "Certifikatet är redan en av dina identiteter",
-    "devicesAndPtt": "Ljudenheter och push-to-talk-tangent",
+    "devicesAndPtt": "Ljudenheter och Push-to-talk-tangent",
     "done": "Klart",
     "undo": "Ångra importen",
     "undone": "Importen ångrades.",

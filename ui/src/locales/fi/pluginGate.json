@@ -25,7 +25,7 @@
   "highRiskNotAutomatic": "Sitä ei asenneta automaattisesti. Versiossa {{version}} pysyminen säilyttää nykyiset pisteet; voit kiinnittää version kohdassa Asennetut.",
   "sameAuthorKey": "sama tekijän avain",
   "places": {
-    "stage": "mediaalue",
+    "stage": "media-alue",
     "side-panel": "sivupaneeli",
     "dialog": "valintaikkuna",
     "panel": "Lisäosapalkki"

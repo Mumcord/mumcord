@@ -1,15 +1,15 @@
 {
-  "installTitle": "Paigaldad {{plugin}}?",
-  "updateTitle": "Uuendad {{plugin}} versioonile {{version}}?",
-  "asks": "{{plugin}} küsib neid lubasid. Valikulised saad välja lülitada nüüd või hiljem.",
+  "installTitle": "Kas paigaldada plugin {{plugin}}?",
+  "updateTitle": "Kas uuendada pluginat {{plugin}} versioonile {{version}}?",
+  "asks": "{{plugin}} küsib neid õigusi. Valikulised saad välja lülitada kohe või hiljem.",
   "asksShort": "See plugin küsib:",
-  "scoreCountsOptional": "Hinne arvestab kõiki lubasid, mida plugin võib küsida, ka valikulisi.",
+  "scoreCountsOptional": "Hinne arvestab kõiki õigusi, mida plugin võib küsida, ka valikulisi.",
   "required": "Kohustuslik",
   "optional": "Valikuline",
   "runsCode": "Käivitab koodi, mille on teinud {{author}}. Mumcord pole seda üle vaadanud.",
   "sealedFrame": "See ei näe Mumcordi, sinu faile, mikrofoni, kaamerat ega lõikelauda. Kuvatakse ainult: {{places}}.",
   "ownCodeAndWebsites": "See plugin toob kaasa oma koodi ja suhtleb veebisaitidega.",
-  "trustRepository": "{{repository}} on hoidla, mille sa lisasid. Paigalda see ainult siis, kui usaldad nende pidajaid.",
+  "trustRepository": "{{repository}} on sinu lisatud hoidla. Paigalda ainult siis, kui usaldad selle pidajaid.",
   "understand": "Saan aru",
   "trustAuthor": "Mõistan riski ja usaldan plugina {{plugin}} autorit",
   "understandUpdate": "Mõistan, et risk kasvas, ja usaldan autorit endiselt",
@@ -20,7 +20,7 @@
   "installAnyway": "Paigalda ikkagi",
   "updateAnyway": "Uuenda ikkagi",
   "highRiskTitle": "See on suure riskiga plugin",
-  "highRiskText": "See võib avada oma veebilehti ja suhelda {{count}} veebisaidiga, mida sa kontrollida ei saa. Mumcord ei näe, mida need saidid pluginale saadavad ega mida plugin neile saadab. Selle avaldas keegi, kes on sellele arvutile uus. Paigalda see ainult siis, kui tunned ja usaldad selle autorit.",
+  "highRiskText": "See võib avada oma veebilehti ja suhelda {{count}} veebisaidiga, mida sa kontrollida ei saa. Mumcord ei näe, mida need saidid pluginale saadavad ega mida plugin neile saadab. Selle avaldas keegi, keda see arvuti veel ei tunne. Paigalda see ainult siis, kui tunned ja usaldad selle autorit.",
   "highRiskWouldBecome": "See uuendus muudaks plugina suure riskiga pluginaks",
   "highRiskNotAutomatic": "Seda ei paigaldata automaatselt. Versioonile {{version}} jäämine säilitab praeguse hinde; versiooni saad kinnitada jaotises Paigaldatud.",
   "sameAuthorKey": "sama autorivõti",
@@ -37,7 +37,7 @@
     "websites_other": "See võib suhelda {{count}} veebisaidiga, mida sa kontrollida ei saa.",
     "webPages": "See võib avada oma veebilehti.",
     "cantSee": "Mumcord ei näe, mida need veebisaidid pluginale saadavad ega mida plugin neile saadab.",
-    "newAuthor": "Selle avaldas keegi, kes on sellele arvutile uus.",
+    "newAuthor": "Selle avaldas keegi, keda see arvuti veel ei tunne.",
     "trust": "Paigalda see ainult siis, kui tunned ja usaldad selle autorit."
   }
 }

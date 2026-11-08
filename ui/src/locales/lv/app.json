@@ -2,13 +2,13 @@
   "regions": {
     "servers": "Serveri",
     "channels": "Kanāli",
-    "chat": "Čats",
+    "chat": "Tērzēšana",
     "members": "Dalībnieki",
     "userPanel": "Tavs statuss"
   },
   "skipLinks": {
     "label": "Izlaist saites",
-    "chat": "Pāriet uz čatu",
+    "chat": "Pāriet uz tērzēšanu",
     "channels": "Pāriet uz kanāliem"
   },
   "resize": {

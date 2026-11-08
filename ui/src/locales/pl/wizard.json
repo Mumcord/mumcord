@@ -5,7 +5,7 @@
   "tipLabel": "O: {{name}}",
   "errors": {
     "generic": "Coś poszło nie tak. Spróbuj ponownie.",
-    "secureStorageUnavailable": "Mumcord nie ma dostępu do bezpiecznego magazynu systemu. Odblokuj pęk kluczy lub menedżer haseł i spróbuj ponownie.",
+    "secureStorageUnavailable": "Mumcord nie ma dostępu do bezpiecznego magazynu systemu. Odblokuj magazyn kluczy lub menedżer haseł i spróbuj ponownie.",
     "saveFailed": "Nie udało się zapisać ustawień. Spróbuj ponownie."
   },
   "nav": {
@@ -13,7 +13,7 @@
     "finishSetup": "Zakończ konfigurację",
     "startMumcord": "Uruchom Mumcord",
     "finish": "Zakończ",
-    "skip": "Pomiń na razie",
+    "skip": "Na razie pomiń",
     "enterKey": "Enter",
     "enterHint": "aby kontynuować"
   },
@@ -42,30 +42,30 @@
   },
   "welcome": {
     "title": "Czat głosowy, który jest jak",
-    "titleAccent": "Twoje własne miejsce.",
+    "titleAccent": "twoje własne miejsce.",
     "subtitle": "Mumcord mówi językiem Mumble, więc działa z każdym serwerem Mumble, a do tego dodaje nowoczesny czat. Skonfigurujmy go tak, jak lubisz. Zajmie to około dwóch minut.",
     "voice": {
       "title": "Kryształowo czysty głos",
-      "text": "Dźwięk z niskim opóźnieniem i wbudowanym odszumianiem."
+      "text": "Dźwięk z niskim opóźnieniem i wbudowanym tłumieniem szumów."
     },
     "servers": {
       "title": "Działa z każdym serwerem Mumble",
       "text": "Bez konta i rejestracji. Dołączaj do serwerów, z których już korzystasz."
     },
     "private": {
-      "title": "Prywatność w założeniach",
-      "text": "Bez telemetrii. To, co zapisuje Mumcord, zostaje na Twoim komputerze."
+      "title": "Prywatność od podstaw",
+      "text": "Bez telemetrii. To, co zapisuje Mumcord, zostaje na twoim komputerze."
     }
   },
   "identity": {
     "title": "Kim jesteś w Mumble?",
-    "intro": "Tożsamość to sposób, w jaki serwery Cię rozpoznają. Utwórz nową albo użyj tej, z której już korzystasz.",
+    "intro": "Tożsamość to sposób, w jaki serwery cię rozpoznają. Utwórz nową albo użyj tej, z której już korzystasz.",
     "legend": "Twoja tożsamość",
     "create": "Utwórz nową tożsamość",
-    "createText": "Twoja tożsamość to certyfikat, który potwierdza, kim jesteś na serwerach Mumble. Przechowuje Twoją zarejestrowaną nazwę i uprawnienia, więc za każdym razem jesteś tą samą osobą.",
+    "createText": "Twoja tożsamość to certyfikat, który potwierdza, kim jesteś na serwerach Mumble. Przechowuje twoją zarejestrowaną nazwę i uprawnienia, więc za każdym razem jesteś tą samą osobą.",
     "import": "Zaimportuj istniejącą tożsamość",
     "name": "Domyślna nazwa wyświetlana",
-    "nameHint": "Używana na serwerach, które jeszcze Cię nie znają. Możesz ją zmienić dla każdego serwera.",
+    "nameHint": "Używana na serwerach, które jeszcze cię nie znają. Możesz ją zmienić dla każdego serwera.",
     "chooseFile": "Wybierz plik…",
     "noFile": "Nie wybrano pliku",
     "chosenFile": "Wybrany plik: {{file}}",
@@ -89,7 +89,7 @@
     "level": "Poziom mikrofonu",
     "idle": "Naciśnij Testuj, powiedz coś, a usłyszysz siebie z powrotem.",
     "recording": "Mów teraz…",
-    "playing": "Odtwarzanie Twojego głosu…",
+    "playing": "Odtwarzanie twojego głosu…",
     "devicesFailed": "Nie udało się wyświetlić listy urządzeń audio. Możesz kontynuować i wybrać je później w Ustawieniach.",
     "testFailed": "Nie udało się rozpocząć testu. Sprawdź, czy mikrofon jest podłączony.",
     "test": "Posłuchaj siebie",
@@ -100,26 +100,26 @@
     "subtitle": "Wybierz urządzenia i powiedz coś. Pasek powinien się poruszać, gdy mówisz.",
     "talkLegend": "Jak chcesz mówić?",
     "voiceActivationDesc": "Mikrofon włącza się, gdy mówisz. Nic nie trzeba trzymać ani naciskać.",
-    "pushToTalkDesc": "Najlepsze do głośnych miejsc. Klawisz wybierasz sam.",
+    "pushToTalkDesc": "Najlepsze do głośnych miejsc. Klawisz wybierasz samodzielnie.",
     "sensitivity": "Czułość",
     "changeLater": "Wszystko to możesz później zmienić w Ustawienia → Głos i dźwięk."
   },
   "style": {
     "title": "Ile chcesz udostępniać?",
-    "subtitle": "Wybierz punkt wyjścia. Na ostatnim ekranie zobaczysz wszystkie wybory ponownie i będziesz mógł je tam zmienić.",
+    "subtitle": "Wybierz punkt wyjścia. Na ostatnim ekranie zobaczysz wszystkie wybory ponownie i możesz je tam zmienić.",
     "legend": "Styl konfiguracji",
     "everythingOn": {
       "title": "Wszystko włączone",
       "subtitle": "Pełen zestaw funkcji",
       "p1": "Inni widzą, w co grasz i czego słuchasz",
       "p2": "Twój adres IP jest widoczny dla osób, z którymi łączysz się bezpośrednio",
-      "p3": "Każdy może do Ciebie pisać; linki i obrazy są ładowane z internetu",
+      "p3": "Każdy może do ciebie pisać; linki i obrazy są ładowane z internetu",
       "p4": "Nakładka, synchronizacja historii i obrazy w pełnym rozmiarze są włączone"
     },
     "balanced": {
       "title": "Zrównoważony",
       "subtitle": "Między prywatnością a wygodą",
-      "p1": "Tylko znajomi i osoby z Twojego kanału mogą do Ciebie pisać",
+      "p1": "Tylko znajomi i osoby z twojego kanału mogą do ciebie pisać",
       "p2": "Połączenie bezpośrednie, z przekaźnikiem jako rozwiązaniem zapasowym",
       "p3": "Podglądy linków i obrazy w pełnym rozmiarze są włączone",
       "p4": "To, w co grasz i czego słuchasz, pozostaje prywatne"
@@ -127,7 +127,7 @@
     "maximumPrivacy": {
       "title": "Maksymalna prywatność",
       "subtitle": "Udostępniaj jak najmniej",
-      "p1": "Tylko znajomi mogą do Ciebie pisać, bez wyjątków",
+      "p1": "Tylko znajomi mogą do ciebie pisać, bez wyjątków",
       "p2": "Twój adres IP jest ukryty; wszystko przechodzi przez przekaźnik",
       "p3": "Brak treści zewnętrznych, synchronizacji historii i udostępniania",
       "p4": "Aktualizacje tylko powiadamiają; nic nie jest udostępniane na temat tego, co robisz"
@@ -139,13 +139,13 @@
       "p2": "Zobacz, co robi każde ustawienie i kto to widzi",
       "p3": "Najlepsze, jeśli wiesz, czego chcesz"
     },
-    "presetSelected": "Wybrano {{preset}}: pomijasz szczegółowe kroki dotyczące prywatności. Wybierz Własny, aby przejść przez każdy z nich.",
-    "customSelected": "Wybrano Własny: kolejne kroki przeprowadzą Cię przez każdy wybór."
+    "presetSelected": "Wybrano {{preset}}: pomijasz szczegółowe kroki dotyczące prywatności. Wybierz „Własny”, aby przejść przez każdy z nich.",
+    "customSelected": "Wybrano „Własny”: kolejne kroki przeprowadzą cię przez każdy wybór."
   },
   "pm": {
-    "title": "Kto może do Ciebie pisać?",
+    "title": "Kto może do ciebie pisać?",
     "subtitle": "Wiadomości prywatne to rozmowy jeden na jeden. Ten wybór nie wpływa na czat kanału.",
-    "local": "Filtrowanie odbywa się na Twoim komputerze. Nadawcy nie są o tym informowani. Później możesz ustawić inną regułę dla każdego serwera."
+    "local": "Filtrowanie odbywa się na twoim komputerze. Nadawcy nie są o tym informowani. Później możesz ustawić inną regułę dla każdego serwera."
   },
   "notifications": {
     "title": "Jak Mumcord ma cię powiadamiać?",
@@ -153,15 +153,15 @@
   },
   "connections": {
     "title": "Połączenia i treści",
-    "subtitle": "Niektóre funkcje łączą Cię bezpośrednio z innymi użytkownikami Mumcord, a część treści czatu jest ładowana z innych stron. Wybierz, co jest dla Ciebie w porządku.",
+    "subtitle": "Niektóre funkcje łączą cię bezpośrednio z innymi użytkownikami Mumcorda, a część treści czatu jest ładowana z innych stron. Wybierz, co jest dla ciebie w porządku.",
     "chatContent": "Treści czatu",
-    "sharing": "Udostępnianie użytkownikom Mumcord"
+    "sharing": "Udostępnianie użytkownikom Mumcorda"
   },
   "features": {
     "title": "Dopasuj do siebie",
     "subtitle": "Włącz dodatki, które chcesz. Przy każdym jest informacja, kto co widzi.",
-    "seenByMumcordUsers": "Widoczne dla użytkowników Mumcord na tym samym serwerze.",
-    "onlyYou": "Widzisz to tylko Ty.",
+    "seenByMumcordUsers": "Widoczne dla użytkowników Mumcorda na tym samym serwerze.",
+    "onlyYou": "Widzisz to tylko ty.",
     "ingameOverlayAlt": "Przykład nakładki w grze pokazującej, kto mówi"
   },
   "appearance": {
@@ -171,7 +171,7 @@
   "startup": {
     "title": "Uruchamianie i aktualizacje",
     "subtitle": "Jak Mumcord się uruchamia i co robi z nowymi wersjami.",
-    "linkHandler": "Otwieraj linki mumble:// w Mumcord",
+    "linkHandler": "Otwieraj linki mumble:// w Mumcordzie",
     "linkHandlerHint": "Kliknięcie linku do serwera na stronie internetowej otworzy go tutaj.",
     "linkHandlerActive": "Mumcord już otwiera linki mumble://.",
     "linkHandlerFailed": "Nie udało się ustawić Mumcord do otwierania linków mumble://. Możesz spróbować ponownie w Ustawieniach.",
@@ -180,7 +180,7 @@
   "summary": {
     "title": "Wszystko gotowe",
     "titleNamed": "Wszystko gotowe, {{name}}",
-    "subtitle": "Oto Twoje wybory. Przed startem użyj Edytuj na dowolnej karcie, aby je zmienić.",
+    "subtitle": "Oto twoje wybory. Przed startem kliknij „Edytuj” na dowolnej karcie, aby je zmienić.",
     "on": "włączone",
     "off": "wyłączone",
     "unavailable": "niedostępne tutaj",
@@ -198,15 +198,15 @@
       "startup": "Uruchamianie",
       "updates": "Aktualizacje"
     },
-    "identityDetail": "Zapisana w systemowym pęku kluczy",
-    "voiceDetail": "Odszumianie: {{noise}}",
+    "identityDetail": "Zapisana w systemowym magazynie kluczy",
+    "voiceDetail": "Tłumienie szumów: {{noise}}",
     "pmDetail": "Mój kanał {{channel}} · zaakceptowane czaty {{accepted}} · prośby {{requests}}",
     "notificationsTitle": "Nowe wiadomości: {{mode}}",
     "notificationsDetail": "Powiadomienia o aktywności: włączono {{on}} z {{total}}",
     "contentTitle": "Podglądy linków: {{previews}}",
     "contentDetail": "Obrazy w pełnym rozmiarze: {{images}} · synchronizacja historii: {{sync}}",
     "featuresTitle": "Nakładka w grze: {{overlay}}",
-    "featuresDetail": "Podążaj za systemowym trybem Nie przeszkadzać: {{dnd}} · teraz odtwarzane: {{playing}} · teraz gram: {{gaming}} · historia aktywności {{history}}",
+    "featuresDetail": "Systemowy tryb „Nie przeszkadzać”: {{dnd}} · teraz odtwarzane: {{playing}} · teraz w grze: {{gaming}} · historia aktywności: {{history}}",
     "effectsDetail": "Efekty wizualne: {{effects}}",
     "startupTitle": "Uruchamianie przy logowaniu: {{login}}",
     "startupDetail": "Uruchamianie zminimalizowane: {{minimized}} · linki mumble://: {{links}}",
@@ -216,9 +216,9 @@
       "off": "Wyłączone"
     },
     "updatesDetail": "Aktualizacje są zawsze sprawdzane i weryfikowane przed instalacją.",
-    "backup": "Twoja tożsamość {{name}} jest zapisana w systemowym pęku kluczy. Wykonaj jej kopię zapasową w Ustawienia → Tożsamość, aby nigdy nie stracić zarejestrowanej nazwy.",
+    "backup": "Twoja tożsamość {{name}} jest zapisana w systemowym magazynie kluczy. Wykonaj jej kopię zapasową w Ustawienia → Tożsamość, aby nigdy nie stracić zarejestrowanej nazwy.",
     "nextServer": "Dalej: dodaj swój pierwszy serwer",
-    "rerunNote": "Zapisywane są tylko wartości, które zmieniłeś."
+    "rerunNote": "Zapisywane są tylko zmienione wartości."
   },
   "rerun": {
     "title": "Kreator konfiguracji",
@@ -249,18 +249,18 @@
       "summary": "Sprawdź swoje wybory"
     },
     "hints": {
-      "welcome": "Cześć, jestem Aaron! Przeprowadzę Cię przez konfigurację. Zajmie to tylko minutę.",
+      "welcome": "Cześć, jestem Aaron! Przeprowadzę cię przez konfigurację. Zajmie to tylko minutę.",
       "import": "To serwery i ustawienia znalezione w Mumble. Wybierz, co chcesz zachować.",
-      "identity": "Twoja tożsamość to Twoja nazwa na serwerach. Utwórz nową albo zaimportuj istniejącą.",
+      "identity": "Twoja tożsamość to twoja nazwa na serwerach. Utwórz nową albo zaimportuj istniejącą.",
       "voice": "Tutaj wybierz mikrofon, do którego mówisz, i powiedz cześć: zielony pasek powinien zatańczyć.",
       "setupStyle": "Wybierz styl. Każde ustawienie możesz później zmienić.",
-      "privateMessages": "Wybierz, kto może wysyłać Ci prywatne wiadomości. Nadawcy nigdy się o tym nie dowiedzą.",
-      "notifications": "Wybierz, w jaki sposób każdy rodzaj wiadomości ma do Ciebie docierać, albo go wyłącz.",
-      "connections": "Wybierz, czy Mumcord może łączyć Cię bezpośrednio z innymi użytkownikami Mumcorda.",
+      "privateMessages": "Wybierz, kto może wysyłać ci prywatne wiadomości. Nadawcy nigdy się o tym nie dowiedzą.",
+      "notifications": "Wybierz, w jaki sposób każdy rodzaj wiadomości ma do ciebie docierać, albo go wyłącz.",
+      "connections": "Wybierz, czy Mumcord może łączyć cię bezpośrednio z innymi użytkownikami Mumcorda.",
       "features": "Włącz tylko te dodatki, które lubisz. Każda karta mówi, kto może go widzieć.",
       "appearance": "Jasny, ciemny albo jak w systemie: tutaj wybierz swój wygląd.",
       "startup": "Wybierz, jak Mumcord ma się uruchamiać po zalogowaniu na komputerze.",
-      "summary": "Gotowe! Sprawdź tu swoje wybory; Edytuj przeniesie Cię do dowolnego kroku."
+      "summary": "Gotowe! Sprawdź tu swoje wybory; „Edytuj” przeniesie cię do dowolnego kroku."
     }
   }
 }
