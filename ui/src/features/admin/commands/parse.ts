@@ -48,11 +48,6 @@ export function commandName(text: string): string | null {
   return match?.[1] ?? null;
 }
 
-/** The reason of `/kick <name> [reason]`: everything after the first word. */
-export function reasonAfterName(words: readonly string[], partial: string): string {
-  return [...words, partial].join(" ").trim();
-}
-
 /**
  * The `[duration]` token of `/ban <name> [duration] [reason]` (FR-10.31): `<n>h` and `<n>d` are
  * hours and days, `perm` is permanent. `null` when the word is no duration, which means it is

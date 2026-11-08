@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { commandName, parseDuration, reasonAfterName, slashQuery } from "./parse";
+import { commandName, parseDuration, slashQuery } from "./parse";
 
 describe("splitting a typed command (FR-10.30)", () => {
   it("names the command and marks the word that is still being written", () => {
@@ -46,7 +46,6 @@ describe("splitting a typed command (FR-10.30)", () => {
     const query = slashQuery("/kick Mallory spam links");
     expect(query?.words).toEqual(["Mallory", "spam"]);
     expect(query?.partial).toBe("links");
-    expect(reasonAfterName(["spam", "links"], "")).toBe("spam links");
   });
 
   it("is no command at all for plain text or a name the keyboard does not make", () => {
