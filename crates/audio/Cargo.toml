@@ -36,8 +36,11 @@ hound.workspace = true
 [target.'cfg(not(target_os = "freebsd"))'.dependencies]
 cpal = { workspace = true, features = ["pipewire"] }
 
-[target.'cfg(target_os = "linux")'.dependencies]
+# rtprio(2) for real-time audio threads (FR-13.17); Linux uses libc for the CPU-time limits.
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 libc.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
 pulseaudio.workspace = true
 futures.workspace = true
 

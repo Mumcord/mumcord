@@ -4,8 +4,9 @@
 //! CPU is loaded (a game, a build), so frames go out late and the device plays gaps. Real-time
 //! scheduling lets them run as soon as they wake up. It is requested the way desktop audio apps
 //! do without root: rtkit over D-Bus on Linux, the MMCSS "Audio" task on Windows, a
-//! time-constraint policy on macOS. When the request is refused (no rtkit, a sandbox), the
-//! thread keeps its normal priority and audio works as before.
+//! time-constraint policy on macOS, `rtprio(2)` on FreeBSD. When the request is refused (no
+//! rtkit, a sandbox, a FreeBSD user without the realtime privilege), the thread keeps its normal
+//! priority and audio works as before.
 //!
 //! On Linux a real-time thread that runs too long without blocking gets SIGXCPU once it passes
 //! the soft `RLIMIT_RTTIME` and SIGKILL at the hard one; rtkit requires both to be set. By
@@ -18,10 +19,12 @@
 use std::marker::PhantomData;
 use std::sync::atomic::{AtomicU32, Ordering};
 
+#[cfg(not(target_os = "freebsd"))]
 use audio_thread_priority::{
     RtPriorityHandle, demote_current_thread_from_real_time, promote_current_thread_to_real_time,
 };
 
+#[cfg(not(target_os = "freebsd"))]
 use crate::{FRAME_SAMPLES, SAMPLE_RATE};
 
 /// Real-time threads returned to normal priority for running past their time budget, since the
@@ -37,12 +40,18 @@ pub struct RtError(String);
 /// priority. Bound to its thread, so it is neither `Send` nor `Sync`.
 #[must_use = "the thread returns to normal priority when the guard is dropped"]
 pub struct RtGuard {
+    #[cfg(not(target_os = "freebsd"))]
     handle: Option<RtPriorityHandle>,
     _thread_bound: PhantomData<*const ()>,
 }
 
 impl Drop for RtGuard {
     fn drop(&mut self) {
+        #[cfg(target_os = "freebsd")]
+        if let Err(e) = freebsd::set(libc::RTP_PRIO_NORMAL, 0) {
+            tracing::debug!("returning an audio thread to normal priority failed: {e}");
+        }
+        #[cfg(not(target_os = "freebsd"))]
         if let Some(handle) = self.handle.take()
             && let Err(e) = demote_current_thread_from_real_time(handle)
         {
@@ -59,25 +68,60 @@ impl Drop for RtGuard {
 /// callback; the audio host schedules those itself.
 pub fn promote_current_thread() -> Result<RtGuard, RtError> {
     guard_overruns();
-    // FRAME_SAMPLES (480) always fits; the conversion cannot fail.
-    let frames = u32::try_from(FRAME_SAMPLES).unwrap_or(u32::MAX);
-    let handle = {
-        // Each promotion resets the process-wide limit to one frame (10 ms); widening it again
-        // under the same lock keeps two promoting threads from undoing each other's widening.
-        #[cfg(target_os = "linux")]
-        let _limits = linux::LIMITS
-            .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let handle = promote_current_thread_to_real_time(frames, SAMPLE_RATE)
-            .map_err(|e| RtError(e.to_string()))?;
-        #[cfg(target_os = "linux")]
-        linux::widen_soft_limit();
-        handle
-    };
-    Ok(RtGuard {
-        handle: Some(handle),
-        _thread_bound: PhantomData,
-    })
+    #[cfg(target_os = "freebsd")]
+    {
+        freebsd::set(libc::RTP_PRIO_REALTIME, freebsd::PRIORITY).map_err(|e| {
+            RtError(format!(
+                "{e}; unprivileged real-time needs mac_priority and the realtime group \
+             (security.mac.priority.realtime_gid)"
+            ))
+        })?;
+        return Ok(RtGuard {
+            _thread_bound: PhantomData,
+        });
+    }
+    #[cfg(not(target_os = "freebsd"))]
+    {
+        // FRAME_SAMPLES (480) always fits; the conversion cannot fail.
+        let frames = u32::try_from(FRAME_SAMPLES).unwrap_or(u32::MAX);
+        let handle = {
+            // Each promotion resets the process-wide limit to one frame (10 ms); widening it again
+            // under the same lock keeps two promoting threads from undoing each other's widening.
+            #[cfg(target_os = "linux")]
+            let _limits = linux::LIMITS
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            let handle = promote_current_thread_to_real_time(frames, SAMPLE_RATE)
+                .map_err(|e| RtError(e.to_string()))?;
+            #[cfg(target_os = "linux")]
+            linux::widen_soft_limit();
+            handle
+        };
+        Ok(RtGuard {
+            handle: Some(handle),
+            _thread_bound: PhantomData,
+        })
+    }
+}
+
+/// FreeBSD: `rtprio(2)` on the calling thread. Unprivileged threads may only switch to realtime
+/// with the `mac_priority` policy loaded and their user in its realtime group; otherwise the
+/// kernel answers EPERM and the thread keeps its normal priority.
+#[cfg(target_os = "freebsd")]
+mod freebsd {
+    /// 0 is the highest realtime priority; 10 leaves room for the sound card's own threads.
+    pub(super) const PRIORITY: libc::c_ushort = 10;
+
+    pub(super) fn set(kind: libc::c_ushort, prio: libc::c_ushort) -> Result<(), String> {
+        let mut rtp = libc::rtprio { type_: kind, prio };
+        // SAFETY: `rtp` is a valid, initialised struct and lwpid 0 means the calling thread.
+        let result = unsafe { libc::rtprio_thread(libc::RTP_SET, 0, &raw mut rtp) };
+        if result == 0 {
+            Ok(())
+        } else {
+            Err(std::io::Error::last_os_error().to_string())
+        }
+    }
 }
 
 /// How many real-time threads were returned to normal priority for running past their time
@@ -207,5 +251,12 @@ mod tests {
         })
         .join()
         .expect("thread");
+    }
+
+    /// The normal priority the guard returns the thread to is always permitted.
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn returning_to_normal_priority_works() {
+        freebsd::set(libc::RTP_PRIO_NORMAL, 0).expect("normal priority is never refused");
     }
 }

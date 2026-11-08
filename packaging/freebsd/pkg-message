@@ -16,3 +16,12 @@ To check which renderer Mumcord got:
 
 Running Mumcord with LIBGL_ALWAYS_SOFTWARE=1 forces software rendering
 (llvmpipe) if the driver turns out to be unusable.
+
+Real-time audio threads: FreeBSD only grants them with the mac_priority
+policy and the user in its realtime group:
+
+    sysrc kld_list+=" mac_priority"
+    pw groupmod realtime -m $USER      # then log in again
+
+Without that Mumcord plays at normal priority, which is fine until the CPU is
+fully loaded.
