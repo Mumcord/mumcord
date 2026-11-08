@@ -44,7 +44,10 @@ printf '%s\n' "$out" | grep -q "checksum mismatch" || fail "no checksum mismatch
 assert_nothing_installed "after the checksum mismatch"
 
 step "install with curl | sh"
-out=$(curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good TERM=xterm-256color sh -s -- --yes --desktop-icon 2>&1)
+out=$(curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good TERM=xterm-256color sh -s -- --yes --desktop-icon 2>&1) || {
+    printf '%s\n' "$out"
+    fail "the installer failed"
+}
 printf '%s\n' "$out"
 ! printf '%s\n' "$out" | grep -qF "$esc" || fail "escape codes in output that is not a terminal"
 case $expected in
