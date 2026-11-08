@@ -422,7 +422,7 @@
   "perUserSave": "Mainas tiek sūtītas pa vienam lietotājam, kad saglabā.",
   "save": "Saglabāt",
   "changesNotSavedUsers": "vēl nav saglabāts",
-  "renameKept": "Serveris nepieņēma šo vārdu; {{name}} joprojām ir sarakstā kā iepriekš.",
+  "changeKept": "Serveris nepieņēma šo izmaiņu; {{name}} joprojām ir sarakstā kā iepriekš.",
   "registeredSaved": "Saglabāts: {{renamed}} pārdēvēti, {{unregistered}} noņemti · saraksts pārlādēts",
   "announcedRenamed": "Vārds saglabāts",
   "announcedUnregistered": "Reģistrācija noņemta",

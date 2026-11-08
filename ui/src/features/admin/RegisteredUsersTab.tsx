@@ -178,9 +178,26 @@ export function RegisteredUsersTab({
     else onRequestClose();
   };
 
+  // The server neither confirms a change nor refuses one, so what the save answers is what gets
+  // said out loud: a failure or a change that was not taken must never announce a success.
   const save = async () => {
-    await saveChanges();
-    announce(t("admin:announcedRegisteredSaved"));
+    const outcome = await saveChanges();
+    switch (outcome.kind) {
+      case "saved":
+        announce(t("admin:announcedRegisteredSaved"));
+        break;
+      case "kept":
+        // The same sentence the banner shows, so what a screen reader hears matches the picture.
+        announce(t("admin:changeKept", { name: outcome.name }));
+        break;
+      case "error":
+        announce(registeredErrorText(t, outcome.error));
+        break;
+      // Nothing queued, or the window and its connection are gone: there is nothing to say.
+      case "idle":
+      case "closed":
+        break;
+    }
   };
 
   /** Arrow keys walk the list; Enter opens the row's name field. */
@@ -281,7 +298,7 @@ export function RegisteredUsersTab({
 
           {keeping ? (
             <p className="admin-notice admin-notice--danger" role="status">
-              {t("admin:renameKept", { name: keeping.name })}
+              {t("admin:changeKept", { name: keeping.name })}
             </p>
           ) : null}
 

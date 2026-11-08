@@ -425,7 +425,7 @@
   "perUserSave": "Zmiany są wysyłane osobno dla każdego użytkownika przy zapisie.",
   "save": "Zapisz",
   "changesNotSavedUsers": "jeszcze niezapisane",
-  "renameKept": "Serwer nie przyjął tej nazwy; {{name}} wciąż jest na liście jak wcześniej.",
+  "changeKept": "Serwer nie przyjął tej zmiany; {{name}} wciąż jest na liście jak wcześniej.",
   "registeredSaved": "Zapisano: {{renamed}} zmieniono nazwy, {{unregistered}} usunięto · lista przeładowana",
   "announcedRenamed": "Nazwa zapisana",
   "announcedUnregistered": "Rejestracja usunięta",

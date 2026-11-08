@@ -1,7 +1,8 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { getServerState } from "../channels/serverStore";
-import { type MockApi } from "../../api";
+import { EngineError, type MockApi } from "../../api";
+import { subscribeAnnouncements } from "../../a11y/announcer";
 import { axeViolations } from "../../test/axe";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { openServerAdmin, resetServerAdmin } from "./banStore";
@@ -46,6 +47,18 @@ function closeButton(dialog: HTMLElement): HTMLElement {
   );
   if (!button) throw new Error("no Close in the footer");
   return button as HTMLElement;
+}
+
+/**
+ * What the app announces from now on, until `stop`. A save must say what it did, so a test that
+ * only reads the panel could not tell a success claim from a failure one (issue #256).
+ */
+function hearAnnouncements(): { stop: () => void; heard: string[] } {
+  const heard: string[] = [];
+  const stop = subscribeAnnouncements(({ message }) => {
+    heard.push(message);
+  });
+  return { stop, heard };
 }
 
 beforeEach(async () => {
@@ -152,6 +165,7 @@ describe("registered users tab", () => {
     expect(within(dialog).getByRole("button", { name: "Save" })).toBeEnabled();
     expect(within(panel).getByRole("heading", { name: "Tove" })).toBeTruthy();
 
+    const announced = hearAnnouncements();
     act(() => {
       fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
     });
@@ -162,6 +176,10 @@ describe("registered users tab", () => {
       within(dialog).getByText("Saved: 1 renamed, 0 unregistered · list reloaded"),
     ).toBeTruthy();
     expect(within(dialog).queryByText("not saved")).toBeNull();
+    await waitFor(() => {
+      expect(announced.heard).toContain("Changes sent to the server");
+    });
+    announced.stop();
   });
 
   it("keeps the server's name when the server did not take the new one (issue #256, AC-10.37)", async () => {
@@ -176,14 +194,54 @@ describe("registered users tab", () => {
         target: { value: "Sigrid" },
       });
     });
+    const announced = hearAnnouncements();
     act(() => {
       fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
     });
     await within(dialog).findByText(
-      "The server did not take that name; Tove is still listed as before.",
+      "The server did not take that change; Tove is still listed as before.",
     );
     expect(within(dialog).queryByText("Saved:")).toBeNull();
     expect(rowOf(dialog, "Tove")).toBeTruthy();
+    // The screen reader hears the same sentence the banner shows, never a success.
+    await waitFor(() => {
+      expect(announced.heard).toContain(
+        "The server did not take that change; Tove is still listed as before.",
+      );
+    });
+    expect(announced.heard).not.toContain("Changes sent to the server");
+    announced.stop();
+  });
+
+  it("says what failed when a save could not go through, and never a success (issue #256)", async () => {
+    const dialog = await openTab("registered");
+    act(() => {
+      fireEvent.click(rowOf(dialog, "Tove"));
+    });
+    const panel = within(dialog).getByRole("complementary", { name: "Details of Tove" });
+    act(() => {
+      fireEvent.change(within(panel).getByRole("textbox", { name: "Name" }), {
+        target: { value: "Tove Eriksson" },
+      });
+    });
+    // The mock copies a server that keeps a held name without a word; this is the refusal the
+    // server does say in words, which the engine reports as a missing right (FR-10.59).
+    api.registeredUserRename = () =>
+      Promise.reject(new EngineError("permissionDenied", "the register right is missing"));
+    const announced = hearAnnouncements();
+    act(() => {
+      fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+    });
+    await within(dialog).findByText(
+      "You need the Register right on the root channel to change the registered users.",
+    );
+    await waitFor(() => {
+      expect(announced.heard).toContain(
+        "You need the Register right on the root channel to change the registered users.",
+      );
+    });
+    expect(announced.heard).not.toContain("Changes sent to the server");
+    announced.stop();
   });
 
   it("confirms unregistering, marks the row, and removes it on save (FR-10.52, AC-10.37)", async () => {

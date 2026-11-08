@@ -422,7 +422,7 @@
   "perUserSave": "Promjene se šalju po korisniku pri spremanju.",
   "save": "Spremi",
   "changesNotSavedUsers": "još nije spremljeno",
-  "renameKept": "Server nije prihvatio to ime; {{name}} je i dalje na popisu kao prije.",
+  "changeKept": "Server nije prihvatio tu promjenu; {{name}} je i dalje na popisu kao prije.",
   "registeredSaved": "Spremljeno: {{renamed}} preimenovanih, {{unregistered}} uklonjenih · popis ponovno učitan",
   "announcedRenamed": "Ime spremljeno",
   "announcedUnregistered": "Registracija uklonjena",

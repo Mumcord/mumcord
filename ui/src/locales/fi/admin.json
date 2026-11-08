@@ -419,7 +419,7 @@
   "perUserSave": "Muutokset lähetetään käyttäjä kerrallaan tallennettaessa.",
   "save": "Tallenna",
   "changesNotSavedUsers": "ei vielä tallennettu",
-  "renameKept": "Palvelin ei ottanut tätä nimeä; {{name}} on yhä listalla kuin ennen.",
+  "changeKept": "Palvelin ei ottanut tätä muutosta; {{name}} on yhä listalla kuin ennen.",
   "registeredSaved": "Tallennettu: {{renamed}} nimetty uudelleen, {{unregistered}} poistettu · lista ladattu uudelleen",
   "announcedRenamed": "Nimi tallennettu",
   "announcedUnregistered": "Rekisteröinti poistettu",

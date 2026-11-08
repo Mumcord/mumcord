@@ -419,7 +419,7 @@
   "perUserSave": "Changes are sent per user when you save.",
   "save": "Save",
   "changesNotSavedUsers": "not saved yet",
-  "renameKept": "The server did not take that name; {{name}} is still listed as before.",
+  "changeKept": "The server did not take that change; {{name}} is still listed as before.",
   "registeredSaved": "Saved: {{renamed}} renamed, {{unregistered}} unregistered · list reloaded",
   "announcedRenamed": "Name saved",
   "announcedUnregistered": "Registration removed",

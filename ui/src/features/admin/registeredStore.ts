@@ -208,17 +208,33 @@ export function dropChanges(): void {
 }
 
 /**
- * Sends the queued changes, one message per account, and reads the list back. `force` is not a
- * thing here: the server's list always wins, and a change it did not take is reported as such.
+ * What a save did. The tab says this back out loud instead of announcing a success it cannot
+ * know about: the server neither confirms a change nor refuses one in words (issue #256).
  */
-export async function saveChanges(): Promise<void> {
+export type RegisteredSave =
+  /** Nothing was queued, or another save was already running. */
+  | { kind: "idle" }
+  /** The window or the connection went away while the changes were out. */
+  | { kind: "closed" }
+  /** The server refused the read, or did not answer. */
+  | { kind: "error"; error: EngineError }
+  /** Every queued change stands in the server's list now. */
+  | { kind: "saved"; renamed: number; unregistered: number }
+  /** At least one change the server did not take; `name` is the account it says still stands. */
+  | { kind: "kept"; name: string; renamed: number; unregistered: number };
+
+/**
+ * Sends the queued changes, one message per account, and reads the list back. There is no `force`
+ * here: the server's list always wins, and a change it did not take comes back as `kept`.
+ */
+export async function saveChanges(): Promise<RegisteredSave> {
   const window = current;
-  if (!window || window.busy) return;
+  if (!window || window.busy) return { kind: "idle" };
   const api = getApi();
   const serverId = window.serverId;
   const rename = pendingRename(window);
   const removals = [...window.removals];
-  if (!rename && removals.length === 0) return;
+  if (!rename && removals.length === 0) return { kind: "idle" };
   set({ ...window, busy: true, error: null, kept: null, saved: null });
   let renamed = 0;
   let unregistered = 0;
@@ -238,7 +254,8 @@ export async function saveChanges(): Promise<void> {
       if (outcome.kind === "saved") renamed += 1;
       else kept = rename.userId;
     }
-    if (!alive(serverId)) return;
+    const open = alive(serverId);
+    if (!open) return { kind: "closed" };
     update({
       entries,
       busy: false,
@@ -250,9 +267,15 @@ export async function saveChanges(): Promise<void> {
       saved: { renamed, unregistered },
       groups: null,
     });
-    if (alive(serverId)?.selected !== null) loadGroups(alive(serverId)?.selected ?? null);
+    if (open.selected !== null) loadGroups(open.selected);
+    if (kept === null) return { kind: "saved", renamed, unregistered };
+    // The name as the server lists it now, which is the one the user is told about.
+    const held = entries.find((entry) => entry.userId === kept);
+    return { kind: "kept", name: held?.name ?? "", renamed, unregistered };
   } catch (error) {
-    if (alive(serverId)) update({ busy: false, error: toEngineError(error) });
+    const engineError = toEngineError(error);
+    if (alive(serverId)) update({ busy: false, error: engineError });
+    return { kind: "error", error: engineError };
   }
 }
 

@@ -422,7 +422,7 @@
   "perUserSave": "Les modifications sont envoyées utilisateur par utilisateur à l’enregistrement.",
   "save": "Enregistrer",
   "changesNotSavedUsers": "pas encore enregistré",
-  "renameKept": "Le serveur n’a pas retenu ce nom ; {{name}} reste listé comme avant.",
+  "changeKept": "Le serveur n’a pas retenu ce changement ; {{name}} reste listé comme avant.",
   "registeredSaved": "Enregistré : {{renamed}} renommés, {{unregistered}} désenregistrés · liste rechargée",
   "announcedRenamed": "Nom enregistré",
   "announcedUnregistered": "Enregistrement supprimé",

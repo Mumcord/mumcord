@@ -425,7 +425,7 @@
   "perUserSave": "Změny se při uložení posílají zvlášť za každého uživatele.",
   "save": "Uložit",
   "changesNotSavedUsers": "zatím neuloženo",
-  "renameKept": "Server toto jméno nepřijal; {{name}} je stále veden jako dřív.",
+  "changeKept": "Server tuto změnu nepřijal; {{name}} je stále veden jako dřív.",
   "registeredSaved": "Uloženo: {{renamed}} přejmenováno, {{unregistered}} odregistrováno · seznam znovu načten",
   "announcedRenamed": "Jméno uloženo",
   "announcedUnregistered": "Registrace odstraněna",
