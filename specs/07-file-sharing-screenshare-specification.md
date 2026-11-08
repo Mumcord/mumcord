@@ -123,7 +123,7 @@ The client only displays; access decisions on the relay are made by the bot (who
 ### 4.4 File sharing: transfer
 
 - **FR-7.31** Request flow (section 6.3): the recipient sends `req` (plugin data `mumcord.file`) to the sender; the sender answers `queued` (with position), `go`, `busy` or `gone`. On `go` both sides open the `mumcord-p2p` connection **through the relay only** (no candidates sent, `rl = 1`, token with use `file`), reusing an existing relay session between the two if one is open and allowed for files.
-- **FR-7.32** The file travels on one new unidirectional QUIC stream of type `file` on the inner connection: a small header (share id, offset 0, length) and then the raw bytes. The receiver rejects a stream whose share id it did not request or whose length differs from the offer.
+- **FR-7.32** The file travels on one new unidirectional QUIC stream of type `file` on the inner connection: a small header (share id, offset 0, length) and then the file bytes. The receiver rejects a stream whose share id it did not request or whose length differs from the offer. Two stream formats exist, negotiated through `req` and `go` without an extra round trip (issue #673): **format 1** (clients up to 0.7.x) is a fixed 32-byte header (share id 16 bytes, offset u64, length u64, big-endian) followed by the raw bytes; **format 2** is a sequence of length-prefixed Bovnar documents (u32 big-endian byte length, then the document): first a header document (`v` = 2, `id` as 32 hex characters, `off`, `len`; at most 1 KiB), then data documents with one `octets` field `d` of 1 B to 64 KiB each, until `len` bytes arrived. The recipient's `req` carries `fmt` = the highest format it reads; the sender picks min(own highest, `fmt` or 1) and names it in `go` as `fmt` (missing = 1), and the recipient reads the stream in that format. Size caps are checked before anything is parsed; a too-large, malformed or empty document, or a total other than `len`, ends the transfer.
 - **FR-7.33** Speed: no extra limit in the client beyond the relay's per-session bandwidth (10 Mbit/s by default, FR-4.35). Screen sharing on the same connection keeps priority over file data.
 - **FR-7.34** Timeouts: no `go`/`queued` answer within 10 s → Failed "{sender} did not answer". `go` but no data within 30 s → Failed "Couldn't connect through the relay: {reason}" with the relay reasons of FR-4.11. No data for 30 s during a transfer → Failed "The transfer stalled".
 
@@ -374,9 +374,9 @@ The receiver validates every field before showing a card (untrusted input) and t
 
 | `t` | Direction | Fields |
 |---|---|---|
-| `req` | recipient → sender | `v`, `id` |
+| `req` | recipient → sender | `v`, `id`, optional `fmt` (u8, highest file stream format it reads; missing = 1, FR-7.32) |
 | `queued` | sender → recipient | `v`, `id`, `pos` (u16, 1 = next) |
-| `go` | sender → recipient | `v`, `id` |
+| `go` | sender → recipient | `v`, `id`, optional `fmt` (u8, file stream format the sender uses; missing = 1, FR-7.32) |
 | `busy` | sender → recipient | `v`, `id` (queue full) |
 | `gone` | sender → recipient | `v`, `id` (share ended, unknown, or refused) |
 | `cancel` | recipient → sender | `v`, `id` |

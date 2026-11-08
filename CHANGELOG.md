@@ -13,6 +13,7 @@
 
 ### Changed
 
+- File sharing (issue #673): the file data now travels as Bovnar documents, like the file messages already do, which keeps the format open for later additions at no noticeable cost. Both sides agree on the format when the download starts, so sending to and receiving from Mumcord 0.7.x keeps working as before
 - macOS releases come as two downloads instead of one universal app (issue #663): "macOS (Apple Silicon)" (`Mumcord_<version>_aarch64.dmg`) and "macOS (Intel)" (`Mumcord_<version>_x64.dmg`), each built natively, signed, notarized and smoke-tested on its own architecture. The download and the installed app are about half the size. Installed universal apps update to the build for their own Mac.
 
 ## [0.7.2] - 2026-11-08
