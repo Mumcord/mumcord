@@ -33,7 +33,8 @@
     "serverDeafened": "palvelimen kuurouttama",
     "suppressed": "vaimennettu (ei voi puhua täällä)",
     "localMuted": "mykistetty sinulta",
-    "unregistered": "ei rekisteröitynyt"
+    "unregistered": "ei rekisteröitynyt",
+    "prioritySpeaker": "etusijapuhuja"
   },
   "mumcordBadge": "Käyttää Mumcordia",
   "botBadge": "Botti",
@@ -60,7 +61,8 @@
     "nowPlaying": "Kuuntelee: {{track}}",
     "nowGaming": "Pelaa: {{game}}",
     "weakConnection": "Heikko yhteys – korkea ping tai pakettihävikki",
-    "positional": "Sijaintiääni käytössä"
+    "positional": "Sijaintiääni käytössä",
+    "prioritySpeaker": "Etusijapuhuja – kuuluu muiden yli"
   },
   "announce": {
     "joined": "{{name}} liittyi kanavallesi",

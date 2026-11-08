@@ -39,7 +39,8 @@
     "serverDeafened": "zvok izklopil strežnik",
     "suppressed": "omejen (tukaj ne more govoriti)",
     "localMuted": "utišan zate",
-    "unregistered": "ni registriran"
+    "unregistered": "ni registriran",
+    "prioritySpeaker": "prednostni govorec"
   },
   "mumcordBadge": "Uporablja Mumcord",
   "botBadge": "Bot",
@@ -66,7 +67,8 @@
     "nowPlaying": "Posluša {{track}}",
     "nowGaming": "Igra {{game}}",
     "weakConnection": "Šibka povezava – visok ping ali izguba paketov",
-    "positional": "Prostorski zvok je vklopljen"
+    "positional": "Prostorski zvok je vklopljen",
+    "prioritySpeaker": "Prednostni govorec – sliši se čez vse druge"
   },
   "announce": {
     "joined": "{{name}} se je pridružil tvojemu kanalu",

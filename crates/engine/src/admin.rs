@@ -345,6 +345,89 @@ impl Engine {
     }
 }
 
+/// A server-side moderation action on one person (issue #257, FR-10.15, FR-10.19).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModerateAction {
+    /// Server mute on or off. Turning it off also lifts a server deafen, as in Mumble.
+    Mute(bool),
+    /// Server deafen on or off. Deafen implies mute, as in Mumble.
+    Deafen(bool),
+    /// Heard over everyone else in the channel.
+    PrioritySpeaker(bool),
+    /// Lets someone the channel's rules keep quiet speak anyway.
+    Unsuppress,
+    /// Clears their comment for everyone.
+    ResetComment,
+    /// Clears their avatar for everyone.
+    ResetAvatar,
+}
+
+impl ModerateAction {
+    fn message(self, session: u32) -> proto::UserState {
+        let mut m = proto::UserState {
+            session: Some(session),
+            ..Default::default()
+        };
+        match self {
+            Self::Mute(on) => {
+                m.mute = Some(on);
+                if !on {
+                    m.deaf = Some(false);
+                }
+            }
+            Self::Deafen(on) => {
+                m.deaf = Some(on);
+                if on {
+                    m.mute = Some(true);
+                }
+            }
+            Self::PrioritySpeaker(on) => m.priority_speaker = Some(on),
+            Self::Unsuppress => m.suppress = Some(false),
+            Self::ResetComment => m.comment = Some(String::new()),
+            Self::ResetAvatar => m.texture = Some(Vec::new()),
+        }
+        m
+    }
+
+    fn name(self) -> &'static str {
+        match self {
+            Self::Mute(_) => "server mute",
+            Self::Deafen(_) => "server deafen",
+            Self::PrioritySpeaker(_) => "priority speaker",
+            Self::Unsuppress => "unsuppress",
+            Self::ResetComment => "reset comment",
+            Self::ResetAvatar => "reset avatar",
+        }
+    }
+}
+
+impl Engine {
+    /// Acts on a person at once (FR-10.15, FR-10.19). The server has the final say: success shows
+    /// in the person's state, a refusal arrives as a `ServerDenied` notice with its reason. The
+    /// menu offers each action only with the right (MuteDeafen in their channel, ResetUserContent
+    /// in Root); Mumcord does not check it again, so a forced attempt shows the server's reason.
+    pub fn person_moderate(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        action: ModerateAction,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let known = ctx
+            .handle
+            .with_state(|state| state.users.contains_key(&session));
+        if !known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
+        }
+        ctx.handle
+            .send_admin_user_state(action.message(session))
+            .map_err(convert::command_error)?;
+        // Only the kind of action (FR-10.64): no names, comments or pictures.
+        tracing::info!(server_id, action = action.name(), "admin action: sent");
+        Ok(())
+    }
+}
+
 /// Writes the `UserRemove` message and waits for the server's answer: the person's removal, a
 /// refusal, or nothing within [`ANSWER_WAIT`] (FR-10.59). The wait is registered first, so a fast
 /// answer cannot miss it.
@@ -446,6 +529,28 @@ pub(crate) fn on_disconnect(hub: &Mutex<Admin>, server_id: ServerId) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn deafen_mutes_and_unmute_lifts_deafen() {
+        let deafen = ModerateAction::Deafen(true).message(4);
+        assert_eq!((deafen.mute, deafen.deaf), (Some(true), Some(true)));
+        let unmute = ModerateAction::Mute(false).message(4);
+        assert_eq!((unmute.mute, unmute.deaf), (Some(false), Some(false)));
+        let undeafen = ModerateAction::Deafen(false).message(4);
+        assert_eq!((undeafen.mute, undeafen.deaf), (None, Some(false)));
+    }
+
+    #[test]
+    fn resets_send_empty_values() {
+        let comment = ModerateAction::ResetComment.message(4);
+        assert_eq!(comment.comment.as_deref(), Some(""));
+        assert_eq!(comment.session, Some(4));
+        assert_eq!(
+            ModerateAction::ResetAvatar.message(4).texture,
+            Some(Vec::new())
+        );
+        assert_eq!(ModerateAction::Unsuppress.message(4).suppress, Some(false));
+    }
 
     #[test]
     fn only_the_kick_and_ban_denials_reach_an_open_dialog() {

@@ -373,5 +373,19 @@
     "rootBody": "Ovo su pravila kanala Root; svaki kanal ih nasljeđuje.",
     "backToEditing": "Natrag na uređivanje",
     "saveAnyway": "Ipak spremi"
+  },
+  "moderate": {
+    "mute": "Utišaj na poslužitelju",
+    "deafen": "Zagluši na poslužitelju",
+    "unsuppress": "Ukini prigušivanje",
+    "priority": "Prioritetni govornik",
+    "resetComment": "Poništi komentar",
+    "resetAvatar": "Poništi avatar",
+    "commentTitle": "Poništiti komentar korisnika {{name}}?",
+    "avatarTitle": "Poništiti avatar korisnika {{name}}?",
+    "resetBody": "Briše se za sve. Može postaviti novi.",
+    "cancel": "Odustani",
+    "reset": "Poništi",
+    "failed": "Poslužitelj nije dostupan. Pokušaj ponovno."
   }
 }

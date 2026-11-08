@@ -370,5 +370,19 @@
     "rootBody": "Need on Root-kanali reeglid; iga kanal pärib need.",
     "backToEditing": "Tagasi muutmise juurde",
     "saveAnyway": "Salvesta ikkagi"
+  },
+  "moderate": {
+    "mute": "Serveris vaigista",
+    "deafen": "Serveris kurdista",
+    "unsuppress": "Tühista summutus",
+    "priority": "Eelisrääkija",
+    "resetComment": "Lähtesta kommentaar",
+    "resetAvatar": "Lähtesta avatar",
+    "commentTitle": "Kas lähtestada kasutaja {{name}} kommentaar?",
+    "avatarTitle": "Kas lähtestada kasutaja {{name}} avatar?",
+    "resetBody": "See eemaldatakse kõigi jaoks. Ta saab määrata uue.",
+    "cancel": "Loobu",
+    "reset": "Lähtesta",
+    "failed": "Serveriga ei saanud ühendust. Proovi uuesti."
   }
 }

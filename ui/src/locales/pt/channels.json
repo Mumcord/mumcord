@@ -36,7 +36,8 @@
     "serverDeafened": "sem áudio pelo servidor",
     "suppressed": "suprimido (não pode falar aqui)",
     "localMuted": "silenciado para ti",
-    "unregistered": "não registado"
+    "unregistered": "não registado",
+    "prioritySpeaker": "orador prioritário"
   },
   "mumcordBadge": "Usa o Mumcord",
   "botBadge": "Bot",
@@ -63,7 +64,8 @@
     "nowPlaying": "A ouvir {{track}}",
     "nowGaming": "A jogar {{game}}",
     "weakConnection": "Ligação fraca – ping alto ou perda de pacotes",
-    "positional": "Áudio posicional ativo"
+    "positional": "Áudio posicional ativo",
+    "prioritySpeaker": "Orador prioritário – ouvido por cima de todos"
   },
   "announce": {
     "joined": "{{name}} entrou no teu canal",

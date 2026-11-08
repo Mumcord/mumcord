@@ -583,3 +583,9 @@
 .servers-form__field > .button {
   align-self: flex-start;
 }
+
+/* The tick of a switched-on toggle in a menu (issue #257): green, at the end of the row. */
+.server-menu__tick {
+  color: var(--color-success);
+  font-weight: 700;
+}

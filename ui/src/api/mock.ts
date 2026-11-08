@@ -1012,6 +1012,7 @@ function person(session: number, name: string, channelId: number, certHash: stri
     serverMute: false,
     serverDeaf: false,
     suppressed: false,
+    prioritySpeaker: false,
     listeningChannelIds: [],
     hasAvatar: false,
     avatarHash: null,
@@ -2950,6 +2951,38 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         fail("invalidInput", "volume must be between 0 and 200");
       }
       updateUser(session, { shareVolume: volume });
+      return Promise.resolve(null);
+    },
+    personModerate: (serverId, session, action) => {
+      requireSession(serverId);
+      requireUser(session);
+      // As the engine sends it: deafen mutes too, unmuting lifts a deafen (issue #257).
+      switch (action.kind) {
+        case "mute":
+          updateUser(
+            session,
+            action.on ? { serverMute: true } : { serverMute: false, serverDeaf: false },
+          );
+          break;
+        case "deafen":
+          updateUser(
+            session,
+            action.on ? { serverMute: true, serverDeaf: true } : { serverDeaf: false },
+          );
+          break;
+        case "prioritySpeaker":
+          updateUser(session, { prioritySpeaker: action.on });
+          break;
+        case "unsuppress":
+          updateUser(session, { suppressed: false });
+          break;
+        case "resetComment":
+          updateUser(session, { hasComment: false });
+          break;
+        case "resetAvatar":
+          updateUser(session, { hasAvatar: false, avatarHash: null });
+          break;
+      }
       return Promise.resolve(null);
     },
     personMove: (serverId, session, channelId) => {

@@ -380,3 +380,37 @@ mod tests {
         assert_eq!(refused.err().map(|e| e.code), Some(ErrorCode::InvalidInput));
     }
 }
+
+/// A server-side moderation action on one person (issue #257).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum ModerateInput {
+    Mute { on: bool },
+    Deafen { on: bool },
+    PrioritySpeaker { on: bool },
+    Unsuppress,
+    ResetComment,
+    ResetAvatar,
+}
+
+/// Server mute, deafen, priority speaker, un-suppress, reset comment or avatar (FR-10.15,
+/// FR-10.19). Acts at once; a refusal arrives as a `serverDenied` notice with the server's reason.
+#[tauri::command]
+#[specta::specta]
+pub fn person_moderate(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    action: ModerateInput,
+) -> ApiResult<()> {
+    use mumcord_engine::ModerateAction as A;
+    let action = match action {
+        ModerateInput::Mute { on } => A::Mute(on),
+        ModerateInput::Deafen { on } => A::Deafen(on),
+        ModerateInput::PrioritySpeaker { on } => A::PrioritySpeaker(on),
+        ModerateInput::Unsuppress => A::Unsuppress,
+        ModerateInput::ResetComment => A::ResetComment,
+        ModerateInput::ResetAvatar => A::ResetAvatar,
+    };
+    Ok(engine.person_moderate(to_engine_server_id(server_id), session, action)?)
+}

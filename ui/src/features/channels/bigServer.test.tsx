@@ -45,6 +45,7 @@ function user(session: number, name: string, channelId: number): User {
     serverMute: false,
     serverDeaf: false,
     suppressed: false,
+    prioritySpeaker: false,
     listeningChannelIds: [],
     hasAvatar: false,
     avatarHash: null,

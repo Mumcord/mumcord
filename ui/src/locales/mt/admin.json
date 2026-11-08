@@ -379,5 +379,19 @@
     "rootBody": "Dawn huma r-regoli tal-kanal Root; kull kanal jirtihom.",
     "backToEditing": "Lura għall-editjar",
     "saveAnyway": "Issalva xorta"
+  },
+  "moderate": {
+    "mute": "Ħassat fuq is-server",
+    "deafen": "Atrax fuq is-server",
+    "unsuppress": "Neħħi s-soppressjoni",
+    "priority": "Kelliem prijoritarju",
+    "resetComment": "Irrisettja l-kumment",
+    "resetAvatar": "Irrisettja l-avatar",
+    "commentTitle": "Tirrisettja l-kumment ta' {{name}}?",
+    "avatarTitle": "Tirrisettja l-avatar ta' {{name}}?",
+    "resetBody": "Jitħassar għal kulħadd. Jistgħu jissettjaw ieħor.",
+    "cancel": "Ikkanċella",
+    "reset": "Irrisettja",
+    "failed": "Ma setax jintlaħaq is-server. Erġa' pprova."
   }
 }

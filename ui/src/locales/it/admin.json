@@ -373,5 +373,19 @@
     "rootBody": "Sono le regole del canale Root; ogni canale le eredita.",
     "backToEditing": "Torna alla modifica",
     "saveAnyway": "Salva comunque"
+  },
+  "moderate": {
+    "mute": "Silenzia sul server",
+    "deafen": "Assorda sul server",
+    "unsuppress": "Annulla soppressione",
+    "priority": "Oratore prioritario",
+    "resetComment": "Reimposta commento",
+    "resetAvatar": "Reimposta avatar",
+    "commentTitle": "Reimpostare il commento di {{name}}?",
+    "avatarTitle": "Reimpostare l'avatar di {{name}}?",
+    "resetBody": "Viene cancellato per tutti. Potrà impostarne uno nuovo.",
+    "cancel": "Annulla",
+    "reset": "Reimposta",
+    "failed": "Impossibile raggiungere il server. Riprova."
   }
 }

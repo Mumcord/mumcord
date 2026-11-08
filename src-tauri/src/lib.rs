@@ -12,6 +12,8 @@ mod display;
 mod dnd;
 mod fullscreen;
 #[cfg(target_os = "linux")]
+mod glib_log;
+#[cfg(target_os = "linux")]
 mod gst_fallback;
 mod hotkeys;
 mod ingame_overlay;
@@ -116,6 +118,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             admin::person_kick,
             admin::person_ban,
             admin::person_action_close,
+            admin::person_moderate,
             channel_admin::channel_create,
             channel_admin::channel_edit,
             channel_admin::channel_remove,
@@ -555,6 +558,8 @@ pub fn run() {
         // The Wayland app ID comes from the program name; it must match the desktop entry
         // (`desktop_entry`) for the taskbar icon. Set before GTK starts.
         gdk::glib::set_prgname(Some(context.config().identifier.as_str()));
+        // GTK, GDK and WebKit warnings into Mumcord's log, before they start (issue #625).
+        glib_log::install();
         ptt::set_host_app_id(&context.config().identifier);
     }
 

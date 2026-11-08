@@ -42,7 +42,8 @@
     "serverDeafened": "bodhraithe ag an bhfreastalaí",
     "suppressed": "faoi chois (ní féidir labhairt anseo)",
     "localMuted": "balbhaithe duitse",
-    "unregistered": "gan chlárú"
+    "unregistered": "gan chlárú",
+    "prioritySpeaker": "cainteoir tosaíochta"
   },
   "mumcordBadge": "Úsáideann sé Mumcord",
   "botBadge": "Bot",
@@ -69,7 +70,8 @@
     "nowPlaying": "Ag éisteacht le {{track}}",
     "nowGaming": "Ag imirt {{game}}",
     "weakConnection": "Ceangal lag – ping ard nó caillteanas paicéad",
-    "positional": "Fuaim shuímh gníomhach"
+    "positional": "Fuaim shuímh gníomhach",
+    "prioritySpeaker": "Cainteoir tosaíochta – cloistear thar chách é"
   },
   "announce": {
     "joined": "Chuaigh {{name}} isteach i do chainéal",

@@ -33,7 +33,8 @@
     "serverDeafened": "serveri poolt kurdistatud",
     "suppressed": "summutatud (ei saa siin rääkida)",
     "localMuted": "sinu jaoks vaigistatud",
-    "unregistered": "registreerimata"
+    "unregistered": "registreerimata",
+    "prioritySpeaker": "eelisrääkija"
   },
   "mumcordBadge": "Kasutab Mumcordi",
   "botBadge": "Bot",
@@ -60,7 +61,8 @@
     "nowPlaying": "Kuulab: {{track}}",
     "nowGaming": "Mängib: {{game}}",
     "weakConnection": "Nõrk ühendus – kõrge ping või pakettide kadu",
-    "positional": "Positsiooniheli on aktiivne"
+    "positional": "Positsiooniheli on aktiivne",
+    "prioritySpeaker": "Eelisrääkija – kostab teistest üle"
   },
   "announce": {
     "joined": "{{name}} liitus sinu kanaliga",

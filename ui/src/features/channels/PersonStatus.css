@@ -37,6 +37,13 @@
   color: var(--color-accent);
 }
 
+/* Priority speaker (issue #257): a filled star in the warning colour, so it stands out from the
+   voice-state icons without reading as a problem. */
+.person-icon--priority {
+  color: var(--color-warning);
+  fill: currentColor;
+}
+
 .person-icon-slot {
   display: inline-flex;
 }

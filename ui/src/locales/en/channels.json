@@ -33,7 +33,8 @@
     "serverDeafened": "deafened by server",
     "suppressed": "suppressed (cannot speak here)",
     "localMuted": "muted for you",
-    "unregistered": "not registered"
+    "unregistered": "not registered",
+    "prioritySpeaker": "priority speaker"
   },
   "mumcordBadge": "Uses Mumcord",
   "botBadge": "Bot",
@@ -60,7 +61,8 @@
     "nowPlaying": "Listening to {{track}}",
     "nowGaming": "Playing {{game}}",
     "weakConnection": "Weak connection – high ping or packet loss",
-    "positional": "Positional audio active"
+    "positional": "Positional audio active",
+    "prioritySpeaker": "Priority speaker – heard over everyone else"
   },
   "announce": {
     "joined": "{{name}} joined your channel",

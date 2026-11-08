@@ -23,7 +23,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { getApi, toEngineError } from "../../api";
+import { getApi, toEngineError, type ModerateInput } from "../../api";
 import { shownServerId, useServerState } from "../channels/serverStore";
 import { WHISPER_ICON_PATHS } from "../whisper/whisperIcons";
 import { createWhisperTarget } from "../whisper/whisperStore";
@@ -36,6 +36,7 @@ import { blockTargetFor, openBlockDialog, unblock, useBlock } from "../blocking"
 import { BLOCK_PATH } from "../blocking/BlockIcon";
 import { ContextMenu, type MenuPosition, type MenuItem } from "../../components/ContextMenu";
 import { canBan, canKick } from "../admin/permissions";
+import type { PersonActionMode } from "../admin/personActionStore";
 import { openPersonAction } from "../admin/personActionStore";
 import "../userpanel/quicksettings.css";
 import "./members.css";
@@ -72,6 +73,17 @@ const MOVE_TO_ME_ICON = "M12 3v12M8 11l4 4 4-4M4 21h16";
 const MOVE_TO_ICON = "M3 12h11M10 8l4 4-4 4M19 4v16";
 /** Leaving the server: a door with an arrow out, so a kick does not rest on its red colour alone. */
 const KICK_ICON = "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9";
+/** Moderation icons (issue #257, mockup "admin-menus"): crossed mic, crossed headphones, a star. */
+const MUTE_ICON =
+  "M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 4.6 2.5M15 9V5a3 3 0 0 0-.9-2.1M5 10v1a7 7 0 0 0 11.5 5.4M19 10v1a7 7 0 0 1-.4 2.3M12 18v4M3 3l18 18";
+const DEAFEN_ICON =
+  "M3 18v-6a9 9 0 0 1 14.4-7.2M21 12v6M21 18a2 2 0 0 1-2 2h-1v-6h3M3 18a2 2 0 0 0 2 2h1v-6H3M3 3l18 18";
+const UNSUPPRESS_ICON =
+  "M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3M19 10v1a7 7 0 0 1-14 0v-1M12 18v4";
+const STAR_ICON = "M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3";
+const RESET_COMMENT_ICON =
+  "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM9 8l6 6M15 8l-6 6";
+const RESET_AVATAR_ICON = "M3 3h18v18H3zM9 9l6 6M15 9l-6 6";
 
 /** Decorative: the entry's label is the accessible name, so the icon stays hidden. */
 function MenuIcon({ children }: { children: ReactNode }) {
@@ -247,7 +259,7 @@ function PersonMenu({
   // Kick… and Ban… only with the right the server granted on the root channel (FR-10.1, FR-10.2),
   // never for yourself (issue #253), and never as a disabled item (FR-10.2).
   const serverId = shownServerId();
-  const openAction = (mode: "kick" | "ban") => {
+  const openAction = (mode: PersonActionMode) => {
     if (!user) return;
     closePersonMenu();
     openPersonAction(
@@ -258,7 +270,88 @@ function PersonMenu({
       mode,
     );
   };
-  const adminItems: MenuItem[] =
+  // Moderation (issue #257): server mute, deafen, un-suppress and priority speaker need Mute others
+  // in the person's channel; resets need Reset profiles in Root (FR-10.7, FR-10.15, FR-10.19).
+  // The standard server refuses them for people in a temporary channel, so they are not offered.
+  const personChannel = user ? state.channels.get(user.channelId) : undefined;
+  const rights = personChannel?.temporary === true ? undefined : personChannel?.permissions;
+  const rootRights = state.channels.get(0)?.permissions;
+  const moderate = (action: ModerateInput) => {
+    if (!user) return;
+    getApi()
+      .personModerate(serverId, user.session, action)
+      .catch((error: unknown) => {
+        console.error("A moderation action failed", toEngineError(error).message);
+      });
+  };
+  const moderation: MenuItem[] =
+    user && rights?.muteDeafen === true
+      ? [
+          {
+            label: tAdmin("moderate.mute"),
+            icon: MUTE_ICON,
+            checked: user.serverMute,
+            onSelect: () => {
+              moderate({ kind: "mute", on: !user.serverMute });
+            },
+          },
+          {
+            label: tAdmin("moderate.deafen"),
+            icon: DEAFEN_ICON,
+            checked: user.serverDeaf,
+            onSelect: () => {
+              moderate({ kind: "deafen", on: !user.serverDeaf });
+            },
+          },
+          ...(user.suppressed
+            ? [
+                {
+                  label: tAdmin("moderate.unsuppress"),
+                  icon: UNSUPPRESS_ICON,
+                  onSelect: () => {
+                    moderate({ kind: "unsuppress" });
+                  },
+                },
+              ]
+            : []),
+          {
+            label: tAdmin("moderate.priority"),
+            icon: STAR_ICON,
+            checked: user.prioritySpeaker,
+            onSelect: () => {
+              moderate({ kind: "prioritySpeaker", on: !user.prioritySpeaker });
+            },
+          },
+        ]
+      : [];
+  const resets: MenuItem[] =
+    user && !isSelf && rootRights?.resetUserContent === true
+      ? [
+          ...(user.hasComment
+            ? [
+                {
+                  label: tAdmin("moderate.resetComment"),
+                  icon: RESET_COMMENT_ICON,
+                  onSelect: () => {
+                    openAction("resetComment");
+                  },
+                },
+              ]
+            : []),
+          ...(user.hasAvatar
+            ? [
+                {
+                  label: tAdmin("moderate.resetAvatar"),
+                  icon: RESET_AVATAR_ICON,
+                  onSelect: () => {
+                    openAction("resetAvatar");
+                  },
+                },
+              ]
+            : []),
+        ]
+      : [];
+  const removal: MenuItem[] =
     user && !isSelf
       ? [
           ...moveItems,
@@ -288,6 +381,16 @@ function PersonMenu({
             : []),
         ]
       : [];
+  // Kick and ban sit last, in red, behind a divider (FR-10.6).
+  const adminItems: MenuItem[] = [
+    ...moderation,
+    ...resets,
+    ...removal.map((item, index) =>
+      index === 0 && moderation.length + resets.length > 0
+        ? { ...item, separatorBefore: true }
+        : item,
+    ),
+  ];
 
   // Chat requests (issue #141) reach Mumcord users who announced them, and only make sense for
   // people who may not write yet: not friends, no accepted conversation, no accepted request.

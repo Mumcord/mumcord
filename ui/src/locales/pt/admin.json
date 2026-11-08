@@ -373,5 +373,19 @@
     "rootBody": "Estas são as regras do canal Root; todos os canais as herdam.",
     "backToEditing": "Voltar à edição",
     "saveAnyway": "Guardar mesmo assim"
+  },
+  "moderate": {
+    "mute": "Silenciar no servidor",
+    "deafen": "Ensurdecer no servidor",
+    "unsuppress": "Levantar supressão",
+    "priority": "Orador prioritário",
+    "resetComment": "Repor comentário",
+    "resetAvatar": "Repor avatar",
+    "commentTitle": "Repor o comentário de {{name}}?",
+    "avatarTitle": "Repor o avatar de {{name}}?",
+    "resetBody": "É apagado para todos. A pessoa pode definir um novo.",
+    "cancel": "Cancelar",
+    "reset": "Repor",
+    "failed": "Não foi possível contactar o servidor. Tenta de novo."
   }
 }

@@ -37,6 +37,7 @@ export function useStatusText() {
     if (talking) parts.push(t("status.talking"));
     const voice = voiceState(user);
     if (voice) parts.push(t(VOICE_STATE_KEY[voice]));
+    if (user.prioritySpeaker) parts.push(t("status.prioritySpeaker"));
     if (user.localMute) parts.push(t("status.localMuted"));
     if (!user.registered) parts.push(t("status.unregistered"));
     return parts;

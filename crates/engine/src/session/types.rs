@@ -231,6 +231,8 @@ pub struct UserView {
     pub server_deaf: bool,
     /// May not speak in the current channel (no Speak permission or suppressed by an admin).
     pub suppressed: bool,
+    /// Heard over everyone else in the channel, set by an admin (issue #257).
+    pub priority_speaker: bool,
     pub listening_channel_ids: Vec<u32>,
     pub has_avatar: bool,
     /// Hex of the avatar texture hash, when the server sent one; changes when the avatar is replaced.

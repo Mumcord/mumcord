@@ -370,5 +370,19 @@
     "rootBody": "Ezek a Root csatorna szabályai; minden csatorna örökli őket.",
     "backToEditing": "Vissza a szerkesztéshez",
     "saveAnyway": "Mentés mindenképp"
+  },
+  "moderate": {
+    "mute": "Némítás a szerveren",
+    "deafen": "Süketítés a szerveren",
+    "unsuppress": "Elnémítás feloldása",
+    "priority": "Elsőbbségi beszélő",
+    "resetComment": "Megjegyzés törlése",
+    "resetAvatar": "Profilkép törlése",
+    "commentTitle": "Törlöd {{name}} megjegyzését?",
+    "avatarTitle": "Törlöd {{name}} profilképét?",
+    "resetBody": "Mindenkinél törlődik. Újat állíthat be.",
+    "cancel": "Mégse",
+    "reset": "Törlés",
+    "failed": "A szerver nem érhető el. Próbáld újra."
   }
 }

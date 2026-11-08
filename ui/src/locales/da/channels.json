@@ -33,7 +33,8 @@
     "serverDeafened": "lyd slået fra af serveren",
     "suppressed": "undertrykt (kan ikke tale her)",
     "localMuted": "slået fra for dig",
-    "unregistered": "ikke registreret"
+    "unregistered": "ikke registreret",
+    "prioritySpeaker": "prioriteret taler"
   },
   "mumcordBadge": "Bruger Mumcord",
   "botBadge": "Bot",
@@ -60,7 +61,8 @@
     "nowPlaying": "Lytter til {{track}}",
     "nowGaming": "Spiller {{game}}",
     "weakConnection": "Svag forbindelse – høj ping eller pakketab",
-    "positional": "Positionslyd er aktiv"
+    "positional": "Positionslyd er aktiv",
+    "prioritySpeaker": "Prioriteret taler – høres over alle andre"
   },
   "announce": {
     "joined": "{{name}} kom ind i din kanal",

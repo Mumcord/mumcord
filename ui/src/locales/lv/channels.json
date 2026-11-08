@@ -36,7 +36,8 @@
     "serverDeafened": "servera izslēgta skaņa",
     "suppressed": "apspiests (šeit nevar runāt)",
     "localMuted": "izslēgts tev",
-    "unregistered": "nereģistrēts"
+    "unregistered": "nereģistrēts",
+    "prioritySpeaker": "prioritārs runātājs"
   },
   "mumcordBadge": "Izmanto Mumcord",
   "botBadge": "Bots",
@@ -63,7 +64,8 @@
     "nowPlaying": "Klausās {{track}}",
     "nowGaming": "Spēlē {{game}}",
     "weakConnection": "Vājš savienojums – augsts ping vai pakešu zudums",
-    "positional": "Pozicionālā skaņa ir aktīva"
+    "positional": "Pozicionālā skaņa ir aktīva",
+    "prioritySpeaker": "Prioritārs runātājs – dzirdams pāri visiem"
   },
   "announce": {
     "joined": "{{name}} pievienojās tavam kanālam",

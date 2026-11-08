@@ -757,10 +757,256 @@ mod native {
     }
 }
 
+/// Windows (issue #629): an unhandled-exception filter writes the exception, the thread, the stack
+/// and the loaded modules into the marker and the modules file, in the same marker format as the
+/// Unix handler, so the next start names the module and offset of every frame. The filter runs
+/// once, writes only into memory reserved at start and through handles opened at start, and then
+/// lets Windows end the process as before.
+#[cfg(windows)]
+mod native {
+    use std::os::windows::io::IntoRawHandle;
+    use std::path::Path;
+    use std::sync::atomic::{AtomicBool, AtomicIsize, Ordering};
+
+    use windows::Win32::Foundation::{HANDLE, HMODULE};
+    use windows::Win32::Storage::FileSystem::{
+        FILE_BEGIN, SetEndOfFile, SetFilePointerEx, WriteFile,
+    };
+    use windows::Win32::System::Diagnostics::Debug::{
+        EXCEPTION_POINTERS, RtlCaptureStackBackTrace, SetUnhandledExceptionFilter,
+    };
+    use windows::Win32::System::ProcessStatus::{
+        K32EnumProcessModules, K32GetModuleBaseNameW, K32GetModuleInformation, MODULEINFO,
+    };
+    use windows::Win32::System::Threading::{GetCurrentProcess, GetCurrentThreadId};
+
+    const MAX_FRAMES: usize = 62;
+    const MAX_MODULES: usize = 512;
+    /// Lets Windows go on and end the process.
+    const CONTINUE_SEARCH: i32 = 0;
+
+    static MARKER: AtomicIsize = AtomicIsize::new(0);
+    static MODULES: AtomicIsize = AtomicIsize::new(0);
+    static ENTERED: AtomicBool = AtomicBool::new(false);
+
+    /// Text built without allocating, in memory that exists before any crash.
+    struct Text {
+        bytes: [u8; 64 * 1024],
+        len: usize,
+    }
+
+    static mut TEXT: Text = Text {
+        bytes: [0; 64 * 1024],
+        len: 0,
+    };
+
+    impl Text {
+        fn push(&mut self, part: &[u8]) {
+            let end = (self.len + part.len()).min(self.bytes.len());
+            let n = end - self.len;
+            self.bytes[self.len..end].copy_from_slice(&part[..n]);
+            self.len = end;
+        }
+
+        fn hex(&mut self, value: usize) {
+            self.push(b"0x");
+            let mut digits = [0u8; 16];
+            let mut i = digits.len();
+            let mut v = value;
+            loop {
+                i -= 1;
+                digits[i] = b"0123456789abcdef"[v & 0xf];
+                v >>= 4;
+                if v == 0 {
+                    break;
+                }
+            }
+            self.push(&digits[i..]);
+        }
+
+        fn decimal(&mut self, value: u32) {
+            let mut digits = [0u8; 10];
+            let mut i = digits.len();
+            let mut v = value;
+            loop {
+                i -= 1;
+                digits[i] = b'0' + (v % 10) as u8;
+                v /= 10;
+                if v == 0 {
+                    break;
+                }
+            }
+            self.push(&digits[i..]);
+        }
+
+        /// A module name; characters outside ASCII become `?`, which is enough to recognise it.
+        fn wide(&mut self, text: &[u16]) {
+            for &c in text {
+                self.push(&[if (1..0x80).contains(&c) {
+                    c as u8
+                } else {
+                    b'?'
+                }]);
+            }
+        }
+    }
+
+    pub fn install(marker: &Path, maps: &Path) {
+        let Ok(file) = std::fs::OpenOptions::new().write(true).open(marker) else {
+            return;
+        };
+        MARKER.store(file.into_raw_handle() as isize, Ordering::Release);
+        if let Ok(file) = std::fs::File::create(maps) {
+            MODULES.store(file.into_raw_handle() as isize, Ordering::Release);
+        }
+        // SAFETY: installs a plain filter function; it only reads the exception record and calls
+        // functions that do not allocate on the Rust heap.
+        unsafe {
+            SetUnhandledExceptionFilter(Some(filter));
+        }
+    }
+
+    /// The name of an exception code; Rust's own `abort` and C++ `throw` included.
+    pub(super) fn exception_name(code: u32) -> &'static str {
+        match code {
+            0xC000_0005 => "EXCEPTION_ACCESS_VIOLATION",
+            0xC000_00FD => "EXCEPTION_STACK_OVERFLOW",
+            0xC000_0409 => "STATUS_STACK_BUFFER_OVERRUN",
+            0xC000_001D => "EXCEPTION_ILLEGAL_INSTRUCTION",
+            0xC000_0094 => "EXCEPTION_INT_DIVIDE_BY_ZERO",
+            0xC000_0006 => "EXCEPTION_IN_PAGE_ERROR",
+            0xC000_0374 => "STATUS_HEAP_CORRUPTION",
+            0xC000_0096 => "EXCEPTION_PRIV_INSTRUCTION",
+            0x8000_0003 => "EXCEPTION_BREAKPOINT",
+            0xE06D_7363 => "C++ exception",
+            _ => "EXCEPTION",
+        }
+    }
+
+    fn write_all(handle: isize, bytes: &[u8]) {
+        if handle == 0 {
+            return;
+        }
+        let handle = HANDLE(handle as *mut core::ffi::c_void);
+        // SAFETY: a handle opened at start for this file; the bytes live in static memory.
+        unsafe {
+            let _ = SetFilePointerEx(handle, 0, None, FILE_BEGIN);
+            let _ = WriteFile(handle, Some(bytes), None, None);
+            let _ = SetEndOfFile(handle);
+        }
+    }
+
+    unsafe extern "system" fn filter(info: *const EXCEPTION_POINTERS) -> i32 {
+        // A second exception while writing ends here; Windows still ends the process.
+        if ENTERED.swap(true, Ordering::AcqRel) {
+            return CONTINUE_SEARCH;
+        }
+        // SAFETY: only this one call of the filter reaches here (ENTERED), so the static text has
+        // a single user; the record comes from Windows and is valid during the call.
+        let text = unsafe { &mut *std::ptr::addr_of_mut!(TEXT) };
+        text.len = 0;
+        let record = unsafe { info.as_ref().and_then(|i| i.ExceptionRecord.as_ref()) };
+        let code = record.map_or(0, |r| r.ExceptionCode.0 as u32);
+        text.push(exception_name(code).as_bytes());
+        text.push(b" (");
+        text.hex(code as usize);
+        text.push(b")\nthread id ");
+        // SAFETY: plain query of the current thread.
+        text.decimal(unsafe { GetCurrentThreadId() });
+        text.push(b"\n");
+        if let Some(record) = record {
+            // For an access violation the second parameter is the address that was touched.
+            if code == 0xC000_0005 && record.NumberParameters >= 2 {
+                text.push(b"fault ");
+                text.hex(record.ExceptionInformation[1]);
+                text.push(b"\n");
+            }
+            text.push(b"ip ");
+            text.hex(record.ExceptionAddress as usize);
+            text.push(b"\n");
+        }
+        let mut frames = [std::ptr::null_mut(); MAX_FRAMES];
+        // SAFETY: fills the array on the stack; does not allocate.
+        let count = unsafe { RtlCaptureStackBackTrace(0, &mut frames, None) } as usize;
+        for frame in &frames[..count.min(MAX_FRAMES)] {
+            text.push(b"ip ");
+            text.hex(*frame as usize);
+            text.push(b"\n");
+        }
+        write_all(MARKER.load(Ordering::Acquire), &text.bytes[..text.len]);
+
+        text.len = 0;
+        let mut modules = [HMODULE::default(); MAX_MODULES];
+        let mut needed = 0u32;
+        // SAFETY: the process's own module list into an array on the stack.
+        let listed = unsafe {
+            K32EnumProcessModules(
+                GetCurrentProcess(),
+                modules.as_mut_ptr(),
+                std::mem::size_of_val(&modules) as u32,
+                &mut needed,
+            )
+        };
+        if listed.as_bool() {
+            let count = (needed as usize / std::mem::size_of::<HMODULE>()).min(MAX_MODULES);
+            for module in &modules[..count] {
+                let mut info = MODULEINFO::default();
+                let mut name = [0u16; 260];
+                // SAFETY: queries about a module of this process, into memory on the stack.
+                let known = unsafe {
+                    K32GetModuleInformation(
+                        GetCurrentProcess(),
+                        *module,
+                        &mut info,
+                        std::mem::size_of::<MODULEINFO>() as u32,
+                    )
+                };
+                let length =
+                    unsafe { K32GetModuleBaseNameW(GetCurrentProcess(), Some(*module), &mut name) };
+                if !known.as_bool() {
+                    continue;
+                }
+                text.push(b"module ");
+                text.hex(info.lpBaseOfDll as usize);
+                text.push(b" ");
+                text.hex(info.SizeOfImage as usize);
+                text.push(b" ");
+                text.wide(&name[..(length as usize).min(name.len())]);
+                text.push(b"\n");
+            }
+        }
+        write_all(MODULES.load(Ordering::Acquire), &text.bytes[..text.len]);
+        CONTINUE_SEARCH
+    }
+}
+
 /// Without a native handler the marker alone tells an unclean exit at the next start.
-#[cfg(not(unix))]
+#[cfg(not(any(unix, windows)))]
 mod native {
     pub fn install(_marker: &std::path::Path, _maps: &std::path::Path) {}
+}
+
+/// A module line the Windows handler wrote: `module <base> <size> <name>`.
+struct Module<'a> {
+    start: usize,
+    end: usize,
+    name: &'a str,
+}
+
+fn modules(text: &str) -> Vec<Module<'_>> {
+    let hex = |s: &str| usize::from_str_radix(s.trim_start_matches("0x"), 16).ok();
+    text.lines()
+        .filter_map(|line| {
+            let mut fields = line.strip_prefix("module ")?.splitn(3, ' ');
+            let start = hex(fields.next()?)?;
+            let size = hex(fields.next()?)?;
+            Some(Module {
+                start,
+                end: start + size,
+                name: fields.next()?.trim(),
+            })
+        })
+        .collect()
 }
 
 /// One mapping line of `/proc/self/maps`: address range, file offset and path.
@@ -818,13 +1064,18 @@ fn symbol_at(data: &[u8], file_offset: usize) -> Option<(String, u64)> {
 /// Turns the addresses the native handler wrote into `library symbol+offset` lines. Addresses
 /// outside any file (JIT code, the stack) stay as they are.
 fn symbolize(ips: &[usize], maps: &str) -> Vec<String> {
+    let windows = modules(maps);
     let maps = mappings(maps);
     let mut files: BTreeMap<&str, Option<Vec<u8>>> = BTreeMap::new();
     ips.iter()
         .enumerate()
         .map(|(i, &ip)| {
             let Some(map) = maps.iter().find(|m| m.start <= ip && ip < m.end) else {
-                return format!("{i:>3}: 0x{ip:x}");
+                // Windows names a frame by its module and the offset in it (issue #629).
+                return match windows.iter().find(|m| m.start <= ip && ip < m.end) {
+                    Some(module) => format!("{i:>3}: {} +0x{:x}", module.name, ip - module.start),
+                    None => format!("{i:>3}: 0x{ip:x}"),
+                };
             };
             let file_offset = ip - map.start + map.offset;
             let library = Path::new(map.path)
@@ -879,6 +1130,26 @@ fn parse_marker(text: &str) -> Option<NativeCrash> {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    #[test]
+    fn a_windows_marker_names_each_frame_by_module_and_offset() {
+        let marker = "EXCEPTION_ACCESS_VIOLATION (0xc0000005)\nthread id 4242\nfault 0x10\n\
+                      ip 0x7ff800001234\nip 0x140005000\nip 0x1\n";
+        let crash = parse_marker(marker).unwrap();
+        assert_eq!(crash.signal, "EXCEPTION_ACCESS_VIOLATION (0xc0000005)");
+        assert_eq!(crash.thread.as_deref(), Some("id 4242"));
+        assert_eq!(crash.fault, Some(0x10));
+        let modules = "module 0x7ff800000000 0x200000 onnxruntime.dll\n\
+                       module 0x140000000 0x800000 mumcord.exe\n";
+        assert_eq!(
+            symbolize(&crash.ips, modules),
+            vec![
+                "  0: onnxruntime.dll +0x1234".to_owned(),
+                "  1: mumcord.exe +0x5000".to_owned(),
+                "  2: 0x1".to_owned(),
+            ]
+        );
+    }
+
     use super::*;
 
     fn test_report(

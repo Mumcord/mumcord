@@ -376,5 +376,19 @@
     "rootBody": "To reguły kanału Root; dziedziczy je każdy kanał.",
     "backToEditing": "Wróć do edycji",
     "saveAnyway": "Zapisz mimo to"
+  },
+  "moderate": {
+    "mute": "Wycisz na serwerze",
+    "deafen": "Ogłusz na serwerze",
+    "unsuppress": "Znieś wyciszenie kanału",
+    "priority": "Mówca priorytetowy",
+    "resetComment": "Zresetuj komentarz",
+    "resetAvatar": "Zresetuj awatar",
+    "commentTitle": "Zresetować komentarz użytkownika {{name}}?",
+    "avatarTitle": "Zresetować awatar użytkownika {{name}}?",
+    "resetBody": "Zostanie usunięty dla wszystkich. Można ustawić nowy.",
+    "cancel": "Anuluj",
+    "reset": "Zresetuj",
+    "failed": "Nie udało się połączyć z serwerem. Spróbuj ponownie."
   }
 }
