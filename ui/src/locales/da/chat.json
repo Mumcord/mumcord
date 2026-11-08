@@ -100,7 +100,8 @@
     "peopleHeading": "Personer",
     "channelHint": "Giv besked til alle i {{channel}} ({{count}})",
     "allHint": "Giv besked til alle, der kan læse denne kanal ({{count}})",
-    "keys": "↑↓ vælg · Enter indsæt · Esc luk"
+    "keys": "↑↓ vælg · Enter indsæt · Esc luk",
+    "channelList": "Kanalforslag"
   },
   "preview": {
     "open": "Åbn i browser",
@@ -408,5 +409,14 @@
   },
   "slash": {
     "list": "Kommandoer med skråstreg"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanal – åbn menuen",
+    "join": "Gå ind i kanalen",
+    "joinPath": "Gå ind i {{path}}",
+    "show": "Vis i kanallisten",
+    "showPath": "Vis {{path}} i kanallisten",
+    "copy": "Kopiér navn",
+    "menu": "Kanal {{channel}}"
   }
 }

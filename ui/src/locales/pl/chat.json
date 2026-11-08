@@ -108,7 +108,8 @@
     "peopleHeading": "Osoby",
     "channelHint": "Powiadom wszystkich w {{channel}} ({{count}})",
     "allHint": "Powiadom wszystkich, którzy mogą czytać ten kanał ({{count}})",
-    "keys": "↑↓ wybierz · Enter wstaw · Esc zamknij"
+    "keys": "↑↓ wybierz · Enter wstaw · Esc zamknij",
+    "channelList": "Podpowiedzi kanałów"
   },
   "preview": {
     "open": "Otwórz w przeglądarce",
@@ -426,5 +427,14 @@
   },
   "slash": {
     "list": "Polecenia ze slashem"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanał – otwórz menu",
+    "join": "Dołącz do kanału",
+    "joinPath": "Dołącz do {{path}}",
+    "show": "Pokaż na liście kanałów",
+    "showPath": "Pokaż {{path}} na liście kanałów",
+    "copy": "Kopiuj nazwę",
+    "menu": "Kanał {{channel}}"
   }
 }

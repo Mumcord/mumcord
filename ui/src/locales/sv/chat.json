@@ -100,7 +100,8 @@
     "peopleHeading": "Personer",
     "channelHint": "Meddela alla i {{channel}} ({{count}})",
     "allHint": "Meddela alla som kan läsa den här kanalen ({{count}})",
-    "keys": "↑↓ välj · Enter infoga · Esc stäng"
+    "keys": "↑↓ välj · Enter infoga · Esc stäng",
+    "channelList": "Kanalförslag"
   },
   "preview": {
     "open": "Öppna i webbläsaren",
@@ -408,5 +409,14 @@
   },
   "slash": {
     "list": "Kommandon med snedsteg"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanal – öppna menyn",
+    "join": "Gå med i kanalen",
+    "joinPath": "Gå med i {{path}}",
+    "show": "Visa i kanallistan",
+    "showPath": "Visa {{path}} i kanallistan",
+    "copy": "Kopiera namn",
+    "menu": "Kanal {{channel}}"
   }
 }
