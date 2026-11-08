@@ -1,7 +1,8 @@
 //! DirectShow cameras (#631). Virtual cameras such as the OBS Virtual Camera register only as
 //! DirectShow capture filters, which Media Foundation does not list. The DirectShow cameras that
-//! Media Foundation does not list already ([`listed_by_mf`]) join the camera list; opening one
-//! runs the filter graph `camera → Sample Grabber → Null Renderer`.
+//! Media Foundation does not list already ([`only_in_directshow`]) join the camera list; opening
+//! one runs the filter graph `camera → Sample Grabber → Null Renderer`, trying the camera's
+//! output pins ([`pin_order`]) and formats ([`preference_order`]) until one connects.
 //!
 //! The Sample Grabber calls back on the camera filter's own streaming thread. The callback only
 //! hands the sample (a reference, no copy) to the capture thread, which converts it through the
@@ -12,22 +13,24 @@
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
 use std::ptr::NonNull;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, SyncSender};
+use std::sync::{Arc, Mutex, PoisonError};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
 use ::windows::Win32::Foundation::{E_NOTIMPL, RECT, S_OK};
 use ::windows::Win32::Media::DirectShow::{
-    IAMStreamConfig, IBaseFilter, ICreateDevEnum, IGraphBuilder, IMediaControl, IMediaEvent,
-    IMediaFilter, IMediaSample, IPin, PIN_DIRECTION, PINDIR_INPUT, PINDIR_OUTPUT,
-    VIDEO_STREAM_CONFIG_CAPS,
+    AMPROPERTY_PIN_CATEGORY, IAMStreamConfig, IBaseFilter, ICreateDevEnum, IGraphBuilder,
+    IMediaControl, IMediaEvent, IMediaFilter, IMediaSample, IPin, PIN_DIRECTION, PINDIR_INPUT,
+    PINDIR_OUTPUT, VIDEO_STREAM_CONFIG_CAPS,
 };
 use ::windows::Win32::Media::IReferenceClock;
+use ::windows::Win32::Media::KernelStreaming::IKsPropertySet;
 use ::windows::Win32::Media::MediaFoundation::{
-    AM_MEDIA_TYPE, CLSID_FilterGraph, CLSID_SystemDeviceEnum, CLSID_VideoInputDeviceCategory,
-    FORMAT_VideoInfo, FORMAT_VideoInfo2, MEDIATYPE_Video, VIDEOINFOHEADER, VIDEOINFOHEADER2,
+    AM_MEDIA_TYPE, AMPROPSETID_Pin, CLSID_FilterGraph, CLSID_SystemDeviceEnum,
+    CLSID_VideoInputDeviceCategory, FORMAT_VideoInfo, FORMAT_VideoInfo2, MEDIATYPE_Video,
+    VIDEOINFOHEADER, VIDEOINFOHEADER2,
 };
 use ::windows::Win32::System::Com::StructuredStorage::IPropertyBag;
 use ::windows::Win32::System::Com::{
@@ -41,10 +44,11 @@ use self::qedit::{ISampleGrabber, ISampleGrabberCB, ISampleGrabberCB_Impl};
 use super::capture::UNREADABLE;
 use super::com::{self, Com};
 use super::dshow_type::{
-    dshow_error, event_end, image_size, listed_by_mf, scaled_size, video_mode,
+    dshow_error, event_end, image_size, only_in_directshow, pin_order, pin_role, preference_order,
+    scaled_size, video_mode,
 };
 use super::media_type::{device_key, raw, tight_stride};
-use crate::mode::{self, Geometry, Mode, PixelFormat};
+use crate::mode::{Geometry, Mode, PixelFormat};
 use crate::pump::Pump;
 use crate::{CameraDevice, CameraError, CaptureRequest, CaptureSession, DeviceId, FrameSink};
 
@@ -63,6 +67,16 @@ const SILENCE_LIMIT: Duration = Duration::from_secs(5);
 /// Building and starting the graph runs the camera filter's own code. One that has not finished
 /// after this long fails the start instead of blocking Mumcord.
 const START_TIMEOUT: Duration = Duration::from_secs(10);
+
+/// The thread of a start that timed out and has not ended yet.
+///
+/// A blocking in-process COM call into a camera filter cannot be cancelled, so the timeout only
+/// stops waiting: the thread keeps owning its graph, cleans it up itself once the filter
+/// returns, and never calls the sink. There is at most one such thread. Until it ends, a new
+/// start fails at once instead of adding another thread (and another filter) per attempt.
+/// Starts never run at the same time: only one capture session runs per Mumcord instance, and
+/// the caller makes sure of that ([`crate::CameraBackend::open`]).
+static STALLED: Mutex<Option<JoinHandle<()>>> = Mutex::new(None);
 
 /// The Sample Grabber's interfaces as `qedit.h` declares them.
 #[allow(
@@ -107,7 +121,8 @@ pub struct Camera {
 /// order.
 pub fn cameras(listed: &[com::Camera]) -> Result<Vec<Camera>, CameraError> {
     let _com = Com::init();
-    let mut cameras = Vec::new();
+    // Key, name and device path of every DirectShow camera.
+    let mut found: Vec<(String, String, Option<String>)> = Vec::new();
     for moniker in monikers()? {
         let Some(key) = display_name(&moniker) else {
             continue;
@@ -119,23 +134,30 @@ pub fn cameras(listed: &[com::Camera]) -> Result<Vec<Camera>, CameraError> {
             continue;
         };
         let name = property(&properties, w!("FriendlyName")).unwrap_or_else(|| "Camera".to_owned());
-        let path = property(&properties, w!("DevicePath"));
-        let mf = listed
-            .iter()
-            .map(|camera| (camera.device.name.as_str(), camera.symbolic_link.as_str()));
-        if listed_by_mf(&name, path.as_deref(), mf) {
-            continue;
-        }
-        cameras.push(Camera {
+        found.push((key, name, property(&properties, w!("DevicePath"))));
+    }
+    let dshow: Vec<(&str, Option<&str>)> = found
+        .iter()
+        .map(|(_, name, path)| (name.as_str(), path.as_deref()))
+        .collect();
+    let mf: Vec<(&str, &str)> = listed
+        .iter()
+        .map(|camera| (camera.device.name.as_str(), camera.symbolic_link.as_str()))
+        .collect();
+    let keep = only_in_directshow(&dshow, &mf);
+    Ok(found
+        .into_iter()
+        .zip(keep)
+        .filter(|(_, keep)| *keep)
+        .map(|((key, name, _), _)| Camera {
             device: CameraDevice {
                 id: DeviceId::from_os_key("dshow", &device_key(&key)),
                 name,
                 is_default: false,
             },
             key,
-        });
-    }
-    Ok(cameras)
+        })
+        .collect())
 }
 
 /// The monikers of DirectShow's video input category.
@@ -213,6 +235,17 @@ impl Session {
         request: CaptureRequest,
         sink: Box<dyn FrameSink>,
     ) -> Result<Self, CameraError> {
+        {
+            let mut stalled = STALLED.lock().unwrap_or_else(PoisonError::into_inner);
+            if let Some(thread) = stalled.take_if(|thread| thread.is_finished()) {
+                join(thread);
+            }
+            if stalled.is_some() {
+                return Err(CameraError::Backend(
+                    "the camera is still starting".to_owned(),
+                ));
+            }
+        }
         let stop = Arc::new(AtomicBool::new(false));
         let (ready, started) = mpsc::sync_channel(1);
         let thread = {
@@ -232,9 +265,9 @@ impl Session {
                 Err(err)
             }
             Err(RecvTimeoutError::Timeout) => {
-                // Not joined: the thread may hang in the filter. It stops the graph and ends on
-                // its own once the filter returns, without ever calling the sink.
+                // The thread may hang in the filter: it is joined later, see `STALLED`.
                 stop.store(true, Ordering::Release);
+                *STALLED.lock().unwrap_or_else(PoisonError::into_inner) = Some(thread);
                 Err(CameraError::Backend("the camera did not start".to_owned()))
             }
             Err(RecvTimeoutError::Disconnected) => {
@@ -344,44 +377,25 @@ impl Graph {
         let graph: IGraphBuilder =
             unsafe { CoCreateInstance(&CLSID_FilterGraph, None, CLSCTX_INPROC_SERVER) }
                 .map_err(failed)?;
-        // SAFETY: valid graph and filter; the name is a constant.
-        unsafe { graph.AddFilter(&camera, w!("Camera")) }.map_err(failed)?;
-        let output = pin(&camera, PINDIR_OUTPUT)?;
-        let config = output.cast::<IAMStreamConfig>().ok();
-        let formats = formats(&output, config.as_ref())?;
-        let modes: Vec<Mode> = formats.iter().map(|format| format.mode).collect();
-        let chosen = mode::choose(&modes, &request)
-            .and_then(|mode| formats.iter().find(|format| format.mode == mode))
-            .ok_or_else(|| {
-                CameraError::Backend("the camera offers no usable picture format".to_owned())
-            })?;
-
-        let (grabbing, grabber, callback) = sample_grabber(chosen, samples)?;
+        let (grabbing, grabber, callback) = sample_grabber(samples)?;
         // SAFETY: plain COM object creation; the result is checked.
         let renderer: IBaseFilter =
             unsafe { CoCreateInstance(&CLSID_NULL_RENDERER, None, CLSCTX_INPROC_SERVER) }
                 .map_err(failed)?;
         // SAFETY: valid graph and filters; the names are constants.
+        unsafe { graph.AddFilter(&camera, w!("Camera")) }.map_err(failed)?;
+        // SAFETY: as above.
         unsafe { graph.AddFilter(&grabbing, w!("Sample Grabber")) }.map_err(failed)?;
         // SAFETY: as above.
         unsafe { graph.AddFilter(&renderer, w!("Null Renderer")) }.map_err(failed)?;
-        connect(
-            &graph,
-            &output,
-            &pin(&grabbing, PINDIR_INPUT)?,
-            config.as_ref(),
-            chosen,
-            &request,
-        )?;
-        // SAFETY: pins of filters in this graph; the grabber passes on what it receives.
-        unsafe {
-            graph.ConnectDirect(
-                &pin(&grabbing, PINDIR_OUTPUT)?,
-                &pin(&renderer, PINDIR_INPUT)?,
-                None,
-            )
-        }
-        .map_err(failed)?;
+        let chain = Chain {
+            graph: &graph,
+            grabber: &grabber,
+            grabber_in: pin(&grabbing, PINDIR_INPUT)?,
+            grabber_out: pin(&grabbing, PINDIR_OUTPUT)?,
+            renderer_in: pin(&renderer, PINDIR_INPUT)?,
+        };
+        let mode = chain.connect(&camera, &request)?;
         // No reference clock: every picture goes through as soon as it arrives, and the
         // renderer never holds the camera's thread back to wait for its time.
         // SAFETY: valid graph.
@@ -392,7 +406,6 @@ impl Graph {
         }
         .map_err(failed)?;
 
-        let mode = connected_mode(&grabber, chosen.mode)?;
         let geometry = Geometry::new(
             mode.width,
             mode.height,
@@ -514,15 +527,15 @@ fn source(key: &str) -> Result<IBaseFilter, CameraError> {
         .map_err(|err| dshow_error(err.code().0))
 }
 
-/// The first pin of `filter` in `direction`. A camera filter's first output pin is the one that
-/// captures.
-fn pin(filter: &IBaseFilter, direction: PIN_DIRECTION) -> Result<IPin, CameraError> {
+/// The pins of `filter` in `direction`, in the filter's order.
+fn pins(filter: &IBaseFilter, direction: PIN_DIRECTION) -> Result<Vec<IPin>, CameraError> {
     // SAFETY: valid filter.
-    let pins = unsafe { filter.EnumPins() }.map_err(|err| dshow_error(err.code().0))?;
+    let list = unsafe { filter.EnumPins() }.map_err(|err| dshow_error(err.code().0))?;
+    let mut pins = Vec::new();
     loop {
         let mut next = [None];
         // SAFETY: room for one pin, which is then ours.
-        if unsafe { pins.Next(&mut next, None) } != S_OK {
+        if unsafe { list.Next(&mut next, None) } != S_OK {
             break;
         }
         let [Some(pin)] = next else {
@@ -530,12 +543,54 @@ fn pin(filter: &IBaseFilter, direction: PIN_DIRECTION) -> Result<IPin, CameraErr
         };
         // SAFETY: valid pin.
         if unsafe { pin.QueryDirection() }.is_ok_and(|found| found == direction) {
-            return Ok(pin);
+            pins.push(pin);
         }
     }
-    Err(CameraError::Backend(
-        "a DirectShow filter lacks a pin".to_owned(),
-    ))
+    Ok(pins)
+}
+
+/// The first pin of `filter` in `direction` (the Sample Grabber and the Null Renderer have one
+/// of each).
+fn pin(filter: &IBaseFilter, direction: PIN_DIRECTION) -> Result<IPin, CameraError> {
+    pins(filter, direction)?
+        .into_iter()
+        .next()
+        .ok_or_else(|| CameraError::Backend("a DirectShow filter lacks a pin".to_owned()))
+}
+
+/// The camera's output pins in the order to try them ([`pin_order`]): capture, then
+/// uncategorised, then preview; still-image pins are left out.
+fn output_pins(camera: &IBaseFilter) -> Result<Vec<IPin>, CameraError> {
+    let pins = pins(camera, PINDIR_OUTPUT)?;
+    let roles: Vec<_> = pins
+        .iter()
+        .map(|pin| pin_role(category(pin).map(|category| category.to_u128())))
+        .collect();
+    Ok(pin_order(&roles)
+        .into_iter()
+        .map(|index| pins[index].clone())
+        .collect())
+}
+
+/// The pin's category (`AMPROPERTY_PIN_CATEGORY`), `None` when the pin does not say.
+fn category(pin: &IPin) -> Option<GUID> {
+    let properties: IKsPropertySet = pin.cast().ok()?;
+    let mut category = GUID::zeroed();
+    let mut returned = 0u32;
+    // SAFETY: valid pin; the property is one GUID, written into `category`.
+    unsafe {
+        properties.Get(
+            &AMPROPSETID_Pin,
+            AMPROPERTY_PIN_CATEGORY.0 as u32,
+            std::ptr::null(),
+            0,
+            (&raw mut category).cast(),
+            size_of::<GUID>() as u32,
+            &mut returned,
+        )
+    }
+    .ok()?;
+    (returned as usize == size_of::<GUID>()).then_some(category)
 }
 
 /// A media type a filter handed out; dropping it frees it as `DeleteMediaType` does.
@@ -685,10 +740,9 @@ fn media_types(pin: &IPin) -> Result<Vec<(MediaType, i64)>, CameraError> {
     Ok(listed)
 }
 
-/// The Sample Grabber (its filter, its interface and the callback it calls), set to take
-/// `chosen`'s subtype and to hand every picture to `samples`.
+/// The Sample Grabber (its filter, its interface and the callback it calls), set to hand every
+/// picture to `samples`. Each connection attempt sets the subtype it takes ([`Chain::attempt`]).
 fn sample_grabber(
-    chosen: &Format,
     samples: SyncSender<Sample>,
 ) -> Result<(IBaseFilter, ISampleGrabber, ISampleGrabberCB), CameraError> {
     let failed = |err: ::windows::core::Error| dshow_error(err.code().0);
@@ -703,20 +757,12 @@ fn sample_grabber(
             })
             .map_err(failed)?;
     let grabber: ISampleGrabber = filter.cast().map_err(failed)?;
-    // Only the subtype is fixed; the camera's pin proposes the rest.
-    let wanted = AM_MEDIA_TYPE {
-        majortype: MEDIATYPE_Video,
-        subtype: chosen.media_type.get().subtype,
-        ..Default::default()
-    };
     let callback: ISampleGrabberCB = Grabbed(samples).into();
-    // SAFETY: valid grabber; it copies the type, and the callback outlives its use in the graph
-    // (0: call `SampleCB`).
+    // SAFETY: valid grabber; the callback outlives its use in the graph (0: call `SampleCB`).
     unsafe {
         grabber
-            .SetMediaType(&wanted)
+            .SetOneShot(false.into())
             .ok()
-            .and_then(|()| grabber.SetOneShot(false.into()).ok())
             .and_then(|()| grabber.SetBufferSamples(false.into()).ok())
             .and_then(|()| grabber.SetCallback(callback.as_raw(), 0).ok())
     }
@@ -804,42 +850,114 @@ fn edit<T: Copy>(block: &mut [u8], change: impl FnOnce(&mut T)) -> bool {
     true
 }
 
-/// Connects the camera's pin straight to the grabber, with no converter in between (as Media
-/// Foundation runs with converters disabled): at the scaled size first when [`scaled_size`]
-/// asks for one, else as listed.
-fn connect(
-    graph: &IGraphBuilder,
-    output: &IPin,
-    input: &IPin,
-    config: Option<&IAMStreamConfig>,
-    chosen: &Format,
-    request: &CaptureRequest,
-) -> Result<(), CameraError> {
-    let scaled = scaled_size(&chosen.mode, request)
-        .and_then(|size| scaled_type(chosen.media_type.get(), chosen.mode.format, size));
-    if let Some(scaled) = &scaled {
-        match connect_as(graph, output, input, config, &scaled.media_type) {
-            Ok(()) => return Ok(()),
-            Err(err) => tracing::debug!(%err, "camera refused the scaled picture size"),
-        }
-    }
-    connect_as(graph, output, input, config, chosen.media_type.get())
+/// The fixed part of the graph: the grabber's pins and the renderer's input.
+struct Chain<'a> {
+    graph: &'a IGraphBuilder,
+    grabber: &'a ISampleGrabber,
+    grabber_in: IPin,
+    grabber_out: IPin,
+    renderer_in: IPin,
 }
 
-fn connect_as(
-    graph: &IGraphBuilder,
-    output: &IPin,
-    input: &IPin,
-    config: Option<&IAMStreamConfig>,
-    media_type: &AM_MEDIA_TYPE,
-) -> Result<(), CameraError> {
-    if let Some(config) = config {
-        // SAFETY: valid pin and media type; the pin copies the type.
-        unsafe { config.SetFormat(media_type) }.map_err(|err| dshow_error(err.code().0))?;
+impl Chain<'_> {
+    /// Connects the camera to the chain and returns the mode the pictures come in. Output pins
+    /// are tried in [`output_pins`]' order and each pin's formats in [`preference_order`];
+    /// pictures go straight from the camera to the grabber with no converter in between (as
+    /// Media Foundation runs with converters disabled). Every failed attempt is undone before
+    /// the next one.
+    fn connect(&self, camera: &IBaseFilter, request: &CaptureRequest) -> Result<Mode, CameraError> {
+        for output in output_pins(camera)? {
+            let config = output.cast::<IAMStreamConfig>().ok();
+            let formats = match formats(&output, config.as_ref()) {
+                Ok(formats) => formats,
+                Err(err) => {
+                    tracing::debug!(%err, "camera pin lists no formats");
+                    continue;
+                }
+            };
+            let modes: Vec<Mode> = formats.iter().map(|format| format.mode).collect();
+            for index in preference_order(&modes, request) {
+                let format = &formats[index];
+                // A size the camera scales to first (see `scaled_size`), then its own.
+                let scaled = scaled_size(&format.mode, request).and_then(|size| {
+                    scaled_type(format.media_type.get(), format.mode.format, size)
+                });
+                let types = scaled
+                    .as_ref()
+                    .map(|scaled| &scaled.media_type)
+                    .into_iter()
+                    .chain([format.media_type.get()]);
+                for media_type in types {
+                    match self.attempt(&output, config.as_ref(), media_type, format.mode) {
+                        Ok(mode) => return Ok(mode),
+                        Err(err) => {
+                            tracing::debug!(%err, mode = ?format.mode, "camera format refused");
+                            self.undo(&output);
+                        }
+                    }
+                }
+            }
+        }
+        Err(CameraError::Backend(
+            "the camera offers no usable picture format".to_owned(),
+        ))
     }
-    // SAFETY: pins of filters in `graph`; the type is valid for the call.
-    unsafe { graph.ConnectDirect(output, input, Some(std::ptr::from_ref(media_type))) }
-        .map_err(|err| dshow_error(err.code().0))
+
+    /// One try: the grabber takes `media_type`'s subtype, the camera's pin connects to it in
+    /// `media_type`, and the grabber to the renderer.
+    fn attempt(
+        &self,
+        output: &IPin,
+        config: Option<&IAMStreamConfig>,
+        media_type: &AM_MEDIA_TYPE,
+        listed: Mode,
+    ) -> Result<Mode, CameraError> {
+        let failed = |err: ::windows::core::Error| dshow_error(err.code().0);
+        // Only the subtype is fixed; the camera's pin proposes the rest.
+        let wanted = AM_MEDIA_TYPE {
+            majortype: MEDIATYPE_Video,
+            subtype: media_type.subtype,
+            ..Default::default()
+        };
+        // SAFETY: valid grabber; it copies the type.
+        unsafe { self.grabber.SetMediaType(&wanted) }
+            .ok()
+            .map_err(failed)?;
+        if let Some(config) = config {
+            // SAFETY: valid pin and media type; the pin copies the type.
+            unsafe { config.SetFormat(media_type) }.map_err(failed)?;
+        }
+        // SAFETY: pins of filters in the graph; the type is valid for the call.
+        unsafe {
+            self.graph.ConnectDirect(
+                output,
+                &self.grabber_in,
+                Some(std::ptr::from_ref(media_type)),
+            )
+        }
+        .map_err(failed)?;
+        // SAFETY: pins of filters in the graph; the grabber passes on what it receives.
+        unsafe {
+            self.graph
+                .ConnectDirect(&self.grabber_out, &self.renderer_in, None)
+        }
+        .map_err(failed)?;
+        connected_mode(self.grabber, listed)
+    }
+
+    /// Disconnects both ends of every link an attempt may have made; a pin that is not
+    /// connected only refuses.
+    fn undo(&self, output: &IPin) {
+        for pin in [
+            output,
+            &self.grabber_in,
+            &self.grabber_out,
+            &self.renderer_in,
+        ] {
+            // SAFETY: pins of filters in the graph.
+            let _ = unsafe { self.graph.Disconnect(pin) };
+        }
+    }
 }
 
 /// The mode the camera and the grabber agreed on, which is what the pictures are in.
