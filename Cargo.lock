@@ -4162,6 +4162,7 @@ dependencies = [
  "tracing",
  "v4l",
  "windows",
+ "windows-core",
  "zune-core",
  "zune-jpeg",
 ]

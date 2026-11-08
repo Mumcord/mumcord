@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Windows: virtual cameras that only DirectShow knows, such as the OBS Virtual Camera, now show in the camera list next to real cameras and work like them, background effects included. OBS is asked for 720p, so a 1080p output does not arrive at half size. A virtual camera that has nothing to show or never starts stops with "The camera couldn't be started" instead of hanging (#631)
+
 ## [0.7.2] - 2026-11-08
 
 ### Added
