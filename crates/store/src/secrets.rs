@@ -239,20 +239,24 @@ mod vault {
         }
     }
 
-    /// Whether the OS secret service answers; a broken one must not be used, or every item
-    /// would fail. A working service reports "no entry" for the probe account.
+    /// Whether the OS secret service really works. A service that only answers reads is not
+    /// enough — a wallet that was never set up (KWallet on a fresh KDE profile, for example) takes
+    /// the request and drops it — so the probe stores, reads back and removes one item. Without
+    /// this every identity and server password would fail instead of landing in the file.
     pub(super) fn secret_service_usable(service: &str) -> bool {
-        let probe = keyring::Entry::new(service, "mumcord-probe").and_then(|entry| match entry
-            .get_secret()
-        {
-            Ok(_) => Ok(()),
-            Err(keyring::Error::NoEntry) => Ok(()),
-            Err(e) => Err(e),
-        });
-        match probe {
+        let probe = || -> keyring::Result<()> {
+            let entry = keyring::Entry::new(service, "mumcord-probe")?;
+            entry.set_secret(b"probe")?;
+            entry.get_secret()?;
+            match entry.delete_credential() {
+                Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
+                Err(e) => Err(e),
+            }
+        };
+        match probe() {
             Ok(()) => true,
             Err(e) => {
-                tracing::info!(error = %e, "no OS secret service; secrets go to the encrypted file");
+                tracing::info!(error = %e, "no usable OS secret service; secrets go to the encrypted file");
                 false
             }
         }
