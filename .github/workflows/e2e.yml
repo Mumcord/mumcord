@@ -11,9 +11,9 @@ name: E2E
 # request filled the 10 GB repository cache and evicted everything else.
 on:
   pull_request:
-    branches: [main]
+    branches: [main, "milestone/**"]
   push:
-    branches: [main]
+    branches: [main, "milestone/**"]
   workflow_dispatch:
 
 concurrency:

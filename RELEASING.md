@@ -4,6 +4,14 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`). Pushing 
 
 Builds are unsigned until code signing is set up (Windows via a Certum code signing certificate in SimplySign, macOS via an Apple Developer ID: see [docs/release-signing.md](docs/release-signing.md) and the [code signing policy](CODE_SIGNING.md)). The release notes say per platform whether the build is signed and explain the SmartScreen and Gatekeeper warnings for unsigned ones.
 
+## Branches: milestone branch and `main`
+
+- Feature work for a milestone (e.g. 0.8.0) collects on `milestone/0.8.0`, a branch created from `main` when the milestone starts. Feature pull requests target that branch.
+- Bug fixes, security and crash fixes, CI and dependency updates target `main` and ship as patch releases (`0.7.2`, `0.7.3`, …) tagged on `main`.
+- After a fix lands on `main`, `main` is merged into the milestone branch (pull request "chore: sync main into milestone/0.8.0"; a merge, not a rebase).
+- Releasing the milestone: merge `milestone/0.8.0` into `main` with a pull request, wait for green CI/E2E on `main`, then tag `v0.8.0` on `main` as below. Delete the milestone branch and create the next one from `main`.
+- Every release tag points to a commit on `main` (the Release workflow checks it), so a milestone branch is never tagged.
+
 ## Versions
 
 The version is set at build time from git; nobody bumps it in the manifests by hand.
