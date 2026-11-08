@@ -3,7 +3,7 @@
   "moreItems": "Breiseáin eile",
   "subline": "{{plugin}} · Neamhoifigiúil",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Taispeánann míreanna breiseáin ainm an bhreiseáin i gcónaí. Bainistigh iad in Socruithe → Breiseáin.",
+  "footer": "Taispeánann míreanna breiseáin ainm an bhreiseáin i gcónaí. Bainistigh iad i Socruithe → Breiseáin.",
   "paletteItem": "{{plugin}}: {{label}}",
   "disabledRestarting": "Ag atosú tar éis fadhb, bain triail eile as ar ball"
 }

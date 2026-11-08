@@ -14,8 +14,8 @@
   "close": "Dún na leideanna",
   "tips": {
     "servers": {
-      "title": "Do fhreastalaithe",
-      "body": "Tá do fhreastalaithe sa bharra ar an taobh clé ar fad. Cuir ceann leis le +, nó brabhsáil freastalaithe poiblí leis an ngloine formhéadúcháin. Is féidir leat ceangal le roinnt freastalaithe ag an am céanna."
+      "title": "D’fhreastalaithe",
+      "body": "Tá d’fhreastalaithe sa bharra ar an taobh clé ar fad. Cuir ceann leis le +, nó aimsigh freastalaithe poiblí leis an ngloine formhéadúcháin. Is féidir leat fanacht ceangailte le roinnt freastalaithe ag an am céanna."
     },
     "channels": {
       "title": "Cainéil",
@@ -23,11 +23,11 @@
     },
     "talk": {
       "title": "Conas a labhraíonn tú",
-      "body": "Brúigh-chun-cainte nó gníomhachtú gutha? Roghnaigh i Socruithe → Guth agus fuaim, nó oscail Socruithe gutha… leis an tsaighead bheag in aice leis an micreafón. Oibríonn brúigh-chun-cainte le cnaipí luiche freisin."
+      "body": "Push-to-talk nó gníomhachtú gutha? Roghnaigh i Socruithe → Guth agus fuaim, nó oscail Socruithe gutha… leis an tsaighead bheag in aice leis an micreafón. Oibríonn Push-to-talk le cnaipí luiche freisin."
     },
     "panel": {
       "title": "Do phainéal úsáideora",
-      "body": "Thíos ar chlé, balbhaíonn tú do mhicreafón, bodhraíonn tú thú féin, casann tú do cheamara air nó dícheanglaíonn tú. Osclaíonn na saighde beaga in aice leo tuilleadh roghanna."
+      "body": "Thíos ar chlé, balbhaíonn tú do mhicreafón, bodhraíonn tú thú féin, cuireann tú do cheamara ar siúl nó dícheanglaíonn tú. Osclaíonn na saighde beaga in aice leo tuilleadh roghanna."
     },
     "search": {
       "title": "Aimsigh rud ar bith",
@@ -39,7 +39,7 @@
     },
     "apps": {
       "title": "Aipeanna",
-      "body": "Tosaíonn an cnaipe Aipeanna sa bharra teachtaireachtaí comhroinnt scáileáin, féachaint le chéile nó do cheamara. Cuireann breiseáin tuilleadh leis."
+      "body": "Tosaíonn an cnaipe Aipeanna sa bharra teachtaireachtaí comhroinnt scáileáin, Breathnú le chéile nó do cheamara. Cuireann breiseáin tuilleadh leis."
     },
     "themes": {
       "title": "Do stíl",

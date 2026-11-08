@@ -45,11 +45,11 @@
     "unregistered": "gan chlárú",
     "prioritySpeaker": "cainteoir tosaíochta"
   },
-  "mumcordBadge": "Úsáideann sé Mumcord",
+  "mumcordBadge": "Úsáideann Mumcord",
   "botBadge": "Bot",
   "bots": {
     "title": "Botanna ar an bhfreastalaí seo ({{total}})",
-    "inChannel": "in {{channel}}",
+    "inChannel": "i {{channel}}",
     "modules": {
       "peer": "Athsheachadán",
       "music": "Seinneann sé ceol",
@@ -75,18 +75,18 @@
   },
   "announce": {
     "joined": "Chuaigh {{name}} isteach i do chainéal",
-    "left": "D'imigh {{name}} ó do chainéal",
+    "left": "D’imigh {{name}} ó do chainéal",
     "talking": "Tá {{name}} ag caint"
   },
   "errors": {
     "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
     "joinFailed": "Níorbh fhéidir dul isteach sa chainéal. Bain triail eile as.",
-    "notConnected": "Gan ceangal le freastalaí.",
+    "notConnected": "Gan cheangal le freastalaí.",
     "moveFailed": "Níorbh fhéidir an duine seo a bhogadh."
   },
   "empty": {
-    "disconnected": "Gan ceangal. Roghnaigh freastalaí chun a chainéil a fheiceáil.",
-    "loading": "Ag luchtú cainéal…",
+    "disconnected": "Gan cheangal. Roghnaigh freastalaí chun a chainéil a fheiceáil.",
+    "loading": "Cainéil á lódáil…",
     "syncingBig": "Freastalaí mór á shioncronú…"
   },
   "search": {
@@ -120,7 +120,7 @@
     "title": "Bog daoine",
     "channel": "Cainéal",
     "search": "Cuardaigh cainéil",
-    "noMatch": "Ní thagann aon chainéal leis.",
+    "noMatch": "Níl aon chainéal ag teacht leis.",
     "hint": "Roghnaigh an cainéal a rachaidh na daoine chuige.",
     "from": "Ó {{channel}}",
     "question": "Bog {{people}} ó {{from}} go {{to}}?",
@@ -144,9 +144,9 @@
     "alongPeople": "Bogfar in éineacht le {{channel}}: {{people}}.",
     "alongNone": "Ní bhogfar ach {{channel}}; tá sé folamh.",
     "subChannels_one": "{{count}} fochainéal",
-    "subChannels_two": "{{count}} fochainéal",
-    "subChannels_few": "{{count}} fochainéal",
-    "subChannels_many": "{{count}} fochainéal",
+    "subChannels_two": "{{count}} fhochainéal",
+    "subChannels_few": "{{count}} fhochainéal",
+    "subChannels_many": "{{count}} bhfochainéal",
     "subChannels_other": "{{count}} fochainéal",
     "pathTo": "go",
     "confirm": "Bog",
