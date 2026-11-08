@@ -21,6 +21,7 @@ use base64::Engine as _;
 use sha2::{Digest, Sha256};
 use wasmtime::component::{HasSelf, Linker};
 
+use crate::api::kit;
 use crate::manifest::{Manifest, WebviewPlace as DeclaredPlace};
 use crate::origins::{Origin, Scheme};
 use crate::runtime::bindings::mumcord::plugin::webview::{Host, Place, add_to_linker};
@@ -345,6 +346,8 @@ struct PluginWeb {
     root: Option<PathBuf>,
     /// The places its manifest allows (see [`allowed_places`]).
     places: Vec<WebviewPlace>,
+    /// The API minor `(major, minor)` its package is built against; decides the kit (FR-13.19).
+    api: (u64, u64),
     /// The plugin's declared `net.origins`.
     origins: Vec<Origin>,
     /// Whether the `net.origins` grant lets its pages reach them.
@@ -425,6 +428,11 @@ impl Webviews {
         }
         web.root = root;
         web.places = places;
+    }
+
+    /// Sets the API minor a plugin's package is built against, at load (see [`Self::kit_file`]).
+    pub fn set_api(&self, plugin: &str, api: (u64, u64)) {
+        self.lock().entry(plugin.to_owned()).or_default().api = api;
     }
 
     /// Sets the websites a plugin declares in `net.origins`, at load. Its pages reach them only
@@ -674,6 +682,23 @@ impl Webviews {
             web.root.clone()?
         };
         resolve(&root, path)
+    }
+
+    /// Mumcord's UI kit file for `path` under the reserved segment (FR-13.19, FR-13.23): only for
+    /// plugins built against API 1.2 or newer, and like [`Self::file`] only while the plugin may
+    /// show web content and has a frame open. Never read from the package (FR-13.28).
+    pub fn kit_file(&self, plugin: &str, path: &str) -> Option<kit::KitFile> {
+        if !is_reserved(path) {
+            return None;
+        }
+        let api = {
+            let plugins = self.lock();
+            let web = plugins.get(plugin)?;
+            web.open_places().next()?;
+            web.root.as_ref()?;
+            web.api
+        };
+        kit::file(api, path)
     }
 
     /// Closes the web views of plugins that stopped; their folders stay known for a restart.
@@ -1086,6 +1111,51 @@ mod tests {
             ),
             Err(Error::Invalid)
         );
+    }
+
+    #[test]
+    fn the_kit_is_served_to_1_2_plugins_with_an_open_frame_only() {
+        let (_dir, root) = web_dir();
+        // A package copy of the kit is never used, even for a 1.2 plugin.
+        std::fs::create_dir_all(root.join("_mumcord/v1")).unwrap();
+        std::fs::write(root.join("_mumcord/v1/kit.css"), "fake").unwrap();
+        let views = Webviews::default();
+        views.set_root("p", Some(root.clone()), ALL.to_vec());
+        views.set_api("p", (1, 2));
+        // No frame open yet.
+        assert_eq!(views.kit_file("p", "_mumcord/v1/kit.css"), None);
+        views
+            .show(
+                "p",
+                WebviewPlace::PanelPopover,
+                "index.html",
+                Instant::now(),
+            )
+            .unwrap();
+        let kit = views.kit_file("p", "_mumcord/v1/kit.css").unwrap();
+        assert_eq!(kit.mime, "text/css; charset=utf-8");
+        assert_ne!(kit.body, b"fake");
+        assert!(views.kit_file("p", "_MUMCORD/v1/kit.css").is_some());
+        assert!(views.kit_file("p", "_mumcord/v1/fonts/OFL.txt").is_some());
+        for path in [
+            "_mumcord/v1/nope.css",
+            "index.html",
+            "x/_mumcord/v1/kit.css",
+        ] {
+            assert_eq!(views.kit_file("p", path), None, "{path}");
+        }
+        assert_eq!(views.kit_file("unknown", "_mumcord/v1/kit.css"), None);
+
+        // 1.0 and 1.1 plugins get "not found" for everything under the reserved segment.
+        for api in [(1, 0), (1, 1)] {
+            views.set_api("p", api);
+            assert_eq!(views.kit_file("p", "_mumcord/v1/kit.css"), None, "{api:?}");
+        }
+
+        // A plugin that may no longer show web content gets no kit either.
+        views.set_api("p", (1, 2));
+        views.set_root("p", None, ALL.to_vec());
+        assert_eq!(views.kit_file("p", "_mumcord/v1/kit.css"), None);
     }
 
     #[cfg(unix)]

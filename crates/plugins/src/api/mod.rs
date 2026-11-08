@@ -9,6 +9,7 @@ pub mod files;
 pub mod host_calls;
 pub mod http;
 pub mod io;
+pub mod kit;
 pub mod log;
 pub mod notify;
 pub mod peers;

@@ -12,7 +12,7 @@
 
 use std::sync::Arc;
 
-use mumcord_plugins::api::webview::{self, PERMISSIONS_POLICY, SCHEME};
+use mumcord_plugins::api::webview::{self, PERMISSIONS_POLICY, SCHEME, Webviews};
 use mumcord_plugins::manifest::is_valid_id;
 use mumcord_plugins::origins::Origin;
 use mumcord_plugins::package::MAX_OFFICIAL_WEB_FILE_BYTES;
@@ -64,11 +64,15 @@ pub fn handle<R: Runtime>(
         return;
     }
     tauri::async_runtime::spawn_blocking(move || {
-        responder.respond(respond(plugins.as_deref(), &method, &path));
+        responder.respond(respond(
+            plugins.as_deref().map(Plugins::webviews),
+            &method,
+            &path,
+        ));
     });
 }
 
-fn respond(plugins: Option<&Plugins>, method: &Method, path: &str) -> Response<Vec<u8>> {
+fn respond(webviews: Option<&Webviews>, method: &Method, path: &str) -> Response<Vec<u8>> {
     let Some((plugin, file)) = path.strip_prefix('/').and_then(|p| p.split_once('/')) else {
         return not_found(None);
     };
@@ -78,10 +82,24 @@ fn respond(plugins: Option<&Plugins>, method: &Method, path: &str) -> Response<V
     if method != Method::GET {
         return not_found(Some(plugin));
     }
-    let Some(plugins) = plugins else {
+    let Some(webviews) = webviews else {
         return not_found(Some(plugin));
     };
-    let Some(found) = plugins.webviews().file(plugin, file) else {
+    // The reserved segment is answered from Mumcord's own kit or not at all, never from the
+    // package (FR-13.19, FR-13.28).
+    if webview::is_reserved(file) {
+        let Some(kit) = webviews.kit_file(plugin, file) else {
+            return not_found(Some(plugin));
+        };
+        let origins = webviews.origins(plugin);
+        return response(
+            StatusCode::OK,
+            Some((plugin, &origins)),
+            Some(kit.mime),
+            kit.body.to_vec(),
+        );
+    }
+    let Some(found) = webviews.file(plugin, file) else {
         return not_found(Some(plugin));
     };
     // Tauri answers with a whole body, so the size is checked before anything is read: a file
@@ -108,7 +126,7 @@ fn respond(plugins: Option<&Plugins>, method: &Method, path: &str) -> Response<V
     } else {
         body
     };
-    let origins = plugins.webviews().origins(plugin);
+    let origins = webviews.origins(plugin);
     response(StatusCode::OK, Some((plugin, &origins)), Some(mime), body)
 }
 
@@ -521,6 +539,101 @@ mod tests {
             "{csp}"
         );
         assert!(csp.contains("worker-src 'none'"), "{csp}");
+    }
+
+    /// Webviews for plugin "kit" with a page open and `web/` holding a fake kit in the reserved
+    /// folder, which must never be served.
+    fn open_plugin(api: (u64, u64)) -> (tempfile::TempDir, Webviews) {
+        use mumcord_plugins::api::webview::WebviewPlace;
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().join("web");
+        std::fs::create_dir_all(root.join("_mumcord/v1")).unwrap();
+        std::fs::write(root.join("index.html"), "<p>hi</p>").unwrap();
+        std::fs::write(root.join("_mumcord/v1/kit.css"), "fake").unwrap();
+        let views = Webviews::default();
+        views.set_root("kit", Some(root), vec![WebviewPlace::PanelPopover]);
+        views.set_api("kit", api);
+        views
+            .show(
+                "kit",
+                WebviewPlace::PanelPopover,
+                "index.html",
+                std::time::Instant::now(),
+            )
+            .unwrap();
+        (dir, views)
+    }
+
+    #[test]
+    fn the_kit_is_served_with_the_frame_headers_and_its_type() {
+        let (_dir, views) = open_plugin((1, 2));
+        let page = respond(Some(&views), &Method::GET, "/kit/index.html");
+        assert_eq!(page.status(), StatusCode::OK);
+        for (path, mime) in [
+            ("/kit/_mumcord/v1/kit.css", "text/css; charset=utf-8"),
+            (
+                "/kit/_mumcord/v1/fonts/instrument-sans-latin-wght-normal.woff2",
+                "font/woff2",
+            ),
+            (
+                "/kit/_mumcord/v1/fonts/bricolage-grotesque-latin-wght-normal.woff2",
+                "font/woff2",
+            ),
+            (
+                "/kit/_mumcord/v1/fonts/OFL.txt",
+                "text/plain; charset=utf-8",
+            ),
+            ("/kit/_MUMCORD/v1/kit.css", "text/css; charset=utf-8"),
+        ] {
+            let answer = respond(Some(&views), &Method::GET, path);
+            assert_eq!(answer.status(), StatusCode::OK, "{path}");
+            assert_eq!(answer.headers()[header::CONTENT_TYPE], mime, "{path}");
+            assert_ne!(answer.body().as_slice(), b"fake", "{path}");
+            // The same frame policy as the plugin's own files (FR-13.23, AC-13.14).
+            for name in [
+                header::CONTENT_SECURITY_POLICY.as_str(),
+                "Permissions-Policy",
+                header::X_CONTENT_TYPE_OPTIONS.as_str(),
+                header::ACCESS_CONTROL_ALLOW_ORIGIN.as_str(),
+            ] {
+                assert_eq!(
+                    answer.headers()[name],
+                    page.headers()[name],
+                    "{path} {name}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn unknown_kit_files_and_older_plugins_get_not_found() {
+        let (_dir, views) = open_plugin((1, 2));
+        for path in [
+            "/kit/_mumcord/v1/missing.css",
+            "/kit/_mumcord/v2/kit.css",
+            "/kit/_mumcord/kit.css",
+            "/kit/_mumcord/v1/",
+            "/kit/_mumcord",
+        ] {
+            let answer = respond(Some(&views), &Method::GET, path);
+            assert_eq!(answer.status(), StatusCode::NOT_FOUND, "{path}");
+            assert!(answer.body().is_empty(), "{path}");
+        }
+        for api in [(1, 0), (1, 1)] {
+            let (_dir, views) = open_plugin(api);
+            for path in ["/kit/_mumcord/v1/kit.css", "/kit/_MUMCORD/v1/kit.css"] {
+                let answer = respond(Some(&views), &Method::GET, path);
+                assert_eq!(answer.status(), StatusCode::NOT_FOUND, "{api:?} {path}");
+                assert!(answer.body().is_empty(), "{api:?} {path}");
+            }
+            assert_eq!(
+                respond(Some(&views), &Method::GET, "/kit/index.html").status(),
+                StatusCode::OK
+            );
+        }
+        // Only GET, like every plugin file.
+        let answer = respond(Some(&views), &Method::POST, "/kit/_mumcord/v1/kit.css");
+        assert_eq!(answer.status(), StatusCode::NOT_FOUND);
     }
 
     #[test]

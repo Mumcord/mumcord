@@ -375,6 +375,9 @@ impl PluginService {
         let web = dir.join("web");
         let webviews = self.io.webviews();
         webviews.set_origins_granted(id, granted.iter().any(|g| g == "net.origins"));
+        if let Some(manifest) = self.host.manifest(id) {
+            webviews.set_api(id, manifest.api_minor());
+        }
         webviews.set_root(id, (allowed && web.is_dir()).then_some(web), places);
         let disabled = self
             .store()
