@@ -31,6 +31,10 @@ The pull request template already has a checkbox for it. Pull requests without i
 - Never include secrets or connect tests to public Mumble servers; use a local test server.
 - Do not bump versions in `package.json` or `Cargo.toml`: the version comes from the release tag at build time, and a local build shows `dev~YYYYMMDD` (see [RELEASING.md](RELEASING.md#versions)).
 
+## Which branch
+
+Bug fixes (and security, crash, CI and dependency fixes) target `main`. New features and enhancements of the current milestone target its branch, `milestone/<version>` (e.g. `milestone/0.8.0`); start your branch from it. See [RELEASING.md](RELEASING.md#branches-milestone-branch-and-main).
+
 ## Changelog
 
 Add entries to the `## [Unreleased]` or `## [X.Y.Z] - Unreleased` section of `CHANGELOG.md`. Sections of released versions (a heading with a date) must never change: CI fails a pull request that edits one, and a daily check compares them with the fingerprint in `releases/`. Correct an old entry with a note in the next version instead (see `RELEASING.md`, "Release integrity").

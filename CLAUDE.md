@@ -18,11 +18,20 @@ Everything is in English: chat, specs, docs, code, comments, commit messages and
 - One task = small, verifiable steps. Every epic must be verifiable in the running client against a local test server (acceptance criteria of the spec).
 - One fresh agent per subtask with a self-contained brief. Never bundle several tasks into one agent. The agent ends after its final report; follow-up work gets a new agent.
 - Commit only on request (exception: `/spec` commits the finished spec). Never `git add -A`. Never push without being asked.
-- Before every push, rebase the branch onto the latest main (`git fetch origin && git rebase origin/main`) instead of merging main into it. On an already pushed feature branch, push with `--force-with-lease`; never force-push `main`.
+- Before every push, rebase the branch onto the latest state of its base branch (`main` or the milestone branch, see "Branches and releases") instead of merging the base into it. On an already pushed feature branch, push with `--force-with-lease`; never force-push `main` or a milestone branch.
 - Commits are small and focused: one logical change per commit, Conventional Commits style (`feat:`, `fix:`, `docs:`, `chore:` …), clear English message. Never add AI attribution: no `Co-Authored-By` trailers, no "Generated with" lines, no mention of Claude or AI.
 - Secrets never go into the repo (no passwords, signing keys or private certificates in files, docs or examples). Use only local env files that are git-ignored and CI variables.
 - Never connect to public or third-party Mumble servers for testing; use a local test server.
 - **Client only.** Never build, require or modify anything on the server side (no server plugins or server config changes). Optional companion services (e.g. a relay or a bot) are allowed, but only in their own repos, and Mumcord must work fully without them against an unmodified standard Mumble server. Nothing may ever be required on the server side.
+
+## Branches and releases
+
+- **Milestone branch:** every milestone (e.g. 0.8.0) has one branch `milestone/<version>` (e.g. `milestone/0.8.0`), created from `main` when the milestone starts. Every feature and enhancement of that milestone goes there: feature branches start from it and their pull requests target it.
+- **Fixes go to `main`:** bug fixes, security fixes, crash fixes, CI, dependency updates and docs that apply to the released app target `main` directly. They ship as patch releases (`X.Y.Z+1`) tagged on `main`.
+- **Keep the milestone branch current:** after something lands on `main`, merge `main` into the milestone branch with a pull request "chore: sync main into milestone/<version>" (a merge, never a rebase, because the branch is shared). Resolve `CHANGELOG.md` conflicts by keeping both sides.
+- **Milestone release:** when the milestone is done, a pull request merges `milestone/<version>` into `main`. Once it is merged and CI/E2E are green, the release is tagged on `main` as described in `RELEASING.md`. Afterwards the milestone branch is deleted and the next one is created from `main`.
+- **Choosing the base:** an issue labelled `bug` (or a security or crash fix) → `main`. Anything else in a milestone (`enhancement`, new spec work) → the milestone branch. If unsure, ask. Each pull request names its base in the description.
+- Tags and releases only ever come from `main`; nothing is released from a milestone branch.
 
 ## Stack
 

@@ -4,7 +4,7 @@ name: CI
 # matrix twice. A branch without a pull request can be checked with a manual run.
 on:
   push:
-    branches: [main]
+    branches: [main, "milestone/**"]
   pull_request:
   workflow_dispatch:
 
