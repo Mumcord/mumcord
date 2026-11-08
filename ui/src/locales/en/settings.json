@@ -557,6 +557,9 @@
     "setupWizardRun": "Run setup wizard again",
     "setupWizardIdentityNote": "Your identity is not part of this. Your certificate, and with it your registered name and permissions on servers, stays exactly as it is.",
     "setupWizardIdentityLink": "Manage it in Identity",
+    "tipsTitle": "Tips",
+    "tipsHint": "Clippy shows you around Mumcord in about a minute: servers, channels, talking, chat and more.",
+    "tipsShow": "Show tips",
     "versionTitle": "Version and licence"
   },
   "profile": {
