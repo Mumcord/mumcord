@@ -145,11 +145,13 @@ impl Registered {
         false
     }
 
-    /// Where the account was last seen, as the list this connection read says.
-    fn last_channel(&self, user_id: u32) -> Option<u32> {
+    /// Where the account was last seen, as the list this connection read says. Only this
+    /// connection's own list: Mumble account ids are server-local, so the same id on another server
+    /// is someone else and must not answer here.
+    fn last_channel(&self, server_id: ServerId, user_id: u32) -> Option<u32> {
         self.slots
-            .values()
-            .find_map(|slot| slot.loaded.iter().find(|user| user.user_id == user_id))
+            .get(&server_id)
+            .and_then(|slot| slot.loaded.iter().find(|user| user.user_id == user_id))
             .and_then(|user| user.last_channel)
     }
 
@@ -314,7 +316,7 @@ impl Engine {
             return Err(denied("register right in the root channel"));
         }
         let channel_id = lock(self.registered_state())
-            .last_channel(user_id)
+            .last_channel(server_id, user_id)
             .unwrap_or(ROOT);
         let receiver = {
             let hub = self.registered_state();
@@ -574,8 +576,24 @@ mod tests {
                 entry
             }],
         );
-        assert_eq!(lock(&hub).last_channel(7), Some(4));
-        assert_eq!(lock(&hub).last_channel(8), None, "an unknown account");
+        assert_eq!(lock(&hub).last_channel(1, 7), Some(4));
+        assert_eq!(lock(&hub).last_channel(1, 8), None, "an unknown account");
+        // The same id on another server is someone else: that server's list must not answer here
+        // (Mumble account ids are server-local).
+        lock(&hub).answer(
+            2,
+            &[{
+                let mut other = account(7, "Someone else");
+                other.last_channel = Some(9);
+                other
+            }],
+        );
+        assert_eq!(
+            lock(&hub).last_channel(1, 7),
+            Some(4),
+            "still this server's own account"
+        );
+        assert_eq!(lock(&hub).last_channel(3, 7), None, "no list read here");
     }
 
     #[test]
