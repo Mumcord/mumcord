@@ -28,7 +28,7 @@ sha256() {
 mkdir -p "$cache" "$dest"
 if [ ! -f "$archive" ] || [ "$(sha256 "$archive")" != "$expected" ]; then
   echo "downloading $asset"
-  curl -fsSL --retry 3 -o "$archive.part" \
+  curl -fsSL --retry 5 --retry-delay 5 --retry 3 -o "$archive.part" \
     "https://github.com/Mumcord/mumbot/releases/download/v$MUMBOT_VERSION/$asset"
   mv "$archive.part" "$archive"
 fi
