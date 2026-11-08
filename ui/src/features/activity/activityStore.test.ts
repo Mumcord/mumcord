@@ -72,6 +72,7 @@ function share(session: number): ScreenShare {
     blocked: null,
     relayReason: null,
     kind: "window",
+    title: null,
     elapsedMs: 126000,
   };
 }

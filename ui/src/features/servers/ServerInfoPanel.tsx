@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import type { ServerState } from "../channels/serverStore";
 import { useConnectionStats, type StatsState } from "../connection/useConnectionStats";
+import { sanitizeHtml } from "../chat/sanitize";
 import { RelayRows } from "../p2p/RelayRows";
 import { Dialog } from "./Dialog";
 import { initials } from "./format";
@@ -375,7 +376,7 @@ export function ServerInfoPanel({ serverState, onClose }: ServerInfoPanelProps) 
             <h3>{t("serverInfo.welcomeText")}</h3>
             <div
               className="server-info-panel__welcome"
-              dangerouslySetInnerHTML={{ __html: info.welcomeText }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(info.welcomeText) }}
             />
           </section>
         )}

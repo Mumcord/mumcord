@@ -33,6 +33,7 @@ function share(patch: Partial<ScreenShare> = {}): ScreenShare {
     blocked: null,
     relayReason: null,
     kind: null,
+    title: null,
     elapsedMs: 0,
     ...patch,
   };
@@ -288,6 +289,20 @@ describe("sharer control bar", () => {
       expect(bar).toHaveTextContent("Shared picture");
       expect(bar).toHaveTextContent("No sound");
     });
+  });
+
+  it("names the shared window after its kind, and nothing more for a screen (issue #558)", async () => {
+    render(<SharerBar />);
+    await api.screenShareStart(1, false, null, null);
+    act(() => {
+      watchedBy(share({ kind: "window", title: "VS Code" }));
+    });
+    const source = await screen.findByText("VS Code");
+    expect(source.closest(".sharer-bar__source")).toHaveTextContent(/^Window · VS Code/);
+    act(() => {
+      watchedBy(share({ kind: "screen", title: null }));
+    });
+    expect(screen.queryByText("VS Code")).toBeNull();
   });
 
   it("counts the viewers, and the viewers button names them with their quality", async () => {
