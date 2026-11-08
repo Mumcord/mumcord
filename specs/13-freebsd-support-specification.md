@@ -21,6 +21,8 @@ Four things FreeBSD does not have decide the shape of this epic: there is no des
 - Desktop integration: package-provided desktop entry and icons, `mumble://` handler, XDG autostart, single-instance handover.
 - The FreeBSD `.pkg`: build script, dependency and soname detection, release asset with checksums, SBOM and third-party notices.
 - A visible in-app note listing the platform gaps, and disabled entries for the features that cannot work.
+- Rendering on the graphics driver the system has loaded (hardware OpenGL), with the Intel driver
+  requirement stated in the package's install message and the release notes.
 - CI on real FreeBSD: check, clippy and tests on every pull request; package build and connection smoke test before a release.
 
 ### 2.2 Out of scope / later
@@ -56,6 +58,13 @@ No new roles. FreeBSD is a client platform; server-side roles (guest, registered
 - **FR-13.2** Where a tool the build downloads has no FreeBSD build, the build uses the system tool: `protoc` from the `protobuf` package when `protoc-bin-vendored` has no binary, `libvpx`/`SVT-AV1`/`dav1d` from the system through `pkg-config`, and the system header layout is accepted (SVT-AV1 keeps its headers flat in `include/svt-av1`).
 - **FR-13.3** PipeWire is not built on FreeBSD (`cpal`'s `pipewire` feature stays off), because the sound server is OSS and libpipewire is not part of a standard installation.
 - **FR-13.4** Behaviour on Linux, Windows and macOS must not change. The existing CI jobs on those platforms are the proof and stay green.
+- **FR-13.32** The app renders with the graphics driver the system has loaded; it does not force
+  software rendering. `LIBGL_ALWAYS_SOFTWARE=1` in the environment stays the escape hatch for a
+  driver that turns out to be unusable.
+- **FR-13.33** The package ships an install message (`+MANIFEST` `messages`) that names the working
+  Intel driver: `drm-612-kmod`, which the `drm-kmod` metaport selects by default, hangs Comet Lake
+  and other Gen9/Gen12 GPUs (`rcs0 preemption time out`, freebsd/drm-kmod issue #509) and takes the
+  desktop down; `drm-66-kmod` works. The release notes repeat it in one sentence.
 
 ### 4.2 Desktop integration
 
@@ -116,6 +125,8 @@ Settings → About
 │ (no PipeWire), window picker (no desktop portal).                     │
 │ Screen sharing captures the whole X11 screen.                         │
 │ Updates come with "pkg upgrade mumcord".                              │
+│ Intel graphics: use drm-66-kmod ("pkg install drm-66-kmod");         │
+│ drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).                │
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -210,6 +221,8 @@ The OS Secret Service is always preferred; the vault is the fallback and its lim
 - **Privacy**: no telemetry; no chat contents or audio in logs; the FreeBSD note and diagnostics hold no personal data.
 - **Accessibility**: unchanged from Linux (keyboard operable, screen-reader labels, system theme and scaling).
 - **Platforms**: FreeBSD 15.x on amd64. X11 is the supported session; Wayland works through XWayland with the stated limits.
+- **Rendering**: hardware OpenGL through the loaded DRM module (Mesa). No GPU hang is accepted in
+  the acceptance checks; `glxinfo -B` must name the Intel renderer on a machine with `drm-66-kmod`.
 - **Footprint**: the package adds one binary (~90 MB installed), 18 background images and a desktop entry; dependencies come from the package collection.
 
 ## 10. Build, packaging & release
@@ -217,6 +230,8 @@ The OS Secret Service is always preferred; the vault is the fallback and its lim
 - **Build**: `npm run build` then `cargo build --release -p mumcord` on FreeBSD (both proven; `CARGO_BUILD_JOBS=2` is the stable setting on a 4-vCPU machine).
 - **Package**: `scripts/build-freebsd-pkg.sh` stages the release binary, the camera backgrounds, the desktop entry, the icons, the licence and the third-party notices under `/usr/local`, then creates `mumcord-<version>.pkg`. The manifest's dependencies and `shlibs_required` are derived from `ldd` and `pkg which`; `flatsize`, `abi` and `arch` are set.
 - **Dependencies** (hard): `webkit2-gtk_41`, `gtk3`, `alsa-lib`, `alsa-plugins`, `libayatana-appindicator`, `libvpx`, `svt-av1`, `dav1d` — plus everything those pull in. Installing Mumcord must be enough to use it (Q4.2).
+- **Install message**: `pkg` prints `packaging/freebsd/pkg-message` after the install — the Intel
+  driver requirement and the software-rendering escape hatch (FR-13.33).
 - **Install/remove**: `pkg add ./mumcord-0.8.0.pkg`, `pkg delete mumcord`. The package's triggers refresh the icon and MIME caches on install and removal.
 - **Distribution**: release asset only (Q5.2). The release lists it in `SHA256SUMS`, the SBOM and the third-party notices (Q5.1), and the release page names the supported version and the limits (Q5.3).
 - **Updates**: none in the app; the About note names `pkg upgrade mumcord` (FR-13.29).
@@ -240,11 +255,15 @@ Verified on a fresh FreeBSD 15.x amd64 (VM is fine), with `mumble-server` runnin
 - **AC-13.11** A direct Mumcord-to-Mumcord connection to a second client on the same network is established, or — if it cannot be — the option is hidden and the About note lists it.
 - **AC-13.12** Starting a screen share captures the whole X11 screen, a viewer on another client sees live pictures, and the start dialog states that there is no share sound.
 - **AC-13.13** The camera entry is visible, disabled and shows "not available on FreeBSD yet"; no background effects are offered.
-- **AC-13.14** Settings → About shows the platform line and the three-line gap note.
+- **AC-13.14** Settings → About shows the platform line, the three-line gap note and the Intel driver line.
 - **AC-13.15** Clicking a `mumble://` link while Mumcord runs hands it to the running window (no second window, no second connection); a second `mumcord` from a terminal behaves the same way.
 - **AC-13.16** Settings → Updates reports the package install kind and offers no download; no request to the release server is made.
 - **AC-13.17** `pkg delete mumcord` removes every installed file and the menu entry; a user-level profile and the encrypted secret file stay where they are.
 - **AC-13.18** `cargo test --workspace` is green on FreeBSD 15.x amd64; the Linux, Windows and macOS CI jobs are unchanged and green.
+- **AC-13.19** On a machine with `drm-66-kmod`, `glxinfo -B` names `Mesa Intel(R) …` (hardware), and a
+  ten-minute session (window, voice, one screen share) produces no `GPU HANG` line in `dmesg`.
+- **AC-13.20** `pkg add` prints the install message naming `drm-66-kmod`; `pkg info -D mumcord`
+  shows it again.
 
 ## 12. Decision log
 
@@ -284,6 +303,7 @@ Verified on a fresh FreeBSD 15.x amd64 (VM is fine), with `mumble-server` runnin
 | Q5.6 | No schema change and no migration | Shared profile format |
 | Dev. 1 | No in-app updater on FreeBSD: `pkg upgrade` only | Product decision before the brainstorming; recorded as FR-13.29 |
 | Dev. 2 | Secrets fall back to an encrypted file when no Secret Service answers | Product decision before the brainstorming; §7 |
+| Q6.1 | Render with the loaded driver (hardware GL); state the `drm-66-kmod` requirement in the package message, About note and release notes | Driver bug freebsd/drm-kmod #509, not a Mumcord bug; measured on the test machine |
 
 ## 13. Open points & risks
 
@@ -296,6 +316,7 @@ Verified on a fresh FreeBSD 15.x amd64 (VM is fine), with `mumble-server` runnin
 | `pkg`'s dependency list is derived at build time | A package rename upstream breaks the manifest silently | The release smoke test installs the built package on a clean system (AC-13.1) |
 | Reduced crash symbols | Harder to debug user reports | Diagnostics says so; the raw stack is still captured |
 | Build memory | `cargo build --release` crashed rustc once with 4 parallel jobs on 8 GB | Keep `CARGO_BUILD_JOBS=2` in the FreeBSD build script and CI |
+| Intel graphics driver | `drm-612-kmod` hangs Gen9/Gen12 GPUs (freebsd/drm-kmod #509, open) | Install message + release notes point at `drm-66-kmod`; the driver requirement is checked in AC-13.19; revisit when upstream fixes it |
 | FreeBSD port submission and repository | Distribution stays manual (`pkg add`) | Deliberate for the first version (Q1.6, Q5.2) |
 
 ## 14. Impact on the roadmap
