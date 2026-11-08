@@ -1,11 +1,12 @@
-//! Kick and ban of a person (Epic 4, issue #253).
+//! Kick and ban of a person (Epic 4, issue #253) and the admin actions a slash command runs
+//! (issue #378): server mute, deafen, priority speaker, registering a guest and moving a whole
+//! channel at once.
 //!
 //! A kick is the standard `UserRemove` message, so the person can reconnect afterwards. A precise
 //! ban needs the server's ban list: `UserRemove` with `ban = true` always takes the server's own
 //! default length and both targets at once, so a chosen duration and the "Ban by" targets only work
 //! through the list (FR-10.12). When the list cannot be read the dialog falls back to that message
-//! (FR-10.13). The rights are the server's own answer for the root channel (FR-10.1); the server
-//! has the final say.
+//! (FR-10.13). The rights are the server's own answers (FR-10.1); the server has the final say.
 //!
 //! Nothing here goes to disk (FR-10.63): what a dialog holds lives in memory for the connection. The
 //! person's address comes from `UserStats`, which standard servers send only to admins (FR-10.65).
@@ -18,9 +19,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use mumcord_protocol::PermissionDenied;
-use mumcord_protocol::ban;
-use mumcord_protocol::permissions;
-use mumcord_protocol::proto;
+use mumcord_protocol::{CommandError, ban, permissions, proto};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
@@ -31,6 +30,13 @@ use crate::session::{Engine, EngineError, EngineResult, ErrorKind, SessionCtx, c
 const ROOT: u32 = 0;
 /// How long a dialog waits for the server's answer, as the ban list read does (FR-10.13).
 pub const ANSWER_WAIT: Duration = banlist::ANSWER_WAIT;
+/// The flood limit of a standard server: this many moves go out at once, the rest one per second
+/// (FR-10.18; spike S2 may still change these, section 13).
+const MOVE_BURST: usize = 5;
+/// How long a mass move waits between two moves after the burst (FR-10.18).
+const MOVE_GAP: Duration = Duration::from_secs(1);
+/// How long a mass move waits after its last message to see who arrived (FR-10.18).
+const ARRIVAL_WAIT: Duration = Duration::from_secs(5);
 
 /// What the kick or ban dialog needs to know about a person before it can be filled.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -68,12 +74,34 @@ pub struct BanRequest {
     pub quick: bool,
 }
 
-/// What a kick produced. `Confirmed` means the server answered with the person's removal.
+/// What an action on a person produced. `Confirmed` means the server answered with the change it
+/// was asked for: the person's removal, or the echo of their new state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KickOutcome {
+pub enum ActionOutcome {
     Confirmed,
     /// The server answered nothing within [`ANSWER_WAIT`]; the message was written to it.
     Unconfirmed,
+}
+
+/// What a mass move produced (FR-10.17, FR-10.18).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MassMoveOutcome {
+    /// All moves were sent; of `total` people, `moved` arrived in the target channel within the
+    /// grace period. The rest were refused by the server or left on their own.
+    Done { moved: u32, total: u32 },
+    /// Another mass move is still running on this server (FR-10.18).
+    AlreadyRunning,
+}
+
+/// What the open wait for one person expects from the server. The right it names is the one a
+/// `PermissionDenied` answer carries, so a refusal reaches the dialog or command that asked
+/// (FR-10.59) and not one that happens to wait for the same person.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Pending {
+    /// `UserRemove` (kick, ban): answered by the person's removal.
+    Removal,
+    /// A change of the person's own state: answered by the echo of their `UserState`.
+    State(u32),
 }
 
 /// What a ban produced (FR-10.12, FR-10.13, FR-10.66).
@@ -101,8 +129,10 @@ struct Slot {
     address: HashMap<u32, IpAddr>,
     /// The dialog waiting for a `UserStats` answer.
     stats: HashMap<u32, oneshot::Sender<StatsAnswer>>,
-    /// The dialog waiting for the server's answer to a kick or a ban.
-    action: HashMap<u32, oneshot::Sender<Result<(), EngineError>>>,
+    /// The dialog or command waiting for the server's answer on a person, with what it expects.
+    actions: HashMap<u32, (Pending, oneshot::Sender<Result<(), EngineError>>)>,
+    /// One mass move runs per server at a time (FR-10.18).
+    mass_move: bool,
 }
 
 /// In-memory kick and ban state, one slot per connection.
@@ -130,13 +160,14 @@ impl Admin {
         &mut self,
         server_id: ServerId,
         session: u32,
+        pending: Pending,
     ) -> oneshot::Receiver<Result<(), EngineError>> {
         let (tx, rx) = oneshot::channel();
         self.slots
             .entry(server_id)
             .or_default()
-            .action
-            .insert(session, tx);
+            .actions
+            .insert(session, (pending, tx));
         rx
     }
 
@@ -150,11 +181,42 @@ impl Admin {
         }
     }
 
-    fn complete(&mut self, server_id: ServerId, session: u32, outcome: Result<(), EngineError>) {
-        if let Some(slot) = self.slots.get_mut(&server_id)
-            && let Some(tx) = slot.action.remove(&session)
+    /// Answers the open wait for `session`, when it is waiting for this kind of answer.
+    fn complete<F: Fn(Pending) -> bool>(
+        &mut self,
+        server_id: ServerId,
+        session: u32,
+        outcome: Result<(), EngineError>,
+        accepts: F,
+    ) {
+        let Some(slot) = self.slots.get_mut(&server_id) else {
+            return;
+        };
+        if !slot
+            .actions
+            .get(&session)
+            .is_some_and(|(pending, _)| accepts(*pending))
         {
+            return;
+        }
+        if let Some((_, tx)) = slot.actions.remove(&session) {
             let _ = tx.send(outcome);
+        }
+    }
+
+    /// Takes the mass-move slot; false when one already runs (FR-10.18).
+    fn begin_mass_move(&mut self, server_id: ServerId) -> bool {
+        let slot = self.slots.entry(server_id).or_default();
+        if slot.mass_move {
+            return false;
+        }
+        slot.mass_move = true;
+        true
+    }
+
+    fn end_mass_move(&mut self, server_id: ServerId) {
+        if let Some(slot) = self.slots.get_mut(&server_id) {
+            slot.mass_move = false;
         }
     }
 
@@ -220,7 +282,7 @@ impl Engine {
         server_id: ServerId,
         session: u32,
         reason: Option<&str>,
-    ) -> EngineResult<KickOutcome> {
+    ) -> EngineResult<ActionOutcome> {
         let ctx = self.session_ctx_for(server_id)?;
         if !self.can_kick(server_id)? {
             return Err(denied("kick right in the root channel"));
@@ -228,7 +290,10 @@ impl Engine {
         if is_own(&ctx, session) {
             return Err(EngineError::invalid("kicking yourself is not offered"));
         }
-        let outcome = send_and_wait(&ctx, self.admin_state(), session, reason, false).await;
+        let outcome = send_and_wait(&ctx, self.admin_state(), session, Pending::Removal, || {
+            ctx.handle.remove_user(session, reason, false)
+        })
+        .await;
         report(&ctx, "kick", &outcome);
         outcome
     }
@@ -254,14 +319,12 @@ impl Engine {
         }
 
         if request.quick {
-            let outcome = send_and_wait(
-                &ctx,
-                self.admin_state(),
-                session,
-                request.reason.as_deref(),
-                true,
-            )
-            .await;
+            let outcome =
+                send_and_wait(&ctx, self.admin_state(), session, Pending::Removal, || {
+                    ctx.handle
+                        .remove_user(session, request.reason.as_deref(), true)
+                })
+                .await;
             report(&ctx, "quick ban", &outcome);
             return outcome.map(|_| BanOutcome::QuickBanned);
         }
@@ -322,20 +385,225 @@ impl Engine {
         // `removed` is the server's own answer; without it the entry stands and the person is only
         // taken off on their next connect (issue #253).
         let confirmed = matches!(
-            send_and_wait(
-                &ctx,
-                self.admin_state(),
-                session,
-                request.reason.as_deref(),
-                false
-            )
+            send_and_wait(&ctx, self.admin_state(), session, Pending::Removal, || ctx
+                .handle
+                .remove_user(session, request.reason.as_deref(), false),)
             .await,
-            Ok(KickOutcome::Confirmed)
+            Ok(ActionOutcome::Confirmed)
         );
         tracing::info!(server_id, action = "ban", confirmed, "admin action: ban");
         Ok(BanOutcome::Saved {
             key,
             removed: confirmed,
+        })
+    }
+
+    /// Server mute of another person (issue #378, FR-10.15): one `UserState` for their session,
+    /// answered by the server echoing their new state.
+    pub async fn person_set_server_mute(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        muted: bool,
+    ) -> EngineResult<ActionOutcome> {
+        self.person_change_state(
+            server_id,
+            session,
+            permissions::MUTE_DEAFEN,
+            None,
+            proto::UserState {
+                mute: Some(muted),
+                ..Default::default()
+            },
+            "server mute",
+        )
+        .await
+    }
+
+    /// Server deafen of another person (FR-10.15). Deafening always mutes too, as in Mumble
+    /// (spec 10, A5); undeafening leaves the mute the admin set before.
+    pub async fn person_set_server_deafen(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        deaf: bool,
+    ) -> EngineResult<ActionOutcome> {
+        self.person_change_state(
+            server_id,
+            session,
+            permissions::MUTE_DEAFEN,
+            None,
+            proto::UserState {
+                mute: deaf.then_some(true),
+                deaf: Some(deaf),
+                ..Default::default()
+            },
+            "server deafen",
+        )
+        .await
+    }
+
+    /// Priority speaker of another person (issue #378, FR-10.15); the same right as mute and
+    /// deafen.
+    pub async fn person_set_priority(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        priority: bool,
+    ) -> EngineResult<ActionOutcome> {
+        self.person_change_state(
+            server_id,
+            session,
+            permissions::MUTE_DEAFEN,
+            None,
+            proto::UserState {
+                priority_speaker: Some(priority),
+                ..Default::default()
+            },
+            "priority speaker",
+        )
+        .await
+    }
+
+    /// Registers an online guest under their current name (issue #378, FR-10.20): `user_id = 0`
+    /// is the standard "register this person" message. Only a guest can be registered, and the
+    /// check is the Register right in the root channel.
+    pub async fn person_register(
+        &self,
+        server_id: ServerId,
+        session: u32,
+    ) -> EngineResult<ActionOutcome> {
+        let registered = {
+            let ctx = self.session_ctx_for(server_id)?;
+            ctx.handle.with_state(|state| {
+                state
+                    .users
+                    .get(&session)
+                    .is_some_and(|user| user.user_id.is_some())
+            })
+        };
+        if registered {
+            return Err(EngineError::invalid("this person is registered already"));
+        }
+        self.person_change_state(
+            server_id,
+            session,
+            permissions::REGISTER,
+            Some(ROOT),
+            proto::UserState {
+                user_id: Some(0),
+                ..Default::default()
+            },
+            "register",
+        )
+        .await
+    }
+
+    /// One change of another person's state (issue #378): `right` names the right the server
+    /// checks, which is its answer for the person's own channel unless `channel` names another
+    /// (the Register right sits in the root channel). Nothing is sent without that right
+    /// (FR-10.1); the server has the final say either way.
+    async fn person_change_state(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        right: u32,
+        channel: Option<u32>,
+        change: proto::UserState,
+        what: &str,
+    ) -> EngineResult<ActionOutcome> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let person_channel = ctx
+            .handle
+            .with_state(|state| state.users.get(&session).map(|user| user.channel_id));
+        let Some(person_channel) = person_channel else {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
+        };
+        if is_own(&ctx, session) {
+            return Err(EngineError::invalid("this action never offers yourself"));
+        }
+        if !right_in(&ctx, channel.unwrap_or(person_channel), right) {
+            return Err(denied(format!("{what} right in this channel")));
+        }
+        let handle = &ctx.handle;
+        let outcome = send_and_wait(
+            &ctx,
+            self.admin_state(),
+            session,
+            Pending::State(right),
+            move || handle.send_admin_user_state(change),
+        )
+        .await;
+        report(&ctx, what, &outcome);
+        outcome
+    }
+
+    /// Moves everyone in the admin's own channel to `target`, including the admin when they are
+    /// there (FR-10.17). The moves go out at the paced rate of FR-10.18 and, after a grace
+    /// period, the count of those who really arrived is compared with the number of people that
+    /// were there. At most one mass move runs per server at a time.
+    pub async fn move_all(
+        &self,
+        server_id: ServerId,
+        target: u32,
+    ) -> EngineResult<MassMoveOutcome> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let from = ctx.handle.with_state(|state| {
+            let source = state
+                .session
+                .and_then(|own| state.users.get(&own))
+                .map(|own| own.channel_id)?;
+            let people = state
+                .users
+                .values()
+                .filter(|user| user.channel_id == source)
+                .map(|user| user.session)
+                .collect::<Vec<u32>>();
+            Some((source, people))
+        });
+        let Some((source, people)) = from else {
+            return Err(EngineError::not_connected());
+        };
+        if !right_in(&ctx, source, permissions::MOVE) {
+            return Err(denied("move right in this channel"));
+        }
+        let total = u32::try_from(people.len()).unwrap_or(u32::MAX);
+        if source == target || people.is_empty() {
+            return Ok(MassMoveOutcome::Done { moved: 0, total });
+        }
+        if !lock(self.admin_state()).begin_mass_move(server_id) {
+            return Ok(MassMoveOutcome::AlreadyRunning);
+        }
+        for (index, session) in people.iter().enumerate() {
+            if index >= MOVE_BURST {
+                tokio::time::sleep(MOVE_GAP).await;
+            }
+            let _ = ctx.handle.move_user(*session, target);
+        }
+        tokio::time::sleep(ARRIVAL_WAIT).await;
+        let moved = ctx.handle.with_state(|state| {
+            people
+                .iter()
+                .filter(|session| {
+                    state
+                        .users
+                        .get(*session)
+                        .is_some_and(|user| user.channel_id == target)
+                })
+                .count()
+        });
+        lock(self.admin_state()).end_mass_move(server_id);
+        // Only the counts (FR-10.64): no names, no channel names.
+        tracing::info!(
+            server_id,
+            action = "mass move",
+            moved,
+            total,
+            "admin action: mass move"
+        );
+        Ok(MassMoveOutcome::Done {
+            moved: u32::try_from(moved).unwrap_or(u32::MAX),
+            total,
         })
     }
 
@@ -428,36 +696,35 @@ impl Engine {
     }
 }
 
-/// Writes the `UserRemove` message and waits for the server's answer: the person's removal, a
-/// refusal, or nothing within [`ANSWER_WAIT`] (FR-10.59). The wait is registered first, so a fast
-/// answer cannot miss it.
-async fn send_and_wait(
+/// Writes one message and waits for the server's answer: the change it confirms, a refusal, or
+/// nothing within [`ANSWER_WAIT`] (FR-10.59). The wait is registered first, so a fast answer
+/// cannot miss it. Also used by [`Engine::person_move`], which reports its result to the admin
+/// who typed `/move` (issue #378).
+pub(crate) async fn send_and_wait<S: FnOnce() -> Result<(), CommandError>>(
     ctx: &SessionCtx,
     hub: &Mutex<Admin>,
     session: u32,
-    reason: Option<&str>,
-    ban: bool,
-) -> EngineResult<KickOutcome> {
-    let receiver = { lock(hub).expect_action(ctx.server_id, session) };
-    ctx.handle
-        .remove_user(session, reason, ban)
-        .map_err(convert::command_error)?;
+    pending: Pending,
+    send: S,
+) -> EngineResult<ActionOutcome> {
+    let receiver = { lock(hub).expect_action(ctx.server_id, session, pending) };
+    send().map_err(convert::command_error)?;
     match tokio::time::timeout(ANSWER_WAIT, receiver).await {
-        Ok(Ok(Ok(()))) => Ok(KickOutcome::Confirmed),
+        Ok(Ok(Ok(()))) => Ok(ActionOutcome::Confirmed),
         Ok(Ok(Err(error))) => Err(error),
         // The wait was dropped, which happens when the connection ends.
         Ok(Err(_)) => Err(EngineError::not_connected()),
-        Err(_) => Ok(KickOutcome::Unconfirmed),
+        Err(_) => Ok(ActionOutcome::Unconfirmed),
     }
 }
 
-fn report(ctx: &SessionCtx, action: &str, outcome: &EngineResult<KickOutcome>) {
+pub(crate) fn report(ctx: &SessionCtx, action: &str, outcome: &EngineResult<ActionOutcome>) {
     // Only the kind of action and its outcome (FR-10.64): no names, addresses or reasons.
     match outcome {
-        Ok(KickOutcome::Confirmed) => {
+        Ok(ActionOutcome::Confirmed) => {
             tracing::info!(server_id = ctx.server_id, action, "admin action: confirmed")
         }
-        Ok(KickOutcome::Unconfirmed) => {
+        Ok(ActionOutcome::Unconfirmed) => {
             tracing::info!(server_id = ctx.server_id, action, "admin action: no answer")
         }
         Err(error) => tracing::warn!(
@@ -469,7 +736,7 @@ fn report(ctx: &SessionCtx, action: &str, outcome: &EngineResult<KickOutcome>) {
     }
 }
 
-fn denied(message: &str) -> EngineError {
+fn denied(message: impl Into<String>) -> EngineError {
     EngineError::new(ErrorKind::PermissionDenied, message)
 }
 
@@ -490,6 +757,19 @@ fn is_own(ctx: &SessionCtx, session: u32) -> bool {
         .with_state(|state| state.session == Some(session))
 }
 
+/// Whether the server's own answers grant a right in a channel (FR-10.1). A channel whose answer
+/// is not known yet falls back to the root channel's, because ACLs inherit downwards.
+fn right_in(ctx: &SessionCtx, channel: u32, bit: u32) -> bool {
+    ctx.handle.with_state(|state| {
+        state
+            .permissions
+            .get(&channel)
+            .or_else(|| state.permissions.get(&ROOT))
+            .copied()
+            .is_some_and(|bits| bits & bit != 0)
+    })
+}
+
 /// A `UserStats` answer for a person the dialog asked about.
 pub(crate) fn on_stats(hub: &Mutex<Admin>, server_id: ServerId, stats: &proto::UserStats) {
     let Some(session) = stats.session else {
@@ -502,23 +782,42 @@ pub(crate) fn on_stats(hub: &Mutex<Admin>, server_id: ServerId, stats: &proto::U
     lock(hub).answer_stats(server_id, session, answer);
 }
 
-/// The person is gone: the open dialog's wait ends with the server's answer.
+/// The person is gone: the open kick or ban wait ends with the server's answer.
 pub(crate) fn on_removed(hub: &Mutex<Admin>, server_id: ServerId, session: u32) {
-    lock(hub).complete(server_id, session, Ok(()));
+    lock(hub).complete(server_id, session, Ok(()), |pending| {
+        pending == Pending::Removal
+    });
 }
 
-/// A refused kick or ban, which the open dialog shows (FR-10.59).
+/// The server echoed a person's state: the open wait for a change of theirs ends (FR-10.15,
+/// FR-10.20, FR-10.35).
+pub(crate) fn on_state(hub: &Mutex<Admin>, server_id: ServerId, session: u32) {
+    lock(hub).complete(server_id, session, Ok(()), |pending| {
+        matches!(pending, Pending::State(_))
+    });
+}
+
+/// A refused action, which the open dialog or command shows (FR-10.59). A denial only reaches a
+/// wait that asked for the right the server names, so an unrelated refusal does not end it.
 pub(crate) fn on_denied(hub: &Mutex<Admin>, server_id: ServerId, denied: &PermissionDenied) {
     let Some(session) = denied.session else {
         return;
     };
-    if denied
-        .permission
-        .is_none_or(|bits| bits & (permissions::KICK | permissions::BAN) == 0)
-    {
-        return;
-    }
-    lock(hub).complete(server_id, session, Err(convert::denial_error(denied)));
+    let asked_for = |pending: Pending| match denied.permission {
+        // A refusal names the right it is about, so it only reaches the wait that asked for it.
+        Some(bits) => match pending {
+            Pending::Removal => bits & (permissions::KICK | permissions::BAN) != 0,
+            Pending::State(bit) => bits & bit != 0,
+        },
+        // Without the right in the answer any open wait for this person may be the one.
+        None => true,
+    };
+    lock(hub).complete(
+        server_id,
+        session,
+        Err(convert::denial_error(denied)),
+        asked_for,
+    );
 }
 
 /// The connection ended: drop what the dialog held (FR-10.63).
@@ -553,33 +852,73 @@ mod tests {
     }
 
     #[test]
-    fn only_the_kick_and_ban_denials_reach_an_open_dialog() {
+    fn only_the_right_denial_reaches_the_open_wait() {
         let hub = Mutex::new(Admin::default());
-        let mut receiver = lock(&hub).expect_action(1, 7);
-        let unrelated = PermissionDenied {
+        let mut mute = lock(&hub).expect_action(1, 7, Pending::State(permissions::MUTE_DEAFEN));
+        let base = PermissionDenied {
             kind: mumcord_protocol::DenyKind::Permission,
-            permission: Some(permissions::MOVE),
+            permission: Some(permissions::KICK),
             channel_id: Some(0),
             session: Some(7),
             reason: None,
             name: None,
         };
-        on_denied(&hub, 1, &unrelated);
+        on_denied(&hub, 1, &base);
         assert!(
-            receiver.try_recv().is_err(),
-            "a denial for another permission is not this dialog's"
+            mute.try_recv().is_err(),
+            "a denial for another right is not this wait's"
         );
 
-        let kick = PermissionDenied {
-            permission: Some(permissions::KICK),
-            ..unrelated.clone()
-        };
-        on_denied(&hub, 1, &kick);
-        let delivered = receiver.try_recv().expect("the dialog was answered");
+        // The right the wait asked for ends it, with the server's reason (FR-10.59).
+        on_denied(
+            &hub,
+            1,
+            &PermissionDenied {
+                permission: Some(permissions::MUTE_DEAFEN),
+                ..base
+            },
+        );
+        let delivered = mute.try_recv().expect("the wait was answered");
         assert_eq!(
             delivered.err().map(|e| e.kind),
             Some(ErrorKind::PermissionDenied)
         );
+    }
+
+    #[test]
+    fn the_echo_of_a_person_ends_only_a_state_wait() {
+        let hub = Mutex::new(Admin::default());
+        let mut moved = lock(&hub).expect_action(2, 5, Pending::State(permissions::MOVE));
+        let mut kicked = lock(&hub).expect_action(2, 6, Pending::Removal);
+        on_state(&hub, 2, 5);
+        on_state(&hub, 2, 6);
+        assert!(moved.try_recv().expect("the echo answered").is_ok());
+        assert!(
+            kicked.try_recv().is_err(),
+            "an echo is not the removal a kick waits for"
+        );
+    }
+
+    #[test]
+    fn one_mass_move_runs_per_server() {
+        let hub = Mutex::new(Admin::default());
+        assert!(lock(&hub).begin_mass_move(4), "the first one starts");
+        assert!(
+            !lock(&hub).begin_mass_move(4),
+            "a second one is refused while it runs (FR-10.18)"
+        );
+        assert!(
+            lock(&hub).begin_mass_move(5),
+            "another server is unaffected"
+        );
+        lock(&hub).end_mass_move(4);
+        assert!(
+            lock(&hub).begin_mass_move(4),
+            "it runs again once the first ended"
+        );
+        // Disconnecting drops the slot, so a reconnect is not blocked (FR-10.63).
+        lock(&hub).forget(4);
+        assert!(lock(&hub).begin_mass_move(4));
     }
 
     #[test]
@@ -612,9 +951,9 @@ mod tests {
     }
 
     #[test]
-    fn a_removed_person_answers_the_open_dialog() {
+    fn a_removed_person_answers_the_open_wait() {
         let hub = Mutex::new(Admin::default());
-        let mut receiver = lock(&hub).expect_action(3, 11);
+        let mut receiver = lock(&hub).expect_action(3, 11, Pending::Removal);
         on_removed(&hub, 3, 11);
         assert!(receiver.try_recv().expect("answered").is_ok());
     }
