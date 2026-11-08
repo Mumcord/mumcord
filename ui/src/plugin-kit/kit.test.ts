@@ -41,6 +41,7 @@ const TOKENS = new Set([
   ...["sm", "md", "lg", "full"].map((size) => `--mc-radius-${size}`),
   "--mc-focus-ring-width",
   "--mc-shadow-raised",
+  "--mc-shadow-primary-glow",
   "--mc-duration-fast",
   "--mc-duration-normal",
   "--mc-ease-out",
@@ -121,6 +122,20 @@ describe("plugin UI kit", () => {
         expect(selector, selector).not.toMatch(/(^|[\s(,])(html|body|\*)([\s:.[)]|$)/);
       }
     }
+  });
+
+  it("matches the app's glow, danger and dialog look (lead decision, spec 13 §12)", () => {
+    const body = (needle: string): string =>
+      rules(css)
+        .filter((r) => r.atRules.length === 0 && r.selector.includes(needle))
+        .map((r) => r.body)
+        .join("\n");
+    expect(body(".mc-button--primary")).toContain("box-shadow: var(--mc-shadow-primary-glow)");
+    const danger = body(".mc-button--danger");
+    expect(danger).toContain("border-color: var(--mc-color-danger)");
+    expect(danger).toContain("color: var(--mc-color-danger)");
+    expect(body(".mc-dialog")).toContain("background: var(--mc-color-surface);");
+    expect(body(".mc-kit")).toContain("font-family: var(--mc-font-family)");
   });
 
   it("uses !important only to restore system colours under forced colours", () => {

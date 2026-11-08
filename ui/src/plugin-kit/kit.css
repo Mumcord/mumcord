@@ -92,16 +92,15 @@
   background: var(--mc-color-primary);
   color: var(--mc-color-on-primary);
   font-weight: var(--mc-font-weight-bold);
+  box-shadow: var(--mc-shadow-primary-glow);
 }
 
-:where(.mc-button--danger) {
-  border-color: var(--mc-color-danger);
-  color: var(--mc-color-danger);
-}
-
+/* Outlined like the app's `.settings-button--danger`: danger border and text, and the border and
+   text stay danger on hover (only the neutral hover fill applies). */
+:where(.mc-button--danger),
 :where(:where(.mc-button--danger):hover:not(:disabled)) {
   border-color: var(--mc-color-danger);
-  background: var(--mc-color-hover);
+  color: var(--mc-color-danger);
 }
 
 /* The press shrink is motion, so it stays off while Mumcord asks for reduced motion. */
@@ -448,7 +447,7 @@
   padding: var(--mc-space-5);
   border: 0.0625rem solid var(--mc-color-border);
   border-radius: var(--mc-radius-lg);
-  background: var(--mc-color-surface-raised);
+  background: var(--mc-color-surface);
   color: var(--mc-color-text);
   box-shadow: var(--mc-shadow-raised);
   font-family: var(--mc-font-family);
