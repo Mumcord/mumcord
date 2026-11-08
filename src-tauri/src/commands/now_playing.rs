@@ -66,7 +66,7 @@ impl From<mumcord_engine::NowPlayingView> for NowPlaying {
 #[specta::specta]
 pub fn now_playing_status(engine: State<'_, Engine>) -> ApiResult<NowPlayingStatus> {
     Ok(NowPlayingStatus {
-        supported: crate::now_playing::SUPPORTED,
+        supported: crate::now_playing::supported(),
         track: engine.now_playing_local().map(Into::into),
     })
 }
