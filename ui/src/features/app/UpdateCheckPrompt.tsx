@@ -12,10 +12,26 @@ export interface UpdateCheckPromptApi {
   answer: (check: boolean) => Promise<void>;
 }
 
+/**
+ * Whether the one-time question is still open. A package install whose package manager owns it
+ * (FreeBSD: `pkg upgrade`, see src-tauri/src/updater_freebsd.rs) never checks for new versions,
+ * so nothing is asked there.
+ */
+export function isPending(
+  settings: { wizardCompleted: boolean; updateCheck: string },
+  install: string,
+): boolean {
+  return (
+    settings.wizardCompleted && settings.updateCheck === "unset" && install !== "pkg"
+  );
+}
+
 const engineApi: UpdateCheckPromptApi = {
   async pending() {
     const settings = await getApi().settingsGet();
-    return settings.wizardCompleted && settings.updateCheck === "unset";
+    if (!settings.wizardCompleted || settings.updateCheck !== "unset") return false;
+    const status = await getApi().updateStatus();
+    return isPending(settings, status.install);
   },
   async answer(check) {
     const api = getApi();
