@@ -233,7 +233,9 @@
     "conflictReload": "Znovu načítať",
     "conflictMine": "Uložiť moju aj tak",
     "goneTitle": "Tento kanál bol odstránený",
-    "goneBody": "Niekto kanál odstránil, kým bolo okno otvorené. Vaše zmeny sa neuložili."
+    "goneBody": "Niekto kanál odstránil, kým bolo okno otvorené. Vaše zmeny sa neuložili.",
+    "tooLong": "Nedá sa uložiť: popis je pre tento server príliš dlhý",
+    "tooLongTip": "Popis je pre tento server príliš dlhý"
   },
   "perm": {
     "everyone": "Všetci",

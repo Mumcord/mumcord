@@ -233,7 +233,9 @@
     "conflictReload": "Ponovno naloži",
     "conflictMine": "Kljub temu shrani mojo",
     "goneTitle": "Ta kanal je bil izbrisan",
-    "goneBody": "Nekdo je izbrisal kanal, medtem ko je bilo okno odprto. Vaše spremembe niso bile shranjene."
+    "goneBody": "Nekdo je izbrisal kanal, medtem ko je bilo okno odprto. Vaše spremembe niso bile shranjene.",
+    "tooLong": "Shranjevanje ni mogoče: opis je predolg za ta strežnik",
+    "tooLongTip": "Opis je predolg za ta strežnik"
   },
   "perm": {
     "everyone": "Vsi",

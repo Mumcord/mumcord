@@ -230,7 +230,9 @@
     "conflictReload": "Ponovno učitaj",
     "conflictMine": "Ipak spremi moju",
     "goneTitle": "Ovaj je kanal izbrisan",
-    "goneBody": "Netko je izbrisao kanal dok je prozor bio otvoren. Tvoje promjene nisu spremljene."
+    "goneBody": "Netko je izbrisao kanal dok je prozor bio otvoren. Tvoje promjene nisu spremljene.",
+    "tooLong": "Spremanje nije moguće: opis je predug za ovaj poslužitelj",
+    "tooLongTip": "Opis je predug za ovaj poslužitelj"
   },
   "perm": {
     "everyone": "Svi",

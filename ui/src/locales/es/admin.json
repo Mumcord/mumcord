@@ -230,7 +230,9 @@
     "conflictReload": "Volver a cargar",
     "conflictMine": "Guardar la mía igualmente",
     "goneTitle": "Este canal se ha eliminado",
-    "goneBody": "Alguien eliminó este canal mientras la ventana estaba abierta. Tus cambios no se guardaron."
+    "goneBody": "Alguien eliminó este canal mientras la ventana estaba abierta. Tus cambios no se guardaron.",
+    "tooLong": "No se puede guardar: la descripción es demasiado larga para este servidor",
+    "tooLongTip": "La descripción es demasiado larga para este servidor"
   },
   "perm": {
     "everyone": "Todos",

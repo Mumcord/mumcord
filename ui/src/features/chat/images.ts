@@ -167,9 +167,14 @@ function canvasEncoder(image: HTMLImageElement): Encoder {
 
 /**
  * Prepares a file for sending within `budget` characters. Small images that already fit are
- * kept as they are (keeps GIF animation and PNG transparency).
+ * kept as they are (keeps GIF animation and PNG transparency) when their type is one of
+ * `keepTypes`; anything else is re-encoded as PNG or JPEG.
  */
-export async function prepareImage(file: Blob, budget: number): Promise<ImageResult> {
+export async function prepareImage(
+  file: Blob,
+  budget: number,
+  keepTypes: readonly string[] = SENDABLE_TYPES,
+): Promise<ImageResult> {
   if (!SENDABLE_TYPES.includes(file.type)) return { ok: false, reason: "notImage" };
   if (file.size > MAX_SOURCE_BYTES) return { ok: false, reason: "sourceTooLarge" };
   let original: string;
@@ -182,7 +187,8 @@ export async function prepareImage(file: Blob, budget: number): Promise<ImageRes
     return { ok: false, reason: "unreadable" };
   }
   const { naturalWidth: width, naturalHeight: height } = image;
-  if (Math.max(width, height) <= MAX_IMAGE_EDGE && original.length <= budget) {
+  const keep = keepTypes.includes(file.type);
+  if (keep && Math.max(width, height) <= MAX_IMAGE_EDGE && original.length <= budget) {
     return { ok: true, dataUrl: original, width, height, scaled: false };
   }
   try {

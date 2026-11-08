@@ -1,12 +1,13 @@
-import { useEffect, useId, useState, type SyntheticEvent } from "react";
+import { useEffect, useId, useMemo, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
-import { shownServerId } from "../channels/serverStore";
+import { shownServerId, useServerState } from "../channels/serverStore";
 import { describeError } from "./errors";
 import { pickImagePath } from "./files";
 import { Modal } from "./Modal";
 import { commentToSend } from "./commentHtml";
 import { RichCommentEditor } from "./RichCommentEditor";
+import { editorLimits, isTooLong } from "./richEditorModel";
 
 type AvatarChange = { kind: "keep" } | { kind: "remove" } | { kind: "set"; path: string };
 
@@ -28,6 +29,10 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
   const [avatar, setAvatar] = useState<AvatarChange>({ kind: "keep" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const info = useServerState().info;
+  const limits = useMemo(() => editorLimits(info), [info]);
+  // The server would refuse it; Save says why instead of failing (issue #666).
+  const tooLong = comment !== null && isTooLong(comment, limits);
 
   useEffect(() => {
     let active = true;
@@ -60,6 +65,7 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
 
   const save = async (event: SyntheticEvent) => {
     event.preventDefault();
+    if (tooLong) return;
     setBusy(true);
     setError(null);
     const api = getApi();
@@ -120,6 +126,8 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
           disabled={!loaded}
           describedBy={error ? errorId : undefined}
           onChange={setComment}
+          purpose="comment"
+          limits={limits}
         />
         {error ? (
           <p id={errorId} className="userpanel-error" role="alert">
@@ -127,10 +135,16 @@ export function ProfileDialog({ session, hasAvatar, registered, onClose }: Profi
           </p>
         ) : null}
         <div className="userpanel-form__actions">
+          {tooLong && <span className="userpanel-form__status">{t("profile.tooLong")}</span>}
           <button type="button" className="button" onClick={onClose}>
             {t("common:cancel")}
           </button>
-          <button type="submit" className="button button--primary" disabled={busy || !loaded}>
+          <button
+            type="submit"
+            className="button button--primary"
+            disabled={busy || !loaded || tooLong}
+            data-tooltip={tooLong ? t("profile.tooLongTip") : undefined}
+          >
             {t("common:save")}
           </button>
         </div>
