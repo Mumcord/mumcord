@@ -215,6 +215,9 @@ fn install_panic_hook() {
     let previous = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |info| {
         if let Some(state) = STATE.get() {
+            // Push buffered log lines to the file too (spec 12 FR-12.1); the report below
+            // already uses the exact in-memory ring.
+            crate::diag::flush_log();
             let thread = std::thread::current();
             let message = match info.payload().downcast_ref::<&str>() {
                 Some(s) => (*s).to_owned(),

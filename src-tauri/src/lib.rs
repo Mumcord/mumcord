@@ -656,6 +656,7 @@ pub fn run() {
         Ok(app) => app.run(|app, event| {
             if matches!(event, tauri::RunEvent::Exit) {
                 mumcord_engine::crash::clean_exit();
+                mumcord_engine::diag::flush_log();
             }
             plugins::watchdog::on_run_event(app, event);
         }),
@@ -744,8 +745,13 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let runtime = tauri::async_runtime::handle().inner().clone();
     let (engine, mut events) = Engine::new(&data_dir, SecretStore::os(), runtime)?;
     let stored = engine.settings()?;
-    if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {
-        eprintln!("file logging unavailable: {e}");
+    if stored.log_to_disk {
+        if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {
+            eprintln!("file logging unavailable: {e}");
+        }
+    } else if let Err(e) = diag::set_log_level(settings::diag_level(stored.log_level)) {
+        // No file (spec 12 FR-12.2); the level still filters the in-memory log.
+        eprintln!("setting the log level failed: {e}");
     }
     tracing::info!(
         version = version::DISPLAY,
