@@ -578,6 +578,14 @@ pub fn run() {
         glib_log::install();
         ptt::set_host_app_id(&context.config().identifier);
     }
+    #[cfg(target_os = "freebsd")]
+    {
+        // GTK and WebKit warnings into Mumcord's log, before they start (issue #625).
+        glib_log::install();
+        // The Wayland app ID comes from the program name; it must match the desktop entry
+        // (`desktop_entry`) for the taskbar icon. Set before GTK starts.
+        gtk::glib::set_prgname(Some(context.config().identifier.as_str()));
+    }
 
     let builder = specta_builder();
     let invoke = builder.invoke_handler();
@@ -661,7 +669,7 @@ pub fn run() {
             dnd::init(app.handle());
             ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
-            #[cfg(target_os = "linux")]
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
             {
                 desktop_entry::ensure(app.handle());
             }
@@ -766,7 +774,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("early logging unavailable: {e}");
     }
     let runtime = tauri::async_runtime::handle().inner().clone();
-    let (engine, mut events) = Engine::new(&data_dir, SecretStore::os(), runtime)?;
+    let (engine, mut events) = Engine::new(&data_dir, SecretStore::os_with_profile(&data_dir), runtime)?;
     let stored = engine.settings()?;
     if stored.log_to_disk {
         if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {

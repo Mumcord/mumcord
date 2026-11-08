@@ -1,5 +1,7 @@
 //! OS secure storage (Secret Service / KWallet on Linux, Keychain on macOS, Credential
-//! Manager on Windows) for the identity and server passwords.
+//! Manager on Windows) for the identity and server passwords. FreeBSD has no Secret Service in
+//! most installs (no gnome-keyring or KWallet session service), so there the same items live in
+//! an encrypted file in the profile directory instead — see [`vault`].
 //!
 //! Layout under service [`KEYRING_SERVICE`]:
 //! - `identity/<id>/count` – number of chunks of identity `‹id›` (decimal text)
@@ -80,6 +82,183 @@ impl SecretBackend for KeyringBackend {
     }
 }
 
+/// The encrypted secret file used where no Secret Service answers (FreeBSD).
+///
+/// One AES-256-GCM blob holds every item as `account -> secret`; the 32-byte key sits in a second
+/// file next to it. Both files are created 0600 in the profile directory, so other users cannot
+/// read them and a copied profile stays useless without its key. This protects the secrets the
+/// same way a browser's "basic" password store does: against other users and against backups that
+/// leak only one of the two files, not against someone who can read the user's whole profile
+/// directory. A Secret Service, where the session has one, is always preferred (see
+/// [`SecretStore::os_with_profile`]).
+#[cfg(target_os = "freebsd")]
+mod vault {
+    use std::collections::BTreeMap;
+    use std::fs;
+    use std::io::Write;
+    use std::os::unix::fs::OpenOptionsExt;
+    use std::path::{Path, PathBuf};
+
+    use ring::aead::{Aad, LessSafeKey, Nonce, UnboundKey};
+    use ring::rand::{SecureRandom, SystemRandom};
+
+    use super::{Result, SecretBackend};
+    use crate::error::Error;
+
+    /// Prefix of the blob, so a foreign file is refused instead of decrypted into nonsense.
+    const MAGIC: &[u8; 8] = b"MCVLT1\0\0";
+    const KEY_LEN: usize = 32;
+    /// AES-256-GCM nonce; a fresh one per write, together with the derived key this is safe for
+    /// the number of writes a profile sees.
+    const NONCE_LEN: usize = 12;
+    /// AES-GCM authentication tag length.
+    const TAG_LEN: usize = 16;
+
+    /// Secrets in an encrypted file inside the profile directory.
+    pub(super) struct VaultBackend {
+        dir: PathBuf,
+        /// Serialises the read-modify-write of the blob.
+        write: std::sync::Mutex<()>,
+    }
+
+    impl VaultBackend {
+        pub(super) fn new(dir: PathBuf) -> Self {
+            Self {
+                dir,
+                write: std::sync::Mutex::new(()),
+            }
+        }
+
+        fn blob_path(&self) -> PathBuf {
+            self.dir.join("secrets.vault")
+        }
+
+        fn key_path(&self) -> PathBuf {
+            self.dir.join("secrets.key")
+        }
+
+        /// The key file, created with a fresh key on first use.
+        fn key(&self) -> Result<LessSafeKey> {
+            let key = match fs::read(self.key_path()) {
+                Ok(key) => key,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    let mut key = vec![0u8; KEY_LEN];
+                    SystemRandom::new()
+                        .fill(&mut key)
+                        .map_err(|_| Error::SecretVault("no random bytes".to_owned()))?;
+                    write_private(&self.key_path(), &key)?;
+                    key
+                }
+                Err(e) => return Err(Error::SecretFile(e)),
+            };
+            let unbound = UnboundKey::new(&ring::aead::AES_256_GCM, &key)
+                .map_err(|_| Error::SecretVault("the key file is corrupt".to_owned()))?;
+            Ok(LessSafeKey::new(unbound))
+        }
+
+        fn read(&self) -> Result<BTreeMap<String, Vec<u8>>> {
+            let blob = match fs::read(self.blob_path()) {
+                Ok(blob) => blob,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(BTreeMap::new()),
+                Err(e) => return Err(Error::SecretFile(e)),
+            };
+            if blob.len() < MAGIC.len() + NONCE_LEN + TAG_LEN || &blob[..MAGIC.len()] != MAGIC {
+                return Err(Error::SecretVault("not a secret file".to_owned()));
+            }
+            let key = self.key()?;
+            let (nonce, rest) = blob[MAGIC.len()..].split_at(NONCE_LEN);
+            let mut plain = rest.to_vec();
+            // `open_in_place` authenticates and returns only the plaintext, without the tag.
+            let plain = key
+                .open_in_place(
+                    Nonce::try_assume_unique_for_key(nonce)
+                        .map_err(|_| Error::SecretVault("bad nonce".to_owned()))?,
+                    Aad::empty(),
+                    &mut plain,
+                )
+                .map_err(|_| Error::SecretVault("the secret file does not decrypt".to_owned()))?;
+            serde_json::from_slice(plain).map_err(Error::from)
+        }
+
+        fn write_map(&self, items: &BTreeMap<String, Vec<u8>>) -> Result<()> {
+            let key = self.key()?;
+            let plain = serde_json::to_vec(items)?;
+            let mut nonce = [0u8; NONCE_LEN];
+            SystemRandom::new()
+                .fill(&mut nonce)
+                .map_err(|_| Error::SecretVault("no random bytes".to_owned()))?;
+            let mut sealed = plain;
+            key.seal_in_place_append_tag(
+                Nonce::assume_unique_for_key(nonce),
+                Aad::empty(),
+                &mut sealed,
+            )
+            .map_err(|_| Error::SecretVault("sealing failed".to_owned()))?;
+            let mut blob = Vec::with_capacity(MAGIC.len() + NONCE_LEN + sealed.len());
+            blob.extend_from_slice(MAGIC);
+            blob.extend_from_slice(&nonce);
+            blob.extend_from_slice(&sealed);
+            write_private(&self.blob_path(), &blob)
+        }
+    }
+
+    /// Writes `bytes` to `path` so that only the user can read it.
+    fn write_private(path: &Path, bytes: &[u8]) -> Result<()> {
+        if let Some(dir) = path.parent() {
+            fs::create_dir_all(dir).map_err(Error::SecretFile)?;
+        }
+        let mut file = fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .mode(0o600)
+            .open(path)
+            .map_err(Error::SecretFile)?;
+        file.write_all(bytes).map_err(Error::SecretFile)
+    }
+
+    impl SecretBackend for VaultBackend {
+        fn set(&self, account: &str, secret: &[u8]) -> Result<()> {
+            let _guard = self.write.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let mut items = self.read()?;
+            items.insert(account.to_owned(), secret.to_vec());
+            self.write_map(&items)
+        }
+
+        fn get(&self, account: &str) -> Result<Option<Vec<u8>>> {
+            Ok(self.read()?.remove(account))
+        }
+
+        fn delete(&self, account: &str) -> Result<()> {
+            let _guard = self.write.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let mut items = self.read()?;
+            if items.remove(account).is_some() {
+                self.write_map(&items)?;
+            }
+            Ok(())
+        }
+    }
+
+    /// Whether the OS secret service answers; a broken one must not be used, or every item
+    /// would fail. A working service reports "no entry" for the probe account.
+    pub(super) fn secret_service_usable(service: &str) -> bool {
+        let probe = keyring::Entry::new(service, "mumcord-probe").and_then(|entry| match entry
+            .get_secret()
+        {
+            Ok(_) => Ok(()),
+            Err(keyring::Error::NoEntry) => Ok(()),
+            Err(e) => Err(e),
+        });
+        match probe {
+            Ok(()) => true,
+            Err(e) => {
+                tracing::info!(error = %e, "no OS secret service; secrets go to the encrypted file");
+                false
+            }
+        }
+    }
+}
+
 /// Password and channel passwords of one saved server, kept in one item so a connect reads
 /// (and may prompt for) a single secret.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -119,6 +298,24 @@ impl SecretStore {
     /// The OS secure storage under [`KEYRING_SERVICE`].
     pub fn os() -> Self {
         Self::os_with_service(KEYRING_SERVICE)
+    }
+
+    /// The OS secure storage under [`KEYRING_SERVICE`], falling back to the encrypted secret file
+    /// in `profile_dir` where no Secret Service answers (FreeBSD). Every other platform ignores
+    /// the directory and uses the OS store only.
+    pub fn os_with_profile(profile_dir: impl Into<std::path::PathBuf>) -> Self {
+        #[cfg(target_os = "freebsd")]
+        {
+            if vault::secret_service_usable(KEYRING_SERVICE) {
+                return Self::os_with_service(KEYRING_SERVICE);
+            }
+            return Self::with_backend(Arc::new(vault::VaultBackend::new(profile_dir.into())));
+        }
+        #[cfg(not(target_os = "freebsd"))]
+        {
+            let _ = profile_dir;
+            Self::os()
+        }
     }
 
     fn os_with_service(service: &str) -> Self {
@@ -683,6 +880,51 @@ mod tests {
             store.load_identity(1).expect("load").as_ref(),
             Some(&*IDENTITY)
         );
+    }
+
+    /// The FreeBSD fallback: the same items survive a restart, the blob is unreadable without
+    /// its key, and both files stay private.
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn vault_round_trip() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let backend = Arc::new(super::vault::VaultBackend::new(dir.path().to_path_buf()));
+        let store = SecretStore::with_backend(backend.clone());
+        assert_eq!(store.server_password(5).expect("none"), None);
+        store.set_server_password(5, "hunter2").expect("set");
+        store
+            .set_access_tokens(5, &["token".to_owned()])
+            .expect("tokens");
+
+        // A new session reads the same file.
+        let reopened = SecretStore::with_backend(Arc::new(super::vault::VaultBackend::new(
+            dir.path().to_path_buf(),
+        )));
+        assert_eq!(
+            reopened.server_password(5).expect("get").as_deref(),
+            Some("hunter2")
+        );
+        assert_eq!(reopened.access_tokens(5).expect("tokens"), ["token"]);
+
+        for name in ["secrets.vault", "secrets.key"] {
+            let path = dir.path().join(name);
+            let mode = std::os::unix::fs::PermissionsExt::mode(
+                &std::fs::metadata(&path).expect("metadata").permissions(),
+            );
+            assert_eq!(mode & 0o077, 0, "{name} must not be group or world readable");
+        }
+        let blob = std::fs::read(dir.path().join("secrets.vault")).expect("blob");
+        assert!(
+            !blob.windows(7).any(|w| w == b"hunter2"),
+            "the password must not be in the file in clear text"
+        );
+
+        store.delete_server_password(5).expect("clear");
+        // A fresh session sees the removal; the open one still has its cached copy.
+        let third = SecretStore::with_backend(Arc::new(super::vault::VaultBackend::new(
+            dir.path().to_path_buf(),
+        )));
+        assert_eq!(third.server_password(5).expect("get"), None);
     }
 
     #[test]

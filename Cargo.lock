@@ -4431,6 +4431,7 @@ dependencies = [
  "p12-keystore",
  "rand 0.10.3",
  "rcgen",
+ "ring",
  "rsa",
  "rusqlite",
  "serde",
