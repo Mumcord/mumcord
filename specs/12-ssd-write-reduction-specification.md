@@ -1,7 +1,7 @@
 # Mumcord · Epic 12 – Reduce SSD writes · Specification
 
 > Status: Draft for review · As of: 2026-11-08
-> Sources: `docs/ssd-write-reduction.md` (inventory of every disk writer, questions, options and pros/cons), the screenshots `docs/images/screenshots/ssd-logloglevel-proposals-*.png`, and the answers given in chat on 2026-11-08 (several independent switches; chat-history batching always on; log buffering variant A; log UI proposal C; `synchronous=OFF` behind a switch; webview cache out of scope).
+> Sources: `docs/ssd-write-reduction.md` (inventory of every disk writer, questions, options and pros/cons), the screenshot `docs/images/screenshots/ssd-logloglevel-proposal-c.png`, and the answers given in chat on 2026-11-08 (several independent switches; chat-history batching always on; log buffering variant A; log UI proposal C; `synchronous=OFF` behind a switch; webview cache out of scope).
 > Builds on: `specs/01-foundation-specification.md` (stack, design system, accessibility, 24 locales), `specs/02-multi-server-themes-specification.md` (several servers, settings screen), `specs/03-comfort-polish-specification.md` (settings conventions), `specs/06-plugin-system-specification.md` (plugin registry cache). All decisions there stay valid unless this spec names a change.
 > Numbering: file number 12 → requirement IDs `FR-12.x` and `AC-12.x`.
 
