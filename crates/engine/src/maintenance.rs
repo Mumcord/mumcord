@@ -13,8 +13,9 @@ const INTERVAL: Duration = Duration::from_secs(60 * 60);
 /// History is pruned on every Nth round, so once a day with the hourly [`INTERVAL`].
 const HISTORY_EVERY: u64 = 24;
 const MILLIS_PER_DAY: i64 = 24 * 60 * 60 * 1000;
-/// Queued chat messages are written in batches this often (spec 12 FR-12.5).
-const CHAT_FLUSH_INTERVAL: Duration = Duration::from_secs(5);
+/// Queued chat messages are written in batches this often (spec 12 FR-12.5): short enough that a
+/// normal restart does not lose messages, long enough that bursts coalesce into one transaction.
+const CHAT_FLUSH_INTERVAL: Duration = Duration::from_secs(1);
 
 /// Messages sent before this moment are older than `days` days.
 pub(crate) fn history_cutoff(now: UnixMillis, days: u32) -> UnixMillis {
