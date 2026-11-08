@@ -49,6 +49,12 @@ import {
   rankMentionCandidates,
   type MentionQuery,
 } from "./mentions";
+import {
+  findChannelQuery,
+  insertChannelMention,
+  mentionableChannels,
+  rankChannelCandidates,
+} from "./channelMentions";
 import { MentionPicker, type MentionOption } from "./MentionPicker";
 import { SlashPicker } from "./SlashPicker";
 import { commandOptionId, useSlashCommands } from "./slashCommands";
@@ -213,13 +219,22 @@ export function Composer({
   const users = useServerSelector((state) => state.users);
   const selfSession = useServerSelector((state) => state.selfSession);
   const ownChannel = useServerSelector((state) => selfUser(state)?.channelId ?? null);
-  const mention = useMemo(
-    // A slash line is a command; its own picker offers the people or channels an argument takes,
-    // so the @ mention list must not open on top of it (issue #378).
-    () =>
-      disabled || composer.text.startsWith("/") ? null : findMentionQuery(composer.text, caret),
-    [composer.text, caret, disabled],
+  // A slash line is a command; its own picker offers the people or channels an argument takes,
+  // so neither the @ nor the # list opens on top of it (issues #378, #643).
+  const slashLine = composer.text.startsWith("/");
+  const atQuery = useMemo(
+    () => (disabled || slashLine ? null : findMentionQuery(composer.text, caret)),
+    [composer.text, caret, disabled, slashLine],
   );
+  // `#` suggests the server's channels (issue #643); the query nearer the caret wins.
+  const hashQuery = useMemo(
+    () => (disabled || slashLine ? null : findChannelQuery(composer.text, caret)),
+    [composer.text, caret, disabled, slashLine],
+  );
+  const channelMode = hashQuery !== null && (atQuery === null || hashQuery.start > atQuery.start);
+  const mention = channelMode ? hashQuery : atQuery;
+  const serverChannels = useServerSelector((state) => state.channels);
+  const channelChoices = useMemo(() => mentionableChannels(serverChannels), [serverChannels]);
   const hereChannel = target?.kind === "channel" ? target.channelId : ownChannel;
   // `@channel` and `@all` only make sense in a channel (issue #70).
   const inChannel = target?.kind === "channel";
@@ -242,20 +257,27 @@ export function Composer({
   }, [users, hereChannel]);
   const candidates = useMemo(
     () =>
-      mention === null
+      mention === null || channelMode
         ? []
         : rankMentionCandidates(users.values(), mention.query, hereChannel, selfSession),
-    [mention, users, hereChannel, selfSession],
+    [mention, channelMode, users, hereChannel, selfSession],
   );
   const options = useMemo<MentionOption[]>(
     () => [
-      ...(mention === null || !inChannel ? [] : rankGroupMentions(mention.query)).map((group) => ({
+      ...(mention === null || !channelMode
+        ? []
+        : rankChannelCandidates(channelChoices, mention.query)
+      ).map((channel) => ({ kind: "channel" as const, channel })),
+      ...(mention === null || !inChannel || channelMode
+        ? []
+        : rankGroupMentions(mention.query)
+      ).map((group) => ({
         kind: "group" as const,
         group,
       })),
       ...candidates.map((user) => ({ kind: "user" as const, user })),
     ],
-    [mention, inChannel, candidates],
+    [mention, inChannel, candidates, channelMode, channelChoices],
   );
   const isDismissed =
     mention !== null &&
@@ -390,8 +412,16 @@ export function Composer({
   function pick(option: MentionOption) {
     const element = input.current;
     if (mention === null || element === null) return;
-    const name = option.kind === "group" ? option.group : option.user.name;
-    const edit = insertMention(element.value, mention.start, element.selectionStart, name);
+    const name =
+      option.kind === "group"
+        ? option.group
+        : option.kind === "channel"
+          ? option.channel.name
+          : option.user.name;
+    const edit =
+      option.kind === "channel"
+        ? insertChannelMention(element.value, mention.start, element.selectionStart, name)
+        : insertMention(element.value, mention.start, element.selectionStart, name);
     pendingSelection.current = {
       text: edit.text,
       selectionStart: edit.caret,

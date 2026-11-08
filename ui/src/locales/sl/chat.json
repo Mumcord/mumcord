@@ -108,7 +108,8 @@
     "peopleHeading": "Osebe",
     "channelHint": "Obvesti vse v {{channel}} ({{count}})",
     "allHint": "Obvesti vse, ki lahko berejo ta kanal ({{count}})",
-    "keys": "↑↓ izberi · Enter vstavi · Esc zapri"
+    "keys": "↑↓ izberi · Enter vstavi · Esc zapri",
+    "channelList": "Predlogi kanalov"
   },
   "preview": {
     "open": "Odpri v brskalniku",
@@ -426,5 +427,14 @@
   },
   "slash": {
     "list": "Ukazi s poševnico"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanal – odpri meni",
+    "join": "Vstopi v kanal",
+    "joinPath": "Vstopi v {{path}}",
+    "show": "Pokaži na seznamu kanalov",
+    "showPath": "Pokaži {{path}} na seznamu kanalov",
+    "copy": "Kopiraj ime",
+    "menu": "Kanal {{channel}}"
   }
 }

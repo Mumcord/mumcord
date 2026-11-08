@@ -108,7 +108,8 @@
     "peopleHeading": "Lidé",
     "channelHint": "Upozornit všechny v {{channel}} ({{count}})",
     "allHint": "Upozornit všechny, kdo mohou číst tento kanál ({{count}})",
-    "keys": "↑↓ vybrat · Enter vložit · Esc zavřít"
+    "keys": "↑↓ vybrat · Enter vložit · Esc zavřít",
+    "channelList": "Návrhy kanálů"
   },
   "preview": {
     "open": "Otevřít v prohlížeči",
@@ -426,5 +427,14 @@
   },
   "slash": {
     "list": "Příkazy se „/“"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanál – otevřít nabídku",
+    "join": "Vstoupit do kanálu",
+    "joinPath": "Vstoupit do {{path}}",
+    "show": "Zobrazit v seznamu kanálů",
+    "showPath": "Zobrazit {{path}} v seznamu kanálů",
+    "copy": "Kopírovat název",
+    "menu": "Kanál {{channel}}"
   }
 }

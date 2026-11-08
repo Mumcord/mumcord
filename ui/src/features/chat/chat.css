@@ -1557,6 +1557,23 @@
   background: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
+/* `#Channel` (issue #643): the same chip family as people, in the link colour, underlined on
+   hover like the channel links it opens a menu for. */
+.chat-channel-mention {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm, 4px);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chat-channel-mention:hover,
+.chat-channel-mention:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 26%, transparent);
+  text-decoration: underline;
+}
+
 /* Attachment tray and drop highlight for images (FR-1.30). */
 .chat-composer[data-dragging="true"] .chat-composer__bar {
   border-color: var(--color-accent);

@@ -100,7 +100,8 @@
     "peopleHeading": "Personen",
     "channelHint": "Iedereen in {{channel}} melden ({{count}})",
     "allHint": "Iedereen melden die dit kanaal kan lezen ({{count}})",
-    "keys": "↑↓ kiezen · Enter invoegen · Esc sluiten"
+    "keys": "↑↓ kiezen · Enter invoegen · Esc sluiten",
+    "channelList": "Kanaalsuggesties"
   },
   "preview": {
     "open": "Openen in browser",
@@ -408,5 +409,14 @@
   },
   "slash": {
     "list": "Commando's met /"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanaal – menu openen",
+    "join": "Kanaal betreden",
+    "joinPath": "{{path}} betreden",
+    "show": "Tonen in kanaallijst",
+    "showPath": "{{path}} tonen in kanaallijst",
+    "copy": "Naam kopiëren",
+    "menu": "Kanaal {{channel}}"
   }
 }
