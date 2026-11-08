@@ -20,8 +20,8 @@
   "packets": "Pacotes enviados / recebidos",
   "packetsValue": "{{sent}} / {{received}}",
   "audioDropouts": "Falhas de áudio",
-  "audioLate": "Quadros de áudio atrasados",
-  "audioConcealed": "Quadros de áudio ocultados",
+  "audioLate": "Tramas de áudio atrasadas",
+  "audioConcealed": "Tramas de áudio ocultadas",
   "jitterBuffer": "Buffer de jitter",
   "audioProcessing": "Processamento de áudio (média / máx.)",
   "audioProcessingValue": "{{avg}} / {{max}} ms",
@@ -41,8 +41,8 @@
     "good_many": "Sem problemas nos últimos {{count}} minutos",
     "good_other": "Sem problemas nos últimos {{count}} minutos",
     "network": "Parte da voz dos outros foi ocultada: perda de rede",
-    "cpu": "O processamento do seu áudio está atrasado: carga de CPU elevada",
-    "device": "O seu dispositivo de áudio teve falhas"
+    "cpu": "O processamento do teu áudio está atrasado: carga de CPU elevada",
+    "device": "O teu dispositivo de áudio teve falhas"
   },
   "details": "Detalhes",
   "sinceConnected": "Contadores desde a ligação. Gráficos: últimos {{minutes}} min.",
@@ -52,7 +52,7 @@
     "late": "Tramas de áudio que o computador processou tarde demais, normalmente por carga de CPU elevada. Normal: 0 ou quase.",
     "concealed": "Tramas de voz dos outros que não chegaram a tempo, pelo que o cliente preencheu a falha. Causa: perda de rede. Normal: quase 0.",
     "jitter": "Atraso que compensa pacotes de voz dos outros que chegam de forma irregular. Normal: 20–60 ms.",
-    "processing": "Tempo para processar uma trama de 10 ms do seu microfone. Normal: bem abaixo de 10 ms.",
+    "processing": "Tempo para processar uma trama de 10 ms do teu microfone. Normal: bem abaixo de 10 ms.",
     "realtime": "Se as threads de áudio recebem prioridade de tempo real do sistema. Ativado ajuda a evitar falhas sob carga."
   },
   "recent": {
@@ -69,7 +69,7 @@
     "voiceSettings": "Definições de voz…",
     "applies": "Aplica-se de imediato, guardado como em Definições → Áudio",
     "keys": "Esc fecha · ↑↓ move · ← → ajusta",
-    "bandwidthLabel": "Largura de banda estimada com cabeçalhos",
+    "bandwidthLabel": "Largura de banda estimada",
     "bandwidthValue": "≈ {{value}} de {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
     "bandwidthMeterText": "{{value}} de {{limit}} kbit/s ({{percent}} %)",

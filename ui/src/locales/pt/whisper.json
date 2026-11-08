@@ -7,7 +7,7 @@
     "whisper": "A sussurrar a {{target}}",
     "shout": "A gritar a {{target}}",
     "releaseKey": "Só as pessoas aí te ouvem. Solta <key>{{key}}</key> para voltares a falar em {{channel}}.",
-    "stopToReturn": "Só as pessoas aí te ouvem. Pára para voltares a falar em {{channel}}.",
+    "stopToReturn": "Só as pessoas aí te ouvem. Para para voltares a falar em {{channel}}.",
     "onlyThere": "Só as pessoas aí te ouvem.",
     "stop": "Parar"
   },

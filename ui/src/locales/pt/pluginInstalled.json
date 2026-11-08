@@ -84,11 +84,11 @@
   "remove": {
     "title": "Remover {{name}}?",
     "deleteData": "Eliminar também os seus dados",
-    "hint": "Os dados mantidos são eliminados ao fim de 30 dias. Reinstale antes disso para os recuperar.",
+    "hint": "Os dados mantidos são eliminados ao fim de 30 dias. Reinstala antes disso para os recuperar.",
     "confirm": "Remover"
   },
   "errors": {
-    "enable": "Não foi possível alternar o plugin.",
+    "enable": "Não foi possível ativar ou desativar o plugin.",
     "permissions": "Não foi possível alterar a permissão.",
     "visibility": "Não foi possível alterar a visibilidade.",
     "notifications": "Não foi possível alterar as notificações.",
@@ -113,7 +113,7 @@
     "uiUserMenu": "Menu do utilizador",
     "uiDialog": "Janela própria",
     "uiWebview": "Conteúdo web",
-    "eventsSelf": "O seu estado",
+    "eventsSelf": "O teu estado",
     "eventsVoice": "Atividade de voz",
     "eventsPresence": "Entradas e saídas",
     "eventsChatActivity": "Atividade do chat",
@@ -121,8 +121,8 @@
     "randomBytes": "Números aleatórios",
     "commands": "Comandos",
     "chatSend": "Escreve no chat",
-    "chatSupersedes": "Substitui a sua linha de texto",
-    "chatTriggers": "Palavras-chave",
+    "chatSupersedes": "Substitui o seu texto",
+    "chatTriggers": "Palavras de ativação",
     "chatPatterns": "Padrões de chat",
     "netHttp": "Acesso à internet",
     "secrets": "Porta-chaves"
