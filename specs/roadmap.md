@@ -47,6 +47,8 @@ of the specs and what has shipped.
   moderation, channel permissions and channel management (0.7.2), registered users (0.8.0).
 - `11-activity-log-specification.md` — the activity feed and notifications. With brainstorming
   and tasks.
+- `12-ssd-write-reduction-specification.md` — fewer disk writes (buffered logs, batched chat
+  history, durability and cache switches). Plan in `docs/ssd-write-reduction.md`.
 
 ## Current state
 
