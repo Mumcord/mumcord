@@ -432,5 +432,8 @@
     "loading": "Íomhá á lódáil…",
     "unavailable": "Níl an íomhá ar fáil",
     "load": "Lódáil an íomhá"
+  },
+  "slash": {
+    "list": "Orduithe le /"
   }
 }

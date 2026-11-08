@@ -11,7 +11,7 @@
     "hiddenBy": "Ocultado por {{plugin}}"
   },
   "command": {
-    "list": "Comandos de plugins",
+    "group": "Comandos de plugins",
     "keys": "↑↓ escolher · Tab completar · Enter executar · Esc fechar",
     "unavailable": "Este comando não está disponível de momento.",
     "failed": "Não foi possível executar o comando. Tente novamente."

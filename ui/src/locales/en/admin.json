@@ -425,5 +425,59 @@
   "announcedUnregistered": "Registration removed",
   "announcedRegistered": "{{name}} is registered now",
   "announcedRegisteredSaved": "Changes sent to the server",
-  "menuRegister": "Register on server…"
+  "menuRegister": "Register on server…",
+  "commands": {
+    "group": "Admin commands · built-in",
+    "groupPeople": "People",
+    "groupChannels": "Channels",
+    "groupBans": "Bans",
+    "groupChoice": "Which one did you mean?",
+    "builtIn": "Built-in",
+    "onlyYou": "Only you see this line",
+    "usageLine": "{{command}} takes {{usage}}",
+    "moveAllQuestion": "Move {{count}} people from {{from}} to {{to}}?",
+    "moveAllNote": "Everyone in the channel moves, you included.",
+    "moveAll": "Move",
+    "usage": {
+      "kick": "name [reason]",
+      "ban": "name [duration] [reason]",
+      "mute": "name",
+      "unmute": "name",
+      "deaf": "name",
+      "undeaf": "name",
+      "priority": "name",
+      "register": "name",
+      "move": "name channel",
+      "moveall": "channel",
+      "unban": "name or address"
+    },
+    "results": {
+      "muted": "You muted {{name}} on the server.",
+      "unmuted": "You unmuted {{name}} on the server.",
+      "deafened": "You deafened {{name}} on the server.",
+      "undeafened": "You undeafened {{name}} on the server.",
+      "priorityOn": "You made {{name}} a priority speaker.",
+      "priorityOff": "{{name}} is no longer a priority speaker.",
+      "registered": "{{name}} is registered on the server.",
+      "moved": "You moved {{name}} to {{channel}}.",
+      "movedAll": "Moved {{moved}} of {{total}} people.",
+      "movedSome": "Moved {{moved}} of {{total}} people; {{refused}} were refused.",
+      "alreadyMoving": "Already moving people…",
+      "unbanned": "{{name}} is unbanned.",
+      "kicked": "You kicked {{name}} from the server.",
+      "banned": "You banned {{name}} on the server.",
+      "noAnswer": "The server did not answer."
+    },
+    "errors": {
+      "unknownPerson": "No one named \"{{name}}\" is on this server right now.",
+      "unknownPersonDidYouMean": "No one named \"{{name}}\" is on this server right now. Did you mean {{suggestion}}?",
+      "unknownChannel": "There is no channel named \"{{name}}\" on this server.",
+      "ambiguousChannel": "More than one channel matches: {{names}}.",
+      "needChannel": "Which channel? Type its name after the command.",
+      "needBan": "Which ban? Type a name or an address after the command.",
+      "unknownBan": "No ban matches \"{{name}}\" on this server.",
+      "banChanged": "That ban changed on the server while you were deciding.",
+      "alreadyInChannel": "You are already in {{channel}}."
+    }
+  }
 }

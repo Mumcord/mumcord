@@ -425,5 +425,59 @@
   "announcedUnregistered": "A regisztráció törölve",
   "announcedRegistered": "{{name}} mostantól regisztrált",
   "announcedRegisteredSaved": "A módosítások elküldve a szervernek",
-  "menuRegister": "Regisztrálás a szerveren…"
+  "menuRegister": "Regisztrálás a szerveren…",
+  "commands": {
+    "group": "Adminisztrációs parancsok · beépített",
+    "groupPeople": "Személyek",
+    "groupChannels": "Csatornák",
+    "groupBans": "Kitiltások",
+    "groupChoice": "Melyikre gondoltál?",
+    "builtIn": "Beépített",
+    "onlyYou": "Ezt a sort csak te látod",
+    "usageLine": "{{command}} ezt kéri: {{usage}}",
+    "moveAllQuestion": "Áthelyezel {{count}} személyt a {{from}} csatornából a {{to}} csatornába?",
+    "moveAllNote": "A teljes csatorna áthelyeződik, te is.",
+    "moveAll": "Áthelyezés",
+    "results": {
+      "muted": "{{name}} elnémítva a szerveren.",
+      "unmuted": "{{name}} ismét hallható a szerveren.",
+      "deafened": "{{name}} süketítve a szerveren.",
+      "undeafened": "{{name}} süketítése feloldva a szerveren.",
+      "priorityOn": "{{name}} prioritású beszélő lett a szerveren.",
+      "priorityOff": "{{name}} többé nem prioritású beszélő.",
+      "registered": "{{name}} regisztrálva a szerveren.",
+      "moved": "{{name}} áthelyezve ide: {{channel}}.",
+      "movedAll": "{{moved}} / {{total}} személy áthelyezve.",
+      "movedSome": "{{moved}} / {{total}} személy áthelyezve; {{refused}} elutasítva.",
+      "alreadyMoving": "Éppen személyeket helyezünk át…",
+      "unbanned": "{{name}} kitiltása feloldva.",
+      "kicked": "{{name}} kirúgva a szerverről.",
+      "banned": "{{name}} kitiltva a szerverről.",
+      "noAnswer": "A szerver nem válaszolt."
+    },
+    "errors": {
+      "unknownPerson": "Jelenleg nincs „{{name}}” nevű személy ezen a szerveren.",
+      "unknownPersonDidYouMean": "Jelenleg nincs „{{name}}” nevű személy ezen a szerveren. Erre gondoltál: {{suggestion}}?",
+      "unknownChannel": "Nincs „{{name}}” nevű csatorna ezen a szerveren.",
+      "ambiguousChannel": "Több csatorna illik rá: {{names}}.",
+      "needChannel": "Melyik csatorna? Írd a nevét a parancs után.",
+      "needBan": "Melyik kitiltás? Írd a parancs után egy nevét vagy egy címét.",
+      "unknownBan": "Nincs „{{name}}”-re illő kitiltás ezen a szerveren.",
+      "banChanged": "A szerveren ez a kitiltás közben módosult.",
+      "alreadyInChannel": "Már a {{channel}} csatornában vagy."
+    },
+    "usage": {
+      "kick": "név [ok]",
+      "ban": "név [időtartam] [ok]",
+      "mute": "név",
+      "unmute": "név",
+      "deaf": "név",
+      "undeaf": "név",
+      "priority": "név",
+      "register": "név",
+      "move": "név csatorna",
+      "moveall": "csatorna",
+      "unban": "név vagy cím"
+    }
+  }
 }

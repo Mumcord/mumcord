@@ -405,5 +405,8 @@
     "loading": "Image loading…",
     "unavailable": "Image not available",
     "load": "Load image"
+  },
+  "slash": {
+    "list": "Slash commands"
   }
 }

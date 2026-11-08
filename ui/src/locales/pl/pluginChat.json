@@ -11,7 +11,7 @@
     "hiddenBy": "Ukryte przez {{plugin}}"
   },
   "command": {
-    "list": "Polecenia wtyczek",
+    "group": "Polecenia wtyczek",
     "keys": "↑↓ wybierz · Tab uzupełnij · Enter uruchom · Esc zamknij",
     "unavailable": "To polecenie jest teraz niedostępne.",
     "failed": "Nie udało się wykonać polecenia. Spróbuj ponownie."

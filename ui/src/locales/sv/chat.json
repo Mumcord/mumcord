@@ -405,5 +405,8 @@
     "loading": "Läser in bild…",
     "unavailable": "Bilden är inte tillgänglig",
     "load": "Läs in bild"
+  },
+  "slash": {
+    "list": "Kommandon med snedsteg"
   }
 }

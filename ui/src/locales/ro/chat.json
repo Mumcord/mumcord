@@ -414,5 +414,8 @@
     "loading": "Se încarcă imaginea…",
     "unavailable": "Imaginea nu este disponibilă",
     "load": "Încarcă imaginea"
+  },
+  "slash": {
+    "list": "Comenzi cu „/“"
   }
 }

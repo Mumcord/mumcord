@@ -425,5 +425,59 @@
   "announcedUnregistered": "Регистрацията е премахната",
   "announcedRegistered": "{{name}} вече е регистриран",
   "announcedRegisteredSaved": "Промени изпратени до сървъра",
-  "menuRegister": "Регистрирай на сървъра…"
+  "menuRegister": "Регистрирай на сървъра…",
+  "commands": {
+    "group": "Администраторски команди · вградени",
+    "groupPeople": "Хора",
+    "groupChannels": "Канали",
+    "groupBans": "Бания",
+    "groupChoice": "Коя точно имаш предвид?",
+    "builtIn": "Вградена",
+    "onlyYou": "Само ти виждаш този ред",
+    "usageLine": "{{command}} изисква {{usage}}",
+    "moveAllQuestion": "Да се преместят ли {{count}} души от {{from}} в {{to}}?",
+    "moveAllNote": "Премества се целият канал, включително ти.",
+    "moveAll": "Преместване",
+    "results": {
+      "muted": "Заглуши {{name}} в сървъра.",
+      "unmuted": "Премахна заглушаването на {{name}} в сървъра.",
+      "deafened": "Оглуши {{name}} в сървъра.",
+      "undeafened": "Премахна оглушаването на {{name}} в сървъра.",
+      "priorityOn": "Направи {{name}} приоритетен говорител.",
+      "priorityOff": "{{name}} вече не е приоритетен говорител.",
+      "registered": "{{name}} е регистриран в сървъра.",
+      "moved": "Премести {{name}} в {{channel}}.",
+      "movedAll": "Преместени са {{moved}} от {{total}} души.",
+      "movedSome": "Преместени са {{moved}} от {{total}} души; {{refused}} бяха отхвърлени.",
+      "alreadyMoving": "Хора се преместват в момента…",
+      "unbanned": "Банът на {{name}} е премахнат.",
+      "kicked": "Изгони {{name}} от сървъра.",
+      "banned": "Забрани {{name}} в сървъра.",
+      "noAnswer": "Сървърът не отговори."
+    },
+    "errors": {
+      "unknownPerson": "Никой на име „{{name}}“ не е в този сървър в момента.",
+      "unknownPersonDidYouMean": "Никой на име „{{name}}“ не е в този сървър в момента. Искаше ли да кажеш {{suggestion}}?",
+      "unknownChannel": "В този сървър няма канал на име „{{name}}“.",
+      "ambiguousChannel": "Пасват няколко канала: {{names}}.",
+      "needChannel": "Кой канал? Напиши името след командата.",
+      "needBan": "Кой бан? Напиши име или адрес след командата.",
+      "unknownBan": "Никакъв бан не съвпада с „{{name}}“ в този сървър.",
+      "banChanged": "Този бан се промени в сървъра, докато решаваше.",
+      "alreadyInChannel": "Вече си в {{channel}}."
+    },
+    "usage": {
+      "kick": "име [причина]",
+      "ban": "име [период] [причина]",
+      "mute": "име",
+      "unmute": "име",
+      "deaf": "име",
+      "undeaf": "име",
+      "priority": "име",
+      "register": "име",
+      "move": "име канал",
+      "moveall": "канал",
+      "unban": "име или адрес"
+    }
+  }
 }

@@ -11,7 +11,7 @@
     "hiddenBy": "Verborgen door {{plugin}}"
   },
   "command": {
-    "list": "Plug-inopdrachten",
+    "group": "Plug-inopdrachten",
     "keys": "↑↓ kiezen · Tab aanvullen · Enter uitvoeren · Esc sluiten",
     "unavailable": "Deze opdracht is nu niet beschikbaar.",
     "failed": "De opdracht kon niet worden uitgevoerd. Probeer het opnieuw."

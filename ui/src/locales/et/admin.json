@@ -425,5 +425,59 @@
   "announcedUnregistered": "Registratsioon eemaldatud",
   "announcedRegistered": "{{name}} on nüüd registreeritud",
   "announcedRegisteredSaved": "Muudatused saadeti serverile",
-  "menuRegister": "Registreeri serveris…"
+  "menuRegister": "Registreeri serveris…",
+  "commands": {
+    "group": "Halduskäsud · sisseehitatud",
+    "groupPeople": "Inimesed",
+    "groupChannels": "Kanalid",
+    "groupBans": "Keelud",
+    "groupChoice": "Millist sa täpselt mõistsid?",
+    "builtIn": "Sisseehitatud",
+    "onlyYou": "Seda rida näed ainult sina",
+    "usageLine": "{{command}} vajab {{usage}}",
+    "moveAllQuestion": "Teisendada {{count}} inimest kanalist {{from}} kanalisse {{to}}?",
+    "moveAllNote": "Kõik kanalis olevad inimesed liiguvad, ka sina.",
+    "moveAll": "Liiguta",
+    "usage": {
+      "kick": "nimi [põhjus]",
+      "ban": "nimi [kestus] [põhjus]",
+      "mute": "nimi",
+      "unmute": "nimi",
+      "deaf": "nimi",
+      "undeaf": "nimi",
+      "priority": "nimi",
+      "register": "nimi",
+      "move": "nimi kanal",
+      "moveall": "kanal",
+      "unban": "nimi või aadress"
+    },
+    "results": {
+      "muted": "Sa vaigistasid {{name}} serveris.",
+      "unmuted": "Sa eemaldasid {{name}} vaigistuse serveris.",
+      "deafened": "Sa kurdistasid {{name}} serveris.",
+      "undeafened": "Sa eemaldasid {{name}} kurdistuse serveris.",
+      "priorityOn": "Sa määrasid {{name}} prioriteetkõnelejaks.",
+      "priorityOff": "{{name}} ei ole enam prioriteetkõneleja.",
+      "registered": "{{name}} on serveris registreeritud.",
+      "moved": "Sa liigutasid {{name}} kanalisse {{channel}}.",
+      "movedAll": "{{moved}} / {{total}} inimest liigutatud.",
+      "movedSome": "{{moved}} / {{total}} inimest liigutatud; server keeldus {{refused}}.",
+      "alreadyMoving": "Inimesi liigutatakse parasjagu…",
+      "unbanned": "{{name}} pole enam keelustatud.",
+      "kicked": "Sa eemaldasid {{name}} serverist.",
+      "banned": "Sa keelustasid {{name}} serveris.",
+      "noAnswer": "Server ei vastanud."
+    },
+    "errors": {
+      "unknownPerson": "Sellel serveril pole praegu kedagi nimega „{{name}}“.",
+      "unknownPersonDidYouMean": "Sellel serveril pole praegu kedagi nimega „{{name}}“. Kas mõistsid {{suggestion}}?",
+      "unknownChannel": "Sellel serveril pole kanalit nimega „{{name}}“.",
+      "ambiguousChannel": "Sobib rohkem kui üks kanal: {{names}}.",
+      "needChannel": "Milline kanal? Kirjuta selle nimi käsu järele.",
+      "needBan": "Milline keelustus? Kirjuta nimi või aadress käsu järele.",
+      "unknownBan": "Sellel serveril pole keeldu, mis sobiks „{{name}}“.",
+      "banChanged": "See keelustus muutus serveris, kui sa otsustasid.",
+      "alreadyInChannel": "Sa oled juba kanalis {{channel}}."
+    }
+  }
 }

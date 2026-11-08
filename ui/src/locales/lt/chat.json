@@ -423,5 +423,8 @@
     "loading": "Įkeliamas vaizdas…",
     "unavailable": "Vaizdas nepasiekiamas",
     "load": "Įkelti vaizdą"
+  },
+  "slash": {
+    "list": "Komandos su „/“"
   }
 }

@@ -428,5 +428,59 @@
   "announcedUnregistered": "Enregistrement supprimé",
   "announcedRegistered": "{{name}} est maintenant enregistré",
   "announcedRegisteredSaved": "Modifications envoyées au serveur",
-  "menuRegister": "Enregistrer sur le serveur…"
+  "menuRegister": "Enregistrer sur le serveur…",
+  "commands": {
+    "group": "Commandes d'administration · intégrées",
+    "groupPeople": "Personnes",
+    "groupChannels": "Canaux",
+    "groupBans": "Bannissements",
+    "groupChoice": "Laquelle vouliez-vous dire ?",
+    "builtIn": "Intégrée",
+    "onlyYou": "Vous seul voyez cette ligne",
+    "usageLine": "{{command}} attend {{usage}}",
+    "moveAllQuestion": "Déplacer {{count}} personnes de {{from}} vers {{to}} ?",
+    "moveAllNote": "Tout le canal se déplace, y compris vous.",
+    "moveAll": "Déplacer",
+    "usage": {
+      "kick": "nom [motif]",
+      "ban": "nom [durée] [motif]",
+      "mute": "nom",
+      "unmute": "nom",
+      "deaf": "nom",
+      "undeaf": "nom",
+      "priority": "nom",
+      "register": "nom",
+      "move": "nom canal",
+      "moveall": "canal",
+      "unban": "nom ou adresse"
+    },
+    "results": {
+      "muted": "Vous avez coupé le micro de {{name}} sur le serveur.",
+      "unmuted": "Vous avez rendu le micro à {{name}} sur le serveur.",
+      "deafened": "Vous avez coupé le son de {{name}} sur le serveur.",
+      "undeafened": "Vous avez rendu le son à {{name}} sur le serveur.",
+      "priorityOn": "Vous avez fait de {{name}} un locuteur prioritaire.",
+      "priorityOff": "{{name}} n'est plus locuteur prioritaire.",
+      "registered": "{{name}} est enregistré sur le serveur.",
+      "moved": "Vous avez déplacé {{name}} vers {{channel}}.",
+      "movedAll": "{{moved}} personnes déplacées sur {{total}}.",
+      "movedSome": "{{moved}} personnes déplacées sur {{total}} ; le serveur en a refusé {{refused}}.",
+      "alreadyMoving": "Déplacement de personnes déjà en cours…",
+      "unbanned": "{{name}} n'est plus banni.",
+      "kicked": "Vous avez expulsé {{name}} du serveur.",
+      "banned": "Vous avez banni {{name}} sur le serveur.",
+      "noAnswer": "Le serveur n'a pas répondu."
+    },
+    "errors": {
+      "unknownPerson": "Il n'y a personne qui s'appelle « {{name}} » sur ce serveur en ce moment.",
+      "unknownPersonDidYouMean": "Il n'y a personne qui s'appelle « {{name}} » sur ce serveur en ce moment. Vouliez-vous dire {{suggestion}} ?",
+      "unknownChannel": "Il n'y a pas de canal nommé « {{name}} » sur ce serveur.",
+      "ambiguousChannel": "Plusieurs canaux correspondent : {{names}}.",
+      "needChannel": "Quel canal ? Écrivez son nom après la commande.",
+      "needBan": "Quel bannissement ? Écrivez un nom ou une adresse après la commande.",
+      "unknownBan": "Aucun bannissement ne correspond à « {{name}} » sur ce serveur.",
+      "banChanged": "Ce bannissement a changé sur le serveur pendant que vous décidiez.",
+      "alreadyInChannel": "Vous êtes déjà dans {{channel}}."
+    }
+  }
 }

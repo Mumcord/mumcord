@@ -11,7 +11,7 @@
     "hiddenBy": "Hidden by {{plugin}}"
   },
   "command": {
-    "list": "Plugin commands",
+    "group": "Plugin commands",
     "keys": "↑↓ choose · Tab complete · Enter run · Esc close",
     "unavailable": "This command is not available right now.",
     "failed": "The command could not be run. Please try again."
