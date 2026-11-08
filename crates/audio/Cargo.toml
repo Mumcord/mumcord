@@ -30,6 +30,12 @@ test-backend = ["dep:hound"]
 [dev-dependencies]
 hound.workspace = true
 
+# The PipeWire device list (every sink and source of a multi-endpoint interface as its own
+# device, issue #183). Enabled on every platform except FreeBSD: there it is the Linux sound
+# server, and FreeBSD's OSS needs no libpipewire.
+[target.'cfg(not(target_os = "freebsd"))'.dependencies]
+cpal = { workspace = true, features = ["pipewire"] }
+
 [target.'cfg(target_os = "linux")'.dependencies]
 libc.workspace = true
 pulseaudio.workspace = true

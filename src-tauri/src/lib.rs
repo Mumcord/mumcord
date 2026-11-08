@@ -6,12 +6,12 @@ mod browser;
 mod cache_dirs;
 mod commands;
 mod deeplink;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod desktop_entry;
 mod display;
 mod dnd;
 mod fullscreen;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod glib_log;
 #[cfg(target_os = "linux")]
 mod gst_plugins;
@@ -29,6 +29,11 @@ mod portable;
 mod ptt;
 mod screen_frames;
 mod tray;
+// FreeBSD has no in-app updater: `pkg` owns the install (see updater_freebsd.rs).
+#[cfg(not(target_os = "freebsd"))]
+mod updater;
+#[cfg(target_os = "freebsd")]
+#[path = "updater_freebsd.rs"]
 mod updater;
 mod version;
 mod watch_player;
@@ -586,19 +591,26 @@ pub fn run() {
         eprintln!("failed to export TypeScript bindings: {err}");
     }
 
-    let app = tauri::Builder::default()
-        // Must be registered first so a second launch hands over to the running instance.
-        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            // A login start while Mumcord already runs must not pop the window up.
-            if !autostart::launched_at_login(&argv) {
-                window::show(app);
-            }
-        }))
+    let tauri_builder = tauri::Builder::default();
+    // Must be registered first so a second launch hands over to the running instance. The plugin
+    // has no FreeBSD implementation; there a second launch opens a second window.
+    #[cfg(not(target_os = "freebsd"))]
+    let tauri_builder = tauri_builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+        // A login start while Mumcord already runs must not pop the window up.
+        if !autostart::launched_at_login(&argv) {
+            window::show(app);
+        }
+    }));
+    // Replaces the app with a downloaded bundle. A FreeBSD package is updated by `pkg upgrade`,
+    // so the plugin is not built there at all (see updater_freebsd.rs).
+    #[cfg(not(target_os = "freebsd"))]
+    let tauri_builder = tauri_builder.plugin(tauri_plugin_updater::Builder::new().build());
+
+    let app = tauri_builder
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .register_asynchronous_uri_scheme_protocol(
             mumcord_plugins::api::webview::SCHEME,
             plugins::webview::handle,

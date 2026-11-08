@@ -98,8 +98,10 @@ rsa = { version = "0.9", default-features = false, features = ["std", "getrandom
 # Linux, MMCSS on Windows), so a loaded CPU does not starve them (issue #123).
 # pipewire (Linux): streams open on the PipeWire node the user picked, so every sink and source
 # of a multi-endpoint interface is its own device (issue #183). Uses the libpipewire that screen
-# sharing already links; no effect on Windows and macOS.
-cpal = { version = "0.18", features = ["realtime-dbus", "pipewire"] }
+# sharing already links; no effect on Windows and macOS. It is enabled per target in
+# crates/audio, because FreeBSD has no PipeWire (the sound server is OSS) and the feature would
+# otherwise pull in libpipewire there.
+cpal = { version = "0.18", features = ["realtime-dbus"] }
 # The same request for Mumcord's own capture and playback threads.
 audio_thread_priority = { version = "0.35", default-features = false, features = ["with_dbus"] }
 # opusic-sys builds libopus statically from bundled sources.
