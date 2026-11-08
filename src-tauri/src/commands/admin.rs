@@ -382,21 +382,6 @@ pub async fn registered_user_unregister(
     Ok(to_save_result(outcome))
 }
 
-/// Registers an online guest under their current name (FR-10.20, AC-10.15). Fails with
-/// `permissionDenied` without the Register right, and with `invalidInput` when the person is not
-/// connected, is registered already, or has no certificate to bind the account to.
-#[tauri::command]
-#[specta::specta]
-pub fn person_register(
-    engine: State<'_, Engine>,
-    server_id: ServerId,
-    session: SessionId,
-) -> ApiResult<()> {
-    engine
-        .registered_register_person(to_engine_server_id(server_id), session)
-        .map_err(|error| error.into())
-}
-
 /// The groups that name one account in a channel (issue #256). A server that will not show its
 /// groups answers with an empty list rather than an error.
 #[tauri::command]
@@ -429,6 +414,7 @@ fn to_save_result(outcome: registered::RegisteredOutcome) -> RegisteredSaveResul
             entries: entries.into_iter().map(Into::into).collect(),
         },
     }
+}
 
 /// Server mute of another person (Epic 4, issue #378, FR-10.15). The server checks the Mute others
 /// right in the channel the person is in and answers with their new state.
