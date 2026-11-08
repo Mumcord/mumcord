@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- The icons in a plugin's permission list are drawn icons now instead of text characters, so they look the same on Windows, macOS and Linux
 - Copy works again in the packet inspector, and when Windows refuses the app's clipboard (e.g. "Copy" on a crash report) Mumcord copies through the window's own clipboard instead
 
 ## [0.7.2] - 2026-11-08
