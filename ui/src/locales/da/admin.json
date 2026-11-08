@@ -426,6 +426,16 @@
   "announcedRegistered": "{{name}} er nu registreret",
   "announcedRegisteredSaved": "Ændringer sendt til serveren",
   "menuRegister": "Registrér på serveren…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Dine rettigheder her",
+    "limits": "Serverbegrænsninger",
+    "welcomeHint": "Kan kun ændres i serverens konfigurationsfil, ikke fra nogen klient.",
+    "notice": "Serverbesked",
+    "noticeEmpty": "Vises som rodkanalens beskrivelse",
+    "noticeEditTitle": "Rediger serverbesked",
+    "banListRegisteredUsers": "Banliste og registrerede brugere…"
+  },
   "commands": {
     "group": "Admin-kommandoer · indbygget",
     "groupPeople": "Personer",

@@ -435,6 +435,16 @@
   "announcedRegistered": "{{name}} issa hu rreġistrat",
   "announcedRegisteredSaved": "Il-bidiet intbagħtu lis-server",
   "menuRegister": "Reġistra fuq is-server…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Id-drittijiet tiegħek hawn",
+    "limits": "Limiti tas-server",
+    "welcomeHint": "Jista' jinbidel biss fil-fajl tas-settings tas-server, mhux minn xi klijent.",
+    "notice": "Avviż tas-server",
+    "noticeEmpty": "Jintwera bħala deskrizzjoni tal-kanal prinċipali",
+    "noticeEditTitle": "Editja l-avviż tas-server",
+    "banListRegisteredUsers": "Lista ta' bans u utenti reġistrati…"
+  },
   "commands": {
     "group": "Kmandi ta' amministrazzjoni · integrati",
     "groupPeople": "Persuni",

@@ -179,6 +179,27 @@
   font-size: var(--font-size-sm);
 }
 
+/* Epic 4, issue #258: the Admin section at the end of the panel (FR-10.54). */
+.server-info-panel__admin {
+  border-inline-start: 3px solid var(--color-accent);
+}
+
+.server-info-panel__hint {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.server-info-panel__notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+}
+
 .server-info-panel__pem {
   max-height: 12rem;
   margin: var(--space-3) 0 0;

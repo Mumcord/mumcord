@@ -429,6 +429,16 @@
   "announcedRegistered": "{{name}} ya está registrado",
   "announcedRegisteredSaved": "Cambios enviados al servidor",
   "menuRegister": "Registrar en el servidor…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Tus derechos aquí",
+    "limits": "Límites del servidor",
+    "welcomeHint": "Solo se puede cambiar en el archivo de configuración del servidor, no desde ningún cliente.",
+    "notice": "Aviso del servidor",
+    "noticeEmpty": "Se muestra como descripción del canal raíz",
+    "noticeEditTitle": "Editar aviso del servidor",
+    "banListRegisteredUsers": "Lista de baneados y usuarios registrados…"
+  },
   "commands": {
     "group": "Comandos de administración · integrados",
     "groupPeople": "Personas",

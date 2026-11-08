@@ -435,6 +435,16 @@
   "announcedRegistered": "Tá {{name}} cláraithe anois",
   "announcedRegisteredSaved": "Seolathar na hathruithe chuig an bhfreabháin",
   "menuRegister": "Cláraigh ar an bhfreabháin…",
+  "serverInfo": {
+    "section": "Riarthóir",
+    "yourRights": "Do chearta anseo",
+    "limits": "Teorainneacha an fhreastalaí",
+    "welcomeHint": "Ní féidir é a athrú ach i gcomhad cumraíochta an fhreastalaí, ní ó aon chliant.",
+    "notice": "Fógra an fhreastalaí",
+    "noticeEmpty": "Taispeántar mar thuairisc an chainéil fhréamh",
+    "noticeEditTitle": "Cuir fógra an fhreastalaí in eagar",
+    "banListRegisteredUsers": "Liosta toirmisc agus úsáideoirí cláraithe…"
+  },
   "commands": {
     "group": "Orduithe riaracháin · ionsaithe",
     "groupPeople": "Daoine",
