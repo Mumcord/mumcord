@@ -15,9 +15,10 @@ const ME = "HotkeyQA";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const xdo = async (...args: string[]) => (await run("xdotool", args)).stdout.trim();
 
-/** The key field of a row in Settings → Hotkeys. */
+/** The row of an action in Settings → Hotkeys (the class is matched as a whole word). */
 const row = (action: string) =>
-  `//div[contains(@class,'hotkey-row')][.//span[normalize-space(.)='${action}']]`;
+  "//div[contains(concat(' ', normalize-space(@class), ' '), ' hotkey-row ')]" +
+  `[.//span[normalize-space(.)='${action}']]`;
 const hotkeyRow = (action: string) => $(row(action));
 const keyField = (action: string) => $(`${row(action)}//button[contains(@class,'hotkey-row__field')]`);
 const rowLink = (action: string, label: string) => $(`${row(action)}//button[normalize-space(.)='${label}']`);
