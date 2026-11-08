@@ -576,7 +576,8 @@ fn start(core: &pw::core::CoreRc, state: &Rc<RefCell<LoopState>>, open: OpenRequ
     };
     tracing::debug!(?mode, "portal camera mode");
     let pump = Rc::new(RefCell::new(Pump::new(mode, geometry, sink)));
-    match stream(core, node, mode, &pump) {
+    let limits = (request.max_width, request.max_height);
+    match stream(core, node, mode, limits, &pump) {
         Ok((stream, listener)) => {
             state.borrow_mut().active = Some(Active {
                 node,
@@ -599,6 +600,7 @@ fn stream(
     core: &pw::core::CoreRc,
     node: u32,
     mode: Mode,
+    limits: (u32, u32),
     pump: &Rc<RefCell<Pump>>,
 ) -> Result<StreamParts, pw::Error> {
     let stream = pw::stream::StreamRc::new(
@@ -623,16 +625,23 @@ fn stream(
                 _ => {}
             }
         })
-        .param_changed(|stream, _, id, param| {
-            if id != ParamType::Format.as_raw() || param.is_none() {
-                return;
-            }
-            let Some(bytes) = buffers() else { return };
-            let Some(pod) = Pod::from_bytes(&bytes) else {
-                return;
-            };
-            if let Err(err) = stream.update_params(&mut [pod]) {
-                tracing::warn!(%err, "camera buffer type not set");
+        .param_changed({
+            let pump = Rc::clone(pump);
+            move |stream, _, id, param| {
+                if id != ParamType::Format.as_raw() {
+                    return;
+                }
+                let Some(param) = param else { return };
+                if !adopt(&mut pump.borrow_mut(), param, mode, limits) {
+                    return;
+                }
+                let Some(bytes) = buffers() else { return };
+                let Some(pod) = Pod::from_bytes(&bytes) else {
+                    return;
+                };
+                if let Err(err) = stream.update_params(&mut [pod]) {
+                    tracing::warn!(%err, "camera buffer type not set");
+                }
             }
         })
         .process({
@@ -645,9 +654,10 @@ fn stream(
                 let Some((first, rest)) = buffer.datas_mut().split_first_mut() else {
                     return;
                 };
+                let mode = pump.borrow().mode();
                 if !layout_logged {
-                    // Producers lay out NV12 buffers differently; the first buffer's layout
-                    // explains an "unreadable pictures" stop without a debugger.
+                    // Producers lay out buffers differently; the first buffer's layout and the
+                    // negotiated mode explain an "unreadable pictures" stop without a debugger.
                     layout_logged = true;
                     tracing::info!(
                         mode = ?mode,
@@ -694,6 +704,38 @@ fn stream(
         &mut [pod],
     )?;
     Ok((stream, listener))
+}
+
+/// Reads the pictures in the format the stream negotiated instead of the requested one.
+/// False (and the session ended) when that format cannot be read.
+fn adopt(pump: &mut Pump, format: &Pod, requested: Mode, limits: (u32, u32)) -> bool {
+    let Some(negotiated) = negotiated_mode(format, requested) else {
+        tracing::warn!(
+            ?requested,
+            "the camera negotiated a picture format Mumcord cannot read"
+        );
+        pump.end(CameraError::Backend(
+            "the camera offers no usable picture format".to_owned(),
+        ));
+        return false;
+    };
+    let Some(geometry) = Geometry::new(negotiated.width, negotiated.height, limits.0, limits.1)
+    else {
+        tracing::warn!(?negotiated, "the negotiated camera picture is too small");
+        pump.end(CameraError::Backend(
+            "the camera picture is too small".to_owned(),
+        ));
+        return false;
+    };
+    if negotiated != pump.mode() {
+        tracing::info!(
+            ?requested,
+            ?negotiated,
+            "camera delivers another mode than requested"
+        );
+        pump.renegotiate(negotiated, geometry);
+    }
+    true
 }
 
 /// One mapped buffer plane and the part of it PipeWire says it filled.
@@ -809,7 +851,10 @@ fn property(key: FormatProperties, value: Value) -> Property {
     }
 }
 
-/// Exactly the chosen mode, so PipeWire cannot negotiate a different one.
+/// Exactly the chosen mode, offered as the stream's only `EnumFormat`. PipeWire files a connect
+/// param under its object id, so under any other id it does not restrict the negotiation. The
+/// camera may still deliver something else (it may be busy elsewhere), so the pictures are read
+/// in the negotiated format, see [`negotiated_mode`].
 fn fixed_format(mode: Mode) -> Option<Vec<u8>> {
     let subtype = match mode.format {
         PixelFormat::Mjpeg => MediaSubtype::Mjpg,
@@ -852,7 +897,7 @@ fn fixed_format(mode: Mode) -> Option<Vec<u8>> {
     ));
     serialize(Object {
         type_: SpaTypes::ObjectParamFormat.as_raw(),
-        id: ParamType::Format.as_raw(),
+        id: ParamType::EnumFormat.as_raw(),
         properties,
     })
 }
@@ -880,9 +925,48 @@ fn buffers() -> Option<Vec<u8>> {
 
 /// The modes one `EnumFormat` param of a camera node describes.
 fn modes_of(param: &Pod) -> Vec<Mode> {
+    let Some((formats, sizes, rates)) = format_parts(param) else {
+        return Vec::new();
+    };
+    let mut modes = Vec::new();
+    for &format in &formats {
+        for &(width, height) in &sizes {
+            for &rate in &rates {
+                modes.push(Mode {
+                    format,
+                    width,
+                    height,
+                    rate,
+                });
+            }
+        }
+    }
+    modes
+}
+
+/// The mode the stream settled on, from its negotiated `Format` param. That is what the camera
+/// sends, whatever was asked for: a camera that is busy elsewhere or ignores the request
+/// delivers its own format and size. A format without a frame rate keeps the requested rate;
+/// the rate does not change how a picture is read. `None` when the format is not one Mumcord
+/// can read.
+fn negotiated_mode(param: &Pod, requested: Mode) -> Option<Mode> {
+    let (formats, sizes, rates) = format_parts(param)?;
+    let (&format, &(width, height)) = (formats.first()?, sizes.first()?);
+    Some(Mode {
+        format,
+        width,
+        height,
+        rate: rates.first().copied().unwrap_or(requested.rate),
+    })
+}
+
+/// Pixel formats Mumcord can read, picture sizes and frame rates of a format param.
+type FormatParts = (Vec<PixelFormat>, Vec<(u32, u32)>, Vec<Rate>);
+
+fn format_parts(param: &Pod) -> Option<FormatParts> {
     let Ok((_, Value::Object(object))) = PodDeserializer::deserialize_any_from(param.as_bytes())
     else {
-        return Vec::new();
+        return None;
     };
     let find = |key: FormatProperties| {
         object
@@ -892,7 +976,7 @@ fn modes_of(param: &Pod) -> Vec<Mode> {
             .map(|p| &p.value)
     };
     if find(FormatProperties::MediaType) != Some(&Value::Id(Id(MediaType::Video.as_raw()))) {
-        return Vec::new();
+        return None;
     }
     let formats: Vec<PixelFormat> = match find(FormatProperties::MediaSubtype) {
         Some(Value::Id(Id(subtype))) if *subtype == MediaSubtype::Mjpg.as_raw() => {
@@ -915,24 +999,13 @@ fn modes_of(param: &Pod) -> Vec<Mode> {
             })
             .collect()
         }
-        _ => return Vec::new(),
+        _ => return None,
     };
-    let sizes = sizes(find(FormatProperties::VideoSize));
-    let rates = rates(find(FormatProperties::VideoFramerate));
-    let mut modes = Vec::new();
-    for &format in &formats {
-        for &(width, height) in &sizes {
-            for &rate in &rates {
-                modes.push(Mode {
-                    format,
-                    width,
-                    height,
-                    rate,
-                });
-            }
-        }
-    }
-    modes
+    Some((
+        formats,
+        sizes(find(FormatProperties::VideoSize)),
+        rates(find(FormatProperties::VideoFramerate)),
+    ))
 }
 
 /// The values of a fixed property or of an enum choice; ranges are handled by the callers.
@@ -1271,5 +1344,113 @@ mod tests {
             };
             assert_eq!(modes(&fixed_format(mode).unwrap()), [mode]);
         }
+    }
+
+    #[test]
+    fn the_fixed_format_is_offered_as_the_only_enum_format() {
+        // PipeWire files a connect param under its object id; only `EnumFormat` restricts the
+        // negotiation, so under any other id the camera picks its own default mode.
+        let mode = Mode {
+            format: PixelFormat::Nv12,
+            width: 1280,
+            height: 720,
+            rate: Rate { num: 30, den: 1 },
+        };
+        let bytes = fixed_format(mode).unwrap();
+        let Ok((_, Value::Object(object))) = PodDeserializer::deserialize_any_from(&bytes) else {
+            panic!("not an object");
+        };
+        assert_eq!(object.id, ParamType::EnumFormat.as_raw());
+        assert_eq!(object.type_, SpaTypes::ObjectParamFormat.as_raw());
+    }
+
+    #[test]
+    fn the_negotiated_format_wins_over_the_requested_mode() {
+        // The log of issue: NV12 1280x720 asked for, YUYV 640x480 delivered.
+        let negotiated = enum_format(
+            MediaSubtype::Raw,
+            vec![
+                property(
+                    FormatProperties::VideoFormat,
+                    Value::Id(Id(VideoFormat::YUY2.as_raw())),
+                ),
+                property(
+                    FormatProperties::VideoSize,
+                    Value::Rectangle(Rectangle {
+                        width: 640,
+                        height: 480,
+                    }),
+                ),
+                property(
+                    FormatProperties::VideoFramerate,
+                    Value::Fraction(Fraction { num: 30, denom: 1 }),
+                ),
+            ],
+        );
+        let requested = Mode {
+            format: PixelFormat::Nv12,
+            width: 1280,
+            height: 720,
+            rate: Rate { num: 30, den: 1 },
+        };
+        let mode = negotiated_mode(Pod::from_bytes(&negotiated).unwrap(), requested).unwrap();
+        assert_eq!(
+            mode,
+            Mode {
+                format: PixelFormat::Yuy2,
+                width: 640,
+                height: 480,
+                rate: Rate { num: 30, den: 1 },
+            }
+        );
+    }
+
+    #[test]
+    fn a_negotiated_format_without_a_frame_rate_keeps_the_requested_rate() {
+        let negotiated = enum_format(
+            MediaSubtype::Raw,
+            vec![
+                property(
+                    FormatProperties::VideoFormat,
+                    Value::Id(Id(VideoFormat::NV12.as_raw())),
+                ),
+                property(
+                    FormatProperties::VideoSize,
+                    Value::Rectangle(Rectangle {
+                        width: 1280,
+                        height: 720,
+                    }),
+                ),
+            ],
+        );
+        let requested = Mode {
+            format: PixelFormat::Nv12,
+            width: 1280,
+            height: 720,
+            rate: Rate { num: 30, den: 1 },
+        };
+        let mode = negotiated_mode(Pod::from_bytes(&negotiated).unwrap(), requested);
+        assert_eq!(mode, Some(requested));
+    }
+
+    #[test]
+    fn an_unusable_negotiated_format_gives_no_mode() {
+        let negotiated = enum_format(
+            MediaSubtype::Raw,
+            vec![property(
+                FormatProperties::VideoFormat,
+                Value::Id(Id(VideoFormat::RGB.as_raw())),
+            )],
+        );
+        let requested = Mode {
+            format: PixelFormat::Nv12,
+            width: 1280,
+            height: 720,
+            rate: Rate { num: 30, den: 1 },
+        };
+        assert_eq!(
+            negotiated_mode(Pod::from_bytes(&negotiated).unwrap(), requested),
+            None
+        );
     }
 }
