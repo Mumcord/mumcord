@@ -1,18 +1,18 @@
 {
   "close": {
-    "title": "Kicsinyítés a tálcára vagy kilépés?",
-    "description": "Még kapcsolódva vagy. Kicsinyítve a Mumcord bent tart a hangcsatornában, és a rendszertálcán marad.",
+    "title": "Kicsinyítés a rendszertálcára vagy kilépés?",
+    "description": "Még csatlakozva vagy. Kicsinyítve a Mumcord bent tart a hangcsatornában, és a rendszertálcán marad.",
     "remember": "Választás megjegyzése",
-    "minimize": "Kicsinyítés a tálcára",
+    "minimize": "Kicsinyítés a rendszertálcára",
     "quit": "Kilépés",
     "failed": "Ez nem sikerült. Próbáld újra.",
-    "descriptionServers": "Még {{count}} szerverhez csatlakozol. Kis méretre állítva a Mumcord bent tart a hangcsatornában, és a tálcán marad."
+    "descriptionServers": "Még {{count}} szerverhez vagy csatlakozva. Kicsinyítve a Mumcord bent tart a hangcsatornában, és a rendszertálcán marad."
   },
   "windowOverlay": {
     "title": "Az ablakos overlay megszűnt",
     "description": "A lebegő overlay ablak már nincs. Helyette a játékon belüli overlay mutatja, ki beszél a játékaidban. Az overlay beállításaiban kapcsolhatod be.",
     "dismiss": "Értem",
-    "openSettings": "Overlay beállításainak megnyitása"
+    "openSettings": "Overlay-beállítások megnyitása"
   },
   "audioDevice": {
     "title": "Válaszd ki újra a hangeszközeidet",
@@ -28,8 +28,8 @@
     "failed": "Ez nem sikerült. Próbáld újra."
   },
   "updateCheck": {
-    "title": "Keressen új verziókat?",
-    "description": "A Mumcord rendszeresen megkérdezheti a GitHubtól, hogy létezik-e újabb verzió, és értesíthet róla. A kérdésed nélkül semmi nem töltődik le vagy települ, és a kérésen, valamint az alkalmazás nevén és verzióján kívül semmi nem kerül elküldésre. Ezt később a Beállításokban módosíthatod.",
+    "title": "Keressünk új verziókat?",
+    "description": "A Mumcord rendszeresen megkérdezheti a GitHubtól, hogy van-e újabb verzió, és szólhat róla. Megkérdezésed nélkül semmi nem töltődik le és nem települ, és a kérésen, valamint az alkalmazás nevén és verzióján kívül semmit nem küld el. Ezt később a Beállításokban módosíthatod.",
     "no": "Nem",
     "yes": "Igen",
     "failed": "Ez nem sikerült. Próbáld újra."
@@ -48,7 +48,7 @@
       "subtitle": "A Mumcord {{version}} készen áll a letöltésre. A jelenlegi verziód: {{current}}.",
       "subtitleManual": "Megjelent a Mumcord {{version}}. A jelenlegi verziód: {{current}}.",
       "whatsNew": "Újdonságok a(z) {{current}} óta",
-      "trust": "Csak a github.com oldalról töltődik le HTTPS-en keresztül, és telepítés előtt ellenőrzi az aláírását és az ellenőrző összegét.",
+      "trust": "Csak a github.com oldalról, HTTPS-en keresztül töltődik le, és telepítés előtt a Mumcord ellenőrzi az aláírását és az ellenőrző összegét.",
       "skip": "Verzió kihagyása",
       "later": "Emlékeztess később",
       "download": "Letöltés és telepítés",
@@ -107,7 +107,7 @@
       "signature": "A letöltés aláírása nem egyezett, ezért a letöltést elvetettük.",
       "checksum": "A letöltés nem egyezett az ellenőrző összegével, ezért elvetettük.",
       "install": "A frissítés telepítése nem sikerült. A telepített verziód változatlan.",
-      "retry": "Újra",
+      "retry": "Újrapróbálás",
       "close": "Bezárás"
     },
     "actionFailed": "Ez nem sikerült. Próbáld újra.",

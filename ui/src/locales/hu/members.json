@@ -4,7 +4,7 @@
   "noChannel": "Válassz egy csatornát, hogy lásd, ki van benne.",
   "nobody": "Senki sincs itt.",
   "nobodyElse": "Rajtad kívül senki nincs a szerveren.",
-  "inOtherChannels": "Más csatornákon",
+  "inOtherChannels": "Más csatornákban",
   "you": "(te)",
   "registered": "Regisztrált",
   "unregistered": "Nem regisztrált",
@@ -20,7 +20,7 @@
     },
     "ping": "Ping",
     "loss": "Csomagvesztés",
-    "late": "Késő csomagok",
+    "late": "Késve érkező csomagok",
     "bandwidth": "Sávszélesség",
     "transport": "Hangátvitel",
     "client": "Kliens",
@@ -38,7 +38,7 @@
     "sessionOnly": "Ennek a személynek nincs tanúsítványa, ezért ezek a beállítások csak erre a munkamenetre érvényesek.",
     "sendPrivateMessage": "Privát üzenet küldése",
     "privateMessage": "Privát üzenet",
-    "localSettingsHint": "Ezeket csak te látod. A változások azonnal mentődnek.",
+    "localSettingsHint": "Ezeket csak te látod. A módosításokat azonnal mentjük.",
     "settingsFor": "{{name}} beállításai",
     "hintMuted": "Némítva",
     "hintVolume": "Hangerő {{value}} %",
@@ -90,7 +90,7 @@
     "fullProfile": "Teljes profil"
   },
   "chatRequest": {
-    "title": "Csevegési kérés neki: {{name}}",
+    "title": "Csevegési kérés {{name}} részére",
     "note": "Megjegyzés (nem kötelező)",
     "counter": "{{count}} / {{max}}",
     "counterLabel": "{{count}} / {{max}} karakter felhasználva",
@@ -109,7 +109,7 @@
   },
   "revokeConsent": {
     "title": "Visszavonod a csevegési hozzájárulást {{name}} számára?",
-    "message": "{{name}} új üzenetkérelmet kell küldjön, mielőtt az üzenetei újra eljutnak hozzád. A csevegési előzmények megmaradnak.",
+    "message": "{{name}} csak egy új üzenetkérés után tud ismét üzenni neked. A csevegési előzmények megmaradnak.",
     "confirm": "Visszavonás",
     "failed": "A csevegési hozzájárulás visszavonása nem sikerült. Próbáld újra."
   },
@@ -122,7 +122,7 @@
     "private": "{{name}} privát üzenetei nem jelennek meg, és nem értesítenek.",
     "channelCollapsed": "{{name}} csatornaüzenetei összecsukva jelennek meg. Továbbra is megnyithatod őket.",
     "channelHidden": "{{name}} csatornaüzenetei el vannak rejtve.",
-    "voice": "{{name}} némítva van nálad a hangban, a súgásokat is beleértve.",
+    "voice": "{{name}} némítva van nálad a hangban, a suttogásokat is beleértve.",
     "data": "Nincs előzményszinkronizálás, meghívó vagy más Mumcord-adat {{name}} felhasználótól.",
     "followsCert": "A letiltás {{name}} tanúsítványát követi, így egy új név nem kerüli meg.",
     "nameOnly": "{{name}} felhasználónak nincs tanúsítványa, ezért a letiltás csak erre a névre vonatkozik a(z) {{server}} szerveren.",

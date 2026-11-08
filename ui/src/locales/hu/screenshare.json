@@ -1,7 +1,7 @@
 {
   "share": "Képernyő megosztása",
-  "shareYourScreen": "A saját képernyő megosztása",
-  "choosing": "Megosztandó kiválasztása…",
+  "shareYourScreen": "Képernyő megosztása",
+  "choosing": "A megosztandó tartalom kiválasztása…",
   "stop": "Megosztás leállítása",
   "startFailed": "A képernyőmegosztást nem sikerült elindítani.",
   "stopFailed": "A képernyőmegosztást nem sikerült leállítani.",
@@ -38,7 +38,7 @@
   "viewerCount_one": "{{count}} néző",
   "viewerCount_other": "{{count}} néző",
   "start": {
-    "title": "Képernyőd megosztása",
+    "title": "Képernyő megosztása",
     "intro": "Először válaszd ki a minőséget. Ezután a rendszer megkérdezi, melyik ablakot vagy képernyőt oszd meg.",
     "resolution": "Felbontás",
     "resolutionAuto": "Automatikus",
@@ -81,16 +81,16 @@
     "sound": "Hang",
     "soundInfo": "Teljes képernyő: a számítógép hangja Mumcord nélkül. Egy ablak: csak az adott alkalmazás hangja.",
     "soundNeeds": {
-      "windows": "Nincs hang: szükséges hozzá Windows 10 2004-es vagy újabb verziója",
-      "macos": "Nincs hang: szükséges hozzá macOS 13 vagy újabb",
-      "pipewire": "Nincs hang: szükséges hozzá PipeWire"
+      "windows": "Nincs hang: Windows 10 2004-es vagy újabb verzió szükséges",
+      "macos": "Nincs hang: macOS 13 vagy újabb szükséges",
+      "pipewire": "Nincs hang: PipeWire szükséges"
     },
     "viewersGet": "A nézők ezt kapják:",
-    "viewersGetSummary": "legfeljebb {{resolution}} · {{fps}} kép/s · {{codec}} · kb. {{mbit}} Mbit/s",
-    "pathRelay": "A szerver átjátszóján keresztül egyszer kerül elküldésre, az pedig továbbítja legfeljebb {{count}} nézőnek.",
+    "viewersGetSummary": "legfeljebb {{resolution}} · {{fps}} fps · {{codec}} · kb. {{mbit}} Mbit/s",
+    "pathRelay": "Egyszer megy el a szerver átjátszójára, amely legfeljebb {{count}} nézőnek továbbítja.",
     "pathDirect": "Nézőnként egy példány, legfeljebb {{count}}.",
     "olderMumcord": "A régebbi Mumcordot használó nézők VP9-et kapnak.",
-    "remember": "Ezekkel a beállításokkal legközelebb is",
+    "remember": "Ezek a beállítások legközelebb is",
     "cancel": "Mégse",
     "confirm": "Válaszd ki, mit osztasz meg"
   },
@@ -118,7 +118,7 @@
     "tipApp": "Egy ablak: csak az adott alkalmazás hangja.",
     "tipOff": "A hangkapcsoló ki van kapcsolva.",
     "tipNone": "Ehhez az ablakhoz a „Nincs hang” lett kiválasztva.",
-    "tipOldWindows": "Nincs hang: Windows 10 2004-es vagy újabb verziója szükséges",
+    "tipOldWindows": "Nincs hang: Windows 10 2004-es vagy újabb verzió szükséges",
     "tipOldMacos": "Nincs hang: macOS 13 vagy újabb szükséges",
     "tipNoPipeWire": "Nincs hang: PipeWire szükséges",
     "tipCaptureFailed": "A hangrögzítés sikertelen. A videómegosztás folytatódik."
@@ -133,7 +133,7 @@
     "optimizeSharp": "Éles szöveg",
     "optimizeSmooth": "Folyékony mozgás",
     "note": "A módosítások egy másodpercen belül érvénybe lépnek, a megosztás újraindítása nélkül.",
-    "lowered": "Csökkentve erre: {{step}}: {{reason}}",
+    "lowered": "Csökkentve erre: {{step}} ({{reason}})",
     "reasonUpload": "a feltöltés túl lassú",
     "reasonEncoder": "a kódoló túl lassú",
     "reasonViewers": "sok néző"
@@ -150,7 +150,7 @@
     "slow": "Lassú kapcsolat",
     "more_one": "és még {{count}}",
     "more_other": "és még {{count}}",
-    "layerNote": "{{name}} {{fps}} kép/s-ot kap: a kapcsolata nem bírja a(z) {{target}} értéket."
+    "layerNote": "{{name}} {{fps}} fps-et kap: a kapcsolata nem bírja a(z) {{target}} értéket."
   },
   "notices": {
     "noFanoutTitle": "Ennek a szervernek nincs átjátszója nagy megosztásokhoz",
@@ -162,12 +162,12 @@
     "reasonDisallowed": "az átjátszó nem engedélyezi a képernyőmegosztást",
     "reasonRefused": "az átjátszó elutasította a szórást",
     "reasonFull": "az átjátszó megtelt",
-    "reasonLost": "az átjátszó megszakadt",
+    "reasonLost": "megszakadt a kapcsolat az átjátszóval",
     "reasonMode": "a P2P-beállításod kihagyja az átjátszót",
-    "reasonNoCertificate": "nincs kliens tanúsítványod",
+    "reasonNoCertificate": "nincs ügyféltanúsítványod",
     "reasonUnavailable": "az átjátszó jelenleg nem használható",
-    "gotIt": "Rendben",
-    "encoderTitle": "A géped nem bírta a(z) {{from}} kódolást — átváltottunk erre: {{to}}, hogy a megosztás gördülékeny maradjon",
+    "gotIt": "Értem",
+    "encoderTitle": "A géped nem bírta a(z) {{from}} kódolást – átváltottunk erre: {{to}}, hogy a megosztás gördülékeny maradjon",
     "encoderBody": "A processzoron végzett kódolás (SVT-AV1) túl sokáig tartott, és képkockák estek ki. A megosztásod {{quality}} minőségen marad {{to}} mellett, ami kevesebb CPU-t igényel. A nézők rövid frissítést láttak, mást nem.",
     "switched": "Átváltottunk erre: {{codec}} a terhelés csökkentéséhez",
     "switchedFor": "Átváltottunk erre: {{codec}}, mert {{name}} így kéri",
@@ -183,14 +183,14 @@
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nincs mérve",
     "close": "Bezárás",
-    "reasonNotRegistered": "a szerver relay-ét csak regisztrált felhasználók használhatják",
-    "reasonGroupNotAllowed": "a relay csak bizonyos csoportokat szolgál ki",
-    "reasonNoHello": "a relay bot még nem ismeri ezt az alkalmazást, csatlakozz újra"
+    "reasonNotRegistered": "a szerver átjátszóját csak regisztrált felhasználók használhatják",
+    "reasonGroupNotAllowed": "az átjátszó csak bizonyos csoportokat szolgál ki",
+    "reasonNoHello": "az átjátszó botja még nem ismeri ezt az alkalmazást; a javításhoz csatlakozz újra"
   },
   "settings": {
     "title": "Képernyőmegosztás",
     "new": "Új",
-    "intro": "Minőség, codec és hardver a képernyőd megosztásához. A nézők indítás előtt mindig látják, mit választottál.",
+    "intro": "Minőség, kodek és hardver a képernyőd megosztásához. A nézők indítás előtt mindig látják, mit választottál.",
     "qualityDefaults": "Alapértelmezett minőség",
     "resolution": "Felbontás",
     "resolutionAuto": "Automatikus",
@@ -212,8 +212,8 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "uploadHint": "A megosztásod által összesen küldött maximum. Hasznos megosztott vagy mért kapcsolaton.",
-    "askEachTime": "Minden megosztáskor kérdezze meg ezeket a beállításokat",
+    "uploadHint": "A megosztásod által összesen küldött maximum. Hasznos megosztott vagy forgalomkorlátos kapcsolaton.",
+    "askEachTime": "Rákérdezés ezekre a beállításokra minden megosztáskor",
     "codec": "Kodek",
     "codecAuto": "Automatikus (ajánlott)",
     "codecAutoHint": "Először AV1 a videokártyádon, aztán AV1 a processzoron, ha egy rövid teszt szerint bírja, különben VP9. AV1 csak akkor, ha minden néző le tudja játszani.",
