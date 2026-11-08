@@ -11,7 +11,9 @@ const RUNTIME_SET = new Set<string>([]);
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) return sourceFiles(path);
+    // The plugin kit uses the `--mc-` tokens that Mumcord sets on plugin pages, not app
+    // properties; plugin-kit/kit.test.ts checks those names against the token list.
+    if (entry.isDirectory()) return entry.name === "plugin-kit" ? [] : sourceFiles(path);
     return /\.(css|tsx?)$/.test(entry.name) && !/\.test\.tsx?$/.test(entry.name) ? [path] : [];
   });
 }
