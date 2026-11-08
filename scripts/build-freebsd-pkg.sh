@@ -1,10 +1,13 @@
 #!/bin/sh
 # Builds the FreeBSD package (.pkg) from a release build of the app.
 #
-#   scripts/build-freebsd-pkg.sh [--no-strip] [output-dir]
+#   scripts/build-freebsd-pkg.sh [--no-build] [--no-strip] [output-dir]
 #
-# Expects `target/release/mumcord` (cargo build --release -p mumcord) and the built UI in
-# `dist/`. The package installs under /usr/local, like every FreeBSD port:
+# Builds the app by default (`cargo build --release -p mumcord --features custom-protocol`, the
+# switch the Tauri CLI sets for a production build); --no-build packages an existing binary.
+#
+# Expects `target/release/mumcord` (cargo build --release -p mumcord --features custom-protocol)
+# and the built UI in `dist/`. The package installs under /usr/local, like every FreeBSD port:
 #
 #   /usr/local/bin/mumcord
 #   /usr/local/lib/mumcord/camera-backgrounds/*.webp     (resources, see resource_dir() in the app)
@@ -19,10 +22,12 @@ set -eu
 
 root_dir=$(cd "$(dirname "$0")/.." && pwd)
 strip_binary=1
+build=1
 output=""
 for arg in "$@"; do
   case "$arg" in
     --no-strip) strip_binary=0 ;;
+    --no-build) build=0 ;;
     -*) echo "unknown option: $arg" >&2; exit 2 ;;
     *) output=$arg ;;
   esac
@@ -31,8 +36,15 @@ done
 
 app_id=app.mumcord.client
 binary="$root_dir/target/release/mumcord"
+if [ "$build" -eq 1 ]; then
+  # --features custom-protocol is what the Tauri CLI turns on for `tauri build`: without it the
+  # binary is a development build that expects the Vite dev server and shows an empty window.
+  echo "== building the app"
+  (cd "$root_dir" && CARGO_PROFILE_RELEASE_DEBUG=0 cargo build --release -p mumcord \
+    --features custom-protocol >/dev/null) || { echo "the build failed" >&2; exit 1; }
+fi
 if [ ! -x "$binary" ]; then
-  echo "missing $binary: run 'cargo build --release -p mumcord' first" >&2
+  echo "missing $binary: run 'cargo build --release -p mumcord --features custom-protocol'" >&2
   exit 2
 fi
 if [ ! -d "$root_dir/dist" ]; then
