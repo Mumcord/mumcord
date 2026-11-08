@@ -19,6 +19,7 @@ import { FeaturesStep } from "./FeaturesStep";
 import { IdentityStep } from "./IdentityStep";
 import { ImportStep } from "./ImportStep";
 import { matchingPreset, RECOMMENDED_PRESET } from "./presets";
+import { NotificationsStep } from "./NotificationsStep";
 import { PrivateMessagesStep } from "./PrivateMessagesStep";
 import { SetupStyleStep } from "./SetupStyleStep";
 import { StartupStep } from "./StartupStep";
@@ -486,6 +487,8 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
         return <SetupStyleStep style={flow.style} onSelect={chooseStyle} onNext={toNext} />;
       case "privateMessages":
         return <PrivateMessagesStep settings={settings} update={update} onNext={toNext} />;
+      case "notifications":
+        return <NotificationsStep settings={settings} update={update} onNext={toNext} />;
       case "connections":
         return <ConnectionsStep settings={settings} update={update} onNext={toNext} />;
       case "features":

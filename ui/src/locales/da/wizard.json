@@ -33,6 +33,7 @@
     "voice": "Tale",
     "setupStyle": "Opsætningstype",
     "privateMessages": "Private beskeder",
+    "notifications": "Notifikationer",
     "connections": "Forbindelser",
     "features": "Funktioner",
     "appearance": "Udseende",
@@ -146,6 +147,10 @@
     "subtitle": "Private beskeder er samtaler mellem to personer. Kanalchatten påvirkes ikke af dette valg.",
     "local": "Filtreringen sker på din computer. Afsendere får ikke besked. Du kan senere angive en anden regel pr. server."
   },
+  "notifications": {
+    "title": "Hvordan skal Mumcord give dig besked?",
+    "subtitle": "Vælg, hvordan hver slags nyheder når dig. Du kan ændre det senere under Indstillinger → Notifikationer."
+  },
   "connections": {
     "title": "Forbindelser og indhold",
     "subtitle": "Nogle funktioner forbinder dig direkte til andre Mumcord-brugere, og noget chatindhold hentes fra andre websteder. Vælg, hvad der er i orden for dig.",
@@ -185,6 +190,7 @@
       "identity": "Identitet",
       "voice": "Tale",
       "privateMessages": "Private beskeder",
+      "notifications": "Notifikationer",
       "connections": "Forbindelser",
       "chatContent": "Chatindhold",
       "features": "Funktioner",
@@ -195,10 +201,12 @@
     "identityDetail": "Gemt i dit systems nøglering",
     "voiceDetail": "Støjdæmpning: {{noise}}",
     "pmDetail": "Min kanal {{channel}} · accepterede chats {{accepted}} · anmodninger {{requests}}",
+    "notificationsTitle": "Nye beskeder: {{mode}}",
+    "notificationsDetail": "Aktivitetsnotifikationer: {{on}} af {{total}} slået til",
     "contentTitle": "Linkforhåndsvisninger {{previews}}",
     "contentDetail": "Billeder i fuld størrelse {{images}} · historiksynkronisering {{sync}}",
     "featuresTitle": "Overlay i spillet {{overlay}}",
-    "featuresDetail": "Følg systemets Forstyr ikke {{dnd}} · spiller nu {{playing}} · gamer nu {{gaming}}",
+    "featuresDetail": "Følg systemets Forstyr ikke {{dnd}} · spiller nu {{playing}} · gamer nu {{gaming}} · aktivitetshistorik {{history}}",
     "effectsDetail": "Visuelle effekter {{effects}}",
     "startupTitle": "Start ved login {{login}}",
     "startupDetail": "Start minimeret {{minimized}} · mumble://-links {{links}}",

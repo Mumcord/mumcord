@@ -48,6 +48,7 @@ export interface Preferences {
       | "cameraHotkey"
       | "cameraMirrorSelf"
       | "cameraReduceMotion"
+      | "keepActivityHistory"
       | HintPreference
     >,
   ) => void;

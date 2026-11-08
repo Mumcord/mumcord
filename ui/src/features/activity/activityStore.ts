@@ -123,6 +123,12 @@ interface Baseline {
 const EMPTY_LOG: readonly ActivityEvent[] = [];
 
 let logs = new Map<number, readonly ActivityEvent[]>();
+/**
+ * "Keep activity history after a restart" (#661). `null` until the settings are known: nothing
+ * is loaded or saved before then, so a feed saved earlier is neither shown against the user's
+ * choice nor overwritten.
+ */
+let keepHistory: boolean | null = null;
 let baselines = new Map<number, Baseline>();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
@@ -136,7 +142,7 @@ function notify(): void {
 function current(serverId: number): readonly ActivityEvent[] {
   let log = logs.get(serverId);
   if (log === undefined) {
-    log = loadHistory(serverId);
+    log = keepHistory === true ? loadHistory(serverId) : [];
     logs.set(serverId, log);
   }
   return log;
@@ -144,7 +150,7 @@ function current(serverId: number): readonly ActivityEvent[] {
 
 function store(serverId: number, log: readonly ActivityEvent[]): void {
   logs.set(serverId, log);
-  saveHistory(serverId, log);
+  if (keepHistory === true) saveHistory(serverId, log);
   notify();
 }
 
@@ -517,6 +523,27 @@ function logOf(serverId: number | null): readonly ActivityEvent[] {
   return serverId === null ? EMPTY_LOG : current(serverId);
 }
 
+/**
+ * Follows the setting (#661). Off deletes the saved history and saves nothing more; the feed of
+ * this session stays. On saves the feed from now on; when the setting just became known, the
+ * history saved earlier joins what this session already logged.
+ */
+export function setActivityHistoryKept(keep: boolean): void {
+  if (keep === keepHistory) return;
+  const known = keepHistory !== null;
+  keepHistory = keep;
+  if (!keep) {
+    clearSavedHistory();
+    return;
+  }
+  for (const [serverId, log] of logs) {
+    const merged = known ? log : [...log, ...loadHistory(serverId)].slice(0, MAX_EVENTS);
+    logs.set(serverId, merged);
+    saveHistory(serverId, merged);
+  }
+  notify();
+}
+
 /** Settings → Privacy (#594): empties the feed of every server and its saved history. */
 export function clearActivityHistory(): void {
   clearSavedHistory();
@@ -539,4 +566,5 @@ export function resetActivityLogStore(): void {
   addedListeners.clear();
   logs = new Map();
   baselines = new Map();
+  keepHistory = null;
 }

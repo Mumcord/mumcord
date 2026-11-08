@@ -33,6 +33,7 @@
     "voice": "Hääl",
     "setupStyle": "Seadistuse laad",
     "privateMessages": "Privaatsõnumid",
+    "notifications": "Teavitused",
     "connections": "Ühendused",
     "features": "Funktsioonid",
     "appearance": "Välimus",
@@ -146,6 +147,10 @@
     "subtitle": "Privaatsõnumid on kahe inimese vestlused. See valik ei mõjuta kanali vestlust.",
     "local": "Filtreerimine toimub sinu arvutis. Saatjatele ei öelda midagi. Serveripõhise erineva reegli saad määrata hiljem."
   },
+  "notifications": {
+    "title": "Kuidas peaks Mumcord sind teavitama?",
+    "subtitle": "Vali, kuidas iga liiki uudiseid sulle edastatakse. Saad seda hiljem muuta jaotises Seaded → Teavitused."
+  },
   "connections": {
     "title": "Ühendused ja sisu",
     "subtitle": "Mõned funktsioonid ühendavad sind otse teiste Mumcordi kasutajatega ja osa vestlussisust laaditakse teistelt veebisaitidelt. Vali, mis sulle sobib.",
@@ -185,6 +190,7 @@
       "identity": "Identiteet",
       "voice": "Hääl",
       "privateMessages": "Privaatsõnumid",
+      "notifications": "Teavitused",
       "connections": "Ühendused",
       "chatContent": "Vestlussisu",
       "features": "Funktsioonid",
@@ -195,10 +201,12 @@
     "identityDetail": "Salvestatud sinu süsteemi võtmehoidlasse",
     "voiceDetail": "Müravähendus: {{noise}}",
     "pmDetail": "Minu kanal {{channel}} · aktsepteeritud vestlused {{accepted}} · taotlused {{requests}}",
+    "notificationsTitle": "Uued sõnumid: {{mode}}",
+    "notificationsDetail": "Tegevuste teavitused: {{on}} / {{total}} sees",
     "contentTitle": "Linkide eelvaated {{previews}}",
     "contentDetail": "Täissuuruses pildid {{images}} · ajaloo sünkroonimine {{sync}}",
     "featuresTitle": "Mängusisene ülekate {{overlay}}",
-    "featuresDetail": "Järgi süsteemi režiimi Ära sega {{dnd}} · praegu mängib {{playing}} · praegu mängitakse {{gaming}}",
+    "featuresDetail": "Järgi süsteemi režiimi Ära sega {{dnd}} · praegu mängib {{playing}} · praegu mängitakse {{gaming}} · tegevuste ajalugu {{history}}",
     "effectsDetail": "Visuaalefektid {{effects}}",
     "startupTitle": "Käivita sisselogimisel {{login}}",
     "startupDetail": "Käivita minimeerituna {{minimized}} · mumble://-lingid {{links}}",

@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Notifications",
-    "legend": "Notifications des nouveaux messages",
-    "explanation": "Pour les nouveaux messages dans votre canal, les canaux suivis et les discussions privées, sauf la discussion que vous regardez.",
-    "inApp": "Dans l’app : une petite fenêtre contextuelle dans Mumcord quand il est au premier plan",
-    "desktop": "Bureau : une notification système",
-    "both": "Les deux : fenêtre contextuelle quand Mumcord est au premier plan, notification système sinon",
-    "off": "Désactivées",
+    "explanation": "Comment Mumcord vous prévient des nouveaux messages et de ce qui se passe sur vos serveurs. Chaque type a son propre choix.",
+    "messages": "Nouveaux messages",
+    "messagesHint": "Votre canal, les canaux suivis et les discussions privées",
+    "mode": {
+      "off": "Désactivé",
+      "inApp": "Dans l’app",
+      "desktop": "Système",
+      "both": "Les deux"
+    },
+    "modesHint": "Dans l’app : une petite fenêtre contextuelle dans Mumcord quand il est au premier plan. Système : une notification de votre système d’exploitation. Les deux : la fenêtre contextuelle quand Mumcord est au premier plan, sinon une notification système. Rien ne s’affiche pour la discussion que vous regardez ni pendant Ne pas déranger.",
     "activityTitle": "Notifications d'activité",
     "activity": {
       "screenShare": "Quelqu'un lance un partage d'écran",
@@ -1281,6 +1285,8 @@
   },
   "activityHistory": {
     "title": "Historique d'activité",
+    "keep": "Conserver l'historique d'activité après un redémarrage",
+    "keepHint": "Enregistre qui s'est connecté, est parti, a changé de salon, a partagé son écran ou lancé une watch party, pour que le fil soit toujours là après un redémarrage. Désactivé : le fil repart vide à chaque fois. Le désactiver supprime ce qui était enregistré.",
     "clear": "Effacer l'historique d'activité",
     "hint": "Supprime le fil enregistré de tous les serveurs.",
     "local": "Enregistré uniquement sur cet appareil.",

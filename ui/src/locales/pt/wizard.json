@@ -33,6 +33,7 @@
     "voice": "Voz",
     "setupStyle": "Estilo de configuração",
     "privateMessages": "Mensagens privadas",
+    "notifications": "Notificações",
     "connections": "Ligações",
     "features": "Funcionalidades",
     "appearance": "Aspeto",
@@ -146,6 +147,10 @@
     "subtitle": "As mensagens privadas são conversas a dois. O chat do canal não é afetado por esta escolha.",
     "local": "A filtragem acontece no teu computador. Os remetentes não são avisados. Mais tarde podes definir uma regra diferente por servidor."
   },
+  "notifications": {
+    "title": "Como deve o Mumcord avisar-te?",
+    "subtitle": "Escolhe como cada tipo de novidade chega até ti. Podes alterá-lo mais tarde em Definições → Notificações."
+  },
   "connections": {
     "title": "Ligações e conteúdo",
     "subtitle": "Algumas funcionalidades ligam-te diretamente a outros utilizadores do Mumcord e parte do conteúdo do chat é carregado de outros sites. Escolhe o que é aceitável para ti.",
@@ -185,6 +190,7 @@
       "identity": "Identidade",
       "voice": "Voz",
       "privateMessages": "Mensagens privadas",
+      "notifications": "Notificações",
       "connections": "Ligações",
       "chatContent": "Conteúdo do chat",
       "features": "Funcionalidades",
@@ -195,10 +201,12 @@
     "identityDetail": "Guardada no porta-chaves do sistema",
     "voiceDetail": "Supressão de ruído: {{noise}}",
     "pmDetail": "O meu canal {{channel}} · conversas aceites {{accepted}} · pedidos {{requests}}",
+    "notificationsTitle": "Novas mensagens: {{mode}}",
+    "notificationsDetail": "Notificações de atividade: {{on}} de {{total}} ativadas",
     "contentTitle": "Pré-visualizações de ligações {{previews}}",
     "contentDetail": "Imagens em tamanho real {{images}} · sincronização do histórico {{sync}}",
     "featuresTitle": "Sobreposição no jogo {{overlay}}",
-    "featuresDetail": "Seguir o Não incomodar do sistema {{dnd}} · a reproduzir {{playing}} · a jogar {{gaming}}",
+    "featuresDetail": "Seguir o Não incomodar do sistema {{dnd}} · a reproduzir {{playing}} · a jogar {{gaming}} · histórico de atividade {{history}}",
     "effectsDetail": "Efeitos visuais {{effects}}",
     "startupTitle": "Arrancar ao iniciar sessão {{login}}",
     "startupDetail": "Arrancar minimizado {{minimized}} · ligações mumble:// {{links}}",

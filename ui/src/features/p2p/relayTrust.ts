@@ -66,6 +66,7 @@ async function announce(serverId: number, context: () => RelayNoticeContext): Pr
   let outcome;
   try {
     outcome = await getApi().notifyActivity({
+      kind: null,
       serverId,
       channelId: 0,
       summary: title,

@@ -453,12 +453,16 @@
   },
   "notifications": {
     "title": "Fógraí",
-    "legend": "Fógraí do theachtaireachtaí nua",
-    "explanation": "Do theachtaireachtaí nua i do chainéal, i gcainéil leanta agus i gcomhráite príobháideacha, ach amháin an comhrá atá á fheiceáil agat.",
-    "inApp": "San aip: preabfhuinneog bheag laistigh de Mumcord agus é chun tosaigh",
-    "desktop": "Deasc: fógra córais",
-    "both": "An dá cheann: preabfhuinneog agus Mumcord chun tosaigh, fógra córais seachas sin",
-    "off": "As",
+    "explanation": "Conas a insíonn Mumcord duit faoi theachtaireachtaí nua agus faoin méid a tharlaíonn ar do chuid freastalaithe. Tá rogha ar leith ag gach cineál.",
+    "messages": "Teachtaireachtaí nua",
+    "messagesHint": "Do chainéal, cainéil a leanann tú agus comhráite príobháideacha",
+    "mode": {
+      "off": "As",
+      "inApp": "San aip",
+      "desktop": "Córas",
+      "both": "An dá cheann"
+    },
+    "modesHint": "San aip: preabfhuinneog bheag laistigh de Mumcord agus é chun tosaigh. Córas: fógra ó do chóras oibriúcháin. An dá cheann: an preabfhuinneog agus Mumcord chun tosaigh, fógra córais ar shlí eile. Ní thaispeántar aon rud don chomhrá atá á fheiceáil agat ná le linn Ná Cuir Isteach Orm.",
     "activityTitle": "Fógraí gníomhaíochta",
     "activity": {
       "screenShare": "Tosaíonn duine éigin comhroinnt scáileáin",
@@ -1301,6 +1305,8 @@
   },
   "activityHistory": {
     "title": "Stair ghníomhaíochta",
+    "keep": "Coinnigh stair ghníomhaíochta tar éis atosaithe",
+    "keepHint": "Sábhálann sé cé a cheangail, a d'imigh, a d'athraigh cainéal, a roinn scáileán nó a thosaigh watch party, ionas go mbeidh an fotha ann fós tar éis atosaithe. As: tosaíonn an fotha folamh gach uair. Scriostar an méid a sábháladh nuair a mhúchtar é.",
     "clear": "Glan an stair ghníomhaíochta",
     "hint": "Baintear an fotha sábháilte do gach freastalaí.",
     "local": "Sábháilte ar an ngléas seo amháin.",

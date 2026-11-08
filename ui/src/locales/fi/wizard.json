@@ -33,6 +33,7 @@
     "voice": "Puhe",
     "setupStyle": "Käyttöönottotapa",
     "privateMessages": "Yksityisviestit",
+    "notifications": "Ilmoitukset",
     "connections": "Yhteydet",
     "features": "Ominaisuudet",
     "appearance": "Ulkoasu",
@@ -146,6 +147,10 @@
     "subtitle": "Yksityisviestit ovat kahdenkeskisiä keskusteluja. Kanavan keskustelu ei muutu tämän valinnan myötä.",
     "local": "Suodatus tapahtuu tietokoneellasi. Lähettäjille ei kerrota. Voit asettaa eri säännön palvelinkohtaisesti myöhemmin."
   },
+  "notifications": {
+    "title": "Miten Mumcordin pitäisi ilmoittaa sinulle?",
+    "subtitle": "Valitse, miten kukin uutislaji tavoittaa sinut. Voit muuttaa tätä myöhemmin kohdassa Asetukset → Ilmoitukset."
+  },
   "connections": {
     "title": "Yhteydet ja sisältö",
     "subtitle": "Jotkin ominaisuudet yhdistävät sinut suoraan muihin Mumcord-käyttäjiin, ja osa keskustelun sisällöstä ladataan muilta verkkosivuilta. Valitse, mikä sopii sinulle.",
@@ -185,6 +190,7 @@
       "identity": "Identiteetti",
       "voice": "Puhe",
       "privateMessages": "Yksityisviestit",
+      "notifications": "Ilmoitukset",
       "connections": "Yhteydet",
       "chatContent": "Keskustelun sisältö",
       "features": "Ominaisuudet",
@@ -195,10 +201,12 @@
     "identityDetail": "Tallennettu järjestelmäsi avainnippuun",
     "voiceDetail": "Kohinanvaimennus: {{noise}}",
     "pmDetail": "Oma kanavani {{channel}} · hyväksytyt keskustelut {{accepted}} · pyynnöt {{requests}}",
+    "notificationsTitle": "Uudet viestit: {{mode}}",
+    "notificationsDetail": "Toimintailmoitukset: {{on}} / {{total}} päällä",
     "contentTitle": "Linkkien esikatselut {{previews}}",
     "contentDetail": "Täysikokoiset kuvat {{images}} · historian synkronointi {{sync}}",
     "featuresTitle": "Pelinaikainen peittokuva {{overlay}}",
-    "featuresDetail": "Seuraa järjestelmän Älä häiritse -tilaa {{dnd}} · nyt soi {{playing}} · nyt pelataan {{gaming}}",
+    "featuresDetail": "Seuraa järjestelmän Älä häiritse -tilaa {{dnd}} · nyt soi {{playing}} · nyt pelataan {{gaming}} · toimintahistoria {{history}}",
     "effectsDetail": "Visuaaliset tehosteet {{effects}}",
     "startupTitle": "Käynnistä kirjautuessa {{login}}",
     "startupDetail": "Käynnistä pienennettynä {{minimized}} · mumble://-linkit {{links}}",

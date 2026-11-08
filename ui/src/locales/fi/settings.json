@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Ilmoitukset",
-    "legend": "Ilmoitukset uusista viesteistä",
-    "explanation": "Uusista viesteistä omalla kanavallasi, seuratuilla kanavilla ja yksityisissä chateissa, paitsi parhaillaan katsomassasi chatissa.",
-    "inApp": "Sovelluksessa: pieni ponnahdusikkuna Mumcordissa, kun se on edessä",
-    "desktop": "Työpöydällä: järjestelmän ilmoitus",
-    "both": "Molemmat: ponnahdusikkuna, kun Mumcord on edessä, muuten järjestelmän ilmoitus",
-    "off": "Pois",
+    "explanation": "Miten Mumcord kertoo sinulle uusista viesteistä ja palvelimillasi tapahtuvasta. Jokaisella lajilla on oma valinta.",
+    "messages": "Uudet viestit",
+    "messagesHint": "Oma kanavasi, seuratut kanavat ja yksityiskeskustelut",
+    "mode": {
+      "off": "Pois",
+      "inApp": "Sovelluksessa",
+      "desktop": "Järjestelmä",
+      "both": "Molemmat"
+    },
+    "modesHint": "Sovelluksessa: pieni ponnahdusikkuna Mumcordissa, kun se on etualalla. Järjestelmä: käyttöjärjestelmäsi ilmoitus. Molemmat: ponnahdusikkuna, kun Mumcord on etualalla, muuten järjestelmäilmoitus. Katsomastasi keskustelusta tai Älä häiritse -tilan aikana ei näytetä mitään.",
     "activityTitle": "Toimintailmoitukset",
     "activity": {
       "screenShare": "Joku aloittaa näytön jakamisen",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Toimintahistoria",
+    "keep": "Säilytä toimintahistoria uudelleenkäynnistyksen jälkeen",
+    "keepHint": "Tallentaa, kuka yhdistyi, poistui, vaihtoi kanavaa, jakoi näytön tai aloitti yhteiskatselun, jotta syöte säilyy uudelleenkäynnistyksen jälkeen. Pois: syöte alkaa joka kerta tyhjänä. Pois kytkeminen poistaa tallennetun.",
     "clear": "Tyhjennä toimintahistoria",
     "hint": "Poistaa kaikkien palvelimien tallennetun syötteen.",
     "local": "Tallennetaan vain tälle laitteelle.",

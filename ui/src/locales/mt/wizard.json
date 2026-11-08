@@ -33,6 +33,7 @@
     "voice": "Vuċi",
     "setupStyle": "Stil tas-setup",
     "privateMessages": "Messaġġi privati",
+    "notifications": "Notifiki",
     "connections": "Konnessjonijiet",
     "features": "Karatteristiċi",
     "appearance": "Dehra",
@@ -146,6 +147,10 @@
     "subtitle": "Il-messaġġi privati huma chats wieħed-għal-wieħed. Iċ-chat tal-kanal ma jaffettwax din l-għażla.",
     "local": "Il-filtrar isir fuq il-kompjuter tiegħek. Dawk li jibagħtu ma jiġux infurmati. Tista' tissettja regola differenti għal kull server aktar tard."
   },
+  "notifications": {
+    "title": "Kif għandu Mumcord jgħarrfek?",
+    "subtitle": "Agħżel kif kull tip ta' aħbar tasal għandek. Tista' tbiddlu aktar tard f'Settings → Notifiki."
+  },
   "connections": {
     "title": "Konnessjonijiet u kontenut",
     "subtitle": "Xi karatteristiċi jikkonnettjawk direttament ma' utenti oħra ta' Mumcord, u xi kontenut taċ-chat jitgħabba minn websites oħra. Agħżel dak li jaqbillek.",
@@ -185,6 +190,7 @@
       "identity": "Identità",
       "voice": "Vuċi",
       "privateMessages": "Messaġġi privati",
+      "notifications": "Notifiki",
       "connections": "Konnessjonijiet",
       "chatContent": "Kontenut taċ-chat",
       "features": "Karatteristiċi",
@@ -195,10 +201,12 @@
     "identityDetail": "Salvata fil-keychain tas-sistema tiegħek",
     "voiceDetail": "Tnaqqis tal-istorbju: {{noise}}",
     "pmDetail": "Il-kanal tiegħi {{channel}} · chats aċċettati {{accepted}} · talbiet {{requests}}",
+    "notificationsTitle": "Messaġġi ġodda: {{mode}}",
+    "notificationsDetail": "Notifiki tal-attività: {{on}} minn {{total}} mixgħula",
     "contentTitle": "Previews tal-links {{previews}}",
     "contentDetail": "Immaġini bid-daqs sħiħ {{images}} · sinkronizzazzjoni tal-istorja {{sync}}",
     "featuresTitle": "Overlay fil-logħba {{overlay}}",
-    "featuresDetail": "Segwi Do Not Disturb tas-sistema {{dnd}} · qed jindaqq issa {{playing}} · qed jilgħab issa {{gaming}}",
+    "featuresDetail": "Segwi Do Not Disturb tas-sistema {{dnd}} · qed jindaqq issa {{playing}} · qed jilgħab issa {{gaming}} · storja tal-attività {{history}}",
     "effectsDetail": "Effetti viżwali {{effects}}",
     "startupTitle": "Ibda meta tidħol {{login}}",
     "startupDetail": "Ibda minimizzat {{minimized}} · links mumble:// {{links}}",

@@ -33,6 +33,7 @@
     "voice": "Sprache",
     "setupStyle": "Einrichtungsart",
     "privateMessages": "Privatnachrichten",
+    "notifications": "Benachrichtigungen",
     "connections": "Verbindungen",
     "features": "Funktionen",
     "appearance": "Aussehen",
@@ -146,6 +147,10 @@
     "subtitle": "Privatnachrichten sind Einzelchats. Der Kanalchat ist von dieser Auswahl nicht betroffen.",
     "local": "Das Filtern passiert auf deinem Computer. Absender erfahren nichts davon. Pro Server kannst du später eine andere Regel festlegen."
   },
+  "notifications": {
+    "title": "Wie soll Mumcord dich benachrichtigen?",
+    "subtitle": "Wähle, wie dich jede Art von Neuigkeiten erreicht. Du kannst das später unter Einstellungen → Benachrichtigungen ändern."
+  },
   "connections": {
     "title": "Verbindungen und Inhalte",
     "subtitle": "Manche Funktionen verbinden dich direkt mit anderen Mumcord-Nutzern, und manche Chatinhalte werden von anderen Websites geladen. Wähle, was für dich in Ordnung ist.",
@@ -185,6 +190,7 @@
       "identity": "Identität",
       "voice": "Sprache",
       "privateMessages": "Privatnachrichten",
+      "notifications": "Benachrichtigungen",
       "connections": "Verbindungen",
       "chatContent": "Chatinhalte",
       "features": "Funktionen",
@@ -195,10 +201,12 @@
     "identityDetail": "Im Schlüsselbund deines Systems gespeichert",
     "voiceDetail": "Rauschunterdrückung: {{noise}}",
     "pmDetail": "Mein Kanal {{channel}} · akzeptierte Chats {{accepted}} · Anfragen {{requests}}",
+    "notificationsTitle": "Neue Nachrichten: {{mode}}",
+    "notificationsDetail": "Aktivitäts-Benachrichtigungen: {{on}} von {{total}} an",
     "contentTitle": "Linkvorschauen {{previews}}",
     "contentDetail": "Bilder in voller Größe {{images}} · Verlaufsabgleich {{sync}}",
     "featuresTitle": "Ingame-Overlay {{overlay}}",
-    "featuresDetail": "System-„Nicht stören“ folgen {{dnd}} · Wiedergabe-Status {{playing}} · Spiel-Status {{gaming}}",
+    "featuresDetail": "System-„Nicht stören“ folgen {{dnd}} · Wiedergabe-Status {{playing}} · Spiel-Status {{gaming}} · Aktivitätsverlauf {{history}}",
     "effectsDetail": "Visuelle Effekte {{effects}}",
     "startupTitle": "Bei Anmeldung starten {{login}}",
     "startupDetail": "Minimiert starten {{minimized}} · mumble://-Links {{links}}",

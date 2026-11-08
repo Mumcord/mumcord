@@ -33,6 +33,7 @@
     "voice": "Voice",
     "setupStyle": "Setup style",
     "privateMessages": "Private messages",
+    "notifications": "Notifications",
     "connections": "Connections",
     "features": "Features",
     "appearance": "Appearance",
@@ -146,6 +147,10 @@
     "subtitle": "Private messages are one-to-one chats. Channel chat isn't affected by this choice.",
     "local": "Filtering happens on your computer. Senders aren't told. You can set a different rule per server later."
   },
+  "notifications": {
+    "title": "How should Mumcord tell you?",
+    "subtitle": "Pick how each kind of news reaches you. You can change it later in Settings → Notifications."
+  },
   "connections": {
     "title": "Connections and content",
     "subtitle": "Some features connect you straight to other Mumcord users, and some chat content loads from other websites. Choose what's OK for you.",
@@ -185,6 +190,7 @@
       "identity": "Identity",
       "voice": "Voice",
       "privateMessages": "Private messages",
+      "notifications": "Notifications",
       "connections": "Connections",
       "chatContent": "Chat content",
       "features": "Features",
@@ -195,10 +201,12 @@
     "identityDetail": "Saved in your system keychain",
     "voiceDetail": "Noise suppression: {{noise}}",
     "pmDetail": "My channel {{channel}} · accepted chats {{accepted}} · requests {{requests}}",
+    "notificationsTitle": "New messages: {{mode}}",
+    "notificationsDetail": "Activity notifications: {{on}} of {{total}} on",
     "contentTitle": "Link previews {{previews}}",
     "contentDetail": "Full-size images {{images}} · history sync {{sync}}",
     "featuresTitle": "In-game overlay {{overlay}}",
-    "featuresDetail": "Follow system Do Not Disturb {{dnd}} · now playing {{playing}} · now gaming {{gaming}}",
+    "featuresDetail": "Follow system Do Not Disturb {{dnd}} · now playing {{playing}} · now gaming {{gaming}} · activity history {{history}}",
     "effectsDetail": "Visual effects {{effects}}",
     "startupTitle": "Start at login {{login}}",
     "startupDetail": "Start minimized {{minimized}} · mumble:// links {{links}}",
