@@ -57,7 +57,7 @@ if [[ $os == windows ]]; then
   cp -R "$installed/include/vpx" "$prefix/include/"
   cp "$installed/lib/vpx.lib" "$prefix/lib/"
 else
-  curl -fsSL "https://github.com/webmproject/libvpx/archive/refs/tags/v$LIBVPX_VERSION.tar.gz" \
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/webmproject/libvpx/archive/refs/tags/v$LIBVPX_VERSION.tar.gz" \
     | tar -xz -C "$work"
   src="$work/libvpx-$LIBVPX_VERSION"
 fi

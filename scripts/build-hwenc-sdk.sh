@@ -49,11 +49,11 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-curl -fsSL "https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n$NV_CODEC_HEADERS_VERSION.tar.gz" \
+curl -fsSL --retry 5 --retry-delay 5 "https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n$NV_CODEC_HEADERS_VERSION.tar.gz" \
   | tar -xz -C "$work"
-curl -fsSL "https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v$AMF_VERSION/AMF-headers-v$AMF_VERSION.tar.gz" \
+curl -fsSL --retry 5 --retry-delay 5 "https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v$AMF_VERSION/AMF-headers-v$AMF_VERSION.tar.gz" \
   | tar -xz -C "$work"
-curl -fsSL "https://github.com/intel/libvpl/archive/refs/tags/v$LIBVPL_VERSION.tar.gz" | tar -xz -C "$work"
+curl -fsSL --retry 5 --retry-delay 5 "https://github.com/intel/libvpl/archive/refs/tags/v$LIBVPL_VERSION.tar.gz" | tar -xz -C "$work"
 
 mkdir -p "$prefix/include" "$prefix/lib/pkgconfig"
 cp -R "$work/nv-codec-headers-n$NV_CODEC_HEADERS_VERSION/include/ffnvcodec" "$prefix/include/"
@@ -84,7 +84,7 @@ sed -e 's|^prefix=.*|prefix=${pcfiledir}/../..|' \
   "$work/install/lib/pkgconfig/vpl.pc" > "$prefix/lib/pkgconfig/vpl.pc"
 
 if [[ $os == linux ]]; then
-  curl -fsSL "https://github.com/intel/libva/archive/refs/tags/$LIBVA_VERSION.tar.gz" | tar -xz -C "$work"
+  curl -fsSL --retry 5 --retry-delay 5 "https://github.com/intel/libva/archive/refs/tags/$LIBVA_VERSION.tar.gz" | tar -xz -C "$work"
   va="$work/libva-$LIBVA_VERSION/va"
   mkdir -p "$prefix/include/va"
   # The public headers of libva and libva-drm; va_version.h is generated from the build's version.
