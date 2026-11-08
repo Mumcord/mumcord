@@ -326,11 +326,14 @@ jobs:
         run: |
           plugins=$(scripts/filter-gst-plugins.sh)
           ln -s "$PWD/src-tauri/gen/ffmpeg/gstreamer-1.0/libgstlibav.so" "$plugins/"
-          echo "GSTREAMER_PLUGINS_DIR=$plugins" >> "$GITHUB_ENV"
-          # linuxdeploy finds the plugin's FFmpeg libraries here and copies them into the AppImage.
-          echo "LD_LIBRARY_PATH=$PWD/src-tauri/gen/ffmpeg" >> "$GITHUB_ENV"
-          # linuxdeploy only finds the plugin scanner by itself on Debian paths; pass it explicitly.
-          echo "GSTREAMER_HELPERS_DIR=$(scripts/gst-helpers-dir.sh)" >> "$GITHUB_ENV"
+          helpers=$(scripts/gst-helpers-dir.sh)
+          {
+            echo "GSTREAMER_PLUGINS_DIR=$plugins"
+            # linuxdeploy finds the plugin's FFmpeg libraries here and copies them into the AppImage.
+            echo "LD_LIBRARY_PATH=$PWD/src-tauri/gen/ffmpeg"
+            # linuxdeploy only finds the plugin scanner by itself on Debian paths; pass it explicitly.
+            echo "GSTREAMER_HELPERS_DIR=$helpers"
+          } >> "$GITHUB_ENV"
 
       # --locked: the bundle is built from exactly the dependencies in Cargo.lock, the same ones the
       # notices job read (scripts/generate-notices.sh), or the build fails instead of resolving anew.
