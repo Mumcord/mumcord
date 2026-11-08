@@ -232,8 +232,9 @@ fn copyable_text(text: &str) -> Result<(), ApiError> {
 pub async fn copy_text(app: tauri::AppHandle, text: String) -> ApiResult<()> {
     use tauri_plugin_clipboard_manager::ClipboardExt as _;
     copyable_text(&text)?;
-    app.clipboard().write_text(text).map_err(|_| {
-        tracing::warn!("the clipboard did not take the copied text");
+    app.clipboard().write_text(text).map_err(|error| {
+        // The system's reason only; never the text (issue #634).
+        tracing::warn!(%error, "the clipboard did not take the copied text");
         ApiError::new(ErrorCode::Io, "the clipboard did not take the text")
     })
 }
