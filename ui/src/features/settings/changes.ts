@@ -249,6 +249,10 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   positional("minDistance", "positional.minDistance"),
   positional("maxDistance", "positional.maxDistance"),
   top("advanced", "diagnostics.logLevel", ["logLevel"]),
+  top("advanced", "diagnostics.writeToDisk", ["logToDisk"]),
+  top("advanced", "diskWrites.durableSaves", ["durableSaves"]),
+  top("advanced", "diskWrites.linkPreviewsOnDisk", ["linkPreviewsOnDisk"]),
+  top("advanced", "diskWrites.pluginRegistryCache", ["pluginRegistryCache"]),
   top("about", "about.whatsNewAuto", ["whatsNewAuto"]),
 ];
 

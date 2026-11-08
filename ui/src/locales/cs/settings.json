@@ -537,7 +537,9 @@
     "copyWhole": "Zkopírovat celý protokol",
     "openLogFolder": "Otevřít složku s protokoly",
     "logCopied": "Protokol zkopírován.",
-    "fileLabel": "Diagnostický soubor"
+    "fileLabel": "Diagnostický soubor",
+    "writeToDisk": "Zapisovat logy na disk",
+    "writeToDiskHint": "Vypnuto ponechá log pouze v paměti pro tuto relaci — na disk se nic nezapisuje."
   },
   "about": {
     "version": "Verze",
@@ -1303,5 +1305,15 @@
     "button": "Vymazat historii",
     "confirm": "Vymazat historii aktivity všech serverů? Tuto akci nelze vrátit.",
     "confirmButton": "Vymazat"
+  },
+  "diskWrites": {
+    "title": "Omezit zápisy na disk",
+    "hint": "Méně zápisů méně opotřebovává SSD disky. Každý přepínač ponechává dnešní chování, když je zapnutý.",
+    "durableSaves": "Čekat na disk při každém uložení",
+    "durableSavesHint": "Vypnuto zapisuje méně, ale výpadek proudu může ztratit posledních pár sekund historie a nastavení.",
+    "linkPreviewsOnDisk": "Ukládat náhledy odkazů na disk",
+    "linkPreviewsOnDiskHint": "Vypnuto uchovává náhledy jen v paměti pro tuto relaci.",
+    "pluginRegistryCache": "Ukládat kopii registru zásuvných modulů na disk",
+    "pluginRegistryCacheHint": "Vypnuto vždy stahuje registr znovu."
   }
 }

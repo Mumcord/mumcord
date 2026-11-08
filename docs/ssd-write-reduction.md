@@ -14,37 +14,37 @@ writes.
 
 ## 1. Inventory: every place Mumcord writes to disk
 
-| # | What | Where | Frequency | Size | Trigger |
-|---|------|-------|-----------|------|---------|
-| 1 | Log files | `<logs>/mumcord-*.log` (daily rotation, 7 kept) | **per log line, direct unbuffered write** | small, constant | every tracing event at Info level (connects, reconnects, device lists, plugins, state changes) |
-| 2 | SQLite database | `<data>/mumcord.sqlite3` + `-wal` + `-shm` (WAL, synchronous NORMAL) | one transaction per change | small–medium | see table 2 below |
-| 3 | Crash marker | `<logs>/crash/marker` | once per start, removed on clean exit | tiny | start/exit |
-| 4 | Crash context | `<logs>/crash/context` | rewritten on every `set_context` call | tiny | camera on/off, screen share start/stop, watch mode, monitor list |
-| 5 | Crash maps + reports | `<logs>/crash/*` | only on crash or "save diagnostic" | medium | crash / user action |
-| 6 | Web engine cache | WebKitGTK / WebView2 / WKWebView cache + `localStorage` + `IndexedDB` | continuous while UI runs | large | UI use, HTTP cache, UI prefs |
-| 7 | Link preview cache | `<data>/link-previews/*.json` (SHA-1 names) | one file per new preview, plus prune scans | small | first render of a link preview / inline image |
-| 8 | Compiled plugin cache | `<cache>/plugin-modules/plugins/*.cwasm` | once per plugin version | medium | plugin install/upgrade |
-| 9 | Plugin packages | `<data>/plugins/**` | on install | medium | plugin install |
-| 10 | Plugin registry cache | `<cache>/plugin-registry/*` (+ signature + etag) | each registry fetch | small | registry refresh |
-| 11 | Plugin peer key | `<data>/plugins/**/peer-key` | once per new peer | tiny | first P2P contact with a peer |
-| 12 | Camera backgrounds | `<data>/backgrounds/*.jpg` | user adds image | medium | user action |
-| 13 | Incoming file transfers | downloads dir (BufWriter, temp + rename) | per transfer | large | receiving a file |
-| 14 | Outgoing file transfers | temp zip + source files | per transfer | large | sending a file |
-| 15 | Identity export | user-chosen path (PKCS#12) | user action | medium | export |
-| 16 | Diagnostic file | user-chosen path | user action | medium | "save diagnostic info" |
-| 17 | Overlay IPC | Unix socket / named pipe | connection lifetime | tiny | overlay connect (usually tmpfs/pipe, negligible) |
-| 18 | OS/toolkit caches | app cache dir (gstreamer registry, GLib, etc.) | occasional | small–medium | framework internals |
+| #   | What                    | Where                                                                 | Frequency                                  | Size            | Trigger                                                                                        |
+| --- | ----------------------- | --------------------------------------------------------------------- | ------------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Log files               | `<logs>/mumcord-*.log` (daily rotation, 7 kept)                       | **per log line, direct unbuffered write**  | small, constant | every tracing event at Info level (connects, reconnects, device lists, plugins, state changes) |
+| 2   | SQLite database         | `<data>/mumcord.sqlite3` + `-wal` + `-shm` (WAL, synchronous NORMAL)  | one transaction per change                 | small–medium    | see table 2 below                                                                              |
+| 3   | Crash marker            | `<logs>/crash/marker`                                                 | once per start, removed on clean exit      | tiny            | start/exit                                                                                     |
+| 4   | Crash context           | `<logs>/crash/context`                                                | rewritten on every `set_context` call      | tiny            | camera on/off, screen share start/stop, watch mode, monitor list                               |
+| 5   | Crash maps + reports    | `<logs>/crash/*`                                                      | only on crash or "save diagnostic"         | medium          | crash / user action                                                                            |
+| 6   | Web engine cache        | WebKitGTK / WebView2 / WKWebView cache + `localStorage` + `IndexedDB` | continuous while UI runs                   | large           | UI use, HTTP cache, UI prefs                                                                   |
+| 7   | Link preview cache      | `<data>/link-previews/*.json` (SHA-1 names)                           | one file per new preview, plus prune scans | small           | first render of a link preview / inline image                                                  |
+| 8   | Compiled plugin cache   | `<cache>/plugin-modules/plugins/*.cwasm`                              | once per plugin version                    | medium          | plugin install/upgrade                                                                         |
+| 9   | Plugin packages         | `<data>/plugins/**`                                                   | on install                                 | medium          | plugin install                                                                                 |
+| 10  | Plugin registry cache   | `<cache>/plugin-registry/*` (+ signature + etag)                      | each registry fetch                        | small           | registry refresh                                                                               |
+| 11  | Plugin peer key         | `<data>/plugins/**/peer-key`                                          | once per new peer                          | tiny            | first P2P contact with a peer                                                                  |
+| 12  | Camera backgrounds      | `<data>/backgrounds/*.jpg`                                            | user adds image                            | medium          | user action                                                                                    |
+| 13  | Incoming file transfers | downloads dir (BufWriter, temp + rename)                              | per transfer                               | large           | receiving a file                                                                               |
+| 14  | Outgoing file transfers | temp zip + source files                                               | per transfer                               | large           | sending a file                                                                                 |
+| 15  | Identity export         | user-chosen path (PKCS#12)                                            | user action                                | medium          | export                                                                                         |
+| 16  | Diagnostic file         | user-chosen path                                                      | user action                                | medium          | "save diagnostic info"                                                                         |
+| 17  | Overlay IPC             | Unix socket / named pipe                                              | connection lifetime                        | tiny            | overlay connect (usually tmpfs/pipe, negligible)                                               |
+| 18  | OS/toolkit caches       | app cache dir (gstreamer registry, GLib, etc.)                        | occasional                                 | small–medium    | framework internals                                                                            |
 
 ### Table 2 — what writes into the SQLite database (item 2)
 
-| Trigger | How often | Question |
-|---------|-----------|----------|
-| Chat history append (one INSERT per message) | **per message** in active chat | needed? is every message worth a transaction? |
-| Settings save (full JSON blob rewrite) | per settings change | needed at change time, or defer? |
-| Own voice (mute/deafen) | per toggle | could be memory + flush later |
-| Friend "last seen" | per friend presence transition | could be throttled/batched |
-| Servers, identities, certificates, trust, favourites, follows, person settings, channel audio, channel passwords, ACLs, ban lists, plugin trust | user action | all needed, all infrequent |
-| WAL checkpoints | background, periodic | tunable |
+| Trigger                                                                                                                                         | How often                      | Question                                      |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | --------------------------------------------- |
+| Chat history append (one INSERT per message)                                                                                                    | **per message** in active chat | needed? is every message worth a transaction? |
+| Settings save (full JSON blob rewrite)                                                                                                          | per settings change            | needed at change time, or defer?              |
+| Own voice (mute/deafen)                                                                                                                         | per toggle                     | could be memory + flush later                 |
+| Friend "last seen"                                                                                                                              | per friend presence transition | could be throttled/batched                    |
+| Servers, identities, certificates, trust, favourites, follows, person settings, channel audio, channel passwords, ACLs, ban lists, plugin trust | user action                    | all needed, all infrequent                    |
+| WAL checkpoints                                                                                                                                 | background, periodic           | tunable                                       |
 
 ---
 
@@ -52,24 +52,24 @@ writes.
 
 1. **Logs** — biggest continuous writer. Info level logs lots of events
    (reconnect attempts, device enumeration, plugin activity). No buffering:
-   every line is one `write` syscall. *Question: do we need Info on disk by
-   default? Can we buffer, or offer "off"?*
+   every line is one `write` syscall. _Question: do we need Info on disk by
+   default? Can we buffer, or offer "off"?_
 2. **SQLite** — correctly already WAL + `synchronous NORMAL` (good). But chat
    history is one transaction per message and settings rewrite the whole blob.
-   *Question: can we batch or defer these two?*
+   _Question: can we batch or defer these two?_
 3. **Crash marker** — negligible, keep.
 4. **Crash context** — rewrites a file on each camera/screen-share state
-   change. *Question: debounce, or write only what the native handler needs?*
+   change. _Question: debounce, or write only what the native handler needs?_
 5. **Crash reports** — crash-only, keep.
-6. **Web engine cache** — biggest *size* writer, fully outside our code (the
-   platform webview). *Question: can we point it at RAM or disable the HTTP
-   cache?*
-7. **Link previews** — already in-memory + disk. *Question: memory-only mode?*
-8–11. **Plugins** — install-time only, mostly fine. Registry cache could be
+6. **Web engine cache** — biggest _size_ writer, fully outside our code (the
+   platform webview). _Question: can we point it at RAM or disable the HTTP
+   cache?_
+7. **Link previews** — already in-memory + disk. _Question: memory-only mode?_
+   8–11. **Plugins** — install-time only, mostly fine. Registry cache could be
    optional.
-12–16. **User-initiated files** — intentional, keep.
-17. **Overlay IPC** — tmpfs/pipe, ignore.
-18. **OS caches** — mostly fixed; cache dir can be relocated.
+   12–16. **User-initiated files** — intentional, keep.
+8. **Overlay IPC** — tmpfs/pipe, ignore.
+9. **OS caches** — mostly fixed; cache dir can be relocated.
 
 ---
 
@@ -148,7 +148,7 @@ second (or write only on the transitions that matter).
 Not in scope for now. Kept here for reference if it comes back.
 
 The webview (WebKitGTK/WebView2/WKWebView) writes HTTP cache, `CacheStorage`,
-`localStorage` and `IndexedDB`. This is the largest *volume* writer and is not
+`localStorage` and `IndexedDB`. This is the largest _volume_ writer and is not
 our code.
 
 - Disable the HTTP cache / use a private (incognito) webview session.

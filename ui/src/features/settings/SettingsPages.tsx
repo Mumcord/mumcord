@@ -8,6 +8,7 @@ import { DevicesCard, MicTestCard } from "./sections/AudioSection";
 import { BlockedMessagesGroup, BlockedUsersGroup } from "./sections/BlockedUsersGroup";
 import { BetaFeaturesCard } from "./sections/BetaFeaturesCard";
 import { CacheGroup } from "./sections/CacheGroup";
+import { DiskWritesGroup } from "./sections/DiskWritesGroup";
 import {
   ExternalContentCard,
   HistorySyncCard,
@@ -186,6 +187,7 @@ export function SettingsPageCards({
           <CrashReportsCard />
           <DiagnosticsCard {...props} />
           <CacheGroup />
+          <DiskWritesGroup {...props} />
           <LicencesCard />
         </>
       );

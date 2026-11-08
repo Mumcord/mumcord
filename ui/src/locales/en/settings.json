@@ -531,7 +531,9 @@
     "copyWhole": "Copy whole log",
     "openLogFolder": "Open log folder",
     "logCopied": "Log copied.",
-    "fileLabel": "Diagnostic file"
+    "fileLabel": "Diagnostic file",
+    "writeToDisk": "Write logs to disk",
+    "writeToDiskHint": "Off keeps the log in memory for this session only — nothing is written to disk."
   },
   "about": {
     "version": "Version",
@@ -1283,5 +1285,15 @@
     "button": "Clear history",
     "confirm": "Clear the activity history of all servers? This cannot be undone.",
     "confirmButton": "Clear"
+  },
+  "diskWrites": {
+    "title": "Reduce disk writes",
+    "hint": "Fewer writes wear solid-state drives less. Each switch keeps today's behaviour when on.",
+    "durableSaves": "Wait for disk on every save",
+    "durableSavesHint": "Off writes less, but a power cut can lose the last few seconds of history and settings.",
+    "linkPreviewsOnDisk": "Keep link previews on disk",
+    "linkPreviewsOnDiskHint": "Off keeps previews in memory for this session only.",
+    "pluginRegistryCache": "Keep plugin registry copy on disk",
+    "pluginRegistryCacheHint": "Off always fetches the registry fresh."
   }
 }

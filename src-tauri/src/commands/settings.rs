@@ -727,6 +727,10 @@ pub struct Settings {
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
+    /// Write logs to disk (default on; spec 12). Off: memory-only log.
+    pub log_to_disk: bool,
+    /// Wait for disk on every save (default on; spec 12). Off: synchronous = OFF.
+    pub durable_saves: bool,
     /// Send the default avatar to servers connected to for the first time (FR-1.47).
     pub send_default_avatar: bool,
     /// "Start Mumcord when I log in" (default off, FR-1.48d). Changing it adds or removes the
@@ -739,6 +743,8 @@ pub struct Settings {
     /// "Show link previews and embeds" (default on; FR-1.49, QA.34). Off: plain links only
     /// and `link_preview` fetches nothing.
     pub link_previews: bool,
+    /// Keep link previews on disk (default on; spec 12). Off: memory only for the session.
+    pub link_previews_on_disk: bool,
     /// "Delete cached previews after X days" (default 7; `null` never; QA.42). Previews,
     /// thumbnails and images are pruned at start, periodically and when this changes.
     pub preview_cache_days: Option<u32>,
@@ -777,6 +783,8 @@ pub struct Settings {
     pub plugins_badge_plugin: Option<String>,
     /// Optional mirror of the official plugin repository.
     pub plugins_mirror_url: Option<String>,
+    /// Keep the plugin registry copy on disk (default on; spec 12). Off: always fetch fresh.
+    pub plugin_registry_cache: bool,
     /// Developer mode (dev folders, local HTTP repositories).
     pub developer_mode: bool,
     /// Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14).
@@ -936,11 +944,14 @@ impl Settings {
                 store::LogLevel::Info => LogLevel::Info,
                 store::LogLevel::Debug => LogLevel::Debug,
             },
+            log_to_disk: s.log_to_disk,
+            durable_saves: s.durable_saves,
             send_default_avatar: s.send_default_avatar,
             autostart: s.autostart,
             start_minimized: s.start_minimized,
             connect_muted: s.connect_muted,
             link_previews: s.link_previews,
+            link_previews_on_disk: s.link_previews_on_disk,
             preview_cache_days: s.preview_cache_days,
             history_max_age_days: s.history_max_age_days,
             now_playing: s.now_playing,
@@ -961,6 +972,7 @@ impl Settings {
             plugins_all_off: s.plugins_all_off,
             plugins_badge_plugin: s.plugins_badge_plugin.clone(),
             plugins_mirror_url: s.plugins_mirror_url.clone(),
+            plugin_registry_cache: s.plugin_registry_cache,
             developer_mode: s.developer_mode,
             app_theme_id: s.app_theme_id.clone(),
             custom_themes: s
@@ -1102,11 +1114,14 @@ impl Settings {
             LogLevel::Info => store::LogLevel::Info,
             LogLevel::Debug => store::LogLevel::Debug,
         };
+        s.log_to_disk = self.log_to_disk;
+        s.durable_saves = self.durable_saves;
         s.send_default_avatar = self.send_default_avatar;
         s.autostart = self.autostart;
         s.start_minimized = self.start_minimized;
         s.connect_muted = self.connect_muted;
         s.link_previews = self.link_previews;
+        s.link_previews_on_disk = self.link_previews_on_disk;
         // 0 days would make every entry expire at once; treat it as 1.
         s.preview_cache_days = self.preview_cache_days.map(|d| d.max(1));
         s.history_max_age_days = self.history_max_age_days.map(|d| d.max(1));
@@ -1147,6 +1162,7 @@ impl Settings {
         s.plugins_badge_plugin
             .clone_from(&self.plugins_badge_plugin);
         s.plugins_mirror_url.clone_from(&self.plugins_mirror_url);
+        s.plugin_registry_cache = self.plugin_registry_cache;
         s.developer_mode = self.developer_mode;
         s.appimage_menu_entry = self.appimage_menu_entry.into();
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
@@ -1342,10 +1358,17 @@ pub async fn settings_update(
         return Err(ApiError::new(ErrorCode::Internal, e.to_string()));
     }
     let stored = engine.update_settings(settings.to_store(&previous)).await?;
-    if stored.log_level != previous.log_level
-        && let Err(e) = diag::set_log_level(diag_level(stored.log_level))
-    {
-        tracing::warn!(error = %e, "changing the log level failed");
+    if stored.log_level != previous.log_level || stored.log_to_disk != previous.log_to_disk {
+        let logs_dir = crate::portable::log_dir(&app)
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        if let Err(e) = diag::set_disk_logging(
+            stored.log_to_disk,
+            &logs_dir,
+            diag_level(stored.log_level),
+            7,
+        ) {
+            tracing::warn!(error = %e, "changing the log settings failed");
+        }
     }
     let key = active_ptt_key(&stored);
     let mouse_changed = stored.allow_mouse_buttons != previous.allow_mouse_buttons;
@@ -1433,6 +1456,12 @@ mod tests {
         ui.sounds.share_stopped = false;
         ui.sounds.banned = false;
         ui.log_level = LogLevel::Debug;
+        assert!(ui.log_to_disk && ui.durable_saves);
+        assert!(ui.link_previews_on_disk && ui.plugin_registry_cache);
+        ui.log_to_disk = false;
+        ui.durable_saves = false;
+        ui.link_previews_on_disk = false;
+        ui.plugin_registry_cache = false;
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
         ui.ptt_compatibility_mode = true;
@@ -1461,6 +1490,8 @@ mod tests {
         assert!(stored.autostart && !stored.start_minimized);
         assert!(!stored.connect_muted);
         assert!(!stored.link_previews);
+        assert!(!stored.log_to_disk && !stored.durable_saves);
+        assert!(!stored.link_previews_on_disk && !stored.plugin_registry_cache);
         assert_eq!(stored.preview_cache_days, Some(14));
         assert_eq!(stored.history_max_age_days, Some(30));
         assert!(stored.now_playing);
