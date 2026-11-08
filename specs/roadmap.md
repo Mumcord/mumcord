@@ -49,6 +49,8 @@ of the specs and what has shipped.
   and tasks.
 - `12-ssd-write-reduction-specification.md` — fewer disk writes (buffered logs, batched chat
   history, durability and cache switches). Plan in `docs/ssd-write-reduction.md`.
+- `13-plugin-platform-1-2-specification.md` — plugin API 1.2: theme tokens and the UI kit for
+  plugin web pages (0.8.0).
 
 ## Current state
 
