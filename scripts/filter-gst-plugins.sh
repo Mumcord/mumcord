@@ -2,7 +2,9 @@
 # Prints a directory of symlinks to the system GStreamer plugins minus the ones the AppImage must
 # not ship. linuxdeploy-plugin-gstreamer (run by Tauri's bundleMediaFramework) copies every file
 # from GSTREAMER_PLUGINS_DIR and bundles their libraries, so leaving a plugin out here also keeps
-# its libraries (libavcodec, libx264, ...) out of the AppImage. Usage:
+# its libraries (the system's libavcodec, libx264, ...) out of the AppImage. The build host's
+# gst-libav is left out too: the AppImage carries Mumcord's own LGPL, decoders-only build of it
+# (scripts/build-ffmpeg.sh), which the workflow adds to the directory. Usage:
 #   echo "GSTREAMER_PLUGINS_DIR=$(scripts/filter-gst-plugins.sh)" >> "$GITHUB_ENV"
 set -euo pipefail
 
@@ -21,7 +23,9 @@ excluded=(
 # gst-plugins-bad is installed on the build host only for these plugins; the rest of it stays out.
 # WebKit's MediaSource only reports Opus in WebM as playable when an Opus parser exists, and
 # without it YouTube finds no audio format and refuses to play ("can't be played in your browser").
-bad_wanted=(libgstopusparse.so)
+# WebKit's MediaSource puts h264parse (videoparsersbad) in front of the H.264 decoder for Twitch;
+# the AppImage used to borrow it from the host's gst-plugins-bad.
+bad_wanted=(libgstopusparse.so libgstvideoparsersbad.so)
 bad=()
 if dpkg-query -W gstreamer1.0-plugins-bad >/dev/null 2>&1; then
   mapfile -t bad < <(dpkg-query -L gstreamer1.0-plugins-bad | grep '/gstreamer-1.0/[^/]*\.so$' | xargs -r -n1 basename)

@@ -4,6 +4,7 @@
 /src-tauri/gen/schemas/
 /src-tauri/gen/overlay-layer/
 /src-tauri/gen/onnxruntime/
+/src-tauri/gen/ffmpeg/
 node_modules/
 *.tsbuildinfo
 

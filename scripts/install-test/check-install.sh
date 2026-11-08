@@ -3,8 +3,9 @@
 # (make-fake-release.sh) served over http: a tampered checksum aborts without installing,
 # `curl | sh` installs the expected kind of package with a desktop icon, --uninstall removes
 # everything and a second --uninstall finds nothing. Output that is not a terminal must be plain
-# text without escape codes. For the AppImage it also checks the gst-libav
-# question in a pseudo-terminal, with a stub pacman instead of the real package manager.
+# text without escape codes. For the AppImage it also checks the output in a pseudo-terminal:
+# colours and Unicode marks, none with TERM=dumb or NO_COLOR, and no gst-libav question (every
+# package brings its own H.264 decoder).
 #
 # Usage: check-install.sh deb|rpm|appimage GOOD_URL BAD_URL
 #   GOOD_URL serves the fake release, BAD_URL the same files with a wrong checksum.
@@ -43,19 +44,20 @@ printf '%s\n' "$out" | grep -q "checksum mismatch" || fail "no checksum mismatch
 assert_nothing_installed "after the checksum mismatch"
 
 step "install with curl | sh"
-out=$(curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good TERM=xterm-256color sh -s -- --yes --desktop-icon 2>&1)
+out=$(curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good TERM=xterm-256color sh -s -- --yes --desktop-icon 2>&1) || {
+    printf '%s\n' "$out"
+    fail "the installer failed"
+}
 printf '%s\n' "$out"
 ! printf '%s\n' "$out" | grep -qF "$esc" || fail "escape codes in output that is not a terminal"
 case $expected in
 deb)
     dpkg-query -W mumcord >/dev/null || fail "the .deb is not installed"
     [ ! -e "$appimage" ] || fail "AppImage installed instead of the .deb"
-    ! printf '%s\n' "$out" | grep -qF "Some videos need H.264 support" || fail "codec hint shown for a native package"
     ;;
 rpm)
     rpm -q Mumcord >/dev/null || fail "the .rpm is not installed"
     [ ! -e "$appimage" ] || fail "AppImage installed instead of the .rpm"
-    ! printf '%s\n' "$out" | grep -qF "Some videos need H.264 support" || fail "codec hint shown for a native package"
     ;;
 appimage)
     [ -x "$appimage" ] || fail "AppImage not installed"
@@ -63,60 +65,39 @@ appimage)
     grep -qx 'X-Mumcord-Managed=true' "$entry" || fail "menu entry lacks the managed marker"
     grep -qx 'MimeType=x-scheme-handler/mumble;' "$entry" || fail "menu entry is not the mumble:// handler"
     [ -f "$HOME/.local/share/icons/hicolor/128x128/apps/app.mumcord.client.png" ] || fail "icon missing"
-    printf '%s\n' "$out" | grep -qF "Some videos need H.264 support" || fail "no codec hint after the AppImage install"
     ;;
 esac
 [ "$expected" = appimage ] || [ -x /usr/bin/mumcord ] || fail "/usr/bin/mumcord missing"
 [ -f "$desktop" ] || fail "desktop icon missing"
 
-# codec_run ANSWER [VAR=VALUE...]: runs the installer in a pseudo-terminal (script(1)) with the
-# given environment, so it can ask on /dev/tty, types ANSWER and prints what the terminal showed.
-codec_run() {
-    answer=$1
-    shift
-    printf '%s\n' "$answer" | script -qec "env $* sh $installer --no-desktop-icon" /dev/null 2>&1
+# tty_run [VAR=VALUE...]: runs the installer in a pseudo-terminal (script(1)) with the given
+# environment, answers no to any question and prints what the terminal showed.
+tty_run() {
+    printf 'n\n' | script -qec "env $* sh $installer --no-desktop-icon" /dev/null 2>&1
 }
 
 if [ "$expected" = appimage ]; then
     installer=$(mktemp)
     curl -fsSL -o "$installer" "$good/install.sh"
-    stub=$(mktemp -d)
-    # Knows only gst-libav: installed once $stub/gst-libav exists, and -S records the call.
-    cat >"$stub/pacman" <<'EOF'
-#!/bin/sh
-here=$(dirname "$0")
-case $1 in
--Q) [ "$2" = gst-libav ] && [ -e "$here/gst-libav" ] ;;
--S) printf '%s\n' "$*" >>"$here/calls" && touch "$here/gst-libav" ;;
-*) exit 1 ;;
-esac
-EOF
-    chmod 755 "$stub/pacman"
-    export PATH="$stub:$PATH" MUMCORD_RELEASE_URL="$good"
+    export MUMCORD_RELEASE_URL="$good"
 
-    step "gst-libav missing, answer no: only the hint"
-    out=$(codec_run n TERM=xterm-256color LANG=C.UTF-8)
+    step "terminal: colours and Unicode marks, no gst-libav question"
+    out=$(tty_run TERM=xterm-256color LANG=C.UTF-8)
     printf '%s\n' "$out"
     printf '%s\n' "$out" | grep -qF "$esc" || fail "no colours in a terminal"
     printf '%s\n' "$out" | grep -qF "✓" || fail "no Unicode marks in a UTF-8 terminal"
-    printf '%s\n' "$out" | grep -qF "Install gst-libav now? [y/N]" || fail "no gst-libav question"
-    printf '%s\n' "$out" | grep -qF "Install gst-libav: sudo pacman -S gst-libav" || fail "no manual command after no"
-    [ ! -e "$stub/calls" ] || fail "pacman -S ran although the answer was no"
+    ! printf '%s\n' "$out" | grep -qF "gst-libav" || fail "gst-libav question or hint"
 
-    step "gst-libav missing, answer yes: installs it"
-    out=$(codec_run y TERM=dumb)
-    ! printf '%s\n' "$out" | grep -qF "$esc" || fail "escape codes despite TERM=dumb"
+    step "TERM=dumb: plain text"
+    out=$(tty_run TERM=dumb)
     printf '%s\n' "$out"
-    grep -qx -- "-S --needed --noconfirm gst-libav" "$stub/calls" || fail "pacman -S gst-libav did not run"
-    printf '%s\n' "$out" | grep -qF "gst-libav installed" || fail "no success message"
+    ! printf '%s\n' "$out" | grep -qF "$esc" || fail "escape codes despite TERM=dumb"
 
-    step "gst-libav installed: no question; NO_COLOR: plain text"
-    out=$(codec_run n TERM=xterm-256color LANG=C.UTF-8 NO_COLOR=1)
+    step "NO_COLOR: plain text"
+    out=$(tty_run TERM=xterm-256color LANG=C.UTF-8 NO_COLOR=1)
     printf '%s\n' "$out"
     ! printf '%s\n' "$out" | grep -qF "$esc" || fail "escape codes despite NO_COLOR"
-    ! printf '%s\n' "$out" | grep -qF "Install gst-libav" || fail "gst-libav question or hint although it is installed"
 
-    export PATH="${PATH#"$stub:"}"
     unset MUMCORD_RELEASE_URL
 fi
 
