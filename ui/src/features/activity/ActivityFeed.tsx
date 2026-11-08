@@ -60,6 +60,8 @@ export function ActivityFeed({ serverId }: { serverId: number | null }) {
       };
     }
     if (!("live" in event) || !event.started) return undefined;
+    // Your own share, party or activity: you are already in it, so there is nothing to watch or join.
+    if (event.self) return undefined;
     const live = event.live;
     if (live.kind === "screenShare") {
       return () => {
