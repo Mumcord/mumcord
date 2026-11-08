@@ -20,6 +20,8 @@ import { resetMembersTabStore } from "./membersTabStore";
 
 const SERVER = 1;
 const BEN = 3;
+/** The mock's own session. */
+const SELF = 1;
 /** A session the seed does not have, so its first upsert reads as a new person. */
 const NEWCOMER = 20;
 
@@ -232,6 +234,31 @@ describe("activity feed", () => {
     expect(within(ended).queryByRole("button", { name: /^Watch/ })).toBeNull();
     expect(within(ended).queryByText("· live")).toBeNull();
     expect(rowWith("Ben stopped a screen share")).not.toHaveAccessibleName(/^Watch/);
+  });
+
+  it("offers no Watch or Join on your own share or party (#664)", async () => {
+    render(<ActivityFeed serverId={SERVER} />);
+    await settle();
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: SERVER, shares: [share(SELF), share(BEN)] });
+      api.mock.emit("watchPartyChanged", { serverId: SERVER, party: party(SELF, 1) });
+    });
+
+    const own = rowWith("You started a screen share");
+    expect(within(own).getByText("· live")).toBeInTheDocument();
+    expect(within(own).queryByRole("button", { name: /^(Watch|Join)/ })).toBeNull();
+    expect(own).not.toHaveClass("activity-row--clickable");
+    fireEvent.click(own);
+    expect(watchedShare()).toBeNull();
+
+    const ownParty = rowWith("You started a watch party");
+    expect(within(ownParty).queryByRole("button", { name: /^(Watch|Join)/ })).toBeNull();
+
+    expect(
+      within(rowWith("Ben started a screen share")).getByRole("button", {
+        name: "Watch Ben's screen share",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("opens the person from the name without running the row's action (#605)", async () => {
