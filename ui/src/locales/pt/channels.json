@@ -121,5 +121,24 @@
     "resultAll": "Movidas {{people}} para {{channel}}.",
     "resultSome": "Movidas {{moved}} de {{people}} para {{channel}}. As restantes foram recusadas.",
     "busy": "Já se estão a mover pessoas…"
+  },
+  "drag": {
+    "into": "Mover para {{channel}}",
+    "above": "Colocar acima de {{channel}}",
+    "below": "Colocar abaixo de {{channel}}",
+    "self": "Não pode ir para dentro de si mesmo",
+    "subChannel": "Não pode ir para um subcanal próprio",
+    "confirmTitle": "Mover «{{channel}}»?",
+    "alongAll": "Com {{channel}} movem-se: {{subChannels}} e {{people}}.",
+    "alongSubChannels": "Com {{channel}} movem-se: {{subChannels}}.",
+    "alongPeople": "Com {{channel}} movem-se: {{people}}.",
+    "alongNone": "Só {{channel}} é movido; está vazio.",
+    "subChannels_one": "{{count}} subcanal",
+    "subChannels_many": "{{count}} subcanais",
+    "subChannels_other": "{{count}} subcanais",
+    "pathTo": "para",
+    "confirm": "Mover",
+    "failedTitle": "Não foi possível mover {{channel}}",
+    "refusedParent": "Não tens permissão para mover canais para {{channel}}."
   }
 }

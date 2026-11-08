@@ -116,5 +116,23 @@
     "resultAll": "Μετακινήθηκαν {{people}} σε {{channel}}.",
     "resultSome": "Μετακινήθηκαν {{moved}} από {{people}} σε {{channel}}. Τα υπόλοιπα απορρίφθηκαν.",
     "busy": "Γίνεται ήδη μετακίνηση ατόμων…"
+  },
+  "drag": {
+    "into": "Μετακίνηση στο {{channel}}",
+    "above": "Τοποθέτηση πάνω από το {{channel}}",
+    "below": "Τοποθέτηση κάτω από το {{channel}}",
+    "self": "Δεν μπορεί να μπει στον εαυτό του",
+    "subChannel": "Δεν μπορεί να μπει σε δικό του υποκανάλι",
+    "confirmTitle": "Μετακίνηση του «{{channel}}»;",
+    "alongAll": "Μαζί με το {{channel}} μετακινούνται: {{subChannels}} και {{people}}.",
+    "alongSubChannels": "Μαζί με το {{channel}} μετακινούνται: {{subChannels}}.",
+    "alongPeople": "Μαζί με το {{channel}} μετακινούνται: {{people}}.",
+    "alongNone": "Μετακινείται μόνο το {{channel}}· είναι άδειο.",
+    "subChannels_one": "{{count}} υποκανάλι",
+    "subChannels_other": "{{count}} υποκανάλια",
+    "pathTo": "σε",
+    "confirm": "Μετακίνηση",
+    "failedTitle": "Δεν ήταν δυνατή η μετακίνηση του {{channel}}",
+    "refusedParent": "Δεν έχεις δικαίωμα να μετακινείς κανάλια στο {{channel}}."
   }
 }

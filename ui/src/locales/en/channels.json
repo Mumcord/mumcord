@@ -116,5 +116,23 @@
     "resultAll": "Moved {{people}} to {{channel}}.",
     "resultSome": "Moved {{moved}} of {{people}} to {{channel}}. The rest were refused.",
     "busy": "Already moving people…"
+  },
+  "drag": {
+    "into": "Move into {{channel}}",
+    "above": "Place above {{channel}}",
+    "below": "Place below {{channel}}",
+    "self": "Can’t go into itself",
+    "subChannel": "Can’t go into its own sub-channel",
+    "confirmTitle": "Move “{{channel}}”?",
+    "alongAll": "{{channel}}, its {{subChannels}} and {{people}} move along.",
+    "alongSubChannels": "{{channel}} and its {{subChannels}} move along.",
+    "alongPeople": "{{channel}} and the {{people}} in it move along.",
+    "alongNone": "Only {{channel}} moves; it is empty.",
+    "subChannels_one": "{{count}} sub-channel",
+    "subChannels_other": "{{count}} sub-channels",
+    "pathTo": "to",
+    "confirm": "Move",
+    "failedTitle": "Couldn’t move {{channel}}",
+    "refusedParent": "You don’t have permission to move channels into {{channel}}."
   }
 }

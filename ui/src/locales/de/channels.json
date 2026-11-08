@@ -116,5 +116,23 @@
     "resultAll": "{{people}} nach {{channel}} verschoben.",
     "resultSome": "{{moved}} von {{people}} nach {{channel}} verschoben. Der Rest wurde abgelehnt.",
     "busy": "Es werden bereits Personen verschoben…"
+  },
+  "drag": {
+    "into": "In {{channel}} verschieben",
+    "above": "Über {{channel}} einordnen",
+    "below": "Unter {{channel}} einordnen",
+    "self": "Kann nicht in sich selbst",
+    "subChannel": "Kann nicht in den eigenen Unterkanal",
+    "confirmTitle": "„{{channel}}“ verschieben?",
+    "alongAll": "Mit {{channel}} werden verschoben: {{subChannels}} und {{people}}.",
+    "alongSubChannels": "Mit {{channel}} werden verschoben: {{subChannels}}.",
+    "alongPeople": "Mit {{channel}} werden verschoben: {{people}}.",
+    "alongNone": "Nur {{channel}} wird verschoben; der Kanal ist leer.",
+    "subChannels_one": "{{count}} Unterkanal",
+    "subChannels_other": "{{count}} Unterkanäle",
+    "pathTo": "nach",
+    "confirm": "Verschieben",
+    "failedTitle": "{{channel}} konnte nicht verschoben werden",
+    "refusedParent": "Dir fehlt das Recht, Kanäle nach {{channel}} zu verschieben."
   }
 }

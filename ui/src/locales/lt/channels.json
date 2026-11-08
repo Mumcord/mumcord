@@ -126,5 +126,25 @@
     "resultAll": "Perkelta {{people}} į {{channel}}.",
     "resultSome": "Perkelta {{moved}} iš {{people}} į {{channel}}. Likusieji atmesti.",
     "busy": "Žmonės jau perkeliami…"
+  },
+  "drag": {
+    "into": "Perkelti į {{channel}}",
+    "above": "Dėti virš {{channel}}",
+    "below": "Dėti po {{channel}}",
+    "self": "Negalima perkelti į save patį",
+    "subChannel": "Negalima perkelti į savo pokanalį",
+    "confirmTitle": "Perkelti „{{channel}}“?",
+    "alongAll": "Kartu su {{channel}} perkeliama: {{subChannels}} ir {{people}}.",
+    "alongSubChannels": "Kartu su {{channel}} perkeliama: {{subChannels}}.",
+    "alongPeople": "Kartu su {{channel}} perkeliama: {{people}}.",
+    "alongNone": "Perkeliamas tik {{channel}}; jis tuščias.",
+    "subChannels_one": "{{count}} pokanalis",
+    "subChannels_few": "{{count}} pokanaliai",
+    "subChannels_many": "{{count}} pokanalio",
+    "subChannels_other": "{{count}} pokanalių",
+    "pathTo": "į",
+    "confirm": "Perkelti",
+    "failedTitle": "Nepavyko perkelti {{channel}}",
+    "refusedParent": "Neturi teisės perkelti kanalų į {{channel}}."
   }
 }

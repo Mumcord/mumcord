@@ -16,7 +16,10 @@ import {
   type ChannelMenuRequest,
   type ChannelTreeHandle,
 } from "./ChannelTree";
+import type { ChannelMovePlan } from "./channelDrag";
 import { JumpToChannelButton } from "./JumpToChannelButton";
+import { MoveChannelDialog } from "./MoveChannelDialog";
+import { moveChannel } from "./moveChannel";
 import { isHiddenBot } from "./mumcord";
 import { ServerSectionHeader } from "./ServerSectionHeader";
 import {
@@ -54,6 +57,7 @@ export function ChannelsPanel({
   channelMenu,
 }: ChannelsPanelProps) {
   const { t } = useTranslation("channels");
+  const { t: tAdmin } = useTranslation("admin");
   const readOnly = useReadOnly();
   const state = useServerState();
   const { conversation, select } = useSelectedConversation();
@@ -133,6 +137,22 @@ export function ChannelsPanel({
       });
     },
     [serverId, t],
+  );
+
+  // A dragged channel (issue #676): a new parent asks first, a new spot among siblings does not.
+  const [pendingMove, setPendingMove] = useState<ChannelMovePlan | null>(null);
+  const sendMove = useCallback(
+    (plan: ChannelMovePlan) => {
+      if (serverId !== null) void moveChannel(t, tAdmin, serverId, plan);
+    },
+    [serverId, t, tAdmin],
+  );
+  const dropChannel = useCallback(
+    (plan: ChannelMovePlan) => {
+      if (plan.toParentId === plan.fromParentId) sendMove(plan);
+      else setPendingMove(plan);
+    },
+    [sendMove],
   );
 
   if (state.serverId === null) {
@@ -225,10 +245,23 @@ export function ChannelsPanel({
             channelAction={channelAction}
             channelMenu={channelMenu}
             onMovePeople={movePeople}
+            onMoveChannel={dropChannel}
             filter={filter}
           />
         </BigServerGate>
       </div>
+      {pendingMove !== null && (
+        <MoveChannelDialog
+          plan={pendingMove}
+          onConfirm={() => {
+            setPendingMove(null);
+            sendMove(pendingMove);
+          }}
+          onClose={() => {
+            setPendingMove(null);
+          }}
+        />
+      )}
       {joinError && (
         <p role="alert" className="channels-error">
           {joinError}

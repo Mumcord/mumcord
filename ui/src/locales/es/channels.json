@@ -121,5 +121,24 @@
     "resultAll": "Se movieron {{people}} a {{channel}}.",
     "resultSome": "Se movieron {{moved}} de {{people}} a {{channel}}. El resto fue rechazado.",
     "busy": "Ya se están moviendo personas…"
+  },
+  "drag": {
+    "into": "Mover a {{channel}}",
+    "above": "Colocar encima de {{channel}}",
+    "below": "Colocar debajo de {{channel}}",
+    "self": "No puede ir dentro de sí mismo",
+    "subChannel": "No puede ir a su propio subcanal",
+    "confirmTitle": "¿Mover «{{channel}}»?",
+    "alongAll": "Con {{channel}} se mueven: {{subChannels}} y {{people}}.",
+    "alongSubChannels": "Con {{channel}} se mueven: {{subChannels}}.",
+    "alongPeople": "Con {{channel}} se mueven: {{people}}.",
+    "alongNone": "Solo se mueve {{channel}}; está vacío.",
+    "subChannels_one": "{{count}} subcanal",
+    "subChannels_many": "{{count}} subcanales",
+    "subChannels_other": "{{count}} subcanales",
+    "pathTo": "a",
+    "confirm": "Mover",
+    "failedTitle": "No se pudo mover {{channel}}",
+    "refusedParent": "No tienes permiso para mover canales a {{channel}}."
   }
 }
