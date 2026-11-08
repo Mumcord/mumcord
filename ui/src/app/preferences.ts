@@ -44,6 +44,8 @@ export interface Preferences {
       | "videoDuckingPercent"
       | "globalHotkeys"
       | "hotkeys"
+      | "pttKey"
+      | "cameraHotkey"
       | "cameraMirrorSelf"
       | "cameraReduceMotion"
       | HintPreference

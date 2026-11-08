@@ -1,6 +1,8 @@
 import type { Ref } from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
+import { useIsMacos } from "../../api/useIsMacos";
+import { ariaShortcut, keyHint } from "../hotkeys/hotkeyKeys";
 import type { ChannelPresence } from "./channelPresence";
 import "./membersToggle.css";
 
@@ -11,8 +13,8 @@ export interface MembersToggleProps {
   controls: string;
   /** The selected channel's people; `null` in a private chat. */
   presence: ChannelPresence | null;
-  /** Display text of the shortcut, e.g. "Ctrl+Shift+M". */
-  shortcut: string;
+  /** The key that shows and hides the column (issue #584), e.g. "Ctrl+Shift+U"; `null` for none. */
+  shortcut: string | null;
   onToggle: () => void;
   buttonRef?: Ref<HTMLButtonElement>;
 }
@@ -31,6 +33,7 @@ export function MembersToggle({
   buttonRef,
 }: MembersToggleProps) {
   const { t } = useTranslation("members");
+  const macos = useIsMacos();
   const action = expanded ? t("toggle.hide") : t("toggle.show");
   const summary = expanded ? null : presence;
   const talking = summary ? talkingText(t, summary.talkers) : "";
@@ -41,11 +44,11 @@ export function MembersToggle({
       className="members-toggle"
       aria-expanded={expanded}
       aria-controls={controls}
-      aria-keyshortcuts="Control+Shift+M Meta+Shift+M"
+      aria-keyshortcuts={shortcut === null ? undefined : ariaShortcut(shortcut)}
       aria-label={summary ? t("toggle.showCount", { count: summary.count }) : action}
       data-tooltip={action}
       data-tooltip-placement="bottom"
-      data-tooltip-shortcut={shortcut}
+      data-tooltip-shortcut={shortcut === null ? "" : keyHint(shortcut, macos)}
       data-tooltip-detail={talking}
       onClick={onToggle}
     >

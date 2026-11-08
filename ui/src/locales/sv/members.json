@@ -105,8 +105,7 @@
     "talkingOne": "{{name}} pratar",
     "talkingTwo": "{{first}} och {{second}} pratar",
     "talkingMore_one": "{{name}} och {{count}} annan pratar",
-    "talkingMore_other": "{{name}} och {{count}} andra pratar",
-    "shortcut": "Ctrl+Skift+M"
+    "talkingMore_other": "{{name}} och {{count}} andra pratar"
   },
   "revokeConsent": {
     "title": "Återkalla chattsamtycket för {{name}}?",

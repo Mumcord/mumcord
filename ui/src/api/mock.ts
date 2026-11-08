@@ -1030,7 +1030,7 @@ function person(session: number, name: string, channelId: number, certHash: stri
 
 /** Mumcord's own shortcuts, as the engine refuses them for global hotkeys. */
 const MOCK_IN_APP_SHORTCUTS: Partial<Record<string, InAppShortcut>> = {
-  "Ctrl+Shift+M": "memberColumn",
+  "Ctrl+Shift+U": "memberColumn",
   "Ctrl+Shift+N": "notificationCentre",
   "Ctrl+K": "search",
   "Ctrl+F": "search",

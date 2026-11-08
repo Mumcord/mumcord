@@ -117,8 +117,7 @@
     "talkingMore_two": "{{name}} u {{count}} oħrajn qed jitkellmu",
     "talkingMore_few": "{{name}} u {{count}} oħrajn qed jitkellmu",
     "talkingMore_many": "{{name}} u {{count}} oħrajn qed jitkellmu",
-    "talkingMore_other": "{{name}} u {{count}} oħrajn qed jitkellmu",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} u {{count}} oħrajn qed jitkellmu"
   },
   "revokeConsent": {
     "title": "Tirtira l-kunsens għaċ-chat għal {{name}}?",

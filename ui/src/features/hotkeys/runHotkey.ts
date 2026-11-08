@@ -113,3 +113,22 @@ export async function runHotkey(action: HotkeyAction, previous: VoicePlace | nul
       return;
   }
 }
+
+/**
+ * The camera default (issue #584) while the window has the focus: the same thing the engine's
+ * camera hotkey does (FR-8.20) — off at once while it is on, otherwise the preview opens.
+ */
+export async function runCameraHotkey(): Promise<void> {
+  const api = getApi();
+  const view = await api.cameraView();
+  if (view !== null && (view.state === "requesting" || view.state === "onAir")) {
+    await api.cameraTurnOff(view.serverId);
+    return;
+  }
+  // The preview is already open, or there is no voice server to use the camera on.
+  if (view?.state === "preview") return;
+  const voice = getVoiceServerId();
+  if (voice === null) return;
+  // The engine reports the preview, and the dialog opens with it.
+  await api.cameraPreviewStart(voice);
+}

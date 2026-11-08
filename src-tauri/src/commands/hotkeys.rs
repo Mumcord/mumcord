@@ -123,7 +123,7 @@ pub enum HotkeySlot {
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum InAppShortcut {
-    /// Ctrl+Shift+M: show or hide the member column.
+    /// Ctrl+Shift+U: show or hide the member column.
     MemberColumn,
     /// Ctrl+Shift+N: the notification centre.
     NotificationCentre,

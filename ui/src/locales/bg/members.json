@@ -105,8 +105,7 @@
     "talkingOne": "{{name}} говори",
     "talkingTwo": "{{first}} и {{second}} говорят",
     "talkingMore_one": "{{name}} и още {{count}} говорят",
-    "talkingMore_other": "{{name}} и още {{count}} говорят",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} и още {{count}} говорят"
   },
   "revokeConsent": {
     "title": "Да се оттегли ли съгласието за чат с {{name}}?",

@@ -6,10 +6,10 @@ import { lazy } from "react";
 import { useTranslation } from "react-i18next";
 import { LazyBoundary } from "../components/LazyBoundary";
 import { getApi } from "../api";
-import { useIsMacos } from "../api/useIsMacos";
 import { useView } from "./view";
 import { useServerStateOf, useShownServerId, useVoiceServerId } from "../features/channels";
 import { useMembersColumn } from "./membersCollapse";
+import { useActionKey } from "../features/hotkeys/defaultHotkeys";
 import { NotificationBell } from "../features/notifications";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
@@ -258,17 +258,16 @@ export function ChatMount() {
 }
 /** The members button in the chat header, wired to the shell's member column (issue #165). */
 function MembersToggleMount() {
-  const { t } = useTranslation("members");
   const column = useMembersColumn();
   const presence = useChannelPresence();
-  const macos = useIsMacos();
+  const shortcut = useActionKey("toggleMemberColumn");
   if (column === null) return null;
   return (
     <MembersToggle
       expanded={column.shown}
       controls={column.controls}
       presence={presence}
-      shortcut={macos ? "⌘⇧M" : t("toggle.shortcut")}
+      shortcut={shortcut}
       onToggle={column.toggle}
       buttonRef={column.buttonRef}
     />

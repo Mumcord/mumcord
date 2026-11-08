@@ -13,7 +13,6 @@ import { SkipLinks } from "../a11y";
 import { onUiHotkey } from "../features/hotkeys";
 import { ColumnResizeHandle } from "./ResizeHandle";
 import {
-  isMembersShortcut,
   loadMembersCollapsed,
   MembersColumnContext,
   saveMembersCollapsed,
@@ -97,12 +96,7 @@ export function AppShell({
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (inert || event.defaultPrevented) return;
-      if (overlayShown && event.key === "Escape") {
-        event.preventDefault();
-        toggleMembers();
-        return;
-      }
-      if (!isMembersShortcut(event)) return;
+      if (!overlayShown || event.key !== "Escape") return;
       event.preventDefault();
       toggleMembers();
     };
@@ -112,7 +106,8 @@ export function AppShell({
     };
   }, [inert, overlayShown, toggleMembers]);
 
-  // The global hotkey also works while the window is in the background (#64).
+  // The hotkey runs here: the default Ctrl+Shift+U while the window has the focus (issue #584),
+  // or the user's own key, also while Mumcord is in the background (#64).
   useEffect(() => onUiHotkey("toggleMemberColumn", toggleMembers), [toggleMembers]);
 
   // Hiding takes the focused element with it: the members button takes the focus instead.

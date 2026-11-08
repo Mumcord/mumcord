@@ -14,7 +14,7 @@ function HeaderButton() {
       expanded={column.shown}
       controls={column.controls}
       presence={{ count: 3, talkers: [] }}
-      shortcut="Ctrl+Shift+M"
+      shortcut="Ctrl+Shift+U"
       onToggle={column.toggle}
       buttonRef={column.buttonRef}
     />
@@ -103,23 +103,6 @@ describe("AppShell member column", () => {
     render(<AppShell slots={slots()} />);
     expect(screen.getByRole("button", { name: "Show members (3)" })).toBeInTheDocument();
     expect(column()).toHaveAttribute("inert");
-  });
-
-  it.each([
-    ["Ctrl", { ctrlKey: true }],
-    ["Cmd", { metaKey: true }],
-  ])("toggles the column with %s+Shift+M", (_name, modifier) => {
-    render(<AppShell slots={slots()} />);
-    fireEvent.keyDown(window, { key: "m", shiftKey: true, ...modifier });
-    expect(screen.getByRole("button", { name: "Show members (3)" })).toBeInTheDocument();
-    fireEvent.keyDown(window, { key: "M", shiftKey: true, ...modifier });
-    expect(screen.getByRole("button", { name: "Hide members" })).toBeInTheDocument();
-  });
-
-  it("ignores the shortcut while the shell is inert", () => {
-    render(<AppShell slots={slots()} inert />);
-    fireEvent.keyDown(window, { key: "m", shiftKey: true, ctrlKey: true });
-    expect(localStorage.getItem("mumcord.membersCollapsed")).toBeNull();
   });
 
   it("hides the column on narrow windows and opens it as an overlay below the header", () => {

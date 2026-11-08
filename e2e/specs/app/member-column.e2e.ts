@@ -1,6 +1,6 @@
 // Issue #165 (FR-3.90): the members button in the chat header hides the member column completely
 // and shows it again; while hidden it shows the channel's head count and a green dot while someone
-// talks, with the talker named in its tooltip. Ctrl+Shift+M toggles it, and the state survives a
+// talks, with the talker named in its tooltip. Ctrl+Shift+U toggles it, and the state survives a
 // restart. The narrow-window overlay is covered by the vitest suite (no window manager here).
 import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
@@ -97,10 +97,10 @@ describe("member column (#165)", () => {
     await $(".members-toggle__talking").waitForExist({ reverse: true, timeout: 15_000 });
   });
 
-  it("toggles the column with Ctrl+Shift+M", async () => {
-    await browser.keys(["Control", "Shift", "m"]);
+  it("toggles the column with the default Ctrl+Shift+U", async () => {
+    await browser.keys(["Control", "Shift", "u"]);
     await expectShown(true);
-    await browser.keys(["Control", "Shift", "m"]);
+    await browser.keys(["Control", "Shift", "u"]);
     await expectShown(false);
   });
 

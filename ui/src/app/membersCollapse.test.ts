@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isMembersShortcut, loadMembersCollapsed, saveMembersCollapsed } from "./membersCollapse";
+import { loadMembersCollapsed, saveMembersCollapsed } from "./membersCollapse";
 
 function memoryStorage(initial: Record<string, string> = {}): Storage {
   const data = new Map(Object.entries(initial));
@@ -20,16 +20,6 @@ function memoryStorage(initial: Record<string, string> = {}): Storage {
     },
   };
 }
-
-const shortcut = (overrides: Partial<Parameters<typeof isMembersShortcut>[0]>) =>
-  isMembersShortcut({
-    key: "m",
-    ctrlKey: false,
-    metaKey: false,
-    shiftKey: false,
-    altKey: false,
-    ...overrides,
-  });
 
 describe("member column collapse", () => {
   it("remembers the collapsed state", () => {
@@ -63,15 +53,5 @@ describe("member column collapse", () => {
       },
     };
     expect(loadMembersCollapsed(broken)).toBe(false);
-  });
-
-  it("accepts Ctrl+Shift+M and Cmd+Shift+M only", () => {
-    expect(shortcut({ ctrlKey: true, shiftKey: true })).toBe(true);
-    expect(shortcut({ metaKey: true, shiftKey: true })).toBe(true);
-    expect(shortcut({ key: "M", ctrlKey: true, shiftKey: true })).toBe(true);
-    expect(shortcut({ ctrlKey: true })).toBe(false);
-    expect(shortcut({ shiftKey: true })).toBe(false);
-    expect(shortcut({ ctrlKey: true, shiftKey: true, altKey: true })).toBe(false);
-    expect(shortcut({ key: "n", ctrlKey: true, shiftKey: true })).toBe(false);
   });
 });

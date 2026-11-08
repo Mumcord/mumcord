@@ -55,6 +55,13 @@ function field(action: string) {
   return screen.getByRole("button", { name: new RegExp(`^${action}`) });
 }
 
+/** The whole row of an action, defaults and notes included. */
+function row(action: string) {
+  const element = field(action).closest(".hotkey-row");
+  if (element === null) throw new Error(`no row for ${action}`);
+  return element as HTMLElement;
+}
+
 function press(target: HTMLElement, code: string, modifiers: { ctrlKey?: boolean } = {}) {
   fireEvent.keyDown(target, { code, key: code, ...modifiers });
 }
@@ -69,22 +76,39 @@ function record(action: string, code: string, modifiers: { ctrlKey?: boolean } =
 // These tests render big lists and pass in seconds alone, but can exceed the default 5 s timeout
 // when the whole suite runs in parallel on a loaded machine.
 describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, () => {
-  it("lists every action without a key and works in the background by default", async () => {
+  it("shows a default under every action and works in the background by default", async () => {
     const { container } = await openHotkeys();
+    // No key is stored: the fields show the defaults (issue #584).
+    expect(field("Mute / unmute microphone")).toHaveTextContent("Ctrl+Shift+M");
+    expect(field("Deafen / undeafen")).toHaveTextContent("Ctrl+Shift+D");
+    expect(field("Show / hide member column")).toHaveTextContent("Ctrl+Shift+U");
+    expect(field("Open quick settings")).toHaveTextContent("Ctrl+,");
     for (const action of [
       "Push-to-talk",
-      "Mute / unmute microphone",
-      "Deafen / undeafen",
-      "Toggle Do Not Disturb",
       "Join / leave voice",
       "Switch voice server",
       "Back to previous channel",
-      "Show / hide member column",
-      "Open quick settings",
       "Open Mumcord",
     ]) {
       expect(field(action)).toHaveTextContent("Not set");
     }
+    for (const action of [
+      "Push-to-talk",
+      "Join / leave voice",
+      "Switch voice server",
+      "Open Mumcord",
+    ]) {
+      expect(within(row(action)).getByText("Default: none")).toBeVisible();
+    }
+    expect(
+      within(row("Mute / unmute microphone")).getByText("Default: Ctrl + Shift + M"),
+    ).toBeVisible();
+    // Ctrl+Shift+N is the notification centre, so DND reports its default instead of binding it.
+    expect(
+      within(row("Toggle Do Not Disturb")).getByText(
+        "Not active: it is Mumcord's own shortcut for the notification centre.",
+      ),
+    ).toBeVisible();
     expect(
       screen.getByRole("switch", { name: /Work while Mumcord is in the background/ }),
     ).toBeChecked();
@@ -106,9 +130,15 @@ describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, ()
         "Mute / unmute microphone Ctrl + F7",
       );
     });
-    fireEvent.click(screen.getByRole("button", { name: "Clear Mute / unmute microphone" }));
+    // "Use default" drops the own key again; the default is back in the field (issue #584).
+    fireEvent.click(screen.getByRole("button", { name: "Use default" }));
     await waitFor(() => {
-      expect(field("Mute / unmute microphone")).toHaveTextContent("Not set");
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ hotkeys: [] }));
+    });
+    await waitFor(() => {
+      expect(field("Mute / unmute microphone")).toHaveAccessibleName(
+        "Mute / unmute microphone Ctrl + Shift + M",
+      );
     });
   });
 
@@ -121,7 +151,7 @@ describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, ()
         expect.objectContaining({ cameraHotkey: "Ctrl+F9", hotkeys: [] }),
       );
     });
-    fireEvent.click(await screen.findByRole("button", { name: "Clear Turn camera on / off" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Use default" }));
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ cameraHotkey: null }));
     });
@@ -194,7 +224,7 @@ describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, ()
     await openHotkeys();
     const button = field("Toggle Do Not Disturb");
     fireEvent.click(button);
-    fireEvent.keyDown(button, { code: "KeyM", key: "M", ctrlKey: true, shiftKey: true });
+    fireEvent.keyDown(button, { code: "KeyU", key: "U", ctrlKey: true, shiftKey: true });
     const alert = await screen.findByText(/own shortcut for showing and hiding the member column/);
     expect(alert.closest("[role='alert']")).not.toBeNull();
     expect(screen.queryByRole("button", { name: "Assign here" })).toBeNull();
@@ -220,6 +250,7 @@ describe("Settings → Voice & Audio → Hotkeys (#64)", { timeout: 30_000 }, ()
   it("resets all hotkeys", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openHotkeys();
+    expect(screen.getByRole("button", { name: "Reset all hotkeys" })).toBeDisabled();
     record("Open Mumcord", "F8", { ctrlKey: true });
     const reset = screen.getByRole("button", { name: "Reset all hotkeys" });
     await waitFor(() => {

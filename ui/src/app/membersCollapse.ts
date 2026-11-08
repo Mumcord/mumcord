@@ -25,18 +25,6 @@ export function saveMembersCollapsed(collapsed: boolean, storage?: Storage): voi
   }
 }
 
-type ShortcutEvent = Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "shiftKey" | "altKey">;
-
-/** Ctrl+Shift+M, or Cmd+Shift+M on macOS: show or hide the member column. */
-export function isMembersShortcut(event: ShortcutEvent): boolean {
-  return (
-    (event.ctrlKey || event.metaKey) &&
-    event.shiftKey &&
-    !event.altKey &&
-    event.key.toLowerCase() === "m"
-  );
-}
-
 /**
  * What the members button in the chat header needs from the shell: whether the column is shown,
  * whether it is the narrow-window overlay, and how to toggle it. The button registers itself in

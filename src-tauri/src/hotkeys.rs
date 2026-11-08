@@ -6,10 +6,12 @@
 //! Without the portal, or with "Work while Mumcord is in the background" off, the UI handles
 //! the keys itself while its window has the focus.
 //!
-//! Nothing is bound by default (Q1.7). A key press runs [`trigger`]: "Open Mumcord" brings the
-//! window to the front here, every other action goes to the UI as [`HotkeyPressed`], which
-//! already knows the voice server, the channels and the layout. The camera hotkey
-//! (`camera_hotkey`, FR-8.20) is bound with the actions and runs [`toggle_camera`] here.
+//! Nothing is bound by default (Q1.7); the defaults of the settings screen (issue #584) work in
+//! the window only and are handled by the UI, never registered here. A key press runs
+//! [`trigger`]: "Open Mumcord" brings the window to the front here, every other action goes to
+//! the UI as [`HotkeyPressed`], which already knows the voice server, the channels and the
+//! layout. The camera hotkey (`camera_hotkey`, FR-8.20) is bound with the actions and runs
+//! [`toggle_camera`] here.
 //!
 //! Other features bind their keys through [`bind_group`] as well (whisper targets, #67): each
 //! [`Group`] is replaced as a whole and never touches the keys of another group.
@@ -92,8 +94,8 @@ fn with_state<T>(f: impl FnOnce(&mut State) -> T) -> T {
 /// Window-wide shortcuts of Mumcord itself (Ctrl, or Cmd on macOS). A global hotkey on one of
 /// them would swallow it, so they are refused.
 const IN_APP: [(&str, InAppShortcut); 10] = [
-    ("Ctrl+Shift+M", InAppShortcut::MemberColumn),
-    ("Shift+Super+M", InAppShortcut::MemberColumn),
+    ("Ctrl+Shift+U", InAppShortcut::MemberColumn),
+    ("Shift+Super+U", InAppShortcut::MemberColumn),
     ("Ctrl+Shift+N", InAppShortcut::NotificationCentre),
     ("Shift+Super+N", InAppShortcut::NotificationCentre),
     ("Ctrl+K", InAppShortcut::Search),
@@ -580,8 +582,8 @@ mod tests {
     #[test]
     fn check_refuses_mumcords_own_shortcuts() {
         for (key, shortcut) in [
-            ("control+shift+KeyM", InAppShortcut::MemberColumn),
-            ("Super+Shift+KeyM", InAppShortcut::MemberColumn),
+            ("control+shift+KeyU", InAppShortcut::MemberColumn),
+            ("Super+Shift+KeyU", InAppShortcut::MemberColumn),
             ("Ctrl+Shift+N", InAppShortcut::NotificationCentre),
             ("Ctrl+KeyK", InAppShortcut::Search),
             ("Meta+KeyF", InAppShortcut::Search),
@@ -590,8 +592,10 @@ mod tests {
             let (_, conflict) = check(key, HotkeySlot::New, &[], None).expect("valid");
             assert_eq!(conflict, Some(HotkeyConflict::InApp { shortcut }), "{key}");
         }
-        // Without Shift, M is free.
-        let (_, conflict) = check("Ctrl+M", HotkeySlot::New, &[], None).expect("valid");
+        // Without Shift, U is free; with Shift, Ctrl+Shift+M is: it is the mute default (#584).
+        let (_, conflict) = check("Ctrl+U", HotkeySlot::New, &[], None).expect("valid");
+        assert_eq!(conflict, None);
+        let (_, conflict) = check("Ctrl+Shift+M", HotkeySlot::New, &[], None).expect("valid");
         assert_eq!(conflict, None);
     }
 

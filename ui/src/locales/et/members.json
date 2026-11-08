@@ -105,8 +105,7 @@
     "talkingOne": "{{name}} räägib",
     "talkingTwo": "{{first}} ja {{second}} räägivad",
     "talkingMore_one": "{{name}} ja veel {{count}} räägivad",
-    "talkingMore_other": "{{name}} ja veel {{count}} räägivad",
-    "shortcut": "Ctrl+Shift+M"
+    "talkingMore_other": "{{name}} ja veel {{count}} räägivad"
   },
   "revokeConsent": {
     "title": "Kas võtta vestlusnõusolek kasutajalt {{name}} tagasi?",

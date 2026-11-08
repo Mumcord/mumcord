@@ -20,8 +20,14 @@ interface HotkeyRowProps {
   label: string;
   /** Second line under the label (e.g. the channel of "switch to channel"). */
   description?: string | undefined;
-  /** Stored key, `null` when none is set. */
+  /** The key the field shows: the user's own key, or the action's active default. */
   value: string | null;
+  /** Whether `value` is the user's own key rather than a default (issue #584). */
+  own?: boolean;
+  /** The action's default: a key, `null` for "Default: none", or absent to hide the line. */
+  defaultKey?: string | null;
+  /** Why an off default is off, as a sentence under the row (e.g. it is taken already). */
+  defaultNote?: string | null;
   /** Shown under the row instead of nothing, e.g. "could not be registered". */
   warning?: string | null;
   /** Starts recording at once (a new "switch to channel" row). */
@@ -31,6 +37,8 @@ interface HotkeyRowProps {
   /** "Assign here": takes the key from its other owner. */
   onAssign: (conflict: PendingConflict) => void;
   onClear: () => void;
+  /** "Use default": forgets the user's own key, so the default applies again. */
+  onUseDefault?: () => void;
   /** Recording ended without a key (Esc, timeout, focus lost). */
   onCancel?: () => void;
 }
@@ -38,17 +46,22 @@ interface HotkeyRowProps {
 /**
  * One action of Settings → Hotkeys (FR-3.72): the key field records the next key combination;
  * Esc cancels, Backspace clears, and recording stops after five seconds. A key already in use
- * shows a conflict with "Assign here".
+ * shows a conflict with "Assign here". Below the field, right-aligned, the action's default
+ * (issue #584) with "Use default" while the user's own key differs from it.
  */
 export function HotkeyRow({
   label,
   description,
   value,
+  own = false,
+  defaultKey,
+  defaultNote,
   warning,
   startRecording = false,
   onCapture,
   onAssign,
   onClear,
+  onUseDefault,
   onCancel,
 }: HotkeyRowProps) {
   const { t } = useTranslation("settings");
@@ -124,6 +137,9 @@ export function HotkeyRow({
   ]
     .filter(Boolean)
     .join(" ");
+  // A default replaces the user's own key, so it is cleared through "Use default" instead.
+  const canUseDefault = own && defaultKey != null && onUseDefault !== undefined;
+  const clearable = own && shown !== null && !canUseDefault;
 
   return (
     <div className="hotkey-row">
@@ -134,55 +150,77 @@ export function HotkeyRow({
             <span className="hotkey-row__description">{description}</span>
           )}
         </div>
-        <button
-          ref={field}
-          type="button"
-          className={fieldClass}
-          aria-labelledby={`${id}-label ${id}-value`}
-          aria-describedby={recording ? `${id}-hint` : undefined}
-          aria-pressed={recording}
-          onClick={() => {
-            if (busy) return;
-            setProblem(null);
-            setConflict(null);
-            if (recording) stop();
-            else setRecording(true);
-          }}
-          onKeyDown={onKeyDown}
-          onBlur={() => {
-            if (recording) stop();
-          }}
-        >
-          <span id={`${id}-value`} className="hotkey-row__keys">
-            {recording ? (
-              <span className="hotkey-row__recording">
-                <span className="hotkey-row__dot" aria-hidden="true" />
-                {t("hotkeys.recording")}
-              </span>
-            ) : shown === null ? (
-              <span className="hotkey-row__placeholder">{keyText}</span>
-            ) : (
-              <>
-                <span className="visually-hidden">{keyText}</span>
-                <span aria-hidden="true" className="hotkey-row__chips">
-                  {keyParts(shown, macos).map((part, i) => (
-                    <span key={i}>
-                      {i > 0 && <span className="hotkey-row__plus">+</span>}
-                      <kbd className="settings-kbd">{part}</kbd>
-                    </span>
-                  ))}
+        <div className="hotkey-row__key">
+          <button
+            ref={field}
+            type="button"
+            className={fieldClass}
+            aria-labelledby={`${id}-label ${id}-value`}
+            aria-describedby={recording ? `${id}-hint` : undefined}
+            aria-pressed={recording}
+            onClick={() => {
+              if (busy) return;
+              setProblem(null);
+              setConflict(null);
+              if (recording) stop();
+              else setRecording(true);
+            }}
+            onKeyDown={onKeyDown}
+            onBlur={() => {
+              if (recording) stop();
+            }}
+          >
+            <span id={`${id}-value`} className="hotkey-row__keys">
+              {recording ? (
+                <span className="hotkey-row__recording">
+                  <span className="hotkey-row__dot" aria-hidden="true" />
+                  {t("hotkeys.recording")}
                 </span>
-              </>
-            )}
-          </span>
-        </button>
+              ) : shown === null ? (
+                <span className="hotkey-row__placeholder">{keyText}</span>
+              ) : (
+                <>
+                  <span className="visually-hidden">{keyText}</span>
+                  <span aria-hidden="true" className="hotkey-row__chips">
+                    {keyParts(shown, macos).map((part, i) => (
+                      <span key={i}>
+                        {i > 0 && <span className="hotkey-row__plus">+</span>}
+                        <kbd className="settings-kbd">{part}</kbd>
+                      </span>
+                    ))}
+                  </span>
+                </>
+              )}
+            </span>
+          </button>
+          {defaultKey !== undefined && conflict === null && !recording && (
+            <p className="hotkey-row__default">
+              {defaultKey === null
+                ? t("hotkeys.defaultNone")
+                : t("hotkeys.defaultKey", { key: keyParts(defaultKey, macos).join(" + ") })}{" "}
+              {canUseDefault && (
+                <button
+                  type="button"
+                  className="settings-link"
+                  onClick={() => {
+                    setProblem(null);
+                    setConflict(null);
+                    onUseDefault();
+                  }}
+                >
+                  {t("hotkeys.useDefault")}
+                </button>
+              )}
+            </p>
+          )}
+        </div>
         <span className="hotkey-row__side">
           {recording ? (
             <button type="button" className="settings-link" onMouseDown={stop}>
               {t("hotkeys.cancel")}
             </button>
           ) : (
-            value !== null && (
+            clearable && (
               <button
                 type="button"
                 className="settings-link"
@@ -246,6 +284,9 @@ export function HotkeyRow({
         </div>
       )}
       {warning != null && conflict === null && <p className="settings-warning">{warning}</p>}
+      {defaultNote != null && conflict === null && (
+        <p className="settings-warning">{defaultNote}</p>
+      )}
       <p role="alert" className="settings-error">
         {problem}
       </p>
