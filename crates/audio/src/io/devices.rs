@@ -87,10 +87,18 @@ fn keep_alsa(pcm: &str) -> bool {
     }
     // FreeBSD's ALSA is a compatibility layer over OSS: alsa-lib lists no cards, so `oss` (the
     // OSS plugin, playing and recording through /dev/dsp) is the sound device, and `null` the
-    // only other entry.
+    // only other entry. `mumcord_dspN` are the per-unit PCMs the package installs; the units this
+    // machine does not have are hidden.
     #[cfg(target_os = "freebsd")]
-    if pcm == "oss" {
-        return true;
+    {
+        if pcm == "oss" {
+            return true;
+        }
+        if let Some(unit) = pcm.strip_prefix("mumcord_dsp")
+            && unit.parse::<u8>().is_ok()
+        {
+            return std::path::Path::new(&format!("/dev/dsp{unit}")).exists();
+        }
     }
     false
 }
@@ -167,6 +175,23 @@ mod tests {
                 "alsa:sysdefault:CARD=II"
             ]
         );
+    }
+
+    /// FreeBSD: the per-unit PCMs stay, but only for units this machine has.
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn freebsd_keeps_one_entry_per_existing_dsp_unit() {
+        let input = vec![
+            dev("alsa:mumcord_dsp0", "Sound card 0 (OSS)", false),
+            dev("alsa:mumcord_dsp9", "Sound card 9 (OSS)", false),
+            dev("alsa:null", "Discard all samples", false),
+            dev("alsa:oss", "Open Sound System", true),
+        ];
+        let ids: Vec<String> = filter(input).into_iter().map(|d| d.id).collect();
+        // The test machine has /dev/dsp0 and no unit 9.
+        assert!(ids.contains(&"alsa:mumcord_dsp0".to_owned()), "{ids:?}");
+        assert!(!ids.contains(&"alsa:mumcord_dsp9".to_owned()), "{ids:?}");
+        assert_eq!(ids.first().map(String::as_str), Some("alsa:oss"));
     }
 
     /// FreeBSD: `oss` is the real device, `null` stays out.

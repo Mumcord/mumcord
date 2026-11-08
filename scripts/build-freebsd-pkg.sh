@@ -13,6 +13,7 @@
 #   /usr/local/lib/mumcord/camera-backgrounds/*.webp     (resources, see resource_dir() in the app)
 #   /usr/local/share/applications/app.mumcord.client.desktop
 #   /usr/local/share/icons/hicolor/<size>/apps/app.mumcord.client.png
+#   /usr/local/etc/alsa/conf.d/95-mumcord-oss.conf        (one PCM per /dev/dsp unit)
 #   /usr/local/share/doc/mumcord/{LICENSE,THIRD_PARTY_NOTICES}
 #
 # The package also carries a +DISPLAY message (packaging/freebsd/pkg-message) that pkg shows after
@@ -77,6 +78,11 @@ echo "== staging the resources and the desktop entry"
 cp "$root_dir"/assets/backgrounds/*.webp "$stage/usr/local/lib/mumcord/camera-backgrounds/"
 install -m 644 "$root_dir/packaging/freebsd/mumcord.desktop" \
   "$stage/usr/local/share/applications/$app_id.desktop"
+
+# One ALSA PCM per /dev/dsp unit, so the picker can list every sound card (FR-13.15).
+mkdir -p "$stage/usr/local/etc/alsa/conf.d"
+install -m 644 "$root_dir/packaging/freebsd/alsa-mumcord.conf" \
+  "$stage/usr/local/etc/alsa/conf.d/95-mumcord-oss.conf"
 
 for icon in 32x32 128x128 256x256 512x512; do
   case "$icon" in
