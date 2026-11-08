@@ -423,5 +423,8 @@
     "loading": "Wczytywanie obrazu…",
     "unavailable": "Obraz niedostępny",
     "load": "Wczytaj obraz"
+  },
+  "slash": {
+    "list": "Polecenia ze slashem"
   }
 }

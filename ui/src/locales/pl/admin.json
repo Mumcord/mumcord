@@ -431,5 +431,59 @@
   "announcedUnregistered": "Rejestracja usunięta",
   "announcedRegistered": "{{name}} jest teraz zarejestrowany",
   "announcedRegisteredSaved": "Zmiany wysłane do serwera",
-  "menuRegister": "Zarejestruj na serwerze…"
+  "menuRegister": "Zarejestruj na serwerze…",
+  "commands": {
+    "group": "Polecenia administratora · wbudowane",
+    "groupPeople": "Osoby",
+    "groupChannels": "Kanały",
+    "groupBans": "Bany",
+    "groupChoice": "O co dokładnie chodzi?",
+    "builtIn": "Wbudowane",
+    "onlyYou": "Tę linię widzisz tylko Ty",
+    "usageLine": "{{command}} wymaga: {{usage}}",
+    "moveAllQuestion": "Przenieść {{count}} osoby z {{from}} do {{to}}?",
+    "moveAllNote": "Przeniesiony zostanie cały kanał, także Ty.",
+    "moveAll": "Przenieś",
+    "results": {
+      "muted": "Wyciszyłeś {{name}} na serwerze.",
+      "unmuted": "Cofnąłeś wyciszenie {{name}} na serwerze.",
+      "deafened": "Ogłuszyłeś {{name}} na serwerze.",
+      "undeafened": "Cofnąłeś ogłuszenie {{name}} na serwerze.",
+      "priorityOn": "Uczyniłeś {{name}} priorytetowym mówcą.",
+      "priorityOff": "{{name}} nie jest już priorytetowym mówcą.",
+      "registered": "{{name}} jest zarejestrowany na serwerze.",
+      "moved": "Przeniosłeś {{name}} do {{channel}}.",
+      "movedAll": "Przeniesiono {{moved}} z {{total}} osób.",
+      "movedSome": "Przeniesiono {{moved}} z {{total}} osób; {{refused}} odrzucono.",
+      "alreadyMoving": "Osoby są już przenoszone…",
+      "unbanned": "Ban {{name}} został zdjęty.",
+      "kicked": "Wyrzuciłeś {{name}} z serwera.",
+      "banned": "Zbanałeś {{name}} na serwerze.",
+      "noAnswer": "Serwer nie odpowiedział."
+    },
+    "errors": {
+      "unknownPerson": "Nikt o imieniu „{{name}}” nie jest teraz na tym serwerze.",
+      "unknownPersonDidYouMean": "Nikt o imieniu „{{name}}” nie jest teraz na tym serwerze. Czy chodziło Ci o {{suggestion}}?",
+      "unknownChannel": "Na tym serwerze nie ma kanału o nazwie „{{name}}”.",
+      "ambiguousChannel": "Pasuje więcej kanałów: {{names}}.",
+      "needChannel": "Który kanał? Wpisz jego nazwę po poleceniu.",
+      "needBan": "Który ban? Wpisz nazwę lub adres po poleceniu.",
+      "unknownBan": "Żaden ban na tym serwerze nie pasuje do „{{name}}”.",
+      "banChanged": "Ten ban zmienił się na serwerze, gdy się zastanawiałeś.",
+      "alreadyInChannel": "Jesteś już na kanale {{channel}}."
+    },
+    "usage": {
+      "kick": "nazwa [powód]",
+      "ban": "nazwa [czas] [powód]",
+      "mute": "nazwa",
+      "unmute": "nazwa",
+      "deaf": "nazwa",
+      "undeaf": "nazwa",
+      "priority": "nazwa",
+      "register": "nazwa",
+      "move": "nazwa kanał",
+      "moveall": "kanał",
+      "unban": "nazwa lub adres"
+    }
+  }
 }

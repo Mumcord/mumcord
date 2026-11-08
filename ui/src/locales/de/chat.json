@@ -405,5 +405,8 @@
     "loading": "Bild wird geladen…",
     "unavailable": "Bild nicht verfügbar",
     "load": "Bild laden"
+  },
+  "slash": {
+    "list": "Schrägstrich-Befehle"
   }
 }

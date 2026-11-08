@@ -29,7 +29,8 @@ import { useServers } from "../servers/store";
 import type { RegisteredUserEntry } from "../../api";
 import { errorText } from "./errors";
 import {
-  endTime,
+  banName as rowName,
+  endsText as sharedEndsText,
   filterBans,
   maskAddress,
   plain,
@@ -195,16 +196,8 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
       ? "—"
       : new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(value));
 
-  const endsText = (entry: BanEntry) => {
-    if (entry.expired) return t("admin:endsExpired");
-    if (entry.durationSecs === 0) return t("admin:endsPermanent");
-    const end = endTime(entry);
-    return end === null ? t("admin:endsUnknown") : date(end.toISOString());
-  };
-
-  /** What a row is called in the label of its own buttons. */
-  const rowName = (entry: BanEntry) =>
-    plain(entry.name) || `${maskAddress(entry.address, entry.mask)}/${String(entry.mask)}`;
+  const endsText = (entry: BanEntry) =>
+    sharedEndsText(entry, (key) => t(`admin:${key}`), i18n.language);
 
   const focusRow = (key: string) => {
     setSelected(key);

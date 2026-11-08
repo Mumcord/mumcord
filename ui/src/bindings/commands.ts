@@ -119,10 +119,11 @@ export const commands = {
 	 */
 	channelDescriptionRequest: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_description_request", { serverId, channelId })),
 	/**
-	 *  Moves a person to another channel; the server checks the move permission and the result
-	 *  arrives as `userUpserted` (issue #172).
+	 *  Moves a person to another channel; the server checks the move permission and answers with the
+	 *  person's `userUpserted` (issue #172). `confirmed` says the server answered the move at all,
+	 *  which the `/move` result line needs (issue #378, FR-10.35).
 	 */
-	personMove: (serverId: number, session: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
+	personMove: (serverId: number, session: number, channelId: number) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { serverId, session, volume })),
 	/**
@@ -161,7 +162,7 @@ export const commands = {
 	 *  Kicks a person with an optional reason (FR-10.11). A refusal arrives as an error, which the open
 	 *  dialog shows; yourself is never offered, so it is refused here too.
 	 */
-	personKick: (serverId: number, session: number, reason: string | null) => typedError<KickResult, ApiError>(__TAURI_INVOKE("person_kick", { serverId, session, reason })),
+	personKick: (serverId: number, session: number, reason: string | null) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_kick", { serverId, session, reason })),
 	/**
 	 *  Bans a person: one entry added to the server's ban list with the safe save of FR-10.66, then the
 	 *  person is removed when the dialog asked for it. Without a readable ban list the dialog sends the
@@ -198,12 +199,6 @@ export const commands = {
 	registeredUserGroups: (serverId: number, userId: number) => typedError<string[], ApiError>(__TAURI_INVOKE("registered_user_groups", { serverId, userId })),
 	/**  The window closed: what it held is dropped (FR-10.63). */
 	registeredUsersClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("registered_users_close", { serverId })),
-	/**
-	 *  Registers an online guest under their current name (FR-10.20, AC-10.15). Fails with
-	 *  `permissionDenied` without the Register right, and with `invalidInput` when the person is not
-	 *  connected, is registered already, or has no certificate to bind the account to.
-	 */
-	personRegister: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_register", { serverId, session })),
 	/**  Creates a channel (FR-10.21, FR-10.22). A temporary channel moves you into it. */
 	channelCreate: (serverId: number, input: ChannelCreateInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_create", { serverId, input })),
 	/**
@@ -235,6 +230,26 @@ export const commands = {
 	 *  the SuperUser.
 	 */
 	channelAclLockout: (serverId: number, acl: ChannelAclView) => typedError<number[], ApiError>(__TAURI_INVOKE("channel_acl_lockout", { serverId, acl })),
+	/**
+	 *  Server mute of another person (Epic 4, issue #378, FR-10.15). The server checks the Mute others
+	 *  right in the channel the person is in and answers with their new state.
+	 */
+	personSetServerMute: (serverId: number, session: number, muted: boolean) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_set_server_mute", { serverId, session, muted })),
+	/**  Server deafen of another person (FR-10.15). Deafening always mutes too (spec 10, A5). */
+	personSetServerDeafen: (serverId: number, session: number, deaf: boolean) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_set_server_deafen", { serverId, session, deaf })),
+	/**  Priority speaker of another person (issue #378); the same right as server mute. */
+	personSetPrioritySpeaker: (serverId: number, session: number, priority: boolean) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_set_priority_speaker", { serverId, session, priority })),
+	/**
+	 *  Registers an online guest under their current name (issue #378, FR-10.20); only a guest, and
+	 *  only with the Register right in the root channel.
+	 */
+	personRegister: (serverId: number, session: number) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_register", { serverId, session })),
+	/**
+	 *  Moves everyone in the admin's own channel to another one (`/moveall`, FR-10.17). The moves go
+	 *  out at the paced rate of FR-10.18, so the answer comes after they all arrived or were refused;
+	 *  a second call while one runs answers `alreadyRunning`.
+	 */
+	personMoveAll: (serverId: number, channelId: number) => typedError<MassMoveResult, ApiError>(__TAURI_INVOKE("person_move_all", { serverId, channelId })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -3003,9 +3018,6 @@ export type KeyChangeReview = {
 	newFingerprint: string,
 };
 
-/**  What a kick produced: the server's answer, or nothing within 5 s. */
-export type KickResult = "confirmed" | "unconfirmed";
-
 /**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
 export type KnownGame = {
 	key: GameKey,
@@ -3101,6 +3113,13 @@ export type LogLevel = "error" | "warn" | "info" | "debug";
 
 /**  Why the share runs below the sharer's pick. */
 export type LoweredReason = "uploadTooSlow" | "encoderTooSlow" | "manyViewers";
+
+/**  What a mass move produced (FR-10.17, FR-10.18). */
+export type MassMoveResult = 
+/**  All moves were sent; `moved` of `total` people arrived in the target channel. */
+{ kind: "done"; moved: number; total: number } | 
+/**  Another mass move is still running on this server (FR-10.18). */
+{ kind: "alreadyRunning" };
 
 /**  Which views are popped out changed; sent to every window. */
 export type MediaPopoutChanged = {
@@ -3546,6 +3565,9 @@ export type PasswordUpdate =
 export type PasswordView = { kind: "none" } | { kind: "set"; password: string } | 
 /**  The Join rules are more than a password; they are edited under Permissions. */
 { kind: "custom" };
+
+/**  What an action on a person produced: the server's answer, or nothing within 5 s (FR-10.59). */
+export type PersonAction = "confirmed" | "unconfirmed";
 
 /**  Comment, avatar and private note, fetched on demand when the profile card opens. */
 export type PersonProfile = {

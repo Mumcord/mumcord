@@ -425,5 +425,59 @@
   "announcedUnregistered": "Registratie verwijderd",
   "announcedRegistered": "{{name}} is nu geregistreerd",
   "announcedRegisteredSaved": "Wijzigingen naar de server verzonden",
-  "menuRegister": "Op de server registreren…"
+  "menuRegister": "Op de server registreren…",
+  "commands": {
+    "group": "Beheercommando's · ingebouwd",
+    "groupPeople": "Personen",
+    "groupChannels": "Kanalen",
+    "groupBans": "Bannen",
+    "groupChoice": "Welke bedoelde je?",
+    "builtIn": "Ingebouwd",
+    "onlyYou": "Alleen jij ziet deze regel",
+    "usageLine": "{{command}} heeft {{usage}} nodig",
+    "moveAllQuestion": "{{count}} personen van {{from}} naar {{to}} verplaatsen?",
+    "moveAllNote": "Het hele kanaal verplaatst mee, ook jij.",
+    "moveAll": "Verplaatsen",
+    "results": {
+      "muted": "Je hebt {{name}} op de server gedempt.",
+      "unmuted": "Je hebt het dempen van {{name}} op de server ongedaan gemaakt.",
+      "deafened": "Je hebt {{name}} op de server doof gezet.",
+      "undeafened": "Je hebt {{name}} op de server weer laten horen.",
+      "priorityOn": "Je hebt {{name}} prioritetsspreker gemaakt.",
+      "priorityOff": "{{name}} is geen prioritetsspreker meer.",
+      "registered": "{{name}} is geregistreerd op de server.",
+      "moved": "Je hebt {{name}} naar {{channel}} verplaatst.",
+      "movedAll": "{{moved}} van {{total}} personen verplaatst.",
+      "movedSome": "{{moved}} van {{total}} personen verplaatst; {{refused}} werden geweigerd.",
+      "alreadyMoving": "Er worden al personen verplaatst…",
+      "unbanned": "{{name}} is niet meer geband.",
+      "kicked": "Je hebt {{name}} van de server getrapt.",
+      "banned": "Je hebt {{name}} op de server verbannen.",
+      "noAnswer": "De server antwoordde niet."
+    },
+    "errors": {
+      "unknownPerson": "Er is nu niemand genaamd „{{name}}“ op deze server.",
+      "unknownPersonDidYouMean": "Er is nu niemand genaamd „{{name}}“ op deze server. Bedoelde je {{suggestion}}?",
+      "unknownChannel": "Er is geen kanaal genaamd „{{name}}“ op deze server.",
+      "ambiguousChannel": "Meerdere kanalen passen: {{names}}.",
+      "needChannel": "Welk kanaal? Typ de naam achter het commando.",
+      "needBan": "Welke ban? Typ een naam of adres achter het commando.",
+      "unknownBan": "Geen enkele ban komt overeen met „{{name}}“ op deze server.",
+      "banChanged": "Die ban is op de server veranderd terwijl je aan het beslissen was.",
+      "alreadyInChannel": "Je bent al in {{channel}}."
+    },
+    "usage": {
+      "kick": "naam [reden]",
+      "ban": "naam [duur] [reden]",
+      "mute": "naam",
+      "unmute": "naam",
+      "deaf": "naam",
+      "undeaf": "naam",
+      "priority": "naam",
+      "register": "naam",
+      "move": "naam kanaal",
+      "moveall": "kanaal",
+      "unban": "naam of adres"
+    }
+  }
 }

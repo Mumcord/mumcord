@@ -1,5 +1,7 @@
 //! The Server administration window (Epic 4, issue #254): the server's ban list, and the kick and
-//! ban of a person (Epic 4, issue #253).
+//! ban of a person (Epic 4, issue #253). The admin actions a slash command runs — server mute,
+//! deafen, priority speaker, registering a guest and moving a whole channel — join here (issue
+//! #378), because they check the same rights and answer the same way.
 //!
 //! The window reads the list when it opens and drops it when it closes or the connection ends
 //! (FR-10.63, FR-10.50). Every save re-reads first and sends back the fresh list with only the
@@ -12,7 +14,9 @@ use specta::Type;
 use std::net::IpAddr;
 use tauri::State;
 
-use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
+use super::types::{
+    ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
+};
 
 /// One ban entry as the window shows it. `key` is what identifies the entry across a re-read, so
 /// an edit or a removal can still be matched (FR-10.66). Name, reason and fingerprint are server
@@ -175,12 +179,31 @@ pub struct BanInput {
     quick: bool,
 }
 
-/// What a kick produced: the server's answer, or nothing within 5 s.
+/// What an action on a person produced: the server's answer, or nothing within 5 s (FR-10.59).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum KickResult {
+pub enum PersonAction {
     Confirmed,
     Unconfirmed,
+}
+
+impl From<mumcord_engine::ActionOutcome> for PersonAction {
+    fn from(v: mumcord_engine::ActionOutcome) -> Self {
+        match v {
+            mumcord_engine::ActionOutcome::Confirmed => Self::Confirmed,
+            mumcord_engine::ActionOutcome::Unconfirmed => Self::Unconfirmed,
+        }
+    }
+}
+
+/// What a mass move produced (FR-10.17, FR-10.18).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum MassMoveResult {
+    /// All moves were sent; `moved` of `total` people arrived in the target channel.
+    Done { moved: u32, total: u32 },
+    /// Another mass move is still running on this server (FR-10.18).
+    AlreadyRunning,
 }
 
 /// What a ban produced (FR-10.12, FR-10.13, FR-10.66).
@@ -229,14 +252,11 @@ pub async fn person_kick(
     server_id: ServerId,
     session: SessionId,
     reason: Option<String>,
-) -> ApiResult<KickResult> {
+) -> ApiResult<PersonAction> {
     let outcome = engine
         .kick_person(to_engine_server_id(server_id), session, reason.as_deref())
         .await?;
-    Ok(match outcome {
-        mumcord_engine::KickOutcome::Confirmed => KickResult::Confirmed,
-        mumcord_engine::KickOutcome::Unconfirmed => KickResult::Unconfirmed,
-    })
+    Ok(outcome.into())
 }
 
 /// Bans a person: one entry added to the server's ban list with the safe save of FR-10.66, then the
@@ -362,21 +382,6 @@ pub async fn registered_user_unregister(
     Ok(to_save_result(outcome))
 }
 
-/// Registers an online guest under their current name (FR-10.20, AC-10.15). Fails with
-/// `permissionDenied` without the Register right, and with `invalidInput` when the person is not
-/// connected, is registered already, or has no certificate to bind the account to.
-#[tauri::command]
-#[specta::specta]
-pub fn person_register(
-    engine: State<'_, Engine>,
-    server_id: ServerId,
-    session: SessionId,
-) -> ApiResult<()> {
-    engine
-        .registered_register_person(to_engine_server_id(server_id), session)
-        .map_err(|error| error.into())
-}
-
 /// The groups that name one account in a channel (issue #256). A server that will not show its
 /// groups answers with an empty list rather than an error.
 #[tauri::command]
@@ -409,6 +414,90 @@ fn to_save_result(outcome: registered::RegisteredOutcome) -> RegisteredSaveResul
             entries: entries.into_iter().map(Into::into).collect(),
         },
     }
+}
+
+/// Server mute of another person (Epic 4, issue #378, FR-10.15). The server checks the Mute others
+/// right in the channel the person is in and answers with their new state.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_set_server_mute(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    muted: bool,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_set_server_mute(to_engine_server_id(server_id), session, muted)
+        .await?
+        .into())
+}
+
+/// Server deafen of another person (FR-10.15). Deafening always mutes too (spec 10, A5).
+#[tauri::command]
+#[specta::specta]
+pub async fn person_set_server_deafen(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    deaf: bool,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_set_server_deafen(to_engine_server_id(server_id), session, deaf)
+        .await?
+        .into())
+}
+
+/// Priority speaker of another person (issue #378); the same right as server mute.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_set_priority_speaker(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    priority: bool,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_set_priority(to_engine_server_id(server_id), session, priority)
+        .await?
+        .into())
+}
+
+/// Registers an online guest under their current name (issue #378, FR-10.20); only a guest, and
+/// only with the Register right in the root channel.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_register(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_register(to_engine_server_id(server_id), session)
+        .await?
+        .into())
+}
+
+/// Moves everyone in the admin's own channel to another one (`/moveall`, FR-10.17). The moves go
+/// out at the paced rate of FR-10.18, so the answer comes after they all arrived or were refused;
+/// a second call while one runs answers `alreadyRunning`.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_move_all(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<MassMoveResult> {
+    Ok(
+        match engine
+            .move_all(to_engine_server_id(server_id), channel_id)
+            .await?
+        {
+            mumcord_engine::MassMoveOutcome::Done { moved, total } => {
+                MassMoveResult::Done { moved, total }
+            }
+            mumcord_engine::MassMoveOutcome::AlreadyRunning => MassMoveResult::AlreadyRunning,
+        },
+    )
 }
 
 fn to_ban_request(input: BanInput) -> ApiResult<mumcord_engine::BanRequest> {

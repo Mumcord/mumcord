@@ -405,5 +405,8 @@
     "loading": "Indlæser billede…",
     "unavailable": "Billedet er ikke tilgængeligt",
     "load": "Indlæs billede"
+  },
+  "slash": {
+    "list": "Kommandoer med skråstreg"
   }
 }

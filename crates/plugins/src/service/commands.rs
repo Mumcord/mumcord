@@ -2,7 +2,7 @@
 //! instead of being kept in step with install, remove, enable and permission changes: it is
 //! tiny, and this way it can never go stale.
 
-use crate::chat::{CommandRegistry, Resolution};
+use crate::chat::{BUILT_IN_COMMANDS, CommandRegistry, Resolution};
 use crate::host::RunState;
 use crate::manifest::Command;
 use crate::wit::events::{ActionSource, ActionValue};
@@ -44,7 +44,10 @@ struct Candidate<'a> {
 /// Active plugins only, in install order ("first installed wins").
 fn build(mut candidates: Vec<Candidate<'_>>) -> CommandRegistry {
     candidates.sort_by_key(|c| c.installed_at);
-    let mut registry = CommandRegistry::new(&[]);
+    // Mumcord answers its own commands, so a plugin that declares one of the names is shown as
+    // "taken by Mumcord" and never runs it (FR-10.30).
+    let builtins: Vec<(&str, &str)> = BUILT_IN_COMMANDS.iter().map(|name| (*name, "")).collect();
+    let mut registry = CommandRegistry::new(&builtins);
     for candidate in candidates.iter().filter(|c| c.active) {
         registry.register(candidate.id, candidate.name, candidate.commands);
     }
@@ -175,6 +178,28 @@ mod tests {
         assert_eq!(owner(&registry, "/roll"), Some("on".into()));
         let registry = build(vec![candidate("off", 10, false, &commands)]);
         assert_eq!(registry.resolve("/roll"), Resolution::Unknown);
+    }
+
+    #[test]
+    fn a_plugin_cannot_take_a_built_in_admin_command() {
+        // Epic 4, issue #378, FR-10.30: the chat box answers the admin commands itself, so they are
+        // registered as built-ins before any plugin gets a name.
+        let commands = vec![
+            Command {
+                name: "mute".into(),
+                description: "Quiet please".into(),
+                usage: None,
+            },
+            Command {
+                name: "roll".into(),
+                description: "Roll dice".into(),
+                usage: None,
+            },
+        ];
+        let registry = build(vec![candidate("dice", 10, true, &commands)]);
+        assert_eq!(registry.resolve("/mute Anna"), Resolution::Builtin);
+        assert_eq!(owner(&registry, "/roll"), Some("dice".into()));
+        assert_eq!(registry.taken_by("dice", "mute"), Some("Mumcord".into()));
     }
 
     #[test]

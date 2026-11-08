@@ -414,5 +414,8 @@
     "loading": "Chargement de l’image…",
     "unavailable": "Image non disponible",
     "load": "Charger l’image"
+  },
+  "slash": {
+    "list": "Commandes avec barre oblique"
   }
 }

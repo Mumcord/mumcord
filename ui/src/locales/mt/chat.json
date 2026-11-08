@@ -432,5 +432,8 @@
     "loading": "Qed titgħabba l-immaġni…",
     "unavailable": "L-immaġni mhix disponibbli",
     "load": "Għabbi l-immaġni"
+  },
+  "slash": {
+    "list": "Kmandi b’“/“"
   }
 }

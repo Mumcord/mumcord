@@ -11,7 +11,7 @@
     "hiddenBy": "Ascuns de {{plugin}}"
   },
   "command": {
-    "list": "Comenzile pluginurilor",
+    "group": "Comenzile pluginurilor",
     "keys": "↑↓ alege · Tab completează · Enter rulează · Esc închide",
     "unavailable": "Această comandă nu este disponibilă acum.",
     "failed": "Comanda nu a putut fi rulată. Încearcă din nou."

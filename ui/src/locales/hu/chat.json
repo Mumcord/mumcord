@@ -405,5 +405,8 @@
     "loading": "Kép betöltése…",
     "unavailable": "A kép nem érhető el",
     "load": "Kép betöltése"
+  },
+  "slash": {
+    "list": "Parancsok / jellel"
   }
 }

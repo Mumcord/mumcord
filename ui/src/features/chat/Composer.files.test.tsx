@@ -70,6 +70,7 @@ function setup(
     <div className="chat">
       <Composer
         target={target}
+        conversation={{ kind: "channel", channelId: 1 }}
         limits={{ text: 5000, image: 100_000, allowHtml: true }}
         label="Message #General"
         blockedReason={null}
@@ -234,6 +235,7 @@ describe("Composer file sharing", () => {
         <div className="chat">
           <Composer
             target={CHANNEL}
+            conversation={{ kind: "channel", channelId: 1 }}
             limits={{ text: 5000, image: 100_000, allowHtml: true }}
             label="Message #General"
             blockedReason={null}
@@ -255,6 +257,7 @@ describe("Composer file sharing", () => {
         <div className="chat">
           <Composer
             target={CHANNEL}
+            conversation={{ kind: "channel", channelId: 1 }}
             limits={{ text: 5000, image: 100_000, allowHtml: true }}
             label="Message #General"
             blockedReason={null}

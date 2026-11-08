@@ -434,5 +434,59 @@
   "announcedUnregistered": "Ir-reġistrazzjoni tneħħiet",
   "announcedRegistered": "{{name}} issa hu rreġistrat",
   "announcedRegisteredSaved": "Il-bidiet intbagħtu lis-server",
-  "menuRegister": "Reġistra fuq is-server…"
+  "menuRegister": "Reġistra fuq is-server…",
+  "commands": {
+    "group": "Kmandi ta' amministrazzjoni · integrati",
+    "groupPeople": "Persuni",
+    "groupChannels": "Kanali",
+    "groupBans": "Projbimenti",
+    "groupChoice": "Liema waħda qed tfisser?",
+    "builtIn": "Integrat",
+    "onlyYou": "Int biss tara din il-linja",
+    "usageLine": "{{command}} trid {{usage}}",
+    "moveAllQuestion": "Iċċaqlaq {{count}} persuni minn {{from}} għal {{to}}?",
+    "moveAllNote": "Il-kanal kollu jiċċaqlaq, int ukoll.",
+    "moveAll": "Iċċaqlaq",
+    "results": {
+      "muted": "Il-mikrofon ta' {{name}} ingħalaq fuq is-server.",
+      "unmuted": "Il-mikrofon ta' {{name}} infetah fuq is-server.",
+      "deafened": "Is-smigħ ta' {{name}} ingħalaq fuq is-server.",
+      "undeafened": "Is-smigħ ta' {{name}} infetah fuq is-server.",
+      "priorityOn": "Għamilt lil {{name}} kelliem ta' prijorità.",
+      "priorityOff": "{{name}} mhuwiex aktar kelliem ta' prijorità.",
+      "registered": "{{name}} huwa rregistrat fuq is-server.",
+      "moved": "Ċaqlajt lil {{name}} għal {{channel}}.",
+      "movedAll": "Ittrasferiti {{moved}} minn {{total}} persuni.",
+      "movedSome": "Ittrasferiti {{moved}} minn {{total}} persuni; {{refused}} ġew irrifjutati.",
+      "alreadyMoving": "Persuni qegħdin diġà jiċċaqalqu…",
+      "unbanned": "Il-projbiment ta' {{name}} tneħħa.",
+      "kicked": "Keċċajt lil {{name}} mis-server.",
+      "banned": "Ipprojbit lil {{name}} fuq is-server.",
+      "noAnswer": "Is-server ma wieġibx."
+    },
+    "errors": {
+      "unknownPerson": "Ħadd b'isem “{{name}}” mhuwiex fuq dan is-server bħalissa.",
+      "unknownPersonDidYouMean": "Ħadd b'isem “{{name}}” mhuwiex fuq dan is-server bħalissa. Kint qed tfisser {{suggestion}}?",
+      "unknownChannel": "Ma hemm ebda kanal imsejjaħ “{{name}}” fuq dan is-server.",
+      "ambiguousChannel": "Aktar minn kanal wieħed jaqbel: {{names}}.",
+      "needChannel": "Liema kanal? Ikteb ismu wara l-kmand.",
+      "needBan": "Liema projbiment? Ikteb isem jew indirizz wara l-kmand.",
+      "unknownBan": "L-ebda projbiment ma jaqbel ma' “{{name}}” fuq dan is-server.",
+      "banChanged": "Dak il-projbiment bidel fuq is-server filwaqt li kint qed tiddeċiedi.",
+      "alreadyInChannel": "Int diġà fil-kanal {{channel}}."
+    },
+    "usage": {
+      "kick": "isem [raġuni]",
+      "ban": "isem [tul] [raġuni]",
+      "mute": "isem",
+      "unmute": "isem",
+      "deaf": "isem",
+      "undeaf": "isem",
+      "priority": "isem",
+      "register": "isem",
+      "move": "isem kanal",
+      "moveall": "kanal",
+      "unban": "isem jew indirizz"
+    }
+  }
 }

@@ -428,5 +428,59 @@
   "announcedUnregistered": "Registo removido",
   "announcedRegistered": "{{name}} está agora registado",
   "announcedRegisteredSaved": "Alterações enviadas ao servidor",
-  "menuRegister": "Registar no servidor…"
+  "menuRegister": "Registar no servidor…",
+  "commands": {
+    "group": "Comandos de administração · integrados",
+    "groupPeople": "Pessoas",
+    "groupChannels": "Canais",
+    "groupBans": "Banimentos",
+    "groupChoice": "Em qual pensaste?",
+    "builtIn": "Integrado",
+    "onlyYou": "Só tu vês esta linha",
+    "usageLine": "{{command}} espera {{usage}}",
+    "moveAllQuestion": "Deslocar {{count}} pessoas de {{from}} para {{to}}?",
+    "moveAllNote": "Todo o canal se desloca, tu incluído.",
+    "moveAll": "Deslocar",
+    "results": {
+      "muted": "Silenciaste {{name}} no servidor.",
+      "unmuted": "Reponheste o microfone de {{name}} no servidor.",
+      "deafened": "Tiraste o áudio a {{name}} no servidor.",
+      "undeafened": "Devolviste o áudio a {{name}} no servidor.",
+      "priorityOn": "Tornaste {{name}} um orador prioritário.",
+      "priorityOff": "{{name}} deixou de ser orador prioritário.",
+      "registered": "{{name}} está registado no servidor.",
+      "moved": "Deslocaste {{name}} para {{channel}}.",
+      "movedAll": "{{moved}} de {{total}} pessoas deslocadas.",
+      "movedSome": "{{moved}} de {{total}} pessoas deslocadas; {{refused}} recusadas.",
+      "alreadyMoving": "Já estás a deslocar pessoas…",
+      "unbanned": "O banimento de {{name}} foi levantado.",
+      "kicked": "Expulsaste {{name}} do servidor.",
+      "banned": "Baniste {{name}} no servidor.",
+      "noAnswer": "O servidor não respondeu."
+    },
+    "errors": {
+      "unknownPerson": "Ninguém chamado «{{name}}» está neste servidor de momento.",
+      "unknownPersonDidYouMean": "Ninguém chamado «{{name}}» está neste servidor de momento. Quiseste dizer {{suggestion}}?",
+      "unknownChannel": "Não há nenhum canal chamado «{{name}}» neste servidor.",
+      "ambiguousChannel": "Mais do que um canal corresponde: {{names}}.",
+      "needChannel": "Que canal? Escreve o nome depois do comando.",
+      "needBan": "Que banimento? Escreve um nome ou um endereço depois do comando.",
+      "unknownBan": "Nenhum banimento corresponde a «{{name}}» neste servidor.",
+      "banChanged": "Esse banimento mudou no servidor enquanto decidias.",
+      "alreadyInChannel": "Já estás no canal {{channel}}."
+    },
+    "usage": {
+      "kick": "nome [motivo]",
+      "ban": "nome [duração] [motivo]",
+      "mute": "nome",
+      "unmute": "nome",
+      "deaf": "nome",
+      "undeaf": "nome",
+      "priority": "nome",
+      "register": "nome",
+      "move": "nome canal",
+      "moveall": "canal",
+      "unban": "nome ou endereço"
+    }
+  }
 }

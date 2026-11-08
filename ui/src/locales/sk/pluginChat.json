@@ -11,7 +11,7 @@
     "hiddenBy": "Skryl {{plugin}}"
   },
   "command": {
-    "list": "Príkazy doplnkov",
+    "group": "Príkazy doplnkov",
     "keys": "↑↓ vybrať · Tab doplniť · Enter spustiť · Esc zavrieť",
     "unavailable": "Tento príkaz teraz nie je k dispozícii.",
     "failed": "Príkaz sa nepodarilo spustiť. Skúste to znova."

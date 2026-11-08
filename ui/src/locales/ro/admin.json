@@ -428,5 +428,59 @@
   "announcedUnregistered": "Înregistrarea a fost eliminată",
   "announcedRegistered": "{{name}} este acum înregistrat",
   "announcedRegisteredSaved": "Modificările au fost trimise serverului",
-  "menuRegister": "Înregistrează pe server…"
+  "menuRegister": "Înregistrează pe server…",
+  "commands": {
+    "group": "Comenzi de administrare · încorporate",
+    "groupPeople": "Persoane",
+    "groupChannels": "Canale",
+    "groupBans": "Interdicții",
+    "groupChoice": "La care te-ai gândit?",
+    "builtIn": "Încorporată",
+    "onlyYou": "Doar tu vezi această linie",
+    "usageLine": "{{command}} cere {{usage}}",
+    "moveAllQuestion": "Mută {{count}} persoane din {{from}} în {{to}}?",
+    "moveAllNote": "Se mută întreg canalul, inclusiv tu.",
+    "moveAll": "Mută",
+    "results": {
+      "muted": "Ai oprit microfonul lui {{name}} pe server.",
+      "unmuted": "Ai repornit microfonul lui {{name}} pe server.",
+      "deafened": "Ai oprit sunetul lui {{name}} pe server.",
+      "undeafened": "Ai repornit sunetul lui {{name}} pe server.",
+      "priorityOn": "L-ai făcut pe {{name}} vorbitor prioritar.",
+      "priorityOff": "{{name}} nu mai este vorbitor prioritar.",
+      "registered": "{{name}} este înregistrat pe server.",
+      "moved": "L-ai mutat pe {{name}} în {{channel}}.",
+      "movedAll": "{{moved}} din {{total}} persoane mutate.",
+      "movedSome": "{{moved}} din {{total}} persoane mutate; {{refused}} au fost respinse.",
+      "alreadyMoving": "Se mută deja persoane…",
+      "unbanned": "Interdicția lui {{name}} a fost ridicată.",
+      "kicked": "L-ai dat afară pe {{name}} de pe server.",
+      "banned": "L-ai interzis pe {{name}} pe server.",
+      "noAnswer": "Serverul nu a răspuns."
+    },
+    "errors": {
+      "unknownPerson": "Nimeni pe nume „{{name}}” nu este pe acest server acum.",
+      "unknownPersonDidYouMean": "Nimeni pe nume „{{name}}” nu este pe acest server acum. Te-ai gândit la {{suggestion}}?",
+      "unknownChannel": "Nu există niciun canal numit „{{name}}” pe acest server.",
+      "ambiguousChannel": "Se potrivesc mai multe canale: {{names}}.",
+      "needChannel": "Ce canal? Scrie-i numele după comandă.",
+      "needBan": "Ce interdicție? Scrie un nume sau o adresă după comandă.",
+      "unknownBan": "Nicio interdicție nu se potrivește cu „{{name}}” pe acest server.",
+      "banChanged": "Interdicția respectivă s-a schimbat pe server în timp ce hotărâai.",
+      "alreadyInChannel": "Deja ești în {{channel}}."
+    },
+    "usage": {
+      "kick": "nume [motiv]",
+      "ban": "nume [durată] [motiv]",
+      "mute": "nume",
+      "unmute": "nume",
+      "deaf": "nume",
+      "undeaf": "nume",
+      "priority": "nume",
+      "register": "nume",
+      "move": "nume canal",
+      "moveall": "canal",
+      "unban": "nume sau adresă"
+    }
+  }
 }

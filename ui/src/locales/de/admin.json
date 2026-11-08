@@ -425,5 +425,59 @@
   "announcedUnregistered": "Registrierung entfernt",
   "announcedRegistered": "{{name}} ist jetzt registriert",
   "announcedRegisteredSaved": "Änderungen an den Server gesendet",
-  "menuRegister": "Auf dem Server registrieren…"
+  "menuRegister": "Auf dem Server registrieren…",
+  "commands": {
+    "group": "Admin-Befehle · integriert",
+    "groupPeople": "Personen",
+    "groupChannels": "Kanäle",
+    "groupBans": "Sperrungen",
+    "groupChoice": "Wen oder was genau?",
+    "builtIn": "Integriert",
+    "onlyYou": "Nur du siehst diese Zeile",
+    "usageLine": "{{command}} erwartet {{usage}}",
+    "moveAllQuestion": "{{count}} Personen von {{from}} nach {{to}} verschieben?",
+    "moveAllNote": "Alle im Kanal werden verschoben, auch du.",
+    "moveAll": "Verschieben",
+    "usage": {
+      "kick": "name [grund]",
+      "ban": "name [dauer] [grund]",
+      "mute": "name",
+      "unmute": "name",
+      "deaf": "name",
+      "undeaf": "name",
+      "priority": "name",
+      "register": "name",
+      "move": "name kanal",
+      "moveall": "kanal",
+      "unban": "name oder adresse"
+    },
+    "results": {
+      "muted": "Du hast {{name}} auf dem Server stummgeschaltet.",
+      "unmuted": "Du hast {{name}} auf dem Server wieder hörbar gemacht.",
+      "deafened": "Du hast {{name}} auf dem Server taubgeschaltet.",
+      "undeafened": "Du hast {{name}} auf dem Server wieder hören lassen.",
+      "priorityOn": "{{name}} ist jetzt Prioritäts-Sprecher.",
+      "priorityOff": "{{name}} ist kein Prioritäts-Sprecher mehr.",
+      "registered": "{{name}} ist auf dem Server registriert.",
+      "moved": "Du hast {{name}} nach {{channel}} verschoben.",
+      "movedAll": "{{moved}} von {{total}} Personen verschoben.",
+      "movedSome": "{{moved}} von {{total}} Personen verschoben; {{refused}} wurden abgelehnt.",
+      "alreadyMoving": "Es werden gerade Personen verschoben…",
+      "unbanned": "{{name}} ist entsperrt.",
+      "kicked": "Du hast {{name}} vom Server gekickt.",
+      "banned": "Du hast {{name}} auf dem Server gesperrt.",
+      "noAnswer": "Der Server hat nicht geantwortet."
+    },
+    "errors": {
+      "unknownPerson": "Niemand namens „{{name}}“ ist gerade auf diesem Server.",
+      "unknownPersonDidYouMean": "Niemand namens „{{name}}“ ist gerade auf diesem Server. Meintest du {{suggestion}}?",
+      "unknownChannel": "Es gibt keinen Kanal namens „{{name}}“ auf diesem Server.",
+      "ambiguousChannel": "Mehrere Kanäle passen: {{names}}.",
+      "needChannel": "Welcher Kanal? Schreib den Namen hinter den Befehl.",
+      "needBan": "Welche Sperre? Schreib einen Namen oder eine Adresse hinter den Befehl.",
+      "unknownBan": "Keine Sperre passt zu „{{name}}“ auf diesem Server.",
+      "banChanged": "Diese Sperre hat sich auf dem Server geändert, während du entschieden hast.",
+      "alreadyInChannel": "Du bist bereits in {{channel}}."
+    }
+  }
 }

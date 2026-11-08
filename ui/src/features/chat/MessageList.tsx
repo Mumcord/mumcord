@@ -80,6 +80,7 @@ import { isCopyShortcut, selectedText } from "./selectionText";
 import { revealDone, usePendingReveal } from "./reveal";
 import { CollapsedMessage } from "../blocking/CollapsedMessage";
 import { LeadingPluginCards, PluginLine } from "../plugins/chat";
+import type { PrivateLine } from "./privateLines";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
 const EDGE_PX = 48;
@@ -115,6 +116,11 @@ export interface MessageListProps {
    * Ids of messages from blocked users drawn collapsed (issue #140) until the user shows one.
    */
   collapsedIds?: ReadonlySet<string> | undefined;
+  /**
+   * Lines only this user sees: the result of an admin command (Epic 4, issue #378, FR-10.61). They
+   * sit in the timeline at their time and are never sent to the server.
+   */
+  privateLines?: readonly PrivateLine[] | undefined;
 }
 
 /** Messages drawn when a conversation is shown, and drawn more each time the user scrolls up. */
@@ -380,21 +386,27 @@ export function MessageList({
   onReply,
   listKey = "",
   collapsedIds,
+  privateLines,
 }: MessageListProps) {
   const { t, i18n } = useTranslation("chat");
   // Own messages not confirmed yet show greyed (FR-2.74) at their send time, where they stay once
   // confirmed, even when others write meanwhile (issue #379).
   const outgoing = log.outgoing;
-  const allMessages = useMemo(
-    () =>
-      outgoing?.length
-        ? insertByTime(
-            log.messages,
-            outgoing.map((item) => item.message),
-          )
-        : log.messages,
-    [log.messages, outgoing],
-  );
+  const allMessages = useMemo(() => {
+    let list: readonly ChatMessage[] = log.messages;
+    if (outgoing?.length)
+      list = insertByTime(
+        list,
+        outgoing.map((item) => item.message),
+      );
+    // A command's result line belongs at the time it happened, among the real messages.
+    if (privateLines?.length)
+      list = insertByTime(
+        list,
+        privateLines.map((line) => line.message),
+      );
+    return list;
+  }, [log.messages, outgoing, privateLines]);
   const {
     shown: messages,
     hidden,
@@ -409,6 +421,11 @@ export function MessageList({
   const outgoingById = useMemo(
     () => new Map((outgoing ?? []).map((item) => [item.message.id, item])),
     [outgoing],
+  );
+  // Which rows of this list are the admin's own results, and the note under each one.
+  const privateNotes = useMemo(
+    () => new Map((privateLines ?? []).map((line) => [line.message.id, line.note])),
+    [privateLines],
   );
   const scrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
@@ -1001,31 +1018,49 @@ export function MessageList({
                 if (index >= 0) setFocusIndex(index);
               }}
             >
-              {messages.map((message, index) => (
-                <MessageItem
-                  key={renderKey(message.id)}
-                  message={message}
-                  index={index}
-                  outgoing={outgoingById.get(message.id) ?? null}
-                  start={layout[index]?.start ?? true}
-                  day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
-                  display={display}
-                  avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
-                  time={time}
-                  fullTime={fullTime}
-                  tabIndex={index === active ? 0 : -1}
-                  clickablePeople={clickablePeople}
-                  linkPreviews={linkPreviews}
-                  senderName={names[index] ?? message.senderName}
-                  highlighted={highlighted === message.id}
-                  canReply={onReply !== undefined}
-                  original={originals[index] ?? null}
-                  collapsed={
-                    collapsedIds?.has(message.id) === true && !shownBlocked.has(message.id)
-                  }
-                  actions={itemActions}
-                />
-              ))}
+              {messages.map((message, index) => {
+                const note = privateNotes.get(message.id);
+                if (note !== undefined) {
+                  return (
+                    <PrivateMessage
+                      key={renderKey(message.id)}
+                      message={message}
+                      note={note}
+                      index={index}
+                      day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
+                      time={time}
+                      fullTime={fullTime}
+                      tabIndex={index === active ? 0 : -1}
+                      actions={itemActions}
+                    />
+                  );
+                }
+                return (
+                  <MessageItem
+                    key={renderKey(message.id)}
+                    message={message}
+                    index={index}
+                    outgoing={outgoingById.get(message.id) ?? null}
+                    start={layout[index]?.start ?? true}
+                    day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
+                    display={display}
+                    avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
+                    time={time}
+                    fullTime={fullTime}
+                    tabIndex={index === active ? 0 : -1}
+                    clickablePeople={clickablePeople}
+                    linkPreviews={linkPreviews}
+                    senderName={names[index] ?? message.senderName}
+                    highlighted={highlighted === message.id}
+                    canReply={onReply !== undefined}
+                    original={originals[index] ?? null}
+                    collapsed={
+                      collapsedIds?.has(message.id) === true && !shownBlocked.has(message.id)
+                    }
+                    actions={itemActions}
+                  />
+                );
+              })}
             </ol>
           )}
         </div>
@@ -1195,6 +1230,57 @@ interface MessageItemProps {
   /** From a blocked user and not shown yet: only a placeholder with "Show" (issue #140). */
   collapsed: boolean;
 }
+
+/**
+ * A line only its admin sees: the result of an admin command (Epic 4, issue #378, FR-10.35) with
+ * the note that says who can see it (mockup `05-result-line`). It was never sent and is never
+ * stored, and it carries none of a message's actions: there is nothing to reply to.
+ */
+const PrivateMessage = memo(function PrivateMessage({
+  message,
+  note,
+  index,
+  day,
+  time,
+  fullTime,
+  tabIndex,
+  actions,
+}: {
+  message: ChatMessage;
+  note: string;
+  index: number;
+  day: string | null;
+  time: Intl.DateTimeFormat;
+  fullTime: Intl.DateTimeFormat;
+  tabIndex: number;
+  actions: MessageItemActions;
+}) {
+  const itemRef = useCallback(
+    (element: HTMLLIElement | null) => {
+      actions.setRef(index, element);
+    },
+    [actions, index],
+  );
+  const when = new Date(message.sentAt);
+  return (
+    <li
+      ref={itemRef}
+      className="chat-message chat-message--start chat-message--private"
+      tabIndex={tabIndex}
+    >
+      {day !== null ? <div className="chat-day">{day}</div> : null}
+      <p className="chat-private">
+        <span className="chat-private__time">{time.format(when)}</span>{" "}
+        <span
+          className="chat-private__text"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(message.body) }}
+        />{" "}
+        <span className="chat-private__note">{note}</span>
+      </p>
+      <span className="visually-hidden">{fullTime.format(when)}</span>
+    </li>
+  );
+});
 
 const MessageItem = memo(function MessageItem({
   message,

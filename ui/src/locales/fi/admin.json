@@ -425,5 +425,59 @@
   "announcedUnregistered": "Rekisteröinti poistettu",
   "announcedRegistered": "{{name}} on nyt rekisteröity",
   "announcedRegisteredSaved": "Muutokset lähetetty palvelimelle",
-  "menuRegister": "Rekisteröi palvelimella…"
+  "menuRegister": "Rekisteröi palvelimella…",
+  "commands": {
+    "group": "Ylläpidon komennot · sisäänrakennetut",
+    "groupPeople": "Henkilöt",
+    "groupChannels": "Kanavat",
+    "groupBans": "Estot",
+    "groupChoice": "Kumman tarkoitit?",
+    "builtIn": "Sisäänrakennettu",
+    "onlyYou": "Vain sinä näet tämän rivin",
+    "usageLine": "{{command}} vaatii {{usage}}",
+    "moveAllQuestion": "Siirretäänkö {{count}} henkilöä kanavasta {{from}} kanavalle {{to}}?",
+    "moveAllNote": "Kaikki kanavalla olevat siirtyvät, sinut mukaan lukien.",
+    "moveAll": "Siirrä",
+    "usage": {
+      "kick": "nimi [syy]",
+      "ban": "nimi [kesto] [syy]",
+      "mute": "nimi",
+      "unmute": "nimi",
+      "deaf": "nimi",
+      "undeaf": "nimi",
+      "priority": "nimi",
+      "register": "nimi",
+      "move": "nimi kanava",
+      "moveall": "kanava",
+      "unban": "nimi tai osoite"
+    },
+    "results": {
+      "muted": "Mykistit henkilön {{name}} palvelimella.",
+      "unmuted": "Poistin mykistyksen henkilöltä {{name}} palvelimella.",
+      "deafened": "Kuuroutit henkilön {{name}} palvelimella.",
+      "undeafened": "Poistin kuuroutuksen henkilöltä {{name}} palvelimella.",
+      "priorityOn": "Teit {{name}}:sta prioriittipuhujan.",
+      "priorityOff": "{{name}} ei enää ole prioriittipuhuja.",
+      "registered": "{{name}} on rekisteröitynyt palvelimelle.",
+      "moved": "Siirsit henkilön {{name}} kanavalle {{channel}}.",
+      "movedAll": "Siirrettiin {{moved}} / {{total}} henkilöstä.",
+      "movedSome": "Siirrettiin {{moved}} / {{total}} henkilöstä; palvelin hylkäsi {{refused}}.",
+      "alreadyMoving": "Henkilöitä siirretään parhaillaan…",
+      "unbanned": "{{name}}:n esto on poistettu.",
+      "kicked": "Potkaisit henkilön {{name}} palvelimelta.",
+      "banned": "Estin henkilön {{name}} palvelimella.",
+      "noAnswer": "Palvelin ei vastannut."
+    },
+    "errors": {
+      "unknownPerson": "Palvelimella ei juuri nyt ole henkilöä nimeltä ”{{name}}”.",
+      "unknownPersonDidYouMean": "Palvelimella ei juuri nyt ole henkilöä nimeltä ”{{name}}”. Tarkoititko {{suggestion}}?",
+      "unknownChannel": "Palvelimella ei ole kanavaa nimeltä ”{{name}}”.",
+      "ambiguousChannel": "Useampi kanava sopii: {{names}}.",
+      "needChannel": "Mikä kanava? Kirjoita sen nimi komennon perään.",
+      "needBan": "Mikä esto? Kirjoita nimi tai osoite komennon perään.",
+      "unknownBan": "Tällä palvelimella ei ole estoa, joka vastaisi hakua ”{{name}}”.",
+      "banChanged": "Tämä esto muuttui palvelimella, kun päättelit.",
+      "alreadyInChannel": "Olet jo kanavalla {{channel}}."
+    }
+  }
 }

@@ -23,6 +23,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { ComposerIcon } from "../../components/ComposerIcon";
+import type { Conversation } from "../../api";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useNoRelayHint } from "../files/composer/noRelayHint";
@@ -49,7 +50,9 @@ import {
   type MentionQuery,
 } from "./mentions";
 import { MentionPicker, type MentionOption } from "./MentionPicker";
-import { CommandPicker, commandOptionId, useSlashCommands } from "../plugins/chat";
+import { SlashPicker } from "./SlashPicker";
+import { commandOptionId, useSlashCommands } from "./slashCommands";
+import { useAdminSlash } from "../admin/commands/useAdminSlash";
 import type { ReplyQuote } from "./reply";
 import { credentialLinks as countCredentials, mumbleLinks } from "./mumbleLink";
 import { MumbleLinkCard } from "./MumbleLinkCard";
@@ -66,6 +69,8 @@ import { isHiddenBot } from "../channels/mumcord";
 
 export interface ComposerProps {
   target: SendTarget | null;
+  /** The conversation being typed in; a command's result line lands here (issue #378). */
+  conversation: Conversation;
   limits: MessageLimits;
   /** Accessible name and placeholder, e.g. "Message #Lobby". */
   label: string;
@@ -136,6 +141,7 @@ function hasText(data: DataTransfer): boolean {
 
 export function Composer({
   target,
+  conversation,
   limits,
   label,
   blockedReason,
@@ -193,8 +199,10 @@ export function Composer({
   const pickerId = useId();
   const commandListId = `${pickerId}-commands`;
   const disabled = blockedReason !== null;
-  // Plugin slash commands (FR-6.43): a typed command goes to its plugin, never into the chat.
-  const slash = useSlashCommands(composer.text, composer.setText, disabled);
+  // Mumcord's own admin commands, then the plugins' (FR-10.30, FR-6.43): a typed command goes to
+  // the engine or its plugin, never into the chat.
+  const admin = useAdminSlash(composer.text, composer.setText, disabled, conversation);
+  const slash = useSlashCommands(composer.text, composer.setText, disabled, admin);
 
   // Mention autocomplete (FR-1.51).
   const [caret, setCaret] = useState(0);
@@ -206,7 +214,10 @@ export function Composer({
   const selfSession = useServerSelector((state) => state.selfSession);
   const ownChannel = useServerSelector((state) => selfUser(state)?.channelId ?? null);
   const mention = useMemo(
-    () => (disabled ? null : findMentionQuery(composer.text, caret)),
+    // A slash line is a command; its own picker offers the people or channels an argument takes,
+    // so the @ mention list must not open on top of it (issue #378).
+    () =>
+      disabled || composer.text.startsWith("/") ? null : findMentionQuery(composer.text, caret),
     [composer.text, caret, disabled],
   );
   const hereChannel = target?.kind === "channel" ? target.channelId : ownChannel;
@@ -585,6 +596,12 @@ export function Composer({
             {slash.error}
           </p>
         ) : null}
+        {admin.notice ? (
+          // Why a command did not run: no such person, or a name several people match (FR-10.34).
+          <p className="chat-composer__error" role="alert">
+            {admin.notice}
+          </p>
+        ) : null}
         {composer.error ? (
           <p id={errorId} className="chat-composer__error" role="alert">
             {composer.error}
@@ -638,7 +655,7 @@ export function Composer({
             onPick={pick}
           />
         ) : null}
-        <CommandPicker id={commandListId} slash={slash} />
+        <SlashPicker id={commandListId} slash={slash} />
         <p className="visually-hidden" role="status">
           {pickerOpen ? t("mention.found", { count: options.length }) : ""}
         </p>

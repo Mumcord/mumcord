@@ -255,52 +255,6 @@ impl Engine {
         Ok(views)
     }
 
-    /// Registers an online guest under their current name (FR-10.20, AC-10.15). This needs a client
-    /// certificate, which is what the account is bound to, and only works while the person is
-    /// connected (issue: "registers an online guest").
-    pub fn registered_register_person(
-        &self,
-        server_id: ServerId,
-        session: u32,
-    ) -> EngineResult<()> {
-        let ctx = self.session_ctx_for(server_id)?;
-        if !self.can_register(server_id)? {
-            return Err(denied("register right in the root channel"));
-        }
-        if ctx.handle.with_state(|state| state.session) == Some(session) {
-            // Registering yourself is the SelfRegister path, which has its own place (FR-1.34).
-            return Err(EngineError::invalid(
-                "registering yourself is not offered here",
-            ));
-        }
-        let known = ctx.handle.with_state(|state| {
-            state
-                .users
-                .get(&session)
-                .map(|user| (user.user_id, user.cert_hash.clone()))
-        });
-        let Some((user_id, cert_hash)) = known else {
-            return Err(EngineError::invalid("this person is not connected"));
-        };
-        if user_id.is_some() {
-            return Err(EngineError::invalid("this person is registered already"));
-        }
-        if cert_hash.is_none() {
-            return Err(EngineError::invalid(
-                "registering needs a client certificate",
-            ));
-        }
-        ctx.handle
-            .send_admin_user_state(proto::UserState {
-                session: Some(session),
-                user_id: Some(0),
-                ..Default::default()
-            })
-            .map_err(convert::command_error)?;
-        tracing::info!(server_id, "registered users: person registered");
-        Ok(())
-    }
-
     /// The groups that name one account, which the detail panel shows (issue #256). They are read
     /// where the account was last seen, or at the root when the server does not say, because that
     /// is the tree the panel is talking about. Standard servers answer an ACL query only for users

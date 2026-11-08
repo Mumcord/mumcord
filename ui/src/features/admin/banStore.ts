@@ -75,6 +75,11 @@ export function useServerAdmin(): BanWindow | null {
   );
 }
 
+/** The open window outside React: a command must not drop the list an open window still uses. */
+export function currentBanWindow(): BanWindow | null {
+  return current;
+}
+
 /** Opens the window on one of its tabs and reads what that tab shows. */
 export function openServerAdmin(serverId: number, tab: AdminTab = "bans"): void {
   set({
