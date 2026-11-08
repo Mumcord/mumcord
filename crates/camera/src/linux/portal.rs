@@ -637,6 +637,7 @@ fn stream(
         })
         .process({
             let pump = Rc::clone(pump);
+            let mut layout_logged = false;
             move |stream, _| {
                 let Some(mut buffer) = stream.dequeue_buffer() else {
                     return;
@@ -644,6 +645,18 @@ fn stream(
                 let Some((first, rest)) = buffer.datas_mut().split_first_mut() else {
                     return;
                 };
+                if !layout_logged {
+                    // Producers lay out NV12 buffers differently; the first buffer's layout
+                    // explains an "unreadable pictures" stop without a debugger.
+                    layout_logged = true;
+                    tracing::info!(
+                        mode = ?mode,
+                        planes = 1 + rest.len(),
+                        first = ?layout(first),
+                        second = ?rest.first_mut().map(layout),
+                        "camera buffer layout"
+                    );
+                }
                 let Some(first) = plane(first) else {
                     return;
                 };
@@ -704,9 +717,21 @@ impl<'a> PlaneView<'a> {
         &self.mapped[start..end]
     }
 
+    /// Everything after the offset, whatever the chunk size says.
+    fn rest(&self) -> &'a [u8] {
+        &self.mapped[self.offset.min(self.mapped.len())..]
+    }
+
     fn stride_or(&self, tight: usize) -> usize {
         if self.stride == 0 { tight } else { self.stride }
     }
+}
+
+/// Offset, size and stride of a plane's chunk and the length of its mapping, for the log.
+fn layout(data: &mut spa::buffer::Data) -> (u32, u32, i32, Option<usize>) {
+    let chunk = data.chunk();
+    let (offset, size, stride) = (chunk.offset(), chunk.size(), chunk.stride());
+    (offset, size, stride, data.data().map(|mapped| mapped.len()))
 }
 
 /// A buffer plane with mapped memory. `None` when it has none (no picture).
@@ -754,6 +779,10 @@ fn nv12_raw<'a>(
             }
         }
         None => {
+            // Some producers set the chunk size to the Y plane alone although the chroma
+            // follows it in the same buffer; then the chroma lies beyond the size.
+            let whole = y_stride * height + y_stride * height.div_ceil(2);
+            let luma = if luma.len() < whole { y.rest() } else { luma };
             let split = (y_stride * height).min(luma.len());
             let (y, uv) = luma.split_at(split);
             Raw::Nv12 {
@@ -1047,6 +1076,16 @@ mod tests {
             (y.len(), y_stride, uv.len(), uv_stride),
             (W * H, W, W * H / 2, W)
         );
+    }
+
+    #[test]
+    fn one_plane_whose_size_covers_only_the_luma_still_gives_the_chroma() {
+        let mut frame = [1u8; W * H * 3 / 2];
+        frame[W * H..].fill(2);
+        let raw = nv12_raw(view(&frame, 0, W * H, W), None, W, H).unwrap();
+        let (y, _, uv, uv_stride) = nv12_parts(raw);
+        assert_eq!((y.len(), uv.len(), uv_stride), (W * H, W * H / 2, W));
+        assert!(uv.iter().all(|&b| b == 2));
     }
 
     #[test]

@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Linux: cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when the camera reports only the brightness part of each picture as filled; the first picture's layout is now logged to diagnose other cameras
 - The activity feed no longer offers "Watch" on your own screen share or "Join" on your own watch party or activity; you are already in it (#664)
 - Screen readers no longer get a broken list announcement while the @mention or /command suggestions are open in the message box; they hear how many suggestions there are
 - Windows: virtual cameras that only DirectShow knows, such as the OBS Virtual Camera, now show in the camera list next to real cameras and work like them, background effects included. OBS is asked for 720p, so a 1080p output does not arrive at half size. A virtual camera that has nothing to show or never starts stops with "The camera couldn't be started" instead of hanging (#631)
