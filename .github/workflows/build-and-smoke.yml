@@ -1,10 +1,10 @@
 name: Build and smoke
 
 # Reusable: builds the unsigned bundles (Linux AppImage, Windows NSIS installer and portable zip,
-# macOS universal DMG), uploads them as workflow artifacts, then installs each one on a fresh runner and
+# macOS DMGs for Apple Silicon and Intel), uploads them as workflow artifacts, then installs each one on a fresh runner and
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
 # test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
-# Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
+# Release builds sign and notarize the macOS DMGs only when the Apple secrets exist, and sign the
 # Windows app and installer with the Certum certificate through SimplySign only when the Certum
 # secrets and variable exist (docs/release-signing.md); without them those bundles are built unsigned.
 # Release builds also bundle the third-party notices that release.yml regenerated (artifact
@@ -66,15 +66,21 @@ jobs:
             args: --bundles nsis --config src-tauri/tauri.onnxruntime.windows.json
             # The installer and the portable zip (packaged below from the same Mumcord.exe).
             bundle: target/release/bundle/nsis/*-setup.exe target/release/bundle/nsis/*-portable.zip
-          # One DMG for Apple Silicon and Intel Macs. The smoke test on the arm64 runner
-          # exercises the arm64 half. "app" keeps Mumcord.app after the DMG is built (Tauri
-          # deletes it otherwise); releases pack it into the updater archive.
-          - name: macos
+          # One DMG per Mac architecture, each built natively in parallel: Apple Silicon on the
+          # arm64 runner, Intel on GitHub's last Intel image (macos-15-intel). Tauri names the
+          # DMG after the architecture (_aarch64.dmg, _x64.dmg); "arch" names the updater archive
+          # the same way. "app" keeps Mumcord.app after the DMG is built (Tauri deletes it
+          # otherwise); releases pack it into the updater archive.
+          - name: macos-aarch64
             os: macos-latest
-            args: --bundles app,dmg --target universal-apple-darwin --config src-tauri/tauri.onnxruntime.macos.json
-            onnxruntime-target: universal-apple-darwin
-            bundle: target/universal-apple-darwin/release/bundle/dmg/*.dmg
-            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
+            args: --bundles app,dmg --config src-tauri/tauri.onnxruntime.macos.json
+            bundle: target/release/bundle/dmg/*.dmg
+            arch: aarch64
+          - name: macos-x64
+            os: macos-15-intel
+            args: --bundles app,dmg --config src-tauri/tauri.onnxruntime.macos.json
+            bundle: target/release/bundle/dmg/*.dmg
+            arch: x64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     # The Certum signing secrets exist only in the "release" environment, which accepts only
@@ -188,8 +194,6 @@ jobs:
         uses: ./.github/actions/native-av1
 
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.rust-targets }}
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -275,7 +279,7 @@ jobs:
       # in the build arguments (Linux /usr/lib/mumcord, Windows next to Mumcord.exe with the
       # Visual C++ runtime it needs, macOS Contents/Frameworks, signed with the app).
       - name: Stage ONNX Runtime
-        run: node scripts/stage-onnxruntime.js ${{ matrix.onnxruntime-target }}
+        run: node scripts/stage-onnxruntime.js
 
       # The AppImage bundles the GStreamer plugins (bundleMediaFramework) but not H.264 (gst-libav,
       # x264) or the GPL-only codecs; see RELEASING.md. The deb/rpm packages depend on gst-libav instead.
@@ -425,9 +429,9 @@ jobs:
           cp ${{ matrix.bundle }} out/
           # The in-app updater swaps the whole app from this archive (issue #168); the release job
           # signs it. COPYFILE_DISABLE keeps macOS metadata files out of the archive.
-          if [[ "${{ matrix.name }}" == "macos" && "${{ inputs.release }}" == "true" ]]; then
-            COPYFILE_DISABLE=1 tar -czf "out/Mumcord_${{ inputs.version }}_universal.app.tar.gz" \
-              -C target/universal-apple-darwin/release/bundle/macos Mumcord.app
+          if [[ "$RUNNER_OS" == macOS && "${{ inputs.release }}" == "true" ]]; then
+            COPYFILE_DISABLE=1 tar -czf "out/Mumcord_${{ inputs.version }}_${{ matrix.arch }}.app.tar.gz" \
+              -C target/release/bundle/macos Mumcord.app
           fi
           # Tells the release job to describe the DMG as signed and notarized.
           if [[ "${MUMCORD_MACOS_SIGNED:-}" == "true" ]]; then touch out/MACOS-SIGNED; fi
@@ -462,7 +466,9 @@ jobs:
           - { name: linux, os: ubuntu-24.04, mumbot: linux-x86_64 }
           - { name: linux-arm64, os: ubuntu-24.04-arm, mumbot: linux-aarch64 }
           - { name: windows, os: windows-latest, mumbot: windows-x86_64 }
-          - { name: macos, os: macos-latest, mumbot: macos-universal }
+          # The test bot itself ships as one universal macOS binary.
+          - { name: macos-aarch64, os: macos-latest, mumbot: macos-universal, arch: arm64 }
+          - { name: macos-x64, os: macos-15-intel, mumbot: macos-universal, arch: x86_64 }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     defaults:
@@ -775,11 +781,17 @@ jobs:
           mount=$(hdiutil attach -nobrowse -readonly "$dmg" | awk -F'\t' '/\/Volumes\//{print $NF}')
           cp -R "$mount/Mumcord.app" /Applications/
           hdiutil detach "$mount"
-          # Camera background effects: ONNX Runtime for both architectures in the app's
-          # Frameworks, signed with the app (Developer ID in a signed build, ad hoc otherwise).
+          # Each DMG holds exactly its own architecture: the runner's (uname -m), for the app and
+          # for ONNX Runtime (camera background effects) in the app's Frameworks, signed with the
+          # app (Developer ID in a signed build, ad hoc otherwise).
+          [[ "$(uname -m)" == "${{ matrix.arch }}" ]] \
+            || { echo "runner is $(uname -m), expected ${{ matrix.arch }}" >&2; exit 1; }
           ort=/Applications/Mumcord.app/Contents/Frameworks/libonnxruntime.1.23.2.dylib
-          for arch in arm64 x86_64; do
-            lipo "$ort" -verify_arch "$arch" || { echo "ONNX Runtime has no $arch slice" >&2; exit 1; }
+          exe=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' /Applications/Mumcord.app/Contents/Info.plist)
+          for bin in "/Applications/Mumcord.app/Contents/MacOS/$exe" "$ort"; do
+            archs=$(lipo -archs "$bin")
+            [[ "$archs" == "${{ matrix.arch }}" ]] \
+              || { echo "$bin has architectures '$archs', expected only ${{ matrix.arch }}" >&2; exit 1; }
           done
           codesign --verify --strict --verbose=2 "$ort"
           if [[ -e build/MACOS-SIGNED ]]; then

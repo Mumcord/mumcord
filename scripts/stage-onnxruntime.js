@@ -9,7 +9,6 @@
 //   src-tauri/tauri.onnxruntime.macos.json    app bundle: Contents/Frameworks/
 // These are separate from tauri.<platform>.conf.json because Tauri checks at compile time that
 // Windows resources and macOS frameworks exist, which would break every plain cargo build.
-// For the universal macOS app both architectures are merged into one library with `lipo`.
 //
 // Usage: node scripts/stage-onnxruntime.js [target-triple]
 // The target defaults to TAURI_ENV_TARGET_TRIPLE, then to the host.
@@ -84,14 +83,7 @@ const staged = join(root, "src-tauri", "gen", "onnxruntime");
 rmSync(staged, { recursive: true, force: true });
 mkdirSync(staged, { recursive: true });
 
-if (triple === "universal-apple-darwin") {
-  const parts = ["aarch64-apple-darwin", "x86_64-apple-darwin"].map(libraryFor);
-  const target = join(staged, plainName(parts[0]));
-  run("lipo", ["-create", ...parts, "-output", target]);
-  console.log(`ONNX Runtime (universal): ${target}`);
-} else {
-  const library = libraryFor(triple);
-  const target = join(staged, plainName(library));
-  copyFileSync(library, target);
-  console.log(`ONNX Runtime (${triple}): ${library}`);
-}
+const library = libraryFor(triple);
+const target = join(staged, plainName(library));
+copyFileSync(library, target);
+console.log(`ONNX Runtime (${triple}): ${library}`);

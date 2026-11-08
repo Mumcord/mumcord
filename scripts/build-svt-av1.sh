@@ -5,8 +5,7 @@
 #   scripts/build-svt-av1.sh <prefix>
 #
 # Result: <prefix>/include/svt-av1/*.h, <prefix>/lib/SvtAv1Enc.lib (Windows) or
-# <prefix>/lib/libSvtAv1Enc.a (macOS: one universal archive with arm64 and x86_64 slices; Linux:
-# the host architecture), and <prefix>/lib/pkgconfig/SvtAv1Enc.pc, which locates itself, so the
+# <prefix>/lib/libSvtAv1Enc.a (macOS and Linux: the host architecture), and <prefix>/lib/pkgconfig/SvtAv1Enc.pc, which locates itself, so the
 # prefix can move. An existing result is kept, so CI can restore <prefix> from its cache and call
 # this script unconditionally.
 #
@@ -69,15 +68,11 @@ elif [[ $os == linux ]]; then
   build "$work/build" "$work/install"
   install="$work/install"
 else
-  for arch in arm64 x86_64; do
-    # CMAKE_OSX_ARCHITECTURES lets the arm64 runner build the x86_64 half.
-    build "$work/build-$arch" "$work/install-$arch" -DCMAKE_OSX_ARCHITECTURES="$arch" \
-      -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_DEPLOYMENT_TARGET"
-  done
-  install="$work/install-arm64"
-  lipo -create "$work/install-arm64/lib/libSvtAv1Enc.a" "$work/install-x86_64/lib/libSvtAv1Enc.a" \
-    -output "$work/libSvtAv1Enc.a"
-  mv "$work/libSvtAv1Enc.a" "$install/lib/libSvtAv1Enc.a"
+  # Each Mac release (Apple Silicon, Intel) is built natively on a runner of its architecture
+  # (uname -m: arm64 or x86_64).
+  build "$work/build" "$work/install" -DCMAKE_OSX_ARCHITECTURES="$(uname -m)" \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOS_DEPLOYMENT_TARGET"
+  install="$work/install"
   lipo -info "$install/lib/libSvtAv1Enc.a"
 fi
 

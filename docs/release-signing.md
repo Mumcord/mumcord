@@ -107,8 +107,9 @@ New certificates have no SmartScreen reputation yet, so the first signed release
 
 ## macOS signing and notarization
 
-Release builds (`vX.Y.Z` tags, `.github/workflows/release.yml`) sign and notarize the universal
-`.dmg` when the Apple secrets below exist. Without them the app gets an ad-hoc signature instead
+Release builds (`vX.Y.Z` tags, `.github/workflows/release.yml`) sign and notarize both macOS
+`.dmg` files (Apple Silicon `_aarch64.dmg` and Intel `_x64.dmg`, each built natively by its own
+job with the same secrets) when the Apple secrets below exist. Without them the app gets an ad-hoc signature instead
 (see below), and the release notes tell users how to open an app that is not notarized. Test
 builds are never signed with the Developer ID.
 
@@ -121,7 +122,7 @@ Signing is done by Tauri itself. It needs no server-side change.
   The `APPLE_SIGNING_IDENTITY` secret overrides it for signed releases. Tauri signs inside out
   with that one identity: the ONNX Runtime library in `Contents/Frameworks` (camera background
   effects; `src-tauri/tauri.onnxruntime.macos.json`, staged by `scripts/stage-onnxruntime.js`
-  as one universal file), then the app's only executable (the universal `Mumcord` binary; there
+  for the build's architecture), then the app's only executable (the `Mumcord` binary; there
   are no helpers or sidecars), then the `.app` bundle. The smoke test checks that the library
   is signed by the same team as the app.
 - **Hardened runtime** (Tauri's default) with `src-tauri/Entitlements.plist`:
@@ -221,9 +222,9 @@ Any mismatch discards the download and shows an error; the installed version sta
 
 The **Create draft release** job in `.github/workflows/release.yml` runs `scripts/sign-updater-bundles.sh` on the finished release files:
 
-- it signs `Mumcord_X.Y.Z_amd64.AppImage`, `Mumcord_X.Y.Z_aarch64.AppImage`, `Mumcord_X.Y.Z_x64-setup.exe` (after its Windows signature) and `Mumcord_X.Y.Z_universal.app.tar.gz` (the signed and notarized `.app`, packed by the macOS build job) with `tauri signer sign --app-version X.Y.Z`, which writes a `.sig` next to each file,
+- it signs `Mumcord_X.Y.Z_amd64.AppImage`, `Mumcord_X.Y.Z_aarch64.AppImage`, `Mumcord_X.Y.Z_x64-setup.exe` (after its Windows signature) `Mumcord_X.Y.Z_aarch64.app.tar.gz` and `Mumcord_X.Y.Z_x64.app.tar.gz` (the signed and notarized `.app` for Apple Silicon and for Intel, each packed by its macOS build job) with `tauri signer sign --app-version X.Y.Z`, which writes a `.sig` next to each file,
 - it checks every signature against the public key in `src-tauri/tauri.conf.json` with `scripts/verify-updater-signature.js`, so a private key that does not match the app fails the release instead of every user's update,
-- it writes the update manifest `latest.json` (Tauri's static format; keys `linux-x86_64-appimage`, `linux-aarch64-appimage`, `windows-x86_64-nsis`, `darwin-aarch64-app`, `darwin-x86_64-app`).
+- it writes the update manifest `latest.json` (Tauri's static format; keys `linux-x86_64-appimage`, `linux-aarch64-appimage`, `windows-x86_64-nsis`, `darwin-aarch64-app` for the Apple Silicon archive, `darwin-x86_64-app` for the Intel archive). The app asks for the key of the architecture it runs on, so an installed universal app (0.7.x and older) updates to the build for its own Mac.
 
 The `.sig` files, `latest.json` and the `.app.tar.gz` are release assets and are listed in `SHA256SUMS`, so `releases/X.Y.Z.json` (post-release sync) records them like every other asset. The release **fails** when the secret is missing or `pubkey` is empty: a release never ships without updater signatures. The `.deb`, `.rpm`, AUR package and the portable Windows zip are not signed for the updater; they are updated by the package manager or by hand.
 
