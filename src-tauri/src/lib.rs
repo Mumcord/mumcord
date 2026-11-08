@@ -116,6 +116,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             admin::person_kick,
             admin::person_ban,
             admin::person_action_close,
+            admin::person_moderate,
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,

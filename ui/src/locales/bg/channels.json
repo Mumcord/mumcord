@@ -33,7 +33,8 @@
     "serverDeafened": "оглушен от сървъра",
     "suppressed": "потиснат (не може да говори тук)",
     "localMuted": "заглушен за теб",
-    "unregistered": "нерегистриран"
+    "unregistered": "нерегистриран",
+    "prioritySpeaker": "приоритетен говорител"
   },
   "mumcordBadge": "Използва Mumcord",
   "botBadge": "Бот",
@@ -60,7 +61,8 @@
     "nowPlaying": "Слуша {{track}}",
     "nowGaming": "Играе {{game}}",
     "weakConnection": "Слаба връзка – висок пинг или загуба на пакети",
-    "positional": "Позиционният звук е активен"
+    "positional": "Позиционният звук е активен",
+    "prioritySpeaker": "Приоритетен говорител – чува се над всички"
   },
   "announce": {
     "joined": "{{name}} влезе в твоя канал",

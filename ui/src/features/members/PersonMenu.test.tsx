@@ -508,3 +508,117 @@ describe("joinTarget", () => {
     expect(joinTarget(state, carla)?.blocked).toBeNull();
   });
 });
+
+describe("moderation in the person menu (issue #257, FR-10.15, FR-10.19)", () => {
+  async function renderWithActions() {
+    api = await connectedMock();
+    render(
+      <>
+        <MembersPanel />
+        <PersonMenuHost />
+        <PersonActionHost />
+      </>,
+    );
+    await screen.findByRole("heading", { name: "In Lobby (4)" });
+  }
+  const grant = (
+    channelId: number,
+    patch: { muteDeafen?: boolean; resetUserContent?: boolean },
+  ) => {
+    const channel = getServerState().channels.get(channelId);
+    if (!channel) throw new Error("seed channel missing");
+    act(() => {
+      api.mock.updateChannel(channelId, {
+        ...channel,
+        permissions: { ...channel.permissions, ...patch },
+      });
+    });
+  };
+  const anna = () => [...getServerState().users.values()].find((u) => u.name === "Anna");
+  function openAdmin() {
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+    fireEvent.click(screen.getByRole("menuitem", { name: "Admin" }));
+    const submenu = screen.getAllByRole("menu").at(-1);
+    if (!submenu) throw new Error("the Admin sub-menu did not open");
+    return submenu;
+  }
+  afterEach(() => {
+    act(resetPersonAction);
+  });
+
+  it("toggles server mute, deafen and priority speaker with a tick, only with the right", async () => {
+    await renderWithActions();
+    const lobby = anna()?.channelId ?? 1;
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+    expect(screen.queryByRole("menuitem", { name: "Admin" })).not.toBeInTheDocument();
+    act(closePersonMenu);
+
+    grant(lobby, { muteDeafen: true });
+    let submenu = openAdmin();
+    const mute = within(submenu).getByRole("menuitemcheckbox", { name: "Server mute" });
+    expect(mute).toHaveAttribute("aria-checked", "false");
+    expect(
+      within(submenu).queryByRole("menuitem", { name: "Un-suppress" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(mute);
+    await waitFor(() => {
+      expect(anna()?.serverMute).toBe(true);
+    });
+
+    submenu = openAdmin();
+    expect(within(submenu).getByRole("menuitemcheckbox", { name: "Server mute" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    // Deafen mutes too, as in Mumble.
+    fireEvent.click(within(submenu).getByRole("menuitemcheckbox", { name: "Server deafen" }));
+    await waitFor(() => {
+      expect(anna()?.serverDeaf).toBe(true);
+    });
+
+    submenu = openAdmin();
+    fireEvent.click(within(submenu).getByRole("menuitemcheckbox", { name: "Priority speaker" }));
+    await waitFor(() => {
+      expect(anna()?.prioritySpeaker).toBe(true);
+    });
+    // The member list shows the star, with its meaning for screen readers.
+    expect(member(/^Anna/)).toHaveAccessibleName(/priority speaker/);
+  });
+
+  it("offers Un-suppress only for someone suppressed", async () => {
+    await renderWithActions();
+    const person = anna();
+    if (!person) throw new Error("seed person missing");
+    grant(person.channelId, { muteDeafen: true });
+    act(() => {
+      api.mock.upsertUser({ ...person, suppressed: true });
+    });
+    fireEvent.click(within(openAdmin()).getByRole("menuitem", { name: "Un-suppress" }));
+    await waitFor(() => {
+      expect(anna()?.suppressed).toBe(false);
+    });
+  });
+
+  it("asks before resetting a comment or avatar, and needs the right in Root", async () => {
+    await renderWithActions();
+    const person = anna();
+    if (!person) throw new Error("seed person missing");
+    act(() => {
+      api.mock.upsertUser({ ...person, hasComment: true, hasAvatar: true });
+    });
+    grant(0, { resetUserContent: true });
+    const submenu = openAdmin();
+    expect(
+      within(submenu)
+        .getAllByRole("menuitem")
+        .map((item) => item.textContent),
+    ).toEqual(["Reset comment", "Reset avatar"]);
+    fireEvent.click(within(submenu).getByRole("menuitem", { name: "Reset comment" }));
+    const ask = await screen.findByRole("alertdialog", { name: /^Reset Anna's comment\?/ });
+    expect(anna()?.hasComment).toBe(true);
+    fireEvent.click(within(ask).getByRole("button", { name: "Reset" }));
+    await waitFor(() => {
+      expect(anna()?.hasComment).toBe(false);
+    });
+  });
+});

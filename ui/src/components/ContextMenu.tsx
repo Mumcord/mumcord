@@ -3,6 +3,7 @@
  * inside the window, arrow keys between items, Escape or Tab closes it and returns the focus.
  */
 import {
+  Fragment,
   useEffect,
   useId,
   useLayoutEffect,
@@ -37,8 +38,14 @@ export interface MenuItem {
   disabled?: boolean;
   /** Selecting it opens another menu: shows an arrow and announces the popup. */
   submenu?: boolean;
+  /** Makes the item a toggle (menuitemcheckbox) with this state and a tick when on. */
+  checked?: boolean;
+  /** Draws a divider above the item, e.g. before the red actions (FR-10.6). */
+  separatorBefore?: boolean;
   onSelect: () => void;
 }
+
+const ITEMS = '[role="menuitem"], [role="menuitemcheckbox"]';
 
 export interface ContextMenuProps {
   menu: MenuPosition;
@@ -104,12 +111,12 @@ export function ContextMenu({ menu, label, items, header, onClose }: ContextMenu
     element.style.left = `${String(left)}px`;
     element.style.top = `${String(top)}px`;
     selection.current = saveSelection();
-    element.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+    element.querySelector<HTMLElement>(ITEMS)?.focus();
     restoreSelection(selection.current);
   }, [menu]);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const elements = [...(ref.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [])];
+    const elements = [...(ref.current?.querySelectorAll<HTMLElement>(ITEMS) ?? [])];
     const index = elements.findIndex((item) => item === document.activeElement);
     const focusAt = (next: number) => {
       elements[(next + elements.length) % elements.length]?.focus();
@@ -152,55 +159,71 @@ export function ContextMenu({ menu, label, items, header, onClose }: ContextMenu
         const labelId = `${idBase}-label-${String(index)}`;
         const hintId = `${idBase}-hint-${String(index)}`;
         return (
-          <button
-            key={item.label}
-            type="button"
-            role="menuitem"
-            tabIndex={-1}
-            className={`server-menu__item${item.danger ? " server-menu__item--danger" : ""}`}
-            aria-labelledby={item.hint ? labelId : undefined}
-            aria-describedby={item.hint ? hintId : undefined}
-            aria-disabled={item.disabled === true ? true : undefined}
-            aria-haspopup={item.submenu === true ? "menu" : undefined}
-            onClick={() => {
-              if (item.disabled === true) return;
-              close(true);
-              restoreSelection(selection.current);
-              item.onSelect();
-            }}
-          >
-            {item.icon ? (
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
-                <path
-                  d={item.icon}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            ) : null}
-            <span className="server-menu__text">
-              <span id={labelId}>{item.label}</span>
-              {item.hint ? (
-                <span id={hintId} className="server-menu__hint">
-                  {item.hint}
+          <Fragment key={item.label}>
+            {item.separatorBefore === true && (
+              <div role="separator" className="server-menu__separator" />
+            )}
+            <button
+              type="button"
+              role={item.checked === undefined ? "menuitem" : "menuitemcheckbox"}
+              aria-checked={item.checked}
+              tabIndex={-1}
+              className={`server-menu__item${item.danger ? " server-menu__item--danger" : ""}`}
+              aria-labelledby={item.hint ? labelId : undefined}
+              aria-describedby={item.hint ? hintId : undefined}
+              aria-disabled={item.disabled === true ? true : undefined}
+              aria-haspopup={item.submenu === true ? "menu" : undefined}
+              onClick={() => {
+                if (item.disabled === true) return;
+                close(true);
+                restoreSelection(selection.current);
+                item.onSelect();
+              }}
+            >
+              {item.icon ? (
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d={item.icon}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              ) : null}
+              <span className="server-menu__text">
+                <span id={labelId}>{item.label}</span>
+                {item.hint ? (
+                  <span id={hintId} className="server-menu__hint">
+                    {item.hint}
+                  </span>
+                ) : null}
+              </span>
+              {item.submenu === true ? (
+                <svg
+                  className="server-menu__submenu"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              ) : null}
+              {item.checked === true ? (
+                <span className="server-menu__end server-menu__tick" aria-hidden="true">
+                  ✓
                 </span>
               ) : null}
-            </span>
-            {item.submenu === true ? (
-              <svg
-                className="server-menu__submenu"
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" />
-              </svg>
-            ) : null}
-          </button>
+            </button>
+          </Fragment>
         );
       })}
     </div>,

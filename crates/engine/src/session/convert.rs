@@ -135,6 +135,7 @@ pub fn user_view(
         self_deaf: user.self_deaf,
         server_mute: user.mute,
         server_deaf: user.deaf,
+        priority_speaker: user.priority_speaker,
         suppressed: user.suppress,
         listening_channel_ids: user.listening.iter().copied().collect(),
         avatar_hash: user.texture_hash.as_deref().map(hex),

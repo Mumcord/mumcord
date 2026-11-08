@@ -835,6 +835,7 @@ mod tests {
             server_mute: false,
             server_deaf: false,
             suppressed: false,
+            priority_speaker: false,
             listening_channel_ids: Vec::new(),
             has_avatar: false,
             avatar_hash: None,

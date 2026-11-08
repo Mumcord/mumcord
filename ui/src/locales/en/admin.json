@@ -153,5 +153,19 @@
       "selfRegister": "You may not register yourself",
       "resetUserContent": "You may not reset comments and avatars"
     }
+  },
+  "moderate": {
+    "mute": "Server mute",
+    "deafen": "Server deafen",
+    "unsuppress": "Un-suppress",
+    "priority": "Priority speaker",
+    "resetComment": "Reset comment",
+    "resetAvatar": "Reset avatar",
+    "commentTitle": "Reset {{name}}'s comment?",
+    "avatarTitle": "Reset {{name}}'s avatar?",
+    "resetBody": "It is cleared for everyone. They can set a new one.",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "failed": "The server could not be reached. Try again."
   }
 }

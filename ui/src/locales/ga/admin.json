@@ -153,5 +153,19 @@
       "selfRegister": "Ní cheadaítear duit clárú",
       "resetUserContent": "Ní cheadaítear duit tráchtanna agus abhatáir a athshocrú"
     }
+  },
+  "moderate": {
+    "mute": "Balbhaigh ar an bhfreastalaí",
+    "deafen": "Bodhraigh ar an bhfreastalaí",
+    "unsuppress": "Bain an cosc labhartha",
+    "priority": "Cainteoir tosaíochta",
+    "resetComment": "Athshocraigh an trácht",
+    "resetAvatar": "Athshocraigh an t-abhatár",
+    "commentTitle": "Athshocraigh trácht {{name}}?",
+    "avatarTitle": "Athshocraigh abhatár {{name}}?",
+    "resetBody": "Glantar é do chách. Is féidir leo ceann nua a shocrú.",
+    "cancel": "Cealaigh",
+    "reset": "Athshocraigh",
+    "failed": "Níorbh fhéidir teacht ar an bhfreastalaí. Bain triail eile as."
   }
 }

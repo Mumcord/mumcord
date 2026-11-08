@@ -153,5 +153,19 @@
       "selfRegister": "Et saa rekisteröityä",
       "resetUserContent": "Et saa nollata kommentteja ja avatareja"
     }
+  },
+  "moderate": {
+    "mute": "Mykistä palvelimella",
+    "deafen": "Kuurouta palvelimella",
+    "unsuppress": "Poista vaiennus",
+    "priority": "Etusijapuhuja",
+    "resetComment": "Nollaa kommentti",
+    "resetAvatar": "Nollaa avatar",
+    "commentTitle": "Nollataanko käyttäjän {{name}} kommentti?",
+    "avatarTitle": "Nollataanko käyttäjän {{name}} avatar?",
+    "resetBody": "Se poistetaan kaikilta. Hän voi asettaa uuden.",
+    "cancel": "Peruuta",
+    "reset": "Nollaa",
+    "failed": "Palvelimeen ei saatu yhteyttä. Yritä uudelleen."
   }
 }

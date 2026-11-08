@@ -153,5 +153,19 @@
       "selfRegister": "Negali užsiregistruoti",
       "resetUserContent": "Negali atstatyti komentarų ir avatarų"
     }
+  },
+  "moderate": {
+    "mute": "Nutildyti serveryje",
+    "deafen": "Apkurtinti serveryje",
+    "unsuppress": "Atšaukti slopinimą",
+    "priority": "Pirmenybinis kalbėtojas",
+    "resetComment": "Atkurti komentarą",
+    "resetAvatar": "Atkurti avatarą",
+    "commentTitle": "Atkurti {{name}} komentarą?",
+    "avatarTitle": "Atkurti {{name}} avatarą?",
+    "resetBody": "Jis išvalomas visiems. Galima nustatyti naują.",
+    "cancel": "Atšaukti",
+    "reset": "Atkurti",
+    "failed": "Nepavyko pasiekti serverio. Bandyk dar kartą."
   }
 }

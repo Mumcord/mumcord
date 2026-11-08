@@ -153,5 +153,19 @@
       "selfRegister": "Nesmieš sa registrovať",
       "resetUserContent": "Nesmieš resetovať komentáre a avatary"
     }
+  },
+  "moderate": {
+    "mute": "Stlmiť na serveri",
+    "deafen": "Ohlušiť na serveri",
+    "unsuppress": "Zrušiť potlačenie",
+    "priority": "Prednostný rečník",
+    "resetComment": "Obnoviť komentár",
+    "resetAvatar": "Obnoviť avatar",
+    "commentTitle": "Obnoviť komentár používateľa {{name}}?",
+    "avatarTitle": "Obnoviť avatar používateľa {{name}}?",
+    "resetBody": "Vymaže sa pre všetkých. Môže si nastaviť nový.",
+    "cancel": "Zrušiť",
+    "reset": "Obnoviť",
+    "failed": "Server nie je dostupný. Skúste to znova."
   }
 }

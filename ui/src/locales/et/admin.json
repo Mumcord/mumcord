@@ -153,5 +153,19 @@
       "selfRegister": "Sa ei tohi end registreerida",
       "resetUserContent": "Sa ei tohi kommentaare ja avatare lähtestada"
     }
+  },
+  "moderate": {
+    "mute": "Serveris vaigista",
+    "deafen": "Serveris kurdista",
+    "unsuppress": "Tühista summutus",
+    "priority": "Eelisrääkija",
+    "resetComment": "Lähtesta kommentaar",
+    "resetAvatar": "Lähtesta avatar",
+    "commentTitle": "Kas lähtestada kasutaja {{name}} kommentaar?",
+    "avatarTitle": "Kas lähtestada kasutaja {{name}} avatar?",
+    "resetBody": "See eemaldatakse kõigi jaoks. Ta saab määrata uue.",
+    "cancel": "Loobu",
+    "reset": "Lähtesta",
+    "failed": "Serveriga ei saanud ühendust. Proovi uuesti."
   }
 }

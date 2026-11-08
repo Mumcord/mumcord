@@ -39,7 +39,8 @@
     "serverDeafened": "zvuk stlmený serverom",
     "suppressed": "potlačený (tu nemôže hovoriť)",
     "localMuted": "stlmený pre teba",
-    "unregistered": "neregistrovaný"
+    "unregistered": "neregistrovaný",
+    "prioritySpeaker": "prednostný rečník"
   },
   "mumcordBadge": "Používa Mumcord",
   "botBadge": "Bot",
@@ -66,7 +67,8 @@
     "nowPlaying": "Počúva {{track}}",
     "nowGaming": "Hrá {{game}}",
     "weakConnection": "Slabé pripojenie – vysoký ping alebo strata paketov",
-    "positional": "Priestorový zvuk je aktívny"
+    "positional": "Priestorový zvuk je aktívny",
+    "prioritySpeaker": "Prednostný rečník – počuť ho cez ostatných"
   },
   "announce": {
     "joined": "{{name}} sa pripojil(a) do tvojho kanála",

@@ -153,5 +153,19 @@
       "selfRegister": "Du får inte registrera dig",
       "resetUserContent": "Du får inte återställa kommentarer och avatarer"
     }
+  },
+  "moderate": {
+    "mute": "Servertysta",
+    "deafen": "Serverdöva",
+    "unsuppress": "Häv undertryckning",
+    "priority": "Prioriterad talare",
+    "resetComment": "Återställ kommentar",
+    "resetAvatar": "Återställ avatar",
+    "commentTitle": "Återställa kommentaren för {{name}}?",
+    "avatarTitle": "Återställa avataren för {{name}}?",
+    "resetBody": "Den rensas för alla. Personen kan välja en ny.",
+    "cancel": "Avbryt",
+    "reset": "Återställ",
+    "failed": "Servern gick inte att nå. Försök igen."
   }
 }

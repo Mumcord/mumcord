@@ -48,7 +48,7 @@ pub mod watch_party;
 pub mod web;
 pub mod whisper;
 
-pub use admin::{BanOutcome, BanRequest, KickOutcome, PersonView};
+pub use admin::{BanOutcome, BanRequest, KickOutcome, ModerateAction, PersonView};
 pub use banlist::{BanChange, BanSaveOutcome, BanView};
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;

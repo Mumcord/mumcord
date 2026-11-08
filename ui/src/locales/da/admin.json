@@ -153,5 +153,19 @@
       "selfRegister": "Du må ikke registrere dig",
       "resetUserContent": "Du må ikke nulstille kommentarer og avatarer"
     }
+  },
+  "moderate": {
+    "mute": "Server-mute",
+    "deafen": "Server-døv",
+    "unsuppress": "Ophæv undertrykkelse",
+    "priority": "Prioriteret taler",
+    "resetComment": "Nulstil kommentar",
+    "resetAvatar": "Nulstil avatar",
+    "commentTitle": "Nulstil kommentaren for {{name}}?",
+    "avatarTitle": "Nulstil avataren for {{name}}?",
+    "resetBody": "Den ryddes for alle. Personen kan vælge en ny.",
+    "cancel": "Annuller",
+    "reset": "Nulstil",
+    "failed": "Serveren kunne ikke nås. Prøv igen."
   }
 }

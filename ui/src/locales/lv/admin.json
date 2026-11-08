@@ -153,5 +153,19 @@
       "selfRegister": "Tu nedrīksti reģistrēties",
       "resetUserContent": "Tu nedrīksti atiestatīt komentārus un avatārus"
     }
+  },
+  "moderate": {
+    "mute": "Apklusināt serverī",
+    "deafen": "Apkurlināt serverī",
+    "unsuppress": "Atcelt apslāpēšanu",
+    "priority": "Prioritārs runātājs",
+    "resetComment": "Atiestatīt komentāru",
+    "resetAvatar": "Atiestatīt avataru",
+    "commentTitle": "Atiestatīt {{name}} komentāru?",
+    "avatarTitle": "Atiestatīt {{name}} avataru?",
+    "resetBody": "Tas tiek notīrīts visiem. Var iestatīt jaunu.",
+    "cancel": "Atcelt",
+    "reset": "Atiestatīt",
+    "failed": "Serveris nav sasniedzams. Mēģini vēlreiz."
   }
 }

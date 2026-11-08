@@ -39,7 +39,8 @@
     "serverDeafened": "garsą išjungė serveris",
     "suppressed": "užtildytas (-a) (čia kalbėti negali)",
     "localMuted": "nutildytas (-a) tau",
-    "unregistered": "neregistruotas (-a)"
+    "unregistered": "neregistruotas (-a)",
+    "prioritySpeaker": "pirmenybinis kalbėtojas"
   },
   "mumcordBadge": "Naudoja Mumcord",
   "botBadge": "Botas",
@@ -66,7 +67,8 @@
     "nowPlaying": "Klauso: {{track}}",
     "nowGaming": "Žaidžia: {{game}}",
     "weakConnection": "Silpnas ryšys – didelis ping arba paketų praradimas",
-    "positional": "Pozicinis garsas įjungtas"
+    "positional": "Pozicinis garsas įjungtas",
+    "prioritySpeaker": "Pirmenybinis kalbėtojas – girdimas virš visų"
   },
   "announce": {
     "joined": "{{name}} prisijungė prie tavo kanalo",

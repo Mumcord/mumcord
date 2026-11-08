@@ -4,6 +4,7 @@
 
 ### Added
 
+- Moderation in the person menu's "Admin ▸": server mute, server deafen (mutes too), priority speaker (a star next to their name) and un-suppress act at once and show a tick while on; reset comment and reset avatar ask first. Each appears only with the server's right
 - Menus can open sub-menus: admin actions in the server ⋯ menu now sit under "Admin ▸" ("Ban list…" for now), shown only when you have a right in it, with red actions last behind a divider. → opens a sub-menu, ← or Escape goes back
 - When a server's relay changes, Mumcord says so in the notification centre and as a notification (in-app or system), with "Trust new relay" and "Details"; the details compare the old and new fingerprint and say when to trust it. The chat's file sharing hint names the changed relay and links there instead of saying there is no relay
 - Activity feed: an icon for each kind of event, and the feed is saved on this device, so it is still there after a reconnect or a restart (an "Earlier" line marks where this session starts). Settings → Privacy → "Clear activity history" removes it for all servers

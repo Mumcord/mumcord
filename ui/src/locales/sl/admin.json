@@ -153,5 +153,19 @@
       "selfRegister": "Ne smeš se registrirati",
       "resetUserContent": "Ne smeš ponastaviti komentarjev in avatarjev"
     }
+  },
+  "moderate": {
+    "mute": "Utišaj na strežniku",
+    "deafen": "Oglušaj na strežniku",
+    "unsuppress": "Odpravi zadušitev",
+    "priority": "Prednostni govorec",
+    "resetComment": "Ponastavi komentar",
+    "resetAvatar": "Ponastavi avatar",
+    "commentTitle": "Ponastavim komentar uporabnika {{name}}?",
+    "avatarTitle": "Ponastavim avatar uporabnika {{name}}?",
+    "resetBody": "Izbriše se za vse. Lahko nastavi novega.",
+    "cancel": "Prekliči",
+    "reset": "Ponastavi",
+    "failed": "Strežnik ni dosegljiv. Poskusite znova."
   }
 }

@@ -33,7 +33,8 @@
     "serverDeafened": "a szerver süketítette",
     "suppressed": "elnémítva (itt nem beszélhet)",
     "localMuted": "nálad némítva",
-    "unregistered": "nem regisztrált"
+    "unregistered": "nem regisztrált",
+    "prioritySpeaker": "elsőbbségi beszélő"
   },
   "mumcordBadge": "Mumcordot használ",
   "botBadge": "Bot",
@@ -60,7 +61,8 @@
     "nowPlaying": "Most hallgatja: {{track}}",
     "nowGaming": "Most játszik: {{game}}",
     "weakConnection": "Gyenge kapcsolat – magas ping vagy csomagvesztés",
-    "positional": "Térhatású hang aktív"
+    "positional": "Térhatású hang aktív",
+    "prioritySpeaker": "Elsőbbségi beszélő – mindenki más fölött hallható"
   },
   "announce": {
     "joined": "{{name}} belépett a csatornádba",
