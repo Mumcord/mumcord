@@ -139,8 +139,8 @@ Mumcord is compatible with Mumble but **not affiliated with or endorsed by the M
 | Epic 2: Multi-server and themes, watch party and screen sharing                        | Released, 0.4.0 to 0.4.3                                                                                                                        |
 | Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …)                 | Released, 0.5.0                                                                                                                                 |
 | Epic 3.1: Plugin system and the official plugins                                       | Released, 0.6.0; fixes in [0.6.1](https://github.com/Mumcord/mumcord/milestone/10)                                                              |
-| Epic 4.1: File sharing, camera sharing, screen-sharing upgrade and plugin platform 1.1 | 0.7.0 (upcoming)                                                                                                                                |
-| Epic 4: Admin features                                                                 | Planned, see the [Epic 4 milestone](https://github.com/Mumcord/mumcord/milestone/7)                                                             |
+| Epic 4.1: File sharing, camera sharing, screen-sharing upgrade and plugin platform 1.1 | Released, 0.7.0                                                                                                                                 |
+| Epic 4: Admin features                                                                 | In progress (0.7.x → 0.8.0), see the [Epic 4 milestone](https://github.com/Mumcord/mumcord/milestone/7)                                         |
 | Epics 5 and 6: Android and iOS apps, release and distribution (store listings)         | Later, see the [Epic 5](https://github.com/Mumcord/mumcord/milestone/6) and [Epic 6](https://github.com/Mumcord/mumcord/milestone/5) milestones |
 
 Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
