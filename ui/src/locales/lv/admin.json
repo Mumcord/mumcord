@@ -230,7 +230,9 @@
     "conflictReload": "Ielādēt no jauna",
     "conflictMine": "Tomēr saglabāt manu",
     "goneTitle": "Šis kanāls ir izdzēsts",
-    "goneBody": "Kāds izdzēsa kanālu, kamēr logs bija atvērts. Tavas izmaiņas netika saglabātas."
+    "goneBody": "Kāds izdzēsa kanālu, kamēr logs bija atvērts. Tavas izmaiņas netika saglabātas.",
+    "tooLong": "Neizdevās saglabāt: apraksts ir pārāk garš šim serverim",
+    "tooLongTip": "Apraksts ir pārāk garš šim serverim"
   },
   "perm": {
     "everyone": "Visi",

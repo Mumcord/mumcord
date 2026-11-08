@@ -227,7 +227,9 @@
     "conflictReload": "Genindlæs",
     "conflictMine": "Gem min alligevel",
     "goneTitle": "Kanalen er slettet",
-    "goneBody": "Nogen slettede kanalen, mens vinduet var åbent. Dine ændringer blev ikke gemt."
+    "goneBody": "Nogen slettede kanalen, mens vinduet var åbent. Dine ændringer blev ikke gemt.",
+    "tooLong": "Kan ikke gemmes: beskrivelsen er for lang til denne server",
+    "tooLongTip": "Beskrivelsen er for lang til denne server"
   },
   "perm": {
     "everyone": "Alle",

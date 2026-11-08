@@ -227,7 +227,9 @@
     "conflictReload": "Laadi uuesti",
     "conflictMine": "Salvesta minu oma ikkagi",
     "goneTitle": "See kanal on kustutatud",
-    "goneBody": "Keegi kustutas kanali, kui aken oli avatud. Sinu muudatusi ei salvestatud."
+    "goneBody": "Keegi kustutas kanali, kui aken oli avatud. Sinu muudatusi ei salvestatud.",
+    "tooLong": "Salvestamine ebaõnnestus: kirjeldus on sellele serverile liiga pikk",
+    "tooLongTip": "Kirjeldus on sellele serverile liiga pikk"
   },
   "perm": {
     "everyone": "Kõik",

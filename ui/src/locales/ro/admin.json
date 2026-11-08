@@ -230,7 +230,9 @@
     "conflictReload": "Reîncarcă",
     "conflictMine": "Salvează a mea oricum",
     "goneTitle": "Acest canal a fost șters",
-    "goneBody": "Cineva a șters canalul în timp ce fereastra era deschisă. Modificările tale nu au fost salvate."
+    "goneBody": "Cineva a șters canalul în timp ce fereastra era deschisă. Modificările tale nu au fost salvate.",
+    "tooLong": "Nu se poate salva: descrierea este prea lungă pentru acest server",
+    "tooLongTip": "Descrierea este prea lungă pentru acest server"
   },
   "perm": {
     "everyone": "Toți",

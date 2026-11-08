@@ -227,7 +227,9 @@
     "conflictReload": "Ladda om",
     "conflictMine": "Spara min ändå",
     "goneTitle": "Kanalen har tagits bort",
-    "goneBody": "Någon tog bort kanalen medan fönstret var öppet. Dina ändringar sparades inte."
+    "goneBody": "Någon tog bort kanalen medan fönstret var öppet. Dina ändringar sparades inte.",
+    "tooLong": "Kan inte sparas: beskrivningen är för lång för den här servern",
+    "tooLongTip": "Beskrivningen är för lång för den här servern"
   },
   "perm": {
     "everyone": "Alla",

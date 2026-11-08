@@ -10,6 +10,7 @@ import { displayName } from "../servers/format";
 import { useServers } from "../servers/store";
 import { RichCommentEditor } from "../userpanel/RichCommentEditor";
 import { commentToSend } from "../userpanel/commentHtml";
+import { editorLimits, isTooLong } from "../userpanel/richEditorModel";
 import {
   changeOf,
   descendants,
@@ -110,6 +111,9 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
   const rulesReadOnly = !(channel?.permissions.write ?? false);
   const dirty = editing ? hasChanges(change) || passwordChanged || permissionsChanged : true;
   const nameMissing = draft.name.trim() === "";
+  const limits = useMemo(() => editorLimits(server.info), [server.info]);
+  // The server would refuse it; Save says why instead of failing (issue #666).
+  const tooLong = isTooLong(draft.description, limits);
 
   const finish = (result: ChannelResult) => {
     const refusal = refusalText(t, result);
@@ -203,7 +207,7 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
   };
 
   const save = () => {
-    if (busy || nameMissing || !dirty) return;
+    if (busy || nameMissing || !dirty || tooLong) return;
     if (editing && change.parentId !== null) {
       setConfirmMove(true);
       return;
@@ -530,7 +534,8 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
                   initialHtml={original.description}
                   loadKey={0}
                   disabled={busy}
-                  tools="description"
+                  purpose="description"
+                  limits={limits}
                   onChange={(html) => {
                     update({ description: html });
                   }}
@@ -667,8 +672,11 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
             {t("channel.delete")}
           </button>
         )}
-        <span className="channel-window__status" aria-live="polite">
-          {editing && dirty && !busy ? t("channel.unsaved") : ""}
+        <span
+          className={`channel-window__status${tooLong ? " channel-window__status--error" : ""}`}
+          aria-live="polite"
+        >
+          {tooLong ? t("channel.tooLong") : editing && dirty && !busy ? t("channel.unsaved") : ""}
         </span>
         <button type="button" className="button" onClick={onClose}>
           {t("channel.cancel")}
@@ -676,7 +684,8 @@ export function ChannelWindow({ mode, onClose, onDelete }: ChannelWindowProps) {
         <button
           type="button"
           className="button button--primary"
-          disabled={busy || nameMissing || !dirty}
+          disabled={busy || nameMissing || !dirty || tooLong}
+          data-tooltip={tooLong ? t("channel.tooLongTip") : undefined}
           onClick={save}
         >
           {busy ? t("channel.saving") : editing ? t("channel.save") : t("channel.create")}

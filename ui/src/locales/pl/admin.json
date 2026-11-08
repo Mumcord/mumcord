@@ -233,7 +233,9 @@
     "conflictReload": "Wczytaj ponownie",
     "conflictMine": "Zapisz moją mimo to",
     "goneTitle": "Ten kanał został usunięty",
-    "goneBody": "Ktoś usunął ten kanał, gdy okno było otwarte. Twoje zmiany nie zostały zapisane."
+    "goneBody": "Ktoś usunął ten kanał, gdy okno było otwarte. Twoje zmiany nie zostały zapisane.",
+    "tooLong": "Nie można zapisać: opis jest za długi dla tego serwera",
+    "tooLongTip": "Opis jest za długi dla tego serwera"
   },
   "perm": {
     "everyone": "Wszyscy",

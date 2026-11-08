@@ -227,7 +227,9 @@
     "conflictReload": "Herladen",
     "conflictMine": "De mijne toch opslaan",
     "goneTitle": "Dit kanaal is verwijderd",
-    "goneBody": "Iemand heeft dit kanaal verwijderd terwijl het venster open was. Je wijzigingen zijn niet opgeslagen."
+    "goneBody": "Iemand heeft dit kanaal verwijderd terwijl het venster open was. Je wijzigingen zijn niet opgeslagen.",
+    "tooLong": "Opslaan niet mogelijk: de beschrijving is te lang voor deze server",
+    "tooLongTip": "De beschrijving is te lang voor deze server"
   },
   "perm": {
     "everyone": "Iedereen",

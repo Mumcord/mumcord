@@ -236,7 +236,9 @@
     "conflictReload": "Erġa' ttella'",
     "conflictMine": "Issalva tiegħi xorta",
     "goneTitle": "Dan il-kanal tħassar",
-    "goneBody": "Xi ħadd ħassar il-kanal waqt li t-tieqa kienet miftuħa. Il-bidliet tiegħek ma ġewx issejvjati."
+    "goneBody": "Xi ħadd ħassar il-kanal waqt li t-tieqa kienet miftuħa. Il-bidliet tiegħek ma ġewx issejvjati.",
+    "tooLong": "Ma jistax jiġi ssejvjat: id-deskrizzjoni twila wisq għal dan is-server",
+    "tooLongTip": "Id-deskrizzjoni twila wisq għal dan is-server"
   },
   "perm": {
     "everyone": "Kulħadd",
