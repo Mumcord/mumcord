@@ -419,7 +419,7 @@
   "perUserSave": "Änderungen werden beim Speichern pro Benutzer gesendet.",
   "save": "Speichern",
   "changesNotSavedUsers": "noch nicht gespeichert",
-  "renameKept": "Der Server hat diesen Namen nicht übernommen; {{name}} steht wie zuvor in der Liste.",
+  "changeKept": "Der Server hat diese Änderung nicht übernommen; {{name}} steht wie zuvor in der Liste.",
   "registeredSaved": "Gespeichert: {{renamed}} umbenannt, {{unregistered}} entfernt · Liste neu geladen",
   "announcedRenamed": "Name gespeichert",
   "announcedUnregistered": "Registrierung entfernt",

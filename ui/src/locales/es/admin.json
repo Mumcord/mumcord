@@ -422,7 +422,7 @@
   "perUserSave": "Los cambios se envían por usuario al guardar.",
   "save": "Guardar",
   "changesNotSavedUsers": "sin guardar todavía",
-  "renameKept": "El servidor no aceptó ese nombre; {{name}} sigue listado como antes.",
+  "changeKept": "El servidor no aceptó ese cambio; {{name}} sigue listado como antes.",
   "registeredSaved": "Guardado: {{renamed}} renombrados, {{unregistered}} dados de baja · lista recargada",
   "announcedRenamed": "Nombre guardado",
   "announcedUnregistered": "Registro eliminado",

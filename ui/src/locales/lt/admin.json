@@ -425,7 +425,7 @@
   "perUserSave": "Išsaugant pakeitimai siunčiami po vieną vartotoją.",
   "save": "Išsaugoti",
   "changesNotSavedUsers": "dar neišsaugota",
-  "renameKept": "Serveris nepriėmė šio vardo; {{name}} vis dar sąraše kaip anksčiau.",
+  "changeKept": "Serveris nepriėmė šio pakeitimo; {{name}} vis dar sąraše kaip anksčiau.",
   "registeredSaved": "Išsaugota: {{renamed}} pervadinta, {{unregistered}} pašalinta · sąrašas įkeltas iš naujo",
   "announcedRenamed": "Vardas išsaugotas",
   "announcedUnregistered": "Registracija pašalinta",

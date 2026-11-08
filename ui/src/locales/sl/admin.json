@@ -425,7 +425,7 @@
   "perUserSave": "Ob shranjevanju se spremembe pošljejo po uporabniku.",
   "save": "Shrani",
   "changesNotSavedUsers": "še ni shranjeno",
-  "renameKept": "Strežnik tega imena ni sprejel; {{name}} je še vedno na seznamu kot prej.",
+  "changeKept": "Strežnik te spremembe ni sprejel; {{name}} je še vedno na seznamu kot prej.",
   "registeredSaved": "Shranjeno: {{renamed}} preimenovanih, {{unregistered}} odstranjenih · seznam ponovno naložen",
   "announcedRenamed": "Ime shranjeno",
   "announcedUnregistered": "Registracija odstranjena",

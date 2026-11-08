@@ -422,7 +422,7 @@
   "perUserSave": "Modificările se trimit câte un utilizator la salvare.",
   "save": "Salvează",
   "changesNotSavedUsers": "încă nu este salvat",
-  "renameKept": "Serverul nu a acceptat acest nume; {{name}} este încă listat ca înainte.",
+  "changeKept": "Serverul nu a acceptat această modificare; {{name}} este încă listat ca înainte.",
   "registeredSaved": "Salvat: {{renamed}} redenumiți, {{unregistered}} eliminați · listă reîncărcată",
   "announcedRenamed": "Nume salvat",
   "announcedUnregistered": "Înregistrarea a fost eliminată",

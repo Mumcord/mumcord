@@ -428,7 +428,7 @@
   "perUserSave": "Seoladh na hathruithe in aghaidh an úsáideora nuair a shábhálann tú.",
   "save": "Sábháil",
   "changesNotSavedUsers": "gan sábháil fós",
-  "renameKept": "Nár ghlac an freabháín leis an ainm sin; tá {{name}} ar an liosta mar a bhí.",
+  "changeKept": "Nár ghlac an freabháín leis an athrú sin; tá {{name}} ar an liosta mar a bhí.",
   "registeredSaved": "Sábháilte: {{renamed}} athainmnithe, {{unregistered}} díchláraithe · liosta athluchtaithe",
   "announcedRenamed": "Ainm sábháilte",
   "announcedUnregistered": "Baineadh an clárúchán",

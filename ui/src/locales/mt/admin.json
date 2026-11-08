@@ -428,7 +428,7 @@
   "perUserSave": "Meta issalva, il-bidiet jintbagħtu għal kull utent.",
   "save": "Issalva",
   "changesNotSavedUsers": "għadu mhux salvat",
-  "renameKept": "Is-server ma ħax dan l-isem; {{name}} għadu fil-lista bħal qabel.",
+  "changeKept": "Is-server ma ħax din il-bidla; {{name}} għadu fil-lista bħal qabel.",
   "registeredSaved": "Salvat: {{renamed}} mibdula isimhom, {{unregistered}} imneħħija · lista mgħobbija mill-ġdid",
   "announcedRenamed": "L-isem ġie salvat",
   "announcedUnregistered": "Ir-reġistrazzjoni tneħħiet",

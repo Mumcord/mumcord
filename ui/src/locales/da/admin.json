@@ -419,7 +419,7 @@
   "perUserSave": "Ændringer sendes pr. bruger, når du gemmer.",
   "save": "Gem",
   "changesNotSavedUsers": "ikke gemt endnu",
-  "renameKept": "Serveren tog ikke det navn; {{name}} står stadig som før.",
+  "changeKept": "Serveren tog ikke den ændring; {{name}} står stadig som før.",
   "registeredSaved": "Gemt: {{renamed}} omdøbt, {{unregistered}} afregistreret · listen genindlæst",
   "announcedRenamed": "Navn gemt",
   "announcedUnregistered": "Registrering fjernet",

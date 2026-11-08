@@ -422,7 +422,7 @@
   "perUserSave": "Le modifiche vengono inviate per singolo utente al salvataggio.",
   "save": "Salva",
   "changesNotSavedUsers": "non ancora salvato",
-  "renameKept": "Il server non ha accettato questo nome; {{name}} è ancora in elenco come prima.",
+  "changeKept": "Il server non ha accettato questa modifica; {{name}} è ancora in elenco come prima.",
   "registeredSaved": "Salvato: {{renamed}} rinominati, {{unregistered}} rimossi · elenco ricaricato",
   "announcedRenamed": "Nome salvato",
   "announcedUnregistered": "Registrazione rimossa",
