@@ -131,5 +131,26 @@
     "resultAll": "Bogadh {{people}} go {{channel}}.",
     "resultSome": "Bogadh {{moved}} as {{people}} go {{channel}}. Diúltaíodh don chuid eile.",
     "busy": "Tá daoine á mbogadh cheana…"
+  },
+  "drag": {
+    "into": "Bog isteach i {{channel}}",
+    "above": "Cuir os cionn {{channel}}",
+    "below": "Cuir faoi {{channel}}",
+    "self": "Ní féidir é a chur isteach ann féin",
+    "subChannel": "Ní féidir é a chur isteach ina fhochainéal féin",
+    "confirmTitle": "Bog “{{channel}}”?",
+    "alongAll": "Bogfar in éineacht le {{channel}}: {{subChannels}} agus {{people}}.",
+    "alongSubChannels": "Bogfar in éineacht le {{channel}}: {{subChannels}}.",
+    "alongPeople": "Bogfar in éineacht le {{channel}}: {{people}}.",
+    "alongNone": "Ní bhogfar ach {{channel}}; tá sé folamh.",
+    "subChannels_one": "{{count}} fochainéal",
+    "subChannels_two": "{{count}} fochainéal",
+    "subChannels_few": "{{count}} fochainéal",
+    "subChannels_many": "{{count}} fochainéal",
+    "subChannels_other": "{{count}} fochainéal",
+    "pathTo": "go",
+    "confirm": "Bog",
+    "failedTitle": "Níorbh fhéidir {{channel}} a bhogadh",
+    "refusedParent": "Níl cead agat cainéil a bhogadh isteach i {{channel}}."
   }
 }

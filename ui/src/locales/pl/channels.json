@@ -126,5 +126,25 @@
     "resultAll": "Przeniesiono {{people}} do {{channel}}.",
     "resultSome": "Przeniesiono {{moved}} z {{people}} do {{channel}}. Resztę odrzucono.",
     "busy": "Osoby są już przenoszone…"
+  },
+  "drag": {
+    "into": "Przenieś do {{channel}}",
+    "above": "Umieść nad {{channel}}",
+    "below": "Umieść pod {{channel}}",
+    "self": "Nie może trafić do samego siebie",
+    "subChannel": "Nie może trafić do własnego podkanału",
+    "confirmTitle": "Przenieść „{{channel}}”?",
+    "alongAll": "Razem z {{channel}} zostaną przeniesione: {{subChannels}} i {{people}}.",
+    "alongSubChannels": "Razem z {{channel}} zostaną przeniesione: {{subChannels}}.",
+    "alongPeople": "Razem z {{channel}} zostaną przeniesione: {{people}}.",
+    "alongNone": "Zostanie przeniesiony tylko {{channel}}; jest pusty.",
+    "subChannels_one": "{{count}} podkanał",
+    "subChannels_few": "{{count}} podkanały",
+    "subChannels_many": "{{count}} podkanałów",
+    "subChannels_other": "{{count}} podkanału",
+    "pathTo": "do",
+    "confirm": "Przenieś",
+    "failedTitle": "Nie udało się przenieść {{channel}}",
+    "refusedParent": "Nie masz uprawnień do przenoszenia kanałów do {{channel}}."
   }
 }

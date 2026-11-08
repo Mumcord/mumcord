@@ -126,5 +126,25 @@
     "resultAll": "Presunutých {{people}} do {{channel}}.",
     "resultSome": "Presunutých {{moved}} z {{people}} do {{channel}}. Ostatní boli odmietnutí.",
     "busy": "Ľudia sa už presúvajú…"
+  },
+  "drag": {
+    "into": "Presunúť do {{channel}}",
+    "above": "Umiestniť nad {{channel}}",
+    "below": "Umiestniť pod {{channel}}",
+    "self": "Nemôže ísť do seba samého",
+    "subChannel": "Nemôže ísť do vlastného podkanála",
+    "confirmTitle": "Presunúť „{{channel}}“?",
+    "alongAll": "S kanálom {{channel}} sa presunú: {{subChannels}} a {{people}}.",
+    "alongSubChannels": "S kanálom {{channel}} sa presunú: {{subChannels}}.",
+    "alongPeople": "S kanálom {{channel}} sa presunú: {{people}}.",
+    "alongNone": "Presunie sa len {{channel}}; je prázdny.",
+    "subChannels_one": "{{count}} podkanál",
+    "subChannels_few": "{{count}} podkanály",
+    "subChannels_many": "{{count}} podkanála",
+    "subChannels_other": "{{count}} podkanálov",
+    "pathTo": "do",
+    "confirm": "Presunúť",
+    "failedTitle": "{{channel}} sa nepodarilo presunúť",
+    "refusedParent": "Nemáš oprávnenie presúvať kanály do {{channel}}."
   }
 }
