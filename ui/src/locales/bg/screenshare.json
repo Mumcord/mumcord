@@ -83,7 +83,8 @@
     "soundNeeds": {
       "windows": "Без звук: изисква Windows 10 версия 2004 или по-нова",
       "macos": "Без звук: изисква macOS 13 или по-нова",
-      "pipewire": "Без звук: изисква PipeWire"
+      "pipewire": "Без звук: изисква PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Зрителите получават:",
     "viewersGetSummary": "до {{resolution}} · {{fps}} кадъра/с · {{codec}} · около {{mbit}} Mbit/s",

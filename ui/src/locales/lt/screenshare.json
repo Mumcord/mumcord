@@ -87,7 +87,8 @@
     "soundNeeds": {
       "windows": "Be garso: reikia Windows 10 2004 ar naujesnės versijos",
       "macos": "Be garso: reikia macOS 13 ar naujesnės versijos",
-      "pipewire": "Be garso: reikia PipeWire"
+      "pipewire": "Be garso: reikia PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Žiūrovai gauna:",
     "viewersGetSummary": "iki {{resolution}} · {{fps}} fps · {{codec}} · apie {{mbit}} Mbit/s",

@@ -14,7 +14,8 @@
     "relayDisallows": "Ir-relay ta' dan is-server ma jippermettix il-qsim tal-kamera.",
     "needsRelayMode": "Il-qsim tal-kamera jeħtieġ ir-relay. Biddlu f'Privatezza u konnessjonijiet.",
     "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
-    "registeredOnly": "Fuq dan is-server biss utenti reġistrati jistgħu jużaw il-kamera."
+    "registeredOnly": "Fuq dan is-server biss utenti reġistrati jistgħu jużaw il-kamera.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera mixgħula",
   "turnOffTray": "Itfi l-kamera",

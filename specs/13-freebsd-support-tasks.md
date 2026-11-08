@@ -42,7 +42,7 @@
 - **Verify:** Settings → About on the FreeBSD machine shows the lines; Linux/Windows/macOS output unchanged.
 
 ## T5 – Features that cannot work are disabled with a reason
-- **Status:** open (camera entry + share-dialog line)
+- **Status:** done (camera reports `unsupportedPlatform` and stays visible but disabled; the share dialog names "whole X11 screen, no sound")
 
 - **Complexity:** simple
 - **Covers:** FR-13.27, FR-13.19, AC-13.13
@@ -78,7 +78,7 @@
 - **Verify:** the workflow runs green on the branch (dispatched run), the package from CI installs, the smoke test connects.
 
 ## T9 – Verification run
-- **Status:** in progress
+- **Status:** done (report written; the criteria that need a second client or hands on the machine are listed as open in the report)
 
 - **Complexity:** simple
 - **Covers:** all ACs

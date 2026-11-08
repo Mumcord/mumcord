@@ -83,7 +83,8 @@
     "soundNeeds": {
       "windows": "Nincs hang: Windows 10 2004-es vagy újabb verzió szükséges",
       "macos": "Nincs hang: macOS 13 vagy újabb szükséges",
-      "pipewire": "Nincs hang: PipeWire szükséges"
+      "pipewire": "Nincs hang: PipeWire szükséges",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "A nézők ezt kapják:",
     "viewersGetSummary": "legfeljebb {{resolution}} · {{fps}} fps · {{codec}} · kb. {{mbit}} Mbit/s",

@@ -83,7 +83,8 @@
     "soundNeeds": {
       "windows": "Geen geluid: vereist Windows 10 versie 2004 of nieuwer",
       "macos": "Geen geluid: vereist macOS 13 of nieuwer",
-      "pipewire": "Geen geluid: vereist PipeWire"
+      "pipewire": "Geen geluid: vereist PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Kijkers krijgen:",
     "viewersGetSummary": "tot {{resolution}} · {{fps}} fps · {{codec}} · ongeveer {{mbit}} Mbit/s",

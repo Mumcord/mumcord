@@ -2011,7 +2011,7 @@ export type CameraTileState =
 "hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
-export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | "unsupportedPlatform";
 
 /**  The own camera as the preview dialog, Settings, the room and the tray see it. */
 export type CameraView = {
@@ -5362,7 +5362,7 @@ export type SoundUnavailableReason =
 /**  Linux without a running PipeWire. */
 "noPipeWire" | 
 /**  The sound capture could not start or stopped. */
-"captureFailed";
+"captureFailed" | "platform";
 
 export type StageActivityKind = 
 /**  "<name> started <plugin> · Join". */

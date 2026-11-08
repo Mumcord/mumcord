@@ -85,7 +85,8 @@
     "soundNeeds": {
       "windows": "Sem som: requer Windows 10 versão 2004 ou posterior",
       "macos": "Sem som: requer macOS 13 ou posterior",
-      "pipewire": "Sem som: requer PipeWire"
+      "pipewire": "Sem som: requer PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Os espetadores recebem:",
     "viewersGetSummary": "até {{resolution}} · {{fps}} imagens/s · {{codec}} · cerca de {{mbit}} Mbit/s",

@@ -103,6 +103,9 @@ pub enum SoundUnavailableReason {
     NoPipeWire,
     /// The sound capture could not start or stopped.
     CaptureFailed,
+    /// This platform cannot take a share's sound at all (FR-13.19): FreeBSD has no PipeWire and
+    /// no desktop portal, so a share is the whole X11 screen without sound.
+    Platform,
 }
 
 impl From<EngineSoundUnavailable> for SoundUnavailableReason {
@@ -473,7 +476,16 @@ pub fn screen_share_set_sound(
 #[tauri::command]
 #[specta::specta]
 pub fn screen_share_sound_support(engine: State<'_, Engine>) -> Option<SoundUnavailableReason> {
-    engine.screen_share_sound_unavailable().map(Into::into)
+    #[cfg(target_os = "freebsd")]
+    {
+        let _ = engine;
+        // Never "no PipeWire yet": on FreeBSD there is no sound to take at all.
+        Some(SoundUnavailableReason::Platform)
+    }
+    #[cfg(not(target_os = "freebsd"))]
+    {
+        engine.screen_share_sound_unavailable().map(Into::into)
+    }
 }
 
 /// The apps playing sound now, for "Which app's sound?" while the own share waits for the

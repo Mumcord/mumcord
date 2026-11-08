@@ -14,7 +14,8 @@
     "relayDisallows": "El relé de este servidor no permite compartir la cámara.",
     "needsRelayMode": "Para compartir la cámara hace falta el relé. Cámbialo en Privacidad y conexiones.",
     "noCertificate": "Para compartir la cámara hace falta un certificado de cliente.",
-    "registeredOnly": "Solo los usuarios registrados pueden usar la cámara en este servidor."
+    "registeredOnly": "Solo los usuarios registrados pueden usar la cámara en este servidor.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Cámara activada",
   "turnOffTray": "Desactivar la cámara",

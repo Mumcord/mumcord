@@ -85,7 +85,8 @@
     "soundNeeds": {
       "windows": "Fără sunet: necesită Windows 10 versiunea 2004 sau mai nouă",
       "macos": "Fără sunet: necesită macOS 13 sau mai nou",
-      "pipewire": "Fără sunet: necesită PipeWire"
+      "pipewire": "Fără sunet: necesită PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Spectatorii primesc:",
     "viewersGetSummary": "până la {{resolution}} · {{fps}} cadre/s · {{codec}} · aproximativ {{mbit}} Mbit/s",

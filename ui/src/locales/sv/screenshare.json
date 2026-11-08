@@ -83,7 +83,8 @@
     "soundNeeds": {
       "windows": "Inget ljud: kräver Windows 10 version 2004 eller senare",
       "macos": "Inget ljud: kräver macOS 13 eller senare",
-      "pipewire": "Inget ljud: kräver PipeWire"
+      "pipewire": "Inget ljud: kräver PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Tittarna får:",
     "viewersGetSummary": "upp till {{resolution}} · {{fps}} bilder/s · {{codec}} · cirka {{mbit}} Mbit/s",

@@ -87,7 +87,8 @@
     "soundNeeds": {
       "windows": "Brak dźwięku: wymaga Windows 10 w wersji 2004 lub nowszej",
       "macos": "Brak dźwięku: wymaga macOS 13 lub nowszego",
-      "pipewire": "Brak dźwięku: wymaga PipeWire"
+      "pipewire": "Brak dźwięku: wymaga PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Widzowie dostaną:",
     "viewersGetSummary": "do {{resolution}} · {{fps}} fps · {{codec}} · ok. {{mbit}} Mbit/s",

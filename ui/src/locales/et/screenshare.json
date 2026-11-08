@@ -83,7 +83,8 @@
     "soundNeeds": {
       "windows": "Heli puudub: nõuab Windows 10 versiooni 2004 või uuemat",
       "macos": "Heli puudub: nõuab macOS 13 või uuemat",
-      "pipewire": "Heli puudub: nõuab PipeWire'i"
+      "pipewire": "Heli puudub: nõuab PipeWire'i",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Vaatajad saavad:",
     "viewersGetSummary": "kuni {{resolution}} · {{fps}} kaadrit/s · {{codec}} · umbes {{mbit}} Mbit/s",

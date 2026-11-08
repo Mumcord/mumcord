@@ -83,7 +83,8 @@
     "soundNeeds": {
       "windows": "Χωρίς ήχο: απαιτείται Windows 10 έκδοση 2004 ή νεότερη",
       "macos": "Χωρίς ήχο: απαιτείται macOS 13 ή νεότερο",
-      "pipewire": "Χωρίς ήχο: απαιτείται PipeWire"
+      "pipewire": "Χωρίς ήχο: απαιτείται PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Οι θεατές λαμβάνουν:",
     "viewersGetSummary": "έως {{resolution}} · {{fps}} καρέ/s · {{codec}} · περίπου {{mbit}} Mbit/s",

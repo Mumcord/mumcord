@@ -14,7 +14,8 @@
     "relayDisallows": "Ennek a szervernek az átjátszója nem engedi a kamera megosztását.",
     "needsRelayMode": "A kamera megosztásához az átjátszó kell. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához klienstanúsítvány kell.",
-    "registeredOnly": "Ezen a szerveren csak regisztrált felhasználók használhatják a kamerát."
+    "registeredOnly": "Ezen a szerveren csak regisztrált felhasználók használhatják a kamerát.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera bekapcsolva",
   "turnOffTray": "Kamera kikapcsolása",

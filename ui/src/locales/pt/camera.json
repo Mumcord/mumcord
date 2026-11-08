@@ -14,7 +14,8 @@
     "relayDisallows": "O retransmissor deste servidor não permite a partilha de câmara.",
     "needsRelayMode": "A partilha de câmara precisa do retransmissor. Altera-o em Privacidade e ligações.",
     "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
-    "registeredOnly": "Neste servidor só utilizadores registados podem usar a câmara."
+    "registeredOnly": "Neste servidor só utilizadores registados podem usar a câmara.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Câmara ligada",
   "turnOffTray": "Desligar a câmara",
