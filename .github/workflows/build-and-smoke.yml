@@ -55,11 +55,11 @@ jobs:
           # AppImage, .deb and .rpm (FR-2.53) for x86_64 and, on GitHub's ARM runner, ARM64.
           - name: linux
             os: ubuntu-24.04
-            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json
+            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json
             bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
           - name: linux-arm64
             os: ubuntu-24.04-arm
-            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json
+            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json
             bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
           - name: windows
             os: windows-latest
@@ -281,12 +281,54 @@ jobs:
       - name: Stage ONNX Runtime
         run: node scripts/stage-onnxruntime.js
 
-      # The AppImage bundles the GStreamer plugins (bundleMediaFramework) but not H.264 (gst-libav,
-      # x264) or the GPL-only codecs; see RELEASING.md. The deb/rpm packages depend on gst-libav instead.
-      - name: Exclude H.264 and GPL-only GStreamer plugins from the AppImage
+      # H.264 and AAC for video playback (Twitch, .mp4) in every Linux package: an LGPL-only,
+      # decoders-only FFmpeg and gst-libav built against the runner's GStreamer 1.24
+      # (scripts/build-ffmpeg.sh, RELEASING.md), cached per architecture; the key changes with the
+      # script, which pins the versions. The .deb and .rpm carry it in /usr/lib/mumcord
+      # (src-tauri/tauri.ffmpeg.linux.json), the AppImage with its other GStreamer plugins.
+      - name: Restore bundled FFmpeg
+        id: ffmpeg-cache
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/ffmpeg
+          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('scripts/build-ffmpeg.sh') }}
+
+      - name: Build bundled FFmpeg
+        if: runner.os == 'Linux' && steps.ffmpeg-cache.outputs.cache-hit != 'true'
+        run: |
+          scripts/ci/apt-install.sh nasm meson ninja-build libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+          scripts/build-ffmpeg.sh "$RUNNER_TEMP/ffmpeg"
+
+      - name: Save bundled FFmpeg
+        if: runner.os == 'Linux' && steps.ffmpeg-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/ffmpeg
+          key: ${{ steps.ffmpeg-cache.outputs.cache-primary-key }}
+
+      # Fails before the long build when the result is not LGPL only or contains encoders.
+      - name: Stage bundled FFmpeg
         if: runner.os == 'Linux'
         run: |
-          echo "GSTREAMER_PLUGINS_DIR=$(scripts/filter-gst-plugins.sh)" >> "$GITHUB_ENV"
+          rm -rf src-tauri/gen/ffmpeg
+          mkdir -p src-tauri/gen
+          cp -R "$RUNNER_TEMP/ffmpeg" src-tauri/gen/ffmpeg
+          python3 -I scripts/smoke/check-ffmpeg.py src-tauri/gen/ffmpeg/libavcodec.so.60
+          echo "Bundled FFmpeg and gst-libav (bytes):"
+          find src-tauri/gen/ffmpeg -type f -printf '%s %P\n'
+          du -sb src-tauri/gen/ffmpeg
+
+      # The AppImage bundles the GStreamer plugins (bundleMediaFramework) without the system's
+      # H.264 and GPL-only ones, and with the bundled gst-libav instead; see RELEASING.md.
+      - name: Choose the GStreamer plugins for the AppImage
+        if: runner.os == 'Linux'
+        run: |
+          plugins=$(scripts/filter-gst-plugins.sh)
+          ln -s "$PWD/src-tauri/gen/ffmpeg/gstreamer-1.0/libgstlibav.so" "$plugins/"
+          echo "GSTREAMER_PLUGINS_DIR=$plugins" >> "$GITHUB_ENV"
+          # linuxdeploy finds the plugin's FFmpeg libraries here and copies them into the AppImage.
+          echo "LD_LIBRARY_PATH=$PWD/src-tauri/gen/ffmpeg" >> "$GITHUB_ENV"
           # linuxdeploy only finds the plugin scanner by itself on Debian paths; pass it explicitly.
           echo "GSTREAMER_HELPERS_DIR=$(scripts/gst-helpers-dir.sh)" >> "$GITHUB_ENV"
 
@@ -506,7 +548,7 @@ jobs:
         run: |
           scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
             libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
-            libwebkit2gtk-4.1-0 libpipewire-0.3-0t64
+            libwebkit2gtk-4.1-0 libpipewire-0.3-0t64 gstreamer1.0-tools
           # The AppImage must bring its own tray library (it is loaded at runtime, so a missing
           # one only shows on machines without it). Keep it off the runner so the smoke test
           # exercises the bundled copy.
@@ -650,24 +692,34 @@ jobs:
           (cd "$RUNNER_TEMP" && "$GITHUB_WORKSPACE/$app" --appimage-extract >/dev/null)
           test -e "$RUNNER_TEMP/squashfs-root/usr/lib/libayatana-appindicator3.so.1" \
             || { echo "libayatana-appindicator3.so.1 is missing from the AppImage" >&2; exit 1; }
-          for f in libgstlibav.so libavcodec.so.* libx264.so.*; do
-            if compgen -G "$RUNNER_TEMP/squashfs-root/usr/lib/$f" >/dev/null \
-              || compgen -G "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer-1.0/$f" >/dev/null; then
+          root=$RUNNER_TEMP/squashfs-root
+          for f in libx264.so.* libgstx264.so libgstopenh264.so; do
+            if compgen -G "$root/usr/lib/$f" >/dev/null || compgen -G "$root/usr/lib/gstreamer-1.0/$f" >/dev/null; then
               echo "$f must not be bundled in the AppImage" >&2; exit 1
             fi
           done
-          # Without the Opus parser YouTube refuses to play in the AppImage (scripts/filter-gst-plugins.sh).
-          test -e "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer-1.0/libgstopusparse.so" \
-            || { echo "libgstopusparse.so is missing from the AppImage" >&2; exit 1; }
+          # Without the Opus parser YouTube refuses to play, without the H.264 parser Twitch
+          # (scripts/filter-gst-plugins.sh).
+          for f in libgstopusparse.so libgstvideoparsersbad.so; do
+            test -e "$root/usr/lib/gstreamer-1.0/$f" || { echo "$f is missing from the AppImage" >&2; exit 1; }
+          done
           # Without the bundled scanner every plugin load warns and runs in-process.
-          test -x "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
+          test -x "$root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
             || { echo "gst-plugin-scanner is missing from the AppImage" >&2; exit 1; }
+          # H.264 and AAC: the bundled FFmpeg (LGPL only, no encoders) decodes a sample through the
+          # AppImage's own GStreamer libraries, plugins and scanner, as the AppRun hook sets them up.
+          python3 -I scripts/smoke/check-ffmpeg.py "$root/usr/lib/libavcodec.so.60"
+          LD_LIBRARY_PATH="$root/usr/lib" GST_PLUGIN_PATH_1_0="" \
+            GST_PLUGIN_SYSTEM_PATH_1_0="$root/usr/lib/gstreamer-1.0" \
+            GST_PLUGIN_SCANNER_1_0="$root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
+            GST_REGISTRY_1_0="$RUNNER_TEMP/appimage-registry.bin" \
+            scripts/smoke/check-h264-playback.sh "$root/usr/lib/gstreamer-1.0/libgstlibav.so"
           # Camera background effects: the bundled ONNX Runtime loads from where
           # crates/effects/src/runtime.rs looks for it (usr/lib/mumcord beside usr/bin).
           test -x "$RUNNER_TEMP/squashfs-root/usr/bin/mumcord" \
             || { echo "usr/bin/mumcord is missing from the AppImage" >&2; exit 1; }
-          python3 -I scripts/smoke/check-onnxruntime.py "$RUNNER_TEMP/squashfs-root/usr/lib/mumcord/libonnxruntime.so.1.23.2"
-          rm -rf "$RUNNER_TEMP/squashfs-root"
+          python3 -I scripts/smoke/check-onnxruntime.py "$root/usr/lib/mumcord/libonnxruntime.so.1.23.2"
+          rm -rf "$root"
           # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
           # An EMPTY password creates no `login` collection, so unlock with a fixed non-empty
           # throwaway password in a fresh D-Bus session; verify with secret-tool before seeding.
@@ -706,12 +758,22 @@ jobs:
             grep -qx "MimeType=x-scheme-handler/mumble;" /usr/share/applications/Mumcord.desktop
             grep -qx "StartupWMClass=app.mumcord.client" /usr/share/applications/Mumcord.desktop
             test -e /usr/share/icons/hicolor/128x128/apps/mumcord.png
+            # H.264 and AAC from the bundled gst-libav in the system GStreamer, with the plugin
+            # path Mumcord sets at start (src-tauri/src/gst_plugins.rs); on Fedora without RPM Fusion.
+            plugin=/usr/lib/mumcord/gstreamer-1.0/libgstlibav.so
+            missing=$(ldd "$plugin" | grep "=> not found" || true)
+            if [ -n "$missing" ]; then echo "gst-libav: unresolved libraries: $missing" >&2; exit 1; fi
+            GST_PLUGIN_PATH_1_0=/usr/lib/mumcord/gstreamer-1.0 GST_REGISTRY_1_0=/tmp/mumcord-registry.bin \
+              /src/scripts/smoke/check-h264-playback.sh "$plugin"
           '
           sudo apt-get install -y --no-install-recommends "$PWD/$(ls build/*.deb)"
+          sudo ln -sfn "$PWD" /src
           bash -c "$check"
           python3 -I scripts/smoke/check-onnxruntime.py /usr/lib/mumcord/libonnxruntime.so.1.23.2
-          docker run --rm -v "$PWD/build:/build:ro" fedora:42 bash -c \
-            "dnf install -y -q /build/*.rpm >/dev/null && $check"
+          python3 -I scripts/smoke/check-ffmpeg.py /usr/lib/mumcord/libavcodec.so.60
+          # gstreamer1 brings gst-launch-1.0 and gst-inspect-1.0.
+          docker run --rm -v "$PWD/build:/build:ro" -v "$PWD/scripts:/src/scripts:ro" fedora:42 bash -c \
+            "dnf install -y -q /build/*.rpm gstreamer1 >/dev/null && $check"
 
       - name: Smoke test (Windows)
         if: runner.os == 'Windows'
