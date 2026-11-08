@@ -214,7 +214,10 @@ export function Composer({
   const selfSession = useServerSelector((state) => state.selfSession);
   const ownChannel = useServerSelector((state) => selfUser(state)?.channelId ?? null);
   const mention = useMemo(
-    () => (disabled ? null : findMentionQuery(composer.text, caret)),
+    // A slash line is a command; its own picker offers the people or channels an argument takes,
+    // so the @ mention list must not open on top of it (issue #378).
+    () =>
+      disabled || composer.text.startsWith("/") ? null : findMentionQuery(composer.text, caret),
     [composer.text, caret, disabled],
   );
   const hereChannel = target?.kind === "channel" ? target.channelId : ownChannel;

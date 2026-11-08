@@ -48,6 +48,18 @@ describe("what a typed argument names (FR-10.34)", () => {
     const found = resolveOne("anna", NAMES);
     expect(found.kind).toBe("one");
   });
+
+  it("takes a leading @ as the mention picker leaves it, and still finds the person", () => {
+    const found = resolveOne("@Mallory", NAMES);
+    expect(found.kind).toBe("one");
+    if (found.kind === "one") expect(found.item.label).toBe("Mallory");
+    // A bare @ names no one yet, so every name still matches for the autocomplete.
+    const at = resolveOne("@", NAMES);
+    expect(at.kind).toBe("many");
+    const partial = resolveOne("@Be", NAMES);
+    expect(partial.kind).toBe("one");
+    if (partial.kind === "one") expect(partial.item.label).toBe("Ben");
+  });
 });
 
 describe("the closest name to a misspelling", () => {

@@ -160,6 +160,32 @@ describe("running a command from the box (FR-10.33 … FR-10.35)", () => {
     expect(privateLinesFor(1, CHANNEL)[0]?.note).toBe("Only you see this line");
   });
 
+  it("takes a leading @ like a mention and still runs the command", async () => {
+    grant(1, { muteDeafen: true });
+    const mute = vi.spyOn(api, "personSetServerMute");
+    const send = vi.spyOn(api, "sendChannelMessage");
+    const input = renderComposer();
+    type(input, "/mute @Anna");
+    fireEvent.keyDown(input, { key: "Enter" });
+    await waitFor(() => {
+      expect(mute).toHaveBeenCalledWith(1, 2, true);
+    });
+    expect(input.value).toBe("");
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it("autocompletes a name written with @ into the bare name", async () => {
+    grant(1, { muteDeafen: true });
+    const input = renderComposer();
+    type(input, "/mute @An");
+    const list = await screen.findByRole("listbox", { name: "Slash commands" });
+    expect(list.textContent).toContain("People");
+    expect(rows().some((row) => row.textContent.includes("Anna"))).toBe(true);
+    // Completing writes the name without the @, so Enter runs it right away.
+    fireEvent.keyDown(input, { key: "Tab" });
+    expect(input.value).toBe("/mute Anna ");
+  });
+
   it("keeps a command the admin may not use in the box and sends nothing (FR-10.33, Q1.10)", async () => {
     // No kick right on the root channel: the command is not listed, not completed and not run.
     const kick = vi.spyOn(api, "personKick");
