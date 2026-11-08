@@ -695,13 +695,17 @@ fn stream(
             }
         })
         .register()?;
-    let format = fixed_format(mode).ok_or(pw::Error::CreationFailed)?;
-    let pod = Pod::from_bytes(&format).ok_or(pw::Error::CreationFailed)?;
+    let formats = offered_formats(mode).ok_or(pw::Error::CreationFailed)?;
+    let mut pods = formats
+        .iter()
+        .map(|format| Pod::from_bytes(format))
+        .collect::<Option<Vec<&Pod>>>()
+        .ok_or(pw::Error::CreationFailed)?;
     stream.connect(
         spa::utils::Direction::Input,
         Some(node),
         StreamFlags::AUTOCONNECT | StreamFlags::MAP_BUFFERS,
-        &mut [pod],
+        &mut pods,
     )?;
     Ok((stream, listener))
 }
@@ -851,12 +855,25 @@ fn property(key: FormatProperties, value: Value) -> Property {
     }
 }
 
-/// Exactly the chosen mode, offered as the stream's only `EnumFormat`. PipeWire files a connect
-/// param under its object id, so under any other id it does not restrict the negotiation. The
-/// camera may still deliver something else (it may be busy elsewhere), so the pictures are read
-/// in the negotiated format, see [`negotiated_mode`].
-fn fixed_format(mode: Mode) -> Option<Vec<u8>> {
-    let subtype = match mode.format {
+/// The stream's `EnumFormat` params: every format Mumcord can read, the chosen one first, each at
+/// any size and rate but preferring the chosen ones. PipeWire tries the params in order and
+/// fixates a choice to its default, so it settles on the chosen mode when the camera can do it
+/// and otherwise on any readable mode (another app may hold the camera in its own mode). The
+/// pictures are read in whatever was negotiated, see [`negotiated_mode`]. PipeWire files a
+/// connect param under its object id, so only `EnumFormat` restricts the negotiation.
+fn offered_formats(mode: Mode) -> Option<Vec<Vec<u8>>> {
+    let others = [PixelFormat::Nv12, PixelFormat::Yuy2, PixelFormat::Mjpeg]
+        .into_iter()
+        .filter(|&format| format != mode.format);
+    std::iter::once(mode.format)
+        .chain(others)
+        .map(|format| offered_format(format, mode))
+        .collect()
+}
+
+/// One `EnumFormat` param: `format` at any size and rate, preferring those of `preferred`.
+fn offered_format(format: PixelFormat, preferred: Mode) -> Option<Vec<u8>> {
+    let subtype = match format {
         PixelFormat::Mjpeg => MediaSubtype::Mjpg,
         PixelFormat::Nv12 | PixelFormat::Yuy2 => MediaSubtype::Raw,
     };
@@ -870,7 +887,7 @@ fn fixed_format(mode: Mode) -> Option<Vec<u8>> {
             Value::Id(Id(subtype.as_raw())),
         ),
     ];
-    let raw_format = match mode.format {
+    let raw_format = match format {
         PixelFormat::Nv12 => Some(VideoFormat::NV12),
         PixelFormat::Yuy2 => Some(VideoFormat::YUY2),
         PixelFormat::Mjpeg => None,
@@ -883,17 +900,41 @@ fn fixed_format(mode: Mode) -> Option<Vec<u8>> {
     }
     properties.push(property(
         FormatProperties::VideoSize,
-        Value::Rectangle(Rectangle {
-            width: mode.width,
-            height: mode.height,
-        }),
+        Value::Choice(ChoiceValue::Rectangle(Choice(
+            spa::utils::ChoiceFlags::empty(),
+            ChoiceEnum::Range {
+                default: Rectangle {
+                    width: preferred.width,
+                    height: preferred.height,
+                },
+                min: Rectangle {
+                    width: 1,
+                    height: 1,
+                },
+                max: Rectangle {
+                    width: MAX_SIDE,
+                    height: MAX_SIDE,
+                },
+            },
+        ))),
     ));
     properties.push(property(
         FormatProperties::VideoFramerate,
-        Value::Fraction(Fraction {
-            num: mode.rate.num,
-            denom: mode.rate.den,
-        }),
+        Value::Choice(ChoiceValue::Fraction(Choice(
+            spa::utils::ChoiceFlags::empty(),
+            ChoiceEnum::Range {
+                default: Fraction {
+                    num: preferred.rate.num,
+                    denom: preferred.rate.den,
+                },
+                // 0/1 is how PipeWire describes a variable frame rate.
+                min: Fraction { num: 0, denom: 1 },
+                max: Fraction {
+                    num: MAX_OFFERED_FPS,
+                    denom: 1,
+                },
+            },
+        ))),
     ));
     serialize(Object {
         type_: SpaTypes::ObjectParamFormat.as_raw(),
@@ -901,6 +942,10 @@ fn fixed_format(mode: Mode) -> Option<Vec<u8>> {
         properties,
     })
 }
+
+/// Bounds of the "any size and rate" ranges: far beyond any camera, so they never exclude one.
+const MAX_SIDE: u32 = 16384;
+const MAX_OFFERED_FPS: u32 = 1000;
 
 /// Buffer types the stream takes: plain shared memory only, mapped by PipeWire.
 fn buffers() -> Option<Vec<u8>> {
@@ -1330,38 +1375,121 @@ mod tests {
         assert!(modes(&rgb).is_empty());
     }
 
-    #[test]
-    fn the_fixed_format_parses_back_to_the_chosen_mode() {
-        for format in [PixelFormat::Nv12, PixelFormat::Yuy2, PixelFormat::Mjpeg] {
-            let mode = Mode {
-                format,
-                width: 1280,
-                height: 720,
-                rate: Rate {
-                    num: 30000,
-                    den: 1001,
-                },
-            };
-            assert_eq!(modes(&fixed_format(mode).unwrap()), [mode]);
+    /// The preferred value of a fixed property or of a range choice.
+    fn preferred<T: CanonicalFixedSizedPod + Clone>(
+        object: &Object,
+        key: FormatProperties,
+        single: impl Fn(&Value) -> Option<T>,
+    ) -> Option<T>
+    where
+        ChoiceValue: ChoiceOf<T>,
+    {
+        let value = &object
+            .properties
+            .iter()
+            .find(|p| p.key == key.as_raw())?
+            .value;
+        match value {
+            Value::Choice(choice) => match ChoiceValue::choice(choice)? {
+                ChoiceEnum::Range { default, .. } => Some(default.clone()),
+                _ => None,
+            },
+            other => single(other),
         }
     }
 
-    #[test]
-    fn the_fixed_format_is_offered_as_the_only_enum_format() {
-        // PipeWire files a connect param under its object id; only `EnumFormat` restricts the
-        // negotiation, so under any other id the camera picks its own default mode.
-        let mode = Mode {
-            format: PixelFormat::Nv12,
-            width: 1280,
-            height: 720,
-            rate: Rate { num: 30, den: 1 },
-        };
-        let bytes = fixed_format(mode).unwrap();
-        let Ok((_, Value::Object(object))) = PodDeserializer::deserialize_any_from(&bytes) else {
+    /// The mode one offered `EnumFormat` prefers: its format, default size and default rate.
+    fn preferred_mode(bytes: &[u8]) -> Mode {
+        let Ok((_, Value::Object(object))) = PodDeserializer::deserialize_any_from(bytes) else {
             panic!("not an object");
         };
         assert_eq!(object.id, ParamType::EnumFormat.as_raw());
         assert_eq!(object.type_, SpaTypes::ObjectParamFormat.as_raw());
+        let subtype = preferred(&object, FormatProperties::MediaSubtype, |v| match v {
+            Value::Id(id) => Some(*id),
+            _ => None,
+        })
+        .unwrap();
+        let format = if subtype == Id(MediaSubtype::Mjpg.as_raw()) {
+            PixelFormat::Mjpeg
+        } else {
+            let Id(raw) = preferred(&object, FormatProperties::VideoFormat, |v| match v {
+                Value::Id(id) => Some(*id),
+                _ => None,
+            })
+            .unwrap();
+            if raw == VideoFormat::NV12.as_raw() {
+                PixelFormat::Nv12
+            } else if raw == VideoFormat::YUY2.as_raw() {
+                PixelFormat::Yuy2
+            } else {
+                panic!("unreadable format offered")
+            }
+        };
+        let size = preferred(&object, FormatProperties::VideoSize, |v| match v {
+            Value::Rectangle(r) => Some(*r),
+            _ => None,
+        })
+        .unwrap();
+        let rate = preferred(&object, FormatProperties::VideoFramerate, |v| match v {
+            Value::Fraction(f) => Some(*f),
+            _ => None,
+        })
+        .unwrap();
+        Mode {
+            format,
+            width: size.width,
+            height: size.height,
+            rate: Rate {
+                num: rate.num,
+                den: rate.denom,
+            },
+        }
+    }
+
+    const REQUESTED: Mode = Mode {
+        format: PixelFormat::Yuy2,
+        width: 1280,
+        height: 720,
+        rate: Rate {
+            num: 30000,
+            den: 1001,
+        },
+    };
+
+    #[test]
+    fn the_requested_mode_is_offered_first_and_preferred() {
+        for format in [PixelFormat::Nv12, PixelFormat::Yuy2, PixelFormat::Mjpeg] {
+            let mode = Mode {
+                format,
+                ..REQUESTED
+            };
+            let offers = offered_formats(mode).unwrap();
+            assert_eq!(preferred_mode(&offers[0]), mode);
+        }
+    }
+
+    #[test]
+    fn every_readable_format_is_offered_once_preferring_the_requested_size_and_rate() {
+        // A camera another app holds in a different mode must still negotiate something.
+        let offers = offered_formats(REQUESTED).unwrap();
+        let preferred: Vec<Mode> = offers.iter().map(|o| preferred_mode(o)).collect();
+        assert_eq!(
+            preferred,
+            [PixelFormat::Yuy2, PixelFormat::Nv12, PixelFormat::Mjpeg].map(|format| Mode {
+                format,
+                ..REQUESTED
+            })
+        );
+    }
+
+    #[test]
+    fn the_offers_accept_any_size_and_rate() {
+        for offer in offered_formats(REQUESTED).unwrap() {
+            let found = modes(&offer);
+            assert!(found.iter().any(|m| (m.width, m.height) == (640, 480)));
+            assert!(found.iter().any(|m| (m.width, m.height) == (320, 240)));
+        }
     }
 
     #[test]
