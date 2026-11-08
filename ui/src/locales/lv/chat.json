@@ -104,7 +104,8 @@
     "peopleHeading": "Cilvēki",
     "channelHint": "Paziņot visiem kanālā {{channel}} ({{count}})",
     "allHint": "Paziņot visiem, kas var lasīt šo kanālu ({{count}})",
-    "keys": "↑↓ izvēlēties · Enter ievietot · Esc aizvērt"
+    "keys": "↑↓ izvēlēties · Enter ievietot · Esc aizvērt",
+    "channelList": "Kanālu ieteikumi"
   },
   "preview": {
     "open": "Atvērt pārlūkā",
@@ -417,5 +418,14 @@
   },
   "slash": {
     "list": "Komandas ar „/“"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanāls – atvērt izvēlni",
+    "join": "Pievienoties kanālam",
+    "joinPath": "Pievienoties {{path}}",
+    "show": "Rādīt kanālu sarakstā",
+    "showPath": "Rādīt {{path}} kanālu sarakstā",
+    "copy": "Kopēt nosaukumu",
+    "menu": "Kanāls {{channel}}"
   }
 }

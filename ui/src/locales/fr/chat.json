@@ -104,7 +104,8 @@
     "peopleHeading": "Personnes",
     "channelHint": "Notifier tout le monde dans {{channel}} ({{count}})",
     "allHint": "Notifier tous ceux qui peuvent lire ce salon ({{count}})",
-    "keys": "↑↓ choisir · Entrée insérer · Échap fermer"
+    "keys": "↑↓ choisir · Entrée insérer · Échap fermer",
+    "channelList": "Suggestions de salons"
   },
   "preview": {
     "open": "Ouvrir dans le navigateur",
@@ -417,5 +418,14 @@
   },
   "slash": {
     "list": "Commandes avec barre oblique"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, salon – ouvrir son menu",
+    "join": "Rejoindre le salon",
+    "joinPath": "Rejoindre {{path}}",
+    "show": "Afficher dans la liste des salons",
+    "showPath": "Afficher {{path}} dans la liste des salons",
+    "copy": "Copier le nom",
+    "menu": "Salon {{channel}}"
   }
 }

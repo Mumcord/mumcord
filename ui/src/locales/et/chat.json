@@ -100,7 +100,8 @@
     "peopleHeading": "Inimesed",
     "channelHint": "Teavita kõiki kanalis {{channel}} ({{count}})",
     "allHint": "Teavita kõiki, kes saavad seda kanalit lugeda ({{count}})",
-    "keys": "↑↓ vali · Enter sisesta · Esc sulge"
+    "keys": "↑↓ vali · Enter sisesta · Esc sulge",
+    "channelList": "Kanalite soovitused"
   },
   "preview": {
     "open": "Ava brauseris",
@@ -408,5 +409,14 @@
   },
   "slash": {
     "list": "Kaldakäsud"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanal – ava menüü",
+    "join": "Liitu kanaliga",
+    "joinPath": "Liitu kanaliga {{path}}",
+    "show": "Näita kanalite loendis",
+    "showPath": "Näita {{path}} kanalite loendis",
+    "copy": "Kopeeri nimi",
+    "menu": "Kanal {{channel}}"
   }
 }

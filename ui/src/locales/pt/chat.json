@@ -104,7 +104,8 @@
     "peopleHeading": "Pessoas",
     "channelHint": "Notificar todos em {{channel}} ({{count}})",
     "allHint": "Notificar todos os que podem ler este canal ({{count}})",
-    "keys": "↑↓ escolher · Enter inserir · Esc fechar"
+    "keys": "↑↓ escolher · Enter inserir · Esc fechar",
+    "channelList": "Sugestões de canais"
   },
   "preview": {
     "open": "Abrir no navegador",
@@ -417,5 +418,14 @@
   },
   "slash": {
     "list": "Comandos com /"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, canal – abrir o menu",
+    "join": "Entrar no canal",
+    "joinPath": "Entrar em {{path}}",
+    "show": "Mostrar na lista de canais",
+    "showPath": "Mostrar {{path}} na lista de canais",
+    "copy": "Copiar nome",
+    "menu": "Canal {{channel}}"
   }
 }
