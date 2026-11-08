@@ -1,7 +1,7 @@
 /**
  * The built-in admin commands of the chat box (Epic 4, issue #378, FR-10.30). What each one needs
  * is decided here: the right that lists it at all, the people it may name and the shape of its
- * arguments. Running one is in `run.ts`, offering them while typing in `options.ts`.
+ * arguments. Running one is in `run.ts`, offering them while typing in `useAdminSlash.ts`.
  */
 import type { User } from "../../../api";
 import type { ServerState } from "../../channels/serverStore";
