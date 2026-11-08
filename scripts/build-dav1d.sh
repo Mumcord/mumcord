@@ -5,7 +5,7 @@
 #   scripts/build-dav1d.sh <prefix>
 #
 # Result: <prefix>/include/dav1d/*.h, <prefix>/lib/dav1d.lib (Windows) or <prefix>/lib/libdav1d.a
-# (macOS: one universal archive with arm64 and x86_64 slices; Linux: the host architecture), and
+# (macOS and Linux: the host architecture), and
 # <prefix>/lib/pkgconfig/dav1d.pc, which locates itself, so the prefix can move. An existing
 # result is kept, so CI can restore <prefix> from its cache and call this script unconditionally.
 #
@@ -67,29 +67,14 @@ elif [[ $os == linux ]]; then
   build "$work/build" "$work/install"
   install="$work/install"
 else
-  for arch in arm64 x86_64; do
-    cpu=$arch
-    [[ $arch == arm64 ]] && cpu=aarch64
-    # A cross file for both halves: the explicit -arch flags let the arm64 runner build x86_64.
-    cat > "$work/$arch.ini" <<EOF
+  # Each Mac release (Apple Silicon, Intel) is built natively on a runner of its architecture;
+  # the native file only pins the minimum macOS version.
+  cat > "$work/macos.ini" <<EOF
 [binaries]
-c = ['cc', '-arch', '$arch', '-mmacosx-version-min=$MACOS_DEPLOYMENT_TARGET']
-ar = 'ar'
-strip = 'strip'
-nasm = 'nasm'
-
-[host_machine]
-system = 'darwin'
-cpu_family = '$cpu'
-cpu = '$cpu'
-endian = 'little'
+c = ['cc', '-mmacosx-version-min=$MACOS_DEPLOYMENT_TARGET']
 EOF
-    build "$work/build-$arch" "$work/install-$arch" --cross-file="$work/$arch.ini"
-  done
-  install="$work/install-arm64"
-  lipo -create "$work/install-arm64/lib/libdav1d.a" "$work/install-x86_64/lib/libdav1d.a" \
-    -output "$install/lib/libdav1d.a.universal"
-  mv "$install/lib/libdav1d.a.universal" "$install/lib/libdav1d.a"
+  build "$work/build" "$work/install" --native-file="$work/macos.ini"
+  install="$work/install"
   lipo -info "$install/lib/libdav1d.a"
 fi
 

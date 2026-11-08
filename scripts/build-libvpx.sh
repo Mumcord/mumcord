@@ -8,7 +8,7 @@
 #   scripts/build-libvpx.sh <prefix>
 #
 # Result: <prefix>/include/vpx/*.h and <prefix>/lib/vpx.lib (Windows) or <prefix>/lib/libvpx.a
-# (macOS: one universal archive with arm64 and x86_64 slices; Linux: the host architecture). An existing result is kept, so CI
+# (macOS and Linux: the host architecture). An existing result is kept, so CI
 # can restore <prefix> from its cache and call this script unconditionally.
 #
 # Windows uses vcpkg (preinstalled on GitHub's runners as VCPKG_INSTALLATION_ROOT) with the
@@ -75,24 +75,20 @@ if [[ $os == linux ]]; then
   cp "$work/install/lib/libvpx.a" "$prefix/lib/"
 elif [[ $os == macos ]]; then
   export MACOSX_DEPLOYMENT_TARGET=$MACOS_DEPLOYMENT_TARGET
-  for arch in arm64 x86_64; do
-    build="$work/build-$arch"
-    mkdir -p "$build"
-    # The explicit -arch flags let the arm64 runner cross-compile the x86_64 half.
-    (cd "$build" && "$src/configure" \
-      --target="$arch-darwin20-gcc" \
-      --prefix="$work/install-$arch" \
-      --extra-cflags="-arch $arch -mmacosx-version-min=$MACOS_DEPLOYMENT_TARGET" \
-      --extra-cxxflags="-arch $arch -mmacosx-version-min=$MACOS_DEPLOYMENT_TARGET" \
-      --enable-static --disable-shared --enable-pic \
-      --disable-examples --disable-tools --disable-docs --disable-unit-tests \
-      && make -j"$(sysctl -n hw.ncpu)" && make install)
-  done
+  # Each Mac release (Apple Silicon, Intel) is built natively on a runner of its architecture
+  # (uname -m: arm64 or x86_64). The explicit target pins the minimum macOS version.
+  arch=$(uname -m)
+  (cd "$work" && mkdir build && cd build && "$src/configure" \
+    --target="$arch-darwin20-gcc" \
+    --prefix="$work/install" \
+    --extra-cflags="-arch $arch -mmacosx-version-min=$MACOS_DEPLOYMENT_TARGET" \
+    --extra-cxxflags="-arch $arch -mmacosx-version-min=$MACOS_DEPLOYMENT_TARGET" \
+    --enable-static --disable-shared --enable-pic \
+    --disable-examples --disable-tools --disable-docs --disable-unit-tests \
+    && make -j"$(sysctl -n hw.ncpu)" && make install)
   mkdir -p "$prefix/include" "$prefix/lib"
-  # The installed headers do not depend on the architecture (vpx_config.h is not installed).
-  cp -R "$work/install-arm64/include/vpx" "$prefix/include/"
-  lipo -create "$work/install-arm64/lib/libvpx.a" "$work/install-x86_64/lib/libvpx.a" \
-    -output "$prefix/lib/libvpx.a"
+  cp -R "$work/install/include/vpx" "$prefix/include/"
+  cp "$work/install/lib/libvpx.a" "$prefix/lib/"
   lipo -info "$prefix/lib/libvpx.a"
 fi
 
