@@ -305,6 +305,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_asset,
             commands::plugins::plugins_ui_trees,
             commands::plugins::plugins_set_appearance,
+            commands::plugins::plugins_set_page_theme,
             commands::plugins::plugin_ui_action,
             commands::plugins::plugin_ui_event,
             commands::plugins::plugins_mentioned,

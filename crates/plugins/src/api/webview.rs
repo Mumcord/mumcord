@@ -21,6 +21,7 @@ use base64::Engine as _;
 use sha2::{Digest, Sha256};
 use wasmtime::component::{HasSelf, Linker};
 
+use crate::api::theme::PageTheme;
 use crate::manifest::{Manifest, WebviewPlace as DeclaredPlace};
 use crate::origins::{Origin, Scheme};
 use crate::runtime::bindings::mumcord::plugin::webview::{Host, Place, add_to_linker};
@@ -192,8 +193,9 @@ fn bootstrap_hash() -> String {
 }
 
 /// An HTML page with the bootstrap in front, after a leading doctype (a script before it
-/// would switch the page into quirks mode).
-pub fn with_bootstrap(html: &[u8]) -> Vec<u8> {
+/// would switch the page into quirks mode). `theme` is the data block of an API 1.2 page
+/// ([`PageTheme::data_block`]); it goes right before the bootstrap, which reads it (FR-13.13).
+pub fn with_bootstrap(html: &[u8], theme: Option<&str>) -> Vec<u8> {
     let start = html
         .iter()
         .position(|b| !b.is_ascii_whitespace())
@@ -209,8 +211,10 @@ pub fn with_bootstrap(html: &[u8]) -> Vec<u8> {
     } else {
         0
     };
-    let mut out = Vec::with_capacity(html.len() + BOOTSTRAP.len() + 17);
+    let theme = theme.unwrap_or_default();
+    let mut out = Vec::with_capacity(html.len() + theme.len() + BOOTSTRAP.len() + 17);
     out.extend_from_slice(&html[..split]);
+    out.extend_from_slice(theme.as_bytes());
     out.extend_from_slice(b"<script>");
     out.extend_from_slice(BOOTSTRAP.as_bytes());
     out.extend_from_slice(b"</script>");
@@ -359,6 +363,8 @@ struct PluginWeb {
     rates: Option<Rates>,
     /// The last click or key press in one of its pages that counted as a gesture (FR-9.45).
     last_gesture: Option<Instant>,
+    /// Its pages get the theme tokens (API 1.2 or newer, FR-13.8).
+    themed: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -404,6 +410,8 @@ impl PluginWeb {
 #[derive(Debug, Default)]
 pub struct Webviews {
     plugins: Mutex<HashMap<String, PluginWeb>>,
+    /// The data block of the current [`PageTheme`]; `None` until the UI first reports it.
+    theme: Mutex<Option<String>>,
 }
 
 impl Webviews {
@@ -425,6 +433,30 @@ impl Webviews {
         }
         web.root = root;
         web.places = places;
+    }
+
+    /// Sets whether a plugin's pages get the theme tokens (its `api` is 1.2 or newer), at load.
+    pub fn set_themed(&self, plugin: &str, themed: bool) {
+        self.lock().entry(plugin.to_owned()).or_default().themed = themed;
+    }
+
+    /// Records the theme the UI resolved; pages served from now on start with it (FR-13.13).
+    /// Open pages get it from the UI directly (FR-13.15).
+    pub fn set_page_theme(&self, theme: &PageTheme) {
+        let block = theme.data_block();
+        *self.theme.lock().unwrap_or_else(PoisonError::into_inner) = Some(block);
+    }
+
+    /// The theme data block for a page of `plugin`: `None` for plugins below API 1.2, whose
+    /// pages stay exactly as before, and before the UI reported a theme.
+    pub fn page_theme(&self, plugin: &str) -> Option<String> {
+        if !self.lock().get(plugin).is_some_and(|web| web.themed) {
+            return None;
+        }
+        self.theme
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone()
     }
 
     /// Sets the websites a plugin declares in `net.origins`, at load. Its pages reach them only
@@ -942,7 +974,7 @@ mod tests {
 
     #[test]
     fn the_bootstrap_hash_matches_the_injected_script() {
-        let page = String::from_utf8(with_bootstrap(b"<p>x</p>")).unwrap();
+        let page = String::from_utf8(with_bootstrap(b"<p>x</p>", None)).unwrap();
         let script = page
             .strip_prefix("<script>")
             .and_then(|rest| rest.split_once("</script>"))
@@ -950,6 +982,40 @@ mod tests {
             .0;
         let digest = base64::engine::general_purpose::STANDARD.encode(Sha256::digest(script));
         assert_eq!(bootstrap_hash(), format!("sha256-{digest}"));
+    }
+
+    #[test]
+    fn the_theme_block_goes_right_before_the_bootstrap() {
+        let block = r#"<script type="application/json">{}</script>"#;
+        let page =
+            String::from_utf8(with_bootstrap(b"<!doctype html><p>x</p>", Some(block))).unwrap();
+        let rest = page.strip_prefix("<!doctype html>").unwrap();
+        let rest = rest.strip_prefix(block).unwrap();
+        assert!(rest.starts_with("<script>"));
+        assert!(rest.ends_with("</script><p>x</p>"));
+    }
+
+    #[test]
+    fn only_themed_plugins_get_the_page_theme() {
+        use crate::api::theme::{PageMode, PageScheme};
+
+        let views = Webviews::default();
+        views.set_themed("new", true);
+        views.set_themed("old", false);
+        // Nothing to embed before the UI reported a theme.
+        assert_eq!(views.page_theme("new"), None);
+
+        let theme = PageTheme::new(
+            PageMode::Dark,
+            PageScheme::Dark,
+            false,
+            [("--mc-color-text".to_owned(), "#fff".to_owned())],
+        );
+        views.set_page_theme(&theme);
+        assert_eq!(views.page_theme("new"), Some(theme.data_block()));
+        // A 1.1 page gets nothing: served byte for byte as before (FR-13.8).
+        assert_eq!(views.page_theme("old"), None);
+        assert_eq!(views.page_theme("unknown"), None);
     }
 
     #[test]
@@ -978,11 +1044,11 @@ mod tests {
 
     #[test]
     fn the_bootstrap_goes_after_the_doctype() {
-        let page = with_bootstrap(b"\n<!DOCTYPE html><p>x</p>");
+        let page = with_bootstrap(b"\n<!DOCTYPE html><p>x</p>", None);
         let text = String::from_utf8(page).unwrap();
         assert!(text.starts_with("\n<!DOCTYPE html><script>"));
         assert!(text.ends_with("</script><p>x</p>"));
-        let bare = String::from_utf8(with_bootstrap(b"<p>x</p>")).unwrap();
+        let bare = String::from_utf8(with_bootstrap(b"<p>x</p>", None)).unwrap();
         assert!(bare.starts_with("<script>"));
     }
 

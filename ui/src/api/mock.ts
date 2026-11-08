@@ -3882,6 +3882,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginsUiTrees: () => Promise.resolve([]),
     pluginAsset: () => fail("notFound", "no such asset"),
     pluginsSetAppearance: () => Promise.resolve(null),
+    pluginsSetPageTheme: () => Promise.resolve(null),
     pluginUiAction: () => fail("invalidInput", "no such action on screen"),
     pluginReenableWeb: () => Promise.resolve(null),
     pluginFramesMute: (plugin, muted) => {
