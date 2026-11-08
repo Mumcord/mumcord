@@ -533,6 +533,15 @@
   white-space: nowrap;
 }
 
+/* A long window title is cut, so the sound badge stays in view (issue #558). */
+.sharer-bar__window {
+  display: inline-block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
 .sharer-bar__actions {
   display: flex;
   flex-wrap: wrap;
