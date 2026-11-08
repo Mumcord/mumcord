@@ -1,22 +1,22 @@
 {
-  "hint": "Laad een uitgepakte pluginmap om die te testen. Ontwikkelaarsplugins zijn niet ondertekend, nooit officieel en kunnen geen net.http, secrets of ui.webview krijgen. Ze worden verwijderd uit het geheugen als de ontwikkelaarsmodus uitgaat.",
-  "load": "Pluginmap laden…",
-  "pickFolder": "Kies de pluginmap",
-  "empty": "Er is geen ontwikkelaarsplugin geladen.",
-  "listLabel": "Ontwikkelaarsplugins",
-  "label": "Ontwikkelaarsplugin",
+  "hint": "Laad een uitgepakte plug-inmap om die te testen. Ontwikkelaarsplug-ins zijn niet ondertekend, nooit officieel en kunnen geen net.http, secrets of ui.webview krijgen. Ze worden uit het geheugen verwijderd als de ontwikkelaarsmodus uitgaat.",
+  "load": "Plug-inmap laden…",
+  "pickFolder": "Kies de plug-inmap",
+  "empty": "Er is geen ontwikkelaarsplug-in geladen.",
+  "listLabel": "Ontwikkelaarsplug-ins",
+  "label": "Ontwikkelaarsplug-in",
   "status": {
     "running": "Actief",
     "off": "Uit",
     "backingOff": "Herstart na een crash",
     "autoOff": "Uitgezet na herhaalde crashes",
-    "allOff": "Alle plugins staan uit",
-    "noPlugins": "Plugins staan uit voor deze sessie",
+    "allOff": "Alle plug-ins staan uit",
+    "noPlugins": "Plug-ins staan uit voor deze sessie",
     "notLoaded": "Kon niet worden geladen"
   },
   "showLog": "Logboek van {{name}} tonen",
   "reload": "{{name}} opnieuw laden",
-  "unload": "{{name}} verwijderen uit het geheugen",
+  "unload": "{{name}} ontladen",
   "logLabel": "Logboek van {{name}}",
   "logTitle": "Logboek van {{name}}",
   "logEmpty": "Nog geen logregels.",
@@ -27,9 +27,9 @@
     "error": "Fout"
   },
   "errors": {
-    "load": "De pluginmap kon niet worden geladen.",
-    "reload": "De plugin kon niet opnieuw worden geladen.",
-    "unload": "De plugin kon niet uit het geheugen worden verwijderd.",
+    "load": "De plug-inmap kon niet worden geladen.",
+    "reload": "De plug-in kon niet opnieuw worden geladen.",
+    "unload": "De plug-in kon niet uit het geheugen worden verwijderd.",
     "log": "Het logboek kon niet worden gelezen."
   }
 }

@@ -5,7 +5,7 @@
     "lost": "Verbinding met {{server}} verbroken. Opnieuw verbinden…",
     "ended": "Verbinding met {{server}} verbroken. Kijk in de balk boven de chat wat je nu kunt doen.",
     "disconnected": "Verbinding met {{server}} verbroken.",
-    "tcp": "Voice loopt nu via TCP omdat UDP is geblokkeerd. Audio kan iets vertraagd zijn.",
+    "tcp": "Spraak loopt nu via TCP omdat UDP is geblokkeerd. Audio kan iets vertraagd zijn.",
     "removed": "{{server}} verwijderd.",
     "moved": "{{server}} verplaatst naar positie {{position}} van {{count}}."
   },
@@ -88,7 +88,7 @@
     "renameDone": "Klaar",
     "removeChannelPassword": "{{name}} verwijderen",
     "remove": "Verwijderen",
-    "channelPasswordsHint": "Opgeslagen wanneer een beveiligd kanaal ze accepteerde. Verwijderde worden bij de volgende keer betreden opnieuw gevraagd.",
+    "channelPasswordsHint": "Opgeslagen wanneer een beveiligd kanaal ze accepteerde. Verwijderde wachtwoorden worden opnieuw gevraagd als je weer deelneemt.",
     "tabsLabel": "Serverinstellingen",
     "tabs": {
       "connection": "Verbinding",
@@ -126,10 +126,10 @@
     "secureStorage": "De beveiligde opslag van je systeem is niet beschikbaar, dus het serverwachtwoord kon niet worden gelezen of opgeslagen. Ontgrendel de opslag en probeer het opnieuw.",
     "notFound": "Deze server is niet meer opgeslagen.",
     "generic": "Er is iets misgegaan. Probeer het opnieuw.",
-    "serverLimit": "Je bent al met het maximum van {{limit}} servers verbonden. Verbreek een server of verhoog de limiet in Instellingen → Servers.",
-    "serverLimitUnknown": "Je bent al met het maximale aantal servers verbonden. Verbreek een server of verhoog de limiet in Instellingen → Servers.",
-    "alwaysConnectLimit": "Slechts {{limit}} servers kunnen op ‘Altijd verbinden bij opstarten’ staan, net zoveel als de limiet voor verbonden servers. Zet het uit voor een andere server of verhoog de limiet in Instellingen → Servers.",
-    "alwaysConnectLimitUnknown": "Er kunnen niet meer servers op ‘Altijd verbinden bij opstarten’ staan dan de limiet voor verbonden servers. Zet het uit voor een andere server of verhoog de limiet in Instellingen → Servers."
+    "serverLimit": "Je bent al met het maximum van {{limit}} servers verbonden. Verbreek de verbinding met een server of verhoog de limiet in Instellingen → Servers.",
+    "serverLimitUnknown": "Je bent al met het maximale aantal servers verbonden. Verbreek de verbinding met een server of verhoog de limiet in Instellingen → Servers.",
+    "alwaysConnectLimit": "Slechts {{limit}} servers kunnen op “Altijd verbinden bij opstarten” staan, net zoveel als de limiet voor verbonden servers. Zet het uit voor een andere server of verhoog de limiet in Instellingen → Servers.",
+    "alwaysConnectLimitUnknown": "Er kunnen niet meer servers op “Altijd verbinden bij opstarten” staan dan de limiet voor verbonden servers. Zet het uit voor een andere server of verhoog de limiet in Instellingen → Servers."
   },
   "remove": {
     "title": "{{server}} verwijderen?",
@@ -150,16 +150,16 @@
     "trustChanged": "Het nieuwe certificaat vertrouwen"
   },
   "rejoin": {
-    "label": "Laatste kanaal opnieuw betreden",
+    "label": "Opnieuw deelnemen aan laatste kanaal",
     "text": "Je zat de vorige keer in {{channel}} – opnieuw deelnemen?",
     "rejoin": "Opnieuw deelnemen",
-    "notNow": "Nu niet"
+    "notNow": "Niet nu"
   },
   "status": {
     "label": "Verbindingsstatus",
     "connecting": "Verbinden met {{server}}…",
     "reconnecting": "Opnieuw verbinden… (poging {{attempt}} van {{max}}, volgende poging over {{seconds}} s)",
-    "tcp": "Verbonden via TCP (UDP geblokkeerd). Voice werkt, maar kan iets vertraagd zijn.",
+    "tcp": "Verbonden via TCP (UDP geblokkeerd). Spraak werkt, maar kan iets vertraagd zijn.",
     "disconnected": "Verbinding verbroken",
     "disconnectedReason": "Verbinding verbroken – {{reason}}",
     "failed": "Kon geen verbinding maken met {{server}}. {{reason}}",
@@ -171,7 +171,7 @@
       "reorder": "De nieuwe servervolgorde kon niet worden opgeslagen. Probeer het opnieuw.",
       "remove": "De server kon niet worden verwijderd. Probeer het opnieuw.",
       "disconnect": "Verbinding verbreken is mislukt. Probeer het opnieuw.",
-      "alwaysConnect": "‘Altijd verbinden bij opstarten’ kon niet worden opgeslagen. Probeer het opnieuw.",
+      "alwaysConnect": "“Altijd verbinden bij opstarten” kon niet worden opgeslagen. Probeer het opnieuw.",
       "notifications": "De meldingsinstelling kon niet worden opgeslagen. Probeer het opnieuw.",
       "savePassword": "Het nieuwe wachtwoord kon niet worden opgeslagen. Bewerk de server om het op te slaan.",
       "identity": "De identiteit kon niet worden opgeslagen. Probeer het opnieuw."
@@ -208,10 +208,10 @@
     "intro": "Voer het wachtwoord voor {{channel}} in.",
     "label": "Wachtwoord",
     "wrong": "Verkeerd wachtwoord",
-    "failed": "Het wachtwoord kon niet worden verstuurd. Probeer het opnieuw.",
+    "failed": "Het wachtwoord kon niet worden verzonden. Probeer het opnieuw.",
     "cancel": "Annuleren",
-    "join": "Betreden",
-    "joining": "Betreden…"
+    "join": "Deelnemen",
+    "joining": "Deelnemen…"
   },
   "serverInfo": {
     "title": "Serverinfo",
@@ -274,7 +274,7 @@
     "permissionTraverse": "Doorkruisen",
     "permissionEnter": "Betreden",
     "permissionSpeak": "Spreken",
-    "permissionMuteDeafen": "Anderen dempen/doof maken",
+    "permissionMuteDeafen": "Anderen dempen/doof zetten",
     "permissionMove": "Gebruikers verplaatsen",
     "permissionMakeChannel": "Kanaal maken",
     "permissionLinkChannel": "Kanaal koppelen",
@@ -282,8 +282,8 @@
     "permissionTextMessage": "Tekstbericht",
     "permissionMakeTempChannel": "Tijdelijk kanaal maken",
     "permissionListen": "Luisteren",
-    "permissionKick": "Verwijderen",
-    "permissionBan": "Bannen",
+    "permissionKick": "Van server verwijderen",
+    "permissionBan": "Verbannen",
     "permissionRegister": "Gebruikers registreren",
     "permissionSelfRegister": "Zichzelf registreren",
     "permissionResetUserContent": "Gebruikersinhoud resetten",
@@ -293,17 +293,17 @@
     "field": "Identiteit voor deze server",
     "useDefault": "Standaard gebruiken ({{identity}})",
     "option": "{{label}} ({{name}})",
-    "hint": "De identiteit wijzigen verbindt deze server opnieuw. De geregistreerde naam en rechten hier horen bij de gekozen identiteit.",
+    "hint": "Als je de identiteit wijzigt, wordt opnieuw met deze server verbonden. De geregistreerde naam en rechten hier horen bij de gekozen identiteit.",
     "manage": "Identiteiten beheren…",
     "title": "Identiteit voor {{server}}",
-    "intro": "Kies welke identiteit Mumcord hier gebruikt. ‘Standaard gebruiken’ volgt de standaardidentiteit.",
+    "intro": "Kies welke identiteit Mumcord hier gebruikt. “Standaard gebruiken” volgt de standaardidentiteit.",
     "save": "Opslaan",
     "saveAndReconnect": "Opslaan en opnieuw verbinden",
-    "reconnectTitle": "{{server}} opnieuw verbinden?",
-    "reconnectMessage": "Deze server nu opnieuw verbinden met {{identity}}? De andere servers blijven verbonden.",
+    "reconnectTitle": "Opnieuw verbinden met {{server}}?",
+    "reconnectMessage": "Nu opnieuw met deze server verbinden met {{identity}}? De andere servers blijven verbonden.",
     "reconnect": "Opnieuw verbinden",
     "later": "Later",
-    "nextConnect": "Geldt de volgende keer dat deze server verbindt.",
+    "nextConnect": "Geldt vanaf de volgende verbinding met deze server.",
     "badge": "Identiteit: {{identity}}",
     "badgeTitle": "Verbonden met de identiteit {{identity}}",
     "missingNotice": "{{server}} is verbonden met de standaardidentiteit omdat de eigen identiteit ontbreekt."
@@ -313,7 +313,7 @@
     "line": "Relay staat toe: {{uses}}",
     "images": "Afbeeldingen",
     "files": "Bestanden",
-    "screen": "Schermdelen",
-    "cameras": "Camera’s"
+    "screen": "Schermdeling",
+    "cameras": "Camera's"
   }
 }

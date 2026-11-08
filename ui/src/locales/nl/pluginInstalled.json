@@ -1,25 +1,25 @@
 {
-  "listLabel": "Geïnstalleerde plugins",
-  "empty": "Nog geen plugins.",
-  "browse": "Plugins bekijken",
+  "listLabel": "Geïnstalleerde plug-ins",
+  "empty": "Nog geen plug-ins.",
+  "browse": "Plug-ins bekijken",
   "enable": "{{name}} aan",
   "labels": {
     "official": "Officieel",
     "unofficial": "Onofficieel · {{repository}}",
     "unofficialUnknown": "Onofficieel",
-    "developer": "Ontwikkelaarsplugin",
+    "developer": "Ontwikkelaarsplug-in",
     "autoOff": "Uitgezet na herhaalde crashes",
     "backingOff": "Herstart na een crash",
     "notLoaded": "Kon niet worden geladen",
     "revoked": "Uitgezet door Mumcord: {{reason}}",
     "revocationWarning": "Waarschuwing van Mumcord: {{reason}}",
-    "tampered": "De bestanden van deze plugin zijn gewijzigd",
-    "permission": "Uitgezet omdat een vereiste toestemming uit staat"
+    "tampered": "De bestanden van deze plug-in zijn gewijzigd",
+    "permission": "Uitgezet omdat een vereist recht uit staat"
   },
   "details": {
     "open": "Details van {{name}}",
-    "permissions": "Toestemmingen",
-    "visibility": "Wie de activiteit van deze plugin kan zien",
+    "permissions": "Rechten",
+    "visibility": "Wie de activiteit van deze plug-in kan zien",
     "visibilityOptions": {
       "everyone": "Iedereen",
       "friends": "Alleen vrienden",
@@ -27,12 +27,12 @@
     },
     "notifications": "Meldingen",
     "pin": "Versie {{version}} vastzetten (geen automatische updates)",
-    "settings": "Plugin-instellingen",
+    "settings": "Plug-ininstellingen",
     "diagnostics": "Diagnostiek",
     "export": "Gegevens exporteren",
     "reset": "Gegevens resetten",
     "remove": "Verwijderen",
-    "commandTaken": "/{{command}}: Opdracht al in gebruik door {{plugin}}"
+    "commandTaken": "/{{command}}: commando al in gebruik door {{plugin}}"
   },
   "badge": {
     "label": "Badge naast namen",
@@ -56,8 +56,8 @@
     "incomingRateDropped": "Inkomende berichten weggegooid door de snelheidslimiet",
     "incomingInvalid": "Ongeldige inkomende berichten",
     "uiFreezes": "Aantal keren dat Mumcord vastliep terwijl de webinhoud open was",
-    "refusedAppMenuLabel": "Deze plug-in is geweigerd: een label in het Apps-menu is gelijk aan een eigen label van Mumcord of begint met \"Mumcord\".",
-    "fieldWithoutPermission": "Deze plug-in is geweigerd: hij gebruikt \"{{field}}\" zonder de toestemming \"{{permission}}\".",
+    "refusedAppMenuLabel": "Deze plug-in is geweigerd: een label in het Apps-menu is gelijk aan een eigen label van Mumcord of begint met “Mumcord”.",
+    "fieldWithoutPermission": "Deze plug-in is geweigerd: hij gebruikt “{{field}}” zonder het recht “{{permission}}”.",
     "webDisabled": "De webinhoud is uitgeschakeld omdat Mumcord niet meer reageerde terwijl deze open was.",
     "reenableWeb": "Webinhoud inschakelen",
     "reenableFailed": "De webinhoud kon niet worden ingeschakeld.",
@@ -77,25 +77,25 @@
   },
   "reset": {
     "title": "Gegevens van {{name}} resetten?",
-    "message": "Alles wat deze plugin heeft opgeslagen wordt verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "message": "Alles wat deze plug-in heeft opgeslagen, wordt verwijderd. Dit kan niet ongedaan worden gemaakt.",
     "confirm": "Gegevens resetten",
     "done": "Gegevens gereset."
   },
   "remove": {
     "title": "{{name}} verwijderen?",
     "deleteData": "Ook de gegevens verwijderen",
-    "hint": "Bewaarde gegevens worden na 30 dagen verwijderd. Installeer de plugin eerder opnieuw om ze terug te krijgen.",
+    "hint": "Bewaarde gegevens worden na 30 dagen verwijderd. Installeer de plug-in eerder opnieuw om ze terug te krijgen.",
     "confirm": "Verwijderen"
   },
   "errors": {
-    "enable": "De plugin kon niet worden omgeschakeld.",
-    "permissions": "De toestemming kon niet worden gewijzigd.",
+    "enable": "De plug-in kon niet worden in- of uitgeschakeld.",
+    "permissions": "Het recht kon niet worden gewijzigd.",
     "visibility": "De zichtbaarheid kon niet worden gewijzigd.",
     "notifications": "De meldingen konden niet worden gewijzigd.",
     "pin": "De versie kon niet worden vastgezet.",
     "export": "De gegevens konden niet worden geëxporteerd.",
     "reset": "De gegevens konden niet worden gereset.",
-    "remove": "De plugin kon niet worden verwijderd.",
+    "remove": "De plug-in kon niet worden verwijderd.",
     "badge": "De badge kon niet worden gewijzigd.",
     "update": "De plug-in kon niet worden bijgewerkt."
   },
@@ -127,9 +127,9 @@
     "netHttp": "Internettoegang",
     "secrets": "Sleutelhanger"
   },
-  "offerBadge": "Nieuwe machtigingen",
+  "offerBadge": "Nieuwe rechten",
   "refused": {
-    "title": "Geweigerde plugins",
+    "title": "Geweigerde plug-ins",
     "when": "Geweigerd op {{time}}"
   }
 }

@@ -122,7 +122,7 @@
     "above": "Boven {{channel}} plaatsen",
     "below": "Onder {{channel}} plaatsen",
     "self": "Kan niet in zichzelf",
-    "subChannel": "Kan niet in een eigen subkanaal",
+    "subChannel": "Kan niet in zijn eigen subkanaal",
     "confirmTitle": "“{{channel}}” verplaatsen?",
     "alongAll": "Met {{channel}} gaan mee: {{subChannels}} en {{people}}.",
     "alongSubChannels": "Met {{channel}} gaan mee: {{subChannels}}.",

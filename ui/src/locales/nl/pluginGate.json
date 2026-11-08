@@ -1,6 +1,6 @@
 {
   "installTitle": "{{plugin}} installeren?",
-  "updateTitle": "{{plugin}} updaten naar {{version}}?",
+  "updateTitle": "{{plugin}} bijwerken naar {{version}}?",
   "asks": "{{plugin}} vraagt hierom. Optionele rechten kun je nu of later uitzetten.",
   "asksShort": "Deze plug-in vraagt om:",
   "scoreCountsOptional": "De score telt alle rechten mee die de plug-in kan vragen, ook de optionele.",
@@ -18,11 +18,11 @@
   "notNow": "Niet nu",
   "install": "Installeren",
   "installAnyway": "Toch installeren",
-  "updateAnyway": "Toch updaten",
+  "updateAnyway": "Toch bijwerken",
   "highRiskTitle": "Dit is een plug-in met hoog risico",
   "highRiskText": "Hij kan eigen webpagina's openen en communiceren met {{count}} websites die je niet kunt controleren. Mumcord kan niet zien wat die websites naar de plug-in sturen of wat de plug-in naar hen stuurt. De plug-in is gepubliceerd door iemand die nieuw is op deze computer. Installeer alleen als je de auteur kent en vertrouwt.",
-  "highRiskWouldBecome": "Deze update zou de plug-in tot hoog risico maken",
-  "highRiskNotAutomatic": "Hij wordt niet automatisch geïnstalleerd. Blijven op {{version}} behoudt de huidige score; je kunt de versie vastzetten onder Geïnstalleerd.",
+  "highRiskWouldBecome": "Met deze update zou de plug-in een hoog risico krijgen",
+  "highRiskNotAutomatic": "Hij wordt niet automatisch geïnstalleerd. Als je op {{version}} blijft, houd je de huidige score; je kunt de versie vastzetten onder Geïnstalleerd.",
   "sameAuthorKey": "zelfde auteurssleutel",
   "places": {
     "stage": "mediagedeelte",

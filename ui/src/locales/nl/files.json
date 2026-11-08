@@ -2,7 +2,7 @@
   "composer": {
     "attach": "Bestanden delen",
     "attachLabel": "Bestanden delen in dit kanaal",
-    "dropTitle": "Zet neer om te delen met #{{channel}}",
+    "dropTitle": "Hier neerzetten om in #{{channel}} te delen",
     "dropChoiceTitle": "Sommige hiervan zijn afbeeldingen. Wat moet ermee gebeuren?",
     "sendAsImage": "Als afbeelding versturen",
     "shareAsFile": "Als bestand delen",
@@ -92,7 +92,7 @@
     },
     "unavailable": {
       "offline": "{{sender}} is offline gegaan. Het bestand is niet meer beschikbaar.",
-      "ended": "Dit delen is beëindigd. Gedeelde bestanden verlopen na 24 uur.",
+      "ended": "Het delen is beëindigd. Bestanden worden maximaal 24 uur gedeeld.",
       "askAgain": "Vraag {{sender}} om het opnieuw te delen."
     },
     "disabled": {
@@ -130,7 +130,7 @@
     "cancel": "Annuleren",
     "riskyTitle": "Dit bestand kan je computer beschadigen",
     "riskyFile": "{{name}} · {{size}} · van {{sender}}",
-    "riskyBody": "Dit is een programma. Programma’s kunnen je computer veranderen en je bestanden lezen. Download het alleen als je {{sender}} vertrouwt en dit bestand verwachtte.",
+    "riskyBody": "Dit is een programma. Programma's kunnen je computer veranderen en je bestanden lezen. Download het alleen als je {{sender}} vertrouwt en dit bestand verwachtte.",
     "riskyNote": "Mumcord controleert of het bestand ongewijzigd aankomt, maar kan niet zien of het veilig is.",
     "riskyConfirm": "Toch downloaden",
     "riskyCancel": "Niet downloaden",

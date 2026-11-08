@@ -1,5 +1,5 @@
 {
-  "intro": "Repositories zijn extra pluginlijsten die door anderen worden beheerd. Mumcord controleert hun plugins niet. Voeg alleen repositories toe die je vertrouwt.",
+  "intro": "Repositories zijn extra plug-inlijsten die door anderen worden beheerd. Mumcord controleert hun plug-ins niet. Voeg alleen repositories toe die je vertrouwt.",
   "add": {
     "button": "Repository toevoegen",
     "title": "Repository toevoegen",
@@ -15,7 +15,7 @@
     "pluginsLine": "Plug-ins: {{number}}",
     "signingKey": "Ondertekeningssleutel",
     "warningTitle": "Onofficiële repository",
-    "warningBody": "Mumcord controleert deze plugins niet. Deze sleutel wordt onthouden: als hij ooit verandert, wordt de repository gepauzeerd tot je hem controleert. Bladeren toont je IP-adres aan de host. Plugins met officiële namen worden hier nooit uit gehaald."
+    "warningBody": "Mumcord controleert deze plug-ins niet. Deze sleutel wordt onthouden: als hij ooit verandert, wordt de repository gepauzeerd tot je hem controleert. Bladeren toont je IP-adres aan de host. Plug-ins met officiële namen worden hier nooit uit gehaald."
   },
   "limit": "Je kunt maximaal {{max}} repositories toevoegen.",
   "limitReached": "De limiet van {{max}} repositories is bereikt.",
@@ -28,18 +28,18 @@
   "fingerprintLine": "Sleutelvingerafdruk: {{fingerprint}}",
   "neverChecked": "Nog niet gecontroleerd",
   "lastChecked": "Laatst gecontroleerd: {{when}}",
-  "installedCount": "Geïnstalleerde plugins: {{number}}",
+  "installedCount": "Geïnstalleerde plug-ins: {{number}}",
   "toggle": "{{name}} gebruiken",
   "remove": {
     "button": "Verwijderen",
     "label": "{{name}} verwijderen",
     "title": "{{name}} verwijderen?",
-    "message": "De repository wordt verwijderd en de bijbehorende plugins worden uitgezet. Ze blijven met hun gegevens geïnstalleerd, maar krijgen geen updates meer.",
+    "message": "De repository wordt verwijderd en de bijbehorende plug-ins worden uitgezet. Ze blijven met hun gegevens geïnstalleerd, maar krijgen geen updates meer.",
     "confirm": "Verwijderen"
   },
   "keyChange": {
     "title": "{{name}} heeft de sleutel gewijzigd",
-    "message": "Deze repository ondertekent zijn pluginlijst nu met een andere sleutel. Hij blijft gepauzeerd tot jij beslist. Vertrouw de nieuwe sleutel alleen als de eigenaar de wijziging heeft aangekondigd.",
+    "message": "Deze repository ondertekent zijn plug-inlijst nu met een andere sleutel. Hij blijft gepauzeerd tot jij beslist. Vertrouw de nieuwe sleutel alleen als de eigenaar de wijziging heeft aangekondigd.",
     "oldKey": "Tot nu toe vertrouwde sleutel",
     "newKey": "Nieuwe sleutel",
     "keepPaused": "Gepauzeerd laten",
@@ -48,13 +48,13 @@
   },
   "mirror": {
     "title": "Geavanceerd",
-    "label": "Mirror voor de officiële pluginlijst (optioneel)",
+    "label": "Mirror voor de officiële plug-inlijst (optioneel)",
     "hint": "Wijzig dit alleen als je een mirroradres hebt gekregen. De mirror moet dezelfde ondertekende bestanden leveren; Mumcord controleert nog steeds elke handtekening.",
     "save": "Opslaan",
     "reset": "Standaard gebruiken"
   },
   "official": {
-    "name": "Officiële Mumcord-plugins",
+    "name": "Officiële Mumcord-plug-ins",
     "alwaysOn": "Altijd aan"
   }
 }

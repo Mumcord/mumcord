@@ -42,7 +42,7 @@
     "messageRequestBody_other": "{{count}} berichten van een standaard Mumble-client",
     "invite": {
       "watchParty": "{{name}} heeft je uitgenodigd voor een watchparty",
-      "screenShare": "{{name}} deelt zijn of haar scherm",
+      "screenShare": "{{name}} deelt het scherm",
       "card": "{{name}} heeft je een kaart gestuurd",
       "theme": "{{name}} heeft een thema met je gedeeld"
     },
@@ -65,7 +65,7 @@
     "failed": "Dat is niet gelukt. Probeer het opnieuw.",
     "block": "Blokkeren",
     "update": {
-      "title": "Mumcord {{version}} is klaar",
+      "title": "Mumcord {{version}} staat klaar",
       "body": "Herstart om bij te werken",
       "restart": "Herstarten en bijwerken",
       "whatsNew": "Wat is er nieuw"

@@ -29,15 +29,15 @@
   "profile": {
     "title": "Profiel bewerken",
     "chooseTitle": "Kies een profielfoto",
-    "chooseAvatar": "Kies een foto…",
+    "chooseAvatar": "Foto kiezen…",
     "removeAvatar": "Foto verwijderen",
     "avatarHint": "De foto wordt verkleind zodat hij binnen de limiet van de server past.",
     "avatarUnregistered": "Deze server bewaart avatars alleen voor geregistreerde gebruikers – Mumcord stuurt de jouwe bij elke verbinding opnieuw.",
     "avatarChosen": "Geselecteerd: {{name}}",
     "avatarRemoved": "De foto wordt verwijderd zodra je opslaat.",
     "comment": "Over jou",
-    "tooLong": "Opslaan niet mogelijk: je reactie is te lang voor deze server",
-    "tooLongTip": "Je reactie is te lang voor deze server"
+    "tooLong": "Opslaan niet mogelijk: je opmerking is te lang voor deze server",
+    "tooLongTip": "Je opmerking is te lang voor deze server"
   },
   "register": {
     "title": "Registreren op deze server",
@@ -186,11 +186,11 @@
     "imageBusy": "Afbeelding wordt aangepast aan de serverlimiet…",
     "imageScaled": "Afbeelding verkleind naar {{width}} × {{height}} om binnen de serverlimiet te passen",
     "imageTooLarge": "Deze afbeelding past ook verkleind niet binnen de serverlimiet. Gebruik een kleinere afbeelding of kort de tekst in.",
-    "imageNotImage": "Alleen PNG, JPEG, GIF or WebP-afbeeldingen kunnen worden toegevoegd.",
+    "imageNotImage": "Alleen PNG-, JPEG-, GIF- of WebP-afbeeldingen kunnen worden toegevoegd.",
     "imageUnreadable": "De afbeelding kon niet worden gelezen. Probeer een ander bestand.",
     "imageSourceTooLarge": "Dit bestand is te groot (meer dan 25 MB).",
     "overText": "Te lang voor deze server: {{used}} van {{limit}} tekens. Kort de tekst in.",
-    "overImage": "Te lang voor deze server met {{size}}, ook met verkleinde afbeelding. Gebruik een kleinere afbeelding of kort de tekst in.",
+    "overImage": "{{size}} te lang voor deze server, ook met verkleinde afbeelding. Gebruik een kleinere afbeelding of kort de tekst in.",
     "sizeKb": "{{size}} KB",
     "meterText": "{{used}} / {{limit}}",
     "meterKb": "{{used}} / {{limit}} KB",
