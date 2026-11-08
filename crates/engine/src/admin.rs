@@ -509,7 +509,7 @@ impl Engine {
         session: u32,
         right: u32,
         channel: Option<u32>,
-        change: proto::UserState,
+        mut change: proto::UserState,
         what: &str,
     ) -> EngineResult<ActionOutcome> {
         let ctx = self.session_ctx_for(server_id)?;
@@ -525,6 +525,9 @@ impl Engine {
         if !right_in(&ctx, channel.unwrap_or(person_channel), right) {
             return Err(denied(format!("{what} right in this channel")));
         }
+        // The session names the person the server changes; without it a standard server would
+        // apply the change to the sender (the admin) instead (issue #378).
+        change.session = Some(session);
         let handle = &ctx.handle;
         let outcome = send_and_wait(
             &ctx,
