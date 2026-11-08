@@ -2295,3 +2295,53 @@ a.message-card__title:hover {
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
 }
+
+/* ---- The command list of the chat box (Epic 4, issue #378) ---------------- */
+
+/* "Built-in" at the end of a built-in command's row, where a plugin row shows
+   its plugin name; the label also keeps the source off colour alone (Q2.16). */
+.slash-picker__tag {
+  flex: none;
+  margin-left: auto;
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-muted);
+}
+
+/* ---- A line only its admin sees (FR-10.35, FR-10.61) --------------------- */
+
+/* No avatar, no sender, no reply: the line is what the server did, not a
+   message. It is muted and indented like a system note, and the note under it
+   says in words who can see it. */
+.chat-message--private {
+  padding: 0;
+}
+
+.chat-private {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-left: 2px solid var(--color-border-strong);
+  background: color-mix(in srgb, var(--color-bg-elevated) 55%, transparent);
+  border-radius: var(--radius-sm);
+  text-indent: 0;
+}
+
+.chat-private__time {
+  flex: none;
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-muted);
+}
+
+.chat-private__text {
+  color: var(--color-text);
+}
+
+.chat-private__note {
+  flex: 1 1 auto;
+  font-size: var(--font-size-xs, 0.75rem);
+  font-style: italic;
+  color: var(--color-text-muted);
+}

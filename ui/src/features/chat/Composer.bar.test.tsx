@@ -38,6 +38,7 @@ function setup(target: SendTarget = CHANNEL, blockedReason: string | null = null
   const { container } = render(
     <Composer
       target={target}
+      conversation={{ kind: "channel", channelId: 1 }}
       limits={LIMITS}
       label="Message #Lobby"
       blockedReason={blockedReason}

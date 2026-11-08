@@ -52,6 +52,9 @@ const ServerAdminWindowHost = lazy(() =>
 const PersonActionHost = lazy(() =>
   import("../features/admin").then((m) => ({ default: m.PersonActionHost })),
 );
+const AdminConfirmHost = lazy(() =>
+  import("../features/admin").then((m) => ({ default: m.AdminConfirmHost })),
+);
 
 function MainScreen() {
   const { overlay, closeOverlay, openSettings, rerunWizard, closeRerunWizard } = useView();
@@ -119,6 +122,11 @@ function MainScreen() {
       {overlay === null && (
         <LazyBoundary>
           <PersonActionHost />
+        </LazyBoundary>
+      )}
+      {overlay === null && (
+        <LazyBoundary>
+          <AdminConfirmHost />
         </LazyBoundary>
       )}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />

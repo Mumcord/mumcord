@@ -5,14 +5,17 @@
  * "Kick only instead" keeps what the user already typed.
  */
 import { useSyncExternalStore } from "react";
+import { i18n } from "../../i18n";
 import {
   getApi,
   toEngineError,
   type BanEntry,
   type BanInput,
+  type Conversation,
   type EngineError,
   type PersonTarget,
 } from "../../api";
+import { report } from "./commands/lines";
 
 /** Kick and ban (#253), and the reset confirmations of #257. */
 export type PersonActionMode = "kick" | "ban" | "resetComment" | "resetAvatar";
@@ -45,6 +48,11 @@ export interface PersonAction {
   error: EngineError | null;
   /** The entry the server changed meanwhile, which the dialog asks about (FR-10.66). */
   conflict: { key: string; fresh: BanEntry[] } | null;
+  /**
+   * The chat the `/kick` or `/ban` command opened this dialog from. Its result line is written
+   * when the dialog's action went through (FR-10.35); `null` for a dialog from a menu.
+   */
+  command: { serverId: number; conversation: Conversation } | null;
 }
 
 let current: PersonAction | null = null;
@@ -86,6 +94,7 @@ export function openPersonAction(
   name: string,
   channel: string,
   mode: PersonActionMode,
+  prefill?: { reason?: string; duration?: number; conversation: Conversation },
 ): void {
   set({
     serverId,
@@ -94,11 +103,20 @@ export function openPersonAction(
     channel,
     mode,
     target: null,
-    draft: { reason: "", duration: 3600, mask: 32, byCert: true, byIp: true, removeNow: true },
+    draft: {
+      reason: prefill?.reason ?? "",
+      // A command opens the dialog permanent unless it named a duration (FR-10.31, spec 10 A1).
+      duration: prefill?.duration ?? 3600,
+      mask: 32,
+      byCert: true,
+      byIp: true,
+      removeNow: true,
+    },
     loading: mode === "ban",
     busy: false,
     error: null,
     conflict: null,
+    command: prefill === undefined ? null : { serverId, conversation: prefill.conversation },
   });
   if (mode === "ban") void loadTarget();
 }
@@ -166,10 +184,23 @@ export async function sendKick(reason: string | null): Promise<void> {
   update({ busy: true, error: null });
   try {
     await api.personKick(action.serverId, action.session, reason);
+    reportCommand("kicked", action.name);
     closePersonAction();
   } catch (error) {
     update({ error: toEngineError(error), busy: false });
   }
+}
+
+/** The line a command leaves once its dialog is done with (FR-10.35); a menu's dialog gets none. */
+function reportCommand(key: "kicked" | "banned", name: string): void {
+  const command = current?.command;
+  if (command === null || command === undefined) return;
+  report({
+    serverId: command.serverId,
+    conversation: command.conversation,
+    text: i18n.t(`admin:commands.results.${key}`, { name }),
+    note: i18n.t("admin:commands.onlyYou"),
+  });
 }
 
 export async function sendBan(input: BanInput): Promise<void> {
@@ -184,6 +215,7 @@ export async function sendBan(input: BanInput): Promise<void> {
       update({ conflict: { key: result.key, fresh: result.fresh }, busy: false });
       return;
     }
+    reportCommand("banned", action.name);
     closePersonAction();
   } catch (error) {
     update({ error: toEngineError(error), busy: false });
