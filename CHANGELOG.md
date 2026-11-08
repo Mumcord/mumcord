@@ -13,6 +13,10 @@
 - Registered users (issue #256): the server menu gains "Registered users…", which opens a tab next to Bans in Server administration and lists every account the server knows, with the account id, the last seen and the last channel. Search, "Online" and "Inactive 90+ days" filters, renaming, unregistering and registering someone who is connected right now, groups that name the account, and one save for all your changes with a clear note when the server did not take one. Only with the server's Register right; without it the menu item and the tab stay away
 - Admin commands in the chat box (issue #378): typing `/` lists the admin commands this server allows you, above the plugin commands and marked "Built-in" — `/kick`, `/ban`, `/mute`, `/unmute`, `/deaf`, `/undeaf`, `/priority`, `/register`, `/move`, `/moveall` and `/unban`. While typing, Mumcord completes the names of the people you may act on and the channels you may move people to. Kick, ban, unban and move-everyone still confirm first: the kick and ban dialogs open with the name, reason and duration you typed. Every command ends with a short result line that only you see in that chat, and the command text is never sent, so other clients see only the usual server result
 
+### Changed
+
+- macOS releases come as two downloads instead of one universal app (issue #663): "macOS (Apple Silicon)" (`Mumcord_<version>_aarch64.dmg`) and "macOS (Intel)" (`Mumcord_<version>_x64.dmg`), each built natively, signed, notarized and smoke-tested on its own architecture. The download and the installed app are about half the size. Installed universal apps update to the build for their own Mac.
+
 ### Fixed
 
 - Linux: cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when the camera reports only the brightness part of each picture as filled; the first picture's layout is now logged to diagnose other cameras
