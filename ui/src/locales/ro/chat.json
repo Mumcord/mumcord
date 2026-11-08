@@ -104,7 +104,8 @@
     "peopleHeading": "Persoane",
     "channelHint": "Anunță pe toți din {{channel}} ({{count}})",
     "allHint": "Anunță pe toți cei care pot citi acest canal ({{count}})",
-    "keys": "↑↓ alege · Enter inserează · Esc închide"
+    "keys": "↑↓ alege · Enter inserează · Esc închide",
+    "channelList": "Sugestii de canale"
   },
   "preview": {
     "open": "Deschide în browser",
@@ -417,5 +418,14 @@
   },
   "slash": {
     "list": "Comenzi cu „/“"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, canal – deschide meniul",
+    "join": "Intră în canal",
+    "joinPath": "Intră în {{path}}",
+    "show": "Arată în lista de canale",
+    "showPath": "Arată {{path}} în lista de canale",
+    "copy": "Copiază numele",
+    "menu": "Canal {{channel}}"
   }
 }

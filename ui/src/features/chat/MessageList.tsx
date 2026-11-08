@@ -67,6 +67,8 @@ import { useSharedTheme, withoutThemeShare } from "./sharedTheme";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
 import { linkMentions, MENTION_CLASS, mentionPeopleOf } from "./mentionChips";
+import { CHANNEL_MENTION_CLASS, linkChannelMentions, mentionableChannels } from "./channelMentions";
+import { ChannelMentionMenu } from "./ChannelMentionMenu";
 import { originalSrc } from "./displaySrc";
 import { imageName, type ImageClickHandler } from "./links";
 import { openInBrowser, openLink } from "./openLink";
@@ -145,6 +147,18 @@ interface BodyProps {
   onJump: (() => void) | null;
   /** Copies a card link (issue #419); the same path the link menu uses, with its confirmation. */
   onCopy: (text: string) => void;
+}
+
+/** The `#Channel` chip an event happened on, with the channels it stands for (issue #643). */
+function channelChipOf(target: EventTarget): { chip: HTMLElement; ids: number[] } | null {
+  const chip =
+    target instanceof Element ? target.closest<HTMLElement>(`.${CHANNEL_MENTION_CLASS}`) : null;
+  if (!chip) return null;
+  const ids = (chip.dataset["channelIds"] ?? "")
+    .split(",")
+    .map(Number)
+    .filter((id) => Number.isInteger(id) && id >= 0);
+  return ids.length === 0 ? null : { chip, ids };
 }
 
 /** The mention chip an event happened on, with the person it stands for. */
@@ -239,6 +253,13 @@ function TextBody({
   const inlineShown = useInlineShown(message.id);
   const serverId = useShownServerId();
   const users = useServerSelector((state) => state.users);
+  const serverChannels = useServerSelector((state) => state.channels);
+  const channelChoices = useMemo(() => mentionableChannels(serverChannels), [serverChannels]);
+  // The menu of a `#Channel` chip (issue #643).
+  const [channelMenu, setChannelMenu] = useState<{
+    ids: number[];
+    menu: MenuPosition;
+  } | null>(null);
   // A link whose image is shown below gives way to the image (QA.43).
   const sharedTheme = useSharedTheme(cleaned);
   // The theme card replaces the raw share text (FR-2.16); an unusable code stays visible.
@@ -253,13 +274,19 @@ function TextBody({
   // Mentions of people on the server become chips; added after sanitizing, from text nodes only.
   const sanitized = useMemo(
     () =>
-      linkMentions(withoutLinks, mentionPeopleOf(users), (name) =>
-        t("mention.chipLabel", { name }),
+      linkChannelMentions(
+        linkMentions(withoutLinks, mentionPeopleOf(users), (name) =>
+          t("mention.chipLabel", { name }),
+        ),
+        channelChoices,
+        (name) => t("channelMention.chipLabel", { name }),
       ),
-    [withoutLinks, users, t],
+    [withoutLinks, users, channelChoices, t],
   );
   useEffect(() => {
-    for (const chip of ref.current?.querySelectorAll(`.${MENTION_CLASS}`) ?? []) {
+    for (const chip of ref.current?.querySelectorAll(
+      `.${MENTION_CLASS}, .${CHANNEL_MENTION_CLASS}`,
+    ) ?? []) {
       chip.setAttribute("tabindex", String(tabIndex));
     }
     for (const link of ref.current?.querySelectorAll("a") ?? []) {
@@ -314,6 +341,14 @@ function TextBody({
         if (chipOf(event.target)) releasePreview();
       }}
       onClick={(event) => {
+        const channel = channelChipOf(event.target);
+        if (channel) {
+          setChannelMenu({
+            ids: channel.ids,
+            menu: { x: event.clientX, y: event.clientY, opener: channel.chip },
+          });
+          return;
+        }
         const hit = chipOf(event.target);
         if (hit && clickablePeople) clickPerson(event.detail, hit.session, hit.chip, hit.name);
       }}
@@ -322,6 +357,21 @@ function TextBody({
         if (hit && clickablePeople) doubleClickPerson(hit.session, hit.name);
       }}
       onContextMenu={(event) => {
+        const channel = channelChipOf(event.target);
+        if (channel) {
+          event.preventDefault();
+          const rect = channel.chip.getBoundingClientRect();
+          const keyboard = event.clientX === 0 && event.clientY === 0;
+          setChannelMenu({
+            ids: channel.ids,
+            menu: {
+              x: keyboard ? rect.left : event.clientX,
+              y: keyboard ? rect.bottom : event.clientY,
+              opener: channel.chip,
+            },
+          });
+          return;
+        }
         const hit = chipOf(event.target);
         if (!hit) return;
         event.preventDefault();
@@ -336,6 +386,21 @@ function TextBody({
         });
       }}
       onKeyDown={(event) => {
+        const channel = channelChipOf(event.target);
+        if (
+          channel &&
+          event.target === channel.chip &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          const rect = channel.chip.getBoundingClientRect();
+          setChannelMenu({
+            ids: channel.ids,
+            menu: { x: rect.left, y: rect.bottom, opener: channel.chip },
+          });
+          return;
+        }
         const hit = chipOf(event.target);
         if (!hit || event.target !== hit.chip) return;
         if (event.key === "Enter" || event.key === " ") {
@@ -348,6 +413,15 @@ function TextBody({
   );
   return (
     <PluginLine message={message}>
+      {channelMenu !== null && (
+        <ChannelMentionMenu
+          channelIds={channelMenu.ids}
+          menu={channelMenu.menu}
+          onClose={() => {
+            setChannelMenu(null);
+          }}
+        />
+      )}
       {reply ? <ReplyHeader quote={reply.quote} onJump={onJump} tabIndex={tabIndex} /> : null}
       {body}
       {codeActions}
