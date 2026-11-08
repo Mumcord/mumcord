@@ -81,11 +81,11 @@ describe("the command list (FR-10.30, FR-10.32)", () => {
     expect(keywords[0]).toContain("Built-in");
     expect(keywords.at(-1)).toContain("/roll");
     expect(keywords.at(-1)).toContain("Dice roller");
-    // The list is the box's combobox, so the keyboard stays in the box (issue #378, a11y).
-    expect(input.getAttribute("aria-expanded")).toBe("true");
-    expect(input.getAttribute("aria-controls")).toBeTruthy();
-    // Escape closes the list first: the box itself has to stay clean, and the picker's
-    // `role="combobox"` on a textarea is a pattern the mention picker already uses (#1.51).
+    // The box points at the list and its active row, so the keyboard stays in the box
+    // (issue #378, a11y); it stays a plain textbox so screen readers announce it correctly.
+    expect(input).not.toHaveAttribute("role");
+    expect(input.getAttribute("aria-controls")).toBe(list.id);
+    // Escape closes the list first: the box itself has to stay clean.
     fireEvent.keyDown(input, { key: "Escape" });
     await waitFor(() => {
       expect(screen.queryByRole("listbox")).toBeNull();
