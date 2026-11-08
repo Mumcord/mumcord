@@ -122,7 +122,7 @@ fn respond(webviews: Option<&Webviews>, method: &Method, path: &str) -> Response
         return not_found(Some(plugin));
     };
     let body = if mime.starts_with("text/html") {
-        let theme = plugins.webviews().page_theme(plugin);
+        let theme = webviews.page_theme(plugin);
         webview::with_bootstrap(&body, theme.as_deref())
     } else {
         body
