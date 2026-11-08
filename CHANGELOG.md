@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- A plugin's badge next to a name keeps the size of the Mumcord badge beside it instead of shrinking when the name is long
 - Copy works again in the packet inspector, and when Windows refuses the app's clipboard (e.g. "Copy" on a crash report) Mumcord copies through the window's own clipboard instead
 
 ## [0.7.2] - 2026-11-08

@@ -1,12 +1,27 @@
 /* Plugin badges, chat decorations and profile-card sections. Colours come from theme tokens. */
+/* The same fixed box as the Mumcord badge next to it (issue #593): it never shrinks when a long
+   name makes the row tight, and an image, icon or emoji inside fills it the same way on every
+   system. */
 .plugin-badge {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  max-width: 24px;
-  max-height: 24px;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
   margin-inline-start: var(--space-1);
   overflow: hidden;
+  font-size: 12px;
+  line-height: 13px;
   vertical-align: middle;
+}
+
+.plugin-badge img,
+.plugin-badge svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
 }
 
 .plugin-decoration {
