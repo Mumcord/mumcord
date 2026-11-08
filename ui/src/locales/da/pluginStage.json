@@ -23,7 +23,7 @@
   "join": "Deltag",
   "joinLabel": "Deltag i {{plugin}}",
   "open": "Åbn",
-  "openLabel": "Åbn: {{plugin}}",
+  "openLabel": "Åbn {{plugin}}",
   "getPlugin": "Hent plugin",
   "getPluginLabel": "Hent {{plugin}}",
   "activityStarted": "{{name}} startede {{plugin}}",
@@ -45,8 +45,8 @@
     "label": "{{plugin}}, plugin-indhold",
     "stopped": "{{plugin}} svarer ikke længere",
     "reload": "Genindlæs",
-    "mute": "Slå lyde fra {{plugin}} fra",
-    "unmute": "Slå lyde fra {{plugin}} til"
+    "mute": "Slå lyden fra for {{plugin}}",
+    "unmute": "Slå lyden til for {{plugin}}"
   },
   "sidePanel": {
     "label": "Sidepanel for {{plugin}}",

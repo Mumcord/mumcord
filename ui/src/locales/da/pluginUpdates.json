@@ -3,7 +3,7 @@
     "legend": "Plugin-opdateringer",
     "info": "Adskilt fra appens opdatering. Mumcord søger efter plugin-opdateringer ved start og derefter hver 6. time.",
     "infoLabel": "Flere oplysninger: plugin-opdateringer",
-    "auto": "Installer automatisk",
+    "auto": "Installér automatisk",
     "notify": "Giv kun besked",
     "off": "Fra"
   },
@@ -11,10 +11,10 @@
   "empty": "Alle plugins er opdaterede.",
   "emptyOff": "Plugin-opdateringer er slået fra. Slå dem til ovenfor for at søge efter opdateringer.",
   "loadFailed": "Opdateringerne kunne ikke indlæses.",
-  "newAuthorKey": "Denne version er signeret af en anden udgiver. Opdater kun, hvis du stoler på den nye udgiver.",
+  "newAuthorKey": "Denne version er signeret af en anden udgiver. Opdatér kun, hvis du stoler på den nye udgiver.",
   "rolledBack": "Version {{version}} kunne ikke starte, så den forrige version blev gendannet. Årsag:",
-  "review": "Gennemgå og opdater",
-  "update": "Opdater",
+  "review": "Gennemgå og opdatér",
+  "update": "Opdatér",
   "installFailed": "{{name}} kunne ikke opdateres. Prøv igen.",
   "pins": "Fastlås version",
   "pinsHint": "Et fastlåst plugin bliver på sin nuværende version og får ikke tilbudt opdateringer.",
@@ -23,8 +23,8 @@
   "versionsTo": "til",
   "pill": {
     "none": "Ingen nye tilladelser",
-    "permission": "Kræver en ny tilladelse",
-    "author": "Ny udvikler",
+    "permission": "Beder om flere tilladelser",
+    "author": "Ny udgiver",
     "websites": "Kontakter nye websteder"
   },
   "newPermissions": "Nye tilladelser",
@@ -35,7 +35,7 @@
     "remove": "Fjern"
   },
   "checkNow": "Tjek nu",
-  "lastChecked": "Sidst tjekket kl. {{time}}",
+  "lastChecked": "Sidst tjekket {{time}}",
   "checkFailed": "Tjekket mislykkedes. Prøv igen.",
   "modeNote": "Plugin-opdateringer: {{mode}}. Du kan ændre det nedenfor.",
   "settings": "Opdateringsindstillinger",
@@ -60,7 +60,7 @@
     "newWebsites_other": "Denne opdatering vil kontakte {{count}} nye websteder. {{name}} bliver på {{version}}, indtil du beslutter dig.",
     "riskUp": "Installeres ikke automatisk: Risikoen steg fra {{from}} til {{to}}. Gennemgå det først.",
     "scoreUp": "Installeres ikke automatisk: Scoren steg fra {{from}} til {{to}}. Gennemgå det først.",
-    "blockedBySafety": "Ikke installeret: Denne version har høj risiko, og “Tillad ikke plugins med høj risiko” er slået til.",
+    "blockedBySafety": "Ikke installeret: Denne version har høj risiko, og »Tillad ikke plugins med høj risiko« er slået til.",
     "scoreUnknown": "Installeres ikke automatisk: Sikkerhedsscoren for denne version kunne ikke beregnes. Gennemgå det først."
   },
   "score": {
@@ -73,8 +73,8 @@
   "dialog": {
     "title": "Opdatér {{name}} til {{version}}?",
     "now": "nu {{version}}",
-    "sameKey": "samme ophavsnøgle",
-    "newKey": "ny ophavsnøgle",
+    "sameKey": "samme udgivernøgle",
+    "newKey": "ny udgivernøgle",
     "newWebsites_one": "Denne opdatering vil kontakte {{count}} nyt websted.",
     "newWebsites_other": "Denne opdatering vil kontakte {{count}} nye websteder.",
     "staysOn": "{{name}} bliver på {{version}}, indtil du beslutter dig.",
@@ -96,8 +96,8 @@
     "permissionsLabel": "Nye tilladelser",
     "recentChange": "Det tæller også som en nylig ændring: Nye tilladelser i de seneste {{versions}} versioner giver yderligere +{{recent}} point. Sammen med de +{{permissions}} ovenfor (× {{multiplier}}) bliver det til +{{total}}.",
     "highTitle": "Denne opdatering ville give pluginet høj risiko",
-    "highText": "Det installeres ikke automatisk. Hvis du bliver på {{version}}, beholder du den nuværende score; du kan fastholde versionen under Installerede.",
-    "highTick": "Jeg forstår, at risikoen er steget, og stoler stadig på ophavsmanden",
+    "highText": "Det installeres ikke automatisk. Hvis du bliver på {{version}}, beholder du den nuværende score; du kan fastlåse versionen under Installerede.",
+    "highTick": "Jeg forstår, at risikoen er steget, og stoler stadig på udgiveren",
     "skipHint": "Hvis du springer over, virker {{version}} stadig.",
     "skip": "Spring denne version over",
     "notNow": "Ikke nu",

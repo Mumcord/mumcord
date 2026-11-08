@@ -12,7 +12,7 @@
   "noCertificate": "Personer uden certifikat kan ikke være venner, fordi Mumcord ikke kan genkende dem igen.",
   "add": "Tilføj ven",
   "remove": "Fjern ven",
-  "failed": "Det lykkedes ikke at ændre vennen. Prøv igen.",
+  "failed": "Vennelisten kunne ikke ændres. Prøv igen.",
   "join": "Deltag",
-  "joinFriend": "Gå til {{name}}s kanal"
+  "joinFriend": "Gå ind i samme kanal som {{name}}"
 }

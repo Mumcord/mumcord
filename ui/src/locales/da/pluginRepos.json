@@ -39,7 +39,7 @@
   },
   "keyChange": {
     "title": "{{name}} har skiftet nøgle",
-    "message": "Dette arkiv signerer nu sin plugin-liste med en anden nøgle. Det forbliver sat på pause, indtil du beslutter dig. Stol kun på den nye nøgle, hvis ejeren har meldt ændringen.",
+    "message": "Dette arkiv signerer nu sin plugin-liste med en anden nøgle. Det forbliver sat på pause, indtil du beslutter dig. Stol kun på den nye nøgle, hvis ejeren har fortalt dig om ændringen.",
     "oldKey": "Nøgle, du hidtil har stolet på",
     "newKey": "Ny nøgle",
     "keepPaused": "Behold på pause",

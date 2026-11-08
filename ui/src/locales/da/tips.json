@@ -19,7 +19,7 @@
     },
     "channels": {
       "title": "Kanaler",
-      "body": "Dobbeltklik på en kanal for at deltage og tale. Et enkelt klik viser kanalens chat uden at deltage, og Følg holder dig opdateret."
+      "body": "Dobbeltklik på en kanal for at gå ind i den og tale. Et enkelt klik viser kanalens chat uden at gå ind, og Følg holder dig opdateret."
     },
     "talk": {
       "title": "Sådan taler du",
@@ -39,11 +39,11 @@
     },
     "apps": {
       "title": "Apps",
-      "body": "Knappen Apps i beskedfeltet starter skærmdeling, en watch party eller dit kamera. Plugins tilføjer flere."
+      "body": "Knappen Apps i beskedfeltet starter skærmdeling, en fællesvisning eller dit kamera. Plugins tilføjer flere."
     },
     "themes": {
-      "title": "Dit look",
-      "body": "Tandhjulet nederst til venstre skifter mellem mørk og lys. Under Indstillinger → Udseende finder du flere temaer, og en server kan få sit eget: højreklik på den, og vælg Tema."
+      "title": "Dit udseende",
+      "body": "Tandhjulet nederst til venstre skifter mellem mørkt og lyst tema. Under Indstillinger → Udseende finder du flere temaer, og en server kan få sit eget: højreklik på den, og vælg Tema."
     },
     "end": {
       "title": "Det var det!",
