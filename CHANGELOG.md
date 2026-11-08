@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Homebrew (issue #662): `brew install --cask mumcord/tap/mumcord` on macOS and `brew install mumcord/tap/mumcord` on Linux, from the new tap `Mumcord/homebrew-tap`, which follows new releases by itself
+
 ### Fixed
 
 - Screen readers no longer get a broken list announcement while the @mention or /command suggestions are open in the message box; they hear how many suggestions there are
