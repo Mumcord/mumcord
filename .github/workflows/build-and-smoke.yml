@@ -354,12 +354,12 @@ jobs:
             || { echo "::error::'$VERSION' is not a release candidate version like 1.2.3-rc.1"; exit 1; }
           base=${BASH_REMATCH[1]}
           rc=${BASH_REMATCH[2]}
-          npm run tauri build -- --bundles appimage,deb --config src-tauri/tauri.onnxruntime.linux.json -- --locked
+          npm run tauri build -- --bundles appimage,deb --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json -- --locked
           for deb in target/release/bundle/deb/*.deb; do
             scripts/deb-set-version.sh "$deb" "$base~rc.$rc"
           done
           rpm=$(jq -nc --arg v "$base" --arg r "0.rc.$rc" '{version: $v, bundle: {linux: {rpm: {release: $r}}}}')
-          npm run tauri bundle -- --bundles rpm --config src-tauri/tauri.onnxruntime.linux.json --config "$rpm"
+          npm run tauri bundle -- --bundles rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json --config "$rpm"
           ls -l target/release/bundle/rpm/*.rpm
 
       # Signed Windows release: Tauri signs the app exe, the uninstaller and the installer through
