@@ -1,7 +1,7 @@
 /**
  * Autocomplete list above the message input for `@` mentions (FR-1.51): `@channel` and `@all`
  * (issue #70) above the people. The input keeps the focus; the list is a listbox the input
- * points at with `aria-activedescendant` (WAI-ARIA combobox pattern). It floats over the chat,
+ * points at with `aria-controls` and `aria-activedescendant`. It floats over the chat,
  * so opening it never shifts the layout.
  */
 import { useEffect, useRef, type ReactNode } from "react";
@@ -113,7 +113,7 @@ export function MentionPicker({
           people.map(row)
         )}
       </div>
-      {/* Screen readers already know how to use a combobox; this is for the eyes. */}
+      {/* The status line tells screen readers how to use the list; this is for the eyes. */}
       <p className="mention-picker__keys" aria-hidden="true">
         {t("mention.keys")}
       </p>

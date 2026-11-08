@@ -1,4 +1,12 @@
-import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatMessage, InstalledPlugin, PluginCommand, PluginUi } from "../../../api";
 import type { MockApi } from "../../../api/mock";
@@ -209,7 +217,12 @@ describe("plugin chat UI", () => {
     const list = await screen.findByRole("listbox", { name: "Plugin commands" });
     expect(list.textContent).toContain("/roll");
     expect(list.textContent).toContain("Dice roller");
-    expect(input.getAttribute("aria-expanded")).toBe("true");
+    expect(input.getAttribute("aria-controls")).toBe(list.id);
+    expect(input.getAttribute("aria-activedescendant")).toBe(
+      within(list).getAllByRole("option")[0]?.id,
+    );
+    // Checked while the list is open (issue #627).
+    expect(await axeViolations(document.body)).toEqual([]);
     fireEvent.keyDown(input, { key: "Tab" });
     expect(input.value).toBe("/roll ");
     expect(await axeViolations(document.body)).toEqual([]);

@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Screen readers no longer get a broken list announcement while the @mention or /command suggestions are open in the message box; they hear how many suggestions there are
 - Windows: virtual cameras that only DirectShow knows, such as the OBS Virtual Camera, now show in the camera list next to real cameras and work like them, background effects included. OBS is asked for 720p, so a 1080p output does not arrive at half size. A virtual camera that has nothing to show or never starts stops with "The camera couldn't be started" instead of hanging (#631)
 - The icons in a plugin's permission list are drawn icons now instead of text characters, so they look the same on Windows, macOS and Linux
 - macOS: plugin content in a dialog or panel sits exactly in its frame again instead of being shifted up by about the title bar's height
