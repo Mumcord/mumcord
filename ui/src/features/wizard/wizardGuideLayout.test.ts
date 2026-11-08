@@ -7,7 +7,7 @@ import {
   guideSpot,
   poseFor,
   type Box,
-} from "./wizardGuide";
+} from "./wizardGuideLayout";
 
 const AARON: Box = { left: 800, top: 200, right: 960, bottom: 360 };
 

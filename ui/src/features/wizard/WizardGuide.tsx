@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "re
 import { useTranslation } from "react-i18next";
 import { Aaron, type AaronPose } from "../tips/Aaron";
 import type { WizardStepId } from "./wizardFlow";
-import { GUIDE_TARGETS, guideSpot, poseFor, type Box } from "./wizardGuide";
+import { GUIDE_TARGETS, guideSpot, poseFor, type Box } from "./wizardGuideLayout";
 
 /** Aaron's rendered size; keep in sync with `.wizard-guide__aaron` in wizard.css. */
 const AARON_SIZE = 160;
