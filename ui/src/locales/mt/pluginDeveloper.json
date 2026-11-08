@@ -1,21 +1,21 @@
 {
-  "hint": "Tella' folder ta' plugin mhux ippakkjat biex tittestjah. Il-plugins tal-iżviluppatur mhumiex iffirmati, qatt mhuma uffiċjali u ma jistgħux jirċievu net.http, secrets jew ui.webview. Jitneħħew meta l-modalità tal-iżviluppatur titwaqqaf.",
-  "load": "Tella' folder tal-plugin…",
+  "hint": "Għabbi folder ta' plugin mhux ippakkjat biex tittestjah. Il-plugins tal-iżviluppatur mhumiex iffirmati, qatt mhuma uffiċjali u ma jistgħux jirċievu net.http, secrets jew ui.webview. Jitneħħew meta l-modalità tal-iżviluppatur tintefa.",
+  "load": "Għabbi folder tal-plugin…",
   "pickFolder": "Agħżel il-folder tal-plugin",
-  "empty": "Ebda plugin tal-iżviluppatur mhu mtella'.",
+  "empty": "Ebda plugin tal-iżviluppatur mhu mgħobbi.",
   "listLabel": "Plugins tal-iżviluppatur",
   "label": "Plugin tal-iżviluppatur",
   "status": {
     "running": "Qed jaħdem",
     "off": "Mitfi",
     "backingOff": "Qed jerġa' jibda wara kraxx",
-    "autoOff": "Mitfi wara krazzjiet ripetuti",
+    "autoOff": "Mitfi wara kraxxijiet ripetuti",
     "allOff": "Il-plugins kollha huma mitfija",
     "noPlugins": "Il-plugins huma mitfija għal din is-sessjoni",
-    "notLoaded": "Ma setax jitella'"
+    "notLoaded": "Ma setax jitgħabba"
   },
   "showLog": "Uri r-reġistru ta' {{name}}",
-  "reload": "Erġa' tella' {{name}}",
+  "reload": "Erġa' għabbi {{name}}",
   "unload": "Neħħi {{name}}",
   "logLabel": "Reġistru ta' {{name}}",
   "logTitle": "Reġistru ta' {{name}}",
@@ -27,8 +27,8 @@
     "error": "Żball"
   },
   "errors": {
-    "load": "Il-folder tal-plugin ma setax jitella'.",
-    "reload": "Il-plugin ma setax jerġa' jitella'.",
+    "load": "Il-folder tal-plugin ma setax jitgħabba.",
+    "reload": "Il-plugin ma setax jerġa' jitgħabba.",
     "unload": "Il-plugin ma setax jitneħħa.",
     "log": "Ir-reġistru ma setax jinqara."
   }

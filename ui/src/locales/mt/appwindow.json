@@ -1,42 +1,42 @@
 {
   "close": {
-    "title": "Timminimizza fit-tray jew toħroġ?",
-    "description": "Għadek konness. Jekk timminimizzah, Mumcord iżommok fil-vuċi u jibqa' fis-system tray.",
+    "title": "Timminimizza fiż-żona tan-notifiki jew toħroġ?",
+    "description": "Għadek konness. Jekk timminimizzah, Mumcord iżommok fil-vuċi u jibqa' fiż-żona tan-notifiki.",
     "remember": "Ftakar l-għażla tiegħi",
-    "minimize": "Minimizza fit-tray",
+    "minimize": "Minimizza fiż-żona tan-notifiki",
     "quit": "Oħroġ",
     "failed": "Dan ma ħadimx. Erġa' pprova.",
-    "descriptionServers": "Għadek konness ma' {{count}} servers. Meta jkun minimizzat, Mumcord iżommok fil-vuċi u jibqa' fit-tray tas-sistema."
+    "descriptionServers": "Għadek konness ma' {{count}} servers. Jekk timminimizzah, Mumcord iżommok fil-vuċi u jibqa' fiż-żona tan-notifiki."
   },
   "windowOverlay": {
     "title": "L-overlay fit-tieqa tneħħa",
-    "description": "It-tieqa tal-overlay li żżomm fuq kollox m'għadhiex. Minflokha, l-overlay fil-logħba juri min qed jitkellem fil-logħob tiegħek. Tista' tixgħelu fis-settings tal-overlay.",
+    "description": "It-tieqa tal-overlay li tibqa' fuq kollox m'għadhiex hawn. Minflokha, l-overlay fil-logħba juri min qed jitkellem fil-logħob tiegħek. Tista' tixgħelu fl-issettjar tal-overlay.",
     "dismiss": "Fhimt",
-    "openSettings": "Iftaħ is-settings tal-overlay"
+    "openSettings": "Iftaħ l-issettjar tal-overlay"
   },
   "audioDevice": {
     "title": "Erġa' agħżel it-tagħmir tal-awdjo tiegħek",
-    "description": "Mumcord issa juri kull input u output tat-tagħmir tal-awdjo tiegħek separatament. It-tagħmir issejvjat ma setax jitqabbel ma' l-ebda wieħed minnhom, għalhekk għalissa qed jintuża d-default tas-sistema. Tista' tagħżel tagħmir fis-settings tal-awdjo.",
+    "description": "Mumcord issa juri kull input u output tat-tagħmir tal-awdjo tiegħek separatament. It-tagħmir issejvjat ma setax jitqabbel ma' ebda wieħed minnhom, għalhekk għalissa qed jintuża d-default tas-sistema. Tista' tagħżel tagħmir fl-issettjar tal-awdjo.",
     "dismiss": "Fhimt",
-    "openSettings": "Iftaħ is-settings tal-awdjo"
+    "openSettings": "Iftaħ l-issettjar tal-awdjo"
   },
   "appImageMenu": {
     "title": "Iżżid lil Mumcord mal-menu tal-apps?",
-    "description": "B'hekk Mumcord jidher fil-menu tal-apps tiegħek. L-ikona u push-to-talk jaħdmu sew fuq Wayland, u l-links mumble:// jiftħu Mumcord. Tista' tibdel dan aktar tard fis-Settings.",
+    "description": "B'hekk Mumcord jidher fil-menu tal-apps tiegħek. L-ikona u l-Push-to-talk jaħdmu sew fuq Wayland, u l-links mumble:// jiftħu Mumcord. Tista' tibdel dan aktar tard fl-Issettjar.",
     "no": "Le",
     "yes": "Iva",
     "failed": "Ma ħadimx. Erġa' pprova."
   },
   "updateCheck": {
     "title": "Tfittex verżjonijiet ġodda?",
-    "description": "Mumcord jista' jistaqsi lil GitHub regolarment jekk hemmx verżjoni aktar ġdida u jgħarrfek biha. Xejn ma jitniżżel jew jiġi installat mingħajr il-permess tiegħek, u xejn ma jintbagħat ħlief it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings.",
+    "description": "Mumcord jista' jistaqsi lil GitHub regolarment jekk hemmx verżjoni aktar ġdida u jgħarrfek biha. Xejn ma jitniżżel jew jiġi installat mingħajr il-permess tiegħek, u xejn ma jintbagħat ħlief it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fl-Issettjar.",
     "no": "Le",
     "yes": "Iva",
     "failed": "Ma ħadimx. Erġa' pprova."
   },
   "directConsent": {
     "title": "Tippermetti konnessjonijiet diretti?",
-    "description": "Il-konnessjonijiet diretti huma aktar mgħaġġla, iżda l-persuna l-oħra tista’ tara l-indirizz IP tiegħek. Mumcord jużahom għal stampi f’daqs sħiħ u għall-qsim tal-iskrin ma’ utenti oħra ta’ Mumcord u jista’ jiftaħ port fuq ir-router tiegħek għalihom. Jekk tgħid le, l-istampi xorta jaslu permezz tas-server u l-qsim tal-iskrin ma jkunx disponibbli. Tista’ tibdel dan aktar tard f’Settings → Privatezza. Jekk dan is-server joffri relay, Mumcord jista' jużah minflok; allura l-persuna l-oħra ma tarax l-indirizz IP tiegħek.",
+    "description": "Il-konnessjonijiet diretti huma aktar mgħaġġla, iżda l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Mumcord jużahom għal stampi f'daqs sħiħ u għall-qsim tal-iskrin ma' utenti oħra ta' Mumcord u jista' jiftaħ port fuq ir-router tiegħek għalihom. Jekk tgħid le, l-istampi xorta jaslu permezz tas-server u l-qsim tal-iskrin ma jkunx disponibbli. Tista' tibdel dan aktar tard fl-Issettjar → Privatezza. Jekk dan is-server joffri relay, Mumcord jista' jużah minflok; b'hekk il-persuna l-oħra ma tarax l-indirizz IP tiegħek.",
     "no": "Le",
     "yes": "Iva",
     "failed": "Ma ħadimx. Erġa' pprova."
@@ -55,12 +55,12 @@
       "openReleasePage": "Iftaħ il-paġna tal-ħruġ",
       "manual": "Niżżel il-verżjoni l-ġdida mill-paġna tal-ħruġ.",
       "manualPackage": "Niżżel il-pakkett mill-paġna tal-ħruġ, imbagħad installah b'dan:",
-      "manualAur": "Aġġornah bl-għajnuna tal-AUR tiegħek:"
+      "manualAur": "Aġġornah bl-AUR helper tiegħek:"
     },
     "tags": {
       "added": "Miżjud",
       "changed": "Mibdul",
-      "fixed": "Iffissat",
+      "fixed": "Imsewwi",
       "removed": "Imneħħi"
     },
     "noNotes": "M'hemm l-ebda noti għal din il-verżjoni.",
@@ -75,7 +75,7 @@
     "progress": {
       "title": "Qed jitniżżel Mumcord {{version}}",
       "subtitle": "Tista' tkompli tuża Mumcord waqt li dan jaħdem.",
-      "label": "Progress tal-aġġornament",
+      "label": "Avvanz tal-aġġornament",
       "unknown": "Id-daqs għadu mhux magħruf",
       "size": "{{received}} minn {{total}} MB",
       "received": "{{received}} MB",
@@ -99,11 +99,11 @@
       "checked": "Firma u somma ta' kontroll ivverifikati",
       "installed": "Installat",
       "installsOnRestart": "Jiġi installat meta Mumcord jerġa' jibda",
-      "connected_one": "Inti konness ma' {{count}} server. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
-      "connected_two": "Inti konness ma' {{count}} servers. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
-      "connected_few": "Inti konness ma' {{count}} servers. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
-      "connected_many": "Inti konness ma' {{count}} server. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
-      "connected_other": "Inti konness ma' {{count}} server. Wara r-restart, Mumcord se jerġa' jkun konness u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_one": "Inti konness ma' {{count}} server. Wara li jerġa' jibda, Mumcord jikkonnettja mill-ġdid u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_two": "Inti konness ma' {{count}} servers. Wara li jerġa' jibda, Mumcord jikkonnettja mill-ġdid u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_few": "Inti konness ma' {{count}} servers. Wara li jerġa' jibda, Mumcord jikkonnettja mill-ġdid u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_many": "Inti konness ma' {{count}} server. Wara li jerġa' jibda, Mumcord jikkonnettja mill-ġdid u jerġa' jidħol fil-kanali tiegħek.",
+      "connected_other": "Inti konness ma' {{count}} server. Wara li jerġa' jibda, Mumcord jikkonnettja mill-ġdid u jerġa' jidħol fil-kanali tiegħek.",
       "later": "Aktar tard",
       "restart": "Erġa' ibda biex taġġorna",
       "announce": "Mumcord {{version}} huwa lest. Erġa' ibda biex taġġorna."
@@ -112,7 +112,7 @@
       "title": "L-aġġornament ma ħadimx",
       "subtitle": "Mumcord {{version}} ma ġiex installat. Il-verżjoni attwali tiegħek tkompli taħdem.",
       "network": "Mumcord ma setax jaċċessa lil GitHub. Iċċekkja l-konnessjoni tal-internet tiegħek u erġa' pprova.",
-      "manifest": "L-informazzjoni dwar l-aġġornament fuq GitHub hija mhux kompluta jew mikissra, għalhekk ma ġie installat xejn.",
+      "manifest": "L-informazzjoni dwar l-aġġornament fuq GitHub mhijiex kompluta jew hija mikissra, għalhekk ma ġie installat xejn.",
       "signature": "Il-firma tat-tniżżil ma qablitx, għalhekk it-tniżżil ġie skartat.",
       "checksum": "It-tniżżil ma qabilx mas-somma ta' kontroll tiegħu, għalhekk ġie skartat.",
       "install": "L-installazzjoni tal-aġġornament falliet. Il-verżjoni installata tiegħek ma nbidlitx.",

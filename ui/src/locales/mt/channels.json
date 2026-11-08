@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanali",
-    "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa · Buttuna tal-menu: għażliet tal-kanal · Ctrl+klikk jew Ctrl+ispazju: agħżel nies",
+    "hint": "Enter: uri ċ-chat · Shift+Enter jew ikklikkja darbtejn: ingħaqad · Vleġeġ: mexxi, wessa', ikkollassa · Buttuna tal-menu: għażliet tal-kanal · Ctrl+klikk jew Ctrl+Spazju: agħżel nies",
     "join": "Ingħaqad",
     "you": "(int)",
     "youAreHere": "int hawn",
@@ -11,7 +11,7 @@
     "people_many": "{{count}} persuna",
     "people_other": "{{count}} persuna",
     "stack": {
-      "some": "{{shown}} minn {{total}} persuni: {{names}} u {{rest}} oħra",
+      "some": "{{shown}} minn {{total}}: {{names}} u {{rest}} oħra",
       "all_one": "{{count}} persuna: {{names}}",
       "all_two": "{{count}} persuni: {{names}}",
       "all_few": "{{count}} persuni: {{names}}",
@@ -30,26 +30,26 @@
     "places_one": "{{taken}} minn {{count}} post meħud",
     "places_two": "{{taken}} minn {{count}} postijiet meħuda",
     "places_few": "{{taken}} minn {{count}} postijiet meħuda",
-    "places_many": "{{taken}} minn {{count}} post meħuda",
-    "places_other": "{{taken}} minn {{count}} post meħuda"
+    "places_many": "{{taken}} minn {{count}} post meħud",
+    "places_other": "{{taken}} minn {{count}} post meħud"
   },
   "status": {
     "listening": "qed jisma' biss",
     "talking": "qed jitkellem",
-    "muted": "mutat",
+    "muted": "imsikket",
     "deafened": "bla smigħ",
-    "serverMuted": "mutat mis-server",
+    "serverMuted": "imsikket mis-server",
     "serverDeafened": "bla smigħ mis-server",
     "suppressed": "soppress (ma jistax jitkellem hawn)",
-    "localMuted": "mutat għalik",
-    "unregistered": "mhux irreġistrat",
+    "localMuted": "imsikket għalik",
+    "unregistered": "mhux reġistrat",
     "prioritySpeaker": "kelliem prijoritarju"
   },
   "mumcordBadge": "Juża Mumcord",
   "botBadge": "Bot",
   "bots": {
     "title": "Bots fuq dan is-server ({{total}})",
-    "inChannel": "f’{{channel}}",
+    "inChannel": "f'{{channel}}",
     "modules": {
       "peer": "Relay",
       "music": "Idoqq il-mużika",
@@ -58,24 +58,24 @@
     }
   },
   "statusTip": {
-    "registered": "Irreġistrat fuq dan is-server",
+    "registered": "Reġistrat fuq dan is-server",
     "listening": "Qed jisma' biss",
-    "muted": "Mutat",
+    "muted": "Imsikket",
     "deafened": "Bla smigħ",
-    "serverMuted": "Mutat mis-server",
+    "serverMuted": "Imsikket mis-server",
     "serverDeafened": "Bla smigħ mis-server",
     "suppressed": "Soppress – ma jistax jitkellem f'dan il-kanal",
-    "localMuted": "Mutat għalik",
-    "unregistered": "Mhux irreġistrat fuq dan is-server (mistieden)",
+    "localMuted": "Imsikket għalik",
+    "unregistered": "Mhux reġistrat fuq dan is-server (mistieden)",
     "nowPlaying": "Qed jisma' {{track}}",
     "nowGaming": "Qed jilgħab {{game}}",
     "weakConnection": "Konnessjoni dgħajfa – ping għoli jew telf ta' pakketti",
-    "positional": "L-awdjo posizzjonali huwa attiv",
+    "positional": "L-awdjo pożizzjonali huwa attiv",
     "prioritySpeaker": "Kelliem prijoritarju – jinstema' fuq kulħadd"
   },
   "announce": {
     "joined": "{{name}} ingħaqad mal-kanal tiegħek",
-    "left": "{{name}} ħareġ mill-kanal tiegħek",
+    "left": "{{name}} telaq mill-kanal tiegħek",
     "talking": "{{name}} qed jitkellem"
   },
   "errors": {
@@ -91,7 +91,7 @@
   },
   "search": {
     "label": "Fittex kanali u persuni",
-    "clear": "Ħassar it-tiftix",
+    "clear": "Neħħi t-tfittxija",
     "empty": "L-ebda kanal jew persuna ma jaqblu ma' “{{query}}”.",
     "count": "{{channels}}, {{people}}",
     "channels_one": "{{count}} kanal",
@@ -127,10 +127,10 @@
     "questionNoSource": "Tmexxi {{people}} għal {{to}}?",
     "confirm": "Mexxi",
     "failed": "Xi nies ma setgħux jitmexxew.",
-    "resultTitle": "Qed jiġu mċaqilqa nies",
-    "resultAll": "Inġiebu {{people}} għal {{channel}}.",
-    "resultSome": "Inġiebu {{moved}} minn {{people}} għal {{channel}}. Il-bqija ġew miċħuda.",
-    "busy": "Diġà qed jiġu mċaqilqa nies…"
+    "resultTitle": "Qed jitmexxew in-nies",
+    "resultAll": "Tmexxew {{people}} għal {{channel}}.",
+    "resultSome": "Tmexxew {{moved}} minn {{people}} għal {{channel}}. Il-bqija ġew irrifjutati.",
+    "busy": "Diġà qed jitmexxew in-nies…"
   },
   "drag": {
     "into": "Mexxi ġo {{channel}}",
@@ -139,18 +139,18 @@
     "self": "Ma jistax imur ġo fih innifsu",
     "subChannel": "Ma jistax imur ġo sottokanal tiegħu",
     "confirmTitle": "Tmexxi “{{channel}}”?",
-    "alongAll": "Flimkien ma’ {{channel}} jitmexxew: {{subChannels}} u {{people}}.",
-    "alongSubChannels": "Flimkien ma’ {{channel}} jitmexxew: {{subChannels}}.",
-    "alongPeople": "Flimkien ma’ {{channel}} jitmexxew: {{people}}.",
+    "alongAll": "Flimkien ma' {{channel}} jitmexxew: {{subChannels}} u {{people}}.",
+    "alongSubChannels": "Flimkien ma' {{channel}} jitmexxew: {{subChannels}}.",
+    "alongPeople": "Flimkien ma' {{channel}} jitmexxew: {{people}}.",
     "alongNone": "Jitmexxa biss {{channel}}; huwa vojt.",
     "subChannels_one": "{{count}} sottokanal",
     "subChannels_two": "{{count}} sottokanali",
     "subChannels_few": "{{count}} sottokanali",
-    "subChannels_many": "{{count}} sottokanali",
-    "subChannels_other": "{{count}} sottokanali",
+    "subChannels_many": "{{count}} sottokanal",
+    "subChannels_other": "{{count}} sottokanal",
     "pathTo": "għal",
     "confirm": "Mexxi",
     "failedTitle": "Ma setax jitmexxa {{channel}}",
-    "refusedParent": "M’għandekx id-dritt tmexxi kanali ġo {{channel}}."
+    "refusedParent": "M'għandekx il-permess li tmexxi kanali ġo {{channel}}."
   }
 }

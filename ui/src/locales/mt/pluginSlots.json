@@ -24,8 +24,8 @@
     "none": "L-ebda fajl magħżul"
   },
   "list": {
-    "handle": "Ċaqlaq ir-ringiela {{position}} minn {{total}} (vleġġa 'l fuq jew 'l isfel)",
-    "moved": "Ir-ringiela {{from}} ġiet imċaqalqa għall-pożizzjoni {{to}} minn {{total}}"
+    "handle": "Mexxi r-ringiela {{position}} minn {{total}} (vleġġa 'l fuq jew 'l isfel)",
+    "moved": "Ir-ringiela {{from}} tmexxiet għall-pożizzjoni {{to}} minn {{total}}"
   },
   "copyButton": {
     "copied": "Ikkopjat",
