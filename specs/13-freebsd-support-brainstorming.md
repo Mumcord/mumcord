@@ -411,3 +411,24 @@ Free text here is welcome — this is the last round before the specification is
 ## Closing
 
 2026-11-08: All rounds answered. The specification has been created: `specs/13-freebsd-support-specification.md`.
+
+## Round 6 – Addendum: graphics driver and rendering
+
+Found while testing on the physical machine (`192.0.2.10`, Intel Comet Lake UHD, FreeBSD 15.1): the first Mumcord start froze the entire desktop, not just the app.
+
+**Cause:** `drm-612-kmod` — the module the `drm-kmod` metaport installs by default — hangs these GPUs (`GPU HANG: ecode 9:1:85…`, `Resetting rcs0 for preemption time out`) as soon as a hardware OpenGL context is created. It is a known upstream report: freebsd/drm-kmod issue #509 ("drm-612-kmod - Comet Lake iGPU, sporadic rcs0 preemption-timeout hangs", open), with the same device family and error code.
+
+**Measured on the machine:**
+- with `drm-612-kmod`: GPU hang, X server wedged, reboot required
+- with `drm-66-kmod`: `glxinfo -B` → `Mesa Intel(R) UHD Graphics (CML GT2)`, OpenGL 4.6, accelerated; KWin on OpenGL; Mumcord with hardware GL; **zero hangs**, desktop responsive
+
+#### Q6.1 What should Mumcord do about it? `◉`
+Answered in chat on 2026-11-08.
+
+- [x] ⭐ **Use the driver the system has loaded (hardware GL), and state the requirement where users see it: the package's install message and the release notes.** Best performance on working setups; a user with the default 6.12 driver reads the note and switches to `drm-66-kmod`. `LIBGL_ALWAYS_SOFTWARE=1` stays the documented escape hatch.
+- [ ] Force software rendering on FreeBSD (safe, but slower and hides the real fix).
+- [ ] Detect the installed module version and decide per machine.
+
+✍️ Note: Chosen because the bug is in the driver and is tracked upstream; punishing every FreeBSD user with software rendering would be the wrong default.
+
+---
