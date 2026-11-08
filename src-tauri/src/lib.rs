@@ -14,7 +14,7 @@ mod fullscreen;
 #[cfg(target_os = "linux")]
 mod glib_log;
 #[cfg(target_os = "linux")]
-mod gst_fallback;
+mod gst_plugins;
 mod hotkeys;
 mod ingame_overlay;
 mod kde;
@@ -562,7 +562,7 @@ pub fn run() {
     #[cfg(target_os = "linux")]
     {
         // Before WebKit starts its web process, which inherits the GStreamer environment.
-        gst_fallback::prepare(&context.config().identifier);
+        gst_plugins::prepare(&context.config().identifier);
         // WebKit reads this when its web process starts (flicker workaround).
         webkit_compositing::prepare();
         // The Wayland app ID comes from the program name; it must match the desktop entry
@@ -762,7 +762,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         "Mumcord starting"
     );
     #[cfg(target_os = "linux")]
-    gst_fallback::log_h264_status(&app.config().identifier);
+    gst_plugins::log_h264_status(&app.config().identifier);
     set_crash_context(app);
     mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
 

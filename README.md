@@ -119,13 +119,12 @@ To remove Mumcord, add `-s -- --uninstall` after `sh`.
 
 - **macOS Local Network:** macOS 15 and later ask whether Mumcord may find devices on your local network. Allow it, or servers in your home network fail with "No route to host" (change it later in System Settings → Privacy & Security → Local Network).
 - **macOS plugins:** Mumcord 0.6.0 on macOS closes as soon as a plugin starts. Update to 0.6.1 or newer.
-- **Linux installer:** the one-liner shows numbered steps and offers to install gst-libav (H.264) when it is missing.
-- **Linux H.264 for watch parties:** the AppImage plays YouTube via VP9 but does not bundle H.264 (gst-libav). Install gst-libav if a video does not play; the player shows a hint when a codec is missing.
+- **Linux H.264 for watch parties:** the AppImage, `.deb` and `.rpm` bring their own H.264 and AAC decoders (an LGPL build of FFmpeg with gst-libav), so Twitch and `.mp4` videos play without extra packages.
 
 <details>
 <summary><b>Linux: GStreamer plugins for watch parties</b></summary>
 
-The `.deb`, `.rpm` and AUR packages install the GStreamer plugins WebKitGTK needs to play YouTube. The AppImage bundles its own plugins (without H.264) and also loads the ones installed on the system. On other distributions, or for H.264 with the AppImage:
+The `.deb`, `.rpm` and AUR packages install the GStreamer plugins WebKitGTK needs to play YouTube; the AppImage bundles its own. Every Linux package also carries its own H.264 and AAC decoders, so gst-libav is not needed. When building Mumcord from source, install the plugins yourself:
 
 - Debian, Ubuntu: `sudo apt install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav`
 - Fedora: `sudo dnf install gstreamer1-plugins-good gstreamer1-plugins-bad-free gstreamer1-libav` (`gstreamer1-libav` may need [RPM Fusion](https://rpmfusion.org/))
