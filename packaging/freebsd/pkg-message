@@ -1,0 +1,18 @@
+Mumcord on FreeBSD uses the graphics driver that is loaded.
+
+Intel graphics (Comet Lake, and other Gen9/Gen12 chips) need drm-66-kmod:
+
+    pkg delete drm-612-kmod drm-kmod
+    pkg install drm-66-kmod
+    reboot
+
+With drm-612-kmod (the default the drm-kmod metaport selects) these GPUs hang
+with "rcs0 preemption time out" and take the whole desktop down with them, not
+just Mumcord (freebsd/drm-kmod issue #509).
+
+To check which renderer Mumcord got:
+
+    LIBGL_ALWAYS_SOFTWARE=0 glxinfo -B        # "Mesa Intel(R) ..." = hardware
+
+Running Mumcord with LIBGL_ALWAYS_SOFTWARE=1 forces software rendering
+(llvmpipe) if the driver turns out to be unusable.

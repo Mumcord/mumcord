@@ -15,6 +15,9 @@
 #   /usr/local/share/icons/hicolor/<size>/apps/app.mumcord.client.png
 #   /usr/local/share/doc/mumcord/{LICENSE,THIRD_PARTY_NOTICES}
 #
+# The package also carries a +DISPLAY message (packaging/freebsd/pkg-message) that pkg shows after
+# the install: the Intel graphics driver requirement.
+#
 # The runtime dependencies are read from the linked libraries with pkg(8), so the manifest lists
 # what this build actually needs instead of a hand-kept list. `pkg repo <output-dir>` turns the
 # result into a repository afterwards; signing is left to the caller (see RELEASING.md).
@@ -131,6 +134,11 @@ case "$arch" in
   *) pkg_arch="freebsd:15:$arch" ;;
 esac
 
+# Shown by pkg after the install: the graphics driver requirement. Newer pkg keeps install
+# messages in the manifest (a legacy +DISPLAY file is ignored).
+message=$(sed -e 's|\\|\\\\|g' -e 's|"|\\"|g' "$root_dir/packaging/freebsd/pkg-message" \
+  | awk '{printf "%s\\n", $0}')
+
 cat > "$stage/+MANIFEST" <<EOF
 name: mumcord
 version: "$version"
@@ -156,6 +164,7 @@ EOD
 deps: {$dep_lines
 }
 shlibs_required: [$shlibs]
+messages: [{ message: "$message", type: "install" }]
 scripts: {
   post-install: "if [ -x /usr/local/bin/update-desktop-database ]; then /usr/local/bin/update-desktop-database -q /usr/local/share/applications; fi",
   post-deinstall: "if [ -x /usr/local/bin/update-desktop-database ]; then /usr/local/bin/update-desktop-database -q /usr/local/share/applications; fi"
