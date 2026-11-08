@@ -30,6 +30,7 @@ use crate::api::storage::{Storage, StorageApi};
 use crate::api::theme::Theme;
 use crate::api::timers::{TimerSet, Timers};
 use crate::api::v1_1::{self, Down};
+use crate::api::v1_2;
 use crate::cache;
 use crate::chat::ChatRef;
 use crate::diag::Diagnostics;
@@ -170,6 +171,7 @@ pub struct Runtime {
     /// wasmtime would otherwise satisfy a `1.0.0` import with a `1.1.0` definition.
     linker_1_0: Linker<PluginState>,
     linker_1_1: Linker<PluginState>,
+    linker_1_2: Linker<PluginState>,
     app_version: Version,
     cache_dir: Option<PathBuf>,
     ticker: Option<JoinHandle<()>>,
@@ -217,12 +219,14 @@ pub struct Compiled {
 enum Pre {
     V1_0(bindings::PluginPre<PluginState>),
     V1_1(v1_1::bindings::PluginPre<PluginState>),
+    V1_2(v1_2::bindings::PluginPre<PluginState>),
 }
 
 /// The exports of a running plugin.
 enum Bound {
     V1_0(bindings::Plugin),
     V1_1(v1_1::bindings::Plugin),
+    V1_2(v1_2::bindings::Plugin),
 }
 
 /// Everything a plugin's store is built from.
@@ -345,6 +349,8 @@ impl Runtime {
         }
         let mut linker_1_1 = Linker::new(&engine);
         v1_1::add_to_linker(&mut linker_1_1).map_err(|e| CompileError::Invalid(e.to_string()))?;
+        let mut linker_1_2 = Linker::new(&engine);
+        v1_2::add_to_linker(&mut linker_1_2).map_err(|e| CompileError::Invalid(e.to_string()))?;
 
         let stop_ticker = Arc::new(AtomicBool::new(false));
         let ticker = {
@@ -364,6 +370,7 @@ impl Runtime {
             engine,
             linker_1_0,
             linker_1_1,
+            linker_1_2,
             app_version,
             cache_dir,
             ticker: Some(ticker),
@@ -421,6 +428,14 @@ impl Runtime {
             ApiMinor::V1_1 => Pre::V1_1(
                 v1_1::bindings::PluginPre::new(
                     self.linker_1_1
+                        .instantiate_pre(&component)
+                        .map_err(mismatch)?,
+                )
+                .map_err(mismatch)?,
+            ),
+            ApiMinor::V1_2 => Pre::V1_2(
+                v1_2::bindings::PluginPre::new(
+                    self.linker_1_2
                         .instantiate_pre(&component)
                         .map_err(mismatch)?,
                 )
@@ -529,6 +544,15 @@ impl Compiled {
                     .call_start(&mut store, &info)
                     .map(|outcome| (Bound::V1_1(plugin), outcome))
             }),
+            Pre::V1_2(pre) => pre.instantiate(&mut store).and_then(|plugin| {
+                let info = v1_2::wit::types::StartInfo {
+                    api_version: ApiMinor::V1_2.wit_version().to_string(),
+                    previous_version,
+                };
+                plugin
+                    .call_start(&mut store, &info)
+                    .map(|outcome| (Bound::V1_2(plugin), outcome))
+            }),
         };
         params.diag.add_cpu(started.elapsed());
         let (plugin, outcome) = result.map_err(classify)?;
@@ -549,6 +573,10 @@ impl Instance {
                 None => Ok(()),
             },
             Bound::V1_1(plugin) => call(store, chat, |store| plugin.call_on_event(store, &event)),
+            Bound::V1_2(plugin) => {
+                let event = v1_2::wit::events::Event::from(event);
+                call(store, chat, |store| plugin.call_on_event(store, &event))
+            }
         }
     }
 
@@ -558,6 +586,7 @@ impl Instance {
         match plugin {
             Bound::V1_0(plugin) => call(store, ChatRef::default(), |store| plugin.call_stop(store)),
             Bound::V1_1(plugin) => call(store, ChatRef::default(), |store| plugin.call_stop(store)),
+            Bound::V1_2(plugin) => call(store, ChatRef::default(), |store| plugin.call_stop(store)),
         }
     }
 }

@@ -23,6 +23,7 @@ pub struct ApiMinor {
 impl ApiMinor {
     pub const V1_0: Self = Self { major: 1, minor: 0 };
     pub const V1_1: Self = Self { major: 1, minor: 1 };
+    pub const V1_2: Self = Self { major: 1, minor: 2 };
 
     /// The WIT package version, e.g. `1.1.0`; plugins see it as `start-info.api-version`.
     pub fn wit_version(self) -> Version {
@@ -50,13 +51,13 @@ impl fmt::Display for ApiMinor {
 }
 
 /// Every API minor this build links, oldest first (FR-9.5). Later 1.x builds keep all of them.
-pub const SUPPORTED: &[ApiMinor] = &[ApiMinor::V1_0, ApiMinor::V1_1];
+pub const SUPPORTED: &[ApiMinor] = &[ApiMinor::V1_0, ApiMinor::V1_1, ApiMinor::V1_2];
 
 /// API minors that still work but will go away with the next major (FR-9.11). None yet.
 const DEPRECATED: &[ApiMinor] = &[];
 
 /// The newest host API this build implements.
-pub const API_VERSION: Version = Version::new(1, 1, 0);
+pub const API_VERSION: Version = Version::new(1, 2, 0);
 
 /// Whether plugins built for `api` should be warned about in Developer mode (FR-9.11).
 pub fn deprecated(api: ApiMinor) -> bool {
@@ -131,12 +132,13 @@ fn number(text: &str) -> Option<u64> {
     text.parse().ok()
 }
 
-/// The first Mumcord release that links an API minor (FR-9.15): 1.0 → 0.6, 1.1 → 0.7.
+/// The first Mumcord release that links an API minor (FR-9.15): 1.0 → 0.6, 1.1 → 0.7, 1.2 → 0.8.
 /// `None` for an API this build does not know.
 pub fn first_release(api: ApiMinor) -> Option<Release> {
     match api {
         ApiMinor::V1_0 => Some(Release { major: 0, minor: 6 }),
         ApiMinor::V1_1 => Some(Release { major: 0, minor: 7 }),
+        ApiMinor::V1_2 => Some(Release { major: 0, minor: 8 }),
         _ => None,
     }
 }
@@ -279,8 +281,9 @@ mod tests {
     fn links_every_supported_minor_and_refuses_others() {
         assert_eq!(check_api(ApiMinor::V1_0), Ok(()));
         assert_eq!(check_api(ApiMinor::V1_1), Ok(()));
+        assert_eq!(check_api(ApiMinor::V1_2), Ok(()));
         assert_eq!(
-            check_api(api(1, 2)),
+            check_api(api(1, 3)),
             Err(Incompatibility::NeedsNewerMumcord)
         );
         assert_eq!(
@@ -296,6 +299,7 @@ mod tests {
         let worlds = [
             include_str!("../wit/1.0.0/world.wit"),
             include_str!("../wit/1.1.0/world.wit"),
+            include_str!("../wit/1.2.0/world.wit"),
         ];
         for (api, world) in SUPPORTED.iter().zip(worlds) {
             assert!(world.contains(&format!("package mumcord:plugin@{};", api.wit_version())));
@@ -322,7 +326,7 @@ mod tests {
             Some("Needs Mumcord 0.8.0 or newer")
         );
         assert_eq!(
-            refusal(&manifest_with("^1.2", None), &app).as_deref(),
+            refusal(&manifest_with("^1.3", None), &app).as_deref(),
             Some("Needs a newer Mumcord")
         );
     }
@@ -361,6 +365,7 @@ mod tests {
             "Needs Mumcord 0.7.0 or newer"
         );
         assert_eq!(first_release(ApiMinor::V1_1), r(0, 7));
+        assert_eq!(first_release(ApiMinor::V1_2), r(0, 8));
         assert_eq!(first_release(api(2, 0)), None);
     }
 

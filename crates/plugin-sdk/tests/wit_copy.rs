@@ -25,7 +25,7 @@ fn wit_files(dir: &Path) -> BTreeMap<String, String> {
 }
 
 /// Every published API minor; the SDK copies each one.
-const VERSIONS: [&str; 2] = ["1.0.0", "1.1.0"];
+const VERSIONS: [&str; 3] = ["1.0.0", "1.1.0", "1.2.0"];
 
 #[test]
 fn sdk_wit_matches_the_canonical_wit() {

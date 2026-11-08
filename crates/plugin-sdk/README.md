@@ -39,6 +39,14 @@ mumcord_plugin_sdk::export!(Hello);
 
 Plugins are built for `wasm32-unknown-unknown`; `mumcord-plugin build` turns the module into a component and packs it into a `.mcplugin` package. A complete example is `examples/hello.rs`.
 
+## API 1.2
+
+Enable the feature `1.2` to bind `mumcord:plugin@1.2.0`. It has everything of `1.1` (the feature includes it) under a new package version; the manifest must declare `"api": "^1.2"` (`mumcord-plugin build` writes it from the imports). Needs Mumcord 0.8 or newer. `mumcord-plugin new` creates 1.2 plugins by default.
+
+```toml
+mumcord-plugin-sdk = { version = "...", features = ["1.2"] }
+```
+
 ## API 1.1
 
 Plugins are written against API 1.0 by default. Enable the feature to use the 1.1 world:

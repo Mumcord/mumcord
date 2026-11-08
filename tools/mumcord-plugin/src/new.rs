@@ -306,12 +306,12 @@ Add a `LICENSE` file with an OSI-approved licence before publishing.
 /// Which project `new` creates.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, clap::ValueEnum)]
 pub enum Template {
-    /// A panel with a wave button (API 1.0).
+    /// A panel with a wave button (API 1.2).
     #[default]
     Hello,
-    /// A stage activity drawn from building blocks (API 1.1).
+    /// A stage activity drawn from building blocks (API 1.2).
     StageTree,
-    /// A stage activity that shows a web page (API 1.1).
+    /// A stage activity that shows a web page (API 1.2).
     StageWeb,
 }
 
@@ -364,13 +364,12 @@ fn files(
         ),
         None => format!("\"{SDK_VERSION}\""),
     };
-    let sdk = if template == Template::Hello {
-        sdk
-    } else if sdk.starts_with('{') {
-        // `{ path = "…" }` → `{ path = "…", features = ["1.1"] }`
-        format!("{}, features = [\"1.1\"] }}", sdk.trim_end_matches(" }"))
+    // New plugins target the newest API (FR-13.3).
+    let sdk = if sdk.starts_with('{') {
+        // `{ path = "…" }` → `{ path = "…", features = ["1.2"] }`
+        format!("{}, features = [\"1.2\"] }}", sdk.trim_end_matches(" }"))
     } else {
-        format!("{{ version = {sdk}, features = [\"1.1\"] }}")
+        format!("{{ version = {sdk}, features = [\"1.2\"] }}")
     };
     let cargo = format!(
         "[package]
@@ -403,7 +402,7 @@ codegen-units = 1
                 "name": name,
                 "description": "Wave at the channel.",
                 "version": "0.1.0",
-                "api": "^1.0",
+                "api": "^1.2",
                 "authors": ["Your name"],
                 "license": "Apache-2.0",
                 "categories": ["fun"],
@@ -428,7 +427,7 @@ codegen-units = 1
                 "name": name,
                 "description": "A click counter in the media area.",
                 "version": "0.1.0",
-                "api": "^1.1",
+                "api": "^1.2",
                 "authors": ["Your name"],
                 "license": "Apache-2.0",
                 "categories": ["fun"],
@@ -563,7 +562,7 @@ mod tests {
             manifest
                 .validate(Source::Repo { repository_id: 0 })
                 .expect("valid for third-party repos");
-            assert_eq!(manifest.api_minor(), (1, 1));
+            assert_eq!(manifest.api_minor(), (1, 2));
             assert!(manifest.stage.is_some());
             assert_eq!(manifest.app_menu.len(), 1);
             assert_eq!(manifest.webview.is_some(), web);
@@ -573,7 +572,7 @@ mod tests {
                 .parse()
                 .expect("valid Cargo.toml");
             let sdk = &cargo["dependencies"]["mumcord-plugin-sdk"];
-            assert_eq!(sdk["features"][0].as_str(), Some("1.1"));
+            assert_eq!(sdk["features"][0].as_str(), Some("1.2"));
         }
     }
 
@@ -584,7 +583,7 @@ mod tests {
         let cargo: toml::Table = files[0].1.parse().expect("valid Cargo.toml");
         let sdk = &cargo["dependencies"]["mumcord-plugin-sdk"];
         assert_eq!(sdk["path"].as_str(), Some("/tmp/my sdk"));
-        assert_eq!(sdk["features"][0].as_str(), Some("1.1"));
+        assert_eq!(sdk["features"][0].as_str(), Some("1.2"));
     }
 
     #[test]
@@ -596,10 +595,9 @@ mod tests {
             env!("CARGO_PKG_VERSION_MAJOR"),
             env!("CARGO_PKG_VERSION_MINOR")
         );
-        assert_eq!(
-            cargo["dependencies"]["mumcord-plugin-sdk"].as_str(),
-            Some(wanted.as_str())
-        );
+        let sdk = &cargo["dependencies"]["mumcord-plugin-sdk"];
+        assert_eq!(sdk["version"].as_str(), Some(wanted.as_str()));
+        assert_eq!(sdk["features"][0].as_str(), Some("1.2"));
     }
 
     #[test]
@@ -609,7 +607,7 @@ mod tests {
         assert!(
             files[0]
                 .1
-                .contains("mumcord-plugin-sdk = { path = \"/tmp/my sdk\" }")
+                .contains("mumcord-plugin-sdk = { path = \"/tmp/my sdk\", features = [\"1.2\"] }")
         );
     }
 }
