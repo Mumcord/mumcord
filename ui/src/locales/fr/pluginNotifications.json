@@ -6,8 +6,8 @@
     "open": "Afficher dans Plugins"
   },
   "pictureRefused": {
-    "title": "{{name}} n'a pas pu utiliser l'image",
-    "body": "Cette image ne peut pas être utilisée. Utilisez un fichier PNG, JPEG ou WebP de 10 Mo maximum."
+    "title": "{{name}} n’a pas pu utiliser l’image",
+    "body": "Cette image ne peut pas être utilisée. Utilise un fichier PNG, JPEG ou WebP de 10 Mo maximum."
   },
   "update": {
     "title": "Mise à jour de {{name}}",
@@ -28,7 +28,7 @@
     "recommended": "Recommandé",
     "official": "Officiel",
     "unofficial": "Non officiel · {{host}}",
-    "footer": "Les suggestions n'installent jamais rien d'elles-mêmes. Le serveur ne sait pas ce que vous installez."
+    "footer": "Les suggestions n’installent jamais rien d’elles-mêmes. Le serveur ne sait pas ce que tu installes."
   },
-  "failed": "Ça n’a pas fonctionné. Veuillez réessayer."
+  "failed": "Ça n’a pas fonctionné. Réessaie."
 }

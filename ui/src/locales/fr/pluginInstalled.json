@@ -1,6 +1,6 @@
 {
   "listLabel": "Plugins installés",
-  "empty": "Aucun plugin pour l'instant.",
+  "empty": "Aucun plugin pour l’instant.",
   "browse": "Parcourir les plugins",
   "enable": "{{name}} activé",
   "labels": {
@@ -9,17 +9,17 @@
     "unofficialUnknown": "Non officiel",
     "developer": "Plugin de développeur",
     "autoOff": "Désactivé après des plantages répétés",
-    "backingOff": "Redémarre après un plantage",
+    "backingOff": "Redémarrage après un plantage",
     "notLoaded": "Impossible à charger",
-    "revoked": "Désactivé par Mumcord : {{reason}}",
-    "revocationWarning": "Avertissement de Mumcord : {{reason}}",
+    "revoked": "Désactivé par Mumcord : {{reason}}",
+    "revocationWarning": "Avertissement de Mumcord : {{reason}}",
     "tampered": "Les fichiers de ce plugin ont été modifiés",
-    "permission": "Désactivé car une autorisation requise est désactivée"
+    "permission": "Désactivé car une permission requise est désactivée"
   },
   "details": {
     "open": "Détails de {{name}}",
-    "permissions": "Autorisations",
-    "visibility": "Qui peut voir l'activité de ce plugin",
+    "permissions": "Permissions",
+    "visibility": "Qui peut voir l’activité de ce plugin",
     "visibilityOptions": {
       "everyone": "Tout le monde",
       "friends": "Amis uniquement",
@@ -32,7 +32,7 @@
     "export": "Exporter les données",
     "reset": "Réinitialiser les données",
     "remove": "Supprimer",
-    "commandTaken": "/{{command}}: Commande déjà prise par {{plugin}}"
+    "commandTaken": "/{{command}} : commande déjà prise par {{plugin}}"
   },
   "badge": {
     "label": "Badge affiché à côté des noms",
@@ -56,11 +56,11 @@
     "incomingRateDropped": "Messages entrants abandonnés par la limite de débit",
     "incomingInvalid": "Messages entrants invalides",
     "uiFreezes": "Nombre de blocages de Mumcord pendant que son contenu web était ouvert",
-    "refusedAppMenuLabel": "Ce plugin a été refusé : un libellé du menu Applis est identique à un libellé de Mumcord ou commence par « Mumcord ».",
-    "fieldWithoutPermission": "Ce plugin a été refusé : il utilise « {{field}} » sans l’autorisation « {{permission}} ».",
-    "webDisabled": "Son contenu web est désactivé, car Mumcord a cessé de répondre pendant qu'il était ouvert.",
+    "refusedAppMenuLabel": "Ce plugin a été refusé : un libellé du menu Applis est identique à un libellé de Mumcord ou commence par « Mumcord ».",
+    "fieldWithoutPermission": "Ce plugin a été refusé : il utilise « {{field}} » sans la permission « {{permission}} ».",
+    "webDisabled": "Son contenu web est désactivé, car Mumcord a cessé de répondre pendant qu’il était ouvert.",
     "reenableWeb": "Activer le contenu web",
-    "reenableFailed": "Impossible d'activer le contenu web.",
+    "reenableFailed": "Impossible d’activer le contenu web.",
     "log": "Journal",
     "logEmpty": "Le journal est vide.",
     "level": {
@@ -76,36 +76,36 @@
     "done": "Données exportées."
   },
   "reset": {
-    "title": "Réinitialiser les données de {{name}} ?",
+    "title": "Réinitialiser les données de {{name}} ?",
     "message": "Tout ce que ce plugin a enregistré est supprimé. Cette action est irréversible.",
     "confirm": "Réinitialiser les données",
     "done": "Données réinitialisées."
   },
   "remove": {
-    "title": "Supprimer {{name}} ?",
+    "title": "Supprimer {{name}} ?",
     "deleteData": "Supprimer aussi ses données",
-    "hint": "Les données conservées sont supprimées au bout de 30 jours. Réinstallez le plugin avant pour les récupérer.",
+    "hint": "Les données conservées sont supprimées au bout de 30 jours. Réinstalle le plugin avant pour les récupérer.",
     "confirm": "Supprimer"
   },
   "errors": {
-    "enable": "Impossible de basculer le plugin.",
-    "permissions": "Impossible de modifier l'autorisation.",
+    "enable": "Impossible d’activer ou de désactiver le plugin.",
+    "permissions": "Impossible de modifier la permission.",
     "visibility": "Impossible de modifier la visibilité.",
     "notifications": "Impossible de modifier les notifications.",
-    "pin": "Impossible d'épingler la version.",
-    "export": "Impossible d'exporter les données.",
+    "pin": "Impossible d’épingler la version.",
+    "export": "Impossible d’exporter les données.",
     "reset": "Impossible de réinitialiser les données.",
     "remove": "Impossible de supprimer le plugin.",
     "badge": "Impossible de modifier le badge.",
-    "update": "Le plugin n'a pas pu être mis à jour."
+    "update": "Le plugin n’a pas pu être mis à jour."
   },
   "update": {
     "hint": "Mise à jour {{version}}",
     "button": "Mettre à jour"
   },
-  "visibilityChip": "Échange avec d'autres utilisateurs de Mumcord · {{visibility}}",
+  "visibilityChip": "Échange avec d’autres utilisateurs de Mumcord · {{visibility}}",
   "chips": {
-    "label": "Autorisations utilisées",
+    "label": "Permissions utilisées",
     "uiPanel": "Panneau",
     "uiMemberBadge": "Badge de membre",
     "uiProfileCard": "Carte de profil",
@@ -113,7 +113,7 @@
     "uiUserMenu": "Menu utilisateur",
     "uiDialog": "Fenêtre propre",
     "uiWebview": "Contenu web",
-    "eventsSelf": "Votre statut",
+    "eventsSelf": "Ton statut",
     "eventsVoice": "Activité vocale",
     "eventsPresence": "Arrivées et départs",
     "eventsChatActivity": "Activité du chat",
@@ -121,15 +121,15 @@
     "randomBytes": "Nombres aléatoires",
     "commands": "Commandes",
     "chatSend": "Écrit dans le chat",
-    "chatSupersedes": "Remplace sa ligne de texte",
+    "chatSupersedes": "Remplace son texte",
     "chatTriggers": "Mots déclencheurs",
     "chatPatterns": "Motifs de chat",
-    "netHttp": "Accès à internet",
+    "netHttp": "Accès à Internet",
     "secrets": "Trousseau"
   },
-  "offerBadge": "Nouvelles autorisations",
+  "offerBadge": "Nouvelles permissions",
   "refused": {
-    "title": "Modules refusés",
+    "title": "Plugins refusés",
     "when": "Refusé le {{time}}"
   }
 }

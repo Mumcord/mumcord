@@ -2,16 +2,16 @@
   "copied": "Lien copié",
   "copyFailed": "Impossible de copier le lien",
   "menu": {
-    "label": "Options du canal {{channel}}",
-    "join": "Rejoindre le canal",
-    "follow": "Suivre le canal",
-    "unfollow": "Ne plus suivre le canal",
+    "label": "Options du salon {{channel}}",
+    "join": "Rejoindre le salon",
+    "follow": "Suivre le salon",
+    "unfollow": "Ne plus suivre le salon",
     "following": "Suivi",
-    "copyLink": "Copier le lien du canal",
-    "password": "Mot de passe du canal",
-    "info": "Infos du canal",
-    "clear": "Effacer l'historique du chat",
-    "audio": "Audio de ce canal",
+    "copyLink": "Copier le lien du salon",
+    "password": "Mot de passe du salon",
+    "info": "Infos du salon",
+    "clear": "Effacer l’historique du chat",
+    "audio": "Audio de ce salon",
     "audioHint": {
       "music": "♪ Musique",
       "jam": "⚡ Jam"
@@ -19,8 +19,8 @@
     "move": "Déplacer des utilisateurs ici"
   },
   "info": {
-    "title": "Infos du canal : {{channel}}",
-    "noDescription": "Ce canal n'a pas de description.",
+    "title": "Infos du salon : {{channel}}",
+    "noDescription": "Ce salon n’a pas de description.",
     "descriptionLoading": "Chargement de la description…",
     "users": "Utilisateurs",
     "usersCount_one": "{{count}} personne",
@@ -36,20 +36,20 @@
     "accessOpen": "Ouvert",
     "accessRestricted": "Restreint (mot de passe ou groupe)",
     "accessSaved": "Protégé, un mot de passe enregistré le déverrouille",
-    "links": "Canaux liés",
+    "links": "Salons liés",
     "none": "Aucun",
     "permissions": "Mes permissions",
-    "denied": "pas de {{permission}}",
+    "denied": "{{permission}} : non",
     "permission": {
       "enter": "Entrer",
       "speak": "Parler",
       "textMessage": "Texte",
       "whisper": "Chuchoter",
       "listen": "Écouter",
-      "write": "Écrire l'ACL"
+      "write": "Modifier les ACL"
     },
     "quality": "Limite de qualité",
-    "qualityLimit": "Opus, jusqu'à {{kbps}} kbit/s",
+    "qualityLimit": "Opus, jusqu’à {{kbps}} kbit/s",
     "following": "Suivi",
     "yes": "Oui",
     "no": "Non",
@@ -63,7 +63,7 @@
     },
     "audioEdit": "Modifier…",
     "audioSet": "Configurer…",
-    "cleared": "Dernier effacement de l'historique",
+    "cleared": "Dernier effacement de l’historique",
     "never": "Jamais",
     "copyLink": "Copier le lien",
     "copied": "Copié",
@@ -74,7 +74,7 @@
     "jam": "Profil Jam"
   },
   "audio": {
-    "title": "Audio de ce canal",
+    "title": "Audio de ce salon",
     "presets": "Préréglages",
     "preset": {
       "voice": "Voix",
@@ -84,8 +84,8 @@
       "jam": "Jam",
       "jamHint": "Faible latence"
     },
-    "musicQuality": "Qualité musique",
-    "musicQualityHint": "Encodeur optimisé pour la musique ; suppression du bruit désactivée.",
+    "musicQuality": "Qualité musicale",
+    "musicQualityHint": "Encodeur optimisé pour la musique ; suppression du bruit désactivée.",
     "musicIncluded": "Inclus tant que le mode faible latence est activé.",
     "lowLatency": "Mode faible latence",
     "lowLatencyHint": "Paquets les plus petits. Plus de bande passante, moins robuste.",
@@ -93,15 +93,15 @@
     "on": "activé",
     "off": "désactivé",
     "followsDefault": "Par défaut ({{value}})",
-    "useDefault": "utiliser le défaut",
+    "useDefault": "utiliser la valeur par défaut",
     "bitrate": "Débit",
     "bitrateValue": "{{kbps}} kbit/s",
     "bitrateMax": "Max",
     "bitrateDefault": "Par défaut, {{value}}",
-    "serverLimit": "Limite du serveur : {{kbps}} kbit/s",
+    "serverLimit": "Limite du serveur : {{kbps}} kbit/s",
     "noServerLimit": "Aucune limite du serveur",
-    "note": "S'applique quand vous rejoignez ce canal, uniquement sur cet appareil. Les autres ne sont pas affectés. Les infos de connexion marquent ces valeurs avec « (profil du canal) ».",
-    "saveFailed": "Impossible d'enregistrer le profil audio.",
+    "note": "S’applique quand tu rejoins ce salon, uniquement sur cet appareil. Les autres personnes ne sont pas concernées. Les infos de connexion signalent ces valeurs par « (profil du salon) ».",
+    "saveFailed": "Impossible d’enregistrer le profil audio.",
     "remove": "Supprimer le profil",
     "cancel": "Annuler",
     "save": "Enregistrer"
@@ -109,8 +109,8 @@
   "moveDialog": {
     "title": "Déplacer des personnes vers {{channel}}",
     "legend": "Personnes à déplacer",
-    "empty": "Personne dans les autres canaux ne peut être déplacé par vous.",
-    "failed": "Certaines personnes n'ont pas pu être déplacées.",
+    "empty": "Tu ne peux déplacer personne depuis un autre salon.",
+    "failed": "Certaines personnes n’ont pas pu être déplacées.",
     "cancel": "Annuler",
     "submit": "Déplacer"
   }

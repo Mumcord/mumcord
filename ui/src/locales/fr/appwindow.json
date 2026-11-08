@@ -1,61 +1,61 @@
 {
   "close": {
-    "title": "Réduire dans la zone de notification ou quitter ?",
-    "description": "Vous êtes toujours connecté. Une fois réduit, Mumcord vous garde en vocal et reste dans la zone de notification.",
+    "title": "Réduire dans la zone de notification ou quitter ?",
+    "description": "Tu es toujours connecté. Une fois réduit, Mumcord te garde en vocal et reste dans la zone de notification.",
     "remember": "Se souvenir de mon choix",
     "minimize": "Réduire dans la zone de notification",
     "quit": "Quitter",
-    "failed": "Cela n’a pas fonctionné. Veuillez réessayer.",
-    "descriptionServers": "Vous êtes encore connecté à {{count}} serveurs. Réduit, Mumcord vous garde en vocal et reste dans la zone de notification."
+    "failed": "Cela n’a pas fonctionné. Réessaie.",
+    "descriptionServers": "Tu es encore connecté à {{count}} serveurs. Une fois réduit, Mumcord te garde en vocal et reste dans la zone de notification."
   },
   "windowOverlay": {
     "title": "L’overlay en fenêtre a été supprimé",
-    "description": "La fenêtre d’overlay flottante n’existe plus. L’overlay en jeu affiche désormais qui parle dans vos jeux. Vous pouvez l’activer dans les paramètres de l’overlay.",
+    "description": "La fenêtre d’overlay flottante n’existe plus. L’overlay en jeu affiche désormais qui parle dans tes jeux. Tu peux l’activer dans les paramètres de l’overlay.",
     "dismiss": "Compris",
     "openSettings": "Ouvrir les paramètres de l’overlay"
   },
   "audioDevice": {
-    "title": "Choisissez à nouveau vos appareils audio",
-    "description": "Mumcord affiche désormais séparément chaque entrée et sortie de vos appareils audio. Votre appareil enregistré n'a pu être associé à aucune d'elles ; l'appareil par défaut du système est donc utilisé pour l'instant. Vous pouvez choisir un appareil dans les paramètres audio.",
+    "title": "Choisis à nouveau tes appareils audio",
+    "description": "Mumcord affiche désormais séparément chaque entrée et sortie de tes appareils audio. Ton appareil enregistré n’a pu être associé à aucune d’elles ; l’appareil par défaut du système est donc utilisé pour l’instant. Tu peux choisir un appareil dans les paramètres audio.",
     "dismiss": "Compris",
     "openSettings": "Ouvrir les paramètres audio"
   },
   "appImageMenu": {
-    "title": "Ajouter Mumcord au menu des applications ?",
-    "description": "Mumcord apparaîtra dans votre menu des applications. L’icône et le push-to-talk fonctionneront correctement sous Wayland, et les liens mumble:// ouvriront Mumcord. Vous pourrez modifier ce choix plus tard dans les paramètres.",
+    "title": "Ajouter Mumcord au menu des applications ?",
+    "description": "Mumcord apparaîtra dans ton menu des applications. L’icône et le Push-to-talk fonctionneront correctement sous Wayland, et les liens mumble:// ouvriront Mumcord. Tu pourras modifier ce choix plus tard dans les paramètres.",
     "no": "Non",
     "yes": "Oui",
-    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+    "failed": "Cela n’a pas fonctionné. Réessaie."
   },
   "updateCheck": {
-    "title": "Rechercher les nouvelles versions ?",
-    "description": "Mumcord peut demander régulièrement à GitHub s'il existe une version plus récente et vous en informer. Rien n'est téléchargé ni installé sans votre accord, et rien n'est envoyé hormis la requête elle-même, le nom de l'application et sa version. Vous pouvez modifier cela plus tard dans les Paramètres.",
+    "title": "Rechercher les nouvelles versions ?",
+    "description": "Mumcord peut demander régulièrement à GitHub s’il existe une version plus récente et t’en informer. Rien n’est téléchargé ni installé sans ton accord, et rien n’est envoyé hormis la requête elle-même, le nom de l’application et sa version. Tu pourras modifier ce choix plus tard dans les paramètres.",
     "no": "Non",
     "yes": "Oui",
-    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+    "failed": "Cela n’a pas fonctionné. Réessaie."
   },
   "directConsent": {
-    "title": "Autoriser les connexions directes ?",
-    "description": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Mumcord les utilise pour les images en taille réelle et le partage d’écran avec d’autres utilisateurs de Mumcord, et peut ouvrir un port sur votre routeur pour elles. Si vous refusez, les images arrivent toujours via le serveur et le partage d’écran n’est pas disponible. Vous pourrez modifier ce choix plus tard dans Paramètres → Confidentialité. Si ce serveur propose un relais, Mumcord peut l’utiliser à la place ; l’autre personne ne voit alors pas votre adresse IP.",
+    "title": "Autoriser les connexions directes ?",
+    "description": "Les connexions directes sont plus rapides, mais l’autre personne peut voir ton adresse IP. Mumcord les utilise pour les images en taille réelle et le partage d’écran avec d’autres utilisateurs de Mumcord, et peut ouvrir un port sur ton routeur pour elles. Si tu refuses, les images arrivent toujours via le serveur et le partage d’écran n’est pas disponible. Tu pourras modifier ce choix plus tard dans Paramètres → Confidentialité. Si ce serveur propose un relais, Mumcord peut l’utiliser à la place ; l’autre personne ne voit alors pas ton adresse IP.",
     "no": "Non",
     "yes": "Oui",
-    "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
+    "failed": "Cela n’a pas fonctionné. Réessaie."
   },
   "updater": {
     "stable": "Stable",
     "available": {
       "title": "Mise à jour disponible",
-      "subtitle": "Mumcord {{version}} est prêt à être téléchargé. Vous avez la {{current}}.",
-      "subtitleManual": "Mumcord {{version}} est sorti. Vous avez la {{current}}.",
+      "subtitle": "Mumcord {{version}} est prêt à être téléchargé. Tu as la {{current}}.",
+      "subtitleManual": "Mumcord {{version}} est sorti. Tu as la {{current}}.",
       "whatsNew": "Nouveautés depuis la {{current}}",
-      "trust": "Téléchargée uniquement depuis github.com via HTTPS, puis vérifiée par sa signature et sa somme de contrôle avant d'être installée.",
+      "trust": "Téléchargée uniquement depuis github.com via HTTPS, puis vérifiée par sa signature et sa somme de contrôle avant d’être installée.",
       "skip": "Ignorer cette version",
       "later": "Me le rappeler plus tard",
       "download": "Télécharger et installer",
       "openReleasePage": "Ouvrir la page de la version",
-      "manual": "Téléchargez la nouvelle version depuis la page de la version.",
-      "manualPackage": "Téléchargez le paquet depuis la page de la version, puis installez-le avec :",
-      "manualAur": "Mettez-le à jour avec votre assistant AUR :"
+      "manual": "Télécharge la nouvelle version depuis la page de la version.",
+      "manualPackage": "Télécharge le paquet depuis la page de la version, puis installe-le avec :",
+      "manualAur": "Mets-le à jour avec ton assistant AUR :"
     },
     "tags": {
       "added": "Ajouté",
@@ -74,7 +74,7 @@
     },
     "progress": {
       "title": "Téléchargement de Mumcord {{version}}",
-      "subtitle": "Vous pouvez continuer à utiliser Mumcord pendant ce temps.",
+      "subtitle": "Tu peux continuer à utiliser Mumcord pendant ce temps.",
       "label": "Progression de la mise à jour",
       "unknown": "Taille pas encore connue",
       "size": "{{received}} sur {{total}} Mo",
@@ -89,34 +89,34 @@
     },
     "ready": {
       "title": "Mumcord {{version}} est prêt",
-      "subtitle": "Redémarrez pour terminer la mise à jour.",
+      "subtitle": "Redémarre pour terminer la mise à jour.",
       "verified": "Vérifiée",
       "downloaded": "Téléchargée",
       "checked": "Signature et somme de contrôle vérifiées",
       "installed": "Installée",
-      "installsOnRestart": "S'installe au redémarrage de Mumcord",
-      "connected_one": "Vous êtes connecté à {{count}} serveur. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau vos canaux.",
-      "connected_many": "Vous êtes connecté à {{count}} de serveurs. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau vos canaux.",
-      "connected_other": "Vous êtes connecté à {{count}} serveurs. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau vos canaux.",
+      "installsOnRestart": "S’installe au redémarrage de Mumcord",
+      "connected_one": "Tu es connecté à {{count}} serveur. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau tes salons.",
+      "connected_many": "Tu es connecté à {{count}} de serveurs. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau tes salons.",
+      "connected_other": "Tu es connecté à {{count}} serveurs. Après le redémarrage, Mumcord se reconnectera et rejoindra de nouveau tes salons.",
       "later": "Plus tard",
       "restart": "Redémarrer pour mettre à jour",
-      "announce": "Mumcord {{version}} est prêt. Redémarrez pour mettre à jour."
+      "announce": "Mumcord {{version}} est prêt. Redémarre pour mettre à jour."
     },
     "failed": {
       "title": "La mise à jour a échoué",
-      "subtitle": "Mumcord {{version}} n'a pas été installé. Votre version actuelle continue de fonctionner.",
-      "network": "Mumcord n'a pas pu joindre GitHub. Vérifiez votre connexion internet et réessayez.",
-      "manifest": "Les informations de mise à jour sur GitHub sont incomplètes ou corrompues, donc rien n'a été installé.",
+      "subtitle": "Mumcord {{version}} n’a pas été installé. Ta version actuelle continue de fonctionner.",
+      "network": "Mumcord n’a pas pu joindre GitHub. Vérifie ta connexion Internet et réessaie.",
+      "manifest": "Les informations de mise à jour sur GitHub sont incomplètes ou corrompues, donc rien n’a été installé.",
       "signature": "La signature du téléchargement ne correspondait pas, il a donc été supprimé.",
       "checksum": "Le téléchargement ne correspondait pas à sa somme de contrôle, il a donc été supprimé.",
-      "install": "L'installation de la mise à jour a échoué. Votre version installée est inchangée.",
+      "install": "L’installation de la mise à jour a échoué. Ta version installée est inchangée.",
       "retry": "Réessayer",
       "close": "Fermer"
     },
-    "actionFailed": "Cela n'a pas fonctionné. Veuillez réessayer.",
+    "actionFailed": "Cela n’a pas fonctionné. Réessaie.",
     "toast": {
       "title": "Mumcord {{version}} est prêt",
-      "body": "Redémarrez pour mettre à jour.",
+      "body": "Redémarre pour mettre à jour.",
       "restart": "Redémarrer",
       "later": "Plus tard"
     }

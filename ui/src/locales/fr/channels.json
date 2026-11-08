@@ -1,28 +1,28 @@
 {
   "tree": {
-    "label": "Canaux",
-    "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire · Touche Menu : options du canal · Ctrl+clic ou Ctrl+Espace : choisir des personnes",
+    "label": "Salons",
+    "hint": "Entrée : afficher le chat · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire · Touche Menu : options du salon · Ctrl+clic ou Ctrl+Espace : choisir des personnes",
     "join": "Rejoindre",
-    "you": "(vous)",
-    "youAreHere": "vous êtes ici",
+    "you": "(toi)",
+    "youAreHere": "tu es ici",
     "people_one": "{{count}} personne",
     "people_many": "{{count}} personnes",
     "people_other": "{{count}} personnes",
     "stack": {
-      "some": "{{shown}} sur {{total}} personnes : {{names}} et {{rest}} de plus",
-      "all_one": "{{count}} personne : {{names}}",
-      "all_many": "{{count}} personnes : {{names}}",
-      "all_other": "{{count}} personnes : {{names}}",
+      "some": "{{shown}} sur {{total}} personnes : {{names}} et {{rest}} de plus",
+      "all_one": "{{count}} personne : {{names}}",
+      "all_many": "{{count}} personnes : {{names}}",
+      "all_other": "{{count}} personnes : {{names}}",
       "person": "{{name}} ({{status}})"
     },
     "showAll": "Tout afficher ({{total}})",
     "showFewer": "Afficher moins",
-    "jump": "Aller à mon canal",
+    "jump": "Aller à mon salon",
     "locked": "verrouillé",
     "temporary": "temporaire",
     "linked": "lié",
-    "full": "Canal plein",
-    "fullPlaces": "Canal plein, {{places}}",
+    "full": "Salon plein",
+    "fullPlaces": "Salon plein, {{places}}",
     "places_one": "{{taken}} place occupée sur {{count}}",
     "places_many": "{{taken}} places occupées sur {{count}}",
     "places_other": "{{taken}} places occupées sur {{count}}"
@@ -35,7 +35,7 @@
     "serverMuted": "micro coupé par le serveur",
     "serverDeafened": "son coupé par le serveur",
     "suppressed": "réduit au silence (ne peut pas parler ici)",
-    "localMuted": "en sourdine pour vous",
+    "localMuted": "en sourdine pour toi",
     "unregistered": "non enregistré",
     "prioritySpeaker": "orateur prioritaire"
   },
@@ -58,8 +58,8 @@
     "deafened": "Son coupé",
     "serverMuted": "Micro coupé par le serveur",
     "serverDeafened": "Son coupé par le serveur",
-    "suppressed": "Réduit au silence – ne peut pas parler dans ce canal",
-    "localMuted": "En sourdine pour vous",
+    "suppressed": "Réduit au silence – ne peut pas parler dans ce salon",
+    "localMuted": "En sourdine pour toi",
     "unregistered": "Non enregistré sur ce serveur (invité)",
     "nowPlaying": "Écoute {{track}}",
     "nowGaming": "Joue à {{game}}",
@@ -68,29 +68,29 @@
     "prioritySpeaker": "Orateur prioritaire – entendu par-dessus les autres"
   },
   "announce": {
-    "joined": "{{name}} a rejoint votre canal",
-    "left": "{{name}} a quitté votre canal",
+    "joined": "{{name}} a rejoint ton salon",
+    "left": "{{name}} a quitté ton salon",
     "talking": "{{name}} parle"
   },
   "errors": {
-    "joinDenied": "Vous n’avez pas le droit d’entrer dans ce canal.",
-    "joinFailed": "Impossible de rejoindre le canal. Veuillez réessayer.",
+    "joinDenied": "Tu n’as pas la permission d’entrer dans ce salon.",
+    "joinFailed": "Impossible de rejoindre le salon. Réessaie.",
     "notConnected": "Non connecté à un serveur.",
     "moveFailed": "Impossible de déplacer cette personne."
   },
   "empty": {
-    "disconnected": "Non connecté. Choisissez un serveur pour voir ses canaux.",
-    "loading": "Chargement des canaux…",
+    "disconnected": "Non connecté. Choisis un serveur pour voir ses salons.",
+    "loading": "Chargement des salons…",
     "syncingBig": "Synchronisation d’un grand serveur…"
   },
   "search": {
-    "label": "Rechercher des canaux et des personnes",
+    "label": "Rechercher des salons et des personnes",
     "clear": "Effacer la recherche",
-    "empty": "Aucun canal ni personne ne correspond à « {{query}} ».",
+    "empty": "Aucun salon ni personne ne correspond à « {{query}} ».",
     "count": "{{channels}}, {{people}}",
-    "channels_one": "{{count}} canal",
-    "channels_many": "{{count}} canaux",
-    "channels_other": "{{count}} canaux",
+    "channels_one": "{{count}} salon",
+    "channels_many": "{{count}} salons",
+    "channels_other": "{{count}} salons",
     "people_one": "{{count}} personne",
     "people_many": "{{count}} personnes",
     "people_other": "{{count}} personnes",
@@ -99,7 +99,7 @@
   "section": {
     "state": {
       "connected": "Connecté",
-      "connecting": "Connexion",
+      "connecting": "Connexion…",
       "reconnecting": "Reconnexion…",
       "disconnected": "Déconnecté"
     },
@@ -108,19 +108,19 @@
   },
   "moveTo": {
     "title": "Déplacer des personnes",
-    "channel": "Canal",
-    "search": "Rechercher des canaux",
-    "noMatch": "Aucun canal ne correspond.",
-    "hint": "Choisis le canal où les personnes doivent aller.",
+    "channel": "Salon",
+    "search": "Rechercher des salons",
+    "noMatch": "Aucun salon ne correspond.",
+    "hint": "Choisis le salon vers lequel déplacer les personnes.",
     "from": "Depuis {{channel}}",
-    "question": "Déplacer {{people}} de {{from}} vers {{to}} ?",
-    "questionNoSource": "Déplacer {{people}} vers {{to}} ?",
+    "question": "Déplacer {{people}} de {{from}} vers {{to}} ?",
+    "questionNoSource": "Déplacer {{people}} vers {{to}} ?",
     "confirm": "Déplacer",
-    "failed": "Certaines personnes n'ont pas pu être déplacées.",
+    "failed": "Certaines personnes n’ont pas pu être déplacées.",
     "resultTitle": "Déplacement de personnes",
     "resultAll": "{{people}} déplacées vers {{channel}}.",
     "resultSome": "{{moved}} sur {{people}} déplacées vers {{channel}}. Les autres ont été refusées.",
-    "busy": "Des personnes sont déjà en cours de déplacement…"
+    "busy": "Déplacement de personnes déjà en cours…"
   },
   "drag": {
     "into": "Déplacer dans {{channel}}",
@@ -128,17 +128,17 @@
     "below": "Placer en dessous de {{channel}}",
     "self": "Impossible de le placer dans lui-même",
     "subChannel": "Impossible de le placer dans son propre sous-salon",
-    "confirmTitle": "Déplacer « {{channel}} » ?",
-    "alongAll": "Avec {{channel}}, sont déplacés : {{subChannels}} et {{people}}.",
-    "alongSubChannels": "Avec {{channel}}, sont déplacés : {{subChannels}}.",
-    "alongPeople": "Avec {{channel}}, sont déplacés : {{people}}.",
-    "alongNone": "Seul {{channel}} est déplacé ; il est vide.",
+    "confirmTitle": "Déplacer « {{channel}} » ?",
+    "alongAll": "Avec {{channel}}, sont déplacés : {{subChannels}} et {{people}}.",
+    "alongSubChannels": "Avec {{channel}}, sont déplacés : {{subChannels}}.",
+    "alongPeople": "Avec {{channel}}, sont déplacés : {{people}}.",
+    "alongNone": "Seul {{channel}} est déplacé ; il est vide.",
     "subChannels_one": "{{count}} sous-salon",
     "subChannels_many": "{{count}} sous-salons",
     "subChannels_other": "{{count}} sous-salons",
     "pathTo": "vers",
     "confirm": "Déplacer",
     "failedTitle": "Impossible de déplacer {{channel}}",
-    "refusedParent": "Tu n’as pas le droit de déplacer des salons dans {{channel}}."
+    "refusedParent": "Tu n’as pas la permission de déplacer des salons dans {{channel}}."
   }
 }

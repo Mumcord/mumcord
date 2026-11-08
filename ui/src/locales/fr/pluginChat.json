@@ -13,7 +13,7 @@
   "command": {
     "group": "Commandes des plugins",
     "keys": "↑↓ choisir · Tab compléter · Entrée exécuter · Échap fermer",
-    "unavailable": "Cette commande n'est pas disponible pour le moment.",
-    "failed": "La commande n'a pas pu être exécutée. Veuillez réessayer."
+    "unavailable": "Cette commande n’est pas disponible pour le moment.",
+    "failed": "La commande n’a pas pu être exécutée. Réessaie."
   }
 }
