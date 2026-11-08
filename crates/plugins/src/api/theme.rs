@@ -214,6 +214,10 @@ mod tests {
                 "--mc-color-hover",
                 "color-mix(in srgb, #fff 6%, transparent)",
             ),
+            (
+                "--mc-shadow-primary-glow",
+                "0 0.5rem 1.5rem -0.25rem color-mix(in srgb, #7c5cff 55%, transparent)",
+            ),
         ] {
             assert!(is_valid_token(name, value), "{name}: {value}");
         }

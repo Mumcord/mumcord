@@ -51,6 +51,8 @@ export const PAGE_TOKEN_VARS: Readonly<Record<string, string>> = {
   "--mc-radius-full": "--radius-full",
   "--mc-focus-ring-width": "--focus-ring-width",
   "--mc-shadow-raised": "--shadow-raised",
+  // Mixed from the accent, so it is read resolved per theme like the colours.
+  "--mc-shadow-primary-glow": "--shadow-primary-glow",
   "--mc-duration-fast": "--duration-fast",
   "--mc-duration-normal": "--duration-normal",
   "--mc-ease-out": "--ease-out",
@@ -82,7 +84,12 @@ export function readPageTheme(): PluginPageTheme {
   const reduced = reducedMotion();
   const tokens: Record<string, string> = {};
   for (const [token, appVar] of Object.entries(PAGE_TOKEN_VARS)) {
-    const value = reduced && DURATIONS.has(token) ? "0ms" : style.getPropertyValue(appVar).trim();
+    // Values written over several lines in tokens.css can keep their line breaks, which the
+    // Rust token check refuses; any run of whitespace becomes one space.
+    const value =
+      reduced && DURATIONS.has(token)
+        ? "0ms"
+        : style.getPropertyValue(appVar).replace(/\s+/g, " ").trim();
     if (value !== "") tokens[token] = value;
   }
   return {

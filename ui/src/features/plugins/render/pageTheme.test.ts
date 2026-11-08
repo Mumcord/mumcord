@@ -45,6 +45,7 @@ const FR_13_9 = {
   "--mc-radius-full": "--radius-full",
   "--mc-focus-ring-width": "--focus-ring-width",
   "--mc-shadow-raised": "--shadow-raised",
+  "--mc-shadow-primary-glow": "--shadow-primary-glow",
   "--mc-duration-fast": "--duration-fast",
   "--mc-duration-normal": "--duration-normal",
   "--mc-ease-out": "--ease-out",
@@ -94,6 +95,16 @@ describe("page theme tokens", () => {
     expect(theme.tokens["--mc-color-text"]).toBe("#123456");
     expect(theme.tokens["--mc-duration-fast"]).toBe("120ms");
     expect(theme.tokens["--mc-space-1"]).toBe("0.25rem");
+  });
+
+  it("carry the primary glow as the current theme resolves it", () => {
+    const glow = "0 0.5rem 1.5rem -0.25rem color-mix(in srgb, #7c5cff 55%, transparent)";
+    setAppVars({ "--shadow-primary-glow": glow });
+    expect(readPageTheme().tokens["--mc-shadow-primary-glow"]).toBe(glow);
+    // A custom theme's accent gives a different glow, and the page gets that one.
+    const custom = "0 0.5rem 1.5rem -0.25rem color-mix(in srgb, #00aa55 55%, transparent)";
+    setAppVars({ "--shadow-primary-glow": custom.replace(" color-mix", "\n    color-mix") });
+    expect(readPageTheme().tokens["--mc-shadow-primary-glow"]).toBe(custom);
   });
 
   it("are high contrast while the system forces colours, keeping the base scheme", () => {
