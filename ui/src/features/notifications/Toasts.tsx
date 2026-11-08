@@ -48,7 +48,7 @@ function ToastItem({
   }
 
   return (
-    <div className="toast">
+    <div className="toast" data-tone={toast.tone}>
       <button
         type="button"
         className="toast__open"
