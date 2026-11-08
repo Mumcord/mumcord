@@ -121,5 +121,24 @@
     "resultAll": "Premješteno {{people}} u {{channel}}.",
     "resultSome": "Premješteno {{moved}} od {{people}} u {{channel}}. Ostali su odbijeni.",
     "busy": "Osobe se već premještaju…"
+  },
+  "drag": {
+    "into": "Premjesti u {{channel}}",
+    "above": "Postavi iznad {{channel}}",
+    "below": "Postavi ispod {{channel}}",
+    "self": "Ne može u samog sebe",
+    "subChannel": "Ne može u vlastiti podkanal",
+    "confirmTitle": "Premjestiti „{{channel}}”?",
+    "alongAll": "S kanalom {{channel}} premještaju se: {{subChannels}} i {{people}}.",
+    "alongSubChannels": "S kanalom {{channel}} premještaju se: {{subChannels}}.",
+    "alongPeople": "S kanalom {{channel}} premještaju se: {{people}}.",
+    "alongNone": "Premješta se samo {{channel}}; prazan je.",
+    "subChannels_one": "{{count}} podkanal",
+    "subChannels_few": "{{count}} podkanala",
+    "subChannels_other": "{{count}} podkanala",
+    "pathTo": "u",
+    "confirm": "Premjesti",
+    "failedTitle": "Nije moguće premjestiti {{channel}}",
+    "refusedParent": "Nemaš dopuštenje premještati kanale u {{channel}}."
   }
 }

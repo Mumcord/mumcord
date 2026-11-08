@@ -121,5 +121,24 @@
     "resultAll": "Pārvietoti {{people}} uz {{channel}}.",
     "resultSome": "Pārvietoti {{moved}} no {{people}} uz {{channel}}. Pārējie tika atteikti.",
     "busy": "Cilvēki jau tiek pārvietoti…"
+  },
+  "drag": {
+    "into": "Pārvietot uz {{channel}}",
+    "above": "Novietot virs {{channel}}",
+    "below": "Novietot zem {{channel}}",
+    "self": "Nevar ievietot pašu sevī",
+    "subChannel": "Nevar ievietot savā apakškanālā",
+    "confirmTitle": "Pārvietot “{{channel}}”?",
+    "alongAll": "Kopā ar {{channel}} tiek pārvietoti: {{subChannels}} un {{people}}.",
+    "alongSubChannels": "Kopā ar {{channel}} tiek pārvietoti: {{subChannels}}.",
+    "alongPeople": "Kopā ar {{channel}} tiek pārvietoti: {{people}}.",
+    "alongNone": "Tiek pārvietots tikai {{channel}}; tas ir tukšs.",
+    "subChannels_zero": "{{count}} apakškanālu",
+    "subChannels_one": "{{count}} apakškanāls",
+    "subChannels_other": "{{count}} apakškanāli",
+    "pathTo": "uz",
+    "confirm": "Pārvietot",
+    "failedTitle": "Neizdevās pārvietot {{channel}}",
+    "refusedParent": "Tev nav tiesību pārvietot kanālus uz {{channel}}."
   }
 }

@@ -121,5 +121,24 @@
     "resultAll": "{{people}} mutate în {{channel}}.",
     "resultSome": "{{moved}} din {{people}} mutate în {{channel}}. Restul au fost refuzate.",
     "busy": "Se mută deja persoane…"
+  },
+  "drag": {
+    "into": "Mută în {{channel}}",
+    "above": "Plasează deasupra lui {{channel}}",
+    "below": "Plasează sub {{channel}}",
+    "self": "Nu poate fi mutat în el însuși",
+    "subChannel": "Nu poate fi mutat în propriul subcanal",
+    "confirmTitle": "Muți „{{channel}}”?",
+    "alongAll": "Împreună cu {{channel}} se mută: {{subChannels}} și {{people}}.",
+    "alongSubChannels": "Împreună cu {{channel}} se mută: {{subChannels}}.",
+    "alongPeople": "Împreună cu {{channel}} se mută: {{people}}.",
+    "alongNone": "Se mută doar {{channel}}; este gol.",
+    "subChannels_one": "{{count}} subcanal",
+    "subChannels_few": "{{count}} subcanale",
+    "subChannels_other": "{{count}} de subcanale",
+    "pathTo": "în",
+    "confirm": "Mută",
+    "failedTitle": "{{channel}} nu a putut fi mutat",
+    "refusedParent": "Nu ai permisiunea să muți canale în {{channel}}."
   }
 }

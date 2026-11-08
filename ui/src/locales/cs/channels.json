@@ -126,5 +126,25 @@
     "resultAll": "Přesunuto {{people}} do {{channel}}.",
     "resultSome": "Přesunuto {{moved}} z {{people}} do {{channel}}. Ostatní byly odmítnuty.",
     "busy": "Už se přesouvají lidé…"
+  },
+  "drag": {
+    "into": "Přesunout do {{channel}}",
+    "above": "Umístit nad {{channel}}",
+    "below": "Umístit pod {{channel}}",
+    "self": "Nemůže do sebe sama",
+    "subChannel": "Nemůže do vlastního podkanálu",
+    "confirmTitle": "Přesunout „{{channel}}“?",
+    "alongAll": "S kanálem {{channel}} se přesunou: {{subChannels}} a {{people}}.",
+    "alongSubChannels": "S kanálem {{channel}} se přesunou: {{subChannels}}.",
+    "alongPeople": "S kanálem {{channel}} se přesunou: {{people}}.",
+    "alongNone": "Přesune se jen {{channel}}; kanál je prázdný.",
+    "subChannels_one": "{{count}} podkanál",
+    "subChannels_few": "{{count}} podkanály",
+    "subChannels_many": "{{count}} podkanálu",
+    "subChannels_other": "{{count}} podkanálů",
+    "pathTo": "do",
+    "confirm": "Přesunout",
+    "failedTitle": "{{channel}} nelze přesunout",
+    "refusedParent": "Nemáš oprávnění přesouvat kanály do {{channel}}."
   }
 }

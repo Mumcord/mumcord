@@ -116,5 +116,23 @@
     "resultAll": "Teisaldati {{people}} kanalisse {{channel}}.",
     "resultSome": "Teisaldati {{moved}} / {{people}} kanalisse {{channel}}. Ülejäänutest keelduti.",
     "busy": "Inimesi juba teisaldatakse…"
+  },
+  "drag": {
+    "into": "Teisalda kanalisse {{channel}}",
+    "above": "Paiguta {{channel}} kohale",
+    "below": "Paiguta {{channel}} alla",
+    "self": "Ei saa iseenda sisse",
+    "subChannel": "Ei saa oma alamkanalisse",
+    "confirmTitle": "Kas teisaldada „{{channel}}“?",
+    "alongAll": "Koos kanaliga {{channel}} teisaldatakse: {{subChannels}} ja {{people}}.",
+    "alongSubChannels": "Koos kanaliga {{channel}} teisaldatakse: {{subChannels}}.",
+    "alongPeople": "Koos kanaliga {{channel}} teisaldatakse: {{people}}.",
+    "alongNone": "Teisaldatakse ainult {{channel}}; see on tühi.",
+    "subChannels_one": "{{count}} alamkanal",
+    "subChannels_other": "{{count}} alamkanalit",
+    "pathTo": "uus asukoht:",
+    "confirm": "Teisalda",
+    "failedTitle": "Kanalit {{channel}} ei saanud teisaldada",
+    "refusedParent": "Sul pole õigust kanaleid kanalisse {{channel}} teisaldada."
   }
 }

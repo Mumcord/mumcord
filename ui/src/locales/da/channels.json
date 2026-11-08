@@ -116,5 +116,23 @@
     "resultAll": "Flyttede {{people}} til {{channel}}.",
     "resultSome": "Flyttede {{moved}} af {{people}} til {{channel}}. Resten blev afvist.",
     "busy": "Flytter allerede personer…"
+  },
+  "drag": {
+    "into": "Flyt ind i {{channel}}",
+    "above": "Placér over {{channel}}",
+    "below": "Placér under {{channel}}",
+    "self": "Kan ikke flyttes ind i sig selv",
+    "subChannel": "Kan ikke flyttes ind i sin egen underkanal",
+    "confirmTitle": "Flyt »{{channel}}«?",
+    "alongAll": "Sammen med {{channel}} flyttes: {{subChannels}} og {{people}}.",
+    "alongSubChannels": "Sammen med {{channel}} flyttes: {{subChannels}}.",
+    "alongPeople": "Sammen med {{channel}} flyttes: {{people}}.",
+    "alongNone": "Kun {{channel}} flyttes; den er tom.",
+    "subChannels_one": "{{count}} underkanal",
+    "subChannels_other": "{{count}} underkanaler",
+    "pathTo": "til",
+    "confirm": "Flyt",
+    "failedTitle": "Kunne ikke flytte {{channel}}",
+    "refusedParent": "Du har ikke ret til at flytte kanaler ind i {{channel}}."
   }
 }

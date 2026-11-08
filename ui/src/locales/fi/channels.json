@@ -116,5 +116,23 @@
     "resultAll": "Siirrettiin {{people}} kanavalle {{channel}}.",
     "resultSome": "Siirrettiin {{moved}} / {{people}} kanavalle {{channel}}. Loput hylättiin.",
     "busy": "Henkilöitä siirretään jo…"
+  },
+  "drag": {
+    "into": "Siirrä kanavaan {{channel}}",
+    "above": "Sijoita kanavan {{channel}} yläpuolelle",
+    "below": "Sijoita kanavan {{channel}} alapuolelle",
+    "self": "Ei voi siirtää itsensä sisään",
+    "subChannel": "Ei voi siirtää omaan alikanavaansa",
+    "confirmTitle": "Siirretäänkö ”{{channel}}”?",
+    "alongAll": "Kanavan {{channel}} mukana siirtyvät: {{subChannels}} ja {{people}}.",
+    "alongSubChannels": "Kanavan {{channel}} mukana siirtyvät: {{subChannels}}.",
+    "alongPeople": "Kanavan {{channel}} mukana siirtyvät: {{people}}.",
+    "alongNone": "Vain {{channel}} siirtyy; se on tyhjä.",
+    "subChannels_one": "{{count}} alikanava",
+    "subChannels_other": "{{count}} alikanavaa",
+    "pathTo": "uusi sijainti:",
+    "confirm": "Siirrä",
+    "failedTitle": "Kanavaa {{channel}} ei voitu siirtää",
+    "refusedParent": "Sinulla ei ole oikeutta siirtää kanavia kanavaan {{channel}}."
   }
 }

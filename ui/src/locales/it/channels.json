@@ -121,5 +121,24 @@
     "resultAll": "Spostate {{people}} in {{channel}}.",
     "resultSome": "Spostate {{moved}} di {{people}} in {{channel}}. Le altre sono state rifiutate.",
     "busy": "Persone già in spostamento…"
+  },
+  "drag": {
+    "into": "Sposta in {{channel}}",
+    "above": "Metti sopra {{channel}}",
+    "below": "Metti sotto {{channel}}",
+    "self": "Non può andare dentro sé stesso",
+    "subChannel": "Non può andare in un proprio sottocanale",
+    "confirmTitle": "Spostare «{{channel}}»?",
+    "alongAll": "Con {{channel}} si spostano: {{subChannels}} e {{people}}.",
+    "alongSubChannels": "Con {{channel}} si spostano: {{subChannels}}.",
+    "alongPeople": "Con {{channel}} si spostano: {{people}}.",
+    "alongNone": "Si sposta solo {{channel}}; è vuoto.",
+    "subChannels_one": "{{count}} sottocanale",
+    "subChannels_many": "{{count}} sottocanali",
+    "subChannels_other": "{{count}} sottocanali",
+    "pathTo": "in",
+    "confirm": "Sposta",
+    "failedTitle": "Impossibile spostare {{channel}}",
+    "refusedParent": "Non hai il permesso di spostare canali in {{channel}}."
   }
 }
