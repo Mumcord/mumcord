@@ -11,7 +11,7 @@
     "hiddenBy": "Skril {{plugin}}"
   },
   "command": {
-    "list": "Ukazi vtičnikov",
+    "group": "Ukazi vtičnikov",
     "keys": "↑↓ izberi · Tab dopolni · Enter zaženi · Esc zapri",
     "unavailable": "Ta ukaz trenutno ni na voljo.",
     "failed": "Ukaza ni bilo mogoče zagnati. Poskusite znova."

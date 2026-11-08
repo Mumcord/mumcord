@@ -428,5 +428,59 @@
   "announcedUnregistered": "Registracija uklonjena",
   "announcedRegistered": "{{name}} je sada registriran",
   "announcedRegisteredSaved": "Promjene poslane serveru",
-  "menuRegister": "Registriraj na serveru…"
+  "menuRegister": "Registriraj na serveru…",
+  "commands": {
+    "group": "Naredbe administratora · ugrađeno",
+    "groupPeople": "Osobe",
+    "groupChannels": "Kanali",
+    "groupBans": "Banovi",
+    "groupChoice": "Što si točno mislio?",
+    "builtIn": "Ugrađeno",
+    "onlyYou": "Ovaj redak vidiš samo ti",
+    "usageLine": "{{command}} zahtijeva {{usage}}",
+    "moveAllQuestion": "Premjestiti {{count}} osoba iz {{from}} u {{to}}?",
+    "moveAllNote": "Premješta se cijeli kanal, uključujući tebe.",
+    "moveAll": "Premjesti",
+    "results": {
+      "muted": "Isključio si mikrofon {{name}} na serveru.",
+      "unmuted": "Uključio si mikrofon {{name}} na serveru.",
+      "deafened": "Isključio si zvuk {{name}} na serveru.",
+      "undeafened": "Uključio si zvuk {{name}} na serveru.",
+      "priorityOn": "Postavio si {{name}} kao prioritetnog govornika.",
+      "priorityOff": "{{name}} više nije prioritetni govornik.",
+      "registered": "{{name}} je registriran na serveru.",
+      "moved": "Premjestio si {{name}} u {{channel}}.",
+      "movedAll": "Premješteno {{moved}} od {{total}} osoba.",
+      "movedSome": "Premješteno {{moved}} od {{total}} osoba; {{refused}} je odbijeno.",
+      "alreadyMoving": "Osobe se već premještaju…",
+      "unbanned": "Ban {{name}} je skinut.",
+      "kicked": "Izbacio si {{name}} sa servera.",
+      "banned": "Banio si {{name}} na serveru.",
+      "noAnswer": "Server se nije javio."
+    },
+    "errors": {
+      "unknownPerson": "Nema nikoga po imenu „{{name}}“ na ovom serveru.",
+      "unknownPersonDidYouMean": "Nema nikoga po imenu „{{name}}“ na ovom serveru. Jesi li mislio na {{suggestion}}?",
+      "unknownChannel": "Na ovom serveru nema kanala po imenu „{{name}}“.",
+      "ambiguousChannel": "Više kanala odgovara: {{names}}.",
+      "needChannel": "Koji kanal? Upiši njegovo ime nakon naredbe.",
+      "needBan": "Koji ban? Upiši ime ili adresu nakon naredbe.",
+      "unknownBan": "Nijedan ban ne odgovara „{{name}}“ na ovom serveru.",
+      "banChanged": "Taj se ban na serveru promijenio dok si odlučivao.",
+      "alreadyInChannel": "Već si u {{channel}}."
+    },
+    "usage": {
+      "kick": "ime [razlog]",
+      "ban": "ime [trajanje] [razlog]",
+      "mute": "ime",
+      "unmute": "ime",
+      "deaf": "ime",
+      "undeaf": "ime",
+      "priority": "ime",
+      "register": "ime",
+      "move": "ime kanal",
+      "moveall": "kanal",
+      "unban": "ime ili adresa"
+    }
+  }
 }

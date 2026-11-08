@@ -425,5 +425,59 @@
   "announcedUnregistered": "Registrering borttagen",
   "announcedRegistered": "{{name}} är registrerad nu",
   "announcedRegisteredSaved": "Ändringar skickade till servern",
-  "menuRegister": "Registrera på servern…"
+  "menuRegister": "Registrera på servern…",
+  "commands": {
+    "group": "Administratörskommandon · inbyggda",
+    "groupPeople": "Personer",
+    "groupChannels": "Kanaler",
+    "groupBans": "Blys",
+    "groupChoice": "Vilket menade du?",
+    "builtIn": "Inbyggd",
+    "onlyYou": "Bara du ser den här raden",
+    "usageLine": "{{command}} kräver {{usage}}",
+    "moveAllQuestion": "Flytta {{count}} personer från {{from}} till {{to}}?",
+    "moveAllNote": "Hela kanalen flyttar, inklusive du.",
+    "moveAll": "Flytta",
+    "results": {
+      "muted": "Du stängde av mikrofonen för {{name}} på servern.",
+      "unmuted": "Du slog på mikrofonen igen för {{name}} på servern.",
+      "deafened": "Du stängde av ljudet för {{name}} på servern.",
+      "undeafened": "Du slog på ljudet igen för {{name}} på servern.",
+      "priorityOn": "Du gjorde {{name}} till prioritetshögtalare på servern.",
+      "priorityOff": "{{name}} är inte längre prioritetshögtalare.",
+      "registered": "{{name}} är registrerad på servern.",
+      "moved": "Du flyttade {{name}} till {{channel}}.",
+      "movedAll": "Flyttade {{moved}} av {{total}} personer.",
+      "movedSome": "Flyttade {{moved}} av {{total}} personer; {{refused}} nekades.",
+      "alreadyMoving": "Personer flyttas redan…",
+      "unbanned": "{{name}} är inte längre blysad.",
+      "kicked": "Du sparkade ut {{name}} från servern.",
+      "banned": "Du blysade {{name}} på servern.",
+      "noAnswer": "Servern svarade inte."
+    },
+    "errors": {
+      "unknownPerson": "Det finns ingen som heter ”{{name}}” på den här servern just nu.",
+      "unknownPersonDidYouMean": "Det finns ingen som heter ”{{name}}” på den här servern just nu. Menade du {{suggestion}}?",
+      "unknownChannel": "Det finns ingen kanal som heter ”{{name}}” på den här servern.",
+      "ambiguousChannel": "Flera kanaler matchar: {{names}}.",
+      "needChannel": "Vilken kanal? Skriv dess namn efter kommandot.",
+      "needBan": "Vilket blys? Skriv ett namn eller en adress efter kommandot.",
+      "unknownBan": "Inget blys matchar ”{{name}}” på den här servern.",
+      "banChanged": "Det blyset ändrades på servern medan du bestämde dig.",
+      "alreadyInChannel": "Du är redan i {{channel}}."
+    },
+    "usage": {
+      "kick": "namn [anledning]",
+      "ban": "namn [tid] [anledning]",
+      "mute": "namn",
+      "unmute": "namn",
+      "deaf": "namn",
+      "undeaf": "namn",
+      "priority": "namn",
+      "register": "namn",
+      "move": "namn kanal",
+      "moveall": "kanal",
+      "unban": "namn eller adress"
+    }
+  }
 }

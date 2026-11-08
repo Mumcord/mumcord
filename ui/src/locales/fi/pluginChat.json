@@ -11,7 +11,7 @@
     "hiddenBy": "Piilottanut {{plugin}}"
   },
   "command": {
-    "list": "Laajennusten komennot",
+    "group": "Laajennusten komennot",
     "keys": "↑↓ valitse · Tab täydennä · Enter suorita · Esc sulje",
     "unavailable": "Tämä komento ei ole juuri nyt käytettävissä.",
     "failed": "Komentoa ei voitu suorittaa. Yritä uudelleen."

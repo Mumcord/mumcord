@@ -423,5 +423,8 @@
     "loading": "Načítava sa obrázok…",
     "unavailable": "Obrázok nie je k dispozícii",
     "load": "Načítať obrázok"
+  },
+  "slash": {
+    "list": "Príkazy s lomítkom"
   }
 }

@@ -425,5 +425,59 @@
   "announcedUnregistered": "Registrering fjernet",
   "announcedRegistered": "{{name}} er nu registreret",
   "announcedRegisteredSaved": "Ændringer sendt til serveren",
-  "menuRegister": "Registrér på serveren…"
+  "menuRegister": "Registrér på serveren…",
+  "commands": {
+    "group": "Admin-kommandoer · indbygget",
+    "groupPeople": "Personer",
+    "groupChannels": "Kanaler",
+    "groupBans": "Udelukkelser",
+    "groupChoice": "Hvilken mente du?",
+    "builtIn": "Indbygget",
+    "onlyYou": "Kun du kan se denne linje",
+    "usageLine": "{{command}} kræver {{usage}}",
+    "moveAllQuestion": "Flyt {{count}} personer fra {{from}} til {{to}}?",
+    "moveAllNote": "Hele kanalen flytter med, også dig.",
+    "moveAll": "Flyt",
+    "results": {
+      "muted": "Du har slået mikrofonen fra for {{name}} på serveren.",
+      "unmuted": "Du har tændt mikrofonen igen for {{name}} på serveren.",
+      "deafened": "Du har slået lyden fra for {{name}} på serveren.",
+      "undeafened": "Du har tændt lyden igen for {{name}} på serveren.",
+      "priorityOn": "Du har gjort {{name}} til prioritetshøjtaler på serveren.",
+      "priorityOff": "{{name}} er ikke længere prioritetshøjtaler.",
+      "registered": "{{name}} er registreret på serveren.",
+      "moved": "Du har flyttet {{name}} til {{channel}}.",
+      "movedAll": "{{moved}} af {{total}} personer blev flyttet.",
+      "movedSome": "{{moved}} af {{total}} personer blev flyttet; {{refused}} blev afvist.",
+      "alreadyMoving": "Der bliver allerede flyttet personer…",
+      "unbanned": "{{name}} er ikke længere udelukket.",
+      "kicked": "Du har smidt {{name}} ud af serveren.",
+      "banned": "Du har udelukket {{name}} på serveren.",
+      "noAnswer": "Serveren svarede ikke."
+    },
+    "errors": {
+      "unknownPerson": "Der er ingen ved navn “{{name}}” på denne server lige nu.",
+      "unknownPersonDidYouMean": "Der er ingen ved navn “{{name}}” på denne server lige nu. Mente du {{suggestion}}?",
+      "unknownChannel": "Der er ingen kanal ved navn “{{name}}” på denne server.",
+      "ambiguousChannel": "Flere kanaler passer: {{names}}.",
+      "needChannel": "Hvilken kanal? Skriv dens navn efter kommandoen.",
+      "needBan": "Hvilken udelukkelse? Skriv et navn eller en adresse efter kommandoen.",
+      "unknownBan": "Ingen udelukkelse matcher “{{name}}” på denne server.",
+      "banChanged": "Den udelukkelse ændrede sig på serveren, mens du overvejede.",
+      "alreadyInChannel": "Du er allerede i {{channel}}."
+    },
+    "usage": {
+      "kick": "navn [årsag]",
+      "ban": "navn [varighed] [årsag]",
+      "mute": "navn",
+      "unmute": "navn",
+      "deaf": "navn",
+      "undeaf": "navn",
+      "priority": "navn",
+      "register": "navn",
+      "move": "navn kanal",
+      "moveall": "kanal",
+      "unban": "navn eller adresse"
+    }
+  }
 }

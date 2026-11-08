@@ -431,5 +431,59 @@
   "announcedUnregistered": "Registracija pašalinta",
   "announcedRegistered": "{{name}} dabar registruotas",
   "announcedRegisteredSaved": "Pakeitimai išsiųsti serveriui",
-  "menuRegister": "Registruoti serveryje…"
+  "menuRegister": "Registruoti serveryje…",
+  "commands": {
+    "group": "Administratoriaus komandos · integruotos",
+    "groupPeople": "Žmonės",
+    "groupChannels": "Kanalai",
+    "groupBans": "Draudimai",
+    "groupChoice": "Ką turi omenyje?",
+    "builtIn": "Integruota",
+    "onlyYou": "Šią eilutę matai tik tu",
+    "usageLine": "{{command}} reikia {{usage}}",
+    "moveAllQuestion": "Perkelti {{count}} asmenis iš {{from}} į {{to}}?",
+    "moveAllNote": "Perkeliamas visas kanalas, įskaitant tave.",
+    "moveAll": "Perkelti",
+    "results": {
+      "muted": "Užtydėjai {{name}} serveryje.",
+      "unmuted": "Atšaukei {{name}} nutildymą serveryje.",
+      "deafened": "Išjungai {{name}} garsą serveryje.",
+      "undeafened": "Įjungei {{name}} garsą atgal serveryje.",
+      "priorityOn": "Skirai {{name}} prioritetiniu kalbėtoju.",
+      "priorityOff": "{{name}} nebėra prioritetinis kalbėtojas.",
+      "registered": "{{name}} užregistruotas serveryje.",
+      "moved": "Perkelėjai {{name}} į {{channel}}.",
+      "movedAll": "Perkelta {{moved}} iš {{total}} asmenų.",
+      "movedSome": "Perkelta {{moved}} iš {{total}} asmenų; {{refused}} atmesta.",
+      "alreadyMoving": "Žmonės jau perkeliami…",
+      "unbanned": "{{name}} draudimas pašalintas.",
+      "kicked": "Pašalinai {{name}} iš serverio.",
+      "banned": "Uždraudei {{name}} serveryje.",
+      "noAnswer": "Serveris neatsakė."
+    },
+    "errors": {
+      "unknownPerson": "Šiame serveryje dabar nėra asmens, vardu „{{name}}“.",
+      "unknownPersonDidYouMean": "Šiame serveryje dabar nėra asmens, vardu „{{name}}“. Ar turėjai omenyje {{suggestion}}?",
+      "unknownChannel": "Šiame serveryje nėra „{{name}}“ kanalo.",
+      "ambiguousChannel": "Tinka keli kanalai: {{names}}.",
+      "needChannel": "Kurį kanalą? Parašyk jo pavadinimą po komanda.",
+      "needBan": "Kurį draudimą? Po komanda parašyk vardą arba adresą.",
+      "unknownBan": "Šiame serveryje joks draudimas neatitinka „{{name}}“.",
+      "banChanged": "Kol sprendei, tas draudimas serveryje pasikeitė.",
+      "alreadyInChannel": "Jau esi kanale {{channel}}."
+    },
+    "usage": {
+      "kick": "vardas [priežastis]",
+      "ban": "vardas [trukmė] [priežastis]",
+      "mute": "vardas",
+      "unmute": "vardas",
+      "deaf": "vardas",
+      "undeaf": "vardas",
+      "priority": "vardas",
+      "register": "vardas",
+      "move": "vardas kanalas",
+      "moveall": "kanalas",
+      "unban": "vardas ar adresas"
+    }
+  }
 }

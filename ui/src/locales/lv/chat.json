@@ -414,5 +414,8 @@
     "loading": "Ielādē attēlu…",
     "unavailable": "Attēls nav pieejams",
     "load": "Ielādēt attēlu"
+  },
+  "slash": {
+    "list": "Komandas ar „/“"
   }
 }

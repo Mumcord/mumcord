@@ -423,5 +423,8 @@
     "loading": "Načítání obrázku…",
     "unavailable": "Obrázek není k dispozici",
     "load": "Načíst obrázek"
+  },
+  "slash": {
+    "list": "Příkazy se „/“"
   }
 }
