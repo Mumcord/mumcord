@@ -432,6 +432,16 @@
   "announcedRegistered": "{{name}} dabar registruotas",
   "announcedRegisteredSaved": "Pakeitimai išsiųsti serveriui",
   "menuRegister": "Registruoti serveryje…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Jūsų teisės čia",
+    "limits": "Serverio apribojimai",
+    "welcomeHint": "Galima keisti tik serverio konfigūracijos faile, ne iš kliento.",
+    "notice": "Serverio pranešimas",
+    "noticeEmpty": "Rodomas kaip šakninio kanalo aprašas",
+    "noticeEditTitle": "Redaguoti serverio pranešimą",
+    "banListRegisteredUsers": "Užblokuotų sąrašas ir registruoti naudotojai…"
+  },
   "commands": {
     "group": "Administratoriaus komandos · integruotos",
     "groupPeople": "Žmonės",

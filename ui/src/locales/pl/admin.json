@@ -432,6 +432,16 @@
   "announcedRegistered": "{{name}} jest teraz zarejestrowany",
   "announcedRegisteredSaved": "Zmiany wysłane do serwera",
   "menuRegister": "Zarejestruj na serwerze…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Twoje uprawnienia tutaj",
+    "limits": "Limity serwera",
+    "welcomeHint": "Można zmienić tylko w pliku konfiguracyjnym serwera, nie z żadnego klienta.",
+    "notice": "Ogłoszenie serwera",
+    "noticeEmpty": "Wyświetlane jako opis kanału głównego",
+    "noticeEditTitle": "Edytuj ogłoszenie serwera",
+    "banListRegisteredUsers": "Lista banów i zarejestrowani użytkownicy…"
+  },
   "commands": {
     "group": "Polecenia administratora · wbudowane",
     "groupPeople": "Osoby",

@@ -429,6 +429,16 @@
   "announcedRegistered": "{{name}} este acum înregistrat",
   "announcedRegisteredSaved": "Modificările au fost trimise serverului",
   "menuRegister": "Înregistrează pe server…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Drepturile tale aici",
+    "limits": "Limitele serverului",
+    "welcomeHint": "Poate fi modificat doar în fișierul de configurare al serverului, nu din niciun client.",
+    "notice": "Anunț server",
+    "noticeEmpty": "Afișat ca descrierea canalului rădăcină",
+    "noticeEditTitle": "Editare anunț server",
+    "banListRegisteredUsers": "Lista de interdicții și utilizatori înregistrați…"
+  },
   "commands": {
     "group": "Comenzi de administrare · încorporate",
     "groupPeople": "Persoane",

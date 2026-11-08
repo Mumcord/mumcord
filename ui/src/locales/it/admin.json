@@ -429,6 +429,16 @@
   "announcedRegistered": "{{name}} ora è registrato",
   "announcedRegisteredSaved": "Modifiche inviate al server",
   "menuRegister": "Registra sul server…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "I tuoi diritti qui",
+    "limits": "Limiti del server",
+    "welcomeHint": "Può essere modificato solo nel file di configurazione del server, non da un client.",
+    "notice": "Avviso del server",
+    "noticeEmpty": "Mostrato come descrizione del canale radice",
+    "noticeEditTitle": "Modifica avviso del server",
+    "banListRegisteredUsers": "Lista ban e utenti registrati…"
+  },
   "commands": {
     "group": "Comandi di amministrazione · integrati",
     "groupPeople": "Persone",

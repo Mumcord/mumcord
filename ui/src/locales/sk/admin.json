@@ -432,6 +432,16 @@
   "announcedRegistered": "{{name}} je teraz registrovaný",
   "announcedRegisteredSaved": "Zmeny odoslané serveru",
   "menuRegister": "Registrovať na serveri…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Vaše práva tu",
+    "limits": "Limity servera",
+    "welcomeHint": "Dá sa zmeniť len v konfiguračnom súbore servera, nie z žiadneho klienta.",
+    "notice": "Oznámenie servera",
+    "noticeEmpty": "Zobrazuje sa ako popis koreňového kanála",
+    "noticeEditTitle": "Upraviť oznámenie servera",
+    "banListRegisteredUsers": "Zoznam banov a registrovaní používatelia…"
+  },
   "commands": {
     "group": "Príkazy správcu · vstavané",
     "groupPeople": "Ľudia",
