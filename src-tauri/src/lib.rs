@@ -733,6 +733,29 @@ fn linux_appimage() -> bool {
     false
 }
 
+/// The folder with the files bundled beside the app (the camera backgrounds). Tauri resolves it
+/// on Linux, macOS and Windows only; FreeBSD follows the same `../lib/mumcord` rule the Linux
+/// packages use and falls back to the package prefix, where `packaging/freebsd` installs them.
+fn resource_dir(app: &AppHandle) -> Option<std::path::PathBuf> {
+    match app.path().resource_dir() {
+        Ok(dir) => return Some(dir),
+        Err(e) => tracing::info!(error = %e, "Tauri knows no resource folder; using the package's"),
+    }
+    #[cfg(target_os = "freebsd")]
+    {
+        let exe = std::env::current_exe().ok()?;
+        let beside = exe.parent()?.join("../lib/mumcord");
+        if let Ok(dir) = beside.canonicalize() {
+            return Some(dir);
+        }
+        let packaged = std::path::PathBuf::from("/usr/local/lib/mumcord");
+        if packaged.is_dir() {
+            return Some(packaged);
+        }
+    }
+    None
+}
+
 /// How Mumcord runs and on which screens, for crash reports (#568).
 fn set_crash_context(app: &AppHandle) {
     // AppImage and Flatpak exist only on Linux.
@@ -820,9 +843,9 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     engine.camera_set_frame_sink(camera_frames.0.clone());
     app.manage(camera_frames);
     app.manage(commands::camera_settings::CameraDeviceWatch::default());
-    match app.path().resource_dir() {
-        Ok(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
-        Err(e) => tracing::warn!(error = %e, "no resource folder for the camera backgrounds"),
+    match resource_dir(app) {
+        Some(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
+        None => tracing::warn!("no resource folder for the camera backgrounds"),
     }
     now_playing::start(engine.clone());
     now_gaming::start(engine.clone());
