@@ -41,6 +41,12 @@ export interface TreeUi {
   query: string;
 }
 
+/**
+ * What a click on a person row does with the picked people (issue #255): a plain click clears the
+ * selection, Ctrl/Cmd adds or takes out one person, Shift picks the range from the last one.
+ */
+export type PersonSelectMode = "toggle" | "range" | "clear";
+
 /** Handlers of `ChannelTree`, read when an event fires (always the latest ones). */
 export interface TreeActions {
   focus: (rowId: string) => void;
@@ -52,8 +58,10 @@ export interface TreeActions {
   openPerson: (session: number, opener: HTMLElement | null) => void;
   /** Opens a channel's right-click menu at `position` (issue #172). */
   openMenu: (channelId: number, position: { x: number; y: number }) => void;
-  /** Moves a dragged person into a channel (issue #172). */
-  movePerson: (session: number, channelId: number) => void;
+  /** Moves dragged people into a channel (issues #172, #255). */
+  movePeople: (sessions: readonly number[], channelId: number) => void;
+  /** Ctrl/Shift-click on a person row (issue #255). */
+  selectPerson: (session: number, mode: PersonSelectMode) => void;
   /** Pure factories of self-updating content (e.g. the unread badge); see `ChannelTreeProps`. */
   channelBadge?: ((channelId: number) => ReactNode) | undefined;
   channelAction?:

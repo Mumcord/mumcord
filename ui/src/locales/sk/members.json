@@ -63,7 +63,9 @@
     "mute": "Stlmiť pre mňa",
     "connectionInfo": "Informácie o pripojení",
     "chatRequestPending": "Žiadosť o chat čaká na vybavenie",
-    "revokeConsent": "Odvolať súhlas s četom"
+    "revokeConsent": "Odvolať súhlas s četom",
+    "moveToMe": "Presunúť do môjho kanála",
+    "moveTo": "Presunúť do"
   },
   "nowPlaying": {
     "label": "Práve hrá",

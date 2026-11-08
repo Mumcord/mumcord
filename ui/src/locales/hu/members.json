@@ -61,7 +61,9 @@
     "mute": "Némítás nálam",
     "connectionInfo": "Kapcsolati adatok",
     "chatRequestPending": "Csevegési kérés függőben",
-    "revokeConsent": "Csevegési hozzájárulás visszavonása"
+    "revokeConsent": "Csevegési hozzájárulás visszavonása",
+    "moveToMe": "Áthelyezés a saját csatornámba",
+    "moveTo": "Áthelyezés"
   },
   "nowPlaying": {
     "label": "Most szól",

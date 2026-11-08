@@ -62,7 +62,9 @@
     "mute": "Mettre en sourdine pour moi",
     "connectionInfo": "Infos de connexion",
     "chatRequestPending": "Demande de chat en attente",
-    "revokeConsent": "Retirer le consentement au chat"
+    "revokeConsent": "Retirer le consentement au chat",
+    "moveToMe": "Déplacer vers mon canal",
+    "moveTo": "Déplacer vers"
   },
   "nowPlaying": {
     "label": "En écoute",

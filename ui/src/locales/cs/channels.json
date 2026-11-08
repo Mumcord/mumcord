@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanály",
-    "hint": "Enter: zobrazit chat · Shift+Enter nebo dvojklik: připojit se · Šipky: pohyb, rozbalit, sbalit · Klávesa nabídky: možnosti kanálu",
+    "hint": "Enter: zobrazit chat · Shift+Enter nebo dvojklik: připojit se · Šipky: pohyb, rozbalit, sbalit · Klávesa nabídky: možnosti kanálu · Ctrl+klik nebo Ctrl+mezerník: výběr lidí",
     "join": "Připojit se",
     "you": "(ty)",
     "youAreHere": "jsi tady",
@@ -110,5 +110,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Přesunout lidi",
+    "channel": "Kanál",
+    "search": "Hledat kanály",
+    "noMatch": "Žádný kanál neodpovídá.",
+    "hint": "Vyber kanál, kam mají lidé jít.",
+    "from": "Z {{channel}}",
+    "question": "Přesunout {{people}} z {{from}} do {{to}}?",
+    "questionNoSource": "Přesunout {{people}} do {{to}}?",
+    "confirm": "Přesunout",
+    "failed": "Některé lidi se nepodařilo přesunout.",
+    "resultTitle": "Přesouvání lidí",
+    "resultAll": "Přesunuto {{people}} do {{channel}}.",
+    "resultSome": "Přesunuto {{moved}} z {{people}} do {{channel}}. Ostatní byly odmítnuty.",
+    "busy": "Už se přesouvají lidé…"
   }
 }

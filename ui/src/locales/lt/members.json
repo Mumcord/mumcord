@@ -63,7 +63,9 @@
     "mute": "Nutildyti man",
     "connectionInfo": "Ryšio informacija",
     "chatRequestPending": "Pokalbio prašymas laukia",
-    "revokeConsent": "Atšaukti pokalbio sutikimą"
+    "revokeConsent": "Atšaukti pokalbio sutikimą",
+    "moveToMe": "Perkelti į mano kanalą",
+    "moveTo": "Perkelti į"
   },
   "nowPlaying": {
     "label": "Dabar groja",

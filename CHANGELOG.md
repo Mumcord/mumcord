@@ -4,6 +4,7 @@
 
 ### Added
 
+- Moving people, under Admin ▸ in the person and channel menus: "Move to my channel" while the person sits elsewhere, "Move to" with a filterable channel picker that shows each channel's user limit and asks in plain words ("Move 3 people from Raid to Lobby?"), and "Move everyone to" for a whole channel at once without taking you along. Ctrl-click (or Ctrl+Space) and Shift-click pick several people in the channel tree, so one drag moves them together, and the person menu's "Move to" carries the picked people. After moving a group Mumcord says how many arrived ("Moved 28 of 30 people to Raid. The rest were refused.") instead of one notice per person, and a full channel is named once
 - Moderation in the person menu's "Admin ▸": server mute, server deafen (mutes too), priority speaker (a star next to their name) and un-suppress act at once and show a tick while on; reset comment and reset avatar ask first. Each appears only with the server's right
 - Channel password: the channel window's Password tab sets or clears the password for joining a channel, written the same way as the official Mumble client; channels with more complex access rules point to Permissions instead
 - Channel permissions: the channel window's Permissions tab shows who can do what in the channel (✓, ✗ or ? per group and person), lets admins edit its rules and groups, and explains any answer in a "Why?" panel. Mumcord warns before you would lock yourself out, asks before changing the whole server's rules, and never overwrites a change someone else made meanwhile

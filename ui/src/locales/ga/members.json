@@ -64,7 +64,9 @@
     "mute": "Balbhaigh dom",
     "connectionInfo": "Faisnéis cheangail",
     "chatRequestPending": "Iarratas comhrá ar feitheamh",
-    "revokeConsent": "Cúlghair toiliú comhrá"
+    "revokeConsent": "Cúlghair toiliú comhrá",
+    "moveToMe": "Bog go dtí mo chainéal",
+    "moveTo": "Bog go"
   },
   "nowPlaying": {
     "label": "Ag seinm anois",

@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanaler",
-    "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul · Menutast: kanalindstillinger",
+    "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul · Menutast: kanalindstillinger · Ctrl-klik eller Ctrl+mellemrum: vælg personer",
     "join": "Deltag",
     "you": "(dig)",
     "youAreHere": "du er her",
@@ -100,5 +100,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Flyt personer",
+    "channel": "Kanal",
+    "search": "Søg kanaler",
+    "noMatch": "Ingen kanal matcher.",
+    "hint": "Vælg den kanal, personerne skal hen til.",
+    "from": "Fra {{channel}}",
+    "question": "Flyt {{people}} fra {{from}} til {{to}}?",
+    "questionNoSource": "Flyt {{people}} til {{to}}?",
+    "confirm": "Flyt",
+    "failed": "Nogle personer kunne ikke flyttes.",
+    "resultTitle": "Flytter personer",
+    "resultAll": "Flyttede {{people}} til {{channel}}.",
+    "resultSome": "Flyttede {{moved}} af {{people}} til {{channel}}. Resten blev afvist.",
+    "busy": "Flytter allerede personer…"
   }
 }

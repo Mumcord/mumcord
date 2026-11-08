@@ -2,6 +2,8 @@ import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import { useServerState } from "../channels";
+import { isHiddenBot } from "../channels/mumcord";
+import { openMovePeople } from "../channels/movePeople";
 import { ChannelAudioDialog, profileKind, useChannelAudioProfile } from "../channelaudio";
 import { ClearHistoryDialog } from "../chat/history/ClearHistory";
 import { useFollowControl, type FollowControl } from "../follow";
@@ -198,6 +200,24 @@ export function useChannelActions(
         onSelect: () => {
           closeMenu(true);
           void quickLink({ linksAdd: [], linksRemove: links });
+        },
+      });
+    }
+    // "Move everyone to…" (issue #255): the whole channel at once, through the same picker as the
+    // person menu. Bots without voice never count as people here, and the own user stays (Q5.2).
+    const inChannel = [...server.users.values()].filter(
+      (user) =>
+        user.channelId === channelId && user.session !== server.selfSession && !isHiddenBot(user),
+    );
+    if (rights.moveUsers && inChannel.length > 0) {
+      const sessions = inChannel.map((user) => user.session);
+      items.push({
+        id: "moveEveryone",
+        label: tAdmin("channel.menuMoveEveryone"),
+        onSelect: () => {
+          closeMenu(false);
+          restoreFocus();
+          openMovePeople({ sessions, fromChannelId: channelId });
         },
       });
     }

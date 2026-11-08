@@ -62,7 +62,9 @@
     "mute": "Utišaj za mene",
     "connectionInfo": "Informacije o vezi",
     "chatRequestPending": "Zahtjev za razgovor na čekanju",
-    "revokeConsent": "Opozovi pristanak na chat"
+    "revokeConsent": "Opozovi pristanak na chat",
+    "moveToMe": "Premjesti u moj kanal",
+    "moveTo": "Premjesti u"
   },
   "nowPlaying": {
     "label": "Trenutno svira",

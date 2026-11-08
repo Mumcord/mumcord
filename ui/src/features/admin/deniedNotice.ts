@@ -6,7 +6,7 @@
 import type { TFunction } from "i18next";
 import type { MumcordApi, ServerDenied, Unsubscribe } from "../../api";
 import { getServerStateOf } from "../channels";
-import { showToast } from "../notifications/notificationStore";
+import { noticeKey, showToast } from "../notifications/notificationStore";
 
 /** The plain-language text of a refusal; the server's own text where it gave one. */
 export function deniedText(t: TFunction<"admin">, denied: ServerDenied): string {
@@ -39,7 +39,12 @@ export function bindDeniedNotices(
     const { t, serverName } = context();
     const server = serverName(denied.serverId);
     showToast({
-      key: `denied:${String(denied.serverId)}:${String(Date.now())}`,
+      // The same refusal in the same place updates one toast instead of stacking up: moving a
+      // whole channel into a full one makes the server refuse once per person (issue #255).
+      key: noticeKey(
+        denied.serverId,
+        `denied:${String(denied.channelId ?? 0)}:${denied.kind}:${denied.permission ?? ""}`,
+      ),
       serverId: denied.serverId,
       conversation: { kind: "channel", channelId: denied.channelId ?? 0 },
       title: server === undefined ? t("denied.title") : t("denied.titleOn", { server }),

@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Cainéil",
-    "hint": "Enter: taispeáin an comhrá · Shift+Enter nó dúbailt-chliceáil: téigh isteach · Eochracha saigheada: bog, leathnaigh, laghdaigh · Eochair roghchláir: roghanna an chainéil",
+    "hint": "Enter: taispeáin an comhrá · Shift+Enter nó dúbailt-chliceáil: téigh isteach · Eochracha saigheada: bog, leathnaigh, laghdaigh · Eochair roghchláir: roghanna an chainéil · Ctrl+cliceáil nó Ctrl+spás: roghnaigh daoine",
     "join": "Téigh isteach",
     "you": "(tusa)",
     "youAreHere": "tá tú anseo",
@@ -115,5 +115,21 @@
     },
     "online": "{{count}} ar líne",
     "onlinePing": "{{count}} ar líne · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Bog daoine",
+    "channel": "Cainéal",
+    "search": "Cuardaigh cainéil",
+    "noMatch": "Ní thagann aon chainéal leis.",
+    "hint": "Roghnaigh an cainéal a rachaidh na daoine chuige.",
+    "from": "Ó {{channel}}",
+    "question": "Bog {{people}} ó {{from}} go {{to}}?",
+    "questionNoSource": "Bog {{people}} go {{to}}?",
+    "confirm": "Bog",
+    "failed": "Níorbh fhéidir roinnt daoine a bhogadh.",
+    "resultTitle": "Daoine á mbogadh",
+    "resultAll": "Bogadh {{people}} go {{channel}}.",
+    "resultSome": "Bogadh {{moved}} as {{people}} go {{channel}}. Diúltaíodh don chuid eile.",
+    "busy": "Tá daoine á mbogadh cheana…"
   }
 }

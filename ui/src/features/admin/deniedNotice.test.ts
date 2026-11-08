@@ -55,6 +55,16 @@ describe("server refusals in plain words (#248)", () => {
     expect(deniedText(t(), denied({ kind: "unknown" }))).toBe("The server refused this.");
   });
 
+  it("says a refusal once when the server repeats it for every person", () => {
+    // Moving three people into a full channel is refused three times, one per person (issue #255).
+    act(() => {
+      for (let person = 0; person < 3; person += 1) {
+        api.mock.emit("serverDenied", denied({ kind: "channelFull", channelId: 1 }));
+      }
+    });
+    expect(getToasts()).toEqual([expect.objectContaining({ text: "The channel is full." })]);
+  });
+
   it("shows a notice unless a dialog already shows the refusal", () => {
     act(() => {
       api.mock.emit("serverDenied", denied({ permission: "kick", handled: true }));

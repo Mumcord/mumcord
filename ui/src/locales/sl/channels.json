@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanali",
-    "hint": "Enter: pokaži klepet · Shift+Enter ali dvoklik: pridruži se · Puščice: premikanje, razširi, strni · Tipka menija: možnosti kanala",
+    "hint": "Enter: pokaži klepet · Shift+Enter ali dvoklik: pridruži se · Puščice: premikanje, razširi, strni · Tipka menija: možnosti kanala · Ctrl+klik ali Ctrl+preslednica: izberi osebe",
     "join": "Pridruži se",
     "you": "(ti)",
     "youAreHere": "tukaj si",
@@ -110,5 +110,21 @@
     },
     "online": "{{count}} na spletu",
     "onlinePing": "{{count}} na spletu · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Premakni osebe",
+    "channel": "Kanal",
+    "search": "Iskanje kanalov",
+    "noMatch": "Noben kanal se ne ujema.",
+    "hint": "Izberi kanal, kam naj gredo osebe.",
+    "from": "Iz {{channel}}",
+    "question": "Premaknem {{people}} iz {{from}} v {{to}}?",
+    "questionNoSource": "Premaknem {{people}} v {{to}}?",
+    "confirm": "Premakni",
+    "failed": "Nekaterih oseb ni bilo mogoče premakniti.",
+    "resultTitle": "Premikanje oseb",
+    "resultAll": "Premaknjenih {{people}} v {{channel}}.",
+    "resultSome": "Premaknjenih {{moved}} od {{people}} v {{channel}}. Ostali so bili zavrnjeni.",
+    "busy": "Osebe se že premikajo…"
   }
 }

@@ -61,7 +61,9 @@
     "mute": "Für mich stummschalten",
     "connectionInfo": "Verbindungsinfo",
     "chatRequestPending": "Chatanfrage ausstehend",
-    "revokeConsent": "Chat-Zustimmung widerrufen"
+    "revokeConsent": "Chat-Zustimmung widerrufen",
+    "moveToMe": "In meinen Kanal verschieben",
+    "moveTo": "Verschieben nach"
   },
   "nowPlaying": {
     "label": "Läuft gerade",

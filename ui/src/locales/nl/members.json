@@ -61,7 +61,9 @@
     "mute": "Voor mij dempen",
     "connectionInfo": "Verbindingsinfo",
     "chatRequestPending": "Chatverzoek in behandeling",
-    "revokeConsent": "Chattoestemming intrekken"
+    "revokeConsent": "Chattoestemming intrekken",
+    "moveToMe": "Naar mijn kanaal verplaatsen",
+    "moveTo": "Verplaatsen naar"
   },
   "nowPlaying": {
     "label": "Speelt nu",

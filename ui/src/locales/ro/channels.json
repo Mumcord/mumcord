@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Canale",
-    "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge · Tasta meniu: opțiunile canalului",
+    "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge · Tasta meniu: opțiunile canalului · Ctrl+clic sau Ctrl+spațiu: alege persoane",
     "join": "Intră",
     "you": "(tu)",
     "youAreHere": "ești aici",
@@ -105,5 +105,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Mută persoane",
+    "channel": "Canal",
+    "search": "Caută canale",
+    "noMatch": "Niciun canal nu se potrivește.",
+    "hint": "Alege canalul în care trebuie să ajungă persoanele.",
+    "from": "Din {{channel}}",
+    "question": "Muți {{people}} din {{from}} în {{to}}?",
+    "questionNoSource": "Muți {{people}} în {{to}}?",
+    "confirm": "Mută",
+    "failed": "Unele persoane nu au putut fi mutate.",
+    "resultTitle": "Se mută persoane",
+    "resultAll": "{{people}} mutate în {{channel}}.",
+    "resultSome": "{{moved}} din {{people}} mutate în {{channel}}. Restul au fost refuzate.",
+    "busy": "Se mută deja persoane…"
   }
 }

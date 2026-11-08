@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Channels",
-    "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse · Menu key: channel options",
+    "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse · Menu key: channel options · Ctrl-click or Ctrl+Space: pick people",
     "join": "Join",
     "you": "(you)",
     "youAreHere": "you are here",
@@ -100,5 +100,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Move people",
+    "channel": "Channel",
+    "search": "Search channels",
+    "noMatch": "No channel matches.",
+    "hint": "Pick the channel the people should move to.",
+    "from": "From {{channel}}",
+    "question": "Move {{people}} from {{from}} to {{to}}?",
+    "questionNoSource": "Move {{people}} to {{to}}?",
+    "confirm": "Move",
+    "failed": "Some people could not be moved.",
+    "resultTitle": "Moving people",
+    "resultAll": "Moved {{people}} to {{channel}}.",
+    "resultSome": "Moved {{moved}} of {{people}} to {{channel}}. The rest were refused.",
+    "busy": "Already moving people…"
   }
 }

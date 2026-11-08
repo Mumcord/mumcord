@@ -7,6 +7,10 @@
  * Epic 4, issue #253 adds the "Admin ▸" sub-menu after the normal items (FR-10.6, FR-10.7): Kick…
  * and Ban…, in red, only with the right the server grants on the root channel (FR-10.1, FR-10.2),
  * and never for yourself. The other admin items come with their own issues.
+ *
+ * Epic 4, issue #255 adds the two move items: "Move to my channel" (only while the person sits
+ * elsewhere) and "Move to…", which opens the channel picker. Both need the move right in the
+ * person's channel, and "Move to…" takes the people picked in the tree along.
  */
 import {
   useEffect,
@@ -40,6 +44,8 @@ import { joinTarget } from "./joinTarget";
 import { findPerson } from "./personLookup";
 import { VolumeSlider } from "./ProfileCard";
 import { openPrivateConversation } from "./privateMessage";
+import { openMovePeople } from "../channels/movePeople";
+import { peopleToMove, sharedChannelOf } from "../channels/peopleSelection";
 import {
   closePersonMenu,
   currentPersonMenu,
@@ -59,6 +65,12 @@ const ITEMS = '[role="menuitem"], [role="menuitemcheckbox"], input[type="range"]
 
 /** Shield for the admin sub-menu; the meaning also sits in its label (FR-2.16). */
 const ADMIN_ICON = "M12 3l8 3v6c0 4.5-3.5 8-8 9-4.5-1-8-4.5-8-9V6z";
+/**
+ * Moving people (issue #255): an arrow down onto a line for "to my channel", an arrow into a bar
+ * for "to another channel".
+ */
+const MOVE_TO_ME_ICON = "M12 3v12M8 11l4 4 4-4M4 21h16";
+const MOVE_TO_ICON = "M3 12h11M10 8l4 4-4 4M19 4v16";
 /** Leaving the server: a door with an arrow out, so a kick does not rest on its red colour alone. */
 const KICK_ICON = "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9";
 /** Moderation icons (issue #257, mockup "admin-menus"): crossed mic, crossed headphones, a star. */
@@ -201,6 +213,48 @@ function PersonMenu({
   const ownChannel =
     state.selfSession === null ? undefined : state.users.get(state.selfSession)?.channelId;
   const inOwnChannel = user && !isSelf && ownChannel !== undefined && user.channelId === ownChannel;
+  // Moving needs the move right where the person is; the server checks the target as well (#255).
+  const movable =
+    user !== undefined &&
+    !isSelf &&
+    state.channels.get(user.channelId)?.permissions.moveUsers === true;
+  const elsewhere = movable && ownChannel !== undefined && user.channelId !== ownChannel;
+  const moveToMyChannel = () => {
+    if (!user || state.serverId === null || ownChannel === undefined) return;
+    closePersonMenu();
+    // A full or forbidden target is refused by the server, which says so once in a notice.
+    getApi()
+      .personMove(state.serverId, user.session, ownChannel)
+      .catch((cause: unknown) => {
+        console.error("Moving a person to the own channel failed", toEngineError(cause).code);
+      });
+  };
+  const openMovePicker = () => {
+    if (!user) return;
+    const sessions = peopleToMove(user.session);
+    // Focus first: the dialog puts it back here when it closes.
+    open.opener?.focus();
+    closePersonMenu();
+    openMovePeople({ sessions, fromChannelId: sharedChannelOf(state.users, sessions) });
+  };
+
+  // The move items come first in Admin ▸ (FR-10.7, issue #255): moving needs the move right where
+  // the person is, and "Move to my channel" only makes sense while they sit elsewhere.
+  const moveItems: MenuItem[] =
+    user !== undefined && !isSelf && movable
+      ? [
+          ...(elsewhere
+            ? [
+                {
+                  label: t("menu.moveToMe"),
+                  icon: MOVE_TO_ME_ICON,
+                  onSelect: moveToMyChannel,
+                },
+              ]
+            : []),
+          { label: t("menu.moveTo"), icon: MOVE_TO_ICON, onSelect: openMovePicker },
+        ]
+      : [];
 
   // Kick… and Ban… only with the right the server granted on the root channel (FR-10.1, FR-10.2),
   // never for yourself (issue #253), and never as a disabled item (FR-10.2).
@@ -300,6 +354,7 @@ function PersonMenu({
   const removal: MenuItem[] =
     user && !isSelf
       ? [
+          ...moveItems,
           ...(canKick(serverId)
             ? [
                 {

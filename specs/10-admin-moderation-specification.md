@@ -1,7 +1,8 @@
 # Epic 4 – Admin & moderation · Specification
 
-> Status: Final (brainstorming completed, round 5 skipped at the user's request) · As of: 2026-11-03
-> Sources: `specs/roadmap.md` (Epic 4 "Admin features"), `specs/10-admin-moderation-brainstorming.md` (rounds 1–4; the answers given in chat are final), issues #247 (overview), #248–#258, #378 with its mockups on branch `mockups/admin-commands` (`docs/mockups/epic-4-commands/`), #300 (ACL query replies)
+> Status: Final (brainstorming completed, round 5 skipped at the user's request) · As of: 2026-11-08
+> Sources: `specs/roadmap.md` (Epic 4 "Admin features"), `specs/10-admin-moderation-brainstorming.md` (rounds 1–4 and Addendum A; the answers given in chat are final), issues #247 (overview), #248–#258, #378 with its mockups on branch `mockups/admin-commands` (`docs/mockups/epic-4-commands/`), #300 (ACL query replies)
+> Changed on 2026-11-08: Addendum A (moving people, #255) answered; FR-10.17, FR-10.18, FR-10.62, FR-10.69 and A7 adjusted, FR-10.70/FR-10.71 and AC-10.45/AC-10.46 added.
 > Builds on: `specs/01-foundation-specification.md` (stack, platforms, design system, 24 locales, accessibility, FR-1.12 old servers, FR-1.40 diagnostics), `specs/02-multi-server-themes-specification.md` (several servers at once, server colors/icons, FR-2.78 channel passwords), `specs/03-comfort-polish-specification.md` (redesigned tree and right-click menus #172, local blocking #140, server info #147), `specs/06-plugin-system-specification.md` (FR-6.43 plugin slash commands), `specs/09-plugin-platform-1-1-specification.md` (mumbot test tooling). All decisions there stay valid unless this spec names a change.
 > Numbering: the file number is 10 because `04` is taken by the mumpeer relay spec; requirement IDs use the epic number 10 (`FR-10.x`, `AC-10.x`) to stay unique across specs.
 
@@ -23,7 +24,8 @@ Today admins and moderators still need the official Mumble client to kick, ban, 
 - **Admin ▸ sub-menu** in the person, channel and server ⋯ menus (#249, updated to the sub-menu decision), plus F2 / Delete on a selected channel.
 - Works on **every connected server** (Spec 02), strictly per server.
 - All new texts in the 24 locales; keyboard and screen-reader support; light and dark theme.
-- **Spikes:** S1 ban variants (certificate-only / IP-only), S2 flood-limit pacing for mass moves.
+- **Spikes:** S1 ban variants (certificate-only / IP-only). S2 (mass-move pacing) was dropped with Q5.4:
+  the client pacer already covers every `UserState` (FR-10.18).
 
 ### 2.2 Out of scope / later
 
@@ -91,8 +93,8 @@ The server enforces every right; Mumcord asks the server for the user's own righ
 - **FR-10.14** The two ban ticks follow the result of spike S1 (section 4.11): a variant that does not work on a standard server is fixed on, greyed, with a one-line reason. At least one tick must stay on; "Ban" is disabled while both are off.
 - **FR-10.15** **Server mute / Server deafen / Un-suppress / Priority speaker** act immediately and toggle (Q1.12). Server deafen implies server mute (as in Mumble). Success is visible in the tree icons; no extra line (Q2.14).
 - **FR-10.16** **Move to my channel** acts immediately; **Move to…** opens the channel picker (FR-10.62) and acts on selection (Q1.1).
-- **FR-10.17** **Move everyone to…** (channel menu) and `/moveall` confirm with the count ("Move 6 people from General to AFK?"), then send one move per person at a paced rate (FR-10.18) and report "Moved 28 of 30 people; 2 were refused" as a private result line (Q4.10). The admin is moved too if they are in that channel.
-- **FR-10.18** **Pacing**: mass moves stay under the standard server's default flood limit (initial value: a burst of 5, then 1 per second; final values from spike S2). After the last move Mumcord compares who actually arrived (with a 5-second grace period) and reports the count. Starting another mass move on the same server while one runs is ignored with the private line "Already moving people…".
+- **FR-10.17** **Move everyone to…** (channel menu's Admin ▸) and `/moveall` confirm with the count ("Move 6 people from General to AFK?"), then send one move per person at a paced rate (FR-10.18) and report **one result for the whole group** (Q4.10, Q5.3): "Moved 30 people to AFK." or "Moved 28 of 30 people to AFK. The rest were refused." Until the result line of #378 exists, the result appears as the same kind of notice the chat uses for server refusals (section 13, A8). **The own user stays in their channel** (Q5.2): joining is how one moves oneself, and an admin move could put the admin into a channel they may not enter.
+- **FR-10.18** **Pacing and counting** (Q5.4): every move is a `UserState`, and the client paces those for the whole app already (a burst of 4, then one per 1.2 s, slower than the server's default flood limit), so a mass move needs no pacing of its own and spike S2 is dropped (FR-10.69). After the last message Mumcord waits 5 seconds and then counts from the server's own user state who really sits in the target channel; that count is the result of FR-10.17. Starting another mass move on the same server while one is still counting is ignored with the line "Already moving people…".
 - **FR-10.19** **Reset comment / Reset avatar** confirm first ("Reset Mallory's comment? They can set a new one.") and then clear it on the server.
 - **FR-10.20** **Register on server** registers an online guest under their current name, immediately (no confirmation). Only offered while the guest is online.
 
@@ -174,7 +176,7 @@ The server enforces every right; Mumcord asks the server for the user's own righ
 - **FR-10.59** Results and refusals (Q2.14, Q4.1, Q1.16): slash commands → private result line. Menu and dialog actions → success is visible in the tree, no extra line; a refusal appears inside the open dialog, or, with no dialog open, as a private line in that server's chat ("The server refused: you can't mute people in Raid · Only you see this line"). After any refusal Mumcord asks for the user's rights again.
 - **FR-10.60** The server's refusal reasons are mapped to plain translated sentences (at least: permission denied with the permission's plain name and channel, channel full, invalid or taken channel name, invalid or taken user name, temporary channel rules, nesting/channel count limit, missing certificate, text too long). Unknown reasons show the server's own text, sanitized.
 - **FR-10.61** Private result lines and refusals are never sent to the server; they live only in this session's chat view (no history entry).
-- **FR-10.62** **Channel pickers** (Move to…, Parent, Links, `/move` target) show the tree shape with a search field on top; channels the action is not allowed for are greyed with a reason (Q4.11).
+- **FR-10.62** **Channel pickers** (Parent, Links, `/move` target) show the tree shape with a search field on top; channels the action is not allowed for are greyed with a reason (Q4.11). The move picker (FR-10.16, FR-10.17) is the exception (Q5.6): a flat, searchable list whose entries name the channel's user limit ("Squad A (2/5)", "Music Room (6/6)"), because that limit decides where people can go; a channel everyone already sits in is not offered.
 
 ### 4.11 Data handling, safety and spikes
 
@@ -184,7 +186,12 @@ The server enforces every right; Mumcord asks the server for the user's own righ
 - **FR-10.66** **Safe ban-list save** (Q4.3): right before every save Mumcord re-reads the ban list, applies only the user's own change (added, edited or removed entry) to the fresh copy and sends the full list back. If the very entry being edited or removed was changed or removed meanwhile, it asks "Reload" / "Save mine anyway" / "Back".
 - **FR-10.67** All text from the server (names, reasons, descriptions, welcome text, group names) is treated as untrusted and sanitized before rendering (CLAUDE.md).
 - **FR-10.68** **Spike S1 – ban variants (Q4.4)**, first task of the build, against the local test server: does a ban-list entry with a certificate hash and an IP range that matches nobody ban only the certificate? Does an entry without a certificate hash ban only the IP? Is a `/32` (IPv4) / `/128` (IPv6) mask honoured? Does the quick ban's default length match the server setting? The result is recorded in this spec (section 13) and decides FR-10.14.
-- **FR-10.69** **Spike S2 – flood-limit pacing**: measure on the local test server (default settings) how fast moves of other people can be sent without drops, and set the FR-10.18 pacing values from it.
+- **FR-10.69** **Spike S2 – flood-limit pacing**: *dropped with Q5.4.* The client already paces every `UserState` (FR-10.18), so there is nothing to measure and no separate value to set.
+
+### 4.12 Moving several people at once (#255)
+
+- **FR-10.70** **Picking people in the tree** (Q5.5): Ctrl-click (Cmd-click on macOS) adds a person to the selection or takes them out again, Shift-click picks everyone between the last picked person and this one in row order, Ctrl+Space and Shift+Space do the same from the keyboard, and a plain click on a row or a channel clears the selection. Picked rows are ringed and carry `aria-selected`. Dragging one picked person moves all of them; Admin ▸ "Move to…" on a picked person moves the whole group. Without the Move right the rows cannot be picked or dragged. The selection belongs to the shown server and is dropped when one of the people leaves, when a channel's chat is picked, or when another server is shown.
+- **FR-10.71** A group moved by drag or by "Move to…" reports its result like FR-10.17; a single person gets no extra line, because the tree already shows where they are (FR-10.59).
 
 ## 5. UI & UX
 
@@ -505,9 +512,9 @@ Test setup for all: local mumble-server with the fixtures of section 10; Mumcord
 - **AC-10.8** Spike S1 result applied: certificate-only and IP-only bans behave as recorded in section 13 (Mallory reconnecting from the same IP with a new certificate, and with the same certificate, gives the recorded result); a variant that does not work shows its tick fixed on with a reason.
 - **AC-10.9** Quick-ban fallback: with the ban list answer suppressed in a test hook → ban dialog shows "This server only allows its default ban length", duration "Server default", ticks fixed → Ban → Mallory is banned with the server default.
 - **AC-10.10** As `admin`, toggle Server mute, Server deafen and Priority speaker on Freya → the tree icons change at once, the bot sees the state; toggling again reverts. `/mute Freya` → private result line "You muted Freya on the server · Only you see this line"; the bot receives no chat message.
-- **AC-10.11** As `admin`, Move to my channel and Move to… (channel picker with search) on Freya → Freya moves; `/move Freya AFK` → Freya is in AFK with a private result line.
-- **AC-10.12** With 30 bots in General, as `admin` `/moveall AFK` → confirmation "Move 30 people from General to AFK?" → Move → all 30 arrive (none dropped by the server's flood limit) and the result line reports "Moved 30 of 30 people"; running `/moveall` again while it runs → "Already moving people…".
-- **AC-10.13** Mass move with refusals: Officers denies Join for `out` and the admin lacks Move there → "Move everyone to… Officers" → result line "Moved 0 of N people; N were refused".
+- **AC-10.11** As `admin`, Admin ▸ Move to my channel and Admin ▸ Move to… (searchable channel list with user limits) on Freya → Freya moves; `/move Freya AFK` → Freya is in AFK with a private result line.
+- **AC-10.12** With 30 bots in General, as `admin` `/moveall AFK` → confirmation "Move 30 people from General to AFK?" → Move → all 30 arrive (none dropped by the server's flood limit) and one result reports "Moved 30 of 30 people"; running `/moveall` again while it runs → "Already moving people…".
+- **AC-10.13** Mass move with refusals: Officers denies Join for `out` and the admin lacks Move there → Admin ▸ "Move everyone to…" Officers → result "Moved 0 of N people to Officers. The rest were refused." The own user is still in the source channel (Q5.2).
 - **AC-10.14** As `admin`, Reset comment on a bot with a comment → confirmation → the comment is gone in the bot's state; Reset avatar likewise.
 - **AC-10.15** As `admin`, Register on server on guest Mallory → Mallory becomes registered (appears in Registered users); `/register` on an already registered person is not offered by autocomplete.
 - **AC-10.16** `/kick Malory` → hint as mockup 04b with "Did you mean Mallory?"; `/mute mar` with Marlo and Marta online → picker as mockup 04c.
@@ -547,6 +554,11 @@ Test setup for all: local mumble-server with the fixtures of section 10; Mumcord
 - **AC-10.42** Logs and a saved diagnostic file after running AC-10.6–AC-10.37 contain no names, IPs, fingerprints, reasons, channel names, descriptions, passwords or rule contents (automated check); the app data folder contains no ban list, user list or ACL data.
 - **AC-10.43** Keyboard only: open Admin ▸ via Shift+F10 on a person and a channel, run kick and ban dialogs, move through the grid with arrows and open Why? with Enter; focus returns to the person/channel; the screen reader reads cells in full and announces result lines; automated a11y checks pass in light and dark theme.
 - **AC-10.44** In German and one RTL locale all new texts are translated, plurals are correct ("1 Person" / "5 Personen"), Mumble permission names appear in English in tooltips, command names stay English.
+
+### Moving people (Addendum A, #255)
+
+- **AC-10.45** As `admin` with three bots in General: Ctrl-click two of them (both rows ringed) and drag one onto AFK → both arrive, one result says "Moved 2 people to AFK.", and the third bot stays. Shift-click over three rows picks all three; Ctrl+Space and Shift+Space do the same without a mouse. As `user` the rows can be neither picked nor dragged.
+- **AC-10.46** As `admin` standing in General, Admin ▸ "Move everyone to…" AFK with two bots in General → the picker asks "Move 2 people from General to AFK?" → Move → both bots arrive, the admin stays in General, and one result says "Moved 2 people to AFK." A second mass move started while the first is counting says "Already moving people…".
 
 ## 12. Decision log
 
@@ -617,12 +629,20 @@ Test setup for all: local mumble-server with the fixtures of section 10; Mumcord
 | Q4.14 | 24 locales; Mumble permission and command names stay English | |
 | Round 5 | Skipped by the user | Assumptions in section 13 |
 
+| Q5.1 | Move items stay in Admin ▸ (person and channel menus) | FR-10.7, FR-10.8, section 5.3 |
+| Q5.2 | "Move everyone to…" leaves the own user where they are | FR-10.17, overrides A7 |
+| Q5.3 | One result for the whole group instead of one notice per person | FR-10.17; surface see A8 |
+| Q5.4 | Use the client's existing pacer, drop spike S2 | FR-10.18, FR-10.69 |
+| Q5.5 | Picking several people in the tree stays in the MVP | FR-10.70, FR-10.71 |
+| Q5.6 | The move picker is a flat list with user limits, not the tree | FR-10.62 |
+
 ## 13. Open points & risks
 
 **Spike results** (mumble-server 1.5.735, default settings, local testenv; `crates/protocol/tests/live_ban_list.rs`)
 - S1 ban variants: a `BanList` message without `query` **replaces** the list, so an empty one clears it. The server stores and answers the subnet length as the client sends it, and the start time as extended ISO (`2026-11-03T20:00:00Z`). **Decision for FR-10.14:** the certificate part of an entry is only compared for a **registered** user; for a guest the server matches the address, and an entry with an empty hash matches any client whose stored certificate it does not know — so Mumcord always sends an address with the entry and keeps "Ban by IP address" fixed on, while "Ban by certificate" only works for registered people. The quick ban (a `UserRemove` with `ban`) uses the server's default length, which for murmur is the whole entry as it builds it (no client-side duration).
 - S1 mask length (measured again for #253): the server counts the subnet length on the **16-byte wire address**, so an entry stored as 32 for an IPv4-mapped address covers only its first four bytes and matches every IPv4 client. Mumcord therefore writes a single IPv4 as 128 while the UI shows it as /32 (`crates/protocol/tests/live_ban_list.rs`); a `/128` IPv6 entry is written as it is shown. On this server a "certificate only" entry reaches nobody, which confirms the decision above: the IP address stays fixed on in the dialog (FR-10.14).
-- S2 flood-limit pacing: _pending_
+- S2 flood-limit pacing: **dropped** (Q5.4). The client pacer in `crates/protocol/src/ratelimit.rs` already sends every
+  `UserState` as 4 at once and then one per 1.2 s, deliberately below the server's default limit.
 
 **Assumptions made because round 5 was skipped** (confirm or correct during review of the PR)
 - A1: `/ban` without a duration opens with "Permanent" selected; duration tokens are `<n>h`, `<n>d`, `perm` (mockup shows `7d`).
@@ -631,13 +651,18 @@ Test setup for all: local mumble-server with the fixtures of section 10; Mumcord
 - A4: The description editor (bold, italic, links, clean HTML) from the Q2.9 recommendation is kept inside the General tab, although the layout part of Q2.9 was overridden by tabs.
 - A5: Server deafen implies server mute and Un-suppress appears only for suppressed people (standard Mumble behaviour).
 - A6: Renaming a registered user needs no confirmation (it was not in the Q1.12 list).
-- A7: The admin who starts "Move everyone to…" from their own channel is moved too.
+- A7: ~~The admin who starts "Move everyone to…" from their own channel is moved too.~~ Overridden by Q5.2: the own
+  user stays where they are.
+- A8: The result of a mass move (FR-10.17) is shown as a notice, like a server refusal, until #378 brings the chat's
+  result line (mockup `05-result-line`); the wording is already the final one.
 
 **Risks**
 - The "Why?" engine can diverge from the server in rare rule combinations; mitigated by the conformance test (AC-10.29) and the "server has the final say" line.
 - Full-list replacement for ACLs and bans can still lose concurrent edits in the small window between re-read and save.
 - Servers that fill groups from external login systems make many cells "Depends".
 - Old (pre-1.4) servers are not covered by automated tests.
+- Mass moves rely on the client pacer, which is tuned to the **default** server flood limit. A server configured stricter
+  than 5 messages per second can still drop moves; the result then honestly reports who arrived.
 
 ## 14. Impact on the roadmap
 
@@ -645,7 +670,8 @@ Test setup for all: local mumble-server with the fixtures of section 10; Mumcord
 - **#259 (local admin log)** is closed as "not planned" (Q2.3); it is no longer part of Epic 4.
 - **#140 "report a person"** (handed over by Spec 03) is not part of Epic 4 and has no planned home; revisit with community features if wanted.
 - **#249** must be updated from a flat "Admin" group to the "Admin ▸" sub-menu (Q3.1).
-- **#378**: mockup `04a-error-no-permission` is dropped; the command list grows by four commands.
+- **#378**: mockup `04a-error-no-permission` is dropped; the command list grows by four commands. Its result line
+  (mockup `05-result-line`) also takes over the mass-move result of FR-10.17 from the notice used until then (A8).
 - **#250 / #252** merge into one Channel window (Q3.3) instead of a separate ACL editor window.
 - The E2E harness gains a SuperUser-driven ACL fixture setup and an admin bot; later epics that touch permissions can reuse it.
 - No server-side work is introduced; nothing changes for later epics' compatibility rules.

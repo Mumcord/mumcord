@@ -160,6 +160,7 @@
     "menuEdit": "Csatorna szerkesztése",
     "menuLink": "Összekapcsolás a csatornámmal",
     "menuUnlinkAll": "Összes kapcsolat bontása",
+    "menuMoveEveryone": "Mindenki áthelyezése",
     "menuDelete": "Csatorna törlése",
     "createTitle": "Alcsatorna létrehozása",
     "createTempTitle": "Ideiglenes csatorna létrehozása",

@@ -1,7 +1,7 @@
 /** Channel column content: the channel tree of the connected server, or an empty state. */
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, toEngineError } from "../../api";
+import { toEngineError } from "../../api";
 import { pinPerson } from "../members/personClick";
 import { useServers as useSavedServers } from "../servers";
 import { displayName } from "../servers/format";
@@ -19,6 +19,13 @@ import {
 import { JumpToChannelButton } from "./JumpToChannelButton";
 import { isHiddenBot } from "./mumcord";
 import { ServerSectionHeader } from "./ServerSectionHeader";
+import {
+  massMoveRunning,
+  movePeopleToChannel,
+  showMoveAlreadyRunning,
+  showMoveResult,
+} from "./movePeople";
+import { clearPeopleSelection } from "./peopleSelection";
 import { useSelectedConversation } from "./selection";
 import { selfUser, useServerState } from "./serverStore";
 import { BIG_SERVER_CHANNELS } from "./tree";
@@ -106,17 +113,24 @@ export function ChannelsPanel({
   );
 
   const serverId = state.serverId;
-  const movePerson = useCallback(
-    (session: number, channelId: number) => {
-      if (serverId === null) return;
+  // Dragged people (issues #172, #255): one message per person, sent at the pace the protocol
+  // layer sets, and one result for the whole group afterwards (FR-10.17, FR-10.18).
+  const movePeople = useCallback(
+    (sessions: readonly number[], channelId: number) => {
+      if (serverId === null || sessions.length === 0) return;
       setJoinError(null);
-      getApi()
-        .personMove(serverId, session, channelId)
-        .catch((cause: unknown) => {
-          const { code } = toEngineError(cause);
-          console.error("Moving a person failed", code);
-          setJoinError(t("errors.moveFailed"));
-        });
+      if (massMoveRunning(serverId)) {
+        showMoveAlreadyRunning(t, serverId, channelId);
+        return;
+      }
+      void movePeopleToChannel(serverId, sessions, channelId).then((result) => {
+        if (result.rejected > 0) {
+          setJoinError(sessions.length === 1 ? t("errors.moveFailed") : t("moveTo.failed"));
+          return;
+        }
+        clearPeopleSelection();
+        showMoveResult(t, serverId, channelId, result);
+      });
     },
     [serverId, t],
   );
@@ -210,7 +224,7 @@ export function ChannelsPanel({
             channelBadge={channelBadge}
             channelAction={channelAction}
             channelMenu={channelMenu}
-            onMovePerson={movePerson}
+            onMovePeople={movePeople}
             filter={filter}
           />
         </BigServerGate>

@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanały",
-    "hint": "Enter: pokaż czat · Shift+Enter lub dwuklik: dołącz · Strzałki: przesuwanie, rozwijanie, zwijanie · Klawisz menu: opcje kanału",
+    "hint": "Enter: pokaż czat · Shift+Enter lub dwuklik: dołącz · Strzałki: przesuwanie, rozwijanie, zwijanie · Klawisz menu: opcje kanału · Ctrl+klik lub Ctrl+spacja: wybierz osoby",
     "join": "Dołącz",
     "you": "(Ty)",
     "youAreHere": "jesteś tutaj",
@@ -110,5 +110,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Przenieś osoby",
+    "channel": "Kanał",
+    "search": "Szukaj kanałów",
+    "noMatch": "Żaden kanał nie pasuje.",
+    "hint": "Wybierz kanał, do którego mają trafić osoby.",
+    "from": "Z {{channel}}",
+    "question": "Przenieść {{people}} z {{from}} do {{to}}?",
+    "questionNoSource": "Przenieść {{people}} do {{to}}?",
+    "confirm": "Przenieś",
+    "failed": "Nie udało się przenieść niektórych osób.",
+    "resultTitle": "Przenoszenie osób",
+    "resultAll": "Przeniesiono {{people}} do {{channel}}.",
+    "resultSome": "Przeniesiono {{moved}} z {{people}} do {{channel}}. Resztę odrzucono.",
+    "busy": "Osoby są już przenoszone…"
   }
 }

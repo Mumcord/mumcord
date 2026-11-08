@@ -23,6 +23,12 @@ import { announce } from "../../a11y/announcer";
 import { useHintPreferences } from "../../a11y/hintPreferences";
 import { useListPreferences } from "../../app/preferences";
 import { useAvatars } from "../members/useAvatars";
+import {
+  clearPeopleSelection,
+  prunePeopleSelection,
+  selectPeopleRange,
+  togglePerson,
+} from "./peopleSelection";
 import { rememberCollapsed, rememberedCollapsed } from "./collapseMemory";
 import { useDrawSteps } from "./drawSteps";
 import { buildSearchIndex, foldQuery, searchTree, type SearchResult } from "./search";
@@ -44,6 +50,7 @@ import {
   onScreenTracker,
   TreeContext,
   valueStore,
+  type PersonSelectMode,
   type TreeActions,
   type TreeContextValue,
   type TreeUi,
@@ -79,8 +86,8 @@ export interface ChannelTreeProps {
    * Without it, right-click shows the browser's own menu.
    */
   channelMenu?: ((menu: ChannelMenuRequest) => ReactNode) | undefined;
-  /** Moves a person dragged onto a channel (issue #172). */
-  onMovePerson?: ((session: number, channelId: number) => void) | undefined;
+  /** Moves the people dragged onto a channel (issues #172, #255). */
+  onMovePeople?: ((sessions: readonly number[], channelId: number) => void) | undefined;
   ref?: Ref<ChannelTreeHandle> | undefined;
 }
 
@@ -159,7 +166,7 @@ export function ChannelTree({
   channelAction,
   filter = "",
   channelMenu,
-  onMovePerson,
+  onMovePeople,
   ref,
 }: ChannelTreeProps) {
   const { t } = useTranslation("channels");
@@ -350,6 +357,15 @@ export function ChannelTree({
     },
   }));
 
+  // The picked people belong to the server that is shown: switching servers or people leaving
+  // clears them (issue #255).
+  useEffect(() => {
+    clearPeopleSelection();
+  }, [state.serverId]);
+  useEffect(() => {
+    prunePeopleSelection(new Set(state.users.keys()));
+  }, [state.users]);
+
   // Focus, scroll to and highlight the row once the expanded path is on screen. A frame later:
   // rows pick up the new expand state in a render of their own, after this effect.
   useEffect(() => {
@@ -374,6 +390,26 @@ export function ChannelTree({
     shortcut?: "edit" | "delete",
   ) => {
     if (channelMenu) setMenu({ channelId, ...position, ...(shortcut ? { shortcut } : {}) });
+  };
+
+  /** The people rows in the order the tree shows them, for Shift-click ranges (issue #255). */
+  const personOrder = rows.flatMap((row) =>
+    row.kind === "member" && row.session !== null ? [row.session] : [],
+  );
+
+  const rowElement = (rowId: string) =>
+    treeRef.current?.querySelector<HTMLElement>(`[data-row="${rowId}"]`) ?? undefined;
+
+  /** Opens a channel's chat; picking a channel ends the person selection (issue #255). */
+  const selectChannel = (channelId: number) => {
+    clearPeopleSelection();
+    onSelect(channelId);
+  };
+
+  const selectPerson = (session: number, mode: PersonSelectMode) => {
+    if (mode === "toggle") togglePerson(session);
+    else if (mode === "range") selectPeopleRange(personOrder, session);
+    else clearPeopleSelection();
   };
 
   const toggleShowAll = (channelId: number) => {
@@ -436,13 +472,25 @@ export function ChannelTree({
         else focusRow(row.parentId ?? undefined);
         break;
       case "Enter":
+        if (row.kind === "channel") {
+          if (event.shiftKey) onJoin(row.channelId);
+          else selectChannel(row.channelId);
+        } else if (row.session !== null) {
+          onOpenPerson(row.session, rowElement(row.id) ?? null);
+        }
+        break;
       case " ":
         if (row.kind === "channel") {
-          if (event.key === "Enter" && event.shiftKey) onJoin(row.channelId);
-          else onSelect(row.channelId);
+          selectChannel(row.channelId);
         } else if (row.session !== null) {
-          const opener = treeRef.current?.querySelector<HTMLElement>(`[data-row="${row.id}"]`);
-          onOpenPerson(row.session, opener ?? null);
+          // Ctrl/Cmd+Space picks a person, Shift+Space extends the range (issue #255); plain Space
+          // stays the keyboard's click.
+          if (event.ctrlKey || event.metaKey) selectPerson(row.session, "toggle");
+          else if (event.shiftKey) selectPerson(row.session, "range");
+          else {
+            selectPerson(row.session, "clear");
+            onOpenPerson(row.session, rowElement(row.id) ?? null);
+          }
         }
         break;
       default:
@@ -460,7 +508,7 @@ export function ChannelTree({
     focus: setFocusedId,
     setExpanded,
     toggleShowAll,
-    select: onSelect,
+    select: selectChannel,
     join: onJoin,
     joinOnce: (channelId, now) => {
       if (lastJoin.current.id === channelId && now - lastJoin.current.at < 600) return;
@@ -469,7 +517,8 @@ export function ChannelTree({
     },
     openPerson: onOpenPerson,
     openMenu,
-    movePerson: (session, channelId) => onMovePerson?.(session, channelId),
+    movePeople: (sessions, channelId) => onMovePeople?.(sessions, channelId),
+    selectPerson,
     channelBadge,
     channelAction,
   };

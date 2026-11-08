@@ -61,7 +61,9 @@
     "mute": "Stäng av för mig",
     "connectionInfo": "Anslutningsinfo",
     "chatRequestPending": "Chattförfrågan väntar",
-    "revokeConsent": "Återkalla chattsamtycke"
+    "revokeConsent": "Återkalla chattsamtycke",
+    "moveToMe": "Flytta till min kanal",
+    "moveTo": "Flytta till"
   },
   "nowPlaying": {
     "label": "Spelas nu",

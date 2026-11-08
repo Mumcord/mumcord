@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanalen",
-    "hint": "Enter: chat tonen · Shift+Enter of dubbelklik: deelnemen · Pijltjestoetsen: bewegen, uitklappen, inklappen · Menutoets: kanaalopties",
+    "hint": "Enter: chat tonen · Shift+Enter of dubbelklik: deelnemen · Pijltjestoetsen: bewegen, uitklappen, inklappen · Menutoets: kanaalopties · Ctrl-klik of Ctrl+spatie: mensen kiezen",
     "join": "Deelnemen",
     "you": "(jij)",
     "youAreHere": "je bent hier",
@@ -100,5 +100,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Mensen verplaatsen",
+    "channel": "Kanaal",
+    "search": "Kanalen zoeken",
+    "noMatch": "Geen kanaal gevonden.",
+    "hint": "Kies het kanaal waar de mensen heen moeten.",
+    "from": "Uit {{channel}}",
+    "question": "{{people}} van {{from}} naar {{to}} verplaatsen?",
+    "questionNoSource": "{{people}} naar {{to}} verplaatsen?",
+    "confirm": "Verplaatsen",
+    "failed": "Sommige mensen konden niet worden verplaatst.",
+    "resultTitle": "Mensen worden verplaatst",
+    "resultAll": "{{people}} naar {{channel}} verplaatst.",
+    "resultSome": "{{moved}} van {{people}} naar {{channel}} verplaatst. De rest is geweigerd.",
+    "busy": "Er worden al mensen verplaatst…"
   }
 }

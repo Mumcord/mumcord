@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanäle",
-    "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen · Menütaste: Kanaloptionen",
+    "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen · Menütaste: Kanaloptionen · Strg-Klick oder Strg+Leertaste: Personen auswählen",
     "join": "Beitreten",
     "you": "(du)",
     "youAreHere": "du bist hier",
@@ -100,5 +100,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Personen verschieben",
+    "channel": "Kanal",
+    "search": "Kanäle durchsuchen",
+    "noMatch": "Kein Kanal passt.",
+    "hint": "Wähle den Kanal, in den die Personen sollen.",
+    "from": "Aus {{channel}}",
+    "question": "{{people}} von {{from}} nach {{to}} verschieben?",
+    "questionNoSource": "{{people}} nach {{to}} verschieben?",
+    "confirm": "Verschieben",
+    "failed": "Einige Personen konnten nicht verschoben werden.",
+    "resultTitle": "Personen werden verschoben",
+    "resultAll": "{{people}} nach {{channel}} verschoben.",
+    "resultSome": "{{moved}} von {{people}} nach {{channel}} verschoben. Der Rest wurde abgelehnt.",
+    "busy": "Es werden bereits Personen verschoben…"
   }
 }

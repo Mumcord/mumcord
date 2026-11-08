@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { LiveRegions } from "../a11y";
 import { TooltipLayer } from "../components/Tooltip";
 import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
+import { MovePeopleDialogHost } from "../features/channels/MovePeopleDialog";
 import { NotificationsHost } from "../features/notifications";
 import { ChatRequestDialogHost, RevokeConsentDialogHost } from "../features/requests";
 import { BlockDialogHost } from "../features/blocking";
@@ -104,6 +105,7 @@ function MainScreen() {
       )}
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
+      {overlay === null && <MovePeopleDialogHost />}
       {overlay === null && <ChatRequestDialogHost />}
       {overlay === null && <RevokeConsentDialogHost />}
       {overlay === null && <BlockDialogHost />}

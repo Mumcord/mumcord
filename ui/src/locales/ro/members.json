@@ -62,7 +62,9 @@
     "mute": "Fără sunet pentru mine",
     "connectionInfo": "Informații conexiune",
     "chatRequestPending": "Cerere de chat în așteptare",
-    "revokeConsent": "Retrage acordul pentru chat"
+    "revokeConsent": "Retrage acordul pentru chat",
+    "moveToMe": "Mută în canalul meu",
+    "moveTo": "Mută în"
   },
   "nowPlaying": {
     "label": "Ascultă acum",

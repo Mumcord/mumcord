@@ -30,6 +30,13 @@ import { WhisperBadge } from "../whisper/WhisperBadge";
 import type { ServerState } from "./serverStore";
 import { useStatusText } from "./statusText";
 import { cachedSelector, sameValue } from "./cachedSelector";
+import {
+  dragPayload,
+  parseDragPayload,
+  peopleToMove,
+  PERSON_DRAG_TYPE,
+  usePersonSelected,
+} from "./peopleSelection";
 import { foldName, matchRange } from "./search";
 import { TreeContext, type TreeContextValue, type ValueStore } from "./treeContext";
 import { MumcordBadge } from "./MumcordBadge";
@@ -86,9 +93,6 @@ function Highlighted({ text, query }: { text: string; query: string }) {
     </>
   );
 }
-
-/** Drag data type of a person row (issue #172); its value is the session. */
-const PERSON_DRAG_TYPE = "application/x-mumcord-person";
 
 /** Small status icon after a channel name, with its meaning for screen readers. */
 const GLYPHS = {
@@ -287,8 +291,8 @@ export const ChannelBranch = memo(function ChannelBranchRow({
           setDropping(false);
           if (!acceptsDrop(event)) return;
           event.preventDefault();
-          const session = Number(event.dataTransfer.getData(PERSON_DRAG_TYPE));
-          if (Number.isInteger(session)) actions.current.movePerson(session, id);
+          const sessions = parseDragPayload(event.dataTransfer.getData(PERSON_DRAG_TYPE));
+          if (sessions.length > 0) actions.current.movePeople(sessions, id);
         }}
       >
         <div
@@ -483,6 +487,8 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
     (s: ServerState) => s.channels.get(user.channelId)?.permissions.moveUsers === true,
   );
   const draggable = movable && !isSelf;
+  // Picked with Ctrl/Shift-click to move several at once (issue #255).
+  const picked = usePersonSelected(session);
   const rowRef = useWatchOnScreen(tree, user.hasAvatar ? [session] : NO_SESSIONS);
   const status = statusText(user, talking);
   const actions = tree.actions;
@@ -493,7 +499,7 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
       ref={rowRef}
       role="treeitem"
       aria-level={level}
-      aria-selected={false}
+      aria-selected={picked}
       aria-labelledby={labelId}
       tabIndex={tabbable ? 0 : -1}
       data-row={rowId}
@@ -503,7 +509,8 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
       onDragStart={
         draggable
           ? (event) => {
-              event.dataTransfer.setData(PERSON_DRAG_TYPE, String(session));
+              // A picked person takes the whole selection along (issue #255).
+              event.dataTransfer.setData(PERSON_DRAG_TYPE, dragPayload(peopleToMove(session)));
               event.dataTransfer.effectAllowed = "move";
             }
           : undefined
@@ -520,6 +527,16 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
       onClick={(event) => {
         event.stopPropagation();
         actions.current.focus(rowId);
+        // Ctrl/Cmd and Shift pick people for a move instead of opening the profile card (#255).
+        if (draggable && (event.ctrlKey || event.metaKey)) {
+          actions.current.selectPerson(session, "toggle");
+          return;
+        }
+        if (draggable && event.shiftKey) {
+          actions.current.selectPerson(session, "range");
+          return;
+        }
+        actions.current.selectPerson(session, "clear");
         clickPerson(event.detail, session, event.currentTarget);
       }}
       onDoubleClick={(event) => {

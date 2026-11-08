@@ -160,6 +160,7 @@
     "menuEdit": "Edit channel",
     "menuLink": "Link with my channel",
     "menuUnlinkAll": "Unlink all",
+    "menuMoveEveryone": "Move everyone to",
     "menuDelete": "Delete channel",
     "createTitle": "Create sub-channel",
     "createTempTitle": "Create temporary channel",
