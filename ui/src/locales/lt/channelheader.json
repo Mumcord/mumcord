@@ -40,13 +40,13 @@
     "accessSaved": "Apsaugotas, išsaugotas slaptažodis jį atrakina",
     "links": "Susieti kanalai",
     "none": "Nėra",
-    "permissions": "Mano teisės",
+    "permissions": "Mano leidimai",
     "denied": "nėra: {{permission}}",
     "permission": {
       "enter": "Įėjimas",
       "speak": "Kalbėjimas",
       "textMessage": "Tekstas",
-      "whisper": "Šnabždėjimas",
+      "whisper": "Šnibždėjimas",
       "listen": "Klausymas",
       "write": "ACL rašymas"
     },
@@ -87,7 +87,7 @@
       "jamHint": "Maža delsa"
     },
     "musicQuality": "Muzikos kokybė",
-    "musicQualityHint": "Muzikai pritaikytas kodavimo įrankis; triukšmo slopinimas išjungtas.",
+    "musicQualityHint": "Muzikai pritaikytas kodavimas; triukšmo slopinimas išjungtas.",
     "musicIncluded": "Įtraukta, kol įjungtas mažos delsos režimas.",
     "lowLatency": "Mažos delsos režimas",
     "lowLatencyHint": "Mažiausi paketai. Daugiau pralaidumo, mažesnis atsparumas.",

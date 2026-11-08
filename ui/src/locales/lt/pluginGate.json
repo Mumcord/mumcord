@@ -1,6 +1,6 @@
 {
   "installTitle": "Įdiegti {{plugin}}?",
-  "updateTitle": "Atnaujinti {{plugin}} į {{version}}?",
+  "updateTitle": "Atnaujinti {{plugin}} iki versijos {{version}}?",
   "asks": "{{plugin}} prašo šių leidimų. Pasirenkamus gali išjungti dabar arba vėliau.",
   "asksShort": "Šis papildinys prašo:",
   "scoreCountsOptional": "Balas apima visus leidimus, kurių papildinys gali prašyti, įskaitant pasirenkamus.",
@@ -9,7 +9,7 @@
   "runsCode": "Vykdo {{author}} sukurtą kodą. Mumcord jo nepatikrino.",
   "sealedFrame": "Jis nemato Mumcord, tavo failų, mikrofono, kameros ar iškarpinės. Rodomas tik čia: {{places}}.",
   "ownCodeAndWebsites": "Šis papildinys turi savo kodą ir jungiasi prie svetainių.",
-  "trustRepository": "{{repository}} yra tavo pridėta saugykla. Diegk tik jei jais pasitiki.",
+  "trustRepository": "{{repository}} yra tavo pridėta saugykla. Diek tik jei ja pasitiki.",
   "understand": "Suprantu",
   "trustAuthor": "Suprantu riziką ir pasitikiu {{plugin}} autoriumi",
   "understandUpdate": "Suprantu, kad rizika padidėjo, ir vis tiek pasitikiu autoriumi",
@@ -20,9 +20,9 @@
   "installAnyway": "Vis tiek įdiegti",
   "updateAnyway": "Vis tiek atnaujinti",
   "highRiskTitle": "Tai didelės rizikos papildinys",
-  "highRiskText": "Jis gali atverti savo tinklalapius ir jungtis prie {{count}} svetainių, kurių patikrinti negali. Mumcord nemato, ką tos svetainės siunčia papildiniui ar ką papildinys siunčia joms. Jį paskelbė asmuo, naujas šiame kompiuteryje. Diegk tik jei pažįsti ir pasitiki jo autoriumi.",
-  "highRiskWouldBecome": "Dėl šio naujinimo papildinys taptų didelės rizikos",
-  "highRiskNotAutomatic": "Automatiškai jis neįdiegiamas. Likus prie {{version}}, dabartinis balas nesikeičia; versiją gali prisegti skiltyje Įdiegti.",
+  "highRiskText": "Jis gali atverti savo tinklalapius ir jungtis prie {{count}} svetainių, kurių patikrinti negali. Mumcord nemato, ką tos svetainės siunčia papildiniui ar ką papildinys siunčia joms. Jį paskelbė asmuo, naujas šiame kompiuteryje. Diek tik jei pažįsti jo autorių ir juo pasitiki.",
+  "highRiskWouldBecome": "Dėl šio naujinio papildinys taptų didelės rizikos",
+  "highRiskNotAutomatic": "Jis nebus įdiegtas automatiškai. Likus versijoje {{version}}, dabartinis balas nesikeičia; versiją gali užfiksuoti skiltyje Įdiegti.",
   "sameAuthorKey": "tas pats autoriaus raktas",
   "places": {
     "stage": "medijos sritis",
@@ -42,6 +42,6 @@
     "webPages": "Jis gali atverti savo tinklalapius.",
     "cantSee": "Mumcord nemato, ką tos svetainės siunčia papildiniui ar ką papildinys siunčia joms.",
     "newAuthor": "Jį paskelbė asmuo, naujas šiame kompiuteryje.",
-    "trust": "Diegk tik jei pažįsti ir pasitiki jo autoriumi."
+    "trust": "Diek tik jei pažįsti jo autorių ir juo pasitiki."
   }
 }

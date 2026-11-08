@@ -1,7 +1,7 @@
 {
   "title": "Papildinių duomenys per perdavimo mazgą",
   "switchLabel": "Leisti papildiniams naudoti serverio perdavimo mazgą",
-  "switchText": "Leidžiami papildiniai gali greičiau siųsti didesnius duomenis (žaidimo ėjimus, piešinius) per serverio bendruomenės perdavimo mazgą. Šifruojama nuo galo iki galo: perdavimo mazgas jų perskaityti negali. Be perdavimo mazgo naudojamas lėtesnis Mumble ryšys.",
+  "switchText": "Papildiniai, kuriems leidi, gali greičiau siųsti didesnius duomenis (žaidimo ėjimus, piešinius) per serverio bendruomenės perdavimo mazgą. Šifruojama nuo galo iki galo: perdavimo mazgas jų perskaityti negali. Be perdavimo mazgo naudojamas lėtesnis Mumble ryšys.",
   "servers": "Tavo serveriai",
   "serverAllows": "{{server}} · perdavimo mazgas leidžia papildinių duomenis",
   "serverAllowsRate": "iki {{rate}} kbit/s vienam papildiniui",

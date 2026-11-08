@@ -1,13 +1,13 @@
 {
   "title": "Viešieji serveriai",
   "loading": "Įkeliamas sąrašas…",
-  "subtitle": "Įkelta, nes atidarėte šį puslapį · rodoma {{shown}} iš {{total}}",
+  "subtitle": "Įkelta, nes atidarei šį puslapį · rodoma {{shown}} iš {{total}}",
   "search": "Ieškoti pagal pavadinimą, adresą ar šalį",
   "refresh": "Atnaujinti",
   "retry": "Bandyti dar kartą",
-  "loadFailed": "Nepavyko įkelti viešųjų serverių sąrašo. Patikrinkite interneto ryšį ir bandykite dar kartą.",
+  "loadFailed": "Nepavyko įkelti viešųjų serverių sąrašo. Patikrink interneto ryšį ir bandyk dar kartą.",
   "noMatch": "Paieškos ir filtrų neatitinka joks serveris.",
-  "saveFailed": "Nepavyko pridėti serverio. Bandykite dar kartą.",
+  "saveFailed": "Nepavyko pridėti serverio. Bandyk dar kartą.",
   "filters": {
     "label": "Filtrai",
     "country": "Šalis",
@@ -37,12 +37,12 @@
   "ms": "{{ms}} ms",
   "connect": "Prisijungti",
   "connectTo": "Prisijungti prie {{server}}",
-  "favourite": "Mėgstamas",
+  "favourite": "Mėgstamiausias",
   "favouriteServer": "Pridėti {{server}} prie savo serverių",
   "saved": "Išsaugota",
-  "savedAs": "{{server}} yra tarp jūsų serverių",
+  "savedAs": "{{server}} yra tarp tavo serverių",
   "announce": {
-    "saved": "{{server}} pridėtas prie jūsų serverių"
+    "saved": "{{server}} pridėtas prie tavo serverių"
   },
-  "note": "Ping siunčiamas tik matomoms eilutėms, po kelias. Daugiau nieko serveriui nesiunčiama, kol neprisijungiate."
+  "note": "Ping siunčiamas tik matomoms eilutėms, po kelias. Daugiau nieko serveriui nesiunčiama, kol neprisijungi."
 }

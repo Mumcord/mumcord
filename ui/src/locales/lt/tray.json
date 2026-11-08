@@ -12,14 +12,14 @@
   "connected": "Prisijungta",
   "connectedIn": "Prisijungta · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Prisijungta – kalba",
+  "talking": "Prisijungta – kalbi",
   "muted": "Prisijungta – nutildyta",
   "voiceMenu": "Balso serveris ir kanalas",
   "voiceServer": "Balso serveris",
   "channelsOf": "Kanalai · {server}",
-  "moreChannels": "Daugiau kanalų Mumcord",
+  "moreChannels": "Daugiau kanalų programoje Mumcord",
   "recentChats": "Naujausi pokalbiai",
-  "chatUnread": "{name} – {count} neperskaityti",
+  "chatUnread": "{name} – neskaitytų: {count}",
   "cameraOn": "Kamera įjungta",
   "turnOffCamera": "Išjungti kamerą"
 }

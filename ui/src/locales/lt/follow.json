@@ -17,7 +17,7 @@
   },
   "notify": {
     "channel": "{{name}} kanale {{channel}}: {{text}}",
-    "private": "{{name}} (privati): {{text}}",
+    "private": "{{name}} (privačiai): {{text}}",
     "more_one": "dar {{count}} nauja žinutė",
     "more_few": "dar {{count}} naujos žinutės",
     "more_many": "dar {{count}} naujos žinutės",
@@ -42,7 +42,7 @@
     "menuLabel": "Serverio parinktys",
     "follow": "Sekti visus kanalus",
     "unfollow": "Nustoti sekti visus kanalus",
-    "working": "Seka kanalus…",
+    "working": "Pradedama sekti kanalus…",
     "followed_one": "Pradėta sekti {{count}} kanalą.",
     "followed_few": "Pradėta sekti {{count}} kanalus.",
     "followed_many": "Pradėta sekti {{count}} kanalo.",
@@ -62,6 +62,6 @@
   "mention": "yra tavo paminėjimas",
   "header": {
     "follow": "Sekti kanalą",
-    "unfollow": "Sekama, spustelėkite, kad nebesektumėte"
+    "unfollow": "Sekama, spustelėk, kad nebesektum"
   }
 }
