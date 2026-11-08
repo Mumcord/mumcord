@@ -801,10 +801,13 @@ pub(crate) fn on_removed(hub: &Mutex<Admin>, server_id: ServerId, session: u32) 
 }
 
 /// The server echoed a person's state: the open wait for a change of theirs ends (FR-10.15,
-/// FR-10.20, FR-10.35).
-pub(crate) fn on_state(hub: &Mutex<Admin>, server_id: ServerId, session: u32) {
-    lock(hub).complete(server_id, session, Ok(()), |pending| {
-        matches!(pending, Pending::State(_))
+/// FR-10.20, FR-10.35). Like a refusal, only an echo of the field the wait asked to change
+/// (`echoed_rights`, see [`mumcord_protocol::UserChange`]) ends it, so an unrelated change of the
+/// same person (they move or mute themselves) does not confirm the action (issue #640).
+pub(crate) fn on_state(hub: &Mutex<Admin>, server_id: ServerId, session: u32, echoed_rights: u32) {
+    lock(hub).complete(server_id, session, Ok(()), |pending| match pending {
+        Pending::State(bit) => echoed_rights & bit != 0,
+        Pending::Removal => false,
     });
 }
 
@@ -901,13 +904,28 @@ mod tests {
         let hub = Mutex::new(Admin::default());
         let mut moved = lock(&hub).expect_action(2, 5, Pending::State(permissions::MOVE));
         let mut kicked = lock(&hub).expect_action(2, 6, Pending::Removal);
-        on_state(&hub, 2, 5);
-        on_state(&hub, 2, 6);
+        on_state(&hub, 2, 5, permissions::MOVE);
+        on_state(&hub, 2, 6, permissions::MOVE);
         assert!(moved.try_recv().expect("the echo answered").is_ok());
         assert!(
             kicked.try_recv().is_err(),
             "an echo is not the removal a kick waits for"
         );
+    }
+
+    #[test]
+    fn only_the_echo_of_the_asked_field_ends_the_wait() {
+        let hub = Mutex::new(Admin::default());
+        let mut mute = lock(&hub).expect_action(3, 7, Pending::State(permissions::MUTE_DEAFEN));
+        // The person moves or mutes themselves while the server mute is in flight (issue #640).
+        on_state(&hub, 3, 7, permissions::MOVE);
+        on_state(&hub, 3, 7, 0);
+        assert!(
+            mute.try_recv().is_err(),
+            "an unrelated change of the person is not the confirmation"
+        );
+        on_state(&hub, 3, 7, permissions::MUTE_DEAFEN);
+        assert!(mute.try_recv().expect("the echo answered").is_ok());
     }
 
     #[test]
