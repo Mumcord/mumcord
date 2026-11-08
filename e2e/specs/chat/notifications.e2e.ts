@@ -17,10 +17,6 @@ function toast(contains: string) {
   );
 }
 
-function anyToast() {
-  return $("//section[@aria-label='Notifications']//button[contains(@class,'toast__open')]");
-}
-
 function followButton() {
   return $("//button[contains(@class,'follow-toggle') and @aria-pressed]");
 }
@@ -62,7 +58,7 @@ describe("chat: message notifications (FR-1.48c)", () => {
     await waitMessage("at eight");
     const focused = await browser.execute(() => document.activeElement?.tagName ?? "");
     expect(focused).toBe("TEXTAREA");
-    await expect(anyToast()).not.toBeExisting();
+    await expect(toast("at eight")).not.toBeExisting();
   });
 
   it("shows no toast for the chat on screen", async () => {
@@ -70,6 +66,7 @@ describe("chat: message notifications (FR-1.48c)", () => {
     await raidBot.run('say --channel Raid "already here"');
     await waitMessage("already here");
     await sleep(1500);
-    await expect(anyToast()).not.toBeExisting();
+    // Named by text: activity toasts (people joining, #660) may be up at the same time.
+    await expect(toast("already here")).not.toBeExisting();
   });
 });
