@@ -426,6 +426,16 @@
   "announcedRegistered": "{{name}} mostantól regisztrált",
   "announcedRegisteredSaved": "A módosítások elküldve a szervernek",
   "menuRegister": "Regisztrálás a szerveren…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Az Ön jogosultságai itt",
+    "limits": "Szerverkorlátok",
+    "welcomeHint": "Csak a szerver konfigurációs fájljában módosítható, kliensből nem.",
+    "notice": "Szerverüzenet",
+    "noticeEmpty": "A gyökércsatorna leírásaként jelenik meg",
+    "noticeEditTitle": "Szerverüzenet szerkesztése",
+    "banListRegisteredUsers": "Kitiltási lista és regisztrált felhasználók…"
+  },
   "commands": {
     "group": "Adminisztrációs parancsok · beépített",
     "groupPeople": "Személyek",

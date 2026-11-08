@@ -426,6 +426,16 @@
   "announcedRegistered": "{{name}} is registered now",
   "announcedRegisteredSaved": "Changes sent to the server",
   "menuRegister": "Register on server…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Your rights here",
+    "limits": "Server limits",
+    "welcomeHint": "Can only be changed in the server's settings file, not from any client.",
+    "notice": "Server notice",
+    "noticeEmpty": "Shown as the Root channel description",
+    "noticeEditTitle": "Edit server notice",
+    "banListRegisteredUsers": "Ban list & registered users…"
+  },
   "commands": {
     "group": "Admin commands · built-in",
     "groupPeople": "People",

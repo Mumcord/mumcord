@@ -429,6 +429,16 @@
   "announcedRegistered": "{{name}} je sada registriran",
   "announcedRegisteredSaved": "Promjene poslane serveru",
   "menuRegister": "Registriraj na serveru…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Vaša prava ovdje",
+    "limits": "Ograničenja poslužitelja",
+    "welcomeHint": "Može se promijeniti samo u konfiguracijskoj datoteci poslužitelja, ne iz klijenta.",
+    "notice": "Obavijest poslužitelja",
+    "noticeEmpty": "Prikazuje se kao opis korijenskog kanala",
+    "noticeEditTitle": "Uredi obavijest poslužitelja",
+    "banListRegisteredUsers": "Popis zabrana i registrirani korisnici…"
+  },
   "commands": {
     "group": "Naredbe administratora · ugrađeno",
     "groupPeople": "Osobe",
