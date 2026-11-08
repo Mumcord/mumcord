@@ -1,0 +1,148 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.7.2-1.aarch64.rpm",
+      "sha256": "8548493df7d8ec54f0ef45f4654d879d01af17b4240aa02fe2c97f77859ea575",
+      "size": 68239752
+    },
+    {
+      "name": "Mumcord-0.7.2-1.x86_64.rpm",
+      "sha256": "076e710584fe3a8bf87f55ddaf47dd9f3aafd5e05f604fbafb56f9985ef1b808",
+      "size": 69281737
+    },
+    {
+      "name": "Mumcord_0.7.2_aarch64.AppImage",
+      "sha256": "70be74891689100a57d1c4c935d47c5b90f968efb871a35cfa5fb22a99f9adde",
+      "size": 147819016
+    },
+    {
+      "name": "Mumcord_0.7.2_aarch64.AppImage.sig",
+      "sha256": "c7924952d429b3263acea4eec658736c3fac86f29cb806209281e4f400ca00a4",
+      "size": 440
+    },
+    {
+      "name": "Mumcord_0.7.2_amd64.AppImage",
+      "sha256": "11264b94db8957b6333ea00495c3b71d2b9fa164c6db31995c8af7ac76dbe0ca",
+      "size": 151243256
+    },
+    {
+      "name": "Mumcord_0.7.2_amd64.AppImage.sig",
+      "sha256": "f7ae3ead417a674672ee782cf82f749b4f2e42e64319a2c2946d36bcebbada06",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.7.2_amd64.deb",
+      "sha256": "030193f8ae682e4d59c9ba10ba4da7d91efa6c3804527248117447cb5bb5a5e5",
+      "size": 69279880
+    },
+    {
+      "name": "Mumcord_0.7.2_arm64.deb",
+      "sha256": "7a8e8bc766006934f5870f310df5538af6d1e53710ae72884be7c9a825692bf4",
+      "size": 68237060
+    },
+    {
+      "name": "Mumcord_0.7.2_universal.app.tar.gz",
+      "sha256": "f12a490374da4f58378f96c7f512f249bc23ff1a8000457172a56737f20d5594",
+      "size": 117442021
+    },
+    {
+      "name": "Mumcord_0.7.2_universal.app.tar.gz.sig",
+      "sha256": "9f5f818abfdf4d5cbb5e98ec29dc1b5bf4d39d041b8ab25d4d0377ed0e3078db",
+      "size": 444
+    },
+    {
+      "name": "Mumcord_0.7.2_universal.dmg",
+      "sha256": "eeb5d16e896a1565b1434afdacfd77d79d7f340b5b867e6ac3099381883838af",
+      "size": 117641286
+    },
+    {
+      "name": "Mumcord_0.7.2_x64-portable.zip",
+      "sha256": "6b0a8ef8b53eb2504702bc34a737852fe982aebeb01b47b26996f8c2107ccc92",
+      "size": 52973253
+    },
+    {
+      "name": "Mumcord_0.7.2_x64-setup.exe",
+      "sha256": "0d226bed975dadf32daf9900eb5b889dcd6251015fbeb2b9f2cec81bc4e696df",
+      "size": 42604192
+    },
+    {
+      "name": "Mumcord_0.7.2_x64-setup.exe.sig",
+      "sha256": "99e21a5f090f6cd7a296c440d1f6b82ab20bf32417f83aa3d6b4063b4bc86b1b",
+      "size": 436
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "25a010f09207ce59b1a49f21810abe3c4f2b93230205e8f45172b169aa6a86a4",
+      "size": 2132
+    },
+    {
+      "name": "install.sh",
+      "sha256": "02f9c7658b0800b17742fd44b3c9d79338612918a3fe74424364e79654ebcb73",
+      "size": 23508
+    },
+    {
+      "name": "latest.json",
+      "sha256": "eb47e0c85a77f6beb68245acfec054f1bd97d33c20af5a936d759cc00c0f66d6",
+      "size": 3129
+    },
+    {
+      "name": "mumcord-0.7.2-appimage-aarch64.cdx.json",
+      "sha256": "e170f1ee93105fd6004ae704f575d150d27783f0d6391a12a0a2df02b59ea88d",
+      "size": 953393
+    },
+    {
+      "name": "mumcord-0.7.2-appimage-x86_64.cdx.json",
+      "sha256": "3be1c4bdf09558dc7a84ff29e2973ed345f54bd526ee54ccfc345a2ab1153322",
+      "size": 954457
+    },
+    {
+      "name": "mumcord-0.7.2-deb-rpm-aarch64.cdx.json",
+      "sha256": "16c2fefd968988a5482a4bd871280fefee766242c1e616316a18467cef9302a3",
+      "size": 903442
+    },
+    {
+      "name": "mumcord-0.7.2-deb-rpm-x86_64.cdx.json",
+      "sha256": "634458d11115f1d0d4f9fde21505bf9ac9d6f6330e11e565e1d669a365f7b954",
+      "size": 904506
+    },
+    {
+      "name": "mumcord-0.7.2-macos-universal.cdx.json",
+      "sha256": "0a92cc8bab2ee91a889a7e08127b03012b82f594172759e40991337809127220",
+      "size": 772550
+    },
+    {
+      "name": "mumcord-0.7.2-windows-x86_64.cdx.json",
+      "sha256": "2df35070312ef6b3524d9ef75be0a25d252509431d97c334d368e6f6a0b8d3b0",
+      "size": 738288
+    }
+  ],
+  "changelog": {
+    "sha256": "3ad1ec15bd6bd77cd9ad2613b45841e3469d16c9dc8aa7f8cba8f46585f676ab",
+    "text": "## [0.7.2] - 2026-11-08\n\n### Added\n\n- Moving people, under Admin ▸ in the person and channel menus: \"Move to my channel\" while the person sits elsewhere, \"Move to\" with a filterable channel picker that shows each channel's user limit and asks in plain words (\"Move 3 people from Raid to Lobby?\"), and \"Move everyone to\" for a whole channel at once without taking you along. Ctrl-click (or Ctrl+Space) and Shift-click pick several people in the channel tree, so one drag moves them together, and the person menu's \"Move to\" carries the picked people. After moving a group Mumcord says how many arrived (\"Moved 28 of 30 people to Raid. The rest were refused.\") instead of one notice per person, and a full channel is named once\n- Moderation in the person menu's \"Admin ▸\": server mute, server deafen (mutes too), priority speaker (a star next to their name) and un-suppress act at once and show a tick while on; reset comment and reset avatar ask first. Each appears only with the server's right\n- Channel password: the channel window's Password tab sets or clears the password for joining a channel, written the same way as the official Mumble client; channels with more complex access rules point to Permissions instead\n- Channel permissions: the channel window's Permissions tab shows who can do what in the channel (✓, ✗ or ? per group and person), lets admins edit its rules and groups, and explains any answer in a \"Why?\" panel. Mumcord warns before you would lock yourself out, asks before changing the whole server's rules, and never overwrites a change someone else made meanwhile\n- Channel management for admins: the channel menu's \"Admin ▸\" can create a sub-channel or a temporary channel, edit a channel (name, description with bold, italic, underline and links, parent, position, user limit) and its links, link it with your channel, unlink all, and delete it after a confirmation that names the sub-channels and people affected. F2 edits and Delete deletes the selected channel. Only what the server allows is shown, and a refusal shows the server's reason\n- **Default shortcuts** in Settings > Hotkeys: below every key field the row now names its default, and the action really has it while the Mumcord window is in front — **Mute / unmute microphone** Ctrl+Shift+M, **Deafen / undeafen** Ctrl+Shift+D, **Turn camera on / off** Ctrl+Shift+C, **Show / hide member column** Ctrl+Shift+U and **Open quick settings** Ctrl+, (Cmd instead of Ctrl on macOS). The defaults are never registered with the operating system, so no desktop or game shortcut is taken over unnoticed; a key you set yourself replaces the default and applies everywhere like before, **Use default** hands the action back to its default, and **Reset all hotkeys** now removes every own key so the defaults come back. Rows without a default say \"Default: none\", and a default that something else already uses is not bound but named under the row — Ctrl+Shift+N stays the notification centre. Push-to-talk, join / leave voice, switch voice server, back to the previous channel, Open Mumcord and your own \"switch to channel\" rows have no default (#584)\n- Menus can open sub-menus: admin actions in the server ⋯ menu now sit under \"Admin ▸\" (\"Ban list…\" for now), shown only when you have a right in it, with red actions last behind a divider. → opens a sub-menu, ← or Escape goes back\n- When a server's relay changes, Mumcord says so in the notification centre and as a notification (in-app or system), with \"Trust new relay\" and \"Details\"; the details compare the old and new fingerprint and say when to trust it. The chat's file sharing hint names the changed relay and links there instead of saying there is no relay\n- Activity feed: an icon for each kind of event, and the feed is saved on this device, so it is still there after a reconnect or a restart (an \"Earlier\" line marks where this session starts). Settings → Privacy → \"Clear activity history\" removes it for all servers\n- Activity notifications: when someone starts a screen share, a watch party or a plugin activity, or a plugin posts an event, Mumcord notifies like for messages (in-app toast or system notification, following Do Not Disturb and muted servers). Settings → Chat & Notifications has a switch per kind; joins, leaves and moves are off by default\n\n### Changed\n\n- **Show / hide member column**: the column's fixed Ctrl+Shift+M is now the hotkey default Ctrl+Shift+U (Cmd+Shift+U on macOS), so Ctrl+Shift+M is free for Mute / unmute microphone. Like the other defaults it works while the Mumcord window has the focus, and a key you set yourself makes it work in the background too (#584)\n- Menu entries no longer end in \"…\" (for example \"Identity\", \"Ban list\", \"Whisper to\"), in every language\n- When the server refuses something, Mumcord says what and where in plain words, e.g. \"You may not move people in Raid.\", unless the dialog that asked shows it already. Rights changed by an admin while you are connected now take effect without reconnecting\n- When the relay refuses the camera, screen sharing or file sharing, Mumcord names the reason (not registered, not in an allowed group, not in the same channel, reconnect needed) with a way out: \"How to register\" or \"Reconnect\". On a relay for registered users only, guests see why the camera and the paperclip are unavailable before trying\n- Radio buttons and checkboxes have Mumcord's own design everywhere: a ring with a lilac dot and a rounded box with a lilac check, with a clear focus ring and high-contrast support. Option cards such as \"Private messages from\" highlight the whole card\n- Setup wizard, \"How do you want to talk?\": two clear cards with a short explanation, the sensitivity choice nested under voice activation, and the push-to-talk key right in its card; Continue waits until a key is set\n- Peer-to-peer: \"Direct + relay (always relay, hides my IP)\" is now the recommended mode and the default for new installs, and the Balanced setup style uses it. A mode you already use stays as it is\n- The hint \"This server has no relay, so file sharing isn't available.\" can be closed per server; it comes back when the server gets a relay and loses it again\n- \"Bots on this server\" starts collapsed; once you open or close it, Mumcord remembers that\n- Plugins strip: plugin icons have no frame anymore; a plugin's own image or its colour tile is the whole icon, with a ring on hover, focus and when open\n- Chat message bar (issue #596, mockup approved): the typed text now starts at the bar's left edge on one line, grows with the text up to about six lines and scrolls from there, without a resize handle. The Apps, file, picture and GIF icons are one consistent set, and the send button is a labelled pill that stays muted while there is nothing to send and becomes the primary button as soon as text, a picture or a file is ready; with only a picture or a file in the tray the field asks for \"Add a message (optional)\". The formatting buttons (bold, italic, strikethrough, inline code, code block, link, quote) now sit in a small pill on the bar's top edge while the cursor is in the input, and the bar carries the single focus ring instead of a second frame around the text field. A channel you may not write in shows a locked note instead of an empty field, and its Apps button (screen share, watch together, camera) still works when you are in that channel by voice.\n\n### Fixed\n\n- The channel search field at the top of the sidebar lines up with the channel name in the chat header\n- Activity feed: names work like in the chat (click opens the profile and menu, double-click a private message), and bots no longer show up with joins, leaves and moves\n- \"Bots on this server\": the line above it spans the whole column like the one below, and the heading has the same space above and below it\n- Twitch's own player only runs when the page that frames it is a website, and Mumcord's window is not one on macOS and Linux: a Twitch card now keeps its picture, says why under it, and Play hands the stream to the browser instead of leaving a picture that stays black (#419)\n- Settings: cards side by side are equally tall, and a \"?\" stays next to its long label instead of wrapping onto its own line\n- Settings → Screen sharing → Hardware acceleration: a long status such as \"Software, keeps up to 1080p30\" stays right-aligned\n- Camera and screen share dialogs: the dropdowns use the app's own design like in Settings, and the codec note ends its sentence before the next one starts\n- Settings → Plugins: the cards have the same gap as on the other pages, every card has its icon, and the \"Output level (debug)\" meter only shows in development builds\n- The Members / Activity tabs now stay in place at the top of the right column when a long list scrolls"
+  },
+  "commit": "c2b6007b0fd607c3fd3bacbf679d56ec1c1b61d3",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "70f297a881b5407fc0df287f8fef3ffea6591a43c7460038f35db966c31bc825",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "ac470f8fca6ec4acfc1aecf23963f30e6869b4f9d98afc09640a0864467ed053",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "baff7c5abff8826b814d9c1320f66753a18ea461e5b182ad53eefa64a676012c",
+      "yanked": false
+    },
+    "mumcord-protocol": {
+      "cksum": "aff4e5eaacfa0469331ae496581b815f311f131ab60b0fab7d8d8b76b8a3e63b",
+      "yanked": false
+    },
+    "mumcord-store": {
+      "cksum": "321433f284a354923ed0e3f6dcbdc568d8d0557dce9a4b15a0815bbe9becb57e",
+      "yanked": false
+    }
+  },
+  "sha256sums": "25a010f09207ce59b1a49f21810abe3c4f2b93230205e8f45172b169aa6a86a4",
+  "tag": "v0.7.2"
+}

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-11-08
+
 ### Added
 
 - Moving people, under Admin ▸ in the person and channel menus: "Move to my channel" while the person sits elsewhere, "Move to" with a filterable channel picker that shows each channel's user limit and asks in plain words ("Move 3 people from Raid to Lobby?"), and "Move everyone to" for a whole channel at once without taking you along. Ctrl-click (or Ctrl+Space) and Shift-click pick several people in the channel tree, so one drag moves them together, and the person menu's "Move to" carries the picked people. After moving a group Mumcord says how many arrived ("Moved 28 of 30 people to Raid. The rest were refused.") instead of one notice per person, and a full channel is named once
@@ -654,6 +656,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.7.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.2
 [0.7.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.1
 [0.7.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.0
 [0.6.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.2
