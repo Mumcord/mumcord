@@ -59,6 +59,21 @@ impl Pump {
         self.sink
     }
 
+    /// Switches to the mode the camera actually delivers, e.g. when the portal stream settled
+    /// on another format or size than the one asked for. Allocates, so it must not run per
+    /// picture; it runs once when the format is (re)negotiated.
+    #[cfg(target_os = "linux")]
+    pub fn renegotiate(&mut self, mode: Mode, geometry: Geometry) {
+        if self.pool.buffer_len() != nv12_len(geometry.width, geometry.height) {
+            self.pool = FramePool::new(POOL_BUFFERS, nv12_len(geometry.width, geometry.height));
+        }
+        self.mjpeg =
+            (mode.format == PixelFormat::Mjpeg).then(|| MjpegDecoder::new(mode.width, mode.height));
+        self.mode = mode;
+        self.geometry = geometry;
+        self.unreadable = UnreadableRun::default();
+    }
+
     pub fn ended(&self) -> bool {
         self.ended
     }
@@ -184,6 +199,29 @@ mod tests {
         assert_eq!(nv12.len(), nv12_len(64, 36));
         assert_eq!(nv12[0], 6, "six rows cut at the top");
         assert_eq!(nv12[64 * 35], 41, "and six at the bottom");
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_renegotiated_pump_reads_the_delivered_format_and_size() {
+        // NV12 1280x720 was asked for, but the camera delivers YUYV 64x48.
+        let (mut pump, rx) = pump(PixelFormat::Nv12, 1280, 720);
+        let mode = Mode {
+            format: PixelFormat::Yuy2,
+            width: 64,
+            height: 48,
+            rate: Rate::fps(30),
+        };
+        pump.renegotiate(mode, Geometry::new(64, 48, 1280, 720).unwrap());
+        assert_eq!(pump.mode(), mode);
+        let data = vec![128u8; 64 * 2 * 48];
+        pump.push(Raw::Packed {
+            data: &data,
+            stride: 128,
+        });
+        let (w, h, nv12) = rx.try_recv().unwrap().unwrap();
+        assert_eq!((w, h), (64, 36));
+        assert_eq!(nv12.len(), nv12_len(64, 36));
     }
 
     #[test]
