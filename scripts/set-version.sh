@@ -7,7 +7,8 @@
 # exact version for a pre-release, which a plain X.Y requirement would not match), Cargo.lock and
 # the smoke-test seeder's scripts/smoke/seed/Cargo.lock. Uses node and perl, which every CI
 # runner (Linux, macOS, Git Bash on Windows) has; cargo may fetch the registry index for the
-# seeder and the final --locked check.
+# seeder and the final --locked check. For a pre-release it also sets the macOS bundle versions
+# in src-tauri/Info.plist to the plain X.Y.Z.
 set -euo pipefail
 version=${1:?version missing, e.g. 0.4.3}
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] \
@@ -45,5 +46,16 @@ cargo metadata --format-version 1 >/dev/null
 # The seeder is its own Cargo project, a CI helper whose lock cargo may refresh freely.
 cargo update --manifest-path scripts/smoke/seed/Cargo.toml --quiet \
   -p mumcord-protocol -p mumcord-store
+
+# macOS bundle versions allow digits and dots only, and Tauri would write the full version
+# (0.8.0-rc.1) into both. For a pre-release the bundle carries X.Y.Z; the app's About shows the
+# full version. Tauri lets src-tauri/Info.plist override its generated keys.
+if [[ "$version" == *-* ]]; then
+  BASE=${version%%-*} perl -0pi -e '
+    /<key>CFBundle(Short)?Version(String)?<\/key>/ and die "Info.plist already sets a bundle version\n";
+    s{(</dict>\s*</plist>\s*)\z}{  <key>CFBundleShortVersionString</key>\n  <string>$ENV{BASE}</string>\n  <key>CFBundleVersion</key>\n  <string>$ENV{BASE}</string>\n$1}
+      or die "no closing </dict> in Info.plist\n";
+  ' src-tauri/Info.plist
+fi
 
 echo "Version set to $version (internal crate requirement $requirement)."

@@ -8,33 +8,21 @@ use sha2::{Digest, Sha256};
 
 use crate::commands::updates::ReleaseNote;
 
-/// A parsed `major.minor.patch[-pre]` version.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Version {
-    core: [u64; 3],
-    /// Pre-releases sort before their release; the flag is inverted so the derived order fits.
-    is_final: bool,
-}
+/// A parsed `major.minor.patch[-pre]` version in SemVer order, so release candidates follow each
+/// other and come before their release (`0.8.0-rc.1` < `0.8.0-rc.2` < `0.8.0`). Build metadata
+/// (`+…`) does not count.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Version(semver::Version);
 
 impl Version {
     pub fn parse(text: &str) -> Option<Self> {
-        let text = text.trim().trim_start_matches('v');
-        let text = text.split('+').next()?;
-        let (core, pre) = match text.split_once('-') {
-            Some((core, _)) => (core, true),
-            None => (text, false),
-        };
-        let mut parts = core.split('.');
-        let mut next = || parts.next()?.parse::<u64>().ok();
-        let version = Self {
-            core: [next()?, next()?, next()?],
-            is_final: !pre,
-        };
-        parts.next().is_none().then_some(version)
+        let mut version = semver::Version::parse(text.trim().trim_start_matches('v')).ok()?;
+        version.build = semver::BuildMetadata::EMPTY;
+        Some(Self(version))
     }
 
     pub fn is_prerelease(&self) -> bool {
-        !self.is_final
+        !self.0.pre.is_empty()
     }
 }
 
@@ -82,7 +70,7 @@ pub fn pick_offer(body: &[u8], current: &str, skipped: Option<&str>) -> Option<O
             Some((version, note))
         })
         .collect();
-    newer.sort_by_key(|(version, _)| std::cmp::Reverse(*version));
+    newer.sort_by(|(a, _), (b, _)| b.cmp(a));
     let newest = newer.first()?.1.version.clone();
     if skipped.is_some_and(|s| Version::parse(s) == Version::parse(&newest)) {
         return None;
@@ -233,6 +221,8 @@ mod tests {
         assert!(v("0.10.0") > v("0.9.9"));
         assert!(v("v1.0.0") > v("1.0.0-rc.1"));
         assert!(v("1.0.0-rc.1") > v("0.9.0"));
+        assert!(v("1.0.0-rc.2") > v("1.0.0-rc.1"));
+        assert!(v("1.0.0-rc.10") > v("1.0.0-rc.9"));
         assert_eq!(v("1.2.3+build"), v("1.2.3"));
         assert!(Version::parse("1.2").is_none());
         assert!(Version::parse("1.2.3.4").is_none());
@@ -286,6 +276,35 @@ mod tests {
                 .expect("offer")
                 .version,
             "0.5.0-beta.1"
+        );
+    }
+
+    /// Release candidates from milestone branches (RELEASING.md): never offered on a final
+    /// release, even if the pre-release flag were missing; an RC moves on to the next RC and to
+    /// the final release.
+    #[test]
+    fn release_candidates_stay_off_the_stable_channel() {
+        let rc_only = list(&[
+            release("v0.8.0-rc.2", true, ""),
+            release("v0.8.0-rc.1", false, ""),
+            release("v0.7.1", false, ""),
+        ]);
+        assert!(pick_offer(&rc_only, "0.7.1", None).is_none());
+        assert_eq!(
+            pick_offer(&rc_only, "0.8.0-rc.1", None)
+                .expect("offer")
+                .version,
+            "0.8.0-rc.2"
+        );
+        let with_final = list(&[
+            release("v0.8.0", false, ""),
+            release("v0.8.0-rc.2", true, ""),
+        ]);
+        assert_eq!(
+            pick_offer(&with_final, "0.8.0-rc.2", None)
+                .expect("offer")
+                .version,
+            "0.8.0"
         );
     }
 
