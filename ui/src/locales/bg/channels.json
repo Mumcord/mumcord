@@ -116,5 +116,23 @@
     "resultAll": "Преместени {{people}} в {{channel}}.",
     "resultSome": "Преместени {{moved}} от {{people}} в {{channel}}. Останалите бяха отказани.",
     "busy": "Вече се преместват хора…"
+  },
+  "drag": {
+    "into": "Премести в {{channel}}",
+    "above": "Постави над {{channel}}",
+    "below": "Постави под {{channel}}",
+    "self": "Не може в самия себе си",
+    "subChannel": "Не може в собствен подканал",
+    "confirmTitle": "Преместване на „{{channel}}“?",
+    "alongAll": "Заедно с {{channel}} се преместват: {{subChannels}} и {{people}}.",
+    "alongSubChannels": "Заедно с {{channel}} се преместват: {{subChannels}}.",
+    "alongPeople": "Заедно с {{channel}} се преместват: {{people}}.",
+    "alongNone": "Премества се само {{channel}}; каналът е празен.",
+    "subChannels_one": "{{count}} подканал",
+    "subChannels_other": "{{count}} подканала",
+    "pathTo": "към",
+    "confirm": "Премести",
+    "failedTitle": "{{channel}} не можа да бъде преместен",
+    "refusedParent": "Нямаш право да местиш канали в {{channel}}."
   }
 }

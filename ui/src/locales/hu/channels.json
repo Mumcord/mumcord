@@ -116,5 +116,23 @@
     "resultAll": "{{people}} áthelyezve ide: {{channel}}.",
     "resultSome": "{{moved}} / {{people}} áthelyezve ide: {{channel}}. A többieket a szerver elutasította.",
     "busy": "Már folyik a személyek áthelyezése…"
+  },
+  "drag": {
+    "into": "Áthelyezés ide: {{channel}}",
+    "above": "Elhelyezés fölé: {{channel}}",
+    "below": "Elhelyezés alá: {{channel}}",
+    "self": "Nem kerülhet önmagába",
+    "subChannel": "Nem kerülhet a saját alcsatornájába",
+    "confirmTitle": "Áthelyezed: „{{channel}}”?",
+    "alongAll": "A(z) {{channel}} csatornával együtt mozog: {{subChannels}} és {{people}}.",
+    "alongSubChannels": "A(z) {{channel}} csatornával együtt mozog: {{subChannels}}.",
+    "alongPeople": "A(z) {{channel}} csatornával együtt mozog: {{people}}.",
+    "alongNone": "Csak a(z) {{channel}} mozog; üres.",
+    "subChannels_one": "{{count}} alcsatorna",
+    "subChannels_other": "{{count}} alcsatorna",
+    "pathTo": "ide:",
+    "confirm": "Áthelyezés",
+    "failedTitle": "Nem sikerült áthelyezni: {{channel}}",
+    "refusedParent": "Nincs jogod csatornákat áthelyezni ide: {{channel}}."
   }
 }

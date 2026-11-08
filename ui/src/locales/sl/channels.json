@@ -126,5 +126,25 @@
     "resultAll": "Premaknjenih {{people}} v {{channel}}.",
     "resultSome": "Premaknjenih {{moved}} od {{people}} v {{channel}}. Ostali so bili zavrnjeni.",
     "busy": "Osebe se že premikajo…"
+  },
+  "drag": {
+    "into": "Premakni v {{channel}}",
+    "above": "Postavi nad {{channel}}",
+    "below": "Postavi pod {{channel}}",
+    "self": "Ne more v samega sebe",
+    "subChannel": "Ne more v lastni podkanal",
+    "confirmTitle": "Premaknem „{{channel}}“?",
+    "alongAll": "S kanalom {{channel}} se premaknejo: {{subChannels}} in {{people}}.",
+    "alongSubChannels": "S kanalom {{channel}} se premaknejo: {{subChannels}}.",
+    "alongPeople": "S kanalom {{channel}} se premaknejo: {{people}}.",
+    "alongNone": "Premakne se samo {{channel}}; je prazen.",
+    "subChannels_one": "{{count}} podkanal",
+    "subChannels_two": "{{count}} podkanala",
+    "subChannels_few": "{{count}} podkanali",
+    "subChannels_other": "{{count}} podkanalov",
+    "pathTo": "v",
+    "confirm": "Premakni",
+    "failedTitle": "{{channel}} ni bilo mogoče premakniti",
+    "refusedParent": "Nimaš dovoljenja za premikanje kanalov v {{channel}}."
   }
 }

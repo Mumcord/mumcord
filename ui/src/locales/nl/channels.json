@@ -116,5 +116,23 @@
     "resultAll": "{{people}} naar {{channel}} verplaatst.",
     "resultSome": "{{moved}} van {{people}} naar {{channel}} verplaatst. De rest is geweigerd.",
     "busy": "Er worden al mensen verplaatst…"
+  },
+  "drag": {
+    "into": "Verplaatsen naar {{channel}}",
+    "above": "Boven {{channel}} plaatsen",
+    "below": "Onder {{channel}} plaatsen",
+    "self": "Kan niet in zichzelf",
+    "subChannel": "Kan niet in een eigen subkanaal",
+    "confirmTitle": "“{{channel}}” verplaatsen?",
+    "alongAll": "Met {{channel}} gaan mee: {{subChannels}} en {{people}}.",
+    "alongSubChannels": "Met {{channel}} gaan mee: {{subChannels}}.",
+    "alongPeople": "Met {{channel}} gaan mee: {{people}}.",
+    "alongNone": "Alleen {{channel}} wordt verplaatst; het is leeg.",
+    "subChannels_one": "{{count}} subkanaal",
+    "subChannels_other": "{{count}} subkanalen",
+    "pathTo": "naar",
+    "confirm": "Verplaatsen",
+    "failedTitle": "Kon {{channel}} niet verplaatsen",
+    "refusedParent": "Je hebt geen recht om kanalen naar {{channel}} te verplaatsen."
   }
 }

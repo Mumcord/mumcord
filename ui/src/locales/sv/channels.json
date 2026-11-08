@@ -116,5 +116,23 @@
     "resultAll": "Flyttade {{people}} till {{channel}}.",
     "resultSome": "Flyttade {{moved}} av {{people}} till {{channel}}. Resten nekades.",
     "busy": "Flyttar redan personer…"
+  },
+  "drag": {
+    "into": "Flytta in i {{channel}}",
+    "above": "Placera ovanför {{channel}}",
+    "below": "Placera nedanför {{channel}}",
+    "self": "Kan inte flyttas in i sig själv",
+    "subChannel": "Kan inte flyttas in i sin egen underkanal",
+    "confirmTitle": "Flytta ”{{channel}}”?",
+    "alongAll": "Med {{channel}} flyttas: {{subChannels}} och {{people}}.",
+    "alongSubChannels": "Med {{channel}} flyttas: {{subChannels}}.",
+    "alongPeople": "Med {{channel}} flyttas: {{people}}.",
+    "alongNone": "Bara {{channel}} flyttas; den är tom.",
+    "subChannels_one": "{{count}} underkanal",
+    "subChannels_other": "{{count}} underkanaler",
+    "pathTo": "till",
+    "confirm": "Flytta",
+    "failedTitle": "Kunde inte flytta {{channel}}",
+    "refusedParent": "Du har inte behörighet att flytta kanaler in i {{channel}}."
   }
 }

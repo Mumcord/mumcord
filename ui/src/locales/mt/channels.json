@@ -131,5 +131,26 @@
     "resultAll": "Inġiebu {{people}} għal {{channel}}.",
     "resultSome": "Inġiebu {{moved}} minn {{people}} għal {{channel}}. Il-bqija ġew miċħuda.",
     "busy": "Diġà qed jiġu mċaqilqa nies…"
+  },
+  "drag": {
+    "into": "Mexxi ġo {{channel}}",
+    "above": "Poġġi fuq {{channel}}",
+    "below": "Poġġi taħt {{channel}}",
+    "self": "Ma jistax imur ġo fih innifsu",
+    "subChannel": "Ma jistax imur ġo sottokanal tiegħu",
+    "confirmTitle": "Tmexxi “{{channel}}”?",
+    "alongAll": "Flimkien ma’ {{channel}} jitmexxew: {{subChannels}} u {{people}}.",
+    "alongSubChannels": "Flimkien ma’ {{channel}} jitmexxew: {{subChannels}}.",
+    "alongPeople": "Flimkien ma’ {{channel}} jitmexxew: {{people}}.",
+    "alongNone": "Jitmexxa biss {{channel}}; huwa vojt.",
+    "subChannels_one": "{{count}} sottokanal",
+    "subChannels_two": "{{count}} sottokanali",
+    "subChannels_few": "{{count}} sottokanali",
+    "subChannels_many": "{{count}} sottokanali",
+    "subChannels_other": "{{count}} sottokanali",
+    "pathTo": "għal",
+    "confirm": "Mexxi",
+    "failedTitle": "Ma setax jitmexxa {{channel}}",
+    "refusedParent": "M’għandekx id-dritt tmexxi kanali ġo {{channel}}."
   }
 }

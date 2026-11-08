@@ -121,5 +121,24 @@
     "resultAll": "{{people}} déplacées vers {{channel}}.",
     "resultSome": "{{moved}} sur {{people}} déplacées vers {{channel}}. Les autres ont été refusées.",
     "busy": "Des personnes sont déjà en cours de déplacement…"
+  },
+  "drag": {
+    "into": "Déplacer dans {{channel}}",
+    "above": "Placer au-dessus de {{channel}}",
+    "below": "Placer en dessous de {{channel}}",
+    "self": "Impossible de le placer dans lui-même",
+    "subChannel": "Impossible de le placer dans son propre sous-salon",
+    "confirmTitle": "Déplacer « {{channel}} » ?",
+    "alongAll": "Avec {{channel}}, sont déplacés : {{subChannels}} et {{people}}.",
+    "alongSubChannels": "Avec {{channel}}, sont déplacés : {{subChannels}}.",
+    "alongPeople": "Avec {{channel}}, sont déplacés : {{people}}.",
+    "alongNone": "Seul {{channel}} est déplacé ; il est vide.",
+    "subChannels_one": "{{count}} sous-salon",
+    "subChannels_many": "{{count}} sous-salons",
+    "subChannels_other": "{{count}} sous-salons",
+    "pathTo": "vers",
+    "confirm": "Déplacer",
+    "failedTitle": "Impossible de déplacer {{channel}}",
+    "refusedParent": "Tu n’as pas le droit de déplacer des salons dans {{channel}}."
   }
 }
