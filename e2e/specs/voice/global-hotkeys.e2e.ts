@@ -18,6 +18,7 @@ const xdo = async (...args: string[]) => (await run("xdotool", args)).stdout.tri
 /** The key field of a row in Settings → Hotkeys. */
 const row = (action: string) =>
   `//div[contains(@class,'hotkey-row')][.//span[normalize-space(.)='${action}']]`;
+const hotkeyRow = (action: string) => $(row(action));
 const keyField = (action: string) => $(`${row(action)}//button[contains(@class,'hotkey-row__field')]`);
 const rowLink = (action: string, label: string) => $(`${row(action)}//button[normalize-space(.)='${label}']`);
 const muteButton = () => $("button[aria-label='Mute microphone']");
@@ -44,7 +45,7 @@ describe("global hotkeys (AC-3.59, #64)", () => {
     await openSettingsGroup("Voice & Audio");
     // Nothing is stored yet: the fields show their defaults (issue #584).
     expect(await keyField("Push-to-talk").getText()).toContain("Not set");
-    expect(await keyField("Push-to-talk").getText()).toContain("Default: none");
+    expect(await hotkeyRow("Push-to-talk").getText()).toContain("Default: none");
     expect(await keyField("Mute / unmute microphone").getText()).not.toContain("Not set");
     expect(await keyField("Mute / unmute microphone").getText()).toContain("Shift");
     expect(await keyField("Toggle Do Not Disturb").getText()).toContain("Not set");
