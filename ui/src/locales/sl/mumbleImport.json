@@ -1,6 +1,6 @@
 {
   "title": "Prenesi svoje nastavitve iz Mumbla",
-  "intro": "Na tem računalu smo našli uradni odjemalec Mumble. Izberi, kaj naj se kopira. V Mumblu se nič ne spremeni in nič ne zapusti tvojega računalnika.",
+  "intro": "Na tem računalniku smo našli uradni odjemalec Mumble. Izberi, kaj naj se kopira. V Mumblu se nič ne spremeni in nič ne zapusti tvojega računalnika.",
   "optional": "{{progress}} · neobvezno",
   "listLabel": "Kaj kopirati iz Mumbla",
   "favourites": {
@@ -46,8 +46,8 @@
     "missing": "Naprave iz Mumbla niso povezane s tem računalnikom."
   },
   "ptt": {
-    "title": "Tipka push-to-talk",
-    "modifierOnly": "Tipka v Mumblu je samo spremenilka, ki je Mumcord ne more uporabiti. Tipko lahko izbereš pozneje.",
+    "title": "Tipka Push-to-talk",
+    "modifierOnly": "Tipka v Mumblu je samo modifikatorska tipka, ki je Mumcord ne more uporabiti. Tipko lahko izbereš pozneje.",
     "tooManyKeys": "Bližnjica v Mumblu ima več kot eno tipko, česar Mumcord ne more uporabiti. Tipko lahko izbereš pozneje.",
     "unknown": "Bližnjica v Mumblu uporablja tipko ali napravo, ki je Mumcord ne pozna. Tipko lahko izbereš pozneje."
   },
@@ -93,7 +93,7 @@
     "identityServers": "Uporabljena za kopirane strežnike",
     "identitySkipped": "Identiteta je že v Mumcordu",
     "identitySkippedDetail": "To potrdilo je že ena od tvojih identitet",
-    "devicesAndPtt": "Zvočne naprave in tipka push-to-talk",
+    "devicesAndPtt": "Zvočne naprave in tipka Push-to-talk",
     "done": "Končano",
     "undo": "Razveljavi uvoz",
     "undone": "Uvoz je bil razveljavljen.",

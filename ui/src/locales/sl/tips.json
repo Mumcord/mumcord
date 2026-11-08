@@ -2,7 +2,7 @@
   "label": "Aaron, pomočnik z namigi",
   "greeting": {
     "title": "Živjo, jaz sem Aaron!",
-    "body": "Jaz sem aksolotl in Mumcord poznam kot svoj žep. Si za hiter ogled? Traja približno minuto. Če ne zdaj, me najdeš v Nastavitve → O aplikaciji → Namigi.",
+    "body": "Jaz sem aksolotl in Mumcord poznam kot svoj žep. Si za hiter ogled? Traja približno minuto. Če ne zdaj, me najdeš v razdelku Nastavitve → O aplikaciji → Namigi.",
     "start": "Pokaži mi",
     "later": "Ne zdaj"
   },
@@ -23,7 +23,7 @@
     },
     "talk": {
       "title": "Kako govoriš",
-      "body": "»Pritisni za govor« ali glasovna aktivacija? Izberi v Nastavitve → Glas in zvok ali odpri Nastavitve glasu… z majhno puščico ob mikrofonu. »Pritisni za govor« deluje tudi z gumbi miške."
+      "body": "Push-to-talk ali glasovna aktivacija? Izberi v razdelku Nastavitve → Glas in zvok ali odpri Nastavitve glasu … z majhno puščico ob mikrofonu. Push-to-talk deluje tudi z gumbi miške."
     },
     "panel": {
       "title": "Tvoja uporabniška plošča",
@@ -43,11 +43,11 @@
     },
     "themes": {
       "title": "Tvoj slog",
-      "body": "Zobnik spodaj levo preklaplja med temnim in svetlim videzom. V Nastavitve → Videz je več tem, strežnik pa ima lahko svojo: desno klikni nanj in izberi Tema."
+      "body": "Zobnik spodaj levo preklaplja med temnim in svetlim videzom. V razdelku Nastavitve → Videz je več tem, strežnik pa ima lahko svojo: desno klikni nanj in izberi Tema."
     },
     "end": {
       "title": "To je to!",
-      "body": "Zabavaj se v Mumcordu. Kadar koli me lahko znova pokličeš v Nastavitve → O aplikaciji → Namigi."
+      "body": "Zabavaj se v Mumcordu. Kadar koli me lahko znova pokličeš v razdelku Nastavitve → O aplikaciji → Namigi."
     }
   }
 }

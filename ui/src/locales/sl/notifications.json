@@ -11,10 +11,10 @@
   "groupedPrivate_two": "{{count}} novi sporočili od {{name}}",
   "groupedPrivate_few": "{{count}} nova sporočila od {{name}}",
   "groupedPrivate_other": "{{count}} novih sporočil od {{name}}",
-  "image": "Poslal sliko",
+  "image": "Poslal(a) je sliko",
   "open": "Odpri klepet",
   "close": "Opusti obvestilo",
-  "mentionLine": "{{sender}} te je omenil: {{preview}}",
+  "mentionLine": "{{sender}} te je omenil(a): {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
     "title": "Obvestila",
@@ -34,11 +34,11 @@
     },
     "empty": "Vse je prebrano.",
     "unread": "Neprebrano",
-    "dndOn": "Ne moti je vklopljeno",
-    "dndOff": "Ne moti je izklopljeno",
+    "dndOn": "Način Ne moti je vklopljen",
+    "dndOff": "Način Ne moti je izklopljen",
     "settings": "Nastavitve obvestil",
     "someone": "Nekdo",
-    "quoted": "„{{text}}“",
+    "quoted": "»{{text}}«",
     "mention": "{{name}} te je omenil(a)",
     "mentionGroup": "{{name}} je omenil(a) vse",
     "reply": "{{name}} je odgovoril(a) na tvoje sporočilo",
@@ -74,12 +74,12 @@
     "block": "Blokiraj",
     "update": {
       "title": "Mumcord {{version}} je pripravljen",
-      "body": "Za posodobitev znova zaženite",
+      "body": "Za posodobitev znova zaženi",
       "restart": "Znova zaženi in posodobi",
       "whatsNew": "Kaj je novega"
     },
     "relay": {
-      "title": "Rele na {{server}} se je spremenil",
+      "title": "Relej na {{server}} se je spremenil",
       "body": "Deljenje zaslona in datotek je zaustavljeno, dokler novemu releju ne zaupaš.",
       "decision": "Potrebna je tvoja odločitev"
     }

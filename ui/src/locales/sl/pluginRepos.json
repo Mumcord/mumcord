@@ -1,25 +1,25 @@
 {
-  "intro": "Skladišča so dodatni seznami vtičnikov, ki jih vodijo drugi ljudje. Mumcord njihovih vtičnikov ne pregleduje. Dodajte le skladišča, ki jim zaupate.",
+  "intro": "Skladišča so dodatni seznami vtičnikov, ki jih vodijo drugi ljudje. Mumcord njihovih vtičnikov ne pregleduje. Dodaj le skladišča, ki jim zaupaš.",
   "add": {
     "button": "Dodaj skladišče",
     "title": "Dodaj skladišče",
     "address": "Naslov skladišča",
     "expectedKey": "Pričakovani ključ (neobvezno)",
-    "expectedKeyHint": "Če vam je lastnik dal ključ, ga prilepite sem. Skladišče mora nato uporabljati natanko ta ključ.",
+    "expectedKeyHint": "Če ti je lastnik dal ključ, ga prilepi sem. Skladišče mora nato uporabljati natanko ta ključ.",
     "check": "Preveri skladišče",
     "found": "To smo našli",
     "confirm": "Dodaj skladišče",
-    "subtitle": "Dodajte samo repozitorije ljudi, ki jim zaupate.",
+    "subtitle": "Dodaj samo skladišča ljudi, ki jim zaupaš.",
     "signatureValid": "podpis veljaven",
     "contactLine": "stik: {{contact}}",
     "pluginsLine": "Vtičniki: {{number}}",
     "signingKey": "Podpisni ključ",
-    "warningTitle": "Neuradni repozitorij",
-    "warningBody": "Mumcord teh vtičnikov ne pregleduje. Ključ si zapomni: če se kdaj spremeni, je repozitorij zaustavljen, dokler ga ne preverite. Pri brskanju gostitelj vidi vaš naslov IP. Vtičniki z uradnimi imeni se od tod nikoli ne vzamejo."
+    "warningTitle": "Neuradno skladišče",
+    "warningBody": "Mumcord teh vtičnikov ne pregleduje. Ta ključ si zapomni: če se kdaj spremeni, se skladišče začasno ustavi, dokler ga ne preveriš. Ko ga brskaš, gostitelj vidi tvoj naslov IP. Vtičniki z uradnimi imeni se iz njega nikoli ne prevzamejo."
   },
-  "limit": "Dodate lahko do {{max}} skladišč.",
+  "limit": "Dodaš lahko največ {{max}} skladišč.",
   "limitReached": "Dosežena je omejitev {{max}} skladišč.",
-  "empty": "Skladišč še niste dodali.",
+  "empty": "Dodanih skladišč še ni.",
   "listLabel": "Dodana skladišča",
   "loadFailed": "Skladišč ni bilo mogoče naložiti.",
   "status": {
@@ -39,7 +39,7 @@
   },
   "keyChange": {
     "title": "{{name}} je spremenilo ključ",
-    "message": "To skladišče zdaj podpisuje seznam vtičnikov z drugim ključem. Ostane začasno ustavljeno, dokler se ne odločite. Novemu ključu zaupajte le, če je lastnik spremembo napovedal.",
+    "message": "To skladišče zdaj podpisuje seznam vtičnikov z drugim ključem. Ostane začasno ustavljeno, dokler se ne odločiš. Novemu ključu zaupaj le, če ti je lastnik spremembo sporočil.",
     "oldKey": "Do zdaj zaupani ključ",
     "newKey": "Nov ključ",
     "keepPaused": "Pusti ustavljeno",
@@ -49,7 +49,7 @@
   "mirror": {
     "title": "Napredno",
     "label": "Zrcalo uradnega seznama vtičnikov (neobvezno)",
-    "hint": "To spremenite le, če ste dobili naslov zrcala. Zrcalo mora ponujati iste podpisane datoteke; Mumcord še vedno preveri vsak podpis.",
+    "hint": "To spremeni le, če si dobil naslov zrcala. Zrcalo mora ponujati iste podpisane datoteke; Mumcord še vedno preveri vsak podpis.",
     "save": "Shrani",
     "reset": "Uporabi privzeto"
   },

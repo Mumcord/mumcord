@@ -15,14 +15,14 @@
     "openSettings": "Odpri nastavitve prekrivnega sloja"
   },
   "audioDevice": {
-    "title": "Znova izberite zvočne naprave",
-    "description": "Mumcord zdaj vsak vhod in izhod vaših zvočnih naprav prikaže posebej. Shranjene naprave ni bilo mogoče povezati z nobenim od njih, zato se zaenkrat uporablja privzeta sistemska naprava. Napravo lahko izberete v nastavitvah zvoka.",
+    "title": "Znova izberi zvočne naprave",
+    "description": "Mumcord zdaj vsak vhod in izhod tvojih zvočnih naprav prikaže posebej. Shranjene naprave ni bilo mogoče povezati z nobenim od njih, zato se zaenkrat uporablja privzeta sistemska naprava. Napravo lahko izbereš v nastavitvah zvoka.",
     "dismiss": "Razumem",
     "openSettings": "Odpri nastavitve zvoka"
   },
   "appImageMenu": {
     "title": "Želiš dodati Mumcord v meni aplikacij?",
-    "description": "Tako se Mumcord pojavi v meniju aplikacij. Ikona in pritisni za govor v Waylandu delujeta pravilno, povezave mumble:// pa odprejo Mumcord. To lahko pozneje spremeniš v Nastavitvah.",
+    "description": "Tako se Mumcord pojavi v meniju aplikacij. Ikona in Push-to-talk v Waylandu delujeta pravilno, povezave mumble:// pa odprejo Mumcord. To lahko pozneje spremeniš v Nastavitvah.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Ni uspelo. Poskusi znova."
@@ -35,8 +35,8 @@
     "failed": "Ni uspelo. Poskusi znova."
   },
   "directConsent": {
-    "title": "Dovolim neposredne povezave?",
-    "description": "Neposredne povezave so hitrejše, vendar lahko druga oseba vidi vaš naslov IP. Mumcord jih uporablja za slike v polni velikosti in deljenje zaslona z drugimi uporabniki Mumcorda ter lahko zanje odpre vrata na vašem usmerjevalniku. Če odklonite, slike še vedno prispejo prek strežnika, deljenje zaslona pa ni na voljo. To lahko pozneje spremenite v Nastavitve → Zasebnost. Če ta strežnik ponuja relej, ga lahko Mumcord uporabi namesto tega; potem druga oseba ne vidi tvojega naslova IP.",
+    "title": "Dovoliš neposredne povezave?",
+    "description": "Neposredne povezave so hitrejše, vendar lahko druga oseba vidi tvoj naslov IP. Mumcord jih uporablja za slike v polni velikosti in deljenje zaslona z drugimi uporabniki Mumcorda ter lahko zanje odpre vrata na tvojem usmerjevalniku. Če odkloniš, slike še vedno prispejo prek strežnika, deljenje zaslona pa ni na voljo. To lahko pozneje spremeniš v razdelku Nastavitve → Zasebnost. Če ta strežnik ponuja relej, ga lahko Mumcord uporabi namesto tega; potem druga oseba ne vidi tvojega naslova IP.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Ni uspelo. Poskusi znova."

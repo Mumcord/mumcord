@@ -20,8 +20,8 @@
     "showAll": "Pokaži vse ({{total}})",
     "showFewer": "Pokaži manj",
     "jump": "Skoči na moj kanal",
-    "locked": "zaklenjeno",
-    "temporary": "začasni",
+    "locked": "zaklenjen",
+    "temporary": "začasen",
     "linked": "povezan",
     "full": "Kanal je poln",
     "fullPlaces": "Kanal je poln, {{places}}",
@@ -48,7 +48,7 @@
     "title": "Boti na tem strežniku ({{total}})",
     "inChannel": "v kanalu {{channel}}",
     "modules": {
-      "peer": "Rele",
+      "peer": "Relej",
       "music": "Predvaja glasbo",
       "history": "Zgodovina klepeta",
       "webhook": "Spletni kavlji"
@@ -108,23 +108,23 @@
       "reconnecting": "Ponovno povezovanje…",
       "disconnected": "Ni povezave"
     },
-    "online": "{{count}} na spletu",
-    "onlinePing": "{{count}} na spletu · {{ping}} ms"
+    "online": "Povezani: {{count}}",
+    "onlinePing": "Povezani: {{count}} · {{ping}} ms"
   },
   "moveTo": {
     "title": "Premakni osebe",
     "channel": "Kanal",
     "search": "Iskanje kanalov",
     "noMatch": "Noben kanal se ne ujema.",
-    "hint": "Izberi kanal, kam naj gredo osebe.",
+    "hint": "Izberi kanal, v katerega naj se osebe premaknejo.",
     "from": "Iz {{channel}}",
     "question": "Premaknem {{people}} iz {{from}} v {{to}}?",
     "questionNoSource": "Premaknem {{people}} v {{to}}?",
     "confirm": "Premakni",
     "failed": "Nekaterih oseb ni bilo mogoče premakniti.",
     "resultTitle": "Premikanje oseb",
-    "resultAll": "Premaknjenih {{people}} v {{channel}}.",
-    "resultSome": "Premaknjenih {{moved}} od {{people}} v {{channel}}. Ostali so bili zavrnjeni.",
+    "resultAll": "Premaknjeno v {{channel}}: {{people}}.",
+    "resultSome": "Premaknjeno v {{channel}}: {{moved}} od {{people}}. Ostale so bile zavrnjene.",
     "busy": "Osebe se že premikajo…"
   },
   "drag": {
@@ -133,7 +133,7 @@
     "below": "Postavi pod {{channel}}",
     "self": "Ne more v samega sebe",
     "subChannel": "Ne more v lastni podkanal",
-    "confirmTitle": "Premaknem „{{channel}}“?",
+    "confirmTitle": "Premaknem »{{channel}}«?",
     "alongAll": "S kanalom {{channel}} se premaknejo: {{subChannels}} in {{people}}.",
     "alongSubChannels": "S kanalom {{channel}} se premaknejo: {{subChannels}}.",
     "alongPeople": "S kanalom {{channel}} se premaknejo: {{people}}.",
