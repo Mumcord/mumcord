@@ -99,21 +99,21 @@ impl StartError {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Kind {
     #[cfg_attr(
-        not(any(target_os = "linux", target_os = "windows", target_os = "macos")),
+        not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")),
         allow(dead_code)
     )]
     Native,
     #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
     Evdev,
     #[cfg_attr(
-        any(target_os = "linux", target_os = "windows", target_os = "macos"),
+        any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos"),
         allow(dead_code)
     )]
     Unsupported,
 }
 
 fn kind() -> Kind {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     {
         match super::current_backend() {
             super::Backend::Portal => Kind::Evdev,
@@ -124,7 +124,7 @@ fn kind() -> Kind {
     {
         Kind::Native
     }
-    #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+    #[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
     {
         Kind::Unsupported
     }
@@ -237,7 +237,7 @@ fn native_state(last_failure: Option<PttUnavailableReason>) -> PttMouseState {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn start_native(button: MouseButton, on_change: OnChange) -> Result<Box<dyn Send>, StartError> {
     super::mouse_x11::start(button, on_change).map(|l| Box::new(l) as Box<dyn Send>)
 }
@@ -252,7 +252,7 @@ fn start_native(button: MouseButton, on_change: OnChange) -> Result<Box<dyn Send
     super::mouse_macos::start(button, on_change).map(|l| Box::new(l) as Box<dyn Send>)
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
 fn start_native(_button: MouseButton, _on_change: OnChange) -> Result<Box<dyn Send>, StartError> {
     Err(StartError::Failed("no mouse backend".to_owned()))
 }
