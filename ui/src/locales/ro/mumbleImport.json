@@ -5,9 +5,9 @@
   "listLabel": "Ce să copiem din Mumble",
   "favourites": {
     "title": "Servere favorite",
-    "found_one": "{{count}} găsit",
-    "found_few": "{{count}} găsite",
-    "found_other": "{{count}} de găsite",
+    "found_one": "Găsit: {{count}}",
+    "found_few": "Găsite: {{count}}",
+    "found_other": "Găsite: {{count}}",
     "duplicates_one": "{{count}} deja în Mumcord (omis)",
     "duplicates_few": "{{count}} deja în Mumcord (omise)",
     "duplicates_other": "{{count}} deja în Mumcord (omise)",
@@ -22,7 +22,7 @@
     "count_one": "{{count}} dintre favorite are o parolă salvată",
     "count_few": "{{count}} dintre favorite au o parolă salvată",
     "count_other": "{{count}} dintre favorite au o parolă salvată",
-    "keychain": "Stocată în depozitul de chei al sistemului"
+    "keychain": "Stocate în depozitul de chei al sistemului"
   },
   "identity": {
     "title": "Identitate (certificat de client)",
@@ -79,7 +79,7 @@
     "passwords_one": "{{count}} parolă salvată",
     "passwords_few": "{{count}} parole salvate",
     "passwords_other": "{{count}} de parole salvate",
-    "passwordsDetail": "Stocată în breloc (keychain) sistemului, nu într-un fișier",
+    "passwordsDetail": "Stocate în depozitul de chei al sistemului, nu într-un fișier",
     "identity": "Identitate importată",
     "identityDefault": "Mumcord o folosește acum",
     "identityServers": "Folosită pentru serverele copiate",

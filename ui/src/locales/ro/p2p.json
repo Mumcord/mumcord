@@ -17,9 +17,9 @@
     "available": "Disponibil",
     "availableAt": "Disponibil · {{host}}",
     "unavailable": "Indisponibil: {{reason}}",
-    "untrusted": "Schimbat, neîncrezut",
+    "untrusted": "Schimbat, nu e de încredere",
     "changed": "Releul acestui server s-a schimbat.",
-    "trustNew": "Ai încredere în noul releu",
+    "trustNew": "Acordă încredere noului releu",
     "keepBlocked": "Păstrează blocat",
     "forget": "Uită releul",
     "actionFailed": "Nu a funcționat. Încearcă din nou.",
@@ -66,14 +66,14 @@
   },
   "refusalAction": {
     "howToRegister": "Cum te înregistrezi",
-    "reconnect": "Reconectează",
+    "reconnect": "Reconectează-te",
     "filesRegisteredOnly": "Partajarea fișierelor e disponibilă pe acest server doar pentru utilizatorii înregistrați."
   },
   "trust": {
     "title": "Releul de pe {{server}} s-a schimbat",
     "body": "Partajarea ecranului și a fișierelor e în pauză până când ai încredere în noul releu.",
     "details": "Detalii",
-    "trustedTitle": "Ai încredere în noul releu",
+    "trustedTitle": "Noul releu e de încredere",
     "trustedBody": "Partajarea ecranului și a fișierelor pe {{server}} funcționează din nou.",
     "dialogBody": "Releul acestui server folosește acum alt certificat. Până când ai încredere în el, partajarea ecranului, a fișierelor și imaginile la dimensiune completă sunt în pauză.",
     "previous": "Releu de încredere până acum",

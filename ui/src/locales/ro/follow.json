@@ -44,9 +44,9 @@
     "followed_one": "Urmărești {{count}} canal.",
     "followed_few": "Urmărești {{count}} canale.",
     "followed_other": "Urmărești {{count}} de canale.",
-    "skipped_one": "{{count}} omis: {{reasons}}.",
-    "skipped_few": "{{count}} omise: {{reasons}}.",
-    "skipped_other": "{{count}} de omise: {{reasons}}.",
+    "skipped_one": "{{count}} canal omis: {{reasons}}.",
+    "skipped_few": "{{count}} canale omise: {{reasons}}.",
+    "skipped_other": "{{count}} de canale omise: {{reasons}}.",
     "limit": "limită atinsă",
     "notAllowed": "nepermis",
     "noAnswer": "niciun răspuns de la server",
@@ -55,9 +55,9 @@
     "dismiss": "Închide",
     "unfollowFailed": "Renunțarea la toate canalele nu a mers. Încearcă din nou."
   },
-  "mention": "conține o mențiune a ta",
+  "mention": "te menționează",
   "header": {
     "follow": "Urmărește canalul",
-    "unfollow": "Urmărești, fă clic pentru a opri"
+    "unfollow": "Urmărești, fă clic ca să nu mai urmărești"
   }
 }

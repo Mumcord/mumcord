@@ -1,18 +1,18 @@
 {
   "close": {
-    "title": "Minimizezi în tray sau închizi?",
-    "description": "Ești încă conectat. Minimizat, Mumcord te păstrează în voice și rămâne în tray-ul sistemului.",
+    "title": "Minimizezi în zona de notificare sau închizi?",
+    "description": "Ești încă conectat. Minimizat, Mumcord te ține pe canalul vocal și rămâne în zona de notificare.",
     "remember": "Ține minte alegerea mea",
-    "minimize": "Minimizează în tray",
+    "minimize": "Minimizează în zona de notificare",
     "quit": "Închide",
     "failed": "Nu a mers. Încearcă din nou.",
-    "descriptionServers": "Ești încă conectat la {{count}} servere. Minimizat, Mumcord te ține pe canalul vocal și rămâne în zona de notificare."
+    "descriptionServers": "Ești încă conectat la mai multe servere ({{count}}). Minimizat, Mumcord te ține pe canalul vocal și rămâne în zona de notificare."
   },
   "windowOverlay": {
-    "title": "Overlay-ul în fereastră a fost eliminat",
-    "description": "Fereastra plutitoare de overlay nu mai există. În schimb, overlay-ul din joc arată cine vorbește în jocurile tale. Îl poți activa din setările overlay-ului.",
+    "title": "Suprapunerea în fereastră a fost eliminată",
+    "description": "Fereastra plutitoare de suprapunere nu mai există. În schimb, suprapunerea din joc arată cine vorbește în jocurile tale. O poți activa din setările suprapunerii.",
     "dismiss": "Am înțeles",
-    "openSettings": "Deschide setările overlay-ului"
+    "openSettings": "Deschide setările suprapunerii"
   },
   "audioDevice": {
     "title": "Alege din nou dispozitivele audio",

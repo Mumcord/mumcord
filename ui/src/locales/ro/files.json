@@ -2,8 +2,8 @@
   "composer": {
     "attach": "Partajează fișiere",
     "attachLabel": "Partajează fișiere în acest canal",
-    "dropTitle": "Eliberează pentru a partaja cu #{{channel}}",
-    "dropChoiceTitle": "Unele dintre ele sunt imagini. Ce să se facă cu ele?",
+    "dropTitle": "Plasează aici pentru a partaja în #{{channel}}",
+    "dropChoiceTitle": "Unele dintre ele sunt imagini. Ce vrei să faci cu ele?",
     "sendAsImage": "Trimite ca imagine",
     "shareAsFile": "Partajează ca fișier",
     "dropChoiceCancel": "Anulează",
@@ -58,7 +58,7 @@
     "progressLabel": "Se descarcă {{name}}",
     "progressValue": "{{percent}} %",
     "progress": "{{percent}} % · {{received}} din {{size}} · {{speed}} · mai durează circa {{left}}",
-    "transport": "Peer-to-peer · criptat integral (end-to-end)",
+    "transport": "Peer-to-peer · criptat integral",
     "checking": "Se verifică…",
     "done": "✓ Descărcat",
     "matches": "✓ Corespunde ofertei",
@@ -66,7 +66,7 @@
     "openFolder": "Deschide folderul",
     "open": "Deschide",
     "gone": "Fișierul nu se mai află în {{folder}}",
-    "mismatchTitle": "Hash nepotrivit – fișier șters",
+    "mismatchTitle": "Sumă de control nepotrivită – fișier șters",
     "mismatch": "Fișierul s-a schimbat pe drum sau nu corespunde ofertei și a fost șters. Nimic nu a fost salvat sau deschis. Roagă-l pe {{sender}} să îl partajeze din nou.",
     "failed": "Descărcarea a eșuat: {{reason}}",
     "cancelled": "Descărcare anulată",
@@ -85,13 +85,13 @@
       "downloading": "se descarcă",
       "checking": "se verifică",
       "done": "descărcat",
-      "mismatch": "hash nepotrivit, fișier șters",
+      "mismatch": "sumă de control nepotrivită, fișier șters",
       "failed": "descărcare eșuată",
       "cancelled": "anulat",
       "unavailable": "indisponibil"
     },
     "unavailable": {
-      "offline": "{{sender}} a trecut offline. Fișierul nu mai este disponibil.",
+      "offline": "{{sender}} s-a deconectat. Fișierul nu mai este disponibil.",
       "ended": "Această partajare s-a încheiat. Partajările se încheie după 24 de ore.",
       "askAgain": "Roagă-l pe {{sender}} să îl partajeze din nou."
     },
@@ -100,7 +100,7 @@
       "receiveOffLink": "Deschide setările de partajare a fișierelor",
       "tooLarge": "Mai mare decât limita ta de {{limit}}",
       "tooLargeLink": "Schimbă limita",
-      "anotherDownload": "Rulează o altă descărcare"
+      "anotherDownload": "O altă descărcare este în curs"
     }
   },
   "sender": {
@@ -153,6 +153,6 @@
     "saveTo": "Salvează fișierele în",
     "change": "Schimbă…",
     "relayNote": "Fișierele trec întotdeauna prin releul serverului, așa că nimeni nu îți vede adresa IP. Serverele fără releu nu pot partaja fișiere. Nimic nu se descarcă fără clicul și confirmarea ta.",
-    "encryptionNote": "Fișierele sunt criptate integral (end-to-end) și verificate după descărcare."
+    "encryptionNote": "Fișierele sunt criptate integral și verificate după descărcare."
   }
 }
