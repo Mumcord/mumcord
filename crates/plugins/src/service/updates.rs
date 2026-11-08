@@ -193,8 +193,8 @@ pub async fn run_check(
     let base = official_base(settings.plugins_mirror_url.as_deref())?;
 
     if due.revocations {
-        let loaded = fetch_revoked(client, &official_dir, &base, settings.plugin_registry_cache)
-            .await?;
+        let loaded =
+            fetch_revoked(client, &official_dir, &base, settings.plugin_registry_cache).await?;
         let fetched = matches!(loaded.freshness, Freshness::Fresh | Freshness::NotModified);
         if let Freshness::Rejected(error) = &loaded.freshness {
             tracing::warn!(%error, "the downloaded revocation list was rejected");
@@ -317,18 +317,18 @@ pub async fn load_repository(
     let dir = registry_cache.join(format!("repo-{id}"));
     let (loaded, new_key) =
         match fetch_repository(client, &dir, repository, is_official_id, cache_enabled).await {
-        Ok(RepoOutcome::Loaded(loaded)) => (loaded, None),
-        Ok(RepoOutcome::Rotated { new_key, loaded }) => (loaded, Some(new_key)),
-        Ok(RepoOutcome::KeyChanged { .. }) => {
-            with_service(service, move |s| s.pause_repository(id)).await??;
-            tracing::warn!(repository = id, "repository key changed; paused");
-            return Ok(None);
-        }
-        Err(error) => {
-            tracing::warn!(repository = id, %error, "could not load a repository");
-            return Ok(None);
-        }
-    };
+            Ok(RepoOutcome::Loaded(loaded)) => (loaded, None),
+            Ok(RepoOutcome::Rotated { new_key, loaded }) => (loaded, Some(new_key)),
+            Ok(RepoOutcome::KeyChanged { .. }) => {
+                with_service(service, move |s| s.pause_repository(id)).await??;
+                tracing::warn!(repository = id, "repository key changed; paused");
+                return Ok(None);
+            }
+            Err(error) => {
+                tracing::warn!(repository = id, %error, "could not load a repository");
+                return Ok(None);
+            }
+        };
     if let Freshness::Rejected(error) = &loaded.freshness {
         tracing::warn!(repository = id, %error, "a repository index was rejected");
     }

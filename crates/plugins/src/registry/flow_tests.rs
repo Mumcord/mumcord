@@ -105,14 +105,29 @@ async fn official_index_cache_offline_rollback_and_wrong_key() {
     }
     assert_eq!(forged.index.sequence, 7);
 
-    let offline = fetch_official_with(&client, cache.path(), &base(&dead_base()), Some(7), true, &keys)
-        .await
-        .expect("test step");
+    let offline = fetch_official_with(
+        &client,
+        cache.path(),
+        &base(&dead_base()),
+        Some(7),
+        true,
+        &keys,
+    )
+    .await
+    .expect("test step");
     assert!(matches!(offline.freshness, Freshness::Offline));
     assert_eq!(offline.index.plugins[0].id, "dice");
 
     let empty = tempfile::tempdir().expect("test step");
-    let never = fetch_official_with(&client, empty.path(), &base(&dead_base()), None, true, &keys).await;
+    let never = fetch_official_with(
+        &client,
+        empty.path(),
+        &base(&dead_base()),
+        None,
+        true,
+        &keys,
+    )
+    .await;
     assert_eq!(never.expect_err("must fail").to_string(), UNREACHABLE_TEXT);
 }
 

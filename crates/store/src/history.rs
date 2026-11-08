@@ -123,11 +123,11 @@ impl Store {
             *next = Some(id + 1);
             return Ok(id);
         }
-        let max: i64 = self.conn.query_row(
-            "SELECT COALESCE(MAX(id), 0) FROM chat_message",
-            [],
-            |row| row.get(0),
-        )?;
+        let max: i64 =
+            self.conn
+                .query_row("SELECT COALESCE(MAX(id), 0) FROM chat_message", [], |row| {
+                    row.get(0)
+                })?;
         *next = Some(max + 2);
         Ok(max + 1)
     }

@@ -192,7 +192,14 @@ pub async fn fetch_revoked(
     base: &Url,
     cache_enabled: bool,
 ) -> Result<RevokedLoaded, RegistryError> {
-    fetch_revoked_with(client, cache_dir, base, cache_enabled, &RegistryKeys::official()).await
+    fetch_revoked_with(
+        client,
+        cache_dir,
+        base,
+        cache_enabled,
+        &RegistryKeys::official(),
+    )
+    .await
 }
 
 pub(super) async fn fetch_revoked_with(
