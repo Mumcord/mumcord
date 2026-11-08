@@ -121,6 +121,9 @@ const neutral = (t: string) =>
   // "Standard" is the German default-identity badge ("Default"), which only matches the English
   // noise suppression level by chance.
   /^Standard$/.test(t) ||
+  // Key combinations read the same in every language: "Ctrl + Shift + M", "Ctrl + ," (the
+  // visually hidden text of the hotkey fields, issue #584).
+  /^((Ctrl|Cmd|Super|Alt|Shift) \+ )+[^ ]+$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // Settings group names that read the same: "General" in Spanish, "Gaming & Overlay" in German.
