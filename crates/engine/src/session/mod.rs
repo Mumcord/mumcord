@@ -2583,6 +2583,7 @@ impl Inner {
                     crate::watch_party::on_tick(&self.watch_parties, &ctx);
                     crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
                     crate::camera::session::on_tick(&self.cameras, &ctx);
+                    crate::mumcord::on_tick(&self.mumcord, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
                         let mut core = lock(&self.core);
