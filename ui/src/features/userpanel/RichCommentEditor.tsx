@@ -10,9 +10,11 @@ interface RichCommentEditorProps {
   disabled: boolean;
   describedBy?: string | undefined;
   onChange: (html: string) => void;
+  /** "description" (channel descriptions, issue #250) offers bold, italic, underline and link. */
+  tools?: "comment" | "description";
 }
 
-type Command = "bold" | "italic" | "insertUnorderedList" | "insertOrderedList";
+type Command = "bold" | "italic" | "underline" | "insertUnorderedList" | "insertOrderedList";
 
 // `execCommand` is deprecated but is the one editing API every webview we ship on supports and
 // it writes the plain <b>/<i>/<ul> markup Mumble clients expect.
@@ -28,6 +30,7 @@ export function RichCommentEditor({
   disabled,
   describedBy,
   onChange,
+  tools = "comment",
 }: RichCommentEditorProps) {
   const { t } = useTranslation("userpanel");
   const editor = useRef<HTMLDivElement>(null);
@@ -100,6 +103,9 @@ export function RichCommentEditor({
     if (key === "b" || key === "i") {
       event.preventDefault();
       format(key === "b" ? "bold" : "italic");
+    } else if (key === "u" && tools === "description") {
+      event.preventDefault();
+      format("underline");
     } else if (key === "k") {
       event.preventDefault();
       startLink();
@@ -129,6 +135,7 @@ export function RichCommentEditor({
       <div role="toolbar" aria-label={t("profile.format")} className="rich-editor__toolbar">
         {tool(t("profile.bold"), "bold", "B")}
         {tool(t("profile.italic"), "italic", "I")}
+        {tools === "description" && tool(t("profile.underline"), "underline", "U")}
         <button
           type="button"
           className="button rich-editor__tool"
@@ -142,8 +149,8 @@ export function RichCommentEditor({
         >
           🔗
         </button>
-        {tool(t("profile.bulletList"), "insertUnorderedList", "•")}
-        {tool(t("profile.numberedList"), "insertOrderedList", "1.")}
+        {tools === "comment" && tool(t("profile.bulletList"), "insertUnorderedList", "•")}
+        {tools === "comment" && tool(t("profile.numberedList"), "insertOrderedList", "1.")}
       </div>
       {linkUrl !== null ? (
         <div className="rich-editor__link">

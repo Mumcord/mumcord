@@ -93,6 +93,8 @@ export interface ChannelMenuRequest {
   restoreFocus: () => void;
   /** The menu and its dialogs are closed. */
   onDone: () => void;
+  /** F2 or Delete on the row: open "Edit channel…" or "Delete channel?" without the menu (FR-10.10). */
+  shortcut?: "edit" | "delete" | undefined;
 }
 
 export interface ChannelTreeHandle {
@@ -193,7 +195,12 @@ export function ChannelTree({
       initialCollapsed(roots, state.channels.size, ownChannelId),
   );
   const [jump, setJump] = useState<{ rowId: string } | null>(null);
-  const [menu, setMenu] = useState<{ channelId: number; x: number; y: number } | null>(null);
+  const [menu, setMenu] = useState<{
+    channelId: number;
+    x: number;
+    y: number;
+    shortcut?: "edit" | "delete";
+  } | null>(null);
 
   // "Hide empty channels" and "Show talking people first" (FR-2.23). Talking only reorders the
   // tree while that switch is on. Search below always covers every channel.
@@ -361,8 +368,12 @@ export function ChannelTree({
     };
   }, [jump]);
 
-  const openMenu = (channelId: number, position: { x: number; y: number }) => {
-    if (channelMenu) setMenu({ channelId, ...position });
+  const openMenu = (
+    channelId: number,
+    position: { x: number; y: number },
+    shortcut?: "edit" | "delete",
+  ) => {
+    if (channelMenu) setMenu({ channelId, ...position, ...(shortcut ? { shortcut } : {}) });
   };
 
   const toggleShowAll = (channelId: number) => {
@@ -387,6 +398,14 @@ export function ChannelTree({
     // The menu key and Shift+F10 open a channel's menu (issue #172); a person row keeps the
     // browser's contextmenu event, which opens the person menu.
     const menuKey = event.key === "ContextMenu" || (event.key === "F10" && event.shiftKey);
+    // F2 and Delete open the channel's edit window or delete confirmation (FR-10.10); the menu
+    // decides whether the user has the right, and does nothing without it.
+    const shortcut = event.key === "F2" ? "edit" : event.key === "Delete" ? "delete" : undefined;
+    if (shortcut && row.kind === "channel" && channelMenu) {
+      openMenu(row.channelId, { x: 0, y: 0 }, shortcut);
+      event.preventDefault();
+      return;
+    }
     if (menuKey && row.kind === "channel" && channelMenu) {
       const element = treeRef.current?.querySelector<HTMLElement>(`[data-row="${row.id}"]`);
       const rect = element?.getBoundingClientRect();
@@ -513,6 +532,7 @@ export function ChannelTree({
         channelMenu?.({
           channelId: menu.channelId,
           position: { x: menu.x, y: menu.y },
+          shortcut: menu.shortcut,
           join:
             menu.channelId === selfChannelId
               ? undefined

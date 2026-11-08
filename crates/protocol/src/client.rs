@@ -172,6 +172,9 @@ pub enum Event {
     /// send it only to users with the Write permission; a refusal arrives as
     /// [`Event::PermissionDenied`] with `permission == [`crate::permissions::WRITE`].
     Acl(Box<proto::Acl>),
+    /// Names for registered user ids (or ids for names), the answer to [`Handle::query_users`].
+    /// Names are untrusted server input.
+    UsersQueried(proto::QueryUsers),
     /// The server's ban list, the answer to [`Handle::query_ban_list`]. Standard servers send it
     /// only to users with the Ban permission in the root channel, so a refusal arrives as
     /// [`Event::PermissionDenied`] with `permission == [`crate::permissions::BAN`]. Texts and
@@ -1128,6 +1131,10 @@ impl Dispatcher {
                 let m: proto::Acl = decode("Acl", payload)?;
                 self.emit(Event::Acl(Box::new(m)));
             }
+            MessageType::QueryUsers => {
+                let m: proto::QueryUsers = decode("QueryUsers", payload)?;
+                self.emit(Event::UsersQueried(m));
+            }
             MessageType::BanList => {
                 let m: proto::BanList = decode("BanList", payload)?;
                 self.emit(Event::BanList(crate::ban::from_message(&m)));
@@ -1517,6 +1524,23 @@ impl Handle {
     /// permissions, e.g. as SuperUser). Without `channel_id` the server creates a new channel.
     pub fn send_channel_state(&self, state: proto::ChannelState) -> Result<(), CommandError> {
         self.send(Frame::from_message(MessageType::ChannelState, &state))
+    }
+
+    /// Asks the server for the names of registered user ids, e.g. those named in a channel's ACL.
+    /// The answer arrives as [`Event::UsersQueried`].
+    pub fn query_users(&self, ids: Vec<u32>) -> Result<(), CommandError> {
+        let m = proto::QueryUsers {
+            ids,
+            names: Vec::new(),
+        };
+        self.send(Frame::from_message(MessageType::QueryUsers, &m))
+    }
+
+    /// Deletes a channel with its sub-channels; the server moves the people in them to the parent
+    /// (needs the Write permission on the channel).
+    pub fn send_channel_remove(&self, channel_id: u32) -> Result<(), CommandError> {
+        let m = proto::ChannelRemove { channel_id };
+        self.send(Frame::from_message(MessageType::ChannelRemove, &m))
     }
 
     /// Defines (or replaces) voice target `target.id` (1..=[`VOICE_TARGET_MAX`]) for whisper and

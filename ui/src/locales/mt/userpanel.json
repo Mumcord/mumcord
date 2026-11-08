@@ -43,7 +43,8 @@
     "linkAddress": "Indirizz tal-link",
     "linkApply": "Żid link",
     "bulletList": "Lista bil-punti",
-    "numberedList": "Lista nnumerata"
+    "numberedList": "Lista nnumerata",
+    "underline": "Sottolinjat"
   },
   "register": {
     "title": "Irreġistra fuq dan is-server",

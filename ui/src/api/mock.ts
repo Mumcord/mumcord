@@ -39,6 +39,12 @@ import type {
   AudioDevices,
   ChannelAudioProfile,
   ChannelInfo,
+  AclRuleView,
+  AclVerdict,
+  ChannelAclView,
+  ChannelResult,
+  DenialKind,
+  Right,
   ChatMessage,
   ConnectionState,
   ConnectionStats,
@@ -740,6 +746,50 @@ const allow = {
   register: false,
   resetUserContent: false,
 };
+
+const ENTER_BIT = 0x4;
+const WRITE_BIT = 0x1;
+const MAKE_TEMP_BIT = 0x400;
+
+function isDenyAll(rule: AclRuleView): boolean {
+  return (
+    rule.userId === null && rule.group === "all" && rule.grant === 0 && rule.deny === ENTER_BIT
+  );
+}
+
+function isTokenAllow(rule: AclRuleView): boolean {
+  return (
+    rule.userId === null &&
+    rule.group !== null &&
+    rule.group.startsWith("#") &&
+    rule.group.length > 1 &&
+    rule.grant === ENTER_BIT &&
+    rule.deny === 0
+  );
+}
+
+/** The channel's own part, as a save compares it (FR-10.43). */
+function ownRules(acl: ChannelAclView): unknown {
+  return {
+    inheritAcls: acl.inheritAcls,
+    rules: acl.rules.filter((r) => !r.inherited),
+    groups: acl.groups.filter((g) => !g.inherited || g.add.length > 0 || g.remove.length > 0),
+  };
+}
+
+/** The password the engine reads from the official client's two rules (FR-10.28). */
+function withPasswordView(acl: ChannelAclView): ChannelAclView {
+  const join = acl.rules.filter((r) => !r.inherited && ((r.grant | r.deny) & ENTER_BIT) !== 0);
+  const tokens = join.filter(isTokenAllow);
+  let password: ChannelAclView["password"] = { kind: "none" };
+  if (join.length > 0) {
+    password =
+      join.length === 2 && join.some(isDenyAll) && tokens.length === 1
+        ? { kind: "set", password: (tokens[0]?.group ?? "#").slice(1) }
+        : { kind: "custom" };
+  }
+  return { ...acl, password };
+}
 
 function seedChannels(): ChannelInfo[] {
   return [
@@ -1548,6 +1598,59 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
 
   /** Emits an event of the server the running command or control addresses. */
+  // Channel rules and groups (issues #251, #252): every channel inherits the Root rules of a
+  // fresh standard server until the editor saves its own.
+  const channelAcls = new Map<number, ChannelAclView>();
+  function aclOf(channelId: number): ChannelAclView {
+    const known = channelAcls.get(channelId);
+    if (known) return known;
+    const inherited = channelId !== 0;
+    const fresh: ChannelAclView = withPasswordView({
+      channelId,
+      inheritAcls: true,
+      groups: [
+        {
+          name: "admin",
+          inherited,
+          inherit: true,
+          inheritable: true,
+          add: inherited ? [] : [1],
+          remove: [],
+          inheritedMembers: inherited ? [1] : [],
+        },
+      ],
+      rules: [
+        {
+          inherited,
+          applyHere: true,
+          applySubs: true,
+          userId: null,
+          group: "admin",
+          grant: WRITE_BIT,
+          deny: 0,
+        },
+        {
+          inherited,
+          applyHere: true,
+          applySubs: true,
+          userId: null,
+          group: "auth",
+          grant: MAKE_TEMP_BIT,
+          deny: 0,
+        },
+      ],
+      userNames: [{ id: 1, name: "Zoe" }],
+      password: { kind: "none" },
+    });
+    channelAcls.set(channelId, fresh);
+    return fresh;
+  }
+
+  /** A refused channel change, as the engine reports the server's answer (issue #250). */
+  function refusedChannel(denial: DenialKind, permission: Right | null): ChannelResult {
+    return { kind: "refused", denial, permission, reason: null };
+  }
+
   function emitServer<K extends ServerEventName>(
     event: K,
     payload: Omit<EventPayloads[K], "serverId">,
@@ -2637,6 +2740,203 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
 
     // people
+    channelCreate: (serverId, input) => {
+      requireSession(serverId);
+      const snap = requireSnapshot();
+      const parent = requireChannel(input.parentId);
+      const allowed = input.temporary
+        ? parent.permissions.makeTempChannel
+        : parent.permissions.makeChannel;
+      if (!allowed) {
+        return Promise.resolve(
+          refusedChannel("permission", input.temporary ? "makeTempChannel" : "makeChannel"),
+        );
+      }
+      const name = input.name.trim();
+      if (snap.channels.some((c) => c.parentId === parent.id && c.name === name)) {
+        return Promise.resolve(refusedChannel("channelName", null));
+      }
+      const id = Math.max(...snap.channels.map((c) => c.id)) + 1;
+      const channel: ChannelInfo = {
+        id,
+        parentId: parent.id,
+        name,
+        position: input.position,
+        permissions: parent.permissions,
+        description: input.description,
+        hasDescription: input.description !== null,
+        maxUsers: input.maxUsers === 0 ? null : input.maxUsers,
+        temporary: input.temporary,
+        links: [],
+        enterRestricted: false,
+      };
+      snap.channels = [...snap.channels, channel];
+      emitServer("channelUpserted", { channel });
+      // The server moves the creator into a new temporary channel.
+      if (input.temporary) updateUser(SELF_SESSION, { channelId: id });
+      return Promise.resolve({ kind: "confirmed", channelId: id });
+    },
+    channelEdit: (serverId, channelId, change) => {
+      requireSession(serverId);
+      const snap = requireSnapshot();
+      const channel = requireChannel(channelId);
+      const linking = change.linksAdd.length > 0 || change.linksRemove.length > 0;
+      if (linking && !channel.permissions.linkChannel) {
+        return Promise.resolve(refusedChannel("permission", "linkChannel"));
+      }
+      const editing =
+        change.name !== null ||
+        change.description !== null ||
+        change.parentId !== null ||
+        change.position !== null ||
+        change.maxUsers !== null;
+      if (editing && !channel.permissions.write) {
+        return Promise.resolve(refusedChannel("permission", "write"));
+      }
+      const links = new Set(channel.links);
+      change.linksAdd.forEach((id) => links.add(id));
+      change.linksRemove.forEach((id) => links.delete(id));
+      const updated: ChannelInfo = {
+        ...channel,
+        name: change.name ?? channel.name,
+        parentId: change.parentId ?? channel.parentId,
+        position: change.position ?? channel.position,
+        maxUsers: change.maxUsers === null ? channel.maxUsers : change.maxUsers || null,
+        description: change.description === null ? channel.description : change.description || null,
+        hasDescription:
+          change.description === null ? channel.hasDescription : change.description !== "",
+        links: [...links].sort((a, b) => a - b),
+      };
+      // Links go both ways, so the other channels change too.
+      const others = snap.channels
+        .filter((c) => change.linksAdd.includes(c.id) || change.linksRemove.includes(c.id))
+        .map((c) => ({
+          ...c,
+          links: change.linksAdd.includes(c.id)
+            ? [...new Set([...c.links, channelId])].sort((a, b) => a - b)
+            : c.links.filter((id) => id !== channelId),
+        }));
+      const changed = new Map([updated, ...others].map((c) => [c.id, c]));
+      snap.channels = snap.channels.map((c) => changed.get(c.id) ?? c);
+      changed.forEach((c) => {
+        emitServer("channelUpserted", { channel: c });
+      });
+      return Promise.resolve({ kind: "confirmed", channelId });
+    },
+    channelAclRead: (serverId, channelId) => {
+      requireSession(serverId);
+      const channel = requireChannel(channelId);
+      if (!channel.permissions.write) return fail("permissionDenied", "write");
+      return Promise.resolve(structuredClone(aclOf(channelId)));
+    },
+    channelAclSave: (serverId, acl, startedFrom, force) => {
+      requireSession(serverId);
+      const current = aclOf(acl.channelId);
+      if (!force && JSON.stringify(ownRules(current)) !== JSON.stringify(ownRules(startedFrom))) {
+        return Promise.resolve({ kind: "conflict", acl: structuredClone(current) });
+      }
+      const saved = withPasswordView({ ...structuredClone(acl) });
+      channelAcls.set(acl.channelId, saved);
+      return Promise.resolve({ kind: "saved", acl: structuredClone(saved) });
+    },
+    channelPasswordSave: (serverId, channelId, password, startedFrom, force) => {
+      requireSession(serverId);
+      const current = aclOf(channelId);
+      if (!force && JSON.stringify(ownRules(current)) !== JSON.stringify(ownRules(startedFrom))) {
+        return Promise.resolve({ kind: "conflict", acl: structuredClone(current) });
+      }
+      if (current.password.kind === "custom") {
+        return fail("invalidInput", "the Join rules are custom; edit them under Permissions");
+      }
+      const keep = current.rules.filter((r) => r.inherited || !(isDenyAll(r) || isTokenAllow(r)));
+      const value = password?.trim() ?? "";
+      const rule = (group: string, grant: number, deny: number): AclRuleView => ({
+        inherited: false,
+        applyHere: true,
+        applySubs: false,
+        userId: null,
+        group,
+        grant,
+        deny,
+      });
+      const rules =
+        value === "" ? keep : [...keep, rule("all", 0, ENTER_BIT), rule(`#${value}`, ENTER_BIT, 0)];
+      const saved = withPasswordView({ ...current, rules });
+      channelAcls.set(channelId, saved);
+      const snap = requireSnapshot();
+      const locked = { ...requireChannel(channelId), enterRestricted: value !== "" };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
+      emitServer("channelUpserted", { channel: locked });
+      return Promise.resolve({ kind: "saved", acl: structuredClone(saved) });
+    },
+    channelAclEvaluate: (serverId, acl, rows) => {
+      requireSession(serverId);
+      // A small stand-in for the core's evaluation: rules for "all" and the row's own group, the
+      // last one winning; enough for the editor's tests and screenshots.
+      const grid = [0x4, 0x2, 0x8, 0x100, 0x200, 0x800, 0x10, 0x20, 0x1, 0x40, 0x400, 0x80];
+      const defaults = 0x2 | 0x4 | 0x8 | 0x100 | 0x200 | 0x800;
+      return Promise.resolve(
+        rows.map((row) =>
+          grid.map((permission) => {
+            let verdict: AclVerdict = (defaults & permission) !== 0 ? "allowed" : "denied";
+            let rule: number | null = null;
+            let overrides: number | null = null;
+            for (const [index, r] of acl.rules.entries()) {
+              const who = r.group ?? "";
+              const hit = who === "all" || (row.kind === "group" && row.name === who);
+              if (!hit || ((r.grant | r.deny) & permission) === 0) continue;
+              overrides = rule;
+              rule = index;
+              verdict = (r.deny & permission) !== 0 ? "denied" : "allowed";
+            }
+            return {
+              permission,
+              verdict,
+              rule,
+              overrides,
+              reason: rule === null ? null : { kind: "everyone" as const },
+              condition: null,
+              viaWrite: false,
+              superuser: false,
+            };
+          }),
+        ),
+      );
+    },
+    channelAclLockout: (serverId) => {
+      requireSession(serverId);
+      return Promise.resolve([]);
+    },
+    channelRemove: (serverId, channelId) => {
+      requireSession(serverId);
+      const snap = requireSnapshot();
+      const channel = requireChannel(channelId);
+      if (!channel.permissions.write) {
+        return Promise.resolve(refusedChannel("permission", "write"));
+      }
+      const gone = new Set([channelId]);
+      for (let grew = true; grew;) {
+        grew = false;
+        for (const c of snap.channels) {
+          if (c.parentId !== null && gone.has(c.parentId) && !gone.has(c.id)) {
+            gone.add(c.id);
+            grew = true;
+          }
+        }
+      }
+      // The server moves the people in deleted channels to the parent.
+      snap.users
+        .filter((u) => gone.has(u.channelId))
+        .forEach((u) => {
+          updateUser(u.session, { channelId: channel.parentId ?? 0 });
+        });
+      snap.channels = snap.channels.filter((c) => !gone.has(c.id));
+      gone.forEach((id) => {
+        emitServer("channelRemoved", { channelId: id });
+      });
+      return Promise.resolve({ kind: "confirmed", channelId });
+    },
+
     personSetVolume: (serverId, session, volume) => {
       requireSession(serverId);
       if (!Number.isInteger(volume) || volume < 0 || volume > 200) {

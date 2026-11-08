@@ -175,6 +175,37 @@ export const commands = {
 	 *  FR-10.19). Acts at once; a refusal arrives as a `serverDenied` notice with the server's reason.
 	 */
 	personModerate: (serverId: number, session: number, action: ModerateInput) => typedError<null, ApiError>(__TAURI_INVOKE("person_moderate", { serverId, session, action })),
+	/**  Creates a channel (FR-10.21, FR-10.22). A temporary channel moves you into it. */
+	channelCreate: (serverId: number, input: ChannelCreateInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_create", { serverId, input })),
+	/**
+	 *  Edits, moves or links a channel (FR-10.23, FR-10.24, FR-10.27); also the menu's quick "Link with
+	 *  my channel" and "Unlink all".
+	 */
+	channelEdit: (serverId: number, channelId: number, change: ChannelChangeInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_edit", { serverId, channelId, change })),
+	/**  Deletes a channel with its sub-channels; the people in them go to the parent (FR-10.25). */
+	channelRemove: (serverId: number, channelId: number) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_remove", { serverId, channelId })),
+	/**
+	 *  Reads a channel's rules and groups (FR-10.36). Fails with `permissionDenied` without the right
+	 *  to edit them, and `serverUnreachable` without an answer within 5 s (FR-10.43).
+	 */
+	channelAclRead: (serverId: number, channelId: number) => typedError<ChannelAclView, ApiError>(__TAURI_INVOKE("channel_acl_read", { serverId, channelId })),
+	/**
+	 *  Saves the channel's own rules and groups; `started_from` is what the editor read, so a change by
+	 *  someone else meanwhile comes back as a conflict unless `force` (FR-10.43).
+	 */
+	channelAclSave: (serverId: number, acl: ChannelAclView, startedFrom: ChannelAclView, force: boolean) => typedError<AclSaveResult, ApiError>(__TAURI_INVOKE("channel_acl_save", { serverId, acl, startedFrom, force })),
+	/**  Sets or clears the channel password (FR-10.28); `None` or an empty text clears it. */
+	channelPasswordSave: (serverId: number, channelId: number, password: string | null, startedFrom: ChannelAclView, force: boolean) => typedError<AclSaveResult, ApiError>(__TAURI_INVOKE("channel_password_save", { serverId, channelId, password, startedFrom, force })),
+	/**
+	 *  Works out the grid rows for the editor's (possibly unsaved) rules (FR-10.40, FR-10.45). Runs in
+	 *  the core, on the open channel only.
+	 */
+	channelAclEvaluate: (serverId: number, acl: ChannelAclView, rows: AclRowInput[]) => typedError<AclCell[][], ApiError>(__TAURI_INVOKE("channel_acl_evaluate", { serverId, acl, rows })),
+	/**
+	 *  The rights the user would lose here with these rules, as permission bits (FR-10.41); empty for
+	 *  the SuperUser.
+	 */
+	channelAclLockout: (serverId: number, acl: ChannelAclView) => typedError<number[], ApiError>(__TAURI_INVOKE("channel_acl_lockout", { serverId, acl })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -1388,6 +1419,64 @@ export type AcceptedConversationsChanged = {
 	conversations: AcceptedConversation[],
 };
 
+/**  One cell of the grid with what the "Why?" panel shows (FR-10.46). */
+export type AclCell = {
+	/**  The permission bit. */
+	permission: number,
+	verdict: AclVerdict,
+	/**  Index into the rules of the rule that decided it; `null` for the default rights. */
+	rule: number | null,
+	overrides: number | null,
+	reason: AclMatchReason | null,
+	condition: AclCondition | null,
+	viaWrite: boolean,
+	superuser: boolean,
+};
+
+/**  Why a cell depends (FR-10.47). */
+export type AclCondition = { kind: "password"; token: string } | { kind: "presence" } | { kind: "serverGroup"; group: string };
+
+/**  One group as this channel sees it (FR-10.38). */
+export type AclGroupView = {
+	name: string,
+	inherited: boolean,
+	inherit: boolean,
+	inheritable: boolean,
+	add: number[],
+	remove: number[],
+	inheritedMembers: number[],
+};
+
+/**  Why a rule matched the row. */
+export type AclMatchReason = { kind: "everyone" } | { kind: "registered" } | { kind: "inChannel" } | { kind: "notInChannel" } | { kind: "member"; group: string } | { kind: "thisPerson" };
+
+/**  A row of the "Who can do what" grid (FR-10.40). */
+export type AclRowInput = { kind: "everyone" } | { kind: "group"; name: string } | 
+/**  Someone online. */
+{ kind: "session"; session: number } | 
+/**  A registered user, online or not. */
+{ kind: "user"; userId: number };
+
+/**  One permission rule (FR-10.37). `grant` and `deny` are Mumble permission bits. */
+export type AclRuleView = {
+	inherited: boolean,
+	applyHere: boolean,
+	applySubs: boolean,
+	/**  One registered user, or else `group`. */
+	userId: number | null,
+	group: string | null,
+	grant: number,
+	deny: number,
+};
+
+/**  What a save produced (FR-10.43). */
+export type AclSaveResult = { kind: "saved"; acl: ChannelAclView } | 
+/**  Someone changed the rules since they were read; nothing was sent. */
+{ kind: "conflict"; acl: ChannelAclView };
+
+/**  One cell's answer (FR-10.45–FR-10.47). */
+export type AclVerdict = "allowed" | "denied" | "depends";
+
 /**  The profile in effect: the own channel's on the server that carries voice. */
 export type ActiveAudioProfile = {
 	serverId: number,
@@ -1888,6 +1977,18 @@ export type CertTrustRequired = {
 /**  How a tested server certificate relates to the saved trust decision. */
 export type CertificateState = "trusted" | "unknown" | "changed";
 
+/**  A channel's rules and groups (FR-10.36). */
+export type ChannelAclView = {
+	channelId: number,
+	inheritAcls: boolean,
+	groups: AclGroupView[],
+	/**  Inherited rules first, then the channel's own ones; later rules win. */
+	rules: AclRuleView[],
+	userNames: UserName[],
+	/**  Worked out from the rules; ignored when saving. */
+	password: PasswordView,
+};
+
 /**  A channel of the server that has a profile. */
 export type ChannelAudioEntry = {
 	channelId: number,
@@ -1906,6 +2007,31 @@ export type ChannelAudioProfile = {
 export type ChannelAudioProfilesChanged = {
 	serverId: number,
 	profiles: ChannelAudioEntry[],
+};
+
+/**  What the Channel window changed; unset fields stay as they are (FR-10.23, FR-10.24, FR-10.27). */
+export type ChannelChangeInput = {
+	name: string | null,
+	/**  An empty string removes the description. */
+	description: string | null,
+	/**  A new parent moves the channel with all its sub-channels. */
+	parentId: number | null,
+	position: number | null,
+	maxUsers: number | null,
+	linksAdd: number[],
+	linksRemove: number[],
+};
+
+/**  A new channel from the Channel window's General tab (FR-10.21, FR-10.22). */
+export type ChannelCreateInput = {
+	parentId: number,
+	name: string,
+	/**  Clean HTML from the description editor; `None` for none. */
+	description: string | null,
+	position: number,
+	/**  0 is the server's own limit. */
+	maxUsers: number,
+	temporary: boolean,
 };
 
 export type ChannelInfo = {
@@ -1991,6 +2117,15 @@ export type ChannelRemoved = {
 	serverId: number,
 	channelId: number,
 };
+
+/**  The server's answer to a channel change. */
+export type ChannelResult = 
+/**  Applied; `channelId` is the new channel after a create. */
+{ kind: "confirmed"; channelId: number } | 
+/**  No answer within 5 s; the change was written to the server. */
+{ kind: "unconfirmed" } | 
+/**  Refused, with the kind, the missing right and the server's own text (untrusted). */
+{ kind: "refused"; denial: DenialKind; permission: Right | null; reason: string | null };
 
 /**  A channel was added or changed. */
 export type ChannelUpserted = {
@@ -3377,6 +3512,11 @@ export type ParticipantPosition = {
 export type PasswordUpdate = 
 /**  Leave the stored password as it is (on add: no password). */
 { kind: "keep" } | { kind: "clear" } | { kind: "set"; value: string };
+
+/**  The channel password as the Password tab shows it (FR-10.28). */
+export type PasswordView = { kind: "none" } | { kind: "set"; password: string } | 
+/**  The Join rules are more than a password; they are edited under Permissions. */
+{ kind: "custom" };
 
 /**  Comment, avatar and private note, fetched on demand when the profile card opens. */
 export type PersonProfile = {
@@ -5365,6 +5505,12 @@ export type UserBot = {
 	voice: boolean,
 	/**  What it runs, e.g. `history`, `peer`, `webhook`, `music`; sorted. */
 	modules: string[],
+};
+
+/**  A registered user's name, as the server told it (untrusted). */
+export type UserName = {
+	id: number,
+	name: string,
 };
 
 export type UserRemoved = {

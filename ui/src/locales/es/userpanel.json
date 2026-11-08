@@ -43,7 +43,8 @@
     "linkAddress": "Dirección del enlace",
     "linkApply": "Añadir enlace",
     "bulletList": "Lista con viñetas",
-    "numberedList": "Lista numerada"
+    "numberedList": "Lista numerada",
+    "underline": "Subrayado"
   },
   "register": {
     "title": "Registrarse en este servidor",

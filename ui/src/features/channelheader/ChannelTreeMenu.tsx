@@ -16,8 +16,10 @@ export function ChannelTreeMenu({
   join,
   restoreFocus,
   onDone,
+  shortcut,
 }: ChannelMenuRequest) {
-  const [open, setOpen] = useState(true);
+  // F2 and Delete skip the menu and open their dialog (FR-10.10).
+  const [open, setOpen] = useState(shortcut === undefined);
   const actions = useChannelActions(channelId, {
     context: "tree",
     closeMenu: (returnFocus) => {
@@ -28,6 +30,7 @@ export function ChannelTreeMenu({
     // The tree has no status line of its own; "Link copied" goes to the live region.
     onStatus: announce,
     join,
+    shortcut,
   });
   const done = !open && actions.dialog === null;
 

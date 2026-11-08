@@ -43,7 +43,8 @@
     "linkAddress": "Saites adrese",
     "linkApply": "Pievienot saiti",
     "bulletList": "Aizzīmju saraksts",
-    "numberedList": "Numurēts saraksts"
+    "numberedList": "Numurēts saraksts",
+    "underline": "Pasvītrots"
   },
   "register": {
     "title": "Reģistrēties šajā serverī",

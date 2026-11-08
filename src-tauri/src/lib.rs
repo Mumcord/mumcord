@@ -41,9 +41,9 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    admin, app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow,
-    friends, history, identity, links, mumble_import, notifications as notify, people, pm_overview,
-    pm_rules, profile, servers, session, settings,
+    admin, app, audio, blocking, channel_admin, channel_audio, channels, chat, diagnostics,
+    dropped, follow, friends, history, identity, links, mumble_import, notifications as notify,
+    people, pm_overview, pm_rules, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -117,6 +117,14 @@ fn specta_builder() -> Builder<tauri::Wry> {
             admin::person_ban,
             admin::person_action_close,
             admin::person_moderate,
+            channel_admin::channel_create,
+            channel_admin::channel_edit,
+            channel_admin::channel_remove,
+            channel_admin::channel_acl_read,
+            channel_admin::channel_acl_save,
+            channel_admin::channel_password_save,
+            channel_admin::channel_acl_evaluate,
+            channel_admin::channel_acl_lockout,
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,

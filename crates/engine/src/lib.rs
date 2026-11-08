@@ -1,12 +1,15 @@
 //! Mumcord engine: app state, the server connection, voice and diagnostics. The app shell
 //! (`src-tauri`) talks only to [`Engine`] and converts its types into command/event types.
 
+pub mod acl_eval;
 pub mod admin;
 pub mod audio_rating;
 pub mod banlist;
 mod blocking;
 pub mod cache;
 pub mod camera;
+pub mod channel_acl;
+pub mod channel_admin;
 pub mod chat;
 pub mod crash;
 pub mod diag;
@@ -50,6 +53,8 @@ pub mod whisper;
 
 pub use admin::{BanOutcome, BanRequest, KickOutcome, ModerateAction, PersonView};
 pub use banlist::{BanChange, BanSaveOutcome, BanView};
+pub use channel_acl::{AclGroup, AclRule, AclSaveOutcome, ChannelAcl, PasswordState, password_of};
+pub use channel_admin::{ChannelChange, ChannelCreate, ChannelOutcome};
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
 pub use friends::{FriendPresence, FriendView};

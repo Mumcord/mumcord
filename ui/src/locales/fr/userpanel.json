@@ -43,7 +43,8 @@
     "linkAddress": "Adresse du lien",
     "linkApply": "Ajouter le lien",
     "bulletList": "Liste à puces",
-    "numberedList": "Liste numérotée"
+    "numberedList": "Liste numérotée",
+    "underline": "Souligné"
   },
   "register": {
     "title": "S’enregistrer sur ce serveur",
