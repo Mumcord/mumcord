@@ -429,6 +429,16 @@
   "announcedRegistered": "{{name}} est maintenant enregistré",
   "announcedRegisteredSaved": "Modifications envoyées au serveur",
   "menuRegister": "Enregistrer sur le serveur…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Vos droits ici",
+    "limits": "Limites du serveur",
+    "welcomeHint": "Ne peut être modifié que dans le fichier de configuration du serveur, pas depuis un client.",
+    "notice": "Annonce du serveur",
+    "noticeEmpty": "Affichée comme description du canal racine",
+    "noticeEditTitle": "Modifier l'annonce du serveur",
+    "banListRegisteredUsers": "Liste des bannis et utilisateurs enregistrés…"
+  },
   "commands": {
     "group": "Commandes d'administration · intégrées",
     "groupPeople": "Personnes",

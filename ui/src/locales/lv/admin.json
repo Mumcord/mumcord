@@ -429,6 +429,16 @@
   "announcedRegistered": "{{name}} tagad ir reģistrēts",
   "announcedRegisteredSaved": "Izmaiņas nosūtītas serverim",
   "menuRegister": "Reģistrēt serverī…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Jūsu tiesības šeit",
+    "limits": "Servera ierobežojumi",
+    "welcomeHint": "To var mainīt tikai servera konfigurācijas failā, ne no klienta.",
+    "notice": "Servera paziņojums",
+    "noticeEmpty": "Tiek rādīts kā saknes kanāla apraksts",
+    "noticeEditTitle": "Rediģēt servera paziņojumu",
+    "banListRegisteredUsers": "Aizliegumu saraksts un reģistrētie lietotāji…"
+  },
   "commands": {
     "group": "Administratora komandas · iebūvētas",
     "groupPeople": "Cilvēki",

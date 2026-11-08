@@ -426,6 +426,16 @@
   "announcedRegistered": "{{name}} on nyt rekisteröity",
   "announcedRegisteredSaved": "Muutokset lähetetty palvelimelle",
   "menuRegister": "Rekisteröi palvelimella…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Oikeutesi täällä",
+    "limits": "Palvelimen rajat",
+    "welcomeHint": "Voidaan muuttaa vain palvelimen asetustiedostossa, ei mistään asiakasohjelmasta.",
+    "notice": "Palvelimen ilmoitus",
+    "noticeEmpty": "Näkyy juurikanavan kuvauksena",
+    "noticeEditTitle": "Muokkaa palvelimen ilmoitusta",
+    "banListRegisteredUsers": "Banilista ja rekisteröityneet käyttäjät…"
+  },
   "commands": {
     "group": "Ylläpidon komennot · sisäänrakennetut",
     "groupPeople": "Henkilöt",

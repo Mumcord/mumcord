@@ -426,6 +426,16 @@
   "announcedRegistered": "{{name}} is nu geregistreerd",
   "announcedRegisteredSaved": "Wijzigingen naar de server verzonden",
   "menuRegister": "Op de server registreren…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Jouw rechten hier",
+    "limits": "Serverlimieten",
+    "welcomeHint": "Kan alleen worden gewijzigd in het configuratiebestand van de server, niet vanuit een client.",
+    "notice": "Servermelding",
+    "noticeEmpty": "Weergegeven als beschrijving van het rootkanaal",
+    "noticeEditTitle": "Servermelding bewerken",
+    "banListRegisteredUsers": "Banlijst en geregistreerde gebruikers…"
+  },
   "commands": {
     "group": "Beheercommando's · ingebouwd",
     "groupPeople": "Personen",

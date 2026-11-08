@@ -83,3 +83,37 @@ export function mayMoveAnywhere(state: ServerState): boolean {
 export function canRegister(serverId: number): boolean {
   return getServerStateOf(serverId).channels.get(0)?.permissions.register === true;
 }
+
+/**
+ * The admin rights the server info Admin section lists (issue #258, FR-10.54), in the order of the
+ * roles table (section 3). `name` is the `perm.name.*` key of the admin locale with its plain
+ * name (Q3.11). Communication rights (Speak, Write messages, …) and Register self are not admin
+ * rights: they unlock nothing in this epic.
+ */
+export const ROOT_ADMIN_RIGHTS: readonly {
+  right: (permissions: ChannelPermissions) => boolean;
+  name: string;
+}[] = [
+  { right: (p) => p.muteDeafen, name: "muteDeafen" },
+  { right: (p) => p.moveUsers, name: "move" },
+  { right: (p) => p.write, name: "write" },
+  { right: (p) => p.makeChannel, name: "makeChannel" },
+  { right: (p) => p.makeTempChannel, name: "makeTempChannel" },
+  { right: (p) => p.linkChannel, name: "linkChannel" },
+  { right: (p) => p.kick, name: "kick" },
+  { right: (p) => p.ban, name: "ban" },
+  { right: (p) => p.register, name: "register" },
+  { right: (p) => p.resetUserContent, name: "resetUserContent" },
+];
+
+/** The admin rights the user holds at the root channel, as `perm.name.*` keys. */
+export function rootAdminRights(state: ServerState): string[] {
+  const root = state.channels.get(ROOT);
+  if (root === undefined) return [];
+  return ROOT_ADMIN_RIGHTS.filter(({ right }) => right(root.permissions)).map(({ name }) => name);
+}
+
+/** Whether the user has at least one admin right (the server info Admin section shows, FR-10.54). */
+export function hasAdminRight(state: ServerState): boolean {
+  return rootAdminRights(state).length > 0;
+}

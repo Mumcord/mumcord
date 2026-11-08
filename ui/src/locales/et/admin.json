@@ -426,6 +426,16 @@
   "announcedRegistered": "{{name}} on nüüd registreeritud",
   "announcedRegisteredSaved": "Muudatused saadeti serverile",
   "menuRegister": "Registreeri serveris…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Sinu õigused siin",
+    "limits": "Serveri piirangud",
+    "welcomeHint": "Seda saab muuta ainult serveri seadistusfailis, mitte ühestki kliendist.",
+    "notice": "Serveriteade",
+    "noticeEmpty": "Kuvatakse juurkanali kirjeldusena",
+    "noticeEditTitle": "Muuda serveriteadet",
+    "banListRegisteredUsers": "Keeluloend ja registreeritud kasutajad…"
+  },
   "commands": {
     "group": "Halduskäsud · sisseehitatud",
     "groupPeople": "Inimesed",

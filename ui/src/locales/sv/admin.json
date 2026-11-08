@@ -426,6 +426,16 @@
   "announcedRegistered": "{{name}} är registrerad nu",
   "announcedRegisteredSaved": "Ändringar skickade till servern",
   "menuRegister": "Registrera på servern…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Dina rättigheter här",
+    "limits": "Servergränser",
+    "welcomeHint": "Kan bara ändras i serverns konfigurationsfil, inte från någon klient.",
+    "notice": "Servermeddelande",
+    "noticeEmpty": "Visas som rotkanalens beskrivning",
+    "noticeEditTitle": "Redigera servermeddelande",
+    "banListRegisteredUsers": "Banlista och registrerade användare…"
+  },
   "commands": {
     "group": "Administratörskommandon · inbyggda",
     "groupPeople": "Personer",

@@ -432,6 +432,16 @@
   "announcedRegistered": "{{name}} je agora registrovaný",
   "announcedRegisteredSaved": "Změny odeslány serveru",
   "menuRegister": "Registrovat na serveru…",
+  "serverInfo": {
+    "section": "Admin",
+    "yourRights": "Vaše práva zde",
+    "limits": "Limity serveru",
+    "welcomeHint": "Lze změnit pouze v konfiguračním souboru serveru, ne z žádného klienta.",
+    "notice": "Oznámení serveru",
+    "noticeEmpty": "Zobrazuje se jako popis kořenového kanálu",
+    "noticeEditTitle": "Upravit oznámení serveru",
+    "banListRegisteredUsers": "Seznam banů a registrovaní uživatelé…"
+  },
   "commands": {
     "group": "Příkazy správce · vestavěné",
     "groupPeople": "Lidé",
