@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- The icons in a plugin's permission list are drawn icons now instead of text characters, so they look the same on Windows, macOS and Linux
 - macOS: plugin content in a dialog or panel sits exactly in its frame again instead of being shifted up by about the title bar's height
 - macOS: when a plugin froze the window, restarting the window failed every time ("a webview with label `main` already exists"); it now waits until the old window is really gone
 - A plugin's badge next to a name keeps the size of the Mumcord badge beside it instead of shrinking when the name is long
