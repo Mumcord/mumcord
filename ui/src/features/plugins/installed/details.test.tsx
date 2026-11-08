@@ -33,6 +33,7 @@ const brawl: InstalledPlugin = {
   offered: [],
   appMenuItems: 0,
   webSize: null,
+  themedPages: false,
 };
 
 const scored: PluginScored = {

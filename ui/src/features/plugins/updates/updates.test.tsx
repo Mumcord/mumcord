@@ -37,6 +37,7 @@ const plugin: InstalledPlugin = {
   offered: [],
   appMenuItems: 0,
   webSize: null,
+  themedPages: false,
 };
 
 const update: PluginUpdate = {

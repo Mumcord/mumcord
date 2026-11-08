@@ -256,6 +256,8 @@ pub struct PluginInfo {
     pub app_menu_items: u32,
     /// Total size in bytes of the plugin's `web/` files; `None` when it has none.
     pub web_size: Option<u64>,
+    /// Its pages get the theme tokens (API 1.2 or newer, FR-13.8).
+    pub themed_pages: bool,
 }
 
 /// The total size of the regular files under `dir/web`, `None` when there is no such folder.
@@ -780,6 +782,7 @@ impl PluginService {
         let app_menu_items =
             manifest.map_or(0, |m| u32::try_from(m.app_menu.len()).unwrap_or(u32::MAX));
         let web_size = dir.as_deref().and_then(web_size);
+        let themed_pages = manifest.is_some_and(|m| m.api_minor() >= crate::permissions::API_1_2);
         PluginInfo {
             icon: manifest.and_then(|m| m.icon.clone()),
             authors: manifest.map(|m| m.authors.clone()).unwrap_or_default(),
@@ -802,6 +805,7 @@ impl PluginService {
             chat_patterns: text.map(|t| t.chat_patterns).unwrap_or_default(),
             app_menu_items,
             web_size,
+            themed_pages,
             status,
             badge: badge == Some(record.id.as_str()),
             id: record.id,

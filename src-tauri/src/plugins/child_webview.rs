@@ -29,11 +29,13 @@ use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard, PoisonError};
 use std::time::Instant;
 
+use mumcord_plugins::api::theme::is_valid_token;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, Manager, Runtime};
 use tauri_specta::Event;
 
+use crate::commands::plugins::PluginPageTheme;
 use crate::commands::types::{ApiError, ApiResult, ErrorCode};
 
 /// The label of every frame web view starts with this; the frame id follows.
@@ -119,16 +121,25 @@ pub enum PluginFrameDelivery {
     Key { key: String },
     /// Mute or unmute the page (`{mumcordWebview:"mute", muted}`).
     Mute { muted: bool },
+    /// The theme changed; only for pages of API 1.2 plugins (`{mumcordWebview:"theme", theme}`,
+    /// FR-13.15, FR-13.17).
+    Theme { theme: PluginPageTheme },
 }
 
 impl PluginFrameDelivery {
     fn checked(self) -> Option<Self> {
-        let fits = match &self {
-            Self::Text { text } => text.len() <= MAX_DELIVERY_TEXT_BYTES,
-            Self::Key { key } => key.len() <= 64,
-            Self::Mute { .. } => true,
-        };
-        fits.then_some(self)
+        match self {
+            Self::Text { text } if text.len() > MAX_DELIVERY_TEXT_BYTES => None,
+            Self::Key { key } if key.len() > 64 => None,
+            // What fails the token rules is dropped, as for served pages (FR-13.14).
+            Self::Theme { mut theme } => {
+                theme
+                    .tokens
+                    .retain(|name, value| is_valid_token(name, value));
+                Some(Self::Theme { theme })
+            }
+            other => Some(other),
+        }
     }
 }
 
@@ -343,6 +354,7 @@ const SHIM: &str = r#"(function () {
       if (message.type === "text") data = message.text;
       else if (message.type === "key") data = { mumcordWebview: "key", key: message.key };
       else if (message.type === "mute") data = { mumcordWebview: "mute", muted: message.muted };
+      else if (message.type === "theme") data = { mumcordWebview: "theme", theme: message.theme };
       else return;
       var init = create(null);
       init.data = data;
@@ -844,6 +856,39 @@ mod tests {
             key: "a".repeat(65),
         };
         assert_eq!(key.checked(), None);
+    }
+
+    #[test]
+    fn theme_deliveries_keep_only_valid_tokens() {
+        use crate::commands::plugins::{PluginPageMode, PluginPageScheme};
+
+        let theme = PluginPageTheme {
+            mode: PluginPageMode::HighContrast,
+            scheme: PluginPageScheme::Dark,
+            reduced_motion: true,
+            tokens: [
+                ("--mc-color-text", "#fff"),
+                ("--mc-color-accent", "red;}</script>"),
+                ("--color-text", "#000"),
+            ]
+            .into_iter()
+            .map(|(name, value)| (name.to_owned(), value.to_owned()))
+            .collect(),
+        };
+        let Some(PluginFrameDelivery::Theme { theme }) =
+            PluginFrameDelivery::Theme { theme }.checked()
+        else {
+            panic!("a theme delivery is never refused");
+        };
+        assert_eq!(theme.tokens.len(), 1);
+        assert_eq!(theme.tokens["--mc-color-text"], "#fff");
+        let script = delivery_script(&PluginFrameDelivery::Theme { theme }).unwrap();
+        assert!(
+            script.ends_with(
+                r##"({"type":"theme","theme":{"mode":"high-contrast","scheme":"dark","reducedMotion":true,"tokens":{"--mc-color-text":"#fff"}}})"##
+            ),
+            "{script}"
+        );
     }
 
     #[test]
