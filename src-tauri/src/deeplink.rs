@@ -91,6 +91,22 @@ pub fn init(app: &AppHandle) {
     deep_link.on_open_url(move |event| open_urls(&handle, &event.urls()));
 }
 
+/// Handles the arguments of a later launch (FR-13.12): it passes links, nothing else.
+#[cfg(target_os = "freebsd")]
+pub(crate) fn open_arguments(app: &AppHandle, args: &[String]) {
+    let urls: Vec<Url> = args
+        .iter()
+        .filter_map(|arg| arg.parse::<Url>().ok())
+        .filter(|url| matches!(url.scheme(), "mumble" | "mumcord"))
+        .collect();
+    if urls.is_empty() {
+        // A launch without a link: the user just wants the running window.
+        window::show(app);
+        return;
+    }
+    open_urls(app, &urls);
+}
+
 /// The URL the app was started with, when it is the only argument and one of our schemes.
 /// Flags and file paths never parse as such a URL, so a normal start yields `None`.
 #[cfg(target_os = "freebsd")]

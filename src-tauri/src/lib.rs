@@ -28,6 +28,9 @@ mod plugins;
 mod portable;
 mod ptt;
 mod screen_frames;
+// The single-instance handover the plugin covers on the other platforms (FR-13.12).
+#[cfg(target_os = "freebsd")]
+mod single_instance;
 mod tray;
 // FreeBSD has no in-app updater: `pkg` owns the install (see updater_freebsd.rs).
 #[cfg(not(target_os = "freebsd"))]
@@ -599,16 +602,23 @@ pub fn run() {
         eprintln!("failed to export TypeScript bindings: {err}");
     }
 
+    // A second launch hands its arguments to the running Mumcord and exits (FR-13.12).
+    #[cfg(target_os = "freebsd")]
+    if !single_instance::claim() {
+        return;
+    }
+
     let tauri_builder = tauri::Builder::default();
     // Must be registered first so a second launch hands over to the running instance. The plugin
     // has no FreeBSD implementation; there a second launch opens a second window.
     #[cfg(not(target_os = "freebsd"))]
-    let tauri_builder = tauri_builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-        // A login start while Mumcord already runs must not pop the window up.
-        if !autostart::launched_at_login(&argv) {
-            window::show(app);
-        }
-    }));
+    let tauri_builder =
+        tauri_builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            // A login start while Mumcord already runs must not pop the window up.
+            if !autostart::launched_at_login(&argv) {
+                window::show(app);
+            }
+        }));
     // Replaces the app with a downloaded bundle. A FreeBSD package is updated by `pkg upgrade`,
     // so the plugin is not built there at all (see updater_freebsd.rs).
     #[cfg(not(target_os = "freebsd"))]
@@ -669,6 +679,8 @@ pub fn run() {
             dnd::init(app.handle());
             ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
+            #[cfg(target_os = "freebsd")]
+            single_instance::forward_launches(app.handle().clone());
             #[cfg(any(target_os = "linux", target_os = "freebsd"))]
             {
                 desktop_entry::ensure(app.handle());
@@ -680,6 +692,8 @@ pub fn run() {
     match app {
         Ok(app) => app.run(|app, event| {
             if matches!(event, tauri::RunEvent::Exit) {
+                #[cfg(target_os = "freebsd")]
+                single_instance::remove_socket();
                 mumcord_engine::crash::clean_exit();
                 // For exits that did not come through `window::quit` (the system ending
                 // the app); after a normal quit the plugins are stopped already (#704).
@@ -797,7 +811,8 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("early logging unavailable: {e}");
     }
     let runtime = tauri::async_runtime::handle().inner().clone();
-    let (engine, mut events) = Engine::new(&data_dir, SecretStore::os_with_profile(&data_dir), runtime)?;
+    let (engine, mut events) =
+        Engine::new(&data_dir, SecretStore::os_with_profile(&data_dir), runtime)?;
     let stored = engine.settings()?;
     if stored.log_to_disk {
         if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {
