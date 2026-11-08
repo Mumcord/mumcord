@@ -13,7 +13,7 @@
   "connectedIn": "Ansluten · {channel}",
   "serverState": "{server} – {state}",
   "talking": "Ansluten – pratar",
-  "muted": "Ansluten – mikrofon avstängd",
+  "muted": "Ansluten – mikrofon av",
   "voiceMenu": "Röstserver och kanal",
   "voiceServer": "Röstserver",
   "channelsOf": "Kanaler · {server}",

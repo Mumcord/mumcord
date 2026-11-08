@@ -15,7 +15,7 @@
   "tips": {
     "servers": {
       "title": "Dina servrar",
-      "body": "I listen längst till vänster finns dina servrar. Lägg till en med + eller bläddra bland offentliga servrar med förstoringsglaset. Du kan vara ansluten till flera servrar samtidigt."
+      "body": "I fältet längst till vänster finns dina servrar. Lägg till en med + eller hitta offentliga servrar med förstoringsglaset. Du kan vara ansluten till flera servrar samtidigt."
     },
     "channels": {
       "title": "Kanaler",
@@ -39,7 +39,7 @@
     },
     "apps": {
       "title": "Appar",
-      "body": "Knappen Appar i meddelandefältet startar skärmdelning, en watch party eller din kamera. Tillägg ger ännu fler."
+      "body": "Knappen Appar i meddelandefältet startar skärmdelning, ett watch party eller din kamera. Tillägg ger ännu fler."
     },
     "themes": {
       "title": "Din stil",

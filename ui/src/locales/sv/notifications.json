@@ -10,7 +10,7 @@
   "image": "Skickade en bild",
   "open": "Öppna chatten",
   "close": "Avfärda avisering",
-  "mentionLine": "{{sender}} omnämnde dig: {{preview}}",
+  "mentionLine": "{{sender}} nämnde dig: {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
     "title": "Aviseringar",
@@ -33,15 +33,15 @@
     "settings": "Aviseringsinställningar",
     "someone": "Någon",
     "quoted": "”{{text}}”",
-    "mention": "{{name}} omnämnde dig",
-    "mentionGroup": "{{name}} omnämnde alla",
+    "mention": "{{name}} nämnde dig",
+    "mentionGroup": "{{name}} nämnde alla",
     "reply": "{{name}} svarade på ditt meddelande",
     "chatRequest": "{{name}} vill chatta med dig",
     "messageRequest": "Meddelandeförfrågan från {{name}}",
     "messageRequestBody_one": "{{count}} meddelande från en vanlig Mumble-klient",
     "messageRequestBody_other": "{{count}} meddelanden från en vanlig Mumble-klient",
     "invite": {
-      "watchParty": "{{name}} bjöd in dig till en watch party",
+      "watchParty": "{{name}} bjöd in dig till ett watch party",
       "screenShare": "{{name}} delar sin skärm",
       "card": "{{name}} skickade ett kort till dig",
       "theme": "{{name}} delade ett tema med dig"

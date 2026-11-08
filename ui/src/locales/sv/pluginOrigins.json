@@ -45,10 +45,10 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Den här uppdateringen vill kommunicera med {{count}} ny webbplats.",
     "wantsNew_other": "Den här uppdateringen vill kommunicera med {{count}} nya webbplatser.",
     "staysOn": "{{plugin}} stannar på {{version}} tills du bestämmer dig.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} uppdatering väntar på dig. Uppdateringar som lägger till behörigheter eller webbplatser installeras aldrig automatiskt.",
     "banner_other": "{{count}} uppdateringar väntar på dig. Uppdateringar som lägger till behörigheter eller webbplatser installeras aldrig automatiskt.",
     "noOther": "Inga andra behörigheter ändras.",
     "whatsNew": "Nyheter i {{version}}",
