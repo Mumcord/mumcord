@@ -124,6 +124,8 @@ pub struct WindowsCapture {
     ended: Arc<AtomicBool>,
     /// What the user picked, as far as the picker's answer tells.
     kind: ShareKind,
+    /// The picked window's title (its capture item's name), for the own live bar only.
+    title: Option<String>,
     /// The app behind a picked window, for its sound; taken when the share starts.
     app: Option<OwnerTree>,
 }
@@ -195,6 +197,7 @@ impl WindowsCapture {
             picture_size: (0, 0),
             ended,
             kind: ShareKind::Window,
+            title: None,
             app: None,
         })
     }
@@ -215,6 +218,9 @@ impl WindowsCapture {
         let windows = top_windows();
         let size = (self.pool_size.Width, self.pool_size.Height);
         self.kind = pick_kind(&windows, &name, size, &monitor_sizes());
+        if self.kind == ShareKind::Window && !name.is_empty() {
+            self.title = Some(name.clone());
+        }
         if !sound || self.kind != ShareKind::Window {
             return;
         }
@@ -319,6 +325,10 @@ impl CaptureSource for WindowsCapture {
 
     fn kind(&self) -> Option<ShareKind> {
         Some(self.kind)
+    }
+
+    fn title(&self) -> Option<String> {
+        self.title.clone()
     }
 
     fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
