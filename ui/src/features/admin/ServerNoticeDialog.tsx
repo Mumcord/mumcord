@@ -10,6 +10,7 @@ import { refusalText } from "../channeladmin/channelAdminModel";
 import { Dialog } from "../servers/Dialog";
 import { RichCommentEditor } from "../userpanel/RichCommentEditor";
 import { commentToSend } from "../userpanel/commentHtml";
+import type { EditorLimits } from "../userpanel/richEditorModel";
 import "../admin/admin.css";
 import "../channeladmin/channeladmin.css";
 import "../userpanel/userpanel.css";
@@ -18,10 +19,17 @@ interface ServerNoticeDialogProps {
   serverId: number;
   /** Sanitized description HTML to start from; empty for none. */
   initialHtml: string;
+  /** The server's description length limits, as the Channel window uses them. */
+  limits: EditorLimits;
   onClose: () => void;
 }
 
-export function ServerNoticeDialog({ serverId, initialHtml, onClose }: ServerNoticeDialogProps) {
+export function ServerNoticeDialog({
+  serverId,
+  initialHtml,
+  limits,
+  onClose,
+}: ServerNoticeDialogProps) {
   const { t } = useTranslation("admin");
   const ids = { description: useId(), hint: useId() };
   const [draft, setDraft] = useState(initialHtml);
@@ -77,7 +85,8 @@ export function ServerNoticeDialog({ serverId, initialHtml, onClose }: ServerNot
             initialHtml={initialHtml}
             loadKey={0}
             disabled={busy}
-            tools="description"
+            purpose="description"
+            limits={limits}
             onChange={setDraft}
           />
           <p id={ids.hint} className="channel-window__hint">
