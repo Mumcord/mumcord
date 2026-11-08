@@ -82,7 +82,17 @@ const ALSA_KEEP: [&str; 3] = ["default", "pipewire", "pulse"];
 
 /// Whether an ALSA PCM name (the part after `alsa:`) is worth showing.
 fn keep_alsa(pcm: &str) -> bool {
-    ALSA_KEEP.contains(&pcm) || pcm.starts_with("sysdefault:CARD=")
+    if ALSA_KEEP.contains(&pcm) || pcm.starts_with("sysdefault:CARD=") {
+        return true;
+    }
+    // FreeBSD's ALSA is a compatibility layer over OSS: alsa-lib lists no cards, so `oss` (the
+    // OSS plugin, playing and recording through /dev/dsp) is the sound device, and `null` the
+    // only other entry.
+    #[cfg(target_os = "freebsd")]
+    if pcm == "oss" {
+        return true;
+    }
+    false
 }
 
 /// Drops duplicate and raw ALSA entries and puts the OS default first, otherwise keeping order.
@@ -157,6 +167,18 @@ mod tests {
                 "alsa:sysdefault:CARD=II"
             ]
         );
+    }
+
+    /// FreeBSD: `oss` is the real device, `null` stays out.
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn freebsd_keeps_the_oss_device_only() {
+        let input = vec![
+            dev("alsa:null", "Discard all samples", false),
+            dev("alsa:oss", "Open Sound System", false),
+        ];
+        let ids: Vec<String> = filter(input).into_iter().map(|d| d.id).collect();
+        assert_eq!(ids, ["alsa:oss"]);
     }
 
     #[test]
