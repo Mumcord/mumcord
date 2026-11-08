@@ -415,9 +415,11 @@ fn ensure_flush_thread(shared: &Shared) {
     STARTED.get_or_init(|| {
         std::thread::Builder::new()
             .name("mumcord-log-flush".to_owned())
-            .spawn(move || loop {
-                std::thread::sleep(FLUSH_INTERVAL);
-                lock(&sink).flush();
+            .spawn(move || {
+                loop {
+                    std::thread::sleep(FLUSH_INTERVAL);
+                    lock(&sink).flush();
+                }
             })
             .expect("spawn log flush thread");
     });
