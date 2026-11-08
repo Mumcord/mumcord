@@ -1,5 +1,5 @@
 {
-  "noConversation": "Připoj se k serveru a vyber kanál, abys mohl chatovat.",
+  "noConversation": "Připoj se k serveru, vyber kanál a začni chatovat.",
   "empty": "Zatím žádné zprávy. Zprávy, které tu dostaneš, se ukládají na tomto počítači.",
   "header": {
     "channel": "#{{name}}",
@@ -19,7 +19,7 @@
     "syncing": "Hledám dřívější zprávy u ostatních uživatelů Mumcordu…",
     "syncAdded_one": "Přidána {{count}} dřívější zpráva od ostatních uživatelů Mumcordu.",
     "syncAdded_few": "Přidány {{count}} dřívější zprávy od ostatních uživatelů Mumcordu.",
-    "syncAdded_many": "Přidáno {{count}} dřívějších zpráv od ostatních uživatelů Mumcordu.",
+    "syncAdded_many": "Přidáno {{count}} dřívější zprávy od ostatních uživatelů Mumcordu.",
     "syncAdded_other": "Přidáno {{count}} dřívějších zpráv od ostatních uživatelů Mumcordu.",
     "syncNone": "Žádné dřívější zprávy nebyly nalezeny.",
     "syncFailed": "Dřívější zprávy tu nelze načíst.",
@@ -27,12 +27,12 @@
     "jumpToNewest": "Přejít na nejnovější",
     "jumpToNewestUnseen_one": "Přejít na nejnovější, {{count}} nová zpráva",
     "jumpToNewestUnseen_few": "Přejít na nejnovější, {{count}} nové zprávy",
-    "jumpToNewestUnseen_many": "Přejít na nejnovější, {{count}} nových zpráv",
+    "jumpToNewestUnseen_many": "Přejít na nejnovější, {{count}} nové zprávy",
     "jumpToNewestUnseen_other": "Přejít na nejnovější, {{count}} nových zpráv"
   },
   "format": {
     "toolbar": "Formátování",
-    "bold": "Tučně",
+    "bold": "Tučné",
     "italic": "Kurzíva",
     "strike": "Přeškrtnutí",
     "code": "Kód v textu",
@@ -62,13 +62,13 @@
   "errors": {
     "tooLong": "Tvoje zpráva je pro tento server příliš dlouhá (nejvýš {{max}} znaků). Zkrať ji a zkus to znovu.",
     "tooLongNoLimit": "Tvoje zpráva je pro tento server příliš dlouhá. Zkrať ji a zkus to znovu.",
-    "imageTooLarge": "Tento obrázek je pro tento server příliš velký, i po komprimaci. Zkus menší obrázek.",
+    "imageTooLarge": "Obrázek je pro tento server příliš velký i po komprimaci. Zkus menší obrázek.",
     "imagesNotAllowed": "Tento server nepovoluje obrázky ve zprávách.",
     "notImage": "Tento soubor nelze odeslat. Použij obrázek PNG, JPEG, GIF nebo WebP.",
     "imageUnreadable": "Obrázek se nepodařilo přečíst. Zkus jiný soubor.",
     "denied": "Server tuto zprávu nepovolil.",
     "deniedWithReason": "Server tuto zprávu nepovolil: {{reason}}",
-    "notConnected": "Nejsi připojen. Připoj se znovu a zkus to ještě jednou.",
+    "notConnected": "Nejsi připojen(a). Připoj se znovu a zkus to ještě jednou.",
     "generic": "Zprávu se nepodařilo odeslat. Zkus to znovu.",
     "onlyImages": "Odeslat lze jen obrázky.",
     "sourceTooLarge": "Tento soubor je na odeslání příliš velký (přes 25 MB).",
@@ -85,7 +85,7 @@
     "image": "{{name}} poslal(a) obrázek",
     "more_one": "{{count}} další nová zpráva",
     "more_few": "{{count}} další nové zprávy",
-    "more_many": "{{count}} dalších nových zpráv",
+    "more_many": "{{count}} další nové zprávy",
     "more_other": "{{count}} dalších nových zpráv"
   },
   "pinned": {
@@ -97,17 +97,17 @@
   },
   "mention": {
     "list": "Návrhy zmínek",
-    "found_one": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
-    "found_few": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
-    "found_many": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
-    "found_other": "Návrhy: {{count}}. Vyberte šipkami a vložte klávesou Enter.",
+    "found_one": "Návrhy: {{count}}. Vyber šipkami a vlož klávesou Enter.",
+    "found_few": "Návrhy: {{count}}. Vyber šipkami a vlož klávesou Enter.",
+    "found_many": "Návrhy: {{count}}. Vyber šipkami a vlož klávesou Enter.",
+    "found_other": "Návrhy: {{count}}. Vyber šipkami a vlož klávesou Enter.",
     "none": "Nikdo nenalezen",
     "mentionsYou": "Zmiňuje tě",
     "chipLabel": "{{name}}, zmínka",
     "groupsHeading": "Zmínky",
     "peopleHeading": "Lidé",
     "channelHint": "Upozornit všechny v {{channel}} ({{count}})",
-    "allHint": "Upozornit všechny, kdo mohou číst tento kanál ({{count}})",
+    "allHint": "Upozornit všechny, kdo může číst tento kanál ({{count}})",
     "keys": "↑↓ vybrat · Enter vložit · Esc zavřít",
     "channelList": "Návrhy kanálů"
   },
@@ -126,7 +126,7 @@
       "show": "Pořad"
     },
     "inBrowser": "Přehraje se v prohlížeči",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Přehrávač Twitche na tomto systému v okně Mumcordu nefunguje, proto Přehrát otevře stream v prohlížeči.",
     "card": "Náhled odkazu: {{title}}",
     "dismiss": "Skrýt náhled"
   },
@@ -151,7 +151,7 @@
     "close": "Zavřít",
     "previous": "Předchozí obrázek",
     "next": "Další obrázek",
-    "unnamed": "obrazek",
+    "unnamed": "obrázek",
     "fullLoading": "Načítání plné velikosti…",
     "fullCancel": "Zrušit stahování v plné velikosti",
     "fullProgress": "Načítání plné velikosti… {{percent}} %",
@@ -200,7 +200,7 @@
     "menuLabel": "Použít motiv na",
     "applyToServer": "Použít na {{server}}",
     "imported": "Importováno ✓",
-    "newer": "Vytvořeno v Mumcordu {{version}} – aktualizuj, abys ho viděl celý",
+    "newer": "Vytvořeno v Mumcordu {{version}} – aktualizuj, ať ho uvidíš celý",
     "failed": "Motiv se nepodařilo použít."
   },
   "reply": {
@@ -268,20 +268,20 @@
     "copyLabel": "Kopírovat odkaz na {{server}}",
     "figures": "Ping {{ping}} ms · {{users}} z {{max}} uživatelů · server {{version}}",
     "goToChannel": "Přejít na kanál",
-    "join": "Připojit",
-    "joinLabel": "Připojit ke serveru {{server}}",
+    "join": "Připojit se",
+    "joinLabel": "Připojit se k serveru {{server}}",
     "joined": "Připojeno",
     "label": "Karta serveru {{server}}",
-    "privacyOff": "Hodnoty serveru jsou ve nastavení vypnuté",
+    "privacyOff": "Hodnoty serveru jsou v nastavení vypnuté",
     "querying": "Kontrola serveru…",
     "retry": "Zkontrolovat znovu",
-    "retryLabel": "Zkontrolovat znovu {{server}}",
+    "retryLabel": "Znovu zkontrolovat server {{server}}",
     "server": "{{server}}",
     "unreachable": "Server není dostupný",
     "warning_few": "{{count}} odkazy v této zprávě zobrazují přihlašovací údaje",
-    "warning_many": "{{count}} odkazů v této zprávě zobrazuje přihlašovací údaje",
+    "warning_many": "{{count}} odkazu v této zprávě zobrazuje přihlašovací údaje",
     "warning_one": "{{count}} odkaz v této zprávě zobrazuje přihlašovací údaje",
-    "warning_other": "{{count}} odkazu v této zprávě zobrazuje přihlašovací údaje"
+    "warning_other": "{{count}} odkazů v této zprávě zobrazuje přihlašovací údaje"
   },
   "requests": {
     "entry": "Žádosti o zprávy",
@@ -325,7 +325,7 @@
     "requestMetaChat": "{{server}} · chce si s tebou psát · {{time}}",
     "requestMetaMessages": "{{server}} · poslal(a) ti zprávy · {{time}}",
     "quote": "„{{text}}“",
-    "block": "Blokovat",
+    "block": "Zablokovat",
     "showMore_one": "Zobrazit další {{count}} žádost",
     "showMore_few": "Zobrazit další {{count}} žádosti",
     "showMore_many": "Zobrazit dalších {{count}} žádosti",
@@ -361,9 +361,9 @@
       "unmute": "Zrušit ztlumení konverzace",
       "muteHour": "Na 1 hodinu",
       "muteEightHours": "Na 8 hodin",
-      "muteForever": "Dokud ho znovu nezapnu",
+      "muteForever": "Dokud ztlumení nezruším",
       "profile": "Zobrazit profil",
-      "block": "Blokovat uživatele {{name}}",
+      "block": "Zablokovat uživatele {{name}}",
       "deleteHistory": "Smazat historii",
       "deleteHint": "Jen toto zařízení · {{name}} si ponechá svou kopii"
     }
@@ -426,12 +426,12 @@
     "load": "Načíst obrázek"
   },
   "slash": {
-    "list": "Příkazy se „/“"
+    "list": "Příkazy s lomítkem"
   },
   "channelMention": {
     "chipLabel": "#{{name}}, kanál – otevřít nabídku",
-    "join": "Vstoupit do kanálu",
-    "joinPath": "Vstoupit do {{path}}",
+    "join": "Připojit se ke kanálu",
+    "joinPath": "Připojit se ke kanálu {{path}}",
     "show": "Zobrazit v seznamu kanálů",
     "showPath": "Zobrazit {{path}} v seznamu kanálů",
     "copy": "Kopírovat název",

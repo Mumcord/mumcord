@@ -1,24 +1,24 @@
 {
-  "hint": "Načtěte rozbalenou složku zásuvného modulu a vyzkoušejte ji. Vývojářské moduly nejsou podepsané, nikdy nejsou oficiální a nemohou získat net.http, secrets ani ui.webview. Po vypnutí vývojářského režimu se uvolní.",
-  "load": "Načíst složku modulu…",
-  "pickFolder": "Vyberte složku modulu",
-  "empty": "Není načten žádný vývojářský modul.",
-  "listLabel": "Vývojářské moduly",
-  "label": "Vývojářský modul",
+  "hint": "Načti rozbalenou složku pluginu a vyzkoušej ho. Vývojářské pluginy nejsou podepsané, nikdy nejsou oficiální a nemohou získat net.http, secrets ani ui.webview. Po vypnutí vývojářského režimu se uvolní.",
+  "load": "Načíst složku pluginu…",
+  "pickFolder": "Vyber složku pluginu",
+  "empty": "Není načten žádný vývojářský plugin.",
+  "listLabel": "Vývojářské pluginy",
+  "label": "Vývojářský plugin",
   "status": {
     "running": "Běží",
     "off": "Vypnutý",
     "backingOff": "Restartuje se po pádu",
     "autoOff": "Vypnutý po opakovaných pádech",
-    "allOff": "Všechny moduly jsou vypnuté",
-    "noPlugins": "Moduly jsou pro tuto relaci vypnuté",
+    "allOff": "Všechny pluginy jsou vypnuté",
+    "noPlugins": "Pluginy jsou pro tuto relaci vypnuté",
     "notLoaded": "Nepodařilo se načíst"
   },
-  "showLog": "Zobrazit protokol modulu {{name}}",
+  "showLog": "Zobrazit protokol pluginu {{name}}",
   "reload": "Znovu načíst {{name}}",
   "unload": "Uvolnit {{name}}",
-  "logLabel": "Protokol modulu {{name}}",
-  "logTitle": "Protokol modulu {{name}}",
+  "logLabel": "Protokol pluginu {{name}}",
+  "logTitle": "Protokol pluginu {{name}}",
   "logEmpty": "Zatím žádné řádky protokolu.",
   "level": {
     "debug": "Ladění",
@@ -27,9 +27,9 @@
     "error": "Chyba"
   },
   "errors": {
-    "load": "Složku modulu se nepodařilo načíst.",
-    "reload": "Modul se nepodařilo znovu načíst.",
-    "unload": "Modul se nepodařilo uvolnit.",
+    "load": "Složku pluginu se nepodařilo načíst.",
+    "reload": "Plugin se nepodařilo znovu načíst.",
+    "unload": "Plugin se nepodařilo uvolnit.",
     "log": "Protokol se nepodařilo přečíst."
   }
 }

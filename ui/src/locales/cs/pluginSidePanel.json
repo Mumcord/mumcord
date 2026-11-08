@@ -4,6 +4,6 @@
   "resize": "Změnit velikost bočního panelu {{plugin}}",
   "failed": "Boční panel {{plugin}} se nepodařilo zavřít. Zkus to prosím znovu.",
   "options": "Možnosti {{plugin}}",
-  "details": "Podrobnosti o doplňku",
+  "details": "Podrobnosti o pluginu",
   "closePanel": "Zavřít panel"
 }

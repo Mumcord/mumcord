@@ -1,16 +1,16 @@
 {
-  "type": "Doplněk",
+  "type": "Plugin",
   "autoOff": {
-    "title": "Doplněk {{name}} byl vypnut",
+    "title": "Plugin {{name}} byl vypnut",
     "body": "Vypnuto po opakovaných pádech",
-    "open": "Zobrazit v Doplňcích"
+    "open": "Zobrazit v Pluginech"
   },
   "pictureRefused": {
-    "title": "{{name}} nemohl použít obrázek",
+    "title": "Plugin {{name}} nemohl použít obrázek",
     "body": "Tento obrázek nelze použít. Použij soubor PNG, JPEG nebo WebP do 10 MB."
   },
   "update": {
-    "title": "Aktualizace pro {{name}}",
+    "title": "Aktualizace pluginu {{name}}",
     "body": "Verze {{version}} čeká na kartě Aktualizace",
     "open": "Zobrazit aktualizace"
   },
@@ -21,14 +21,14 @@
     "installLabel": "Nainstalovat {{name}}",
     "addRepositoryLabel": "Přidat repozitář pro {{name}}",
     "details": "Zobrazit podrobnosti",
-    "detailsLabel": "Podrobnosti o {{name}}",
+    "detailsLabel": "Podrobnosti o pluginu {{name}}",
     "notNow": "Teď ne",
     "notNowLabel": "Prozatím skrýt {{name}}",
     "dontAsk": "Pro tento server se už neptat",
     "recommended": "Doporučeno",
     "official": "Oficiální",
     "unofficial": "Neoficiální · {{host}}",
-    "footer": "Návrhy nikdy nic samy neinstalují. Server se nedozví, co instalujete."
+    "footer": "Návrhy nikdy nic samy neinstalují. Server se nedozví, co instaluješ."
   },
-  "failed": "Nepodařilo se. Zkuste to prosím znovu."
+  "failed": "To se nepodařilo. Zkus to prosím znovu."
 }

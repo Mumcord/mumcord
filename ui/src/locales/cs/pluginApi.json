@@ -3,5 +3,5 @@
   "heldForApi": "Aktualizace bude dostupná po aktualizaci Mumcordu",
   "updateMumcord": "Aktualizovat Mumcord",
   "oldMajor": "Vytvořeno pro starší Mumcord – nemusí fungovat",
-  "deprecated": "{{plugin}} používá starší rozhraní doplňků, které Mumcord stále podporuje."
+  "deprecated": "{{plugin}} používá starší rozhraní pluginů, které Mumcord stále podporuje."
 }

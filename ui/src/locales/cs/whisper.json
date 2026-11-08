@@ -1,21 +1,21 @@
 {
   "menu": {
-    "whisper": "Pošeptat",
+    "whisper": "Šeptat",
     "noPermission": "Server tady šeptání nepovoluje"
   },
   "banner": {
     "whisper": "Šeptáš: {{target}}",
     "shout": "Voláš na: {{target}}",
-    "releaseKey": "Slyší tě jen lidé tam. Pusť <key>{{key}}</key> a znovu mluvíš do {{channel}}.",
-    "stopToReturn": "Slyší tě jen lidé tam. Zastav a znovu mluvíš do {{channel}}.",
+    "releaseKey": "Slyší tě jen lidé tam. Pusť <key>{{key}}</key> a budeš zase mluvit do kanálu {{channel}}.",
+    "stopToReturn": "Slyší tě jen lidé tam. Zastav a budeš zase mluvit do kanálu {{channel}}.",
     "onlyThere": "Slyší tě jen lidé tam.",
     "stop": "Zastavit"
   },
   "denied": {
-    "title": "Nelze pošeptat: {{target}}",
-    "noVoiceServer": "Nejdřív vstup do kanálu: šepot jde přes server, na kterém mluvíš.",
+    "title": "Šeptání se nepodařilo: {{target}}",
+    "noVoiceServer": "Nejdřív se připoj ke kanálu: šeptání jde přes server, na kterém mluvíš.",
     "muted": "Pro šeptání zapni mikrofon.",
-    "serverMuted": "Server tě ztlumil, proto tvůj hlas nepředává.",
+    "serverMuted": "Server ti ztlumil mikrofon, proto tvůj hlas nepředává.",
     "nobodyHere": "Nikdo z těchto lidí teď na serveru není.",
     "channelNotFound": "Tento kanál na serveru neexistuje.",
     "noPermission": "Server ti nedovoluje šeptat do kanálu {{channel}}.",

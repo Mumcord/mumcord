@@ -1,13 +1,13 @@
 {
   "turnOn": "Zapnout kameru",
-  "turnOnHint": "Nejdřív uvidíš náhled. Vidět tě můžou jen lidé v {{channel}}.",
+  "turnOnHint": "Nejdřív uvidíš náhled. Vidět tě můžou jen lidé v kanálu {{channel}}.",
   "turnOff": "Vypnout kameru",
   "turnOffLabel": "Vypnout kameru. Tvoje kamera je zapnutá.",
   "cameraOn": "Kamera zapnutá",
   "cameraOnLabel": "Tvoje kamera je zapnutá",
   "cameraOffLabel": "Tvoje kamera je vypnutá",
   "personCameraOn": "Kamera uživatele {{name}} je zapnutá",
-  "notInChannel": "Připoj se k hlasovému kanálu, abys mohl zapnout kameru.",
+  "notInChannel": "Pro zapnutí kamery se připoj k hlasovému kanálu.",
   "unavailable": {
     "noRelay": "Tento server nemá relay, takže sdílení kamery není dostupné.",
     "relayTooOld": "Relay tohoto serveru je pro sdílení kamery příliš starý.",
@@ -23,7 +23,7 @@
     "title": "Zapnout kameru",
     "subtitle": "Náhled · zatím to nikdo nevidí",
     "previewLabel": "Náhled kamery",
-    "privacy": "Tvoji kameru vidí jen lidé v {{channel}} a až po stisknutí Zapnout kameru. Mumcord kamery nikdy nenahrává.",
+    "privacy": "Tvoji kameru vidí jen lidé v kanálu {{channel}}, a to až po stisknutí Zapnout kameru. Mumcord kamery nikdy nenahrává.",
     "camera": "Kamera",
     "background": "Pozadí",
     "backgroundNone": "Žádné",
@@ -116,7 +116,7 @@
   "announce": {
     "on": "Kamera zapnutá",
     "off": "Kamera vypnutá",
-    "live": "Tvoje kamera běží živě",
+    "live": "Tvoje kamera vysílá živě",
     "stopped": "Tvoje kamera se zastavila",
     "joined": "{{name}} zapnul(a) kameru",
     "left": "{{name}} vypnul(a) kameru",
@@ -135,7 +135,7 @@
     "label_few": "Místnost kamer, {{count}} zapnuté kamery",
     "label_many": "Místnost kamer, {{count}} zapnuté kamery",
     "label_other": "Místnost kamer, {{count}} zapnutých kamer",
-    "subtitle": "{{cameras}} · {{people}} v {{channel}}",
+    "subtitle": "{{cameras}} · {{people}} v kanálu {{channel}}",
     "cameras_one": "{{count}} zapnutá kamera",
     "cameras_few": "{{count}} zapnuté kamery",
     "cameras_many": "{{count}} zapnuté kamery",
@@ -171,13 +171,13 @@
     "miniBar_many": "{{count}} zapnuté kamery",
     "miniBar_other": "{{count}} zapnutých kamer",
     "cameras": "Kamery",
-    "fullTitle": "Místnost je plná při 9 kamerách",
+    "fullTitle": "Místnost je plná (9 kamer)",
     "backgroundPicker": "Změnit pozadí"
   },
   "position": {
     "label": "Kamery",
     "beside": "Kamery vedle",
-    "above": "Nad",
+    "above": "Nahoře",
     "hidden": "Skryté"
   },
   "tile": {
@@ -222,7 +222,7 @@
     "screenLive": "Živě",
     "partyTitle": "Společné sledování",
     "partyStarted": "Spustil(a) {{name}}",
-    "label": "{{title}} s místností s kamerami"
+    "label": "{{title}} a místnost kamer"
   },
   "settings": {
     "title": "Kamera",
@@ -235,8 +235,8 @@
     "sendQualityAuto": "Automaticky",
     "sendQuality720": "720p · 15 fps",
     "sendQuality360": "360p · 30 fps",
-    "sendQualityHint": "Auto (až 720p · 30 fps) posílá jen tolik, kolik diváci potřebují: menší obraz ve velké mřížce, ostřejší, když tě někdo připne.",
-    "mirror": "Zrcadlit můj vlastní náhled",
+    "sendQualityHint": "Automaticky (až 720p · 30 fps) posílá jen tolik, kolik diváci potřebují: menší obraz ve velké mřížce, ostřejší, když tě někdo připne.",
+    "mirror": "Zrcadlit vlastní náhled",
     "mirrorHint": "Zrcadlí se jen tvůj vlastní náhled. Ostatní tě vidí správně.",
     "backgroundSection": "Pozadí",
     "defaultBackground": "Výchozí pozadí",
@@ -247,7 +247,7 @@
     "effectAuto": "Automaticky",
     "effectBest": "Nejlepší (grafická karta)",
     "effectLight": "Lehká (šetří baterii)",
-    "effectHint": "Auto používá grafickou kartu, kdykoli to jde, a na baterii nebo při vytíženém počítači přepne na Lehkou.",
+    "effectHint": "Automaticky se použije grafická karta, kdykoli to jde; na baterii nebo při vytíženém počítači se přepne na Lehkou.",
     "ownImages_one": "Tvoje vlastní obrázky pozadí zůstávají v tomto zařízení (uloženo: {{count}}). Odesílá se jen hotový obraz.",
     "ownImages_few": "Tvoje vlastní obrázky pozadí zůstávají v tomto zařízení (uloženo: {{count}}). Odesílá se jen hotový obraz.",
     "ownImages_many": "Tvoje vlastní obrázky pozadí zůstávají v tomto zařízení (uloženo: {{count}}). Odesílá se jen hotový obraz.",
@@ -261,7 +261,7 @@
     "showAlways": "Vždy",
     "showOnOpen": "Když otevřu místnost",
     "showNever": "Nikdy",
-    "showHint": "Vždy otevře místnost kamer, když někdo ve tvém kanálu zapne kameru. Nikdy tě nechá jen u hlasu a nestahuje žádné video.",
+    "showHint": "Možnost Vždy otevře místnost kamer, když někdo ve tvém kanálu zapne kameru. Možnost Nikdy tě nechá jen u hlasu a nestahuje žádné video.",
     "dataSaver": "Šetření daty: až 15 fps pro všechny",
     "reduceMotion": "Omezit pohyb: žádná záře ani animace na rámečku mluvčího",
     "reduceMotionHint": "Ve výchozím stavu se řídí nastavením omezení pohybu v systému."

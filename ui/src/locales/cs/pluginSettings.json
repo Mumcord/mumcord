@@ -1,6 +1,6 @@
 {
-  "title": "Doplňky",
-  "tabsLabel": "Sekce doplňků",
+  "title": "Pluginy",
+  "tabsLabel": "Sekce pluginů",
   "tabs": {
     "installed": "Nainstalované",
     "browse": "Procházet",
@@ -8,15 +8,15 @@
     "repositories": "Repozitáře",
     "developer": "Vývojář"
   },
-  "turnOffAll": "Vypnout všechny doplňky",
-  "allOff": "Všechny doplňky jsou vypnuté. Zůstanou vypnuté i po restartu, dokud je znovu nezapnete.",
-  "noPlugins": "Doplňky jsou pro tuto relaci vypnuté (spuštěno s --no-plugins).",
-  "loadFailed": "Doplňky se nepodařilo načíst.",
+  "turnOffAll": "Vypnout všechny pluginy",
+  "allOff": "Všechny pluginy jsou vypnuté. Zůstanou vypnuté i po restartu, dokud je znovu nezapneš.",
+  "noPlugins": "Pluginy jsou pro tuto relaci vypnuté (spuštěno s --no-plugins).",
+  "loadFailed": "Pluginy se nepodařilo načíst.",
   "palette": {
     "label": "Paleta příkazů",
-    "placeholder": "Zadejte příkaz",
+    "placeholder": "Zadej příkaz",
     "empty": "Žádný odpovídající příkaz",
-    "openPlugins": "Doplňky",
-    "turnOffAll": "Vypnout všechny doplňky"
+    "openPlugins": "Pluginy",
+    "turnOffAll": "Vypnout všechny pluginy"
   }
 }
