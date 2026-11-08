@@ -65,7 +65,7 @@ None. All settings are per user, local, and available to everyone. No server or 
 ### 4.2 Chat-history batching (always on)
 
 - **FR-12.5** New chat messages are held in memory and written to the database in **batches**
-  instead of one transaction per message: flushed every 5 seconds, on idle, and at shutdown.
+  instead of one transaction per message: flushed every second, on idle, and at shutdown.
   Always on; no setting.
 - **FR-12.6** The per-server "Save history" switch and history sync stay exactly as they are.
   Batching changes only *when* the same messages reach the database, not which messages are kept.
@@ -120,7 +120,7 @@ Always-on changes (no settings):
 
 - `engine::diag` — replace the per-line `write_all` with a buffered writer and a 5 s flush timer;
   flush on shutdown and on panic (the panic hook already reads the memory ring).
-- `store::history` / `engine::session` — collect messages and flush in batches (5 s / idle /
+- `store::history` / `engine::session` — collect messages and flush in batches (1 s / idle /
   shutdown).
 - `engine::crash::persist_context` — debounce file writes to once per second.
 
@@ -228,7 +228,7 @@ Acceptance criteria (running client, local test server):
 
 ## 11. Open points & risks
 
-- **Flush interval (5 s)** is a starting point; the tasks may tune it after measuring.
+- **Flush interval (1 s)** is a starting point; the tasks may tune it after measuring.
 - **Hard crash loses the last batch of chat history** even with "Wait for disk" on, because
   batching holds the newest messages in memory. Accepted by decision (D2); a normal close never
   loses anything.

@@ -228,4 +228,37 @@ mod tests {
             .collect();
         assert_eq!(view, vec![("hello Bob", Some("Bob")), ("only mine", None)]);
     }
+
+    #[test]
+    fn summaries_survive_a_reopen_after_the_batched_write() {
+        // Mirrors the E2E restart: a private message is queued, flushed by the summary read,
+        // then a fresh Store (new process) reads the same summaries.
+        let dir = tempfile::tempdir().expect("tempdir");
+        let id = {
+            let store = Store::open(dir.path()).expect("open");
+            let id = server(&store);
+            store
+                .append_message(
+                    id,
+                    &NewChatMessage {
+                        conversation: Conversation::Private("bob".into()),
+                        sender_name: "Bob".into(),
+                        sender_cert_hash: Some("bob".into()),
+                        sent_at: 10,
+                        body: "hi".into(),
+                    },
+                )
+                .expect("append");
+            let all = store.private_conversation_summaries(id).expect("list");
+            assert_eq!(all.len(), 1, "the summary read flushes the queued message");
+            id
+        };
+        let store = Store::open(dir.path()).expect("reopen");
+        let all = store
+            .private_conversation_summaries(id)
+            .expect("list after reopen");
+        assert_eq!(all.len(), 1);
+        assert_eq!(all[0].last.body, "hi");
+        assert_eq!(all[0].peer_name.as_deref(), Some("Bob"));
+    }
 }
