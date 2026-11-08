@@ -29,6 +29,7 @@ import type {
 import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
+  RegisteredUserEntry,
   BlockedUser,
   ActiveAudioProfile,
   BanEntry,
@@ -899,8 +900,9 @@ function demoChannels(serverName: string): ChannelInfo[] {
     name,
     position,
     // The demo user moderates, so the tree shows "Move users here…" and dragging (#172), the
-    // server menu offers the ban list (#436), and the person menu offers Kick… and Ban… (#253).
-    permissions: { ...allow, moveUsers: true, ban: true, kick: true },
+    // server menu offers the ban list (#436), the person menu offers Kick… and Ban… (#253), and
+    // the Server administration window grows its Registered users tab (#256).
+    permissions: { ...allow, moveUsers: true, ban: true, kick: true, register: true },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
@@ -2146,7 +2148,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true, isMumcord: true }),
       withAvatar({ ...person(5, "Jonas", 1, "jonashash"), isMumcord: true }),
       withAvatar(person(7, "Priya", 1, "priyahash")),
-      { ...person(3, "Ben", 1, null), selfMute: true },
+      // A guest: "Register on server…" has someone to offer it to, and the friend and profile
+      // tests keep showing what a person without a certificate cannot do (issue #256).
+      { ...person(3, "Ben", 1, null), registered: false, selfMute: true },
       { ...person(4, "Carla", 7, "carlahash"), listeningChannelIds: [1] },
       person(6, "Leo", 4, "leohash"),
       withAvatar(person(9, "Sam", 4, "samhash")),
@@ -2353,6 +2357,147 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       canKick: root?.permissions.kick === true,
       canBan: root?.permissions.ban === true,
     };
+  }
+
+  /**
+   * The registered accounts a mock server holds (issue #256): the ones nobody is using right now
+   * stand here, and the people connected on this server are added to them as they are in the tree.
+   * This map is the *server*, not the window: it keeps what a save changed, while the window itself
+   * forgets its list when it closes (FR-10.63).
+   */
+  const registeredOffline = new Map<number, RegisteredUserEntry[]>();
+  /** Accounts the user removed here, by server; an online person stops being registered too. */
+  const registeredRemoved = new Map<number, Set<number>>();
+  /** Ids handed out by name, so an account keeps the same id across reads. */
+  const registeredIds = new Map<string, number>();
+  let nextRegisteredId = 40;
+
+  function idOfAccount(name: string): number {
+    const known = registeredIds.get(name);
+    if (known !== undefined) return known;
+    const fresh = nextRegisteredId++;
+    registeredIds.set(name, fresh);
+    return fresh;
+  }
+
+  // A mixed list for the tab and the screenshots: accounts used today, days ago and long ago, one
+  // without a last channel and one the server has never seen. Fictional names only (issue #436).
+  function seedRegistered(): RegisteredUserEntry[] {
+    // One clock, so "3 days ago" and the 90-day filter agree with the people in the tree.
+    const days = (before: number) => new Date(Date.now() - before * 86_400_000).toISOString();
+    return [
+      {
+        userId: 4,
+        name: "Aastrid",
+        lastSeen: days(1),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 7,
+        name: "Bjørn",
+        lastSeen: days(2),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 12,
+        name: "Freya",
+        lastSeen: days(4),
+        lastChannel: "Squad A",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 15,
+        name: "Sigrid",
+        lastSeen: days(14),
+        lastChannel: "Squad B",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 18,
+        name: "Tove",
+        lastSeen: days(1),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 21,
+        name: "Leif",
+        lastSeen: days(3),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 24,
+        name: "Ingrid",
+        lastSeen: days(24),
+        lastChannel: "Music Room",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 9,
+        name: "Ragnar",
+        lastSeen: days(127),
+        lastChannel: "AFK",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 26,
+        name: "Odalys",
+        lastSeen: days(204),
+        lastChannel: null,
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 31,
+        name: "Brennan",
+        lastSeen: null,
+        lastChannel: null,
+        online: false,
+        certHash: null,
+      },
+    ];
+  }
+
+  function registeredList(serverId: number): RegisteredUserEntry[] {
+    if (!registeredOffline.has(serverId)) registeredOffline.set(serverId, seedRegistered());
+    const snapshot = sessions.get(serverId)?.snapshot;
+    const removed = registeredRemoved.get(serverId) ?? new Set<number>();
+    const out = (registeredOffline.get(serverId) ?? [])
+      .filter((entry) => !removed.has(entry.userId))
+      .map((entry) => ({ ...entry }));
+    // The people who are connected hold their accounts here and now, with the certificate the
+    // server knows for them.
+    for (const user of snapshot?.users ?? []) {
+      if (!user.registered || removed.has(idOfAccount(user.name))) continue;
+      out.push({
+        userId: idOfAccount(user.name),
+        name: user.name,
+        lastSeen: new Date().toISOString(),
+        lastChannel:
+          snapshot?.channels.find((channel) => channel.id === user.channelId)?.name ?? null,
+        online: true,
+        certHash: user.certHash,
+      });
+    }
+    return out;
+  }
+
+  /** A few accounts belong to the demo groups, so the detail panel has something to show. */
+  function groupsFor(userId: number): string[] {
+    if (userId % 3 === 1) return ["officers", "raiders"];
+    if (userId % 3 === 2) return ["raiders"];
+    return [];
   }
 
   // A mixed list for screenshots: active and expired entries, one without a name, one network
@@ -4082,6 +4227,71 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }
       if (input.removeNow) removePerson(serverId, session);
       return Promise.resolve({ kind: "saved", key, removed: input.removeNow });
+    },
+    registeredUsersOpen: (serverId) => {
+      const snapshot = sessions.get(serverId)?.snapshot;
+      const root = snapshot?.channels.find((c) => c.id === 0);
+      if (root && !root.permissions.register) {
+        return fail("permissionDenied", "register right in the root channel");
+      }
+      return Promise.resolve(registeredList(serverId));
+    },
+    registeredUserRename: (serverId, userId, name) => {
+      const snapshot = sessions.get(serverId)?.snapshot;
+      const wanted = name.trim();
+      const list = registeredList(serverId);
+      const entry = list.find((candidate) => candidate.userId === userId);
+      if (!entry) return fail("notFound", "the account is not on the list");
+      // The mock copies the measured server: a name another account holds is taken without a
+      // refusal, and the list still shows the old name (issue #256).
+      if (list.some((candidate) => candidate.userId !== userId && candidate.name === wanted)) {
+        return Promise.resolve({ kind: "kept", entries: registeredList(serverId) });
+      }
+      const person = snapshot?.users.find((u) => u.name === entry.name);
+      if (person) {
+        // An account someone is using now: the tree shows the new name too, as a server would.
+        updateUser(person.session, { name: wanted });
+        registeredIds.set(wanted, userId);
+      }
+      const offline = registeredOffline.get(serverId) ?? seedRegistered();
+      const stored = offline.find((candidate) => candidate.userId === userId);
+      if (stored) stored.name = wanted;
+      return Promise.resolve({ kind: "saved", entries: registeredList(serverId) });
+    },
+    registeredUserUnregister: (serverId, userId) => {
+      const snapshot = sessions.get(serverId)?.snapshot;
+      const entry = registeredList(serverId).find((candidate) => candidate.userId === userId);
+      if (!entry) return fail("notFound", "the account is not on the list");
+      const removed = registeredRemoved.get(serverId) ?? new Set<number>();
+      removed.add(userId);
+      registeredRemoved.set(serverId, removed);
+      // The person can still connect, but as a guest: their registration is off the account.
+      const person = snapshot?.users.find((u) => u.name === entry.name);
+      if (person) updateUser(person.session, { registered: false });
+      return Promise.resolve({ kind: "saved", entries: registeredList(serverId) });
+    },
+    registeredUserGroups: (serverId, userId) => {
+      registeredList(serverId);
+      return Promise.resolve(groupsFor(userId));
+    },
+    // Closing the tab forgets nothing here: the mock stands for the server, which keeps its
+    // accounts; FR-10.63 is about what Mumcord itself stores.
+    registeredUsersClose: () => Promise.resolve(null),
+    personRegister: (serverId, session) => {
+      const snapshot = sessions.get(serverId)?.snapshot;
+      const root = snapshot?.channels.find((c) => c.id === 0);
+      if (root && !root.permissions.register) {
+        return fail("permissionDenied", "register right in the root channel");
+      }
+      const user = snapshot?.users.find((u) => u.session === session);
+      if (!user) return fail("notFound", "the person is not on this server");
+      if (user.registered) return fail("invalidInput", "this person is registered already");
+      if (!user.certHash) return fail("invalidInput", "registering needs a client certificate");
+      // The account takes the name they are here under, and appears in the list at once.
+      const removed = registeredRemoved.get(serverId);
+      if (removed) removed.delete(idOfAccount(user.name));
+      updateUser(session, { registered: true });
+      return Promise.resolve(null);
     },
     personActionClose: (serverId) => {
       personTargets.delete(serverId);
