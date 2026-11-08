@@ -220,7 +220,12 @@ describe("packet inspector (issue #60)", () => {
   });
 
   it("captures only while the window is open: a reopened inspector starts empty", async () => {
-    await browser.pause(1500);
+    // The bot never answers the hello, so the app asks it again after 10, 30 and 90 s (#647);
+    // such a request could land in the reopened window. Once the bot has left, nothing more is
+    // sent to it.
+    peer?.stop();
+    peer = undefined;
+    await browser.pause(3000);
     await button("Open packet inspector").click();
     await switchToInspector();
     await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();
