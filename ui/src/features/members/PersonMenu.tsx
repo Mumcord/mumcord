@@ -24,6 +24,7 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError, type ModerateInput } from "../../api";
+import { announce } from "../../a11y";
 import { shownServerId, useServerState } from "../channels/serverStore";
 import { WHISPER_ICON_PATHS } from "../whisper/whisperIcons";
 import { createWhisperTarget } from "../whisper/whisperStore";
@@ -35,9 +36,11 @@ import { useAcceptedConsent, usePmRequests } from "../requests/requestsStore";
 import { blockTargetFor, openBlockDialog, unblock, useBlock } from "../blocking";
 import { BLOCK_PATH } from "../blocking/BlockIcon";
 import { ContextMenu, type MenuPosition, type MenuItem } from "../../components/ContextMenu";
-import { canBan, canKick } from "../admin/permissions";
+import { canBan, canKick, canRegister } from "../admin/permissions";
 import type { PersonActionMode } from "../admin/personActionStore";
 import { openPersonAction } from "../admin/personActionStore";
+import { actionErrorText } from "../admin/errors";
+import { registerPerson } from "../admin/registeredStore";
 import "../userpanel/quicksettings.css";
 import "./members.css";
 import { joinTarget } from "./joinTarget";
@@ -84,6 +87,9 @@ const STAR_ICON = "M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L
 const RESET_COMMENT_ICON =
   "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM9 8l6 6M15 8l-6 6";
 const RESET_AVATAR_ICON = "M3 3h18v18H3zM9 9l6 6M15 9l-6 6";
+/** Person with a plus: this registers someone who is here as a guest (FR-10.20). */
+const REGISTER_ICON =
+  "M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6";
 
 /** Decorative: the entry's label is the accessible name, so the icon stays hidden. */
 function MenuIcon({ children }: { children: ReactNode }) {
@@ -324,6 +330,31 @@ function PersonMenu({
           },
         ]
       : [];
+
+  // "Register on server…" only for a guest, only while they are online, and only with the
+  // Register right (FR-10.20, AC-10.15, issue #256). It acts at once, without a confirmation.
+  // A person without a certificate is left out too: a standard server has nothing to bind the
+  // account to, so the item could only ever be refused (FR-10.2).
+  const registerItem: MenuItem[] =
+    user && !isSelf && !user.registered && user.certHash !== null && canRegister(serverId)
+      ? [
+          {
+            label: tAdmin("menuRegister"),
+            icon: REGISTER_ICON,
+            onSelect: () => {
+              const target = user;
+              closePersonMenu();
+              void registerPerson(serverId, target.session).then((outcome) => {
+                if (outcome.ok) {
+                  announce(tAdmin("announcedRegistered", { name: target.name }));
+                } else {
+                  announce(actionErrorText(tAdmin, outcome.error));
+                }
+              });
+            },
+          },
+        ]
+      : [];
   const resets: MenuItem[] =
     user && !isSelf && rootRights?.resetUserContent === true
       ? [
@@ -383,10 +414,11 @@ function PersonMenu({
       : [];
   // Kick and ban sit last, in red, behind a divider (FR-10.6).
   const adminItems: MenuItem[] = [
+    ...registerItem,
     ...moderation,
     ...resets,
     ...removal.map((item, index) =>
-      index === 0 && moderation.length + resets.length > 0
+      index === 0 && moderation.length + resets.length + registerItem.length > 0
         ? { ...item, separatorBefore: true }
         : item,
     ),

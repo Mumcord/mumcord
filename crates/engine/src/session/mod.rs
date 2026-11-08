@@ -260,6 +260,8 @@ struct Inner {
     admin: Mutex<crate::admin::Admin>,
     channel_admin: Mutex<crate::channel_admin::ChannelAdmin>,
     channel_acls: Mutex<crate::channel_acl::ChannelAcls>,
+    /// The registered users held in memory while the Registered users tab is open (issue #256).
+    registered: Mutex<crate::registered::Registered>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
     /// Chat and message requests per server (issue #141).
@@ -612,6 +614,7 @@ impl Engine {
             admin: Mutex::default(),
             channel_admin: Mutex::default(),
             channel_acls: Mutex::default(),
+            registered: Mutex::default(),
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
@@ -924,6 +927,11 @@ impl Engine {
 
     pub(crate) fn admin_state(&self) -> &Mutex<crate::admin::Admin> {
         &self.inner.admin
+    }
+
+    /// What the open Registered users tab holds (issue #256).
+    pub(crate) fn registered_state(&self) -> &Mutex<crate::registered::Registered> {
+        &self.inner.registered
     }
 
     pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
@@ -1936,6 +1944,7 @@ impl Inner {
             crate::admin::on_disconnect(&self.admin, server_id);
             crate::channel_admin::on_disconnect(&self.channel_admin, server_id);
             crate::channel_acl::on_disconnect(&self.channel_acls, server_id);
+            crate::registered::on_disconnect(&self.registered, server_id);
             self.forget_password_attempt(server_id);
             self.files.on_connection_reset(server_id);
             self.full_images.reset(server_id);
@@ -2908,6 +2917,10 @@ impl Inner {
                             | mumcord_protocol::permissions::BAN)
                             != 0
                     });
+                // A refused read, rename or unregister of the registered accounts, and a refused
+                // group read, are answered by that tab (issue #256).
+                let registered =
+                    crate::registered::on_denied(&self.registered, ctx.server_id, denied);
                 // A ban-list query is refused with the Ban permission (issue #254).
                 let ban_list = denied.session.is_none()
                     && denied.permission == Some(mumcord_protocol::permissions::BAN);
@@ -2939,7 +2952,7 @@ impl Inner {
                     kind: convert::denial_kind(denied),
                     permission: denied.permission.and_then(convert::right_of),
                     // Shown by the dialog that asked; the UI adds no second notice (#248).
-                    handled: kick_or_ban || ban_list || password || channel_change,
+                    handled: kick_or_ban || ban_list || password || channel_change || registered,
                 });
             }
             // Collected by the session loop and emitted in batches (`emit_permissions`); history
@@ -2949,8 +2962,12 @@ impl Inner {
                     crate::history_sync::on_permissions(&self.history_sync, ctx, *channel_id);
                 }
             }
-            // The Permissions and Password tabs read the rules (Epic 4, #251, #252).
-            Event::Acl(acl) => crate::channel_acl::on_acl(&self.channel_acls, ctx.server_id, acl),
+            // The Permissions and Password tabs read the rules (Epic 4, #251, #252), and so does
+            // the detail panel of the Registered users tab (issue #256).
+            Event::Acl(acl) => {
+                crate::channel_acl::on_acl(&self.channel_acls, ctx.server_id, acl);
+                crate::registered::on_acl(&self.registered, ctx.server_id, acl);
+            }
             Event::UsersQueried(users) => {
                 crate::channel_acl::on_users(&self.channel_acls, ctx.server_id, users);
             }
@@ -3036,6 +3053,10 @@ impl Inner {
             }
             // The Server administration window's Bans tab is the consumer (issue #254).
             Event::BanList(list) => crate::banlist::on_answer(&self.ban_lists, ctx.server_id, list),
+            // Its Registered users tab is the consumer of the same kind of read (issue #256).
+            Event::UserList(list) => {
+                crate::registered::on_answer(&self.registered, ctx.server_id, list)
+            }
             // Here rather than in the extension hooks: the private message rule needs to know
             // who runs Mumcord (issue #141).
             Event::TextMessage(message) => {

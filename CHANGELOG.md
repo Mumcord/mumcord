@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Registered users (issue #256): the server menu gains "Registered users…", which opens a tab next to Bans in Server administration and lists every account the server knows, with the account id, the last seen and the last channel. Search, "Online" and "Inactive 90+ days" filters, renaming, unregistering and registering someone who is connected right now, groups that name the account, and one save for all your changes with a clear note when the server did not take one. Only with the server's Register right; without it the menu item and the tab stay away
+
 ## [0.7.2] - 2026-11-08
 
 ### Added

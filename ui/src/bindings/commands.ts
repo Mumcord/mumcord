@@ -175,6 +175,35 @@ export const commands = {
 	 *  FR-10.19). Acts at once; a refusal arrives as a `serverDenied` notice with the server's reason.
 	 */
 	personModerate: (serverId: number, session: number, action: ModerateInput) => typedError<null, ApiError>(__TAURI_INVOKE("person_moderate", { serverId, session, action })),
+	/**
+	 *  Reads the server's registered accounts for the window (issue #256). Fails with
+	 *  `permissionDenied` without the Register right in the root channel, and with `serverUnreachable`
+	 *  when the server does not answer within 5 s. Nothing is stored on disk (FR-10.63).
+	 */
+	registeredUsersOpen: (serverId: number) => typedError<RegisteredUserEntry[], ApiError>(__TAURI_INVOKE("registered_users_open", { serverId })),
+	/**
+	 *  Renames one account (FR-10.52, AC-10.37). One `UserList` entry carries the new name; the answer
+	 *  is the list the server holds afterwards, which is what tells whether it took the name.
+	 */
+	registeredUserRename: (serverId: number, userId: number, name: string) => typedError<RegisteredSaveResult, ApiError>(__TAURI_INVOKE("registered_user_rename", { serverId, userId, name })),
+	/**
+	 *  Removes one registration (FR-10.52, AC-10.37). The person can still connect, as a guest, and
+	 *  loses the name and the group memberships that name them.
+	 */
+	registeredUserUnregister: (serverId: number, userId: number) => typedError<RegisteredSaveResult, ApiError>(__TAURI_INVOKE("registered_user_unregister", { serverId, userId })),
+	/**
+	 *  The groups that name one account in a channel (issue #256). A server that will not show its
+	 *  groups answers with an empty list rather than an error.
+	 */
+	registeredUserGroups: (serverId: number, userId: number) => typedError<string[], ApiError>(__TAURI_INVOKE("registered_user_groups", { serverId, userId })),
+	/**  The window closed: what it held is dropped (FR-10.63). */
+	registeredUsersClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("registered_users_close", { serverId })),
+	/**
+	 *  Registers an online guest under their current name (FR-10.20, AC-10.15). Fails with
+	 *  `permissionDenied` without the Register right, and with `invalidInput` when the person is not
+	 *  connected, is registered already, or has no certificate to bind the account to.
+	 */
+	personRegister: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_register", { serverId, session })),
 	/**  Creates a channel (FR-10.21, FR-10.22). A temporary channel moves you into it. */
 	channelCreate: (serverId: number, input: ChannelCreateInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_create", { serverId, input })),
 	/**
@@ -4488,6 +4517,37 @@ export type RefusedPlugin = {
 	issue: PluginLoadIssue,
 	/**  When it was refused, in milliseconds since 1970. */
 	atMillis: number | null,
+};
+
+/**
+ *  What a rename or an unregister produced (issue #256). The window shows `entries` either way,
+ *  because the server's own list is the only account of what stands.
+ */
+export type RegisteredSaveResult = 
+/**  The server's list now carries the change. */
+{ kind: "saved"; entries: RegisteredUserEntry[] } | 
+/**
+ *  The list still shows the account as it was, which the server does not say in words: the
+ *  usual cause is a name another account already holds.
+ */
+{ kind: "kept"; entries: RegisteredUserEntry[] };
+
+/**
+ *  One registered account as the window shows it (issue #256). `userId` is the key of the row: the
+ *  server does not keep names unique in a way a client can rely on, and only the id says which
+ *  account a change acts on. `certHash` is personal data shown only to a user with the Ban right
+ *  (FR-10.65).
+ */
+export type RegisteredUserEntry = {
+	userId: number,
+	name: string,
+	/**  RFC 3339, or `null` when the server does not say (FR-10.5). */
+	lastSeen: string | null,
+	/**  The channel the account was last seen in, named, or `null` when the server does not say. */
+	lastChannel: string | null,
+	/**  Whether one of their accounts is connected right now. */
+	online: boolean,
+	certHash: string | null,
 };
 
 /**  The relay of a server changed (FR-4.20). */
