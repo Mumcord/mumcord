@@ -638,6 +638,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["about.setupWizardHint"],
   },
   {
+    section: "about",
+    group: "about.tipsTitle",
+    control: "about.tipsShow",
+    terms: ["about.tipsHint"],
+  },
+  {
     section: "advanced",
     group: "inspector.title",
     control: "inspector.devTools",

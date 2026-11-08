@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, pomočnik z namigi",
+  "greeting": {
+    "title": "Živjo, jaz sem Aaron!",
+    "body": "Jaz sem aksolotl in Mumcord poznam kot svoj žep. Si za hiter ogled? Traja približno minuto. Če ne zdaj, me najdeš v Nastavitve → O aplikaciji → Namigi.",
+    "start": "Pokaži mi",
+    "later": "Ne zdaj"
+  },
+  "progress": "Namig {{current}} od {{total}}",
+  "back": "Nazaj",
+  "next": "Naprej",
+  "done": "Končano",
+  "skip": "Preskoči ogled",
+  "close": "Zapri namige",
+  "tips": {
+    "servers": {
+      "title": "Tvoji strežniki",
+      "body": "V vrstici skrajno levo so tvoji strežniki. Strežnik dodaš z gumbom +, po javnih strežnikih pa brskaš s povečevalnim steklom. Hkrati se lahko povežeš z več strežniki."
+    },
+    "channels": {
+      "title": "Kanali",
+      "body": "Z dvoklikom se pridružiš kanalu in lahko govoriš. En klik pokaže njegov klepet brez pridružitve, z gumbom Sledi pa ostaneš na tekočem."
+    },
+    "talk": {
+      "title": "Kako govoriš",
+      "body": "»Pritisni za govor« ali glasovna aktivacija? Izberi v Nastavitve → Glas in zvok ali odpri Nastavitve glasu… z majhno puščico ob mikrofonu. »Pritisni za govor« deluje tudi z gumbi miške."
+    },
+    "panel": {
+      "title": "Tvoja uporabniška plošča",
+      "body": "Spodaj levo utišaš mikrofon, izklopiš zvok, vklopiš kamero ali prekineš povezavo. Male puščice zraven odprejo več možnosti."
+    },
+    "search": {
+      "title": "Najdi karkoli",
+      "body": "Pritisni {{key}} in poišči osebe in kanale, tudi na velikih strežnikih."
+    },
+    "chat": {
+      "title": "Klepet",
+      "body": "Odgovori na sporočilo ali ga citiraj, omeni osebe z @ ter deli slike in datoteke. Gumbi za oblikovanje se prikažejo med tipkanjem."
+    },
+    "apps": {
+      "title": "Aplikacije",
+      "body": "Gumb Aplikacije v vrstici za sporočila zažene deljenje zaslona, skupno gledanje ali tvojo kamero. Vtičniki dodajo še več."
+    },
+    "themes": {
+      "title": "Tvoj slog",
+      "body": "Zobnik spodaj levo preklaplja med temnim in svetlim videzom. V Nastavitve → Videz je več tem, strežnik pa ima lahko svojo: desno klikni nanj in izberi Tema."
+    },
+    "end": {
+      "title": "To je to!",
+      "body": "Zabavaj se v Mumcordu. Kadar koli me lahko znova pokličeš v Nastavitve → O aplikaciji → Namigi."
+    }
+  }
+}

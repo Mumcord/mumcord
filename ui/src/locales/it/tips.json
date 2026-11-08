@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, l'assistente dei suggerimenti",
+  "greeting": {
+    "title": "Ciao, sono Aaron!",
+    "body": "Sono un axolotl e conosco Mumcord come le mie tasche. Ti va un giro veloce? Ci vuole circa un minuto. Se non ora, mi trovi in Impostazioni → Informazioni → Suggerimenti.",
+    "start": "Fammi vedere",
+    "later": "Non ora"
+  },
+  "progress": "Suggerimento {{current}} di {{total}}",
+  "back": "Indietro",
+  "next": "Avanti",
+  "done": "Fatto",
+  "skip": "Salta il giro",
+  "close": "Chiudi i suggerimenti",
+  "tips": {
+    "servers": {
+      "title": "I tuoi server",
+      "body": "La barra all'estrema sinistra contiene i tuoi server. Aggiungine uno con + o sfoglia i server pubblici con la lente d'ingrandimento. Puoi connetterti a più server contemporaneamente."
+    },
+    "channels": {
+      "title": "Canali",
+      "body": "Fai doppio clic su un canale per entrarci e parlare. Un clic singolo ne mostra la chat senza entrare, e Segui ti tiene aggiornato."
+    },
+    "talk": {
+      "title": "Come parli",
+      "body": "Push-to-talk o attivazione vocale? Scegli in Impostazioni → Voce e audio, oppure apri Impostazioni vocali… con la piccola freccia accanto al microfono. Il push-to-talk funziona anche con i pulsanti del mouse."
+    },
+    "panel": {
+      "title": "Il tuo pannello utente",
+      "body": "In basso a sinistra disattivi il microfono o l'audio, attivi la fotocamera o riagganci. Le piccole frecce accanto aprono altre opzioni."
+    },
+    "search": {
+      "title": "Trova tutto",
+      "body": "Premi {{key}} per trovare persone e canali, anche sui server grandi."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Rispondi a un messaggio, citalo, menziona le persone con @ e condividi immagini e file. I pulsanti di formattazione compaiono mentre scrivi."
+    },
+    "apps": {
+      "title": "App",
+      "body": "Il pulsante App nella barra dei messaggi avvia la condivisione dello schermo, una watch party o la fotocamera. I plugin ne aggiungono altre."
+    },
+    "themes": {
+      "title": "Il tuo stile",
+      "body": "L’ingranaggio in basso a sinistra passa dal tema scuro a quello chiaro. In Impostazioni → Aspetto trovi altri temi, e un server può averne uno tutto suo: fai clic con il tasto destro e scegli Tema."
+    },
+    "end": {
+      "title": "Ecco fatto!",
+      "body": "Divertiti su Mumcord. Puoi richiamarmi quando vuoi da Impostazioni → Informazioni → Suggerimenti."
+    }
+  }
+}

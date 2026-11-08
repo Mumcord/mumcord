@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, vinkkiapuri",
+  "greeting": {
+    "title": "Hei, olen Aaron!",
+    "body": "Olen aksolotli ja tunnen Mumcordin kuin omat taskuni. Haluatko pikaesittelyn? Se kestää noin minuutin. Jos et nyt, löydät minut kohdasta Asetukset → Tietoja → Vinkit.",
+    "start": "Näytä",
+    "later": "Ei nyt"
+  },
+  "progress": "Vinkki {{current}}/{{total}}",
+  "back": "Takaisin",
+  "next": "Seuraava",
+  "done": "Valmis",
+  "skip": "Ohita esittely",
+  "close": "Sulje vinkit",
+  "tips": {
+    "servers": {
+      "title": "Palvelimesi",
+      "body": "Vasemman reunan palkissa ovat palvelimesi. Lisää palvelin +-painikkeella tai selaa julkisia palvelimia suurennuslasilla. Voit olla yhteydessä moneen palvelimeen yhtä aikaa."
+    },
+    "channels": {
+      "title": "Kanavat",
+      "body": "Kaksoisnapsauta kanavaa, niin liityt siihen ja voit puhua. Yksi napsautus näyttää kanavan chatin liittymättä, ja Seuraa-painike pitää sinut ajan tasalla."
+    },
+    "talk": {
+      "title": "Näin puhut",
+      "body": "Puhu painamalla vai puheaktivointi? Valitse kohdassa Asetukset → Puhe ja ääni tai avaa Ääniasetukset… mikrofonin vieressä olevalla pienellä nuolella. Puhu painamalla -tila toimii myös hiiren painikkeilla."
+    },
+    "panel": {
+      "title": "Käyttäjäpaneelisi",
+      "body": "Vasemmassa alakulmassa mykistät mikrofonin tai kuulokkeet, laitat kameran päälle tai katkaiset yhteyden. Viereiset pienet nuolet avaavat lisää vaihtoehtoja."
+    },
+    "search": {
+      "title": "Löydä kaikki",
+      "body": "Paina {{key}}, niin löydät henkilöitä ja kanavia, myös suurilla palvelimilla."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Vastaa viestiin, lainaa sitä, mainitse ihmisiä @-merkillä ja jaa kuvia ja tiedostoja. Muotoilupainikkeet tulevat esiin, kun kirjoitat."
+    },
+    "apps": {
+      "title": "Sovellukset",
+      "body": "Viestipalkin Sovellukset-painikkeella käynnistät näytön jaon, yhteiskatselun tai kamerasi. Lisäosat tuovat lisää."
+    },
+    "themes": {
+      "title": "Oma tyylisi",
+      "body": "Vasemmassa alareunassa oleva hammasratas vaihtaa tumman ja vaalean välillä. Kohdassa Asetukset → Ulkoasu on lisää teemoja, ja palvelin voi saada oman teemansa: napsauta sitä hiiren oikealla painikkeella ja valitse Teema."
+    },
+    "end": {
+      "title": "Siinä kaikki!",
+      "body": "Pidä hauskaa Mumcordissa. Voit kutsua minut takaisin milloin vain kohdasta Asetukset → Tietoja → Vinkit."
+    }
+  }
+}

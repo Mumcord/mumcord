@@ -228,5 +228,39 @@
     "discardBody": "Nichts wird vor dem Abschluss gespeichert. Wenn du jetzt abbrichst, bleibt alles, wie es ist.",
     "discardKeep": "Weiter bearbeiten",
     "discardConfirm": "Änderungen verwerfen"
+  },
+  "guide": {
+    "label": "Tipp von Aaron",
+    "from": "Tipp von Aaron",
+    "hide": "Aaron ausblenden",
+    "show": "Aaron einblenden",
+    "titles": {
+      "welcome": "Willkommen an Bord",
+      "import": "Hol deine Mumble-Sachen",
+      "identity": "Dein Name auf Servern",
+      "voice": "Wähle dein Mikrofon",
+      "setupStyle": "Wähle einen Stil",
+      "privateMessages": "Wer dir schreiben darf",
+      "notifications": "Deine Benachrichtigungen",
+      "connections": "Direkte Verbindungen",
+      "features": "Wähle deine Extras",
+      "appearance": "Wähle deinen Look",
+      "startup": "Mumcord starten",
+      "summary": "Prüfe deine Auswahl"
+    },
+    "hints": {
+      "welcome": "Hallo, ich bin Aaron! Ich begleite dich durch die Einrichtung. Das dauert nur eine Minute.",
+      "import": "Das sind die Server und Einstellungen, die in Mumble gefunden wurden. Wähle, was du behalten möchtest.",
+      "identity": "Deine Identität ist dein Name auf Servern. Erstelle eine neue oder importiere eine vorhandene.",
+      "voice": "Wähle hier das Mikrofon, in das du sprichst, und sag dann Hallo: Der grüne Balken sollte tanzen.",
+      "setupStyle": "Wähle einen Stil. Jede einzelne Einstellung kannst du später ändern.",
+      "privateMessages": "Lege fest, wer dir private Nachrichten schicken darf. Absender erfahren nie davon.",
+      "notifications": "Wähle, wie dich jede Art von Neuigkeit erreicht, oder schalte sie aus.",
+      "connections": "Lege fest, ob Mumcord dich direkt mit anderen Mumcord-Nutzern verbinden darf.",
+      "features": "Schalte nur die Extras ein, die du magst. Jede Karte zeigt, wer sie sehen kann.",
+      "appearance": "Hell, dunkel oder wie dein System: Wähle hier deinen Look.",
+      "startup": "Lege fest, wie Mumcord startet, wenn du dich an deinem Computer anmeldest.",
+      "summary": "Alles bereit! Prüfe hier deine Auswahl; mit Bearbeiten kommst du zu jedem Schritt zurück."
+    }
   }
 }

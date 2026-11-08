@@ -228,5 +228,39 @@
     "discardBody": "Enne lõpetamist ei salvestata midagi. Kui tühistad nüüd, jääb kõik nii, nagu on.",
     "discardKeep": "Jätka muutmist",
     "discardConfirm": "Hülga muudatused"
+  },
+  "guide": {
+    "label": "Aaroni näpunäide",
+    "from": "Aaroni näpunäide",
+    "hide": "Peida Aaron",
+    "show": "Näita Aaronit",
+    "titles": {
+      "welcome": "Tere tulemast pardale",
+      "import": "Too oma Mumble'i asjad kaasa",
+      "identity": "Sinu nimi serverites",
+      "voice": "Vali oma mikrofon",
+      "setupStyle": "Vali stiil",
+      "privateMessages": "Kes võib sulle kirjutada",
+      "notifications": "Sinu teavitused",
+      "connections": "Otseühendused",
+      "features": "Vali oma lisad",
+      "appearance": "Vali oma välimus",
+      "startup": "Mumcordi käivitamine",
+      "summary": "Kontrolli oma valikuid"
+    },
+    "hints": {
+      "welcome": "Tere, mina olen Aaron! Juhatan sind seadistuses. See võtab vaid minuti.",
+      "import": "Need on Mumbles leitud serverid ja seaded. Vali, mida tahad alles jätta.",
+      "identity": "Sinu identiteet on sinu nimi serverites. Loo uus või impordi olemasolev.",
+      "voice": "Vali siin mikrofon, millesse räägid, ja ütle tere: roheline riba peaks tantsima.",
+      "setupStyle": "Vali stiil. Iga üksiku seade saad hiljem muuta.",
+      "privateMessages": "Vali, kes tohib sulle privaatsõnumeid saata. Saatjatele ei anta sellest kunagi teada.",
+      "notifications": "Vali, kuidas iga liiki uudised sinuni jõuavad, või lülita need välja.",
+      "connections": "Vali, kas Mumcord tohib sind otse teiste Mumcordi kasutajatega ühendada.",
+      "features": "Lülita sisse ainult need lisad, mis sulle meeldivad. Iga kaart näitab, kes seda näeb.",
+      "appearance": "Hele, tume või nagu su süsteem: vali siin oma välimus.",
+      "startup": "Vali, kuidas Mumcord käivitub, kui arvutisse sisse logid.",
+      "summary": "Kõik valmis! Vaata siin oma valikud üle; Muuda viib sind tagasi mis tahes sammu juurde."
+    }
   }
 }

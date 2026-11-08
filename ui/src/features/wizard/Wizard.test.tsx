@@ -348,36 +348,41 @@ describe("Wizard (first start)", () => {
     expect(await heading("Voice chat that feels like your own place.")).toBeInTheDocument();
   });
 
-  it.each(["dark", "light"] as const)("has no axe violations on any step (%s)", async (theme) => {
-    harness = await setupWizardTest(theme);
-    const { container } = renderInWizard(harness, <Wizard />);
-    await heading("Voice chat that feels like your own place.");
-    expect(await axeViolations(container)).toEqual([]);
-    click("Let's get started");
-    await heading("Who are you on Mumble?");
-    expect(await axeViolations(container)).toEqual([]);
-    fireEvent.change(screen.getByLabelText("Default display name"), { target: { value: "Ana" } });
-    click("Next");
-    await heading("Sound good?");
-    expect(await axeViolations(container)).toEqual([]);
-    click("Next");
-    await heading("How much do you want to share?");
-    expect(await axeViolations(container)).toEqual([]);
-    fireEvent.click(screen.getByRole("radio", { name: "Custom" }));
-    for (const step of [
-      "Who can message you?",
-      "How should Mumcord tell you?",
-      "Connections and content",
-      "Make it yours",
-      "Pick your look",
-      "Startup and updates",
-      "You're all set, Ana",
-    ]) {
-      click("Next");
-      await heading(step);
+  it.each(["dark", "light"] as const)(
+    "has no axe violations on any step (%s)",
+    async (theme) => {
+      harness = await setupWizardTest(theme);
+      const { container } = renderInWizard(harness, <Wizard />);
+      await heading("Voice chat that feels like your own place.");
       expect(await axeViolations(container)).toEqual([]);
-    }
-  });
+      click("Let's get started");
+      await heading("Who are you on Mumble?");
+      expect(await axeViolations(container)).toEqual([]);
+      fireEvent.change(screen.getByLabelText("Default display name"), { target: { value: "Ana" } });
+      click("Next");
+      await heading("Sound good?");
+      expect(await axeViolations(container)).toEqual([]);
+      click("Next");
+      await heading("How much do you want to share?");
+      expect(await axeViolations(container)).toEqual([]);
+      fireEvent.click(screen.getByRole("radio", { name: "Custom" }));
+      for (const step of [
+        "Who can message you?",
+        "How should Mumcord tell you?",
+        "Connections and content",
+        "Make it yours",
+        "Pick your look",
+        "Startup and updates",
+        "You're all set, Ana",
+      ]) {
+        click("Next");
+        await heading(step);
+        expect(await axeViolations(container)).toEqual([]);
+      }
+      // Eleven full axe runs, each over Aaron's detailed SVG, take longer than the 5 s default.
+    },
+    20_000,
+  );
 });
 
 describe("Wizard rerun from Settings (#149)", () => {

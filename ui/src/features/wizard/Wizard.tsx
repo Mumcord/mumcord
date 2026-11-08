@@ -28,6 +28,7 @@ import { SummaryStep } from "./SummaryStep";
 import { VoiceStep } from "./VoiceStep";
 import { WelcomeStep } from "./WelcomeStep";
 import { WizardCancelDialog } from "./WizardCancelDialog";
+import { WizardGuide } from "./WizardGuide";
 import {
   applyStyle,
   changedSettings,
@@ -211,6 +212,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   const stored = useRef<Settings | null>(null);
   const shownPreview = useRef<string | null>(null);
   const finished = useRef(false);
+  const stepRoot = useRef<HTMLDivElement>(null);
 
   const start = useCallback(() => {
     loadWizard(rerun)
@@ -557,10 +559,11 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       <div className="wizard-main">
         <StepNavContext.Provider value={nav}>
           {/* A new key per step remounts it, so its heading takes the focus. */}
-          <div key={flow.step} className="wizard-main__step">
+          <div key={flow.step} ref={stepRoot} className="wizard-main__step">
             {stepBody()}
           </div>
         </StepNavContext.Provider>
+        <WizardGuide step={flow.step} stepRoot={stepRoot} />
       </div>
       {cancelAsked && (
         <WizardCancelDialog

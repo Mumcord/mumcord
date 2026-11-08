@@ -557,6 +557,9 @@
     "setupWizardRun": "Beállítási varázsló futtatása újra",
     "setupWizardIdentityNote": "Az identitásod nem része ennek. A tanúsítványod, és vele a regisztrált neved és a szerverekre vonatkozó jogosultságaid, pontosan úgy maradnak, ahogy vannak.",
     "setupWizardIdentityLink": "Kezeld az Identitás alatt",
+    "tipsTitle": "Tippek",
+    "tipsHint": "Aaron nagyjából egy perc alatt körbevezet a Mumcordban: szerverek, csatornák, beszéd, chat és még sok más.",
+    "tipsShow": "Tippek megjelenítése",
     "versionTitle": "Verzió és licenc"
   },
   "profile": {

@@ -566,6 +566,9 @@
     "setupWizardRun": "Rith an treoraí socraithe arís",
     "setupWizardIdentityNote": "Níl do chéannacht mar chuid de seo. Fanann do theastas, agus leis an ainm cláraithe agus na ceadanna atá agat ar fhreastalaithe, go díreach mar atá siad.",
     "setupWizardIdentityLink": "Bainistigh í i gCéannacht",
+    "tipsTitle": "Leideanna",
+    "tipsHint": "Taispeánann Aaron Mumcord duit i nóiméad nó mar sin: freastalaithe, cainéil, caint, comhrá agus tuilleadh.",
+    "tipsShow": "Taispeáin leideanna",
     "versionTitle": "Leagan agus ceadúnas"
   },
   "profile": {

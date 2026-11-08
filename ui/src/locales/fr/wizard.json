@@ -228,5 +228,39 @@
     "discardBody": "Rien n'est enregistré avant la fin. Si vous annulez maintenant, tout reste en l'état.",
     "discardKeep": "Continuer la modification",
     "discardConfirm": "Abandonner les modifications"
+  },
+  "guide": {
+    "label": "Astuce d’Aaron",
+    "from": "Astuce d’Aaron",
+    "hide": "Masquer Aaron",
+    "show": "Afficher Aaron",
+    "titles": {
+      "welcome": "Bienvenue à bord",
+      "import": "Récupérez vos réglages Mumble",
+      "identity": "Votre nom sur les serveurs",
+      "voice": "Choisissez votre micro",
+      "setupStyle": "Choisissez un style",
+      "privateMessages": "Qui peut vous écrire",
+      "notifications": "Vos notifications",
+      "connections": "Connexions directes",
+      "features": "Choisissez vos extras",
+      "appearance": "Choisissez votre apparence",
+      "startup": "Démarrage de Mumcord",
+      "summary": "Vérifiez vos choix"
+    },
+    "hints": {
+      "welcome": "Bonjour, je suis Aaron ! Je vous guide pendant la configuration. Cela ne prend qu’une minute.",
+      "import": "Voici les serveurs et réglages trouvés dans Mumble. Choisissez ce que vous voulez garder.",
+      "identity": "Votre identité, c’est votre nom sur les serveurs. Créez-en une nouvelle ou importez-en une existante.",
+      "voice": "Choisissez ici le micro dans lequel vous parlez, puis dites bonjour : la barre verte doit danser.",
+      "setupStyle": "Choisissez un style. Vous pourrez modifier chaque réglage plus tard.",
+      "privateMessages": "Choisissez qui peut vous envoyer des messages privés. Les expéditeurs ne sont jamais prévenus.",
+      "notifications": "Choisissez comment chaque type de nouvelle vous parvient, ou désactivez-le.",
+      "connections": "Choisissez si Mumcord peut vous connecter directement à d’autres utilisateurs de Mumcord.",
+      "features": "N’activez que les extras qui vous plaisent. Chaque carte indique qui peut le voir.",
+      "appearance": "Clair, sombre ou comme votre système : choisissez votre apparence ici.",
+      "startup": "Choisissez comment Mumcord démarre quand vous ouvrez votre session.",
+      "summary": "Tout est prêt ! Vérifiez vos choix ici ; Modifier vous ramène à n’importe quelle étape."
+    }
   }
 }

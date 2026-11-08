@@ -560,6 +560,9 @@
     "setupWizardRun": "Ponovno pokreni čarobnjak za postavljanje",
     "setupWizardIdentityNote": "Tvoj identitet nije dio ovoga. Tvoj certifikat, a s njim i registrirano ime i dopuštenja na poslužiteljima, ostaje točno onakav kakav jest.",
     "setupWizardIdentityLink": "Upravljaj njime u Identitetu",
+    "tipsTitle": "Savjeti",
+    "tipsHint": "Aaron te za otprilike minutu provodi kroz Mumcord: poslužitelje, kanale, govor, chat i još mnogo toga.",
+    "tipsShow": "Prikaži savjete",
     "versionTitle": "Verzija i licenca"
   },
   "profile": {

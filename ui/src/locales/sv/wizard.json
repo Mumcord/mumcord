@@ -228,5 +228,39 @@
     "discardBody": "Inget sparas innan du är klar. Avbryter du nu förblir allt som det är.",
     "discardKeep": "Fortsätt redigera",
     "discardConfirm": "Kasta ändringarna"
+  },
+  "guide": {
+    "label": "Tips från Aaron",
+    "from": "Tips från Aaron",
+    "hide": "Dölj Aaron",
+    "show": "Visa Aaron",
+    "titles": {
+      "welcome": "Välkommen ombord",
+      "import": "Ta med dina Mumble-grejer",
+      "identity": "Ditt namn på servrar",
+      "voice": "Välj din mikrofon",
+      "setupStyle": "Välj en stil",
+      "privateMessages": "Vem som får skriva till dig",
+      "notifications": "Dina aviseringar",
+      "connections": "Direkta anslutningar",
+      "features": "Välj dina extrafunktioner",
+      "appearance": "Välj ditt utseende",
+      "startup": "När Mumcord startar",
+      "summary": "Kolla dina val"
+    },
+    "hints": {
+      "welcome": "Hej, jag är Aaron! Jag guidar dig genom installationen. Det tar bara en minut.",
+      "import": "Det här är servrarna och inställningarna som hittades i Mumble. Välj vad du vill behålla.",
+      "identity": "Din identitet är ditt namn på servrar. Skapa en ny eller importera en befintlig.",
+      "voice": "Välj här mikrofonen du pratar i och säg sedan hej: den gröna stapeln ska dansa.",
+      "setupStyle": "Välj en stil. Du kan ändra varje enskild inställning senare.",
+      "privateMessages": "Välj vem som får skicka privata meddelanden till dig. Avsändare får aldrig veta det.",
+      "notifications": "Välj hur varje sorts nyhet når dig, eller stäng av den.",
+      "connections": "Välj om Mumcord får koppla dig direkt till andra Mumcord-användare.",
+      "features": "Aktivera bara de extrafunktioner du gillar. Varje kort visar vem som kan se det.",
+      "appearance": "Ljust, mörkt eller som ditt system: välj ditt utseende här.",
+      "startup": "Välj hur Mumcord startar när du loggar in på datorn.",
+      "summary": "Allt klart! Kolla dina val här; Redigera tar dig tillbaka till vilket steg som helst."
+    }
   }
 }

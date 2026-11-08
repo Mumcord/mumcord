@@ -228,5 +228,39 @@
     "discardBody": "Nada é guardado antes de terminar. Se cancelar agora, tudo fica como está.",
     "discardKeep": "Continuar a editar",
     "discardConfirm": "Descartar alterações"
+  },
+  "guide": {
+    "label": "Dica do Aaron",
+    "from": "Dica do Aaron",
+    "hide": "Ocultar o Aaron",
+    "show": "Mostrar o Aaron",
+    "titles": {
+      "welcome": "Bem-vindo a bordo",
+      "import": "Traz as tuas coisas do Mumble",
+      "identity": "O teu nome nos servidores",
+      "voice": "Escolhe o teu microfone",
+      "setupStyle": "Escolhe um estilo",
+      "privateMessages": "Quem te pode escrever",
+      "notifications": "As tuas notificações",
+      "connections": "Ligações diretas",
+      "features": "Escolhe os teus extras",
+      "appearance": "Escolhe o teu aspeto",
+      "startup": "Arranque do Mumcord",
+      "summary": "Revê as tuas escolhas"
+    },
+    "hints": {
+      "welcome": "Olá, sou o Aaron! Vou guiar-te pela configuração. Demora só um minuto.",
+      "import": "Estes são os servidores e as definições encontrados no Mumble. Escolhe o que queres manter.",
+      "identity": "A tua identidade é o teu nome nos servidores. Cria uma nova ou importa uma existente.",
+      "voice": "Escolhe aqui o microfone em que falas e diz olá: a barra verde deve dançar.",
+      "setupStyle": "Escolhe um estilo. Podes alterar cada definição mais tarde.",
+      "privateMessages": "Escolhe quem te pode enviar mensagens privadas. Os remetentes nunca são avisados.",
+      "notifications": "Escolhe como cada tipo de novidade chega até ti, ou desativa-o.",
+      "connections": "Escolhe se o Mumcord te pode ligar diretamente a outros utilizadores do Mumcord.",
+      "features": "Ativa só os extras de que gostas. Cada cartão diz quem o pode ver.",
+      "appearance": "Claro, escuro ou como o teu sistema: escolhe aqui o teu aspeto.",
+      "startup": "Escolhe como o Mumcord arranca quando inicias sessão no computador.",
+      "summary": "Tudo pronto! Revê aqui as tuas escolhas; Editar leva-te de volta a qualquer passo."
+    }
   }
 }

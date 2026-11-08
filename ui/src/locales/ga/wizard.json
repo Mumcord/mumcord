@@ -228,5 +228,39 @@
     "discardBody": "Ní shábháiltear aon rud sula gcríochnaíonn tú. Má chealaíonn tú anois, fanfaidh gach rud mar atá.",
     "discardKeep": "Lean leis an eagarthóireacht",
     "discardConfirm": "Caith athruithe amach"
+  },
+  "guide": {
+    "label": "Leid ó Aaron",
+    "from": "Leid ó Aaron",
+    "hide": "Folaigh Aaron",
+    "show": "Taispeáin Aaron",
+    "titles": {
+      "welcome": "Fáilte ar bord",
+      "import": "Tabhair leat do chuid ó Mumble",
+      "identity": "D'ainm ar fhreastalaithe",
+      "voice": "Roghnaigh do mhicreafón",
+      "setupStyle": "Roghnaigh stíl",
+      "privateMessages": "Cé a fhéadann scríobh chugat",
+      "notifications": "Do chuid fógraí",
+      "connections": "Naisc dhíreacha",
+      "features": "Roghnaigh do bhreiseáin",
+      "appearance": "Roghnaigh do chuma",
+      "startup": "Mumcord a thosú",
+      "summary": "Seiceáil do roghanna"
+    },
+    "hints": {
+      "welcome": "Dia duit, is mise Aaron! Taispeánfaidh mé duit conas an socrú a dhéanamh. Ní thógann sé ach nóiméad.",
+      "import": "Seo iad na freastalaithe agus na socruithe a fuarthas i Mumble. Roghnaigh cad ba mhaith leat a choinneáil.",
+      "identity": "Is é d’aitheantas d’ainm ar fhreastalaithe. Cruthaigh ceann nua nó iompórtáil ceann atá ann cheana.",
+      "voice": "Roghnaigh anseo an micreafón a labhraíonn tú isteach ann, ansin abair haigh: ba cheart don bharra glas rince.",
+      "setupStyle": "Roghnaigh stíl. Is féidir leat gach socrú a athrú ar ball.",
+      "privateMessages": "Roghnaigh cé a fhéadfaidh teachtaireachtaí príobháideacha a sheoladh chugat. Ní insítear do sheoltóirí go deo.",
+      "notifications": "Roghnaigh conas a shroicheann gach cineál nuachta thú, nó múch é.",
+      "connections": "Roghnaigh an bhfuil cead ag Mumcord tú a nascadh go díreach le húsáideoirí Mumcord eile.",
+      "features": "Cuir air na breiseanna is maith leat amháin. Insíonn gach cárta cé a fheiceann é.",
+      "appearance": "Geal, dorcha nó mar a bhfuil do chóras: roghnaigh do chuma anseo.",
+      "startup": "Roghnaigh conas a thosaíonn Mumcord nuair a logálann tú isteach ar doríomhaire.",
+      "summary": "Réidh! Seiceáil do roghanna anseo; tugann Cuir in eagar ar ais tú chuig aon chéim."
+    }
   }
 }

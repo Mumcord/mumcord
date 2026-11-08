@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, pomocnik od wskazówek",
+  "greeting": {
+    "title": "Cześć, jestem Aaron!",
+    "body": "Jestem aksolotlem i znam Mumcorda jak własną kieszeń. Chcesz krótkiego oprowadzenia? Zajmie to około minuty. Jeśli nie teraz, znajdziesz mnie w Ustawienia → O aplikacji → Wskazówki.",
+    "start": "Pokaż",
+    "later": "Nie teraz"
+  },
+  "progress": "Wskazówka {{current}} z {{total}}",
+  "back": "Wstecz",
+  "next": "Dalej",
+  "done": "Gotowe",
+  "skip": "Pomiń oprowadzanie",
+  "close": "Zamknij wskazówki",
+  "tips": {
+    "servers": {
+      "title": "Twoje serwery",
+      "body": "Na pasku po lewej stronie są Twoje serwery. Dodaj serwer przyciskiem +, a serwery publiczne przeglądaj za pomocą lupy. Możesz łączyć się z kilkoma serwerami naraz."
+    },
+    "channels": {
+      "title": "Kanały",
+      "body": "Kliknij dwukrotnie kanał, aby dołączyć i mówić. Pojedyncze kliknięcie pokazuje jego czat bez dołączania, a przycisk Obserwuj informuje Cię na bieżąco."
+    },
+    "talk": {
+      "title": "Jak mówisz",
+      "body": "Push-to-talk czy aktywacja głosem? Wybierz w Ustawienia → Głos i dźwięk albo otwórz Ustawienia głosu… małą strzałką obok mikrofonu. Push-to-talk działa też z przyciskami myszy."
+    },
+    "panel": {
+      "title": "Twój panel użytkownika",
+      "body": "W lewym dolnym rogu wyciszasz mikrofon, ogłuszasz się, włączasz kamerę lub się rozłączasz. Małe strzałki obok otwierają więcej opcji."
+    },
+    "search": {
+      "title": "Znajdź wszystko",
+      "body": "Naciśnij {{key}}, aby znaleźć osoby i kanały, nawet na dużych serwerach."
+    },
+    "chat": {
+      "title": "Czat",
+      "body": "Odpowiadaj na wiadomości, cytuj je, oznaczaj osoby przez @ i udostępniaj obrazy oraz pliki. Przyciski formatowania pojawiają się podczas pisania."
+    },
+    "apps": {
+      "title": "Aplikacje",
+      "body": "Przycisk Aplikacje na pasku wiadomości uruchamia udostępnianie ekranu, wspólne oglądanie lub Twoją kamerę. Wtyczki dodają więcej."
+    },
+    "themes": {
+      "title": "Twój styl",
+      "body": "Koło zębate w lewym dolnym rogu przełącza między ciemnym a jasnym. W Ustawienia → Wygląd znajdziesz więcej motywów, a serwer może mieć własny: kliknij go prawym przyciskiem i wybierz Motyw."
+    },
+    "end": {
+      "title": "To wszystko!",
+      "body": "Miłej zabawy w Mumcordzie. W każdej chwili możesz mnie przywołać w Ustawienia → O aplikacji → Wskazówki."
+    }
+  }
+}

@@ -524,6 +524,110 @@
   border-radius: var(--radius-md);
 }
 
+/* ---- Aaron (#637): beside the step, level with the field he points at ---- */
+
+.wizard-guide {
+  flex: 0 0 15rem;
+  min-height: 0;
+  padding: var(--space-6) var(--space-4) var(--space-6) 0;
+}
+
+.wizard-guide--hidden {
+  flex-basis: auto;
+}
+
+.wizard-guide__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  transition: transform 0.3s ease-out;
+}
+
+/* Keep in sync with AARON_SIZE in WizardGuide.tsx. */
+.wizard-guide__aaron {
+  width: 160px;
+  height: 160px;
+}
+
+.wizard-guide__bubble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+}
+
+/* The notch points up at Aaron. */
+.wizard-guide__bubble::before {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-top: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+  background: inherit;
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.wizard-guide__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.wizard-guide__title {
+  margin: 0;
+  color: var(--color-accent-text);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.wizard-guide__hint {
+  margin: 0;
+  color: var(--color-text);
+}
+
+/* The field Aaron points at glows, so it is clear what his hint is about. */
+[data-guide-target] {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 1rem 0.25rem color-mix(in srgb, var(--color-focus) 40%, transparent);
+}
+
+.wizard-guide__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* A two-line pill looks broken; "Tip from Aaron" wraps instead. */
+.wizard-guide__hide {
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard-guide__body {
+    transition: none;
+  }
+}
+
+/* Too narrow for Aaron beside the step: he steps aside so nothing is covered. */
+@media (width < 72rem) {
+  .wizard-guide {
+    display: none;
+  }
+}
+
 /* Narrow windows: the rail stacks above the step. */
 @media (width < 48rem) {
   .wizard-layout {

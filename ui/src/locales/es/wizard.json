@@ -228,5 +228,39 @@
     "discardBody": "Nada se guarda antes de terminar. Si cancelas ahora, todo queda como está.",
     "discardKeep": "Seguir editando",
     "discardConfirm": "Descartar cambios"
+  },
+  "guide": {
+    "label": "Consejo de Aaron",
+    "from": "Consejo de Aaron",
+    "hide": "Ocultar a Aaron",
+    "show": "Mostrar a Aaron",
+    "titles": {
+      "welcome": "Bienvenido a bordo",
+      "import": "Trae tus cosas de Mumble",
+      "identity": "Tu nombre en los servidores",
+      "voice": "Elige tu micrófono",
+      "setupStyle": "Elige un estilo",
+      "privateMessages": "Quién puede escribirte",
+      "notifications": "Tus notificaciones",
+      "connections": "Conexiones directas",
+      "features": "Elige tus extras",
+      "appearance": "Elige tu aspecto",
+      "startup": "Al iniciar Mumcord",
+      "summary": "Revisa tus elecciones"
+    },
+    "hints": {
+      "welcome": "¡Hola, soy Aaron! Te guiaré por la configuración. Solo lleva un minuto.",
+      "import": "Estos son los servidores y ajustes encontrados en Mumble. Elige lo que quieras conservar.",
+      "identity": "Tu identidad es tu nombre en los servidores. Crea una nueva o importa una existente.",
+      "voice": "Elige aquí el micrófono con el que hablas y di hola: la barra verde debería bailar.",
+      "setupStyle": "Elige un estilo. Podrás cambiar cada ajuste más adelante.",
+      "privateMessages": "Elige quién puede enviarte mensajes privados. Los remitentes nunca se enteran.",
+      "notifications": "Elige cómo te llega cada tipo de novedad, o desactívala.",
+      "connections": "Elige si Mumcord puede conectarte directamente con otros usuarios de Mumcord.",
+      "features": "Activa solo los extras que te gusten. Cada tarjeta indica quién puede verlo.",
+      "appearance": "Claro, oscuro o como tu sistema: elige aquí tu aspecto.",
+      "startup": "Elige cómo arranca Mumcord cuando inicias sesión en tu ordenador.",
+      "summary": "¡Todo listo! Revisa aquí tus elecciones; Editar te lleva de vuelta a cualquier paso."
+    }
   }
 }

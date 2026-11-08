@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, pomoćnik za savjete",
+  "greeting": {
+    "title": "Bok, ja sam Aaron!",
+    "body": "Ja sam aksolotl i Mumcord poznajem kao svoj džep. Želiš li kratak obilazak? Traje otprilike minutu. Ako ne sada, naći ćeš me u Postavke → O aplikaciji → Savjeti.",
+    "start": "Pokaži mi",
+    "later": "Ne sada"
+  },
+  "progress": "Savjet {{current}} od {{total}}",
+  "back": "Natrag",
+  "next": "Dalje",
+  "done": "Gotovo",
+  "skip": "Preskoči obilazak",
+  "close": "Zatvori savjete",
+  "tips": {
+    "servers": {
+      "title": "Tvoji poslužitelji",
+      "body": "U traci skroz lijevo nalaze se tvoji poslužitelji. Dodaj novi pomoću +, a javne poslužitelje pregledaj povećalom. Možeš se povezati s više poslužitelja istodobno."
+    },
+    "channels": {
+      "title": "Kanali",
+      "body": "Dvoklikom se pridružuješ kanalu i možeš govoriti. Jedan klik prikazuje njegov chat bez pridruživanja, a gumb Prati te drži u tijeku."
+    },
+    "talk": {
+      "title": "Kako govoriš",
+      "body": "„Pritisni za govor” ili glasovna aktivacija? Odaberi u Postavke → Glas i zvuk ili otvori Postavke glasa… malom strelicom pored mikrofona. „Pritisni za govor” radi i s tipkama miša."
+    },
+    "panel": {
+      "title": "Tvoja korisnička ploča",
+      "body": "Dolje lijevo isključuješ mikrofon ili zvuk, uključuješ kameru ili prekidaš vezu. Male strelice pokraj njih otvaraju više mogućnosti."
+    },
+    "search": {
+      "title": "Pronađi sve",
+      "body": "Pritisni {{key}} da pronađeš osobe i kanale, čak i na velikim poslužiteljima."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Odgovori na poruku, citiraj je, spomeni osobe s @ i dijeli slike i datoteke. Gumbi za oblikovanje pojavljuju se dok tipkaš."
+    },
+    "apps": {
+      "title": "Aplikacije",
+      "body": "Gumb Aplikacije u traci za poruke pokreće dijeljenje zaslona, zajedničko gledanje ili tvoju kameru. Dodaci donose još više."
+    },
+    "themes": {
+      "title": "Tvoj stil",
+      "body": "Zupčanik dolje lijevo prebacuje između tamne i svijetle teme. U Postavke → Izgled ima još tema, a poslužitelj može dobiti svoju: klikni ga desnom tipkom i odaberi Tema."
+    },
+    "end": {
+      "title": "To je to!",
+      "body": "Zabavi se u Mumcordu. Možeš me ponovno pozvati bilo kada u Postavke → O aplikaciji → Savjeti."
+    }
+  }
+}

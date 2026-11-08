@@ -560,6 +560,9 @@
     "setupWizardRun": "Repetir el asistente de configuración",
     "setupWizardIdentityNote": "Tu identidad no forma parte de esto. Tu certificado, y con él tu nombre registrado y tus permisos en los servidores, se queda exactamente como está.",
     "setupWizardIdentityLink": "Gestiónala en Identidad",
+    "tipsTitle": "Consejos",
+    "tipsHint": "Aaron te enseña Mumcord en más o menos un minuto: servidores, canales, cómo hablar, chat y más.",
+    "tipsShow": "Mostrar consejos",
     "versionTitle": "Versión y licencia"
   },
   "profile": {

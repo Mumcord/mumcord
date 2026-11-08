@@ -1,6 +1,12 @@
 import { SettingsImport } from "../mumbleImport/SettingsImport";
 import { WhisperTargetsGroup } from "../whisper/WhisperTargetsGroup";
-import { LicencesCard, SetupCard, SupportCard, VersionCard } from "./sections/AboutSection";
+import {
+  LicencesCard,
+  SetupCard,
+  SupportCard,
+  TipsCard,
+  VersionCard,
+} from "./sections/AboutSection";
 import { AccessibilityCard } from "./sections/AccessibilitySection";
 import { AcceptedConversationsGroup } from "./sections/AcceptedConversationsGroup";
 import { ChannelListCard, LookCard, StartupCard, ThemeCard } from "./sections/AppearanceSection";
@@ -197,6 +203,7 @@ export function SettingsPageCards({
           <VersionCard {...props} />
           <SupportCard />
           <SetupCard />
+          <TipsCard />
         </>
       );
   }

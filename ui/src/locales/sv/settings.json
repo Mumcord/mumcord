@@ -557,6 +557,9 @@
     "setupWizardRun": "Kör installationsguiden igen",
     "setupWizardIdentityNote": "Din identitet är inte en del av detta. Ditt certifikat, och med det ditt registrerade namn och dina behörigheter på servrar, förblir precis som det är.",
     "setupWizardIdentityLink": "Hantera den under Identitet",
+    "tipsTitle": "Tips",
+    "tipsHint": "Aaron visar dig runt i Mumcord på ungefär en minut: servrar, kanaler, prata, chatt och mer.",
+    "tipsShow": "Visa tips",
     "versionTitle": "Version och licens"
   },
   "profile": {

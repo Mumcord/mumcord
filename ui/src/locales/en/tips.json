@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, the tips helper",
+  "greeting": {
+    "title": "Hi, I'm Aaron!",
+    "body": "I'm an axolotl, and I know my way around Mumcord. Want a quick tour? It takes about a minute. If not now, you'll find me in Settings → About → Tips.",
+    "start": "Show me",
+    "later": "Not now"
+  },
+  "progress": "Tip {{current}} of {{total}}",
+  "back": "Back",
+  "next": "Next",
+  "done": "Done",
+  "skip": "Skip tour",
+  "close": "Close tips",
+  "tips": {
+    "servers": {
+      "title": "Your servers",
+      "body": "The bar on the far left holds your servers. Add one with +, or find public servers with the magnifying glass. You can stay connected to several servers at once."
+    },
+    "channels": {
+      "title": "Channels",
+      "body": "Double-click a channel to join it for voice. A single click shows its chat without joining, and Follow keeps you posted about it."
+    },
+    "talk": {
+      "title": "How you talk",
+      "body": "Push-to-talk or voice activation? Choose in Settings → Voice & Audio, or open Voice settings… with the small arrow next to the microphone. Push-to-talk also works with mouse buttons."
+    },
+    "panel": {
+      "title": "Your user panel",
+      "body": "Bottom left you mute your microphone, deafen, turn your camera on or hang up. The small arrows next to them open more choices."
+    },
+    "search": {
+      "title": "Find anything",
+      "body": "Press {{key}} to find people and channels, even on big servers."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Reply to a message, quote it, @mention people and share pictures and files. The formatting buttons appear while you type."
+    },
+    "apps": {
+      "title": "Apps",
+      "body": "The Apps button in the message bar starts a screen share, a watch party or your camera. Plugins add more."
+    },
+    "themes": {
+      "title": "Your look",
+      "body": "The gear at the bottom left switches between dark and light. Settings → Appearance has more themes, and a server can get its own: right-click it and choose Theme."
+    },
+    "end": {
+      "title": "That's it!",
+      "body": "Have fun on Mumcord. You can call me back any time in Settings → About → Tips."
+    }
+  }
+}

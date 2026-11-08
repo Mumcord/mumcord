@@ -228,5 +228,39 @@
     "discardBody": "Xejn mhu jiġi salvat qabel ma tispiċċa. Jekk tikkanċella issa, kollox jibqa' kif inhu.",
     "discardKeep": "Kompli teditja",
     "discardConfirm": "Armi l-bidliet"
+  },
+  "guide": {
+    "label": "Suġġeriment minn Aaron",
+    "from": "Suġġeriment minn Aaron",
+    "hide": "Aħbi lil Aaron",
+    "show": "Uri lil Aaron",
+    "titles": {
+      "welcome": "Merħba abbord",
+      "import": "Ġib l-affarijiet tiegħek minn Mumble",
+      "identity": "Ismek fuq is-servers",
+      "voice": "Agħżel il-mikrofonu tiegħek",
+      "setupStyle": "Agħżel stil",
+      "privateMessages": "Min jista' jiktiblek",
+      "notifications": "In-notifiki tiegħek",
+      "connections": "Konnessjonijiet diretti",
+      "features": "Agħżel l-extras tiegħek",
+      "appearance": "Agħżel id-dehra tiegħek",
+      "startup": "Il-bidu ta' Mumcord",
+      "summary": "Iċċekkja l-għażliet tiegħek"
+    },
+    "hints": {
+      "welcome": "Merħba, jien Aaron! Se nwassalk matul is-setup. Jieħu minuta biss.",
+      "import": "Dawn huma s-servers u l-issettjar misjuba f'Mumble. Agħżel x'trid iżżomm.",
+      "identity": "L-identità tiegħek hija ismek fuq is-servers. Oħloq waħda ġdida jew importa waħda eżistenti.",
+      "voice": "Agħżel hawnhekk il-mikrofonu li titkellem fih, imbagħad għid ħello: il-bar ħadra għandha tiżfen.",
+      "setupStyle": "Agħżel stil. Tista' tbiddel kull issettjar aktar tard.",
+      "privateMessages": "Agħżel min jista' jibgħatlek messaġġi privati. Min jibgħat qatt ma jiġi mgħarraf.",
+      "notifications": "Agħżel kif kull tip ta' aħbarijiet jilħqek, jew itfih.",
+      "connections": "Agħżel jekk Mumcord jistax jgħaqqdek direttament ma' utenti oħra ta' Mumcord.",
+      "features": "Ixgħel biss l-extras li togħġob. Kull karta tgħid min jista' jarha.",
+      "appearance": "Ċar, skur jew bħas-sistema tiegħek: agħżel id-dehra tiegħek hawnhekk.",
+      "startup": "Agħżel kif jibda Mumcord meta tidħol fil-kompjuter tiegħek.",
+      "summary": "Lest! Iċċekkja l-għażliet tiegħek hawnhekk; Editja terġa' teħodok lejn kwalunkwe pass."
+    }
   }
 }
