@@ -40,15 +40,24 @@ zune-jpeg = "0.5"
 zune-core = "0.5"
 
 [target.'cfg(windows)'.dependencies]
-# Media Foundation capture (FR-8.25) and device-interface notifications for hot-plug (FR-8.27).
-# Same version as the engine's and Tauri's own `windows`.
+# Media Foundation capture (FR-8.25) and device-interface notifications for hot-plug (FR-8.27);
+# DirectShow for virtual cameras that only register there, such as the OBS Virtual Camera
+# (#631): the device list (property bags, variants) and the capture graph (video headers need
+# GDI's BITMAPINFOHEADER). Same version as the engine's and Tauri's own `windows`;
+# `windows-core` for the Sample Grabber interfaces (`#[interface]`, `#[implement]`).
 windows = { version = "0.62", features = [
     "Win32_Devices_DeviceAndDriverInstallation",
     "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Media_DirectShow",
     "Win32_Media_KernelStreaming",
     "Win32_Media_MediaFoundation",
     "Win32_System_Com",
+    "Win32_System_Com_StructuredStorage",
+    "Win32_System_Ole",
+    "Win32_System_Variant",
 ] }
+windows-core = "0.62"
 
 [lints]
 workspace = true

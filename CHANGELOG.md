@@ -4,6 +4,25 @@
 
 ### Added
 
+- Homebrew (issue #662): `brew install --cask mumcord/tap/mumcord` on macOS and `brew install mumcord/tap/mumcord` on Linux, from the new tap `Mumcord/homebrew-tap`, which follows new releases by itself
+- Release candidates (issue #686): coming versions can be tried early as pre-releases (e.g. "Mumcord 0.8.0 RC 1") on the Releases page, with every package; the in-app updater, Homebrew and the AUR keep offering only final releases, and the final release installs over a release candidate
+
+### Fixed
+
+- Linux: cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when the camera reports only the brightness part of each picture as filled; the first picture's layout is now logged to diagnose other cameras
+- The activity feed no longer offers "Watch" on your own screen share or "Join" on your own watch party or activity; you are already in it (#664)
+- Screen readers no longer get a broken list announcement while the @mention or /command suggestions are open in the message box; they hear how many suggestions there are
+- Windows: virtual cameras that only DirectShow knows, such as the OBS Virtual Camera, now show in the camera list next to real cameras and work like them, background effects included. OBS is asked for 720p, so a 1080p output does not arrive at half size. A virtual camera that has nothing to show or never starts stops with "The camera couldn't be started" instead of hanging (#631)
+- The icons in a plugin's permission list are drawn icons now instead of text characters, so they look the same on Windows, macOS and Linux
+- macOS: plugin content in a dialog or panel sits exactly in its frame again instead of being shifted up by about the title bar's height
+- macOS: when a plugin froze the window, restarting the window failed every time ("a webview with label `main` already exists"); it now waits until the old window is really gone
+- A plugin's badge next to a name keeps the size of the Mumcord badge beside it instead of shrinking when the name is long
+- Copy works again in the packet inspector, and when Windows refuses the app's clipboard (e.g. "Copy" on a crash report) Mumcord copies through the window's own clipboard instead
+
+## [0.7.2] - 2026-11-08
+
+### Added
+
 - Moving people, under Admin ▸ in the person and channel menus: "Move to my channel" while the person sits elsewhere, "Move to" with a filterable channel picker that shows each channel's user limit and asks in plain words ("Move 3 people from Raid to Lobby?"), and "Move everyone to" for a whole channel at once without taking you along. Ctrl-click (or Ctrl+Space) and Shift-click pick several people in the channel tree, so one drag moves them together, and the person menu's "Move to" carries the picked people. After moving a group Mumcord says how many arrived ("Moved 28 of 30 people to Raid. The rest were refused.") instead of one notice per person, and a full channel is named once
 - Moderation in the person menu's "Admin ▸": server mute, server deafen (mutes too), priority speaker (a star next to their name) and un-suppress act at once and show a tick while on; reset comment and reset avatar ask first. Each appears only with the server's right
 - Channel password: the channel window's Password tab sets or clears the password for joining a channel, written the same way as the official Mumble client; channels with more complex access rules point to Permissions instead
@@ -654,6 +673,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.7.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.2
 [0.7.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.1
 [0.7.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.0
 [0.6.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.2

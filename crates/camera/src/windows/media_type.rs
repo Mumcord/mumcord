@@ -92,6 +92,11 @@ pub fn raw(format: PixelFormat, data: &[u8], stride: usize, height: u32) -> Opti
 /// Maps a failed Media Foundation call to what the UI shows (FR-8.25). The text of other
 /// errors carries only the code, never device names or ids (FR-8.28).
 pub fn camera_error(hresult: i32) -> CameraError {
+    api_error("Media Foundation", hresult)
+}
+
+/// [`camera_error`] for a call of `api`, whose name the text of other errors carries.
+pub fn api_error(api: &str, hresult: i32) -> CameraError {
     match hresult as u32 {
         E_ACCESSDENIED => CameraError::PermissionDenied,
         MF_E_VIDEO_RECORDING_DEVICE_INVALIDATED
@@ -101,7 +106,7 @@ pub fn camera_error(hresult: i32) -> CameraError {
         DEVICE_PREEMPTED | FAILED_START_STREAMING => {
             CameraError::Backend("another app is using the camera".to_owned())
         }
-        code => CameraError::Backend(format!("Media Foundation error 0x{code:08X}")),
+        code => CameraError::Backend(format!("{api} error 0x{code:08X}")),
     }
 }
 

@@ -2,7 +2,7 @@
 # Tests scripts/set-version.sh on a temporary copy of the committed tree: every manifest and lock
 # file carries the new version, the locks stay valid for --locked builds, and mumcord-protocol
 # still packages for crates.io. The real release runs the same script in release.yml.
-#   scripts/ci/test-set-version.sh [version]   (default 9.8.7)
+#   scripts/ci/test-set-version.sh [version]   (default 9.8.7; CI also runs a pre-release)
 set -euo pipefail
 version=${1:-9.8.7}
 repo=$(cd "$(dirname "$0")/../.." && pwd)
@@ -36,6 +36,18 @@ requirement=$version
 [[ "$version" == *-* ]] || requirement=${version%.*}
 grep -q "^mumcord-protocol = { path = \"crates/protocol\", version = \"$requirement\" }" Cargo.toml \
   || fail "internal crate requirement is not $requirement"
+
+plist=src-tauri/Info.plist
+if [[ "$version" == *-* ]]; then
+  base=${version%%-*}
+  for key in CFBundleShortVersionString CFBundleVersion; do
+    grep -A1 "<key>$key</key>" "$plist" | grep -q "<string>$base</string>" \
+      || fail "$plist: $key is not $base"
+  done
+  tail -n 1 "$plist" | grep -qx '</plist>' || fail "$plist no longer ends with </plist>"
+else
+  cmp -s "$plist" "$repo/$plist" || fail "$plist changed for a release version"
+fi
 
 if [[ "$version" != *-* ]]; then
   # --allow-dirty: the copy has no git repository.

@@ -24,6 +24,20 @@
   <img src="docs/images/screenshots/main-dark.png" alt="Mumcord main window: server bar with several servers, channel tree, chat with a reply, code and a link preview, and the member list (demo data)" />
 </picture>
 
+## Contents
+
+- [Why Mumcord](#why-mumcord)
+- [Features](#features)
+- [Quick start](#quick-start)
+- [Download](#download)
+- [Compatibility](#compatibility)
+- [Ecosystem](#ecosystem)
+- [Roadmap](#roadmap)
+- [Documentation](#documentation)
+- [Troubleshooting](#troubleshooting)
+- [Building from source](#building-from-source)
+- [Contributing](#contributing) · [Privacy](#privacy) · [Code signing](#code-signing) · [Licence](#licence)
+
 ## Why Mumcord
 
 - **Works with any standard Mumble server.** A pure client: nothing to install or change on the server. Mumble 1.4 and newer are fully supported.
@@ -50,16 +64,49 @@ Plugins: what each official plugin does is in the [plugin wiki](https://github.c
 
 More in the wiki: [Features](https://github.com/Mumcord/mumcord/wiki/Features). Mumcord is in early development; expect rough edges, especially in Beta features.
 
+## Quick start
+
+### 1. Install
+
+**🪟 Windows 10/11:** download the `…_x64-setup.exe` from the **[latest release](https://github.com/Mumcord/mumcord/releases/latest)** and run it.
+
+**🍎 macOS:**
+
+```sh
+brew install --cask mumcord/tap/mumcord
+```
+
+No Homebrew? Download the `.dmg` from the **[latest release](https://github.com/Mumcord/mumcord/releases/latest)**, open it and drag Mumcord into Applications.
+
+**🐧 Linux:**
+
+```sh
+curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
+```
+
+### 2. Set up
+
+Start Mumcord. The setup wizard walks you through your identity and your microphone. Click **Next** until the end; everything can be changed later.
+
+### 3. Connect
+
+Click **+** (Add a server) in the server bar, enter your Mumble server's address and click **Save and connect**.
+
+> **Allow access when asked:** microphone, and on macOS also Local Network. Coming from Mumble? The wizard can import your certificate and servers.
+
+Other packages (portable Windows, `.deb`, `.rpm`, AppImage, AUR, Homebrew on Linux) are listed under [Download](#download).
+
 ## Download
 
 Get the latest build from the [Releases page](https://github.com/Mumcord/mumcord/releases/latest). Every release ships a `SHA256SUMS` file to check your download.
 
-| System                     | Package                                     | Notes                                                                                                                                                                                                                     |
-| -------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Windows** 10/11          | `*-setup.exe` installer or `*-portable.zip` | Code-signed with a Certum certificate from 0.6.1 on (0.6.0 and older are unsigned: SmartScreen warns, choose "More info" → "Run anyway"). Portable: unpack and run, no installation ([details](docs/windows-portable.md)) |
-| **macOS**                  | `.dmg`, Apple Silicon and Intel             | Signed and notarized since 0.4.1                                                                                                                                                                                          |
-| **Linux** x86_64 and ARM64 | `.deb`, `.rpm`, `.AppImage`                 | The `.deb` and `.rpm` pull in everything they need                                                                                                                                                                        |
-| **Arch Linux**             | AUR `mumcord-bin`                           | `paru -S mumcord-bin` or `yay -S mumcord-bin`                                                                                                                                                                             |
+| System                      | Package                                                  | Notes                                                                                                                                                                                                                     |
+| --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Windows** 10/11           | `*-setup.exe` installer or `*-portable.zip`              | Code-signed with a Certum certificate from 0.6.1 on (0.6.0 and older are unsigned: SmartScreen warns, choose "More info" → "Run anyway"). Portable: unpack and run, no installation ([details](docs/windows-portable.md)) |
+| **macOS**                   | `.dmg`, Apple Silicon and Intel                          | Signed and notarized since 0.4.1                                                                                                                                                                                          |
+| **Linux** x86_64 and ARM64  | `.deb`, `.rpm`, `.AppImage`                              | The `.deb` and `.rpm` pull in everything they need                                                                                                                                                                        |
+| **Arch Linux**              | AUR `mumcord-bin`                                        | `paru -S mumcord-bin` or `yay -S mumcord-bin`                                                                                                                                                                             |
+| **Homebrew** (macOS, Linux) | [`mumcord/tap`](https://github.com/Mumcord/homebrew-tap) | macOS: `brew install --cask mumcord/tap/mumcord`. Linux: `brew install mumcord/tap/mumcord` (installs the AppImage; `brew info` lists the system packages it needs)                                                       |
 
 **Linux one-liner** (picks the right package for your distribution, falls back to the AppImage):
 
@@ -139,8 +186,8 @@ Mumcord is compatible with Mumble but **not affiliated with or endorsed by the M
 | Epic 2: Multi-server and themes, watch party and screen sharing                        | Released, 0.4.0 to 0.4.3                                                                                                                        |
 | Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …)                 | Released, 0.5.0                                                                                                                                 |
 | Epic 3.1: Plugin system and the official plugins                                       | Released, 0.6.0; fixes in [0.6.1](https://github.com/Mumcord/mumcord/milestone/10)                                                              |
-| Epic 4.1: File sharing, camera sharing, screen-sharing upgrade and plugin platform 1.1 | 0.7.0 (upcoming)                                                                                                                                |
-| Epic 4: Admin features                                                                 | Planned, see the [Epic 4 milestone](https://github.com/Mumcord/mumcord/milestone/7)                                                             |
+| Epic 4.1: File sharing, camera sharing, screen-sharing upgrade and plugin platform 1.1 | Released, 0.7.0 to 0.7.2                                                                                                                        |
+| Epic 4: Admin features (channels, permissions, bans, registered users, admin commands) | In progress for 0.8.0, see the [0.8.0 milestone](https://github.com/Mumcord/mumcord/milestone/12)                                               |
 | Epics 5 and 6: Android and iOS apps, release and distribution (store listings)         | Later, see the [Epic 5](https://github.com/Mumcord/mumcord/milestone/6) and [Epic 6](https://github.com/Mumcord/mumcord/milestone/5) milestones |
 
 Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.

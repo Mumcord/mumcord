@@ -322,7 +322,17 @@ jobs:
       # release.yml and publish-crates.yml set the tag's version with this script before building.
       - name: Version script
         if: matrix.task == 'check' && runner.os == 'Linux'
-        run: scripts/ci/test-set-version.sh
+        run: |
+          scripts/ci/test-set-version.sh
+          scripts/ci/test-set-version.sh 9.8.7-rc.2
+
+      # release.yml decides with these scripts which tags build a release or a release candidate
+      # and how a release candidate's .deb is versioned.
+      - name: Release candidate scripts
+        if: matrix.task == 'check' && runner.os == 'Linux'
+        run: |
+          scripts/ci/test-release-tag.sh
+          scripts/ci/test-deb-set-version.sh
 
       - name: Changelog script
         if: matrix.task == 'check' && runner.os == 'Linux'

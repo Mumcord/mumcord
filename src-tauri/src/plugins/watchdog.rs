@@ -201,17 +201,26 @@ fn restart_ui(app: &AppHandle) {
         RECREATING.store(false, Ordering::SeqCst);
         return;
     }
-    // Destroying is asynchronous; the new window needs the label back.
+    // Destroying is asynchronous; the new window needs the label back. The window's own web
+    // view keeps the label "main" a little longer than the window, and the plugin frames' web
+    // views laid over it go with it, so wait for all of them (a recreate before failed three
+    // times with "a webview with label `main` already exists").
     let waited = Instant::now();
-    while main_window(app).is_some() && waited.elapsed() < GONE_WAIT {
+    while (main_window(app).is_some() || app.get_webview("main").is_some())
+        && waited.elapsed() < GONE_WAIT
+    {
         std::thread::sleep(Duration::from_millis(50));
+    }
+    if app.get_webview("main").is_some() {
+        tracing::warn!("the frozen window's web view is still there; recreating anyway");
     }
     for attempt in 1..=ATTEMPTS {
         match crate::create_main_window(app) {
             Ok(()) => break,
             Err(error) => {
                 tracing::error!(%error, attempt, "recreating the window failed");
-                std::thread::sleep(Duration::from_millis(500));
+                // Give the old web view more time to let go of its label before the next try.
+                std::thread::sleep(Duration::from_secs(2));
             }
         }
     }

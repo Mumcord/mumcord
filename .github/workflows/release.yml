@@ -1,7 +1,8 @@
 name: Release
 
 # Release builds from version tags on main (decision QA.12). Pushing `vX.Y.Z` checks that the
-# tag is a version and points to a commit on main, sets that version in all manifests of each
+# tag is a version and points to a commit on main (a release candidate `vX.Y.Z-rc.N`: a commit on
+# milestone/X.Y.Z, released as a pre-release that never becomes "Latest"), sets that version in all manifests of each
 # build (scripts/set-version.sh), builds and smoke-tests the bundles (build-and-smoke.yml), and
 # creates a DRAFT GitHub Release with the bundles, one SBOM per bundle type and SHA256SUMS. The
 # maintainer reviews and publishes it by hand. See RELEASING.md.
@@ -24,6 +25,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       version: ${{ steps.check.outputs.version }}
+      prerelease: ${{ steps.check.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -32,22 +34,18 @@ jobs:
 
       # The manifests in the repository are not bumped for a release: every job that builds or
       # publishes sets this version first (scripts/set-version.sh, RELEASING.md).
-      - name: Check tag is a version on main
+      # vX.Y.Z on main is a release; vX.Y.Z-rc.N on milestone/X.Y.Z (not yet on main) is a
+      # release candidate, published as a pre-release. Every other tag fails here.
+      - name: Check tag is a release on main or a release candidate on its milestone branch
         id: check
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          fail() { echo "::error::$1"; exit 1; }
-          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] \
-            || fail "Tag '$TAG' is not a version tag like v1.2.3."
-          version=${TAG#v}
-
-          commit=$(git rev-parse HEAD)
-          git merge-base --is-ancestor "$commit" origin/main \
-            || fail "Tag '$TAG' points to $commit, which is not on main. Tag a commit on main."
-
-          echo "Tag $TAG is a version on main."
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if ! result=$(scripts/release-tag.sh "$TAG" 2>&1); then
+            echo "::error::$result"
+            exit 1
+          fi
+          echo "$result" | tee -a "$GITHUB_OUTPUT"
 
       # Fails here, before any build, when the script cannot set this version.
       - name: Dry run of the version step
@@ -212,6 +210,7 @@ jobs:
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           VERSION: ${{ needs.guard.outputs.version }}
+          PRERELEASE: ${{ needs.guard.outputs.prerelease }}
         run: |
           # Fails if any bundle is missing; Linux has three packages for each of two CPUs.
           linux=(*_amd64.AppImage *_aarch64.AppImage *_amd64.deb *_arm64.deb *.x86_64.rpm *.aarch64.rpm)
@@ -256,6 +255,11 @@ jobs:
 
           Full changelog: [CHANGELOG.md](https://github.com/Mumcord/mumcord/blob/main/CHANGELOG.md)
           EOF
+          if [[ "$PRERELEASE" == "true" ]]; then
+            { printf '> [!IMPORTANT]\n> This is a **release candidate** of Mumcord %s for testing. The in-app updater, Homebrew and the AUR keep offering the latest final release; installing the final %s later replaces this one.\n\n' \
+                "${VERSION%%-*}" "${VERSION%%-*}"; cat ../notes.md; } > ../notes.tmp
+            mv ../notes.tmp ../notes.md
+          fi
           # "What's new" is the version's section of CHANGELOG.md (dated, "X.Y.Z - Unreleased" or a plain
           # "[Unreleased]" at tag time); without one the notes stay plain.
           section() {
@@ -284,10 +288,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
           VERSION: ${{ needs.guard.outputs.version }}
-        # --generate-notes appends GitHub's change list after notes.md.
+          PRERELEASE: ${{ needs.guard.outputs.prerelease }}
+        # --generate-notes appends GitHub's change list after notes.md. A release candidate is a
+        # pre-release that never becomes "Latest": the Homebrew tap and the curl installer follow
+        # "Latest", and the in-app updater skips pre-releases unless it runs one itself.
         run: |
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
-            --title "Mumcord $VERSION" --notes-file notes.md --generate-notes \
+          kind=()
+          title="Mumcord $VERSION"
+          if [[ "$PRERELEASE" == "true" ]]; then
+            kind=(--prerelease --latest=false)
+            title="Mumcord ${VERSION%%-rc.*} RC ${VERSION##*-rc.}"
+          fi
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft "${kind[@]}" \
+            --title "$title" --notes-file notes.md --generate-notes \
             dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*-portable.zip dist/*.dmg dist/*.app.tar.gz dist/*.sig dist/latest.json dist/*.cdx.json dist/install.sh dist/SHA256SUMS
 
   # After the draft exists, so a failed build never leaves a crate on crates.io without a
