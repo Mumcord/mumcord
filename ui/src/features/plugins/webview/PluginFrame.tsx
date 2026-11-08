@@ -24,7 +24,14 @@ import { getApi, toEngineError, type PluginWebviewPlace, type Unsubscribe } from
 import { useStageShown } from "../../media/stageContext";
 import { usePlugins } from "../pluginStore";
 import type { PluginWebview } from "../render/pluginUiStore";
-import { createBridge, inOrder, newGestureKey, type Bridge, type FrameTarget } from "./bridge";
+import {
+  createBridge,
+  inOrder,
+  maxMessageBytes,
+  newGestureKey,
+  type Bridge,
+  type FrameTarget,
+} from "./bridge";
 import {
   childFramesUsed,
   listenFrame,
@@ -263,6 +270,7 @@ interface FrameBridgeArgs {
 function frameBridge(args: FrameBridgeArgs): Bridge {
   const { plugin, place, callbacks, watch, focusApp } = args;
   let warned = false;
+  let warnedTooLarge = false;
   const toPlugin = inOrder((text: string) =>
     getApi()
       .pluginUiEvent(plugin, { type: "webviewMessage", place, text })
@@ -274,6 +282,7 @@ function frameBridge(args: FrameBridgeArgs): Bridge {
   return createBridge({
     frame: args.frame,
     toPlugin,
+    maxBytes: maxMessageBytes(place),
     onEscape: () => {
       focusApp();
       callbacks.current.onEscape?.();
@@ -291,6 +300,16 @@ function frameBridge(args: FrameBridgeArgs): Bridge {
           // Too fast, or the frame closed meanwhile.
           console.debug("A web view gesture was not counted", toEngineError(error).code);
         });
+    },
+    onTooLarge: (bytes) => {
+      // Once per frame, so a page stuck in a loop cannot flood the log; size and place only.
+      if (warnedTooLarge) return;
+      warnedTooLarge = true;
+      console.warn("A plugin web view message above its place's size limit was dropped", {
+        place,
+        bytes,
+        limit: maxMessageBytes(place),
+      });
     },
     onDropped: () => {
       if (warned) return;

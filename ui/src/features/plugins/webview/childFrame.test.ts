@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createMockApi, setApi, type MockApi, type PluginFrameBounds } from "../../../api";
-import { createBridge } from "./bridge";
+import { createBridge, MAX_MESSAGE_BYTES } from "./bridge";
 import {
   childFramesUsed,
   listenFrame,
@@ -164,6 +164,7 @@ describe("message routing", () => {
     const bridge = createBridge({
       frame: () => ({ postMessage: (data) => sent.push(toDelivery(data)) }),
       toPlugin: (text) => toPlugin.push(text),
+      maxBytes: MAX_MESSAGE_BYTES,
       onEscape: () => {
         escapes += 1;
       },
