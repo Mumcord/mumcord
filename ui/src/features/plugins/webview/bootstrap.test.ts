@@ -25,6 +25,22 @@ function fromApp(key: string, source: Window | null = window) {
   );
 }
 
+const SERVED = {
+  mode: "light",
+  scheme: "light",
+  reducedMotion: false,
+  tokens: { "--mc-color-text": "#111111", "--mc-space-1": "0.25rem" },
+};
+const themeBlock = document.createElement("script");
+const themeEvents: unknown[] = [];
+const root = document.documentElement;
+
+function themeFromApp(theme: unknown, source: Window | null = window) {
+  window.dispatchEvent(
+    new MessageEvent("message", { data: { mumcordWebview: "theme", theme }, source }),
+  );
+}
+
 describe("web view bootstrap", () => {
   beforeAll(() => {
     vi.useFakeTimers();
@@ -32,7 +48,17 @@ describe("web view bootstrap", () => {
     // jsdom runs no <script> elements, so the served text runs as a function body instead.
     // eslint-disable-next-line @typescript-eslint/no-implied-eval
     const bootstrap = new Function(source) as () => void;
+    // An API 1.2 page: Rust serves the theme as a JSON block right before the bootstrap.
+    themeBlock.type = "application/json";
+    themeBlock.textContent = JSON.stringify(SERVED);
+    const self = document.createElement("script");
+    document.head.append(themeBlock, self);
+    Object.defineProperty(document, "currentScript", { configurable: true, get: () => self });
+    window.addEventListener("mumcord-theme-change", (event) => {
+      themeEvents.push((event as CustomEvent).detail);
+    });
     bootstrap();
+    Reflect.deleteProperty(document, "currentScript");
     Event.prototype.stopImmediatePropagation = () => undefined;
   });
   afterEach(() => post.mockClear());
@@ -54,5 +80,48 @@ describe("web view bootstrap", () => {
     document.body.click();
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }));
     expect(gestureReports()).toEqual([]);
+  });
+
+  it("applies the served theme before the page's code and removes the block", () => {
+    expect(root.style.getPropertyValue("--mc-color-text")).toBe("#111111");
+    expect(root.style.getPropertyValue("--mc-space-1")).toBe("0.25rem");
+    expect(root.dataset.mcMode).toBe("light");
+    expect(root.dataset.mcScheme).toBe("light");
+    expect(root.dataset.mcReducedMotion).toBe("false");
+    expect(root.style.getPropertyValue("color-scheme")).toBe("light");
+    expect(themeBlock.isConnected).toBe(false);
+    // The initial values are no change (FR-13.16).
+    expect(themeEvents).toEqual([]);
+  });
+
+  it("applies a live change from the app, fires the event and hides the message", () => {
+    const pageListener = vi.fn();
+    window.addEventListener("message", pageListener, true);
+    themeFromApp({
+      mode: "high-contrast",
+      scheme: "dark",
+      reducedMotion: true,
+      tokens: { "--mc-color-text": "#eeeeee", "--mc-duration-fast": "0ms" },
+    });
+    expect(pageListener).not.toHaveBeenCalled();
+    window.removeEventListener("message", pageListener, true);
+
+    expect(root.style.getPropertyValue("--mc-color-text")).toBe("#eeeeee");
+    expect(root.style.getPropertyValue("--mc-duration-fast")).toBe("0ms");
+    // A token the new theme lacks does not keep its old value.
+    expect(root.style.getPropertyValue("--mc-space-1")).toBe("");
+    expect(root.dataset.mcMode).toBe("high-contrast");
+    expect(root.dataset.mcScheme).toBe("dark");
+    expect(root.dataset.mcReducedMotion).toBe("true");
+    expect(root.style.getPropertyValue("color-scheme")).toBe("dark");
+    expect(themeEvents).toEqual([{ mode: "high-contrast", scheme: "dark", reducedMotion: true }]);
+  });
+
+  it("ignores a theme from anyone but the app", () => {
+    themeEvents.length = 0;
+    const before = root.style.getPropertyValue("--mc-color-text");
+    themeFromApp({ mode: "light", scheme: "light", tokens: { "--mc-color-text": "#000" } }, null);
+    expect(root.style.getPropertyValue("--mc-color-text")).toBe(before);
+    expect(themeEvents).toEqual([]);
   });
 });
