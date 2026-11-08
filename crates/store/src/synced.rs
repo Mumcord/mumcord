@@ -30,6 +30,9 @@ impl Store {
         message: &NewChatMessage,
         holder: &str,
     ) -> Result<Option<i64>> {
+        // Pending live messages hold ids ahead of `MAX(id)`; flush them first so the
+        // auto-increment id cannot collide with a queued one.
+        self.flush_pending()?;
         let (kind, key) = message.conversation.parts();
         let inserted = self.conn.execute(
             "INSERT INTO chat_message
@@ -48,6 +51,9 @@ impl Store {
                 holder
             ],
         )?;
+        // This direct insert took an auto-increment id; forget the queued-message counter so
+        // the next queued message re-derives from `MAX(id)` and cannot collide.
+        *self.next_message_id.borrow_mut() = None;
         Ok((inserted == 1).then(|| self.conn.last_insert_rowid()))
     }
 
@@ -98,6 +104,7 @@ impl Store {
         to: UnixMillis,
         limit: u32,
     ) -> Result<Vec<ChatMessage>> {
+        self.flush_pending()?;
         let (kind, key) = conversation.parts();
         let mut stmt = self.conn.prepare(
             "SELECT * FROM (
@@ -127,6 +134,7 @@ impl Store {
         needle: &str,
         limit: u32,
     ) -> Result<Vec<ChatMessage>> {
+        self.flush_pending()?;
         let (kind, key) = conversation.parts();
         let mut stmt = self.conn.prepare(
             "SELECT * FROM (
@@ -145,6 +153,7 @@ impl Store {
 
     /// Replaces the body of a stored message (a synced message whose images arrived).
     pub fn set_message_body(&self, id: i64, body: &str) -> Result<()> {
+        self.flush_pending()?;
         self.conn.execute(
             "UPDATE chat_message SET body = ?2 WHERE id = ?1",
             params![id, body],
@@ -160,6 +169,7 @@ impl Store {
         from: UnixMillis,
         to: UnixMillis,
     ) -> Result<RangeSummary> {
+        self.flush_pending()?;
         let (kind, key) = conversation.parts();
         let (count, oldest, newest): (i64, Option<i64>, Option<i64>) = self.conn.query_row(
             "SELECT COUNT(*), MIN(sent_at), MAX(sent_at) FROM chat_message
@@ -177,6 +187,7 @@ impl Store {
 
     /// Whose history the given messages came from; messages received live are absent.
     pub fn synced_origins(&self, message_ids: &[i64]) -> Result<HashMap<i64, String>> {
+        self.flush_pending()?;
         let mut stmt = self.conn.prepare(
             "SELECT synced_from FROM chat_message WHERE id = ?1 AND synced_from IS NOT NULL",
         )?;
@@ -278,6 +289,31 @@ mod tests {
                 .expect("insert"),
             None
         );
+    }
+
+    #[test]
+    fn queued_and_synced_ids_do_not_collide() {
+        let (_dir, store) = temp_store();
+        let id = server(&store);
+        let lobby = Conversation::Channel("Lobby".into());
+        let first = store
+            .insert_message(id, &msg(1, "a"))
+            .expect("queue")
+            .expect("stored");
+        let synced = store
+            .insert_synced_message(id, &msg(2, "old"), "Bob")
+            .expect("synced")
+            .expect("stored");
+        let second = store
+            .insert_message(id, &msg(3, "b"))
+            .expect("queue")
+            .expect("stored");
+        store.flush_pending().expect("flush");
+        let mut ids = vec![first, synced, second];
+        ids.sort_unstable();
+        ids.dedup();
+        assert_eq!(ids.len(), 3, "the three ids are unique");
+        assert_eq!(store.messages(id, &lobby, 10).expect("read").len(), 3);
     }
 
     #[test]

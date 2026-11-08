@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use rusqlite::{Row, params};
+use rusqlite::{OptionalExtension, Row, params};
 
 use crate::db::{Store, UnixMillis};
 use crate::error::Result;
@@ -58,6 +58,15 @@ pub struct ChatMessage {
     pub body: String,
 }
 
+/// A message queued for the next batch write (spec 12 FR-12.5), with the row id assigned up
+/// front so callers receive a real id before the row reaches disk.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct PendingMessage {
+    pub(crate) server: ServerId,
+    pub(crate) message: NewChatMessage,
+    pub(crate) id: i64,
+}
+
 pub(crate) fn message_from_row(row: &Row<'_>) -> rusqlite::Result<ChatMessage> {
     Ok(ChatMessage {
         id: row.get(0)?,
@@ -77,31 +86,83 @@ impl Store {
     }
 
     /// Like [`Store::append_message`], but returns the new message id (`None` when the
-    /// message was not stored).
+    /// message was not stored). The message is queued and written with the next batch
+    /// (spec 12 FR-12.5); the id is a real row id assigned up front.
     pub fn insert_message(
         &self,
         server: ServerId,
         message: &NewChatMessage,
     ) -> Result<Option<i64>> {
-        let (kind, key) = message.conversation.parts();
-        // The save-history check is part of the INSERT so it cannot race a toggle.
-        let inserted = self.conn.execute(
-            "INSERT INTO chat_message
-                 (server_id, conversation_kind, conversation_key, sender_name, sender_cert_hash,
-                  sent_at, body)
-             SELECT id, ?2, ?3, ?4, ?5, ?6, ?7 FROM saved_server
-             WHERE id = ?1 AND save_history = 1",
-            params![
-                server,
-                kind,
-                key,
-                message.sender_name,
-                message.sender_cert_hash,
-                message.sent_at,
-                message.body
-            ],
+        // The save-history check is serialized by the caller's lock, so it cannot race a toggle.
+        let save: Option<bool> = self
+            .conn
+            .query_row(
+                "SELECT save_history FROM saved_server WHERE id = ?1",
+                [server],
+                |row| row.get(0),
+            )
+            .optional()?;
+        if !save.unwrap_or(false) {
+            return Ok(None);
+        }
+        let id = self.next_message_id()?;
+        self.pending_messages.borrow_mut().push(PendingMessage {
+            server,
+            message: message.clone(),
+            id,
+        });
+        Ok(Some(id))
+    }
+
+    /// The next row id for a chat message, without inserting yet. Reads `MAX(id)` once and
+    /// then counts the queued messages; the store mutex serializes every caller, so the ids
+    /// stay unique.
+    fn next_message_id(&self) -> Result<i64> {
+        let mut next = self.next_message_id.borrow_mut();
+        if let Some(id) = *next {
+            *next = Some(id + 1);
+            return Ok(id);
+        }
+        let max: i64 = self.conn.query_row(
+            "SELECT COALESCE(MAX(id), 0) FROM chat_message",
+            [],
+            |row| row.get(0),
         )?;
-        Ok((inserted == 1).then(|| self.conn.last_insert_rowid()))
+        *next = Some(max + 2);
+        Ok(max + 1)
+    }
+
+    /// Writes all queued chat messages in one transaction (spec 12 FR-12.5). Called on a
+    /// timer, on idle and on shutdown, and before any read or by-id write that must see them.
+    pub fn flush_pending(&self) -> Result<()> {
+        let pending = std::mem::take(&mut *self.pending_messages.borrow_mut());
+        if pending.is_empty() {
+            return Ok(());
+        }
+        let tx = self.conn.unchecked_transaction()?;
+        {
+            let mut stmt = tx.prepare(
+                "INSERT INTO chat_message
+                     (id, server_id, conversation_kind, conversation_key, sender_name,
+                      sender_cert_hash, sent_at, body)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            )?;
+            for p in &pending {
+                let (kind, key) = p.message.conversation.parts();
+                stmt.execute(params![
+                    p.id,
+                    p.server,
+                    kind,
+                    key,
+                    p.message.sender_name,
+                    p.message.sender_cert_hash,
+                    p.message.sent_at,
+                    p.message.body,
+                ])?;
+            }
+        }
+        tx.commit()?;
+        Ok(())
     }
 
     /// The server whose messages make up `conversation` on `server`; `None` for a private chat
@@ -124,6 +185,7 @@ impl Store {
         conversation: &Conversation,
         limit: u32,
     ) -> Result<Vec<ChatMessage>> {
+        self.flush_pending()?;
         let (kind, key) = conversation.parts();
         let scope = self.history_scope(server, conversation)?;
         let mut stmt = self.conn.prepare(
@@ -151,6 +213,7 @@ impl Store {
         before: i64,
         limit: u32,
     ) -> Result<Vec<ChatMessage>> {
+        self.flush_pending()?;
         let (kind, key) = conversation.parts();
         let scope = self.history_scope(server, conversation)?;
         let mut stmt = self.conn.prepare(
@@ -175,6 +238,7 @@ impl Store {
         conversation: &Conversation,
         since: UnixMillis,
     ) -> Result<u64> {
+        self.flush_pending()?;
         let (kind, key) = conversation.parts();
         let count: i64 = self.conn.query_row(
             "SELECT COUNT(*) FROM chat_message
@@ -189,6 +253,7 @@ impl Store {
     /// Remembers that the preview card of `url` under message `message_id` was dismissed
     /// (QA.42). Unknown messages are ignored.
     pub fn dismiss_preview(&self, message_id: i64, url: &str) -> Result<()> {
+        self.flush_pending()?;
         self.conn.execute(
             "INSERT OR IGNORE INTO dismissed_preview (message_id, url)
              SELECT id, ?2 FROM chat_message WHERE id = ?1",
@@ -199,6 +264,7 @@ impl Store {
 
     /// The dismissed preview links of the given messages (messages without any are absent).
     pub fn dismissed_previews(&self, message_ids: &[i64]) -> Result<HashMap<i64, Vec<String>>> {
+        self.flush_pending()?;
         let mut stmt = self
             .conn
             .prepare("SELECT url FROM dismissed_preview WHERE message_id = ?1 ORDER BY url")?;
@@ -218,6 +284,7 @@ impl Store {
     /// flags (QA.42). Private chats with friends are kept (FR-1.65). Returns the number of
     /// deleted messages.
     pub fn delete_messages_before(&self, cutoff: UnixMillis) -> Result<usize> {
+        self.flush_pending()?;
         // Foreign keys cascade to `dismissed_preview`; `sent_at` is indexed.
         Ok(self.conn.execute(
             "DELETE FROM chat_message
@@ -236,6 +303,7 @@ impl Store {
         conversation: &Conversation,
         at: UnixMillis,
     ) -> Result<()> {
+        self.flush_pending()?;
         let (kind, key) = conversation.parts();
         let scope = self.history_scope(server, conversation)?;
         self.conn.execute(
@@ -252,6 +320,7 @@ impl Store {
 
     /// "Clear history" for a whole server.
     pub fn clear_server_history(&self, server: ServerId, at: UnixMillis) -> Result<()> {
+        self.flush_pending()?;
         self.conn
             .execute("DELETE FROM chat_message WHERE server_id = ?1", [server])?;
         self.mark_cleared(Some(server), None, at)
@@ -259,6 +328,7 @@ impl Store {
 
     /// "Clear all history".
     pub fn clear_all_history(&self, at: UnixMillis) -> Result<()> {
+        self.flush_pending()?;
         self.conn.execute("DELETE FROM chat_message", [])?;
         self.mark_cleared(None, None, at)?;
         // Deleted chat contents must not linger in free pages of the file.
@@ -310,6 +380,34 @@ mod tests {
         assert_eq!(last3[0].sender_cert_hash.as_deref(), Some("aa"));
         assert_eq!(store.messages(id, &private, 10).expect("private").len(), 1);
         assert_eq!(store.count_messages_since(id, &lobby, 2).expect("count"), 3);
+    }
+
+    #[test]
+    fn messages_wait_in_memory_until_flushed() {
+        // FR-12.5: inserts are batched; ids are real row ids assigned up front.
+        let (_dir, store) = temp_store();
+        let id = store
+            .add_server(&NewServer::new("A", "a", "u"))
+            .expect("add")
+            .id;
+        let lobby = Conversation::Channel("Lobby".into());
+        let first = store
+            .insert_message(id, &msg(&lobby, 1, "a"))
+            .expect("queue")
+            .expect("stored");
+        let second = store
+            .insert_message(id, &msg(&lobby, 2, "b"))
+            .expect("queue")
+            .expect("stored");
+        assert_eq!((first, second), (1, 2));
+        let count = |s: &Store| -> i64 {
+            s.conn
+                .query_row("SELECT COUNT(*) FROM chat_message", [], |r| r.get(0))
+                .expect("count")
+        };
+        assert_eq!(count(&store), 0, "nothing is written before the flush");
+        store.flush_pending().expect("flush");
+        assert_eq!(count(&store), 2);
     }
 
     #[test]

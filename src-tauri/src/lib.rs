@@ -657,6 +657,9 @@ pub fn run() {
             if matches!(event, tauri::RunEvent::Exit) {
                 mumcord_engine::crash::clean_exit();
                 mumcord_engine::diag::flush_log();
+                if let Some(engine) = app.try_state::<Engine>() {
+                    engine.flush_chat_pending();
+                }
             }
             plugins::watchdog::on_run_event(app, event);
         }),

@@ -644,6 +644,7 @@ impl Engine {
             .link_previews()
             .set_max_age_days(settings.preview_cache_days);
         engine.start_maintenance();
+        engine.start_chat_flush();
         // Unit tests build many engines; none of them needs the encoder probe.
         if !cfg!(test) {
             engine
@@ -1122,6 +1123,7 @@ impl Engine {
     pub fn shutdown(&self) -> impl Future<Output = ()> + Send + use<> {
         self.files_quit();
         self.camera_quit();
+        self.flush_chat_pending();
         let mut core = lock(&self.inner.core);
         let mut slots: Vec<(ServerId, u64)> = core
             .slots
