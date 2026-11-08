@@ -1,5 +1,5 @@
 {
-  "noConversation": "Pripoj sa k serveru a vyber kanál, aby si mohol začať chatovať.",
+  "noConversation": "Pripoj sa k serveru a vyber kanál, potom môžeš začať chatovať.",
   "empty": "Zatiaľ žiadne správy. Správy, ktoré tu dostaneš, sa ukladajú v tomto počítači.",
   "header": {
     "channel": "#{{name}}",
@@ -48,7 +48,7 @@
     "removeImage": "Odstrániť obrázok {{name}}",
     "imagePreview": "Obrázok na odoslanie: {{name}}",
     "send": "Odoslať",
-    "noPermission": "Nemáš povolenie písať do tohto kanála.",
+    "noPermission": "Nemáš oprávnenie písať do tohto kanála.",
     "unavailable": "Tento kanál už nie je dostupný.",
     "offline": "{{name}} je offline. Napísať budeš môcť znova, keď sa vráti.",
     "unnamedImage": "Vložený obrázok",
@@ -68,7 +68,7 @@
     "imageUnreadable": "Obrázok sa nepodarilo prečítať. Skús iný súbor.",
     "denied": "Server túto správu nepovolil.",
     "deniedWithReason": "Server túto správu nepovolil: {{reason}}",
-    "notConnected": "Nie si pripojený. Pripoj sa znova a skús to ešte raz.",
+    "notConnected": "Nemáš pripojenie. Pripoj sa znova a skús to ešte raz.",
     "generic": "Správu sa nepodarilo odoslať. Skús to znova.",
     "onlyImages": "Odoslať sa dajú len obrázky.",
     "sourceTooLarge": "Tento súbor je na odoslanie príliš veľký (viac ako 25 MB).",
@@ -97,10 +97,10 @@
   },
   "mention": {
     "list": "Návrhy zmienok",
-    "found_one": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
-    "found_few": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
-    "found_many": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
-    "found_other": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
+    "found_one": "Návrhy: {{count}}. Vyber šípkami a vlož klávesom Enter.",
+    "found_few": "Návrhy: {{count}}. Vyber šípkami a vlož klávesom Enter.",
+    "found_many": "Návrhy: {{count}}. Vyber šípkami a vlož klávesom Enter.",
+    "found_other": "Návrhy: {{count}}. Vyber šípkami a vlož klávesom Enter.",
     "none": "Nikto sa nenašiel",
     "mentionsYou": "Spomína ťa",
     "chipLabel": "{{name}}, zmienka",
@@ -126,7 +126,7 @@
       "show": "Relácia"
     },
     "inBrowser": "Prehrá sa v tvojom prehliadači",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Prehrávač Twitchu v tomto systéme nebeží v okne Mumcordu, preto tlačidlo Prehrať otvorí stream v tvojom prehliadači.",
     "card": "Náhľad odkazu: {{title}}",
     "dismiss": "Skryť náhľad"
   },
@@ -200,7 +200,7 @@
     "menuLabel": "Použiť motív na",
     "applyToServer": "Použiť na {{server}}",
     "imported": "Importované ✓",
-    "newer": "Vytvorené v Mumcorde {{version}} – aktualizuj, aby si ho videl celý",
+    "newer": "Vytvorené v Mumcorde {{version}} – aktualizuj, aby sa zobrazil celý",
     "failed": "Motív sa nepodarilo použiť."
   },
   "reply": {
@@ -215,7 +215,7 @@
   },
   "actions": {
     "label": "Začať spolu",
-    "notConnected": "Nepripojené k serveru.",
+    "notConnected": "Nemáš pripojenie k serveru.",
     "invalidLink": "Toto nie je odkaz na video na YouTube.",
     "linkLabel": "Odkaz na YouTube",
     "linkPlaceholder": "Vlož odkaz na YouTube",
@@ -268,20 +268,20 @@
     "copyLabel": "Kopírovať odkaz na {{server}}",
     "figures": "Ping {{ping}} ms · {{users}} z {{max}} používateľov · server {{version}}",
     "goToChannel": "Prejsť na kanál",
-    "join": "Pripojiť",
-    "joinLabel": "Pripojiť k {{server}}",
+    "join": "Pripojiť sa",
+    "joinLabel": "Pripojiť sa k {{server}}",
     "joined": "Pripojené",
     "label": "Karta servera {{server}}",
-    "privacyOff": "Hodnoty servera sú vo nastavení vypnuté",
+    "privacyOff": "Hodnoty servera sú v nastaveniach vypnuté",
     "querying": "Kontrola servera…",
     "retry": "Skontrolovať znova",
     "retryLabel": "Skontrolovať znova {{server}}",
     "server": "{{server}}",
     "unreachable": "Server nie je dostupný",
     "warning_few": "{{count}} odkazy v tejto správe zobrazujú prihlasovacie údaje",
-    "warning_many": "{{count}} odkazov v tejto správe zobrazuje prihlasovacie údaje",
+    "warning_many": "{{count}} odkazu v tejto správe zobrazuje prihlasovacie údaje",
     "warning_one": "{{count}} odkaz v tejto správe zobrazuje prihlasovacie údaje",
-    "warning_other": "{{count}} odkazu v tejto správe zobrazuje prihlasovacie údaje"
+    "warning_other": "{{count}} odkazov v tejto správe zobrazuje prihlasovacie údaje"
   },
   "requests": {
     "entry": "Žiadosti o správy",
@@ -325,7 +325,7 @@
     "requestMetaChat": "{{server}} · chce sa s tebou rozprávať · {{time}}",
     "requestMetaMessages": "{{server}} · poslal(a) ti správy · {{time}}",
     "quote": "„{{text}}“",
-    "block": "Blokovať",
+    "block": "Zablokovať",
     "showMore_one": "Zobraziť ďalšiu {{count}} žiadosť",
     "showMore_few": "Zobraziť ďalšie {{count}} žiadosti",
     "showMore_many": "Zobraziť ďalších {{count}} žiadosti",
@@ -363,7 +363,7 @@
       "muteEightHours": "Na 8 hodín",
       "muteForever": "Kým ho znova nezapnem",
       "profile": "Zobraziť profil",
-      "block": "Blokovať používateľa {{name}}",
+      "block": "Zablokovať používateľa {{name}}",
       "deleteHistory": "Odstrániť históriu",
       "deleteHint": "Iba toto zariadenie · {{name}} si ponechá svoju kópiu"
     }
@@ -417,7 +417,7 @@
     "link": "Náhľad odkazu je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
     "several_one": "{{count}} náhľad je skrytý, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
     "several_few": "{{count}} náhľady sú skryté, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
-    "several_many": "{{count}} náhľadu je skrytých, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
+    "several_many": "{{count}} náhľadu je skrytého, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
     "several_other": "{{count}} náhľadov je skrytých, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>."
   },
   "historyImage": {
@@ -430,8 +430,8 @@
   },
   "channelMention": {
     "chipLabel": "#{{name}}, kanál – otvoriť ponuku",
-    "join": "Vstúpiť do kanála",
-    "joinPath": "Vstúpiť do {{path}}",
+    "join": "Pripojiť sa ku kanálu",
+    "joinPath": "Pripojiť sa k {{path}}",
     "show": "Zobraziť v zozname kanálov",
     "showPath": "Zobraziť {{path}} v zozname kanálov",
     "copy": "Kopírovať názov",

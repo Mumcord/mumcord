@@ -2,7 +2,7 @@
   "composer": {
     "attach": "Zdieľať súbory",
     "attachLabel": "Zdieľať súbory v tomto kanáli",
-    "dropTitle": "Pusti na zdieľanie s #{{channel}}",
+    "dropTitle": "Pusti a zdieľaj v #{{channel}}",
     "dropChoiceTitle": "Niektoré z nich sú obrázky. Čo sa s nimi má stať?",
     "sendAsImage": "Odoslať ako obrázok",
     "shareAsFile": "Zdieľať ako súbor",
@@ -58,7 +58,7 @@
     "progressLabel": "Sťahuje sa {{name}}",
     "progressValue": "{{percent}} %",
     "progress": "{{percent}} % · {{received}} z {{size}} · {{speed}} · zostáva asi {{left}}",
-    "transport": "Peer-to-peer · koncové šifrovanie",
+    "transport": "Peer-to-peer · end-to-end šifrovanie",
     "checking": "Kontrola…",
     "done": "✓ Stiahnuté",
     "matches": "✓ Zodpovedá ponuke",
@@ -67,13 +67,13 @@
     "open": "Otvoriť",
     "gone": "Súbor už nie je v priečinku {{folder}}",
     "mismatchTitle": "Hash nesedí – súbor vymazaný",
-    "mismatch": "Súbor sa cestou zmenil alebo nezodpovedá ponuke, a preto bol vymazaný. Nič sa neuložilo ani neotvorilo. Požiadaj {{sender}}, aby ho zdieľal znova.",
+    "mismatch": "Súbor sa cestou zmenil alebo nezodpovedá ponuke, a preto bol vymazaný. Nič sa neuložilo ani neotvorilo. Požiadaj používateľa {{sender}}, aby ho zdieľal znova.",
     "failed": "Sťahovanie zlyhalo: {{reason}}",
     "cancelled": "Sťahovanie zrušené",
     "busy": "{{sender}} je zaneprázdnený, skús to neskôr",
     "noSpace": "V priečinku {{folder}} nie je dosť miesta na disku",
     "reason": {
-      "noAnswer": "{{sender}} neodpovedal",
+      "noAnswer": "{{sender}} neodpovedal(a)",
       "connect": "Nepodarilo sa pripojiť cez relay: {{reason}}",
       "connectUnknown": "Nepodarilo sa pripojiť cez relay",
       "stalled": "Prenos uviazol",
@@ -91,9 +91,9 @@
       "unavailable": "nedostupné"
     },
     "unavailable": {
-      "offline": "{{sender}} sa odpojil. Súbor už nie je dostupný.",
+      "offline": "{{sender}} sa odpojil(a). Súbor už nie je dostupný.",
       "ended": "Zdieľanie skončilo. Zdieľania končia po 24 hodinách.",
-      "askAgain": "Požiadaj {{sender}}, aby ho zdieľal znova."
+      "askAgain": "Požiadaj používateľa {{sender}}, aby ho zdieľal znova."
     },
     "disabled": {
       "receiveOff": "Príjem súborov máš vypnutý",
@@ -118,9 +118,9 @@
     "stop": "Prestať zdieľať",
     "stopFailed": "Zdieľanie sa nepodarilo zastaviť: {{reason}}. Súbor sa stále zdieľa.",
     "ended": "Zdieľanie skončilo",
-    "endedStopped": "Zdieľanie bolo zastavené",
+    "endedStopped": "Zdieľanie si zastavil(a)",
     "endedExpired": "24 hodín uplynulo",
-    "endedLeft": "Server bol opustený",
+    "endedLeft": "Opustil si server",
     "endedChanged": "Súbor sa na disku zmenil, preto sa zdieľanie zastavilo"
   },
   "dialog": {
@@ -154,7 +154,7 @@
     "size2gb": "2 GB",
     "saveTo": "Ukladať súbory do",
     "change": "Zmeniť…",
-    "relayNote": "Súbory vždy putujú cez relay servera, takže nikto nevidí tvoju IP adresu. Servery bez relay súbory zdieľať nemôžu. Nič sa nestiahne bez tvojho kliknutia a potvrdenia.",
-    "encryptionNote": "Súbory sú koncovo šifrované a po stiahnutí sa kontrolujú."
+    "relayNote": "Súbory vždy putujú cez relay servera, takže nikto nevidí tvoju IP adresu. Servery bez relayu súbory zdieľať nemôžu. Nič sa nestiahne bez tvojho kliknutia a potvrdenia.",
+    "encryptionNote": "Súbory sú šifrované end-to-end a po stiahnutí sa kontrolujú."
   }
 }

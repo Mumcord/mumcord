@@ -1,6 +1,6 @@
 {
   "share": "Zdieľať obrazovku",
-  "shareYourScreen": "Zdieľať vlastnú obrazovku",
+  "shareYourScreen": "Zdieľať obrazovku",
   "choosing": "Vyberá sa, čo zdieľať…",
   "stop": "Ukončiť zdieľanie",
   "startFailed": "Zdieľanie obrazovky sa nepodarilo spustiť.",
@@ -8,8 +8,8 @@
   "screenRecordingDenied": "Mumcord nesmie nahrávať tvoju obrazovku. Povoľ to v Systémových nastaveniach → Súkromie a bezpečnosť → Nahrávanie obrazovky a systémového zvuku a potom Mumcord reštartuj.",
   "changeFailed": "Zdieľanie obrazovky neprijalo tvoju zmenu.",
   "blocked": {
-    "notInChannel": "Pripoj sa do hlasového kanála, aby si mohol zdieľať obrazovku.",
-    "consentOff": "Zdieľanie obrazovky potrebuje priame pripojenia. Zapni ich v Nastavenia → Súkromie.",
+    "notInChannel": "Pripoj sa do hlasového kanála, potom môžeš zdieľať obrazovku.",
+    "consentOff": "Zdieľanie obrazovky potrebuje priame spojenia. Zapni ich v Nastavenia → Súkromie.",
     "unsupportedPlatform": "Zdieľanie obrazovky zatiaľ v tomto systéme nie je k dispozícii."
   },
   "live": "Naživo",
@@ -33,7 +33,7 @@
   "changeWindow": "Zmeniť okno",
   "viewersTitle": "Diváci",
   "thumbnail": "Náhľad zdieľaného obsahu",
-  "youAreSharing": "Zdieľate",
+  "youAreSharing": "Zdieľaš",
   "ofMax": "{{count}} z {{max}}",
   "fullShort": "Všetky miesta sú obsadené.",
   "stopShort": "Ukončiť",
@@ -90,7 +90,7 @@
       "pipewire": "Bez zvuku: vyžaduje PipeWire"
     },
     "viewersGet": "Diváci dostanú:",
-    "viewersGetSummary": "až {{resolution}} · {{fps}} sn./s · {{codec}} · približne {{mbit}} Mbit/s",
+    "viewersGetSummary": "až {{resolution}} · {{fps}} fps · {{codec}} · približne {{mbit}} Mbit/s",
     "pathRelay": "Odoslané raz cez relay servera, ktorý ho odovzdá až {{count}} divákom.",
     "pathDirect": "Jedna kópia na diváka, najviac {{count}}.",
     "olderMumcord": "Diváci so starším Mumcordom dostanú VP9.",
@@ -122,7 +122,7 @@
     "tipApp": "Jedno okno: iba zvuk tejto aplikácie.",
     "tipOff": "Prepínač zvuku je vypnutý.",
     "tipNone": "Pre toto okno bolo zvolené „Bez zvuku“.",
-    "tipOldWindows": "Bez zvuku: vyžaduje Windows 10 verzie 2004 alebo novšiu",
+    "tipOldWindows": "Bez zvuku: vyžaduje Windows 10 verzie 2004 alebo novšej",
     "tipOldMacos": "Bez zvuku: vyžaduje macOS 13 alebo novší",
     "tipNoPipeWire": "Bez zvuku: vyžaduje PipeWire",
     "tipCaptureFailed": "Zachytávanie zvuku zlyhalo. Zdieľanie videa pokračuje."
@@ -156,7 +156,7 @@
     "more_few": "a ďalší {{count}}",
     "more_many": "a ďalších {{count}}",
     "more_other": "a ďalších {{count}}",
-    "layerNote": "{{name}} dostáva {{fps}} sn./s: jeho pripojenie nestíha {{target}}."
+    "layerNote": "{{name}} dostáva {{fps}} fps: pripojenie nestíha {{target}}."
   },
   "notices": {
     "noFanoutTitle": "Tento server nemá relay pre veľké zdieľania",
@@ -169,8 +169,8 @@
     "reasonOldRelay": "relay je príliš starý",
     "reasonDisallowed": "relay zdieľanie obrazovky nepovoľuje",
     "reasonRefused": "relay vysielanie odmietol",
-    "reasonFull": "relay je plné",
-    "reasonLost": "relay sa stratilo",
+    "reasonFull": "relay je plný",
+    "reasonLost": "spojenie s relayom sa stratilo",
     "reasonMode": "tvoje nastavenie P2P relay vynecháva",
     "reasonNoCertificate": "nemáš klientsky certifikát",
     "reasonUnavailable": "relay sa teraz nedá použiť",
@@ -185,7 +185,7 @@
     "detailsTitle": "Prečo zdieľanie zmenilo kodér",
     "detailsEncoder": "Kodér",
     "detailsFromTo": "{{from}} → {{to}}",
-    "detailsEncodeTime": "Čas kódovania jedného snímku",
+    "detailsEncodeTime": "Čas kódovania jednej snímky",
     "detailsBudget": "Dostupný čas na snímku",
     "detailsDropped": "Vynechané snímky",
     "detailsMs": "{{ms}} ms",
@@ -193,7 +193,7 @@
     "close": "Zavrieť",
     "reasonNotRegistered": "relay tohto servera môžu používať len registrovaní používatelia",
     "reasonGroupNotAllowed": "relay obsluhuje len určité skupiny",
-    "reasonNoHello": "bot relaya túto aplikáciu ešte nepozná, pripoj sa znova"
+    "reasonNoHello": "bot relayu túto aplikáciu ešte nepozná, pripoj sa znova"
   },
   "settings": {
     "title": "Zdieľanie obrazovky",
@@ -252,7 +252,7 @@
     "share": "Zdieľať zvuk",
     "cancel": "Zrušiť",
     "empty": "Práve neprehráva zvuk žiadna aplikácia",
-    "gone": "Táto aplikácia už neprehráva zvuk. Vyberte inú.",
-    "failed": "Váš výber sa nepodarilo použiť."
+    "gone": "Táto aplikácia už neprehráva zvuk. Vyber inú.",
+    "failed": "Tvoj výber sa nepodarilo použiť."
   }
 }

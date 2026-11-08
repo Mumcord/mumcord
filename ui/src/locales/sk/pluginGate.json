@@ -13,14 +13,14 @@
   "understand": "Rozumiem",
   "trustAuthor": "Rozumiem riziku a dôverujem autorovi doplnku {{plugin}}",
   "understandUpdate": "Rozumiem, že riziko vzrástlo, a autorovi stále dôverujem",
-  "changeLater": "Zmeň neskôr v Nastaveniach → Doplnky.",
+  "changeLater": "Môžeš to zmeniť neskôr v Nastaveniach → Doplnky.",
   "cancel": "Zrušiť",
   "notNow": "Teraz nie",
   "install": "Nainštalovať",
   "installAnyway": "Napriek tomu nainštalovať",
   "updateAnyway": "Napriek tomu aktualizovať",
   "highRiskTitle": "Toto je vysoko rizikový doplnok",
-  "highRiskText": "Môže otvárať vlastné webové stránky a komunikovať s {{count}} webmi, ktoré nemôžeš overiť. Mumcord nevidí, čo tieto weby doplnku posielajú ani čo im posiela doplnok. Zverejnil ho niekto, kto je pre tento počítač nový. Inštaluj ho, len ak poznáš a dôveruješ jeho autorovi.",
+  "highRiskText": "Môže otvárať vlastné webové stránky a komunikovať s {{count}} webmi, ktoré nemôžeš overiť. Mumcord nevidí, čo tieto weby doplnku posielajú ani čo im posiela doplnok. Zverejnil ho niekto, kto je pre tento počítač nový. Inštaluj ho, len ak jeho autora poznáš a dôveruješ mu.",
   "highRiskWouldBecome": "Táto aktualizácia by z doplnku urobila vysoko rizikový doplnok",
   "highRiskNotAutomatic": "Nenainštaluje sa automaticky. Ak zostaneš na verzii {{version}}, zachová sa súčasné skóre; verziu môžeš pripnúť v časti Nainštalované.",
   "sameAuthorKey": "rovnaký kľúč autora",
@@ -42,6 +42,6 @@
     "webPages": "Môže otvárať vlastné webové stránky.",
     "cantSee": "Mumcord nevidí, čo tieto weby doplnku posielajú ani čo im posiela doplnok.",
     "newAuthor": "Zverejnil ho niekto, kto je pre tento počítač nový.",
-    "trust": "Inštaluj ho, len ak poznáš a dôveruješ jeho autorovi."
+    "trust": "Inštaluj ho, len ak jeho autora poznáš a dôveruješ mu."
   }
 }
