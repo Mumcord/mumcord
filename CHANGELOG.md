@@ -26,6 +26,7 @@
 
 ### Fixed
 
+- Windows crash reports now name the crash in more cases (issue #699): a crash after a library such as ONNX Runtime (background effects) or a camera driver replaced Mumcord's crash handler, a stack overflow, heap corruption and a C or C++ library calling `abort()` (for example an uncaught C++ exception) are now recorded with their code and stack. When a crash still leaves nothing to record (a fast-fail), the report says so instead of only "Mumcord closed without shutting down"
 - Plugin stage pages can send messages of up to 64 KiB to their plugin again (issue #692); messages above 16 KiB used to be dropped silently, as in a side panel, popover or dialog, where 16 KiB stays the limit
 - Linux: cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when the camera reports only the brightness part of each picture as filled; the first picture's layout is now logged to diagnose other cameras
 - The activity feed no longer offers "Watch" on your own screen share or "Join" on your own watch party or activity; you are already in it (#664)
