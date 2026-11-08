@@ -5,6 +5,7 @@ import { announce } from "../../../a11y";
 import { getApi } from "../../../api";
 import { useUnlockClicks } from "../../inspector/devTools";
 import { openInBrowser } from "../../chat/openLink";
+import { startTour } from "../../tips";
 import { useView } from "../../../app/view";
 import { openSettingsSection } from "../settingsOpener";
 import { Group } from "../components/Section";
@@ -101,6 +102,28 @@ export function SetupCard() {
           {t("about.setupWizardIdentityLink")}
         </button>
       </p>
+    </Group>
+  );
+}
+
+/** Clippy's tour of the main window (#637), on demand; it starts once the settings are closed. */
+export function TipsCard() {
+  const { t } = useTranslation("settings");
+  const { closeOverlay } = useView();
+  return (
+    <Group title={t("about.tipsTitle")} icon="compass" info={t("about.tipsHint")}>
+      <div className="settings-actions">
+        <button
+          type="button"
+          className="settings-button"
+          onClick={() => {
+            closeOverlay();
+            startTour();
+          }}
+        >
+          {t("about.tipsShow")}
+        </button>
+      </div>
     </Group>
   );
 }

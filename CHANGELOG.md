@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Clippy, a little lighter with a face, gives new users a short tour of Mumcord right after the setup wizard: the server bar, joining and following channels, how you talk, the user panel, search, chat, the Apps button and themes, one tip at a time with Back and Next. Settings → About → Tips shows the tour again at any time (#637)
+
 ## [0.7.2] - 2026-11-08
 
 ### Added

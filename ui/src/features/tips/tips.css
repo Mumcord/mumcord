@@ -1,0 +1,149 @@
+/* Clippy's tips (#637): the character in the lower right corner of the main window, above the
+   message bar, with its speech bubble to the left. Below the toasts (z-index 50), so a new
+   message is never hidden behind it. */
+.tips {
+  position: fixed;
+  right: var(--space-5);
+  bottom: 5.5rem;
+  z-index: 48;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  pointer-events: none;
+}
+
+.tips__bubble {
+  position: relative;
+  box-sizing: border-box;
+  width: min(21rem, calc(100vw - 12rem));
+  /* Lifts the tail to Clippy's face. */
+  margin-bottom: 1.5rem;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  pointer-events: auto;
+}
+
+/* The tail points at Clippy. */
+.tips__bubble::after {
+  content: "";
+  position: absolute;
+  right: -0.5625rem;
+  bottom: 1.75rem;
+  width: 1rem;
+  height: 1rem;
+  border-top: 1px solid var(--color-border-strong);
+  border-right: 1px solid var(--color-border-strong);
+  background: var(--color-bg-elevated);
+  transform: rotate(45deg);
+}
+
+.tips__progress {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tips__title {
+  margin: 0 2.25rem var(--space-2) 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.tips__body {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.tips__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.tips__close {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+}
+
+.tips__close:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.clippy {
+  flex: none;
+  width: 7rem;
+  height: auto;
+  filter: drop-shadow(0 0.5rem 0.75rem rgb(0 0 0 / 35%));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tips {
+    animation: tips-in var(--duration-normal) var(--ease-out);
+  }
+
+  .clippy__flame {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: clippy-flicker 1.4s ease-in-out infinite alternate;
+  }
+
+  .clippy__eyes {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: clippy-blink 5s infinite;
+  }
+}
+
+@keyframes tips-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+@keyframes clippy-flicker {
+  from {
+    transform: scale(1, 1) rotate(-2deg);
+  }
+
+  50% {
+    transform: scale(0.94, 1.06) rotate(1deg);
+  }
+
+  to {
+    transform: scale(1.03, 0.97) rotate(2deg);
+  }
+}
+
+@keyframes clippy-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  97% {
+    transform: scaleY(0.1);
+  }
+}
