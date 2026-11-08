@@ -9,6 +9,7 @@ use base64::Engine as _;
 use mumcord_engine::Engine;
 use mumcord_engine::store::PluginVisibility;
 use mumcord_plugins::Incompatibility;
+use mumcord_plugins::api::theme::{PageMode, PageScheme, PageTheme};
 use mumcord_plugins::i18n::PurposeTexts;
 use mumcord_plugins::manifest::Visibility as ManifestVisibility;
 use mumcord_plugins::package::Package;
@@ -186,6 +187,8 @@ pub struct InstalledPlugin {
     pub app_menu_items: u32,
     /// Size in bytes of the plugin's web pages (its `web/` files); `None` when it has none.
     pub web_size: Option<f64>,
+    /// Its pages get the theme tokens and theme messages (API 1.2 or newer, FR-13.8).
+    pub themed_pages: bool,
 }
 
 /// The name of a third-party repository; empty when it was removed.
@@ -241,6 +244,7 @@ impl InstalledPlugin {
             offered: p.offered,
             app_menu_items: p.app_menu_items,
             web_size: p.web_size.map(|bytes| bytes as f64),
+            themed_pages: p.themed_pages,
         }
     }
 }
@@ -1865,6 +1869,63 @@ pub async fn plugins_set_appearance(
         .await
 }
 
+/// `data-mc-mode` of an API 1.2 plugin page (FR-13.11).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "kebab-case")]
+pub enum PluginPageMode {
+    Dark,
+    Light,
+    HighContrast,
+}
+
+/// `data-mc-scheme` of an API 1.2 plugin page: the base variant.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum PluginPageScheme {
+    Dark,
+    Light,
+}
+
+/// The theme of API 1.2 plugin pages as the UI resolved it (FR-13.9 … FR-13.12): the `--mc-`
+/// tokens with their current values and the mode attributes.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginPageTheme {
+    pub mode: PluginPageMode,
+    pub scheme: PluginPageScheme,
+    pub reduced_motion: bool,
+    pub tokens: std::collections::BTreeMap<String, String>,
+}
+
+impl From<PluginPageTheme> for PageTheme {
+    fn from(theme: PluginPageTheme) -> Self {
+        PageTheme::new(
+            match theme.mode {
+                PluginPageMode::Dark => PageMode::Dark,
+                PluginPageMode::Light => PageMode::Light,
+                PluginPageMode::HighContrast => PageMode::HighContrast,
+            },
+            match theme.scheme {
+                PluginPageScheme::Dark => PageScheme::Dark,
+                PluginPageScheme::Light => PageScheme::Light,
+            },
+            theme.reduced_motion,
+            theme.tokens,
+        )
+    }
+}
+
+/// The theme for plugin pages changed (or the app started): pages of API 1.2 plugins served
+/// from now on start with it (FR-13.13). Open pages get it from the UI directly (FR-13.15).
+#[tauri::command]
+#[specta::specta]
+pub fn plugins_set_page_theme(app: AppHandle, theme: PluginPageTheme) -> ApiResult<()> {
+    plugins_of(&app)?
+        .webviews()
+        .set_page_theme(&PageTheme::from(theme));
+    Ok(())
+}
+
 /// The user acted in a plugin's UI (`slot`) or typed one of its slash commands (`slot`
 /// `None`: `action` is the command, `value` the rest of the line as text). Actions must
 /// belong to an enabled component on screen. Server addresses become reachable for the
@@ -2197,6 +2258,7 @@ mod tests {
             offered: Vec::new(),
             app_menu_items: 0,
             web_size: None,
+            themed_pages: false,
         }
     }
 

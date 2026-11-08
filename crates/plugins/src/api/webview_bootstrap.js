@@ -175,4 +175,71 @@
       else if (clicked) original.resume.call(context);
     });
   });
+
+  // FR-13.9 … FR-13.17: theme tokens for pages of API 1.2 plugins. Mumcord serves such a page
+  // with its current theme as a JSON block right before this script and later sends changes as
+  // host messages; pages of older plugins get neither, so nothing here touches them. Kept last:
+  // the signals above work even if a value is off.
+  var root = document.documentElement;
+  var rootStyle = root.style;
+  var setProperty = uncurry(CSSStyleDeclaration.prototype.setProperty);
+  var removeProperty = uncurry(CSSStyleDeclaration.prototype.removeProperty);
+  var setAttribute = uncurry(Element.prototype.setAttribute);
+  var dispatchEvent = window.dispatchEvent.bind(window);
+  var ThemeEvent = CustomEvent;
+  var keys = Object.keys;
+  var applied = [];
+
+  function applyTheme(theme) {
+    var tokens = theme.tokens;
+    var names = typeof tokens === "object" && tokens !== null ? keys(tokens) : [];
+    var next = [];
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i];
+      var value = tokens[name];
+      if (name.slice(0, 5) !== "--mc-" || typeof value !== "string") continue;
+      setProperty(rootStyle, name, value);
+      next.push(name);
+    }
+    for (var j = 0; j < applied.length; j++) {
+      if (next.indexOf(applied[j]) < 0) removeProperty(rootStyle, applied[j]);
+    }
+    applied = next;
+    var scheme = theme.scheme === "light" ? "light" : "dark";
+    setAttribute(root, "data-mc-mode", String(theme.mode));
+    setAttribute(root, "data-mc-scheme", scheme);
+    setAttribute(root, "data-mc-reduced-motion", theme.reducedMotion === true ? "true" : "false");
+    // Native scrollbars and form controls follow the base variant (FR-13.11).
+    setProperty(rootStyle, "color-scheme", scheme);
+    return {
+      mode: String(theme.mode),
+      scheme: scheme,
+      reducedMotion: theme.reducedMotion === true,
+    };
+  }
+
+  // FR-13.13: before the page's first script and first paint; the block goes, the values stay.
+  var block = document.currentScript && document.currentScript.previousElementSibling;
+  if (block && block.tagName === "SCRIPT" && block.type === "application/json") {
+    var initial = JSON.parse(block.textContent);
+    block.remove();
+    if (typeof initial === "object" && initial !== null) applyTheme(initial);
+  }
+
+  // FR-13.15 … FR-13.17: a change from the app, which only ever sends it to API 1.2 pages. Taken
+  // first and stopped, so the page's own `message` listeners never see it.
+  addEventListener(
+    "message",
+    function (event) {
+      var data = messageData(event);
+      if (messageSource(event) !== host || typeof data !== "object" || data === null) return;
+      if (data.mumcordWebview !== "theme") return;
+      stopEvent(event);
+      var theme = data.theme;
+      if (typeof theme !== "object" || theme === null) return;
+      var detail = applyTheme(theme);
+      dispatchEvent(new ThemeEvent("mumcord-theme-change", { detail: detail }));
+    },
+    true,
+  );
 })();

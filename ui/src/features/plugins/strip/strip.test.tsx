@@ -32,6 +32,7 @@ function plugin(id: string, name: string, enabled = true): InstalledPlugin {
     offered: [],
     appMenuItems: 0,
     webSize: null,
+    themedPages: false,
   };
 }
 

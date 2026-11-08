@@ -16,6 +16,7 @@ import {
   type PluginFrameBounds,
   type PluginFrameChange,
   type PluginFrameDelivery,
+  type PluginPageTheme,
   type Unsubscribe,
 } from "../../../api";
 import { signalKind } from "./bridge";
@@ -138,12 +139,15 @@ export function trackPlacement(
 /** A bridge post as the Rust side takes it; `null` for anything the bridge never sends. */
 export function toDelivery(data: unknown): PluginFrameDelivery | null {
   if (typeof data === "string") return { type: "text", text: data };
-  const fields = data as { key?: unknown; muted?: unknown };
+  const fields = data as { key?: unknown; muted?: unknown; theme?: PluginPageTheme };
   switch (signalKind(data)) {
     case "key":
       return typeof fields.key === "string" ? { type: "key", key: fields.key } : null;
     case "mute":
       return typeof fields.muted === "boolean" ? { type: "mute", muted: fields.muted } : null;
+    case "theme":
+      // Only the bridge sends these, with a theme from `readPageTheme`.
+      return fields.theme === undefined ? null : { type: "theme", theme: fields.theme };
     default:
       return null;
   }

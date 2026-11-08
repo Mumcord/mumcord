@@ -379,6 +379,11 @@ impl PluginService {
             webviews.set_api(id, manifest.api_minor());
         }
         webviews.set_root(id, (allowed && web.is_dir()).then_some(web), places);
+        let themed = self
+            .host
+            .manifest(id)
+            .is_some_and(|m| crate::api::theme::themes_pages(m.api_minor()));
+        webviews.set_themed(id, themed);
         let disabled = self
             .store()
             .plugin_web_disabled(id)

@@ -41,6 +41,7 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
     offered: [],
     appMenuItems: 0,
     webSize: null,
+    themedPages: false,
     ...overrides,
   };
 }

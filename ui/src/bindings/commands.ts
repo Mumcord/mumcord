@@ -854,6 +854,11 @@ export const commands = {
 	/**  The resolved app language and theme for plugins (the UI knows the system values). */
 	pluginsSetAppearance: (language: string, dark: boolean, reducedMotion: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_set_appearance", { language, dark, reducedMotion })),
 	/**
+	 *  The theme for plugin pages changed (or the app started): pages of API 1.2 plugins served
+	 *  from now on start with it (FR-13.13). Open pages get it from the UI directly (FR-13.15).
+	 */
+	pluginsSetPageTheme: (theme: PluginPageTheme) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_set_page_theme", { theme })),
+	/**
 	 *  The user acted in a plugin's UI (`slot`) or typed one of its slash commands (`slot`
 	 *  `None`: `action` is the command, `value` the rest of the line as text). Actions must
 	 *  belong to an enabled component on screen. Server addresses become reachable for the
@@ -3014,6 +3019,8 @@ export type InstalledPlugin = {
 	appMenuItems: number,
 	/**  Size in bytes of the plugin's web pages (its `web/` files); `None` when it has none. */
 	webSize: number | null,
+	/**  Its pages get the theme tokens and theme messages (API 1.2 or newer, FR-13.8). */
+	themedPages: boolean,
 };
 
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
@@ -3776,7 +3783,12 @@ export type PluginFrameDelivery =
 /**  The bootstrap's gesture key (`{mumcordWebview:"key", key}`). */
 { type: "key"; key: string } | 
 /**  Mute or unmute the page (`{mumcordWebview:"mute", muted}`). */
-{ type: "mute"; muted: boolean };
+{ type: "mute"; muted: boolean } | 
+/**
+ *  The theme changed; only for pages of API 1.2 plugins (`{mumcordWebview:"theme", theme}`,
+ *  FR-13.15, FR-13.17).
+ */
+{ type: "theme"; theme: PluginPageTheme };
 
 /**  `plugin://frame`: something from a frame's web view, for the main window only. */
 export type PluginFrameEvent = {
@@ -3962,6 +3974,23 @@ export type PluginOptionalPermission = {
 	id: string,
 	/**  Preselected in the install prompt. */
 	suggested: boolean,
+};
+
+/**  `data-mc-mode` of an API 1.2 plugin page (FR-13.11). */
+export type PluginPageMode = "dark" | "light" | "high-contrast";
+
+/**  `data-mc-scheme` of an API 1.2 plugin page: the base variant. */
+export type PluginPageScheme = "dark" | "light";
+
+/**
+ *  The theme of API 1.2 plugin pages as the UI resolved it (FR-13.9 … FR-13.12): the `--mc-`
+ *  tokens with their current values and the mode attributes.
+ */
+export type PluginPageTheme = {
+	mode: PluginPageMode,
+	scheme: PluginPageScheme,
+	reducedMotion: boolean,
+	tokens: { [key in string]: string },
 };
 
 /**  How the user saw the plugin's panel. */
