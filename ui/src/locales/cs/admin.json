@@ -233,7 +233,9 @@
     "conflictReload": "Znovu načíst",
     "conflictMine": "Přesto uložit moji",
     "goneTitle": "Tento kanál byl smazán",
-    "goneBody": "Někdo kanál smazal, zatímco bylo okno otevřené. Vaše změny se neuložily."
+    "goneBody": "Někdo kanál smazal, zatímco bylo okno otevřené. Vaše změny se neuložily.",
+    "tooLong": "Nelze uložit: popis je pro tento server příliš dlouhý",
+    "tooLongTip": "Popis je pro tento server příliš dlouhý"
   },
   "perm": {
     "everyone": "Všichni",

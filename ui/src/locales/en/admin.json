@@ -227,7 +227,9 @@
     "conflictReload": "Reload",
     "conflictMine": "Save mine anyway",
     "goneTitle": "This channel was deleted",
-    "goneBody": "Someone deleted this channel while the window was open. Your changes were not saved."
+    "goneBody": "Someone deleted this channel while the window was open. Your changes were not saved.",
+    "tooLong": "Can't save: the description is too long for this server",
+    "tooLongTip": "The description is too long for this server"
   },
   "perm": {
     "everyone": "Everyone",

@@ -92,7 +92,7 @@ describe("profile: register, avatar, comment", () => {
     await openUserMenu();
     await clickItem("Edit profile");
     // The comment editor is a rich-text field (contenteditable), not a textarea.
-    const area = $("[role='textbox'].rich-editor__field");
+    const area = $("[role='textbox'].rte__field");
     await area.waitForDisplayed();
     await area.click();
     await area.setValue(`Hello from ${ME}`);

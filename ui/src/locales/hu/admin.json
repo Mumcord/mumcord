@@ -227,7 +227,9 @@
     "conflictReload": "Újratöltés",
     "conflictMine": "Mégis az enyémet mentem",
     "goneTitle": "Ezt a csatornát törölték",
-    "goneBody": "Valaki törölte a csatornát, amíg az ablak nyitva volt. A módosításaidat nem mentettük."
+    "goneBody": "Valaki törölte a csatornát, amíg az ablak nyitva volt. A módosításaidat nem mentettük.",
+    "tooLong": "Nem menthető: a leírás túl hosszú ehhez a szerverhez",
+    "tooLongTip": "A leírás túl hosszú ehhez a szerverhez"
   },
   "perm": {
     "everyone": "Mindenki",

@@ -150,6 +150,16 @@
   font-size: var(--font-size-sm);
 }
 
+.channel-window__status--error {
+  color: var(--color-danger);
+}
+
+/* Same look as the admin window's disabled buttons (FR-10.58). */
+.channel-window .button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 /* The shared field grows in a row; in this column it takes only its own height. */
 .channel-window__body > .admin-field {
   flex: none;

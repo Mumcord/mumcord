@@ -227,7 +227,9 @@
     "conflictReload": "Neu laden",
     "conflictMine": "Meine trotzdem speichern",
     "goneTitle": "Dieser Kanal wurde gelöscht",
-    "goneBody": "Jemand hat diesen Kanal gelöscht, während das Fenster offen war. Deine Änderungen wurden nicht gespeichert."
+    "goneBody": "Jemand hat diesen Kanal gelöscht, während das Fenster offen war. Deine Änderungen wurden nicht gespeichert.",
+    "tooLong": "Speichern nicht möglich: Die Beschreibung ist für diesen Server zu lang",
+    "tooLongTip": "Die Beschreibung ist für diesen Server zu lang"
   },
   "perm": {
     "everyone": "Alle",
