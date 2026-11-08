@@ -1,5 +1,9 @@
 //! Effects on the test camera's picture: the fixture mask (FR-8.41, the pixel check of AC-8.5),
 //! the real model, and the effects thread end to end.
+//!
+//! Only where a package can carry ONNX Runtime: the real model and the thread both need the
+//! library, and FreeBSD has no official build of it (see crates/effects/build.rs).
+#![cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
 
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
