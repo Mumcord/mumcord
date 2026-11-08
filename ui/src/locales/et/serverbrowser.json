@@ -11,9 +11,9 @@
   "filters": {
     "label": "Filtrid",
     "country": "Riik",
-    "anyCountry": "Iga riik",
+    "anyCountry": "Kõik riigid",
     "ping": "Ping",
-    "anyPing": "Iga ping",
+    "anyPing": "Mis tahes ping",
     "pingBelow": "Alla {{ms}} ms",
     "hideEmpty": "Peida tühjad",
     "hideFull": "Peida täis"
@@ -35,8 +35,8 @@
   "measuring": "Mõõdan",
   "noAnswer": "Vastust pole",
   "ms": "{{ms}} ms",
-  "connect": "Ühenda",
-  "connectTo": "Ühenda serveriga {{server}}",
+  "connect": "Ühendu",
+  "connectTo": "Ühendu serveriga {{server}}",
   "favourite": "Lemmik",
   "favouriteServer": "Lisa {{server}} oma serverite hulka",
   "saved": "Salvestatud",
@@ -44,5 +44,5 @@
   "announce": {
     "saved": "{{server}} lisati sinu serverite hulka"
   },
-  "note": "Pingitakse ainult nähtavaid ridu, mõnda korraga. Muud midagi serverile ei saadeta enne, kui ühendad."
+  "note": "Pingitakse ainult nähtavaid ridu, mõnda korraga. Muud midagi serverile ei saadeta enne, kui ühendud."
 }

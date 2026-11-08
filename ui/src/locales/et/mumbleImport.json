@@ -41,8 +41,8 @@
   },
   "ptt": {
     "title": "Push-to-talk-klahv",
-    "modifierOnly": "Mumble'i klahv on ainult muuteklahv, mida Mumcord ei saa kasutada. Klahvi saad valida hiljem.",
-    "tooManyKeys": "Mumble'i kiirklahvil on rohkem kui üks klahv, mida Mumcord ei saa kasutada. Klahvi saad valida hiljem.",
+    "modifierOnly": "Mumble'i klahv on üksik muuteklahv, mida Mumcord ei saa kasutada. Klahvi saad valida hiljem.",
+    "tooManyKeys": "Mumble'i kiirklahv koosneb mitmest klahvist, mida Mumcord ei toeta. Klahvi saad valida hiljem.",
     "unknown": "Mumble'i kiirklahv kasutab klahvi või seadet, mida Mumcord ei tunne. Klahvi saad valida hiljem."
   },
   "volume": {

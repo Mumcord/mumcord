@@ -4,7 +4,7 @@
     "noPermission": "Server ei luba siin sosistada"
   },
   "banner": {
-    "whisper": "Sosistad kasutajale {{target}}",
+    "whisper": "Sosistad: {{target}}",
     "shout": "Hüüad kanalisse {{target}}",
     "releaseKey": "Sind kuulevad ainult seal olevad inimesed. Lase <key>{{key}}</key> lahti, et rääkida taas kanalis {{channel}}.",
     "stopToReturn": "Sind kuulevad ainult seal olevad inimesed. Lõpeta, et rääkida taas kanalis {{channel}}.",
@@ -12,9 +12,9 @@
     "stop": "Lõpeta"
   },
   "denied": {
-    "title": "Kasutajale {{target}} ei saanud sosistada",
-    "noVoiceServer": "Liitu kõigepealt kanaliga: sosin läheb läbi serveri, kus räägid.",
-    "muted": "Sosistamiseks lülita mikrofon sisse.",
+    "title": "Ei saanud sosistada: {{target}}",
+    "noVoiceServer": "Liitu kõigepealt kanaliga: sosin liigub selle serveri kaudu, kus räägid.",
+    "muted": "Sosistamiseks tühista mikrofoni vaigistus.",
     "serverMuted": "Server on sind vaigistanud, seega ei edasta see sinu häält.",
     "nobodyHere": "Keegi neist pole praegu selles serveris.",
     "channelNotFound": "Seda kanalit pole selles serveris olemas.",
@@ -34,10 +34,10 @@
   },
   "panel": {
     "open": "Sosista või hüüa",
-    "menu": "Sosina ja hüüde sihtmärgid",
+    "menu": "Sosistamise ja hüüdmise sihtmärgid",
     "manage": "Halda sihtmärke…",
     "none": "Sihtmärke veel pole",
-    "indicatorWhisper": "Sosistad kasutajale {{target}}",
+    "indicatorWhisper": "Sosistad: {{target}}",
     "indicatorShout": "Hüüad kanalisse {{target}}",
     "stop": "Lõpeta"
   }
