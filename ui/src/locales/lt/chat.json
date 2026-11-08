@@ -108,7 +108,8 @@
     "peopleHeading": "Žmonės",
     "channelHint": "Pranešti visiems kanale {{channel}} ({{count}})",
     "allHint": "Pranešti visiems, kurie gali skaityti šį kanalą ({{count}})",
-    "keys": "↑↓ rinktis · Enter įterpti · Esc uždaryti"
+    "keys": "↑↓ rinktis · Enter įterpti · Esc uždaryti",
+    "channelList": "Kanalų pasiūlymai"
   },
   "preview": {
     "open": "Atidaryti naršyklėje",
@@ -426,5 +427,14 @@
   },
   "slash": {
     "list": "Komandos su „/“"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanalas – atverti meniu",
+    "join": "Prisijungti prie kanalo",
+    "joinPath": "Prisijungti prie {{path}}",
+    "show": "Rodyti kanalų sąraše",
+    "showPath": "Rodyti {{path}} kanalų sąraše",
+    "copy": "Kopijuoti pavadinimą",
+    "menu": "Kanalas {{channel}}"
   }
 }
