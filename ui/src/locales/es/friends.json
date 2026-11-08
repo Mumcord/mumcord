@@ -8,11 +8,11 @@
   "offline": "Desconectado",
   "lastSeen": "Desconectado, visto por última vez {{when}}",
   "friend": "Amigo",
-  "friendHint": "Muestra cuándo está en línea y conserva vuestro chat privado.",
+  "friendHint": "Muestra cuándo está en línea y conserva tu chat privado con esa persona.",
   "noCertificate": "Las personas sin certificado no pueden ser amigos, porque Mumcord no podría reconocerlas de nuevo.",
   "add": "Añadir amigo",
   "remove": "Quitar amigo",
-  "failed": "No se pudo cambiar el amigo. Inténtalo de nuevo.",
+  "failed": "No se pudo cambiar la amistad. Inténtalo de nuevo.",
   "join": "Unirse",
   "joinFriend": "Unirse al canal de {{name}}"
 }

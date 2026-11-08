@@ -122,7 +122,7 @@
       "show": "Podcast"
     },
     "inBrowser": "Se reproduce en tu navegador",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "El reproductor de Twitch no funciona dentro de la ventana de Mumcord en este sistema, así que Reproducir abre la transmisión en tu navegador.",
     "card": "Vista previa del enlace: {{title}}",
     "dismiss": "Ocultar vista previa"
   },
@@ -160,8 +160,8 @@
     "remove": "Quitar de favoritos",
     "removeNamed": "Quitar {{name}} de favoritos",
     "send": "Enviar {{name}}",
-    "hint": "Las flechas se mueven, Intro envía, Supr quita, Escape cierra.",
-    "empty": "Aún no hay favoritos. Haz clic derecho en un GIF del chat o usa su estrella y elige \"Guardar como favorito\". Aparecerá aquí."
+    "hint": "Usa las flechas para moverte, Intro para enviar, Supr para quitar y Esc para cerrar.",
+    "empty": "Aún no hay favoritos. Haz clic derecho en un GIF del chat o usa su estrella y elige «Guardar como favorito». Aparecerá aquí."
   },
   "linkMenu": {
     "label": "Enlace",
@@ -226,11 +226,11 @@
   "activity": {
     "share": "{{name}} está compartiendo su pantalla",
     "watch": "Ver",
-    "party": "Watch party: {{title}}",
+    "party": "Sesión de visionado: {{title}}",
     "join": "Unirse",
     "videoFallback": "Vídeo de YouTube",
     "someone": "Alguien",
-    "joinFailed": "No se pudo unir a la watch party."
+    "joinFailed": "No se pudo unir a la sesión de visionado."
   },
   "card": {
     "label": "Tarjeta: {{title}}",
@@ -268,20 +268,20 @@
     "joinLabel": "Unirse a {{server}}",
     "joined": "Unido",
     "label": "Tarjeta del servidor {{server}}",
-    "privacyOff": "Los valores del servidor están desactivados en la configuración",
+    "privacyOff": "Los datos del servidor están desactivados en los ajustes",
     "querying": "Comprobando el servidor…",
     "retry": "Volver a comprobar",
     "retryLabel": "Volver a comprobar {{server}}",
     "server": "{{server}}",
     "unreachable": "No se puede acceder al servidor",
-    "warning_many": "{{count}} millones de enlaces de este mensaje muestran credenciales",
+    "warning_many": "{{count}} enlaces de este mensaje muestran credenciales",
     "warning_one": "{{count}} enlace de este mensaje muestra credenciales",
     "warning_other": "{{count}} enlaces de este mensaje muestran credenciales"
   },
   "requests": {
     "entry": "Solicitudes de mensajes",
     "entryCount_one": "{{count}} solicitud",
-    "entryCount_many": "{{count}} de solicitudes",
+    "entryCount_many": "{{count}} solicitudes",
     "entryCount_other": "{{count}} solicitudes",
     "title": "Solicitudes de mensajes",
     "listLabel": "Solicitudes",
@@ -293,7 +293,7 @@
     "noteFrom": "Nota de {{name}}",
     "explain": "Has configurado los mensajes privados en «Solo amigos». Si aceptas, {{name}} podrá escribirte. Rechazar es silencioso: {{name}} solo ve «pendiente». Las solicitudes se borran cuando cierras Mumcord.",
     "sentMessages_one": "{{name}} te ha enviado {{count}} mensaje",
-    "sentMessages_many": "{{name}} te ha enviado {{count}} de mensajes",
+    "sentMessages_many": "{{name}} te ha enviado {{count}} mensajes",
     "sentMessages_other": "{{name}} te ha enviado {{count}} mensajes",
     "messagesLabel": "Mensajes de {{name}}",
     "accept": "Aceptar",
@@ -320,7 +320,7 @@
     "quote": "«{{text}}»",
     "block": "Bloquear",
     "showMore_one": "Mostrar {{count}} solicitud más",
-    "showMore_many": "Mostrar {{count}} de solicitudes más",
+    "showMore_many": "Mostrar {{count}} solicitudes más",
     "showMore_other": "Mostrar {{count}} solicitudes más",
     "showFewer": "Mostrar menos solicitudes",
     "pinnedTitle": "Fijadas",
@@ -401,15 +401,15 @@
     "output": "Se reproduce en tu dispositivo de salida, no en tu micrófono"
   },
   "embedHint": {
-    "image": "Imagen oculta, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "gif": "GIF oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "video": "Reproductor de vídeo oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "audio": "Reproductor de audio oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "music": "Reproductor de música oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "link": "Vista previa del enlace oculta, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "several_one": "{{count}} vista previa oculta, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "several_many": "{{count}} vistas previas ocultas, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
-    "several_other": "{{count}} vistas previas ocultas, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>."
+    "image": "Imagen oculta porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "gif": "GIF oculto porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "video": "Reproductor de vídeo oculto porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "audio": "Reproductor de audio oculto porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "music": "Reproductor de música oculto porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "link": "Vista previa del enlace oculta porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "several_one": "{{count}} vista previa oculta porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "several_many": "{{count}} vistas previas ocultas porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "several_other": "{{count}} vistas previas ocultas porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>."
   },
   "historyImage": {
     "loading": "Cargando imagen…",
