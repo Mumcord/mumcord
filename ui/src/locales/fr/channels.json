@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Canaux",
-    "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire · Touche Menu : options du canal",
+    "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire · Touche Menu : options du canal · Ctrl+clic ou Ctrl+Espace : choisir des personnes",
     "join": "Rejoindre",
     "you": "(vous)",
     "youAreHere": "vous êtes ici",
@@ -103,5 +103,21 @@
     },
     "online": "{{count}} en ligne",
     "onlinePing": "{{count}} en ligne · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Déplacer des personnes",
+    "channel": "Canal",
+    "search": "Rechercher des canaux",
+    "noMatch": "Aucun canal ne correspond.",
+    "hint": "Choisis le canal où les personnes doivent aller.",
+    "from": "Depuis {{channel}}",
+    "question": "Déplacer {{people}} de {{from}} vers {{to}} ?",
+    "questionNoSource": "Déplacer {{people}} vers {{to}} ?",
+    "confirm": "Déplacer",
+    "failed": "Certaines personnes n'ont pas pu être déplacées.",
+    "resultTitle": "Déplacement de personnes",
+    "resultAll": "{{people}} déplacées vers {{channel}}.",
+    "resultSome": "{{moved}} sur {{people}} déplacées vers {{channel}}. Les autres ont été refusées.",
+    "busy": "Des personnes sont déjà en cours de déplacement…"
   }
 }

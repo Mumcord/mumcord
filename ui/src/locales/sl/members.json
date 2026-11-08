@@ -63,7 +63,9 @@
     "mute": "Utišaj zame",
     "connectionInfo": "Podatki o povezavi",
     "chatRequestPending": "Prošnja za klepet čaka",
-    "revokeConsent": "Prekliči soglasje za klepet"
+    "revokeConsent": "Prekliči soglasje za klepet",
+    "moveToMe": "Premakni v moj kanal",
+    "moveTo": "Premakni v"
   },
   "nowPlaying": {
     "label": "Zdaj se predvaja",

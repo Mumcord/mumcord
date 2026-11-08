@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanalid",
-    "hint": "Enter: näita vestlust · Shift+Enter või topeltklõps: liitu · Nooleklahvid: liigu, laienda, ahenda · Menüüklahv: kanali valikud",
+    "hint": "Enter: näita vestlust · Shift+Enter või topeltklõps: liitu · Nooleklahvid: liigu, laienda, ahenda · Menüüklahv: kanali valikud · Ctrl+klõps või Ctrl+tühik: vali inimesed",
     "join": "Liitu",
     "you": "(sina)",
     "youAreHere": "oled siin",
@@ -98,5 +98,21 @@
     },
     "online": "{{count}} võrgus",
     "onlinePing": "{{count}} võrgus · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Teisalda inimesed",
+    "channel": "Kanal",
+    "search": "Otsi kanaleid",
+    "noMatch": "Ükski kanal ei vasta.",
+    "hint": "Vali kanal, kuhu inimesed peaksid minema.",
+    "from": "Kanalist {{channel}}",
+    "question": "Kas teisaldada {{people}} kanalist {{from}} kanalisse {{to}}?",
+    "questionNoSource": "Kas teisaldada {{people}} kanalisse {{to}}?",
+    "confirm": "Teisalda",
+    "failed": "Mõnda inimest ei õnnestunud teisaldada.",
+    "resultTitle": "Inimeste teisaldamine",
+    "resultAll": "Teisaldati {{people}} kanalisse {{channel}}.",
+    "resultSome": "Teisaldati {{moved}} / {{people}} kanalisse {{channel}}. Ülejäänutest keelduti.",
+    "busy": "Inimesi juba teisaldatakse…"
   }
 }

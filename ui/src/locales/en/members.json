@@ -61,7 +61,9 @@
     "mute": "Mute for me",
     "connectionInfo": "Connection info",
     "chatRequestPending": "Chat request pending",
-    "revokeConsent": "Revoke chat consent"
+    "revokeConsent": "Revoke chat consent",
+    "moveToMe": "Move to my channel",
+    "moveTo": "Move to"
   },
   "nowPlaying": {
     "label": "Now playing",

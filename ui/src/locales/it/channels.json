@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Canali",
-    "hint": "Invio: mostra la chat · Maiusc+Invio o doppio clic: entra · Frecce: sposta, espandi, comprimi · Tasto Menu: opzioni del canale",
+    "hint": "Invio: mostra la chat · Maiusc+Invio o doppio clic: entra · Frecce: sposta, espandi, comprimi · Tasto Menu: opzioni del canale · Ctrl+clic o Ctrl+Spazio: scegli persone",
     "join": "Entra",
     "you": "(tu)",
     "youAreHere": "sei qui",
@@ -103,5 +103,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Sposta persone",
+    "channel": "Canale",
+    "search": "Cerca canali",
+    "noMatch": "Nessun canale corrisponde.",
+    "hint": "Scegli il canale in cui devono andare le persone.",
+    "from": "Da {{channel}}",
+    "question": "Spostare {{people}} da {{from}} a {{to}}?",
+    "questionNoSource": "Spostare {{people}} in {{to}}?",
+    "confirm": "Sposta",
+    "failed": "Non è stato possibile spostare alcune persone.",
+    "resultTitle": "Spostamento persone",
+    "resultAll": "Spostate {{people}} in {{channel}}.",
+    "resultSome": "Spostate {{moved}} di {{people}} in {{channel}}. Le altre sono state rifiutate.",
+    "busy": "Persone già in spostamento…"
   }
 }

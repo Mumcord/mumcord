@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanavat",
-    "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista · Valikkonäppäin: kanavan asetukset",
+    "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista · Valikkonäppäin: kanavan asetukset · Ctrl+klikkaus tai Ctrl+välilyönti: valitse henkilöt",
     "join": "Liity",
     "you": "(sinä)",
     "youAreHere": "olet täällä",
@@ -98,5 +98,21 @@
     },
     "online": "{{count}} paikalla",
     "onlinePing": "{{count}} paikalla · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Siirrä henkilöitä",
+    "channel": "Kanava",
+    "search": "Hae kanavia",
+    "noMatch": "Ei vastaavaa kanavaa.",
+    "hint": "Valitse kanava, johon henkilöt siirretään.",
+    "from": "Kanavalta {{channel}}",
+    "question": "Siirretäänkö {{people}} kanavalta {{from}} kanavalle {{to}}?",
+    "questionNoSource": "Siirretäänkö {{people}} kanavalle {{to}}?",
+    "confirm": "Siirrä",
+    "failed": "Joitakin henkilöitä ei voitu siirtää.",
+    "resultTitle": "Siirretään henkilöitä",
+    "resultAll": "Siirrettiin {{people}} kanavalle {{channel}}.",
+    "resultSome": "Siirrettiin {{moved}} / {{people}} kanavalle {{channel}}. Loput hylättiin.",
+    "busy": "Henkilöitä siirretään jo…"
   }
 }

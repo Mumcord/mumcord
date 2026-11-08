@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanaler",
-    "hint": "Enter: visa chatt · Skift+Enter eller dubbelklick: gå med · Piltangenter: flytta, expandera, fäll ihop · Menytangent: kanalalternativ",
+    "hint": "Enter: visa chatt · Skift+Enter eller dubbelklick: gå med · Piltangenter: flytta, expandera, fäll ihop · Menytangent: kanalalternativ · Ctrl-klick eller Ctrl+mellanslag: välj personer",
     "join": "Gå med",
     "you": "(du)",
     "youAreHere": "du är här",
@@ -98,5 +98,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Flytta personer",
+    "channel": "Kanal",
+    "search": "Sök kanaler",
+    "noMatch": "Ingen kanal matchar.",
+    "hint": "Välj kanalen som personerna ska flyttas till.",
+    "from": "Från {{channel}}",
+    "question": "Flytta {{people}} från {{from}} till {{to}}?",
+    "questionNoSource": "Flytta {{people}} till {{to}}?",
+    "confirm": "Flytta",
+    "failed": "Några personer kunde inte flyttas.",
+    "resultTitle": "Flyttar personer",
+    "resultAll": "Flyttade {{people}} till {{channel}}.",
+    "resultSome": "Flyttade {{moved}} av {{people}} till {{channel}}. Resten nekades.",
+    "busy": "Flyttar redan personer…"
   }
 }

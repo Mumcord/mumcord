@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Canais",
-    "hint": "Enter: mostrar chat · Shift+Enter ou duplo clique: entrar · Setas: mover, expandir, recolher · Tecla de menu: opções do canal",
+    "hint": "Enter: mostrar chat · Shift+Enter ou duplo clique: entrar · Setas: mover, expandir, recolher · Tecla de menu: opções do canal · Ctrl+clique ou Ctrl+Espaço: escolher pessoas",
     "join": "Entrar",
     "you": "(tu)",
     "youAreHere": "estás aqui",
@@ -103,5 +103,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Mover pessoas",
+    "channel": "Canal",
+    "search": "Pesquisar canais",
+    "noMatch": "Nenhum canal corresponde.",
+    "hint": "Escolhe o canal para onde as pessoas devem ir.",
+    "from": "De {{channel}}",
+    "question": "Mover {{people}} de {{from}} para {{to}}?",
+    "questionNoSource": "Mover {{people}} para {{to}}?",
+    "confirm": "Mover",
+    "failed": "Não foi possível mover algumas pessoas.",
+    "resultTitle": "A mover pessoas",
+    "resultAll": "Movidas {{people}} para {{channel}}.",
+    "resultSome": "Movidas {{moved}} de {{people}} para {{channel}}. As restantes foram recusadas.",
+    "busy": "Já se estão a mover pessoas…"
   }
 }

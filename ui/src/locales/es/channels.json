@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Canales",
-    "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer · Tecla de menú: opciones del canal",
+    "hint": "Intro: ver chat · Mayús+Intro o doble clic: unirse · Flechas: mover, expandir, contraer · Tecla de menú: opciones del canal · Ctrl+clic o Ctrl+Espacio: elegir personas",
     "join": "Unirse",
     "you": "(tú)",
     "youAreHere": "estás aquí",
@@ -103,5 +103,21 @@
     },
     "online": "{{count}} en línea",
     "onlinePing": "{{count}} en línea · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Mover personas",
+    "channel": "Canal",
+    "search": "Buscar canales",
+    "noMatch": "Ningún canal coincide.",
+    "hint": "Elige el canal al que deben ir las personas.",
+    "from": "Desde {{channel}}",
+    "question": "¿Mover {{people}} de {{from}} a {{to}}?",
+    "questionNoSource": "¿Mover {{people}} a {{to}}?",
+    "confirm": "Mover",
+    "failed": "No se pudo mover a algunas personas.",
+    "resultTitle": "Moviendo personas",
+    "resultAll": "Se movieron {{people}} a {{channel}}.",
+    "resultSome": "Se movieron {{moved}} de {{people}} a {{channel}}. El resto fue rechazado.",
+    "busy": "Ya se están moviendo personas…"
   }
 }

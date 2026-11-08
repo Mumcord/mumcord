@@ -61,7 +61,9 @@
     "mute": "Mykistä minulta",
     "connectionInfo": "Yhteyden tiedot",
     "chatRequestPending": "Keskustelupyyntö odottaa",
-    "revokeConsent": "Peru keskustelusuostumus"
+    "revokeConsent": "Peru keskustelusuostumus",
+    "moveToMe": "Siirrä omalle kanavalleni",
+    "moveTo": "Siirrä"
   },
   "nowPlaying": {
     "label": "Nyt soi",

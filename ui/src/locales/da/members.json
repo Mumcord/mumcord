@@ -61,7 +61,9 @@
     "mute": "Slå lyden fra for mig",
     "connectionInfo": "Forbindelsesinfo",
     "chatRequestPending": "Chatanmodning afventer",
-    "revokeConsent": "Tilbagekald chatsamtykke"
+    "revokeConsent": "Tilbagekald chatsamtykke",
+    "moveToMe": "Flyt til min kanal",
+    "moveTo": "Flyt til"
   },
   "nowPlaying": {
     "label": "Spiller nu",

@@ -62,7 +62,9 @@
     "mute": "Izslēgt man",
     "connectionInfo": "Savienojuma informācija",
     "chatRequestPending": "Tērzēšanas pieprasījums gaida",
-    "revokeConsent": "Atsaukt tērzēšanas piekrišanu"
+    "revokeConsent": "Atsaukt tērzēšanas piekrišanu",
+    "moveToMe": "Pārvietot uz manu kanālu",
+    "moveTo": "Pārvietot uz"
   },
   "nowPlaying": {
     "label": "Tagad skan",

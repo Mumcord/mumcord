@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanalai",
-    "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti · Meniu klavišas: kanalo parinktys",
+    "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti · Meniu klavišas: kanalo parinktys · Ctrl+spustelėjimas arba Ctrl+tarpas: pasirinkti žmones",
     "join": "Prisijungti",
     "you": "(tu)",
     "youAreHere": "tu čia",
@@ -108,5 +108,21 @@
     },
     "online": "{{count}} prisijungę",
     "onlinePing": "{{count}} prisijungę · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Perkelti žmones",
+    "channel": "Kanalas",
+    "search": "Ieškoti kanalų",
+    "noMatch": "Nė vienas kanalas neatitinka.",
+    "hint": "Pasirink kanalą, į kurį turi patekti žmonės.",
+    "from": "Iš {{channel}}",
+    "question": "Perkelti {{people}} iš {{from}} į {{to}}?",
+    "questionNoSource": "Perkelti {{people}} į {{to}}?",
+    "confirm": "Perkelti",
+    "failed": "Kai kurių žmonių nepavyko perkelti.",
+    "resultTitle": "Perkeliami žmonės",
+    "resultAll": "Perkelta {{people}} į {{channel}}.",
+    "resultSome": "Perkelta {{moved}} iš {{people}} į {{channel}}. Likusieji atmesti.",
+    "busy": "Žmonės jau perkeliami…"
   }
 }

@@ -61,7 +61,9 @@
     "mute": "Vaigista minu jaoks",
     "connectionInfo": "Ühenduse teave",
     "chatRequestPending": "Vestlustaotlus ootel",
-    "revokeConsent": "Võta vestlusnõusolek tagasi"
+    "revokeConsent": "Võta vestlusnõusolek tagasi",
+    "moveToMe": "Teisalda minu kanalisse",
+    "moveTo": "Teisalda"
   },
   "nowPlaying": {
     "label": "Praegu mängib",

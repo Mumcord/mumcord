@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanali",
-    "hint": "Enter: prikaži chat · Shift+Enter ili dvoklik: pridruži se · Strelice: pomicanje, proširivanje, sažimanje · Tipka izbornika: mogućnosti kanala",
+    "hint": "Enter: prikaži chat · Shift+Enter ili dvoklik: pridruži se · Strelice: pomicanje, proširivanje, sažimanje · Tipka izbornika: mogućnosti kanala · Ctrl+klik ili Ctrl+razmaknica: odaberi osobe",
     "join": "Pridruži se",
     "you": "(ti)",
     "youAreHere": "ovdje si",
@@ -103,5 +103,21 @@
     },
     "online": "{{count}} na mreži",
     "onlinePing": "{{count}} na mreži · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Premjesti osobe",
+    "channel": "Kanal",
+    "search": "Pretraži kanale",
+    "noMatch": "Nijedan kanal ne odgovara.",
+    "hint": "Odaberi kanal u koji osobe trebaju ići.",
+    "from": "Iz {{channel}}",
+    "question": "Premjestiti {{people}} iz {{from}} u {{to}}?",
+    "questionNoSource": "Premjestiti {{people}} u {{to}}?",
+    "confirm": "Premjesti",
+    "failed": "Neke osobe nije moguće premjestiti.",
+    "resultTitle": "Premještanje osoba",
+    "resultAll": "Premješteno {{people}} u {{channel}}.",
+    "resultSome": "Premješteno {{moved}} od {{people}} u {{channel}}. Ostali su odbijeni.",
+    "busy": "Osobe se već premještaju…"
   }
 }

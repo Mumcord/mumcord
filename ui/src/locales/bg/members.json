@@ -61,7 +61,9 @@
     "mute": "Заглуши за мен",
     "connectionInfo": "Информация за връзката",
     "chatRequestPending": "Заявката за чат е в изчакване",
-    "revokeConsent": "Оттегли съгласието за чат"
+    "revokeConsent": "Оттегли съгласието за чат",
+    "moveToMe": "Премести в моя канал",
+    "moveTo": "Премести в"
   },
   "nowPlaying": {
     "label": "Слуша сега",

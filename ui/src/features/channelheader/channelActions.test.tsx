@@ -114,12 +114,15 @@ describe("shared channel actions (issue #172)", () => {
       "Copy channel link",
       "Channel info",
       "Clear chat history",
+      // Only the move right is granted here, so Admin ▸ holds just "Move everyone to" (#255).
+      "Admin",
     ]);
     expect(tree).toEqual([
       "Join channel",
-      ...header.slice(0, -1),
+      ...header.slice(0, -2),
       "Move users here",
       "Clear chat history",
+      "Admin",
     ]);
   });
 
@@ -128,6 +131,7 @@ describe("shared channel actions (issue #172)", () => {
     const menu = openTreeMenu(/^Raid/);
     const shown = itemLabels(menu);
     expect(shown).not.toContain("Move users here");
+    expect(shown).not.toContain("Admin");
     expect(shown).not.toContain("Channel password");
     expect(within(menu).queryAllByRole("menuitem", { hidden: true })).toHaveLength(shown.length);
     fireEvent.keyDown(menu, { key: "Escape" });

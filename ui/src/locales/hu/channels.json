@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Csatornák",
-    "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás · Menübillentyű: csatorna beállításai",
+    "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás · Menübillentyű: csatorna beállításai · Ctrl+kattintás vagy Ctrl+szóköz: személyek kijelölése",
     "join": "Belépés",
     "you": "(te)",
     "youAreHere": "itt vagy",
@@ -98,5 +98,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Személyek áthelyezése",
+    "channel": "Csatorna",
+    "search": "Csatornák keresése",
+    "noMatch": "Nincs egyező csatorna.",
+    "hint": "Válaszd ki a csatornát, ahová a személyek kerüljenek.",
+    "from": "Innen: {{channel}}",
+    "question": "Áthelyezés: {{people}}, {{from}} → {{to}}?",
+    "questionNoSource": "Áthelyezés: {{people}} → {{to}}?",
+    "confirm": "Áthelyezés",
+    "failed": "Néhány személyt nem sikerült áthelyezni.",
+    "resultTitle": "Személyek áthelyezése",
+    "resultAll": "{{people}} áthelyezve ide: {{channel}}.",
+    "resultSome": "{{moved}} / {{people}} áthelyezve ide: {{channel}}. A többieket a szerver elutasította.",
+    "busy": "Már folyik a személyek áthelyezése…"
   }
 }

@@ -63,7 +63,9 @@
     "mute": "Wycisz dla mnie",
     "connectionInfo": "Informacje o połączeniu",
     "chatRequestPending": "Prośba o czat oczekuje",
-    "revokeConsent": "Cofnij zgodę na czat"
+    "revokeConsent": "Cofnij zgodę na czat",
+    "moveToMe": "Przenieś do mojego kanału",
+    "moveTo": "Przenieś do"
   },
   "nowPlaying": {
     "label": "Teraz gra",

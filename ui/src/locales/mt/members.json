@@ -64,7 +64,9 @@
     "mute": "Mutja għalija",
     "connectionInfo": "Informazzjoni dwar il-konnessjoni",
     "chatRequestPending": "Talba għal chat pendenti",
-    "revokeConsent": "Irtira l-kunsens għaċ-chat"
+    "revokeConsent": "Irtira l-kunsens għaċ-chat",
+    "moveToMe": "Mexxi għall-kanal tiegħi",
+    "moveTo": "Mexxi għal"
   },
   "nowPlaying": {
     "label": "Qed jindaqq issa",

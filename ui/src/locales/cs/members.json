@@ -63,7 +63,9 @@
     "mute": "Ztlumit pro mě",
     "connectionInfo": "Informace o připojení",
     "chatRequestPending": "Žádost o chat čeká na vyřízení",
-    "revokeConsent": "Odvolat souhlas s chatem"
+    "revokeConsent": "Odvolat souhlas s chatem",
+    "moveToMe": "Přesunout do mého kanálu",
+    "moveTo": "Přesunout do"
   },
   "nowPlaying": {
     "label": "Právě hraje",

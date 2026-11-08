@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanali",
-    "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa · Buttuna tal-menu: għażliet tal-kanal",
+    "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa · Buttuna tal-menu: għażliet tal-kanal · Ctrl+klikk jew Ctrl+ispazju: agħżel nies",
     "join": "Ingħaqad",
     "you": "(int)",
     "youAreHere": "int hawn",
@@ -113,5 +113,21 @@
     },
     "online": "{{count}} online",
     "onlinePing": "{{count}} online · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Mexxi nies",
+    "channel": "Kanal",
+    "search": "Fittex kanali",
+    "noMatch": "L-ebda kanal ma jaqbel.",
+    "hint": "Agħżel il-kanal fejn għandhom imorru n-nies.",
+    "from": "Minn {{channel}}",
+    "question": "Tmexxi {{people}} minn {{from}} għal {{to}}?",
+    "questionNoSource": "Tmexxi {{people}} għal {{to}}?",
+    "confirm": "Mexxi",
+    "failed": "Xi nies ma setgħux jitmexxew.",
+    "resultTitle": "Qed jiġu mċaqilqa nies",
+    "resultAll": "Inġiebu {{people}} għal {{channel}}.",
+    "resultSome": "Inġiebu {{moved}} minn {{people}} għal {{channel}}. Il-bqija ġew miċħuda.",
+    "busy": "Diġà qed jiġu mċaqilqa nies…"
   }
 }

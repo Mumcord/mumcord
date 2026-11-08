@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanāli",
-    "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut · Izvēlnes taustiņš: kanāla opcijas",
+    "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut · Izvēlnes taustiņš: kanāla opcijas · Ctrl+klikšķis vai Ctrl+atstarpe: izvēlēties cilvēkus",
     "join": "Pievienoties",
     "you": "(tu)",
     "youAreHere": "tu esi šeit",
@@ -103,5 +103,21 @@
     },
     "online": "{{count}} tiešsaistē",
     "onlinePing": "{{count}} tiešsaistē · {{ping}} ms"
+  },
+  "moveTo": {
+    "title": "Pārvietot cilvēkus",
+    "channel": "Kanāls",
+    "search": "Meklēt kanālus",
+    "noMatch": "Neviens kanāls neatbilst.",
+    "hint": "Izvēlies kanālu, uz kuru cilvēkiem jāpāriet.",
+    "from": "No {{channel}}",
+    "question": "Pārvietot {{people}} no {{from}} uz {{to}}?",
+    "questionNoSource": "Pārvietot {{people}} uz {{to}}?",
+    "confirm": "Pārvietot",
+    "failed": "Dažus cilvēkus neizdevās pārvietot.",
+    "resultTitle": "Pārvieto cilvēkus",
+    "resultAll": "Pārvietoti {{people}} uz {{channel}}.",
+    "resultSome": "Pārvietoti {{moved}} no {{people}} uz {{channel}}. Pārējie tika atteikti.",
+    "busy": "Cilvēki jau tiek pārvietoti…"
   }
 }

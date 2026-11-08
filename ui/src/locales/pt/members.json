@@ -62,7 +62,9 @@
     "mute": "Silenciar para mim",
     "connectionInfo": "Informações da ligação",
     "chatRequestPending": "Pedido de chat pendente",
-    "revokeConsent": "Revogar consentimento de chat"
+    "revokeConsent": "Revogar consentimento de chat",
+    "moveToMe": "Mover para o meu canal",
+    "moveTo": "Mover para"
   },
   "nowPlaying": {
     "label": "A reproduzir",
