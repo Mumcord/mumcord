@@ -230,7 +230,9 @@
     "conflictReload": "Ricarica",
     "conflictMine": "Salva la mia comunque",
     "goneTitle": "Questo canale è stato eliminato",
-    "goneBody": "Qualcuno ha eliminato questo canale mentre la finestra era aperta. Le tue modifiche non sono state salvate."
+    "goneBody": "Qualcuno ha eliminato questo canale mentre la finestra era aperta. Le tue modifiche non sono state salvate.",
+    "tooLong": "Impossibile salvare: la descrizione è troppo lunga per questo server",
+    "tooLongTip": "La descrizione è troppo lunga per questo server"
   },
   "perm": {
     "everyone": "Tutti",

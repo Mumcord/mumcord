@@ -236,7 +236,9 @@
     "conflictReload": "Athlódáil",
     "conflictMine": "Sábháil mo cheann mar sin féin",
     "goneTitle": "Scriosadh an cainéal seo",
-    "goneBody": "Scrios duine éigin an cainéal agus an fhuinneog ar oscailt. Níor sábháladh d'athruithe."
+    "goneBody": "Scrios duine éigin an cainéal agus an fhuinneog ar oscailt. Níor sábháladh d'athruithe.",
+    "tooLong": "Ní féidir a shábháil: tá an cur síos rófhada don fhreastalaí seo",
+    "tooLongTip": "Tá an cur síos rófhada don fhreastalaí seo"
   },
   "perm": {
     "everyone": "Gach duine",

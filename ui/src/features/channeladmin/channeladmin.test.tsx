@@ -132,6 +132,22 @@ describe("Channel window (FR-10.21–FR-10.24)", () => {
     );
   });
 
+  it("disables Save with the reason when the description is too long (issue #666)", async () => {
+    await renderTree({ 2: ADMIN });
+    fireEvent.keyDown(row(/^Raid/), { key: "F2" });
+    const dialog = screen.getByRole("dialog", { name: "Edit channel" });
+    const field = within(dialog).getByRole("textbox", { name: "Description" });
+    field.innerHTML = `<p>${"x".repeat(6000)}</p>`;
+    fireEvent.input(field);
+    expect(within(dialog).getByRole("button", { name: "Save changes" })).toBeDisabled();
+    expect(dialog).toHaveTextContent("Can't save: the description is too long for this server");
+    expect(within(dialog).getByRole("meter", { name: "Length" })).toHaveAttribute(
+      "aria-valuetext",
+      "6,007 / 5,000",
+    );
+    expect(await axeViolations(dialog)).toEqual([]);
+  });
+
   it("saves only what changed and asks before moving under another parent", async () => {
     await renderTree({ 2: ADMIN });
     fireEvent.keyDown(row(/^Raid/), { key: "F2" });

@@ -227,7 +227,9 @@
     "conflictReload": "Lataa uudelleen",
     "conflictMine": "Tallenna omani silti",
     "goneTitle": "Kanava on poistettu",
-    "goneBody": "Joku poisti kanavan, kun ikkuna oli auki. Muutoksiasi ei tallennettu."
+    "goneBody": "Joku poisti kanavan, kun ikkuna oli auki. Muutoksiasi ei tallennettu.",
+    "tooLong": "Tallennus ei onnistu: kuvaus on liian pitkä tälle palvelimelle",
+    "tooLongTip": "Kuvaus on liian pitkä tälle palvelimelle"
   },
   "perm": {
     "everyone": "Kaikki",

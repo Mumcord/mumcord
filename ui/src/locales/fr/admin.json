@@ -230,7 +230,9 @@
     "conflictReload": "Recharger",
     "conflictMine": "Enregistrer la mienne quand même",
     "goneTitle": "Ce salon a été supprimé",
-    "goneBody": "Quelqu'un a supprimé ce salon pendant que la fenêtre était ouverte. Vos modifications n'ont pas été enregistrées."
+    "goneBody": "Quelqu'un a supprimé ce salon pendant que la fenêtre était ouverte. Vos modifications n'ont pas été enregistrées.",
+    "tooLong": "Enregistrement impossible : la description est trop longue pour ce serveur",
+    "tooLongTip": "La description est trop longue pour ce serveur"
   },
   "perm": {
     "everyone": "Tout le monde",

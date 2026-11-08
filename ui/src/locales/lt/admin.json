@@ -233,7 +233,9 @@
     "conflictReload": "Įkelti iš naujo",
     "conflictMine": "Vis tiek išsaugoti mano",
     "goneTitle": "Šis kanalas ištrintas",
-    "goneBody": "Kažkas ištrynė kanalą, kol langas buvo atidarytas. Tavo pakeitimai neišsaugoti."
+    "goneBody": "Kažkas ištrynė kanalą, kol langas buvo atidarytas. Tavo pakeitimai neišsaugoti.",
+    "tooLong": "Nepavyksta išsaugoti: aprašas per ilgas šiam serveriui",
+    "tooLongTip": "Aprašas per ilgas šiam serveriui"
   },
   "perm": {
     "everyone": "Visi",
