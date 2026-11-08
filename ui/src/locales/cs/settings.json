@@ -557,6 +557,9 @@
     "setupWizardRun": "Spustit průvodce nastavením znovu",
     "setupWizardIdentityNote": "Tvoje identita do toho nepatří. Tvůj certifikát a s ním registrované jméno a oprávnění na serverech zůstávají přesně tak, jak jsou.",
     "setupWizardIdentityLink": "Spravuj ji v části Identita",
+    "tipsTitle": "Tipy",
+    "tipsHint": "Clippy tě asi za minutu provede Mumcordem: servery, kanály, mluvení, chat a další.",
+    "tipsShow": "Zobrazit tipy",
     "versionTitle": "Verze a licence"
   },
   "profile": {

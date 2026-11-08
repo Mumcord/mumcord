@@ -557,6 +557,9 @@
     "setupWizardRun": "Uruchom kreator konfiguracji ponownie",
     "setupWizardIdentityNote": "Twoja tożsamość nie jest tego częścią. Twój certyfikat, a z nim zarejestrowana nazwa i uprawnienia na serwerach, pozostaje dokładnie taki, jaki jest.",
     "setupWizardIdentityLink": "Zarządzaj nią w sekcji Tożsamość",
+    "tipsTitle": "Wskazówki",
+    "tipsHint": "Clippy w około minutę oprowadzi Cię po Mumcordzie: serwery, kanały, mówienie, czat i więcej.",
+    "tipsShow": "Pokaż wskazówki",
     "versionTitle": "Wersja i licencja"
   },
   "profile": {

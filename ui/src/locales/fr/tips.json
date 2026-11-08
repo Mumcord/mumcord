@@ -1,0 +1,52 @@
+{
+  "label": "Clippy, l’assistant des astuces",
+  "greeting": {
+    "title": "Bonjour, je suis Clippy !",
+    "body": "Je connais Mumcord comme ma poche. Une petite visite ? Elle dure environ une minute. Sinon, vous me trouverez dans Paramètres → À propos → Astuces.",
+    "start": "Montrez-moi",
+    "later": "Pas maintenant"
+  },
+  "progress": "Astuce {{current}} sur {{total}}",
+  "back": "Retour",
+  "next": "Suivant",
+  "done": "Terminé",
+  "close": "Fermer les astuces",
+  "tips": {
+    "servers": {
+      "title": "Vos serveurs",
+      "body": "La barre tout à gauche contient vos serveurs. Ajoutez-en un avec +, ou parcourez les serveurs publics avec la loupe. Vous pouvez vous connecter à plusieurs serveurs à la fois."
+    },
+    "channels": {
+      "title": "Canaux",
+      "body": "Double-cliquez sur un canal pour le rejoindre et parler. Un simple clic affiche sa discussion sans le rejoindre, et « Suivre » vous tient au courant."
+    },
+    "talk": {
+      "title": "Votre façon de parler",
+      "body": "Push-to-talk ou activation vocale ? Choisissez dans Paramètres → Voix et audio. Le push-to-talk fonctionne aussi avec les boutons de la souris."
+    },
+    "panel": {
+      "title": "Votre panneau utilisateur",
+      "body": "En bas à gauche, vous coupez le micro ou le son, activez la caméra ou raccrochez. Les petites flèches à côté ouvrent d’autres options."
+    },
+    "search": {
+      "title": "Tout trouver",
+      "body": "Appuyez sur {{key}} pour trouver des personnes et des canaux, même sur les grands serveurs."
+    },
+    "chat": {
+      "title": "Discussion",
+      "body": "Répondez à un message, citez-le, @mentionnez des personnes et partagez des images et des fichiers. Les boutons de mise en forme apparaissent pendant que vous écrivez."
+    },
+    "apps": {
+      "title": "Applis",
+      "body": "Le bouton Applis de la barre de message lance un partage d’écran, une watch party ou votre caméra. Les plugins en ajoutent d’autres."
+    },
+    "themes": {
+      "title": "Votre style",
+      "body": "Paramètres → Apparence propose des thèmes sombres et clairs. Un serveur peut avoir le sien : faites un clic droit dessus et choisissez « Thème »."
+    },
+    "end": {
+      "title": "C’est tout !",
+      "body": "Amusez-vous bien sur Mumcord. Vous pouvez me rappeler à tout moment dans Paramètres → À propos → Astuces."
+    }
+  }
+}

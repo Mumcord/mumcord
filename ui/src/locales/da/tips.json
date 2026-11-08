@@ -1,0 +1,52 @@
+{
+  "label": "Clippy, tipshjælperen",
+  "greeting": {
+    "title": "Hej, jeg er Clippy!",
+    "body": "Jeg kender Mumcord som min egen bukselomme. Har du lyst til en hurtig rundvisning? Den tager cirka et minut. Hvis ikke nu, finder du mig under Indstillinger → Om → Tips.",
+    "start": "Vis mig det",
+    "later": "Ikke nu"
+  },
+  "progress": "Tip {{current}} af {{total}}",
+  "back": "Tilbage",
+  "next": "Næste",
+  "done": "Færdig",
+  "close": "Luk tips",
+  "tips": {
+    "servers": {
+      "title": "Dine servere",
+      "body": "Bjælken yderst til venstre viser dine servere. Tilføj en med +, eller gennemse offentlige servere med forstørrelsesglasset. Du kan være forbundet til flere servere på én gang."
+    },
+    "channels": {
+      "title": "Kanaler",
+      "body": "Dobbeltklik på en kanal for at deltage og tale. Et enkelt klik viser kanalens chat uden at deltage, og Følg holder dig opdateret."
+    },
+    "talk": {
+      "title": "Sådan taler du",
+      "body": "Push-to-talk eller stemmeaktivering? Vælg under Indstillinger → Tale og lyd. Push-to-talk virker også med museknapper."
+    },
+    "panel": {
+      "title": "Dit brugerpanel",
+      "body": "Nederst til venstre slår du mikrofonen eller lyden fra, tænder kameraet eller lægger på. De små pile ved siden af åbner flere valg."
+    },
+    "search": {
+      "title": "Find alt",
+      "body": "Tryk på {{key}} for at finde personer og kanaler, også på store servere."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Svar på en besked, citér den, omtal personer med @, og del billeder og filer. Formateringsknapperne dukker op, mens du skriver."
+    },
+    "apps": {
+      "title": "Apps",
+      "body": "Knappen Apps i beskedfeltet starter skærmdeling, en watch party eller dit kamera. Plugins tilføjer flere."
+    },
+    "themes": {
+      "title": "Dit look",
+      "body": "Under Indstillinger → Udseende finder du mørke og lyse temaer. En server kan få sit eget: højreklik på den, og vælg Tema."
+    },
+    "end": {
+      "title": "Det var det!",
+      "body": "God fornøjelse med Mumcord. Du kan kalde på mig igen når som helst under Indstillinger → Om → Tips."
+    }
+  }
+}

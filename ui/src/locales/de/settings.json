@@ -551,6 +551,9 @@
     "setupWizardRun": "Einrichtung erneut ausführen",
     "setupWizardIdentityNote": "Deine Identität gehört nicht dazu. Dein Zertifikat und damit dein registrierter Name und deine Rechte auf Servern bleiben genau, wie sie sind.",
     "setupWizardIdentityLink": "Verwalte sie unter Identität",
+    "tipsTitle": "Tipps",
+    "tipsHint": "Clippy zeigt dir Mumcord in etwa einer Minute: Server, Kanäle, Sprechen, Chat und mehr.",
+    "tipsShow": "Tipps anzeigen",
     "versionTitle": "Version und Lizenz"
   },
   "profile": {
