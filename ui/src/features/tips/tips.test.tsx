@@ -6,13 +6,14 @@ import { fakeView } from "../../app/testView";
 import { useView, ViewContext } from "../../app/view";
 import { ViewProvider } from "../../app/ViewProvider";
 import { applyLanguage } from "../../i18n";
+import { subscribeAnnouncements } from "../../a11y/announcer";
 import { axeViolations } from "../../test/axe";
 import { TipsCard } from "../settings/sections/AboutSection";
 import { TipsHost } from "./TipsHost";
 import { GAP } from "./placement";
 import { closeTour, offerTour, startTour, TIPS } from "./tour";
 
-const dialog = () => screen.getByRole("dialog", { name: "Aaron, the tips helper" });
+const bubble = () => screen.getByRole("region", { name: "Aaron, the tips helper" });
 const button = (name: string) => screen.getByRole("button", { name });
 const aaron = () => screen.getByTestId("aaron");
 
@@ -54,7 +55,27 @@ afterEach(() => {
 describe("Aaron's tips", () => {
   it("shows nothing until the tour is offered or started", () => {
     render(<TipsHost />);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Aaron, the tips helper" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("reads the offer and every tip out to screen readers", () => {
+    const spoken: string[] = [];
+    const unsubscribe = subscribeAnnouncements((a) => {
+      spoken.push(a.message);
+    });
+    render(<TipsHost />);
+    act(() => {
+      offerTour();
+    });
+    fireEvent.click(button("Show me"));
+    fireEvent.click(button("Next"));
+    unsubscribe();
+    expect(spoken).toHaveLength(3);
+    expect(spoken[0]).toContain("Hi, I'm Aaron!");
+    expect(spoken[1]).toContain("Your servers");
+    expect(spoken[2]).not.toContain("Your servers");
   });
 
   it("offers the tour and walks through every tip to the end", () => {
@@ -62,21 +83,23 @@ describe("Aaron's tips", () => {
     act(() => {
       offerTour();
     });
-    expect(dialog()).toHaveTextContent("Hi, I'm Aaron!");
+    expect(bubble()).toHaveTextContent("Hi, I'm Aaron!");
     expect(screen.getByTestId("aaron")).toBeInTheDocument();
     expect(button("Show me")).toHaveFocus();
 
     fireEvent.click(button("Show me"));
-    expect(dialog()).toHaveTextContent(`Tip 1 of ${String(TIPS.length)}`);
-    expect(dialog()).toHaveTextContent("Your servers");
+    expect(bubble()).toHaveTextContent(`Tip 1 of ${String(TIPS.length)}`);
+    expect(bubble()).toHaveTextContent("Your servers");
     expect(screen.queryByRole("button", { name: "Back" })).not.toBeInTheDocument();
     expect(button("Next")).toHaveFocus();
 
     for (let tip = 1; tip < TIPS.length; tip += 1) fireEvent.click(button("Next"));
-    expect(dialog()).toHaveTextContent(`Tip ${String(TIPS.length)} of ${String(TIPS.length)}`);
-    expect(dialog()).toHaveTextContent("That's it!");
+    expect(bubble()).toHaveTextContent(`Tip ${String(TIPS.length)} of ${String(TIPS.length)}`);
+    expect(bubble()).toHaveTextContent("That's it!");
     fireEvent.click(button("Done"));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Aaron, the tips helper" }),
+    ).not.toBeInTheDocument();
   });
 
   it("goes back a tip and names the search shortcut", () => {
@@ -85,9 +108,9 @@ describe("Aaron's tips", () => {
       startTour();
     });
     for (let tip = 0; tip < TIPS.indexOf("search"); tip += 1) fireEvent.click(button("Next"));
-    expect(dialog()).toHaveTextContent("Press Ctrl K to find people and channels");
+    expect(bubble()).toHaveTextContent("Press Ctrl K to find people and channels");
     fireEvent.click(button("Back"));
-    expect(dialog()).toHaveTextContent("Your user panel");
+    expect(bubble()).toHaveTextContent("Your user panel");
   });
 
   it("floats next to the tip's element and points at it", () => {
@@ -102,13 +125,13 @@ describe("Aaron's tips", () => {
       startTour();
     });
     expect(aaron()).toHaveAttribute("data-pose", "point-left");
-    expect(dialog()).toHaveClass("tips--mascot-left");
-    expect(dialog()).toHaveStyle({ left: `${String(72 + GAP)}px` });
+    expect(bubble()).toHaveClass("tips--mascot-left");
+    expect(bubble()).toHaveStyle({ left: `${String(72 + GAP)}px` });
 
     for (let tip = 0; tip < TIPS.indexOf("apps"); tip += 1) fireEvent.click(button("Next"));
-    expect(dialog()).toHaveTextContent("Apps");
+    expect(bubble()).toHaveTextContent("Apps");
     expect(aaron()).toHaveAttribute("data-pose", "point-right");
-    expect(dialog()).not.toHaveClass("tips--mascot-left");
+    expect(bubble()).not.toHaveClass("tips--mascot-left");
   });
 
   it("dims the window during the tour and spotlights the tip's element", () => {
@@ -146,7 +169,7 @@ describe("Aaron's tips", () => {
     });
     expect(aaron()).toHaveAttribute("data-pose", "idle");
     fireEvent.click(button("Show me"));
-    expect(dialog()).toHaveTextContent("Your servers");
+    expect(bubble()).toHaveTextContent("Your servers");
     expect(aaron()).toHaveAttribute("data-pose", "idle");
     for (let tip = 1; tip < TIPS.length; tip += 1) fireEvent.click(button("Next"));
     expect(aaron()).toHaveAttribute("data-pose", "idle");
@@ -178,7 +201,9 @@ describe("Aaron's tips", () => {
     });
     fireEvent.click(button("Next"));
     fireEvent.click(button("Skip tour"));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Aaron, the tips helper" }),
+    ).not.toBeInTheDocument();
   });
 
   it("closes a tip with Escape from any of its buttons", () => {
@@ -189,7 +214,9 @@ describe("Aaron's tips", () => {
     fireEvent.click(button("Next"));
     expect(button("Next")).toHaveFocus();
     fireEvent.keyDown(button("Back"), { key: "Escape" });
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Aaron, the tips helper" }),
+    ).not.toBeInTheDocument();
   });
 
   it.each([
@@ -202,7 +229,9 @@ describe("Aaron's tips", () => {
       offerTour();
     });
     close();
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Aaron, the tips helper" }),
+    ).not.toBeInTheDocument();
   });
 
   it("has no axe violations", async () => {
@@ -210,7 +239,7 @@ describe("Aaron's tips", () => {
     act(() => {
       startTour();
     });
-    expect(await axeViolations(dialog())).toEqual([]);
+    expect(await axeViolations(bubble())).toEqual([]);
   });
 
   it("offers the tour when the first-start wizard finishes", async () => {
@@ -231,9 +260,11 @@ describe("Aaron's tips", () => {
         </ViewProvider>
       </PreferencesProvider>,
     );
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Aaron, the tips helper" }),
+    ).not.toBeInTheDocument();
     fireEvent.click(await screen.findByRole("button", { name: "Finish" }));
-    expect(dialog()).toHaveTextContent("Hi, I'm Aaron!");
+    expect(bubble()).toHaveTextContent("Hi, I'm Aaron!");
   });
 });
 
@@ -248,6 +279,6 @@ describe("Settings → About → Tips", () => {
     );
     fireEvent.click(button("Show tips"));
     expect(view.closeOverlay).toHaveBeenCalledOnce();
-    expect(dialog()).toHaveTextContent(`Tip 1 of ${String(TIPS.length)}`);
+    expect(bubble()).toHaveTextContent(`Tip 1 of ${String(TIPS.length)}`);
   });
 });

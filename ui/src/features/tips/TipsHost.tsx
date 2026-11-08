@@ -84,6 +84,7 @@ export function TipsHost() {
 
   const tip: TipId | null = tour.kind === "tip" ? (TIPS[tour.index] ?? "end") : null;
   const target = tip === "end" ? null : tip;
+  const searchKey = macos ? "⌘K" : t("channels:search.shortcut");
 
   // Floats next to the target, measured again whenever the window or anything in it scrolls or
   // changes size. Runs before paint, so the guide never flashes at its old place.
@@ -140,10 +141,14 @@ export function TipsHost() {
     };
   }, [tour]);
 
-  // The offer pops up on its own after the wizard, so screen readers hear it too.
+  // The offer pops up on its own after the wizard and every tip replaces the bubble's text, so
+  // screen readers hear each step; the bubble is a plain region, which is not read out by itself.
   useEffect(() => {
     if (tour.kind === "offer") announce(`${t("greeting.title")} ${t("greeting.body")}`);
-  }, [tour.kind, t]);
+    else if (tip !== null) {
+      announce(`${t(`tips.${tip}.title`)} ${t(`tips.${tip}.body`, { key: searchKey })}`);
+    }
+  }, [tour, tip, searchKey, t]);
 
   // Keyboard users land on the bubble's main button for every new step.
   useEffect(() => {
@@ -185,7 +190,6 @@ export function TipsHost() {
   } else {
     const id: TipId = tip ?? "end";
     const last = tour.index === TIPS.length - 1;
-    const searchKey = macos ? "⌘K" : t("channels:search.shortcut");
     title = t(`tips.${id}.title`);
     body = t(`tips.${id}.body`, { key: searchKey });
     progress = t("progress", { current: tour.index + 1, total: TIPS.length });
@@ -242,7 +246,10 @@ export function TipsHost() {
         ref={guide}
         className={classes.join(" ")}
         style={style}
-        role="dialog"
+        // A labelled region, not a dialog: the bubble is non-modal and sits beside the app, and
+        // assistive tech (and the app's own dialog lookups) must not take it for a real dialog.
+        // Its text reaches screen readers through the announcements above.
+        role="region"
         aria-label={t("label")}
         aria-describedby={`${titleId} ${bodyId}`}
       >
