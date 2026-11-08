@@ -30,6 +30,7 @@ function onSystem(os: string, distro: LinuxDistro | null) {
     os,
     appimage: true,
     portable: false,
+    limits: [],
     distro,
   });
 }

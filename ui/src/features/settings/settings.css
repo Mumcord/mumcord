@@ -319,6 +319,18 @@
   color: var(--color-text-muted);
 }
 
+/* The platform limits of the About card (FR-13.27): a short list, not prose. */
+.settings-limits {
+  margin: var(--space-1) 0;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.settings-limits li + li {
+  margin-top: var(--space-1);
+}
+
 .settings-control-row__text {
   flex: 1 1 auto;
   min-width: 0;

@@ -83,7 +83,12 @@ struct State {
     /// The configured key is a mouse button.
     mouse_key: bool,
     /// Shortcut currently registered with the global-shortcut plugin.
-    #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos"))]
+    #[cfg(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "windows",
+        target_os = "macos"
+    ))]
     registered: Option<String>,
     #[cfg(target_os = "linux")]
     portal: Option<portal::Binding>,
@@ -97,7 +102,12 @@ static STATE: Mutex<State> = Mutex::new(State {
     pressed: false,
     last_failure: None,
     mouse_key: false,
-    #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos"))]
+    #[cfg(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "windows",
+        target_os = "macos"
+    ))]
     registered: None,
     #[cfg(target_os = "linux")]
     portal: None,
@@ -538,7 +548,12 @@ pub(crate) fn portal_trigger(canonical: &str) -> Option<String> {
 // Global-shortcut plugin (X11, Windows, macOS)
 // ---------------------------------------------------------------------------------------------
 
-#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos"))]
+#[cfg(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+))]
 fn register_global<R: Runtime>(app: &AppHandle<R>, key: &str) -> Result<(), PttUnavailableReason> {
     use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
@@ -562,7 +577,12 @@ fn register_global<R: Runtime>(app: &AppHandle<R>, key: &str) -> Result<(), PttU
     Ok(())
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 fn register_global<R: Runtime>(
     _app: &AppHandle<R>,
     _key: &str,
@@ -571,7 +591,12 @@ fn register_global<R: Runtime>(
 }
 
 fn unregister_global<R: Runtime>(app: &AppHandle<R>) {
-    #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos"))]
+    #[cfg(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "windows",
+        target_os = "macos"
+    ))]
     {
         use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
@@ -582,7 +607,12 @@ fn unregister_global<R: Runtime>(app: &AppHandle<R>) {
             tracing::warn!("unregistering the push-to-talk shortcut failed: {err}");
         }
     }
-    #[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
+    #[cfg(not(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "windows",
+        target_os = "macos"
+    )))]
     let _ = app;
 }
 
@@ -1154,7 +1184,12 @@ mod tests {
         assert_eq!(normalize_key("Ctrl+"), Err(KeyError::InvalidFormat));
     }
 
-    #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos"))]
+    #[cfg(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "windows",
+        target_os = "macos"
+    ))]
     #[test]
     fn canonical_keys_are_accepted_by_the_plugin() {
         use tauri_plugin_global_shortcut::Shortcut;

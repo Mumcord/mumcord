@@ -351,6 +351,7 @@ describe("WhatsNewOnStart", () => {
       appimage: false,
       portable: false,
       distro: null,
+              limits: [],
     });
     const open = vi.spyOn(api, "changelogOpen");
     const seen = vi.spyOn(api, "whatsNewMarkSeen");

@@ -47,15 +47,30 @@ type Source = mpris::Reader;
 type Source = gsmtc::Reader;
 #[cfg(target_os = "macos")]
 type Source = macos::Reader;
-#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 type Source = Unsupported;
 
 /// No media information on this platform.
-#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 #[derive(Default)]
 struct Unsupported;
 
-#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 impl Unsupported {
     // Same shape as the real readers.
     async fn read(&mut self) -> Option<mumcord_engine::LocalTrack> {

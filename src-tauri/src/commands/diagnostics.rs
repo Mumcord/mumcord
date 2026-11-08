@@ -24,6 +24,43 @@ pub struct AppInfo {
     /// The Linux distribution, for the missing-codec install hint (FR-2.41a); `None` on other
     /// systems or without a readable os-release file.
     pub distro: Option<LinuxDistro>,
+    /// What this platform cannot offer (FR-13.27): the UI disables those entries and the About
+    /// note lists them. Empty where everything works.
+    pub limits: Vec<PlatformLimit>,
+}
+
+/// A feature this platform cannot provide, with the reason named in the About note.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PlatformLimit {
+    /// No camera backend.
+    Camera,
+    /// No ONNX Runtime for the AI backgrounds.
+    CameraEffects,
+    /// No PipeWire to take an application's sound into a share.
+    ScreenShareSound,
+    /// No `xdg-desktop-portal` to pick a window or an app.
+    WindowPicker,
+    /// No in-game overlay.
+    Overlay,
+}
+
+/// What this build cannot do, from the platform it is compiled for.
+fn platform_limits() -> Vec<PlatformLimit> {
+    #[cfg(target_os = "freebsd")]
+    {
+        vec![
+            PlatformLimit::Camera,
+            PlatformLimit::CameraEffects,
+            PlatformLimit::ScreenShareSound,
+            PlatformLimit::WindowPicker,
+            PlatformLimit::Overlay,
+        ]
+    }
+    #[cfg(not(target_os = "freebsd"))]
+    {
+        Vec::new()
+    }
 }
 
 /// `ID` and `ID_LIKE` from os-release, e.g. `linuxmint` like `ubuntu debian`.
@@ -57,6 +94,7 @@ pub fn app_info() -> ApiResult<AppInfo> {
         appimage: appimage(),
         portable: crate::portable::is_active(),
         distro: distro(),
+        limits: platform_limits(),
     })
 }
 
@@ -107,6 +145,18 @@ fn parse_os_release(text: &str) -> Option<LinuxDistro> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// FreeBSD names every gap the specification documents (FR-13.27).
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn freebsd_reports_every_platform_limit() {
+        let limits = platform_limits();
+        assert!(limits.contains(&PlatformLimit::Camera));
+        assert!(limits.contains(&PlatformLimit::CameraEffects));
+        assert!(limits.contains(&PlatformLimit::ScreenShareSound));
+        assert!(limits.contains(&PlatformLimit::WindowPicker));
+        assert!(limits.contains(&PlatformLimit::Overlay));
+    }
 
     #[test]
     fn reads_id_and_id_like() {

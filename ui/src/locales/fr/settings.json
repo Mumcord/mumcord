@@ -563,7 +563,14 @@
     "tipsTitle": "Astuces",
     "tipsHint": "Aaron te fait découvrir Mumcord en une minute environ : serveurs, salons, parole, chat et plus encore.",
     "tipsShow": "Afficher les astuces",
-    "versionTitle": "Version et licence"
+    "versionTitle": "Version et licence",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509)."
   },
   "profile": {
     "title": "Profil",

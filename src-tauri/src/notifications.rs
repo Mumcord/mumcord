@@ -298,7 +298,12 @@ async fn show(
 #[cfg(any(target_os = "windows", target_os = "macos"))]
 async fn close(_notifier: &Notifier, _ids: Vec<u32>) {}
 
-#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 async fn show(
     _app: &AppHandle,
     _notifier: &Notifier,
@@ -308,7 +313,12 @@ async fn show(
     Err("desktop notifications are not supported on this platform".into())
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 async fn close(_notifier: &Notifier, _ids: Vec<u32>) {}
 
 /// A click on a notification: brings the window to the front and tells the UI which server and

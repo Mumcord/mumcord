@@ -563,7 +563,14 @@
     "tipsTitle": "Padomi",
     "tipsHint": "Aarons apmēram minūtē izrāda Mumcord: serverus, kanālus, runāšanu, tērzēšanu un vēl daudz ko.",
     "tipsShow": "Rādīt padomus",
-    "versionTitle": "Versija un licence"
+    "versionTitle": "Versija un licence",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509)."
   },
   "profile": {
     "title": "Profils",
