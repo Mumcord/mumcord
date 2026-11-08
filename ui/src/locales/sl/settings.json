@@ -450,12 +450,16 @@
   },
   "notifications": {
     "title": "Obvestila",
-    "legend": "Obvestila za nova sporočila",
-    "explanation": "Za nova sporočila v tvojem kanalu, kanalih, ki jim slediš, in zasebnih klepetih, razen klepeta, ki ga gledaš.",
-    "inApp": "V aplikaciji: majhno pojavno okno v Mumcordu, ko je v ospredju",
-    "desktop": "Namizje: sistemsko obvestilo",
-    "both": "Oboje: pojavno okno, ko je Mumcord v ospredju, sicer sistemsko obvestilo",
-    "off": "Izklopljeno",
+    "explanation": "Kako vas Mumcord obvešča o novih sporočilih in dogajanju na vaših strežnikih. Vsaka vrsta ima svojo izbiro.",
+    "messages": "Nova sporočila",
+    "messagesHint": "Vaš kanal, kanali, ki jim sledite, in zasebni klepeti",
+    "mode": {
+      "off": "Izklopljeno",
+      "inApp": "V aplikaciji",
+      "desktop": "Sistem",
+      "both": "Oboje"
+    },
+    "modesHint": "V aplikaciji: majhno pojavno okno v Mumcordu, ko je v ospredju. Sistem: obvestilo vašega operacijskega sistema. Oboje: pojavno okno, ko je Mumcord v ospredju, sicer sistemsko obvestilo. Za klepet, ki ga trenutno gledate, in med načinom Ne moti se ne prikaže nič.",
     "activityTitle": "Obvestila o dejavnosti",
     "activity": {
       "screenShare": "Nekdo začne deliti zaslon",
@@ -1291,6 +1295,8 @@
   },
   "activityHistory": {
     "title": "Zgodovina dejavnosti",
+    "keep": "Ohrani zgodovino dejavnosti po ponovnem zagonu",
+    "keepHint": "Shrani, kdo se je povezal, odšel, zamenjal kanal, delil zaslon ali začel watch party, da je vir po ponovnem zagonu še vedno tam. Izklopljeno: vir se vsakič začne prazen. Z izklopom se shranjeno izbriše.",
     "clear": "Počisti zgodovino dejavnosti",
     "hint": "Odstrani shranjen vir za vse strežnike.",
     "local": "Shranjeno samo v tej napravi.",

@@ -33,6 +33,7 @@
     "voice": "Głos",
     "setupStyle": "Styl konfiguracji",
     "privateMessages": "Wiadomości prywatne",
+    "notifications": "Powiadomienia",
     "connections": "Połączenia",
     "features": "Funkcje",
     "appearance": "Wygląd",
@@ -146,6 +147,10 @@
     "subtitle": "Wiadomości prywatne to rozmowy jeden na jeden. Ten wybór nie wpływa na czat kanału.",
     "local": "Filtrowanie odbywa się na Twoim komputerze. Nadawcy nie są o tym informowani. Później możesz ustawić inną regułę dla każdego serwera."
   },
+  "notifications": {
+    "title": "Jak Mumcord ma cię powiadamiać?",
+    "subtitle": "Wybierz, w jaki sposób każdy rodzaj wiadomości ma do ciebie docierać. Możesz to później zmienić w Ustawienia → Powiadomienia."
+  },
   "connections": {
     "title": "Połączenia i treści",
     "subtitle": "Niektóre funkcje łączą Cię bezpośrednio z innymi użytkownikami Mumcord, a część treści czatu jest ładowana z innych stron. Wybierz, co jest dla Ciebie w porządku.",
@@ -185,6 +190,7 @@
       "identity": "Tożsamość",
       "voice": "Głos",
       "privateMessages": "Wiadomości prywatne",
+      "notifications": "Powiadomienia",
       "connections": "Połączenia",
       "chatContent": "Treści czatu",
       "features": "Funkcje",
@@ -195,10 +201,12 @@
     "identityDetail": "Zapisana w systemowym pęku kluczy",
     "voiceDetail": "Odszumianie: {{noise}}",
     "pmDetail": "Mój kanał {{channel}} · zaakceptowane czaty {{accepted}} · prośby {{requests}}",
+    "notificationsTitle": "Nowe wiadomości: {{mode}}",
+    "notificationsDetail": "Powiadomienia o aktywności: włączono {{on}} z {{total}}",
     "contentTitle": "Podglądy linków: {{previews}}",
     "contentDetail": "Obrazy w pełnym rozmiarze: {{images}} · synchronizacja historii: {{sync}}",
     "featuresTitle": "Nakładka w grze: {{overlay}}",
-    "featuresDetail": "Podążaj za systemowym trybem Nie przeszkadzać: {{dnd}} · teraz odtwarzane: {{playing}} · teraz gram: {{gaming}}",
+    "featuresDetail": "Podążaj za systemowym trybem Nie przeszkadzać: {{dnd}} · teraz odtwarzane: {{playing}} · teraz gram: {{gaming}} · historia aktywności {{history}}",
     "effectsDetail": "Efekty wizualne: {{effects}}",
     "startupTitle": "Uruchamianie przy logowaniu: {{login}}",
     "startupDetail": "Uruchamianie zminimalizowane: {{minimized}} · linki mumble://: {{links}}",

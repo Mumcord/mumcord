@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Teavitused",
-    "legend": "Uute sõnumite teavitused",
-    "explanation": "Uute sõnumite kohta sinu kanalis, jälgitavates kanalites ja privaatvestlustes, välja arvatud vestlus, mida parasjagu vaatad.",
-    "inApp": "Rakenduses: väike hüpikaken Mumcordi sees, kui see on esiplaanil",
-    "desktop": "Töölaual: süsteemi teavitus",
-    "both": "Mõlemad: hüpikaken, kui Mumcord on esiplaanil, muidu süsteemi teavitus",
-    "off": "Väljas",
+    "explanation": "Kuidas Mumcord teavitab sind uutest sõnumitest ja sellest, mis sinu serverites toimub. Igal liigil on oma valik.",
+    "messages": "Uued sõnumid",
+    "messagesHint": "Sinu kanal, jälgitavad kanalid ja privaatvestlused",
+    "mode": {
+      "off": "Väljas",
+      "inApp": "Rakenduses",
+      "desktop": "Süsteem",
+      "both": "Mõlemad"
+    },
+    "modesHint": "Rakenduses: väike hüpikaken Mumcordi sees, kui see on esiplaanil. Süsteem: sinu operatsioonisüsteemi teavitus. Mõlemad: hüpikaken, kui Mumcord on esiplaanil, muidu süsteemi teavitus. Vestluse kohta, mida parasjagu vaatad, ega režiimis Ära sega midagi ei näidata.",
     "activityTitle": "Tegevuste teavitused",
     "activity": {
       "screenShare": "Keegi alustab ekraani jagamist",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Tegevuste ajalugu",
+    "keep": "Säilita tegevuste ajalugu pärast taaskäivitust",
+    "keepHint": "Salvestab, kes ühendus, lahkus, vahetas kanalit, jagas ekraani või alustas ühisvaatamist, et voog oleks pärast taaskäivitust alles. Väljas: voog algab iga kord tühjana. Väljalülitamine kustutab salvestatu.",
     "clear": "Kustuta tegevuste ajalugu",
     "hint": "Eemaldab kõigi serverite salvestatud voo.",
     "local": "Salvestatakse ainult selles seadmes.",

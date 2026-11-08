@@ -1545,6 +1545,11 @@ export type ActiveEncoder = {
 
 /**  One new activity-feed event as the UI would announce it (#597). Texts are translated and plain. */
 export type ActivityNotice = {
+	/**
+	 *  The activity kind whose setting decides; `null` for other notices (the relay warning),
+	 *  which follow the message setting.
+	 */
+	kind: ActivityNotifyKind | null,
 	serverId: number,
 	/**
 	 *  The channel the event happened in; clicking the notification opens its chat, where the
@@ -1558,15 +1563,21 @@ export type ActivityNotice = {
 	actionLabel: string,
 };
 
-/**  Activity-feed events that notify like messages (#597). */
+/**  Which setting decides how an activity event notifies (#660). */
+export type ActivityNotifyKind = "joins" | "screenShare" | "watchParty" | "pluginActivity" | "pluginEvent";
+
+/**
+ *  How each kind of activity-feed event notifies (#597, #660), with the same choices as
+ *  messages. Every kind starts as `inApp`.
+ */
 export type ActivityNotifySettings = {
-	/**  Someone connected, left or moved channel. Off by default. */
-	joins: boolean,
-	screenShare: boolean,
-	watchParty: boolean,
-	pluginActivity: boolean,
+	/**  Someone connected, left or moved channel. */
+	joins: NotificationMode,
+	screenShare: NotificationMode,
+	watchParty: NotificationMode,
+	pluginActivity: NotificationMode,
 	/**  Events a plugin pushes to the feed. */
-	pluginEvent: boolean,
+	pluginEvent: NotificationMode,
 };
 
 /**  Error returned by every failing command. */
@@ -4994,6 +5005,8 @@ export type Settings = {
 	notifications: NotificationMode,
 	/**  Activity events that notify (#597). */
 	activityNotify: ActivityNotifySettings,
+	/**  "Keep activity history after a restart" (#661); off by default. */
+	keepActivityHistory: boolean,
 	closeBehaviour: CloseBehaviour,
 	chatDisplay: ChatDisplay,
 	logLevel: LogLevel,

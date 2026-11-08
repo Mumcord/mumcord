@@ -33,6 +33,7 @@
     "voice": "Hlas",
     "setupStyle": "Styl nastavení",
     "privateMessages": "Soukromé zprávy",
+    "notifications": "Oznámení",
     "connections": "Připojení",
     "features": "Funkce",
     "appearance": "Vzhled",
@@ -146,6 +147,10 @@
     "subtitle": "Soukromé zprávy jsou konverzace jeden na jednoho. Chat kanálu touto volbou nijak neovlivníte.",
     "local": "Filtrování probíhá ve vašem počítači. Odesílatelé se to nedozvědí. Jiné pravidlo pro každý server můžete nastavit později."
   },
+  "notifications": {
+    "title": "Jak vás má Mumcord informovat?",
+    "subtitle": "Vyberte, jak se k vám má dostat každý druh zpráv. Později to můžete změnit v Nastavení → Oznámení."
+  },
   "connections": {
     "title": "Připojení a obsah",
     "subtitle": "Některé funkce vás spojují přímo s dalšími uživateli Mumcordu a část obsahu chatu se načítá z jiných webů. Vyberte, co vám vyhovuje.",
@@ -185,6 +190,7 @@
       "identity": "Identita",
       "voice": "Hlas",
       "privateMessages": "Soukromé zprávy",
+      "notifications": "Oznámení",
       "connections": "Připojení",
       "chatContent": "Obsah chatu",
       "features": "Funkce",
@@ -195,10 +201,12 @@
     "identityDetail": "Uloženo v klíčence vašeho systému",
     "voiceDetail": "Potlačení šumu: {{noise}}",
     "pmDetail": "Můj kanál {{channel}} · přijaté chaty {{accepted}} · žádosti {{requests}}",
+    "notificationsTitle": "Nové zprávy: {{mode}}",
+    "notificationsDetail": "Oznámení o aktivitě: zapnuto {{on}} z {{total}}",
     "contentTitle": "Náhledy odkazů {{previews}}",
     "contentDetail": "Obrázky v plné velikosti {{images}} · synchronizace historie {{sync}}",
     "featuresTitle": "Překryv ve hře {{overlay}}",
-    "featuresDetail": "Sledovat systémový režim Nerušit {{dnd}} · právě hraje {{playing}} · právě hraji {{gaming}}",
+    "featuresDetail": "Sledovat systémový režim Nerušit {{dnd}} · právě hraje {{playing}} · právě hraji {{gaming}} · historie aktivity {{history}}",
     "effectsDetail": "Vizuální efekty {{effects}}",
     "startupTitle": "Spustit při přihlášení {{login}}",
     "startupDetail": "Spustit minimalizovaně {{minimized}} · odkazy mumble:// {{links}}",

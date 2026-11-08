@@ -33,6 +33,7 @@
     "voice": "Glas",
     "setupStyle": "Slog nastavitve",
     "privateMessages": "Zasebna sporočila",
+    "notifications": "Obvestila",
     "connections": "Povezave",
     "features": "Funkcije",
     "appearance": "Videz",
@@ -146,6 +147,10 @@
     "subtitle": "Zasebna sporočila so pogovori ena na ena. Ta izbira ne vpliva na klepet v kanalu.",
     "local": "Filtriranje poteka v tvojem računalniku. Pošiljatelji o tem niso obveščeni. Pozneje lahko za vsak strežnik določiš drugačno pravilo."
   },
+  "notifications": {
+    "title": "Kako naj vas Mumcord obvešča?",
+    "subtitle": "Izberite, kako do vas pride posamezna vrsta novic. To lahko pozneje spremenite v Nastavitve → Obvestila."
+  },
   "connections": {
     "title": "Povezave in vsebina",
     "subtitle": "Nekatere funkcije te povežejo neposredno z drugimi uporabniki Mumcorda, del vsebine klepeta pa se naloži z drugih spletnih mest. Izberi, kaj ti ustreza.",
@@ -185,6 +190,7 @@
       "identity": "Identiteta",
       "voice": "Glas",
       "privateMessages": "Zasebna sporočila",
+      "notifications": "Obvestila",
       "connections": "Povezave",
       "chatContent": "Vsebina klepeta",
       "features": "Funkcije",
@@ -195,10 +201,12 @@
     "identityDetail": "Shranjena v sistemskem obesku ključev",
     "voiceDetail": "Odstranjevanje hrupa: {{noise}}",
     "pmDetail": "Moj kanal {{channel}} · sprejeti klepeti {{accepted}} · zahteve {{requests}}",
+    "notificationsTitle": "Nova sporočila: {{mode}}",
+    "notificationsDetail": "Obvestila o dejavnosti: vklopljenih {{on}} od {{total}}",
     "contentTitle": "Predogledi povezav {{previews}}",
     "contentDetail": "Slike v polni velikosti {{images}} · sinhronizacija zgodovine {{sync}}",
     "featuresTitle": "Prekrivanje v igri {{overlay}}",
-    "featuresDetail": "Sledi sistemskemu načinu Ne moti {{dnd}} · zdaj se predvaja {{playing}} · zdaj igram {{gaming}}",
+    "featuresDetail": "Sledi sistemskemu načinu Ne moti {{dnd}} · zdaj se predvaja {{playing}} · zdaj igram {{gaming}} · zgodovina dejavnosti {{history}}",
     "effectsDetail": "Vizualni učinki {{effects}}",
     "startupTitle": "Zagon ob prijavi {{login}}",
     "startupDetail": "Zagon pomanjšano {{minimized}} · povezave mumble:// {{links}}",

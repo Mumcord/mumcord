@@ -33,6 +33,7 @@
     "voice": "Voce",
     "setupStyle": "Stile di configurazione",
     "privateMessages": "Messaggi privati",
+    "notifications": "Notifiche",
     "connections": "Connessioni",
     "features": "Funzioni",
     "appearance": "Aspetto",
@@ -146,6 +147,10 @@
     "subtitle": "I messaggi privati sono chat uno a uno. La chat del canale non è influenzata da questa scelta.",
     "local": "Il filtro avviene sul tuo computer. I mittenti non vengono avvisati. Più avanti potrai impostare una regola diversa per ogni server."
   },
+  "notifications": {
+    "title": "Come deve avvisarti Mumcord?",
+    "subtitle": "Scegli come ti raggiunge ogni tipo di novità. Potrai cambiarlo in seguito in Impostazioni → Notifiche."
+  },
   "connections": {
     "title": "Connessioni e contenuti",
     "subtitle": "Alcune funzioni ti collegano direttamente ad altri utenti di Mumcord e alcuni contenuti della chat vengono caricati da altri siti web. Scegli cosa va bene per te.",
@@ -185,6 +190,7 @@
       "identity": "Identità",
       "voice": "Voce",
       "privateMessages": "Messaggi privati",
+      "notifications": "Notifiche",
       "connections": "Connessioni",
       "chatContent": "Contenuti della chat",
       "features": "Funzioni",
@@ -195,10 +201,12 @@
     "identityDetail": "Salvata nel portachiavi del sistema",
     "voiceDetail": "Riduzione del rumore: {{noise}}",
     "pmDetail": "Il mio canale {{channel}} · chat accettate {{accepted}} · richieste {{requests}}",
+    "notificationsTitle": "Nuovi messaggi: {{mode}}",
+    "notificationsDetail": "Notifiche di attività: {{on}} su {{total}} attive",
     "contentTitle": "Anteprime dei link {{previews}}",
     "contentDetail": "Immagini a dimensione intera {{images}} · sincronizzazione della cronologia {{sync}}",
     "featuresTitle": "Overlay in gioco {{overlay}}",
-    "featuresDetail": "Segui Non disturbare del sistema {{dnd}} · in riproduzione {{playing}} · in gioco {{gaming}}",
+    "featuresDetail": "Segui Non disturbare del sistema {{dnd}} · in riproduzione {{playing}} · in gioco {{gaming}} · cronologia attività {{history}}",
     "effectsDetail": "Effetti visivi {{effects}}",
     "startupTitle": "Avvio all'accesso {{login}}",
     "startupDetail": "Avvio ridotto a icona {{minimized}} · link mumble:// {{links}}",

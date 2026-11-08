@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Notifications",
-    "legend": "Notifications for new messages",
-    "explanation": "For new messages in your channel, followed channels and private chats, except the chat you are looking at.",
-    "inApp": "In-app: a small pop-up inside Mumcord while it is in front",
-    "desktop": "Desktop: a system notification",
-    "both": "Both: pop-up while Mumcord is in front, system notification otherwise",
-    "off": "Off",
+    "explanation": "How Mumcord tells you about new messages and what happens on your servers. Each kind has its own choice.",
+    "messages": "New messages",
+    "messagesHint": "Your channel, followed channels and private chats",
+    "mode": {
+      "off": "Off",
+      "inApp": "In-app",
+      "desktop": "System",
+      "both": "Both"
+    },
+    "modesHint": "In-app: a small pop-up inside Mumcord while it is in front. System: a notification from your operating system. Both: the pop-up while Mumcord is in front, otherwise a system notification. Nothing shows for the chat you are looking at or during Do Not Disturb.",
     "activityTitle": "Activity notifications",
     "activity": {
       "screenShare": "Someone starts a screen share",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Activity history",
+    "keep": "Keep activity history after a restart",
+    "keepHint": "Saves who connected, left, moved channel, shared a screen or started a watch party, so the feed is still there after a restart. Off: the feed starts empty each time. Turning it off deletes what was saved.",
     "clear": "Clear activity history",
     "hint": "Removes the saved feed for all servers.",
     "local": "Saved only on this device.",

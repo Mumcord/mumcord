@@ -33,6 +33,7 @@
     "voice": "Hang",
     "setupStyle": "Beállítási stílus",
     "privateMessages": "Privát üzenetek",
+    "notifications": "Értesítések",
     "connections": "Kapcsolatok",
     "features": "Funkciók",
     "appearance": "Megjelenés",
@@ -146,6 +147,10 @@
     "subtitle": "A privát üzenetek egyéni beszélgetések. A csatornacsevegést ez a választás nem érinti.",
     "local": "A szűrés a számítógépeden történik. A feladókat nem értesítjük. Később szerverenként más szabályt is beállíthatsz."
   },
+  "notifications": {
+    "title": "Hogyan értesítsen a Mumcord?",
+    "subtitle": "Válaszd ki, hogyan érjen el az egyes hírfajták. Később módosíthatod a Beállítások → Értesítések részben."
+  },
   "connections": {
     "title": "Kapcsolatok és tartalom",
     "subtitle": "Egyes funkciók közvetlenül más Mumcord-felhasználókhoz kapcsolnak, a csevegés egyes tartalmai pedig más weboldalakról töltődnek be. Válaszd ki, mi fér bele.",
@@ -185,6 +190,7 @@
       "identity": "Identitás",
       "voice": "Hang",
       "privateMessages": "Privát üzenetek",
+      "notifications": "Értesítések",
       "connections": "Kapcsolatok",
       "chatContent": "Csevegéstartalom",
       "features": "Funkciók",
@@ -195,10 +201,12 @@
     "identityDetail": "A rendszer kulcstartójába mentve",
     "voiceDetail": "Zajszűrés: {{noise}}",
     "pmDetail": "Saját csatorna {{channel}} · elfogadott csevegések {{accepted}} · kérések {{requests}}",
+    "notificationsTitle": "Új üzenetek: {{mode}}",
+    "notificationsDetail": "Tevékenységi értesítések: {{on}} / {{total}} bekapcsolva",
     "contentTitle": "Hivatkozás-előnézetek {{previews}}",
     "contentDetail": "Teljes méretű képek {{images}} · előzményszinkron {{sync}}",
     "featuresTitle": "Játékon belüli overlay {{overlay}}",
-    "featuresDetail": "A rendszer Ne zavarjanak módjának követése {{dnd}} · most szól {{playing}} · most játszik {{gaming}}",
+    "featuresDetail": "A rendszer Ne zavarjanak módjának követése {{dnd}} · most szól {{playing}} · most játszik {{gaming}} · tevékenységi előzmények {{history}}",
     "effectsDetail": "Vizuális effektek {{effects}}",
     "startupTitle": "Indítás bejelentkezéskor {{login}}",
     "startupDetail": "Indítás kis méretben {{minimized}} · mumble:// hivatkozások {{links}}",

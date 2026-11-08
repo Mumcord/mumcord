@@ -37,6 +37,8 @@ export interface PresetValues {
   historySharing: boolean;
   nowPlaying: boolean;
   nowGaming: boolean;
+  /** "Keep activity history after a restart" (#661). */
+  keepActivityHistory: boolean;
   /** In-game overlay mode "on". */
   ingameOverlay: boolean;
   /** "Follow system Do Not Disturb". */
@@ -58,6 +60,7 @@ export const PRESET_KEYS: readonly PresetKey[] = [
   "historySharing",
   "nowPlaying",
   "nowGaming",
+  "keepActivityHistory",
   "ingameOverlay",
   "dndFollowSystem",
 ];
@@ -75,6 +78,7 @@ export const PRESETS: Readonly<Record<PresetId, Readonly<PresetValues>>> = {
     historySharing: true,
     nowPlaying: true,
     nowGaming: true,
+    keepActivityHistory: true,
     ingameOverlay: true,
     dndFollowSystem: true,
   },
@@ -90,6 +94,7 @@ export const PRESETS: Readonly<Record<PresetId, Readonly<PresetValues>>> = {
     historySharing: true,
     nowPlaying: false,
     nowGaming: false,
+    keepActivityHistory: false,
     ingameOverlay: true,
     dndFollowSystem: true,
   },
@@ -105,6 +110,7 @@ export const PRESETS: Readonly<Record<PresetId, Readonly<PresetValues>>> = {
     historySharing: false,
     nowPlaying: false,
     nowGaming: false,
+    keepActivityHistory: false,
     ingameOverlay: false,
     dndFollowSystem: true,
   },
@@ -139,6 +145,7 @@ export function presetValueOf<K extends PresetKey>(
     historySharing: settings.historySharing,
     nowPlaying: settings.nowPlaying,
     nowGaming: settings.nowGaming,
+    keepActivityHistory: settings.keepActivityHistory,
     ingameOverlay: draft.ingameOverlay,
     dndFollowSystem: draft.dndFollowSystem,
   };
@@ -169,6 +176,7 @@ export function applyPreset(draft: PresetDraft, preset: PresetId): PresetDraft {
       historySharing: values.historySharing,
       nowPlaying: values.nowPlaying,
       nowGaming: values.nowGaming,
+      keepActivityHistory: values.keepActivityHistory,
       setupPreset: preset,
     },
     ingameOverlay: draft.ingameOverlay === null ? null : values.ingameOverlay,

@@ -245,12 +245,12 @@ pub enum LogLevel {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationMode {
-    /// In-app toasts only, while the window has focus.
+    /// In-app toasts only, while the window has focus. The default for new profiles (#660).
+    #[default]
     InApp,
     /// System notifications only, also while the window has focus.
     Desktop,
     /// Toasts while the window has focus, system notifications otherwise.
-    #[default]
     Both,
     Off,
 }
@@ -267,27 +267,36 @@ pub enum SoundTheme {
     Rich,
 }
 
-/// Which activity-feed events also notify (#597), like messages: a toast or a system
-/// notification. Joins, leaves and moves are off by default because they are noisy on busy
-/// servers; starts of shared things are on.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+/// How each kind of activity-feed event notifies (#597, #660): off, an in-app toast, a system
+/// notification or both, like messages. Every kind starts as an in-app toast.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ActivityNotifySettings {
-    pub joins: bool,
-    pub screen_share: bool,
-    pub watch_party: bool,
-    pub plugin_activity: bool,
-    pub plugin_event: bool,
+    pub joins: NotificationMode,
+    pub screen_share: NotificationMode,
+    pub watch_party: NotificationMode,
+    pub plugin_activity: NotificationMode,
+    pub plugin_event: NotificationMode,
 }
 
-impl Default for ActivityNotifySettings {
-    fn default() -> Self {
+impl ActivityNotifySettings {
+    /// The modes for a profile saved before #660, which had one switch per kind under the
+    /// `activity_notify` key and showed every switched-on kind like messages (`messages`). A
+    /// switch missing from the record had its old default: joins off, everything else on.
+    fn from_switches(switches: Option<&serde_json::Value>, messages: NotificationMode) -> Self {
+        let mode = |key: &str, default: bool| {
+            let on = switches
+                .and_then(|s| s.get(key))
+                .and_then(serde_json::Value::as_bool)
+                .unwrap_or(default);
+            if on { messages } else { NotificationMode::Off }
+        };
         Self {
-            joins: false,
-            screen_share: true,
-            watch_party: true,
-            plugin_activity: true,
-            plugin_event: true,
+            joins: mode("joins", false),
+            screen_share: mode("screen_share", true),
+            watch_party: mode("watch_party", true),
+            plugin_activity: mode("plugin_activity", true),
+            plugin_event: mode("plugin_event", true),
         }
     }
 }
@@ -722,8 +731,13 @@ pub struct Settings {
     pub video_ducking_percent: u8,
     pub sounds: SoundSettings,
     pub notifications: NotificationMode,
-    /// Activity events that notify (#597).
+    /// How activity events notify (#597, #660). Stored under a new key: the old one held one
+    /// switch per kind, which an older Mumcord still reads.
+    #[serde(rename = "activity_notifications")]
     pub activity_notify: ActivityNotifySettings,
+    /// "Keep activity history after a restart" (#661): the activity feed is saved on this
+    /// device. Off by default; the "Everything on" setup preset turns it on.
+    pub keep_activity_history: bool,
     /// The Mumcord "Do Not Disturb" switch (FR-3.111): no notification sounds and no toasts or
     /// system notifications on any server. Badges still count. Off by default.
     pub do_not_disturb: bool,
@@ -1034,6 +1048,7 @@ impl Default for Settings {
             sounds: SoundSettings::default(),
             notifications: NotificationMode::default(),
             activity_notify: ActivityNotifySettings::default(),
+            keep_activity_history: false,
             do_not_disturb: false,
             follow_system_dnd: true,
             close_behaviour: CloseBehaviour::default(),
@@ -1207,6 +1222,18 @@ impl Store {
                     } else {
                         P2pMode::DirectRelay
                     };
+                }
+                if !has_key(&json, "notifications") {
+                    // #660 made in-app the default for new profiles; older ones keep "Both".
+                    settings.notifications = NotificationMode::Both;
+                }
+                if !has_key(&json, "activity_notifications") {
+                    // #660: keep how activity notified before, one switch per kind.
+                    let old = serde_json::from_str::<serde_json::Value>(&json).ok();
+                    settings.activity_notify = ActivityNotifySettings::from_switches(
+                        old.as_ref().and_then(|v| v.get("activity_notify")),
+                        settings.notifications,
+                    );
                 }
                 if settings.music_quality && !has_key(&json, "bitrate_kbps") {
                     // Music quality used to lift the cap; keep those users at "Max".
@@ -1949,6 +1976,30 @@ mod tests {
     }
 
     #[test]
+    fn activity_switches_become_modes_and_old_records_keep_both() {
+        let old = load_raw(
+            r#"{"notifications":"desktop","activity_notify":{"joins":true,"watch_party":false}}"#,
+        );
+        assert_eq!(old.notifications, NotificationMode::Desktop);
+        assert_eq!(old.activity_notify.joins, NotificationMode::Desktop);
+        assert_eq!(old.activity_notify.watch_party, NotificationMode::Off);
+        assert_eq!(old.activity_notify.screen_share, NotificationMode::Desktop);
+        assert!(!old.keep_activity_history);
+
+        let older = load_raw(r#"{"theme":"dark"}"#);
+        assert_eq!(older.notifications, NotificationMode::Both);
+        assert_eq!(older.activity_notify.joins, NotificationMode::Off);
+        assert_eq!(older.activity_notify.plugin_event, NotificationMode::Both);
+
+        let new = load_raw(
+            r#"{"notifications":"in_app","activity_notifications":{"joins":"both"},"keep_activity_history":true}"#,
+        );
+        assert_eq!(new.activity_notify.joins, NotificationMode::Both);
+        assert_eq!(new.activity_notify.watch_party, NotificationMode::InApp);
+        assert!(new.keep_activity_history);
+    }
+
+    #[test]
     fn partial_json_falls_back_to_defaults() {
         let parsed: Settings =
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
@@ -1984,7 +2035,7 @@ mod tests {
         );
         assert!(!parsed.wizard_completed);
         assert_eq!(parsed.log_level, LogLevel::Info);
-        assert_eq!(parsed.notifications, NotificationMode::Both);
+        assert_eq!(parsed.notifications, NotificationMode::InApp);
         assert!(parsed.link_previews, "link previews are on for old records");
         assert_eq!(parsed.preview_cache_days, Some(7), "7 days for old records");
         assert_eq!(

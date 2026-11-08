@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Benachrichtigungen",
-    "legend": "Benachrichtigungen bei neuen Nachrichten",
-    "explanation": "Für neue Nachrichten in deinem Kanal, in gefolgten Kanälen und in Privatchats, außer dem Chat, den du gerade ansiehst.",
-    "inApp": "In der App: ein kleines Pop-up in Mumcord, solange es im Vordergrund ist",
-    "desktop": "Desktop: eine Systembenachrichtigung",
-    "both": "Beides: Pop-up, solange Mumcord im Vordergrund ist, sonst Systembenachrichtigung",
-    "off": "Aus",
+    "explanation": "Wie Mumcord dich über neue Nachrichten und das Geschehen auf deinen Servern informiert. Jede Art hat ihre eigene Auswahl.",
+    "messages": "Neue Nachrichten",
+    "messagesHint": "Dein Kanal, gefolgte Kanäle und Privatchats",
+    "mode": {
+      "off": "Aus",
+      "inApp": "In der App",
+      "desktop": "System",
+      "both": "Beides"
+    },
+    "modesHint": "In der App: ein kleines Pop-up in Mumcord, solange es im Vordergrund ist. System: eine Benachrichtigung deines Betriebssystems. Beides: das Pop-up, solange Mumcord im Vordergrund ist, sonst eine Systembenachrichtigung. Für den Chat, den du gerade ansiehst, und bei „Nicht stören“ wird nichts angezeigt.",
     "activityTitle": "Aktivitäts-Benachrichtigungen",
     "activity": {
       "screenShare": "Jemand startet eine Bildschirmübertragung",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Aktivitätsverlauf",
+    "keep": "Aktivitätsverlauf nach einem Neustart behalten",
+    "keepHint": "Speichert, wer sich verbunden hat, gegangen ist, den Kanal gewechselt, einen Bildschirm geteilt oder eine Watch-Party gestartet hat, damit der Verlauf nach einem Neustart noch da ist. Aus: Der Verlauf beginnt jedes Mal leer. Beim Ausschalten wird das Gespeicherte gelöscht.",
     "clear": "Aktivitätsverlauf löschen",
     "hint": "Entfernt den gespeicherten Verlauf aller Server.",
     "local": "Nur auf diesem Gerät gespeichert.",

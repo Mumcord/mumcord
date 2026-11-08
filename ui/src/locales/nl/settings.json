@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Meldingen",
-    "legend": "Meldingen voor nieuwe berichten",
-    "explanation": "Voor nieuwe berichten in je kanaal, gevolgde kanalen en privéchats, behalve de chat waar je naar kijkt.",
-    "inApp": "In de app: een kleine pop-up in Mumcord zolang het op de voorgrond staat",
-    "desktop": "Desktop: een systeemmelding",
-    "both": "Beide: pop-up zolang Mumcord op de voorgrond staat, anders een systeemmelding",
-    "off": "Uit",
+    "explanation": "Hoe Mumcord je op de hoogte houdt van nieuwe berichten en wat er op je servers gebeurt. Elk soort heeft een eigen keuze.",
+    "messages": "Nieuwe berichten",
+    "messagesHint": "Je kanaal, gevolgde kanalen en privéchats",
+    "mode": {
+      "off": "Uit",
+      "inApp": "In de app",
+      "desktop": "Systeem",
+      "both": "Beide"
+    },
+    "modesHint": "In de app: een kleine pop-up in Mumcord zolang het op de voorgrond staat. Systeem: een melding van je besturingssysteem. Beide: de pop-up zolang Mumcord op de voorgrond staat, anders een systeemmelding. Voor de chat waar je nu naar kijkt en tijdens Niet storen wordt niets getoond.",
     "activityTitle": "Activiteitsmeldingen",
     "activity": {
       "screenShare": "Iemand start een schermdeling",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Activiteitengeschiedenis",
+    "keep": "Activiteitengeschiedenis bewaren na een herstart",
+    "keepHint": "Slaat op wie verbond, vertrok, van kanaal wisselde, een scherm deelde of een watch party startte, zodat de feed na een herstart nog bestaat. Uit: de feed begint elke keer leeg. Uitschakelen wist wat is opgeslagen.",
     "clear": "Activiteitengeschiedenis wissen",
     "hint": "Verwijdert de opgeslagen feed van alle servers.",
     "local": "Alleen op dit apparaat opgeslagen.",

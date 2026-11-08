@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Értesítések",
-    "legend": "Értesítések új üzenetekről",
-    "explanation": "Új üzenetekhez a csatornádban, a követett csatornákban és a privát chatekben, kivéve azt a chatet, amelyet éppen nézel.",
-    "inApp": "Alkalmazáson belül: kis felugró ablak a Mumcordban, amíg előtérben van",
-    "desktop": "Asztali: rendszerértesítés",
-    "both": "Mindkettő: felugró ablak, amíg a Mumcord előtérben van, egyébként rendszerértesítés",
-    "off": "Ki",
+    "explanation": "Hogyan értesít a Mumcord az új üzenetekről és a szervereiden történtekről. Minden fajtának saját választása van.",
+    "messages": "Új üzenetek",
+    "messagesHint": "A csatornád, a követett csatornák és a privát csevegések",
+    "mode": {
+      "off": "Ki",
+      "inApp": "Alkalmazáson belül",
+      "desktop": "Rendszer",
+      "both": "Mindkettő"
+    },
+    "modesHint": "Alkalmazáson belül: kis felugró ablak a Mumcordban, amíg az előtérben van. Rendszer: az operációs rendszered értesítése. Mindkettő: a felugró ablak, amíg a Mumcord előtérben van, egyébként rendszerértesítés. A jelenleg nézett csevegésnél és a Ne zavarjanak mód alatt semmi sem jelenik meg.",
     "activityTitle": "Tevékenységi értesítések",
     "activity": {
       "screenShare": "Valaki képernyőmegosztást indít",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Tevékenységi előzmények",
+    "keep": "Tevékenységi előzmények megtartása újraindítás után",
+    "keepHint": "Elmenti, ki csatlakozott, lépett ki, váltott csatornát, osztott meg képernyőt vagy indított watch partyt, így a hírfolyam újraindítás után is megmarad. Ki: a hírfolyam minden alkalommal üresen indul. Kikapcsoláskor a mentett adatok törlődnek.",
     "clear": "Tevékenységi előzmények törlése",
     "hint": "Törli az összes szerver mentett hírfolyamát.",
     "local": "Csak ezen az eszközön tárolva.",

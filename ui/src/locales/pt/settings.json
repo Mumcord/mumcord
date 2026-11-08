@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Notificações",
-    "legend": "Notificações de novas mensagens",
-    "explanation": "Para novas mensagens no teu canal, nos canais seguidos e nos chats privados, exceto o chat que estás a ver.",
-    "inApp": "Na app: um pequeno pop-up dentro do Mumcord enquanto está em primeiro plano",
-    "desktop": "Ambiente de trabalho: uma notificação do sistema",
-    "both": "Ambos: pop-up com o Mumcord em primeiro plano, notificação do sistema caso contrário",
-    "off": "Desativado",
+    "explanation": "Como o Mumcord te avisa de novas mensagens e do que acontece nos teus servidores. Cada tipo tem a sua própria escolha.",
+    "messages": "Novas mensagens",
+    "messagesHint": "O teu canal, os canais seguidos e as conversas privadas",
+    "mode": {
+      "off": "Desativado",
+      "inApp": "Na app",
+      "desktop": "Sistema",
+      "both": "Ambos"
+    },
+    "modesHint": "Na app: um pequeno pop-up dentro do Mumcord enquanto está em primeiro plano. Sistema: uma notificação do teu sistema operativo. Ambos: o pop-up com o Mumcord em primeiro plano e, caso contrário, uma notificação do sistema. Não aparece nada para a conversa que estás a ver nem durante o Não incomodar.",
     "activityTitle": "Notificações de atividade",
     "activity": {
       "screenShare": "Alguém inicia uma partilha de ecrã",
@@ -1281,6 +1285,8 @@
   },
   "activityHistory": {
     "title": "Histórico de atividade",
+    "keep": "Manter o histórico de atividade após reiniciar",
+    "keepHint": "Guarda quem se ligou, saiu, mudou de canal, partilhou o ecrã ou iniciou uma watch party, para que o feed continue lá após reiniciar. Desativado: o feed começa vazio de cada vez. Desativar apaga o que foi guardado.",
     "clear": "Limpar histórico de atividade",
     "hint": "Remove o feed guardado de todos os servidores.",
     "local": "Guardado apenas neste dispositivo.",

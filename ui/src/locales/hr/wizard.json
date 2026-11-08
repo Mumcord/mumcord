@@ -33,6 +33,7 @@
     "voice": "Glas",
     "setupStyle": "Način postavljanja",
     "privateMessages": "Privatne poruke",
+    "notifications": "Obavijesti",
     "connections": "Veze",
     "features": "Značajke",
     "appearance": "Izgled",
@@ -146,6 +147,10 @@
     "subtitle": "Privatne poruke su razgovori jedan na jedan. Ovaj izbor ne utječe na chat kanala.",
     "local": "Filtriranje se odvija na vašem računalu. Pošiljatelji nisu obaviješteni. Kasnije možete postaviti drugo pravilo po poslužitelju."
   },
+  "notifications": {
+    "title": "Kako vas Mumcord treba obavještavati?",
+    "subtitle": "Odaberite kako vam stiže svaka vrsta vijesti. Kasnije to možete promijeniti u Postavke → Obavijesti."
+  },
   "connections": {
     "title": "Veze i sadržaj",
     "subtitle": "Neke značajke povezuju vas izravno s drugim korisnicima Mumcorda, a dio sadržaja chata učitava se s drugih web-stranica. Odaberite što vam odgovara.",
@@ -185,6 +190,7 @@
       "identity": "Identitet",
       "voice": "Glas",
       "privateMessages": "Privatne poruke",
+      "notifications": "Obavijesti",
       "connections": "Veze",
       "chatContent": "Sadržaj chata",
       "features": "Značajke",
@@ -195,10 +201,12 @@
     "identityDetail": "Spremljeno u sistemski privjesak ključeva",
     "voiceDetail": "Smanjenje buke: {{noise}}",
     "pmDetail": "Moj kanal {{channel}} · prihvaćeni razgovori {{accepted}} · zahtjevi {{requests}}",
+    "notificationsTitle": "Nove poruke: {{mode}}",
+    "notificationsDetail": "Obavijesti o aktivnosti: uključeno {{on}} od {{total}}",
     "contentTitle": "Pretpregledi poveznica {{previews}}",
     "contentDetail": "Slike u punoj veličini {{images}} · sinkronizacija povijesti {{sync}}",
     "featuresTitle": "Overlay u igri {{overlay}}",
-    "featuresDetail": "Prati sistemski Ne smetaj {{dnd}} · trenutno svira {{playing}} · trenutno igra {{gaming}}",
+    "featuresDetail": "Prati sistemski Ne smetaj {{dnd}} · trenutno svira {{playing}} · trenutno igra {{gaming}} · povijest aktivnosti {{history}}",
     "effectsDetail": "Vizualni efekti {{effects}}",
     "startupTitle": "Pokretanje pri prijavi {{login}}",
     "startupDetail": "Pokreni smanjeno {{minimized}} · mumble:// poveznice {{links}}",

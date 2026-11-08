@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Paziņojumi",
-    "legend": "Paziņojumi par jaunām ziņām",
-    "explanation": "Par jaunām ziņām tavā kanālā, kanālos, kuriem seko, un privātajos čatos, izņemot čatu, kuru pašlaik skati.",
-    "inApp": "Lietotnē: neliels uznirstošs logs Mumcord iekšienē, kamēr tas ir priekšplānā",
-    "desktop": "Darbvirsmā: sistēmas paziņojums",
-    "both": "Abi: uznirstošs logs, kamēr Mumcord ir priekšplānā, citādi sistēmas paziņojums",
-    "off": "Izslēgts",
+    "explanation": "Kā Mumcord paziņo par jaunām ziņām un notikumiem jūsu serveros. Katram veidam ir sava izvēle.",
+    "messages": "Jaunas ziņas",
+    "messagesHint": "Jūsu kanāls, sekotie kanāli un privātās sarunas",
+    "mode": {
+      "off": "Izslēgts",
+      "inApp": "Lietotnē",
+      "desktop": "Sistēma",
+      "both": "Abi"
+    },
+    "modesHint": "Lietotnē: neliels uznirstošs logs Mumcord iekšienē, kamēr tas ir priekšplānā. Sistēma: jūsu operētājsistēmas paziņojums. Abi: uznirstošais logs, kamēr Mumcord ir priekšplānā, citādi sistēmas paziņojums. Sarunai, kuru pašlaik skatāties, vai režīmā “Netraucēt” nekas netiek rādīts.",
     "activityTitle": "Darbību paziņojumi",
     "activity": {
       "screenShare": "Kāds sāk ekrāna kopīgošanu",
@@ -1281,6 +1285,8 @@
   },
   "activityHistory": {
     "title": "Darbību vēsture",
+    "keep": "Saglabāt darbību vēsturi pēc restartēšanas",
+    "keepHint": "Saglabā, kurš pieslēdzās, aizgāja, mainīja kanālu, kopīgoja ekrānu vai sāka watch party, lai plūsma būtu pieejama arī pēc restartēšanas. Izslēgts: plūsma katru reizi sākas tukša. Izslēdzot saglabātais tiek dzēsts.",
     "clear": "Notīrīt darbību vēsturi",
     "hint": "Noņem saglabāto plūsmu visiem serveriem.",
     "local": "Saglabāts tikai šajā ierīcē.",

@@ -1,8 +1,7 @@
 /**
  * Activity notifications (#597): a new event in the activity feed notifies like a message, as an
  * in-app toast or a system notification. The engine applies Do Not Disturb, a muted server, the
- * window focus and the notification mode; the switches per kind (Settings → Notifications) are
- * checked here. Own events, events from before this connection and "stopped" events never notify.
+ * window focus and the mode of the event's kind (#660); a kind set to Off stops here already. Own events, events from before this connection and "stopped" events never notify.
  */
 import type { TFunction } from "i18next";
 import { getApi, type ActivityNotifySettings } from "../../api";
@@ -87,14 +86,15 @@ export async function handleActivity(
 ): Promise<void> {
   const kind = switchOf(event);
   if (kind === null) return;
-  const enabled = await switches();
-  if (enabled === null || !enabled[kind]) return;
+  const modes = await switches();
+  if (modes === null || modes[kind] === "off") return;
   const summary = context.serverName(event.serverId) ?? "";
   const body = noticeBody(event, context.t);
   const channelId = channelIdOf(event);
   let outcome;
   try {
     outcome = await getApi().notifyActivity({
+      kind,
       serverId: event.serverId,
       channelId,
       summary,

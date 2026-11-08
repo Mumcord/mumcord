@@ -69,7 +69,7 @@ export async function chooseFileInNativeDialog(path: string): Promise<void> {
 // ---- Setup wizard (#159) ----
 //
 // First start: Welcome → [Import from Mumble] → Identity → Voice → Setup style → [Custom only:
-// Private messages → Connections → Features → Appearance → Startup and updates] → All set.
+// Private messages → Notifications → Connections → Features → Appearance → Startup and updates] → All set.
 // Rerun from Settings → About (#149): the same without import and identity.
 
 /** Rail names of the steps, as the step header shows them ("STEP n OF m · <name>"). */
@@ -80,6 +80,7 @@ export const WIZARD_STEP_NAMES = {
   voice: "Voice",
   setupStyle: "Setup style",
   privateMessages: "Private messages",
+  notifications: "Notifications",
   connections: "Connections",
   features: "Features",
   appearance: "Appearance",
@@ -91,6 +92,7 @@ export type WizardStepName = keyof typeof WIZARD_STEP_NAMES;
 /** The Custom-only steps in order. */
 export const CUSTOM_STEPS: readonly WizardStepName[] = [
   "privateMessages",
+  "notifications",
   "connections",
   "features",
   "appearance",
@@ -191,7 +193,7 @@ export async function finishWithPreset(preset: WizardPreset): Promise<void> {
 }
 
 /**
- * On the setup style step: Custom → Next through the five Custom steps (running `onStep` on each
+ * On the setup style step: Custom → Next through the six Custom steps (running `onStep` on each
  * before Next) → summary.
  */
 export async function walkCustomSteps(

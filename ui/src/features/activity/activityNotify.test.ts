@@ -67,6 +67,11 @@ describe("activity notifications (#597)", () => {
   });
 
   it("shows a system notification in the background", async () => {
+    const settings = await api.settingsGet();
+    await api.settingsUpdate({
+      ...settings,
+      activityNotify: { ...settings.activityNotify, screenShare: "both" },
+    });
     api.mock.setWindowFocused(false);
     await handleActivity(share, context());
     expect(api.mock.activityNotices()).toEqual([
@@ -74,17 +79,17 @@ describe("activity notifications (#597)", () => {
     ]);
   });
 
-  it("follows the switch per kind: joins are off by default", async () => {
+  it("follows the mode per kind (#660): off is quiet, in-app is a toast, system notifies", async () => {
     api.mock.setWindowFocused(false);
+    const settings = await api.settingsGet();
+    const set = (joins: "off" | "inApp" | "desktop") =>
+      api.settingsUpdate({ ...settings, activityNotify: { ...settings.activityNotify, joins } });
+    await set("off");
     await handleActivity(join, context());
     expect(api.mock.activityNotices()).toEqual([]);
-    const settings = await api.settingsGet();
-    await api.settingsUpdate({
-      ...settings,
-      activityNotify: { ...settings.activityNotify, joins: true },
-    });
+    await set("desktop");
     await handleActivity(join, context());
-    expect(api.mock.activityNotices()).toHaveLength(1);
+    expect(api.mock.activityNotices()).toEqual([expect.objectContaining({ kind: "joins" })]);
   });
 
   it("stays quiet during Do Not Disturb", async () => {

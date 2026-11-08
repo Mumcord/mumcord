@@ -453,12 +453,16 @@
   },
   "notifications": {
     "title": "Notifiki",
-    "legend": "Notifiki għal messaġġi ġodda",
-    "explanation": "Għal messaġġi ġodda fil-kanal tiegħek, fil-kanali segwiti u fiċ-chats privati, ħlief iċ-chat li qed tħares lejha.",
-    "inApp": "Fl-app: pop-up żgħir ġewwa Mumcord waqt li jkun quddiem",
-    "desktop": "Desktop: notifika tas-sistema",
-    "both": "It-tnejn: pop-up waqt li Mumcord ikun quddiem, inkella notifika tas-sistema",
-    "off": "Mitfi",
+    "explanation": "Kif Mumcord jgħarrfek dwar messaġġi ġodda u dak li jiġri fis-servers tiegħek. Kull tip għandu l-għażla tiegħu.",
+    "messages": "Messaġġi ġodda",
+    "messagesHint": "Il-kanal tiegħek, il-kanali li ssegwi u ċ-chats privati",
+    "mode": {
+      "off": "Mitfi",
+      "inApp": "Fl-app",
+      "desktop": "Sistema",
+      "both": "It-tnejn"
+    },
+    "modesHint": "Fl-app: pop-up żgħir ġewwa Mumcord waqt li jkun quddiem. Sistema: notifika mis-sistema operattiva tiegħek. It-tnejn: il-pop-up waqt li Mumcord ikun quddiem, inkella notifika tas-sistema. Ma jidher xejn għaċ-chat li qed tara jew waqt Do Not Disturb.",
     "activityTitle": "Notifiki tal-attività",
     "activity": {
       "screenShare": "Xi ħadd jibda jaqsam l-iskrin",
@@ -1301,6 +1305,8 @@
   },
   "activityHistory": {
     "title": "Storja tal-attività",
+    "keep": "Żomm l-istorja tal-attività wara r-restart",
+    "keepHint": "Isalva min qabad, telaq, biddel kanal, qasam skrin jew beda watch party, biex il-feed jibqa' hemm wara r-restart. Mitfi: il-feed jibda vojt kull darba. Meta tintfa, dak li ssejvja jitħassar.",
     "clear": "Ħassar l-istorja tal-attività",
     "hint": "Tneħħi l-feed issejvjat tas-servers kollha.",
     "local": "Issejvjat biss fuq dan it-tagħmir.",
