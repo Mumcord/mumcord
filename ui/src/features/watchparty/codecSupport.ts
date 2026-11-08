@@ -1,7 +1,7 @@
 /**
- * The missing-codec hint (FR-2.41a). The Linux AppImage bundles GStreamer without H.264/AAC
- * decoders, and some distributions ship WebKitGTK without them too; videos that need H.264 then
- * fail. The hint names the package manager command that installs gst-libav. It is only shown
+ * The missing-codec hint (FR-2.41a). Every Linux package brings its own H.264/AAC decoders, but a
+ * source build has only the system's, and some distributions ship WebKitGTK without them; videos
+ * that need H.264 then fail. The hint names the package manager command that installs gst-libav. It is only shown
  * when the player failed in a way a missing decoder causes and the webview really lacks H.264,
  * so a generic failure never gets a misleading install hint.
  */
