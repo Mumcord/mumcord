@@ -10,10 +10,12 @@
  * presses with that key; a report without it is page code pretending and never counts.
  *
  * The bootstrap's other signals (heartbeat, Escape, F6, sound) are objects too, so a page can
- * never smuggle them in as bridge strings; faking one only hurts the page itself.
+ * never smuggle them in as bridge strings; faking one only hurts the page itself. The app's own
+ * messages to the bootstrap (key, mute, theme) are objects as well and never count against the
+ * bridge limits.
  */
 
-import type { PluginWebviewPlace } from "../../../api";
+import type { PluginPageTheme, PluginWebviewPlace } from "../../../api";
 
 /** One bridge message to or from a panel popover, dialog or side panel, in UTF-8 bytes. */
 export const MAX_MESSAGE_BYTES = 16 * 1024;
@@ -132,12 +134,18 @@ export interface Bridge {
   readonly loaded: () => void;
   /** Mutes or unmutes the page's sound (mute button, deafened); sent at once when loaded. */
   readonly mute: (muted: boolean) => void;
+  /**
+   * A theme change for an API 1.2 page (FR-13.15); held until the page loaded. Only changes go
+   * here: the page was served with the theme of its load (FR-13.13).
+   */
+  readonly theme: (theme: PluginPageTheme) => void;
 }
 
 export function createBridge(options: BridgeOptions): Bridge {
   const allow = rateLimiter(options.now);
   let ready = false;
   let muted: boolean | null = null;
+  let theme: PluginPageTheme | null = null;
   const queue: string[] = [];
 
   const send = (message: string) => {
@@ -198,10 +206,15 @@ export function createBridge(options: BridgeOptions): Bridge {
       options.frame()?.postMessage({ mumcordWebview: "key", key: options.gestureKey }, "*");
       for (const message of queue.splice(0)) send(message);
       if (muted !== null) options.frame()?.postMessage({ mumcordWebview: "mute", muted }, "*");
+      if (theme !== null) options.frame()?.postMessage({ mumcordWebview: "theme", theme }, "*");
     },
     mute: (next) => {
       muted = next;
       if (ready) options.frame()?.postMessage({ mumcordWebview: "mute", muted }, "*");
+    },
+    theme: (next) => {
+      theme = next;
+      if (ready) options.frame()?.postMessage({ mumcordWebview: "theme", theme }, "*");
     },
   };
 }

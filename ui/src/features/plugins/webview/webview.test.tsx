@@ -28,7 +28,7 @@ const api = vi.hoisted(() => ({
   ),
   muteState: { all: false, plugins: [] as string[] },
   listeners: new Map<string, (payload: unknown) => void>(),
-  plugins: [] as { id: string; name: string; source: { kind: string } }[],
+  plugins: [] as { id: string; name: string; source: { kind: string }; themedPages?: boolean }[],
 }));
 vi.mock("../../../api", async (orig) => {
   // One object, so the stores bind to it once.
@@ -580,4 +580,45 @@ describe("PluginFrame sound", () => {
   function view(): PluginWebview {
     return viewIn("sidePanel");
   }
+});
+
+describe("PluginFrame theme", () => {
+  const themeMessages = (post: { mock: { calls: unknown[][] } }) =>
+    post.mock.calls
+      .map(([message]) => message as { mumcordWebview?: string; theme?: { scheme: string } })
+      .filter((message) => message.mumcordWebview === "theme")
+      .map((message) => message.theme?.scheme);
+
+  afterEach(() => {
+    document.documentElement.dataset.theme = "dark";
+  });
+
+  async function openPage(themedPages: boolean) {
+    api.plugins = [{ id: "snacks", name: "Snacks", source: { kind: "official" }, themedPages }];
+    document.documentElement.dataset.theme = "dark";
+    const { container } = render(<PluginFrame plugin="snacks" webview={viewIn("stage")} />);
+    await screen.findByText("Plugin content · Snacks");
+    const post = vi.spyOn(pageOf(container), "postMessage");
+    fireEvent.load(frameOf(container));
+    return post;
+  }
+
+  it("sends an API 1.2 page every theme change, but not the theme it was served with", async () => {
+    const post = await openPage(true);
+    expect(themeMessages(post)).toEqual([]);
+    await act(async () => {
+      document.documentElement.dataset.theme = "light";
+      await Promise.resolve();
+    });
+    expect(themeMessages(post)).toEqual(["light"]);
+  });
+
+  it("sends a 1.0 or 1.1 page nothing (FR-13.8)", async () => {
+    const post = await openPage(false);
+    await act(async () => {
+      document.documentElement.dataset.theme = "light";
+      await Promise.resolve();
+    });
+    expect(themeMessages(post)).toEqual([]);
+  });
 });

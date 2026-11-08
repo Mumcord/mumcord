@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getApi } from "../../api";
+import { getApi, type PluginPageTheme } from "../../api";
 import { usePreferences } from "../../app/preferences";
 import { PluginDialogHost } from "./dialog";
 import { usePluginDeepLinks } from "./browse/deepLink";
@@ -9,11 +9,7 @@ import { PluginStageHost } from "./stage";
 import { usePluginFramesDeafen } from "./webview";
 import { usePluginRequestRouter } from "./pluginRequestStore";
 import { usePluginMentions } from "./chat";
-
-const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
-
-const prefersReducedMotion = () =>
-  typeof window.matchMedia === "function" && window.matchMedia(REDUCED_MOTION).matches;
+import { onPageThemeChange, readPageTheme, reducedMotion } from "./render/pageTheme";
 
 /**
  * Tells the plugins which language and colour scheme the app shows (plugins draw their UI in
@@ -29,21 +25,34 @@ export function PluginsHost() {
   usePluginFramesDeafen();
 
   useEffect(() => {
+    let reduced = reducedMotion();
     const send = () => {
       getApi()
-        .pluginsSetAppearance(language, dark, prefersReducedMotion())
+        .pluginsSetAppearance(language, dark, reduced)
         .catch((error: unknown) => {
           console.error("Sending the appearance to the plugins failed", error);
         });
     };
     send();
-    if (typeof window.matchMedia !== "function") return;
-    const query = window.matchMedia(REDUCED_MOTION);
-    query.addEventListener("change", send);
-    return () => {
-      query.removeEventListener("change", send);
-    };
+    return onPageThemeChange((theme) => {
+      if (theme.reducedMotion === reduced) return;
+      reduced = theme.reducedMotion;
+      send();
+    });
   }, [language, dark]);
+
+  // API 1.2 pages served from now on start with the current theme (FR-13.13).
+  useEffect(() => {
+    const send = (theme: PluginPageTheme) => {
+      getApi()
+        .pluginsSetPageTheme(theme)
+        .catch((error: unknown) => {
+          console.error("Sending the theme for plugin pages failed", error);
+        });
+    };
+    send(readPageTheme());
+    return onPageThemeChange(send);
+  }, []);
 
   return (
     <>
