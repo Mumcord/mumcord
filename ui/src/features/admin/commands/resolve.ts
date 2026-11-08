@@ -21,10 +21,18 @@ export type Resolved<T> =
   /** Nothing matches; `suggestion` is the closest name, when there is one (mockup `04b`). */
   | { kind: "none"; suggestion: string | null };
 
+/**
+ * A leading `@` is a mention; a command takes the bare name, so `/kick @Mallory` works exactly
+ * like `/kick Mallory`. This is the same the mention picker does, so a name picked there fits.
+ */
+function bare(query: string): string {
+  return query.startsWith("@") ? query.slice(1) : query;
+}
+
 /** A word is a full match when a name equals it, a start match when it begins it, else a part match. */
 function rank(query: string, name: string): number {
   const lowered = name.toLowerCase();
-  const wanted = query.toLowerCase();
+  const wanted = bare(query).toLowerCase();
   if (lowered === wanted) return 0;
   if (lowered.startsWith(wanted)) return 1;
   if (lowered.includes(wanted)) return 2;
@@ -46,7 +54,8 @@ export function ranked<T>(query: string, items: readonly Candidate<T>[]): Candid
 /** Resolves a word to one item, asks which of several was meant, or finds nothing. */
 export function resolveOne<T>(query: string, items: readonly Candidate<T>[]): Resolved<T> {
   const matches = ranked(query, items);
-  const exact = matches.filter((item) => item.name.toLowerCase() === query.toLowerCase());
+  const wanted = bare(query).toLowerCase();
+  const exact = matches.filter((item) => item.name.toLowerCase() === wanted);
   // A full name wins over people who only contain it: `/mute Mall` means Mallory, not Mallory Ann.
   if (exact.length === 1) {
     const only = exact[0];
@@ -70,7 +79,7 @@ export function resolveOne<T>(query: string, items: readonly Candidate<T>[]): Re
  * Small edits only, so a word nobody resembles gives no hint.
  */
 export function closest(query: string, names: readonly string[]): string | null {
-  const wanted = query.toLowerCase();
+  const wanted = bare(query).toLowerCase();
   const budget = Math.max(1, Math.floor(wanted.length / 3));
   let best: { name: string; distance: number } | null = null;
   for (const name of names) {
