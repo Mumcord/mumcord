@@ -43,6 +43,8 @@ pub const INSPECTOR: Spec = Spec {
         "packet_capture_export",
         "packet_inspector_view",
         "packet_inspector_close",
+        // "Copy" on a packet (issue #634).
+        "copy_text",
     ],
     player_window: false,
 };
@@ -115,6 +117,8 @@ pub const WATCH_POPOUT: Spec = Spec {
         "watch_party_report",
         "watch_party_next",
         "watch_party_previous",
+        // "Open in browser" when the video cannot play here (issue #634).
+        "open_link",
     ],
     player_window: true,
 };
@@ -167,6 +171,10 @@ pub const STAGE_POPOUT: Spec = Spec {
         "stage_leave",
         "stage_visibility",
         "plugin_details_open",
+        // The server name in the "no relay" banner (issue #634).
+        "servers_list",
+        // A plugin's copy button in its stage tree (issue #634).
+        "copy_text",
     ],
     // A stage window shows a plugin's tree or page, never a player Mumcord grants full screen to.
     player_window: false,
@@ -198,6 +206,8 @@ pub const CAMERA_POPOUT: Spec = Spec {
         "camera_frames_attach",
         "camera_frames_detach",
         "camera_set_decode_codecs",
+        // The images in the room bar's background picker (issue #634).
+        "camera_backgrounds",
     ],
     // A camera window shows frames Mumcord decoded, not a player page, so it never gets a
     // full-screen request (issue #419).
@@ -438,6 +448,39 @@ mod tests {
         assert!(command_allowed(STAGE_POPOUT.label, "plugin_details_open"));
         assert!(!command_allowed(SHARE_POPOUT.label, "plugin_details_open"));
         assert!(!command_allowed(STAGE_POPOUT.label, "settings_update"));
+    }
+
+    #[test]
+    fn the_packet_inspector_may_copy_a_packet() {
+        // Issue #634: "Copy" in the inspector was refused for its window.
+        assert!(command_allowed(INSPECTOR.label, "copy_text"));
+        assert!(!command_allowed(INSPECTOR.label, "settings_update"));
+    }
+
+    #[test]
+    fn the_watch_popout_may_open_the_video_in_the_browser() {
+        // Issue #634: "Open in browser" was refused for the pop-out.
+        assert!(command_allowed(WATCH_POPOUT.label, "open_link"));
+        assert!(!command_allowed(SHARE_POPOUT.label, "open_link"));
+    }
+
+    #[test]
+    fn the_stage_popout_may_copy_and_name_the_server() {
+        // Issue #634: a plugin's copy button and the banner's server name were refused.
+        assert!(command_allowed(STAGE_POPOUT.label, "copy_text"));
+        assert!(command_allowed(STAGE_POPOUT.label, "servers_list"));
+        assert!(!command_allowed(STAGE_POPOUT.label, "server_update"));
+    }
+
+    #[test]
+    fn the_camera_popout_may_list_the_background_images() {
+        // Issue #634: the background picker in the pop-out showed no images.
+        assert!(command_allowed(CAMERA_POPOUT.label, "camera_backgrounds"));
+        assert!(!command_allowed(
+            CAMERA_POPOUT.label,
+            "camera_own_background_add"
+        ));
+        assert!(!command_allowed(CAMERA_POPOUT.label, "settings_get"));
     }
 
     #[test]
