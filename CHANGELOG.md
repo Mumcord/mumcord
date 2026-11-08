@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- macOS: plugin content in a dialog or panel sits exactly in its frame again instead of being shifted up by about the title bar's height
+- macOS: when a plugin froze the window, restarting the window failed every time ("a webview with label `main` already exists"); it now waits until the old window is really gone
 - Copy works again in the packet inspector, and when Windows refuses the app's clipboard (e.g. "Copy" on a crash report) Mumcord copies through the window's own clipboard instead
 
 ## [0.7.2] - 2026-11-08
