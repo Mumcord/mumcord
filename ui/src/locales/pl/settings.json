@@ -450,12 +450,16 @@
   },
   "notifications": {
     "title": "Powiadomienia",
-    "legend": "Powiadomienia o nowych wiadomościach",
-    "explanation": "Dla nowych wiadomości na Twoim kanale, obserwowanych kanałach i czatach prywatnych, z wyjątkiem czatu, na który patrzysz.",
-    "inApp": "W aplikacji: małe okienko w Mumcord, gdy jest na wierzchu",
-    "desktop": "Pulpit: powiadomienie systemowe",
-    "both": "Oba: okienko, gdy Mumcord jest na wierzchu, w przeciwnym razie powiadomienie systemowe",
-    "off": "Wyłączone",
+    "explanation": "Jak Mumcord informuje cię o nowych wiadomościach i o tym, co dzieje się na twoich serwerach. Każdy rodzaj ma własny wybór.",
+    "messages": "Nowe wiadomości",
+    "messagesHint": "Twój kanał, obserwowane kanały i czaty prywatne",
+    "mode": {
+      "off": "Wyłączone",
+      "inApp": "W aplikacji",
+      "desktop": "Systemowe",
+      "both": "Oba"
+    },
+    "modesHint": "W aplikacji: małe okienko w Mumcord, gdy jest na wierzchu. Systemowe: powiadomienie z twojego systemu operacyjnego. Oba: okienko, gdy Mumcord jest na wierzchu, w przeciwnym razie powiadomienie systemowe. Nic nie jest pokazywane dla czatu, na który patrzysz, ani w trybie Nie przeszkadzać.",
     "activityTitle": "Powiadomienia o aktywności",
     "activity": {
       "screenShare": "Ktoś rozpoczyna udostępnianie ekranu",
@@ -1291,6 +1295,8 @@
   },
   "activityHistory": {
     "title": "Historia aktywności",
+    "keep": "Zachowaj historię aktywności po ponownym uruchomieniu",
+    "keepHint": "Zapisuje, kto się połączył, wyszedł, zmienił kanał, udostępnił ekran lub rozpoczął watch party, aby kanał aktywności był dostępny po ponownym uruchomieniu. Wyłączone: kanał za każdym razem zaczyna się pusty. Wyłączenie usuwa zapisane dane.",
     "clear": "Wyczyść historię aktywności",
     "hint": "Usuwa zapisany kanał wszystkich serwerów.",
     "local": "Zapisywane tylko na tym urządzeniu.",

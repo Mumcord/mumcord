@@ -344,6 +344,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
     section: "privacy",
     group: "activityHistory.title",
+    control: "activityHistory.keep",
+    terms: ["activityHistory.keepHint"],
+  },
+  {
+    section: "privacy",
+    group: "activityHistory.title",
     control: "activityHistory.button",
     terms: ["activityHistory.clear", "activityHistory.hint", "activityHistory.local"],
   },
@@ -463,9 +469,16 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
     section: "chatNotifications",
     group: "notifications.title",
-    control: "notifications.legend",
-    terms: ["searchTerms.notifications", "notifications.explanation"],
+    control: "notifications.messages",
+    terms: ["searchTerms.notifications", "notifications.explanation", "notifications.modesHint"],
   },
+  ...(["screenShare", "watchParty", "pluginActivity", "pluginEvent", "joins"] as const).map(
+    (kind) => ({
+      section: "chatNotifications" as const,
+      group: "notifications.title",
+      control: `notifications.activity.${kind}`,
+    }),
+  ),
   {
     section: "gaming",
     group: "overlay.inGame.title",

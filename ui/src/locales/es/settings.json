@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Notificaciones",
-    "legend": "Notificaciones de mensajes nuevos",
-    "explanation": "Para mensajes nuevos en tu canal, en canales seguidos y en chats privados, excepto el chat que estás viendo.",
-    "inApp": "En la app: un aviso pequeño dentro de Mumcord mientras está en primer plano",
-    "desktop": "Escritorio: una notificación del sistema",
-    "both": "Ambas: aviso mientras Mumcord está en primer plano, notificación del sistema si no",
-    "off": "Desactivadas",
+    "explanation": "Cómo te avisa Mumcord de los mensajes nuevos y de lo que ocurre en tus servidores. Cada tipo tiene su propia opción.",
+    "messages": "Mensajes nuevos",
+    "messagesHint": "Tu canal, los canales que sigues y los chats privados",
+    "mode": {
+      "off": "Desactivado",
+      "inApp": "En la app",
+      "desktop": "Sistema",
+      "both": "Ambas"
+    },
+    "modesHint": "En la app: un aviso pequeño dentro de Mumcord mientras está en primer plano. Sistema: una notificación de tu sistema operativo. Ambas: el aviso mientras Mumcord está en primer plano y, si no, una notificación del sistema. No se muestra nada para el chat que estás viendo ni con No molestar.",
     "activityTitle": "Notificaciones de actividad",
     "activity": {
       "screenShare": "Alguien empieza a compartir pantalla",
@@ -1281,6 +1285,8 @@
   },
   "activityHistory": {
     "title": "Historial de actividad",
+    "keep": "Conservar el historial de actividad tras reiniciar",
+    "keepHint": "Guarda quién se conectó, salió, cambió de canal, compartió pantalla o inició una watch party, para que el historial siga ahí tras reiniciar. Desactivado: el historial empieza vacío cada vez. Al desactivarlo se borra lo guardado.",
     "clear": "Borrar historial de actividad",
     "hint": "Elimina el registro guardado de todos los servidores.",
     "local": "Se guarda solo en este dispositivo.",

@@ -450,12 +450,16 @@
   },
   "notifications": {
     "title": "Pranešimai",
-    "legend": "Pranešimai apie naujas žinutes",
-    "explanation": "Apie naujas žinutes tavo kanale, sekamuose kanaluose ir privačiuose pokalbiuose, išskyrus pokalbį, į kurį žiūri.",
-    "inApp": "Programoje: nedidelis iššokantis langelis Mumcord viduje, kol jis priekyje",
-    "desktop": "Darbalaukyje: sistemos pranešimas",
-    "both": "Abu: iššokantis langelis, kol Mumcord priekyje, kitu atveju – sistemos pranešimas",
-    "off": "Išjungta",
+    "explanation": "Kaip Mumcord praneša apie naujas žinutes ir tai, kas vyksta jūsų serveriuose. Kiekviena rūšis turi savo pasirinkimą.",
+    "messages": "Naujos žinutės",
+    "messagesHint": "Jūsų kanalas, sekami kanalai ir privatūs pokalbiai",
+    "mode": {
+      "off": "Išjungta",
+      "inApp": "Programoje",
+      "desktop": "Sistema",
+      "both": "Abu"
+    },
+    "modesHint": "Programoje: nedidelis iššokantis langelis Mumcord viduje, kol jis priekiniame plane. Sistema: jūsų operacinės sistemos pranešimas. Abu: iššokantis langelis, kol Mumcord priekiniame plane, kitu atveju sistemos pranešimas. Pokalbiui, į kurį dabar žiūrite, ir veikiant režimui „Netrukdyti“ nieko nerodoma.",
     "activityTitle": "Veiklos pranešimai",
     "activity": {
       "screenShare": "Kas nors pradeda bendrinti ekraną",
@@ -1291,6 +1295,8 @@
   },
   "activityHistory": {
     "title": "Veiklos istorija",
+    "keep": "Išsaugoti veiklos istoriją po paleidimo iš naujo",
+    "keepHint": "Išsaugo, kas prisijungė, išėjo, pakeitė kanalą, bendrino ekraną ar pradėjo watch party, kad srautas išliktų ir paleidus iš naujo. Išjungta: srautas kaskart prasideda tuščias. Išjungus išsaugoti duomenys ištrinami.",
     "clear": "Išvalyti veiklos istoriją",
     "hint": "Pašalina išsaugotą visų serverių sklaidą.",
     "local": "Saugoma tik šiame įrenginyje.",

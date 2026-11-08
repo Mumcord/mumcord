@@ -73,10 +73,24 @@ pub async fn notify_message(
     Ok(notifications::notify(&app, mode, notice).await)
 }
 
+/// Which setting decides how an activity event notifies (#660).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ActivityNotifyKind {
+    Joins,
+    ScreenShare,
+    WatchParty,
+    PluginActivity,
+    PluginEvent,
+}
+
 /// One new activity-feed event as the UI would announce it (#597). Texts are translated and plain.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityNotice {
+    /// The activity kind whose setting decides; `null` for other notices (the relay warning),
+    /// which follow the message setting.
+    pub kind: Option<ActivityNotifyKind>,
     pub server_id: ServerId,
     /// The channel the event happened in; clicking the notification opens its chat, where the
     /// share, party or activity is shown.
@@ -101,7 +115,16 @@ pub async fn notify_activity(
     if crate::dnd::active(&app) || notifications::server_muted(&app, notice.server_id).await {
         return Ok(NotifyOutcome::None);
     }
-    let mode = engine.settings()?.notifications;
+    let settings = engine.settings()?;
+    let modes = settings.activity_notify;
+    let mode = match notice.kind {
+        None => settings.notifications,
+        Some(ActivityNotifyKind::Joins) => modes.joins,
+        Some(ActivityNotifyKind::ScreenShare) => modes.screen_share,
+        Some(ActivityNotifyKind::WatchParty) => modes.watch_party,
+        Some(ActivityNotifyKind::PluginActivity) => modes.plugin_activity,
+        Some(ActivityNotifyKind::PluginEvent) => modes.plugin_event,
+    };
     let message = MessageNotice {
         server_id: notice.server_id,
         conversation: Conversation::Channel {

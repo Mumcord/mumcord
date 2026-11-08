@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Notificări",
-    "legend": "Notificări pentru mesaje noi",
-    "explanation": "Pentru mesajele noi din canalul tău, din canalele urmărite și din chaturile private, cu excepția chatului pe care îl vezi.",
-    "inApp": "În aplicație: un mic pop-up în Mumcord cât timp e în prim-plan",
-    "desktop": "Desktop: o notificare de sistem",
-    "both": "Ambele: pop-up cât timp Mumcord e în prim-plan, altfel notificare de sistem",
-    "off": "Oprit",
+    "explanation": "Cum te anunță Mumcord despre mesajele noi și despre ce se întâmplă pe serverele tale. Fiecare tip are alegerea lui.",
+    "messages": "Mesaje noi",
+    "messagesHint": "Canalul tău, canalele urmărite și conversațiile private",
+    "mode": {
+      "off": "Oprit",
+      "inApp": "În aplicație",
+      "desktop": "Sistem",
+      "both": "Ambele"
+    },
+    "modesHint": "În aplicație: un mic pop-up în Mumcord cât timp e în prim-plan. Sistem: o notificare de la sistemul tău de operare. Ambele: pop-up-ul cât timp Mumcord e în prim-plan, altfel o notificare de sistem. Nu se afișează nimic pentru conversația pe care o vezi sau în timpul Nu deranja.",
     "activityTitle": "Notificări de activitate",
     "activity": {
       "screenShare": "Cineva începe o partajare de ecran",
@@ -1281,6 +1285,8 @@
   },
   "activityHistory": {
     "title": "Istoricul activității",
+    "keep": "Păstrează istoricul activității după repornire",
+    "keepHint": "Salvează cine s-a conectat, a plecat, a schimbat canalul, a partajat ecranul sau a pornit un watch party, ca fluxul să rămână și după repornire. Oprit: fluxul pornește gol de fiecare dată. Dezactivarea șterge ce a fost salvat.",
     "clear": "Șterge istoricul activității",
     "hint": "Elimină fluxul salvat pentru toate serverele.",
     "local": "Salvat doar pe acest dispozitiv.",

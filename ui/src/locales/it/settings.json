@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Notifiche",
-    "legend": "Notifiche per i nuovi messaggi",
-    "explanation": "Per i nuovi messaggi nel tuo canale, nei canali seguiti e nelle chat private, tranne la chat che stai guardando.",
-    "inApp": "Nell'app: un piccolo pop-up dentro Mumcord quando è in primo piano",
-    "desktop": "Desktop: una notifica di sistema",
-    "both": "Entrambe: pop-up quando Mumcord è in primo piano, altrimenti notifica di sistema",
-    "off": "Disattivate",
+    "explanation": "Come Mumcord ti avvisa dei nuovi messaggi e di ciò che accade sui tuoi server. Ogni tipo ha la sua scelta.",
+    "messages": "Nuovi messaggi",
+    "messagesHint": "Il tuo canale, i canali seguiti e le chat private",
+    "mode": {
+      "off": "Disattivato",
+      "inApp": "Nell'app",
+      "desktop": "Sistema",
+      "both": "Entrambe"
+    },
+    "modesHint": "Nell'app: un piccolo pop-up dentro Mumcord quando è in primo piano. Sistema: una notifica del tuo sistema operativo. Entrambe: il pop-up quando Mumcord è in primo piano, altrimenti una notifica di sistema. Non viene mostrato nulla per la chat che stai guardando né durante Non disturbare.",
     "activityTitle": "Notifiche di attività",
     "activity": {
       "screenShare": "Qualcuno avvia una condivisione schermo",
@@ -1281,6 +1285,8 @@
   },
   "activityHistory": {
     "title": "Cronologia attività",
+    "keep": "Mantieni la cronologia attività dopo il riavvio",
+    "keepHint": "Salva chi si è connesso, è uscito, ha cambiato canale, ha condiviso lo schermo o ha avviato una watch party, così il feed resta anche dopo il riavvio. Disattivato: il feed parte vuoto ogni volta. Disattivandolo, ciò che era stato salvato viene eliminato.",
     "clear": "Cancella cronologia attività",
     "hint": "Rimuove il feed salvato di tutti i server.",
     "local": "Salvato solo su questo dispositivo.",

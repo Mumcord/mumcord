@@ -33,6 +33,7 @@
     "voice": "Guth",
     "setupStyle": "Stíl socraithe",
     "privateMessages": "Teachtaireachtaí príobháideacha",
+    "notifications": "Fógraí",
     "connections": "Naisc",
     "features": "Gnéithe",
     "appearance": "Cuma",
@@ -146,6 +147,10 @@
     "subtitle": "Is comhráite duine le duine iad teachtaireachtaí príobháideacha. Ní bhíonn tionchar ag an rogha seo ar chomhrá cainéil.",
     "local": "Tarlaíonn an scagadh ar do ríomhaire. Ní insítear do na seoltóirí. Is féidir leat riail dhifriúil a shocrú do gach freastalaí níos déanaí."
   },
+  "notifications": {
+    "title": "Conas ba cheart do Mumcord fógra a thabhairt duit?",
+    "subtitle": "Roghnaigh conas a shroicheann gach cineál nuachta thú. Is féidir leat é a athrú ar ball in Socruithe → Fógraí."
+  },
   "connections": {
     "title": "Naisc agus ábhar",
     "subtitle": "Nascann roinnt gnéithe thú go díreach le húsáideoirí Mumcord eile, agus luchtaítear roinnt ábhair chomhrá ó shuíomhanna gréasáin eile. Roghnaigh cad atá ceart duit.",
@@ -185,6 +190,7 @@
       "identity": "Féiniúlacht",
       "voice": "Guth",
       "privateMessages": "Teachtaireachtaí príobháideacha",
+      "notifications": "Fógraí",
       "connections": "Naisc",
       "chatContent": "Ábhar comhrá",
       "features": "Gnéithe",
@@ -195,10 +201,12 @@
     "identityDetail": "Sábháilte i dtaisceadán eochracha do chórais",
     "voiceDetail": "Laghdú torainn: {{noise}}",
     "pmDetail": "Mo chainéal {{channel}} · comhráite glactha {{accepted}} · iarratais {{requests}}",
+    "notificationsTitle": "Teachtaireachtaí nua: {{mode}}",
+    "notificationsDetail": "Fógraí gníomhaíochta: {{on}} as {{total}} ar siúl",
     "contentTitle": "Réamhamharcanna naisc {{previews}}",
     "contentDetail": "Íomhánna lán-mhéide {{images}} · sioncronú staire {{sync}}",
     "featuresTitle": "Forleagan sa chluiche {{overlay}}",
-    "featuresDetail": "Lean Ná Cuir Isteach Orm an chórais {{dnd}} · ag seinm anois {{playing}} · ag imirt anois {{gaming}}",
+    "featuresDetail": "Lean Ná Cuir Isteach Orm an chórais {{dnd}} · ag seinm anois {{playing}} · ag imirt anois {{gaming}} · stair ghníomhaíochta {{history}}",
     "effectsDetail": "Éifeachtaí amhairc {{effects}}",
     "startupTitle": "Tosú ag logáil isteach {{login}}",
     "startupDetail": "Tosú íoslaghdaithe {{minimized}} · naisc mumble:// {{links}}",
