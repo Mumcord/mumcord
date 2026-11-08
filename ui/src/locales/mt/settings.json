@@ -540,7 +540,9 @@
     "copyWhole": "Ikkopja l-log kollu",
     "openLogFolder": "Iftaħ il-folder tal-logs",
     "logCopied": "Il-log ġie kkopjat.",
-    "fileLabel": "Fajl dijanjostiku"
+    "fileLabel": "Fajl dijanjostiku",
+    "writeToDisk": "Ikteb il-logs fuq id-diska",
+    "writeToDiskHint": "Mitfi jżomm il-log fil-memorja biss għal din is-sessjoni — xejn ma jinkiteb fuq id-diska."
   },
   "about": {
     "version": "Verżjoni",
@@ -1313,5 +1315,15 @@
     "button": "Ħassar l-istorja",
     "confirm": "Tħassar l-istorja tal-attività tas-servers kollha? Dan ma jistax jitreġġa' lura.",
     "confirmButton": "Ħassar"
+  },
+  "diskWrites": {
+    "title": "Inqas kitba fuq id-diska",
+    "hint": "Inqas kitba tilbes inqas lid-diski SSD. Kull swiċċ iżomm l-imġiba attwali meta jkun mixgħul.",
+    "durableSaves": "Stenna għad-diska f'kull ħlief",
+    "durableSavesHint": "Mitfi jikteb inqas, imma qtugħ tad-dawl jista' jitlef l-aħħar sekondi ta' storja u settings.",
+    "linkPreviewsOnDisk": "Żomm il-previews tal-links fuq id-diska",
+    "linkPreviewsOnDiskHint": "Mitfi jżomm il-previews fil-memorja biss għal din is-sessjoni.",
+    "pluginRegistryCache": "Żomm kopja tar-reġistru tal-plugins fuq id-diska",
+    "pluginRegistryCacheHint": "Mitfi dejjem iniżżel ir-reġistru mill-ġdid."
   }
 }

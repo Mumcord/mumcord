@@ -580,10 +580,29 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   },
   { section: "plugins", group: "pluginSounds.title", control: "pluginSounds.mute" },
   { section: "advanced", group: "diagnostics.title", control: "diagnostics.logLevel" },
+  { section: "advanced", group: "diagnostics.title", control: "diagnostics.writeToDisk" },
   {
     section: "advanced",
     group: "diagnostics.title",
     terms: ["diagnostics.file", "diagnostics.fileHint"],
+  },
+  {
+    section: "advanced",
+    group: "diskWrites.title",
+    control: "diskWrites.durableSaves",
+    terms: ["diskWrites.durableSavesHint", "diskWrites.hint"],
+  },
+  {
+    section: "advanced",
+    group: "diskWrites.title",
+    control: "diskWrites.linkPreviewsOnDisk",
+    terms: ["diskWrites.linkPreviewsOnDiskHint"],
+  },
+  {
+    section: "advanced",
+    group: "diskWrites.title",
+    control: "diskWrites.pluginRegistryCache",
+    terms: ["diskWrites.pluginRegistryCacheHint"],
   },
   {
     section: "general",

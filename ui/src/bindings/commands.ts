@@ -5010,6 +5010,10 @@ export type Settings = {
 	closeBehaviour: CloseBehaviour,
 	chatDisplay: ChatDisplay,
 	logLevel: LogLevel,
+	/**  Write logs to disk (default on; spec 12). Off: memory-only log. */
+	logToDisk: boolean,
+	/**  Wait for disk on every save (default on; spec 12). Off: synchronous = OFF. */
+	durableSaves: boolean,
 	/**  Send the default avatar to servers connected to for the first time (FR-1.47). */
 	sendDefaultAvatar: boolean,
 	/**
@@ -5026,6 +5030,8 @@ export type Settings = {
 	 *  and `link_preview` fetches nothing.
 	 */
 	linkPreviews: boolean,
+	/**  Keep link previews on disk (default on; spec 12). Off: memory only for the session. */
+	linkPreviewsOnDisk: boolean,
 	/**
 	 *  "Delete cached previews after X days" (default 7; `null` never; QA.42). Previews,
 	 *  thumbnails and images are pruned at start, periodically and when this changes.
@@ -5076,6 +5082,8 @@ export type Settings = {
 	pluginsBadgePlugin: string | null,
 	/**  Optional mirror of the official plugin repository. */
 	pluginsMirrorUrl: string | null,
+	/**  Keep the plugin registry copy on disk (default on; spec 12). Off: always fetch fresh. */
+	pluginRegistryCache: boolean,
 	/**  Developer mode (dev folders, local HTTP repositories). */
 	developerMode: boolean,
 	/**  Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14). */

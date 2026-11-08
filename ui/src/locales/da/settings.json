@@ -531,7 +531,9 @@
     "copyWhole": "Kopiér hele loggen",
     "openLogFolder": "Åbn logmappen",
     "logCopied": "Log kopieret.",
-    "fileLabel": "Diagnosefil"
+    "fileLabel": "Diagnosefil",
+    "writeToDisk": "Skriv logfiler til disk",
+    "writeToDiskHint": "Slået fra holdes loggen kun i hukommelsen for denne session — intet skrives til disk."
   },
   "about": {
     "version": "Version",
@@ -1283,5 +1285,15 @@
     "button": "Ryd historik",
     "confirm": "Vil du rydde aktivitetshistorikken for alle servere? Det kan ikke fortrydes.",
     "confirmButton": "Ryd"
+  },
+  "diskWrites": {
+    "title": "Færre skrivninger til disken",
+    "hint": "Færre skrivninger slider mindre på SSD-drev. Hver kontakt bevarer den nuværende adfærd, når den er tændt.",
+    "durableSaves": "Vent på disken ved hver gemning",
+    "durableSavesHint": "Slået fra skriver mindre, men strømsvigt kan miste de sidste få sekunders historik og indstillinger.",
+    "linkPreviewsOnDisk": "Gem linkeksempler på disken",
+    "linkPreviewsOnDiskHint": "Slået fra gemmes eksempler kun i hukommelsen for denne session.",
+    "pluginRegistryCache": "Gem kopi af pluginregistret på disken",
+    "pluginRegistryCacheHint": "Slået fra hentes registret altid på ny."
   }
 }

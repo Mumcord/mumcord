@@ -531,7 +531,9 @@
     "copyWhole": "Ganzes Protokoll kopieren",
     "openLogFolder": "Protokollordner öffnen",
     "logCopied": "Protokoll kopiert.",
-    "fileLabel": "Diagnosedatei"
+    "fileLabel": "Diagnosedatei",
+    "writeToDisk": "Protokolle auf die Festplatte schreiben",
+    "writeToDiskHint": "Aus hält das Protokoll nur für diese Sitzung im Speicher — es wird nichts auf die Festplatte geschrieben."
   },
   "about": {
     "version": "Version",
@@ -1283,5 +1285,15 @@
     "button": "Verlauf löschen",
     "confirm": "Den Aktivitätsverlauf aller Server löschen? Das kann nicht rückgängig gemacht werden.",
     "confirmButton": "Löschen"
+  },
+  "diskWrites": {
+    "title": "Festplatten-Schreibvorgänge reduzieren",
+    "hint": "Weniger Schreibvorgänge schonen SSDs. Jeder Schalter behält das heutige Verhalten, wenn er an ist.",
+    "durableSaves": "Bei jedem Speichern auf die Festplatte warten",
+    "durableSavesHint": "Aus schreibt weniger, aber ein Stromausfall kann die letzten Sekunden von Verlauf und Einstellungen verlieren.",
+    "linkPreviewsOnDisk": "Link-Vorschauen auf der Festplatte behalten",
+    "linkPreviewsOnDiskHint": "Aus hält Vorschauen nur für diese Sitzung im Speicher.",
+    "pluginRegistryCache": "Kopie des Plugin-Registers auf der Festplatte behalten",
+    "pluginRegistryCacheHint": "Aus lädt das Register immer neu."
   }
 }

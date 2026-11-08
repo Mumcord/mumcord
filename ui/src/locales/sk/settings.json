@@ -537,7 +537,9 @@
     "copyWhole": "Skopírovať celý záznam",
     "openLogFolder": "Otvoriť priečinok so záznamami",
     "logCopied": "Záznam skopírovaný.",
-    "fileLabel": "Diagnostický súbor"
+    "fileLabel": "Diagnostický súbor",
+    "writeToDisk": "Zapisovať logy na disk",
+    "writeToDiskHint": "Vypnuté ponechá log len v pamäti počas tejto relácie — na disk sa nič nezapisuje."
   },
   "about": {
     "version": "Verzia",
@@ -1303,5 +1305,15 @@
     "button": "Vymazať históriu",
     "confirm": "Vymazať históriu aktivity všetkých serverov? Túto akciu nie je možné vrátiť.",
     "confirmButton": "Vymazať"
+  },
+  "diskWrites": {
+    "title": "Menej zápisov na disk",
+    "hint": "Menej zápisov menej opotrebúva SSD disky. Každý prepínač zachováva dnešné správanie, keď je zapnutý.",
+    "durableSaves": "Čakať na disk pri každom uložení",
+    "durableSavesHint": "Vypnuté zapisuje menej, ale výpadok prúdu môže stratiť posledné sekundy histórie a nastavení.",
+    "linkPreviewsOnDisk": "Ukladať náhľady odkazov na disk",
+    "linkPreviewsOnDiskHint": "Vypnuté uchováva náhľady len v pamäti počas tejto relácie.",
+    "pluginRegistryCache": "Ukladať kópiu registra doplnkov na disk",
+    "pluginRegistryCacheHint": "Vypnuté vždy stiahne register znova."
   }
 }

@@ -217,6 +217,9 @@ fn lock<T>(m: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 enum Sink {
     Pending(Vec<String>),
     File(BufWriter<RollingFileAppender>),
+    /// Logging to disk is off (spec 12 FR-12.2): the memory ring still records, nothing is
+    /// written.
+    Off,
 }
 
 impl Sink {
@@ -233,10 +236,11 @@ impl Sink {
                     eprintln!("mumcord: writing log file failed: {err}");
                 }
             }
+            Self::Off => {}
         }
     }
 
-    /// Pushes everything buffered to the file. A no-op for `Pending`.
+    /// Pushes everything buffered to the file. A no-op for `Pending` and `Off`.
     fn flush(&mut self) {
         if let Self::File(file) = self
             && let Err(err) = file.flush()
@@ -361,11 +365,30 @@ pub fn init_early() -> anyhow::Result<()> {
 /// Opens the log file in `logs_dir` (created if missing), writes the lines kept since
 /// [`init_early`] and sets the level. Keeps at most `max_files` daily files.
 pub fn attach_file(logs_dir: &Path, level: LogLevel, max_files: usize) -> anyhow::Result<()> {
+    set_disk_logging(true, logs_dir, level, max_files)
+}
+
+/// Turns writing the log file on or off at runtime (spec 12 FR-12.2). The in-memory ring and
+/// the level filter stay active either way, so "copy log" and the diagnostic file keep working.
+pub fn set_disk_logging(
+    enabled: bool,
+    logs_dir: &Path,
+    level: LogLevel,
+    max_files: usize,
+) -> anyhow::Result<()> {
     let shared = GLOBAL
         .get()
         .ok_or_else(|| anyhow::anyhow!("logging not initialised"))?;
-    std::fs::create_dir_all(logs_dir)?;
-    attach(shared, logs_dir, max_files)?;
+    if enabled {
+        if matches!(&*lock(&shared.sink), Sink::Pending(_) | Sink::Off) {
+            std::fs::create_dir_all(logs_dir)?;
+            attach(shared, logs_dir, max_files)?;
+        }
+    } else {
+        let mut sink = lock(&shared.sink);
+        sink.flush();
+        *sink = Sink::Off;
+    }
     set_log_level(level)
 }
 

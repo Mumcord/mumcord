@@ -531,7 +531,9 @@
     "copyWhole": "Hele log kopiëren",
     "openLogFolder": "Logmap openen",
     "logCopied": "Log gekopieerd.",
-    "fileLabel": "Diagnosebestand"
+    "fileLabel": "Diagnosebestand",
+    "writeToDisk": "Logs naar schijf schrijven",
+    "writeToDiskHint": "Uit houdt het logboek alleen in het geheugen voor deze sessie — er wordt niets naar schijf geschreven."
   },
   "about": {
     "version": "Versie",
@@ -1283,5 +1285,15 @@
     "button": "Geschiedenis wissen",
     "confirm": "De activiteitengeschiedenis van alle servers wissen? Dit kan niet ongedaan worden gemaakt.",
     "confirmButton": "Wissen"
+  },
+  "diskWrites": {
+    "title": "Minder schijfschrijfacties",
+    "hint": "Minder schrijfacties slijten SSD's minder. Elke schakelaar behoudt het huidige gedrag wanneer aan.",
+    "durableSaves": "Wacht bij elke opslag op de schijf",
+    "durableSavesHint": "Uit schrijft minder, maar stroomuitval kan de laatste seconden geschiedenis en instellingen verliezen.",
+    "linkPreviewsOnDisk": "Linkvoorbeelden op schijf bewaren",
+    "linkPreviewsOnDiskHint": "Uit bewaart voorbeelden alleen in het geheugen voor deze sessie.",
+    "pluginRegistryCache": "Kopie van het pluginregister op schijf bewaren",
+    "pluginRegistryCacheHint": "Uit haalt het register altijd opnieuw op."
   }
 }
