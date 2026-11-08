@@ -1,0 +1,666 @@
+/*
+ * Mumcord UI kit for plugin pages (API 1.2, spec 13 FR-13.18 … FR-13.27). Served to 1.2 plugins at
+ * `_mumcord/v1/kit.css` inside their own web address.
+ *
+ * Rules of this file:
+ * - Opt-in only: it styles elements with an `mc-` class anywhere, and plain controls only inside
+ *   `.mc-kit`. It never styles `html`, `body` or `*`.
+ * - Every selector sits in `:where()`, so its specificity is zero and any style of the page wins.
+ * - Colours, sizes, radii, fonts and durations come only from the `--mc-` tokens Mumcord puts on
+ *   the page's root, so the kit follows theme changes without a reload. Sizes are `rem`/`em`.
+ * - `!important` only inside `forced-colors`, and there only to restore system colours.
+ *
+ * The controls copy Mumcord's own (ui/src/theme/controls.css, the pill buttons in
+ * ui/src/app/shell.css, the Settings switch and text fields, the Select trigger, the app dialogs).
+ * Change both in the same pull request.
+ */
+
+/* The app's own faces (Latin subsets, OFL-1.1, see fonts/OFL.txt). */
+@font-face {
+  font-family: "Instrument Sans Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url("fonts/instrument-sans-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* The opted-in area reads like Mumcord's window. Colours and background stay the page's (or
+   `.mc-surface`), so linking the kit never repaints a page. */
+:where(.mc-kit) {
+  font-family: var(--mc-font-family);
+  font-size: var(--mc-font-size-md);
+  line-height: var(--mc-line-height);
+}
+
+/* ---- Shared type for every control ---------------------------------------------------------- */
+
+:where(
+  .mc-button,
+  .mc-select,
+  .mc-input,
+  .mc-textarea,
+  .mc-kit button,
+  .mc-kit select,
+  .mc-kit textarea,
+  .mc-kit input
+) {
+  font-family: var(--mc-font-family);
+  font-size: var(--mc-font-size-md);
+  line-height: var(--mc-line-height);
+  color: var(--mc-color-text);
+}
+
+/* ---- Buttons (shell.css `.button`, `.button--primary`) -------------------------------------- */
+
+:where(.mc-button, .mc-kit button) {
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--mc-space-2) var(--mc-space-4);
+  border: 0.0625rem solid var(--mc-color-border-strong);
+  border-radius: var(--mc-radius-full);
+  background: var(--mc-color-surface-raised);
+  font-weight: var(--mc-font-weight-normal);
+  cursor: pointer;
+  transition:
+    background-color var(--mc-duration-fast),
+    border-color var(--mc-duration-fast),
+    transform var(--mc-duration-normal) var(--mc-ease-out);
+}
+
+:where(:where(.mc-button, .mc-kit button):hover:not(:disabled)) {
+  border-color: var(--mc-color-text-secondary);
+  background: var(--mc-color-hover);
+}
+
+:where(.mc-button--primary),
+:where(:where(.mc-button--primary):hover:not(:disabled)) {
+  border-color: transparent;
+  background: var(--mc-color-primary);
+  color: var(--mc-color-on-primary);
+  font-weight: var(--mc-font-weight-bold);
+}
+
+:where(.mc-button--danger) {
+  border-color: var(--mc-color-danger);
+  color: var(--mc-color-danger);
+}
+
+:where(:where(.mc-button--danger):hover:not(:disabled)) {
+  border-color: var(--mc-color-danger);
+  background: var(--mc-color-hover);
+}
+
+/* The press shrink is motion, so it stays off while Mumcord asks for reduced motion. */
+:where(
+  :where(:root:not([data-mc-reduced-motion="true"]))
+    :where(.mc-button, .mc-kit button):active:not(:disabled)
+) {
+  transform: scale(0.97);
+}
+
+:where(:where(.mc-button, .mc-kit button):disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Radio button and checkbox (controls.css) ----------------------------------------------- */
+
+:where(
+  .mc-radio,
+  .mc-checkbox,
+  .mc-kit input[type="radio"],
+  .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch)
+) {
+  appearance: none;
+  display: inline-grid;
+  flex: none;
+  place-content: center;
+  box-sizing: border-box;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.0625rem 0 0;
+  border: 0.125rem solid var(--mc-color-border-strong);
+  background: transparent;
+  color: var(--mc-color-accent);
+  vertical-align: middle;
+  cursor: pointer;
+  transition:
+    border-color var(--mc-duration-fast) var(--mc-ease-out),
+    background-color var(--mc-duration-fast) var(--mc-ease-out);
+}
+
+:where(.mc-radio, .mc-kit input[type="radio"]) {
+  border-radius: 50%;
+}
+
+:where(.mc-checkbox, .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch)) {
+  border-radius: 0.25rem;
+}
+
+:where(
+  .mc-radio:checked,
+  .mc-checkbox:checked,
+  .mc-checkbox:indeterminate,
+  .mc-kit input[type="radio"]:checked,
+  .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):checked,
+  .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):indeterminate
+) {
+  border-color: var(--mc-color-accent);
+}
+
+:where(.mc-radio:checked, .mc-kit input[type="radio"]:checked) {
+  background: radial-gradient(circle, var(--mc-color-accent) 0 38%, transparent 42%);
+}
+
+/* The check is a mask over the accent colour, so it follows every theme's accent. */
+:where(.mc-checkbox, .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch))::before {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  background: currentcolor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3.2L15 6.8' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: scale(0);
+  transition: transform var(--mc-duration-fast) var(--mc-ease-out);
+}
+
+:where(
+  .mc-checkbox:indeterminate,
+  .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):indeterminate
+)::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10h9' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+:where(
+  .mc-checkbox:checked,
+  .mc-checkbox:indeterminate,
+  .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):checked,
+  .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):indeterminate
+)::before {
+  transform: scale(1);
+}
+
+/* Hovering the control or its label hints at the click target. */
+:where(
+  :where(
+    label:hover > .mc-radio,
+    label:hover > .mc-checkbox,
+    .mc-kit label:hover > input[type="radio"],
+    .mc-kit label:hover > input[type="checkbox"]:not([role="switch"], .mc-switch),
+    .mc-radio:hover,
+    .mc-checkbox:hover,
+    .mc-kit input[type="radio"]:hover,
+    .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):hover
+  ):not(:disabled)
+) {
+  border-color: var(--mc-color-accent);
+}
+
+:where(
+  :where(
+    .mc-radio,
+    .mc-checkbox,
+    .mc-kit input[type="radio"],
+    .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch)
+  ):disabled
+) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- Switch (the Settings switch) ----------------------------------------------------------- */
+
+:where(.mc-switch, .mc-kit input[type="checkbox"][role="switch"]) {
+  appearance: none;
+  position: relative;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 2.5rem;
+  height: 1.5rem;
+  margin: 0;
+  border: 0.0625rem solid var(--mc-color-border-strong);
+  border-radius: var(--mc-radius-full);
+  background: var(--mc-color-hover);
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background var(--mc-duration-fast);
+}
+
+:where(.mc-switch, .mc-kit input[type="checkbox"][role="switch"])::after {
+  content: "";
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--mc-radius-full);
+  background: var(--mc-color-text-secondary);
+  transition: transform var(--mc-duration-fast);
+}
+
+:where(.mc-switch:checked, .mc-kit input[type="checkbox"][role="switch"]:checked) {
+  border-color: var(--mc-color-accent);
+  background: var(--mc-color-accent);
+}
+
+:where(.mc-switch:checked, .mc-kit input[type="checkbox"][role="switch"]:checked)::after {
+  background: var(--mc-color-on-accent);
+  transform: translateX(1rem);
+}
+
+:where(
+  :where(.mc-switch, .mc-kit input[type="checkbox"][role="switch"]):hover:not(:disabled, :checked)
+) {
+  border-color: var(--mc-color-text-secondary);
+}
+
+:where(:where(.mc-switch, .mc-kit input[type="checkbox"][role="switch"]):disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Dropdown (the closed Select trigger; the open list stays the system list) -------------- */
+
+:where(.mc-select, .mc-kit select:not([multiple], [size])) {
+  appearance: none;
+  box-sizing: border-box;
+  min-width: 12rem;
+  max-width: 100%;
+  margin: 0;
+  /* Room for the chevron on the inline end, drawn below as two token-coloured strokes. */
+  padding: var(--mc-space-2) calc(var(--mc-space-2) * 2 + 0.75rem) var(--mc-space-2)
+    var(--mc-space-2);
+  border: 0.0625rem solid var(--mc-color-border-strong);
+  border-radius: var(--mc-radius-md);
+  background-color: var(--mc-color-surface-raised);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--mc-color-text) 50%),
+    linear-gradient(135deg, var(--mc-color-text) 50%, transparent 50%);
+  background-position:
+    right calc(var(--mc-space-2) + 0.375rem) center,
+    right var(--mc-space-2) center;
+  background-size: 0.375rem 0.375rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+:where(:where(.mc-select, .mc-kit select:not([multiple], [size])):hover:not(:disabled)) {
+  border-color: var(--mc-color-text-secondary);
+}
+
+:where(:where(.mc-select, .mc-kit select):disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* The options of the system list follow the page's scheme; only their text colours are set. */
+:where(.mc-select option, .mc-kit select option) {
+  background-color: var(--mc-color-surface-raised);
+  color: var(--mc-color-text);
+}
+
+/* ---- Text fields (Settings `.settings-input`) ----------------------------------------------- */
+
+:where(
+  .mc-input,
+  .mc-textarea,
+  .mc-kit textarea,
+  .mc-kit input:not([type]),
+  .mc-kit input[type="text"],
+  .mc-kit input[type="search"],
+  .mc-kit input[type="number"],
+  .mc-kit input[type="email"],
+  .mc-kit input[type="url"],
+  .mc-kit input[type="password"]
+) {
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--mc-space-2);
+  border: 0.0625rem solid var(--mc-color-border-strong);
+  border-radius: var(--mc-radius-md);
+  background: var(--mc-color-surface-raised);
+  transition: border-color var(--mc-duration-fast);
+}
+
+:where(.mc-textarea, .mc-kit textarea) {
+  min-height: 5em;
+  resize: vertical;
+}
+
+:where(.mc-input, .mc-textarea, .mc-kit textarea, .mc-kit input)::placeholder {
+  color: var(--mc-color-text-muted);
+  opacity: 1;
+}
+
+:where(
+  :where(
+      .mc-input,
+      .mc-textarea,
+      .mc-kit textarea,
+      .mc-kit input:not([type]),
+      .mc-kit input[type="text"],
+      .mc-kit input[type="search"],
+      .mc-kit input[type="number"],
+      .mc-kit input[type="email"],
+      .mc-kit input[type="url"],
+      .mc-kit input[type="password"]
+    ):hover:not(:disabled, [aria-invalid="true"])
+) {
+  border-color: var(--mc-color-text-secondary);
+}
+
+:where(
+  :where(
+    .mc-input,
+    .mc-textarea,
+    .mc-kit textarea,
+    .mc-kit input:not([type]),
+    .mc-kit input[type="text"],
+    .mc-kit input[type="search"],
+    .mc-kit input[type="number"],
+    .mc-kit input[type="email"],
+    .mc-kit input[type="url"],
+    .mc-kit input[type="password"]
+  )[aria-invalid="true"]
+) {
+  border-color: var(--mc-color-danger);
+  box-shadow: 0 0 0 0.0625rem var(--mc-color-danger);
+}
+
+:where(
+  :where(
+    .mc-input,
+    .mc-textarea,
+    .mc-kit textarea,
+    .mc-kit input:not([type]),
+    .mc-kit input[type="text"],
+    .mc-kit input[type="search"],
+    .mc-kit input[type="number"],
+    .mc-kit input[type="email"],
+    .mc-kit input[type="url"],
+    .mc-kit input[type="password"]
+  ):disabled
+) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Labels, hints, groups and section labels (Settings) ------------------------------------ */
+
+:where(.mc-label) {
+  display: block;
+  margin: var(--mc-space-2) 0 var(--mc-space-1);
+  color: var(--mc-color-text);
+}
+
+:where(.mc-kit label) {
+  color: var(--mc-color-text);
+}
+
+:where(.mc-hint) {
+  margin: var(--mc-space-1) 0;
+  font-size: var(--mc-font-size-sm);
+  color: var(--mc-color-text-muted);
+}
+
+:where(.mc-kit fieldset) {
+  min-width: 0;
+  margin: 0 0 var(--mc-space-3);
+  padding: 0;
+  border: none;
+}
+
+:where(.mc-kit legend) {
+  margin-bottom: var(--mc-space-2);
+  padding: 0;
+  color: var(--mc-color-text);
+}
+
+:where(.mc-section-label) {
+  margin: 0 0 var(--mc-space-4);
+  font-family: var(--mc-font-family-display);
+  font-size: var(--mc-font-size-xl);
+  letter-spacing: -0.01em;
+  color: var(--mc-color-text);
+}
+
+/* ---- Dialog chrome (app dialogs; visual only, the page sets role, aria and focus) ----------- */
+
+:where(.mc-dialog) {
+  box-sizing: border-box;
+  width: min(26rem, 100% - 2 * var(--mc-space-4));
+  max-width: 100%;
+  padding: var(--mc-space-5);
+  border: 0.0625rem solid var(--mc-color-border);
+  border-radius: var(--mc-radius-lg);
+  background: var(--mc-color-surface-raised);
+  color: var(--mc-color-text);
+  box-shadow: var(--mc-shadow-raised);
+  font-family: var(--mc-font-family);
+  font-size: var(--mc-font-size-md);
+  line-height: var(--mc-line-height);
+}
+
+:where(dialog.mc-dialog)::backdrop,
+:where(.mc-backdrop) {
+  background: var(--mc-color-backdrop);
+}
+
+:where(.mc-backdrop) {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+:where(.mc-dialog__header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mc-space-2);
+  margin: 0 0 var(--mc-space-3);
+}
+
+:where(.mc-dialog__title) {
+  margin: 0;
+  font-family: var(--mc-font-family-display);
+  font-size: var(--mc-font-size-lg);
+  font-weight: var(--mc-font-weight-bold);
+  letter-spacing: -0.01em;
+}
+
+:where(.mc-dialog__body) {
+  margin: 0;
+}
+
+:where(.mc-dialog__footer) {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--mc-space-2);
+  margin-top: var(--mc-space-5);
+}
+
+/* ---- Surfaces and text ---------------------------------------------------------------------- */
+
+:where(.mc-surface) {
+  background: var(--mc-color-surface);
+  color: var(--mc-color-text);
+}
+
+:where(.mc-surface-raised) {
+  background: var(--mc-color-surface-raised);
+  color: var(--mc-color-text);
+}
+
+:where(.mc-text-muted) {
+  color: var(--mc-color-text-muted);
+}
+
+/* ---- Focus ring: keyboard focus only, like the app's `:focus-visible` ----------------------- */
+
+:where(
+  :where(
+    .mc-button,
+    .mc-radio,
+    .mc-checkbox,
+    .mc-switch,
+    .mc-select,
+    .mc-input,
+    .mc-textarea,
+    .mc-focus-ring,
+    .mc-kit button,
+    .mc-kit input,
+    .mc-kit select,
+    .mc-kit textarea
+  ):focus-visible
+) {
+  outline: var(--mc-focus-ring-width) solid var(--mc-color-focus);
+  outline-offset: 0.125rem;
+}
+
+/* ---- High contrast: system colours, visible borders and focus ring -------------------------- */
+
+@media (forced-colors: active) {
+  :where(
+    .mc-button,
+    .mc-select,
+    .mc-input,
+    .mc-textarea,
+    .mc-kit button,
+    .mc-kit select,
+    .mc-kit textarea,
+    .mc-kit input:not([type="radio"], [type="checkbox"])
+  ) {
+    border-color: ButtonText !important;
+    background-color: ButtonFace !important;
+    color: ButtonText !important;
+  }
+
+  :where(
+    .mc-input,
+    .mc-textarea,
+    .mc-kit textarea,
+    .mc-kit input:not([type="radio"], [type="checkbox"])
+  ) {
+    background-color: Canvas !important;
+    color: CanvasText !important;
+  }
+
+  :where(.mc-select, .mc-kit select:not([multiple], [size])) {
+    forced-color-adjust: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, ButtonText 50%),
+      linear-gradient(135deg, ButtonText 50%, transparent 50%) !important;
+  }
+
+  /* The drawn controls must survive without author colours. */
+  :where(
+    .mc-radio,
+    .mc-checkbox,
+    .mc-kit input[type="radio"],
+    .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch)
+  ) {
+    forced-color-adjust: none;
+    border-color: ButtonText !important;
+    background-color: Canvas !important;
+    color: Highlight !important;
+  }
+
+  :where(.mc-radio:checked, .mc-kit input[type="radio"]:checked) {
+    border-color: Highlight !important;
+    background: radial-gradient(circle, Highlight 0 38%, Canvas 42%) !important;
+  }
+
+  :where(
+    .mc-checkbox:checked,
+    .mc-checkbox:indeterminate,
+    .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):checked,
+    .mc-kit input[type="checkbox"]:not([role="switch"], .mc-switch):indeterminate
+  ) {
+    border-color: Highlight !important;
+  }
+
+  /* Off knob is a hollow ring, on knob is solid on the other side: the states differ in shape. */
+  :where(.mc-switch, .mc-kit input[type="checkbox"][role="switch"]) {
+    forced-color-adjust: none;
+    border: 0.125rem solid ButtonText !important;
+    background: Canvas !important;
+  }
+
+  :where(.mc-switch, .mc-kit input[type="checkbox"][role="switch"])::after {
+    top: 0.125rem;
+    left: 0.125rem;
+    box-sizing: border-box;
+    border: 0.125rem solid ButtonText !important;
+    background: Canvas !important;
+  }
+
+  :where(.mc-switch:checked, .mc-kit input[type="checkbox"][role="switch"]:checked) {
+    border-color: ButtonText !important;
+    background: Highlight !important;
+  }
+
+  :where(.mc-switch:checked, .mc-kit input[type="checkbox"][role="switch"]:checked)::after {
+    border-color: HighlightText !important;
+    background: HighlightText !important;
+  }
+
+  :where(
+    :where(
+      .mc-button,
+      .mc-radio,
+      .mc-checkbox,
+      .mc-switch,
+      .mc-select,
+      .mc-input,
+      .mc-textarea,
+      .mc-kit button,
+      .mc-kit input,
+      .mc-kit select,
+      .mc-kit textarea
+    ):disabled
+  ) {
+    border-color: GrayText !important;
+    color: GrayText !important;
+    opacity: 1;
+  }
+
+  :where(
+    :where(
+      .mc-button,
+      .mc-radio,
+      .mc-checkbox,
+      .mc-switch,
+      .mc-select,
+      .mc-input,
+      .mc-textarea,
+      .mc-focus-ring,
+      .mc-kit button,
+      .mc-kit input,
+      .mc-kit select,
+      .mc-kit textarea
+    ):focus-visible
+  ) {
+    outline: 0.1875rem solid Highlight !important;
+    outline-offset: 0.125rem;
+  }
+
+  :where(.mc-dialog) {
+    border-color: CanvasText !important;
+  }
+}
