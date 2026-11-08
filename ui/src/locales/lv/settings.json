@@ -560,6 +560,9 @@
     "setupWizardRun": "Palaist iestatīšanas vedni vēlreiz",
     "setupWizardIdentityNote": "Tava identitāte tam nepieder. Tavs sertifikāts un līdz ar to reģistrētais vārds un atļaujas serveros paliek tieši tādi, kādi tie ir.",
     "setupWizardIdentityLink": "Pārvaldi to sadaļā Identitāte",
+    "tipsTitle": "Padomi",
+    "tipsHint": "Clippy apmēram minūtē izrāda Mumcord: serverus, kanālus, runāšanu, čatu un vēl daudz ko.",
+    "tipsShow": "Rādīt padomus",
     "versionTitle": "Versija un licence"
   },
   "profile": {

@@ -1,0 +1,52 @@
+{
+  "label": "Clippy, näpunäidete abiline",
+  "greeting": {
+    "title": "Tere, mina olen Clippy!",
+    "body": "Tunnen Mumcordi nagu oma viit sõrme. Kas teeme kiire ringkäigu? See võtab umbes minuti. Kui mitte praegu, leiad mind jaotisest Seaded → Teave → Näpunäited.",
+    "start": "Näita",
+    "later": "Mitte praegu"
+  },
+  "progress": "Näpunäide {{current}} / {{total}}",
+  "back": "Tagasi",
+  "next": "Edasi",
+  "done": "Valmis",
+  "close": "Sulge näpunäited",
+  "tips": {
+    "servers": {
+      "title": "Sinu serverid",
+      "body": "Kõige vasakpoolsemal ribal on sinu serverid. Lisa server nupuga + või sirvi avalikke servereid luubiga. Võid olla korraga ühendatud mitme serveriga."
+    },
+    "channels": {
+      "title": "Kanalid",
+      "body": "Topeltklõpsa kanalil, et sellega liituda ja rääkida. Üks klõps näitab kanali vestlust liitumata ja nupp Jälgi hoiab sind kursis."
+    },
+    "talk": {
+      "title": "Kuidas sa räägid",
+      "body": "„Vajuta ja räägi“ või hääleaktiveerimine? Vali jaotises Seaded → Hääl ja heli. „Vajuta ja räägi“ töötab ka hiirenuppudega."
+    },
+    "panel": {
+      "title": "Sinu kasutajapaneel",
+      "body": "All vasakul saad mikrofoni vaigistada, end kurdistada, kaamera sisse lülitada või ühenduse katkestada. Kõrval olevad väikesed nooled avavad rohkem valikuid."
+    },
+    "search": {
+      "title": "Leia kõik",
+      "body": "Vajuta {{key}}, et leida inimesi ja kanaleid, isegi suurtes serverites."
+    },
+    "chat": {
+      "title": "Vestlus",
+      "body": "Vasta sõnumile, tsiteeri seda, maini inimesi @-märgiga ning jaga pilte ja faile. Vormindusnupud ilmuvad, kui kirjutad."
+    },
+    "apps": {
+      "title": "Rakendused",
+      "body": "Sõnumiriba nupp Rakendused käivitab ekraani jagamise, ühisvaatamise või sinu kaamera. Pluginad lisavad veel võimalusi."
+    },
+    "themes": {
+      "title": "Sinu stiil",
+      "body": "Jaotises Seaded → Välimus on tumedad ja heledad teemad. Serveril võib olla oma teema: paremklõpsa sellel ja vali Teema."
+    },
+    "end": {
+      "title": "Ongi kõik!",
+      "body": "Head lõbutsemist Mumcordis! Võid mind igal ajal tagasi kutsuda jaotisest Seaded → Teave → Näpunäited."
+    }
+  }
+}

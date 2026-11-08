@@ -557,6 +557,9 @@
     "setupWizardRun": "Käivita seadistusviisard uuesti",
     "setupWizardIdentityNote": "Sinu identiteet ei kuulu selle juurde. Sinu sertifikaat ja koos sellega registreeritud nimi ning õigused serverites jäävad täpselt selliseks, nagu need on.",
     "setupWizardIdentityLink": "Halda seda jaotises Identiteet",
+    "tipsTitle": "Näpunäited",
+    "tipsHint": "Clippy tutvustab sulle umbes minutiga Mumcordi: serverid, kanalid, rääkimine, vestlus ja muu.",
+    "tipsShow": "Näita näpunäiteid",
     "versionTitle": "Versioon ja litsents"
   },
   "profile": {

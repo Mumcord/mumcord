@@ -557,6 +557,9 @@
     "setupWizardRun": "Installatiewizard opnieuw uitvoeren",
     "setupWizardIdentityNote": "Je identiteit hoort hier niet bij. Je certificaat, en daarmee je geregistreerde naam en rechten op servers, blijft precies zoals het is.",
     "setupWizardIdentityLink": "Beheer die bij Identiteit",
+    "tipsTitle": "Tips",
+    "tipsHint": "Clippy laat je in ongeveer een minuut Mumcord zien: servers, kanalen, praten, chat en meer.",
+    "tipsShow": "Tips tonen",
     "versionTitle": "Versie en licentie"
   },
   "profile": {

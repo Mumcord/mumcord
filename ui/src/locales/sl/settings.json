@@ -563,6 +563,9 @@
     "setupWizardRun": "Znova zaženi čarovnika za nastavitev",
     "setupWizardIdentityNote": "Tvoja identiteta ni del tega. Tvoje potrdilo in z njim registrirano ime ter dovoljenja na strežnikih ostanejo natanko takšni, kot so.",
     "setupWizardIdentityLink": "Upravljaj jo v Identiteti",
+    "tipsTitle": "Namigi",
+    "tipsHint": "Clippy ti v približno minuti razkaže Mumcord: strežnike, kanale, govorjenje, klepet in še več.",
+    "tipsShow": "Pokaži namige",
     "versionTitle": "Različica in licenca"
   },
   "profile": {

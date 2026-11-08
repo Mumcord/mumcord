@@ -560,6 +560,9 @@
     "setupWizardRun": "Repetir o assistente de configuração",
     "setupWizardIdentityNote": "A sua identidade não faz parte disto. O seu certificado, e com ele o nome registado e as permissões nos servidores, fica exatamente como está.",
     "setupWizardIdentityLink": "Gerir em Identidade",
+    "tipsTitle": "Dicas",
+    "tipsHint": "O Clippy mostra-te o Mumcord em cerca de um minuto: servidores, canais, falar, chat e mais.",
+    "tipsShow": "Mostrar dicas",
     "versionTitle": "Versão e licença"
   },
   "profile": {
