@@ -1,0 +1,25 @@
+[package]
+name = "bovnar-mux"
+description = "Prototype of Bovnar's octet-stream mux framing for media streams (benchmark for #680; not used by the client)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+thiserror.workspace = true
+
+[dev-dependencies]
+# Conformance only: the C reference must read our output and we must read its output. The
+# benchmark never touches it.
+bovnar.workspace = true
+# The baseline of the benchmark: today's fixed broadcast header.
+mumcord-p2p.workspace = true
+
+[lints]
+workspace = true
+
+[[bench]]
+name = "mux"
+harness = false

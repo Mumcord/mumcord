@@ -814,6 +814,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bovnar-mux"
+version = "0.7.2"
+dependencies = [
+ "bovnar",
+ "mumcord-p2p 0.7.2",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "brotli"
 version = "9.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

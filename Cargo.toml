@@ -15,6 +15,7 @@ members = [
     "crates/effects",
     "crates/plugins",
     "crates/plugin-sdk",
+    "crates/bovnar-mux",
     "tools/netsim",
     "tools/mumcord-plugin",
     "src-tauri",
