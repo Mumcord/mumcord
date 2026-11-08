@@ -1097,3 +1097,91 @@ These match the recommendations except where marked:
 ## Closing
 
 2026-11-03: The user skipped round 5 (review & remaining open points) and asked for the specification now. `specs/10-admin-moderation-specification.md` was created from this brainstorming. The answers to rounds 1–4 were given in chat and are recorded in the "Answers to round N (given in chat)" sections; they override the preselected checkboxes, and later rounds override earlier ones. Points that round 5 would have reviewed are listed as assumptions in the specification's section 13.
+
+---
+
+## Addendum A – Moving people (issue #255)
+
+> Added 2026-11-08. Issue #255 ("moving people: move to me, move a whole channel") is already
+> specified in `specs/10-admin-moderation-specification.md` (FR-10.7, FR-10.8, FR-10.16,
+> FR-10.17, FR-10.18, FR-10.62 and the menu wireframe in section 5.3). The first build of #255
+> went a different way in five points. This addendum settles, point by point, whether the
+> **specification** or the **build** changes. Everything else stays as written.
+>
+> Settled and not asked again: moves never span servers (FR-10.4, Q1.19); the server's ACLs decide
+> and Mumcord only reflects them (Spec 01 section 3); no server-side anything.
+
+### A1 · Where the move items live
+
+#### Q5.1 The move items in the person and channel menus `◉`
+The specification (FR-10.7, FR-10.8) and the menu wireframe (section 5.3) put "Move to my channel", "Move to…" and "Move everyone to…" into the **Admin ▸** sub-menu, together with kick, ban, mute and the rest. The build shows them in the main menus, right under "Join …", the way issue #255 words it.
+
+- [x] ⭐ **Keep them in Admin ▸** as specified: one place for everything an admin does, the same in all three menus, and nothing changes for #249/#253.
+- [ ] **Main menu** (as built): one click less for a frequent action, but then the moved items sit in two different places in the same menu.
+
+✍️ Note:
+
+### A2 · Is the admin moved too?
+
+#### Q5.2 "Move everyone here to…" and the own user `◉`
+FR-10.17 says the admin is moved too when they are in that channel. The build leaves the own user out, following #172's rule that joining is how one moves oneself.
+
+- [x] ⭐ **Leave the own user out** and correct FR-10.17: an admin move can put you into a channel you may not enter or cannot write in, and it pulls you out of a conversation for no reason. Joining is one click in the tree.
+- [ ] **Move the own user too** as written: "everyone here" then really means everyone, and the result line counts one more person.
+
+✍️ Note:
+
+### A3 · Saying what actually happened
+
+#### Q5.3 The result line after a mass move `◉`
+FR-10.17 and FR-10.18 ask for a private result line after comparing who arrived ("Moved 28 of 30 people; 2 were refused", 5-second grace), and FR-10.59 uses the same line for refusals. The build shows the server's refusal as one notice (once for the whole group) plus a local error line, and no counts.
+
+- [x] ⭐ **Add the result line** as specified: moving 30 people is only trustworthy when the client says who arrived, and a full channel then reads as "2 were refused" instead of two separate notices.
+- [ ] **Keep the notices only** and change FR-10.17/10.18 to describe them: less to build, but nobody learns whether everyone arrived.
+
+✍️ Note:
+
+### A4 · Pacing a mass move
+
+#### Q5.4 Spike S2 and the flood limit `◉`
+FR-10.18 wants spike S2 to measure the standard server's flood limit and set the pace from it. The protocol layer already paces every `UserState` (4 at once, then one per 1.2 s, deliberately slower than the server's 5 per second), so a mass move is paced today without any extra code.
+
+- [x] ⭐ **Use the existing pacer and drop spike S2** from FR-10.18: one place paces, every feature benefits, and there is nothing left to measure.
+- [ ] **Run spike S2 anyway** and give mass moves their own values: more control, one more mechanism next to the pacer.
+
+✍️ Note:
+
+### A5 · Moving a few people, not all of them
+
+#### Q5.5 Picking several people in the tree `☑`
+Issue #255 asks for Ctrl-click/Shift-click on people and dragging them together; the specification has no tree selection (it only knows "Move everyone to…"). The build has it: picked rows are ringed, one drag moves them all, and "Move to…" in a picked person's menu takes the group along (the keyboard way).
+
+- [x] ⭐ **Keep it and write it into the spec** (new FR in section 4.3): it is built, tested and works in all 24 locales; without it, moving 3 of 5 people takes three round trips.
+- [ ] **Drop it again**: "Move everyone to…" plus the single-person moves are enough, and the tree keeps no selection state.
+
+✍️ Note:
+
+### A6 · The shape of the channel picker
+
+#### Q5.6 Where the picker shows user limits `◉`
+FR-10.62 makes every channel picker a small channel tree with a search field, with channels the action is not allowed for greyed out and explained. The move picker is built as a flat searchable list that names each channel's user limit ("Squad A (2/5)", "Music Room (6/6)").
+
+- [x] ⭐ **Keep the flat list with user limits** for moves, and say so in FR-10.62: when moving people, "how full is it" decides, and a flat list answers that at a glance; the tree stays for parent, links and `/move`.
+- [ ] **Tree picker for moves too**: one picker everywhere, but the limits need a second line per row.
+
+✍️ Note:
+
+---
+
+## Answers to Addendum A (given in chat, 2026-11-08)
+
+"The recommendations are ok" – all six questions keep the recommended answer:
+
+- **Q5.1:** the move items stay in **Admin ▸** (person menu and channel menu), as FR-10.7, FR-10.8 and the wireframe in section 5.3 say. The build was changed to match.
+- **Q5.2:** "Move everyone to…" leaves the **own user** where they are; FR-10.17 now says so and assumption A7 is withdrawn.
+- **Q5.3:** **one result for the whole group** after the arrival check ("Moved 28 of 30 people to AFK. The rest were refused."). Until #378 brings the chat's result line, it appears as a notice (A8).
+- **Q5.4:** the **existing client pacer** is enough; spike S2 is dropped (FR-10.18, FR-10.69).
+- **Q5.5:** picking several people in the tree **stays in the MVP** and is written down as FR-10.70 / FR-10.71 with AC-10.45.
+- **Q5.6:** the move picker stays a **flat list with user limits**; FR-10.62 names it as the exception to the tree-shaped pickers.
+
+The specification was updated the same day (FR-10.17, FR-10.18, FR-10.62, FR-10.69, FR-10.70, FR-10.71, AC-10.11–AC-10.13, AC-10.45, AC-10.46, decision log, section 13).
