@@ -307,9 +307,10 @@ impl SecretStore {
         #[cfg(target_os = "freebsd")]
         {
             if vault::secret_service_usable(KEYRING_SERVICE) {
-                return Self::os_with_service(KEYRING_SERVICE);
+                Self::os_with_service(KEYRING_SERVICE)
+            } else {
+                Self::with_backend(Arc::new(vault::VaultBackend::new(profile_dir.into())))
             }
-            return Self::with_backend(Arc::new(vault::VaultBackend::new(profile_dir.into())));
         }
         #[cfg(not(target_os = "freebsd"))]
         {

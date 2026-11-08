@@ -83,13 +83,13 @@ fn beside_executable(dir: &Path) -> Vec<PathBuf> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     /// The installers put the library where the packaged executable finds it. No FreeBSD
     /// package ships ONNX Runtime, so background effects stay off there and nothing is staged.
     #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
     #[test]
     fn finds_the_library_where_the_packages_put_it() {
+        use super::*;
+
         #[cfg(target_os = "linux")]
         let (exe_dir, bundled) = ("/usr/bin", "/usr/lib/mumcord/libonnxruntime.so.1.23.2");
         #[cfg(target_os = "macos")]
