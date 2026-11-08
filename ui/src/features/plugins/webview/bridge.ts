@@ -1,8 +1,9 @@
 /**
  * The message bridge between a plugin's sealed web view and the plugin (FR-6.47). The page
  * sends with `window.parent.postMessage(string, "*")` and receives the plugin's `post` calls as
- * `message` events. Only strings from this exact frame pass, at most 16 KiB each and 60 per
- * second; the Rust side checks the same limits again. Message texts are never logged.
+ * `message` events. Only strings from this exact frame pass, at most 60 per second and each within
+ * its place's size limit (64 KiB on the stage, 16 KiB elsewhere, FR-9.37); the Rust side checks the
+ * same limits again. Message texts are never logged.
  *
  * Gestures (FR-9.45): once the page has loaded, the bridge hands the page's bootstrap script a
  * random key that the page's own code never sees. The bootstrap reports genuine clicks and key
@@ -12,8 +13,12 @@
  * never smuggle them in as bridge strings; faking one only hurts the page itself.
  */
 
-/** One bridge message, in UTF-8 bytes. */
+import type { PluginWebviewPlace } from "../../../api";
+
+/** One bridge message to or from a panel popover, dialog or side panel, in UTF-8 bytes. */
 export const MAX_MESSAGE_BYTES = 16 * 1024;
+/** One bridge message to or from a stage frame, in UTF-8 bytes (FR-9.37). */
+export const MAX_STAGE_MESSAGE_BYTES = 64 * 1024;
 /** Bridge messages per second, in each direction. */
 export const MAX_MESSAGES_PER_SECOND = 60;
 /** Posts that wait for the page to finish loading; more than a second's worth are dropped. */
@@ -57,9 +62,14 @@ export function inOrder<T>(send: (value: T) => Promise<unknown>): (value: T) => 
   };
 }
 
-/** Whether `data` is a bridge message the plugin may get. */
-export function fitsBridge(data: unknown): data is string {
-  return typeof data === "string" && encoder.encode(data).length <= MAX_MESSAGE_BYTES;
+/** The largest bridge message of `place`; mirrors `WebviewPlace::max_message_bytes` in Rust. */
+export function maxMessageBytes(place: PluginWebviewPlace): number {
+  return place === "stage" ? MAX_STAGE_MESSAGE_BYTES : MAX_MESSAGE_BYTES;
+}
+
+/** The UTF-8 size of a bridge message. */
+export function messageBytes(text: string): number {
+  return encoder.encode(text).length;
 }
 
 /** The `mumcordWebview` kind of a bootstrap signal (served by Rust), or `null` for others. */
@@ -102,7 +112,11 @@ export interface BridgeOptions {
   readonly gestureKey: string;
   /** The user really clicked or pressed a key in the visible page (FR-9.45). */
   readonly onGesture: () => void;
-  /** Called once for every dropped page message (counts only). */
+  /** The largest page message the plugin may get, in UTF-8 bytes (see {@link maxMessageBytes}). */
+  readonly maxBytes: number;
+  /** Called for every page message dropped as too large, with its size only. */
+  readonly onTooLarge?: (bytes: number) => void;
+  /** Called once for every other dropped page message (counts only). */
   readonly onDropped?: () => void;
   readonly now?: () => number;
 }
@@ -158,7 +172,13 @@ export function createBridge(options: BridgeOptions): Bridge {
         options.onDropped?.();
         return;
     }
-    if (fitsBridge(data) && allow()) options.toPlugin(data);
+    if (typeof data !== "string") {
+      options.onDropped?.();
+      return;
+    }
+    const bytes = messageBytes(data);
+    if (bytes > options.maxBytes) options.onTooLarge?.(bytes);
+    else if (allow()) options.toPlugin(data);
     else options.onDropped?.();
   };
 
