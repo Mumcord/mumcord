@@ -535,11 +535,12 @@ mod native {
         let window = app
             .get_window("main")
             .ok_or_else(|| internal("the main window is gone"))?;
+        let (dx, dy) = main_offset(&app);
         // `add_child` waits for the main thread, so it must not run on an async worker.
         let built = tauri::async_runtime::spawn_blocking(move || {
             window.add_child(
                 builder,
-                PhysicalPosition::new(bounds.x, bounds.y),
+                PhysicalPosition::new(bounds.x + dx, bounds.y + dy),
                 PhysicalSize::new(bounds.width.unsigned_abs(), bounds.height.unsigned_abs()),
             )
         })
@@ -559,6 +560,16 @@ mod native {
         }
     }
 
+    /// Where the main web view sits in its window, in physical pixels. The UI measures a frame's
+    /// place from the main web view's top left corner, but a child web view is placed in window
+    /// coordinates; when the main web view does not start at the window's corner (macOS reported
+    /// a shift by about the title bar's height), the frame would land that far off.
+    fn main_offset(app: &AppHandle) -> (i32, i32) {
+        app.get_webview("main")
+            .and_then(|main| main.position().ok())
+            .map_or((0, 0), |p| (p.x, p.y))
+    }
+
     pub(super) fn bounds(
         app: &AppHandle,
         frame: &str,
@@ -568,9 +579,10 @@ mod native {
         match bounds {
             None => webview.hide().map_err(internal),
             Some(bounds) => {
+                let (dx, dy) = main_offset(app);
                 webview
                     .set_bounds(tauri::Rect {
-                        position: PhysicalPosition::new(bounds.x, bounds.y).into(),
+                        position: PhysicalPosition::new(bounds.x + dx, bounds.y + dy).into(),
                         size: PhysicalSize::new(
                             bounds.width.unsigned_abs(),
                             bounds.height.unsigned_abs(),
