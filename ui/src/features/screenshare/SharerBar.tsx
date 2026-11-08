@@ -159,7 +159,7 @@ export function SharerBar(): ReactNode {
             {own.kind === "window" && own.title !== null && (
               <>
                 {" · "}
-                <span className="sharer-bar__window" title={own.title}>
+                <span className="sharer-bar__window" data-tooltip={own.title}>
                   {own.title}
                 </span>
               </>
