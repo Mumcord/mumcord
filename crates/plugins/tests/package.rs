@@ -526,3 +526,71 @@ fn a_package_with_a_bad_origin_is_a_hard_stop() {
     ));
     assert!(err.to_string().contains("not encrypted"));
 }
+
+/// A package with web content and the given `api` range.
+fn web_package(api: &str, web_files: &[&str]) -> Result<Package, PackageError> {
+    let mut files = good_files();
+    files[0].1 = String::from_utf8(manifest_with(r#"{"optional":["ui.webview"]}"#))
+        .expect("utf8")
+        .replace("^1.0", api)
+        .into_bytes();
+    files.push(("web/index.html".into(), b"<p>".to_vec()));
+    for name in web_files {
+        files.push(((*name).into(), b"x".to_vec()));
+    }
+    Package::read(&zip(&files), REPO)
+}
+
+#[test]
+fn an_api_1_2_package_may_not_use_the_reserved_web_folder() {
+    for name in [
+        "web/_mumcord/v1/kit.css",
+        "web/_MUMCORD/x.css",
+        "web/_Mumcord/a/b.html",
+        "web/_mumcord/fonts/OFL.txt.woff2",
+    ] {
+        let result = web_package("^1.2", &[name]);
+        assert!(
+            matches!(result, Err(PackageError::ReservedWebFolder)),
+            "{name}: {result:?}"
+        );
+    }
+    let error = web_package("^1.2", &["web/_mumcord/x.css"]).expect_err("refused");
+    assert!(error.to_string().contains("web/_mumcord"), "{error}");
+}
+
+#[test]
+fn an_api_1_2_package_with_an_empty_reserved_folder_is_refused() {
+    let mut files = good_files();
+    files[0].1 = String::from_utf8(manifest_with(r#"{"optional":["ui.webview"]}"#))
+        .expect("utf8")
+        .replace("^1.0", "^1.2")
+        .into_bytes();
+    files.push(("web/index.html".into(), b"<p>".to_vec()));
+    let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
+    let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
+    for (name, data) in &files {
+        writer.start_file(name.as_str(), options).expect("start");
+        writer.write_all(data).expect("write");
+    }
+    writer
+        .add_directory("web/_MUMCORD/", options)
+        .expect("directory");
+    let bytes = writer.finish().expect("finish").into_inner();
+    assert!(matches!(
+        Package::read(&bytes, REPO),
+        Err(PackageError::ReservedWebFolder)
+    ));
+}
+
+#[test]
+fn lookalike_folders_are_fine_and_older_packages_only_carry_dead_files() {
+    let ok = web_package("^1.2", &["web/_mumcord2/x.css", "web/a/_mumcord/x.css"]);
+    assert!(ok.is_ok(), "{ok:?}");
+    assert_eq!(ok.expect("valid").reserved_web_files().count(), 0);
+    for api in ["^1.0", "^1.1"] {
+        let package = web_package(api, &["web/_mumcord/v1/kit.css", "web/_MUMCORD/x.css"])
+            .unwrap_or_else(|e| panic!("{api}: {e:?}"));
+        assert_eq!(package.reserved_web_files().count(), 2, "{api}");
+    }
+}

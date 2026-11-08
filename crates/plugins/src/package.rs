@@ -145,6 +145,8 @@ pub enum PackageError {
     BadTranslation(String),
     #[error("The package has no {0}")]
     MissingFile(String),
+    #[error("The package uses the reserved folder \"web/_mumcord\"")]
+    ReservedWebFolder,
     #[error("Web content needs the permission \"ui.webview\"")]
     WebWithoutWebview,
     #[error(transparent)]
@@ -192,6 +194,8 @@ impl Package {
         }
 
         let mut files = BTreeMap::new();
+        // Whether `web/` holds anything under the reserved folder; only an error from API 1.2 on.
+        let mut uses_reserved = false;
         // Case-insensitive file systems (Windows, macOS) would merge names that differ only in case.
         let mut folded = BTreeSet::new();
         let mut unpacked = 0u64;
@@ -203,6 +207,7 @@ impl Package {
                 .name()
                 .map_err(|e| PackageError::Zip(e.to_string()))?
                 .into_owned();
+            uses_reserved |= is_reserved_web_entry(name.trim_end_matches('/'));
             if entry.is_dir() {
                 relative_path(name.trim_end_matches('/'))
                     .map_err(|_| PackageError::BadEntry(name.clone()))?;
@@ -261,6 +266,9 @@ impl Package {
                 .ok_or_else(|| PackageError::MissingFile(MANIFEST_FILE.into()))?,
         )?;
         manifest.validate(source)?;
+        if uses_reserved && manifest.api_minor() >= (1, 2) {
+            return Err(PackageError::ReservedWebFolder);
+        }
         let mut required = vec![WASM_FILE, ENGLISH_FILE];
         if source == Source::Official {
             required.extend(OFFICIAL_FILES);
@@ -305,6 +313,12 @@ impl Package {
     }
 
     /// A file as it will be installed (SVG assets already sanitised).
+    /// Files under `web/_mumcord`, which Mumcord never serves from a package (FR-13.28). Only a
+    /// 1.2 package is refused for them; older ones just carry dead files (FR-13.29).
+    pub fn reserved_web_files(&self) -> impl Iterator<Item = &str> {
+        self.file_names().filter(|name| is_reserved_web_entry(name))
+    }
+
     pub fn file(&self, name: &str) -> Option<&[u8]> {
         self.files.get(name).map(Vec::as_slice)
     }
@@ -355,6 +369,12 @@ enum FileKind {
     /// A bundled sound effect (FR-9.65); its limits are checked once the manifest is read.
     Sound,
     Web,
+}
+
+/// Whether a package entry name lies under `web/_mumcord` (any ASCII case).
+fn is_reserved_web_entry(name: &str) -> bool {
+    name.strip_prefix("web/")
+        .is_some_and(crate::api::webview::is_reserved)
 }
 
 impl FileKind {
