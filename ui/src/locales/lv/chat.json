@@ -1,11 +1,11 @@
 {
-  "noConversation": "Izveido savienojumu ar serveri un izvēlies kanālu, lai sāktu čatot.",
+  "noConversation": "Savienojies ar serveri un izvēlies kanālu, lai sāktu tērzēt.",
   "empty": "Vēl nav ziņu. Šeit saņemtās ziņas tiek saglabātas šajā datorā.",
   "header": {
     "channel": "#{{name}}",
     "channelPrefix": "Kanāls",
-    "privatePrefix": "Privāts čats ar",
-    "unknownPerson": "Nezināms cilvēks"
+    "privatePrefix": "Privāta tērzēšana ar",
+    "unknownPerson": "Nezināma persona"
   },
   "list": {
     "server": "Serveris",
@@ -24,7 +24,7 @@
     "syncFailed": "Agrākas ziņas šeit nevar ielādēt.",
     "syncedFrom": "no {{name}} vēstures",
     "jumpToNewest": "Pāriet uz jaunāko",
-    "jumpToNewestUnseen_zero": "Pāriet uz jaunāko, {{count}} jaunu ziņu",
+    "jumpToNewestUnseen_zero": "Pāriet uz jaunāko, {{count}} jaunas ziņas",
     "jumpToNewestUnseen_one": "Pāriet uz jaunāko, {{count}} jauna ziņa",
     "jumpToNewestUnseen_other": "Pāriet uz jaunāko, {{count}} jaunas ziņas"
   },
@@ -48,7 +48,7 @@
     "send": "Sūtīt",
     "noPermission": "Tev nav atļaujas rakstīt šajā kanālā.",
     "unavailable": "Šis kanāls vairs nav pieejams.",
-    "offline": "{{name}} ir bezsaistē. Vari rakstīt atkal, kad viņš būs atpakaļ.",
+    "offline": "{{name}} ir bezsaistē. Rakstīt varēsi, kad šī persona atgriezīsies.",
     "unnamedImage": "Ielīmēts attēls",
     "attachFiles": "Kopīgot failus"
   },
@@ -66,7 +66,7 @@
     "imageUnreadable": "Attēlu neizdevās nolasīt. Izmēģini citu failu.",
     "denied": "Serveris neatļāva šo ziņu.",
     "deniedWithReason": "Serveris neatļāva šo ziņu: {{reason}}",
-    "notConnected": "Tu neesi savienots. Izveido savienojumu atkārtoti un mēģini vēlreiz.",
+    "notConnected": "Nav savienojuma. Savienojies no jauna un mēģini vēlreiz.",
     "generic": "Ziņu neizdevās nosūtīt. Mēģini vēlreiz.",
     "onlyImages": "Var sūtīt tikai attēlus.",
     "sourceTooLarge": "Šis fails ir pārāk liels, lai to nosūtītu (virs 25 MB).",
@@ -81,7 +81,7 @@
   "announce": {
     "message": "{{name}}: {{text}}",
     "image": "{{name}} nosūtīja attēlu",
-    "more_zero": "vēl {{count}} jaunu ziņu",
+    "more_zero": "vēl {{count}} jaunas ziņas",
     "more_one": "vēl {{count}} jauna ziņa",
     "more_other": "vēl {{count}} jaunas ziņas"
   },
@@ -122,7 +122,7 @@
       "show": "Raidījums"
     },
     "inBrowser": "Atskaņo tavā pārlūkā",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Twitch atskaņotājs šajā sistēmā nedarbojas Mumcord logā, tāpēc „Atskaņot” atver straumi tavā pārlūkā.",
     "card": "Saites priekšskatījums: {{title}}",
     "dismiss": "Slēpt priekšskatījumu"
   },
@@ -161,7 +161,7 @@
     "removeNamed": "Noņemt {{name}} no izlases",
     "send": "Sūtīt {{name}}",
     "hint": "Bulttaustiņi pārvieto, Enter sūta, Delete noņem, Escape aizver.",
-    "empty": "Izlasē vēl nekā nav. Noklikšķini ar peles labo pogu uz GIF čatā vai izmanto zvaigznīti uz tā un izvēlies “Saglabāt izlasē”. Tas parādīsies šeit."
+    "empty": "Izlasē vēl nekā nav. Noklikšķini ar peles labo pogu uz GIF tērzēšanā vai izmanto zvaigznīti uz tā un izvēlies „Saglabāt izlasē”. Tas parādīsies šeit."
   },
   "linkMenu": {
     "label": "Saite",
@@ -266,21 +266,21 @@
     "goToChannel": "Pāriet uz kanālu",
     "join": "Pievienoties",
     "joinLabel": "Pievienoties {{server}}",
-    "joined": "Pievienots",
-    "label": "Servera karte {{server}}",
+    "joined": "Pievienojies",
+    "label": "Servera kartīte: {{server}}",
     "privacyOff": "Servera vērtības iestatījumos ir izslēgtas",
     "querying": "Pārbauda serveri…",
     "retry": "Pārbaudīt vēlreiz",
     "retryLabel": "Pārbaudīt vēlreiz {{server}}",
     "server": "{{server}}",
     "unreachable": "Serveris nav sasniedzams",
-    "warning_one": "{{count}} saite šajā ziņojam parāda pieteikšanās datus",
-    "warning_other": "{{count}} saites šajā ziņojam parāda pieteikšanās datus",
-    "warning_zero": "{{count}} saites šajā ziņojam parāda pieteikšanās datus"
+    "warning_one": "{{count}} saite šajā ziņā parāda pieteikšanās datus",
+    "warning_other": "{{count}} saites šajā ziņā parāda pieteikšanās datus",
+    "warning_zero": "{{count}} saites šajā ziņā parāda pieteikšanās datus"
   },
   "requests": {
     "entry": "Ziņu pieprasījumi",
-    "entryCount_zero": "{{count}} pieprasījumu",
+    "entryCount_zero": "{{count}} pieprasījumi",
     "entryCount_one": "{{count}} pieprasījums",
     "entryCount_other": "{{count}} pieprasījumi",
     "title": "Ziņu pieprasījumi",
@@ -291,8 +291,8 @@
     "metaMumcord": "Mumcord lietotājs · {{server}} · {{time}}",
     "metaStandard": "{{server}} · {{time}}",
     "noteFrom": "{{name}} piezīme",
-    "explain": "Tu esi iestatījis privātās ziņas uz “Tikai draugi”. Ja pieņemsi, {{name}} varēs tev rakstīt. Noraidīšana ir kluša: {{name}} redz tikai “gaida”. Pieprasījumi tiek dzēsti, kad aizver Mumcord.",
-    "sentMessages_zero": "{{name}} tev nosūtīja {{count}} ziņu",
+    "explain": "Privātās ziņas ir iestatītas uz „Tikai draugi”. Ja pieņemsi, {{name}} varēs tev rakstīt. Noraidīšana ir kluša: {{name}} redz tikai „gaida”. Pieprasījumi tiek dzēsti, kad aizver Mumcord.",
+    "sentMessages_zero": "{{name}} tev nosūtīja {{count}} ziņas",
     "sentMessages_one": "{{name}} tev nosūtīja {{count}} ziņu",
     "sentMessages_other": "{{name}} tev nosūtīja {{count}} ziņas",
     "messagesLabel": "{{name}} ziņas",
@@ -304,8 +304,8 @@
     "failed": "Tas neizdevās. Lūdzu, mēģini vēlreiz."
   },
   "overview": {
-    "title": "Ziņojumi",
-    "buttonUnread": "Ziņojumi, nelasīti: {{count}}",
+    "title": "Ziņas",
+    "buttonUnread": "Ziņas, nelasītas: {{count}}",
     "new": "Sākt jaunu sarunu",
     "search": "Meklēt sarunas",
     "searchKey": "Ctrl K",
@@ -313,13 +313,13 @@
     "filterAll": "Visas",
     "filterUnread": "Nelasītās",
     "filterRequests": "Pieprasījumi",
-    "requestsTitle": "Ziņojumu pieprasījumi",
+    "requestsTitle": "Ziņu pieprasījumi",
     "requestsNote": "Nav tavā draugu sarakstā",
     "requestMetaChat": "{{server}} · vēlas ar tevi sarunāties · {{time}}",
-    "requestMetaMessages": "{{server}} · tev nosūtīja ziņojumus · {{time}}",
-    "quote": "„{{text}}“",
+    "requestMetaMessages": "{{server}} · tev nosūtīja ziņas · {{time}}",
+    "quote": "„{{text}}”",
     "block": "Bloķēt",
-    "showMore_zero": "Rādīt vēl {{count}} pieprasījumu",
+    "showMore_zero": "Rādīt vēl {{count}} pieprasījumus",
     "showMore_one": "Rādīt vēl {{count}} pieprasījumu",
     "showMore_other": "Rādīt vēl {{count}} pieprasījumus",
     "showFewer": "Rādīt mazāk pieprasījumu",
@@ -330,27 +330,27 @@
     "offline": "bezsaistē",
     "unreadCount": "Nelasīti: {{count}}",
     "pinned": "piesprausta",
-    "muted": "izslēgts skaņas signāls",
+    "muted": "apklusināta",
     "you": "Tu: {{text}}",
     "image": "Nosūtīja attēlu",
     "yesterday": "Vakar",
     "emptyTitle": "Vēl nav sarunu",
-    "emptyText": "Šeit tiek rādīti privātie ziņojumi no visiem pievienotajiem serveriem.",
+    "emptyText": "Šeit tiek rādītas privātās ziņas no visiem serveriem, ar kuriem ir savienojums.",
     "noMatch": "Sarunas nav atrastas.",
-    "noRequests": "Nav ziņojumu pieprasījumu.",
+    "noRequests": "Nav ziņu pieprasījumu.",
     "failed": "Neizdevās. Mēģini vēlreiz.",
     "newTitle": "Sākt jaunu sarunu",
     "newSearch": "Meklēt cilvēkus savos serveros",
-    "newEmpty": "Pievienotajos serveros neviens nav atrasts.",
+    "newEmpty": "Serveros, ar kuriem ir savienojums, neviens nav atrasts.",
     "deleteTitle": "Dzēst vēsturi ar {{name}}?",
-    "deleteMessage": "Ziņojumi tiek dzēsti tikai šajā ierīcē. {{name}} paturēs savu kopiju.",
+    "deleteMessage": "Ziņas tiek dzēstas tikai šajā ierīcē. {{name}} paturēs savu kopiju.",
     "menu": {
       "label": "Saruna ar {{name}}",
       "markRead": "Atzīmēt kā lasītu",
       "pin": "Piespraust augšā",
       "unpin": "Atspraust",
-      "mute": "Izslēgt sarunas skaņu",
-      "unmute": "Ieslēgt sarunas skaņu",
+      "mute": "Apklusināt sarunu",
+      "unmute": "Atcelt apklusināšanu",
       "muteHour": "Uz 1 stundu",
       "muteEightHours": "Uz 8 stundām",
       "muteForever": "Līdz es to atkal ieslēgšu",
@@ -372,7 +372,7 @@
     "seek": "Pozīcija",
     "position": "{{time}} no {{length}}",
     "volume": "Skaļums",
-    "mute": "Izslēgt skaņu",
+    "mute": "Apklusināt",
     "open": "Atvērt {{name}} pārlūkā",
     "save": "Saglabāt {{name}}",
     "saveShort": "Saglabāt failu",
@@ -417,7 +417,7 @@
     "load": "Ielādēt attēlu"
   },
   "slash": {
-    "list": "Komandas ar „/“"
+    "list": "Komandas ar „/”"
   },
   "channelMention": {
     "chipLabel": "#{{name}}, kanāls – atvērt izvēlni",

@@ -8,8 +8,8 @@
   "player": "Kopīgās skatīšanās atskaņotājs",
   "watchTogether": "Skatīties kopā",
   "watchTogetherFor": "Skatīties {{title}} kopā ar šo kanālu",
-  "embedsOff": "Ieslēdziet iegultos atskaņotājus privātuma iestatījumos, lai skatītos kopā",
-  "embedsOffJoin": "Notiek kopīga skatīšanās: lai pievienotos, ieslēdziet iegultos atskaņotājus",
+  "embedsOff": "Ieslēdz iegultos atskaņotājus privātuma iestatījumos, lai skatītos kopā",
+  "embedsOffJoin": "Notiek kopīga skatīšanās: lai pievienotos, ieslēdz iegultos atskaņotājus",
   "openPrivacy": "Atvērt privātuma iestatījumus",
   "cantPlay": "Atskaņotājs šeit nevar darboties.",
   "openInBrowser": "Atvērt pārlūkā",
@@ -19,16 +19,16 @@
   "commandFailed": "Kopīgā skatīšanās nesaņēma tavas izmaiņas.",
   "someone": "Kāds",
   "other": {
-    "play": "{{name}} nospieda atskaņot",
+    "play": "{{name}} sāka atskaņošanu",
     "pause": "{{name}} pauzēja",
     "seek": "{{name}} pārlēca uz priekšu",
     "skipped": "{{name}} izlaida"
   },
   "addToPlaylist": "Pievienot atskaņošanas sarakstam",
-  "addToPlaylistFor": "Pievienot {{title}} kopīgās skatīšanās sarakstam",
+  "addToPlaylistFor": "Pievienot {{title}} kopīgās skatīšanās atskaņošanas sarakstam",
   "playlist": {
     "title": "Nākamais",
-    "empty": "Nekā nākamā. Pievieno YouTube saites ar “Pievienot atskaņošanas sarakstam”.",
+    "empty": "Nākamo video nav. Pievieno YouTube saites ar „Pievienot atskaņošanas sarakstam”.",
     "skip": "Izlaist",
     "previous": "Iepriekšējais",
     "previousFailed": "Neizdevās atgriezties pie iepriekšējā video.",
@@ -36,21 +36,21 @@
     "moved": "Pārvietots uz vietu {{position}}",
     "videoTitle": "YouTube video",
     "addedBy": "Pievienoja {{name}}",
-    "remove": "Noņemt {{title}} no saraksta",
-    "addFailed": "Video neizdevās pievienot sarakstam. Tajā var būt līdz 50 video.",
-    "removeFailed": "Video neizdevās noņemt no saraksta.",
+    "remove": "Noņemt {{title}} no atskaņošanas saraksta",
+    "addFailed": "Video neizdevās pievienot atskaņošanas sarakstam. Tajā var būt līdz 50 video.",
+    "removeFailed": "Video neizdevās noņemt no atskaņošanas saraksta.",
     "moveFailed": "Video neizdevās pārvietot.",
     "skipFailed": "Neizdevās pāriet uz nākamo video.",
     "nextFailed": "Nākamo video neizdevās sākt.",
     "move": "Pārvietot {{title}}",
     "upNext": "Nākamais: {{title}}",
-    "upNextNone": "Nekā nākamā",
-    "paste": "Ielīmējiet YouTube saiti",
-    "notALink": "Tas nav YouTube saite",
+    "upNextNone": "Nākamo video nav",
+    "paste": "Ielīmē YouTube saiti",
+    "notALink": "Tā nav YouTube saite",
     "more": "Vairāk: {{title}}",
     "playNext": "Atskaņot nākamo",
-    "removeShort": "Noņemt no saraksta",
-    "emptyPaste": "Nekā nav nākamajā. Ielīmējiet YouTube saiti augstāk."
+    "removeShort": "Noņemt no atskaņošanas saraksta",
+    "emptyPaste": "Nākamo video nav. Ielīmē YouTube saiti augstāk."
   },
   "widget": {
     "play": "Atskaņot",
@@ -59,16 +59,16 @@
   "codecHint": {
     "install": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav:",
     "generic": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav (GStreamer libav spraudni) ar savas sistēmas pakotņu pārvaldnieku.",
-    "rpmFusion": "Fedora sistēmā gst-libav nāk no RPM Fusion repozitorija; vispirms iespējo RPM Fusion."
+    "rpmFusion": "Fedora sistēmā gst-libav nāk no RPM Fusion krātuves; vispirms iespējo RPM Fusion."
   },
-  "keys": "Atstarpe atskaņot/pauze · ← → pārlēkt 5 s · M izslēgt skaņu · F pilnekrāns",
-  "headerPill": "Skatieties kopā · {{count}}",
+  "keys": "Atstarpe atskaņot/pauze · ← → pārlēkt 5 s · M apklusināt · F pilnekrāns",
+  "headerPill": "Skatīties kopā · {{count}}",
   "miniPlayer": "Mini atskaņotājs",
   "tabs": {
     "playlist": "Atskaņošanas saraksts"
   },
-  "upNextHeading": "Nākamais · velciet, lai mainītu secību",
+  "upNextHeading": "Nākamais · velc, lai mainītu secību",
   "whoIsWatching": "Kas skatās",
   "pasteKey": "Ctrl V",
-  "you": "Jūs"
+  "you": "Tu"
 }

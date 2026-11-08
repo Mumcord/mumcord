@@ -1,9 +1,9 @@
 {
-  "region": "{{plugin}} sānjosla",
-  "close": "Aizvērt {{plugin}} sānjoslu",
-  "resize": "Mainīt {{plugin}} sānjoslas izmēru",
-  "failed": "Neizdevās aizvērt {{plugin}} sānjoslu. Mēģini vēlreiz.",
+  "region": "{{plugin}} sānu panelis",
+  "close": "Aizvērt {{plugin}} sānu paneli",
+  "resize": "Mainīt {{plugin}} sānu paneļa izmēru",
+  "failed": "Neizdevās aizvērt {{plugin}} sānu paneli. Mēģini vēlreiz.",
   "options": "{{plugin}} opcijas",
   "details": "Spraudņa informācija",
-  "closePanel": "Aizvērt sānjoslu"
+  "closePanel": "Aizvērt paneli"
 }
