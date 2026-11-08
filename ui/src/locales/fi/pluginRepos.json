@@ -12,10 +12,10 @@
     "subtitle": "Lisää vain luotettavien ihmisten arkistoja.",
     "signatureValid": "allekirjoitus kelvollinen",
     "contactLine": "yhteystieto: {{contact}}",
-    "pluginsLine": "Liitännäisiä: {{number}}",
+    "pluginsLine": "Lisäosia: {{number}}",
     "signingKey": "Allekirjoitusavain",
     "warningTitle": "Epävirallinen arkisto",
-    "warningBody": "Mumcord ei tarkista näitä liitännäisiä. Avain muistetaan: jos se muuttuu, arkisto keskeytetään, kunnes tarkistat sen. Selaaminen näyttää IP-osoitteesi ylläpitäjälle. Viralliset nimet omaavia liitännäisiä ei koskaan oteta tästä."
+    "warningBody": "Mumcord ei tarkista näitä lisäosia. Avain muistetaan: jos se muuttuu, arkisto keskeytetään, kunnes tarkistat sen. Selaaminen näyttää IP-osoitteesi arkiston palvelimelle. Virallisennimisiä lisäosia ei koskaan haeta siitä."
   },
   "limit": "Voit lisätä enintään {{max}} arkistoa.",
   "limitReached": "Enimmäismäärä {{max}} arkistoa on saavutettu.",
@@ -54,7 +54,7 @@
     "reset": "Käytä oletusta"
   },
   "official": {
-    "name": "Mumcordin viralliset liitännäiset",
+    "name": "Mumcordin viralliset lisäosat",
     "alwaysOn": "Aina käytössä"
   }
 }

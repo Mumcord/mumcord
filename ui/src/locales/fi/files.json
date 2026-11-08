@@ -49,7 +49,7 @@
     "checksumLabel": "SHA-256-tarkistussumma {{hash}}",
     "copy": "Kopioi",
     "copied": "Kopioitu",
-    "available": "Saatavilla, kun {{sender}} on online-tilassa · päättyy {{when}}",
+    "available": "Saatavilla, kun {{sender}} on paikalla · päättyy {{when}}",
     "download": "Lataa",
     "cancel": "Peruuta",
     "retry": "Yritä uudelleen",
@@ -58,7 +58,7 @@
     "progressLabel": "Ladataan {{name}}",
     "progressValue": "{{percent}} %",
     "progress": "{{percent}} % · {{received}} / {{size}} · {{speed}} · noin {{left}} jäljellä",
-    "transport": "Peer-to-peer · päästä päähän salattu",
+    "transport": "Vertaisyhteys · päästä päähän salattu",
     "checking": "Tarkistetaan…",
     "done": "✓ Ladattu",
     "matches": "✓ Vastaa tarjousta",
@@ -74,8 +74,8 @@
     "noSpace": "Kansiossa {{folder}} ei ole tarpeeksi levytilaa",
     "reason": {
       "noAnswer": "{{sender}} ei vastannut",
-      "connect": "Yhteyttä ei voitu muodostaa releen kautta: {{reason}}",
-      "connectUnknown": "Yhteyttä ei voitu muodostaa releen kautta",
+      "connect": "Yhteyttä ei voitu muodostaa välityspalvelimen kautta: {{reason}}",
+      "connectUnknown": "Yhteyttä ei voitu muodostaa välityspalvelimen kautta",
       "stalled": "Siirto pysähtyi",
       "connectionLost": "Yhteys katkesi"
     },
@@ -91,7 +91,7 @@
       "unavailable": "ei saatavilla"
     },
     "unavailable": {
-      "offline": "{{sender}} meni offline-tilaan. Tiedosto ei ole enää saatavilla.",
+      "offline": "{{sender}} ei ole enää paikalla. Tiedosto ei ole enää saatavilla.",
       "ended": "Tämä jako päättyi. Jaot päättyvät 24 tunnin kuluttua.",
       "askAgain": "Pyydä käyttäjää {{sender}} jakamaan se uudelleen."
     },
@@ -110,7 +110,7 @@
     "sendingTo": "Lähetetään käyttäjälle {{name}} · {{percent}} %",
     "waiting_one": "{{count}} odottaa",
     "waiting_other": "{{count}} odottaa",
-    "sharing": "Jaossa, kun olet online-tilassa · päättyy {{when}}",
+    "sharing": "Jaossa, kun olet paikalla · päättyy {{when}}",
     "stop": "Lopeta jako",
     "stopFailed": "Jakoa ei voitu lopettaa: {{reason}}. Tiedosto on yhä jaossa.",
     "ended": "Jako päättyi",
@@ -141,16 +141,16 @@
     "title": "Tiedostojen jako",
     "new": "Uusi",
     "receive": "Vastaanota tiedostoja muilta Mumcord-käyttäjiltä",
-    "receiveHint": "Tiedostot tulevat lähettäjältä, kun tämä on online-tilassa. Estetyt henkilöt eivät voi lähettää sinulle tiedostoja.",
+    "receiveHint": "Tiedostot tulevat lähettäjältä, kun tämä on paikalla. Estetyt henkilöt eivät voi lähettää sinulle tiedostoja.",
     "maxSize": "Tiedoston enimmäiskoko",
-    "maxSizeHint": "Jopa 2 Gt:n tiedostoja voi jakaa. Oletuksena 1 Gt. Suurempi ei ole mahdollista.",
+    "maxSizeHint": "Voit jakaa enintään 2 Gt:n tiedostoja. Oletus on 1 Gt. Suurempia ei voi jakaa.",
     "size100mb": "100 Mt",
     "size500mb": "500 Mt",
     "size1gb": "1 Gt",
     "size2gb": "2 Gt",
     "saveTo": "Tallenna tiedostot kansioon",
     "change": "Muuta…",
-    "relayNote": "Tiedostot kulkevat aina palvelimen releen kautta, joten kukaan ei näe IP-osoitettasi. Palvelimilla ilman relettä ei voi jakaa tiedostoja. Mitään ei ladata ilman napsautustasi ja vahvistustasi.",
+    "relayNote": "Tiedostot kulkevat aina palvelimen välityspalvelimen kautta, joten kukaan ei näe IP-osoitettasi. Palvelimilla, joilla ei ole välityspalvelinta, tiedostoja ei voi jakaa. Mitään ei ladata ilman napsautustasi ja vahvistustasi.",
     "encryptionNote": "Tiedostot on salattu päästä päähän ja ne tarkistetaan latauksen jälkeen."
   }
 }

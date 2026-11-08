@@ -19,18 +19,18 @@
     },
     "channels": {
       "title": "Kanavat",
-      "body": "Kaksoisnapsauta kanavaa, niin liityt siihen ja voit puhua. Yksi napsautus näyttää kanavan chatin liittymättä, ja Seuraa-painike pitää sinut ajan tasalla."
+      "body": "Kaksoisnapsauta kanavaa, niin liityt sille ja voit puhua. Yksi napsautus näyttää kanavan chatin liittymättä, ja Seuraa-painike pitää sinut ajan tasalla."
     },
     "talk": {
       "title": "Näin puhut",
-      "body": "Puhu painamalla vai puheaktivointi? Valitse kohdassa Asetukset → Puhe ja ääni tai avaa Ääniasetukset… mikrofonin vieressä olevalla pienellä nuolella. Puhu painamalla -tila toimii myös hiiren painikkeilla."
+      "body": "Push-to-talk vai puheaktivointi? Valitse kohdassa Asetukset → Puhe ja ääni tai avaa Ääniasetukset… mikrofonin vieressä olevalla pienellä nuolella. Push-to-talk toimii myös hiiren painikkeilla."
     },
     "panel": {
       "title": "Käyttäjäpaneelisi",
-      "body": "Vasemmassa alakulmassa mykistät mikrofonin tai kuulokkeet, laitat kameran päälle tai katkaiset yhteyden. Viereiset pienet nuolet avaavat lisää vaihtoehtoja."
+      "body": "Vasemmassa alakulmassa mykistät mikrofonin, hiljennät kuulokkeet, laitat kameran päälle tai katkaiset yhteyden. Viereiset pienet nuolet avaavat lisää vaihtoehtoja."
     },
     "search": {
-      "title": "Löydä kaikki",
+      "title": "Etsi mitä vain",
       "body": "Paina {{key}}, niin löydät henkilöitä ja kanavia, myös suurilla palvelimilla."
     },
     "chat": {

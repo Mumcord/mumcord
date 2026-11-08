@@ -46,7 +46,7 @@
     "send": "Lähetä",
     "noPermission": "Sinulla ei ole oikeutta kirjoittaa tälle kanavalle.",
     "unavailable": "Tämä kanava ei ole enää käytettävissä.",
-    "offline": "{{name}} on offline-tilassa. Voit kirjoittaa taas, kun hän palaa.",
+    "offline": "{{name}} ei ole paikalla. Voit kirjoittaa taas, kun hän palaa.",
     "unnamedImage": "Liitetty kuva",
     "attachFiles": "Jaa tiedostoja"
   },
@@ -118,7 +118,7 @@
       "show": "Ohjelma"
     },
     "inBrowser": "Toistetaan selaimessasi",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Twitchin soitin ei toimi Mumcordin ikkunassa tässä järjestelmässä, joten Toista avaa lähetyksen selaimessasi.",
     "card": "Linkin esikatselu: {{title}}",
     "dismiss": "Piilota esikatselu"
   },
@@ -126,7 +126,7 @@
     "loading": "Ladataan kuvaa {{name}}",
     "label": "Kuva: {{name}}",
     "view": "Näytä kuva {{name}}",
-    "viewMessage": "Kuva lähettäjältä {{name}}, avaa katseluohjelmassa",
+    "viewMessage": "Kuva lähettäjältä {{name}}, avaa kuvankatselussa",
     "failed": "Kuvaa ei voi näyttää (liian suuri tai ei saatavilla)."
   },
   "viewer": {
@@ -156,7 +156,7 @@
     "remove": "Poista suosikeista",
     "removeNamed": "Poista {{name}} suosikeista",
     "send": "Lähetä {{name}}",
-    "hint": "Nuolinäppäimet liikkuvat, Enter lähettää, Delete poistaa, Escape sulkee.",
+    "hint": "Liiku nuolinäppäimillä, Enter lähettää, Delete poistaa, Esc sulkee.",
     "empty": "Ei vielä suosikkeja. Napsauta GIFiä chatissa hiiren oikealla painikkeella tai käytä sen tähteä ja valitse ”Tallenna suosikiksi”. Se näkyy sitten täällä."
   },
   "linkMenu": {
@@ -175,7 +175,7 @@
     "copy": "Kopioi kuva",
     "save": "Tallenna kuva",
     "copyAddress": "Kopioi kuvan osoite",
-    "openViewer": "Avaa kuvankatseluohjelmassa",
+    "openViewer": "Avaa kuvankatselussa",
     "copied": "Kuva kopioitu",
     "addressCopied": "Kuvan osoite kopioitu",
     "copyFailed": "Kuvaa ei voitu kopioida",
@@ -263,15 +263,15 @@
     "join": "Liity",
     "joinLabel": "Liity palvelimeen {{server}}",
     "joined": "Liitytty",
-    "label": "Palvelin kortti: {{server}}",
-    "privacyOff": "Palvelin-arvot on sulettu asetuksissa",
+    "label": "Palvelinkortti: {{server}}",
+    "privacyOff": "Palvelimen tiedot on poistettu käytöstä asetuksissa",
     "querying": "Tarkistetaan palvelinta…",
     "retry": "Tarkista uudelleen",
     "retryLabel": "Tarkista uudelleen {{server}}",
     "server": "{{server}}",
     "unreachable": "Palvelimeen ei saada yhteyttä",
-    "warning_one": "{{count}} linkki tässä viestissä näyttää kirjautumistiedot",
-    "warning_other": "{{count}} linkkiä tässä viestissä näyttävät kirjautumistiedot"
+    "warning_one": "Tässä viestissä {{count}} linkki näyttää kirjautumistiedot",
+    "warning_other": "Tässä viestissä {{count}} linkkiä näyttää kirjautumistiedot"
   },
   "requests": {
     "entry": "Viestipyynnöt",
@@ -379,7 +379,7 @@
     "card": "{{service}}: {{title}}",
     "title": "{{service}}-linkki",
     "other": "Musiikkilinkki",
-    "thirdParty": "Kolmannen osapuolen sisältöä palvelimelta {{host}}",
+    "thirdParty": "Kolmannen osapuolen sisältöä sivustolta {{host}}",
     "thirdPartyShort": "Kolmannen osapuolen sisältöä",
     "embedded": "Upotettu soitin · {{service}} · {{host}}",
     "player": "{{service}}-soitin: {{title}}",

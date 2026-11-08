@@ -39,14 +39,14 @@
     "soundServerBlock": "Äänipalvelin toimittaa {{value}} ms:n lohkot, koska toinen sovellus pyytää niitä; Mumcord ei voi tehdä niitä pienemmiksi."
   },
   "media": {
-    "controls": "Soittimen valitsimet",
+    "controls": "Soittimen säätimet",
     "nowPlaying": "Nyt toistetaan",
-    "watching": "Katsovat",
+    "watching": "Katsojat",
     "open": "Avaa",
     "next": "Seuraava",
     "seek": "Siirry",
     "volume": "Äänenvoimakkuus",
-    "syncedPlay": "Synkassa",
+    "syncedPlay": "Synkronoitu toisto",
     "keys": "Välilyönti · ← → · M · F · Esc",
     "inControl": "{{name}} hallitsee",
     "inSync": "Synkassa",
@@ -60,7 +60,7 @@
     "host": "Isäntä",
     "fullscreen": "Koko näyttö",
     "exitFullscreen": "Poistu koko näytöstä",
-    "none": "Kukaan",
+    "none": "Ei kukaan",
     "popOut": "Avaa erillisessä ikkunassa",
     "popIn": "Palauta pääikkunaan",
     "onTop": "Aina päällimmäisenä",
@@ -71,24 +71,24 @@
     "onTopFailed": "Asetusta Aina päällimmäisenä ei voitu muuttaa",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Muuta mediaalueen kokoa",
+      "label": "Muuta media-alueen kokoa",
       "valueText": "{{percent}} % ikkunan korkeudesta",
       "ofWindow": "ikkunan korkeudesta",
       "chatMinimum": "chat säilyttää vähimmäiskokonsa",
-      "release": "vapauta tiivistääksesi",
+      "release": "vapauta pienentääksesi",
       "keys": "↑ ↓ koko · PageUp/PageDown kiinnittyminen · Home/End · Enter palauttaa",
       "releaseHint": "Vapauta pienentääksesi minipalkkiin",
-      "minimised": "Mediaalue pienennetty"
+      "minimised": "Media-alue pienennetty"
     },
     "stage": {
       "tabs": "Mitä media-alue näyttää",
       "hint": "Vaihtaminen ei pysäytä mitään",
       "share": "Näytön jako",
-      "plugin": "Laajennus",
+      "plugin": "Lisäosa",
       "tabName": "{{label}}, välilehti {{index}}/{{count}}",
       "tabNameNew": "{{label}}, uusi, välilehti {{index}}/{{count}}",
-      "pluginTabName": "{{label}}, laajennuksen toiminta, välilehti {{index}}/{{count}}",
-      "pluginTabNameNew": "{{label}}, laajennuksen toiminta, uusi, välilehti {{index}}/{{count}}"
+      "pluginTabName": "{{label}}, lisäosan toiminta, välilehti {{index}}/{{count}}",
+      "pluginTabNameNew": "{{label}}, lisäosan toiminta, uusi, välilehti {{index}}/{{count}}"
     }
   }
 }
