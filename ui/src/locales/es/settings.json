@@ -534,7 +534,9 @@
     "copyWhole": "Copiar todo el registro",
     "openLogFolder": "Abrir carpeta de registros",
     "logCopied": "Registro copiado.",
-    "fileLabel": "Archivo de diagnóstico"
+    "fileLabel": "Archivo de diagnóstico",
+    "writeToDisk": "Escribir registros en el disco",
+    "writeToDiskHint": "Desactivado mantiene el registro solo en memoria durante esta sesión: no se escribe nada en el disco."
   },
   "about": {
     "version": "Versión",
@@ -1293,5 +1295,15 @@
     "button": "Borrar historial",
     "confirm": "¿Borrar el historial de actividad de todos los servidores? No se puede deshacer.",
     "confirmButton": "Borrar"
+  },
+  "diskWrites": {
+    "title": "Reducir escrituras en disco",
+    "hint": "Menos escrituras desgastan menos los discos SSD. Cada interruptor mantiene el comportamiento actual cuando está activado.",
+    "durableSaves": "Esperar al disco en cada guardado",
+    "durableSavesHint": "Desactivado escribe menos, pero un corte de luz puede perder los últimos segundos de historial y ajustes.",
+    "linkPreviewsOnDisk": "Guardar vistas previas de enlaces en el disco",
+    "linkPreviewsOnDiskHint": "Desactivado mantiene las vistas previas solo en memoria durante esta sesión.",
+    "pluginRegistryCache": "Guardar copia del registro de complementos en el disco",
+    "pluginRegistryCacheHint": "Desactivado descarga siempre el registro de nuevo."
   }
 }

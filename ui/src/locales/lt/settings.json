@@ -537,7 +537,9 @@
     "copyWhole": "Kopijuoti visą žurnalą",
     "openLogFolder": "Atidaryti žurnalų aplanką",
     "logCopied": "Žurnalas nukopijuotas.",
-    "fileLabel": "Diagnostikos failas"
+    "fileLabel": "Diagnostikos failas",
+    "writeToDisk": "Rašyti žurnalus į diską",
+    "writeToDiskHint": "Išjungta žurnalą laiko tik atmintyje šiai sesijai — į diską nieko nerašoma."
   },
   "about": {
     "version": "Versija",
@@ -1303,5 +1305,15 @@
     "button": "Išvalyti istoriją",
     "confirm": "Išvalyti visų serverių veiklos istoriją? To atšaukti negalima.",
     "confirmButton": "Išvalyti"
+  },
+  "diskWrites": {
+    "title": "Mažiau rašymo į diską",
+    "hint": "Mažiau rašymo mažiau dėvi SSD diskus. Kiekvienas jungiklis išlaiko dabartinį elgesį, kai įjungtas.",
+    "durableSaves": "Laukti disko kiekvieną kartą išsaugant",
+    "durableSavesHint": "Išjungta rašo mažiau, bet dingus elektrai gali būti prarastos paskutinės sekundės istorijos ir nustatymų.",
+    "linkPreviewsOnDisk": "Laikyti nuorodų peržiūras diske",
+    "linkPreviewsOnDiskHint": "Išjungta peržiūras laiko tik atmintyje šiai sesijai.",
+    "pluginRegistryCache": "Laikyti įskiepių registro kopiją diske",
+    "pluginRegistryCacheHint": "Išjungta registrą visada atsisiunčia iš naujo."
   }
 }

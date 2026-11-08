@@ -537,7 +537,9 @@
     "copyWhole": "Kopiuj cały log",
     "openLogFolder": "Otwórz folder logów",
     "logCopied": "Log skopiowany.",
-    "fileLabel": "Plik diagnostyczny"
+    "fileLabel": "Plik diagnostyczny",
+    "writeToDisk": "Zapisuj dzienniki na dysku",
+    "writeToDiskHint": "Wyłączone trzyma dziennik tylko w pamięci na czas tej sesji — nic nie jest zapisywane na dysku."
   },
   "about": {
     "version": "Wersja",
@@ -1303,5 +1305,15 @@
     "button": "Wyczyść historię",
     "confirm": "Wyczyścić historię aktywności wszystkich serwerów? Tej operacji nie można cofnąć.",
     "confirmButton": "Wyczyść"
+  },
+  "diskWrites": {
+    "title": "Mniej zapisów na dysku",
+    "hint": "Mniej zapisów mniej zużywa dyski SSD. Każdy przełącznik zachowuje obecne zachowanie, gdy jest włączony.",
+    "durableSaves": "Czekaj na dysk przy każdym zapisie",
+    "durableSavesHint": "Wyłączone zapisuje mniej, ale zanik prądu może utracić ostatnie sekundy historii i ustawień.",
+    "linkPreviewsOnDisk": "Trzymaj podglądy linków na dysku",
+    "linkPreviewsOnDiskHint": "Wyłączone trzyma podglądy tylko w pamięci na czas tej sesji.",
+    "pluginRegistryCache": "Trzymaj kopię rejestru wtyczek na dysku",
+    "pluginRegistryCacheHint": "Wyłączone zawsze pobiera rejestr na nowo."
   }
 }

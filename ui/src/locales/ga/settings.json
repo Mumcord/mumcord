@@ -540,7 +540,9 @@
     "copyWhole": "Cóipeáil an logchomhad iomlán",
     "openLogFolder": "Oscail fillteán na logchomhad",
     "logCopied": "Cóipeáladh an logchomhad.",
-    "fileLabel": "Comhad diagnóiseach"
+    "fileLabel": "Comhad diagnóiseach",
+    "writeToDisk": "Scríobh logaí ar an diosca",
+    "writeToDiskHint": "Nuair a bhíonn sé as, coinnítear an loga sa chuimhne amháin don seisiún seo — ní scríobhtar aon rud ar an diosca."
   },
   "about": {
     "version": "Leagan",
@@ -1313,5 +1315,15 @@
     "button": "Glan an stair",
     "confirm": "An bhfuil tú ag iarraidh stair ghníomhaíochta gach freastalaí a ghlanadh? Ní féidir é seo a chealú.",
     "confirmButton": "Glan"
+  },
+  "diskWrites": {
+    "title": "Níos lú scríobh ar an diosca",
+    "hint": "Caitheann níos lú scríobh níos lú ar dhioscaí SSD. Coinníonn gach lasc an iompar reatha nuair atá sé ar siúl.",
+    "durableSaves": "Fan ar an diosca ar gach sábháil",
+    "durableSavesHint": "Nuair a bhíonn sé as, scríobhtar níos lú, ach is féidir le briseadh cumhachta na soicindí deireanacha staire agus socruithe a chailleadh.",
+    "linkPreviewsOnDisk": "Coinnigh réamhamhairc nasc ar an diosca",
+    "linkPreviewsOnDiskHint": "Nuair a bhíonn sé as, coinnítear réamhamhairc sa chuimhne amháin don seisiún seo.",
+    "pluginRegistryCache": "Coinnigh cóip de chlár na mbreiseán ar an diosca",
+    "pluginRegistryCacheHint": "Nuair a bhíonn sé as, faightear an clár as an nua i gcónaí."
   }
 }

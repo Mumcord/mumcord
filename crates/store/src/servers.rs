@@ -344,6 +344,9 @@ impl Store {
         // Secrets first: if secure storage fails, the server stays and the user can retry
         // instead of leaving an orphaned secret behind.
         secrets.delete_server_secrets(id)?;
+        // Queued messages for this server would otherwise fail the foreign key at the next
+        // flush; write them first so the cascade below removes them.
+        self.flush_pending()?;
         let changed = self
             .conn
             .execute("DELETE FROM saved_server WHERE id = ?1", [id])?;

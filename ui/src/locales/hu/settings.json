@@ -531,7 +531,9 @@
     "copyWhole": "Teljes napló másolása",
     "openLogFolder": "Naplómappa megnyitása",
     "logCopied": "Napló másolva.",
-    "fileLabel": "Diagnosztikai fájl"
+    "fileLabel": "Diagnosztikai fájl",
+    "writeToDisk": "Naplók írása a lemezre",
+    "writeToDiskHint": "Kikapcsolva a napló csak a memóriában marad erre a munkamenetre — semmi sem íródik a lemezre."
   },
   "about": {
     "version": "Verzió",
@@ -1283,5 +1285,15 @@
     "button": "Előzmények törlése",
     "confirm": "Törlöd az összes szerver tevékenységi előzményeit? Ez nem vonható vissza.",
     "confirmButton": "Törlés"
+  },
+  "diskWrites": {
+    "title": "Kevesebb lemezírás",
+    "hint": "A kevesebb írás kevésbé koptatja az SSD-ket. Minden kapcsoló megtartja a jelenlegi viselkedést bekapcsolva.",
+    "durableSaves": "Várakozás a lemezre minden mentésnél",
+    "durableSavesHint": "Kikapcsolva kevesebbet ír, de áramszünet elveszítheti az előzmények és beállítások utolsó néhány másodpercét.",
+    "linkPreviewsOnDisk": "Hivatkozás-előnézetek tárolása a lemezen",
+    "linkPreviewsOnDiskHint": "Kikapcsolva az előnézetek csak a memóriában maradnak erre a munkamenetre.",
+    "pluginRegistryCache": "Bővítményregiszter másolatának tárolása a lemezen",
+    "pluginRegistryCacheHint": "Kikapcsolva mindig újra letölti a regisztert."
   }
 }

@@ -747,6 +747,13 @@ pub struct Settings {
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
+    /// Write the log to disk (spec 12, FR-12.2). Off: the log stays in memory only for the
+    /// session; nothing is written to the log file. On by default.
+    pub log_to_disk: bool,
+    /// Wait for disk on every database save (`PRAGMA synchronous = NORMAL`, spec 12 FR-12.8).
+    /// Off: `synchronous = OFF`, fewer writes; a power cut can lose the last few seconds of
+    /// history and settings, but the database file cannot be corrupted (WAL). On by default.
+    pub durable_saves: bool,
     /// In-game overlay drawn inside games (FR-1.46b).
     pub ingame_overlay: InGameOverlaySettings,
     pub positional: PositionalSettings,
@@ -767,6 +774,9 @@ pub struct Settings {
     /// Cached previews, thumbnails and images are deleted after this many days; `None` keeps
     /// them (QA.42).
     pub preview_cache_days: Option<u32>,
+    /// Keep link previews on disk (spec 12, FR-12.10). Off: previews live in memory only for
+    /// the session and are re-fetched after a restart. On by default.
+    pub link_previews_on_disk: bool,
     /// Local chat history older than this many days is deleted; `None` keeps it (QA.42).
     pub history_max_age_days: Option<u32>,
     /// Share the track playing in the system's media player with others on the server
@@ -800,6 +810,9 @@ pub struct Settings {
     pub plugins_badge_plugin: Option<String>,
     /// Optional mirror of the official plugin repository.
     pub plugins_mirror_url: Option<String>,
+    /// Keep the offline copy of the plugin registry on disk (spec 12, FR-12.11). Off: the
+    /// registry is always fetched fresh and no offline copy is written. On by default.
+    pub plugin_registry_cache: bool,
     /// Developer mode: dev folders, local HTTP repositories.
     pub developer_mode: bool,
     /// Highest sequence number seen from the official repository (rollback protection).
@@ -1054,6 +1067,8 @@ impl Default for Settings {
             close_behaviour: CloseBehaviour::default(),
             chat_display: ChatDisplay::default(),
             log_level: LogLevel::default(),
+            log_to_disk: true,
+            durable_saves: true,
             ingame_overlay: InGameOverlaySettings::default(),
             positional: PositionalSettings::default(),
             enabled_plugins: Vec::new(),
@@ -1063,6 +1078,7 @@ impl Default for Settings {
             connect_muted: true,
             link_previews: true,
             preview_cache_days: Some(DEFAULT_PREVIEW_CACHE_DAYS),
+            link_previews_on_disk: true,
             history_max_age_days: None,
             now_playing: false,
             now_gaming: false,
@@ -1077,6 +1093,7 @@ impl Default for Settings {
             plugins_all_off: false,
             plugins_badge_plugin: None,
             plugins_mirror_url: None,
+            plugin_registry_cache: true,
             developer_mode: false,
             plugins_last_official_sequence: 0,
             plugins_revoked_checked_at: None,
@@ -1570,6 +1587,35 @@ mod tests {
             )
             .expect("insert");
         store.settings().expect("load")
+    }
+
+    #[test]
+    fn disk_settings_default_on_and_round_trip() {
+        // FR-12.13: all four default to on, so old profiles behave as today.
+        let defaults = Settings::default();
+        assert!(defaults.log_to_disk);
+        assert!(defaults.durable_saves);
+        assert!(defaults.link_previews_on_disk);
+        assert!(defaults.plugin_registry_cache);
+
+        let loaded = load_raw(r#"{"log_level":"info"}"#);
+        assert!(loaded.log_to_disk);
+        assert!(loaded.durable_saves);
+        assert!(loaded.link_previews_on_disk);
+        assert!(loaded.plugin_registry_cache);
+
+        let mut changed = loaded;
+        changed.log_to_disk = false;
+        changed.durable_saves = false;
+        changed.link_previews_on_disk = false;
+        changed.plugin_registry_cache = false;
+        let (_dir, store) = temp_store();
+        store.save_settings(&changed).expect("save");
+        let reloaded = store.settings().expect("load");
+        assert!(!reloaded.log_to_disk);
+        assert!(!reloaded.durable_saves);
+        assert!(!reloaded.link_previews_on_disk);
+        assert!(!reloaded.plugin_registry_cache);
     }
 
     #[test]

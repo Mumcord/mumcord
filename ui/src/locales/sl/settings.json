@@ -537,7 +537,9 @@
     "copyWhole": "Kopiraj celoten dnevnik",
     "openLogFolder": "Odpri mapo z dnevniki",
     "logCopied": "Dnevnik je kopiran.",
-    "fileLabel": "Diagnostična datoteka"
+    "fileLabel": "Diagnostična datoteka",
+    "writeToDisk": "Zapisuj dnevnike na disk",
+    "writeToDiskHint": "Izklopljeno hrani dnevnik samo v pomnilniku za to sejo — na disk se nič ne zapiše."
   },
   "about": {
     "version": "Različica",
@@ -1303,5 +1305,15 @@
     "button": "Počisti zgodovino",
     "confirm": "Želite počistiti zgodovino dejavnosti vseh strežnikov? Tega ni mogoče razveljaviti.",
     "confirmButton": "Počisti"
+  },
+  "diskWrites": {
+    "title": "Manj pisanja na disk",
+    "hint": "Manj pisanja manj obrablja diske SSD. Vsako stikalo ohrani današnje vedenje, ko je vklopljeno.",
+    "durableSaves": "Počakaj na disk pri vsakem shranjevanju",
+    "durableSavesHint": "Izklopljeno piše manj, a izpad elektrike lahko izgubi zadnjih nekaj sekund zgodovine in nastavitev.",
+    "linkPreviewsOnDisk": "Hrani predoglede povezav na disku",
+    "linkPreviewsOnDiskHint": "Izklopljeno hrani predoglede samo v pomnilniku za to sejo.",
+    "pluginRegistryCache": "Hrani kopijo registra vtičnikov na disku",
+    "pluginRegistryCacheHint": "Izklopljeno vedno znova prenese register."
   }
 }

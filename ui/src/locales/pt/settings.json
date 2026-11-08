@@ -534,7 +534,9 @@
     "copyWhole": "Copiar todo o registo",
     "openLogFolder": "Abrir pasta de registos",
     "logCopied": "Registo copiado.",
-    "fileLabel": "Ficheiro de diagnóstico"
+    "fileLabel": "Ficheiro de diagnóstico",
+    "writeToDisk": "Escrever registos no disco",
+    "writeToDiskHint": "Desligado mantém o registo apenas em memória durante esta sessão — nada é escrito no disco."
   },
   "about": {
     "version": "Versão",
@@ -1293,5 +1295,15 @@
     "button": "Limpar histórico",
     "confirm": "Limpar o histórico de atividade de todos os servidores? Esta ação não pode ser anulada.",
     "confirmButton": "Limpar"
+  },
+  "diskWrites": {
+    "title": "Reduzir escritas no disco",
+    "hint": "Menos escritas desgastam menos os discos SSD. Cada interruptor mantém o comportamento atual quando ligado.",
+    "durableSaves": "Esperar pelo disco em cada gravação",
+    "durableSavesHint": "Desligado grava menos, mas uma falha de energia pode perder os últimos segundos de histórico e definições.",
+    "linkPreviewsOnDisk": "Manter pré-visualizações de links no disco",
+    "linkPreviewsOnDiskHint": "Desligado mantém as pré-visualizações apenas em memória durante esta sessão.",
+    "pluginRegistryCache": "Manter cópia do registo de plugins no disco",
+    "pluginRegistryCacheHint": "Desligado descarrega sempre o registo de novo."
   }
 }

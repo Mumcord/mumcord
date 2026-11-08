@@ -531,7 +531,9 @@
     "copyWhole": "Kopiera hela loggen",
     "openLogFolder": "Öppna loggmappen",
     "logCopied": "Loggen har kopierats.",
-    "fileLabel": "Diagnostikfil"
+    "fileLabel": "Diagnostikfil",
+    "writeToDisk": "Skriv loggar till disk",
+    "writeToDiskHint": "Av behåller loggen endast i minnet för den här sessionen — inget skrivs till disk."
   },
   "about": {
     "version": "Version",
@@ -1283,5 +1285,15 @@
     "button": "Rensa historik",
     "confirm": "Vill du rensa aktivitetshistoriken för alla servrar? Det går inte att ångra.",
     "confirmButton": "Rensa"
+  },
+  "diskWrites": {
+    "title": "Färre skrivningar till disk",
+    "hint": "Färre skrivningar sliter mindre på SSD-diskar. Varje brytare behåller dagens beteende när den är på.",
+    "durableSaves": "Vänta på disken vid varje sparning",
+    "durableSavesHint": "Av skriver mindre, men ett strömavbrott kan förlora de sista sekunderna av historik och inställningar.",
+    "linkPreviewsOnDisk": "Behåll länkförhandsvisningar på disk",
+    "linkPreviewsOnDiskHint": "Av behåller förhandsvisningar endast i minnet för den här sessionen.",
+    "pluginRegistryCache": "Behåll en kopia av pluginregistret på disk",
+    "pluginRegistryCacheHint": "Av hämtar alltid registret på nytt."
   }
 }
