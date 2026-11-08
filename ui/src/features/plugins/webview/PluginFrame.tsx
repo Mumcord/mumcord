@@ -43,6 +43,7 @@ import {
 } from "./childFrame";
 import { setPluginFramesMuted, useFrameMute } from "./frameMute";
 import { watchHeartbeat, type HeartbeatWatch } from "./heartbeat";
+import { onPageThemeChange } from "../render/pageTheme";
 import "./webview.css";
 
 interface Props {
@@ -134,6 +135,7 @@ export function PluginFrame({ plugin, webview, onEscape }: Props) {
           url={webview.url}
           label={t("frame.label", { plugin: name })}
           muted={muted}
+          themed={installed?.themedPages === true}
           watched={shown}
           focusOnMount={reloads > 0}
           onEscape={onEscape}
@@ -154,6 +156,8 @@ interface FrameProps {
   readonly url: string;
   readonly label: string;
   readonly muted: boolean;
+  /** The page gets theme changes (an API 1.2 plugin, FR-13.8). */
+  readonly themed: boolean;
   /** Whether the heartbeat is watched (the frame is on screen). */
   readonly watched: boolean;
   /** Takes focus when it appears (after Reload). */
@@ -164,7 +168,7 @@ interface FrameProps {
 }
 
 function SealedFrame(props: FrameProps) {
-  const { plugin, place, url, label, muted, watched, focusOnMount } = props;
+  const { plugin, place, url, label, muted, themed, watched, focusOnMount } = props;
   const wrapper = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
   const loads = useRef(0);
@@ -214,6 +218,7 @@ function SealedFrame(props: FrameProps) {
   useEffect(() => {
     bridge.current?.mute(muted);
   }, [muted]);
+  useFrameTheme(themed, bridge);
 
   useEffect(() => () => watch.current?.stop(), []);
   useEffect(() => {
@@ -253,6 +258,16 @@ function SealedFrame(props: FrameProps) {
       )}
     </div>
   );
+}
+
+/** Sends every theme change to an API 1.2 page while it is open (FR-13.15). */
+function useFrameTheme(themed: boolean, bridge: { readonly current: Bridge | null }): void {
+  useEffect(() => {
+    if (!themed) return;
+    return onPageThemeChange((theme) => {
+      bridge.current?.theme(theme);
+    });
+  }, [themed, bridge]);
 }
 
 interface FrameBridgeArgs {
@@ -347,7 +362,7 @@ const FIRST_PLACE = { x: 0, y: 0, width: 1, height: 1 };
  * needs nothing from the page, so a frozen page is simply closed and Reload opens a new one.
  */
 function ChildFrame(props: FrameProps) {
-  const { plugin, place, url, label, muted, watched, focusOnMount } = props;
+  const { plugin, place, url, label, muted, themed, watched, focusOnMount } = props;
   const wrapper = useRef<HTMLDivElement>(null);
   const placeholder = useRef<HTMLDivElement>(null);
   const frameId = useRef<string | null>(null);
@@ -461,6 +476,7 @@ function ChildFrame(props: FrameProps) {
   useEffect(() => {
     bridge.current?.mute(muted);
   }, [muted]);
+  useFrameTheme(themed, bridge);
 
   useEffect(() => {
     watch.current?.setActive(watched);
