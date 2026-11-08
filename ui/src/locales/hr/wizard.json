@@ -228,5 +228,39 @@
     "discardBody": "Ništa se ne sprema prije završetka. Ako sada odustaneš, sve ostaje kako jest.",
     "discardKeep": "Nastavi uređivati",
     "discardConfirm": "Odbaci promjene"
+  },
+  "guide": {
+    "label": "Savjet od Aarona",
+    "from": "Savjet od Aarona",
+    "hide": "Sakrij Aarona",
+    "show": "Prikaži Aarona",
+    "titles": {
+      "welcome": "Dobro došao",
+      "import": "Prenesi svoje stvari iz Mumblea",
+      "identity": "Tvoje ime na poslužiteljima",
+      "voice": "Odaberi svoj mikrofon",
+      "setupStyle": "Odaberi stil",
+      "privateMessages": "Tko ti smije pisati",
+      "notifications": "Tvoje obavijesti",
+      "connections": "Izravne veze",
+      "features": "Odaberi svoje dodatke",
+      "appearance": "Odaberi svoj izgled",
+      "startup": "Pokretanje Mumcorda",
+      "summary": "Provjeri svoje odabire"
+    },
+    "hints": {
+      "welcome": "Bok, ja sam Aaron! Provest ću te kroz postavljanje. Traje samo minutu.",
+      "import": "Ovo su poslužitelji i postavke pronađeni u Mumbleu. Odaberi što želiš zadržati.",
+      "identity": "Tvoj identitet je tvoje ime na poslužiteljima. Stvori novi ili uvezi postojeći.",
+      "voice": "Ovdje odaberi mikrofon u koji govoriš, pa reci bok: zelena traka trebala bi zaplesati.",
+      "setupStyle": "Odaberi stil. Svaku pojedinu postavku možeš kasnije promijeniti.",
+      "privateMessages": "Odaberi tko ti smije slati privatne poruke. Pošiljatelji to nikad ne saznaju.",
+      "notifications": "Odaberi kako ti stiže svaka vrsta obavijesti ili je isključi.",
+      "connections": "Odaberi smije li te Mumcord izravno povezati s drugim korisnicima Mumcorda.",
+      "features": "Uključi samo dodatke koji ti se sviđaju. Svaka kartica kaže tko je može vidjeti.",
+      "appearance": "Svijetlo, tamno ili kao tvoj sustav: ovdje odaberi svoj izgled.",
+      "startup": "Odaberi kako se Mumcord pokreće kad se prijaviš na računalo.",
+      "summary": "Sve je spremno! Provjeri svoje odabire ovdje; Uredi te vraća na bilo koji korak."
+    }
   }
 }

@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, el ayudante de consejos",
+  "label": "Aaron, el ayudante de consejos",
   "greeting": {
-    "title": "¡Hola, soy Clippy!",
-    "body": "Me conozco Mumcord al dedillo. ¿Te apetece un recorrido rápido? Lleva más o menos un minuto. Si ahora no, me encontrarás en Ajustes → Acerca de → Consejos.",
+    "title": "¡Hola, soy Aaron!",
+    "body": "Soy un axolote y me conozco Mumcord al dedillo. ¿Te apetece un recorrido rápido? Lleva más o menos un minuto. Si ahora no, me encontrarás en Ajustes → Acerca de → Consejos.",
     "start": "Enséñamelo",
     "later": "Ahora no"
   },
@@ -10,6 +10,7 @@
   "back": "Atrás",
   "next": "Siguiente",
   "done": "Hecho",
+  "skip": "Saltar el recorrido",
   "close": "Cerrar consejos",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Cómo hablas",
-      "body": "¿Pulsar para hablar o activación por voz? Elígelo en Ajustes → Voz y audio. Pulsar para hablar también funciona con los botones del ratón."
+      "body": "¿Pulsar para hablar o activación por voz? Elígelo en Ajustes → Voz y audio, o abre Ajustes de voz… con la flechita junto al micrófono. Pulsar para hablar también funciona con los botones del ratón."
     },
     "panel": {
       "title": "Tu panel de usuario",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Tu estilo",
-      "body": "En Ajustes → Apariencia hay temas oscuros y claros. Un servidor puede tener el suyo: haz clic derecho en él y elige Tema."
+      "body": "El engranaje de abajo a la izquierda cambia entre oscuro y claro. En Ajustes → Apariencia hay más temas, y un servidor puede tener el suyo: haz clic derecho en él y elige Tema."
     },
     "end": {
       "title": "¡Eso es todo!",

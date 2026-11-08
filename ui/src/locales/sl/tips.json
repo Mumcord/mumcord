@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, pomočnik z namigi",
+  "label": "Aaron, pomočnik z namigi",
   "greeting": {
-    "title": "Živjo, jaz sem Clippy!",
-    "body": "Mumcord poznam kot svoj žep. Si za hiter ogled? Traja približno minuto. Če ne zdaj, me najdeš v Nastavitve → O aplikaciji → Namigi.",
+    "title": "Živjo, jaz sem Aaron!",
+    "body": "Jaz sem aksolotl in Mumcord poznam kot svoj žep. Si za hiter ogled? Traja približno minuto. Če ne zdaj, me najdeš v Nastavitve → O aplikaciji → Namigi.",
     "start": "Pokaži mi",
     "later": "Ne zdaj"
   },
@@ -10,6 +10,7 @@
   "back": "Nazaj",
   "next": "Naprej",
   "done": "Končano",
+  "skip": "Preskoči ogled",
   "close": "Zapri namige",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Kako govoriš",
-      "body": "»Pritisni za govor« ali glasovna aktivacija? Izberi v Nastavitve → Glas in zvok. »Pritisni za govor« deluje tudi z gumbi miške."
+      "body": "»Pritisni za govor« ali glasovna aktivacija? Izberi v Nastavitve → Glas in zvok ali odpri Nastavitve glasu… z majhno puščico ob mikrofonu. »Pritisni za govor« deluje tudi z gumbi miške."
     },
     "panel": {
       "title": "Tvoja uporabniška plošča",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Tvoj slog",
-      "body": "V Nastavitve → Videz so temne in svetle teme. Strežnik ima lahko svojo: desno klikni nanj in izberi Tema."
+      "body": "Zobnik spodaj levo preklaplja med temnim in svetlim videzom. V Nastavitve → Videz je več tem, strežnik pa ima lahko svojo: desno klikni nanj in izberi Tema."
     },
     "end": {
       "title": "To je to!",

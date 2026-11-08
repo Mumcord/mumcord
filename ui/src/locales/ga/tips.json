@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, an cúntóir leideanna",
+  "label": "Aaron, an cúntóir leideanna",
   "greeting": {
-    "title": "Dia duit, is mise Clippy!",
-    "body": "Tá Mumcord ar eolas agam go maith. Ar mhaith leat turas gasta? Tógann sé thart ar nóiméad. Mura n-oireann sé anois, gheobhaidh tú mé i Socruithe → Maidir le → Leideanna.",
+    "title": "Dia duit, is mise Aaron!",
+    "body": "Is axolotl mé agus tá Mumcord ar eolas agam go maith. Ar mhaith leat turas gasta? Tógann sé thart ar nóiméad. Mura n-oireann sé anois, gheobhaidh tú mé i Socruithe → Maidir le → Leideanna.",
     "start": "Taispeáin dom",
     "later": "Ní anois"
   },
@@ -10,6 +10,7 @@
   "back": "Siar",
   "next": "Ar aghaidh",
   "done": "Déanta",
+  "skip": "Scipeáil an turas",
   "close": "Dún na leideanna",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Conas a labhraíonn tú",
-      "body": "Brúigh-chun-cainte nó gníomhachtú gutha? Roghnaigh i Socruithe → Guth agus fuaim. Oibríonn brúigh-chun-cainte le cnaipí luiche freisin."
+      "body": "Brúigh-chun-cainte nó gníomhachtú gutha? Roghnaigh i Socruithe → Guth agus fuaim, nó oscail Socruithe gutha… leis an tsaighead bheag in aice leis an micreafón. Oibríonn brúigh-chun-cainte le cnaipí luiche freisin."
     },
     "panel": {
       "title": "Do phainéal úsáideora",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Do stíl",
-      "body": "Tá téamaí dorcha agus geala i Socruithe → Cuma. Is féidir a théama féin a bheith ag freastalaí: cliceáil ar dheis air agus roghnaigh Téama."
+      "body": "Athraíonn an giar thíos ar chlé idir dorcha agus geal. Tá tuilleadh téamaí i Socruithe → Cuma, agus is féidir a théama féin a bheith ag freastalaí: cliceáil ar dheis air agus roghnaigh Téama."
     },
     "end": {
       "title": "Sin é!",

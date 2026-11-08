@@ -228,5 +228,39 @@
     "discardBody": "Mitään ei tallenneta ennen lopetusta. Jos peruutat nyt, kaikki pysyy ennallaan.",
     "discardKeep": "Jatka muokkaamista",
     "discardConfirm": "Hylkää muutokset"
+  },
+  "guide": {
+    "label": "Aaronin vinkki",
+    "from": "Aaronin vinkki",
+    "hide": "Piilota Aaron",
+    "show": "Näytä Aaron",
+    "titles": {
+      "welcome": "Tervetuloa mukaan",
+      "import": "Tuo Mumble-tavarasi",
+      "identity": "Nimesi palvelimilla",
+      "voice": "Valitse mikrofonisi",
+      "setupStyle": "Valitse tyyli",
+      "privateMessages": "Kuka saa viestiä sinulle",
+      "notifications": "Ilmoituksesi",
+      "connections": "Suorat yhteydet",
+      "features": "Valitse lisäosasi",
+      "appearance": "Valitse ulkoasusi",
+      "startup": "Mumcordin käynnistys",
+      "summary": "Tarkista valintasi"
+    },
+    "hints": {
+      "welcome": "Hei, olen Aaron! Opastan sinut asetusten läpi. Se vie vain minuutin.",
+      "import": "Nämä ovat Mumblesta löytyneet palvelimet ja asetukset. Valitse, mitä haluat säilyttää.",
+      "identity": "Identiteettisi on nimesi palvelimilla. Luo uusi tai tuo olemassa oleva.",
+      "voice": "Valitse tässä mikrofoni, johon puhut, ja sano sitten hei: vihreän palkin pitäisi tanssia.",
+      "setupStyle": "Valitse tyyli. Voit muuttaa jokaista asetusta myöhemmin.",
+      "privateMessages": "Valitse, kuka saa lähettää sinulle yksityisviestejä. Lähettäjille ei kerrota siitä koskaan.",
+      "notifications": "Valitse, miten kukin uutislaji tavoittaa sinut, tai poista se käytöstä.",
+      "connections": "Valitse, saako Mumcord yhdistää sinut suoraan muihin Mumcordin käyttäjiin.",
+      "features": "Ota käyttöön vain ne lisäominaisuudet, joista pidät. Jokaisessa kortissa lukee, kuka sen näkee.",
+      "appearance": "Vaalea, tumma tai järjestelmän mukainen: valitse ulkoasusi tässä.",
+      "startup": "Valitse, miten Mumcord käynnistyy, kun kirjaudut tietokoneellesi.",
+      "summary": "Valmista! Tarkista valintasi tässä; Muokkaa vie sinut takaisin mihin tahansa vaiheeseen."
+    }
   }
 }

@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, vinkkiapuri",
+  "label": "Aaron, vinkkiapuri",
   "greeting": {
-    "title": "Hei, olen Clippy!",
-    "body": "Tunnen Mumcordin kuin omat taskuni. Haluatko pikaesittelyn? Se kestää noin minuutin. Jos et nyt, löydät minut kohdasta Asetukset → Tietoja → Vinkit.",
+    "title": "Hei, olen Aaron!",
+    "body": "Olen aksolotli ja tunnen Mumcordin kuin omat taskuni. Haluatko pikaesittelyn? Se kestää noin minuutin. Jos et nyt, löydät minut kohdasta Asetukset → Tietoja → Vinkit.",
     "start": "Näytä",
     "later": "Ei nyt"
   },
@@ -10,6 +10,7 @@
   "back": "Takaisin",
   "next": "Seuraava",
   "done": "Valmis",
+  "skip": "Ohita esittely",
   "close": "Sulje vinkit",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Näin puhut",
-      "body": "Puhu painamalla vai puheaktivointi? Valitse kohdassa Asetukset → Puhe ja ääni. Puhu painamalla -tila toimii myös hiiren painikkeilla."
+      "body": "Puhu painamalla vai puheaktivointi? Valitse kohdassa Asetukset → Puhe ja ääni tai avaa Ääniasetukset… mikrofonin vieressä olevalla pienellä nuolella. Puhu painamalla -tila toimii myös hiiren painikkeilla."
     },
     "panel": {
       "title": "Käyttäjäpaneelisi",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Oma tyylisi",
-      "body": "Kohdassa Asetukset → Ulkoasu on tummia ja vaaleita teemoja. Palvelin voi saada oman teemansa: napsauta sitä hiiren oikealla painikkeella ja valitse Teema."
+      "body": "Vasemmassa alareunassa oleva hammasratas vaihtaa tumman ja vaalean välillä. Kohdassa Asetukset → Ulkoasu on lisää teemoja, ja palvelin voi saada oman teemansa: napsauta sitä hiiren oikealla painikkeella ja valitse Teema."
     },
     "end": {
       "title": "Siinä kaikki!",

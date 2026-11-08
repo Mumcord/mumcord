@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, a tippsegéd",
+  "label": "Aaron, a tippsegéd",
   "greeting": {
-    "title": "Szia, Clippy vagyok!",
-    "body": "Úgy ismerem a Mumcordot, mint a tenyeremet. Jöhet egy gyors körbevezetés? Nagyjából egy percig tart. Ha most nem, a Beállítások → Névjegy → Tippek alatt megtalálsz.",
+    "title": "Szia, Aaron vagyok!",
+    "body": "Axolotl vagyok, és úgy ismerem a Mumcordot, mint a tenyeremet. Jöhet egy gyors körbevezetés? Nagyjából egy percig tart. Ha most nem, a Beállítások → Névjegy → Tippek alatt megtalálsz.",
     "start": "Mutasd",
     "later": "Most nem"
   },
@@ -10,6 +10,7 @@
   "back": "Vissza",
   "next": "Tovább",
   "done": "Kész",
+  "skip": "Túra kihagyása",
   "close": "Tippek bezárása",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Így beszélsz",
-      "body": "Push-to-talk vagy hangaktiválás? Válassz a Beállítások → Hang és audió menüben. A push-to-talk egérgombokkal is működik."
+      "body": "Push-to-talk vagy hangaktiválás? Válassz a Beállítások → Hang és audió menüben, vagy nyisd meg a Hangbeállítások… lehetőséget a mikrofon melletti kis nyíllal. A push-to-talk egérgombokkal is működik."
     },
     "panel": {
       "title": "A felhasználói paneled",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "A stílusod",
-      "body": "A Beállítások → Megjelenés alatt sötét és világos témákat találsz. Egy szerver saját témát is kaphat: kattints rá jobb gombbal, és válaszd a Téma lehetőséget."
+      "body": "A bal alsó fogaskerék váltogat a sötét és a világos között. A Beállítások → Megjelenés alatt további témák vannak, és egy szerver saját témát is kaphat: kattints rá jobb gombbal, és válaszd a Téma lehetőséget."
     },
     "end": {
       "title": "Ennyi volt!",

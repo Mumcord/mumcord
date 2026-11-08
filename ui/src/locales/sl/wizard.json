@@ -228,5 +228,39 @@
     "discardBody": "Nič se ne shrani pred zaključkom. Če zdaj prekličeš, vse ostane tako, kot je.",
     "discardKeep": "Nadaljuj z urejanjem",
     "discardConfirm": "Zavrzi spremembe"
+  },
+  "guide": {
+    "label": "Namig od Aarona",
+    "from": "Namig od Aarona",
+    "hide": "Skrij Aarona",
+    "show": "Pokaži Aarona",
+    "titles": {
+      "welcome": "Dobrodošel na krovu",
+      "import": "Prinesi svoje stvari iz Mumbla",
+      "identity": "Tvoje ime na strežnikih",
+      "voice": "Izberi svoj mikrofon",
+      "setupStyle": "Izberi slog",
+      "privateMessages": "Kdo ti sme pisati",
+      "notifications": "Tvoja obvestila",
+      "connections": "Neposredne povezave",
+      "features": "Izberi svoje dodatke",
+      "appearance": "Izberi svoj videz",
+      "startup": "Zagon Mumcorda",
+      "summary": "Preveri svoje izbire"
+    },
+    "hints": {
+      "welcome": "Živjo, jaz sem Aaron! Popeljal te bom skozi nastavitev. Vzame le minuto.",
+      "import": "To so strežniki in nastavitve, najdeni v Mumble. Izberi, kaj želiš obdržati.",
+      "identity": "Tvoja identiteta je tvoje ime na strežnikih. Ustvari novo ali uvozi obstoječo.",
+      "voice": "Tukaj izberi mikrofon, v katerega govoriš, nato reci živjo: zelena vrstica bi morala zaplesati.",
+      "setupStyle": "Izberi slog. Vsako posamezno nastavitev lahko pozneje spremeniš.",
+      "privateMessages": "Izberi, kdo ti sme pošiljati zasebna sporočila. Pošiljatelji tega nikoli ne izvedo.",
+      "notifications": "Izberi, kako te doseže vsaka vrsta novic, ali jo izklopi.",
+      "connections": "Izberi, ali te sme Mumcord neposredno povezati z drugimi uporabniki Mumcorda.",
+      "features": "Vklopi samo dodatke, ki so ti všeč. Vsaka kartica pove, kdo jo vidi.",
+      "appearance": "Svetlo, temno ali kot tvoj sistem: tukaj izberi svoj videz.",
+      "startup": "Izberi, kako se Mumcord zažene, ko se prijaviš v računalnik.",
+      "summary": "Vse je pripravljeno! Tukaj preveri svoje izbire; Uredi te vrne na kateri koli korak."
+    }
   }
 }

@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, tipshjälparen",
+  "label": "Aaron, tipshjälparen",
   "greeting": {
-    "title": "Hej, jag är Clippy!",
-    "body": "Jag kan Mumcord utan och innan. Vill du ha en snabb rundtur? Den tar ungefär en minut. Om inte nu, så hittar du mig under Inställningar → Om → Tips.",
+    "title": "Hej, jag är Aaron!",
+    "body": "Jag är en axolotl och kan Mumcord utan och innan. Vill du ha en snabb rundtur? Den tar ungefär en minut. Om inte nu, så hittar du mig under Inställningar → Om → Tips.",
     "start": "Visa mig",
     "later": "Inte nu"
   },
@@ -10,6 +10,7 @@
   "back": "Tillbaka",
   "next": "Nästa",
   "done": "Klart",
+  "skip": "Hoppa över rundturen",
   "close": "Stäng tips",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Hur du pratar",
-      "body": "Push-to-talk eller röstaktivering? Välj under Inställningar → Röst och ljud. Push-to-talk fungerar också med musknappar."
+      "body": "Push-to-talk eller röstaktivering? Välj under Inställningar → Röst och ljud, eller öppna Röstinställningar… med den lilla pilen bredvid mikrofonen. Push-to-talk fungerar också med musknappar."
     },
     "panel": {
       "title": "Din användarpanel",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Din stil",
-      "body": "Under Inställningar → Utseende finns mörka och ljusa teman. En server kan få ett eget: högerklicka på den och välj Tema."
+      "body": "Kugghjulet nere till vänster växlar mellan mörkt och ljust. Under Inställningar → Utseende finns fler teman, och en server kan få ett eget: högerklicka på den och välj Tema."
     },
     "end": {
       "title": "Det var allt!",

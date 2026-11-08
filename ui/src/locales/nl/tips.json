@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, de tipshulp",
+  "label": "Aaron, de tipshulp",
   "greeting": {
-    "title": "Hoi, ik ben Clippy!",
-    "body": "Ik ken Mumcord op mijn duimpje. Zin in een korte rondleiding? Die duurt ongeveer een minuut. Niet nu? Dan vind je me bij Instellingen → Over → Tips.",
+    "title": "Hoi, ik ben Aaron!",
+    "body": "Ik ben een axolotl en ik ken Mumcord op mijn duimpje. Zin in een korte rondleiding? Die duurt ongeveer een minuut. Niet nu? Dan vind je me bij Instellingen → Over → Tips.",
     "start": "Laat maar zien",
     "later": "Niet nu"
   },
@@ -10,6 +10,7 @@
   "back": "Terug",
   "next": "Volgende",
   "done": "Klaar",
+  "skip": "Rondleiding overslaan",
   "close": "Tips sluiten",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Zo praat je",
-      "body": "Push-to-talk of spraakactivering? Kies het bij Instellingen → Spraak en audio. Push-to-talk werkt ook met muisknoppen."
+      "body": "Push-to-talk of spraakactivering? Kies het bij Instellingen → Spraak en audio, of open Spraakinstellingen… met het pijltje naast de microfoon. Push-to-talk werkt ook met muisknoppen."
     },
     "panel": {
       "title": "Je gebruikerspaneel",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Jouw look",
-      "body": "Bij Instellingen → Weergave vind je donkere en lichte thema's. Een server kan een eigen thema krijgen: klik er met de rechtermuisknop op en kies Thema."
+      "body": "Het tandwiel linksonder schakelt tussen donker en licht. Bij Instellingen → Weergave vind je meer thema's, en een server kan een eigen thema krijgen: klik er met de rechtermuisknop op en kies Thema."
     },
     "end": {
       "title": "Dat was het!",

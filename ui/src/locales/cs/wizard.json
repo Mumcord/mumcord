@@ -228,5 +228,39 @@
     "discardBody": "Nic se neukládá před dokončením. Když teď zrušíš, vše zůstane tak, jak to je.",
     "discardKeep": "Pokračovat v úpravách",
     "discardConfirm": "Zahodit změny"
+  },
+  "guide": {
+    "label": "Tip od Aarona",
+    "from": "Tip od Aarona",
+    "hide": "Skrýt Aarona",
+    "show": "Zobrazit Aarona",
+    "titles": {
+      "welcome": "Vítej na palubě",
+      "import": "Přenes si věci z Mumble",
+      "identity": "Tvé jméno na serverech",
+      "voice": "Vyber si mikrofon",
+      "setupStyle": "Vyber si styl",
+      "privateMessages": "Kdo ti smí psát",
+      "notifications": "Tvá oznámení",
+      "connections": "Přímá spojení",
+      "features": "Vyber si doplňky",
+      "appearance": "Vyber si vzhled",
+      "startup": "Spouštění Mumcordu",
+      "summary": "Zkontroluj své volby"
+    },
+    "hints": {
+      "welcome": "Ahoj, já jsem Aaron! Provedu tě nastavením. Zabere to jen minutu.",
+      "import": "Tohle jsou servery a nastavení nalezené v Mumble. Vyber, co chceš zachovat.",
+      "identity": "Tvoje identita je tvé jméno na serverech. Vytvoř novou, nebo importuj existující.",
+      "voice": "Tady vyber mikrofon, do kterého mluvíš, a pak řekni ahoj: zelený pruh by měl tančit.",
+      "setupStyle": "Vyber styl. Každé jednotlivé nastavení můžeš později změnit.",
+      "privateMessages": "Vyber, kdo ti smí posílat soukromé zprávy. Odesílatelé se to nikdy nedozvědí.",
+      "notifications": "Vyber, jak se k tobě každý druh novinek dostane, nebo ho vypni.",
+      "connections": "Vyber, jestli tě Mumcord smí propojit přímo s dalšími uživateli Mumcordu.",
+      "features": "Zapni jen doplňky, které se ti líbí. Každá karta říká, kdo ji vidí.",
+      "appearance": "Světlý, tmavý, nebo podle systému: tady si vyber vzhled.",
+      "startup": "Vyber, jak se Mumcord spustí, když se přihlásíš k počítači.",
+      "summary": "Hotovo! Tady zkontroluj své volby; tlačítkem Upravit se vrátíš k libovolnému kroku."
+    }
   }
 }

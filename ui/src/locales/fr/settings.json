@@ -561,7 +561,7 @@
     "setupWizardIdentityNote": "Votre identité n'en fait pas partie. Votre certificat, et avec lui votre nom enregistré et vos permissions sur les serveurs, reste exactement tel qu'il est.",
     "setupWizardIdentityLink": "Gérez-la dans Identité",
     "tipsTitle": "Astuces",
-    "tipsHint": "Clippy vous fait découvrir Mumcord en une minute environ : serveurs, canaux, parole, discussion et plus encore.",
+    "tipsHint": "Aaron vous fait découvrir Mumcord en une minute environ : serveurs, canaux, parole, discussion et plus encore.",
     "tipsShow": "Afficher les astuces",
     "versionTitle": "Version et licence"
   },

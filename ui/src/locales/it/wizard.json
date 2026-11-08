@@ -228,5 +228,39 @@
     "discardBody": "Niente viene salvato prima della fine. Se annulli ora, tutto resta com'è.",
     "discardKeep": "Continua a modificare",
     "discardConfirm": "Scarta le modifiche"
+  },
+  "guide": {
+    "label": "Suggerimento di Aaron",
+    "from": "Suggerimento di Aaron",
+    "hide": "Nascondi Aaron",
+    "show": "Mostra Aaron",
+    "titles": {
+      "welcome": "Benvenuto a bordo",
+      "import": "Porta con te le cose di Mumble",
+      "identity": "Il tuo nome sui server",
+      "voice": "Scegli il tuo microfono",
+      "setupStyle": "Scegli uno stile",
+      "privateMessages": "Chi può scriverti",
+      "notifications": "Le tue notifiche",
+      "connections": "Connessioni dirette",
+      "features": "Scegli i tuoi extra",
+      "appearance": "Scegli il tuo aspetto",
+      "startup": "Avvio di Mumcord",
+      "summary": "Controlla le tue scelte"
+    },
+    "hints": {
+      "welcome": "Ciao, sono Aaron! Ti accompagno nella configurazione. Ci vuole solo un minuto.",
+      "import": "Questi sono i server e le impostazioni trovati in Mumble. Scegli cosa vuoi tenere.",
+      "identity": "La tua identità è il tuo nome sui server. Creane una nuova o importane una esistente.",
+      "voice": "Scegli qui il microfono con cui parli, poi saluta: la barra verde dovrebbe ballare.",
+      "setupStyle": "Scegli uno stile. Potrai cambiare ogni singola impostazione più avanti.",
+      "privateMessages": "Scegli chi può mandarti messaggi privati. I mittenti non lo sanno mai.",
+      "notifications": "Scegli come ti arriva ogni tipo di novità, oppure disattivala.",
+      "connections": "Scegli se Mumcord può collegarti direttamente ad altri utenti Mumcord.",
+      "features": "Attiva solo gli extra che ti piacciono. Ogni scheda dice chi può vederlo.",
+      "appearance": "Chiaro, scuro o come il tuo sistema: scegli qui il tuo aspetto.",
+      "startup": "Scegli come si avvia Mumcord quando accedi al computer.",
+      "summary": "Tutto pronto! Controlla qui le tue scelte; Modifica ti riporta a qualsiasi passaggio."
+    }
   }
 }

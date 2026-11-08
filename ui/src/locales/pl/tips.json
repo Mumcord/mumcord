@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, pomocnik od wskazówek",
+  "label": "Aaron, pomocnik od wskazówek",
   "greeting": {
-    "title": "Cześć, jestem Clippy!",
-    "body": "Znam Mumcorda jak własną kieszeń. Chcesz krótkiego oprowadzenia? Zajmie to około minuty. Jeśli nie teraz, znajdziesz mnie w Ustawienia → O aplikacji → Wskazówki.",
+    "title": "Cześć, jestem Aaron!",
+    "body": "Jestem aksolotlem i znam Mumcorda jak własną kieszeń. Chcesz krótkiego oprowadzenia? Zajmie to około minuty. Jeśli nie teraz, znajdziesz mnie w Ustawienia → O aplikacji → Wskazówki.",
     "start": "Pokaż",
     "later": "Nie teraz"
   },
@@ -10,6 +10,7 @@
   "back": "Wstecz",
   "next": "Dalej",
   "done": "Gotowe",
+  "skip": "Pomiń oprowadzanie",
   "close": "Zamknij wskazówki",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Jak mówisz",
-      "body": "Push-to-talk czy aktywacja głosem? Wybierz w Ustawienia → Głos i dźwięk. Push-to-talk działa też z przyciskami myszy."
+      "body": "Push-to-talk czy aktywacja głosem? Wybierz w Ustawienia → Głos i dźwięk albo otwórz Ustawienia głosu… małą strzałką obok mikrofonu. Push-to-talk działa też z przyciskami myszy."
     },
     "panel": {
       "title": "Twój panel użytkownika",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Twój styl",
-      "body": "W Ustawienia → Wygląd znajdziesz motywy ciemne i jasne. Serwer może mieć własny: kliknij go prawym przyciskiem i wybierz Motyw."
+      "body": "Koło zębate w lewym dolnym rogu przełącza między ciemnym a jasnym. W Ustawienia → Wygląd znajdziesz więcej motywów, a serwer może mieć własny: kliknij go prawym przyciskiem i wybierz Motyw."
     },
     "end": {
       "title": "To wszystko!",

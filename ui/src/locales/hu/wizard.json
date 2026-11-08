@@ -228,5 +228,39 @@
     "discardBody": "A befejezés előtt semmi nem mentődik. Ha most megszakítod, minden úgy marad, ahogy van.",
     "discardKeep": "Szerkesztés folytatása",
     "discardConfirm": "Módosítások elvetése"
+  },
+  "guide": {
+    "label": "Aaron tippje",
+    "from": "Aaron tippje",
+    "hide": "Aaron elrejtése",
+    "show": "Aaron megjelenítése",
+    "titles": {
+      "welcome": "Üdv a fedélzeten",
+      "import": "Hozd át a Mumble-dolgaidat",
+      "identity": "A neved a szervereken",
+      "voice": "Válassz mikrofont",
+      "setupStyle": "Válassz stílust",
+      "privateMessages": "Ki írhat neked",
+      "notifications": "Az értesítéseid",
+      "connections": "Közvetlen kapcsolatok",
+      "features": "Válaszd ki az extrákat",
+      "appearance": "Válaszd ki a megjelenést",
+      "startup": "A Mumcord indítása",
+      "summary": "Ellenőrizd a választásaidat"
+    },
+    "hints": {
+      "welcome": "Szia, Aaron vagyok! Végigvezetlek a beállításon. Csak egy percig tart.",
+      "import": "Ezeket a szervereket és beállításokat találtuk a Mumble-ben. Válaszd ki, mit tartanál meg.",
+      "identity": "Az identitásod a neved a szervereken. Hozz létre újat, vagy importálj egy meglévőt.",
+      "voice": "Itt választhatod ki a mikrofont, amibe beszélsz, aztán köszönj: a zöld sávnak táncolnia kell.",
+      "setupStyle": "Válassz egy stílust. Minden egyes beállítást később is módosíthatsz.",
+      "privateMessages": "Válaszd ki, ki küldhet neked privát üzenetet. A feladók ezt soha nem tudják meg.",
+      "notifications": "Válaszd ki, hogyan érjen el minden típusú hír, vagy kapcsold ki.",
+      "connections": "Válaszd ki, hogy a Mumcord közvetlenül összekapcsolhat-e más Mumcord-felhasználókkal.",
+      "features": "Csak azokat a extrákat kapcsold be, amelyek tetszenek. Minden kártya megmondja, ki láthatja.",
+      "appearance": "Világos, sötét vagy a rendszeredhez igazodó: itt választhatod ki a megjelenést.",
+      "startup": "Válaszd ki, hogyan induljon a Mumcord, amikor bejelentkezel a számítógépedre.",
+      "summary": "Minden kész! Itt ellenőrizheted a választásaidat; a Szerkesztés bármelyik lépéshez visszavisz."
+    }
   }
 }

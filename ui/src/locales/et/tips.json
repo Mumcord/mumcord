@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, näpunäidete abiline",
+  "label": "Aaron, näpunäidete abiline",
   "greeting": {
-    "title": "Tere, mina olen Clippy!",
-    "body": "Tunnen Mumcordi nagu oma viit sõrme. Kas teeme kiire ringkäigu? See võtab umbes minuti. Kui mitte praegu, leiad mind jaotisest Seaded → Teave → Näpunäited.",
+    "title": "Tere, mina olen Aaron!",
+    "body": "Olen aksolotl ja tunnen Mumcordi nagu oma viit sõrme. Kas teeme kiire ringkäigu? See võtab umbes minuti. Kui mitte praegu, leiad mind jaotisest Seaded → Teave → Näpunäited.",
     "start": "Näita",
     "later": "Mitte praegu"
   },
@@ -10,6 +10,7 @@
   "back": "Tagasi",
   "next": "Edasi",
   "done": "Valmis",
+  "skip": "Jäta ringkäik vahele",
   "close": "Sulge näpunäited",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Kuidas sa räägid",
-      "body": "„Vajuta ja räägi“ või hääleaktiveerimine? Vali jaotises Seaded → Hääl ja heli. „Vajuta ja räägi“ töötab ka hiirenuppudega."
+      "body": "„Vajuta ja räägi“ või hääleaktiveerimine? Vali jaotises Seaded → Hääl ja heli või ava Hääleseaded… mikrofoni kõrval oleva väikese noolega. „Vajuta ja räägi“ töötab ka hiirenuppudega."
     },
     "panel": {
       "title": "Sinu kasutajapaneel",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Sinu stiil",
-      "body": "Jaotises Seaded → Välimus on tumedad ja heledad teemad. Serveril võib olla oma teema: paremklõpsa sellel ja vali Teema."
+      "body": "Hammasratas all vasakul vahetab tumeda ja heleda vahel. Jaotises Seaded → Välimus on veel teemasid ning serveril võib olla oma teema: paremklõpsa sellel ja vali Teema."
     },
     "end": {
       "title": "Ongi kõik!",

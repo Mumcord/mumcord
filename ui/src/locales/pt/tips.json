@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, o ajudante das dicas",
+  "label": "Aaron, o ajudante das dicas",
   "greeting": {
-    "title": "Olá, sou o Clippy!",
-    "body": "Conheço o Mumcord como a palma da minha mão. Queres uma visita rápida? Demora cerca de um minuto. Se não for agora, encontras-me em Definições → Acerca de → Dicas.",
+    "title": "Olá, sou o Aaron!",
+    "body": "Sou um axolote e conheço o Mumcord como a palma da minha mão. Queres uma visita rápida? Demora cerca de um minuto. Se não for agora, encontras-me em Definições → Acerca de → Dicas.",
     "start": "Mostra-me",
     "later": "Agora não"
   },
@@ -10,6 +10,7 @@
   "back": "Voltar",
   "next": "Seguinte",
   "done": "Concluído",
+  "skip": "Saltar a visita",
   "close": "Fechar dicas",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Como falas",
-      "body": "Push-to-talk ou ativação por voz? Escolhe em Definições → Voz e áudio. O push-to-talk também funciona com os botões do rato."
+      "body": "Push-to-talk ou ativação por voz? Escolhe em Definições → Voz e áudio, ou abre Definições de voz… com a setinha junto ao microfone. O push-to-talk também funciona com os botões do rato."
     },
     "panel": {
       "title": "O teu painel de utilizador",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "O teu visual",
-      "body": "Em Definições → Aspeto há temas escuros e claros. Um servidor pode ter o seu: clica nele com o botão direito e escolhe Tema."
+      "body": "A roda dentada em baixo à esquerda alterna entre escuro e claro. Em Definições → Aspeto há mais temas, e um servidor pode ter o seu: clica nele com o botão direito e escolhe Tema."
     },
     "end": {
       "title": "E pronto!",

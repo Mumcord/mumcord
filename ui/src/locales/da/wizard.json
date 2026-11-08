@@ -228,5 +228,39 @@
     "discardBody": "Intet gemmes, før du er færdig. Annullerer du nu, forbliver alt som det er.",
     "discardKeep": "Fortsæt med at redigere",
     "discardConfirm": "Kassér ændringer"
+  },
+  "guide": {
+    "label": "Tip fra Aaron",
+    "from": "Tip fra Aaron",
+    "hide": "Skjul Aaron",
+    "show": "Vis Aaron",
+    "titles": {
+      "welcome": "Velkommen om bord",
+      "import": "Tag dine Mumble-ting med",
+      "identity": "Dit navn på servere",
+      "voice": "Vælg din mikrofon",
+      "setupStyle": "Vælg en stil",
+      "privateMessages": "Hvem må skrive til dig",
+      "notifications": "Dine notifikationer",
+      "connections": "Direkte forbindelser",
+      "features": "Vælg dine ekstra funktioner",
+      "appearance": "Vælg dit udseende",
+      "startup": "Når Mumcord starter",
+      "summary": "Tjek dine valg"
+    },
+    "hints": {
+      "welcome": "Hej, jeg er Aaron! Jeg guider dig gennem opsætningen. Det tager kun et minut.",
+      "import": "Det her er de servere og indstillinger, der blev fundet i Mumble. Vælg, hvad du vil beholde.",
+      "identity": "Din identitet er dit navn på servere. Opret en ny, eller importér en eksisterende.",
+      "voice": "Vælg her den mikrofon, du taler i, og sig så hej: den grønne bjælke bør danse.",
+      "setupStyle": "Vælg en stil. Du kan ændre hver enkelt indstilling senere.",
+      "privateMessages": "Vælg, hvem der må sende dig private beskeder. Afsendere får det aldrig at vide.",
+      "notifications": "Vælg, hvordan hver slags nyheder når dig, eller slå dem fra.",
+      "connections": "Vælg, om Mumcord må forbinde dig direkte med andre Mumcord-brugere.",
+      "features": "Slå kun de ekstra funktioner til, du kan lide. Hvert kort viser, hvem der kan se det.",
+      "appearance": "Lyst, mørkt eller som dit system: Vælg dit udseende her.",
+      "startup": "Vælg, hvordan Mumcord starter, når du logger ind på din computer.",
+      "summary": "Så er alt klar! Tjek dine valg her; Rediger tager dig tilbage til et hvilket som helst trin."
+    }
   }
 }

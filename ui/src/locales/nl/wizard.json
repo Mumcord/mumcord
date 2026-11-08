@@ -228,5 +228,39 @@
     "discardBody": "Er wordt niets opgeslagen voordat je klaar bent. Als je nu annuleert, blijft alles zoals het is.",
     "discardKeep": "Verder bewerken",
     "discardConfirm": "Wijzigingen weggooien"
+  },
+  "guide": {
+    "label": "Tip van Aaron",
+    "from": "Tip van Aaron",
+    "hide": "Aaron verbergen",
+    "show": "Aaron tonen",
+    "titles": {
+      "welcome": "Welkom aan boord",
+      "import": "Neem je Mumble-spullen mee",
+      "identity": "Je naam op servers",
+      "voice": "Kies je microfoon",
+      "setupStyle": "Kies een stijl",
+      "privateMessages": "Wie je mag berichten",
+      "notifications": "Je meldingen",
+      "connections": "Directe verbindingen",
+      "features": "Kies je extra's",
+      "appearance": "Kies je uiterlijk",
+      "startup": "Mumcord opstarten",
+      "summary": "Controleer je keuzes"
+    },
+    "hints": {
+      "welcome": "Hoi, ik ben Aaron! Ik loop met je door de installatie. Dat duurt maar een minuut.",
+      "import": "Dit zijn de servers en instellingen die in Mumble zijn gevonden. Kies wat je wilt houden.",
+      "identity": "Je identiteit is je naam op servers. Maak een nieuwe aan of importeer een bestaande.",
+      "voice": "Kies hier de microfoon waarin je praat en zeg dan hoi: de groene balk moet gaan dansen.",
+      "setupStyle": "Kies een stijl. Elke instelling kun je later nog wijzigen.",
+      "privateMessages": "Kies wie je privéberichten mag sturen. Afzenders horen dat nooit.",
+      "notifications": "Kies hoe elk soort nieuws je bereikt, of zet het uit.",
+      "connections": "Kies of Mumcord je rechtstreeks met andere Mumcord-gebruikers mag verbinden.",
+      "features": "Zet alleen de extra's aan die je leuk vindt. Op elke kaart staat wie het kan zien.",
+      "appearance": "Licht, donker of zoals je systeem: kies hier je uiterlijk.",
+      "startup": "Kies hoe Mumcord start wanneer je inlogt op je computer.",
+      "summary": "Klaar! Controleer hier je keuzes; met Wijzigen ga je terug naar elke stap."
+    }
   }
 }

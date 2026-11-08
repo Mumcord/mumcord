@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, padomu palīgs",
+  "label": "Aaron, padomu palīgs",
   "greeting": {
-    "title": "Sveiki, es esmu Clippy!",
-    "body": "Mumcord es pazīstu kā savus piecus pirkstus. Gribi ātru ekskursiju? Tā aizņem apmēram minūti. Ja ne tagad, atradīsi mani sadaļā Iestatījumi → Par lietotni → Padomi.",
+    "title": "Sveiki, es esmu Aaron!",
+    "body": "Es esmu aksolotls un Mumcord pazīstu kā savus piecus pirkstus. Gribi ātru ekskursiju? Tā aizņem apmēram minūti. Ja ne tagad, atradīsi mani sadaļā Iestatījumi → Par lietotni → Padomi.",
     "start": "Parādi",
     "later": "Ne tagad"
   },
@@ -10,6 +10,7 @@
   "back": "Atpakaļ",
   "next": "Tālāk",
   "done": "Gatavs",
+  "skip": "Izlaist ekskursiju",
   "close": "Aizvērt padomus",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Kā tu runā",
-      "body": "Push-to-talk vai balss aktivizācija? Izvēlies sadaļā Iestatījumi → Balss un skaņa. Push-to-talk darbojas arī ar peles pogām."
+      "body": "Push-to-talk vai balss aktivizācija? Izvēlies sadaļā Iestatījumi → Balss un skaņa vai atver Balss iestatījumi… ar mazo bultiņu blakus mikrofonam. Push-to-talk darbojas arī ar peles pogām."
     },
     "panel": {
       "title": "Tavs lietotāja panelis",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Tavs stils",
-      "body": "Sadaļā Iestatījumi → Izskats ir tumši un gaiši motīvi. Serverim var būt savs: noklikšķini uz tā ar peles labo pogu un izvēlies Motīvs."
+      "body": "Zobrats apakšā pa kreisi pārslēdz tumšo un gaišo motīvu. Sadaļā Iestatījumi → Izskats ir vairāk motīvu, un serverim var būt savs: noklikšķini uz tā ar peles labo pogu un izvēlies Motīvs."
     },
     "end": {
       "title": "Tas arī viss!",

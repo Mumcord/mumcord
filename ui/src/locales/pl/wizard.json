@@ -228,5 +228,39 @@
     "discardBody": "Nic nie jest zapisywane przed zakończeniem. Jeśli teraz anulujesz, wszystko zostanie bez zmian.",
     "discardKeep": "Kontynuuj edycję",
     "discardConfirm": "Odrzuć zmiany"
+  },
+  "guide": {
+    "label": "Wskazówka od Aarona",
+    "from": "Wskazówka od Aarona",
+    "hide": "Ukryj Aarona",
+    "show": "Pokaż Aarona",
+    "titles": {
+      "welcome": "Witaj na pokładzie",
+      "import": "Przenieś swoje rzeczy z Mumble",
+      "identity": "Twoja nazwa na serwerach",
+      "voice": "Wybierz mikrofon",
+      "setupStyle": "Wybierz styl",
+      "privateMessages": "Kto może do ciebie pisać",
+      "notifications": "Twoje powiadomienia",
+      "connections": "Połączenia bezpośrednie",
+      "features": "Wybierz dodatki",
+      "appearance": "Wybierz wygląd",
+      "startup": "Uruchamianie Mumcorda",
+      "summary": "Sprawdź swoje wybory"
+    },
+    "hints": {
+      "welcome": "Cześć, jestem Aaron! Przeprowadzę Cię przez konfigurację. Zajmie to tylko minutę.",
+      "import": "To serwery i ustawienia znalezione w Mumble. Wybierz, co chcesz zachować.",
+      "identity": "Twoja tożsamość to Twoja nazwa na serwerach. Utwórz nową albo zaimportuj istniejącą.",
+      "voice": "Tutaj wybierz mikrofon, do którego mówisz, i powiedz cześć: zielony pasek powinien zatańczyć.",
+      "setupStyle": "Wybierz styl. Każde ustawienie możesz później zmienić.",
+      "privateMessages": "Wybierz, kto może wysyłać Ci prywatne wiadomości. Nadawcy nigdy się o tym nie dowiedzą.",
+      "notifications": "Wybierz, w jaki sposób każdy rodzaj wiadomości ma do Ciebie docierać, albo go wyłącz.",
+      "connections": "Wybierz, czy Mumcord może łączyć Cię bezpośrednio z innymi użytkownikami Mumcorda.",
+      "features": "Włącz tylko te dodatki, które lubisz. Każda karta mówi, kto może go widzieć.",
+      "appearance": "Jasny, ciemny albo jak w systemie: tutaj wybierz swój wygląd.",
+      "startup": "Wybierz, jak Mumcord ma się uruchamiać po zalogowaniu na komputerze.",
+      "summary": "Gotowe! Sprawdź tu swoje wybory; Edytuj przeniesie Cię do dowolnego kroku."
+    }
   }
 }

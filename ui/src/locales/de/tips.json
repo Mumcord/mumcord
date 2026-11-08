@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, der Tipp-Helfer",
+  "label": "Aaron, der Tipp-Helfer",
   "greeting": {
-    "title": "Hallo, ich bin Clippy!",
-    "body": "Ich kenne mich in Mumcord bestens aus. Lust auf eine kurze Tour? Sie dauert etwa eine Minute. Wenn nicht jetzt, findest du mich unter Einstellungen → Über → Tipps.",
+    "title": "Hallo, ich bin Aaron!",
+    "body": "Ich bin ein Axolotl und kenne mich in Mumcord bestens aus. Lust auf eine kurze Tour? Sie dauert etwa eine Minute. Wenn nicht jetzt, findest du mich unter Einstellungen → Über → Tipps.",
     "start": "Zeig's mir",
     "later": "Nicht jetzt"
   },
@@ -10,6 +10,7 @@
   "back": "Zurück",
   "next": "Weiter",
   "done": "Fertig",
+  "skip": "Tour überspringen",
   "close": "Tipps schließen",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "So sprichst du",
-      "body": "Push-to-Talk oder Sprachaktivierung? Das wählst du unter Einstellungen → Sprache & Audio. Push-to-Talk klappt auch mit Maustasten."
+      "body": "Push-to-Talk oder Sprachaktivierung? Das wählst du unter Einstellungen → Sprache & Audio oder über Spracheinstellungen… mit dem kleinen Pfeil neben dem Mikrofon. Push-to-Talk klappt auch mit Maustasten."
     },
     "panel": {
       "title": "Dein Nutzerpanel",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Dein Look",
-      "body": "Unter Einstellungen → Darstellung findest du dunkle und helle Designs. Ein Server kann ein eigenes bekommen: Rechtsklick darauf und „Design“ wählen."
+      "body": "Das Zahnrad unten links wechselt zwischen dunkel und hell. Unter Einstellungen → Darstellung gibt es weitere Designs, und ein Server kann ein eigenes bekommen: Rechtsklick darauf und „Design“ wählen."
     },
     "end": {
       "title": "Das war's!",

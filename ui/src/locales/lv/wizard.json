@@ -228,5 +228,39 @@
     "discardBody": "Nekas netiek saglabāts pirms pabeigšanas. Ja tagad atcelsi, viss paliks kā ir.",
     "discardKeep": "Turpināt rediģēt",
     "discardConfirm": "Atmest izmaiņas"
+  },
+  "guide": {
+    "label": "Aarona padoms",
+    "from": "Aarona padoms",
+    "hide": "Paslēpt Aaronu",
+    "show": "Rādīt Aaronu",
+    "titles": {
+      "welcome": "Laipni lūgts",
+      "import": "Paņem līdzi savas Mumble lietas",
+      "identity": "Tavs vārds serveros",
+      "voice": "Izvēlies mikrofonu",
+      "setupStyle": "Izvēlies stilu",
+      "privateMessages": "Kas drīkst tev rakstīt",
+      "notifications": "Tavi paziņojumi",
+      "connections": "Tiešie savienojumi",
+      "features": "Izvēlies papildiespējas",
+      "appearance": "Izvēlies izskatu",
+      "startup": "Mumcord palaišana",
+      "summary": "Pārbaudi savas izvēles"
+    },
+    "hints": {
+      "welcome": "Sveiki, es esmu Aarons! Vadīšu tevi cauri iestatīšanai. Tas aizņem tikai minūti.",
+      "import": "Šie ir serveri un iestatījumi, kas atrasti Mumble. Izvēlies, ko vēlies paturēt.",
+      "identity": "Tava identitāte ir tavs vārds serveros. Izveido jaunu vai importē esošu.",
+      "voice": "Šeit izvēlies mikrofonu, kurā runā, un pasaki sveiki: zaļajai joslai jādejo.",
+      "setupStyle": "Izvēlies stilu. Katru atsevišķo iestatījumu vari mainīt vēlāk.",
+      "privateMessages": "Izvēlies, kam drīkst tev sūtīt privātas ziņas. Sūtītāji par to nekad netiek informēti.",
+      "notifications": "Izvēlies, kā tevi sasniedz katrs jaunumu veids, vai izslēdz to.",
+      "connections": "Izvēlies, vai Mumcord drīkst tevi tieši savienot ar citiem Mumcord lietotājiem.",
+      "features": "Ieslēdz tikai tos papildus, kas tev patīk. Katra kartīte norāda, kas to var redzēt.",
+      "appearance": "Gaišs, tumšs vai kā tava sistēma: šeit izvēlies savu izskatu.",
+      "startup": "Izvēlies, kā Mumcord startē, kad piesakies datorā.",
+      "summary": "Viss gatavs! Šeit pārbaudi savas izvēles; Rediģēt aizved tevi atpakaļ uz jebkuru soli."
+    }
   }
 }

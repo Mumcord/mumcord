@@ -228,5 +228,39 @@
     "discardBody": "Nimic nu este salvat înainte de finalizare. Dacă anulezi acum, totul rămâne așa cum este.",
     "discardKeep": "Continuă editarea",
     "discardConfirm": "Renunță la modificări"
+  },
+  "guide": {
+    "label": "Sfat de la Aaron",
+    "from": "Sfat de la Aaron",
+    "hide": "Ascunde-l pe Aaron",
+    "show": "Arată-l pe Aaron",
+    "titles": {
+      "welcome": "Bun venit la bord",
+      "import": "Adu-ți lucrurile din Mumble",
+      "identity": "Numele tău pe servere",
+      "voice": "Alege-ți microfonul",
+      "setupStyle": "Alege un stil",
+      "privateMessages": "Cine îți poate scrie",
+      "notifications": "Notificările tale",
+      "connections": "Conexiuni directe",
+      "features": "Alege-ți extraopțiunile",
+      "appearance": "Alege-ți aspectul",
+      "startup": "Pornirea Mumcord",
+      "summary": "Verifică-ți alegerile"
+    },
+    "hints": {
+      "welcome": "Salut, eu sunt Aaron! Te ghidez prin configurare. Durează doar un minut.",
+      "import": "Acestea sunt serverele și setările găsite în Mumble. Alege ce vrei să păstrezi.",
+      "identity": "Identitatea ta este numele tău pe servere. Creează una nouă sau importă una existentă.",
+      "voice": "Alege aici microfonul în care vorbești, apoi spune salut: bara verde ar trebui să danseze.",
+      "setupStyle": "Alege un stil. Poți schimba fiecare setare mai târziu.",
+      "privateMessages": "Alege cine îți poate trimite mesaje private. Expeditorii nu sunt anunțați niciodată.",
+      "notifications": "Alege cum ajunge la tine fiecare fel de noutăți sau dezactivează-l.",
+      "connections": "Alege dacă Mumcord te poate conecta direct cu alți utilizatori Mumcord.",
+      "features": "Activează doar extra-urile care îți plac. Fiecare card spune cine îl poate vedea.",
+      "appearance": "Luminos, întunecat sau ca sistemul tău: alege aici aspectul.",
+      "startup": "Alege cum pornește Mumcord când te conectezi la calculator.",
+      "summary": "Gata! Verifică aici alegerile; Editează te duce înapoi la orice pas."
+    }
   }
 }

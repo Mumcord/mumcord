@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, l-assistent tas-suġġerimenti",
+  "label": "Aaron, l-assistent tas-suġġerimenti",
   "greeting": {
-    "title": "Merħba, jien Clippy!",
-    "body": "Naf Mumcord sew. Trid dawra qasira? Tieħu madwar minuta. Jekk mhux issa, issibni f'Settings → Dwar → Suġġerimenti.",
+    "title": "Merħba, jien Aaron!",
+    "body": "Jien axolotl u naf Mumcord sew. Trid dawra qasira? Tieħu madwar minuta. Jekk mhux issa, issibni f'Settings → Dwar → Suġġerimenti.",
     "start": "Urini",
     "later": "Mhux issa"
   },
@@ -10,6 +10,7 @@
   "back": "Lura",
   "next": "Li jmiss",
   "done": "Lest",
+  "skip": "Aqbeż id-dawra",
   "close": "Agħlaq is-suġġerimenti",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Kif titkellem",
-      "body": "Push-to-talk jew attivazzjoni bil-vuċi? Agħżel f'Settings → Vuċi u awdjo. Push-to-talk jaħdem ukoll bil-buttuni tal-maws."
+      "body": "Push-to-talk jew attivazzjoni bil-vuċi? Agħżel f'Settings → Vuċi u awdjo, jew iftaħ Issettjar tal-vuċi… bil-vleġġa ż-żgħira ħdejn il-mikrofonu. Push-to-talk jaħdem ukoll bil-buttuni tal-maws."
     },
     "panel": {
       "title": "Il-pannell tal-utent tiegħek",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "L-istil tiegħek",
-      "body": "F'Settings → Dehra hemm temi skuri u ċari. Server jista' jkollu t-tema tiegħu: agħfas il-buttuna tal-lemin fuqu u agħżel Tema."
+      "body": "L-ingranaġġ fil-qiegħ fuq ix-xellug jibdel bejn skur u ċar. F'Settings → Dehra hemm aktar temi, u server jista' jkollu t-tema tiegħu: agħfas il-buttuna tal-lemin fuqu u agħżel Tema."
     },
     "end": {
       "title": "Dak kollu!",

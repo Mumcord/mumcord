@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, patarimų pagalbininkas",
+  "label": "Aaron, patarimų pagalbininkas",
   "greeting": {
-    "title": "Labas, aš Clippy!",
-    "body": "„Mumcord“ žinau kaip savo penkis pirštus. Nori trumpos ekskursijos? Ji užtrunka maždaug minutę. Jei ne dabar, mane rasi skiltyje Nustatymai → Apie → Patarimai.",
+    "title": "Labas, aš Aaron!",
+    "body": "Aš esu aksolotlis ir „Mumcord“ žinau kaip savo penkis pirštus. Nori trumpos ekskursijos? Ji užtrunka maždaug minutę. Jei ne dabar, mane rasi skiltyje Nustatymai → Apie → Patarimai.",
     "start": "Parodyk",
     "later": "Ne dabar"
   },
@@ -10,6 +10,7 @@
   "back": "Atgal",
   "next": "Toliau",
   "done": "Atlikta",
+  "skip": "Praleisti ekskursiją",
   "close": "Uždaryti patarimus",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Kaip kalbi",
-      "body": "„Spausk ir kalbėk“ ar aktyvinimas balsu? Pasirink skiltyje Nustatymai → Balsas ir garsas. „Spausk ir kalbėk“ veikia ir su pelės mygtukais."
+      "body": "„Spausk ir kalbėk“ ar aktyvinimas balsu? Pasirink skiltyje Nustatymai → Balsas ir garsas arba atverk Balso nustatymai… mažąja rodykle šalia mikrofono. „Spausk ir kalbėk“ veikia ir su pelės mygtukais."
     },
     "panel": {
       "title": "Tavo naudotojo skydelis",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Tavo stilius",
-      "body": "Skiltyje Nustatymai → Išvaizda rasi tamsias ir šviesias temas. Serveris gali turėti savo temą: spustelėk jį dešiniuoju pelės klavišu ir pasirink Tema."
+      "body": "Krumpliaratis apačioje kairėje perjungia tamsią ir šviesią temą. Skiltyje Nustatymai → Išvaizda yra daugiau temų, o serveris gali turėti savo: spustelėk jį dešiniuoju pelės klavišu ir pasirink Tema."
     },
     "end": {
       "title": "Tai viskas!",

@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, pomocník s tipy",
+  "label": "Aaron, pomocník s tipy",
   "greeting": {
-    "title": "Ahoj, já jsem Clippy!",
-    "body": "Mumcord znám jako své boty. Chceš rychlou prohlídku? Zabere asi minutu. Jestli ne teď, najdeš mě v Nastavení → O aplikaci → Tipy.",
+    "title": "Ahoj, já jsem Aaron!",
+    "body": "Jsem axolotl a Mumcord znám jako své boty. Chceš rychlou prohlídku? Zabere asi minutu. Jestli ne teď, najdeš mě v Nastavení → O aplikaci → Tipy.",
     "start": "Ukaž mi to",
     "later": "Teď ne"
   },
@@ -10,6 +10,7 @@
   "back": "Zpět",
   "next": "Další",
   "done": "Hotovo",
+  "skip": "Přeskočit prohlídku",
   "close": "Zavřít tipy",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Jak mluvíš",
-      "body": "Push-to-talk, nebo aktivace hlasem? Vyber si v Nastavení → Hlas a zvuk. Push-to-talk funguje i s tlačítky myši."
+      "body": "Push-to-talk, nebo aktivace hlasem? Vyber si v Nastavení → Hlas a zvuk, nebo otevři Nastavení hlasu… malou šipkou vedle mikrofonu. Push-to-talk funguje i s tlačítky myši."
     },
     "panel": {
       "title": "Tvůj panel uživatele",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Tvůj styl",
-      "body": "V Nastavení → Vzhled najdeš tmavé a světlé motivy. Server může mít vlastní: klikni na něj pravým tlačítkem a zvol Motiv."
+      "body": "Ozubené kolo vlevo dole přepíná mezi tmavým a světlým vzhledem. V Nastavení → Vzhled najdeš další motivy a server může mít vlastní: klikni na něj pravým tlačítkem a zvol Motiv."
     },
     "end": {
       "title": "To je vše!",

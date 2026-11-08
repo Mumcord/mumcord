@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, tipshjælperen",
+  "label": "Aaron, tipshjælperen",
   "greeting": {
-    "title": "Hej, jeg er Clippy!",
-    "body": "Jeg kender Mumcord som min egen bukselomme. Har du lyst til en hurtig rundvisning? Den tager cirka et minut. Hvis ikke nu, finder du mig under Indstillinger → Om → Tips.",
+    "title": "Hej, jeg er Aaron!",
+    "body": "Jeg er en axolotl og kender Mumcord som min egen bukselomme. Har du lyst til en hurtig rundvisning? Den tager cirka et minut. Hvis ikke nu, finder du mig under Indstillinger → Om → Tips.",
     "start": "Vis mig det",
     "later": "Ikke nu"
   },
@@ -10,6 +10,7 @@
   "back": "Tilbage",
   "next": "Næste",
   "done": "Færdig",
+  "skip": "Spring rundvisningen over",
   "close": "Luk tips",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Sådan taler du",
-      "body": "Push-to-talk eller stemmeaktivering? Vælg under Indstillinger → Tale og lyd. Push-to-talk virker også med museknapper."
+      "body": "Push-to-talk eller stemmeaktivering? Vælg under Indstillinger → Tale og lyd, eller åbn Stemmeindstillinger… med den lille pil ved siden af mikrofonen. Push-to-talk virker også med museknapper."
     },
     "panel": {
       "title": "Dit brugerpanel",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Dit look",
-      "body": "Under Indstillinger → Udseende finder du mørke og lyse temaer. En server kan få sit eget: højreklik på den, og vælg Tema."
+      "body": "Tandhjulet nederst til venstre skifter mellem mørk og lys. Under Indstillinger → Udseende finder du flere temaer, og en server kan få sit eget: højreklik på den, og vælg Tema."
     },
     "end": {
       "title": "Det var det!",

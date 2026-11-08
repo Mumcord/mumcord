@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, asistentul pentru sfaturi",
+  "label": "Aaron, asistentul pentru sfaturi",
   "greeting": {
-    "title": "Salut, eu sunt Clippy!",
-    "body": "Cunosc Mumcord ca pe propriul buzunar. Vrei un tur rapid? Durează cam un minut. Dacă nu acum, mă găsești în Setări → Despre → Sfaturi.",
+    "title": "Salut, eu sunt Aaron!",
+    "body": "Sunt un axolotl și cunosc Mumcord ca pe propriul buzunar. Vrei un tur rapid? Durează cam un minut. Dacă nu acum, mă găsești în Setări → Despre → Sfaturi.",
     "start": "Arată-mi",
     "later": "Nu acum"
   },
@@ -10,6 +10,7 @@
   "back": "Înapoi",
   "next": "Înainte",
   "done": "Gata",
+  "skip": "Sari peste tur",
   "close": "Închide sfaturile",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Cum vorbești",
-      "body": "Push-to-talk sau activare vocală? Alege în Setări → Voce și audio. Push-to-talk funcționează și cu butoanele mouse-ului."
+      "body": "Push-to-talk sau activare vocală? Alege în Setări → Voce și audio sau deschide Setări de voce… cu săgeata mică de lângă microfon. Push-to-talk funcționează și cu butoanele mouse-ului."
     },
     "panel": {
       "title": "Panoul tău de utilizator",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Stilul tău",
-      "body": "În Setări → Aspect găsești teme întunecate și luminoase. Un server își poate avea propria temă: dă clic dreapta pe el și alege Temă."
+      "body": "Roata dințată din stânga jos comută între întunecat și luminos. În Setări → Aspect găsești mai multe teme, iar un server își poate avea propria temă: dă clic dreapta pe el și alege Temă."
     },
     "end": {
       "title": "Asta e tot!",

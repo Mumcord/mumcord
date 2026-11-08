@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, l'assistente dei suggerimenti",
+  "label": "Aaron, l'assistente dei suggerimenti",
   "greeting": {
-    "title": "Ciao, sono Clippy!",
-    "body": "Conosco Mumcord come le mie tasche. Ti va un giro veloce? Ci vuole circa un minuto. Se non ora, mi trovi in Impostazioni → Informazioni → Suggerimenti.",
+    "title": "Ciao, sono Aaron!",
+    "body": "Sono un axolotl e conosco Mumcord come le mie tasche. Ti va un giro veloce? Ci vuole circa un minuto. Se non ora, mi trovi in Impostazioni → Informazioni → Suggerimenti.",
     "start": "Fammi vedere",
     "later": "Non ora"
   },
@@ -10,6 +10,7 @@
   "back": "Indietro",
   "next": "Avanti",
   "done": "Fatto",
+  "skip": "Salta il giro",
   "close": "Chiudi i suggerimenti",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "Come parli",
-      "body": "Push-to-talk o attivazione vocale? Scegli in Impostazioni → Voce e audio. Il push-to-talk funziona anche con i pulsanti del mouse."
+      "body": "Push-to-talk o attivazione vocale? Scegli in Impostazioni → Voce e audio, oppure apri Impostazioni vocali… con la piccola freccia accanto al microfono. Il push-to-talk funziona anche con i pulsanti del mouse."
     },
     "panel": {
       "title": "Il tuo pannello utente",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Il tuo stile",
-      "body": "In Impostazioni → Aspetto trovi temi scuri e chiari. Un server può averne uno tutto suo: fai clic con il tasto destro e scegli Tema."
+      "body": "L’ingranaggio in basso a sinistra passa dal tema scuro a quello chiaro. In Impostazioni → Aspetto trovi altri temi, e un server può averne uno tutto suo: fai clic con il tasto destro e scegli Tema."
     },
     "end": {
       "title": "Ecco fatto!",

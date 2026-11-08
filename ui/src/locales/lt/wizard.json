@@ -228,5 +228,39 @@
     "discardBody": "Niekas neišsaugoma prieš baigiant. Jei dabar atšauksite, viskas liks taip, kaip yra.",
     "discardKeep": "Tęsti redagavimą",
     "discardConfirm": "Atmesti pakeitimus"
+  },
+  "guide": {
+    "label": "Aarono patarimas",
+    "from": "Aarono patarimas",
+    "hide": "Slėpti Aaroną",
+    "show": "Rodyti Aaroną",
+    "titles": {
+      "welcome": "Sveiki atvykę",
+      "import": "Atsinešk savo Mumble daiktus",
+      "identity": "Tavo vardas serveriuose",
+      "voice": "Pasirink mikrofoną",
+      "setupStyle": "Pasirink stilių",
+      "privateMessages": "Kas gali tau rašyti",
+      "notifications": "Tavo pranešimai",
+      "connections": "Tiesioginiai ryšiai",
+      "features": "Pasirink priedus",
+      "appearance": "Pasirink išvaizdą",
+      "startup": "Mumcord paleidimas",
+      "summary": "Patikrink savo pasirinkimus"
+    },
+    "hints": {
+      "welcome": "Labas, aš Aaronas! Padėsiu tau per sąranką. Tai užtruks tik minutę.",
+      "import": "Tai serveriai ir nustatymai, rasti „Mumble“. Pasirink, ką nori pasilikti.",
+      "identity": "Tavo tapatybė yra tavo vardas serveriuose. Sukurk naują arba importuok esamą.",
+      "voice": "Čia pasirink mikrofoną, į kurį kalbi, ir pasakyk labas: žalia juosta turėtų šokti.",
+      "setupStyle": "Pasirink stilių. Kiekvieną nustatymą galėsi pakeisti vėliau.",
+      "privateMessages": "Pasirink, kas gali siųsti tau privačias žinutes. Siuntėjams apie tai niekada nepranešama.",
+      "notifications": "Pasirink, kaip kiekvienos rūšies naujienos tave pasiekia, arba jas išjunk.",
+      "connections": "Pasirink, ar „Mumcord“ gali tave tiesiogiai sujungti su kitais „Mumcord“ naudotojais.",
+      "features": "Įjunk tik tuos priedus, kurie tau patinka. Kiekvienoje kortelėje parašyta, kas ją mato.",
+      "appearance": "Šviesi, tamsi ar kaip tavo sistema: čia pasirink savo išvaizdą.",
+      "startup": "Pasirink, kaip „Mumcord“ paleidžiamas, kai prisijungi prie kompiuterio.",
+      "summary": "Viskas paruošta! Čia peržiūrėk savo pasirinkimus; Redaguoti grąžina tave prie bet kurio žingsnio."
+    }
   }
 }
