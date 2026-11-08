@@ -5,6 +5,7 @@
 ### Added
 
 - Registered users (issue #256): the server menu gains "Registered users…", which opens a tab next to Bans in Server administration and lists every account the server knows, with the account id, the last seen and the last channel. Search, "Online" and "Inactive 90+ days" filters, renaming, unregistering and registering someone who is connected right now, groups that name the account, and one save for all your changes with a clear note when the server did not take one. Only with the server's Register right; without it the menu item and the tab stay away
+- Admin commands in the chat box (issue #378): typing `/` lists the admin commands this server allows you, above the plugin commands and marked "Built-in" — `/kick`, `/ban`, `/mute`, `/unmute`, `/deaf`, `/undeaf`, `/priority`, `/register`, `/move`, `/moveall` and `/unban`. While typing, Mumcord completes the names of the people you may act on and the channels you may move people to. Kick, ban, unban and move-everyone still confirm first: the kick and ban dialogs open with the name, reason and duration you typed. Every command ends with a short result line that only you see in that chat, and the command text is never sent, so other clients see only the usual server result
 
 ## [0.7.2] - 2026-11-08
 
@@ -20,7 +21,6 @@
 - When a server's relay changes, Mumcord says so in the notification centre and as a notification (in-app or system), with "Trust new relay" and "Details"; the details compare the old and new fingerprint and say when to trust it. The chat's file sharing hint names the changed relay and links there instead of saying there is no relay
 - Activity feed: an icon for each kind of event, and the feed is saved on this device, so it is still there after a reconnect or a restart (an "Earlier" line marks where this session starts). Settings → Privacy → "Clear activity history" removes it for all servers
 - Activity notifications: when someone starts a screen share, a watch party or a plugin activity, or a plugin posts an event, Mumcord notifies like for messages (in-app toast or system notification, following Do Not Disturb and muted servers). Settings → Chat & Notifications has a switch per kind; joins, leaves and moves are off by default
-- Admin commands in the chat box (issue #378): typing `/` lists the admin commands this server allows you, above the plugin commands and marked "Built-in" — `/kick`, `/ban`, `/mute`, `/unmute`, `/deaf`, `/undeaf`, `/priority`, `/register`, `/move`, `/moveall` and `/unban`. While typing, Mumcord completes the names of the people you may act on and the channels you may move people to. Kick, ban, unban and move-everyone still confirm first: the kick and ban dialogs open with the name, reason and duration you typed. Every command ends with a short result line that only you see in that chat, and the command text is never sent, so other clients see only the usual server result
 
 ### Changed
 
