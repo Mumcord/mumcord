@@ -14,7 +14,9 @@ use specta::Type;
 use std::net::IpAddr;
 use tauri::State;
 
-use super::types::{ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id};
+use super::types::{
+    ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
+};
 
 /// One ban entry as the window shows it. `key` is what identifies the entry across a re-read, so
 /// an edit or a removal can still be matched (FR-10.66). Name, reason and fingerprint are server
@@ -469,11 +471,7 @@ pub async fn person_set_priority_speaker(
     priority: bool,
 ) -> ApiResult<PersonAction> {
     Ok(engine
-        .person_set_priority(
-            to_engine_server_id(server_id),
-            session,
-            priority,
-        )
+        .person_set_priority(to_engine_server_id(server_id), session, priority)
         .await?
         .into())
 }
@@ -503,12 +501,17 @@ pub async fn person_move_all(
     server_id: ServerId,
     channel_id: ChannelId,
 ) -> ApiResult<MassMoveResult> {
-    Ok(match engine.move_all(to_engine_server_id(server_id), channel_id).await? {
-        mumcord_engine::MassMoveOutcome::Done { moved, total } => {
-            MassMoveResult::Done { moved, total }
-        }
-        mumcord_engine::MassMoveOutcome::AlreadyRunning => MassMoveResult::AlreadyRunning,
-    })
+    Ok(
+        match engine
+            .move_all(to_engine_server_id(server_id), channel_id)
+            .await?
+        {
+            mumcord_engine::MassMoveOutcome::Done { moved, total } => {
+                MassMoveResult::Done { moved, total }
+            }
+            mumcord_engine::MassMoveOutcome::AlreadyRunning => MassMoveResult::AlreadyRunning,
+        },
+    )
 }
 
 fn to_ban_request(input: BanInput) -> ApiResult<mumcord_engine::BanRequest> {
