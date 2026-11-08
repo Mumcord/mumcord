@@ -11,7 +11,7 @@
     "hiddenBy": "Skjult af {{plugin}}"
   },
   "command": {
-    "list": "Plugin-kommandoer",
+    "group": "Plugin-kommandoer",
     "keys": "↑↓ vælg · Tab fuldfør · Enter kør · Esc luk",
     "unavailable": "Denne kommando er ikke tilgængelig lige nu.",
     "failed": "Kommandoen kunne ikke køres. Prøv igen."

@@ -431,5 +431,59 @@
   "announcedUnregistered": "Registrace odstraněna",
   "announcedRegistered": "{{name}} je agora registrovaný",
   "announcedRegisteredSaved": "Změny odeslány serveru",
-  "menuRegister": "Registrovat na serveru…"
+  "menuRegister": "Registrovat na serveru…",
+  "commands": {
+    "group": "Příkazy správce · vestavěné",
+    "groupPeople": "Lidé",
+    "groupChannels": "Kanály",
+    "groupBans": "Bany",
+    "groupChoice": "Který jsi měl na mysli?",
+    "builtIn": "Vestavěno",
+    "onlyYou": "Tento řádek vidíš jen ty",
+    "usageLine": "{{command}} očekává {{usage}}",
+    "moveAllQuestion": "Přesunout {{count}} osob z {{from}} do {{to}}?",
+    "moveAllNote": "Přesune se celý kanál, včetně tebe.",
+    "moveAll": "Přesunout",
+    "results": {
+      "muted": "Ztlumil jsi {{name}} na serveru.",
+      "unmuted": "Zrušil jsi ztlumení {{name}} na serveru.",
+      "deafened": "Ztlumil jsi zvuk {{name}} na serveru.",
+      "undeafened": "Zrušil jsi ztlumení zvuku {{name}} na serveru.",
+      "priorityOn": "Udělal jsi z {{name}} prioritního mluvčího.",
+      "priorityOff": "{{name}} už není prioritním mluvčím.",
+      "registered": "{{name}} je na serveru registrovaný.",
+      "moved": "Přesunul jsi {{name}} do {{channel}}.",
+      "movedAll": "Přesunuto {{moved}} z {{total}} osob.",
+      "movedSome": "Přesunuto {{moved}} z {{total}} osob; {{refused}} zamítnuto.",
+      "alreadyMoving": "Přesun osob právě probíhá…",
+      "unbanned": "Ban {{name}} byl zrušen.",
+      "kicked": "Vyhodil jsi {{name}} ze serveru.",
+      "banned": "Zabanoval jsi {{name}} na serveru.",
+      "noAnswer": "Server neodpověděl."
+    },
+    "errors": {
+      "unknownPerson": "Nikdo jménem „{{name}}“ teď na tomto serveru není.",
+      "unknownPersonDidYouMean": "Nikdo jménem „{{name}}“ teď na tomto serveru není. Myslel jsi {{suggestion}}?",
+      "unknownChannel": "Na tomto serveru není žádný kanál jménem „{{name}}“.",
+      "ambiguousChannel": "Odpovídá víc kanálů: {{names}}.",
+      "needChannel": "Který kanál? Napiš jeho název za příkaz.",
+      "needBan": "Který ban? Napiš za příkaz jméno nebo adresu.",
+      "unknownBan": "Žádný ban na tomto serveru neodpovídá „{{name}}“.",
+      "banChanged": "Tenhle ban se na serveru mezitím změnil.",
+      "alreadyInChannel": "Už jsi v {{channel}}."
+    },
+    "usage": {
+      "kick": "jméno [důvod]",
+      "ban": "jméno [doba] [důvod]",
+      "mute": "jméno",
+      "unmute": "jméno",
+      "deaf": "jméno",
+      "undeaf": "jméno",
+      "priority": "jméno",
+      "register": "jméno",
+      "move": "jméno kanál",
+      "moveall": "kanál",
+      "unban": "jméno nebo adresa"
+    }
+  }
 }

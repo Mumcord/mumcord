@@ -405,5 +405,8 @@
     "loading": "Ladataan kuvaa…",
     "unavailable": "Kuva ei ole saatavilla",
     "load": "Lataa kuva"
+  },
+  "slash": {
+    "list": "Kauttaviivakomennot"
   }
 }

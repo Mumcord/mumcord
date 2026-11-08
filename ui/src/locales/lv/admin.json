@@ -428,5 +428,59 @@
   "announcedUnregistered": "Reģistrācija noņemta",
   "announcedRegistered": "{{name}} tagad ir reģistrēts",
   "announcedRegisteredSaved": "Izmaiņas nosūtītas serverim",
-  "menuRegister": "Reģistrēt serverī…"
+  "menuRegister": "Reģistrēt serverī…",
+  "commands": {
+    "group": "Administratora komandas · iebūvētas",
+    "groupPeople": "Cilvēki",
+    "groupChannels": "Kanāli",
+    "groupBans": "Aizliegumi",
+    "groupChoice": "Kuru tu domāji?",
+    "builtIn": "Iebūvēta",
+    "onlyYou": "Šo rindu redz tikai tu",
+    "usageLine": "{{command}} vajag {{usage}}",
+    "moveAllQuestion": "Pārvietot {{count}} cilvēkus no {{from}} uz {{to}}?",
+    "moveAllNote": "Pārvietojas viss kanāls, arī tu.",
+    "moveAll": "Pārvietot",
+    "results": {
+      "muted": "Tu apklusināji {{name}} serverī.",
+      "unmuted": "Tu atjaunoji {{name}} mikrofonu serverī.",
+      "deafened": "Tu izslēdzi {{name}} skaņu serverī.",
+      "undeafened": "Tu atkal ieslēdzi {{name}} skaņu serverī.",
+      "priorityOn": "Tu iestatīji {{name}} par prioritāro runātāju.",
+      "priorityOff": "{{name}} vairs nav prioritārais runātājs.",
+      "registered": "{{name}} ir reģistrēts serverī.",
+      "moved": "Tu pārvietoji {{name}} uz {{channel}}.",
+      "movedAll": "Pārvietoti {{moved}} no {{total}} cilvēkiem.",
+      "movedSome": "Pārvietoti {{moved}} no {{total}} cilvēkiem; {{refused}} tika noraidīti.",
+      "alreadyMoving": "Cilvēki jau tiek pārvietoti…",
+      "unbanned": "{{name}} aizliegums ir noņemts.",
+      "kicked": "Tu izmeta {{name}} no servera.",
+      "banned": "Tu aizliegji {{name}} serverī.",
+      "noAnswer": "Serveris neatbildēja."
+    },
+    "errors": {
+      "unknownPerson": "Šajā serverī tagad nav neviena ar vārdu „{{name}}“.",
+      "unknownPersonDidYouMean": "Šajā serverī tagad nav neviena ar vārdu „{{name}}“. Vai domāji {{suggestion}}?",
+      "unknownChannel": "Šajā serverī nav kanāla ar nosaukumu „{{name}}“.",
+      "ambiguousChannel": "Sakrīt vairāki kanāli: {{names}}.",
+      "needChannel": "Kurš kanāls? Ieraksti tā nosaukumu aiz komandas.",
+      "needBan": "Kurš aizliegums? Ieraksti aiz komandas vārdu vai adresi.",
+      "unknownBan": "Šajā serverī neviens aizliegums neatbilst „{{name}}“.",
+      "banChanged": "Kam tu izlēmi, šis aizliegums serverī mainījās.",
+      "alreadyInChannel": "Tu jau esi kanālā {{channel}}."
+    },
+    "usage": {
+      "kick": "vārds [iemesls]",
+      "ban": "vārds [ilgums] [iemesls]",
+      "mute": "vārds",
+      "unmute": "vārds",
+      "deaf": "vārds",
+      "undeaf": "vārds",
+      "priority": "vārds",
+      "register": "vārds",
+      "move": "vārds kanāls",
+      "moveall": "kanāls",
+      "unban": "vārds vai adrese"
+    }
+  }
 }

@@ -414,5 +414,8 @@
     "loading": "Caricamento immagine…",
     "unavailable": "Immagine non disponibile",
     "load": "Carica immagine"
+  },
+  "slash": {
+    "list": "Comandi con /"
   }
 }

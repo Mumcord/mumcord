@@ -414,5 +414,8 @@
     "loading": "Učitavanje slike…",
     "unavailable": "Slika nije dostupna",
     "load": "Učitaj sliku"
+  },
+  "slash": {
+    "list": "Naredbe s kosom crtom"
   }
 }

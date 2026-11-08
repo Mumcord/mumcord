@@ -1282,14 +1282,15 @@ impl Engine {
         Ok(())
     }
 
-    /// Moves a person to another channel (drag in the tree, "Move users here…"). The server
-    /// enforces the move permission; the result arrives as the person's `UserUpserted`.
-    pub fn person_move(
+    /// Moves a person to another channel (drag in the tree, "Move users here…", `/move`). The
+    /// server enforces the move permission and answers with the person's `UserUpserted`, so the
+    /// call also reports whether the move was confirmed (issue #378, FR-10.35).
+    pub async fn person_move(
         &self,
         server_id: ServerId,
         session: u32,
         channel_id: u32,
-    ) -> EngineResult<()> {
+    ) -> EngineResult<crate::ActionOutcome> {
         let ctx = self.session_ctx_for(server_id)?;
         let (channel_known, user_known) = ctx.handle.with_state(|s| {
             (
@@ -1303,9 +1304,16 @@ impl Engine {
         if !user_known {
             return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
         }
-        ctx.handle
-            .move_user(session, channel_id)
-            .map_err(convert::command_error)
+        let outcome = crate::admin::send_and_wait(
+            &ctx,
+            self.admin_state(),
+            session,
+            crate::admin::Pending::State(mumcord_protocol::permissions::MOVE),
+            || ctx.handle.move_user(session, channel_id),
+        )
+        .await;
+        crate::admin::report(&ctx, "move", &outcome);
+        outcome
     }
 
     pub fn person_set_volume(
@@ -2852,6 +2860,8 @@ impl Inner {
                         self.user_view_of(server_id, user, setting),
                     ));
                 }
+                // The echo of a person's state confirms an open admin action on them (issue #378).
+                crate::admin::on_state(&self.admin, server_id, user.session);
                 if change.joined {
                     self.files
                         .on_user_joined(server_id, user.cert_hash.as_deref());

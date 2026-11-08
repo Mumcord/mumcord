@@ -434,5 +434,59 @@
   "announcedUnregistered": "Baineadh an clárúchán",
   "announcedRegistered": "Tá {{name}} cláraithe anois",
   "announcedRegisteredSaved": "Seolathar na hathruithe chuig an bhfreabháin",
-  "menuRegister": "Cláraigh ar an bhfreabháin…"
+  "menuRegister": "Cláraigh ar an bhfreabháin…",
+  "commands": {
+    "group": "Orduithe riaracháin · ionsaithe",
+    "groupPeople": "Daoine",
+    "groupChannels": "Cainéil",
+    "groupBans": "Cosc",
+    "groupChoice": "Cén ceann a chiallaigh tú?",
+    "builtIn": "Ionsaithe",
+    "onlyYou": "Ní fheiceann ach tusa an líne seo",
+    "usageLine": "Teastaíonn {{usage}} ó {{command}}",
+    "moveAllQuestion": "Bog {{count}} duine ó {{from}} go {{to}}?",
+    "moveAllNote": "Bogtar an cainéal ar fad, tú féin san áireamh.",
+    "moveAll": "Bog",
+    "results": {
+      "muted": "Tá {{name}} balbhaithe agat ar an bhfreastalaí.",
+      "unmuted": "Tá balbhú {{name}} Bainthe agat ar an bhfreastalaí.",
+      "deafened": "Tá {{name}} bodhraithe agat ar an bhfreastalaí.",
+      "undeafened": "Tá {{name}} in a chluinntin arís agat ar an bhfreastalaí.",
+      "priorityOn": "Tá {{name}} socraithe agat mar chainteoir tosaigh.",
+      "priorityOff": "Ní cainteoir tosaigh é {{name}} a thuilleadh.",
+      "registered": "Tá {{name}} cláraithe ar an bhfreastalaí.",
+      "moved": "Tá {{name}} bogtha agat go {{channel}}.",
+      "movedAll": "Bogadh {{moved}} as {{total}} duine.",
+      "movedSome": "Bogadh {{moved}} as {{total}} duine; diúltaíodh do {{refused}}.",
+      "alreadyMoving": "Tá daoine á m-bogadh faoi láthair…",
+      "unbanned": "Tá cosc {{name}} bainte.",
+      "kicked": "Tá {{name}} curtha amach agat ón bhfreastalaí.",
+      "banned": "Tá {{name}} cosaithe agat ar an bhfreastalaí.",
+      "noAnswer": "Níor tháinig freagra ón bhfreastalaí."
+    },
+    "errors": {
+      "unknownPerson": "Níl aon duine darb ainm “{{name}}” ar an bhfreastalaí seo anois.",
+      "unknownPersonDidYouMean": "Níl aon duine darb ainm “{{name}}” ar an bhfreastalaí seo anois. An {{suggestion}} a chiallaigh tú?",
+      "unknownChannel": "Níl cainéal darb ainm “{{name}}” ar an bhfreastalaí seo.",
+      "ambiguousChannel": "Tá níos mó ná cainéal amháin ann: {{names}}.",
+      "needChannel": "Cén cainéal? Scríobh a ainm i ndiaidh an ordú.",
+      "needBan": "Cén cosc? Scríobh ainm nó seoladh i ndiaidh an ordú.",
+      "unknownBan": "Níl aon chosc ag teacht le “{{name}}” ar an bhfreastalaí seo.",
+      "banChanged": "Athraíodh an cosc sin ar an bhfreastalaí agus tú ag cinneadh.",
+      "alreadyInChannel": "Tá tú i {{channel}} cheana féin."
+    },
+    "usage": {
+      "kick": "ainm [cúis]",
+      "ban": "ainm [fad] [cúis]",
+      "mute": "ainm",
+      "unmute": "ainm",
+      "deaf": "ainm",
+      "undeaf": "ainm",
+      "priority": "ainm",
+      "register": "ainm",
+      "move": "ainm cainéal",
+      "moveall": "cainéal",
+      "unban": "ainm nó seoladh"
+    }
+  }
 }

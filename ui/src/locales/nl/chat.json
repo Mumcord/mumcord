@@ -405,5 +405,8 @@
     "loading": "Afbeelding laden…",
     "unavailable": "Afbeelding niet beschikbaar",
     "load": "Afbeelding laden"
+  },
+  "slash": {
+    "list": "Commando's met /"
   }
 }

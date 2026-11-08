@@ -69,6 +69,7 @@ function renderComposer(linkPreviews: boolean) {
     <main>
       <Composer
         target={{ kind: "channel", channelId: 1 }}
+        conversation={{ kind: "channel", channelId: 1 }}
         limits={LIMITS}
         label="Message #Lobby"
         blockedReason={null}

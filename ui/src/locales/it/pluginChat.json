@@ -11,7 +11,7 @@
     "hiddenBy": "Nascosto da {{plugin}}"
   },
   "command": {
-    "list": "Comandi dei plugin",
+    "group": "Comandi dei plugin",
     "keys": "↑↓ scegli · Tab completa · Invio esegui · Esc chiudi",
     "unavailable": "Questo comando non è disponibile al momento.",
     "failed": "Impossibile eseguire il comando. Riprova."

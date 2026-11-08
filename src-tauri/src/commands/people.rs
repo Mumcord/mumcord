@@ -6,6 +6,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
+use super::admin::PersonAction;
 use super::types::{ApiResult, ChannelId, ServerId, SessionId, to_engine_server_id};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -165,17 +166,21 @@ pub fn person_set_share_volume(
     Ok(engine.person_set_share_volume(to_engine_server_id(server_id), session, volume)?)
 }
 
-/// Moves a person to another channel; the server checks the move permission and the result
-/// arrives as `userUpserted` (issue #172).
+/// Moves a person to another channel; the server checks the move permission and answers with the
+/// person's `userUpserted` (issue #172). `confirmed` says the server answered the move at all,
+/// which the `/move` result line needs (issue #378, FR-10.35).
 #[tauri::command]
 #[specta::specta]
-pub fn person_move(
+pub async fn person_move(
     engine: State<'_, Engine>,
     server_id: ServerId,
     session: SessionId,
     channel_id: ChannelId,
-) -> ApiResult<()> {
-    Ok(engine.person_move(to_engine_server_id(server_id), session, channel_id)?)
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_move(to_engine_server_id(server_id), session, channel_id)
+        .await?
+        .into())
 }
 
 /// Mutes a person locally; remembered by certificate hash per server.

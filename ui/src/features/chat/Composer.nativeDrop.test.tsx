@@ -65,6 +65,7 @@ function setup() {
   const { container } = render(
     <Composer
       target={{ kind: "private", session: 2 }}
+      conversation={{ kind: "privateSession", session: 2 }}
       limits={{ text: 5000, image: 100_000, allowHtml: true }}
       label="Message #Lobby"
       blockedReason={null}

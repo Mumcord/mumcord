@@ -13,7 +13,13 @@ function renderComposer(target: SendTarget = { kind: "channel", channelId: 1 }) 
   const { container } = render(
     <main>
       <ChannelSearch value="" onChange={() => {}} onClear={() => {}} onSubmit={() => {}} />
-      <Composer target={target} limits={LIMITS} label="Message #Lobby" blockedReason={null} />
+      <Composer
+        target={target}
+        conversation={{ kind: "channel", channelId: 1 }}
+        limits={LIMITS}
+        label="Message #Lobby"
+        blockedReason={null}
+      />
     </main>,
   );
   const input = screen.getByRole<HTMLTextAreaElement>("textbox", { name: "Message #Lobby" });
@@ -253,6 +259,7 @@ describe("Composer replies", () => {
     const { rerender } = render(
       <Composer
         target={{ kind: "channel", channelId: 1 }}
+        conversation={{ kind: "channel", channelId: 1 }}
         limits={LIMITS}
         label="Message #Lobby"
         blockedReason={null}
@@ -279,6 +286,7 @@ describe("Composer replies", () => {
     rerender(
       <Composer
         target={{ kind: "channel", channelId: 1 }}
+        conversation={{ kind: "channel", channelId: 1 }}
         limits={LIMITS}
         label="Message #Lobby"
         blockedReason={null}
@@ -307,6 +315,7 @@ describe("Composer cards", () => {
     render(
       <Composer
         target={{ kind: "channel", channelId: 1 }}
+        conversation={{ kind: "channel", channelId: 1 }}
         limits={LIMITS}
         label="Message #Lobby"
         blockedReason={null}
@@ -345,6 +354,7 @@ describe("Composer code blocks", () => {
     render(
       <Composer
         target={{ kind: "channel", channelId: 1 }}
+        conversation={{ kind: "channel", channelId: 1 }}
         limits={LIMITS}
         label="Message #Lobby"
         blockedReason={null}
