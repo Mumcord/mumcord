@@ -85,6 +85,7 @@ describe("relay fan-out notice", () => {
       blocked: null,
       relayReason: null,
       kind: "window",
+      title: null,
       elapsedMs: 0,
     };
     act(() => {
@@ -187,6 +188,7 @@ describe("live viewer limit", () => {
             blocked: null,
             relayReason: null,
             kind: "window",
+            title: null,
             elapsedMs: 0,
           },
         ],

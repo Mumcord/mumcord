@@ -400,6 +400,8 @@ mod sck {
         kind: Option<ShareKind>,
         /// The picked app, where the system names it.
         app: Option<AppName>,
+        /// The picked window's title, else the app's name, for the own live bar only.
+        title: Option<String>,
         stream: Retained<SCStream>,
         _handler: Retained<StreamHandler>,
         _queues: [DispatchRetained<DispatchQueue>; 2],
@@ -414,11 +416,11 @@ mod sck {
         /// starts capturing it, with the shared content's sound where the system has it.
         pub async fn open() -> Result<Self, MacCaptureError> {
             let (major, minor) = os_version();
-            let (filter, size, kind, app) = match plan(major, minor) {
+            let (filter, size, kind, app, title) = match plan(major, minor) {
                 Plan::Unsupported => return Err(MacCaptureError::Unsupported),
                 Plan::MainDisplay => {
                     let (filter, size) = main_display().await?;
-                    (filter, size, Some(ShareKind::Screen), None)
+                    (filter, size, Some(ShareKind::Screen), None, None)
                 }
                 Plan::Picker => {
                     let filter = pick().await?;
@@ -437,12 +439,20 @@ mod sck {
                         }
                         _ => None,
                     };
-                    (filter, size, picked_kind(pick), app)
+                    let title = match pick {
+                        Some(Picked::Window) if app_names_known(major, minor) => {
+                            window_title(&filter.0)
+                        }
+                        _ => None,
+                    }
+                    .or_else(|| app.as_ref().map(|a| a.as_str().to_owned()));
+                    (filter, size, picked_kind(pick), app, title)
                 }
             };
             let mut capture = start(filter, size, sound_supported(major)).await?;
             capture.kind = kind;
             capture.app = app;
+            capture.title = title;
             Ok(capture)
         }
     }
@@ -473,6 +483,15 @@ mod sck {
         // SAFETY: plain property of a valid app.
         let name = unsafe { app.applicationName() }.to_string();
         (!name.is_empty()).then(|| AppName::new(name))
+    }
+
+    /// The title of the picked window (macOS 15.2+); `None` when it has none.
+    fn window_title(filter: &SCContentFilter) -> Option<String> {
+        // SAFETY: macOS 15.2+ API, checked by the caller.
+        let window = unsafe { filter.includedWindows().firstObject() }?;
+        // SAFETY: plain property of a valid window.
+        let title = unsafe { window.title() }?.to_string();
+        (!title.trim().is_empty()).then_some(title)
     }
 
     type Filter = Moved<Retained<SCContentFilter>>;
@@ -606,6 +625,7 @@ mod sck {
             sound,
             kind: None,
             app: None,
+            title: None,
             stream,
             _handler: handler,
             _queues: queues,
@@ -689,6 +709,10 @@ mod sck {
 
         fn kind(&self) -> Option<ShareKind> {
             self.kind
+        }
+
+        fn title(&self) -> Option<String> {
+            self.title.clone()
         }
 
         fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
