@@ -10,7 +10,7 @@ use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 use std::time::Instant;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::diag;
 
@@ -86,6 +86,9 @@ static SYSTEM: OnceLock<Vec<String>> = OnceLock::new();
 
 /// What is running right now (camera, screen share, install type, …), see [`set_context`].
 static RUNNING: Mutex<BTreeMap<&'static str, String>> = Mutex::new(BTreeMap::new());
+/// Last time the context file was written, so rapid changes write at most once per second
+/// (spec 12 FR-12.12). The in-memory [`RUNNING`] map stays exact for the panic hook.
+static LAST_CONTEXT_WRITE: Mutex<Option<Instant>> = Mutex::new(None);
 
 /// Records what is going on, e.g. `set_context("camera", "on, NV12 1280x720@15")`, so a crash
 /// report can say what was running. Values must hold nothing personal (no names, URLs, paths).
@@ -106,9 +109,19 @@ pub fn clear_context(key: &'static str) {
 }
 
 fn persist_context(running: &BTreeMap<&'static str, String>) {
-    if let Some(state) = STATE.get() {
-        let _ = fs::write(state.dir.join(CONTEXT), context_text(running));
+    let Some(state) = STATE.get() else {
+        return;
+    };
+    // Debounce: at most one file write per second (spec 12 FR-12.12).
+    let now = Instant::now();
+    let mut last = LAST_CONTEXT_WRITE
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    if last.is_some_and(|at| now.duration_since(at) < Duration::from_secs(1)) {
+        return;
     }
+    *last = Some(now);
+    let _ = fs::write(state.dir.join(CONTEXT), context_text(running));
 }
 
 fn context_text(running: &BTreeMap<&'static str, String>) -> String {
@@ -1213,6 +1226,30 @@ mod tests {
             context_text(&running),
             "camera: on\nscreen share: sending, AV1 1080p\n"
         );
+    }
+
+    #[test]
+    fn context_file_is_written_at_most_once_per_second() {
+        let dir = tempfile::tempdir().unwrap();
+        let _ = STATE.set(State {
+            dir: dir.path().to_path_buf(),
+            version: "0.7.2".to_owned(),
+            started: Instant::now(),
+        });
+        let on_disk = || fs::read_to_string(dir.path().join(CONTEXT)).unwrap();
+
+        // The first write always happens.
+        set_context("camera", "on");
+        assert_eq!(on_disk(), "camera: on\n");
+
+        // A change right after the write is not written again.
+        set_context("camera", "off");
+        assert_eq!(on_disk(), "camera: on\n");
+
+        // After a second has passed, the next change reaches the file.
+        *LAST_CONTEXT_WRITE.lock().unwrap() = Some(Instant::now() - Duration::from_secs(2));
+        set_context("camera", "off");
+        assert_eq!(on_disk(), "camera: off\n");
     }
 
     #[test]
