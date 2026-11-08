@@ -33,6 +33,7 @@
 
 ### Fixed
 
+- Copy works again in the packet inspector, and when Windows refuses the app's clipboard (e.g. "Copy" on a crash report) Mumcord copies through the window's own clipboard instead
 - The channel search field at the top of the sidebar lines up with the channel name in the chat header
 - Activity feed: names work like in the chat (click opens the profile and menu, double-click a private message), and bots no longer show up with joins, leaves and moves
 - "Bots on this server": the line above it spans the whole column like the one below, and the heading has the same space above and below it

@@ -73,5 +73,25 @@ export function createTauriApi(): MumcordApi {
   const wrapped = Object.fromEntries(
     Object.entries(commands).map(([name, fn]) => [name, wrap(fn as AnyCommand)]),
   ) as EngineCommands;
-  return { ...wrapped, kind: "tauri", on };
+  return { ...wrapped, copyText: copyWithFallback(wrapped.copyText), kind: "tauri", on };
+}
+
+/**
+ * Copies through the app's clipboard, and through the webview's when the system refused it
+ * (issue #634): Windows can deny the app's clipboard access while the webview's still works.
+ * The original error stays the answer when both fail.
+ */
+export function copyWithFallback(copy: EngineCommands["copyText"]): EngineCommands["copyText"] {
+  return async (text) => {
+    try {
+      return await copy(text);
+    } catch (error) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return null;
+      } catch {
+        throw error;
+      }
+    }
+  };
 }

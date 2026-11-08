@@ -43,6 +43,8 @@ pub const INSPECTOR: Spec = Spec {
         "packet_capture_export",
         "packet_inspector_view",
         "packet_inspector_close",
+        // "Copy" on a packet (issue #634).
+        "copy_text",
     ],
     player_window: false,
 };
@@ -438,6 +440,13 @@ mod tests {
         assert!(command_allowed(STAGE_POPOUT.label, "plugin_details_open"));
         assert!(!command_allowed(SHARE_POPOUT.label, "plugin_details_open"));
         assert!(!command_allowed(STAGE_POPOUT.label, "settings_update"));
+    }
+
+    #[test]
+    fn the_packet_inspector_may_copy_a_packet() {
+        // Issue #634: "Copy" in the inspector was refused for its window.
+        assert!(command_allowed(INSPECTOR.label, "copy_text"));
+        assert!(!command_allowed(INSPECTOR.label, "settings_update"));
     }
 
     #[test]
