@@ -2866,7 +2866,7 @@ impl Inner {
                     ));
                 }
                 // The echo of a person's state confirms an open admin action on them (issue #378).
-                crate::admin::on_state(&self.admin, server_id, user.session);
+                crate::admin::on_state(&self.admin, server_id, user.session, change.echoed_rights);
                 if change.joined {
                     self.files
                         .on_user_joined(server_id, user.cert_hash.as_deref());

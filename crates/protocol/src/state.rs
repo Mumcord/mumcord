@@ -149,6 +149,27 @@ pub struct UserChange {
     pub moved_from: Option<u32>,
     /// Session that caused the change (e.g. an admin moving someone).
     pub actor: Option<u32>,
+    /// The admin rights ([`crate::permissions`]) whose fields this message carried: MuteDeafen
+    /// for mute, deafen, suppress and priority speaker, Move for the channel, Register for the
+    /// user id. An open admin action is only confirmed by an echo of the field it changed.
+    pub echoed_rights: u32,
+}
+
+/// The admin rights whose fields a `UserState` carries (see [`UserChange::echoed_rights`]).
+fn echoed_rights(m: &proto::UserState) -> u32 {
+    use crate::permissions::{MOVE, MUTE_DEAFEN, REGISTER};
+    let mut rights = 0;
+    if m.mute.is_some() || m.deaf.is_some() || m.suppress.is_some() || m.priority_speaker.is_some()
+    {
+        rights |= MUTE_DEAFEN;
+    }
+    if m.channel_id.is_some() {
+        rights |= MOVE;
+    }
+    if m.user_id.is_some() {
+        rights |= REGISTER;
+    }
+    rights
 }
 
 impl ServerState {
@@ -258,6 +279,7 @@ impl ServerState {
     pub fn apply_user_state(&mut self, m: proto::UserState) -> Option<UserChange> {
         let session = m.session?;
         let joined = !self.users.contains_key(&session);
+        let echoed_rights = echoed_rights(&m);
         let user = self.users.entry(session).or_insert_with(|| User {
             session,
             ..Default::default()
@@ -329,6 +351,7 @@ impl ServerState {
             joined,
             moved_from,
             actor: m.actor,
+            echoed_rights,
         })
     }
 
