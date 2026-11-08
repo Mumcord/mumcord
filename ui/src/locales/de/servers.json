@@ -2,7 +2,7 @@
   "unknownServer": "dem Server",
   "announce": {
     "connected": "Mit {{server}} verbunden.",
-    "lost": "Verbindung zu {{server}} verloren. Verbinde neu …",
+    "lost": "Verbindung zu {{server}} verloren. Verbindung wird wiederhergestellt…",
     "ended": "Von {{server}} getrennt. Die Leiste über dem Chat zeigt, wie es weitergeht.",
     "disconnected": "Von {{server}} getrennt.",
     "tcp": "Sprache läuft jetzt über TCP, weil UDP blockiert ist. Der Ton kann leicht verzögert sein.",
@@ -13,12 +13,12 @@
     "listLabel": "Gespeicherte Server",
     "add": "Server hinzufügen",
     "browse": "Öffentliche Server durchsuchen",
-    "keyboardHint": "Eingabe verbindet. Alt plus Pfeil hoch oder runter verschiebt den Server. Umschalt plus F10 öffnet weitere Optionen.",
+    "keyboardHint": "Enter verbindet. Alt plus Pfeil hoch oder runter verschiebt den Server. Umschalt plus F10 öffnet weitere Optionen.",
     "label": "{{server}} ({{state}})",
     "state": {
       "connected": "verbunden",
-      "connecting": "verbindet",
-      "reconnecting": "verbindet neu",
+      "connecting": "wird verbunden",
+      "reconnecting": "wird neu verbunden",
       "error": "Verbindung verloren",
       "failed": "Verbindung fehlgeschlagen",
       "voice": "Sprachserver",
@@ -76,19 +76,19 @@
       "labelLong": "Der Name in der Serverleiste darf höchstens 64 Zeichen haben."
     },
     "alwaysConnect": "Beim Start immer verbinden",
-    "alwaysConnectHint": "Mumcord verbindet diesen Server beim Start schreibgeschützt.",
+    "alwaysConnectHint": "Mumcord verbindet sich beim Start schreibgeschützt mit diesem Server.",
     "channelPasswords": "Kanalpasswörter",
     "channelPassword": "Passwort {{number}}",
     "channelPasswordChannel": "{{name}} ({{parent}})",
     "channelPasswordNotFound": "(nicht gefunden)",
-    "channelPasswordLastUsed": "Zuletzt verwendet {{when}}",
+    "channelPasswordLastUsed": "Zuletzt verwendet: {{when}}",
     "channelPasswordName": "Name für {{name}}",
     "renameChannelPassword": "{{name}} umbenennen",
     "rename": "Umbenennen",
     "renameDone": "Fertig",
     "removeChannelPassword": "{{name}} entfernen",
     "remove": "Entfernen",
-    "channelPasswordsHint": "Gespeichert, wenn ein geschützter Kanal sie akzeptiert hat. Entfernte werden beim nächsten Betreten erneut abgefragt.",
+    "channelPasswordsHint": "Gespeichert, wenn ein geschützter Kanal sie akzeptiert hat. Entfernte werden beim nächsten Beitritt erneut abgefragt.",
     "tabsLabel": "Servereinstellungen",
     "tabs": {
       "connection": "Verbindung",
@@ -109,7 +109,7 @@
       "nameInUse": "Der Name wird auf diesem Server bereits verwendet.",
       "unreachable": "Der Server ist nicht erreichbar.",
       "invalid": "Die Angaben sind nicht gültig.",
-      "failed": "Der Test ist fehlgeschlagen. Bitte erneut versuchen."
+      "failed": "Der Test ist fehlgeschlagen. Bitte versuche es erneut."
     }
   },
   "errors": {
@@ -150,15 +150,15 @@
     "trustChanged": "Dem neuen Zertifikat vertrauen"
   },
   "rejoin": {
-    "label": "Letzten Kanal wieder betreten",
+    "label": "Letztem Kanal wieder beitreten",
     "text": "Du warst zuletzt in {{channel}} – wieder beitreten?",
     "rejoin": "Beitreten",
     "notNow": "Jetzt nicht"
   },
   "status": {
     "label": "Verbindungsstatus",
-    "connecting": "Verbinde mit {{server}} …",
-    "reconnecting": "Verbinde neu … (Versuch {{attempt}} von {{max}}, nächster in {{seconds}} s)",
+    "connecting": "Verbindung mit {{server}} wird hergestellt…",
+    "reconnecting": "Verbindung wird wiederhergestellt… (Versuch {{attempt}} von {{max}}, nächster in {{seconds}} s)",
     "tcp": "Über TCP verbunden (UDP blockiert). Sprache funktioniert, kann aber leicht verzögert sein.",
     "disconnected": "Getrennt",
     "disconnectedReason": "Getrennt – {{reason}}",
@@ -174,7 +174,7 @@
       "alwaysConnect": "„Beim Start immer verbinden“ konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "notifications": "Die Benachrichtigungseinstellung konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "savePassword": "Das neue Passwort konnte nicht gespeichert werden. Bearbeite den Server, um es zu speichern.",
-      "identity": "Die Identität konnte nicht gespeichert werden. Bitte erneut versuchen."
+      "identity": "Die Identität konnte nicht gespeichert werden. Bitte versuche es erneut."
     }
   },
   "empty": {
@@ -184,7 +184,7 @@
     "addressHint": "Zum Beispiel mumble.example.org oder mumble.example.org:64738.",
     "connect": "Hinzufügen und verbinden",
     "pasteLink": "mumble://-Link einfügen",
-    "moreOptions": "Weitere Optionen …",
+    "moreOptions": "Weitere Optionen…",
     "noLinkInClipboard": "Die Zwischenablage enthält keinen mumble://-Link. Füge die Adresse oben ein oder tippe sie.",
     "pasteManually": "Mumcord konnte die Zwischenablage nicht lesen. Klicke in das Feld oben und drücke Strg+V.",
     "errors": {
@@ -201,7 +201,7 @@
     "save": "Passwort speichern",
     "cancel": "Abbrechen",
     "connect": "Verbinden",
-    "connecting": "Verbinde …"
+    "connecting": "Wird verbunden…"
   },
   "channelPassword": {
     "title": "Dieser Kanal braucht ein Passwort",
@@ -211,7 +211,7 @@
     "failed": "Das Passwort konnte nicht gesendet werden. Bitte versuche es erneut.",
     "cancel": "Abbrechen",
     "join": "Beitreten",
-    "joining": "Trete bei …"
+    "joining": "Beitritt läuft…"
   },
   "serverInfo": {
     "title": "Server-Info",
@@ -274,7 +274,7 @@
     "permissionTraverse": "Durchqueren",
     "permissionEnter": "Betreten",
     "permissionSpeak": "Sprechen",
-    "permissionMuteDeafen": "Andere stummschalten/taub stellen",
+    "permissionMuteDeafen": "Andere stumm-/taubschalten",
     "permissionMove": "Benutzer verschieben",
     "permissionMakeChannel": "Kanal erstellen",
     "permissionLinkChannel": "Kanal verknüpfen",
@@ -283,7 +283,7 @@
     "permissionMakeTempChannel": "Temporären Kanal erstellen",
     "permissionListen": "Zuhören",
     "permissionKick": "Kicken",
-    "permissionBan": "Bannen",
+    "permissionBan": "Sperren",
     "permissionRegister": "Benutzer registrieren",
     "permissionSelfRegister": "Sich selbst registrieren",
     "permissionResetUserContent": "Benutzerinhalte zurücksetzen",
@@ -293,7 +293,7 @@
     "field": "Identität für diesen Server",
     "useDefault": "Standard verwenden ({{identity}})",
     "option": "{{label}} ({{name}})",
-    "hint": "Beim Ändern der Identität verbindet sich dieser Server neu. Der registrierte Name und die Rechte hier gehören zu der gewählten Identität.",
+    "hint": "Beim Ändern der Identität verbindet sich dieser Server neu. Der registrierte Name und die Berechtigungen hier gehören zu der gewählten Identität.",
     "manage": "Identitäten verwalten…",
     "title": "Identität für {{server}}",
     "intro": "Wähle, welche Identität Mumcord hier zum Verbinden nutzt. „Standard verwenden“ folgt der Standardidentität.",

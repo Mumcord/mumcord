@@ -26,7 +26,7 @@
       "body": "Push-to-Talk oder Sprachaktivierung? Das wählst du unter Einstellungen → Sprache & Audio oder über Spracheinstellungen… mit dem kleinen Pfeil neben dem Mikrofon. Push-to-Talk klappt auch mit Maustasten."
     },
     "panel": {
-      "title": "Dein Nutzerpanel",
+      "title": "Dein Benutzerbereich",
       "body": "Unten links kannst du dein Mikrofon stummschalten, dich taubschalten, die Kamera einschalten oder auflegen. Die kleinen Pfeile daneben öffnen weitere Optionen."
     },
     "search": {
@@ -43,7 +43,7 @@
     },
     "themes": {
       "title": "Dein Look",
-      "body": "Das Zahnrad unten links wechselt zwischen dunkel und hell. Unter Einstellungen → Darstellung gibt es weitere Designs, und ein Server kann ein eigenes bekommen: Rechtsklick darauf und „Design“ wählen."
+      "body": "Das Zahnrad unten links wechselt zwischen Dunkel und Hell. Unter Einstellungen → Darstellung gibt es weitere Designs, und ein Server kann ein eigenes bekommen: Rechtsklick darauf und „Design“ wählen."
     },
     "end": {
       "title": "Das war's!",

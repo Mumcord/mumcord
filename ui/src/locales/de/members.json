@@ -36,9 +36,9 @@
     "volumeValue": "{{value}} %",
     "localMute": "Für mich stummschalten",
     "sessionOnly": "Diese Person hat kein Zertifikat, daher gelten diese Einstellungen nur für diese Sitzung.",
-    "sendPrivateMessage": "Private Nachricht senden",
-    "privateMessage": "Private Nachricht",
-    "localSettingsHint": "Nur du siehst sie. Änderungen werden sofort gespeichert.",
+    "sendPrivateMessage": "Privatnachricht senden",
+    "privateMessage": "Privatnachricht",
+    "localSettingsHint": "Nur du siehst diese Einstellungen. Änderungen werden sofort gespeichert.",
     "settingsFor": "Einstellungen für {{name}}",
     "hintMuted": "Stummgeschaltet",
     "hintVolume": "Lautstärke {{value}} %",
@@ -86,7 +86,7 @@
     "joinFailed": "Steam konnte nicht geöffnet werden."
   },
   "preview": {
-    "privateMessage": "Private Nachricht",
+    "privateMessage": "Privatnachricht",
     "fullProfile": "Vollständiges Profil"
   },
   "chatRequest": {
@@ -119,7 +119,7 @@
     "title": "{{name}} blockieren?",
     "onServer": "auf {{server}}",
     "whatHappens": "Was passiert",
-    "private": "Private Nachrichten von {{name}} werden nicht angezeigt und benachrichtigen dich nicht.",
+    "private": "Privatnachrichten von {{name}} werden nicht angezeigt und lösen keine Benachrichtigung aus.",
     "channelCollapsed": "Kanalnachrichten von {{name}} sind eingeklappt. Du kannst sie weiterhin öffnen.",
     "channelHidden": "Kanalnachrichten von {{name}} werden ausgeblendet.",
     "voice": "{{name}} ist für dich im Sprachchat stummgeschaltet, auch beim Flüstern.",
@@ -132,8 +132,8 @@
     "done": "{{name}} ist blockiert.",
     "failed": "{{name}} konnte nicht blockiert werden. Bitte versuche es erneut.",
     "badge": "Blockiert",
-    "collapsed": "Nachricht eines blockierten Nutzers",
+    "collapsed": "Nachricht eines blockierten Benutzers",
     "show": "Anzeigen",
-    "showLabel": "Nachricht eines blockierten Nutzers anzeigen"
+    "showLabel": "Nachricht eines blockierten Benutzers anzeigen"
   }
 }

@@ -17,9 +17,9 @@
   "suggestion": {
     "title": "Dieser Server nutzt {{name}}",
     "noReason": "Vom Server vorgeschlagen",
-    "install": "Installieren …",
+    "install": "Installieren…",
     "installLabel": "{{name}} installieren",
-    "addRepositoryLabel": "Repository für {{name}} hinzufügen",
+    "addRepositoryLabel": "Quelle für {{name}} hinzufügen",
     "details": "Details ansehen",
     "detailsLabel": "Details zu {{name}}",
     "notNow": "Jetzt nicht",

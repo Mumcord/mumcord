@@ -9,7 +9,7 @@
     "unmuted": "Mikrofon wieder aktiv",
     "deafened": "Taubgeschaltet. Du hörst niemanden und dein Mikrofon ist stumm",
     "undeafened": "Taubschaltung aufgehoben",
-    "leftVoice": "Sprache auf {{server}} verlassen",
+    "leftVoice": "Sprachchat auf {{server}} verlassen",
     "disconnected": "Von {{server}} getrennt",
     "disconnectedAll": "Von allen Servern getrennt"
   },
@@ -18,8 +18,8 @@
     "join": "{{channel}} beitreten"
   },
   "status": {
-    "connecting": "Verbinde…",
-    "reconnecting": "Verbinde erneut…",
+    "connecting": "Wird verbunden…",
+    "reconnecting": "Wird neu verbunden…",
     "connected": "Verbunden",
     "readOnly": "Nur lesen",
     "disconnected": "Nicht verbunden",
@@ -60,7 +60,7 @@
     "file": "Die Datei konnte nicht gelesen oder geschrieben werden.",
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
-  "ptt": "Push-to-Talk: {{key}} gedrückt halten zum Sprechen",
+  "ptt": "Push-to-Talk: Halte {{key}} gedrückt, um zu sprechen",
   "pttNoKey": "Push-to-Talk: keine Taste festgelegt",
   "quickSettings": {
     "linkPreviews": "Link-Vorschauen und Einbettungen",
@@ -79,7 +79,7 @@
     "editProfileHint": "Name, Avatar und Kommentar",
     "register": "Auf diesem Server registrieren",
     "registered": "Auf diesem Server registriert ✓",
-    "registerHint": "Behält deinen Namen und Avatar auf diesem Server",
+    "registerHint": "Sichert deinen Namen und Avatar auf diesem Server",
     "allSettings": "Alle Einstellungen…",
     "label": "Schnelleinstellungen",
     "positional": "Positionsabhängiger Ton",
@@ -90,7 +90,7 @@
     "loadImagesHint": "Originalbilder von anderen abrufen",
     "dnd": "Nicht stören",
     "dndHint": "Stellt Benachrichtigungstöne und -banner stumm",
-    "dndSystemHint": "An über „Nicht stören“ deines Desktops",
+    "dndSystemHint": "Aktiv durch „Nicht stören“ deines Desktops",
     "privateMessages": "Nachrichten von",
     "pm_everyone": "Alle",
     "pm_friendsOnly": "Freunde",
@@ -101,17 +101,17 @@
     "account": "Konto"
   },
   "voice": {
-    "line": "Sprache: {{channel}} · {{server}}",
-    "server": "Sprache: {{server}}",
+    "line": "Sprachchat: {{channel}} · {{server}}",
+    "server": "Sprachchat: {{server}}",
     "show": "{{location}} – diesen Server anzeigen"
   },
   "disconnectMenu": {
-    "label": "Trennen-Optionen",
-    "open": "Weitere Trennen-Optionen",
-    "leaveVoice": "Sprache verlassen",
+    "label": "Optionen zum Trennen",
+    "open": "Weitere Optionen zum Trennen",
+    "leaveVoice": "Sprachchat verlassen",
     "leaveVoiceHint": "Nicht mehr sprechen und hören, für den Chat verbunden bleiben",
     "disconnectHint": "Die Verbindung zu diesem Server schließen",
-    "switchTo": "Sprache zu {{server}} wechseln",
+    "switchTo": "Sprachchat zu {{server}} wechseln",
     "all": "Von allen Servern trennen",
     "allHint": "Alle Serververbindungen schließen"
   },
@@ -121,8 +121,8 @@
     "confirm": "Trennen"
   },
   "audio": {
-    "inputOptions": "Mikrofon-Optionen",
-    "outputOptions": "Lautsprecher-Optionen",
+    "inputOptions": "Mikrofonoptionen",
+    "outputOptions": "Lautsprecheroptionen",
     "inputDevices": "Eingabegerät",
     "outputDevices": "Ausgabegerät",
     "systemDefault": "Systemstandard",
@@ -186,7 +186,7 @@
     "imageBusy": "Bild wird an das Serverlimit angepasst…",
     "imageScaled": "Bild auf {{width}} × {{height}} verkleinert, um das Serverlimit einzuhalten",
     "imageTooLarge": "Dieses Bild passt auch verkleinert nicht in das Serverlimit. Nimm ein kleineres Bild oder kürze den Text.",
-    "imageNotImage": "Es können nur Bilder in PNG, JPEG, GIF or WebP hinzugefügt werden.",
+    "imageNotImage": "Es können nur Bilder in PNG, JPEG, GIF oder WebP hinzugefügt werden.",
     "imageUnreadable": "Das Bild konnte nicht gelesen werden. Versuche eine andere Datei.",
     "imageSourceTooLarge": "Diese Datei ist zu groß (über 25 MB).",
     "overText": "Für diesen Server zu lang: {{used}} von {{limit}} Zeichen. Kürze den Text.",
