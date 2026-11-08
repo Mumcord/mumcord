@@ -51,3 +51,5 @@ required-features = ["1.1"]
 [features]
 # Opts a plugin into the 1.1 API (WIT package mumcord:plugin@1.1.0); off keeps the 1.0 world.
 "1.1" = ["dep:bovnar"]
+# Opts a plugin into the 1.2 API (WIT package mumcord:plugin@1.2.0); includes everything of 1.1.
+"1.2" = ["1.1"]

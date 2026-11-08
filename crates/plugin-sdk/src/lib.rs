@@ -77,12 +77,25 @@ pub mod bindings {
 
 /// Generated bindings of the 1.1 API (feature `1.1`). 1.0 stays the default so that existing
 /// plugins keep importing only 1.0 interfaces.
-#[cfg(feature = "1.1")]
+#[cfg(all(feature = "1.1", not(feature = "1.2")))]
 #[doc(hidden)]
 pub mod bindings {
     wit_bindgen::generate!({
         world: "plugin",
         path: "wit/1.1.0",
+        pub_export_macro: true,
+        default_bindings_module: "mumcord_plugin_sdk::bindings",
+    });
+}
+
+/// Generated bindings of the 1.2 API (feature `1.2`): the interfaces of 1.1 under the package
+/// version 1.2.0, so a plugin's imports tell the host which API it was built for.
+#[cfg(feature = "1.2")]
+#[doc(hidden)]
+pub mod bindings {
+    wit_bindgen::generate!({
+        world: "plugin",
+        path: "wit/1.2.0",
         pub_export_macro: true,
         default_bindings_module: "mumcord_plugin_sdk::bindings",
     });
