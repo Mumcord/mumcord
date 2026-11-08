@@ -8223,22 +8223,56 @@ GStreamer Good Plugins
 License: LGPL-2.1-or-later
 Repository: https://gitlab.freedesktop.org/gstreamer/gstreamer
 
-The plugins of gst-plugins-good, bundled in the AppImage. Plugins that implement
-H.264 and H.265 (gst-libav / FFmpeg, x264, x265, OpenH264) and GPL-only codecs
+The plugins of gst-plugins-good, bundled in the AppImage. The build host's plugins that
+implement H.264 and H.265 (gst-libav / FFmpeg, x264, x265, OpenH264) and GPL-only codecs
 (a52dec, dtsdec, mpeg2dec, libdvdread, faac, faad) are deliberately not bundled
-(scripts/filter-gst-plugins.sh); the AppImage plays YouTube through VP9.
+(scripts/filter-gst-plugins.sh); H.264 and AAC come from Mumcord's own LGPL build of
+FFmpeg and gst-libav instead (see below).
 
 (License text: see GStreamer above.)
 
 --------------------------------------------------------------------------------
-GStreamer Bad Plugins (opusparse)
+GStreamer Bad Plugins (opusparse, videoparsersbad)
 --------------------------------------------------------------------------------
 
 License: LGPL-2.1-or-later
 Repository: https://gitlab.freedesktop.org/gstreamer/gstreamer
 
-Only the Opus parser of gst-plugins-bad, bundled in the AppImage: without it WebKit
-reports no playable audio format for YouTube.
+Only the Opus parser and the video parsers (h264parse and others) of gst-plugins-bad,
+bundled in the AppImage: without them WebKit reports no playable audio format for
+YouTube and cannot play H.264 streams such as Twitch.
+
+(License text: see GStreamer above.)
+
+--------------------------------------------------------------------------------
+FFmpeg 6.1.6
+--------------------------------------------------------------------------------
+
+License: LGPL-2.1-or-later
+Repository: https://ffmpeg.org
+
+The H.264 and AAC decoders for video playback (Twitch, .mp4 links) in every Linux
+package: libavutil, libavcodec, libavformat and libavfilter as shared libraries in
+/usr/lib/mumcord (.deb, .rpm) or usr/lib inside the AppImage, used only by Mumcord's
+gst-libav. Built by scripts/build-ffmpeg.sh as LGPL only (no GPL, nonfree or version 3
+parts) with only the H.264, AAC and AAC-LATM decoders and parsers; no encoders. The
+libraries can be replaced with a compatible build of your own.
+Source: https://ffmpeg.org/releases/ffmpeg-6.1.6.tar.xz (SHA-256 d4fcb164028dd3beee5d92c0ac72e46aac6973c75ea12dc14de07bf8f407370a), unmodified. Configured with: --disable-gpl --disable-nonfree --disable-version3 --enable-shared --disable-static --disable-programs --disable-doc --disable-autodetect --disable-network --disable-avdevice --disable-swscale --disable-swresample --disable-postproc --disable-everything --enable-decoder=h264,aac,aac_latm --enable-parser=h264,aac,aac_latm --disable-debug
+
+(License text: see GStreamer above.)
+
+--------------------------------------------------------------------------------
+GStreamer FFmpeg plugin (gst-libav) 1.24.2
+--------------------------------------------------------------------------------
+
+License: LGPL-2.1-or-later
+Repository: https://gitlab.freedesktop.org/gstreamer/gstreamer
+
+The GStreamer plugin (libgstlibav.so) that gives WebKitGTK the bundled FFmpeg decoders,
+in every Linux package: /usr/lib/mumcord/gstreamer-1.0 (.deb, .rpm) or with the other
+GStreamer plugins inside the AppImage. Built by scripts/build-ffmpeg.sh against the
+bundled FFmpeg and Ubuntu 24.04's GStreamer 1.24.
+Source: https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-1.24.2.tar.xz (SHA-256 962838648e14ce8a78322ab16f84c7d84d86a6d7bebb6574ac05dea84a7c7c9b), unmodified.
 
 (License text: see GStreamer above.)
 
