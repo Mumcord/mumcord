@@ -37,6 +37,10 @@ pub fn run(path: &Path, official: bool, key: Option<&str>) -> Result<()> {
     if let Some(warning) = deprecation_warning(api, version::deprecated(api)) {
         println!("{warning}");
     }
+    // A 1.2 package with such files was refused above; older ones only get a warning (FR-13.29).
+    if let Some(file) = package.reserved_web_files().next() {
+        println!("{}", reserved_warning(file));
+    }
     if let Some(key) = key {
         let public = sign::read_public(key)?;
         let signature_path = sign::signature_path(path);
@@ -104,6 +108,13 @@ fn api_matches(api: ApiMinor, imported: Option<ApiMinor>) -> Result<()> {
     }
 }
 
+fn reserved_warning(file: &str) -> String {
+    format!(
+        "warning: {file} is under the reserved folder web/_mumcord; Mumcord never serves it \
+         (an API 1.2 package with such files is refused)"
+    )
+}
+
 fn deprecation_warning(api: ApiMinor, deprecated: bool) -> Option<String> {
     deprecated.then(|| {
         format!(
@@ -163,6 +174,13 @@ mod tests {
             "{error}"
         );
         assert!(api_matches(ApiMinor::V1_1, Some(ApiMinor::V1_0)).is_err());
+    }
+
+    #[test]
+    fn reserved_folder_warning_names_the_file() {
+        let warning = reserved_warning("web/_MUMCORD/x.css");
+        assert!(warning.contains("web/_MUMCORD/x.css"), "{warning}");
+        assert!(warning.starts_with("warning:"), "{warning}");
     }
 
     #[test]

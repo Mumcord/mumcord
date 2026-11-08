@@ -108,7 +108,20 @@ pub fn parse_entry(entry: &str) -> Option<(&str, Option<&str>)> {
         Some((path, query)) => (path, Some(query)),
         None => (entry, None),
     };
-    (is_web_path(path) && path.ends_with(".html")).then_some((path, query))
+    (is_web_path(path) && !is_reserved(path) && path.ends_with(".html")).then_some((path, query))
+}
+
+/// The first path segment Mumcord keeps for its own files (FR-13.28). Never taken from the plugin
+/// package, whatever the plugin's API version: a package file there could imitate the UI kit.
+pub const RESERVED_SEGMENT: &str = "_mumcord";
+
+/// Whether `path` (relative to `web/`) lies under the reserved segment. ASCII case is ignored so
+/// that case-insensitive file systems cannot reach the kit's folder through `_MUMCORD`; other
+/// spellings (percent-encoding, backslashes, non-ASCII) are never plain web paths anyway.
+pub fn is_reserved(path: &str) -> bool {
+    path.split('/')
+        .next()
+        .is_some_and(|first| first.eq_ignore_ascii_case(RESERVED_SEGMENT))
 }
 
 /// Whether `path` (relative to `web/`) is a plain relative path to a file type `web/` may hold.
@@ -651,7 +664,7 @@ impl Webviews {
     /// The file to serve for `path` below the plugin's `web/` folder, only while the plugin has a
     /// frame open. The resolved file must stay inside the folder (no links out of it).
     pub fn file(&self, plugin: &str, path: &str) -> Option<PathBuf> {
-        if !is_web_path(path) {
+        if !is_web_path(path) || is_reserved(path) {
             return None;
         }
         let root = {
@@ -753,8 +766,47 @@ mod tests {
             "%2e%2e/index.html",
             "index.html#x",
             "ünï.html",
+            "_mumcord/v1/kit.css",
+            "_mumcord/x.html",
+            "_MUMCORD/x.html",
+            "_MumCord/a/b.html",
+            "_mumcord",
+            "_mumcord.html/",
+            "%5Fmumcord/x.html",
+            "_mumcord%2Fx.html",
+            "_mumcord\\x.html",
+            "./_mumcord/x.html",
+            "a/../_mumcord/x.html",
+            "_mumcord/x.html?a=b",
+            "ſ.html",
+            "_mumcorд/x.html",
         ] {
             assert_eq!(parse_entry(bad), None, "{bad}");
+        }
+        // Only the first segment is reserved; a lookalike name or a deeper folder is ordinary.
+        assert!(parse_entry("_mumcord2/x.html").is_some());
+        assert!(parse_entry("a/_mumcord/x.html").is_some());
+    }
+
+    #[test]
+    fn the_reserved_segment_ignores_ascii_case_only() {
+        for reserved in [
+            "_mumcord/v1/kit.css",
+            "_MUMCORD/x",
+            "_Mumcord",
+            "_mUmCoRd/a/b",
+        ] {
+            assert!(is_reserved(reserved), "{reserved}");
+        }
+        for plain in [
+            "",
+            "x/_mumcord",
+            "_mumcord2/x",
+            "mumcord/x",
+            "_mumcor/x",
+            "\u{212a}_mumcord",
+        ] {
+            assert!(!is_reserved(plain), "{plain}");
         }
     }
 
@@ -997,6 +1049,43 @@ mod tests {
         assert!(views.file("other", "index.html").is_none());
         assert_eq!(views.hide("p"), vec![WebviewPlace::PanelPopover]);
         assert!(views.file("p", "index.html").is_none());
+    }
+
+    #[test]
+    fn reserved_files_are_never_served_from_the_package() {
+        let (_dir, root) = web_dir();
+        std::fs::create_dir_all(root.join("_mumcord/v1")).unwrap();
+        std::fs::write(root.join("_mumcord/v1/kit.css"), "x").unwrap();
+        std::fs::write(root.join("_mumcord/x.html"), "x").unwrap();
+        let views = Webviews::default();
+        views.set_root("p", Some(root), ALL.to_vec());
+        views
+            .show(
+                "p",
+                WebviewPlace::PanelPopover,
+                "index.html",
+                Instant::now(),
+            )
+            .unwrap();
+        for path in [
+            "_mumcord/v1/kit.css",
+            "_MUMCORD/v1/kit.css",
+            "_Mumcord/x.html",
+            "%5Fmumcord/v1/kit.css",
+            "_mumcord%2Fx.html",
+            "_mumcord\\x.html",
+        ] {
+            assert!(views.file("p", path).is_none(), "{path}");
+        }
+        assert_eq!(
+            views.show(
+                "p",
+                WebviewPlace::PanelPopover,
+                "_MUMCORD/x.html",
+                Instant::now()
+            ),
+            Err(Error::Invalid)
+        );
     }
 
     #[cfg(unix)]
