@@ -16,12 +16,12 @@ Builds are unsigned until code signing is set up (Windows via a Certum code sign
 
 The version is set at build time from git; nobody bumps it in the manifests by hand.
 
-| Build                                | Version shown in the app (About, diagnostics, log, server) | Package version of the bundles   |
-| ------------------------------------ | ---------------------------------------------------------- | -------------------------------- |
-| Release tag `vX.Y.Z` (`release.yml`) | `X.Y.Z`                                                    | `X.Y.Z`                          |
+| Build                                | Version shown in the app (About, diagnostics, log, server) | Package version of the bundles                |
+| ------------------------------------ | ---------------------------------------------------------- | --------------------------------------------- |
+| Release tag `vX.Y.Z` (`release.yml`) | `X.Y.Z`                                                    | `X.Y.Z`                                       |
 | Release candidate `vX.Y.Z-rc.N`      | `X.Y.Z-rc.N`                                               | see [Release candidates](#release-candidates) |
-| CI build of `main` or a pull request | `dev~<short commit>`, e.g. `dev~a1b2c3d`                   | test builds: the latest `v*` tag |
-| Local build                          | `dev~YYYYMMDD`, plus `-dirty` with uncommitted changes     | the version in `Cargo.toml`      |
+| CI build of `main` or a pull request | `dev~<short commit>`, e.g. `dev~a1b2c3d`                   | test builds: the latest `v*` tag              |
+| Local build                          | `dev~YYYYMMDD`, plus `-dirty` with uncommitted changes     | the version in `Cargo.toml`                   |
 
 - **Display version.** `src-tauri/build.rs` reads `MUMCORD_VERSION` (set by CI: the tag's version in releases, `dev~<short commit>` in `ci.yml`, `e2e.yml` and test builds). Without it, it uses the build date and asks git whether the tree has uncommitted changes; without git (for example a source tarball) it leaves out `-dirty` instead of failing. The rules are in `src-tauri/build/version.rs`. Dev builds never look for updates, since they are newer than the release they are based on. Theme share codes keep the numeric package version, because other clients reject a version they cannot parse.
 - **Package version.** Installer formats need a plain number (RPM rejects `-`, MSI/NSIS want `X.Y.Z`, macOS bundle versions are numeric), so dev bundles carry the version of the latest `v*` tag (`scripts/latest-release-version.sh`) and only the app's display version says `dev~…`.
@@ -98,14 +98,14 @@ The release workflow file comes from the tagged commit, so the milestone branch 
 
 **Package versions.** One source version, mapped so every package accepts it and sorts the RC before the final release:
 
-| Package | `0.8.0-rc.1` becomes | Why |
-| --- | --- | --- |
-| App (About, diagnostics), Cargo, npm, updater | `0.8.0-rc.1` | SemVer; `0.8.0-rc.1` < `0.8.0` |
-| AppImage, `.dmg`, `-setup.exe`, `.deb` file names | `Mumcord_0.8.0-rc.1_…` | |
-| `.deb` package version | `0.8.0~rc.1` | `~` sorts before `0.8.0`; Tauri's `0.8.0-rc.1` would sort after it. `scripts/deb-set-version.sh` rewrites it after the build. |
-| `.rpm` | version `0.8.0`, release `0.rc.1` (`Mumcord-0.8.0-0.rc.1.x86_64.rpm`) | RPM rejects `-`, and Tauri accepts only SemVer, so `0.8.0~rc.1` is not possible; Fedora's pre-release scheme `0.rc.N` sorts below the final's release `1`. Bundled with `tauri bundle` from the same binary. |
-| Windows NSIS installer | `0.8.0-rc.1` (file properties `0.8.0.0`) | The installer compares versions as SemVer, so the final installs over the RC as an upgrade. |
-| macOS `CFBundleShortVersionString` / `CFBundleVersion` | `0.8.0` / `0.8.0` | Apple allows digits and dots only; `scripts/set-version.sh` writes both into `src-tauri/Info.plist`. Finder shows `0.8.0`, the app's About shows `0.8.0-rc.1`. Installing the final replaces the app. |
+| Package                                                | `0.8.0-rc.1` becomes                                                  | Why                                                                                                                                                                                                          |
+| ------------------------------------------------------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| App (About, diagnostics), Cargo, npm, updater          | `0.8.0-rc.1`                                                          | SemVer; `0.8.0-rc.1` < `0.8.0`                                                                                                                                                                               |
+| AppImage, `.dmg`, `-setup.exe`, `.deb` file names      | `Mumcord_0.8.0-rc.1_…`                                                |                                                                                                                                                                                                              |
+| `.deb` package version                                 | `0.8.0~rc.1`                                                          | `~` sorts before `0.8.0`; Tauri's `0.8.0-rc.1` would sort after it. `scripts/deb-set-version.sh` rewrites it after the build.                                                                                |
+| `.rpm`                                                 | version `0.8.0`, release `0.rc.1` (`Mumcord-0.8.0-0.rc.1.x86_64.rpm`) | RPM rejects `-`, and Tauri accepts only SemVer, so `0.8.0~rc.1` is not possible; Fedora's pre-release scheme `0.rc.N` sorts below the final's release `1`. Bundled with `tauri bundle` from the same binary. |
+| Windows NSIS installer                                 | `0.8.0-rc.1` (file properties `0.8.0.0`)                              | The installer compares versions as SemVer, so the final installs over the RC as an upgrade.                                                                                                                  |
+| macOS `CFBundleShortVersionString` / `CFBundleVersion` | `0.8.0` / `0.8.0`                                                     | Apple allows digits and dots only; `scripts/set-version.sh` writes both into `src-tauri/Info.plist`. Finder shows `0.8.0`, the app's About shows `0.8.0-rc.1`. Installing the final replaces the app.        |
 
 There is no MSI: Windows ships only the NSIS installer and the portable zip.
 
