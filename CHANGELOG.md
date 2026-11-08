@@ -25,6 +25,7 @@
 
 ### Fixed
 
+- Plugin stage pages can send messages of up to 64 KiB to their plugin again (issue #692); messages above 16 KiB used to be dropped silently, as in a side panel, popover or dialog, where 16 KiB stays the limit
 - Linux: cameras through the desktop camera portal no longer stop with "the camera sends unreadable pictures" when the camera reports only the brightness part of each picture as filled; the first picture's layout is now logged to diagnose other cameras
 - The activity feed no longer offers "Watch" on your own screen share or "Join" on your own watch party or activity; you are already in it (#664)
 - Screen readers no longer get a broken list announcement while the @mention or /command suggestions are open in the message box; they hear how many suggestions there are

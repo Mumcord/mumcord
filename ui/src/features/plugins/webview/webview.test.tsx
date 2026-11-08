@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PluginFrameMute, PluginUi, PluginWebviewPlace } from "../../../api";
@@ -7,10 +8,12 @@ import { StageShown } from "../../media/stageContext";
 import { applyChange, type PluginUiState, type PluginWebview } from "../render/pluginUiStore";
 import {
   createBridge,
-  fitsBridge,
   inOrder,
   isGestureReport,
   MAX_MESSAGE_BYTES,
+  MAX_STAGE_MESSAGE_BYTES,
+  maxMessageBytes,
+  messageBytes,
   newGestureKey,
   rateLimiter,
 } from "./bridge";
@@ -98,11 +101,42 @@ beforeEach(() => {
 });
 
 describe("bridge limits", () => {
-  it("passes strings up to 16 KiB in UTF-8 only", () => {
-    expect(fitsBridge("x".repeat(MAX_MESSAGE_BYTES))).toBe(true);
-    expect(fitsBridge("x".repeat(MAX_MESSAGE_BYTES + 1))).toBe(false);
-    expect(fitsBridge("ä".repeat(MAX_MESSAGE_BYTES / 2 + 1))).toBe(false);
-    expect(fitsBridge({ text: "x" })).toBe(false);
+  it("limits each place like Rust: 64 KiB on the stage, 16 KiB elsewhere (FR-9.37)", () => {
+    expect(maxMessageBytes("stage")).toBe(64 * 1024);
+    for (const place of ["panelPopover", "dialog", "sidePanel"] as const)
+      expect(maxMessageBytes(place)).toBe(16 * 1024);
+    // One source of truth: the Rust limits, which check every message again.
+    const rust = readFileSync("crates/plugins/src/api/webview.rs", "utf8");
+    const constant = (name: string) => {
+      const match = new RegExp(`pub const ${name}: usize = (\\d+) \\* 1024;`).exec(rust);
+      if (match === null) throw new Error(`${name} not found`);
+      return Number(match[1]) * 1024;
+    };
+    expect(constant("MAX_MESSAGE_BYTES")).toBe(MAX_MESSAGE_BYTES);
+    expect(constant("MAX_STAGE_MESSAGE_BYTES")).toBe(MAX_STAGE_MESSAGE_BYTES);
+  });
+
+  it("measures messages in UTF-8 and refuses ones above its limit with their size only", () => {
+    expect(messageBytes("ä")).toBe(2);
+    const toPlugin = vi.fn();
+    const tooLarge: number[] = [];
+    const dropped = vi.fn();
+    const bridge = createBridge({
+      frame: () => null,
+      toPlugin,
+      maxBytes: 4,
+      onTooLarge: (bytes) => tooLarge.push(bytes),
+      onDropped: dropped,
+      onEscape: vi.fn(),
+      gestureKey: "k",
+      onGesture: vi.fn(),
+    });
+    bridge.receiveData("xxxx");
+    bridge.receiveData("äää");
+    bridge.receiveData({ text: "x" });
+    expect(toPlugin.mock.calls).toEqual([["xxxx"]]);
+    expect(tooLarge).toEqual([6]);
+    expect(dropped).toHaveBeenCalledTimes(1);
   });
 
   it("allows 60 messages per second", () => {
@@ -121,6 +155,7 @@ describe("bridge limits", () => {
     const onEscape = vi.fn();
     const bridge = createBridge({
       frame: () => frame,
+      maxBytes: MAX_MESSAGE_BYTES,
       toPlugin,
       onEscape,
       gestureKey: "k",
@@ -152,6 +187,7 @@ describe("bridge limits", () => {
     const calls: string[] = [];
     const bridge = createBridge({
       frame: () => frame,
+      maxBytes: MAX_MESSAGE_BYTES,
       toPlugin: () => calls.push("plugin"),
       onEscape: () => calls.push("escape"),
       onF6: () => calls.push("f6"),
@@ -178,6 +214,7 @@ describe("bridge limits", () => {
     expect(newGestureKey()).not.toBe(key);
     const bridge = createBridge({
       frame: () => frame,
+      maxBytes: MAX_MESSAGE_BYTES,
       toPlugin,
       onEscape: vi.fn(),
       gestureKey: key,
@@ -318,6 +355,38 @@ describe("PluginFrame", () => {
     expect(container.querySelector("iframe")).not.toBeNull();
     fireEvent.load(frame);
     expect(container.querySelector("iframe")).toBeNull();
+  });
+
+  it("takes page messages up to the place's limit: 64 KiB on the stage (FR-9.37)", () => {
+    const { container } = render(<PluginFrame plugin="snacks" webview={viewIn("stage")} />);
+    const page = pageOf(container);
+    fireEvent.load(frameOf(container));
+    const text = "x".repeat(40 * 1024);
+    fromPage(page, text);
+    expect(api.sendEvent).toHaveBeenCalledWith("snacks", {
+      type: "webviewMessage",
+      place: "stage",
+      text,
+    });
+  });
+
+  it("refuses a page message above 16 KiB in the side panel and logs only size and place", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const { container } = render(<PluginFrame plugin="snacks" webview={viewIn("sidePanel")} />);
+    const page = pageOf(container);
+    fireEvent.load(frameOf(container));
+    const text = "secret".padEnd(20 * 1024, "x");
+    fromPage(page, text);
+    expect(api.sendEvent).not.toHaveBeenCalledWith(
+      "snacks",
+      expect.objectContaining({ type: "webviewMessage" }),
+    );
+    expect(warn).toHaveBeenCalledTimes(1);
+    const logged = JSON.stringify(warn.mock.calls);
+    expect(logged).toContain(String(20 * 1024));
+    expect(logged).toContain("sidePanel");
+    expect(logged).not.toContain("secret");
+    warn.mockRestore();
   });
 
   it("hands page messages to its plugin and plugin posts to its place only", () => {
