@@ -93,6 +93,7 @@ impl Store {
         &self,
         server: ServerId,
     ) -> Result<Vec<PrivateConversationSummary>> {
+        self.flush_pending()?;
         let mut stmt = self.conn.prepare(
             "SELECT m.id, m.conversation_kind, m.conversation_key, m.sender_name,
                     m.sender_cert_hash, m.sent_at, m.body,

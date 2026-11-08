@@ -13,6 +13,8 @@ const INTERVAL: Duration = Duration::from_secs(60 * 60);
 /// History is pruned on every Nth round, so once a day with the hourly [`INTERVAL`].
 const HISTORY_EVERY: u64 = 24;
 const MILLIS_PER_DAY: i64 = 24 * 60 * 60 * 1000;
+/// Queued chat messages are written in batches this often (spec 12 FR-12.5).
+const CHAT_FLUSH_INTERVAL: Duration = Duration::from_secs(5);
 
 /// Messages sent before this moment are older than `days` days.
 pub(crate) fn history_cutoff(now: UnixMillis, days: u32) -> UnixMillis {
@@ -31,6 +33,25 @@ impl Engine {
                     .run_maintenance(round.is_multiple_of(HISTORY_EVERY))
                     .await;
                 round += 1;
+            }
+        });
+    }
+
+    /// Flushes queued chat messages to disk (spec 12 FR-12.5). Called on a timer, on shutdown
+    /// and from the app-exit path, so a clean exit never loses messages.
+    pub fn flush_chat_pending(&self) {
+        if let Err(e) = lock(&self.store_handle()).flush_pending() {
+            tracing::warn!(error = %e, "flushing queued chat messages failed");
+        }
+    }
+
+    pub(crate) fn start_chat_flush(&self) {
+        let engine = self.clone();
+        self.runtime().spawn(async move {
+            let mut interval = tokio::time::interval(CHAT_FLUSH_INTERVAL);
+            loop {
+                interval.tick().await;
+                engine.flush_chat_pending();
             }
         });
     }

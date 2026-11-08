@@ -22,6 +22,7 @@ impl Store {
     /// Saves how the download of the offer in message `message_id` ended. Unknown messages are
     /// ignored; a later download replaces the earlier result.
     pub fn save_file_card(&self, message_id: i64, record: &FileCardRecord) -> Result<()> {
+        self.flush_pending()?;
         let (state, path) = match record {
             FileCardRecord::Done { path } => ("done", Some(path.as_str())),
             FileCardRecord::Mismatch => ("mismatch", None),
