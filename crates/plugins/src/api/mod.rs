@@ -21,5 +21,6 @@ pub mod theme;
 pub mod timers;
 pub mod ui;
 pub mod v1_1;
+pub mod v1_2;
 pub mod webview;
 pub mod webview_status;

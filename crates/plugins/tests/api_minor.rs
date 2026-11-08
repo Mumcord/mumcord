@@ -1,7 +1,7 @@
 //! Linking by API minor (FR-9.5 … FR-9.8, AC-9.25 unit part): a plugin is linked against
 //! exactly the minor its manifest declares, and a 1.0 plugin keeps working as on 0.6.x next to
-//! 1.1 plugins. The plugins are built from `fixtures/plugin.wat` against `wit/1.0.0` or
-//! `wit/1.1.0`.
+//! 1.1 and 1.2 plugins. The plugins are built from `fixtures/plugin.wat` against `wit/1.0.0`,
+//! `wit/1.1.0` or `wit/1.2.0`.
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -101,7 +101,11 @@ fn logged(host: &PluginHost, id: &str, lines: usize) -> Vec<String> {
 fn components_tell_which_minor_they_import() {
     let engine =
         wasmtime::Engine::new(wasmtime::Config::new().wasm_component_model(true)).expect("engine");
-    for (version, api) in [("1.0.0", ApiMinor::V1_0), ("1.1.0", ApiMinor::V1_1)] {
+    for (version, api) in [
+        ("1.0.0", ApiMinor::V1_0),
+        ("1.1.0", ApiMinor::V1_1),
+        ("1.2.0", ApiMinor::V1_2),
+    ] {
         let component =
             wasmtime::component::Component::new(&engine, component(version)).expect("compiles");
         assert_eq!(imports_api(&component), Some(api));
@@ -114,7 +118,11 @@ fn components_tell_which_minor_they_import() {
 fn each_plugin_is_linked_against_its_declared_minor() {
     let root = tempfile::tempdir().expect("temp dir");
     let mut host = host();
-    for (id, version, api) in [("old", "1.0.0", "^1.0"), ("new", "1.1.0", "^1.1")] {
+    for (id, version, api) in [
+        ("old", "1.0.0", "^1.0"),
+        ("new", "1.1.0", "^1.1"),
+        ("newest", "1.2.0", "^1.2"),
+    ] {
         host.load(&plugin_dir(root.path(), id, &component(version), api), None)
             .expect("loads");
         host.enable(id).expect("starts");
@@ -122,6 +130,7 @@ fn each_plugin_is_linked_against_its_declared_minor() {
     }
     assert_eq!(logged(&host, "old", 2), ["1.0.0", "E"]);
     assert_eq!(logged(&host, "new", 2), ["1.1.0", "E"]);
+    assert_eq!(logged(&host, "newest", 2), ["1.2.0", "E"]);
 }
 
 /// FR-9.8: the manifest's minor and the component's imports must agree, so a plugin that says
@@ -133,6 +142,8 @@ fn a_component_built_for_another_minor_is_refused() {
     for (id, version, api) in [
         ("claims-old", "1.1.0", "^1.0"),
         ("claims-new", "1.0.0", "^1.1"),
+        ("claims-1-1", "1.2.0", "^1.1"),
+        ("claims-1-2", "1.1.0", "^1.2"),
     ] {
         let error = host
             .load(&plugin_dir(root.path(), id, &component(version), api), None)
