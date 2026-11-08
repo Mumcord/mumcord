@@ -1,8 +1,8 @@
 {
-  "label": "Clippy, the tips helper",
+  "label": "Aaron, the tips helper",
   "greeting": {
-    "title": "Hi, I'm Clippy!",
-    "body": "I know my way around Mumcord. Want a quick tour? It takes about a minute. If not now, you'll find me in Settings → About → Tips.",
+    "title": "Hi, I'm Aaron!",
+    "body": "I'm an axolotl, and I know my way around Mumcord. Want a quick tour? It takes about a minute. If not now, you'll find me in Settings → About → Tips.",
     "start": "Show me",
     "later": "Not now"
   },
@@ -10,6 +10,7 @@
   "back": "Back",
   "next": "Next",
   "done": "Done",
+  "skip": "Skip tour",
   "close": "Close tips",
   "tips": {
     "servers": {
@@ -22,7 +23,7 @@
     },
     "talk": {
       "title": "How you talk",
-      "body": "Push-to-talk or voice activation? Choose in Settings → Voice & Audio. Push-to-talk also works with mouse buttons."
+      "body": "Push-to-talk or voice activation? Choose in Settings → Voice & Audio, or open Voice settings… with the small arrow next to the microphone. Push-to-talk also works with mouse buttons."
     },
     "panel": {
       "title": "Your user panel",
@@ -42,7 +43,7 @@
     },
     "themes": {
       "title": "Your look",
-      "body": "Settings → Appearance has themes in dark and light. A server can get its own: right-click it and choose Theme."
+      "body": "The gear at the bottom left switches between dark and light. Settings → Appearance has more themes, and a server can get its own: right-click it and choose Theme."
     },
     "end": {
       "title": "That's it!",

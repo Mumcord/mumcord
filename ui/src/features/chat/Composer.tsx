@@ -568,6 +568,7 @@ export function Composer({
       <form
         ref={formRef}
         className="chat-composer"
+        data-tour="chat"
         data-dragging={dragging || nativeOver ? "true" : undefined}
         onDragEnter={onDragEnter}
         onDragLeave={onDragLeave}

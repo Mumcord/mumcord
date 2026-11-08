@@ -1,0 +1,272 @@
+/* Aaron, the axolotl mascot (#637). Idle he floats, breathes, blinks and sways his arms; talking
+   makes his gills pulse like an equalizer; pointing leans him toward the target. With reduced
+   motion everything holds still and poses switch instantly; only the eyes still follow. */
+.aaron {
+  overflow: visible;
+}
+
+/* A thin light rim keeps his dark outline readable on dark backgrounds too. */
+.aaron__lean {
+  filter: drop-shadow(0 0 1.5px rgb(255 255 255 / 45%));
+}
+
+.aaron__float {
+  animation: aaron-float 3.6s ease-in-out infinite;
+}
+
+.aaron__breathe {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: aaron-breathe 3.6s ease-in-out infinite;
+}
+
+.aaron__shadow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: aaron-shadow 3.6s ease-in-out infinite;
+}
+
+.aaron__lid {
+  transform: scaleY(0);
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: aaron-blink 5.2s infinite;
+}
+
+.aaron__mouth-talk {
+  opacity: 0;
+  transform: scaleY(var(--aaron-mouth, 1));
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.aaron--talking .aaron__mouth-idle {
+  opacity: 0;
+}
+
+.aaron--talking .aaron__mouth-talk {
+  opacity: 1;
+}
+
+.aaron__eq {
+  transform-origin: 0 0;
+}
+
+.aaron--talking .aaron__eq {
+  animation: aaron-eq 0.5s ease-in-out infinite alternate;
+}
+
+.aaron--talking .aaron__gills {
+  animation: aaron-shine 0.4s ease-in-out infinite alternate;
+}
+
+.aaron__rings {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.aaron--talking .aaron__rings {
+  opacity: 1;
+}
+
+.aaron__spark {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.aaron--talking .aaron__spark {
+  animation: aaron-spark 1.6s ease-out infinite;
+}
+
+.aaron__arm-sway {
+  animation: aaron-arm-sway 3.6s ease-in-out infinite;
+}
+
+.aaron__arm-sway--right {
+  animation-name: aaron-arm-sway-right;
+}
+
+/* Only the arm that points is shown; the other one keeps resting. */
+.aaron__arm-point,
+.aaron--pointing:not(.aaron--point-right) .aaron__arm-rest,
+.aaron--point-right .aaron__arm-rest-right {
+  display: none;
+}
+
+.aaron--pointing:not(.aaron--point-right) .aaron__arm-point:not(.aaron__arm-point--right),
+.aaron--point-right .aaron__arm-point--right {
+  display: inline;
+}
+
+/* The slight overshoot makes the arm and the lean settle instead of stopping dead. */
+.aaron__arm-point,
+.aaron__forearm,
+.aaron__lean {
+  transition: transform 0.3s cubic-bezier(0.3, 1.45, 0.55, 1);
+}
+
+/* Wind-up: the arm swings in from below and the body gives a small hop. */
+.aaron--pointing .aaron__arm-pop {
+  animation: aaron-point-in 0.32s ease-out;
+}
+
+.aaron--point-right .aaron__arm-pop {
+  animation-name: aaron-point-in-right;
+}
+
+.aaron--pointing .aaron__hop {
+  animation: aaron-hop 0.32s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aaron * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .aaron--talking .aaron__spark {
+    opacity: 0.9;
+  }
+}
+
+@keyframes aaron-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes aaron-breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.008, 1.018);
+  }
+}
+
+@keyframes aaron-shadow {
+  50% {
+    opacity: 0.75;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes aaron-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(0);
+  }
+
+  95% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes aaron-eq {
+  from {
+    transform: scaleX(0.82);
+  }
+
+  to {
+    transform: scaleX(1.14);
+  }
+}
+
+@keyframes aaron-shine {
+  to {
+    filter: brightness(1.15);
+  }
+}
+
+@keyframes aaron-spark {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.6);
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-22px) scale(1.1);
+  }
+}
+
+@keyframes aaron-arm-sway {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  50% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes aaron-arm-sway-right {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes aaron-point-in {
+  0% {
+    transform: rotate(-62deg) scale(0.94);
+  }
+
+  55% {
+    transform: rotate(7deg);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes aaron-point-in-right {
+  0% {
+    transform: rotate(62deg) scale(0.94);
+  }
+
+  55% {
+    transform: rotate(-7deg);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes aaron-hop {
+  0% {
+    transform: none;
+  }
+
+  30% {
+    transform: translateY(2px);
+  }
+
+  65% {
+    transform: translateY(-2.5px);
+  }
+
+  100% {
+    transform: none;
+  }
+}

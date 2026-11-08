@@ -106,7 +106,7 @@ export function SetupCard() {
   );
 }
 
-/** Clippy's tour of the main window (#637), on demand; it starts once the settings are closed. */
+/** Aaron's tour of the main window (#637), on demand; it starts once the settings are closed. */
 export function TipsCard() {
   const { t } = useTranslation("settings");
   const { closeOverlay } = useView();

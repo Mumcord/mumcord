@@ -130,7 +130,7 @@ function MainScreen() {
           <AdminConfirmHost />
         </LazyBoundary>
       )}
-      {/* Clippy's tips (#637) stay out of the way while the settings are open. */}
+      {/* Aaron's tips (#637) stay out of the way while the settings are open. */}
       {overlay === null && <TipsHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
       <TraySync onOpenSettings={openSettings} />

@@ -39,7 +39,7 @@ export function ViewProvider({ children }: { children: ReactNode }) {
       ...state,
       finishWizard: () => {
         // Only the first-start wizard ends here (a rerun from Settings closes on its own), so
-        // this is the one moment Clippy offers the tour by itself (#637).
+        // this is the one moment Aaron offers the tour by itself (#637).
         offerTour();
         dispatch({ type: "finishWizard" });
       },

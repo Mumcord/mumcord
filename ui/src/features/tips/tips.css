@@ -1,6 +1,29 @@
-/* Clippy's tips (#637): the character in the lower right corner of the main window, above the
-   message bar, with its speech bubble to the left. Below the toasts (z-index 50), so a new
-   message is never hidden behind it. */
+/* Aaron's tips (#637): the mascot with its speech bubble, floating next to the element of the
+   current tip (placed by TipsHost) or in the lower right corner above the message bar. Below the
+   toasts (z-index 50), so a new message is never hidden behind it. */
+/* During the tour the rest of the window is dimmed and the target sits in a ringed spotlight.
+   The layer is decoration only: it lets every click through, so the app stays usable. */
+.tips-dim {
+  --tips-dim: color-mix(in srgb, var(--color-backdrop) 75%, transparent);
+
+  position: fixed;
+  inset: 0;
+  z-index: 47;
+  background: var(--tips-dim);
+  pointer-events: none;
+}
+
+/* Left, top, width and height come inline: the target's box. The huge shadow dims the rest. */
+.tips-dim--spot {
+  inset: auto;
+  border-radius: var(--radius-lg);
+  outline: 2px solid var(--color-focus);
+  background: none;
+  box-shadow:
+    0 0 1rem 0.25rem color-mix(in srgb, var(--color-focus) 45%, transparent),
+    0 0 0 200vmax var(--tips-dim);
+}
+
 .tips {
   position: fixed;
   right: var(--space-5);
@@ -8,16 +31,31 @@
   z-index: 48;
   display: flex;
   align-items: flex-end;
-  gap: var(--space-3);
+  gap: var(--space-2);
   pointer-events: none;
+}
+
+/* Next to a target in the upper half Aaron stands at the top, level with the bubble's title. */
+.tips--top {
+  align-items: flex-start;
+}
+
+/* Placed by TipsHost: left and top come inline. */
+.tips[style] {
+  right: auto;
+  bottom: auto;
+}
+
+/* Aaron stands left of the bubble when the target is on his left. */
+.tips--mascot-left {
+  flex-direction: row-reverse;
 }
 
 .tips__bubble {
   position: relative;
+  flex: none;
   box-sizing: border-box;
-  width: min(21rem, calc(100vw - 12rem));
-  /* Lifts the tail to Clippy's face. */
-  margin-bottom: 1.5rem;
+  width: min(21rem, calc(100vw - 14rem));
   padding: var(--space-4);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-lg);
@@ -27,12 +65,12 @@
   pointer-events: auto;
 }
 
-/* The tail points at Clippy. */
+/* The tail points at Aaron's face. */
 .tips__bubble::after {
   content: "";
   position: absolute;
   right: -0.5625rem;
-  bottom: 1.75rem;
+  bottom: 5.5rem;
   width: 1rem;
   height: 1rem;
   border-top: 1px solid var(--color-border-strong);
@@ -90,28 +128,52 @@
   color: var(--color-text);
 }
 
-.clippy {
+.tips--top .tips__bubble::after {
+  top: 1.75rem;
+  bottom: auto;
+}
+
+.tips--mascot-left .tips__bubble::after {
+  right: auto;
+  left: -0.5625rem;
+  border-top: none;
+  border-right: none;
+  border-bottom: 1px solid var(--color-border-strong);
+  border-left: 1px solid var(--color-border-strong);
+}
+
+/* Aaron beside the bubble, lifted off the app by a soft shadow. */
+.tips__mascot {
   flex: none;
-  width: 7rem;
-  height: auto;
+  width: 9rem;
   filter: drop-shadow(0 0.5rem 0.75rem rgb(0 0 0 / 35%));
 }
 
+.tips__mascot > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* With reduced motion he jumps from target to target instead of gliding. */
 @media (prefers-reduced-motion: no-preference) {
-  .tips {
+  .tips,
+  .tips-dim {
     animation: tips-in var(--duration-normal) var(--ease-out);
+    transition:
+      left calc(var(--duration-normal) * 2) var(--ease-out),
+      top calc(var(--duration-normal) * 2) var(--ease-out);
   }
 
-  .clippy__flame {
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
-    animation: clippy-flicker 1.4s ease-in-out infinite alternate;
+  .tips-dim {
+    animation-name: tips-fade-in;
+    transition-property: left, top, width, height;
   }
+}
 
-  .clippy__eyes {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: clippy-blink 5s infinite;
+@keyframes tips-fade-in {
+  from {
+    opacity: 0;
   }
 }
 
@@ -119,31 +181,5 @@
   from {
     opacity: 0;
     transform: translateY(1rem);
-  }
-}
-
-@keyframes clippy-flicker {
-  from {
-    transform: scale(1, 1) rotate(-2deg);
-  }
-
-  50% {
-    transform: scale(0.94, 1.06) rotate(1deg);
-  }
-
-  to {
-    transform: scale(1.03, 0.97) rotate(2deg);
-  }
-}
-
-@keyframes clippy-blink {
-  0%,
-  94%,
-  100% {
-    transform: scaleY(1);
-  }
-
-  97% {
-    transform: scaleY(0.1);
   }
 }
