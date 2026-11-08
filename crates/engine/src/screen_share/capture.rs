@@ -34,6 +34,13 @@ pub trait CaptureSource: Send {
         None
     }
 
+    /// The picked window's title, else its app's name, for the user's own live bar (issue
+    /// #558); `None` for a screen or where the platform does not say. It stays on this device:
+    /// never sent to viewers, the relay or the server, and never logged (FR-7.87).
+    fn title(&self) -> Option<String> {
+        None
+    }
+
     /// The share's sound for `request`, taken once when the share starts (FR-7.76). Only asked
     /// where the system can share sound at all; [`SoundOutcome::NoSound`] where the capture has
     /// none.
@@ -98,6 +105,15 @@ impl CaptureSource for TestPattern {
             SharePick::Screen => ShareKind::Screen,
             SharePick::Window(_) => ShareKind::Window,
         })
+    }
+
+    /// Like Wayland, the test picker knows only an app hint for a window.
+    fn title(&self) -> Option<String> {
+        use crate::test_hooks::SharePick;
+        match &self.pick {
+            Some(SharePick::Window(hint)) => hint.clone(),
+            _ => None,
+        }
     }
 
     #[cfg(all(target_os = "linux", feature = "test-backend"))]
