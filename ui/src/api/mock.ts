@@ -34,6 +34,7 @@ import type {
   ActiveAudioProfile,
   BanEntry,
   PmConversationPrefs,
+  PersonAction,
   PersonTarget,
   PrivateConversation,
   ApiError,
@@ -901,8 +902,16 @@ function demoChannels(serverName: string): ChannelInfo[] {
     position,
     // The demo user moderates, so the tree shows "Move users here…" and dragging (#172), the
     // server menu offers the ban list (#436), the person menu offers Kick… and Ban… (#253), and
-    // the Server administration window grows its Registered users tab (#256).
-    permissions: { ...allow, moveUsers: true, ban: true, kick: true, register: true },
+    // the Server administration window grows its Registered users tab (#256), and the chat box
+    // offers the admin commands (#378).
+    permissions: {
+      ...allow,
+      moveUsers: true,
+      ban: true,
+      kick: true,
+      muteDeafen: true,
+      register: true,
+    },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
@@ -3133,10 +3142,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     personMove: (serverId, session, channelId) => {
       requireSession(serverId);
       requireUser(session);
-      // Like a real server, a refused move only answers with a denial; nobody moves.
-      if (!requireChannel(channelId).permissions.moveUsers) return Promise.resolve(null);
+      // Like a real server, a refused move answers nothing that confirms it; nobody moves.
+      if (!requireChannel(channelId).permissions.moveUsers) return Promise.resolve("unconfirmed");
       updateUser(session, { channelId });
-      return Promise.resolve(null);
+      return Promise.resolve("confirmed");
     },
     personSetLocalMute: (serverId, session, muted) => {
       requireSession(serverId);
@@ -4297,6 +4306,71 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       personTargets.delete(serverId);
       return Promise.resolve(null);
     },
+    // Epic 4, issue #378: the actions a built-in admin command runs. Like the engine, the mock
+    // checks the right the server would check and answers with the person's new state.
+    personSetServerMute: (serverId, session, muted) => {
+      requireSession(serverId);
+      return adminStateChange(
+        session,
+        "muteDeafen",
+        { serverMute: muted },
+        "this person is in the channel",
+      );
+    },
+    personSetServerDeafen: (serverId, session, deaf) => {
+      requireSession(serverId);
+      // Deafening always mutes too, as a standard server does (spec 10, A5).
+      return adminStateChange(
+        session,
+        "muteDeafen",
+        deaf ? { serverDeaf: true, serverMute: true } : { serverDeaf: false },
+        "this person is in the channel",
+      );
+    },
+    personSetPrioritySpeaker: (serverId, session, priority) => {
+      requireSession(serverId);
+      return adminStateChange(
+        session,
+        "muteDeafen",
+        { prioritySpeaker: priority },
+        "this person is in the channel",
+      );
+    },
+    personRegister: (serverId, session) => {
+      requireSession(serverId);
+      const user = requireUser(session);
+      if (user.registered) return fail("invalidInput", "this person is registered already");
+      if (requireSnapshot().selfSession === session) {
+        return fail("invalidInput", "this action never offers yourself");
+      }
+      // Register others is a root-channel right, unlike mute and move which the person's own
+      // channel decides (FR-10.20).
+      if (!requireChannel(0).permissions.register) {
+        return fail("permissionDenied", "register right in the root channel");
+      }
+      updateUser(session, { registered: true });
+      return Promise.resolve("confirmed");
+    },
+    personMoveAll: (serverId, channelId) => {
+      const snap = requireSession(serverId);
+      const own = snap.users.find((user) => user.session === snap.selfSession);
+      if (own === undefined) return fail("notConnected", "the mock is not in a channel");
+      const source = requireChannel(own.channelId);
+      const people = snap.users
+        .filter((user) => user.channelId === own.channelId)
+        .map((user) => user.session);
+      const total = people.length;
+      if (own.channelId === channelId || total === 0) {
+        return Promise.resolve({ kind: "done", moved: 0, total });
+      }
+      requireChannel(channelId);
+      if (!source.permissions.moveUsers) {
+        return fail("permissionDenied", "move right in this channel");
+      }
+      for (const session of people) updateUser(session, { channelId });
+      const moved = people.filter((session) => requireUser(session).channelId === channelId).length;
+      return Promise.resolve({ kind: "done", moved, total });
+    },
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
@@ -4694,6 +4768,28 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function removePerson(serverId: number, session: number): void {
     currentServerId = serverId;
     mock.removeUser(session);
+  }
+
+  /**
+   * One change of another person's state, as the mock server answers it (issue #378): the right of
+   * the channel they are in decides, yourself is never offered, and a change answers with the
+   * person's new state — the `confirmed` the command's result line waits for.
+   */
+  function adminStateChange(
+    session: number,
+    right: "muteDeafen",
+    patch: Partial<User>,
+    why: string,
+  ): Promise<PersonAction> {
+    const user = requireUser(session);
+    if (requireSnapshot().selfSession === session) {
+      return fail("invalidInput", "this action never offers yourself");
+    }
+    if (!requireChannel(user.channelId).permissions[right]) {
+      return fail("permissionDenied", `${right} right in the channel ${why}`);
+    }
+    updateUser(session, patch);
+    return Promise.resolve("confirmed");
   }
 
   const mock: MockControls = {

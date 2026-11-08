@@ -202,6 +202,7 @@ describe("plugin chat UI", () => {
       <main>
         <Composer
           target={{ kind: "channel", channelId: 1 }}
+          conversation={{ kind: "channel", channelId: 1 }}
           limits={{ text: 5000, image: 100_000, allowHtml: true }}
           label="Message #Lobby"
           blockedReason={null}
@@ -214,7 +215,7 @@ describe("plugin chat UI", () => {
   it("autocompletes plugin commands with the plugin name", async () => {
     const input = renderComposer();
     fireEvent.change(input, { target: { value: "/r" } });
-    const list = await screen.findByRole("listbox", { name: "Plugin commands" });
+    const list = await screen.findByRole("listbox", { name: "Slash commands" });
     expect(list.textContent).toContain("/roll");
     expect(list.textContent).toContain("Dice roller");
     expect(input.getAttribute("aria-controls")).toBe(list.id);
@@ -235,7 +236,7 @@ describe("plugin chat UI", () => {
     const input = renderComposer();
     await screen.findByRole("textbox");
     fireEvent.change(input, { target: { value: "/r" } });
-    await screen.findByRole("listbox", { name: "Plugin commands" });
+    await screen.findByRole("listbox", { name: "Slash commands" });
     fireEvent.change(input, { target: { value: "/roll 2d6" } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(run).toHaveBeenCalledWith("/roll 2d6", getShownServerId());
@@ -250,7 +251,7 @@ describe("plugin chat UI", () => {
     const send = vi.spyOn(api, "sendChannelMessage");
     const input = renderComposer();
     fireEvent.change(input, { target: { value: "/r" } });
-    await screen.findByRole("listbox", { name: "Plugin commands" });
+    await screen.findByRole("listbox", { name: "Slash commands" });
     fireEvent.change(input, { target: { value: "/shrug" } });
     fireEvent.keyDown(input, { key: "Enter" });
     await waitFor(() => {

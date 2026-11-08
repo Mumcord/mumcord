@@ -29,6 +29,7 @@ import { conversationInfo } from "./conversationInfo";
 import { messageLimits } from "./images";
 import { createMessageAnnouncer } from "./messageAnnouncer";
 import { MessageList } from "./MessageList";
+import { usePrivateLines } from "./privateLines";
 import { useBlockedView } from "./blockedView";
 import { cardAnnouncement, createLineAnnouncer } from "../plugins/chat";
 import { PinnedInfoBox, type PinnedBlock } from "./PinnedInfo";
@@ -88,6 +89,8 @@ function ConversationChat({
   const server = useServerState();
   const fullLog = useConversationLog(conversation);
   const serverId = shownServerId();
+  // What the admin's own commands answered here, at their time (issue #378, FR-10.61).
+  const privateLines = usePrivateLines(serverId, conversation);
   const blocked = useBlockedView(fullLog, serverId, conversation);
   const log = blocked.log;
   const info = conversationInfo(server, conversation, fullLog.messages);
@@ -282,9 +285,11 @@ function ConversationChat({
         onReply={blockedReason === null ? setReplyTo : undefined}
         listKey={`${String(serverId)}:${JSON.stringify(conversation)}`}
         collapsedIds={blocked.collapsedIds}
+        privateLines={privateLines}
       />
       <Composer
         target={info.target}
+        conversation={conversation}
         limits={limits}
         label={t("composer.label", { name: title })}
         blockedReason={blockedReason}

@@ -48,6 +48,25 @@ export function endTime(entry: BanEntry): Date | null {
   return new Date(start.getTime() + entry.durationSecs * 1000);
 }
 
+/** What a ban row is called, for its own labels: its name, else the address it bans (FR-10.51). */
+export function banName(entry: BanEntry): string {
+  return plain(entry.name) || `${maskAddress(entry.address, entry.mask)}/${String(entry.mask)}`;
+}
+
+/** When a ban ends, in words: "permanent", "Expired", or the date in the user's locale (FR-10.51). */
+export function endsText(
+  entry: BanEntry,
+  t: (key: "endsExpired" | "endsPermanent" | "endsUnknown") => string,
+  language: string,
+): string {
+  if (entry.expired) return t("endsExpired");
+  if (entry.durationSecs === 0) return t("endsPermanent");
+  const end = endTime(entry);
+  return end === null
+    ? t("endsUnknown")
+    : new Intl.DateTimeFormat(language, { dateStyle: "medium" }).format(end);
+}
+
 /** Whether the window can send this as an address (FR-10.51). */
 export function looksLikeAddress(value: string): boolean {
   const groups = value.split(".");
