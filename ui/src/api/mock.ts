@@ -375,12 +375,13 @@ const DEFAULT_SETTINGS: Settings = {
   soundTheme: "classic",
   notifications: "both",
   activityNotify: {
-    joins: false,
-    screenShare: true,
-    watchParty: true,
-    pluginActivity: true,
-    pluginEvent: true,
+    joins: "inApp",
+    screenShare: "inApp",
+    watchParty: "inApp",
+    pluginActivity: "inApp",
+    pluginEvent: "inApp",
   },
+  keepActivityHistory: false,
   logLevel: "info",
   sendDefaultAvatar: true,
   autostart: false,
@@ -4040,7 +4041,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     notifyActivity: (notice) => {
       if (dndActive()) return Promise.resolve("none");
-      const mode = settings.notifications;
+      const mode =
+        notice.kind === null ? settings.notifications : settings.activityNotify[notice.kind];
       let outcome: NotifyOutcome;
       if (mode === "off") outcome = "none";
       else if (mode === "desktop") outcome = "desktop";

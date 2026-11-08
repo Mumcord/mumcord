@@ -181,7 +181,11 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   top("voiceAudio", "audio.duckingLevel", ["videoDuckingPercent"]),
   top("voiceAudio", "sounds.theme", ["soundTheme"]),
   ...SOUND_KEYS.map(sound),
-  top("chatNotifications", "notifications.legend", ["notifications"]),
+  top("chatNotifications", "notifications.messages", ["notifications"]),
+  top("chatNotifications", "notifications.activityTitle", ["activityNotify"]),
+  top("privacy", "activityHistory.keep", ["keepActivityHistory"], {
+    preset: "keepActivityHistory",
+  }),
   {
     id: "dndFollowSystem",
     section: "chatNotifications",

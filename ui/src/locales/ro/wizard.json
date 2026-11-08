@@ -33,6 +33,7 @@
     "voice": "Voce",
     "setupStyle": "Stilul configurării",
     "privateMessages": "Mesaje private",
+    "notifications": "Notificări",
     "connections": "Conexiuni",
     "features": "Funcții",
     "appearance": "Aspect",
@@ -146,6 +147,10 @@
     "subtitle": "Mesajele private sunt conversații între două persoane. Chatul canalului nu este afectat de această alegere.",
     "local": "Filtrarea se face pe calculatorul tău. Expeditorii nu sunt înștiințați. Mai târziu poți seta o altă regulă pentru fiecare server."
   },
+  "notifications": {
+    "title": "Cum să te anunțe Mumcord?",
+    "subtitle": "Alege cum ajunge la tine fiecare tip de noutăți. Poți schimba asta mai târziu în Setări → Notificări."
+  },
   "connections": {
     "title": "Conexiuni și conținut",
     "subtitle": "Unele funcții te conectează direct la alți utilizatori Mumcord, iar o parte din conținutul chatului se încarcă de pe alte site-uri. Alege ce ți se potrivește.",
@@ -185,6 +190,7 @@
       "identity": "Identitate",
       "voice": "Voce",
       "privateMessages": "Mesaje private",
+      "notifications": "Notificări",
       "connections": "Conexiuni",
       "chatContent": "Conținutul chatului",
       "features": "Funcții",
@@ -195,10 +201,12 @@
     "identityDetail": "Salvată în depozitul de chei a sistemului",
     "voiceDetail": "Eliminarea zgomotului: {{noise}}",
     "pmDetail": "Canalul meu {{channel}} · conversații acceptate {{accepted}} · cereri {{requests}}",
+    "notificationsTitle": "Mesaje noi: {{mode}}",
+    "notificationsDetail": "Notificări de activitate: {{on}} din {{total}} pornite",
     "contentTitle": "Previzualizări de linkuri {{previews}}",
     "contentDetail": "Imagini la dimensiune completă {{images}} · sincronizarea istoricului {{sync}}",
     "featuresTitle": "Suprapunere în joc {{overlay}}",
-    "featuresDetail": "Urmează Nu deranja din sistem {{dnd}} · se redă acum {{playing}} · joc acum {{gaming}}",
+    "featuresDetail": "Urmează Nu deranja din sistem {{dnd}} · se redă acum {{playing}} · joc acum {{gaming}} · istoricul activității {{history}}",
     "effectsDetail": "Efecte vizuale {{effects}}",
     "startupTitle": "Pornire la autentificare {{login}}",
     "startupDetail": "Pornire minimizată {{minimized}} · linkuri mumble:// {{links}}",

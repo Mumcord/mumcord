@@ -33,6 +33,7 @@
     "voice": "Balss",
     "setupStyle": "Iestatīšanas stils",
     "privateMessages": "Privātās ziņas",
+    "notifications": "Paziņojumi",
     "connections": "Savienojumi",
     "features": "Funkcijas",
     "appearance": "Izskats",
@@ -146,6 +147,10 @@
     "subtitle": "Privātās ziņas ir tērzēšana vienam ar vienu. Šī izvēle neietekmē kanāla tērzēšanu.",
     "local": "Filtrēšana notiek jūsu datorā. Sūtītājiem netiek paziņots. Vēlāk varēsiet iestatīt citu noteikumu katram serverim."
   },
+  "notifications": {
+    "title": "Kā Mumcord jums jāpaziņo?",
+    "subtitle": "Izvēlieties, kā jūs sasniedz katrs jaunumu veids. Vēlāk to varat mainīt sadaļā Iestatījumi → Paziņojumi."
+  },
   "connections": {
     "title": "Savienojumi un saturs",
     "subtitle": "Dažas funkcijas savieno jūs tieši ar citiem Mumcord lietotājiem, un daļa tērzēšanas satura tiek ielādēta no citām vietnēm. Izvēlieties, kas jums der.",
@@ -185,6 +190,7 @@
       "identity": "Identitāte",
       "voice": "Balss",
       "privateMessages": "Privātās ziņas",
+      "notifications": "Paziņojumi",
       "connections": "Savienojumi",
       "chatContent": "Tērzēšanas saturs",
       "features": "Funkcijas",
@@ -195,10 +201,12 @@
     "identityDetail": "Saglabāta jūsu sistēmas atslēgu saišķī",
     "voiceDetail": "Trokšņu slāpēšana: {{noise}}",
     "pmDetail": "Mans kanāls {{channel}} · pieņemtās tērzēšanas {{accepted}} · pieprasījumi {{requests}}",
+    "notificationsTitle": "Jaunas ziņas: {{mode}}",
+    "notificationsDetail": "Darbību paziņojumi: ieslēgti {{on}} no {{total}}",
     "contentTitle": "Saišu priekšskatījumi {{previews}}",
     "contentDetail": "Pilna izmēra attēli {{images}} · vēstures sinhronizācija {{sync}}",
     "featuresTitle": "Pārklājums spēlē {{overlay}}",
-    "featuresDetail": "Sekot sistēmas režīmam “Netraucēt” {{dnd}} · tagad skan {{playing}} · tagad spēlē {{gaming}}",
+    "featuresDetail": "Sekot sistēmas režīmam “Netraucēt” {{dnd}} · tagad skan {{playing}} · tagad spēlē {{gaming}} · darbību vēsture {{history}}",
     "effectsDetail": "Vizuālie efekti {{effects}}",
     "startupTitle": "Palaist pieteikšanās brīdī {{login}}",
     "startupDetail": "Palaist minimizētu {{minimized}} · mumble:// saites {{links}}",

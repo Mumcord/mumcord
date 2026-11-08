@@ -450,12 +450,16 @@
   },
   "notifications": {
     "title": "Oznámení",
-    "legend": "Oznámení o nových zprávách",
-    "explanation": "Pro nové zprávy ve tvém kanálu, sledovaných kanálech a soukromých chatech, kromě chatu, který máš právě otevřený.",
-    "inApp": "V aplikaci: malé vyskakovací okno v Mumcordu, když je v popředí",
-    "desktop": "Na ploše: systémové oznámení",
-    "both": "Obojí: vyskakovací okno, když je Mumcord v popředí, jinak systémové oznámení",
-    "off": "Vypnuto",
+    "explanation": "Jak vás Mumcord informuje o nových zprávách a dění na vašich serverech. Každý druh má vlastní volbu.",
+    "messages": "Nové zprávy",
+    "messagesHint": "Váš kanál, sledované kanály a soukromé chaty",
+    "mode": {
+      "off": "Vypnuto",
+      "inApp": "V aplikaci",
+      "desktop": "Systémové",
+      "both": "Obojí"
+    },
+    "modesHint": "V aplikaci: malé vyskakovací okno v Mumcordu, když je v popředí. Systémové: oznámení od vašeho operačního systému. Obojí: vyskakovací okno, když je Mumcord v popředí, jinak systémové oznámení. Pro chat, na který se právě díváte, ani v režimu Nerušit se nic nezobrazí.",
     "activityTitle": "Oznámení o aktivitě",
     "activity": {
       "screenShare": "Někdo začne sdílet obrazovku",
@@ -1291,6 +1295,8 @@
   },
   "activityHistory": {
     "title": "Historie aktivity",
+    "keep": "Ponechat historii aktivity po restartu",
+    "keepHint": "Ukládá, kdo se připojil, odešel, změnil kanál, sdílel obrazovku nebo zahájil společné sledování, aby přehled zůstal i po restartu. Vypnuto: přehled je pokaždé prázdný. Vypnutím se uložená data smažou.",
     "clear": "Vymazat historii aktivity",
     "hint": "Odstraní uložený přehled pro všechny servery.",
     "local": "Uloženo jen v tomto zařízení.",

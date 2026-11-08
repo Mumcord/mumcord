@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Aviseringar",
-    "legend": "Aviseringar för nya meddelanden",
-    "explanation": "För nya meddelanden i din kanal, följda kanaler och privata chattar, utom chatten du tittar på.",
-    "inApp": "I appen: en liten pop-up i Mumcord när det är i förgrunden",
-    "desktop": "Skrivbord: en systemavisering",
-    "both": "Båda: pop-up när Mumcord är i förgrunden, annars systemavisering",
-    "off": "Av",
+    "explanation": "Hur Mumcord meddelar dig om nya meddelanden och vad som händer på dina servrar. Varje sort har sitt eget val.",
+    "messages": "Nya meddelanden",
+    "messagesHint": "Din kanal, följda kanaler och privata chattar",
+    "mode": {
+      "off": "Av",
+      "inApp": "I appen",
+      "desktop": "System",
+      "both": "Båda"
+    },
+    "modesHint": "I appen: en liten pop-up i Mumcord när det är i förgrunden. System: en avisering från ditt operativsystem. Båda: pop-up'en när Mumcord är i förgrunden, annars en systemavisering. Inget visas för chatten du tittar på eller under Stör ej.",
     "activityTitle": "Aktivitetsaviseringar",
     "activity": {
       "screenShare": "Någon startar en skärmdelning",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Aktivitetshistorik",
+    "keep": "Behåll aktivitetshistorik efter omstart",
+    "keepHint": "Sparar vem som anslöt, lämnade, bytte kanal, delade skärm eller startade en watch party, så att flödet finns kvar efter en omstart. Av: flödet börjar tomt varje gång. När du stänger av det raderas det som sparats.",
     "clear": "Rensa aktivitetshistorik",
     "hint": "Tar bort det sparade flödet för alla servrar.",
     "local": "Sparas bara på den här enheten.",

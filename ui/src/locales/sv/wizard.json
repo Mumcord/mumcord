@@ -33,6 +33,7 @@
     "voice": "Röst",
     "setupStyle": "Installationsstil",
     "privateMessages": "Privata meddelanden",
+    "notifications": "Aviseringar",
     "connections": "Anslutningar",
     "features": "Funktioner",
     "appearance": "Utseende",
@@ -146,6 +147,10 @@
     "subtitle": "Privata meddelanden är samtal mellan två personer. Kanalchatten påverkas inte av det här valet.",
     "local": "Filtreringen sker på din dator. Avsändare får inget besked. Du kan ställa in en annan regel per server senare."
   },
+  "notifications": {
+    "title": "Hur ska Mumcord meddela dig?",
+    "subtitle": "Välj hur varje sorts nyheter når dig. Du kan ändra det senare under Inställningar → Aviseringar."
+  },
   "connections": {
     "title": "Anslutningar och innehåll",
     "subtitle": "Vissa funktioner ansluter dig direkt till andra Mumcord-användare, och en del chattinnehåll läses in från andra webbplatser. Välj vad som passar dig.",
@@ -185,6 +190,7 @@
       "identity": "Identitet",
       "voice": "Röst",
       "privateMessages": "Privata meddelanden",
+      "notifications": "Aviseringar",
       "connections": "Anslutningar",
       "chatContent": "Chattinnehåll",
       "features": "Funktioner",
@@ -195,10 +201,12 @@
     "identityDetail": "Sparad i systemets nyckelring",
     "voiceDetail": "Brusreducering: {{noise}}",
     "pmDetail": "Min kanal {{channel}} · accepterade chattar {{accepted}} · förfrågningar {{requests}}",
+    "notificationsTitle": "Nya meddelanden: {{mode}}",
+    "notificationsDetail": "Aktivitetsaviseringar: {{on}} av {{total}} på",
     "contentTitle": "Länkförhandsvisningar {{previews}}",
     "contentDetail": "Bilder i full storlek {{images}} · historiksynkronisering {{sync}}",
     "featuresTitle": "Överlägg i spel {{overlay}}",
-    "featuresDetail": "Följ systemets Stör ej {{dnd}} · spelas nu {{playing}} · spelar nu {{gaming}}",
+    "featuresDetail": "Följ systemets Stör ej {{dnd}} · spelas nu {{playing}} · spelar nu {{gaming}} · aktivitetshistorik {{history}}",
     "effectsDetail": "Visuella effekter {{effects}}",
     "startupTitle": "Starta vid inloggning {{login}}",
     "startupDetail": "Starta minimerad {{minimized}} · mumble://-länkar {{links}}",

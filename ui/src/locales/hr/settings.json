@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Obavijesti",
-    "legend": "Obavijesti za nove poruke",
-    "explanation": "Za nove poruke u tvom kanalu, praćenim kanalima i privatnim chatovima, osim chata koji upravo gledaš.",
-    "inApp": "U aplikaciji: mali skočni prozor unutar Mumcorda dok je u prvom planu",
-    "desktop": "Desktop: obavijest sustava",
-    "both": "Oboje: skočni prozor dok je Mumcord u prvom planu, inače obavijest sustava",
-    "off": "Isključeno",
+    "explanation": "Kako vas Mumcord obavještava o novim porukama i onome što se događa na vašim poslužiteljima. Svaka vrsta ima vlastiti izbor.",
+    "messages": "Nove poruke",
+    "messagesHint": "Vaš kanal, praćeni kanali i privatni razgovori",
+    "mode": {
+      "off": "Isključeno",
+      "inApp": "U aplikaciji",
+      "desktop": "Sustav",
+      "both": "Oboje"
+    },
+    "modesHint": "U aplikaciji: mali skočni prozor unutar Mumcorda dok je u prvom planu. Sustav: obavijest vašeg operacijskog sustava. Oboje: skočni prozor dok je Mumcord u prvom planu, inače obavijest sustava. Za razgovor koji trenutno gledate ili tijekom načina Ne smetaj ne prikazuje se ništa.",
     "activityTitle": "Obavijesti o aktivnosti",
     "activity": {
       "screenShare": "Netko pokrene dijeljenje zaslona",
@@ -1281,6 +1285,8 @@
   },
   "activityHistory": {
     "title": "Povijest aktivnosti",
+    "keep": "Zadrži povijest aktivnosti nakon ponovnog pokretanja",
+    "keepHint": "Sprema tko se povezao, otišao, promijenio kanal, podijelio zaslon ili pokrenuo watch party, tako da popis ostane i nakon ponovnog pokretanja. Isključeno: popis svaki put počinje prazan. Isključivanjem se izbriše spremljeno.",
     "clear": "Očisti povijest aktivnosti",
     "hint": "Uklanja spremljeni feed za sve poslužitelje.",
     "local": "Sprema se samo na ovom uređaju.",

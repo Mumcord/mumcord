@@ -33,6 +33,7 @@
     "voice": "Voix",
     "setupStyle": "Style de configuration",
     "privateMessages": "Messages privés",
+    "notifications": "Notifications",
     "connections": "Connexions",
     "features": "Fonctionnalités",
     "appearance": "Apparence",
@@ -146,6 +147,10 @@
     "subtitle": "Les messages privés sont des conversations en tête-à-tête. Le chat des salons n'est pas concerné par ce choix.",
     "local": "Le filtrage se fait sur votre ordinateur. Les expéditeurs n'en sont pas informés. Vous pourrez définir une règle différente par serveur plus tard."
   },
+  "notifications": {
+    "title": "Comment Mumcord doit-il vous prévenir ?",
+    "subtitle": "Choisissez comment chaque type de nouveauté vous parvient. Vous pourrez le modifier plus tard dans Paramètres → Notifications."
+  },
   "connections": {
     "title": "Connexions et contenu",
     "subtitle": "Certaines fonctionnalités vous connectent directement à d'autres utilisateurs de Mumcord, et du contenu de chat se charge depuis d'autres sites web. Choisissez ce qui vous convient.",
@@ -185,6 +190,7 @@
       "identity": "Identité",
       "voice": "Voix",
       "privateMessages": "Messages privés",
+      "notifications": "Notifications",
       "connections": "Connexions",
       "chatContent": "Contenu du chat",
       "features": "Fonctionnalités",
@@ -195,10 +201,12 @@
     "identityDetail": "Enregistrée dans le trousseau de votre système",
     "voiceDetail": "Réduction de bruit : {{noise}}",
     "pmDetail": "Mon salon {{channel}} · discussions acceptées {{accepted}} · demandes {{requests}}",
+    "notificationsTitle": "Nouveaux messages : {{mode}}",
+    "notificationsDetail": "Notifications d'activité : {{on}} sur {{total}} activées",
     "contentTitle": "Aperçus de liens {{previews}}",
     "contentDetail": "Images en taille réelle {{images}} · synchronisation de l'historique {{sync}}",
     "featuresTitle": "Overlay en jeu {{overlay}}",
-    "featuresDetail": "Suivre Ne pas déranger du système {{dnd}} · lecture en cours {{playing}} · jeu en cours {{gaming}}",
+    "featuresDetail": "Suivre Ne pas déranger du système {{dnd}} · lecture en cours {{playing}} · jeu en cours {{gaming}} · historique d'activité {{history}}",
     "effectsDetail": "Effets visuels {{effects}}",
     "startupTitle": "Démarrer à l'ouverture de session {{login}}",
     "startupDetail": "Démarrer réduit {{minimized}} · liens mumble:// {{links}}",

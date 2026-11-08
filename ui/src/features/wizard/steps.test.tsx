@@ -114,7 +114,7 @@ describe("SummaryStep", () => {
       />,
     );
     expect(screen.getByRole("heading", { name: "You're all set, Mira" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /^Edit / })).toHaveLength(9);
+    expect(screen.getAllByRole("button", { name: /^Edit / })).toHaveLength(10);
     fireEvent.click(screen.getByRole("button", { name: "Edit Chat content" }));
     expect(onEdit).toHaveBeenCalledWith("connections");
     expect(screen.getByText(/Your identity Mira is saved/)).toBeInTheDocument();

@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Notifikationer",
-    "legend": "Notifikationer om nye beskeder",
-    "explanation": "Om nye beskeder i din kanal, fulgte kanaler og private chats, undtagen den chat, du kigger på.",
-    "inApp": "I appen: en lille pop-up i Mumcord, mens det er forrest",
-    "desktop": "Skrivebord: en systemnotifikation",
-    "both": "Begge: pop-up, mens Mumcord er forrest, ellers systemnotifikation",
-    "off": "Fra",
+    "explanation": "Hvordan Mumcord fortæller dig om nye beskeder, og hvad der sker på dine servere. Hver type har sit eget valg.",
+    "messages": "Nye beskeder",
+    "messagesHint": "Din kanal, fulgte kanaler og private chats",
+    "mode": {
+      "off": "Fra",
+      "inApp": "I appen",
+      "desktop": "System",
+      "both": "Begge"
+    },
+    "modesHint": "I appen: en lille pop-up i Mumcord, mens det er i forgrunden. System: en notifikation fra dit operativsystem. Begge: pop-up'en, mens Mumcord er i forgrunden, ellers en systemnotifikation. Intet vises for den chat, du kigger på, eller under Forstyr ikke.",
     "activityTitle": "Aktivitetsnotifikationer",
     "activity": {
       "screenShare": "Nogen starter en skærmdeling",
@@ -1271,6 +1275,8 @@
   },
   "activityHistory": {
     "title": "Aktivitetshistorik",
+    "keep": "Behold aktivitetshistorik efter genstart",
+    "keepHint": "Gemmer, hvem der har forbundet, forladt, skiftet kanal, delt skærm eller startet en watch party, så feedet stadig er der efter en genstart. Fra: feedet starter tomt hver gang. Når du slår det fra, slettes det gemte.",
     "clear": "Ryd aktivitetshistorik",
     "hint": "Fjerner det gemte feed for alle servere.",
     "local": "Gemmes kun på denne enhed.",

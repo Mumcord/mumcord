@@ -33,6 +33,7 @@
     "voice": "Hlas",
     "setupStyle": "Štýl nastavenia",
     "privateMessages": "Súkromné správy",
+    "notifications": "Upozornenia",
     "connections": "Pripojenia",
     "features": "Funkcie",
     "appearance": "Vzhľad",
@@ -146,6 +147,10 @@
     "subtitle": "Súkromné správy sú rozhovory jeden na jedného. Táto voľba sa netýka chatu kanála.",
     "local": "Filtrovanie prebieha na tvojom počítači. Odosielatelia sa o ňom nedozvedia. Neskôr môžeš nastaviť iné pravidlo pre každý server."
   },
+  "notifications": {
+    "title": "Ako vás má Mumcord upozorňovať?",
+    "subtitle": "Vyberte, ako sa k vám má dostať každý druh noviniek. Neskôr to môžete zmeniť v Nastaveniach → Upozornenia."
+  },
   "connections": {
     "title": "Pripojenia a obsah",
     "subtitle": "Niektoré funkcie ťa pripoja priamo k iným používateľom Mumcordu a časť obsahu chatu sa načítava z iných webov. Vyber, čo ti vyhovuje.",
@@ -185,6 +190,7 @@
       "identity": "Identita",
       "voice": "Hlas",
       "privateMessages": "Súkromné správy",
+      "notifications": "Upozornenia",
       "connections": "Pripojenia",
       "chatContent": "Obsah chatu",
       "features": "Funkcie",
@@ -195,10 +201,12 @@
     "identityDetail": "Uložená v systémovej kľúčenke",
     "voiceDetail": "Potlačenie hluku: {{noise}}",
     "pmDetail": "Môj kanál {{channel}} · prijaté chaty {{accepted}} · žiadosti {{requests}}",
+    "notificationsTitle": "Nové správy: {{mode}}",
+    "notificationsDetail": "Upozornenia na aktivitu: zapnuté {{on}} z {{total}}",
     "contentTitle": "Náhľady odkazov {{previews}}",
     "contentDetail": "Obrázky v plnej veľkosti {{images}} · synchronizácia histórie {{sync}}",
     "featuresTitle": "Prekrytie v hre {{overlay}}",
-    "featuresDetail": "Sledovať systémový režim Nerušiť {{dnd}} · práve hrá {{playing}} · práve hrám {{gaming}}",
+    "featuresDetail": "Sledovať systémový režim Nerušiť {{dnd}} · práve hrá {{playing}} · práve hrám {{gaming}} · história aktivity {{history}}",
     "effectsDetail": "Vizuálne efekty {{effects}}",
     "startupTitle": "Spustiť pri prihlásení {{login}}",
     "startupDetail": "Spustiť minimalizovaný {{minimized}} · odkazy mumble:// {{links}}",

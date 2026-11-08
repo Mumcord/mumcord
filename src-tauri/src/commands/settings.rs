@@ -462,27 +462,28 @@ impl From<SoundTheme> for store::SoundTheme {
     }
 }
 
-/// Activity-feed events that notify like messages (#597).
+/// How each kind of activity-feed event notifies (#597, #660), with the same choices as
+/// messages. Every kind starts as `inApp`.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityNotifySettings {
-    /// Someone connected, left or moved channel. Off by default.
-    pub joins: bool,
-    pub screen_share: bool,
-    pub watch_party: bool,
-    pub plugin_activity: bool,
+    /// Someone connected, left or moved channel.
+    pub joins: NotificationMode,
+    pub screen_share: NotificationMode,
+    pub watch_party: NotificationMode,
+    pub plugin_activity: NotificationMode,
     /// Events a plugin pushes to the feed.
-    pub plugin_event: bool,
+    pub plugin_event: NotificationMode,
 }
 
 impl From<store::ActivityNotifySettings> for ActivityNotifySettings {
     fn from(s: store::ActivityNotifySettings) -> Self {
         Self {
-            joins: s.joins,
-            screen_share: s.screen_share,
-            watch_party: s.watch_party,
-            plugin_activity: s.plugin_activity,
-            plugin_event: s.plugin_event,
+            joins: s.joins.into(),
+            screen_share: s.screen_share.into(),
+            watch_party: s.watch_party.into(),
+            plugin_activity: s.plugin_activity.into(),
+            plugin_event: s.plugin_event.into(),
         }
     }
 }
@@ -490,11 +491,11 @@ impl From<store::ActivityNotifySettings> for ActivityNotifySettings {
 impl From<ActivityNotifySettings> for store::ActivityNotifySettings {
     fn from(s: ActivityNotifySettings) -> Self {
         Self {
-            joins: s.joins,
-            screen_share: s.screen_share,
-            watch_party: s.watch_party,
-            plugin_activity: s.plugin_activity,
-            plugin_event: s.plugin_event,
+            joins: s.joins.into(),
+            screen_share: s.screen_share.into(),
+            watch_party: s.watch_party.into(),
+            plugin_activity: s.plugin_activity.into(),
+            plugin_event: s.plugin_event.into(),
         }
     }
 }
@@ -721,6 +722,8 @@ pub struct Settings {
     pub notifications: NotificationMode,
     /// Activity events that notify (#597).
     pub activity_notify: ActivityNotifySettings,
+    /// "Keep activity history after a restart" (#661); off by default.
+    pub keep_activity_history: bool,
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
@@ -917,6 +920,7 @@ impl Settings {
             sound_theme: s.sounds.theme.into(),
             notifications: s.notifications.into(),
             activity_notify: s.activity_notify.into(),
+            keep_activity_history: s.keep_activity_history,
             close_behaviour: match s.close_behaviour {
                 store::CloseBehaviour::Ask => CloseBehaviour::Ask,
                 store::CloseBehaviour::MinimizeToTray => CloseBehaviour::MinimizeToTray,
@@ -1082,6 +1086,7 @@ impl Settings {
         s.sounds.banned = self.sounds.banned;
         s.notifications = self.notifications.into();
         s.activity_notify = self.activity_notify.into();
+        s.keep_activity_history = self.keep_activity_history;
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
             CloseBehaviour::MinimizeToTray => store::CloseBehaviour::MinimizeToTray,
@@ -1409,7 +1414,9 @@ mod tests {
         assert!(!ui.wizard_completed);
         assert_eq!(ui.log_level, LogLevel::Info);
         assert!(ui.send_default_avatar);
-        assert_eq!(ui.notifications, NotificationMode::Both);
+        assert_eq!(ui.notifications, NotificationMode::InApp);
+        assert_eq!(ui.activity_notify.joins, NotificationMode::InApp);
+        assert!(!ui.keep_activity_history);
         assert_eq!(ui.sound_theme, SoundTheme::Classic);
         assert!(ui.sounds.channel_switch);
 

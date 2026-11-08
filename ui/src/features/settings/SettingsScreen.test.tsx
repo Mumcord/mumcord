@@ -411,18 +411,24 @@ describe("SettingsScreen", () => {
     });
   });
 
-  it("chooses how message notifications are shown", async () => {
+  it("chooses how each kind of notification is shown (#660)", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Chat & Notifications");
-    const group = screen.getByRole("group", { name: "Notifications for new messages" });
-    expect(within(group).getByRole("radio", { name: /^Both/ })).toBeChecked();
-    fireEvent.click(within(group).getByRole("radio", { name: "Off" }));
+    const messages = screen.getByRole("combobox", { name: "New messages" });
+    expect(messages).toHaveTextContent("Both");
+    expect(optionLabels(messages)).toEqual(["Off", "In-app", "System", "Both"]);
+    chooseOption(messages, "Off");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ notifications: "off" }));
     });
-    fireEvent.click(within(group).getByRole("radio", { name: /^In-app/ }));
+    const shares = screen.getByRole("combobox", { name: "Someone starts a screen share" });
+    expect(shares).toHaveTextContent("In-app");
+    chooseOption(shares, "System");
     await waitFor(() => {
-      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ notifications: "inApp" }));
+      expect(update.mock.lastCall?.[0].activityNotify).toMatchObject({
+        screenShare: "desktop",
+        joins: "inApp",
+      });
     });
   });
 

@@ -117,7 +117,7 @@ export function SettingsPageCards({
           <ConnectionsCard {...props} />
           <ExternalContentCard {...props} />
           <HistorySyncCard {...props} />
-          <ActivityHistoryCard />
+          <ActivityHistoryCard {...props} />
         </>
       );
     case "plugins":

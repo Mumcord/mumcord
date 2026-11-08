@@ -33,6 +33,7 @@
     "voice": "Spraak",
     "setupStyle": "Installatiestijl",
     "privateMessages": "Privéberichten",
+    "notifications": "Meldingen",
     "connections": "Verbindingen",
     "features": "Functies",
     "appearance": "Uiterlijk",
@@ -146,6 +147,10 @@
     "subtitle": "Privéberichten zijn één-op-één-gesprekken. Kanaalchat wordt door deze keuze niet beïnvloed.",
     "local": "Het filteren gebeurt op je computer. Afzenders krijgen hier geen melding van. Later kun je per server een andere regel instellen."
   },
+  "notifications": {
+    "title": "Hoe moet Mumcord je waarschuwen?",
+    "subtitle": "Kies hoe elk soort nieuws je bereikt. Je kunt dit later wijzigen in Instellingen → Meldingen."
+  },
   "connections": {
     "title": "Verbindingen en inhoud",
     "subtitle": "Sommige functies verbinden je rechtstreeks met andere Mumcord-gebruikers en sommige chatinhoud wordt van andere websites geladen. Kies wat voor jou prima is.",
@@ -185,6 +190,7 @@
       "identity": "Identiteit",
       "voice": "Spraak",
       "privateMessages": "Privéberichten",
+      "notifications": "Meldingen",
       "connections": "Verbindingen",
       "chatContent": "Chatinhoud",
       "features": "Functies",
@@ -195,10 +201,12 @@
     "identityDetail": "Opgeslagen in de sleutelhanger van je systeem",
     "voiceDetail": "Ruisonderdrukking: {{noise}}",
     "pmDetail": "Mijn kanaal {{channel}} · geaccepteerde chats {{accepted}} · verzoeken {{requests}}",
+    "notificationsTitle": "Nieuwe berichten: {{mode}}",
+    "notificationsDetail": "Activiteitsmeldingen: {{on}} van {{total}} aan",
     "contentTitle": "Linkvoorbeelden {{previews}}",
     "contentDetail": "Afbeeldingen op volle grootte {{images}} · geschiedenissynchronisatie {{sync}}",
     "featuresTitle": "Overlay in games {{overlay}}",
-    "featuresDetail": "Systeem-Niet-storen volgen {{dnd}} · nu aan het afspelen {{playing}} · nu aan het gamen {{gaming}}",
+    "featuresDetail": "Systeem-Niet-storen volgen {{dnd}} · nu aan het afspelen {{playing}} · nu aan het gamen {{gaming}} · activiteitengeschiedenis {{history}}",
     "effectsDetail": "Visuele effecten {{effects}}",
     "startupTitle": "Starten bij inloggen {{login}}",
     "startupDetail": "Geminimaliseerd starten {{minimized}} · mumble://-links {{links}}",

@@ -44,6 +44,7 @@ describe("PRESETS", () => {
         historySharing: true,
         nowPlaying: true,
         nowGaming: true,
+        keepActivityHistory: true,
         ingameOverlay: true,
         dndFollowSystem: true,
       },
@@ -59,6 +60,7 @@ describe("PRESETS", () => {
         historySharing: true,
         nowPlaying: false,
         nowGaming: false,
+        keepActivityHistory: false,
         ingameOverlay: true,
         dndFollowSystem: true,
       },
@@ -74,6 +76,7 @@ describe("PRESETS", () => {
         historySharing: false,
         nowPlaying: false,
         nowGaming: false,
+        keepActivityHistory: false,
         ingameOverlay: false,
         dndFollowSystem: true,
       },
@@ -159,6 +162,7 @@ describe("presetDifferences", () => {
       "p2pMode",
       "nowPlaying",
       "nowGaming",
+      "keepActivityHistory",
     ]);
   });
 });

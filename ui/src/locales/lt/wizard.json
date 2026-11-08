@@ -33,6 +33,7 @@
     "voice": "Balsas",
     "setupStyle": "Sąrankos stilius",
     "privateMessages": "Privačios žinutės",
+    "notifications": "Pranešimai",
     "connections": "Ryšiai",
     "features": "Funkcijos",
     "appearance": "Išvaizda",
@@ -146,6 +147,10 @@
     "subtitle": "Privačios žinutės yra pokalbiai vienas su vienu. Šis pasirinkimas kanalo pokalbio neveikia.",
     "local": "Filtravimas vyksta jūsų kompiuteryje. Siuntėjams apie tai nepranešama. Vėliau galėsite nustatyti kitokią taisyklę kiekvienam serveriui."
   },
+  "notifications": {
+    "title": "Kaip Mumcord turėtų jums pranešti?",
+    "subtitle": "Pasirinkite, kaip jus pasiekia kiekviena naujienų rūšis. Vėliau tai galėsite pakeisti skiltyje Nustatymai → Pranešimai."
+  },
   "connections": {
     "title": "Ryšiai ir turinys",
     "subtitle": "Kai kurios funkcijos jus jungia tiesiogiai su kitais „Mumcord“ naudotojais, o dalis pokalbio turinio įkeliama iš kitų svetainių. Pasirinkite, kas jums tinka.",
@@ -185,6 +190,7 @@
       "identity": "Tapatybė",
       "voice": "Balsas",
       "privateMessages": "Privačios žinutės",
+      "notifications": "Pranešimai",
       "connections": "Ryšiai",
       "chatContent": "Pokalbio turinys",
       "features": "Funkcijos",
@@ -195,10 +201,12 @@
     "identityDetail": "Išsaugota sistemos raktų pakabuke",
     "voiceDetail": "Triukšmo slopinimas: {{noise}}",
     "pmDetail": "Mano kanalas {{channel}} · priimti pokalbiai {{accepted}} · prašymai {{requests}}",
+    "notificationsTitle": "Naujos žinutės: {{mode}}",
+    "notificationsDetail": "Veiklos pranešimai: įjungta {{on}} iš {{total}}",
     "contentTitle": "Nuorodų peržiūros {{previews}}",
     "contentDetail": "Viso dydžio paveikslėliai {{images}} · istorijos sinchronizavimas {{sync}}",
     "featuresTitle": "Perdanga žaidime {{overlay}}",
-    "featuresDetail": "Sekti sistemos režimą „Netrukdyti“ {{dnd}} · dabar groja {{playing}} · dabar žaidžia {{gaming}}",
+    "featuresDetail": "Sekti sistemos režimą „Netrukdyti“ {{dnd}} · dabar groja {{playing}} · dabar žaidžia {{gaming}} · veiklos istorija {{history}}",
     "effectsDetail": "Vaizdo efektai {{effects}}",
     "startupTitle": "Paleisti prisijungus {{login}}",
     "startupDetail": "Paleisti suskleistą {{minimized}} · mumble:// nuorodos {{links}}",
