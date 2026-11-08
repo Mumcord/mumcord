@@ -11,6 +11,7 @@ pub mod framing;
 pub mod permissions;
 pub mod query;
 mod ratelimit;
+pub mod registered;
 pub mod state;
 pub mod tap;
 pub mod tls;
@@ -32,6 +33,7 @@ pub use query::{
     LEGACY_ANSWER_LEN, LEGACY_QUERY_LEN, QueryAnswer, decode_answer, encode_legacy_query,
     encode_query,
 };
+pub use registered::RegisteredUser;
 /// Certificate/key DER types used by [`ClientIdentity`] and [`ServerCert`].
 pub use rustls::pki_types;
 pub use state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
