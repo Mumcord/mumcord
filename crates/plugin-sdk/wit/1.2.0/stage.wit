@@ -1,0 +1,45 @@
+/// Since 1.1. Plugin activities in the media area (FR-9.44 … FR-9.52). Needs `ui.stage`.
+///
+/// A plugin starts at most one activity in the user's current voice channel; at most 3 plugin
+/// activities run per channel. Channel members with the same plugin see "<name> started
+/// <plugin> · Join" and a stage tab after they join. Mumcord draws the stage header (name,
+/// starter, connection, Pop out, Full screen, Leave) outside the plugin content.
+interface stage {
+  use types.{error};
+  use ui.{node};
+
+  /// Identifies one activity across all clients in the channel.
+  type activity-id = string;
+
+  /// What the activity shows.
+  variant stage-content {
+    /// A building-block tree, as in `ui.set-tree`; clicks arrive as `ui-action` from the
+    /// `stage` slot.
+    tree(list<node>),
+    /// The plugin's own web content: a path inside `web/` such as 'board/index.html'. Needs
+    /// `ui.webview` and `stage` in the manifest's `webview.places`.
+    web(string),
+  }
+
+  /// Starts an activity with `title` (at most 64 characters) and joins it. Only within 8 s of a
+  /// user gesture for this plugin (FR-9.45). Errors: `not-permitted` (no permission, no gesture,
+  /// not in a voice channel), `quota-exceeded` (this plugin already runs an activity here, or the
+  /// channel has 3), `invalid` (bad title, tree or entry).
+  start: func(title: string, content: stage-content) -> result<activity-id, error>;
+
+  /// Joins an activity announced by `stage-activity-started` from the plugin's own Join button.
+  /// Mumcord's Join (activity line, stage) joins by itself and needs no call. Only within 8 s
+  /// of a user gesture for this plugin (FR-9.45). Errors: `not-permitted` (no permission or
+  /// gesture), `quota-exceeded` (the activity is full), `invalid` (unknown or ended activity).
+  join: func(activity: activity-id) -> result<_, error>;
+
+  /// Leaves the current activity; it keeps running for the others.
+  leave: func();
+
+  /// Ends the activity this plugin started, for everyone.
+  end: func();
+
+  /// Replaces the stage tree of the current activity. Same limits and errors as `ui.set-tree`;
+  /// `invalid` when the activity shows web content or none is running.
+  set-tree: func(nodes: list<node>) -> result<_, error>;
+}

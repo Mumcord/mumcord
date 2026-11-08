@@ -1,0 +1,51 @@
+/// Sandboxed web view (FR-6.46 … FR-6.48, FR-9.32 … FR-9.43). Needs the `ui.webview` permission
+/// (all plugins since 1.1), and each place must be listed in the manifest's `webview.places`.
+///
+/// Shows an HTML file from the package's `web/` folder in a frame with an opaque origin: no
+/// storage, no navigation, no popups, no Tauri IPC and no access to the Mumcord window. The page
+/// may reach only the websites declared in `net.origins`. It talks to its own plugin through a
+/// message bridge; the plugin decides what to share through the normal API. Limits: each message
+/// at most 16 KiB (64 KiB in the stage), at most 60 messages per second in each direction (extra
+/// messages are dropped). Messages from the page arrive as the `webview-message` event.
+interface webview {
+  use types.{error};
+
+  /// Where the web view is shown. Only one web view per plugin is open at a time.
+  enum place {
+    /// The large panel popover (420×560) in the Plugins strip.
+    panel-popover,
+    /// The plugin's dialog (see `ui.open-dialog`), replacing its `dialog` tree.
+    dialog,
+    /// Since 1.1. `ui.side-panel`: a column docked right of the chat (18–32 rem, resizable, one
+    /// plugin at a time).
+    side-panel,
+    /// Since 1.1. `ui.stage`: the plugin's activity in the media area. Opened through
+    /// `stage.start` with `stage-content.web`; `show` here only replaces the page of an
+    /// activity this plugin runs.
+    stage,
+  }
+
+  /// Shows `entry`, a path inside `web/` such as 'snack-race/index.html', replacing any web view
+  /// this plugin already shows. Errors: `not-permitted`, `invalid` (no such file).
+  show: func(place: place, entry: string) -> result<_, error>;
+
+  /// Closes the web view; the slot falls back to its tree.
+  hide: func();
+
+  /// Sends a message to the page (delivered as a `message` event in the page's JavaScript).
+  /// Errors: `not-permitted`, `too-large`, `rate-limited`, `invalid` (no web view open).
+  post: func(message: string) -> result<_, error>;
+
+  /// Since 1.1. Asks for a minimum size of the side panel in CSS pixels; Mumcord clamps it to
+  /// the panel's limits and the user may still resize it. Errors: `not-permitted`, `invalid`
+  /// (no side panel open).
+  set-size-hint: func(min-width: u32, min-height: u32) -> result<_, error>;
+
+  /// Since 1.1. Sets the status line under the plugin's side panel, such as '3 drawing · relay ·
+  /// Esc leaves the board'. Plain text only, at most 80 characters; control characters become
+  /// spaces. An empty string clears it. At most 4 updates per second reach the screen; quicker
+  /// ones are merged and the last value wins. The line goes away when the side panel closes.
+  /// Errors: `not-permitted`, `invalid` (no side panel open, longer than 80 characters, or
+  /// markup such as '<' or '>').
+  set-status: func(text: string) -> result<_, error>;
+}

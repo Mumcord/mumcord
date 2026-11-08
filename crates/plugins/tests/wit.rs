@@ -301,6 +301,31 @@ fn package_1_1_shape_is_frozen() {
     assert_frozen("1.1.0");
 }
 
+#[test]
+fn package_1_2_shape_is_frozen() {
+    assert_frozen("1.2.0");
+}
+
+/// FR-13.2: 1.2.0 has exactly the interfaces, functions, events and types of 1.1.0; only the
+/// package version differs.
+#[test]
+fn minor_1_2_equals_1_1_except_the_package_version() {
+    let as_1_1 = declarations("1.2.0").replace(
+        "package mumcord:plugin@1.2.0;",
+        "package mumcord:plugin@1.1.0;",
+    );
+    assert_eq!(as_1_1, declarations("1.1.0"));
+}
+
+#[test]
+fn package_1_2_is_mumcord_plugin_1_2_0() {
+    let (resolve, package) = package_of("1.2.0");
+    assert_eq!(
+        resolve.packages[package].name.to_string(),
+        "mumcord:plugin@1.2.0"
+    );
+}
+
 fn type_in_1_1(interface: &str, name: &str) -> (Resolve, TypeId) {
     let (resolve, _) = package_of("1.1.0");
     let id = type_in(&resolve, interface, name);
