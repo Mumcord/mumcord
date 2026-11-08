@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Screen readers no longer get a broken list announcement while the @mention or /command suggestions are open in the message box; they hear how many suggestions there are
 - Copy works again in the packet inspector, and when Windows refuses the app's clipboard (e.g. "Copy" on a crash report) Mumcord copies through the window's own clipboard instead
 
 ## [0.7.2] - 2026-11-08

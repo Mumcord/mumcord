@@ -640,7 +640,11 @@ export function Composer({
         ) : null}
         <CommandPicker id={commandListId} slash={slash} />
         <p className="visually-hidden" role="status">
-          {pickerOpen ? t("mention.found", { count: options.length }) : ""}
+          {pickerOpen
+            ? t("mention.found", { count: options.length })
+            : slash.open
+              ? t("mention.found", { count: slash.options.length })
+              : ""}
         </p>
         {blockedReason === null ? (
           // The handlers only watch where the focus is, so the field can be measured again once
@@ -659,8 +663,8 @@ export function Composer({
             <FormatToolbar onFormat={format} />
             <textarea
               ref={input}
-              role={pickerOpen || slash.open ? "combobox" : undefined}
-              aria-expanded={pickerOpen || slash.open ? true : undefined}
+              // A textarea cannot be a combobox (axe, issue #627): it stays a textbox that names
+              // the open list and its highlighted row, and the status line above counts the rows.
               aria-controls={pickerOpen ? pickerId : slash.open ? commandListId : undefined}
               aria-activedescendant={
                 pickerOpen

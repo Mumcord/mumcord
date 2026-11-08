@@ -139,8 +139,11 @@ describe("Composer mentions", () => {
     const { input } = await setup();
     type(input, "@", 1);
     expect(await screen.findByRole("listbox")).toBeInTheDocument();
-    expect(input).toHaveAttribute("role", "combobox");
-    expect(input).toHaveAttribute("aria-expanded", "true");
+    expect(input).not.toHaveAttribute("role");
+    expect(input).toHaveAttribute("aria-controls", screen.getByRole("listbox").id);
+    expect(input).toHaveAttribute("aria-activedescendant", screen.getAllByRole("option")[0]?.id);
+    expect(screen.getByRole("status")).toHaveTextContent("Suggestions: 5");
+    expect(await axeViolations(document.body)).toEqual([]);
     expect(names()).toEqual(["@channel", "@all", "Anna", "Ben", "Carla"]);
     type(input, "@c", 2);
     expect(names()).toEqual(["@channel", "Carla"]);
