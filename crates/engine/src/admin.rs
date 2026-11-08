@@ -473,17 +473,25 @@ impl Engine {
         server_id: ServerId,
         session: u32,
     ) -> EngineResult<ActionOutcome> {
-        let registered = {
+        let known = {
             let ctx = self.session_ctx_for(server_id)?;
             ctx.handle.with_state(|state| {
                 state
                     .users
                     .get(&session)
-                    .is_some_and(|user| user.user_id.is_some())
+                    .map(|user| (user.user_id.is_some(), user.cert_hash.is_some()))
             })
         };
-        if registered {
-            return Err(EngineError::invalid("this person is registered already"));
+        if let Some((registered, has_cert)) = known {
+            if registered {
+                return Err(EngineError::invalid("this person is registered already"));
+            }
+            // The account is bound to the client certificate (issue #256).
+            if !has_cert {
+                return Err(EngineError::invalid(
+                    "registering needs a client certificate",
+                ));
+            }
         }
         self.person_change_state(
             server_id,

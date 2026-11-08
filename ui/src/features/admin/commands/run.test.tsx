@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { i18n } from "../../../i18n";
 import type { Conversation, MockApi } from "../../../api";
@@ -103,6 +103,12 @@ describe("a command that acts at once (FR-10.15, FR-10.35)", () => {
     expect(await typed("/register Anna")).toEqual({
       kind: "notice",
       text: 'No one named "Anna" is on this server right now.',
+    });
+    // An account is bound to the client certificate, so only a guest with one can be registered.
+    const ben = getServerState().users.get(BEN);
+    if (!ben) throw new Error("seed person missing");
+    act(() => {
+      api.mock.upsertUser({ ...ben, certHash: "ab".repeat(20) });
     });
     const register = vi.spyOn(api, "personRegister");
     await typed("/register Ben");

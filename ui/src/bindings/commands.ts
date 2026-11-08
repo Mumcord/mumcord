@@ -199,12 +199,6 @@ export const commands = {
 	registeredUserGroups: (serverId: number, userId: number) => typedError<string[], ApiError>(__TAURI_INVOKE("registered_user_groups", { serverId, userId })),
 	/**  The window closed: what it held is dropped (FR-10.63). */
 	registeredUsersClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("registered_users_close", { serverId })),
-	/**
-	 *  Registers an online guest under their current name (FR-10.20, AC-10.15). Fails with
-	 *  `permissionDenied` without the Register right, and with `invalidInput` when the person is not
-	 *  connected, is registered already, or has no certificate to bind the account to.
-	 */
-	personRegister: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_register", { serverId, session })),
 	/**  Creates a channel (FR-10.21, FR-10.22). A temporary channel moves you into it. */
 	channelCreate: (serverId: number, input: ChannelCreateInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_create", { serverId, input })),
 	/**

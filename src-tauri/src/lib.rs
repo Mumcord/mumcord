@@ -124,7 +124,6 @@ fn specta_builder() -> Builder<tauri::Wry> {
             admin::registered_user_unregister,
             admin::registered_user_groups,
             admin::registered_users_close,
-            admin::person_register,
             channel_admin::channel_create,
             channel_admin::channel_edit,
             channel_admin::channel_remove,

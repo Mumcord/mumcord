@@ -4286,22 +4286,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // Closing the tab forgets nothing here: the mock stands for the server, which keeps its
     // accounts; FR-10.63 is about what Mumcord itself stores.
     registeredUsersClose: () => Promise.resolve(null),
-    personRegister: (serverId, session) => {
-      const snapshot = sessions.get(serverId)?.snapshot;
-      const root = snapshot?.channels.find((c) => c.id === 0);
-      if (root && !root.permissions.register) {
-        return fail("permissionDenied", "register right in the root channel");
-      }
-      const user = snapshot?.users.find((u) => u.session === session);
-      if (!user) return fail("notFound", "the person is not on this server");
-      if (user.registered) return fail("invalidInput", "this person is registered already");
-      if (!user.certHash) return fail("invalidInput", "registering needs a client certificate");
-      // The account takes the name they are here under, and appears in the list at once.
-      const removed = registeredRemoved.get(serverId);
-      if (removed) removed.delete(idOfAccount(user.name));
-      updateUser(session, { registered: true });
-      return Promise.resolve(null);
-    },
     personActionClose: (serverId) => {
       personTargets.delete(serverId);
       return Promise.resolve(null);
@@ -4348,6 +4332,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       if (!requireChannel(0).permissions.register) {
         return fail("permissionDenied", "register right in the root channel");
       }
+      if (!user.certHash) return fail("invalidInput", "registering needs a client certificate");
+      // The account takes the name they are here under, and appears in the list at once (#256).
+      registeredRemoved.get(serverId)?.delete(idOfAccount(user.name));
       updateUser(session, { registered: true });
       return Promise.resolve("confirmed");
     },
