@@ -372,5 +372,19 @@
     "rootBody": "Ce sont les règles du salon Root ; tous les salons en héritent.",
     "backToEditing": "Retour à l'édition",
     "saveAnyway": "Enregistrer quand même"
+  },
+  "moderate": {
+    "mute": "Rendre muet (serveur)",
+    "deafen": "Rendre sourd (serveur)",
+    "unsuppress": "Lever la suppression",
+    "priority": "Orateur prioritaire",
+    "resetComment": "Réinitialiser le commentaire",
+    "resetAvatar": "Réinitialiser l'avatar",
+    "commentTitle": "Réinitialiser le commentaire de {{name}} ?",
+    "avatarTitle": "Réinitialiser l'avatar de {{name}} ?",
+    "resetBody": "Il est effacé pour tout le monde. La personne peut en définir un nouveau.",
+    "cancel": "Annuler",
+    "reset": "Réinitialiser",
+    "failed": "Le serveur est injoignable. Réessayez."
   }
 }

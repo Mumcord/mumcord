@@ -369,5 +369,19 @@
     "rootBody": "Dit zijn de regels van het Root-kanaal; elk kanaal erft ze.",
     "backToEditing": "Terug naar bewerken",
     "saveAnyway": "Toch opslaan"
+  },
+  "moderate": {
+    "mute": "Server-dempen",
+    "deafen": "Server-doof maken",
+    "unsuppress": "Onderdrukking opheffen",
+    "priority": "Voorrangsspreker",
+    "resetComment": "Opmerking wissen",
+    "resetAvatar": "Avatar wissen",
+    "commentTitle": "Opmerking van {{name}} wissen?",
+    "avatarTitle": "Avatar van {{name}} wissen?",
+    "resetBody": "Hij wordt voor iedereen gewist. Diegene kan een nieuwe instellen.",
+    "cancel": "Annuleren",
+    "reset": "Wissen",
+    "failed": "De server is niet bereikbaar. Probeer het opnieuw."
   }
 }

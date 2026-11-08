@@ -42,7 +42,8 @@
     "serverDeafened": "bla smigħ mis-server",
     "suppressed": "soppress (ma jistax jitkellem hawn)",
     "localMuted": "mutat għalik",
-    "unregistered": "mhux irreġistrat"
+    "unregistered": "mhux irreġistrat",
+    "prioritySpeaker": "kelliem prijoritarju"
   },
   "mumcordBadge": "Juża Mumcord",
   "botBadge": "Bot",
@@ -69,7 +70,8 @@
     "nowPlaying": "Qed jisma' {{track}}",
     "nowGaming": "Qed jilgħab {{game}}",
     "weakConnection": "Konnessjoni dgħajfa – ping għoli jew telf ta' pakketti",
-    "positional": "L-awdjo posizzjonali huwa attiv"
+    "positional": "L-awdjo posizzjonali huwa attiv",
+    "prioritySpeaker": "Kelliem prijoritarju – jinstema' fuq kulħadd"
   },
   "announce": {
     "joined": "{{name}} ingħaqad mal-kanal tiegħek",

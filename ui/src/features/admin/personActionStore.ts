@@ -14,7 +14,8 @@ import {
   type PersonTarget,
 } from "../../api";
 
-export type PersonActionMode = "kick" | "ban";
+/** Kick and ban (#253), and the reset confirmations of #257. */
+export type PersonActionMode = "kick" | "ban" | "resetComment" | "resetAvatar";
 
 /** The form as the ban dialog shows it (FR-10.12); the kick dialog uses only its reason. */
 export interface PersonDraft {

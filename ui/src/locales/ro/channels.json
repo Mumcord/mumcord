@@ -36,7 +36,8 @@
     "serverDeafened": "sunet oprit de server",
     "suppressed": "suprimat (nu poate vorbi aici)",
     "localMuted": "fără sunet pentru tine",
-    "unregistered": "neînregistrat"
+    "unregistered": "neînregistrat",
+    "prioritySpeaker": "vorbitor prioritar"
   },
   "mumcordBadge": "Folosește Mumcord",
   "botBadge": "Bot",
@@ -63,7 +64,8 @@
     "nowPlaying": "Ascultă {{track}}",
     "nowGaming": "Joacă {{game}}",
     "weakConnection": "Conexiune slabă – ping mare sau pierdere de pachete",
-    "positional": "Audio pozițional activ"
+    "positional": "Audio pozițional activ",
+    "prioritySpeaker": "Vorbitor prioritar – se aude peste ceilalți"
   },
   "announce": {
     "joined": "{{name}} a intrat în canalul tău",

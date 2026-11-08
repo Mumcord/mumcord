@@ -4,6 +4,7 @@
 
 ### Added
 
+- Moderation in the person menu's "Admin ▸": server mute, server deafen (mutes too), priority speaker (a star next to their name) and un-suppress act at once and show a tick while on; reset comment and reset avatar ask first. Each appears only with the server's right
 - Channel password: the channel window's Password tab sets or clears the password for joining a channel, written the same way as the official Mumble client; channels with more complex access rules point to Permissions instead
 - Channel permissions: the channel window's Permissions tab shows who can do what in the channel (✓, ✗ or ? per group and person), lets admins edit its rules and groups, and explains any answer in a "Why?" panel. Mumcord warns before you would lock yourself out, asks before changing the whole server's rules, and never overwrites a change someone else made meanwhile
 - Channel management for admins: the channel menu's "Admin ▸" can create a sub-channel or a temporary channel, edit a channel (name, description with bold, italic, underline and links, parent, position, user limit) and its links, link it with your channel, unlink all, and delete it after a confirmation that names the sub-channels and people affected. F2 edits and Delete deletes the selected channel. Only what the server allows is shown, and a refusal shows the server's reason

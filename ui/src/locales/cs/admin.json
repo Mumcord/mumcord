@@ -375,5 +375,19 @@
     "rootBody": "Toto jsou pravidla kanálu Root; dědí je každý kanál.",
     "backToEditing": "Zpět k úpravám",
     "saveAnyway": "Přesto uložit"
+  },
+  "moderate": {
+    "mute": "Ztlumit na serveru",
+    "deafen": "Ohlušit na serveru",
+    "unsuppress": "Zrušit potlačení",
+    "priority": "Přednostní řečník",
+    "resetComment": "Obnovit komentář",
+    "resetAvatar": "Obnovit avatar",
+    "commentTitle": "Obnovit komentář uživatele {{name}}?",
+    "avatarTitle": "Obnovit avatar uživatele {{name}}?",
+    "resetBody": "Smaže se pro všechny. Může si nastavit nový.",
+    "cancel": "Zrušit",
+    "reset": "Obnovit",
+    "failed": "Server není dostupný. Zkuste to znovu."
   }
 }

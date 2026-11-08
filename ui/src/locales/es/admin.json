@@ -372,5 +372,19 @@
     "rootBody": "Son las reglas del canal Root; todos los canales las heredan.",
     "backToEditing": "Volver a editar",
     "saveAnyway": "Guardar igualmente"
+  },
+  "moderate": {
+    "mute": "Silenciar en el servidor",
+    "deafen": "Ensordecer en el servidor",
+    "unsuppress": "Quitar supresión",
+    "priority": "Orador prioritario",
+    "resetComment": "Restablecer comentario",
+    "resetAvatar": "Restablecer avatar",
+    "commentTitle": "¿Restablecer el comentario de {{name}}?",
+    "avatarTitle": "¿Restablecer el avatar de {{name}}?",
+    "resetBody": "Se borra para todos. Puede poner uno nuevo.",
+    "cancel": "Cancelar",
+    "reset": "Restablecer",
+    "failed": "No se pudo contactar con el servidor. Inténtalo de nuevo."
   }
 }

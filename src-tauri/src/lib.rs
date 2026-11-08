@@ -118,6 +118,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             admin::person_kick,
             admin::person_ban,
             admin::person_action_close,
+            admin::person_moderate,
             channel_admin::channel_create,
             channel_admin::channel_edit,
             channel_admin::channel_remove,

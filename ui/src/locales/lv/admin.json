@@ -372,5 +372,19 @@
     "rootBody": "Šie ir Root kanāla noteikumi; katrs kanāls tos manto.",
     "backToEditing": "Atpakaļ uz rediģēšanu",
     "saveAnyway": "Tomēr saglabāt"
+  },
+  "moderate": {
+    "mute": "Apklusināt serverī",
+    "deafen": "Apkurlināt serverī",
+    "unsuppress": "Atcelt apslāpēšanu",
+    "priority": "Prioritārs runātājs",
+    "resetComment": "Atiestatīt komentāru",
+    "resetAvatar": "Atiestatīt avataru",
+    "commentTitle": "Atiestatīt {{name}} komentāru?",
+    "avatarTitle": "Atiestatīt {{name}} avataru?",
+    "resetBody": "Tas tiek notīrīts visiem. Var iestatīt jaunu.",
+    "cancel": "Atcelt",
+    "reset": "Atiestatīt",
+    "failed": "Serveris nav sasniedzams. Mēģini vēlreiz."
   }
 }

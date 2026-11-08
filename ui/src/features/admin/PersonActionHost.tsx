@@ -7,6 +7,7 @@ import { displayName } from "../servers/format";
 import { useServers } from "../servers/store";
 import { BanDialog } from "./BanDialog";
 import { KickDialog } from "./KickDialog";
+import { ResetDialog } from "./ResetDialog";
 import { usePersonAction } from "./personActionStore";
 
 export function PersonActionHost() {
@@ -16,9 +17,13 @@ export function PersonActionHost() {
   if (!action) return null;
   const server = servers.servers.find((s) => s.id === action.serverId);
   const serverName = server ? displayName(server) : t("servers:unknownServer");
-  return action.mode === "kick" ? (
-    <KickDialog action={action} serverName={serverName} />
-  ) : (
-    <BanDialog action={action} serverName={serverName} />
-  );
+  switch (action.mode) {
+    case "kick":
+      return <KickDialog action={action} serverName={serverName} />;
+    case "ban":
+      return <BanDialog action={action} serverName={serverName} />;
+    case "resetComment":
+    case "resetAvatar":
+      return <ResetDialog action={action} serverName={serverName} />;
+  }
 }

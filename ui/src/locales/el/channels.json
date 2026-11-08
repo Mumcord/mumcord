@@ -33,7 +33,8 @@
     "serverDeafened": "με κλειστό ήχο από τον διακομιστή",
     "suppressed": "καταστολή (δεν μπορεί να μιλήσει εδώ)",
     "localMuted": "σε σίγαση για σένα",
-    "unregistered": "μη εγγεγραμμένος"
+    "unregistered": "μη εγγεγραμμένος",
+    "prioritySpeaker": "ομιλητής προτεραιότητας"
   },
   "mumcordBadge": "Χρησιμοποιεί το Mumcord",
   "botBadge": "Bot",
@@ -60,7 +61,8 @@
     "nowPlaying": "Ακούει {{track}}",
     "nowGaming": "Παίζει {{game}}",
     "weakConnection": "Αδύναμη σύνδεση – υψηλό ping ή απώλεια πακέτων",
-    "positional": "Ενεργός θεσιακός ήχος"
+    "positional": "Ενεργός θεσιακός ήχος",
+    "prioritySpeaker": "Ομιλητής προτεραιότητας – ακούγεται πάνω από όλους"
   },
   "announce": {
     "joined": "Ο/Η {{name}} μπήκε στο κανάλι σου",

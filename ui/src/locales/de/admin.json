@@ -369,5 +369,19 @@
     "rootBody": "Das sind die Regeln des Root-Kanals; jeder Kanal erbt sie.",
     "backToEditing": "Zurück zur Bearbeitung",
     "saveAnyway": "Trotzdem speichern"
+  },
+  "moderate": {
+    "mute": "Server-Stummschaltung",
+    "deafen": "Server-Taubschaltung",
+    "unsuppress": "Unterdrückung aufheben",
+    "priority": "Bevorzugter Sprecher",
+    "resetComment": "Kommentar zurücksetzen",
+    "resetAvatar": "Avatar zurücksetzen",
+    "commentTitle": "Kommentar von {{name}} zurücksetzen?",
+    "avatarTitle": "Avatar von {{name}} zurücksetzen?",
+    "resetBody": "Er wird für alle entfernt. Die Person kann einen neuen festlegen.",
+    "cancel": "Abbrechen",
+    "reset": "Zurücksetzen",
+    "failed": "Der Server war nicht erreichbar. Versuche es erneut."
   }
 }

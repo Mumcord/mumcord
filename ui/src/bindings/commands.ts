@@ -170,6 +170,11 @@ export const commands = {
 	personBan: (serverId: number, session: number, input: BanInput) => typedError<BanResult, ApiError>(__TAURI_INVOKE("person_ban", { serverId, session, input })),
 	/**  The dialog closed: what it held is dropped (FR-10.63). */
 	personActionClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_action_close", { serverId })),
+	/**
+	 *  Server mute, deafen, priority speaker, un-suppress, reset comment or avatar (FR-10.15,
+	 *  FR-10.19). Acts at once; a refusal arrives as a `serverDenied` notice with the server's reason.
+	 */
+	personModerate: (serverId: number, session: number, action: ModerateInput) => typedError<null, ApiError>(__TAURI_INVOKE("person_moderate", { serverId, session, action })),
 	/**  Creates a channel (FR-10.21, FR-10.22). A temporary channel moves you into it. */
 	channelCreate: (serverId: number, input: ChannelCreateInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_create", { serverId, input })),
 	/**
@@ -3176,6 +3181,9 @@ export type MicTestPhaseChanged = {
 	phase: MicTestPhase,
 };
 
+/**  A server-side moderation action on one person (issue #257). */
+export type ModerateInput = { kind: "mute"; on: boolean } | { kind: "deafen"; on: boolean } | { kind: "prioritySpeaker"; on: boolean } | { kind: "unsuppress" } | { kind: "resetComment" } | { kind: "resetAvatar" };
+
 export type MumbleCertificate = {
 	/**  Common name; empty while locked by a password. */
 	name: string,
@@ -5460,6 +5468,8 @@ export type User = {
 	serverDeaf: boolean,
 	/**  May not speak in the current channel (no Speak permission or suppressed by an admin). */
 	suppressed: boolean,
+	/**  Heard over everyone else in the channel, set by an admin (issue #257). */
+	prioritySpeaker: boolean,
 	/**  Channels this person listens to (ear icon). */
 	listeningChannelIds: number[],
 	hasAvatar: boolean,

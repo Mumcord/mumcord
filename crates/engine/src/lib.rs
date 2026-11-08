@@ -51,7 +51,7 @@ pub mod watch_party;
 pub mod web;
 pub mod whisper;
 
-pub use admin::{BanOutcome, BanRequest, KickOutcome, PersonView};
+pub use admin::{BanOutcome, BanRequest, KickOutcome, ModerateAction, PersonView};
 pub use banlist::{BanChange, BanSaveOutcome, BanView};
 pub use channel_acl::{AclGroup, AclRule, AclSaveOutcome, ChannelAcl, PasswordState, password_of};
 pub use channel_admin::{ChannelChange, ChannelCreate, ChannelOutcome};

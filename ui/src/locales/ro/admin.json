@@ -372,5 +372,19 @@
     "rootBody": "Acestea sunt regulile canalului Root; fiecare canal le moștenește.",
     "backToEditing": "Înapoi la editare",
     "saveAnyway": "Salvează oricum"
+  },
+  "moderate": {
+    "mute": "Dezactivează sunetul pe server",
+    "deafen": "Asurzește pe server",
+    "unsuppress": "Anulează suprimarea",
+    "priority": "Vorbitor prioritar",
+    "resetComment": "Resetează comentariul",
+    "resetAvatar": "Resetează avatarul",
+    "commentTitle": "Resetezi comentariul lui {{name}}?",
+    "avatarTitle": "Resetezi avatarul lui {{name}}?",
+    "resetBody": "Se șterge pentru toți. Poate seta unul nou.",
+    "cancel": "Anulează",
+    "reset": "Resetează",
+    "failed": "Serverul nu a putut fi contactat. Încearcă din nou."
   }
 }

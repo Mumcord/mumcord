@@ -24,7 +24,8 @@ type IconName =
   | "user-check"
   | "music"
   | "gamepad"
-  | "signal";
+  | "signal"
+  | "star";
 
 const PATHS: Record<IconName, string> = {
   "mic-off":
@@ -34,6 +35,8 @@ const PATHS: Record<IconName, string> = {
   ear: "M6 8.5a6 6 0 1 1 12 0c0 3-2 4.5-3 5.5s-1.5 2-1.5 3.5a3 3 0 0 1-6 0M9 8.5a3 3 0 0 1 6 0",
   ban: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M5.6 5.6l12.8 12.8",
   "volume-x": "M11 5 6 9H3v6h3l5 4V5M22 9l-6 6M16 9l6 6",
+  // Priority speaker (issue #257): heard over everyone else.
+  star: "M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3",
   music: "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0a3 3 0 1 1 6 0M21 16a3 3 0 1 1-6 0a3 3 0 1 1 6 0",
   gamepad: GAMEPAD_PATH,
   // Three rising signal bars.
@@ -123,6 +126,9 @@ export function StatusIcons({ user, listener = false }: { user: User; listener?:
           variant={VOICE_ICONS[voice].variant}
           tip={t(`statusTip.${voice}`)}
         />
+      )}
+      {user.prioritySpeaker && (
+        <Icon name="star" variant="priority" tip={t("statusTip.prioritySpeaker")} />
       )}
       {user.localMute && (
         <Icon name="volume-x" variant="local-muted" tip={t("statusTip.localMuted")} />

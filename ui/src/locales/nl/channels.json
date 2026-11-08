@@ -33,7 +33,8 @@
     "serverDeafened": "doof gezet door server",
     "suppressed": "onderdrukt (kan hier niet praten)",
     "localMuted": "voor jou gedempt",
-    "unregistered": "niet geregistreerd"
+    "unregistered": "niet geregistreerd",
+    "prioritySpeaker": "voorrangsspreker"
   },
   "mumcordBadge": "Gebruikt Mumcord",
   "botBadge": "Bot",
@@ -60,7 +61,8 @@
     "nowPlaying": "Luistert naar {{track}}",
     "nowGaming": "Speelt {{game}}",
     "weakConnection": "Zwakke verbinding – hoge ping of pakketverlies",
-    "positional": "Positionele audio actief"
+    "positional": "Positionele audio actief",
+    "prioritySpeaker": "Voorrangsspreker – wordt boven iedereen gehoord"
   },
   "announce": {
     "joined": "{{name}} is je kanaal binnengekomen",
