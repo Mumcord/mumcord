@@ -480,6 +480,11 @@ pub mod tests {
         assert!(check_min_mumcord(ApiMinor::V1_1, Some("0.7")).is_ok());
         assert!(check_min_mumcord(ApiMinor::V1_1, Some("0.8.2")).is_ok());
         assert!(check_min_mumcord(ApiMinor::V1_0, Some("0.6")).is_ok());
+        // FR-13.6: API 1.2 needs Mumcord 0.8.
+        assert!(check_min_mumcord(ApiMinor::V1_2, None).is_ok());
+        assert!(check_min_mumcord(ApiMinor::V1_2, Some("0.8")).is_ok());
+        assert!(check_min_mumcord(ApiMinor::V1_2, Some("0.8.0")).is_ok());
+        assert!(check_min_mumcord(ApiMinor::V1_2, Some("0.7")).is_err());
         let error = check_min_mumcord(ApiMinor::V1_1, Some("0.6.9")).expect_err("too low");
         assert!(
             error.to_string().contains("first release with API 1.1"),
