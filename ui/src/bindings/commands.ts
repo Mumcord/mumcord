@@ -4781,6 +4781,12 @@ export type ScreenShare = {
 	 *  tell a window from the whole screen.
 	 */
 	kind: ShareKind | null,
+	/**
+	 *  The picked window's title, else its app's name, for the own live bar (issue #558);
+	 *  `null` for a screen, where the platform does not say, and for the shares of others. It
+	 *  never leaves this device (FR-7.87).
+	 */
+	title: string | null,
 	/**  How long the share has been running (issue #163). */
 	elapsedMs: number,
 };

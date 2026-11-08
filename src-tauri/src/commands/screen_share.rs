@@ -66,6 +66,10 @@ pub struct ScreenShare {
     /// What the sharer picked in the system picker (issue #163); `null` where the platform cannot
     /// tell a window from the whole screen.
     pub kind: Option<ShareKind>,
+    /// The picked window's title, else its app's name, for the own live bar (issue #558);
+    /// `null` for a screen, where the platform does not say, and for the shares of others. It
+    /// never leaves this device (FR-7.87).
+    pub title: Option<String>,
     /// How long the share has been running (issue #163).
     pub elapsed_ms: u32,
 }
@@ -395,6 +399,7 @@ impl From<ScreenShareView> for ScreenShare {
                 EngineShareKind::Window => ShareKind::Window,
                 EngineShareKind::Screen => ShareKind::Screen,
             }),
+            title: v.title,
             elapsed_ms: v.elapsed_ms,
         }
     }
@@ -1020,8 +1025,20 @@ mod tests {
             viewers: Vec::new(),
             blocked: None,
             kind: None,
+            title: None,
             elapsed_ms: 0,
         }
+    }
+
+    #[test]
+    fn the_window_title_reaches_the_live_bar() {
+        let s = ScreenShare::from(ScreenShareView {
+            kind: Some(EngineShareKind::Window),
+            title: Some("VS Code".into()),
+            ..view(SoundStatus::default())
+        });
+        assert_eq!(s.kind, Some(ShareKind::Window));
+        assert_eq!(s.title.as_deref(), Some("VS Code"));
     }
 
     #[test]

@@ -156,6 +156,14 @@ export function SharerBar(): ReactNode {
           </span>
           <span className="sharer-bar__source">
             {source.join(" · ")}
+            {own.kind === "window" && own.title !== null && (
+              <>
+                {" · "}
+                <span className="sharer-bar__window" title={own.title}>
+                  {own.title}
+                </span>
+              </>
+            )}
             <SoundBadge own={own} />
             {quality !== null && <ShareBadges quality={quality} />}
           </span>
