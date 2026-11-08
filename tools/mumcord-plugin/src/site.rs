@@ -179,6 +179,44 @@ mod tests {
     use crate::source::tests::write_plugin;
     use mumcord_plugins::registry::Choice;
 
+    /// FR-13.6: a 1.2 version is listed in `v1.1/index.json` only, with its `min_mumcord`.
+    #[test]
+    fn api_1_2_versions_go_only_into_the_v1_1_index() {
+        let repo = tempfile::tempdir().expect("test step");
+        write_plugin(repo.path(), "dice", &["1.0.0", "1.1.0"]);
+        let path = source::version_path(repo.path(), "dice", "1.1.0");
+        let text = fs::read_to_string(&path).expect("test step");
+        fs::write(
+            &path,
+            text.replace("api = 1", "api = \"1.2\"\nmin_mumcord = \"0.8\""),
+        )
+        .expect("test step");
+        let out = tempfile::tempdir().expect("test step");
+        run(Args {
+            repo: repo.path().to_owned(),
+            out: out.path().to_owned(),
+            sequence: Some(9),
+            base_url: BASE_URL.into(),
+            package_url: PACKAGE_URL.into(),
+        })
+        .expect("test step");
+        let v1 = Index::parse(
+            &fs::read(out.path().join("v1/index.json")).expect("test step"),
+            &IndexKind::Official,
+        )
+        .expect("0.6 clients accept the index");
+        assert_eq!(
+            v1.plugin("dice").expect("1.0 version").latest().version,
+            "1.0.0"
+        );
+        let v2: serde_json::Value = serde_json::from_slice(
+            &fs::read(out.path().join("v1.1/index.json")).expect("test step"),
+        )
+        .expect("json");
+        assert_eq!(v2["plugins"][0]["versions"][1]["api"], "1.2");
+        assert_eq!(v2["plugins"][0]["versions"][1]["min_mumcord"], "0.8");
+    }
+
     #[test]
     fn api_1_1_versions_go_only_into_the_v1_1_index() {
         let repo = tempfile::tempdir().expect("test step");
