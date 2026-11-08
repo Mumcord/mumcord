@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "bundle": {
+    "linux": {
+      "deb": {
+        "files": {
+          "/usr/lib/mumcord/libavutil.so.58": "gen/ffmpeg/libavutil.so.58",
+          "/usr/lib/mumcord/libavcodec.so.60": "gen/ffmpeg/libavcodec.so.60",
+          "/usr/lib/mumcord/libavformat.so.60": "gen/ffmpeg/libavformat.so.60",
+          "/usr/lib/mumcord/libavfilter.so.9": "gen/ffmpeg/libavfilter.so.9",
+          "/usr/lib/mumcord/gstreamer-1.0/libgstlibav.so": "gen/ffmpeg/gstreamer-1.0/libgstlibav.so"
+        }
+      },
+      "rpm": {
+        "files": {
+          "/usr/lib/mumcord/libavutil.so.58": "gen/ffmpeg/libavutil.so.58",
+          "/usr/lib/mumcord/libavcodec.so.60": "gen/ffmpeg/libavcodec.so.60",
+          "/usr/lib/mumcord/libavformat.so.60": "gen/ffmpeg/libavformat.so.60",
+          "/usr/lib/mumcord/libavfilter.so.9": "gen/ffmpeg/libavfilter.so.9",
+          "/usr/lib/mumcord/gstreamer-1.0/libgstlibav.so": "gen/ffmpeg/gstreamer-1.0/libgstlibav.so"
+        }
+      }
+    }
+  }
+}
