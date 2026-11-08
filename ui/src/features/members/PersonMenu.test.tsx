@@ -342,6 +342,48 @@ describe("PersonMenu", () => {
     expect(screen.queryByRole("menuitem", { name: "Admin" })).not.toBeInTheDocument();
   });
 
+  it("registers an online guest with a certificate, and only with the right (FR-10.20, AC-10.15, issue #256)", async () => {
+    await renderPanel();
+    // A guest who brought a certificate: that is what an account is bound to. Ben, the seeded
+    // guest, has none, so the item is not offered for him.
+    const anna = getServerState().users.get(2);
+    if (!anna) throw new Error("seed person missing");
+    act(() => {
+      api.mock.upsertUser({
+        ...anna,
+        session: 60,
+        name: "Mallory",
+        certHash: "malloryhash",
+        registered: false,
+      });
+    });
+    const root = getServerState().channels.get(0);
+    if (!root) throw new Error("seed channel missing");
+
+    act(() => {
+      api.mock.updateChannel(0, { ...root, permissions: { ...root.permissions, register: true } });
+    });
+    fireEvent.contextMenu(member(/^Mallory/), { clientX: 1, clientY: 1 });
+    const admin = screen.getByRole("menuitem", { name: "Admin" });
+    fireEvent.click(admin);
+    const submenu = screen.getAllByRole("menu").at(-1);
+    if (!submenu) throw new Error("the Admin sub-menu did not open");
+    expect(within(submenu).getByRole("menuitem", { name: "Register on server…" })).toBeTruthy();
+
+    fireEvent.click(within(submenu).getByRole("menuitem", { name: "Register on server…" }));
+    await waitFor(() => {
+      expect(getServerState().users.get(60)?.registered).toBe(true);
+    });
+
+    // A registered person is no longer offered, and without the right nothing shows at all.
+    act(() => {
+      api.mock.updateChannel(0, { ...root, permissions: { ...root.permissions, register: false } });
+    });
+    act(closePersonMenu);
+    fireEvent.contextMenu(member(/^Mallory/), { clientX: 1, clientY: 1 });
+    expect(screen.queryByRole("menuitem", { name: "Admin" })).not.toBeInTheDocument();
+  });
+
   it("opens the kick and ban dialogs from a real pointer press on the Admin sub-menu (issue #507)", async () => {
     await renderPanel();
     render(<PersonActionHost />);

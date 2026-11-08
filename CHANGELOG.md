@@ -6,6 +6,7 @@
 
 - Homebrew (issue #662): `brew install --cask mumcord/tap/mumcord` on macOS and `brew install mumcord/tap/mumcord` on Linux, from the new tap `Mumcord/homebrew-tap`, which follows new releases by itself
 - Release candidates (issue #686): coming versions can be tried early as pre-releases (e.g. "Mumcord 0.8.0 RC 1") on the Releases page, with every package; the in-app updater, Homebrew and the AUR keep offering only final releases, and the final release installs over a release candidate
+- Registered users (issue #256): the server menu gains "Registered users…", which opens a tab next to Bans in Server administration and lists every account the server knows, with the account id, the last seen and the last channel. Search, "Online" and "Inactive 90+ days" filters, renaming, unregistering and registering someone who is connected right now, groups that name the account, and one save for all your changes with a clear note when the server did not take one. Only with the server's Register right; without it the menu item and the tab stay away
 
 ### Fixed
 
