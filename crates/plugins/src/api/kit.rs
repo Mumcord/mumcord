@@ -2,7 +2,7 @@
 //! app's two font faces and their licence, compiled into the binary from `ui/src/plugin-kit/` so
 //! nothing is ever read from disk or fetched from the network.
 
-use crate::permissions::API_1_2;
+use crate::permissions::{API_1_2, is_api_1_2};
 
 /// The kit's folder below the reserved segment for API major 1 (FR-13.19); a future 2.0 kit would
 /// live at `v2/` next to it.
@@ -55,7 +55,7 @@ const FILES: [(&str, KitFile); 4] = [
 /// for a plugin built against `api`. `None` for plugins before 1.2 and for every unknown path.
 /// Only the reserved segment itself ignores ASCII case (FR-13.28); the rest must match exactly.
 pub fn file(api: (u64, u64), path: &str) -> Option<KitFile> {
-    if api < API_1_2 || api.0 != API_1_2.0 {
+    if !is_api_1_2(api) {
         return None;
     }
     let (_reserved, rest) = path.split_once('/')?;

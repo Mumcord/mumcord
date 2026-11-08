@@ -72,15 +72,6 @@ impl Theme {
     }
 }
 
-/// The first API minor whose pages get the theme tokens (FR-13.8); 1.0 and 1.1 pages stay as
-/// they were.
-pub const PAGE_THEME_API: (u64, u64) = (1, 2);
-
-/// Whether the pages of a plugin built against API minor `api` get the theme tokens.
-pub fn themes_pages(api: (u64, u64)) -> bool {
-    api >= PAGE_THEME_API
-}
-
 /// `data-mc-mode` of a page (FR-13.11).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -202,14 +193,6 @@ mod tests {
 
     fn token(name: &str, value: &str) -> (String, String) {
         (name.to_owned(), value.to_owned())
-    }
-
-    #[test]
-    fn only_api_1_2_and_newer_pages_are_themed() {
-        assert!(!themes_pages((1, 0)));
-        assert!(!themes_pages((1, 1)));
-        assert!(themes_pages((1, 2)));
-        assert!(themes_pages((1, 3)));
     }
 
     #[test]

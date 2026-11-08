@@ -25,6 +25,7 @@ use crate::api::kit;
 use crate::api::theme::PageTheme;
 use crate::manifest::{Manifest, WebviewPlace as DeclaredPlace};
 use crate::origins::{Origin, Scheme};
+use crate::permissions::is_api_1_2;
 use crate::runtime::bindings::mumcord::plugin::webview::{Host, Place, add_to_linker};
 use crate::runtime::wit::types::Error;
 use crate::runtime::{HostApi, PluginState};
@@ -366,8 +367,6 @@ struct PluginWeb {
     rates: Option<Rates>,
     /// The last click or key press in one of its pages that counted as a gesture (FR-9.45).
     last_gesture: Option<Instant>,
-    /// Its pages get the theme tokens (API 1.2 or newer, FR-13.8).
-    themed: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -443,11 +442,6 @@ impl Webviews {
         self.lock().entry(plugin.to_owned()).or_default().api = api;
     }
 
-    /// Sets whether a plugin's pages get the theme tokens (its `api` is 1.2 or newer), at load.
-    pub fn set_themed(&self, plugin: &str, themed: bool) {
-        self.lock().entry(plugin.to_owned()).or_default().themed = themed;
-    }
-
     /// Records the theme the UI resolved; pages served from now on start with it (FR-13.13).
     /// Open pages get it from the UI directly (FR-13.15).
     pub fn set_page_theme(&self, theme: &PageTheme) {
@@ -458,7 +452,11 @@ impl Webviews {
     /// The theme data block for a page of `plugin`: `None` for plugins below API 1.2, whose
     /// pages stay exactly as before, and before the UI reported a theme.
     pub fn page_theme(&self, plugin: &str) -> Option<String> {
-        if !self.lock().get(plugin).is_some_and(|web| web.themed) {
+        if !self
+            .lock()
+            .get(plugin)
+            .is_some_and(|web| is_api_1_2(web.api))
+        {
             return None;
         }
         self.theme
@@ -1025,8 +1023,8 @@ mod tests {
         use crate::api::theme::{PageMode, PageScheme};
 
         let views = Webviews::default();
-        views.set_themed("new", true);
-        views.set_themed("old", false);
+        views.set_api("new", (1, 2));
+        views.set_api("old", (1, 1));
         // Nothing to embed before the UI reported a theme.
         assert_eq!(views.page_theme("new"), None);
 

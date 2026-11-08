@@ -37,6 +37,12 @@ pub const API_1_1: (u64, u64) = (1, 1);
 /// The API minor that added theme tokens and the UI kit for pages (spec 13).
 pub const API_1_2: (u64, u64) = (1, 2);
 
+/// Whether a plugin built against API minor `api` is on API 1.2 or newer of the current major:
+/// its pages get the theme tokens and the UI kit (FR-13.8, FR-13.19).
+pub fn is_api_1_2(api: (u64, u64)) -> bool {
+    api >= API_1_2 && api.0 == API_1_2.0
+}
+
 const fn all(
     id: &'static str,
     risk: Risk,
