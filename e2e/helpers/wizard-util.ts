@@ -196,12 +196,14 @@ export async function finishWithPreset(preset: WizardPreset): Promise<void> {
 /**
  * Right after the first-start wizard Aaron offers the tips tour (#637) in the lower right corner,
  * where his bubble covers the chat and holds the focus. A real user answers it first; the specs
- * that only need a finished wizard say "Not now", like such a user would.
+ * that only need a finished wizard close it, like such a user would.
  */
 export async function declineTourOffer(): Promise<void> {
   const offer = $("//*[@role='region'][@aria-label='Aaron, the tips helper']");
   await offer.waitForDisplayed({ timeout: 10_000 });
-  await offer.$("//button[normalize-space(.)='Not now']").click();
+  // Escape instead of a click on "Not now": a click leaves the pointer over the toast corner,
+  // and hovered toasts stay open, so later specs would see stale toasts.
+  await browser.keys("Escape");
   await offer.waitForExist({ reverse: true, timeout: 10_000 });
 }
 
