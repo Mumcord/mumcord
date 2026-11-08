@@ -39,6 +39,7 @@ pub mod pm_rules;
 pub mod positional;
 pub mod profile;
 pub mod public_servers;
+pub mod registered;
 pub mod screen_share;
 pub mod server_query;
 pub mod session;
@@ -72,6 +73,7 @@ pub use now_playing::{LocalTrack, NowPlayingView};
 pub use pm_overview::PrivateConversationView;
 pub use pm_rules::{MessageRequestView, PmRequestsView, SentChatRequestView};
 pub use positional::PositionalStatus;
+pub use registered::{RegisteredOutcome, RegisteredView};
 pub use server_query::{QueryOutcome, ServerQueries, ServerQuery};
 pub use session::Engine;
 pub use session::{
