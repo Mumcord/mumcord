@@ -6,7 +6,7 @@
 //! user's own change applied (FR-10.66). Entries carry the full address; the UI masks it by default
 //! and shows it only for one row at a time (FR-10.51, FR-10.65).
 
-use mumcord_engine::{Engine, banlist};
+use mumcord_engine::{Engine, banlist, registered};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use std::net::IpAddr;
@@ -272,6 +272,145 @@ pub fn person_action_close(engine: State<'_, Engine>, server_id: ServerId) -> Ap
     Ok(())
 }
 
+/// One registered account as the window shows it (issue #256). `userId` is the key of the row: the
+/// server does not keep names unique in a way a client can rely on, and only the id says which
+/// account a change acts on. `certHash` is personal data shown only to a user with the Ban right
+/// (FR-10.65).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct RegisteredUserEntry {
+    pub user_id: u32,
+    pub name: String,
+    /// RFC 3339, or `null` when the server does not say (FR-10.5).
+    pub last_seen: Option<String>,
+    /// The channel the account was last seen in, named, or `null` when the server does not say.
+    pub last_channel: Option<String>,
+    /// Whether one of their accounts is connected right now.
+    pub online: bool,
+    pub cert_hash: Option<String>,
+}
+
+impl From<registered::RegisteredView> for RegisteredUserEntry {
+    fn from(v: registered::RegisteredView) -> Self {
+        Self {
+            user_id: v.user_id,
+            name: v.name,
+            last_seen: v.last_seen,
+            last_channel: v.last_channel,
+            online: v.online,
+            cert_hash: v.cert_hash,
+        }
+    }
+}
+
+/// What a rename or an unregister produced (issue #256). The window shows `entries` either way,
+/// because the server's own list is the only account of what stands.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum RegisteredSaveResult {
+    /// The server's list now carries the change.
+    Saved { entries: Vec<RegisteredUserEntry> },
+    /// The list still shows the account as it was, which the server does not say in words: the
+    /// usual cause is a name another account already holds.
+    Kept { entries: Vec<RegisteredUserEntry> },
+}
+
+/// Reads the server's registered accounts for the window (issue #256). Fails with
+/// `permissionDenied` without the Register right in the root channel, and with `serverUnreachable`
+/// when the server does not answer within 5 s. Nothing is stored on disk (FR-10.63).
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_users_open(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Vec<RegisteredUserEntry>> {
+    Ok(registered_entries(
+        engine
+            .registered_open(to_engine_server_id(server_id))
+            .await?,
+    ))
+}
+
+/// Renames one account (FR-10.52, AC-10.37). One `UserList` entry carries the new name; the answer
+/// is the list the server holds afterwards, which is what tells whether it took the name.
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_user_rename(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    user_id: u32,
+    name: String,
+) -> ApiResult<RegisteredSaveResult> {
+    let outcome = engine
+        .registered_rename(to_engine_server_id(server_id), user_id, &name)
+        .await?;
+    Ok(to_save_result(outcome))
+}
+
+/// Removes one registration (FR-10.52, AC-10.37). The person can still connect, as a guest, and
+/// loses the name and the group memberships that name them.
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_user_unregister(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    user_id: u32,
+) -> ApiResult<RegisteredSaveResult> {
+    let outcome = engine
+        .registered_unregister(to_engine_server_id(server_id), user_id)
+        .await?;
+    Ok(to_save_result(outcome))
+}
+
+/// Registers an online guest under their current name (FR-10.20, AC-10.15). Fails with
+/// `permissionDenied` without the Register right, and with `invalidInput` when the person is not
+/// connected, is registered already, or has no certificate to bind the account to.
+#[tauri::command]
+#[specta::specta]
+pub fn person_register(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+) -> ApiResult<()> {
+    engine
+        .registered_register_person(to_engine_server_id(server_id), session)
+        .map_err(|error| error.into())
+}
+
+/// The groups that name one account in a channel (issue #256). A server that will not show its
+/// groups answers with an empty list rather than an error.
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_user_groups(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    user_id: u32,
+) -> ApiResult<Vec<String>> {
+    engine
+        .registered_groups(to_engine_server_id(server_id), user_id)
+        .await
+        .map_err(|error| error.into())
+}
+
+/// The window closed: what it held is dropped (FR-10.63).
+#[tauri::command]
+#[specta::specta]
+pub fn registered_users_close(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
+    engine.registered_close(to_engine_server_id(server_id));
+    Ok(())
+}
+
+fn to_save_result(outcome: registered::RegisteredOutcome) -> RegisteredSaveResult {
+    match outcome {
+        registered::RegisteredOutcome::Saved { entries } => RegisteredSaveResult::Saved {
+            entries: entries.into_iter().map(Into::into).collect(),
+        },
+        registered::RegisteredOutcome::Kept { entries } => RegisteredSaveResult::Kept {
+            entries: entries.into_iter().map(Into::into).collect(),
+        },
+    }
+}
+
 fn to_ban_request(input: BanInput) -> ApiResult<mumcord_engine::BanRequest> {
     if !input.by_cert && !input.by_ip {
         return Err(invalid("at least one target must stay on"));
@@ -335,6 +474,10 @@ fn invalid(message: &str) -> ApiError {
 }
 
 fn entries(list: Vec<banlist::BanView>) -> Vec<BanEntry> {
+    list.into_iter().map(Into::into).collect()
+}
+
+fn registered_entries(list: Vec<registered::RegisteredView>) -> Vec<RegisteredUserEntry> {
     list.into_iter().map(Into::into).collect()
 }
 
