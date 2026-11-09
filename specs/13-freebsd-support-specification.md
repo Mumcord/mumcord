@@ -34,6 +34,7 @@ Four things FreeBSD does not have decide the shape of this epic: there is no des
 | Screen-share sound | PipeWire is the only way the share takes an app's sound; FreeBSD has no PipeWire |
 | Window/screen picker, per-app share | Needs `xdg-desktop-portal`, which FreeBSD does not provide |
 | Wayland-native global hotkeys | Same portal; X11 and XWayland are the supported path |
+| DRM-protected video and AV1/Opus-only streams in the watch party | This WebKitGTK has no EME (Widevine/ClearKey) and no AV1 decoder. Ordinary YouTube videos play: the package depends on the GStreamer decoders WebKitGTK loads at runtime (`gstreamer1-libav`, `-vpx`, `-opus`) |
 | Self-updater | A package is updated with `pkg upgrade`; the app never replaces itself |
 | FreeBSD 14.x, arm64 | A second build and test target; added when there is demand (Q4.1) |
 | Signed Mumcord package repository, FreeBSD ports collection | Release asset first, decided in Q1.6 and Q5.2 |

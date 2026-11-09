@@ -18,7 +18,7 @@ Mumcord installs from a FreeBSD package, starts as a single instance, connects t
 | AC-13.4 | ⚠️ | Receive: 1984 voice packets from the second client reached the server, 123+ (~330 B) were forwarded to the box's client over loopback, output stream open at real-time priority (`real-time scheduling on thread=playback`). Send: with F9 held the server forwarded 361 voice frames to the second client. Audibility itself could not be judged: the machine has only a Jabra Link 380 dongle without headset, so its capture device delivers no audio |
 | AC-13.5 | ⚠️ | Per-unit PCMs installed (`aplay -L` lists 8 "Sound card N (OSS)"), filter unit test; switching between two real cards not exercised (the machine has one `/dev/dsp`) |
 | AC-13.6 | ⚠️ | Pulling the dongle mid-call: `Input/Output audio stream failed; reopening` → `no audio device available … may have been disconnected`, connection kept, no crash; replugging reopened both streams by itself. No "device changed" notice and no fallback, because with a single device there is nothing to fall back to (same code path as Linux) |
-| AC-13.7 | ⚠️ | Chat ✅ (three messages, one synced "from another user's history"), image ✅ (inline, over the direct connection), watch party ✅ as a party (invite, join, playlist, sync, watcher list). File sharing impossible on this server: files need the relay, and the test server has none ("This server has no relay, so file sharing isn't available"), so not exercised |
+| AC-13.7 | ⚠️ | Chat ✅ (three messages, one synced "from another user's history"), image ✅ (inline, over the direct connection), watch party ✅ (invite, join, playlist, sync, watcher list, and the video plays on the FreeBSD viewer with subtitles). File sharing impossible on this server: files need the relay, and the test server has none, so not exercised |
 | AC-13.8 | ✅ | Signed registry loaded over TLS ("Official repository · signed index checked"), dice-roller installed with its permission dialog, `/roll` produced the chat card ("rolled d20 = 7") |
 | AC-13.9 | ✅ | Push-to-talk key F9 set in Settings → Voice; holding it opened the mic and transmitted (361 forwarded frames) |
 | AC-13.10 | ✅ | KDE's StatusNotifierWatcher lists `…/org/ayatana/NotificationItem/tray_icon_tray_app_main`; no-host hint not exercised |
@@ -52,10 +52,12 @@ Mumcord installs from a FreeBSD package, starts as a single instance, connects t
 - T2: the per-unit entries come from an ALSA configuration the package installs (as specified), and Mumcord hides the units the machine does not have. Switching between two real cards is unverified.
 - The About note names the gaps in one list instead of three separate lines (FR-13.28 wording "three lines"); the content is the same.
 - Translations of the new About/camera/share texts are English in every locale for now.
-- **Watch party**: the party itself works (invite, join, playlist, sync, watcher list), but the
-  YouTube player inside the app stays black — this WebKitGTK build has no EME/Widevine, so
-  YouTube refuses its embedded player. Spec §2.1 lists watch party as supported; that is wrong
-  for the video part. Needs either a spec deviation in §2.2 or a native player.
+- **Watch party**: party mechanics and playback work, but only with the GStreamer decoders
+  WebKitGTK loads at runtime; without them YouTube reports "this video cannot be played in your
+  browser" (its HTML5 error 5) and the frame stays black. Two limits stay: DRM-protected videos
+  cannot play (this WebKitGTK build has no EME at all — `requestMediaKeySystemAccess` is
+  undefined) and streams YouTube serves only as AV1/Opus cannot decode (no AV1 decoder, no Opus
+  in MSE; `av1_mse`/`opus_mse` are false). Both are in spec §2.2 now.
 - The package gains three runtime dependencies that `ldd` cannot see, because WebKitGTK loads
   its decoders through GStreamer: `gstreamer1-libav`, `gstreamer1-plugins-vpx`,
   `gstreamer1-plugins-opus` (`scripts/build-freebsd-pkg.sh`). Without them even H.264 does not

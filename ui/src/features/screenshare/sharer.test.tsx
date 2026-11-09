@@ -77,14 +77,16 @@ describe("share availability", () => {
       block: off,
     });
     expect(
-      shareBlock({ inChannel: true, p2p: null, platform: platformOf("freebsd x86_64") }),
+      shareBlock({ inChannel: true, p2p: null, platform: platformOf("android aarch64") }),
     ).toEqual({ kind: "unsupportedPlatform" });
   });
 
-  it("supports Linux, macOS and Windows", () => {
+  it("supports Linux, macOS, Windows and FreeBSD", () => {
     expect(platformOf("Linux x86_64")).toEqual({ supported: true });
     expect(platformOf("macos aarch64")).toEqual({ supported: true });
     expect(platformOf("windows x86_64")).toEqual({ supported: true });
+    // FreeBSD shares the whole X11 screen like Linux on X11 (FR-13.20).
+    expect(platformOf("freebsd x86_64")).toEqual({ supported: true });
   });
 });
 
