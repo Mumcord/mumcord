@@ -83,7 +83,7 @@ No new roles. FreeBSD is a client platform; server-side roles (guest, registered
 
 - **FR-13.14** Capture and playback go through ALSA, which FreeBSD implements over OSS (`/dev/dsp`). The package depends on `alsa-lib` and the OSS plugin.
 - **FR-13.15** The device list contains the OSS device and **one entry per `/dev/dsp` unit**, so a machine with two sound cards can be switched inside Mumcord. The package ships the ALSA configuration that defines these entries (to build, Q3.1).
-- **FR-13.16** When the selected device disappears, playback and capture fall back to the system default, the call continues, and the existing "device changed" notice is shown (Q3.2).
+- **FR-13.16** When the selected device disappears while it is in use, playback and capture fall back to the device that is left and the call continues — the shared behaviour, measured: the streams reopen with `fallback: true` and the connection stays up. The saved choice is kept, so the card is used again when it comes back. No separate notice appears for a device that disappears mid-call, exactly as on Linux; the "device changed" notice is the start-up migration one (Q3.2).
 - **FR-13.17** The capture and playback threads are raised to real-time priority with FreeBSD's `rtprio`, using the same values the Linux path asks rtkit for (to build, Q3.3).
 - **FR-13.18** Noise suppression, echo cancellation, AGC, volume handling, voice activation and all DSP defaults are the shared implementation and stay unchanged.
 - **FR-13.19** A screen share carries no sound on FreeBSD; the start dialog says so in one line (Q1.2).
@@ -258,7 +258,7 @@ Verified on a fresh FreeBSD 15.x amd64 (VM is fine), with `mumble-server` runnin
 - **AC-13.3** After the wizard, `mumcord "mumble://127.0.0.1:64738/"` connects: the window shows the server, the channel tree and the user; the log contains `session: connected` and no error.
 - **AC-13.4** Voice works in both directions on hardware with a sound device: the level meters move, the other client (mumble or a second Mumcord) hears the user and the user hears it; the log shows capture and playback streams without fallback.
 - **AC-13.5** With two sound cards, the device picker lists one entry per `/dev/dsp` unit and switching between them works within the running session.
-- **AC-13.6** Unplugging the selected USB sound card during a call falls back to the system default, keeps the connection and shows the "device changed" notice.
+- **AC-13.6** Unplugging the selected USB sound card during a call falls back to the device that is left and keeps the connection (measured: `chosen Output device unavailable …; using the default`, `audio stream active … fallback=true`); replugging brings it back without restarting, the saved choice survives, and no notice is shown, as on Linux.
 - **AC-13.7** Text chat, file sharing and watch party work with a second client on the same server.
 - **AC-13.8** A Wasm plugin from the registry installs, runs and its chat card renders.
 - **AC-13.9** A push-to-talk key and a mouse side button trigger transmission; Settings → Hotkeys shows no hint in an X11 session.
