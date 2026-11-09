@@ -6,7 +6,7 @@
 # The release workflow runs it; it also works locally. Usage:
 #   scripts/generate-sbom.sh <version> <native-dir> <out-dir>
 # <native-dir> holds sbom-native-<build>.txt from scripts/sbom-native.sh for each build job
-# (linux, linux-arm64, windows, macos-aarch64, macos-x64). PLATFORMS limits the output, for example
+# (linux, linux-arm64, windows, macos-aarch64, macos-x64, freebsd). PLATFORMS limits the output, for example
 #   PLATFORMS="appimage-x86_64 deb-rpm-x86_64" scripts/generate-sbom.sh 0.0.0 native out
 # Needs cargo-cyclonedx at the version in scripts/license-tools.env, node/npm and jq.
 set -euo pipefail
@@ -35,6 +35,7 @@ deb-rpm-aarch64   linux-arm64 aarch64-unknown-linux-gnu                 -
 windows-x86_64    windows     x86_64-pc-windows-msvc                    -
 macos-aarch64     macos-aarch64 aarch64-apple-darwin                    -
 macos-x86_64      macos-x64   x86_64-apple-darwin                       -
+freebsd-pkg-x86_64 freebsd    x86_64-unknown-freebsd                    -
 "
 platforms="${PLATFORMS:-$(awk 'NF { print $1 }' <<<"$table")}"
 

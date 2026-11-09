@@ -60,7 +60,7 @@
 - **Verify:** Diagnostics lists the facts, no personal data; hints appear in the documented situations.
 
 ## T7 – Release wiring
-- **Status:** open (release wiring)
+- **Status:** done (FreeBSD build job, checksums, release notes, changelog, SBOM row; the CI run itself is verified with T8)
 
 - **Complexity:** complex (CI)
 - **Covers:** §10, Q5.1, Q5.2, Q5.3

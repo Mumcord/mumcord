@@ -244,7 +244,7 @@ The OS Secret Service is always preferred; the vault is the fallback and its lim
 - **Install message**: `pkg` prints `packaging/freebsd/pkg-message` after the install — the Intel
   driver requirement and the software-rendering escape hatch (FR-13.33).
 - **Install/remove**: `pkg add ./mumcord-0.8.0.pkg`, `pkg delete mumcord`. The package's triggers refresh the icon and MIME caches on install and removal.
-- **Distribution**: release asset only (Q5.2). The release lists it in `SHA256SUMS`, the SBOM and the third-party notices (Q5.1), and the release page names the supported version and the limits (Q5.3).
+- **Distribution**: release asset only (Q5.2). The release lists it in `SHA256SUMS`, the SBOM and the third-party notices (Q5.1), and the release page names the supported version and the limits (Q5.3). The package carries its own licence and third-party notices; its CycloneDX SBOM (`mumcord-<version>-freebsd-pkg-x86_64.cdx.json`) is generated from the native-library list the FreeBSD build job writes (`scripts/sbom-native.sh`).
 - **Updates**: none in the app; the About note names `pkg upgrade mumcord` (FR-13.29).
 - **CI**: on every pull request `cargo check`, `cargo clippy` and `cargo test --workspace` inside a FreeBSD VM; before a release the package build and the connection smoke test against a local `mumble-server` from the FreeBSD package collection (Q5.4, Q5.5, Q3.6).
 - **Test server**: the native `mumble-server` package with a test ini (port, database in a temporary folder, no registration), started and stopped by the test script.

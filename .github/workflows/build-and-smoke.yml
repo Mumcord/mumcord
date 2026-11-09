@@ -521,6 +521,68 @@ jobs:
           if-no-files-found: error
           retention-days: ${{ inputs.release && 7 || 14 }}
 
+  # FreeBSD 15.x amd64 in a VM on a Linux runner (spec 13 §10): the .pkg is built with the repo's
+  # own script and smoke-tested against a local mumble-server from the package collection. Its job
+  # is separate from the matrix because the build runs inside the VM, not on the runner.
+  freebsd:
+    name: Build FreeBSD package
+    if: inputs.release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      # Releases bundle the notices release.yml regenerated from the tagged commit.
+      - name: Use the regenerated third-party notices
+        uses: actions/download-artifact@v8
+        with:
+          name: third-party-notices
+
+      - name: Build the package in a FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: "15.1"
+          usesh: true
+          # 8 GB RAM and four cores: `cargo build --release` needs both (spec 13 §10).
+          mem: 8192
+          cpu: 4
+          prepare: |
+            pkg install -y rust node24 npm protobuf python3 pkgconf alsa-lib alsa-plugins \
+              libvpx svt-av1 dav1d alsa-plugins gstreamer1-libav gstreamer1-plugins-vpx \
+              gstreamer1-plugins-opus webkit2-gtk_41 gtk3 libayatana-appindicator
+          run: |
+            set -e
+            export PATH="$HOME/.cargo/bin:$PATH"
+            export CARGO_BUILD_JOBS=4
+            scripts/set-version.sh "${{ inputs.version }}"
+            # The version stamp goes into the binary, so no cargo cache is reused across versions.
+            npm ci
+            npm run build
+            sh scripts/build-freebsd-pkg.sh
+            # The native libraries this build ships, for the SBOM job (scripts/generate-sbom.sh).
+            scripts/sbom-native.sh > sbom-native-freebsd.txt
+            ls -l dist-freebsd/ sbom-native-freebsd.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sbom-native-freebsd
+          path: sbom-native-freebsd.txt
+          if-no-files-found: error
+
+      - name: Collect artifact
+        shell: bash
+        run: |
+          mkdir -p out
+          cp "${{ github.workspace }}/dist-freebsd/"*.pkg out/
+          ls -l out
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mumcord-freebsd-release
+          path: out/
+          if-no-files-found: error
+          retention-days: 7
+
   smoke:
     name: Smoke ${{ matrix.name }}
     needs: build

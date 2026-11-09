@@ -69,6 +69,9 @@ jobs:
         run: grep '^[A-Z_]*=' scripts/license-tools.env >> "$GITHUB_OUTPUT"
 
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          # The FreeBSD package's SBOM is resolved from this Linux runner (spec 13 §10).
+          targets: x86_64-unknown-freebsd
 
       - uses: ./.github/actions/cargo-tool
         with:
@@ -216,9 +219,11 @@ jobs:
           # DMG and an updater archive for each of two CPUs.
           linux=(*_amd64.AppImage *_aarch64.AppImage *_amd64.deb *_arm64.deb *.x86_64.rpm *.aarch64.rpm)
           macos=(*_aarch64.dmg *_x64.dmg *_aarch64.app.tar.gz *_x64.app.tar.gz)
-          ls -l -- "${linux[@]}" *-setup.exe *-portable.zip "${macos[@]}" *.cdx.json *.sig latest.json
+          # FreeBSD 15.x amd64 (spec 13); the package carries its own third-party notices.
+          freebsd=(*.pkg)
+          ls -l -- "${linux[@]}" "${freebsd[@]}" *-setup.exe *-portable.zip "${macos[@]}" *.cdx.json *.sig latest.json
           cp ../scripts/install.sh .
-          sha256sum -- "${linux[@]}" *-setup.exe *-portable.zip "${macos[@]}" *.cdx.json *.sig latest.json install.sh > SHA256SUMS
+          sha256sum -- "${linux[@]}" "${freebsd[@]}" *-setup.exe *-portable.zip "${macos[@]}" *.cdx.json *.sig latest.json install.sh > SHA256SUMS
           cat SHA256SUMS
           # A warning box as soon as one platform is unsigned, a plain note otherwise.
           callout=NOTE
@@ -244,6 +249,7 @@ jobs:
             - Debian, Ubuntu and derivatives: \`*.deb\` (\`sudo apt install ./Mumcord_*.deb\`)
             - Fedora, openSUSE and derivatives: \`*.rpm\` (\`sudo dnf install ./Mumcord-*.rpm\` or \`sudo zypper install ./Mumcord-*.rpm\`)
             - Any distribution: \`*.AppImage\` (make it executable, then run it)
+          - **FreeBSD 15.x (amd64)**: \`mumcord-$VERSION.pkg\` (\`sudo pkg add ./mumcord-$VERSION.pkg\`). Updates come with \`pkg upgrade\`, the app never updates itself. Not available there: camera and AI backgrounds, in-game overlay, screen-share sound, window picker, protected (DRM) video. Screen sharing captures the whole X11 screen. Intel graphics need \`drm-66-kmod\`, and real-time audio needs the \`realtime\` group (\`pkg info -D mumcord\`).
 
           Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`. Each package type has a software bill of materials (SBOM, CycloneDX JSON) that lists its Rust crates, npm packages and bundled native libraries: \`mumcord-$VERSION-<platform>.cdx.json\` (\`windows-x86_64\` covers the installer and the portable zip, which carry the same \`Mumcord.exe\`). The files are attested by GitHub (\`gh attestation verify <file> --repo Mumcord/mumcord\`).
 
@@ -304,7 +310,7 @@ jobs:
           fi
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft "${kind[@]}" \
             --title "$title" --notes-file notes.md --generate-notes \
-            dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*-portable.zip dist/*.dmg dist/*.app.tar.gz dist/*.sig dist/latest.json dist/*.cdx.json dist/install.sh dist/SHA256SUMS
+            dist/*.AppImage dist/*.deb dist/*.rpm dist/*.pkg dist/*-setup.exe dist/*-portable.zip dist/*.dmg dist/*.app.tar.gz dist/*.sig dist/latest.json dist/*.cdx.json dist/install.sh dist/SHA256SUMS
 
   # After the draft exists, so a failed build never leaves a crate on crates.io without a
   # release (published versions cannot be removed). Pre-releases are skipped inside the workflow.
