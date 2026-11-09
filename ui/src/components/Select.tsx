@@ -1,5 +1,11 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { createPortal } from "react-dom";
 import "./select.css";
+
+/** Space the list keeps to the window edge and to its button. */
+const GAP = 4;
+/** Below this much room the list opens upwards instead. */
+const MIN_BELOW = 160;
 
 export interface SelectOption {
   value: string;
@@ -44,16 +50,34 @@ export function Select({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(selectedIndex);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  // The list is portalled out of the card, so a card that clips its children cannot cut it off;
+  // it is placed against the button and flips up when the window has no room below.
+  const listRef = useRef<HTMLDivElement>(null);
+  const [place, setPlace] = useState<ListPlacement | null>(null);
   const typed = useRef({ text: "", at: 0 });
 
   useEffect(() => {
     if (!open) return;
+    const inside = (target: EventTarget | null) =>
+      wrapperRef.current?.contains(target as Node) === true ||
+      listRef.current?.contains(target as Node) === true;
     const close = (event: PointerEvent) => {
-      if (!wrapperRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!inside(event.target)) setOpen(false);
     };
+    // The button moves with the page, so the list follows it or closes.
+    const replace = () => {
+      const rect = wrapperRef.current?.getBoundingClientRect();
+      if (rect === undefined) return;
+      setPlace(placeList(rect));
+    };
+    const onScroll = () => setOpen(false);
     document.addEventListener("pointerdown", close);
+    window.addEventListener("resize", replace);
+    window.addEventListener("scroll", onScroll, true);
     return () => {
       document.removeEventListener("pointerdown", close);
+      window.removeEventListener("resize", replace);
+      window.removeEventListener("scroll", onScroll, true);
     };
   }, [open]);
 
@@ -67,6 +91,8 @@ export function Select({
 
   const show = () => {
     setActive(selectedIndex);
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    setPlace(rect === undefined ? null : placeList(rect));
     setOpen(true);
   };
 
@@ -176,39 +202,79 @@ export function Select({
         <span className="select__value">{options[selectedIndex]?.label ?? ""}</span>
         <span className="select__chevron" aria-hidden="true" />
       </button>
-      {open && (
-        <div
-          id={listId}
-          role="listbox"
-          tabIndex={-1}
-          className="select__list"
-          // Keeps focus on the button while the pointer picks an option.
-          onMouseDown={(event) => {
-            event.preventDefault();
-          }}
-        >
-          {options.map((option, index) => (
-            // Keyboard handling lives on the combobox button (aria-activedescendant pattern).
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-            <div
-              key={option.value}
-              id={optionId(index)}
-              role="option"
-              tabIndex={-1}
-              aria-selected={index === selectedIndex}
-              className={`select__option${index === active ? " select__option--active" : ""}`}
-              onMouseMove={() => {
-                setActive(index);
-              }}
-              onClick={() => {
-                choose(index);
-              }}
-            >
-              {option.label}
-            </div>
-          ))}
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div
+            ref={listRef}
+            id={listId}
+            role="listbox"
+            tabIndex={-1}
+            className="select__list select__list--portal"
+            style={
+              place === null
+                ? undefined
+                : {
+                    left: place.left,
+                    minWidth: place.width,
+                    maxHeight: place.maxHeight,
+                    ...(place.above === null
+                      ? { top: place.top }
+                      : { bottom: place.above }),
+                  }
+            }
+            // Keeps focus on the button while the pointer picks an option.
+            onMouseDown={(event) => {
+              event.preventDefault();
+            }}
+          >
+            {options.map((option, index) => (
+              // Keyboard handling lives on the combobox button (aria-activedescendant pattern).
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+              <div
+                key={option.value}
+                id={optionId(index)}
+                role="option"
+                tabIndex={-1}
+                aria-selected={index === selectedIndex}
+                className={`select__option${index === active ? " select__option--active" : ""}`}
+                onMouseMove={() => {
+                  setActive(index);
+                }}
+                onClick={() => {
+                  choose(index);
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>,
+          document.body,
+        )}
     </div>
   );
+}
+
+/** Where the portalled list goes: below the button, or above it when the window has no room. */
+interface ListPlacement {
+  left: number;
+  width: number;
+  maxHeight: number;
+  /** Distance from the window top, when the list opens downwards. */
+  top: number;
+  /** Distance from the window bottom, when it opens upwards. */
+  above: number | null;
+}
+
+export function placeList(rect: DOMRect, viewport = window.innerHeight): ListPlacement {
+  const below = viewport - rect.bottom - GAP;
+  const above = rect.top - GAP;
+  const goUp = below < MIN_BELOW && above > below;
+  const maxHeight = Math.max(MIN_BELOW, Math.min(16 * 16, goUp ? above : below));
+  return {
+    left: rect.left,
+    width: rect.width,
+    maxHeight,
+    top: rect.bottom + GAP,
+    above: goUp ? viewport - rect.top + GAP : null,
+  };
 }

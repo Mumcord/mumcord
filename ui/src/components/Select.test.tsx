@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { Select } from "./Select";
+import { placeList, Select } from "./Select";
 
 const OPTIONS = [
   { value: "a", label: "Apple" },
@@ -91,5 +91,40 @@ describe("Select", () => {
     fireEvent.keyDown(box, { key: "Enter" });
     fireEvent.click(box);
     expect(screen.queryByRole("listbox")).toBeNull();
+  });
+});
+
+describe("Select list placement", () => {
+  /** A button rect as `getBoundingClientRect` would report it. */
+  const rect = (top: number, height = 32) =>
+    ({ top, bottom: top + height, left: 40, width: 200 }) as DOMRect;
+
+  it("opens below the button when the window has room", () => {
+    const place = placeList(rect(100), 800);
+    expect(place.above).toBeNull();
+    expect(place.top).toBe(136);
+  });
+
+  it("opens upwards near the bottom edge, so the list is never cut off", () => {
+    // 40 px below, 700 px above: a clipped list is what this prevents (FreeBSD card bug).
+    const place = placeList(rect(700), 800);
+    expect(place.above).not.toBeNull();
+    expect(place.maxHeight).toBeGreaterThan(100);
+  });
+
+  it("lives outside the card that holds the button, so no ancestor can clip it", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <div style={{ overflow: "hidden" }}>
+        <Select id="fruit" value="a" options={OPTIONS} onChange={onChange} />
+      </div>,
+    );
+    fireEvent.click(screen.getByRole("combobox"));
+    const list = screen.getByRole("listbox");
+    expect(container.contains(list)).toBe(false);
+    expect(document.body.contains(list)).toBe(true);
+    // The pointer still picks an option through the portal.
+    fireEvent.click(screen.getByRole("option", { name: "Cherry" }));
+    expect(onChange).toHaveBeenCalledWith("c");
   });
 });
