@@ -213,7 +213,7 @@ rustc-demangle = "0.1"
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Memory", "Win32_System_Diagnostics_ToolHelp"] }
 
 # Linux desktop portals (Wayland global shortcuts)
-ashpd = "0.13"
+ashpd = "0.14"
 # XDG activation token so the desktop may raise the window a portal call opens (already in the tree via Tauri)
 gdk = "0.18"
 # Desktop notifications for new messages (FR-1.48c): the freedesktop notification service on D-Bus,
