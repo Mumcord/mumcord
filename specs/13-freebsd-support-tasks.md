@@ -84,3 +84,21 @@
 - **Covers:** all ACs
 - **Plan:** every AC on the physical FreeBSD machine (KDE, Jabra) and, where a screenshot is needed, on the VM; results into `specs/13-freebsd-support-implementation.md`.
 - **Verify:** the report lists pass/fail per AC with evidence.
+
+## T10 – Media hints: name the missing package
+- **Status:** open
+
+- **Complexity:** simple (frontend)
+- **Covers:** FR-13.34 – FR-13.36, AC-13.21, AC-13.22
+- **Files:** `ui/src/features/watchparty/codecSupport.ts`, `ui/src/features/watchparty/CodecHint.tsx`, `ui/src/locales/*/watchparty.json`
+- **Plan:** `codecSupport` learns the FreeBSD packages and their `pkg install` commands next to the existing Linux ones; the decoder probe (`isTypeSupported` for H.264, VP8/VP9, Opus, AV1) runs once per session and caches. The hint keeps its rule "only after a real failure and only for a codec the WebView lacks". AV1-only and DRM-protected failures get the browser button without a command.
+- **Verify:** unit tests for every mapping (decoder present → nothing, missing → command, AV1/DRM → browser), plus AC-13.21/13.22 on the FreeBSD machine with a decoder removed.
+
+## T11 – Diagnostics and About name the media state
+- **Status:** open
+
+- **Complexity:** simple (frontend, rides on T6)
+- **Covers:** FR-13.37, FR-13.38, AC-13.23
+- **Files:** `ui/src/features/settings/sections/DiagnosticsSection.tsx`, `AboutSection.tsx`, `ui/src/features/settings/settings.css`, `ui/src/locales/*/settings.json`
+- **Plan:** Diagnostics shows a "media packages" line with the copyable command while something is missing, and nothing when all decoders answer; About gains the permanent DRM line in its gap note.
+- **Verify:** component tests for "missing → line with command" and "complete → no line"; AC-13.23 on the FreeBSD machine.

@@ -34,7 +34,7 @@ Four things FreeBSD does not have decide the shape of this epic: there is no des
 | Screen-share sound | PipeWire is the only way the share takes an app's sound; FreeBSD has no PipeWire |
 | Window/screen picker, per-app share | Needs `xdg-desktop-portal`, which FreeBSD does not provide |
 | Wayland-native global hotkeys | Same portal; X11 and XWayland are the supported path |
-| DRM-protected video and AV1/Opus-only streams in the watch party | This WebKitGTK has no EME (Widevine/ClearKey) and no AV1 decoder. Ordinary YouTube videos play: the package depends on the GStreamer decoders WebKitGTK loads at runtime (`gstreamer1-libav`, `-vpx`, `-opus`) |
+| DRM-protected video and AV1-only streams | This WebKitGTK has no EME (Widevine/ClearKey) and no AV1 decoder, and neither has a FreeBSD package. Ordinary YouTube videos play: the package depends on the GStreamer decoders WebKitGTK loads at runtime (`gstreamer1-libav`, `-vpx`, `-opus`), and a missing one is named with its `pkg install` command (FR-13.34 – FR-13.37) |
 | Self-updater | A package is updated with `pkg upgrade`; the app never replaces itself |
 | FreeBSD 14.x, arm64 | A second build and test target; added when there is demand (Q4.1) |
 | Signed Mumcord package repository, FreeBSD ports collection | Release asset first, decided in Q1.6 and Q5.2 |
@@ -104,16 +104,21 @@ No new roles. FreeBSD is a client platform; server-side roles (guest, registered
 ### 4.6 Gaps, updates and diagnostics
 
 - **FR-13.27** Camera and camera background effects are unavailable: the camera entry is visible but disabled with one short line "not available on FreeBSD yet", and no effects UI promises them (Q1.3).
-- **FR-13.28** Settings → About shows, directly under the version line, the platform line and the three-line gap note of §5.1 (Q2.1, Q2.2).
+- **FR-13.28** Settings → About shows, directly under the version line, the platform line and the gap note of §5.1 (Q2.1, Q2.2).
 - **FR-13.29** The app never downloads or installs an update on FreeBSD. Settings → About/Care reports "package; update with `pkg upgrade mumcord`" as the install kind, and the one-time "Check for new versions?" question is not asked (Q8 of the development decision, see §12).
 - **FR-13.30** Crash reports are written as on the other platforms, best effort: native stack and system information, with coarser symbol names because `/proc` is missing. Settings → Diagnostics says so in one line (Q4.5).
 - **FR-13.31** Diagnostics show the FreeBSD version, the architecture, the sound device in use and whether an X11 or Wayland session is active — no personal data.
+- **FR-13.34** A media element that fails because the WebView lacks a decoder names the package that fixes it, the way the Linux hint does (FR-2.41a): H.264/AAC → `gstreamer1-libav`, VP8/VP9 → `gstreamer1-plugins-vpx`, Opus → `gstreamer1-plugins-opus`. The command is shown as `sudo pkg install <package>` and can be copied.
+- **FR-13.35** The hint appears only when the player really failed *and* the WebView really lacks that decoder. The app probes once per run with `MediaSource.isTypeSupported` and `HTMLMediaElement.canPlayType`; a generic failure never gets an install command.
+- **FR-13.36** Where no package exists, the hint says so and offers the browser instead: AV1-only streams (no AV1 decoder in the GStreamer stack of this WebKitGTK) and DRM-protected video (no EME in this WebKitGTK build). Neither is presented as fixable by a command.
+- **FR-13.37** Settings → Diagnostics carries a "media packages" line naming what is missing, with the same command, so a source build or a removed package can be repaired without hitting a broken video first. It stays absent when everything decodes; nothing about the user is sent anywhere.
+- **FR-13.38** Settings → About names the permanent playback limit in its gap note: protected (DRM) video cannot play in the app and opens in the browser instead.
 
 ## 5. UI & UX
 
 ### 5.1 The FreeBSD note
 
-Settings → About, under the version line, always visible, three short lines (Q2.1, Q2.2):
+Settings → About, under the version line, always visible, short lines (Q2.1, Q2.2):
 
 ```text
 Settings → About
@@ -126,7 +131,9 @@ Settings → About
 │ (no PipeWire), window picker (no desktop portal).                     │
 │ Screen sharing captures the whole X11 screen.                         │
 │ Updates come with "pkg upgrade mumcord".                              │
-│ Intel graphics: use drm-66-kmod ("pkg install drm-66-kmod");         │
+│ Protected (DRM) video cannot play in the app; it opens in the         │
+│ browser instead.                                                      │
+│ Intel graphics: use drm-66-kmod ("pkg install drm-66-kmod");          │
 │ drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).                │
 └───────────────────────────────────────────────────────────────────────┘
 ```
@@ -141,7 +148,8 @@ Settings → About
 | Settings → Hotkeys | hint line only in a Wayland session |
 | Settings → Tray | existing hint when no StatusNotifier host answers |
 | Settings → Notifications | existing hint when no service answers |
-| Settings → Diagnostics | note on reduced crash symbols, plus the platform/session lines |
+| Settings → Diagnostics | note on reduced crash symbols, the platform/session lines, and a "media packages" line when a decoder is missing (FR-13.37) |
+| Watch party player, chat embeds | missing decoder → "`sudo pkg install …`"; AV1-only or protected video → "open in the browser" (FR-13.34 – FR-13.36) |
 
 Everything else — main window, channel tree, chat, members, settings, setup wizard, themes and scaling — is identical to Linux, including the ten-step wizard (Q2.7).
 
@@ -206,7 +214,8 @@ The OS Secret Service is always preferred; the vault is the fallback and its lim
 |---|---|
 | Tauri 2 with GTK 3 + WebKitGTK 4.1, same UI code (Q4.2) | The stack already carries FreeBSD code paths; no second UI |
 | FreeBSD joins the existing Linux `cfg` lists where the code is portable instead of a fork | One code path for all desktops, Linux behaviour stays untouched (FR-13.4) |
-| Linux-only infrastructure stays out: `xdg-desktop-portal`, PipeWire, GStreamer fallback, Vulkan overlay layer | They do not exist on FreeBSD |
+| Linux-only infrastructure stays out: `xdg-desktop-portal`, PipeWire, the Vulkan overlay layer | They do not exist on FreeBSD |
+| WebKitGTK's decoders come from GStreamer plugin packages the `.pkg` depends on (`gstreamer1-libav`, `gstreamer1-plugins-vpx`, `-opus`) | The WebView loads them at runtime, so `ldd` never sees them; without them video and audio of a YouTube stream do not decode (measured: `h264_mse`, `aac_mse`, `vp9_mse` false until installed) |
 | Platform modules where the OS differs: process list (`sysctl`), secrets (encrypted file), updater (stub), start-link parsing, resource folder | Small, self-contained, testable |
 | `updater_freebsd.rs` with the same command surface as the updater, reporting `InstallKind::Pkg` | The UI and its bindings stay identical; no update is ever installed |
 | Resource folder resolved by the app (`../lib/mumcord`, then `/usr/local/lib/mumcord`) | Tauri only resolves one on Linux, macOS and Windows |
@@ -231,6 +240,7 @@ The OS Secret Service is always preferred; the vault is the fallback and its lim
 - **Build**: `npm run build` then `cargo build --release -p mumcord` on FreeBSD (both proven; `CARGO_BUILD_JOBS=2` is the stable setting on a 4-vCPU machine).
 - **Package**: `scripts/build-freebsd-pkg.sh` stages the release binary, the camera backgrounds, the desktop entry, the icons, the licence and the third-party notices under `/usr/local`, then creates `mumcord-<version>.pkg`. The manifest's dependencies and `shlibs_required` are derived from `ldd` and `pkg which`; `flatsize`, `abi` and `arch` are set.
 - **Dependencies** (hard): `webkit2-gtk_41`, `gtk3`, `alsa-lib`, `alsa-plugins`, `libayatana-appindicator`, `libvpx`, `svt-av1`, `dav1d` — plus everything those pull in. Installing Mumcord must be enough to use it (Q4.2).
+- **Media dependencies** (hard, not linked): `gstreamer1-libav`, `gstreamer1-plugins-vpx`, `gstreamer1-plugins-opus`. WebKitGTK loads its decoders at runtime, so `ldd` cannot see them and the build script names them explicitly; without them video and audio in the watch party and in chat embeds stay black (measured, see §2.2 and FR-13.34).
 - **Install message**: `pkg` prints `packaging/freebsd/pkg-message` after the install — the Intel
   driver requirement and the software-rendering escape hatch (FR-13.33).
 - **Install/remove**: `pkg add ./mumcord-0.8.0.pkg`, `pkg delete mumcord`. The package's triggers refresh the icon and MIME caches on install and removal.
@@ -265,6 +275,9 @@ Verified on a fresh FreeBSD 15.x amd64 (VM is fine), with `mumble-server` runnin
   ten-minute session (window, voice, one screen share) produces no `GPU HANG` line in `dmesg`.
 - **AC-13.20** `pkg add` prints the install message naming `drm-66-kmod`; `pkg info -D mumcord`
   shows it again.
+- **AC-13.21** With `gstreamer1-libav` removed, a YouTube video in the watch party fails and names `sudo pkg install gstreamer1-libav`; after installing it the same video plays without restarting the party.
+- **AC-13.22** A video that only exists as AV1 or is DRM-protected shows "open in the browser" and no install command; clicking it opens the system browser.
+- **AC-13.23** With every decoder present, no hint appears anywhere — player, Diagnostics and About stay clean apart from the permanent DRM line.
 
 ## 12. Decision log
 
@@ -305,6 +318,8 @@ Verified on a fresh FreeBSD 15.x amd64 (VM is fine), with `mumble-server` runnin
 | Dev. 1 | No in-app updater on FreeBSD: `pkg upgrade` only | Product decision before the brainstorming; recorded as FR-13.29 |
 | Dev. 2 | Secrets fall back to an encrypted file when no Secret Service answers | Product decision before the brainstorming; §7 |
 | Q6.1 | Render with the loaded driver (hardware GL); state the `drm-66-kmod` requirement in the package message, About note and release notes | Driver bug freebsd/drm-kmod #509, not a Mumcord bug; measured on the test machine |
+| Q6.2 | A missing media decoder names its package in the player and in Diagnostics (`pkg install …`), instead of a silent black frame | Measured on the test machine: without `gstreamer1-libav` YouTube answers with its own "cannot be played in your browser" error (HTML5 error 5), which the Linux hint already explains with a command |
+| Q6.3 | No command is offered where none exists: AV1-only streams and DRM-protected video get "open in the browser" | This WebKitGTK has no AV1 decoder (`av1_mse: false`) and no EME (`requestMediaKeySystemAccess` undefined); a fake install hint would waste the user's time |
 
 ## 13. Open points & risks
 
@@ -316,6 +331,7 @@ Verified on a fresh FreeBSD 15.x amd64 (VM is fine), with `mumble-server` runnin
 | Secrets in a file rather than in a keyring | Weaker than an OS keyring when the profile directory leaks as a whole | Documented in §9; a Secret Service is always preferred when present |
 | `pkg`'s dependency list is derived at build time | A package rename upstream breaks the manifest silently | The release smoke test installs the built package on a clean system (AC-13.1) |
 | Reduced crash symbols | Harder to debug user reports | Diagnostics says so; the raw stack is still captured |
+| Media decoders arrive with GStreamer packages | A source build or a `pkg delete` of a decoder leaves video black, and the cause is invisible | The player and Diagnostics name the package (FR-13.34 – FR-13.37) and the package depends on all three (AC-13.21 – AC-13.23) |
 | Build memory | `cargo build --release` crashed rustc once with 4 parallel jobs on 8 GB | Keep `CARGO_BUILD_JOBS=2` in the FreeBSD build script and CI |
 | Intel graphics driver | `drm-612-kmod` hangs Gen9/Gen12 GPUs (freebsd/drm-kmod #509, open) | Install message + release notes point at `drm-66-kmod`; the driver requirement is checked in AC-13.19; revisit when upstream fixes it |
 | FreeBSD port submission and repository | Distribution stays manual (`pkg add`) | Deliberate for the first version (Q1.6, Q5.2) |
