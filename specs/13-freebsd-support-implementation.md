@@ -52,6 +52,11 @@ Mumcord installs from a FreeBSD package, starts as a single instance, connects t
 - T2: the per-unit entries come from an ALSA configuration the package installs (as specified), and Mumcord hides the units the machine does not have. Switching between two real cards is unverified.
 - The About note names the gaps in one list instead of three separate lines (FR-13.28 wording "three lines"); the content is the same.
 - Translations of the new About/camera/share texts are English in every locale for now.
+- **Missing decoders are named** (FR-13.34 – FR-13.38, AC-13.21 – AC-13.23): with
+  `gstreamer1-libav` removed, Settings → Diagnostics showed
+  `sudo pkg install gstreamer1-libav` and the player showed the same line under the picture
+  ("… Install it and restart Mumcord"). Installing it while the app runs does nothing — the
+  WebView scans its decoders only at process start — after a restart the same video played.
 - **Watch party**: party mechanics and playback work, but only with the GStreamer decoders
   WebKitGTK loads at runtime; without them YouTube reports "this video cannot be played in your
   browser" (its HTML5 error 5) and the frame stays black. Two limits stay: DRM-protected videos

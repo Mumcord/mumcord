@@ -540,7 +540,7 @@
     "fileLabel": "Diagnostický súbor",
     "writeToDisk": "Zapisovať záznamy na disk",
     "writeToDiskHint": "Vypnuté ponechá záznam len v pamäti počas tejto relácie — na disk sa nič nezapisuje.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Verzia",

@@ -540,7 +540,7 @@
     "fileLabel": "Diagnostična datoteka",
     "writeToDisk": "Zapisuj dnevnike na disk",
     "writeToDiskHint": "Izklopljeno hrani dnevnik samo v pomnilniku za to sejo — na disk se nič ne zapiše.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Različica",

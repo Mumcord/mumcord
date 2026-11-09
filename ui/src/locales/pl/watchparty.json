@@ -60,7 +60,7 @@
     "install": "Ten film wymaga obsługi H.264. Zainstaluj gst-libav:",
     "generic": "Ten film wymaga obsługi H.264. Zainstaluj gst-libav (wtyczkę libav dla GStreamera) menedżerem pakietów swojego systemu.",
     "rpmFusion": "W Fedorze gst-libav pochodzi z repozytorium RPM Fusion; najpierw włącz RPM Fusion.",
-    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it:",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
     "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Spacja odtwórz/wstrzymaj · ← → przewiń 5 s · M wycisz · F pełny ekran",

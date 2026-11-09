@@ -534,7 +534,7 @@
     "fileLabel": "Diagnosebestand",
     "writeToDisk": "Logs naar schijf schrijven",
     "writeToDiskHint": "Als dit uit staat, blijft de log alleen voor deze sessie in het geheugen — er wordt niets naar schijf geschreven.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Versie",

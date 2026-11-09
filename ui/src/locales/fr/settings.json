@@ -537,7 +537,7 @@
     "fileLabel": "Fichier de diagnostic",
     "writeToDisk": "Écrire les journaux sur le disque",
     "writeToDiskHint": "Si désactivé, le journal reste uniquement en mémoire pour cette session — rien n’est écrit sur le disque.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Version",

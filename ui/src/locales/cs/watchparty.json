@@ -60,7 +60,7 @@
     "install": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav:",
     "generic": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav (plugin libav pro GStreamer) správcem balíčků svého systému.",
     "rpmFusion": "Na Fedoře pochází gst-libav z repozitáře RPM Fusion; nejdřív povol RPM Fusion.",
-    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it:",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
     "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Mezerník přehrát/pozastavit · ← → posun o 5 s · M ztlumit · F celá obrazovka",

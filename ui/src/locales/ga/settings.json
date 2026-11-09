@@ -543,7 +543,7 @@
     "fileLabel": "Comhad diagnóiseach",
     "writeToDisk": "Scríobh logaí ar an diosca",
     "writeToDiskHint": "Nuair a bhíonn sé as, coinnítear an loga sa chuimhne amháin don seisiún seo — ní scríobhtar aon rud ar an diosca.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Leagan",

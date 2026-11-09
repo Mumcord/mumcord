@@ -60,7 +60,7 @@
     "install": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot:",
     "generic": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot (a GStreamer libav bővítményét) a rendszered csomagkezelőjével.",
     "rpmFusion": "Fedorán a gst-libav az RPM Fusion tárolóból érhető el; előbb engedélyezd az RPM Fusiont.",
-    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it:",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
     "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Szóköz: lejátszás/szünet · ← →: ugrás 5 mp · M: némítás · F: teljes képernyő",

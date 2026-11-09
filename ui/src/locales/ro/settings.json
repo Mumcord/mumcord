@@ -537,7 +537,7 @@
     "fileLabel": "Fișier de diagnosticare",
     "writeToDisk": "Scrie jurnalele pe disc",
     "writeToDiskHint": "Când e dezactivat, jurnalul rămâne doar în memorie pentru această sesiune — nu se scrie nimic pe disc.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Versiune",

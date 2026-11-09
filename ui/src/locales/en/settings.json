@@ -534,7 +534,7 @@
     "fileLabel": "Diagnostic file",
     "writeToDisk": "Write logs to disk",
     "writeToDiskHint": "Off keeps the log in memory for this session only — nothing is written to disk.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Version",

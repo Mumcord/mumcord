@@ -534,7 +534,7 @@
     "fileLabel": "Diagnostikafail",
     "writeToDisk": "Kirjuta logid kettale",
     "writeToDiskHint": "Väljas hoiab logi ainult mälus selle seansi jooksul — kettale ei kirjutata midagi.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Versioon",

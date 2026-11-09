@@ -540,7 +540,7 @@
     "fileLabel": "Diagnostický soubor",
     "writeToDisk": "Zapisovat protokoly na disk",
     "writeToDiskHint": "Vypnuto: protokol zůstane jen v paměti pro tuto relaci — na disk se nic nezapisuje.",
-    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
   },
   "about": {
     "version": "Verze",

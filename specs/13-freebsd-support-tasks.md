@@ -86,7 +86,7 @@
 - **Verify:** the report lists pass/fail per AC with evidence.
 
 ## T10 – Media hints: name the missing package
-- **Status:** open
+- **Status:** done (player hint and the stall fallback, verified on the FreeBSD machine with the decoder removed)
 
 - **Complexity:** simple (frontend)
 - **Covers:** FR-13.34 – FR-13.36, AC-13.21, AC-13.22
@@ -95,7 +95,7 @@
 - **Verify:** unit tests for every mapping (decoder present → nothing, missing → command, AV1/DRM → browser), plus AC-13.21/13.22 on the FreeBSD machine with a decoder removed.
 
 ## T11 – Diagnostics and About name the media state
-- **Status:** open
+- **Status:** done (Diagnostics line and the About DRM line, verified on the FreeBSD machine)
 
 - **Complexity:** simple (frontend, rides on T6)
 - **Covers:** FR-13.37, FR-13.38, AC-13.23
