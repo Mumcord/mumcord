@@ -18,7 +18,7 @@ Mumcord installs from a FreeBSD package, starts as a single instance, connects t
 | AC-13.4 | ✅ | With a Logitech PRO X headset on `pcm1` the box captures and plays on `/dev/dsp1` (`Input/Output audio stream started (fallback: false)`, both directions open at once, real-time threads). Both directions were heard: the second client hears the box and the box hears the second client. Earlier runs proved the packet path (1984 voice packets in, 123+ forwarded; 361 frames out with push-to-talk held) |
 | AC-13.5 | ✅ | With a Logitech PRO X next to the Jabra dongle the engine lists `Sound card 0`/`Sound card 1` for both directions, and picking one in Settings moved capture to `/dev/dsp0` while playback stayed on `/dev/dsp1` (both open at once). The list was clipped by its card until the dropdown was portalled (fixed, with a test) |
 | AC-13.6 | ✅ | With two cards (Logitech active, Jabra left): pulling the Logitech logs `chosen Output device unavailable …; using the default` and both streams reopen on the Jabra (`fallback=true`), connection kept, `/dev/dsp0` open. Replugging logs `chosen Output device is back; switched to it` and both streams return to `/dev/dsp1` with `fallback=false`. No notice, exactly as on Linux — the spec wording was corrected to say so |
-| AC-13.7 | ⚠️ | Chat ✅ (three messages, one synced "from another user's history"), image ✅ (inline, over the direct connection), watch party ✅ (invite, join, playlist, sync, watcher list, and the video plays on the FreeBSD viewer with subtitles). File sharing impossible on this server: files need the relay, and the test server has none, so not exercised |
+| AC-13.7 | ✅ | Chat ✅ (three messages, one synced "from another user's history"), image ✅ (inline, over the direct connection), watch party ✅ (invite, join, playlist, sync, watcher list, and the video plays on the FreeBSD viewer with subtitles). File sharing ✅ after a relay was available: with a BastilleBSD jail running a stock `mumble-server`, a `mumpeer` relay and the `mumbot` peer bot (`scripts/freebsd-relay-jail`), `fileshare-test.txt` (61 B) went from one client to the other and the received file's SHA-256 matched the offer (`✓ Matches the offer`); a second run with both clients in `relay_only` sent `relay-test.txt` (81 B) through the relay (`session ended … transports=udp/udp bytes_ab=3149 bytes_ba=2192 dropped=0`) and the hash matched again |
 | AC-13.8 | ✅ | Signed registry loaded over TLS ("Official repository · signed index checked"), dice-roller installed with its permission dialog, `/roll` produced the chat card ("rolled d20 = 7") |
 | AC-13.9 | ✅ | Push-to-talk key F9 set in Settings → Voice; holding it opened the mic and transmitted (361 forwarded frames) |
 | AC-13.10 | ✅ | KDE's StatusNotifierWatcher lists `…/org/ayatana/NotificationItem/tray_icon_tray_app_main`; no-host hint not exercised |
@@ -82,7 +82,9 @@ to the repository.
 ### Open points & known issues
 - AC-13.4 audibility and AC-13.5 device switching need hardware the test machine lacks: a
   microphone/headset on the dongle and a second sound card.
-- AC-13.7 file sharing needs a relay; the local test server has none, so files stay untested.
+- File sharing needs a relay in front of the Mumble server. The test rig for it is
+  `scripts/freebsd-relay-jail` (BastilleBSD template: stock `mumble-server` + `mumpeer` +
+  `mumbot` peer bot in one jail); it is test tooling, not shipped with the app.
 - Watch party video playback is a platform gap (see deviations).
 - T6 (Diagnostics lines, FR-13.30/31), T7 (release wiring) and T8 (CI in a FreeBSD VM) are not implemented yet.
 - Screenshots: the test machine returns black pixels for every capture tool, so UI screenshots have to come from the VM.
@@ -93,4 +95,10 @@ to the repository.
 - Build: `scripts/build-freebsd-pkg.sh` builds with `--features custom-protocol` (a plain release build is a dev build), `CARGO_BUILD_JOBS=4` is stable on 8 GB.
 - Machine setup used: FreeBSD 15.1, `drm-66-kmod` (6.12 hangs this GPU), `mac_priority` + group `realtime` (gid 47), KDE Plasma 6 on X11, Jabra Link 380.
 - No new environment variables or secrets; the profile layout is unchanged.
-- Tested server: `mumble-server` 1.5.939 from the FreeBSD package collection.
+- Tested server: `mumble-server` 1.5.939 from the FreeBSD package collection; for file sharing
+  additionally `mumpeer` 0.2.1 and `mumbot` 0.5.3, both built from source inside a BastilleBSD
+  jail (`scripts/freebsd-relay-jail`).
+- FreeBSD quirks found while building the relay rig: a shared-IP jail has no IPv6 and no
+  loopback of its own (so both services bind IPv4 addresses explicitly and the relay's allowlist
+  API runs on the jail address with HTTPS + certificate pinning), and `mumbot`'s
+  `mumcord-protocol` dependency needs a system `protoc` (a `[patch.crates-io]` path patch).

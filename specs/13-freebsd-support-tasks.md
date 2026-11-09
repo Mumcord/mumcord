@@ -102,3 +102,13 @@
 - **Files:** `ui/src/features/settings/sections/DiagnosticsSection.tsx`, `AboutSection.tsx`, `ui/src/features/settings/settings.css`, `ui/src/locales/*/settings.json`
 - **Plan:** Diagnostics shows a "media packages" line with the copyable command while something is missing, and nothing when all decoders answer; About gains the permanent DRM line in its gap note.
 - **Verify:** component tests for "missing → line with command" and "complete → no line"; AC-13.23 on the FreeBSD machine.
+
+## T12 – Relay test rig for file sharing
+- **Status:** done (BastilleBSD jail with `mumble-server`, `mumpeer` and the `mumbot` peer bot; file
+  sharing verified both directly and forced through the relay, AC-13.7)
+
+- **Complexity:** simple (test tooling, no app code)
+- **Covers:** AC-13.7 (the file-sharing part)
+- **Files:** `scripts/freebsd-relay-jail/` (`Bastillefile`, `files/usr/local/etc/mumble/mumble-server.ini`, `files/usr/local/etc/mumpeer/mumpeer.toml`, `files/root/bot.toml.in`, `files/root/build-stack.sh`, `files/root/setup-stack.sh`, `README.md`)
+- **Plan:** one jail so the FreeBSD box needs no second machine: a stock `mumble-server` on 64738, a `mumpeer` relay on 443/udp and 443/tcp, and the `mumbot` peer bot announcing the relay to clients. The template installs the packages, builds both services inside the jail, fills in the two certificate pins, registers the bot and starts everything. IPv4-only listeners because a shared-IP jail has no IPv6, and the relay's allowlist API on the jail address because it has no loopback.
+- **Verify:** `bastille template` ends with `Template applied`; a client sees the relay (`mumcord_engine::peer: relay pinned on first use`) and no "this server has no relay" banner; a file sent between two clients arrives with the same SHA-256 (`✓ Matches the offer`); with both clients in `relay_only` the relay log shows the session and its byte counts.
