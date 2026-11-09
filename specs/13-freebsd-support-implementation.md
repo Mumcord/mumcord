@@ -68,6 +68,17 @@ Mumcord installs from a FreeBSD package, starts as a single instance, connects t
   `gstreamer1-plugins-opus` (`scripts/build-freebsd-pkg.sh`). Without them even H.264 does not
   decode.
 
+### Tasks and the pipeline
+
+| Task | State |
+|---|---|
+| T6 Diagnostics | done: release (`kern.osrelease`), session (X11/Wayland), audio devices and the crash-symbol note, seen on the FreeBSD machine |
+| T7 Release wiring | done: FreeBSD build job in `build-and-smoke.yml`, `.pkg` in `SHA256SUMS`, release notes, changelog and the SBOM row (`freebsd-pkg-x86_64`) |
+| T8 CI | done: `ci.yml` job `FreeBSD 15.1`; its commands (`cargo check`, `cargo clippy -- -D warnings`, `cargo test --workspace`) were run by hand on the FreeBSD machine and pass (clippy found one `needless_return` in `rt.rs`, fixed) |
+
+The FreeBSD workflow jobs themselves (`vmactions/freebsd-vm`) have not run yet: they need a push
+to the repository.
+
 ### Open points & known issues
 - AC-13.4 audibility and AC-13.5 device switching need hardware the test machine lacks: a
   microphone/headset on the dongle and a second sound card.

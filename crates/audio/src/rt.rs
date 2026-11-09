@@ -76,9 +76,9 @@ pub fn promote_current_thread() -> Result<RtGuard, RtError> {
              (security.mac.priority.realtime_gid)"
             ))
         })?;
-        return Ok(RtGuard {
+        Ok(RtGuard {
             _thread_bound: PhantomData,
-        });
+        })
     }
     #[cfg(not(target_os = "freebsd"))]
     {

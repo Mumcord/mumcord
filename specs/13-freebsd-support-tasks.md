@@ -69,7 +69,7 @@
 - **Verify:** dry run of the release steps produces the asset and the checksum entry; `release-manifest.sh` records it.
 
 ## T8 – CI on a real FreeBSD machine
-- **Status:** open (CI)
+- **Status:** done (job written; `cargo check`, `cargo clippy -D warnings` and `cargo test --workspace` verified by hand on the FreeBSD machine — the workflow run itself needs a push)
 
 - **Complexity:** complex (CI)
 - **Covers:** §10, Q5.4, Q5.5
