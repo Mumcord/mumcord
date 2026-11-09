@@ -31,6 +31,7 @@ function onSystem(os: string, distro: LinuxDistro | null) {
     appimage: true,
     portable: false,
     limits: [],
+    session: null,
     distro,
   });
 }

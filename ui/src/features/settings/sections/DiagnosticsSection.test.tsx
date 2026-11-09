@@ -29,6 +29,7 @@ function onSystem(os: string) {
     appimage: false,
     portable: false,
     limits: [],
+    session: null,
     distro: null,
   });
 }
@@ -40,6 +41,34 @@ async function renderCard() {
   });
   return view;
 }
+
+describe("DiagnosticsCard: system facts (FR-13.30, FR-13.31)", () => {
+  it("names the FreeBSD release, the session and the audio device", async () => {
+    onSystem("freebsd 15.1-RELEASE x86_64");
+    vi.spyOn(api, "appInfo").mockResolvedValue({
+      version: "0.8.0",
+      packageVersion: "0.8.0",
+      os: "freebsd 15.1-RELEASE x86_64",
+      appimage: false,
+      portable: false,
+      limits: [],
+      distro: null,
+      session: "x11",
+    });
+    await renderCard();
+    expect(await screen.findByText("freebsd 15.1-RELEASE x86_64")).toBeInTheDocument();
+    expect(screen.getByText("X11")).toBeInTheDocument();
+    // Nothing chosen means the system default, for both directions.
+    expect(screen.getByText("System default · System default")).toBeInTheDocument();
+    expect(screen.getByText(/coarser symbol names/)).toBeInTheDocument();
+  });
+
+  it("shows no system facts on another platform", async () => {
+    onSystem("linux x86_64");
+    await renderCard();
+    expect(screen.queryByText(/coarser symbol names/)).toBeNull();
+  });
+});
 
 describe("DiagnosticsCard: media packages (FR-13.37)", () => {
   it("names the missing FreeBSD packages with their install line", async () => {

@@ -1335,3 +1335,21 @@
     background: GrayText;
   }
 }
+
+/* What the FreeBSD machine runs on, in the diagnostics card (FR-13.31). */
+.settings-system-facts__list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+  font-size: 0.9em;
+}
+
+.settings-system-facts__list dt {
+  color: var(--color-text-muted);
+}
+
+.settings-system-facts__list dd {
+  margin: 0;
+  word-break: break-word;
+}

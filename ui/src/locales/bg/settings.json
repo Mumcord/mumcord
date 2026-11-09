@@ -534,7 +534,17 @@
     "fileLabel": "Диагностичен файл",
     "writeToDisk": "Записвай дневника на диска",
     "writeToDiskHint": "Когато е изключено, дневникът остава само в паметта за тази сесия — нищо не се записва на диска.",
-    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Версия",

@@ -1631,6 +1631,7 @@ describe("Overlay on macOS (QA.58)", () => {
       portable: false,
       distro: null,
               limits: [],
+              session: null,
     });
 
   it("hides the in-game overlay card and its search entries", async () => {
@@ -1656,6 +1657,7 @@ describe("Overlay on macOS (QA.58)", () => {
       portable: false,
       distro: null,
               limits: [],
+              session: null,
     });
     renderScreen();
     await switchSection("Gaming & Overlay");

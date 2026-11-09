@@ -27,6 +27,36 @@ pub struct AppInfo {
     /// What this platform cannot offer (FR-13.27): the UI disables those entries and the About
     /// note lists them. Empty where everything works.
     pub limits: Vec<PlatformLimit>,
+    /// The desktop session in use, where the platform has more than one (FR-13.31); `None`
+    /// elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything.
+    pub session: Option<SessionKind>,
+}
+
+/// Which display server the app talks to (FR-13.31, FR-13.21).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum SessionKind {
+    /// X11, also through XWayland on a Wayland session.
+    X11,
+    /// A Wayland session; hotkeys and capture still go through XWayland.
+    Wayland,
+}
+
+/// `XDG_SESSION_TYPE` first, then the two display variables; Wayland wins when both are set.
+fn session_kind() -> Option<SessionKind> {
+    let var = |name: &str| std::env::var_os(name).is_some_and(|value| !value.is_empty());
+    match std::env::var("XDG_SESSION_TYPE").ok().as_deref() {
+        Some("wayland") => return Some(SessionKind::Wayland),
+        Some("x11") => return Some(SessionKind::X11),
+        _ => {}
+    }
+    if var("WAYLAND_DISPLAY") {
+        Some(SessionKind::Wayland)
+    } else if var("DISPLAY") {
+        Some(SessionKind::X11)
+    } else {
+        None
+    }
 }
 
 /// A feature this platform cannot provide, with the reason named in the About note.
@@ -98,6 +128,7 @@ pub fn app_info() -> ApiResult<AppInfo> {
         portable: crate::portable::is_active(),
         distro: distro(),
         limits: platform_limits(),
+        session: session_kind(),
     })
 }
 

@@ -543,7 +543,17 @@
     "fileLabel": "Comhad diagnóiseach",
     "writeToDisk": "Scríobh logaí ar an diosca",
     "writeToDiskHint": "Nuair a bhíonn sé as, coinnítear an loga sa chuimhne amháin don seisiún seo — ní scríobhtar aon rud ar an diosca.",
-    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Leagan",

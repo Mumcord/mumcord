@@ -96,6 +96,7 @@ describe("party player", () => {
       appimage: false,
       portable: false,
       limits: [],
+      session: null,
       distro: null,
     });
     vi.spyOn(HTMLMediaElement.prototype, "canPlayType").mockReturnValue("");

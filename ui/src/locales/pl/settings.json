@@ -540,7 +540,17 @@
     "fileLabel": "Plik diagnostyczny",
     "writeToDisk": "Zapisuj logi na dysku",
     "writeToDiskHint": "Wyłączone: log jest trzymany tylko w pamięci na czas tej sesji – nic nie trafia na dysk.",
-    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do."
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Wersja",

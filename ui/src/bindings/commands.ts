@@ -1608,6 +1608,9 @@ export type AppInfo = {
 	 *  note lists them. Empty where everything works.
 	 */
 	limits: PlatformLimit[],
+	/**  The desktop session in use, where the platform has more than one (FR-13.31); `None`
+	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything. */
+	session: SessionKind | null,
 };
 
 /**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
@@ -3623,6 +3626,13 @@ export type PersonTarget = {
 };
 
 /**  A feature this platform cannot provide, with the reason named in the About note. */
+/**  Which display server the app talks to (FR-13.31, FR-13.21). */
+export type SessionKind = 
+/**  X11, also through XWayland on a Wayland session. */
+"x11" | 
+/**  A Wayland session; hotkeys and capture still go through XWayland. */
+"wayland";
+
 export type PlatformLimit = 
 /**  No camera backend. */
 "camera" | 

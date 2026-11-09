@@ -51,7 +51,7 @@
 - **Verify:** camera entry disabled with the line, share dialog shows the line, everything unchanged on the other platforms.
 
 ## T6 – Diagnostics and hints
-- **Status:** open (diagnostics lines and hints)
+- **Status:** done (system block with release, session, audio devices and the crash-symbol note, verified on the FreeBSD machine)
 
 - **Complexity:** simple
 - **Covers:** FR-13.30, FR-13.31, FR-13.8–13.11
