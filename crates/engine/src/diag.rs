@@ -171,7 +171,12 @@ impl DiagnosticInfo {
 /// `freebsd 15.1-RELEASE x86_64` (FR-13.31).
 pub fn os_description() -> String {
     match os_release() {
-        Some(release) => format!("{} {} {}", std::env::consts::OS, release, std::env::consts::ARCH),
+        Some(release) => format!(
+            "{} {} {}",
+            std::env::consts::OS,
+            release,
+            std::env::consts::ARCH
+        ),
         None => format!("{} {}", std::env::consts::OS, std::env::consts::ARCH),
     }
 }
@@ -196,7 +201,10 @@ fn os_release() -> Option<String> {
     }
     // SAFETY: the syscall wrote at most `size` bytes into the buffer and NUL-terminates it.
     let bytes = unsafe { std::slice::from_raw_parts(value.as_ptr().cast::<u8>(), size) };
-    let text = bytes.split(|byte| *byte == 0).next().filter(|it| !it.is_empty())?;
+    let text = bytes
+        .split(|byte| *byte == 0)
+        .next()
+        .filter(|it| !it.is_empty())?;
     std::str::from_utf8(text).ok().map(str::to_owned)
 }
 
@@ -679,7 +687,11 @@ mod tests {
         let parts: Vec<&str> = line.split(' ').collect();
         assert_eq!(parts.first(), Some(&"freebsd"), "{line}");
         assert_eq!(parts.last(), Some(&std::env::consts::ARCH), "{line}");
-        assert_eq!(parts.len(), 3, "expected 'freebsd <release> <arch>', got {line}");
+        assert_eq!(
+            parts.len(),
+            3,
+            "expected 'freebsd <release> <arch>', got {line}"
+        );
     }
 
     #[test]

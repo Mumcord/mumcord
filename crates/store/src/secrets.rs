@@ -219,7 +219,10 @@ mod vault {
 
     impl SecretBackend for VaultBackend {
         fn set(&self, account: &str, secret: &[u8]) -> Result<()> {
-            let _guard = self.write.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let _guard = self
+                .write
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
             let mut items = self.read()?;
             items.insert(account.to_owned(), secret.to_vec());
             self.write_map(&items)
@@ -230,7 +233,10 @@ mod vault {
         }
 
         fn delete(&self, account: &str) -> Result<()> {
-            let _guard = self.write.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let _guard = self
+                .write
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
             let mut items = self.read()?;
             if items.remove(account).is_some() {
                 self.write_map(&items)?;
@@ -916,7 +922,11 @@ mod tests {
             let mode = std::os::unix::fs::PermissionsExt::mode(
                 &std::fs::metadata(&path).expect("metadata").permissions(),
             );
-            assert_eq!(mode & 0o077, 0, "{name} must not be group or world readable");
+            assert_eq!(
+                mode & 0o077,
+                0,
+                "{name} must not be group or world readable"
+            );
         }
         let blob = std::fs::read(dir.path().join("secrets.vault")).expect("blob");
         assert!(

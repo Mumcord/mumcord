@@ -125,8 +125,7 @@ mod platform {
         // between (the call then fails with ENOMEM).
         let mut count = 512;
         for _ in 0..4 {
-            let mut buffer: Vec<MaybeUninit<libc::kinfo_proc>> =
-                vec![MaybeUninit::uninit(); count];
+            let mut buffer: Vec<MaybeUninit<libc::kinfo_proc>> = vec![MaybeUninit::uninit(); count];
             let mut mib = mib;
             let mut len = count * std::mem::size_of::<libc::kinfo_proc>();
             // SAFETY: `buffer` holds `len` writable bytes; `mib` is a valid MIB.
@@ -179,7 +178,10 @@ mod platform {
             return None;
         }
         let filled = buffer.len().min(len);
-        let first = buffer[..filled].split(|&b| b == 0).next().unwrap_or_default();
+        let first = buffer[..filled]
+            .split(|&b| b == 0)
+            .next()
+            .unwrap_or_default();
         let first = String::from_utf8_lossy(first).into_owned();
         (!first.is_empty()).then_some(first)
     }
@@ -223,7 +225,12 @@ mod platform {
     }
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "macos", windows)))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "macos",
+    windows
+)))]
 mod platform {
     pub(super) fn running() -> Vec<(String, u64)> {
         Vec::new()
@@ -258,4 +265,3 @@ mod tests {
         );
     }
 }
-
