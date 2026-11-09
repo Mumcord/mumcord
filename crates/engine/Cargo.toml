@@ -138,7 +138,7 @@ proptest.workspace = true
 # Paused time for the relay timeouts.
 tokio = { workspace = true, features = ["test-util"] }
 # Live tests drive scripted bots through the mumbot library.
-mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.4.1", features = ["tester"] }
+mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.5.0", features = ["tester"] }
 # The release mumbot is built against; bot-side message types must come from it, not the workspace crate.
 bot_protocol = { package = "mumcord-protocol", version = "0.5" }
 mumcord-store = { workspace = true, features = ["test-util"] }
