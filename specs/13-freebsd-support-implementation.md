@@ -14,23 +14,23 @@ Mumcord installs from a FreeBSD package, starts as a single instance, connects t
 |---|---|---|
 | AC-13.1 | ✅ | `pkg add` on 192.0.2.10: pkg triggers refresh icon and MIME caches; `pkg info -l` lists binary, 18 backgrounds, desktop entry, 4 icons, licence, ALSA config |
 | AC-13.2 | ✅ | Starts from the installed binary, wizard completed on a fresh profile (VM, setup wizard screenshot); menu entry installed |
-| AC-13.3 | ✅ | `mumcord "mumble://127.0.0.1:64738/"` → `connected server_id=1`; murmur log: `Authenticated` for SmokeTester |
-| AC-13.4 | 🎧 | Jabra `pcm0` opens both directions (`Input`/`Output audio stream started (fallback: false)`, threads at `real:10`); listening check with a second client pending |
+| AC-13.3 | ✅ | `mumcord "mumble://127.0.0.1:64738/"` → `connected server_id=1` |
+| AC-13.4 | ⚠️ | Receive: 1984 voice packets from the second client reached the server, 123+ (~330 B) were forwarded to the box's client over loopback, output stream open at real-time priority (`real-time scheduling on thread=playback`). Send: with F9 held the server forwarded 361 voice frames to the second client. Audibility itself could not be judged: the machine has only a Jabra Link 380 dongle without headset, so its capture device delivers no audio |
 | AC-13.5 | ⚠️ | Per-unit PCMs installed (`aplay -L` lists 8 "Sound card N (OSS)"), filter unit test; switching between two real cards not exercised (the machine has one `/dev/dsp`) |
-| AC-13.6 | ❌ | Unplugging the USB device mid-call not tested (needs hands on the machine) |
-| AC-13.7 | ❌ | Chat, file sharing and watch party need a second client |
-| AC-13.8 | ❌ | Plugin install/chat card not tested |
-| AC-13.9 | ❌ | PTT key and mouse side button not tested (needs interaction) |
+| AC-13.6 | ⚠️ | Pulling the dongle mid-call: `Input/Output audio stream failed; reopening` → `no audio device available … may have been disconnected`, connection kept, no crash; replugging reopened both streams by itself. No "device changed" notice and no fallback, because with a single device there is nothing to fall back to (same code path as Linux) |
+| AC-13.7 | ⚠️ | Chat ✅ (three messages, one synced "from another user's history"), image ✅ (inline, over the direct connection), watch party ✅ as a party (invite, join, playlist, sync, watcher list). File sharing impossible on this server: files need the relay, and the test server has none ("This server has no relay, so file sharing isn't available"), so not exercised |
+| AC-13.8 | ✅ | Signed registry loaded over TLS ("Official repository · signed index checked"), dice-roller installed with its permission dialog, `/roll` produced the chat card ("rolled d20 = 7") |
+| AC-13.9 | ✅ | Push-to-talk key F9 set in Settings → Voice; holding it opened the mic and transmitted (361 forwarded frames) |
 | AC-13.10 | ✅ | KDE's StatusNotifierWatcher lists `…/org/ayatana/NotificationItem/tray_icon_tray_app_main`; no-host hint not exercised |
-| AC-13.11 | ❌ | Direct connection to a second client not tested |
-| AC-13.12 | ❌ | Screen share with a viewer not tested |
-| AC-13.13 | ✅ | FreeBSD reports `CameraUnavailable::UnsupportedPlatform`, the entry stays visible and disabled with the note; engine + UI tests |
-| AC-13.14 | ✅ | `AppInfo.limits` → About lists the gaps and the driver line; component test `AboutSection.test.tsx`; visual check pending (no screenshots on the test machine) |
+| AC-13.11 | ✅ | `mumcord_engine::p2p: peer-to-peer connection open` while the share ran; image and share both travelled over it |
+| AC-13.12 | ✅ | Whole X11 screen captured (`1080p · 30 fps · AV1-CPU`, thumbnail shows the real screen), the second client watched live for 10 minutes, the start dialog stated "On FreeBSD a share is the whole X11 screen and carries no sound" |
+| AC-13.13 | ✅ | Apps menu: "Turn on camera" greyed with "Camera sharing is not available on FreeBSD yet"; engine reports `CameraUnavailable::UnsupportedPlatform` |
+| AC-13.14 | ✅ | Settings → About lists "Not available on FreeBSD" with all five gaps and the `drm-66-kmod` line; component test `AboutSection.test.tsx` |
 | AC-13.15 | ✅ | Second launch with a link exits 0 and the running window receives it (`link received outcome=Shown`) |
-| AC-13.16 | ✅ | `updater_freebsd.rs` reports `InstallKind::Pkg`, no download offered; the one-time question is skipped |
-| AC-13.17 | ❌ | `pkg delete` not run yet |
-| AC-13.18 | ✅ | `cargo test --workspace` on FreeBSD 15.1 amd64, 117 test targets green; Linux/Windows/macOS CI untouched |
-| AC-13.19 | ✅ | `glxinfo -B` → `Mesa Intel(R) UHD Graphics (CML GT2)` (hardware), `dmesg` without `GPU HANG` over the whole session |
+| AC-13.16 | ✅ | About → Updates: "installed from updates.install.pkg", "This copy cannot update itself, so Mumcord only tells you about new versions" |
+| AC-13.17 | ✅ | `pkg delete -y mumcord`: binary, desktop entry and all icons removed, desktop-file and icon-cache triggers run again, the profile stays |
+| AC-13.18 | ✅ | `cargo test --workspace` on FreeBSD 15.1 amd64, 117 test targets green; UI suite 306 files with `--maxWorkers=4` |
+| AC-13.19 | ✅ | `glxinfo -B` → `Mesa Intel(R) UHD Graphics (CML GT2)` (hardware), no `GPU HANG` in `dmesg`, a 10-minute share stayed at ~90 % of one core without hangs |
 | AC-13.20 | ✅ | `pkg add` prints the install message; `pkg info -D mumcord` shows it |
 
 ### Try it yourself
@@ -52,9 +52,20 @@ Mumcord installs from a FreeBSD package, starts as a single instance, connects t
 - T2: the per-unit entries come from an ALSA configuration the package installs (as specified), and Mumcord hides the units the machine does not have. Switching between two real cards is unverified.
 - The About note names the gaps in one list instead of three separate lines (FR-13.28 wording "three lines"); the content is the same.
 - Translations of the new About/camera/share texts are English in every locale for now.
+- **Watch party**: the party itself works (invite, join, playlist, sync, watcher list), but the
+  YouTube player inside the app stays black — this WebKitGTK build has no EME/Widevine, so
+  YouTube refuses its embedded player. Spec §2.1 lists watch party as supported; that is wrong
+  for the video part. Needs either a spec deviation in §2.2 or a native player.
+- The package gains three runtime dependencies that `ldd` cannot see, because WebKitGTK loads
+  its decoders through GStreamer: `gstreamer1-libav`, `gstreamer1-plugins-vpx`,
+  `gstreamer1-plugins-opus` (`scripts/build-freebsd-pkg.sh`). Without them even H.264 does not
+  decode.
 
 ### Open points & known issues
-- AC-13.6, 13.7, 13.8, 13.9, 13.11, 13.12, 13.17 still need a hands-on run (second client, two sound cards, unplug, screen share viewer, plugin, `pkg delete`).
+- AC-13.4 audibility and AC-13.5 device switching need hardware the test machine lacks: a
+  microphone/headset on the dongle and a second sound card.
+- AC-13.7 file sharing needs a relay; the local test server has none, so files stay untested.
+- Watch party video playback is a platform gap (see deviations).
 - T6 (Diagnostics lines, FR-13.30/31), T7 (release wiring) and T8 (CI in a FreeBSD VM) are not implemented yet.
 - Screenshots: the test machine returns black pixels for every capture tool, so UI screenshots have to come from the VM.
 - KWallet on a fresh KDE profile accepts secrets and drops them; the app treats it as unusable and uses the encrypted file (documented behaviour, `e6e15205`).

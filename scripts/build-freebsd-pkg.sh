@@ -123,6 +123,17 @@ for lib in $(printf '%s\n' "$linked" | awk '/=>/ {print $3}' | sort -u); do
   case " $deps " in *" $name "*) continue ;; esac
   deps="$deps $name"
 done
+# Packages the app loads at runtime instead of linking, so `ldd` never sees them: WebKitGTK
+# pulls its media decoders from GStreamer, and without libav/vpx/opus the watch party and any
+# video in the app stay black on FreeBSD.
+for name in gstreamer1-libav gstreamer1-plugins-vpx gstreamer1-plugins-opus; do
+  pkg query -e "%n == $name" '%n' >/dev/null || {
+    echo "missing build dependency $name" >&2
+    exit 1
+  }
+  case " $deps " in *" $name "*) continue ;; esac
+  deps="$deps $name"
+done
 dep_lines=""
 for name in $deps; do
   # Separate names: `read` would otherwise overwrite the app version below.
