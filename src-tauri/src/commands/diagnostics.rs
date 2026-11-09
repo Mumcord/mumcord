@@ -43,6 +43,8 @@ pub enum PlatformLimit {
     WindowPicker,
     /// No in-game overlay.
     Overlay,
+    /// No EME in the platform's WebView (FR-13.38): protected video can only play in a browser.
+    ProtectedVideo,
 }
 
 /// What this build cannot do, from the platform it is compiled for.
@@ -55,6 +57,7 @@ fn platform_limits() -> Vec<PlatformLimit> {
             PlatformLimit::ScreenShareSound,
             PlatformLimit::WindowPicker,
             PlatformLimit::Overlay,
+            PlatformLimit::ProtectedVideo,
         ]
     }
     #[cfg(not(target_os = "freebsd"))]
@@ -156,6 +159,7 @@ mod tests {
         assert!(limits.contains(&PlatformLimit::ScreenShareSound));
         assert!(limits.contains(&PlatformLimit::WindowPicker));
         assert!(limits.contains(&PlatformLimit::Overlay));
+        assert!(limits.contains(&PlatformLimit::ProtectedVideo));
     }
 
     #[test]

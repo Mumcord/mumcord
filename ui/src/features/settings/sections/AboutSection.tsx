@@ -29,6 +29,8 @@ function limitText(limit: PlatformLimit): string {
       return "about.limitWindowPicker";
     case "overlay":
       return "about.limitOverlay";
+    case "protectedVideo":
+      return "about.limitProtectedVideo";
   }
 }
 

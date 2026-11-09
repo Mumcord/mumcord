@@ -6,6 +6,8 @@ import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
 import { pickSavePath } from "../fileDialogs";
+import { installLine, missingPackages, probeCodecs } from "../../watchparty/codecSupport";
+import { useHintPlatform } from "../../watchparty/useHintPlatform";
 import type { SettingsSectionProps } from "./types";
 import "../crash/crash.css";
 
@@ -103,9 +105,32 @@ export function DiagnosticsCard({ settings, update }: SettingsSectionProps) {
           {t("diagnostics.save")}
         </button>
       </div>
+      <MediaPackages />
       <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
         {status?.text}
       </p>
     </Group>
+  );
+}
+
+/**
+ * "Missing media packages: sudo pkg install …" (FR-13.37). FreeBSD only, and only while a decoder
+ * is really absent: the WebView loads its decoders from GStreamer packages at runtime, so a source
+ * build or a removed package leaves video black without any other sign.
+ */
+function MediaPackages() {
+  const { t } = useTranslation("settings");
+  const platform = useHintPlatform();
+  const [codecs] = useState(() => probeCodecs());
+  if (platform?.kind !== "freebsd") return null;
+  const line = installLine(missingPackages(codecs));
+  if (line === null) return null;
+  return (
+    <div className="settings-media-packages">
+      <p className="cr-section-label cr-label">{t("diagnostics.mediaPackages")}</p>
+      <p className="settings-hint cr-tight">
+        <code>{line}</code>
+      </p>
+    </div>
   );
 }

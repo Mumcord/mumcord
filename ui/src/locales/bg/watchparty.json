@@ -59,7 +59,9 @@
   "codecHint": {
     "install": "Това видео изисква поддръжка на H.264. Инсталирай gst-libav:",
     "generic": "Това видео изисква поддръжка на H.264. Инсталирай gst-libav (добавката libav за GStreamer) с мениджъра на пакети на системата си.",
-    "rpmFusion": "Във Fedora gst-libav идва от хранилището RPM Fusion; първо включи RPM Fusion."
+    "rpmFusion": "Във Fedora gst-libav идва от хранилището RPM Fusion; първо включи RPM Fusion.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Интервал пускане/пауза · ← → прескачане 5 с · M без звук · F цял екран",
   "headerPill": "Общо гледане · {{count}}",

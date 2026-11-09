@@ -207,6 +207,12 @@ export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }
                 className="media-frame__frame"
               />
             )}
+            {player.stalled && !player.failed && mockPlaceholder() === null && (
+              <CodecHint
+                failure={{ kind: "stalled" }}
+                className="watch-party__codec-hint"
+              />
+            )}
             {player.failed && mockPlaceholder() === null && (
               <div className="media-frame__unavailable" role="status">
                 <p>{t("cantPlay")}</p>

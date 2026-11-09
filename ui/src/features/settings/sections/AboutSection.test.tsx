@@ -47,6 +47,11 @@ describe("About section", () => {
     expect(screen.getByText(/drm-66-kmod/)).toBeTruthy();
   });
 
+  it("names the protected-video limit", async () => {
+    await renderCard(["protectedVideo"]);
+    expect(await screen.findByText(/Protected \(DRM\) video cannot play/)).toBeTruthy();
+  });
+
   it("says nothing about limits where everything works", async () => {
     await renderCard([]);
     expect(screen.queryByText("Not available on FreeBSD")).toBeNull();

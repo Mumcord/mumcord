@@ -3633,7 +3633,7 @@ export type PlatformLimit =
 /**  No `xdg-desktop-portal` to pick a window or an app. */
 "windowPicker" | 
 /**  No in-game overlay. */
-"overlay";
+"overlay" | "protectedVideo";
 
 /**  A video waiting in the party's playlist (FR-2.69). */
 export type PlaylistEntry = {

@@ -533,7 +533,8 @@
     "logCopied": "Logi kopeeritud.",
     "fileLabel": "Diagnostikafail",
     "writeToDisk": "Kirjuta logid kettale",
-    "writeToDiskHint": "Väljas hoiab logi ainult mälus selle seansi jooksul — kettale ei kirjutata midagi."
+    "writeToDiskHint": "Väljas hoiab logi ainult mälus selle seansi jooksul — kettale ei kirjutata midagi.",
+    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
   },
   "about": {
     "version": "Versioon",
@@ -567,7 +568,8 @@
     "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
     "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
     "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
-    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509)."
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profiil",

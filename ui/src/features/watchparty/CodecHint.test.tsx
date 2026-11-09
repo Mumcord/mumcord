@@ -70,6 +70,39 @@ describe("CodecHint", () => {
     );
   });
 
+  it("names the FreeBSD package that decodes the missing codec", async () => {
+    onSystem("freebsd amd64", null);
+    // jsdom decodes nothing, so every package is missing; H.264 comes first.
+    await renderHint({ kind: "youtube", code: 5 });
+    const hint = await screen.findByRole("status");
+    expect(hint).toHaveTextContent("needs a GStreamer decoder that is missing");
+    expect(hint).toHaveTextContent(
+      "sudo pkg install gstreamer1-libav gstreamer1-plugins-vpx gstreamer1-plugins-opus",
+    );
+  });
+
+  it("names only the FreeBSD package for the codec that is really missing", async () => {
+    onSystem("freebsd amd64", null);
+    // H.264 and VP9 decode here, Opus does not.
+    vi.spyOn(HTMLMediaElement.prototype, "canPlayType").mockImplementation((type: string) =>
+      type.includes("opus") ? "" : "probably",
+    );
+    await renderHint({ kind: "twitch" });
+    const hint = await screen.findByRole("status");
+    expect(hint).toHaveTextContent("sudo pkg install gstreamer1-plugins-opus");
+    expect(hint).not.toHaveTextContent("gstreamer1-libav");
+  });
+
+  it("offers the browser on FreeBSD when no package can help", async () => {
+    onSystem("freebsd amd64", null);
+    // Every installable decoder is there; an AV1-only or protected video still fails.
+    vi.spyOn(HTMLMediaElement.prototype, "canPlayType").mockReturnValue("probably");
+    await renderHint({ kind: "youtube", code: 5 });
+    const hint = await screen.findByRole("status");
+    expect(hint).toHaveTextContent("No FreeBSD package decodes this video");
+    expect(hint).not.toHaveTextContent("pkg install");
+  });
+
   it("stays hidden for other errors, without a failure, with H.264 and off Linux", async () => {
     onSystem("linux x86_64", { id: "arch", idLike: [] });
     const other = await renderHint({ kind: "youtube", code: 150 });

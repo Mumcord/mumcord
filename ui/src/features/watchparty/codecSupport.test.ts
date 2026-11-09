@@ -1,16 +1,23 @@
 import { describe, expect, it } from "vitest";
 import {
+  AV1_TYPE,
   H264_TYPE,
   installHint,
+  installLine,
   isCodecFailure,
   isTwitchPlayer,
+  missingPackages,
+  probeCodecs,
   supportsH264,
+  type MediaCodecs,
 } from "./codecSupport";
 
 describe("isCodecFailure", () => {
   it("counts YouTube's HTML5 error and any Twitch player", () => {
     expect(isCodecFailure({ kind: "youtube", code: 5 })).toBe(true);
     expect(isCodecFailure({ kind: "twitch" })).toBe(true);
+    // YouTube paints its own panel for a missing decoder and sends no onError (FR-13.35).
+    expect(isCodecFailure({ kind: "stalled" })).toBe(true);
   });
 
   it("ignores other YouTube errors", () => {
@@ -84,5 +91,48 @@ describe("installHint", () => {
     expect(installHint(distro("nixos"))).toEqual({ command: null, rpmFusion: false });
     expect(installHint(distro("gentoo"))).toEqual({ command: null, rpmFusion: false });
     expect(installHint(null)).toEqual({ command: null, rpmFusion: false });
+  });
+});
+
+describe("probeCodecs", () => {
+  it("asks for every decoder the app cares about", () => {
+    const asked: string[] = [];
+    const codecs = probeCodecs({
+      mse: (type) => {
+        asked.push(type);
+        return type === "video/mp4; codecs=\"avc1.42E01E\"";
+      },
+      element: () => "",
+    });
+    expect(codecs).toEqual({ h264: true, vp9: false, opus: false, av1: false });
+    expect(asked).toEqual([H264_TYPE, 'video/webm; codecs="vp9"', 'audio/webm; codecs="opus"', AV1_TYPE]);
+  });
+});
+
+describe("missingPackages", () => {
+  const all: MediaCodecs = { h264: true, vp9: true, opus: true, av1: false };
+
+  it("names the packages in the order a YouTube video needs them", () => {
+    expect(missingPackages(all)).toEqual([]);
+    expect(missingPackages({ ...all, h264: false }).map((e) => e.package)).toEqual([
+      "gstreamer1-libav",
+    ]);
+    expect(missingPackages({ ...all, vp9: false, opus: false }).map((e) => e.package)).toEqual([
+      "gstreamer1-plugins-vpx",
+      "gstreamer1-plugins-opus",
+    ]);
+  });
+
+  it("never offers a package for AV1, which the collection does not have", () => {
+    expect(missingPackages({ ...all, av1: false })).toEqual([]);
+  });
+});
+
+describe("installLine", () => {
+  it("builds the pkg command, and nothing when all decoders are there", () => {
+    expect(installLine(missingPackages({ h264: false, vp9: false, opus: true, av1: false }))).toBe(
+      "sudo pkg install gstreamer1-libav gstreamer1-plugins-vpx",
+    );
+    expect(installLine([])).toBeNull();
   });
 });

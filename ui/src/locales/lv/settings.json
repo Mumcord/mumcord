@@ -536,7 +536,8 @@
     "logCopied": "Žurnāls nokopēts.",
     "fileLabel": "Diagnostikas fails",
     "writeToDisk": "Rakstīt žurnālus diskā",
-    "writeToDiskHint": "Izslēgts žurnālu glabā tikai atmiņā šai sesijai — diskā nekas netiek rakstīts."
+    "writeToDiskHint": "Izslēgts žurnālu glabā tikai atmiņā šai sesijai — diskā nekas netiek rakstīts.",
+    "mediaPackages": "Missing media packages: video and sound of a watch party will not play."
   },
   "about": {
     "version": "Versija",
@@ -570,7 +571,8 @@
     "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
     "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
     "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
-    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509)."
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profils",
