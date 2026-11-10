@@ -6,7 +6,7 @@
 //! playback mix ([`ShareSound`]).
 
 use std::sync::atomic::{AtomicU8, AtomicU32, Ordering};
-use std::sync::mpsc::{self, SyncSender, TrySendError};
+use std::sync::mpsc::{self, RecvTimeoutError, SyncSender, TrySendError};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -659,6 +659,7 @@ mod tests {
             control.clone(),
         );
         let size = I420Frame::buffer_len(width, height);
+        let mut pictures = Vec::new();
         for index in 0..10_u8 {
             let picture =
                 I420Frame::new(width, height, vec![index.wrapping_mul(20); size]).expect("picture");
@@ -679,13 +680,21 @@ mod tests {
                     payload: out.data,
                 };
                 thread.push(frame, &control);
-                // Let the decoder keep up, so the bounded queue drops nothing.
-                thread::sleep(Duration::from_millis(20));
+            }
+            // Wait for the decoder to catch up instead of sleeping a fixed time: the queue is
+            // bounded, so a slow machine (a CI VM, for example) would drop frames otherwise.
+            let deadline = Instant::now() + Duration::from_secs(10);
+            while pictures.len() <= usize::from(index) && Instant::now() < deadline {
+                match rx.recv_timeout(Duration::from_millis(50)) {
+                    Ok(picture) => pictures.push(picture),
+                    Err(RecvTimeoutError::Timeout) => {}
+                    Err(RecvTimeoutError::Disconnected) => break,
+                }
             }
         }
         drop(thread);
-        let pictures: Vec<_> = rx.iter().collect();
-        assert!(pictures.len() >= 8, "decoded {} of 10", pictures.len());
+        pictures.extend(rx.iter());
+        assert_eq!(pictures.len(), 10, "decoded {} of 10", pictures.len());
         assert!(pictures.iter().all(|&p| p == (Codec::Av1, width, height)));
     }
 }
