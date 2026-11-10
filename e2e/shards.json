@@ -52,6 +52,7 @@
       "specs/app/updater.e2e.ts",
       "specs/chat/follow-v13.e2e.ts",
       "specs/chat/notifications.e2e.ts",
+      "specs/plugins/quit-signal.e2e.ts",
       "specs/plugins/sound-frame.e2e.ts",
       "specs/voice/leave-voice-menu.e2e.ts"
     ],

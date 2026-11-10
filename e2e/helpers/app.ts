@@ -315,7 +315,8 @@ export function appPid(id: AppId = "a"): number {
   return pid;
 }
 
-function alive(pid: number): boolean {
+/** Whether the process still runs. */
+export function alive(pid: number): boolean {
   try {
     // Zombies (exited, not yet reaped by --init) count as gone.
     return !/^\d+ \(.*\) Z/.test(readFileSync(`/proc/${String(pid)}/stat`, "utf8"));
