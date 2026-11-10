@@ -896,6 +896,16 @@
     "modeNotify": "Csak értesítés",
     "modeOff": "Ki",
     "autoUnavailable": "Ez a példány nem tudja önmagát frissíteni, ezért a Mumcord csak az új verziókról értesít.",
+    "channel": "Frissítési csatorna",
+    "channelHint": "Válaszd ki, mely kiadásokat kínálja fel a Mumcord. A kiadásra jelölt verziók a következő verzió korai változatai.",
+    "channels": {
+      "stable": { "name": "Stabil", "hint": "Csak végleges kiadások" },
+      "releaseCandidates": {
+        "name": "Kiadásra jelölt verziók",
+        "hint": "A következő verzió korai változatai; hibákat tartalmazhatnak"
+      }
+    },
+    "channelSwitchBack": "Ha visszaváltasz a Stabil csatornára, a jelenlegi verziód megmarad, amíg meg nem jelenik a következő végleges kiadás.",
     "interval": "Frissítések keresése",
     "intervalHint_one": "Indításkor és óránként",
     "intervalHint_other": "Indításkor és {{count}} óránként",

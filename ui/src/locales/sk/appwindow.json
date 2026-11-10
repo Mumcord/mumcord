@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabilná",
+    "releaseCandidate": "Kandidát na vydanie",
+    "prereleaseNote": "Toto je predbežná verzia a môže obsahovať chyby. Ak chceš dostávať iba finálne vydania, prepni v nastaveniach na stabilný kanál.",
     "available": {
       "title": "Aktualizácia je k dispozícii",
       "subtitle": "Mumcord {{version}} je pripravený na stiahnutie. Máš verziu {{current}}.",

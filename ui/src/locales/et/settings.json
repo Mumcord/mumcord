@@ -896,6 +896,16 @@
     "modeNotify": "Anna ainult teada",
     "modeOff": "Väljas",
     "autoUnavailable": "See koopia ei saa end ise uuendada, seega annab Mumcord uutest versioonidest ainult teada.",
+    "channel": "Uuenduste kanal",
+    "channelHint": "Vali, milliseid väljalaskeid Mumcord pakub. Väljalaskekandidaadid on järgmise versiooni varased järgud.",
+    "channels": {
+      "stable": { "name": "Stabiilne", "hint": "Ainult lõplikud väljalasked" },
+      "releaseCandidates": {
+        "name": "Väljalaskekandidaadid",
+        "hint": "Järgmise versiooni varased järgud; võivad sisaldada vigu"
+      }
+    },
+    "channelSwitchBack": "Stabiilsele kanalile tagasi lülitudes jääb sinu praegune versioon alles, kuni ilmub järgmine lõplik väljalase.",
     "interval": "Kontrolli uuendusi",
     "intervalHint_one": "Käivitamisel ja iga tunni järel",
     "intervalHint_other": "Käivitamisel ja iga {{count}} tunni järel",

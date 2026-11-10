@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabilă",
+    "releaseCandidate": "Versiune candidat",
+    "prereleaseNote": "Aceasta este o versiune preliminară și poate conține erori. Treci la canalul Stabil din setări pentru a primi doar versiuni finale.",
     "available": {
       "title": "Actualizare disponibilă",
       "subtitle": "Mumcord {{version}} este gata de descărcat. Ai versiunea {{current}}.",

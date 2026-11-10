@@ -901,6 +901,16 @@
     "modeNotify": "Apenas notificar",
     "modeOff": "Desativado",
     "autoUnavailable": "Esta cópia não se consegue atualizar sozinha, por isso o Mumcord só te avisa das novas versões.",
+    "channel": "Canal de atualizações",
+    "channelHint": "Escolhe que versões o Mumcord oferece. As versões candidatas são compilações iniciais da próxima versão.",
+    "channels": {
+      "stable": { "name": "Estável", "hint": "Apenas versões finais" },
+      "releaseCandidates": {
+        "name": "Versões candidatas",
+        "hint": "Compilações iniciais da próxima versão; podem conter erros"
+      }
+    },
+    "channelSwitchBack": "Ao voltares ao canal Estável, manténs a tua versão atual até sair a próxima versão final.",
     "interval": "Procurar atualizações",
     "intervalHint_one": "Ao iniciar e a cada hora",
     "intervalHint_many": "Ao iniciar e a cada {{count}} horas",

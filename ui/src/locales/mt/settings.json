@@ -911,6 +911,16 @@
     "modeNotify": "Ibgħat notifika biss",
     "modeOff": "Mitfi",
     "autoUnavailable": "Din il-kopja ma tistax taġġorna lilha nnifisha, għalhekk Mumcord jgħarrfek biss dwar verżjonijiet ġodda.",
+    "channel": "Kanal tal-aġġornamenti",
+    "channelHint": "Agħżel liema rilaxxi joffri Mumcord. Il-kandidati għar-rilaxx huma bnadi bikrin tal-verżjoni li jmiss.",
+    "channels": {
+      "stable": { "name": "Stabbli", "hint": "Rilaxxi finali biss" },
+      "releaseCandidates": {
+        "name": "Kandidati għar-rilaxx",
+        "hint": "Bnadi bikrin tal-verżjoni li jmiss; jistgħu jinkludu bugs"
+      }
+    },
+    "channelSwitchBack": "Meta terġa’ taqleb għal Stabbli, tżomm il-verżjoni attwali tiegħek sakemm joħroġ ir-rilaxx finali li jmiss.",
     "interval": "Iċċekkja għall-aġġornamenti",
     "intervalHint_one": "Fil-bidu u kull siegħa",
     "intervalHint_two": "Fil-bidu u kull {{count}} sigħat",

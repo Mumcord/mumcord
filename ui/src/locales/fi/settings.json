@@ -896,6 +896,16 @@
     "modeNotify": "Vain ilmoita",
     "modeOff": "Pois",
     "autoUnavailable": "Tämä kopio ei voi päivittää itseään, joten Mumcord vain kertoo uusista versioista.",
+    "channel": "Päivityskanava",
+    "channelHint": "Valitse, mitä julkaisuja Mumcord tarjoaa. Julkaisuehdokkaat ovat seuraavan version varhaisia versioita.",
+    "channels": {
+      "stable": { "name": "Vakaa", "hint": "Vain lopulliset julkaisut" },
+      "releaseCandidates": {
+        "name": "Julkaisuehdokkaat",
+        "hint": "Seuraavan version varhaisia versioita; voivat sisältää virheitä"
+      }
+    },
+    "channelSwitchBack": "Kun vaihdat takaisin vakaaseen kanavaan, nykyinen versiosi säilyy, kunnes seuraava lopullinen julkaisu tulee.",
     "interval": "Tarkista päivitykset",
     "intervalHint_one": "Käynnistyksessä ja joka tunti",
     "intervalHint_other": "Käynnistyksessä ja {{count}} tunnin välein",

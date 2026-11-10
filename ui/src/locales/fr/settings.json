@@ -901,6 +901,16 @@
     "modeNotify": "Notifier seulement",
     "modeOff": "Désactivé",
     "autoUnavailable": "Cette copie ne peut pas se mettre à jour elle-même, donc Mumcord t’informe seulement des nouvelles versions.",
+    "channel": "Canal de mise à jour",
+    "channelHint": "Choisis les versions que Mumcord propose. Les versions candidates sont des préversions de la prochaine version.",
+    "channels": {
+      "stable": { "name": "Stable", "hint": "Versions finales uniquement" },
+      "releaseCandidates": {
+        "name": "Versions candidates",
+        "hint": "Préversions de la prochaine version ; peuvent contenir des bogues"
+      }
+    },
+    "channelSwitchBack": "Si tu reviens à Stable, tu gardes ta version actuelle jusqu’à la sortie de la prochaine version finale.",
     "interval": "Rechercher des mises à jour",
     "intervalHint_one": "Au démarrage et toutes les heures",
     "intervalHint_many": "Au démarrage et toutes les {{count}} heures",

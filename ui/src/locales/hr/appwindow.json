@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabilna",
+    "releaseCandidate": "Kandidat za izdanje",
+    "prereleaseNote": "Ovo je pretpregled verzije i može sadržavati greške. Prebaci se na stabilni kanal u postavkama da dobivaš samo završna izdanja.",
     "available": {
       "title": "Dostupno je ažuriranje",
       "subtitle": "Mumcord {{version}} spreman je za preuzimanje. Imaš {{current}}.",

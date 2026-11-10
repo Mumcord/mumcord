@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabiilne",
+    "releaseCandidate": "Väljalaskekandidaat",
+    "prereleaseNote": "See on eelversioon ja võib sisaldada vigu. Et saada ainult lõplikke väljalaskeid, lülitu seadetes stabiilsele kanalile.",
     "available": {
       "title": "Uuendus on saadaval",
       "subtitle": "Mumcord {{version}} on allalaadimiseks valmis. Sul on {{current}}.",

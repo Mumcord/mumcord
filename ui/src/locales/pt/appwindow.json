@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Estável",
+    "releaseCandidate": "Versão candidata",
+    "prereleaseNote": "Esta é uma versão preliminar e pode conter erros. Muda para o canal Estável nas definições para receberes apenas versões finais.",
     "available": {
       "title": "Atualização disponível",
       "subtitle": "O Mumcord {{version}} está pronto para transferir. Tens a {{current}}.",

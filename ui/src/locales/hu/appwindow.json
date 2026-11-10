@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabil",
+    "releaseCandidate": "Kiadásra jelölt verzió",
+    "prereleaseNote": "Ez egy előzetes verzió, és hibákat tartalmazhat. A beállításokban válts a Stabil csatornára, ha csak végleges kiadásokat szeretnél kapni.",
     "available": {
       "title": "Frissítés érhető el",
       "subtitle": "A Mumcord {{version}} készen áll a letöltésre. A jelenlegi verziód: {{current}}.",

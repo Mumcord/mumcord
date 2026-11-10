@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabil",
+    "releaseCandidate": "Release candidate",
+    "prereleaseNote": "Dette er en forhåndsversion og kan indeholde fejl. Skift til den stabile kanal i indstillingerne for kun at få endelige udgivelser.",
     "available": {
       "title": "Opdatering tilgængelig",
       "subtitle": "Mumcord {{version}} er klar til download. Du har {{current}}.",

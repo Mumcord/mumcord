@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Vakaa",
+    "releaseCandidate": "Julkaisuehdokas",
+    "prereleaseNote": "Tämä on esijulkaisu, ja se voi sisältää virheitä. Vaihda asetuksissa vakaaseen kanavaan, jos haluat vain lopullisia julkaisuja.",
     "available": {
       "title": "Päivitys saatavilla",
       "subtitle": "Mumcord {{version}} on valmis ladattavaksi. Sinulla on {{current}}.",

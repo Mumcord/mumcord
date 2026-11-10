@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabilā",
+    "releaseCandidate": "Izlaides kandidāts",
+    "prereleaseNote": "Šī ir pirmsizlaides versija, un tajā var būt kļūdas. Iestatījumos pārslēdzies uz stabilo kanālu, lai saņemtu tikai galīgās versijas.",
     "available": {
       "title": "Pieejams atjauninājums",
       "subtitle": "Mumcord {{version}} ir gatavs lejupielādei. Tev ir {{current}}.",

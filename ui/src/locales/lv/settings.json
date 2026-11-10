@@ -901,6 +901,16 @@
     "modeNotify": "Tikai paziņot",
     "modeOff": "Izslēgts",
     "autoUnavailable": "Šī kopija nevar atjaunināt pati sevi, tāpēc Mumcord tikai paziņo par jaunām versijām.",
+    "channel": "Atjauninājumu kanāls",
+    "channelHint": "Izvēlies, kuras versijas Mumcord piedāvā. Izlaides kandidāti ir nākamās versijas agrīnie būvējumi.",
+    "channels": {
+      "stable": { "name": "Stabilā", "hint": "Tikai galīgās versijas" },
+      "releaseCandidates": {
+        "name": "Izlaides kandidāti",
+        "hint": "Nākamās versijas agrīnie būvējumi; var saturēt kļūdas"
+      }
+    },
+    "channelSwitchBack": "Pārslēdzoties atpakaļ uz stabilo kanālu, tava pašreizējā versija paliek, līdz iznāk nākamā galīgā versija.",
     "interval": "Pārbaudīt atjauninājumus",
     "intervalHint_zero": "Startējot un ik pēc {{count}} stundām",
     "intervalHint_one": "Startējot un ik pēc {{count}} stundas",

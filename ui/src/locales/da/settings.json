@@ -896,6 +896,16 @@
     "modeNotify": "Giv kun besked",
     "modeOff": "Fra",
     "autoUnavailable": "Denne kopi kan ikke opdatere sig selv, så Mumcord fortæller dig kun om nye versioner.",
+    "channel": "Opdateringskanal",
+    "channelHint": "Vælg, hvilke udgivelser Mumcord tilbyder. Release candidates er tidlige versioner af den næste version.",
+    "channels": {
+      "stable": { "name": "Stabil", "hint": "Kun endelige udgivelser" },
+      "releaseCandidates": {
+        "name": "Release candidates",
+        "hint": "Tidlige versioner af den næste version; kan indeholde fejl"
+      }
+    },
+    "channelSwitchBack": "Når du skifter tilbage til Stabil, beholder du din nuværende version, indtil den næste endelige udgivelse er ude.",
     "interval": "Søg efter opdateringer",
     "intervalHint_one": "Ved start og hver time",
     "intervalHint_other": "Ved start og hver {{count}}. time",

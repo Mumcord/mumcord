@@ -901,6 +901,16 @@
     "modeNotify": "Doar notifică",
     "modeOff": "Dezactivat",
     "autoUnavailable": "Această copie nu se poate actualiza singură, așa că Mumcord doar te anunță despre versiunile noi.",
+    "channel": "Canal de actualizări",
+    "channelHint": "Alege ce versiuni oferă Mumcord. Versiunile candidat sunt build-uri timpurii ale următoarei versiuni.",
+    "channels": {
+      "stable": { "name": "Stabilă", "hint": "Doar versiuni finale" },
+      "releaseCandidates": {
+        "name": "Versiuni candidat",
+        "hint": "Build-uri timpurii ale următoarei versiuni; pot conține erori"
+      }
+    },
+    "channelSwitchBack": "Dacă revii la Stabil, îți păstrezi versiunea curentă până apare următoarea versiune finală.",
     "interval": "Caută actualizări",
     "intervalHint_one": "La pornire și în fiecare oră",
     "intervalHint_few": "La pornire și la fiecare {{count}} ore",
