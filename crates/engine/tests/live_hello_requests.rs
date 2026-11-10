@@ -105,7 +105,7 @@ async fn a_client_without_hello_is_asked_three_times_then_left_alone() {
     // The requests come 10, 40 and 130 s after the bot appeared; wait a little longer than that.
     let deadline = tokio::time::Instant::now() + Duration::from_secs(150);
     while let Ok(event) = tokio::time::timeout_at(deadline, events.recv()).await {
-        let Ok(bot_protocol::Event::PluginData(data)) = event else {
+        let Ok(mumbot::protocol::Event::PluginData(data)) = event else {
             continue;
         };
         if data.data_id != mumcord_engine::mumcord::DATA_ID {
