@@ -23,7 +23,7 @@
   "dialogEdit": "Sperrung bearbeiten",
   "who": "Wer",
   "name": "Name",
-  "fingerprint": "Zertifikats-Fingerabdruck",
+  "fingerprint": "Fingerabdruck des Zertifikats",
   "ipAddress": "IP-Adresse",
   "mask": "Subnetzmaske",
   "maskHelp": "32 sperrt eine IPv4-Adresse, 128 eine IPv6-Adresse.",
@@ -249,7 +249,7 @@
       "textMessage": "Nachrichten schreiben",
       "listen": "Mithören",
       "muteDeafen": "Andere stummschalten",
-      "move": "Leute verschieben",
+      "move": "Personen verschieben",
       "write": "Berechtigungen bearbeiten",
       "makeChannel": "Kanäle erstellen",
       "makeTempChannel": "Temporäre Kanäle erstellen",
@@ -257,7 +257,7 @@
       "kick": "Kicken",
       "ban": "Sperren",
       "register": "Andere registrieren",
-      "selfRegister": "Selbst registrieren",
+      "selfRegister": "Sich selbst registrieren",
       "resetUserContent": "Profile zurücksetzen"
     },
     "cellLabel": "{{who}}, {{permission}}: {{verdict}}",
@@ -330,7 +330,7 @@
     },
     "groups": {
       "here": "Gruppen in diesem Kanal",
-      "builtIn": "Eingebaut",
+      "builtIn": "Integriert",
       "explain": {
         "all": "alle",
         "auth": "registriert",

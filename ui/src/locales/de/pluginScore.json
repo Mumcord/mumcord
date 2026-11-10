@@ -128,7 +128,7 @@
   "higherThanListing": "Dieses Plugin wird höher bewertet, als in der Auflistung stand",
   "safety": {
     "title": "Plugin-Sicherheit",
-    "label": "Plugins mit hohem Risiko nicht erlauben",
+    "label": "Plugins mit hohem Risiko nicht zulassen",
     "description": "Blendet die Schaltfläche „Installieren“ für Plugins mit einer Bewertung ab 60 aus und verhindert Updates, die ein installiertes Plugin dorthin brächten. Bereits installierte Plugins funktionieren weiter.",
     "note": "Standardmäßig aus. Offizielle Plugins und Entwickler-Plugins sind nie betroffen. Bewertungen sind Schätzungen, keine Garantie.",
     "highConfirmed": "Hohes Risiko: Das hast du am {{date}} bestätigt."

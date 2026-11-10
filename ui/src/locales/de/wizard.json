@@ -36,7 +36,7 @@
     "notifications": "Benachrichtigungen",
     "connections": "Verbindungen",
     "features": "Funktionen",
-    "appearance": "Aussehen",
+    "appearance": "Darstellung",
     "startup": "Start und Updates",
     "summary": "Alles bereit"
   },
@@ -66,8 +66,8 @@
     "import": "Vorhandene Identität importieren",
     "name": "Standard-Anzeigename",
     "nameHint": "Wird auf Servern verwendet, die dich noch nicht kennen. Du kannst ihn pro Server ändern.",
-    "chooseFile": "Datei wählen…",
-    "noFile": "Keine Datei gewählt",
+    "chooseFile": "Datei auswählen…",
+    "noFile": "Keine Datei ausgewählt",
     "chosenFile": "Gewählte Datei: {{file}}",
     "password": "Dateipasswort",
     "passwordHint": "Das Passwort bleibt auf diesem Computer und wird nirgendwohin gesendet.",
@@ -194,7 +194,7 @@
       "connections": "Verbindungen",
       "chatContent": "Chatinhalte",
       "features": "Funktionen",
-      "appearance": "Aussehen",
+      "appearance": "Darstellung",
       "startup": "Start",
       "updates": "Updates"
     },

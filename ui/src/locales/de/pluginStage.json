@@ -50,7 +50,7 @@
   },
   "sidePanel": {
     "label": "Seitenleiste von {{plugin}}",
-    "options": "Optionen von {{plugin}}",
+    "options": "Optionen für {{plugin}}",
     "close": "Seitenleiste von {{plugin}} schließen",
     "resize": "Größe der Seitenleiste von {{plugin}} ändern"
   },

@@ -10,7 +10,7 @@
   "sealedFrame": "Es kann weder Mumcord noch deine Dateien, dein Mikrofon, deine Kamera oder die Zwischenablage sehen. Wird nur angezeigt in: {{places}}.",
   "ownCodeAndWebsites": "Dieses Plugin bringt eigenen Code mit und kommuniziert mit Websites.",
   "trustRepository": "{{repository}} ist eine Quelle, die du hinzugefügt hast. Installiere das Plugin nur, wenn du ihr vertraust.",
-  "understand": "Ich habe verstanden",
+  "understand": "Verstanden",
   "trustAuthor": "Ich kenne das Risiko und vertraue dem Autor von {{plugin}}",
   "understandUpdate": "Ich weiß, dass das Risiko gestiegen ist, und vertraue dem Autor trotzdem",
   "changeLater": "Später änderbar unter Einstellungen → Plugins.",

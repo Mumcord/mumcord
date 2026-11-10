@@ -45,7 +45,7 @@
     }
   },
   "update": {
-    "wantsNew_one": "Dieses Update möchte mit {{count}} neuen Website kommunizieren.",
+    "wantsNew_one": "Dieses Update möchte mit {{count}} neuer Website kommunizieren.",
     "wantsNew_other": "Dieses Update möchte mit {{count}} neuen Websites kommunizieren.",
     "staysOn": "{{plugin}} bleibt auf {{version}}, bis du dich entscheidest.",
     "banner_one": "{{count}} Update wartet auf dich. Updates, die Berechtigungen oder Websites hinzufügen, werden nie automatisch installiert.",

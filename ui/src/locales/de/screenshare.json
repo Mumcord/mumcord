@@ -31,7 +31,7 @@
   "changeWindow": "Fenster wechseln",
   "viewersTitle": "Zuschauer",
   "thumbnail": "Vorschau deiner Freigabe",
-  "youAreSharing": "Du gibst frei",
+  "youAreSharing": "Freigabe läuft",
   "ofMax": "{{count}} von {{max}}",
   "fullShort": "Alle Plätze sind belegt.",
   "stopShort": "Beenden",
@@ -81,9 +81,9 @@
     "sound": "Ton",
     "soundInfo": "Ganzer Bildschirm: Ton des Computers ohne Mumcord. Ein Fenster: nur der Ton dieser App.",
     "soundNeeds": {
-      "windows": "Kein Ton: erfordert Windows 10 Version 2004 oder neuer",
-      "macos": "Kein Ton: erfordert macOS 13 oder neuer",
-      "pipewire": "Kein Ton: erfordert PipeWire"
+      "windows": "Kein Ton: benötigt Windows 10 Version 2004 oder neuer",
+      "macos": "Kein Ton: benötigt macOS 13 oder neuer",
+      "pipewire": "Kein Ton: benötigt PipeWire"
     },
     "viewersGet": "Zuschauer erhalten:",
     "viewersGetSummary": "bis zu {{resolution}} · {{fps}} fps · {{codec}} · etwa {{mbit}} Mbit/s",
@@ -212,7 +212,7 @@
     "upload5": "5 Mbit/s",
     "upload10": "10 Mbit/s",
     "upload20": "20 Mbit/s",
-    "uploadHint": "Das Maximum, das deine Freigabe insgesamt sendet. Nützlich bei geteilten oder volumenbegrenzten Verbindungen.",
+    "uploadHint": "Das Maximum, das deine Freigabe insgesamt sendet. Nützlich bei geteilter oder getakteter Verbindung.",
     "askEachTime": "Bei jeder Freigabe nach diesen Einstellungen fragen",
     "codec": "Videocodec",
     "codecAuto": "Automatisch (empfohlen)",

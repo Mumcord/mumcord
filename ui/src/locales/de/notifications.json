@@ -68,7 +68,7 @@
       "title": "Mumcord {{version}} ist bereit",
       "body": "Zum Aktualisieren neu starten",
       "restart": "Neu starten und aktualisieren",
-      "whatsNew": "Was ist neu"
+      "whatsNew": "Neuigkeiten"
     },
     "relay": {
       "title": "Relay auf {{server}} geändert",

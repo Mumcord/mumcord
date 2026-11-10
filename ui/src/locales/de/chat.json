@@ -285,7 +285,7 @@
     "metaMumcord": "Mumcord-Benutzer · {{server}} · {{time}}",
     "metaStandard": "{{server}} · {{time}}",
     "noteFrom": "Notiz von {{name}}",
-    "explain": "Du hast private Nachrichten auf „Nur Freunde“ gestellt. Wenn du annimmst, kann {{name}} dir schreiben. Ablehnen bleibt unbemerkt: {{name}} sieht nur „Ausstehend“. Anfragen werden gelöscht, wenn du Mumcord beendest.",
+    "explain": "Du hast Privatnachrichten auf „Nur Freunde“ gestellt. Wenn du annimmst, kann {{name}} dir schreiben. Ablehnen bleibt unbemerkt: {{name}} sieht nur „Ausstehend“. Anfragen werden gelöscht, wenn du Mumcord beendest.",
     "sentMessages_one": "{{name}} hat dir {{count}} Nachricht geschickt",
     "sentMessages_other": "{{name}} hat dir {{count}} Nachrichten geschickt",
     "messagesLabel": "Nachrichten von {{name}}",

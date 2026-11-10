@@ -42,7 +42,7 @@
   "fitGroup": "Bildgröße",
   "panel": "Panel von {{name}}",
   "viewersCount": "Zuschauer {{watching}} / {{max}}",
-  "sharing": "Gibt frei",
+  "sharing": "Freigabe",
   "viewersNone": "Noch schaut niemand zu",
   "loweredFor": "Die Qualität passt sich dem langsamsten Zuschauer an: {{name}} bekommt {{fps}} fps",
   "notWatching": "Im Kanal, schaut nicht zu",

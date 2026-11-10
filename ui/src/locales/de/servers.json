@@ -153,7 +153,7 @@
     "label": "Letztem Kanal wieder beitreten",
     "text": "Du warst zuletzt in {{channel}} – wieder beitreten?",
     "rejoin": "Beitreten",
-    "notNow": "Jetzt nicht"
+    "notNow": "Nicht jetzt"
   },
   "status": {
     "label": "Verbindungsstatus",
