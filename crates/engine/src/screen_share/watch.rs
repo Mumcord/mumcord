@@ -116,8 +116,8 @@ pub(crate) struct WatchLink {
 
 /// Where a watched share's frames come from.
 pub(crate) enum FrameSource {
-    /// The direct stream from the sharer.
-    Stream(RecvStream),
+    /// The direct stream from the sharer, in either wire format.
+    Stream(Box<wire::FrameReader<RecvStream>>),
     /// Frames decrypted from the relay broadcast.
     Broadcast(mpsc_async::Receiver<Frame>),
 }
@@ -125,7 +125,7 @@ pub(crate) enum FrameSource {
 impl FrameSource {
     async fn next(&mut self) -> Result<Option<Frame>, wire::WireError> {
         match self {
-            Self::Stream(recv) => wire::read_frame(recv).await,
+            Self::Stream(reader) => reader.read_frame().await,
             Self::Broadcast(frames) => Ok(frames.recv().await),
         }
     }
@@ -153,7 +153,7 @@ impl WatchLink {
             Source { server_id, sharer },
             sink,
             sound,
-            FrameSource::Stream(recv),
+            FrameSource::Stream(Box::new(wire::FrameReader::auto(recv))),
             RequestSink::Stream(send),
             None,
         )

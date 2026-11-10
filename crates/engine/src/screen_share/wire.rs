@@ -268,7 +268,18 @@ pub async fn read_frame<R: AsyncRead + Unpin>(reader: &mut R) -> Result<Option<F
     if reader.read(&mut bytes[..1]).await? == 0 {
         return Ok(None);
     }
-    let len = header_len(bytes[0]).ok_or(WireError::BadVersion(bytes[0]))?;
+    read_frame_after_first(reader, bytes[0]).await
+}
+
+/// Reads a legacy frame whose first header byte was already read (the format detector needs
+/// it to tell the two formats apart).
+async fn read_frame_after_first<R: AsyncRead + Unpin>(
+    reader: &mut R,
+    first: u8,
+) -> Result<Option<Frame>, WireError> {
+    let mut bytes = [0u8; MAX_HEADER_LEN];
+    bytes[0] = first;
+    let len = header_len(first).ok_or(WireError::BadVersion(first))?;
     reader.read_exact(&mut bytes[1..len]).await?;
     let header = FrameHeader::decode(&bytes[..len])?;
     let len = usize::try_from(header.payload_len).map_err(|_| WireError::BadField)?;
@@ -403,6 +414,11 @@ impl<W: AsyncWrite + Unpin> FrameWriter<W> {
 pub struct FrameReader<R> {
     inner: R,
     media: Option<MediaFraming>,
+    /// The format is not known yet: the first byte tells the media document apart from a legacy
+    /// frame (FR-7.97). A 0.8.x sharer and a 0.9.0 sharer both serve direct viewers.
+    auto: bool,
+    /// The first legacy header byte read while detecting the format.
+    first: Option<u8>,
 }
 
 impl<R: AsyncRead + Unpin> FrameReader<R> {
@@ -410,14 +426,45 @@ impl<R: AsyncRead + Unpin> FrameReader<R> {
         Self {
             inner,
             media: matches!(format, Format::Media).then(MediaFraming::new),
+            auto: false,
+            first: None,
+        }
+    }
+
+    /// A reader that accepts both formats and recognizes the first one from the stream.
+    pub fn auto(inner: R) -> Self {
+        Self {
+            inner,
+            media: None,
+            auto: true,
+            first: None,
         }
     }
 
     /// The next frame, or `Ok(None)` when the stream ended at a frame or message boundary.
     pub async fn read_frame(&mut self) -> Result<Option<Frame>, WireError> {
+        if self.auto {
+            let mut first = [0u8; 1];
+            if self.inner.read(&mut first).await? == 0 {
+                return Ok(None);
+            }
+            self.auto = false;
+            match first[0] {
+                b'#' => {
+                    let mut media = MediaFraming::new();
+                    media.buffer.push(b'#');
+                    self.media = Some(media);
+                }
+                V1 | V2 => self.first = Some(first[0]),
+                other => return Err(WireError::BadVersion(other)),
+            }
+        }
         match &mut self.media {
             Some(media) => media.read_frame(&mut self.inner).await,
-            None => read_frame(&mut self.inner).await,
+            None => match self.first.take() {
+                Some(first) => read_frame_after_first(&mut self.inner, first).await,
+                None => read_frame(&mut self.inner).await,
+            },
         }
     }
 
@@ -932,6 +979,78 @@ mod tests {
         assert!(matches!(
             reader.read_frame().await,
             Err(WireError::Media(CodecError::Truncated))
+        ));
+    }
+
+    #[tokio::test]
+    async fn auto_reader_accepts_a_media_and_a_legacy_sharer() {
+        let description = screen_description(Codec::Vp9, 1280, 720);
+        let media_frames = vec![
+            frame(Codec::Vp9, true, 0, 0, &[1, 2, 3]),
+            frame(Codec::Vp9, false, 1, 1, &[4, 5]),
+        ];
+        let legacy_frames = vec![
+            frame(Codec::Vp9, true, 0, 0, &[6, 7]),
+            audio_frame(&[8, 9, 10]),
+        ];
+        let mut media = Vec::new();
+        let mut writer = FrameWriter::new(&mut media, Format::Media);
+        writer.write_description(&description).await.unwrap();
+        for frame in &media_frames {
+            writer.write_frame(frame).await.unwrap();
+        }
+        writer.finish().await.unwrap();
+
+        let mut legacy = Vec::new();
+        let mut writer = FrameWriter::new(&mut legacy, Format::Legacy(V2));
+        for frame in &legacy_frames {
+            writer.write_frame(frame).await.unwrap();
+        }
+
+        let mut reader = FrameReader::auto(media.as_slice());
+        let mut read = Vec::new();
+        while let Some(frame) = reader.read_frame().await.unwrap() {
+            read.push(frame);
+        }
+        assert_eq!(read, media_frames);
+
+        let mut reader = FrameReader::auto(legacy.as_slice());
+        let mut read = Vec::new();
+        while let Some(frame) = reader.read_frame().await.unwrap() {
+            read.push(frame);
+        }
+        assert_eq!(read, legacy_frames);
+    }
+
+    #[tokio::test]
+    async fn a_late_frame_before_the_first_description_is_dropped() {
+        let description = screen_description(Codec::Vp9, 1280, 720);
+        let mut buf = Vec::new();
+        let mut writer = FrameWriter::new(&mut buf, Format::Media);
+        writer
+            .write_frame(&frame(Codec::Vp9, true, 0, 0, &[1]))
+            .await
+            .unwrap();
+        writer.write_description(&description).await.unwrap();
+        writer
+            .write_frame(&frame(Codec::Vp9, true, 0, 1, &[2]))
+            .await
+            .unwrap();
+        writer.finish().await.unwrap();
+
+        let mut reader = FrameReader::new(buf.as_slice(), Format::Media);
+        let frame = reader.read_frame().await.unwrap().unwrap();
+        assert_eq!(frame.payload, [2], "only the frame after the description");
+        assert!(reader.read_frame().await.unwrap().is_none());
+    }
+
+    #[tokio::test]
+    async fn auto_reader_refuses_an_unknown_first_byte() {
+        let bytes = [9u8];
+        let mut reader = FrameReader::auto(bytes.as_slice());
+        assert!(matches!(
+            reader.read_frame().await,
+            Err(WireError::BadVersion(9))
         ));
     }
 
