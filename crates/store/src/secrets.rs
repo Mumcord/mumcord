@@ -203,18 +203,31 @@ mod vault {
     }
 
     /// Writes `bytes` to `path` so that only the user can read it.
+    ///
+    /// The bytes go into a temporary file beside `path` that is renamed onto it once they are
+    /// flushed, so a crash or a full disk half way leaves the previous file intact. That file
+    /// holds every stored secret, including the identity, so a truncated one would be the end of
+    /// the profile.
     fn write_private(path: &Path, bytes: &[u8]) -> Result<()> {
         if let Some(dir) = path.parent() {
             fs::create_dir_all(dir).map_err(Error::SecretFile)?;
         }
+        let mut temp_name = path.file_name().unwrap_or_default().to_os_string();
+        temp_name.push(".tmp");
+        let temp = path.with_file_name(temp_name);
         let mut file = fs::OpenOptions::new()
             .write(true)
             .create(true)
             .truncate(true)
             .mode(0o600)
-            .open(path)
+            .open(&temp)
             .map_err(Error::SecretFile)?;
-        file.write_all(bytes).map_err(Error::SecretFile)
+        file.write_all(bytes).map_err(Error::SecretFile)?;
+        // On the disk before the rename: a rename that outlived its data would leave a file of
+        // zeroes behind the name.
+        file.sync_all().map_err(Error::SecretFile)?;
+        drop(file);
+        fs::rename(&temp, path).map_err(Error::SecretFile)
     }
 
     impl SecretBackend for VaultBackend {
@@ -928,6 +941,24 @@ mod tests {
                 "{name} must not be group or world readable"
             );
         }
+
+        // Rewrites go through a temporary file and a rename: no leftovers, no window in which
+        // the stored secrets are missing.
+        store.set_server_password(5, "hunter3").expect("overwrite");
+        let third = SecretStore::with_backend(Arc::new(super::vault::VaultBackend::new(
+            dir.path().to_path_buf(),
+        )));
+        assert_eq!(
+            third.server_password(5).expect("get").as_deref(),
+            Some("hunter3")
+        );
+        let leftovers: Vec<String> = std::fs::read_dir(dir.path())
+            .expect("dir")
+            .filter_map(|entry| entry.ok())
+            .map(|entry| entry.file_name().to_string_lossy().into_owned())
+            .filter(|name| name.ends_with(".tmp"))
+            .collect();
+        assert_eq!(leftovers, Vec::<String>::new());
         let blob = std::fs::read(dir.path().join("secrets.vault")).expect("blob");
         assert!(
             !blob.windows(7).any(|w| w == b"hunter2"),
