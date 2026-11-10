@@ -544,7 +544,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
-Bovnar C library 2.0.2
+Bovnar C library 2.1.0
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -554,7 +554,7 @@ Reference implementation of the Bovnar data format, compiled from the C sources 
 the published bovnar crate (crates.io; the version and checksum are pinned in Cargo.lock).
 File offers and the diagnostic file are Bovnar documents. The library compiles in the unit
 identifiers of the vocabularies listed in its third-party notices below.
-Upstream revision: https://github.com/sothis/bovnar v2.0.2, commit b3741916b791aade49d3113e8ee6b9c8f51bda83; all 105 files of the crate match its PROVENANCE.json.
+Upstream revision: https://github.com/sothis/bovnar v2.1.0, commit 4895049243bf8f2fb7c533c78c54d0c237b5682d; all 112 files of the crate match its PROVENANCE.json.
 
 MIT License
 
@@ -12123,7 +12123,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - bovnar 2.0.2 (https://github.com/sothis/bovnar)
+  - bovnar 2.1.0 (https://github.com/sothis/bovnar)
 
 /*
  * SPDX-License-Identifier: MIT

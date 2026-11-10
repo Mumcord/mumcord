@@ -1,4 +1,4 @@
-//! The part of the Bovnar C API (`bovnar.h`, `bovnar_dom.h` of Bovnar 2.0.0) the SDK uses:
+//! The part of the Bovnar C API (`bovnar.h`, `bovnar_dom.h` of Bovnar 2.1.0) the SDK uses:
 //! the event writer into memory and the DOM reader. The `bovnar` crate's own binding cannot
 //! be used on `wasm32-unknown-unknown` because its build script compiles the C sources, so the
 //! SDK declares the few functions it needs and links them from the prebuilt library there
@@ -178,7 +178,7 @@ unsafe extern "C" {
     pub fn bvn_dom_get_string(node: *mut c_void, out: *mut *const c_void, len: *mut u32) -> bool;
 }
 
-// The C sizes and offsets of Bovnar 2.0.0 (measured with clang on both targets), so a layout
+// The C sizes and offsets of Bovnar 2.1.0 (unchanged since 2.0.0; measured with clang on both targets), so a layout
 // mistake fails the build instead of corrupting memory.
 #[cfg(target_pointer_width = "32")]
 const _: () = assert!(
