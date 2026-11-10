@@ -24,7 +24,7 @@ import {
 import { credentialLinks, mumbleLinks } from "./mumbleLink";
 
 import { MumbleLinkCard } from "./MumbleLinkCard";
-import { parsePluginLink, pluginLinks } from "./pluginLink";
+import { parsePluginLink, pluginLinks, usePluginCardLinks } from "./pluginLink";
 import { PluginLinkCard } from "./PluginLinkCard";
 import { openInBrowser } from "./openLink";
 import { canonicalVideoUrl } from "./videoLink";
@@ -79,7 +79,8 @@ export function LinkPreviews({
   const links = useMemo(() => previewableLinks(html), [html]);
   const images = useMemo(() => externalImages(body), [body]);
   const mumble = useMemo(() => mumbleLinks(body), [body]);
-  const plugins = useMemo(() => pluginLinks(body), [body]);
+  // Only plugin links that get a card take a preview slot.
+  const plugins = usePluginCardLinks(useMemo(() => pluginLinks(body), [body]));
   const hidden = useDismissedPreviews(messageId, dismissed);
   // A `mumble://` link always gets its card, because the card is the message's own content; the
   // web previews need the setting (issue #175). A plugin link's card contacts no third party

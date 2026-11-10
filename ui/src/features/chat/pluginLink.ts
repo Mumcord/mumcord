@@ -3,9 +3,15 @@
  * `parse_plugin_link` in `src-tauri/src/deeplink.rs`: the link is untrusted input, so only the
  * plugin id is taken from it, and everything the card shows comes from the plugin index.
  */
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useSettledPluginIndex } from "../plugins/browse/indexStore";
 
-/** More cards than this per message would bury the conversation (the same cap as the previews). */
-const MAX_LINKS = 3;
+/**
+ * Bound on the links looked at per message. Well above the three preview slots, so made-up links
+ * in front cannot crowd out a real one; the slot cap is applied after the ids are checked.
+ */
+const MAX_LINKS = 20;
 
 /** Plugin ids follow FR-6.11, like `is_plugin_id` in the app's link handler. */
 const PLUGIN_ID = /^[a-z][a-z0-9-]{2,31}$/;
@@ -58,4 +64,27 @@ export function pluginLinks(html: string): string[] {
     }
   }
   return links;
+}
+
+/**
+ * The plugin links of a message that get a card: all of them while the plugin list loads (they
+ * show the placeholder), then only those of official plugins. Links without a card must not take
+ * a preview slot, or a few made-up plugin links could push a message's real previews out.
+ */
+export function usePluginCardLinks(links: readonly string[]): string[] {
+  const { i18n } = useTranslation();
+  const index = useSettledPluginIndex(i18n.language, links.length > 0);
+  return useMemo(() => {
+    if (index.status === "failed") return [];
+    if (index.status === "loading") return [...links];
+    const official = new Set(
+      index.index.plugins
+        .filter((plugin) => plugin.source.kind === "official")
+        .map((plugin) => plugin.id),
+    );
+    return links.filter((url) => {
+      const id = parsePluginLink(url);
+      return id !== null && official.has(id);
+    });
+  }, [index, links]);
 }

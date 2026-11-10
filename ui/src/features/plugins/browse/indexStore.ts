@@ -76,12 +76,13 @@ export function usePluginIndex(language: string): PluginIndexState {
 /**
  * The list without a reload per mount: it is only loaded when no load in `language` has settled
  * yet. For chat cards, where any message could otherwise make the app contact the plugin list
- * again and again while the user scrolls.
+ * again and again while the user scrolls. With `wanted` false nothing is loaded at all (a message
+ * without plugin links).
  */
-export function useSettledPluginIndex(language: string): PluginIndexState {
+export function useSettledPluginIndex(language: string, wanted = true): PluginIndexState {
   useEffect(() => {
-    if (settledLanguage !== language) void loadPluginIndex(language);
-  }, [language]);
+    if (wanted && settledLanguage !== language) void loadPluginIndex(language);
+  }, [language, wanted]);
   return usePluginIndexState();
 }
 

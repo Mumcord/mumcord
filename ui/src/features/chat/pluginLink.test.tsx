@@ -180,9 +180,9 @@ describe("pluginLinks", () => {
     expect(pluginLinks(html)).toEqual([]);
   });
 
-  it("stops at three links", () => {
-    const html = ["one", "two", "three", "four"].map((id) => `mumcord://plugins/${id}`).join(" ");
-    expect(pluginLinks(html)).toHaveLength(3);
+  it("looks at no more than twenty links", () => {
+    const html = Array.from({ length: 25 }, (_, n) => `mumcord://plugins/plugin-${String(n)}`).join(" ");
+    expect(pluginLinks(html)).toHaveLength(20);
   });
 });
 
@@ -322,6 +322,19 @@ describe("LinkPreviews", () => {
     renderPreviews("Try mumcord://plugins/does-not-exist", true);
     await settled();
     expect(screen.queryByRole("article")).toBeNull();
+  });
+
+  it("gives plugin links without a card no preview slot", async () => {
+    withIndex([WHITEBOARD]);
+    const preview = vi.spyOn(api, "linkPreview");
+    renderPreviews(
+      'mumcord://plugins/fake-one mumcord://plugins/fake-two mumcord://plugins/fake-three <a href="https://news.example/story">story</a>',
+      true,
+    );
+    await waitFor(() => {
+      expect(preview).toHaveBeenCalledWith("https://news.example/story");
+    });
+    expect(screen.queryByRole("article", { name: "Loading plugin…" })).toBeNull();
   });
 
   it("hides a dismissed card", async () => {
