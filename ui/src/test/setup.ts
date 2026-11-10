@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach } from "vitest";
+import { afterAll, afterEach } from "vitest";
 
 afterEach(() => {
   cleanup();
@@ -32,3 +32,12 @@ globalThis.cancelAnimationFrame = (handle: number): void => {
   if (timer !== undefined) clearTimeout(timer);
   frames.delete(handle);
 };
+
+// A frame still waiting when a test file ends would run after its jsdom is gone and fail the
+// whole run with "document is not defined". A page drops its pending frames on unload too.
+afterAll(() => {
+  frames.forEach((timer) => {
+    clearTimeout(timer);
+  });
+  frames.clear();
+});
