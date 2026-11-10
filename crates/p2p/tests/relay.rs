@@ -233,6 +233,7 @@ async fn reports_an_unreachable_relay_within_the_setup_timeout() {
         broadcast: None,
         plugin_data_kbps: None,
         registered_only: false,
+        media: false,
     };
     drop(closed);
     let (alice, _) = identity();
@@ -375,6 +376,7 @@ mod fake {
                 broadcast: None,
                 plugin_data_kbps: None,
                 registered_only: false,
+                media: false,
             }
         }
 
