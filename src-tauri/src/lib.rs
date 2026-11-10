@@ -32,6 +32,8 @@ mod screen_frames;
 #[cfg(target_os = "freebsd")]
 mod single_instance;
 mod tray;
+// Which release channel the settings show; the same rule everywhere, see the module.
+mod update_channel;
 // FreeBSD has no in-app updater: `pkg` owns the install (see updater_freebsd.rs).
 #[cfg(not(target_os = "freebsd"))]
 mod updater;

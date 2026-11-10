@@ -14,6 +14,10 @@ use tauri::AppHandle;
 
 use crate::commands::updates::{InstallKind, UpdatePhase, UpdateStatus};
 
+// The settings still show a release channel, so the shared rule is re-exported here: the commands
+// import it through `crate::updater` on every platform.
+pub use crate::update_channel::effective_update_channel;
+
 /// Managed as Tauri state, like the real updater, so the commands stay identical.
 #[derive(Clone)]
 pub struct Updater;

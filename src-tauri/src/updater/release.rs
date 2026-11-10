@@ -6,8 +6,6 @@ use base64::engine::general_purpose::STANDARD;
 use minisign_verify::{PublicKey, Signature};
 use sha2::{Digest, Sha256};
 
-use mumcord_engine::store;
-
 use crate::commands::settings::UpdateChannel;
 use crate::commands::updates::ReleaseNote;
 
@@ -27,21 +25,6 @@ impl Version {
     pub fn is_prerelease(&self) -> bool {
         !self.0.pre.is_empty()
     }
-}
-
-/// The channel updates come from: the user's choice, else the one that fits the installed
-/// version (a release candidate follows release candidates, anything else stays on stable).
-pub fn effective_update_channel(
-    chosen: Option<store::UpdateChannel>,
-    installed: &str,
-) -> UpdateChannel {
-    chosen.map(UpdateChannel::from).unwrap_or_else(|| {
-        if Version::parse(installed).is_some_and(|v| v.is_prerelease()) {
-            UpdateChannel::ReleaseCandidates
-        } else {
-            UpdateChannel::Stable
-        }
-    })
 }
 
 /// The newest release to offer and the notes of every release since `current`.
@@ -229,6 +212,8 @@ pub fn checksum_matches(sums: &[u8], file: &str, data: &[u8]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::update_channel::effective_update_channel;
+    use mumcord_engine::store;
     use std::io::Cursor;
 
     const STABLE: UpdateChannel = UpdateChannel::Stable;

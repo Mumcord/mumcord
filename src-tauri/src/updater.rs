@@ -22,8 +22,8 @@ use crate::commands::updates::{
     InstallKind, UpdateError, UpdateOffer, UpdatePhase, UpdateProgress, UpdateStatus,
     UpdateStatusChanged,
 };
+pub use crate::update_channel::effective_update_channel;
 use release::Rejected;
-pub use release::effective_update_channel;
 
 const RELEASES_API: &str = "https://api.github.com/repos/Mumcord/mumcord/releases?per_page=30";
 const RELEASES: &str = "https://github.com/Mumcord/mumcord/releases";
