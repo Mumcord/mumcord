@@ -547,9 +547,11 @@ jobs:
           mem: 8192
           cpu: 4
           prepare: |
-            pkg install -y rust node24 npm protobuf python3 pkgconf alsa-lib alsa-plugins \
-              libvpx svt-av1 dav1d alsa-plugins gstreamer1-libav gstreamer1-plugins-vpx \
-              gstreamer1-plugins-opus webkit2-gtk_41 gtk3 libayatana-appindicator
+            # cmake and gmake build the bundled libopus (cpal -> opusic-sys) from source.
+            pkg install -y rust node24 npm protobuf python3 pkgconf cmake gmake ca_root_nss \
+              alsa-lib alsa-plugins libvpx svt-av1 dav1d gstreamer1-libav \
+              gstreamer1-plugins-vpx gstreamer1-plugins-opus webkit2-gtk_41 gtk3 \
+              libayatana-appindicator
           run: |
             set -e
             export PATH="$HOME/.cargo/bin:$PATH"
