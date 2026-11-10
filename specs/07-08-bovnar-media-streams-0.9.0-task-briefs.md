@@ -3,7 +3,8 @@
 > Source plan: `specs/07-08-bovnar-media-streams-0.9.0-plan.md`
 > Spec addendum: `specs/07-08-bovnar-media-streams-0.9.0-spec-addendum.md`
 > Base branch: `milestone/0.9.0`. Each task gets its own branch `feat/<id>-<slug>` from it and a
-> pull request into `milestone/0.9.0`; bug fixes go to `main` as usual.
+> pull request into `milestone/0.9.0`; bug fixes go to `main` as usual. Exception: P0.5 ships in
+> 0.8.0 and branches from `milestone/0.8.0` before the 0.8.0 release.
 >
 > Usage: give one fresh agent this header plus exactly one task section. Never bundle tasks.
 > The brief, the plan and the addendum are the contract; the agent asks before guessing.
@@ -32,10 +33,11 @@
 
 | ID | Title | Status | Depends on | Cx |
 |---|---|---|---|---|
-| P0.1 | Release 0.8.0, create `milestone/0.9.0` | done | – | – |
+| P0.1 | Release 0.8.0, create `milestone/0.9.0` | in progress (0.8.0 at rc.3) | P0.5 | – |
 | P0.2 | Bump `bovnar` to 2.1.0, notices, plugin wasm | done | – | – |
 | P0.3 | Spike: bovnar 2.1.0 on static musl (mumpeer) | open | – | complex |
 | P0.4 | Spike: encoder output → temporal-layer channels | open | – | complex |
+| P0.5 | 0.8.0: receive `needs`, tile text, 24 locales | open | – | simple |
 | S1 | Finalize the spec addendum, resolve D1–D14 | in progress | P0.4 | simple |
 | S2 | Final acceptance criteria for every fallback cell | in progress | S1 | simple |
 | W1 | `media` module: channels, control kinds, description, limits | open | S1 | complex |
@@ -49,7 +51,7 @@
 | D3 | Viewer: description, changes at keyframes, both formats | open | D2 | complex |
 | D4 | Capability negotiation and refusal texts | open | D3 | complex |
 | D5 | Direct camera path (`STREAM_CAMERA`) | open | D4 | complex |
-| D6 | Camera relay/direct choice and fallback matrix | open | D5 | complex |
+| D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | open | D1 | simple |
 | R1 | Relay broadcast profile types and new links | open | W1, W2, W6 | complex |
 | R2 | Relay transports: QUIC streams and TCP mux chunks | open | R1 | complex |
@@ -60,12 +62,13 @@
 | E1 | Packet inspector: description, channels, format | open | D1, R2 | complex |
 | E2 | UI texts and 24 locales for fallback paths | open | D4, D6 | simple |
 | E3 | Notices and licences for Bovnar 2.1.0 | open | – | simple |
-| E4 | Acceptance run of every AC | open | all | complex |
+| E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
-Suggested first wave: P0.3 and P0.4 in parallel (no 0.9.0 code). S1 starts when P0.4 reports,
-because D3 (temporal layer mapping) is the gate for the profile. No implementation task starts
-before S1/S2 are merged.
+Suggested first wave: P0.3 and P0.4 in parallel (no 0.9.0 code). P0.5 also runs in parallel on
+`milestone/0.8.0` and must merge before the 0.8.0 release; it touches no 0.9.0 code. S1 starts
+when P0.4 reports, because D3 (temporal layer mapping) is the gate for the profile. No
+implementation task starts before S1/S2 are merged.
 
 ---
 
@@ -107,6 +110,35 @@ targets, sizes and any failure. A failed spike is a valid result if it names the
 
 **Done when:** every path is classified clean/not clean with a reproducible test or measurement,
 and the report gives the result S1 needs.
+
+---
+
+## P0.5 — 0.8.0 forward-compatibility: `needs` receive path
+
+**Type:** simple · **Branch:** `milestone/0.8.0` (0.8.0 is unreleased) · **Owns:**
+`crates/engine/src/camera/signal.rs`, `crates/engine/src/camera/recv.rs`, the camera tile in
+`ui/src/features/camera/room/` and `ui/src/locales/*/camera.json`
+
+**Goal:** a 0.9.0 sender cannot serve a 0.8.x viewer of a new-format camera. It tells the viewer
+with the new `mumcord.camera` message `needs`; 0.8.0 must show the clear text and stop retrying,
+so the user sees a reason instead of "Couldn't join …" forever.
+
+- Protocol (fixed for 0.8.0 and 0.9.0, spec 08 §6.5): a `mumcord.camera` Bovnar document
+  `.v = 1; .t = "needs"; .id = <16 lowercase hex camera session id>`, sender → viewer. Parse it
+  like the other camera messages: size limit checked before decoding, unknown fields ignored,
+  malformed documents refused without a crash or payload content in the log.
+- On `needs` for the camera session named by `id`: enter a new "needs update" tile state that
+  shows "This camera needs Mumcord 0.9.0", send no further `cam-join` for that camera and do not
+  enter the FR-8.52 10 s retry. A `needs` for another `id` and an unknown `t` are ignored. The
+  camera's next `on` clears the state and joins normally.
+- Add the text to `en` and all 24 locales next to `tile.failed`; keep "Couldn't join {name}'s
+  camera" for a real join timeout (no `needs`).
+- No other 0.8.0 camera behaviour changes, no 0.9.0 sender code here, and nothing is changed on
+  `milestone/0.9.0`.
+
+**Done when:** unit tests cover the parser (valid, malformed, oversized, wrong `id`), the tile
+state and the no-retry rule; a 0.8.0 build shows "This camera needs Mumcord 0.9.0" when a fixture
+or test CLI sends `needs`, does not retry, and joins again on the next `on`; no untranslated text.
 
 ---
 
@@ -343,6 +375,9 @@ unit tests cover every missing/garbled capability combination.
 
 - Add `STREAM_CAMERA = 5` next to the existing stream kinds; one stream per admitted viewer,
   opened by the sharer after `cam-join`; refuse a stale camera session id.
+- When a `cam-join` carries no `mv: 2` (the viewer's hello lacks `media-v2`) and the camera uses
+  the new format, send `mumcord.camera` `needs` (`v`, `id`, spec 08 §6.5) to that viewer and open
+  no `STREAM_CAMERA`; there is no old-format direct camera copy for 0.8.x.
 - Reuse the media document/description with video channels only; the description carries the
   camera session id.
 - Reverse stream: keep `KEYFRAME_REQUEST = 1`; add `WANT = 2 + u16 height` (or the signalling
@@ -350,26 +385,33 @@ unit tests cover every missing/garbled capability combination.
 - Keep admission, same-channel, blocked users, viewer limit 8, `full` and rekey rules as today.
 - The camera room may mix direct and relay viewers and several senders.
 
-**Done when:** camera works with no relay, with an old relay and between two 0.9.0 clients; the
-camera room still passes its tests.
+**Done when:** camera works with no relay, with an old relay and between two 0.9.0 clients; a
+viewer without `media-v2` gets `needs` and no stream; the camera room still passes its tests.
 
 ---
 
 ## D6 — Camera relay/direct choice and fallback matrix
 
-**Type:** complex · **Depends:** D5 · **Owns:** `crates/engine/src/camera/session.rs`,
+**Type:** complex · **Depends:** D5, P0.5 · **Owns:** `crates/engine/src/camera/session.rs`,
 `avail.rs`, `signal.rs`, `crates/engine/src/p2p.rs` (path choice)
 
 **Goal:** FR-8.94/8.95 and the product-owner decisions.
 
 - Relay broadcast first when a new relay is available; direct when the relay is old, missing or
   the user is in direct-only mode. The viewer list shows the path per viewer.
-- A 0.8.x viewer of a new-format camera gets an old-format direct copy while the 8-viewer limit
-  allows, otherwise "This camera needs Mumcord 0.9.0".
+- The sender sends `mumcord.camera` `needs` (`v`, `id`, spec 08 §6.5) to a viewer whose hello
+  lacks `media-v2` when the camera uses the new format; that 0.8.x viewer shows "This camera needs
+  Mumcord 0.9.0" on the tile and stops retrying until the next `on`. Never open an old-format
+  direct camera copy and never create a second relay broadcast for it (0.8.x has no direct camera
+  receive path). Verify the text in a real 0.8.0 build that includes P0.5; if that build lacks
+  the state, report it instead of inventing a workaround.
+- On an old relay the camera's old-format relay broadcast serves 0.8.x viewers as today.
 - A 0.9.0 viewer of a 0.8.x camera uses the old relay path as today.
 - Every cell of the camera fallback matrix is tested, including `full`, leaving and blocking.
 
-**Done when:** every camera fallback cell passes and the UI shows the correct path per viewer.
+**Done when:** every camera fallback cell passes, a real 0.8.0 build shows the "needs 0.9.0"
+text after `needs` with no retry and no video arrives, and the UI shows the correct path per
+viewer.
 
 ---
 
@@ -538,7 +580,7 @@ provenance.
 
 ## E4 — Acceptance run of every AC
 
-**Type:** complex · **Depends:** all · **Owns:** `e2e/specs/*`, test fixtures, screenshots; report
+**Type:** complex · **Depends:** all, incl. P0.5 · **Owns:** `e2e/specs/*`, test fixtures, screenshots; report
 file
 
 **Goal:** prove the whole addendum in the running client.
@@ -546,7 +588,12 @@ file
 - Run every AC against a local Mumble server (`testenv/up.sh v15`), a local mumpeer
   (`MUMPEER_DIR=../mumpeer`) and a local mumbot. Cover every fallback combination, direct and
   relay, late join, layer switch, keyframe, rekey, TCP fallback, malformed/truncated/oversized
-  input and an old client served by fallback.
+  input and an old client served by fallback: screen share with the old-format direct copy, and
+  camera with the "This camera needs Mumcord 0.9.0" text for a 0.8.x viewer and never an
+  old-format direct camera copy or a second relay broadcast.
+- For the 0.8.x side use a real 0.8.0 build that includes P0.5: the sender's inspector shows the
+  `needs` message to that viewer, the 0.8.0 tile shows the text, the viewer sends no further
+  `cam-join` until the camera's next `on`, and no video arrives.
 - Report per AC: `AC-7.72 ✅` or `❌ <symptom>`; mark manual listening checks.
 - Dark and light screenshots for every changed UI surface.
 - A failure becomes a fix task, then a new verification run; never fix and verify in the same

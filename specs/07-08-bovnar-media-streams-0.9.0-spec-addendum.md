@@ -17,8 +17,8 @@
 | Description, capability negotiation, fallback matrix, old-format retention, refusal texts, late joiner, packet inspector | Spec 07 §4.11, FR-7.95 … FR-7.101 |
 | Protocol additions (hello `media-v2`, `Watch` / `mumcord.peer` `mv`, relay `bind` `"media": 2`, mumpeer `/v1/status`) | Spec 07 §6.6; spec 08 §6.5 |
 | Camera direct path, direct control, path choice, camera fallback, camera without a relay | Spec 08 §4.14, FR-8.92 … FR-8.96 |
-| Acceptance criteria | Spec 07 §11 AC-7.72 … AC-7.84; spec 08 §11 AC-8.29 … AC-8.33 |
-| Decision log | Spec 07 §12 (D1–D10, D14); spec 08 §12 (D11–D13) |
+| Acceptance criteria | Spec 07 §11 AC-7.72 … AC-7.84; spec 08 §11 AC-8.29 … AC-8.41 |
+| Decision log | Spec 07 §12 (D1–D10, D14); spec 08 §12 (D11–D13, the 0.8.x camera fallback and the 0.8.0 `needs` forward compatibility) |
 
 ## 2. FR / AC number mapping
 
@@ -27,11 +27,14 @@
 | FR-7.89 … FR-7.101 | Spec 07, unchanged numbers |
 | FR-8.92 … FR-8.96 | Spec 08, unchanged numbers |
 | AC-7.72 … AC-7.84 | Spec 07 §11 |
-| AC-8.29 … AC-8.33 | Spec 08 §11 |
+| AC-8.29 … AC-8.41 | Spec 08 §11 |
 
 The numbers stay provisional until the 0.8.0 branch is merged into `main`. They start after
 the highest numbers on `main` (FR-7.88, FR-8.91, AC-7.71, AC-8.28) and are renumbered once
 after that merge, never against `milestone/0.8.0`.
+
+The `needs` message adds no FR or AC number: it refines FR-8.95 and AC-8.31 and is specified
+in spec 08 §6.5, so the AC range AC-8.29 … AC-8.41 above stays current.
 
 ## 3. Decisions D1–D14
 
@@ -57,6 +60,20 @@ after that merge, never against `milestone/0.8.0`.
 None. D1–D14 are settled in the specifications. The only provisional item is the FR/AC
 numbering above, which is fixed once after the 0.8.0 branch is merged into `main`.
 
-One implementation risk is recorded in spec 08 §13: 0.8.x has no direct camera receive path,
-so D6 must confirm the wire path for the old-format direct camera copy or the 0.8.x viewer sees
-"This camera needs Mumcord 0.9.0".
+The camera fallback for 0.8.x viewers was decided on 2026-11-10: 0.8.x has no direct camera
+receive path and cannot decode the new media profile, so a 0.8.x viewer of a new-format camera
+always sees "This camera needs Mumcord 0.9.0" on the tile. There is no old-format direct camera
+copy and no second relay broadcast. An old relay still serves 0.8.x viewers with the camera's
+old-format relay broadcast as today, and a 0.9.0 viewer of a 0.8.x camera keeps the old relay
+path. The screen-share fallback of FR-7.97 is unchanged, because 0.8.x does have a direct
+screen-share receive path. The decision is recorded in spec 08 FR-8.94, FR-8.95, §12 and §13
+(AC-8.31).
+
+The 0.8.0 forward-compatibility part was decided on 2026-11-10 too: the 0.9.0 sender sends the
+new `mumcord.camera` message `needs` (`.v = 1; .t = "needs"; .id = <16 lowercase hex camera
+session id>`, spec 08 §6.5) to a viewer whose hello lacks `media-v2` when the camera uses the new
+format and it cannot serve that viewer. 0.8.0 ships the receive path, the tile state and the text
+in all 24 locales before its release (plan P0.5): the tile shows "This camera needs Mumcord
+0.9.0" and stops retrying until the camera's next `on`. A 0.7.x client ignores `needs` and keeps
+the FR-8.52 retry. Recorded in spec 08 FR-8.91, FR-8.95, §6.5, §7.2, §12 and §13; the AC range
+stays AC-8.29 … AC-8.41 because `needs` adds no new AC number.
