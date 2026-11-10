@@ -4,8 +4,8 @@
 //!
 //! A new-format media link carries one endless Bovnar document,
 //! `.media = \x00 …messages… \x00;`, where a message is `varint(channel) varint(length) bytes`.
-//! The codec that writes and reads those messages is `bovnar::codec`; this module names the
-//! profile both sides must agree on.
+//! [`MediaWriter`] and [`MediaReader`] write and read that document over `bovnar::codec`; this
+//! module names the profile both sides must agree on.
 //!
 //! | Channel | Use |
 //! |---|---|
@@ -22,8 +22,10 @@
 //! checks the size before parsing, validates each field against the profile, and reports errors
 //! with a static field name only, never with received content.
 
+mod codec;
 mod description;
 
+pub use codec::{CodecError, MediaMessage, MediaReader, MediaWriter};
 pub use description::{
     AudioCodec, AudioTrack, Description, StreamKind, Track, VideoCodec, VideoTrack,
 };
