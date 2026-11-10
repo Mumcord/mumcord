@@ -4365,6 +4365,7 @@ dependencies = [
 name = "mumcord-p2p"
 version = "0.8.0"
 dependencies = [
+ "bovnar",
  "bytes",
  "crab_nat",
  "igd-next",
