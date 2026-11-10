@@ -53,8 +53,8 @@
 | D5 | Direct camera path (`STREAM_CAMERA`) | open | D4 | complex |
 | D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | open | D1 | simple |
-| R1 | Relay broadcast profile types and new links | open | W1, W2, W6 | complex |
-| R2 | Relay transports: QUIC streams and TCP mux chunks | open | R1 | complex |
+| R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
+| R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
 | R3 | Engine broadcast link: media profile end to end | open | R1, W3, R5 | complex |
 | R4 | Plugin relay data on channel 6 | open | R1 | complex |
 | R5 | mumpeer: new format, routing, description cache | open | P0.3, W1, W2 | complex |
@@ -67,9 +67,9 @@
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
 then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D3 are done on their
-stacked branches; D4 has the hello and `Watch` halves. R1 can start now. The relay `mv` fields
-of D4 wait for R6: mumbot v0.5.4 constructs the p2p types and fails to build when new fields are
-added. E3 can run at any time.
+stacked branches; D4 has the hello and `Watch` halves. R1 and R2 are done; R3 is next. The relay
+`mv` fields of D4 wait for R6: mumbot v0.5.4 constructs the p2p types and fails to build when
+new fields are added. E3 can run at any time.
 
 ---
 
