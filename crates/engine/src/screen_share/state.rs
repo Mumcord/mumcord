@@ -35,20 +35,25 @@ pub(crate) struct ViewerCaps {
     pub av1: bool,
     /// The frame version the viewer reads ([`super::wire`]).
     pub wire: u8,
+    /// The viewer reads the Bovnar media profile (FR-7.96).
+    pub media: bool,
 }
 
 impl ViewerCaps {
-    /// 0.6.x lists no codecs: VP9 only, frame version 1.
-    pub fn from_watch(codecs: &[CodecName]) -> Self {
+    /// 0.6.x lists no codecs: VP9 only, frame version 1. 0.8.x lists codecs but no `mv`: frame
+    /// version 2 without the media profile.
+    pub fn from_watch(codecs: &[CodecName], mv: u8) -> Self {
         if codecs.is_empty() {
             Self {
                 av1: false,
                 wire: super::wire::V1,
+                media: false,
             }
         } else {
             Self {
                 av1: codecs.contains(&CodecName::Av1),
                 wire: super::wire::V2,
+                media: mv >= super::signal::MEDIA_VERSION,
             }
         }
     }
@@ -177,7 +182,7 @@ impl OwnShare {
         self.caps
             .get(&viewer)
             .copied()
-            .unwrap_or_else(|| ViewerCaps::from_watch(&[]))
+            .unwrap_or_else(|| ViewerCaps::from_watch(&[], 0))
     }
 
     /// The first viewer that cannot play AV1; the share runs VP9 while there is one (FR-7.58).
@@ -440,11 +445,13 @@ fn elapsed(then: Instant, now: Instant) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::screen_share::signal::MEDIA_VERSION;
     use crate::screen_share::sound::{AppName, NoSoundReason, ShareSoundMode};
 
     const NEW: ViewerCaps = ViewerCaps {
         av1: true,
         wire: super::super::wire::V2,
+        media: true,
     };
 
     #[test]
@@ -461,15 +468,18 @@ mod tests {
 
     #[test]
     fn an_old_viewer_blocks_av1_until_it_leaves() {
-        let old = ViewerCaps::from_watch(&[]);
-        assert_eq!((old.av1, old.wire), (false, super::super::wire::V1));
-        let vp9_only = ViewerCaps::from_watch(&[CodecName::Vp9]);
+        let old = ViewerCaps::from_watch(&[], 0);
         assert_eq!(
-            (vp9_only.av1, vp9_only.wire),
-            (false, super::super::wire::V2)
+            (old.av1, old.wire, old.media),
+            (false, super::super::wire::V1, false)
+        );
+        let vp9_only = ViewerCaps::from_watch(&[CodecName::Vp9], 0);
+        assert_eq!(
+            (vp9_only.av1, vp9_only.wire, vp9_only.media),
+            (false, super::super::wire::V2, false)
         );
         assert_eq!(
-            ViewerCaps::from_watch(&[CodecName::Av1, CodecName::Vp9]),
+            ViewerCaps::from_watch(&[CodecName::Av1, CodecName::Vp9], MEDIA_VERSION),
             NEW
         );
 
@@ -503,9 +513,12 @@ mod tests {
 
     #[test]
     fn relay_viewers_count_for_the_codec_without_a_direct_copy() {
-        let vp9_only = ViewerCaps::from_watch(&[CodecName::Vp9]);
+        let vp9_only = ViewerCaps::from_watch(&[CodecName::Vp9], 0);
         let mut own = OwnShare::new(false, SoundStatus::default());
-        own.admit(1, ViewerCaps::from_watch(&[CodecName::Av1, CodecName::Vp9]));
+        own.admit(
+            1,
+            ViewerCaps::from_watch(&[CodecName::Av1, CodecName::Vp9], 0),
+        );
         own.set_caps(30, vp9_only);
         assert_eq!(own.av1_blocker(), Some(30));
         assert_eq!(

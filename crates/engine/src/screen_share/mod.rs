@@ -340,13 +340,14 @@ pub(crate) fn on_plugin_data(
         tracing::debug!(sender, live, "screen share announcement received");
     }
     // What a Watch needs to know before the state is locked.
-    let (broadcast_viewer, viewer_hash) = match signal {
-        Signal::Watch { bc, .. } => (
+    let (broadcast_viewer, viewer_hash, viewer_media) = match signal {
+        Signal::Watch { bc, mv, .. } => (
             bc == 1
                 && !capable(peers, ctx.server_id, &[sender], FEATURE_SCREEN_BROADCAST).is_empty(),
             cert_hash(&ctx.handle, sender),
+            mv,
         ),
-        _ => (false, None),
+        _ => (false, None, 0),
     };
     let mut reply = None;
     let mut own_viewers = false;
@@ -375,7 +376,7 @@ pub(crate) fn on_plugin_data(
             ),
             Signal::Share { live: false, .. } => shares.share_ended(sender),
             Signal::Watch { codecs, .. } => {
-                let caps = state::ViewerCaps::from_watch(&codecs);
+                let caps = state::ViewerCaps::from_watch(&codecs, viewer_media);
                 let fanout = shares.own.as_mut().map(|own| {
                     on_watch(
                         own,
