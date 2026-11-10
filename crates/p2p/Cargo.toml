@@ -30,6 +30,8 @@ thiserror.workspace = true
 tracing.workspace = true
 socket2.workspace = true
 mumcord-protocol.workspace = true
+# The stream description of the Bovnar media profile (spec 07, FR-7.95).
+bovnar.workspace = true
 
 [dev-dependencies]
 rcgen.workspace = true
