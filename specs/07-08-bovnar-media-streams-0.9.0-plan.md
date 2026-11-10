@@ -21,14 +21,19 @@ Product decisions taken with the owner on 2026-11-10:
 
 Screen share and camera keep their current features and viewer UI, gain a direct camera path,
 and use one endless Bovnar document per media link when both sides and the relay support it;
-with 0.8.x peers or an old relay they fall back to today's binary header, so nobody is cut off.
+with 0.8.x peers or an old relay they fall back to today's binary header. A 0.8.x viewer of a
+new-format camera cannot be served: the sender sends it `needs`, and it shows a clear "This
+camera needs Mumcord 0.9.0" text (P0.5 ships that receive path in 0.8.0).
 
 ## 2. What changes for users
 
 - Screen share, share sound, camera and the camera room look and behave as before.
 - With two 0.9.0 clients and an updated relay, media uses the new Bovnar profile: less framing
   overhead, less relay work, and no timestamp, resolution or frame sequence visible to the relay.
-- With a 0.8.x peer, the old format is used; screen share and camera keep working.
+- With a 0.8.x peer, the old format is used; screen share keeps working, and camera works when an
+  old relay carries the old-format broadcast. A 0.8.x viewer of a new-format camera receives
+  `needs` and sees the clear "This camera needs Mumcord 0.9.0" text (no old-format direct copy);
+  0.8.0 ships that receive path before its release (P0.5).
 - With an old relay, screen share and camera fall back to direct connections between 0.9.0
   clients; the relay fan-out is unavailable, and the client says why.
 - Camera now works without a relay at all (direct between 0.9.0 clients), which it cannot today.
@@ -260,16 +265,19 @@ Otherwise the old format is used; the fallback is a normal mode, not an error.
 | 0.9.0 | 0.9.0 | new (`mv:2`) | new relay broadcast | new relay broadcast, or direct if the relay is unavailable |
 | 0.9.0 | 0.9.0 | old/none | new direct | new direct |
 | 0.9.0 | 0.8.x | old | old relay broadcast | old relay broadcast |
-| 0.9.0 | 0.8.x | new | old direct copy if capacity, else "needs 0.9.0" | old direct camera copy if capacity, else "needs 0.9.0" |
+| 0.9.0 | 0.8.x | new | old direct copy if capacity, else "needs 0.9.0" | `needs` sent; "This camera needs Mumcord 0.9.0"; no old-format copy |
 | 0.8.x | 0.9.0 | any | old direct/relay as today | old relay as today |
 | 0.8.x | 0.8.x | any | old | old |
 
 - The relay broadcast format is chosen by the publisher and fixed for the broadcast. A new
   relay does not mix formats inside one broadcast; a subscriber binds with the broadcast's
   format.
-- An old viewer of a new-format broadcast gets a direct copy in the old format when the direct
-  path has room (8 viewers, as today's direct screen share). Otherwise the viewer sees "This
-  share needs Mumcord 0.9.0". The same rule applies to a camera.
+- An old viewer of a new-format screen-share broadcast gets a direct copy in the old format when
+  the direct path has room (8 viewers, as today's direct screen share); otherwise the viewer sees
+  "This share needs Mumcord 0.9.0". For camera this copy is not possible: 0.8.x has no direct
+  camera receive path, so a 0.8.x viewer of a new-format camera receives `needs`, shows "This
+  camera needs Mumcord 0.9.0" and no second relay broadcast is created for it (spec 08 FR-8.95,
+  decision of 2026-11-10; the 0.8.0 receive path is P0.5).
 - The old format stays in 0.9.0 for 0.8.x peers and old relays. Removing it is a later decision,
   once 0.8.x is no longer supported.
 
@@ -306,13 +314,16 @@ with its own tests and a report; the next task starts from the merged branch.
 
 | ID | Repo | Task | Done when |
 |---|---|---|---|
-| P0.1 | Mumcord | Finish and release 0.8.0; create `milestone/0.9.0` from `main`. | The branch exists and CI is green. |
+| P0.1 | Mumcord | Finish and release 0.8.0 after P0.5; create `milestone/0.9.0` from `main`. | `milestone/0.9.0` exists with CI green; v0.8.0 is tagged after P0.5 is merged. |
 | P0.2 | Mumcord | Bump `bovnar` from 2.0.2 to 2.1.0 in the workspace, regenerate notices, refresh the plugin-SDK prebuilt wasm library (still 2.0.2). | `cargo build`, tests, clippy and the notices gate pass; the lock has the 2.1.0 checksum; notices name v2.1.0. |
 | P0.3 | mumpeer | Spike: build `bovnar` 2.1.0 for the static musl targets with cargo-zigbuild. | A static binary builds and runs; if not, an upstream `codec-only` feature is requested before Phase 4. |
 | P0.4 | — | Spike: map encoder output to temporal-layer channels (D3). | A short measurement or test shows every frame can be routed cleanly; the result is added to the spec notes. |
+| P0.5 | Mumcord (`milestone/0.8.0`) | 0.8.0 forward-compatibility: read the `mumcord.camera` `needs` message (spec 08 §6.5), show "This camera needs Mumcord 0.9.0" on the tile, stop retrying until the camera's next `on`; text in `en` and all 24 locales. Ships in 0.8.0, before its release. | A 0.8.0 build shows the text after `needs` and does not retry; unit tests cover the parser, the tile state and the no-retry rule. |
 
 P0.2 is a small dependency-update PR. It can start as soon as the 0.9.0 branch exists; it does
-not need the spec addendum because it changes no behavior. P0.3 and P0.4 run in parallel.
+not need the spec addendum because it changes no behavior. P0.3 and P0.4 run in parallel. P0.5
+runs on `milestone/0.8.0` because 0.8.0 is still unreleased; it is the only 0.9.0-related change
+that ships in 0.8.0, and P0.1's release step completes only after P0.5 is merged.
 
 ### Phase 1 — spec addendum (the gate)
 
@@ -346,10 +357,12 @@ W1–W3 can be one agent each; W2 depends on W1, W3 on W1, W4/W5 on W2+W3, W6 is
 | D3 | Viewer: read the description before the first frame, apply changes at keyframes, request keyframes on the reverse stream, treat EOF at a message boundary as a clean stop; accept both formats. | Direct viewer tests, including a late frame, a mid-stream quality change and an old sharer. |
 | D4 | Version negotiation and refusal texts: hello `media-v2`, `Watch` `mv`, no offer to a viewer that cannot be served, clear "needs 0.9.0" text when the direct fallback is full. | Old-client scenarios show the clear message and never a broken picture. |
 | D5 | New direct camera path: `STREAM_CAMERA` kind, `mumcord.camera` signalling, per-viewer queue, direct viewer, `want` on the reverse stream, camera room. | Camera works with no relay, with an old relay and with two 0.9.0 clients; the camera room still works with multiple senders. |
-| D6 | Camera relay/direct choice: relay first when a new relay is available, direct otherwise; old viewers get the old format where capacity allows. | Every cell of the fallback matrix for camera is tested. |
+| D6 | Camera relay/direct choice: relay first when a new relay is available, direct otherwise; the sender sends `needs` to a viewer whose hello lacks `media-v2`, so a 0.8.x viewer gets the "needs 0.9.0" text (no old-format copy). | Every cell of the fallback matrix for camera is tested; a real 0.8.0 build (P0.5) shows the text after `needs` and does not retry. |
 | D7 | Watch-party UI regression: the shared media view still plays and resizes. | The existing screen-share/watch-party UI tests pass unchanged. |
 
-D1–D3 are one vertical slice; D4–D6 follow. D5 is the largest new task.
+D1–D3 are one vertical slice; D4–D6 follow. D5 is the largest new task and adds the `needs`
+sender side. D6 depends on P0.5: its 0.8.x viewer cell needs a 0.8.0 build that understands
+`needs`; without P0.5 the cell cannot pass and must be reported, not worked around.
 
 ### Phase 4 — relay broadcast and mumpeer
 
@@ -372,7 +385,10 @@ start before R3 can be tested end to end. The old-format paths are not removed.
 | E1 | Packet inspector: decoded description, channel, flags, keyframe state and the detected format. | A captured share shows the description and every message's channel; docs updated. |
 | E2 | UI texts and 24 locales for the fallback and old-relay messages; error paths. | No untranslated text; screen reader and keyboard checks. |
 | E3 | Notices and licences for Bovnar 2.1.0; third-party notices regenerated. | The notices gate passes with the 2.1.0 provenance. |
-| E4 | Acceptance run: all spec ACs against a local Mumble server, local mumpeer and local mumbot; every fallback combination; direct and relay; late join; layer switch; keyframe; rekey; TCP fallback; malformed, truncated and oversized input; old client served by fallback. | Every AC passes; dark and light screenshots for changed UI. |
+| E4 | Acceptance run: all spec ACs against a local Mumble server, local mumpeer and local mumbot; every fallback combination; direct and relay; late join; layer switch; keyframe; rekey; TCP fallback; malformed, truncated and oversized input; old client served by fallback; a real 0.8.0 build (P0.5) shows the `needs` text and does not retry. | Every AC passes; dark and light screenshots for changed UI. |
+
+E4 depends on P0.5 for the 0.8.x side of AC-8.31 (the `needs` text and the stopped retry); a
+0.8.0 build without P0.5 cannot run that check.
 | E5 | Release: Mumcord 0.9.0, mumpeer 0.3.0, mumbot patch; release notes explain the new format, the fallback and the direct camera path. | The three releases are tagged and the notes are published. |
 
 ## 8. Test plan
@@ -406,7 +422,7 @@ start before R3 can be tested end to end. The old-format paths are not removed.
 | mumpeer cannot build the C part of `bovnar` for static musl. | P0.3 spike; if it fails, request an upstream codec-only feature before Phase 4. |
 | Two formats double the test matrix and keep old code alive. | A single format-selection point, legacy tests kept, a removal milestone recorded; the fallback matrix is explicit. |
 | Direct camera fan-out costs upload per viewer. | Reuse the screen-share direct limit (8) and the existing queue policy; relay first when available; the UI shows the path. |
-| Old viewers on a new relay get a worse path. | Direct old-format copy when capacity allows; otherwise a clear "needs 0.9.0" text. |
+| Old viewers on a new relay get a worse path. | Screen share: direct old-format copy when capacity allows, otherwise a clear "needs 0.9.0" text. Camera (decided 2026-11-10): the sender sends `needs` and the 0.8.x viewer shows the clear "This camera needs Mumcord 0.9.0" text, because 0.8.x has no direct camera receive path; no old-format copy and no second relay broadcast. The receive path ships in 0.8.0 before its release (P0.5), so the text is available when 0.9.0 arrives. |
 | Relay description cache grows or leaks. | Cap at 8 KiB per broadcast, one entry per broadcast, clear on broadcast end; tests. |
 | Per-frame allocations in the engine. | Measure; reuse buffers where the existing pipeline already can; do not add copies in the new codec. |
 | 0.8.0 slips and 0.9.0 cannot start. | The plan and the spec addendum are drafted now; code waits for `milestone/0.9.0`. |
@@ -425,6 +441,8 @@ start before R3 can be tested end to end. The old-format paths are not removed.
 ## 11. Definition of done
 
 - The spec addendum is committed and every new AC passes in the running client.
+- 0.8.0 ships the `needs` receive path, tile state and 24 locales (P0.5) before its release; a
+  real 0.8.0 build shows "This camera needs Mumcord 0.9.0" and does not retry.
 - The new format is used when both peers and the relay support it; every fallback cell works.
 - The old format still works with 0.8.x clients and old relays.
 - The codec allocates nothing per message; the relay path shows no regression against 0.8.0.
@@ -441,3 +459,16 @@ start before R3 can be tested end to end. The old-format paths are not removed.
    limit allows; otherwise show "This share needs Mumcord 0.9.0".
 3. **Old-format lifetime:** keep it through 0.9.x and remove it in the milestone after 0.8.x is
    no longer supported.
+4. **Camera fallback for 0.8.x viewers (follow-up, 2026-11-10):** a 0.8.x viewer of a new-format
+   camera always sees "This camera needs Mumcord 0.9.0". 0.8.x has no direct camera receive path,
+   so there is no old-format direct camera copy and no second relay broadcast for it. An old relay
+   still serves 0.8.x viewers with the camera's old-format relay broadcast. Decision 2 stays as is
+   for screen share, which 0.8.x can receive directly. The refusal is carried by `needs` (item 5).
+5. **0.8.0 forward-compatibility (`needs`) (2026-11-10):** a 0.9.0 sender sends the
+   `mumcord.camera` message `needs` (`.v = 1; .t = "needs"; .id = <16 lowercase hex camera
+   session id>`, spec 08 §6.5) to a viewer whose hello lacks `media-v2` when the camera uses the
+   new format and it cannot serve that viewer. 0.8.0 ships the receive path, the tile state and
+   the text in all 24 locales before its release (P0.5): the tile shows "This camera needs
+   Mumcord 0.9.0" and stops retrying until the camera's next `on`. A 0.7.x client ignores the
+   unknown `needs` and keeps the "Couldn't join {name}'s camera" retry of FR-8.52. Reason: 0.8.x
+   has no direct camera receive path, so 0.8.0 must know this refusal state before release.
