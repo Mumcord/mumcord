@@ -638,3 +638,37 @@ Round 5 was answered in chat on 2026-11-09: all recommendations taken (the prese
 ## Closing
 
 2026-11-09: All rounds answered. The specification has been created: `specs/14-pinball-plugin-specification.md`.
+
+## Addendum A – Community plugin instead of official (2026-11-10)
+
+Decided in chat on 2026-11-10: Mumball starts as a **community plugin in its own repository**, not as an official plugin in `Mumcord/plugins`. This replaces the answer to Q1.11. If the Mumcord maintainers want to take it over later, it can still become official then.
+
+What this changes, checked against specs 06 and 09:
+
+- Every permission Mumball uses is open to community plugins (the web page in the media area since API 1.1), so the game itself stays exactly as specified.
+- Mumball is shown as "Unofficial · <repository>" with a security score. Mumcord users without the plugin see nothing (the "<name> is playing … · Get plugin" line is only for official plugins).
+- The package limit is 5 MiB, which the plan already meets (Q4.8).
+- No maintainer agreement and no issue are needed (Q5.6 falls away).
+- Players add the repository's address once in Settings → Plugins → Repositories, then install Mumball like any plugin.
+
+Two questions follow from it.
+
+#### QA.1 Where does Mumball live? `◉`
+
+- [x] ⭐ **A new public repository `avkruedener/mumball`** with the plugin's code, its own signed plugin index and the packages, published with GitHub Pages and GitHub releases. Players add `https://avkruedener.github.io/mumball/v1/index.json` in Mumcord. The signing key stays on your computer (never in the repository).
+- [ ] Inside the Mumphone repository. Keeps everything in one place, but Mumphone is private, and a plugin index has to be public for Mumcord to read it.
+
+✍️ Note:
+
+#### QA.2 Which languages at the start? `◉`
+Community plugins only need English. Every extra language means checking all texts in it.
+
+- [x] ⭐ **English and German.** German for you and your friends; more languages later, or all 24 if it becomes official.
+- [ ] English only. Least work.
+- [ ] All 24 Mumcord languages, as planned for the official plugin.
+
+✍️ Note:
+
+---
+
+Addendum A was answered in chat on 2026-11-10: recommendations taken for QA.1 and QA.2. The specification has been updated.

@@ -1,14 +1,14 @@
 # 14 – Pinball plugin "Mumball" (working title) · Specification
 
-> Status: Final (brainstorming completed) · As of: 2026-11-09
-> Sources: `specs/14-pinball-plugin-brainstorming.md` (rounds 1–5, all recommendations taken)
+> Status: Final (brainstorming completed) · As of: 2026-11-10
+> Sources: `specs/14-pinball-plugin-brainstorming.md` (rounds 1–5 and Addendum A, all recommendations taken)
 > Builds on: `specs/06-plugin-system-specification.md` (plugin system, permissions, message limits FR-6.36, old servers FR-6.38, package limits FR-6.10), `specs/09-plugin-platform-1-1-specification.md` (activities in the media area FR-9.46 … FR-9.48, web content host FR-9.32 … FR-9.45, sound effects, gesture rule), `specs/13-plugin-platform-1-2-specification.md` (theme tokens and UI kit for plugin pages)
-> Repositories: the plugin is built in `Mumcord/plugins` (folder `mumball/`); this specification lives in `Mumcord/mumcord` next to the platform specs. Nothing in the Mumcord client changes.
+> Repositories: the plugin is a community plugin built and published in its own public repository `avkruedener/mumball` (Addendum A); this specification lives in `Mumcord/mumcord` next to the platform specs. Nothing in the Mumcord client changes.
 > Numbering: requirements and criteria use the spec file number (`FR-14.n`, `AC-14.n`).
 
 ## 1. Goal & context
 
-Friends in a voice channel want something light to play together while they talk. The wish was to bring the old Windows pinball game into Mumcord; that game (3D Pinball for Windows – Space Cadet) can't be used, because its table, art, sounds and code belong to Microsoft, the plugin review requires an open-source licence and a plugin can't load the original files. **Mumball** is therefore a new, original pinball game as an official Mumcord plugin: everyone in the channel plays their own table at the same time, a live scoreboard shows who is ahead, and the results land in the chat. It uses only the existing plugin platform (API 1.2) and works against any unmodified Mumble server.
+Friends in a voice channel want something light to play together while they talk. The wish was to bring the old Windows pinball game into Mumcord; that game (3D Pinball for Windows – Space Cadet) can't be used, because its table, art, sounds and code belong to Microsoft, the plugin review requires an open-source licence and a plugin can't load the original files. **Mumball** is therefore a new, original pinball game as a community plugin in its own repository (it can become official later if the Mumcord maintainers want to take it over): everyone in the channel plays their own table at the same time, a live scoreboard shows who is ahead, and the results land in the chat. It uses only the existing plugin platform (API 1.2) and works against any unmodified Mumble server.
 
 ## 2. Scope
 
@@ -24,7 +24,7 @@ Friends in a voice channel want something light to play together while they talk
 - Table sounds and short jingles, ducked under voice, own volume and mute (Q3.1, Q3.2); talking glow on the scoreboard (Q3.4).
 - Score sync over Mumble plugin data every 2 seconds (Q3.5); optional notification, off by default (Q3.8).
 - Edge cases: starter hand-over, players leaving, long pauses, ties (Q5.1 … Q5.4).
-- All 24 Mumcord languages, AGPL-3.0, package ≤ 5 MiB, tests in the mock host and end to end in Mumcord (Q1.11, Q4.7, Q4.8).
+- Community plugin in `avkruedener/mumball` with its own signed plugin index (QA.1); English and German (QA.2); AGPL-3.0, package ≤ 5 MiB, tests in the mock host and end to end in Mumcord (Q4.7, Q4.8).
 
 ### 2.2 Out of scope / later
 
@@ -41,6 +41,7 @@ Friends in a voice channel want something light to play together while they talk
 - Chat lines at match start and for personal bests (Q3.6).
 - WebGL effects (Q4.4); translated table lettering (Q4.9); a "relaxed" slower ball (Q4.10).
 - Keeping the "Tonight" board across restarts (Q5.5).
+- Official status in `Mumcord/plugins` and the remaining 22 languages: only if the Mumcord maintainers take Mumball over (Addendum A, QA.2).
 - Mumphone (iOS) has no plugin support; not affected.
 
 ## 3. Roles & permissions
@@ -50,7 +51,7 @@ Mumball needs no Mumble ACLs beyond being in a voice channel and being allowed t
 | Action | Starter | Player | Channel member with the plugin, not joined | Mumcord user without the plugin | Standard Mumble user |
 |---|---|---|---|---|---|
 | Start the activity (Apps menu, `/mumball`) | yes | yes (when none runs in the channel) | yes | – | – |
-| Join the lobby (Join) | – | – | yes | gets "Get plugin" (FR-9.47) | – |
+| Join the lobby (Join) | – | – | yes | sees nothing (community plugin, FR-9.47) | – |
 | Start match, Next match, Close | yes | – | – | – | – |
 | Play, pause, leave | yes | yes | – | – | – |
 | See scoreboard and results | yes | yes | results card in the chat | – | results text line |
@@ -345,20 +346,22 @@ stateDiagram-v2
 - **Security:** no network access, no remote code, all web content in the package (review rules). Names from the server are rendered as text only.
 - **Privacy:** only score, ball and state are sent, and only to players of the activity. Stored data per §7.1. No logging of names or scores; logs contain only errors and counts.
 - **Accessibility** (Q4.10): everything around the table works with the keyboard alone; screen readers read lobby, scoreboard and results and announce match start, ball number, "You're out" and the final ranking through a live region; places are numbered and the own row says "You", nothing depends on colour alone; "reduce motion" per §5.7; nothing flashes more than 3 times per second. Pinball itself can't be played by ear; that is stated in the README.
-- **Languages:** all 24 Mumcord languages for every text (`i18n/<tag>.json`).
+- **Languages:** English and German for every text (`i18n/en.json`, `i18n/de.json`, same keys); further languages can be added later (QA.2).
 - **Platforms:** wherever Mumcord 0.8.0 runs (Windows, macOS, Linux).
 
 ## 10. Build, packaging & release
 
-- Folder `mumball/` in `Mumcord/plugins` with `manifest.json`, `Cargo.toml`, `rust-toolchain.toml`, `LICENSE`, `README.md`, `i18n/`, `web/` (built output plus TypeScript sources), `sounds/`, `sounds-src/`, `assets/` (icon), `scenarios/`, `e2e/`.
-- `mumcord-plugin build --reproducible`; registry entry `plugins/mumball/`; published in the `v1.1` index only, `min_mumcord` 0.8.
-- E2E needs Mumcord 0.8.0: `mumball/e2e/min-mumcord` names `v0.8.0` until the pinned tag reaches it.
-- Before building: an issue in `Mumcord/mumcord` (like #394) for the maintainers' agreement, drafted from this specification and shown to the product owner before posting (Q5.6).
+- Public repository `avkruedener/mumball` with `manifest.json`, `Cargo.toml`, `rust-toolchain.toml`, `LICENSE`, `README.md`, `i18n/`, `web/` (built output plus TypeScript sources), `sounds/`, `sounds-src/`, `assets/` (icon), `scenarios/`, `e2e/`.
+- **Build:** `mumcord-plugin build --reproducible` with a pinned Rust toolchain; each package is signed with the author key (minisign).
+- **Own plugin index (QA.1):** `mumcord-plugin site-data` writes `v1/index.json` (empty of API 1.2 versions, so Mumcord 0.6.x finds nothing it can't run) and `v1.1/index.json` with `repository` (name "Mumball", homepage, `public_key`) and `min_mumcord` 0.8; both are signed with the repository key and served by GitHub Pages at `https://avkruedener.github.io/mumball/`; packages are GitHub release assets `mumball-v<ver>/mumball-<ver>.mcplugin` with `.minisig`. `sequence` rises with every publish.
+- **Keys:** the repository key and the author key are created on the product owner's computer and never committed; CI signs only if the keys are later stored as GitHub secrets. The public keys are in the README.
+- **CI** (GitHub Actions in the repository): build, `cargo test`, TypeScript type check and lint, `mumcord-plugin check`, mock-host scenarios, licence check; E2E against a Mumcord 0.8.0 build with a local Mumble server, run locally until 0.8.0 is released.
+- **Players** add `https://avkruedener.github.io/mumball/v1/index.json` in Settings → Plugins → Repositories once; the README explains it with screenshots.
 - Release after Mumcord 0.8.0 is out; the "Mumball" name is checked (trademarks, app stores) before publishing.
 
 ## 11. Acceptance criteria (verifiable in the running client)
 
-Setup unless stated otherwise: local Mumble test server (1.5), three Mumcord 0.8.0 clients A, B, C with Mumball installed, one standard Mumble client D, all in channel "Lounge".
+Setup unless stated otherwise: local Mumble test server (1.5), three Mumcord 0.8.0 clients A, B, C with the Mumball repository added and Mumball installed, one standard Mumble client D, all in channel "Lounge".
 
 - **AC-14.1** A chooses "Start Mumball" in the Apps menu → the lobby opens in A's media area; B and C see "A started Mumball · Join"; D sees nothing.
 - **AC-14.2** B and C press Join → all three lobbies list A (starter), B, C and "Players (3 of 8)"; only A sees "Start match".
@@ -384,7 +387,9 @@ Setup unless stated otherwise: local Mumble test server (1.5), three Mumcord 0.8
 - **AC-14.22** Keyboard only: join, start, play, read results, Next match and Leave without a mouse; Esc returns focus to Mumcord.
 - **AC-14.23** Server with plugin data blocked → the lobby shows "This server doesn't support shared plugin features. You can still play alone."; a solo match works.
 - **AC-14.24** Performance: on the reference laptop during a voice call, the frame-time overlay of a test build shows ≥ 58 frames per second over 3 minutes of play.
-- **AC-14.25** Package: `mumcord-plugin check --official` passes; size ≤ 5 MiB; 24 language files with the keys of `en.json`; CI of `Mumcord/plugins` green (reproducible rebuild, licence scan, mock-host scenarios).
+- **AC-14.25** Package: `mumcord-plugin check` passes; size ≤ 5 MiB; `en.json` and `de.json` with the same keys; the repository's CI is green.
+- **AC-14.26** Repository: in a fresh Mumcord 0.8.0, adding `https://avkruedener.github.io/mumball/v1/index.json` shows the repository "Mumball" with its key; Mumball installs from it, appears as "Unofficial · Mumball" with a security score, and a tampered package (changed byte) is refused.
+- **AC-14.27** German: with Mumcord set to German, every Mumball text in lobby, ticker, scoreboard, results, chat card and settings is German.
 
 ## 12. Decision log
 
@@ -401,7 +406,7 @@ Setup unless stated otherwise: local Mumble test server (1.5), three Mumcord 0.8
 | Q1.8 | Table elements of FR-14.13 | Multiball, third flipper, more tables later |
 | Q1.9 | Personal top 10, Tonight board, results line | No server-wide list (would need the server) |
 | Q1.10 | Trust scores | Verified scores later |
-| Q1.11 | Official plugin in `Mumcord/plugins` | Needs maintainer yes |
+| Q1.11 | Official plugin in `Mumcord/plugins` | Replaced by Addendum A |
 | Q2.1 | Media area only | Side panel later |
 | Q2.2 | Layout A, auto B when narrow | |
 | Q2.3 | Lobby: players, starter's Start, keys, Tonight, personal best | Ready check, attract mode later |
@@ -436,11 +441,15 @@ Setup unless stated otherwise: local Mumble test server (1.5), three Mumcord 0.8
 | Q5.3 | 60 s countdown when only paused players remain | |
 | Q5.4 | Shared places | |
 | Q5.5 | Save personal top 10 and settings only | |
-| Q5.6 | Issue for maintainers before building | Shown to the product owner first |
+| Q5.6 | Issue for maintainers before building | Falls away with Addendum A |
+| Addendum A | Community plugin in its own repository | Can become official later if the maintainers take it over |
+| QA.1 | Public repository `avkruedener/mumball`, own signed index on GitHub Pages | Keys stay on the owner's computer |
+| QA.2 | English and German | More languages later |
 
 ## 13. Open points & risks
 
-- **Maintainer agreement** (owner: product owner): an official plugin needs the Mumcord maintainers' yes; until then nothing is built.
+- **Reach:** as a community plugin Mumball is shown as "Unofficial" with a security score, players must add the repository first, and Mumcord users without it see nothing of a running match.
+- **Keys** (owner: product owner): losing the repository key means players must re-add the repository; back it up offline.
 - **Name** (owner: product owner): "Mumball" is a working name; trademark and store check before release.
 - **Dependency on Mumcord 0.8.0:** API 1.2 ships with 0.8.0; if 0.8.0 slips, Mumball slips.
 - **Game feel:** point values, mission goals, flipper strength and ball speed need play tests; the README documents the final values.
@@ -451,4 +460,4 @@ Setup unless stated otherwise: local Mumble test server (1.5), three Mumcord 0.8
 
 ## 14. Impact on the roadmap
 
-None for the Mumcord client. A new official plugin in `Mumcord/plugins` that can only be released after Mumcord 0.8.0 (plugin API 1.2). The roadmap's spec index can list `14-pinball-plugin-specification.md` when the spec lands.
+None for the Mumcord client. A new community plugin in `avkruedener/mumball` that can only be released after Mumcord 0.8.0 (plugin API 1.2); it may move to `Mumcord/plugins` later. The roadmap's spec index can list `14-pinball-plugin-specification.md` when the spec lands.
