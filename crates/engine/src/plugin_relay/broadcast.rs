@@ -856,7 +856,7 @@ impl PublisherTask {
         let units = link.sender();
         let end = loop {
             let alive = tokio::select! {
-                unit = link.recv() => match unit {
+                unit = link.recv_legacy() => match unit {
                     Ok(unit) => self.on_unit(&unit, &units).await,
                     Err(end) => break end,
                 },
@@ -1088,7 +1088,7 @@ impl SubscriberTask {
             tokio::time::interval_at(tokio::time::Instant::now() + KEY_RETRY, KEY_RETRY);
         let end = loop {
             tokio::select! {
-                unit = link.recv() => match unit {
+                unit = link.recv_legacy() => match unit {
                     Ok(mut unit) => self.on_unit(&mut unit),
                     Err(end) => break end,
                 },

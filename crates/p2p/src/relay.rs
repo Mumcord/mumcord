@@ -31,7 +31,7 @@ use tokio_rustls::TlsConnector;
 use tokio_rustls::client::TlsStream;
 
 use crate::broadcast::{
-    Bind as BroadcastBind, BindRole, Content, ControlKind, HEADER_LEN, Header, HeaderError,
+    Bind as BroadcastBind, BindRole, Content, ControlKind, HEADER_LEN, Header, HeaderError, profile,
 };
 use crate::tls::{self, RelayPin};
 use crate::{P2pError, RelayAnnouncement, RelayToken};
@@ -720,12 +720,22 @@ impl Unit {
     }
 }
 
+/// What arrives on a broadcast link: an old-format unit or a new-format media message.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BroadcastMessage {
+    Legacy(Unit),
+    Media(profile::Message),
+}
+
 /// A bound broadcast link to the relay, as publisher or subscriber. Dropping it closes the link
 /// (the relay ends the broadcast when it was the publisher's).
 pub struct BroadcastLink {
     transport: RelayTransport,
+    /// `true` for a new-format link: the sender carries the mux chunks of [`profile::Message`]
+    /// and the receiver hands out [`BroadcastMessage::Media`].
+    media: bool,
     outbound: mpsc::Sender<Vec<u8>>,
-    inbound: mpsc::Receiver<Unit>,
+    inbound: mpsc::Receiver<BroadcastMessage>,
     end: Arc<Mutex<Option<BroadcastEnd>>>,
     tasks: Vec<AbortHandle>,
     quic: Option<(Connection, Endpoint)>,
@@ -744,17 +754,33 @@ impl BroadcastLink {
         self.transport
     }
 
-    /// A sender for whole units (clear header + payload), usable from other tasks. Sending
-    /// fails once the link is gone.
+    /// Whether this link carries the new media profile.
+    pub fn is_media(&self) -> bool {
+        self.media
+    }
+
+    /// A sender for whole units (clear header + payload) or, on a media link, the chunk bytes of
+    /// one [`profile::Message`]. Usable from other tasks; sending fails once the link is gone.
     pub fn sender(&self) -> mpsc::Sender<Vec<u8>> {
         self.outbound.clone()
     }
 
-    /// The next unit, or why the link ended.
-    pub async fn recv(&mut self) -> Result<Unit, BroadcastEnd> {
+    /// The next message, old or new format, or why the link ended.
+    pub async fn recv(&mut self) -> Result<BroadcastMessage, BroadcastEnd> {
         match self.inbound.recv().await {
-            Some(unit) => Ok(unit),
+            Some(message) => Ok(message),
             None => Err(lock_end(&self.end).unwrap_or(BroadcastEnd::Lost)),
+        }
+    }
+
+    /// The next old-format unit. Only for a link that was opened without `media`.
+    pub async fn recv_legacy(&mut self) -> Result<Unit, BroadcastEnd> {
+        match self.recv().await? {
+            BroadcastMessage::Legacy(unit) => Ok(unit),
+            BroadcastMessage::Media(_) => {
+                tracing::debug!("old-format receiver on a media broadcast link");
+                Err(BroadcastEnd::Closed)
+            }
         }
     }
 }
@@ -818,16 +844,16 @@ impl crate::P2p {
             media,
         }
         .encode();
-        tokio::time::timeout(SETUP_TIMEOUT, outer.bind_broadcast(bind))
+        tokio::time::timeout(SETUP_TIMEOUT, outer.bind_broadcast(bind, media))
             .await
             .map_err(|_| P2pError::RelayFailed)?
     }
 }
 
 impl Outer {
-    async fn bind_broadcast(self, bind: Vec<u8>) -> Result<BroadcastLink, P2pError> {
+    async fn bind_broadcast(self, bind: Vec<u8>, media: bool) -> Result<BroadcastLink, P2pError> {
         let (out_tx, out_rx) = mpsc::channel(UNIT_QUEUE);
-        let (in_tx, inbound) = mpsc::channel(UNIT_INBOX);
+        let (in_tx, inbound) = mpsc::channel::<BroadcastMessage>(UNIT_INBOX);
         let end = Arc::new(Mutex::new(None));
         match self {
             Outer::Quic {
@@ -849,14 +875,20 @@ impl Outer {
                 };
                 // The relay sends every unit on its own stream; it may keep this many open.
                 connection.set_max_concurrent_uni_streams(UNI_STREAMS.into());
+                let read = if media {
+                    tokio::spawn(read_message_streams(connection.clone(), in_tx, end.clone()))
+                } else {
+                    tokio::spawn(read_unit_streams(connection.clone(), in_tx, end.clone()))
+                };
                 let tasks = vec![
                     tokio::spawn(read_control(send, recv, end.clone())).abort_handle(),
-                    tokio::spawn(read_unit_streams(connection.clone(), in_tx, end.clone()))
+                    read.abort_handle(),
+                    tokio::spawn(write_unit_streams(connection.clone(), out_rx, media))
                         .abort_handle(),
-                    tokio::spawn(write_unit_streams(connection.clone(), out_rx)).abort_handle(),
                 ];
                 Ok(BroadcastLink {
                     transport: RelayTransport::Udp,
+                    media,
                     outbound: out_tx,
                     inbound,
                     end,
@@ -869,6 +901,7 @@ impl Outer {
                     .await
                     .map_err(failed)?;
                 let mut units = UnitStream::default();
+                let mut messages = profile::MessageReader::new();
                 loop {
                     match read_frame(&mut stream).await.map_err(failed)? {
                         (FRAME_CONTROL, message) => {
@@ -877,21 +910,33 @@ impl Outer {
                             }
                         }
                         // Units only follow `ready`; keep an early one all the same.
+                        (FRAME_INNER, bytes) if media => {
+                            messages.push(&bytes);
+                            while let Some(message) = messages.next_message().map_err(failed)? {
+                                drop(in_tx.try_send(BroadcastMessage::Media(message)));
+                            }
+                        }
                         (FRAME_INNER, bytes) => {
                             for unit in units.push(&bytes).map_err(failed)? {
-                                drop(in_tx.try_send(unit));
+                                drop(in_tx.try_send(BroadcastMessage::Legacy(unit)));
                             }
                         }
                         (kind, _) => tracing::debug!("relay frame of unknown type {kind} ignored"),
                     }
                 }
                 let (read, write) = tokio::io::split(*stream);
+                let read = if media {
+                    tokio::spawn(read_message_frames(read, messages, in_tx, end.clone()))
+                } else {
+                    tokio::spawn(read_unit_frames(read, units, in_tx, end.clone()))
+                };
                 let tasks = vec![
-                    tokio::spawn(read_unit_frames(read, units, in_tx, end.clone())).abort_handle(),
-                    tokio::spawn(write_unit_frames(write, out_rx)).abort_handle(),
+                    read.abort_handle(),
+                    tokio::spawn(write_unit_frames(write, out_rx, media)).abort_handle(),
                 ];
                 Ok(BroadcastLink {
                     transport: RelayTransport::Tcp,
+                    media,
                     outbound: out_tx,
                     inbound,
                     end,
@@ -919,7 +964,7 @@ async fn read_control(
 /// Reads one unit per incoming unidirectional stream, in the order the streams were opened.
 async fn read_unit_streams(
     connection: Connection,
-    inbound: mpsc::Sender<Unit>,
+    inbound: mpsc::Sender<BroadcastMessage>,
     end: Arc<Mutex<Option<BroadcastEnd>>>,
 ) {
     loop {
@@ -937,7 +982,7 @@ async fn read_unit_streams(
         };
         match read_unit_stream(stream).await {
             Ok(unit) => {
-                if inbound.send(unit).await.is_err() {
+                if inbound.send(BroadcastMessage::Legacy(unit)).await.is_err() {
                     break;
                 }
             }
@@ -945,6 +990,61 @@ async fn read_unit_streams(
                 tracing::debug!("broadcast unit refused: {e}");
                 connection.close(0u32.into(), b"bad_request");
                 break;
+            }
+        }
+    }
+}
+
+/// Reads new-format messages: each unidirectional stream carries the mux chunks of one message,
+/// in order, and a message spans the whole stream.
+async fn read_message_streams(
+    connection: Connection,
+    inbound: mpsc::Sender<BroadcastMessage>,
+    end: Arc<Mutex<Option<BroadcastEnd>>>,
+) {
+    let mut reader = profile::MessageReader::new();
+    loop {
+        let mut stream = match connection.accept_uni().await {
+            Ok(stream) => stream,
+            Err(e) => {
+                if let quinn::ConnectionError::ApplicationClosed(close) = &e
+                    && let Ok(reason) = std::str::from_utf8(&close.reason)
+                {
+                    set_end(&end, BroadcastEnd::from_reason(reason));
+                }
+                tracing::debug!("broadcast link closed: {e}");
+                break;
+            }
+        };
+        let bytes = match stream
+            .read_to_end(crate::media::MAX_VIDEO_MESSAGE + 4096)
+            .await
+        {
+            Ok(bytes) => bytes,
+            Err(e) => {
+                tracing::debug!("broadcast message refused: {e}");
+                connection.close(0u32.into(), b"bad_request");
+                break;
+            }
+        };
+        reader.push(&bytes);
+        loop {
+            match reader.next_message() {
+                Ok(Some(message)) => {
+                    if inbound
+                        .send(BroadcastMessage::Media(message))
+                        .await
+                        .is_err()
+                    {
+                        return;
+                    }
+                }
+                Ok(None) => break,
+                Err(e) => {
+                    tracing::debug!("broadcast message refused: {e}");
+                    connection.close(0u32.into(), b"bad_request");
+                    return;
+                }
             }
         }
     }
@@ -970,9 +1070,24 @@ async fn read_unit_stream(
 }
 
 /// Sends every unit on its own unidirectional stream, one after the other, so they stay in
-/// order at the relay.
-async fn write_unit_streams(connection: Connection, mut units: mpsc::Receiver<Vec<u8>>) {
-    while let Some(unit) = units.recv().await {
+/// order at the relay. On a media link the first stream also opens the endless document.
+async fn write_unit_streams(
+    connection: Connection,
+    mut units: mpsc::Receiver<Vec<u8>>,
+    media: bool,
+) {
+    let opening = media.then(|| profile::MessageWriter::new().opening().to_vec());
+    let mut first = true;
+    while let Some(mut unit) = units.recv().await {
+        if let Some(opening) = &opening
+            && first
+        {
+            let mut with_opening = Vec::with_capacity(opening.len() + unit.len());
+            with_opening.extend_from_slice(opening);
+            with_opening.extend_from_slice(&unit);
+            unit = with_opening;
+            first = false;
+        }
         let sent = async {
             let mut stream = connection.open_uni().await?;
             stream.write_all(&unit).await?;
@@ -1018,7 +1133,7 @@ impl UnitStream {
 async fn read_unit_frames(
     mut reader: ReadHalf<TlsStream<TcpStream>>,
     mut units: UnitStream,
-    inbound: mpsc::Sender<Unit>,
+    inbound: mpsc::Sender<BroadcastMessage>,
     end: Arc<Mutex<Option<BroadcastEnd>>>,
 ) {
     loop {
@@ -1026,7 +1141,7 @@ async fn read_unit_frames(
             Ok((FRAME_INNER, bytes)) => match units.push(&bytes) {
                 Ok(done) => {
                     for unit in done {
-                        if inbound.send(unit).await.is_err() {
+                        if inbound.send(BroadcastMessage::Legacy(unit)).await.is_err() {
                             return;
                         }
                     }
@@ -1050,12 +1165,69 @@ async fn read_unit_frames(
     }
 }
 
-/// Cuts units into `0x01` frames of at most [`MAX_FRAME`] bytes.
+/// Reads new-format messages from the mux chunks inside the `0x01` frames of a TCP link.
+async fn read_message_frames(
+    mut reader: ReadHalf<TlsStream<TcpStream>>,
+    mut messages: profile::MessageReader,
+    inbound: mpsc::Sender<BroadcastMessage>,
+    end: Arc<Mutex<Option<BroadcastEnd>>>,
+) {
+    loop {
+        match read_frame(&mut reader).await {
+            Ok((FRAME_INNER, bytes)) => {
+                messages.push(&bytes);
+                loop {
+                    match messages.next_message() {
+                        Ok(Some(message)) => {
+                            if inbound
+                                .send(BroadcastMessage::Media(message))
+                                .await
+                                .is_err()
+                            {
+                                return;
+                            }
+                        }
+                        Ok(None) => break,
+                        Err(e) => {
+                            tracing::debug!("broadcast message refused: {e}");
+                            return;
+                        }
+                    }
+                }
+            }
+            Ok((FRAME_CONTROL, message)) => {
+                if let Some(reason) = end_of(&message) {
+                    set_end(&end, reason);
+                }
+            }
+            Ok((kind, _)) => tracing::debug!("relay frame of type {kind} after ready ignored"),
+            Err(e) => {
+                tracing::debug!("broadcast link closed: {e}");
+                return;
+            }
+        }
+    }
+}
+
+/// Cuts units into `0x01` frames of at most [`MAX_FRAME`] bytes. On a media link the first
+/// frame also opens the endless document.
 async fn write_unit_frames(
     mut writer: WriteHalf<TlsStream<TcpStream>>,
     mut units: mpsc::Receiver<Vec<u8>>,
+    media: bool,
 ) {
-    while let Some(unit) = units.recv().await {
+    let opening = media.then(|| profile::MessageWriter::new().opening().to_vec());
+    let mut first = true;
+    while let Some(mut unit) = units.recv().await {
+        if let Some(opening) = &opening
+            && first
+        {
+            let mut with_opening = Vec::with_capacity(opening.len() + unit.len());
+            with_opening.extend_from_slice(opening);
+            with_opening.extend_from_slice(&unit);
+            unit = with_opening;
+            first = false;
+        }
         for chunk in unit.chunks(MAX_FRAME) {
             if let Err(e) = write_frame(&mut writer, FRAME_INNER, chunk).await {
                 tracing::debug!("broadcast link write failed: {e}");

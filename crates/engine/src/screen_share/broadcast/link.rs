@@ -288,7 +288,7 @@ impl<S: FrameSource> PublisherControl<S> {
         let units = link.sender();
         let end = loop {
             tokio::select! {
-                unit = link.recv() => match unit {
+                unit = link.recv_legacy() => match unit {
                     Ok(unit) => {
                         if !self.on_unit(&unit, &units).await {
                             break BroadcastEnd::Lost;
@@ -654,7 +654,7 @@ impl SubscriberState {
         let mut detached = false;
         let end = loop {
             tokio::select! {
-                unit = link.recv() => match unit {
+                unit = link.recv_legacy() => match unit {
                     Ok(mut unit) => {
                         let max = *max_fps.borrow();
                         if detached {
