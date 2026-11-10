@@ -206,7 +206,8 @@ echo "== creating the package in $output"
 # `pkg create` wants the metadata inside the staged tree; -m/-p point at them.
 (cd "$stage" && pkg create -m +MANIFEST -p +PLIST -r "$stage" -o "$output")
 
-package_file=$(ls -t "$output"/mumcord-"$version"*.pkg 2>/dev/null | head -1)
+# `pkg create` writes one file per version into a fresh output directory.
+package_file=$(find "$output" -maxdepth 1 -name "mumcord-$version*.pkg" | head -1)
 if [ -z "$package_file" ]; then
   echo "pkg create produced no package" >&2
   exit 1
