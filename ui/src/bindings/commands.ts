@@ -2002,6 +2002,8 @@ export type CameraTileState =
 "full" | 
 /**  The join brought no answer; retried every 10 s. */
 "failed" | 
+/**  The camera needs Mumcord 0.9.0; the text stays until the camera's next `on` (FR-8.95). */
+"needsUpdate" | 
 /**  Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never. */
 "hidden";
 

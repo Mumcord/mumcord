@@ -192,6 +192,7 @@
     "joining": "Dołączanie do kamery użytkownika {{name}} …",
     "full": "Zbyt wiele osób ogląda użytkownika {{name}}",
     "failed": "Nie udało się dołączyć do kamery użytkownika {{name}}",
+    "needsUpdate": "Ta kamera wymaga Mumcord 0.9.0",
     "retry": "Spróbuj ponownie",
     "hidden": "Wideo ukryte",
     "showVideo": "Pokaż wideo",

@@ -199,6 +199,7 @@
     "joining": "Qed tingħaqad mal-kamera ta' {{name}} …",
     "full": "Wisq nies qed jaraw lil {{name}}",
     "failed": "Ma stajtx tingħaqad mal-kamera ta' {{name}}",
+    "needsUpdate": "Din il-kamera teħtieġ Mumcord 0.9.0",
     "retry": "Erġa' pprova",
     "hidden": "Vidjo moħbi",
     "showVideo": "Uri l-vidjo",

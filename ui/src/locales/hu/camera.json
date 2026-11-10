@@ -178,6 +178,7 @@
     "joining": "Csatlakozás {{name}} kamerájához …",
     "full": "Túl sokan nézik {{name}} kameráját",
     "failed": "Nem sikerült csatlakozni {{name}} kamerájához",
+    "needsUpdate": "Ez a kamera a Mumcord 0.9.0 verziót igényli",
     "retry": "Újra",
     "hidden": "Videó elrejtve",
     "showVideo": "Videó megjelenítése",

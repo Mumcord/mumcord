@@ -178,6 +178,7 @@
     "joining": "Liitytään käyttäjän {{name}} kameraan …",
     "full": "Liian moni katsoo käyttäjää {{name}}",
     "failed": "Käyttäjän {{name}} kameraan ei voitu liittyä",
+    "needsUpdate": "Tämä kamera vaatii Mumcord 0.9.0",
     "retry": "Yritä uudelleen",
     "hidden": "Video piilotettu",
     "showVideo": "Näytä video",

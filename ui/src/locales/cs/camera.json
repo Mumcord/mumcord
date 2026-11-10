@@ -192,6 +192,7 @@
     "joining": "Připojování ke kameře uživatele {{name}} …",
     "full": "Uživatele {{name}} sleduje příliš mnoho lidí",
     "failed": "Ke kameře uživatele {{name}} se nepodařilo připojit",
+    "needsUpdate": "Tato kamera vyžaduje Mumcord 0.9.0",
     "retry": "Zkusit znovu",
     "hidden": "Video skryto",
     "showVideo": "Zobrazit video",

@@ -178,6 +178,7 @@
     "joining": "Verbinden met de camera van {{name}} …",
     "full": "Te veel mensen kijken naar {{name}}",
     "failed": "Kon niet verbinden met de camera van {{name}}",
+    "needsUpdate": "Deze camera heeft Mumcord 0.9.0 nodig",
     "retry": "Opnieuw proberen",
     "hidden": "Video verborgen",
     "showVideo": "Video tonen",

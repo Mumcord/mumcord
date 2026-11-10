@@ -192,6 +192,7 @@
     "joining": "Jungiamasi prie {{name}} kameros …",
     "full": "{{name}}: per daug žiūrovų",
     "failed": "Nepavyko prisijungti prie {{name}} kameros",
+    "needsUpdate": "Šiai kamerai reikia Mumcord 0.9.0",
     "retry": "Bandyti dar kartą",
     "hidden": "Vaizdas paslėptas",
     "showVideo": "Rodyti vaizdą",

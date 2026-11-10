@@ -199,6 +199,7 @@
     "joining": "Ceamara {{name}} á oscailt …",
     "full": "Tá an iomarca daoine ag breathnú ar {{name}}",
     "failed": "Níorbh fhéidir ceamara {{name}} a oscailt",
+    "needsUpdate": "Teastaíonn Mumcord 0.9.0 ón gceamara seo",
     "retry": "Bain triail eile as",
     "hidden": "Físeán folaithe",
     "showVideo": "Taispeáin an físeán",

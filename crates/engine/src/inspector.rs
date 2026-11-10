@@ -347,6 +347,7 @@ fn camera_json(m: &crate::camera::signal::CameraMessage) -> Value {
         }),
         CameraMessage::CamLeave { id } => json!({ "t": "cam-leave", "id": id }),
         CameraMessage::Full { id } => json!({ "t": "full", "id": id }),
+        CameraMessage::Needs { id } => json!({ "t": "needs", "id": id }),
     }
 }
 

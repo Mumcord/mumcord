@@ -185,6 +185,7 @@
     "joining": "Se conectează la camera lui {{name}} …",
     "full": "Prea multe persoane se uită la {{name}}",
     "failed": "Nu s-a putut conecta la camera lui {{name}}",
+    "needsUpdate": "Această cameră necesită Mumcord 0.9.0",
     "retry": "Încearcă din nou",
     "hidden": "Video ascuns",
     "showVideo": "Arată video",
