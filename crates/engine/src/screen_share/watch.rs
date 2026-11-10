@@ -6,7 +6,7 @@
 //! playback mix ([`ShareSound`]).
 
 use std::sync::atomic::{AtomicU8, AtomicU32, Ordering};
-use std::sync::mpsc::{self, RecvTimeoutError, SyncSender, TrySendError};
+use std::sync::mpsc::{self, SyncSender, TrySendError};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -687,8 +687,8 @@ mod tests {
             while pictures.len() <= usize::from(index) && Instant::now() < deadline {
                 match rx.recv_timeout(Duration::from_millis(50)) {
                     Ok(picture) => pictures.push(picture),
-                    Err(RecvTimeoutError::Timeout) => {}
-                    Err(RecvTimeoutError::Disconnected) => break,
+                    Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {}
+                    Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
                 }
             }
         }
