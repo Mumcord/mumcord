@@ -75,5 +75,9 @@
       "body": "Näytön ja tiedostojen jakaminen on tauolla, kunnes luotat uuteen välityspalvelimeen.",
       "decision": "Vaatii päätöksesi"
     }
+  },
+  "suppressionFallback": {
+    "title": "Kohinanvaimennus on liian hidas",
+    "text": "Liian hidas tällä tietokoneella juuri nyt. Käytössä on ”{{standard}}”, kunnes se pysyy mukana."
   }
 }

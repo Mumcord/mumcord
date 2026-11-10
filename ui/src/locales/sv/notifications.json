@@ -75,5 +75,9 @@
       "body": "Skärm- och fildelning är pausade tills du litar på det nya reläet.",
       "decision": "Kräver ditt beslut"
     }
+  },
+  "suppressionFallback": {
+    "title": "Brusreduceringen är för långsam",
+    "text": "För långsam på den här datorn just nu. ”{{standard}}” används tills den hinner med."
   }
 }

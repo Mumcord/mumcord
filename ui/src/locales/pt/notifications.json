@@ -79,5 +79,9 @@
       "body": "A partilha de ecrã e de ficheiros está em pausa até confiares no novo retransmissor.",
       "decision": "Precisa da tua decisão"
     }
+  },
+  "suppressionFallback": {
+    "title": "Supressão de ruído demasiado lenta",
+    "text": "Demasiado lenta neste computador neste momento. Usa-se «{{standard}}» até conseguir acompanhar."
   }
 }

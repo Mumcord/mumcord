@@ -16,6 +16,7 @@ import { handleActivity } from "../activity/activityNotify";
 import { subscribeActivityAdded } from "../activity/activityStore";
 import { bindRelayTrustNotices } from "../p2p/relayTrust";
 import { bindDeniedNotices } from "../admin/deniedNotice";
+import { bindSuppressionNotices } from "./suppressionNotice";
 import { RelayTrustDialog } from "../p2p/RelayTrustDialog";
 import { NotificationCentre } from "./NotificationCentre";
 import { clearServerNotifications, markSeen, noticeKey } from "./notificationStore";
@@ -62,6 +63,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
   const { t: tActivity } = useTranslation("activity");
   const { t: tP2p } = useTranslation("p2p");
   const { t: tAdmin } = useTranslation("admin");
+  const { t: tSettings } = useTranslation("settings");
   const { conversation: selected } = useSelectedConversation();
   const shown = useShownServerId();
   const { servers } = useServers();
@@ -83,6 +85,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     tActivity,
     tP2p,
     tAdmin,
+    tSettings,
     overlayOpen,
     onOpenChat,
     selected,
@@ -96,6 +99,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
       tActivity,
       tP2p,
       tAdmin,
+      tSettings,
       overlayOpen,
       onOpenChat,
       selected,
@@ -143,6 +147,11 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
       bindDeniedNotices(getApi(), () => ({
         t: live.current.tAdmin,
         serverName: (id) => live.current.serverName(id),
+      })),
+      // Noise suppression that is too slow for this computer says so (#753).
+      bindSuppressionNotices(getApi(), () => ({
+        t: live.current.t,
+        tSettings: live.current.tSettings,
       })),
       // A changed relay waits for the user's decision (#600).
       bindRelayTrustNotices(getApi(), () => ({

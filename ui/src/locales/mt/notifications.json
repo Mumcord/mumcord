@@ -87,5 +87,9 @@
       "body": "Il-qsim tal-iskrin u tal-fajls huwa mwaqqaf sakemm tafda r-relay il-ġdid.",
       "decision": "Jeħtieġ id-deċiżjoni tiegħek"
     }
+  },
+  "suppressionFallback": {
+    "title": "It-tnaqqis tal-istorbju huwa bil-mod wisq",
+    "text": "Bil-mod wisq fuq dan il-kompjuter bħalissa. Jintuża “{{standard}}” sakemm ilaħħaq."
   }
 }

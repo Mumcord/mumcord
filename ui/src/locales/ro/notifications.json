@@ -79,5 +79,9 @@
       "body": "Partajarea ecranului și a fișierelor e în pauză până când ai încredere în noul releu.",
       "decision": "Necesită decizia ta"
     }
+  },
+  "suppressionFallback": {
+    "title": "Suprimarea zgomotului este prea lentă",
+    "text": "Prea lentă pe acest computer în acest moment. Se folosește „{{standard}}” până când ține pasul."
   }
 }

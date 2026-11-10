@@ -487,6 +487,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
             audio::AudioDeviceFallback,
+            audio::NoiseSuppressionFallback,
             audio::BitrateMaxChanged,
             channel_audio::ChannelAudioProfilesChanged,
             channel_audio::ActiveAudioProfileChanged,
@@ -989,6 +990,7 @@ fn emit_engine_event(
         EngineEvent::AudioDeviceFallback { input } => {
             audio::AudioDeviceFallback { input }.emit(app)
         }
+        EngineEvent::NoiseSuppressionFallback => audio::NoiseSuppressionFallback.emit(app),
         EngineEvent::BitrateMaxChanged(max_bps) => audio::BitrateMaxChanged {
             kbps: max_bps.map(|b| b / 1000),
         }

@@ -79,5 +79,9 @@
       "body": "Ekrāna un failu kopīgošana ir apturēta, līdz uzticēsies jaunajam relejam.",
       "decision": "Nepieciešams tavs lēmums"
     }
+  },
+  "suppressionFallback": {
+    "title": "Trokšņu slāpēšana ir pārāk lēna",
+    "text": "Šajā datorā pašlaik pārāk lēna. Kamēr netiek līdzi, tiek izmantots “{{standard}}”."
   }
 }

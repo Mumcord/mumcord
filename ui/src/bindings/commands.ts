@@ -1404,6 +1404,7 @@ export const events = {
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
+	noiseSuppressionFallback: makeEvent<NoiseSuppressionFallback, NoiseSuppressionFallback>("noise-suppression-fallback"),
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
@@ -3366,6 +3367,12 @@ export type NoiseBackend =
 "standard" | 
 /**  "Advanced (AI)", Beta. */
 "advanced";
+
+/**
+ *  The selected noise suppression is too slow for this computer right now and the standard one
+ *  stands in (issue #753).
+ */
+export type NoiseSuppressionFallback = null;
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server

@@ -83,5 +83,9 @@
       "body": "Ekrano ir failų bendrinimas sustabdytas, kol patvirtinsi, kad pasitiki nauju perdavimo mazgu.",
       "decision": "Reikia tavo sprendimo"
     }
+  },
+  "suppressionFallback": {
+    "title": "Triukšmo slopinimas per lėtas",
+    "text": "Šiame kompiuteryje dabar per lėtas. Kol spės, naudojamas „{{standard}}“."
   }
 }

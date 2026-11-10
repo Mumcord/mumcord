@@ -75,5 +75,9 @@
       "body": "Skærm- og fildeling er sat på pause, indtil du stoler på det nye relæ.",
       "decision": "Kræver din beslutning"
     }
+  },
+  "suppressionFallback": {
+    "title": "Støjdæmpning er for langsom",
+    "text": "For langsom på denne computer lige nu. Bruger “{{standard}}”, indtil den kan følge med."
   }
 }

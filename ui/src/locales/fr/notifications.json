@@ -79,5 +79,9 @@
       "body": "Le partage d’écran et de fichiers est en pause jusqu’à ce que tu fasses confiance au nouveau relais.",
       "decision": "Décision requise"
     }
+  },
+  "suppressionFallback": {
+    "title": "Suppression du bruit trop lente",
+    "text": "Trop lente sur cet ordinateur pour le moment. « {{standard}} » prend le relais en attendant."
   }
 }

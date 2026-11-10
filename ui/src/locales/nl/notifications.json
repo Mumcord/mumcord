@@ -75,5 +75,9 @@
       "body": "Scherm- en bestandsdeling zijn gepauzeerd tot je de nieuwe relay vertrouwt.",
       "decision": "Jouw beslissing nodig"
     }
+  },
+  "suppressionFallback": {
+    "title": "Ruisonderdrukking te traag",
+    "text": "Nu te traag op deze computer. ‘{{standard}}’ wordt gebruikt tot het weer lukt."
   }
 }

@@ -75,5 +75,9 @@
       "body": "Bildschirm- und Dateifreigabe sind pausiert, bis du dem neuen Relay vertraust.",
       "decision": "Deine Entscheidung ist gefragt"
     }
+  },
+  "suppressionFallback": {
+    "title": "Rauschunterdrückung zu langsam",
+    "text": "Auf diesem Computer gerade zu langsam. Bis es wieder geht, läuft „{{standard}}“."
   }
 }

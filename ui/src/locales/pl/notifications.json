@@ -83,5 +83,9 @@
       "body": "Udostępnianie ekranu i plików jest wstrzymane, dopóki nie zaufasz nowemu przekaźnikowi.",
       "decision": "Wymaga twojej decyzji"
     }
+  },
+  "suppressionFallback": {
+    "title": "Tłumienie szumów jest zbyt wolne",
+    "text": "Na tym komputerze jest teraz zbyt wolne. Dopóki nie nadąży, działa „{{standard}}”."
   }
 }

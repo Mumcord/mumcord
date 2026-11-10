@@ -79,5 +79,9 @@
       "body": "La condivisione di schermo e file è in pausa finché non ti fidi del nuovo relay.",
       "decision": "Serve la tua decisione"
     }
+  },
+  "suppressionFallback": {
+    "title": "Soppressione del rumore troppo lenta",
+    "text": "Al momento è troppo lenta su questo computer. Si usa «{{standard}}» finché non riesce a stare al passo."
   }
 }
