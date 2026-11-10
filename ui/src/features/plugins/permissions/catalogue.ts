@@ -44,6 +44,11 @@ export function isPermissionId(id: string): id is PermissionId {
   return Object.hasOwn(PERMISSION_RISK, id);
 }
 
+/** Unknown ids cannot come from a validated manifest; they count as the highest risk, never hidden. */
+export function permissionRisk(id: string): PermissionRisk {
+  return isPermissionId(id) ? PERMISSION_RISK[id] : "red";
+}
+
 /** Translation key of a permission's plain-language text; ids contain dots, which i18next treats as nesting. */
 export function permissionTextKey(id: PermissionId): string {
   return id.replace(/[.-](\w)/g, (_, c: string) => c.toUpperCase());

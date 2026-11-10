@@ -14,6 +14,7 @@ import { PluginIcon } from "../browse/PluginIcon";
 import { sourceLabel } from "../browse/source";
 import { pluginErrorText } from "./errorText";
 import { ScoreChip } from "../score";
+import { AllowAll } from "./AllowAll";
 import { ConfirmBox } from "./ConfirmBox";
 import { hasNewAuthorKey } from "./highRisk";
 import { InstallProgress } from "./InstallProgress";
@@ -206,7 +207,15 @@ export function InstallPrompt({ plugin, suggestedBy = null, onClose }: InstallPr
               <p>{t("prompt.suggestedText")}</p>
             </div>
           )}
-          <p className="plugin-prompt-subtitle">{t("prompt.intro", { name })}</p>
+          <AllowAll
+            pluginName={name}
+            optional={offer.optional.map((o) => o.id)}
+            enabled={enabled}
+            disabled={installing}
+            onAllow={(ids) => {
+              setEnabled((current) => new Set([...current, ...ids]));
+            }}
+          />
           <PermissionList
             requested={requestedOf(offer)}
             pluginName={plugin.name}
