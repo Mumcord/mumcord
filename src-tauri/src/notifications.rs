@@ -143,7 +143,9 @@ pub fn init(app: &AppHandle) {
 }
 
 fn main_window_focused(app: &AppHandle) -> bool {
-    let Some(window) = app.get_webview_window("main") else {
+    // Not `get_webview_window`: that finds nothing while a plugin frame's child web view sits in
+    // the window (macOS), and the focused window would count as away.
+    let Some(window) = app.get_window("main") else {
         return false;
     };
     window.is_visible().unwrap_or(false)

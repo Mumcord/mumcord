@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use mumcord_engine::{ConnState, Engine, store::CloseBehaviour};
-use tauri::{AppHandle, Manager, WebviewWindow, Window, WindowEvent};
+use tauri::{AppHandle, Manager, Runtime, Window, WindowEvent};
 use tauri_specta::Event;
 
 use crate::commands::app::CloseRequested;
@@ -83,8 +83,10 @@ pub fn on_window_event(window: &Window, event: &WindowEvent) {
     }
 }
 
-fn main_window(app: &AppHandle) -> Option<WebviewWindow> {
-    let window = app.get_webview_window(MAIN);
+/// The main window itself. Not `get_webview_window`: that finds nothing while a plugin frame's
+/// child web view sits in the window (macOS), and the window could not be shown or hidden then.
+fn main_window<R: Runtime>(app: &AppHandle<R>) -> Option<Window<R>> {
+    let window = app.get_window(MAIN);
     if window.is_none() {
         tracing::warn!("main window not found");
     }
@@ -262,6 +264,39 @@ pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Issue #705: on macOS a plugin frame is a child web view in the main window. The window
+    /// must still be found then, or the tray can neither show nor hide it.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn the_main_window_is_found_while_a_plugin_frame_is_open() {
+        use tauri::{
+            LogicalPosition, LogicalSize, WebviewBuilder, WebviewUrl, WebviewWindowBuilder,
+        };
+
+        let app = tauri::test::mock_app();
+        let handle = app.handle();
+        WebviewWindowBuilder::new(handle, MAIN, WebviewUrl::default())
+            .build()
+            .expect("main window");
+        assert!(main_window(handle).is_some());
+
+        handle
+            .get_window(MAIN)
+            .expect("main window")
+            .add_child(
+                WebviewBuilder::new("plugin-frame-0123456789abcdef", WebviewUrl::default()),
+                LogicalPosition::new(0, 0),
+                LogicalSize::new(100, 100),
+            )
+            .expect("frame web view");
+        assert!(
+            handle.get_webview_window(MAIN).is_none(),
+            "the lookup this replaced"
+        );
+        let main = main_window(handle).expect("found with a frame open");
+        assert_eq!(main.label(), MAIN);
+    }
 
     #[test]
     fn the_window_waits_for_the_first_paint() {
