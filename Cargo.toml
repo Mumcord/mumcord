@@ -110,9 +110,10 @@ nnnoiseless = { version = "0.5", default-features = false }
 # the engine, because a published crate cannot carry a git dependency (issue #176).
 rnnoise-rs = { git = "https://github.com/Mumcord/rnnoise-rs", rev = "4430677a365294ca8a6fd0b2e7854c02537a47a4" }
 # Bovnar (MIT), published on crates.io (issue #400). The build compiles the bundled C sources, so
-# it needs a C compiler but no Python. All unit-profile features stay on (the default). 2.0.2 is
-# the first release whose crate carries PROVENANCE.json, which scripts/notices.js checks.
-bovnar = "2.0.2"
+# it needs a C compiler but no Python. All unit-profile features stay on (the default). 2.1.0
+# adds the incremental streaming mux codec (`bovnar::codec`) for the 0.9.0 media profile; its
+# crate carries PROVENANCE.json, which scripts/notices.js checks.
+bovnar = "2.1.0"
 sonora = "0.2"
 rtrb = "0.4"
 # Lock-free bounded queue: the camera frame pool hands buffers between capture and consumer
