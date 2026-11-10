@@ -58,9 +58,11 @@ impl SharedMemory {
     pub(crate) fn open(name: &str, len: usize) -> io::Result<Self> {
         use std::ffi::CString;
         let cname = CString::new(name).map_err(|_| io::Error::from(io::ErrorKind::InvalidInput))?;
-        // `shm_open` is variadic, so `mode_t` is promoted to the integer type the platform's
-        // variadic call expects; a plain `mode_t` argument would be a `u16` on macOS and rejected.
-        let mode = (libc::S_IRUSR | libc::S_IWUSR) as libc::c_uint;
+        let mode = (libc::S_IRUSR | libc::S_IWUSR) as libc::mode_t;
+        // Linux and the BSDs declare `shm_open` with a plain `mode_t` parameter; macOS declares it
+        // variadic, where a `u16` `mode_t` cannot be passed and has to be promoted first.
+        #[cfg(target_os = "macos")]
+        let mode = mode as libc::c_uint;
         // SAFETY: valid NUL-terminated name; the descriptor is closed below.
         let fd = unsafe { libc::shm_open(cname.as_ptr(), libc::O_RDWR | libc::O_CREAT, mode) };
         if fd < 0 {
