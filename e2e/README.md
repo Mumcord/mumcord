@@ -236,7 +236,7 @@ pinned Mumcord release.
 | ------------------------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------- |
 | `fx-strip` "Fixture Strip"                       | official                          | a panel with an animated button (strip icon, render checks) and a chat plugin's permissions |
 | `echolings` "Fixture Highlight"                  | official                          | the same code under the id Browse highlights first (FR-6.59), also a deep-link target       |
-| `test-quit-save` "Fixture Quit Save"             | official                          | saves a value to its storage in `stop()`: a system quit signal stops the plugins (#748)     |
+| `test-quit-save` "Fixture Quit Save"             | official, published by its spec   | saves a value to its storage in `stop()`: a system quit signal stops the plugins (#748)     |
 | `fx-*` in `crates/plugins/tests/fixtures/safety` | mostly the third-party repository | misbehaving and edge-case plugins (limits, back-off, web view, updates)                     |
 
 A new test plugin is a folder under `e2e/fixtures/plugins` with a `manifest.json`, `i18n/en.json` and a Rust crate on

@@ -11,6 +11,7 @@ import { completeWizard } from "../../helpers/voice-ui.ts";
 
 const ID = "test-quit-save";
 const NAME = "Fixture Quit Save";
+const PACKAGE = `${ID}-1.0.0`;
 
 interface Overview {
   plugins: { id: string; status: { kind: string } }[];
@@ -42,6 +43,9 @@ describe("plugins: a system quit signal stops the plugins (#748)", () => {
   before(async function () {
     this.timeout(20 * 60_000);
     fixtures = await registry.start();
+    // Only this spec needs the plugin, so the registry script leaves it staged: the other plugin
+    // specs keep the Browse list they were written against.
+    await fixtures.publish(PACKAGE);
   });
 
   after(async () => {
