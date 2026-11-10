@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { InstallKind, UpdateOffer, UpdateStatus } from "../../api";
-import { Badge, DialogHeader } from "./DialogHeader";
+import { ChannelBadge, DialogHeader, PrereleaseNote } from "./DialogHeader";
 import { ReleaseNotesList } from "./ReleaseNotesList";
 import { packageCommand } from "./updateMode";
 
@@ -32,12 +32,13 @@ export function AvailableView(props: AvailableViewProps) {
           version: offer.version,
           current: status.currentVersion,
         })}
-        badge={<Badge>{t("updater.stable")}</Badge>}
+        badge={<ChannelBadge channel={offer.channel} />}
       />
       <h3 className="upd-section-title">
         {t("updater.available.whatsNew", { current: status.currentVersion })}
       </h3>
       <ReleaseNotesList notes={offer.notes} />
+      {offer.channel === "releaseCandidates" && <PrereleaseNote />}
       {manual ? (
         <ManualInstructions install={status.install} version={offer.version} />
       ) : (

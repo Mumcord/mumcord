@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stable",
+    "releaseCandidate": "Release candidate",
+    "prereleaseNote": "This is a pre-release build and may contain bugs. Switch to the Stable channel in Settings to get final releases only.",
     "available": {
       "title": "Update available",
       "subtitle": "Mumcord {{version}} is ready to download. You have {{current}}.",
