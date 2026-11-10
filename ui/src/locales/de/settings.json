@@ -896,6 +896,16 @@
     "modeNotify": "Nur benachrichtigen",
     "modeOff": "Aus",
     "autoUnavailable": "Diese Kopie kann sich nicht selbst aktualisieren, deshalb weist Mumcord dich nur auf neue Versionen hin.",
+    "channel": "Update-Kanal",
+    "channelHint": "Lege fest, welche Versionen Mumcord anbietet. Release Candidates sind frühe Builds der nächsten Version.",
+    "channels": {
+      "stable": { "name": "Stabil", "hint": "Nur finale Versionen" },
+      "releaseCandidates": {
+        "name": "Release Candidates",
+        "hint": "Frühe Builds der nächsten Version; können Fehler enthalten"
+      }
+    },
+    "channelSwitchBack": "Wenn du zu Stabil zurückwechselst, bleibt deine aktuelle Version, bis die nächste finale Version erscheint.",
     "interval": "Nach Updates suchen",
     "intervalHint_one": "Beim Start und jede Stunde",
     "intervalHint_other": "Beim Start und alle {{count}} Stunden",

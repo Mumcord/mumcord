@@ -420,6 +420,7 @@ const DEFAULT_SETTINGS: Settings = {
   pluginRegistryCache: true,
   developerMode: false,
   updateIntervalHours: 12,
+  updateChannel: "stable",
   updateSkipped: null,
   appimageMenuEntry: "unset",
   windowOverlayNoticeShown: false,

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import type { UpdateStatus } from "../../api";
+import type { UpdateChannel, UpdateStatus } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { stubDialog } from "../channels/testUtils";
@@ -24,6 +24,7 @@ function statusWith(change: Partial<UpdateStatus>): UpdateStatus {
     offer: {
       version: "0.4.5",
       url: URL,
+      channel: "stable",
       notes: [
         {
           version: "0.4.5",
@@ -189,10 +190,52 @@ describe("UpdateDialog: failed", () => {
   });
 });
 
+describe("UpdateDialog: channel (#741)", () => {
+  function rcStatus(): UpdateStatus {
+    const status = statusWith({});
+    if (status.offer === null) throw new Error("fixture has an offer");
+    return { ...status, offer: { ...status.offer, channel: "releaseCandidates" } };
+  }
+
+  it("shows the Stable badge and no warning for a final release", () => {
+    renderDialog(statusWith({}));
+    expect(screen.getByText("Stable")).toBeInTheDocument();
+    expect(screen.queryByText("Release candidate")).not.toBeInTheDocument();
+    expect(screen.queryByText(/pre-release build/)).not.toBeInTheDocument();
+  });
+
+  it("shows the Release candidate badge and the pre-release warning", () => {
+    renderDialog(rcStatus());
+    expect(screen.getByText("Release candidate")).toBeInTheDocument();
+    expect(screen.queryByText("Stable")).not.toBeInTheDocument();
+    expect(screen.getByText(/pre-release build and may contain bugs/)).toHaveTextContent(
+      "Switch to the Stable channel in Settings to get final releases only.",
+    );
+  });
+});
+
+describe("UpdateToast channel (#741)", () => {
+  it("badges a release candidate and stays plain for a final release", () => {
+    const props = {
+      version: "0.8.0-rc.2",
+      connectedServers: 0,
+      onRestart: vi.fn(),
+      onShowDialog: vi.fn(),
+      onLater: vi.fn(),
+    };
+    const { unmount } = render(<UpdateToast {...props} channel="releaseCandidates" />);
+    expect(screen.getByText("Release candidate")).toBeInTheDocument();
+    unmount();
+    render(<UpdateToast {...props} channel="stable" />);
+    expect(screen.queryByText("Release candidate")).not.toBeInTheDocument();
+  });
+});
+
 describe("UpdateToast", () => {
-  function renderToast(connected: number) {
+  function renderToast(connected: number, channel: UpdateChannel = "stable") {
     const props = {
       version: "0.4.5",
+      channel,
       connectedServers: connected,
       onRestart: vi.fn(),
       onShowDialog: vi.fn(),

@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabil",
+    "releaseCandidate": "Release Candidate",
+    "prereleaseNote": "Dies ist eine Vorabversion und kann Fehler enthalten. Wechsle in den Einstellungen zum Stabil-Kanal, um nur finale Versionen zu erhalten.",
     "available": {
       "title": "Update verfügbar",
       "subtitle": "Mumcord {{version}} steht zum Download bereit. Du hast {{current}}.",

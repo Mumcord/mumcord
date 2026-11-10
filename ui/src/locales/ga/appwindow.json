@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Cobhsaí",
+    "releaseCandidate": "Iarrthóir eisiúna",
+    "prereleaseNote": "Is leagan réamheisiúna é seo agus d’fhéadfadh fabhtanna a bheith ann. Athraigh go dtí an cainéal Cobhsaí sna socruithe chun eisiúintí deiridh amháin a fháil.",
     "available": {
       "title": "Nuashonrú ar fáil",
       "subtitle": "Tá Mumcord {{version}} réidh le híoslódáil. Tá {{current}} agat.",

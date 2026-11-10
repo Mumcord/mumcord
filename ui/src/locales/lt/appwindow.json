@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabili",
+    "releaseCandidate": "Išleidimo kandidatas",
+    "prereleaseNote": "Tai išankstinė versija, joje gali būti klaidų. Nustatymuose perjunk į stabilų kanalą, jei nori gauti tik galutines versijas.",
     "available": {
       "title": "Yra naujinys",
       "subtitle": "Mumcord {{version}} paruoštas atsisiųsti. Tu turi {{current}}.",

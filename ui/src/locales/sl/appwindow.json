@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabilna",
+    "releaseCandidate": "Kandidat za izdajo",
+    "prereleaseNote": "To je predizdajna različica in lahko vsebuje napake. V nastavitvah preklopi na stabilni kanal, če želiš prejemati samo končne izdaje.",
     "available": {
       "title": "Na voljo je posodobitev",
       "subtitle": "Mumcord {{version}} je pripravljen za prenos. Imaš {{current}}.",

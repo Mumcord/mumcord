@@ -505,6 +505,14 @@ pub enum Consent {
     No,
 }
 
+/// Which releases the updater offers: only final releases, or release candidates as well.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum UpdateChannel {
+    Stable,
+    ReleaseCandidates,
+}
+
 /// How peer-to-peer features (screen share, full-size images) reach another Mumcord user
 /// (spec 04, FR-4.1): directly, through the server's mumpeer relay, or not at all.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -845,6 +853,9 @@ pub struct Settings {
     pub update_auto_download: bool,
     /// Hours between two update checks (FR-3.144). Clamped on load.
     pub update_interval_hours: u32,
+    /// The update channel the user picked; `None` follows the installed version (a release
+    /// candidate gets release candidates, a final version stays on stable) until they choose.
+    pub update_channel: Option<UpdateChannel>,
     /// "Skip this version": this version is never offered again (FR-3.144).
     pub update_skipped: Option<String>,
     /// When the last update check ran, in milliseconds since the Unix epoch.
@@ -1109,6 +1120,7 @@ impl Default for Settings {
             update_check: Consent::Unset,
             update_auto_download: false,
             update_interval_hours: DEFAULT_UPDATE_INTERVAL_HOURS,
+            update_channel: None,
             update_skipped: None,
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
@@ -1536,6 +1548,7 @@ mod tests {
         assert_eq!(loaded.last_update_check, None);
         assert!(!loaded.update_auto_download);
         assert_eq!(loaded.update_interval_hours, DEFAULT_UPDATE_INTERVAL_HOURS);
+        assert_eq!(loaded.update_channel, None);
         assert_eq!(loaded.update_skipped, None);
         assert!(!loaded.window_overlay_notice_shown);
         assert!(loaded.whats_new_auto);

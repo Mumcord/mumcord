@@ -906,6 +906,16 @@
     "modeNotify": "Jen upozornit",
     "modeOff": "Vypnuto",
     "autoUnavailable": "Tato kopie se nemůže aktualizovat sama, proto tě Mumcord jen upozorní na nové verze.",
+    "channel": "Kanál aktualizací",
+    "channelHint": "Vyber, která vydání ti Mumcord nabízí. Kandidáti na vydání jsou rané verze příští verze.",
+    "channels": {
+      "stable": { "name": "Stabilní", "hint": "Jen finální vydání" },
+      "releaseCandidates": {
+        "name": "Kandidáti na vydání",
+        "hint": "Rané verze příští verze; mohou obsahovat chyby"
+      }
+    },
+    "channelSwitchBack": "Po návratu na stabilní kanál zůstane tvá současná verze, dokud nevyjde další finální vydání.",
     "interval": "Kontrolovat aktualizace",
     "intervalHint_one": "Při spuštění a každou hodinu",
     "intervalHint_few": "Při spuštění a každé {{count}} hodiny",

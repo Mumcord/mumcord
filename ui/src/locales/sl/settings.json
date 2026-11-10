@@ -906,6 +906,16 @@
     "modeNotify": "Samo obvesti",
     "modeOff": "Izklopljeno",
     "autoUnavailable": "Ta kopija se ne more posodobiti sama, zato te Mumcord le obvesti o novih različicah.",
+    "channel": "Kanal posodobitev",
+    "channelHint": "Izberi, katere izdaje ponuja Mumcord. Kandidati za izdajo so zgodnje različice naslednje različice.",
+    "channels": {
+      "stable": { "name": "Stabilna", "hint": "Samo končne izdaje" },
+      "releaseCandidates": {
+        "name": "Kandidati za izdajo",
+        "hint": "Zgodnje različice naslednje različice; lahko vsebujejo napake"
+      }
+    },
+    "channelSwitchBack": "Ko se vrneš na stabilni kanal, ostane tvoja trenutna različica, dokler ne izide naslednja končna izdaja.",
     "interval": "Preveri posodobitve",
     "intervalHint_one": "Ob zagonu in vsako uro",
     "intervalHint_two": "Ob zagonu in vsaki {{count}} uri",

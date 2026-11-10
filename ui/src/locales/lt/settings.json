@@ -906,6 +906,16 @@
     "modeNotify": "Tik pranešti",
     "modeOff": "Išjungta",
     "autoUnavailable": "Ši kopija negali pati atsinaujinti, todėl Mumcord tik praneša apie naujas versijas.",
+    "channel": "Naujinių kanalas",
+    "channelHint": "Pasirink, kokias versijas siūlo Mumcord. Išleidimo kandidatai yra ankstyvos kitos versijos darinys.",
+    "channels": {
+      "stable": { "name": "Stabili", "hint": "Tik galutinės versijos" },
+      "releaseCandidates": {
+        "name": "Išleidimo kandidatai",
+        "hint": "Ankstyvos kitos versijos darinys; gali būti klaidų"
+      }
+    },
+    "channelSwitchBack": "Grįžus į stabilų kanalą, tavo dabartinė versija lieka, kol išeis kita galutinė versija.",
     "interval": "Tikrinti, ar yra naujinių",
     "intervalHint_one": "Paleidžiant ir kas valandą",
     "intervalHint_few": "Paleidžiant ir kas {{count}} valandas",

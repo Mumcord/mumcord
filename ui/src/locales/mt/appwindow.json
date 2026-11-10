@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabbli",
+    "releaseCandidate": "Kandidat għar-rilaxx",
+    "prereleaseNote": "Din hija verżjoni preliminari u tista’ tinkludi bugs. Aqleb għall-kanal Stabbli fl-issettjar biex tieħu biss ir-rilaxxi finali.",
     "available": {
       "title": "Aġġornament disponibbli",
       "subtitle": "Mumcord {{version}} huwa lest biex jitniżżel. Inti għandek {{current}}.",

@@ -896,6 +896,16 @@
     "modeNotify": "Alleen melden",
     "modeOff": "Uit",
     "autoUnavailable": "Deze kopie kan zichzelf niet bijwerken, dus Mumcord meldt alleen nieuwe versies.",
+    "channel": "Updatekanaal",
+    "channelHint": "Kies welke versies Mumcord aanbiedt. Release candidates zijn vroege builds van de volgende versie.",
+    "channels": {
+      "stable": { "name": "Stabiel", "hint": "Alleen definitieve versies" },
+      "releaseCandidates": {
+        "name": "Release candidates",
+        "hint": "Vroege builds van de volgende versie; kunnen bugs bevatten"
+      }
+    },
+    "channelSwitchBack": "Als je terugschakelt naar Stabiel, houd je je huidige versie tot de volgende definitieve versie uit is.",
     "interval": "Op updates controleren",
     "intervalHint_one": "Bij het starten en elk uur",
     "intervalHint_other": "Bij het starten en elke {{count}} uur",

@@ -66,7 +66,8 @@ pub use settings::{
     MIN_VIDEO_DUCKING_PERCENT, NoiseBackend, NotificationMode, OverlayCorner, OwnVoice, P2pMode,
     PluginUpdates, PmRule, PositionalSettings, PrivateMessageSettings, ScreenCodec, ScreenFps,
     ScreenOptimize, ScreenResolution, ScreenUploadLimit, Settings, SetupPreset, SoundSettings,
-    SoundTheme, TalkMode, Theme, ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
+    SoundTheme, TalkMode, Theme, ThemePreference, UpdateChannel, VoiceActivation, WhisperReceivers,
+    WhisperTarget,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

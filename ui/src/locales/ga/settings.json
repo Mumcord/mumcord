@@ -911,6 +911,16 @@
     "modeNotify": "Fógair amháin",
     "modeOff": "As",
     "autoUnavailable": "Ní féidir leis an gcóip seo í féin a nuashonrú, mar sin ní dhéanann Mumcord ach leaganacha nua a chur in iúl duit.",
+    "channel": "Cainéal nuashonruithe",
+    "channelHint": "Roghnaigh na heisiúintí a thairgeann Mumcord. Is éard atá in iarrthóirí eisiúna ná tógálacha luatha den chéad leagan eile.",
+    "channels": {
+      "stable": { "name": "Cobhsaí", "hint": "Eisiúintí deiridh amháin" },
+      "releaseCandidates": {
+        "name": "Iarrthóirí eisiúna",
+        "hint": "Tógálacha luatha den chéad leagan eile; d’fhéadfadh fabhtanna a bheith iontu"
+      }
+    },
+    "channelSwitchBack": "Má athraíonn tú ar ais go Cobhsaí, coinníonn tú do leagan reatha go dtí go mbeidh an chéad eisiúint dheiridh eile ar fáil.",
     "interval": "Seiceáil le haghaidh nuashonruithe",
     "intervalHint_one": "Ag tosú agus gach uair an chloig",
     "intervalHint_two": "Ag tosú agus gach {{count}} uair an chloig",
