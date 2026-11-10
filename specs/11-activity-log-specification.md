@@ -57,8 +57,9 @@ events may appear.
   **Activity** shows the feed; **Members** shows the existing member list. The strip behaves like a
   `tablist`: `tab` buttons with `aria-selected` and `aria-controls`, panels with `aria-labelledby`,
   Left/Right arrows switch and Tab moves into the panel.
-- **FR-11.2** The tab choice is remembered for the session but resets to **Members** for a new
-  connection. The Activity tab shows no unread indicator (decided: no unread dot).
+- **FR-11.2** **Activity** is the tab that is open by default (issue #709). The tab choice is
+  remembered for the session but resets to **Activity** for a new connection. The Activity tab
+  shows no unread indicator (decided: no unread dot).
 - **FR-11.3** On narrow windows the members column already becomes an overlay (issue #165); the tab
   strip appears there too and behaves the same.
 
