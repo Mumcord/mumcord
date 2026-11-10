@@ -115,6 +115,8 @@ const neutral = (t: string) =>
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
+  // The channel of an activity row ("· # Lobby") is a channel name, not UI text.
+  /^· # /.test(t) ||
   // "Beta" is the same word in English, German and Spanish; "Details" is the German one.
   /^(Beta|Details)$/.test(t) ||
   // "Apps" and "Plugin(s)" are also the German and Spanish words, "Bitrate", "Status" and "Updates" the German ones;
