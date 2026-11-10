@@ -390,6 +390,7 @@
     },
     "check": "Controlla una persona",
     "checkSearch": "Cerca persone online…",
+    "checkClear": "Smetti di controllare {{name}}",
     "refresh": "Aggiorna",
     "lockoutTitle": "Perderesti dei permessi qui",
     "lockoutBody": "Dopo il salvataggio non potrai più: {{rights}}.",

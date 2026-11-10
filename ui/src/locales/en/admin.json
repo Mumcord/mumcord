@@ -386,6 +386,7 @@
     },
     "check": "Check a person",
     "checkSearch": "Search people online…",
+    "checkClear": "Stop checking {{name}}",
     "refresh": "Refresh",
     "lockoutTitle": "You would lose rights here",
     "lockoutBody": "After saving, you can no longer: {{rights}}.",

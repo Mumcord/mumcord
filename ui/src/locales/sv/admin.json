@@ -386,6 +386,7 @@
     },
     "check": "Kontrollera en person",
     "checkSearch": "Sök personer online…",
+    "checkClear": "Sluta kontrollera {{name}}",
     "refresh": "Uppdatera",
     "lockoutTitle": "Du skulle förlora behörigheter här",
     "lockoutBody": "Efter att du sparat kan du inte längre: {{rights}}.",

@@ -394,6 +394,7 @@
     },
     "check": "Zkontrolovat osobu",
     "checkSearch": "Hledat osoby online…",
+    "checkClear": "Přestat kontrolovat: {{name}}",
     "refresh": "Obnovit",
     "lockoutTitle": "Ztratíš tu práva",
     "lockoutBody": "Po uložení už nebudeš moct: {{rights}}.",

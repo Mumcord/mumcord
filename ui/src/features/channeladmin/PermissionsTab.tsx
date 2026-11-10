@@ -85,7 +85,12 @@ export function PermissionsTab({
   const checkId = useId();
   const [view, setView] = useState<View>("who");
   const [rule, setRule] = useState<number | null>(null);
-  const [checked, setChecked] = useState<{ row: AclRowInput; name: string } | null>(null);
+  const [checkedPick, setChecked] = useState<{ row: AclRowInput; name: string } | null>(null);
+  // The checked person may disconnect; their session is gone, so there is nothing left to check.
+  const checked =
+    checkedPick?.row.kind === "session" && !server.users.has(checkedPick.row.session)
+      ? null
+      : checkedPick;
 
   if (load.status === "idle" || load.status === "loading" || draft === null) {
     if (load.status === "failed") {
@@ -162,7 +167,12 @@ export function PermissionsTab({
               options={online}
               placeholder={t("perm.checkSearch")}
               noMatch={t("perm.groups.noPeople")}
+              clearLabel={t("perm.checkClear", { name: checked?.name ?? "" })}
               onChange={(value) => {
+                if (value === "") {
+                  setChecked(null);
+                  return;
+                }
                 const session = Number(value);
                 const user = server.users.get(session);
                 setChecked(

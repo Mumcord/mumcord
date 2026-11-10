@@ -394,6 +394,7 @@
     },
     "check": "Patikrinti asmenį",
     "checkSearch": "Ieškoti prisijungusių žmonių…",
+    "checkClear": "Nebetikrinti: {{name}}",
     "refresh": "Atnaujinti",
     "lockoutTitle": "Čia prarastum leidimus",
     "lockoutBody": "Išsaugojęs nebegalėsi: {{rights}}.",

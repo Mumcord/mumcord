@@ -390,6 +390,7 @@
     },
     "check": "Verificar uma pessoa",
     "checkSearch": "Procurar pessoas ligadas…",
+    "checkClear": "Parar de verificar {{name}}",
     "refresh": "Atualizar",
     "lockoutTitle": "Perderias permissões aqui",
     "lockoutBody": "Depois de guardar, já não poderás: {{rights}}.",

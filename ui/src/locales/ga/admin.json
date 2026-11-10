@@ -398,6 +398,7 @@
     },
     "check": "Seiceáil duine",
     "checkSearch": "Cuardaigh daoine ar líne…",
+    "checkClear": "Stop ag seiceáil {{name}}",
     "refresh": "Athnuaigh",
     "lockoutTitle": "Chaillfeá cearta anseo",
     "lockoutBody": "Tar éis duit sábháil, ní bheidh tú in ann: {{rights}}.",

@@ -386,6 +386,7 @@
     },
     "check": "Person prüfen",
     "checkSearch": "Online-Personen suchen…",
+    "checkClear": "Prüfung von {{name}} beenden",
     "refresh": "Aktualisieren",
     "lockoutTitle": "Du würdest hier Berechtigungen verlieren",
     "lockoutBody": "Nach dem Speichern kannst du nicht mehr: {{rights}}.",

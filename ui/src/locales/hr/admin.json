@@ -390,6 +390,7 @@
     },
     "check": "Provjeri osobu",
     "checkSearch": "Traži osobe na mreži…",
+    "checkClear": "Prestani provjeravati: {{name}}",
     "refresh": "Osvježi",
     "lockoutTitle": "Izgubit ćeš prava ovdje",
     "lockoutBody": "Nakon spremanja gubiš: {{rights}}.",

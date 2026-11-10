@@ -6,6 +6,7 @@ import { axeViolations } from "../../test/axe";
 import { ChannelsPanel } from "../channels";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { ChannelTreeMenu } from "../channelheader";
+import { getServerState } from "../channels/serverStore";
 import { resetFollowStore } from "../follow";
 import { GroupsView } from "./GroupsView";
 import { deleteImpact, descendants, parentOptions } from "./channelAdminModel";
@@ -261,6 +262,37 @@ describe("Permissions tab (#252)", () => {
       "Worked out by Mumcord from the rules; the server has the final say.",
     );
     expect(await axeViolations(dialog)).toEqual([]);
+  });
+
+  it("stops checking a person with the clear button and when they leave (issue #710)", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    const field = within(dialog).getByRole("combobox", { name: "Check a person" });
+    expect(within(dialog).queryByRole("button", { name: /^Stop checking/ })).toBeNull();
+    const everyoneRow = within(dialog).getAllByRole("row").length;
+    fireEvent.click(field);
+    fireEvent.click(within(dialog).getAllByRole("option")[0] as HTMLElement);
+    const name = (field as HTMLInputElement).value;
+    expect(name).not.toBe("");
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow + 1);
+    fireEvent.click(within(dialog).getByRole("button", { name: `Stop checking ${name}` }));
+    expect(field).toHaveValue("");
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow);
+    expect(within(dialog).queryByRole("button", { name: /^Stop checking/ })).toBeNull();
+
+    fireEvent.click(field);
+    const other = within(dialog)
+      .getAllByRole("option")
+      .find((o) => o.textContent !== "Zoe") as HTMLElement;
+    const leaver = other.textContent;
+    fireEvent.click(other);
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow + 1);
+    const session = [...getServerState().users.values()].find((u) => u.name === leaver)?.session;
+    act(() => {
+      api.mock.removeUser(session as number);
+    });
+    expect(field).toHaveValue("");
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow);
   });
 
   it("marks the open view, shows counts and refreshes from the icon button", async () => {

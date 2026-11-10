@@ -390,6 +390,7 @@
     },
     "check": "Verifică o persoană",
     "checkSearch": "Caută persoane online…",
+    "checkClear": "Nu mai verifica: {{name}}",
     "refresh": "Reîmprospătează",
     "lockoutTitle": "Ai pierde drepturi aici",
     "lockoutBody": "După salvare nu vei mai putea: {{rights}}.",

@@ -386,6 +386,7 @@
     },
     "check": "Persoon controleren",
     "checkSearch": "Online personen zoeken…",
+    "checkClear": "Stop met controleren van {{name}}",
     "refresh": "Vernieuwen",
     "lockoutTitle": "Je zou hier rechten verliezen",
     "lockoutBody": "Na het opslaan kun je dit niet meer: {{rights}}.",

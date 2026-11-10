@@ -386,6 +386,7 @@
     },
     "check": "Kontrolli isikut",
     "checkSearch": "Otsi võrgus olevaid isikuid…",
+    "checkClear": "Lõpeta isiku {{name}} kontrollimine",
     "refresh": "Värskenda",
     "lockoutTitle": "Sa kaotaksid siin õigusi",
     "lockoutBody": "Pärast salvestamist ei saa sa enam: {{rights}}.",

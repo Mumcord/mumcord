@@ -386,6 +386,7 @@
     },
     "check": "Tarkista henkilö",
     "checkSearch": "Hae paikalla olevia henkilöitä…",
+    "checkClear": "Lopeta henkilön {{name}} tarkistaminen",
     "refresh": "Päivitä",
     "lockoutTitle": "Menettäisit oikeuksia täällä",
     "lockoutBody": "Tallennuksen jälkeen menetät nämä oikeudet: {{rights}}.",

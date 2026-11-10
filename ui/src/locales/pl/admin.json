@@ -394,6 +394,7 @@
     },
     "check": "Sprawdź osobę",
     "checkSearch": "Szukaj osób online…",
+    "checkClear": "Przestań sprawdzać: {{name}}",
     "refresh": "Odśwież",
     "lockoutTitle": "Stracisz tu uprawnienia",
     "lockoutBody": "Po zapisaniu stracisz: {{rights}}.",

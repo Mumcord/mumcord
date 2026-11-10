@@ -398,6 +398,7 @@
     },
     "check": "Iċċekkja persuna",
     "checkSearch": "Fittex nies online…",
+    "checkClear": "Waqqaf il-verifika ta’ {{name}}",
     "refresh": "Aġġorna",
     "lockoutTitle": "Titlef xi drittijiet hawn",
     "lockoutBody": "Wara li tissejvja, ma tkunx tista' aktar: {{rights}}.",

@@ -386,6 +386,7 @@
     },
     "check": "Tjek en person",
     "checkSearch": "Søg efter personer online…",
+    "checkClear": "Stop kontrollen af {{name}}",
     "refresh": "Opdatér",
     "lockoutTitle": "Du ville miste tilladelser her",
     "lockoutBody": "Når du har gemt, kan du ikke længere: {{rights}}.",

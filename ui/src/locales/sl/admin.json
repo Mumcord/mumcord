@@ -394,6 +394,7 @@
     },
     "check": "Preveri osebo",
     "checkSearch": "Iskanje povezanih oseb…",
+    "checkClear": "Prenehaj preverjati: {{name}}",
     "refresh": "Osveži",
     "lockoutTitle": "Tukaj bi izgubil pravice",
     "lockoutBody": "Po shranjevanju ne boš mogel več: {{rights}}.",

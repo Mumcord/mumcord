@@ -386,6 +386,7 @@
     },
     "check": "Személy ellenőrzése",
     "checkSearch": "Online személyek keresése…",
+    "checkClear": "{{name}} ellenőrzésének leállítása",
     "refresh": "Frissítés",
     "lockoutTitle": "Itt jogokat veszítenél",
     "lockoutBody": "Mentés után már nem tudod: {{rights}}.",
