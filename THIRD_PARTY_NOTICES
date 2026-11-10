@@ -23075,7 +23075,7 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
 --------------------------------------------------------------------------------
-@tanstack/react-virtual@3.14.24
+@tanstack/react-virtual@3.14.26
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23105,7 +23105,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-@tanstack/virtual-core@3.19.9
+@tanstack/virtual-core@3.19.11
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23555,7 +23555,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-i18next@26.5.12
+i18next@26.7.2
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23585,7 +23585,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-marked@18.1.2
+marked@18.1.3
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23667,7 +23667,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-react-i18next@17.1.9
+react-i18next@17.1.13
 --------------------------------------------------------------------------------
 
 License: MIT
