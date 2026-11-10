@@ -1,0 +1,518 @@
+<!doctype html>
+<!--
+  Mockups for spec 14 (Mumball, community pinball plugin).
+  Open with ?screen=<id>&theme=<dark|light>. Screens: lobby, play, paused, out, results, popout, chat.
+  Mumcord's own chrome (window, header, chat) is drawn only for context; the plugin owns the game frame.
+  The table art is an original "On Air" radio-station design (spec 14, section 5.7).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mumball mockups</title>
+<style>
+@font-face { font-family: "Instrument Sans Variable"; font-weight: 400 700;
+  src: url("../../../node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2") format("woff2"); }
+@font-face { font-family: "Bricolage Grotesque Variable"; font-weight: 200 800;
+  src: url("../../../node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2") format("woff2"); }
+
+/* Mumcord tokens (ui/src/theme/tokens.css), as a 1.2 plugin page receives them with the --mc- prefix. */
+:root, :root[data-theme="dark"] {
+  --mc-font-family: "Instrument Sans Variable", "Segoe UI", system-ui, sans-serif;
+  --mc-font-family-display: "Bricolage Grotesque Variable", var(--mc-font-family);
+  --mc-font-family-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mc-color-servers: #0e0a26; --mc-color-sidebar: #150f38; --mc-color-surface: #1a1342;
+  --mc-color-surface-raised: #231b55; --mc-color-hover: #2c2366; --mc-color-selected: #2a1f5e;
+  --mc-color-text: #f6f0e8; --mc-color-text-secondary: #cbc3e3; --mc-color-text-muted: #aaa2cc;
+  --mc-color-accent: #a78bff; --mc-color-accent-text: #ffb08a; --mc-color-success: #3ee39e;
+  --mc-color-warning: #fbbf24; --mc-color-danger: #ff8f8f; --mc-color-primary: #ffd9c2;
+  --mc-color-on-primary: #0e0a26; --mc-color-border: #31285f; --mc-color-border-strong: #8a80b8;
+  --mc-color-focus: #ffb08a; --mc-color-backdrop: rgb(7 5 20 / 72%);
+  --mc-shadow-raised: 0 1rem 2.5rem -0.75rem rgb(0 0 0 / 60%);
+  --glow-talking: 0 0 0.625rem rgb(62 227 158 / 45%);
+  --gradient-accent: linear-gradient(135deg, #ffb08a, #ff6fa8 50%, #9b7bff);
+  --stage-bg: #0b0824;
+  /* Mumball's own "late-night studio" palette for its UI accents */
+  --mb-amber: #ffb547; --mb-onair: #ff4d3d; --mb-onair-glow: rgb(255 77 61 / 55%);
+}
+:root[data-theme="light"] {
+  --mc-color-servers: #dfd8f1; --mc-color-sidebar: #f5f2fb; --mc-color-surface: #ffffff;
+  --mc-color-surface-raised: #eee9f8; --mc-color-hover: #e2daf3; --mc-color-selected: #e6dcfa;
+  --mc-color-text: #17113a; --mc-color-text-secondary: #3d3566; --mc-color-text-muted: #544c7c;
+  --mc-color-accent: #6a40e0; --mc-color-accent-text: #5b34d6; --mc-color-success: #136634;
+  --mc-color-warning: #7f4d00; --mc-color-danger: #b01c1c; --mc-color-primary: #17113a;
+  --mc-color-on-primary: #ffffff; --mc-color-border: #d6cfe8; --mc-color-border-strong: #716894;
+  --mc-color-focus: #c21f62; --mc-color-backdrop: rgb(23 17 58 / 45%);
+  --mc-shadow-raised: 0 1rem 2.5rem -0.75rem rgb(23 17 58 / 25%);
+  --glow-talking: 0 0 0.5rem rgb(21 128 61 / 35%);
+  --gradient-accent: linear-gradient(135deg, #c2410c, #c21f62 50%, #6a40e0);
+  --stage-bg: #f1edf9;
+  /* "daytime studio" */
+  --mb-amber: #b86e00; --mb-onair: #c8382c; --mb-onair-glow: rgb(200 56 44 / 30%);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; }
+body { font-family: var(--mc-font-family); font-size: 14px; line-height: 1.4; color: var(--mc-color-text);
+  background: var(--mc-color-servers); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- Mumcord window (context only) ---------- */
+.window { display: grid; grid-template-columns: 72px 248px 1fr; width: 100vw; height: 100vh; }
+.servers { background: var(--mc-color-servers); display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 14px; }
+.srv { width: 44px; height: 44px; border-radius: 14px; background: var(--mc-color-surface-raised); display: grid; place-items: center;
+  font-family: var(--mc-font-family-display); font-weight: 700; color: var(--mc-color-text-secondary); }
+.srv.active { background: var(--gradient-accent); color: #fff; }
+.sidebar { background: var(--mc-color-sidebar); padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid var(--mc-color-border); }
+.sidebar h1 { font-family: var(--mc-font-family-display); font-size: 16px; padding: 2px 8px 12px; }
+.chan { padding: 5px 8px; border-radius: 8px; color: var(--mc-color-text-muted); font-weight: 500; }
+.chan.active { background: var(--mc-color-selected); color: var(--mc-color-text); }
+.user { display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 22px; color: var(--mc-color-text-secondary); }
+.user .act { margin-left: auto; font-size: 11px; color: var(--mc-color-text-muted); }
+.av { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; flex: none; }
+.av.talk { box-shadow: 0 0 0 2px var(--mc-color-success), var(--glow-talking); }
+.a1 { background: #db2777; } .a2 { background: #4f46e5; } .a3 { background: #b45309; } .a4 { background: #7c3aed; }
+.main { display: flex; flex-direction: column; min-width: 0; background: var(--mc-color-surface); }
+.topbar { height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 18px; border-bottom: 1px solid var(--mc-color-border);
+  font-family: var(--mc-font-family-display); font-weight: 700; font-size: 16px; }
+.topbar small { font-family: var(--mc-font-family); font-weight: 400; font-size: 13px; color: var(--mc-color-text-muted); }
+
+/* Mumcord stage with its activity header (FR-9.48) */
+.stage { flex: none; height: 540px; display: flex; flex-direction: column; background: var(--stage-bg); border-bottom: 1px solid var(--mc-color-border); }
+.stagehead { height: 44px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--mc-color-border); background: var(--mc-color-surface); }
+.picon { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: #1b1340; }
+.stagehead b { font-family: var(--mc-font-family-display); }
+.chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--mc-color-border-strong); color: var(--mc-color-text-secondary); }
+.chip.ok::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--mc-color-success); margin-right: 5px; vertical-align: 1px; }
+.muted { color: var(--mc-color-text-muted); }
+.spacer { flex: 1; }
+.ghost { background: none; border: 1px solid transparent; padding: 4px 10px; border-radius: 999px; color: var(--mc-color-text-secondary); font-size: 13px; }
+.ghost.danger { color: var(--mc-color-danger); border-color: color-mix(in srgb, var(--mc-color-danger) 45%, transparent); }
+.frame { flex: 1; min-height: 0; position: relative; }
+
+.chat { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 18px 14px; gap: 10px; min-height: 0; }
+.msg { display: flex; gap: 10px; }
+.msg .av { width: 32px; height: 32px; font-size: 13px; }
+.msg b { font-size: 14px; }
+.msg time { font-size: 11px; color: var(--mc-color-text-muted); margin-left: 6px; }
+.msg p { color: var(--mc-color-text-secondary); }
+.sys { font-size: 13px; color: var(--mc-color-text-muted); padding-left: 42px; }
+.sys a { color: var(--mc-color-accent-text); font-weight: 600; text-decoration: none; }
+.composer { height: 42px; border-radius: 12px; background: var(--mc-color-surface-raised); border: 1px solid var(--mc-color-border); display: flex; align-items: center; padding: 0 14px; color: var(--mc-color-text-muted); }
+
+/* ---------- Mumcord UI kit (spec 13) as used by the plugin page ---------- */
+.mc-button { border-radius: 999px; padding: 8px 18px; font-weight: 600; border: 1px solid var(--mc-color-border-strong); background: transparent; color: var(--mc-color-text); }
+.mc-button--primary { background: var(--mc-color-primary); color: var(--mc-color-on-primary); border-color: transparent; box-shadow: 0 0.5rem 1.5rem -0.25rem color-mix(in srgb, var(--mc-color-accent) 50%, transparent); }
+.mc-button--lg { padding: 11px 28px; font-size: 15px; }
+.mc-surface-raised { background: var(--mc-color-surface-raised); border: 1px solid var(--mc-color-border); border-radius: 12px; }
+.mc-section-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mc-color-text-muted); }
+.focus { outline: 3px solid var(--mc-color-focus); outline-offset: 2px; }
+.kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border-radius: 6px; border: 1px solid var(--mc-color-border-strong); border-bottom-width: 2px;
+  font-size: 12px; font-weight: 600; text-align: center; background: var(--mc-color-surface); color: var(--mc-color-text); }
+
+/* volume control */
+.vol { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mc-color-text-secondary); }
+.vol .track { width: 90px; height: 4px; border-radius: 4px; background: var(--mc-color-border); position: relative; }
+.vol .track i { position: absolute; inset: 0 60% 0 0; background: var(--mc-color-accent); border-radius: 4px; }
+.vol .track i::after { content: ""; position: absolute; right: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--mc-color-text); }
+
+/* ---------- Mumball page ---------- */
+.mb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 22px; padding: 16px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand h2 { font-family: var(--mc-font-family-display); font-size: 30px; letter-spacing: -0.02em; line-height: 1; }
+.onair { font-family: var(--mc-font-family-display); font-weight: 800; font-size: 12px; letter-spacing: .14em; padding: 4px 9px; border-radius: 6px;
+  color: #fff; background: var(--mb-onair); box-shadow: 0 0 14px var(--mb-onair-glow); }
+.onair.off { background: transparent; color: var(--mc-color-text-muted); border: 1px solid var(--mc-color-border-strong); box-shadow: none; }
+
+.lobby { width: 760px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lobby .top { grid-column: 1 / -1; display: flex; align-items: center; }
+.card { padding: 14px 16px; }
+.card h3 { margin-bottom: 10px; }
+.plist { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.plist li { display: flex; align-items: center; gap: 10px; }
+.tag { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: var(--mc-color-selected); color: var(--mc-color-text-secondary); }
+.board { width: 100%; border-collapse: collapse; }
+.board td { padding: 4px 0; }
+.board td:first-child { width: 26px; color: var(--mc-color-text-muted); }
+.board td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.best { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--mc-color-border); display: flex; justify-content: space-between; font-size: 13px; }
+.keys { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; font-size: 13px; color: var(--mc-color-text-secondary); }
+.keys .hint { flex-basis: 100%; color: var(--mc-color-text-muted); font-size: 12px; }
+.actions { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 14px; }
+
+/* play: table + scoreboard (layout A) */
+.table { height: 100%; aspect-ratio: 360 / 640; border-radius: 14px; overflow: hidden; flex: none; position: relative; box-shadow: var(--mc-shadow-raised); }
+.table svg { display: block; width: 100%; height: 100%; }
+.sb { width: 16rem; flex: none; display: flex; flex-direction: column; gap: 10px; align-self: stretch; justify-content: center; }
+.sb .card { padding: 12px 14px; }
+.rows { display: flex; flex-direction: column; gap: 2px; }
+.row { display: grid; grid-template-columns: 18px 1fr auto; grid-template-rows: auto auto; column-gap: 8px; align-items: center; padding: 6px 8px; border-radius: 8px; }
+.row .pl { grid-row: 1 / 3; color: var(--mc-color-text-muted); font-weight: 600; }
+.row .nm { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.row .sc { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.row .st { grid-column: 2 / 4; font-size: 12px; color: var(--mc-color-text-muted); }
+.row.me { background: var(--mc-color-selected); box-shadow: inset 3px 0 0 var(--mc-color-accent); }
+.spk { width: 14px; height: 14px; color: var(--mc-color-success); filter: drop-shadow(0 0 4px color-mix(in srgb, var(--mc-color-success) 60%, transparent)); }
+.mine { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.mine .line { display: flex; justify-content: space-between; align-items: center; }
+.mult { display: flex; gap: 4px; }
+.mult span { font-size: 11px; font-weight: 700; padding: 1px 5px; border-radius: 5px; border: 1px solid var(--mc-color-border); color: var(--mc-color-text-muted); }
+.mult span.on { background: var(--mb-amber); border-color: transparent; color: #1a1000; }
+:root[data-theme="light"] .mult span.on { color: #fff; }
+.balls { display: flex; gap: 5px; }
+.balls i { width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #a8adb8 55%, #5d6370); }
+.balls i.used { opacity: .25; }
+
+/* overlays on the table */
+.over { position: absolute; inset: 0; display: grid; place-items: center; background: color-mix(in srgb, #050314 55%, transparent); }
+.over .box { background: var(--mc-color-surface-raised); border: 1px solid var(--mc-color-border); border-radius: 14px; padding: 16px 18px; text-align: center; width: 82%; box-shadow: var(--mc-shadow-raised); }
+.over .box b { display: block; font-family: var(--mc-font-family-display); font-size: 20px; margin-bottom: 4px; }
+
+/* out + results */
+.big { width: 720px; display: flex; flex-direction: column; gap: 14px; }
+.final { text-align: center; }
+.final .score { font-family: var(--mc-font-family-display); font-size: 56px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.bigrows .row { grid-template-columns: 28px 1fr auto; padding: 10px 14px; font-size: 16px; }
+.bigrows .row .sc { font-size: 18px; }
+.bigrows .row .st { font-size: 13px; }
+.countdown { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 10px 14px; border-radius: 12px;
+  background: color-mix(in srgb, var(--mc-color-warning) 14%, transparent); border: 1px solid color-mix(in srgb, var(--mc-color-warning) 45%, transparent); color: var(--mc-color-text); }
+.ring { width: 26px; height: 26px; border-radius: 50%; background: conic-gradient(var(--mc-color-warning) 70%, var(--mc-color-border) 0); display: grid; place-items: center; }
+.ring::after { content: ""; width: 18px; height: 18px; border-radius: 50%; background: var(--stage-bg); }
+.pb { font-size: 12px; font-weight: 700; color: var(--mb-amber); display: inline-flex; align-items: center; gap: 4px; }
+.lft { font-size: 12px; font-weight: 600; color: var(--mc-color-text-muted); border: 1px dashed var(--mc-color-border-strong); padding: 0 6px; border-radius: 999px; }
+.resbar { display: flex; gap: 10px; align-items: center; }
+
+/* pop-out window, layout B */
+.popwin { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: var(--stage-bg); }
+.titlebar { height: 30px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--mc-color-servers); font-size: 12px; color: var(--mc-color-text-muted); }
+.titlebar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.strip { flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 12px; font-size: 13px; background: var(--mc-color-surface-raised); border-bottom: 1px solid var(--mc-color-border); white-space: nowrap; }
+.strip .me { font-weight: 700; color: var(--mc-color-accent-text); }
+.popframe { flex: 1; min-height: 0; display: flex; justify-content: center; padding: 10px; }
+
+/* chat results card (FR-14.30) */
+.rcard { width: 420px; margin-top: 6px; border-radius: 12px; border: 1px solid var(--mc-color-border); background: var(--mc-color-surface-raised); overflow: hidden; }
+.rcard header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--mc-color-border);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--mb-onair) 18%, transparent), transparent 70%); }
+.rcard header b { font-family: var(--mc-font-family-display); }
+.rcard ol { list-style: none; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
+.rcard li { display: flex; gap: 8px; font-size: 14px; color: var(--mc-color-text-secondary); }
+.rcard li .p { width: 18px; color: var(--mc-color-text-muted); }
+.rcard li .s { margin-left: auto; font-weight: 700; color: var(--mc-color-text); font-variant-numeric: tabular-nums; }
+.rcard footer { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 12px; font-size: 12px; color: var(--mc-color-text-muted); }
+.rcard .mc-button { padding: 6px 14px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const theme = q.get("theme") === "light" ? "light" : "dark";
+const screen = q.get("screen") || "lobby";
+document.documentElement.dataset.theme = theme;
+
+/* ---------- table art: original "On Air" radio-studio table, viewBox 360 x 640 ---------- */
+const PAL = {
+  dark: { cab: "#3a2316", cab2: "#4b2e1c", field: "#0f1738", field2: "#1a2452", glow: "rgba(255,170,60,.20)", glow2: "rgba(63,184,168,.16)",
+    rail: "#c9ced8", railDark: "#6b7280", lampOn: "#ffb547", lampOff: "#3d3424", red: "#ff4d3d", redOff: "#4a1f22", ink: "#f3e6cf", inkDim: "#8d86a8",
+    knob: "#262b36", knobRing: "#dfe3ea", cap: "#ffb547", teal: "#3fb8a8", insOff: "#28305a", rubber: "#e8483c", flip: "#f3e6cf", led: "#0a0805", ledOn: "#ffb547", ledOff: "#2a1d08", plank: "#2c1a10" },
+  light: { cab: "#b9824e", cab2: "#a7703f", field: "#f4ead4", field2: "#eadcbc", glow: "rgba(42,157,143,.18)", glow2: "rgba(224,154,31,.18)",
+    rail: "#7b828d", railDark: "#5b616b", lampOn: "#e09a1f", lampOff: "#dccfae", red: "#c8382c", redOff: "#e7c3b5", ink: "#2b2018", inkDim: "#8a7a5f",
+    knob: "#e9e3d5", knobRing: "#4f5661", cap: "#2a9d8f", teal: "#2a9d8f", insOff: "#e2d4b2", rubber: "#c8382c", flip: "#fffaf0", led: "#17120b", ledOn: "#ffb547", ledOff: "#3a2a10", plank: "#8f5b30" },
+};
+
+function tableSVG(opts = {}) {
+  const p = PAL[theme];
+  const lanes = opts.lanes ?? [1, 1, 0, 1, 0];
+  const ticker = opts.ticker ?? "TUNE IN · HIT THE KNOBS 6×";
+  const knob = (x, y, r) => `
+    <g transform="translate(${x} ${y})">
+      <circle r="${r + 7}" fill="${p.glow}"/>
+      <circle r="${r}" fill="${p.knob}" stroke="${p.knobRing}" stroke-width="3"/>
+      <circle r="${r - 6}" fill="none" stroke="${p.knobRing}" stroke-width="3" stroke-dasharray="2 3.2" opacity=".75"/>
+      <circle r="${r - 11}" fill="${p.cap}"/>
+      <line x1="0" y1="${-(r - 13)}" x2="0" y2="${-(r - 4)}" stroke="${p.knob}" stroke-width="3" stroke-linecap="round"/>
+    </g>`;
+  const laneLetters = ["O", "N", "A", "I", "R"].map((L, i) => {
+    const x = 108 + i * 34, on = lanes[i];
+    return `<g transform="translate(${x} 104)">
+      <circle r="11" fill="${on ? p.lampOn : p.lampOff}" ${on ? `filter="url(#lampglow)"` : ""}/>
+      <text y="4.5" text-anchor="middle" font-family="Bricolage Grotesque Variable" font-weight="800" font-size="13" fill="${on ? "#2a1700" : p.inkDim}">${L}</text>
+    </g>`;
+  }).join("");
+  const posts = [91, 125, 159, 193, 227, 261].map(x => `<rect x="${x - 2}" y="84" width="4" height="34" rx="2" fill="${p.rail}"/>`).join("");
+  const faders = [0, 1, 2, 3].map(i => {
+    const down = (opts.faders ?? [0, 1, 0, 0])[i];
+    return `<g transform="translate(${268 + i * 3} ${238 + i * 22}) rotate(-18)">
+      <rect x="-14" y="-5" width="28" height="10" rx="2" fill="${down ? p.insOff : p.teal}" stroke="${p.railDark}" stroke-width="1" opacity="${down ? .55 : 1}"/>
+      <rect x="-3" y="-7" width="6" height="14" rx="1.5" fill="${p.rail}" opacity="${down ? .4 : 1}"/>
+    </g>`;
+  }).join("");
+  const missions = [["TUNE IN", 1], ["REQUEST", 0], ["GO LIVE", 0]].map(([t, on], i) => {
+    const x = 132 + i * 48;
+    return `<g transform="translate(${x} 392)">
+      <path d="M-18 8 L0 -12 L18 8 Z" fill="${on ? p.lampOn : p.insOff}" ${on ? `filter="url(#lampglow)"` : ""}/>
+      <text y="22" text-anchor="middle" font-family="Instrument Sans Variable" font-weight="700" font-size="7.5" letter-spacing=".06em" fill="${on ? p.lampOn : p.inkDim}">${t}</text>
+    </g>`;
+  }).join("");
+  const mult = ["2×", "3×", "4×", "5×"].map((t, i) => {
+    const on = i < (opts.mult ?? 2) - 1;
+    return `<g transform="translate(${135 + i * 30} 452)"><rect x="-11" y="-8" width="22" height="16" rx="4" fill="${on ? p.lampOn : p.insOff}"/>
+      <text y="3.8" text-anchor="middle" font-family="Instrument Sans Variable" font-weight="800" font-size="9" fill="${on ? "#2a1700" : p.inkDim}">${t}</text></g>`;
+  }).join("");
+  const grain = Array.from({ length: 22 }, (_, i) =>
+    `<path d="M0 ${i * 30 + 6} C 90 ${i * 30 - 4}, 270 ${i * 30 + 16}, 360 ${i * 30 + 4}" stroke="${p.cab2}" stroke-width="1.4" fill="none" opacity=".7"/>`).join("");
+  const ball = opts.ball ?? [214, 300];
+  return `
+<svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mumball table">
+  <defs>
+    <radialGradient id="ballg" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#c3c8d2"/><stop offset="1" stop-color="#4b5160"/></radialGradient>
+    <radialGradient id="fieldg" cx=".5" cy=".42" r=".75"><stop offset="0" stop-color="${p.field2}"/><stop offset="1" stop-color="${p.field}"/></radialGradient>
+    <pattern id="dots" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r=".9" fill="${p.ledOff}"/></pattern>
+    <filter id="lampglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <clipPath id="fieldclip"><path d="M24 640 L24 150 Q24 58 116 58 L244 58 Q336 58 336 150 L336 640 Z"/></clipPath>
+  </defs>
+
+  <!-- wood cabinet -->
+  <rect width="360" height="640" fill="${p.cab}"/>${grain}
+
+  <!-- LED ticker (FR-14.15) -->
+  <rect x="14" y="10" width="332" height="36" rx="6" fill="${p.led}" stroke="${p.plank}" stroke-width="2"/>
+  <rect x="20" y="15" width="320" height="26" fill="url(#dots)"/>
+  <text x="180" y="33" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="800" font-size="12.5" letter-spacing=".08em" fill="${p.ledOn}" filter="url(#lampglow)">${ticker}</text>
+
+  <!-- playfield -->
+  <g clip-path="url(#fieldclip)">
+    <rect x="0" y="0" width="360" height="640" fill="url(#fieldg)"/>
+    <circle cx="180" cy="210" r="120" fill="${p.glow}"/>
+    <circle cx="80" cy="470" r="90" fill="${p.glow2}"/>
+    <circle cx="290" cy="470" r="90" fill="${p.glow2}"/>
+    <!-- broadcast waves behind the lamp -->
+    <g fill="none" stroke="${p.teal}" stroke-width="2" opacity=".35">
+      <path d="M140 340 a50 50 0 0 1 80 0"/><path d="M124 330 a70 70 0 0 1 112 0"/><path d="M108 320 a90 90 0 0 1 144 0"/>
+    </g>
+  </g>
+  <path d="M24 640 L24 150 Q24 58 116 58 L244 58 Q336 58 336 150 L336 640" fill="none" stroke="${p.rail}" stroke-width="4"/>
+
+  <!-- orbit: left lane up and over the top -->
+  <path d="M60 330 L60 160 Q60 92 128 90" fill="none" stroke="${p.rail}" stroke-width="3"/>
+  <path d="M40 360 L40 152 Q40 72 120 70 L240 70 Q312 72 316 150" fill="none" stroke="${p.rail}" stroke-width="3" opacity=".8"/>
+  <text transform="translate(52 250) rotate(-90)" text-anchor="middle" font-family="Instrument Sans Variable" font-weight="800" font-size="8" letter-spacing=".2em" fill="${p.inkDim}">FREQUENCY ORBIT</text>
+
+  <!-- ramp ("Request line") -->
+  <path d="M76 372 C 84 300, 100 220, 150 168" fill="none" stroke="${p.teal}" stroke-width="22" stroke-linecap="round" opacity=".28"/>
+  <path d="M76 372 C 84 300, 100 220, 150 168" fill="none" stroke="${p.rail}" stroke-width="2" stroke-dasharray="1 0"/>
+  <path d="M98 378 C 106 306, 120 232, 164 182" fill="none" stroke="${p.rail}" stroke-width="2"/>
+  ${[0, 1, 2].map(i => `<path transform="translate(${92 + i * 12} ${330 - i * 52}) rotate(${-10 - i * 14})" d="M-6 4 L0 -4 L6 4" fill="none" stroke="${p.lampOn}" stroke-width="2.4" stroke-linecap="round"/>`).join("")}
+  <text transform="translate(108 288) rotate(-68)" text-anchor="middle" font-family="Instrument Sans Variable" font-weight="800" font-size="8" letter-spacing=".16em" fill="${p.ink}">REQUEST LINE</text>
+
+  <!-- O-N-A-I-R rollover lanes -->
+  ${posts}${laneLetters}
+
+  <!-- bumpers styled as studio knobs -->
+  ${knob(150, 182, 22)}${knob(222, 172, 22)}${knob(188, 238, 22)}
+  ${opts.popup ? `<text x="236" y="140" text-anchor="middle" font-family="Bricolage Grotesque Variable" font-weight="800" font-size="15" fill="${p.lampOn}" filter="url(#lampglow)">+25,000</text>` : ""}
+
+  <!-- drop targets styled as faders -->
+  ${faders}
+  <text transform="translate(306 268) rotate(72)" text-anchor="middle" font-family="Instrument Sans Variable" font-weight="800" font-size="7.5" letter-spacing=".16em" fill="${p.inkDim}">MIXER</text>
+
+  <!-- ON AIR lamp -->
+  <g transform="translate(180 330)">
+    <rect x="-36" y="-14" width="72" height="28" rx="6" fill="${opts.onair === false ? p.redOff : p.red}" ${opts.onair === false ? "" : `filter="url(#lampglow)"`}/>
+    <text y="5.5" text-anchor="middle" font-family="Bricolage Grotesque Variable" font-weight="800" font-size="15" letter-spacing=".12em" fill="#fff">ON AIR</text>
+  </g>
+
+  <!-- mission inserts and multiplier lamps -->
+  ${missions}${mult}
+
+  <!-- slingshots -->
+  <path d="M72 470 L72 530 L108 552 Z" fill="${p.insOff}" stroke="${p.rubber}" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M276 470 L276 530 L240 552 Z" fill="${p.insOff}" stroke="${p.rubber}" stroke-width="4" stroke-linejoin="round"/>
+  <!-- inlane / outlane guides -->
+  <path d="M46 440 L46 548 L118 590" fill="none" stroke="${p.rail}" stroke-width="3"/>
+  <path d="M302 440 L302 548 L230 590" fill="none" stroke="${p.rail}" stroke-width="3"/>
+  <path d="M28 420 L28 600" stroke="${p.rail}" stroke-width="2" opacity=".6"/>
+  <!-- ball save lamp -->
+  <g transform="translate(174 628)"><rect x="-20" y="-7" width="40" height="14" rx="7" fill="${opts.save ? p.teal : p.insOff}"/>
+    <text y="3.4" text-anchor="middle" font-family="Instrument Sans Variable" font-weight="800" font-size="7.5" letter-spacing=".1em" fill="${opts.save ? "#fff" : p.inkDim}">SAVE</text></g>
+
+  <!-- flippers (right one raised) -->
+  <g transform="translate(120 592) rotate(${opts.leftUp ? -26 : 24})"><path d="M-8 -9 L54 -3 Q60 0 54 3 L-8 9 A9 9 0 0 1 -8 -9 Z" fill="${p.flip}" stroke="${p.rubber}" stroke-width="3"/><circle r="3" fill="${p.railDark}"/></g>
+  <g transform="translate(228 592) scale(-1 1) rotate(-26)"><path d="M-8 -9 L54 -3 Q60 0 54 3 L-8 9 A9 9 0 0 1 -8 -9 Z" fill="${p.flip}" stroke="${p.rubber}" stroke-width="3"/><circle r="3" fill="${p.railDark}"/></g>
+
+  <!-- plunger lane -->
+  <path d="M316 640 L316 160" stroke="${p.rail}" stroke-width="3"/>
+  <rect x="320" y="572" width="12" height="54" rx="3" fill="${p.railDark}"/>
+  <path d="M326 572 l-5 6 l10 6 l-10 6 l10 6 l-10 6 l10 6 l-5 4" fill="none" stroke="${p.rail}" stroke-width="1.6"/>
+  <rect x="319" y="566" width="14" height="8" rx="2" fill="${p.rubber}"/>
+  <!-- skill shot zone -->
+  <rect x="319" y="190" width="14" height="22" rx="3" fill="none" stroke="${p.lampOn}" stroke-width="1.6" stroke-dasharray="3 2"/>
+
+  <!-- ball -->
+  ${opts.noBall ? "" : `<circle cx="${ball[0]}" cy="${ball[1]}" r="8" fill="url(#ballg)"/><ellipse cx="${ball[0] + 3}" cy="${ball[1] + 9}" rx="6" ry="2" fill="#000" opacity=".2"/>`}
+</svg>`;
+}
+
+/* ---------- shared pieces ---------- */
+const spk = `<svg class="spk" viewBox="0 0 16 16" aria-label="talking"><path fill="currentColor" d="M2 6h3l4-3v10L5 10H2z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.6 3.6a6 6 0 0 1 0 8.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+const pIcon = `<span class="picon"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="7" r="4" fill="#ffb547"/><path d="M3 13 L7 11.5 M13 13 L9 11.5" stroke="#ff4d3d" stroke-width="2" stroke-linecap="round"/></svg></span>`;
+
+function windowShell(stageInner, { players = 3, chat = defaultChat(), stage = true, starter = "Anna" } = {}) {
+  return `
+<div class="window">
+  <nav class="servers"><div class="srv active">LT</div><div class="srv">FR</div><div class="srv">+</div></nav>
+  <aside class="sidebar">
+    <h1>Local test server</h1>
+    <div class="chan">Lobby</div>
+    <div class="chan active">Lounge</div>
+    <div class="user"><span class="av a1 talk">A</span>Anna${stage ? `<span class="act">Mumball</span>` : ""}</div>
+    <div class="user"><span class="av a2">Y</span>You${stage ? `<span class="act">Mumball</span>` : ""}</div>
+    <div class="user"><span class="av a3">B</span>Ben${stage ? `<span class="act">Mumball</span>` : ""}</div>
+    <div class="user"><span class="av a4">C</span>Cleo</div>
+    <div class="chan">Games</div>
+    <div class="chan">AFK</div>
+  </aside>
+  <main class="main">
+    <div class="topbar">Lounge <small>4 people</small></div>
+    ${stage ? `<section class="stage">
+      <div class="stagehead">${pIcon}<b>Mumball</b><span class="chip">Unofficial</span>
+        <span class="muted">Started by ${starter} · ${players} in the game</span>
+        <span class="chip ok">Mumble connection</span><span class="spacer"></span>
+        <button class="ghost">Pop out</button><button class="ghost">Full screen</button><button class="ghost danger">Leave</button></div>
+      <div class="frame">${stageInner}</div>
+    </section>` : ""}
+    <section class="chat">${chat}<div class="composer">Message #Lounge</div></section>
+  </main>
+</div>`;
+}
+function defaultChat() {
+  return `<div class="sys">Anna started Mumball · <a href="#">Join</a></div>
+  <div class="msg"><span class="av a3">B</span><div><b>Ben</b><time>21:04</time><p>one more, I nearly had the extra ball</p></div></div>`;
+}
+
+const volume = `<div class="vol"><span>Volume</span><span class="track"><i></i></span><span class="num">40%</span><button class="ghost">Mute</button></div>`;
+const scoreRows = (rows) => `<div class="rows">${rows.map(r => `
+  <div class="row${r.me ? " me" : ""}"><span class="pl">${r.p}</span>
+    <span class="nm">${r.n}${r.talk ? spk : ""}</span><span class="sc">${r.s}</span>
+    <span class="st">${r.st}</span></div>`).join("")}</div>`;
+
+const PLAYING = [
+  { p: 1, n: "Anna", s: "1,204,000", st: "Ball 3", talk: true },
+  { p: 2, n: "You", s: "880,500", st: "Ball 2", me: true },
+  { p: 3, n: "Ben", s: "410,000", st: "Out" },
+];
+
+function scoreboard() {
+  return `<div class="sb">
+    <div class="mc-surface-raised card">
+      <div class="mc-section-label" style="margin-bottom:8px">Match 2 · 3 balls</div>
+      ${scoreRows(PLAYING)}
+    </div>
+    <div class="mc-surface-raised card mine">
+      <div class="line"><span>Ball 2 of 3</span><span class="balls"><i class="used"></i><i></i><i></i></span></div>
+      <div class="line"><span>Bonus</span><span class="mult"><span class="on">2×</span><span class="on">3×</span><span>4×</span><span>5×</span></span></div>
+      <div class="line"><span class="muted">Your best</span><b class="num">1,950,000</b></div>
+      ${volume}
+    </div>
+  </div>`;
+}
+
+/* ---------- screens ---------- */
+const SCREENS = {
+  lobby() {
+    return windowShell(`<div class="mb">
+      <div class="lobby">
+        <div class="top"><div class="brand"><h2>Mumball</h2><span class="onair">ON AIR</span></div><span class="spacer"></span>${volume}</div>
+        <div class="mc-surface-raised card">
+          <h3 class="mc-section-label">Players (3 of 8)</h3>
+          <ul class="plist">
+            <li><span class="av a1 talk">A</span>Anna <span class="tag">Starter</span></li>
+            <li><span class="av a2">Y</span>You</li>
+            <li><span class="av a3">B</span>Ben</li>
+          </ul>
+        </div>
+        <div class="mc-surface-raised card">
+          <h3 class="mc-section-label">Tonight in Lounge</h3>
+          <table class="board"><tr><td>1.</td><td>Ben</td><td>2,310,000</td></tr><tr><td>2.</td><td>Anna</td><td>1,980,000</td></tr><tr><td>3.</td><td>You</td><td>1,205,500</td></tr></table>
+          <div class="best"><span class="muted">Your best</span><b class="num">1,950,000</b></div>
+        </div>
+        <div class="mc-surface-raised card keys">
+          <span><span class="kbd">Left Shift</span> or <span class="kbd">←</span> left flipper</span>
+          <span><span class="kbd">Right Shift</span> or <span class="kbd">→</span> right flipper</span>
+          <span>hold <span class="kbd">Space</span> or <span class="kbd">↓</span> plunger</span>
+          <span><span class="kbd">↑</span> nudge</span><span><span class="kbd">P</span> pause</span>
+          <span class="hint">If one of these keys is your push-to-talk key, use the other one.</span>
+        </div>
+        <div class="actions"><button class="mc-button mc-button--primary mc-button--lg focus">Start match</button></div>
+      </div></div>`);
+  },
+  play() {
+    return windowShell(`<div class="mb"><div class="table">${tableSVG({ popup: true, save: false })}</div>${scoreboard()}</div>`);
+  },
+  paused() {
+    return windowShell(`<div class="mb"><div class="table">${tableSVG({ ball: [180, 520] })}
+      <div class="over"><div class="box"><b>Paused</b><span class="muted">Click the table or press <span class="kbd">P</span> to go on</span></div></div>
+      </div>${scoreboard()}</div>`);
+  },
+  out() {
+    return windowShell(`<div class="mb"><div class="big">
+      <div class="final"><div class="mc-section-label">You're out · Match 2</div><div class="score">1,990,000</div>
+        <span class="pb">★ New personal best</span></div>
+      <div class="mc-surface-raised card bigrows">${scoreRows([
+        { p: 1, n: "You", s: "1,990,000", st: "Out", me: true },
+        { p: 2, n: "Anna", s: "1,712,400", st: "Out", talk: true },
+        { p: 3, n: "Ben", s: "1,024,000", st: "Ball 3 · paused" },
+      ])}</div>
+      <div class="countdown"><span class="ring"></span><span>Match ends in <b class="num">42 s</b> · waiting for Ben (paused)</span></div>
+    </div></div>`);
+  },
+  results() {
+    return windowShell(`<div class="mb"><div class="big">
+      <div class="final"><div class="mc-section-label">Results · Match 2</div></div>
+      <div class="mc-surface-raised card bigrows">${scoreRows([
+        { p: 1, n: "Anna", s: "2,104,000", st: "3 balls · extra ball" , talk: true },
+        { p: 2, n: "You", s: "1,990,000", st: `<span class="pb">★ New personal best</span>`, me: true },
+        { p: 3, n: "Ben", s: "410,000", st: `<span class="lft">left</span>` },
+      ])}</div>
+      <div class="resbar"><span class="muted">Anna starts the next match.</span><span class="spacer"></span><button class="mc-button">Leave</button></div>
+    </div></div>`);
+  },
+  "results-starter"() { /* the user is the starter here */
+    return windowShell(`<div class="mb"><div class="big">
+      <div class="final"><div class="mc-section-label">Results · Match 2</div></div>
+      <div class="mc-surface-raised card bigrows">${scoreRows([
+        { p: 1, n: "You", s: "2,104,000", st: `<span class="pb">★ New personal best</span>`, me: true },
+        { p: 2, n: "Anna", s: "1,990,000", st: "3 balls", talk: true },
+        { p: 3, n: "Ben", s: "410,000", st: `<span class="lft">left</span>` },
+      ])}</div>
+      <div class="resbar"><button class="mc-button mc-button--primary focus">Next match</button><button class="mc-button">Close</button>
+        <span class="muted" style="font-size:12px">Both post the results in chat.</span><span class="spacer"></span><button class="mc-button">Leave</button></div>
+    </div></div>`, { starter: "you" });
+  },
+  popout() {
+    return `<div class="popwin">
+      <div class="titlebar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span style="margin-left:8px">Mumball · Lounge</span></div>
+      <div class="stagehead">${pIcon}<b>Mumball</b><span class="chip">Unofficial</span><span class="spacer"></span><button class="ghost">Full screen</button><button class="ghost danger">Leave</button></div>
+      <div class="strip"><span>1. Anna 1.2M ${spk}</span><span class="me">2. You 880k</span><span class="muted">3. Ben out</span><span class="spacer"></span><span>Ball 2 · 3×</span><button class="ghost">Mute</button></div>
+      <div class="popframe"><div class="table">${tableSVG({ popup: true, leftUp: true, ball: [150, 520], ticker: "REQUEST LINE LIT · RAMP" })}</div></div>
+    </div>`;
+  },
+  chat() {
+    const card = `<div class="msg"><span class="av a1">A</span><div><b>Anna</b><time>21:31</time>
+      <div class="rcard"><header>${pIcon}<b>Mumball · Match 2</b><span class="spacer"></span><span class="onair off">FINAL</span></header>
+        <ol><li><span class="p">1.</span>Anna<span class="s">2,104,000</span></li><li><span class="p">2.</span>You<span class="s">1,990,000</span></li><li><span class="p">3.</span>Ben<span class="s">410,000</span></li></ol>
+        <footer><span>3 players · Lounge</span><button class="mc-button mc-button--primary">Play again</button></footer></div></div></div>`;
+    return windowShell("", { stage: false, chat: `
+      <div class="sys">Anna started Mumball · <a href="#">Join</a></div>
+      <div class="msg"><span class="av a3">B</span><div><b>Ben</b><time>21:04</time><p>one more, I nearly had the extra ball</p></div></div>
+      <div class="msg"><span class="av a4">C</span><div><b>Cleo</b><time>21:22</time><p>who's winning?</p></div></div>
+      ${card}` });
+  },
+};
+
+document.getElementById("root").innerHTML = (SCREENS[screen] || SCREENS.lobby)();
+</script>
+</body>
+</html>

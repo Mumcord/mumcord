@@ -5,6 +5,7 @@
 > Builds on: `specs/06-plugin-system-specification.md` (plugin system, permissions, message limits FR-6.36, old servers FR-6.38, package limits FR-6.10), `specs/09-plugin-platform-1-1-specification.md` (activities in the media area FR-9.46 … FR-9.48, web content host FR-9.32 … FR-9.45, sound effects, gesture rule), `specs/13-plugin-platform-1-2-specification.md` (theme tokens and UI kit for plugin pages)
 > Repositories: the plugin is a community plugin built and published in its own public repository `avkruedener/mumball` (Addendum A); this specification lives in `Mumcord/mumcord` next to the platform specs. Nothing in the Mumcord client changes.
 > Numbering: requirements and criteria use the spec file number (`FR-14.n`, `AC-14.n`).
+> Mockups: `docs/mockups/0.8.0-mumball/` (01–08, dark and light, source `mumball.html`) are binding for layout, texts and states of section 5. The table art in them shows the theme and the element layout; final art, exact positions and physics tuning come from play tests (FR-14.14). Mumcord's own parts (window, sidebar, chat, activity header) are drawn only for context.
 
 ## 1. Goal & context
 
@@ -144,6 +145,19 @@ No `net.*`, `secrets`, `peers.relay`, `files.*` or `chat.post-image`.
 - **FR-14.32** The plugin's settings (Settings → Plugins → Mumball) hold: volume, mute, "Tell me when someone in my channel starts a match" (off). They are also changed by the in-game controls.
 
 ## 5. UI & UX
+
+Mockups (`docs/mockups/0.8.0-mumball/`, each as `-dark.png` and `-light.png`):
+
+| No. | Screen | Shows |
+|---|---|---|
+| 01 | Lobby | Players, "Tonight" board, your best, keys card with push-to-talk hint, volume, "Start match" (FR-14.3) |
+| 02 | Play screen, layout A | Table with LED ticker, score pop-up, scoreboard with talking glow, ball, bonus, volume (FR-14.13 … FR-14.15, FR-14.22, FR-14.23) |
+| 03 | Paused | Own table paused, others keep playing (FR-14.16) |
+| 04 | You're out | Final score, new personal best, 60-second countdown for a paused player (FR-14.8, FR-14.19) |
+| 05 | Results, starter | "Next match", "Close", "Leave", "left" mark (FR-14.10, FR-14.11, FR-14.18) |
+| 06 | Results, other players | "Leave" only, "<starter> starts the next match" |
+| 07 | Chat results card | Ranking and "Play again" in chat (FR-14.30) |
+| 08 | Pop-out window, layout B | Narrow area: one-line scoreboard above the table (section 5.3) |
 
 ### 5.1 Navigation
 
