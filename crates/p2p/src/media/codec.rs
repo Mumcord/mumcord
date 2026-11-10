@@ -129,7 +129,9 @@ impl Default for MediaWriter {
 ///
 /// [`read`](Self::read) returns each complete message as soon as it arrives, in the order the
 /// messages completed. A split inside a chunk header, a channel or length varint or a payload
-/// is fine. A message outside the profile is skipped and reported as
+/// is fine. The chunks of a message on one channel may interleave with the chunks of messages
+/// on other channels: a message that completes first is delivered first, and the longer one
+/// when its last chunk arrives. A message outside the profile is skipped and reported as
 /// [`CodecError::Dropped`], and the stream goes on.
 ///
 /// Call [`finish`](Self::finish) when the input ends. A stream that ends at a message boundary
@@ -138,11 +140,6 @@ impl Default for MediaWriter {
 #[derive(Debug)]
 pub struct MediaReader {
     mux: MuxReader,
-    /// The channel of the message most recently peeked at, validated before it was delivered.
-    channel: u16,
-    /// A checked message's bytes are being delivered; more input may be needed to finish it,
-    /// and no profile check may run before it does.
-    delivering: bool,
     /// The first error that stopped the reader, so a later [`finish`](Self::finish) reports the
     /// real cause instead of calling a malformed stream truncated.
     fatal: Option<CodecError>,
@@ -154,12 +151,7 @@ impl MediaReader {
     pub fn new() -> Self {
         let mux = MuxReader::with_options(MAX_VIDEO_MESSAGE as u64, Some(MEDIA_KEY))
             .expect("the fixed media document key and limits are valid");
-        Self {
-            mux,
-            channel: 0,
-            delivering: false,
-            fatal: None,
-        }
+        Self { mux, fatal: None }
     }
 
     /// Reads from the front of `input` and returns the next complete message, or `None` once
@@ -173,73 +165,66 @@ impl MediaReader {
         &'s mut self,
         input: &mut &'a [u8],
     ) -> Result<Option<MediaMessage<'s>>, CodecError> {
-        if self.delivering {
-            return self.deliver(input);
-        }
-        match self.prepare(input)? {
-            Prepared::Ready => {
-                self.delivering = true;
-                self.deliver(input)
-            }
-            Prepared::Nothing => Ok(None),
-            Prepared::Dropped(error) => Err(CodecError::Dropped(error)),
-        }
-    }
-
-    /// One demultiplexer step that never hands out a payload: it validates a message's start
-    /// against the profile, drops an invalid message whole (without gathering its payload into
-    /// a buffer, so a hostile length cannot make the reader allocate) and reports whether a
-    /// valid start now waits to be delivered.
-    fn prepare(&mut self, input: &mut &[u8]) -> Result<Prepared, CodecError> {
-        match self.mux.next_item(input, 0) {
-            Ok(None) => Ok(Prepared::Nothing),
-            Ok(Some(Item::Peek(peek))) => match check_peek(&peek) {
-                Ok(channel) => {
-                    self.channel = channel;
-                    Ok(Prepared::Ready)
-                }
+        // A completed message's payload borrows either `input` or a buffer inside the
+        // demultiplexer, so handing it out from inside this scan loop would hold a borrow of
+        // `self` across the next iteration. Rust cannot express that (it would be a lending
+        // iterator), and copying the payload would end the profile's zero-copy promise. The
+        // loop therefore breaks with the payload's address and length — plain data — and the
+        // slice is rebuilt after the last borrow of `self` has ended; see the `SAFETY` comment.
+        let (channel, payload, len) = loop {
+            let item = match self.mux.next_item(input, 0) {
+                Ok(item) => item,
                 Err(error) => {
-                    peek.skip();
-                    Ok(Prepared::Dropped(error))
+                    let error = CodecError::Malformed(error.kind());
+                    self.fatal = Some(error);
+                    return Err(error);
                 }
-            },
-            Ok(Some(Item::Message(_))) => unreachable!(
-                "no message completes while its start is still waiting for the profile check"
-            ),
-            Ok(Some(Item::Wire(_))) => unreachable!("the media reader never forwards a message"),
-            Err(error) => {
-                let error = CodecError::Malformed(error.kind());
-                self.fatal = Some(error);
-                Err(error)
+            };
+            match item {
+                // A message starts: check it before any of its payload is gathered. Dropping
+                // the peek delivers the message; the next call either completes it or keeps
+                // gathering it while chunks of other channels' messages interleave. A later
+                // call may therefore hand out another message's start first: every start is
+                // checked on its own, and a completed message carries its own channel, not the
+                // channel of the most recent peek.
+                Some(Item::Peek(peek)) => match check_peek(&peek) {
+                    Ok(()) => {}
+                    Err(error) => {
+                        peek.skip();
+                        return Err(CodecError::Dropped(error));
+                    }
+                },
+                Some(Item::Message(message)) => {
+                    // Every message the demultiplexer completes was peeked first, so its
+                    // channel and size passed `check_peek` on an earlier call. Checking the
+                    // delivered message again keeps the promise of a validated payload
+                    // independent of that; a value outside the profile is dropped, not
+                    // exposed.
+                    let channel = u16::try_from(message.channel)
+                        .map_err(|_| CodecError::Dropped(MediaError::OutOfRange("channel")))?;
+                    check_message(channel, message.payload.len()).map_err(CodecError::Dropped)?;
+                    break (channel, message.payload.as_ptr(), message.payload.len());
+                }
+                // The media reader never calls `Peek::forward`, so the demultiplexer cannot
+                // produce a wire item. Reported as malformed rather than panicking, should
+                // that ever change.
+                Some(Item::Wire(_)) => {
+                    let error = CodecError::Malformed(None);
+                    self.fatal = Some(error);
+                    return Err(error);
+                }
+                None => return Ok(None),
             }
-        }
-    }
-
-    /// Resolves the peek [`prepare`](Self::prepare) left pending: the message itself, or
-    /// nothing while a multi-chunk message waits for more input.
-    fn deliver<'s, 'a: 's>(
-        &'s mut self,
-        input: &mut &'a [u8],
-    ) -> Result<Option<MediaMessage<'s>>, CodecError> {
-        match self.mux.next_item(input, 0) {
-            Ok(Some(Item::Message(message))) => {
-                self.delivering = false;
-                Ok(Some(MediaMessage {
-                    channel: self.channel,
-                    payload: message.payload,
-                }))
-            }
-            Ok(None) => Ok(None),
-            Ok(Some(Item::Peek(_))) => {
-                unreachable!("a validated peek resolves straight into its message")
-            }
-            Ok(Some(Item::Wire(_))) => unreachable!("the media reader never forwards a message"),
-            Err(error) => {
-                let error = CodecError::Malformed(error.kind());
-                self.fatal = Some(error);
-                Err(error)
-            }
-        }
+        };
+        // SAFETY: `payload` and `len` describe the slice of the message `next_item` just
+        // completed. It points into `input` (whose bytes outlive `'a`, and `'a: 's`) or into a
+        // buffer of `self.mux`. Both are still alive and neither has been written since: the
+        // loop broke at that message, and nothing in this window can touch them — `self` is
+        // mutably borrowed for `'s`, and `input` holds an immutable slice `'a`. The rebuilt
+        // reference is tied to `'s`, so no later `read` or `finish` can mutate the buffer while
+        // it lives.
+        let payload = unsafe { std::slice::from_raw_parts(payload, len) };
+        Ok(Some(MediaMessage { channel, payload }))
     }
 
     /// Checks that the input ended at a message boundary; call it when the link closes.
@@ -287,8 +272,6 @@ impl MediaReader {
     /// allocate for the next stream's messages either.
     pub fn reset(&mut self) {
         self.mux.reset();
-        self.channel = 0;
-        self.delivering = false;
         self.fatal = None;
     }
 }
@@ -299,23 +282,13 @@ impl Default for MediaReader {
     }
 }
 
-/// What one [`MediaReader::prepare`] found.
-enum Prepared {
-    /// A message's start passed the profile check and its payload is pending.
-    Ready,
-    /// No message completed yet; all the input given was taken.
-    Nothing,
-    /// A message outside the profile, skipped whole.
-    Dropped(MediaError),
-}
-
-/// Checks a message's start against the media profile and returns its channel. The declared
-/// length is checked before the message is gathered, so an oversized one is never buffered.
-fn check_peek(peek: &Peek<'_>) -> Result<u16, MediaError> {
+/// Checks a message's start against the media profile. The declared length is checked before
+/// the message is gathered, so an oversized one is never buffered.
+fn check_peek(peek: &Peek<'_>) -> Result<(), MediaError> {
     let channel = u16::try_from(peek.channel).map_err(|_| MediaError::OutOfRange("channel"))?;
     let len = usize::try_from(peek.len).map_err(|_| MediaError::TooLarge)?;
     check_message(channel, len)?;
-    Ok(channel)
+    Ok(())
 }
 
 #[cfg(test)]
@@ -455,6 +428,228 @@ mod tests {
             }
             reader.finish().expect("the document ends cleanly");
             assert_eq!(got, messages, "split at {split}");
+        }
+    }
+
+    /// The stream the fuzz harness saved as `interleaved_chunks.bin`: the first chunk of a
+    /// four-byte message on channel 1, then a whole one-byte message on channel 5, then the
+    /// chunk that completes channel 1.
+    const INTERLEAVED_CHUNKS: &[u8] = &[
+        0x23, 0x21, 0x62, 0x6f, 0x76, 0x6e, 0x61, 0x72, 0x20, 0x31, 0x2e, 0x32, 0x0a, 0x2e, 0x6d,
+        0x65, 0x64, 0x69, 0x61, 0x3d, 0x00, 0x01, 0x04, 0x00, 0x01, 0x04, 0x41, 0x41, 0x01, 0x03,
+        0x00, 0x05, 0x01, 0x42, 0x01, 0x03, 0x00, 0x01, 0x43, 0x43, 0x00, 0x3b,
+    ];
+
+    #[test]
+    fn interleaved_chunks_of_the_fuzz_corpus_are_read() {
+        let expected = vec![(5u16, b"B".to_vec()), (1, b"AACC".to_vec())];
+        // Whole, byte by byte, and the 36-byte pieces the fuzz harness fed it in.
+        for piece in [INTERLEAVED_CHUNKS.len(), 1, 36] {
+            read_all(INTERLEAVED_CHUNKS, piece, &expected);
+        }
+    }
+
+    /// The wire chunks of one message, cut exactly as [`MediaWriter`] cuts them: the first
+    /// chunk carries the channel varint, the length varint and as much payload as fits, each
+    /// later chunk the channel varint and up to 65,535 payload bytes.
+    fn message_chunks(channel: u16, payload: &[u8]) -> Vec<Vec<u8>> {
+        let mut channel_bytes = Vec::new();
+        varint(u64::from(channel), &mut channel_bytes);
+        let mut length_bytes = Vec::new();
+        varint(payload.len() as u64, &mut length_bytes);
+        let mut chunks = Vec::new();
+        let mut pos = 0;
+        loop {
+            let mut body = channel_bytes.clone();
+            if pos == 0 {
+                body.extend_from_slice(&length_bytes);
+            }
+            let room = 65_536 - body.len();
+            let take = (payload.len() - pos).min(room);
+            body.extend_from_slice(&payload[pos..pos + take]);
+            let mut chunk = Vec::with_capacity(3 + body.len());
+            chunk.push(0x01);
+            // A body of 65,536 reads as a zero length (FR-7.89).
+            chunk.extend_from_slice(&((body.len() as u32 as u16).to_le_bytes()));
+            chunk.extend_from_slice(&body);
+            chunks.push(chunk);
+            pos += take;
+            if pos == payload.len() {
+                return chunks;
+            }
+        }
+    }
+
+    /// `messages` cut into chunks and sent round by round: one chunk of every message that
+    /// still has one, then the next round. This is the interleaving a producer may use while a
+    /// long message waits for its later chunks.
+    fn interleaved_chunks(messages: &[(u16, Vec<u8>)]) -> Vec<Vec<u8>> {
+        let per_message: Vec<Vec<Vec<u8>>> = messages
+            .iter()
+            .map(|(channel, payload)| message_chunks(*channel, payload))
+            .collect();
+        let rounds = per_message.iter().map(Vec::len).max().unwrap_or(0);
+        let mut wire = Vec::new();
+        for round in 0..rounds {
+            for chunks in &per_message {
+                if let Some(chunk) = chunks.get(round) {
+                    wire.push(chunk.clone());
+                }
+            }
+        }
+        wire
+    }
+
+    /// The document of already-cut `chunks`, opener and terminator included.
+    fn document_of_chunks(chunks: &[Vec<u8>]) -> Vec<u8> {
+        let writer = MediaWriter::new();
+        let mut doc = Vec::new();
+        writer.begin(&mut doc);
+        for chunk in chunks {
+            doc.extend_from_slice(chunk);
+        }
+        writer.finish(&mut doc);
+        doc
+    }
+
+    /// The messages of the three-channel interleave: the audio one completes first, the plugin
+    /// one second and the three-chunk video one last.
+    fn three_channel_messages() -> Vec<(u16, Vec<u8>)> {
+        vec![
+            (1u16, payload(140_000, 1)),
+            (5, payload(150, 2)),
+            // The plugin cap exactly, so it spans two chunks.
+            (6, payload(MAX_PLUGIN_MESSAGE, 3)),
+        ]
+    }
+
+    /// [`three_channel_messages`] in their order of completion.
+    fn three_channel_expected(messages: &[(u16, Vec<u8>)]) -> Vec<(u16, Vec<u8>)> {
+        vec![
+            (messages[1].0, messages[1].1.clone()),
+            (messages[2].0, messages[2].1.clone()),
+            (messages[0].0, messages[0].1.clone()),
+        ]
+    }
+
+    #[test]
+    fn a_three_channel_interleave_is_read_in_completion_order() {
+        let messages = three_channel_messages();
+        let doc = document_of_chunks(&interleaved_chunks(&messages));
+        let expected = three_channel_expected(&messages);
+        for piece in [1, 2, 3, 5, 7, 64, 1_024, 65_536, doc.len()] {
+            read_all(&doc, piece, &expected);
+        }
+    }
+
+    #[test]
+    fn an_interleave_is_read_split_at_every_chunk_boundary() {
+        let messages = three_channel_messages();
+        let chunks = interleaved_chunks(&messages);
+        let doc = document_of_chunks(&chunks);
+        let expected = three_channel_expected(&messages);
+        let mut end = MediaWriter::new().opening().len();
+        for chunk in &chunks {
+            end += chunk.len();
+            let mut reader = MediaReader::new();
+            let mut got = Vec::new();
+            for part in [&doc[..end], &doc[end..]] {
+                let mut input = part;
+                while let Some(message) = reader.read(&mut input).expect("valid stream") {
+                    got.push((message.channel, message.payload.to_vec()));
+                }
+                assert!(input.is_empty(), "the reader took every byte of the piece");
+            }
+            reader.finish().expect("the document ends cleanly");
+            assert_eq!(got, expected, "split at chunk boundary {end}");
+        }
+    }
+
+    #[test]
+    fn a_zero_length_message_interleaved_with_a_pending_one_is_delivered() {
+        let big = payload(70_000, 4);
+        let big_chunks = message_chunks(1, &big);
+        let mut wire = vec![big_chunks[0].clone(), message_chunks(0, b"")[0].clone()];
+        wire.extend_from_slice(&big_chunks[1..]);
+        let doc = document_of_chunks(&wire);
+        read_all(&doc, 1, &[(0, Vec::new()), (1, big.clone())]);
+        read_all(&doc, doc.len(), &[(0, Vec::new()), (1, big)]);
+    }
+
+    #[test]
+    fn a_dropped_message_interleaved_with_a_pending_one_keeps_the_pending_one() {
+        let big = payload(70_000, 5);
+        let big_chunks = message_chunks(1, &big);
+        let mut wire = vec![
+            big_chunks[0].clone(),
+            message_chunks(7, b"reserved")[0].clone(),
+        ];
+        wire.extend_from_slice(&big_chunks[1..]);
+        let doc = document_of_chunks(&wire);
+        let mut reader = MediaReader::new();
+        let mut input = &doc[..];
+        assert_eq!(
+            reader.read(&mut input),
+            Err(CodecError::Dropped(MediaError::Invalid("channel")))
+        );
+        let message = reader
+            .read(&mut input)
+            .expect("valid stream")
+            .expect("the pending message follows the dropped one");
+        assert_eq!(message.channel, 1);
+        assert_eq!(message.payload, &big[..]);
+        assert_eq!(reader.read(&mut input), Ok(None));
+        assert!(input.is_empty());
+        assert_eq!(reader.finish(), Ok(()));
+    }
+
+    #[test]
+    fn eof_after_an_interleaved_message_is_truncated_not_a_panic() {
+        let big_chunks = message_chunks(1, &payload(70_000, 6));
+        let audio = message_chunks(5, b"opus");
+        // Opening, the first video chunk and the whole audio message: the video message never
+        // completes and no terminator follows.
+        let mut doc = Vec::new();
+        MediaWriter::new().begin(&mut doc);
+        doc.extend_from_slice(&big_chunks[0]);
+        doc.extend_from_slice(&audio[0]);
+        let audio_end = doc.len();
+        // A prefix of the next video chunk, so the cuts also land inside a chunk header.
+        doc.extend_from_slice(&big_chunks[1][..3]);
+        for cut in [audio_end, audio_end + 1, audio_end + 2, audio_end + 3] {
+            let mut reader = MediaReader::new();
+            let mut input = &doc[..cut];
+            let message = reader
+                .read(&mut input)
+                .expect("valid framing")
+                .expect("the audio message completes");
+            assert_eq!(message.channel, 5);
+            assert_eq!(message.payload, b"opus");
+            assert_eq!(reader.read(&mut input), Ok(None));
+            assert_eq!(
+                reader.finish(),
+                Err(CodecError::Truncated),
+                "an incomplete video message is truncated, cut at {cut}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_reader_resets_after_an_interleaved_stream() {
+        let messages = three_channel_messages();
+        let doc = document_of_chunks(&interleaved_chunks(&messages));
+        let expected = three_channel_expected(&messages);
+        let mut reader = MediaReader::new();
+        for round in 0..3 {
+            let mut input = &doc[..];
+            let mut got = Vec::new();
+            while let Some(message) = reader.read(&mut input).expect("valid stream") {
+                got.push((message.channel, message.payload.to_vec()));
+            }
+            reader.finish().expect("clean stop");
+            assert_eq!(got, expected, "stream {round}");
+            assert!(input.is_empty());
+            reader.reset();
         }
     }
 
