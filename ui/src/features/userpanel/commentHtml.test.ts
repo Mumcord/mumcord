@@ -51,6 +51,21 @@ describe("comment html", () => {
     expect(commentToSend("<b>x</b>")).toBe("<b>x</b>");
   });
 
+  it("sends well-formed XML, which the server needs to accept a picture (issue #712)", () => {
+    const picture = "data:image/png;base64,AAAA";
+    const sent = commentToSend(
+      `<p>a&nbsp;b &amp; c &lt;d&gt;<br><img src="${picture}"></p><a href="https://e.org/?a=1&amp;b=2">l</a>`,
+    );
+    expect(sent).toBe(
+      `<p>a\u00a0b &amp; c &lt;d&gt;<br /><img src="${picture}" /></p>` +
+        '<a href="https://e.org/?a=1&amp;b=2" rel="noopener noreferrer">l</a>',
+    );
+    const parsed = new DOMParser().parseFromString(`<d>${sent}</d>`, "application/xml");
+    expect(parsed.querySelector("parsererror")).toBeNull();
+    // Sending it again changes nothing.
+    expect(commentToSend(sent)).toBe(sent);
+  });
+
   it("accepts web and mail links only", () => {
     expect(normalizeLink("example.org")).toBe("https://example.org");
     expect(normalizeLink("mailto:a@b.c")).toBe("mailto:a@b.c");

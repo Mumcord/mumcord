@@ -28,6 +28,7 @@
 
 ### Fixed
 
+- Pictures in your profile comment, a channel description or the server notice are saved again (issue #712): the picture was already scaled down to fit, but the server still answered "This is too large for the server" as soon as the text with the picture was longer than the server's plain text limit. Mumcord now writes the text in the form Mumble servers expect
 - Windows crash reports now name the crash in more cases (issue #699): a crash after a library such as ONNX Runtime (background effects) or a camera driver replaced Mumcord's crash handler, a stack overflow, heap corruption and a C or C++ library calling `abort()` (for example an uncaught C++ exception) are now recorded with their code and stack. When a crash still leaves nothing to record (a fast-fail), the report says so instead of only "Mumcord closed without shutting down"
 - An error above the message box, such as "Only images can be sent.", now goes away by itself after a few seconds instead of staying until you type or send something (issue #707)
 - Plugin stage pages can send messages of up to 64 KiB to their plugin again (issue #692); messages above 16 KiB used to be dropped silently, as in a side panel, popover or dialog, where 16 KiB stays the limit

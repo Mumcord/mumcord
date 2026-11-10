@@ -9,16 +9,36 @@ export function cleanCommentHtml(html: string): string {
   return sanitizeHtml(html);
 }
 
-/** True when the comment shows nothing: no text and no image. */
-export function isBlankComment(html: string): boolean {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  return doc.body.textContent.trim() === "" && doc.body.querySelector("img") === null;
+/** Elements without content; written self-closed so the markup is well-formed XML. */
+const VOID_TAGS = new Set(["area", "br", "col", "hr", "img", "wbr"]);
+
+function escapeXml(text: string): string {
+  return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-/** The HTML to send: sanitized, and empty when nothing would be visible. */
+function toXml(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) return escapeXml(node.textContent ?? "");
+  if (!(node instanceof Element)) return "";
+  const name = node.nodeName.toLowerCase();
+  const attributes = Array.from(node.attributes)
+    .map((a) => ` ${a.name}="${escapeXml(a.value).replaceAll('"', "&quot;")}"`)
+    .join("");
+  if (VOID_TAGS.has(name)) return `<${name}${attributes} />`;
+  return `<${name}${attributes}>${Array.from(node.childNodes).map(toXml).join("")}</${name}>`;
+}
+
+/**
+ * The HTML to send: sanitized, and empty when nothing would be visible.
+ *
+ * Written as well-formed XML (`<img … />`, `<br />`, no `&nbsp;`): above its text limit a
+ * Mumble server parses the text as XML to leave image data out of the count, and refuses
+ * with "too long" whatever does not parse (issue #712).
+ */
 export function commentToSend(html: string): string {
-  const clean = cleanCommentHtml(html);
-  return isBlankComment(clean) ? "" : clean;
+  const doc = new DOMParser().parseFromString(cleanCommentHtml(html), "text/html");
+  // Nothing visible: no text and no image.
+  if (doc.body.textContent.trim() === "" && doc.body.querySelector("img") === null) return "";
+  return Array.from(doc.body.childNodes).map(toXml).join("");
 }
 
 /** Only links an official client may open are accepted from the link field. */
