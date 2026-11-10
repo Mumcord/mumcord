@@ -112,6 +112,12 @@ describe("profile: register, avatar, comment", () => {
         ["expect", "user", "Bot", "--has-avatar", "true", "--comment-contains", "XYZ"],
         { name: "Checker" },
       );
+      // The members column opens on Activity (issue #709); the member list is the other tab.
+      const membersTab = $(
+        "//div[contains(@class,'activity-tabs__row')]//button[@role='tab'][normalize-space()='Members']",
+      );
+      await membersTab.waitForClickable();
+      await membersTab.click();
       // Exact name (the name's own text, not its hidden status): other people on the server, e.g.
       // scale bots, may have "Bot" in theirs, and the list may need scrolling to reach the row.
       const row = $(
