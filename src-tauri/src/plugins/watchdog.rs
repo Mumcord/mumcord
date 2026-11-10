@@ -10,7 +10,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
 use std::time::{Duration, Instant};
 
-use tauri::{AppHandle, Listener, Manager, RunEvent, WebviewWindow};
+use tauri::{AppHandle, Listener, Manager, RunEvent, Runtime, Webview};
 
 use super::Plugins;
 
@@ -142,19 +142,21 @@ fn run(app: &AppHandle, plugins: &Plugins, answers: &Receiver<u64>) {
     }
 }
 
-fn main_window(app: &AppHandle) -> Option<WebviewWindow> {
-    app.get_webview_window("main")
+/// The main window's own web view. Not `get_webview_window`: that finds nothing while a plugin
+/// frame's child web view sits in the window (macOS), which is exactly when the watchdog runs.
+fn main_webview<R: Runtime>(app: &AppHandle<R>) -> Option<Webview<R>> {
+    app.get_webview("main")
 }
 
 /// Runs a script in the UI that answers through the event system: if it runs, the UI is alive.
 fn send_ping(app: &AppHandle, ping: u64) {
-    let Some(window) = main_window(app) else {
+    let Some(webview) = main_webview(app) else {
         return;
     };
     let script = format!(
         "window.__TAURI_INTERNALS__.invoke(\"plugin:event|emit\",{{event:\"{PONG_EVENT}\",payload:{ping}}})"
     );
-    if let Err(error) = window.eval(script) {
+    if let Err(error) = webview.eval(script) {
         tracing::debug!(%error, "pinging the UI failed");
     }
 }
@@ -177,10 +179,10 @@ fn recover(app: &AppHandle, plugins: &Plugins, open: &[String]) {
 /// WebKitGTK: the frozen web process is killed and the page loaded in a new one (S0).
 #[cfg(target_os = "linux")]
 fn restart_ui(app: &AppHandle) {
-    let Some(window) = main_window(app) else {
+    let Some(webview) = main_webview(app) else {
         return;
     };
-    if let Err(error) = window.with_webview(|webview| linux::restart(&webview.inner())) {
+    if let Err(error) = webview.with_webview(|webview| linux::restart(&webview.inner())) {
         tracing::error!(%error, "restarting the window's web process failed");
     }
 }
@@ -191,11 +193,13 @@ fn restart_ui(app: &AppHandle) {
     const GONE_WAIT: Duration = Duration::from_secs(5);
     const ATTEMPTS: u32 = 3;
     RECREATING.store(true, Ordering::SeqCst);
-    if let Some(window) = main_window(app)
+    if let Some(window) = app.get_window("main")
         && let Err(error) = window.destroy()
     {
         tracing::error!(%error, "closing the frozen window failed; reloading it instead");
-        if let Err(error) = window.reload() {
+        if let Some(webview) = main_webview(app)
+            && let Err(error) = webview.reload()
+        {
             tracing::error!(%error, "reloading the frozen window failed");
         }
         RECREATING.store(false, Ordering::SeqCst);
@@ -206,7 +210,7 @@ fn restart_ui(app: &AppHandle) {
     // views laid over it go with it, so wait for all of them (a recreate before failed three
     // times with "a webview with label `main` already exists").
     let waited = Instant::now();
-    while (main_window(app).is_some() || app.get_webview("main").is_some())
+    while (app.get_window("main").is_some() || app.get_webview("main").is_some())
         && waited.elapsed() < GONE_WAIT
     {
         std::thread::sleep(Duration::from_millis(50));
@@ -233,8 +237,8 @@ fn restart_ui(app: &AppHandle) {
 /// hangs anyway while a frame is open, a reload is the recovery.
 #[cfg(not(any(target_os = "linux", target_os = "macos")))]
 fn restart_ui(app: &AppHandle) {
-    if let Some(window) = main_window(app)
-        && let Err(error) = window.reload()
+    if let Some(webview) = main_webview(app)
+        && let Err(error) = webview.reload()
     {
         tracing::error!(%error, "reloading the window failed");
     }
@@ -279,6 +283,35 @@ mod tests {
     use super::*;
 
     const SECOND: Duration = Duration::from_secs(1);
+
+    /// Issue #705: on macOS a plugin frame is a child web view in the main window. The ping must
+    /// still find the main web view then, or every open frame looks like a frozen UI.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn the_main_web_view_is_found_while_a_plugin_frame_is_open() {
+        use tauri::{
+            LogicalPosition, LogicalSize, WebviewBuilder, WebviewUrl, WebviewWindowBuilder,
+        };
+
+        let app = tauri::test::mock_app();
+        let handle = app.handle();
+        WebviewWindowBuilder::new(handle, "main", WebviewUrl::default())
+            .build()
+            .expect("main window");
+        assert!(main_webview(handle).is_some());
+
+        handle
+            .get_window("main")
+            .expect("main window")
+            .add_child(
+                WebviewBuilder::new("plugin-frame-0123456789abcdef", WebviewUrl::default()),
+                LogicalPosition::new(0, 0),
+                LogicalSize::new(100, 100),
+            )
+            .expect("frame web view");
+        let main = main_webview(handle).expect("found with a frame open");
+        assert_eq!(main.label(), "main");
+    }
 
     /// Ticks once a second from `start` for `seconds`, answering every ping when `answering`;
     /// returns the steps.
