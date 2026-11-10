@@ -33,18 +33,18 @@
 
 | ID | Title | Status | Depends on | Cx |
 |---|---|---|---|---|
-| P0.1 | Release 0.8.0, create `milestone/0.9.0` | in progress (0.8.0 at rc.3) | P0.5 | – |
+| P0.1 | Release 0.8.0, create `milestone/0.9.0` | in progress — waits for P0.5 merge and the 0.8.0 release (rc.3) | P0.5 | – |
 | P0.2 | Bump `bovnar` to 2.1.0, notices, plugin wasm | done | – | – |
-| P0.3 | Spike: bovnar 2.1.0 on static musl (mumpeer) | open | – | complex |
-| P0.4 | Spike: encoder output → temporal-layer channels | open | – | complex |
-| P0.5 | 0.8.0: receive `needs`, tile text, 24 locales | open | – | simple |
-| S1 | Finalize the spec addendum, resolve D1–D14 | in progress | P0.4 | simple |
-| S2 | Final acceptance criteria for every fallback cell | in progress | S1 | simple |
-| W1 | `media` module: channels, control kinds, description, limits | open | S1 | complex |
-| W2 | `MediaWriter` / `MediaReader` over `bovnar::codec` | open | W1 | complex |
-| W3 | SFrame crypto profile for the media stream | open | W1 | complex |
-| W4 | Conformance vectors and fuzzing | open | W2, W3 | complex |
-| W5 | Benchmark regression against today's header | open | W2, W3 | simple |
+| P0.3 | Spike: bovnar 2.1.0 on static musl (mumpeer) | done — PASS, both static targets | – | complex |
+| P0.4 | Spike: encoder output → temporal-layer channels | done — PASS, `channel = 1 + layer`, 4 layers | – | complex |
+| P0.5 | 0.8.0: receive `needs`, tile text, 24 locales | done — `a2ba6e57`, PR #728 CI green; open before merge: screenshots, bindings regen, 4 locale reviews | – | simple |
+| S1 | Finalize the spec addendum, resolve D1–D14 | done — merged into specs 07/08 (`bb7e06a6`) | P0.4 | simple |
+| S2 | Final acceptance criteria for every fallback cell | done — `3cd26e2d`; uniform-shape fix `407344e1` unpushed | S1 | simple |
+| W1 | `media` module: channels, control kinds, description, limits | done — `1b8851ad`, branch not pushed | S1 | complex |
+| W2 | `MediaWriter` / `MediaReader` over `bovnar::codec` | done — `2675531e` incl. interleave fix, branch not pushed | W1 | complex |
+| W3 | SFrame crypto profile for the media stream | done — `262c9d2e`, branch not pushed | W1 | complex |
+| W4 | Conformance vectors and fuzzing | done — `33171c65`, pushed | W2, W3 | complex |
+| W5 | Benchmark regression against today's header | done — `962c2048`, pushed | W2, W3 | simple |
 | W6 | Legacy header behind a `legacy` module | open | S1 | simple |
 | D1 | Direct `STREAM_SCREEN` format switch | open | W2, W3, S2 | complex |
 | D2 | Sharer: description, layer routing, format choice | open | D1 | complex |
@@ -65,10 +65,9 @@
 | E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
-Suggested first wave: P0.3 and P0.4 in parallel (no 0.9.0 code). P0.5 also runs in parallel on
-`milestone/0.8.0` and must merge before the 0.8.0 release; it touches no 0.9.0 code. S1 starts
-when P0.4 reports, because D3 (temporal layer mapping) is the gate for the profile. No
-implementation task starts before S1/S2 are merged.
+Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
+then release 0.8.0 (P0.1). Push or merge the W1–W3 branches. W6, D1 and R1 can then start in
+parallel: D1 needs W2/W3/S2, R1 needs W1/W2/W6. E3 can run at any time.
 
 ---
 
