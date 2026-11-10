@@ -27,3 +27,12 @@ export function placeList(rect: DOMRect, viewport = window.innerHeight): ListPla
     above: goUp ? viewport - rect.top + GAP : null,
   };
 }
+
+/**
+ * Where the portalled list goes in the DOM. A modal `<dialog>` lives in the browser's top layer,
+ * which no `z-index` can reach, so a select inside one has to keep its list there as well;
+ * everywhere else the body is right, because a list inside a scrolling card would be clipped.
+ */
+export function listHost(trigger: Element | null): HTMLElement {
+  return trigger?.closest("dialog[open]") ?? document.body;
+}

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { placeList } from "./selectPlacement";
+import { listHost, placeList } from "./selectPlacement";
 import { Select } from "./Select";
 
 const OPTIONS = [
@@ -127,5 +127,20 @@ describe("Select list placement", () => {
     // The pointer still picks an option through the portal.
     fireEvent.click(screen.getByRole("option", { name: "Cherry" }));
     expect(onChange).toHaveBeenCalledWith("c");
+  });
+
+  it("stays inside an open modal dialog, whose top layer the body is below", () => {
+    const dialog = document.createElement("dialog");
+    dialog.setAttribute("open", "");
+    document.body.append(dialog);
+    try {
+      const trigger = document.createElement("button");
+      dialog.append(trigger);
+      expect(listHost(trigger)).toBe(dialog);
+      expect(listHost(document.createElement("button"))).toBe(document.body);
+      expect(listHost(null)).toBe(document.body);
+    } finally {
+      dialog.remove();
+    }
   });
 });

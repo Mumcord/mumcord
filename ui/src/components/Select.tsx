@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import "./select.css";
-import { placeList, type ListPlacement } from "./selectPlacement";
+import { listHost, placeList, type ListPlacement } from "./selectPlacement";
 
 export interface SelectOption {
   value: string;
@@ -50,6 +50,8 @@ export function Select({
   // it is placed against the button and flips up when the window has no room below.
   const listRef = useRef<HTMLDivElement>(null);
   const [place, setPlace] = useState<ListPlacement | null>(null);
+  // The element the list is portalled into; set from the event handlers, never during render.
+  const [host, setHost] = useState<HTMLElement | null>(null);
   const typed = useRef({ text: "", at: 0 });
 
   useEffect(() => {
@@ -89,7 +91,11 @@ export function Select({
 
   const show = () => {
     setActive(selectedIndex);
-    const rect = wrapperRef.current?.getBoundingClientRect();
+    const trigger = wrapperRef.current;
+    const rect = trigger?.getBoundingClientRect();
+    // A modal <dialog> lives in the browser's top layer, so a select inside one keeps its list in
+    // the same layer instead of the body, where nothing above the dialog would be reachable.
+    setHost(listHost(trigger));
     setPlace(rect === undefined ? null : placeList(rect));
     setOpen(true);
   };
@@ -244,7 +250,7 @@ export function Select({
               </div>
             ))}
           </div>,
-          document.body,
+          host ?? document.body,
         )}
     </div>
   );
