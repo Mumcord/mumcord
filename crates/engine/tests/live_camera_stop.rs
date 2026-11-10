@@ -18,8 +18,8 @@ use mumcord_engine::camera::{CameraFailure, CameraState, CameraView};
 use mumcord_engine::{
     Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields, ServerId,
 };
-// mumbot pins its own mumcord-protocol release, so bot-side messages use its types.
-use bot_protocol::proto;
+// Bot-side messages use the protocol types that mumbot re-exports.
+use mumbot::protocol::proto;
 
 const WAIT: Duration = Duration::from_secs(20);
 

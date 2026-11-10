@@ -1,0 +1,110 @@
+# Automatic code review of every pull request by Claude Sonnet 5.5.
+# Drafts and milestone merges are skipped; a maintainer starts a review there by adding the
+# label `claude-review` to the pull request (the label is removed again after the run, so it
+# works like a button and can be pressed again).
+# Posts one summary comment and inline comments on concrete problems; it never pushes code.
+# Runs on the maintainer's Claude subscription, not on pay-per-use API credit: needs the
+# repository secret CLAUDE_CODE_OAUTH_TOKEN (created locally with `claude setup-token`).
+name: Claude review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened, labeled]
+
+# A new push to the same PR replaces the review still running for the old commit. Adding any
+# other label also starts this workflow (the job is then skipped); it gets a group of its own
+# so that it does not cancel a review that is still running.
+concurrency:
+  group: >-
+    claude-review-${{ github.event.pull_request.number }}-${{
+    github.event.action == 'labeled' && github.event.label.name != 'claude-review'
+    && github.run_id || 'review' }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # Drafts are not ready for review. PRs from forks and from bots get no secrets, so the
+    # review could not run there anyway. Milestone merges (main synced into a milestone branch,
+    # or a milestone branch released into main) only move code that was already reviewed in its
+    # own pull request, so reviewing the whole merge again would cost a lot and find nothing new.
+    # The `claude-review` label overrides the draft and milestone rules: only people with triage
+    # rights or more can add labels, so it is a maintainer-only switch.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      && github.event.pull_request.user.type != 'Bot'
+      && (
+        (github.event.action == 'labeled' && github.event.label.name == 'claude-review')
+        || (
+          github.event.action != 'labeled'
+          && !github.event.pull_request.draft
+          && !startsWith(github.head_ref, 'milestone/')
+          && !startsWith(github.head_ref, 'chore/sync-main-into-milestone')
+        )
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      # The review is advice, not a gate: if it cannot run (token, usage limit, outage), the
+      # pull request must not turn red because of it.
+      - uses: anthropics/claude-code-action@v1
+        id: claude
+        continue-on-error: true
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            BASE BRANCH: ${{ github.event.pull_request.base.ref }}
+
+            Review this pull request. The PR branch is checked out in the working directory.
+            Read CLAUDE.md first: its coding rules (real-time audio thread, protocol/audio/UI
+            separation, Mumble server compatibility, untrusted server input, no personal data
+            in logs, tests for new logic, CHANGELOG entry for user-visible changes) are the
+            review standard.
+
+            Use `gh pr diff` to see the change and read surrounding code only where needed.
+            Report only real problems: bugs, security or privacy issues, broken rules from
+            CLAUDE.md, missing tests for new logic, missing CHANGELOG entry. No style nitpicks,
+            no praise, no restating what the PR does.
+
+            Post inline comments with `mcp__github_inline_comment__create_inline_comment`
+            (with `confirmed: true`) for each concrete problem. If the fix is simple and
+            local (a few lines in the commented range), put it in a GitHub suggestion block
+            (```suggestion ... ```) containing the complete replacement for those lines, so
+            it can be applied with one click. Otherwise describe the fix in a sentence or two.
+            Then post exactly one summary with `gh pr comment`: a verdict line
+            ("No blocking issues" or "N issues to fix") and a short list. If there is nothing
+            to report, the summary is just "No blocking issues found."
+            Only post GitHub comments - don't submit review text as messages.
+          claude_args: |
+            --model claude-sonnet-5-5
+            --max-turns 30
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Grep,Glob"
+
+      # The action hides Claude's output, so a failed run shows no reason. Surface only the
+      # final result text (for a failed start that is the API error) as a warning.
+      - name: Report why the review did not run
+        if: steps.claude.outcome == 'failure'
+        env:
+          EXECUTION_FILE: ${{ steps.claude.outputs.execution_file || format('{0}/claude-execution-output.json', runner.temp) }}
+        run: |
+          reason="no result in the execution log"
+          if [ -f "$EXECUTION_FILE" ]; then
+            reason=$(jq -r '[.[] | select(.type == "result")] | last | .result // "no reason given"' "$EXECUTION_FILE" | tr '\n' ' ' | cut -c1-500)
+          fi
+          echo "::warning title=Claude review did not run::$reason"
+
+      # Take the label off again so that adding it starts the next review.
+      - name: Remove the claude-review label
+        if: always() && github.event.action == 'labeled'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X DELETE "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels/claude-review"
