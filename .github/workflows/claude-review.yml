@@ -1,4 +1,7 @@
 # Automatic code review of every pull request by Claude Sonnet 5.5.
+# Drafts and milestone merges are skipped; a maintainer starts a review there by adding the
+# label `claude-review` to the pull request (the label is removed again after the run, so it
+# works like a button and can be pressed again).
 # Posts one summary comment and inline comments on concrete problems; it never pushes code.
 # Runs on the maintainer's Claude subscription, not on pay-per-use API credit: needs the
 # repository secret CLAUDE_CODE_OAUTH_TOKEN (created locally with `claude setup-token`).
@@ -6,11 +9,16 @@ name: Claude review
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
+    types: [opened, synchronize, ready_for_review, reopened, labeled]
 
-# A new push to the same PR replaces the review still running for the old commit.
+# A new push to the same PR replaces the review still running for the old commit. Adding any
+# other label also starts this workflow (the job is then skipped); it gets a group of its own
+# so that it does not cancel a review that is still running.
 concurrency:
-  group: claude-review-${{ github.event.pull_request.number }}
+  group: >-
+    claude-review-${{ github.event.pull_request.number }}-${{
+    github.event.action == 'labeled' && github.event.label.name != 'claude-review'
+    && github.run_id || 'review' }}
   cancel-in-progress: true
 
 jobs:
@@ -19,12 +27,20 @@ jobs:
     # review could not run there anyway. Milestone merges (main synced into a milestone branch,
     # or a milestone branch released into main) only move code that was already reviewed in its
     # own pull request, so reviewing the whole merge again would cost a lot and find nothing new.
+    # The `claude-review` label overrides the draft and milestone rules: only people with triage
+    # rights or more can add labels, so it is a maintainer-only switch.
     if: >-
-      !github.event.pull_request.draft
-      && github.event.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository
       && github.event.pull_request.user.type != 'Bot'
-      && !startsWith(github.head_ref, 'milestone/')
-      && !startsWith(github.head_ref, 'chore/sync-main-into-milestone')
+      && (
+        (github.event.action == 'labeled' && github.event.label.name == 'claude-review')
+        || (
+          github.event.action != 'labeled'
+          && !github.event.pull_request.draft
+          && !startsWith(github.head_ref, 'milestone/')
+          && !startsWith(github.head_ref, 'chore/sync-main-into-milestone')
+        )
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -85,3 +101,10 @@ jobs:
             reason=$(jq -r '[.[] | select(.type == "result")] | last | .result // "no reason given"' "$EXECUTION_FILE" | tr '\n' ' ' | cut -c1-500)
           fi
           echo "::warning title=Claude review did not run::$reason"
+
+      # Take the label off again so that adding it starts the next review.
+      - name: Remove the claude-review label
+        if: always() && github.event.action == 'labeled'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X DELETE "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels/claude-review"

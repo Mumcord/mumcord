@@ -342,8 +342,9 @@ opt-level = 3
 [profile.dev.package.mumcord-effects]
 opt-level = 3
 
-# mumbot (dev-dependency of the engine's live tests) depends on the published protocol and codec
+# mumbot (dev-dependency of the engine's live tests) depends on the published protocol, codec and p2p
 # crates; build it against these instead, so they exist once and `cargo -p` stays unambiguous.
 [patch.crates-io]
 mumcord-protocol = { path = "crates/protocol" }
 mumcord-codec = { path = "crates/codec" }
+mumcord-p2p = { path = "crates/p2p" }
