@@ -181,7 +181,9 @@ describe("pluginLinks", () => {
   });
 
   it("looks at no more than twenty links", () => {
-    const html = Array.from({ length: 25 }, (_, n) => `mumcord://plugins/plugin-${String(n)}`).join(" ");
+    const html = Array.from({ length: 25 }, (_, n) => `mumcord://plugins/plugin-${String(n)}`).join(
+      " ",
+    );
     expect(pluginLinks(html)).toHaveLength(20);
   });
 });
