@@ -239,22 +239,22 @@ pub fn restart(app: &AppHandle) {
     after_disconnect(app, AppHandle::request_restart);
 }
 
-/// Saves the windows, disconnects cleanly (keeping what the next start rejoins), then runs
-/// `then`.
+/// Saves the windows, stops the plugins, disconnects cleanly (keeping what the next start
+/// rejoins), then runs `then`.
 pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'static) {
     crate::aux_window::save_before_exit(app);
-    if connected_servers(&app.state::<Engine>()) == 0 {
-        then(app);
-        return;
-    }
-    // Keeps the voice channel so the next start can offer to rejoin it (QA.9). Waits (bounded)
-    // until the connections have sent what is still queued and their TLS close, and for the
-    // quit sound (#325). A second quit request finds no connection left and exits at once, so
-    // the wait never blocks a forced quit.
-    let closed = app.state::<Engine>().shutdown();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
-        tokio::join!(closed, tokio::time::sleep(QUIT_GRACE));
+        // Before the disconnect, so a plugin can still send from its `stop` (#704).
+        crate::plugins::stop_all(&app).await;
+        if connected_servers(&app.state::<Engine>()) > 0 {
+            // Keeps the voice channel so the next start can offer to rejoin it (QA.9). Waits
+            // (bounded) until the connections have sent what is still queued and their TLS
+            // close, and for the quit sound (#325). A second quit request finds no connection
+            // left and skips this wait, so it never blocks a forced quit.
+            let closed = app.state::<Engine>().shutdown();
+            tokio::join!(closed, tokio::time::sleep(QUIT_GRACE));
+        }
         then(&app);
     });
 }

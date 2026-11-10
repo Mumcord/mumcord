@@ -656,6 +656,9 @@ pub fn run() {
         Ok(app) => app.run(|app, event| {
             if matches!(event, tauri::RunEvent::Exit) {
                 mumcord_engine::crash::clean_exit();
+                // For exits that did not come through `window::quit` (the system ending
+                // the app); after a normal quit the plugins are stopped already (#704).
+                tauri::async_runtime::block_on(plugins::stop_all(app));
                 mumcord_engine::diag::flush_log();
                 if let Some(engine) = app.try_state::<Engine>() {
                     engine.flush_chat_pending();
