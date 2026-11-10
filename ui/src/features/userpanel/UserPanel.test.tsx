@@ -462,7 +462,7 @@ describe("UserPanel", () => {
       expect(screen.queryByRole("dialog")).toBeNull();
     });
     expect(avatar).toHaveBeenCalledWith(1, "/home/me/face.png");
-    expect(comment).toHaveBeenCalledWith(1, "a &lt; b<br>line");
+    expect(comment).toHaveBeenCalledWith(1, "a &lt; b<br />line");
   });
 
   it("explains the avatar re-send only to unregistered users", async () => {
