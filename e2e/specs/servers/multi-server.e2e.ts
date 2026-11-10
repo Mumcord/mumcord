@@ -1,5 +1,6 @@
 import { browser, expect, $ } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
+import { openMembersTab } from "../../helpers/members-ui.ts";
 import { hasClass } from "../../helpers/selectors.ts";
 import {
   channelName,
@@ -245,6 +246,8 @@ describe("multiple servers (AC-2.1–2.10)", function () {
       await row.click();
       await browser.keys("Escape");
       await show(ALPHA);
+      // The friends list sits under the member list, on the Members tab.
+      await openMembersTab();
       const item = $("//section[contains(@class,'friends-list')]//button[starts-with(@aria-label,'FriendyB,')]");
       await item.waitForDisplayed({ timeout: 15_000 });
       const label = (await item.getAttribute("aria-label")) ?? "";
