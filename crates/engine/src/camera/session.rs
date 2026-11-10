@@ -456,7 +456,7 @@ impl Engine {
             .ok_or(CameraFailure::NoCertificate)?;
         let me = cert_key(&identity).ok_or(CameraFailure::NoCertificate)?;
         let (ann, id, token) = self
-            .relay_broadcast_request(server_id, RelayUse::Camera, limit)
+            .relay_broadcast_request(server_id, RelayUse::Camera, limit, false)
             .await
             .map_err(CameraFailure::from_fanout)?;
         let link = p2p

@@ -146,6 +146,8 @@ pub struct RelayInfo {
     pub broadcast_max: Option<u16>,
     /// The relay only serves registered users (announced `reg`, #601).
     pub registered_only: bool,
+    /// The relay speaks the Bovnar media profile (announced `mv`, FR-7.96).
+    pub media: bool,
     /// The announced relay's certificate fingerprint.
     pub fingerprint: Option<String>,
     /// The trusted relay's fingerprint while a changed relay waits for trust (#600), so the user
@@ -332,6 +334,7 @@ impl ServerRelay {
                 .collect(),
             broadcast_max: announcer.ann.broadcast,
             registered_only: announcer.ann.registered_only,
+            media: announcer.ann.media,
             fingerprint: Some(announcer.pair.fp.clone()),
             previous_fingerprint: if untrusted {
                 self.pin.as_ref().map(|p| p.relay_fp.clone())
@@ -1280,6 +1283,7 @@ impl Engine {
         server_id: ServerId,
         relay_use: RelayUse,
         max: u16,
+        media: bool,
     ) -> Result<(RelayAnnouncement, BroadcastId, RelayToken), FanoutUnavailable> {
         let ctx = self
             .session_ctx_for(server_id)
@@ -1294,6 +1298,7 @@ impl Engine {
             rid,
             max,
             kind: (relay_use != RelayUse::ScreenShare).then_some(relay_use),
+            media,
         };
         let rx = self
             .relays()
@@ -1409,6 +1414,7 @@ mod tests {
             broadcast: None,
             plugin_data_kbps: None,
             registered_only: false,
+            media: false,
         }
     }
 

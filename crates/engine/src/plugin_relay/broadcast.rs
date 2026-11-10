@@ -435,7 +435,7 @@ impl Engine {
             .filter(|max| *max > 0)
             .unwrap_or(DEFAULT_RECEIVERS);
         let (ann, id, token) = match self
-            .relay_broadcast_request(server_id, RelayUse::PluginData, max)
+            .relay_broadcast_request(server_id, RelayUse::PluginData, max, false)
             .await
         {
             Ok(answer) => answer,

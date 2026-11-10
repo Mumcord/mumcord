@@ -228,7 +228,7 @@ impl Engine {
         let me = cert_key(&identity).ok_or(FanoutUnavailable::NoCertificate)?;
         self.with_fanout(server_id, token, |fanout| *fanout = Some(Fanout::Starting));
         let (ann, id, relay_token) = self
-            .relay_broadcast_request(server_id, RelayUse::ScreenShare, limit)
+            .relay_broadcast_request(server_id, RelayUse::ScreenShare, limit, false)
             .await?;
         let link = p2p
             .broadcast(&ann, &relay_token, BindRole::Publisher, false)
