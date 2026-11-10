@@ -239,7 +239,7 @@ else: it never parses, rewrites or logs a payload, and it does not know whether 
 
 ## What the SDK bundles
 
-Each SDK version pins exactly one Bovnar version (2.0.0 today); a new Bovnar version only arrives
+Each SDK version pins exactly one Bovnar version (2.1.0 today); a new Bovnar version only arrives
 with an SDK upgrade, so the format your plugin speaks does not change underneath you. For the
 plugin target `wasm32-unknown-unknown` the SDK ships a prebuilt Bovnar library, so building a
 plugin needs no C compiler, no Python and no wasi-sdk. (Building the SDK itself for the host, as its

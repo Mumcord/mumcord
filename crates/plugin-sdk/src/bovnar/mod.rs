@@ -33,7 +33,7 @@
 //! }
 //! ```
 //!
-//! The SDK pins exactly one Bovnar version (2.0.0) and, for the plugin target
+//! The SDK pins exactly one Bovnar version (2.1.0) and, for the plugin target
 //! `wasm32-unknown-unknown`, links a prebuilt Bovnar library bundled with the SDK, so building
 //! a plugin needs no C compiler. A new Bovnar version only arrives with an SDK upgrade.
 

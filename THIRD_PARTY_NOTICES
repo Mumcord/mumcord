@@ -544,7 +544,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
-Bovnar C library 2.0.2
+Bovnar C library 2.1.0
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -554,7 +554,7 @@ Reference implementation of the Bovnar data format, compiled from the C sources 
 the published bovnar crate (crates.io; the version and checksum are pinned in Cargo.lock).
 File offers and the diagnostic file are Bovnar documents. The library compiles in the unit
 identifiers of the vocabularies listed in its third-party notices below.
-Upstream revision: https://github.com/sothis/bovnar v2.0.2, commit b3741916b791aade49d3113e8ee6b9c8f51bda83; all 105 files of the crate match its PROVENANCE.json.
+Upstream revision: https://github.com/sothis/bovnar v2.1.0, commit 4895049243bf8f2fb7c533c78c54d0c237b5682d; all 112 files of the crate match its PROVENANCE.json.
 
 MIT License
 
@@ -12157,7 +12157,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - bovnar 2.0.2 (https://github.com/sothis/bovnar)
+  - bovnar 2.1.0 (https://github.com/sothis/bovnar)
 
 /*
  * SPDX-License-Identifier: MIT
@@ -13207,7 +13207,7 @@ MIT License
 
 Used by:
   - tempfile 3.27.0 (https://github.com/Stebalien/tempfile)
-  - xattr 1.6.1 (https://github.com/Stebalien/xattr)
+  - xattr 1.7.0 (https://github.com/Stebalien/xattr)
 
 Copyright (c) 2015 Steven Allen
 
@@ -15399,7 +15399,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - aes 0.9.3 (https://github.com/RustCrypto/block-ciphers)
+  - aes 0.9.4 (https://github.com/RustCrypto/block-ciphers)
 
 Copyright (c) 2018-2024 The RustCrypto Project Developers
 Copyright (c) 2018 Artyom Pavlov
@@ -17354,13 +17354,13 @@ Used by:
   - is_terminal_polyfill 1.70.2 (https://github.com/polyfill-rs/is_terminal_polyfill)
   - once_cell_polyfill 1.70.2 (https://github.com/polyfill-rs/once_cell_polyfill)
   - serde_spanned 1.1.2 (https://github.com/toml-rs/toml)
-  - toml 1.1.8+spec-1.1.0 (https://github.com/toml-rs/toml)
+  - toml 1.2.0+spec-1.1.0 (https://github.com/toml-rs/toml)
   - toml_datetime 1.1.2+spec-1.1.0 (https://github.com/toml-rs/toml)
   - toml_edit 0.19.15 (https://github.com/toml-rs/toml)
   - toml_edit 0.20.2 (https://github.com/toml-rs/toml)
   - toml_edit 0.25.17+spec-1.1.0 (https://github.com/toml-rs/toml)
   - toml_parser 1.1.5+spec-1.1.0 (https://github.com/toml-rs/toml)
-  - toml_writer 1.1.3+spec-1.1.0 (https://github.com/toml-rs/toml)
+  - toml_writer 1.2.0+spec-1.1.0 (https://github.com/toml-rs/toml)
 
 Copyright (c) Individual contributors
 
@@ -17945,7 +17945,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - psl 2.1.246 (https://github.com/addr-rs/psl)
+  - psl 2.1.249 (https://github.com/addr-rs/psl)
 
 MIT License
 
@@ -18611,7 +18611,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - ashpd 0.13.13 (https://github.com/bilelmoussaoui/ashpd)
+  - ashpd 0.14.0 (https://github.com/bilelmoussaoui/ashpd)
   - rfd 0.17.2 (https://github.com/PolyMeilex/rfd)
 
 MIT License
@@ -19343,7 +19343,7 @@ Used by:
   - dlopen2 0.8.2 (https://github.com/OpenByteDev/dlopen2)
   - dlopen2_derive 0.4.3 (https://github.com/OpenByteDev/dlopen2)
   - dpi 0.1.2 (https://github.com/rust-windowing/winit)
-  - granit-parser 2.0.0 (https://github.com/bourumir-wyngs/granit-parser)
+  - granit-parser 2.1.0 (https://github.com/bourumir-wyngs/granit-parser)
   - lewton 0.10.2 (https://github.com/RustAudio/lewton)
   - libappindicator-sys 0.9.0
   - libm 0.2.16 (https://github.com/rust-lang/compiler-builtins)
@@ -19785,10 +19785,10 @@ Used by:
   - proc-macro2 1.0.107 (https://github.com/dtolnay/proc-macro2)
   - quote 1.0.47 (https://github.com/dtolnay/quote)
   - rtrb 0.4.1 (https://github.com/mgeier/rtrb)
-  - rustix 1.1.5 (https://github.com/bytecodealliance/rustix)
+  - rustix 1.1.6 (https://github.com/bytecodealliance/rustix)
   - rustversion 1.0.23 (https://github.com/dtolnay/rustversion)
   - semver 1.0.28 (https://github.com/dtolnay/semver)
-  - serde-saphyr 2.0.0 (https://github.com/bourumir-wyngs/serde-saphyr)
+  - serde-saphyr 2.1.1 (https://github.com/bourumir-wyngs/serde-saphyr)
   - serde-untagged 0.1.9 (https://github.com/dtolnay/serde-untagged)
   - serde 1.0.229 (https://github.com/serde-rs/serde)
   - serde_core 1.0.229 (https://github.com/serde-rs/serde)
@@ -20177,7 +20177,7 @@ MIT License
 
 Used by:
   - tracing-core 0.1.36 (https://github.com/tokio-rs/tracing)
-  - zip 9.2.0 (https://github.com/zip-rs/zip2)
+  - zip 9.4.1 (https://github.com/zip-rs/zip2)
 
 The MIT License (MIT)
 
@@ -23109,7 +23109,7 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
 --------------------------------------------------------------------------------
-@tanstack/react-virtual@3.14.24
+@tanstack/react-virtual@3.14.26
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23139,7 +23139,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-@tanstack/virtual-core@3.19.9
+@tanstack/virtual-core@3.19.11
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23589,7 +23589,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-i18next@26.5.12
+i18next@26.7.2
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23619,7 +23619,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-marked@18.1.2
+marked@18.1.3
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -23701,7 +23701,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-react-i18next@17.1.9
+react-i18next@17.1.13
 --------------------------------------------------------------------------------
 
 License: MIT
