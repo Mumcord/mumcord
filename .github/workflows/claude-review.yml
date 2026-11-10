@@ -31,7 +31,11 @@ jobs:
         with:
           fetch-depth: 1
 
+      # The review is advice, not a gate: if it cannot run (API key, credit, outage), the
+      # pull request must not turn red because of it.
       - uses: anthropics/claude-code-action@v1
+        id: claude
+        continue-on-error: true
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -51,7 +55,10 @@ jobs:
             no praise, no restating what the PR does.
 
             Post inline comments with `mcp__github_inline_comment__create_inline_comment`
-            (with `confirmed: true`) for each concrete problem, with a short fix suggestion.
+            (with `confirmed: true`) for each concrete problem. If the fix is simple and
+            local (a few lines in the commented range), put it in a GitHub suggestion block
+            (```suggestion ... ```) containing the complete replacement for those lines, so
+            it can be applied with one click. Otherwise describe the fix in a sentence or two.
             Then post exactly one summary with `gh pr comment`: a verdict line
             ("No blocking issues" or "N issues to fix") and a short list. If there is nothing
             to report, the summary is just "No blocking issues found."
@@ -60,3 +67,16 @@ jobs:
             --model claude-sonnet-5-5
             --max-turns 30
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Grep,Glob"
+
+      # The action hides Claude's output, so a failed run shows no reason. Surface only the
+      # final result text (for a failed start that is the API error) as a warning.
+      - name: Report why the review did not run
+        if: steps.claude.outcome == 'failure'
+        env:
+          EXECUTION_FILE: ${{ steps.claude.outputs.execution_file || format('{0}/claude-execution-output.json', runner.temp) }}
+        run: |
+          reason="no result in the execution log"
+          if [ -f "$EXECUTION_FILE" ]; then
+            reason=$(jq -r '[.[] | select(.type == "result")] | last | .result // "no reason given"' "$EXECUTION_FILE" | tr '\n' ' ' | cut -c1-500)
+          fi
+          echo "::warning title=Claude review did not run::$reason"
