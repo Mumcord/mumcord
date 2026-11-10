@@ -45,8 +45,8 @@
 | W3 | SFrame crypto profile for the media stream | done — `262c9d2e`, branch not pushed | W1 | complex |
 | W4 | Conformance vectors and fuzzing | done — `33171c65`, pushed | W2, W3 | complex |
 | W5 | Benchmark regression against today's header | done — `962c2048`, pushed | W2, W3 | simple |
-| W6 | Legacy header behind a `legacy` module | open | S1 | simple |
-| D1 | Direct `STREAM_SCREEN` format switch | open | W2, W3, S2 | complex |
+| W6 | Legacy header behind a `legacy` module | done — `f4a8516d`, branch not pushed | S1 | simple |
+| D1 | Direct `STREAM_SCREEN` format switch | done — `04026690`, branch not pushed | W2, W3, S2 | complex |
 | D2 | Sharer: description, layer routing, format choice | open | D1 | complex |
 | D3 | Viewer: description, changes at keyframes, both formats | open | D2 | complex |
 | D4 | Capability negotiation and refusal texts | open | D3 | complex |
@@ -66,8 +66,8 @@
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
-then release 0.8.0 (P0.1). Push or merge the W1–W3 branches. W6, D1 and R1 can then start in
-parallel: D1 needs W2/W3/S2, R1 needs W1/W2/W6. E3 can run at any time.
+then release 0.8.0 (P0.1). Push or merge the W1–W3 branches. W6 and D1 are done on their branches.
+D2 and R1 can then start in parallel: D2 needs D1, R1 needs W1/W2/W6. E3 can run at any time.
 
 ---
 
