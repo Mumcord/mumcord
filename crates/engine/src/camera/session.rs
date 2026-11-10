@@ -460,7 +460,7 @@ impl Engine {
             .await
             .map_err(CameraFailure::from_fanout)?;
         let link = p2p
-            .broadcast(&ann, &token, BindRole::Publisher)
+            .broadcast(&ann, &token, BindRole::Publisher, false)
             .await
             .map_err(|e| {
                 tracing::info!(error = %e, "camera broadcast link not opened");
@@ -787,7 +787,7 @@ impl Engine {
             .ok_or_else(|| failed("no identity"))?;
         let me = cert_key(&identity).ok_or_else(|| failed("no key"))?;
         let link = p2p
-            .broadcast(&ann, &token, BindRole::Subscriber)
+            .broadcast(&ann, &token, BindRole::Subscriber, false)
             .await
             .map_err(|e| failed(&e.to_string()))?;
         let (subscriber, frames, _units) = crate::screen_share::broadcast::link::Subscriber::start(

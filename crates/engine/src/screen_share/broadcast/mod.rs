@@ -231,7 +231,7 @@ impl Engine {
             .relay_broadcast_request(server_id, RelayUse::ScreenShare, limit)
             .await?;
         let link = p2p
-            .broadcast(&ann, &relay_token, BindRole::Publisher)
+            .broadcast(&ann, &relay_token, BindRole::Publisher, false)
             .await
             .map_err(|e| {
                 tracing::info!(error = %e, "screen share broadcast link not opened");
@@ -557,7 +557,7 @@ impl Engine {
             .ok_or_else(|| block(WatchBlock::PeerUnsupported))?;
         let me = cert_key(&identity).ok_or_else(|| block(WatchBlock::PeerUnsupported))?;
         let link = p2p
-            .broadcast(&ann, token, BindRole::Subscriber)
+            .broadcast(&ann, token, BindRole::Subscriber, false)
             .await
             .map_err(|e| {
                 tracing::info!(error = %e, "screen share broadcast not joined");

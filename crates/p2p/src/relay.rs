@@ -802,6 +802,7 @@ impl crate::P2p {
         relay: &RelayAnnouncement,
         token: &RelayToken,
         role: BindRole,
+        media: bool,
     ) -> Result<BroadcastLink, P2pError> {
         let pin = RelayPin::new(relay.fingerprint);
         let crypto = tls::relay_client_config(&self.chain, &self.key, &pin)?;
@@ -814,6 +815,7 @@ impl crate::P2p {
         let bind = BroadcastBind {
             token: token.clone(),
             role: Some(role),
+            media,
         }
         .encode();
         tokio::time::timeout(SETUP_TIMEOUT, outer.bind_broadcast(bind))

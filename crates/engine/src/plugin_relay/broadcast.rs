@@ -444,7 +444,10 @@ impl Engine {
                 return None;
             }
         };
-        match p2p.broadcast(&ann, &token, BindRole::Publisher).await {
+        match p2p
+            .broadcast(&ann, &token, BindRole::Publisher, false)
+            .await
+        {
             Ok(link) => Some((id, me, link)),
             Err(e) => {
                 tracing::info!(error = %e, "plugin broadcast link not opened");
@@ -680,7 +683,10 @@ impl Engine {
             .ok()?;
         let (p2p, identity) = self.p2p_with_identity().await?;
         let me = cert_key(&identity)?;
-        match p2p.broadcast(&ann, token, BindRole::Subscriber).await {
+        match p2p
+            .broadcast(&ann, token, BindRole::Subscriber, false)
+            .await
+        {
             Ok(link) => Some((me, link)),
             Err(e) => {
                 tracing::info!(error = %e, "plugin broadcast not joined");
