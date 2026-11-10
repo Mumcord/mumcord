@@ -192,6 +192,7 @@
     "joining": "Povezovanje s kamero uporabnika {{name}} …",
     "full": "Uporabnika {{name}} gleda preveč ljudi",
     "failed": "S kamero uporabnika {{name}} se ni bilo mogoče povezati",
+    "needsUpdate": "Ta kamera potrebuje Mumcord 0.9.0",
     "retry": "Poskusi znova",
     "hidden": "Video skrit",
     "showVideo": "Pokaži video",

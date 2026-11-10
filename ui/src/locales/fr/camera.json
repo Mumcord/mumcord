@@ -185,6 +185,7 @@
     "joining": "Connexion à la caméra de {{name}}…",
     "full": "Trop de personnes regardent {{name}}",
     "failed": "Impossible de rejoindre la caméra de {{name}}",
+    "needsUpdate": "Cette caméra nécessite Mumcord 0.9.0",
     "retry": "Réessayer",
     "hidden": "Vidéo masquée",
     "showVideo": "Afficher la vidéo",

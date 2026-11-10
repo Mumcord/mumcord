@@ -2,7 +2,8 @@
  * One camera tile (FR-8.65, spec 08 §5.3): the video, the name tag with the microphone icon, the
  * green speaking frame, "● Live" on the self-view, the "{n} fps" badge of a weak connection and,
  * with the tile under the pointer or focused, the height and codec it arrives in (mockup 10).
- * Without a picture it shows who it is and why: joining, full, couldn't join or hidden (§7.2).
+ * Without a picture it shows who it is and why: joining, full, couldn't join, needs 0.9.0 or
+ * hidden (§7.2).
  * Names come from the server and are rendered as text only.
  */
 import type { TFunction } from "i18next";
@@ -170,6 +171,8 @@ function statusText(tile: TileModel, t: TFunction<"camera">): string | null {
       return t("tile.full", { name: tile.name });
     case "failed":
       return t("tile.failed", { name: tile.name });
+    case "needsUpdate":
+      return t("tile.needsUpdate");
     case "hidden":
       return t("tile.hidden");
     default:

@@ -154,6 +154,14 @@ describe("camera room", () => {
     expect(screen.getByText("Couldn't join Ben's camera")).toBeInTheDocument();
   });
 
+  it("says when a camera needs a newer Mumcord", async () => {
+    api.mock.setCameraRoom(1, [tile(ANNA, { state: "needsUpdate" })], true);
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    expect(await screen.findByRole("group", { name: "Anna, camera on" })).toHaveTextContent(
+      "This camera needs Mumcord 0.9.0",
+    );
+  });
+
   it("shows a hidden video again", async () => {
     api.mock.setCameraRoom(1, [tile(ANNA, { state: "hidden", hidden: true })], true);
     render(<CameraRoom serverId={1} onTurnOn={null} />);

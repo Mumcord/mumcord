@@ -178,6 +178,7 @@
     "joining": "Ansluter till {{name}}s kamera …",
     "full": "För många tittar på {{name}}",
     "failed": "Kunde inte ansluta till {{name}}s kamera",
+    "needsUpdate": "Den här kameran kräver Mumcord 0.9.0",
     "retry": "Försök igen",
     "hidden": "Video dold",
     "showVideo": "Visa video",

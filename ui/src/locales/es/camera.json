@@ -185,6 +185,7 @@
     "joining": "Conectando con la cámara de {{name}} …",
     "full": "Demasiadas personas están viendo a {{name}}",
     "failed": "No se pudo conectar con la cámara de {{name}}",
+    "needsUpdate": "Esta cámara necesita Mumcord 0.9.0",
     "retry": "Intentar de nuevo",
     "hidden": "Vídeo oculto",
     "showVideo": "Mostrar vídeo",

@@ -178,6 +178,7 @@
     "joining": "Joining {{name}}'s camera …",
     "full": "Too many people are watching {{name}}",
     "failed": "Couldn't join {{name}}'s camera",
+    "needsUpdate": "This camera needs Mumcord 0.9.0",
     "retry": "Try again",
     "hidden": "Video hidden",
     "showVideo": "Show video",

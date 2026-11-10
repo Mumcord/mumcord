@@ -75,6 +75,9 @@ pub enum CameraMessage {
     /// Camera owner to one viewer: broadcast `id` has no room for you (FR-8.52); ask again on
     /// the next `on`.
     Full { id: String },
+    /// Camera owner to one viewer: camera `id` uses a media format this client cannot play and
+    /// needs Mumcord 0.9.0 (FR-8.95); stop asking until the next `on`.
+    Needs { id: String },
 }
 
 impl CameraMessage {
@@ -139,6 +142,7 @@ pub fn encode(message: &CameraMessage) -> Option<Vec<u8>> {
         }
         CameraMessage::CamLeave { id } => ("cam-leave", Some(id), None),
         CameraMessage::Full { id } => ("full", Some(id), None),
+        CameraMessage::Needs { id } => ("needs", Some(id), None),
     };
     if id.is_some_and(|id| !is_broadcast_id(id)) {
         return None;
@@ -167,6 +171,7 @@ pub fn decode(data: &[u8]) -> Result<CameraMessage, Refused> {
         "on" => CameraMessage::On { id: id_of(&doc)? },
         "cam-leave" => CameraMessage::CamLeave { id: id_of(&doc)? },
         "full" => CameraMessage::Full { id: id_of(&doc)? },
+        "needs" => CameraMessage::Needs { id: id_of(&doc)? },
         "cam-join" => {
             let id = id_of(&doc)?;
             // Names this client cannot play are skipped, so a newer client may list more; a
@@ -369,6 +374,7 @@ mod tests {
             },
             CameraMessage::CamLeave { id: ID.into() },
             CameraMessage::Full { id: ID.into() },
+            CameraMessage::Needs { id: ID.into() },
         ]
     }
 
@@ -402,7 +408,7 @@ mod tests {
     #[test]
     fn direction_follows_the_table() {
         let to_channel: Vec<_> = all().iter().map(CameraMessage::to_channel).collect();
-        assert_eq!(to_channel, [true, true, false, false, false]);
+        assert_eq!(to_channel, [true, true, false, false, false, false]);
     }
 
     #[test]
@@ -421,6 +427,40 @@ mod tests {
             }),
             None
         );
+        assert_eq!(encode(&CameraMessage::Needs { id: "short".into() }), None);
+    }
+
+    #[test]
+    fn needs_is_validated_and_carries_only_the_camera_id() {
+        let good = encode(&CameraMessage::Needs { id: ID.into() }).expect("valid");
+        assert_eq!(decode(&good), Ok(CameraMessage::Needs { id: ID.into() }));
+        let cases = [
+            (r#".v = 1; .t = "needs";"#, Refused::Malformed),
+            (r#".v = 0; .t = "needs"; .id = "ID";"#, Refused::Invalid),
+            (r#".v = 1; .t = "needs"; .id = 5;"#, Refused::WrongType),
+            (
+                r#".v = 1; .t = "needs"; .id = "0123456789ABCDEF";"#,
+                Refused::Invalid,
+            ),
+            (
+                r#".v = 1; .t = "needs"; .id = "0123456789abcde";"#,
+                Refused::Invalid,
+            ),
+            (
+                r#".v = 1; .t = "needs"; .id = "0123456789abcdef0";"#,
+                Refused::Invalid,
+            ),
+            (
+                r#".v = 1; .t = "needs"; .id = "0123456789abcdeg";"#,
+                Refused::Invalid,
+            ),
+        ];
+        for (text, reason) in cases {
+            assert_eq!(decode(&doc(text)), Err(reason), "{text}");
+        }
+        let mut big = good;
+        big.resize(MAX_PAYLOAD_BYTES + 1, b' ');
+        assert_eq!(decode(&big), Err(Refused::TooLarge));
     }
 
     #[test]
@@ -508,7 +548,7 @@ mod tests {
     fn other_messages_are_not_join_limited() {
         let mut limiter = JoinLimiter::default();
         let now = Instant::now();
-        for m in [&all()[0], &all()[1], &all()[3]] {
+        for m in [&all()[0], &all()[1], &all()[3], &all()[5]] {
             let bytes = encode(m).expect("valid");
             for _ in 0..3 {
                 assert!(receive(7, true, &bytes, &mut limiter, now).is_ok());
@@ -553,7 +593,7 @@ mod tests {
 
         #[test]
         fn mutated_valid_documents_never_panic(
-            which in 0usize..4,
+            which in 0usize..6,
             flips in proptest::collection::vec((any::<prop::sample::Index>(), any::<u8>()), 1..6),
         ) {
             let mut bytes = encode(&all()[which]).expect("valid");

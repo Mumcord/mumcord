@@ -185,6 +185,7 @@
     "joining": "Pievienojas lietotāja {{name}} kamerai …",
     "full": "Pārāk daudz cilvēku skatās lietotāja {{name}} kameru",
     "failed": "Neizdevās pievienoties lietotāja {{name}} kamerai",
+    "needsUpdate": "Šai kamerai nepieciešams Mumcord 0.9.0",
     "retry": "Mēģināt vēlreiz",
     "hidden": "Video paslēpts",
     "showVideo": "Rādīt video",

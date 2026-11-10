@@ -178,6 +178,7 @@
     "joining": "Åbner kameraet fra {{name}} …",
     "full": "For mange ser {{name}}",
     "failed": "Kunne ikke åbne kameraet fra {{name}}",
+    "needsUpdate": "Dette kamera kræver Mumcord 0.9.0",
     "retry": "Prøv igen",
     "hidden": "Video skjult",
     "showVideo": "Vis video",

@@ -185,6 +185,7 @@
     "joining": "A entrar na câmara de {{name}} …",
     "full": "Demasiadas pessoas estão a ver {{name}}",
     "failed": "Não foi possível entrar na câmara de {{name}}",
+    "needsUpdate": "Esta câmara requer o Mumcord 0.9.0",
     "retry": "Tentar novamente",
     "hidden": "Vídeo oculto",
     "showVideo": "Mostrar vídeo",
