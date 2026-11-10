@@ -26,8 +26,8 @@
 //! accepts it. [`PeerConnection::path`] tells how a connection travels.
 //!
 //! Screen-share broadcasts (spec 07): the relay bot sets them up with the `bcast-*` messages of
-//! [`PeerMessage`]; [`broadcast`] holds the relay `bind` with a role and the clear frame header
-//! the relay reads to fan frames out.
+//! [`PeerMessage`]; [`broadcast`] holds the relay `bind` with a role and the shared slot helper,
+//! and [`broadcast::legacy`] keeps the clear frame header the relay reads for 0.8.x fallback.
 //!
 //! Consent (FR-2.36) is the caller's job: an offer or answer reveals this machine's addresses
 //! (it also opens a router port mapping), and [`PendingOffer::complete`] and
