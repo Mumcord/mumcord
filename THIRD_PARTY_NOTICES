@@ -8303,7 +8303,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (683 crates)
+* MIT License (687 crates)
 * Apache License 2.0 (43 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
 * ISC License (21 crates)
@@ -13006,6 +13006,7 @@ MIT License
 Used by:
   - coreaudio-rs 0.14.2 (https://github.com/RustAudio/coreaudio-rs.git)
   - either 1.19.0 (https://github.com/rayon-rs/either)
+  - itertools 0.13.0 (https://github.com/rust-itertools/itertools)
   - itertools 0.14.0 (https://github.com/rust-itertools/itertools)
   - maplit 1.0.2 (https://github.com/bluss/maplit)
   - petgraph 0.8.3 (https://github.com/petgraph/petgraph)
@@ -19367,13 +19368,16 @@ Used by:
   - windows-registry 0.6.1 (https://github.com/microsoft/windows-rs)
   - windows-result 0.4.1 (https://github.com/microsoft/windows-rs)
   - windows-strings 0.5.1 (https://github.com/microsoft/windows-rs)
+  - windows-sys 0.45.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.59.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.61.2 (https://github.com/microsoft/windows-rs)
+  - windows-targets 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows-targets 0.52.6 (https://github.com/microsoft/windows-rs)
   - windows-threading 0.2.1 (https://github.com/microsoft/windows-rs)
   - windows-version 0.1.7 (https://github.com/microsoft/windows-rs)
   - windows 0.62.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_gnu 0.52.6 (https://github.com/microsoft/windows-rs)
+  - windows_x86_64_msvc 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_msvc 0.52.6 (https://github.com/microsoft/windows-rs)
 
 MIT License
