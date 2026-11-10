@@ -269,15 +269,18 @@ The new media profile carries one endless Bovnar document per media link when bo
   .id = "…";                              # camera session id, absent for screen
   .tracks = [
       { .ch = <uint:8> 1; .kind = "video"; .codec = "av1"; .layer = <uint:8> 0;
-        .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0; },
+        .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0;
+        .bitrate = <uint:32,k~b/s> 0; },
       { .ch = <uint:8> 2; .kind = "video"; .codec = "av1"; .layer = <uint:8> 1;
-        .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0; },
-      { .ch = <uint:8> 5; .kind = "audio"; .codec = "opus";
-        .rate = <uint:32,Hz> 48000; .bitrate = <uint:32,k~b/s> 96; }
+        .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0;
+        .bitrate = <uint:32,k~b/s> 0; },
+      { .ch = <uint:8> 5; .kind = "audio"; .codec = "opus"; .layer = <uint:8> 0;
+        .width = <uint:16> 0; .height = <uint:16> 0; .rate = <uint:32,Hz> 48000;
+        .bitrate = <uint:32,k~b/s> 96; }
   ];
   ```
 
-  `width`, `height`, `codec` and `rate` change with the quality step; `ch` and `layer` state where the frames for that track arrive. Fields a reader does not know are ignored, so a later codec, HDR metadata or a second audio track needs no wire version bump. The camera description carries `.kind = "camera"` and the camera session id in `.id` (spec 08, FR-8.92), so a stale stream is refused. The description is sent at stream start, again whenever the encoder changes resolution, codec, rate or track set, and at every rekey. The viewer applies a new description only at a keyframe. On the direct stream the description is clear inside the QUIC TLS connection. On the relay path it is encrypted with the current share key (D2); the relay caches the latest kind-0 ciphertext opaquely and replays it to a late joiner after the key exchange.
+  Every track object carries the same eight fields, because a Bovnar `DomDoc` array must hold one struct shape; fields that do not apply to a track are zero (video `.bitrate` = 0; audio `.layer`, `.width` and `.height` = 0). The parser requires the fields that belong to the track's kind, validates their ranges, and ignores unknown or inapplicable fields, so a streaming parse still accepts either shape. `width`, `height`, `codec` and `rate` change with the quality step; `ch` and `layer` state where the frames for that track arrive. Unknown fields remain ignored, so a later codec, HDR metadata or a second audio track needs no wire version bump. The camera description carries `.kind = "camera"` and the camera session id in `.id` (spec 08, FR-8.92), so a stale stream is refused. The description is sent at stream start, again whenever the encoder changes resolution, codec, rate or track set, and at every rekey. The viewer applies a new description only at a keyframe. On the direct stream the description is clear inside the QUIC TLS connection. On the relay path it is encrypted with the current share key (D2); the relay caches the latest kind-0 ciphertext opaquely and replays it to a late joiner after the key exchange.
 - **FR-7.96 — Capability negotiation (D9).** 0.9.0 clients announce the hello feature `media-v2`. `Watch` gains an optional `mv: 2`; the relay announcement gains `mv`; `bcast-req` gains `mv` (the publisher's chosen format); `bcast` and `bcast-tok` carry it so every subscriber binds with the same format; relay `bind` gains an optional `"media": 2`; mumpeer `/v1/status` gains `"media": 2`. A missing field means the old format. A new mumpeer accepts both formats and advertises `media: 2`; an old mumpeer has no `mv`, so the client chooses the old format. The publisher's format is fixed for the whole broadcast: a new relay never mixes formats inside one broadcast, and a subscriber binds with the broadcast's format. The exact names are fixed before code (D9).
 - **FR-7.97 — Fallback matrix (D10).** The new format is used only when both ends and, for a relay broadcast, the relay support it. Otherwise the old format is used; the fallback is a normal mode, not an error.
 
