@@ -49,7 +49,7 @@
 | D1 | Direct `STREAM_SCREEN` format switch | done — `04026690`, branch not pushed | W2, W3, S2 | complex |
 | D2 | Sharer: description, layer routing, format choice | done — `a950bec9`, branch not pushed | D1 | complex |
 | D3 | Viewer: description, changes at keyframes, both formats | done — `b41444ab`, branch not pushed | D2 | complex |
-| D4 | Capability negotiation and refusal texts | open | D3 | complex |
+| D4 | Capability negotiation and refusal texts | partial — `12bb9696`: hello `media-v2` and `Watch` `mv`; relay `mv`/bind waits for R6 (mumbot) | D3 | complex |
 | D5 | Direct camera path (`STREAM_CAMERA`) | open | D4 | complex |
 | D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | open | D1 | simple |
@@ -67,7 +67,9 @@
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
 then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D3 are done on their
-stacked branches; D4 and R1 can start in parallel. E3 can run at any time.
+stacked branches; D4 has the hello and `Watch` halves. R1 can start now. The relay `mv` fields
+of D4 wait for R6: mumbot v0.5.4 constructs the p2p types and fails to build when new fields are
+added. E3 can run at any time.
 
 ---
 
