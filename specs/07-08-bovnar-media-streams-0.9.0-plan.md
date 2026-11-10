@@ -433,13 +433,11 @@ start before R3 can be tested end to end. The old-format paths are not removed.
 - Dark/light screenshots for changed UI; 24 locales; keyboard and screen reader.
 - Mumcord 0.9.0, mumpeer 0.3.0 and mumbot are released together with the notes above.
 
-## 12. Open questions for the product owner
+## 12. Product-owner decisions (2026-11-10)
 
-1. **Direct camera preference:** relay broadcast first when a new relay is available, direct
-   otherwise (recommended, scales to 25 viewers), or direct whenever possible? The current plan
-   uses relay first and direct as the fallback.
+1. **Direct camera preference:** relay broadcast first when a new relay is available (scales to
+   25 viewers); direct when the relay is old, missing, or the user is in direct-only mode.
 2. **Old viewers on a new relay:** give them an old-format direct copy when the 8-viewer direct
-   limit allows, or always show "needs 0.9.0" (recommended: direct copy, because that is the
-   fallback you asked for).
+   limit allows; otherwise show "This share needs Mumcord 0.9.0".
 3. **Old-format lifetime:** keep it through 0.9.x and remove it in the milestone after 0.8.x is
-   unsupported (recommended), or keep it indefinitely.
+   no longer supported.
