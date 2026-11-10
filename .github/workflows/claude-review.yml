@@ -16,11 +16,15 @@ concurrency:
 jobs:
   review:
     # Drafts are not ready for review. PRs from forks and from bots get no secrets, so the
-    # review could not run there anyway.
+    # review could not run there anyway. Milestone merges (main synced into a milestone branch,
+    # or a milestone branch released into main) only move code that was already reviewed in its
+    # own pull request, so reviewing the whole merge again would cost a lot and find nothing new.
     if: >-
       !github.event.pull_request.draft
       && github.event.pull_request.head.repo.full_name == github.repository
       && github.event.pull_request.user.type != 'Bot'
+      && !startsWith(github.head_ref, 'milestone/')
+      && !startsWith(github.head_ref, 'chore/sync-main-into-milestone')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
