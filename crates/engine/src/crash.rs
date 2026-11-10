@@ -226,6 +226,17 @@ fn unexpected_cause(windows: bool) -> &'static str {
     }
 }
 
+/// Runs `quit` once, on its own thread, when the system asks the app to end (Unix: SIGTERM,
+/// SIGINT or SIGHUP, i.e. shutdown, logout, `kill` or Ctrl+C), instead of the process ending at
+/// once: `quit` is expected to shut down as a normal quit does and then exit (#748). A second
+/// such signal ends the process immediately. Either way the run does not count as a crash.
+/// Call it once.
+pub fn on_quit_signal(quit: impl FnOnce() + Send + 'static) {
+    if let Err(e) = native::on_quit(quit) {
+        tracing::warn!(error = %e, "no clean quit when the system ends the app");
+    }
+}
+
 /// The app is closing normally: the next start does not report a crash.
 pub fn clean_exit() {
     if let Some(state) = STATE.get() {
@@ -601,7 +612,7 @@ pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
 mod native {
     use std::os::fd::IntoRawFd;
     use std::path::Path;
-    use std::sync::atomic::{AtomicI32, Ordering};
+    use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
     pub const MAX_FRAMES: usize = 64;
     static MARKER_FD: AtomicI32 = AtomicI32::new(-1);
@@ -610,20 +621,106 @@ mod native {
     /// Asked to quit (the system shuts down, the session ends, Ctrl+C): not a crash.
     const QUIT_SIGNALS: [libc::c_int; 3] = [libc::SIGTERM, libc::SIGINT, libc::SIGHUP];
 
+    /// Write end of the pipe that wakes the quit thread; -1 until [`on_quit`] ran.
+    static QUIT_FD: AtomicI32 = AtomicI32::new(-1);
+    /// A quit signal was already handed to the quit thread.
+    static QUITTING: AtomicBool = AtomicBool::new(false);
+
     /// A quit request: the run ends on purpose, so its marker goes and the next start reports
-    /// nothing; then the default action ends the process as before.
+    /// nothing. The first one wakes the quit thread, which runs the normal quit path (plugins
+    /// get their `stop`, the connections close; #748). A second one, or one before anybody
+    /// listens, ends the process through the default action, so a hanging quit can be forced.
     extern "C" fn quit(signal: libc::c_int) {
+        // The process goes on after this handler, so the code it interrupted must find its
+        // errno untouched.
+        // SAFETY: the errno location is valid for the calling thread.
+        let errno = unsafe { *errno_location() };
         if let Some(path) = MARKER_PATH.get() {
             // SAFETY: unlink(2) is async-signal-safe; the path was set before the handler.
             unsafe {
                 libc::unlink(path.as_ptr());
             }
         }
+        let fd = QUIT_FD.load(Ordering::Acquire);
+        if fd >= 0 && !QUITTING.swap(true, Ordering::AcqRel) {
+            put(fd, &[0]);
+            // SAFETY: as above.
+            unsafe {
+                *errno_location() = errno;
+            }
+            return;
+        }
         // SAFETY: raise(3) is async-signal-safe; SA_RESETHAND restored the default action.
         unsafe {
             libc::raise(signal);
         }
     }
+
+    fn errno_location() -> *mut libc::c_int {
+        // SAFETY: these only return the address of the calling thread's errno.
+        unsafe {
+            #[cfg(target_os = "linux")]
+            return libc::__errno_location();
+            #[cfg(target_os = "android")]
+            return libc::__errno();
+            #[cfg(any(target_os = "macos", target_os = "ios"))]
+            return libc::__error();
+        }
+    }
+
+    fn install_quit_handlers() {
+        for signal in QUIT_SIGNALS {
+            // SAFETY: a plain C handler installed with sigaction; it only uses async-signal-safe
+            // calls (unlink, write, raise) and atomics.
+            unsafe {
+                let mut action: libc::sigaction = std::mem::zeroed();
+                action.sa_sigaction = quit as extern "C" fn(libc::c_int) as libc::sighandler_t;
+                action.sa_flags = libc::SA_RESETHAND;
+                libc::sigemptyset(&mut action.sa_mask);
+                libc::sigaction(signal, &action, std::ptr::null_mut());
+            }
+        }
+    }
+
+    /// Runs `run` on its own thread at the first quit signal. A signal handler may not do more
+    /// than a few system calls, so it only writes a byte into a pipe this thread waits on.
+    pub fn on_quit(run: impl FnOnce() + Send + 'static) -> std::io::Result<()> {
+        let mut fds: [libc::c_int; 2] = [-1; 2];
+        // SAFETY: pipe(2) fills the two descriptors; fcntl only sets a flag on them.
+        unsafe {
+            if libc::pipe(fds.as_mut_ptr()) != 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            for fd in fds {
+                libc::fcntl(fd, libc::F_SETFD, libc::FD_CLOEXEC);
+            }
+        }
+        let [read, write] = fds;
+        std::thread::Builder::new()
+            .name("quit-signal".to_owned())
+            .spawn(move || {
+                let mut byte = 0u8;
+                loop {
+                    // SAFETY: reads at most one byte into a one-byte buffer.
+                    let got = unsafe { libc::read(read, std::ptr::from_mut(&mut byte).cast(), 1) };
+                    if got == 1 {
+                        run();
+                        return;
+                    }
+                    let interrupted = got < 0
+                        && std::io::Error::last_os_error().kind()
+                            == std::io::ErrorKind::Interrupted;
+                    if !interrupted {
+                        return;
+                    }
+                }
+            })?;
+        QUIT_FD.store(write, Ordering::Release);
+        // Again, in case crash reporting could not be set up and left them out.
+        install_quit_handlers();
+        Ok(())
+    }
+
     const SIGNALS: [(libc::c_int, &[u8]); 5] = [
         (libc::SIGSEGV, b"SIGSEGV"),
         (libc::SIGILL, b"SIGILL"),
@@ -639,16 +736,7 @@ mod native {
         if let Ok(path) = std::ffi::CString::new(marker.as_os_str().as_encoded_bytes()) {
             let _ = MARKER_PATH.set(path);
         }
-        for signal in QUIT_SIGNALS {
-            // SAFETY: as below; the handler only calls unlink and raise.
-            unsafe {
-                let mut action: libc::sigaction = std::mem::zeroed();
-                action.sa_sigaction = quit as extern "C" fn(libc::c_int) as libc::sighandler_t;
-                action.sa_flags = libc::SA_RESETHAND;
-                libc::sigemptyset(&mut action.sa_mask);
-                libc::sigaction(signal, &action, std::ptr::null_mut());
-            }
-        }
+        install_quit_handlers();
         MARKER_FD.store(file.into_raw_fd(), Ordering::Release);
         if let Ok(file) = std::fs::File::create(maps) {
             MAPS_FD.store(file.into_raw_fd(), Ordering::Release);
@@ -962,6 +1050,11 @@ mod native {
         }
     }
 
+    /// Windows has no quit signals; the end of the session reaches the app as a window message.
+    pub fn on_quit(_run: impl FnOnce() + Send + 'static) -> std::io::Result<()> {
+        Ok(())
+    }
+
     pub fn install(marker: &Path, maps: &Path) {
         let Ok(file) = std::fs::OpenOptions::new().write(true).open(marker) else {
             return;
@@ -1147,6 +1240,10 @@ mod native {
 #[cfg(not(any(unix, windows)))]
 mod native {
     pub fn install(_marker: &std::path::Path, _maps: &std::path::Path) {}
+
+    pub fn on_quit(_run: impl FnOnce() + Send + 'static) -> std::io::Result<()> {
+        Ok(())
+    }
 }
 
 /// A module line the Windows handler wrote: `module <base> <size> <name>`.
@@ -1451,6 +1548,22 @@ mod tests {
         assert_eq!(utc(0), "1970-01-01 00:00 UTC");
         assert_eq!(utc(1_794_001_864), "2026-11-06 21:51 UTC");
         assert_eq!(utc(951_782_400), "2000-02-29 00:00 UTC");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_quit_signal_runs_the_quit_path_instead_of_ending_the_process() {
+        let (tx, rx) = std::sync::mpsc::channel();
+        on_quit_signal(move || {
+            let _ = tx.send(());
+        });
+        // SAFETY: raises a signal whose handler was just installed.
+        unsafe {
+            libc::raise(libc::SIGTERM);
+        }
+        // Still alive, and the quit path was started.
+        rx.recv_timeout(std::time::Duration::from_secs(5))
+            .expect("the quit path runs");
     }
 
     #[test]

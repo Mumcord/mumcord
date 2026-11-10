@@ -640,6 +640,10 @@ pub fn run() {
             notifications::init(app.handle());
             create_main_window(app.handle())?;
             start_engine(app.handle())?;
+            // Logout, shutdown, `kill` and Ctrl+C quit like "Quit" does, so the plugins get
+            // their `stop` and the connections close cleanly (#748).
+            let quitting = app.handle().clone();
+            mumcord_engine::crash::on_quit_signal(move || window::quit(&quitting));
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
             dnd::init(app.handle());
