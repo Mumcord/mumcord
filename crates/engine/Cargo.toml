@@ -150,3 +150,8 @@ prost.workspace = true
 
 [lints]
 workspace = true
+
+# W5: a hand-rolled harness prints the AC-7.82 figures itself; no benchmark crate is needed.
+[[bench]]
+name = "media_crypto"
+harness = false
