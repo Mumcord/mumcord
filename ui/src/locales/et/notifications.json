@@ -75,5 +75,9 @@
       "body": "Ekraani ja failide jagamine on peatatud, kuni usaldad uut releeserverit.",
       "decision": "Vajab sinu otsust"
     }
+  },
+  "suppressionFallback": {
+    "title": "Mürasummutus on liiga aeglane",
+    "text": "Selles arvutis praegu liiga aeglane. Kuni see järele jõuab, on kasutusel „{{standard}}“."
   }
 }

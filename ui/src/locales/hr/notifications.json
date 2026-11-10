@@ -79,5 +79,9 @@
       "body": "Dijeljenje zaslona i datoteka pauzirano je dok ne potvrdiš da vjeruješ novom releju.",
       "decision": "Potrebna je tvoja odluka"
     }
+  },
+  "suppressionFallback": {
+    "title": "Potiskivanje šuma je presporo",
+    "text": "Trenutačno presporo na ovom računalu. Koristi se „{{standard}}” dok ne bude moglo pratiti."
   }
 }

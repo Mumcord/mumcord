@@ -83,5 +83,9 @@
       "body": "Deljenje zaslona in datotek je zaustavljeno, dokler novemu releju ne zaupaš.",
       "decision": "Potrebna je tvoja odločitev"
     }
+  },
+  "suppressionFallback": {
+    "title": "Dušenje šuma je prepočasno",
+    "text": "Na tem računalniku je trenutno prepočasno. Dokler ne dohaja, deluje »{{standard}}«."
   }
 }

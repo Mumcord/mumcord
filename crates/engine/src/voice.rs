@@ -46,6 +46,9 @@ use crate::session::{
 const _: () = assert!(MAX_VOICE_PAYLOAD_BYTES == mumcord_protocol::MAX_VOICE_PAYLOAD);
 
 const METER_INTERVAL: Duration = Duration::from_millis(50);
+/// Shortest time between two notices that noise suppression fell back. Under lasting load it
+/// falls back again every half minute, and the user needs to hear that once, not every time.
+const FALLBACK_NOTICE_PAUSE: Duration = Duration::from_secs(600);
 /// Poll interval of talk indicators; well inside the 200 ms of AC-1.7.
 const TALK_POLL: Duration = Duration::from_millis(20);
 /// Longest mic-test recording (B8: record, then play back).
@@ -372,8 +375,23 @@ pub(crate) fn spawn_meter(
     rt.spawn(async move {
         let mut tick = tokio::time::interval(METER_INTERVAL);
         tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        let mut fallbacks = controls.suppression_fallbacks();
+        let mut noticed: Option<tokio::time::Instant> = None;
         loop {
             tick.tick().await;
+            // Reported here because the processing thread must not log.
+            let now = controls.suppression_fallbacks();
+            if now != fallbacks {
+                fallbacks = now;
+                tracing::warn!(
+                    backend = ?controls.noise_backend(),
+                    "noise suppression cannot keep up with the microphone; using the standard model for now"
+                );
+                if noticed.is_none_or(|at| at.elapsed() >= FALLBACK_NOTICE_PAUSE) {
+                    noticed = Some(tokio::time::Instant::now());
+                    events.emit(EngineEvent::NoiseSuppressionFallback);
+                }
+            }
             if meter.voice.load(Ordering::Relaxed) || meter.test.load(Ordering::Relaxed) {
                 let level = meter_level(controls.level().peak_dbfs);
                 events.emit(EngineEvent::MicLevel(level));

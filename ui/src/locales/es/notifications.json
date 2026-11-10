@@ -79,5 +79,9 @@
       "body": "Compartir pantalla y archivos está en pausa hasta que confíes en el nuevo relé.",
       "decision": "Requiere tu decisión"
     }
+  },
+  "suppressionFallback": {
+    "title": "Supresión de ruido demasiado lenta",
+    "text": "Ahora mismo es demasiado lenta en este ordenador. Se usa «{{standard}}» hasta que pueda seguir el ritmo."
   }
 }

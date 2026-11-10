@@ -83,5 +83,9 @@
       "body": "Zdieľanie obrazovky a súborov je pozastavené, kým nezačneš dôverovať novému relayu.",
       "decision": "Vyžaduje tvoje rozhodnutie"
     }
+  },
+  "suppressionFallback": {
+    "title": "Potlačenie šumu je príliš pomalé",
+    "text": "Na tomto počítači je teraz príliš pomalé. Kým to nezvládne, beží „{{standard}}“."
   }
 }

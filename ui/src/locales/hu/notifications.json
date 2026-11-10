@@ -75,5 +75,9 @@
       "body": "A képernyő- és fájlmegosztás szünetel, amíg meg nem bízol az új átjátszóban.",
       "decision": "A döntésedre vár"
     }
+  },
+  "suppressionFallback": {
+    "title": "A zajszűrés túl lassú",
+    "text": "Ezen a számítógépen most túl lassú. Amíg nem bírja, a(z) „{{standard}}” beállítás működik."
   }
 }
