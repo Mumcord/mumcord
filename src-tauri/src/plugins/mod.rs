@@ -41,6 +41,9 @@ pub mod sound;
 const NO_PLUGINS_FLAG: &str = "--no-plugins";
 /// How often updates and revocations are checked for (B17b decides what is due).
 const REGISTRY_CHECK_INTERVAL: std::time::Duration = std::time::Duration::from_secs(15 * 60);
+/// How long quitting waits for the plugins to stop. One `stop` call is cut off after its call
+/// budget anyway; this bounds all of them together and a busy service.
+const STOP_GRACE: std::time::Duration = std::time::Duration::from_secs(2);
 
 /// The app's plugin state (managed as `Arc<Plugins>`).
 pub struct Plugins {
@@ -355,6 +358,25 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
     pump_registry_checks(&plugins, engine);
     focus(app, &plugins, engine.voice_server());
     Ok(())
+}
+
+/// Stops every running plugin before the app exits (#704), so each one gets its `stop` and
+/// what it saves there is kept. Waits at most [`STOP_GRACE`]: a plugin that hangs, or a service
+/// that is busy, must not keep the app from quitting.
+pub async fn stop_all(app: &AppHandle) {
+    let Some(plugins) = app.try_state::<Arc<Plugins>>() else {
+        return;
+    };
+    let plugins = Arc::clone(&plugins);
+    let stopping = plugins.call(|service| {
+        service.stop_all();
+        Ok(())
+    });
+    match tokio::time::timeout(STOP_GRACE, stopping).await {
+        Ok(Ok(())) => {}
+        Ok(Err(e)) => tracing::warn!(error = %e, "stopping the plugins failed"),
+        Err(_) => tracing::warn!("the plugins did not stop in time; quitting anyway"),
+    }
 }
 
 /// Debug builds only: shorter restart back-off for the crash tests (AC-6.8).
