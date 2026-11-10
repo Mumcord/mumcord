@@ -222,6 +222,26 @@ describe("PluginLinkCard", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("shows the plugin's icon when it has one, and its initial otherwise", async () => {
+    withIndex([indexed("whiteboard", { icon: "https://example.org/w.png" }), indexed("echolings")]);
+    const image = vi
+      .spyOn(api, "pluginIndexImage")
+      .mockResolvedValue("data:image/png;base64,iVBORw0KGgo=");
+    const withIcon = renderCard();
+    await waitFor(() => {
+      expect(withIcon.container.querySelector("img")?.getAttribute("src")).toBe(
+        "data:image/png;base64,iVBORw0KGgo=",
+      );
+    });
+    expect(image).toHaveBeenCalledWith("whiteboard", { kind: "icon" });
+    withIcon.unmount();
+    const withoutIcon = renderCard("echolings");
+    await waitFor(() => {
+      expect(withoutIcon.container.querySelector(".plugin-browse-initial")).not.toBeNull();
+    });
+    expect(withoutIcon.container.querySelector("img")).toBeNull();
+  });
+
   it("does not load the plugin list again when a card mounts later", async () => {
     const load = vi.spyOn(api, "pluginsIndex").mockResolvedValue(index([indexed("whiteboard")]));
     const first = renderCard();
