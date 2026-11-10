@@ -54,12 +54,14 @@ use tokio::sync::mpsc;
 use tokio::task::JoinSet;
 
 pub use peer::{
-    BroadcastErrorReason, BroadcastId, BroadcastKind, CAMERA_FEATURE, MAX_PEER_BYTES, PEER_DATA_ID,
-    PEER_VERSION, PeerError, PeerMessage, RelayAnnouncement, RelayState, RelayToken, RelayUse,
-    RequestId, TokenErrorReason,
+    BroadcastErrorReason, BroadcastId, BroadcastKind, CAMERA_FEATURE, MAX_PEER_BYTES,
+    MEDIA_VERSION, PEER_DATA_ID, PEER_VERSION, PeerError, PeerMessage, RelayAnnouncement,
+    RelayState, RelayToken, RelayUse, RequestId, TokenErrorReason,
 };
 pub use quinn;
-pub use relay::{BroadcastEnd, BroadcastLink, RelayRefusal, RelayTransport, Unit};
+pub use relay::{
+    BroadcastEnd, BroadcastLink, BroadcastMessage, RelayRefusal, RelayTransport, Unit,
+};
 pub use signal::{
     DATA_ID, DeclineReason, MAX_CANDIDATES, MAX_SIGNAL_BYTES, SessionId, Signal, SignalError,
     VERSION,
