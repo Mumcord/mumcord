@@ -178,9 +178,13 @@ mod tests {
     }
 
     /// FreeBSD: the per-unit PCMs stay, but only for units this machine has.
+    ///
+    /// What counts as "has" is the machine's own `/dev/dsp*`, so the assertions follow it: a CI VM
+    /// without sound cards keeps none of them, a machine with two cards keeps two.
     #[cfg(target_os = "freebsd")]
     #[test]
     fn freebsd_keeps_one_entry_per_existing_dsp_unit() {
+        let has_unit = |unit: &str| std::path::Path::new(&format!("/dev/dsp{unit}")).exists();
         let input = vec![
             dev("alsa:mumcord_dsp0", "Sound card 0 (OSS)", false),
             dev("alsa:mumcord_dsp9", "Sound card 9 (OSS)", false),
@@ -188,10 +192,18 @@ mod tests {
             dev("alsa:oss", "Open Sound System", true),
         ];
         let ids: Vec<String> = filter(input).into_iter().map(|d| d.id).collect();
-        // The test machine has /dev/dsp0 and no unit 9.
-        assert!(ids.contains(&"alsa:mumcord_dsp0".to_owned()), "{ids:?}");
-        assert!(!ids.contains(&"alsa:mumcord_dsp9".to_owned()), "{ids:?}");
+        assert_eq!(
+            ids.contains(&"alsa:mumcord_dsp0".to_owned()),
+            has_unit("0"),
+            "{ids:?}"
+        );
+        assert_eq!(
+            ids.contains(&"alsa:mumcord_dsp9".to_owned()),
+            has_unit("9"),
+            "{ids:?}"
+        );
         assert_eq!(ids.first().map(String::as_str), Some("alsa:oss"));
+        assert!(!ids.iter().any(|id| id == "alsa:null"), "{ids:?}");
     }
 
     /// FreeBSD: `oss` is the real device, `null` stays out.
