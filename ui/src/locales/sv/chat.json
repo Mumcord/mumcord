@@ -273,6 +273,11 @@
     "warning_one": "{{count}} länk i det här meddelandet visar inloggningsuppgifter",
     "warning_other": "{{count}} länkar i det här meddelandet visar inloggningsuppgifter"
   },
+  "pluginCard": {
+    "label": "Tilläggskort för {{name}}",
+    "loading": "Läser in tillägget…",
+    "openLabel": "Öppna {{name}}"
+  },
   "requests": {
     "entry": "Meddelandeförfrågningar",
     "entryCount_one": "{{count}} förfrågan",

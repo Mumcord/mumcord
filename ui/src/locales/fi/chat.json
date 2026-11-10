@@ -273,6 +273,11 @@
     "warning_one": "Tässä viestissä {{count}} linkki näyttää kirjautumistiedot",
     "warning_other": "Tässä viestissä {{count}} linkkiä näyttää kirjautumistiedot"
   },
+  "pluginCard": {
+    "label": "Lisäosakortti: {{name}}",
+    "loading": "Ladataan lisäosaa…",
+    "openLabel": "Avaa {{name}}"
+  },
   "requests": {
     "entry": "Viestipyynnöt",
     "entryCount_one": "{{count}} pyyntö",

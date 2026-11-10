@@ -283,6 +283,11 @@
     "warning_one": "{{count}} link w tej wiadomości pokazuje dane logowania",
     "warning_other": "{{count}} linku w tej wiadomości pokazuje dane logowania"
   },
+  "pluginCard": {
+    "label": "Karta wtyczki {{name}}",
+    "loading": "Wczytywanie wtyczki…",
+    "openLabel": "Otwórz {{name}}"
+  },
   "requests": {
     "entry": "Prośby o wiadomości",
     "entryCount_one": "{{count}} prośba",

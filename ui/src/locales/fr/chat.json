@@ -278,6 +278,11 @@
     "warning_one": "{{count}} lien dans ce message affiche des identifiants",
     "warning_other": "{{count}} liens dans ce message affichent des identifiants"
   },
+  "pluginCard": {
+    "label": "Carte du plugin {{name}}",
+    "loading": "Chargement du plugin…",
+    "openLabel": "Ouvrir {{name}}"
+  },
   "requests": {
     "entry": "Demandes de message",
     "entryCount_one": "{{count}} demande",

@@ -273,6 +273,11 @@
     "warning_one": "{{count}} link in this message shows credentials",
     "warning_other": "{{count}} links in this message show credentials"
   },
+  "pluginCard": {
+    "label": "Plugin card for {{name}}",
+    "loading": "Loading plugin…",
+    "openLabel": "Open {{name}}"
+  },
   "requests": {
     "entry": "Message requests",
     "entryCount_one": "{{count}} request",

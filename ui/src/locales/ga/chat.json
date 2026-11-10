@@ -288,6 +288,11 @@
     "warning_other": "Tá sonraí logála isteach le feiceáil i {{count}} nasc sa teachtaireacht seo",
     "warning_two": "Tá sonraí logála isteach le feiceáil i {{count}} nasc sa teachtaireacht seo"
   },
+  "pluginCard": {
+    "label": "Cárta breiseáin do {{name}}",
+    "loading": "Breiseán á lódáil…",
+    "openLabel": "Oscail {{name}}"
+  },
   "requests": {
     "entry": "Iarratais teachtaireachta",
     "entryCount_one": "{{count}} iarratas",

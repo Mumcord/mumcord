@@ -283,6 +283,11 @@
     "warning_one": "{{count}} odkaz v této zprávě zobrazuje přihlašovací údaje",
     "warning_other": "{{count}} odkazů v této zprávě zobrazuje přihlašovací údaje"
   },
+  "pluginCard": {
+    "label": "Karta doplňku {{name}}",
+    "loading": "Načítání doplňku…",
+    "openLabel": "Otevřít {{name}}"
+  },
   "requests": {
     "entry": "Žádosti o zprávy",
     "entryCount_one": "{{count}} žádost",

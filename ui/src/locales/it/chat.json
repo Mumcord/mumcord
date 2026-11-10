@@ -278,6 +278,11 @@
     "warning_one": "{{count}} link in questo messaggio mostra le credenziali",
     "warning_other": "{{count}} link in questo messaggio mostrano le credenziali"
   },
+  "pluginCard": {
+    "label": "Scheda del plugin {{name}}",
+    "loading": "Caricamento del plugin…",
+    "openLabel": "Apri {{name}}"
+  },
   "requests": {
     "entry": "Richieste di messaggi",
     "entryCount_one": "{{count}} richiesta",

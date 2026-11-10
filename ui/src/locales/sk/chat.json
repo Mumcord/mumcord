@@ -283,6 +283,11 @@
     "warning_one": "{{count}} odkaz v tejto správe zobrazuje prihlasovacie údaje",
     "warning_other": "{{count}} odkazov v tejto správe zobrazuje prihlasovacie údaje"
   },
+  "pluginCard": {
+    "label": "Karta doplnku {{name}}",
+    "loading": "Načítava sa doplnok…",
+    "openLabel": "Otvoriť {{name}}"
+  },
   "requests": {
     "entry": "Žiadosti o správy",
     "entryCount_one": "{{count}} žiadosť",

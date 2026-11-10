@@ -288,6 +288,11 @@
     "warning_other": "{{count}} link f'dan il-messaġġ juru l-kredenzjali",
     "warning_two": "{{count}} links f'dan il-messaġġ juru l-kredenzjali"
   },
+  "pluginCard": {
+    "label": "Karta tal-plagin {{name}}",
+    "loading": "Qed jitgħabba l-plagin…",
+    "openLabel": "Iftaħ {{name}}"
+  },
   "requests": {
     "entry": "Talbiet għal messaġġi",
     "entryCount_one": "{{count}} talba",

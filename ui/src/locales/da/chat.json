@@ -273,6 +273,11 @@
     "warning_one": "{{count}} link i denne besked viser loginoplysninger",
     "warning_other": "{{count}} links i denne besked viser loginoplysninger"
   },
+  "pluginCard": {
+    "label": "Pluginkort for {{name}}",
+    "loading": "Indlæser plugin…",
+    "openLabel": "Åbn {{name}}"
+  },
   "requests": {
     "entry": "Beskedanmodninger",
     "entryCount_one": "{{count}} anmodning",
