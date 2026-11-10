@@ -1,0 +1,81 @@
+name: Plugin repository submission
+description: Submit a third-party plugin repository so Mumcord can promote it.
+title: "Plugin repository: "
+labels: ["plugin"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to suggest a third-party plugin repository that Mumcord should point people to.
+        The repository must follow the [plugin registry format](https://github.com/Mumcord/mumcord/blob/main/docs/plugin-registry-format.md).
+        We look at every submission before promoting it; a submission is not a guarantee.
+        To add a plugin to the official registry instead, open a pull request in [Mumcord/plugins](https://github.com/Mumcord/plugins).
+  - type: input
+    id: name
+    attributes:
+      label: Repository name
+      description: The name people see in Mumcord's "add repository" dialog.
+    validations:
+      required: true
+  - type: input
+    id: address
+    attributes:
+      label: Repository address
+      description: The address people add in Mumcord. It ends in `/v1/index.json`.
+      placeholder: https://example.org/plugins/v1/index.json
+    validations:
+      required: true
+  - type: input
+    id: key
+    attributes:
+      label: Public key
+      description: The repository's minisign public key, so people can type it as the "Expected key" when they add the repository. Never post the secret key.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source code
+      description: Where the source of the plugins can be read.
+      placeholder: https://github.com/example/plugins
+    validations:
+      required: true
+  - type: textarea
+    id: plugins
+    attributes:
+      label: Plugins in the repository
+      description: List the plugins, what each one does and which permissions it asks for.
+    validations:
+      required: true
+  - type: input
+    id: licence
+    attributes:
+      label: Licence
+      description: The licence the plugins are published under.
+    validations:
+      required: true
+  - type: input
+    id: maintainer
+    attributes:
+      label: Maintainer
+      description: Who looks after the repository and how to reach them (a GitHub handle is enough).
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Screenshots, a short pitch, or things we should know before trying the repository.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I maintain this repository or have the maintainer's permission to submit it.
+          required: true
+        - label: The index is signed and the repository can be added in a current Mumcord release.
+          required: true
+        - label: Every plugin works against an unmodified standard Mumble server.
+          required: true
+        - label: The plugins contain no malware and collect no personal data without telling the user.
+          required: true
