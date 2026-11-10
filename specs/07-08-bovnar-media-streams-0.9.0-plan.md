@@ -212,18 +212,25 @@ The description is one embedded Bovnar document, capped at 8 KiB, for example:
 .id = "…";                              # camera session id, absent for screen
 .tracks = [
     { .ch = <uint:8> 1; .kind = "video"; .codec = "av1"; .layer = <uint:8> 0;
-      .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0; },
+      .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0;
+      .bitrate = <uint:32,k~b/s> 0; },
     { .ch = <uint:8> 2; .kind = "video"; .codec = "av1"; .layer = <uint:8> 1;
-      .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0; },
-    { .ch = <uint:8> 5; .kind = "audio"; .codec = "opus";
-      .rate = <uint:32,Hz> 48000; .bitrate = <uint:32,k~b/s> 96; }
+      .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0;
+      .bitrate = <uint:32,k~b/s> 0; },
+    { .ch = <uint:8> 5; .kind = "audio"; .codec = "opus"; .layer = <uint:8> 0;
+      .width = <uint:16> 0; .height = <uint:16> 0; .rate = <uint:32,Hz> 48000;
+      .bitrate = <uint:32,k~b/s> 96; }
 ];
 ```
 
-`width`, `height`, `codec` and `rate` change with the quality step; `ch` and `layer` state where
-the frames for that track arrive. Fields a reader does not know are ignored, so a later codec,
-HDR metadata or a second audio track needs no wire version bump. The camera id ties a direct
-camera stream to the `on`/`cam-join` session, so a stale stream is refused.
+Every track object carries the same eight fields, because a Bovnar `DomDoc` array must hold one
+struct shape; fields that do not apply to a track are zero (video `.bitrate` = 0; audio `.layer`,
+`.width` and `.height` = 0). The parser requires the fields that belong to the track's kind,
+validates their ranges, and ignores unknown or inapplicable fields, so a streaming parse still
+accepts either shape. `width`, `height`, `codec` and `rate` change with the quality step; `ch`
+and `layer` state where the frames for that track arrive. Unknown fields remain ignored, so a
+later codec, HDR metadata or a second audio track needs no wire version bump. The camera id ties
+a direct camera stream to the `on`/`cam-join` session, so a stale stream is refused.
 
 Everything received is untrusted: check the document size before parsing, validate the channel
 map, the codec and the track count, and reject anything that does not fit the profile.
