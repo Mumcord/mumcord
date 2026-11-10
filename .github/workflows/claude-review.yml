@@ -1,6 +1,7 @@
 # Automatic code review of every pull request by Claude Sonnet 5.5.
 # Posts one summary comment and inline comments on concrete problems; it never pushes code.
-# Needs the repository secret ANTHROPIC_API_KEY (pay-per-use key from console.anthropic.com).
+# Runs on the maintainer's Claude subscription, not on pay-per-use API credit: needs the
+# repository secret CLAUDE_CODE_OAUTH_TOKEN (created locally with `claude setup-token`).
 name: Claude review
 
 on:
@@ -31,13 +32,13 @@ jobs:
         with:
           fetch-depth: 1
 
-      # The review is advice, not a gate: if it cannot run (API key, credit, outage), the
+      # The review is advice, not a gate: if it cannot run (token, usage limit, outage), the
       # pull request must not turn red because of it.
       - uses: anthropics/claude-code-action@v1
         id: claude
         continue-on-error: true
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
