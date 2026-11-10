@@ -23,6 +23,7 @@ use crate::commands::updates::{
     UpdateStatusChanged,
 };
 use release::Rejected;
+pub use release::effective_update_channel;
 
 const RELEASES_API: &str = "https://api.github.com/repos/Mumcord/mumcord/releases?per_page=30";
 const RELEASES: &str = "https://github.com/Mumcord/mumcord/releases";
@@ -257,6 +258,7 @@ impl Updater {
         // Stamped before the request so a failing network is not retried every loop.
         settings.last_update_check = Some(now);
         let skipped = settings.update_skipped.clone();
+        let channel = effective_update_channel(settings.update_channel, current);
         let auto = settings.update_auto_download;
         self.0.engine.update_settings(settings).await?;
         self.set_phase(UpdatePhase::Checking, None);
@@ -270,13 +272,14 @@ impl Updater {
             LIST_LIMIT,
         )
         .await
-        .map(|body| release::pick_offer(&body, current, skipped.as_deref()));
+        .map(|body| release::pick_offer(&body, current, channel, skipped.as_deref()));
         let prompt = match found {
             Ok(Some(offer)) => {
                 let mut state = self.state();
                 state.offer = Some(UpdateOffer {
                     url: format!("{RELEASES}/tag/v{}", offer.version),
                     version: offer.version,
+                    channel: offer.channel,
                     notes: offer.notes,
                 });
                 state.phase = UpdatePhase::Available;

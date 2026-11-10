@@ -6,6 +6,9 @@ use base64::engine::general_purpose::STANDARD;
 use minisign_verify::{PublicKey, Signature};
 use sha2::{Digest, Sha256};
 
+use mumcord_engine::store;
+
+use crate::commands::settings::UpdateChannel;
 use crate::commands::updates::ReleaseNote;
 
 /// A parsed `major.minor.patch[-pre]` version in SemVer order, so release candidates follow each
@@ -26,21 +29,44 @@ impl Version {
     }
 }
 
+/// The channel updates come from: the user's choice, else the one that fits the installed
+/// version (a release candidate follows release candidates, anything else stays on stable).
+pub fn effective_update_channel(
+    chosen: Option<store::UpdateChannel>,
+    installed: &str,
+) -> UpdateChannel {
+    chosen.map(UpdateChannel::from).unwrap_or_else(|| {
+        if Version::parse(installed).is_some_and(|v| v.is_prerelease()) {
+            UpdateChannel::ReleaseCandidates
+        } else {
+            UpdateChannel::Stable
+        }
+    })
+}
+
 /// The newest release to offer and the notes of every release since `current`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Offer {
     pub version: String,
+    /// The channel of the offered version: `Stable` for a final release, `ReleaseCandidates`
+    /// for a pre-release.
+    pub channel: UpdateChannel,
     /// Newest first.
     pub notes: Vec<ReleaseNote>,
 }
 
-/// Picks the update from a GitHub "list releases" document. Only the stable channel exists in
-/// 0.5.0: pre-releases are offered only to users who run one. Never offers a downgrade, nor
-/// the version the user skipped.
-pub fn pick_offer(body: &[u8], current: &str, skipped: Option<&str>) -> Option<Offer> {
+/// Picks the update from a GitHub "list releases" document. The stable channel offers final
+/// releases only, even to someone who runs a release candidate; the release-candidate channel
+/// offers both. Never offers a downgrade, nor the version the user skipped.
+pub fn pick_offer(
+    body: &[u8],
+    current: &str,
+    channel: UpdateChannel,
+    skipped: Option<&str>,
+) -> Option<Offer> {
     let current = Version::parse(current)?;
     let releases: Vec<serde_json::Value> = serde_json::from_slice(body).ok()?;
-    let mut newer: Vec<(Version, ReleaseNote)> = releases
+    let mut newer: Vec<(Version, bool, ReleaseNote)> = releases
         .iter()
         .filter_map(|release| {
             let flag = |key| release.get(key).and_then(serde_json::Value::as_bool);
@@ -50,7 +76,7 @@ pub fn pick_offer(body: &[u8], current: &str, skipped: Option<&str>) -> Option<O
             let tag = release.get("tag_name")?.as_str()?;
             let version = Version::parse(tag)?;
             let pre = flag("prerelease") == Some(true) || version.is_prerelease();
-            if (pre && !current.is_prerelease()) || version <= current {
+            if (pre && channel == UpdateChannel::Stable) || version <= current {
                 return None;
             }
             let date = release
@@ -67,17 +93,24 @@ pub fn pick_offer(body: &[u8], current: &str, skipped: Option<&str>) -> Option<O
                 date,
                 changes: whats_new(body),
             };
-            Some((version, note))
+            Some((version, pre, note))
         })
         .collect();
-    newer.sort_by(|(a, _), (b, _)| b.cmp(a));
-    let newest = newer.first()?.1.version.clone();
+    newer.sort_by(|(a, ..), (b, ..)| b.cmp(a));
+    let (_, newest_is_pre, newest_note) = newer.first()?;
+    let newest = newest_note.version.clone();
+    let newest_channel = if *newest_is_pre {
+        UpdateChannel::ReleaseCandidates
+    } else {
+        UpdateChannel::Stable
+    };
     if skipped.is_some_and(|s| Version::parse(s) == Version::parse(&newest)) {
         return None;
     }
     Some(Offer {
         version: newest,
-        notes: newer.into_iter().map(|(_, note)| note).collect(),
+        channel: newest_channel,
+        notes: newer.into_iter().map(|(.., note)| note).collect(),
     })
 }
 
@@ -198,6 +231,9 @@ mod tests {
     use super::*;
     use std::io::Cursor;
 
+    const STABLE: UpdateChannel = UpdateChannel::Stable;
+    const RC: UpdateChannel = UpdateChannel::ReleaseCandidates;
+
     fn release(tag: &str, pre: bool, body: &str) -> serde_json::Value {
         serde_json::json!({
             "tag_name": tag,
@@ -239,7 +275,7 @@ mod tests {
             release("v0.4.2", false, ""),
             release("v0.4.1", false, ""),
         ]);
-        let offer = pick_offer(&body, "0.4.2", None).expect("offer");
+        let offer = pick_offer(&body, "0.4.2", STABLE, None).expect("offer");
         assert_eq!(offer.version, "0.4.5");
         let versions: Vec<_> = offer.notes.iter().map(|n| n.version.as_str()).collect();
         assert_eq!(versions, ["0.4.5", "0.4.4", "0.4.3"]);
@@ -253,12 +289,36 @@ mod tests {
 
     #[test]
     fn no_downgrade_no_same_version_no_garbage() {
-        assert!(pick_offer(&list(&[release("v0.4.2", false, "")]), "0.4.2", None).is_none());
-        assert!(pick_offer(&list(&[release("v0.3.9", false, "")]), "0.4.2", None).is_none());
-        assert!(pick_offer(b"not json", "0.4.2", None).is_none());
-        assert!(pick_offer(&list(&[release("nightly", false, "")]), "0.4.2", None).is_none());
+        assert!(
+            pick_offer(
+                &list(&[release("v0.4.2", false, "")]),
+                "0.4.2",
+                STABLE,
+                None
+            )
+            .is_none()
+        );
+        assert!(
+            pick_offer(
+                &list(&[release("v0.3.9", false, "")]),
+                "0.4.2",
+                STABLE,
+                None
+            )
+            .is_none()
+        );
+        assert!(pick_offer(b"not json", "0.4.2", STABLE, None).is_none());
+        assert!(
+            pick_offer(
+                &list(&[release("nightly", false, "")]),
+                "0.4.2",
+                STABLE,
+                None
+            )
+            .is_none()
+        );
         let draft = serde_json::json!({"tag_name": "v9.0.0", "draft": true});
-        assert!(pick_offer(&list(&[draft]), "0.4.2", None).is_none());
+        assert!(pick_offer(&list(&[draft]), "0.4.2", STABLE, None).is_none());
     }
 
     #[test]
@@ -267,31 +327,49 @@ mod tests {
             release("v0.5.0-beta.1", true, ""),
             release("v0.4.3", false, ""),
         ]);
-        assert_eq!(
-            pick_offer(&body, "0.4.2", None).expect("offer").version,
-            "0.4.3"
-        );
-        assert_eq!(
-            pick_offer(&body, "0.4.3-rc.1", None)
-                .expect("offer")
-                .version,
-            "0.5.0-beta.1"
-        );
+        let offer = pick_offer(&body, "0.4.2", STABLE, None).expect("offer");
+        assert_eq!(offer.version, "0.4.3");
+        assert_eq!(offer.channel, STABLE);
     }
 
-    /// Release candidates from milestone branches (RELEASING.md): never offered on a final
-    /// release, even if the pre-release flag were missing; an RC moves on to the next RC and to
-    /// the final release.
+    /// Release candidates from milestone branches (RELEASING.md): the stable channel never
+    /// offers one, whether it is flagged as a pre-release or only has a pre-release version, and
+    /// also not to someone who runs a release candidate (issue #741).
     #[test]
-    fn release_candidates_stay_off_the_stable_channel() {
+    fn stable_channel_never_offers_release_candidates() {
         let rc_only = list(&[
             release("v0.8.0-rc.2", true, ""),
             release("v0.8.0-rc.1", false, ""),
             release("v0.7.1", false, ""),
         ]);
-        assert!(pick_offer(&rc_only, "0.7.1", None).is_none());
+        assert!(pick_offer(&rc_only, "0.7.1", STABLE, None).is_none());
+        assert!(pick_offer(&rc_only, "0.8.0-rc.1", STABLE, None).is_none());
+        let flagged = list(&[release("v0.8.0", true, "")]);
+        assert!(pick_offer(&flagged, "0.7.1", STABLE, None).is_none());
+        let with_final = list(&[
+            release("v0.8.0", false, ""),
+            release("v0.8.0-rc.2", true, ""),
+        ]);
         assert_eq!(
-            pick_offer(&rc_only, "0.8.0-rc.1", None)
+            pick_offer(&with_final, "0.8.0-rc.2", STABLE, None)
+                .expect("offer")
+                .version,
+            "0.8.0"
+        );
+    }
+
+    #[test]
+    fn release_candidate_channel_offers_candidates_and_final_releases() {
+        let rcs = list(&[
+            release("v0.8.0-rc.2", true, ""),
+            release("v0.8.0-rc.1", true, ""),
+            release("v0.7.1", false, ""),
+        ]);
+        let offer = pick_offer(&rcs, "0.7.1", RC, None).expect("offer");
+        assert_eq!(offer.version, "0.8.0-rc.2");
+        assert_eq!(offer.channel, RC);
+        assert_eq!(
+            pick_offer(&rcs, "0.8.0-rc.1", RC, None)
                 .expect("offer")
                 .version,
             "0.8.0-rc.2"
@@ -300,21 +378,30 @@ mod tests {
             release("v0.8.0", false, ""),
             release("v0.8.0-rc.2", true, ""),
         ]);
-        assert_eq!(
-            pick_offer(&with_final, "0.8.0-rc.2", None)
-                .expect("offer")
-                .version,
-            "0.8.0"
-        );
+        let offer = pick_offer(&with_final, "0.8.0-rc.2", RC, None).expect("offer");
+        assert_eq!(offer.version, "0.8.0");
+        assert_eq!(offer.channel, STABLE);
+        assert!(pick_offer(&with_final, "0.8.0", RC, None).is_none());
+    }
+
+    #[test]
+    fn channel_follows_the_installed_version_until_chosen() {
+        let chosen = Some(store::UpdateChannel::Stable);
+        assert_eq!(effective_update_channel(None, "0.7.1"), STABLE);
+        assert_eq!(effective_update_channel(None, "0.8.0-rc.1"), RC);
+        assert_eq!(effective_update_channel(None, "dev~a1b2c3d"), STABLE);
+        assert_eq!(effective_update_channel(chosen, "0.8.0-rc.1"), STABLE);
+        let rc = Some(store::UpdateChannel::ReleaseCandidates);
+        assert_eq!(effective_update_channel(rc, "0.7.1"), RC);
     }
 
     #[test]
     fn skipped_version_is_not_offered_but_a_newer_one_is() {
         let one = list(&[release("v0.4.4", false, "")]);
-        assert!(pick_offer(&one, "0.4.2", Some("0.4.4")).is_none());
+        assert!(pick_offer(&one, "0.4.2", STABLE, Some("0.4.4")).is_none());
         let two = list(&[release("v0.4.5", false, ""), release("v0.4.4", false, "")]);
         assert_eq!(
-            pick_offer(&two, "0.4.2", Some("0.4.4"))
+            pick_offer(&two, "0.4.2", STABLE, Some("0.4.4"))
                 .expect("offer")
                 .version,
             "0.4.5"

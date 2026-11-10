@@ -5112,6 +5112,11 @@ export type Settings = {
 	updateAutoDownload: boolean,
 	/**  Hours between two update checks, 1–168 (FR-3.144). */
 	updateIntervalHours: number,
+	/**
+	 *  The effective update channel (issue #741): the user's choice, else the one that fits the
+	 *  installed version. Saving stores it as the choice.
+	 */
+	updateChannel: UpdateChannel,
 	/**  The version the user skipped; `null` when none is (FR-3.144). */
 	updateSkipped: string | null,
 	/**  AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55). */
@@ -5501,6 +5506,12 @@ export type UnreadCount = {
 	count: number,
 };
 
+/**
+ *  Which releases the updater offers (issue #741): final releases only, or release candidates
+ *  as well.
+ */
+export type UpdateChannel = "stable" | "releaseCandidates";
+
 /**  Why the last step failed. Offline checks are not shown as errors, only in Settings. */
 export type UpdateError = 
 /**  GitHub could not be reached or answered with an error. */
@@ -5517,6 +5528,11 @@ export type UpdateError =
 /**  A newer release than the installed one. */
 export type UpdateOffer = {
 	version: string,
+	/**
+	 *  The channel this version belongs to: `stable` for a final release, `releaseCandidates`
+	 *  for a pre-release.
+	 */
+	channel: UpdateChannel,
 	/**  Newest first: every release since the installed one. */
 	notes: ReleaseNote[],
 	/**  The release page, built from the version (never taken from the response). */

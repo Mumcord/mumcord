@@ -6,8 +6,11 @@
  */
 import type { Settings, UpdateOffer, UpdateStatus } from "../bindings/commands";
 
+const OFFER_VERSION = "0.4.5";
+
 const OFFER: UpdateOffer = {
-  version: "0.4.5",
+  version: OFFER_VERSION,
+  channel: OFFER_VERSION.includes("-") ? "releaseCandidates" : "stable",
   url: "https://github.com/Mumcord/mumcord/releases/tag/v0.4.5",
   notes: [
     {
