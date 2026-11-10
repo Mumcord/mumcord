@@ -105,6 +105,8 @@ jobs:
 
       - uses: docker/setup-buildx-action@v4
 
+      # Only a push writes the image cache: a merged pull-request run can still report
+      # refs/heads/main, but its token cannot write cache entries.
       - name: Build image
         uses: docker/build-push-action@v7
         with:
@@ -112,7 +114,7 @@ jobs:
           tags: mumcord-e2e
           load: true
           cache-from: type=gha,scope=e2e-image-${{ steps.keys.outputs.month }}
-          cache-to: ${{ github.ref == 'refs/heads/main' && format('type=gha,mode=max,scope=e2e-image-{0}', steps.keys.outputs.month) || '' }}
+          cache-to: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && format('type=gha,mode=max,scope=e2e-image-{0}', steps.keys.outputs.month) || '' }}
 
       # The shards only run tests: they pull the slim `runtime` stage (no compiler or headers)
       # from GHCR instead of downloading and loading the whole image as an artifact (#562). Pull
@@ -147,7 +149,7 @@ jobs:
           CARGO_PROFILE_DEV_DEBUG: 0
           CARGO_INCREMENTAL: 0
 
-      - if: github.ref == 'refs/heads/main' && steps.target-cache.outputs.cache-hit != 'true'
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.target-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
@@ -212,7 +214,7 @@ jobs:
           key: e2e-plugins
           # `mumcord-plugin build` puts each test plugin's target dir next to its sources.
           cache-directories: e2e/fixtures/plugins/*/target
-          save-if: ${{ github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
       - name: Build plugin CLI and packages
         run: scripts/e2e-plugin-registry.sh --build-only "$RUNNER_TEMP/plugins"
@@ -276,7 +278,7 @@ jobs:
           docker save mumpeer:testenv mumbot:peer-e2e | zstd -T0 -3 -q -o e2e-relay-images.tar.zst
           ls -lh e2e-relay-images.tar.zst
 
-      - if: github.ref == 'refs/heads/main' && steps.cache.outputs.cache-hit != 'true'
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: e2e-relay-images.tar.zst
