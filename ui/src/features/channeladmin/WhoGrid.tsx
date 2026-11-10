@@ -20,8 +20,10 @@ interface WhoGridProps {
   checkedName: string;
   /** "Go to rule N" in the Why? panel. */
   onGoToRule: (index: number) => void;
-  /** Fewer columns, for the summary under the Groups view (mockup "acl-groups"). */
+  /** Fewer columns, for the "what can this group do" dialog of the Groups view. */
   columns?: readonly string[] | undefined;
+  /** Only this group's row plus "Everyone" for comparison, the group's row marked (Groups view). */
+  onlyGroup?: string | undefined;
 }
 
 /**
@@ -38,9 +40,16 @@ export function WhoGrid({
   checkedName,
   onGoToRule,
   columns,
+  onlyGroup,
 }: WhoGridProps) {
   const { t } = useTranslation("admin");
-  const rows = gridRows(acl, checked);
+  const rows: { key: string; row: AclRowInput }[] =
+    onlyGroup === undefined
+      ? gridRows(acl, checked)
+      : [
+          { key: `group:${onlyGroup}`, row: { kind: "group", name: onlyGroup } },
+          { key: "everyone", row: { kind: "everyone" } },
+        ];
   const [cells, setCells] = useState<AclCell[][] | null>(null);
   const [selected, setSelected] = useState<{ row: number; permission: number } | null>(null);
 
@@ -63,7 +72,7 @@ export function WhoGrid({
     };
     // `rows` follows from `acl` and `checked`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serverId, acl, checked]);
+  }, [serverId, acl, checked, onlyGroup]);
 
   const label = (index: number): string => {
     const row = rows[index]?.row;
@@ -103,9 +112,7 @@ export function WhoGrid({
               {groups.flatMap((g) =>
                 g.perms.map((p, i) => (
                   <th key={p} scope="col" data-group-start={i === 0 || undefined}>
-                    {i === 0 && columns === undefined && (
-                      <span className="who-grid__group">{t(`perm.group.${g.id}`)}</span>
-                    )}
+                    {i === 0 && <span className="who-grid__group">{t(`perm.group.${g.id}`)}</span>}
                     {t(`perm.name.${p}`)}
                   </th>
                 )),
@@ -114,7 +121,10 @@ export function WhoGrid({
           </thead>
           <tbody>
             {rows.map((r, rowIndex) => (
-              <tr key={r.key}>
+              <tr
+                key={r.key}
+                data-current={(onlyGroup !== undefined && rowIndex === 0) || undefined}
+              >
                 <th scope="row">{label(rowIndex)}</th>
                 {groups.flatMap((g) =>
                   g.perms.map((p) => {

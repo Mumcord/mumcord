@@ -104,6 +104,25 @@
   color: var(--color-text-muted);
 }
 
+.select__clear {
+  align-self: stretch;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.select__clear:hover {
+  color: inherit;
+}
+
+.select__clear:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
 .select__toggle {
   display: flex;
   align-items: center;
