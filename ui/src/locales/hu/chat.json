@@ -273,6 +273,11 @@
     "warning_one": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat",
     "warning_other": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat"
   },
+  "pluginCard": {
+    "label": "Bővítménykártya: {{name}}",
+    "loading": "Bővítmény betöltése…",
+    "openLabel": "{{name}} megnyitása"
+  },
   "requests": {
     "entry": "Üzenetkérések",
     "entryCount_one": "{{count}} kérés",

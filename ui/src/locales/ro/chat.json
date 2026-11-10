@@ -278,6 +278,11 @@
     "warning_one": "{{count}} link din acest mesaj afișează datele de conectare",
     "warning_other": "{{count}} de linkuri din acest mesaj afișează datele de conectare"
   },
+  "pluginCard": {
+    "label": "Cardul pluginului {{name}}",
+    "loading": "Se încarcă pluginul…",
+    "openLabel": "Deschide {{name}}"
+  },
   "requests": {
     "entry": "Cereri de mesaje",
     "entryCount_one": "{{count}} cerere",

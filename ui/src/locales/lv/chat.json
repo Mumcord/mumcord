@@ -278,6 +278,11 @@
     "warning_other": "{{count}} saites šajā ziņā parāda pieteikšanās datus",
     "warning_zero": "{{count}} saites šajā ziņā parāda pieteikšanās datus"
   },
+  "pluginCard": {
+    "label": "Spraudņa karte {{name}}",
+    "loading": "Notiek spraudņa ielāde…",
+    "openLabel": "Atvērt {{name}}"
+  },
   "requests": {
     "entry": "Ziņu pieprasījumi",
     "entryCount_zero": "{{count}} pieprasījumi",

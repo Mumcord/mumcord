@@ -278,6 +278,11 @@
     "warning_one": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice",
     "warning_other": "{{count}} poveznica u ovoj poruci prikazuje vjerodajnice"
   },
+  "pluginCard": {
+    "label": "Kartica dodatka {{name}}",
+    "loading": "Učitavanje dodatka…",
+    "openLabel": "Otvori {{name}}"
+  },
   "requests": {
     "entry": "Zahtjevi za poruke",
     "entryCount_one": "{{count}} zahtjev",

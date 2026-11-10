@@ -2265,6 +2265,160 @@ a.message-card__title:hover {
   background: var(--color-bg-hover);
 }
 
+/* Card under a message for a `mumcord://plugins/<id>` link (FR-6.65a): the message card's frame with
+   the plugin's icon beside the text. */
+.plugin-link-card {
+  position: relative;
+  flex-direction: row;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.plugin-link-card--loading {
+  --card-stripe: var(--color-border);
+}
+
+/* The Browse list's icon classes, sized here because its stylesheet loads only with the settings. */
+.plugin-link-card .plugin-browse-icon {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-tile);
+  object-fit: cover;
+  font-size: var(--font-size-lg);
+}
+
+.plugin-link-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.plugin-link-card__body p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.plugin-link-card__top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  /* Keeps the name and its labels clear of the dismiss button. */
+  padding-right: var(--space-5);
+}
+
+.plugin-link-card__name {
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-link-card__tag {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-full);
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-link-card__installed {
+  color: var(--color-success);
+  font-size: var(--font-size-xs);
+}
+
+.plugin-link-card__summary {
+  color: var(--color-text-secondary);
+}
+
+.plugin-link-card__authors {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.plugin-link-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.plugin-link-card__button {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.plugin-link-card__button:hover {
+  background: var(--color-bg-hover);
+}
+
+.plugin-link-card__button--primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-link-card__button--primary:hover {
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--color-text));
+}
+
+.plugin-link-card__skeleton {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  animation: plugin-link-card-pulse 1.4s ease-in-out infinite;
+}
+
+.plugin-link-card__skeleton--icon {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-tile);
+}
+
+.plugin-link-card__skeleton--name {
+  width: 9rem;
+  height: 1.125rem;
+}
+
+.plugin-link-card__skeleton--summary {
+  width: 17rem;
+  height: 0.75rem;
+}
+
+.plugin-link-card__skeleton--authors {
+  width: 6rem;
+  height: 0.625rem;
+}
+
+.plugin-link-card__skeleton--button {
+  width: 4.5rem;
+  height: 1.75rem;
+}
+
+@keyframes plugin-link-card-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plugin-link-card__skeleton {
+    animation: none;
+  }
+}
+
 /* "Identity: ‹label›" next to the conversation title, only for non-default identities (#148). */
 .chat-header__identity {
   flex: 0 0 auto;

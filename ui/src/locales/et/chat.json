@@ -273,6 +273,11 @@
     "warning_one": "{{count}} link selles sõnumis näitab sisselogimisandmeid",
     "warning_other": "{{count}} linki selles sõnumis näitavad sisselogimisandmeid"
   },
+  "pluginCard": {
+    "label": "Plugina kaart {{name}}",
+    "loading": "Plugina laadimine…",
+    "openLabel": "Ava {{name}}"
+  },
   "requests": {
     "entry": "Sõnumitaotlused",
     "entryCount_one": "{{count}} taotlus",

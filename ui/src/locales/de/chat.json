@@ -273,6 +273,11 @@
     "warning_one": "{{count}} Link in dieser Nachricht zeigt Anmeldedaten",
     "warning_other": "{{count}} Links in dieser Nachricht zeigen Anmeldedaten"
   },
+  "pluginCard": {
+    "label": "Plugin-Karte für {{name}}",
+    "loading": "Plugin wird geladen…",
+    "openLabel": "{{name}} öffnen"
+  },
   "requests": {
     "entry": "Nachrichtenanfragen",
     "entryCount_one": "{{count}} Anfrage",

@@ -9,6 +9,8 @@ export type PluginIndexState =
   | { status: "failed"; message: string };
 
 let state: PluginIndexState = { status: "loading" };
+/** Language of the last load that settled (loaded or failed); `null` before the first one. */
+let settledLanguage: string | null = null;
 let inflight: { language: string; promise: Promise<PluginIndex | null> } | null = null;
 const listeners = new Set<() => void>();
 
@@ -39,6 +41,7 @@ export function loadPluginIndex(language: string): Promise<PluginIndex | null> {
       return null;
     })
     .finally(() => {
+      settledLanguage = language;
       if (inflight?.promise === promise) inflight = null;
     });
   inflight = { language, promise };
@@ -50,11 +53,7 @@ export function currentPluginIndex(): PluginIndexState {
   return state;
 }
 
-/** The list, loaded again whenever a component using it mounts or the language changes. */
-export function usePluginIndex(language: string): PluginIndexState {
-  useEffect(() => {
-    void loadPluginIndex(language);
-  }, [language]);
+function usePluginIndexState(): PluginIndexState {
   return useSyncExternalStore(
     (listener) => {
       listeners.add(listener);
@@ -66,8 +65,29 @@ export function usePluginIndex(language: string): PluginIndexState {
   );
 }
 
+/** The list, loaded again whenever a component using it mounts or the language changes. */
+export function usePluginIndex(language: string): PluginIndexState {
+  useEffect(() => {
+    void loadPluginIndex(language);
+  }, [language]);
+  return usePluginIndexState();
+}
+
+/**
+ * The list without a reload per mount: it is only loaded when no load in `language` has settled
+ * yet. For chat cards, where any message could otherwise make the app contact the plugin list
+ * again and again while the user scrolls.
+ */
+export function useSettledPluginIndex(language: string): PluginIndexState {
+  useEffect(() => {
+    if (settledLanguage !== language) void loadPluginIndex(language);
+  }, [language]);
+  return usePluginIndexState();
+}
+
 /** Tests only. */
 export function resetPluginIndex(): void {
   inflight = null;
+  settledLanguage = null;
   set({ status: "loading" });
 }

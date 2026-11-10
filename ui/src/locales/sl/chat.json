@@ -283,6 +283,11 @@
     "warning_other": "{{count}} povezke v tem sporočilu prikazuje poverilnice",
     "warning_two": "{{count}} povezavi v tem sporočilu prikazujeta poverilnice"
   },
+  "pluginCard": {
+    "label": "Kartica vtičnika {{name}}",
+    "loading": "Nalaganje vtičnika…",
+    "openLabel": "Odpri {{name}}"
+  },
   "requests": {
     "entry": "Prošnje za sporočila",
     "entryCount_one": "{{count}} prošnja",

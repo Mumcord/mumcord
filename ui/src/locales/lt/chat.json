@@ -283,6 +283,11 @@
     "warning_one": "{{count}} nuoroda šioje žinutėje rodo prisijungimo duomenis",
     "warning_other": "{{count}} nuorodų šioje žinutėje rodo prisijungimo duomenis"
   },
+  "pluginCard": {
+    "label": "Papildinio kortelė {{name}}",
+    "loading": "Įkeliamas papildinys…",
+    "openLabel": "Atidaryti {{name}}"
+  },
   "requests": {
     "entry": "Žinučių prašymai",
     "entryCount_one": "{{count}} prašymas",

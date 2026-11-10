@@ -273,6 +273,11 @@
     "warning_one": "{{count}} link in dit bericht toont inloggegevens",
     "warning_other": "{{count}} links in dit bericht tonen inloggegevens"
   },
+  "pluginCard": {
+    "label": "Plug-inkaart voor {{name}}",
+    "loading": "Plug-in laden…",
+    "openLabel": "{{name}} openen"
+  },
   "requests": {
     "entry": "Berichtverzoeken",
     "entryCount_one": "{{count}} verzoek",
