@@ -186,9 +186,9 @@ describe("PluginTree", () => {
         disabled: false,
       }),
     ]);
-    expect(screen.getByRole("heading", { name: "Lunch?" })).toHaveStyle({
-      color: "var(--color-accent)",
-    });
+    // The variable is a theme token whose value lives in the app stylesheet, not in this test:
+    // jsdom resolves it to nothing, so check the declaration the plugin UI sets.
+    expect(screen.getByRole("heading", { name: "Lunch?" }).style.color).toBe("var(--color-accent)");
     expect(screen.getByRole("meter", { name: "Energy" })).toBeInTheDocument();
     expect(screen.getByRole("switch", { name: "Notify" })).toBeChecked();
     expect(screen.getByRole("button", { name: "Refresh Song" })).toBeInTheDocument();
@@ -646,7 +646,7 @@ describe("variants", () => {
     const tone = screen.getByText("Connected");
     expect(tone).toHaveClass("pr-chip", "pr-tone--success");
     expect(tone).not.toHaveAttribute("style");
-    expect(screen.getByText("3 votes")).toHaveStyle({ color: "var(--color-accent)" });
+    expect(screen.getByText("3 votes").style.color).toBe("var(--color-accent)");
     expect(document.querySelector(".pr-stack")).toHaveStyle({ justifyContent: "flex-end" });
   });
 });
