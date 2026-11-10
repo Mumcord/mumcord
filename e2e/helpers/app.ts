@@ -395,6 +395,30 @@ export async function applyLaunchOptions(inst: Instance, opts: LaunchOptions): P
 }
 
 /**
+ * Asks the app to quit like the user does: the command disconnects, flushes the queued chat
+ * messages and exits (spec 12 FR-12.7). Specs that restart the app and then expect saved chat
+ * history must call this before `restart`: killing the process instead loses what is still in the
+ * batching queue of FR-12.5 (up to the last second), which only a clean close promises to keep.
+ * A broken session or an app that is already gone is not an error.
+ */
+export async function quitCleanly(): Promise<void> {
+  await withTimeout(
+    browser.execute(async () => {
+      const w = window as unknown as {
+        __TAURI_INTERNALS__: { invoke: (c: string, a: object) => Promise<unknown> };
+      };
+      return w.__TAURI_INTERNALS__.invoke("close_choice", { choice: "quit", remember: false });
+    }),
+    10_000,
+    "clean quit",
+  ).catch((e: unknown) => {
+    // The app exits while the command is still running, so WebDriver reports the closed session.
+    if (/invalid session id|session deleted/.test(String(e))) return;
+    console.warn(`[e2e] quitting the app cleanly failed: ${String(e)}`);
+  });
+}
+
+/**
  * Quits app A and starts it again ("restart Mumcord"), optionally with a fresh profile, another
  * audio backend, env or arguments. Keeps the profile by default, so persisted state must
  * survive. Instance B keeps running; use `restartB` (apps.ts) for it.

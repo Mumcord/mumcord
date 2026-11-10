@@ -66,6 +66,10 @@ describe("chat: own messages stay in time order (#379)", () => {
   });
 
   it("keeps the same order after a restart", async () => {
+    // Quit like the user does before the restart: the app batches chat messages (spec 12 FR-12.5,
+    // every second) and only a clean close writes them before the process ends (FR-12.7). A
+    // killed app would lose the own message here and this spec would depend on the batch timer.
+    await app.quitCleanly();
     await app.restart();
     await reconnectSaved();
     await selectChannel("Lobby");
