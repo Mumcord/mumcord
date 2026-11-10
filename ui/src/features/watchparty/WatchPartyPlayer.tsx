@@ -43,13 +43,16 @@ export function WatchPartyPlayer({ live, onCommand, onEnded }: WatchPartyPlayerP
   const [youTubeError, setYouTubeError] = useState<number | null>(null);
   const [stalled, setStalled] = useState(false);
   const platform = useHintPlatform();
-  const codecs = useRef(probeCodecs());
+  // Probed once per session and kept in state: render must not read a ref, and the answer cannot
+  // change while the app runs.
+  const [codecs] = useState(() => probeCodecs());
   // A missing decoder only matters where a package can fix it (FreeBSD, FR-13.34).
-  const decoderMissing =
-    platform?.kind === "freebsd" && missingPackages(codecs.current).length > 0;
+  const decoderMissing = platform?.kind === "freebsd" && missingPackages(codecs).length > 0;
   // The stall timer starts before the app info arrives, so it reads this on the way out.
   const decoderMissingRef = useRef(decoderMissing);
-  decoderMissingRef.current = decoderMissing;
+  useEffect(() => {
+    decoderMissingRef.current = decoderMissing;
+  }, [decoderMissing]);
   const onCommandRef = useRef(onCommand);
   const onEndedRef = useRef(onEnded);
   const liveRef = useRef(live);

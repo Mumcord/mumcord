@@ -27,9 +27,7 @@ export function useHintPlatform(): HintPlatform | null {
           if (!active) return;
           const known = hintPlatformOf(info.os);
           if (known === null) return;
-          setPlatform(
-            known.kind === "linux" ? { kind: "linux", distro: info.distro } : known,
-          );
+          setPlatform(known.kind === "linux" ? { kind: "linux", distro: info.distro } : known);
         },
         (error: unknown) => {
           console.error("Reading the app info failed", error);

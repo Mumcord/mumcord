@@ -10,11 +10,11 @@ jail. Production relay and bot deployments belong to their own repositories
 
 ## What you get
 
-| Service | Address | Notes |
-| --- | --- | --- |
-| Mumble server (mumble-server from ports) | `mumble://<jail_ip>:64738` | unmodified FreeBSD package |
-| mumpeer relay | `443/udp` and `443/tcp` on `<jail_ip>` | built from source in the jail |
-| mumbot peer bot | joins the server as `RelayBot` | announces the relay to Mumcord clients |
+| Service                                  | Address                                | Notes                                  |
+| ---------------------------------------- | -------------------------------------- | -------------------------------------- |
+| Mumble server (mumble-server from ports) | `mumble://<jail_ip>:64738`             | unmodified FreeBSD package             |
+| mumpeer relay                            | `443/udp` and `443/tcp` on `<jail_ip>` | built from source in the jail          |
+| mumbot peer bot                          | joins the server as `RelayBot`         | announces the relay to Mumcord clients |
 
 ## Usage
 

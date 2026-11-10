@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { placeList, Select } from "./Select";
+import { placeList } from "./selectPlacement";
+import { Select } from "./Select";
 
 const OPTIONS = [
   { value: "a", label: "Apple" },

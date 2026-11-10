@@ -83,11 +83,14 @@ export function useWatchPlayer(
   const [volume, setLevel] = useState(1);
   const videoId = live.party.videoId;
   const platform = useHintPlatform();
-  const codecs = useRef(probeCodecs());
-  const decoderMissing =
-    platform?.kind === "freebsd" && missingPackages(codecs.current).length > 0;
+  // Probed once per session and kept in state, not in a ref: render must not read a ref, and the
+  // answer cannot change while the app runs.
+  const [codecs] = useState(() => probeCodecs());
+  const decoderMissing = platform?.kind === "freebsd" && missingPackages(codecs).length > 0;
   const decoderMissingRef = useRef(decoderMissing);
-  decoderMissingRef.current = decoderMissing;
+  useEffect(() => {
+    decoderMissingRef.current = decoderMissing;
+  }, [decoderMissing]);
   const origin = pageUrl === null ? null : playerOrigin(pageUrl);
   const postRef = useRef<(command: BridgeCommand) => void>(() => {});
   const syncRef = useRef<PartySync | null>(null);

@@ -100,12 +100,17 @@ describe("probeCodecs", () => {
     const codecs = probeCodecs({
       mse: (type) => {
         asked.push(type);
-        return type === "video/mp4; codecs=\"avc1.42E01E\"";
+        return type === 'video/mp4; codecs="avc1.42E01E"';
       },
       element: () => "",
     });
     expect(codecs).toEqual({ h264: true, vp9: false, opus: false, av1: false });
-    expect(asked).toEqual([H264_TYPE, 'video/webm; codecs="vp9"', 'audio/webm; codecs="opus"', AV1_TYPE]);
+    expect(asked).toEqual([
+      H264_TYPE,
+      'video/webm; codecs="vp9"',
+      'audio/webm; codecs="opus"',
+      AV1_TYPE,
+    ]);
   });
 });
 

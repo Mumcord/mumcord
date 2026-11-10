@@ -120,7 +120,11 @@ export const FREEBSD_PACKAGES: readonly MediaPackage[] = [
 
 /** The packages this webview lacks, in [`FREEBSD_PACKAGES`] order; empty when all decode. */
 export function missingPackages(codecs: MediaCodecs): MediaPackage[] {
-  const have: Record<string, boolean> = { "H.264": codecs.h264, VP9: codecs.vp9, Opus: codecs.opus };
+  const have: Record<string, boolean> = {
+    "H.264": codecs.h264,
+    VP9: codecs.vp9,
+    Opus: codecs.opus,
+  };
   return FREEBSD_PACKAGES.filter((entry) => !have[entry.codec]);
 }
 

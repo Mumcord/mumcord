@@ -21,9 +21,7 @@ export function isPending(
   settings: { wizardCompleted: boolean; updateCheck: string },
   install: string,
 ): boolean {
-  return (
-    settings.wizardCompleted && settings.updateCheck === "unset" && install !== "pkg"
-  );
+  return settings.wizardCompleted && settings.updateCheck === "unset" && install !== "pkg";
 }
 
 const engineApi: UpdateCheckPromptApi = {

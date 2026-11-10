@@ -1,11 +1,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import "./select.css";
-
-/** Space the list keeps to the window edge and to its button. */
-const GAP = 4;
-/** Below this much room the list opens upwards instead. */
-const MIN_BELOW = 160;
+import { placeList, type ListPlacement } from "./selectPlacement";
 
 export interface SelectOption {
   value: string;
@@ -70,7 +66,9 @@ export function Select({
       if (rect === undefined) return;
       setPlace(placeList(rect));
     };
-    const onScroll = () => setOpen(false);
+    const onScroll = () => {
+      setOpen(false);
+    };
     document.addEventListener("pointerdown", close);
     window.addEventListener("resize", replace);
     window.addEventListener("scroll", onScroll, true);
@@ -217,9 +215,7 @@ export function Select({
                     left: place.left,
                     minWidth: place.width,
                     maxHeight: place.maxHeight,
-                    ...(place.above === null
-                      ? { top: place.top }
-                      : { bottom: place.above }),
+                    ...(place.above === null ? { top: place.top } : { bottom: place.above }),
                   }
             }
             // Keeps focus on the button while the pointer picks an option.
@@ -252,29 +248,4 @@ export function Select({
         )}
     </div>
   );
-}
-
-/** Where the portalled list goes: below the button, or above it when the window has no room. */
-interface ListPlacement {
-  left: number;
-  width: number;
-  maxHeight: number;
-  /** Distance from the window top, when the list opens downwards. */
-  top: number;
-  /** Distance from the window bottom, when it opens upwards. */
-  above: number | null;
-}
-
-export function placeList(rect: DOMRect, viewport = window.innerHeight): ListPlacement {
-  const below = viewport - rect.bottom - GAP;
-  const above = rect.top - GAP;
-  const goUp = below < MIN_BELOW && above > below;
-  const maxHeight = Math.max(MIN_BELOW, Math.min(16 * 16, goUp ? above : below));
-  return {
-    left: rect.left,
-    width: rect.width,
-    maxHeight,
-    top: rect.bottom + GAP,
-    above: goUp ? viewport - rect.top + GAP : null,
-  };
 }
