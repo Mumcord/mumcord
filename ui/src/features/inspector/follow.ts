@@ -51,7 +51,8 @@ export function useFollowScroll(packets: readonly Packet[]): FollowScroll {
   const [follow, setFollowState] = useState(true);
   const [seenId, setSeenId] = useState<number | null>(null);
   // Where our own scrolling ended: the scroll event it causes arrives later, possibly after more
-  // packets were added, and must not be mistaken for the user scrolling up.
+  // packets were added or after following was paused, and must not be mistaken for the user
+  // scrolling up or down.
   const ownScroll = useRef<number | null>(null);
   const newestId = packets[packets.length - 1]?.id ?? null;
 
@@ -79,7 +80,10 @@ export function useFollowScroll(packets: readonly Packet[]): FollowScroll {
 
   const onScroll = (event: UIEvent<HTMLDivElement>) => {
     const el = event.currentTarget;
-    if (follow && ownScroll.current !== null && Math.abs(el.scrollTop - ownScroll.current) < 1) {
+    // Checked even while paused: the event of a scroll made while following can arrive after the
+    // user paused (a row expanded, the Follow button), and at the bottom it would otherwise
+    // switch following back on and move the list under the pointer.
+    if (ownScroll.current !== null && Math.abs(el.scrollTop - ownScroll.current) < 1) {
       return;
     }
     const atBottom = isAtBottom(el);
