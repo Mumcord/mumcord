@@ -35,6 +35,7 @@ Out of scope: file transfer (already Bovnar, #673), plugin data to one person on
 | 2026-11-04 | Clean break from the old media header, no transition period. | **Superseded on 2026-11-10.** |
 | 2026-11-10 | Keep the old media format as a capability-based fallback. | 0.9.0 uses the new profile only when the peer and the relay support it; otherwise the old format. |
 | 2026-11-10 | Add a direct camera path. | Camera works without a relay and with an old relay, not only through a relay broadcast. |
+| 2026-11-10 | Camera uses the relay broadcast first; direct is the fallback. | The relay scales to 25 viewers; direct is used with an old or missing relay, or in direct-only mode. |
 | 2026-11-10 | Relay broadcast format is chosen by the publisher and fixed for the broadcast. | A new relay does not mix formats inside one broadcast. |
 
 ## 3. Functional requirements (spec 07)
