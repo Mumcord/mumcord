@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockApi,
@@ -399,5 +399,123 @@ describe("InstallPrompt gate", () => {
     await screen.findAllByText("Required");
     expect(screen.queryByRole("meter")).toBeNull();
     expect(screen.queryByRole("checkbox", { name: /I understand/ })).toBeNull();
+  });
+});
+
+describe("InstallPrompt allow all (issue #708)", () => {
+  const switchOf = (name: string) => screen.getByRole("switch", { name: new RegExp(name) });
+  const withHighRisk: PluginInstallOffer = {
+    ...offer,
+    optional: [
+      { id: "ui.panel", suggested: true },
+      { id: "notify", suggested: false },
+      { id: "net.http", suggested: false },
+      { id: "secrets", suggested: false },
+    ],
+  };
+
+  it("switches every optional permission on with one click when none is high risk", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(offer);
+    const install = vi.spyOn(api, "pluginInstall").mockResolvedValue(null);
+    render(<InstallPrompt plugin={poll} onClose={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Allow all" }));
+
+    expect(switchOf("Show notifications")).toHaveProperty("checked", true);
+    expect(screen.queryByRole("button", { name: "Allow all" })).toBeNull();
+    expect(screen.getByText("All allowed")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Install" }));
+    await waitFor(() => {
+      expect(install).toHaveBeenCalledWith(
+        "poll",
+        "1.1.0",
+        ["ui.panel", "notify"],
+        "friends",
+        true,
+      );
+    });
+  });
+
+  it("offers the button again once a permission is switched off", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(offer);
+    render(<InstallPrompt plugin={poll} onClose={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Allow all" }));
+    fireEvent.click(switchOf("Show notifications"));
+    expect(screen.getByRole("button", { name: "Allow all" })).toBeTruthy();
+    expect(screen.queryByText("All allowed")).toBeNull();
+  });
+
+  it("has no button for a plugin without optional permissions", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue({ ...offer, optional: [] });
+    render(<InstallPrompt plugin={poll} onClose={vi.fn()} />);
+    await screen.findAllByText("Required");
+    expect(screen.queryByRole("button", { name: "Allow all" })).toBeNull();
+    expect(screen.queryByText("All allowed")).toBeNull();
+  });
+
+  it("asks before switching on high-risk permissions and changes nothing until then", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(withHighRisk);
+    render(<InstallPrompt plugin={poll} onClose={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Allow all" }));
+
+    const approval = screen.getByRole("group", {
+      name: '"Allow all" includes high-risk permissions',
+    });
+    expect(approval.querySelectorAll("li")).toHaveLength(2);
+    expect(switchOf("Show notifications")).toHaveProperty("checked", false);
+    expect(switchOf("Talk to a server you choose")).toHaveProperty("checked", false);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Allow all, including high risk" }),
+    );
+    expect(await axeViolations(approval)).toEqual([]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Allow all, including high risk" }));
+    expect(screen.queryByRole("group", { name: /high-risk permissions/ })).toBeNull();
+    for (const row of screen.getAllByRole("switch")) {
+      expect(row).toHaveProperty("checked", true);
+    }
+    expect(screen.getByText("All allowed")).toBeTruthy();
+  });
+
+  it("can allow everything except the high-risk permissions", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(withHighRisk);
+    const install = vi.spyOn(api, "pluginInstall").mockResolvedValue(null);
+    render(<InstallPrompt plugin={poll} onClose={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Allow all" }));
+    fireEvent.click(screen.getByRole("button", { name: "Allow all except high risk" }));
+
+    expect(switchOf("Show notifications")).toHaveProperty("checked", true);
+    expect(switchOf("Talk to a server you choose")).toHaveProperty("checked", false);
+    expect(switchOf("Keep a secret")).toHaveProperty("checked", false);
+    const allowAll = screen.getByRole("button", { name: "Allow all" });
+    expect(document.activeElement).toBe(allowAll);
+
+    fireEvent.click(screen.getByRole("button", { name: "Install" }));
+    await waitFor(() => {
+      expect(install).toHaveBeenCalledWith(
+        "poll",
+        "1.1.0",
+        ["ui.panel", "notify"],
+        "friends",
+        true,
+      );
+    });
+  });
+
+  it("leaves everything as it was on Cancel, and closes the question when a switch changes", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(withHighRisk);
+    render(<InstallPrompt plugin={poll} onClose={vi.fn()} />);
+    const allowAll = await screen.findByRole("button", { name: "Allow all" });
+    fireEvent.click(allowAll);
+    const approval = screen.getByRole("group", { name: /high-risk permissions/ });
+    fireEvent.click(within(approval).getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("group", { name: /high-risk permissions/ })).toBeNull();
+    expect(switchOf("Show notifications")).toHaveProperty("checked", false);
+    expect(switchOf("Keep a secret")).toHaveProperty("checked", false);
+
+    fireEvent.click(allowAll);
+    fireEvent.click(switchOf("Show notifications"));
+    expect(screen.queryByRole("group", { name: /high-risk permissions/ })).toBeNull();
+    expect(switchOf("Keep a secret")).toHaveProperty("checked", false);
   });
 });
