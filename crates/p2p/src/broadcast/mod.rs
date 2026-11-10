@@ -15,7 +15,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::peer::{PEER_VERSION, PeerError, RelayToken};
 
+/// The `media` bind value of a new-format broadcast link (FR-7.96).
+pub const MEDIA_VERSION: u8 = 2;
+
 pub mod legacy;
+pub mod profile;
 
 // Backward-compatible re-exports of the old wire types. New code paths must not use them
 // (FR-7.98); they stay here for the current 0.8.x path and the fallback selection.
@@ -50,6 +54,8 @@ pub struct Bind {
     pub token: RelayToken,
     /// `None` for a pair token, the broadcast role otherwise.
     pub role: Option<BindRole>,
+    /// The link carries the Bovnar media profile (`"media": 2`, FR-7.96).
+    pub media: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -59,6 +65,13 @@ struct BindWire {
     tok: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     role: Option<String>,
+    /// `2` for the media profile; absent means the old format.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    media: u8,
+}
+
+fn is_zero(value: &u8) -> bool {
+    *value == 0
 }
 
 impl Bind {
@@ -69,6 +82,7 @@ impl Bind {
             t: "bind".to_owned(),
             tok: self.token.expose().to_owned(),
             role: self.role.map(|role| role.as_str().to_owned()),
+            media: if self.media { MEDIA_VERSION } else { 0 },
         };
         // Strings and integers only, so serialising cannot fail.
         serde_json::to_vec(&wire).unwrap_or_default()
@@ -92,6 +106,7 @@ impl Bind {
         Ok(Self {
             token: RelayToken::parse(&wire.tok)?,
             role,
+            media: wire.media >= MEDIA_VERSION,
         })
     }
 }
@@ -122,6 +137,7 @@ mod tests {
         let bind = Bind {
             token: token.clone(),
             role: Some(BindRole::Subscriber),
+            media: false,
         };
         let bytes = bind.encode();
         assert_eq!(
@@ -134,16 +150,33 @@ mod tests {
         let pair = format!(r#"{{"v":1,"t":"bind","tok":"{TOKEN}"}}"#);
         assert_eq!(
             Bind::decode(pair.as_bytes()),
-            Ok(Bind { token, role: None })
+            Ok(Bind {
+                token,
+                role: None,
+                media: false
+            })
         );
         assert_eq!(
             Bind {
                 token: RelayToken::parse(TOKEN).expect("token"),
-                role: None
+                role: None,
+                media: false
             }
             .encode(),
             pair.as_bytes()
         );
+
+        let media = Bind {
+            token: RelayToken::parse(TOKEN).expect("token"),
+            role: Some(BindRole::Publisher),
+            media: true,
+        };
+        let bytes = media.encode();
+        assert_eq!(
+            String::from_utf8(bytes.clone()).expect("utf8"),
+            format!(r#"{{"v":1,"t":"bind","tok":"{TOKEN}","role":"pub","media":2}}"#)
+        );
+        assert_eq!(Bind::decode(&bytes), Ok(media));
 
         let newer = format!(r#"{{"v":2,"t":"bind","tok":"{TOKEN}","role":"pub","x":1}}"#);
         assert_eq!(

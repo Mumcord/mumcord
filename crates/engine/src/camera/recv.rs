@@ -732,7 +732,7 @@ impl Engine {
                 .ok_or("no identity for the key exchange")?;
             let me = cert_key(&identity).ok_or("no key for the key exchange")?;
             let link = p2p
-                .broadcast(&ann, &token, BindRole::Subscriber)
+                .broadcast(&ann, &token, BindRole::Subscriber, false)
                 .await
                 .map_err(|e| {
                     tracing::info!(error = %e, "camera bind refused");
