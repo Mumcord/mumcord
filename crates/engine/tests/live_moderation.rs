@@ -13,8 +13,8 @@ use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot, UserView,
 };
-// mumbot pins its own mumcord-protocol release (the `bot_protocol` alias), so bot-side messages use its types.
-use bot_protocol::proto;
+// Bot-side messages use the protocol types that mumbot re-exports.
+use mumbot::protocol::proto;
 
 const WAIT: Duration = Duration::from_secs(20);
 
@@ -201,7 +201,7 @@ fn only_server(engine: &Engine) -> mumcord_engine::ServerId {
 }
 
 /// Waits until the bot, as the person acted on, sees its own state change.
-async fn bot_sees(bot: &Bot, what: &str, check: impl Fn(&bot_protocol::User) -> bool) {
+async fn bot_sees(bot: &Bot, what: &str, check: impl Fn(&mumbot::protocol::User) -> bool) {
     let deadline = tokio::time::Instant::now() + WAIT;
     loop {
         let state = bot.state();
@@ -277,8 +277,8 @@ async fn mumcord_mutes_deafens_prioritises_and_unsuppresses() {
             inherit_acls: Some(true),
             groups: Vec::new(),
             acls: vec![rule(
-                bot_protocol::permissions::MUTE_DEAFEN,
-                bot_protocol::permissions::SPEAK,
+                mumbot::protocol::permissions::MUTE_DEAFEN,
+                mumbot::protocol::permissions::SPEAK,
             )],
             query: Some(false),
         })

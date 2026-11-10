@@ -17,8 +17,8 @@ use mumcord_engine::{
     password_of,
 };
 
-// mumbot pins its own mumcord-protocol release (the `bot_protocol` alias), so bot-side messages use its types.
-use bot_protocol::proto;
+// Bot-side messages use the protocol types that mumbot re-exports.
+use mumbot::protocol::proto;
 
 const WAIT: Duration = Duration::from_secs(20);
 
@@ -110,7 +110,7 @@ async fn wait_channel(
 }
 
 /// Waits until the bot, as a second client, sees what `check` looks for.
-async fn bot_sees(bot: &Bot, what: &str, check: impl Fn(&bot_protocol::ServerState) -> bool) {
+async fn bot_sees(bot: &Bot, what: &str, check: impl Fn(&mumbot::protocol::ServerState) -> bool) {
     let deadline = tokio::time::Instant::now() + WAIT;
     while !check(&bot.state()) {
         assert!(tokio::time::Instant::now() < deadline, "{what}");
@@ -176,9 +176,9 @@ async fn create_edit_move_link_and_delete_channels() {
         assert!(tokio::time::Instant::now() < deadline, "room not created");
         tokio::time::sleep(Duration::from_millis(100)).await;
     };
-    let rights = bot_protocol::permissions::WRITE
-        | bot_protocol::permissions::MAKE_CHANNEL
-        | bot_protocol::permissions::LINK_CHANNEL;
+    let rights = mumbot::protocol::permissions::WRITE
+        | mumbot::protocol::permissions::MAKE_CHANNEL
+        | mumbot::protocol::permissions::LINK_CHANNEL;
     admin
         .handle()
         .send_acl(proto::Acl {
@@ -365,9 +365,9 @@ async fn channel_password_and_rule_conflicts() {
         assert!(tokio::time::Instant::now() < deadline, "room not created");
         tokio::time::sleep(Duration::from_millis(100)).await;
     };
-    let rights = bot_protocol::permissions::WRITE
-        | bot_protocol::permissions::MAKE_CHANNEL
-        | bot_protocol::permissions::LINK_CHANNEL;
+    let rights = mumbot::protocol::permissions::WRITE
+        | mumbot::protocol::permissions::MAKE_CHANNEL
+        | mumbot::protocol::permissions::LINK_CHANNEL;
     admin
         .handle()
         .send_acl(proto::Acl {
@@ -492,9 +492,9 @@ async fn the_core_works_out_rights_like_the_server() {
         assert!(tokio::time::Instant::now() < deadline, "room not created");
         tokio::time::sleep(Duration::from_millis(100)).await;
     };
-    let rights = bot_protocol::permissions::WRITE
-        | bot_protocol::permissions::MAKE_CHANNEL
-        | bot_protocol::permissions::LINK_CHANNEL;
+    let rights = mumbot::protocol::permissions::WRITE
+        | mumbot::protocol::permissions::MAKE_CHANNEL
+        | mumbot::protocol::permissions::LINK_CHANNEL;
     admin
         .handle()
         .send_acl(proto::Acl {
@@ -539,7 +539,7 @@ async fn the_core_works_out_rights_like_the_server() {
         user_id: None,
         group: Some("all".into()),
         grant: 0,
-        deny: bot_protocol::permissions::SPEAK,
+        deny: mumbot::protocol::permissions::SPEAK,
     });
     let AclSaveOutcome::Saved(saved) = engine
         .channel_acl_save(server_id, &next, &start, false)
@@ -577,23 +577,23 @@ async fn the_core_works_out_rights_like_the_server() {
             Verdict::Denied
         }
     };
-    let p = bot_protocol::permissions::SPEAK;
+    let p = mumbot::protocol::permissions::SPEAK;
     assert_eq!(verdict(p), as_server(view.permissions.speak), "Speak");
-    let p = bot_protocol::permissions::ENTER;
+    let p = mumbot::protocol::permissions::ENTER;
     assert_eq!(verdict(p), as_server(view.permissions.enter), "Join");
-    let p = bot_protocol::permissions::MAKE_CHANNEL;
+    let p = mumbot::protocol::permissions::MAKE_CHANNEL;
     assert_eq!(
         verdict(p),
         as_server(view.permissions.make_channel),
         "Create channels"
     );
-    let p = bot_protocol::permissions::WRITE;
+    let p = mumbot::protocol::permissions::WRITE;
     assert_eq!(
         verdict(p),
         as_server(view.permissions.write),
         "Edit permissions"
     );
-    let p = bot_protocol::permissions::MOVE;
+    let p = mumbot::protocol::permissions::MOVE;
     assert_eq!(
         verdict(p),
         as_server(view.permissions.move_users),

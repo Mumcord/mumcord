@@ -299,12 +299,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d902e3d592a523def97af8f317b08ce16b7ab854c1985a0c671e6f15cebc236"
 
 [[package]]
-name = "arrayvec"
-version = "0.7.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3fb67a6e08acf24fdeccbac2cb6ac4305825bd1f117462e0e6f2f193345ad56"
-
-[[package]]
 name = "ash"
 version = "0.38.0+1.3.281"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4048,16 +4042,18 @@ checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
 
 [[package]]
 name = "mumbot"
-version = "0.4.1"
-source = "git+https://github.com/Mumcord/mumbot?tag=v0.4.1#06569261b9f998fdf1526972f2e03dfd9bcd3656"
+version = "0.5.4"
+source = "git+https://github.com/Mumcord/mumbot?tag=v0.5.4#ed065c45cce129e4ed43e53cd818f88f71a4d9a8"
 dependencies = [
  "anyhow",
+ "base64 0.23.1",
  "bytes",
  "clap",
  "hound",
- "mumcord-codec 0.5.0",
- "mumcord-p2p 0.5.0",
- "mumcord-protocol 0.5.0",
+ "image",
+ "mumcord-codec",
+ "mumcord-p2p",
+ "mumcord-protocol",
  "rcgen",
  "ring",
  "rtrb",
@@ -4093,7 +4089,7 @@ dependencies = [
  "mumcord-engine",
  "mumcord-overlay-ipc",
  "mumcord-plugins",
- "mumcord-protocol 0.7.2",
+ "mumcord-protocol",
  "notify-rust",
  "objc2",
  "open",
@@ -4134,7 +4130,7 @@ dependencies = [
  "futures",
  "hound",
  "libc",
- "mumcord-codec 0.7.2",
+ "mumcord-codec",
  "pulseaudio",
  "rtrb",
  "rubato",
@@ -4165,20 +4161,6 @@ dependencies = [
  "windows-core",
  "zune-core",
  "zune-jpeg",
-]
-
-[[package]]
-name = "mumcord-codec"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66a69a982adda6ef7138e3539d8cfaead1c2e7879d8688081e6010645af28261"
-dependencies = [
- "nnnoiseless",
- "opus",
- "rtrb",
- "sonora",
- "thiserror 2.0.21",
- "tracing",
 ]
 
 [[package]]
@@ -4232,10 +4214,9 @@ dependencies = [
  "mumcord-audio",
  "mumcord-camera",
  "mumcord-effects",
- "mumcord-p2p 0.7.2",
+ "mumcord-p2p",
  "mumcord-positional",
- "mumcord-protocol 0.5.0",
- "mumcord-protocol 0.7.2",
+ "mumcord-protocol",
  "mumcord-screenshare",
  "mumcord-store",
  "netsim",
@@ -4264,7 +4245,7 @@ dependencies = [
  "rustls-platform-verifier",
  "serde",
  "serde_json",
- "sha1 0.11.0",
+ "sha1",
  "sha2 0.11.1",
  "specta",
  "tempfile",
@@ -4303,36 +4284,12 @@ dependencies = [
 
 [[package]]
 name = "mumcord-p2p"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3da262b16b19b1d6be0c5e9a40949bf02109c991a53aef0b48e74518701c23d1"
-dependencies = [
- "bytes",
- "crab_nat",
- "igd-next",
- "mumcord-protocol 0.5.0",
- "netdev",
- "quinn",
- "rand 0.10.3",
- "rustls",
- "serde",
- "serde_json",
- "sha2 0.11.1",
- "socket2",
- "thiserror 2.0.21",
- "tokio",
- "tokio-rustls",
- "tracing",
-]
-
-[[package]]
-name = "mumcord-p2p"
 version = "0.7.2"
 dependencies = [
  "bytes",
  "crab_nat",
  "igd-next",
- "mumcord-protocol 0.7.2",
+ "mumcord-protocol",
  "mumcord-store",
  "netdev",
  "quinn",
@@ -4435,28 +4392,6 @@ dependencies = [
 
 [[package]]
 name = "mumcord-protocol"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bff10c5441dda0142adf57db87912893c32c4a6ed72565dedc35c6a01009e5ab"
-dependencies = [
- "aes",
- "base64 0.23.1",
- "bytes",
- "prost",
- "prost-build",
- "protoc-bin-vendored",
- "rand 0.10.3",
- "rustls",
- "sha1 0.10.7",
- "thiserror 2.0.21",
- "tokio",
- "tokio-rustls",
- "tracing",
- "x509-parser",
-]
-
-[[package]]
-name = "mumcord-protocol"
 version = "0.7.2"
 dependencies = [
  "aes",
@@ -4468,7 +4403,7 @@ dependencies = [
  "rand 0.10.3",
  "rcgen",
  "rustls",
- "sha1 0.11.0",
+ "sha1",
  "thiserror 2.0.21",
  "tokio",
  "tokio-rustls",
@@ -4502,7 +4437,7 @@ dependencies = [
  "serde_ignored",
  "serde_json",
  "serde_path_to_error",
- "sha1 0.11.0",
+ "sha1",
  "tempfile",
  "thiserror 2.0.21",
  "tracing",
@@ -5321,7 +5256,7 @@ dependencies = [
  "pkcs8 0.11.0",
  "rand 0.10.3",
  "rc2",
- "sha1 0.11.0",
+ "sha1",
  "sha2 0.11.1",
  "thiserror 2.0.21",
  "x509-parser",
@@ -6344,6 +6279,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "regex-lite"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cab834c73d247e67f4fae452806d17d3c7501756d98c8808d7c9c7aa7d18f973"
+
+[[package]]
 name = "regex-syntax"
 version = "0.8.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7088,17 +7029,6 @@ dependencies = [
 
 [[package]]
 name = "sha1"
-version = "0.10.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a978451301f4db1d02937a4ab3ccce137717b81826e79b7d49ffe3244a13c3b8"
-dependencies = [
- "cfg-if",
- "cpufeatures 0.2.17",
- "digest 0.10.7",
-]
-
-[[package]]
-name = "sha1"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aacc4cc499359472b4abe1bf11d0b12e688af9a805fa5e3016f9a386dc2d0214"
@@ -7531,9 +7461,9 @@ checksum = "a7973cce6668464ea31f176d85b13c7ab3bba2cb3b77a2ed26abd7801688010a"
 
 [[package]]
 name = "symphonia"
-version = "0.5.5"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5773a4c030a19d9bfaa090f49746ff35c75dfddfa700df7a5939d5e076a57039"
+checksum = "a7edef6a96b696d4e0cab5ee9ebb7ca155ed95f30a6b45bbb8b97d2727f02424"
 dependencies = [
  "lazy_static",
  "symphonia-bundle-mp3",
@@ -7543,38 +7473,39 @@ dependencies = [
 
 [[package]]
 name = "symphonia-bundle-mp3"
-version = "0.5.5"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4872dd6bb56bf5eac799e3e957aa1981086c3e613b27e0ac23b176054f7c57ed"
+checksum = "98ea5ffc8716bff677dfb3b01b420c7b758de901a72b8c330bf2040ab74b4add"
 dependencies = [
  "lazy_static",
  "log",
  "symphonia-core",
- "symphonia-metadata",
 ]
 
 [[package]]
 name = "symphonia-core"
-version = "0.5.5"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea00cc4f79b7f6bb7ff87eddc065a1066f3a43fe1875979056672c9ef948c2af"
+checksum = "01c412864d599d4750d0c3d684d7e093ec05e5309681ef5252cc1096a437f6e0"
 dependencies = [
- "arrayvec",
- "bitflags 1.3.2",
+ "bitflags 2.13.2",
  "bytemuck",
  "lazy_static",
  "log",
+ "num-complex",
+ "smallvec",
 ]
 
 [[package]]
 name = "symphonia-metadata"
-version = "0.5.5"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36306ff42b9ffe6e5afc99d49e121e0bd62fe79b9db7b9681d48e29fa19e6b16"
+checksum = "83713a97705d77bdef7cdbc0768fd6e5a54e4cd7e48d60a806ae85639e2c87c6"
 dependencies = [
- "encoding_rs",
  "lazy_static",
  "log",
+ "regex-lite",
+ "smallvec",
  "symphonia-core",
 ]
 
