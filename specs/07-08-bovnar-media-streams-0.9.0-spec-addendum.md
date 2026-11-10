@@ -1,6 +1,6 @@
 # Addendum — Bovnar media streams for screen share and camera (0.9.0)
 
-> **Draft, 2026-11-10 — not committed.** This addendum will be merged into
+> **Draft, 2026-11-10 — committed to `milestone/0.9.0`.** This addendum will be merged into
 > `specs/07-file-sharing-screenshare-specification.md` and
 > `specs/08-camera-sharing-specification.md` on `milestone/0.9.0`.
 > FR and AC numbers are provisional until the 0.8.0 branch is merged; they start after the
