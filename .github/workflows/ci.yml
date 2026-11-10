@@ -418,12 +418,13 @@ jobs:
           run: |
             set -e
             export PATH="$HOME/.cargo/bin:$PATH"
+            # The version the app reports, as on the other platforms. Set here rather than in the
+            # step's env: the action runs this script inside the VM, which does not see it.
+            export MUMCORD_VERSION="${{ steps.version.outputs.value }}"
             export CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=4
             cargo check --workspace --all-targets --locked
             cargo clippy --workspace --all-targets --locked -- -D warnings
             cargo test --workspace --locked
-          env:
-            MUMCORD_VERSION: ${{ steps.version.outputs.value }}
 
   result:
     name: ${{ matrix.os }}
