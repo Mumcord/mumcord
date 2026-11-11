@@ -2,12 +2,18 @@
 //!
 //! - **Preview**: the camera runs locally, nothing is sent (FR-8.10): no `bcast-req`, no
 //!   broadcast, no announcement.
-//! - **Requesting**: **Turn on camera** asks the bot for a broadcast with `k = cam` (FR-8.13,
-//!   FR-8.42) and binds as its publisher. A refusal goes back to Preview with the reason
-//!   (FR-8.51).
-//! - **OnAir**: the broadcast is live, the channel gets `mumcord.camera on`, newcomers get it too
-//!   (FR-8.8), viewers are admitted on `cam-join` and removed with a rekey (FR-8.47 – FR-8.49),
-//!   and the encoder follows their `want` reports (FR-8.45).
+//! - **Requesting**: **Turn on camera** opens the paths of FR-8.94. A new relay (one that carries
+//!   `bc`, `cam` and the media profile `mv`) gets one broadcast asked for with `k = cam`
+//!   (FR-8.13, FR-8.42) that this client binds as its publisher; an old relay keeps its old-format
+//!   broadcast for 0.8.x viewers. With no usable relay — or in `direct_only` mode — no broadcast
+//!   is created at all and the camera runs on the direct path alone (FR-8.94, FR-8.96). A refusal
+//!   goes back to Preview with the reason (FR-8.51).
+//! - **OnAir**: the channel gets `mumcord.camera on`, newcomers get it too (FR-8.8), viewers are
+//!   admitted on `cam-join` — through the bot for the broadcast, locally for a direct stream
+//!   (FR-8.47) — and removed with a rekey or a closed stream (FR-8.48 – FR-8.49), and the encoder
+//!   follows their `want` reports (FR-8.45). A 0.9.0 viewer goes direct when the broadcast is old
+//!   or missing, and a viewer that cannot read the new media profile gets `needs` instead of a
+//!   stream (FR-8.95).
 //!
 //! One camera per Mumcord instance (FR-8.29). The stop rules (leave channel, lock screen, …) live
 //! in `stop`.
@@ -22,10 +28,11 @@ use mumcord_p2p::{
     BroadcastEnd, BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken,
 };
 use mumcord_protocol::PluginData;
-use mumcord_store::{ScreenFps, ScreenOptimize, ScreenResolution};
+use mumcord_store::{P2pMode, ScreenFps, ScreenOptimize, ScreenResolution};
 use tokio::sync::oneshot;
 
-use super::admit::{CameraViewers, Join, MAX_VIEWERS};
+use super::admit::{CameraPath, CameraViewer, CameraViewers, Join, MAX_VIEWERS};
+use super::avail::Paths;
 use super::preview::PreviewTap;
 use super::send::{CameraSend, SendCeiling};
 use super::signal::{self, CameraMessage, CameraSignals, Codec};
@@ -176,10 +183,11 @@ pub struct CameraView {
     pub state: CameraState,
     /// Why the last Turn on failed; shown in the preview until the next try (FR-8.13).
     pub error: Option<CameraFailure>,
-    /// The broadcast id (16 hex) while on air.
+    /// The relay broadcast id (16 hex) while on air; `None` for a camera that runs without one
+    /// (FR-8.94).
     pub broadcast: Option<String>,
-    /// The admitted viewers' sessions.
-    pub viewers: Vec<u32>,
+    /// The admitted viewers with the path each of them gets (FR-8.62).
+    pub viewers: Vec<CameraViewer>,
 }
 
 impl CameraView {
@@ -227,14 +235,104 @@ pub fn broadcast_hex(id: BroadcastId) -> String {
     format!("{:016x}", id.0)
 }
 
-struct Live {
+/// Which media format the camera sends (FR-7.96, FR-8.95).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Format {
+    /// No relay broadcast: every 0.9.0 viewer gets a direct stream (FR-8.96).
+    Direct,
+    /// The old relay broadcast; it serves 0.8.x viewers as today (FR-7.98).
+    Old,
+    /// A relay broadcast with the Bovnar media profile (FR-7.96).
+    New,
+}
+
+/// How a `cam-join` is answered (FR-8.94, FR-8.95).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Route {
+    /// Through the relay broadcast.
+    Relay,
+    /// Through its own `STREAM_CAMERA`.
+    Direct,
+    /// It cannot be served at all: it gets `needs` (FR-8.95).
+    Needs,
+}
+
+/// The matrix of FR-8.94/FR-8.95 for one viewer.
+fn route(format: Format, direct_ok: bool, media: bool) -> Route {
+    match (format, media) {
+        // A 0.8.x viewer has no direct camera path and cannot read the new profile (FR-8.95).
+        (Format::New | Format::Direct, false) => Route::Needs,
+        (Format::New, true) => Route::Relay,
+        (Format::Direct, true) => Route::Direct,
+        // The old broadcast serves 0.8.x viewers as today; a 0.9.0 viewer gets its own stream
+        // unless the mode forbids direct, and then the old broadcast stays the fallback it has
+        // always been for 0.9.0 clients (FR-8.94).
+        (Format::Old, false) => Route::Relay,
+        (Format::Old, true) if direct_ok => Route::Direct,
+        (Format::Old, true) => Route::Relay,
+    }
+}
+
+struct Broadcast {
     id: BroadcastId,
     publisher: Publisher,
+}
+struct Live {
+    /// The camera session id: the `on` id, which is also the `STREAM_CAMERA` description id
+    /// (FR-8.92). It is the relay broadcast id when there is one.
+    session: String,
+    /// The format every viewer gets at least one of (FR-8.95).
+    format: Format,
+    /// The relay broadcast; `None` when the camera runs without a relay (FR-8.94).
+    broadcast: Option<Broadcast>,
     viewers: CameraViewers,
-    /// The broadcast uses the Bovnar media profile.
-    media: bool,
     /// One `STREAM_CAMERA` per admitted viewer that reads the media profile (FR-8.92).
     direct: super::direct::DirectViewers,
+    /// The mode leaves the direct path open; `relay_only` does not (FR-8.94).
+    direct_ok: bool,
+}
+
+impl Live {
+    /// Decides about a `cam-join` that passed the channel, blocking and rate checks (FR-8.47);
+    /// `media` says whether the viewer reads the Bovnar media profile (FR-8.95).
+    fn admit(
+        &mut self,
+        viewer: u32,
+        hash: &str,
+        codecs: &[Codec],
+        media: bool,
+    ) -> Result<Admit, CameraMessage> {
+        let id = self.session.clone();
+        let path = match route(self.format, self.direct_ok, media) {
+            Route::Needs => return Err(CameraMessage::Needs { id }),
+            Route::Relay => CameraPath::Relay,
+            Route::Direct => CameraPath::Direct,
+        };
+        if path == CameraPath::Direct && !self.direct.has_room(viewer) {
+            // The direct path serves 8 viewers per camera (FR-8.93, FR-8.52).
+            return Err(CameraMessage::Full { id });
+        }
+        match self.viewers.join(viewer, hash, codecs, path) {
+            Join::Full => Err(CameraMessage::Full { id }),
+            Join::Admit => match (path, &mut self.broadcast) {
+                (CameraPath::Relay, Some(broadcast)) => {
+                    broadcast.publisher.admit(hash);
+                    Ok(Admit::Relay(broadcast.id))
+                }
+                // A direct viewer is admitted locally; no bot is involved (FR-8.47).
+                _ => Ok(Admit::Direct),
+            },
+        }
+    }
+}
+
+/// How an admitted viewer is served.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Admit {
+    /// Ask the bot to admit it to this relay broadcast, then it does the key exchange.
+    Relay(BroadcastId),
+    /// Open a `STREAM_CAMERA` to it.
+    Direct,
 }
 
 pub(super) struct Own {
@@ -253,11 +351,15 @@ impl Own {
             server_id: self.server_id,
             state: self.state,
             error: self.error.clone(),
-            broadcast: self.live.as_ref().map(|l| broadcast_hex(l.id)),
+            broadcast: self
+                .live
+                .as_ref()
+                .and_then(|l| l.broadcast.as_ref())
+                .map(|b| broadcast_hex(b.id)),
             viewers: self
                 .live
                 .as_ref()
-                .map(|l| l.viewers.sessions())
+                .map(|l| l.viewers.entries())
                 .unwrap_or_default(),
         }
     }
@@ -267,6 +369,14 @@ impl Own {
             return None;
         }
         self.live.as_mut()
+    }
+
+    /// The camera is on air here and reaches its viewers through a relay broadcast, so losing the
+    /// relay ends it (FR-8.7).
+    pub(super) fn on_relay(&self, server_id: ServerId) -> bool {
+        self.server_id == server_id
+            && self.state == CameraState::OnAir
+            && self.live.as_ref().is_some_and(|l| l.broadcast.is_some())
     }
 }
 
@@ -418,8 +528,9 @@ impl Engine {
         Ok(())
     }
 
-    /// **Turn on camera** (Preview → Requesting → OnAir, FR-8.13): returns once the broadcast is
-    /// live, or with the reason it is not (the camera stays in the preview).
+    /// **Turn on camera** (Preview → Requesting → OnAir, FR-8.13): returns once the camera is
+    /// on air over the paths of FR-8.94, or with the reason it is not (the camera stays in the
+    /// preview).
     pub async fn camera_turn_on(&self, server_id: ServerId) -> Result<(), CameraFailure> {
         let (attempt, view) = {
             let mut cameras = lock(self.camera_state());
@@ -436,16 +547,39 @@ impl Engine {
             (attempt, own.view())
         };
         self.emit_camera(server_id, Some(view));
-        let opened = self.open_camera_broadcast(server_id).await;
+        let opened = self.open_camera(server_id).await;
         self.camera_opened(server_id, attempt, opened)
     }
 
-    async fn open_camera_broadcast(&self, server_id: ServerId) -> Result<Opened, CameraFailure> {
-        self.relays()
-            .availability_for(server_id, RelayUse::Camera)
-            .map_err(CameraFailure::from_relay)?;
-        if !self.relay_mode_allows_broadcast(server_id) {
-            return Err(CameraFailure::Mode);
+    /// The paths of FR-8.94 on `server_id`, or why no path is left.
+    fn camera_paths(&self, server_id: ServerId) -> Result<Paths, CameraFailure> {
+        let relay = self.relays().info(server_id);
+        let mode = self.p2p_mode_of(server_id);
+        // No path is left in `off` mode and in `relay_only` without a relay that carries cameras
+        // (FR-8.4); availability already refused the entries with that reason.
+        Paths::of(&relay, mode).ok_or_else(|| {
+            if mode == P2pMode::Off {
+                CameraFailure::Mode
+            } else {
+                CameraFailure::from_relay(
+                    self.relays()
+                        .availability_for(server_id, RelayUse::Camera)
+                        .err()
+                        .unwrap_or(RelayUnavailable::UseNotAllowed(RelayUse::Camera)),
+                )
+            }
+        })
+    }
+
+    /// Opens what the camera needs before it goes on air: a relay broadcast when the paths allow
+    /// one, nothing at all on the direct path alone (FR-8.42, FR-8.94).
+    async fn open_camera(
+        &self,
+        server_id: ServerId,
+    ) -> Result<(Paths, Option<Opened>), CameraFailure> {
+        let paths = self.camera_paths(server_id)?;
+        if !paths.relay {
+            return Ok((paths, None));
         }
         // A relay without broadcasts can't carry a camera.
         let limit = self
@@ -462,24 +596,24 @@ impl Engine {
             .ok_or(CameraFailure::NoCertificate)?;
         let me = cert_key(&identity).ok_or(CameraFailure::NoCertificate)?;
         let (ann, id, token) = self
-            .relay_broadcast_request(server_id, RelayUse::Camera, limit, false)
+            .relay_broadcast_request(server_id, RelayUse::Camera, limit, paths.media)
             .await
             .map_err(CameraFailure::from_fanout)?;
         let link = p2p
-            .broadcast(&ann, &token, BindRole::Publisher, false)
+            .broadcast(&ann, &token, BindRole::Publisher, paths.media)
             .await
             .map_err(|e| {
                 tracing::info!(error = %e, "camera broadcast link not opened");
                 CameraFailure::from_link(&e)
             })?;
-        Ok((id, me, link, limit))
+        Ok((paths, Some((id, me, link, limit))))
     }
 
     fn camera_opened(
         &self,
         server_id: ServerId,
         attempt: u64,
-        opened: Result<Opened, CameraFailure>,
+        opened: Result<(Paths, Option<Opened>), CameraFailure>,
     ) -> Result<(), CameraFailure> {
         let rt = self.runtime().clone();
         let weak = self.downgrade();
@@ -493,39 +627,62 @@ impl Engine {
                 // Turned off meanwhile; dropping the link ends the broadcast.
                 return Err(CameraFailure::Busy);
             };
-            let started = opened.and_then(|(id, me, link, limit)| {
+            let started = opened.and_then(|(paths, relay_opened)| {
                 let frames = own.send.take_frames().ok_or(CameraFailure::Busy)?;
-                let media = link.is_media();
-                let on_end: OnEnd = Box::new(move |end| {
-                    tracing::info!(?end, "camera broadcast ended");
-                    if let Some(engine) = weak.upgrade() {
-                        engine.camera_broadcast_ended(server_id, id, end);
-                    }
-                });
+                // Without a broadcast the session id is its own: the `on` id and the stream
+                // description id are the same 16 hex characters either way (FR-8.92, §6.5).
+                let session = match relay_opened {
+                    Some((id, ..)) => broadcast_hex(id),
+                    None => crate::files::prepare::random_hex(8),
+                };
+                let on_end_id = relay_opened.as_ref().map(|(id, ..)| *id);
+                let direct = super::direct::DirectViewers::new(session.clone(), frames.clone());
                 frames.pump(&rt);
-                let direct = super::direct::DirectViewers::new(broadcast_hex(id), frames.clone());
-                let publisher = Publisher::start(&rt, id, me, link, frames.relay(), on_end)
-                    .map_err(|e| {
-                        tracing::warn!(error = %e, "camera broadcast not started");
-                        CameraFailure::RelayDown
-                    })?;
+                let limit = relay_opened
+                    .as_ref()
+                    .map_or(MAX_VIEWERS, |(_, _, _, limit)| *limit);
+                let broadcast = match relay_opened {
+                    Some((id, me, link, _)) => {
+                        let on_end: OnEnd = Box::new(move |end| {
+                            tracing::info!(?end, "camera broadcast ended");
+                            if let (Some(engine), Some(id)) = (weak.upgrade(), on_end_id) {
+                                engine.camera_broadcast_ended(server_id, id, end);
+                            }
+                        });
+                        let publisher = Publisher::start(&rt, id, me, link, frames.relay(), on_end)
+                            .map_err(|e| {
+                                tracing::warn!(error = %e, "camera broadcast not started");
+                                CameraFailure::RelayDown
+                            })?;
+                        Some(Broadcast { id, publisher })
+                    }
+                    None => None,
+                };
+                // The broadcast's format is fixed for it by the publisher and the relay's
+                // capability (FR-7.97); without a broadcast every viewer gets the new one.
+                let format = match (&broadcast, paths.media) {
+                    (None, _) => Format::Direct,
+                    (Some(_), true) => Format::New,
+                    (Some(_), false) => Format::Old,
+                };
                 Ok(Live {
-                    id,
-                    publisher,
+                    session,
+                    format,
+                    broadcast,
                     viewers: CameraViewers::new(limit),
-                    media,
                     direct,
+                    direct_ok: paths.direct,
                 })
             });
             match started {
                 Ok(live) => {
-                    let id = live.id;
+                    let session = live.session.clone();
                     own.live = Some(live);
                     own.state = next_state(own.state, Step::Ready).unwrap_or(CameraState::OnAir);
                     own.send.set_on_air(true);
                     tracing::info!("camera on air");
                     crate::crash::set_context("camera", "on air");
-                    (Ok(()), own.view(), Some(id))
+                    (Ok(()), own.view(), Some(session))
                 }
                 Err(failure) => {
                     tracing::info!(reason = failure.code(), "camera not turned on");
@@ -536,15 +693,9 @@ impl Engine {
                 }
             }
         };
-        if let (Some(id), Ok(ctx)) = (announce, self.session_ctx_for(server_id)) {
+        if let (Some(session), Ok(ctx)) = (announce, self.session_ctx_for(server_id)) {
             let peers = signal::channel_peers(&ctx, self.mumcord_state());
-            signal::send(
-                &ctx,
-                &peers,
-                &CameraMessage::On {
-                    id: broadcast_hex(id),
-                },
-            );
+            signal::send(&ctx, &peers, &CameraMessage::On { id: session });
         }
         self.emit_camera(server_id, Some(view));
         result
@@ -601,8 +752,10 @@ impl Engine {
         let same = lock(self.camera_state())
             .own
             .as_ref()
-            .and_then(|o| o.live.as_ref().filter(|_| o.server_id == server_id))
-            .is_some_and(|l| l.id == id);
+            .filter(|o| o.server_id == server_id)
+            .and_then(|o| o.live.as_ref())
+            .and_then(|l| l.broadcast.as_ref())
+            .is_some_and(|broadcast| broadcast.id == id);
         if same {
             self.camera_stop(server_id, StopReason::from_end(end));
         }
@@ -617,25 +770,13 @@ impl Engine {
     }
 
     /// A viewer asked to join the own camera `id` (FR-8.47). Same channel, not blocked and
-    /// the join rate were checked on arrival.
+    /// the join rate were checked on arrival; `media` says whether it reads the Bovnar media
+    /// profile (FR-8.95).
     fn camera_join(&self, ctx: &SessionCtx, viewer: u32, id: &str, codecs: &[Codec], media: bool) {
         let Some(hash) = cert_hash(ctx, viewer) else {
             return;
         };
-        let needs_update = {
-            let cameras = lock(self.camera_state());
-            cameras
-                .own
-                .as_ref()
-                .and_then(|own| own.live.as_ref())
-                .filter(|live| broadcast_hex(live.id) == id)
-                .is_some_and(|live| live.media && !media)
-        };
-        if needs_update {
-            signal::send(ctx, &[viewer], &CameraMessage::Needs { id: id.to_owned() });
-            return;
-        }
-        let (broadcast, direct) = {
+        let answer = {
             let mut cameras = lock(self.camera_state());
             let Some(own) = cameras.own.as_mut() else {
                 return;
@@ -644,61 +785,61 @@ impl Engine {
             let Some(live) = own
                 .live
                 .as_mut()
-                .filter(|l| broadcast_hex(l.id) == id && own.server_id == ctx.server_id)
+                .filter(|l| l.session == id && own.server_id == ctx.server_id)
             else {
                 return;
             };
-            match live.viewers.join(viewer, &hash, codecs) {
-                Join::Full => (None, false),
-                Join::Admit => {
-                    live.publisher.admit(&hash);
-                    send.set_vp9_only(live.viewers.needs_vp9());
-                    // A viewer that reads the media profile gets its own direct stream while the
-                    // relay broadcast cannot carry that profile (FR-8.92, FR-8.94).
-                    let wanted = media && !live.media && live.direct.wants(viewer);
-                    (Some(live.id), wanted)
-                }
+            let answer = live.admit(viewer, &hash, codecs, media);
+            if answer.is_ok() {
+                send.set_vp9_only(live.viewers.needs_vp9());
             }
+            answer
         };
-        let Some(broadcast) = broadcast else {
-            tracing::debug!("camera viewer not admitted: the broadcast is full");
-            // Told, so the viewer shows "Too many people are watching" instead of waiting for a
-            // token that never comes (FR-8.52).
-            signal::send(ctx, &[viewer], &CameraMessage::Full { id: id.to_owned() });
-            return;
-        };
-        if direct {
-            self.camera_direct_open(ctx.server_id, viewer, id);
+        match answer {
+            Err(refused) => {
+                // Told, so the viewer shows "Too many people are watching" or the "needs
+                // 0.9.0" text instead of waiting for a token that never comes (FR-8.52,
+                // FR-8.95).
+                signal::send(ctx, &[viewer], &refused);
+            }
+            Ok(Admit::Direct) => self.camera_direct_open(ctx.server_id, viewer, id),
+            Ok(Admit::Relay(broadcast)) => {
+                let engine = self.clone();
+                let server_id = ctx.server_id;
+                self.runtime().spawn(async move {
+                    let Err(reason) = engine
+                        .relay_broadcast_admit(server_id, RelayUse::Camera, broadcast, viewer)
+                        .await
+                    else {
+                        engine.emit_camera(server_id, engine.camera_view());
+                        return;
+                    };
+                    tracing::info!(
+                        reason = reason.as_str(),
+                        "camera viewer not admitted by the bot"
+                    );
+                    if reason == BroadcastErrorReason::Full
+                        && let Ok(ctx) = engine.session_ctx_for(server_id)
+                    {
+                        let full = CameraMessage::Full {
+                            id: broadcast_hex(broadcast),
+                        };
+                        signal::send(&ctx, &[viewer], &full);
+                    }
+                    engine.camera_remove_viewer(
+                        server_id,
+                        &broadcast_hex(broadcast),
+                        viewer,
+                        false,
+                    );
+                });
+            }
         }
-        let engine = self.clone();
-        let server_id = ctx.server_id;
-        self.runtime().spawn(async move {
-            let Err(reason) = engine
-                .relay_broadcast_admit(server_id, RelayUse::Camera, broadcast, viewer)
-                .await
-            else {
-                engine.emit_camera(server_id, engine.camera_view());
-                return;
-            };
-            tracing::info!(
-                reason = reason.as_str(),
-                "camera viewer not admitted by the bot"
-            );
-            if reason == BroadcastErrorReason::Full
-                && let Ok(ctx) = engine.session_ctx_for(server_id)
-            {
-                let full = CameraMessage::Full {
-                    id: broadcast_hex(broadcast),
-                };
-                signal::send(&ctx, &[viewer], &full);
-            }
-            engine.camera_remove_viewer(server_id, broadcast, viewer, false);
-        });
     }
 
     /// Opens the direct stream to an admitted viewer that reads the media profile (FR-8.92). The
-    /// connection is made in the background: a camera viewer that cannot connect directly keeps
-    /// watching through the relay broadcast.
+    /// connection is made in the background; a viewer whose stream does not come up asks again
+    /// with its next `cam-join` (FR-8.52).
     fn camera_direct_open(&self, server_id: ServerId, viewer: u32, id: &str) {
         let engine = self.clone();
         let id = id.to_owned();
@@ -730,11 +871,7 @@ impl Engine {
             return;
         };
         let on_air = own.state == CameraState::OnAir;
-        let Some(live) = own
-            .live
-            .as_mut()
-            .filter(|l| on_air && broadcast_hex(l.id) == id)
-        else {
+        let Some(live) = own.live.as_mut().filter(|l| on_air && l.session == id) else {
             return;
         };
         if !live.viewers.contains(viewer) {
@@ -749,9 +886,10 @@ impl Engine {
         }
     }
 
-    /// Ends `viewer`'s admission to the own camera `id`: it gets no keys any more, the key
-    /// rotates (FR-7.44), and with `kick` the bot is told (`bcast-kick`, FR-8.49).
-    fn camera_remove_viewer(&self, server_id: ServerId, id: BroadcastId, viewer: u32, kick: bool) {
+    /// Ends `viewer`'s admission to the own camera `session`: it gets no keys any more, the key
+    /// rotates for a relay viewer (FR-7.44), its direct stream closes, and with `kick` the bot is
+    /// told (`bcast-kick`, FR-8.49).
+    fn camera_remove_viewer(&self, server_id: ServerId, session: &str, viewer: u32, kick: bool) {
         let removed = {
             let mut cameras = lock(self.camera_state());
             let Some(own) = cameras.own.as_mut() else {
@@ -759,16 +897,21 @@ impl Engine {
             };
             let on_air = own.server_id == server_id && own.state == CameraState::OnAir;
             let send = &own.send;
-            match own.live.as_mut().filter(|l| on_air && l.id == id) {
+            match own.live.as_mut().filter(|l| on_air && l.session == session) {
                 Some(live) => {
                     // Its direct stream, if any, closes with the admission (FR-8.92).
                     live.direct.remove(viewer);
                     let was_full = live.viewers.is_full();
                     match live.viewers.leave(viewer) {
-                        Some(hash) => {
-                            live.publisher.remove(&hash);
+                        Some((hash, path)) => {
+                            // Only a relay viewer holds the broadcast keys (FR-8.48).
+                            if path == CameraPath::Relay
+                                && let Some(broadcast) = &mut live.broadcast
+                            {
+                                broadcast.publisher.remove(&hash);
+                            }
                             send.set_vp9_only(live.viewers.needs_vp9());
-                            Some(was_full)
+                            Some((was_full, live.broadcast.as_ref().map(|b| b.id)))
                         }
                         None => None,
                     }
@@ -776,7 +919,7 @@ impl Engine {
                 None => None,
             }
         };
-        let Some(was_full) = removed else {
+        let Some((was_full, broadcast)) = removed else {
             return;
         };
         // A freed slot is announced again, so viewers turned away as full ask anew (FR-8.52).
@@ -786,21 +929,21 @@ impl Engine {
                 &ctx,
                 &peers,
                 &CameraMessage::On {
-                    id: broadcast_hex(id),
+                    id: session.to_owned(),
                 },
             );
         }
-        if kick {
-            self.relay_broadcast_kick(server_id, RelayUse::Camera, id, viewer);
+        if kick && let Some(broadcast) = broadcast {
+            self.relay_broadcast_kick(server_id, RelayUse::Camera, broadcast, viewer);
         }
         self.emit_camera(server_id, self.camera_view());
     }
 
-    /// The own camera's broadcast on `server_id` with `viewer` admitted, if any.
-    fn camera_watched_by(&self, server_id: ServerId, viewer: u32) -> Option<BroadcastId> {
+    /// The own camera's session id on `server_id` with `viewer` admitted, if any.
+    fn camera_watched_by(&self, server_id: ServerId, viewer: u32) -> Option<String> {
         let mut cameras = lock(self.camera_state());
         let live = cameras.own.as_mut()?.live_on(server_id)?;
-        live.viewers.contains(viewer).then_some(live.id)
+        live.viewers.contains(viewer).then(|| live.session.clone())
     }
 
     /// Nobody this client blocks keeps a direct camera stream (FR-8.92); the relay broadcast of
@@ -932,10 +1075,12 @@ pub(crate) fn on_plugin_data(
             engine.camera_join(ctx, event.sender, &id, &codecs, media);
         }
         CameraMessage::CamLeave { id } => {
-            if let Some(live) = engine.camera_watched_by(ctx.server_id, event.sender)
-                && broadcast_hex(live) == id
+            if engine
+                .camera_watched_by(ctx.server_id, event.sender)
+                .as_deref()
+                == Some(id.as_str())
             {
-                engine.camera_remove_viewer(ctx.server_id, live, event.sender, true);
+                engine.camera_remove_viewer(ctx.server_id, &id, event.sender, true);
             }
         }
         CameraMessage::On { id } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
@@ -975,21 +1120,14 @@ pub(crate) fn on_peer_known(
     ctx: &SessionCtx,
     session: u32,
 ) {
-    let id = {
+    let camera = {
         let mut cameras = lock(state);
         let Some(live) = cameras.own.as_mut().and_then(|o| o.live_on(ctx.server_id)) else {
             return;
         };
-        live.id
+        live.session.clone()
     };
-    signal::announce_to_newcomer(
-        ctx,
-        peers,
-        session,
-        &CameraMessage::On {
-            id: broadcast_hex(id),
-        },
-    );
+    signal::announce_to_newcomer(ctx, peers, session, &CameraMessage::On { id: camera });
 }
 
 /// A person joined the server or moved: a viewer who left the own channel is removed and the
@@ -1014,7 +1152,7 @@ pub(crate) fn on_user_moved(
     }
     super::recv::on_camera_gone(&engine, ctx, session);
     if let Some(id) = engine.camera_watched_by(ctx.server_id, session) {
-        engine.camera_remove_viewer(ctx.server_id, id, session, true);
+        engine.camera_remove_viewer(ctx.server_id, &id, session, true);
     }
 }
 
@@ -1032,7 +1170,7 @@ pub(crate) fn on_user_removed(
     };
     super::recv::on_camera_gone(&engine, ctx, session);
     if let Some(id) = engine.camera_watched_by(ctx.server_id, session) {
-        engine.camera_remove_viewer(ctx.server_id, id, session, true);
+        engine.camera_remove_viewer(ctx.server_id, &id, session, true);
     }
 }
 
@@ -1075,6 +1213,25 @@ pub(crate) fn on_connection_reset(
 mod tests {
     use super::*;
     use CameraState::{Off, OnAir, Preview, Requesting};
+    use Route::{Direct, Needs, Relay};
+
+    #[test]
+    fn the_fallback_matrix_picks_the_path_per_viewer() {
+        // FR-8.95, 0.9.0 sharer; `media` is the viewer's `mv: 2`. A 0.8.x viewer of a new-format
+        // camera is never offered an old copy, on any path.
+        assert_eq!(route(Format::New, true, true), Relay);
+        assert_eq!(route(Format::New, false, true), Relay);
+        assert_eq!(route(Format::New, true, false), Needs);
+        assert_eq!(route(Format::New, false, false), Needs);
+        assert_eq!(route(Format::Direct, true, true), Direct);
+        assert_eq!(route(Format::Direct, true, false), Needs);
+        // An old relay serves 0.8.x viewers over the broadcast while 0.9.0 viewers go direct
+        // (FR-8.94); `relay_only` leaves the old broadcast as the only path.
+        assert_eq!(route(Format::Old, true, true), Direct);
+        assert_eq!(route(Format::Old, true, false), Relay);
+        assert_eq!(route(Format::Old, false, true), Relay);
+        assert_eq!(route(Format::Old, false, false), Relay);
+    }
 
     #[test]
     fn the_session_follows_the_state_diagram() {

@@ -64,9 +64,10 @@ impl DirectViewers {
         }
     }
 
-    /// Whether `viewer` should get a stream: it has none yet and the direct path has room.
-    pub(crate) fn wants(&self, viewer: u32) -> bool {
-        !self.views.contains_key(&viewer) && self.views.len() < MAX_DIRECT_VIEWERS
+    /// Whether `viewer` can be served over the direct path: it keeps the stream it has, and a
+    /// new one fits while the path serves fewer than [`MAX_DIRECT_VIEWERS`] (FR-8.93).
+    pub(crate) fn has_room(&self, viewer: u32) -> bool {
+        self.views.len() < MAX_DIRECT_VIEWERS || self.views.contains_key(&viewer)
     }
 
     /// Sends the camera to `viewer` from now on; a stream it had already closes.
