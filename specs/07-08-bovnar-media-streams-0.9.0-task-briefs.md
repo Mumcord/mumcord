@@ -49,16 +49,16 @@
 | D1 | Direct `STREAM_SCREEN` format switch | done — `04026690`, branch not pushed | W2, W3, S2 | complex |
 | D2 | Sharer: description, layer routing, format choice | done — `a950bec9`, branch not pushed | D1 | complex |
 | D3 | Viewer: description, changes at keyframes, both formats | done — `b41444ab`, branch not pushed | D2 | complex |
-| D4 | Capability negotiation and refusal texts | partial — `12bb9696`: hello `media-v2` and `Watch` `mv`; relay `mv`/bind waits for R6 (mumbot) | D3 | complex |
+| D4 | Capability negotiation and refusal texts | partial — `12bb9696`, `abc88dd0`, `7794576b`; refusal texts wait for R3 | D3 | complex |
 | D5 | Direct camera path (`STREAM_CAMERA`) | open | D4 | complex |
 | D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | open | D1 | simple |
 | R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
 | R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
 | R3 | Engine broadcast link: media profile end to end | open | R1, W3, R5 | complex |
-| R4 | Plugin relay data on channel 6 | open | R1 | complex |
+| R4 | Plugin relay data on channel 6 | done — `875d1656`, `feat/r4-plugin-channel6` | R1 | complex |
 | R5 | mumpeer: new format, routing, description cache | open | P0.3, W1, W2 | complex |
-| R6 | mumbot: pass `mv` through the broadcast messages | open | S1, R1 | simple |
+| R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
 | E1 | Packet inspector: description, channels, format | open | D1, R2 | complex |
 | E2 | UI texts and 24 locales for fallback paths | open | D4, D6 | simple |
 | E3 | Notices and licences for Bovnar 2.1.0 | open | – | simple |
@@ -67,9 +67,9 @@
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
 then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D3 are done on their
-stacked branches; D4 has the hello and `Watch` halves. R1 and R2 are done; R3 is next. The relay
-`mv` fields of D4 wait for R6: mumbot v0.5.4 constructs the p2p types and fails to build when
-new fields are added. E3 can run at any time.
+stacked branches. R1, R2, R4 and R6 are done; R3 and the D4 refusal texts are next. The engine
+dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the
+0.9.0 tag exists. E3 can run at any time.
 
 ---
 
