@@ -139,6 +139,8 @@
     "people_other": "{{count}} osoba",
     "limit": "{{count}} od {{max}} kamera",
     "relay": "Relej · end-to-end šifrirano",
+    "direct": "Izravno · end-to-end šifrirano",
+    "both": "Relej i izravno · end-to-end šifrirano",
     "relayTitle": "Svaka se kamera jednom šalje releju, a on je kopira gledateljima",
     "layout": "Raspored",
     "grid": "Mreža",
@@ -257,5 +259,10 @@
     "dataSaver": "Štednja podataka: do 15 fps za sve",
     "reduceMotion": "Smanji kretanje: bez sjaja i animacije na okviru govornika",
     "reduceMotionHint": "Prema zadanim postavkama prati postavku smanjenog kretanja tvog sustava."
+  },
+  "viewers": {
+    "title": "Gledatelji",
+    "relay": "Relej",
+    "direct": "Izravno"
   }
 }

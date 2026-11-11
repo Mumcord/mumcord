@@ -140,6 +140,8 @@
     "people_other": "{{count}} persone",
     "limit": "{{count}} fotocamere su {{max}}",
     "relay": "Relay · crittografato end-to-end",
+    "direct": "Diretto · crittografato end-to-end",
+    "both": "Relay e diretto · crittografato end-to-end",
     "relayTitle": "Ogni fotocamera viene inviata una sola volta al relay e copiata per gli spettatori",
     "layout": "Layout",
     "grid": "Griglia",
@@ -257,5 +259,10 @@
     "dataSaver": "Risparmio dati: fino a 15 fps per tutti",
     "reduceMotion": "Riduci movimento: nessun alone né animazione sul riquadro di chi parla",
     "reduceMotionHint": "Per impostazione predefinita segue l'impostazione di riduzione del movimento del sistema."
+  },
+  "viewers": {
+    "title": "Spettatori",
+    "relay": "Relay",
+    "direct": "Diretto"
   }
 }

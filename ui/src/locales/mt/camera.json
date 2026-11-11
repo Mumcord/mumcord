@@ -147,6 +147,8 @@
     "people_other": "{{count}} persuna",
     "limit": "{{count}} minn {{max}} kameras",
     "relay": "Relay · encrypted minn tarf sa tarf",
+    "direct": "Dirett · encrypted minn tarf sa tarf",
+    "both": "Relay u dirett · encrypted minn tarf sa tarf",
     "relayTitle": "Kull kamera tintbagħat darba lir-relay u tiġi kkupjata għal dawk li jaraw",
     "layout": "Disinn",
     "grid": "Griglja",
@@ -273,5 +275,10 @@
     "dataSaver": "Iffrankar tad-data: sa 15 fps għal kulħadd",
     "reduceMotion": "Naqqas il-moviment: l-ebda tiddi jew animazzjoni fuq il-fram tal-kelliem",
     "reduceMotionHint": "B'mod awtomatiku jsegwi s-setting tas-sistema tiegħek biex titnaqqas il-moviment."
+  },
+  "viewers": {
+    "title": "Telespettaturi",
+    "relay": "Relay",
+    "direct": "Dirett"
   }
 }

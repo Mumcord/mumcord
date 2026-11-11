@@ -146,6 +146,8 @@
     "people_other": "{{count}} osoby",
     "limit": "{{count}} z {{max}} kamer",
     "relay": "Przekaźnik · szyfrowanie end-to-end",
+    "direct": "Bezpośrednio · szyfrowanie end-to-end",
+    "both": "Przekaźnik i bezpośrednio · szyfrowanie end-to-end",
     "relayTitle": "Każda kamera jest wysyłana raz do przekaźnika i kopiowana do widzów",
     "layout": "Układ",
     "grid": "Siatka",
@@ -265,5 +267,10 @@
     "dataSaver": "Oszczędzanie danych: do 15 fps dla wszystkich",
     "reduceMotion": "Ogranicz ruch: bez poświaty i animacji na ramce mówiącego",
     "reduceMotionHint": "Domyślnie zgodnie z ustawieniem ograniczania ruchu w systemie."
+  },
+  "viewers": {
+    "title": "Widzowie",
+    "relay": "Przekaźnik",
+    "direct": "Bezpośrednio"
   }
 }

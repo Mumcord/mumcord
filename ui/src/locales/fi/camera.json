@@ -135,6 +135,8 @@
     "people_other": "{{count}} henkilöä",
     "limit": "{{count}} / {{max}} kameraa",
     "relay": "Välityspalvelin · päästä päähän salattu",
+    "direct": "Suora · päästä päähän salattu",
+    "both": "Välityspalvelin ja suora · päästä päähän salattu",
     "relayTitle": "Jokainen kamera lähetetään kerran välityspalvelimelle, joka kopioi sen katsojille",
     "layout": "Asettelu",
     "grid": "Ruudukko",
@@ -249,5 +251,10 @@
     "dataSaver": "Datansäästö: enintään 15 fps kaikille",
     "reduceMotion": "Vähennä liikettä: ei hehkua tai animaatiota puhujan kehyksessä",
     "reduceMotionHint": "Noudattaa oletuksena järjestelmäsi liikkeen vähennys -asetusta."
+  },
+  "viewers": {
+    "title": "Katsojat",
+    "relay": "Välityspalvelin",
+    "direct": "Suora"
   }
 }

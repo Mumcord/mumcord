@@ -146,6 +146,8 @@
     "people_other": "{{count}} osôb",
     "limit": "{{count}} z {{max}} kamier",
     "relay": "Relay · end-to-end šifrovanie",
+    "direct": "Priamo · end-to-end šifrovanie",
+    "both": "Relay a priamo · end-to-end šifrovanie",
     "relayTitle": "Každá kamera sa na relay pošle raz a ten ju rozkopíruje divákom",
     "layout": "Rozloženie",
     "grid": "Mriežka",
@@ -265,5 +267,10 @@
     "dataSaver": "Šetrenie dát: až 15 fps pre všetkých",
     "reduceMotion": "Obmedziť pohyb: žiadna žiara ani animácia na rámčeku hovoriaceho",
     "reduceMotionHint": "Predvolene sa riadi nastavením obmedzenia pohybu v systéme."
+  },
+  "viewers": {
+    "title": "Diváci",
+    "relay": "Relay",
+    "direct": "Priamo"
   }
 }

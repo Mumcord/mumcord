@@ -146,6 +146,8 @@
     "people_other": "{{count}} lidí",
     "limit": "{{count}} z {{max}} kamer",
     "relay": "Relay · koncové šifrování",
+    "direct": "Přímo · koncové šifrování",
+    "both": "Relay a přímo · koncové šifrování",
     "relayTitle": "Každá kamera se na relay pošle jednou a ten ji rozkopíruje divákům",
     "layout": "Rozvržení",
     "grid": "Mřížka",
@@ -265,5 +267,10 @@
     "dataSaver": "Šetření daty: až 15 fps pro všechny",
     "reduceMotion": "Omezit pohyb: žádná záře ani animace na rámečku mluvčího",
     "reduceMotionHint": "Ve výchozím stavu se řídí nastavením omezení pohybu v systému."
+  },
+  "viewers": {
+    "title": "Diváci",
+    "relay": "Relay",
+    "direct": "Přímo"
   }
 }
