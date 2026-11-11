@@ -12,7 +12,7 @@
     "noRelay": "Questo server non ha un relay, quindi la condivisione della fotocamera non è disponibile.",
     "relayTooOld": "Il relay di questo server è troppo vecchio per la condivisione della fotocamera.",
     "relayDisallows": "Il relay di questo server non consente la condivisione della fotocamera.",
-    "needsRelayMode": "La condivisione della fotocamera richiede il relay. Modificalo in Privacy e connessioni.",
+    "needsRelayMode": "La condivisione della fotocamera è disattivata. Modificalo in Privacy e connessioni.",
     "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
     "registeredOnly": "Su questo server solo gli utenti registrati possono usare la fotocamera.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
@@ -96,7 +96,7 @@
     "denied": "Impossibile avviare la fotocamera: il relay del server l'ha rifiutata.",
     "relayDown": "Fotocamera interrotta: il relay non è raggiungibile",
     "rateLimited": "Impossibile avviare la fotocamera: troppi tentativi. Riprova tra un minuto.",
-    "mode": "La condivisione della fotocamera richiede il relay. Modificalo in Privacy e connessioni.",
+    "mode": "La condivisione della fotocamera è disattivata. Modificalo in Privacy e connessioni.",
     "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
     "endedByRelay": "Fotocamera interrotta dal relay del server",
     "dismissStopped": "Ignora",

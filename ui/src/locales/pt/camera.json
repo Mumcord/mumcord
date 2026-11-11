@@ -12,7 +12,7 @@
     "noRelay": "Este servidor não tem retransmissor, por isso a partilha de câmara não está disponível.",
     "relayTooOld": "O retransmissor deste servidor é demasiado antigo para a partilha de câmara.",
     "relayDisallows": "O retransmissor deste servidor não permite a partilha de câmara.",
-    "needsRelayMode": "A partilha de câmara precisa do retransmissor. Altera-o em Privacidade e ligações.",
+    "needsRelayMode": "A partilha de câmara está desativada. Altera-o em Privacidade e ligações.",
     "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
     "registeredOnly": "Neste servidor só utilizadores registados podem usar a câmara.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
@@ -96,7 +96,7 @@
     "denied": "Não foi possível iniciar a câmara: o retransmissor do servidor recusou-a.",
     "relayDown": "A câmara parou: o retransmissor não está acessível",
     "rateLimited": "Não foi possível iniciar a câmara: demasiadas tentativas. Tenta novamente dentro de um minuto.",
-    "mode": "A partilha de câmara precisa do retransmissor. Altera-o em Privacidade e ligações.",
+    "mode": "A partilha de câmara está desativada. Altera-o em Privacidade e ligações.",
     "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
     "endedByRelay": "Câmara parada pelo retransmissor do servidor",
     "dismissStopped": "Dispensar",

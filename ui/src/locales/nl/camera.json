@@ -12,7 +12,7 @@
     "noRelay": "Deze server heeft geen relay, dus camera delen is niet beschikbaar.",
     "relayTooOld": "De relay van deze server is te oud voor camera delen.",
     "relayDisallows": "De relay van deze server staat camera delen niet toe.",
-    "needsRelayMode": "Camera delen heeft de relay nodig. Wijzig dit in Privacy en verbindingen.",
+    "needsRelayMode": "Camera delen staat uit. Wijzig dit in Privacy en verbindingen.",
     "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
     "registeredOnly": "Alleen geregistreerde gebruikers mogen de camera op deze server gebruiken.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
@@ -96,7 +96,7 @@
     "denied": "Camera kon niet starten: de relay van de server weigerde het.",
     "relayDown": "Camera gestopt: de relay is niet bereikbaar",
     "rateLimited": "Camera kon niet starten: te veel pogingen. Probeer het over een minuut opnieuw.",
-    "mode": "Camera delen heeft de relay nodig. Wijzig dit in Privacy en verbindingen.",
+    "mode": "Camera delen staat uit. Wijzig dit in Privacy en verbindingen.",
     "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
     "endedByRelay": "Camera gestopt door de relay van de server",
     "dismissStopped": "Sluiten",

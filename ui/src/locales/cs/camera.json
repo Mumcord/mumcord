@@ -12,7 +12,7 @@
     "noRelay": "Tento server nemá relay, takže sdílení kamery není dostupné.",
     "relayTooOld": "Relay tohoto serveru je pro sdílení kamery příliš starý.",
     "relayDisallows": "Relay tohoto serveru sdílení kamery nepovoluje.",
-    "needsRelayMode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
+    "needsRelayMode": "Sdílení kamery je vypnuté. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
     "registeredOnly": "Na tomto serveru mohou kameru používat jen registrovaní uživatelé.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
@@ -96,7 +96,7 @@
     "denied": "Kameru se nepodařilo spustit: relay serveru ji odmítl.",
     "relayDown": "Kamera se zastavila: relay není dostupný",
     "rateLimited": "Kameru se nepodařilo spustit: příliš mnoho pokusů. Zkus to znovu za minutu.",
-    "mode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
+    "mode": "Sdílení kamery je vypnuté. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
     "endedByRelay": "Kameru zastavil relay serveru",
     "dismissStopped": "Zavřít",

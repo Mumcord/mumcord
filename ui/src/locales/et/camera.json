@@ -12,7 +12,7 @@
     "noRelay": "Sellel serveril pole releeserverit, seega kaamera jagamine pole saadaval.",
     "relayTooOld": "Selle serveri releeserver on kaamera jagamiseks liiga vana.",
     "relayDisallows": "Selle serveri releeserver ei luba kaamera jagamist.",
-    "needsRelayMode": "Kaamera jagamine vajab releeserverit. Muuda seda jaotises Privaatsus ja ühendused.",
+    "needsRelayMode": "Kaamera jagamine on välja lülitatud. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
     "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
@@ -96,7 +96,7 @@
     "denied": "Kaamerat ei saanud käivitada: serveri releeserver lükkas selle tagasi.",
     "relayDown": "Kaamera peatus: releeserver pole kättesaadav",
     "rateLimited": "Kaamerat ei saanud käivitada: liiga palju katseid. Proovi minuti pärast uuesti.",
-    "mode": "Kaamera jagamine vajab releeserverit. Muuda seda jaotises Privaatsus ja ühendused.",
+    "mode": "Kaamera jagamine on välja lülitatud. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
     "endedByRelay": "Serveri releeserver peatas kaamera",
     "dismissStopped": "Sulge",

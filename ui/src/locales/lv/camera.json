@@ -12,7 +12,7 @@
     "noRelay": "Šim serverim nav releja, tāpēc kameras kopīgošana nav pieejama.",
     "relayTooOld": "Šī servera relejs ir pārāk vecs kameras kopīgošanai.",
     "relayDisallows": "Šī servera relejs neļauj kopīgot kameru.",
-    "needsRelayMode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
+    "needsRelayMode": "Kameras kopīgošana ir izslēgta. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
     "registeredOnly": "Šajā serverī kameru drīkst izmantot tikai reģistrēti lietotāji.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
@@ -96,7 +96,7 @@
     "denied": "Kameru neizdevās startēt: servera relejs to noraidīja.",
     "relayDown": "Kamera apstājās: relejs nav sasniedzams",
     "rateLimited": "Kameru neizdevās startēt: pārāk daudz mēģinājumu. Mēģini vēlreiz pēc minūtes.",
-    "mode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
+    "mode": "Kameras kopīgošana ir izslēgta. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
     "endedByRelay": "Servera relejs apturēja kameru",
     "dismissStopped": "Aizvērt",
