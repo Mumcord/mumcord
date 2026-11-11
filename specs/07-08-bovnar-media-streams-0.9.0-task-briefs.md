@@ -57,7 +57,7 @@
 | R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
 | R3 | Engine broadcast link: media profile end to end | done — `c27812f4`, `2f317177`; E2E still needs R5 | R1, W3, R5 | complex |
 | R4 | Plugin relay data on channel 6 | done — `875d1656`, `feat/r4-plugin-channel6` | R1 | complex |
-| R5 | mumpeer: new format, routing, description cache | partial — `8cf61d9`, `9b1a7db`, `b186d85` on `sothis/mumpeer`, PR #17: parser, cache, reassembly, queues; routing and status not wired | P0.3, W1, W2 | complex |
+| R5 | mumpeer: new format, routing, description cache | done — `4b94be6` on `sothis/mumpeer`, PR #17 | P0.3, W1, W2 | complex |
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
 | E1 | Packet inspector: description, channels, format | open | D1, R2 | complex |
 | E2 | UI texts and 24 locales for fallback paths | open | D4, D6 | simple |
@@ -67,10 +67,9 @@
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
 then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4 protocol work and
-R1–R4/R6 are done. R5 has its mux-channel parser on `sothis/mumpeer`; routing, the description
-cache and `/v1/status` are next, then the D4 refusal texts. The engine dev-dependency
-temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the 0.9.0 tag exists.
-E3 can run at any time.
+R1–R6 are done. Next: the D4 refusal texts and the E2E acceptance run (E4). The engine
+dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the
+0.9.0 tag exists. E3 can run at any time.
 
 ---
 
