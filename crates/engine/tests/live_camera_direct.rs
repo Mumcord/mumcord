@@ -1,7 +1,7 @@
-//! The direct camera path (spec 08, FR-8.92, FR-8.93) with two engines on this machine: A turns
-//! the test camera on against a relay that cannot carry the media profile, so it opens one
-//! `STREAM_CAMERA` to B; B's tile plays it without the relay broadcast, follows B's tile height
-//! on the reverse stream, and closes when B blocks A or A turns the camera off.
+//! The direct camera path (spec 08, FR-8.92, FR-8.93) with two engines on this machine: A runs
+//! `direct_only`, so it opens one `STREAM_CAMERA` to B; B's tile plays it without any relay
+//! broadcast, follows B's tile height on the reverse stream, and closes when B blocks A or A
+//! turns the camera off.
 //!
 //! `testenv/up.sh` with the camera profile (see `live_camera.rs`), then:
 //! `MUMCORD_LIVE=1 MUMCORD_TEST_CAMERA=1 MUMCORD_CAMERA_PORT=44758 cargo test -p mumcord-engine --features test-backend --test live_camera_direct -- --ignored --test-threads=1 --nocapture`
@@ -15,7 +15,7 @@ use mumcord_engine::camera::{CameraState, TileState};
 use mumcord_engine::p2p::P2pConfig;
 use mumcord_engine::screen_share::wire::{Codec, Frame, FrameHeader};
 use mumcord_engine::screen_share::{I420Frame, ScreenFrameSink};
-use mumcord_engine::store::Consent;
+use mumcord_engine::store::{Consent, P2pMode};
 use mumcord_engine::{
     Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields, ServerId,
     Snapshot,
@@ -207,6 +207,12 @@ async fn the_camera_reaches_a_viewer_over_the_direct_stream() {
     let a = start(&dir, "a").await;
     let b = start(&dir, "b").await;
     let (server_a, server_b) = (a.server(), b.server());
+
+    // `direct_only` keeps the camera off the relay broadcast whatever format the testenv's
+    // relay speaks, so this test always exercises the direct path (FR-8.94).
+    let mut settings = a.engine.settings().expect("settings");
+    settings.p2p_mode = P2pMode::DirectOnly;
+    a.engine.update_settings(settings).await.expect("mode");
 
     // B watches the room before A goes on air.
     let frames = Arc::new(Received::default());

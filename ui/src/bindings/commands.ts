@@ -1959,10 +1959,23 @@ export type CameraView = {
 	state: CameraState,
 	/**  Why the last **Turn on camera** failed; shown in the preview until the next try. */
 	error: CameraFailure | null,
-	/**  The broadcast id (16 hex) while on air. */
+	/**  The relay broadcast id (16 hex) while on air; `null` for a camera that runs without one. */
 	broadcast: string | null,
-	/**  The people who receive the camera now. */
-	viewers: number[],
+	/**  The people who receive the camera now, with the path each of them gets. */
+	viewers: CameraViewer[],
+};
+
+/**  How one viewer gets the own camera (FR-8.62, FR-8.94); the camera room's viewer list shows it. */
+export type CameraPath = 
+/**  Through the relay broadcast. */
+"relay" | 
+/**  Through its own stream. */
+"direct";
+
+/**  One admitted viewer of the own camera. */
+export type CameraViewer = {
+	session: number,
+	path: CameraPath,
 };
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
