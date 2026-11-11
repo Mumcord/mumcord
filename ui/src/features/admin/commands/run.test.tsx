@@ -186,6 +186,45 @@ describe("what an argument names (FR-10.34)", () => {
     expect(lines()).toEqual(["You muted Annabel on the server. · Only you see this line"]);
   });
 
+  it("reads a name with a space as one person, and the words after it as the reason", async () => {
+    grant(1, { muteDeafen: true });
+    const anna = getServerState().users.get(ANNA);
+    if (!anna) throw new Error("the mock has no Anna");
+    act(() => {
+      api.mock.upsertUser({ ...anna, session: 21, name: "Bob" });
+      api.mock.upsertUser({ ...anna, session: 22, name: "Bob Smith" });
+    });
+    const mute = vi.spyOn(api, "personSetServerMute");
+    await typed("/mute Bob Smith");
+    await waitFor(() => {
+      expect(mute).toHaveBeenLastCalledWith(1, 22, true);
+    });
+    await typed("/mute Bob spamming");
+    await waitFor(() => {
+      expect(mute).toHaveBeenLastCalledWith(1, 21, true);
+    });
+    expect(mute).toHaveBeenCalledTimes(2);
+    // The words after the full name stay the reason.
+    grant(0, { kick: true });
+    await typed("/kick Bob Smith spamming");
+    render(<PersonActionHost />);
+    const dialog = await screen.findByRole("dialog", {
+      name: "Kick Bob Smith? · Local test server",
+    });
+    expect(within(dialog).getByLabelText("Reason")).toHaveValue("spamming");
+  });
+
+  it("never runs on a partial name; the admin picks from the list (FR-10.34)", async () => {
+    grant(1, { muteDeafen: true });
+    const mute = vi.spyOn(api, "personSetServerMute");
+    const result = await typed("/mute An");
+    expect(result.kind).toBe("choice");
+    if (result.kind === "choice") {
+      expect(result.options.map((option) => option.keyword)).toEqual(["Anna"]);
+    }
+    expect(mute).not.toHaveBeenCalled();
+  });
+
   it("names a channel, and says so when none fits (FR-10.34)", async () => {
     grant(1, { moveUsers: true });
     grant(2, { moveUsers: true });

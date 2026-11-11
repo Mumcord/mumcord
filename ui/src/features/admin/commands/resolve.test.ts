@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { getServerState } from "../../channels/serverStore";
 import { connectedMock, resetAll } from "../../channels/testUtils";
-import { channelCandidates, closest, editDistance, personCandidates, resolveOne } from "./resolve";
+import {
+  channelCandidates,
+  closest,
+  editDistance,
+  personCandidates,
+  resolveLeading,
+  resolveOne,
+} from "./resolve";
 
 interface Named {
   readonly label: string;
@@ -22,10 +29,25 @@ describe("what a typed argument names (FR-10.34)", () => {
     if (found.kind === "one") expect(found.item.label).toBe("Mallory");
   });
 
-  it("takes a unique beginning of a name", () => {
+  it("never takes a unique beginning of a name as the answer on its own", () => {
     const found = resolveOne("Be", NAMES);
+    expect(found.kind).toBe("many");
+    if (found.kind === "many") expect(found.items.map((item) => item.name)).toEqual(["Ben"]);
+  });
+
+  it("takes a unique beginning where a confirmation follows", () => {
+    const found = resolveOne("Be", NAMES, true);
     expect(found.kind).toBe("one");
-    if (found.kind === "one") expect(found.item.label).toBe("Ben");
+  });
+
+  it("reads the longest full name out of the words (names may hold spaces)", () => {
+    const both = ["Bob", "Bob Smith"].map((name) => candidate(name));
+    const smith = resolveLeading(["Bob", "Smith", "spam"], both);
+    expect(smith.used).toBe(2);
+    expect(smith.found.kind === "one" && smith.found.item.label).toBe("Bob Smith");
+    const bob = resolveLeading(["Bob", "spamming"], both);
+    expect(bob.used).toBe(1);
+    expect(bob.found.kind === "one" && bob.found.item.label).toBe("Bob");
   });
 
   it("asks which one was meant when several fit (mockup 04c)", () => {
@@ -57,8 +79,7 @@ describe("what a typed argument names (FR-10.34)", () => {
     const at = resolveOne("@", NAMES);
     expect(at.kind).toBe("many");
     const partial = resolveOne("@Be", NAMES);
-    expect(partial.kind).toBe("one");
-    if (partial.kind === "one") expect(partial.item.label).toBe("Ben");
+    expect(partial.kind).toBe("many");
   });
 });
 
