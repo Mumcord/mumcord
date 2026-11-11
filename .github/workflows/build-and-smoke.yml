@@ -553,8 +553,9 @@ jobs:
           cpu: 4
           prepare: |
             # git: the plugin tool's publish test runs git. cmake and gmake build the bundled
-            # libopus (cpal -> opusic-sys) from source.
-            pkg install -y git rust node24 npm protobuf python3 pkgconf cmake gmake ca_root_nss \
+            # libopus (cpal -> opusic-sys) from source. bash: the version and SBOM scripts are
+            # bash scripts, and FreeBSD ships none.
+            pkg install -y git bash rust node24 npm protobuf python3 pkgconf cmake gmake ca_root_nss \
               alsa-lib alsa-plugins libvpx svt-av1 dav1d gstreamer1-libav \
               gstreamer1-plugins-vpx gstreamer1-plugins-opus webkit2-gtk_41 gtk3 \
               libayatana-appindicator
@@ -562,7 +563,9 @@ jobs:
             set -e
             export PATH="$HOME/.cargo/bin:$PATH"
             export CARGO_BUILD_JOBS=4
-            scripts/set-version.sh "${{ inputs.version }}"
+            # Called through bash: the script's "#!/bin/bash" does not exist on FreeBSD, where
+            # bash lives in /usr/local/bin.
+            bash scripts/set-version.sh "${{ inputs.version }}"
             # The version stamp goes into the binary, so no cargo cache is reused across versions.
             npm ci
             npm run build
