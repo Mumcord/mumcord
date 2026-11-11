@@ -171,7 +171,7 @@
     "noFanoutBody_other": "Faigheann gach breathnóir a chóip féin ó do ríomhaire, mar sin is féidir le suas le {{max}} duine breathnú. Laghdaíonn an cháilíocht de réir mar a thagann níos mó isteach: faoi láthair teastaíonn thart ar {{mbit}} Mbit/s uaslódála ó {{count}} breathnóir, mar sin ritheann do chomhroinnt ag {{now}} in ionad {{wanted}}.",
     "fanoutUnavailable": "Níl scaipeadh athsheachadáin ar fáil ({{reason}}). Faigheann gach breathnóir a chóip féin, mar sin is féidir le suas le {{max}} breathnú agus d’fhéadfadh an cháilíocht titim.",
     "reasonNoRelay": "níl athsheachadán ag an bhfreastalaí seo",
-    "reasonOldRelay": "tá an t-athsheachadán ró-shean",
+    "reasonOldRelay": "teastaíonn nuashonrú ón relá den fhreastalaí seo",
     "reasonDisallowed": "ní cheadaíonn an t-athsheachadán comhroinnt scáileáin",
     "reasonRefused": "dhiúltaigh an t-athsheachadán don chraoladh",
     "reasonFull": "tá an t-athsheachadán lán",

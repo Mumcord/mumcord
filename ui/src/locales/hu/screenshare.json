@@ -159,7 +159,7 @@
     "noFanoutBody_other": "Minden néző saját példányt kap a te gépedről, így legfeljebb {{max}} ember nézheti. A minőség a csatlakozókkal romlik: most {{count}} nézőnek kb. {{mbit}} Mbit/s feltöltés kell, ezért a megosztásod {{wanted}} helyett {{now}} értéken fut.",
     "fanoutUnavailable": "Az átjátszós szórás nem érhető el ({{reason}}). Minden néző saját példányt kap, így legfeljebb {{max}} nézheti, és a minőség csökkenhet.",
     "reasonNoRelay": "ennek a szervernek nincs átjátszója",
-    "reasonOldRelay": "az átjátszó túl régi",
+    "reasonOldRelay": "a szerver relayének frissítésre van szüksége",
     "reasonDisallowed": "az átjátszó nem engedélyezi a képernyőmegosztást",
     "reasonRefused": "az átjátszó elutasította a szórást",
     "reasonFull": "az átjátszó megtelt",

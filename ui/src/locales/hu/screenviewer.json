@@ -13,6 +13,7 @@
   "starting": "Csatlakozás {{name}} képernyőjéhez…",
   "paused": "{{name}} szüneteltette a megosztást.",
   "full": "Ez a megosztás megtelt.",
+  "needsUpdate": "Ehhez a megosztáshoz Mumcord 0.9.0 szükséges.",
   "unreachable": "{{name}} közvetlenül nem érhető el. A hálózata talán blokkolja a közvetlen kapcsolatokat.",
   "tooOld": "{{name}} Mumcordja túl régi ahhoz, hogy megossza veled a képernyőjét.",
   "consentOff": "A nézéshez közvetlen kapcsolatok kellenek, és te kikapcsoltad őket.",

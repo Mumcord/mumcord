@@ -163,7 +163,7 @@
     "noFanoutBody_other": "Katrs skatītājs saņem savu kopiju no tava datora, tāpēc skatīties var līdz {{max}} cilvēkiem. Kvalitāte pazeminās, pievienojoties vairāk cilvēku: šobrīd {{count}} skatītājiem vajag apmēram {{mbit}} Mbit/s augšupielādes, tāpēc tava kopīgošana darbojas ar {{now}} {{wanted}} vietā.",
     "fanoutUnavailable": "Releja izplatīšana nav pieejama ({{reason}}). Katrs skatītājs saņem savu kopiju, tāpēc skatīties var līdz {{max}} un kvalitāte var pazemināties.",
     "reasonNoRelay": "šim serverim nav releja",
-    "reasonOldRelay": "relejs ir pārāk vecs",
+    "reasonOldRelay": "šī servera relay ir jāatjaunina",
     "reasonDisallowed": "relejs neatļauj ekrāna kopīgošanu",
     "reasonRefused": "relejs noraidīja apraidi",
     "reasonFull": "relejs ir pilns",
