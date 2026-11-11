@@ -107,6 +107,8 @@
       "certChanged": "Certifikatet er ændret – kontrollér det, før du forbinder",
       "wrongPassword": "Serveren afviste adgangskoden.",
       "nameInUse": "Navnet er allerede i brug på denne server.",
+      "certUntrustedNotSent": "Serverens certifikat er ikke tillid endnu, så adgangskoden blev ikke sendt. Opret forbindelse én gang og stol på certifikatet, og test derefter igen.",
+      "certChangedNotSent": "Serverens certifikat er ændret, så adgangskoden blev ikke sendt.",
       "unreachable": "Serveren kan ikke nås.",
       "invalid": "Oplysningerne er ikke gyldige.",
       "failed": "Testen mislykkedes. Prøv igen."

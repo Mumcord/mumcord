@@ -75,6 +75,23 @@ fn test_failure(err: ConnectError) -> EngineError {
     }
 }
 
+/// A probe that held the password back (untrusted certificate) and was then refused for the
+/// missing password: says why the password was not sent instead of calling it wrong.
+fn withheld_failure(error: EngineError, cert_changed: bool) -> EngineError {
+    if error.kind != ErrorKind::WrongPassword {
+        return error;
+    }
+    let (kind, state) = if cert_changed {
+        (ErrorKind::CertificateChanged, "has changed")
+    } else {
+        (ErrorKind::CertificateRejected, "is not trusted yet")
+    };
+    EngineError::new(
+        kind,
+        format!("the server certificate {state}, so the password was not sent"),
+    )
+}
+
 fn now_ms() -> UnixMillis {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -398,32 +415,46 @@ impl Engine {
         };
 
         // The probe accepts the certificate to read the version; the trust decision itself is
-        // reported, never stored (FR-3.43).
+        // reported, never stored (FR-3.43). A password, though, only goes to the certificate
+        // already trusted for this server: an attempt with one refuses any other certificate,
+        // and the probe then tries again without the password.
         let presented = Arc::new(std::sync::Mutex::new(None::<String>));
-        let seen = presented.clone();
-        let config = ConnectConfig {
-            host: address.clone(),
-            port: input.port,
-            username,
-            password,
-            tokens: Vec::new(),
-            identity: Some(ClientIdentity {
-                chain: vec![CertificateDer::from(identity.cert_der().to_vec())],
-                key: PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(
-                    identity.key_pkcs8_der().to_vec(),
-                )),
-            }),
-            verify_cert: Arc::new(move |cert| {
-                *lock(&seen) = Some(format_fingerprint(&cert.sha256_hex));
-                true
-            }),
-            login_timeout: TEST_TIMEOUT,
+        let config = |password: Option<String>| {
+            let seen = presented.clone();
+            let trusted = trusted.clone();
+            let needs_trust = password.is_some();
+            ConnectConfig {
+                host: address.clone(),
+                port: input.port,
+                username: username.clone(),
+                password,
+                tokens: Vec::new(),
+                identity: Some(ClientIdentity {
+                    chain: vec![CertificateDer::from(identity.cert_der().to_vec())],
+                    key: PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(
+                        identity.key_pkcs8_der().to_vec(),
+                    )),
+                }),
+                verify_cert: Arc::new(move |cert| {
+                    let fingerprint = format_fingerprint(&cert.sha256_hex);
+                    let accept = !needs_trust
+                        || check_cert(trusted.as_deref(), &fingerprint) == CertCheck::Trusted;
+                    *lock(&seen) = Some(fingerprint);
+                    accept
+                }),
+                login_timeout: TEST_TIMEOUT,
+            }
         };
 
         let probe = async {
-            let connection = mumcord_protocol::connect(config)
-                .await
-                .map_err(test_failure)?;
+            let connection = match mumcord_protocol::connect(config(password)).await {
+                Err(ConnectError::CertificateRejected(_)) => {
+                    mumcord_protocol::connect(config(None))
+                        .await
+                        .map_err(|err| withheld_failure(test_failure(err), trusted.is_some()))?
+                }
+                attempt => attempt.map_err(test_failure)?,
+            };
             let info = super::convert::server_info_view(&connection.handle.state());
             let ping = connection.handle.ping().await;
             connection.handle.disconnect();
@@ -1246,5 +1277,122 @@ mod tests {
             .await
             .expect("reset");
         assert_eq!(view.p2p_mode_override, None);
+    }
+
+    /// A TLS server with a fresh self-signed certificate that records every byte a client sends
+    /// after the handshake, then hangs up. Stands in for a man in the middle.
+    fn eavesdropper() -> (u16, Arc<std::sync::Mutex<Vec<u8>>>) {
+        use std::io::Read;
+
+        let generated =
+            rcgen::generate_simple_self_signed(vec!["localhost".to_owned()]).expect("server cert");
+        let config = rustls::ServerConfig::builder_with_provider(Arc::new(
+            rustls::crypto::ring::default_provider(),
+        ))
+        .with_safe_default_protocol_versions()
+        .expect("protocol versions")
+        .with_no_client_auth()
+        .with_single_cert(
+            vec![generated.cert.der().clone()],
+            PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(
+                generated.signing_key.serialize_der(),
+            )),
+        )
+        .expect("server config");
+        let config = Arc::new(config);
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind");
+        let port = listener.local_addr().expect("addr").port();
+        let received = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let sink = received.clone();
+        std::thread::spawn(move || {
+            for tcp in listener.incoming() {
+                let Ok(tcp) = tcp else { break };
+                tcp.set_read_timeout(Some(std::time::Duration::from_millis(500)))
+                    .expect("read timeout");
+                let tls = rustls::ServerConnection::new(config.clone()).expect("tls");
+                let mut stream = rustls::StreamOwned::new(tls, tcp);
+                let mut buf = [0u8; 4096];
+                // A rejected handshake or the read timeout ends this connection.
+                while let Ok(n @ 1..) = stream.read(&mut buf) {
+                    lock(&sink).extend_from_slice(&buf[..n]);
+                }
+            }
+        });
+        (port, received)
+    }
+
+    /// The probe must never send a password to a certificate that is not the trusted one: not
+    /// the saved one of a server whose certificate changed, not a typed one to an unknown server.
+    #[tokio::test]
+    async fn a_test_connection_withholds_the_password_from_an_untrusted_certificate() {
+        let (_dir, engine) = engine().await;
+        engine
+            .identity_create("Zoe".into(), None)
+            .await
+            .expect("identity");
+        let (port, received) = eavesdropper();
+        let saved = "saved-secret-4711";
+        let typed = "typed-secret-0815";
+        let server = engine
+            .server_add(ServerFields {
+                password: PasswordChange::Set(saved.into()),
+                ..fields("home", "127.0.0.1", "Zoe")
+            })
+            .await
+            .expect("server");
+        lock(&engine.inner.store)
+            .set_trusted_cert(server.id, "AA:BB:CC")
+            .expect("trust another certificate");
+        let input = |server_id, password| ServerTestInput {
+            address: "127.0.0.1".into(),
+            port,
+            username: "Zoe".into(),
+            password,
+            server_id,
+            identity_id: None,
+        };
+
+        let changed = engine
+            .server_test_connection(input(Some(server.id), PasswordChange::Keep))
+            .await
+            .expect_err("the eavesdropper never completes a login");
+        let unknown = engine
+            .server_test_connection(input(None, PasswordChange::Set(typed.into())))
+            .await
+            .expect_err("the eavesdropper never completes a login");
+
+        let received = lock(&received).clone();
+        assert!(
+            !received.is_empty(),
+            "the probe still logs in without a password"
+        );
+        for secret in [saved, typed] {
+            assert!(
+                !received
+                    .windows(secret.len())
+                    .any(|w| w == secret.as_bytes()),
+                "the password reached an untrusted certificate"
+            );
+        }
+        for error in [changed, unknown] {
+            assert_ne!(error.kind, ErrorKind::WrongPassword, "{error}");
+        }
+    }
+
+    /// A server that refuses the password-less login is reported as an untrusted certificate,
+    /// not as a wrong password.
+    #[test]
+    fn a_refused_login_without_the_password_names_the_certificate() {
+        let refused = EngineError::new(ErrorKind::WrongPassword, "WrongServerPassword: ");
+        assert_eq!(
+            withheld_failure(refused.clone(), false).kind,
+            ErrorKind::CertificateRejected
+        );
+        assert_eq!(
+            withheld_failure(refused, true).kind,
+            ErrorKind::CertificateChanged
+        );
+        let unreachable = EngineError::new(ErrorKind::ServerUnreachable, "closed");
+        assert_eq!(withheld_failure(unreachable.clone(), false), unreachable);
     }
 }

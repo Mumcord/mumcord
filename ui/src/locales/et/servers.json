@@ -107,6 +107,8 @@
       "certChanged": "Sertifikaat on muutunud – kontrolli seda enne ühendamist",
       "wrongPassword": "Server keeldus paroolist.",
       "nameInUse": "See nimi on selles serveris juba kasutusel.",
+      "certUntrustedNotSent": "Serveri sertifikaati ei usaldata veel, seetõttu parooli ei saadetud. Ühenda üks kord ja usalda sertifikaati, seejärel testi uuesti.",
+      "certChangedNotSent": "Serveri sertifikaat on muutunud, seetõttu parooli ei saadetud.",
       "unreachable": "Server ei ole kättesaadav.",
       "invalid": "Andmed ei ole kehtivad.",
       "failed": "Test ebaõnnestus. Proovi uuesti."

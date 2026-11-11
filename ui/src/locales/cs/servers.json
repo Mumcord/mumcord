@@ -107,6 +107,8 @@
       "certChanged": "Certifikát se změnil – před připojením ho zkontroluj",
       "wrongPassword": "Server heslo odmítl.",
       "nameInUse": "Toto jméno je na serveru už obsazené.",
+      "certUntrustedNotSent": "Certifikátu serveru zatím nedůvěřujete, proto nebylo heslo odesláno. Připojte se jednou a certifikátu důvěřujte, pak test zopakujte.",
+      "certChangedNotSent": "Certifikát serveru se změnil, proto nebylo heslo odesláno.",
       "unreachable": "Server je nedostupný.",
       "invalid": "Údaje nejsou platné.",
       "failed": "Test selhal. Zkus to znovu."

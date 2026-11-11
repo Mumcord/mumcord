@@ -107,6 +107,8 @@
       "certChanged": "Sertifikāts ir mainījies – pārbaudi to pirms savienošanās",
       "wrongPassword": "Serveris noraidīja paroli.",
       "nameInUse": "Šis vārds šajā serverī jau tiek izmantots.",
+      "certUntrustedNotSent": "Servera sertifikātam vēl neuzticas, tāpēc parole netika nosūtīta. Savienojieties vienreiz un uzticieties sertifikātam, pēc tam testējiet vēlreiz.",
+      "certChangedNotSent": "Servera sertifikāts ir mainījies, tāpēc parole netika nosūtīta.",
       "unreachable": "Serveris nav sasniedzams.",
       "invalid": "Dati nav derīgi.",
       "failed": "Pārbaude neizdevās. Mēģini vēlreiz."

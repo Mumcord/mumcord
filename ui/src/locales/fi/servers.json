@@ -107,6 +107,8 @@
       "certChanged": "Varmenne on muuttunut – tarkista se ennen yhdistämistä",
       "wrongPassword": "Palvelin hylkäsi salasanan.",
       "nameInUse": "Nimi on jo käytössä tällä palvelimella.",
+      "certUntrustedNotSent": "Palvelimen varmenteeseen ei vielä luoteta, joten salasanaa ei lähetetty. Yhdistä kerran ja luota varmenteeseen, testaa sitten uudelleen.",
+      "certChangedNotSent": "Palvelimen varmenne on muuttunut, joten salasanaa ei lähetetty.",
       "unreachable": "Palvelimeen ei saada yhteyttä.",
       "invalid": "Tiedot eivät ole kelvollisia.",
       "failed": "Testi epäonnistui. Yritä uudelleen."

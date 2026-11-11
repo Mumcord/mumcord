@@ -107,6 +107,8 @@
       "certChanged": "Le certificat a changé – vérifie-le avant de te connecter",
       "wrongPassword": "Le serveur a refusé le mot de passe.",
       "nameInUse": "Ce nom est déjà utilisé sur ce serveur.",
+      "certUntrustedNotSent": "Le certificat du serveur n'est pas encore approuvé, le mot de passe n'a donc pas été envoyé. Connectez-vous une fois et approuvez le certificat, puis refaites le test.",
+      "certChangedNotSent": "Le certificat du serveur a changé, le mot de passe n'a donc pas été envoyé.",
       "unreachable": "Impossible de joindre le serveur.",
       "invalid": "Ces informations ne sont pas valides.",
       "failed": "Le test a échoué. Réessaie."
