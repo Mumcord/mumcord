@@ -8303,7 +8303,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (687 crates)
+* MIT License (688 crates)
 * Apache License 2.0 (43 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
 * ISC License (21 crates)
@@ -19369,6 +19369,7 @@ Used by:
   - windows-result 0.4.1 (https://github.com/microsoft/windows-rs)
   - windows-strings 0.5.1 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.45.0 (https://github.com/microsoft/windows-rs)
+  - windows-sys 0.52.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.59.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.61.2 (https://github.com/microsoft/windows-rs)
   - windows-targets 0.42.2 (https://github.com/microsoft/windows-rs)
@@ -19755,7 +19756,7 @@ Used by:
   - proc-macro2 1.0.107 (https://github.com/dtolnay/proc-macro2)
   - quote 1.0.47 (https://github.com/dtolnay/quote)
   - rtrb 0.4.1 (https://github.com/mgeier/rtrb)
-  - rustix 1.1.5 (https://github.com/bytecodealliance/rustix)
+  - rustix 1.1.6 (https://github.com/bytecodealliance/rustix)
   - rustversion 1.0.23 (https://github.com/dtolnay/rustversion)
   - semver 1.0.28 (https://github.com/dtolnay/semver)
   - serde-saphyr 2.0.0 (https://github.com/bourumir-wyngs/serde-saphyr)
