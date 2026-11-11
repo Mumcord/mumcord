@@ -12,7 +12,7 @@
 
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -204,6 +204,9 @@ struct Hub {
     stats: Mutex<ScreenMediaStats>,
     /// The last keyframe the encoder took, for the picture in the sharer's bar (issue #163).
     thumbnail: Mutex<Option<I420Frame>>,
+    /// Where the frames this share sends go for the packet inspector (FR-7.101). Set once,
+    /// right after the share starts, before any viewer can be added.
+    tap: OnceLock<crate::inspector::MediaTapSink>,
 }
 
 impl Hub {
@@ -293,6 +296,7 @@ impl Media {
             top_layer: AtomicU8::new(TEMPORAL_LAYERS - 1),
             stats: Mutex::new(ScreenMediaStats::default()),
             thumbnail: Mutex::new(None),
+            tap: OnceLock::new(),
         });
         crate::crash::set_context("screen share", "sending");
         let thread_hub = hub.clone();
@@ -365,6 +369,12 @@ impl Media {
     /// the next frame (FR-7.58).
     pub fn set_av1_blocker(&self, viewer: Option<u32>) {
         *lock(&self.hub.av1_blocker) = viewer;
+    }
+
+    /// Records what this share sends for the packet inspector (FR-7.101); call it once, before
+    /// any viewer is added.
+    pub fn set_media_tap(&self, tap: crate::inspector::MediaTapSink) {
+        let _ = self.hub.tap.set(tap);
     }
 
     /// Goes back to the encoder before a load fallback; false when the share offers no Undo.
@@ -561,7 +571,7 @@ async fn write_frames(
     } else {
         wire::Format::Legacy(caps.wire)
     };
-    let mut writer = wire::FrameWriter::new(&mut send, format);
+    let mut writer = wire::FrameWriter::new(&mut send, format).with_tap(hub.tap.get().cloned());
     let mut video = None;
     let mut description = None;
     loop {

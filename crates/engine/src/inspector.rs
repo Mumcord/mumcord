@@ -7,6 +7,10 @@
 //! capture off drops them. Plugin data keeps its payload (for the decoded view and raw hex);
 //! every other control message keeps only its type and size, because those carry chat text
 //! and names the inspector does not need. Voice is counted, not captured.
+//!
+//! Media streams (FR-7.101) are tapped where their messages are framed, not on the control
+//! channel: a stream keeps its format, the decoded description and one row per message with its
+//! channel, flags, keyframe state and size. Nothing of the media itself is kept.
 
 use std::collections::{BTreeMap, VecDeque};
 use std::fmt::Write as _;
@@ -15,6 +19,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use mumcord_p2p::PEER_DATA_ID;
+use mumcord_p2p::media::{self, Description, Track};
 pub use mumcord_protocol::TapDirection;
 use mumcord_protocol::framing::MessageType;
 use mumcord_protocol::{PacketTap, TappedFrame};
@@ -56,6 +61,130 @@ pub struct PacketView {
     pub decoded: Option<String>,
     /// The plugin data as lowercase hex; empty for other types.
     pub raw_hex: String,
+    /// What this message is within its media stream; `None` for control-channel packets.
+    pub media: Option<MediaView>,
+}
+
+/// The wire format of a captured media stream (FR-7.89, FR-7.98).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MediaFormat {
+    /// The 0.9.0 endless `.media` document: a description on channel 0, frames on their layer
+    /// channel.
+    Document,
+    /// The fixed frame header of 0.8.x, kept for the fallback (FR-7.98); the value is its
+    /// version byte.
+    Legacy(u8),
+}
+
+impl MediaFormat {
+    /// The kind the list shows this format under.
+    pub const fn kind(self) -> &'static str {
+        match self {
+            Self::Document => ".media",
+            Self::Legacy(1) => ".media legacy v1",
+            Self::Legacy(2) => ".media legacy v2",
+            Self::Legacy(_) => ".media legacy",
+        }
+    }
+}
+
+/// One media stream message as the list shows it. The payload itself never gets this far.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MediaView {
+    pub format: MediaFormat,
+    /// The channel the message travelled on; `None` for the old header, which has no channel.
+    pub channel: Option<u16>,
+    /// The track message's flags byte; `None` for a control message and the old header.
+    pub flags: Option<u8>,
+    /// The control kind of a channel-0 message, as its number; `None` for a track message.
+    pub control: Option<u8>,
+    pub keyframe: bool,
+}
+
+/// One message of a media stream as the wire layer frames it (FR-7.101).
+///
+/// A `Frame`-based stream ([`crate::screen_share::wire`]) and a relay broadcast both hand their
+/// messages over this way; neither passes the payload on, so media content stays where it is.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MediaTap<'a> {
+    pub format: MediaFormat,
+    pub channel: Option<u16>,
+    pub flags: Option<u8>,
+    pub control: Option<media::ControlKind>,
+    /// The message's size on the wire, flags byte and encryption header included.
+    pub size: u32,
+    pub keyframe: bool,
+    /// The stream description of a description message, once it parsed.
+    pub description: Option<&'a Description>,
+}
+
+impl<'a> MediaTap<'a> {
+    /// A track message on a video layer, the audio or the plugin-data channel.
+    pub const fn track(format: MediaFormat, channel: u16, flags: u8, size: u32) -> Self {
+        Self {
+            format,
+            channel: Some(channel),
+            flags: Some(flags),
+            control: None,
+            size,
+            keyframe: flags & media::FLAG_KEYFRAME != 0,
+            description: None,
+        }
+    }
+
+    /// A channel-0 control message. Only a description carries readable content.
+    pub const fn control(
+        format: MediaFormat,
+        kind: media::ControlKind,
+        size: u32,
+        description: Option<&'a Description>,
+    ) -> Self {
+        Self {
+            format,
+            channel: Some(media::CHANNEL_CONTROL),
+            flags: None,
+            control: Some(kind),
+            size,
+            keyframe: false,
+            description,
+        }
+    }
+
+    /// A frame of the old header: it has no channel, and its flags byte shows the keyframe bit.
+    pub const fn legacy(version: u8, keyframe: bool, size: u32) -> Self {
+        Self {
+            format: MediaFormat::Legacy(version),
+            channel: None,
+            flags: None,
+            control: None,
+            size,
+            keyframe,
+            description: None,
+        }
+    }
+}
+
+/// The inspector and the server one media stream belongs to: the wire layer records every
+/// message it frames here. Cloning is cheap, and recording while capture is off costs one atomic
+/// load.
+#[derive(Clone)]
+pub struct MediaTapSink {
+    inspector: Arc<Inspector>,
+    server_id: ServerId,
+}
+
+impl MediaTapSink {
+    pub fn new(inspector: &Arc<Inspector>, server_id: ServerId) -> Self {
+        Self {
+            inspector: inspector.clone(),
+            server_id,
+        }
+    }
+
+    /// Keeps `tap` in the packet list, unless the capture is off.
+    pub fn record(&self, direction: TapDirection, tap: MediaTap<'_>) {
+        self.inspector.capture_media(self.server_id, direction, tap);
+    }
 }
 
 /// Packets captured per server, kind and direction since capture started or was cleared,
@@ -95,7 +224,36 @@ struct Captured {
     id: u64,
     server_id: ServerId,
     at_ms: u64,
-    frame: TappedFrame,
+    direction: TapDirection,
+    body: Body,
+}
+
+/// What one captured row holds: a control-channel frame, or one media stream message.
+enum Body {
+    Frame(TappedFrame),
+    Media(MediaRecord),
+}
+
+impl Body {
+    /// The kind the row is listed and counted under.
+    fn kind(&self) -> String {
+        match self {
+            Self::Frame(frame) => kind_of(frame),
+            Self::Media(record) => record.format.kind().to_owned(),
+        }
+    }
+}
+
+/// One media stream message: no payload, no timestamp, no keys.
+struct MediaRecord {
+    format: MediaFormat,
+    channel: Option<u16>,
+    flags: Option<u8>,
+    control: Option<u8>,
+    keyframe: bool,
+    size: u32,
+    /// The decoded description of a channel-0 description message.
+    decoded: Option<String>,
 }
 
 #[derive(Default)]
@@ -170,13 +328,38 @@ impl Inspector {
         if frame.kind == MessageType::UdpTunnel as u16 {
             return;
         }
+        self.push(server_id, frame.direction, Body::Frame(frame));
+    }
+
+    /// Keeps one media stream message (FR-7.101); the wire layer calls this per message.
+    fn capture_media(&self, server_id: ServerId, direction: TapDirection, tap: MediaTap<'_>) {
+        let record = MediaRecord {
+            format: tap.format,
+            channel: tap.channel,
+            flags: tap.flags,
+            control: tap.control.map(media::ControlKind::to_byte),
+            keyframe: tap.keyframe,
+            size: tap.size,
+            decoded: tap
+                .description
+                .and_then(|d| serde_json::to_string_pretty(&description_json(d)).ok()),
+        };
+        self.push(server_id, direction, Body::Media(record));
+    }
+
+    /// Adds one row to the ring buffer and counts it, unless the capture is off.
+    fn push(&self, server_id: ServerId, direction: TapDirection, body: Body) {
+        if !self.is_enabled() {
+            return;
+        }
         let at_ms = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_or(0, |d| u64::try_from(d.as_millis()).unwrap_or(u64::MAX));
+        let kind = body.kind();
         let mut buffer = lock(&self.buffer);
         *buffer
             .counts
-            .entry((server_id, kind_of(&frame), frame.direction.into()))
+            .entry((server_id, kind, direction.into()))
             .or_default() += 1;
         if buffer.packets.len() == CAPACITY {
             buffer.packets.pop_front();
@@ -187,7 +370,8 @@ impl Inspector {
             id,
             server_id,
             at_ms,
-            frame,
+            direction,
+            body,
         });
     }
 
@@ -256,13 +440,19 @@ fn kind_of(frame: &TappedFrame) -> String {
 }
 
 fn view(p: &Captured) -> PacketView {
-    let frame = &p.frame;
+    match &p.body {
+        Body::Frame(frame) => frame_view(p, frame),
+        Body::Media(record) => media_view(p, record),
+    }
+}
+
+fn frame_view(p: &Captured, frame: &TappedFrame) -> PacketView {
     let data = frame.plugin_data.as_ref();
     PacketView {
         id: p.id,
         server_id: p.server_id,
         at_ms: p.at_ms,
-        direction: frame.direction,
+        direction: p.direction,
         kind: kind_of(frame),
         plugin_data: data.is_some(),
         size: u32::try_from(data.map_or(frame.size, |d| d.data.len())).unwrap_or(u32::MAX),
@@ -279,6 +469,65 @@ fn view(p: &Captured) -> PacketView {
             .filter(|d| !carries_token(&d.data_id, &d.data))
             .map(|d| hex(&d.data))
             .unwrap_or_default(),
+        media: None,
+    }
+}
+
+fn media_view(p: &Captured, record: &MediaRecord) -> PacketView {
+    PacketView {
+        id: p.id,
+        server_id: p.server_id,
+        at_ms: p.at_ms,
+        direction: p.direction,
+        kind: record.format.kind().to_owned(),
+        plugin_data: false,
+        size: record.size,
+        sender: None,
+        receivers: Vec::new(),
+        delay_ms: None,
+        tokens_left: None,
+        decoded: record.decoded.clone(),
+        // Media content is never shown, not even as hex (FR-7.101).
+        raw_hex: String::new(),
+        media: Some(MediaView {
+            format: record.format,
+            channel: record.channel,
+            flags: record.flags,
+            control: record.control,
+            keyframe: record.keyframe,
+        }),
+    }
+}
+
+/// A readable form of a stream description (FR-7.95): what the description says, never any
+/// media content.
+fn description_json(description: &Description) -> Value {
+    json!({
+        "kind": description.kind.name(),
+        "timebase": description.timebase,
+        "id": description.id,
+        "tracks": description.tracks.iter().map(track_json).collect::<Vec<_>>(),
+    })
+}
+
+fn track_json(track: &Track) -> Value {
+    match track {
+        Track::Video(video) => json!({
+            "ch": video.channel,
+            "kind": "video",
+            "codec": video.codec.name(),
+            "layer": video.layer,
+            "width": video.width,
+            "height": video.height,
+            "rate": video.rate,
+        }),
+        Track::Audio(audio) => json!({
+            "ch": audio.channel,
+            "kind": "audio",
+            "codec": audio.codec.name(),
+            "rate": audio.rate,
+            "bitrate": audio.bitrate,
+        }),
     }
 }
 
@@ -599,8 +848,7 @@ mod tests {
     }
 
     #[test]
-    fn ignored_messages_are_counted_while_capturing() {
-        let inspector = Arc::new(Inspector::default());
+    fn ignored_messages_are_counted_while_capturing() {        let inspector = Arc::new(Inspector::default());
         inspector.count_ignored(2, PEER_DATA_ID, "sender not registered");
         assert!(inspector.poll(None, Vec::new()).counts.is_empty());
         inspector.set_enabled(true);
@@ -657,5 +905,107 @@ mod tests {
             Some(json!("plain text"))
         );
         assert_eq!(decode("other.plugin", &[0xff, 0x00]), None);
+    }
+
+    fn screen_description() -> Description {
+        Description {
+            kind: media::StreamKind::Screen,
+            timebase: 1,
+            id: None,
+            tracks: vec![
+                Track::Video(media::VideoTrack {
+                    channel: media::CHANNEL_VIDEO_BASE,
+                    codec: media::VideoCodec::Av1,
+                    layer: 0,
+                    width: 1920,
+                    height: 1080,
+                    rate: 30.0,
+                }),
+                Track::Audio(media::AudioTrack {
+                    channel: media::CHANNEL_AUDIO,
+                    codec: media::AudioCodec::Opus,
+                    rate: 48_000,
+                    bitrate: 96,
+                }),
+            ],
+        }
+    }
+
+    #[test]
+    fn media_messages_keep_channel_flags_and_the_description() {
+        let inspector = enabled();
+        let tap = MediaTapSink::new(&inspector, 1);
+        let description = screen_description();
+        tap.record(
+            TapDirection::Sent,
+            MediaTap::control(
+                MediaFormat::Document,
+                media::ControlKind::Description,
+                96,
+                Some(&description),
+            ),
+        );
+        tap.record(
+            TapDirection::Sent,
+            MediaTap::track(MediaFormat::Document, 2, media::FLAG_KEYFRAME, 4096),
+        );
+        tap.record(
+            TapDirection::Sent,
+            MediaTap::track(MediaFormat::Document, media::CHANNEL_AUDIO, 0, 120),
+        );
+        tap.record(TapDirection::Received, MediaTap::legacy(1, true, 700));
+
+        let poll = inspector.poll(None, Vec::new());
+        let rows = &poll.packets;
+        assert_eq!(rows.len(), 4);
+
+        let description_row = &rows[0];
+        assert_eq!(description_row.kind, ".media");
+        assert_eq!(description_row.direction, TapDirection::Sent);
+        assert_eq!(description_row.size, 96);
+        let view = description_row.media.as_ref().expect("a media row");
+        assert_eq!(view.format, MediaFormat::Document);
+        assert_eq!(view.channel, Some(media::CHANNEL_CONTROL));
+        assert_eq!(view.control, Some(media::KIND_DESCRIPTION));
+        assert_eq!(view.flags, None);
+        assert!(!view.keyframe);
+        let decoded = description_row
+            .decoded
+            .as_deref()
+            .expect("the description is decoded");
+        assert!(decoded.contains("\"kind\": \"screen\""));
+        assert!(decoded.contains("\"ch\": 5"));
+        assert_eq!(description_row.raw_hex, "", "no media content, ever");
+
+        let keyframe = rows[1].media.as_ref().expect("a media row");
+        assert_eq!(keyframe.channel, Some(2), "channel = 1 + layer");
+        assert_eq!(keyframe.flags, Some(media::FLAG_KEYFRAME));
+        assert!(keyframe.keyframe);
+        assert_eq!(rows[1].size, 4096);
+        let sound = rows[2].media.as_ref().expect("a media row");
+        assert_eq!(sound.channel, Some(media::CHANNEL_AUDIO));
+        assert!(!sound.keyframe);
+
+        let legacy = &rows[3];
+        assert_eq!(legacy.kind, ".media legacy v1");
+        assert_eq!(legacy.direction, TapDirection::Received);
+        let view = legacy.media.as_ref().expect("a media row");
+        assert_eq!((view.channel, view.keyframe), (None, true));
+        assert_eq!(legacy.decoded, None);
+
+        let kinds: Vec<&str> = poll.counts.iter().map(|c| c.kind.as_str()).collect();
+        assert!(kinds.contains(&".media") && kinds.contains(&".media legacy v1"));
+    }
+
+    #[test]
+    fn media_messages_are_dropped_while_the_capture_is_off() {
+        let inspector = Arc::new(Inspector::default());
+        let tap = MediaTapSink::new(&inspector, 1);
+        tap.record(
+            TapDirection::Sent,
+            MediaTap::track(MediaFormat::Document, 1, 0, 10),
+        );
+        let poll = inspector.poll(None, Vec::new());
+        assert!(poll.packets.is_empty() && poll.counts.is_empty());
     }
 }
