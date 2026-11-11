@@ -49,8 +49,8 @@
 | D1 | Direct `STREAM_SCREEN` format switch | done — `04026690`, branch not pushed | W2, W3, S2 | complex |
 | D2 | Sharer: description, layer routing, format choice | done — `a950bec9`, branch not pushed | D1 | complex |
 | D3 | Viewer: description, changes at keyframes, both formats | done — `b41444ab`, branch not pushed | D2 | complex |
-| D4 | Capability negotiation and refusal texts | done — `12bb9696`, `abc88dd0`, `7794576b`, `b103d57c`; 24 locales in E2 | D3 | complex |
-| D5 | Direct camera path (`STREAM_CAMERA`) | partial — `dee7fb92`, `1b910208`: stream kind, `mv`, `needs`, old-viewer refusal; direct stream and reverse `want` not wired | D4 | complex |
+| D4 | Capability negotiation and refusal texts | done — `12bb9696`, `abc88dd0`, `7794576b`, `b103d57c`; 24 locales in E2, `needsUpdate` error mapping `10b030f2` | D3 | complex |
+| D5 | Direct camera path (`STREAM_CAMERA`) | partial — `dee7fb92`, `1b910208`, `491d076d`, `a16c306e`, `63345098`, `2e7c83e4`, `87998b23`, `2003f007`, `bd516e64`: stream kind, `mv`, `needs`, old-viewer refusal, media description, frame hub, per-viewer direct stream, viewer bind and reverse `want`; no-relay and old-relay paths follow in D6 | D4 | complex |
 | D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | done — UI tests unchanged, 183 pass | D1 | simple |
 | R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
@@ -67,9 +67,16 @@
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
 then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4, D7, R1–R6 and E3 are
-done; E2 has the screen-share fallbacks. D5 has the signal and stream kind; its direct media
-path and reverse `want` are next, then D6, the camera texts and E4. The engine dev-dependency
-temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the 0.9.0 tag exists.
+done; E2 has the screen-share fallbacks. D5 has both halves of the direct camera stream; what
+remains of its "done when" (no relay, old relay, the `needs` reception in a real 0.8.0 build) is
+D6's path matrix, together with the camera texts and E4. The engine dev-dependency temporarily
+points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the 0.9.0 tag exists.
+
+Environment notes for the next agents: `cargo check -p mumcord` and any app build fail on a host
+whose rustc is older than 1.97 (cranelift 0.137.1 needs it; CI uses stable, so CI is fine) — say
+so instead of debugging the app crate. Build the SVT-AV1 dependency with
+`SVTAV1_STATIC_DIR=~/.cache/mumcord-native/svt-av1`, and read the five engine lib tests that fail
+with "the CPU has no AVX2" as a host limit, not a regression. Live relay tests need docker.
 
 ---
 
