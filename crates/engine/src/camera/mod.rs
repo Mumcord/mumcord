@@ -18,6 +18,7 @@ pub mod session;
 pub mod signal;
 pub(crate) mod stop;
 
+pub use admit::{CameraPath, CameraViewer};
 pub use mumcord_camera::{CameraDevice, CameraError, DeviceId};
 pub use mumcord_effects::{
     Background, EffectStats, EffectsError, Level as EffectLevel, Load as EffectLoad,
