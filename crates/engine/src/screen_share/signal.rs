@@ -73,6 +73,8 @@ pub enum Signal {
     Accept,
     /// The sender's share already has [`MAX_VIEWERS`] viewers.
     Full,
+    /// The sender's share uses a format this viewer's Mumcord cannot read.
+    NeedsUpdate,
     /// The sender stopped watching the receiver's share.
     Unwatch,
     /// Everyone watching the sender's share, sorted.

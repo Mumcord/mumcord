@@ -25,6 +25,7 @@ pub(crate) const REANNOUNCE: Duration = Duration::from_secs(3);
 pub(crate) enum Answer {
     Accept,
     Full,
+    NeedsUpdate,
     /// Admitted to the sharer's relay broadcast: the bot's `bcast-tok` (spec 07, FR-7.42),
     /// with whether it carries the media profile.
     Broadcast(BroadcastId, RelayToken, bool),
@@ -184,6 +185,14 @@ impl OwnShare {
             .get(&viewer)
             .copied()
             .unwrap_or_else(|| ViewerCaps::from_watch(&[], 0))
+    }
+
+    /// Every accepted viewer with what it can play.
+    pub fn viewers_caps(&self) -> Vec<(u32, ViewerCaps)> {
+        self.viewers
+            .keys()
+            .map(|viewer| (*viewer, self.viewer_caps(*viewer)))
+            .collect()
     }
 
     /// The first viewer that cannot play AV1; the share runs VP9 while there is one (FR-7.58).
@@ -374,6 +383,7 @@ impl Shares {
                 self.watching.insert(sharer, Watching::Opening(attempt))
             }
             Answer::Full => self.watching.remove(&sharer),
+            Answer::NeedsUpdate => self.watching.remove(&sharer),
         };
         if let Some(Watching::Asked { reply, .. }) = next {
             // The asking call may have timed out already.
