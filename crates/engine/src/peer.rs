@@ -641,8 +641,9 @@ impl Relays {
                 token,
                 sharer,
                 kind,
+                media,
                 ..
-            } => self.on_broadcast_token(ctx, sender, sharer, kind, id, token),
+            } => self.on_broadcast_token(ctx, sender, sharer, kind, id, token, media),
             // Only relay bots receive token requests and the sharer's broadcast messages.
             PeerMessage::TokenRequest { .. }
             | PeerMessage::BroadcastRequest { .. }
@@ -761,6 +762,7 @@ impl Relays {
 
     /// `bcast-tok` (FR-7.42): handed to the side of its broadcast kind; each side checks that
     /// this client waits for that sharer.
+    #[allow(clippy::too_many_arguments)]
     fn on_broadcast_token(
         &self,
         ctx: &SessionCtx,
@@ -769,13 +771,14 @@ impl Relays {
         kind: BroadcastKind,
         id: BroadcastId,
         token: RelayToken,
+        media: bool,
     ) {
         let route = self.broadcast_token_route(ctx.server_id, sender, kind);
         let engine = || self.engine.get().and_then(WeakEngine::upgrade);
         match route {
             BroadcastTokenRoute::ScreenShare => {
                 if let Some(engine) = engine() {
-                    engine.screen_share_broadcast_token(ctx, sharer, id, token);
+                    engine.screen_share_broadcast_token(ctx, sharer, id, token, media);
                 }
             }
             BroadcastTokenRoute::PluginData => {

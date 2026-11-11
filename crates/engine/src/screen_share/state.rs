@@ -25,8 +25,9 @@ pub(crate) const REANNOUNCE: Duration = Duration::from_secs(3);
 pub(crate) enum Answer {
     Accept,
     Full,
-    /// Admitted to the sharer's relay broadcast: the bot's `bcast-tok` (spec 07, FR-7.42).
-    Broadcast(BroadcastId, RelayToken),
+    /// Admitted to the sharer's relay broadcast: the bot's `bcast-tok` (spec 07, FR-7.42),
+    /// with whether it carries the media profile.
+    Broadcast(BroadcastId, RelayToken, bool),
 }
 
 /// What a viewer's `Watch` said it can play (FR-7.58).

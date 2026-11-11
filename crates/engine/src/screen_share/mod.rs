@@ -1113,8 +1113,10 @@ impl Engine {
         let request = self.watch_request(server_id);
         match ask_to_watch(&ctx.handle, sharer, request, answer).await {
             Some(Ok(Answer::Accept)) => {}
-            Some(Ok(Answer::Broadcast(id, token))) => {
-                return self.watch_broadcast(&ctx, sharer, attempt, id, token).await;
+            Some(Ok(Answer::Broadcast(id, token, media))) => {
+                return self
+                    .watch_broadcast(&ctx, sharer, attempt, id, token, media)
+                    .await;
             }
             Some(Ok(Answer::Full)) => {
                 return Err(EngineError::new(ErrorKind::ShareFull, "this share is full"));
