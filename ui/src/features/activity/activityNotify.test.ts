@@ -4,7 +4,13 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { resetNotifications, useToasts } from "../notifications/notificationStore";
-import { handleActivity, noticeBody, switchOf } from "./activityNotify";
+import {
+  ACTIVITY_NOTICE_INTERVAL_MS,
+  handleActivity,
+  noticeBody,
+  resetActivityThrottle,
+  switchOf,
+} from "./activityNotify";
 import type { ActivityEvent } from "./activityStore";
 
 const SERVER = 1;
@@ -33,6 +39,7 @@ const context = () => ({ t: t(), openLabel: "Open", serverName: () => "Night Owl
 beforeEach(async () => {
   await applyLanguage("en");
   resetNotifications();
+  resetActivityThrottle();
   api = createMockApi();
   setApi(api);
 });
@@ -97,5 +104,38 @@ describe("activity notifications (#597)", () => {
     await api.dndSet(true);
     await handleActivity(share, context());
     expect(api.mock.activityNotices()).toEqual([]);
+  });
+
+  it("never notifies for a blocked person", async () => {
+    expect(switchOf({ ...join, blocked: true })).toBeNull();
+    expect(switchOf({ ...join, kind: "moved", channelName: "Raid", blocked: true })).toBeNull();
+    api.mock.setWindowFocused(false);
+    const settings = await api.settingsGet();
+    await api.settingsUpdate({
+      ...settings,
+      activityNotify: { ...settings.activityNotify, joins: "desktop" },
+    });
+    await handleActivity({ ...join, blocked: true }, context());
+    expect(api.mock.activityNotices()).toEqual([]);
+  });
+
+  it("notifies once per person within the interval, others still notify", async () => {
+    api.mock.setWindowFocused(false);
+    const settings = await api.settingsGet();
+    await api.settingsUpdate({
+      ...settings,
+      activityNotify: { ...settings.activityNotify, joins: "desktop" },
+    });
+    for (let i = 0; i < 5; i++) {
+      await handleActivity(
+        { ...join, kind: "moved", channelName: `Room ${String(i)}`, at: 2_000 + i * 100 },
+        context(),
+      );
+    }
+    expect(api.mock.activityNotices()).toHaveLength(1);
+    await handleActivity({ ...join, name: "Ben", at: 2_500 }, context());
+    expect(api.mock.activityNotices()).toHaveLength(2);
+    await handleActivity({ ...join, at: 2_000 + ACTIVITY_NOTICE_INTERVAL_MS + 1 }, context());
+    expect(api.mock.activityNotices()).toHaveLength(3);
   });
 });

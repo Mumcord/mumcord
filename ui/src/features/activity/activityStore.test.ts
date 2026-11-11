@@ -7,6 +7,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, ScreenShare, StageActivityView, User, WatchParty } from "../../api";
 import { createMockApi, setApi } from "../../api";
+import { isBlocked, resetBlockedStore } from "../blocking";
 import { getServerStateOf } from "../channels/serverStore";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetActivityStore } from "../plugins/stage/activityStore";
@@ -18,6 +19,7 @@ import {
   setActivityHistoryKept,
   resetActivityLogStore,
   useActivityLog,
+  type ActivityEvent,
 } from "./activityStore";
 
 /** The default mock seed: server 1, Lobby is channel 1 and "Raid" channel 2, the own session is 1. */
@@ -137,6 +139,7 @@ describe("activity log", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    resetBlockedStore();
     resetActivityLogStore();
     resetScreenShareStore();
     resetWatchPartyStore();
@@ -219,6 +222,32 @@ describe("activity log", () => {
       api.mock.emit("userRemoved", { serverId: SERVER, session: NEWCOMER });
     });
     expect(result.current[0]).toMatchObject({ kind: "disconnected", name: "Nia", self: false });
+  });
+
+  it("keeps a blocked person in the history but marks the events so they never notify", async () => {
+    const { result } = renderHook(() => useActivityLog(SERVER));
+    await settle();
+    await act(async () => {
+      await api.blockCert(SERVER, "niahash", "Nia");
+    });
+    await vi.waitFor(() => {
+      expect(isBlocked(SERVER, "niahash", "Nia")).toBe(true);
+    });
+    act(() => {
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 1) });
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 2) });
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER + 1, "Omar", 1) });
+      api.mock.emit("userRemoved", { serverId: SERVER, session: NEWCOMER });
+    });
+    const log = result.current.filter(
+      (event): event is Exclude<ActivityEvent, { kind: "pluginEvent" }> =>
+        event.kind !== "pluginEvent",
+    );
+    expect(log.filter((event) => event.name === "Nia")).toHaveLength(3);
+    expect(
+      log.filter((event) => event.name === "Nia").every((event) => event.blocked === true),
+    ).toBe(true);
+    expect(log.find((event) => event.name === "Omar")?.blocked).toBeUndefined();
   });
 
   it("marks the own session as self (FR-11.7)", async () => {
