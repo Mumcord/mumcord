@@ -162,7 +162,7 @@
     "noFanoutBody_other": "Svaki gledatelj dobiva vlastitu kopiju s tvog računala, pa može gledati najviše {{max}} osoba. Kvaliteta pada kako se pridružuje više ljudi: trenutačno {{count}} gledatelja treba oko {{mbit}} Mbit/s uploada, pa tvoje dijeljenje radi na {{now}} umjesto na {{wanted}}.",
     "fanoutUnavailable": "Relejno umnožavanje nije dostupno ({{reason}}). Svaki gledatelj dobiva vlastitu kopiju, pa može gledati najviše {{max}} osoba, a kvaliteta može pasti.",
     "reasonNoRelay": "ovaj poslužitelj nema relej",
-    "reasonOldRelay": "relej je prestar",
+    "reasonOldRelay": "relay ovog poslužitelja treba ažuriranje",
     "reasonDisallowed": "relej ne dopušta dijeljenje ekrana",
     "reasonRefused": "relej je odbio emitiranje",
     "reasonFull": "relej je pun",

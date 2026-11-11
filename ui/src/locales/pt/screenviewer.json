@@ -13,6 +13,7 @@
   "starting": "A ligar ao ecrã de {{name}}…",
   "paused": "{{name}} pausou a partilha.",
   "full": "Esta partilha está cheia.",
+  "needsUpdate": "Esta partilha requer o Mumcord 0.9.0.",
   "unreachable": "Não foi possível chegar a {{name}} diretamente. A rede dessa pessoa pode bloquear ligações diretas.",
   "tooOld": "O Mumcord de {{name}} é demasiado antigo para partilhar o ecrã contigo.",
   "consentOff": "Ver precisa de ligações diretas, e desativaste-as.",

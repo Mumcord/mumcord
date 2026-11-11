@@ -13,6 +13,7 @@
   "starting": "Ühendumine ekraaniga: {{name}}…",
   "paused": "{{name}} peatas jagamise.",
   "full": "See jagamine on täis.",
+  "needsUpdate": "See jagamine vajab Mumcordi 0.9.0.",
   "unreachable": "Kasutajaga {{name}} ei saanud otse ühendust. Võrk võib otseühendusi blokeerida.",
   "tooOld": "Kasutaja {{name}} Mumcord on sinuga ekraani jagamiseks liiga vana.",
   "consentOff": "Vaatamine vajab otseühendusi ja sa oled need välja lülitanud.",

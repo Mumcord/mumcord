@@ -2400,6 +2400,8 @@ export type ErrorCode =
 "shortcutNotConfirmed" | 
 /**  The screen share already has the maximum of 8 viewers (FR-2.43). */
 "shareFull" | 
+/**  The share or camera needs a newer Mumcord. */
+"needsUpdate" |
 /**
  *  Watching a screen share needs a direct connection and none can be made (FR-2.46);
  *  `message` is the reason: `consentOff`, `peerUnsupported` or `noDirectPath`.

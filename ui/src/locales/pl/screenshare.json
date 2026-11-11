@@ -166,7 +166,7 @@
     "noFanoutBody_other": "Każdy widz dostaje własną kopię z Twojego komputera, więc może oglądać maksymalnie {{max}} osób. Jakość spada, gdy dołączają kolejne: teraz {{count}} widza potrzebuje około {{mbit}} Mbit/s wysyłania, więc Twoje udostępnianie działa w {{now}} zamiast {{wanted}}.",
     "fanoutUnavailable": "Rozsyłanie przez przekaźnik jest niedostępne ({{reason}}). Każdy widz dostaje własną kopię, więc może oglądać maksymalnie {{max}} osób, a jakość może spaść.",
     "reasonNoRelay": "ten serwer nie ma przekaźnika",
-    "reasonOldRelay": "przekaźnik jest zbyt stary",
+    "reasonOldRelay": "relay tego serwera wymaga aktualizacji",
     "reasonDisallowed": "przekaźnik nie zezwala na udostępnianie ekranu",
     "reasonRefused": "przekaźnik odrzucił rozsyłanie",
     "reasonFull": "przekaźnik jest pełny",

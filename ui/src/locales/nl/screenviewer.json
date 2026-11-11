@@ -13,6 +13,7 @@
   "starting": "Verbinden met het scherm van {{name}}…",
   "paused": "{{name}} heeft het delen gepauzeerd.",
   "full": "Deze schermdeling is vol.",
+  "needsUpdate": "Deze share vereist Mumcord 0.9.0.",
   "unreachable": "{{name}} is niet direct bereikbaar. Het netwerk blokkeert misschien directe verbindingen.",
   "tooOld": "De Mumcord van {{name}} is te oud om het scherm met je te delen.",
   "consentOff": "Kijken heeft directe verbindingen nodig, en je hebt ze uitgezet.",

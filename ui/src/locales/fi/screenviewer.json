@@ -13,6 +13,7 @@
   "starting": "Yhdistetään näyttöön: {{name}}…",
   "paused": "{{name}} keskeytti jaon.",
   "full": "Tämä jako on täynnä.",
+  "needsUpdate": "Tämä jakaminen vaatii Mumcordin 0.9.0.",
   "unreachable": "Henkilöön {{name}} ei saatu suoraa yhteyttä. Verkko saattaa estää suorat yhteydet.",
   "tooOld": "Henkilön {{name}} Mumcord on liian vanha jakamaan näyttöä kanssasi.",
   "consentOff": "Katsominen tarvitsee suoria yhteyksiä, ja olet poistanut ne käytöstä.",

@@ -162,7 +162,7 @@
     "noFanoutBody_other": "Ogni spettatore riceve una copia propria dal tuo computer, quindi possono guardare fino a {{max}} persone. La qualità cala man mano che ne entrano altre: ora {{count}} spettatori richiedono circa {{mbit}} Mbit/s di upload, quindi la tua condivisione va a {{now}} invece di {{wanted}}.",
     "fanoutUnavailable": "La trasmissione tramite relay non è disponibile ({{reason}}). Ogni spettatore riceve una copia propria, quindi possono guardare fino a {{max}} persone e la qualità può calare.",
     "reasonNoRelay": "questo server non ha un relay",
-    "reasonOldRelay": "il relay è troppo vecchio",
+    "reasonOldRelay": "il relay di questo server deve essere aggiornato",
     "reasonDisallowed": "il relay non consente la condivisione dello schermo",
     "reasonRefused": "il relay ha rifiutato la trasmissione",
     "reasonFull": "il relay è pieno",

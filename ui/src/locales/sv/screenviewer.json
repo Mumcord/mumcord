@@ -13,6 +13,7 @@
   "starting": "Ansluter till {{name}}s skärm…",
   "paused": "{{name}} pausade delningen.",
   "full": "Den här delningen är full.",
+  "needsUpdate": "Den här delningen kräver Mumcord 0.9.0.",
   "unreachable": "Kunde inte nå {{name}} direkt. Nätverket kanske blockerar direktanslutningar.",
   "tooOld": "{{name}}s Mumcord är för gammal för att dela skärmen med dig.",
   "consentOff": "Att titta kräver direktanslutningar, och du har stängt av dem.",
