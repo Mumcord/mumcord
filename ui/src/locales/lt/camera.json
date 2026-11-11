@@ -12,7 +12,7 @@
     "noRelay": "Šis serveris neturi perdavimo mazgo, todėl kameros bendrinimas negalimas.",
     "relayTooOld": "Šio serverio perdavimo mazgas per senas kameros bendrinimui.",
     "relayDisallows": "Šio serverio perdavimo mazgas neleidžia bendrinti kameros.",
-    "needsRelayMode": "Kameros bendrinimui reikia perdavimo mazgo. Pakeisk tai skiltyje Privatumas ir ryšiai.",
+    "needsRelayMode": "Kameros bendrinimas išjungtas. Pakeisk tai skiltyje Privatumas ir ryšiai.",
     "noCertificate": "Kameros bendrinimui reikia kliento sertifikato.",
     "registeredOnly": "Šiame serveryje kamerą gali naudoti tik registruoti naudotojai."
   },
@@ -95,7 +95,7 @@
     "denied": "Kameros nepavyko paleisti: serverio perdavimo mazgas ją atmetė.",
     "relayDown": "Kamera sustojo: perdavimo mazgas nepasiekiamas",
     "rateLimited": "Kameros nepavyko paleisti: per daug bandymų. Pabandyk dar kartą po minutės.",
-    "mode": "Kameros bendrinimui reikia perdavimo mazgo. Pakeisk tai skiltyje Privatumas ir ryšiai.",
+    "mode": "Kameros bendrinimas išjungtas. Pakeisk tai skiltyje Privatumas ir ryšiai.",
     "noCertificate": "Kameros bendrinimui reikia kliento sertifikato.",
     "endedByRelay": "Kamerą sustabdė serverio perdavimo mazgas",
     "dismissStopped": "Paslėpti",

@@ -12,7 +12,7 @@
     "noRelay": "Ce serveur n'a pas de relais, le partage de caméra n'est donc pas disponible.",
     "relayTooOld": "Le relais de ce serveur est trop ancien pour le partage de caméra.",
     "relayDisallows": "Le relais de ce serveur n'autorise pas le partage de caméra.",
-    "needsRelayMode": "Le partage de caméra nécessite le relais. Modifiez-le dans Confidentialité et connexions.",
+    "needsRelayMode": "Le partage de caméra est désactivé. Modifiez-le dans Confidentialité et connexions.",
     "noCertificate": "Le partage de caméra nécessite un certificat client.",
     "registeredOnly": "Seuls les utilisateurs enregistrés peuvent utiliser la caméra sur ce serveur."
   },
@@ -95,7 +95,7 @@
     "denied": "La caméra n'a pas pu démarrer : le relais du serveur l'a refusée.",
     "relayDown": "Caméra arrêtée : le relais est injoignable",
     "rateLimited": "La caméra n'a pas pu démarrer : trop de tentatives. Réessayez dans une minute.",
-    "mode": "Le partage de caméra nécessite le relais. Modifiez-le dans Confidentialité et connexions.",
+    "mode": "Le partage de caméra est désactivé. Modifiez-le dans Confidentialité et connexions.",
     "noCertificate": "Le partage de caméra nécessite un certificat client.",
     "endedByRelay": "Caméra arrêtée par le relais du serveur",
     "dismissStopped": "Ignorer",

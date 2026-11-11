@@ -12,7 +12,7 @@
     "noRelay": "Acest server nu are releu, deci partajarea camerei nu este disponibilă.",
     "relayTooOld": "Releul acestui server este prea vechi pentru partajarea camerei.",
     "relayDisallows": "Releul acestui server nu permite partajarea camerei.",
-    "needsRelayMode": "Partajarea camerei are nevoie de releu. Schimbă asta în Confidențialitate și conexiuni.",
+    "needsRelayMode": "Partajarea camerei este oprită. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
     "registeredOnly": "Pe acest server doar utilizatorii înregistrați pot folosi camera."
   },
@@ -95,7 +95,7 @@
     "denied": "Camera nu a putut porni: releul serverului a refuzat-o.",
     "relayDown": "Camera s-a oprit: releul nu este accesibil",
     "rateLimited": "Camera nu a putut porni: prea multe încercări. Încearcă din nou peste un minut.",
-    "mode": "Partajarea camerei are nevoie de releu. Schimbă asta în Confidențialitate și conexiuni.",
+    "mode": "Partajarea camerei este oprită. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
     "endedByRelay": "Camera a fost oprită de releul serverului",
     "dismissStopped": "Închide",

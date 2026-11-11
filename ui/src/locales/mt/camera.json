@@ -12,7 +12,7 @@
     "noRelay": "Dan is-server m'għandux relay, għalhekk il-qsim tal-kamera mhuwiex disponibbli.",
     "relayTooOld": "Ir-relay ta' dan is-server huwa qadim wisq għall-qsim tal-kamera.",
     "relayDisallows": "Ir-relay ta' dan is-server ma jippermettix il-qsim tal-kamera.",
-    "needsRelayMode": "Il-qsim tal-kamera jeħtieġ ir-relay. Biddlu f'Privatezza u konnessjonijiet.",
+    "needsRelayMode": "Il-qsim tal-kamera huwa mitfi. Biddlu f'Privatezza u konnessjonijiet.",
     "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
     "registeredOnly": "Fuq dan is-server biss utenti rreġistrati jistgħu jużaw il-kamera."
   },
@@ -95,7 +95,7 @@
     "denied": "Il-kamera ma setgħetx tibda: ir-relay tas-server irrifjutaha.",
     "relayDown": "Il-kamera waqfet: ir-relay mhuwiex jintlaħaq",
     "rateLimited": "Il-kamera ma setgħetx tibda: wisq tentattivi. Erġa' pprova wara minuta.",
-    "mode": "Il-qsim tal-kamera jeħtieġ ir-relay. Biddlu f'Privatezza u konnessjonijiet.",
+    "mode": "Il-qsim tal-kamera huwa mitfi. Biddlu f'Privatezza u konnessjonijiet.",
     "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
     "endedByRelay": "Il-kamera twaqqfet mir-relay tas-server",
     "dismissStopped": "Neħħi",

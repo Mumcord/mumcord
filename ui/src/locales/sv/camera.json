@@ -12,7 +12,7 @@
     "noRelay": "Servern har inget relä, så kameradelning är inte tillgänglig.",
     "relayTooOld": "Serverns relä är för gammalt för kameradelning.",
     "relayDisallows": "Serverns relä tillåter inte kameradelning.",
-    "needsRelayMode": "Kameradelning kräver reläet. Ändra det under Integritet och anslutningar.",
+    "needsRelayMode": "Kameradelning är avstängd. Ändra det under Integritet och anslutningar.",
     "noCertificate": "Kameradelning kräver ett klientcertifikat.",
     "registeredOnly": "Bara registrerade användare får använda kameran på den här servern."
   },
@@ -95,7 +95,7 @@
     "denied": "Kameran kunde inte startas: serverns relä avvisade den.",
     "relayDown": "Kameran stoppades: reläet kan inte nås",
     "rateLimited": "Kameran kunde inte startas: för många försök. Försök igen om en minut.",
-    "mode": "Kameradelning kräver reläet. Ändra det under Integritet och anslutningar.",
+    "mode": "Kameradelning är avstängd. Ändra det under Integritet och anslutningar.",
     "noCertificate": "Kameradelning kräver ett klientcertifikat.",
     "endedByRelay": "Kameran stoppades av serverns relä",
     "dismissStopped": "Avfärda",
