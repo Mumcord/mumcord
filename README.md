@@ -8,6 +8,7 @@
   <a href="https://github.com/Mumcord/mumcord/releases"><img src="https://img.shields.io/github/downloads/Mumcord/mumcord/total?color=ff9a8b" alt="Downloads" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-AGPL--3.0-blue" alt="Licence: AGPL-3.0" /></a>
   <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-555" alt="Platforms: Windows, macOS, Linux" />
+  <a href="https://scorecard.dev/viewer/?uri=github.com/Mumcord/mumcord"><img src="https://api.scorecard.dev/projects/github.com/Mumcord/mumcord/badge" alt="OpenSSF Scorecard" /></a>
   <a href="https://crates.io/crates/mumcord-protocol"><img src="https://img.shields.io/crates/v/mumcord-protocol?label=crates.io" alt="mumcord-protocol on crates.io" /></a>
 </p>
 
