@@ -107,6 +107,8 @@
       "certChanged": "A tanúsítvány megváltozott – ellenőrizd csatlakozás előtt",
       "wrongPassword": "A szerver elutasította a jelszót.",
       "nameInUse": "Ez a név már használatban van ezen a szerveren.",
+      "certUntrustedNotSent": "A kiszolgáló tanúsítványában még nem bízol, ezért a jelszót nem küldtük el. Csatlakozz egyszer, bízz meg a tanúsítványban, majd teszteld újra.",
+      "certChangedNotSent": "A kiszolgáló tanúsítványa megváltozott, ezért a jelszót nem küldtük el.",
       "unreachable": "A szerver nem érhető el.",
       "invalid": "Az adatok nem érvényesek.",
       "failed": "A teszt sikertelen. Próbáld újra."

@@ -107,6 +107,8 @@
       "certChanged": "Iċ-ċertifikat inbidel – iċċekkjah qabel ma tikkonnettja",
       "wrongPassword": "Is-server irrifjuta l-password.",
       "nameInUse": "Dan l-isem diġà jintuża fuq dan is-server.",
+      "certUntrustedNotSent": "Iċ-ċertifikat tas-server għadu mhux fdat, għalhekk il-password ma ntbagħtitx. Qabbad darba u afda ċ-ċertifikat, imbagħad ittestja għal darb'oħra.",
+      "certChangedNotSent": "Iċ-ċertifikat tas-server inbidel, għalhekk il-password ma ntbagħtitx.",
       "unreachable": "Is-server ma jintlaħaqx.",
       "invalid": "Id-dettalji mhumiex validi.",
       "failed": "It-test falla. Erġa' pprova."

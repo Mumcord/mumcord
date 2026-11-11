@@ -7,8 +7,9 @@ use mumcord_engine::{
 };
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager, State, WebviewWindow};
 
+use super::file_dialog::{SaveDialog, pick_save_path};
 use super::servers::{DeepLinkOpened, LinkOutcome, parse_link};
 use super::types::{ApiError, ApiResult, ErrorCode};
 use crate::watch_player::PlayerServer;
@@ -257,16 +258,27 @@ pub async fn audio_file(engine: State<'_, Engine>, url: String) -> ApiResult<Opt
     Ok(engine.audio_file(&url).await.map(|f| f.data_url()))
 }
 
-/// Saves the audio file of a direct audio link to `path`, which the user picked in a save
-/// dialog (issue #260). The engine fetches it again with the same checks as for playing.
+/// Asks where to save the audio file of a direct audio link and saves it there (issue #260).
+/// The engine fetches it again with the same checks as for playing. Returns false when the user
+/// cancelled the save dialog.
 #[tauri::command]
 #[specta::specta]
-pub async fn audio_save(engine: State<'_, Engine>, url: String, path: String) -> ApiResult<()> {
+pub async fn audio_save(
+    window: WebviewWindow,
+    engine: State<'_, Engine>,
+    url: String,
+    dialog: SaveDialog,
+) -> ApiResult<bool> {
+    let Some(path) = pick_save_path(&window, dialog).await? else {
+        return Ok(false);
+    };
     let file = engine
         .audio_file(&url)
         .await
         .ok_or_else(|| ApiError::new(ErrorCode::InvalidInput, "not a playable audio file"))?;
-    std::fs::write(&path, file.bytes).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
+    std::fs::write(&path, file.bytes)
+        .map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))?;
+    Ok(true)
 }
 
 /// Hides the preview card of `url` under a message for good (QA.42). Messages that were not

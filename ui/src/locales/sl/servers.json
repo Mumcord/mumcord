@@ -107,6 +107,8 @@
       "certChanged": "Potrdilo se je spremenilo – preveri ga pred povezavo",
       "wrongPassword": "Strežnik je zavrnil geslo.",
       "nameInUse": "To ime je na tem strežniku že v uporabi.",
+      "certUntrustedNotSent": "Potrdilu strežnika še ne zaupate, zato geslo ni bilo poslano. Povežite se enkrat in potrdilu zaupajte, nato test ponovite.",
+      "certChangedNotSent": "Potrdilo strežnika se je spremenilo, zato geslo ni bilo poslano.",
       "unreachable": "Strežnik ni dosegljiv.",
       "invalid": "Podatki niso veljavni.",
       "failed": "Preizkus ni uspel. Poskusi znova."

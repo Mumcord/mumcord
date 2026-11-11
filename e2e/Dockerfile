@@ -9,7 +9,7 @@
 # Stages (#562): `runtime` has only what the test shards run (no compiler, headers or Rust), so
 # CI pulls a smaller image there; `build` (the default) adds the toolchain for compiling.
 
-FROM ubuntu:24.04 AS base
+FROM ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852 AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG NODE_MAJOR=24
@@ -58,7 +58,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV RUSTUP_HOME=/opt/rustup PATH=/opt/cargo/bin:$PATH
-RUN curl -fsSL https://sh.rustup.rs | CARGO_HOME=/opt/cargo sh -s -- -y --profile minimal --default-toolchain stable \
+# rustup-init is pinned by version and SHA-256 (x86_64 only, like the rest of this image).
+ARG RUSTUP_VERSION=1.29.3
+ARG RUSTUP_INIT_SHA256=b1c8cb14e30889e7e2999e6b69e62d9e9b9ffc0f4df8180564d306d9680e6c55
+RUN curl -fsSL -o /tmp/rustup-init "https://static.rust-lang.org/rustup/archive/${RUSTUP_VERSION}/x86_64-unknown-linux-gnu/rustup-init" \
+    && echo "${RUSTUP_INIT_SHA256}  /tmp/rustup-init" | sha256sum -c - \
+    && chmod +x /tmp/rustup-init \
+    && CARGO_HOME=/opt/cargo /tmp/rustup-init -y --profile minimal --default-toolchain stable \
+    && rm /tmp/rustup-init \
     && chmod -R a+rX /opt/rustup /opt/cargo
 
 FROM toolchain AS driver

@@ -17,9 +17,6 @@ import { imageFileName } from "./imageActions";
 import { clearPreviews } from "./links";
 import { MessageList } from "./MessageList";
 
-const dialogs = vi.hoisted(() => ({ pickSavePath: vi.fn() }));
-vi.mock("../settings/fileDialogs", () => dialogs);
-
 const PNG = "data:image/png;base64,iVBORw0KGgo=";
 const FULL_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==";
 const CAT = "https://pics.example/cat.gif";
@@ -92,7 +89,6 @@ beforeEach(() => {
   clearDismissedPreviews();
   clearFavorites();
   resetFullImages();
-  dialogs.pickSavePath.mockReset();
   api = createMockApi();
   setApi(api);
 });
@@ -142,18 +138,19 @@ describe("image context menu (#115)", () => {
   });
 
   it("saves the original bytes under a dated name in the real format", async () => {
-    dialogs.pickSavePath.mockResolvedValue("/tmp/x.png");
-    const save = vi.spyOn(api, "saveImage");
+    const save = vi.spyOn(api, "saveImage").mockResolvedValue(true);
     renderMessage(`<img src="${PNG}">`);
     rightClick(screen.getByRole("button", { name: /image from Maya/i }));
     fireEvent.click(screen.getByRole("menuitem", { name: "Save image" }));
     expect(await screen.findByText("Image saved")).toBeInTheDocument();
-    expect(dialogs.pickSavePath).toHaveBeenCalledWith(
-      expect.stringMatching(/^image-\d{4}-\d{2}-\d{2}\.png$/),
-      expect.objectContaining({ extensions: ["png"] }),
-      "Save image",
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Save image",
+        defaultName: expect.stringMatching(/^image-\d{4}-\d{2}-\d{2}\.png$/) as string,
+        extensions: ["png"],
+      }),
+      PNG,
     );
-    expect(save).toHaveBeenCalledWith("/tmp/x.png", PNG);
   });
 
   it("shows an error when copying fails, without the image in the log", async () => {
@@ -189,8 +186,7 @@ describe("image context menu (#115)", () => {
 
   it("offers everything for a loaded external GIF and saves the animated file", async () => {
     vi.spyOn(api, "inlineImage").mockResolvedValue(GIF);
-    dialogs.pickSavePath.mockResolvedValue("/tmp/cat.gif");
-    const save = vi.spyOn(api, "saveImage");
+    const save = vi.spyOn(api, "saveImage").mockResolvedValue(true);
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     renderMessage(`<img src="${CAT}">`);
@@ -206,13 +202,15 @@ describe("image context menu (#115)", () => {
     ]);
     fireEvent.click(screen.getByRole("menuitem", { name: "Save image" }));
     await waitFor(() => {
-      expect(save).toHaveBeenCalledWith("/tmp/cat.gif", GIF.src);
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "Save image",
+          defaultName: "cat.gif",
+          extensions: ["gif"],
+        }),
+        GIF.src,
+      );
     });
-    expect(dialogs.pickSavePath).toHaveBeenCalledWith(
-      "cat.gif",
-      expect.objectContaining({ extensions: ["gif"] }),
-      "Save image",
-    );
     rightClick(figure);
     fireEvent.click(screen.getByRole("menuitem", { name: "Copy image address" }));
     expect(writeText).toHaveBeenCalledWith(CAT);

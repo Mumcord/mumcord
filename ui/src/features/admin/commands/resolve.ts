@@ -52,7 +52,12 @@ export function ranked<T>(query: string, items: readonly Candidate<T>[]): Candid
     .map((entry) => entry.item);
 }
 /** Resolves a word to one item, asks which of several was meant, or finds nothing. */
-export function resolveOne<T>(query: string, items: readonly Candidate<T>[]): Resolved<T> {
+export function resolveOne<T>(
+  query: string,
+  items: readonly Candidate<T>[],
+  /** Whether a single partial match counts as the answer; only safe where a confirmation follows. */
+  partialRuns = false,
+): Resolved<T> {
   const matches = ranked(query, items);
   const wanted = bare(query).toLowerCase();
   const exact = matches.filter((item) => item.name.toLowerCase() === wanted);
@@ -62,9 +67,13 @@ export function resolveOne<T>(query: string, items: readonly Candidate<T>[]): Re
     if (only !== undefined) return { kind: "one", item: only.item };
   }
   if (exact.length > 1) return { kind: "many", items: exact };
+  // A part of a name is a guess, and a guess must not mute, move or register someone: the admin
+  // picks it from the list instead.
   const onlyMatch = matches[0];
-  if (matches.length === 1 && onlyMatch !== undefined) return { kind: "one", item: onlyMatch.item };
-  if (matches.length > 1) return { kind: "many", items: matches };
+  if (partialRuns && matches.length === 1 && onlyMatch !== undefined) {
+    return { kind: "one", item: onlyMatch.item };
+  }
+  if (matches.length > 0) return { kind: "many", items: matches };
   return {
     kind: "none",
     suggestion: closest(
@@ -72,6 +81,31 @@ export function resolveOne<T>(query: string, items: readonly Candidate<T>[]): Re
       items.map((item) => item.name),
     ),
   };
+}
+
+/**
+ * Resolves the start of an argument that may hold spaces ("Bob Smith spamming"): the longest run
+ * of words that is a full name wins, so "Bob Smith" is never read as "Bob" plus a reason. Without
+ * a full name the first word is resolved alone, which can only ask or fail. `used` is how many
+ * words the answer consumed; the rest belong to the command.
+ */
+export function resolveLeading<T>(
+  words: readonly string[],
+  items: readonly Candidate<T>[],
+): { found: Resolved<T>; used: number } {
+  for (let count = words.length; count >= 1; count -= 1) {
+    const found = resolveOne(words.slice(0, count).join(" "), items);
+    const full = found.kind === "one" || (found.kind === "many" && isFull(words, count, found));
+    if (full) return { found, used: count };
+  }
+  return { found: resolveOne(words[0] ?? "", items), used: 1 };
+}
+
+/** Whether a many-result is a set of exact duplicates rather than partial matches. */
+function isFull<T>(words: readonly string[], count: number, found: Resolved<T>): boolean {
+  if (found.kind !== "many") return false;
+  const wanted = bare(words.slice(0, count).join(" ")).toLowerCase();
+  return found.items.every((item) => item.name.toLowerCase() === wanted);
 }
 
 /**

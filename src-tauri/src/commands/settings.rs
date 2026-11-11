@@ -1212,10 +1212,8 @@ impl Settings {
         s.blocked_messages = self.blocked_messages.into();
         s.files_receive = self.files_receive;
         s.files_max_size = self.files_max_size.into();
-        s.files_save_folder = self
-            .files_save_folder
-            .clone()
-            .filter(|folder| !folder.is_empty());
+        // `files_save_folder` keeps the stored value: only `files_save_folder_choose` (a Rust-side
+        // folder dialog) changes it, so a script in the page cannot redirect downloads.
         s.screen_resolution = self.screen_resolution.into();
         s.screen_fps = self.screen_fps.into();
         s.screen_optimize = self.screen_optimize.into();

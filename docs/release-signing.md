@@ -161,8 +161,10 @@ update, which asks once more. Only the Developer ID signature keeps them across 
    <https://appstoreconnect.apple.com/access/integrations/api> → _Team Keys → Generate API Key_,
    access _Developer_. Note the **Issuer ID** (top of the page) and the **Key ID**, and download
    the `AuthKey_<KEYID>.p8` file (it can be downloaded only once).
-6. **Add the GitHub secrets** (repository _Settings → Secrets and variables → Actions → New
-   repository secret_). Exact names:
+6. **Add the GitHub secrets** in the `release` environment (repository _Settings → Environments →
+   release → Add environment secret_), not as repository secrets: a repository secret can be read
+   by any workflow run, an environment secret only by the release jobs of a version tag. Exact
+   names:
 
    | Secret                       | Value                                                                     |
    | ---------------------------- | ------------------------------------------------------------------------- |
@@ -239,7 +241,7 @@ The `.sig` files, `latest.json` and the `.app.tar.gz` are release assets and are
    It writes the private key to `~/.tauri/mumcord-updater.key` and the public key to `~/.tauri/mumcord-updater.key.pub`. Never commit or share the private key file.
 
 2. Store a backup of the private key file and its password in your password manager. **If the private key is lost, installed apps can no longer be updated automatically**: users would have to install the next version by hand once.
-3. In the repository _Settings → Secrets and variables → Actions → Secrets_, add two repository secrets with exactly these names:
+3. In the repository _Settings → Environments → release_, add two environment secrets with exactly these names (not repository secrets: a repository secret can be read by any workflow run, an environment secret only by the release jobs of a version tag):
 
    | Secret                               | Value                                      |
    | ------------------------------------ | ------------------------------------------ |

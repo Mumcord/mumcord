@@ -300,18 +300,23 @@ export const commands = {
 	sendChannelMessage: (serverId: number, channelId: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_channel_message", { serverId, channelId, html })),
 	sendPrivateMessage: (serverId: number, session: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_private_message", { serverId, session, html })),
 	/**
-	 *  Writes the image of a `data:` URL to `path` (the viewer's "Save image", FR-1.56). The data is
-	 *  already in the UI, so nothing is fetched again.
+	 *  Asks where to save the image of a `data:` URL and writes it there (the viewer's "Save image",
+	 *  FR-1.56). The data is already in the UI, so nothing is fetched again. Returns false when the
+	 *  user cancelled the save dialog.
 	 */
-	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	saveImage: (dialog: SaveDialog, dataUrl: string) => typedError<boolean, ApiError>(__TAURI_INVOKE("save_image", { dialog, dataUrl })),
 	/**
 	 *  Puts the image of a `data:` URL on the system clipboard as image data ("Copy image", issue
 	 *  #115). Fails with `messageTooLarge` above the size limits, `invalidInput` when the data is not
 	 *  a readable image and `io` when the clipboard does not take it.
 	 */
 	copyImage: (dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("copy_image", { dataUrl })),
-	/**  Writes text the UI already has to `path` (a chat code block's "Download", issue #111). */
-	saveText: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_text", { path, contents })),
+	/**
+	 *  Asks where to save text the UI already has and writes it there (a chat code block's
+	 *  "Download", issue #111, or a plugin's data export). Returns false when the user cancelled the
+	 *  save dialog.
+	 */
+	saveText: (dialog: SaveDialog, contents: string) => typedError<boolean, ApiError>(__TAURI_INVOKE("save_text", { dialog, contents })),
 	/**
 	 *  Puts plain text on the system clipboard (copying chat text, issue #114). The webview's own
 	 *  clipboard access does not reach the desktop everywhere (WebKitGTK on Linux), so the copy
@@ -362,9 +367,17 @@ export const commands = {
 	filesAvailability: (serverId: number) => __TAURI_INVOKE<FilesUnavailable | null>("files_availability", { serverId }),
 	/**
 	 *  Adds a file or folder to the attachment tray (FR-7.11 – 7.13) and returns its chip; a folder
-	 *  is zipped in the background and reported as `fileChipChanged`.
+	 *  is zipped in the background and reported as `fileChipChanged`. Only a path the user just
+	 *  dropped onto the window or picked with `files_pick` is accepted, once; any other path fails
+	 *  with `notFound`, so a script in the page cannot attach files the user never chose.
 	 */
-	filesChipAdd: (path: string) => __TAURI_INVOKE<FileChip>("files_chip_add", { path }),
+	filesChipAdd: (path: string) => typedError<FileChip, ApiError>(__TAURI_INVOKE("files_chip_add", { path })),
+	/**
+	 *  Opens the system file picker for the paperclip (several files) and returns the chosen paths;
+	 *  empty when the user cancelled. Each may then be added once with `files_chip_add`. Paths that
+	 *  are not valid UTF-8 are skipped: the UI could not hand them back unchanged.
+	 */
+	filesPick: (title: string) => typedError<string[], ApiError>(__TAURI_INVOKE("files_pick", { title })),
 	/**  Takes a chip out of the tray (and drops its zip). */
 	filesChipRemove: (chipId: number) => __TAURI_INVOKE<void>("files_chip_remove", { chipId }),
 	/**
@@ -386,6 +399,13 @@ export const commands = {
 	filesCancel: (serverId: number, shareId: string) => __TAURI_INVOKE<void>("files_cancel", { serverId, shareId }),
 	/**  The folder downloads are saved to: the setting, else `Mumcord` inside the system Downloads folder. */
 	filesSaveFolder: () => typedError<string, ApiError>(__TAURI_INVOKE("files_save_folder")),
+	/**
+	 *  Opens the system folder picker and makes the chosen folder the download folder; returns it,
+	 *  or `null` when the user cancelled. This is the only way to change `filesSaveFolder`:
+	 *  `settings_update` keeps the stored value, so a script in the page cannot point downloads at
+	 *  an autostart folder.
+	 */
+	filesSaveFolderChoose: (title: string) => typedError<string | null, ApiError>(__TAURI_INVOKE("files_save_folder_choose", { title })),
 	/**
 	 *  Opens a downloaded file with the system's default program (FR-7.29). The saved file keeps
 	 *  its mark-of-the-web, so the system still warns about it. Errors: `notFound` with "The file is
@@ -444,10 +464,11 @@ export const commands = {
 	 */
 	audioFile: (url: string) => typedError<string | null, ApiError>(__TAURI_INVOKE("audio_file", { url })),
 	/**
-	 *  Saves the audio file of a direct audio link to `path`, which the user picked in a save
-	 *  dialog (issue #260). The engine fetches it again with the same checks as for playing.
+	 *  Asks where to save the audio file of a direct audio link and saves it there (issue #260).
+	 *  The engine fetches it again with the same checks as for playing. Returns false when the user
+	 *  cancelled the save dialog.
 	 */
-	audioSave: (url: string, path: string) => typedError<null, ApiError>(__TAURI_INVOKE("audio_save", { url, path })),
+	audioSave: (url: string, dialog: SaveDialog) => typedError<boolean, ApiError>(__TAURI_INVOKE("audio_save", { url, dialog })),
 	/**
 	 *  Hides the preview card of `url` under a message for good (QA.42). Messages that were not
 	 *  stored (history saving off) keep nothing; the UI hides the card for the session.
@@ -921,8 +942,11 @@ export const commands = {
 	pluginSuggestionInstalled: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_installed", { serverId, plugin })),
 	/**  "Don't ask again for this server". */
 	pluginSuggestionsDismissServer: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestions_dismiss_server", { serverId })),
-	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
-	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
+	/**
+	 *  Asks where to save the diagnostic file (no chat contents, passwords, certificates or
+	 *  personal data) and writes it there. Returns false when the user cancelled the save dialog.
+	 */
+	diagnosticsSave: (dialog: SaveDialog) => typedError<boolean, ApiError>(__TAURI_INVOKE("diagnostics_save", { dialog })),
 	/**  The saved crash reports, newest first. */
 	crashList: () => typedError<CrashReport[], ApiError>(__TAURI_INVOKE("crash_list")),
 	/**  Reports from crashes the user has not been told about yet (the notice at start-up). */
@@ -965,8 +989,11 @@ export const commands = {
 	packetCapturePoll: (after: number | null) => typedError<PacketCapture, ApiError>(__TAURI_INVOKE("packet_capture_poll", { after })),
 	/**  Drops the captured packets and resets the counters. */
 	packetCaptureClear: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_clear")),
-	/**  Writes an export the UI built from the captured packets (JSON or Markdown) to `path`. */
-	packetCaptureExport: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_export", { path, contents })),
+	/**
+	 *  Asks where to save an export the UI built from the captured packets (JSON or Markdown) and
+	 *  writes it there. Returns false when the user cancelled the save dialog.
+	 */
+	packetCaptureExport: (dialog: SaveDialog, contents: string) => typedError<boolean, ApiError>(__TAURI_INVOKE("packet_capture_export", { dialog, contents })),
 	/**  Opens the packet inspector window, or brings it to the front if it is already open. */
 	packetInspectorOpen: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_inspector_open")),
 	/**  Closes the packet inspector window (Ctrl+W in that window). */
@@ -1356,7 +1383,10 @@ export const commands = {
 	 *  reconnects and rejoins), finishes the install where it waits for the restart, and restarts.
 	 */
 	updateRestart: () => typedError<null, ApiError>(__TAURI_INVOKE("update_restart")),
-	/**  Only the Linux AppImage has a menu entry to add. */
+	/**
+	 *  AppImage only: adds Mumcord to the app menu (desktop entry and icon). The UI calls this
+	 *  after the user said yes and then stores the choice in `appimageMenuEntry`.
+	 */
 	appimageMenuEntryAdd: () => typedError<null, ApiError>(__TAURI_INVOKE("appimage_menu_entry_add")),
 };
 
@@ -1608,8 +1638,10 @@ export type AppInfo = {
 	 *  note lists them. Empty where everything works.
 	 */
 	limits: PlatformLimit[],
-	/**  The desktop session in use, where the platform has more than one (FR-13.31); `None`
-	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything. */
+	/**
+	 *  The desktop session in use, where the platform has more than one (FR-13.31); `None`
+	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything.
+	 */
 	session: SessionKind | null,
 };
 
@@ -2014,7 +2046,9 @@ export type CameraTileState =
 "hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
-export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | "unsupportedPlatform";
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | 
+/**  This platform has no camera backend at all (FR-13.27). */
+"unsupportedPlatform";
 
 /**  The own camera as the preview dialog, Settings, the room and the tray see it. */
 export type CameraView = {
@@ -3626,13 +3660,6 @@ export type PersonTarget = {
 };
 
 /**  A feature this platform cannot provide, with the reason named in the About note. */
-/**  Which display server the app talks to (FR-13.31, FR-13.21). */
-export type SessionKind = 
-/**  X11, also through XWayland on a Wayland session. */
-"x11" | 
-/**  A Wayland session; hotkeys and capture still go through XWayland. */
-"wayland";
-
 export type PlatformLimit = 
 /**  No camera backend. */
 "camera" | 
@@ -3643,7 +3670,9 @@ export type PlatformLimit =
 /**  No `xdg-desktop-portal` to pick a window or an app. */
 "windowPicker" | 
 /**  No in-game overlay. */
-"overlay" | "protectedVideo";
+"overlay" | 
+/**  No EME in the platform's WebView (FR-13.38): protected video can only play in a browser. */
+"protectedVideo";
 
 /**  A video waiting in the party's playlist (FR-2.69). */
 export type PlaylistEntry = {
@@ -4740,6 +4769,18 @@ export type RepositoryView = {
 /**  A Mumble permission, as named in a refusal (#248). */
 export type Right = "write" | "traverse" | "enter" | "speak" | "muteDeafen" | "move" | "makeChannel" | "linkChannel" | "whisper" | "textMessage" | "makeTempChannel" | "listen" | "kick" | "ban" | "register" | "selfRegister" | "resetUserContent";
 
+/**  Texts of a save dialog, translated by the UI. */
+export type SaveDialog = {
+	/**  Window title of the dialog. */
+	title: string,
+	/**  Suggested file name, e.g. `mumcord-diagnostics.txt`. */
+	defaultName: string,
+	/**  Name of the file type in the filter, e.g. "Text file". */
+	filterName: string,
+	/**  Extensions of the filter without the dot; the first is added when the name has none. */
+	extensions: string[],
+};
+
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
 	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
@@ -4974,6 +5015,13 @@ export type ServerTestInput = {
 	/**  Identity to try; `null` uses the default identity. */
 	identityId: number | null,
 };
+
+/**  Which display server the app talks to (FR-13.31, FR-13.21). */
+export type SessionKind = 
+/**  X11, also through XWayland on a Wayland session. */
+"x11" | 
+/**  A Wayland session; hotkeys and capture still go through XWayland. */
+"wayland";
 
 export type Settings = {
 	/**  False until the first-start wizard was finished. */
@@ -5372,7 +5420,12 @@ export type SoundUnavailableReason =
 /**  Linux without a running PipeWire. */
 "noPipeWire" | 
 /**  The sound capture could not start or stopped. */
-"captureFailed" | "platform";
+"captureFailed" | 
+/**
+ *  This platform cannot take a share's sound at all (FR-13.19): FreeBSD has no PipeWire and
+ *  no desktop portal, so a share is the whole X11 screen without sound.
+ */
+"platform";
 
 export type StageActivityKind = 
 /**  "<name> started <plugin> · Join". */

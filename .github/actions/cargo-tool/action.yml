@@ -23,7 +23,7 @@ runs:
       run: echo "root=$HOME/.cargo-tools/$CRATE-$VERSION" >> "$GITHUB_OUTPUT"
 
     - id: cache
-      uses: actions/cache/restore@v6
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ steps.dir.outputs.root }}
         key: cargo-tool-${{ runner.os }}-${{ runner.arch }}-${{ inputs.crate }}-${{ inputs.version }}-${{ inputs.features }}
@@ -39,7 +39,7 @@ runs:
 
     # Only main saves: branch caches would evict main's from the 10 GB repository limit.
     - if: steps.cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-      uses: actions/cache/save@v6
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ steps.dir.outputs.root }}
         key: ${{ steps.cache.outputs.cache-primary-key }}

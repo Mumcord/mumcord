@@ -24,6 +24,7 @@ import {
   type ServerChange,
   type ServerState,
 } from "../channels/serverStore";
+import { isBlocked } from "../blocking/blockedStore";
 import { isBot } from "../channels/mumcord";
 import {
   activitiesLoaded,
@@ -75,6 +76,11 @@ interface PersonBase {
   name: string | null;
   self: boolean;
   session?: number | null;
+  /**
+   * Set when the own identity had blocked this person at event time. A blocked person stays in
+   * the history (the spec has no rule to hide them), but their events never notify.
+   */
+  blocked?: true;
 }
 
 /**
@@ -406,6 +412,13 @@ function rememberActivities(baseline: Baseline, list: readonly StageActivityView
   );
 }
 
+function blockedMark(
+  serverId: number,
+  user: { name: string; certHash: string | null },
+): { blocked?: true } {
+  return isBlocked(serverId, user.certHash, user.name) ? { blocked: true } : {};
+}
+
 function onServerChange(serverId: number, change: ServerChange, state: ServerState): void {
   switch (change.kind) {
     case "synced": {
@@ -441,6 +454,7 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
           session: change.user.session,
           name: change.user.name,
           self: false,
+          ...blockedMark(serverId, change.user),
         });
       } else if (change.previous.channelId !== change.user.channelId) {
         add(serverId, {
@@ -451,6 +465,7 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
           name: change.user.name,
           self: isSelf(state, change.user.session),
           channelName: channelNameOf(state, change.user.channelId),
+          ...blockedMark(serverId, change.user),
         });
       }
       break;
@@ -464,6 +479,7 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
         session: change.user.session,
         name: change.user.name,
         self: isSelf(state, change.user.session),
+        ...blockedMark(serverId, change.user),
       });
       break;
     }

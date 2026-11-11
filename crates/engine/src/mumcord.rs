@@ -268,6 +268,8 @@ pub(crate) struct Peers {
     asks: HashMap<u32, Ask>,
     /// People asked three times without an answer; not asked again until they leave.
     given_up: HashSet<u32>,
+    /// Session → when we last replied to its hello; see [`ANSWER_INTERVAL`].
+    answered: HashMap<u32, Instant>,
 }
 
 /// Asking someone who never said hello: when next, and how often already.
@@ -284,6 +286,11 @@ const ASK_DELAYS: [Duration; 3] = [
     Duration::from_secs(30),
     Duration::from_secs(90),
 ];
+
+/// The shortest gap between two replies to hellos of the same sender. Every reply is a plugin
+/// message that counts against our own budget on the server (pluginmessagelimit); without this
+/// gap anyone could send requests in a loop and make our file, camera and plugin messages drop.
+const ANSWER_INTERVAL: Duration = Duration::from_secs(30);
 
 impl Peers {
     pub(crate) fn features(&self, session: u32) -> Option<&[String]> {
@@ -358,7 +365,25 @@ impl Peers {
         self.greeted.insert(session)
     }
 
+    /// Whether a hello from `session` is answered now: always the first one (`first`), a request
+    /// only when the last reply to this sender is older than [`ANSWER_INTERVAL`]. Entries are
+    /// keyed by server-assigned sessions and dropped in `forget`, so the map stays bounded by the
+    /// users on the server.
+    fn should_answer(&mut self, session: u32, first: bool, ask: bool, now: Instant) -> bool {
+        let recent = self
+            .answered
+            .get(&session)
+            .is_some_and(|last| now.saturating_duration_since(*last) < ANSWER_INTERVAL);
+        if first || (ask && !recent) {
+            self.answered.insert(session, now);
+            true
+        } else {
+            false
+        }
+    }
+
     fn forget(&mut self, session: u32) -> bool {
+        self.answered.remove(&session);
         self.greeted.remove(&session);
         self.asks.remove(&session);
         self.given_up.remove(&session);
@@ -477,7 +502,7 @@ pub(crate) fn on_plugin_data(
         (
             peers.learn(sender, hello.features) | peers.learn_bot(sender, hello.bot),
             // A request is always answered, without asking back, so there is no ping-pong.
-            first || (peers.synced && hello.ask),
+            peers.synced && peers.should_answer(sender, first, hello.ask, Instant::now()),
         )
     };
     if reply {
@@ -524,6 +549,30 @@ mod tests {
                 .expect("utf8")
                 .contains("ask")
         );
+    }
+
+    #[test]
+    fn a_request_is_answered_at_most_once_per_interval_and_sender() {
+        let mut peers = Peers::default();
+        let start = Instant::now();
+        // The first hello of a new peer is answered.
+        assert!(peers.should_answer(7, true, true, start));
+        // Five more requests in a row get no reply.
+        for i in 1..=5 {
+            assert!(!peers.should_answer(7, false, true, start + Duration::from_secs(i)));
+        }
+        // A different sender is still answered, once.
+        assert!(peers.should_answer(8, false, true, start + Duration::from_secs(2)));
+        assert!(!peers.should_answer(8, false, true, start + Duration::from_secs(3)));
+        // After the interval the same sender is answered again.
+        assert!(peers.should_answer(7, false, true, start + ANSWER_INTERVAL));
+        assert!(!peers.should_answer(7, false, true, start + ANSWER_INTERVAL));
+        // A plain hello without a request is never answered unless it is the first.
+        assert!(!peers.should_answer(9, false, false, start));
+        // Leaving clears the entry.
+        peers.forget(7);
+        assert!(peers.should_answer(7, false, true, start + ANSWER_INTERVAL));
+        assert!(peers.answered.len() <= 3);
     }
 
     #[test]

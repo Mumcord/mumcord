@@ -82,34 +82,194 @@ impl SecretBackend for KeyringBackend {
     }
 }
 
+/// Files in the profile directory that hold secret material and only the user may touch.
+///
+/// The vault key and blob are trusted only when they are regular files (not symbolic links)
+/// owned by the user and closed to group and others: a file restored from a backup with 0644, or
+/// one another local user planted, is refused with an error that says how to fix it instead of
+/// being used as it is. The checks run on the opened file, so swapping the path between check and
+/// read does not help. Kept apart from the vault so they run in the Linux test suite as well.
+#[cfg(any(target_os = "freebsd", all(test, unix)))]
+mod private_file {
+    use std::fs;
+    use std::io::{self, Read, Write};
+    use std::os::unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt};
+    use std::path::{Path, PathBuf};
+
+    /// Contents of `path`, or `None` if it does not exist.
+    pub(super) fn read(path: &Path) -> io::Result<Option<Vec<u8>>> {
+        match fs::symlink_metadata(path) {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return Err(refused(path, "is a symbolic link"));
+            }
+            Ok(_) => {}
+            Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
+            Err(e) => return Err(e),
+        }
+        // O_NOFOLLOW: a link put in place after the check above is not followed either.
+        let mut file = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_NOFOLLOW)
+            .open(path)?;
+        let meta = file.metadata()?;
+        if !meta.is_file() {
+            return Err(refused(path, "is not a regular file"));
+        }
+        check_owner(path, &meta)?;
+        if meta.mode() & 0o077 != 0 {
+            return Err(refused(path, "can be read or changed by other users"));
+        }
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        Ok(Some(bytes))
+    }
+
+    /// Writes `bytes` to `path` so that only the user can read it.
+    ///
+    /// The bytes go into a temporary file beside `path` that is renamed onto it once they are
+    /// flushed, so a crash or a full disk half way leaves the previous file intact. That file
+    /// holds every stored secret, including the identity, so a truncated one would be the end of
+    /// the profile. The temporary file is always created anew: a stale one left with wider
+    /// permissions would otherwise keep them through the rename.
+    pub(super) fn write(path: &Path, bytes: &[u8]) -> io::Result<()> {
+        let dir = path.parent().unwrap_or(Path::new("."));
+        fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(dir)?;
+        let dir_meta = fs::metadata(dir)?;
+        check_owner(dir, &dir_meta)?;
+        if dir_meta.mode() & 0o022 != 0 {
+            // Another user could replace the files in it.
+            return Err(refused(dir, "can be changed by other users"));
+        }
+        let temp = temp_path(path);
+        match fs::remove_file(&temp) {
+            Ok(()) => {}
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+            Err(e) => return Err(e),
+        }
+        let mut file = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(&temp)?;
+        file.write_all(bytes)?;
+        // On the disk before the rename: a rename that outlived its data would leave a file of
+        // zeroes behind the name.
+        file.sync_all()?;
+        drop(file);
+        fs::rename(&temp, path)
+    }
+
+    fn temp_path(path: &Path) -> PathBuf {
+        let mut name = path.file_name().unwrap_or_default().to_os_string();
+        name.push(".tmp");
+        path.with_file_name(name)
+    }
+
+    fn check_owner(path: &Path, meta: &fs::Metadata) -> io::Result<()> {
+        // Safety: geteuid cannot fail and has no preconditions.
+        if meta.uid() != unsafe { libc::geteuid() } {
+            return Err(refused(path, "belongs to another user"));
+        }
+        Ok(())
+    }
+
+    /// The error names only the file, not its full path, which would contain the user name.
+    fn refused(path: &Path, reason: &str) -> io::Error {
+        let name = path.file_name().unwrap_or_default().to_string_lossy();
+        io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            format!(
+                "{name} {reason}; it must be a file of your own that only you can read (chmod 600)"
+            ),
+        )
+    }
+}
+
+/// Which store a profile keeps its secrets in where a Secret Service may or may not answer.
+///
+/// The choice is sticky per profile so that a Secret Service that is merely late or locked at one
+/// start (D-Bus not up yet, an unlock prompt dismissed) does not silently send new secrets to the
+/// file while the old ones stay in the wallet, or the other way round:
+/// - a profile with a secret file keeps using it;
+/// - a profile marked as using the Secret Service keeps using it, and a failing service surfaces
+///   as the usual "secure storage could not be read" error instead of an empty file;
+/// - only a profile that has used neither is probed, and the result is remembered.
+#[cfg(any(target_os = "freebsd", all(test, unix)))]
+mod backend_choice {
+    use std::path::Path;
+
+    use super::private_file;
+
+    pub(super) const BLOB_FILE: &str = "secrets.vault";
+    pub(super) const KEY_FILE: &str = "secrets.key";
+    /// Empty marker: this profile's secrets are in the OS Secret Service.
+    pub(super) const OS_MARKER_FILE: &str = "secrets.os-store";
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub(super) enum Choice {
+        Os,
+        File,
+    }
+
+    /// Picks the store for the profile in `dir`; `probe` checks whether a Secret Service works and
+    /// runs only for a profile that has not used either store yet.
+    pub(super) fn choose(dir: &Path, probe: impl FnOnce() -> bool) -> Choice {
+        if dir.join(BLOB_FILE).exists() || dir.join(KEY_FILE).exists() {
+            if dir.join(OS_MARKER_FILE).exists() {
+                tracing::warn!(
+                    "this profile has secrets in the OS secret service and in the encrypted file; using the file"
+                );
+            }
+            return Choice::File;
+        }
+        if dir.join(OS_MARKER_FILE).exists() {
+            return Choice::Os;
+        }
+        if probe() {
+            if let Err(e) = private_file::write(&dir.join(OS_MARKER_FILE), &[]) {
+                tracing::warn!(error = %e, "could not remember that the profile uses the OS secret service");
+            }
+            Choice::Os
+        } else {
+            tracing::warn!(
+                "no usable OS secret service; secrets go to the encrypted file in the profile, which is weaker"
+            );
+            Choice::File
+        }
+    }
+}
+
 /// The encrypted secret file used where no Secret Service answers (FreeBSD).
 ///
-/// One AES-256-GCM blob holds every item as `account -> secret`; the 32-byte key sits in a second
-/// file next to it. Both files are created 0600 in the profile directory, so other users cannot
-/// read them and a copied profile stays useless without its key. This protects the secrets the
-/// same way a browser's "basic" password store does: against other users and against backups that
-/// leak only one of the two files, not against someone who can read the user's whole profile
-/// directory. A Secret Service, where the session has one, is always preferred (see
+/// One AES-256-GCM blob holds every item as `account -> secret`; the 32-byte random key sits in a
+/// second file next to it, unprotected: no passphrase or key derivation is involved. Both files
+/// are 0600 in the profile directory and refused otherwise (see [`private_file`]), so other users
+/// cannot read them and a backup that leaks only the blob stays useless. This protects the secrets
+/// the same way a browser's "basic" password store does: against other users and against backups
+/// that leak only one of the two files, not against anyone or anything that can read the user's
+/// whole profile directory. A Secret Service, where the session has one, is always preferred (see
 /// [`SecretStore::os_with_profile`]).
 #[cfg(target_os = "freebsd")]
 mod vault {
     use std::collections::BTreeMap;
-    use std::fs;
-    use std::io::Write;
-    use std::os::unix::fs::OpenOptionsExt;
-    use std::path::{Path, PathBuf};
+    use std::path::PathBuf;
 
     use ring::aead::{Aad, LessSafeKey, Nonce, UnboundKey};
     use ring::rand::{SecureRandom, SystemRandom};
 
+    use super::backend_choice::{BLOB_FILE, KEY_FILE};
+    use super::private_file;
     use super::{Result, SecretBackend};
     use crate::error::Error;
 
     /// Prefix of the blob, so a foreign file is refused instead of decrypted into nonsense.
     const MAGIC: &[u8; 8] = b"MCVLT1\0\0";
     const KEY_LEN: usize = 32;
-    /// AES-256-GCM nonce; a fresh one per write, together with the derived key this is safe for
-    /// the number of writes a profile sees.
+    /// AES-256-GCM nonce; a fresh random one per write, which is safe for the number of writes a
+    /// profile sees.
     const NONCE_LEN: usize = 12;
     /// AES-GCM authentication tag length.
     const TAG_LEN: usize = 16;
@@ -130,26 +290,25 @@ mod vault {
         }
 
         fn blob_path(&self) -> PathBuf {
-            self.dir.join("secrets.vault")
+            self.dir.join(BLOB_FILE)
         }
 
         fn key_path(&self) -> PathBuf {
-            self.dir.join("secrets.key")
+            self.dir.join(KEY_FILE)
         }
 
         /// The key file, created with a fresh key on first use.
         fn key(&self) -> Result<LessSafeKey> {
-            let key = match fs::read(self.key_path()) {
-                Ok(key) => key,
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            let key = match private_file::read(&self.key_path()).map_err(Error::SecretFile)? {
+                Some(key) => key,
+                None => {
                     let mut key = vec![0u8; KEY_LEN];
                     SystemRandom::new()
                         .fill(&mut key)
                         .map_err(|_| Error::SecretVault("no random bytes".to_owned()))?;
-                    write_private(&self.key_path(), &key)?;
+                    private_file::write(&self.key_path(), &key).map_err(Error::SecretFile)?;
                     key
                 }
-                Err(e) => return Err(Error::SecretFile(e)),
             };
             let unbound = UnboundKey::new(&ring::aead::AES_256_GCM, &key)
                 .map_err(|_| Error::SecretVault("the key file is corrupt".to_owned()))?;
@@ -157,10 +316,9 @@ mod vault {
         }
 
         fn read(&self) -> Result<BTreeMap<String, Vec<u8>>> {
-            let blob = match fs::read(self.blob_path()) {
-                Ok(blob) => blob,
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(BTreeMap::new()),
-                Err(e) => return Err(Error::SecretFile(e)),
+            let Some(blob) = private_file::read(&self.blob_path()).map_err(Error::SecretFile)?
+            else {
+                return Ok(BTreeMap::new());
             };
             if blob.len() < MAGIC.len() + NONCE_LEN + TAG_LEN || &blob[..MAGIC.len()] != MAGIC {
                 return Err(Error::SecretVault("not a secret file".to_owned()));
@@ -198,36 +356,8 @@ mod vault {
             blob.extend_from_slice(MAGIC);
             blob.extend_from_slice(&nonce);
             blob.extend_from_slice(&sealed);
-            write_private(&self.blob_path(), &blob)
+            private_file::write(&self.blob_path(), &blob).map_err(Error::SecretFile)
         }
-    }
-
-    /// Writes `bytes` to `path` so that only the user can read it.
-    ///
-    /// The bytes go into a temporary file beside `path` that is renamed onto it once they are
-    /// flushed, so a crash or a full disk half way leaves the previous file intact. That file
-    /// holds every stored secret, including the identity, so a truncated one would be the end of
-    /// the profile.
-    fn write_private(path: &Path, bytes: &[u8]) -> Result<()> {
-        if let Some(dir) = path.parent() {
-            fs::create_dir_all(dir).map_err(Error::SecretFile)?;
-        }
-        let mut temp_name = path.file_name().unwrap_or_default().to_os_string();
-        temp_name.push(".tmp");
-        let temp = path.with_file_name(temp_name);
-        let mut file = fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .truncate(true)
-            .mode(0o600)
-            .open(&temp)
-            .map_err(Error::SecretFile)?;
-        file.write_all(bytes).map_err(Error::SecretFile)?;
-        // On the disk before the rename: a rename that outlived its data would leave a file of
-        // zeroes behind the name.
-        file.sync_all().map_err(Error::SecretFile)?;
-        drop(file);
-        fs::rename(&temp, path).map_err(Error::SecretFile)
     }
 
     impl SecretBackend for VaultBackend {
@@ -275,7 +405,7 @@ mod vault {
         match probe() {
             Ok(()) => true,
             Err(e) => {
-                tracing::info!(error = %e, "no usable OS secret service; secrets go to the encrypted file");
+                tracing::info!(error = %e, "the OS secret service probe failed");
                 false
             }
         }
@@ -324,15 +454,18 @@ impl SecretStore {
     }
 
     /// The OS secure storage under [`KEYRING_SERVICE`], falling back to the encrypted secret file
-    /// in `profile_dir` where no Secret Service answers (FreeBSD). Every other platform ignores
-    /// the directory and uses the OS store only.
+    /// in `profile_dir` where no Secret Service answers (FreeBSD). Once a profile has used one
+    /// of the two it sticks with it (see `backend_choice`). Every other platform ignores the
+    /// directory and uses the OS store only.
     pub fn os_with_profile(profile_dir: impl Into<std::path::PathBuf>) -> Self {
         #[cfg(target_os = "freebsd")]
         {
-            if vault::secret_service_usable(KEYRING_SERVICE) {
-                Self::os_with_service(KEYRING_SERVICE)
-            } else {
-                Self::with_backend(Arc::new(vault::VaultBackend::new(profile_dir.into())))
+            let dir = profile_dir.into();
+            match backend_choice::choose(&dir, || vault::secret_service_usable(KEYRING_SERVICE)) {
+                backend_choice::Choice::Os => Self::os_with_service(KEYRING_SERVICE),
+                backend_choice::Choice::File => {
+                    Self::with_backend(Arc::new(vault::VaultBackend::new(dir)))
+                }
             }
         }
         #[cfg(not(target_os = "freebsd"))]
@@ -971,6 +1104,121 @@ mod tests {
             dir.path().to_path_buf(),
         )));
         assert_eq!(third.server_password(5).expect("get"), None);
+    }
+
+    #[cfg(unix)]
+    fn mode_of(path: &std::path::Path) -> u32 {
+        std::os::unix::fs::PermissionsExt::mode(
+            &std::fs::metadata(path).expect("metadata").permissions(),
+        ) & 0o777
+    }
+
+    #[cfg(unix)]
+    fn set_mode(path: &std::path::Path, mode: u32) {
+        std::fs::set_permissions(path, std::os::unix::fs::PermissionsExt::from_mode(mode))
+            .expect("chmod");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn fresh_secret_files_are_private() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let profile = dir.path().join("profile");
+        let key = profile.join("secrets.key");
+        super::private_file::write(&key, b"key").expect("write");
+        assert_eq!(mode_of(&key), 0o600);
+        assert_eq!(mode_of(&profile) & 0o077, 0, "a new profile folder is 0700");
+        assert_eq!(
+            super::private_file::read(&key).expect("read").as_deref(),
+            Some(&b"key"[..])
+        );
+        assert_eq!(
+            super::private_file::read(&profile.join("missing")).expect("missing"),
+            None
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_stale_temp_file_does_not_pass_on_its_permissions() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let temp = dir.path().join("secrets.key.tmp");
+        std::fs::write(&temp, b"old").expect("stale temp");
+        set_mode(&temp, 0o644);
+        let key = dir.path().join("secrets.key");
+        super::private_file::write(&key, b"key").expect("write");
+        assert_eq!(mode_of(&key), 0o600);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_secret_file_open_to_others_is_refused() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let key = dir.path().join("secrets.key");
+        super::private_file::write(&key, b"key").expect("write");
+        for mode in [0o644, 0o640, 0o604, 0o620, 0o602] {
+            set_mode(&key, mode);
+            let error = super::private_file::read(&key).expect_err("refused");
+            assert_eq!(error.kind(), std::io::ErrorKind::PermissionDenied);
+            let message = error.to_string();
+            assert!(message.contains("secrets.key"), "{message}");
+            assert!(
+                !message.contains(&*dir.path().to_string_lossy()),
+                "the full path is not in the error: {message}"
+            );
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_symlinked_secret_file_is_refused() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let target = dir.path().join("elsewhere");
+        super::private_file::write(&target, b"key").expect("write");
+        let key = dir.path().join("secrets.key");
+        std::os::unix::fs::symlink(&target, &key).expect("symlink");
+        let error = super::private_file::read(&key).expect_err("refused");
+        assert_eq!(error.kind(), std::io::ErrorKind::PermissionDenied);
+        assert!(error.to_string().contains("symbolic link"), "{error}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn secret_files_are_not_written_into_a_folder_others_can_change() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        set_mode(dir.path(), 0o777);
+        let error = super::private_file::write(&dir.path().join("secrets.key"), b"key")
+            .expect_err("refused");
+        assert_eq!(error.kind(), std::io::ErrorKind::PermissionDenied);
+        assert!(!dir.path().join("secrets.key").exists());
+        set_mode(dir.path(), 0o700);
+    }
+
+    /// A profile sticks with the store it used: a Secret Service that is late or locked at one
+    /// start does not send new secrets to the file, and an existing file is not abandoned when a
+    /// Secret Service appears.
+    #[cfg(unix)]
+    #[test]
+    fn the_secret_store_choice_sticks_to_the_profile() {
+        use super::backend_choice::{Choice, choose};
+
+        let fresh = tempfile::tempdir().expect("temp dir");
+        assert_eq!(choose(fresh.path(), || false), Choice::File);
+        // Nothing was stored yet, so the next start may still pick the Secret Service.
+        assert_eq!(choose(fresh.path(), || true), Choice::Os);
+        // From now on the profile uses the Secret Service, even when it does not answer.
+        assert_eq!(
+            choose(fresh.path(), || panic!("not probed again")),
+            Choice::Os
+        );
+
+        let with_file = tempfile::tempdir().expect("temp dir");
+        super::private_file::write(&with_file.path().join("secrets.vault"), b"blob")
+            .expect("write");
+        assert_eq!(
+            choose(with_file.path(), || panic!("not probed")),
+            Choice::File
+        );
     }
 
     #[test]

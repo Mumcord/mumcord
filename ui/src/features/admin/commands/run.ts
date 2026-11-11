@@ -14,7 +14,13 @@ import { adminCommand, type AdminCommand } from "./commands";
 import { say, type CommandContext } from "./context";
 import { stageConfirm } from "./confirmStore";
 import { commandName, parseDuration, slashQuery } from "./parse";
-import { channelCandidates, personCandidates, resolveOne, type Candidate } from "./resolve";
+import {
+  channelCandidates,
+  personCandidates,
+  resolveLeading,
+  resolveOne,
+  type Candidate,
+} from "./resolve";
 
 /** What the runner wants to show in or above the box (FR-10.34). */
 export type RunResult =
@@ -184,10 +190,12 @@ async function withPerson(
   ctx: CommandContext,
   act_: (person: PersonArgument) => Promise<RunResult>,
 ): Promise<RunResult> {
-  const [wanted, ...rest] = tokens;
+  const wanted = tokens[0];
   if (wanted === undefined || wanted === "") return { kind: "notice", text: usage(command, ctx) };
   const matches = peopleOf(command, ctx.state);
-  const found = resolveOne(wanted, matches);
+  // Names may hold spaces, so the longest run of words that is a full name is the person.
+  const { found, used } = resolveLeading(tokens, matches);
+  const rest = tokens.slice(used);
   if (found.kind === "many") {
     return {
       kind: "choice",
@@ -289,7 +297,8 @@ async function withBan(wanted: string, ctx: CommandContext): Promise<RunResult> 
   }
   try {
     const matches = banCandidates(entries);
-    const found = resolveOne(wanted, matches);
+    // The removal is confirmed afterwards, so a single partial match may be offered directly.
+    const found = resolveOne(wanted, matches, true);
     if (found.kind === "many") {
       return {
         kind: "choice",

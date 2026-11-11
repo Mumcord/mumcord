@@ -1,7 +1,7 @@
 /**
  * Activity notifications (#597): a new event in the activity feed notifies like a message, as an
  * in-app toast or a system notification. The engine applies Do Not Disturb, a muted server, the
- * window focus and the mode of the event's kind (#660); a kind set to Off stops here already. Own events, events from before this connection and "stopped" events never notify.
+ * window focus and the mode of the event's kind (#660); a kind set to Off stops here already. Own events, blocked people's events, events from before this connection and "stopped" events never notify.
  */
 import type { TFunction } from "i18next";
 import { getApi, type ActivityNotifySettings } from "../../api";
@@ -16,9 +16,33 @@ export interface ActivityNoticeContext {
   serverName: (serverId: number) => string | undefined;
 }
 
+/**
+ * One join, leave or move notification per person in this time. Hopping channels or reconnecting
+ * quickly would otherwise flood the toasts and system notifications; later events in the interval
+ * still reach the history.
+ */
+export const ACTIVITY_NOTICE_INTERVAL_MS = 30_000;
+
+const lastNoticeAt = new Map<string, number>();
+
+export function resetActivityThrottle(): void {
+  lastNoticeAt.clear();
+}
+
+/** True when this person was already announced inside the interval; otherwise records it. */
+function throttled(event: ActivityEvent): boolean {
+  if (event.kind === "pluginEvent") return false;
+  const key = `${String(event.serverId)}:${event.name ?? String(event.session ?? "")}`;
+  const last = lastNoticeAt.get(key);
+  if (last !== undefined && event.at - last < ACTIVITY_NOTICE_INTERVAL_MS) return true;
+  lastNoticeAt.set(key, event.at);
+  return false;
+}
+
 /** The switch that decides about an event, or `null` when the event never notifies. */
 export function switchOf(event: ActivityEvent): keyof ActivityNotifySettings | null {
   if (event.earlier === true) return null;
+  if (event.kind !== "pluginEvent" && event.blocked === true) return null;
   switch (event.kind) {
     case "connected":
     case "disconnected":
@@ -88,6 +112,7 @@ export async function handleActivity(
   if (kind === null) return;
   const modes = await switches();
   if (modes === null || modes[kind] === "off") return;
+  if (kind === "joins" && throttled(event)) return;
   const summary = context.serverName(event.serverId) ?? "";
   const body = noticeBody(event, context.t);
   const channelId = channelIdOf(event);

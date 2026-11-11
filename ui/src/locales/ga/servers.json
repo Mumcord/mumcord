@@ -107,6 +107,8 @@
       "certChanged": "Tá an teastas athraithe – seiceáil é sula gceanglaíonn tú",
       "wrongPassword": "Dhiúltaigh an freastalaí don phasfhocal.",
       "nameInUse": "Tá an t-ainm seo in úsáid cheana ar an bhfreastalaí seo.",
+      "certUntrustedNotSent": "Níl iontaobhas ag an bhfreastalaí ar an deimhniú go fóill, mar sin níor seoladh an focal faire. Ceangail uair amháin agus cuir muinín sa deimhniú, ansin déan tástáil arís.",
+      "certChangedNotSent": "Tá deimhniú an fhreastalaí athraithe, mar sin níor seoladh an focal faire.",
       "unreachable": "Ní féidir teacht ar an bhfreastalaí.",
       "invalid": "Níl na sonraí bailí.",
       "failed": "Theip ar an tástáil. Bain triail eile as."

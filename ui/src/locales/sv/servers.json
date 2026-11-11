@@ -107,6 +107,8 @@
       "certChanged": "Certifikatet har ändrats – kontrollera det innan du ansluter",
       "wrongPassword": "Servern avvisade lösenordet.",
       "nameInUse": "Namnet används redan på den här servern.",
+      "certUntrustedNotSent": "Serverns certifikat är inte betrott ännu, så lösenordet skickades inte. Anslut en gång och lita på certifikatet, testa sedan igen.",
+      "certChangedNotSent": "Serverns certifikat har ändrats, så lösenordet skickades inte.",
       "unreachable": "Servern kan inte nås.",
       "invalid": "Uppgifterna är inte giltiga.",
       "failed": "Testet misslyckades. Försök igen."

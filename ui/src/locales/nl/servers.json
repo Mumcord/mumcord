@@ -107,6 +107,8 @@
       "certChanged": "Certificaat is gewijzigd – controleer het voor je verbindt",
       "wrongPassword": "De server heeft het wachtwoord geweigerd.",
       "nameInUse": "Die naam is al in gebruik op deze server.",
+      "certUntrustedNotSent": "Het certificaat van de server wordt nog niet vertrouwd, dus het wachtwoord is niet verstuurd. Maak één keer verbinding en vertrouw het certificaat, test daarna opnieuw.",
+      "certChangedNotSent": "Het certificaat van de server is gewijzigd, dus het wachtwoord is niet verstuurd.",
       "unreachable": "De server is niet bereikbaar.",
       "invalid": "De gegevens zijn niet geldig.",
       "failed": "De test is mislukt. Probeer het opnieuw."

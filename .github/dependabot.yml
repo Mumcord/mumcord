@@ -98,3 +98,14 @@ updates:
       github_actions-major:
         update-types:
           - "major"
+  # Keeps the digests pinned in the Dockerfiles current.
+  - package-ecosystem: "docker"
+    directories:
+      - "/e2e"
+      - "/testenv/v13"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(deps)"

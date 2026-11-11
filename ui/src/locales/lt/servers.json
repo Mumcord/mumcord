@@ -107,6 +107,8 @@
       "certChanged": "Sertifikatas pasikeitė – patikrink jį prieš prisijungdamas",
       "wrongPassword": "Serveris atmetė slaptažodį.",
       "nameInUse": "Šis vardas šiame serveryje jau naudojamas.",
+      "certUntrustedNotSent": "Serverio sertifikatu dar nepasitikima, todėl slaptažodis nebuvo išsiųstas. Prisijunkite vieną kartą ir pasitikėkite sertifikatu, tada testuokite dar kartą.",
+      "certChangedNotSent": "Serverio sertifikatas pasikeitė, todėl slaptažodis nebuvo išsiųstas.",
       "unreachable": "Serveris nepasiekiamas.",
       "invalid": "Duomenys neteisingi.",
       "failed": "Tikrinimas nepavyko. Bandyk dar kartą."

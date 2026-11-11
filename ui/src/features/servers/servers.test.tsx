@@ -786,6 +786,19 @@ describe("ServerDialog", () => {
     expect(await screen.findByText(/The server refused the password/)).toBeInTheDocument();
   });
 
+  it.each([
+    ["certificateRejected", /certificate isn't trusted yet, so the password was not sent/],
+    ["certificateChanged", /certificate has changed, so the password was not sent/],
+  ] as const)("explains a withheld password from the test (%s)", async (code, text) => {
+    setup();
+    await renderAll();
+    fireEvent.click(screen.getByRole("button", { name: "Add a server" }));
+    fireEvent.change(screen.getByLabelText("Address"), { target: { value: "localhost" } });
+    api.mock.failNext("serverTestConnection", code);
+    fireEvent.click(screen.getByRole("button", { name: "Test connection" }));
+    expect(await screen.findByText(text)).toBeInTheDocument();
+  });
+
   it("fills the fields from a pasted mumble:// link", async () => {
     setup();
     await renderAll();

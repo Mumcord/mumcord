@@ -219,15 +219,15 @@ fn windows_browser_args<R: Runtime>(app: &tauri::AppHandle<R>) -> &'static str {
 
 /// Engine settings applied once a window exists (S0 closing measures, FR-9.2).
 pub fn harden_window<R: Runtime>(window: &WebviewWindow<R>) {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     let result = window.with_webview(|webview| linux::harden(&webview.inner()));
     #[cfg(target_os = "macos")]
     let result = window.with_webview(|webview| macos::harden(webview.inner()));
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
     if let Err(error) = result {
         tracing::error!(%error, "the web view settings could not be applied");
     }
-    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    #[cfg(not(any(target_os = "linux", target_os = "freebsd", target_os = "macos")))]
     let _ = window;
 }
 
@@ -240,8 +240,8 @@ pub fn harden_child<R: Runtime>(webview: &tauri::Webview<R>) {
 }
 
 /// WebKitGTK: no link preconnect (S0: a `<link rel="preconnect">` and `window.open` opened TCP
-/// connections from a sandboxed frame) and no WebRTC.
-#[cfg(target_os = "linux")]
+/// connections from a sandboxed frame) and no WebRTC. FreeBSD runs the same WebKitGTK.
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod linux {
     use std::ffi::{CStr, c_char, c_int, c_void};
 

@@ -165,14 +165,7 @@ fn sound_for(
 
 /// Whether `channel` is `root` or one of its sub-channels.
 fn is_within(state: &ServerState, channel: u32, root: u32) -> bool {
-    let mut current = Some(channel);
-    while let Some(id) = current {
-        if id == root {
-            return true;
-        }
-        current = state.channels.get(&id).and_then(|c| c.parent);
-    }
-    false
+    channel == root || state.ancestry(channel).any(|c| c.parent == Some(root))
 }
 
 /// Rejects empty messages and messages above the server limit (FR-1.30). Lengths are in
@@ -961,6 +954,20 @@ mod tests {
             },
         );
         s
+    }
+
+    #[test]
+    fn is_within_ends_on_a_cyclic_tree() {
+        let mut s = state();
+        assert!(is_within(&s, 3, 0));
+        assert!(is_within(&s, 3, 2));
+        assert!(!is_within(&s, 3, 1));
+        s.channels.get_mut(&3).expect("team").parent = Some(3);
+        assert!(!is_within(&s, 3, 0));
+        s.channels.get_mut(&2).expect("raid").parent = Some(3);
+        s.channels.get_mut(&3).expect("team").parent = Some(2);
+        assert!(is_within(&s, 3, 2));
+        assert!(!is_within(&s, 3, 0));
     }
 
     fn text(actor: Option<u32>, target: TextTarget) -> TextMessage {

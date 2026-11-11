@@ -107,6 +107,8 @@
       "certChanged": "Certifikat se promijenio – provjeri ga prije povezivanja",
       "wrongPassword": "Poslužitelj je odbio lozinku.",
       "nameInUse": "To je ime već zauzeto na ovom poslužitelju.",
+      "certUntrustedNotSent": "Certifikatu poslužitelja još se ne vjeruje, pa lozinka nije poslana. Povežite se jednom i vjerujte certifikatu, a zatim ponovite test.",
+      "certChangedNotSent": "Certifikat poslužitelja se promijenio, pa lozinka nije poslana.",
       "unreachable": "Poslužitelj nije dostupan.",
       "invalid": "Podaci nisu valjani.",
       "failed": "Test nije uspio. Pokušaj ponovno."

@@ -107,6 +107,8 @@
       "certChanged": "Certificatul s-a schimbat – verifică-l înainte de conectare",
       "wrongPassword": "Serverul a refuzat parola.",
       "nameInUse": "Acest nume este deja folosit pe acest server.",
+      "certUntrustedNotSent": "Certificatul serverului nu este încă de încredere, așa că parola nu a fost trimisă. Conectează-te o dată și acceptă certificatul, apoi testează din nou.",
+      "certChangedNotSent": "Certificatul serverului s-a schimbat, așa că parola nu a fost trimisă.",
       "unreachable": "Serverul nu poate fi contactat.",
       "invalid": "Datele nu sunt valide.",
       "failed": "Testul a eșuat. Încearcă din nou."

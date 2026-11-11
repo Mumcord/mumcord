@@ -18,9 +18,6 @@ import { extensionFor, loadHighlighter } from "./highlight";
 import { markdownToHtml } from "./markdown";
 import { MessageList } from "./MessageList";
 
-const dialogs = vi.hoisted(() => ({ pickSavePath: vi.fn() }));
-vi.mock("../settings/fileDialogs", () => dialogs);
-
 const SQL = "SELECT name, count(*) FROM users\nWHERE active = 1\nGROUP BY name;";
 
 function message(body: string): ChatMessage {
@@ -71,7 +68,6 @@ beforeAll(async () => {
 beforeEach(() => {
   api = createMockApi();
   setApi(api);
-  dialogs.pickSavePath.mockReset();
   writeText = vi.spyOn(api, "copyText").mockResolvedValue(null);
 });
 
@@ -118,31 +114,32 @@ describe("code block buttons", () => {
   });
 
   it("downloads the block as snippet.<ext> of the detected language", async () => {
-    dialogs.pickSavePath.mockResolvedValue("/tmp/snippet.sql");
-    const save = vi.spyOn(api, "saveText");
+    const save = vi.spyOn(api, "saveText").mockResolvedValue(true);
     renderMessage(markdownToHtml("```\n" + SQL + "\n```"));
     fireEvent.click(screen.getByRole("button", { name: "Download code" }));
     await waitFor(() => {
       expect(screen.getByRole("status").textContent).toBe("Saved");
     });
-    expect(dialogs.pickSavePath).toHaveBeenCalledWith(
-      "snippet.sql",
-      { name: "Code file", extensions: ["sql"] },
-      "Download code",
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Download code",
+        defaultName: "snippet.sql",
+        filterName: "Code file",
+        extensions: ["sql"],
+      }),
+      SQL + "\n",
     );
-    expect(save).toHaveBeenCalledWith("/tmp/snippet.sql", SQL + "\n");
   });
 
   it("falls back to snippet.txt when the language is unknown", async () => {
-    dialogs.pickSavePath.mockResolvedValue(null);
-    const save = vi.spyOn(api, "saveText");
+    const save = vi.spyOn(api, "saveText").mockResolvedValue(false);
     renderMessage(markdownToHtml("```\nhello there\n```"));
     fireEvent.click(screen.getByRole("button", { name: "Download code" }));
     await waitFor(() => {
-      expect(dialogs.pickSavePath).toHaveBeenCalled();
+      expect(save).toHaveBeenCalled();
     });
-    expect(dialogs.pickSavePath.mock.calls[0]?.[0]).toBe("snippet.txt");
-    expect(save).not.toHaveBeenCalled();
+    expect(save.mock.calls[0]?.[0].defaultName).toBe("snippet.txt");
+    expect(screen.getByRole("status").textContent).toBe("");
   });
 
   it("refuses to download a block above the size limit", async () => {
@@ -151,16 +148,16 @@ describe("code block buttons", () => {
     const pre = document.createElement("pre");
     pre.textContent = "x".repeat(MAX_DOWNLOAD_BYTES + 1);
     block.append(pre);
+    const save = vi.spyOn(api, "saveText");
     render(<CodeBlockActions block={block} tabIndex={0} />);
     fireEvent.click(screen.getByRole("button", { name: "Download code" }));
     await waitFor(() => {
       expect(screen.getByRole("status").textContent).toBe("The code is too large to download.");
     });
-    expect(dialogs.pickSavePath).not.toHaveBeenCalled();
+    expect(save).not.toHaveBeenCalled();
   });
 
   it("reports a failed save", async () => {
-    dialogs.pickSavePath.mockResolvedValue("/tmp/snippet.txt");
     vi.spyOn(api, "saveText").mockRejectedValue(new Error("disk full"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     renderMessage(markdownToHtml("```\nhello\n```"));
@@ -206,13 +203,13 @@ describe("language label (issue #112)", () => {
   });
 
   it("names the download after the fence language", async () => {
-    dialogs.pickSavePath.mockResolvedValue(null);
+    const save = vi.spyOn(api, "saveText").mockResolvedValue(false);
     renderMessage(markdownToHtml("```py\nprint('hi')\n```"));
     fireEvent.click(screen.getByRole("button", { name: "Download code" }));
     await waitFor(() => {
-      expect(dialogs.pickSavePath).toHaveBeenCalled();
+      expect(save).toHaveBeenCalled();
     });
-    expect(dialogs.pickSavePath.mock.calls[0]?.[0]).toBe("snippet.py");
+    expect(save.mock.calls[0]?.[0].defaultName).toBe("snippet.py");
   });
 
   it("highlights a lazily loaded language once its grammar arrives", async () => {
