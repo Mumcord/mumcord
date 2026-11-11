@@ -168,6 +168,7 @@ struct Opened {
     me: CertKey,
     link: mumcord_p2p::BroadcastLink,
     limit: u16,
+    media: bool,
 }
 
 impl Engine {
@@ -242,6 +243,7 @@ impl Engine {
             me,
             link,
             limit,
+            media: ann.media,
         })
     }
 
@@ -309,11 +311,11 @@ impl Engine {
                     on_end,
                 ) {
                     Ok(publisher) => {
-                        let mut roster = Roster::new(opened.limit);
+                        let mut roster = Roster::new(opened.limit, opened.media);
                         let now = Instant::now();
                         // Viewers that got direct copies while the broadcast started.
-                        for viewer in own.viewers.keys() {
-                            roster.decide(*viewer, false, now);
+                        for (viewer, caps) in own.viewers_caps() {
+                            roster.decide(viewer, false, caps.media, now);
                         }
                         tracing::info!(
                             limit = opened.limit,
@@ -443,6 +445,7 @@ impl Engine {
             match decision {
                 Decision::Direct => send(&ctx.handle, &[viewer], &Signal::Accept),
                 Decision::Full => send(&ctx.handle, &[viewer], &Signal::Full),
+                Decision::NeedsUpdate => send(&ctx.handle, &[viewer], &Signal::NeedsUpdate),
                 Decision::Relay | Decision::Wait => {}
             }
             if let Some(Here { others, .. }) = here(&ctx.handle) {

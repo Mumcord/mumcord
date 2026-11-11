@@ -425,6 +425,10 @@ pub(crate) fn on_plugin_data(
                     false
                 }
             }
+            Signal::NeedsUpdate => {
+                shares.answered(sender, Answer::NeedsUpdate);
+                false
+            }
             Signal::Unwatch => {
                 let left = shares.own.as_mut().and_then(|own| leave(own, sender));
                 own_viewers = left.is_some();
@@ -514,7 +518,7 @@ fn on_watch(
             ..
         }) => {
             let new = roster.path(viewer).is_none();
-            Some(match roster.decide(viewer, broadcast, now) {
+            Some(match roster.decide(viewer, broadcast, caps.media, now) {
                 Decision::Relay => {
                     if let Some(hash) = hash {
                         publisher.admit(hash);
@@ -528,6 +532,7 @@ fn on_watch(
                 }
                 Decision::Wait => OnWatch::Quiet,
                 Decision::Full => OnWatch::Reply(Signal::Full, false),
+                Decision::NeedsUpdate => OnWatch::Reply(Signal::NeedsUpdate, false),
             })
         }
         _ => None,
@@ -1120,6 +1125,12 @@ impl Engine {
             }
             Some(Ok(Answer::Full)) => {
                 return Err(EngineError::new(ErrorKind::ShareFull, "this share is full"));
+            }
+            Some(Ok(Answer::NeedsUpdate)) => {
+                return Err(EngineError::new(
+                    ErrorKind::NeedsUpdate,
+                    "this share needs Mumcord 0.9.0",
+                ));
             }
             // The share ended, the user left the channel or a newer attempt replaced this one.
             Some(Err(_)) => return Err(not_sharing()),
