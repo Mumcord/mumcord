@@ -139,6 +139,8 @@
     "people_other": "{{count}} de persoane",
     "limit": "{{count}} din {{max}} camere",
     "relay": "Releu · criptat end-to-end",
+    "direct": "Direct · criptat end-to-end",
+    "both": "Releu și direct · criptat end-to-end",
     "relayTitle": "Fiecare cameră este trimisă o singură dată releului și copiată pentru spectatori",
     "layout": "Aranjare",
     "grid": "Grilă",
@@ -257,5 +259,10 @@
     "dataSaver": "Economie de date: până la 15 fps pentru toți",
     "reduceMotion": "Mișcare redusă: fără strălucire sau animație pe cadrul vorbitorului",
     "reduceMotionHint": "Urmează implicit setarea de mișcare redusă a sistemului."
+  },
+  "viewers": {
+    "title": "Spectatori",
+    "relay": "Releu",
+    "direct": "Direct"
   }
 }

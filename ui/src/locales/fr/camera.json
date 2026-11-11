@@ -140,6 +140,8 @@
     "people_other": "{{count}} personnes",
     "limit": "{{count}} caméras sur {{max}}",
     "relay": "Relais · chiffré de bout en bout",
+    "direct": "Direct · chiffré de bout en bout",
+    "both": "Relais et direct · chiffré de bout en bout",
     "relayTitle": "Chaque caméra est envoyée une seule fois au relais, qui la copie pour les spectateurs",
     "layout": "Disposition",
     "grid": "Grille",
@@ -257,5 +259,10 @@
     "dataSaver": "Économie de données : jusqu'à 15 fps pour tout le monde",
     "reduceMotion": "Réduire les animations : pas de halo ni d'animation sur le cadre de l'orateur",
     "reduceMotionHint": "Suit par défaut le réglage de réduction des animations de votre système."
+  },
+  "viewers": {
+    "title": "Spectateurs",
+    "relay": "Relais",
+    "direct": "Direct"
   }
 }

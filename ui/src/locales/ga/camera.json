@@ -147,6 +147,8 @@
     "people_other": "{{count}} duine",
     "limit": "{{count}} as {{max}} gceamara",
     "relay": "Athsheachadán · criptithe ó cheann go ceann",
+    "direct": "Díreach · criptithe ó cheann go ceann",
+    "both": "Athsheachadán agus díreach · criptithe ó cheann go ceann",
     "relayTitle": "Seoltar gach ceamara uair amháin chuig an athsheachadán agus déantar cóip de lucht féachana",
     "layout": "Leagan amach",
     "grid": "Greille",
@@ -273,5 +275,10 @@
     "dataSaver": "Sábhálaí sonraí: suas le 15 fps do chách",
     "reduceMotion": "Laghdaigh gluaiseacht: gan glioscarnach ná beochan ar fhráma an chainteora",
     "reduceMotionHint": "Leanann sé socrú laghdaithe gluaisne do chórais de réir réamhshocraithe."
+  },
+  "viewers": {
+    "title": "Lucht féachana",
+    "relay": "Athsheachadán",
+    "direct": "Díreach"
   }
 }
