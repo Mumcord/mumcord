@@ -50,7 +50,7 @@
 | D2 | Sharer: description, layer routing, format choice | done — `a950bec9`, branch not pushed | D1 | complex |
 | D3 | Viewer: description, changes at keyframes, both formats | done — `b41444ab`, branch not pushed | D2 | complex |
 | D4 | Capability negotiation and refusal texts | done — `12bb9696`, `abc88dd0`, `7794576b`, `b103d57c`; 24 locales in E2 | D3 | complex |
-| D5 | Direct camera path (`STREAM_CAMERA`) | partial — `dee7fb92`: stream kind, `mv` in `cam-join`, `needs`; direct stream and reverse `want` not wired | D4 | complex |
+| D5 | Direct camera path (`STREAM_CAMERA`) | partial — `dee7fb92`, `1b910208`: stream kind, `mv`, `needs`, old-viewer refusal; direct stream and reverse `want` not wired | D4 | complex |
 | D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | done — UI tests unchanged, 183 pass | D1 | simple |
 | R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
