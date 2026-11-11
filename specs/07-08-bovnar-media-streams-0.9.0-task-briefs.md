@@ -49,7 +49,7 @@
 | D1 | Direct `STREAM_SCREEN` format switch | done — `04026690`, branch not pushed | W2, W3, S2 | complex |
 | D2 | Sharer: description, layer routing, format choice | done — `a950bec9`, branch not pushed | D1 | complex |
 | D3 | Viewer: description, changes at keyframes, both formats | done — `b41444ab`, branch not pushed | D2 | complex |
-| D4 | Capability negotiation and refusal texts | partial — `12bb9696`, `abc88dd0`, `7794576b`; refusal texts wait for R3 | D3 | complex |
+| D4 | Capability negotiation and refusal texts | done — `12bb9696`, `abc88dd0`, `7794576b`, `b103d57c`; 24 locales in E2 | D3 | complex |
 | D5 | Direct camera path (`STREAM_CAMERA`) | open | D4 | complex |
 | D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | open | D1 | simple |
@@ -66,10 +66,10 @@
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
-then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4 protocol work and
-R1–R6 are done. Next: the D4 refusal texts and the E2E acceptance run (E4). The engine
-dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the
-0.9.0 tag exists. E3 can run at any time.
+then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4 and R1–R6 are done;
+E2 (24 locales) and E4 (acceptance run) are next. The engine dev-dependency temporarily points
+at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the 0.9.0 tag exists. E3 can run at any
+time.
 
 ---
 
