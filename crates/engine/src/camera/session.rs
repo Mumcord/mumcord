@@ -817,7 +817,7 @@ pub(crate) fn on_plugin_data(
         return;
     };
     match event.message {
-        CameraMessage::CamJoin { id, codecs } => {
+        CameraMessage::CamJoin { id, codecs, .. } => {
             engine.camera_join(ctx, event.sender, &id, &codecs);
         }
         CameraMessage::CamLeave { id } => {
@@ -830,6 +830,7 @@ pub(crate) fn on_plugin_data(
         CameraMessage::On { id } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
         CameraMessage::Full { id } => super::recv::on_camera_full(&engine, ctx, event.sender, &id),
         CameraMessage::Off => super::recv::on_camera_gone(&engine, ctx, event.sender),
+        CameraMessage::Needs { .. } => {}
     }
 }
 

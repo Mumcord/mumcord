@@ -50,6 +50,8 @@ pub const STREAM_SCREEN: u8 = 2;
 pub const STREAM_FILE: u8 = 3;
 /// Plugin data to one person (spec 09 FR-9.59), on a one-way stream.
 pub const STREAM_PLUGIN_DATA: u8 = 4;
+/// A direct camera stream, opened by the sharer to one admitted viewer (spec 08 FR-8.92).
+pub const STREAM_CAMERA: u8 = 5;
 
 /// What a stream of `kind` uses the relay for (FR-7.6); `None` for an unknown kind.
 pub(crate) fn stream_use(kind: u8) -> Option<RelayUse> {
@@ -58,6 +60,7 @@ pub(crate) fn stream_use(kind: u8) -> Option<RelayUse> {
         STREAM_SCREEN => Some(RelayUse::ScreenShare),
         STREAM_FILE => Some(RelayUse::Files),
         STREAM_PLUGIN_DATA => Some(RelayUse::PluginData),
+        STREAM_CAMERA => Some(RelayUse::Camera),
         _ => None,
     }
 }
@@ -1352,6 +1355,7 @@ mod tests {
         assert_eq!(stream_use(STREAM_SCREEN), Some(RelayUse::ScreenShare));
         assert_eq!(stream_use(STREAM_FILE), Some(RelayUse::Files));
         assert_eq!(stream_use(STREAM_PLUGIN_DATA), Some(RelayUse::PluginData));
+        assert_eq!(stream_use(STREAM_CAMERA), Some(RelayUse::Camera));
         assert_eq!(stream_use(0), None);
     }
 
