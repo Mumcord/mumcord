@@ -55,7 +55,7 @@
 | D7 | Watch-party UI regression | open | D1 | simple |
 | R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
 | R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
-| R3 | Engine broadcast link: media profile end to end | open | R1, W3, R5 | complex |
+| R3 | Engine broadcast link: media profile end to end | partial — `c27812f4`: description encryption; publisher/subscriber still on the legacy path | R1, W3, R5 | complex |
 | R4 | Plugin relay data on channel 6 | done — `875d1656`, `feat/r4-plugin-channel6` | R1 | complex |
 | R5 | mumpeer: new format, routing, description cache | open | P0.3, W1, W2 | complex |
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
