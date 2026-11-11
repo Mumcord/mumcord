@@ -64,6 +64,7 @@ pub use broadcast::{FanoutInfo, FanoutUnavailable, FanoutView, RelayViewer};
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use encoder::monitor::LoadDetails;
 pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
+pub(crate) use fanout::ViewerQueue;
 pub(crate) use media::EncoderFactory;
 pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats, ViewerPath};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
@@ -338,13 +339,14 @@ pub(crate) fn on_plugin_data(
         tracing::debug!(sender, live, "screen share announcement received");
     }
     // What a Watch needs to know before the state is locked.
-    let (broadcast_viewer, viewer_hash) = match signal {
-        Signal::Watch { bc, .. } => (
+    let (broadcast_viewer, viewer_hash, viewer_media) = match signal {
+        Signal::Watch { bc, mv, .. } => (
             bc == 1
                 && !capable(peers, ctx.server_id, &[sender], FEATURE_SCREEN_BROADCAST).is_empty(),
             cert_hash(&ctx.handle, sender),
+            mv,
         ),
-        _ => (false, None),
+        _ => (false, None, 0),
     };
     let mut reply = None;
     let mut own_viewers = false;
@@ -373,7 +375,7 @@ pub(crate) fn on_plugin_data(
             ),
             Signal::Share { live: false, .. } => shares.share_ended(sender),
             Signal::Watch { codecs, .. } => {
-                let caps = state::ViewerCaps::from_watch(&codecs);
+                let caps = state::ViewerCaps::from_watch(&codecs, viewer_media);
                 let fanout = shares.own.as_mut().map(|own| {
                     on_watch(
                         own,
@@ -423,6 +425,10 @@ pub(crate) fn on_plugin_data(
                     shares.answered(sender, Answer::Full);
                     false
                 }
+            }
+            Signal::NeedsUpdate => {
+                shares.answered(sender, Answer::NeedsUpdate);
+                false
             }
             Signal::Unwatch => {
                 let left = shares.own.as_mut().and_then(|own| leave(own, sender));
@@ -513,7 +519,7 @@ fn on_watch(
             ..
         }) => {
             let new = roster.path(viewer).is_none();
-            Some(match roster.decide(viewer, broadcast, now) {
+            Some(match roster.decide(viewer, broadcast, caps.media, now) {
                 Decision::Relay => {
                     if let Some(hash) = hash {
                         publisher.admit(hash);
@@ -527,6 +533,7 @@ fn on_watch(
                 }
                 Decision::Wait => OnWatch::Quiet,
                 Decision::Full => OnWatch::Reply(Signal::Full, false),
+                Decision::NeedsUpdate => OnWatch::Reply(Signal::NeedsUpdate, false),
             })
         }
         _ => None,
@@ -1112,11 +1119,19 @@ impl Engine {
         let request = self.watch_request(server_id);
         match ask_to_watch(&ctx.handle, sharer, request, answer).await {
             Some(Ok(Answer::Accept)) => {}
-            Some(Ok(Answer::Broadcast(id, token))) => {
-                return self.watch_broadcast(&ctx, sharer, attempt, id, token).await;
+            Some(Ok(Answer::Broadcast(id, token, media))) => {
+                return self
+                    .watch_broadcast(&ctx, sharer, attempt, id, token, media)
+                    .await;
             }
             Some(Ok(Answer::Full)) => {
                 return Err(EngineError::new(ErrorKind::ShareFull, "this share is full"));
+            }
+            Some(Ok(Answer::NeedsUpdate)) => {
+                return Err(EngineError::new(
+                    ErrorKind::NeedsUpdate,
+                    "this share needs Mumcord 0.9.0",
+                ));
             }
             // The share ended, the user left the channel or a newer attempt replaced this one.
             Some(Err(_)) => return Err(not_sharing()),

@@ -13,6 +13,7 @@
   "starting": "Łączenie z ekranem: {{name}}…",
   "paused": "{{name}} wstrzymuje udostępnianie.",
   "full": "To udostępnianie jest pełne.",
+  "needsUpdate": "To udostępnianie wymaga Mumcord 0.9.0.",
   "unreachable": "Nie można połączyć się bezpośrednio z {{name}}. Sieć może blokować połączenia bezpośrednie.",
   "tooOld": "Mumcord użytkownika {{name}} jest za stary, aby udostępnić ci ekran.",
   "consentOff": "Oglądanie wymaga połączeń bezpośrednich, a są one wyłączone.",

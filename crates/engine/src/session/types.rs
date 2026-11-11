@@ -31,6 +31,8 @@ pub enum ErrorKind {
     NotFound,
     /// The screen share already has the maximum of viewers (FR-2.43).
     ShareFull,
+    /// The share or camera needs a newer Mumcord.
+    NeedsUpdate,
     /// Watching needs a direct connection and none can be made (FR-2.46); `message` is the
     /// reason, a [`crate::screen_share::WatchBlock::code`].
     DirectUnavailable,

@@ -42,9 +42,10 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use mumcord_p2p::broadcast::{
-    BindRole, Content, ControlKind, ENCRYPTION_OVERHEAD, MAX_DATA_PAYLOAD, split_slot,
+    BindRole, Content, ControlKind, ENCRYPTION_OVERHEAD, MAX_DATA_PAYLOAD, profile, split_slot,
 };
-use mumcord_p2p::{BroadcastEnd, BroadcastId, BroadcastLink, RelayToken, Unit};
+use mumcord_p2p::media;
+use mumcord_p2p::{BroadcastEnd, BroadcastId, BroadcastLink, BroadcastMessage, RelayToken, Unit};
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
@@ -54,7 +55,10 @@ use super::rate::{DEFAULT_KBPS, Pacer};
 use crate::ServerId;
 use crate::peer::RelayUse;
 use crate::screen_share::broadcast::cert_key;
-use crate::screen_share::broadcast::crypto::{FrameOpener, FrameSealer, TAG_LEN};
+use crate::screen_share::broadcast::crypto::{
+    FrameOpener, FrameSealer, SFrameHeader, ShareKey, TAG_LEN, TIMESTAMP_LEN, TrackOpener,
+    TrackSealer,
+};
 use crate::screen_share::broadcast::keyx::{
     self, CertKey, PendingRequest, Reassembler, SharerChannel, ViewerChannel,
 };
@@ -81,7 +85,13 @@ const KEY_RETRY: Duration = Duration::from_secs(3);
 /// Bytes of the piece header (index, count) in a unit's plaintext.
 const PIECE_HEADER: usize = 2;
 /// Largest piece of an envelope in one unit: what the relay takes, minus the tag and header.
-const MAX_PIECE: usize = MAX_DATA_PAYLOAD as usize - TAG_LEN - PIECE_HEADER;
+const MAX_PIECE: usize = {
+    let legacy = MAX_DATA_PAYLOAD as usize - TAG_LEN - PIECE_HEADER;
+    let media = media::MAX_PLUGIN_MESSAGE
+        - (1 + SFrameHeader::MAX_LEN + TIMESTAMP_LEN + TAG_LEN)
+        - PIECE_HEADER;
+    if media < legacy { media } else { legacy }
+};
 // The encryption has to fit in the room the relay leaves for it.
 const _: () = assert!(TAG_LEN + PIECE_HEADER <= ENCRYPTION_OVERHEAD as usize);
 
@@ -435,7 +445,7 @@ impl Engine {
             .filter(|max| *max > 0)
             .unwrap_or(DEFAULT_RECEIVERS);
         let (ann, id, token) = match self
-            .relay_broadcast_request(server_id, RelayUse::PluginData, max)
+            .relay_broadcast_request(server_id, RelayUse::PluginData, max, true)
             .await
         {
             Ok(answer) => answer,
@@ -444,7 +454,10 @@ impl Engine {
                 return None;
             }
         };
-        match p2p.broadcast(&ann, &token, BindRole::Publisher).await {
+        match p2p
+            .broadcast(&ann, &token, BindRole::Publisher, false)
+            .await
+        {
             Ok(link) => Some((id, me, link)),
             Err(e) => {
                 tracing::info!(error = %e, "plugin broadcast link not opened");
@@ -680,7 +693,10 @@ impl Engine {
             .ok()?;
         let (p2p, identity) = self.p2p_with_identity().await?;
         let me = cert_key(&identity)?;
-        match p2p.broadcast(&ann, token, BindRole::Subscriber).await {
+        match p2p
+            .broadcast(&ann, token, BindRole::Subscriber, false)
+            .await
+        {
             Ok(link) => Some((me, link)),
             Err(e) => {
                 tracing::info!(error = %e, "plugin broadcast not joined");
@@ -751,6 +767,99 @@ enum PubCommand {
 }
 
 /// The sender's end; dropping it closes the link, which ends the broadcast.
+/// Seals plugin envelopes in the link's format: the legacy clear header or the media profile's
+/// channel 6.
+enum DataSealer {
+    Legacy(FrameSealer),
+    Media(TrackSealer),
+}
+
+impl DataSealer {
+    fn new(media: bool) -> Result<Self, crate::screen_share::broadcast::crypto::CryptoError> {
+        if media {
+            Ok(Self::Media(TrackSealer::new()?))
+        } else {
+            Ok(Self::Legacy(FrameSealer::new()?))
+        }
+    }
+
+    fn keys(&self) -> Vec<ShareKey> {
+        match self {
+            Self::Legacy(sealer) => sealer.keys(),
+            Self::Media(sealer) => sealer.keys(),
+        }
+    }
+
+    fn rekey(&mut self) -> Result<ShareKey, crate::screen_share::broadcast::crypto::CryptoError> {
+        match self {
+            Self::Legacy(sealer) => sealer.rekey(),
+            Self::Media(sealer) => sealer.rekey(),
+        }
+    }
+
+    fn seal(
+        &mut self,
+        plain: &[u8],
+        out: &mut Vec<u8>,
+    ) -> Result<(), crate::screen_share::broadcast::crypto::CryptoError> {
+        match self {
+            Self::Legacy(sealer) => {
+                sealer.seal(Content::Data, plain, out)?;
+                Ok(())
+            }
+            Self::Media(sealer) => {
+                sealer.seal(media::CHANNEL_PLUGIN_DATA, false, 0, plain, out)?;
+                Ok(())
+            }
+        }
+    }
+}
+
+/// Opens plugin envelopes in the link's format.
+enum DataOpener {
+    Legacy(FrameOpener),
+    Media(TrackOpener),
+}
+
+impl DataOpener {
+    fn new(media: bool) -> Self {
+        if media {
+            Self::Media(TrackOpener::new())
+        } else {
+            Self::Legacy(FrameOpener::new())
+        }
+    }
+
+    fn add_key(&mut self, key: &ShareKey) {
+        match self {
+            Self::Legacy(opener) => opener.add_key(key),
+            Self::Media(opener) => opener.add_key(key),
+        }
+    }
+
+    fn open_legacy<'a>(
+        &mut self,
+        bytes: &'a mut [u8],
+    ) -> Result<&'a [u8], crate::screen_share::broadcast::crypto::CryptoError> {
+        match self {
+            Self::Legacy(opener) => opener.open(bytes).map(|(_, plain)| plain),
+            Self::Media(_) => Err(crate::screen_share::broadcast::crypto::CryptoError::BadTrack),
+        }
+    }
+
+    fn open_media<'a>(
+        &mut self,
+        payload: &'a mut [u8],
+    ) -> Result<&'a [u8], crate::screen_share::broadcast::crypto::CryptoError> {
+        match self {
+            Self::Media(opener) => opener
+                .open(media::CHANNEL_PLUGIN_DATA, payload)
+                .map(|track| track.frame),
+            Self::Legacy(_) => Err(crate::screen_share::broadcast::crypto::CryptoError::BadTrack),
+        }
+    }
+}
+
 struct Publisher {
     id: BroadcastId,
     /// Certificate hashes of the admitted receivers; only they get keys.
@@ -771,11 +880,13 @@ impl Publisher {
     ) -> Result<Self, crate::screen_share::broadcast::crypto::CryptoError> {
         let admitted = Arc::new(Mutex::new(HashSet::new()));
         let (commands, command_rx) = mpsc::unbounded_channel();
+        let media = link.is_media();
         let task = rt.spawn(
             PublisherTask {
                 id,
                 me,
-                sealer: FrameSealer::new()?,
+                sealer: DataSealer::new(media)?,
+                media,
                 admitted: admitted.clone(),
                 channels: HashMap::new(),
                 reassembler: Reassembler::new(),
@@ -827,7 +938,8 @@ impl Drop for Publisher {
 struct PublisherTask {
     id: BroadcastId,
     me: CertKey,
-    sealer: FrameSealer,
+    sealer: DataSealer,
+    media: bool,
     admitted: Arc<Mutex<HashSet<String>>>,
     channels: HashMap<u16, ViewerChannel>,
     reassembler: Reassembler<u16>,
@@ -850,8 +962,15 @@ impl PublisherTask {
         let units = link.sender();
         let end = loop {
             let alive = tokio::select! {
-                unit = link.recv() => match unit {
-                    Ok(unit) => self.on_unit(&unit, &units).await,
+                message = link.recv() => match message {
+                    Ok(BroadcastMessage::Legacy(unit)) => self.on_unit(&unit, &units).await,
+                    Ok(BroadcastMessage::Media(profile::Message::Control { kind, payload })) => {
+                        match crate::screen_share::broadcast::link::legacy_control(kind) {
+                            Some(kind) => self.on_control(kind, &payload, &units).await,
+                            None => true,
+                        }
+                    }
+                    Ok(BroadcastMessage::Media(_)) => true,
                     Err(end) => break end,
                 },
                 () = sleep_until(self.replay_at), if self.replay_at.is_some() => {
@@ -910,28 +1029,60 @@ impl PublisherTask {
     /// Seals the envelope in pieces and sends them at the relay's per-sender rate.
     async fn send(&mut self, envelope: &[u8], units: &mpsc::Sender<Vec<u8>>) -> bool {
         for plain in pieces(envelope, MAX_PIECE) {
-            let mut unit = Vec::new();
-            if let Err(e) = self.sealer.seal(Content::Data, &plain, &mut unit) {
+            let mut sealed = Vec::new();
+            if let Err(e) = self.sealer.seal(&plain, &mut sealed) {
                 tracing::warn!(error = %e, "plugin broadcast unit not sealed");
                 return true;
             }
+            let wire = if self.media {
+                let message = match profile::Message::track(media::CHANNEL_PLUGIN_DATA, sealed) {
+                    Ok(message) => message,
+                    Err(e) => {
+                        tracing::warn!(error = %e, "plugin broadcast message not made");
+                        return true;
+                    }
+                };
+                let mut writer = profile::MessageWriter::new();
+                match writer.encode(&message) {
+                    Ok(bytes) => bytes.to_vec(),
+                    Err(e) => {
+                        tracing::warn!(error = %e, "plugin broadcast message not made");
+                        return true;
+                    }
+                }
+            } else {
+                sealed
+            };
             let now = Instant::now();
-            let wait = self.pacer.delay(unit.len(), now);
+            let wait = self.pacer.delay(wire.len(), now);
             if !wait.is_zero() {
                 tokio::time::sleep(wait).await;
             }
-            if units.send(unit).await.is_err() {
+            if units.send(wire).await.is_err() {
                 return false;
             }
         }
         true
     }
 
-    /// Handles one unit from the relay; false once the link is gone.
+    /// Handles one old-format unit from the relay; false once the link is gone.
     async fn on_unit(&mut self, unit: &Unit, units: &mpsc::Sender<Vec<u8>>) -> bool {
         match unit.header.content {
-            Content::Control(ControlKind::Gone) => {
-                if let Some((slot, _)) = split_slot(unit.payload()) {
+            Content::Control(kind) => self.on_control(kind, unit.payload(), units).await,
+            _ => true,
+        }
+    }
+
+    /// Handles one control message in either format; false once the link is gone.
+    async fn on_control(
+        &mut self,
+        kind: ControlKind,
+        payload: &[u8],
+        units: &mpsc::Sender<Vec<u8>>,
+    ) -> bool {
+        match kind {
+            ControlKind::Gone => {
+                if let Some((slot, _)) = split_slot(payload) {
                     self.reassembler.forget(&slot);
                     if self.channels.remove(&slot).is_some() {
                         return self.rekey(units).await;
@@ -939,8 +1090,8 @@ impl PublisherTask {
                 }
                 true
             }
-            Content::Control(ControlKind::KeyRequest) => {
-                let Some((slot, chunk)) = split_slot(unit.payload()) else {
+            ControlKind::KeyRequest => {
+                let Some((slot, chunk)) = split_slot(payload) else {
                     return true;
                 };
                 match self.reassembler.push(slot, chunk, Instant::now()) {
@@ -976,7 +1127,15 @@ impl PublisherTask {
                 } else if !self.early.envelopes.is_empty() && self.replay_at.is_none() {
                     self.replay_at = Some(now + REPLAY_DEBOUNCE);
                 }
-                send_chunks(units, ControlKind::Key, Some(slot), &answer, self.set_id).await
+                send_chunks(
+                    units,
+                    ControlKind::Key,
+                    Some(slot),
+                    &answer,
+                    self.set_id,
+                    self.media,
+                )
+                .await
             }
             Err(e) => {
                 tracing::info!(error = %e, "plugin broadcast key request refused");
@@ -1003,7 +1162,16 @@ impl PublisherTask {
         }
         for (slot, update) in updates {
             self.set_id = self.set_id.wrapping_add(1);
-            if !send_chunks(units, ControlKind::Key, Some(slot), &update, self.set_id).await {
+            if !send_chunks(
+                units,
+                ControlKind::Key,
+                Some(slot),
+                &update,
+                self.set_id,
+                self.media,
+            )
+            .await
+            {
                 return false;
             }
         }
@@ -1031,6 +1199,7 @@ impl Subscriber {
         link: BroadcastLink,
         on_end: OnEnd,
     ) -> Self {
+        let media = link.is_media();
         let task = engine.runtime().spawn(
             SubscriberTask {
                 engine: engine.downgrade(),
@@ -1038,9 +1207,10 @@ impl Subscriber {
                 id,
                 me,
                 sharer_hash,
+                media,
                 pending: None,
                 channel: None,
-                opener: FrameOpener::new(),
+                opener: DataOpener::new(media),
                 reassembler: Reassembler::new(),
                 set_id: 0,
                 pieces: Pieces::default(),
@@ -1063,9 +1233,10 @@ struct SubscriberTask {
     id: BroadcastId,
     me: CertKey,
     sharer_hash: String,
+    media: bool,
     pending: Option<PendingRequest>,
     channel: Option<SharerChannel>,
-    opener: FrameOpener,
+    opener: DataOpener,
     reassembler: Reassembler<()>,
     set_id: u8,
     pieces: Pieces,
@@ -1082,8 +1253,8 @@ impl SubscriberTask {
             tokio::time::interval_at(tokio::time::Instant::now() + KEY_RETRY, KEY_RETRY);
         let end = loop {
             tokio::select! {
-                unit = link.recv() => match unit {
-                    Ok(mut unit) => self.on_unit(&mut unit),
+                message = link.recv() => match message {
+                    Ok(message) => self.on_message(message),
                     Err(end) => break end,
                 },
                 _ = retry.tick(), if self.channel.is_none() => {
@@ -1096,6 +1267,25 @@ impl SubscriberTask {
         on_end(end);
     }
 
+    fn on_message(&mut self, message: BroadcastMessage) {
+        match message {
+            BroadcastMessage::Legacy(mut unit) => self.on_unit(&mut unit),
+            BroadcastMessage::Media(profile::Message::Control { kind, payload }) => {
+                if let Some(kind) = crate::screen_share::broadcast::link::legacy_control(kind) {
+                    self.on_control(kind, &payload);
+                }
+            }
+            BroadcastMessage::Media(profile::Message::Track {
+                channel,
+                mut payload,
+            }) if channel == media::CHANNEL_PLUGIN_DATA && self.channel.is_some() => {
+                let opened = self.opener.open_media(&mut payload).map(<[u8]>::to_vec);
+                self.on_opened(opened);
+            }
+            BroadcastMessage::Media(_) => {}
+        }
+    }
+
     async fn request_keys(&mut self, units: &mpsc::Sender<Vec<u8>>) -> bool {
         let (pending, request) = match keyx::request(self.id, &self.me) {
             Ok(request) => request,
@@ -1106,32 +1296,52 @@ impl SubscriberTask {
         };
         self.pending = Some(pending);
         self.set_id = self.set_id.wrapping_add(1);
-        send_chunks(units, ControlKind::KeyRequest, None, &request, self.set_id).await
+        send_chunks(
+            units,
+            ControlKind::KeyRequest,
+            None,
+            &request,
+            self.set_id,
+            self.media,
+        )
+        .await
     }
 
     fn on_unit(&mut self, unit: &mut Unit) {
         match unit.header.content {
-            Content::Control(ControlKind::Key) => {
-                match self.reassembler.push((), unit.payload(), Instant::now()) {
-                    Ok(Some(message)) => self.on_key_message(&message),
-                    Ok(None) => {}
-                    Err(e) => tracing::debug!(error = %e, "plugin broadcast key chunk dropped"),
-                }
-            }
+            Content::Control(kind) => self.on_control(kind, unit.payload()),
             Content::Data if self.channel.is_some() => {
-                let whole = match self.opener.open(&mut unit.bytes) {
-                    Ok((_, plain)) => self.pieces.push(plain),
-                    Err(e) => {
-                        tracing::debug!(error = %e, "plugin broadcast unit not decrypted");
-                        self.pieces = Pieces::default();
-                        None
-                    }
-                };
-                if let (Some(whole), Some(engine)) = (whole, self.engine.upgrade()) {
-                    engine.plugin_broadcast_received(self.key, &whole);
-                }
+                let opened = self.opener.open_legacy(&mut unit.bytes).map(<[u8]>::to_vec);
+                self.on_opened(opened);
             }
             _ => {}
+        }
+    }
+
+    fn on_control(&mut self, kind: ControlKind, payload: &[u8]) {
+        if kind == ControlKind::Key {
+            match self.reassembler.push((), payload, Instant::now()) {
+                Ok(Some(message)) => self.on_key_message(&message),
+                Ok(None) => {}
+                Err(e) => tracing::debug!(error = %e, "plugin broadcast key chunk dropped"),
+            }
+        }
+    }
+
+    fn on_opened(
+        &mut self,
+        opened: Result<Vec<u8>, crate::screen_share::broadcast::crypto::CryptoError>,
+    ) {
+        let whole = match opened {
+            Ok(plain) => self.pieces.push(&plain),
+            Err(e) => {
+                tracing::debug!(error = %e, "plugin broadcast unit not decrypted");
+                self.pieces = Pieces::default();
+                None
+            }
+        };
+        if let (Some(whole), Some(engine)) = (whole, self.engine.upgrade()) {
+            engine.plugin_broadcast_received(self.key, &whole);
         }
     }
 
@@ -1178,6 +1388,32 @@ mod tests {
             data: (0..len).map(|i| i as u8).collect(),
         })
         .expect("valid")
+    }
+
+    #[test]
+    fn a_media_link_seals_and_opens_plugin_data_on_channel_six() {
+        let whole = envelope_of(envelope::MAX_DATA);
+        let parts = pieces(&whole, MAX_PIECE);
+        let mut sealer = DataSealer::new(true).expect("sealer");
+        let mut opener = DataOpener::new(true);
+        for key in sealer.keys() {
+            opener.add_key(&key);
+        }
+        let mut received = Pieces::default();
+        let mut out = None;
+        for plain in parts {
+            let mut sealed = Vec::new();
+            sealer.seal(&plain, &mut sealed).expect("sealed");
+            let message =
+                profile::Message::track(media::CHANNEL_PLUGIN_DATA, sealed).expect("message");
+            assert_eq!(message.channel(), media::CHANNEL_PLUGIN_DATA);
+            let profile::Message::Track { mut payload, .. } = message else {
+                panic!("not a track");
+            };
+            let opened = opener.open_media(&mut payload).expect("opened").to_vec();
+            out = received.push(&opened);
+        }
+        assert_eq!(out, Some(whole));
     }
 
     #[test]

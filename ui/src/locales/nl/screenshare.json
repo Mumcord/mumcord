@@ -158,7 +158,7 @@
     "noFanoutBody_other": "Elke kijker krijgt een eigen kopie van jouw computer, dus maximaal {{max}} mensen kunnen meekijken. De kwaliteit daalt naarmate er meer bijkomen: nu hebben {{count}} kijkers ongeveer {{mbit}} Mbit/s upload nodig, dus je scherm draait op {{now}} in plaats van {{wanted}}.",
     "fanoutUnavailable": "Verspreiden via de relay is niet beschikbaar ({{reason}}). Elke kijker krijgt een eigen kopie, dus maximaal {{max}} mensen kunnen meekijken en de kwaliteit kan dalen.",
     "reasonNoRelay": "deze server heeft geen relay",
-    "reasonOldRelay": "de relay is te oud",
+    "reasonOldRelay": "de relay van deze server heeft een update nodig",
     "reasonDisallowed": "de relay staat schermdelen niet toe",
     "reasonRefused": "de relay heeft de uitzending geweigerd",
     "reasonFull": "de relay is vol",

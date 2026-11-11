@@ -158,7 +158,7 @@
     "noFanoutBody_other": "Hver seer får sin egen kopi fra din computer, så op til {{max}} personer kan se med. Kvaliteten falder, når flere kommer til: lige nu skal {{count}} seere bruge omkring {{mbit}} Mbit/s upload, så din deling kører i {{now}} i stedet for {{wanted}}.",
     "fanoutUnavailable": "Udbredelse via relæ er ikke tilgængelig ({{reason}}). Hver seer får sin egen kopi, så op til {{max}} kan se med, og kvaliteten kan falde.",
     "reasonNoRelay": "denne server har intet relæ",
-    "reasonOldRelay": "relæet er for gammelt",
+    "reasonOldRelay": "denne servers relay kræver en opdatering",
     "reasonDisallowed": "relæet tillader ikke skærmdeling",
     "reasonRefused": "relæet afviste udsendelsen",
     "reasonFull": "relæet er fuldt",

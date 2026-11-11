@@ -1,23 +1,18 @@
-//! Wire format of a screen-share broadcast through the community relay (spec 07, FR-7.41–7.45,
-//! section 6.6). Pure encoding and decoding; the relay link that carries it is in `relay.rs`.
+//! **Legacy:** the old clear 14-byte broadcast header, kept for 0.8.x peers and old relays
+//! (FR-7.98).
 //!
-//! A broadcast has one publisher (the sharer) and up to `max_viewers` subscribers. Each side
-//! opens its own outer relay link and sends a [`Bind`] with its broadcast token and role. The
-//! relay refuses with the bind error codes of spec 04 plus `use_not_allowed` and `broadcast_full`
-//! ([`crate::RelayRefusal`]).
+//! New links use the Bovnar media profile instead. This module exists only for the fallback
+//! selection (D1/R1); new production code must not use it. The format is frozen: no byte of the
+//! wire layout may change and the test vectors below mirror the crate README so the relay
+//! (mumpeer) can keep reading the old format.
 //!
-//! After `ready` every unit on the link (media frame or control message) is a 14-byte clear
-//! [`Header`] followed by its payload. Media payloads are end-to-end encrypted by the sharer, so
-//! the relay only reads the header: enough to drop temporal layers, wait for keyframes and route
-//! control messages. The byte layout and test vectors are in the crate README so the relay
-//! (mumpeer) can mirror it.
+//! After `ready` every legacy unit on the link (media frame or control message) is a 14-byte
+//! clear [`Header`] followed by its payload. Media payloads are end-to-end encrypted by the
+//! sharer, so the relay only reads the header: enough to drop temporal layers, wait for
+//! keyframes and route control messages.
 //!
 //! Everything received is untrusted: the header is fully checked before any payload is read, so
 //! a bad size never makes the reader allocate.
-
-use serde::{Deserialize, Serialize};
-
-use crate::peer::{PEER_VERSION, PeerError, RelayToken};
 
 /// The header version this side writes and reads; another version ends the link, since the
 /// layout may differ.
@@ -52,85 +47,14 @@ const CODEC_VP9: u8 = 1;
 const CODEC_AV1: u8 = 2;
 const CODEC_OPUS: u8 = 3;
 
-/// Which end of a broadcast a relay link binds.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BindRole {
-    /// The sharer (`pub`): sends media once, receives control messages.
-    Publisher,
-    /// A viewer (`sub`): receives media, sends control messages.
-    Subscriber,
-}
-
-impl BindRole {
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::Publisher => "pub",
-            Self::Subscriber => "sub",
-        }
-    }
-}
-
-/// The relay `bind` message, `{"v":1,"t":"bind","tok":"…","role":"pub"|"sub"}`. A bind without
-/// `role` is a pair bind (spec 04).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Bind {
-    pub token: RelayToken,
-    /// `None` for a pair token, the broadcast role otherwise.
-    pub role: Option<BindRole>,
-}
-
-#[derive(Serialize, Deserialize)]
-struct BindWire {
-    v: u32,
-    t: String,
-    tok: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    role: Option<String>,
-}
-
-impl Bind {
-    /// The bind message as sent on the relay link (one JSON object, no line end).
-    pub fn encode(&self) -> Vec<u8> {
-        let wire = BindWire {
-            v: PEER_VERSION,
-            t: "bind".to_owned(),
-            tok: self.token.expose().to_owned(),
-            role: self.role.map(|role| role.as_str().to_owned()),
-        };
-        // Strings and integers only, so serialising cannot fail.
-        serde_json::to_vec(&wire).unwrap_or_default()
-    }
-
-    /// Reads a bind message; unknown fields are ignored.
-    pub fn decode(bytes: &[u8]) -> Result<Self, PeerError> {
-        let wire: BindWire = serde_json::from_slice(bytes).map_err(|_| PeerError::Malformed)?;
-        if wire.v < PEER_VERSION {
-            return Err(PeerError::UnsupportedVersion(wire.v));
-        }
-        if wire.t != "bind" {
-            return Err(PeerError::UnknownType);
-        }
-        let role = match wire.role.as_deref() {
-            None => None,
-            Some("pub") => Some(BindRole::Publisher),
-            Some("sub") => Some(BindRole::Subscriber),
-            Some(_) => return Err(PeerError::Malformed),
-        };
-        Ok(Self {
-            token: RelayToken::parse(&wire.tok)?,
-            role,
-        })
-    }
-}
-
-/// Video codec of a broadcast frame.
+/// Video codec of a legacy broadcast frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VideoCodec {
     Vp9,
     Av1,
 }
 
-/// Control messages of a broadcast; the payload layout of each is in the crate README.
+/// Control messages of a legacy broadcast; the payload layout of each is in the crate README.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ControlKind {
     /// Subscriber → publisher: opaque key request; the relay prepends the subscriber's slot.
@@ -174,7 +98,7 @@ impl ControlKind {
     }
 }
 
-/// What a unit carries.
+/// What a legacy unit carries.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Content {
     /// An encrypted video frame.
@@ -193,7 +117,7 @@ pub enum Content {
     Control(ControlKind),
 }
 
-/// The clear header in front of every broadcast unit.
+/// The clear header in front of every legacy broadcast unit.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Header {
     pub content: Content,
@@ -207,6 +131,7 @@ pub struct Header {
     pub payload_len: u32,
 }
 
+/// Why a legacy header was rejected.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
 pub enum HeaderError {
     #[error("broadcast header shorter than {HEADER_LEN} bytes")]
@@ -345,18 +270,9 @@ impl Header {
     }
 }
 
-/// Splits the leading subscriber slot off a `keyreq` (as the publisher receives it), `key` (as
-/// the publisher sends it) or `gone` payload.
-pub fn split_slot(payload: &[u8]) -> Option<(u16, &[u8])> {
-    let (slot, rest) = payload.split_first_chunk::<2>()?;
-    Some((u16::from_be_bytes(*slot), rest))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    const TOKEN: &str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA_";
 
     fn hex(bytes: &[u8]) -> String {
         bytes.iter().map(|b| format!("{b:02x}")).collect()
@@ -554,70 +470,5 @@ mod tests {
         let mut key = control(ControlKind::Key, 10);
         key.key_id = 1;
         assert_eq!(key.encode(), Err(HeaderError::BadControl));
-    }
-
-    #[test]
-    fn splits_the_slot() {
-        assert_eq!(split_slot(&[0x00, 0x05, 9, 9]), Some((5, &[9u8, 9][..])));
-        assert_eq!(split_slot(&[0x01, 0x00]), Some((256, &[][..])));
-        assert_eq!(split_slot(&[1]), None);
-    }
-
-    #[test]
-    fn bind_messages() {
-        let token = RelayToken::parse(TOKEN).expect("token");
-        let bind = Bind {
-            token: token.clone(),
-            role: Some(BindRole::Subscriber),
-        };
-        let bytes = bind.encode();
-        assert_eq!(
-            String::from_utf8(bytes.clone()).expect("utf8"),
-            format!(r#"{{"v":1,"t":"bind","tok":"{TOKEN}","role":"sub"}}"#)
-        );
-        assert_eq!(Bind::decode(&bytes), Ok(bind));
-
-        // A pair bind (spec 04) has no role.
-        let pair = format!(r#"{{"v":1,"t":"bind","tok":"{TOKEN}"}}"#);
-        assert_eq!(
-            Bind::decode(pair.as_bytes()),
-            Ok(Bind { token, role: None })
-        );
-        assert_eq!(
-            Bind {
-                token: RelayToken::parse(TOKEN).expect("token"),
-                role: None
-            }
-            .encode(),
-            pair.as_bytes()
-        );
-
-        let newer = format!(r#"{{"v":2,"t":"bind","tok":"{TOKEN}","role":"pub","x":1}}"#);
-        assert_eq!(
-            Bind::decode(newer.as_bytes()).map(|bind| bind.role),
-            Ok(Some(BindRole::Publisher))
-        );
-        for (input, expected) in [
-            (
-                format!(r#"{{"v":1,"t":"bind","tok":"{TOKEN}","role":"admin"}}"#),
-                PeerError::Malformed,
-            ),
-            (
-                format!(r#"{{"v":1,"t":"ready","tok":"{TOKEN}"}}"#),
-                PeerError::UnknownType,
-            ),
-            (
-                format!(r#"{{"v":0,"t":"bind","tok":"{TOKEN}"}}"#),
-                PeerError::UnsupportedVersion(0),
-            ),
-            (
-                r#"{"v":1,"t":"bind","tok":"short"}"#.to_owned(),
-                PeerError::BadToken,
-            ),
-        ] {
-            assert_eq!(Bind::decode(input.as_bytes()), Err(expected), "{input}");
-        }
-        let debug = format!("{:?}", Bind::decode(&bytes));
-        assert!(!debug.contains(TOKEN), "{debug}");
     }
 }

@@ -13,6 +13,7 @@
   "starting": "Povezivanje sa zaslonom: {{name}}…",
   "paused": "{{name}} je pauzirao dijeljenje.",
   "full": "Ovo dijeljenje je puno.",
+  "needsUpdate": "Ovo dijeljenje zahtijeva Mumcord 0.9.0.",
   "unreachable": "{{name}} nije izravno dostupan. Mreža možda blokira izravne veze.",
   "tooOld": "Mumcord korisnika {{name}} prestar je da bi s tobom dijelio zaslon.",
   "consentOff": "Gledanje treba izravne veze, a ti si ih isključio.",

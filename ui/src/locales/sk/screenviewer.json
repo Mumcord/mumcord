@@ -13,6 +13,7 @@
   "starting": "Pripája sa k obrazovke: {{name}}…",
   "paused": "{{name}} pozastavil(a) zdieľanie.",
   "full": "Toto zdieľanie je plné.",
+  "needsUpdate": "Toto zdieľanie vyžaduje Mumcord 0.9.0.",
   "unreachable": "{{name}} nie je priamo dostupný. Sieť možno blokuje priame pripojenia.",
   "tooOld": "Mumcord používateľa {{name}} je príliš starý na to, aby s tebou zdieľal obrazovku.",
   "consentOff": "Sledovanie potrebuje priame pripojenia a ty ich máš vypnuté.",

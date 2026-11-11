@@ -13,6 +13,7 @@
   "starting": "Forbinder til {{name}}s skærm…",
   "paused": "{{name}} satte delingen på pause.",
   "full": "Denne deling er fuld.",
+  "needsUpdate": "Denne deling kræver Mumcord 0.9.0.",
   "unreachable": "Kunne ikke nå {{name}} direkte. Netværket blokerer måske direkte forbindelser.",
   "tooOld": "{{name}}s Mumcord er for gammel til at dele skærmen med dig.",
   "consentOff": "At se med kræver direkte forbindelser, og du har slået dem fra.",

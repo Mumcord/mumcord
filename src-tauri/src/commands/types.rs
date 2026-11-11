@@ -60,6 +60,8 @@ pub enum ErrorCode {
     ShortcutNotConfirmed,
     /// The screen share already has the maximum of 8 viewers (FR-2.43).
     ShareFull,
+    /// The share or camera needs a newer Mumcord.
+    NeedsUpdate,
     /// Watching a screen share needs a direct connection and none can be made (FR-2.46);
     /// `message` is the reason: `consentOff`, `peerUnsupported` or `noDirectPath`.
     DirectUnavailable,
@@ -119,6 +121,7 @@ impl From<EngineError> for ApiError {
             ErrorKind::DuplicateIdentity => ErrorCode::DuplicateIdentity,
             ErrorKind::NotFound => ErrorCode::NotFound,
             ErrorKind::ShareFull => ErrorCode::ShareFull,
+            ErrorKind::NeedsUpdate => ErrorCode::NeedsUpdate,
             ErrorKind::DirectUnavailable => ErrorCode::DirectUnavailable,
             ErrorKind::SecureStorageUnavailable => ErrorCode::SecureStorageUnavailable,
             ErrorKind::Io => ErrorCode::Io,

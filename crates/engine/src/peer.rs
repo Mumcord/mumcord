@@ -146,6 +146,8 @@ pub struct RelayInfo {
     pub broadcast_max: Option<u16>,
     /// The relay only serves registered users (announced `reg`, #601).
     pub registered_only: bool,
+    /// The relay speaks the Bovnar media profile (announced `mv`, FR-7.96).
+    pub media: bool,
     /// The announced relay's certificate fingerprint.
     pub fingerprint: Option<String>,
     /// The trusted relay's fingerprint while a changed relay waits for trust (#600), so the user
@@ -332,6 +334,7 @@ impl ServerRelay {
                 .collect(),
             broadcast_max: announcer.ann.broadcast,
             registered_only: announcer.ann.registered_only,
+            media: announcer.ann.media,
             fingerprint: Some(announcer.pair.fp.clone()),
             previous_fingerprint: if untrusted {
                 self.pin.as_ref().map(|p| p.relay_fp.clone())
@@ -638,8 +641,9 @@ impl Relays {
                 token,
                 sharer,
                 kind,
+                media,
                 ..
-            } => self.on_broadcast_token(ctx, sender, sharer, kind, id, token),
+            } => self.on_broadcast_token(ctx, sender, sharer, kind, id, token, media),
             // Only relay bots receive token requests and the sharer's broadcast messages.
             PeerMessage::TokenRequest { .. }
             | PeerMessage::BroadcastRequest { .. }
@@ -758,6 +762,7 @@ impl Relays {
 
     /// `bcast-tok` (FR-7.42): handed to the side of its broadcast kind; each side checks that
     /// this client waits for that sharer.
+    #[allow(clippy::too_many_arguments)]
     fn on_broadcast_token(
         &self,
         ctx: &SessionCtx,
@@ -766,13 +771,14 @@ impl Relays {
         kind: BroadcastKind,
         id: BroadcastId,
         token: RelayToken,
+        media: bool,
     ) {
         let route = self.broadcast_token_route(ctx.server_id, sender, kind);
         let engine = || self.engine.get().and_then(WeakEngine::upgrade);
         match route {
             BroadcastTokenRoute::ScreenShare => {
                 if let Some(engine) = engine() {
-                    engine.screen_share_broadcast_token(ctx, sharer, id, token);
+                    engine.screen_share_broadcast_token(ctx, sharer, id, token, media);
                 }
             }
             BroadcastTokenRoute::PluginData => {
@@ -1280,6 +1286,7 @@ impl Engine {
         server_id: ServerId,
         relay_use: RelayUse,
         max: u16,
+        media: bool,
     ) -> Result<(RelayAnnouncement, BroadcastId, RelayToken), FanoutUnavailable> {
         let ctx = self
             .session_ctx_for(server_id)
@@ -1288,12 +1295,15 @@ impl Engine {
             .relays()
             .broadcast_bot(server_id, relay_use)
             .map_err(FanoutUnavailable::Relay)?;
+        // The publisher's format is fixed for the broadcast and needs the relay's capability.
+        let media = media && ann.media;
         let rid = RequestId::random();
         // Screen shares leave `k` out, which bots from before plugin data understand.
         let message = PeerMessage::BroadcastRequest {
             rid,
             max,
             kind: (relay_use != RelayUse::ScreenShare).then_some(relay_use),
+            media,
         };
         let rx = self
             .relays()
@@ -1409,6 +1419,7 @@ mod tests {
             broadcast: None,
             plugin_data_kbps: None,
             registered_only: false,
+            media: false,
         }
     }
 

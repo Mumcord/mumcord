@@ -166,7 +166,7 @@
     "noFanoutBody_other": "Vsak gledalec dobi svojo kopijo iz tvojega računalnika, zato lahko gleda največ {{max}} oseb. Kakovost pada, ko se pridružijo novi: trenutno {{count}} gledalcev potrebuje približno {{mbit}} Mbit/s pošiljanja, zato tvoje deljenje teče v {{now}} namesto v {{wanted}}.",
     "fanoutUnavailable": "Razpošiljanje prek releja ni na voljo ({{reason}}). Vsak gledalec dobi svojo kopijo, zato lahko gleda največ {{max}} oseb in kakovost lahko pade.",
     "reasonNoRelay": "ta strežnik nima releja",
-    "reasonOldRelay": "relej je prestar",
+    "reasonOldRelay": "relay tega strežnika potrebuje posodobitev",
     "reasonDisallowed": "relej ne dovoljuje deljenja zaslona",
     "reasonRefused": "relej je zavrnil oddajanje",
     "reasonFull": "relej je poln",
