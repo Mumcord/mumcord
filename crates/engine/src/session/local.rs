@@ -400,6 +400,7 @@ impl Engine {
         if username.is_empty() {
             return Err(EngineError::invalid("username is empty"));
         }
+        let saved_password = input.password == PasswordChange::Keep;
         let password = self.test_password(input.server_id, input.password).await?;
         let identity = match input.identity_id {
             Some(id) => self.inner.identity_by_id(id).await?,
@@ -415,9 +416,12 @@ impl Engine {
         };
 
         // The probe accepts the certificate to read the version; the trust decision itself is
-        // reported, never stored (FR-3.43). A password, though, only goes to the certificate
-        // already trusted for this server: an attempt with one refuses any other certificate,
-        // and the probe then tries again without the password.
+        // reported, never stored (FR-3.43). A password, though, never goes to a certificate that
+        // differs from the one trusted for this server, and the saved password only goes to
+        // the trusted one. A password typed for a server without a trusted certificate is sent,
+        // as on a first connection, so the test can still say that it is wrong (AC-3.23). An
+        // attempt that must not send the password refuses the certificate, and the probe then
+        // tries again without it.
         let presented = Arc::new(std::sync::Mutex::new(None::<String>));
         let config = |password: Option<String>| {
             let seen = presented.clone();
@@ -438,7 +442,11 @@ impl Engine {
                 verify_cert: Arc::new(move |cert| {
                     let fingerprint = format_fingerprint(&cert.sha256_hex);
                     let accept = !needs_trust
-                        || check_cert(trusted.as_deref(), &fingerprint) == CertCheck::Trusted;
+                        || match check_cert(trusted.as_deref(), &fingerprint) {
+                            CertCheck::Trusted => true,
+                            CertCheck::Unknown => !saved_password,
+                            CertCheck::Changed { .. } => false,
+                        };
                     *lock(&seen) = Some(fingerprint);
                     accept
                 }),
@@ -1321,8 +1329,10 @@ mod tests {
         (port, received)
     }
 
-    /// The probe must never send a password to a certificate that is not the trusted one: not
-    /// the saved one of a server whose certificate changed, not a typed one to an unknown server.
+    /// The probe must never send a password to a certificate that differs from the trusted one,
+    /// neither the saved nor a typed one, and never the saved one to a server without a trusted
+    /// certificate. A password typed for a server without a trusted certificate is sent, as on
+    /// a first connection.
     #[tokio::test]
     async fn a_test_connection_withholds_the_password_from_an_untrusted_certificate() {
         let (_dir, engine) = engine().await;
@@ -1356,27 +1366,50 @@ mod tests {
             .server_test_connection(input(Some(server.id), PasswordChange::Keep))
             .await
             .expect_err("the eavesdropper never completes a login");
-        let unknown = engine
-            .server_test_connection(input(None, PasswordChange::Set(typed.into())))
+        let retyped = engine
+            .server_test_connection(input(Some(server.id), PasswordChange::Set(typed.into())))
+            .await
+            .expect_err("the eavesdropper never completes a login");
+        let untrusted = engine
+            .server_add(ServerFields {
+                password: PasswordChange::Set(saved.into()),
+                ..fields("never connected", "127.0.0.1", "Zoe")
+            })
+            .await
+            .expect("server");
+        let never_trusted = engine
+            .server_test_connection(input(Some(untrusted.id), PasswordChange::Keep))
             .await
             .expect_err("the eavesdropper never completes a login");
 
-        let received = lock(&received).clone();
+        let contains = |secret: &str| {
+            lock(&received)
+                .windows(secret.len())
+                .any(|w| w == secret.as_bytes())
+        };
         assert!(
-            !received.is_empty(),
+            !lock(&received).is_empty(),
             "the probe still logs in without a password"
         );
         for secret in [saved, typed] {
             assert!(
-                !received
-                    .windows(secret.len())
-                    .any(|w| w == secret.as_bytes()),
+                !contains(secret),
                 "the password reached an untrusted certificate"
             );
         }
-        for error in [changed, unknown] {
+        for error in [changed, retyped, never_trusted] {
             assert_ne!(error.kind, ErrorKind::WrongPassword, "{error}");
         }
+
+        let first_contact = "first-contact-2342";
+        engine
+            .server_test_connection(input(None, PasswordChange::Set(first_contact.into())))
+            .await
+            .expect_err("the eavesdropper never completes a login");
+        assert!(
+            contains(first_contact),
+            "a typed password is tested against a server without a trusted certificate"
+        );
     }
 
     /// A server that refuses the password-less login is reported as an untrusted certificate,

@@ -35,7 +35,7 @@
 ### Fixed
 
 - macOS: plugin content such as the Whiteboard stays exactly in its frame when the window's height changes (issue #706); before, it could sit too high or too low, covering the frame's title and leaving a gap at the bottom, until the frame itself moved or changed size
-- Security: "Test" in the server dialog no longer sends the server password to a server whose certificate is not the one you trusted. The test then runs without the password and says so, instead of handing the saved password to whoever answers at that address.
+- Security: "Test" in the server dialog no longer sends a password to a server whose certificate differs from the one you trusted, and the saved password only goes to the trusted certificate. The test then runs without the password and says so, instead of handing the saved password to whoever answers at that address. A password you type for a server you have not connected to yet is still tested.
 - Security: a malicious server can no longer crash Mumcord with a crafted voice packet or with a channel list in which channels are each other's parent, and a screen share or camera stream that claims a picture larger than 8K is refused instead of using up all memory.
 - Security: saving a file, attaching a file and choosing the download folder now only work with a file or folder you picked in the system dialog or dropped onto the window; the app no longer acts on a path that merely comes from its own interface.
 - "Bots on this server" now shows the channel every bot is in, including bots that never talk and are therefore not listed in the channel itself.
