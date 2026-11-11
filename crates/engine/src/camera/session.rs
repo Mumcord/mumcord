@@ -17,6 +17,7 @@ use std::sync::Arc;
 
 use mumcord_camera::{CameraBackend, CameraError, TestCamera, TestCameraMode};
 use mumcord_p2p::broadcast::BindRole;
+use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_p2p::{
     BroadcastEnd, BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken,
 };
@@ -31,6 +32,7 @@ use super::signal::{self, CameraMessage, CameraSignals, Codec};
 use super::stop::StopReason;
 use crate::ServerId;
 use crate::mumcord::ServerPeers;
+use crate::p2p::DirectError;
 use crate::peer::{RelayUnavailable, RelayUse};
 use crate::screen_share::QualityPrefs;
 use crate::screen_share::broadcast::keyx::CertKey;
@@ -231,6 +233,8 @@ struct Live {
     viewers: CameraViewers,
     /// The broadcast uses the Bovnar media profile.
     media: bool,
+    /// One `STREAM_CAMERA` per admitted viewer that reads the media profile (FR-8.92).
+    direct: super::direct::DirectViewers,
 }
 
 pub(super) struct Own {
@@ -498,8 +502,10 @@ impl Engine {
                         engine.camera_broadcast_ended(server_id, id, end);
                     }
                 });
-                let publisher =
-                    Publisher::start(&rt, id, me, link, frames, on_end).map_err(|e| {
+                frames.pump(&rt);
+                let direct = super::direct::DirectViewers::new(broadcast_hex(id), frames.clone());
+                let publisher = Publisher::start(&rt, id, me, link, frames.relay(), on_end)
+                    .map_err(|e| {
                         tracing::warn!(error = %e, "camera broadcast not started");
                         CameraFailure::RelayDown
                     })?;
@@ -508,6 +514,7 @@ impl Engine {
                     publisher,
                     viewers: CameraViewers::new(limit),
                     media,
+                    direct,
                 })
             });
             match started {
@@ -628,7 +635,7 @@ impl Engine {
             signal::send(ctx, &[viewer], &CameraMessage::Needs { id: id.to_owned() });
             return;
         }
-        let broadcast = {
+        let (broadcast, direct) = {
             let mut cameras = lock(self.camera_state());
             let Some(own) = cameras.own.as_mut() else {
                 return;
@@ -642,11 +649,14 @@ impl Engine {
                 return;
             };
             match live.viewers.join(viewer, &hash, codecs) {
-                Join::Full => None,
+                Join::Full => (None, false),
                 Join::Admit => {
                     live.publisher.admit(&hash);
                     send.set_vp9_only(live.viewers.needs_vp9());
-                    Some(live.id)
+                    // A viewer that reads the media profile gets its own direct stream while the
+                    // relay broadcast cannot carry that profile (FR-8.92, FR-8.94).
+                    let wanted = media && !live.media && live.direct.wants(viewer);
+                    (Some(live.id), wanted)
                 }
             }
         };
@@ -657,6 +667,9 @@ impl Engine {
             signal::send(ctx, &[viewer], &CameraMessage::Full { id: id.to_owned() });
             return;
         };
+        if direct {
+            self.camera_direct_open(ctx.server_id, viewer, id);
+        }
         let engine = self.clone();
         let server_id = ctx.server_id;
         self.runtime().spawn(async move {
@@ -683,6 +696,59 @@ impl Engine {
         });
     }
 
+    /// Opens the direct stream to an admitted viewer that reads the media profile (FR-8.92). The
+    /// connection is made in the background: a camera viewer that cannot connect directly keeps
+    /// watching through the relay broadcast.
+    fn camera_direct_open(&self, server_id: ServerId, viewer: u32, id: &str) {
+        let engine = self.clone();
+        let id = id.to_owned();
+        self.runtime().spawn(async move {
+            let opened = engine
+                .p2p_open_stream(
+                    server_id,
+                    viewer,
+                    crate::p2p::STREAM_CAMERA,
+                    crate::p2p::ConsentPrompt::Allowed,
+                )
+                .await;
+            engine.camera_direct_opened(server_id, viewer, &id, opened);
+        });
+    }
+
+    /// The stream to `viewer` was opened: it starts sending only if that viewer is still admitted
+    /// to this very camera session; a stream for an older session or a viewer that left meanwhile
+    /// is dropped, which closes it (FR-8.92).
+    fn camera_direct_opened(
+        &self,
+        server_id: ServerId,
+        viewer: u32,
+        id: &str,
+        opened: Result<(SendStream, RecvStream), DirectError>,
+    ) {
+        let mut cameras = lock(self.camera_state());
+        let Some(own) = cameras.own.as_mut().filter(|o| o.server_id == server_id) else {
+            return;
+        };
+        let on_air = own.state == CameraState::OnAir;
+        let Some(live) = own
+            .live
+            .as_mut()
+            .filter(|l| on_air && broadcast_hex(l.id) == id)
+        else {
+            return;
+        };
+        if !live.viewers.contains(viewer) {
+            return;
+        }
+        match opened {
+            Ok((send, recv)) => {
+                live.direct.add(self.runtime(), viewer, send, recv);
+                tracing::info!(session = viewer, "camera direct stream opened");
+            }
+            Err(e) => tracing::debug!(error = %e, "no direct stream to a camera viewer"),
+        }
+    }
+
     /// Ends `viewer`'s admission to the own camera `id`: it gets no keys any more, the key
     /// rotates (FR-7.44), and with `kick` the bot is told (`bcast-kick`, FR-8.49).
     fn camera_remove_viewer(&self, server_id: ServerId, id: BroadcastId, viewer: u32, kick: bool) {
@@ -695,6 +761,8 @@ impl Engine {
             let send = &own.send;
             match own.live.as_mut().filter(|l| on_air && l.id == id) {
                 Some(live) => {
+                    // Its direct stream, if any, closes with the admission (FR-8.92).
+                    live.direct.remove(viewer);
                     let was_full = live.viewers.is_full();
                     match live.viewers.leave(viewer) {
                         Some(hash) => {
@@ -733,6 +801,29 @@ impl Engine {
         let mut cameras = lock(self.camera_state());
         let live = cameras.own.as_mut()?.live_on(server_id)?;
         live.viewers.contains(viewer).then_some(live.id)
+    }
+
+    /// Nobody this client blocks keeps a direct camera stream (FR-8.92); the relay broadcast of
+    /// the camera is left as it is.
+    pub(super) fn camera_close_blocked_direct(&self, ctx: &SessionCtx) {
+        let blocked = self.camera_blocked(ctx);
+        if blocked.is_empty() {
+            return;
+        }
+        let mut cameras = lock(self.camera_state());
+        let Some(own) = cameras
+            .own
+            .as_mut()
+            .filter(|o| o.server_id == ctx.server_id)
+        else {
+            return;
+        };
+        let Some(live) = own.live.as_mut() else {
+            return;
+        };
+        for viewer in blocked {
+            live.direct.remove(viewer);
+        }
     }
 
     /// The bot's `bcast-tok` for a camera (`k = cam`), already checked to come from the pinned
@@ -785,6 +876,7 @@ impl Engine {
         let join = CameraMessage::CamJoin {
             id: id.to_owned(),
             codecs: vec![Codec::Av1, Codec::Vp9],
+            media: true,
         };
         if !signal::send(&ctx, &[sharer], &join) {
             return Err(failed("cam-join not sent"));
