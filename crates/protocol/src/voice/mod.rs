@@ -386,6 +386,11 @@ impl Worker {
     }
 
     fn on_tunnel(&mut self, data: &[u8]) {
+        // Tunnelled frames are only bounded by the control frame limit, not by the UDP packet size.
+        if data.len() > MAX_PACKET {
+            tracing::debug!("dropping oversized tunnelled voice packet");
+            return;
+        }
         match packet::decode(self.format, data) {
             Some(Incoming::Audio(audio)) => self.emit_audio(audio, Transport::Tcp),
             Some(Incoming::Ping(_)) => {}
