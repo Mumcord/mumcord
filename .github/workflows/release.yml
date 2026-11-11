@@ -4,8 +4,8 @@ name: Release
 # tag is a version and points to a commit on main (a release candidate `vX.Y.Z-rc.N`: a commit on
 # milestone/X.Y.Z, released as a pre-release that never becomes "Latest"), sets that version in all manifests of each
 # build (scripts/set-version.sh), builds and smoke-tests the bundles (build-and-smoke.yml), and
-# creates a DRAFT GitHub Release with the bundles, one SBOM per bundle type and SHA256SUMS. The
-# maintainer reviews and publishes it by hand. See RELEASING.md.
+# creates a DRAFT GitHub Release with the bundles, one SBOM per bundle type, SHA256SUMS and the
+# signed build provenance (mumcord-X.Y.Z.intoto.jsonl). The maintainer reviews and publishes it by hand. See RELEASING.md.
 on:
   push:
     tags: ["v*"]
@@ -258,7 +258,7 @@ jobs:
             - Any distribution: \`*.AppImage\` (make it executable, then run it)
           - **FreeBSD 15.x (amd64)**: \`mumcord-$VERSION.pkg\` (\`sudo pkg add ./mumcord-$VERSION.pkg\`). Updates come with \`pkg upgrade\`, the app never updates itself. Not available there: camera and AI backgrounds, in-game overlay, screen-share sound, window picker, protected (DRM) video. Screen sharing captures the whole X11 screen. Intel graphics need \`drm-66-kmod\`, and real-time audio needs the \`realtime\` group (\`pkg info -D mumcord\`).
 
-          Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`. Each package type has a software bill of materials (SBOM, CycloneDX JSON) that lists its Rust crates, npm packages and bundled native libraries: \`mumcord-$VERSION-<platform>.cdx.json\` (\`windows-x86_64\` covers the installer and the portable zip, which carry the same \`Mumcord.exe\`). The files are attested by GitHub (\`gh attestation verify <file> --repo Mumcord/mumcord\`).
+          Check a download with \`sha256sum -c SHA256SUMS --ignore-missing\`. Each package type has a software bill of materials (SBOM, CycloneDX JSON) that lists its Rust crates, npm packages and bundled native libraries: \`mumcord-$VERSION-<platform>.cdx.json\` (\`windows-x86_64\` covers the installer and the portable zip, which carry the same \`Mumcord.exe\`). The files are attested by GitHub (\`gh attestation verify <file> --repo Mumcord/mumcord\`); the signed attestation is also attached as \`mumcord-$VERSION.intoto.jsonl\` for offline checks (\`gh attestation verify <file> --repo Mumcord/mumcord --bundle mumcord-$VERSION.intoto.jsonl\`).
 
           > [!$callout]
           > $windows_note
@@ -295,9 +295,21 @@ jobs:
 
       # Signed provenance: proves each file listed in SHA256SUMS was built by this workflow run.
       - name: Attest build provenance
+        id: attest
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-checksums: dist/SHA256SUMS
+
+      # The same signed attestation (a Sigstore bundle as one JSON line) as a release asset, so it
+      # can be checked offline and OpenSSF Scorecard finds provenance (it looks for *.intoto.jsonl).
+      # It is not listed in SHA256SUMS: it is made from that list, and its own signature protects it.
+      - name: Attach provenance file
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          VERSION: ${{ needs.guard.outputs.version }}
+        run: |
+          test -s "$BUNDLE"
+          cp -- "$BUNDLE" "dist/mumcord-$VERSION.intoto.jsonl"
 
       - name: Create draft release
         env:
@@ -317,7 +329,7 @@ jobs:
           fi
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft "${kind[@]}" \
             --title "$title" --notes-file notes.md --generate-notes \
-            dist/*.AppImage dist/*.deb dist/*.rpm dist/*.pkg dist/*-setup.exe dist/*-portable.zip dist/*.dmg dist/*.app.tar.gz dist/*.sig dist/latest.json dist/*.cdx.json dist/install.sh dist/SHA256SUMS
+            dist/*.AppImage dist/*.deb dist/*.rpm dist/*.pkg dist/*-setup.exe dist/*-portable.zip dist/*.dmg dist/*.app.tar.gz dist/*.sig dist/latest.json dist/*.cdx.json dist/install.sh dist/SHA256SUMS dist/*.intoto.jsonl
 
   # After the draft exists, so a failed build never leaves a crate on crates.io without a
   # release (published versions cannot be removed). Pre-releases are skipped inside the workflow.
