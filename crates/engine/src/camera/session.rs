@@ -229,6 +229,8 @@ struct Live {
     id: BroadcastId,
     publisher: Publisher,
     viewers: CameraViewers,
+    /// The broadcast uses the Bovnar media profile.
+    media: bool,
 }
 
 pub(super) struct Own {
@@ -489,6 +491,7 @@ impl Engine {
             };
             let started = opened.and_then(|(id, me, link, limit)| {
                 let frames = own.send.take_frames().ok_or(CameraFailure::Busy)?;
+                let media = link.is_media();
                 let on_end: OnEnd = Box::new(move |end| {
                     tracing::info!(?end, "camera broadcast ended");
                     if let Some(engine) = weak.upgrade() {
@@ -504,6 +507,7 @@ impl Engine {
                     id,
                     publisher,
                     viewers: CameraViewers::new(limit),
+                    media,
                 })
             });
             match started {
@@ -607,10 +611,23 @@ impl Engine {
 
     /// A viewer asked to join the own camera `id` (FR-8.47). Same channel, not blocked and
     /// the join rate were checked on arrival.
-    fn camera_join(&self, ctx: &SessionCtx, viewer: u32, id: &str, codecs: &[Codec]) {
+    fn camera_join(&self, ctx: &SessionCtx, viewer: u32, id: &str, codecs: &[Codec], media: bool) {
         let Some(hash) = cert_hash(ctx, viewer) else {
             return;
         };
+        let needs_update = {
+            let cameras = lock(self.camera_state());
+            cameras
+                .own
+                .as_ref()
+                .and_then(|own| own.live.as_ref())
+                .filter(|live| broadcast_hex(live.id) == id)
+                .is_some_and(|live| live.media && !media)
+        };
+        if needs_update {
+            signal::send(ctx, &[viewer], &CameraMessage::Needs { id: id.to_owned() });
+            return;
+        }
         let broadcast = {
             let mut cameras = lock(self.camera_state());
             let Some(own) = cameras.own.as_mut() else {
@@ -817,8 +834,10 @@ pub(crate) fn on_plugin_data(
         return;
     };
     match event.message {
-        CameraMessage::CamJoin { id, codecs, .. } => {
-            engine.camera_join(ctx, event.sender, &id, &codecs);
+        CameraMessage::CamJoin {
+            id, codecs, media, ..
+        } => {
+            engine.camera_join(ctx, event.sender, &id, &codecs, media);
         }
         CameraMessage::CamLeave { id } => {
             if let Some(live) = engine.camera_watched_by(ctx.server_id, event.sender)
