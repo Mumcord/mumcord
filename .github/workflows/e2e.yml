@@ -46,7 +46,7 @@ jobs:
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: scripts/ci
       - id: filter
@@ -76,7 +76,7 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           df -h /
 
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The version the app shows (RELEASING.md); the manifests keep the last release's version.
       - name: Set display version
@@ -104,18 +104,18 @@ jobs:
 
       # Cargo registry + target dir of the in-container build.
       - id: target-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}-${{ steps.keys.outputs.week }}
           restore-keys: e2e-
 
-      - uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       # Only a push writes the image cache: a merged pull-request run can still report
       # refs/heads/main, but its token cannot write cache entries.
       - name: Build image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: e2e
           tags: mumcord-e2e
@@ -139,7 +139,7 @@ jobs:
         run: echo "$TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
 
       - if: steps.registry.outputs.image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: e2e
           target: runtime
@@ -157,7 +157,7 @@ jobs:
           CARGO_INCREMENTAL: 0
 
       - if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.target-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
           key: ${{ steps.target-cache.outputs.cache-primary-key }}
@@ -181,7 +181,7 @@ jobs:
           ls -lh e2e-*.tar.zst
 
       - if: github.event_name != 'push'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-build
           # A re-run of the same run must replace the first attempt's artifact, otherwise the
@@ -208,15 +208,16 @@ jobs:
       CARGO_PROFILE_DEV_DEBUG: 0
       CARGO_INCREMENTAL: 0
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The safety fixture builder and the test plugins need the wasm32 target of the workspace
       # toolchain.
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
+          toolchain: stable
           targets: wasm32-unknown-unknown
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           key: e2e-plugins
           # `mumcord-plugin build` puts each test plugin's target dir next to its sources.
@@ -232,7 +233,7 @@ jobs:
         run: tar -C "$RUNNER_TEMP/plugins" -cf - bin staged packages | zstd -T0 -3 -q -o e2e-plugins.tar.zst
 
       - if: github.event_name != 'push'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-plugins
           overwrite: true
@@ -252,14 +253,14 @@ jobs:
     timeout-minutes: 30
     steps:
       - id: cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: e2e-relay-images.tar.zst
           key: e2e-relay-images-${{ env.MUMPEER_REF }}-${{ env.MUMBOT_REF }}
 
       - name: Check out mumpeer
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Mumcord/mumpeer
           ref: ${{ env.MUMPEER_REF }}
@@ -268,7 +269,7 @@ jobs:
 
       - name: Check out mumbot
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Mumcord/mumbot
           ref: ${{ env.MUMBOT_REF }}
@@ -286,13 +287,13 @@ jobs:
           ls -lh e2e-relay-images.tar.zst
 
       - if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: e2e-relay-images.tar.zst
           key: ${{ steps.cache.outputs.cache-primary-key }}
 
       - if: github.event_name != 'push'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-relay-images
           overwrite: true
@@ -322,15 +323,15 @@ jobs:
         # Must match the number of shards in e2e/shards.json (scripts/e2e-shards.js).
         shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: ./.github/actions/npm-ci
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: e2e-build
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: e2e-plugins
 
@@ -373,7 +374,7 @@ jobs:
       # it into the E2E container through MUMPEER_DIR.
       - name: Check out mumpeer (relay testenv)
         if: steps.relay.outputs.needed == 'true'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Mumcord/mumpeer
           ref: ${{ env.MUMPEER_REF }}
@@ -381,7 +382,7 @@ jobs:
           persist-credentials: false
 
       - if: steps.relay.outputs.needed == 'true'
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: e2e-relay-images
 
@@ -417,7 +418,7 @@ jobs:
       # Per-spec durations for scripts/e2e-shards.js --measure (written by wdio.conf.ts).
       - name: Upload spec durations
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-durations-shard-${{ matrix.shard }}
           overwrite: true
@@ -429,7 +430,7 @@ jobs:
       # image diff, so a person compares them.
       - name: Upload mockup screenshots
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-mockup-shots-shard-${{ matrix.shard }}
           path: e2e/artifacts/mockup-shots/
@@ -438,7 +439,7 @@ jobs:
 
       - name: Upload failure artifacts
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-artifacts-shard-${{ matrix.shard }}
           path: e2e/artifacts/

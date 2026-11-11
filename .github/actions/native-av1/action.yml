@@ -18,13 +18,13 @@ runs:
         } >> "$GITHUB_OUTPUT"
 
     - id: svt-av1
-      uses: actions/cache/restore@v6
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/svt-av1
         key: ${{ steps.key.outputs.svt-av1 }}
 
     - id: dav1d
-      uses: actions/cache/restore@v6
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/dav1d
         key: ${{ steps.key.outputs.dav1d }}
@@ -32,7 +32,7 @@ runs:
     # macOS has no AV1 or VP9 hardware encoder (scripts/build-hwenc-sdk.sh).
     - id: hwenc
       if: runner.os != 'macOS'
-      uses: actions/cache/restore@v6
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/hwenc-sdk
         key: ${{ steps.key.outputs.hwenc }}
@@ -74,19 +74,19 @@ runs:
 
     # Only main saves: branch caches would evict main's from the 10 GB repository limit.
     - if: steps.svt-av1.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-      uses: actions/cache/save@v6
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/svt-av1
         key: ${{ steps.svt-av1.outputs.cache-primary-key }}
 
     - if: steps.dav1d.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-      uses: actions/cache/save@v6
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/dav1d
         key: ${{ steps.dav1d.outputs.cache-primary-key }}
 
     - if: runner.os != 'macOS' && steps.hwenc.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-      uses: actions/cache/save@v6
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/hwenc-sdk
         key: ${{ steps.hwenc.outputs.cache-primary-key }}

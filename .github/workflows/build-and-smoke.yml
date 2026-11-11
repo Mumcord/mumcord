@@ -91,12 +91,12 @@ jobs:
     # which accepts only version tags, so no other workflow run can read them.
     environment: ${{ (inputs.release && (matrix.name == 'windows' || matrix.name == 'macos')) && 'release' || '' }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Releases bundle the notices release.yml regenerated from the tagged commit.
       - name: Use the regenerated third-party notices
         if: inputs.release
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: third-party-notices
 
@@ -110,7 +110,7 @@ jobs:
       - name: Restore apt packages
         id: apt-cache
         if: runner.os == 'Linux'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -132,7 +132,7 @@ jobs:
 
       - name: Save apt packages
         if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -155,7 +155,7 @@ jobs:
 
       - name: Restore static libvpx
         id: libvpx-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -170,7 +170,7 @@ jobs:
 
       - name: Save static libvpx
         if: steps.libvpx-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -197,14 +197,16 @@ jobs:
       - name: Native AV1 libraries
         uses: ./.github/actions/native-av1
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: release
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm
@@ -485,7 +487,7 @@ jobs:
           LIBVPX_VERSION: ${{ runner.os == 'Windows' && steps.libvpx.outputs.version || '' }}
         run: scripts/sbom-native.sh "$LIBVPX_VERSION" > "sbom-native-${{ matrix.name }}.txt"
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: inputs.release
         with:
           name: sbom-native-${{ matrix.name }}
@@ -518,7 +520,7 @@ jobs:
           EOF
           ls -l out
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mumcord-${{ matrix.name }}-${{ inputs.release && 'release' || 'unsigned-test-build' }}
           path: out/
@@ -610,9 +612,9 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: mumcord-${{ matrix.name }}-${{ inputs.release && 'release' || 'unsigned-test-build' }}
           path: build
@@ -629,7 +631,7 @@ jobs:
       - name: Restore apt packages
         id: apt-cache-smoke
         if: runner.os == 'Linux'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
@@ -659,7 +661,7 @@ jobs:
 
       - name: Save apt packages
         if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache-smoke.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
@@ -695,7 +697,7 @@ jobs:
       - name: Cache Mumble server (macOS)
         if: runner.os == 'macOS'
         id: server-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/mumble-server
           key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}
@@ -718,7 +720,7 @@ jobs:
 
       - name: Save Mumble server (macOS)
         if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main' && steps.server-build.outcome == 'success'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/mumble-server
           key: ${{ steps.server-cache.outputs.cache-primary-key }}
@@ -741,9 +743,11 @@ jobs:
 
       # --- Smoke helpers ---------------------------------------------------------------------
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: smoke
@@ -756,7 +760,7 @@ jobs:
 
       # The archive name carries the version, so a bump in scripts/mumbot.env misses the cache.
       - id: mumbot-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/mumbot
           key: mumbot-${{ matrix.mumbot }}-${{ hashFiles('scripts/mumbot.env') }}
@@ -765,7 +769,7 @@ jobs:
         run: scripts/fetch-mumbot.sh ${{ matrix.mumbot }} "$RUNNER_TEMP/mumbot"
 
       - if: steps.mumbot-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/mumbot
           key: ${{ steps.mumbot-cache.outputs.cache-primary-key }}

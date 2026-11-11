@@ -27,7 +27,7 @@ jobs:
       version: ${{ steps.check.outputs.version }}
       prerelease: ${{ steps.check.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # Full history, so the tagged commit can be checked against main.
           fetch-depth: 0
@@ -62,14 +62,15 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read tool versions
         id: tools
         run: grep '^[A-Z_]*=' scripts/license-tools.env >> "$GITHUB_OUTPUT"
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
+          toolchain: stable
           # The FreeBSD package's SBOM is resolved from this Linux runner (spec 13 §10).
           targets: x86_64-unknown-freebsd
 
@@ -79,7 +80,7 @@ jobs:
           version: ${{ steps.tools.outputs.CARGO_ABOUT_VERSION }}
           features: cli
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm
@@ -90,7 +91,7 @@ jobs:
       - name: Generate notices
         run: scripts/generate-notices.sh
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: third-party-notices
           path: |
@@ -118,24 +119,26 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read tool versions
         id: tools
         run: grep '^[A-Z_]*=' scripts/license-tools.env >> "$GITHUB_OUTPUT"
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
 
       - uses: ./.github/actions/cargo-tool
         with:
           crate: cargo-cyclonedx
           version: ${{ steps.tools.outputs.CARGO_CYCLONEDX_VERSION }}
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: sbom-native-*
           path: native
@@ -153,7 +156,7 @@ jobs:
           VERSION: ${{ needs.guard.outputs.version }}
         run: scripts/generate-sbom.sh "$VERSION" native sbom
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mumcord-sbom
           path: sbom/
@@ -176,7 +179,7 @@ jobs:
     steps:
       # The curl installer, which is published with each release (FR-2.54), and the changelog for the
       # release notes.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: |
             scripts/install.sh
@@ -187,14 +190,14 @@ jobs:
             CHANGELOG.md
           sparse-checkout-cone-mode: false
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: mumcord-*-release
           path: dist
           merge-multiple: true
 
       - name: Download SBOMs
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: mumcord-sbom
           path: dist
@@ -292,7 +295,7 @@ jobs:
 
       # Signed provenance: proves each file listed in SHA256SUMS was built by this workflow run.
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-checksums: dist/SHA256SUMS
 
