@@ -14,7 +14,8 @@
     "relayDisallows": "Il relay di questo server non consente la condivisione della fotocamera.",
     "needsRelayMode": "La condivisione della fotocamera è disattivata. Modificalo in Privacy e connessioni.",
     "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
-    "registeredOnly": "Su questo server solo gli utenti registrati possono usare la fotocamera."
+    "registeredOnly": "Su questo server solo gli utenti registrati possono usare la fotocamera.",
+    "needsDirect": "La condivisione della fotocamera richiede connessioni dirette. Modificalo in Privacy e connessioni."
   },
   "cameraOnTray": "Fotocamera attiva",
   "turnOffTray": "Disattiva la fotocamera",

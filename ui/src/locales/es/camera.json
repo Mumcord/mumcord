@@ -14,7 +14,8 @@
     "relayDisallows": "El relé de este servidor no permite compartir la cámara.",
     "needsRelayMode": "Compartir la cámara está desactivado. Cámbialo en Privacidad y conexiones.",
     "noCertificate": "Compartir la cámara necesita un certificado de cliente.",
-    "registeredOnly": "Solo los usuarios registrados pueden usar la cámara en este servidor."
+    "registeredOnly": "Solo los usuarios registrados pueden usar la cámara en este servidor.",
+    "needsDirect": "Compartir la cámara necesita conexiones directas. Cámbialo en Privacidad y conexiones."
   },
   "cameraOnTray": "Cámara activada",
   "turnOffTray": "Desactivar la cámara",

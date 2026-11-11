@@ -14,7 +14,8 @@
     "relayDisallows": "Šī servera relejs neļauj kopīgot kameru.",
     "needsRelayMode": "Kameras kopīgošana ir izslēgta. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
-    "registeredOnly": "Šajā serverī kameru drīkst izmantot tikai reģistrēti lietotāji."
+    "registeredOnly": "Šajā serverī kameru drīkst izmantot tikai reģistrēti lietotāji.",
+    "needsDirect": "Kameras kopīgošanai nepieciešami tiešie savienojumi. Maini to sadaļā Privātums un savienojumi."
   },
   "cameraOnTray": "Kamera ieslēgta",
   "turnOffTray": "Izslēgt kameru",

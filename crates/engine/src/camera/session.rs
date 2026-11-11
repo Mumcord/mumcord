@@ -28,7 +28,7 @@ use mumcord_p2p::{
     BroadcastEnd, BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken,
 };
 use mumcord_protocol::PluginData;
-use mumcord_store::{P2pMode, ScreenFps, ScreenOptimize, ScreenResolution};
+use mumcord_store::{Consent, P2pMode, ScreenFps, ScreenOptimize, ScreenResolution};
 use tokio::sync::oneshot;
 
 use super::admit::{CameraPath, CameraViewer, CameraViewers, Join, MAX_VIEWERS};
@@ -554,11 +554,16 @@ impl Engine {
     /// The paths of FR-8.94 on `server_id`, or why no path is left.
     fn camera_paths(&self, server_id: ServerId) -> Result<Paths, CameraFailure> {
         let relay = self.relays().info(server_id);
-        let mode = self.p2p_mode_of(server_id);
-        // No path is left in `off` mode and in `relay_only` without a relay that carries cameras
-        // (FR-8.4); availability already refused the entries with that reason.
-        Paths::of(&relay, mode).ok_or_else(|| {
-            if mode == P2pMode::Off {
+        let (mode, consent) = self.p2p_mode_and_consent_of(server_id);
+        let direct_allowed = consent != Consent::No;
+        // No path is left in `off` mode, in `relay_only` without a relay that carries cameras and
+        // with direct connections turned off while only the direct path remains (FR-8.4);
+        // availability already refused the entries with that reason.
+        Paths::of(&relay, mode, direct_allowed).ok_or_else(|| {
+            // The mode `off` and turned-off direct connections are one place in the settings, so
+            // both answer with the mode's text; the availability reason tells them apart in the
+            // UI, which disables the entries before this step is reached (FR-8.4).
+            if mode == P2pMode::Off || !direct_allowed {
                 CameraFailure::Mode
             } else {
                 CameraFailure::from_relay(

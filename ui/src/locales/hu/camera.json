@@ -14,7 +14,8 @@
     "relayDisallows": "Ennek a szervernek az átjátszója nem engedi a kamera megosztását.",
     "needsRelayMode": "A kamera megosztás ki van kapcsolva. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
-    "registeredOnly": "Ezen a szerveren csak regisztrált felhasználók használhatják a kamerát."
+    "registeredOnly": "Ezen a szerveren csak regisztrált felhasználók használhatják a kamerát.",
+    "needsDirect": "A kamera megosztásához közvetlen kapcsolatok kellenek. Módosítsd az Adatvédelem és kapcsolatok alatt."
   },
   "cameraOnTray": "Kamera bekapcsolva",
   "turnOffTray": "Kamera kikapcsolása",

@@ -5,7 +5,7 @@
 //! way the user needs a client certificate and the mode must not be `off`. Only when no path is
 //! left does a reason name why (FR-8.4) — a relay problem alone keeps the camera available.
 
-use mumcord_store::{P2pMode, ServerId};
+use mumcord_store::{Consent, P2pMode, ServerId};
 
 use crate::peer::{RelayInfo, RelayStatus, RelayUse};
 use crate::session::{Engine, EngineEvent};
@@ -28,6 +28,9 @@ pub enum CameraUnavailable {
     NeedsRelayMode,
     /// "Camera sharing needs a client certificate."
     NoCertificate,
+    /// "Camera sharing needs direct connections. Change it in Privacy & Connections." The mode
+    /// leaves only the direct path and the user turned direct connections off (FR-4.3, FR-8.4).
+    NeedsDirect,
 }
 
 /// Whether the relay can carry camera broadcasts at all (FR-8.2): it must be usable, offer
@@ -51,6 +54,7 @@ pub(crate) fn evaluate(
     relay: &RelayInfo,
     mode: P2pMode,
     has_certificate: bool,
+    direct_allowed: bool,
 ) -> Option<CameraUnavailable> {
     // `relay_only` leaves the relay as the only path, so the three relay reasons come first
     // (FR-8.4). Every other mode keeps the direct path, and with it the camera (FR-8.2).
@@ -64,6 +68,11 @@ pub(crate) fn evaluate(
     }
     if !has_certificate {
         return Some(CameraUnavailable::NoCertificate);
+    }
+    // The mode and the relay leave the direct path only, and the user turned it off: there is
+    // nothing left to carry the camera (FR-8.4).
+    if Paths::of(relay, mode, direct_allowed).is_none() {
+        return Some(CameraUnavailable::NeedsDirect);
     }
     None
 }
@@ -85,10 +94,10 @@ impl Paths {
     /// The paths `mode` leaves with this relay, or `None` when neither is left: `relay_only`
     /// never opens a direct stream, `direct_only` never a relay broadcast, `off` uses neither
     /// (FR-8.94).
-    pub(crate) fn of(relay: &RelayInfo, mode: P2pMode) -> Option<Self> {
+    pub(crate) fn of(relay: &RelayInfo, mode: P2pMode, direct_allowed: bool) -> Option<Self> {
         let broadcast = !matches!(mode, P2pMode::DirectOnly | P2pMode::Off)
             && relay_carries_cameras(relay).is_ok();
-        let direct = !matches!(mode, P2pMode::RelayOnly | P2pMode::Off);
+        let direct = direct_allowed && !matches!(mode, P2pMode::RelayOnly | P2pMode::Off);
         (broadcast || direct).then_some(Self {
             relay: broadcast,
             direct,
@@ -102,7 +111,7 @@ impl Engine {
     /// Changes arrive as [`EngineEvent::CameraAvailabilityChanged`].
     pub fn camera_unavailable(&self, server_id: ServerId) -> Option<CameraUnavailable> {
         let relay = self.relays().info(server_id);
-        let mode = self.p2p_mode_of(server_id);
+        let (mode, consent) = self.p2p_mode_and_consent_of(server_id);
         // Before the own user is known nothing says the certificate is missing.
         let has_certificate = self
             .session_ctx_for(server_id)
@@ -114,7 +123,7 @@ impl Engine {
                 })
             })
             .unwrap_or(true);
-        evaluate(&relay, mode, has_certificate)
+        evaluate(&relay, mode, has_certificate, consent != Consent::No)
     }
 
     /// Recomputes the availability of `server_id` and emits the event when it changed. Called
@@ -165,7 +174,7 @@ mod tests {
     }
 
     fn check(relay: &RelayInfo) -> Option<CameraUnavailable> {
-        evaluate(relay, P2pMode::RelayFirst, true)
+        evaluate(relay, P2pMode::RelayFirst, true, true)
     }
 
     #[test]
@@ -177,7 +186,7 @@ mod tests {
             P2pMode::RelayOnly,
             P2pMode::DirectOnly,
         ] {
-            assert_eq!(evaluate(&good(), mode, true), None, "{mode:?}");
+            assert_eq!(evaluate(&good(), mode, true, true), None, "{mode:?}");
         }
     }
 
@@ -202,7 +211,7 @@ mod tests {
         ];
         for relay in &relays {
             assert_eq!(check(relay), None);
-            assert_eq!(evaluate(relay, P2pMode::DirectRelay, true), None);
+            assert_eq!(evaluate(relay, P2pMode::DirectRelay, true, true), None);
         }
     }
 
@@ -210,12 +219,12 @@ mod tests {
     fn relay_only_names_the_relay_problem() {
         let none = RelayInfo::default();
         assert_eq!(
-            evaluate(&none, P2pMode::RelayOnly, true),
+            evaluate(&none, P2pMode::RelayOnly, true, true),
             Some(CameraUnavailable::NoRelay)
         );
         // Every earlier-failing input at once still reports the first reason.
         assert_eq!(
-            evaluate(&none, P2pMode::RelayOnly, false),
+            evaluate(&none, P2pMode::RelayOnly, false, true),
             Some(CameraUnavailable::NoRelay)
         );
         for status in [
@@ -227,7 +236,7 @@ mod tests {
         ] {
             let relay = RelayInfo { status, ..good() };
             assert_eq!(
-                evaluate(&relay, P2pMode::RelayOnly, true),
+                evaluate(&relay, P2pMode::RelayOnly, true, true),
                 Some(CameraUnavailable::NoRelay)
             );
         }
@@ -240,7 +249,7 @@ mod tests {
             ..good()
         };
         assert_eq!(
-            evaluate(&relay, P2pMode::RelayOnly, true),
+            evaluate(&relay, P2pMode::RelayOnly, true, true),
             Some(CameraUnavailable::RelayTooOld)
         );
         let old_bot = RelayInfo {
@@ -249,7 +258,7 @@ mod tests {
             ..good()
         };
         assert_eq!(
-            evaluate(&old_bot, P2pMode::RelayOnly, true),
+            evaluate(&old_bot, P2pMode::RelayOnly, true, true),
             Some(CameraUnavailable::RelayTooOld)
         );
     }
@@ -261,7 +270,7 @@ mod tests {
             ..good()
         };
         assert_eq!(
-            evaluate(&relay, P2pMode::RelayOnly, true),
+            evaluate(&relay, P2pMode::RelayOnly, true, true),
             Some(CameraUnavailable::RelayDisallows)
         );
     }
@@ -269,18 +278,18 @@ mod tests {
     #[test]
     fn an_old_relay_still_serves_relay_only() {
         // The old-format broadcast serves 0.8.x viewers as today (FR-8.94).
-        assert_eq!(evaluate(&old(), P2pMode::RelayOnly, true), None);
+        assert_eq!(evaluate(&old(), P2pMode::RelayOnly, true, true), None);
     }
 
     #[test]
     fn the_mode_off_is_the_fourth_reason() {
         assert_eq!(
-            evaluate(&good(), P2pMode::Off, true),
+            evaluate(&good(), P2pMode::Off, true, true),
             Some(CameraUnavailable::NeedsRelayMode)
         );
         // A relay problem does not hide the mode's own reason.
         assert_eq!(
-            evaluate(&RelayInfo::default(), P2pMode::Off, true),
+            evaluate(&RelayInfo::default(), P2pMode::Off, true, true),
             Some(CameraUnavailable::NeedsRelayMode)
         );
     }
@@ -294,20 +303,42 @@ mod tests {
             P2pMode::RelayOnly,
         ] {
             assert_eq!(
-                evaluate(&good(), mode, false),
+                evaluate(&good(), mode, false, true),
                 Some(CameraUnavailable::NoCertificate),
                 "{mode:?}"
             );
         }
         assert_eq!(
-            evaluate(&good(), P2pMode::Off, false),
+            evaluate(&good(), P2pMode::Off, false, true),
             Some(CameraUnavailable::NeedsRelayMode)
         );
     }
 
+    #[test]
+    fn the_consent_names_the_reason_when_the_direct_path_is_the_only_one() {
+        // `direct_only` with direct connections turned off leaves nothing (FR-4.3, FR-8.4).
+        assert_eq!(
+            evaluate(&good(), P2pMode::DirectOnly, true, false),
+            Some(CameraUnavailable::NeedsDirect)
+        );
+        // The same holds for a mode that falls back to direct while no relay can carry a camera.
+        assert_eq!(
+            evaluate(&RelayInfo::default(), P2pMode::RelayFirst, true, false),
+            Some(CameraUnavailable::NeedsDirect)
+        );
+        // A missing certificate is the earlier reason, and the relay path is unaffected.
+        assert_eq!(
+            evaluate(&good(), P2pMode::DirectOnly, false, false),
+            Some(CameraUnavailable::NoCertificate)
+        );
+        assert_eq!(evaluate(&good(), P2pMode::RelayFirst, true, false), None);
+        assert_eq!(evaluate(&good(), P2pMode::RelayOnly, true, false), None);
+        assert_eq!(evaluate(&old(), P2pMode::RelayOnly, true, false), None);
+    }
+
     /// The paths as `(relay, direct, media)`.
     fn paths(relay: &RelayInfo, mode: P2pMode) -> Option<(bool, bool, bool)> {
-        Paths::of(relay, mode).map(|p| (p.relay, p.direct, p.media))
+        Paths::of(relay, mode, true).map(|p| (p.relay, p.direct, p.media))
     }
 
     #[test]
@@ -362,5 +393,15 @@ mod tests {
         // `relay_only` and `off` leave no path at all (FR-8.4).
         assert_eq!(paths(&none, P2pMode::RelayOnly), None);
         assert_eq!(paths(&good(), P2pMode::Off), None);
+        // Turned-off direct connections take the direct path away and leave the relay broadcast.
+        assert_eq!(
+            Paths::of(&good(), P2pMode::RelayFirst, false).map(|p| (p.relay, p.direct, p.media)),
+            Some((true, false, true))
+        );
+        assert_eq!(Paths::of(&good(), P2pMode::DirectOnly, false), None);
+        assert_eq!(
+            Paths::of(&RelayInfo::default(), P2pMode::RelayFirst, false),
+            None
+        );
     }
 }

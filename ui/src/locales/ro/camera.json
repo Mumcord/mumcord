@@ -14,7 +14,8 @@
     "relayDisallows": "Releul acestui server nu permite partajarea camerei.",
     "needsRelayMode": "Partajarea camerei este oprită. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
-    "registeredOnly": "Pe acest server doar utilizatorii înregistrați pot folosi camera."
+    "registeredOnly": "Pe acest server doar utilizatorii înregistrați pot folosi camera.",
+    "needsDirect": "Partajarea camerei are nevoie de conexiuni directe. Schimbă asta în Confidențialitate și conexiuni."
   },
   "cameraOnTray": "Cameră pornită",
   "turnOffTray": "Oprește camera",

@@ -308,6 +308,7 @@ pub enum CameraUnavailable {
     RelayDisallows,
     NeedsRelayMode,
     NoCertificate,
+    NeedsDirect,
 }
 
 impl From<camera::avail::CameraUnavailable> for CameraUnavailable {
@@ -319,6 +320,7 @@ impl From<camera::avail::CameraUnavailable> for CameraUnavailable {
             R::RelayDisallows => Self::RelayDisallows,
             R::NeedsRelayMode => Self::NeedsRelayMode,
             R::NoCertificate => Self::NoCertificate,
+            R::NeedsDirect => Self::NeedsDirect,
         }
     }
 }

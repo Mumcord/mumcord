@@ -14,7 +14,8 @@
     "relayDisallows": "O retransmissor deste servidor não permite a partilha de câmara.",
     "needsRelayMode": "A partilha de câmara está desativada. Altera-o em Privacidade e ligações.",
     "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
-    "registeredOnly": "Neste servidor só utilizadores registados podem usar a câmara."
+    "registeredOnly": "Neste servidor só utilizadores registados podem usar a câmara.",
+    "needsDirect": "A partilha de câmara precisa de ligações diretas. Altera-o em Privacidade e ligações."
   },
   "cameraOnTray": "Câmara ligada",
   "turnOffTray": "Desligar a câmara",

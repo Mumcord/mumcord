@@ -14,7 +14,8 @@
     "relayDisallows": "Le relais de ce serveur n'autorise pas le partage de caméra.",
     "needsRelayMode": "Le partage de caméra est désactivé. Modifiez-le dans Confidentialité et connexions.",
     "noCertificate": "Le partage de caméra nécessite un certificat client.",
-    "registeredOnly": "Seuls les utilisateurs enregistrés peuvent utiliser la caméra sur ce serveur."
+    "registeredOnly": "Seuls les utilisateurs enregistrés peuvent utiliser la caméra sur ce serveur.",
+    "needsDirect": "Le partage de caméra nécessite des connexions directes. Modifiez-le dans Confidentialité et connexions."
   },
   "cameraOnTray": "Caméra activée",
   "turnOffTray": "Désactiver la caméra",

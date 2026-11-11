@@ -14,7 +14,8 @@
     "relayDisallows": "De relay van deze server staat camera delen niet toe.",
     "needsRelayMode": "Camera delen staat uit. Wijzig dit in Privacy en verbindingen.",
     "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
-    "registeredOnly": "Alleen geregistreerde gebruikers mogen de camera op deze server gebruiken."
+    "registeredOnly": "Alleen geregistreerde gebruikers mogen de camera op deze server gebruiken.",
+    "needsDirect": "Camera delen heeft directe verbindingen nodig. Wijzig dit in Privacy en verbindingen."
   },
   "cameraOnTray": "Camera aan",
   "turnOffTray": "Camera uitzetten",

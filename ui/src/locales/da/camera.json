@@ -14,7 +14,8 @@
     "relayDisallows": "Denne servers relæ tillader ikke kameradeling.",
     "needsRelayMode": "Kameradeling er slået fra. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
-    "registeredOnly": "Kun registrerede brugere må bruge kameraet på denne server."
+    "registeredOnly": "Kun registrerede brugere må bruge kameraet på denne server.",
+    "needsDirect": "Kameradeling kræver direkte forbindelser. Ændr det under Privatliv og forbindelser."
   },
   "cameraOnTray": "Kamera tændt",
   "turnOffTray": "Sluk kamera",
