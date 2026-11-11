@@ -60,16 +60,16 @@
 | R5 | mumpeer: new format, routing, description cache | done — `4b94be6` on `sothis/mumpeer`, PR #17 | P0.3, W1, W2 | complex |
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
 | E1 | Packet inspector: description, channels, format | open | D1, R2 | complex |
-| E2 | UI texts and 24 locales for fallback paths | open | D4, D6 | simple |
+| E2 | UI texts and 24 locales for fallback paths | partial — `8f8a516b`: screen-share fallbacks in 24 locales; camera texts wait for D6 | D4, D6 | simple |
 | E3 | Notices and licences for Bovnar 2.1.0 | open | – | simple |
 | E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
 then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4 and R1–R6 are done;
-E2 (24 locales) and E4 (acceptance run) are next. The engine dev-dependency temporarily points
-at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the 0.9.0 tag exists. E3 can run at any
-time.
+E2 has the screen-share fallbacks and needs the camera texts after D6. D5/D6 and E4 remain. The
+engine dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until
+the 0.9.0 tag exists. E3 can run at any time.
 
 ---
 
