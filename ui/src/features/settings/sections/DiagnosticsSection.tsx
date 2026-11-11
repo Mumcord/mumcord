@@ -5,7 +5,6 @@ import { Select } from "../../../components/Select";
 import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { errorText } from "../errors";
-import { pickSavePath } from "../fileDialogs";
 import { installLine, missingPackages, probeCodecs } from "../../watchparty/codecSupport";
 import { useHintPlatform } from "../../watchparty/useHintPlatform";
 import { useAppInfo } from "../useAppInfo";
@@ -25,13 +24,14 @@ export function DiagnosticsCard({ settings, update }: SettingsSectionProps) {
   const save = async () => {
     setStatus(null);
     try {
-      const path = await pickSavePath(
-        "mumcord-diagnostics.txt",
-        { name: t("diagnostics.fileType"), extensions: ["txt"] },
-        t("diagnostics.save"),
-      );
-      if (path === null) return;
-      await getApi().diagnosticsSave(path);
+      // The engine opens the save dialog itself and writes only where the user chose.
+      const saved = await getApi().diagnosticsSave({
+        title: t("diagnostics.save"),
+        defaultName: "mumcord-diagnostics.txt",
+        filterName: t("diagnostics.fileType"),
+        extensions: ["txt"],
+      });
+      if (!saved) return;
       setStatus({ kind: "success", text: t("diagnostics.saved") });
     } catch (error: unknown) {
       console.error("Saving the diagnostic file failed", error);

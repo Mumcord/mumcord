@@ -9,7 +9,6 @@ import {
 } from "../../../api";
 import { Select } from "../../../components/Select";
 import { ConfirmDialog } from "../../settings/components/ConfirmDialog";
-import { pickSavePath } from "../../settings/fileDialogs";
 import { DetailSection, OwnCode, PluginPlaces, PluginScoreCard } from "../browse/PluginDetails";
 import { usePluginScore } from "../browse/usePluginScore";
 import "../browse/details.css";
@@ -95,13 +94,18 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
   const exportData = () =>
     void run(async () => {
       setNotice(null);
-      const path = await pickSavePath(
-        `${plugin.id}-data.json`,
-        { name: t("export.filter"), extensions: ["json"] },
-        t("export.title", { name }),
+      const data = await getApi().pluginExportData(plugin.id);
+      // The engine opens the save dialog itself and writes only where the user chose.
+      const saved = await getApi().saveText(
+        {
+          title: t("export.title", { name }),
+          defaultName: `${plugin.id}-data.json`,
+          filterName: t("export.filter"),
+          extensions: ["json"],
+        },
+        data,
       );
-      if (path === null) return;
-      await getApi().saveText(path, await getApi().pluginExportData(plugin.id));
+      if (!saved) return;
       setNotice(t("export.done"));
     }, "errors.export");
 

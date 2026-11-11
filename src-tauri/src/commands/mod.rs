@@ -20,6 +20,7 @@ pub mod crash;
 pub mod diagnostics;
 pub mod dnd;
 pub mod dropped;
+pub mod file_dialog;
 pub mod files;
 pub mod follow;
 pub mod friends;

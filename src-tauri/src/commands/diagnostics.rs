@@ -1,11 +1,11 @@
 //! Diagnostic file and About information (FR-1.39, FR-1.40).
 
-use std::path::Path;
-
 use mumcord_engine::diag;
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use tauri::WebviewWindow;
 
+use super::file_dialog::{SaveDialog, pick_save_path};
 use super::types::{ApiError, ApiResult, ErrorCode};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -104,17 +104,22 @@ pub struct LinuxDistro {
     pub id_like: Vec<String>,
 }
 
-/// Writes the diagnostic file (no chat contents, passwords, certificates or personal data).
+/// Asks where to save the diagnostic file (no chat contents, passwords, certificates or
+/// personal data) and writes it there. Returns false when the user cancelled the save dialog.
 #[tauri::command]
 #[specta::specta]
-pub fn diagnostics_save(path: String) -> ApiResult<()> {
+pub async fn diagnostics_save(window: WebviewWindow, dialog: SaveDialog) -> ApiResult<bool> {
+    let Some(path) = pick_save_path(&window, dialog).await? else {
+        return Ok(false);
+    };
     let info = diag::collect_info(crate::version::DISPLAY);
-    diag::save_diagnostic_file(Path::new(&path), &info).map_err(|e| {
+    diag::save_diagnostic_file(&path, &info).map_err(|e| {
         ApiError::new(
             ErrorCode::Io,
             format!("writing diagnostic file failed: {e}"),
         )
-    })
+    })?;
+    Ok(true)
 }
 
 #[tauri::command]

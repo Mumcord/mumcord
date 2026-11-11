@@ -30,26 +30,30 @@ pub const MAX_DROPPED_BYTES: u64 = 25 * 1024 * 1024;
 /// How long a dropped path stays readable; the UI reads it right after the drop.
 const ALLOW_FOR: Duration = Duration::from_secs(60);
 
-/// Paths of the most recent drops and pastes with the time they were dropped or pasted.
+/// How long a dropped or picked path may become an attachment chip. Longer than `ALLOW_FOR`:
+/// a dropped image first asks "Send as image" or "Share as file", and the user may take a while.
+const ATTACH_FOR: Duration = Duration::from_secs(10 * 60);
+
+/// Paths the user just handed over, each with the time it was handed over.
 #[derive(Default)]
-pub struct DroppedFiles {
+struct Allowlist {
     allowed: Mutex<HashMap<PathBuf, Instant>>,
 }
 
-impl DroppedFiles {
-    fn allow(&self, paths: &[PathBuf], now: Instant) {
+impl Allowlist {
+    fn allow(&self, paths: &[PathBuf], now: Instant, ttl: Duration) {
         let mut allowed = self.lock();
-        allowed.retain(|_, at| now.duration_since(*at) < ALLOW_FOR);
+        allowed.retain(|_, at| now.duration_since(*at) < ttl);
         for path in paths {
             allowed.insert(path.clone(), now);
         }
     }
 
-    /// Removes `path` from the list; true when it was dropped recently.
-    fn take(&self, path: &Path, now: Instant) -> bool {
+    /// Removes `path` from the list; true when it was allowed less than `ttl` ago.
+    fn take(&self, path: &Path, now: Instant, ttl: Duration) -> bool {
         self.lock()
             .remove(path)
-            .is_some_and(|at| now.duration_since(at) < ALLOW_FOR)
+            .is_some_and(|at| now.duration_since(at) < ttl)
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, HashMap<PathBuf, Instant>> {
@@ -60,13 +64,45 @@ impl DroppedFiles {
     }
 }
 
+/// Paths of the most recent drops and pastes, which the UI may read as images, and of drops
+/// and file-picker choices, which the UI may turn into attachment chips. Each is usable once.
+#[derive(Default)]
+pub struct DroppedFiles {
+    readable: Allowlist,
+    attachable: Allowlist,
+}
+
+impl DroppedFiles {
+    fn allow(&self, paths: &[PathBuf], now: Instant) {
+        self.readable.allow(paths, now, ALLOW_FOR);
+    }
+
+    /// Removes `path` from the list; true when it was dropped recently.
+    fn take(&self, path: &Path, now: Instant) -> bool {
+        self.readable.take(path, now, ALLOW_FOR)
+    }
+
+    /// Lets the UI attach `paths` once each: they were dropped or picked in a Rust-side dialog.
+    pub fn allow_attach(&self, paths: &[PathBuf], now: Instant) {
+        self.attachable.allow(paths, now, ATTACH_FOR);
+    }
+
+    /// Removes `path` from the attachable list; true when the user handed it over recently.
+    pub fn take_attachable(&self, path: &Path, now: Instant) -> bool {
+        self.attachable.take(path, now, ATTACH_FOR)
+    }
+}
+
 /// Records the paths of a drop onto the main window so the UI may read them.
 pub fn on_window_event(window: &Window, event: &WindowEvent) {
     if window.label() != MAIN {
         return;
     }
     if let WindowEvent::DragDrop(DragDropEvent::Drop { paths, .. }) = event {
-        window.state::<DroppedFiles>().allow(paths, Instant::now());
+        let dropped = window.state::<DroppedFiles>();
+        let now = Instant::now();
+        dropped.allow(paths, now);
+        dropped.allow_attach(paths, now);
     }
 }
 
@@ -358,6 +394,40 @@ mod tests {
         let dropped = DroppedFiles::default();
         let err = read_allowed(&dropped, &path, Instant::now()).expect_err("not dropped");
         assert_eq!(err.code, ErrorCode::NotFound);
+    }
+
+    #[test]
+    fn attachable_paths_are_separate_from_readable_ones() {
+        let dropped = DroppedFiles::default();
+        let path = PathBuf::from("/home/me/cat.png");
+        let now = Instant::now();
+        assert!(
+            !dropped.take_attachable(&path, now),
+            "nothing handed over yet"
+        );
+
+        // A drop allows both; reading the image must not use up the attachment.
+        dropped.allow(std::slice::from_ref(&path), now);
+        dropped.allow_attach(std::slice::from_ref(&path), now);
+        assert!(dropped.take(&path, now));
+        assert!(dropped.take_attachable(&path, now + ALLOW_FOR));
+        assert!(
+            !dropped.take_attachable(&path, now),
+            "each path attaches once"
+        );
+
+        // A paste allows reading only.
+        dropped.allow(std::slice::from_ref(&path), now);
+        assert!(!dropped.take_attachable(&path, now));
+    }
+
+    #[test]
+    fn attachable_paths_expire() {
+        let dropped = DroppedFiles::default();
+        let path = PathBuf::from("/home/me/notes.txt");
+        let then = Instant::now();
+        dropped.allow_attach(std::slice::from_ref(&path), then);
+        assert!(!dropped.take_attachable(&path, then + ATTACH_FOR));
     }
 
     #[test]

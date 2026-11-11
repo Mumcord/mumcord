@@ -1398,7 +1398,6 @@ describe("Identity section", () => {
 
 describe("Diagnostics section", () => {
   it("changes the log level and saves a diagnostic file", async () => {
-    savePath.mockResolvedValue("/home/me/diag.txt");
     const update = vi.spyOn(api, "settingsUpdate");
     const save = vi.spyOn(api, "diagnosticsSave");
     await openSection("Advanced & Developer");
@@ -1411,7 +1410,9 @@ describe("Diagnostics section", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Save diagnostic file…" }));
     await waitFor(() => {
-      expect(save).toHaveBeenCalledWith("/home/me/diag.txt");
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({ defaultName: "mumcord-diagnostics.txt", extensions: ["txt"] }),
+      );
     });
     expect(await screen.findByText("Diagnostic file saved.")).toBeInTheDocument();
   });

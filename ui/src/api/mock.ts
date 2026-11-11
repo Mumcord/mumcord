@@ -3474,7 +3474,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve(
         settings.linkPreviews && mockAudioInfo(url) !== null ? mockAudioFile() : null,
       ),
-    audioSave: () => Promise.resolve(null),
+    audioSave: () => Promise.resolve(true),
     previewDismiss: (messageId, url) => {
       for (const conversations of history.values()) {
         for (const messages of conversations.values()) {
@@ -3500,9 +3500,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         gifFavorites = [url, ...gifFavorites.filter((u) => u !== url)];
       return Promise.resolve(null);
     },
-    saveImage: () => Promise.resolve(null),
+    saveImage: () => Promise.resolve(true),
     copyImage: () => Promise.resolve(null),
-    saveText: () => Promise.resolve(null),
+    saveText: () => Promise.resolve(true),
     // The browser's own clipboard stands in for the system one.
     copyText: (text) => navigator.clipboard.writeText(text).then(() => null),
     // The browser has no native file drops; dropped files arrive as `File` objects instead.
@@ -3924,7 +3924,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       inspector.clear();
       return Promise.resolve(null);
     },
-    packetCaptureExport: () => Promise.resolve(null),
+    packetCaptureExport: () => Promise.resolve(true),
     // The mock has no second window; the inspector page opens with `?window=packet-inspector`.
     packetInspectorOpen: () => Promise.resolve(null),
     packetInspectorClose: () => Promise.resolve(null),
@@ -3965,7 +3965,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     windowLook: () => Promise.resolve(windowLook),
 
     // diagnostics
-    diagnosticsSave: () => Promise.resolve(null),
+    diagnosticsSave: () => Promise.resolve(true),
     // Crash reports (#568), seeded through `MockOptions.crashReports`.
     crashList: () => Promise.resolve([...crashReports]),
     crashTakeUnseen: () => {
@@ -4136,6 +4136,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       };
       return Promise.resolve(chip);
     },
+    filesPick: () => Promise.resolve([]),
     filesChipRemove: () => Promise.resolve(undefined),
     filesSend: () => Promise.resolve([]),
     filesStop: () => Promise.resolve(undefined),
@@ -4143,6 +4144,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     filesDownload: () => Promise.resolve(null),
     filesCancel: () => Promise.resolve(undefined),
     filesSaveFolder: () => Promise.resolve("~/Downloads/Mumcord"),
+    filesSaveFolderChoose: () => Promise.resolve(null),
     filesOpen: () => Promise.resolve(null),
     filesOpenFolder: () => Promise.resolve(null),
     banListOpen: (serverId) => {
