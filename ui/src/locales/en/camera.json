@@ -15,7 +15,7 @@
     "needsRelayMode": "Camera sharing is turned off. Change it in Privacy & Connections.",
     "noCertificate": "Camera sharing needs a client certificate.",
     "registeredOnly": "Only registered users can use the camera on this server.",
-    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
+    "needsDirect": "Camera sharing needs direct connections. Change it in Privacy & Connections."
   },
   "cameraOnTray": "Camera on",
   "turnOffTray": "Turn off camera",
@@ -181,7 +181,6 @@
     "joining": "Joining {{name}}'s camera …",
     "full": "Too many people are watching {{name}}",
     "failed": "Couldn't join {{name}}'s camera",
-    "needsUpdate": "This camera needs Mumcord 0.9.0",
     "retry": "Try again",
     "hidden": "Video hidden",
     "showVideo": "Show video",

@@ -15,7 +15,7 @@
     "needsRelayMode": "Kaamera jagamine on välja lülitatud. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
     "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad.",
-    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
+    "needsDirect": "Kaamera jagamine vajab otseseid ühendusi. Muuda seda jaotises Privaatsus ja ühendused."
   },
   "cameraOnTray": "Kaamera sees",
   "turnOffTray": "Lülita kaamera välja",
@@ -47,7 +47,7 @@
     "unitGpu": "graafikakaart",
     "unitCpu": "protsessor",
     "remember": "Kasuta seda tausta ka järgmisel korral",
-    "cancel": "Loobu",
+    "cancel": "Tühista",
     "turnOn": "Lülita kaamera sisse",
     "starting": "Kaamera käivitub …",
     "privacyNote": "Sinu kaamerat näevad ainult kanali <channel/> liikmed ja alles pärast nupu Lülita kaamera sisse vajutamist. Mumcord ei salvesta kunagi kaameraid.",
@@ -90,7 +90,7 @@
     "deviceGone": "Kaamera peatus: kaamera ühendus katkes.",
     "unreadable": "Kaamera peatus: kaamera saadab loetamatuid pilte.",
     "cameraFailed": "Kaamerat ei saanud käivitada.",
-    "roomFull": "Kaameraruum on täis (9/9 kaamerat).",
+    "roomFull": "Kaameraruum on täis (9 kaamerat 9-st).",
     "relayFull": "Kaamerat ei saanud käivitada: selle serveri releeserver on praegu täis.",
     "useNotAllowed": "Kaamerat ei saanud käivitada: serveri releeserver ei luba kaameraid.",
     "denied": "Kaamerat ei saanud käivitada: serveri releeserver lükkas selle tagasi.",
@@ -101,10 +101,10 @@
     "endedByRelay": "Serveri releeserver peatas kaamera",
     "dismissStopped": "Sulge",
     "notRegistered": "Kaamera ei käivitunud: selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad.",
-    "groupNotAllowed": "Kaamera ei käivitunud: selle serveri releeserver teenindab ainult teatud rühmi. Palu adminil sind lisada.",
+    "groupNotAllowed": "Kaamera ei käivitunud: selle serveri relee teenindab ainult teatud gruppe. Palu halduril sind lisada.",
     "notSameChannel": "Kaamera ei käivitunud: sina ja su vaatajad peate olema samas kanalis.",
     "notInChannel": "Kaamera ei käivitunud: liitu esmalt kanaliga.",
-    "noHello": "Kaamera ei käivitunud: releebot ei tunne seda rakendust veel. Ühendu parandamiseks uuesti."
+    "noHello": "Kaamera ei käivitunud: relee bot ei tunne seda rakendust veel. Ühenda uuesti."
   },
   "privacy": {
     "windows": "Windows blokeerib töölauarakenduste juurdepääsu kaamerale",
@@ -117,7 +117,7 @@
   "announce": {
     "on": "Kaamera sees",
     "off": "Kaamera väljas",
-    "live": "Sinu kaamera on otse-eetris",
+    "live": "Sinu kaamera on otse",
     "stopped": "Sinu kaamera peatus",
     "joined": "{{name}} lülitas oma kaamera sisse",
     "left": "{{name}} lülitas oma kaamera välja",
@@ -147,7 +147,7 @@
     "without_other": "{{names}} on siin ilma kaamerata",
     "live": "Otse",
     "you": "Sina",
-    "selfLabel": "Sina, kaamera sees, otse-eetris",
+    "selfLabel": "Sina, kaamera sees, otse",
     "selfLabelPlain": "Sina, kaamera sees",
     "background": "Taust: {{name}}",
     "hideSelf": "Peida enda pilt",
@@ -166,7 +166,7 @@
   "position": {
     "label": "Kaamerad",
     "beside": "Kaamerad kõrval",
-    "above": "Üleval",
+    "above": "Peal",
     "hidden": "Peidetud"
   },
   "tile": {
@@ -181,7 +181,6 @@
     "joining": "Liitun kasutaja {{name}} kaameraga …",
     "full": "Liiga palju inimesi vaatab kasutajat {{name}}",
     "failed": "Kasutaja {{name}} kaameraga ei saanud liituda",
-    "needsUpdate": "See kaamera vajab Mumcord 0.9.0",
     "retry": "Proovi uuesti",
     "hidden": "Video peidetud",
     "showVideo": "Näita videot",
@@ -191,15 +190,15 @@
   },
   "tileMenu": {
     "options": "Valikud: {{name}}",
-    "pin": "Kinnita enda jaoks",
+    "pin": "Kinnita mulle",
     "unpin": "Eemalda kinnitus",
     "showLarge": "Näita suurelt",
     "leaveLarge": "Välju suurest vaatest",
     "hideVideo": "Peida kasutaja {{name}} video",
     "showVideo": "Näita kasutaja {{name}} videot",
-    "quality": "Kvaliteet minu jaoks",
+    "quality": "Kvaliteet mulle",
     "qualityAuto": "Automaatne",
-    "qualityAutoHint": "vastavalt ruudu suurusele",
+    "qualityAutoHint": "sobib ruudu suurusega",
     "qualityDataSaver": "Andmesäästja",
     "qualityDataSaverHint": "kuni 15 fps",
     "qualityBest": "Parim",
@@ -237,7 +236,7 @@
     "effectAuto": "Automaatne",
     "effectBest": "Parim (graafikakaart)",
     "effectLight": "Kerge (säästab akut)",
-    "effectHint": "Automaatne kasutab võimalusel graafikakaarti ja lülitub akutoitel või hõivatud arvuti puhul valikule Kerge.",
+    "effectHint": "Automaatne kasutab graafikakaarti, kui võimalik, ja lülitub akutoitel või hõivatud arvuti puhul Kergele.",
     "ownImages_one": "Sinu enda taustapildid jäävad sellesse seadmesse ({{count}} salvestatud). Saadetakse ainult valmis pilt.",
     "ownImages_other": "Sinu enda taustapildid jäävad sellesse seadmesse ({{count}} salvestatud). Saadetakse ainult valmis pilt.",
     "manageImages": "Halda pilte",
@@ -249,9 +248,9 @@
     "showAlways": "Alati",
     "showOnOpen": "Kui ruumi avan",
     "showNever": "Mitte kunagi",
-    "showHint": "Valik Alati avab kaameraruumi, kui keegi sinu kanalis kaamera sisse lülitab. Valik Mitte kunagi jätab sulle ainult hääle ega laadi videot alla.",
+    "showHint": "Alati avab kaameraruumi, kui keegi sinu kanalis kaamera sisse lülitab. Mitte kunagi jätab sind ainult häälega ega lae videot alla.",
     "dataSaver": "Andmesäästja: kuni 15 fps kõigile",
-    "reduceMotion": "Vähenda liikumist: kõneleja raamil pole kuma ega animatsiooni",
+    "reduceMotion": "Vähenda liikumist: ei mingit hõõgumist ega animatsiooni kõneleja raamil",
     "reduceMotionHint": "Järgib vaikimisi sinu süsteemi liikumise vähendamise seadet."
   },
   "viewers": {

@@ -14,7 +14,8 @@
     "relayDisallows": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt ceamara.",
     "needsRelayMode": "Tá comhroinnt ceamara múchta. Athraigh é in Príobháideachas agus naisc.",
     "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
-    "registeredOnly": "Ar an bhfreastalaí seo ní féidir ach le húsáideoirí cláraithe an ceamara a úsáid."
+    "registeredOnly": "Ar an bhfreastalaí seo ní féidir ach le húsáideoirí cláraithe an ceamara a úsáid.",
+    "needsDirect": "Teastaíonn naisc dhíreacha ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc."
   },
   "cameraOnTray": "Ceamara ar siúl",
   "turnOffTray": "Cas ceamara as",
