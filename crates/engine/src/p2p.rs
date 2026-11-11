@@ -770,6 +770,9 @@ async fn accept_streams(engine: WeakEngine, key: Key, connection: quinn::Connect
                 STREAM_SCREEN => {
                     crate::screen_share::serve_direct(&engine, key.0, key.1, send, recv).await;
                 }
+                STREAM_CAMERA => {
+                    crate::camera::recv::serve_direct(&engine, key.0, key.1, send, recv).await;
+                }
                 other => tracing::debug!(kind = other, "ignoring an unknown direct stream"),
             }
         });

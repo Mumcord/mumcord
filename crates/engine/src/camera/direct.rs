@@ -29,7 +29,7 @@ use crate::screen_share::wire::{self, FrameHeader, FrameKind};
 pub(crate) const MAX_DIRECT_VIEWERS: usize = 8;
 
 /// Viewer to sender: my tile is this high; one big-endian u16 follows (FR-8.93).
-const WANT: u8 = 2;
+pub(super) const WANT: u8 = 2;
 
 /// What one reverse-stream message from a viewer asks for (FR-8.93).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
