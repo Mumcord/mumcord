@@ -1292,6 +1292,8 @@ impl Engine {
             .relays()
             .broadcast_bot(server_id, relay_use)
             .map_err(FanoutUnavailable::Relay)?;
+        // The publisher's format is fixed for the broadcast and needs the relay's capability.
+        let media = media && ann.media;
         let rid = RequestId::random();
         // Screen shares leave `k` out, which bots from before plugin data understand.
         let message = PeerMessage::BroadcastRequest {

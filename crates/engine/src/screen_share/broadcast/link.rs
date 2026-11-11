@@ -17,7 +17,10 @@ use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use mumcord_p2p::broadcast::{Content, ControlKind, MAX_TEMPORAL_LAYER, VideoCodec, split_slot};
+use mumcord_p2p::broadcast::{
+    Content, ControlKind, MAX_TEMPORAL_LAYER, VideoCodec, profile, split_slot,
+};
+use mumcord_p2p::media;
 use mumcord_p2p::{BroadcastEnd, BroadcastId, BroadcastLink, Unit};
 use tokio::sync::{mpsc, watch};
 use tokio::task::JoinHandle;
@@ -76,6 +79,31 @@ fn frame_of(plain: &[u8]) -> Option<Frame> {
     })
 }
 
+/// The new-format control kind for a legacy one; both name the same messages.
+fn profile_control(kind: ControlKind) -> media::ControlKind {
+    match kind {
+        ControlKind::KeyRequest => media::ControlKind::KeyRequest,
+        ControlKind::Key => media::ControlKind::Key,
+        ControlKind::KeyframeRequest => media::ControlKind::Keyframe,
+        ControlKind::Layers => media::ControlKind::Layers,
+        ControlKind::Want => media::ControlKind::Want,
+        ControlKind::Gone => media::ControlKind::Gone,
+    }
+}
+
+/// The legacy name for a new-format control message; `None` for the description.
+pub(crate) fn legacy_control(kind: media::ControlKind) -> Option<ControlKind> {
+    Some(match kind {
+        media::ControlKind::Description => return None,
+        media::ControlKind::KeyRequest => ControlKind::KeyRequest,
+        media::ControlKind::Key => ControlKind::Key,
+        media::ControlKind::Keyframe => ControlKind::KeyframeRequest,
+        media::ControlKind::Layers => ControlKind::Layers,
+        media::ControlKind::Want => ControlKind::Want,
+        media::ControlKind::Gone => ControlKind::Gone,
+    })
+}
+
 /// Sends `message` as `key`/`keyreq` chunks; `slot` is set for `key` (publisher side).
 pub(crate) async fn send_chunks(
     units: &mpsc::Sender<Vec<u8>>,
@@ -83,6 +111,7 @@ pub(crate) async fn send_chunks(
     slot: Option<u16>,
     message: &[u8],
     set_id: u8,
+    media: bool,
 ) -> bool {
     let chunks = match keyx::split(message, set_id) {
         Ok(chunks) => chunks,
@@ -97,14 +126,34 @@ pub(crate) async fn send_chunks(
             payload.extend_from_slice(&slot.to_be_bytes());
         }
         payload.extend_from_slice(&chunk);
-        let unit = match Unit::control(kind, &payload) {
-            Ok(unit) => unit,
-            Err(e) => {
-                tracing::warn!(error = %e, "broadcast key chunk not sent");
-                return true;
-            }
+        let sent = if media {
+            let message = match profile::Message::control(profile_control(kind), payload) {
+                Ok(message) => message,
+                Err(e) => {
+                    tracing::warn!(error = %e, "broadcast key chunk not sent");
+                    return true;
+                }
+            };
+            let mut writer = profile::MessageWriter::new();
+            let bytes = match writer.encode(&message) {
+                Ok(bytes) => bytes.to_vec(),
+                Err(e) => {
+                    tracing::warn!(error = %e, "broadcast key chunk not sent");
+                    return true;
+                }
+            };
+            units.send(bytes).await
+        } else {
+            let unit = match Unit::control(kind, &payload) {
+                Ok(unit) => unit,
+                Err(e) => {
+                    tracing::warn!(error = %e, "broadcast key chunk not sent");
+                    return true;
+                }
+            };
+            units.send(unit).await
         };
-        if units.send(unit).await.is_err() {
+        if sent.is_err() {
             return false;
         }
     }
@@ -378,7 +427,15 @@ impl<S: FrameSource> PublisherControl<S> {
                 self.channels.insert(slot, channel);
                 self.viewers_changed();
                 self.set_id = self.set_id.wrapping_add(1);
-                send_chunks(units, ControlKind::Key, Some(slot), &answer, self.set_id).await
+                send_chunks(
+                    units,
+                    ControlKind::Key,
+                    Some(slot),
+                    &answer,
+                    self.set_id,
+                    false,
+                )
+                .await
             }
             Err(e) => {
                 tracing::info!(error = %e, "broadcast key request refused");
@@ -409,7 +466,16 @@ impl<S: FrameSource> PublisherControl<S> {
         }
         for (slot, update) in updates {
             self.set_id = self.set_id.wrapping_add(1);
-            if !send_chunks(units, ControlKind::Key, Some(slot), &update, self.set_id).await {
+            if !send_chunks(
+                units,
+                ControlKind::Key,
+                Some(slot),
+                &update,
+                self.set_id,
+                false,
+            )
+            .await
+            {
                 return false;
             }
         }
@@ -698,7 +764,15 @@ impl SubscriberState {
         };
         self.pending = Some(pending);
         self.set_id = self.set_id.wrapping_add(1);
-        send_chunks(units, ControlKind::KeyRequest, None, &request, self.set_id).await
+        send_chunks(
+            units,
+            ControlKind::KeyRequest,
+            None,
+            &request,
+            self.set_id,
+            false,
+        )
+        .await
     }
 
     async fn on_unit(
