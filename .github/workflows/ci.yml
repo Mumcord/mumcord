@@ -114,6 +114,82 @@ jobs:
             }
           done
 
+  # Runs the bounded fuzz harness of every network decoder of the media profile (media reader,
+  # description, channel-0 kinds, legacy header, SFrame header and opener, direct-track decoder,
+  # key-exchange chunk and update decoders) over the committed corpus (FR-7.94, AC-7.83). The job
+  # decides from the changed paths whether it has anything to test, so an unrelated pull request
+  # skips the build; every push always runs it.
+  media-fuzz:
+    name: Media decoder fuzzing
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The first parent of a pull request's merge commit is its base.
+          fetch-depth: 2
+
+      - name: Decode changed paths
+        id: filter
+        run: |
+          run=false
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            run=true
+          else
+            while IFS= read -r file; do
+              case "$file" in
+                crates/p2p/src/media/* | crates/p2p/src/broadcast.rs) run=true ;;
+                crates/engine/src/screen_share/broadcast/*) run=true ;;
+                crates/p2p/tests/media_fuzz.rs | crates/p2p/tests/corpus/*) run=true ;;
+                crates/engine/tests/media_fuzz.rs | crates/engine/tests/corpus/*) run=true ;;
+                Cargo.toml | Cargo.lock | crates/p2p/Cargo.toml | crates/engine/Cargo.toml) run=true ;;
+              esac
+            done < <(git diff --name-only HEAD^1 HEAD)
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+
+      - name: apt cache key
+        id: apt
+        if: steps.filter.outputs.run == 'true'
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      # Restores what the Linux build-test jobs save; this job never writes the shared cache.
+      - name: Restore apt packages
+        if: steps.filter.outputs.run == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/apt-archives
+          key: apt-ubuntu-24.04-${{ steps.apt.outputs.image }}
+
+      - name: Install Linux system libraries
+        if: steps.filter.outputs.run == 'true'
+        timeout-minutes: 20
+        run: |
+          scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
+            libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+
+      - uses: ./.github/actions/native-av1
+        if: steps.filter.outputs.run == 'true'
+
+      - uses: dtolnay/rust-toolchain@stable
+        if: steps.filter.outputs.run == 'true'
+
+      - uses: Swatinem/rust-cache@v2
+        if: steps.filter.outputs.run == 'true'
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          key: media-fuzz
+
+      - name: Fuzz the p2p decoders
+        if: steps.filter.outputs.run == 'true'
+        run: cargo test -p mumcord-p2p --locked --test media_fuzz -- --ignored --test-threads=1 --nocapture
+
+      - name: Fuzz the screen-share decoders
+        if: steps.filter.outputs.run == 'true'
+        run: cargo test -p mumcord-engine --locked --test media_fuzz -- --ignored --test-threads=1 --nocapture
+
   # Two jobs per OS that run side by side, each about half the old single job: "check" (format,
   # clippy, the app build on Windows/macOS and the CI script tests) and "test" (cargo test). They
   # build different artifacts (check metadata vs. test binaries), so each keeps its own cache.
