@@ -164,6 +164,9 @@ jobs:
     needs: [guard, build, sbom]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    # The updater signing key exists only in the "release" environment, which accepts only
+    # version tags, so no other workflow run can read it.
+    environment: release
     permissions:
       contents: write
       # Build provenance attestation of the release files.

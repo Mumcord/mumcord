@@ -83,9 +83,9 @@ jobs:
             arch: x64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
-    # The Certum signing secrets exist only in the "release" environment, which accepts only
-    # version tags.
-    environment: ${{ (inputs.release && matrix.name == 'windows') && 'release' || '' }}
+    # The Windows (Certum) and Apple signing secrets exist only in the "release" environment,
+    # which accepts only version tags, so no other workflow run can read them.
+    environment: ${{ (inputs.release && (matrix.name == 'windows' || matrix.name == 'macos')) && 'release' || '' }}
     steps:
       - uses: actions/checkout@v7
 
