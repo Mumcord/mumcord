@@ -514,6 +514,16 @@ pub(crate) struct Subscription {
 }
 
 impl Subscription {
+    /// The description this share sends to a media-profile viewer, for the last video frame.
+    pub(crate) fn description(&self, video: FrameHeader) -> Description {
+        media_description(
+            video,
+            self.hub.top_layer.load(Ordering::Relaxed),
+            self.hub.step_fps.load(Ordering::Relaxed),
+            self.hub.sound.load(Ordering::Relaxed),
+        )
+    }
+
     /// The next frame to send, once the upload limits allow it. Relay units carry frame
     /// version 2, and while a viewer that cannot play AV1 watches (on any path), AV1 frames
     /// left from before the switch to VP9 are skipped (FR-7.58).
@@ -602,7 +612,12 @@ struct DescriptionKey {
 
 /// The description of what this share sends to a media viewer: one video track per temporal
 /// layer the encoder can emit, plus the audio track while the share has sound (FR-7.95).
-fn media_description(video: FrameHeader, top_layer: u8, fps: u32, sound: bool) -> Description {
+pub(crate) fn media_description(
+    video: FrameHeader,
+    top_layer: u8,
+    fps: u32,
+    sound: bool,
+) -> Description {
     let FrameKind::Video(codec) = video.kind else {
         // Callers only pass a video header; keep the profile model valid if that ever changes.
         return Description {

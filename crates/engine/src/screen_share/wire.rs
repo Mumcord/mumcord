@@ -143,7 +143,7 @@ impl HeaderBytes {
 
 impl FrameHeader {
     /// Checks the header as the reader does, so a writer never sends what the other side drops.
-    fn validate(&self) -> Result<(), WireError> {
+    pub(crate) fn validate(&self) -> Result<(), WireError> {
         if self.temporal_layer > MAX_TEMPORAL_LAYER {
             return Err(WireError::BadField);
         }
