@@ -564,6 +564,8 @@ impl Engine {
     pub(crate) fn camera_blocks_changed(&self) {
         for ctx in self.session_ctxs() {
             self.camera_sync(&ctx, false);
+            // Nobody this client blocks keeps a direct camera stream (FR-8.92).
+            self.camera_close_blocked_direct(&ctx);
         }
     }
 
@@ -675,7 +677,7 @@ impl Engine {
     }
 
     /// The people in the own channel `ctx` blocks.
-    fn camera_blocked(&self, ctx: &SessionCtx) -> HashSet<u32> {
+    pub(super) fn camera_blocked(&self, ctx: &SessionCtx) -> HashSet<u32> {
         let sessions: Vec<u32> = ctx.handle.with_state(|s| s.users.keys().copied().collect());
         sessions
             .into_iter()
