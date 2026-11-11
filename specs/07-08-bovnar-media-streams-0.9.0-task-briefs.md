@@ -55,7 +55,7 @@
 | D7 | Watch-party UI regression | open | D1 | simple |
 | R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
 | R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
-| R3 | Engine broadcast link: media profile end to end | partial — `c27812f4`: description encryption; publisher/subscriber still on the legacy path | R1, W3, R5 | complex |
+| R3 | Engine broadcast link: media profile end to end | done — `c27812f4`, `2f317177`; E2E still needs R5 | R1, W3, R5 | complex |
 | R4 | Plugin relay data on channel 6 | done — `875d1656`, `feat/r4-plugin-channel6` | R1 | complex |
 | R5 | mumpeer: new format, routing, description cache | open | P0.3, W1, W2 | complex |
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
@@ -66,10 +66,10 @@
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
-then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D3 are done on their
-stacked branches. R1, R2, R4 and R6 are done; R3 and the D4 refusal texts are next. The engine
-dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the
-0.9.0 tag exists. E3 can run at any time.
+then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4 protocol work and
+R1–R4/R6 are done; R5 (mumpeer) and the D4 refusal texts are next. The engine dev-dependency
+temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the 0.9.0 tag exists.
+E3 can run at any time.
 
 ---
 
