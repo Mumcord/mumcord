@@ -16,7 +16,7 @@
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use mumcord_engine::camera::{CameraFailure, CameraState};
+use mumcord_engine::camera::{CameraFailure, CameraPath, CameraState, CameraViewer};
 use mumcord_engine::p2p::P2pConfig;
 use mumcord_engine::screen_share::wire::FrameKind;
 use mumcord_engine::store::Consent;
@@ -251,11 +251,19 @@ async fn the_test_camera_goes_on_air_and_reaches_a_viewer() {
     let viewers = poll("B among A's viewers", || {
         a.engine
             .camera_view()
-            .filter(|v| v.viewers.contains(&b.session()))
+            .filter(|v| v.viewers.iter().any(|x| x.session == b.session()))
             .map(|v| v.viewers)
     })
     .await;
-    assert_eq!(viewers, [b.session()]);
+    // The testenv's relay announces the media profile, so the 0.9.0 viewer is served by the new
+    // broadcast rather than over a stream of its own (FR-8.94).
+    assert_eq!(
+        viewers,
+        [CameraViewer {
+            session: b.session(),
+            path: CameraPath::Relay
+        }]
+    );
 
     // Off: the broadcast ends and the camera is released.
     a.engine.camera_turn_off(server_a);
