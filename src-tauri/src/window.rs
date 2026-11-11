@@ -83,10 +83,21 @@ pub fn on_window_event(window: &Window, event: &WindowEvent) {
     }
 }
 
-/// The main window itself. Not `get_webview_window`: that finds nothing while a plugin frame's
-/// child web view sits in the window (macOS), and the window could not be shown or hidden then.
+/// The main window itself. On macOS not `get_webview_window`: that finds nothing while a plugin
+/// frame's child web view sits in the window, and the window could not be shown or hidden then.
+/// Elsewhere plugin frames are no child web views, and the direct window lookup is not compiled
+/// in (Tauri's `unstable` feature is macOS only).
+pub fn find_main_window<R: Runtime>(app: &AppHandle<R>) -> Option<Window<R>> {
+    #[cfg(target_os = "macos")]
+    return app.get_window(MAIN);
+    #[cfg(not(target_os = "macos"))]
+    return app
+        .get_webview_window(MAIN)
+        .map(|window| window.as_ref().window());
+}
+
 fn main_window<R: Runtime>(app: &AppHandle<R>) -> Option<Window<R>> {
-    let window = app.get_window(MAIN);
+    let window = find_main_window(app);
     if window.is_none() {
         tracing::warn!("main window not found");
     }

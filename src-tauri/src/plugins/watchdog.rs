@@ -142,10 +142,17 @@ fn run(app: &AppHandle, plugins: &Plugins, answers: &Receiver<u64>) {
     }
 }
 
-/// The main window's own web view. Not `get_webview_window`: that finds nothing while a plugin
-/// frame's child web view sits in the window (macOS), which is exactly when the watchdog runs.
+/// The main window's own web view. On macOS not `get_webview_window`: that finds nothing while
+/// a plugin frame's child web view sits in the window, which is exactly when the watchdog runs.
+/// Elsewhere plugin frames are no child web views, and the direct web view lookup is not compiled
+/// in (Tauri's `unstable` feature is macOS only).
 fn main_webview<R: Runtime>(app: &AppHandle<R>) -> Option<Webview<R>> {
-    app.get_webview("main")
+    #[cfg(target_os = "macos")]
+    return app.get_webview("main");
+    #[cfg(not(target_os = "macos"))]
+    return app
+        .get_webview_window("main")
+        .map(|window| window.as_ref().clone());
 }
 
 /// Runs a script in the UI that answers through the event system: if it runs, the UI is alive.
