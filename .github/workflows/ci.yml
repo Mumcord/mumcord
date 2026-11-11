@@ -167,8 +167,11 @@ jobs:
         if: steps.filter.outputs.run == 'true'
         timeout-minutes: 20
         run: |
+          # libdbus-1-dev: mumcord-engine links audio_thread_priority through cpal, which
+          # builds libdbus-sys. The app jobs get it transitively from libwebkit2gtk.
           scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
-            libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+            libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev libdbus-1-dev \
+            pkg-config cmake
 
       - uses: ./.github/actions/native-av1
         if: steps.filter.outputs.run == 'true'
