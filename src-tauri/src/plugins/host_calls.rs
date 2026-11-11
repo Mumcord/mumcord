@@ -20,7 +20,7 @@ use mumcord_plugins::api::host_calls::{
 };
 use mumcord_plugins::test_hooks::{self, DialogAnswer};
 use mumcord_plugins::wit::types::Error;
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
 use tauri_plugin_dialog::{DialogExt, FileDialogBuilder};
 use tauri_specta::Event;
 
@@ -55,7 +55,9 @@ pub fn handle(app: &AppHandle, engine: &Engine, plugin: String, request: HostReq
 /// A file dialog in front of the main window.
 fn dialog(app: &AppHandle) -> FileDialogBuilder<tauri::Wry> {
     let builder = app.dialog().file();
-    match app.get_webview_window("main") {
+    // Not `get_webview_window`: that finds nothing while a plugin frame's child web view sits in
+    // the window (macOS), which is when a plugin usually asks for a file.
+    match crate::window::find_main_window(app) {
         Some(window) => builder.set_parent(&window),
         None => builder,
     }
