@@ -35,7 +35,7 @@
 
 use mumcord_p2p::media::{
     self, CHANNEL_CONTROL, ChannelUse, CodecError, ControlKind, Description, MediaReader,
-    MediaWriter, Track, VideoCodec,
+    MediaWriter, StreamKind, Track, VideoCodec,
 };
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
@@ -48,6 +48,33 @@ pub enum Format {
     Legacy(u8),
     /// The 0.9.0 Bovnar media document (FR-7.89).
     Media,
+}
+
+/// What the description of a direct media stream must say before any of its frames is read
+/// (FR-8.92): a camera stream names the camera session it carries.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DescriptionCheck {
+    /// Whatever the sharer announces; the screen-share viewer filters frames itself.
+    Any,
+    /// A camera stream: `.kind = "camera"` and exactly this camera session id.
+    Camera(String),
+}
+
+impl DescriptionCheck {
+    fn accepts(&self, description: &Description) -> bool {
+        match self {
+            Self::Any => true,
+            Self::Camera(id) => {
+                description.kind == StreamKind::Camera
+                    && description.id.as_deref() == Some(id.as_str())
+            }
+        }
+    }
+
+    /// Whether a description this check does not accept ends the stream instead of being dropped.
+    fn strict(&self) -> bool {
+        !matches!(self, Self::Any)
+    }
 }
 
 /// The frame version of 0.6.x: VP9 only, no codec byte.
@@ -125,6 +152,8 @@ pub enum WireError {
     Profile(#[from] media::MediaError),
     #[error("the media stream is already finished")]
     Finished,
+    #[error("the media stream description is not what this viewer expects")]
+    Refused,
     #[error("screen share stream failed: {0}")]
     Io(#[from] std::io::Error),
 }
@@ -419,15 +448,19 @@ pub struct FrameReader<R> {
     auto: bool,
     /// The first legacy header byte read while detecting the format.
     first: Option<u8>,
+    /// What the description must say; see [`Self::with_check`].
+    check: DescriptionCheck,
 }
 
 impl<R: AsyncRead + Unpin> FrameReader<R> {
     pub fn new(inner: R, format: Format) -> Self {
+        let check = DescriptionCheck::Any;
         Self {
             inner,
-            media: matches!(format, Format::Media).then(MediaFraming::new),
+            media: matches!(format, Format::Media).then(|| MediaFraming::new(check.clone())),
             auto: false,
             first: None,
+            check,
         }
     }
 
@@ -438,7 +471,18 @@ impl<R: AsyncRead + Unpin> FrameReader<R> {
             media: None,
             auto: true,
             first: None,
+            check: DescriptionCheck::Any,
         }
+    }
+
+    /// Accepts only a description `check` allows and ends the stream on any other (FR-8.92):
+    /// frames that belong to another camera session are never decoded.
+    pub fn with_check(mut self, check: DescriptionCheck) -> Self {
+        if let Some(media) = &mut self.media {
+            media.check = check.clone();
+        }
+        self.check = check;
+        self
     }
 
     /// The next frame, or `Ok(None)` when the stream ended at a frame or message boundary.
@@ -451,7 +495,7 @@ impl<R: AsyncRead + Unpin> FrameReader<R> {
             self.auto = false;
             match first[0] {
                 b'#' => {
-                    let mut media = MediaFraming::new();
+                    let mut media = MediaFraming::new(self.check.clone());
                     media.buffer.push(b'#');
                     self.media = Some(media);
                 }
@@ -481,16 +525,21 @@ struct MediaFraming {
     description: Option<Description>,
     pending: Option<Description>,
     eof: bool,
+    check: DescriptionCheck,
+    /// A description this check refused: the stream is over.
+    refused: bool,
 }
 
 impl MediaFraming {
-    fn new() -> Self {
+    fn new(check: DescriptionCheck) -> Self {
         Self {
             reader: MediaReader::new(),
             buffer: Vec::new(),
             description: None,
             pending: None,
             eof: false,
+            check,
+            refused: false,
         }
     }
 
@@ -520,6 +569,9 @@ impl MediaFraming {
     /// goes on; only a broken document is fatal.
     fn next_frame(&mut self) -> Result<Option<Frame>, WireError> {
         loop {
+            if self.refused {
+                return Err(WireError::Refused);
+            }
             let (consumed, step) = {
                 let mut input = &self.buffer[..];
                 let result = self.reader.read(&mut input);
@@ -576,7 +628,7 @@ impl MediaFraming {
         };
         match ControlKind::from_byte(kind) {
             Some(ControlKind::Description) => match Description::parse(body) {
-                Ok(description) => {
+                Ok(description) if self.check.accepts(&description) => {
                     tracing::trace!(
                         kind = description.kind.name(),
                         tracks = description.tracks.len(),
@@ -588,7 +640,19 @@ impl MediaFraming {
                         self.description = Some(description);
                     }
                 }
-                Err(error) => tracing::debug!(%error, "dropping an invalid media description"),
+                Ok(description) => {
+                    tracing::debug!(
+                        kind = description.kind.name(),
+                        "refusing a media description this viewer did not ask for"
+                    );
+                    self.refused = true;
+                }
+                Err(error) => {
+                    tracing::debug!(%error, "dropping an invalid media description");
+                    // A viewer that waits for one particular stream closes on it; a screen
+                    // share keeps reading and waits for a description it can use.
+                    self.refused = self.check.strict();
+                }
             },
             Some(kind) => {
                 tracing::debug!(?kind, "ignoring a direct media control message");
@@ -1052,6 +1116,56 @@ mod tests {
             reader.read_frame().await,
             Err(WireError::BadVersion(9))
         ));
+    }
+
+    /// FR-8.92: a camera viewer reads only the camera session it asked for; a screen share
+    /// still reads whatever its sharer announces.
+    #[tokio::test]
+    async fn a_camera_reader_refuses_a_description_of_another_session() {
+        const ID: &str = "0123456789abcdef";
+        let camera = |id: &str| {
+            let mut description = screen_description(Codec::Vp9, 640, 360);
+            description.kind = StreamKind::Camera;
+            description.id = Some(id.to_owned());
+            // A camera carries video only (FR-8.92).
+            description
+                .tracks
+                .retain(|track| matches!(track, Track::Video(_)));
+            description
+        };
+        async fn read(description: &Description, check: DescriptionCheck) -> Result<(), WireError> {
+            let mut buf = Vec::new();
+            let mut writer = FrameWriter::new(&mut buf, Format::Media);
+            writer.write_description(description).await.unwrap();
+            writer
+                .write_frame(&frame(Codec::Vp9, true, 0, 0, &[1, 2, 3]))
+                .await
+                .unwrap();
+            let mut reader = FrameReader::new(buf.as_slice(), Format::Media).with_check(check);
+            let first = reader.read_frame().await?;
+            assert!(
+                first.is_some(),
+                "a matching description still carries frames"
+            );
+            Ok(())
+        }
+        let check = DescriptionCheck::Camera(ID.to_owned());
+        read(&camera(ID), check.clone()).await.unwrap();
+        for refused in [
+            camera("ffffffffffffffff"),
+            // A screen share is never a camera stream, whatever id it claims.
+            screen_description(Codec::Vp9, 640, 360),
+        ] {
+            let refused = read(&refused, check.clone()).await;
+            assert!(matches!(refused, Err(WireError::Refused)));
+        }
+        // A screen-share viewer checks nothing.
+        read(
+            &screen_description(Codec::Vp9, 640, 360),
+            DescriptionCheck::Any,
+        )
+        .await
+        .unwrap();
     }
 
     #[tokio::test]
