@@ -13,6 +13,9 @@ on:
       - ".github/workflows/seed-lock.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   seed-lock:
     name: Seeder lock is current

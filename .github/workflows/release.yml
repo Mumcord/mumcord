@@ -168,6 +168,7 @@ jobs:
     # version tags, so no other workflow run can read it.
     environment: release
     permissions:
+      # Creates the draft release and uploads its files.
       contents: write
       # Build provenance attestation of the release files.
       id-token: write

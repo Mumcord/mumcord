@@ -45,6 +45,10 @@ env:
   # Official Mumble server for the native Windows/macOS smoke servers (Linux uses testenv).
   MUMBLE_SERVER_VERSION: 1.5.939
 
+# Callers grant at most this; the jobs only read the repository and upload run artifacts.
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build ${{ matrix.name }}

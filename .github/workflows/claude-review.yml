@@ -21,6 +21,9 @@ concurrency:
     && github.run_id || 'review' }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   review:
     # Drafts are not ready for review. PRs from forks and from bots get no secrets, so the

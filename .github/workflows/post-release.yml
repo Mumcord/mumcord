@@ -37,16 +37,20 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
-  # Starts CI and E2E on the branch.
-  actions: write
+  contents: read
 
 jobs:
   sync:
     name: Sync version and notices
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    permissions:
+      # Pushes the version sync branch.
+      contents: write
+      # Opens the sync pull request and closes an open notices pull request.
+      pull-requests: write
+      # Starts CI and E2E on the branch.
+      actions: write
     env:
       GH_TOKEN: ${{ github.token }}
       VERSION_INPUT: ${{ inputs.version || github.event.release.tag_name }}

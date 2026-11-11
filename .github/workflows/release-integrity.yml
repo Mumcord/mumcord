@@ -13,8 +13,6 @@ on:
 
 permissions:
   contents: read
-  # Opens and comments on the issues.
-  issues: write
 
 concurrency:
   group: release-integrity
@@ -25,6 +23,10 @@ jobs:
     name: Verify published releases
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: read
+      # Opens and comments on the issues.
+      issues: write
     env:
       GH_TOKEN: ${{ github.token }}
     steps:

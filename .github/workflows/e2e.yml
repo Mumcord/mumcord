@@ -29,6 +29,9 @@ env:
   MUMPEER_REF: 703cd3d67ade93e7fd1901c4af8c65275308402e
   MUMBOT_REF: f320522a87505cd73e6d9d0cb608c07847868928
 
+permissions:
+  contents: read
+
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
   # checks pending forever on pull requests without code changes, so the checks always report.
@@ -36,6 +39,10 @@ jobs:
     name: Changed files
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions:
+      contents: read
+      # Lists the changed files of the pull request through the API.
+      pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:

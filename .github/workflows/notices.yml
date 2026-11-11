@@ -30,10 +30,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
-  pull-requests: write
-  # Starts CI and E2E on the branch.
-  actions: write
+  contents: read
 
 env:
   BRANCH: chore/regenerate-notices
@@ -46,6 +43,13 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      # Pushes the fixed notices branch.
+      contents: write
+      # Opens or updates the notices pull request.
+      pull-requests: write
+      # Starts CI and E2E on the branch.
+      actions: write
     steps:
       - uses: actions/checkout@v7
 
