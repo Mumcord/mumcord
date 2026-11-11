@@ -12,14 +12,14 @@
   "connected": "Povezano",
   "connectedIn": "Povezano · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Povezano – govori",
-  "muted": "Povezano – utišano",
+  "talking": "Povezano – govoriš",
+  "muted": "Povezano – mikrofon utišan",
   "voiceMenu": "Glasovni strežnik in kanal",
   "voiceServer": "Glasovni strežnik",
   "channelsOf": "Kanali · {server}",
   "moreChannels": "Več kanalov v Mumcordu",
   "recentChats": "Nedavni klepeti",
-  "chatUnread": "{name} – {count} neprebranih",
+  "chatUnread": "{name} – neprebrano: {count}",
   "cameraOn": "Kamera vklopljena",
   "turnOffCamera": "Izklopi kamero"
 }

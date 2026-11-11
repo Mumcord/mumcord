@@ -17,9 +17,9 @@
   "suggestion": {
     "title": "Denne server bruger {{name}}",
     "noReason": "Foreslået af serveren",
-    "install": "Installer…",
-    "installLabel": "Installer {{name}}",
-    "addRepositoryLabel": "Tilføj repository til {{name}}",
+    "install": "Installér…",
+    "installLabel": "Installér {{name}}",
+    "addRepositoryLabel": "Tilføj arkiv for {{name}}",
     "details": "Se detaljer",
     "detailsLabel": "Detaljer om {{name}}",
     "notNow": "Ikke nu",

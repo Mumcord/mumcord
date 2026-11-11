@@ -338,8 +338,7 @@ describe("InstalledTab", () => {
     withPlugins([echolings]);
     const pin = vi.spyOn(api, "pluginSetPinned").mockResolvedValue(null);
     vi.spyOn(api, "pluginExportData").mockResolvedValue('{"format":1}');
-    const saveText = vi.spyOn(api, "saveText").mockResolvedValue(null);
-    vi.spyOn(window, "prompt").mockReturnValue("/tmp/echolings.json");
+    const saveText = vi.spyOn(api, "saveText").mockResolvedValue(true);
     render(<InstalledTab />);
     fireEvent.click(
       await screen.findByRole("button", { name: "Permissions", description: "Echolings" }),
@@ -352,7 +351,10 @@ describe("InstalledTab", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Export data" }));
     await waitFor(() => {
-      expect(saveText).toHaveBeenCalledWith("/tmp/echolings.json", '{"format":1}');
+      expect(saveText).toHaveBeenCalledWith(
+        expect.objectContaining({ defaultName: "echolings-data.json", extensions: ["json"] }),
+        '{"format":1}',
+      );
     });
     expect(await screen.findByText("Data exported.")).toBeInTheDocument();
   });

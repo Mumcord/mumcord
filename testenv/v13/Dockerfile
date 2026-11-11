@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:bullseye-slim@sha256:e5b6442dd2e9684cf5e87d8338b5968f3b348636fc0be6d7850a381e3731a2bd
 # Bullseye is EOL: its packages only live on archive.debian.org now.
 RUN sed -i "s|deb.debian.org|archive.debian.org|; /security.debian.org/d; /bullseye-updates/d" /etc/apt/sources.list \
  && apt-get update \

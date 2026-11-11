@@ -4,10 +4,10 @@
     "channels": "Kanalid",
     "chat": "Vestlus",
     "members": "Liikmed",
-    "userPanel": "Sinu staatus"
+    "userPanel": "Sinu olek"
   },
   "skipLinks": {
-    "label": "Jäta lingid vahele",
+    "label": "Kiirlingid",
     "chat": "Mine vestlusesse",
     "channels": "Mine kanalite juurde"
   },

@@ -1,6 +1,6 @@
 {
   "link": {
-    "label": "Peer-to-peer",
+    "label": "P2P",
     "direct": "Otse",
     "relayUdp": "Releeserveri kaudu (UDP)",
     "relayTcp": "Releeserveri kaudu (TCP 443)",
@@ -29,15 +29,15 @@
     "camerasDisallowed": "Selle serveri releeserver ei luba kaamera jagamist.",
     "imagesDisallowed": "Täissuurus pole saadaval: selle serveri releeserver ei luba pilte",
     "noCertificate": "Failide jagamiseks on vaja kliendisertifikaati.",
-    "modeNeedsRelay": "Failide jagamiseks on vaja releeserverit; sinu peer-to-peer seade on {{mode}}.",
+    "modeNeedsRelay": "Failide jagamiseks on vaja releeserverit; sinu P2P-seade on {{mode}}.",
     "modeOff": "Väljas",
     "modeDirectOnly": "Ainult otse",
     "hideNoRelay": "Peida see vihje serveri {{server}} jaoks"
   },
   "reason": {
-    "p2pOff": "Peer-to-peer on välja lülitatud.",
+    "p2pOff": "P2P on välja lülitatud.",
     "noRelay": "Sellel serveril pole releeserverit.",
-    "notConnected": "Selle serveriga pole ühendatud.",
+    "notConnected": "Sa pole selle serveriga ühendatud.",
     "untrusted": "Selle serveri releeserver on muutunud ja seda ei usaldata.",
     "conflict": "Sellel serveril on teatatud kaks releeserverit; ühtegi ei kasutata.",
     "botLeft": "Releebot lahkus serverist.",
@@ -50,8 +50,8 @@
     "notRegistered": "Selle serveri releeserver on saadaval ainult registreeritud kasutajatele. Selle kasutamiseks registreeru sellel serveril.",
     "peerGone": "Teine inimene lahkus serverist.",
     "rateLimited": "Liiga palju releepäringuid. Proovi minuti pärast uuesti.",
-    "groupNotAllowed": "Selle serveri relee on saadaval ainult teatud gruppidele. Palu halduril sind lisada.",
-    "noHello": "Relee bot ei tunne seda rakendust veel. Ühenda uuesti."
+    "groupNotAllowed": "Selle serveri releeserver on saadaval ainult teatud rühmadele. Palu adminil sind lisada.",
+    "noHello": "Releebot ei tunne seda rakendust veel. Parandamiseks ühendu uuesti."
   },
   "refusal": {
     "unknownToken": "tundmatu pääsutõend",
@@ -66,25 +66,25 @@
   },
   "refusalAction": {
     "howToRegister": "Kuidas registreeruda",
-    "reconnect": "Ühenda uuesti",
+    "reconnect": "Ühendu uuesti",
     "filesRegisteredOnly": "Failide jagamine on selles serveris saadaval ainult registreeritud kasutajatele."
   },
   "trust": {
-    "title": "Relee serveris {{server}} muutus",
-    "body": "Ekraani ja failide jagamine on peatatud, kuni usaldad uut releed.",
+    "title": "Serveri {{server}} releeserver muutus",
+    "body": "Ekraani ja failide jagamine on peatatud, kuni usaldad uut releeserverit.",
     "details": "Üksikasjad",
-    "trustedTitle": "Uut releed usaldatakse",
+    "trustedTitle": "Uut releeserverit usaldatakse",
     "trustedBody": "Ekraani ja failide jagamine serveris {{server}} töötab jälle.",
-    "dialogBody": "Selle serveri relee kasutab nüüd teist sertifikaati. Kuni sa seda ei usalda, on ekraani ja failide jagamine ning täissuuruses pildid peatatud.",
-    "previous": "Varem usaldatud relee",
-    "current": "Uus relee",
+    "dialogBody": "Selle serveri releeserver kasutab nüüd teist sertifikaati. Kuni sa seda ei usalda, on ekraani ja failide jagamine ning täissuuruses pildid peatatud.",
+    "previous": "Varem usaldatud releeserver",
+    "current": "Uus releeserver",
     "unknown": "Tundmatu",
     "trustIf": "Usalda seda, kui",
-    "trustIfText": "serveri haldurid teatasid uuest releest või kolimisest ja saad seda nendega kinnitada.",
+    "trustIfText": "serveri adminid teatasid uuest releeserverist või selle kolimisest ja saad seda nendega kinnitada.",
     "dontTrustIf": "Ära usalda seda, kui",
-    "dontTrustIfText": "keegi ei teatanud muutusest või sa pole kindel. Keegi võib releena esineda.",
+    "dontTrustIfText": "keegi ei teatanud muutusest või sa pole kindel. Keegi võib releeserverina esineda.",
     "notNow": "Mitte praegu",
-    "review": "Relee muutus – vaata üle",
-    "filesBlocked": "Failide jagamine pole saadaval: selle serveri relee muutus ega ole veel usaldatud."
+    "review": "Releeserver muutus – vaata üle",
+    "filesBlocked": "Failide jagamine pole saadaval: selle serveri releeserver muutus ega ole veel usaldatud."
   }
 }

@@ -10,7 +10,7 @@
   "groupedPrivate_one": "{{count}} jauna ziņa no {{name}}",
   "groupedPrivate_other": "{{count}} jaunas ziņas no {{name}}",
   "image": "Nosūtīja attēlu",
-  "open": "Atvērt čatu",
+  "open": "Atvērt tērzēšanu",
   "close": "Aizvērt paziņojumu",
   "mentionLine": "{{sender}} tevi pieminēja: {{preview}}",
   "withServer": "{{server}} · {{what}}",
@@ -26,16 +26,16 @@
       "all": "Visi",
       "mentions": "Pieminējumi",
       "requests": "Pieprasījumi",
-      "invites": "Ielūgumi",
+      "invites": "Uzaicinājumi",
       "plugins": "Spraudņi"
     },
-    "empty": "Viss ir izlasīts.",
+    "empty": "Tev nav jaunu paziņojumu.",
     "unread": "Nelasīti",
     "dndOn": "Režīms Netraucēt ir ieslēgts",
     "dndOff": "Režīms Netraucēt ir izslēgts",
     "settings": "Paziņojumu iestatījumi",
     "someone": "Kāds",
-    "quoted": "„{{text}}“",
+    "quoted": "„{{text}}”",
     "mention": "{{name}} tevi pieminēja",
     "mentionGroup": "{{name}} pieminēja visus",
     "reply": "{{name}} atbildēja uz tavu ziņu",
@@ -54,8 +54,8 @@
     "type": {
       "chatRequest": "Tērzēšanas pieprasījums",
       "messageRequest": "Ziņas pieprasījums",
-      "invite": "Ielūgums",
-      "private": "Privāta ziņa",
+      "invite": "Uzaicinājums",
+      "private": "Privātā ziņa",
       "connection": "Savienojums",
       "update": "Atjauninājums"
     },
@@ -70,14 +70,18 @@
     "block": "Bloķēt",
     "update": {
       "title": "Mumcord {{version}} ir gatavs",
-      "body": "Restartējiet, lai atjauninātu",
+      "body": "Restartē, lai atjauninātu",
       "restart": "Restartēt un atjaunināt",
       "whatsNew": "Jaunumi"
     },
     "relay": {
-      "title": "Retranslators serverī {{server}} mainījies",
-      "body": "Ekrāna un failu kopīgošana ir apturēta, līdz uzticēsies jaunajam retranslatoram.",
+      "title": "Relejs serverī {{server}} ir mainījies",
+      "body": "Ekrāna un failu kopīgošana ir apturēta, līdz uzticēsies jaunajam relejam.",
       "decision": "Nepieciešams tavs lēmums"
     }
+  },
+  "suppressionFallback": {
+    "title": "Trokšņu slāpēšana ir pārāk lēna",
+    "text": "Šajā datorā pašlaik pārāk lēna. Kamēr netiek līdzi, tiek izmantots “{{standard}}”."
   }
 }

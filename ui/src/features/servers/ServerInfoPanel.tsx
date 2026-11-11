@@ -1,8 +1,13 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import type { ServerState } from "../channels/serverStore";
 import { useConnectionStats, type StatsState } from "../connection/useConnectionStats";
+import { sanitizeHtml } from "../chat/sanitize";
+import { editorLimits } from "../userpanel/richEditorModel";
+import { openServerAdmin } from "../admin";
+import { hasAdminRight, rootAdminRights } from "../admin/permissions";
+import { ServerNoticeDialog } from "../admin/ServerNoticeDialog";
 import { RelayRows } from "../p2p/RelayRows";
 import { Dialog } from "./Dialog";
 import { initials } from "./format";
@@ -107,15 +112,30 @@ function ConnectionCard({
  * the welcome text. Copy buttons put the values on the clipboard for bug reports.
  */
 export function ServerInfoPanel({ serverState, onClose }: ServerInfoPanelProps) {
-  const { t } = useTranslation("servers");
+  const { t } = useTranslation(["servers", "admin"]);
   const { t: tc } = useTranslation("connection");
   const { info } = serverState;
   const [copied, setCopied] = useState<"address" | "diagnostics" | "fingerprint" | null>(null);
   const [showCertificate, setShowCertificate] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
   const connection = useConnectionStats(true);
+
+  // The Root channel's description is the "server notice" (FR-10.29); fetch it on demand.
+  const rootChannel = serverState.channels.get(0);
+  const noticeNeedsFetch =
+    rootChannel !== undefined && rootChannel.hasDescription && rootChannel.description === null;
+  useEffect(() => {
+    if (serverState.serverId === null || !noticeNeedsFetch) return;
+    getApi()
+      .channelDescriptionRequest(serverState.serverId, 0)
+      .catch((error: unknown) => {
+        console.error("Fetching the server notice failed", error);
+      });
+  }, [serverState.serverId, noticeNeedsFetch]);
 
   if (!info) return null;
 
+  const serverId = serverState.serverId;
   const address = info.serverAddress
     ? `${info.serverAddress}:${info.serverPort?.toString() ?? ""}`
     : "";
@@ -148,6 +168,26 @@ export function ServerInfoPanel({ serverState, onClose }: ServerInfoPanelProps) 
     value === 0
       ? t("serverInfo.unlimited")
       : t("serverInfo.characters", { value: value.toLocaleString() });
+  // Epic 4, issue #258 (FR-10.54): the Admin section, only with at least one admin right.
+  const adminSection = hasAdminRight(serverState);
+  const rootRights = rootAdminRights(serverState);
+  const rightsText =
+    rootRights.length > 0
+      ? rootRights.map((name) => t(`admin:perm.name.${name}`)).join(" · ")
+      : t("serverInfo.nothing");
+  const maxUsersText = (info.maxUsers ?? 0) > 0 ? String(info.maxUsers) : t("serverInfo.unlimited");
+  const limitsText = [
+    `${t("serverInfo.maxUsers")} ${maxUsersText}`,
+    ...(info.maxBandwidth === null
+      ? []
+      : [`${t("serverInfo.maxBandwidth")} ${String(Math.round(info.maxBandwidth / 1000))} kbit/s`]),
+    `${t("serverInfo.maxMessageLength")} ${formatLimit(info.maxMessageLength)}`,
+    `${t("serverInfo.maxImageMessageLength")} ${formatLimit(info.maxImageMessageLength)}`,
+  ].join(" · ");
+  const noticeHtml = rootChannel?.description ? sanitizeHtml(rootChannel.description) : "";
+  const mayWriteRoot = rootChannel?.permissions.write === true;
+  const mayBan = rootChannel?.permissions.ban === true;
+  const mayRegister = rootChannel?.permissions.register === true;
   const validRange =
     info.tlsValidFrom && info.tlsValidUntil
       ? t("serverInfo.validRange", { from: info.tlsValidFrom, to: info.tlsValidUntil })
@@ -227,171 +267,244 @@ export function ServerInfoPanel({ serverState, onClose }: ServerInfoPanelProps) 
   };
 
   return (
-    <Dialog className="server-info-panel" title={title} onClose={onClose}>
-      <header className="server-info-panel__header">
-        <span className="server-info-panel__avatar" aria-hidden="true">
-          {initials(title)}
-        </span>
-        <div className="server-info-panel__heading">
-          <h2 className="server-info-panel__title">{title}</h2>
-          {subtitle && <p className="server-info-panel__subtitle">{subtitle}</p>}
-        </div>
-        <button
-          type="button"
-          className="server-info-panel__close"
-          aria-label={t("serverInfo.close")}
-          onClick={onClose}
-        >
-          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
-            <path
-              d="M6 6l12 12M18 6L6 18"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-      </header>
-
-      <div className="server-info-panel__grid">
-        <section className="server-info-panel__card">
-          <h3>{t("serverInfo.serverSection")}</h3>
-          <dl className="server-info-panel__list">
-            <Row label={t("serverInfo.version")}>{info.version || t("serverInfo.none")}</Row>
-            <Row label={t("serverInfo.os")}>{info.os ?? t("serverInfo.none")}</Row>
-            <Row label={t("serverInfo.usersOnline")}>
-              {maxUsers > 0 ? (
-                <>
-                  <span>
-                    {t("serverInfo.usersOf", { online: info.usersOnline, max: maxUsers })}
-                  </span>
-                  <span className="server-info-panel__meter" aria-hidden="true">
-                    <span style={{ width: `${String(usersPercent)}%` }} />
-                  </span>
-                </>
-              ) : (
-                info.usersOnline.toString()
-              )}
-            </Row>
-            {info.maxBandwidth !== null && (
-              <Row label={t("serverInfo.maxBandwidth")}>
-                {`${String(Math.round(info.maxBandwidth / 1000))} kbit/s`}
-              </Row>
-            )}
-            <Row label={t("serverInfo.maxMessageLength")}>{formatLimit(info.maxMessageLength)}</Row>
-            <Row label={t("serverInfo.maxImageMessageLength")}>
-              {formatLimit(info.maxImageMessageLength)}
-            </Row>
-            <Row label={t("serverInfo.codecs")}>Opus</Row>
-            <RelayRows serverId={serverState.serverId} Row={Row} />
-          </dl>
-        </section>
-
-        <section className="server-info-panel__card">
-          <h3>{t("serverInfo.youSection")}</h3>
-          <dl className="server-info-panel__list">
-            <Row label={t("serverInfo.sessionId")}>
-              {info.sessionId?.toString() ?? t("serverInfo.none")}
-            </Row>
-            <Row label={t("serverInfo.registered")}>{registeredText}</Row>
-            <Row
-              label={
-                channelName
-                  ? t("serverInfo.inChannelYouMay", { channel: channelName })
-                  : t("serverInfo.youMay")
-              }
-            >
-              {permissionText}
-            </Row>
-            <Row label={t("serverInfo.mumcordUsers")}>
-              {t("serverInfo.mumcordUsersOf", {
-                count: info.mumcordUsers,
-                total: info.usersOnline,
-              })}
-            </Row>
-          </dl>
-        </section>
-
-        <section className="server-info-panel__card">
-          <h3>{t("serverInfo.certificate")}</h3>
-          <dl className="server-info-panel__list">
-            <Row label={t("serverInfo.tlsStatus")}>
-              <span className={info.tlsTrusted ? "server-info-panel__trusted" : undefined}>
-                {tlsStatus}
-              </span>
-            </Row>
-            <Row label={t("serverInfo.tlsIssuer")}>{info.tlsIssuer ?? t("serverInfo.none")}</Row>
-            <Row label={t("serverInfo.tlsValid")}>{validRange}</Row>
-            <Row label={t("serverInfo.sha256")}>
-              <span className="server-info-panel__mono">
-                {info.tlsFingerprint ?? t("serverInfo.none")}
-              </span>
-            </Row>
-          </dl>
-          <div className="server-info-panel__card-actions">
-            {info.tlsFingerprint && (
-              <button
-                type="button"
-                className="button"
-                onClick={() => {
-                  void copy(info.tlsFingerprint ?? "", "fingerprint");
-                }}
-              >
-                {copied === "fingerprint"
-                  ? t("serverInfo.copied")
-                  : t("serverInfo.copyFingerprint")}
-              </button>
-            )}
-            {info.tlsCertificatePem && (
-              <button
-                type="button"
-                className="button"
-                aria-expanded={showCertificate}
-                onClick={() => {
-                  setShowCertificate((open) => !open);
-                }}
-              >
-                {t("serverInfo.showCertificate")}
-              </button>
-            )}
+    <>
+      <Dialog className="server-info-panel" title={title} onClose={onClose}>
+        <header className="server-info-panel__header">
+          <span className="server-info-panel__avatar" aria-hidden="true">
+            {initials(title)}
+          </span>
+          <div className="server-info-panel__heading">
+            <h2 className="server-info-panel__title">{title}</h2>
+            {subtitle && <p className="server-info-panel__subtitle">{subtitle}</p>}
           </div>
-          {showCertificate && info.tlsCertificatePem && (
-            <pre className="server-info-panel__pem">{info.tlsCertificatePem}</pre>
-          )}
-        </section>
+          <button
+            type="button"
+            className="server-info-panel__close"
+            aria-label={t("serverInfo.close")}
+            onClick={onClose}
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+              <path
+                d="M6 6l12 12M18 6L6 18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </header>
 
-        <ConnectionCard
-          state={connection}
-          address={address}
-          copied={copied === "address"}
-          onCopyAddress={() => {
-            void copy(address, "address");
+        <div className="server-info-panel__grid">
+          <section className="server-info-panel__card">
+            <h3>{t("serverInfo.serverSection")}</h3>
+            <dl className="server-info-panel__list">
+              <Row label={t("serverInfo.version")}>{info.version || t("serverInfo.none")}</Row>
+              <Row label={t("serverInfo.os")}>{info.os ?? t("serverInfo.none")}</Row>
+              <Row label={t("serverInfo.usersOnline")}>
+                {maxUsers > 0 ? (
+                  <>
+                    <span>
+                      {t("serverInfo.usersOf", { online: info.usersOnline, max: maxUsers })}
+                    </span>
+                    <span className="server-info-panel__meter" aria-hidden="true">
+                      <span style={{ width: `${String(usersPercent)}%` }} />
+                    </span>
+                  </>
+                ) : (
+                  info.usersOnline.toString()
+                )}
+              </Row>
+              {info.maxBandwidth !== null && (
+                <Row label={t("serverInfo.maxBandwidth")}>
+                  {`${String(Math.round(info.maxBandwidth / 1000))} kbit/s`}
+                </Row>
+              )}
+              <Row label={t("serverInfo.maxMessageLength")}>
+                {formatLimit(info.maxMessageLength)}
+              </Row>
+              <Row label={t("serverInfo.maxImageMessageLength")}>
+                {formatLimit(info.maxImageMessageLength)}
+              </Row>
+              <Row label={t("serverInfo.codecs")}>Opus</Row>
+              <RelayRows serverId={serverState.serverId} Row={Row} />
+            </dl>
+          </section>
+
+          <section className="server-info-panel__card">
+            <h3>{t("serverInfo.youSection")}</h3>
+            <dl className="server-info-panel__list">
+              <Row label={t("serverInfo.sessionId")}>
+                {info.sessionId?.toString() ?? t("serverInfo.none")}
+              </Row>
+              <Row label={t("serverInfo.registered")}>{registeredText}</Row>
+              <Row
+                label={
+                  channelName
+                    ? t("serverInfo.inChannelYouMay", { channel: channelName })
+                    : t("serverInfo.youMay")
+                }
+              >
+                {permissionText}
+              </Row>
+              <Row label={t("serverInfo.mumcordUsers")}>
+                {t("serverInfo.mumcordUsersOf", {
+                  count: info.mumcordUsers,
+                  total: info.usersOnline,
+                })}
+              </Row>
+            </dl>
+          </section>
+
+          <section className="server-info-panel__card">
+            <h3>{t("serverInfo.certificate")}</h3>
+            <dl className="server-info-panel__list">
+              <Row label={t("serverInfo.tlsStatus")}>
+                <span className={info.tlsTrusted ? "server-info-panel__trusted" : undefined}>
+                  {tlsStatus}
+                </span>
+              </Row>
+              <Row label={t("serverInfo.tlsIssuer")}>{info.tlsIssuer ?? t("serverInfo.none")}</Row>
+              <Row label={t("serverInfo.tlsValid")}>{validRange}</Row>
+              <Row label={t("serverInfo.sha256")}>
+                <span className="server-info-panel__mono">
+                  {info.tlsFingerprint ?? t("serverInfo.none")}
+                </span>
+              </Row>
+            </dl>
+            <div className="server-info-panel__card-actions">
+              {info.tlsFingerprint && (
+                <button
+                  type="button"
+                  className="button"
+                  onClick={() => {
+                    void copy(info.tlsFingerprint ?? "", "fingerprint");
+                  }}
+                >
+                  {copied === "fingerprint"
+                    ? t("serverInfo.copied")
+                    : t("serverInfo.copyFingerprint")}
+                </button>
+              )}
+              {info.tlsCertificatePem && (
+                <button
+                  type="button"
+                  className="button"
+                  aria-expanded={showCertificate}
+                  onClick={() => {
+                    setShowCertificate((open) => !open);
+                  }}
+                >
+                  {t("serverInfo.showCertificate")}
+                </button>
+              )}
+            </div>
+            {showCertificate && info.tlsCertificatePem && (
+              <pre className="server-info-panel__pem">{info.tlsCertificatePem}</pre>
+            )}
+          </section>
+
+          <ConnectionCard
+            state={connection}
+            address={address}
+            copied={copied === "address"}
+            onCopyAddress={() => {
+              void copy(address, "address");
+            }}
+          />
+
+          {info.welcomeText && (
+            <section className="server-info-panel__card server-info-panel__card--wide">
+              <h3>{t("serverInfo.welcomeText")}</h3>
+              <div
+                className="server-info-panel__welcome"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(info.welcomeText) }}
+              />
+            </section>
+          )}
+
+          {adminSection && (
+            <section className="server-info-panel__card server-info-panel__card--wide server-info-panel__admin">
+              <h3>{t("admin:serverInfo.section")}</h3>
+              <dl className="server-info-panel__list">
+                <Row label={t("admin:serverInfo.yourRights")}>{rightsText}</Row>
+                <Row label={t("admin:serverInfo.limits")}>{limitsText}</Row>
+                <Row label={t("serverInfo.welcomeText")}>
+                  <span>
+                    {info.welcomeText ? (
+                      <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(info.welcomeText) }} />
+                    ) : (
+                      t("serverInfo.none")
+                    )}
+                    <span className="server-info-panel__hint" role="note">
+                      <span aria-hidden="true">ⓘ </span>
+                      {t("admin:serverInfo.welcomeHint")}
+                    </span>
+                  </span>
+                </Row>
+                <Row label={t("admin:serverInfo.notice")}>
+                  <span className="server-info-panel__notice">
+                    {noticeHtml ? (
+                      <span
+                        className="server-info-panel__welcome"
+                        dangerouslySetInnerHTML={{ __html: noticeHtml }}
+                      />
+                    ) : (
+                      <span>{t("admin:serverInfo.noticeEmpty")}</span>
+                    )}
+                    {mayWriteRoot && serverId !== null && (
+                      <button
+                        type="button"
+                        className="button"
+                        onClick={() => {
+                          setNoticeOpen(true);
+                        }}
+                      >
+                        {t("admin:edit")}
+                      </button>
+                    )}
+                  </span>
+                </Row>
+              </dl>
+              {(mayBan || mayRegister) && serverId !== null && (
+                <div className="server-info-panel__card-actions">
+                  <button
+                    type="button"
+                    className="button"
+                    onClick={() => {
+                      openServerAdmin(serverId);
+                    }}
+                  >
+                    {t("admin:serverInfo.banListRegisteredUsers")}
+                  </button>
+                </div>
+              )}
+            </section>
+          )}
+        </div>
+
+        <footer className="server-info-panel__footer">
+          <div className="server-info-panel__footer-actions">
+            <button type="button" className="button button--primary" onClick={copyDiagnostics}>
+              {copied === "diagnostics" ? t("serverInfo.copied") : t("serverInfo.copyDiagnostics")}
+            </button>
+            <button type="button" className="button" onClick={onClose}>
+              {t("serverInfo.close")}
+            </button>
+          </div>
+          <p className="server-info-panel__privacy">{t("serverInfo.privacyNote")}</p>
+        </footer>
+      </Dialog>
+      {noticeOpen && serverId !== null && (
+        <ServerNoticeDialog
+          serverId={serverId}
+          initialHtml={noticeHtml}
+          limits={editorLimits(info)}
+          onClose={() => {
+            setNoticeOpen(false);
           }}
         />
-
-        {info.welcomeText && (
-          <section className="server-info-panel__card server-info-panel__card--wide">
-            <h3>{t("serverInfo.welcomeText")}</h3>
-            <div
-              className="server-info-panel__welcome"
-              dangerouslySetInnerHTML={{ __html: info.welcomeText }}
-            />
-          </section>
-        )}
-      </div>
-
-      <footer className="server-info-panel__footer">
-        <div className="server-info-panel__footer-actions">
-          <button type="button" className="button button--primary" onClick={copyDiagnostics}>
-            {copied === "diagnostics" ? t("serverInfo.copied") : t("serverInfo.copyDiagnostics")}
-          </button>
-          <button type="button" className="button" onClick={onClose}>
-            {t("serverInfo.close")}
-          </button>
-        </div>
-        <p className="server-info-panel__privacy">{t("serverInfo.privacyNote")}</p>
-      </footer>
-    </Dialog>
+      )}
+    </>
   );
 }

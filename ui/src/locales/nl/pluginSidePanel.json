@@ -4,6 +4,6 @@
   "resize": "Grootte van het zijpaneel van {{plugin}} aanpassen",
   "failed": "Het zijpaneel van {{plugin}} kon niet worden gesloten. Probeer het opnieuw.",
   "options": "Opties van {{plugin}}",
-  "details": "Plugindetails",
+  "details": "Plug-indetails",
   "closePanel": "Paneel sluiten"
 }

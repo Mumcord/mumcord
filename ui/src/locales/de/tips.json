@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, der Tipp-Helfer",
+  "greeting": {
+    "title": "Hallo, ich bin Aaron!",
+    "body": "Ich bin ein Axolotl und kenne mich in Mumcord bestens aus. Lust auf eine kurze Tour? Sie dauert etwa eine Minute. Wenn nicht jetzt, findest du mich unter Einstellungen → Über → Tipps.",
+    "start": "Zeig's mir",
+    "later": "Nicht jetzt"
+  },
+  "progress": "Tipp {{current}} von {{total}}",
+  "back": "Zurück",
+  "next": "Weiter",
+  "done": "Fertig",
+  "skip": "Tour überspringen",
+  "close": "Tipps schließen",
+  "tips": {
+    "servers": {
+      "title": "Deine Server",
+      "body": "Die Leiste ganz links zeigt deine Server. Mit + fügst du einen hinzu, mit der Lupe durchsuchst du öffentliche Server. Du kannst mit mehreren Servern gleichzeitig verbunden bleiben."
+    },
+    "channels": {
+      "title": "Kanäle",
+      "body": "Mit einem Doppelklick trittst du einem Kanal bei und kannst sprechen. Ein einfacher Klick zeigt seinen Chat, ohne beizutreten, und mit „Folgen“ bleibst du auf dem Laufenden."
+    },
+    "talk": {
+      "title": "So sprichst du",
+      "body": "Push-to-Talk oder Sprachaktivierung? Das wählst du unter Einstellungen → Sprache & Audio oder über Spracheinstellungen… mit dem kleinen Pfeil neben dem Mikrofon. Push-to-Talk klappt auch mit Maustasten."
+    },
+    "panel": {
+      "title": "Dein Benutzerbereich",
+      "body": "Unten links kannst du dein Mikrofon stummschalten, dich taubschalten, die Kamera einschalten oder auflegen. Die kleinen Pfeile daneben öffnen weitere Optionen."
+    },
+    "search": {
+      "title": "Alles finden",
+      "body": "Drücke {{key}}, um Personen und Kanäle zu finden, auch auf großen Servern."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Antworte auf eine Nachricht, zitiere sie, erwähne Personen mit @ und teile Bilder und Dateien. Die Schaltflächen zum Formatieren erscheinen, während du tippst."
+    },
+    "apps": {
+      "title": "Apps",
+      "body": "Die Schaltfläche „Apps“ in der Nachrichtenleiste startet eine Bildschirmfreigabe, eine Watch-Party oder deine Kamera. Plugins bringen weitere mit."
+    },
+    "themes": {
+      "title": "Dein Look",
+      "body": "Das Zahnrad unten links wechselt zwischen Dunkel und Hell. Unter Einstellungen → Darstellung gibt es weitere Designs, und ein Server kann ein eigenes bekommen: Rechtsklick darauf und „Design“ wählen."
+    },
+    "end": {
+      "title": "Das war's!",
+      "body": "Viel Spaß mit Mumcord! Unter Einstellungen → Über → Tipps kannst du mich jederzeit zurückholen."
+    }
+  }
+}

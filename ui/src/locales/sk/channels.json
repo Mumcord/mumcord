@@ -37,7 +37,7 @@
     "deafened": "stlmený zvuk",
     "serverMuted": "stlmený serverom",
     "serverDeafened": "zvuk stlmený serverom",
-    "suppressed": "potlačený (tu nemôže hovoriť)",
+    "suppressed": "umlčaný (tu nemôže hovoriť)",
     "localMuted": "stlmený pre teba",
     "unregistered": "neregistrovaný",
     "prioritySpeaker": "prednostný rečník"
@@ -50,7 +50,7 @@
     "modules": {
       "peer": "Relay",
       "music": "Prehráva hudbu",
-      "history": "História četu",
+      "history": "História chatu",
       "webhook": "Webhooky"
     }
   },
@@ -61,14 +61,14 @@
     "deafened": "Stlmený zvuk",
     "serverMuted": "Stlmený serverom",
     "serverDeafened": "Zvuk stlmený serverom",
-    "suppressed": "Potlačený – v tomto kanáli nemôže hovoriť",
+    "suppressed": "Umlčaný – v tomto kanáli nemôže hovoriť",
     "localMuted": "Stlmený pre teba",
     "unregistered": "Neregistrovaný na tomto serveri (hosť)",
     "nowPlaying": "Počúva {{track}}",
     "nowGaming": "Hrá {{game}}",
     "weakConnection": "Slabé pripojenie – vysoký ping alebo strata paketov",
     "positional": "Priestorový zvuk je aktívny",
-    "prioritySpeaker": "Prednostný rečník – počuť ho cez ostatných"
+    "prioritySpeaker": "Prednostný rečník – počuť ho ponad ostatných"
   },
   "announce": {
     "joined": "{{name}} sa pripojil(a) do tvojho kanála",
@@ -78,11 +78,11 @@
   "errors": {
     "joinDenied": "Do tohto kanála nemáš povolený vstup.",
     "joinFailed": "Do kanála sa nepodarilo pripojiť. Skús to znova.",
-    "notConnected": "Nie si pripojený k serveru.",
+    "notConnected": "Nemáš pripojenie k serveru.",
     "moveFailed": "Túto osobu sa nepodarilo presunúť."
   },
   "empty": {
-    "disconnected": "Nie si pripojený. Vyber server a uvidíš jeho kanály.",
+    "disconnected": "Nemáš pripojenie. Vyber server a uvidíš jeho kanály.",
     "loading": "Načítavam kanály…",
     "syncingBig": "Synchronizuje sa veľký server…"
   },
@@ -118,13 +118,33 @@
     "noMatch": "Žiadny kanál nezodpovedá.",
     "hint": "Vyber kanál, kam majú ľudia ísť.",
     "from": "Z {{channel}}",
-    "question": "Presunúť {{people}} z {{from}} do {{to}}?",
-    "questionNoSource": "Presunúť {{people}} do {{to}}?",
+    "question": "Presunúť z {{from}} do {{to}}: {{people}}?",
+    "questionNoSource": "Presunúť do {{to}}: {{people}}?",
     "confirm": "Presunúť",
     "failed": "Niektorých ľudí sa nepodarilo presunúť.",
     "resultTitle": "Presúvanie ľudí",
-    "resultAll": "Presunutých {{people}} do {{channel}}.",
+    "resultAll": "Presunuté do {{channel}}: {{people}}.",
     "resultSome": "Presunutých {{moved}} z {{people}} do {{channel}}. Ostatní boli odmietnutí.",
     "busy": "Ľudia sa už presúvajú…"
+  },
+  "drag": {
+    "into": "Presunúť do {{channel}}",
+    "above": "Umiestniť nad {{channel}}",
+    "below": "Umiestniť pod {{channel}}",
+    "self": "Kanál nemožno presunúť do seba samého",
+    "subChannel": "Kanál nemožno presunúť do vlastného podkanála",
+    "confirmTitle": "Presunúť „{{channel}}“?",
+    "alongAll": "S kanálom {{channel}} sa presunú: {{subChannels}} a {{people}}.",
+    "alongSubChannels": "S kanálom {{channel}} sa presunú: {{subChannels}}.",
+    "alongPeople": "S kanálom {{channel}} sa presunú: {{people}}.",
+    "alongNone": "Presunie sa len {{channel}}; je prázdny.",
+    "subChannels_one": "{{count}} podkanál",
+    "subChannels_few": "{{count}} podkanály",
+    "subChannels_many": "{{count}} podkanála",
+    "subChannels_other": "{{count}} podkanálov",
+    "pathTo": "do",
+    "confirm": "Presunúť",
+    "failedTitle": "{{channel}} sa nepodarilo presunúť",
+    "refusedParent": "Nemáš oprávnenie presúvať kanály do {{channel}}."
   }
 }

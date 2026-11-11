@@ -28,8 +28,8 @@
     },
     "empty": "Kõik on loetud.",
     "unread": "Lugemata",
-    "dndOn": "Ära sega on sees",
-    "dndOff": "Ära sega on väljas",
+    "dndOn": "Režiim „Ära sega“ on sees",
+    "dndOff": "Režiim „Ära sega“ on väljas",
     "settings": "Teavituste seaded",
     "someone": "Keegi",
     "quoted": "„{{text}}“",
@@ -38,13 +38,13 @@
     "reply": "{{name}} vastas sinu sõnumile",
     "chatRequest": "{{name}} tahab sinuga vestelda",
     "messageRequest": "Sõnumitaotlus kasutajalt {{name}}",
-    "messageRequestBody_one": "{{count}} sõnum tavalisest Mumble’i kliendist",
-    "messageRequestBody_other": "{{count}} sõnumit tavalisest Mumble’i kliendist",
+    "messageRequestBody_one": "{{count}} sõnum tavaliselt Mumble'i kliendilt",
+    "messageRequestBody_other": "{{count}} sõnumit tavaliselt Mumble'i kliendilt",
     "invite": {
       "watchParty": "{{name}} kutsus sind ühisvaatamisele",
       "screenShare": "{{name}} jagab oma ekraani",
       "card": "{{name}} saatis sulle kaardi",
-      "theme": "{{name}} jagas sinuga teemat"
+      "theme": "{{name}} jagas sinuga teema"
     },
     "connection": "{{server}} ei ole kättesaadav",
     "type": {
@@ -53,7 +53,7 @@
       "invite": "Kutse",
       "private": "Privaatsõnum",
       "connection": "Ühendus",
-      "update": "Värskendus"
+      "update": "Uuendus"
     },
     "accept": "Nõustu",
     "decline": "Keeldu",
@@ -66,14 +66,18 @@
     "block": "Blokeeri",
     "update": {
       "title": "Mumcord {{version}} on valmis",
-      "body": "Värskendamiseks taaskäivita",
-      "restart": "Taaskäivita ja värskenda",
+      "body": "Uuendamiseks taaskäivita",
+      "restart": "Taaskäivita ja uuenda",
       "whatsNew": "Mis on uut"
     },
     "relay": {
-      "title": "Relee serveris {{server}} muutus",
-      "body": "Ekraani ja failide jagamine on peatatud, kuni usaldad uut releed.",
+      "title": "Releeserver muutus serveris {{server}}",
+      "body": "Ekraani ja failide jagamine on peatatud, kuni usaldad uut releeserverit.",
       "decision": "Vajab sinu otsust"
     }
+  },
+  "suppressionFallback": {
+    "title": "Mürasummutus on liiga aeglane",
+    "text": "Selles arvutis praegu liiga aeglane. Kuni see järele jõuab, on kasutusel „{{standard}}“."
   }
 }

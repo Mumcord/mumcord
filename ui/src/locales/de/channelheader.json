@@ -3,7 +3,7 @@
   "copyFailed": "Link konnte nicht kopiert werden",
   "menu": {
     "label": "Kanaloptionen für {{channel}}",
-    "join": "Kanal betreten",
+    "join": "Kanal beitreten",
     "follow": "Kanal folgen",
     "unfollow": "Kanal nicht mehr folgen",
     "following": "Folge ich",
@@ -22,7 +22,7 @@
     "title": "Kanalinfo: {{channel}}",
     "noDescription": "Dieser Kanal hat keine Beschreibung.",
     "descriptionLoading": "Beschreibung wird geladen…",
-    "users": "Nutzer",
+    "users": "Benutzer",
     "usersCount_one": "{{count}} Person",
     "usersCount_other": "{{count}} Personen",
     "usersOfMax_one": "{{count}} von max. {{max}}",

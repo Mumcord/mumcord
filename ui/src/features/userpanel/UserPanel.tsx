@@ -263,6 +263,7 @@ export function UserPanel() {
           ref={settingsButton}
           type="button"
           className="userpanel__toggle userpanel__toggle--settings"
+          data-tour="themes"
           aria-label={t("settings")}
           data-tooltip={t("settings")}
           aria-haspopup="menu"
@@ -308,7 +309,7 @@ export function UserPanel() {
         }}
       />
       <div className="userpanel__row">
-        <span className="userpanel__split">
+        <span className="userpanel__split" data-tour="talk">
           <button
             ref={micButton}
             type="button"

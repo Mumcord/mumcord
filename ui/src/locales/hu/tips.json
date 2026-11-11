@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, a tippsegéd",
+  "greeting": {
+    "title": "Szia, Aaron vagyok!",
+    "body": "Axolotl vagyok, és úgy ismerem a Mumcordot, mint a tenyeremet. Jöhet egy gyors bemutató? Nagyjából egy percig tart. Ha most nem, a Beállítások → Névjegy → Tippek alatt megtalálsz.",
+    "start": "Mutasd",
+    "later": "Most nem"
+  },
+  "progress": "{{current}}. tipp / {{total}}",
+  "back": "Vissza",
+  "next": "Tovább",
+  "done": "Kész",
+  "skip": "Bemutató kihagyása",
+  "close": "Tippek bezárása",
+  "tips": {
+    "servers": {
+      "title": "A szervereid",
+      "body": "A bal szélső sávban vannak a szervereid. A + gombbal újat adhatsz hozzá, a nagyítóval nyilvános szervereket böngészhetsz. Egyszerre több szerverhez is csatlakozhatsz."
+    },
+    "channels": {
+      "title": "Csatornák",
+      "body": "Dupla kattintással csatlakozol egy csatornához, és beszélhetsz. Egy kattintás csatlakozás nélkül mutatja meg a csatorna csevegését, a Követés gombbal pedig mindenről értesülsz."
+    },
+    "talk": {
+      "title": "Így beszélsz",
+      "body": "Push-to-talk vagy hangaktiválás? Válassz a Beállítások → Beszéd és hang részben, vagy nyisd meg a Hangbeállítások… lehetőséget a mikrofon melletti kis nyíllal. A Push-to-talk egérgombokkal is működik."
+    },
+    "panel": {
+      "title": "A felhasználói paneled",
+      "body": "Bal lent némíthatod a mikrofont, süketítheted magad, bekapcsolhatod a kamerát, vagy lecsatlakozhatsz. A mellettük lévő kis nyilak további lehetőségeket nyitnak meg."
+    },
+    "search": {
+      "title": "Bármit megtalálsz",
+      "body": "A {{key}} lenyomásával személyeket és csatornákat találsz, nagy szervereken is."
+    },
+    "chat": {
+      "title": "Csevegés",
+      "body": "Válaszolj egy üzenetre, idézd, említs meg másokat a @ jellel, és ossz meg képeket és fájlokat. A formázógombok gépelés közben jelennek meg."
+    },
+    "apps": {
+      "title": "Alkalmazások",
+      "body": "Az üzenetsáv Alkalmazások gombjával képernyőmegosztást, közös nézést vagy kamerát indíthatsz. A bővítmények még többet adnak."
+    },
+    "themes": {
+      "title": "A stílusod",
+      "body": "A bal alsó fogaskerék váltogat a sötét és a világos között. A Beállítások → Megjelenés alatt további témák vannak, és egy szerver saját témát is kaphat: kattints rá jobb gombbal, és válaszd a Téma lehetőséget."
+    },
+    "end": {
+      "title": "Ennyi volt!",
+      "body": "Jó szórakozást a Mumcordban! Bármikor visszahívhatsz a Beállítások → Névjegy → Tippek alatt."
+    }
+  }
+}

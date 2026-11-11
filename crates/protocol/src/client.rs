@@ -180,6 +180,11 @@ pub enum Event {
     /// [`Event::PermissionDenied`] with `permission == [`crate::permissions::BAN`]. Texts and
     /// addresses are untrusted server input (issue #254).
     BanList(Vec<crate::ban::Ban>),
+    /// The server's registered accounts, the answer to [`Handle::query_user_list`] and every push
+    /// it sends after a change (issue #256). Standard servers send it only to users with the
+    /// Register permission in the root channel. `last_seen` and `last_channel` stay `None` on
+    /// servers that do not report them. Names are untrusted server text.
+    UserList(Vec<crate::registered::RegisteredUser>),
     ServerConfigUpdated(ServerInfo),
     /// UDP crypto parameters for the voice transport, passed through as received (also during
     /// login; the latest value is in `ServerState::crypt`).
@@ -1139,6 +1144,10 @@ impl Dispatcher {
                 let m: proto::BanList = decode("BanList", payload)?;
                 self.emit(Event::BanList(crate::ban::from_message(&m)));
             }
+            MessageType::UserList => {
+                let m: proto::UserList = decode("UserList", payload)?;
+                self.emit(Event::UserList(crate::registered::from_message(&m)));
+            }
             MessageType::ServerConfig => {
                 let m: proto::ServerConfig = decode("ServerConfig", payload)?;
                 let info = {
@@ -1504,6 +1513,37 @@ impl Handle {
         self.send(Frame::from_message(
             MessageType::BanList,
             &crate::ban::to_message(bans),
+        ))
+    }
+
+    /// Asks the server for its registered accounts (issue #256); the answer arrives as
+    /// [`Event::UserList`], as does every list the server pushes after a change. Standard servers
+    /// answer only users with the Register permission in the root channel, so a refusal arrives as
+    /// [`Event::PermissionDenied`].
+    pub fn query_user_list(&self) -> Result<(), CommandError> {
+        self.send(Frame::from_message(
+            MessageType::UserList,
+            &crate::registered::query_message(),
+        ))
+    }
+
+    /// Changes one registered account (issue #256): `Some(name)` renames it, `None` removes the
+    /// registration and leaves the person free to connect as a guest again. Unlike the ban list the
+    /// server applies this entry on its own, so one change is one message. Needs the Register
+    /// permission in the root channel; a refusal (a name already taken, for example) arrives as
+    /// [`Event::PermissionDenied`], the effect as a fresh [`Event::UserList`].
+    pub fn change_registered_user(
+        &self,
+        user_id: u32,
+        name: Option<&str>,
+    ) -> Result<(), CommandError> {
+        self.send(Frame::from_message(
+            MessageType::UserList,
+            &crate::registered::change_message(&crate::registered::RegisteredUser {
+                user_id,
+                name: name.map(str::to_owned),
+                ..Default::default()
+            }),
         ))
     }
 

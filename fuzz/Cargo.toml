@@ -1,0 +1,38 @@
+[package]
+name = "mumcord-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+# Not part of the app workspace: it needs nightly and sanitizer flags (CONTRIBUTING.md).
+[workspace]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+bytes = "1"
+mumcord-protocol = { path = "../crates/protocol" }
+mumcord-engine = { path = "../crates/engine" }
+
+[[bin]]
+name = "control_frame"
+path = "fuzz_targets/control_frame.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "voice_packet"
+path = "fuzz_targets/voice_packet.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "mumcord_hello"
+path = "fuzz_targets/mumcord_hello.rs"
+test = false
+doc = false
+bench = false

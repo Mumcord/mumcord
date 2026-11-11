@@ -95,6 +95,19 @@ async fn formatted_comment_reaches_other_clients_and_oversized_one_is_refused() 
     .await
     .expect("the other client sees the HTML");
 
+    // Above `message_length` the server reads the comment as XML, to leave the picture's data
+    // out of the text count, and refuses anything that is not well-formed (issue #712). So a
+    // picture only passes when its tag is closed.
+    let data = "A".repeat(8000);
+    let unclosed = format!("<p>pic</p><img src=\"data:image/png;base64,{data}\">");
+    let refused = engine.set_own_comment(server.id, unclosed).await;
+    assert!(refused.is_err(), "an unclosed image tag is refused");
+    let closed = format!("<p>pic</p><img src=\"data:image/png;base64,{data}\" />");
+    engine
+        .set_own_comment(server.id, closed)
+        .await
+        .expect("a well-formed comment with a picture is accepted");
+
     let too_long = format!("<p>{}</p>", "x".repeat(200_000));
     let refused = engine.set_own_comment(server.id, too_long).await;
     assert!(refused.is_err(), "an oversized comment must be refused");

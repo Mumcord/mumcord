@@ -98,8 +98,10 @@ rsa = { version = "0.9", default-features = false, features = ["std", "getrandom
 # Linux, MMCSS on Windows), so a loaded CPU does not starve them (issue #123).
 # pipewire (Linux): streams open on the PipeWire node the user picked, so every sink and source
 # of a multi-endpoint interface is its own device (issue #183). Uses the libpipewire that screen
-# sharing already links; no effect on Windows and macOS.
-cpal = { version = "0.18", features = ["realtime-dbus", "pipewire"] }
+# sharing already links; no effect on Windows and macOS. It is enabled per target in
+# crates/audio, because FreeBSD has no PipeWire (the sound server is OSS) and the feature would
+# otherwise pull in libpipewire there.
+cpal = { version = "0.18", features = ["realtime-dbus"] }
 # The same request for Mumcord's own capture and playback threads.
 audio_thread_priority = { version = "0.35", default-features = false, features = ["with_dbus"] }
 # opusic-sys builds libopus statically from bundled sources.
@@ -214,7 +216,7 @@ rustc-demangle = "0.1"
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Memory", "Win32_System_Diagnostics_ToolHelp"] }
 
 # Linux desktop portals (Wayland global shortcuts)
-ashpd = "0.13"
+ashpd = "0.14"
 # XDG activation token so the desktop may raise the window a portal call opens (already in the tree via Tauri)
 gdk = "0.18"
 # Desktop notifications for new messages (FR-1.48c): the freedesktop notification service on D-Bus,
@@ -269,6 +271,8 @@ specta-typescript = "0.0.13"
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "warn"
+# cargo-fuzz builds with `--cfg fuzzing`, which exposes the voice packet decoder to fuzz/.
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(fuzzing)"] }
 
 [workspace.lints.clippy]
 dbg_macro = "warn"

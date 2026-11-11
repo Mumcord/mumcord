@@ -19,7 +19,7 @@
     "noReason": "Föreslaget av servern",
     "install": "Installera…",
     "installLabel": "Installera {{name}}",
-    "addRepositoryLabel": "Lägg till databas för {{name}}",
+    "addRepositoryLabel": "Lägg till förråd för {{name}}",
     "details": "Visa detaljer",
     "detailsLabel": "Detaljer om {{name}}",
     "notNow": "Inte nu",

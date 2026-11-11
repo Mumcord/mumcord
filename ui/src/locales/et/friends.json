@@ -8,11 +8,11 @@
   "offline": "Võrgust väljas",
   "lastSeen": "Võrgust väljas, viimati nähtud {{when}}",
   "friend": "Sõber",
-  "friendHint": "Näitab, millal ta on võrgus, ja hoiab sinu privaatset vestlust temaga.",
+  "friendHint": "Näitab, millal ta on võrgus, ja säilitab sinu privaatvestluse temaga.",
   "noCertificate": "Sertifikaadita inimesi ei saa sõbraks lisada, sest Mumcord ei suudaks neid uuesti ära tunda.",
   "add": "Lisa sõber",
   "remove": "Eemalda sõber",
-  "failed": "Sõbra muutmine ei õnnestunud. Proovi palun uuesti.",
+  "failed": "Sõbraloendi muutmine ei õnnestunud. Proovi palun uuesti.",
   "join": "Liitu",
   "joinFriend": "Liitu kanaliga, kus on {{name}}"
 }

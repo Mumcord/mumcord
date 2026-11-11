@@ -6,13 +6,13 @@
     "minimize": "Minimera till systemfältet",
     "quit": "Avsluta",
     "failed": "Det fungerade inte. Försök igen.",
-    "descriptionServers": "Du är fortfarande ansluten till {{count}} servrar. Minimerad håller Mumcord dig kvar i röstkanalen och ligger kvar i systemfältet."
+    "descriptionServers": "Du är fortfarande ansluten till {{count}} servrar. När Mumcord är minimerat är du kvar i samtalet och appen ligger i systemfältet."
   },
   "windowOverlay": {
-    "title": "Fönsteroverlayen har tagits bort",
-    "description": "Det flytande overlayfönstret finns inte längre. I stället visar overlayen i spelet vem som pratar i dina spel. Du kan slå på den i overlayinställningarna.",
+    "title": "Fönsteröverlägget har tagits bort",
+    "description": "Det flytande överläggsfönstret finns inte längre. I stället visar överlägget i spelet vem som pratar i dina spel. Du kan slå på det i inställningarna för överlägg.",
     "dismiss": "Uppfattat",
-    "openSettings": "Öppna overlayinställningar"
+    "openSettings": "Öppna inställningar för överlägg"
   },
   "audioDevice": {
     "title": "Välj dina ljudenheter igen",
@@ -22,7 +22,7 @@
   },
   "appImageMenu": {
     "title": "Lägga till Mumcord i appmenyn?",
-    "description": "Då hamnar Mumcord i din appmeny. Ikonen och push-to-talk fungerar då ordentligt under Wayland, och mumble://-länkar öppnar Mumcord. Du kan ändra det senare i Inställningar.",
+    "description": "Då hamnar Mumcord i din appmeny. Ikonen och Push-to-talk fungerar då ordentligt under Wayland, och mumble://-länkar öppnar Mumcord. Du kan ändra det senare i Inställningar.",
     "no": "Nej",
     "yes": "Ja",
     "failed": "Det fungerade inte. Försök igen."
@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabil",
+    "releaseCandidate": "Releasekandidat",
+    "prereleaseNote": "Det här är en förhandsversion och kan innehålla fel. Byt till den stabila kanalen i inställningarna om du bara vill ha slutgiltiga versioner.",
     "available": {
       "title": "Uppdatering tillgänglig",
       "subtitle": "Mumcord {{version}} är redo att laddas ned. Du har {{current}}.",

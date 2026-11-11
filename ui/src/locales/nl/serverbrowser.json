@@ -14,7 +14,7 @@
     "anyCountry": "Elk land",
     "ping": "Ping",
     "anyPing": "Elke ping",
-    "pingBelow": "Onder {{ms}} ms",
+    "pingBelow": "Minder dan {{ms}} ms",
     "hideEmpty": "Lege verbergen",
     "hideFull": "Volle verbergen"
   },
@@ -32,7 +32,7 @@
   },
   "users": "{{users}} / {{max}}",
   "unknown": "Nog onbekend",
-  "measuring": "Meten",
+  "measuring": "Meten…",
   "noAnswer": "Geen antwoord",
   "ms": "{{ms}} ms",
   "connect": "Verbinden",

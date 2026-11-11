@@ -3,9 +3,10 @@
 use mumcord_engine::{ChatMessageView, Engine};
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::State;
+use tauri::{State, WebviewWindow};
 use tauri_specta::Event;
 
+use super::file_dialog::{SaveDialog, pick_save_path};
 use super::types::{
     ApiError, ApiResult, ChannelId, Conversation, ErrorCode, ServerId, SessionId,
     to_engine_server_id,
@@ -116,13 +117,22 @@ pub(crate) fn rfc3339(millis: i64) -> String {
     )
 }
 
-/// Writes the image of a `data:` URL to `path` (the viewer's "Save image", FR-1.56). The data is
-/// already in the UI, so nothing is fetched again.
+/// Asks where to save the image of a `data:` URL and writes it there (the viewer's "Save image",
+/// FR-1.56). The data is already in the UI, so nothing is fetched again. Returns false when the
+/// user cancelled the save dialog.
 #[tauri::command]
 #[specta::specta]
-pub async fn save_image(path: String, data_url: String) -> ApiResult<()> {
+pub async fn save_image(
+    window: WebviewWindow,
+    dialog: SaveDialog,
+    data_url: String,
+) -> ApiResult<bool> {
     let bytes = limited_image_bytes(&data_url)?;
-    std::fs::write(&path, bytes).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
+    let Some(path) = pick_save_path(&window, dialog).await? else {
+        return Ok(false);
+    };
+    std::fs::write(&path, bytes).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))?;
+    Ok(true)
 }
 
 /// Largest image "Copy image" and "Save image" take (issue #115): well above the largest
@@ -196,17 +206,33 @@ pub async fn copy_image(app: tauri::AppHandle, data_url: String) -> ApiResult<()
 /// Largest text `save_text` writes; matches the UI's limit for downloading a code block.
 const MAX_TEXT_BYTES: usize = 1024 * 1024;
 
-/// Writes text the UI already has to `path` (a chat code block's "Download", issue #111).
-#[tauri::command]
-#[specta::specta]
-pub fn save_text(path: String, contents: String) -> ApiResult<()> {
+/// Refuses text above `MAX_TEXT_BYTES`; split out so the limit is testable without a dialog.
+fn check_text_size(contents: &str) -> ApiResult<()> {
     if contents.len() > MAX_TEXT_BYTES {
         return Err(ApiError::new(
             ErrorCode::InvalidInput,
             "text too large to save",
         ));
     }
-    std::fs::write(&path, contents).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))
+    Ok(())
+}
+
+/// Asks where to save text the UI already has and writes it there (a chat code block's
+/// "Download", issue #111, or a plugin's data export). Returns false when the user cancelled the
+/// save dialog.
+#[tauri::command]
+#[specta::specta]
+pub async fn save_text(
+    window: WebviewWindow,
+    dialog: SaveDialog,
+    contents: String,
+) -> ApiResult<bool> {
+    check_text_size(&contents)?;
+    let Some(path) = pick_save_path(&window, dialog).await? else {
+        return Ok(false);
+    };
+    std::fs::write(&path, contents).map_err(|err| ApiError::new(ErrorCode::Io, err.to_string()))?;
+    Ok(true)
 }
 
 /// Largest text `copy_text` puts on the clipboard: far more than a long chat selection.
@@ -253,8 +279,8 @@ pub(crate) fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, ApiError>
 #[cfg(test)]
 mod tests {
     use super::{
-        MAX_COPY_TEXT_BYTES, MAX_IMAGE_BYTES, MAX_TEXT_BYTES, clipboard_pixels, copyable_text,
-        decode_image_data_url, limited_image_bytes, rfc3339, save_text,
+        MAX_COPY_TEXT_BYTES, MAX_IMAGE_BYTES, MAX_TEXT_BYTES, check_text_size, clipboard_pixels,
+        copyable_text, decode_image_data_url, limited_image_bytes, rfc3339,
     };
     use crate::commands::types::ErrorCode;
     use base64::Engine as _;
@@ -279,17 +305,8 @@ mod tests {
 
     #[test]
     fn saves_text_up_to_the_limit() {
-        let dir = std::env::temp_dir().join(format!("mumcord-save-text-{}", std::process::id()));
-        std::fs::create_dir_all(&dir).expect("temp dir");
-        let path = dir.join("snippet.sql");
-        let path_text = path.to_string_lossy().into_owned();
-        save_text(path_text.clone(), "SELECT 1;\n".into()).expect("small text is saved");
-        assert_eq!(
-            std::fs::read_to_string(&path).expect("saved file"),
-            "SELECT 1;\n"
-        );
-        assert!(save_text(path_text, "x".repeat(MAX_TEXT_BYTES + 1)).is_err());
-        std::fs::remove_dir_all(&dir).expect("remove temp dir");
+        check_text_size(&"x".repeat(MAX_TEXT_BYTES)).expect("text at the limit is saved");
+        assert!(check_text_size(&"x".repeat(MAX_TEXT_BYTES + 1)).is_err());
     }
 
     fn data_url(mime: &str, bytes: &[u8]) -> String {

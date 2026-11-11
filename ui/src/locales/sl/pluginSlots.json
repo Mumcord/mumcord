@@ -1,7 +1,7 @@
 {
   "tree": {
     "empty": "Ta vtičnik tukaj še ničesar ne prikazuje.",
-    "actionFailed": "Vtičnik tega ni mogel obdelati. Poskusite znova."
+    "actionFailed": "Vtičnik tega ni mogel obdelati. Poskusi znova."
   },
   "progress": {
     "working": "V teku"

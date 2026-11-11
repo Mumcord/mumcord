@@ -13,7 +13,7 @@
     "listLabel": "Servidores guardados",
     "add": "Añadir un servidor",
     "browse": "Explorar servidores públicos",
-    "keyboardHint": "Intro conecta. Alt más flecha arriba o abajo mueve el servidor. Mayúsculas más F10 abre más opciones.",
+    "keyboardHint": "Intro conecta. Alt más flecha arriba o abajo mueve el servidor. Mayús más F10 abre más opciones.",
     "label": "{{server}} ({{state}})",
     "state": {
       "connected": "conectado",
@@ -81,7 +81,7 @@
     "channelPassword": "Contraseña {{number}}",
     "channelPasswordChannel": "{{name}} ({{parent}})",
     "channelPasswordNotFound": "(no encontrado)",
-    "channelPasswordLastUsed": "Último uso {{when}}",
+    "channelPasswordLastUsed": "Último uso: {{when}}",
     "channelPasswordName": "Nombre para {{name}}",
     "renameChannelPassword": "Renombrar {{name}}",
     "rename": "Renombrar",
@@ -107,6 +107,8 @@
       "certChanged": "El certificado ha cambiado: compruébalo antes de conectar",
       "wrongPassword": "El servidor ha rechazado la contraseña.",
       "nameInUse": "Ese nombre ya está en uso en este servidor.",
+      "certUntrustedNotSent": "El certificado del servidor aún no es de confianza, así que no se envió la contraseña. Conéctate una vez y confía en el certificado; después vuelve a probar.",
+      "certChangedNotSent": "El certificado del servidor ha cambiado, así que no se envió la contraseña.",
       "unreachable": "No se pudo contactar con el servidor.",
       "invalid": "Los datos no son válidos.",
       "failed": "La prueba ha fallado. Inténtalo de nuevo."
@@ -211,7 +213,7 @@
     "failed": "No se pudo enviar la contraseña. Inténtalo de nuevo.",
     "cancel": "Cancelar",
     "join": "Unirse",
-    "joining": "Uniéndose…"
+    "joining": "Entrando…"
   },
   "serverInfo": {
     "title": "Información del servidor",
@@ -283,9 +285,9 @@
     "permissionMakeTempChannel": "Crear canal temporal",
     "permissionListen": "Escuchar",
     "permissionKick": "Expulsar",
-    "permissionBan": "Vetar",
+    "permissionBan": "Banear",
     "permissionRegister": "Registrar usuarios",
-    "permissionSelfRegister": "Registrarse a sí mismo",
+    "permissionSelfRegister": "Registrarse",
     "permissionResetUserContent": "Restablecer contenido de usuario",
     "characters": "{{value}} caracteres"
   },

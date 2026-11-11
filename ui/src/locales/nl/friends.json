@@ -9,10 +9,10 @@
   "lastSeen": "Offline, laatst gezien {{when}}",
   "friend": "Vriend",
   "friendHint": "Toont wanneer ze online zijn en bewaart je privéchat met hen.",
-  "noCertificate": "Mensen zonder certificaat kunnen geen vriend zijn, omdat Mumcord ze niet opnieuw kan herkennen.",
+  "noCertificate": "Mensen zonder certificaat kunnen geen vrienden worden, omdat Mumcord ze niet opnieuw zou herkennen.",
   "add": "Vriend toevoegen",
   "remove": "Vriend verwijderen",
-  "failed": "De vriend wijzigen is mislukt. Probeer het opnieuw.",
+  "failed": "Vriendschap wijzigen is mislukt. Probeer het opnieuw.",
   "join": "Deelnemen",
-  "joinFriend": "Kanaal van {{name}} betreden"
+  "joinFriend": "Deelnemen aan kanaal van {{name}}"
 }

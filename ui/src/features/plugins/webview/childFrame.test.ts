@@ -97,6 +97,26 @@ describe("trackPlacement", () => {
     expect(frames.waiting()).toBe(false);
   });
 
+  it("reports the same placement again when the window's height changed", () => {
+    const frames = manualFrames();
+    const place: PluginFrameBounds = { x: 0, y: 40, width: 100, height: 100 };
+    let height = 800;
+    const seen: (PluginFrameBounds | null)[] = [];
+    const stop = trackPlacement(
+      document.createElement("div"),
+      (b) => seen.push(b),
+      () => place,
+      frames.scheduler,
+      () => height,
+    );
+    frames.step();
+    height = 772; // the window got shorter; the frame's place from the top stayed
+    frames.step();
+    frames.step();
+    expect(seen).toEqual([place, place]);
+    stop();
+  });
+
   it("compares bounds by value", () => {
     const a = { x: 1, y: 2, width: 3, height: 4 };
     expect(sameBounds(a, { ...a })).toBe(true);

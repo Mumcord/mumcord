@@ -26,6 +26,11 @@
   animation: toast-in var(--duration-normal) var(--ease-out);
 }
 
+/* Something did not work: a red bar on the left, the toast stays readable as plain text. */
+.toast[data-tone="error"] {
+  border-left: 3px solid var(--color-danger);
+}
+
 /* Buttons of a toast that asks for a decision (#600), on their own row below the text. */
 .toast__actions {
   display: flex;

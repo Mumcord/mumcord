@@ -23,7 +23,7 @@
   "join": "Beitreten",
   "joinLabel": "{{plugin}} beitreten",
   "open": "Öffnen",
-  "openLabel": "Öffnen: {{plugin}}",
+  "openLabel": "{{plugin}} öffnen",
   "getPlugin": "Plugin holen",
   "getPluginLabel": "{{plugin}} holen",
   "activityStarted": "{{name}} hat {{plugin}} gestartet",

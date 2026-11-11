@@ -51,7 +51,7 @@ pub struct Groups {
 
 impl Groups {
     /// Notification id to replace for this chat; 0 asks for a new one.
-    #[cfg(any(target_os = "linux", test))]
+    #[cfg(any(target_os = "linux", target_os = "freebsd", test))]
     pub fn replaces(&self, server_id: ServerId, conversation: &Conversation) -> u32 {
         self.by_key
             .get(&key(server_id, conversation))
@@ -63,7 +63,7 @@ impl Groups {
             .insert(key(server_id, &conversation), (server_id, conversation, id));
     }
 
-    #[cfg(any(target_os = "linux", test))]
+    #[cfg(any(target_os = "linux", target_os = "freebsd", test))]
     fn take_id(&mut self, id: u32) -> Option<(ServerId, Conversation)> {
         let key = self
             .by_key
@@ -75,7 +75,7 @@ impl Groups {
     }
 
     /// A notification action: the server and chat to open for a click ("default"), else `None`.
-    #[cfg(any(target_os = "linux", test))]
+    #[cfg(any(target_os = "linux", target_os = "freebsd", test))]
     pub fn action(&mut self, id: u32, action_key: &str) -> Option<(ServerId, Conversation)> {
         if action_key == "default" {
             self.take_id(id)
@@ -85,7 +85,7 @@ impl Groups {
     }
 
     /// The notification went away (expired, dismissed or clicked).
-    #[cfg(any(target_os = "linux", test))]
+    #[cfg(any(target_os = "linux", target_os = "freebsd", test))]
     pub fn closed(&mut self, id: u32) {
         self.take_id(id);
     }
@@ -112,7 +112,7 @@ impl Groups {
 }
 
 /// Body text for notification services that interpret a subset of HTML.
-#[cfg(any(target_os = "linux", test))]
+#[cfg(any(target_os = "linux", target_os = "freebsd", test))]
 pub fn escape_markup(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     for c in text.chars() {
@@ -133,7 +133,7 @@ pub fn escape_markup(text: &str) -> String {
 pub struct Notifier {
     // Held across a show so two quick messages of one chat never create two notifications.
     groups: tokio::sync::Mutex<Groups>,
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     linux: linux::Service,
 }
 
@@ -143,7 +143,9 @@ pub fn init(app: &AppHandle) {
 }
 
 fn main_window_focused(app: &AppHandle) -> bool {
-    let Some(window) = app.get_webview_window("main") else {
+    // Not `get_webview_window`: that finds nothing while a plugin frame's child web view sits in
+    // the window (macOS), and the focused window would count as away.
+    let Some(window) = crate::window::find_main_window(app) else {
         return false;
     };
     window.is_visible().unwrap_or(false)
@@ -237,7 +239,7 @@ pub fn on_engine_event(app: &AppHandle, server_id: ServerId, event: &EngineEvent
 }
 
 /// Shows or replaces the chat's notification; returns its id where the platform has one.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 async fn show(
     app: &AppHandle,
     notifier: &Notifier,
@@ -255,7 +257,7 @@ async fn show(
         .map(Some)
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 async fn close(notifier: &Notifier, ids: Vec<u32>) {
     notifier.linux.close(ids).await;
 }
@@ -298,7 +300,12 @@ async fn show(
 #[cfg(any(target_os = "windows", target_os = "macos"))]
 async fn close(_notifier: &Notifier, _ids: Vec<u32>) {}
 
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 async fn show(
     _app: &AppHandle,
     _notifier: &Notifier,
@@ -308,12 +315,17 @@ async fn show(
     Err("desktop notifications are not supported on this platform".into())
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 async fn close(_notifier: &Notifier, _ids: Vec<u32>) {}
 
 /// A click on a notification: brings the window to the front and tells the UI which server and
 /// chat to open.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn activate(
     app: &AppHandle,
     server_id: ServerId,
@@ -335,7 +347,7 @@ fn activate(
 
 /// On Wayland the compositor only raises the window with the activation token the
 /// notification service handed out for the click; GTK passes it on with the startup id.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn present(app: &AppHandle, activation_token: Option<String>) {
     let handle = app.clone();
     let result = app.run_on_main_thread(move || {
@@ -354,7 +366,7 @@ fn present(app: &AppHandle, activation_token: Option<String>) {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod linux {
     use std::collections::HashMap;
 

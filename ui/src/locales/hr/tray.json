@@ -12,7 +12,7 @@
   "connected": "Povezano",
   "connectedIn": "Povezano · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Povezano – govori",
+  "talking": "Povezano – govoriš",
   "muted": "Povezano – mikrofon isključen",
   "voiceMenu": "Glasovni poslužitelj i kanal",
   "voiceServer": "Glasovni poslužitelj",

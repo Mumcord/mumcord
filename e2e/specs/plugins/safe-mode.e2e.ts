@@ -8,6 +8,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { $, browser, expect } from "@wdio/globals";
+import type { ChainablePromiseElement } from "webdriverio";
 import { app, registry, repoRoot, testenv } from "../../helpers/index.ts";
 import { ScriptBot, addFirstServer, finishWizard } from "../../helpers/chat-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
@@ -94,6 +95,21 @@ async function waitState(name: string, text: string, timeout: number): Promise<v
 
 function banner() {
   return $(".plugins-banner");
+}
+
+/**
+ * Clicks `element` even when a notification toast sits on top of it (#660: activity toasts are
+ * in-app by default); the click still means that element.
+ */
+async function clickUnderToast(element: ChainablePromiseElement): Promise<void> {
+  await element.click().catch(async () => {
+    await browser.execute(
+      (el: HTMLElement) => {
+        el.click();
+      },
+      await element,
+    );
+  });
 }
 
 function turnOffAll() {
@@ -201,7 +217,7 @@ describe("plugins: limits, back-off and safe mode (AC-6.8 … AC-6.10)", () => {
     );
 
     await openInstalled();
-    await turnOffAll().click();
+    await clickUnderToast(turnOffAll());
     await expect(banner()).toHaveText(expect.stringContaining("All plugins are turned off"), {
       wait: 10_000,
     });
@@ -219,7 +235,7 @@ describe("plugins: limits, back-off and safe mode (AC-6.8 … AC-6.10)", () => {
     expect(state.plugins.find((p) => p.id === "fx-strip")?.status.kind).toBe("allOff");
     expect(await turnOffAll().isSelected()).toBe(true);
 
-    await turnOffAll().click();
+    await clickUnderToast(turnOffAll());
     await browser.waitUntil(
       async () =>
         (await overview()).plugins.find((p) => p.id === "fx-strip")?.status.kind === "running",

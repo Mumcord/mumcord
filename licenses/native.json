@@ -192,22 +192,54 @@
       "license": "LGPL-2.1-or-later",
       "repository": "https://gitlab.freedesktop.org/gstreamer/gstreamer",
       "description": [
-        "The plugins of gst-plugins-good, bundled in the AppImage. Plugins that implement",
-        "H.264 and H.265 (gst-libav / FFmpeg, x264, x265, OpenH264) and GPL-only codecs",
+        "The plugins of gst-plugins-good, bundled in the AppImage. The build host's plugins that",
+        "implement H.264 and H.265 (gst-libav / FFmpeg, x264, x265, OpenH264) and GPL-only codecs",
         "(a52dec, dtsdec, mpeg2dec, libdvdread, faac, faad) are deliberately not bundled",
-        "(scripts/filter-gst-plugins.sh); the AppImage plays YouTube through VP9."
+        "(scripts/filter-gst-plugins.sh); H.264 and AAC come from Mumcord's own LGPL build of",
+        "FFmpeg and gst-libav instead (see below)."
       ],
       "texts": ["licenses/lgpl-2.1.txt"]
     },
     {
-      "name": "GStreamer Bad Plugins (opusparse)",
+      "name": "GStreamer Bad Plugins (opusparse, videoparsersbad)",
       "version": "",
       "license": "LGPL-2.1-or-later",
       "repository": "https://gitlab.freedesktop.org/gstreamer/gstreamer",
       "description": [
-        "Only the Opus parser of gst-plugins-bad, bundled in the AppImage: without it WebKit",
-        "reports no playable audio format for YouTube."
+        "Only the Opus parser and the video parsers (h264parse and others) of gst-plugins-bad,",
+        "bundled in the AppImage: without them WebKit reports no playable audio format for",
+        "YouTube and cannot play H.264 streams such as Twitch."
       ],
+      "texts": ["licenses/lgpl-2.1.txt"]
+    },
+    {
+      "name": "FFmpeg",
+      "version": "@ffmpeg",
+      "license": "LGPL-2.1-or-later",
+      "repository": "https://ffmpeg.org",
+      "description": [
+        "The H.264 and AAC decoders for video playback (Twitch, .mp4 links) in every Linux",
+        "package: libavutil, libavcodec, libavformat and libavfilter as shared libraries in",
+        "/usr/lib/mumcord (.deb, .rpm) or usr/lib inside the AppImage, used only by Mumcord's",
+        "gst-libav. Built by scripts/build-ffmpeg.sh as LGPL only (no GPL, nonfree or version 3",
+        "parts) with only the H.264, AAC and AAC-LATM decoders and parsers; no encoders. The",
+        "libraries can be replaced with a compatible build of your own."
+      ],
+      "revision": "@ffmpeg-build",
+      "texts": ["licenses/lgpl-2.1.txt"]
+    },
+    {
+      "name": "GStreamer FFmpeg plugin (gst-libav)",
+      "version": "@gst-libav",
+      "license": "LGPL-2.1-or-later",
+      "repository": "https://gitlab.freedesktop.org/gstreamer/gstreamer",
+      "description": [
+        "The GStreamer plugin (libgstlibav.so) that gives WebKitGTK the bundled FFmpeg decoders,",
+        "in every Linux package: /usr/lib/mumcord/gstreamer-1.0 (.deb, .rpm) or with the other",
+        "GStreamer plugins inside the AppImage. Built by scripts/build-ffmpeg.sh against the",
+        "bundled FFmpeg and Ubuntu 24.04's GStreamer 1.24."
+      ],
+      "revision": "@gst-libav-build",
       "texts": ["licenses/lgpl-2.1.txt"]
     },
     {

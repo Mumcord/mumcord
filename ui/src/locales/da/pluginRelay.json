@@ -1,7 +1,7 @@
 {
   "title": "Plugin-data via relæet",
   "switchLabel": "Lad plugins bruge en servers relæ",
-  "switchText": "Plugins, du tillader, kan sende større data (spiltræk, tegninger) hurtigere via servercommunityets relæ. Ende-til-ende-krypteret: relæet kan ikke læse det. Uden relæ bruger de den langsommere Mumble-forbindelse.",
+  "switchText": "Plugins, du tillader, kan sende større data (spiltræk, tegninger) hurtigere via serverfællesskabets relæ. Ende-til-ende-krypteret: relæet kan ikke læse det. Uden relæ bruger de den langsommere Mumble-forbindelse.",
   "servers": "Dine servere",
   "serverAllows": "{{server}} · relæet tillader plugin-data",
   "serverAllowsRate": "op til {{rate}} kbit/s pr. plugin",
@@ -18,6 +18,6 @@
     "title": "Plugin-lyde",
     "volume": "Lydstyrke for plugin-lyde",
     "mute": "Slå plugin-lyde fra",
-    "text": "Korte lyde, der følger med plugins. Lydstyrke og lydløs gælder alle plugins."
+    "text": "Korte lyde, der følger med plugins. Lydstyrke og slå lyd fra gælder for alle plugins."
   }
 }

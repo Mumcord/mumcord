@@ -25,6 +25,7 @@ function share(session: number): ScreenShare {
     blocked: null,
     relayReason: null,
     kind: null,
+    title: null,
     elapsedMs: 0,
   };
 }

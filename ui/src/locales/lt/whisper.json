@@ -7,20 +7,20 @@
     "whisper": "Šnibždi: {{target}}",
     "shout": "Šauki: {{target}}",
     "releaseKey": "Tave girdi tik ten esantys žmonės. Atleisk <key>{{key}}</key>, kad vėl kalbėtum kanale {{channel}}.",
-    "stopToReturn": "Tave girdi tik ten esantys žmonės. Sustabdyk, kad vėl kalbėtum kanale {{channel}}.",
+    "stopToReturn": "Tave girdi tik ten esantys žmonės. Spausk „Sustabdyti“, kad vėl kalbėtum kanale {{channel}}.",
     "onlyThere": "Tave girdi tik ten esantys žmonės.",
     "stop": "Sustabdyti"
   },
   "denied": {
     "title": "Nepavyko pašnibždėti: {{target}}",
-    "noVoiceServer": "Pirmiausia prisijunk prie kanalo: šnabždesys eina per serverį, kuriame kalbi.",
+    "noVoiceServer": "Pirmiausia prisijunk prie kanalo: šnibždesys eina per serverį, kuriame kalbi.",
     "muted": "Įjunk mikrofoną, kad galėtum šnibždėti.",
     "serverMuted": "Serveris tave nutildė, todėl neperduoda tavo balso.",
     "nobodyHere": "Nė vieno iš šių žmonių dabar nėra šiame serveryje.",
     "channelNotFound": "Šio kanalo šiame serveryje nėra.",
-    "noPermission": "Serveris neleidžia tau šnibždėti kanale {{channel}}.",
+    "noPermission": "Serveris neleidžia tau šnibždėti kanalui {{channel}}.",
     "unknownTarget": "Šio tikslo nebėra.",
-    "dismiss": "Atsisakyti"
+    "dismiss": "Paslėpti"
   },
   "badge": {
     "whisper": "šnibžda",
@@ -34,7 +34,7 @@
   },
   "panel": {
     "open": "Šnibždėti arba šaukti",
-    "menu": "Šnabždesio ir šūksnio tikslai",
+    "menu": "Šnibždesio ir šūksnio tikslai",
     "manage": "Tvarkyti tikslus…",
     "none": "Tikslų dar nėra",
     "indicatorWhisper": "Šnibždi: {{target}}",

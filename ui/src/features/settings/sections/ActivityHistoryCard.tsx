@@ -3,13 +3,26 @@ import { useTranslation } from "react-i18next";
 import { clearActivityHistory } from "../../activity/activityStore";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Group } from "../components/Section";
+import { Switch } from "../components/Switch";
+import type { SettingsSectionProps } from "./types";
 
-/** "Clear activity history" (#594): the saved activity feed of all servers, after a confirmation. */
-export function ActivityHistoryCard() {
+/**
+ * "Keep activity history after a restart" (#661) and "Clear activity history" (#594): whether
+ * the feed is saved on this device, and deleting what was saved, after a confirmation.
+ */
+export function ActivityHistoryCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const [confirming, setConfirming] = useState(false);
   return (
     <Group title={t("activityHistory.title")} icon="list">
+      <Switch
+        label={t("activityHistory.keep")}
+        description={t("activityHistory.keepHint")}
+        checked={settings.keepActivityHistory}
+        onChange={(keepActivityHistory) => {
+          update({ keepActivityHistory });
+        }}
+      />
       <div className="settings-control-row">
         <div className="settings-control-row__text">
           <p className="settings-control-row__title">{t("activityHistory.clear")}</p>

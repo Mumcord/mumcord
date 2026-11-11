@@ -1,7 +1,7 @@
 {
   "tree": {
     "empty": "Tento plugin zde zatím nic nezobrazuje.",
-    "actionFailed": "Plugin to nedokázal zpracovat. Zkuste to prosím znovu."
+    "actionFailed": "Plugin to nedokázal zpracovat. Zkus to prosím znovu."
   },
   "progress": {
     "working": "Probíhá"

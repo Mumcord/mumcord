@@ -444,12 +444,16 @@
   },
   "notifications": {
     "title": "Notifications",
-    "legend": "Notifications for new messages",
-    "explanation": "For new messages in your channel, followed channels and private chats, except the chat you are looking at.",
-    "inApp": "In-app: a small pop-up inside Mumcord while it is in front",
-    "desktop": "Desktop: a system notification",
-    "both": "Both: pop-up while Mumcord is in front, system notification otherwise",
-    "off": "Off",
+    "explanation": "How Mumcord tells you about new messages and what happens on your servers. Each kind has its own choice.",
+    "messages": "New messages",
+    "messagesHint": "Your channel, followed channels and private chats",
+    "mode": {
+      "off": "Off",
+      "inApp": "In-app",
+      "desktop": "System",
+      "both": "Both"
+    },
+    "modesHint": "In-app: a small pop-up inside Mumcord while it is in front. System: a notification from your operating system. Both: the pop-up while Mumcord is in front, otherwise a system notification. Nothing shows for the chat you are looking at or during Do Not Disturb.",
     "activityTitle": "Activity notifications",
     "activity": {
       "screenShare": "Someone starts a screen share",
@@ -527,7 +531,20 @@
     "copyWhole": "Copy whole log",
     "openLogFolder": "Open log folder",
     "logCopied": "Log copied.",
-    "fileLabel": "Diagnostic file"
+    "fileLabel": "Diagnostic file",
+    "writeToDisk": "Write logs to disk",
+    "writeToDiskHint": "Off keeps the log in memory for this session only — nothing is written to disk.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Version",
@@ -551,7 +568,18 @@
     "setupWizardRun": "Run setup wizard again",
     "setupWizardIdentityNote": "Your identity is not part of this. Your certificate, and with it your registered name and permissions on servers, stays exactly as it is.",
     "setupWizardIdentityLink": "Manage it in Identity",
-    "versionTitle": "Version and licence"
+    "tipsTitle": "Tips",
+    "tipsHint": "Aaron shows you around Mumcord in about a minute: servers, channels, talking, chat and more.",
+    "tipsShow": "Show tips",
+    "versionTitle": "Version and licence",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profile",
@@ -887,6 +915,16 @@
     "modeNotify": "Notify only",
     "modeOff": "Off",
     "autoUnavailable": "This copy cannot update itself, so Mumcord only tells you about new versions.",
+    "channel": "Update channel",
+    "channelHint": "Choose which releases Mumcord offers. Release candidates are early builds of the next version.",
+    "channels": {
+      "stable": { "name": "Stable", "hint": "Final releases only" },
+      "releaseCandidates": {
+        "name": "Release candidates",
+        "hint": "Early builds of the next version; may contain bugs"
+      }
+    },
+    "channelSwitchBack": "Switching back to Stable keeps your current version until the next final release is out.",
     "interval": "Check for updates",
     "intervalHint_one": "On start and every hour",
     "intervalHint_other": "On start and every {{count}} hours",
@@ -1271,11 +1309,23 @@
   },
   "activityHistory": {
     "title": "Activity history",
+    "keep": "Keep activity history after a restart",
+    "keepHint": "Saves who connected, left, moved channel, shared a screen or started a watch party, so the feed is still there after a restart. Off: the feed starts empty each time. Turning it off deletes what was saved.",
     "clear": "Clear activity history",
     "hint": "Removes the saved feed for all servers.",
     "local": "Saved only on this device.",
     "button": "Clear history",
     "confirm": "Clear the activity history of all servers? This cannot be undone.",
     "confirmButton": "Clear"
+  },
+  "diskWrites": {
+    "title": "Reduce disk writes",
+    "hint": "Fewer writes wear solid-state drives less. Each switch keeps today's behaviour when on.",
+    "durableSaves": "Wait for disk on every save",
+    "durableSavesHint": "Off writes less, but a power cut can lose the last few seconds of history and settings.",
+    "linkPreviewsOnDisk": "Keep link previews on disk",
+    "linkPreviewsOnDiskHint": "Off keeps previews in memory for this session only.",
+    "pluginRegistryCache": "Keep plugin registry copy on disk",
+    "pluginRegistryCacheHint": "Off always fetches the registry fresh."
   }
 }

@@ -7,14 +7,15 @@
   "cameraOnLabel": "Tvoja kamera je zapnutá",
   "cameraOffLabel": "Tvoja kamera je vypnutá",
   "personCameraOn": "Kamera používateľa {{name}} je zapnutá",
-  "notInChannel": "Pripoj sa k hlasovému kanálu, aby si mohol zapnúť kameru.",
+  "notInChannel": "Pripoj sa k hlasovému kanálu, potom môžeš zapnúť kameru.",
   "unavailable": {
     "noRelay": "Tento server nemá relay, takže zdieľanie kamery nie je dostupné.",
     "relayTooOld": "Relay tohto servera je na zdieľanie kamery príliš starý.",
     "relayDisallows": "Relay tohto servera zdieľanie kamery nepovoľuje.",
     "needsRelayMode": "Zdieľanie kamery potrebuje relay. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
-    "registeredOnly": "Na tomto serveri môžu kameru používať len registrovaní používatelia."
+    "registeredOnly": "Na tomto serveri môžu kameru používať len registrovaní používatelia.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera zapnutá",
   "turnOffTray": "Vypnúť kameru",
@@ -103,7 +104,7 @@
     "groupNotAllowed": "Kamera sa nespustila: relay tohto servera obsluhuje len určité skupiny. Požiadaj správcu, nech ťa pridá.",
     "notSameChannel": "Kamera sa nespustila: ty a tvoji diváci musíte byť v rovnakom kanáli.",
     "notInChannel": "Kamera sa nespustila: najprv sa pripoj do kanála.",
-    "noHello": "Kamera sa nespustila: bot relaya túto aplikáciu ešte nepozná. Pripoj sa znova."
+    "noHello": "Kamera sa nespustila: bot relayu túto aplikáciu ešte nepozná. Pripoj sa znova."
   },
   "privacy": {
     "windows": "Windows blokuje prístup ku kamere desktopovým aplikáciám",
@@ -120,11 +121,11 @@
     "stopped": "Tvoja kamera sa zastavila",
     "joined": "{{name}} zapol(a) kameru",
     "left": "{{name}} vypol(a) kameru",
-    "turnedOn_one": "{{names}} zapol/zapla kameru",
+    "turnedOn_one": "{{names}} zapol(a) kameru",
     "turnedOn_few": "{{names}} zapli kamery",
     "turnedOn_many": "{{names}} zapli kamery",
     "turnedOn_other": "{{names}} zapli kamery",
-    "turnedOff_one": "{{names}} vypol/vypla kameru",
+    "turnedOff_one": "{{names}} vypol(a) kameru",
     "turnedOff_few": "{{names}} vypli kamery",
     "turnedOff_many": "{{names}} vypli kamery",
     "turnedOff_other": "{{names}} vypli kamery"
@@ -171,13 +172,13 @@
     "miniBar_many": "{{count}} zapnutej kamery",
     "miniBar_other": "{{count}} zapnutých kamier",
     "cameras": "Kamery",
-    "fullTitle": "Miestnosť je plná pri 9 kamerách",
+    "fullTitle": "Miestnosť je plná (9 kamier)",
     "backgroundPicker": "Zmeniť pozadie"
   },
   "position": {
     "label": "Kamery",
     "beside": "Kamery vedľa",
-    "above": "Nad",
+    "above": "Hore",
     "hidden": "Skryté"
   },
   "tile": {
@@ -192,6 +193,7 @@
     "joining": "Pripájanie ku kamere používateľa {{name}} …",
     "full": "Používateľa {{name}} sleduje príliš veľa ľudí",
     "failed": "Ku kamere používateľa {{name}} sa nepodarilo pripojiť",
+    "needsUpdate": "Táto kamera vyžaduje Mumcord 0.9.0",
     "retry": "Skúsiť znova",
     "hidden": "Video skryté",
     "showVideo": "Zobraziť video",
@@ -204,7 +206,7 @@
     "pin": "Pripnúť pre mňa",
     "unpin": "Odopnúť",
     "showLarge": "Zobraziť veľké",
-    "leaveLarge": "Opustiť veľké zobrazenie",
+    "leaveLarge": "Zavrieť veľké zobrazenie",
     "hideVideo": "Skryť video používateľa {{name}}",
     "showVideo": "Zobraziť video používateľa {{name}}",
     "quality": "Kvalita pre mňa",
@@ -222,12 +224,12 @@
     "screenLive": "Naživo",
     "partyTitle": "Spoločné sledovanie",
     "partyStarted": "Spustil(a) {{name}}",
-    "label": "{{title}} s miestnosťou s kamerami"
+    "label": "{{title}} s miestnosťou kamier"
   },
   "settings": {
     "title": "Kamera",
     "intro": "Tvoja kamera, efekty pozadia a to, ako vidíš kamery ostatných.",
-    "needsRelay": "Zdieľanie kamery potrebuje server s relay mumpeer.",
+    "needsRelay": "Zdieľanie kamery potrebuje server s relayom mumpeer.",
     "cameraSection": "Kamera",
     "previewNote": "Ukážka len v tomto zariadení. Skončí, keď túto stránku opustíš.",
     "camera": "Kamera",
@@ -255,13 +257,13 @@
     "manageImages": "Spravovať obrázky",
     "privacySection": "Súkromie",
     "lockOff": "Vypnúť moju kameru pri zamknutí obrazovky",
-    "privacyNote": "Tvoja kamera sa vždy spúšťa vypnutá a najprv ukáže náhľad. Vypne sa, keď opustíš kanál alebo sa odpojíš. Vidia ju len ľudia v tvojom hlasovom kanáli, cez relay tohto servera, s end-to-end šifrovaním. Mumcord kamery nikdy nenahráva.",
+    "privacyNote": "Tvoja kamera je na začiatku vždy vypnutá a najprv ukáže náhľad. Vypne sa, keď opustíš kanál alebo sa odpojíš. Vidia ju len ľudia v tvojom hlasovom kanáli, cez relay tohto servera, s end-to-end šifrovaním. Mumcord kamery nikdy nenahráva.",
     "othersSection": "Kamery ostatných",
     "showCameras": "Zobrazovať kamery",
     "showAlways": "Vždy",
     "showOnOpen": "Keď otvorím miestnosť",
     "showNever": "Nikdy",
-    "showHint": "Vždy otvorí miestnosť kamier, keď niekto v tvojom kanáli zapne kameru. Nikdy ťa nechá len pri hlase a nesťahuje žiadne video.",
+    "showHint": "„Vždy“ otvorí miestnosť kamier, keď niekto v tvojom kanáli zapne kameru. „Nikdy“ ťa nechá len pri hlase a nesťahuje žiadne video.",
     "dataSaver": "Šetrenie dát: až 15 fps pre všetkých",
     "reduceMotion": "Obmedziť pohyb: žiadna žiara ani animácia na rámčeku hovoriaceho",
     "reduceMotionHint": "Predvolene sa riadi nastavením obmedzenia pohybu v systéme."

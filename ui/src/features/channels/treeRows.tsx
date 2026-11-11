@@ -38,6 +38,13 @@ import {
   usePersonSelected,
 } from "./peopleSelection";
 import { foldName, matchRange } from "./search";
+import {
+  CHANNEL_DRAG_TYPE,
+  draggedChannel,
+  dropZone,
+  planChannelDrop,
+  type DropPlan,
+} from "./channelDrag";
 import { TreeContext, type TreeContextValue, type ValueStore } from "./treeContext";
 import { MumcordBadge } from "./MumcordBadge";
 import { MemberBadge } from "../plugins/badges";
@@ -223,9 +230,23 @@ export const ChannelBranch = memo(function ChannelBranchRow({
   const max = channel.maxUsers;
   const full = max !== null && count >= max;
   const places = max === null ? "" : t("tree.places", { count: max, taken: count });
-  const [dropping, setDropping] = useState(false);
+  // What a drag over this row would do: people dropped in, or a channel moved or refused (#676).
+  const [drop, setDrop] = useState<DropShown | null>(null);
   const acceptsDrop = (event: DragEvent) =>
     channel.permissions.moveUsers && event.dataTransfer.types.includes(PERSON_DRAG_TYPE);
+  const innerRef = useRef<HTMLDivElement>(null);
+  // Dragging a channel needs Write on it, like Edit in its menu; the root stays put (#676).
+  const channelDraggable = channel.permissions.write && channel.parentId !== null;
+  const dragging = useSelect(draggedChannel, (dragged) => dragged === id);
+  const channelDrop = (event: DragEvent): DropPlan | null => {
+    const draggedId = draggedChannel.get();
+    const row = innerRef.current;
+    if (draggedId === null || row === null) return null;
+    if (!event.dataTransfer.types.includes(CHANNEL_DRAG_TYPE)) return null;
+    const rect = row.getBoundingClientRect();
+    const zone = dropZone(event.clientY - rect.top, rect.height);
+    return planChannelDrop(tree.server.get().channels, draggedId, id, zone);
+  };
   // Indent of the channel's people and sub-channels; also read by its avatar stack line, which is
   // indented like its people (QA.27).
   const indent = { "--tree-indent": `${String(indentRem(level + 1))}rem` } as CSSProperties;
@@ -246,12 +267,31 @@ export const ChannelBranch = memo(function ChannelBranchRow({
         aria-keyshortcuts="Shift+Enter"
         tabIndex={tabbable ? 0 : -1}
         data-row={rowId}
+        data-dragging={dragging || undefined}
         data-full={full || undefined}
         data-tooltip={full ? t("tree.full") : undefined}
         data-tooltip-detail={full ? places : undefined}
         data-tooltip-placement={full ? "right" : undefined}
         className="tree-channel"
         style={indent}
+        draggable={channelDraggable || undefined}
+        onDragStart={
+          channelDraggable
+            ? (event) => {
+                event.dataTransfer.setData(CHANNEL_DRAG_TYPE, String(id));
+                event.dataTransfer.effectAllowed = "move";
+                setDragImage(event, channel.name);
+                draggedChannel.set(id);
+              }
+            : undefined
+        }
+        onDragEnd={
+          channelDraggable
+            ? () => {
+                draggedChannel.set(null);
+              }
+            : undefined
+        }
         onFocus={(event) => {
           if (event.target === event.currentTarget) actions.current.focus(rowId);
         }}
@@ -278,17 +318,35 @@ export const ChannelBranch = memo(function ChannelBranchRow({
           });
         }}
         onDragOver={(event) => {
+          const plan = channelDrop(event);
+          if (plan !== null) {
+            const shown = dropShown(plan);
+            if (shown !== drop) setDrop(shown);
+            // Without preventDefault a refused drop keeps the browser's no-drop cursor.
+            if (plan.kind !== "move") return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+            return;
+          }
           if (!acceptsDrop(event)) return;
           event.preventDefault();
           event.dataTransfer.dropEffect = "move";
-          if (!dropping) setDropping(true);
+          if (drop !== "people") setDrop("people");
         }}
         onDragLeave={(event) => {
           const to = event.relatedTarget;
-          if (!(to instanceof Node && event.currentTarget.contains(to))) setDropping(false);
+          if (!(to instanceof Node && event.currentTarget.contains(to))) setDrop(null);
         }}
         onDrop={(event) => {
-          setDropping(false);
+          setDrop(null);
+          const plan = channelDrop(event);
+          if (plan !== null) {
+            if (plan.kind !== "move") return;
+            event.preventDefault();
+            draggedChannel.set(null);
+            actions.current.moveChannel(plan);
+            return;
+          }
           if (!acceptsDrop(event)) return;
           event.preventDefault();
           const sessions = parseDragPayload(event.dataTransfer.getData(PERSON_DRAG_TYPE));
@@ -296,10 +354,18 @@ export const ChannelBranch = memo(function ChannelBranchRow({
         }}
       >
         <div
+          ref={innerRef}
           className="tree-channel__row"
           data-selected={selected}
           data-voice={isOwn}
-          data-drop={dropping || undefined}
+          data-drop={
+            drop === "people" || drop === "into"
+              ? true
+              : drop === "self" || drop === "subChannel"
+                ? "refused"
+                : undefined
+          }
+          data-drop-line={drop === "above" || drop === "below" ? drop : undefined}
         >
           <span
             className="tree-channel__toggle"
@@ -396,6 +462,12 @@ export const ChannelBranch = memo(function ChannelBranchRow({
             {/* The stack's label follows in the name (aria-labelledby); this is its comma. */}
             {showStack && <span className="visually-hidden">,</span>}
           </span>
+          {drop !== null && drop !== "people" && (
+            // Pointer only; the Edit dialog is the keyboard and screen-reader way (#676).
+            <span className="tree-channel__drop-hint" data-drop={drop} aria-hidden="true">
+              {t(`drag.${drop}`, { channel: channel.name })}
+            </span>
+          )}
           {/* Also on locked channels: joining one asks for its password (FR-2.78). */}
           {!isOwn && (
             <button
@@ -454,7 +526,7 @@ export const ChannelBranch = memo(function ChannelBranchRow({
         )}
       </div>
       {expanded && (
-        <div role="group" id={groupId} style={indent}>
+        <div role="group" id={groupId} style={indent} data-dragging={dragging || undefined}>
           {(shown ?? (!crowded || listingAll ? node.members : NO_STACK)).map((user) => (
             <PersonRow key={memberRowId(user.session)} user={user} level={level + 1} />
           ))}
@@ -466,6 +538,29 @@ export const ChannelBranch = memo(function ChannelBranchRow({
     </>
   );
 });
+
+/** What a row shows while something is dragged over it. */
+type DropShown = "people" | "into" | "above" | "below" | "self" | "subChannel";
+
+function dropShown(plan: DropPlan): DropShown | null {
+  if (plan.kind === "none") return null;
+  return plan.kind === "refused" ? plan.reason : plan.zone;
+}
+
+/** A small "# Raid" chip under the pointer instead of a picture of the whole row. */
+function setDragImage(event: DragEvent, name: string) {
+  const ghost = document.createElement("div");
+  ghost.className = "channel-drag-ghost";
+  const glyph = document.createElement("span");
+  glyph.textContent = "#";
+  ghost.append(glyph, name);
+  document.body.append(ghost);
+  event.dataTransfer.setDragImage(ghost, 12, 12);
+  // The browser takes its picture right away; the element is only needed during this event.
+  requestAnimationFrame(() => {
+    ghost.remove();
+  });
+}
 
 /** One person in the tree. */
 const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; level: number }) {

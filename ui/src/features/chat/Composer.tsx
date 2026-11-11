@@ -23,6 +23,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { ComposerIcon } from "../../components/ComposerIcon";
+import type { Conversation } from "../../api";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useNoRelayHint } from "../files/composer/noRelayHint";
@@ -48,8 +49,16 @@ import {
   rankMentionCandidates,
   type MentionQuery,
 } from "./mentions";
+import {
+  findChannelQuery,
+  insertChannelMention,
+  mentionableChannels,
+  rankChannelCandidates,
+} from "./channelMentions";
 import { MentionPicker, type MentionOption } from "./MentionPicker";
-import { CommandPicker, commandOptionId, useSlashCommands } from "../plugins/chat";
+import { SlashPicker } from "./SlashPicker";
+import { commandOptionId, useSlashCommands } from "./slashCommands";
+import { useAdminSlash } from "../admin/commands/useAdminSlash";
 import type { ReplyQuote } from "./reply";
 import { credentialLinks as countCredentials, mumbleLinks } from "./mumbleLink";
 import { MumbleLinkCard } from "./MumbleLinkCard";
@@ -66,6 +75,8 @@ import { isHiddenBot } from "../channels/mumcord";
 
 export interface ComposerProps {
   target: SendTarget | null;
+  /** The conversation being typed in; a command's result line lands here (issue #378). */
+  conversation: Conversation;
   limits: MessageLimits;
   /** Accessible name and placeholder, e.g. "Message #Lobby". */
   label: string;
@@ -136,6 +147,7 @@ function hasText(data: DataTransfer): boolean {
 
 export function Composer({
   target,
+  conversation,
   limits,
   label,
   blockedReason,
@@ -193,8 +205,10 @@ export function Composer({
   const pickerId = useId();
   const commandListId = `${pickerId}-commands`;
   const disabled = blockedReason !== null;
-  // Plugin slash commands (FR-6.43): a typed command goes to its plugin, never into the chat.
-  const slash = useSlashCommands(composer.text, composer.setText, disabled);
+  // Mumcord's own admin commands, then the plugins' (FR-10.30, FR-6.43): a typed command goes to
+  // the engine or its plugin, never into the chat.
+  const admin = useAdminSlash(composer.text, composer.setText, disabled, conversation);
+  const slash = useSlashCommands(composer.text, composer.setText, disabled, admin);
 
   // Mention autocomplete (FR-1.51).
   const [caret, setCaret] = useState(0);
@@ -205,10 +219,22 @@ export function Composer({
   const users = useServerSelector((state) => state.users);
   const selfSession = useServerSelector((state) => state.selfSession);
   const ownChannel = useServerSelector((state) => selfUser(state)?.channelId ?? null);
-  const mention = useMemo(
-    () => (disabled ? null : findMentionQuery(composer.text, caret)),
-    [composer.text, caret, disabled],
+  // A slash line is a command; its own picker offers the people or channels an argument takes,
+  // so neither the @ nor the # list opens on top of it (issues #378, #643).
+  const slashLine = composer.text.startsWith("/");
+  const atQuery = useMemo(
+    () => (disabled || slashLine ? null : findMentionQuery(composer.text, caret)),
+    [composer.text, caret, disabled, slashLine],
   );
+  // `#` suggests the server's channels (issue #643); the query nearer the caret wins.
+  const hashQuery = useMemo(
+    () => (disabled || slashLine ? null : findChannelQuery(composer.text, caret)),
+    [composer.text, caret, disabled, slashLine],
+  );
+  const channelMode = hashQuery !== null && (atQuery === null || hashQuery.start > atQuery.start);
+  const mention = channelMode ? hashQuery : atQuery;
+  const serverChannels = useServerSelector((state) => state.channels);
+  const channelChoices = useMemo(() => mentionableChannels(serverChannels), [serverChannels]);
   const hereChannel = target?.kind === "channel" ? target.channelId : ownChannel;
   // `@channel` and `@all` only make sense in a channel (issue #70).
   const inChannel = target?.kind === "channel";
@@ -231,20 +257,27 @@ export function Composer({
   }, [users, hereChannel]);
   const candidates = useMemo(
     () =>
-      mention === null
+      mention === null || channelMode
         ? []
         : rankMentionCandidates(users.values(), mention.query, hereChannel, selfSession),
-    [mention, users, hereChannel, selfSession],
+    [mention, channelMode, users, hereChannel, selfSession],
   );
   const options = useMemo<MentionOption[]>(
     () => [
-      ...(mention === null || !inChannel ? [] : rankGroupMentions(mention.query)).map((group) => ({
+      ...(mention === null || !channelMode
+        ? []
+        : rankChannelCandidates(channelChoices, mention.query)
+      ).map((channel) => ({ kind: "channel" as const, channel })),
+      ...(mention === null || !inChannel || channelMode
+        ? []
+        : rankGroupMentions(mention.query)
+      ).map((group) => ({
         kind: "group" as const,
         group,
       })),
       ...candidates.map((user) => ({ kind: "user" as const, user })),
     ],
-    [mention, inChannel, candidates],
+    [mention, inChannel, candidates, channelMode, channelChoices],
   );
   const isDismissed =
     mention !== null &&
@@ -379,8 +412,16 @@ export function Composer({
   function pick(option: MentionOption) {
     const element = input.current;
     if (mention === null || element === null) return;
-    const name = option.kind === "group" ? option.group : option.user.name;
-    const edit = insertMention(element.value, mention.start, element.selectionStart, name);
+    const name =
+      option.kind === "group"
+        ? option.group
+        : option.kind === "channel"
+          ? option.channel.name
+          : option.user.name;
+    const edit =
+      option.kind === "channel"
+        ? insertChannelMention(element.value, mention.start, element.selectionStart, name)
+        : insertMention(element.value, mention.start, element.selectionStart, name);
     pendingSelection.current = {
       text: edit.text,
       selectionStart: edit.caret,
@@ -527,6 +568,7 @@ export function Composer({
       <form
         ref={formRef}
         className="chat-composer"
+        data-tour="chat"
         data-dragging={dragging || nativeOver ? "true" : undefined}
         onDragEnter={onDragEnter}
         onDragLeave={onDragLeave}
@@ -585,6 +627,12 @@ export function Composer({
             {slash.error}
           </p>
         ) : null}
+        {admin.notice ? (
+          // Why a command did not run: no such person, or a name several people match (FR-10.34).
+          <p className="chat-composer__error" role="alert">
+            {admin.notice}
+          </p>
+        ) : null}
         {composer.error ? (
           <p id={errorId} className="chat-composer__error" role="alert">
             {composer.error}
@@ -638,7 +686,7 @@ export function Composer({
             onPick={pick}
           />
         ) : null}
-        <CommandPicker id={commandListId} slash={slash} />
+        <SlashPicker id={commandListId} slash={slash} />
         <p className="visually-hidden" role="status">
           {pickerOpen
             ? t("mention.found", { count: options.length })

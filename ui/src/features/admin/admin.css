@@ -32,13 +32,6 @@
   margin-bottom: var(--space-3);
 }
 
-.admin-tabs__tab {
-  padding: var(--space-1) var(--space-3);
-  border-bottom: 2px solid var(--color-accent);
-  color: var(--color-text);
-  font-weight: var(--font-weight-bold);
-}
-
 .admin-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -363,4 +356,192 @@
 
 .admin-switch__label {
   font-weight: var(--font-weight-bold);
+}
+
+/* ── Registered users tab (Epic 4, issue #256, mockups `registered-users-dark` and
+   `registered-users-light`) ─────────────────────────────────────────────────────────────── */
+
+/* The window gets a second column when the detail panel opens; the list keeps its own scroll, so
+   the toolbar and the footer stay where the user left them. */
+.registered {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.registered:has(.registered__panel) {
+  grid-template-columns: minmax(0, 1fr) 19rem;
+}
+
+.registered__main {
+  min-width: 0;
+}
+
+/* A narrower table than the ban list: four columns instead of six. */
+.admin-table--registered {
+  min-width: 32rem;
+}
+
+/* Without the two columns an old server does not report, the row narrows instead of stretching
+   what it has (FR-10.5). */
+.admin-table--registered:has(.admin-row[data-columns="2"]) {
+  min-width: 22rem;
+}
+
+.admin-table--registered .admin-row {
+  grid-template-columns:
+    minmax(8rem, 1.6fr) 3.5rem minmax(6.5rem, 1fr) minmax(5.5rem, 1fr)
+    2.5rem;
+}
+
+.admin-cell--id {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+/* The row's mark: initials in a circle, green-ringed while the account is connected — the same
+   signal the channel tree uses for a person who is here. */
+.registered__mark {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.registered__mark--online {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.registered__online {
+  color: var(--color-success);
+}
+
+/* Accounts the server says nothing about, and the 90-day filter's result, read dimmer. The word in
+   the cell already says what is unknown, so this is not colour-only meaning. */
+.admin-table--registered .admin-row[data-inactive] {
+  color: var(--color-text-muted);
+}
+
+.admin-row__more {
+  padding: 0 var(--space-1);
+  line-height: 1;
+}
+
+/* The panel beside the list: the account's own figures, then the two actions. */
+.registered__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+}
+
+/* The shared `.admin-field` grows to fill a row of the bans form; stacked in the detail panel it
+   would stretch the one field of its own and push the rest of the panel down. */
+.registered__panel .admin-field {
+  flex: 0 0 auto;
+}
+
+.registered__panel-name {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  overflow-wrap: anywhere;
+}
+
+.registered__panel-line {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.registered__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+}
+
+.registered__row-label {
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: var(--font-size-xs);
+}
+
+.registered__groups,
+.registered__group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.registered__group {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+}
+
+.registered__help {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.registered__ban,
+.registered__unregister {
+  width: 100%;
+  justify-content: center;
+}
+
+/* The note under the panel's actions: what unregistering does (FR-10.52). */
+.registered__note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.admin-footer__note {
+  flex: 1 1 100%;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Tabs of the window (FR-10.50): only the ones the user has a right for are drawn, and the active
+   one carries the accent underline the mockups show. */
+.admin-tabs__tab {
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.admin-tabs__tab--active {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+@media (max-width: 60rem) {
+  /* A narrow window stacks the panel under the list instead of squeezing both. */
+  .registered:has(.registered__panel) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -126,7 +126,12 @@ describe("packet inspector (issue #60)", () => {
     const toggle = row.$("button.pi-expand");
     // While following, every new packet (the client pings every few seconds) scrolls the list,
     // which can move another row under the pointer between locating the toggle and the click
-    // (seen: a received ServerConfig row opened). Pausing first keeps the rows in place.
+    // (seen: a received ServerConfig row opened, "element click intercepted"). Pausing the
+    // capture stops packets from arriving at all, so nothing moves while the row is clicked.
+    const pause = button("Pause");
+    const paused = async () => (await pause.getAttribute("aria-pressed")) === "true";
+    if (!(await paused())) await pause.click();
+    await browser.waitUntil(paused, { timeoutMsg: "the capture did not pause" });
     const follow = button("Follow");
     if ((await follow.getAttribute("aria-pressed")) === "true") await follow.click();
     await browser.waitUntil(async () => (await follow.getAttribute("aria-pressed")) === "false", {
@@ -144,6 +149,9 @@ describe("packet inspector (issue #60)", () => {
     const hex = $("pre[aria-label='Raw bytes in hex']");
     await hex.waitForDisplayed();
     expect(await hex.getText()).toMatch(/^0000 {2}7b/);
+    // The next tests need the live packets again (the client's own pings).
+    await button("Resume").click();
+    await browser.waitUntil(async () => !(await paused()), { timeoutMsg: "the capture did not resume" });
   });
 
   it("exports the list as JSON", async () => {
@@ -220,7 +228,12 @@ describe("packet inspector (issue #60)", () => {
   });
 
   it("captures only while the window is open: a reopened inspector starts empty", async () => {
-    await browser.pause(1500);
+    // The bot never answers the hello, so the app asks it again after 10, 30 and 90 s (#647);
+    // such a request could land in the reopened window. Once the bot has left, nothing more is
+    // sent to it.
+    peer?.stop();
+    peer = undefined;
+    await browser.pause(3000);
     await button("Open packet inspector").click();
     await switchToInspector();
     await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();

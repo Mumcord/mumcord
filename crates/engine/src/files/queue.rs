@@ -23,6 +23,8 @@ pub struct Requester {
 pub struct Request {
     pub share_id: String,
     pub requester: Requester,
+    /// The file stream format chosen for this recipient (see [`super::transfer`]).
+    pub format: u8,
 }
 
 /// A message for one recipient.
@@ -72,12 +74,14 @@ impl SenderQueue {
             .count()
     }
 
-    /// A `req` arrived. `blocked`: the sender blocked the requester; `active`: the share is in the
-    /// registry. Duplicates of a queued or running request are ignored.
+    /// A `req` arrived; `format` is the file stream format chosen for it. `blocked`: the sender
+    /// blocked the requester; `active`: the share is in the registry. Duplicates of a queued or
+    /// running request are ignored.
     pub fn request(
         &mut self,
         share_id: &str,
         requester: Requester,
+        format: u8,
         blocked: bool,
         active: bool,
     ) -> Step {
@@ -94,6 +98,7 @@ impl SenderQueue {
         let request = Request {
             share_id: id,
             requester,
+            format,
         };
         if self.running.as_ref() == Some(&request) || self.waiting.contains(&request) {
             return Step::default();
@@ -215,6 +220,7 @@ impl SenderQueue {
                 to: request.requester,
                 message: FileMessage::Go {
                     id: request.share_id.clone(),
+                    fmt: request.format,
                 },
             }],
             start: Some(request),
@@ -245,7 +251,10 @@ mod tests {
     fn go(to: Requester, id: &str) -> Outgoing {
         Outgoing {
             to,
-            message: FileMessage::Go { id: id.into() },
+            message: FileMessage::Go {
+                id: id.into(),
+                fmt: 1,
+            },
         }
     }
 
@@ -270,6 +279,7 @@ mod tests {
         Request {
             share_id: id.into(),
             requester,
+            format: 1,
         }
     }
 
@@ -277,11 +287,11 @@ mod tests {
     fn first_request_goes_others_queue_in_order() {
         let mut q = SenderQueue::new();
         let (a, b, c) = (who(1, 10), who(2, 20), who(1, 30));
-        let step = q.request("s1", a, false, true);
+        let step = q.request("s1", a, 1, false, true);
         assert_eq!(step.send, [go(a, "s1")]);
         assert_eq!(step.start, Some(req("s1", a)));
-        assert_eq!(q.request("s2", b, false, true).send, [pos(b, "s2", 1)]);
-        assert_eq!(q.request("s1", c, false, true).send, [pos(c, "s1", 2)]);
+        assert_eq!(q.request("s2", b, 1, false, true).send, [pos(b, "s2", 1)]);
+        assert_eq!(q.request("s1", c, 1, false, true).send, [pos(c, "s1", 2)]);
         assert_eq!(q.waiting_for("s1"), 1);
 
         let step = q.finish();
@@ -297,8 +307,8 @@ mod tests {
     fn blocked_or_inactive_get_gone() {
         let mut q = SenderQueue::new();
         let a = who(1, 1);
-        assert_eq!(q.request("s", a, true, true).send, [gone(a, "s")]);
-        assert_eq!(q.request("s", a, false, false).send, [gone(a, "s")]);
+        assert_eq!(q.request("s", a, 1, true, true).send, [gone(a, "s")]);
+        assert_eq!(q.request("s", a, 1, false, false).send, [gone(a, "s")]);
         assert!(q.running().is_none());
     }
 
@@ -306,25 +316,25 @@ mod tests {
     fn duplicates_are_ignored() {
         let mut q = SenderQueue::new();
         let (a, b) = (who(1, 1), who(1, 2));
-        q.request("s", a, false, true);
-        assert_eq!(q.request("s", a, false, true), Step::default());
-        q.request("s", b, false, true);
-        assert_eq!(q.request("s", b, false, true), Step::default());
+        q.request("s", a, 1, false, true);
+        assert_eq!(q.request("s", a, 1, false, true), Step::default());
+        q.request("s", b, 1, false, true);
+        assert_eq!(q.request("s", b, 1, false, true), Step::default());
         // Same user, other share is a new request.
-        assert_eq!(q.request("t", b, false, true).send, [pos(b, "t", 2)]);
+        assert_eq!(q.request("t", b, 1, false, true).send, [pos(b, "t", 2)]);
     }
 
     #[test]
     fn fifty_wait_the_next_is_busy() {
         let mut q = SenderQueue::new();
-        q.request("s", who(1, 0), false, true);
+        q.request("s", who(1, 0), 1, false, true);
         for session in 1..=MAX_WAITING as u32 {
-            let step = q.request("s", who(1, session), false, true);
+            let step = q.request("s", who(1, session), 1, false, true);
             assert_eq!(step.send, [pos(who(1, session), "s", session as u16)]);
         }
         let late = who(1, 999);
         assert_eq!(
-            q.request("s", late, false, true).send,
+            q.request("s", late, 1, false, true).send,
             [Outgoing {
                 to: late,
                 message: FileMessage::Busy { id: "s".into() }
@@ -338,7 +348,7 @@ mod tests {
         let mut q = SenderQueue::new();
         let (a, b, c, d) = (who(1, 1), who(1, 2), who(1, 3), who(1, 4));
         for r in [a, b, c, d] {
-            q.request("s", r, false, true);
+            q.request("s", r, 1, false, true);
         }
         let step = q.cancel("s", c);
         assert_eq!(step.send, [pos(d, "s", 2)]);
@@ -351,7 +361,7 @@ mod tests {
         let mut q = SenderQueue::new();
         let (a, b, c) = (who(1, 1), who(1, 2), who(1, 3));
         for r in [a, b, c] {
-            q.request("s", r, false, true);
+            q.request("s", r, 1, false, true);
         }
         let step = q.cancel("s", a);
         assert_eq!(step.abort, Some(req("s", a)));
@@ -363,9 +373,9 @@ mod tests {
     fn requester_leaving_drops_all_their_requests() {
         let mut q = SenderQueue::new();
         let (a, b) = (who(1, 1), who(1, 2));
-        q.request("s", a, false, true);
-        q.request("s", b, false, true);
-        q.request("t", a, false, true);
+        q.request("s", a, 1, false, true);
+        q.request("s", b, 1, false, true);
+        q.request("t", a, 1, false, true);
         let step = q.drop_requester(a);
         assert_eq!(step.abort, Some(req("s", a)));
         assert_eq!(step.send, [go(b, "s")]);
@@ -376,9 +386,9 @@ mod tests {
     fn share_end_sends_gone_and_aborts() {
         let mut q = SenderQueue::new();
         let (a, b, c) = (who(1, 1), who(1, 2), who(2, 3));
-        q.request("s", a, false, true);
-        q.request("s", b, false, true);
-        q.request("t", c, false, true);
+        q.request("s", a, 1, false, true);
+        q.request("s", b, 1, false, true);
+        q.request("t", c, 1, false, true);
         let step = q.end_share("s");
         assert_eq!(step.abort, Some(req("s", a)));
         assert_eq!(step.send, [gone(a, "s"), gone(b, "s"), go(c, "t")]);
@@ -389,9 +399,9 @@ mod tests {
     fn share_end_while_other_runs_updates_positions() {
         let mut q = SenderQueue::new();
         let (a, b, c) = (who(1, 1), who(1, 2), who(1, 3));
-        q.request("t", a, false, true);
-        q.request("s", b, false, true);
-        q.request("t", c, false, true);
+        q.request("t", a, 1, false, true);
+        q.request("s", b, 1, false, true);
+        q.request("t", c, 1, false, true);
         let step = q.end_share("s");
         assert_eq!(step.abort, None);
         assert_eq!(step.send, [gone(b, "s"), pos(c, "t", 1)]);
@@ -401,12 +411,36 @@ mod tests {
     fn sender_leaving_a_server_is_silent_there() {
         let mut q = SenderQueue::new();
         let (a, b, c) = (who(1, 1), who(2, 2), who(1, 3));
-        q.request("s", a, false, true);
-        q.request("t", b, false, true);
-        q.request("s", c, false, true);
+        q.request("s", a, 1, false, true);
+        q.request("t", b, 1, false, true);
+        q.request("s", c, 1, false, true);
         let step = q.end_server(1);
         assert_eq!(step.abort, Some(req("s", a)));
         assert_eq!(step.send, [go(b, "t")]);
         assert_eq!(q.waiting().count(), 0);
+    }
+
+    #[test]
+    fn go_names_the_stream_format_of_its_request() {
+        let mut q = SenderQueue::new();
+        let (a, b) = (who(1, 10), who(1, 20));
+        let step = q.request("s", a, 2, false, true);
+        assert_eq!(
+            step.send[0].message,
+            FileMessage::Go {
+                id: "s".into(),
+                fmt: 2
+            }
+        );
+        q.request("s", b, 1, false, true);
+        let step = q.cancel("s", a);
+        let go = step.send.iter().find(|o| o.to == b).expect("b starts");
+        assert_eq!(
+            go.message,
+            FileMessage::Go {
+                id: "s".into(),
+                fmt: 1
+            }
+        );
     }
 }

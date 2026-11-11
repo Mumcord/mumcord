@@ -5,6 +5,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
+use super::settings::UpdateChannel;
 #[cfg(not(target_os = "linux"))]
 use super::types::not_implemented;
 use super::types::{ApiError, ApiResult, ErrorCode};
@@ -31,6 +32,8 @@ pub enum InstallKind {
     Rpm,
     Aur,
     OtherLinux,
+    /// A FreeBSD package: `pkg upgrade mumcord` updates it (see updater_freebsd.rs).
+    Pkg,
 }
 
 /// Where the updater is (FR-3.144, FR-3.145).
@@ -84,6 +87,9 @@ pub struct ReleaseNote {
 #[serde(rename_all = "camelCase")]
 pub struct UpdateOffer {
     pub version: String,
+    /// The channel this version belongs to: `stable` for a final release, `releaseCandidates`
+    /// for a pre-release.
+    pub channel: UpdateChannel,
     /// Newest first: every release since the installed one.
     pub notes: Vec<ReleaseNote>,
     /// The release page, built from the version (never taken from the response).

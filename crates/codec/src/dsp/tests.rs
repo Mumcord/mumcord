@@ -3,6 +3,7 @@ use std::cell::Cell;
 use std::f32::consts::PI;
 use std::path::Path;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
 use super::gate::{PTT_TAIL_FRAMES, PttGate, VAD_HANGOVER_FRAMES, VoiceDetector};
@@ -1043,4 +1044,96 @@ fn input_gain_scales_the_signal_and_clips_at_full_scale() {
     );
     assert_eq!(silent, 0.0);
     assert!(loud.iter().all(|s| s.abs() <= 1.0));
+}
+
+/// A selected backend that needs more than half a frame period per frame, as the current RNNoise
+/// model does on an old CPU under load (issue #753). It writes silence, so the test can tell whose
+/// audio the chain sends.
+#[derive(Debug)]
+struct SlowBackend {
+    slow: Arc<AtomicBool>,
+    calls: Arc<AtomicU32>,
+}
+
+impl SuppressionBackend for SlowBackend {
+    fn kind(&self) -> Backend {
+        Backend::Rnnoise
+    }
+
+    fn process(&mut self, _input: &Frame, output: &mut Frame) -> Outcome {
+        self.calls.fetch_add(1, Ordering::Relaxed);
+        if self.slow.load(Ordering::Relaxed) {
+            std::thread::sleep(SLOW_FRAME + Duration::from_millis(1));
+        }
+        *output = [0.0; FRAME_SAMPLES];
+        Outcome {
+            probability: Some(0.0),
+            failed: false,
+        }
+    }
+}
+
+/// Chain with only noise suppression on and a [`SlowBackend`] selected.
+fn chain_with_slow_backend() -> (DspChain, Arc<AtomicBool>, Arc<AtomicU32>) {
+    let controls = Arc::new(DspControls::default());
+    controls.set_echo_cancellation(false);
+    controls.set_auto_gain(false);
+    let (_producer, consumer) = echo_reference();
+    let chain = DspChain::new(controls.clone(), consumer);
+    let slow = Arc::new(AtomicBool::new(true));
+    let calls = Arc::new(AtomicU32::new(0));
+    controls.hand_over_backend(Box::new(SlowBackend {
+        slow: slow.clone(),
+        calls: calls.clone(),
+    }));
+    (chain, slow, calls)
+}
+
+#[test]
+fn a_backend_that_cannot_keep_up_is_replaced_by_the_standard_one() {
+    let (mut chain, _slow, calls) = chain_with_slow_backend();
+    let noise = fan_noise(FRAME_SAMPLES * 2 * OVERLOAD_SLOW_FRAMES as usize, 0.2);
+    let out = run(&mut chain, &noise);
+
+    assert_eq!(
+        calls.load(Ordering::Relaxed),
+        OVERLOAD_SLOW_FRAMES,
+        "the slow backend kept the microphone"
+    );
+    assert_eq!(chain.controls().suppression_fallbacks(), 1);
+    assert!(
+        energy(last_seconds(&out, 0.1)) > 0.0,
+        "the standard backend did not take over the audio"
+    );
+}
+
+#[test]
+fn the_selected_backend_gets_another_try_after_the_fallback_period() {
+    let (mut chain, slow, calls) = chain_with_slow_backend();
+    let noise = fan_noise(FRAME_SAMPLES * OVERLOAD_SLOW_FRAMES as usize, 0.2);
+    run(&mut chain, &noise);
+    slow.store(false, Ordering::Relaxed);
+
+    let quiet = vec![0.0; FRAME_SAMPLES * (FALLBACK_FRAMES as usize + 10)];
+    run(&mut chain, &quiet);
+    assert_eq!(
+        calls.load(Ordering::Relaxed),
+        OVERLOAD_SLOW_FRAMES + 10,
+        "the selected backend did not come back"
+    );
+    assert_eq!(chain.controls().suppression_fallbacks(), 1);
+}
+
+#[test]
+fn occasional_slow_frames_keep_the_selected_backend() {
+    let (mut chain, slow, calls) = chain_with_slow_backend();
+    let frame = [0.0; FRAME_SAMPLES];
+    let mut out = [0.0; FRAME_SAMPLES];
+    let frames = 2 * OVERLOAD_WINDOW_FRAMES;
+    for index in 0..frames {
+        slow.store(index % 10 == 0, Ordering::Relaxed);
+        chain.process(&frame, &mut out);
+    }
+    assert_eq!(calls.load(Ordering::Relaxed), frames);
+    assert_eq!(chain.controls().suppression_fallbacks(), 0);
 }

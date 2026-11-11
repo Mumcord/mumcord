@@ -411,8 +411,18 @@ describe("UserPanel", () => {
     await setup();
     const comment = vi.spyOn(api, "setOwnComment");
     await openMenuItem("Edit profile");
-    const toolbar = await screen.findByRole("toolbar", { name: "Text formatting" });
-    for (const name of ["Bold", "Italic", "Link", "Bulleted list", "Numbered list"]) {
+    const toolbar = await screen.findByRole("toolbar", { name: "Formatting" });
+    for (const name of [
+      "Bold",
+      "Italic",
+      "Underline",
+      "Strikethrough",
+      "Text colour",
+      "Link",
+      "Insert image",
+      "Bulleted list",
+      "Numbered list",
+    ]) {
       expect(within(toolbar).getByRole("button", { name })).toBeInTheDocument();
     }
     typeHtml(await editable(), "<b>x</b><onerror>");
@@ -421,6 +431,20 @@ describe("UserPanel", () => {
     await waitFor(() => {
       expect(comment).toHaveBeenCalledWith(1, "");
     });
+  });
+
+  it("disables Save with the reason when the comment is too long for the server", async () => {
+    await setup();
+    const comment = vi.spyOn(api, "setOwnComment");
+    await openMenuItem("Edit profile");
+    typeHtml(await editable(), `<p>${"x".repeat(5001)}</p>`);
+    const save = screen.getByRole("button", { name: "Save" });
+    expect(save).toBeDisabled();
+    expect(
+      screen.getByText("Can't save: your comment is too long for this server"),
+    ).toBeInTheDocument();
+    fireEvent.submit(save);
+    expect(comment).not.toHaveBeenCalled();
   });
 
   it("saves avatar and comment", async () => {
@@ -438,7 +462,7 @@ describe("UserPanel", () => {
       expect(screen.queryByRole("dialog")).toBeNull();
     });
     expect(avatar).toHaveBeenCalledWith(1, "/home/me/face.png");
-    expect(comment).toHaveBeenCalledWith(1, "a &lt; b<br>line");
+    expect(comment).toHaveBeenCalledWith(1, "a &lt; b<br />line");
   });
 
   it("explains the avatar re-send only to unregistered users", async () => {

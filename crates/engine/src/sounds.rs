@@ -1594,6 +1594,7 @@ mod tests {
                     viewers: viewers.to_vec(),
                     blocked: None,
                     kind: None,
+                    title: None,
                     elapsed_ms: 0,
                 })
                 .collect(),

@@ -32,7 +32,7 @@
     "export": "Izvozi podatke",
     "reset": "Ponastavi podatke",
     "remove": "Odstrani",
-    "commandTaken": "/{{command}}: Ukaz je že zaseden s {{plugin}}"
+    "commandTaken": "/{{command}}: ukaz že uporablja {{plugin}}"
   },
   "badge": {
     "label": "Značka ob imenih",
@@ -56,8 +56,8 @@
     "incomingRateDropped": "Dohodna sporočila, zavržena zaradi omejitve hitrosti",
     "incomingInvalid": "Neveljavna dohodna sporočila",
     "uiFreezes": "Kolikokrat je Mumcord zamrznil, ko je bila spletna vsebina odprta",
-    "refusedAppMenuLabel": "Ta vtičnik je bil zavrnjen: oznaka v meniju Aplikacije je enaka eni od Mumcordovih ali se začne z „Mumcord“.",
-    "fieldWithoutPermission": "Ta vtičnik je bil zavrnjen: uporablja „{{field}}“ brez dovoljenja „{{permission}}“.",
+    "refusedAppMenuLabel": "Ta vtičnik je bil zavrnjen: oznaka v meniju Aplikacije je enaka eni od Mumcordovih ali se začne z »Mumcord«.",
+    "fieldWithoutPermission": "Ta vtičnik je bil zavrnjen: uporablja »{{field}}« brez dovoljenja »{{permission}}«.",
     "webDisabled": "Spletna vsebina je izklopljena, ker se Mumcord ni več odzival, ko je bila odprta.",
     "reenableWeb": "Vklopi spletno vsebino",
     "reenableFailed": "Spletne vsebine ni bilo mogoče vklopiti.",
@@ -113,7 +113,7 @@
     "uiUserMenu": "Uporabniški meni",
     "uiDialog": "Lastno okno",
     "uiWebview": "Spletna vsebina",
-    "eventsSelf": "Vaš status",
+    "eventsSelf": "Tvoje stanje",
     "eventsVoice": "Glasovna dejavnost",
     "eventsPresence": "Prihodi in odhodi",
     "eventsChatActivity": "Dejavnost v klepetu",
@@ -121,7 +121,7 @@
     "randomBytes": "Naključna števila",
     "commands": "Ukazi",
     "chatSend": "Piše v klepet",
-    "chatSupersedes": "Nadomesti svojo besedilno vrstico",
+    "chatSupersedes": "Nadomesti svoje besedilo",
     "chatTriggers": "Sprožilne besede",
     "chatPatterns": "Vzorci v klepetu",
     "netHttp": "Dostop do interneta",

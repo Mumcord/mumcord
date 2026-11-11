@@ -41,6 +41,11 @@ pub struct AudioDeviceFallback {
     pub input: bool,
 }
 
+/// The selected noise suppression is too slow for this computer right now and the standard one
+/// stands in (issue #753).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+pub struct NoiseSuppressionFallback;
+
 /// The highest bitrate the bitrate slider can reach changed (FR-2.64), e.g. on connecting or
 /// when the voice server changes. `null` without a voice server: show "depends on server".
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]

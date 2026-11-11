@@ -1,5 +1,5 @@
 {
-  "hint": "Indlæs en udpakket plugin-mappe for at teste den. Udviklerplugins er ikke signeret, aldrig officielle og kan ikke få net.http, secrets eller ui.webview. De fjernes, når udviklertilstand slås fra.",
+  "hint": "Indlæs en udpakket plugin-mappe for at teste den. Udviklerplugins er ikke signerede, aldrig officielle og kan ikke få net.http, secrets eller ui.webview. De fjernes, når udviklertilstand slås fra.",
   "load": "Indlæs plugin-mappe…",
   "pickFolder": "Vælg plugin-mappen",
   "empty": "Intet udviklerplugin er indlæst.",

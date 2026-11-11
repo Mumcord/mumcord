@@ -245,12 +245,12 @@ pub enum LogLevel {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationMode {
-    /// In-app toasts only, while the window has focus.
+    /// In-app toasts only, while the window has focus. The default for new profiles (#660).
+    #[default]
     InApp,
     /// System notifications only, also while the window has focus.
     Desktop,
     /// Toasts while the window has focus, system notifications otherwise.
-    #[default]
     Both,
     Off,
 }
@@ -267,27 +267,36 @@ pub enum SoundTheme {
     Rich,
 }
 
-/// Which activity-feed events also notify (#597), like messages: a toast or a system
-/// notification. Joins, leaves and moves are off by default because they are noisy on busy
-/// servers; starts of shared things are on.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+/// How each kind of activity-feed event notifies (#597, #660): off, an in-app toast, a system
+/// notification or both, like messages. Every kind starts as an in-app toast.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ActivityNotifySettings {
-    pub joins: bool,
-    pub screen_share: bool,
-    pub watch_party: bool,
-    pub plugin_activity: bool,
-    pub plugin_event: bool,
+    pub joins: NotificationMode,
+    pub screen_share: NotificationMode,
+    pub watch_party: NotificationMode,
+    pub plugin_activity: NotificationMode,
+    pub plugin_event: NotificationMode,
 }
 
-impl Default for ActivityNotifySettings {
-    fn default() -> Self {
+impl ActivityNotifySettings {
+    /// The modes for a profile saved before #660, which had one switch per kind under the
+    /// `activity_notify` key and showed every switched-on kind like messages (`messages`). A
+    /// switch missing from the record had its old default: joins off, everything else on.
+    fn from_switches(switches: Option<&serde_json::Value>, messages: NotificationMode) -> Self {
+        let mode = |key: &str, default: bool| {
+            let on = switches
+                .and_then(|s| s.get(key))
+                .and_then(serde_json::Value::as_bool)
+                .unwrap_or(default);
+            if on { messages } else { NotificationMode::Off }
+        };
         Self {
-            joins: false,
-            screen_share: true,
-            watch_party: true,
-            plugin_activity: true,
-            plugin_event: true,
+            joins: mode("joins", false),
+            screen_share: mode("screen_share", true),
+            watch_party: mode("watch_party", true),
+            plugin_activity: mode("plugin_activity", true),
+            plugin_event: mode("plugin_event", true),
         }
     }
 }
@@ -494,6 +503,14 @@ pub enum Consent {
     Unset,
     Yes,
     No,
+}
+
+/// Which releases the updater offers: only final releases, or release candidates as well.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum UpdateChannel {
+    Stable,
+    ReleaseCandidates,
 }
 
 /// How peer-to-peer features (screen share, full-size images) reach another Mumcord user
@@ -722,8 +739,13 @@ pub struct Settings {
     pub video_ducking_percent: u8,
     pub sounds: SoundSettings,
     pub notifications: NotificationMode,
-    /// Activity events that notify (#597).
+    /// How activity events notify (#597, #660). Stored under a new key: the old one held one
+    /// switch per kind, which an older Mumcord still reads.
+    #[serde(rename = "activity_notifications")]
     pub activity_notify: ActivityNotifySettings,
+    /// "Keep activity history after a restart" (#661): the activity feed is saved on this
+    /// device. Off by default; the "Everything on" setup preset turns it on.
+    pub keep_activity_history: bool,
     /// The Mumcord "Do Not Disturb" switch (FR-3.111): no notification sounds and no toasts or
     /// system notifications on any server. Badges still count. Off by default.
     pub do_not_disturb: bool,
@@ -733,6 +755,13 @@ pub struct Settings {
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
+    /// Write the log to disk (spec 12, FR-12.2). Off: the log stays in memory only for the
+    /// session; nothing is written to the log file. On by default.
+    pub log_to_disk: bool,
+    /// Wait for disk on every database save (`PRAGMA synchronous = NORMAL`, spec 12 FR-12.8).
+    /// Off: `synchronous = OFF`, fewer writes; a power cut can lose the last few seconds of
+    /// history and settings, but the database file cannot be corrupted (WAL). On by default.
+    pub durable_saves: bool,
     /// In-game overlay drawn inside games (FR-1.46b).
     pub ingame_overlay: InGameOverlaySettings,
     pub positional: PositionalSettings,
@@ -753,6 +782,9 @@ pub struct Settings {
     /// Cached previews, thumbnails and images are deleted after this many days; `None` keeps
     /// them (QA.42).
     pub preview_cache_days: Option<u32>,
+    /// Keep link previews on disk (spec 12, FR-12.10). Off: previews live in memory only for
+    /// the session and are re-fetched after a restart. On by default.
+    pub link_previews_on_disk: bool,
     /// Local chat history older than this many days is deleted; `None` keeps it (QA.42).
     pub history_max_age_days: Option<u32>,
     /// Share the track playing in the system's media player with others on the server
@@ -786,6 +818,9 @@ pub struct Settings {
     pub plugins_badge_plugin: Option<String>,
     /// Optional mirror of the official plugin repository.
     pub plugins_mirror_url: Option<String>,
+    /// Keep the offline copy of the plugin registry on disk (spec 12, FR-12.11). Off: the
+    /// registry is always fetched fresh and no offline copy is written. On by default.
+    pub plugin_registry_cache: bool,
     /// Developer mode: dev folders, local HTTP repositories.
     pub developer_mode: bool,
     /// Highest sequence number seen from the official repository (rollback protection).
@@ -818,6 +853,9 @@ pub struct Settings {
     pub update_auto_download: bool,
     /// Hours between two update checks (FR-3.144). Clamped on load.
     pub update_interval_hours: u32,
+    /// The update channel the user picked; `None` follows the installed version (a release
+    /// candidate gets release candidates, a final version stays on stable) until they choose.
+    pub update_channel: Option<UpdateChannel>,
     /// "Skip this version": this version is never offered again (FR-3.144).
     pub update_skipped: Option<String>,
     /// When the last update check ran, in milliseconds since the Unix epoch.
@@ -1034,11 +1072,14 @@ impl Default for Settings {
             sounds: SoundSettings::default(),
             notifications: NotificationMode::default(),
             activity_notify: ActivityNotifySettings::default(),
+            keep_activity_history: false,
             do_not_disturb: false,
             follow_system_dnd: true,
             close_behaviour: CloseBehaviour::default(),
             chat_display: ChatDisplay::default(),
             log_level: LogLevel::default(),
+            log_to_disk: true,
+            durable_saves: true,
             ingame_overlay: InGameOverlaySettings::default(),
             positional: PositionalSettings::default(),
             enabled_plugins: Vec::new(),
@@ -1048,6 +1089,7 @@ impl Default for Settings {
             connect_muted: true,
             link_previews: true,
             preview_cache_days: Some(DEFAULT_PREVIEW_CACHE_DAYS),
+            link_previews_on_disk: true,
             history_max_age_days: None,
             now_playing: false,
             now_gaming: false,
@@ -1062,6 +1104,7 @@ impl Default for Settings {
             plugins_all_off: false,
             plugins_badge_plugin: None,
             plugins_mirror_url: None,
+            plugin_registry_cache: true,
             developer_mode: false,
             plugins_last_official_sequence: 0,
             plugins_revoked_checked_at: None,
@@ -1077,6 +1120,7 @@ impl Default for Settings {
             update_check: Consent::Unset,
             update_auto_download: false,
             update_interval_hours: DEFAULT_UPDATE_INTERVAL_HOURS,
+            update_channel: None,
             update_skipped: None,
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
@@ -1207,6 +1251,18 @@ impl Store {
                     } else {
                         P2pMode::DirectRelay
                     };
+                }
+                if !has_key(&json, "notifications") {
+                    // #660 made in-app the default for new profiles; older ones keep "Both".
+                    settings.notifications = NotificationMode::Both;
+                }
+                if !has_key(&json, "activity_notifications") {
+                    // #660: keep how activity notified before, one switch per kind.
+                    let old = serde_json::from_str::<serde_json::Value>(&json).ok();
+                    settings.activity_notify = ActivityNotifySettings::from_switches(
+                        old.as_ref().and_then(|v| v.get("activity_notify")),
+                        settings.notifications,
+                    );
                 }
                 if settings.music_quality && !has_key(&json, "bitrate_kbps") {
                     // Music quality used to lift the cap; keep those users at "Max".
@@ -1492,6 +1548,7 @@ mod tests {
         assert_eq!(loaded.last_update_check, None);
         assert!(!loaded.update_auto_download);
         assert_eq!(loaded.update_interval_hours, DEFAULT_UPDATE_INTERVAL_HOURS);
+        assert_eq!(loaded.update_channel, None);
         assert_eq!(loaded.update_skipped, None);
         assert!(!loaded.window_overlay_notice_shown);
         assert!(loaded.whats_new_auto);
@@ -1543,6 +1600,35 @@ mod tests {
             )
             .expect("insert");
         store.settings().expect("load")
+    }
+
+    #[test]
+    fn disk_settings_default_on_and_round_trip() {
+        // FR-12.13: all four default to on, so old profiles behave as today.
+        let defaults = Settings::default();
+        assert!(defaults.log_to_disk);
+        assert!(defaults.durable_saves);
+        assert!(defaults.link_previews_on_disk);
+        assert!(defaults.plugin_registry_cache);
+
+        let loaded = load_raw(r#"{"log_level":"info"}"#);
+        assert!(loaded.log_to_disk);
+        assert!(loaded.durable_saves);
+        assert!(loaded.link_previews_on_disk);
+        assert!(loaded.plugin_registry_cache);
+
+        let mut changed = loaded;
+        changed.log_to_disk = false;
+        changed.durable_saves = false;
+        changed.link_previews_on_disk = false;
+        changed.plugin_registry_cache = false;
+        let (_dir, store) = temp_store();
+        store.save_settings(&changed).expect("save");
+        let reloaded = store.settings().expect("load");
+        assert!(!reloaded.log_to_disk);
+        assert!(!reloaded.durable_saves);
+        assert!(!reloaded.link_previews_on_disk);
+        assert!(!reloaded.plugin_registry_cache);
     }
 
     #[test]
@@ -1949,6 +2035,30 @@ mod tests {
     }
 
     #[test]
+    fn activity_switches_become_modes_and_old_records_keep_both() {
+        let old = load_raw(
+            r#"{"notifications":"desktop","activity_notify":{"joins":true,"watch_party":false}}"#,
+        );
+        assert_eq!(old.notifications, NotificationMode::Desktop);
+        assert_eq!(old.activity_notify.joins, NotificationMode::Desktop);
+        assert_eq!(old.activity_notify.watch_party, NotificationMode::Off);
+        assert_eq!(old.activity_notify.screen_share, NotificationMode::Desktop);
+        assert!(!old.keep_activity_history);
+
+        let older = load_raw(r#"{"theme":"dark"}"#);
+        assert_eq!(older.notifications, NotificationMode::Both);
+        assert_eq!(older.activity_notify.joins, NotificationMode::Off);
+        assert_eq!(older.activity_notify.plugin_event, NotificationMode::Both);
+
+        let new = load_raw(
+            r#"{"notifications":"in_app","activity_notifications":{"joins":"both"},"keep_activity_history":true}"#,
+        );
+        assert_eq!(new.activity_notify.joins, NotificationMode::Both);
+        assert_eq!(new.activity_notify.watch_party, NotificationMode::InApp);
+        assert!(new.keep_activity_history);
+    }
+
+    #[test]
     fn partial_json_falls_back_to_defaults() {
         let parsed: Settings =
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
@@ -1984,7 +2094,7 @@ mod tests {
         );
         assert!(!parsed.wizard_completed);
         assert_eq!(parsed.log_level, LogLevel::Info);
-        assert_eq!(parsed.notifications, NotificationMode::Both);
+        assert_eq!(parsed.notifications, NotificationMode::InApp);
         assert!(parsed.link_previews, "link previews are on for old records");
         assert_eq!(parsed.preview_cache_days, Some(7), "7 days for old records");
         assert_eq!(

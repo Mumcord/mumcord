@@ -13,8 +13,8 @@
     "moved": "cambió de canal",
     "screenShareStarted": "empezó a compartir pantalla",
     "screenShareStopped": "dejó de compartir pantalla",
-    "watchPartyStarted": "empezó una watch party",
-    "watchPartyStopped": "terminó la watch party",
+    "watchPartyStarted": "empezó una sesión de visionado",
+    "watchPartyStopped": "terminó una sesión de visionado",
     "pluginActivityStarted": "inició {{plugin}}",
     "pluginActivityStopped": "detuvo {{plugin}}",
     "pluginEvent": "«{{text}}»"
@@ -29,14 +29,14 @@
   "empty": "Todavía no hay actividad.",
   "rowLabel": {
     "screenShare": "{{action}} la pantalla compartida de {{name}}",
-    "watchParty": "{{action}} la watch party de {{name}}",
+    "watchParty": "{{action}} la sesión de visionado de {{name}}",
     "pluginActivity": "{{action}} el {{plugin}} de {{name}}",
     "pluginEvent": "{{action}} {{plugin}}"
   },
-  "joinPartyFailed": "No se pudo unir a la watch party.",
+  "joinPartyFailed": "No se pudo unir a la sesión de visionado.",
   "joinActivityFailed": "No se pudo unir a la actividad del plugin.",
-  "earlier": "Anterior",
-  "earlierLabel": "Anterior, de antes de esta sesión",
+  "earlier": "Antes",
+  "earlierLabel": "Antes de esta sesión",
   "notice": {
     "body": "{{name}} {{action}}",
     "bodyInChannel": "{{name}} {{action}} en #{{channel}}"

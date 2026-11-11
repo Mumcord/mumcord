@@ -1,22 +1,22 @@
 {
-  "title": "Watch party",
+  "title": "Soirée de visionnage",
   "addVideo": "Ajouter une vidéo",
   "beta": "Bêta",
-  "join": "Rejoindre la watch party",
-  "leave": "Quitter la party",
-  "watching": "{{count}} regardent : {{names}}",
-  "player": "Lecteur de la watch party",
+  "join": "Rejoindre la soirée",
+  "leave": "Quitter la soirée",
+  "watching": "{{count}} regardent : {{names}}",
+  "player": "Lecteur de la soirée de visionnage",
   "watchTogether": "Regarder ensemble",
-  "watchTogetherFor": "Regarder {{title}} avec ce canal",
-  "embedsOff": "Activez les lecteurs intégrés dans les paramètres de confidentialité pour regarder ensemble",
-  "embedsOffJoin": "Une watch party est en cours : activez les lecteurs intégrés pour la rejoindre",
+  "watchTogetherFor": "Regarder {{title}} avec ce salon",
+  "embedsOff": "Active les lecteurs intégrés dans les paramètres de confidentialité pour regarder ensemble",
+  "embedsOffJoin": "Une soirée de visionnage est en cours : active les lecteurs intégrés pour la rejoindre",
   "openPrivacy": "Ouvrir les paramètres de confidentialité",
   "cantPlay": "Le lecteur ne peut pas fonctionner ici.",
   "openInBrowser": "Ouvrir dans le navigateur",
-  "startFailed": "La watch party n’a pas pu être lancée.",
-  "joinFailed": "Impossible de rejoindre la watch party.",
-  "leaveFailed": "Impossible de quitter la watch party.",
-  "commandFailed": "La watch party n’a pas pris en compte votre modification.",
+  "startFailed": "La soirée de visionnage n’a pas pu être lancée.",
+  "joinFailed": "Impossible de rejoindre la soirée de visionnage.",
+  "leaveFailed": "Impossible de quitter la soirée de visionnage.",
+  "commandFailed": "La soirée de visionnage n’a pas pris en compte ta modification.",
   "someone": "Quelqu’un",
   "other": {
     "play": "{{name}} a lancé la lecture",
@@ -25,14 +25,14 @@
     "skipped": "{{name}} a passé la vidéo"
   },
   "addToPlaylist": "Ajouter à la playlist",
-  "addToPlaylistFor": "Ajouter {{title}} à la playlist de la watch party",
+  "addToPlaylistFor": "Ajouter {{title}} à la playlist de la soirée de visionnage",
   "playlist": {
     "title": "À suivre",
-    "empty": "Rien à suivre. Ajoutez des liens YouTube avec « Ajouter à la playlist ».",
+    "empty": "Rien à suivre. Ajoute des liens YouTube avec « Ajouter à la playlist ».",
     "skip": "Passer",
     "previous": "Précédent",
     "previousFailed": "Impossible de revenir à la vidéo précédente.",
-    "moveHint": "Alt+Haut et Alt+Bas déplacent la vidéo ; vous pouvez aussi la faire glisser.",
+    "moveHint": "Alt+Haut et Alt+Bas déplacent la vidéo ; tu peux aussi la faire glisser.",
     "moved": "Déplacé en position {{position}}",
     "videoTitle": "Vidéo YouTube",
     "addedBy": "Ajouté par {{name}}",
@@ -43,25 +43,27 @@
     "skipFailed": "Impossible de passer à la vidéo suivante.",
     "nextFailed": "La vidéo suivante n’a pas pu être lancée.",
     "move": "Déplacer {{title}}",
-    "upNext": "À suivre : {{title}}",
+    "upNext": "À suivre : {{title}}",
     "upNextNone": "Rien à suivre",
-    "paste": "Collez un lien YouTube",
-    "notALink": "Ce n'est pas un lien YouTube",
+    "paste": "Colle un lien YouTube",
+    "notALink": "Ce n’est pas un lien YouTube",
     "more": "Plus pour {{title}}",
     "playNext": "Lire ensuite",
     "removeShort": "Retirer de la playlist",
-    "emptyPaste": "Rien à suivre. Collez un lien YouTube ci-dessus."
+    "emptyPaste": "Rien à suivre. Colle un lien YouTube ci-dessus."
   },
   "widget": {
     "play": "Lecture",
     "pause": "Pause"
   },
   "codecHint": {
-    "install": "Cette vidéo nécessite la prise en charge de H.264. Installez gst-libav :",
-    "generic": "Cette vidéo nécessite la prise en charge de H.264. Installez gst-libav (le plugin libav de GStreamer) avec le gestionnaire de paquets de votre système.",
-    "rpmFusion": "Sur Fedora, gst-libav provient du dépôt RPM Fusion ; activez d’abord RPM Fusion."
+    "install": "Cette vidéo nécessite la prise en charge de H.264. Installe gst-libav :",
+    "generic": "Cette vidéo nécessite la prise en charge de H.264. Installe gst-libav (le plugin libav de GStreamer) avec le gestionnaire de paquets de ton système.",
+    "rpmFusion": "Sur Fedora, gst-libav provient du dépôt RPM Fusion ; active d’abord RPM Fusion.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
-  "keys": "Espace lecture/pause · ← → avancer de 5 s · M muet · F plein écran",
+  "keys": "Espace lecture/pause · ← → reculer/avancer de 5 s · M couper le son · F plein écran",
   "headerPill": "Regarder ensemble · {{count}}",
   "miniPlayer": "Mini-lecteur",
   "tabs": {
@@ -70,5 +72,5 @@
   "upNextHeading": "À suivre · glisser pour réorganiser",
   "whoIsWatching": "Qui regarde",
   "pasteKey": "Ctrl V",
-  "you": "Vous"
+  "you": "Toi"
 }

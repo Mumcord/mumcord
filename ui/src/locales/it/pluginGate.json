@@ -1,7 +1,7 @@
 {
   "installTitle": "Installare {{plugin}}?",
   "updateTitle": "Aggiornare {{plugin}} alla {{version}}?",
-  "asks": "{{plugin}} richiede questi permessi. Quelli facoltativi si possono disattivare ora o in seguito.",
+  "asks": "{{plugin}} richiede questi permessi. Puoi disattivare quelli facoltativi ora o in seguito.",
   "asksShort": "Questo plugin richiede:",
   "scoreCountsOptional": "Il punteggio conta tutti i permessi che il plugin può richiedere, compresi quelli facoltativi.",
   "required": "Obbligatorio",
@@ -9,7 +9,7 @@
   "runsCode": "Esegue codice creato da {{author}}. Mumcord non lo ha verificato.",
   "sealedFrame": "Non può vedere Mumcord, i tuoi file, il microfono, la fotocamera o gli appunti. Mostrato solo in: {{places}}.",
   "ownCodeAndWebsites": "Questo plugin porta con sé il proprio codice e comunica con siti web.",
-  "trustRepository": "{{repository}} è un repository che hai aggiunto. Installalo solo se ti fidi.",
+  "trustRepository": "{{repository}} è un repository che hai aggiunto. Installalo solo se ti fidi di chi lo gestisce.",
   "understand": "Ho capito",
   "trustAuthor": "Ho capito il rischio e mi fido dell'autore di {{plugin}}",
   "understandUpdate": "Ho capito che il rischio è aumentato e mi fido ancora dell'autore",
@@ -20,9 +20,9 @@
   "installAnyway": "Installa comunque",
   "updateAnyway": "Aggiorna comunque",
   "highRiskTitle": "Questo plugin è ad alto rischio",
-  "highRiskText": "Può aprire le proprie pagine web e comunicare con {{count}} siti web che non puoi controllare. Mumcord non può vedere cosa quei siti inviano al plugin né cosa il plugin invia a loro. È stato pubblicato da qualcuno che è nuovo su questo computer. Installalo solo se conosci e ti fidi del suo autore.",
+  "highRiskText": "Può aprire le proprie pagine web e comunicare con {{count}} siti web che non puoi controllare. Mumcord non può vedere cosa quei siti inviano al plugin né cosa il plugin invia a loro. È stato pubblicato da qualcuno mai visto prima su questo computer. Installalo solo se conosci il suo autore e ti fidi di lui.",
   "highRiskWouldBecome": "Questo aggiornamento renderebbe il plugin ad alto rischio",
-  "highRiskNotAutomatic": "Non verrà installato automaticamente. Restare sulla {{version}} mantiene il punteggio attuale; puoi bloccare la versione in Installati.",
+  "highRiskNotAutomatic": "Non verrà installato automaticamente. Restando sulla {{version}} il punteggio non cambia; puoi fissare la versione in Installati.",
   "sameAuthorKey": "stessa chiave dell'autore",
   "places": {
     "stage": "area multimediale",
@@ -39,7 +39,7 @@
     "websites_other": "Può comunicare con {{count}} siti web che non puoi controllare.",
     "webPages": "Può aprire le proprie pagine web.",
     "cantSee": "Mumcord non può vedere cosa quei siti inviano al plugin né cosa il plugin invia a loro.",
-    "newAuthor": "È stato pubblicato da qualcuno che è nuovo su questo computer.",
-    "trust": "Installalo solo se conosci e ti fidi del suo autore."
+    "newAuthor": "È stato pubblicato da qualcuno mai visto prima su questo computer.",
+    "trust": "Installalo solo se conosci il suo autore e ti fidi di lui."
   }
 }

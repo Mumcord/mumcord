@@ -9,13 +9,13 @@
   },
   "waiting": "Posodobitve",
   "empty": "Vsi vtičniki so posodobljeni.",
-  "emptyOff": "Posodobitve vtičnikov so izklopljene. Vklopite jih zgoraj, da se iščejo posodobitve.",
+  "emptyOff": "Posodobitve vtičnikov so izklopljene. Vklopi jih zgoraj, da se bodo iskale posodobitve.",
   "loadFailed": "Posodobitev ni bilo mogoče naložiti.",
-  "newAuthorKey": "To različico je podpisal drug avtor. Posodobite le, če novemu avtorju zaupate.",
+  "newAuthorKey": "To različico je podpisal drug avtor. Posodobi le, če novemu avtorju zaupaš.",
   "rolledBack": "Različica {{version}} se ni zagnala, zato je bila obnovljena prejšnja. Razlog:",
   "review": "Preglej in posodobi",
   "update": "Posodobi",
-  "installFailed": "Vtičnika {{name}} ni bilo mogoče posodobiti. Poskusite znova.",
+  "installFailed": "Vtičnika {{name}} ni bilo mogoče posodobiti. Poskusi znova.",
   "pins": "Pripni različico",
   "pinsHint": "Pripet vtičnik ostane na trenutni različici in zanj ni ponujenih posodobitev.",
   "pin": "Obdrži {{name}} na tej različici",
@@ -23,7 +23,7 @@
   "versionsTo": "na",
   "pill": {
     "none": "Brez novih dovoljenj",
-    "permission": "Potrebuje novo dovoljenje",
+    "permission": "Zahteva več dovoljenj",
     "author": "Nov avtor",
     "websites": "Komunicira z novimi spletnimi mesti"
   },
@@ -36,16 +36,16 @@
   },
   "checkNow": "Preveri zdaj",
   "lastChecked": "Zadnje preverjanje ob {{time}}",
-  "checkFailed": "Preverjanje ni uspelo. Poskusite znova.",
-  "modeNote": "Posodobitve vtičnikov: {{mode}}. To lahko spremenite spodaj.",
+  "checkFailed": "Preverjanje ni uspelo. Poskusi znova.",
+  "modeNote": "Posodobitve vtičnikov: {{mode}}. To lahko spremeniš spodaj.",
   "settings": "Nastavitve posodobitev",
   "offer": {
     "heading": "Nova dovoljenja",
-    "title": "{{name}} {{version}} zdaj zmore več. Te možnosti ostanejo izklopljene, dokler jih ne vklopite.",
+    "title": "{{name}} {{version}} zdaj zmore več. Te možnosti ostanejo izklopljene, dokler jih ne vklopiš.",
     "permission": "Novo neobvezno dovoljenje: {{permission}}",
     "save": "Shrani",
     "notNow": "Ne zdaj",
-    "failed": "Dovoljenj za {{name}} ni bilo mogoče spremeniti. Poskusite znova."
+    "failed": "Dovoljenj za {{name}} ni bilo mogoče spremeniti. Poskusi znova."
   },
   "waitingHeading": "Posodobitve čakajo",
   "autoNote": "Samodejne posodobitve se namestijo samo, če vtičnik ne zahteva ničesar novega in njegova ocena ostane v istem razredu ali pade. Vse ostalo čaka tukaj.",
@@ -101,7 +101,7 @@
     "asksForMore": "ker ta različica zahteva več:",
     "permissionsLabel": "Nova dovoljenja",
     "recentChange": "Šteje tudi kot nedavna sprememba: nova dovoljenja v zadnjih {{versions}} različicah dodajo še +{{recent}} točk. Skupaj z zgornjimi +{{permissions}} (× {{multiplier}}) je to +{{total}}.",
-    "highTitle": "Ta posodobitev bi vtičnik spremenila v vtičnik z visokim tveganjem",
+    "highTitle": "S to posodobitvijo bi imel vtičnik visoko tveganje",
     "highText": "Ne bo se namestila samodejno. Če ostaneš na {{version}}, ostane trenutna ocena; različico lahko pripneš v Nameščeni.",
     "highTick": "Razumem, da se je tveganje povečalo, in avtorju še vedno zaupam",
     "skipHint": "Če preskočiš, {{version}} še naprej deluje.",
@@ -109,6 +109,6 @@
     "notNow": "Ne zdaj",
     "allow": "Dovoli in posodobi",
     "updateAnyway": "Vseeno posodobi",
-    "failed": "{{name}} ni bilo mogoče posodobiti. Poskusi znova."
+    "failed": "Vtičnika {{name}} ni bilo mogoče posodobiti. Poskusi znova."
   }
 }

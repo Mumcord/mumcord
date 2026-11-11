@@ -149,6 +149,27 @@ pub struct UserChange {
     pub moved_from: Option<u32>,
     /// Session that caused the change (e.g. an admin moving someone).
     pub actor: Option<u32>,
+    /// The admin rights ([`crate::permissions`]) whose fields this message carried: MuteDeafen
+    /// for mute, deafen, suppress and priority speaker, Move for the channel, Register for the
+    /// user id. An open admin action is only confirmed by an echo of the field it changed.
+    pub echoed_rights: u32,
+}
+
+/// The admin rights whose fields a `UserState` carries (see [`UserChange::echoed_rights`]).
+fn echoed_rights(m: &proto::UserState) -> u32 {
+    use crate::permissions::{MOVE, MUTE_DEAFEN, REGISTER};
+    let mut rights = 0;
+    if m.mute.is_some() || m.deaf.is_some() || m.suppress.is_some() || m.priority_speaker.is_some()
+    {
+        rights |= MUTE_DEAFEN;
+    }
+    if m.channel_id.is_some() {
+        rights |= MOVE;
+    }
+    if m.user_id.is_some() {
+        rights |= REGISTER;
+    }
+    rights
 }
 
 impl ServerState {
@@ -191,15 +212,40 @@ impl ServerState {
             .find(|c| c.parent == Some(parent) && c.name == name)
     }
 
+    /// `id` and then its parents up to the root. A cyclic tree from a malicious server cannot
+    /// make this endless: no real chain is longer than the number of channels.
+    pub fn ancestry(&self, id: u32) -> impl Iterator<Item = &Channel> {
+        let mut next = Some(id);
+        std::iter::from_fn(move || {
+            let channel = self.channels.get(&next?)?;
+            next = channel.parent;
+            Some(channel)
+        })
+        .take(self.channels.len())
+    }
+
+    /// Whether `parent` is `id` itself or lies below it, so moving `id` there forms a loop.
+    fn would_loop(&self, id: u32, parent: u32) -> bool {
+        parent == id || self.ancestry(parent).any(|c| c.parent == Some(id))
+    }
+
     pub fn apply_channel_state(&mut self, m: proto::ChannelState) -> Option<&Channel> {
         let id = m.channel_id?;
+        let parent = match m.parent {
+            // The root has no parent; servers never send one for it.
+            Some(_) if id == 0 => Some(None),
+            Some(parent) if self.would_loop(id, parent) => {
+                tracing::warn!("ignored a channel parent that would form a loop");
+                None
+            }
+            parent => parent.map(Some),
+        };
         let ch = self.channels.entry(id).or_insert_with(|| Channel {
             id,
             ..Default::default()
         });
-        if let Some(parent) = m.parent {
-            // The root has no parent; servers never send one for it.
-            ch.parent = (id != 0).then_some(parent);
+        if let Some(parent) = parent {
+            ch.parent = parent;
         }
         if let Some(name) = m.name {
             ch.name = name;
@@ -258,6 +304,7 @@ impl ServerState {
     pub fn apply_user_state(&mut self, m: proto::UserState) -> Option<UserChange> {
         let session = m.session?;
         let joined = !self.users.contains_key(&session);
+        let echoed_rights = echoed_rights(&m);
         let user = self.users.entry(session).or_insert_with(|| User {
             session,
             ..Default::default()
@@ -329,6 +376,7 @@ impl ServerState {
             joined,
             moved_from,
             actor: m.actor,
+            echoed_rights,
         })
     }
 
@@ -425,6 +473,55 @@ mod tests {
         assert_eq!(names, ["AFK", "Raid", "Lobby"]);
         assert_eq!(s.channels[&0].parent, None);
         assert_eq!(s.child_by_name(0, "Raid").map(|c| c.id), Some(2));
+    }
+
+    #[test]
+    fn a_channel_cannot_become_its_own_parent() {
+        let mut s = tree();
+        s.apply_channel_state(proto::ChannelState {
+            channel_id: Some(2),
+            parent: Some(2),
+            ..Default::default()
+        });
+        assert_eq!(s.channels[&2].parent, Some(0));
+    }
+
+    #[test]
+    fn a_parent_change_cannot_form_a_loop() {
+        let mut s = tree();
+        s.apply_channel_state(channel(4, Some(2), "Team"));
+        s.apply_channel_state(channel(5, Some(4), "Squad"));
+        // Raid under its own grandchild would cut it off from the root: A→B→A.
+        s.apply_channel_state(proto::ChannelState {
+            channel_id: Some(2),
+            parent: Some(5),
+            ..Default::default()
+        });
+        assert_eq!(s.channels[&2].parent, Some(0));
+        // Moving to an unrelated channel still works.
+        s.apply_channel_state(proto::ChannelState {
+            channel_id: Some(5),
+            parent: Some(3),
+            ..Default::default()
+        });
+        assert_eq!(s.channels[&5].parent, Some(3));
+    }
+
+    #[test]
+    fn a_loop_through_a_channel_not_yet_known_is_refused() {
+        let mut s = tree();
+        // The server announces 6 under 7 before 7 exists; 7 then claims 6 as its parent.
+        s.apply_channel_state(channel(6, Some(7), "Early"));
+        s.apply_channel_state(channel(7, Some(6), "Late"));
+        assert_eq!(s.channels[&7].parent, None);
+        assert_eq!(s.ancestry(6).count(), 2);
+    }
+
+    #[test]
+    fn ancestry_ends_on_a_cyclic_tree() {
+        let mut s = tree();
+        s.channels.get_mut(&2).expect("raid").parent = Some(2);
+        assert_eq!(s.ancestry(2).count(), s.channels.len());
     }
 
     #[test]

@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, o ajudante das dicas",
+  "greeting": {
+    "title": "Olá, sou o Aaron!",
+    "body": "Sou um axolote e conheço o Mumcord como a palma da minha mão. Queres uma visita rápida? Demora cerca de um minuto. Se não for agora, encontras-me em Definições → Acerca de → Dicas.",
+    "start": "Mostra-me",
+    "later": "Agora não"
+  },
+  "progress": "Dica {{current}} de {{total}}",
+  "back": "Voltar",
+  "next": "Seguinte",
+  "done": "Concluído",
+  "skip": "Saltar a visita",
+  "close": "Fechar dicas",
+  "tips": {
+    "servers": {
+      "title": "Os teus servidores",
+      "body": "A barra mais à esquerda tem os teus servidores. Adiciona um com + ou explora servidores públicos com a lupa. Podes ligar-te a vários servidores ao mesmo tempo."
+    },
+    "channels": {
+      "title": "Canais",
+      "body": "Faz duplo clique num canal para entrar e falar. Um só clique mostra o chat dele sem entrar, e Seguir mantém-te a par."
+    },
+    "talk": {
+      "title": "Como falas",
+      "body": "Push-to-talk ou ativação por voz? Escolhe em Definições → Voz e áudio, ou abre Definições de voz… com a setinha junto ao microfone. O push-to-talk também funciona com os botões do rato."
+    },
+    "panel": {
+      "title": "O teu painel de utilizador",
+      "body": "Em baixo à esquerda silencias o microfone, desativas o áudio, ligas a câmara ou desligas a chamada. As pequenas setas ao lado abrem mais opções."
+    },
+    "search": {
+      "title": "Encontra tudo",
+      "body": "Carrega em {{key}} para encontrar pessoas e canais, mesmo em servidores grandes."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Responde a uma mensagem, cita-a, menciona pessoas com @ e partilha imagens e ficheiros. Os botões de formatação aparecem enquanto escreves."
+    },
+    "apps": {
+      "title": "Apps",
+      "body": "O botão Apps na barra de mensagens inicia uma partilha de ecrã, uma sessão de visualização ou a tua câmara. Os plugins acrescentam mais."
+    },
+    "themes": {
+      "title": "O teu visual",
+      "body": "A roda dentada em baixo à esquerda alterna entre escuro e claro. Em Definições → Aspeto há mais temas, e um servidor pode ter o seu: clica nele com o botão direito e escolhe Tema."
+    },
+    "end": {
+      "title": "E pronto!",
+      "body": "Diverte-te no Mumcord. Podes chamar-me de novo quando quiseres em Definições → Acerca de → Dicas."
+    }
+  }
+}

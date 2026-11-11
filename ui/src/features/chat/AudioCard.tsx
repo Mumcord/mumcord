@@ -9,7 +9,6 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { useTranslation } from "react-i18next";
 import type { AudioInfo } from "../../api";
 import { getApi } from "../../api";
-import { pickSavePath } from "../settings/fileDialogs";
 import { dataUrlToBlob, formatSize, formatTime, waveformOf } from "./audioPlayer";
 import { DismissButton } from "./cardButtons";
 import { imageName, loadAudioFile, loadAudioInfo } from "./links";
@@ -128,12 +127,13 @@ export function AudioCard({ url, tabIndex, onDismiss }: AudioCardProps) {
     setSaveFailed(false);
     const extension = /\.([a-z0-9]+)$/i.exec(name)?.[1]?.toLowerCase() ?? "audio";
     try {
-      const path = await pickSavePath(
-        name,
-        { name: t("audio.fileType"), extensions: [extension] },
-        t("audio.saveTitle"),
-      );
-      if (path !== null) await getApi().audioSave(url, path);
+      // The engine opens the save dialog itself and writes only where the user chose.
+      await getApi().audioSave(url, {
+        title: t("audio.saveTitle"),
+        defaultName: name,
+        filterName: t("audio.fileType"),
+        extensions: [extension],
+      });
     } catch (error: unknown) {
       console.error("Saving an audio file failed", error);
       setSaveFailed(true);

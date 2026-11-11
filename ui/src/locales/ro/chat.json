@@ -58,7 +58,7 @@
     "scaled": "Redimensionată la {{width}}×{{height}} ca să încapă în limita serverului"
   },
   "errors": {
-    "tooLong": "Mesajul tău e prea lung pentru acest server (maximum {{max}} caractere). Scurtează-l și încearcă din nou.",
+    "tooLong": "Mesajul tău e prea lung pentru acest server (limită de caractere: {{max}}). Scurtează-l și încearcă din nou.",
     "tooLongNoLimit": "Mesajul tău e prea lung pentru acest server. Scurtează-l și încearcă din nou.",
     "imageTooLarge": "Imaginea e prea mare pentru acest server, chiar și după comprimare. Încearcă o imagine mai mică.",
     "imagesNotAllowed": "Acest server nu permite imagini în mesaje.",
@@ -104,7 +104,8 @@
     "peopleHeading": "Persoane",
     "channelHint": "Anunță pe toți din {{channel}} ({{count}})",
     "allHint": "Anunță pe toți cei care pot citi acest canal ({{count}})",
-    "keys": "↑↓ alege · Enter inserează · Esc închide"
+    "keys": "↑↓ alege · Enter inserează · Esc închide",
+    "channelList": "Sugestii de canale"
   },
   "preview": {
     "open": "Deschide în browser",
@@ -121,7 +122,7 @@
       "show": "Emisiune"
     },
     "inBrowser": "Se redă în browserul tău",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Playerul Twitch nu rulează în fereastra Mumcord pe acest sistem, așa că „Redă” deschide transmisiunea în browser.",
     "card": "Previzualizare link: {{title}}",
     "dismiss": "Ascunde previzualizarea"
   },
@@ -209,13 +210,13 @@
     "cancel": "Anulează răspunsul"
   },
   "actions": {
-    "label": "Începeți împreună",
+    "label": "Începe împreună",
     "notConnected": "Nu ești conectat la server.",
     "invalidLink": "Acesta nu este un link către un videoclip YouTube.",
     "linkLabel": "Link YouTube",
     "linkPlaceholder": "Lipește un link YouTube",
     "confirm": "Începe",
-    "dialogTitle": "Urmăriți împreună",
+    "dialogTitle": "Urmărește împreună",
     "addTitle": "Adaugă în playlist",
     "addToPlaylist": "Adaugă în playlist",
     "addConfirm": "Adaugă",
@@ -226,10 +227,10 @@
     "share": "{{name}} își partajează ecranul",
     "watch": "Urmărește",
     "party": "Vizionare comună: {{title}}",
-    "join": "Alătură-te",
+    "join": "Intră",
     "videoFallback": "Videoclip YouTube",
     "someone": "Cineva",
-    "joinFailed": "Nu te-ai putut alătura vizionării comune."
+    "joinFailed": "Nu ai putut intra în vizionarea comună."
   },
   "card": {
     "label": "Card: {{title}}",
@@ -259,23 +260,28 @@
   "mumbleCard": {
     "addServer": "Adaugă la servere",
     "channel": "Canal {{channel}}",
-    "copy": "Copiaza linkul",
-    "copyLabel": "Copiaza linkul catre {{server}}",
+    "copy": "Copiază linkul",
+    "copyLabel": "Copiază linkul către {{server}}",
     "figures": "Ping {{ping}} ms · {{users}} din {{max}} utilizatori · server {{version}}",
     "goToChannel": "Mergi la canal",
-    "join": "Intra",
-    "joinLabel": "Intra în {{server}}",
-    "joined": "Intrai",
+    "join": "Intră",
+    "joinLabel": "Intră pe {{server}}",
+    "joined": "Ai intrat",
     "label": "Cardul serverului {{server}}",
-    "privacyOff": "Valorile serverului sunt oprite în setări",
+    "privacyOff": "Datele serverului sunt dezactivate în setări",
     "querying": "Se verifică serverul…",
     "retry": "Verifică din nou",
     "retryLabel": "Verifică din nou {{server}}",
     "server": "{{server}}",
     "unreachable": "Serverul nu poate fi contactat",
-    "warning_few": "{{count}} linkuri din acest mesaj afiseaza datele de conectare",
-    "warning_one": "{{count}} link din acest mesaj afiseaza datele de conectare",
-    "warning_other": "{{count}} linkuri din acest mesaj afiseaza datele de conectare"
+    "warning_few": "{{count}} linkuri din acest mesaj afișează datele de conectare",
+    "warning_one": "{{count}} link din acest mesaj afișează datele de conectare",
+    "warning_other": "{{count}} de linkuri din acest mesaj afișează datele de conectare"
+  },
+  "pluginCard": {
+    "label": "Cardul pluginului {{name}}",
+    "loading": "Se încarcă pluginul…",
+    "openLabel": "Deschide {{name}}"
   },
   "requests": {
     "entry": "Cereri de mesaje",
@@ -311,17 +317,17 @@
     "filterLabel": "Afișează conversațiile",
     "filterAll": "Toate",
     "filterUnread": "Necitite",
-    "filterRequests": "Solicitări",
-    "requestsTitle": "Solicitări de mesaje",
+    "filterRequests": "Cereri",
+    "requestsTitle": "Cereri de mesaje",
     "requestsNote": "Nu este în lista ta de prieteni",
     "requestMetaChat": "{{server}} · vrea să discute cu tine · {{time}}",
     "requestMetaMessages": "{{server}} · ți-a trimis mesaje · {{time}}",
     "quote": "„{{text}}”",
     "block": "Blochează",
-    "showMore_one": "Afișează încă {{count}} solicitare",
-    "showMore_few": "Afișează încă {{count}} solicitări",
-    "showMore_other": "Afișează încă {{count}} de solicitări",
-    "showFewer": "Afișează mai puține solicitări",
+    "showMore_one": "Afișează încă {{count}} cerere",
+    "showMore_few": "Afișează încă {{count}} cereri",
+    "showMore_other": "Afișează încă {{count}} de cereri",
+    "showFewer": "Afișează mai puține cereri",
     "pinnedTitle": "Fixate",
     "recentTitle": "Recente",
     "unknown": "Persoană necunoscută",
@@ -329,14 +335,14 @@
     "offline": "offline",
     "unreadCount": "{{count}} necitite",
     "pinned": "fixată",
-    "muted": "dezactivată",
+    "muted": "sunet dezactivat",
     "you": "Tu: {{text}}",
     "image": "A trimis o imagine",
     "yesterday": "Ieri",
     "emptyTitle": "Încă nu există conversații",
     "emptyText": "Mesajele private de pe toate serverele conectate apar aici.",
     "noMatch": "Nu s-a găsit nicio conversație.",
-    "noRequests": "Nicio solicitare de mesaje.",
+    "noRequests": "Nicio cerere de mesaje.",
     "failed": "Nu a mers. Încearcă din nou.",
     "newTitle": "Începe o conversație nouă",
     "newSearch": "Caută persoane pe serverele tale",
@@ -386,8 +392,8 @@
     "card": "{{service}}: {{title}}",
     "title": "Link {{service}}",
     "other": "Link muzical",
-    "thirdParty": "Conținut de la terți de la {{host}}",
-    "thirdPartyShort": "Conținut de la terți",
+    "thirdParty": "Conținut terț de la {{host}}",
+    "thirdPartyShort": "Conținut terț",
     "embedded": "Player încorporat · {{service}} · {{host}}",
     "player": "Player {{service}}: {{title}}",
     "play": "Redă",
@@ -414,5 +420,17 @@
     "loading": "Se încarcă imaginea…",
     "unavailable": "Imaginea nu este disponibilă",
     "load": "Încarcă imaginea"
+  },
+  "slash": {
+    "list": "Comenzi cu „/”"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, canal – deschide meniul",
+    "join": "Intră în canal",
+    "joinPath": "Intră în {{path}}",
+    "show": "Arată în lista de canale",
+    "showPath": "Arată {{path}} în lista de canale",
+    "copy": "Copiază numele",
+    "menu": "Canal {{channel}}"
   }
 }

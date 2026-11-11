@@ -4,12 +4,12 @@
     "members": "Dalībnieki",
     "activity": "Aktivitāte"
   },
-  "you": "Jūs",
+  "you": "Tu",
   "selfName": "tava",
   "someone": "kāds",
   "verb": {
-    "connected": "pieslēgās",
-    "disconnected": "atslēdzās",
+    "connected": "savienojās",
+    "disconnected": "atvienojās",
     "moved": "mainīja kanālu",
     "screenShareStarted": "sāka ekrāna kopīgošanu",
     "screenShareStopped": "pārtrauca ekrāna kopīgošanu",
@@ -17,7 +17,7 @@
     "watchPartyStopped": "pārtrauca kopīgu skatīšanos",
     "pluginActivityStarted": "sāka {{plugin}}",
     "pluginActivityStopped": "pārtrauca {{plugin}}",
-    "pluginEvent": "„{{text}}“"
+    "pluginEvent": "„{{text}}”"
   },
   "channel": "# {{channel}}",
   "plugin": "spraudnis",

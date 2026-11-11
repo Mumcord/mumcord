@@ -7,6 +7,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, ScreenShare, StageActivityView, User, WatchParty } from "../../api";
 import { createMockApi, setApi } from "../../api";
+import { isBlocked, resetBlockedStore } from "../blocking";
 import { getServerStateOf } from "../channels/serverStore";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { resetActivityStore } from "../plugins/stage/activityStore";
@@ -15,8 +16,10 @@ import { resetWatchPartyStore } from "../watchparty/watchPartyStore";
 import {
   MAX_EVENTS,
   clearActivityHistory,
+  setActivityHistoryKept,
   resetActivityLogStore,
   useActivityLog,
+  type ActivityEvent,
 } from "./activityStore";
 
 /** The default mock seed: server 1, Lobby is channel 1 and "Raid" channel 2, the own session is 1. */
@@ -71,6 +74,7 @@ function share(session: number): ScreenShare {
     blocked: null,
     relayReason: null,
     kind: "window",
+    title: null,
     elapsedMs: 126000,
   };
 }
@@ -135,6 +139,7 @@ describe("activity log", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    resetBlockedStore();
     resetActivityLogStore();
     resetScreenShareStore();
     resetWatchPartyStore();
@@ -217,6 +222,32 @@ describe("activity log", () => {
       api.mock.emit("userRemoved", { serverId: SERVER, session: NEWCOMER });
     });
     expect(result.current[0]).toMatchObject({ kind: "disconnected", name: "Nia", self: false });
+  });
+
+  it("keeps a blocked person in the history but marks the events so they never notify", async () => {
+    const { result } = renderHook(() => useActivityLog(SERVER));
+    await settle();
+    await act(async () => {
+      await api.blockCert(SERVER, "niahash", "Nia");
+    });
+    await vi.waitFor(() => {
+      expect(isBlocked(SERVER, "niahash", "Nia")).toBe(true);
+    });
+    act(() => {
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 1) });
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 2) });
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER + 1, "Omar", 1) });
+      api.mock.emit("userRemoved", { serverId: SERVER, session: NEWCOMER });
+    });
+    const log = result.current.filter(
+      (event): event is Exclude<ActivityEvent, { kind: "pluginEvent" }> =>
+        event.kind !== "pluginEvent",
+    );
+    expect(log.filter((event) => event.name === "Nia")).toHaveLength(3);
+    expect(
+      log.filter((event) => event.name === "Nia").every((event) => event.blocked === true),
+    ).toBe(true);
+    expect(log.find((event) => event.name === "Omar")?.blocked).toBeUndefined();
   });
 
   it("marks the own session as self (FR-11.7)", async () => {
@@ -391,6 +422,7 @@ describe("activity log", () => {
   });
 
   it("saves the log on this device and loads it as earlier after a restart (#594)", async () => {
+    setActivityHistoryKept(true);
     const { result, unmount } = renderHook(() => useActivityLog(SERVER));
     await settle();
     expect(result.current).toHaveLength(1);
@@ -402,6 +434,7 @@ describe("activity log", () => {
 
     // A restart: the in-memory log is gone, the saved one is still there.
     resetActivityLogStore();
+    setActivityHistoryKept(true);
     const reloaded = renderHook(() => useActivityLog(SERVER));
     expect(reloaded.result.current).toEqual([
       expect.objectContaining({ kind: "connected", self: true, earlier: true }),
@@ -412,8 +445,29 @@ describe("activity log", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     localStorage.setItem(`mumcord.activity.${String(SERVER)}`, "{not json");
     resetActivityLogStore();
+    setActivityHistoryKept(true);
     const { result } = renderHook(() => useActivityLog(SERVER));
     expect(result.current).toEqual([]);
+  });
+
+  it("saves nothing while the history is not kept, and deletes it when turned off (#661)", async () => {
+    localStorage.setItem(
+      `mumcord.activity.${String(SERVER)}`,
+      JSON.stringify([{ kind: "connected", self: true, serverId: SERVER, at: 1 }]),
+    );
+    const { result } = renderHook(() => useActivityLog(SERVER));
+    await settle();
+    // Before the setting is known nothing is loaded and the saved feed is left alone.
+    expect(result.current).toHaveLength(1);
+    act(() => {
+      setActivityHistoryKept(true);
+    });
+    expect(result.current).toHaveLength(2);
+    act(() => {
+      setActivityHistoryKept(false);
+    });
+    expect(localStorage.getItem(`mumcord.activity.${String(SERVER)}`)).toBeNull();
+    expect(result.current).toHaveLength(2);
   });
 
   it("clears the feed and the saved history of every server (#594)", async () => {

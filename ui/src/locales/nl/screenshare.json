@@ -6,7 +6,7 @@
   "startFailed": "Scherm delen kon niet starten.",
   "stopFailed": "Scherm delen kon niet worden gestopt.",
   "screenRecordingDenied": "Mumcord mag je scherm niet opnemen. Sta het toe in Systeeminstellingen → Privacy en beveiliging → Scherm- en systeemaudio-opname en start Mumcord daarna opnieuw.",
-  "changeFailed": "Het scherm delen heeft je wijziging niet overgenomen.",
+  "changeFailed": "De schermdeling heeft je wijziging niet overgenomen.",
   "blocked": {
     "notInChannel": "Ga naar een spraakkanaal om je scherm te delen.",
     "consentOff": "Scherm delen heeft directe verbindingen nodig. Zet ze aan in Instellingen → Privacy.",
@@ -66,7 +66,7 @@
     "encoderAv1Cpu": "AV1 (software)",
     "encoderVp9Gpu": "VP9 (videokaart)",
     "encoderVp9Cpu": "VP9",
-    "codecHintCpu": "Gebruikt de processor: ongeveer {{used}} van {{total}} kernen. Met een AV1-videokaart: AV1 (GPU), vrijwel geen CPU.",
+    "codecHintCpu": "Gebruikt de processor: ongeveer {{used}} van {{total}} kernen. Met een AV1-videokaart: AV1 (videokaart), vrijwel geen CPU.",
     "codecHintGpu": "Gebruikt je videokaart, dus delen kost vrijwel geen CPU.",
     "av1SoftwareLimit": "AV1 in software is op deze pc beperkt tot 1080p30",
     "av1SkippedTooHeavy": "Auto gebruikt VP9: AV1 op de processor kan het op deze pc niet bijhouden",
@@ -83,11 +83,12 @@
     "soundNeeds": {
       "windows": "Geen geluid: vereist Windows 10 versie 2004 of nieuwer",
       "macos": "Geen geluid: vereist macOS 13 of nieuwer",
-      "pipewire": "Geen geluid: vereist PipeWire"
+      "pipewire": "Geen geluid: vereist PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Kijkers krijgen:",
     "viewersGetSummary": "tot {{resolution}} · {{fps}} fps · {{codec}} · ongeveer {{mbit}} Mbit/s",
-    "pathRelay": "Eén keer verstuurd via de relay van de server, die het doorgeeft aan maximaal {{count}} kijkers.",
+    "pathRelay": "Eén keer verzonden via de relay van de server, die het doorgeeft aan maximaal {{count}} kijkers.",
     "pathDirect": "Eén kopie per kijker, maximaal {{count}}.",
     "olderMumcord": "Kijkers met een oudere Mumcord krijgen VP9.",
     "remember": "Deze instellingen de volgende keer gebruiken",
@@ -159,7 +160,7 @@
     "fanoutUnavailable": "Verspreiden via de relay is niet beschikbaar ({{reason}}). Elke kijker krijgt een eigen kopie, dus maximaal {{max}} mensen kunnen meekijken en de kwaliteit kan dalen.",
     "reasonNoRelay": "deze server heeft geen relay",
     "reasonOldRelay": "de relay is te oud",
-    "reasonDisallowed": "de relay staat schermdelen niet toe",
+    "reasonDisallowed": "de relay staat schermdeling niet toe",
     "reasonRefused": "de relay heeft de uitzending geweigerd",
     "reasonFull": "de relay is vol",
     "reasonLost": "de verbinding met de relay is verloren",

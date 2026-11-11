@@ -66,7 +66,7 @@
     "openFolder": "Ordner öffnen",
     "open": "Öffnen",
     "gone": "Die Datei ist nicht mehr in {{folder}}",
-    "mismatchTitle": "Hash stimmt nicht überein – Datei gelöscht",
+    "mismatchTitle": "Prüfsumme stimmt nicht überein – Datei gelöscht",
     "mismatch": "Die Datei wurde unterwegs verändert oder passt nicht zum Angebot – sie wurde gelöscht. Es wurde nichts gespeichert oder geöffnet. Bitte {{sender}}, sie erneut zu teilen.",
     "failed": "Download fehlgeschlagen: {{reason}}",
     "cancelled": "Download abgebrochen",
@@ -85,7 +85,7 @@
       "downloading": "wird heruntergeladen",
       "checking": "wird geprüft",
       "done": "heruntergeladen",
-      "mismatch": "Hash stimmt nicht überein, Datei gelöscht",
+      "mismatch": "Prüfsumme stimmt nicht überein, Datei gelöscht",
       "failed": "Download fehlgeschlagen",
       "cancelled": "abgebrochen",
       "unavailable": "nicht verfügbar"
@@ -97,7 +97,7 @@
     },
     "disabled": {
       "receiveOff": "Du hast den Empfang von Dateien ausgeschaltet",
-      "receiveOffLink": "Einstellungen zum Dateiaustausch öffnen",
+      "receiveOffLink": "Einstellungen zur Dateifreigabe öffnen",
       "tooLarge": "Größer als dein Limit von {{limit}}",
       "tooLargeLink": "Limit ändern",
       "anotherDownload": "Ein anderer Download läuft gerade"
@@ -107,7 +107,7 @@
     "downloadedBy": "Heruntergeladen von {{names}}",
     "inProgress_one": "{{count}} Download läuft · {{details}}",
     "inProgress_other": "{{count}} Downloads laufen · {{details}}",
-    "sendingTo": "Senden an {{name}} · {{percent}} %",
+    "sendingTo": "Wird an {{name}} gesendet · {{percent}} %",
     "waiting_one": "{{count}} wartet",
     "waiting_other": "{{count}} warten",
     "sharing": "Geteilt, solange du online bist · endet {{when}}",
@@ -138,12 +138,12 @@
     "riskyOpenConfirm": "Trotzdem öffnen"
   },
   "settings": {
-    "title": "Dateiaustausch",
+    "title": "Dateifreigabe",
     "new": "Neu",
-    "receive": "Dateien von anderen Mumcord-Nutzern empfangen",
-    "receiveHint": "Dateien kommen vom Absender, solange er online ist. Blockierte Personen können dir keine Dateien senden.",
+    "receive": "Dateien von anderen Mumcord-Benutzern empfangen",
+    "receiveHint": "Dateien kommen direkt von der sendenden Person, solange sie online ist. Blockierte Personen können dir keine Dateien senden.",
     "maxSize": "Maximale Dateigröße",
-    "maxSizeHint": "Dateien bis 2 GB können geteilt werden. Standardmäßig 1 GB. Größer geht nicht.",
+    "maxSizeHint": "Dateien bis 2 GB können geteilt werden, standardmäßig 1 GB. Mehr ist nicht möglich.",
     "size100mb": "100 MB",
     "size500mb": "500 MB",
     "size1gb": "1 GB",

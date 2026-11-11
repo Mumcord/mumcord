@@ -8,6 +8,7 @@
   <a href="https://github.com/Mumcord/mumcord/releases"><img src="https://img.shields.io/github/downloads/Mumcord/mumcord/total?color=ff9a8b" alt="Downloads" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-AGPL--3.0-blue" alt="Licence: AGPL-3.0" /></a>
   <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-555" alt="Platforms: Windows, macOS, Linux" />
+  <a href="https://scorecard.dev/viewer/?uri=github.com/Mumcord/mumcord"><img src="https://api.scorecard.dev/projects/github.com/Mumcord/mumcord/badge" alt="OpenSSF Scorecard" /></a>
   <a href="https://crates.io/crates/mumcord-protocol"><img src="https://img.shields.io/crates/v/mumcord-protocol?label=crates.io" alt="mumcord-protocol on crates.io" /></a>
 </p>
 
@@ -103,7 +104,8 @@ Get the latest build from the [Releases page](https://github.com/Mumcord/mumcord
 | System                      | Package                                                  | Notes                                                                                                                                                                                                                     |
 | --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Windows** 10/11           | `*-setup.exe` installer or `*-portable.zip`              | Code-signed with a Certum certificate from 0.6.1 on (0.6.0 and older are unsigned: SmartScreen warns, choose "More info" → "Run anyway"). Portable: unpack and run, no installation ([details](docs/windows-portable.md)) |
-| **macOS**                   | `.dmg`, Apple Silicon and Intel                          | Signed and notarized since 0.4.1                                                                                                                                                                                          |
+| **macOS (Apple Silicon)**   | `*_aarch64.dmg`                                          | Signed and notarized since 0.4.1                                                                                                                                                                                          |
+| **macOS (Intel)**           | `*_x64.dmg`                                              | Signed and notarized since 0.4.1                                                                                                                                                                                          |
 | **Linux** x86_64 and ARM64  | `.deb`, `.rpm`, `.AppImage`                              | The `.deb` and `.rpm` pull in everything they need                                                                                                                                                                        |
 | **Arch Linux**              | AUR `mumcord-bin`                                        | `paru -S mumcord-bin` or `yay -S mumcord-bin`                                                                                                                                                                             |
 | **Homebrew** (macOS, Linux) | [`mumcord/tap`](https://github.com/Mumcord/homebrew-tap) | macOS: `brew install --cask mumcord/tap/mumcord`. Linux: `brew install mumcord/tap/mumcord` (installs the AppImage; `brew info` lists the system packages it needs)                                                       |
@@ -118,13 +120,12 @@ To remove Mumcord, add `-s -- --uninstall` after `sh`.
 
 - **macOS Local Network:** macOS 15 and later ask whether Mumcord may find devices on your local network. Allow it, or servers in your home network fail with "No route to host" (change it later in System Settings → Privacy & Security → Local Network).
 - **macOS plugins:** Mumcord 0.6.0 on macOS closes as soon as a plugin starts. Update to 0.6.1 or newer.
-- **Linux installer:** the one-liner shows numbered steps and offers to install gst-libav (H.264) when it is missing.
-- **Linux H.264 for watch parties:** the AppImage plays YouTube via VP9 but does not bundle H.264 (gst-libav). Install gst-libav if a video does not play; the player shows a hint when a codec is missing.
+- **Linux H.264 for watch parties:** the AppImage, `.deb` and `.rpm` bring their own H.264 and AAC decoders (an LGPL build of FFmpeg with gst-libav), so Twitch and `.mp4` videos play without extra packages.
 
 <details>
 <summary><b>Linux: GStreamer plugins for watch parties</b></summary>
 
-The `.deb`, `.rpm` and AUR packages install the GStreamer plugins WebKitGTK needs to play YouTube. The AppImage bundles its own plugins (without H.264) and also loads the ones installed on the system. On other distributions, or for H.264 with the AppImage:
+The `.deb`, `.rpm` and AUR packages install the GStreamer plugins WebKitGTK needs to play YouTube; the AppImage bundles its own. Every Linux package also carries its own H.264 and AAC decoders, so gst-libav is not needed. When building Mumcord from source, install the plugins yourself:
 
 - Debian, Ubuntu: `sudo apt install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav`
 - Fedora: `sudo dnf install gstreamer1-plugins-good gstreamer1-plugins-bad-free gstreamer1-libav` (`gstreamer1-libav` may need [RPM Fusion](https://rpmfusion.org/))

@@ -40,7 +40,7 @@
   },
   "composer": {
     "label": "Mensagem para {{name}}",
-    "hint": "Prime Enter para enviar e Shift+Enter para uma nova linha. Markdown funciona: **negrito**, *itálico*, `código`, [ligação](https://…).",
+    "hint": "Prime Enter para enviar e Shift+Enter para uma nova linha. O Markdown funciona: **negrito**, *itálico*, `código`, [ligação](https://…).",
     "addImage": "Adicionar imagem",
     "optionalMessage": "Adicionar uma mensagem (opcional)",
     "removeImage": "Remover imagem {{name}}",
@@ -94,9 +94,9 @@
   },
   "mention": {
     "list": "Sugestões de menções",
-    "found_one": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
-    "found_many": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
-    "found_other": "Sugestões: {{count}}. Use as setas e depois Enter para inserir.",
+    "found_one": "Sugestões: {{count}}. Usa as setas e depois Enter para inserir.",
+    "found_many": "Sugestões: {{count}}. Usa as setas e depois Enter para inserir.",
+    "found_other": "Sugestões: {{count}}. Usa as setas e depois Enter para inserir.",
     "none": "Ninguém encontrado",
     "mentionsYou": "Menciona-te",
     "chipLabel": "{{name}}, menção",
@@ -104,7 +104,8 @@
     "peopleHeading": "Pessoas",
     "channelHint": "Notificar todos em {{channel}} ({{count}})",
     "allHint": "Notificar todos os que podem ler este canal ({{count}})",
-    "keys": "↑↓ escolher · Enter inserir · Esc fechar"
+    "keys": "↑↓ escolher · Enter inserir · Esc fechar",
+    "channelList": "Sugestões de canais"
   },
   "preview": {
     "open": "Abrir no navegador",
@@ -121,7 +122,7 @@
       "show": "Programa"
     },
     "inBrowser": "Reproduz no teu navegador",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "O leitor da Twitch não funciona dentro da janela do Mumcord neste sistema, por isso Reproduzir abre a transmissão no teu navegador.",
     "card": "Pré-visualização da ligação: {{title}}",
     "dismiss": "Ocultar pré-visualização"
   },
@@ -160,7 +161,7 @@
     "removeNamed": "Remover {{name}} dos favoritos",
     "send": "Enviar {{name}}",
     "hint": "As setas movem, Enter envia, Delete remove, Escape fecha.",
-    "empty": "Ainda não há favoritos. Clica com o botão direito num GIF no chat, ou usa a estrela nele, e escolhe \"Guardar como favorito\". Vai aparecer aqui."
+    "empty": "Ainda não há favoritos. Clica com o botão direito num GIF no chat, ou usa a estrela nele, e escolhe «Guardar como favorito». Vai aparecer aqui."
   },
   "linkMenu": {
     "label": "Ligação",
@@ -216,8 +217,8 @@
     "linkPlaceholder": "Cola uma ligação do YouTube",
     "confirm": "Começar",
     "dialogTitle": "Ver juntos",
-    "addTitle": "Adicionar à playlist",
-    "addToPlaylist": "Adicionar à playlist",
+    "addTitle": "Adicionar à lista de reprodução",
+    "addToPlaylist": "Adicionar à lista de reprodução",
     "addConfirm": "Adicionar",
     "apps": "Apps",
     "appsLive": "Apps (estás a partilhar o ecrã)"
@@ -225,11 +226,11 @@
   "activity": {
     "share": "{{name}} está a partilhar o ecrã",
     "watch": "Ver",
-    "party": "Watch party: {{title}}",
+    "party": "Sessão de visualização: {{title}}",
     "join": "Entrar",
     "videoFallback": "Vídeo do YouTube",
     "someone": "Alguém",
-    "joinFailed": "Não foi possível entrar na watch party."
+    "joinFailed": "Não foi possível entrar na sessão de visualização."
   },
   "card": {
     "label": "Cartão: {{title}}",
@@ -260,27 +261,32 @@
     "addServer": "Adicionar aos servidores",
     "channel": "Canal {{channel}}",
     "copy": "Copiar ligação",
-    "copyLabel": "Copiar a ligação para {{server}}",
+    "copyLabel": "Copiar a ligação de {{server}}",
     "figures": "Ping {{ping}} ms · {{users}} de {{max}} utilizadores · servidor {{version}}",
     "goToChannel": "Ir para o canal",
-    "join": "Participar",
-    "joinLabel": "Participar em {{server}}",
-    "joined": "Participou",
+    "join": "Entrar",
+    "joinLabel": "Entrar em {{server}}",
+    "joined": "Ligado",
     "label": "Cartão do servidor {{server}}",
     "privacyOff": "Os valores do servidor estão desativados nas definições",
     "querying": "A verificar o servidor…",
     "retry": "Verificar novamente",
     "retryLabel": "Verificar novamente {{server}}",
     "server": "{{server}}",
-    "unreachable": "Servidor não acessível",
-    "warning_many": "{{count}} milhões de ligações nesta mensagem mostram credenciais",
+    "unreachable": "Servidor inacessível",
+    "warning_many": "{{count}} ligações nesta mensagem mostram credenciais",
     "warning_one": "{{count}} ligação nesta mensagem mostra credenciais",
     "warning_other": "{{count}} ligações nesta mensagem mostram credenciais"
+  },
+  "pluginCard": {
+    "label": "Cartão do plugin {{name}}",
+    "loading": "A carregar o plugin…",
+    "openLabel": "Abrir {{name}}"
   },
   "requests": {
     "entry": "Pedidos de mensagem",
     "entryCount_one": "{{count}} pedido",
-    "entryCount_many": "{{count}} de pedidos",
+    "entryCount_many": "{{count}} pedidos",
     "entryCount_other": "{{count}} pedidos",
     "title": "Pedidos de mensagem",
     "listLabel": "Pedidos",
@@ -292,7 +298,7 @@
     "noteFrom": "Nota de {{name}}",
     "explain": "Definiste as mensagens privadas como «Só amigos». Se aceitares, {{name}} poderá escrever-te. Recusar é silencioso: {{name}} só vê «pendente». Os pedidos são apagados quando fechas o Mumcord.",
     "sentMessages_one": "{{name}} enviou-te {{count}} mensagem",
-    "sentMessages_many": "{{name}} enviou-te {{count}} de mensagens",
+    "sentMessages_many": "{{name}} enviou-te {{count}} mensagens",
     "sentMessages_other": "{{name}} enviou-te {{count}} mensagens",
     "messagesLabel": "Mensagens de {{name}}",
     "accept": "Aceitar",
@@ -312,14 +318,14 @@
     "filterAll": "Todas",
     "filterUnread": "Não lidas",
     "filterRequests": "Pedidos",
-    "requestsTitle": "Pedidos de mensagens",
+    "requestsTitle": "Pedidos de mensagem",
     "requestsNote": "Não está na tua lista de amigos",
     "requestMetaChat": "{{server}} · quer conversar contigo · {{time}}",
     "requestMetaMessages": "{{server}} · enviou-te mensagens · {{time}}",
     "quote": "«{{text}}»",
     "block": "Bloquear",
     "showMore_one": "Mostrar mais {{count}} pedido",
-    "showMore_many": "Mostrar mais {{count}} de pedidos",
+    "showMore_many": "Mostrar mais {{count}} pedidos",
     "showMore_other": "Mostrar mais {{count}} pedidos",
     "showFewer": "Mostrar menos pedidos",
     "pinnedTitle": "Afixadas",
@@ -336,7 +342,7 @@
     "emptyTitle": "Ainda não há conversas",
     "emptyText": "As mensagens privadas de todos os servidores ligados aparecem aqui.",
     "noMatch": "Nenhuma conversa encontrada.",
-    "noRequests": "Sem pedidos de mensagens.",
+    "noRequests": "Sem pedidos de mensagem.",
     "failed": "Não funcionou. Tenta novamente.",
     "newTitle": "Iniciar uma nova conversa",
     "newSearch": "Pesquisar pessoas nos teus servidores",
@@ -367,7 +373,7 @@
     "play": "Reproduzir {{name}}",
     "pause": "Pausar {{name}}",
     "playShort": "Reproduzir",
-    "pauseShort": "Pausa",
+    "pauseShort": "Pausar",
     "seek": "Posição",
     "position": "{{time}} de {{length}}",
     "volume": "Volume",
@@ -414,5 +420,17 @@
     "loading": "A carregar imagem…",
     "unavailable": "Imagem não disponível",
     "load": "Carregar imagem"
+  },
+  "slash": {
+    "list": "Comandos com /"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, canal – abrir o menu",
+    "join": "Entrar no canal",
+    "joinPath": "Entrar em {{path}}",
+    "show": "Mostrar na lista de canais",
+    "showPath": "Mostrar {{path}} na lista de canais",
+    "copy": "Copiar nome",
+    "menu": "Canal {{channel}}"
   }
 }

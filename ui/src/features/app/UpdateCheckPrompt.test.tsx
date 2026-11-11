@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { stubDialog } from "../channels/testUtils";
-import { UpdateCheckPrompt, type UpdateCheckPromptApi } from "./UpdateCheckPrompt";
+import { UpdateCheckPrompt, isPending, type UpdateCheckPromptApi } from "./UpdateCheckPrompt";
 
 beforeAll(async () => {
   stubDialog();
@@ -28,6 +28,14 @@ describe("UpdateCheckPrompt", () => {
       expect(api.pending).toHaveBeenCalled();
     });
     expect(screen.queryByRole("dialog", { name: NAME })).toBeNull();
+  });
+
+  it("stays hidden when the package manager owns the install", () => {
+    // FreeBSD: `pkg upgrade` is the only update path, so the question never appears.
+    const settings = { wizardCompleted: true, updateCheck: "unset" };
+    expect(isPending(settings, "appImage")).toBe(true);
+    expect(isPending(settings, "pkg")).toBe(false);
+    expect(isPending({ ...settings, updateCheck: "no" }, "appImage")).toBe(false);
   });
 
   it("asks once and stores a yes", async () => {

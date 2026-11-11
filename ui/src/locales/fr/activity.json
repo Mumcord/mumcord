@@ -4,20 +4,20 @@
     "members": "Membres",
     "activity": "Activité"
   },
-  "you": "Vous",
-  "selfName": "vous",
+  "you": "Toi",
+  "selfName": "toi",
   "someone": "quelqu’un",
   "verb": {
     "connected": "s’est connecté",
     "disconnected": "s’est déconnecté",
-    "moved": "a changé de canal",
+    "moved": "a changé de salon",
     "screenShareStarted": "a commencé à partager son écran",
     "screenShareStopped": "a arrêté de partager son écran",
-    "watchPartyStarted": "a démarré une watch party",
-    "watchPartyStopped": "a terminé la watch party",
+    "watchPartyStarted": "a lancé une soirée de visionnage",
+    "watchPartyStopped": "a terminé une soirée de visionnage",
     "pluginActivityStarted": "a lancé {{plugin}}",
     "pluginActivityStopped": "a arrêté {{plugin}}",
-    "pluginEvent": "« {{text}} »"
+    "pluginEvent": "« {{text}} »"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",
@@ -29,11 +29,11 @@
   "empty": "Pas encore d’activité.",
   "rowLabel": {
     "screenShare": "{{action}} le partage d’écran de {{name}}",
-    "watchParty": "{{action}} la watch party de {{name}}",
+    "watchParty": "{{action}} la soirée de visionnage de {{name}}",
     "pluginActivity": "{{action}} le {{plugin}} de {{name}}",
     "pluginEvent": "{{action}} {{plugin}}"
   },
-  "joinPartyFailed": "Impossible de rejoindre la watch party.",
+  "joinPartyFailed": "Impossible de rejoindre la soirée de visionnage.",
   "joinActivityFailed": "Impossible de rejoindre l’activité du plugin.",
   "earlier": "Plus tôt",
   "earlierLabel": "Plus tôt, avant cette session",

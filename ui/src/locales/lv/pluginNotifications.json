@@ -20,15 +20,15 @@
     "install": "Instalēt…",
     "installLabel": "Instalēt {{name}}",
     "addRepositoryLabel": "Pievienot krātuvi: {{name}}",
-    "details": "Skatīt detaļas",
-    "detailsLabel": "Detaļas: {{name}}",
+    "details": "Skatīt informāciju",
+    "detailsLabel": "Informācija par {{name}}",
     "notNow": "Ne tagad",
     "notNowLabel": "Pagaidām paslēpt {{name}}",
     "dontAsk": "Vairs nejautāt par šo serveri",
     "recommended": "Ieteicams",
     "official": "Oficiāls",
     "unofficial": "Neoficiāls · {{host}}",
-    "footer": "Ieteikumi nekad paši neko neinstalē. Serveris neuzzina, ko jūs instalējat."
+    "footer": "Ieteikumi nekad paši neko neinstalē. Serveris neuzzina, ko tu instalē."
   },
-  "failed": "Neizdevās. Lūdzu, mēģiniet vēlreiz."
+  "failed": "Neizdevās. Mēģini vēlreiz."
 }

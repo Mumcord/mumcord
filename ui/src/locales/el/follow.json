@@ -15,10 +15,10 @@
   },
   "notify": {
     "channel": "{{name}} στο {{channel}}: {{text}}",
-    "private": "{{name}} (ιδιωτικό): {{text}}",
+    "private": "{{name}} (ιδιωτικά): {{text}}",
     "more_one": "{{count}} ακόμη νέο μήνυμα",
     "more_other": "{{count}} ακόμη νέα μηνύματα",
-    "channelOn": "{{name}} στο {{channel}} στο {{server}}: {{text}}",
+    "channelOn": "{{name}} στο {{channel}} ({{server}}): {{text}}",
     "privateOn": "{{name}} (ιδιωτικά, {{server}}): {{text}}"
   },
   "history": {
@@ -48,7 +48,7 @@
     "noAnswer": "καμία απάντηση από τον διακομιστή",
     "unfollowed": "Σταμάτησες να ακολουθείς όλα τα κανάλια.",
     "failed": "Η ακολούθηση όλων των καναλιών δεν λειτούργησε. Δοκίμασε ξανά.",
-    "dismiss": "Απόρριψη",
+    "dismiss": "Κλείσιμο",
     "unfollowFailed": "Η διακοπή ακολούθησης όλων των καναλιών δεν λειτούργησε. Δοκίμασε ξανά."
   },
   "mention": "περιλαμβάνει αναφορά σε σένα",

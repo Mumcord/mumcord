@@ -140,13 +140,14 @@ fn handler_register(app: &AppHandle) -> ApiResult<()> {
     Ok(())
 }
 
-// Linux uses the app-ID desktop entry, so the handler and the taskbar share one entry.
-#[cfg(target_os = "linux")]
+// Linux and FreeBSD use the app-ID desktop entry, so the handler and the taskbar share one
+// entry.
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn handler_status(app: &AppHandle) -> ApiResult<bool> {
     crate::desktop_entry::is_handler(app).map_err(|e| link_error(&e))
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn handler_register(app: &AppHandle) -> ApiResult<()> {
     crate::desktop_entry::register_handler(app).map_err(|e| link_error(&e))
 }

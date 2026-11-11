@@ -165,7 +165,7 @@ impl Backend for CpalBackend {
             Direction::Output => self.host.output_devices().map_err(backend_err)?.collect(),
         };
         // One device that cannot be described must not hide all the others.
-        let infos = devices
+        let mut infos: Vec<DeviceInfo> = devices
             .iter()
             .filter_map(|d| {
                 self.info(direction, d)
@@ -173,6 +173,16 @@ impl Backend for CpalBackend {
                     .ok()
             })
             .collect();
+        // A stream without a chosen device follows the system default, which some backends report
+        // under an id their device list never mentions (FreeBSD: "default" next to the "oss" hint).
+        // The poll loop reads a missing id as "the device went away" and reopens the stream, so the
+        // default has to be in the list.
+        if let Some(default) = self.default_device(direction)
+            && let Ok(info) = self.info(direction, &default)
+            && !infos.iter().any(|d| d.id == info.id)
+        {
+            infos.push(info);
+        }
         Ok(super::devices::filter(infos))
     }
 

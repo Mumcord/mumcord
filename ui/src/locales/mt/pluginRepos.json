@@ -7,7 +7,7 @@
     "expectedKey": "Ċavetta mistennija (mhux obbligatorja)",
     "expectedKeyHint": "Jekk is-sid tak ċavetta, waħħalha hawn. Ir-repożitorju mbagħad irid juża eżattament din iċ-ċavetta.",
     "check": "Iċċekkja r-repożitorju",
-    "found": "Dan sibna",
+    "found": "Dan li sibna",
     "confirm": "Żid repożitorju",
     "subtitle": "Żid biss repożitorji minn nies li tafda fihom.",
     "signatureValid": "firma valida",
@@ -15,7 +15,7 @@
     "pluginsLine": "Plugins: {{number}}",
     "signingKey": "Ċavetta tal-firma",
     "warningTitle": "Repożitorju mhux uffiċjali",
-    "warningBody": "Mumcord ma jeżaminax dawn il-plugins. Iċ-ċavetta tinżamm f'moħħha: jekk qatt tinbidel, ir-repożitorju jitwaqqaf sakemm tiċċekkjaha. Meta tfittex, l-indirizz IP tiegħek jidher lill-host. Plugins b'ismijiet uffiċjali qatt ma jittieħdu minn hawn."
+    "warningBody": "Mumcord ma jeżaminax dawn il-plugins. Mumcord jiftakar din iċ-ċavetta: jekk qatt tinbidel, ir-repożitorju jitwaqqaf sakemm tiċċekkjah. Meta tfittex fih, l-indirizz IP tiegħek jidher lil min jospitah. Plugins b'ismijiet uffiċjali qatt ma jittieħdu minnu."
   },
   "limit": "Tista' żżid sa {{max}} repożitorji.",
   "limitReached": "Intlaħaq il-limitu ta' {{max}} repożitorji.",
@@ -23,7 +23,7 @@
   "listLabel": "Repożitorji miżjuda",
   "loadFailed": "Ir-repożitorji ma setgħux jitgħabbew.",
   "status": {
-    "keyChanged": "Iċ-ċavetta nbidlet, f'paws"
+    "keyChanged": "Iċ-ċavetta nbidlet, f'pawża"
   },
   "fingerprintLine": "Marka diġitali taċ-ċavetta: {{fingerprint}}",
   "neverChecked": "Għadu ma ġiex iċċekkjat",
@@ -34,15 +34,15 @@
     "button": "Neħħi",
     "label": "Neħħi {{name}}",
     "title": "Tneħħi {{name}}?",
-    "message": "Ir-repożitorju jitneħħa u l-plugins tiegħu jingħalqu. Jibqgħu installati bid-dejta tagħhom, iżda ma jibqgħux jirċievu aġġornamenti.",
+    "message": "Ir-repożitorju jitneħħa u l-plugins tiegħu jintfew. Jibqgħu installati bid-dejta tagħhom, iżda ma jibqgħux jirċievu aġġornamenti.",
     "confirm": "Neħħi"
   },
   "keyChange": {
     "title": "{{name}} biddel iċ-ċavetta",
-    "message": "Dan ir-repożitorju issa jiffirma l-lista tal-plugins tiegħu b'ċavetta oħra. Jibqa' f'paws sakemm tiddeċiedi. Afda ċ-ċavetta l-ġdida biss jekk is-sid ħabbar il-bidla.",
+    "message": "Dan ir-repożitorju issa jiffirma l-lista tal-plugins tiegħu b'ċavetta oħra. Jibqa' f'pawża sakemm tiddeċiedi. Afda ċ-ċavetta l-ġdida biss jekk is-sid qallek bil-bidla.",
     "oldKey": "Iċ-ċavetta li fdajt s'issa",
     "newKey": "Ċavetta ġdida",
-    "keepPaused": "Żomm f'paws",
+    "keepPaused": "Żommu f'pawża",
     "trust": "Afda ċ-ċavetta l-ġdida",
     "review": "Irrevedi l-bidla taċ-ċavetta"
   },

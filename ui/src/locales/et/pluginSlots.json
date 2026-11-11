@@ -24,8 +24,8 @@
     "none": "Faili pole valitud"
   },
   "list": {
-    "handle": "Liiguta rida {{position}}/{{total}} (nool üles või alla)",
-    "moved": "Rida {{from}} liigutati kohale {{to}}/{{total}}"
+    "handle": "Tõsta rida {{position}}/{{total}} (nool üles või alla)",
+    "moved": "Rida {{from}} tõsteti kohale {{to}}/{{total}}"
   },
   "copyButton": {
     "copied": "Kopeeritud",

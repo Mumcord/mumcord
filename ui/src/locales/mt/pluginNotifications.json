@@ -1,9 +1,9 @@
 {
-  "type": "Plagin",
+  "type": "Plugin",
   "autoOff": {
     "title": "{{name}} ġie mitfi",
-    "body": "Mitfi wara ħabtiet ripetuti",
-    "open": "Uri fil-Plagins"
+    "body": "Mitfi wara li waqa' diversi drabi",
+    "open": "Uri fil-Plugins"
   },
   "pictureRefused": {
     "title": "{{name}} ma setax juża l-istampa",
@@ -21,7 +21,7 @@
     "installLabel": "Installa {{name}}",
     "addRepositoryLabel": "Żid ir-repożitorju għal {{name}}",
     "details": "Ara d-dettalji",
-    "detailsLabel": "Dettalji ta’ {{name}}",
+    "detailsLabel": "Dettalji ta' {{name}}",
     "notNow": "Mhux issa",
     "notNowLabel": "Aħbi {{name}} għalissa",
     "dontAsk": "Tistaqsix aktar għal dan is-server",
@@ -30,5 +30,5 @@
     "unofficial": "Mhux uffiċjali · {{host}}",
     "footer": "Is-suġġerimenti qatt ma jinstallaw xejn waħedhom. Is-server ma jkunx jaf x'tinstalla."
   },
-  "failed": "Dan ma ħadimx. Erġa’ pprova."
+  "failed": "Dan ma ħadimx. Erġa' pprova."
 }

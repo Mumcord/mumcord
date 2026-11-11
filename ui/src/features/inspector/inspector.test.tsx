@@ -111,7 +111,6 @@ describe("PacketInspector", () => {
     setDevToolsUnlocked(true);
     await api.packetCaptureSet(true);
     const save = vi.spyOn(api, "packetCaptureExport");
-    const prompt = vi.spyOn(window, "prompt");
     render(<PacketInspector names={names} />);
     expect(await screen.findAllByText("Mumcord hello")).not.toHaveLength(0);
     expect(screen.getByText("Packets (6 of 6)")).toBeInTheDocument();
@@ -127,14 +126,17 @@ describe("PacketInspector", () => {
     fireEvent.click(screen.getByRole("option", { name: "Received" }));
     expect(screen.getByText("Packets (3 of 6)")).toBeInTheDocument();
 
-    prompt.mockReturnValueOnce("out.json");
     fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
     await screen.findByText("Export saved.");
-    const [jsonPath, json] = save.mock.calls[0] ?? [];
-    expect(jsonPath).toBe("out.json");
+    const [dialog, json] = save.mock.calls[0] ?? [];
+    expect(dialog).toEqual({
+      title: "Export JSON",
+      defaultName: "mumcord-packets.json",
+      filterName: expect.any(String) as string,
+      extensions: ["json"],
+    });
     expect((JSON.parse(json ?? "") as { packets: unknown[] }).packets).toHaveLength(3);
 
-    prompt.mockReturnValueOnce("out.md");
     fireEvent.click(screen.getByRole("button", { name: "Export Markdown" }));
     await waitFor(() => {
       expect(save).toHaveBeenCalledTimes(2);

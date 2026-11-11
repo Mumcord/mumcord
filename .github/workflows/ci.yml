@@ -17,6 +17,9 @@ env:
   # No debug info: CI only needs pass/fail, and it makes linking faster and the caches smaller.
   CARGO_PROFILE_DEV_DEBUG: 0
 
+permissions:
+  contents: read
+
 jobs:
   # Decides whether the heavy jobs run. A path filter on the trigger would leave the required
   # checks pending forever on pull requests without code changes, so the checks always report.
@@ -24,10 +27,14 @@ jobs:
     name: Changed files
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions:
+      contents: read
+      # Lists the changed files of the pull request through the API.
+      pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: scripts/ci
       - id: filter
@@ -48,7 +55,7 @@ jobs:
       SHELLCHECK_VERSION: 0.11.0
       SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The runner's preinstalled shellcheck changes with the image, so both tools are downloaded
       # at fixed versions and verified; actionlint runs the same shellcheck on inline run: scripts.
@@ -76,7 +83,7 @@ jobs:
     timeout-minutes: 5
     steps:
       # The merge commit's first parent is the current base branch.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
 
@@ -102,7 +109,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Rebuild and compare
         run: |
@@ -134,7 +141,7 @@ jobs:
             task: test
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The version the app shows (RELEASING.md); the manifests keep the last release's version.
       - name: Set display version
@@ -154,7 +161,7 @@ jobs:
       - name: Restore apt packages
         id: apt-cache
         if: runner.os == 'Linux'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -176,7 +183,7 @@ jobs:
 
       - name: Save apt packages
         if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -200,7 +207,7 @@ jobs:
       - name: Restore static libvpx
         id: libvpx-cache
         if: runner.os != 'Linux'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -214,7 +221,7 @@ jobs:
 
       - name: Save static libvpx
         if: runner.os != 'Linux' && steps.libvpx-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -244,8 +251,9 @@ jobs:
         uses: ./.github/actions/native-av1
 
       # wasm32: the plugin SDK build test and the safety fixtures below (Linux only).
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
+          toolchain: stable
           components: rustfmt, clippy
           targets: ${{ runner.os == 'Linux' && 'wasm32-unknown-unknown' || '' }}
 
@@ -253,7 +261,7 @@ jobs:
       # cache and evicted main's caches, so later runs started cold.
       # Only main saves: PR-scoped caches are unreadable by other PRs, and at 1-1.5 GB each they push
       # the repository over the 10 GB limit, which evicts the small apt cache.
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: ${{ matrix.task }}
@@ -365,7 +373,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: ./.github/actions/npm-ci
 
@@ -383,9 +391,52 @@ jobs:
 
   # Required status checks, one per OS under the old names. Runs even when the build was
   # skipped (no code change), because a skipped matrix job would not report these names.
+  # FreeBSD (spec 13 §10): the same checks on a real FreeBSD machine, in a VM on a Linux runner.
+  # Only the parts that can differ from Linux run here — check, clippy and the Rust tests — because
+  # the UI checks and the app builds already run on the three supported platforms above.
+  freebsd:
+    name: FreeBSD 15.1
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The version the app shows, as on the other platforms (RELEASING.md).
+      - name: Display version
+        id: version
+        shell: bash
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: echo "value=dev~${SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Check, clippy and test in a FreeBSD VM
+        uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
+        with:
+          release: "15.1"
+          usesh: true
+          mem: 8192
+          cpu: 4
+          prepare: |
+            # git: the plugin tool's publish test runs git. cmake and gmake build the bundled
+            # libopus (cpal -> opusic-sys) from source.
+            pkg install -y git rust node24 npm protobuf python3 pkgconf cmake gmake ca_root_nss \
+              alsa-lib alsa-plugins libvpx svt-av1 dav1d webkit2-gtk_41 gtk3 \
+              libayatana-appindicator
+          run: |
+            set -e
+            export PATH="$HOME/.cargo/bin:$PATH"
+            # The version the app reports, as on the other platforms. Set here rather than in the
+            # step's env: the action runs this script inside the VM, which does not see it.
+            export MUMCORD_VERSION="${{ steps.version.outputs.value }}"
+            export CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=4
+            cargo check --workspace --all-targets --locked
+            cargo clippy --workspace --all-targets --locked -- -D warnings
+            cargo test --workspace --locked
+
   result:
     name: ${{ matrix.os }}
-    needs: [changes, build-test, ui]
+    needs: [changes, build-test, ui, freebsd]
     if: always()
     strategy:
       matrix:
@@ -395,9 +446,11 @@ jobs:
     steps:
       - name: Check results
         run: |
-          echo "changes: $CHANGES, build: $BUILD, ui: $UI"
+          echo "changes: $CHANGES, build: $BUILD, ui: $UI, freebsd: $FREEBSD"
           [ "$CHANGES" = success ] || exit 1
           [ "$BUILD" = success ] || [ "$BUILD" = skipped ] || exit 1
+          # The FreeBSD job runs once and gates the whole run, like the UI checks.
+          [ "$OS" != ubuntu-24.04 ] || [ "$FREEBSD" = success ] || [ "$FREEBSD" = skipped ] || exit 1
           # The UI checks run once and count for the Linux check only.
           [ "$OS" != ubuntu-24.04 ] || [ "$UI" = success ] || [ "$UI" = skipped ]
         env:
@@ -405,3 +458,4 @@ jobs:
           CHANGES: ${{ needs.changes.result }}
           BUILD: ${{ needs.build-test.result }}
           UI: ${{ needs.ui.result }}
+          FREEBSD: ${{ needs.freebsd.result }}

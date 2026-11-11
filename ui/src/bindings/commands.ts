@@ -119,10 +119,11 @@ export const commands = {
 	 */
 	channelDescriptionRequest: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_description_request", { serverId, channelId })),
 	/**
-	 *  Moves a person to another channel; the server checks the move permission and the result
-	 *  arrives as `userUpserted` (issue #172).
+	 *  Moves a person to another channel; the server checks the move permission and answers with the
+	 *  person's `userUpserted` (issue #172). `confirmed` says the server answered the move at all,
+	 *  which the `/move` result line needs (issue #378, FR-10.35).
 	 */
-	personMove: (serverId: number, session: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
+	personMove: (serverId: number, session: number, channelId: number) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { serverId, session, volume })),
 	/**
@@ -161,7 +162,7 @@ export const commands = {
 	 *  Kicks a person with an optional reason (FR-10.11). A refusal arrives as an error, which the open
 	 *  dialog shows; yourself is never offered, so it is refused here too.
 	 */
-	personKick: (serverId: number, session: number, reason: string | null) => typedError<KickResult, ApiError>(__TAURI_INVOKE("person_kick", { serverId, session, reason })),
+	personKick: (serverId: number, session: number, reason: string | null) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_kick", { serverId, session, reason })),
 	/**
 	 *  Bans a person: one entry added to the server's ban list with the safe save of FR-10.66, then the
 	 *  person is removed when the dialog asked for it. Without a readable ban list the dialog sends the
@@ -175,6 +176,29 @@ export const commands = {
 	 *  FR-10.19). Acts at once; a refusal arrives as a `serverDenied` notice with the server's reason.
 	 */
 	personModerate: (serverId: number, session: number, action: ModerateInput) => typedError<null, ApiError>(__TAURI_INVOKE("person_moderate", { serverId, session, action })),
+	/**
+	 *  Reads the server's registered accounts for the window (issue #256). Fails with
+	 *  `permissionDenied` without the Register right in the root channel, and with `serverUnreachable`
+	 *  when the server does not answer within 5 s. Nothing is stored on disk (FR-10.63).
+	 */
+	registeredUsersOpen: (serverId: number) => typedError<RegisteredUserEntry[], ApiError>(__TAURI_INVOKE("registered_users_open", { serverId })),
+	/**
+	 *  Renames one account (FR-10.52, AC-10.37). One `UserList` entry carries the new name; the answer
+	 *  is the list the server holds afterwards, which is what tells whether it took the name.
+	 */
+	registeredUserRename: (serverId: number, userId: number, name: string) => typedError<RegisteredSaveResult, ApiError>(__TAURI_INVOKE("registered_user_rename", { serverId, userId, name })),
+	/**
+	 *  Removes one registration (FR-10.52, AC-10.37). The person can still connect, as a guest, and
+	 *  loses the name and the group memberships that name them.
+	 */
+	registeredUserUnregister: (serverId: number, userId: number) => typedError<RegisteredSaveResult, ApiError>(__TAURI_INVOKE("registered_user_unregister", { serverId, userId })),
+	/**
+	 *  The groups that name one account in a channel (issue #256). A server that will not show its
+	 *  groups answers with an empty list rather than an error.
+	 */
+	registeredUserGroups: (serverId: number, userId: number) => typedError<string[], ApiError>(__TAURI_INVOKE("registered_user_groups", { serverId, userId })),
+	/**  The window closed: what it held is dropped (FR-10.63). */
+	registeredUsersClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("registered_users_close", { serverId })),
 	/**  Creates a channel (FR-10.21, FR-10.22). A temporary channel moves you into it. */
 	channelCreate: (serverId: number, input: ChannelCreateInput) => typedError<ChannelResult, ApiError>(__TAURI_INVOKE("channel_create", { serverId, input })),
 	/**
@@ -206,6 +230,26 @@ export const commands = {
 	 *  the SuperUser.
 	 */
 	channelAclLockout: (serverId: number, acl: ChannelAclView) => typedError<number[], ApiError>(__TAURI_INVOKE("channel_acl_lockout", { serverId, acl })),
+	/**
+	 *  Server mute of another person (Epic 4, issue #378, FR-10.15). The server checks the Mute others
+	 *  right in the channel the person is in and answers with their new state.
+	 */
+	personSetServerMute: (serverId: number, session: number, muted: boolean) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_set_server_mute", { serverId, session, muted })),
+	/**  Server deafen of another person (FR-10.15). Deafening always mutes too (spec 10, A5). */
+	personSetServerDeafen: (serverId: number, session: number, deaf: boolean) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_set_server_deafen", { serverId, session, deaf })),
+	/**  Priority speaker of another person (issue #378); the same right as server mute. */
+	personSetPrioritySpeaker: (serverId: number, session: number, priority: boolean) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_set_priority_speaker", { serverId, session, priority })),
+	/**
+	 *  Registers an online guest under their current name (issue #378, FR-10.20); only a guest, and
+	 *  only with the Register right in the root channel.
+	 */
+	personRegister: (serverId: number, session: number) => typedError<PersonAction, ApiError>(__TAURI_INVOKE("person_register", { serverId, session })),
+	/**
+	 *  Moves everyone in the admin's own channel to another one (`/moveall`, FR-10.17). The moves go
+	 *  out at the paced rate of FR-10.18, so the answer comes after they all arrived or were refused;
+	 *  a second call while one runs answers `alreadyRunning`.
+	 */
+	personMoveAll: (serverId: number, channelId: number) => typedError<MassMoveResult, ApiError>(__TAURI_INVOKE("person_move_all", { serverId, channelId })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -256,18 +300,23 @@ export const commands = {
 	sendChannelMessage: (serverId: number, channelId: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_channel_message", { serverId, channelId, html })),
 	sendPrivateMessage: (serverId: number, session: number, html: string) => typedError<ChatMessage, ApiError>(__TAURI_INVOKE("send_private_message", { serverId, session, html })),
 	/**
-	 *  Writes the image of a `data:` URL to `path` (the viewer's "Save image", FR-1.56). The data is
-	 *  already in the UI, so nothing is fetched again.
+	 *  Asks where to save the image of a `data:` URL and writes it there (the viewer's "Save image",
+	 *  FR-1.56). The data is already in the UI, so nothing is fetched again. Returns false when the
+	 *  user cancelled the save dialog.
 	 */
-	saveImage: (path: string, dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_image", { path, dataUrl })),
+	saveImage: (dialog: SaveDialog, dataUrl: string) => typedError<boolean, ApiError>(__TAURI_INVOKE("save_image", { dialog, dataUrl })),
 	/**
 	 *  Puts the image of a `data:` URL on the system clipboard as image data ("Copy image", issue
 	 *  #115). Fails with `messageTooLarge` above the size limits, `invalidInput` when the data is not
 	 *  a readable image and `io` when the clipboard does not take it.
 	 */
 	copyImage: (dataUrl: string) => typedError<null, ApiError>(__TAURI_INVOKE("copy_image", { dataUrl })),
-	/**  Writes text the UI already has to `path` (a chat code block's "Download", issue #111). */
-	saveText: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("save_text", { path, contents })),
+	/**
+	 *  Asks where to save text the UI already has and writes it there (a chat code block's
+	 *  "Download", issue #111, or a plugin's data export). Returns false when the user cancelled the
+	 *  save dialog.
+	 */
+	saveText: (dialog: SaveDialog, contents: string) => typedError<boolean, ApiError>(__TAURI_INVOKE("save_text", { dialog, contents })),
 	/**
 	 *  Puts plain text on the system clipboard (copying chat text, issue #114). The webview's own
 	 *  clipboard access does not reach the desktop everywhere (WebKitGTK on Linux), so the copy
@@ -318,9 +367,17 @@ export const commands = {
 	filesAvailability: (serverId: number) => __TAURI_INVOKE<FilesUnavailable | null>("files_availability", { serverId }),
 	/**
 	 *  Adds a file or folder to the attachment tray (FR-7.11 – 7.13) and returns its chip; a folder
-	 *  is zipped in the background and reported as `fileChipChanged`.
+	 *  is zipped in the background and reported as `fileChipChanged`. Only a path the user just
+	 *  dropped onto the window or picked with `files_pick` is accepted, once; any other path fails
+	 *  with `notFound`, so a script in the page cannot attach files the user never chose.
 	 */
-	filesChipAdd: (path: string) => __TAURI_INVOKE<FileChip>("files_chip_add", { path }),
+	filesChipAdd: (path: string) => typedError<FileChip, ApiError>(__TAURI_INVOKE("files_chip_add", { path })),
+	/**
+	 *  Opens the system file picker for the paperclip (several files) and returns the chosen paths;
+	 *  empty when the user cancelled. Each may then be added once with `files_chip_add`. Paths that
+	 *  are not valid UTF-8 are skipped: the UI could not hand them back unchanged.
+	 */
+	filesPick: (title: string) => typedError<string[], ApiError>(__TAURI_INVOKE("files_pick", { title })),
 	/**  Takes a chip out of the tray (and drops its zip). */
 	filesChipRemove: (chipId: number) => __TAURI_INVOKE<void>("files_chip_remove", { chipId }),
 	/**
@@ -342,6 +399,13 @@ export const commands = {
 	filesCancel: (serverId: number, shareId: string) => __TAURI_INVOKE<void>("files_cancel", { serverId, shareId }),
 	/**  The folder downloads are saved to: the setting, else `Mumcord` inside the system Downloads folder. */
 	filesSaveFolder: () => typedError<string, ApiError>(__TAURI_INVOKE("files_save_folder")),
+	/**
+	 *  Opens the system folder picker and makes the chosen folder the download folder; returns it,
+	 *  or `null` when the user cancelled. This is the only way to change `filesSaveFolder`:
+	 *  `settings_update` keeps the stored value, so a script in the page cannot point downloads at
+	 *  an autostart folder.
+	 */
+	filesSaveFolderChoose: (title: string) => typedError<string | null, ApiError>(__TAURI_INVOKE("files_save_folder_choose", { title })),
 	/**
 	 *  Opens a downloaded file with the system's default program (FR-7.29). The saved file keeps
 	 *  its mark-of-the-web, so the system still warns about it. Errors: `notFound` with "The file is
@@ -400,10 +464,11 @@ export const commands = {
 	 */
 	audioFile: (url: string) => typedError<string | null, ApiError>(__TAURI_INVOKE("audio_file", { url })),
 	/**
-	 *  Saves the audio file of a direct audio link to `path`, which the user picked in a save
-	 *  dialog (issue #260). The engine fetches it again with the same checks as for playing.
+	 *  Asks where to save the audio file of a direct audio link and saves it there (issue #260).
+	 *  The engine fetches it again with the same checks as for playing. Returns false when the user
+	 *  cancelled the save dialog.
 	 */
-	audioSave: (url: string, path: string) => typedError<null, ApiError>(__TAURI_INVOKE("audio_save", { url, path })),
+	audioSave: (url: string, dialog: SaveDialog) => typedError<boolean, ApiError>(__TAURI_INVOKE("audio_save", { url, dialog })),
 	/**
 	 *  Hides the preview card of `url` under a message for good (QA.42). Messages that were not
 	 *  stored (history saving off) keep nothing; the UI hides the card for the session.
@@ -877,8 +942,11 @@ export const commands = {
 	pluginSuggestionInstalled: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_installed", { serverId, plugin })),
 	/**  "Don't ask again for this server". */
 	pluginSuggestionsDismissServer: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestions_dismiss_server", { serverId })),
-	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
-	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
+	/**
+	 *  Asks where to save the diagnostic file (no chat contents, passwords, certificates or
+	 *  personal data) and writes it there. Returns false when the user cancelled the save dialog.
+	 */
+	diagnosticsSave: (dialog: SaveDialog) => typedError<boolean, ApiError>(__TAURI_INVOKE("diagnostics_save", { dialog })),
 	/**  The saved crash reports, newest first. */
 	crashList: () => typedError<CrashReport[], ApiError>(__TAURI_INVOKE("crash_list")),
 	/**  Reports from crashes the user has not been told about yet (the notice at start-up). */
@@ -921,8 +989,11 @@ export const commands = {
 	packetCapturePoll: (after: number | null) => typedError<PacketCapture, ApiError>(__TAURI_INVOKE("packet_capture_poll", { after })),
 	/**  Drops the captured packets and resets the counters. */
 	packetCaptureClear: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_clear")),
-	/**  Writes an export the UI built from the captured packets (JSON or Markdown) to `path`. */
-	packetCaptureExport: (path: string, contents: string) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_export", { path, contents })),
+	/**
+	 *  Asks where to save an export the UI built from the captured packets (JSON or Markdown) and
+	 *  writes it there. Returns false when the user cancelled the save dialog.
+	 */
+	packetCaptureExport: (dialog: SaveDialog, contents: string) => typedError<boolean, ApiError>(__TAURI_INVOKE("packet_capture_export", { dialog, contents })),
 	/**  Opens the packet inspector window, or brings it to the front if it is already open. */
 	packetInspectorOpen: () => typedError<null, ApiError>(__TAURI_INVOKE("packet_inspector_open")),
 	/**  Closes the packet inspector window (Ctrl+W in that window). */
@@ -1360,6 +1431,7 @@ export const events = {
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
+	noiseSuppressionFallback: makeEvent<NoiseSuppressionFallback, NoiseSuppressionFallback>("noise-suppression-fallback"),
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
@@ -1501,6 +1573,11 @@ export type ActiveEncoder = {
 
 /**  One new activity-feed event as the UI would announce it (#597). Texts are translated and plain. */
 export type ActivityNotice = {
+	/**
+	 *  The activity kind whose setting decides; `null` for other notices (the relay warning),
+	 *  which follow the message setting.
+	 */
+	kind: ActivityNotifyKind | null,
 	serverId: number,
 	/**
 	 *  The channel the event happened in; clicking the notification opens its chat, where the
@@ -1514,15 +1591,21 @@ export type ActivityNotice = {
 	actionLabel: string,
 };
 
-/**  Activity-feed events that notify like messages (#597). */
+/**  Which setting decides how an activity event notifies (#660). */
+export type ActivityNotifyKind = "joins" | "screenShare" | "watchParty" | "pluginActivity" | "pluginEvent";
+
+/**
+ *  How each kind of activity-feed event notifies (#597, #660), with the same choices as
+ *  messages. Every kind starts as `inApp`.
+ */
 export type ActivityNotifySettings = {
-	/**  Someone connected, left or moved channel. Off by default. */
-	joins: boolean,
-	screenShare: boolean,
-	watchParty: boolean,
-	pluginActivity: boolean,
+	/**  Someone connected, left or moved channel. */
+	joins: NotificationMode,
+	screenShare: NotificationMode,
+	watchParty: NotificationMode,
+	pluginActivity: NotificationMode,
 	/**  Events a plugin pushes to the feed. */
-	pluginEvent: boolean,
+	pluginEvent: NotificationMode,
 };
 
 /**  Error returned by every failing command. */
@@ -1550,6 +1633,16 @@ export type AppInfo = {
 	 *  systems or without a readable os-release file.
 	 */
 	distro: LinuxDistro | null,
+	/**
+	 *  What this platform cannot offer (FR-13.27): the UI disables those entries and the About
+	 *  note lists them. Empty where everything works.
+	 */
+	limits: PlatformLimit[],
+	/**
+	 *  The desktop session in use, where the platform has more than one (FR-13.31); `None`
+	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything.
+	 */
+	session: SessionKind | null,
 };
 
 /**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
@@ -1947,11 +2040,15 @@ export type CameraTileState =
 "full" | 
 /**  The join brought no answer; retried every 10 s. */
 "failed" | 
+/**  The camera needs Mumcord 0.9.0; the text stays until the camera's next `on` (FR-8.95). */
+"needsUpdate" | 
 /**  Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never. */
 "hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
-export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | 
+/**  This platform has no camera backend at all (FR-13.27). */
+"unsupportedPlatform";
 
 /**  The own camera as the preview dialog, Settings, the room and the tray see it. */
 export type CameraView = {
@@ -2910,7 +3007,9 @@ export type InstallKind =
 /**  A Mac app outside an `.app` bundle (a development run). */
 "otherMac" | 
 /**  Packages: the package manager updates them. */
-"deb" | "rpm" | "aur" | "otherLinux";
+"deb" | "rpm" | "aur" | "otherLinux" | 
+/**  A FreeBSD package: `pkg upgrade mumcord` updates it (see updater_freebsd.rs). */
+"pkg";
 
 /**  One installed plugin. */
 export type InstalledPlugin = {
@@ -2973,9 +3072,6 @@ export type KeyChangeReview = {
 	oldFingerprint: string,
 	newFingerprint: string,
 };
-
-/**  What a kick produced: the server's answer, or nothing within 5 s. */
-export type KickResult = "confirmed" | "unconfirmed";
 
 /**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
 export type KnownGame = {
@@ -3072,6 +3168,13 @@ export type LogLevel = "error" | "warn" | "info" | "debug";
 
 /**  Why the share runs below the sharer's pick. */
 export type LoweredReason = "uploadTooSlow" | "encoderTooSlow" | "manyViewers";
+
+/**  What a mass move produced (FR-10.17, FR-10.18). */
+export type MassMoveResult = 
+/**  All moves were sent; `moved` of `total` people arrived in the target channel. */
+{ kind: "done"; moved: number; total: number } | 
+/**  Another mass move is still running on this server (FR-10.18). */
+{ kind: "alreadyRunning" };
 
 /**  Which views are popped out changed; sent to every window. */
 export type MediaPopoutChanged = {
@@ -3307,6 +3410,12 @@ export type NoiseBackend =
 "advanced";
 
 /**
+ *  The selected noise suppression is too slow for this computer right now and the standard one
+ *  stands in (issue #753).
+ */
+export type NoiseSuppressionFallback = null;
+
+/**
  *  The user clicked a system notification; the window is already in front. Show the server
  *  and open this chat.
  */
@@ -3518,6 +3627,9 @@ export type PasswordView = { kind: "none" } | { kind: "set"; password: string } 
 /**  The Join rules are more than a password; they are edited under Permissions. */
 { kind: "custom" };
 
+/**  What an action on a person produced: the server's answer, or nothing within 5 s (FR-10.59). */
+export type PersonAction = "confirmed" | "unconfirmed";
+
 /**  Comment, avatar and private note, fetched on demand when the profile card opens. */
 export type PersonProfile = {
 	/**  Sanitized HTML. */
@@ -3546,6 +3658,21 @@ export type PersonTarget = {
 	canKick: boolean,
 	canBan: boolean,
 };
+
+/**  A feature this platform cannot provide, with the reason named in the About note. */
+export type PlatformLimit = 
+/**  No camera backend. */
+"camera" | 
+/**  No ONNX Runtime for the AI backgrounds. */
+"cameraEffects" | 
+/**  No PipeWire to take an application's sound into a share. */
+"screenShareSound" | 
+/**  No `xdg-desktop-portal` to pick a window or an app. */
+"windowPicker" | 
+/**  No in-game overlay. */
+"overlay" | 
+/**  No EME in the platform's WebView (FR-13.38): protected video can only play in a browser. */
+"protectedVideo";
 
 /**  A video waiting in the party's playlist (FR-2.69). */
 export type PlaylistEntry = {
@@ -4490,6 +4617,37 @@ export type RefusedPlugin = {
 	atMillis: number | null,
 };
 
+/**
+ *  What a rename or an unregister produced (issue #256). The window shows `entries` either way,
+ *  because the server's own list is the only account of what stands.
+ */
+export type RegisteredSaveResult = 
+/**  The server's list now carries the change. */
+{ kind: "saved"; entries: RegisteredUserEntry[] } | 
+/**
+ *  The list still shows the account as it was, which the server does not say in words: the
+ *  usual cause is a name another account already holds.
+ */
+{ kind: "kept"; entries: RegisteredUserEntry[] };
+
+/**
+ *  One registered account as the window shows it (issue #256). `userId` is the key of the row: the
+ *  server does not keep names unique in a way a client can rely on, and only the id says which
+ *  account a change acts on. `certHash` is personal data shown only to a user with the Ban right
+ *  (FR-10.65).
+ */
+export type RegisteredUserEntry = {
+	userId: number,
+	name: string,
+	/**  RFC 3339, or `null` when the server does not say (FR-10.5). */
+	lastSeen: string | null,
+	/**  The channel the account was last seen in, named, or `null` when the server does not say. */
+	lastChannel: string | null,
+	/**  Whether one of their accounts is connected right now. */
+	online: boolean,
+	certHash: string | null,
+};
+
 /**  The relay of a server changed (FR-4.20). */
 export type RelayChanged = {
 	serverId: number,
@@ -4611,6 +4769,18 @@ export type RepositoryView = {
 /**  A Mumble permission, as named in a refusal (#248). */
 export type Right = "write" | "traverse" | "enter" | "speak" | "muteDeafen" | "move" | "makeChannel" | "linkChannel" | "whisper" | "textMessage" | "makeTempChannel" | "listen" | "kick" | "ban" | "register" | "selfRegister" | "resetUserContent";
 
+/**  Texts of a save dialog, translated by the UI. */
+export type SaveDialog = {
+	/**  Window title of the dialog. */
+	title: string,
+	/**  Suggested file name, e.g. `mumcord-diagnostics.txt`. */
+	defaultName: string,
+	/**  Name of the file type in the filter, e.g. "Text file". */
+	filterName: string,
+	/**  Extensions of the filter without the dot; the first is added when the name has none. */
+	extensions: string[],
+};
+
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
 	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
@@ -4699,6 +4869,12 @@ export type ScreenShare = {
 	 *  tell a window from the whole screen.
 	 */
 	kind: ShareKind | null,
+	/**
+	 *  The picked window's title, else its app's name, for the own live bar (issue #558);
+	 *  `null` for a screen, where the platform does not say, and for the shares of others. It
+	 *  never leaves this device (FR-7.87).
+	 */
+	title: string | null,
 	/**  How long the share has been running (issue #163). */
 	elapsedMs: number,
 };
@@ -4840,6 +5016,13 @@ export type ServerTestInput = {
 	identityId: number | null,
 };
 
+/**  Which display server the app talks to (FR-13.31, FR-13.21). */
+export type SessionKind = 
+/**  X11, also through XWayland on a Wayland session. */
+"x11" | 
+/**  A Wayland session; hotkeys and capture still go through XWayland. */
+"wayland";
+
 export type Settings = {
 	/**  False until the first-start wizard was finished. */
 	wizardCompleted: boolean,
@@ -4906,9 +5089,15 @@ export type Settings = {
 	notifications: NotificationMode,
 	/**  Activity events that notify (#597). */
 	activityNotify: ActivityNotifySettings,
+	/**  "Keep activity history after a restart" (#661); off by default. */
+	keepActivityHistory: boolean,
 	closeBehaviour: CloseBehaviour,
 	chatDisplay: ChatDisplay,
 	logLevel: LogLevel,
+	/**  Write logs to disk (default on; spec 12). Off: memory-only log. */
+	logToDisk: boolean,
+	/**  Wait for disk on every save (default on; spec 12). Off: synchronous = OFF. */
+	durableSaves: boolean,
 	/**  Send the default avatar to servers connected to for the first time (FR-1.47). */
 	sendDefaultAvatar: boolean,
 	/**
@@ -4925,6 +5114,8 @@ export type Settings = {
 	 *  and `link_preview` fetches nothing.
 	 */
 	linkPreviews: boolean,
+	/**  Keep link previews on disk (default on; spec 12). Off: memory only for the session. */
+	linkPreviewsOnDisk: boolean,
 	/**
 	 *  "Delete cached previews after X days" (default 7; `null` never; QA.42). Previews,
 	 *  thumbnails and images are pruned at start, periodically and when this changes.
@@ -4975,6 +5166,8 @@ export type Settings = {
 	pluginsBadgePlugin: string | null,
 	/**  Optional mirror of the official plugin repository. */
 	pluginsMirrorUrl: string | null,
+	/**  Keep the plugin registry copy on disk (default on; spec 12). Off: always fetch fresh. */
+	pluginRegistryCache: boolean,
 	/**  Developer mode (dev folders, local HTTP repositories). */
 	developerMode: boolean,
 	/**  Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14). */
@@ -5001,6 +5194,11 @@ export type Settings = {
 	updateAutoDownload: boolean,
 	/**  Hours between two update checks, 1–168 (FR-3.144). */
 	updateIntervalHours: number,
+	/**
+	 *  The effective update channel (issue #741): the user's choice, else the one that fits the
+	 *  installed version. Saving stores it as the choice.
+	 */
+	updateChannel: UpdateChannel,
 	/**  The version the user skipped; `null` when none is (FR-3.144). */
 	updateSkipped: string | null,
 	/**  AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55). */
@@ -5222,7 +5420,12 @@ export type SoundUnavailableReason =
 /**  Linux without a running PipeWire. */
 "noPipeWire" | 
 /**  The sound capture could not start or stopped. */
-"captureFailed";
+"captureFailed" | 
+/**
+ *  This platform cannot take a share's sound at all (FR-13.19): FreeBSD has no PipeWire and
+ *  no desktop portal, so a share is the whole X11 screen without sound.
+ */
+"platform";
 
 export type StageActivityKind = 
 /**  "<name> started <plugin> · Join". */
@@ -5390,6 +5593,12 @@ export type UnreadCount = {
 	count: number,
 };
 
+/**
+ *  Which releases the updater offers (issue #741): final releases only, or release candidates
+ *  as well.
+ */
+export type UpdateChannel = "stable" | "releaseCandidates";
+
 /**  Why the last step failed. Offline checks are not shown as errors, only in Settings. */
 export type UpdateError = 
 /**  GitHub could not be reached or answered with an error. */
@@ -5406,6 +5615,11 @@ export type UpdateError =
 /**  A newer release than the installed one. */
 export type UpdateOffer = {
 	version: string,
+	/**
+	 *  The channel this version belongs to: `stable` for a final release, `releaseCandidates`
+	 *  for a pre-release.
+	 */
+	channel: UpdateChannel,
 	/**  Newest first: every release since the installed one. */
 	notes: ReleaseNote[],
 	/**  The release page, built from the version (never taken from the response). */

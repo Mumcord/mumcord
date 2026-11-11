@@ -15,8 +15,8 @@
     "ping": "Ping",
     "anyPing": "Orice ping",
     "pingBelow": "Sub {{ms}} ms",
-    "hideEmpty": "Ascunde goale",
-    "hideFull": "Ascunde pline"
+    "hideEmpty": "Ascunde cele goale",
+    "hideFull": "Ascunde cele pline"
   },
   "sortedBy": "Sortare: {{column}}",
   "columns": {
@@ -35,7 +35,7 @@
   "measuring": "Se măsoară",
   "noAnswer": "Niciun răspuns",
   "ms": "{{ms}} ms",
-  "connect": "Conectează",
+  "connect": "Conectează-te",
   "connectTo": "Conectează-te la {{server}}",
   "favourite": "Favorit",
   "favouriteServer": "Adaugă {{server}} la serverele tale",
@@ -44,5 +44,5 @@
   "announce": {
     "saved": "{{server}} a fost adăugat la serverele tale"
   },
-  "note": "Doar rândurile vizibile primesc ping, câteva odată. Nimic altceva nu se trimite unui server până nu te conectezi."
+  "note": "Doar rândurile vizibile primesc ping, câteva o dată. Nimic altceva nu se trimite unui server până nu te conectezi."
 }

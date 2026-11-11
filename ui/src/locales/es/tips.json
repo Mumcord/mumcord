@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, el ayudante de consejos",
+  "greeting": {
+    "title": "¡Hola, soy Aaron!",
+    "body": "Soy un axolote y me conozco Mumcord al dedillo. ¿Te apetece un recorrido rápido? Lleva más o menos un minuto. Si ahora no, me encontrarás en Ajustes → Acerca de → Consejos.",
+    "start": "Enséñamelo",
+    "later": "Ahora no"
+  },
+  "progress": "Consejo {{current}} de {{total}}",
+  "back": "Atrás",
+  "next": "Siguiente",
+  "done": "Hecho",
+  "skip": "Saltar el recorrido",
+  "close": "Cerrar consejos",
+  "tips": {
+    "servers": {
+      "title": "Tus servidores",
+      "body": "En la barra de la izquierda del todo están tus servidores. Añade uno con + o explora servidores públicos con la lupa. Puedes conectarte a varios servidores a la vez."
+    },
+    "channels": {
+      "title": "Canales",
+      "body": "Haz doble clic en un canal para unirte y hablar. Un solo clic muestra su chat sin unirte, y Seguir te mantiene al tanto."
+    },
+    "talk": {
+      "title": "Cómo hablas",
+      "body": "¿Push-to-talk o activación por voz? Elígelo en Ajustes → Voz y audio, o abre Ajustes de voz… con la flechita junto al micrófono. Push-to-talk también funciona con los botones del ratón."
+    },
+    "panel": {
+      "title": "Tu panel de usuario",
+      "body": "Abajo a la izquierda silencias el micrófono, ensordeces, activas la cámara o cuelgas. Las flechitas de al lado abren más opciones."
+    },
+    "search": {
+      "title": "Encuéntralo todo",
+      "body": "Pulsa {{key}} para encontrar personas y canales, incluso en servidores grandes."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Responde a un mensaje, cítalo, menciona a gente con @ y comparte imágenes y archivos. Los botones de formato aparecen mientras escribes."
+    },
+    "apps": {
+      "title": "Apps",
+      "body": "Con el botón Apps de la barra de mensajes puedes compartir pantalla, empezar una sesión de visionado o activar tu cámara. Los plugins añaden más."
+    },
+    "themes": {
+      "title": "Tu estilo",
+      "body": "El engranaje de abajo a la izquierda cambia entre oscuro y claro. En Ajustes → Apariencia hay más temas, y un servidor puede tener el suyo: haz clic derecho en él y elige Tema."
+    },
+    "end": {
+      "title": "¡Eso es todo!",
+      "body": "Disfruta de Mumcord. Puedes volver a llamarme cuando quieras en Ajustes → Acerca de → Consejos."
+    }
+  }
+}

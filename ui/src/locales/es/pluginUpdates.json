@@ -17,13 +17,13 @@
   "update": "Actualizar",
   "installFailed": "No se pudo actualizar {{name}}. Inténtalo de nuevo.",
   "pins": "Fijar versión",
-  "pinsHint": "Un plugin fijado se queda en su versión actual y no recibe ofertas de actualización.",
+  "pinsHint": "Un plugin fijado se queda en su versión actual y no se le ofrecen actualizaciones.",
   "pin": "Mantener {{name}} en esta versión",
   "pinVersion": "Versión {{version}}",
   "versionsTo": "a",
   "pill": {
     "none": "Sin permisos nuevos",
-    "permission": "Necesita un permiso nuevo",
+    "permission": "Pide más permisos",
     "author": "Autor nuevo",
     "websites": "Se comunica con sitios web nuevos"
   },
@@ -35,7 +35,7 @@
     "remove": "Quitar"
   },
   "checkNow": "Comprobar ahora",
-  "lastChecked": "Última comprobación a las {{time}}",
+  "lastChecked": "Última comprobación: {{time}}",
   "checkFailed": "La comprobación ha fallado. Inténtalo de nuevo.",
   "modeNote": "Actualizaciones de plugins: {{mode}}. Puedes cambiarlo abajo.",
   "settings": "Ajustes de actualización",

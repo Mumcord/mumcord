@@ -128,11 +128,13 @@ async fn a_test_connection_reports_version_ping_and_certificate_state() {
     assert_eq!(trusted.version, result.version);
     engine.disconnect(server.id);
 
-    // A wrong password is reported as such, with no figures.
+    // A wrong password is reported as such, with no figures. Only the trusted certificate of the
+    // saved server gets a password at all.
     if let Some(password) = env::testenv_var("SERVER_PASSWORD") {
         let wrong = engine
             .server_test_connection(ServerTestInput {
                 password: PasswordChange::Set(format!("wrong-{password}")),
+                server_id: Some(server.id),
                 ..input(common::v15(), &name)
             })
             .await

@@ -51,7 +51,31 @@ describe("UpdatesCard (FR-3.146)", () => {
     const auto = screen.getByRole("radio", { name: "Download automatically" });
     expect(auto).toBeDisabled();
     expect(screen.getByRole("radio", { name: "Notify only" })).toBeChecked();
-    expect(screen.getByRole("radiogroup")).toHaveAccessibleDescription(/cannot update itself/);
+    expect(screen.getByRole("radiogroup", { name: /When an update/ })).toHaveAccessibleDescription(
+      /cannot update itself/,
+    );
+  });
+
+  it("stores the update channel and hints at switching back only on release candidates", () => {
+    const update = vi.fn();
+    const { rerender } = render(<UpdatesCard settings={settings} update={update} />);
+    expect(screen.getByRole("radiogroup", { name: /Update channel/ })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /^Stable/ })).toBeChecked();
+    expect(screen.queryByText(/Switching back to Stable/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /^Release candidates/ }));
+    expect(update).toHaveBeenLastCalledWith({ updateChannel: "releaseCandidates" });
+    rerender(
+      <UpdatesCard
+        settings={{ ...settings, updateChannel: "releaseCandidates" }}
+        update={update}
+      />,
+    );
+    expect(screen.getByRole("radio", { name: /^Release candidates/ })).toBeChecked();
+    expect(
+      screen.getByText(/Switching back to Stable keeps your current version/),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /^Stable/ }));
+    expect(update).toHaveBeenLastCalledWith({ updateChannel: "stable" });
   });
 
   it("changes the check interval", async () => {

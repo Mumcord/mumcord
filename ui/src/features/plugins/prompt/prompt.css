@@ -44,6 +44,71 @@
   }
 }
 
+/* Intro line with the "Allow all" button (issue #708). */
+.plugin-prompt-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 var(--space-1);
+}
+
+.plugin-prompt-head .plugin-prompt-subtitle {
+  flex: 1;
+  margin: 0;
+}
+
+.plugin-prompt-allow-all,
+.plugin-prompt-approve-actions .settings-button {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.plugin-prompt-all-allowed {
+  flex: none;
+  color: var(--color-success);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.plugin-prompt-all-allowed:focus {
+  outline: none;
+}
+
+/* Approval before "Allow all" switches on high-risk permissions: the look of the high-risk box. */
+.plugin-prompt-approve {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  padding: var(--space-3);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.plugin-prompt-approve p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-prompt-approve ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-prompt-approve-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
 .plugin-prompt-visibility {
   display: flex;
   align-items: center;

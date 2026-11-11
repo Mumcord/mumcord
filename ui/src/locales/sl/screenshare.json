@@ -9,7 +9,7 @@
   "changeFailed": "Deljenje zaslona ni sprejelo tvoje spremembe.",
   "blocked": {
     "notInChannel": "Pridruži se glasovnemu kanalu, da deliš zaslon.",
-    "consentOff": "Deljenje zaslona potrebuje neposredne povezave. Vklopi jih v Nastavitve → Zasebnost.",
+    "consentOff": "Deljenje zaslona potrebuje neposredne povezave. Vklopi jih v razdelku Nastavitve → Zasebnost.",
     "unsupportedPlatform": "Deljenje zaslona v tem sistemu še ni na voljo."
   },
   "live": "V živo",
@@ -30,10 +30,10 @@
   "pauseSharing": "Začasno ustavi deljenje",
   "resumeSharing": "Nadaljuj deljenje",
   "viewersLabel": "Kdo gleda",
-  "changeWindow": "Zmeni okno",
+  "changeWindow": "Zamenjaj okno",
   "viewersTitle": "Gledalci",
-  "thumbnail": "Predogled tega, kar delite",
-  "youAreSharing": "Delite",
+  "thumbnail": "Predogled tega, kar deliš",
+  "youAreSharing": "Deliš",
   "ofMax": "{{count}} od {{max}}",
   "fullShort": "Vsa mesta so zasedena.",
   "stopShort": "Ustavi",
@@ -87,11 +87,12 @@
     "soundNeeds": {
       "windows": "Brez zvoka: zahteva Windows 10 različice 2004 ali novejše",
       "macos": "Brez zvoka: zahteva macOS 13 ali novejši",
-      "pipewire": "Brez zvoka: zahteva PipeWire"
+      "pipewire": "Brez zvoka: zahteva PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Gledalci dobijo:",
-    "viewersGetSummary": "do {{resolution}} · {{fps}} sl./s · {{codec}} · približno {{mbit}} Mbit/s",
-    "pathRelay": "Poslano enkrat prek releja strežnika, ki ga posreduje do {{count}} gledalcem.",
+    "viewersGetSummary": "do {{resolution}} · {{fps}} fps · {{codec}} · približno {{mbit}} Mbit/s",
+    "pathRelay": "Poslano enkrat prek releja strežnika, ki ga posreduje največ {{count}} gledalcem.",
     "pathDirect": "Ena kopija na gledalca, največ {{count}}.",
     "olderMumcord": "Gledalci s starejšim Mumcordom dobijo VP9.",
     "remember": "Naslednjič uporabi te nastavitve",
@@ -121,7 +122,7 @@
     "tipDesktop": "Cel zaslon: zvok namizja brez Mumcorda.",
     "tipApp": "Eno okno: samo zvok te aplikacije.",
     "tipOff": "Stikalo za zvok je izklopljeno.",
-    "tipNone": "Za to okno je izbrano „Brez zvoka“.",
+    "tipNone": "Za to okno je izbrano »Brez zvoka«.",
     "tipOldWindows": "Brez zvoka: zahteva Windows 10 različice 2004 ali novejši",
     "tipOldMacos": "Brez zvoka: zahteva macOS 13 ali novejši",
     "tipNoPipeWire": "Brez zvoka: zahteva PipeWire",
@@ -156,7 +157,7 @@
     "more_two": "in še {{count}}",
     "more_few": "in še {{count}}",
     "more_other": "in še {{count}}",
-    "layerNote": "{{name}} dobiva {{fps}} sl./s: njegova povezava ne zdrži {{target}}."
+    "layerNote": "{{name}} dobiva {{fps}} fps: povezava te osebe ne zdrži {{target}}."
   },
   "notices": {
     "noFanoutTitle": "Ta strežnik nima releja za velika deljenja",
@@ -191,8 +192,8 @@
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Ni izmerjeno",
     "close": "Zapri",
-    "reasonNotRegistered": "rele tega strežnika lahko uporabljajo le registrirani uporabniki",
-    "reasonGroupNotAllowed": "rele streže le določenim skupinam",
+    "reasonNotRegistered": "relej tega strežnika lahko uporabljajo le registrirani uporabniki",
+    "reasonGroupNotAllowed": "relej je na voljo le določenim skupinam",
     "reasonNoHello": "bot releja te aplikacije še ne pozna, znova se poveži"
   },
   "settings": {
@@ -252,7 +253,7 @@
     "share": "Deli zvok",
     "cancel": "Prekliči",
     "empty": "Trenutno nobena aplikacija ne predvaja zvoka",
-    "gone": "Ta aplikacija ne predvaja več zvoka. Izberite drugo.",
-    "failed": "Vaše izbire ni bilo mogoče uporabiti."
+    "gone": "Ta aplikacija ne predvaja več zvoka. Izberi drugo.",
+    "failed": "Tvoje izbire ni bilo mogoče uporabiti."
   }
 }

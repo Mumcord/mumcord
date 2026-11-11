@@ -34,12 +34,12 @@
     "button": "Eltávolítás",
     "label": "{{name}} eltávolítása",
     "title": "Eltávolítod: {{name}}?",
-    "message": "A tároló eltávolításra kerül, a bővítményei pedig kikapcsolnak. Az adataikkal együtt telepítve maradnak, de nem kapnak több frissítést.",
+    "message": "A Mumcord eltávolítja a tárolót, és kikapcsolja a bővítményeit. Ezek az adataikkal együtt telepítve maradnak, de nem kapnak több frissítést.",
     "confirm": "Eltávolítás"
   },
   "keyChange": {
     "title": "{{name}} kulcsot váltott",
-    "message": "Ez a tároló mostantól másik kulccsal írja alá a bővítménylistáját. Szüneteltetve marad, amíg döntesz. Csak akkor bízz az új kulcsban, ha a tulajdonos jelezte a változást.",
+    "message": "Ez a tároló mostantól másik kulccsal írja alá a bővítménylistáját. Szüneteltetve marad, amíg nem döntesz. Csak akkor bízz az új kulcsban, ha a tulajdonos jelezte a változást.",
     "oldKey": "Eddig megbízott kulcs",
     "newKey": "Új kulcs",
     "keepPaused": "Szüneteltetve hagyom",

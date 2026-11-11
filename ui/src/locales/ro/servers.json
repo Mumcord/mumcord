@@ -107,6 +107,8 @@
       "certChanged": "Certificatul s-a schimbat – verifică-l înainte de conectare",
       "wrongPassword": "Serverul a refuzat parola.",
       "nameInUse": "Acest nume este deja folosit pe acest server.",
+      "certUntrustedNotSent": "Certificatul serverului nu este încă de încredere, așa că parola nu a fost trimisă. Conectează-te o dată și acceptă certificatul, apoi testează din nou.",
+      "certChangedNotSent": "Certificatul serverului s-a schimbat, așa că parola nu a fost trimisă.",
       "unreachable": "Serverul nu poate fi contactat.",
       "invalid": "Datele nu sunt valide.",
       "failed": "Testul a eșuat. Încearcă din nou."
@@ -114,7 +116,7 @@
   },
   "errors": {
     "serverUnreachable": "Serverul nu poate fi accesat. Verifică adresa și portul și dacă ești online.",
-    "localNetwork": "Serverul nu poate fi accesat. Dacă este în rețeaua ta locală, permite Mumcord în System Settings → Privacy & Security → Local Network, apoi încearcă din nou.",
+    "localNetwork": "Serverul nu poate fi accesat. Dacă este în rețeaua ta locală, permite Mumcord în Configurări sistem → Confidențialitate și securitate → Rețea locală, apoi încearcă din nou.",
     "serverTooOld": "Serverul nu acceptă această versiune de Mumcord. Verifică dacă există o actualizare Mumcord sau întreabă proprietarul serverului.",
     "wrongPassword": "Parola serverului e greșită. Editează serverul și introdu parola corectă.",
     "nameInUse": "Numele tău este deja folosit sau înregistrat de altcineva pe acest server. Editează serverul și alege alt nume.",
@@ -126,9 +128,9 @@
     "secureStorage": "Stocarea securizată a sistemului tău nu e disponibilă, așa că parola serverului nu a putut fi citită sau salvată. Deblocheaz-o și încearcă din nou.",
     "notFound": "Acest server nu mai este salvat.",
     "generic": "Ceva n-a mers bine. Încearcă din nou.",
-    "serverLimit": "Ești deja conectat la maximum {{limit}} servere. Deconectează un server sau mărește limita din Setări → Servere.",
+    "serverLimit": "Ești deja conectat la numărul maxim de servere ({{limit}}). Deconectează un server sau mărește limita din Setări → Servere.",
     "serverLimitUnknown": "Ești deja conectat la numărul maxim de servere. Deconectează un server sau mărește limita din Setări → Servere.",
-    "alwaysConnectLimit": "Doar {{limit}} servere pot avea „Conectează mereu la pornire”, cât limita de servere conectate. Dezactivează opțiunea pentru alt server sau mărește limita din Setări → Servere.",
+    "alwaysConnectLimit": "Numărul maxim de servere cu „Conectează mereu la pornire” este {{limit}}, cât limita de servere conectate. Dezactivează opțiunea pentru alt server sau mărește limita din Setări → Servere.",
     "alwaysConnectLimitUnknown": "Nu pot avea „Conectează mereu la pornire” mai multe servere decât limita de servere conectate. Dezactivează opțiunea pentru alt server sau mărește limita din Setări → Servere."
   },
   "remove": {
@@ -146,8 +148,8 @@
     "previousFingerprint": "Amprenta de încredere anterioară",
     "newFingerprint": "Amprenta nouă",
     "reject": "Nu te conecta",
-    "trust": "Ai încredere și conectează-te",
-    "trustChanged": "Ai încredere în noul certificat"
+    "trust": "Acordă încredere și conectează-te",
+    "trustChanged": "Acordă încredere noului certificat"
   },
   "rejoin": {
     "label": "Revino în ultimul canal",
@@ -162,7 +164,7 @@
     "tcp": "Conectat prin TCP (UDP blocat). Vocea merge, dar poate avea o mică întârziere.",
     "disconnected": "Deconectat",
     "disconnectedReason": "Deconectat – {{reason}}",
-    "failed": "Nu s-a putut conecta la {{server}}. {{reason}}",
+    "failed": "Nu te-ai putut conecta la {{server}}. {{reason}}",
     "cancel": "Anulează",
     "dismiss": "Închide",
     "reconnect": "Reconectează-te",
@@ -200,7 +202,7 @@
     "wrong": "Și această parolă e greșită. Încearcă din nou.",
     "save": "Salvează parola",
     "cancel": "Anulează",
-    "connect": "Conectează",
+    "connect": "Conectează-te",
     "connecting": "Se conectează…"
   },
   "channelPassword": {
@@ -274,20 +276,20 @@
     "permissionTraverse": "Traversare",
     "permissionEnter": "Intrare",
     "permissionSpeak": "Vorbire",
-    "permissionMuteDeafen": "Dezactivarea sunetului/auzului altora",
+    "permissionMuteDeafen": "Oprirea microfonului/sunetului altora",
     "permissionMove": "Mutarea utilizatorilor",
     "permissionMakeChannel": "Crearea unui canal",
     "permissionLinkChannel": "Legarea unui canal",
-    "permissionWhisper": "Șoptire",
+    "permissionWhisper": "Șoaptă",
     "permissionTextMessage": "Mesaj text",
     "permissionMakeTempChannel": "Crearea unui canal temporar",
     "permissionListen": "Ascultare",
-    "permissionKick": "Eliminare",
+    "permissionKick": "Dare afară",
     "permissionBan": "Interzicere",
     "permissionRegister": "Înregistrarea utilizatorilor",
-    "permissionSelfRegister": "Înregistrare proprie",
+    "permissionSelfRegister": "Auto-înregistrare",
     "permissionResetUserContent": "Resetarea conținutului utilizatorului",
-    "characters": "{{value}} caractere"
+    "characters": "Caractere: {{value}}"
   },
   "identity": {
     "field": "Identitatea pentru acest server",

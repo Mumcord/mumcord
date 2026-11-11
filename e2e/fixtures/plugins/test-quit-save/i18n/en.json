@@ -1,0 +1,4 @@
+{
+  "manifest.description": "E2E test plugin that saves a value to its storage when it is stopped.",
+  "manifest.name": "Fixture Quit Save"
+}

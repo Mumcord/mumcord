@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, l-assistent tas-suġġerimenti",
+  "greeting": {
+    "title": "Ħello, jien Aaron!",
+    "body": "Jien axolotl u naf Mumcord sew. Trid dawra qasira? Tieħu madwar minuta. Jekk mhux issa, issibni f'Issettjar → Dwar → Suġġerimenti.",
+    "start": "Urini",
+    "later": "Mhux issa"
+  },
+  "progress": "Suġġeriment {{current}} minn {{total}}",
+  "back": "Lura",
+  "next": "Li jmiss",
+  "done": "Lest",
+  "skip": "Aqbeż id-dawra",
+  "close": "Agħlaq is-suġġerimenti",
+  "tips": {
+    "servers": {
+      "title": "Is-servers tiegħek",
+      "body": "Il-bar l-aktar fuq ix-xellug fih is-servers tiegħek. Żid wieħed b'+, jew sib servers pubbliċi bil-lenti. Tista' tibqa' konness ma' diversi servers fl-istess ħin."
+    },
+    "channels": {
+      "title": "Kanali",
+      "body": "Agħmel double-click fuq kanal biex tingħaqad miegħu u titkellem. Klikk wieħed juri ċ-chat tiegħu mingħajr ma tingħaqad, u l-buttuna Segwi żżommok aġġornat."
+    },
+    "talk": {
+      "title": "Kif titkellem",
+      "body": "Push-to-talk jew attivazzjoni bil-vuċi? Agħżel f'Issettjar → Vuċi u awdjo, jew iftaħ Issettjar tal-vuċi… bil-vleġġa ż-żgħira ħdejn il-mikrofonu. Push-to-talk jaħdem ukoll bil-buttuni tal-maws."
+    },
+    "panel": {
+      "title": "Il-pannell tal-utent tiegħek",
+      "body": "Isfel fuq ix-xellug tista' tissikket il-mikrofonu, titfi s-smigħ, tixgħel il-kamera jew taqta'. Il-vleġeġ żgħar ħdejhom jiftħu aktar għażliet."
+    },
+    "search": {
+      "title": "Sib kollox",
+      "body": "Agħfas {{key}} biex issib persuni u kanali, anke fuq servers kbar."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Wieġeb għal messaġġ, ikkwotah, semmi n-nies b'@ u aqsam stampi u fajls. Il-buttuni tal-formattjar jidhru waqt li tikteb."
+    },
+    "apps": {
+      "title": "Apps",
+      "body": "Il-buttuna Apps fil-bar tal-messaġġi tibda qsim tal-iskrin, ħarsa flimkien jew il-kamera tiegħek. Il-plugins iżidu aktar."
+    },
+    "themes": {
+      "title": "L-istil tiegħek",
+      "body": "L-ingranaġġ fil-qiegħ fuq ix-xellug jaqleb bejn skur u ċar. F'Issettjar → Dehra hemm aktar temi, u server jista' jkollu t-tema tiegħu: agħfas il-buttuna tal-lemin fuqu u agħżel Tema."
+    },
+    "end": {
+      "title": "Dak hu kollox!",
+      "body": "Ħu gost fuq Mumcord. Tista' terġa' ssejjaħli meta trid f'Issettjar → Dwar → Suġġerimenti."
+    }
+  }
+}

@@ -46,20 +46,20 @@ pub fn deny_new_windows<'a, R: Runtime, M: Manager<R>>(
     })
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 pub fn open_url(url: &str) -> io::Result<()> {
     tauri_plugin_opener::open_url(url, None::<&str>).map_err(io::Error::other)
 }
 
 /// Opens `url` and returns once the browser is handed the link, so the caller may exit.
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 pub fn open_url_before_exit(url: &str) -> io::Result<()> {
     open_url(url)
 }
 
 /// Opens `url` and returns once a launcher has started, so the caller may exit: the
 /// launcher keeps running on its own, which [`open_url`]'s thread would not after an exit.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 pub fn open_url_before_exit(url: &str) -> io::Result<()> {
     let mut last = io::Error::from(io::ErrorKind::NotFound);
     for mut launcher in launchers(url) {
@@ -71,7 +71,7 @@ pub fn open_url_before_exit(url: &str) -> io::Result<()> {
     Err(last)
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 pub fn open_url(url: &str) -> io::Result<()> {
     let launchers = launchers(url);
     // `xdg-open` may wait for the browser, so the launchers run on their own thread; a failing
@@ -94,7 +94,7 @@ pub fn open_url(url: &str) -> io::Result<()> {
 }
 
 /// The desktop's link launchers for `url`, quiet and with the host's environment.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn launchers(url: &str) -> Vec<std::process::Command> {
     use std::process::Stdio;
 
@@ -121,7 +121,7 @@ fn launchers(url: &str) -> Vec<std::process::Command> {
 /// mounted at `appdir`: `Some` is the variable's value without bundle paths, `None` removes a
 /// variable that held only bundle paths. Paths of other AppImage mounts next to it (left in
 /// `PATH` by an AppImage started from this one) are dropped too.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn host_env(
     appdir: &std::ffi::OsStr,
     vars: impl Iterator<Item = (std::ffi::OsString, std::ffi::OsString)>,
@@ -196,7 +196,7 @@ mod tests {
         assert_eq!(new_window_target(""), None);
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     mod host_env {
         use super::super::host_env;
         use std::ffi::{OsStr, OsString};

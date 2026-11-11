@@ -11,7 +11,7 @@
   "notOwnDomain": "Jedna od njih nije na vlastitoj domeni dodatka.",
   "details": {
     "title": "Web stranice s kojima komunicira",
-    "text": "{{plugin}} i njegova stranica mogu doseći samo ove. Odobrio si ih {{date}}; ažuriranje koje doda novu čeka tvoje odobrenje.",
+    "text": "{{plugin}} i njegova stranica mogu doseći samo ove. Odobrio/la si ih {{date}}; ažuriranje koje doda novu čeka tvoje odobrenje.",
     "lastRequest": "Zadnji zahtjev",
     "requestsToday": "Zahtjevi danas",
     "requestsTodayValue": "{{count}} (blokirano: {{blocked}})",
@@ -34,7 +34,7 @@
     "relayData": "Podaci releja",
     "relayOff": "Isključeno ·",
     "relayOn": "Uključeno",
-    "turnOnInPermissions": "Uključi u dozvolama",
+    "turnOnInPermissions": "Uključi u dopuštenjima",
     "tags": {
       "webview": "Vlastiti web sadržaj",
       "origins": "Web stranice: {{count}}",
@@ -45,16 +45,16 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Ovo ažuriranje želi komunicirati s {{count}} novom web stranicom.",
     "wantsNew_few": "Ovo ažuriranje želi komunicirati s {{count}} nove web stranice.",
     "wantsNew_other": "Ovo ažuriranje želi komunicirati s {{count}} novih web stranica.",
-    "staysOn": "{{plugin}} ostaje na {{version}} dok ne odlučiš.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
-    "banner_few": "Ažuriranja koja čekaju: {{count}}. Ažuriranja koja dodaju dozvole ili web stranice nikad se ne instaliraju automatski.",
-    "banner_other": "Ažuriranja koja čekaju: {{count}}. Ažuriranja koja dodaju dozvole ili web stranice nikad se ne instaliraju automatski.",
-    "noOther": "Nijedna druga dozvola se ne mijenja.",
-    "whatsNew": "Što je novo u {{version}}",
-    "skipKeeps": "Preskakanjem {{version}} nastavlja raditi.",
+    "staysOn": "{{plugin}} ostaje na verziji {{version}} dok ne odlučiš.",
+    "banner_one": "{{count}} ažuriranje te čeka. Ažuriranja koja dodaju dopuštenja ili web stranice nikad se ne instaliraju automatski.",
+    "banner_few": "{{count}} ažuriranja te čekaju. Ažuriranja koja dodaju dopuštenja ili web stranice nikad se ne instaliraju automatski.",
+    "banner_other": "{{count}} ažuriranja te čeka. Ažuriranja koja dodaju dopuštenja ili web stranice nikad se ne instaliraju automatski.",
+    "noOther": "Nijedno drugo dopuštenje se ne mijenja.",
+    "whatsNew": "Što je novo u verziji {{version}}",
+    "skipKeeps": "Ako preskočiš, verzija {{version}} nastavlja raditi.",
     "skip": "Preskoči ovu verziju",
     "allow": "Dopusti i ažuriraj"
   }

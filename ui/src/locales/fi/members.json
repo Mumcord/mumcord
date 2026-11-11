@@ -34,7 +34,7 @@
     "loadFailed": "Profiilia ei voitu ladata.",
     "volume": "Äänenvoimakkuus",
     "volumeValue": "{{value}} %",
-    "localMute": "Mykistä minulta",
+    "localMute": "Mykistä minulle",
     "sessionOnly": "Tällä henkilöllä ei ole varmennetta, joten nämä asetukset ovat voimassa vain tämän istunnon ajan.",
     "sendPrivateMessage": "Lähetä yksityisviesti",
     "privateMessage": "Yksityisviesti",
@@ -58,7 +58,7 @@
     "join": "Liity kanavalle {{channel}}",
     "joinFull": "Tämä kanava on täynnä.",
     "joinLocked": "Et voi liittyä tälle kanavalle, tai se vaatii salasanan.",
-    "mute": "Mykistä minulta",
+    "mute": "Mykistä minulle",
     "connectionInfo": "Yhteyden tiedot",
     "chatRequestPending": "Keskustelupyyntö odottaa",
     "revokeConsent": "Peru keskustelusuostumus",
@@ -108,7 +108,7 @@
     "talkingMore_other": "{{name}} ja {{count}} muuta puhuvat"
   },
   "revokeConsent": {
-    "title": "Perutaanko keskustelusuostumus käyttäjältä {{name}}?",
+    "title": "Perutaanko käyttäjälle {{name}} annettu keskustelusuostumus?",
     "message": "Käyttäjän {{name}} täytyy lähettää uusi viestipyyntö, ennen kuin hänen viestinsä tulevat taas perille. Keskusteluhistoria säilyy.",
     "confirm": "Peru",
     "failed": "Keskustelusuostumuksen peruminen epäonnistui. Yritä uudelleen."
@@ -122,7 +122,7 @@
     "private": "Käyttäjän {{name}} yksityisviestejä ei näytetä, eivätkä ne ilmoita sinulle.",
     "channelCollapsed": "Käyttäjän {{name}} kanavaviestit on tiivistetty. Voit silti avata ne.",
     "channelHidden": "Käyttäjän {{name}} kanavaviestit on piilotettu.",
-    "voice": "{{name}} on mykistetty sinulta puheessa, myös kuiskaukset.",
+    "voice": "{{name}} on mykistetty sinulle puheessa, myös kuiskaukset.",
     "data": "Ei historian synkronointia, kutsuja tai muuta Mumcord-dataa käyttäjältä {{name}}.",
     "followsCert": "Esto seuraa käyttäjän {{name}} varmennetta, joten uusi nimi ei kierrä sitä.",
     "nameOnly": "Käyttäjällä {{name}} ei ole varmennetta, joten esto koskee vain tätä nimeä palvelimella {{server}}.",

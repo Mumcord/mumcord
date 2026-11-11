@@ -54,7 +54,7 @@ struct Runtime {
 }
 
 /// ONNX Runtime per target (`target_os`, `target_arch`). 1.23.2 is the newest release that
-/// still ships an Intel macOS build, which the universal macOS app needs.
+/// still ships an Intel macOS build, which the Intel macOS app needs.
 fn runtime_for(os: &str, arch: &str) -> Option<Runtime> {
     let runtime = match (os, arch) {
         ("linux", "x86_64") => Runtime {

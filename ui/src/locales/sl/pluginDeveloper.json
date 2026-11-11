@@ -1,7 +1,7 @@
 {
-  "hint": "Naložite razpakirano mapo vtičnika in jo preizkusite. Razvijalski vtičniki niso podpisani, nikoli niso uradni in ne morejo dobiti net.http, secrets ali ui.webview. Ob izklopu razvijalskega načina se razložijo.",
+  "hint": "Naloži razpakirano mapo vtičnika, da ga preizkusiš. Razvijalski vtičniki niso podpisani, nikoli niso uradni in ne morejo dobiti net.http, secrets ali ui.webview. Ob izklopu razvijalskega načina se razložijo.",
   "load": "Naloži mapo vtičnika …",
-  "pickFolder": "Izberite mapo vtičnika",
+  "pickFolder": "Izberi mapo vtičnika",
   "empty": "Noben razvijalski vtičnik ni naložen.",
   "listLabel": "Razvijalski vtičniki",
   "label": "Razvijalski vtičnik",

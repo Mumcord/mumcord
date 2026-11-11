@@ -1,9 +1,13 @@
 /**
- * The Server administration window (Epic 4, issue #254). One window per server is open at a time;
- * its ban list lives in memory only (FR-10.63), is read when the window opens and dropped when it
- * closes or the connection ends. Changes are collected here and saved together (FR-10.66): a save
- * first re-reads the server's list, and an entry someone else changed meanwhile becomes a conflict
- * the UI asks about before anything is sent.
+ * The Server administration window and its Bans tab (Epic 4, issues #254 and #256).
+ *
+ * One window per server is open at a time; its ban list lives in memory only (FR-10.63), is read
+ * when its tab opens and dropped when the window closes or the connection ends. Changes are
+ * collected here and saved together (FR-10.66): a save first re-reads the server's list, and an
+ * entry someone else changed meanwhile becomes a conflict the UI asks about before anything is sent.
+ *
+ * The window holds a tab, because FR-10.50 gives it a second one: the Registered users tab keeps
+ * its own state in `registeredStore`, and the window drops both when it closes.
  */
 import { useSyncExternalStore } from "react";
 import {
@@ -14,9 +18,15 @@ import {
   type BanSaveResult,
   type EngineError,
 } from "../../api";
+import { closeRegistered, openRegistered } from "./registeredStore";
+
+/** Which of the window's tabs is shown (FR-10.50). */
+export type AdminTab = "bans" | "registered";
 
 export interface BanWindow {
   serverId: number;
+  /** The shown tab; the other one's list is read only when it is opened (FR-10.63). */
+  tab: AdminTab;
   entries: BanEntry[];
   /** Reading the server's list. */
   loading: boolean;
@@ -28,6 +38,12 @@ export interface BanWindow {
   revealed: Set<string>;
   /** The conflict a save found, if any (FR-10.66). */
   conflict: { key: string; fresh: BanEntry[] } | null;
+  /**
+   * An add-ban form the Registered users tab asked for, with the account's name and certificate
+   * written in (issue #256, FR-10.65). The address is still missing there, which is why the form
+   * opens instead of saving anything: a ban entry needs the address the server reports.
+   */
+  prefill: { name: string; hash: string | null } | null;
 }
 
 let current: BanWindow | null = null;
@@ -45,6 +61,7 @@ function update(patch: Partial<BanWindow>): void {
 
 /** Tests start from an empty window. */
 export function resetServerAdmin(): void {
+  closeRegistered();
   set(null);
 }
 
@@ -58,22 +75,44 @@ export function useServerAdmin(): BanWindow | null {
   );
 }
 
-export function openServerAdmin(serverId: number): void {
+/** The open window outside React: a command must not drop the list an open window still uses. */
+export function currentBanWindow(): BanWindow | null {
+  return current;
+}
+
+/** Opens the window on one of its tabs and reads what that tab shows. */
+export function openServerAdmin(serverId: number, tab: AdminTab = "bans"): void {
   set({
     serverId,
+    tab,
     entries: [],
-    loading: true,
+    loading: tab === "bans",
     error: null,
     changes: new Map(),
     revealed: new Set(),
     conflict: null,
+    prefill: null,
   });
-  void load();
+  // A window opened on the other tab must not wait for a list nobody is looking at (FR-10.63).
+  if (tab === "bans") void load();
+  else openRegistered(serverId);
 }
 
-/** Closing drops what the window held (FR-10.63). */
+/**
+ * Moves to the other tab and reads its list now. The ban list is only read when its tab is shown
+ * and it is still empty, so Refresh stays the one way to re-read it on purpose (FR-10.44).
+ */
+export function selectTab(tab: AdminTab): void {
+  if (!current || current.tab === tab) return;
+  set({ ...current, tab });
+  if (tab === "registered") openRegistered(current.serverId);
+  else if (current.entries.length === 0) void load();
+}
+
+/** Closing drops what either tab held (FR-10.63). */
 export function closeServerAdmin(): void {
   if (current) void getApi().banListClose(current.serverId);
+  closeRegistered();
   set(null);
 }
 
@@ -90,6 +129,23 @@ export async function load(): Promise<void> {
   } finally {
     update({ loading: false });
   }
+}
+
+/**
+ * Opens the Bans tab with the add form waiting for one account's ban (issue #256). The form is
+ * what asks for the address, which the other tab does not have.
+ */
+export function requestBanCertificate(name: string, hash: string | null): void {
+  if (!current) return;
+  const serverId = current.serverId;
+  set({ ...current, tab: "bans", prefill: { name, hash } });
+  if (current.entries.length === 0) void load();
+  openRegistered(serverId);
+}
+
+/** The form opened from the prefill: it is shown once. */
+export function clearPrefill(): void {
+  if (current) update({ prefill: null });
 }
 
 /** Stages one change; the window saves all of them together. */

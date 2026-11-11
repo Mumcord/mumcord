@@ -408,11 +408,7 @@ refresh_menu() {
     fi
 }
 
-# Set once the AppImage is installed, whatever the distribution, so the codec hint follows it.
-appimage_installed=false
-
 install_appimage() {
-    appimage_installed=true
     fetch appimage
     file=$fetched
     mkdir -p "$BIN_DIR" "$APPLICATIONS"
@@ -479,58 +475,6 @@ install_package() {
     start_hint="from the app menu, or run mumcord"
 }
 
-# The AppImage has no H.264 decoder (patent-encumbered); the system's gst-libav adds it
-# (FR-2.41a). The distribution is unknown here, so the package manager decides the package.
-# Nothing is asked when it is already installed; otherwise the user may let the installer add it.
-codec_support() {
-    if installed_package gst-libav gstreamer1.0-libav gstreamer1-plugin-libav gstreamer1-libav gstreamer-plugins-libav >/dev/null; then
-        step ok "H.264 support" "gst-libav is installed"
-        return
-    fi
-    if have apt-get; then
-        hint="sudo apt install gstreamer1.0-libav"
-        set -- apt-get install -y gstreamer1.0-libav
-    elif have dnf; then
-        hint="sudo dnf install gstreamer1-libav (gst-libav comes from RPM Fusion; enable it first)"
-        set -- dnf install -y gstreamer1-libav
-    elif have pacman; then
-        hint="sudo pacman -S gst-libav"
-        set -- pacman -S --needed --noconfirm gst-libav
-    elif have zypper; then
-        hint="sudo zypper install gstreamer-plugins-libav"
-        set -- zypper --non-interactive install gstreamer-plugins-libav
-    else
-        step warn "H.264 support" "gst-libav is missing"
-        info "Some videos need H.264 support. Install gst-libav (the GStreamer libav plugin) with your system's package manager."
-        codec_todo="install gst-libav with your package manager"
-        return
-    fi
-    if ask_yes_no "Some videos need H.264 support. Install gst-libav now?"; then
-        if run_as_root "$@"; then
-            step ok "H.264 support" "gst-libav installed"
-            return
-        fi
-        warn "installing gst-libav failed"
-    fi
-    step warn "H.264 support" "gst-libav is missing"
-    info "Some videos need H.264 support. Install gst-libav: $hint"
-    codec_todo=${hint%% (*}
-}
-
-# run_as_root COMMAND...: like need_root, but a missing sudo only fails this command instead of
-# stopping the installer, for optional extras.
-run_as_root() {
-    if [ "$(id -u)" -eq 0 ]; then
-        "$@" </dev/null
-    elif have sudo; then
-        info "Installing gst-libav needs administrator rights; sudo may ask for your password."
-        sudo "$@" </dev/null
-    else
-        warn "sudo is not installed"
-        return 1
-    fi
-}
-
 aur_helper() {
     for helper in paru yay; do
         have "$helper" && echo "$helper" && return
@@ -547,7 +491,7 @@ do_install() {
     banner installer
     family=$(distro_family)
     cpu >/dev/null
-    version='' installed_path='' start_hint='' codec_todo='' aur_tip=false
+    version='' installed_path='' start_hint='' aur_tip=false
     case $family in
     debian | fedora | suse) install_package "$family" ;;
     arch)
@@ -570,10 +514,6 @@ do_install() {
     *) install_appimage ;;
     esac
     offer_desktop_icon
-    # After the desktop icon question, so its hint is not lost above it.
-    if [ "$appimage_installed" = true ]; then
-        codec_support
-    fi
     summary
 }
 
@@ -589,7 +529,6 @@ summary() {
     set -- "Mumcord${version:+ $version} is installed" "" \
         "Path    $(short_path "$installed_path")" \
         "Start   $start_hint"
-    [ -z "$codec_todo" ] || set -- "$@" "H.264   $codec_todo"
     if $aur_tip; then
         set -- "$@" "Tip     if the AUR has $AUR_PACKAGE, installing it with an AUR" \
             "        helper gets Mumcord updates with your system."

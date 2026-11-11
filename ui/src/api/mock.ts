@@ -29,10 +29,12 @@ import type {
 import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
+  RegisteredUserEntry,
   BlockedUser,
   ActiveAudioProfile,
   BanEntry,
   PmConversationPrefs,
+  PersonAction,
   PersonTarget,
   PrivateConversation,
   ApiError,
@@ -373,18 +375,22 @@ const DEFAULT_SETTINGS: Settings = {
   soundTheme: "classic",
   notifications: "both",
   activityNotify: {
-    joins: false,
-    screenShare: true,
-    watchParty: true,
-    pluginActivity: true,
-    pluginEvent: true,
+    joins: "inApp",
+    screenShare: "inApp",
+    watchParty: "inApp",
+    pluginActivity: "inApp",
+    pluginEvent: "inApp",
   },
+  keepActivityHistory: false,
   logLevel: "info",
+  logToDisk: true,
+  durableSaves: true,
   sendDefaultAvatar: true,
   autostart: false,
   startMinimized: true,
   connectMuted: true,
   linkPreviews: true,
+  linkPreviewsOnDisk: true,
   previewCacheDays: 7,
   historyMaxAgeDays: null,
   nowPlaying: false,
@@ -411,8 +417,10 @@ const DEFAULT_SETTINGS: Settings = {
   pluginsAllOff: false,
   pluginsBadgePlugin: null,
   pluginsMirrorUrl: null,
+  pluginRegistryCache: true,
   developerMode: false,
   updateIntervalHours: 12,
+  updateChannel: "stable",
   updateSkipped: null,
   appimageMenuEntry: "unset",
   windowOverlayNoticeShown: false,
@@ -899,8 +907,17 @@ function demoChannels(serverName: string): ChannelInfo[] {
     name,
     position,
     // The demo user moderates, so the tree shows "Move users here…" and dragging (#172), the
-    // server menu offers the ban list (#436), and the person menu offers Kick… and Ban… (#253).
-    permissions: { ...allow, moveUsers: true, ban: true, kick: true },
+    // server menu offers the ban list (#436), the person menu offers Kick… and Ban… (#253), and
+    // the Server administration window grows its Registered users tab (#256), and the chat box
+    // offers the admin commands (#378).
+    permissions: {
+      ...allow,
+      moveUsers: true,
+      ban: true,
+      kick: true,
+      muteDeafen: true,
+      register: true,
+    },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
@@ -1132,6 +1149,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           soundReason: null,
           soundChoice: null,
           kind: "window",
+          title: null,
           elapsedMs: 126000,
           viewers: [1, 2, 5],
           blocked: null,
@@ -2146,7 +2164,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true, isMumcord: true }),
       withAvatar({ ...person(5, "Jonas", 1, "jonashash"), isMumcord: true }),
       withAvatar(person(7, "Priya", 1, "priyahash")),
-      { ...person(3, "Ben", 1, null), selfMute: true },
+      // A guest: "Register on server…" has someone to offer it to, and the friend and profile
+      // tests keep showing what a person without a certificate cannot do (issue #256).
+      { ...person(3, "Ben", 1, null), registered: false, selfMute: true },
       { ...person(4, "Carla", 7, "carlahash"), listeningChannelIds: [1] },
       person(6, "Leo", 4, "leohash"),
       withAvatar(person(9, "Sam", 4, "samhash")),
@@ -2353,6 +2373,147 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       canKick: root?.permissions.kick === true,
       canBan: root?.permissions.ban === true,
     };
+  }
+
+  /**
+   * The registered accounts a mock server holds (issue #256): the ones nobody is using right now
+   * stand here, and the people connected on this server are added to them as they are in the tree.
+   * This map is the *server*, not the window: it keeps what a save changed, while the window itself
+   * forgets its list when it closes (FR-10.63).
+   */
+  const registeredOffline = new Map<number, RegisteredUserEntry[]>();
+  /** Accounts the user removed here, by server; an online person stops being registered too. */
+  const registeredRemoved = new Map<number, Set<number>>();
+  /** Ids handed out by name, so an account keeps the same id across reads. */
+  const registeredIds = new Map<string, number>();
+  let nextRegisteredId = 40;
+
+  function idOfAccount(name: string): number {
+    const known = registeredIds.get(name);
+    if (known !== undefined) return known;
+    const fresh = nextRegisteredId++;
+    registeredIds.set(name, fresh);
+    return fresh;
+  }
+
+  // A mixed list for the tab and the screenshots: accounts used today, days ago and long ago, one
+  // without a last channel and one the server has never seen. Fictional names only (issue #436).
+  function seedRegistered(): RegisteredUserEntry[] {
+    // One clock, so "3 days ago" and the 90-day filter agree with the people in the tree.
+    const days = (before: number) => new Date(Date.now() - before * 86_400_000).toISOString();
+    return [
+      {
+        userId: 4,
+        name: "Aastrid",
+        lastSeen: days(1),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 7,
+        name: "Bjørn",
+        lastSeen: days(2),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 12,
+        name: "Freya",
+        lastSeen: days(4),
+        lastChannel: "Squad A",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 15,
+        name: "Sigrid",
+        lastSeen: days(14),
+        lastChannel: "Squad B",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 18,
+        name: "Tove",
+        lastSeen: days(1),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 21,
+        name: "Leif",
+        lastSeen: days(3),
+        lastChannel: "Lobby",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 24,
+        name: "Ingrid",
+        lastSeen: days(24),
+        lastChannel: "Music Room",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 9,
+        name: "Ragnar",
+        lastSeen: days(127),
+        lastChannel: "AFK",
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 26,
+        name: "Odalys",
+        lastSeen: days(204),
+        lastChannel: null,
+        online: false,
+        certHash: null,
+      },
+      {
+        userId: 31,
+        name: "Brennan",
+        lastSeen: null,
+        lastChannel: null,
+        online: false,
+        certHash: null,
+      },
+    ];
+  }
+
+  function registeredList(serverId: number): RegisteredUserEntry[] {
+    if (!registeredOffline.has(serverId)) registeredOffline.set(serverId, seedRegistered());
+    const snapshot = sessions.get(serverId)?.snapshot;
+    const removed = registeredRemoved.get(serverId) ?? new Set<number>();
+    const out = (registeredOffline.get(serverId) ?? [])
+      .filter((entry) => !removed.has(entry.userId))
+      .map((entry) => ({ ...entry }));
+    // The people who are connected hold their accounts here and now, with the certificate the
+    // server knows for them.
+    for (const user of snapshot?.users ?? []) {
+      if (!user.registered || removed.has(idOfAccount(user.name))) continue;
+      out.push({
+        userId: idOfAccount(user.name),
+        name: user.name,
+        lastSeen: new Date().toISOString(),
+        lastChannel:
+          snapshot?.channels.find((channel) => channel.id === user.channelId)?.name ?? null,
+        online: true,
+        certHash: user.certHash,
+      });
+    }
+    return out;
+  }
+
+  /** A few accounts belong to the demo groups, so the detail panel has something to show. */
+  function groupsFor(userId: number): string[] {
+    if (userId % 3 === 1) return ["officers", "raiders"];
+    if (userId % 3 === 2) return ["raiders"];
+    return [];
   }
 
   // A mixed list for screenshots: active and expired entries, one without a name, one network
@@ -2988,10 +3149,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     personMove: (serverId, session, channelId) => {
       requireSession(serverId);
       requireUser(session);
-      // Like a real server, a refused move only answers with a denial; nobody moves.
-      if (!requireChannel(channelId).permissions.moveUsers) return Promise.resolve(null);
+      // Like a real server, a refused move answers nothing that confirms it; nobody moves.
+      if (!requireChannel(channelId).permissions.moveUsers) return Promise.resolve("unconfirmed");
       updateUser(session, { channelId });
-      return Promise.resolve(null);
+      return Promise.resolve("confirmed");
     },
     personSetLocalMute: (serverId, session, muted) => {
       requireSession(serverId);
@@ -3313,7 +3474,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve(
         settings.linkPreviews && mockAudioInfo(url) !== null ? mockAudioFile() : null,
       ),
-    audioSave: () => Promise.resolve(null),
+    audioSave: () => Promise.resolve(true),
     previewDismiss: (messageId, url) => {
       for (const conversations of history.values()) {
         for (const messages of conversations.values()) {
@@ -3339,9 +3500,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         gifFavorites = [url, ...gifFavorites.filter((u) => u !== url)];
       return Promise.resolve(null);
     },
-    saveImage: () => Promise.resolve(null),
+    saveImage: () => Promise.resolve(true),
     copyImage: () => Promise.resolve(null),
-    saveText: () => Promise.resolve(null),
+    saveText: () => Promise.resolve(true),
     // The browser's own clipboard stands in for the system one.
     copyText: (text) => navigator.clipboard.writeText(text).then(() => null),
     // The browser has no native file drops; dropped files arrive as `File` objects instead.
@@ -3763,7 +3924,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       inspector.clear();
       return Promise.resolve(null);
     },
-    packetCaptureExport: () => Promise.resolve(null),
+    packetCaptureExport: () => Promise.resolve(true),
     // The mock has no second window; the inspector page opens with `?window=packet-inspector`.
     packetInspectorOpen: () => Promise.resolve(null),
     packetInspectorClose: () => Promise.resolve(null),
@@ -3804,7 +3965,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     windowLook: () => Promise.resolve(windowLook),
 
     // diagnostics
-    diagnosticsSave: () => Promise.resolve(null),
+    diagnosticsSave: () => Promise.resolve(true),
     // Crash reports (#568), seeded through `MockOptions.crashReports`.
     crashList: () => Promise.resolve([...crashReports]),
     crashTakeUnseen: () => {
@@ -3856,6 +4017,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               appimage: false,
               portable: false,
               distro: null,
+              limits: [],
+              session: null,
             }
           : {
               version: "0.0.0-mock",
@@ -3864,6 +4027,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               appimage: false,
               portable: false,
               distro: null,
+              limits: [],
+              session: null,
             },
       ),
 
@@ -3885,7 +4050,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     notifyActivity: (notice) => {
       if (dndActive()) return Promise.resolve("none");
-      const mode = settings.notifications;
+      const mode =
+        notice.kind === null ? settings.notifications : settings.activityNotify[notice.kind];
       let outcome: NotifyOutcome;
       if (mode === "off") outcome = "none";
       else if (mode === "desktop") outcome = "desktop";
@@ -3970,6 +4136,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       };
       return Promise.resolve(chip);
     },
+    filesPick: () => Promise.resolve([]),
     filesChipRemove: () => Promise.resolve(undefined),
     filesSend: () => Promise.resolve([]),
     filesStop: () => Promise.resolve(undefined),
@@ -3977,6 +4144,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     filesDownload: () => Promise.resolve(null),
     filesCancel: () => Promise.resolve(undefined),
     filesSaveFolder: () => Promise.resolve("~/Downloads/Mumcord"),
+    filesSaveFolderChoose: () => Promise.resolve(null),
     filesOpen: () => Promise.resolve(null),
     filesOpenFolder: () => Promise.resolve(null),
     banListOpen: (serverId) => {
@@ -4083,9 +4251,126 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       if (input.removeNow) removePerson(serverId, session);
       return Promise.resolve({ kind: "saved", key, removed: input.removeNow });
     },
+    registeredUsersOpen: (serverId) => {
+      const snapshot = sessions.get(serverId)?.snapshot;
+      const root = snapshot?.channels.find((c) => c.id === 0);
+      if (root && !root.permissions.register) {
+        return fail("permissionDenied", "register right in the root channel");
+      }
+      return Promise.resolve(registeredList(serverId));
+    },
+    registeredUserRename: (serverId, userId, name) => {
+      const snapshot = sessions.get(serverId)?.snapshot;
+      const wanted = name.trim();
+      const list = registeredList(serverId);
+      const entry = list.find((candidate) => candidate.userId === userId);
+      if (!entry) return fail("notFound", "the account is not on the list");
+      // The mock copies the measured server: a name another account holds is taken without a
+      // refusal, and the list still shows the old name (issue #256).
+      if (list.some((candidate) => candidate.userId !== userId && candidate.name === wanted)) {
+        return Promise.resolve({ kind: "kept", entries: registeredList(serverId) });
+      }
+      const person = snapshot?.users.find((u) => u.name === entry.name);
+      if (person) {
+        // An account someone is using now: the tree shows the new name too, as a server would.
+        updateUser(person.session, { name: wanted });
+        registeredIds.set(wanted, userId);
+      }
+      const offline = registeredOffline.get(serverId) ?? seedRegistered();
+      const stored = offline.find((candidate) => candidate.userId === userId);
+      if (stored) stored.name = wanted;
+      return Promise.resolve({ kind: "saved", entries: registeredList(serverId) });
+    },
+    registeredUserUnregister: (serverId, userId) => {
+      const snapshot = sessions.get(serverId)?.snapshot;
+      const entry = registeredList(serverId).find((candidate) => candidate.userId === userId);
+      if (!entry) return fail("notFound", "the account is not on the list");
+      const removed = registeredRemoved.get(serverId) ?? new Set<number>();
+      removed.add(userId);
+      registeredRemoved.set(serverId, removed);
+      // The person can still connect, but as a guest: their registration is off the account.
+      const person = snapshot?.users.find((u) => u.name === entry.name);
+      if (person) updateUser(person.session, { registered: false });
+      return Promise.resolve({ kind: "saved", entries: registeredList(serverId) });
+    },
+    registeredUserGroups: (serverId, userId) => {
+      registeredList(serverId);
+      return Promise.resolve(groupsFor(userId));
+    },
+    // Closing the tab forgets nothing here: the mock stands for the server, which keeps its
+    // accounts; FR-10.63 is about what Mumcord itself stores.
+    registeredUsersClose: () => Promise.resolve(null),
     personActionClose: (serverId) => {
       personTargets.delete(serverId);
       return Promise.resolve(null);
+    },
+    // Epic 4, issue #378: the actions a built-in admin command runs. Like the engine, the mock
+    // checks the right the server would check and answers with the person's new state.
+    personSetServerMute: (serverId, session, muted) => {
+      requireSession(serverId);
+      return adminStateChange(
+        session,
+        "muteDeafen",
+        { serverMute: muted },
+        "this person is in the channel",
+      );
+    },
+    personSetServerDeafen: (serverId, session, deaf) => {
+      requireSession(serverId);
+      // Deafening always mutes too, as a standard server does (spec 10, A5).
+      return adminStateChange(
+        session,
+        "muteDeafen",
+        deaf ? { serverDeaf: true, serverMute: true } : { serverDeaf: false },
+        "this person is in the channel",
+      );
+    },
+    personSetPrioritySpeaker: (serverId, session, priority) => {
+      requireSession(serverId);
+      return adminStateChange(
+        session,
+        "muteDeafen",
+        { prioritySpeaker: priority },
+        "this person is in the channel",
+      );
+    },
+    personRegister: (serverId, session) => {
+      requireSession(serverId);
+      const user = requireUser(session);
+      if (user.registered) return fail("invalidInput", "this person is registered already");
+      if (requireSnapshot().selfSession === session) {
+        return fail("invalidInput", "this action never offers yourself");
+      }
+      // Register others is a root-channel right, unlike mute and move which the person's own
+      // channel decides (FR-10.20).
+      if (!requireChannel(0).permissions.register) {
+        return fail("permissionDenied", "register right in the root channel");
+      }
+      if (!user.certHash) return fail("invalidInput", "registering needs a client certificate");
+      // The account takes the name they are here under, and appears in the list at once (#256).
+      registeredRemoved.get(serverId)?.delete(idOfAccount(user.name));
+      updateUser(session, { registered: true });
+      return Promise.resolve("confirmed");
+    },
+    personMoveAll: (serverId, channelId) => {
+      const snap = requireSession(serverId);
+      const own = snap.users.find((user) => user.session === snap.selfSession);
+      if (own === undefined) return fail("notConnected", "the mock is not in a channel");
+      const source = requireChannel(own.channelId);
+      const people = snap.users
+        .filter((user) => user.channelId === own.channelId)
+        .map((user) => user.session);
+      const total = people.length;
+      if (own.channelId === channelId || total === 0) {
+        return Promise.resolve({ kind: "done", moved: 0, total });
+      }
+      requireChannel(channelId);
+      if (!source.permissions.moveUsers) {
+        return fail("permissionDenied", "move right in this channel");
+      }
+      for (const session of people) updateUser(session, { channelId });
+      const moved = people.filter((session) => requireUser(session).channelId === channelId).length;
+      return Promise.resolve({ kind: "done", moved, total });
     },
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
@@ -4312,6 +4597,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         soundReason: withSound ? null : "off",
         soundChoice: null,
         kind: null,
+        title: null,
         elapsedMs: 0,
         viewers: [],
         blocked: null,
@@ -4484,6 +4770,28 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function removePerson(serverId: number, session: number): void {
     currentServerId = serverId;
     mock.removeUser(session);
+  }
+
+  /**
+   * One change of another person's state, as the mock server answers it (issue #378): the right of
+   * the channel they are in decides, yourself is never offered, and a change answers with the
+   * person's new state — the `confirmed` the command's result line waits for.
+   */
+  function adminStateChange(
+    session: number,
+    right: "muteDeafen",
+    patch: Partial<User>,
+    why: string,
+  ): Promise<PersonAction> {
+    const user = requireUser(session);
+    if (requireSnapshot().selfSession === session) {
+      return fail("invalidInput", "this action never offers yourself");
+    }
+    if (!requireChannel(user.channelId).permissions[right]) {
+      return fail("permissionDenied", `${right} right in the channel ${why}`);
+    }
+    updateUser(session, patch);
+    return Promise.resolve("confirmed");
   }
 
   const mock: MockControls = {

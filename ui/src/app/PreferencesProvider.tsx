@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
+import { setActivityHistoryKept } from "../features/activity/activityStore";
 import { applyHintPreferences, type HintPreference } from "../a11y";
 import type { ChatDisplay, Language, Settings, Theme } from "../api";
 import { applyLanguage, osLanguages, resolveLanguage } from "../i18n";
@@ -84,12 +85,14 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         | "cameraHotkey"
         | "cameraMirrorSelf"
         | "cameraReduceMotion"
+        | "keepActivityHistory"
         | HintPreference
       >,
     ) => {
       applyHintPreferences(settings);
       setHotkeySettings(settings);
       setCameraLookSettings(settings);
+      setActivityHistoryKept(settings.keepActivityHistory);
       setAppThemes(settings.appThemeId, settings.customThemes);
       ducker.setSettings(settings);
       rememberStartTheme(settings.theme);

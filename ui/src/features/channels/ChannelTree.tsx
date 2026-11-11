@@ -56,6 +56,7 @@ import {
   type TreeUi,
 } from "./treeContext";
 import { ChannelBranch } from "./treeRows";
+import type { ChannelMovePlan } from "./channelDrag";
 
 export interface ChannelTreeProps {
   state: ServerState;
@@ -88,6 +89,8 @@ export interface ChannelTreeProps {
   channelMenu?: ((menu: ChannelMenuRequest) => ReactNode) | undefined;
   /** Moves the people dragged onto a channel (issues #172, #255). */
   onMovePeople?: ((sessions: readonly number[], channelId: number) => void) | undefined;
+  /** Moves or reorders a channel dragged in the tree (issue #676). */
+  onMoveChannel?: ((plan: ChannelMovePlan) => void) | undefined;
   ref?: Ref<ChannelTreeHandle> | undefined;
 }
 
@@ -167,6 +170,7 @@ export function ChannelTree({
   filter = "",
   channelMenu,
   onMovePeople,
+  onMoveChannel,
   ref,
 }: ChannelTreeProps) {
   const { t } = useTranslation("channels");
@@ -518,6 +522,7 @@ export function ChannelTree({
     openPerson: onOpenPerson,
     openMenu,
     movePeople: (sessions, channelId) => onMovePeople?.(sessions, channelId),
+    moveChannel: (plan) => onMoveChannel?.(plan),
     selectPerson,
     channelBadge,
     channelAction,

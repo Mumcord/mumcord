@@ -1,13 +1,13 @@
 {
   "title": "Publiskie serveri",
   "loading": "Ielādē sarakstu…",
-  "subtitle": "Ielādēts, jo atvērāt šo lapu · parādīti {{shown}} no {{total}}",
+  "subtitle": "Ielādēts, jo atvēri šo lapu · parādīti {{shown}} no {{total}}",
   "search": "Meklēt pēc nosaukuma, adreses vai valsts",
   "refresh": "Atsvaidzināt",
   "retry": "Mēģināt vēlreiz",
-  "loadFailed": "Publisko serveru sarakstu neizdevās ielādēt. Pārbaudiet interneta savienojumu un mēģiniet vēlreiz.",
+  "loadFailed": "Publisko serveru sarakstu neizdevās ielādēt. Pārbaudi interneta savienojumu un mēģini vēlreiz.",
   "noMatch": "Meklēšanai un filtriem neatbilst neviens serveris.",
-  "saveFailed": "Serveri neizdevās pievienot. Mēģiniet vēlreiz.",
+  "saveFailed": "Serveri neizdevās pievienot. Mēģini vēlreiz.",
   "filters": {
     "label": "Filtri",
     "country": "Valsts",
@@ -35,14 +35,14 @@
   "measuring": "Mēra",
   "noAnswer": "Nav atbildes",
   "ms": "{{ms}} ms",
-  "connect": "Savienot",
-  "connectTo": "Savienot ar {{server}}",
+  "connect": "Savienoties",
+  "connectTo": "Savienoties ar {{server}}",
   "favourite": "Izlase",
   "favouriteServer": "Pievienot {{server}} saviem serveriem",
   "saved": "Saglabāts",
-  "savedAs": "{{server}} ir jūsu serveru sarakstā",
+  "savedAs": "{{server}} ir tavu serveru sarakstā",
   "announce": {
-    "saved": "{{server}} pievienots jūsu serveriem"
+    "saved": "{{server}} pievienots taviem serveriem"
   },
-  "note": "Ping tiek sūtīts tikai redzamajām rindām, pa dažām. Nekas cits serverim netiek sūtīts, līdz pievienojaties."
+  "note": "Ping tiek sūtīts tikai redzamajām rindām, pa dažām. Nekas cits serverim netiek sūtīts, līdz savienojies."
 }

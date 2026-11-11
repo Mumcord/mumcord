@@ -14,12 +14,12 @@
   "serverState": "{server} – {state}",
   "talking": "Forbundet – taler",
   "muted": "Forbundet – mikrofon slået fra",
-  "voiceMenu": "Stemmeserver og kanal",
-  "voiceServer": "Stemmeserver",
+  "voiceMenu": "Taleserver og kanal",
+  "voiceServer": "Taleserver",
   "channelsOf": "Kanaler · {server}",
   "moreChannels": "Flere kanaler i Mumcord",
   "recentChats": "Seneste chats",
   "chatUnread": "{name} – {count} ulæste",
   "cameraOn": "Kamera tændt",
-  "turnOffCamera": "Slå kamera fra"
+  "turnOffCamera": "Sluk kamera"
 }

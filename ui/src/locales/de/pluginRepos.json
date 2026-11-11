@@ -9,13 +9,13 @@
     "check": "Quelle prüfen",
     "found": "Das haben wir gefunden",
     "confirm": "Quelle hinzufügen",
-    "subtitle": "Füge nur Repositories von Menschen hinzu, denen du vertraust.",
+    "subtitle": "Füge nur Quellen von Menschen hinzu, denen du vertraust.",
     "signatureValid": "Signatur gültig",
     "contactLine": "Kontakt: {{contact}}",
     "pluginsLine": "Plugins: {{number}}",
     "signingKey": "Signaturschlüssel",
-    "warningTitle": "Inoffizielles Repository",
-    "warningBody": "Mumcord prüft diese Plugins nicht. Dieser Schlüssel wird gemerkt: Ändert er sich, wird das Repository pausiert, bis du es prüfst. Beim Durchsuchen sieht der Betreiber deine IP-Adresse. Plugins mit offiziellen Namen werden nie daraus übernommen."
+    "warningTitle": "Inoffizielle Quelle",
+    "warningBody": "Mumcord prüft diese Plugins nicht. Dieser Schlüssel wird gemerkt: Ändert er sich, wird die Quelle pausiert, bis du sie prüfst. Beim Durchsuchen sieht der Betreiber deine IP-Adresse. Plugins mit offiziellen Namen werden nie daraus übernommen."
   },
   "limit": "Du kannst bis zu {{max}} Quellen hinzufügen.",
   "limitReached": "Das Limit von {{max}} Quellen ist erreicht.",

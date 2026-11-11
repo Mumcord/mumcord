@@ -3,7 +3,7 @@
   "moreItems": "Aktar plugins",
   "subline": "{{plugin}} · Mhux uffiċjali",
   "sublineOfficial": "{{plugin}}",
-  "footer": "L-elementi tal-plugins dejjem juru isem il-plugin. Immaniġjahom f'Settings → Plugins.",
+  "footer": "L-elementi tal-plugins dejjem juru isem il-plugin. Immaniġġjahom f'Issettjar → Plugins.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Qed jerġa' jibda wara problema, erġa' pprova mal-ewwel"
+  "disabledRestarting": "Qed jerġa' jibda wara problema, erġa' pprova ftit wara"
 }

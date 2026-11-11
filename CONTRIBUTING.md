@@ -54,6 +54,19 @@ When it fails:
 - **Source:** dependencies come from crates.io only, plus the mumbot tag pinned in `crates/engine/Cargo.toml`. A new git or registry source needs an explicit entry in `[sources]` of `deny.toml` and a reason in the pull request.
 - **npm audit:** update the package (`npm update <package>`). If no fixed version exists, say so in the pull request and note the accepted finding here; `npm audit` itself has no ignore list, so the workflow step is adjusted only together with that note. No exceptions are accepted at the moment.
 
+## Fuzzing
+
+`fuzz/` holds [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) targets for the code that reads bytes from servers and other users: `control_frame` (TCP control frames, `crates/protocol/src/framing.rs`), `voice_packet` (UDP and tunnelled voice packets in both wire formats, `crates/protocol/src/voice/packet.rs`) and `mumcord_hello` (the Mumcord hello plugin data, `crates/engine/src/mumcord.rs`). Each one feeds arbitrary bytes in and fails on a panic, a hang or a stack overflow. The voice decoder is private; cargo-fuzz builds with `--cfg fuzzing`, which exposes `mumcord_protocol::voice::fuzz_decode` for the target and nothing else.
+
+The fuzz crate is its own workspace because it needs a nightly toolchain and sanitizer flags. It needs `rustup toolchain install nightly`, `cargo install cargo-fuzz` and, for `mumcord_hello`, the same system libraries as the app build. To run a target for a minute:
+
+```sh
+cp Cargo.lock fuzz/   # build against the app's dependency versions
+cargo +nightly fuzz run voice_packet -- -max_total_time=60
+```
+
+A crash saves the input under `fuzz/artifacts/<target>/`; `cargo +nightly fuzz run <target> <file>` reproduces it. Fix the bug with a regular unit test that reproduces it first. The workflow "Fuzzing" (`.github/workflows/fuzz.yml`) runs every target for five minutes each week and on manual dispatch, not on pull requests; when it fails, the crashing input is attached to the run as an artifact.
+
 ## Dependency updates
 
 Dependabot (`.github/dependabot.yml`) opens one pull request per ecosystem every Monday for minor and patch updates of Cargo, npm and GitHub Actions dependencies; major updates come as separate pull requests. `tauri-specta` and `specta` are pinned to exact versions and ignored; bump them together by hand.

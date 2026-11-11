@@ -1,6 +1,6 @@
 {
   "title": "Zabierz swoją konfigurację z Mumble",
-  "intro": "Znaleźliśmy oficjalnego klienta Mumble na tym komputerze. Wybierz, co skopiować. Nic w Mumble się nie zmienia i nic nie opuszcza Twojego komputera.",
+  "intro": "Znaleźliśmy oficjalnego klienta Mumble na tym komputerze. Wybierz, co skopiować. Nic w Mumble nie zostanie zmienione i nic nie opuści twojego komputera.",
   "optional": "{{progress}} · opcjonalne",
   "listLabel": "Co skopiować z Mumble",
   "favourites": {
@@ -9,15 +9,15 @@
     "found_few": "Znaleziono {{count}}",
     "found_many": "Znaleziono {{count}}",
     "found_other": "Znaleziono {{count}}",
-    "duplicates_one": "{{count}} już w Mumcord (pominięty)",
-    "duplicates_few": "{{count}} już w Mumcord (pominięte)",
-    "duplicates_many": "{{count}} już w Mumcord (pominiętych)",
-    "duplicates_other": "{{count}} już w Mumcord (pominiętego)",
+    "duplicates_one": "{{count}} już w Mumcordzie (pominięty)",
+    "duplicates_few": "{{count}} już w Mumcordzie (pominięte)",
+    "duplicates_many": "{{count}} już w Mumcordzie (pominiętych)",
+    "duplicates_other": "{{count}} już w Mumcordzie (pominiętego)",
     "failed": "Nie udało się odczytać listy serwerów z Mumble.",
     "review": "Sprawdź listę",
     "hide": "Ukryj listę",
     "listLabel": "Serwery do skopiowania",
-    "duplicate": "Już w Mumcord"
+    "duplicate": "Już w Mumcordzie"
   },
   "passwords": {
     "title": "Zapisane hasła",
@@ -25,16 +25,16 @@
     "count_few": "{{count}} ulubione serwery mają zapisane hasło",
     "count_many": "{{count}} ulubionych serwerów ma zapisane hasło",
     "count_other": "{{count}} ulubionego serwera ma zapisane hasło",
-    "keychain": "Zapisane w systemowym breloku kluczy"
+    "keychain": "Zapisane w systemowym magazynie kluczy"
   },
   "identity": {
     "title": "Tożsamość (certyfikat klienta)",
-    "keeps": "Zachowuje Twoją zarejestrowaną nazwę i uprawnienia",
+    "keeps": "Zachowuje twoją zarejestrowaną nazwę i uprawnienia",
     "locked": "chroniony hasłem w Mumble",
     "named": "Certyfikat dla „{{name}}”",
     "validUntil": "ważny do {{date}}",
     "passwordNeeded": "Wymagane hasło",
-    "already": "Już w Mumcord",
+    "already": "Już w Mumcordzie",
     "password": "Hasło certyfikatu z Mumble",
     "passwordRequired": "Wpisz hasło certyfikatu.",
     "wrongPassword": "To hasło nie otwiera certyfikatu. Spróbuj ponownie."
@@ -46,7 +46,7 @@
     "missing": "Urządzenia z Mumble nie są podłączone do tego komputera."
   },
   "ptt": {
-    "title": "Klawisz push-to-talk",
+    "title": "Klawisz Push-to-talk",
     "modifierOnly": "Klawisz w Mumble to tylko klawisz modyfikujący, którego Mumcord nie może użyć. Klawisz możesz wybrać później.",
     "tooManyKeys": "Skrót w Mumble ma więcej niż jeden klawisz, czego Mumcord nie może użyć. Klawisz możesz wybrać później.",
     "unknown": "Skrót w Mumble używa klawisza lub urządzenia, którego Mumcord nie zna. Klawisz możesz wybrać później."
@@ -65,7 +65,7 @@
   "skip": "Pomiń na razie",
   "cancel": "Anuluj",
   "failed": "Nie udało się dokończyć importu. Spróbuj ponownie.",
-  "secureStorage": "Mumcord nie ma dostępu do bezpiecznego magazynu systemu. Odblokuj brelok kluczy lub menedżer haseł i spróbuj ponownie.",
+  "secureStorage": "Mumcord nie ma dostępu do bezpiecznego magazynu systemu. Odblokuj magazyn kluczy lub menedżer haseł i spróbuj ponownie.",
   "settingsFailed": "Serwery zostały skopiowane, ale nie udało się zapisać ustawień.",
   "summary": {
     "title": "Import zakończony",
@@ -78,22 +78,22 @@
     "skipped_few": "{{count}} serwery pominięte",
     "skipped_many": "{{count}} serwerów pominiętych",
     "skipped_other": "{{count}} serwera pominiętego",
-    "skippedDetail_one": "{{names}} jest już na Twojej liście",
-    "skippedDetail_few": "{{names}} są już na Twojej liście",
-    "skippedDetail_many": "{{names}} są już na Twojej liście",
-    "skippedDetail_other": "{{names}} są już na Twojej liście",
+    "skippedDetail_one": "{{names}} jest już na twojej liście",
+    "skippedDetail_few": "{{names}} są już na twojej liście",
+    "skippedDetail_many": "{{names}} są już na twojej liście",
+    "skippedDetail_other": "{{names}} są już na twojej liście",
     "duplicate": "Duplikat",
     "passwords_one": "{{count}} hasło zapisane",
     "passwords_few": "{{count}} hasła zapisane",
     "passwords_many": "{{count}} haseł zapisanych",
     "passwords_other": "{{count}} hasła zapisanego",
-    "passwordsDetail": "Zapisane w systemowym breloku kluczy, nie w pliku",
+    "passwordsDetail": "Zapisane w systemowym magazynie kluczy, nie w pliku",
     "identity": "Tożsamość zaimportowana",
     "identityDefault": "Mumcord teraz jej używa",
     "identityServers": "Używana dla skopiowanych serwerów",
-    "identitySkipped": "Tożsamość już w Mumcord",
-    "identitySkippedDetail": "Ten certyfikat jest już jedną z Twoich tożsamości",
-    "devicesAndPtt": "Urządzenia audio i klawisz push-to-talk",
+    "identitySkipped": "Tożsamość już jest w Mumcordzie",
+    "identitySkippedDetail": "Ten certyfikat jest już jedną z twoich tożsamości",
+    "devicesAndPtt": "Urządzenia audio i klawisz Push-to-talk",
     "done": "Gotowe",
     "undo": "Cofnij import",
     "undone": "Import został cofnięty.",

@@ -4,7 +4,7 @@
  * focused tile open its menu (Enter, Shift+F10), pin (P), show large (F), hide (H) or leave the
  * large view (Escape).
  */
-import { useState, type FocusEvent, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
 import type { TileKey } from "./layout";
 
 export type TileCommand = "menu" | "pin" | "large" | "hide" | "escape";
@@ -87,6 +87,14 @@ export function useGridKeys(
   onCommand: (key: TileKey, command: TileCommand, tile: HTMLElement) => boolean,
 ): GridKeys {
   const [active, setActive] = useState<TileKey | null>(null);
+  // The frame that puts the focus back after Show large: it must not run once the tiles are gone.
+  const refocus = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (refocus.current !== null) cancelAnimationFrame(refocus.current);
+    },
+    [],
+  );
   const current = active !== null && keys.includes(active) ? active : (keys[0] ?? null);
   const keyOf = (element: HTMLElement): TileKey | undefined =>
     keys.find((key) => String(key) === element.dataset.tile);
@@ -120,7 +128,9 @@ export function useGridKeys(
     // Show large moves the tile to another place, where React draws it anew: keep the focus on it.
     const container = event.currentTarget;
     const id = tile.dataset.tile;
-    requestAnimationFrame(() => {
+    if (refocus.current !== null) cancelAnimationFrame(refocus.current);
+    refocus.current = requestAnimationFrame(() => {
+      refocus.current = null;
       if (container.contains(document.activeElement)) return;
       tileElements(container)
         .find((element) => element.dataset.tile === id)

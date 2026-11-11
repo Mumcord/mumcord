@@ -32,11 +32,11 @@
   "changeWindow": "Mainīt logu",
   "viewersTitle": "Skatītāji",
   "thumbnail": "Kopīgotā satura priekšskatījums",
-  "youAreSharing": "Jūs kopīgojat",
+  "youAreSharing": "Tu kopīgo",
   "ofMax": "{{count}} no {{max}}",
   "fullShort": "Visas vietas ir aizņemtas.",
   "stopShort": "Apturēt",
-  "viewerCount_zero": "{{count}} skatītāju",
+  "viewerCount_zero": "{{count}} skatītāji",
   "viewerCount_one": "{{count}} skatītājs",
   "viewerCount_other": "{{count}} skatītāji",
   "start": {
@@ -85,7 +85,8 @@
     "soundNeeds": {
       "windows": "Nav skaņas: nepieciešams Windows 10 versija 2004 vai jaunāka",
       "macos": "Nav skaņas: nepieciešams macOS 13 vai jaunāks",
-      "pipewire": "Nav skaņas: nepieciešams PipeWire"
+      "pipewire": "Nav skaņas: nepieciešams PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Skatītāji saņem:",
     "viewersGetSummary": "līdz {{resolution}} · {{fps}} fps · {{codec}} · apmēram {{mbit}} Mbit/s",
@@ -119,7 +120,7 @@
     "tipDesktop": "Viss ekrāns: darbvirsmas skaņa bez Mumcord.",
     "tipApp": "Viens logs: tikai šīs lietotnes skaņa.",
     "tipOff": "Skaņas slēdzis ir izslēgts.",
-    "tipNone": "Šim logam izvēlēts „Bez skaņas“.",
+    "tipNone": "Šim logam izvēlēts „Bez skaņas”.",
     "tipOldWindows": "Bez skaņas: nepieciešama Windows 10 versija 2004 vai jaunāka",
     "tipOldMacos": "Bez skaņas: nepieciešama macOS 13 vai jaunāka",
     "tipNoPipeWire": "Bez skaņas: nepieciešams PipeWire",
@@ -153,7 +154,7 @@
     "more_zero": "un vēl {{count}}",
     "more_one": "un vēl {{count}}",
     "more_other": "un vēl {{count}}",
-    "layerNote": "{{name}} saņem {{fps}} fps: viņa savienojums netiek līdzi ar {{target}}."
+    "layerNote": "{{name}} saņem {{fps}} fps: savienojums nespēj nodrošināt {{target}}."
   },
   "notices": {
     "noFanoutTitle": "Šim serverim nav releja lielām kopīgošanām",
@@ -171,10 +172,10 @@
     "reasonNoCertificate": "tev nav klienta sertifikāta",
     "reasonUnavailable": "releju pašlaik nevar izmantot",
     "gotIt": "Sapratu",
-    "encoderTitle": "Tavs dators netika līdzi ar {{from}} — pārslēdzāmies uz {{to}}, lai kopīgošana paliktu plūstoša",
-    "encoderBody": "Kodēšana uz procesora (SVT-AV1) ilga pārāk ilgi, un kadri tika izlaisti. Tava kopīgošana ar {{to}} paliek {{quality}}, un tai vajag mazāk CPU. Skatītāji redzēja īsu atsvaidzināšanu, nekas cits.",
+    "encoderTitle": "Tavs dators netika galā ar {{from}} — pārslēgts uz {{to}}, lai kopīgošana paliktu plūstoša",
+    "encoderBody": "Kodēšana uz procesora (SVT-AV1) ilga pārāk ilgi, un kadri tika izlaisti. Tava kopīgošana ar {{to}} paliek {{quality}}, un tai vajag mazāk CPU. Skatītāji pamanīja tikai īsu attēla atsvaidzināšanu.",
     "switched": "Pārslēgts uz {{codec}}, lai samazinātu slodzi",
-    "switchedFor": "Pārslēgts uz {{codec}} dēļ {{name}}",
+    "switchedFor": "Pārslēgts uz {{codec}} skatītāja {{name}} dēļ",
     "undo": "Atsaukt",
     "details": "Detaļas",
     "undoFailed": "Atsaukšana neizdevās. Tava kopīgošana turpina darboties ar {{codec}}.",
@@ -187,9 +188,9 @@
     "detailsMs": "{{ms}} ms",
     "detailsUnknown": "Nav mērīts",
     "close": "Aizvērt",
-    "reasonNotRegistered": "šī servera retranslatoru drīkst izmantot tikai reģistrēti lietotāji",
-    "reasonGroupNotAllowed": "retranslators apkalpo tikai noteiktas grupas",
-    "reasonNoHello": "retranslatora bots vēl nepazīst lietotni, pievienojies vēlreiz"
+    "reasonNotRegistered": "šī servera releju drīkst izmantot tikai reģistrēti lietotāji",
+    "reasonGroupNotAllowed": "relejs apkalpo tikai noteiktas grupas",
+    "reasonNoHello": "releja bots vēl nepazīst šo lietotni; lai to novērstu, savienojies no jauna"
   },
   "settings": {
     "title": "Ekrāna kopīgošana",
@@ -226,7 +227,7 @@
     "codecVp9": "VP9",
     "codecVp9Hint": "Tas, ko Mumcord izmantoja līdz šim. Der visiem skatītājiem.",
     "codecNoteCpu": "Bez grafiskās kartes AV1 izmanto procesoru (SVT-AV1). Mumcord pārslēdzas uz VP9, ja dators netiek līdzi.",
-    "codecNoteOlder": "Skatītāji ar vecāku Mumcord vienmēr saņem VP9, ko arī izvēlētos.",
+    "codecNoteOlder": "Skatītāji ar vecāku Mumcord vienmēr saņem VP9, lai ko tu izvēlētos.",
     "hardware": "Aparatūras paātrinājums",
     "useGpu": "Izmantot grafisko karti, ja pieejama",
     "useGpuHint": "Kodē AV1 uz tavas grafiskās kartes, tāpēc kopīgošana gandrīz neslogo CPU. Izslēgts: AV1 izmanto procesoru.",
@@ -248,7 +249,7 @@
     "share": "Kopīgot skaņu",
     "cancel": "Atcelt",
     "empty": "Pašlaik neviena lietotne neatskaņo skaņu",
-    "gone": "Šī lietotne vairs neatskaņo skaņu. Izvēlieties citu.",
-    "failed": "Jūsu izvēli neizdevās pielietot."
+    "gone": "Šī lietotne vairs neatskaņo skaņu. Izvēlies citu.",
+    "failed": "Tavu izvēli neizdevās lietot."
   }
 }

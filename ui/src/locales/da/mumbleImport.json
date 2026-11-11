@@ -23,9 +23,9 @@
   },
   "identity": {
     "title": "Identitet (klientcertifikat)",
-    "keeps": "Beholder dit registrerede navn og dine rettigheder",
+    "keeps": "Beholder dit registrerede navn og dine tilladelser",
     "locked": "beskyttet med en adgangskode i Mumble",
-    "named": "Certifikat for “{{name}}”",
+    "named": "Certifikat for »{{name}}«",
     "validUntil": "gyldigt til {{date}}",
     "passwordNeeded": "Adgangskode påkrævet",
     "already": "Findes allerede i Mumcord",
@@ -46,7 +46,7 @@
     "unknown": "Genvejen i Mumble bruger en tast eller en enhed, som Mumcord ikke kender. Du kan vælge en tast senere."
   },
   "volume": {
-    "title": "Lydstyrke og stemmeindstillinger",
+    "title": "Lydstyrke og taleindstillinger",
     "hint": "Mumble og Mumcord bruger forskellige skalaer, så værdierne ville ikke passe sammen",
     "notRecommended": "Anbefales ikke"
   },
@@ -60,7 +60,7 @@
   "secureStorage": "Mumcord kan ikke nå systemets sikre lager. Lås din nøglering eller adgangskodeadministrator op, og prøv igen.",
   "settingsFailed": "Dine servere blev kopieret, men indstillingerne kunne ikke gemmes.",
   "summary": {
-    "title": "Import færdig",
+    "title": "Importen er færdig",
     "intro": "Dine Mumble-data er kopieret. Se, hvad der skete.",
     "added_one": "{{count}} server føjet til favoritter",
     "added_other": "{{count}} servere føjet til favoritter",

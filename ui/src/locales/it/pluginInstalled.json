@@ -10,7 +10,7 @@
     "developer": "Plugin per sviluppatori",
     "autoOff": "Disattivato dopo arresti anomali ripetuti",
     "backingOff": "Riavvio dopo un arresto anomalo",
-    "notLoaded": "Impossibile caricarlo",
+    "notLoaded": "Caricamento non riuscito",
     "revoked": "Disattivato da Mumcord: {{reason}}",
     "revocationWarning": "Avviso da Mumcord: {{reason}}",
     "tampered": "I file di questo plugin sono stati modificati",
@@ -121,13 +121,13 @@
     "randomBytes": "Numeri casuali",
     "commands": "Comandi",
     "chatSend": "Scrive in chat",
-    "chatSupersedes": "Sostituisce la sua riga di testo",
+    "chatSupersedes": "Sostituisce il suo testo",
     "chatTriggers": "Parole chiave",
     "chatPatterns": "Modelli di chat",
     "netHttp": "Accesso a internet",
     "secrets": "Portachiavi"
   },
-  "offerBadge": "Nuove autorizzazioni",
+  "offerBadge": "Nuovi permessi",
   "refused": {
     "title": "Plugin rifiutati",
     "when": "Rifiutato il {{time}}"

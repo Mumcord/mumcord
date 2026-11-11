@@ -42,7 +42,7 @@
     "privateMessage": "Súkromná správa",
     "localSettingsHint": "Vidíš ich len ty. Zmeny sa ukladajú okamžite.",
     "settingsFor": "Nastavenia pre {{name}}",
-    "hintMuted": "Stlmené",
+    "hintMuted": "Stlmený",
     "hintVolume": "Hlasitosť {{value}} %",
     "localMuteHint": "Túto osobu nebudeš počuť.",
     "privateNote": "Súkromná poznámka",
@@ -50,7 +50,7 @@
     "saved": "Uložené"
   },
   "errors": {
-    "notConnected": "Nie si pripojený k serveru.",
+    "notConnected": "Nemáš pripojenie k serveru.",
     "generic": "Nepodarilo sa. Skús to znova."
   },
   "menu": {
@@ -63,7 +63,7 @@
     "mute": "Stlmiť pre mňa",
     "connectionInfo": "Informácie o pripojení",
     "chatRequestPending": "Žiadosť o chat čaká na vybavenie",
-    "revokeConsent": "Odvolať súhlas s četom",
+    "revokeConsent": "Odvolať súhlas s chatom",
     "moveToMe": "Presunúť do môjho kanála",
     "moveTo": "Presunúť do"
   },
@@ -116,15 +116,15 @@
     "talkingMore_other": "{{name}} a {{count}} ďalších hovorí"
   },
   "revokeConsent": {
-    "title": "Odvolať súhlas s četom pre {{name}}?",
-    "message": "{{name}} bude musieť znova poslať žiadosť o správu, kým sa k tebe jeho správy dostanú. História četu zostane.",
+    "title": "Odvolať súhlas s chatom pre {{name}}?",
+    "message": "{{name}} ti bude musieť poslať novú žiadosť o správu, aby sa k tebe jeho správy znova dostali. História chatu zostane.",
     "confirm": "Odvolať",
-    "failed": "Odvolanie súhlasu s četom sa nepodarilo. Skús to znova."
+    "failed": "Súhlas s chatom sa nepodarilo odvolať. Skús to znova."
   },
   "block": {
-    "menu": "Blokovať",
+    "menu": "Zablokovať",
     "unblock": "Odblokovať",
-    "title": "Blokovať používateľa {{name}}?",
+    "title": "Zablokovať používateľa {{name}}?",
     "onServer": "na serveri {{server}}",
     "whatHappens": "Čo sa stane",
     "private": "Súkromné správy od používateľa {{name}} sa nezobrazujú a neupozorňujú ťa.",
@@ -136,7 +136,7 @@
     "nameOnly": "Používateľ {{name}} nemá certifikát, takže sa blokovanie vzťahuje iba na toto meno na serveri {{server}}.",
     "warning": "Používateľ {{name}} ťa stále vidí a môže čítať tvoje správy. Mumble to nedokáže zastaviť iba na tvojej strane. Používateľ {{name}} sa o blokovaní nedozvie.",
     "cancel": "Zrušiť",
-    "confirm": "Blokovať používateľa {{name}}",
+    "confirm": "Zablokovať používateľa {{name}}",
     "done": "Používateľ {{name}} je zablokovaný.",
     "failed": "Blokovanie používateľa {{name}} zlyhalo. Skús to znova.",
     "badge": "Zablokovaný",

@@ -10,9 +10,9 @@
     "developer": "Wtyczka deweloperska",
     "autoOff": "Wyłączona po wielokrotnych awariach",
     "backingOff": "Uruchamia się ponownie po awarii",
-    "notLoaded": "Nie udało się załadować",
+    "notLoaded": "Nie udało się wczytać",
     "revoked": "Wyłączona przez Mumcord: {{reason}}",
-    "revocationWarning": "Ostrzeżenie od Mumcord: {{reason}}",
+    "revocationWarning": "Ostrzeżenie od Mumcorda: {{reason}}",
     "tampered": "Pliki tej wtyczki zostały zmienione",
     "permission": "Wyłączona, bo wymagane uprawnienie jest wyłączone"
   },
@@ -56,7 +56,7 @@
     "incomingRateDropped": "Przychodzące wiadomości odrzucone przez limit częstotliwości",
     "incomingInvalid": "Nieprawidłowe wiadomości przychodzące",
     "uiFreezes": "Ile razy Mumcord się zawiesił przy otwartej treści internetowej",
-    "refusedAppMenuLabel": "Ta wtyczka została odrzucona: etykieta w menu Aplikacje jest taka sama jak jedna z własnych etykiet Mumcord albo zaczyna się od „Mumcord”.",
+    "refusedAppMenuLabel": "Ta wtyczka została odrzucona: etykieta w menu Aplikacje jest taka sama jak jedna z własnych etykiet Mumcorda albo zaczyna się od „Mumcord”.",
     "fieldWithoutPermission": "Ta wtyczka została odrzucona: używa „{{field}}” bez uprawnienia „{{permission}}”.",
     "webDisabled": "Treść internetowa jest wyłączona, ponieważ Mumcord przestał odpowiadać, gdy była otwarta.",
     "reenableWeb": "Włącz treść internetową",
@@ -101,7 +101,7 @@
   },
   "update": {
     "hint": "Aktualizacja {{version}}",
-    "button": "Aktualizuj"
+    "button": "Zaktualizuj"
   },
   "visibilityChip": "Komunikuje się z innymi użytkownikami Mumcorda · {{visibility}}",
   "chips": {
@@ -121,11 +121,11 @@
     "randomBytes": "Liczby losowe",
     "commands": "Polecenia",
     "chatSend": "Pisze na czacie",
-    "chatSupersedes": "Zastępuje swój wiersz tekstu",
+    "chatSupersedes": "Zastępuje swój tekst",
     "chatTriggers": "Słowa wyzwalające",
     "chatPatterns": "Wzorce czatu",
     "netHttp": "Dostęp do internetu",
-    "secrets": "Klucze systemowe"
+    "secrets": "Magazyn kluczy"
   },
   "offerBadge": "Nowe uprawnienia",
   "refused": {

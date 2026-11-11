@@ -55,6 +55,18 @@ export function FeaturesStep({
           />
           <p className="wizard-muted wizard-small">{t("features.seenByMumcordUsers")}</p>
         </section>
+        <section className="wizard-card" aria-label={ts("activityHistory.title")}>
+          <Switch
+            label={ts("activityHistory.keep")}
+            description={ts("activityHistory.keepHint")}
+            descriptionLabel={t("tipLabel", { name: ts("activityHistory.keep") })}
+            checked={settings.keepActivityHistory}
+            onChange={(keepActivityHistory) => {
+              update({ keepActivityHistory });
+            }}
+          />
+          <p className="wizard-muted wizard-small">{t("features.onlyYou")}</p>
+        </section>
         {ingameOverlay !== null && (
           <section className="wizard-card" aria-label={ts("overlay.inGame.title")}>
             <Switch

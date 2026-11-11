@@ -3,6 +3,7 @@
 //! as typed commands and events, supplies the system Downloads folder and opens saved files.
 
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 use mumcord_engine::Engine;
 use mumcord_engine::files::card::{
@@ -14,10 +15,12 @@ use mumcord_engine::files::sender::{ChipError as EngineChipError, ChipState as E
 use mumcord_engine::files::share::EndReason as EngineEnd;
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager, State, WebviewWindow};
 use tauri_specta::Event;
 
 use super::chat::ChatMessage;
+use super::dropped::DroppedFiles;
+use super::file_dialog;
 use super::p2p::RelayUnavailable;
 use super::settings::{FilesMaxSize, P2pMode};
 use super::types::{ApiError, ApiResult, ChannelId, ErrorCode, ServerId, to_engine_server_id};
@@ -434,29 +437,31 @@ fn downloads_or_home(downloads: Option<PathBuf>, home: Option<PathBuf>) -> Optio
     downloads.or_else(|| home.map(|home| home.join("Downloads")))
 }
 
-/// Opens `path` with the default program. Windows and macOS use the opener plugin; Linux goes
-/// through the launchers of `browser`, which repair the environment inside an AppImage. Nothing
+/// Opens `path` with the default program. Windows and macOS use the opener plugin; Linux and
+/// FreeBSD go through the launchers of `browser`, which repair the environment inside an
+/// AppImage. Nothing
 /// touches the file's mark-of-the-web, so the system's own warning still applies.
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 pub(crate) fn open_file(path: &Path) -> ApiResult<()> {
     tauri_plugin_opener::open_path(path, None::<&str>)
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 pub(crate) fn open_file(path: &Path) -> ApiResult<()> {
     crate::browser::open_url(&path_text(path))
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }
 
-/// Shows `path` in the file manager; Linux has no portable "select", so it opens the folder.
-#[cfg(not(target_os = "linux"))]
+/// Shows `path` in the file manager; Linux and FreeBSD have no portable "select", so it opens
+/// the folder.
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 fn reveal_file(path: &Path) -> ApiResult<()> {
     tauri_plugin_opener::reveal_item_in_dir(path)
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn reveal_file(path: &Path) -> ApiResult<()> {
     let folder = path.parent().unwrap_or(path);
     open_file(folder)
@@ -477,11 +482,48 @@ pub fn files_availability(
 }
 
 /// Adds a file or folder to the attachment tray (FR-7.11 – 7.13) and returns its chip; a folder
-/// is zipped in the background and reported as `fileChipChanged`.
+/// is zipped in the background and reported as `fileChipChanged`. Only a path the user just
+/// dropped onto the window or picked with `files_pick` is accepted, once; any other path fails
+/// with `notFound`, so a script in the page cannot attach files the user never chose.
 #[tauri::command]
 #[specta::specta]
-pub fn files_chip_add(engine: State<'_, Engine>, path: String) -> FileChip {
-    engine.files_chip_add(PathBuf::from(path)).into()
+pub fn files_chip_add(
+    engine: State<'_, Engine>,
+    dropped: State<'_, DroppedFiles>,
+    path: String,
+) -> ApiResult<FileChip> {
+    let path = PathBuf::from(path);
+    ensure_attachable(&dropped, &path, Instant::now())?;
+    Ok(engine.files_chip_add(path).into())
+}
+
+fn ensure_attachable(dropped: &DroppedFiles, path: &Path, now: Instant) -> ApiResult<()> {
+    if dropped.take_attachable(path, now) {
+        Ok(())
+    } else {
+        Err(ApiError::new(
+            ErrorCode::NotFound,
+            "the file was not dropped onto Mumcord or picked in the file dialog",
+        ))
+    }
+}
+
+/// Opens the system file picker for the paperclip (several files) and returns the chosen paths;
+/// empty when the user cancelled. Each may then be added once with `files_chip_add`. Paths that
+/// are not valid UTF-8 are skipped: the UI could not hand them back unchanged.
+#[tauri::command]
+#[specta::specta]
+pub async fn files_pick(
+    window: WebviewWindow,
+    dropped: State<'_, DroppedFiles>,
+    title: String,
+) -> ApiResult<Vec<String>> {
+    let paths = file_dialog::pick_files(&window, &title).await?;
+    dropped.allow_attach(&paths, Instant::now());
+    Ok(paths
+        .into_iter()
+        .filter_map(|path| path.into_os_string().into_string().ok())
+        .collect())
 }
 
 /// Takes a chip out of the tray (and drops its zip).
@@ -561,6 +603,29 @@ pub fn files_save_folder(app: AppHandle, engine: State<'_, Engine>) -> ApiResult
     Ok(path_text(&engine.files_save_folder(&downloads)))
 }
 
+/// Opens the system folder picker and makes the chosen folder the download folder; returns it,
+/// or `null` when the user cancelled. This is the only way to change `filesSaveFolder`:
+/// `settings_update` keeps the stored value, so a script in the page cannot point downloads at
+/// an autostart folder.
+#[tauri::command]
+#[specta::specta]
+pub async fn files_save_folder_choose(
+    app: AppHandle,
+    window: WebviewWindow,
+    engine: State<'_, Engine>,
+    title: String,
+) -> ApiResult<Option<String>> {
+    let current = engine.files_save_folder(&downloads_dir(&app)?);
+    let Some(folder) = file_dialog::pick_folder(&window, &title, &current).await? else {
+        return Ok(None);
+    };
+    let folder = path_text(&folder);
+    let mut settings = engine.settings()?;
+    settings.files_save_folder = Some(folder.clone());
+    engine.update_settings(settings).await?;
+    Ok(Some(folder))
+}
+
 /// Opens a downloaded file with the system's default program (FR-7.29). The saved file keeps
 /// its mark-of-the-web, so the system still warns about it. Errors: `notFound` with "The file is
 /// no longer in {folder}" when it was moved or deleted.
@@ -592,6 +657,19 @@ mod tests {
     use super::*;
     use mumcord_engine::peer::RelayUnavailable as EngineRelay;
     use mumcord_engine::store::{FilesMaxSize as StoreMax, P2pMode as StoreMode};
+
+    #[test]
+    fn attaches_only_dropped_or_picked_paths_once() {
+        let dropped = DroppedFiles::default();
+        let path = PathBuf::from("/home/me/.ssh");
+        let now = Instant::now();
+        let err = ensure_attachable(&dropped, &path, now).expect_err("never handed over");
+        assert_eq!(err.code, ErrorCode::NotFound);
+
+        dropped.allow_attach(std::slice::from_ref(&path), now);
+        ensure_attachable(&dropped, &path, now).expect("dropped or picked path is accepted");
+        ensure_attachable(&dropped, &path, now).expect_err("second use is refused");
+    }
 
     #[test]
     fn downloads_fall_back_to_the_home_folder() {

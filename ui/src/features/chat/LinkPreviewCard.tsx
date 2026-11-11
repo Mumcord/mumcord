@@ -24,6 +24,8 @@ import {
 import { credentialLinks, mumbleLinks } from "./mumbleLink";
 
 import { MumbleLinkCard } from "./MumbleLinkCard";
+import { parsePluginLink, pluginLinks, usePluginCardLinks } from "./pluginLink";
+import { PluginLinkCard } from "./PluginLinkCard";
 import { openInBrowser } from "./openLink";
 import { canonicalVideoUrl } from "./videoLink";
 import { ControlButton, DismissButton, OpenButton } from "./cardButtons";
@@ -49,8 +51,8 @@ interface LinkPreviewsProps {
   html: string;
   /** Message HTML as the engine delivered it; still holds external `<img src>` URLs. */
   body: string;
-  /** "Link previews in chat": without it only the `mumble://` card is shown, without figures,
-   * plus a hint naming what was hidden. */
+  /** "Link previews in chat": without it only the `mumble://` card (without figures) and the
+   * plugin card are shown, plus a hint naming what was hidden. */
   linkPreviews: boolean;
   /** Roving tab stop of the message the cards belong to. */
   tabIndex: number;
@@ -77,13 +79,17 @@ export function LinkPreviews({
   const links = useMemo(() => previewableLinks(html), [html]);
   const images = useMemo(() => externalImages(body), [body]);
   const mumble = useMemo(() => mumbleLinks(body), [body]);
+  // Only plugin links that get a card take a preview slot.
+  const plugins = usePluginCardLinks(useMemo(() => pluginLinks(body), [body]));
   const hidden = useDismissedPreviews(messageId, dismissed);
   // A `mumble://` link always gets its card, because the card is the message's own content; the
-  // web previews need the setting (issue #175).
-  const wanted = [...mumble, ...images, ...links.filter((url) => !images.includes(url))]
+  // web previews need the setting (issue #175). A plugin link's card contacts no third party
+  // either, so it is shown the same way (FR-6.65a).
+  const own = [...mumble, ...plugins];
+  const wanted = [...own, ...images, ...links.filter((url) => !images.includes(url))]
     .filter((url) => !hidden.has(url))
     .slice(0, MAX_PREVIEWS);
-  const shown = linkPreviews ? wanted : wanted.filter((url) => mumble.includes(url));
+  const shown = linkPreviews ? wanted : wanted.filter((url) => own.includes(url));
   // What the switch hides gets one combined hint instead of vanishing silently (issue #261).
   const withheld = wanted
     .filter((url) => !shown.includes(url))
@@ -99,6 +105,15 @@ export function LinkPreviews({
             key={url}
             url={url}
             credentialLinks={credentials}
+            tabIndex={tabIndex}
+            onDismiss={() => {
+              dismissPreview(messageId, url);
+            }}
+          />
+        ) : plugins.includes(url) ? (
+          <PluginLinkCard
+            key={url}
+            id={parsePluginLink(url) ?? ""}
             tabIndex={tabIndex}
             onDismiss={() => {
               dismissPreview(messageId, url);

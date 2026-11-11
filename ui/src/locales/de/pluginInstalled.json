@@ -39,7 +39,7 @@
     "none": "Keines"
   },
   "diagnostics": {
-    "loading": "Diagnose wird geladen …",
+    "loading": "Diagnose wird geladen…",
     "failed": "Die Diagnose konnte nicht geladen werden.",
     "unknown": "Nicht verfügbar",
     "ms": "{{value}} ms",
@@ -56,7 +56,7 @@
     "incomingRateDropped": "Durch das Ratenlimit verworfene eingehende Nachrichten",
     "incomingInvalid": "Ungültige eingehende Nachrichten",
     "uiFreezes": "Wie oft Mumcord bei geöffnetem Webinhalt eingefroren ist",
-    "refusedAppMenuLabel": "Dieses Plugin wurde abgelehnt: Eine Bezeichnung im Apps-Menü ist gleich einer von Mumcord selbst oder beginnt mit „Mumcord“.",
+    "refusedAppMenuLabel": "Dieses Plugin wurde abgelehnt: Eine Bezeichnung im Apps-Menü ist identisch mit einer von Mumcord selbst oder beginnt mit „Mumcord“.",
     "fieldWithoutPermission": "Dieses Plugin wurde abgelehnt: Es verwendet „{{field}}“ ohne die Berechtigung „{{permission}}“.",
     "webDisabled": "Der Webinhalt ist ausgeschaltet, weil Mumcord nicht mehr reagiert hat, während er geöffnet war.",
     "reenableWeb": "Webinhalt einschalten",
@@ -103,14 +103,14 @@
     "hint": "Update {{version}}",
     "button": "Aktualisieren"
   },
-  "visibilityChip": "Spricht mit anderen Mumcord-Nutzern · {{visibility}}",
+  "visibilityChip": "Spricht mit anderen Mumcord-Benutzern · {{visibility}}",
   "chips": {
     "label": "Genutzte Berechtigungen",
     "uiPanel": "Leiste",
     "uiMemberBadge": "Mitglieder-Abzeichen",
     "uiProfileCard": "Profilkarte",
     "uiChatCard": "Chat-Karten",
-    "uiUserMenu": "Nutzermenü",
+    "uiUserMenu": "Benutzermenü",
     "uiDialog": "Eigenes Fenster",
     "uiWebview": "Webinhalt",
     "eventsSelf": "Dein Status",

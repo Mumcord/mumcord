@@ -49,6 +49,7 @@ function own(viewers: number[]): ScreenShare {
     blocked: null,
     relayReason: null,
     kind: "window",
+    title: null,
     elapsedMs: 0,
   };
 }

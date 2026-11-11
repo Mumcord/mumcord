@@ -7,7 +7,7 @@
   "noChannel": "Roghnaigh cainéal chun a fheiceáil cé atá ann.",
   "nobody": "Níl aon duine anseo.",
   "nobodyElse": "Níl duine ar bith eile ar an bhfreastalaí.",
-  "inOtherChannels": "In cainéil eile",
+  "inOtherChannels": "I gcainéil eile",
   "you": "(tusa)",
   "registered": "Cláraithe",
   "unregistered": "Gan chlárú",
@@ -34,14 +34,14 @@
   },
   "card": {
     "close": "Dún",
-    "loadFailed": "Níorbh fhéidir an próifíl a luchtú.",
-    "volume": "Airde fhuaime",
+    "loadFailed": "Níorbh fhéidir an phróifíl a lódáil.",
+    "volume": "Airde fuaime",
     "volumeValue": "{{value}} %",
     "localMute": "Balbhaigh dom",
     "sessionOnly": "Níl teastas ag an duine seo, mar sin ní mhaireann na socruithe seo ach don seisiún seo.",
     "sendPrivateMessage": "Seol teachtaireacht phríobháideach",
     "privateMessage": "Teachtaireacht phríobháideach",
-    "localSettingsHint": "Ní fheiceann ach tusa iad seo. Sábhálfar na hathruithe láithreach.",
+    "localSettingsHint": "Ní fheiceann ach tusa iad seo. Sábháiltear na hathruithe láithreach.",
     "settingsFor": "Socruithe do {{name}}",
     "hintMuted": "Balbhaithe",
     "hintVolume": "Airde {{value}} %",
@@ -51,7 +51,7 @@
     "saved": "Sábháilte"
   },
   "errors": {
-    "notConnected": "Gan ceangal le freastalaí.",
+    "notConnected": "Gan cheangal le freastalaí.",
     "generic": "Níor oibrigh sé sin. Bain triail eile as."
   },
   "menu": {
@@ -69,16 +69,16 @@
     "moveTo": "Bog go"
   },
   "nowPlaying": {
-    "label": "Ag seinm anois",
+    "label": "Á sheinm anois",
     "listening": "Ag éisteacht le",
     "paused": "Curtha ar sos",
-    "progress": "Dul chun cinn an tseinm",
+    "progress": "Dul chun cinn na seinme",
     "position": "{{position}} as {{duration}}"
   },
   "nowGaming": {
     "label": "Ag imirt anois",
     "playing": "Ag imirt",
-    "playedFor": "le {{time}}",
+    "playedFor": "ar feadh {{time}}",
     "hoursMinutes": "{{hours}} u {{minutes}} nóim",
     "minutes_one": "{{count}} nóim",
     "minutes_two": "{{count}} nóim",
@@ -120,25 +120,25 @@
     "talkingMore_other": "Tá {{name}} agus {{count}} eile ag caint"
   },
   "revokeConsent": {
-    "title": "An gcúlghairfear an toiliú comhrá do {{name}}?",
-    "message": "Beidh ar {{name}} iarratas teachtaireachta nua a sheoladh sula sroichfidh a t(h)eachtaireachtaí thú arís. Fanfaidh do stair chomhrá.",
+    "title": "Cúlghair an toiliú comhrá do {{name}}?",
+    "message": "Beidh ar {{name}} iarratas teachtaireachta nua a sheoladh sula sroichfidh na teachtaireachtaí thú arís. Fanfaidh do stair chomhrá.",
     "confirm": "Cúlghair",
     "failed": "Theip ar chúlghairm an toilithe comhrá. Bain triail eile as."
   },
   "block": {
     "menu": "Bac",
     "unblock": "Díbhac",
-    "title": "An bhfuil tú ag iarraidh {{name}} a bhacadh?",
+    "title": "Bac {{name}}?",
     "onServer": "ar {{server}}",
     "whatHappens": "Céard a tharlaíonn",
     "private": "Ní thaispeántar teachtaireachtaí príobháideacha ó {{name}} agus ní chuireann siad fógra ort.",
     "channelCollapsed": "Tá teachtaireachtaí cainéil {{name}} fillte. Is féidir leat iad a oscailt fós.",
     "channelHidden": "Tá teachtaireachtaí cainéil {{name}} i bhfolach.",
-    "voice": "Tá {{name}} balbhaithe duit sa ghuth, cogaíocha san áireamh.",
-    "data": "Gan sioncrónú staire, cuireadh ná sonraí eile Mumcord ó {{name}}.",
+    "voice": "Tá {{name}} balbhaithe duit sa ghuth, cogair san áireamh.",
+    "data": "Gan sioncrónú staire, cuirí ná sonraí eile Mumcord ó {{name}}.",
     "followsCert": "Leanann an bac teastas {{name}}, mar sin ní sheachnaíonn ainm nua é.",
     "nameOnly": "Níl teastas ag {{name}}, mar sin ní bhaineann an bac ach leis an ainm seo ar {{server}}.",
-    "warning": "Is féidir le {{name}} tú a fheiceáil agus do theachtaireachtaí a léamh fós. Níl aon bhealach ag Mumble é sin a stopadh ar do thaobh féin amháin. Ní chuirtear in iúl do {{name}} go bhfuil sé bactha.",
+    "warning": "Is féidir le {{name}} tú a fheiceáil agus do theachtaireachtaí a léamh fós. Níl aon bhealach ag Mumble é sin a stopadh ar do thaobh féin amháin. Ní chuirtear an bac in iúl do {{name}}.",
     "cancel": "Cealaigh",
     "confirm": "Bac {{name}}",
     "done": "Tá {{name}} bactha.",

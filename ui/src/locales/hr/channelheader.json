@@ -2,8 +2,8 @@
   "copied": "Poveznica kopirana",
   "copyFailed": "Poveznicu nije moguće kopirati",
   "menu": {
-    "label": "Opcije kanala {{channel}}",
-    "join": "Uđi u kanal",
+    "label": "Mogućnosti kanala {{channel}}",
+    "join": "Pridruži se kanalu",
     "follow": "Prati kanal",
     "unfollow": "Prestani pratiti kanal",
     "following": "Pratiš",
@@ -44,7 +44,7 @@
       "enter": "Ulazak",
       "speak": "Govor",
       "textMessage": "Tekst",
-      "whisper": "Šapat",
+      "whisper": "Šaptanje",
       "listen": "Slušanje",
       "write": "Pisanje ACL-a"
     },
@@ -70,7 +70,7 @@
     "close": "Zatvori"
   },
   "badge": {
-    "music": "Profil glazbe",
+    "music": "Glazbeni profil",
     "jam": "Jam profil"
   },
   "audio": {
@@ -100,7 +100,7 @@
     "bitrateDefault": "Zadano, {{value}}",
     "serverLimit": "Ograničenje poslužitelja {{kbps}} kbit/s",
     "noServerLimit": "Bez ograničenja poslužitelja",
-    "note": "Primjenjuje se kad uđete u ovaj kanal, samo na ovom uređaju. Ostali nisu pogođeni. Informacije o vezi označavaju ove vrijednosti s „(profil kanala)”.",
+    "note": "Primjenjuje se kad se pridružiš ovom kanalu, samo na ovom uređaju. Na druge to ne utječe. Informacije o vezi označavaju ove vrijednosti s „(profil kanala)“.",
     "saveFailed": "Audioprofil nije moguće spremiti.",
     "remove": "Ukloni profil",
     "cancel": "Odustani",

@@ -86,7 +86,7 @@
     "musicQualityHint": "Musiikkiin viritetty enkooderi; kohinanvaimennus pois päältä.",
     "musicIncluded": "Sisältyy, kun pienen viiveen tila on päällä.",
     "lowLatency": "Pienen viiveen tila",
-    "lowLatencyHint": "Pienimmät paketit. Enemmän kaistanleveyttä, vähemmän kestävä.",
+    "lowLatencyHint": "Pienimmät paketit. Enemmän kaistaa, alttiimpi häiriöille.",
     "beta": "Beta",
     "on": "päällä",
     "off": "pois",

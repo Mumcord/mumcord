@@ -4,7 +4,7 @@
     "members": "Μέλη",
     "activity": "Δραστηριότητα"
   },
-  "you": "Εσείς",
+  "you": "Εσύ",
   "selfName": "σου",
   "someone": "κάποιος",
   "verb": {
@@ -28,9 +28,9 @@
   "yesterday": "Χθες",
   "empty": "Δεν υπάρχει δραστηριότητα ακόμη.",
   "rowLabel": {
-    "screenShare": "{{action}} κοινή χρήση οθόνης {{name}}",
-    "watchParty": "{{action}} κοινή προβολή {{name}}",
-    "pluginActivity": "{{action}} {{plugin}} {{name}}",
+    "screenShare": "{{action}}: κοινή χρήση οθόνης {{name}}",
+    "watchParty": "{{action}}: κοινή προβολή {{name}}",
+    "pluginActivity": "{{action}}: {{plugin}} {{name}}",
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Η συμμετοχή στην κοινή προβολή απέτυχε.",

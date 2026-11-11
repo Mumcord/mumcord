@@ -36,7 +36,7 @@
     "output": "Vyrovnávacia pamäť reproduktorov",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms",
-    "soundServerBlock": "Zvukový server dodáva bloky {{value}} ms, pretože iná aplikácia ich vyžaduje; Mumcord ich nemôže zmenšiť."
+    "soundServerBlock": "Zvukový server dodáva bloky po {{value}} ms, pretože ich vyžaduje iná aplikácia; Mumcord ich nemôže zmenšiť."
   },
   "media": {
     "controls": "Ovládanie prehrávača",
@@ -48,13 +48,13 @@
     "volume": "Hlasitosť",
     "syncedPlay": "Synchronizované",
     "keys": "Medzerník · ← → · M · F · Esc",
-    "inControl": "{{name}} má kontrolu",
+    "inControl": "Ovláda {{name}}",
     "inSync": "Synchronizované",
     "inSyncAll": "Všetci synchronizovaní",
     "inSyncExcept": "Všetci synchronizovaní okrem {{count}}",
-    "buffering": "Načítava",
+    "buffering": "Načítava sa",
     "behind": "{{seconds}} s pozadu",
-    "ahead": "{{seconds}} s vpredu",
+    "ahead": "{{seconds}} s napred",
     "noReport": "Bez hlásenia",
     "you": "ty",
     "host": "Hostiteľ",
@@ -75,9 +75,9 @@
       "valueText": "{{percent}} % výšky okna",
       "ofWindow": "výšky okna",
       "chatMinimum": "chat si drží minimum",
-      "release": "pusti na zbalenie",
+      "release": "pusti a zbalí sa",
       "keys": "↑ ↓ zmena veľkosti · PageUp/PageDown prichytenie · Home/End · Enter obnoví",
-      "releaseHint": "Pusti na zbalenie do malého pruhu",
+      "releaseHint": "Pusti a zbalí sa do malého pruhu",
       "minimised": "Oblasť médií je zbalená"
     },
     "stage": {

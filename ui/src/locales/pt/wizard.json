@@ -33,6 +33,7 @@
     "voice": "Voz",
     "setupStyle": "Estilo de configuração",
     "privateMessages": "Mensagens privadas",
+    "notifications": "Notificações",
     "connections": "Ligações",
     "features": "Funcionalidades",
     "appearance": "Aspeto",
@@ -82,7 +83,7 @@
   },
   "mic": {
     "input": "Microfone",
-    "output": "Colunas ou auscultadores",
+    "output": "Altifalantes ou auscultadores",
     "systemDefault": "Predefinição do sistema",
     "defaultVia": "Predefinição do sistema ({{backend}})",
     "level": "Nível do microfone",
@@ -119,7 +120,7 @@
       "title": "Equilibrado",
       "subtitle": "Entre privacidade e conforto",
       "p1": "Só amigos e pessoas do teu canal podem enviar-te mensagens",
-      "p2": "Ligação direta, com um relay como alternativa",
+      "p2": "Ligação direta, com um retransmissor como alternativa",
       "p3": "Pré-visualizações de ligações e imagens em tamanho real estão ativadas",
       "p4": "O que jogas e o que ouves permanece privado"
     },
@@ -127,7 +128,7 @@
       "title": "Privacidade máxima",
       "subtitle": "Partilhar o mínimo possível",
       "p1": "Só amigos podem enviar-te mensagens, sem exceções",
-      "p2": "O teu IP está oculto; tudo passa pelo relay",
+      "p2": "O teu IP está oculto; tudo passa pelo retransmissor",
       "p3": "Sem conteúdo externo, sem sincronização do histórico, sem partilha",
       "p4": "As atualizações só te notificam; nada é partilhado sobre o que fazes"
     },
@@ -145,6 +146,10 @@
     "title": "Quem te pode enviar mensagens?",
     "subtitle": "As mensagens privadas são conversas a dois. O chat do canal não é afetado por esta escolha.",
     "local": "A filtragem acontece no teu computador. Os remetentes não são avisados. Mais tarde podes definir uma regra diferente por servidor."
+  },
+  "notifications": {
+    "title": "Como deve o Mumcord avisar-te?",
+    "subtitle": "Escolhe como cada tipo de novidade chega até ti. Podes alterá-lo mais tarde em Definições → Notificações."
   },
   "connections": {
     "title": "Ligações e conteúdo",
@@ -185,6 +190,7 @@
       "identity": "Identidade",
       "voice": "Voz",
       "privateMessages": "Mensagens privadas",
+      "notifications": "Notificações",
       "connections": "Ligações",
       "chatContent": "Conteúdo do chat",
       "features": "Funcionalidades",
@@ -195,10 +201,12 @@
     "identityDetail": "Guardada no porta-chaves do sistema",
     "voiceDetail": "Supressão de ruído: {{noise}}",
     "pmDetail": "O meu canal {{channel}} · conversas aceites {{accepted}} · pedidos {{requests}}",
+    "notificationsTitle": "Novas mensagens: {{mode}}",
+    "notificationsDetail": "Notificações de atividade: {{on}} de {{total}} ativadas",
     "contentTitle": "Pré-visualizações de ligações {{previews}}",
     "contentDetail": "Imagens em tamanho real {{images}} · sincronização do histórico {{sync}}",
     "featuresTitle": "Sobreposição no jogo {{overlay}}",
-    "featuresDetail": "Seguir o Não incomodar do sistema {{dnd}} · a reproduzir {{playing}} · a jogar {{gaming}}",
+    "featuresDetail": "Seguir o Não incomodar do sistema {{dnd}} · a reproduzir {{playing}} · a jogar {{gaming}} · histórico de atividade {{history}}",
     "effectsDetail": "Efeitos visuais {{effects}}",
     "startupTitle": "Arrancar ao iniciar sessão {{login}}",
     "startupDetail": "Arrancar minimizado {{minimized}} · ligações mumble:// {{links}}",
@@ -214,11 +222,45 @@
   },
   "rerun": {
     "title": "Assistente de configuração",
-    "note": "Está a repetir a configuração. A sua identidade não é alterada.",
+    "note": "Estás a repetir a configuração. A tua identidade não é alterada.",
     "manageIdentities": "Gerir identidades",
     "discardTitle": "Descartar as alterações?",
-    "discardBody": "Nada é guardado antes de terminar. Se cancelar agora, tudo fica como está.",
+    "discardBody": "Nada é guardado antes de terminares. Se cancelares agora, tudo fica como está.",
     "discardKeep": "Continuar a editar",
     "discardConfirm": "Descartar alterações"
+  },
+  "guide": {
+    "label": "Dica do Aaron",
+    "from": "Dica do Aaron",
+    "hide": "Ocultar o Aaron",
+    "show": "Mostrar o Aaron",
+    "titles": {
+      "welcome": "Bem-vindo a bordo",
+      "import": "Traz as tuas coisas do Mumble",
+      "identity": "O teu nome nos servidores",
+      "voice": "Escolhe o teu microfone",
+      "setupStyle": "Escolhe um estilo",
+      "privateMessages": "Quem te pode escrever",
+      "notifications": "As tuas notificações",
+      "connections": "Ligações diretas",
+      "features": "Escolhe os teus extras",
+      "appearance": "Escolhe o teu aspeto",
+      "startup": "Arranque do Mumcord",
+      "summary": "Revê as tuas escolhas"
+    },
+    "hints": {
+      "welcome": "Olá, sou o Aaron! Vou guiar-te pela configuração. Demora só um minuto.",
+      "import": "Estes são os servidores e as definições encontrados no Mumble. Escolhe o que queres manter.",
+      "identity": "A tua identidade é o teu nome nos servidores. Cria uma nova ou importa uma existente.",
+      "voice": "Escolhe aqui o microfone em que falas e diz olá: a barra verde deve dançar.",
+      "setupStyle": "Escolhe um estilo. Podes alterar cada definição mais tarde.",
+      "privateMessages": "Escolhe quem te pode enviar mensagens privadas. Os remetentes nunca são avisados.",
+      "notifications": "Escolhe como cada tipo de novidade chega até ti, ou desativa-o.",
+      "connections": "Escolhe se o Mumcord te pode ligar diretamente a outros utilizadores do Mumcord.",
+      "features": "Ativa só os extras de que gostas. Cada cartão diz quem o pode ver.",
+      "appearance": "Claro, escuro ou como o teu sistema: escolhe aqui o teu aspeto.",
+      "startup": "Escolhe como o Mumcord arranca quando inicias sessão no computador.",
+      "summary": "Tudo pronto! Revê aqui as tuas escolhas; Editar leva-te de volta a qualquer passo."
+    }
   }
 }

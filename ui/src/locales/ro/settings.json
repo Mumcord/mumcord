@@ -31,7 +31,7 @@
     "gaming": "Suprapunerea din joc, audio poziționat și pluginuri pentru jocuri.",
     "advanced": "Instrumente pentru dezvoltatori, diagnosticare, stocare și licențe.",
     "about": "Versiune, asistență și asistentul de configurare.",
-    "plugins": "Pluginurile rulează într-un mediu izolat și primesc doar ce permiteți. Nu vă văd niciodată sunetul, fișierele sau certificatul.",
+    "plugins": "Pluginurile rulează într-un mediu izolat și primesc doar ce permiți. Nu îți văd niciodată sunetul, fișierele sau certificatul.",
     "screenSharing": "Calitate, codec și hardware pentru partajarea ecranului. Spectatorii văd mereu ce alegi înainte de a începe.",
     "camera": "Camera ta, efectele de fundal și modul în care vezi camerele celorlalți. Partajarea camerei necesită un server cu releu mumpeer."
   },
@@ -39,7 +39,7 @@
   "moreInfo": "Mai multe informații: {{topic}}",
   "searchTerms": {
     "devices": "intrare ieșire căști difuzor placă de sunet",
-    "talkMode": "PTT VAD activitate vocală scurtătură",
+    "talkMode": "PTT VAD activitate vocală comandă rapidă",
     "noiseSuppression": "zgomot de fundal eliminare zgomot",
     "p2p": "P2P releu conexiuni directe ascunde adresa mea IP",
     "theme": "mod întunecat mod luminos culori",
@@ -128,7 +128,7 @@
     "deleteWarning": "Fără o copie de siguranță se pierd numele și permisiunile înregistrate cu această identitate pe servere. Nu se poate anula.",
     "deleteNewDefault": "{{identity}} devine identitatea implicită.",
     "lastIdentity": "Mumcord are nevoie de cel puțin o identitate. Creează alta înainte de a o șterge pe aceasta.",
-    "backupFirst": "Copie de siguranță mai întâi",
+    "backupFirst": "Fă întâi o copie de siguranță",
     "typeToConfirm": "Scrie eticheta identității pentru confirmare",
     "typeToConfirmHint": "Scrie exact „{{identity}}” pentru a activa Șterge.",
     "deleted": "Identitate ștearsă.",
@@ -151,7 +151,7 @@
     "testRecording": "Se înregistrează… vorbește acum.",
     "testPlaying": "Se redă vocea ta…",
     "musicQuality": "Calitate pentru muzică",
-    "musicQualityHint": "Folosește mai multă lățime de bandă și oprește suprimarea zgomotului și volumul automat; pentru muzică. Merge cel mai bine cu push-to-talk.",
+    "musicQualityHint": "Optimizează encoderul pentru muzică și oprește suprimarea zgomotului și volumul automat. Merge cel mai bine cu push-to-talk.",
     "bitrate": "Rată de biți",
     "bitrateMax": "Max.",
     "bitrateValue": "{{kbps}} kbit/s",
@@ -166,9 +166,9 @@
     "lowLatencyHint": "Pentru a cânta împreună în timp real",
     "lowLatencyWarningTitle": "Sacrifică robustețea pentru viteză",
     "lowLatencyBandwidth": "Folosește mai multă lățime de bandă (pachete de 10 ms).",
-    "lowLatencyWifi": "Poate avea întreruperi pe Wi-Fi sau pe o conexiune aglomerată; folosiți un cablu dacă puteți.",
-    "lowLatencyHeadphones": "Folosiți căști: anularea ecoului este oprită (la fel și suprimarea zgomotului și volumul automat).",
-    "lowLatencyPtt": "Se recomandă apăsarea pentru a vorbi sau un prag manual de activare vocală."
+    "lowLatencyWifi": "Poate avea întreruperi pe Wi-Fi sau pe o conexiune aglomerată; folosește un cablu dacă poți.",
+    "lowLatencyHeadphones": "Folosește căști: anularea ecoului este oprită (la fel și suprimarea zgomotului și volumul automat).",
+    "lowLatencyPtt": "Se recomandă Push-to-talk sau un prag manual de activare vocală."
   },
   "voice": {
     "talkMode": "Mod de vorbire",
@@ -176,8 +176,8 @@
     "voiceActivation": "Activare vocală – transmite când vorbești",
     "pushToTalk": "Push-to-talk – transmite cât ții apăsată o tastă",
     "unavailable": {
-      "waylandNoPortal": "Push-to-talk nu e disponibil: desktopul tău nu oferă scurtături globale.",
-      "registrationFailed": "Push-to-talk nu e disponibil: scurtătura nu a putut fi înregistrată.",
+      "waylandNoPortal": "Push-to-talk nu e disponibil: desktopul tău nu oferă comenzi rapide globale.",
+      "registrationFailed": "Push-to-talk nu e disponibil: comanda rapidă nu a putut fi înregistrată.",
       "mouseDisabled": "Push-to-talk nu e disponibil: pentru butonul de mouse trebuie activat „Permite butoanele mouse-ului”.",
       "mouseNeedsInputGroup": "Push-to-talk nu e disponibil: Mumcord nu are încă voie să-ți citească mouse-ul (vezi mai jos).",
       "mouseNeedsAccessibility": "Push-to-talk nu e disponibil: Mumcord are nevoie de permisiunea Accesibilitate ca să vadă butoanele mouse-ului."
@@ -188,11 +188,11 @@
     "keySet": "Setează tasta",
     "keyChange": "Schimbă tasta",
     "keyListening": "Apasă o tastă… (Escape pentru anulare)",
-    "keyWaiting": "Confirmă scurtătura în dialogul desktopului sau atribuie-o în fereastra System Settings care se deschide…",
+    "keyWaiting": "Confirmă comanda rapidă în dialogul desktopului sau atribuie-o în fereastra System Settings care se deschide…",
     "keyCancel": "Anulează",
     "keyMissing": "Setează o tastă, altfel nu te aude nimeni.",
     "keyRejected": "Tasta nu poate fi folosită. Încearcă alta, eventual cu Ctrl, Alt sau Shift.",
-    "keyNotConfirmed": "Desktopul nu a confirmat scurtătura. Încearcă din nou și acceptă dialogul sistemului sau atribuie tasta în setările de scurtături ale desktopului.",
+    "keyNotConfirmed": "Desktopul nu a confirmat comanda rapidă. Încearcă din nou și acceptă dialogul sistemului sau atribuie tasta în setările de comenzi rapide ale desktopului.",
     "processing": "Procesare și calitate",
     "noiseSuppression": "Suprimarea zgomotului",
     "noiseSuppressionHint": "Filtrează zgomotul de fundal, cum ar fi tastaturile și ventilatoarele.",
@@ -205,17 +205,17 @@
     "noiseChoiceHint": {
       "light": "Filtru clasic pentru zgomot constant, cum ar fi ventilatoarele sau bâzâitul. Cea mai mică utilizare a procesorului.",
       "standard": "Filtru AI pentru zgomotul de zi cu zi, cum ar fi tastaturile și ventilatoarele. Utilizare redusă a procesorului.",
-      "advanced": "Model AI mai nou care elimină și zgomotul variabil. Aproximativ de trei ori procesorul variantei Standard și 10 ms întârziere în plus."
+      "advanced": "Model AI mai nou care elimină și zgomotul variabil. Folosește de circa trei ori mai mult procesor decât Standard și adaugă 10 ms întârziere."
     },
     "noiseChoiceBeta": "Beta",
     "noiseChoiceTipLabel": "Despre {{choice}}",
-    "detectorHint": "Activarea vocală detectează vorbirea cu modelul RNNoise; nu îți schimbă audio-ul.",
+    "detectorHint": "Activarea vocală detectează vorbirea cu modelul RNNoise; nu îți schimbă sunetul.",
     "echoCancellation": "Anularea ecoului",
     "echoCancellationHint": "Îi împiedică pe ceilalți să se audă pe ei înșiși când folosești difuzoare.",
     "autoGain": "Volum automat",
     "connecting": "Conectare",
     "connectMuted": "Conectează-mă cu microfonul oprit până intru într-un canal",
-    "connectMutedHint": "Când e oprit, te conectezi direct cu ultima setare de microfon și sunet, în loc să doar asculți.",
+    "connectMutedHint": "Când e oprit, te conectezi direct cu ultima setare de microfon și sunet, în loc să asculți doar.",
     "autoGainHint": "Îți menține vocea la un nivel constant.",
     "keyListeningMouse": "Apasă o tastă sau un buton de mouse (din mijloc sau lateral)… (Escape pentru anulare)",
     "mouse": {
@@ -228,7 +228,7 @@
     "mouseInputGroup": "Mumcord nu are încă voie să-ți citească mouse-ul. Adaugă-te în grupul „input” rulând această comandă într-un terminal:",
     "mouseLogOut": "Apoi deconectează-te din sesiune și autentifică-te din nou. Până atunci, folosește o tastă sau activarea vocală.",
     "mouseNoDevice": "Nu s-a găsit niciun mouse. Conectează unul; Mumcord îl detectează automat.",
-    "mouseAccessibility": "Ca să folosești butoanele mouse-ului, permite Mumcord în System Settings → Privacy & Security → Accessibility, apoi repornește Mumcord.",
+    "mouseAccessibility": "Ca să folosești butoanele mouse-ului, permite Mumcord în Configurări sistem → Confidențialitate și securitate → Accesibilitate, apoi repornește Mumcord.",
     "compatMode": "Mod de compatibilitate (X11)",
     "compatModeHint": "Mumcord rulează prin stratul de compatibilitate X11 al desktopului, așa că push-to-talk merge fără dialog al desktopului și fără grupul „input”. Desktopul tău decide ce poate vedea Mumcord: în KDE, la System Settings → Legacy X11 App Support. Implicit merg doar combinațiile de taste și tastele modificatoare; butoanele mouse-ului doar dacă le permiți acolo. Este mai puțin izolat decât varianta modernă.",
     "compatRestartNeeded": "Se aplică după ce Mumcord repornește. Vei fi deconectat pentru scurt timp.",
@@ -253,7 +253,7 @@
     "threshold": "Pragul activării vocale",
     "thresholdValue": "{{value}} dBFS",
     "thresholdHint": "Trage glisorul peste indicator. Mumcord transmite cât timp nivelul e peste linie, plus un scurt moment după.",
-    "measure": "Arată nivelul live",
+    "measure": "Arată nivelul în timp real",
     "measuring": "Se măsoară… vorbește acum",
     "whisper": {
       "title": "Ținte pentru șoapte și strigăte",
@@ -261,7 +261,7 @@
       "edit": "Editează ținta",
       "new": "Țintă nouă",
       "empty": "Încă nu există ținte. Creează una aici sau cu „Șoptește către…” din meniul unei persoane sau al unui canal.",
-      "hint": "Ține apăsată tasta ca să vorbești țintei. Eliberează-o ca să revii la canalul tău. Funcționează pe orice server Mumble.",
+      "hint": "Ține apăsată tasta ca să vorbești cu ținta. Eliberează-o ca să revii la canalul tău. Funcționează pe orice server Mumble.",
       "name": "Nume",
       "receiversLegend": "Cine te aude",
       "people": "Persoane",
@@ -288,8 +288,8 @@
       "keyListening": "Apasă o tastă…",
       "keyRemove": "Elimină tasta",
       "keyTaken": "Această tastă nu poate fi folosită: nu este o singură tastă cu modificatori opționali sau este deja push-to-talk ori tasta altei ținte.",
-      "keyFailed": "Această tastă este ținută de altă aplicație, deci acum nu funcționează.",
-      "keysWayland": "Tastele pentru șoapte nu sunt disponibile în această sesiune Wayland: desktopul tău nu oferă scurtături globale. Activează modul de compatibilitate ca să le folosești sau începe să șoptești din panoul utilizatorului.",
+      "keyFailed": "Această tastă este ocupată de altă aplicație, deci acum nu funcționează.",
+      "keysWayland": "Tastele pentru șoaptă nu sunt disponibile în această sesiune Wayland: desktopul tău nu oferă comenzi rapide globale. Activează modul de compatibilitate ca să le folosești sau începe să șoptești din panoul utilizatorului.",
       "save": "Salvează",
       "delete": "Șterge ținta",
       "savedStatus": "Salvat.",
@@ -339,11 +339,11 @@
     "behaviour": "Pornire și fereastră",
     "closeLegend": "Când închizi fereastra în timp ce ești conectat",
     "closeAsk": "Întreabă de fiecare dată",
-    "closeTray": "Minimizează în tray",
+    "closeTray": "Minimizează în zona de notificare",
     "closeQuit": "Închide Mumcord",
     "autostart": "Pornește Mumcord când mă autentific",
     "startMinimized": "Pornește minimizat",
-    "startMinimizedHint": "Când Mumcord pornește la autentificare, așteaptă în tray în loc să deschidă fereastra.",
+    "startMinimizedHint": "Când Mumcord pornește la autentificare, așteaptă în zona de notificare în loc să deschidă fereastra.",
     "look": "Aspect și aranjare"
   },
   "themeEditor": {
@@ -385,7 +385,7 @@
     "importUnreadable": "Această temă nu este suficient de lizibilă.",
     "imported": "„{{name}}” importată.",
     "alreadyImported": "„{{name}}” este deja în temele tale.",
-    "madeWithNewer": "Creat cu Mumcord {{version}} – actualizează ca să o vezi complet.",
+    "madeWithNewer": "Creată cu Mumcord {{version}} – actualizează ca s-o vezi complet.",
     "reset": "Resetează",
     "menuLabel": "Opțiuni pentru {{name}}",
     "edit": "Editează tema",
@@ -433,7 +433,7 @@
     "quit": "Închizi Mumcord în timp ce ești într-un canal vocal",
     "channelSwitch": "Treci pe alt canal în timp ce ești pe voce",
     "kicked": "Ești dat afară de pe un server",
-    "banned": "Ești interzis pe un server",
+    "banned": "Primești interdicție pe un server",
     "messages": "Mesaj nou într-un canal urmărit sau într-un chat privat",
     "mention": "Sunet când ești menționat",
     "mentionNotify": "Notificare când ești menționat",
@@ -447,12 +447,16 @@
   },
   "notifications": {
     "title": "Notificări",
-    "legend": "Notificări pentru mesaje noi",
-    "explanation": "Pentru mesajele noi din canalul tău, din canalele urmărite și din chaturile private, cu excepția chatului pe care îl vezi.",
-    "inApp": "În aplicație: un mic pop-up în Mumcord cât timp e în prim-plan",
-    "desktop": "Desktop: o notificare de sistem",
-    "both": "Ambele: pop-up cât timp Mumcord e în prim-plan, altfel notificare de sistem",
-    "off": "Oprit",
+    "explanation": "Cum te anunță Mumcord despre mesajele noi și despre ce se întâmplă pe serverele tale. Fiecare tip are alegerea lui.",
+    "messages": "Mesaje noi",
+    "messagesHint": "Canalul tău, canalele urmărite și conversațiile private",
+    "mode": {
+      "off": "Oprit",
+      "inApp": "În aplicație",
+      "desktop": "Sistem",
+      "both": "Ambele"
+    },
+    "modesHint": "În aplicație: un mic pop-up în Mumcord cât timp e în prim-plan. Sistem: o notificare de la sistemul tău de operare. Ambele: pop-up-ul cât timp Mumcord e în prim-plan, altfel o notificare de sistem. Nu se afișează nimic pentru conversația pe care o vezi sau în timpul Nu deranja.",
     "activityTitle": "Notificări de activitate",
     "activity": {
       "screenShare": "Cineva începe o partajare de ecran",
@@ -469,16 +473,16 @@
       "topRight": "Dreapta sus",
       "bottomLeft": "Stânga jos",
       "bottomRight": "Dreapta jos",
-      "custom": "Personalizată (mutat)"
+      "custom": "Personalizată (mutată)"
     },
     "opacity": "Opacitate",
     "inGame": {
-      "title": "Overlay în joc",
+      "title": "Suprapunere în joc",
       "explanation": "Arată cine vorbește în jocurile tale. Pornește singur când începe un joc și apare doar în jocuri.",
-      "mode": "Overlay în joc",
+      "mode": "Suprapunere în joc",
       "off": "Oprit",
       "on": "Pornit",
-      "antiCheat": "Unele jocuri cu protecție anti-cheat consideră orice overlay ca trișare și pot bana contul. Acele jocuri sunt oprite implicit, chiar dacă opțiunea e Pornit.",
+      "antiCheat": "Unele jocuri cu protecție anti-cheat consideră orice suprapunere drept trișare și pot bloca contul. Aceste jocuri sunt oprite implicit, chiar dacă opțiunea e Pornit.",
       "games": "Jocuri",
       "noGames": "Încă nu e cunoscut niciun joc. Jocurile apar aici după ce sunt detectate.",
       "running": "Rulează acum",
@@ -489,9 +493,9 @@
       "options": "Opțiuni pentru {{game}}",
       "reset": "Folosește setarea implicită pentru {{game}}",
       "size": "Dimensiune",
-      "unsupported": "Overlay-ul în joc nu e disponibil pe acest sistem. Se folosește în schimb overlay-ul în fereastră de mai sus.",
-      "loadFailed": "Setările overlay-ului în joc nu au putut fi încărcate.",
-      "saveFailed": "Modificarea overlay-ului în joc nu a putut fi aplicată.",
+      "unsupported": "Suprapunerea în joc nu e disponibilă pe acest sistem.",
+      "loadFailed": "Setările suprapunerii în joc nu au putut fi încărcate.",
+      "saveFailed": "Modificarea suprapunerii în joc nu a putut fi aplicată.",
       "opengl": {
         "title": "Jocuri OpenGL",
         "explanation": "Necesar doar pentru jocurile OpenGL: lipește în opțiunile de lansare Steam ale jocului.",
@@ -500,13 +504,13 @@
         "copied": "Copiat",
         "copyFailed": "Copierea a eșuat. Selectează textul și copiază-l manual."
       },
-      "confirmTitle": "Activezi overlay-ul pentru {{game}}?",
-      "confirmMessage": "Atenție: {{game}} folosește protecție anti-cheat ({{reason}}). Overlay-urile pot fi detectate ca trișare, iar contul tău poate fi banat. Mumcord nu răspunde pentru asta. Continuă doar dacă accepți acest risc.",
+      "confirmTitle": "Activezi suprapunerea pentru {{game}}?",
+      "confirmMessage": "Atenție: {{game}} folosește protecție anti-cheat ({{reason}}). Suprapunerile pot fi detectate ca trișare, iar contul tău poate fi blocat. Mumcord nu răspunde pentru asta. Continuă doar dacă accepți acest risc.",
       "confirmEnable": "Activează oricum",
       "limits": {
-        "libraryMissing": "Overlay-ul în joc nu e disponibil: biblioteca sa (libmumcord_overlay_layer.so) nu a fost găsită lângă Mumcord. Reinstalează Mumcord ca s-o restaurezi. Se folosește în schimb overlay-ul în fereastră de mai sus.",
+        "libraryMissing": "Suprapunerea în joc nu e disponibilă: biblioteca sa (libmumcord_overlay_layer.so) nu a fost găsită lângă Mumcord. Reinstalează Mumcord ca s-o restaurezi.",
         "windowsFullscreen": "Folosește în joc ecran complet fără margini sau în fereastră.",
-        "macos": "macOS nu acceptă overlay-uri în joc. Se folosește în schimb overlay-ul în fereastră de mai sus."
+        "macos": "macOS nu acceptă suprapuneri în joc."
       }
     }
   },
@@ -530,7 +534,20 @@
     "copyWhole": "Copiază tot jurnalul",
     "openLogFolder": "Deschide folderul jurnalelor",
     "logCopied": "Jurnal copiat.",
-    "fileLabel": "Fișier de diagnosticare"
+    "fileLabel": "Fișier de diagnosticare",
+    "writeToDisk": "Scrie jurnalele pe disc",
+    "writeToDiskHint": "Când e dezactivat, jurnalul rămâne doar în memorie pentru această sesiune — nu se scrie nimic pe disc.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Versiune",
@@ -554,7 +571,18 @@
     "setupWizardRun": "Rulează din nou asistentul de configurare",
     "setupWizardIdentityNote": "Identitatea ta nu face parte din asta. Certificatul tău, împreună cu numele înregistrat și permisiunile pe servere, rămâne exact așa cum este.",
     "setupWizardIdentityLink": "Gestioneaz-o în Identitate",
-    "versionTitle": "Versiune și licență"
+    "tipsTitle": "Sfaturi",
+    "tipsHint": "Aaron îți arată Mumcord în aproximativ un minut: servere, canale, voce, chat și altele.",
+    "tipsShow": "Afișează sfaturile",
+    "versionTitle": "Versiune și licență",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profil",
@@ -587,7 +615,7 @@
     "hint": "Previzualizările de linkuri, miniaturile și imaginile externe sunt păstrate pe acest computer ca să se încarce mai repede. Cele vechi sunt eliminate automat.",
     "never": "Niciodată",
     "clearNow": "Golește acum",
-    "cleared": "Cache golit, {{size}} eliberați."
+    "cleared": "Cache golit, s-au eliberat {{size}}."
   },
   "cache": {
     "title": "Stocare",
@@ -667,7 +695,7 @@
   "p2p": {
     "title": "Peer-to-peer (partajarea ecranului, imagini la dimensiune completă)",
     "modeLabel": "Mod peer-to-peer",
-    "explanation": "Direct îi arată celeilalte persoane adresa ta IP. Releul o ascunde de ea; operatorul releului (comunitatea acestui server) o poate vedea. Ambele sunt criptate end-to-end.",
+    "explanation": "Direct îi arată celeilalte persoane adresa ta IP. Releul o ascunde de ea; operatorul releului (comunitatea acestui server) o poate vedea. Ambele sunt criptate integral.",
     "useGlobal": "Folosește setarea globală",
     "overrideHint": "Doar pentru acest server. „Folosește setarea globală” urmează Setări → Confidențialitate.",
     "mode": {
@@ -762,7 +790,7 @@
       "nowplaying": "Stare „ascultă acum”",
       "p2p": "Stabilirea conexiunii directe",
       "screen": "Semnal de partajare a ecranului",
-      "watch": "Starea sesiunii de vizionare",
+      "watch": "Starea vizionării comune",
       "plugin": "Date plugin",
       "mumble": "Mesaj Mumble",
       "peer": "Configurarea releului"
@@ -830,7 +858,7 @@
     "keepRequests": "Păstrează mesajele de la clienții standard ca cereri de mesaje",
     "keepRequestsHint": "Se folosește doar cu „Doar prieteni”. Când este dezactivată, aceste mesaje sunt ignorate.",
     "overrideTitle": "Excepție pe server",
-    "overrideLabel": "Mesaje private de la pe {{server}}",
+    "overrideLabel": "Mesaje private pe {{server}} de la",
     "useDefault": "Folosește valoarea implicită ({{rule}})",
     "noServers": "Încă nu există servere salvate.",
     "alwaysTitle": "Mereu permise",
@@ -850,7 +878,7 @@
   },
   "blocked": {
     "title": "Utilizatori blocați",
-    "hint": "Blocările sunt păstrate doar pe acest computer. Utilizatorii blocați sunt reduși la tăcere pentru tine, iar mesajele și datele lor Mumcord sunt ignorate.",
+    "hint": "Blocările sunt păstrate doar pe acest computer. Pentru tine, utilizatorii blocați au sunetul dezactivat, iar mesajele și datele lor Mumcord sunt ignorate.",
     "empty": "Nu ai blocat pe nimeni.",
     "user": "Utilizator",
     "server": "Server",
@@ -876,7 +904,7 @@
     "installedFrom": "Mumcord {{version}} · instalat din {{source}}",
     "install": {
       "appImage": "AppImage",
-      "appImageReadOnly": "un AppImage într-un dosar doar pentru citire",
+      "appImageReadOnly": "un AppImage într-un folder doar pentru citire",
       "windowsInstaller": "programul de instalare pentru Windows",
       "windowsPortable": "zip-ul portabil pentru Windows",
       "macApp": "aplicația macOS",
@@ -892,6 +920,16 @@
     "modeNotify": "Doar notifică",
     "modeOff": "Dezactivat",
     "autoUnavailable": "Această copie nu se poate actualiza singură, așa că Mumcord doar te anunță despre versiunile noi.",
+    "channel": "Canal de actualizări",
+    "channelHint": "Alege ce versiuni oferă Mumcord. Versiunile candidat sunt build-uri timpurii ale următoarei versiuni.",
+    "channels": {
+      "stable": { "name": "Stabilă", "hint": "Doar versiuni finale" },
+      "releaseCandidates": {
+        "name": "Versiuni candidat",
+        "hint": "Build-uri timpurii ale următoarei versiuni; pot conține erori"
+      }
+    },
+    "channelSwitchBack": "Dacă revii la Stabil, îți păstrezi versiunea curentă până apare următoarea versiune finală.",
     "interval": "Caută actualizări",
     "intervalHint_one": "La pornire și în fiecare oră",
     "intervalHint_few": "La pornire și la fiecare {{count}} ore",
@@ -924,9 +962,9 @@
     "skipped": "Versiune omisă",
     "skippedHint": "Versiunea {{version}} este omisă și nu va mai fi oferită.",
     "stopSkipping": "Nu mai omite",
-    "whatsNew": "Ce e nou",
+    "whatsNew": "Noutăți",
     "whatsNewHint": "Vezi modificările din fiecare versiune.",
-    "openChangelog": "Deschide jurnalul de modificări"
+    "openChangelog": "Deschide lista de modificări"
   },
   "badges": {
     "changed": "Modificat",
@@ -1037,7 +1075,7 @@
       "toggleMute": "Oprește / pornește microfonul",
       "toggleDeafen": "Oprește / pornește sunetul",
       "toggleDnd": "Comută Nu deranja",
-      "joinLeaveVoice": "Intră în / ieși din voce",
+      "joinLeaveVoice": "Intră în / ieși din canalul vocal",
       "switchVoiceServer": "Schimbă serverul de voce",
       "switchChannel": "Treci la canalul…",
       "previousChannel": "Înapoi la canalul anterior",
@@ -1052,7 +1090,7 @@
     "notSet": "Nesetat",
     "defaultKey": "Implicit: {{key}}",
     "defaultNone": "Implicit: niciunul",
-    "useDefault": "Folosește implicit",
+    "useDefault": "Folosește valoarea implicită",
     "defaultBlockedInApp": "Inactiv: este comanda rapidă proprie a Mumcord pentru {{shortcut}}.",
     "defaultBlockedOther": "Inactiv: {{other}} îl folosește deja.",
     "recording": "Apasă o combinație de taste…",
@@ -1084,7 +1122,7 @@
   "developerMode": {
     "title": "Mod dezvoltator",
     "switch": "Mod dezvoltator",
-    "hint": "Adaugă o filă Dezvoltator la Pluginuri, unde poți încărca pluginuri nesemnate dintr-un dosar. Activează-l doar dacă îți creezi singur pluginurile."
+    "hint": "Adaugă o filă Dezvoltator la Pluginuri, unde poți încărca pluginuri nesemnate dintr-un folder. Activează-l doar dacă îți creezi singur pluginurile."
   },
   "newBadge": "Nou",
   "pluginSafety": {
@@ -1096,8 +1134,8 @@
   "pluginSounds": {
     "title": "Sunetele pluginurilor",
     "volume": "Volumul sunetelor pluginurilor",
-    "mute": "Oprește sunetul pluginurilor",
-    "hint": "Se aplică fiecărui sunet redat de un plugin. Sunetele pluginurilor sunt mai încet cât timp vorbesc oamenii.",
+    "mute": "Dezactivează sunetele pluginurilor",
+    "hint": "Se aplică fiecărui sunet redat de un plugin. Sunetele pluginurilor se aud mai încet cât timp vorbesc oamenii.",
     "meter": "Nivel de ieșire (depanare)"
   },
   "screenShare": {
@@ -1119,7 +1157,7 @@
     "codecTitle": "Codec video",
     "codec": "Codec video",
     "codecAuto": "Automat (recomandat)",
-    "codecAutoHint": "Mai întâi AV1 pe placa video, apoi AV1 pe procesor dacă o scurtă verificare arată că face față, altfel VP9. AV1 doar dacă îl poate reda toți spectatorii.",
+    "codecAutoHint": "Mai întâi AV1 pe placa video, apoi AV1 pe procesor dacă o scurtă verificare arată că face față, altfel VP9. AV1 doar dacă îl pot reda toți spectatorii.",
     "codecAv1": "AV1",
     "codecAv1Hint": "Cea mai clară imagine cu aceeași cantitate de date. Spectatorii care nu îl pot reda primesc VP9.",
     "codecVp9": "VP9",
@@ -1128,11 +1166,11 @@
     "codecOlder": "Spectatorii cu un Mumcord mai vechi primesc mereu VP9, indiferent ce alegi.",
     "hardwareTitle": "Accelerare hardware",
     "useGpu": "Folosește placa video când este disponibilă",
-    "useGpuHint": "Codifică AV1 pe placa video, deci partajarea consumă aproape deloc CPU. Dezactivat: AV1 folosește procesorul.",
+    "useGpuHint": "Codifică AV1 pe placa video, deci partajarea nu consumă aproape deloc procesor. Dezactivat: AV1 folosește procesorul.",
     "statusList": "Starea encoderului",
     "av1Encode": "Codificare AV1",
     "sound": "Sunet",
-    "askEachTime": "Întreabă-mă aceste setări la fiecare partajare",
+    "askEachTime": "Întreabă-mă de aceste setări la fiecare partajare",
     "av1Playback": "Redare AV1",
     "vp9Playback": "Redare VP9",
     "playbackHardware": "Prin hardware",
@@ -1203,16 +1241,16 @@
     "imageFilter": "Imagini",
     "close": "Închide",
     "privacyTitle": "Confidențialitate",
-    "lockOff": "Oprește camera mea când ecranul se blochează",
-    "privacyNote": "Camera ta pornește întotdeauna oprită și arată mai întâi o previzualizare. Se oprește când părăsești canalul sau te deconectezi. Doar persoanele din canalul tău vocal o pot vedea, prin releul acestui server, criptată end-to-end. Mumcord nu înregistrează niciodată camerele. Mumcord-ul celor care te privesc nu salvează niciodată imaginea ta pe disc, dar nu poate împiedica pe cineva să facă o captură de ecran cu sistemul său de operare.",
+    "lockOff": "Oprește-mi camera când ecranul se blochează",
+    "privacyNote": "Camera ta e întotdeauna oprită la început și arată mai întâi o previzualizare. Se oprește când părăsești canalul sau te deconectezi. Doar persoanele din canalul tău vocal o pot vedea, prin releul acestui server, criptată end-to-end. Mumcord nu înregistrează niciodată camerele. La cei care te privesc, Mumcord nu salvează niciodată imaginea ta pe disc, dar nu poate împiedica pe cineva să facă o captură de ecran cu sistemul său de operare.",
     "othersTitle": "Camerele celorlalți",
     "showCameras": "Afișează camerele",
     "showAlways": "Întotdeauna",
-    "showOnOpen": "Când deschid camera",
+    "showOnOpen": "Când deschid vizualizarea camerelor",
     "showNever": "Niciodată",
-    "showHint": "Întotdeauna deschide camera video când cineva din canalul tău pornește o cameră. Niciodată te ține doar pe voce și nu descarcă video.",
+    "showHint": "„Întotdeauna” deschide vizualizarea camerelor când cineva din canalul tău pornește o cameră. „Niciodată” te ține doar pe voce și nu descarcă video.",
     "dataSaver": "Economisire de date: cel mult 15 fps pentru toți",
-    "reduceMotion": "Reduce mișcarea: fără strălucire sau animație pe cadrul vorbitorului",
+    "reduceMotion": "Reducerea mișcării: fără strălucire sau animație pe cadrul vorbitorului",
     "reduceMotionHint": "Implicit urmează setarea de reducere a mișcării din sistem.",
     "errors": {
       "busy": "Camera s-a oprit: altă aplicație îți folosește camera.",
@@ -1281,11 +1319,23 @@
   },
   "activityHistory": {
     "title": "Istoricul activității",
+    "keep": "Păstrează istoricul activității după repornire",
+    "keepHint": "Salvează cine s-a conectat, a plecat, a schimbat canalul, a partajat ecranul sau a pornit o vizionare comună, ca fluxul să rămână și după repornire. Oprit: fluxul pornește gol de fiecare dată. Dezactivarea șterge ce a fost salvat.",
     "clear": "Șterge istoricul activității",
     "hint": "Elimină fluxul salvat pentru toate serverele.",
     "local": "Salvat doar pe acest dispozitiv.",
     "button": "Șterge istoricul",
     "confirm": "Ștergi istoricul activității tuturor serverelor? Acțiunea nu poate fi anulată.",
     "confirmButton": "Șterge"
+  },
+  "diskWrites": {
+    "title": "Mai puține scrieri pe disc",
+    "hint": "Mai puține scrieri uzează mai puțin discurile SSD. Fiecare comutator păstrează comportamentul actual când este activ.",
+    "durableSaves": "Așteaptă discul la fiecare salvare",
+    "durableSavesHint": "Când e dezactivat, se scrie mai puțin, dar la o pană de curent se pot pierde ultimele secunde de istoric și setări.",
+    "linkPreviewsOnDisk": "Păstrează previzualizările linkurilor pe disc",
+    "linkPreviewsOnDiskHint": "Când e dezactivat, previzualizările rămân doar în memorie pentru această sesiune.",
+    "pluginRegistryCache": "Păstrează o copie a registrului de pluginuri pe disc",
+    "pluginRegistryCacheHint": "Când e dezactivat, registrul este descărcat mereu din nou."
   }
 }

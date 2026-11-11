@@ -19,11 +19,11 @@
 
 use std::collections::VecDeque;
 use std::fmt::{self, Write as _};
-use std::io::{self, Write as _};
+use std::io::{self, BufWriter, Write as _};
 use std::path::Path;
 use std::str::FromStr;
 use std::sync::{Arc, Mutex, OnceLock, PoisonError};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use bovnar::Value;
 use serde::{Deserialize, Serialize};
@@ -38,6 +38,10 @@ const REDACTED: &str = "[redacted]";
 const RING_CAPACITY: usize = 500;
 const LOG_PREFIX: &str = "mumcord";
 const LOG_SUFFIX: &str = "log";
+/// Log lines are written in batches (spec 12 FR-12.1): the buffer is flushed this often.
+const FLUSH_INTERVAL: Duration = Duration::from_secs(5);
+/// Buffer capacity for the log file, so many small lines coalesce into one write.
+const LOG_BUF_CAPACITY: usize = 64 * 1024;
 
 /// Words in a field name that mark its value as personal or secret.
 const SENSITIVE_WORDS: &[&str] = &[
@@ -163,9 +167,50 @@ impl DiagnosticInfo {
     }
 }
 
-/// OS family and CPU architecture, e.g. `linux x86_64`.
+/// OS family, release where the system tells it, and CPU architecture, e.g. `linux x86_64` or
+/// `freebsd 15.1-RELEASE x86_64` (FR-13.31).
 pub fn os_description() -> String {
-    format!("{} {}", std::env::consts::OS, std::env::consts::ARCH)
+    match os_release() {
+        Some(release) => format!(
+            "{} {} {}",
+            std::env::consts::OS,
+            release,
+            std::env::consts::ARCH
+        ),
+        None => format!("{} {}", std::env::consts::OS, std::env::consts::ARCH),
+    }
+}
+
+/// The kernel release, where asking costs nothing: FreeBSD's `kern.osrelease`.
+#[cfg(target_os = "freebsd")]
+fn os_release() -> Option<String> {
+    let mut value = [0 as libc::c_char; 256];
+    let mut size = value.len();
+    // SAFETY: `value` and `size` match what the syscall writes, as `sysctlbyname` documents.
+    let status = unsafe {
+        libc::sysctlbyname(
+            c"kern.osrelease".as_ptr(),
+            value.as_mut_ptr().cast(),
+            &mut size,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    if status != 0 || size == 0 {
+        return None;
+    }
+    // SAFETY: the syscall wrote at most `size` bytes into the buffer and NUL-terminates it.
+    let bytes = unsafe { std::slice::from_raw_parts(value.as_ptr().cast::<u8>(), size) };
+    let text = bytes
+        .split(|byte| *byte == 0)
+        .next()
+        .filter(|it| !it.is_empty())?;
+    std::str::from_utf8(text).ok().map(str::to_owned)
+}
+
+#[cfg(not(target_os = "freebsd"))]
+fn os_release() -> Option<String> {
+    None
 }
 
 type InfoProvider = Box<dyn Fn() -> DiagnosticInfo + Send + Sync>;
@@ -208,10 +253,14 @@ fn lock<T>(m: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 /// Layer that redacts, formats, writes to the rotating file and keeps the in-memory ring.
 /// Where formatted lines go. `Pending` holds the lines logged before the log directory and
 /// level are known, so nothing from start-up is lost and nothing is written to disk before the
-/// profile has been checked.
+/// profile has been checked. `File` writes through a buffer (spec 12 FR-12.1): lines collect in
+/// memory and are flushed every [`FLUSH_INTERVAL`], on clean shutdown and on a panic.
 enum Sink {
     Pending(Vec<String>),
-    File(RollingFileAppender),
+    File(BufWriter<RollingFileAppender>),
+    /// Logging to disk is off (spec 12 FR-12.2): the memory ring still records, nothing is
+    /// written.
+    Off,
 }
 
 impl Sink {
@@ -228,6 +277,16 @@ impl Sink {
                     eprintln!("mumcord: writing log file failed: {err}");
                 }
             }
+            Self::Off => {}
+        }
+    }
+
+    /// Pushes everything buffered to the file. A no-op for `Pending` and `Off`.
+    fn flush(&mut self) {
+        if let Self::File(file) = self
+            && let Err(err) = file.flush()
+        {
+            eprintln!("mumcord: flushing the log file failed: {err}");
         }
     }
 }
@@ -347,24 +406,73 @@ pub fn init_early() -> anyhow::Result<()> {
 /// Opens the log file in `logs_dir` (created if missing), writes the lines kept since
 /// [`init_early`] and sets the level. Keeps at most `max_files` daily files.
 pub fn attach_file(logs_dir: &Path, level: LogLevel, max_files: usize) -> anyhow::Result<()> {
+    set_disk_logging(true, logs_dir, level, max_files)
+}
+
+/// Turns writing the log file on or off at runtime (spec 12 FR-12.2). The in-memory ring and
+/// the level filter stay active either way, so "copy log" and the diagnostic file keep working.
+pub fn set_disk_logging(
+    enabled: bool,
+    logs_dir: &Path,
+    level: LogLevel,
+    max_files: usize,
+) -> anyhow::Result<()> {
     let shared = GLOBAL
         .get()
         .ok_or_else(|| anyhow::anyhow!("logging not initialised"))?;
-    std::fs::create_dir_all(logs_dir)?;
-    attach(shared, logs_dir, max_files)?;
+    if enabled {
+        if matches!(&*lock(&shared.sink), Sink::Pending(_) | Sink::Off) {
+            std::fs::create_dir_all(logs_dir)?;
+            attach(shared, logs_dir, max_files)?;
+        }
+    } else {
+        let mut sink = lock(&shared.sink);
+        sink.flush();
+        *sink = Sink::Off;
+    }
     set_log_level(level)
 }
 
 fn attach(shared: &Shared, logs_dir: &Path, max_files: usize) -> anyhow::Result<()> {
-    let mut appender = open_appender(logs_dir, max_files)?;
+    let appender = open_appender(logs_dir, max_files)?;
+    let mut writer = BufWriter::with_capacity(LOG_BUF_CAPACITY, appender);
     let mut sink = lock(&shared.sink);
     if let Sink::Pending(lines) = &*sink {
         for line in lines {
-            appender.write_all(format!("{line}\n").as_bytes())?;
+            writer.write_all(format!("{line}\n").as_bytes())?;
         }
+        // Start-up lines are few and should reach the file right away.
+        writer.flush()?;
     }
-    *sink = Sink::File(appender);
+    *sink = Sink::File(writer);
+    ensure_flush_thread(shared);
     Ok(())
+}
+
+/// Starts the periodic log flush (spec 12 FR-12.1). Runs once, detached, for the process life.
+fn ensure_flush_thread(shared: &Shared) {
+    static STARTED: OnceLock<()> = OnceLock::new();
+    let sink = Arc::clone(&shared.sink);
+    STARTED.get_or_init(|| {
+        std::thread::Builder::new()
+            .name("mumcord-log-flush".to_owned())
+            .spawn(move || {
+                loop {
+                    std::thread::sleep(FLUSH_INTERVAL);
+                    lock(&sink).flush();
+                }
+            })
+            .expect("spawn log flush thread");
+    });
+}
+
+/// Writes buffered log lines to the file now (spec 12 FR-12.1): called on clean shutdown and
+/// from the panic hook. The in-memory ring feeds the panic report and "copy log", so those
+/// never depend on this flush.
+pub fn flush_log() {
+    if let Some(shared) = GLOBAL.get() {
+        lock(&shared.sink).flush();
+    }
 }
 
 /// Changes the log level at runtime (settings `logLevel`).
@@ -516,6 +624,8 @@ mod tests {
         let (sub, shared) = build_with(Sink::Pending(Vec::new()), level);
         attach(&shared, dir.path(), 7).unwrap();
         tracing::subscriber::with_default(sub, f);
+        // Buffered writes land on disk only after a flush (spec 12 FR-12.1).
+        lock(&shared.sink).flush();
         (dir, shared)
     }
 
@@ -538,6 +648,27 @@ mod tests {
         assert!(on_disk.contains("CPU without AVX2, self-test skipped"));
     }
 
+    #[test]
+    fn lines_wait_in_the_buffer_until_a_flush() {
+        // FR-12.1: writing is batched; a line is not on disk until the buffer is flushed.
+        let dir = tempfile::tempdir().unwrap();
+        let (sub, shared) = build_with(Sink::Pending(Vec::new()), LogLevel::Info);
+        attach(&shared, dir.path(), 7).unwrap();
+        tracing::subscriber::with_default(sub, || {
+            tracing::info!("buffered");
+        });
+        let on_disk = |d: &Path| {
+            std::fs::read_dir(d)
+                .unwrap()
+                .filter_map(Result::ok)
+                .map(|e| std::fs::read_to_string(e.path()).unwrap())
+                .collect::<String>()
+        };
+        assert!(!on_disk(dir.path()).contains("buffered"));
+        lock(&shared.sink).flush();
+        assert!(on_disk(dir.path()).contains("buffered"));
+    }
+
     /// Writes the diagnostic file and parses it back.
     fn written(info: &DiagnosticInfo, lines: &[String]) -> bovnar::DomDoc {
         let dir = tempfile::tempdir().unwrap();
@@ -546,6 +677,21 @@ mod tests {
         let bytes = std::fs::read(&file).unwrap();
         assert_eq!(bovnar::json::detect(&bytes), bovnar::json::Format::Bovnar);
         bovnar::DomDoc::parse(&bytes).unwrap()
+    }
+
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn the_os_line_names_the_freebsd_release() {
+        // FR-13.31: the diagnostics must say which FreeBSD this is.
+        let line = os_description();
+        let parts: Vec<&str> = line.split(' ').collect();
+        assert_eq!(parts.first(), Some(&"freebsd"), "{line}");
+        assert_eq!(parts.last(), Some(&std::env::consts::ARCH), "{line}");
+        assert_eq!(
+            parts.len(),
+            3,
+            "expected 'freebsd <release> <arch>', got {line}"
+        );
     }
 
     #[test]

@@ -1,0 +1,48 @@
+name: CodeQL
+
+# Static analysis (SAST) of the TypeScript UI, the Rust crates and the workflow files themselves.
+# Findings show up under Security > Code scanning. Rust and the workflows need no build
+# (build-mode none), so the job does not compile the native workspace.
+on:
+  push:
+    branches: [main, "milestone/**"]
+    paths-ignore: ["**/*.md", "docs/**", "specs/**"]
+  pull_request:
+    paths-ignore: ["**/*.md", "docs/**", "specs/**"]
+  schedule:
+    # Weekly, so new CodeQL queries also run against code that has not changed.
+    - cron: "41 5 * * 3"
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, actions, rust]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}

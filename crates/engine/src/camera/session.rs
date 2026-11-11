@@ -829,6 +829,9 @@ pub(crate) fn on_plugin_data(
         }
         CameraMessage::On { id } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
         CameraMessage::Full { id } => super::recv::on_camera_full(&engine, ctx, event.sender, &id),
+        CameraMessage::Needs { id } => {
+            super::recv::on_camera_needs(&engine, ctx, event.sender, &id)
+        }
         CameraMessage::Off => super::recv::on_camera_gone(&engine, ctx, event.sender),
     }
 }

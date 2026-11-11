@@ -13,8 +13,14 @@ import {
 import { userPanelLayout } from "../../helpers/voice-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
-function anyToast() {
-  return $("//section[@aria-label='Notifications']//button[contains(@class,'toast__open')]");
+/**
+ * A toast that shows `text`. Activity toasts (people joining, #660) may be up at the same time, so
+ * the check names the message instead of taking any toast.
+ */
+function toastWith(text: string) {
+  return $(
+    `//section[@aria-label='Notifications']//button[contains(@class,'toast__open')][contains(normalize-space(.), "${text}")]`,
+  );
 }
 
 function followButton() {
@@ -84,7 +90,7 @@ describe("chat: Do Not Disturb (AC-3.76)", () => {
       timeoutMsg: "no unread badge 1 on Raid",
     });
     await sleep(1500);
-    await expect(anyToast()).not.toBeExisting();
+    await expect(toastWith("pull at eight")).not.toBeExisting();
   });
 
   it("says the system state can't be read here", async () => {

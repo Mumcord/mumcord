@@ -193,7 +193,8 @@ pub async fn run_check(
     let base = official_base(settings.plugins_mirror_url.as_deref())?;
 
     if due.revocations {
-        let loaded = fetch_revoked(client, &official_dir, &base).await?;
+        let loaded =
+            fetch_revoked(client, &official_dir, &base, settings.plugin_registry_cache).await?;
         let fetched = matches!(loaded.freshness, Freshness::Fresh | Freshness::NotModified);
         if let Freshness::Rejected(error) = &loaded.freshness {
             tracing::warn!(%error, "the downloaded revocation list was rejected");
@@ -223,7 +224,15 @@ pub async fn run_check(
     schedule.updates_checked(now);
     let last_seen = u64::try_from(settings.plugins_last_official_sequence).ok();
     let mut indexes: Vec<(Source, Index)> = Vec::new();
-    match fetch_official(client, &official_dir, &base, last_seen).await {
+    match fetch_official(
+        client,
+        &official_dir,
+        &base,
+        last_seen,
+        settings.plugin_registry_cache,
+    )
+    .await
+    {
         Ok(loaded) => {
             if let Freshness::Rejected(error) = &loaded.freshness {
                 tracing::warn!(%error, "the downloaded official index was rejected");
@@ -253,8 +262,15 @@ pub async fn run_check(
     // Every switched-on repository, also those nothing is installed from yet: a key change
     // must be noticed before the user installs from it (FR-6.75).
     for repository in repositories.iter().filter(|r| r.enabled) {
-        if let Some(index) =
-            load_repository(client, service, registry_cache, repository, &is_official_id).await?
+        if let Some(index) = load_repository(
+            client,
+            service,
+            registry_cache,
+            repository,
+            &is_official_id,
+            settings.plugin_registry_cache,
+        )
+        .await?
         {
             indexes.push((
                 Source::Repo {
@@ -295,22 +311,24 @@ pub async fn load_repository(
     registry_cache: &Path,
     repository: &PluginRepository,
     is_official_id: &(dyn Fn(&str) -> bool + Sync),
+    cache_enabled: bool,
 ) -> Result<Option<Index>, ServiceError> {
     let id = repository.id;
     let dir = registry_cache.join(format!("repo-{id}"));
-    let (loaded, new_key) = match fetch_repository(client, &dir, repository, is_official_id).await {
-        Ok(RepoOutcome::Loaded(loaded)) => (loaded, None),
-        Ok(RepoOutcome::Rotated { new_key, loaded }) => (loaded, Some(new_key)),
-        Ok(RepoOutcome::KeyChanged { .. }) => {
-            with_service(service, move |s| s.pause_repository(id)).await??;
-            tracing::warn!(repository = id, "repository key changed; paused");
-            return Ok(None);
-        }
-        Err(error) => {
-            tracing::warn!(repository = id, %error, "could not load a repository");
-            return Ok(None);
-        }
-    };
+    let (loaded, new_key) =
+        match fetch_repository(client, &dir, repository, is_official_id, cache_enabled).await {
+            Ok(RepoOutcome::Loaded(loaded)) => (loaded, None),
+            Ok(RepoOutcome::Rotated { new_key, loaded }) => (loaded, Some(new_key)),
+            Ok(RepoOutcome::KeyChanged { .. }) => {
+                with_service(service, move |s| s.pause_repository(id)).await??;
+                tracing::warn!(repository = id, "repository key changed; paused");
+                return Ok(None);
+            }
+            Err(error) => {
+                tracing::warn!(repository = id, %error, "could not load a repository");
+                return Ok(None);
+            }
+        };
     if let Freshness::Rejected(error) = &loaded.freshness {
         tracing::warn!(repository = id, %error, "a repository index was rejected");
     }

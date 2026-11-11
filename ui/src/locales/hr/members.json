@@ -1,7 +1,7 @@
 {
-  "inChannel_one": "U {{channel}} ({{count}})",
-  "inChannel_few": "U {{channel}} ({{count}})",
-  "inChannel_other": "U {{channel}} ({{count}})",
+  "inChannel_one": "U kanalu {{channel}} ({{count}})",
+  "inChannel_few": "U kanalu {{channel}} ({{count}})",
+  "inChannel_other": "U kanalu {{channel}} ({{count}})",
   "noChannel": "Odaberi kanal da vidiš tko je u njemu.",
   "nobody": "Ovdje nema nikoga.",
   "nobodyElse": "Na poslužitelju nema nikog drugog.",
@@ -49,7 +49,7 @@
     "saved": "Spremljeno"
   },
   "errors": {
-    "notConnected": "Nisi povezan s poslužiteljem.",
+    "notConnected": "Nisi povezan/a s poslužiteljem.",
     "generic": "To nije uspjelo. Pokušaj ponovno."
   },
   "menu": {
@@ -58,10 +58,10 @@
     "sendMessage": "Pošalji poruku",
     "join": "Pridruži se kanalu {{channel}}",
     "joinFull": "Ovaj kanal je pun.",
-    "joinLocked": "Ne smiješ ući u ovaj kanal ili je potrebna lozinka.",
+    "joinLocked": "Ne smiješ se pridružiti ovom kanalu ili je potrebna lozinka.",
     "mute": "Utišaj za mene",
     "connectionInfo": "Informacije o vezi",
-    "chatRequestPending": "Zahtjev za razgovor na čekanju",
+    "chatRequestPending": "Zahtjev za chat na čekanju",
     "revokeConsent": "Opozovi pristanak na chat",
     "moveToMe": "Premjesti u moj kanal",
     "moveTo": "Premjesti u"
@@ -92,12 +92,12 @@
     "fullProfile": "Cijeli profil"
   },
   "chatRequest": {
-    "title": "Zahtjev za razgovor korisniku {{name}}",
+    "title": "Zahtjev za chat korisniku {{name}}",
     "note": "Bilješka (neobavezno)",
     "counter": "{{count}} / {{max}}",
     "counterLabel": "Iskorišteno {{count}} od {{max}} znakova",
     "send": "Pošalji",
-    "failed": "Zahtjev za razgovor nije bilo moguće poslati. Pokušaj ponovno."
+    "failed": "Zahtjev za chat nije bilo moguće poslati. Pokušaj ponovno."
   },
   "toggle": {
     "show": "Prikaži članove",
@@ -112,7 +112,7 @@
     "talkingMore_other": "{{name}} i još {{count}} govore"
   },
   "revokeConsent": {
-    "title": "Opozvati pristanak na chat za {{name}}?",
+    "title": "Opozvati pristanak na chat za korisnika {{name}}?",
     "message": "{{name}} morat će ponovno poslati zahtjev za poruku prije nego što ti poruke opet stignu. Povijest chata ostaje.",
     "confirm": "Opozovi",
     "failed": "Opoziv pristanka na chat nije uspio. Pokušaj ponovno."

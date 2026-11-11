@@ -7,7 +7,7 @@
     "userPanel": "Do stádas"
   },
   "skipLinks": {
-    "label": "Léim naisc",
+    "label": "Naisc léime",
     "chat": "Léim go dtí an comhrá",
     "channels": "Léim go dtí na cainéil"
   },
@@ -24,6 +24,6 @@
   "placeholder": "Ag teacht go luath",
   "startupError": {
     "title": "Níorbh fhéidir Mumcord a thosú",
-    "description": "Níorbh fhéidir leis an aip do shocruithe a luchtú. Bain triail eile as; má theipeann air arís, atosaigh Mumcord."
+    "description": "Níorbh fhéidir leis an aip do shocruithe a luchtú. Bain triail eile as; má leanann sé ag teip, atosaigh Mumcord."
   }
 }

@@ -22,7 +22,7 @@
   "highRiskTitle": "Det här är ett tillägg med hög risk",
   "highRiskText": "Det kan öppna egna webbsidor och kommunicera med {{count}} webbplatser som du inte kan kontrollera. Mumcord kan inte se vad dessa webbplatser skickar till tillägget eller vad tillägget skickar till dem. Det har publicerats av någon som är ny för den här datorn. Installera det bara om du känner till och litar på upphovspersonen.",
   "highRiskWouldBecome": "Den här uppdateringen skulle ge tillägget hög risk",
-  "highRiskNotAutomatic": "Det installeras inte automatiskt. Om du stannar på {{version}} behålls den nuvarande poängen; du kan fästa versionen under Installerade.",
+  "highRiskNotAutomatic": "Det installeras inte automatiskt. Om du stannar på {{version}} behålls den nuvarande poängen; du kan låsa versionen under Installerade.",
   "sameAuthorKey": "samma upphovsnyckel",
   "places": {
     "stage": "mediaytan",

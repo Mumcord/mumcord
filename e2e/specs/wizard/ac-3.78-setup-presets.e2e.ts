@@ -54,12 +54,12 @@ describe("AC-3.78 setup wizard with presets", () => {
   });
 
   it("starts with Welcome, Identity, Voice and Setup style, Balanced preselected", async () => {
-    expect(await header("welcome")).toContain("step 1 of 10");
+    expect(await header("welcome")).toContain("step 1 of 11");
     await passWelcome();
-    expect(await header("identity")).toContain("step 2 of 10");
+    expect(await header("identity")).toContain("step 2 of 11");
     await createIdentity("PresetTester");
     await voiceToSetupStyle();
-    expect(await header("setupStyle")).toContain("step 4 of 10");
+    expect(await header("setupStyle")).toContain("step 4 of 11");
     await expect(setupStyleRadio("balanced")).toBeSelected();
     const cards = await $$("form.wizard-step label.preset-card").map((card) =>
       card.getAttribute("data-preset"),
@@ -96,23 +96,23 @@ describe("AC-3.78 setup wizard, Custom path", () => {
     await app.restart({ freshProfile: true });
   });
 
-  it("walks Private messages, Connections, Features, Appearance and Startup, then the summary", async () => {
+  it("walks Private messages, Notifications, Connections, Features, Appearance and Startup, then the summary", async () => {
     await passWelcome();
     await createIdentity("CustomTester");
     await voiceToSetupStyle();
     await chooseSetupStyle("custom");
     await expect(wizardPrimary()).toHaveText(expect.stringContaining("Next"));
     await wizardPrimary().click();
-    // Welcome, Identity, Voice, Setup style, the five Custom steps, All set.
+    // Welcome, Identity, Voice, Setup style, the six Custom steps, All set.
     for (const [index, step] of CUSTOM_STEPS.entries()) {
-      expect(await header(step)).toContain(`step ${String(index + 5)} of 10`);
+      expect(await header(step)).toContain(`step ${String(index + 5)} of 11`);
       const tagged = $(
         `//li[contains(@class,'wizard-rail__step')][@aria-current='step'][.//span[contains(@class,'wizard-rail__label')][normalize-space(.)='${WIZARD_STEP_NAMES[step]}']]//span[contains(@class,'wizard-rail__tag')]`,
       );
       await expect(tagged).toHaveText("Custom");
       await wizardPrimary().click();
     }
-    expect(await header("summary")).toContain("step 10 of 10");
+    expect(await header("summary")).toContain("step 11 of 11");
     await button("Start Mumcord").click();
     await $('button[aria-label="Add a server"]').waitForExist({ timeout: 30_000 });
     // Untouched Custom values are the Balanced ones the wizard starts from, so Balanced is recorded.

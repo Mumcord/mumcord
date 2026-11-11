@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, l’assistant des astuces",
+  "greeting": {
+    "title": "Salut, moi c’est Aaron !",
+    "body": "Je suis un axolotl et je connais Mumcord comme ma poche. Une petite visite ? Elle dure environ une minute. Sinon, tu me trouveras dans Paramètres → À propos → Astuces.",
+    "start": "Montre-moi",
+    "later": "Pas maintenant"
+  },
+  "progress": "Astuce {{current}} sur {{total}}",
+  "back": "Retour",
+  "next": "Suivant",
+  "done": "Terminé",
+  "skip": "Passer la visite",
+  "close": "Fermer les astuces",
+  "tips": {
+    "servers": {
+      "title": "Tes serveurs",
+      "body": "La barre tout à gauche contient tes serveurs. Ajoutes-en un avec +, ou trouve des serveurs publics avec la loupe. Tu peux rester connecté à plusieurs serveurs à la fois."
+    },
+    "channels": {
+      "title": "Salons",
+      "body": "Double-clique sur un salon pour le rejoindre en vocal. Un simple clic affiche son chat sans le rejoindre, et « Suivre » te tient au courant."
+    },
+    "talk": {
+      "title": "Ta façon de parler",
+      "body": "Push-to-talk ou activation vocale ? Choisis dans Paramètres → Voix et audio, ou ouvre Paramètres vocaux… avec la petite flèche à côté du micro. Le Push-to-talk fonctionne aussi avec les boutons de la souris."
+    },
+    "panel": {
+      "title": "Ton panneau utilisateur",
+      "body": "En bas à gauche, tu coupes ton micro ou le son, actives ta caméra ou raccroches. Les petites flèches à côté ouvrent d’autres options."
+    },
+    "search": {
+      "title": "Tout trouver",
+      "body": "Appuie sur {{key}} pour trouver des personnes et des salons, même sur les grands serveurs."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Réponds à un message, cite-le, @mentionne des personnes et partage des images et des fichiers. Les boutons de mise en forme apparaissent pendant que tu écris."
+    },
+    "apps": {
+      "title": "Applis",
+      "body": "Le bouton Applis de la barre de message lance un partage d’écran, une soirée de visionnage ou ta caméra. Les plugins en ajoutent d’autres."
+    },
+    "themes": {
+      "title": "Ton style",
+      "body": "L’engrenage en bas à gauche bascule entre sombre et clair. Paramètres → Apparence propose d’autres thèmes, et un serveur peut avoir le sien : fais un clic droit dessus et choisis « Thème »."
+    },
+    "end": {
+      "title": "C’est tout !",
+      "body": "Amuse-toi bien sur Mumcord. Tu peux me rappeler à tout moment dans Paramètres → À propos → Astuces."
+    }
+  }
+}

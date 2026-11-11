@@ -34,7 +34,7 @@
     "relayData": "Relaygegevens",
     "relayOff": "Uit ·",
     "relayOn": "Aan",
-    "turnOnInPermissions": "Zet aan bij de rechten",
+    "turnOnInPermissions": "Aanzetten bij rechten",
     "tags": {
       "webview": "Eigen webinhoud",
       "origins": "{{count}} websites",
@@ -45,15 +45,15 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Deze update wil communiceren met {{count}} nieuwe website.",
     "wantsNew_other": "Deze update wil communiceren met {{count}} nieuwe websites.",
     "staysOn": "{{plugin}} blijft op {{version}} tot jij beslist.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} update wacht op jou. Updates die rechten of websites toevoegen worden nooit automatisch geïnstalleerd.",
     "banner_other": "{{count}} updates wachten op jou. Updates die rechten of websites toevoegen worden nooit automatisch geïnstalleerd.",
     "noOther": "Er wijzigen geen andere rechten.",
     "whatsNew": "Wat is er nieuw in {{version}}",
-    "skipKeeps": "Overslaan laat {{version}} gewoon werken.",
+    "skipKeeps": "Als je overslaat, blijft {{version}} gewoon werken.",
     "skip": "Deze versie overslaan",
-    "allow": "Toestaan en updaten"
+    "allow": "Toestaan en bijwerken"
   }
 }

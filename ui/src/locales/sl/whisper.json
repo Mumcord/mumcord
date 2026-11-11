@@ -1,7 +1,7 @@
 {
   "menu": {
-    "whisper": "Šepni",
-    "noPermission": "Strežnik tu ne dovoljuje šepetanja"
+    "whisper": "Šepetaj",
+    "noPermission": "Strežnik tu ne dovoli šepetati"
   },
   "banner": {
     "whisper": "Šepetaš: {{target}}",
@@ -12,7 +12,7 @@
     "stop": "Ustavi"
   },
   "denied": {
-    "title": "Šepetanje ni uspelo: {{target}}",
+    "title": "Šepet ni uspel: {{target}}",
     "noVoiceServer": "Najprej se pridruži kanalu: šepet gre prek strežnika, na katerem govoriš.",
     "muted": "Vklopi mikrofon, da lahko šepetaš.",
     "serverMuted": "Strežnik te je utišal, zato ne posreduje tvojega glasu.",

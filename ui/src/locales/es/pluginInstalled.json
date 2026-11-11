@@ -103,7 +103,7 @@
     "hint": "Actualización {{version}}",
     "button": "Actualizar"
   },
-  "visibilityChip": "Habla con otros usuarios de Mumcord · {{visibility}}",
+  "visibilityChip": "Se comunica con otros usuarios de Mumcord · {{visibility}}",
   "chips": {
     "label": "Permisos que usa",
     "uiPanel": "Panel",
@@ -121,15 +121,15 @@
     "randomBytes": "Números aleatorios",
     "commands": "Comandos",
     "chatSend": "Escribe en el chat",
-    "chatSupersedes": "Sustituye su línea de texto",
-    "chatTriggers": "Palabras clave",
+    "chatSupersedes": "Sustituye su texto",
+    "chatTriggers": "Palabras de activación",
     "chatPatterns": "Patrones de chat",
     "netHttp": "Acceso a internet",
     "secrets": "Llavero"
   },
   "offerBadge": "Permisos nuevos",
   "refused": {
-    "title": "Complementos rechazados",
+    "title": "Plugins rechazados",
     "when": "Rechazado el {{time}}"
   }
 }

@@ -1,7 +1,7 @@
 {
   "type": "Bővítmény",
   "autoOff": {
-    "title": "A(z) {{name}} ki lett kapcsolva",
+    "title": "A(z) {{name}} kikapcsolva",
     "body": "Ismételt összeomlások után kikapcsolva",
     "open": "Megjelenítés a Bővítményekben"
   },
@@ -24,11 +24,11 @@
     "detailsLabel": "{{name}} részletei",
     "notNow": "Most nem",
     "notNowLabel": "{{name}} elrejtése egyelőre",
-    "dontAsk": "Ne kérdezze újra ennél a szervernél",
+    "dontAsk": "Ne jelenjen meg többé ezen a szerveren",
     "recommended": "Ajánlott",
     "official": "Hivatalos",
     "unofficial": "Nem hivatalos · {{host}}",
     "footer": "A javaslatok soha nem telepítenek semmit maguktól. A szerver nem tudja meg, mit telepítesz."
   },
-  "failed": "Ez nem sikerült. Próbálja újra."
+  "failed": "Ez nem sikerült. Próbáld újra."
 }

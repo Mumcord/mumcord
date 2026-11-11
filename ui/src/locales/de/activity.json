@@ -5,11 +5,11 @@
     "activity": "Aktivität"
   },
   "you": "Du",
-  "selfName": "deine",
+  "selfName": "dir",
   "someone": "jemand",
   "verb": {
     "connected": "hat sich verbunden",
-    "disconnected": "hat die Verbindung beendet",
+    "disconnected": "hat die Verbindung getrennt",
     "moved": "hat den Kanal gewechselt",
     "screenShareStarted": "hat die Bildschirmfreigabe gestartet",
     "screenShareStopped": "hat die Bildschirmfreigabe beendet",
@@ -21,17 +21,17 @@
   },
   "channel": "# {{channel}}",
   "plugin": "Plugin",
-  "live": "live",
+  "live": "Live",
   "watch": "Ansehen",
   "join": "Beitreten",
   "today": "Heute",
   "yesterday": "Gestern",
   "empty": "Noch keine Aktivität.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} Bildschirmfreigabe",
-    "watchParty": "{{action}} {{name}} Watch-Party",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
-    "pluginEvent": "{{action}} {{plugin}}"
+    "screenShare": "{{action}}: Bildschirmfreigabe von {{name}}",
+    "watchParty": "{{action}}: Watch-Party von {{name}}",
+    "pluginActivity": "{{action}}: {{plugin}} von {{name}}",
+    "pluginEvent": "{{action}}: {{plugin}}"
   },
   "joinPartyFailed": "Beitritt zur Watch-Party fehlgeschlagen.",
   "joinActivityFailed": "Beitritt zur Plugin-Aktivität fehlgeschlagen.",

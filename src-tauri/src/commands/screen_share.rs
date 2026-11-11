@@ -66,6 +66,10 @@ pub struct ScreenShare {
     /// What the sharer picked in the system picker (issue #163); `null` where the platform cannot
     /// tell a window from the whole screen.
     pub kind: Option<ShareKind>,
+    /// The picked window's title, else its app's name, for the own live bar (issue #558);
+    /// `null` for a screen, where the platform does not say, and for the shares of others. It
+    /// never leaves this device (FR-7.87).
+    pub title: Option<String>,
     /// How long the share has been running (issue #163).
     pub elapsed_ms: u32,
 }
@@ -99,6 +103,9 @@ pub enum SoundUnavailableReason {
     NoPipeWire,
     /// The sound capture could not start or stopped.
     CaptureFailed,
+    /// This platform cannot take a share's sound at all (FR-13.19): FreeBSD has no PipeWire and
+    /// no desktop portal, so a share is the whole X11 screen without sound.
+    Platform,
 }
 
 impl From<EngineSoundUnavailable> for SoundUnavailableReason {
@@ -395,6 +402,7 @@ impl From<ScreenShareView> for ScreenShare {
                 EngineShareKind::Window => ShareKind::Window,
                 EngineShareKind::Screen => ShareKind::Screen,
             }),
+            title: v.title,
             elapsed_ms: v.elapsed_ms,
         }
     }
@@ -468,7 +476,16 @@ pub fn screen_share_set_sound(
 #[tauri::command]
 #[specta::specta]
 pub fn screen_share_sound_support(engine: State<'_, Engine>) -> Option<SoundUnavailableReason> {
-    engine.screen_share_sound_unavailable().map(Into::into)
+    #[cfg(target_os = "freebsd")]
+    {
+        let _ = engine;
+        // Never "no PipeWire yet": on FreeBSD there is no sound to take at all.
+        Some(SoundUnavailableReason::Platform)
+    }
+    #[cfg(not(target_os = "freebsd"))]
+    {
+        engine.screen_share_sound_unavailable().map(Into::into)
+    }
 }
 
 /// The apps playing sound now, for "Which app's sound?" while the own share waits for the
@@ -1020,8 +1037,20 @@ mod tests {
             viewers: Vec::new(),
             blocked: None,
             kind: None,
+            title: None,
             elapsed_ms: 0,
         }
+    }
+
+    #[test]
+    fn the_window_title_reaches_the_live_bar() {
+        let s = ScreenShare::from(ScreenShareView {
+            kind: Some(EngineShareKind::Window),
+            title: Some("VS Code".into()),
+            ..view(SoundStatus::default())
+        });
+        assert_eq!(s.kind, Some(ShareKind::Window));
+        assert_eq!(s.title.as_deref(), Some("VS Code"));
     }
 
     #[test]

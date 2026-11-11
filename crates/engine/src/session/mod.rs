@@ -260,6 +260,8 @@ struct Inner {
     admin: Mutex<crate::admin::Admin>,
     channel_admin: Mutex<crate::channel_admin::ChannelAdmin>,
     channel_acls: Mutex<crate::channel_acl::ChannelAcls>,
+    /// The registered users held in memory while the Registered users tab is open (issue #256).
+    registered: Mutex<crate::registered::Registered>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
     /// Chat and message requests per server (issue #141).
@@ -594,7 +596,9 @@ impl Engine {
             password_overrides: Mutex::new(HashMap::new()),
             password_attempts: Mutex::default(),
             previews: Arc::new(crate::web::LinkPreviews::new(
-                Some(data_dir.join("link-previews")),
+                settings
+                    .link_previews_on_disk
+                    .then(|| data_dir.join("link-previews")),
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
             )),
@@ -612,6 +616,7 @@ impl Engine {
             admin: Mutex::default(),
             channel_admin: Mutex::default(),
             channel_acls: Mutex::default(),
+            registered: Mutex::default(),
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
@@ -641,6 +646,7 @@ impl Engine {
             .link_previews()
             .set_max_age_days(settings.preview_cache_days);
         engine.start_maintenance();
+        engine.start_chat_flush();
         // Unit tests build many engines; none of them needs the encoder probe.
         if !cfg!(test) {
             engine
@@ -926,6 +932,11 @@ impl Engine {
         &self.inner.admin
     }
 
+    /// What the open Registered users tab holds (issue #256).
+    pub(crate) fn registered_state(&self) -> &Mutex<crate::registered::Registered> {
+        &self.inner.registered
+    }
+
     pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
         &self.inner.history_sync
     }
@@ -1114,6 +1125,7 @@ impl Engine {
     pub fn shutdown(&self) -> impl Future<Output = ()> + Send + use<> {
         self.files_quit();
         self.camera_quit();
+        self.flush_chat_pending();
         let mut core = lock(&self.inner.core);
         let mut slots: Vec<(ServerId, u64)> = core
             .slots
@@ -1274,14 +1286,15 @@ impl Engine {
         Ok(())
     }
 
-    /// Moves a person to another channel (drag in the tree, "Move users here…"). The server
-    /// enforces the move permission; the result arrives as the person's `UserUpserted`.
-    pub fn person_move(
+    /// Moves a person to another channel (drag in the tree, "Move users here…", `/move`). The
+    /// server enforces the move permission and answers with the person's `UserUpserted`, so the
+    /// call also reports whether the move was confirmed (issue #378, FR-10.35).
+    pub async fn person_move(
         &self,
         server_id: ServerId,
         session: u32,
         channel_id: u32,
-    ) -> EngineResult<()> {
+    ) -> EngineResult<crate::ActionOutcome> {
         let ctx = self.session_ctx_for(server_id)?;
         let (channel_known, user_known) = ctx.handle.with_state(|s| {
             (
@@ -1295,9 +1308,16 @@ impl Engine {
         if !user_known {
             return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
         }
-        ctx.handle
-            .move_user(session, channel_id)
-            .map_err(convert::command_error)
+        let outcome = crate::admin::send_and_wait(
+            &ctx,
+            self.admin_state(),
+            session,
+            crate::admin::Pending::State(mumcord_protocol::permissions::MOVE),
+            || ctx.handle.move_user(session, channel_id),
+        )
+        .await;
+        crate::admin::report(&ctx, "move", &outcome);
+        outcome
     }
 
     pub fn person_set_volume(
@@ -1936,6 +1956,7 @@ impl Inner {
             crate::admin::on_disconnect(&self.admin, server_id);
             crate::channel_admin::on_disconnect(&self.channel_admin, server_id);
             crate::channel_acl::on_disconnect(&self.channel_acls, server_id);
+            crate::registered::on_disconnect(&self.registered, server_id);
             self.forget_password_attempt(server_id);
             self.files.on_connection_reset(server_id);
             self.full_images.reset(server_id);
@@ -2566,6 +2587,7 @@ impl Inner {
                     crate::watch_party::on_tick(&self.watch_parties, &ctx);
                     crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
                     crate::camera::session::on_tick(&self.cameras, &ctx);
+                    crate::mumcord::on_tick(&self.mumcord, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
                         let mut core = lock(&self.core);
@@ -2843,6 +2865,8 @@ impl Inner {
                         self.user_view_of(server_id, user, setting),
                     ));
                 }
+                // The echo of a person's state confirms an open admin action on them (issue #378).
+                crate::admin::on_state(&self.admin, server_id, user.session, change.echoed_rights);
                 if change.joined {
                     self.files
                         .on_user_joined(server_id, user.cert_hash.as_deref());
@@ -2908,6 +2932,10 @@ impl Inner {
                             | mumcord_protocol::permissions::BAN)
                             != 0
                     });
+                // A refused read, rename or unregister of the registered accounts, and a refused
+                // group read, are answered by that tab (issue #256).
+                let registered =
+                    crate::registered::on_denied(&self.registered, ctx.server_id, denied);
                 // A ban-list query is refused with the Ban permission (issue #254).
                 let ban_list = denied.session.is_none()
                     && denied.permission == Some(mumcord_protocol::permissions::BAN);
@@ -2939,7 +2967,7 @@ impl Inner {
                     kind: convert::denial_kind(denied),
                     permission: denied.permission.and_then(convert::right_of),
                     // Shown by the dialog that asked; the UI adds no second notice (#248).
-                    handled: kick_or_ban || ban_list || password || channel_change,
+                    handled: kick_or_ban || ban_list || password || channel_change || registered,
                 });
             }
             // Collected by the session loop and emitted in batches (`emit_permissions`); history
@@ -2949,8 +2977,12 @@ impl Inner {
                     crate::history_sync::on_permissions(&self.history_sync, ctx, *channel_id);
                 }
             }
-            // The Permissions and Password tabs read the rules (Epic 4, #251, #252).
-            Event::Acl(acl) => crate::channel_acl::on_acl(&self.channel_acls, ctx.server_id, acl),
+            // The Permissions and Password tabs read the rules (Epic 4, #251, #252), and so does
+            // the detail panel of the Registered users tab (issue #256).
+            Event::Acl(acl) => {
+                crate::channel_acl::on_acl(&self.channel_acls, ctx.server_id, acl);
+                crate::registered::on_acl(&self.registered, ctx.server_id, acl);
+            }
             Event::UsersQueried(users) => {
                 crate::channel_acl::on_users(&self.channel_acls, ctx.server_id, users);
             }
@@ -3036,6 +3068,10 @@ impl Inner {
             }
             // The Server administration window's Bans tab is the consumer (issue #254).
             Event::BanList(list) => crate::banlist::on_answer(&self.ban_lists, ctx.server_id, list),
+            // Its Registered users tab is the consumer of the same kind of read (issue #256).
+            Event::UserList(list) => {
+                crate::registered::on_answer(&self.registered, ctx.server_id, list)
+            }
             // Here rather than in the extension hooks: the private message rule needs to know
             // who runs Mumcord (issue #141).
             Event::TextMessage(message) => {
