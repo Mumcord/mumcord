@@ -12,7 +12,7 @@
     "noRelay": "Ta strežnik nima releja, zato deljenje kamere ni na voljo.",
     "relayTooOld": "Relej tega strežnika je za deljenje kamere prestar.",
     "relayDisallows": "Relej tega strežnika ne dovoljuje deljenja kamere.",
-    "needsRelayMode": "Deljenje kamere potrebuje relej. Spremeni to v Zasebnost in povezave.",
+    "needsRelayMode": "Deljenje kamere je izklopljeno. Spremeni to v Zasebnost in povezave.",
     "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo.",
     "registeredOnly": "Na tem strežniku lahko kamero uporabljajo le registrirani uporabniki."
   },
@@ -95,7 +95,7 @@
     "denied": "Kamere ni bilo mogoče zagnati: relej strežnika jo je zavrnil.",
     "relayDown": "Kamera se je ustavila: relej ni dosegljiv",
     "rateLimited": "Kamere ni bilo mogoče zagnati: preveč poskusov. Poskusi znova čez minuto.",
-    "mode": "Deljenje kamere potrebuje relej. Spremeni to v Zasebnost in povezave.",
+    "mode": "Deljenje kamere je izklopljeno. Spremeni to v Zasebnost in povezave.",
     "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo.",
     "endedByRelay": "Kamero je ustavil relej strežnika",
     "dismissStopped": "Opusti",

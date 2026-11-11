@@ -12,7 +12,7 @@
     "noRelay": "Tällä palvelimella ei ole välityspalvelinta, joten kameran jakaminen ei ole käytettävissä.",
     "relayTooOld": "Tämän palvelimen välityspalvelin on liian vanha kameran jakamiseen.",
     "relayDisallows": "Tämän palvelimen välityspalvelin ei salli kameran jakamista.",
-    "needsRelayMode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
+    "needsRelayMode": "Kameran jakaminen on pois päältä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
     "registeredOnly": "Vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella."
   },
@@ -95,7 +95,7 @@
     "denied": "Kameraa ei voitu käynnistää: palvelimen välityspalvelin hylkäsi sen.",
     "relayDown": "Kamera pysähtyi: välityspalvelin ei ole tavoitettavissa",
     "rateLimited": "Kameraa ei voitu käynnistää: liian monta yritystä. Yritä uudelleen minuutin kuluttua.",
-    "mode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
+    "mode": "Kameran jakaminen on pois päältä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
     "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran",
     "dismissStopped": "Ohita",

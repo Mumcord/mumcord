@@ -12,7 +12,7 @@
     "noRelay": "Níl athsheachadán ag an bhfreastalaí seo, mar sin níl comhroinnt ceamara ar fáil.",
     "relayTooOld": "Tá athsheachadán an fhreastalaí seo ró-shean le haghaidh comhroinnt ceamara.",
     "relayDisallows": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt ceamara.",
-    "needsRelayMode": "Teastaíonn an t-athsheachadán ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc.",
+    "needsRelayMode": "Tá comhroinnt ceamara múchta. Athraigh é in Príobháideachas agus naisc.",
     "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
     "registeredOnly": "Ar an bhfreastalaí seo ní féidir ach le húsáideoirí cláraithe an ceamara a úsáid."
   },
@@ -95,7 +95,7 @@
     "denied": "Níor tosaíodh an ceamara: dhiúltaigh athsheachadán an fhreastalaí dó.",
     "relayDown": "Stop an ceamara: níl an t-athsheachadán inrochtana",
     "rateLimited": "Níor tosaíodh an ceamara: an iomarca iarrachtaí. Bain triail eile as i gceann nóiméid.",
-    "mode": "Teastaíonn an t-athsheachadán ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc.",
+    "mode": "Tá comhroinnt ceamara múchta. Athraigh é in Príobháideachas agus naisc.",
     "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
     "endedByRelay": "Stop athsheachadán an fhreastalaí an ceamara",
     "dismissStopped": "Cuir ar leataobh",

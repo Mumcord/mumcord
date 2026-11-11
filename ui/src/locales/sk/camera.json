@@ -12,7 +12,7 @@
     "noRelay": "Tento server nemá relay, takže zdieľanie kamery nie je dostupné.",
     "relayTooOld": "Relay tohto servera je na zdieľanie kamery príliš starý.",
     "relayDisallows": "Relay tohto servera zdieľanie kamery nepovoľuje.",
-    "needsRelayMode": "Zdieľanie kamery potrebuje relay. Zmeň to v Súkromie a pripojeniach.",
+    "needsRelayMode": "Zdieľanie kamery je vypnuté. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
     "registeredOnly": "Na tomto serveri môžu kameru používať len registrovaní používatelia."
   },
@@ -95,7 +95,7 @@
     "denied": "Kameru sa nepodarilo spustiť: relay servera ju odmietol.",
     "relayDown": "Kamera sa zastavila: relay nie je dostupný",
     "rateLimited": "Kameru sa nepodarilo spustiť: príliš veľa pokusov. Skús to znova o minútu.",
-    "mode": "Zdieľanie kamery potrebuje relay. Zmeň to v Súkromie a pripojeniach.",
+    "mode": "Zdieľanie kamery je vypnuté. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
     "endedByRelay": "Kameru zastavil relay servera",
     "dismissStopped": "Zavrieť",

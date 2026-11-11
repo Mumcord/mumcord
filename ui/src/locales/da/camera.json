@@ -12,7 +12,7 @@
     "noRelay": "Denne server har intet relæ, så kameradeling er ikke tilgængelig.",
     "relayTooOld": "Denne servers relæ er for gammelt til kameradeling.",
     "relayDisallows": "Denne servers relæ tillader ikke kameradeling.",
-    "needsRelayMode": "Kameradeling kræver relæet. Ændr det under Privatliv og forbindelser.",
+    "needsRelayMode": "Kameradeling er slået fra. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
     "registeredOnly": "Kun registrerede brugere må bruge kameraet på denne server."
   },
@@ -95,7 +95,7 @@
     "denied": "Kameraet kunne ikke starte: serverens relæ afviste det.",
     "relayDown": "Kameraet stoppede: relæet kan ikke nås",
     "rateLimited": "Kameraet kunne ikke starte: for mange forsøg. Prøv igen om et minut.",
-    "mode": "Kameradeling kræver relæet. Ændr det under Privatliv og forbindelser.",
+    "mode": "Kameradeling er slået fra. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
     "endedByRelay": "Kameraet blev stoppet af serverens relæ",
     "dismissStopped": "Luk",

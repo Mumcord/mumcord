@@ -12,7 +12,7 @@
     "noRelay": "Ennek a szervernek nincs átjátszója, ezért a kamera megosztása nem érhető el.",
     "relayTooOld": "Ennek a szervernek az átjátszója túl régi a kamera megosztásához.",
     "relayDisallows": "Ennek a szervernek az átjátszója nem engedi a kamera megosztását.",
-    "needsRelayMode": "A kamera megosztásához az átjátszó kell. Módosítsd az Adatvédelem és kapcsolatok alatt.",
+    "needsRelayMode": "A kamera megosztás ki van kapcsolva. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
     "registeredOnly": "Ezen a szerveren csak regisztrált felhasználók használhatják a kamerát."
   },
@@ -95,7 +95,7 @@
     "denied": "A kamera nem indulhatott el: a szerver átjátszója elutasította.",
     "relayDown": "A kamera leállt: az átjátszó nem érhető el",
     "rateLimited": "A kamera nem indulhatott el: túl sok próbálkozás. Próbáld újra egy perc múlva.",
-    "mode": "A kamera megosztásához az átjátszó kell. Módosítsd az Adatvédelem és kapcsolatok alatt.",
+    "mode": "A kamera megosztás ki van kapcsolva. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
     "endedByRelay": "A kamerát a szerver átjátszója leállította",
     "dismissStopped": "Elvetés",

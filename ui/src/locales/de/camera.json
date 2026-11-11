@@ -12,7 +12,7 @@
     "noRelay": "Dieser Server hat kein Relay, daher ist Kamerafreigabe nicht verfügbar.",
     "relayTooOld": "Das Relay dieses Servers ist für die Kamerafreigabe zu alt.",
     "relayDisallows": "Das Relay dieses Servers erlaubt keine Kamerafreigabe.",
-    "needsRelayMode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
+    "needsRelayMode": "Die Kamerafreigabe ist ausgeschaltet. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
     "registeredOnly": "Auf diesem Server dürfen nur registrierte Nutzer die Kamera verwenden."
   },
@@ -95,7 +95,7 @@
     "denied": "Die Kamera konnte nicht gestartet werden: Das Relay des Servers hat sie abgelehnt.",
     "relayDown": "Kamera angehalten: Das Relay ist nicht erreichbar",
     "rateLimited": "Die Kamera konnte nicht gestartet werden: zu viele Versuche. Versuche es in einer Minute erneut.",
-    "mode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
+    "mode": "Die Kamerafreigabe ist ausgeschaltet. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
     "endedByRelay": "Kamera vom Relay des Servers angehalten",
     "dismissStopped": "Verwerfen",

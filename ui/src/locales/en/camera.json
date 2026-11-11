@@ -12,7 +12,7 @@
     "noRelay": "This server has no relay, so camera sharing isn't available.",
     "relayTooOld": "This server's relay is too old for camera sharing.",
     "relayDisallows": "This server's relay doesn't allow camera sharing.",
-    "needsRelayMode": "Camera sharing needs the relay. Change it in Privacy & Connections.",
+    "needsRelayMode": "Camera sharing is turned off. Change it in Privacy & Connections.",
     "noCertificate": "Camera sharing needs a client certificate.",
     "registeredOnly": "Only registered users can use the camera on this server."
   },
@@ -95,7 +95,7 @@
     "denied": "Camera couldn't start: the server's relay refused it.",
     "relayDown": "Camera stopped: the relay isn't reachable",
     "rateLimited": "Camera couldn't start: too many attempts. Try again in a minute.",
-    "mode": "Camera sharing needs the relay. Change it in Privacy & Connections.",
+    "mode": "Camera sharing is turned off. Change it in Privacy & Connections.",
     "noCertificate": "Camera sharing needs a client certificate.",
     "endedByRelay": "Camera stopped by the server's relay",
     "dismissStopped": "Dismiss",

@@ -12,7 +12,7 @@
     "noRelay": "Este servidor no tiene relé, así que compartir la cámara no está disponible.",
     "relayTooOld": "El relé de este servidor es demasiado antiguo para compartir la cámara.",
     "relayDisallows": "El relé de este servidor no permite compartir la cámara.",
-    "needsRelayMode": "Compartir la cámara necesita el relé. Cámbialo en Privacidad y conexiones.",
+    "needsRelayMode": "Compartir la cámara está desactivado. Cámbialo en Privacidad y conexiones.",
     "noCertificate": "Compartir la cámara necesita un certificado de cliente.",
     "registeredOnly": "Solo los usuarios registrados pueden usar la cámara en este servidor."
   },
@@ -95,7 +95,7 @@
     "denied": "No se pudo iniciar la cámara: el relé del servidor la rechazó.",
     "relayDown": "Cámara detenida: el relé no está accesible",
     "rateLimited": "No se pudo iniciar la cámara: demasiados intentos. Inténtalo de nuevo en un minuto.",
-    "mode": "Compartir la cámara necesita el relé. Cámbialo en Privacidad y conexiones.",
+    "mode": "Compartir la cámara está desactivado. Cámbialo en Privacidad y conexiones.",
     "noCertificate": "Compartir la cámara necesita un certificado de cliente.",
     "endedByRelay": "Cámara detenida por el relé del servidor",
     "dismissStopped": "Descartar",

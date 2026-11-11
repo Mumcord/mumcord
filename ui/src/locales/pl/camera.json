@@ -12,7 +12,7 @@
     "noRelay": "Ten serwer nie ma przekaźnika, więc udostępnianie kamery jest niedostępne.",
     "relayTooOld": "Przekaźnik tego serwera jest zbyt stary do udostępniania kamery.",
     "relayDisallows": "Przekaźnik tego serwera nie pozwala na udostępnianie kamery.",
-    "needsRelayMode": "Udostępnianie kamery wymaga przekaźnika. Zmień to w Prywatność i połączenia.",
+    "needsRelayMode": "Udostępnianie kamery jest wyłączone. Zmień to w Prywatność i połączenia.",
     "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta.",
     "registeredOnly": "Na tym serwerze kamery mogą używać tylko zarejestrowani użytkownicy."
   },
@@ -95,7 +95,7 @@
     "denied": "Nie udało się uruchomić kamery: przekaźnik serwera ją odrzucił.",
     "relayDown": "Kamera zatrzymana: przekaźnik jest nieosiągalny",
     "rateLimited": "Nie udało się uruchomić kamery: zbyt wiele prób. Spróbuj ponownie za minutę.",
-    "mode": "Udostępnianie kamery wymaga przekaźnika. Zmień to w Prywatność i połączenia.",
+    "mode": "Udostępnianie kamery jest wyłączone. Zmień to w Prywatność i połączenia.",
     "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta.",
     "endedByRelay": "Kamera zatrzymana przez przekaźnik serwera",
     "dismissStopped": "Zamknij",
