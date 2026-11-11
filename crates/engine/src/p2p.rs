@@ -291,9 +291,10 @@ pub(crate) fn mode_and_consent(store: &Store, server_id: ServerId) -> (P2pMode, 
 }
 
 impl Engine {
-    /// The effective P2P mode of `server_id` ("off" when it cannot be read).
-    pub(crate) fn p2p_mode_of(&self, server_id: ServerId) -> P2pMode {
-        mode_and_consent(&lock(&self.store_handle()), server_id).0
+    /// The effective P2P mode of `server_id` and whether direct connections are allowed there.
+    /// A stored "no" forbids the direct path whatever the mode says (FR-4.3, FR-4.5).
+    pub(crate) fn p2p_mode_and_consent_of(&self, server_id: ServerId) -> (P2pMode, Consent) {
+        mode_and_consent(&lock(&self.store_handle()), server_id)
     }
 }
 

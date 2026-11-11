@@ -14,7 +14,8 @@
     "relayDisallows": "Relay tohoto serveru sdílení kamery nepovoluje.",
     "needsRelayMode": "Sdílení kamery je vypnuté. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
-    "registeredOnly": "Na tomto serveru mohou kameru používat jen registrovaní uživatelé."
+    "registeredOnly": "Na tomto serveru mohou kameru používat jen registrovaní uživatelé.",
+    "needsDirect": "Sdílení kamery potřebuje přímá připojení. Změň to v Soukromí a připojení."
   },
   "cameraOnTray": "Kamera zapnutá",
   "turnOffTray": "Vypnout kameru",

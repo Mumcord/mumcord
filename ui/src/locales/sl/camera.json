@@ -14,7 +14,8 @@
     "relayDisallows": "Relej tega strežnika ne dovoljuje deljenja kamere.",
     "needsRelayMode": "Deljenje kamere je izklopljeno. Spremeni to v Zasebnost in povezave.",
     "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo.",
-    "registeredOnly": "Na tem strežniku lahko kamero uporabljajo le registrirani uporabniki."
+    "registeredOnly": "Na tem strežniku lahko kamero uporabljajo le registrirani uporabniki.",
+    "needsDirect": "Deljenje kamere potrebuje neposredne povezave. Spremeni to v Zasebnost in povezave."
   },
   "cameraOnTray": "Kamera vklopljena",
   "turnOffTray": "Izklopi kamero",

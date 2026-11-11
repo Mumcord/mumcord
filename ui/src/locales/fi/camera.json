@@ -14,7 +14,8 @@
     "relayDisallows": "Tämän palvelimen välityspalvelin ei salli kameran jakamista.",
     "needsRelayMode": "Kameran jakaminen on pois päältä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
-    "registeredOnly": "Vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella."
+    "registeredOnly": "Vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella.",
+    "needsDirect": "Kameran jakaminen tarvitsee suoria yhteyksiä. Muuta asetus kohdassa Yksityisyys ja yhteydet."
   },
   "cameraOnTray": "Kamera päällä",
   "turnOffTray": "Sammuta kamera",

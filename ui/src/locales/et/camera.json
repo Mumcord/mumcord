@@ -14,7 +14,8 @@
     "relayDisallows": "Selle serveri releeserver ei luba kaamera jagamist.",
     "needsRelayMode": "Kaamera jagamine on välja lülitatud. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
-    "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad."
+    "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad.",
+    "needsDirect": "Kaamera jagamine vajab otseseid ühendusi. Muuda seda jaotises Privaatsus ja ühendused."
   },
   "cameraOnTray": "Kaamera sees",
   "turnOffTray": "Lülita kaamera välja",

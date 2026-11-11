@@ -14,7 +14,8 @@
     "relayDisallows": "Relay tohto servera zdieľanie kamery nepovoľuje.",
     "needsRelayMode": "Zdieľanie kamery je vypnuté. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
-    "registeredOnly": "Na tomto serveri môžu kameru používať len registrovaní používatelia."
+    "registeredOnly": "Na tomto serveri môžu kameru používať len registrovaní používatelia.",
+    "needsDirect": "Zdieľanie kamery potrebuje priame pripojenia. Zmeň to v Súkromie a pripojeniach."
   },
   "cameraOnTray": "Kamera zapnutá",
   "turnOffTray": "Vypnúť kameru",
