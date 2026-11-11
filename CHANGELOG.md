@@ -33,6 +33,7 @@
 
 ### Fixed
 
+- macOS: plugin content such as the Whiteboard stays exactly in its frame when the window's height changes (issue #706); before, it could sit too high or too low, covering the frame's title and leaving a gap at the bottom, until the frame itself moved or changed size
 - Advanced (AI) noise suppression no longer turns your voice into static for the others when the computer cannot keep up, for example an older processor without AVX2 under high CPU and memory load (issue #753). When the selected noise suppression needs too long per frame, Mumcord switches to the Standard model by itself and tries your choice again after 30 seconds, so it comes back once the load is gone. A notice at the bottom right says so when it happens (at most once every ten minutes)
 - Pictures in your profile comment, a channel description or the server notice are saved again (issue #712): the picture was already scaled down to fit, but the server still answered "This is too large for the server" as soon as the text with the picture was longer than the server's plain text limit. Mumcord now writes the text in the form Mumble servers expect
 - Plugins are now stopped properly when Mumcord quits or restarts (issue #704): what a plugin saves while stopping, such as the last Whiteboard edits before quitting, is no longer lost. A plugin that hangs cannot hold up quitting
