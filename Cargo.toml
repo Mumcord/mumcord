@@ -271,6 +271,8 @@ specta-typescript = "0.0.13"
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "warn"
+# cargo-fuzz builds with `--cfg fuzzing`, which exposes the voice packet decoder to fuzz/.
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(fuzzing)"] }
 
 [workspace.lints.clippy]
 dbg_macro = "warn"

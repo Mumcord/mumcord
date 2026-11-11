@@ -64,6 +64,15 @@ use packet::{AudioIn, AudioOut, Format, Incoming, MAX_PACKET};
 
 pub use packet::MAX_VOICE_PAYLOAD;
 
+/// Runs a decrypted UDP or tunnelled voice packet through both wire formats. Only for the fuzz
+/// targets in `fuzz/`: the decoder stays private in normal builds, and cargo-fuzz builds with
+/// `--cfg fuzzing`.
+#[cfg(fuzzing)]
+pub fn fuzz_decode(data: &[u8]) {
+    let _ = packet::decode(Format::Legacy, data);
+    let _ = packet::decode(Format::Protobuf, data);
+}
+
 /// Oversized outgoing packets are logged at most this often, with the count since the last
 /// log line, so a misbehaving encoder cannot flood the log.
 const OVERSIZE_LOG_INTERVAL: Duration = Duration::from_secs(10);
