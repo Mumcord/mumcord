@@ -141,6 +141,9 @@ pub(crate) enum RequestSink {
 }
 
 impl WatchLink {
+    /// Plays a direct stream. `tap` records every message of it for the packet inspector
+    /// (FR-7.101).
+    #[allow(clippy::too_many_arguments)]
     pub fn start(
         rt: &tokio::runtime::Handle,
         server_id: ServerId,
@@ -149,13 +152,14 @@ impl WatchLink {
         sound: ShareSound,
         send: SendStream,
         recv: RecvStream,
+        tap: Option<crate::inspector::MediaTapSink>,
     ) -> Self {
         Self::start_with(
             rt,
             Source { server_id, sharer },
             sink,
             sound,
-            FrameSource::Stream(Box::new(wire::FrameReader::auto(recv))),
+            FrameSource::Stream(Box::new(wire::FrameReader::auto(recv).with_tap(tap))),
             RequestSink::Stream(send),
             None,
             None,
