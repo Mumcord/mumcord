@@ -16,16 +16,14 @@ use super::types::{
 /// The root channel always has id 0 in Mumble.
 pub const ROOT_CHANNEL: u32 = 0;
 
-/// Channel path below the root, e.g. `["Raid", "Team 1"]`; empty for the root itself.
+/// Channel path below the root, e.g. `["Raid", "Team 1"]`; empty for the root itself. `None`
+/// when the chain never reaches the root (an unknown parent or a cyclic tree).
 pub fn channel_path(state: &ServerState, id: u32) -> Option<Vec<String>> {
-    let mut path = Vec::new();
-    let mut current = state.channels.get(&id)?;
-    while let Some(parent) = current.parent {
-        path.push(current.name.clone());
-        current = state.channels.get(&parent)?;
+    let chain: Vec<&Channel> = state.ancestry(id).collect();
+    if chain.last()?.parent.is_some() {
+        return None;
     }
-    path.reverse();
-    Some(path)
+    Some(chain.iter().rev().skip(1).map(|c| c.name.clone()).collect())
 }
 
 /// Stored form of a channel path (store columns `last_channel`, `channel_path`).
@@ -404,6 +402,16 @@ mod tests {
             );
         }
         state
+    }
+
+    #[test]
+    fn a_cyclic_tree_has_no_path() {
+        let mut state = tree();
+        state.channels.get_mut(&3).expect("team").parent = Some(3);
+        assert_eq!(channel_path(&state, 3), None);
+        state.channels.get_mut(&2).expect("raid").parent = Some(3);
+        state.channels.get_mut(&3).expect("team").parent = Some(2);
+        assert_eq!(channel_path(&state, 3), None);
     }
 
     #[test]
