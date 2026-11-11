@@ -57,7 +57,7 @@
 | R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
 | R3 | Engine broadcast link: media profile end to end | done — `c27812f4`, `2f317177`; E2E still needs R5 | R1, W3, R5 | complex |
 | R4 | Plugin relay data on channel 6 | done — `875d1656`, `feat/r4-plugin-channel6` | R1 | complex |
-| R5 | mumpeer: new format, routing, description cache | partial — `8cf61d9` on `sothis/mumpeer`: mux channel/flags parser; routing, cache and status not wired | P0.3, W1, W2 | complex |
+| R5 | mumpeer: new format, routing, description cache | partial — `8cf61d9` on `sothis/mumpeer`, PR #17: mux parser; routing, cache and status not wired | P0.3, W1, W2 | complex |
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
 | E1 | Packet inspector: description, channels, format | open | D1, R2 | complex |
 | E2 | UI texts and 24 locales for fallback paths | open | D4, D6 | simple |
