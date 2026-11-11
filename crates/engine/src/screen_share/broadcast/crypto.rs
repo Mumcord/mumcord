@@ -432,6 +432,56 @@ impl TrackSealer {
         self.next_counter = counter.checked_add(1);
         Ok(header)
     }
+
+    /// Seals one channel-0 control payload (the stream description, FR-7.95) with the current
+    /// share key and a counter from the same sequence as the track messages. The SFrame header
+    /// is clear so the relay can cache the ciphertext; the AAD binds channel 0 and the header.
+    pub fn seal_control(
+        &mut self,
+        plain: &[u8],
+        out: &mut Vec<u8>,
+    ) -> Result<SFrameHeader, CryptoError> {
+        if plain.len() > media::MAX_DESCRIPTION {
+            return Err(CryptoError::TooLarge);
+        }
+        let counter = self.next_counter.ok_or(CryptoError::CounterExhausted)?;
+        let header = SFrameHeader {
+            key_id: u64::from(self.current.id),
+            counter,
+        };
+        let mut header_bytes = [0u8; SFrameHeader::MAX_LEN];
+        let header_len = header.encode(&mut header_bytes);
+        let total = header_len
+            .checked_add(plain.len())
+            .and_then(|len| len.checked_add(TAG_LEN))
+            .ok_or(CryptoError::TooLarge)?;
+        if total > media::MAX_DESCRIPTION + SFrameHeader::MAX_LEN + TAG_LEN {
+            return Err(CryptoError::TooLarge);
+        }
+        let mut aad_buf = [0u8; TRACK_AAD_MAX];
+        let aad = track_aad(
+            &mut aad_buf,
+            media::CHANNEL_CONTROL,
+            0,
+            &header_bytes[..header_len],
+        );
+        out.clear();
+        out.reserve(total);
+        out.extend_from_slice(&header_bytes[..header_len]);
+        out.extend_from_slice(plain);
+        let tag = self
+            .current
+            .aead
+            .seal_in_place_separate_tag(
+                self.current.nonce(counter),
+                Aad::from(aad),
+                &mut out[header_len..],
+            )
+            .map_err(|_| CryptoError::Authentication)?;
+        out.extend_from_slice(tag.as_ref());
+        self.next_counter = counter.checked_add(1);
+        Ok(header)
+    }
 }
 
 /// One decrypted relay track message (FR-7.92).
@@ -555,6 +605,40 @@ impl TrackOpener {
             timestamp_micros: u64::from_be_bytes(*timestamp),
             frame,
         })
+    }
+
+    /// Opens one channel-0 control payload (the stream description, FR-7.95): SFrame header,
+    /// ciphertext and tag, with the same key and counter sequence as the track messages.
+    pub fn open_control<'a>(&mut self, payload: &'a mut [u8]) -> Result<&'a [u8], CryptoError> {
+        if payload.len() > media::MAX_DESCRIPTION + SFrameHeader::MAX_LEN + TAG_LEN {
+            return Err(CryptoError::TooLarge);
+        }
+        let (header, header_len) = SFrameHeader::decode(payload)?;
+        let (clear, rest) = payload.split_at_mut(header_len);
+        if rest.len() < TAG_LEN {
+            return Err(CryptoError::BadTrack);
+        }
+        let index = self
+            .keys
+            .iter()
+            .position(|known| u64::from(known.key.id) == header.key_id)
+            .ok_or(CryptoError::UnknownKey(header.key_id))?;
+        if self.keys[index]
+            .highest
+            .is_some_and(|highest| header.counter <= highest)
+        {
+            return Err(CryptoError::Replay);
+        }
+        let mut aad_buf = [0u8; TRACK_AAD_MAX];
+        let aad = track_aad(&mut aad_buf, media::CHANNEL_CONTROL, 0, clear);
+        let key = &self.keys[index].key;
+        let plain = key
+            .aead
+            .open_in_place(key.nonce(header.counter), Aad::from(aad), rest)
+            .map_err(|_| CryptoError::Authentication)?;
+        self.keys[index].highest = Some(header.counter);
+        self.keys.drain(..index);
+        Ok(plain)
     }
 }
 
@@ -954,6 +1038,39 @@ mod tests {
     }
 
     // -- Media profile ------------------------------------------------------------------------
+
+    #[test]
+    fn a_control_description_round_trips_and_is_bound_to_channel_zero() {
+        let mut sealer = TrackSealer::new().expect("sealer");
+        let description = b".v = 1; .timebase = 1; .kind = \"screen\";";
+        let mut sealed = Vec::new();
+        let header = sealer.seal_control(description, &mut sealed).expect("seal");
+        assert_eq!(header.counter, 0);
+        assert!(
+            !sealed
+                .windows(description.len())
+                .any(|window| window == description),
+            "the description is encrypted"
+        );
+
+        let mut opener = track_opener_for(&sealer);
+        let mut replay = sealed.clone();
+        assert_eq!(opener.open_control(&mut sealed).expect("open"), description);
+        assert_eq!(opener.open_control(&mut replay), Err(CryptoError::Replay));
+
+        // Control and track messages share one counter sequence.
+        let mut track = Vec::new();
+        let track_header = sealer
+            .seal(
+                media::CHANNEL_AUDIO,
+                false,
+                timestamp(),
+                b"opus",
+                &mut track,
+            )
+            .expect("track");
+        assert_eq!(track_header.counter, 1);
+    }
 
     #[test]
     fn a_track_message_round_trips_and_hides_the_timestamp_and_frame() {
