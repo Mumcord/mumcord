@@ -340,12 +340,13 @@ fn camera_json(m: &crate::camera::signal::CameraMessage) -> Value {
     match m {
         CameraMessage::On { id } => json!({ "t": "on", "id": id }),
         CameraMessage::Off => json!({ "t": "off" }),
-        CameraMessage::CamJoin { id, codecs } => json!({
+        CameraMessage::CamJoin { id, codecs, .. } => json!({
             "t": "cam-join",
             "id": id,
             "codecs": codecs.iter().map(|c| format!("{c:?}").to_lowercase()).collect::<Vec<_>>(),
         }),
         CameraMessage::CamLeave { id } => json!({ "t": "cam-leave", "id": id }),
+        CameraMessage::Needs { id } => json!({ "t": "needs", "id": id }),
         CameraMessage::Full { id } => json!({ "t": "full", "id": id }),
         CameraMessage::Needs { id } => json!({ "t": "needs", "id": id }),
     }

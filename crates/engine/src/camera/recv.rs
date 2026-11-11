@@ -690,6 +690,7 @@ impl Engine {
             id: id.clone(),
             // Both play: whatever the webview cannot decode is decoded here.
             codecs: vec![Codec::Av1, Codec::Vp9],
+            media: true,
         };
         if !super::signal::send(ctx, &[sharer], &join) {
             // The tile stays Joining; the tick retries within the join limit.

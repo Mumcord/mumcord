@@ -69,7 +69,12 @@ pub enum CameraMessage {
     Off,
     /// Viewer to camera owner: please admit me to broadcast `id`. `codecs` lists what the viewer
     /// plays, never empty.
-    CamJoin { id: String, codecs: Vec<Codec> },
+    CamJoin {
+        id: String,
+        codecs: Vec<Codec>,
+        /// The viewer reads the Bovnar media profile (wire `mv: 2`).
+        media: bool,
+    },
     /// Viewer to camera owner: I stopped watching broadcast `id`.
     CamLeave { id: String },
     /// Camera owner to one viewer: broadcast `id` has no room for you (FR-8.52); ask again on
@@ -130,19 +135,19 @@ fn is_broadcast_id(id: &str) -> bool {
 /// Encodes a message as a Bovnar document; `None` if an id is not a broadcast id or `codecs` is
 /// empty.
 pub fn encode(message: &CameraMessage) -> Option<Vec<u8>> {
-    let (t, id, codecs) = match message {
-        CameraMessage::On { id } => ("on", Some(id), None),
-        CameraMessage::Off => ("off", None, None),
-        CameraMessage::CamJoin { id, codecs } => {
+    let (t, id, codecs, media) = match message {
+        CameraMessage::On { id } => ("on", Some(id), None, false),
+        CameraMessage::Off => ("off", None, None, false),
+        CameraMessage::CamJoin { id, codecs, media } => {
             if codecs.is_empty() {
                 return None;
             }
             let names: Vec<_> = codecs.iter().map(|c| c.name()).collect();
-            ("cam-join", Some(id), Some(names.join(",")))
+            ("cam-join", Some(id), Some(names.join(",")), *media)
         }
-        CameraMessage::CamLeave { id } => ("cam-leave", Some(id), None),
-        CameraMessage::Full { id } => ("full", Some(id), None),
-        CameraMessage::Needs { id } => ("needs", Some(id), None),
+        CameraMessage::CamLeave { id } => ("cam-leave", Some(id), None, false),
+        CameraMessage::Full { id } => ("full", Some(id), None, false),
+        CameraMessage::Needs { id } => ("needs", Some(id), None, false),
     };
     if id.is_some_and(|id| !is_broadcast_id(id)) {
         return None;
@@ -155,6 +160,9 @@ pub fn encode(message: &CameraMessage) -> Option<Vec<u8>> {
         }
         if let Some(codecs) = &codecs {
             w.write_string("codecs", codecs)?;
+        }
+        if media {
+            w.write_uint("mv", 2, 8, bovnar::Base::DECIMAL)?;
         }
         Ok(())
     })
@@ -183,7 +191,11 @@ pub fn decode(data: &[u8]) -> Result<CameraMessage, Refused> {
             if codecs.is_empty() {
                 return Err(Refused::Invalid);
             }
-            CameraMessage::CamJoin { id, codecs }
+            let media = doc
+                .get("mv")
+                .and_then(|node| node.as_u64())
+                .is_some_and(|v| v >= 2);
+            CameraMessage::CamJoin { id, codecs, media }
         }
         _ => return Err(Refused::Invalid),
     })
@@ -371,6 +383,7 @@ mod tests {
             CameraMessage::CamJoin {
                 id: ID.into(),
                 codecs: vec![Codec::Av1, Codec::Vp9],
+                media: false,
             },
             CameraMessage::CamLeave { id: ID.into() },
             CameraMessage::Full { id: ID.into() },
@@ -406,6 +419,20 @@ mod tests {
     }
 
     #[test]
+    fn cam_join_carries_the_media_capability_and_needs_round_trips() {
+        let join = CameraMessage::CamJoin {
+            id: ID.into(),
+            codecs: vec![Codec::Vp9],
+            media: true,
+        };
+        let encoded = encode(&join).expect("encodes");
+        assert!(String::from_utf8_lossy(&encoded).contains("mv"));
+        assert_eq!(decode(&encoded), Ok(join));
+        let needs = CameraMessage::Needs { id: ID.into() };
+        assert_eq!(decode(&encode(&needs).expect("encodes")), Ok(needs));
+    }
+
+    #[test]
     fn direction_follows_the_table() {
         let to_channel: Vec<_> = all().iter().map(CameraMessage::to_channel).collect();
         assert_eq!(to_channel, [true, true, false, false, false, false]);
@@ -423,7 +450,8 @@ mod tests {
         assert_eq!(
             encode(&CameraMessage::CamJoin {
                 id: ID.into(),
-                codecs: vec![]
+                codecs: vec![],
+                media: false
             }),
             None
         );
@@ -523,7 +551,8 @@ mod tests {
             decode(&text),
             Ok(CameraMessage::CamJoin {
                 id: ID.into(),
-                codecs: vec![Codec::Vp9]
+                codecs: vec![Codec::Vp9],
+                media: false
             })
         );
     }
