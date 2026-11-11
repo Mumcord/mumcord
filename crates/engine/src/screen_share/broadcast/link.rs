@@ -27,6 +27,7 @@ use tokio::task::JoinHandle;
 
 use super::crypto::{FrameOpener, FrameSealer, ShareKey, TrackOpener, TrackSealer};
 use super::keyx::{self, CertKey, PendingRequest, Reassembler, SharerChannel, ViewerChannel};
+use crate::inspector::{MediaFormat, MediaTap, MediaTapSink, TapDirection};
 use crate::screen_share::media::Subscription;
 use crate::screen_share::wire::{self, Codec, Frame, FrameHeader, FrameKind};
 use crate::session::lock;
@@ -287,6 +288,40 @@ impl PublisherSealer {
 /// control task.
 type SharedDescription = Arc<Mutex<Option<Description>>>;
 
+/// Keeps one sealed track message of a media-profile link for the packet inspector (FR-7.101):
+/// its channel, its clear flags byte and its size, never the ciphertext.
+fn tap_track(tap: &Option<MediaTapSink>, channel: u16, sealed: &[u8]) {
+    let Some(tap) = tap else {
+        return;
+    };
+    tap.record(
+        TapDirection::Sent,
+        MediaTap::track(
+            MediaFormat::Document,
+            channel,
+            sealed.first().copied().unwrap_or(0),
+            u32::try_from(sealed.len()).unwrap_or(u32::MAX),
+        ),
+    );
+}
+
+/// Keeps one sealed description of a media-profile link, with its decoded form, for the packet
+/// inspector (FR-7.101).
+fn tap_description(tap: &Option<MediaTapSink>, size: u32, description: &Description) {
+    let Some(tap) = tap else {
+        return;
+    };
+    tap.record(
+        TapDirection::Sent,
+        MediaTap::control(
+            MediaFormat::Document,
+            media::ControlKind::Description,
+            size,
+            Some(description),
+        ),
+    );
+}
+
 /// The tile height in a `want` from the relay (slot already split off); `None` when malformed.
 fn want_height(payload: &[u8]) -> Option<u16> {
     let bytes: [u8; 2] = payload.try_into().ok()?;
@@ -318,13 +353,15 @@ pub(crate) struct Publisher {
 
 impl Publisher {
     /// Starts sending the share taken from `frames` over `link` as broadcast `id`. `on_end`
-    /// runs when the link ends by itself (the relay or the network).
+    /// runs when the link ends by itself (the relay or the network); `tap` records every message
+    /// of a media-profile link for the packet inspector (FR-7.101).
     pub fn start<S: FrameSource>(
         rt: &tokio::runtime::Handle,
         id: BroadcastId,
         me: CertKey,
         link: BroadcastLink,
         frames: S,
+        tap: Option<MediaTapSink>,
         on_end: OnEnd,
     ) -> Result<Self, super::crypto::CryptoError> {
         let media = link.is_media();
@@ -339,6 +376,7 @@ impl Publisher {
             description.clone(),
             link.sender(),
             media,
+            tap.clone(),
         ));
         let control = rt.spawn(
             PublisherControl {
@@ -353,6 +391,7 @@ impl Publisher {
                 wants: HashMap::new(),
                 reassembler: Reassembler::new(),
                 set_id: 0,
+                tap,
             }
             .run(link, command_rx, on_end),
         );
@@ -397,6 +436,7 @@ async fn write_units<S: FrameSource>(
     description: SharedDescription,
     units: mpsc::Sender<Vec<u8>>,
     media: bool,
+    tap: Option<MediaTapSink>,
 ) {
     let mut writer = profile::MessageWriter::new();
     loop {
@@ -414,6 +454,7 @@ async fn write_units<S: FrameSource>(
                         continue;
                     }
                 };
+                let sealed_len = u32::try_from(sealed.len()).unwrap_or(u32::MAX);
                 let message =
                     match profile::Message::control(media::ControlKind::Description, sealed) {
                         Ok(message) => message,
@@ -432,6 +473,7 @@ async fn write_units<S: FrameSource>(
                 if units.send(bytes).await.is_err() {
                     return;
                 }
+                tap_description(&tap, sealed_len, &wanted);
                 *lock(&description) = Some(wanted);
                 // The viewer applies the description at the next keyframe.
                 frames.force_keyframe();
@@ -455,6 +497,9 @@ async fn write_units<S: FrameSource>(
                 tracing::warn!("broadcast frame outside the media profile");
                 continue;
             };
+            if let profile::Message::Track { channel, payload } = &message {
+                tap_track(&tap, *channel, payload);
+            }
             match writer.encode(&message) {
                 Ok(bytes) => bytes.to_vec(),
                 Err(e) => {
@@ -484,6 +529,9 @@ struct PublisherControl<S> {
     wants: HashMap<u16, u16>,
     reassembler: Reassembler<u16>,
     set_id: u8,
+    /// Where the control messages this publisher receives go for the packet inspector
+    /// (FR-7.101).
+    tap: Option<MediaTapSink>,
 }
 
 impl<S: FrameSource> PublisherControl<S> {
@@ -503,6 +551,17 @@ impl<S: FrameSource> PublisherControl<S> {
                         }
                     }
                     Ok(BroadcastMessage::Media(profile::Message::Control { kind, payload })) => {
+                        if let Some(tap) = &self.tap {
+                            tap.record(
+                                TapDirection::Received,
+                                MediaTap::control(
+                                    MediaFormat::Document,
+                                    kind,
+                                    u32::try_from(payload.len() + 1).unwrap_or(u32::MAX),
+                                    None,
+                                ),
+                            );
+                        }
                         if let Some(kind) = legacy_control(kind)
                             && !self.on_control(kind, &payload, &units).await
                         {
@@ -1349,6 +1408,41 @@ mod tests {
                 keyframe: false,
                 temporal_layer: 1
             }
+        );
+    }
+
+    #[test]
+    fn sealed_broadcast_messages_are_tapped_for_the_inspector() {
+        let inspector = Arc::new(crate::inspector::Inspector::default());
+        inspector.set_enabled(true);
+        let tap = Some(MediaTapSink::new(&inspector, 1));
+        // A track message as it goes on the wire: flags byte, SFrame header, ciphertext.
+        tap_track(&tap, 3, &[media::FLAG_KEYFRAME, 0x10, 0xab, 0xcd]);
+        let description = Description {
+            kind: media::StreamKind::Screen,
+            timebase: 1,
+            id: None,
+            tracks: Vec::new(),
+        };
+        tap_description(&tap, 42, &description);
+
+        let poll = inspector.poll(None, Vec::new());
+        assert_eq!(poll.packets.len(), 2);
+        let track = poll.packets[0].media.as_ref().expect("a media row");
+        assert_eq!(track.channel, Some(3));
+        assert!(track.keyframe);
+        assert_eq!(poll.packets[0].size, 4);
+        assert_eq!(poll.packets[0].raw_hex, "", "never the ciphertext");
+        let control = poll.packets[1].media.as_ref().expect("a media row");
+        assert_eq!(control.channel, Some(media::CHANNEL_CONTROL));
+        assert_eq!(control.control, Some(media::KIND_DESCRIPTION));
+        assert_eq!(poll.packets[1].size, 42);
+        assert!(
+            poll.packets[1]
+                .decoded
+                .as_deref()
+                .is_some_and(|d: &str| d.contains("screen")),
+            "the description is decoded"
         );
     }
 

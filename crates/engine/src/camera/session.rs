@@ -657,11 +657,12 @@ impl Engine {
                                 engine.camera_broadcast_ended(server_id, id, end);
                             }
                         });
-                        let publisher = Publisher::start(&rt, id, me, link, frames.relay(), on_end)
-                            .map_err(|e| {
-                                tracing::warn!(error = %e, "camera broadcast not started");
-                                CameraFailure::RelayDown
-                            })?;
+                        let publisher =
+                            Publisher::start(&rt, id, me, link, frames.relay(), None, on_end)
+                                .map_err(|e| {
+                                    tracing::warn!(error = %e, "camera broadcast not started");
+                                    CameraFailure::RelayDown
+                                })?;
                         Some(Broadcast { id, publisher })
                     }
                     None => None,
