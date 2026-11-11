@@ -303,9 +303,8 @@ fn main() {
                 FrameKind::Video(Codec::Vp9)
             },
             keyframe: case.keyframe,
-            temporal_layer: if case.channel == 5 {
-                0
-            } else if case.keyframe {
+            // Audio sits on layer 0 like a keyframe; only delta video frames use layer 2.
+            temporal_layer: if case.channel == 5 || case.keyframe {
                 0
             } else {
                 2
