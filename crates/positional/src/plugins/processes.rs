@@ -82,6 +82,111 @@ mod platform {
     }
 }
 
+/// FreeBSD has no `/proc` by default (procfs is optional and deprecated), so the programs come
+/// from `sysctl`: `KERN_PROC_ALL` for the list and `KERN_PROC_ARGS` for the command line, which
+/// keeps the full file name instead of `ki_comm`'s 19 bytes. Another user's command line needs
+/// `security.bsd.see_other_uids`; without it the shorter `ki_comm` is used.
+#[cfg(target_os = "freebsd")]
+mod platform {
+    use std::ffi::CStr;
+    use std::mem::MaybeUninit;
+
+    use super::file_name;
+
+    pub(super) fn running() -> Vec<(String, u64)> {
+        let Some(procs) = list() else {
+            tracing::warn!("listing the running programs failed");
+            return Vec::new();
+        };
+        procs
+            .into_iter()
+            .filter_map(|proc| {
+                let pid = proc.ki_pid;
+                if pid <= 0 {
+                    return None;
+                }
+                let name = args(pid).or_else(|| {
+                    // SAFETY: `ki_comm` is a NUL-terminated array owned by the entry.
+                    let comm = unsafe { CStr::from_ptr(proc.ki_comm.as_ptr()) };
+                    Some(comm.to_string_lossy().into_owned())
+                })?;
+                let name = file_name(name.trim());
+                let pid = u64::try_from(pid).ok()?;
+                (!name.is_empty()).then(|| (name.to_owned(), pid))
+            })
+            .collect()
+    }
+
+    /// Every process the kernel reports, or `None` when `sysctl` refuses.
+    fn list() -> Option<Vec<libc::kinfo_proc>> {
+        // Three names: `KERN_PROC_ALL` takes no pid.
+        let mib = [libc::CTL_KERN, libc::KERN_PROC, libc::KERN_PROC_ALL];
+        // Start with room for more processes than reported, and grow when they multiplied in
+        // between (the call then fails with ENOMEM).
+        let mut count = 512;
+        for _ in 0..4 {
+            let mut buffer: Vec<MaybeUninit<libc::kinfo_proc>> = vec![MaybeUninit::uninit(); count];
+            let mut mib = mib;
+            let mut len = count * std::mem::size_of::<libc::kinfo_proc>();
+            // SAFETY: `buffer` holds `len` writable bytes; `mib` is a valid MIB.
+            let result = unsafe {
+                libc::sysctl(
+                    mib.as_mut_ptr(),
+                    mib.len() as libc::c_uint,
+                    buffer.as_mut_ptr().cast(),
+                    &mut len,
+                    std::ptr::null_mut(),
+                    0,
+                )
+            };
+            if result == 0 {
+                let filled = len / std::mem::size_of::<libc::kinfo_proc>();
+                // SAFETY: the kernel filled `filled` entries.
+                let procs = unsafe {
+                    std::slice::from_raw_parts(buffer.as_ptr().cast::<libc::kinfo_proc>(), filled)
+                };
+                return Some(procs.to_vec());
+            }
+            let error = std::io::Error::last_os_error();
+            if error.raw_os_error() != Some(libc::ENOMEM) {
+                tracing::debug!(error = %error, "sysctl KERN_PROC_ALL failed");
+                return None;
+            }
+            count *= 2;
+        }
+        None
+    }
+
+    /// The command line of `pid`, NUL-separated by the kernel; its first argument is the
+    /// program. `None` when the kernel refuses (another user's process).
+    fn args(pid: libc::pid_t) -> Option<String> {
+        let mut mib = [libc::CTL_KERN, libc::KERN_PROC, libc::KERN_PROC_ARGS, pid];
+        let mut len = 4096;
+        let mut buffer = vec![0u8; len];
+        // SAFETY: `buffer` holds `len` writable bytes; `mib` is a valid MIB.
+        let result = unsafe {
+            libc::sysctl(
+                mib.as_mut_ptr(),
+                mib.len() as libc::c_uint,
+                buffer.as_mut_ptr().cast(),
+                &mut len,
+                std::ptr::null_mut(),
+                0,
+            )
+        };
+        if result != 0 {
+            return None;
+        }
+        let filled = buffer.len().min(len);
+        let first = buffer[..filled]
+            .split(|&b| b == 0)
+            .next()
+            .unwrap_or_default();
+        let first = String::from_utf8_lossy(first).into_owned();
+        (!first.is_empty()).then_some(first)
+    }
+}
+
 #[cfg(windows)]
 mod platform {
     use windows_sys::Win32::Foundation::{CloseHandle, INVALID_HANDLE_VALUE};
@@ -120,7 +225,12 @@ mod platform {
     }
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "macos",
+    windows
+)))]
 mod platform {
     pub(super) fn running() -> Vec<(String, u64)> {
         Vec::new()

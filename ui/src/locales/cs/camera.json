@@ -14,7 +14,8 @@
     "relayDisallows": "Relay tohoto serveru sdílení kamery nepovoluje.",
     "needsRelayMode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
-    "registeredOnly": "Na tomto serveru mohou kameru používat jen registrovaní uživatelé."
+    "registeredOnly": "Na tomto serveru mohou kameru používat jen registrovaní uživatelé.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera zapnutá",
   "turnOffTray": "Vypnout kameru",

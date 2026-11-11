@@ -85,7 +85,8 @@
     "soundNeeds": {
       "windows": "Bez zvuka: potreban je Windows 10 verzije 2004 ili noviji",
       "macos": "Bez zvuka: potreban je macOS 13 ili noviji",
-      "pipewire": "Bez zvuka: potreban je PipeWire"
+      "pipewire": "Bez zvuka: potreban je PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Gledatelji dobivaju:",
     "viewersGetSummary": "do {{resolution}} · {{fps}} kadrova/s · {{codec}} · oko {{mbit}} Mbit/s",

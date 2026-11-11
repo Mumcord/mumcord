@@ -4017,6 +4017,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               appimage: false,
               portable: false,
               distro: null,
+              limits: [],
+              session: null,
             }
           : {
               version: "0.0.0-mock",
@@ -4025,6 +4027,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               appimage: false,
               portable: false,
               distro: null,
+              limits: [],
+              session: null,
             },
       ),
 

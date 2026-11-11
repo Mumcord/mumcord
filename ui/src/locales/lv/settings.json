@@ -536,7 +536,18 @@
     "logCopied": "Žurnāls nokopēts.",
     "fileLabel": "Diagnostikas fails",
     "writeToDisk": "Rakstīt žurnālus diskā",
-    "writeToDiskHint": "Izslēgts žurnālu glabā tikai atmiņā šai sesijai — diskā nekas netiek rakstīts."
+    "writeToDiskHint": "Izslēgts žurnālu glabā tikai atmiņā šai sesijai — diskā nekas netiek rakstīts.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Versija",
@@ -563,7 +574,15 @@
     "tipsTitle": "Padomi",
     "tipsHint": "Aarons apmēram minūtē izrāda Mumcord: serverus, kanālus, runāšanu, tērzēšanu un vēl daudz ko.",
     "tipsShow": "Rādīt padomus",
-    "versionTitle": "Versija un licence"
+    "versionTitle": "Versija un licence",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profils",

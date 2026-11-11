@@ -145,3 +145,12 @@
   background: var(--color-bg-elevated);
   color: var(--color-text-muted);
 }
+
+/* The portalled list is placed against its button in window coordinates. */
+.select__list--portal {
+  position: fixed;
+  inset-inline: auto;
+  z-index: 1000;
+  margin: 0;
+  min-width: 6rem;
+}

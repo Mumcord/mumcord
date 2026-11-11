@@ -1356,10 +1356,7 @@ export const commands = {
 	 *  reconnects and rejoins), finishes the install where it waits for the restart, and restarts.
 	 */
 	updateRestart: () => typedError<null, ApiError>(__TAURI_INVOKE("update_restart")),
-	/**
-	 *  AppImage only: adds Mumcord to the app menu (desktop entry and icon). The UI calls this
-	 *  after the user said yes and then stores the choice in `appimageMenuEntry`.
-	 */
+	/**  Only the Linux AppImage has a menu entry to add. */
 	appimageMenuEntryAdd: () => typedError<null, ApiError>(__TAURI_INVOKE("appimage_menu_entry_add")),
 };
 
@@ -1606,6 +1603,14 @@ export type AppInfo = {
 	 *  systems or without a readable os-release file.
 	 */
 	distro: LinuxDistro | null,
+	/**
+	 *  What this platform cannot offer (FR-13.27): the UI disables those entries and the About
+	 *  note lists them. Empty where everything works.
+	 */
+	limits: PlatformLimit[],
+	/**  The desktop session in use, where the platform has more than one (FR-13.31); `None`
+	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything. */
+	session: SessionKind | null,
 };
 
 /**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
@@ -2009,7 +2014,7 @@ export type CameraTileState =
 "hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
-export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate";
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | "unsupportedPlatform";
 
 /**  The own camera as the preview dialog, Settings, the room and the tray see it. */
 export type CameraView = {
@@ -2968,7 +2973,9 @@ export type InstallKind =
 /**  A Mac app outside an `.app` bundle (a development run). */
 "otherMac" | 
 /**  Packages: the package manager updates them. */
-"deb" | "rpm" | "aur" | "otherLinux";
+"deb" | "rpm" | "aur" | "otherLinux" | 
+/**  A FreeBSD package: `pkg upgrade mumcord` updates it (see updater_freebsd.rs). */
+"pkg";
 
 /**  One installed plugin. */
 export type InstalledPlugin = {
@@ -3617,6 +3624,26 @@ export type PersonTarget = {
 	canKick: boolean,
 	canBan: boolean,
 };
+
+/**  A feature this platform cannot provide, with the reason named in the About note. */
+/**  Which display server the app talks to (FR-13.31, FR-13.21). */
+export type SessionKind = 
+/**  X11, also through XWayland on a Wayland session. */
+"x11" | 
+/**  A Wayland session; hotkeys and capture still go through XWayland. */
+"wayland";
+
+export type PlatformLimit = 
+/**  No camera backend. */
+"camera" | 
+/**  No ONNX Runtime for the AI backgrounds. */
+"cameraEffects" | 
+/**  No PipeWire to take an application's sound into a share. */
+"screenShareSound" | 
+/**  No `xdg-desktop-portal` to pick a window or an app. */
+"windowPicker" | 
+/**  No in-game overlay. */
+"overlay" | "protectedVideo";
 
 /**  A video waiting in the party's playlist (FR-2.69). */
 export type PlaylistEntry = {
@@ -5345,7 +5372,7 @@ export type SoundUnavailableReason =
 /**  Linux without a running PipeWire. */
 "noPipeWire" | 
 /**  The sound capture could not start or stopped. */
-"captureFailed";
+"captureFailed" | "platform";
 
 export type StageActivityKind = 
 /**  "<name> started <plugin> · Join". */

@@ -96,7 +96,17 @@ fn main() {
     generate(
         &svt,
         bindgen::Builder::default()
-            .header_contents("svt.h", "#include <svt-av1/EbSvtAv1Enc.h>\n")
+            // FreeBSD's port points pkg-config at include/svt-av1 and keeps the headers flat
+            // there, while the libraries we build ourselves and the Linux packages keep them
+            // below include/svt-av1/. Accept both layouts.
+            .header_contents(
+                "svt.h",
+                "#if __has_include(<svt-av1/EbSvtAv1Enc.h>)\n\
+                 #include <svt-av1/EbSvtAv1Enc.h>\n\
+                 #else\n\
+                 #include <EbSvtAv1Enc.h>\n\
+                 #endif\n",
+            )
             .allowlist_function("svt_av1_.*")
             .allowlist_type("Eb.*|SvtAv1.*|PrivDataType|PredStructure")
             .allowlist_var("EB_.*"),

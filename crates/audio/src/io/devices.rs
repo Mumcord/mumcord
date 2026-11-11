@@ -82,7 +82,25 @@ const ALSA_KEEP: [&str; 3] = ["default", "pipewire", "pulse"];
 
 /// Whether an ALSA PCM name (the part after `alsa:`) is worth showing.
 fn keep_alsa(pcm: &str) -> bool {
-    ALSA_KEEP.contains(&pcm) || pcm.starts_with("sysdefault:CARD=")
+    if ALSA_KEEP.contains(&pcm) || pcm.starts_with("sysdefault:CARD=") {
+        return true;
+    }
+    // FreeBSD's ALSA is a compatibility layer over OSS: alsa-lib lists no cards, so `oss` (the
+    // OSS plugin, playing and recording through /dev/dsp) is the sound device, and `null` the
+    // only other entry. `mumcord_dspN` are the per-unit PCMs the package installs; the units this
+    // machine does not have are hidden.
+    #[cfg(target_os = "freebsd")]
+    {
+        if pcm == "oss" {
+            return true;
+        }
+        if let Some(unit) = pcm.strip_prefix("mumcord_dsp")
+            && unit.parse::<u8>().is_ok()
+        {
+            return std::path::Path::new(&format!("/dev/dsp{unit}")).exists();
+        }
+    }
+    false
 }
 
 /// Drops duplicate and raw ALSA entries and puts the OS default first, otherwise keeping order.
@@ -157,6 +175,47 @@ mod tests {
                 "alsa:sysdefault:CARD=II"
             ]
         );
+    }
+
+    /// FreeBSD: the per-unit PCMs stay, but only for units this machine has.
+    ///
+    /// What counts as "has" is the machine's own `/dev/dsp*`, so the assertions follow it: a CI VM
+    /// without sound cards keeps none of them, a machine with two cards keeps two.
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn freebsd_keeps_one_entry_per_existing_dsp_unit() {
+        let has_unit = |unit: &str| std::path::Path::new(&format!("/dev/dsp{unit}")).exists();
+        let input = vec![
+            dev("alsa:mumcord_dsp0", "Sound card 0 (OSS)", false),
+            dev("alsa:mumcord_dsp9", "Sound card 9 (OSS)", false),
+            dev("alsa:null", "Discard all samples", false),
+            dev("alsa:oss", "Open Sound System", true),
+        ];
+        let ids: Vec<String> = filter(input).into_iter().map(|d| d.id).collect();
+        assert_eq!(
+            ids.contains(&"alsa:mumcord_dsp0".to_owned()),
+            has_unit("0"),
+            "{ids:?}"
+        );
+        assert_eq!(
+            ids.contains(&"alsa:mumcord_dsp9".to_owned()),
+            has_unit("9"),
+            "{ids:?}"
+        );
+        assert_eq!(ids.first().map(String::as_str), Some("alsa:oss"));
+        assert!(!ids.iter().any(|id| id == "alsa:null"), "{ids:?}");
+    }
+
+    /// FreeBSD: `oss` is the real device, `null` stays out.
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn freebsd_keeps_the_oss_device_only() {
+        let input = vec![
+            dev("alsa:null", "Discard all samples", false),
+            dev("alsa:oss", "Open Sound System", false),
+        ];
+        let ids: Vec<String> = filter(input).into_iter().map(|d| d.id).collect();
+        assert_eq!(ids, ["alsa:oss"]);
     }
 
     #[test]

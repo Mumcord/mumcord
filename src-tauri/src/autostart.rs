@@ -43,7 +43,7 @@ pub fn program(app: &AppHandle) -> io::Result<PathBuf> {
 }
 
 #[cfg(not(target_os = "linux"))]
-fn program(_app: &AppHandle) -> io::Result<PathBuf> {
+pub fn program(_app: &AppHandle) -> io::Result<PathBuf> {
     tauri::utils::platform::current_exe()
 }
 
@@ -69,7 +69,7 @@ pub fn sync(app: &AppHandle, enabled: bool) {
 }
 
 /// An autostart entry stored as a file (Linux, macOS).
-#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
 struct FileEntry {
     path: PathBuf,
     content: String,
@@ -77,7 +77,7 @@ struct FileEntry {
     marker: &'static str,
 }
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
 impl FileEntry {
     fn apply(&self, enabled: bool) -> io::Result<()> {
         let current = match std::fs::read_to_string(&self.path) {
@@ -109,7 +109,7 @@ impl FileEntry {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod os {
     use std::io;
     use std::path::{Path, PathBuf};

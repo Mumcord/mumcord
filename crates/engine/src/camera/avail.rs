@@ -24,7 +24,13 @@ pub enum CameraUnavailable {
     NeedsRelayMode,
     /// "Camera sharing needs a client certificate."
     NoCertificate,
+    /// "Camera sharing is not available on FreeBSD yet." This platform has no camera backend
+    /// (FR-13.27), so the entry stays visible but disabled.
+    UnsupportedPlatform,
 }
+
+/// Whether this build has a camera backend at all.
+const CAMERA_BACKEND: bool = cfg!(any(target_os = "linux", target_os = "macos", windows, test));
 
 /// The reason camera sharing is unavailable, or `None` when it is available.
 pub(crate) fn evaluate(
@@ -32,6 +38,9 @@ pub(crate) fn evaluate(
     mode: P2pMode,
     has_certificate: bool,
 ) -> Option<CameraUnavailable> {
+    if !CAMERA_BACKEND {
+        return Some(CameraUnavailable::UnsupportedPlatform);
+    }
     if relay.status != RelayStatus::Available {
         return Some(CameraUnavailable::NoRelay);
     }
@@ -110,6 +119,16 @@ mod tests {
 
     fn check(relay: &RelayInfo) -> Option<CameraUnavailable> {
         evaluate(relay, P2pMode::RelayFirst, true)
+    }
+
+    /// A platform without a camera backend names that first, whatever the relay says (FR-13.27).
+    #[test]
+    fn a_platform_without_a_camera_backend_says_so() {
+        if CAMERA_BACKEND {
+            assert_eq!(check(&good()), None);
+        } else {
+            assert_eq!(check(&good()), Some(CameraUnavailable::UnsupportedPlatform));
+        }
     }
 
     #[test]

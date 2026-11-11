@@ -539,7 +539,18 @@
     "logCopied": "Log skopiowany.",
     "fileLabel": "Plik diagnostyczny",
     "writeToDisk": "Zapisuj logi na dysku",
-    "writeToDiskHint": "Wyłączone: log jest trzymany tylko w pamięci na czas tej sesji – nic nie trafia na dysk."
+    "writeToDiskHint": "Wyłączone: log jest trzymany tylko w pamięci na czas tej sesji – nic nie trafia na dysk.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Wersja",
@@ -566,7 +577,15 @@
     "tipsTitle": "Wskazówki",
     "tipsHint": "Aaron w około minutę oprowadzi cię po Mumcordzie: serwery, kanały, mówienie, czat i więcej.",
     "tipsShow": "Pokaż wskazówki",
-    "versionTitle": "Wersja i licencja"
+    "versionTitle": "Wersja i licencja",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profil",

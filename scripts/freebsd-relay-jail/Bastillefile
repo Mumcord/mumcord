@@ -1,0 +1,48 @@
+# BastilleBSD template: a throw-away test jail with a Mumble server, the mumpeer relay and the
+# mumbot peer bot, for testing Mumcord's peer-to-peer features (file sharing, screen sharing,
+# cameras) on FreeBSD.
+#
+# This is test tooling for the FreeBSD port (specs/13-freebsd-support-*), not a production
+# deployment: the relay runs on a self-signed identity, the server has no registration rules and
+# everything runs as root inside the jail. Production relay and bot deployments belong to their
+# own repositories (Mumcord/mumpeer, Mumcord/mumbot).
+#
+# Usage (on a FreeBSD host with bastille installed):
+#   bastille bootstrap 15.1-RELEASE
+#   ifconfig em0 alias 192.0.2.11/24          # or any free address on the LAN
+#   bastille create relay 15.1-RELEASE 192.0.2.11 em0
+#   bastille template relay "$PWD/scripts/freebsd-relay-jail" \
+#       --arg jail_ip=192.0.2.11 --arg relay_host=192.0.2.11
+#
+# The jail gets: mumble-server on 64738, mumpeer on 443/udp+443/tcp, the peer bot on the server.
+
+ARG jail_ip
+ARG relay_host
+
+# Rust for the two services, cmake/protobuf for mumbot's bundled Opus and its protobuf codegen.
+PKG mumble-server rust git cmake protobuf ca_root_nss curl
+
+# Source trees are built inside the jail; the release binaries land in /root/bin.
+CMD mkdir -p /root/src /root/bin /var/db/mumpeer /var/db/mumble-server /var/log/mumpeer
+CMD chown -R mumble-server:mumble-server /var/db/mumble-server
+
+# COPY takes a path inside the template and a destination inside the jail.
+COPY files/usr/local/etc/mumble/mumble-server.ini /usr/local/etc/mumble/mumble-server.ini
+COPY files/usr/local/etc/mumpeer/mumpeer.toml /usr/local/etc/mumpeer/mumpeer.toml
+COPY files/root/bot.toml.in /root/bot.toml.in
+COPY files/root/build-stack.sh /root/build-stack.sh
+COPY files/root/setup-stack.sh /root/setup-stack.sh
+
+# The jail's address and the address clients use are the same here; both are substituted so a
+# port-forwarded jail works too.
+CMD sed -i '' -e 's|@JAIL_IP@|${jail_ip}|g' -e 's|@RELAY_HOST@|${relay_host}|g' \
+    /usr/local/etc/mumble/mumble-server.ini \
+    /usr/local/etc/mumpeer/mumpeer.toml
+
+# Build mumpeer and mumbot. mumbot's mumcord-protocol dependency cannot find a vendored protoc on
+# FreeBSD, so /root/build-stack.sh patches it to use the system protoc.
+CMD sh /root/build-stack.sh
+
+# Start the server, start the relay, pin its fingerprint into the bot config, register the bot,
+# start the bot.
+CMD sh /root/setup-stack.sh

@@ -14,7 +14,8 @@
     "relayDisallows": "Przekaźnik tego serwera nie pozwala na udostępnianie kamery.",
     "needsRelayMode": "Udostępnianie kamery wymaga przekaźnika. Zmień to w sekcji „Prywatność i połączenia”.",
     "noCertificate": "Udostępnianie kamery wymaga certyfikatu klienta.",
-    "registeredOnly": "Na tym serwerze kamery mogą używać tylko zarejestrowani użytkownicy."
+    "registeredOnly": "Na tym serwerze kamery mogą używać tylko zarejestrowani użytkownicy.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera włączona",
   "turnOffTray": "Wyłącz kamerę",

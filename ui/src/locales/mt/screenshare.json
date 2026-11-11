@@ -89,7 +89,8 @@
     "soundNeeds": {
       "windows": "Ebda ħoss: teħtieġ Windows 10 verżjoni 2004 jew aktar ġdida",
       "macos": "Ebda ħoss: teħtieġ macOS 13 jew aktar ġdid",
-      "pipewire": "Ebda ħoss: teħtieġ PipeWire"
+      "pipewire": "Ebda ħoss: teħtieġ PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Dawk li jaraw jirċievu:",
     "viewersGetSummary": "sa {{resolution}} · {{fps}} fps · {{codec}} · madwar {{mbit}} Mbit/s",

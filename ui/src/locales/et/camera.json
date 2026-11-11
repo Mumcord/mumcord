@@ -14,7 +14,8 @@
     "relayDisallows": "Selle serveri releeserver ei luba kaamera jagamist.",
     "needsRelayMode": "Kaamera jagamine vajab releeserverit. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
-    "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad."
+    "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kaamera sees",
   "turnOffTray": "Lülita kaamera välja",

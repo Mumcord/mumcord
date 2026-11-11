@@ -32,6 +32,8 @@ pub enum InstallKind {
     Rpm,
     Aur,
     OtherLinux,
+    /// A FreeBSD package: `pkg upgrade mumcord` updates it (see updater_freebsd.rs).
+    Pkg,
 }
 
 /// Where the updater is (FR-3.144, FR-3.145).

@@ -13,4 +13,4 @@ export { WatchLinkDialog } from "./WatchLinkDialog";
 export { parseBridgeReport, playerOrigin, type BridgeCommand } from "./playerBridge";
 export { CodecHint } from "./CodecHint";
 export { isTwitchPlayer, twitchNeedsBrowser, type PlaybackFailure } from "./codecSupport";
-export { useLinux } from "./useLinux";
+export { useHintPlatform, type HintPlatform } from "./useHintPlatform";

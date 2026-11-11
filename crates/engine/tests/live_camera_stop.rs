@@ -4,7 +4,8 @@
 //! the preview with the test camera, so no relay is needed; the relay stops (FR-8.24) are covered
 //! by the E2E tests with mumpeer's testenv. `testenv/up.sh v15 v15b`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_camera_stop -- --ignored --test-threads=1`
-#![cfg(feature = "test-backend")]
+// FreeBSD: see the note on the mumbot dev-dependency in Cargo.toml.
+#![cfg(all(feature = "test-backend", not(target_os = "freebsd")))]
 
 mod common;
 

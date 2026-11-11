@@ -59,7 +59,7 @@ fn locations_in(dirs: &AppDirs) -> CacheLocations {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn web_dirs(dirs: &AppDirs) -> Vec<PathBuf> {
     vec![
         dirs.local_data.join("WebKitCache"),
@@ -83,7 +83,7 @@ fn web_dirs(dirs: &AppDirs) -> Vec<PathBuf> {
 }
 
 /// The directories before the app exists, from the same rules Tauri uses.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn startup_dirs(identifier: &str) -> Option<AppDirs> {
     let base = |var: &str, fallback: &str| -> Option<PathBuf> {
         match std::env::var_os(var).map(PathBuf::from) {

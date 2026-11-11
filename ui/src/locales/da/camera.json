@@ -14,7 +14,8 @@
     "relayDisallows": "Denne servers relæ tillader ikke kameradeling.",
     "needsRelayMode": "Kameradeling kræver relæet. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
-    "registeredOnly": "Kun registrerede brugere må bruge kameraet på denne server."
+    "registeredOnly": "Kun registrerede brugere må bruge kameraet på denne server.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera tændt",
   "turnOffTray": "Sluk kamera",

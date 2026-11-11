@@ -14,7 +14,8 @@
     "relayDisallows": "Relej ovog poslužitelja ne dopušta dijeljenje kamere.",
     "needsRelayMode": "Dijeljenje kamere zahtijeva relej. Promijeni to u odjeljku Privatnost i veze.",
     "noCertificate": "Dijeljenje kamere zahtijeva klijentski certifikat.",
-    "registeredOnly": "Na ovom poslužitelju kameru smiju koristiti samo registrirani korisnici."
+    "registeredOnly": "Na ovom poslužitelju kameru smiju koristiti samo registrirani korisnici.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera uključena",
   "turnOffTray": "Isključi kameru",

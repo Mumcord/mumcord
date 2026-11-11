@@ -14,7 +14,8 @@
     "relayDisallows": "Releul acestui server nu permite partajarea camerei.",
     "needsRelayMode": "Partajarea camerei are nevoie de releu. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
-    "registeredOnly": "Pe acest server doar utilizatorii înregistrați pot folosi camera."
+    "registeredOnly": "Pe acest server doar utilizatorii înregistrați pot folosi camera.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Cameră pornită",
   "turnOffTray": "Oprește camera",

@@ -14,7 +14,8 @@
     "relayDisallows": "Das Relay dieses Servers erlaubt keine Kamerafreigabe.",
     "needsRelayMode": "Die Kamerafreigabe benötigt das Relay. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
-    "registeredOnly": "Auf diesem Server dürfen nur registrierte Benutzer die Kamera verwenden."
+    "registeredOnly": "Auf diesem Server dürfen nur registrierte Benutzer die Kamera verwenden.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera an",
   "turnOffTray": "Kamera ausschalten",

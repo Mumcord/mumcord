@@ -663,7 +663,8 @@ mod native {
             return libc::__errno_location();
             #[cfg(target_os = "android")]
             return libc::__errno();
-            #[cfg(any(target_os = "macos", target_os = "ios"))]
+            // The BSDs spell it `__error` like macOS does.
+            #[cfg(any(target_os = "macos", target_os = "ios", target_os = "freebsd"))]
             return libc::__error();
         }
     }

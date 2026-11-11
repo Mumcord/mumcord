@@ -14,7 +14,8 @@
     "relayDisallows": "Le relais de ce serveur n’autorise pas le partage de caméra.",
     "needsRelayMode": "Le partage de caméra nécessite le relais. Modifie-le dans Confidentialité et connexions.",
     "noCertificate": "Le partage de caméra nécessite un certificat client.",
-    "registeredOnly": "Seuls les utilisateurs enregistrés peuvent utiliser la caméra sur ce serveur."
+    "registeredOnly": "Seuls les utilisateurs enregistrés peuvent utiliser la caméra sur ce serveur.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Caméra activée",
   "turnOffTray": "Désactiver la caméra",

@@ -85,7 +85,8 @@
     "soundNeeds": {
       "windows": "Nav skaņas: nepieciešams Windows 10 versija 2004 vai jaunāka",
       "macos": "Nav skaņas: nepieciešams macOS 13 vai jaunāks",
-      "pipewire": "Nav skaņas: nepieciešams PipeWire"
+      "pipewire": "Nav skaņas: nepieciešams PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Skatītāji saņem:",
     "viewersGetSummary": "līdz {{resolution}} · {{fps}} fps · {{codec}} · apmēram {{mbit}} Mbit/s",

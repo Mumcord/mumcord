@@ -14,7 +14,8 @@
     "relayDisallows": "Šio serverio perdavimo mazgas neleidžia bendrinti kameros.",
     "needsRelayMode": "Kameros bendrinimui reikia perdavimo mazgo. Pakeisk tai skiltyje „Privatumas ir ryšiai“.",
     "noCertificate": "Kameros bendrinimui reikia kliento sertifikato.",
-    "registeredOnly": "Šiame serveryje kamerą gali naudoti tik registruoti naudotojai."
+    "registeredOnly": "Šiame serveryje kamerą gali naudoti tik registruoti naudotojai.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera įjungta",
   "turnOffTray": "Išjungti kamerą",

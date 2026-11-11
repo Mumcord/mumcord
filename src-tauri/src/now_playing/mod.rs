@@ -1,5 +1,5 @@
 //! Reads the track playing in the system's media player for "Now playing" (FR-1.58) and hands
-//! it to the engine, which shares it. Linux: MPRIS over the session D-Bus. Windows: the system
+//! it to the engine, which shares it. Linux and FreeBSD: MPRIS over the session D-Bus. Windows: the system
 //! media session (GlobalSystemMediaTransportControls). macOS: the private MediaRemote framework,
 //! read through Apple's `osascript` (issue #658). The player is read only while the setting is on, off the
 //! UI thread, every `POLL_INTERVAL`; the engine decides what changed.
@@ -8,7 +8,7 @@
 mod gsmtc;
 #[cfg(any(target_os = "macos", test))]
 mod macos;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod mpris;
 
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -19,6 +19,7 @@ use mumcord_engine::now_playing::POLL_INTERVAL;
 /// Whether this platform can read the media player.
 const SUPPORTED: bool = cfg!(any(
     target_os = "linux",
+    target_os = "freebsd",
     target_os = "windows",
     target_os = "macos"
 ));
@@ -40,21 +41,36 @@ fn set_unavailable() {
     UNAVAILABLE.store(true, Ordering::Relaxed);
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 type Source = mpris::Reader;
 #[cfg(target_os = "windows")]
 type Source = gsmtc::Reader;
 #[cfg(target_os = "macos")]
 type Source = macos::Reader;
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 type Source = Unsupported;
 
 /// No media information on this platform.
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 #[derive(Default)]
 struct Unsupported;
 
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 impl Unsupported {
     // Same shape as the real readers.
     async fn read(&mut self) -> Option<mumcord_engine::LocalTrack> {

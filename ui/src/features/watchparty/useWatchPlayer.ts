@@ -10,7 +10,10 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { getApi, type WatchCommand } from "../../api";
 import { PartySync } from "./partySync";
+import { missingPackages, probeCodecs } from "./codecSupport";
+import { STALL_MS } from "./stall";
 import { ducker } from "./ducking";
+import { useHintPlatform } from "./useHintPlatform";
 import {
   loadCommand,
   parseBridgeReport,
@@ -38,6 +41,11 @@ export interface WatchPlayerOptions {
 
 export interface WatchPlayer {
   pageUrl: string | null;
+  /**
+   * The picture never started while the WebView lacks an installable decoder (FR-13.35): YouTube
+   * answers such a failure with its own panel and no `onError`, so the stall is the only signal.
+   */
+  stalled: boolean;
   /** The load command for the current video, sent when the page answers. */
   load: BridgeCommand | null;
   /** Whether the player answered. */
@@ -66,6 +74,7 @@ export function useWatchPlayer(
   const [pageUrl, setPageUrl] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [stalled, setStalled] = useState(false);
   const [youTubeError, setYouTubeError] = useState<number | null>(null);
   const [state, setState] = useState<number | null>(null);
   const [positionMs, setPositionMs] = useState(live.party.positionMs);
@@ -73,6 +82,15 @@ export function useWatchPlayer(
   const [bufferedMs, setBufferedMs] = useState<number | null>(null);
   const [volume, setLevel] = useState(1);
   const videoId = live.party.videoId;
+  const platform = useHintPlatform();
+  // Probed once per session and kept in state, not in a ref: render must not read a ref, and the
+  // answer cannot change while the app runs.
+  const [codecs] = useState(() => probeCodecs());
+  const decoderMissing = platform?.kind === "freebsd" && missingPackages(codecs).length > 0;
+  const decoderMissingRef = useRef(decoderMissing);
+  useEffect(() => {
+    decoderMissingRef.current = decoderMissing;
+  }, [decoderMissing]);
   const origin = pageUrl === null ? null : playerOrigin(pageUrl);
   const postRef = useRef<(command: BridgeCommand) => void>(() => {});
   const syncRef = useRef<PartySync | null>(null);
@@ -183,6 +201,7 @@ export function useWatchPlayer(
           break;
         }
         case "time": {
+          if (message.seconds > 0) window.clearTimeout(stall);
           localRef.current.ms = Math.round(message.seconds * 1000);
           setPositionMs(localRef.current.ms);
           control.onTime(message.seconds);
@@ -206,12 +225,16 @@ export function useWatchPlayer(
     const timeout = window.setTimeout(() => {
       if (!answered) setFailed(true);
     }, READY_TIMEOUT_MS);
+    const stall = window.setTimeout(() => {
+      if (decoderMissingRef.current) setStalled(true);
+    }, STALL_MS);
     return () => {
       window.removeEventListener("message", onMessage);
       unsubscribeDucking();
       postRef.current = () => {};
       syncRef.current = null;
       window.clearTimeout(timeout);
+      window.clearTimeout(stall);
     };
   }, [videoId, origin, frameRef]);
 
@@ -243,6 +266,7 @@ export function useWatchPlayer(
     load: loadCommand(videoId),
     ready,
     failed,
+    stalled,
     youTubeError,
     state,
     positionMs,

@@ -434,29 +434,31 @@ fn downloads_or_home(downloads: Option<PathBuf>, home: Option<PathBuf>) -> Optio
     downloads.or_else(|| home.map(|home| home.join("Downloads")))
 }
 
-/// Opens `path` with the default program. Windows and macOS use the opener plugin; Linux goes
-/// through the launchers of `browser`, which repair the environment inside an AppImage. Nothing
+/// Opens `path` with the default program. Windows and macOS use the opener plugin; Linux and
+/// FreeBSD go through the launchers of `browser`, which repair the environment inside an
+/// AppImage. Nothing
 /// touches the file's mark-of-the-web, so the system's own warning still applies.
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 pub(crate) fn open_file(path: &Path) -> ApiResult<()> {
     tauri_plugin_opener::open_path(path, None::<&str>)
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 pub(crate) fn open_file(path: &Path) -> ApiResult<()> {
     crate::browser::open_url(&path_text(path))
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }
 
-/// Shows `path` in the file manager; Linux has no portable "select", so it opens the folder.
-#[cfg(not(target_os = "linux"))]
+/// Shows `path` in the file manager; Linux and FreeBSD have no portable "select", so it opens
+/// the folder.
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 fn reveal_file(path: &Path) -> ApiResult<()> {
     tauri_plugin_opener::reveal_item_in_dir(path)
         .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 fn reveal_file(path: &Path) -> ApiResult<()> {
     let folder = path.parent().unwrap_or(path);
     open_file(folder)
