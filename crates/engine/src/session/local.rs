@@ -1397,8 +1397,8 @@ mod tests {
                 "the password reached an untrusted certificate"
             );
         }
-        for error in [changed, retyped, never_trusted] {
-            assert_ne!(error.kind, ErrorKind::WrongPassword, "{error}");
+        for kind in [changed.kind, retyped.kind, never_trusted.kind] {
+            assert_ne!(kind, ErrorKind::WrongPassword);
         }
 
         let first_contact = "first-contact-2342";
