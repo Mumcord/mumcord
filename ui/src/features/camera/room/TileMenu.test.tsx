@@ -149,7 +149,7 @@ describe("tile menu", () => {
       state: "onAir",
       error: null,
       broadcast: "00112233aabbccdd",
-      viewers: [ANNA],
+      viewers: [{ session: ANNA, path: "relay" }],
     });
     await renderRoom();
     const self = await screen.findByRole("group", { name: "You, camera on, live" });

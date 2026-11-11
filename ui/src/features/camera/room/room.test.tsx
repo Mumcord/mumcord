@@ -48,7 +48,7 @@ function onAir(api: MockApi): void {
     state: "onAir",
     error: null,
     broadcast: "00112233aabbccdd",
-    viewers: [ANNA],
+    viewers: [{ session: ANNA, path: "relay" }],
   });
 }
 
