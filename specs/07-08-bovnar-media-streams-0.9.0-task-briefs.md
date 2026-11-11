@@ -52,7 +52,7 @@
 | D4 | Capability negotiation and refusal texts | done — `12bb9696`, `abc88dd0`, `7794576b`, `b103d57c`; 24 locales in E2 | D3 | complex |
 | D5 | Direct camera path (`STREAM_CAMERA`) | open | D4 | complex |
 | D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
-| D7 | Watch-party UI regression | open | D1 | simple |
+| D7 | Watch-party UI regression | done — UI tests unchanged, 183 pass | D1 | simple |
 | R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
 | R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
 | R3 | Engine broadcast link: media profile end to end | done — `c27812f4`, `2f317177`; E2E still needs R5 | R1, W3, R5 | complex |
@@ -61,15 +61,15 @@
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
 | E1 | Packet inspector: description, channels, format | open | D1, R2 | complex |
 | E2 | UI texts and 24 locales for fallback paths | partial — `8f8a516b`: screen-share fallbacks in 24 locales; camera texts wait for D6 | D4, D6 | simple |
-| E3 | Notices and licences for Bovnar 2.1.0 | open | – | simple |
+| E3 | Notices and licences for Bovnar 2.1.0 | done — `scripts/ci/test-notices.sh` passes, 771 Rust / 19 native, 363 texts | – | simple |
 | E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
-then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4 and R1–R6 are done;
-E2 has the screen-share fallbacks and needs the camera texts after D6. D5/D6 and E4 remain. The
-engine dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until
-the 0.9.0 tag exists. E3 can run at any time.
+then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4, D7, R1–R6 and E3 are
+done; E2 has the screen-share fallbacks. D5/D6 (camera direct path), the camera texts and E4
+remain. The engine dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2`
+(PR #72) until the 0.9.0 tag exists.
 
 ---
 
