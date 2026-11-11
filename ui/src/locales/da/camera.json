@@ -136,6 +136,8 @@
     "people_other": "{{count}} personer",
     "limit": "{{count}} af {{max}} kameraer",
     "relay": "Relæ · end-to-end-krypteret",
+    "direct": "Direkte · end-to-end-krypteret",
+    "both": "Relæ og direkte · end-to-end-krypteret",
     "relayTitle": "Hvert kamera sendes én gang til relæet og kopieres til seerne",
     "layout": "Layout",
     "grid": "Gitter",
@@ -251,5 +253,10 @@
     "dataSaver": "Datasparer: op til 15 fps for alle",
     "reduceMotion": "Reducér bevægelse: ingen glød eller animation på talerammen",
     "reduceMotionHint": "Følger som standard dit systems indstilling for reduceret bevægelse."
+  },
+  "viewers": {
+    "title": "Seere",
+    "relay": "Relæ",
+    "direct": "Direkte"
   }
 }

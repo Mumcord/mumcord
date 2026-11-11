@@ -147,6 +147,8 @@
     "people_other": "{{count}} oseb",
     "limit": "{{count}} od {{max}} kamer",
     "relay": "Relej · šifriranje od konca do konca",
+    "direct": "Neposredno · šifriranje od konca do konca",
+    "both": "Relej in neposredno · šifriranje od konca do konca",
     "relayTitle": "Vsaka kamera se releju pošlje enkrat, ta pa jo skopira gledalcem",
     "layout": "Postavitev",
     "grid": "Mreža",
@@ -267,5 +269,10 @@
     "dataSaver": "Varčevanje s podatki: do 15 fps za vse",
     "reduceMotion": "Zmanjšaj gibanje: brez sijaja in animacije na okvirju govorca",
     "reduceMotionHint": "Privzeto sledi sistemski nastavitvi zmanjšanja gibanja."
+  },
+  "viewers": {
+    "title": "Gledalci",
+    "relay": "Relej",
+    "direct": "Neposredno"
   }
 }

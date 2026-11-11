@@ -141,6 +141,8 @@
     "people_other": "{{count}} cilvēki",
     "limit": "{{count}} no {{max}} kamerām",
     "relay": "Relejs · šifrēts no gala līdz galam",
+    "direct": "Tiešais · šifrēts no gala līdz galam",
+    "both": "Relejs un tiešais · šifrēts no gala līdz galam",
     "relayTitle": "Katra kamera tiek nosūtīta releja serverim vienu reizi un nokopēta skatītājiem",
     "layout": "Izkārtojums",
     "grid": "Režģis",
@@ -259,5 +261,10 @@
     "dataSaver": "Datu taupīšana: līdz 15 fps visiem",
     "reduceMotion": "Mazināt kustību: bez mirdzuma un animācijas uz runātāja rāmja",
     "reduceMotionHint": "Pēc noklusējuma seko tavas sistēmas kustības mazināšanas iestatījumam."
+  },
+  "viewers": {
+    "title": "Skatītāji",
+    "relay": "Relejs",
+    "direct": "Tiešais"
   }
 }

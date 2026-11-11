@@ -128,6 +128,51 @@ describe("camera room", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("names the path each viewer of the own camera gets", async () => {
+    api.mock.setCameraView({
+      serverId: 1,
+      state: "onAir",
+      error: null,
+      broadcast: "00112233aabbccdd",
+      viewers: [{ session: ANNA, path: "direct" }],
+    });
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    const room = await screen.findByRole("region", { name: /^Camera room/ });
+    // Only a direct viewer: the header says so (FR-8.62).
+    expect(room).toHaveTextContent("Direct · end-to-end encrypted");
+    const button = await screen.findByRole("button", { name: "Viewers (1)" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(button);
+    const list = screen.getByRole("list", { name: "Viewers" });
+    expect(list).toHaveTextContent("Anna");
+    expect(list).toHaveTextContent("Direct");
+    fireEvent.keyDown(button, { key: "Escape" });
+    expect(screen.queryByRole("list", { name: "Viewers" })).toBeNull();
+  });
+
+  it("says both when an old relay and a direct stream serve the camera", async () => {
+    api.mock.setCameraView({
+      serverId: 1,
+      state: "onAir",
+      error: null,
+      broadcast: "00112233aabbccdd",
+      viewers: [
+        { session: ANNA, path: "relay" },
+        { session: BEN, path: "direct" },
+      ],
+    });
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    const room = await screen.findByRole("region", { name: /^Camera room/ });
+    expect(room).toHaveTextContent("Relay and direct · end-to-end encrypted");
+    fireEvent.click(await screen.findByRole("button", { name: "Viewers (2)" }));
+    const list = screen.getByRole("list", { name: "Viewers" });
+    expect(list).toHaveTextContent("Anna");
+    expect(list).toHaveTextContent("Relay");
+    expect(list).toHaveTextContent("Ben");
+    expect(list).toHaveTextContent("Direct");
+  });
+
   it("follows the Mirror and Reduce motion settings", async () => {
     onAir(api);
     api.mock.setCameraRoom(1, [tile(ANNA)], true);

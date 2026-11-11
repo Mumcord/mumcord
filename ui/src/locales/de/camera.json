@@ -136,6 +136,8 @@
     "people_other": "{{count}} Personen",
     "limit": "{{count}} von {{max}} Kameras",
     "relay": "Relay · Ende-zu-Ende-verschlüsselt",
+    "direct": "Direkt · Ende-zu-Ende-verschlüsselt",
+    "both": "Relay und direkt · Ende-zu-Ende-verschlüsselt",
     "relayTitle": "Jede Kamera wird einmal an das Relay gesendet und an die Zuschauer verteilt",
     "layout": "Layout",
     "grid": "Raster",
@@ -251,5 +253,10 @@
     "dataSaver": "Datensparmodus: bis zu 15 fps für alle",
     "reduceMotion": "Weniger Bewegung: kein Leuchten und keine Animation am Sprecherrahmen",
     "reduceMotionHint": "Folgt standardmäßig der Systemeinstellung für weniger Bewegung."
+  },
+  "viewers": {
+    "title": "Zuschauer",
+    "relay": "Relay",
+    "direct": "Direkt"
   }
 }

@@ -144,6 +144,8 @@
     "people_other": "{{count}} žmonių",
     "limit": "{{count}} iš {{max}} kamerų",
     "relay": "Perdavimo mazgas · visapusiškai užšifruota",
+    "direct": "Tiesiogiai · visapusiškai užšifruota",
+    "both": "Perdavimo mazgas ir tiesiogiai · visapusiškai užšifruota",
     "relayTitle": "Kiekviena kamera vieną kartą siunčiama į perdavimo mazgą ir kopijuojama žiūrovams",
     "layout": "Išdėstymas",
     "grid": "Tinklelis",
@@ -267,5 +269,10 @@
     "dataSaver": "Duomenų taupymas: iki 15 fps visiems",
     "reduceMotion": "Mažinti judesį: be švytėjimo ir animacijos kalbančiojo rėmelyje",
     "reduceMotionHint": "Pagal numatytuosius nustatymus laikosi sistemos judesio mažinimo nustatymo."
+  },
+  "viewers": {
+    "title": "Žiūrovai",
+    "relay": "Perdavimo mazgas",
+    "direct": "Tiesiogiai"
   }
 }

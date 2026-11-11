@@ -142,6 +142,8 @@
     "people_other": "{{count}} pessoas",
     "limit": "{{count}} de {{max}} câmaras",
     "relay": "Retransmissor · cifrado de ponta a ponta",
+    "direct": "Direto · cifrado de ponta a ponta",
+    "both": "Retransmissor e direto · cifrado de ponta a ponta",
     "relayTitle": "Cada câmara é enviada uma só vez ao retransmissor e copiada para os espetadores",
     "layout": "Disposição",
     "grid": "Grelha",
@@ -259,5 +261,10 @@
     "dataSaver": "Poupança de dados: até 15 fps para todos",
     "reduceMotion": "Reduzir movimento: sem brilho nem animação na moldura de quem fala",
     "reduceMotionHint": "Por predefinição segue a definição de reduzir movimento do teu sistema."
+  },
+  "viewers": {
+    "title": "Espetadores",
+    "relay": "Retransmissor",
+    "direct": "Direto"
   }
 }

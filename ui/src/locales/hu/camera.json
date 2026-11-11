@@ -136,6 +136,8 @@
     "people_other": "{{count}} személy",
     "limit": "{{count}} / {{max}} kamera",
     "relay": "Átjátszó · végpontok közötti titkosítás",
+    "direct": "Közvetlen · végpontok közötti titkosítás",
+    "both": "Átjátszó és közvetlen · végpontok közötti titkosítás",
     "relayTitle": "Minden kamera egyszer megy az átjátszóhoz, ami lemásolja a nézőknek",
     "layout": "Elrendezés",
     "grid": "Rács",
@@ -251,5 +253,10 @@
     "dataSaver": "Adatkímélő: legfeljebb 15 fps mindenkinek",
     "reduceMotion": "Mozgás csökkentése: nincs ragyogás vagy animáció a beszélő keretén",
     "reduceMotionHint": "Alapértelmezés szerint követi a rendszer mozgáscsökkentési beállítását."
+  },
+  "viewers": {
+    "title": "Nézők",
+    "relay": "Átjátszó",
+    "direct": "Közvetlen"
   }
 }

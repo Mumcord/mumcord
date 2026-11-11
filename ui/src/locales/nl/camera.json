@@ -136,6 +136,8 @@
     "people_other": "{{count}} mensen",
     "limit": "{{count}} van {{max}} camera's",
     "relay": "Relay · end-to-end versleuteld",
+    "direct": "Direct · end-to-end versleuteld",
+    "both": "Relay en direct · end-to-end versleuteld",
     "relayTitle": "Elke camera wordt één keer naar de relay gestuurd en gekopieerd naar kijkers",
     "layout": "Indeling",
     "grid": "Raster",
@@ -251,5 +253,10 @@
     "dataSaver": "Databesparing: tot 15 fps voor iedereen",
     "reduceMotion": "Minder beweging: geen gloed of animatie op het spreekkader",
     "reduceMotionHint": "Volgt standaard de instelling voor minder beweging van je systeem."
+  },
+  "viewers": {
+    "title": "Kijkers",
+    "relay": "Relay",
+    "direct": "Direct"
   }
 }

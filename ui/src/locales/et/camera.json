@@ -136,6 +136,8 @@
     "people_other": "{{count}} inimest",
     "limit": "{{count}} / {{max}} kaamerat",
     "relay": "Releeserver · otspunktkrüptitud",
+    "direct": "Otse · otspunktkrüptitud",
+    "both": "Releeserver ja otse · otspunktkrüptitud",
     "relayTitle": "Iga kaamera saadetakse üks kord releeserverisse ja kopeeritakse vaatajatele",
     "layout": "Paigutus",
     "grid": "Ruudustik",
@@ -251,5 +253,10 @@
     "dataSaver": "Andmesäästja: kuni 15 fps kõigile",
     "reduceMotion": "Vähenda liikumist: kõneleja raamil pole kuma ega animatsiooni",
     "reduceMotionHint": "Järgib vaikimisi sinu süsteemi liikumise vähendamise seadet."
+  },
+  "viewers": {
+    "title": "Vaatajad",
+    "relay": "Releeserver",
+    "direct": "Otse"
   }
 }

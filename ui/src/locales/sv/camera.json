@@ -136,6 +136,8 @@
     "people_other": "{{count}} personer",
     "limit": "{{count}} av {{max}} kameror",
     "relay": "Relä · end-to-end-krypterat",
+    "direct": "Direkt · end-to-end-krypterat",
+    "both": "Relä och direkt · end-to-end-krypterat",
     "relayTitle": "Varje kamera skickas en gång till reläet och kopieras till tittarna",
     "layout": "Layout",
     "grid": "Rutnät",
@@ -251,5 +253,10 @@
     "dataSaver": "Datasparläge: upp till 15 fps för alla",
     "reduceMotion": "Minska rörelse: ingen glöd eller animation på talarramen",
     "reduceMotionHint": "Följer som standard systemets inställning för minskad rörelse."
+  },
+  "viewers": {
+    "title": "Tittare",
+    "relay": "Relä",
+    "direct": "Direkt"
   }
 }

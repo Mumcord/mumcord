@@ -141,6 +141,8 @@
     "people_other": "{{count}} personas",
     "limit": "{{count}} de {{max}} cámaras",
     "relay": "Relé · cifrado de extremo a extremo",
+    "direct": "Directo · cifrado de extremo a extremo",
+    "both": "Relé y directo · cifrado de extremo a extremo",
     "relayTitle": "Cada cámara se envía una vez al relé y se copia a los espectadores",
     "layout": "Diseño",
     "grid": "Cuadrícula",
@@ -259,5 +261,10 @@
     "dataSaver": "Ahorro de datos: hasta 15 fps para todos",
     "reduceMotion": "Reducir movimiento: sin brillo ni animación en el marco de quien habla",
     "reduceMotionHint": "Por defecto sigue el ajuste de reducción de movimiento de tu sistema."
+  },
+  "viewers": {
+    "title": "Espectadores",
+    "relay": "Relé",
+    "direct": "Directo"
   }
 }
