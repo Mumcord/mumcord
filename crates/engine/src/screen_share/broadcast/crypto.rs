@@ -1455,7 +1455,14 @@ mod tests {
             .expect_err("authentication");
         let text = format!("{error} {error:?}").to_lowercase();
         assert!(!text.contains("secret"));
-        assert!(!text.contains(&format!("{:02x}", sealer.keys()[0].base[0])));
+        // The whole key, not one byte: a two-character hex pair such as "ca" also occurs in
+        // ordinary words like "authentication", which made this assertion flaky.
+        let key: String = sealer.keys()[0]
+            .base
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect();
+        assert!(!text.contains(&key));
 
         // A successfully opened track keeps its frame out of logs too.
         sealer
