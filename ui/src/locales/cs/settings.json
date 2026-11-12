@@ -777,7 +777,13 @@
       "gap": "Odstup od předchozího paketu",
       "kind": "Interní ID",
       "size": "Velikost",
-      "decoded": "Dekódovaný obsah"
+      "decoded": "Dekódovaný obsah",
+      "media": "Média"
+    },
+    "media": {
+      "channel": "kanál {{channel}}",
+      "keyframe": "klíčový snímek",
+      "delta": "delta snímek"
     },
     "noDecoding": "Tato data nemají čitelnou podobu; podívej se na surové bajty.",
     "controlOnly": "Standardní zpráva Mumble: zaznamenává se pouze její typ a velikost.",
@@ -798,7 +804,8 @@
       "watch": "Stav společného sledování",
       "plugin": "Data pluginu",
       "mumble": "Zpráva Mumble",
-      "peer": "Nastavení relay"
+      "peer": "Nastavení relay",
+      "media": "Mediální proud"
     }
   },
   "licences": {

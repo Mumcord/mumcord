@@ -777,7 +777,13 @@
       "gap": "Odstęp od poprzedniego pakietu",
       "kind": "Wewnętrzny identyfikator",
       "size": "Rozmiar",
-      "decoded": "Zdekodowana zawartość"
+      "decoded": "Zdekodowana zawartość",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "kanał {{channel}}",
+      "keyframe": "klatka kluczowa",
+      "delta": "klatka delta"
     },
     "noDecoding": "Ta zawartość nie ma czytelnej postaci; zobacz surowe bajty.",
     "controlOnly": "Standardowa wiadomość Mumble: zapisywany jest tylko jej typ i rozmiar.",
@@ -798,7 +804,8 @@
       "watch": "Stan wspólnego oglądania",
       "plugin": "Dane wtyczki",
       "mumble": "Wiadomość Mumble",
-      "peer": "Konfiguracja przekaźnika"
+      "peer": "Konfiguracja przekaźnika",
+      "media": "Strumień mediów"
     }
   },
   "licences": {

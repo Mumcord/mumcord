@@ -767,7 +767,13 @@
       "gap": "Afstand til forrige pakke",
       "kind": "Internt id",
       "size": "Størrelse",
-      "decoded": "Afkodet indhold"
+      "decoded": "Afkodet indhold",
+      "media": "Medie"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "nøglebillede",
+      "delta": "deltabillede"
     },
     "noDecoding": "Denne nyttelast har ingen læsbar form; se de rå bytes.",
     "controlOnly": "Almindelig Mumble-besked: kun type og størrelse registreres.",
@@ -788,7 +794,8 @@
       "watch": "Status for fællesvisning",
       "plugin": "Plugindata",
       "mumble": "Mumble-besked",
-      "peer": "Opsætning af relæ"
+      "peer": "Opsætning af relæ",
+      "media": "Mediestrøm"
     }
   },
   "licences": {

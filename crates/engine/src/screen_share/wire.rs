@@ -442,12 +442,7 @@ impl<W: AsyncWrite + Unpin> FrameWriter<W> {
         let flags = self.payload.first().copied().unwrap_or(0);
         let size = u32::try_from(self.payload.len()).unwrap_or(u32::MAX);
         self.write_media_message(channel).await?;
-        self.record(MediaTap::track(
-            MediaFormat::Document,
-            channel,
-            flags,
-            size,
-        ));
+        self.record(MediaTap::track(MediaFormat::Document, channel, flags, size));
         Ok(())
     }
 
@@ -761,11 +756,7 @@ impl MediaFraming {
         match ControlKind::from_byte(kind) {
             Some(ControlKind::Description) => match Description::parse(body) {
                 Ok(description) => {
-                    self.record_control(
-                        Some(ControlKind::Description),
-                        size,
-                        Some(&description),
-                    );
+                    self.record_control(Some(ControlKind::Description), size, Some(&description));
                     if !self.check.accepts(&description) {
                         tracing::debug!(
                             kind = description.kind.name(),
@@ -1090,7 +1081,12 @@ mod tests {
         while reader.read_frame().await.unwrap().is_some() {}
         let received = inspector.poll(Some(sent.packets[1].id), Vec::new());
         assert_eq!(received.packets.len(), 2);
-        assert!(received.packets.iter().all(|p| p.direction == TapDirection::Received));
+        assert!(
+            received
+                .packets
+                .iter()
+                .all(|p| p.direction == TapDirection::Received)
+        );
         let layer = received.packets[1].media.as_ref().expect("a media row");
         assert_eq!(layer.channel, Some(2));
         assert!(layer.keyframe);

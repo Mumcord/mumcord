@@ -3191,6 +3191,26 @@ export type MassMoveResult =
 /**  Another mass move is still running on this server (FR-10.18). */
 { kind: "alreadyRunning" };
 
+/**  The wire format of a captured media stream. */
+export type MediaFormat = "media" | "legacy";
+
+/**
+ *  One message of a media stream (FR-7.101): its format, channel, flags and keyframe state.
+ *  The media content itself is never captured, so there is no payload here.
+ */
+export type MediaPacket = {
+	format: MediaFormat,
+	/**  The old header's version byte; `null` for the media document. */
+	version: number | null,
+	/**  The channel the message travelled on; `null` for the old header, which has none. */
+	channel: number | null,
+	/**  The channel-0 control kind; `null` for a track message. */
+	control: number | null,
+	/**  The track message's flags byte; `null` for a control message and the old header. */
+	flags: number | null,
+	keyframe: boolean,
+};
+
 /**  Which views are popped out changed; sent to every window. */
 export type MediaPopoutChanged = {
 	state: MediaPopoutState,
@@ -3599,6 +3619,8 @@ export type Packet = {
 	decoded: string | null,
 	/**  The plugin data as lowercase hex; empty for other types. */
 	rawHex: string,
+	/**  What this message is within its media stream; `null` for control-channel packets. */
+	media: MediaPacket | null,
 };
 
 export type PacketCapture = {

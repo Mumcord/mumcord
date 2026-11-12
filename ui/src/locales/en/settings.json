@@ -767,7 +767,13 @@
       "gap": "Gap to previous packet",
       "kind": "Internal id",
       "size": "Size",
-      "decoded": "Decoded content"
+      "decoded": "Decoded content",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "channel {{channel}}",
+      "keyframe": "keyframe",
+      "delta": "delta frame"
     },
     "noDecoding": "This payload has no readable form; see the raw bytes.",
     "controlOnly": "Standard Mumble message: only its type and size are recorded.",
@@ -788,7 +794,8 @@
       "watch": "Watch party state",
       "plugin": "Plugin data",
       "mumble": "Mumble message",
-      "peer": "Relay setup"
+      "peer": "Relay setup",
+      "media": "Media stream"
     }
   },
   "licences": {

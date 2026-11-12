@@ -848,7 +848,8 @@ mod tests {
     }
 
     #[test]
-    fn ignored_messages_are_counted_while_capturing() {        let inspector = Arc::new(Inspector::default());
+    fn ignored_messages_are_counted_while_capturing() {
+        let inspector = Arc::new(Inspector::default());
         inspector.count_ignored(2, PEER_DATA_ID, "sender not registered");
         assert!(inspector.poll(None, Vec::new()).counts.is_empty());
         inspector.set_enabled(true);
