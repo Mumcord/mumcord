@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- The install script supports FreeBSD (issue #781): on FreeBSD 15.x (amd64), `fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh` downloads the release's `.pkg`, checks it against SHA256SUMS, installs the packages it needs from the pkg repositories and then installs it with `pkg add` (with sudo or doas when you are not root); running it again updates Mumcord, and `--uninstall` removes it with `pkg delete`
+
 ## [0.8.0] - 2026-11-12
 
 ### Added
@@ -25,7 +29,6 @@
 - Rich text editor for your profile comment and channel descriptions (issue #666): one box with the toolbar attached, for bold, italic, underline, strikethrough, text colour (a palette, "default" and any hex colour), links you can edit or remove, images, bulleted and numbered lists, and a Source view for the HTML. Buttons show the formatting at the cursor. Images are scaled down until everything fits the server's limit, and a meter under the text shows how much room is left; when it is too long, Save says why instead of failing. Other Mumble clients see the same formatting, including the colours
 - H.264 videos (Twitch, .mp4 links) and AAC sound now play on every Linux distribution without extra packages (issue #678): the AppImage, the .deb and the .rpm bring their own H.264 and AAC decoders, so Fedora no longer needs RPM Fusion and the AppImage no longer needs gst-libav from the system (which newer distributions could not load into it). The .deb and .rpm no longer depend on gst-libav
 - Aaron, an axolotl guide in Mumcord's colours, gives new users a short tour of the main window right after the setup wizard (issue #637): the server bar, joining and following channels, how you talk, the user panel, search, chat, the Apps button and themes, one tip at a time with Back, Next and Skip tour. The rest of the window dims while Aaron points at each part in a spotlight, its eyes follow the mouse and its gills pulse while it talks. In the setup wizard it stands next to the field of each step, makes it glow, gives a short tip and can be hidden. Settings → About → Tips shows the tour again at any time
-- The install script supports FreeBSD (issue #781): on FreeBSD 15.x (amd64), `fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh` downloads the release's `.pkg`, checks it against SHA256SUMS, installs the packages it needs from the pkg repositories and then installs it with `pkg add` (with sudo or doas when you are not root); running it again updates Mumcord, and `--uninstall` removes it with `pkg delete`
 
 ### Changed
 
