@@ -276,6 +276,41 @@ fn route(format: Format, direct_ok: bool, media: bool) -> Route {
     }
 }
 
+/// What a `cam-join` gets from the matrix, before the viewer list's own seat count (FR-8.94,
+/// FR-8.95).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Answer {
+    /// Served over the relay broadcast.
+    Relay,
+    /// Opened a `STREAM_CAMERA` of its own.
+    Direct,
+    /// The direct path has no seat left (FR-8.93): it gets `full`.
+    Full,
+    /// It cannot read the camera's format and gets nothing but `needs` (FR-8.95).
+    Needs,
+}
+
+/// The matrix of FR-8.94/FR-8.95 for one `cam-join`: `direct_room` is a free seat on the direct
+/// path (8 viewers, FR-8.93).
+fn answer(format: Format, direct_ok: bool, media: bool, direct_room: bool) -> Answer {
+    match route(format, direct_ok, media) {
+        Route::Needs => Answer::Needs,
+        Route::Relay => Answer::Relay,
+        Route::Direct if direct_room => Answer::Direct,
+        Route::Direct => Answer::Full,
+    }
+}
+
+/// The format a camera carries: without a broadcast every stream uses the new profile, with one
+/// the relay's capability picks it and it stays fixed for that broadcast (FR-7.97, FR-8.94).
+fn format_of(broadcast: bool, media: bool) -> Format {
+    match (broadcast, media) {
+        (false, _) => Format::Direct,
+        (true, true) => Format::New,
+        (true, false) => Format::Old,
+    }
+}
+
 struct Broadcast {
     id: BroadcastId,
     publisher: Publisher,
@@ -306,15 +341,18 @@ impl Live {
         media: bool,
     ) -> Result<Admit, CameraMessage> {
         let id = self.session.clone();
-        let path = match route(self.format, self.direct_ok, media) {
-            Route::Needs => return Err(CameraMessage::Needs { id }),
-            Route::Relay => CameraPath::Relay,
-            Route::Direct => CameraPath::Direct,
-        };
-        if path == CameraPath::Direct && !self.direct.has_room(viewer) {
+        let path = match answer(
+            self.format,
+            self.direct_ok,
+            media,
+            self.direct.has_room(viewer),
+        ) {
+            Answer::Needs => return Err(CameraMessage::Needs { id }),
             // The direct path serves 8 viewers per camera (FR-8.93, FR-8.52).
-            return Err(CameraMessage::Full { id });
-        }
+            Answer::Full => return Err(CameraMessage::Full { id }),
+            Answer::Relay => CameraPath::Relay,
+            Answer::Direct => CameraPath::Direct,
+        };
         match self.viewers.join(viewer, hash, codecs, path) {
             Join::Full => Err(CameraMessage::Full { id }),
             Join::Admit => match (path, &mut self.broadcast) {
@@ -669,11 +707,7 @@ impl Engine {
                 };
                 // The broadcast's format is fixed for it by the publisher and the relay's
                 // capability (FR-7.97); without a broadcast every viewer gets the new one.
-                let format = match (&broadcast, paths.media) {
-                    (None, _) => Format::Direct,
-                    (Some(_), true) => Format::New,
-                    (Some(_), false) => Format::Old,
-                };
+                let format = format_of(broadcast.is_some(), paths.media);
                 Ok(Live {
                     session,
                     format,
@@ -1222,25 +1256,174 @@ pub(crate) fn on_connection_reset(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use Answer::{Direct as DirectAnswer, Full, Needs as NeedsAnswer, Relay as RelayAnswer};
     use CameraState::{Off, OnAir, Preview, Requesting};
-    use Route::{Direct, Needs, Relay};
 
     #[test]
-    fn the_fallback_matrix_picks_the_path_per_viewer() {
-        // FR-8.95, 0.9.0 sharer; `media` is the viewer's `mv: 2`. A 0.8.x viewer of a new-format
-        // camera is never offered an old copy, on any path.
-        assert_eq!(route(Format::New, true, true), Relay);
-        assert_eq!(route(Format::New, false, true), Relay);
-        assert_eq!(route(Format::New, true, false), Needs);
-        assert_eq!(route(Format::New, false, false), Needs);
-        assert_eq!(route(Format::Direct, true, true), Direct);
-        assert_eq!(route(Format::Direct, true, false), Needs);
-        // An old relay serves 0.8.x viewers over the broadcast while 0.9.0 viewers go direct
-        // (FR-8.94); `relay_only` leaves the old broadcast as the only path.
-        assert_eq!(route(Format::Old, true, true), Direct);
-        assert_eq!(route(Format::Old, true, false), Relay);
-        assert_eq!(route(Format::Old, false, true), Relay);
-        assert_eq!(route(Format::Old, false, false), Relay);
+    fn every_cell_of_the_fallback_table_picks_the_path_per_viewer() {
+        // FR-8.95 with a 0.9.0 sharer, cell by cell. `media` is the viewer's `mv: 2` (its hello
+        // has `media-v2`), `direct_ok` the mode (`false` in `relay_only` or with direct
+        // connections off) and `direct_room` a free seat on the direct path (FR-8.93).
+        let cells = [
+            // 0.9.0 viewer, new relay: the new-format relay broadcast. A full direct path does not
+            // change that; the broadcast is the first path (FR-8.94).
+            (Format::New, true, true, true, RelayAnswer, "new relay"),
+            (
+                Format::New,
+                true,
+                true,
+                false,
+                RelayAnswer,
+                "new relay, direct full",
+            ),
+            (
+                Format::New,
+                false,
+                true,
+                true,
+                RelayAnswer,
+                "new relay, relay_only",
+            ),
+            // 0.9.0 viewer, old relay or none: a `STREAM_CAMERA` of its own.
+            (Format::Old, true, true, true, DirectAnswer, "old relay"),
+            (Format::Direct, true, true, true, DirectAnswer, "no relay"),
+            // `relay_only` never opens a stream, so the 0.9.0 viewer stays on the broadcast in
+            // whatever format it has, the old one included (FR-8.94).
+            (
+                Format::Old,
+                false,
+                true,
+                true,
+                RelayAnswer,
+                "old relay, relay_only",
+            ),
+            // The direct path's 8 viewers are taken (FR-8.93).
+            (
+                Format::Old,
+                true,
+                true,
+                false,
+                Full,
+                "old relay, direct full",
+            ),
+            (
+                Format::Direct,
+                true,
+                true,
+                false,
+                Full,
+                "no relay, direct full",
+            ),
+            // 0.8.x viewer, old relay: the old-format broadcast serves it as today.
+            (
+                Format::Old,
+                true,
+                false,
+                true,
+                RelayAnswer,
+                "old relay, 0.8.x viewer",
+            ),
+            (
+                Format::Old,
+                false,
+                false,
+                true,
+                RelayAnswer,
+                "old relay, relay_only, 0.8.x viewer",
+            ),
+            // 0.8.x viewer of a new-format camera: `needs`, and no stream and no second broadcast
+            // are opened for it (FR-8.95).
+            (
+                Format::New,
+                true,
+                false,
+                true,
+                NeedsAnswer,
+                "new relay, 0.8.x viewer",
+            ),
+            (
+                Format::New,
+                false,
+                false,
+                true,
+                NeedsAnswer,
+                "new relay, relay_only, 0.8.x viewer",
+            ),
+            (
+                Format::Direct,
+                true,
+                false,
+                true,
+                NeedsAnswer,
+                "no relay, 0.8.x viewer",
+            ),
+            // A format refusal outranks `full`: the seat count is not why it is refused.
+            (
+                Format::New,
+                true,
+                false,
+                false,
+                NeedsAnswer,
+                "new relay, 0.8.x viewer, direct full",
+            ),
+            (
+                Format::Direct,
+                true,
+                false,
+                false,
+                NeedsAnswer,
+                "no relay, 0.8.x viewer, direct full",
+            ),
+        ];
+        for (format, direct_ok, media, direct_room, want, why) in cells {
+            assert_eq!(
+                answer(format, direct_ok, media, direct_room),
+                want,
+                "{why} ({format:?}, direct_ok: {direct_ok}, media: {media})"
+            );
+        }
+    }
+
+    #[test]
+    fn the_matrix_never_mixes_up_a_refusal_and_a_path() {
+        // Every combination of the FR-8.95 inputs: only an old-format broadcast serves a 0.8.x
+        // viewer, a 0.8.x viewer of a new-format camera is never served on any path, and a 0.9.0
+        // viewer (its `cam-join` has `mv: 2`) never gets `needs`.
+        for format in [Format::New, Format::Old, Format::Direct] {
+            for direct_ok in [true, false] {
+                for media in [true, false] {
+                    for direct_room in [true, false] {
+                        let got = answer(format, direct_ok, media, direct_room);
+                        let why = format!(
+                            "{format:?}, direct_ok: {direct_ok}, media: {media}, room: {direct_room}"
+                        );
+                        match (format, media) {
+                            (Format::Old, false) => assert_eq!(got, RelayAnswer, "{why}"),
+                            (Format::New | Format::Direct, false) => {
+                                assert_eq!(got, NeedsAnswer, "{why}")
+                            }
+                            (_, true) => {
+                                assert!(matches!(got, RelayAnswer | DirectAnswer | Full), "{why}")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn the_broadcast_format_is_fixed_per_broadcast() {
+        // FR-7.97, FR-8.94: the relay's capability picks the format once, when the camera goes on
+        // air. Without a broadcast every stream carries the new profile (FR-8.92), so a
+        // `direct_only` camera never claims a relay format it does not have.
+        assert_eq!(format_of(true, true), Format::New);
+        assert_eq!(format_of(true, false), Format::Old);
+        assert_eq!(format_of(false, false), Format::Direct);
+        assert_eq!(format_of(false, true), Format::Direct);
+        // A new relay is the new format, an old one the old: the camera never runs a new-format
+        // broadcast that a 0.8.x viewer could be served from (FR-8.95).
+        assert_ne!(format_of(true, true), format_of(true, false));
     }
 
     #[test]
