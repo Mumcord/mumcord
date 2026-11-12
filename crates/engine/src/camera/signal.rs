@@ -63,8 +63,9 @@ impl Codec {
 /// One `mumcord.camera` message. The sender is the session the server stamped on the data.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CameraMessage {
-    /// Camera owner to the channel (and to newcomers): the camera is on, with this broadcast id.
-    On { id: String },
+    /// Camera owner to the channel (and to newcomers): the camera is on, with this broadcast id,
+    /// and whether it sends the Bovnar media profile (wire `mv: 2`, FR-8.95).
+    On { id: String, media: bool },
     /// Camera owner to the channel: the camera is off.
     Off,
     /// Viewer to camera owner: please admit me to broadcast `id`. `codecs` lists what the viewer
@@ -136,7 +137,7 @@ fn is_broadcast_id(id: &str) -> bool {
 /// empty.
 pub fn encode(message: &CameraMessage) -> Option<Vec<u8>> {
     let (t, id, codecs, media) = match message {
-        CameraMessage::On { id } => ("on", Some(id), None, false),
+        CameraMessage::On { id, media } => ("on", Some(id), None, *media),
         CameraMessage::Off => ("off", None, None, false),
         CameraMessage::CamJoin { id, codecs, media } => {
             if codecs.is_empty() {
@@ -176,7 +177,10 @@ pub fn decode(data: &[u8]) -> Result<CameraMessage, Refused> {
     let t = str_field(&doc, "t")?;
     Ok(match t {
         "off" => CameraMessage::Off,
-        "on" => CameraMessage::On { id: id_of(&doc)? },
+        "on" => CameraMessage::On {
+            id: id_of(&doc)?,
+            media: media_of(&doc),
+        },
         "cam-leave" => CameraMessage::CamLeave { id: id_of(&doc)? },
         "full" => CameraMessage::Full { id: id_of(&doc)? },
         "needs" => CameraMessage::Needs { id: id_of(&doc)? },
@@ -191,14 +195,18 @@ pub fn decode(data: &[u8]) -> Result<CameraMessage, Refused> {
             if codecs.is_empty() {
                 return Err(Refused::Invalid);
             }
-            let media = doc
-                .get("mv")
-                .and_then(|node| node.as_u64())
-                .is_some_and(|v| v >= 2);
+            let media = media_of(&doc);
             CameraMessage::CamJoin { id, codecs, media }
         }
         _ => return Err(Refused::Invalid),
     })
+}
+
+/// The `mv` field: 2 or higher means the sender reads the Bovnar media profile (FR-7.96).
+fn media_of(doc: &DomDoc) -> bool {
+    doc.get("mv")
+        .and_then(|node| node.as_u64())
+        .is_some_and(|v| v >= 2)
 }
 
 fn id_of(doc: &DomDoc) -> Result<String, Refused> {
@@ -378,7 +386,10 @@ mod tests {
 
     fn all() -> Vec<CameraMessage> {
         vec![
-            CameraMessage::On { id: ID.into() },
+            CameraMessage::On {
+                id: ID.into(),
+                media: true,
+            },
             CameraMessage::Off,
             CameraMessage::CamJoin {
                 id: ID.into(),
@@ -433,6 +444,25 @@ mod tests {
     }
 
     #[test]
+    fn on_names_the_media_format_and_an_old_relay_leaves_it_out() {
+        // FR-8.95: `mv` is present on a new-format camera and absent on an old-format one.
+        let new = CameraMessage::On {
+            id: ID.into(),
+            media: true,
+        };
+        let encoded = encode(&new).expect("encodes");
+        assert!(String::from_utf8_lossy(&encoded).contains("mv"));
+        assert_eq!(decode(&encoded), Ok(new));
+        let old = CameraMessage::On {
+            id: ID.into(),
+            media: false,
+        };
+        let encoded = encode(&old).expect("encodes");
+        assert!(!String::from_utf8_lossy(&encoded).contains("mv"));
+        assert_eq!(decode(&encoded), Ok(old));
+    }
+
+    #[test]
     fn direction_follows_the_table() {
         let to_channel: Vec<_> = all().iter().map(CameraMessage::to_channel).collect();
         assert_eq!(to_channel, [true, true, false, false, false, false]);
@@ -440,10 +470,17 @@ mod tests {
 
     #[test]
     fn invalid_messages_are_not_encoded() {
-        assert_eq!(encode(&CameraMessage::On { id: "short".into() }), None);
         assert_eq!(
             encode(&CameraMessage::On {
-                id: "ABCDEF0123456789".into()
+                id: "short".into(),
+                media: false
+            }),
+            None
+        );
+        assert_eq!(
+            encode(&CameraMessage::On {
+                id: "ABCDEF0123456789".into(),
+                media: false
             }),
             None
         );
@@ -528,7 +565,14 @@ mod tests {
     fn truncated_json_and_empty_payloads_are_refused() {
         let good = encode(&all()[0]).expect("valid");
         for cut in 0..good.len() {
-            assert!(decode(&good[..cut]).is_err() || cut == good.len());
+            // A cut before the optional trailing `mv` is still a valid `on` document, just
+            // without the format; anything else must be refused rather than half-read.
+            if let Ok(message) = decode(&good[..cut]) {
+                assert!(
+                    matches!(message, CameraMessage::On { media: false, .. }),
+                    "cut {cut} decoded to {message:?}"
+                );
+            }
         }
         assert!(decode(br#"{"v":1,"t":"off"}"#).is_err());
         assert!(decode(b"").is_err());
