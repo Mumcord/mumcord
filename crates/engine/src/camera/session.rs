@@ -331,6 +331,12 @@ struct Live {
 }
 
 impl Live {
+    /// Whether the camera sends the Bovnar media profile, which the `on` message names in `mv`
+    /// (FR-8.95): true for a new-format broadcast and for a camera that runs without one.
+    fn sends_media(&self) -> bool {
+        matches!(self.format, Format::New | Format::Direct)
+    }
+
     /// Decides about a `cam-join` that passed the channel, blocking and rate checks (FR-8.47);
     /// `media` says whether the viewer reads the Bovnar media profile (FR-8.95).
     fn admit(
@@ -720,12 +726,13 @@ impl Engine {
             match started {
                 Ok(live) => {
                     let session = live.session.clone();
+                    let media = live.sends_media();
                     own.live = Some(live);
                     own.state = next_state(own.state, Step::Ready).unwrap_or(CameraState::OnAir);
                     own.send.set_on_air(true);
                     tracing::info!("camera on air");
                     crate::crash::set_context("camera", "on air");
-                    (Ok(()), own.view(), Some(session))
+                    (Ok(()), own.view(), Some((session, media)))
                 }
                 Err(failure) => {
                     tracing::info!(reason = failure.code(), "camera not turned on");
@@ -736,9 +743,9 @@ impl Engine {
                 }
             }
         };
-        if let (Some(session), Ok(ctx)) = (announce, self.session_ctx_for(server_id)) {
+        if let (Some((session, media)), Ok(ctx)) = (announce, self.session_ctx_for(server_id)) {
             let peers = signal::channel_peers(&ctx, self.mumcord_state());
-            signal::send(&ctx, &peers, &CameraMessage::On { id: session });
+            signal::send(&ctx, &peers, &CameraMessage::On { id: session, media });
         }
         self.emit_camera(server_id, Some(view));
         result
@@ -954,7 +961,11 @@ impl Engine {
                                 broadcast.publisher.remove(&hash);
                             }
                             send.set_vp9_only(live.viewers.needs_vp9());
-                            Some((was_full, live.broadcast.as_ref().map(|b| b.id)))
+                            Some((
+                                was_full,
+                                live.broadcast.as_ref().map(|b| b.id),
+                                live.sends_media(),
+                            ))
                         }
                         None => None,
                     }
@@ -962,7 +973,7 @@ impl Engine {
                 None => None,
             }
         };
-        let Some((was_full, broadcast)) = removed else {
+        let Some((was_full, broadcast, media)) = removed else {
             return;
         };
         // A freed slot is announced again, so viewers turned away as full ask anew (FR-8.52).
@@ -973,6 +984,7 @@ impl Engine {
                 &peers,
                 &CameraMessage::On {
                     id: session.to_owned(),
+                    media,
                 },
             );
         }
@@ -1127,7 +1139,9 @@ pub(crate) fn on_plugin_data(
                 engine.camera_remove_viewer(ctx.server_id, &id, event.sender, true);
             }
         }
-        CameraMessage::On { id } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
+        // A 0.9.0 client reads both formats, so `mv` changes nothing it does; a 0.8.x viewer of a
+        // new-format camera learns from it that it needs 0.9.0 (FR-8.95).
+        CameraMessage::On { id, .. } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
         CameraMessage::Full { id } => super::recv::on_camera_full(&engine, ctx, event.sender, &id),
         CameraMessage::Off => super::recv::on_camera_gone(&engine, ctx, event.sender),
         CameraMessage::Needs { .. } => {}
@@ -1164,14 +1178,19 @@ pub(crate) fn on_peer_known(
     ctx: &SessionCtx,
     session: u32,
 ) {
-    let camera = {
+    let (camera, media) = {
         let mut cameras = lock(state);
         let Some(live) = cameras.own.as_mut().and_then(|o| o.live_on(ctx.server_id)) else {
             return;
         };
-        live.session.clone()
+        (live.session.clone(), live.sends_media())
     };
-    signal::announce_to_newcomer(ctx, peers, session, &CameraMessage::On { id: camera });
+    signal::announce_to_newcomer(
+        ctx,
+        peers,
+        session,
+        &CameraMessage::On { id: camera, media },
+    );
 }
 
 /// A person joined the server or moved: a viewer who left the own channel is removed and the

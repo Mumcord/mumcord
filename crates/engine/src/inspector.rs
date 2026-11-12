@@ -587,7 +587,9 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
 fn camera_json(m: &crate::camera::signal::CameraMessage) -> Value {
     use crate::camera::signal::CameraMessage;
     match m {
-        CameraMessage::On { id } => json!({ "t": "on", "id": id }),
+        CameraMessage::On { id, media } => {
+            json!({ "t": "on", "id": id, "mv": if *media { Some(2) } else { None } })
+        }
         CameraMessage::Off => json!({ "t": "off" }),
         CameraMessage::CamJoin { id, codecs, .. } => json!({
             "t": "cam-join",
