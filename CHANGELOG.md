@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- The install script supports FreeBSD (issue #781): on FreeBSD 15.x (amd64), `fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh` downloads the release's `.pkg`, checks it against SHA256SUMS, installs the packages it needs from the pkg repositories and then installs it with `pkg add` (with sudo or doas when you are not root); running it again updates Mumcord, and `--uninstall` removes it with `pkg delete`
+
 ## [0.8.0] - 2026-11-12
 
 ### Added
