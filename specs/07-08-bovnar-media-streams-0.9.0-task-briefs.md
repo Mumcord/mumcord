@@ -59,7 +59,7 @@
 | R4 | Plugin relay data on channel 6 | done — `875d1656`, `feat/r4-plugin-channel6` | R1 | complex |
 | R5 | mumpeer: new format, routing, description cache | done — `4b94be6` on `sothis/mumpeer`, PR #17 | P0.3, W1, W2 | complex |
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
-| E1 | Packet inspector: description, channels, format | open | D1, R2 | complex |
+| E1 | Packet inspector: description, channels, format | done — `e43e87ce`, `fe004f81`, `432578c0`, `42b9eb4e` on `feat/e1-inspector`; screenshots not retaken | D1, R2 | complex |
 | E2 | UI texts and 24 locales for fallback paths | partial — `8f8a516b`: screen-share fallbacks in 24 locales; camera texts wait for D6 | D4, D6 | simple |
 | E3 | Notices and licences for Bovnar 2.1.0 | done — `scripts/ci/test-notices.sh` passes, 771 Rust / 19 native, 363 texts | – | simple |
 | E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
