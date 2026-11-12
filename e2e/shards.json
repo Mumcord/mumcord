@@ -47,6 +47,7 @@
       "specs/servers/public-server-browser.e2e.ts"
     ],
     [
+      "specs/camera/media-streams.e2e.ts",
       "specs/camera/viewer.e2e.ts",
       "specs/files/failures.e2e.ts",
       "specs/app/updater.e2e.ts",

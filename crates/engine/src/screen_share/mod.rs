@@ -47,6 +47,7 @@ use mumcord_protocol::{Handle, PluginData};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
+use crate::inspector::MediaTapSink;
 use crate::mumcord::{FEATURE_SCREEN_BROADCAST, ServerPeers};
 use crate::p2p::DirectError;
 use crate::peer::{RelayUnavailable, RelayUse};
@@ -841,6 +842,7 @@ impl Engine {
                 selection.prefs,
                 encoder::factory(selection.candidates, own.encoder.clone()),
             );
+            media.set_media_tap(MediaTapSink::new(&self.inspector(), server_id));
             if let Some(app_sound) = app_sound {
                 media.start_sound(app_sound);
             }
@@ -1176,6 +1178,7 @@ impl Engine {
                                 sound::ShareSound::new(self.voice_shared().clone(), volume),
                                 send,
                                 recv,
+                                Some(MediaTapSink::new(&self.inspector(), server_id)),
                             ));
                         }
                     }
@@ -1244,6 +1247,7 @@ impl Engine {
                             sound::ShareSound::new(engine.voice_shared().clone(), volume),
                             send,
                             recv,
+                            Some(MediaTapSink::new(&engine.inspector(), server_id)),
                         );
                         link.set_decode_codecs(&decode_codecs);
                         link.set_max_fps(max_fps);

@@ -1626,6 +1626,12 @@ impl Engine {
         self.inner.inspector.set_enabled(enabled);
     }
 
+    /// The packet inspector's capture, for the media paths that frame a stream themselves
+    /// (FR-7.101).
+    pub(crate) fn inspector(&self) -> Arc<crate::inspector::Inspector> {
+        self.inner.inspector.clone()
+    }
+
     /// Drops the captured packets and resets the inspector's counters.
     pub fn clear_packet_capture(&self) {
         self.inner.inspector.clear();

@@ -25,6 +25,7 @@ import { startScreenShare } from "../../helpers/chat-ui.ts";
 import { personRow } from "../../helpers/voice-ui.ts";
 import {
   NAMES,
+  type CameraViewer,
   cameraView,
   clientLog,
   on,
@@ -46,12 +47,12 @@ const rekeys = (): number => clientLog("a").split("\n").filter((l) => l.includes
 
 /** Waits until A's camera lists `session` as a viewer (`present`) or not. */
 async function waitViewer(session: number, present: boolean, timeout = 15_000): Promise<void> {
-  let viewers: number[] = [];
+  let viewers: CameraViewer[] = [];
   await browser
     .waitUntil(
       async () => {
         viewers = (await cameraView())?.viewers ?? [];
-        return viewers.includes(session) === present;
+        return viewers.some((v) => v.session === session) === present;
       },
       { timeout, interval: 250 },
     )
@@ -110,7 +111,7 @@ async function waitViewer(session: number, present: boolean, timeout = 15_000): 
     });
     // B stays unbound for 10 s while C keeps watching.
     await sleep(10_000);
-    expect((await cameraView())?.viewers).not.toContain(bob);
+    expect((await cameraView())?.viewers.some((v) => v.session === bob)).toBe(false);
     await on("b", async () => {
       expect((await tileOf(NAMES.a))?.state).toBe("hidden");
     });
@@ -129,7 +130,7 @@ async function waitViewer(session: number, present: boolean, timeout = 15_000): 
     await on("b", () => updateSettings({ cameraShow: "never" }));
     await waitViewer(bob, false);
     await sleep(5_000);
-    expect((await cameraView())?.viewers).not.toContain(bob);
+    expect((await cameraView())?.viewers.some((v) => v.session === bob)).toBe(false);
     await on("b", async () => {
       const tile = await tileOf(NAMES.a);
       expect(tile === undefined || tile.state !== "playing").toBe(true);

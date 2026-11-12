@@ -777,7 +777,13 @@
       "gap": "Tarpas nuo ankstesnio paketo",
       "kind": "Vidinis ID",
       "size": "Dydis",
-      "decoded": "Iškoduotas turinys"
+      "decoded": "Iškoduotas turinys",
+      "media": "Medija"
+    },
+    "media": {
+      "channel": "kanalas {{channel}}",
+      "keyframe": "raktinis kadras",
+      "delta": "delta kadras"
     },
     "noDecoding": "Šis turinys neturi įskaitomos formos; žiūrėk neapdorotus baitus.",
     "controlOnly": "Standartinis Mumble pranešimas: įrašomas tik jo tipas ir dydis.",
@@ -798,7 +804,8 @@
       "watch": "Bendros peržiūros būsena",
       "plugin": "Papildinio duomenys",
       "mumble": "Mumble pranešimas",
-      "peer": "Perdavimo mazgo sąranka"
+      "peer": "Perdavimo mazgo sąranka",
+      "media": "Medijos srautas"
     }
   },
   "licences": {

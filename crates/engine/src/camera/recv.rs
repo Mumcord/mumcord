@@ -574,6 +574,22 @@ impl Engine {
         }
     }
 
+    /// Whether this client wants `sharer`'s camera right now, so it welcomes a direct answer to
+    /// that sender's offer (spec 08, FR-8.94): a tile that is announced, joining or playing.
+    pub(crate) fn camera_wants_direct(&self, server_id: ServerId, sharer: u32) -> bool {
+        lock(self.camera_state())
+            .recv
+            .rooms
+            .get(&server_id)
+            .and_then(|room| room.tiles.get(&sharer))
+            .is_some_and(|tile| {
+                matches!(
+                    tile.state,
+                    TileState::Announced | TileState::Joining | TileState::Playing
+                )
+            })
+    }
+
     /// Test access: whether `sharer`'s tile plays the sender's own `STREAM_CAMERA` instead of a
     /// relay broadcast (FR-8.92).
     #[cfg(feature = "test-backend")]
@@ -914,8 +930,8 @@ fn may_bind(tile: Option<&Tile>, blocked: bool) -> bool {
 }
 
 /// A sender opened a `STREAM_CAMERA` to this client (FR-8.92). It plays on that sender's tile
-/// only if the description names the camera session the tile waits for (FR-8.95) and the tile
-/// shows video; anything else closes the stream unread.
+/// only if the description names the camera session the tile waits for (a stale session is
+/// refused, FR-8.92) and the tile shows video; anything else closes the stream unread.
 pub(crate) async fn serve_direct(
     engine: &Engine,
     server_id: ServerId,
