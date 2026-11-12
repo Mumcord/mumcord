@@ -1,7 +1,7 @@
 {
   "menu": {
     "whisper": "Fluister naar",
-    "noPermission": "De server staat hier geen fluisteren toe"
+    "noPermission": "De server staat fluisteren hier niet toe"
   },
   "banner": {
     "whisper": "Fluistert naar {{target}}",
@@ -13,10 +13,10 @@
   },
   "denied": {
     "title": "Kon niet fluisteren naar {{target}}",
-    "noVoiceServer": "Ga eerst naar een kanaal: fluisteren loopt via de server waarop je praat.",
+    "noVoiceServer": "Neem eerst deel aan een kanaal: fluisteren loopt via de server waarop je praat.",
     "muted": "Zet je microfoon aan om te fluisteren.",
     "serverMuted": "De server heeft je gedempt en geeft je stem daarom niet door.",
-    "nobodyHere": "Niemand hiervan zit nu op deze server.",
+    "nobodyHere": "Geen van deze mensen is nu op deze server.",
     "channelNotFound": "Dit kanaal bestaat niet op deze server.",
     "noPermission": "De server staat niet toe dat je naar {{channel}} fluistert.",
     "unknownTarget": "Dit doel bestaat niet meer.",

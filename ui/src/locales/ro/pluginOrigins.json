@@ -1,6 +1,6 @@
 {
   "title": "Comunică cu aceste site-uri web",
-  "intro": "{{plugin}} și pagina sa pot trimite și primi date doar de la:",
+  "intro": "{{plugin}} și pagina sa pot face schimb de date doar cu:",
   "introUpdate": "{{plugin}} și pagina sa ar putea accesa apoi:",
   "privacy": "Aceste site-uri web îți pot vedea adresa IP și tot ce le trimite {{plugin}}.",
   "includesNames": "Aceasta poate include numele persoanelor de pe canalul tău.",
@@ -22,7 +22,7 @@
       "side-panel": "Panou lateral",
       "dialog": "Fereastră",
       "panel": "Bara de pluginuri",
-      "appMenu": "Meniul Aplicații · {{count}} intrări",
+      "appMenu": "Meniul Aplicații · intrări: {{count}}",
       "chat": "Carduri de chat"
     },
     "ownCode": "Cod propriu",
@@ -31,25 +31,25 @@
     "sealedPageTextNoSize": "{{entry}} · fără acces la Mumcord, fișiere, microfon, cameră sau clipboard",
     "relayAsks": "Cere să-l folosească · decizi tu când instalezi",
     "securityTitle": "Securitate",
-    "relayData": "Date prin relay",
+    "relayData": "Date prin releu",
     "relayOff": "Oprit ·",
     "relayOn": "Pornit",
     "turnOnInPermissions": "Activează în permisiuni",
     "tags": {
       "webview": "Conținut web propriu",
-      "origins": "{{count}} site-uri web",
+      "origins": "Site-uri web: {{count}}",
       "stage": "Zona media",
       "sidePanel": "Panou lateral",
-      "relay": "Date prin relay",
+      "relay": "Date prin releu",
       "appMenu": "Meniul Aplicații"
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Această actualizare dorește să comunice cu {{count}} site web nou.",
     "wantsNew_few": "Această actualizare dorește să comunice cu {{count}} site-uri web noi.",
     "wantsNew_other": "Această actualizare dorește să comunice cu {{count}} de site-uri web noi.",
     "staysOn": "{{plugin}} rămâne pe {{version}} până decizi tu.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} actualizare te așteaptă. Actualizările care adaugă permisiuni sau site-uri web nu se instalează niciodată automat.",
     "banner_few": "{{count}} actualizări te așteaptă. Actualizările care adaugă permisiuni sau site-uri web nu se instalează niciodată automat.",
     "banner_other": "{{count}} de actualizări te așteaptă. Actualizările care adaugă permisiuni sau site-uri web nu se instalează niciodată automat.",
     "noOther": "Nicio altă permisiune nu se modifică.",

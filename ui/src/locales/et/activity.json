@@ -8,7 +8,7 @@
   "selfName": "sinu",
   "someone": "keegi",
   "verb": {
-    "connected": "ühendas",
+    "connected": "ühendus",
     "disconnected": "katkestas ühenduse",
     "moved": "vahetas kanali",
     "screenShareStarted": "alustas ekraani jagamist",
@@ -20,7 +20,7 @@
     "pluginEvent": "„{{text}}“"
   },
   "channel": "# {{channel}}",
-  "plugin": "pistikprogramm",
+  "plugin": "plugin",
   "live": "otse",
   "watch": "Vaata",
   "join": "Liitu",
@@ -28,10 +28,10 @@
   "yesterday": "Eile",
   "empty": "Tegevust pole veel.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} ekraani jagamine",
-    "watchParty": "{{action}} {{name}} ühisvaatamine",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
-    "pluginEvent": "{{action}} {{plugin}}"
+    "screenShare": "{{action}}: {{name}} – ekraani jagamine",
+    "watchParty": "{{action}}: {{name}} – ühisvaatamine",
+    "pluginActivity": "{{action}}: {{name}} – {{plugin}}",
+    "pluginEvent": "{{action}}: {{plugin}}"
   },
   "joinPartyFailed": "Ühisvaatamisega liitumine ebaõnnestus.",
   "joinActivityFailed": "Plugina tegevusega liitumine ebaõnnestus.",

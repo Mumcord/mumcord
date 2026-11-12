@@ -3,5 +3,5 @@
   "heldForApi": "Ažuriranje je dostupno nakon ažuriranja Mumcorda",
   "updateMumcord": "Ažuriraj Mumcord",
   "oldMajor": "Izrađeno za stariji Mumcord – možda neće raditi",
-  "deprecated": "{{plugin}} koristi stariji dodatkov API koji Mumcord još podržava."
+  "deprecated": "{{plugin}} koristi starije sučelje za dodatke koje Mumcord još podržava."
 }

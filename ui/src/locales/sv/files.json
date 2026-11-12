@@ -92,7 +92,7 @@
     },
     "unavailable": {
       "offline": "{{sender}} gick offline. Filen är inte längre tillgänglig.",
-      "ended": "Den här delningen har tagit slut. Delningar upphör efter 24 timmar.",
+      "ended": "Den här delningen har upphört. Delningar upphör efter 24 timmar.",
       "askAgain": "Be {{sender}} dela den igen."
     },
     "disabled": {

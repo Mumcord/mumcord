@@ -3,7 +3,8 @@
 //! and turning the setting off removes them again. The bot's own payload reaches the engine as
 //! a `NowPlayingChanged` event. `testenv/up.sh v14`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_now_playing -- --ignored --test-threads=1`
-#![cfg(feature = "test-backend")]
+// FreeBSD: see the note on the mumbot dev-dependency in Cargo.toml.
+#![cfg(all(feature = "test-backend", not(target_os = "freebsd")))]
 
 mod common;
 

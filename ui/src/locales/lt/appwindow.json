@@ -1,12 +1,12 @@
 {
   "close": {
     "title": "Suskleisti į dėklą ar išeiti?",
-    "description": "Tu vis dar prisijungęs (-usi). Suskleistas Mumcord palaiko tave balso kanale ir lieka sistemos dėkle.",
+    "description": "Vis dar esi prisijungęs. Suskleistas Mumcord laiko tave balso kanale ir lieka sistemos dėkle.",
     "remember": "Prisiminti mano pasirinkimą",
     "minimize": "Suskleisti į dėklą",
     "quit": "Išeiti",
     "failed": "Nepavyko. Bandyk dar kartą.",
-    "descriptionServers": "Vis dar esi prisijungęs prie {{count}} serverių. Sumažintas Mumcord laiko tave balso kanale ir lieka sistemos dėkle."
+    "descriptionServers": "Vis dar esi prisijungęs prie {{count}} serverių. Suskleistas Mumcord laiko tave balso kanale ir lieka sistemos dėkle."
   },
   "windowOverlay": {
     "title": "Lango perdanga pašalinta",
@@ -15,14 +15,14 @@
     "openSettings": "Atidaryti perdangos nustatymus"
   },
   "audioDevice": {
-    "title": "Iš naujo pasirinkite garso įrenginius",
-    "description": "Mumcord dabar atskirai rodo kiekvieną jūsų garso įrenginių įvestį ir išvestį. Išsaugoto įrenginio nepavyko susieti nė su viena iš jų, todėl kol kas naudojamas sistemos numatytasis. Įrenginį galite pasirinkti garso nustatymuose.",
+    "title": "Iš naujo pasirink garso įrenginius",
+    "description": "Mumcord dabar atskirai rodo kiekvieną tavo garso įrenginių įvestį ir išvestį. Išsaugoto įrenginio nepavyko susieti nė su viena iš jų, todėl kol kas naudojamas sistemos numatytasis. Įrenginį gali pasirinkti garso nustatymuose.",
     "dismiss": "Supratau",
     "openSettings": "Atidaryti garso nustatymus"
   },
   "appImageMenu": {
     "title": "Pridėti Mumcord į programų meniu?",
-    "description": "Taip Mumcord atsiras tavo programų meniu. Piktograma ir „spausk ir kalbėk“ Wayland aplinkoje veiks tinkamai, o mumble:// nuorodos atidarys Mumcord. Vėliau tai gali pakeisti nustatymuose.",
+    "description": "Taip Mumcord atsiras tavo programų meniu. Piktograma ir Push-to-talk Wayland aplinkoje veiks tinkamai, o mumble:// nuorodos atidarys Mumcord. Vėliau tai gali pakeisti nustatymuose.",
     "no": "Ne",
     "yes": "Taip",
     "failed": "Nepavyko. Bandyk dar kartą."
@@ -36,15 +36,17 @@
   },
   "directConsent": {
     "title": "Leisti tiesioginius ryšius?",
-    "description": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti jūsų IP adresą. Mumcord juos naudoja viso dydžio paveikslėliams ir ekrano bendrinimui su kitais Mumcord naudotojais ir gali tam atidaryti prievadą jūsų maršruto parinktuve. Jei atsisakysite, paveikslėliai vis tiek atkeliaus per serverį, o ekrano bendrinimas nebus pasiekiamas. Tai galite pakeisti vėliau skiltyje Nustatymai → Privatumas. Jei šis serveris siūlo perdavimo mazgą, Mumcord gali naudoti jį; tada kitas asmuo nemato tavo IP adreso.",
+    "description": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Mumcord juos naudoja viso dydžio paveikslėliams ir ekrano bendrinimui su kitais Mumcord naudotojais ir gali tam atidaryti prievadą tavo maršruto parinktuve. Jei atsisakysi, paveikslėliai vis tiek atkeliaus per serverį, o ekrano bendrinimas nebus pasiekiamas. Vėliau tai gali pakeisti skiltyje Nustatymai → Privatumas. Jei šis serveris siūlo perdavimo mazgą, Mumcord gali naudoti jį; tada kitas asmuo nemato tavo IP adreso.",
     "no": "Ne",
     "yes": "Taip",
     "failed": "Nepavyko. Bandyk dar kartą."
   },
   "updater": {
     "stable": "Stabili",
+    "releaseCandidate": "Išleidimo kandidatas",
+    "prereleaseNote": "Tai išankstinė versija, joje gali būti klaidų. Nustatymuose perjunk į stabilų kanalą, jei nori gauti tik galutines versijas.",
     "available": {
-      "title": "Yra naujinimas",
+      "title": "Yra naujinys",
       "subtitle": "Mumcord {{version}} paruoštas atsisiųsti. Tu turi {{current}}.",
       "subtitleManual": "Išleista Mumcord {{version}}. Tu turi {{current}}.",
       "whatsNew": "Kas nauja nuo {{current}}",

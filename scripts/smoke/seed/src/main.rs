@@ -49,7 +49,8 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         &identity.cert_hash(),
         now_ms()?,
     ))?;
-    SecretStore::os().save_identity(record.id, &identity)?;
+    // The same store the app uses: the OS keyring, or the encrypted file next to the profile.
+    SecretStore::os_with_profile(&data_dir).save_identity(record.id, &identity)?;
 
     let mut settings = store.settings()?;
     settings.wizard_completed = true;

@@ -1,0 +1,185 @@
+/* Aaron's tips (#637): the mascot with its speech bubble, floating next to the element of the
+   current tip (placed by TipsHost) or in the lower right corner above the message bar. Below the
+   toasts (z-index 50), so a new message is never hidden behind it. */
+/* During the tour the rest of the window is dimmed and the target sits in a ringed spotlight.
+   The layer is decoration only: it lets every click through, so the app stays usable. */
+.tips-dim {
+  --tips-dim: color-mix(in srgb, var(--color-backdrop) 75%, transparent);
+
+  position: fixed;
+  inset: 0;
+  z-index: 47;
+  background: var(--tips-dim);
+  pointer-events: none;
+}
+
+/* Left, top, width and height come inline: the target's box. The huge shadow dims the rest. */
+.tips-dim--spot {
+  inset: auto;
+  border-radius: var(--radius-lg);
+  outline: 2px solid var(--color-focus);
+  background: none;
+  box-shadow:
+    0 0 1rem 0.25rem color-mix(in srgb, var(--color-focus) 45%, transparent),
+    0 0 0 200vmax var(--tips-dim);
+}
+
+.tips {
+  position: fixed;
+  right: var(--space-5);
+  bottom: 5.5rem;
+  z-index: 48;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+/* Next to a target in the upper half Aaron stands at the top, level with the bubble's title. */
+.tips--top {
+  align-items: flex-start;
+}
+
+/* Placed by TipsHost: left and top come inline. */
+.tips[style] {
+  right: auto;
+  bottom: auto;
+}
+
+/* Aaron stands left of the bubble when the target is on his left. */
+.tips--mascot-left {
+  flex-direction: row-reverse;
+}
+
+.tips__bubble {
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  width: min(21rem, calc(100vw - 14rem));
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  pointer-events: auto;
+}
+
+/* The tail points at Aaron's face. */
+.tips__bubble::after {
+  content: "";
+  position: absolute;
+  right: -0.5625rem;
+  bottom: 5.5rem;
+  width: 1rem;
+  height: 1rem;
+  border-top: 1px solid var(--color-border-strong);
+  border-right: 1px solid var(--color-border-strong);
+  background: var(--color-bg-elevated);
+  transform: rotate(45deg);
+}
+
+.tips__progress {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tips__title {
+  margin: 0 2.25rem var(--space-2) 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.tips__body {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.tips__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.tips__close {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+}
+
+.tips__close:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.tips--top .tips__bubble::after {
+  top: 1.75rem;
+  bottom: auto;
+}
+
+.tips--mascot-left .tips__bubble::after {
+  right: auto;
+  left: -0.5625rem;
+  border-top: none;
+  border-right: none;
+  border-bottom: 1px solid var(--color-border-strong);
+  border-left: 1px solid var(--color-border-strong);
+}
+
+/* Aaron beside the bubble, lifted off the app by a soft shadow. */
+.tips__mascot {
+  flex: none;
+  width: 9rem;
+  filter: drop-shadow(0 0.5rem 0.75rem rgb(0 0 0 / 35%));
+}
+
+.tips__mascot > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* With reduced motion he jumps from target to target instead of gliding. */
+@media (prefers-reduced-motion: no-preference) {
+  .tips,
+  .tips-dim {
+    animation: tips-in var(--duration-normal) var(--ease-out);
+    transition:
+      left calc(var(--duration-normal) * 2) var(--ease-out),
+      top calc(var(--duration-normal) * 2) var(--ease-out);
+  }
+
+  .tips-dim {
+    animation-name: tips-fade-in;
+    transition-property: left, top, width, height;
+  }
+}
+
+@keyframes tips-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes tips-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}

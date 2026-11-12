@@ -1,12 +1,12 @@
 {
   "close": {
     "title": "Minimaliseren naar het systeemvak of afsluiten?",
-    "description": "Je bent nog verbonden. Als je minimaliseert, blijft Mumcord je in de voicechat houden en draait het in het systeemvak.",
+    "description": "Je bent nog verbonden. Als je minimaliseert, blijf je in de spraakchat en blijft Mumcord in het systeemvak.",
     "remember": "Mijn keuze onthouden",
     "minimize": "Naar systeemvak minimaliseren",
     "quit": "Afsluiten",
     "failed": "Dat is mislukt. Probeer het opnieuw.",
-    "descriptionServers": "Je bent nog met {{count}} servers verbonden. Geminimaliseerd houdt Mumcord je in de spraak en blijft het in het systeemvak."
+    "descriptionServers": "Je bent nog met {{count}} servers verbonden. Als je minimaliseert, blijf je in de spraakchat en blijft Mumcord in het systeemvak."
   },
   "windowOverlay": {
     "title": "De vensteroverlay is verwijderd",
@@ -36,21 +36,23 @@
   },
   "directConsent": {
     "title": "Directe verbindingen toestaan?",
-    "description": "Directe verbindingen zijn sneller, maar de andere persoon kan je IP-adres zien. Mumcord gebruikt ze voor afbeeldingen op volledige grootte en schermdelen met andere Mumcord-gebruikers en kan hiervoor een poort op je router openen. Als je nee zegt, komen afbeeldingen nog steeds via de server binnen en is schermdelen niet beschikbaar. Je kunt dit later wijzigen via Instellingen → Privacy. Als deze server een relay aanbiedt, kan Mumcord die in plaats daarvan gebruiken; dan ziet de ander je IP-adres niet.",
+    "description": "Directe verbindingen zijn sneller, maar de andere persoon kan je IP-adres zien. Mumcord gebruikt ze voor afbeeldingen op volledige grootte en schermdeling met andere Mumcord-gebruikers en kan hiervoor een poort op je router openen. Als je nee zegt, komen afbeeldingen nog steeds via de server binnen en is schermdeling niet beschikbaar. Je kunt dit later wijzigen via Instellingen → Privacy. Als deze server een relay aanbiedt, kan Mumcord die in plaats daarvan gebruiken; dan ziet de ander je IP-adres niet.",
     "no": "Nee",
     "yes": "Ja",
     "failed": "Dat is niet gelukt. Probeer het opnieuw."
   },
   "updater": {
     "stable": "Stabiel",
+    "releaseCandidate": "Release candidate",
+    "prereleaseNote": "Dit is een pre-releaseversie en kan bugs bevatten. Schakel in de instellingen over naar het stabiele kanaal om alleen definitieve versies te krijgen.",
     "available": {
       "title": "Update beschikbaar",
       "subtitle": "Mumcord {{version}} staat klaar om te downloaden. Jij hebt {{current}}.",
-      "subtitleManual": "Mumcord {{version}} is uit. Jij hebt {{current}}.",
+      "subtitleManual": "Mumcord {{version}} is verschenen. Jij hebt {{current}}.",
       "whatsNew": "Wat is er nieuw sinds {{current}}",
       "trust": "Wordt alleen van github.com via HTTPS gedownload en vóór de installatie gecontroleerd op handtekening en controlesom.",
       "skip": "Deze versie overslaan",
-      "later": "Herinner me later",
+      "later": "Later herinneren",
       "download": "Downloaden en installeren",
       "openReleasePage": "Releasepagina openen",
       "manual": "Download de nieuwe versie van de releasepagina.",

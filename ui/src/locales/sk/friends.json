@@ -8,7 +8,7 @@
   "offline": "Offline",
   "lastSeen": "Offline, naposledy {{when}}",
   "friend": "Priateľ",
-  "friendHint": "Ukáže, kedy je online, a ponechá tvoj súkromný chat s ním.",
+  "friendHint": "Ukáže, keď je tento človek online, a zachová tvoj súkromný chat s ním.",
   "noCertificate": "Ľudia bez certifikátu nemôžu byť priatelia, pretože Mumcord by ich nedokázal znova rozpoznať.",
   "add": "Pridať priateľa",
   "remove": "Odstrániť priateľa",

@@ -17,19 +17,19 @@
     "available": "Verfügbar",
     "availableAt": "Verfügbar · {{host}}",
     "unavailable": "Nicht verfügbar: {{reason}}",
-    "untrusted": "Geändert, nicht vertraut",
+    "untrusted": "Geändert, nicht bestätigt",
     "changed": "Das Relay dieses Servers hat sich geändert.",
     "trustNew": "Neuem Relay vertrauen",
     "keepBlocked": "Gesperrt lassen",
     "forget": "Relay vergessen",
     "actionFailed": "Das hat nicht geklappt. Bitte versuche es erneut.",
-    "noRelay": "Dieser Server hat kein Relay, daher ist der Dateiaustausch nicht verfügbar.",
-    "filesDisallowed": "Das Relay dieses Servers erlaubt keinen Dateiaustausch.",
+    "noRelay": "Dieser Server hat kein Relay, daher ist die Dateifreigabe nicht verfügbar.",
+    "filesDisallowed": "Das Relay dieses Servers erlaubt keine Dateifreigabe.",
     "screenDisallowed": "Das Relay dieses Servers erlaubt keine Bildschirmfreigabe.",
     "camerasDisallowed": "Das Relay dieses Servers erlaubt keine Kamerafreigabe.",
     "imagesDisallowed": "Originalgröße nicht verfügbar: Das Relay dieses Servers erlaubt keine Bilder",
-    "noCertificate": "Für den Dateiaustausch ist ein Client-Zertifikat nötig.",
-    "modeNeedsRelay": "Der Dateiaustausch braucht das Relay; deine Peer-to-Peer-Einstellung ist {{mode}}.",
+    "noCertificate": "Für die Dateifreigabe ist ein Client-Zertifikat nötig.",
+    "modeNeedsRelay": "Die Dateifreigabe braucht das Relay; deine Peer-to-Peer-Einstellung ist {{mode}}.",
     "modeOff": "Aus",
     "modeDirectOnly": "Nur direkt",
     "hideNoRelay": "Diesen Hinweis für {{server}} ausblenden"
@@ -38,7 +38,7 @@
     "p2pOff": "Peer-to-Peer ist aus.",
     "noRelay": "Dieser Server hat kein Relay.",
     "notConnected": "Nicht mit diesem Server verbunden.",
-    "untrusted": "Das Relay dieses Servers hat sich geändert und wird nicht vertraut.",
+    "untrusted": "Das Relay dieses Servers hat sich geändert und ist noch nicht als vertrauenswürdig bestätigt.",
     "conflict": "Auf diesem Server sind zwei Relays angekündigt; keines wird verwendet.",
     "botLeft": "Der Relay-Bot hat den Server verlassen.",
     "relayDown": "Das Relay ist gerade nicht erreichbar (gemeldet vom Relay-Bot).",
@@ -57,7 +57,7 @@
     "unknownToken": "unbekanntes Zugriffstoken",
     "expired": "Zugriffstoken abgelaufen",
     "notAllowed": "nicht erlaubt",
-    "botGone": "Relay-Bot weg",
+    "botGone": "Relay-Bot nicht mehr da",
     "relayFull": "Relay voll",
     "peerLimit": "zu viele Verbindungen",
     "rateLimited": "zu viele Versuche",
@@ -67,7 +67,7 @@
   "refusalAction": {
     "howToRegister": "So registrierst du dich",
     "reconnect": "Neu verbinden",
-    "filesRegisteredOnly": "Dateifreigabe ist auf diesem Server nur für registrierte Nutzer verfügbar."
+    "filesRegisteredOnly": "Dateifreigabe ist auf diesem Server nur für registrierte Benutzer verfügbar."
   },
   "trust": {
     "title": "Relay auf {{server}} geändert",
@@ -85,6 +85,6 @@
     "dontTrustIfText": "niemand eine Änderung angekündigt hat oder du unsicher bist. Jemand könnte sich als das Relay ausgeben.",
     "notNow": "Nicht jetzt",
     "review": "Relay geändert – prüfen",
-    "filesBlocked": "Dateifreigabe ist nicht verfügbar: Das Relay dieses Servers hat sich geändert und ist noch nicht vertraut."
+    "filesBlocked": "Dateifreigabe ist nicht verfügbar: Das Relay dieses Servers hat sich geändert und ist noch nicht als vertrauenswürdig bestätigt."
   }
 }

@@ -11,14 +11,12 @@ import {
   waitMessage,
 } from "../../helpers/chat-ui.ts";
 
+// Matched on the title only: activity toasts (a person joining, #660; "RaidBot moved channel in
+// #Raid") mention the channel in their text and must not be taken for the chat's toast.
 function toast(contains: string) {
   return $(
-    `//section[@aria-label='Notifications']//button[contains(@class,'toast__open') and contains(.,'${contains}')]`,
+    `//section[@aria-label='Notifications']//button[contains(@class,'toast__open')][.//span[contains(@class,'toast__title') and contains(.,'${contains}')]]`,
   );
-}
-
-function anyToast() {
-  return $("//section[@aria-label='Notifications']//button[contains(@class,'toast__open')]");
 }
 
 function followButton() {
@@ -62,7 +60,7 @@ describe("chat: message notifications (FR-1.48c)", () => {
     await waitMessage("at eight");
     const focused = await browser.execute(() => document.activeElement?.tagName ?? "");
     expect(focused).toBe("TEXTAREA");
-    await expect(anyToast()).not.toBeExisting();
+    await expect(toast("#Raid")).not.toBeExisting();
   });
 
   it("shows no toast for the chat on screen", async () => {
@@ -70,6 +68,7 @@ describe("chat: message notifications (FR-1.48c)", () => {
     await raidBot.run('say --channel Raid "already here"');
     await waitMessage("already here");
     await sleep(1500);
-    await expect(anyToast()).not.toBeExisting();
+    // By chat: activity toasts (people joining, #660) may be up at the same time.
+    await expect(toast("#Raid")).not.toBeExisting();
   });
 });

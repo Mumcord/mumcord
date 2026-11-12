@@ -1,12 +1,12 @@
 {
   "close": {
     "title": "Íoslaghdaigh go dtí an tráidire nó scoir?",
-    "description": "Tá tú ceangailte fós. Má dhéanann tú íoslaghdú, coinníonn Mumcord ar an nguthán thú agus fanann sé i dtráidire an chórais.",
+    "description": "Tá tú ceangailte fós. Má íoslaghdaíonn tú é, coinníonn Mumcord sa chomhrá gutha thú agus fanann sé i dtráidire an chórais.",
     "remember": "Cuimhnigh ar mo rogha",
     "minimize": "Íoslaghdaigh go dtí an tráidire",
     "quit": "Scoir",
     "failed": "Níor oibrigh sé sin. Bain triail eile as.",
-    "descriptionServers": "Tá tú fós ceangailte le {{count}} freastalaí. Íoslaghdaithe, coinníonn Mumcord sa ghuth thú agus fanann sé i dtráidire an chórais."
+    "descriptionServers": "Tá tú fós ceangailte le {{count}} freastalaí. Má íoslaghdaíonn tú é, coinníonn Mumcord sa chomhrá gutha thú agus fanann sé i dtráidire an chórais."
   },
   "windowOverlay": {
     "title": "Baineadh an forleagan fuinneoige",
@@ -22,7 +22,7 @@
   },
   "appImageMenu": {
     "title": "Mumcord a chur le roghchlár na n-aipeanna?",
-    "description": "Cuireann sé seo Mumcord i do roghchlár aipeanna. Oibríonn an deilbhín agus brúigh-chun-cainte i gceart ar Wayland, agus osclaíonn naisc mumble:// Mumcord. Is féidir leat é seo a athrú níos déanaí sna Socruithe.",
+    "description": "Cuireann sé seo Mumcord i do roghchlár aipeanna. Dá bharr, oibríonn an deilbhín agus Push-to-talk i gceart ar Wayland, agus osclaíonn naisc mumble:// Mumcord. Is féidir leat é seo a athrú níos déanaí sna Socruithe.",
     "no": "Níl",
     "yes": "Tá",
     "failed": "Níor oibrigh sé sin. Bain triail eile as."
@@ -36,13 +36,15 @@
   },
   "directConsent": {
     "title": "Ceangail dhíreacha a cheadú?",
-    "description": "Bíonn ceangail dhíreacha níos tapúla, ach feicfidh an duine eile do sheoladh IP. Úsáideann Mumcord iad le haghaidh íomhánna lánmhéide agus comhroinnt scáileáin le húsáideoirí eile Mumcord, agus d’fhéadfadh sé port a oscailt ar do ródaire dóibh. Má deir tú nach ea, tiocfaidh íomhánna tríd an bhfreastalaí fós agus ní bheidh comhroinnt scáileáin ar fáil. Is féidir leat é seo a athrú níos déanaí i Socruithe → Príobháideacht. Má thairgeann an freastalaí seo athsheachadán, is féidir le Mumcord é a úsáid ina ionad; ansin ní fheiceann an duine eile do sheoladh IP.",
+    "description": "Bíonn ceangail dhíreacha níos tapúla, ach feicfidh an duine eile do sheoladh IP. Úsáideann Mumcord iad le haghaidh íomhánna lánmhéide agus comhroinnt scáileáin le húsáideoirí eile Mumcord, agus d’fhéadfadh sé port a oscailt ar do ródaire dóibh. Má dhiúltaíonn tú, tiocfaidh íomhánna tríd an bhfreastalaí fós agus ní bheidh comhroinnt scáileáin ar fáil. Is féidir leat é seo a athrú níos déanaí i Socruithe → Príobháideachas. Má thairgeann an freastalaí seo athsheachadán, is féidir le Mumcord é a úsáid ina ionad; ansin ní fheiceann an duine eile do sheoladh IP.",
     "no": "Níl",
     "yes": "Tá",
     "failed": "Níor oibrigh sé sin. Bain triail eile as."
   },
   "updater": {
     "stable": "Cobhsaí",
+    "releaseCandidate": "Iarrthóir eisiúna",
+    "prereleaseNote": "Is leagan réamheisiúna é seo agus d’fhéadfadh fabhtanna a bheith ann. Athraigh go dtí an cainéal Cobhsaí sna socruithe chun eisiúintí deiridh amháin a fháil.",
     "available": {
       "title": "Nuashonrú ar fáil",
       "subtitle": "Tá Mumcord {{version}} réidh le híoslódáil. Tá {{current}} agat.",

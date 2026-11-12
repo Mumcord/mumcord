@@ -296,6 +296,16 @@ impl PluginHost {
         result
     }
 
+    /// Stops every running plugin; they stay loaded. For the app's quit (#704): nothing drops
+    /// the host then, so without this no plugin would get its `stop`.
+    pub fn stop_all(&mut self) {
+        let ids: Vec<String> = self.plugins.keys().cloned().collect();
+        for id in ids {
+            // Failures while stopping are already logged; the plugin is off either way.
+            let _ = self.disable(&id);
+        }
+    }
+
     /// Stops (if running) and forgets a plugin.
     pub fn unload(&mut self, id: &str) -> Result<(), HostError> {
         let stopped = self.disable(id);

@@ -5,11 +5,11 @@
     "infoLabel": "Mai multe informații: actualizări pentru pluginuri",
     "auto": "Instalează automat",
     "notify": "Doar notifică",
-    "off": "Oprit"
+    "off": "Dezactivat"
   },
   "waiting": "Actualizări",
   "empty": "Toate pluginurile sunt la zi.",
-  "emptyOff": "Actualizările pentru pluginuri sunt oprite. Pornește-le mai sus pentru a căuta actualizări.",
+  "emptyOff": "Actualizările pentru pluginuri sunt dezactivate. Activează-le mai sus ca să cauți actualizări.",
   "loadFailed": "Actualizările nu au putut fi încărcate.",
   "newAuthorKey": "Această versiune este semnată de alt autor. Actualizează doar dacă ai încredere în noul autor.",
   "rolledBack": "Versiunea {{version}} nu a pornit, așa că a fost restaurată versiunea anterioară. Motiv:",
@@ -23,7 +23,7 @@
   "versionsTo": "la",
   "pill": {
     "none": "Fără permisiuni noi",
-    "permission": "Necesită o permisiune nouă",
+    "permission": "Cere mai multe permisiuni",
     "author": "Autor nou",
     "websites": "Comunică cu site-uri web noi"
   },
@@ -37,7 +37,7 @@
   "checkNow": "Verifică acum",
   "lastChecked": "Ultima verificare la {{time}}",
   "checkFailed": "Verificarea a eșuat. Încearcă din nou.",
-  "modeNote": "Actualizări de plugin-uri: {{mode}}. Poți schimba asta mai jos.",
+  "modeNote": "Actualizări pentru pluginuri: {{mode}}. Poți schimba asta mai jos.",
   "settings": "Setări de actualizare",
   "offer": {
     "heading": "Permisiuni noi",
@@ -98,7 +98,7 @@
     "asksForMore": "pentru că această versiune cere mai mult:",
     "permissionsLabel": "Permisiuni noi",
     "recentChange": "Se consideră și o modificare recentă: permisiunile noi din ultimele {{versions}} versiuni adaugă încă +{{recent}} puncte. Împreună cu +{{permissions}} de mai sus (× {{multiplier}}), rezultă +{{total}}.",
-    "highTitle": "Această actualizare ar face pluginul cu risc ridicat",
+    "highTitle": "Cu această actualizare, pluginul ar avea risc ridicat",
     "highText": "Nu va fi instalat automat. Dacă rămâi pe {{version}}, scorul actual se păstrează; poți fixa versiunea în Instalate.",
     "highTick": "Am înțeles că riscul a crescut și tot am încredere în autor",
     "skipHint": "Dacă sari peste ea, {{version}} continuă să funcționeze.",

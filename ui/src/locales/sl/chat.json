@@ -50,7 +50,7 @@
     "send": "Pošlji",
     "noPermission": "Nimaš dovoljenja za pisanje v tem kanalu.",
     "unavailable": "Ta kanal ni več na voljo.",
-    "offline": "{{name}} ni na spletu. Znova lahko pišeš, ko se vrne.",
+    "offline": "{{name}} ni povezan. Znova lahko pišeš, ko se vrne.",
     "unnamedImage": "Prilepljena slika",
     "attachFiles": "Deli datoteke"
   },
@@ -97,10 +97,10 @@
   },
   "mention": {
     "list": "Predlogi omemb",
-    "found_one": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
-    "found_two": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
-    "found_few": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
-    "found_other": "Predlogi: {{count}}. Uporabite puščice, nato Enter za vstavljanje.",
+    "found_one": "Predlogi: {{count}}. Uporabi puščice, nato Enter za vstavljanje.",
+    "found_two": "Predlogi: {{count}}. Uporabi puščice, nato Enter za vstavljanje.",
+    "found_few": "Predlogi: {{count}}. Uporabi puščice, nato Enter za vstavljanje.",
+    "found_other": "Predlogi: {{count}}. Uporabi puščice, nato Enter za vstavljanje.",
     "none": "Nihče ni najden",
     "mentionsYou": "Omenja te",
     "chipLabel": "{{name}}, omemba",
@@ -108,7 +108,8 @@
     "peopleHeading": "Osebe",
     "channelHint": "Obvesti vse v {{channel}} ({{count}})",
     "allHint": "Obvesti vse, ki lahko berejo ta kanal ({{count}})",
-    "keys": "↑↓ izberi · Enter vstavi · Esc zapri"
+    "keys": "↑↓ izberi · Enter vstavi · Esc zapri",
+    "channelList": "Predlogi kanalov"
   },
   "preview": {
     "open": "Odpri v brskalniku",
@@ -125,7 +126,7 @@
       "show": "Oddaja"
     },
     "inBrowser": "Predvaja se v tvojem brskalniku",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Predvajalnik Twitch v tem sistemu ne deluje v oknu Mumcorda, zato Predvajaj odpre prenos v tvojem brskalniku.",
     "card": "Predogled povezave: {{title}}",
     "dismiss": "Skrij predogled"
   },
@@ -282,6 +283,11 @@
     "warning_other": "{{count}} povezke v tem sporočilu prikazuje poverilnice",
     "warning_two": "{{count}} povezavi v tem sporočilu prikazujeta poverilnice"
   },
+  "pluginCard": {
+    "label": "Kartica vtičnika {{name}}",
+    "loading": "Nalaganje vtičnika…",
+    "openLabel": "Odpri {{name}}"
+  },
   "requests": {
     "entry": "Prošnje za sporočila",
     "entryCount_one": "{{count}} prošnja",
@@ -296,7 +302,7 @@
     "metaMumcord": "Uporabnik Mumcorda · {{server}} · {{time}}",
     "metaStandard": "{{server}} · {{time}}",
     "noteFrom": "Opomba od {{name}}",
-    "explain": "Zasebna sporočila si nastavil/a na »Samo prijatelji«. Če sprejmeš, ti bo {{name}} lahko pisal(a). Zavrnitev je tiha: {{name}} vidi samo »v čakanju«. Prošnje se izbrišejo, ko zapreš Mumcord.",
+    "explain": "Zasebna sporočila si nastavil na »Samo prijatelji«. Če sprejmeš, ti bo {{name}} lahko pisal(a). Zavrnitev je tiha: {{name}} vidi samo »v čakanju«. Prošnje se izbrišejo, ko zapreš Mumcord.",
     "sentMessages_one": "{{name}} ti je poslal(a) {{count}} sporočilo",
     "sentMessages_two": "{{name}} ti je poslal(a) {{count}} sporočili",
     "sentMessages_few": "{{name}} ti je poslal(a) {{count}} sporočila",
@@ -323,7 +329,7 @@
     "requestsNote": "Ni na tvojem seznamu prijateljev",
     "requestMetaChat": "{{server}} · se želi pogovarjati s tabo · {{time}}",
     "requestMetaMessages": "{{server}} · ti je poslal(a) sporočila · {{time}}",
-    "quote": "„{{text}}“",
+    "quote": "»{{text}}«",
     "block": "Blokiraj",
     "showMore_one": "Pokaži še {{count}} zahtevo",
     "showMore_two": "Pokaži še {{count}} zahtevi",
@@ -333,7 +339,7 @@
     "pinnedTitle": "Pripeti",
     "recentTitle": "Nedavni",
     "unknown": "Neznana oseba",
-    "online": "na spletu",
+    "online": "povezan",
     "offline": "brez povezave",
     "unreadCount": "Neprebrano: {{count}}",
     "pinned": "pripeto",
@@ -408,20 +414,32 @@
     "output": "Predvaja se na izhodni napravi, ne v mikrofon"
   },
   "embedHint": {
-    "image": "Slika je skrita, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "gif": "GIF je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "video": "Video predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "audio": "Zvočni predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "music": "Glasbeni predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "link": "Predogled povezave je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "several_one": "{{count}} predogled je skrit, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "several_two": "{{count}} predogleda sta skrita, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "several_few": "{{count}} predogledi so skriti, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
-    "several_other": "{{count}} predogledov je skritih, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>."
+    "image": "Slika je skrita, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "gif": "GIF je skrit, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "video": "Video predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "audio": "Zvočni predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "music": "Glasbeni predvajalnik je skrit, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "link": "Predogled povezave je skrit, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "several_one": "{{count}} predogled je skrit, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "several_two": "{{count}} predogleda sta skrita, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "several_few": "{{count}} predogledi so skriti, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>.",
+    "several_other": "{{count}} predogledov je skritih, ker so predogledi povezav in vdelave izklopljeni v razdelku <settings>Nastavitve → Zasebnost</settings>."
   },
   "historyImage": {
     "loading": "Nalaganje slike…",
     "unavailable": "Slika ni na voljo",
     "load": "Naloži sliko"
+  },
+  "slash": {
+    "list": "Ukazi s poševnico"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanal – odpri meni",
+    "join": "Vstopi v kanal",
+    "joinPath": "Vstopi v {{path}}",
+    "show": "Pokaži na seznamu kanalov",
+    "showPath": "Pokaži {{path}} na seznamu kanalov",
+    "copy": "Kopiraj ime",
+    "menu": "Kanal {{channel}}"
   }
 }

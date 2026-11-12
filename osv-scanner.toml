@@ -1,0 +1,36 @@
+# Advisories accepted for the lock files in this directory (Cargo.lock, package-lock.json).
+# OSV-Scanner, and OpenSSF Scorecard through it, reads this file per directory; it does not apply
+# to lock files in subdirectories. Keep it in sync with the `ignore` list in deny.toml.
+# Every entry is a transitive dependency we cannot update without a fix upstream.
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0429"
+reason = "glib 0.18 via Tauri's GTK 3 stack, which is pinned to gtk-rs 0.18; the fix needs glib 0.20 (#93)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0370"
+reason = "proc-macro-error is unmaintained (no vulnerability); pulled in by glib-macros 0.18 in the same GTK 3 stack (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0436"
+reason = "paste is unmaintained (no vulnerability); compile-time macro used by specta and tauri-specta (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0192"
+reason = "ttf-parser is unmaintained (no vulnerability); used by ab_glyph to render the game overlay with bundled fonts (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0370"
+reason = "zvariant is unmaintained (no vulnerability); via zbus 5, waiting for zbus 6 in ashpd, ksni and secret-service (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0371"
+reason = "zbus_names is unmaintained (no vulnerability); via zbus 5 (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0372"
+reason = "zvariant_derive is unmaintained (no vulnerability); via zbus 5 (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2023-0071"
+reason = "rsa Marvin timing attack: rsa only generates identity keys; all private-key operations (signing, TLS) run in ring, so the vulnerable code is not reachable; fix needs the semver-major rsa 0.10 (#131)"

@@ -18,18 +18,18 @@
   "installFailed": "Lisäosaa {{name}} ei voitu päivittää. Yritä uudelleen.",
   "pins": "Kiinnitä versio",
   "pinsHint": "Kiinnitetty lisäosa pysyy nykyisessä versiossaan, eikä sille tarjota päivityksiä.",
-  "pin": "Pidä {{name}} tässä versiossa",
+  "pin": "Pidä lisäosa {{name}} tässä versiossa",
   "pinVersion": "Versio {{version}}",
   "versionsTo": "versioon",
   "pill": {
     "none": "Ei uusia oikeuksia",
-    "permission": "Tarvitsee uuden oikeuden",
+    "permission": "Pyytää lisää oikeuksia",
     "author": "Uusi tekijä",
     "websites": "Ottaa yhteyttä uusiin verkkosivustoihin"
   },
   "newPermissions": "Uudet oikeudet",
   "revoked": {
-    "title": "{{name}} otettiin pois käytöstä",
+    "title": "{{name}} poistettiin käytöstä",
     "text": "Versio {{version}} on mitätöintilistalla: {{reason}}. Lisäosan tiedot säilyvät.",
     "details": "Tiedot",
     "remove": "Poista"
@@ -40,12 +40,12 @@
   "modeNote": "Lisäosapäivitykset: {{mode}}. Voit muuttaa tätä alla.",
   "settings": "Päivitysasetukset",
   "offer": {
-    "heading": "Uudet käyttöoikeudet",
+    "heading": "Uudet oikeudet",
     "title": "{{name}} {{version}} osaa nyt enemmän. Nämä asetukset ovat pois päältä, kunnes otat ne käyttöön.",
-    "permission": "Uusi valinnainen käyttöoikeus: {{permission}}",
+    "permission": "Uusi valinnainen oikeus: {{permission}}",
     "save": "Tallenna",
     "notNow": "Ei nyt",
-    "failed": "Laajennuksen {{name}} käyttöoikeuksia ei voitu muuttaa. Yritä uudelleen."
+    "failed": "Lisäosan {{name}} oikeuksia ei voitu muuttaa. Yritä uudelleen."
   },
   "waitingHeading": "Odottavat päivitykset",
   "autoNote": "Automaattiset päivitykset asennetaan vain, kun lisäosa ei pyydä mitään uutta ja sen pisteet pysyvät samalla tasolla tai laskevat. Kaikki muu odottaa täällä.",
@@ -59,7 +59,7 @@
     "newWebsites_one": "Tämä päivitys haluaa ottaa yhteyttä {{count}} uuteen verkkosivustoon. {{name}} pysyy versiossa {{version}}, kunnes päätät.",
     "newWebsites_other": "Tämä päivitys haluaa ottaa yhteyttä {{count}} uuteen verkkosivustoon. {{name}} pysyy versiossa {{version}}, kunnes päätät.",
     "riskUp": "Ei asenneta automaattisesti: riski nousi arvosta {{from}} arvoon {{to}}. Tarkista se ensin.",
-    "scoreUp": "Ei asenneta automaattisesti: pisteet nousivat arvosta {{from}} arvoon {{to}}. Tarkista ne ensin.",
+    "scoreUp": "Ei asenneta automaattisesti: pisteet nousivat arvosta {{from}} arvoon {{to}}. Tarkista päivitys ensin.",
     "blockedBySafety": "Ei asenneta: tämä versio on suuririskinen ja ”Älä salli suuririskisiä lisäosia” on päällä.",
     "scoreUnknown": "Ei asenneta automaattisesti: tämän version turvallisuuspisteitä ei voitu laskea. Tarkista se ensin."
   },
@@ -71,7 +71,7 @@
     "goesDown": ", riski pienenee"
   },
   "dialog": {
-    "title": "Päivitetäänkö {{name}} versioon {{version}}?",
+    "title": "Päivitetäänkö lisäosa {{name}} versioon {{version}}?",
     "now": "nyt {{version}}",
     "sameKey": "sama tekijän avain",
     "newKey": "uusi tekijän avain",

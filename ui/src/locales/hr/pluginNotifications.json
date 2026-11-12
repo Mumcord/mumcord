@@ -6,11 +6,11 @@
     "open": "Prikaži u Dodacima"
   },
   "pictureRefused": {
-    "title": "{{name}} nije mogao upotrijebiti sliku",
+    "title": "Dodatak {{name}} nije mogao upotrijebiti sliku",
     "body": "Ova se slika ne može koristiti. Koristi PNG, JPEG ili WebP datoteku do 10 MB."
   },
   "update": {
-    "title": "Ažuriranje za {{name}}",
+    "title": "Ažuriranje dodatka {{name}}",
     "body": "Verzija {{version}} čeka na kartici Ažuriranja",
     "open": "Prikaži ažuriranja"
   },
@@ -21,14 +21,14 @@
     "installLabel": "Instaliraj {{name}}",
     "addRepositoryLabel": "Dodaj repozitorij za {{name}}",
     "details": "Prikaži pojedinosti",
-    "detailsLabel": "Pojedinosti o {{name}}",
+    "detailsLabel": "Pojedinosti o dodatku {{name}}",
     "notNow": "Ne sada",
     "notNowLabel": "Za sada sakrij {{name}}",
     "dontAsk": "Više ne pitaj za ovaj poslužitelj",
     "recommended": "Preporučeno",
     "official": "Službeno",
     "unofficial": "Neslužbeno · {{host}}",
-    "footer": "Prijedlozi nikad ništa ne instaliraju sami. Poslužitelj ne zna što instalirate."
+    "footer": "Prijedlozi nikad ništa ne instaliraju sami. Poslužitelj ne zna što instaliraš."
   },
-  "failed": "Nije uspjelo. Pokušajte ponovno."
+  "failed": "To nije uspjelo. Pokušaj ponovno."
 }

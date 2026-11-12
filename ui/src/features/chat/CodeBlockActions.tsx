@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
-import { pickSavePath } from "../settings/fileDialogs";
 import { codeOf, MAX_DOWNLOAD_BYTES } from "./codeBlock";
 import { extensionFor } from "./highlight";
 
@@ -77,13 +76,17 @@ export function CodeBlockActions({ block, tabIndex }: CodeBlockActionsProps) {
     }
     const extension = extensionFor(block.dataset["language"]);
     try {
-      const path = await pickSavePath(
-        `snippet.${extension}`,
-        { name: t("codeBlock.fileType"), extensions: [extension] },
-        t("codeBlock.download"),
+      // The engine opens the save dialog itself and writes only where the user chose.
+      const saved = await getApi().saveText(
+        {
+          title: t("codeBlock.download"),
+          defaultName: `snippet.${extension}`,
+          filterName: t("codeBlock.fileType"),
+          extensions: [extension],
+        },
+        code,
       );
-      if (path === null) return;
-      await getApi().saveText(path, code);
+      if (!saved) return;
       show({ kind: "saved", text: t("codeBlock.saved") });
     } catch (error) {
       console.error("Saving the code block failed", error);

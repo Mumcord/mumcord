@@ -82,6 +82,8 @@ pub(crate) struct OwnShare {
     caps: BTreeMap<u32, ViewerCaps>,
     /// What the user picked in the system picker (issue #163).
     pub kind: Option<ShareKind>,
+    /// The picked window's title for the own live bar (issue #558); stays on this device.
+    pub title: Option<String>,
     /// When the share started, for the "since" line (issue #163).
     pub started_at: Instant,
     /// Capture and encoding; `None` only in tests of the bookkeeping.
@@ -104,6 +106,7 @@ impl OwnShare {
             viewers: BTreeMap::new(),
             caps: BTreeMap::new(),
             kind: None,
+            title: None,
             started_at: Instant::now(),
             media: None,
             encoder: Arc::default(),
@@ -423,6 +426,7 @@ impl Shares {
             viewers: share.viewer_list(),
             blocked: None,
             kind: share.kind,
+            title: share.title.clone(),
             elapsed_ms: elapsed(share.started_at, now),
         });
         let others = self.others.iter().map(|(session, share)| ScreenShareView {
@@ -433,6 +437,7 @@ impl Shares {
             viewers: share.viewers.clone(),
             blocked: self.failed.get(session).copied(),
             kind: share.kind,
+            title: None,
             // Their own elapsed time at the moment they signalled, plus the time since.
             elapsed_ms: share.elapsed_ms + elapsed(share.seen_at, now),
         });

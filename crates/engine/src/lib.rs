@@ -39,6 +39,7 @@ pub mod pm_rules;
 pub mod positional;
 pub mod profile;
 pub mod public_servers;
+pub mod registered;
 pub mod screen_share;
 pub mod server_query;
 pub mod session;
@@ -51,7 +52,9 @@ pub mod watch_party;
 pub mod web;
 pub mod whisper;
 
-pub use admin::{BanOutcome, BanRequest, KickOutcome, ModerateAction, PersonView};
+pub use admin::{
+    ActionOutcome, BanOutcome, BanRequest, MassMoveOutcome, ModerateAction, PersonView,
+};
 pub use banlist::{BanChange, BanSaveOutcome, BanView};
 pub use channel_acl::{AclGroup, AclRule, AclSaveOutcome, ChannelAcl, PasswordState, password_of};
 pub use channel_admin::{ChannelChange, ChannelCreate, ChannelOutcome};
@@ -72,6 +75,7 @@ pub use now_playing::{LocalTrack, NowPlayingView};
 pub use pm_overview::PrivateConversationView;
 pub use pm_rules::{MessageRequestView, PmRequestsView, SentChatRequestView};
 pub use positional::PositionalStatus;
+pub use registered::{RegisteredOutcome, RegisteredView};
 pub use server_query::{QueryOutcome, ServerQueries, ServerQuery};
 pub use session::Engine;
 pub use session::{

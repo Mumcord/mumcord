@@ -1,11 +1,11 @@
 {
   "noConversation": "Prisijunk prie serverio ir pasirink kanalą, kad pradėtum bendrauti.",
-  "empty": "Žinučių dar nėra. Čia gautos žinutės įrašomos šiame kompiuteryje.",
+  "empty": "Žinučių dar nėra. Čia gautos žinutės išsaugomos šiame kompiuteryje.",
   "header": {
     "channel": "#{{name}}",
     "channelPrefix": "Kanalas",
     "privatePrefix": "Privatus pokalbis su",
-    "unknownPerson": "Nežinomas žmogus"
+    "unknownPerson": "Nežinomas asmuo"
   },
   "list": {
     "server": "Serveris",
@@ -14,12 +14,12 @@
     "label": "Žinutės: {{name}}",
     "loadOlder": "Įkelti senesnes žinutes",
     "loading": "Įkeliamos žinutės…",
-    "loadFailed": "Nepavyko įkelti senesnių žinučių. Slinkis aukštyn ir bandyk dar kartą.",
+    "loadFailed": "Nepavyko įkelti senesnių žinučių. Slink aukštyn, kad bandytum dar kartą.",
     "loadEarlier": "Įkelti ankstesnes žinutes",
     "syncing": "Ieškoma ankstesnių žinučių iš kitų Mumcord naudotojų…",
     "syncAdded_one": "Pridėta {{count}} ankstesnė žinutė iš kitų Mumcord naudotojų.",
     "syncAdded_few": "Pridėtos {{count}} ankstesnės žinutės iš kitų Mumcord naudotojų.",
-    "syncAdded_many": "Pridėtos {{count}} ankstesnės žinutės iš kitų Mumcord naudotojų.",
+    "syncAdded_many": "Pridėta {{count}} ankstesnės žinutės iš kitų Mumcord naudotojų.",
     "syncAdded_other": "Pridėta {{count}} ankstesnių žinučių iš kitų Mumcord naudotojų.",
     "syncNone": "Ankstesnių žinučių nerasta.",
     "syncFailed": "Čia ankstesnių žinučių įkelti negalima.",
@@ -44,13 +44,13 @@
     "label": "Rašyti: {{name}}",
     "hint": "Spausk Enter, kad išsiųstum, ir Shift+Enter, kad pereitum į naują eilutę. Veikia Markdown: **pusjuodis**, *kursyvas*, `kodas`, [nuoroda](https://…).",
     "addImage": "Pridėti paveikslėlį",
-    "optionalMessage": "Įrašykite žinutę (nebūtina)",
+    "optionalMessage": "Parašyk žinutę (nebūtina)",
     "removeImage": "Pašalinti paveikslėlį {{name}}",
     "imagePreview": "Siunčiamas paveikslėlis: {{name}}",
     "send": "Siųsti",
-    "noPermission": "Neturi teisės rašyti šiame kanale.",
+    "noPermission": "Neturi leidimo rašyti šiame kanale.",
     "unavailable": "Šis kanalas nebepasiekiamas.",
-    "offline": "{{name}} neprisijungęs (-usi). Galėsi vėl rašyti, kai grįš.",
+    "offline": "{{name}} dabar nėra tinkle. Galėsi vėl rašyti, kai grįš.",
     "unnamedImage": "Įklijuotas paveikslėlis",
     "attachFiles": "Bendrinti failus"
   },
@@ -72,7 +72,7 @@
     "generic": "Nepavyko išsiųsti žinutės. Bandyk dar kartą.",
     "onlyImages": "Galima siųsti tik paveikslėlius.",
     "sourceTooLarge": "Šis failas per didelis siuntimui (daugiau nei 25 MB).",
-    "personOffline": "Šis asmuo neprisijungęs. Bandyk dar kartą, kai jis grįš."
+    "personOffline": "Šis asmuo neprisijungęs. Bandyk dar kartą, kai grįš."
   },
   "failed": {
     "notSent": "Neišsiųsta.",
@@ -97,10 +97,10 @@
   },
   "mention": {
     "list": "Paminėjimų pasiūlymai",
-    "found_one": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
-    "found_few": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
-    "found_many": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
-    "found_other": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
+    "found_one": "Pasiūlymai: {{count}}. Naudok rodykles, tada Enter, kad įterptum.",
+    "found_few": "Pasiūlymai: {{count}}. Naudok rodykles, tada Enter, kad įterptum.",
+    "found_many": "Pasiūlymai: {{count}}. Naudok rodykles, tada Enter, kad įterptum.",
+    "found_other": "Pasiūlymai: {{count}}. Naudok rodykles, tada Enter, kad įterptum.",
     "none": "Nieko nerasta",
     "mentionsYou": "Mini tave",
     "chipLabel": "{{name}}, paminėjimas",
@@ -108,7 +108,8 @@
     "peopleHeading": "Žmonės",
     "channelHint": "Pranešti visiems kanale {{channel}} ({{count}})",
     "allHint": "Pranešti visiems, kurie gali skaityti šį kanalą ({{count}})",
-    "keys": "↑↓ rinktis · Enter įterpti · Esc uždaryti"
+    "keys": "↑↓ rinktis · Enter įterpti · Esc uždaryti",
+    "channelList": "Kanalų pasiūlymai"
   },
   "preview": {
     "open": "Atidaryti naršyklėje",
@@ -125,7 +126,7 @@
       "show": "Laida"
     },
     "inBrowser": "Groja tavo naršyklėje",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Šioje sistemoje Twitch grotuvas neveikia Mumcord lange, todėl „Leisti“ atidaro srautą tavo naršyklėje.",
     "card": "Nuorodos peržiūra: {{title}}",
     "dismiss": "Slėpti peržiūrą"
   },
@@ -133,7 +134,7 @@
     "loading": "Įkeliamas paveikslėlis {{name}}",
     "label": "Paveikslėlis: {{name}}",
     "view": "Peržiūrėti paveikslėlį {{name}}",
-    "viewMessage": "Paveikslėlis nuo {{name}}, atidaryti peržiūros lange",
+    "viewMessage": "{{name}} paveikslėlis, atidaryti peržiūroje",
     "failed": "Paveikslėlio parodyti negalima (per didelis arba nepasiekiamas)."
   },
   "viewer": {
@@ -142,29 +143,29 @@
     "zoomIn": "Priartinti",
     "zoomOut": "Tolinti",
     "fit": "Priderinti prie lango",
-    "save": "Įrašyti paveikslėlį",
-    "saved": "Paveikslėlis įrašytas",
-    "saveFailed": "Nepavyko įrašyti paveikslėlio",
+    "save": "Išsaugoti paveikslėlį",
+    "saved": "Paveikslėlis išsaugotas",
+    "saveFailed": "Nepavyko išsaugoti paveikslėlio",
     "fileFilter": "Paveikslėlis",
     "openInBrowser": "Atidaryti naršyklėje",
     "close": "Uždaryti",
     "previous": "Ankstesnis paveikslėlis",
     "next": "Kitas paveikslėlis",
     "unnamed": "paveikslėlis",
-    "fullLoading": "Įkeliamas pilnas dydis…",
+    "fullLoading": "Įkeliamas viso dydžio vaizdas…",
     "fullCancel": "Atšaukti viso dydžio atsisiuntimą",
-    "fullProgress": "Įkeliamas pilnas dydis… {{percent}} %",
-    "fullUnavailable": "Pilno dydžio nėra – rodoma peržiūra"
+    "fullProgress": "Įkeliamas viso dydžio vaizdas… {{percent}} %",
+    "fullUnavailable": "Viso dydžio vaizdo nėra – rodoma peržiūra"
   },
   "favorites": {
     "open": "Mėgstamiausi GIF",
     "title": "Mėgstamiausi GIF",
-    "save": "Įrašyti į mėgstamiausius",
+    "save": "Išsaugoti kaip mėgstamiausią",
     "remove": "Pašalinti iš mėgstamiausių",
     "removeNamed": "Pašalinti {{name}} iš mėgstamiausių",
     "send": "Siųsti {{name}}",
     "hint": "Rodyklės juda, Enter siunčia, Delete šalina, Escape uždaro.",
-    "empty": "Mėgstamiausių dar nėra. Pokalbyje spustelėk GIF dešiniuoju pelės klavišu arba naudok jo žvaigždutę ir pasirink „Įrašyti į mėgstamiausius“. Jis atsiras čia."
+    "empty": "Mėgstamiausių dar nėra. Pokalbyje spustelėk GIF dešiniuoju pelės klavišu arba naudok jo žvaigždutę ir pasirink „Išsaugoti kaip mėgstamiausią“. Jis atsiras čia."
   },
   "linkMenu": {
     "label": "Nuoroda",
@@ -180,26 +181,26 @@
   "imageMenu": {
     "label": "Paveikslėlis {{name}}",
     "copy": "Kopijuoti paveikslėlį",
-    "save": "Įrašyti paveikslėlį",
+    "save": "Išsaugoti paveikslėlį",
     "copyAddress": "Kopijuoti paveikslėlio adresą",
-    "openViewer": "Atverti paveikslėlių peržiūroje",
+    "openViewer": "Atidaryti paveikslėlių peržiūroje",
     "copied": "Paveikslėlis nukopijuotas",
     "addressCopied": "Paveikslėlio adresas nukopijuotas",
     "copyFailed": "Nepavyko nukopijuoti paveikslėlio",
-    "tooLarge": "Paveikslėlis per didelis kopijuoti ar įrašyti"
+    "tooLarge": "Paveikslėlis per didelis, kad jį būtų galima kopijuoti ar išsaugoti"
   },
   "attribution": {
     "via": "per {{brand}}",
-    "view": "Peržiūrėti per {{brand}}"
+    "view": "Žiūrėti {{brand}} svetainėje"
   },
   "themeCard": {
     "label": "Bendrinama tema {{name}}",
     "apply": "Taikyti temą",
     "more": "Taikyti serveriui",
     "menuLabel": "Taikyti temą",
-    "applyToServer": "Taikyti {{server}}",
+    "applyToServer": "Taikyti serveriui {{server}}",
     "imported": "Importuota ✓",
-    "newer": "Sukurta su Mumcord {{version}} – atnaujink, kad matytum visą",
+    "newer": "Sukurta su Mumcord {{version}} – atnaujink, kad matytum ją visą",
     "failed": "Nepavyko pritaikyti temos."
   },
   "reply": {
@@ -270,17 +271,22 @@
     "join": "Prisijungti",
     "joinLabel": "Prisijungti prie {{server}}",
     "joined": "Prisijungta",
-    "label": "Serverio kortelė {{server}}",
-    "privacyOff": "Serverio reikšmės išjungtos nustatymuose",
+    "label": "Serverio kortelė: {{server}}",
+    "privacyOff": "Serverio rodikliai išjungti nustatymuose",
     "querying": "Tikrinamas serveris…",
     "retry": "Tikrinti dar kartą",
-    "retryLabel": "Tikrinti dar kartą {{server}}",
+    "retryLabel": "Tikrinti dar kartą: {{server}}",
     "server": "{{server}}",
     "unreachable": "Serveris nepasiekiamas",
-    "warning_few": "{{count}} nuorodos šiame pranešime rodo prisijungimo duomenis",
-    "warning_many": "{{count}} nurodų šiame pranešime rodo prisijungimo duomenis",
-    "warning_one": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis",
-    "warning_other": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis"
+    "warning_few": "{{count}} nuorodos šioje žinutėje rodo prisijungimo duomenis",
+    "warning_many": "{{count}} nuorodos šioje žinutėje rodo prisijungimo duomenis",
+    "warning_one": "{{count}} nuoroda šioje žinutėje rodo prisijungimo duomenis",
+    "warning_other": "{{count}} nuorodų šioje žinutėje rodo prisijungimo duomenis"
+  },
+  "pluginCard": {
+    "label": "Papildinio kortelė {{name}}",
+    "loading": "Įkeliamas papildinys…",
+    "openLabel": "Atidaryti {{name}}"
   },
   "requests": {
     "entry": "Žinučių prašymai",
@@ -293,7 +299,7 @@
     "chatRequestTag": "Pokalbio prašymas",
     "messageRequestTag": "Žinutės prašymas",
     "wantsToChat": "{{name}} nori su tavimi kalbėtis",
-    "metaMumcord": "„Mumcord“ naudotojas · {{server}} · {{time}}",
+    "metaMumcord": "Mumcord naudotojas · {{server}} · {{time}}",
     "metaStandard": "{{server}} · {{time}}",
     "noteFrom": "{{name}} pastaba",
     "explain": "Privačias žinutes nustatei į „Tik draugai“. Jei priimsi, {{name}} galės tau rašyti. Atmetimas tylus: {{name}} mato tik „laukiama“. Prašymai išvalomi, kai uždarai Mumcord.",
@@ -372,22 +378,22 @@
     "file": "Garso failas",
     "playing": "Grojama",
     "loading": "Įkeliama…",
-    "play": "Groti {{name}}",
+    "play": "Leisti {{name}}",
     "pause": "Pristabdyti {{name}}",
-    "playShort": "Groti",
-    "pauseShort": "Pauzė",
+    "playShort": "Leisti",
+    "pauseShort": "Pristabdyti",
     "seek": "Pozicija",
     "position": "{{time}} iš {{length}}",
     "volume": "Garsumas",
     "mute": "Nutildyti",
     "open": "Atidaryti {{name}} naršyklėje",
-    "save": "Įrašyti {{name}}",
-    "saveShort": "Įrašyti failą",
-    "saveTitle": "Įrašyti garso failą",
+    "save": "Išsaugoti {{name}}",
+    "saveShort": "Išsaugoti failą",
+    "saveTitle": "Išsaugoti garso failą",
     "fileType": "Garso failas",
-    "saveFailed": "Failo nepavyko įrašyti.",
-    "errorTitle": "Šio failo negalima groti",
-    "errorText": "Failo nėra, jis per didelis arba jo formato Mumcord negali groti.",
+    "saveFailed": "Nepavyko išsaugoti failo.",
+    "errorTitle": "Šio failo negalima paleisti",
+    "errorText": "Failo nėra, jis per didelis arba jo formato Mumcord negali paleisti.",
     "retry": "Bandyti dar kartą"
   },
   "music": {
@@ -398,14 +404,14 @@
     "thirdPartyShort": "Trečiosios šalies turinys",
     "embedded": "Įterptasis grotuvas · {{service}} · {{host}}",
     "player": "{{service}} grotuvas: {{title}}",
-    "play": "Groti",
-    "playLabel": "Groti {{title}} per {{service}}",
+    "play": "Leisti",
+    "playLabel": "Leisti {{title}} per {{service}}",
     "stop": "Stabdyti",
     "stopLabel": "Stabdyti {{title}}",
     "openIn": "Atidaryti per {{service}}",
     "limits": "Atkūrimo apribojimus nustato paslauga",
     "noPlayer": "Šiai paslaugai grotuvo nėra",
-    "output": "Grojama jūsų išvesties įrenginyje, o ne į mikrofoną"
+    "output": "Grojama tavo išvesties įrenginyje, o ne į mikrofoną"
   },
   "embedHint": {
     "image": "Paveikslėlis paslėptas, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
@@ -420,8 +426,20 @@
     "several_other": "Paslėpta {{count}} peržiūrų, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>."
   },
   "historyImage": {
-    "loading": "Įkeliamas vaizdas…",
-    "unavailable": "Vaizdas nepasiekiamas",
-    "load": "Įkelti vaizdą"
+    "loading": "Įkeliamas paveikslėlis…",
+    "unavailable": "Paveikslėlis nepasiekiamas",
+    "load": "Įkelti paveikslėlį"
+  },
+  "slash": {
+    "list": "Komandos su „/“"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanalas – atidaryti jo meniu",
+    "join": "Prisijungti prie kanalo",
+    "joinPath": "Prisijungti prie {{path}}",
+    "show": "Rodyti kanalų sąraše",
+    "showPath": "Rodyti {{path}} kanalų sąraše",
+    "copy": "Kopijuoti pavadinimą",
+    "menu": "Kanalas {{channel}}"
   }
 }

@@ -1,7 +1,7 @@
 {
   "tree": {
     "empty": "Šis spraudnis šeit vēl neko nerāda.",
-    "actionFailed": "Spraudnis to nevarēja apstrādāt. Lūdzu, mēģiniet vēlreiz."
+    "actionFailed": "Spraudnis to nevarēja apstrādāt. Mēģini vēlreiz."
   },
   "progress": {
     "working": "Notiek"

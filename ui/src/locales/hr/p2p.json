@@ -26,7 +26,7 @@
     "noRelay": "Ovaj poslužitelj nema relej pa dijeljenje datoteka nije dostupno.",
     "filesDisallowed": "Relej ovog poslužitelja ne dopušta dijeljenje datoteka.",
     "screenDisallowed": "Relej ovog poslužitelja ne dopušta dijeljenje zaslona.",
-    "camerasDisallowed": "Relay ovog poslužitelja ne dopušta dijeljenje kamere.",
+    "camerasDisallowed": "Relej ovog poslužitelja ne dopušta dijeljenje kamere.",
     "imagesDisallowed": "Puna veličina nije dostupna: relej ovog poslužitelja ne dopušta slike",
     "noCertificate": "Dijeljenje datoteka zahtijeva klijentski certifikat.",
     "modeNeedsRelay": "Dijeljenje datoteka treba relej; tvoja peer-to-peer postavka je {{mode}}.",
@@ -37,7 +37,7 @@
   "reason": {
     "p2pOff": "Peer-to-peer je isključen.",
     "noRelay": "Ovaj poslužitelj nema relej.",
-    "notConnected": "Nisi povezan s ovim poslužiteljem.",
+    "notConnected": "Nisi povezan/a s ovim poslužiteljem.",
     "untrusted": "Relej ovog poslužitelja se promijenio i nije pouzdan.",
     "conflict": "Na ovom poslužitelju najavljena su dva releja; nijedan se ne koristi.",
     "botLeft": "Bot releja napustio je poslužitelj.",
@@ -47,7 +47,7 @@
     "unreachable": "Relej nije bilo moguće dosegnuti ni preko UDP-a ni preko TCP 443.",
     "peerCannotRelay": "Druga osoba ne može koristiti relej (stariji Mumcord ili isključen relej).",
     "denied": "Bot releja odbio je zahtjev.",
-    "notRegistered": "Relej ovog poslužitelja dostupan je samo registriranim korisnicima. Registriraj se na ovom poslužitelju da bi ga koristio.",
+    "notRegistered": "Relej ovog poslužitelja dostupan je samo registriranim korisnicima. Registriraj se na ovom poslužitelju da ga možeš koristiti.",
     "peerGone": "Druga osoba napustila je poslužitelj.",
     "rateLimited": "Previše zahtjeva za relej. Pokušaj ponovno za minutu.",
     "groupNotAllowed": "Relej ovog poslužitelja dostupan je samo određenim grupama. Zamoli administratora da te doda.",
@@ -66,7 +66,7 @@
   },
   "refusalAction": {
     "howToRegister": "Kako se registrirati",
-    "reconnect": "Ponovno poveži",
+    "reconnect": "Ponovno se poveži",
     "filesRegisteredOnly": "Dijeljenje datoteka na ovom poslužitelju dostupno je samo registriranim korisnicima."
   },
   "trust": {
@@ -82,7 +82,7 @@
     "trustIf": "Vjeruj mu ako",
     "trustIfText": "su administratori poslužitelja najavili novi relej ili selidbu i to možeš potvrditi s njima.",
     "dontTrustIf": "Ne vjeruj mu ako",
-    "dontTrustIfText": "nitko nije najavio promjenu ili nisi siguran. Netko se može predstavljati kao relej.",
+    "dontTrustIfText": "nitko nije najavio promjenu ili nisi siguran/na. Netko se može predstavljati kao relej.",
     "notNow": "Ne sada",
     "review": "Relej promijenjen – provjeri",
     "filesBlocked": "Dijeljenje datoteka nije dostupno: relej ovog poslužitelja se promijenio i još mu ne vjeruješ."

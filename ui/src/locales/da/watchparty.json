@@ -1,22 +1,22 @@
 {
-  "title": "Watch party",
+  "title": "Fællesvisning",
   "addVideo": "Tilføj video",
   "beta": "Beta",
-  "join": "Deltag i watch party",
-  "leave": "Forlad partyen",
+  "join": "Deltag i fællesvisning",
+  "leave": "Forlad fællesvisning",
   "watching": "{{count}} ser med: {{names}}",
-  "player": "Watch party-afspiller",
+  "player": "Afspiller til fællesvisning",
   "watchTogether": "Se sammen",
   "watchTogetherFor": "Se {{title}} sammen med denne kanal",
   "embedsOff": "Slå indlejrede afspillere til i privatlivsindstillingerne for at se sammen",
-  "embedsOffJoin": "En se-sammen-fest er i gang: slå indlejrede afspillere til for at deltage",
+  "embedsOffJoin": "En fællesvisning er i gang: slå indlejrede afspillere til for at deltage",
   "openPrivacy": "Åbn privatlivsindstillinger",
   "cantPlay": "Afspilleren kan ikke køre her.",
   "openInBrowser": "Åbn i browser",
-  "startFailed": "Watch partyen kunne ikke startes.",
-  "joinFailed": "Kunne ikke deltage i watch partyen.",
-  "leaveFailed": "Kunne ikke forlade watch partyen.",
-  "commandFailed": "Watch partyen modtog ikke din ændring.",
+  "startFailed": "Fællesvisningen kunne ikke startes.",
+  "joinFailed": "Kunne ikke deltage i fællesvisningen.",
+  "leaveFailed": "Kunne ikke forlade fællesvisningen.",
+  "commandFailed": "Fællesvisningen modtog ikke din ændring.",
   "someone": "Nogen",
   "other": {
     "play": "{{name}} trykkede på afspil",
@@ -25,10 +25,10 @@
     "skipped": "{{name}} sprang over"
   },
   "addToPlaylist": "Føj til playliste",
-  "addToPlaylistFor": "Føj {{title}} til watch partyens playliste",
+  "addToPlaylistFor": "Føj {{title}} til fællesvisningens playliste",
   "playlist": {
     "title": "Næste",
-    "empty": "Intet i køen. Tilføj YouTube-links med “Føj til playliste”.",
+    "empty": "Intet i køen. Tilføj YouTube-links med »Føj til playliste«.",
     "skip": "Spring over",
     "previous": "Forrige",
     "previousFailed": "Kunne ikke gå tilbage til den forrige video.",
@@ -47,7 +47,7 @@
     "upNextNone": "Intet i køen",
     "paste": "Indsæt et YouTube-link",
     "notALink": "Det er ikke et YouTube-link",
-    "more": "Mere om {{title}}",
+    "more": "Flere muligheder for {{title}}",
     "playNext": "Afspil som næste",
     "removeShort": "Fjern fra playlisten",
     "emptyPaste": "Intet i køen. Indsæt et YouTube-link ovenfor."
@@ -59,9 +59,11 @@
   "codecHint": {
     "install": "Denne video kræver H.264-understøttelse. Installér gst-libav:",
     "generic": "Denne video kræver H.264-understøttelse. Installér gst-libav (GStreamers libav-plugin) med dit systems pakkehåndtering.",
-    "rpmFusion": "På Fedora kommer gst-libav fra RPM Fusion-arkivet; aktivér RPM Fusion først."
+    "rpmFusion": "På Fedora kommer gst-libav fra RPM Fusion-arkivet; aktivér RPM Fusion først.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
-  "keys": "Mellemrum afspil/pause · ← → spring 5 s · M lydløs · F fuld skærm",
+  "keys": "Mellemrum afspil/pause · ← → spring 5 s · M slå lyd fra · F fuld skærm",
   "headerPill": "Se sammen · {{count}}",
   "miniPlayer": "Miniafspiller",
   "tabs": {

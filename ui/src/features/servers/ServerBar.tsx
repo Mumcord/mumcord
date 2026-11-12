@@ -16,7 +16,7 @@ import { useFollowStates } from "../follow/followStore";
 import { displayName, initials } from "./format";
 import { openServerAdmin } from "../admin";
 import { adminEntry } from "../admin/adminMenu";
-import { canBan } from "../admin/permissions";
+import { canBan, canRegister } from "../admin/permissions";
 import { mentionCount, useMentions } from "./mentions";
 import { ServerMenu, type MenuItem } from "./ServerMenu";
 import {
@@ -146,16 +146,28 @@ function ServerOptions({
       }),
     });
   }
-  // Epic 4: the Admin ▸ sub-menu (FR-10.6, FR-10.9, #249). The ban list window is only reachable
-  // with the Ban right on the root channel (#254).
+  // Epic 4: the Admin ▸ sub-menu (FR-10.6, FR-10.9, #249). Each entry of the window shows only
+  // with its own right on the root channel: the ban list with the Ban right (#254), the registered
+  // accounts with the Register right (#256).
   const admin = adminEntry(t("admin:menuAdmin"), [
+    ...(canRegister(server.id)
+      ? [
+          {
+            id: "registeredUsers",
+            label: t("admin:registeredUsers"),
+            onSelect: act(() => {
+              openServerAdmin(server.id, "registered");
+            }),
+          },
+        ]
+      : []),
     ...(canBan(server.id)
       ? [
           {
             id: "banList",
             label: t("admin:banList"),
             onSelect: act(() => {
-              openServerAdmin(server.id);
+              openServerAdmin(server.id, "bans");
             }),
           },
         ]

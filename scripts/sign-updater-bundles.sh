@@ -29,12 +29,15 @@ fi
 verify_key=${UPDATER_ROTATION_OLD_PUBKEY:-$pubkey}
 
 # The manifest key for each bundle: {os}-{arch}-{installer}, as the app asks for it
-# (src-tauri/src/updater/install_kind.rs). The universal macOS app serves both CPUs.
+# (src-tauri/src/updater/install_kind.rs). Each macOS archive serves one CPU. Installed
+# universal apps (0.7.x and older) ask with the architecture they run on, so they move to the
+# matching build.
 declare -A targets=(
   ["Mumcord_${version}_amd64.AppImage"]="linux-x86_64-appimage"
   ["Mumcord_${version}_aarch64.AppImage"]="linux-aarch64-appimage"
   ["Mumcord_${version}_x64-setup.exe"]="windows-x86_64-nsis"
-  ["Mumcord_${version}_universal.app.tar.gz"]="darwin-aarch64-app darwin-x86_64-app"
+  ["Mumcord_${version}_aarch64.app.tar.gz"]="darwin-aarch64-app"
+  ["Mumcord_${version}_x64.app.tar.gz"]="darwin-x86_64-app"
 )
 
 tauri=(npx --yes "@tauri-apps/cli@$(jq -r '.devDependencies["@tauri-apps/cli"] | ltrimstr("^")' "$root/package.json")")

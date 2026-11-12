@@ -40,7 +40,7 @@
   },
   "composer": {
     "label": "Scrivi a {{name}}",
-    "hint": "Premi Invio per inviare e Maiusc+Invio per andare a capo. Markdown funziona: **grassetto**, *corsivo*, `codice`, [link](https://…).",
+    "hint": "Premi Invio per inviare e Maiusc+Invio per andare a capo. Puoi usare il Markdown: **grassetto**, *corsivo*, `codice`, [link](https://…).",
     "addImage": "Aggiungi immagine",
     "optionalMessage": "Aggiungi un messaggio (facoltativo)",
     "removeImage": "Rimuovi immagine {{name}}",
@@ -48,7 +48,7 @@
     "send": "Invia",
     "noPermission": "Non hai il permesso di scrivere in questo canale.",
     "unavailable": "Questo canale non è più disponibile.",
-    "offline": "{{name}} è offline. Potrai scrivere di nuovo quando sarà tornato.",
+    "offline": "{{name}} è offline. Potrai scrivere di nuovo quando tornerà online.",
     "unnamedImage": "Immagine incollata",
     "attachFiles": "Condividi file"
   },
@@ -104,7 +104,8 @@
     "peopleHeading": "Persone",
     "channelHint": "Avvisa tutti in {{channel}} ({{count}})",
     "allHint": "Avvisa tutti quelli che possono leggere questo canale ({{count}})",
-    "keys": "↑↓ scegli · Invio inserisci · Esc chiudi"
+    "keys": "↑↓ scegli · Invio inserisci · Esc chiudi",
+    "channelList": "Suggerimenti di canali"
   },
   "preview": {
     "open": "Apri nel browser",
@@ -121,7 +122,7 @@
       "show": "Programma"
     },
     "inBrowser": "Si riproduce nel tuo browser",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Su questo sistema il lettore di Twitch non funziona nella finestra di Mumcord, quindi Riproduci apre la trasmissione nel browser.",
     "card": "Anteprima del link: {{title}}",
     "dismiss": "Nascondi anteprima"
   },
@@ -160,7 +161,7 @@
     "removeNamed": "Rimuovi {{name}} dai preferiti",
     "send": "Invia {{name}}",
     "hint": "Frecce per spostarti, Invio per inviare, Canc per rimuovere, Esc per chiudere.",
-    "empty": "Ancora nessun preferito. Fai clic con il tasto destro su una GIF nella chat, o usa la stella su di essa, e scegli \"Salva nei preferiti\". Apparirà qui."
+    "empty": "Ancora nessun preferito. Fai clic con il tasto destro su una GIF nella chat, o usa la stella su di essa, e scegli «Salva nei preferiti». Apparirà qui."
   },
   "linkMenu": {
     "label": "Link",
@@ -181,8 +182,8 @@
     "openViewer": "Apri nel visualizzatore",
     "copied": "Immagine copiata",
     "addressCopied": "Indirizzo immagine copiato",
-    "copyFailed": "Impossibile copiare l’immagine",
-    "tooLarge": "L’immagine è troppo grande per essere copiata o salvata"
+    "copyFailed": "Impossibile copiare l'immagine",
+    "tooLarge": "L'immagine è troppo grande per essere copiata o salvata"
   },
   "attribution": {
     "via": "tramite {{brand}}",
@@ -205,7 +206,7 @@
     "replyTo": "Risposta a",
     "jump": "Vai al messaggio originale",
     "image": "Immagine",
-    "replyingTo": "Rispondi a",
+    "replyingTo": "In risposta a",
     "cancel": "Annulla risposta"
   },
   "actions": {
@@ -229,7 +230,7 @@
     "join": "Entra",
     "videoFallback": "Video YouTube",
     "someone": "Qualcuno",
-    "joinFailed": "Impossibile entrare nel watch party."
+    "joinFailed": "Impossibile entrare nella watch party."
   },
   "card": {
     "label": "Scheda: {{title}}",
@@ -259,13 +260,13 @@
   "mumbleCard": {
     "addServer": "Aggiungi ai server",
     "channel": "Canale {{channel}}",
-    "copy": "Copia collegamento",
-    "copyLabel": "Copia il collegamento a {{server}}",
+    "copy": "Copia link",
+    "copyLabel": "Copia il link a {{server}}",
     "figures": "Ping {{ping}} ms · {{users}} di {{max}} utenti · server {{version}}",
     "goToChannel": "Vai al canale",
-    "join": "Unisciti",
-    "joinLabel": "Unisciti a {{server}}",
-    "joined": "Unito",
+    "join": "Entra",
+    "joinLabel": "Entra in {{server}}",
+    "joined": "Connesso",
     "label": "Scheda del server {{server}}",
     "privacyOff": "I valori del server sono disattivati nelle impostazioni",
     "querying": "Verifica del server…",
@@ -273,9 +274,14 @@
     "retryLabel": "Verifica di nuovo {{server}}",
     "server": "{{server}}",
     "unreachable": "Server non raggiungibile",
-    "warning_many": "{{count}} milioni di collegamenti in questo messaggio mostrano le credenziali",
-    "warning_one": "{{count}} collegamento in questo messaggio mostra le credenziali",
-    "warning_other": "{{count}} collegamenti in questo messaggio mostrano le credenziali"
+    "warning_many": "{{count}} di link in questo messaggio mostrano le credenziali",
+    "warning_one": "{{count}} link in questo messaggio mostra le credenziali",
+    "warning_other": "{{count}} link in questo messaggio mostrano le credenziali"
+  },
+  "pluginCard": {
+    "label": "Scheda del plugin {{name}}",
+    "loading": "Caricamento del plugin…",
+    "openLabel": "Apri {{name}}"
   },
   "requests": {
     "entry": "Richieste di messaggi",
@@ -318,7 +324,7 @@
     "requestMetaMessages": "{{server}} · ti ha inviato messaggi · {{time}}",
     "quote": "«{{text}}»",
     "block": "Blocca",
-    "showMore_one": "Mostra altra {{count}} richiesta",
+    "showMore_one": "Mostra {{count}} altra richiesta",
     "showMore_many": "Mostra altre {{count}} di richieste",
     "showMore_other": "Mostra altre {{count}} richieste",
     "showFewer": "Mostra meno richieste",
@@ -347,7 +353,7 @@
       "label": "Conversazione con {{name}}",
       "markRead": "Segna come letta",
       "pin": "Fissa in alto",
-      "unpin": "Rimuovi dalle fissate",
+      "unpin": "Non fissare più",
       "mute": "Silenzia conversazione",
       "unmute": "Riattiva conversazione",
       "muteHour": "Per 1 ora",
@@ -388,15 +394,15 @@
     "other": "Link musicale",
     "thirdParty": "Contenuto di terze parti da {{host}}",
     "thirdPartyShort": "Contenuto di terze parti",
-    "embedded": "Player incorporato · {{service}} · {{host}}",
-    "player": "Player {{service}}: {{title}}",
+    "embedded": "Lettore incorporato · {{service}} · {{host}}",
+    "player": "Lettore {{service}}: {{title}}",
     "play": "Riproduci",
     "playLabel": "Riproduci {{title}} su {{service}}",
     "stop": "Interrompi",
     "stopLabel": "Interrompi {{title}}",
     "openIn": "Apri in {{service}}",
     "limits": "I limiti di riproduzione sono stabiliti dal servizio",
-    "noPlayer": "Nessun player disponibile per questo servizio",
+    "noPlayer": "Nessun lettore disponibile per questo servizio",
     "output": "Riprodotto sul tuo dispositivo di uscita, non nel microfono"
   },
   "embedHint": {
@@ -414,5 +420,17 @@
     "loading": "Caricamento immagine…",
     "unavailable": "Immagine non disponibile",
     "load": "Carica immagine"
+  },
+  "slash": {
+    "list": "Comandi con /"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, canale – apri il menu",
+    "join": "Entra nel canale",
+    "joinPath": "Entra in {{path}}",
+    "show": "Mostra nell'elenco dei canali",
+    "showPath": "Mostra {{path}} nell'elenco dei canali",
+    "copy": "Copia nome",
+    "menu": "Canale {{channel}}"
   }
 }

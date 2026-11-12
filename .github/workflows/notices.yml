@@ -30,10 +30,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
-  pull-requests: write
-  # Starts CI and E2E on the branch.
-  actions: write
+  contents: read
 
 env:
   BRANCH: chore/regenerate-notices
@@ -46,14 +43,23 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      # Pushes the fixed notices branch.
+      contents: write
+      # Opens or updates the notices pull request.
+      pull-requests: write
+      # Starts CI and E2E on the branch.
+      actions: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read tool versions
         id: tools
         run: grep '^[A-Z_]*=' scripts/license-tools.env >> "$GITHUB_OUTPUT"
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
 
       - uses: ./.github/actions/cargo-tool
         with:
@@ -61,7 +67,7 @@ jobs:
           version: ${{ steps.tools.outputs.CARGO_ABOUT_VERSION }}
           features: cli
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm

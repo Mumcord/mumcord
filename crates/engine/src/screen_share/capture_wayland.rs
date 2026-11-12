@@ -100,17 +100,17 @@ impl WaylandCapture {
     /// the Tokio runtime: the portal session is watched and closed by a task there.
     pub async fn open() -> Result<Self, WaylandCaptureError> {
         let portal = Screencast::new().await?;
-        let wanted = SourceType::Monitor | SourceType::Window;
+        let wanted = SourceType::MONITOR | SourceType::WINDOW;
         let sources = portal.available_source_types().await? & wanted;
         let sources = if sources.is_empty() { wanted } else { sources };
         let cursor = if portal
             .available_cursor_modes()
             .await?
-            .contains(CursorMode::Embedded)
+            .contains(CursorMode::EMBEDDED)
         {
-            CursorMode::Embedded
+            CursorMode::EMBEDDED
         } else {
-            CursorMode::Hidden
+            CursorMode::HIDDEN
         };
         let session = portal
             .create_session(CreateSessionOptions::default())
@@ -187,9 +187,16 @@ impl WaylandCapture {
 
 /// The share kind of the portal's source type. A virtual monitor is a whole screen.
 fn share_kind(source: Option<SourceType>) -> Option<ShareKind> {
-    match source? {
-        SourceType::Monitor | SourceType::Virtual => Some(ShareKind::Screen),
-        SourceType::Window => Some(ShareKind::Window),
+    let source = source?;
+    if source.is_empty() {
+        return None;
+    }
+    // The portal reports the picked source as a flag set, one flag per stream. Anything that is
+    // not a single window counts as a whole screen, so desktop sound is shared with it.
+    if source == SourceType::WINDOW {
+        Some(ShareKind::Window)
+    } else {
+        Some(ShareKind::Screen)
     }
 }
 
@@ -562,16 +569,21 @@ mod tests {
     #[test]
     fn the_portal_pick_decides_the_kind() {
         assert_eq!(
-            share_kind(Some(SourceType::Monitor)),
+            share_kind(Some(SourceType::MONITOR)),
             Some(ShareKind::Screen)
         );
         assert_eq!(
-            share_kind(Some(SourceType::Virtual)),
+            share_kind(Some(SourceType::VIRTUAL)),
             Some(ShareKind::Screen)
         );
         assert_eq!(
-            share_kind(Some(SourceType::Window)),
+            share_kind(Some(SourceType::WINDOW)),
             Some(ShareKind::Window)
+        );
+        assert_eq!(
+            share_kind(Some(SourceType::empty())),
+            None,
+            "a portal that names no source"
         );
         assert_eq!(share_kind(None), None, "a portal that does not say");
     }

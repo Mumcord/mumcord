@@ -3,7 +3,7 @@
     "legend": "Bővítményfrissítések",
     "info": "Az alkalmazásfrissítéstől független. A Mumcord induláskor, majd 6 óránként keres bővítményfrissítéseket.",
     "infoLabel": "További információ: bővítményfrissítések",
-    "auto": "Telepítés automatikusan",
+    "auto": "Automatikus telepítés",
     "notify": "Csak értesítés",
     "off": "Ki"
   },
@@ -23,13 +23,13 @@
   "versionsTo": "erre:",
   "pill": {
     "none": "Nincs új engedély",
-    "permission": "Új engedélyt kér",
+    "permission": "Több engedélyt kér",
     "author": "Új szerző",
     "websites": "Új weboldalakkal kommunikál"
   },
   "newPermissions": "Új engedélyek",
   "revoked": {
-    "title": "A(z) {{name}} ki lett kapcsolva",
+    "title": "A Mumcord kikapcsolta: {{name}}",
     "text": "A(z) {{version}} verzió szerepel a visszavonási listán: {{reason}}. A bővítmény adatai megmaradnak.",
     "details": "Részletek",
     "remove": "Eltávolítás"
@@ -71,7 +71,7 @@
     "goesDown": ", a kockázat csökken"
   },
   "dialog": {
-    "title": "Frissíted a(z) {{name}} bővítményt a következőre: {{version}}?",
+    "title": "Frissíted a(z) {{name}} bővítményt ({{version}})?",
     "now": "most: {{version}}",
     "sameKey": "ugyanaz a szerzői kulcs",
     "newKey": "új szerzői kulcs",
@@ -79,7 +79,7 @@
     "newWebsites_other": "Ez a frissítés {{count}} új weboldallal akar kommunikálni.",
     "staysOn": "A(z) {{name}} a(z) {{version}} verzión marad, amíg nem döntesz.",
     "otherDomain": "Az egyik nem a bővítmény saját domainjén van.",
-    "whatsNew": "Újdonságok a {{version}} verzióban",
+    "whatsNew": "Újdonságok a(z) {{version}} verzióban",
     "websitesLead": "A(z) {{name}} és az oldala ezután elérhetné ezeket:",
     "websitesWarning": "Ezek a weboldalak látják az IP-címedet és mindent, amit a(z) {{name}} küld nekik.",
     "websitesLabel": "Weboldalak",

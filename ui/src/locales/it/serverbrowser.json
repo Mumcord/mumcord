@@ -1,11 +1,11 @@
 {
   "title": "Server pubblici",
-  "loading": "Caricamento dell’elenco…",
+  "loading": "Caricamento dell'elenco…",
   "subtitle": "Caricato perché hai aperto questa pagina · {{shown}} di {{total}} mostrati",
   "search": "Cerca per nome, indirizzo o paese",
   "refresh": "Aggiorna",
   "retry": "Riprova",
-  "loadFailed": "Impossibile caricare l’elenco dei server pubblici. Controlla la connessione a Internet e riprova.",
+  "loadFailed": "Impossibile caricare l'elenco dei server pubblici. Controlla la connessione a Internet e riprova.",
   "noMatch": "Nessun server corrisponde alla ricerca e ai filtri.",
   "saveFailed": "Impossibile aggiungere il server. Riprova.",
   "filters": {
@@ -18,7 +18,7 @@
     "hideEmpty": "Nascondi vuoti",
     "hideFull": "Nascondi pieni"
   },
-  "sortedBy": "Ordine: {{column}}",
+  "sortedBy": "Ordinati per: {{column}}",
   "columns": {
     "name": "Nome",
     "country": "Paese",
@@ -44,5 +44,5 @@
   "announce": {
     "saved": "{{server}} aggiunto ai tuoi server"
   },
-  "note": "Il ping viene inviato solo alle righe visibili, poche alla volta. Nient’altro viene inviato a un server finché non ti connetti."
+  "note": "Il ping viene inviato solo alle righe visibili, poche alla volta. Nient'altro viene inviato a un server finché non ti connetti."
 }

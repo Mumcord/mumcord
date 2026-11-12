@@ -1,9 +1,9 @@
 {
-  "inChannel_one": "V {{channel}} ({{count}})",
-  "inChannel_few": "V {{channel}} ({{count}})",
-  "inChannel_many": "V {{channel}} ({{count}})",
-  "inChannel_other": "V {{channel}} ({{count}})",
-  "noChannel": "Vyber kanál, abys viděl, kdo v něm je.",
+  "inChannel_one": "V kanálu {{channel}} ({{count}})",
+  "inChannel_few": "V kanálu {{channel}} ({{count}})",
+  "inChannel_many": "V kanálu {{channel}} ({{count}})",
+  "inChannel_other": "V kanálu {{channel}} ({{count}})",
+  "noChannel": "Vyber kanál a uvidíš, kdo v něm je.",
   "nobody": "Nikdo tu není.",
   "nobodyElse": "Na serveru nikdo jiný není.",
   "inOtherChannels": "V jiných kanálech",
@@ -50,16 +50,16 @@
     "saved": "Uloženo"
   },
   "errors": {
-    "notConnected": "Nejsi připojen k serveru.",
+    "notConnected": "Nepřipojeno k serveru.",
     "generic": "To se nepovedlo. Zkus to prosím znovu."
   },
   "menu": {
     "label": "Akce pro {{name}}",
     "viewProfile": "Zobrazit profil",
     "sendMessage": "Poslat zprávu",
-    "join": "Připojit se k {{channel}}",
+    "join": "Připojit se ke kanálu {{channel}}",
     "joinFull": "Tento kanál je plný.",
-    "joinLocked": "Do tohoto kanálu nesmíš vstoupit, nebo vyžaduje heslo.",
+    "joinLocked": "Do tohoto kanálu se nesmíš připojit, nebo vyžaduje heslo.",
     "mute": "Ztlumit pro mě",
     "connectionInfo": "Informace o připojení",
     "chatRequestPending": "Žádost o chat čeká na vyřízení",
@@ -68,7 +68,7 @@
     "moveTo": "Přesunout do"
   },
   "nowPlaying": {
-    "label": "Právě hraje",
+    "label": "Právě poslouchá",
     "listening": "Poslouchá",
     "paused": "Pozastaveno",
     "progress": "Průběh přehrávání",
@@ -94,7 +94,7 @@
     "fullProfile": "Celý profil"
   },
   "chatRequest": {
-    "title": "Žádost o chat pro {{name}}",
+    "title": "Žádost o chat pro uživatele {{name}}",
     "note": "Poznámka (volitelné)",
     "counter": "{{count}} / {{max}}",
     "counterLabel": "Využito {{count}} z {{max}} znaků",
@@ -116,18 +116,18 @@
     "talkingMore_other": "{{name}} a {{count}} dalších mluví"
   },
   "revokeConsent": {
-    "title": "Odvolat souhlas s chatem pro {{name}}?",
-    "message": "{{name}} bude muset znovu poslat žádost o zprávu, než se k tobě jeho zprávy dostanou. Historie chatu zůstane.",
+    "title": "Odvolat souhlas s chatem pro uživatele {{name}}?",
+    "message": "Uživatel {{name}} bude muset znovu poslat žádost o zprávu, než se k tobě jeho zprávy zase dostanou. Historie chatu zůstane.",
     "confirm": "Odvolat",
     "failed": "Odvolání souhlasu s chatem se nezdařilo. Zkus to prosím znovu."
   },
   "block": {
-    "menu": "Blokovat",
+    "menu": "Zablokovat",
     "unblock": "Odblokovat",
-    "title": "Blokovat uživatele {{name}}?",
+    "title": "Zablokovat uživatele {{name}}?",
     "onServer": "na serveru {{server}}",
     "whatHappens": "Co se stane",
-    "private": "Soukromé zprávy od uživatele {{name}} se nezobrazují a nevyvolají upozornění.",
+    "private": "Soukromé zprávy od uživatele {{name}} se nezobrazí a nedostaneš na ně oznámení.",
     "channelCollapsed": "Zprávy uživatele {{name}} v kanálu jsou sbalené. Stále je můžeš otevřít.",
     "channelHidden": "Zprávy uživatele {{name}} v kanálu jsou skryté.",
     "voice": "Uživatel {{name}} je pro tebe v hlasovém chatu ztlumený, včetně šeptání.",
@@ -136,7 +136,7 @@
     "nameOnly": "Uživatel {{name}} nemá certifikát, takže se blokování vztahuje jen na toto jméno na serveru {{server}}.",
     "warning": "Uživatel {{name}} tě stále vidí a může číst tvé zprávy. Mumble to nedokáže zastavit jen na tvé straně. Uživatel {{name}} se o blokování nedozví.",
     "cancel": "Zrušit",
-    "confirm": "Blokovat uživatele {{name}}",
+    "confirm": "Zablokovat uživatele {{name}}",
     "done": "Uživatel {{name}} je zablokován.",
     "failed": "Blokování uživatele {{name}} se nezdařilo. Zkus to prosím znovu.",
     "badge": "Zablokováno",

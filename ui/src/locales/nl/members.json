@@ -55,7 +55,7 @@
     "label": "Acties voor {{name}}",
     "viewProfile": "Profiel bekijken",
     "sendMessage": "Bericht sturen",
-    "join": "Naar {{channel}} gaan",
+    "join": "Deelnemen aan {{channel}}",
     "joinFull": "Dit kanaal is vol.",
     "joinLocked": "Je mag dit kanaal niet betreden, of het vraagt om een wachtwoord.",
     "mute": "Voor mij dempen",
@@ -66,14 +66,14 @@
     "moveTo": "Verplaatsen naar"
   },
   "nowPlaying": {
-    "label": "Speelt nu",
+    "label": "Wordt nu afgespeeld",
     "listening": "Luistert naar",
     "paused": "Gepauzeerd",
     "progress": "Afspeelvoortgang",
     "position": "{{position}} van {{duration}}"
   },
   "nowGaming": {
-    "label": "Gamet nu",
+    "label": "Speelt nu",
     "playing": "Speelt",
     "playedFor": "al {{time}}",
     "hoursMinutes": "{{hours}} u {{minutes}} min",
@@ -81,7 +81,7 @@
     "minutes_other": "{{count}} min",
     "join": "Meespelen",
     "joinTitle": "Meespelen?",
-    "joinMessage": "Steam wordt geopend en maakt verbinding met de server waarop deze persoon {{game}} speelt. Sluit alleen aan bij servers die je vertrouwt.",
+    "joinMessage": "Steam wordt geopend en maakt verbinding met de server waarop deze persoon {{game}} speelt. Maak alleen verbinding met servers die je vertrouwt.",
     "joinConfirm": "Steam openen",
     "joinFailed": "Steam kon niet worden geopend."
   },
@@ -124,7 +124,7 @@
     "channelHidden": "Kanaalberichten van {{name}} worden verborgen.",
     "voice": "{{name}} is voor jou gedempt in spraak, inclusief gefluister.",
     "data": "Geen geschiedenissynchronisatie, uitnodigingen of andere Mumcord-gegevens van {{name}}.",
-    "followsCert": "De blokkade volgt het certificaat van {{name}}, dus een nieuwe naam omzeilt hem niet.",
+    "followsCert": "De blokkade volgt het certificaat van {{name}}, dus een nieuwe naam omzeilt die niet.",
     "nameOnly": "{{name}} heeft geen certificaat, dus de blokkade geldt alleen voor deze naam op {{server}}.",
     "warning": "{{name}} kan je nog steeds zien en je berichten lezen. Mumble biedt geen manier om dat alleen aan jouw kant te voorkomen. {{name}} krijgt geen melding van de blokkade.",
     "cancel": "Annuleren",

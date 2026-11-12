@@ -12,7 +12,7 @@
   "bandMeaning": {
     "low": "Keveset kér, és jól ellenőrizhető.",
     "medium": "Weboldalakat futtathat vagy elérheti az internetet, vagy nehezen ellenőrizhető.",
-    "high": "Sok erős engedély, vagy rosszul ellenőrizhető. A telepítéshez külön megerősítés kell."
+    "high": "Sok erős engedély, vagy nehezen ellenőrizhető. A telepítéshez külön megerősítés kell."
   },
   "chipLabel": "Biztonsági pontszám: {{score}} a 100-ból. {{band}}. Minél magasabb, annál nagyobb a kockázat.",
   "chipShort": "{{band}} · {{score}}",
@@ -63,13 +63,13 @@
     "formulaVersion": "Képlet verziója: {{version}}",
     "howCalculated": "Hogyan számolódik a pontszám",
     "firstWebSurface": "első webes felület",
-    "websitesCount_one": "{{count}} websites",
+    "websitesCount_one": "{{count}} weboldal",
     "websitesCount_other": "{{count}} weboldal",
     "moreThanOneWebsite": "Több mint egy weboldal",
-    "websitesDeclared_one": "{{count}} websites declared",
+    "websitesDeclared_one": "{{count}} weboldal megadva",
     "websitesDeclared_other": "{{count}} weboldal megadva",
     "packageSize": "Csomagméret és kódmodulok",
-    "packageSizeValue_one": "{{size}} · {{count}} WASM modules",
+    "packageSizeValue_one": "{{size}} · {{count}} WASM-modul",
     "packageSizeValue_other": "{{size}} · {{count}} WASM-modul",
     "sourceLink": "Forráskód-hivatkozás",
     "sourceLinkGiven": "Nyilvános tárolóhivatkozás megadva",
@@ -82,7 +82,7 @@
     "reproducibleClaimed": "A tároló állítása szerint",
     "reproducibleNone": "Nincs megadva",
     "authorKey": "Az eszköz által ismert szerzői kulcs",
-    "authorKeyDays_one": "{{count}} days",
+    "authorKeyDays_one": "{{count}} napja",
     "authorKeyDays_other": "{{count}} napja",
     "authorKeyNew": "Új ezen az eszközön",
     "expectedKey": "Várt kulcs",
@@ -131,14 +131,14 @@
     "label": "Nagy kockázatú bővítmények tiltása",
     "description": "Elrejti a Telepítés gombot a 60 vagy magasabb pontszámú bővítményeknél, és megállítja azokat a frissítéseket, amelyek egy telepített bővítményt ide emelnének. A már telepített bővítmények tovább működnek.",
     "note": "Alapértelmezetten ki van kapcsolva. A hivatalos és a fejlesztői bővítményeket sosem érinti. A pontszámok becslések, nem garanciák.",
-    "highConfirmed": "Magas kockázat: ezt {{date}} napján megerősítetted."
+    "highConfirmed": "Magas kockázat: megerősítetted ({{date}})."
   },
   "update": {
     "scoreLabel": "Biztonsági pontszám:",
     "unchanged": "változatlan",
     "up": "▲ +{{count}} pont, a kockázat nő",
     "down": "▼ −{{count}} pont, a kockázat csökken",
-    "upText_one": "The risk goes up by {{count}} points",
+    "upText_one": "A kockázat {{count}} ponttal nő",
     "upText_other": "A kockázat {{count}} ponttal nő",
     "because": "mert ez a verzió többet kér:",
     "now": "Most ({{version}})",

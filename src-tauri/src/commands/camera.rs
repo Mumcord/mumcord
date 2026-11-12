@@ -482,6 +482,8 @@ pub enum CameraTileState {
     Full,
     /// The join brought no answer; retried every 10 s.
     Failed,
+    /// The camera needs Mumcord 0.9.0; the text stays until the camera's next `on` (FR-8.95).
+    NeedsUpdate,
     /// Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never.
     Hidden,
 }
@@ -494,6 +496,7 @@ impl From<EngineTileState> for CameraTileState {
             EngineTileState::Playing => Self::Playing,
             EngineTileState::Full => Self::Full,
             EngineTileState::Failed => Self::Failed,
+            EngineTileState::NeedsUpdate => Self::NeedsUpdate,
             EngineTileState::Hidden => Self::Hidden,
         }
     }

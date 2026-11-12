@@ -4,7 +4,7 @@
     "members": "Nariai",
     "activity": "Veikla"
   },
-  "you": "Jūs",
+  "you": "Tu",
   "selfName": "tavo",
   "someone": "kažkas",
   "verb": {
@@ -28,10 +28,10 @@
   "yesterday": "Vakar",
   "empty": "Veiklos dar nėra.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} ekrano bendrinimas",
-    "watchParty": "{{action}} {{name}} bendra peržiūra",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
-    "pluginEvent": "{{action}} {{plugin}}"
+    "screenShare": "{{action}}: {{name}} ekrano bendrinimas",
+    "watchParty": "{{action}}: {{name}} bendra peržiūra",
+    "pluginActivity": "{{action}}: {{name}} – {{plugin}}",
+    "pluginEvent": "{{action}}: {{plugin}}"
   },
   "joinPartyFailed": "Nepavyko prisijungti prie bendros peržiūros.",
   "joinActivityFailed": "Nepavyko prisijungti prie papildinio veiklos.",

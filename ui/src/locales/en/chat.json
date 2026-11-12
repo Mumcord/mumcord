@@ -100,7 +100,8 @@
     "peopleHeading": "People",
     "channelHint": "Notify everyone in {{channel}} ({{count}})",
     "allHint": "Notify everyone who can read this channel ({{count}})",
-    "keys": "↑↓ choose · Enter insert · Esc close"
+    "keys": "↑↓ choose · Enter insert · Esc close",
+    "channelList": "Channel suggestions"
   },
   "preview": {
     "open": "Open in browser",
@@ -272,6 +273,11 @@
     "warning_one": "{{count}} link in this message shows credentials",
     "warning_other": "{{count}} links in this message show credentials"
   },
+  "pluginCard": {
+    "label": "Plugin card for {{name}}",
+    "loading": "Loading plugin…",
+    "openLabel": "Open {{name}}"
+  },
   "requests": {
     "entry": "Message requests",
     "entryCount_one": "{{count}} request",
@@ -405,5 +411,17 @@
     "loading": "Image loading…",
     "unavailable": "Image not available",
     "load": "Load image"
+  },
+  "slash": {
+    "list": "Slash commands"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, channel – open its menu",
+    "join": "Join channel",
+    "joinPath": "Join {{path}}",
+    "show": "Show in channel list",
+    "showPath": "Show {{path}} in channel list",
+    "copy": "Copy name",
+    "menu": "Channel {{channel}}"
   }
 }

@@ -1,11 +1,11 @@
 {
   "follow": "Jälgi",
-  "unsupported": "Kanalite jälgimiseks on vaja serverit versiooniga 1.4 või uuemat.",
+  "unsupported": "Kanalite jälgimiseks peab serveri versioon olema 1.4 või uuem.",
   "unread_one": "{{count}} lugemata sõnum",
   "unread_other": "{{count}} lugemata sõnumit",
   "errors": {
     "denied": "Server ei luba sul seda kanalit jälgida.",
-    "limit": "Sel serveril ei saa rohkem kanaleid jälgida. Lõpeta esmalt mõne teise kanali jälgimine.",
+    "limit": "Sa ei saa selles serveris rohkem kanaleid jälgida. Lõpeta esmalt mõne teise kanali jälgimine.",
     "tooOld": "See server on kanalite jälgimiseks liiga vana (vaja on versiooni 1.4 või uuemat).",
     "notConnected": "Sa pole serveriga ühendatud.",
     "generic": "Selle kanali jälgimine ei õnnestunud. Proovi palun uuesti."
@@ -23,7 +23,7 @@
   },
   "history": {
     "clear": "Tühjenda ajalugu",
-    "title": "Tühjendan ajaloo?",
+    "title": "Kas tühjendada ajalugu?",
     "body": "See kustutab selle vestluse salvestatud sõnumid sellest arvutist jäädavalt. Teistel jäävad nende koopiad alles. Nende koopiaid ei sünkroonita sellesse arvutisse tagasi.",
     "confirm": "Tühjenda ajalugu",
     "cancel": "Tühista",
@@ -39,8 +39,8 @@
     "follow": "Jälgi kõiki kanaleid",
     "unfollow": "Lõpeta kõigi kanalite jälgimine",
     "working": "Jälgin kanaleid…",
-    "followed_one": "Jälgin {{count}} kanalit.",
-    "followed_other": "Jälgin {{count}} kanalit.",
+    "followed_one": "Hakkasid jälgima {{count}} kanalit.",
+    "followed_other": "Hakkasid jälgima {{count}} kanalit.",
     "skipped_one": "{{count}} jäeti vahele: {{reasons}}.",
     "skipped_other": "{{count}} jäeti vahele: {{reasons}}.",
     "limit": "piir täis",

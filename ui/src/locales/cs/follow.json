@@ -3,26 +3,26 @@
   "unsupported": "Sledování kanálů vyžaduje server ve verzi 1.4 nebo novější.",
   "unread_one": "{{count}} nepřečtená zpráva",
   "unread_few": "{{count}} nepřečtené zprávy",
-  "unread_many": "{{count}} nepřečtených zpráv",
+  "unread_many": "{{count}} nepřečtené zprávy",
   "unread_other": "{{count}} nepřečtených zpráv",
   "errors": {
     "denied": "Server ti nedovoluje sledovat tento kanál.",
     "limit": "Na tomto serveru už nemůžeš sledovat další kanály. Nejdřív přestaň sledovat jiný kanál.",
     "tooOld": "Tento server je na sledování kanálů příliš starý (je potřeba verze 1.4 nebo novější).",
-    "notConnected": "Nejsi připojen k serveru.",
+    "notConnected": "Nemáš spojení se serverem.",
     "generic": "Sledování tohoto kanálu se nepovedlo. Zkus to prosím znovu."
   },
   "dm": {
     "unknown": "Neznámá osoba"
   },
   "notify": {
-    "channel": "{{name}} v {{channel}}: {{text}}",
+    "channel": "{{name}} v kanálu {{channel}}: {{text}}",
     "private": "{{name}} (soukromě): {{text}}",
     "more_one": "{{count}} další nová zpráva",
     "more_few": "{{count}} další nové zprávy",
-    "more_many": "{{count}} dalších nových zpráv",
+    "more_many": "{{count}} další nové zprávy",
     "more_other": "{{count}} dalších nových zpráv",
-    "channelOn": "{{name}} v {{channel}} na {{server}}: {{text}}",
+    "channelOn": "{{name}} v kanálu {{channel}} na serveru {{server}}: {{text}}",
     "privateOn": "{{name}} (soukromě, {{server}}): {{text}}"
   },
   "history": {
@@ -45,7 +45,7 @@
     "working": "Nastavuji sledování kanálů…",
     "followed_one": "Sleduješ {{count}} kanál.",
     "followed_few": "Sleduješ {{count}} kanály.",
-    "followed_many": "Sleduješ {{count}} kanálů.",
+    "followed_many": "Sleduješ {{count}} kanálu.",
     "followed_other": "Sleduješ {{count}} kanálů.",
     "skipped_one": "{{count}} přeskočen: {{reasons}}.",
     "skipped_few": "{{count}} přeskočeny: {{reasons}}.",
@@ -54,7 +54,7 @@
     "limit": "dosažen limit",
     "notAllowed": "není povoleno",
     "noAnswer": "žádná odpověď od serveru",
-    "unfollowed": "Přestal(a) jsi sledovat všechny kanály.",
+    "unfollowed": "Sledování všech kanálů zrušeno.",
     "failed": "Sledování všech kanálů se nepovedlo. Zkus to prosím znovu.",
     "dismiss": "Zavřít",
     "unfollowFailed": "Zrušení sledování všech kanálů se nepovedlo. Zkus to prosím znovu."

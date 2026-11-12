@@ -1,7 +1,7 @@
 {
-  "hint": "Töltsön be egy kicsomagolt bővítménymappát a teszteléshez. A fejlesztői bővítmények nincsenek aláírva, soha nem hivatalosak, és nem kaphatják meg a net.http, secrets vagy ui.webview jogosultságot. A fejlesztői mód kikapcsolásakor eltávolításra kerülnek.",
+  "hint": "Tölts be egy kicsomagolt bővítménymappát a teszteléshez. A fejlesztői bővítmények nincsenek aláírva, soha nem hivatalosak, és nem kaphatják meg a net.http, secrets vagy ui.webview jogosultságot. A fejlesztői mód kikapcsolásakor a Mumcord kiüríti őket.",
   "load": "Bővítménymappa betöltése…",
-  "pickFolder": "Válassza ki a bővítmény mappáját",
+  "pickFolder": "Válaszd ki a bővítmény mappáját",
   "empty": "Nincs betöltött fejlesztői bővítmény.",
   "listLabel": "Fejlesztői bővítmények",
   "label": "Fejlesztői bővítmény",
@@ -16,7 +16,7 @@
   },
   "showLog": "{{name}} naplójának megjelenítése",
   "reload": "{{name}} újratöltése",
-  "unload": "{{name}} eltávolítása",
+  "unload": "{{name}} kiürítése",
   "logLabel": "{{name}} naplója",
   "logTitle": "{{name}} naplója",
   "logEmpty": "Még nincsenek naplósorok.",
@@ -29,7 +29,7 @@
   "errors": {
     "load": "A bővítménymappát nem sikerült betölteni.",
     "reload": "A bővítményt nem sikerült újratölteni.",
-    "unload": "A bővítményt nem sikerült eltávolítani.",
-    "log": "A naplót nem sikerült elolvasni."
+    "unload": "A bővítményt nem sikerült kiüríteni.",
+    "log": "A naplót nem sikerült beolvasni."
   }
 }

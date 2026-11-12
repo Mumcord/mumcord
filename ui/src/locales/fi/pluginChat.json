@@ -1,17 +1,17 @@
 {
   "card": {
-    "label": "Kortti laajennukselta {{plugin}}",
+    "label": "Kortti lisäosalta {{plugin}}",
     "showMore": "Näytä lisää",
     "showLess": "Näytä vähemmän"
   },
-  "via": "{{plugin}} kautta",
+  "via": "lisäosan {{plugin}} kautta",
   "supersede": {
     "showText": "Näytä alkuperäinen teksti",
     "hideText": "Piilota alkuperäinen teksti",
     "hiddenBy": "Piilottanut {{plugin}}"
   },
   "command": {
-    "list": "Laajennusten komennot",
+    "group": "Lisäosien komennot",
     "keys": "↑↓ valitse · Tab täydennä · Enter suorita · Esc sulje",
     "unavailable": "Tämä komento ei ole juuri nyt käytettävissä.",
     "failed": "Komentoa ei voitu suorittaa. Yritä uudelleen."

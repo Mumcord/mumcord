@@ -43,6 +43,7 @@ function setup() {
   const { container } = render(
     <Composer
       target={{ kind: "channel", channelId: 1 }}
+      conversation={{ kind: "channel", channelId: 1 }}
       limits={LIMITS}
       label="Message #Lobby"
       blockedReason={null}
@@ -234,5 +235,24 @@ describe("Composer image attachments", () => {
     });
     expect(notCancelled).toBe(false);
     expect(input.value).toBe("");
+  });
+
+  it("takes an error away again after a few seconds", () => {
+    const { form } = setup();
+    vi.useFakeTimers();
+    try {
+      drop(form, [png("doc.pdf", "application/pdf")]);
+      expect(screen.getByRole("alert").textContent).toBe("Only images can be sent.");
+      act(() => {
+        vi.advanceTimersByTime(5900);
+      });
+      expect(screen.queryByRole("alert")).not.toBeNull();
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByRole("alert")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

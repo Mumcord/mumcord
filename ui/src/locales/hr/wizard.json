@@ -24,15 +24,16 @@
     "custom": "Prilagođeno",
     "done": "(gotovo)",
     "progress": "Napredak postavljanja",
-    "later": "Sve ovdje možete kasnije promijeniti u Postavkama."
+    "later": "Sve ovdje možeš kasnije promijeniti u Postavkama."
   },
   "steps": {
-    "welcome": "Dobrodošli",
+    "welcome": "Dobrodošlica",
     "import": "Uvoz iz Mumblea",
     "identity": "Identitet",
     "voice": "Glas",
     "setupStyle": "Način postavljanja",
     "privateMessages": "Privatne poruke",
+    "notifications": "Obavijesti",
     "connections": "Veze",
     "features": "Značajke",
     "appearance": "Izgled",
@@ -40,38 +41,38 @@
     "summary": "Sve je spremno"
   },
   "welcome": {
-    "title": "Glasovni chat koji se osjeća kao",
-    "titleAccent": "vaš vlastiti prostor.",
-    "subtitle": "Mumcord govori Mumble, pa radi sa svakim Mumble poslužiteljem, a povrh toga dodaje moderan chat. Postavimo ga kako vam odgovara. Traje oko dvije minute.",
+    "title": "Glasovni chat u kojem se osjećaš",
+    "titleAccent": "kao kod kuće.",
+    "subtitle": "Mumcord govori Mumble, pa radi sa svakim Mumble poslužiteljem, a povrh toga dodaje moderan chat. Postavimo ga kako tebi odgovara. Traje oko dvije minute.",
     "voice": {
       "title": "Kristalno čist glas",
-      "text": "Zvuk s niskom latencijom i ugrađenim smanjenjem buke."
+      "text": "Zvuk s niskom latencijom i ugrađenim potiskivanjem šuma."
     },
     "servers": {
       "title": "Radi sa svakim Mumble poslužiteljem",
-      "text": "Bez računa, bez registracije. Pridružite se poslužiteljima koje već koristite."
+      "text": "Bez računa, bez registracije. Pridruži se poslužiteljima koje već koristiš."
     },
     "private": {
-      "title": "Privatno po dizajnu",
-      "text": "Bez telemetrije. Ono što Mumcord sprema ostaje na vašem računalu."
+      "title": "Privatnost od samog početka",
+      "text": "Bez telemetrije. Ono što Mumcord sprema ostaje na tvom računalu."
     }
   },
   "identity": {
-    "title": "Tko ste vi na Mumbleu?",
-    "intro": "Vaš identitet je način na koji vas poslužitelji prepoznaju. Napravite novi ili dovedite onaj koji već koristite.",
-    "legend": "Vaš identitet",
-    "create": "Napravi novi identitet",
-    "createText": "Vaš identitet je certifikat koji dokazuje tko ste na Mumble poslužiteljima. Čuva vaše registrirano ime i dozvole, pa ste svaki put kad se pridružite ista osoba.",
+    "title": "Tko si na Mumbleu?",
+    "intro": "Tvoj identitet je ono po čemu te poslužitelji prepoznaju. Stvori novi ili uvezi onaj koji već koristiš.",
+    "legend": "Tvoj identitet",
+    "create": "Stvori novi identitet",
+    "createText": "Tvoj identitet je certifikat koji dokazuje tko si na Mumble poslužiteljima. Čuva tvoje registrirano ime i dopuštenja, pa si svaki put kad se pridružiš ista osoba.",
     "import": "Uvezi postojeći identitet",
     "name": "Zadano prikazano ime",
-    "nameHint": "Koristi se na poslužiteljima koji vas još ne poznaju. Možete ga promijeniti po poslužitelju.",
+    "nameHint": "Koristi se na poslužiteljima koji te još ne poznaju. Možeš ga promijeniti za svaki poslužitelj.",
     "chooseFile": "Odaberi datoteku…",
     "noFile": "Nije odabrana datoteka",
     "chosenFile": "Odabrana datoteka: {{file}}",
     "password": "Lozinka datoteke",
     "passwordHint": "Lozinka ostaje na ovom računalu i nikamo se ne šalje.",
     "existing": "Koristi se identitet {{name}}.",
-    "backup": "Sigurnosnu kopiju napravite kasnije u Postavkama. Sigurnosna kopija omogućuje vraćanje identiteta na novom računalu.",
+    "backup": "Sigurnosnu kopiju napravi kasnije u Postavkama. Sigurnosna kopija omogućuje vraćanje identiteta na novom računalu.",
     "nameRequired": "Unesi ime.",
     "fileRequired": "Odaberi datoteku identiteta (.p12 ili .pfx).",
     "fileType": "Datoteka identiteta",
@@ -89,79 +90,83 @@
     "idle": "Pritisni Testiraj, reci nešto i čut ćeš samog sebe.",
     "recording": "Govori sada…",
     "playing": "Reprodukcija tvog glasa…",
-    "devicesFailed": "Tvoje audiouređaje nije bilo moguće izlistati. Možeš nastaviti i odabrati ih kasnije u postavkama.",
+    "devicesFailed": "Popis audiouređaja nije bilo moguće učitati. Možeš nastaviti i odabrati ih kasnije u Postavkama.",
     "testFailed": "Test nije mogao početi. Provjeri je li mikrofon priključen.",
     "test": "Čuj sebe",
     "stop": "Zaustavi"
   },
   "voice": {
     "title": "Zvuči li dobro?",
-    "subtitle": "Odaberite uređaje i recite nešto. Traka bi se trebala pomicati dok govorite.",
-    "talkLegend": "Kako želite govoriti?",
-    "voiceActivationDesc": "Mikrofon se otvara kad govoriš. Ništa za držati ni pritiskati.",
+    "subtitle": "Odaberi uređaje i reci nešto. Traka bi se trebala pomicati dok govoriš.",
+    "talkLegend": "Kako želiš govoriti?",
+    "voiceActivationDesc": "Mikrofon se otvara kad govoriš. Ništa ne trebaš držati ni pritiskati.",
     "pushToTalkDesc": "Najbolje za bučne prostorije. Ti biraš tipku.",
     "sensitivity": "Osjetljivost",
-    "changeLater": "Sve ovo možeš kasnije promijeniti u Postavke → Glas i zvuk."
+    "changeLater": "Sve ovo možeš kasnije promijeniti u odjeljku Postavke → Glas i zvuk."
   },
   "style": {
-    "title": "Koliko želite dijeliti?",
-    "subtitle": "Odaberite početnu točku. Svaki izbor ponovno vidite na zadnjem zaslonu i tamo ga možete promijeniti.",
+    "title": "Koliko želiš dijeliti?",
+    "subtitle": "Odaberi početnu točku. Svaki izbor ponovno vidiš na zadnjem zaslonu i tamo ga možeš promijeniti.",
     "legend": "Način postavljanja",
     "everythingOn": {
       "title": "Sve uključeno",
       "subtitle": "Puni skup značajki",
-      "p1": "Drugi vide što igrate i slušate",
-      "p2": "Vaš IP vide osobe s kojima se izravno povezujete",
-      "p3": "Svatko vam može pisati; poveznice i slike učitavaju se s weba",
+      "p1": "Drugi vide što igraš i slušaš",
+      "p2": "Tvoj IP vide osobe s kojima se izravno povezuješ",
+      "p3": "Svatko ti može pisati; poveznice i slike učitavaju se s weba",
       "p4": "Overlay, sinkronizacija povijesti i slike u punoj veličini su uključeni"
     },
     "balanced": {
       "title": "Uravnoteženo",
       "subtitle": "Između privatnosti i udobnosti",
-      "p1": "Pisati vam mogu samo prijatelji i osobe iz vašeg kanala",
+      "p1": "Pisati ti mogu samo prijatelji i osobe iz tvog kanala",
       "p2": "Izravna veza, s relejem kao rezervom",
-      "p3": "Pretpregledi poveznica i slike u punoj veličini su uključeni",
-      "p4": "Što igrate i slušate ostaje privatno"
+      "p3": "Pregledi poveznica i slike u punoj veličini su uključeni",
+      "p4": "Što igraš i slušaš ostaje privatno"
     },
     "maximumPrivacy": {
       "title": "Maksimalna privatnost",
-      "subtitle": "Dijelite što je manje moguće",
-      "p1": "Pisati vam mogu samo prijatelji, bez iznimki",
-      "p2": "Vaš IP je skriven; sve ide preko releja",
+      "subtitle": "Dijeli što je manje moguće",
+      "p1": "Pisati ti mogu samo prijatelji, bez iznimki",
+      "p2": "Tvoj IP je skriven; sve ide preko releja",
       "p3": "Bez vanjskog sadržaja, bez sinkronizacije povijesti, bez dijeljenja",
-      "p4": "Ažuriranja vas samo obavještavaju; ništa se ne dijeli o tome što radite"
+      "p4": "Ažuriranja te samo obavještavaju; ništa se ne dijeli o tome što radiš"
     },
     "custom": {
       "title": "Prilagođeno",
-      "subtitle": "Prođite kroz svaki izbor",
-      "p1": "Sami prođite kroz svaki korak",
-      "p2": "Vidite što svaka postavka radi i tko je vidi",
-      "p3": "Najbolje ako znate što želite"
+      "subtitle": "Prođi kroz svaki izbor",
+      "p1": "Sam prođi kroz svaki korak",
+      "p2": "Pogledaj što svaka postavka radi i tko je vidi",
+      "p3": "Najbolje ako znaš što želiš"
     },
-    "presetSelected": "Odabrano: {{preset}}. Preskačete detaljne korake privatnosti. Odaberite Prilagođeno da prođete kroz svaki.",
+    "presetSelected": "Odabrano: {{preset}}. Preskačeš detaljne korake privatnosti. Odaberi Prilagođeno da prođeš kroz svaki.",
     "customSelected": "Odabrano: Prilagođeno. Sljedeći koraci prolaze kroz svaki izbor."
   },
   "pm": {
-    "title": "Tko vam može pisati?",
+    "title": "Tko ti može pisati?",
     "subtitle": "Privatne poruke su razgovori jedan na jedan. Ovaj izbor ne utječe na chat kanala.",
-    "local": "Filtriranje se odvija na vašem računalu. Pošiljatelji nisu obaviješteni. Kasnije možete postaviti drugo pravilo po poslužitelju."
+    "local": "Filtriranje se odvija na tvom računalu. Pošiljatelji nisu obaviješteni. Kasnije možeš postaviti drugo pravilo za svaki poslužitelj."
+  },
+  "notifications": {
+    "title": "Kako da te Mumcord obavještava?",
+    "subtitle": "Odaberi kako ti stiže svaka vrsta vijesti. Kasnije to možeš promijeniti u odjeljku Postavke → Obavijesti."
   },
   "connections": {
     "title": "Veze i sadržaj",
-    "subtitle": "Neke značajke povezuju vas izravno s drugim korisnicima Mumcorda, a dio sadržaja chata učitava se s drugih web-stranica. Odaberite što vam odgovara.",
+    "subtitle": "Neke značajke povezuju te izravno s drugim korisnicima Mumcorda, a dio sadržaja chata učitava se s drugih web-stranica. Odaberi što ti odgovara.",
     "chatContent": "Sadržaj chata",
     "sharing": "Dijeljenje s korisnicima Mumcorda"
   },
   "features": {
-    "title": "Prilagodite po svom",
-    "subtitle": "Uključite dodatke koje želite. Svaki navodi tko što može vidjeti.",
+    "title": "Prilagodi po svom",
+    "subtitle": "Uključi dodatne značajke koje želiš. Uz svaku piše tko što može vidjeti.",
     "seenByMumcordUsers": "Vidljivo korisnicima Mumcorda na istom poslužitelju.",
-    "onlyYou": "Vidite samo vi.",
+    "onlyYou": "Vidiš samo ti.",
     "ingameOverlayAlt": "Primjer overlaya u igri koji prikazuje tko govori"
   },
   "appearance": {
-    "title": "Odaberite izgled",
-    "subtitle": "Prozor se ažurira dok birate. Više tema, i vaše vlastite, nalazi se u Postavkama."
+    "title": "Odaberi izgled",
+    "subtitle": "Prozor se ažurira dok biraš. Više tema, i tvoje vlastite, nalazi se u Postavkama."
   },
   "startup": {
     "title": "Pokretanje i ažuriranja",
@@ -169,13 +174,13 @@
     "linkHandler": "Otvaraj mumble:// poveznice u Mumcordu",
     "linkHandlerHint": "Klik na poveznicu poslužitelja na web-stranici tada je otvara ovdje.",
     "linkHandlerActive": "Mumcord već otvara mumble:// poveznice.",
-    "linkHandlerFailed": "Mumcord nije bilo moguće postaviti da otvara mumble:// poveznice. Možete pokušati ponovno u Postavkama.",
-    "autostartFailed": "Mumcord nije bilo moguće postaviti da se pokreće pri prijavi. Možete pokušati ponovno u Postavkama."
+    "linkHandlerFailed": "Mumcord nije bilo moguće postaviti da otvara mumble:// poveznice. Možeš pokušati ponovno u Postavkama.",
+    "autostartFailed": "Mumcord nije bilo moguće postaviti da se pokreće pri prijavi. Možeš pokušati ponovno u Postavkama."
   },
   "summary": {
     "title": "Sve je spremno",
     "titleNamed": "Sve je spremno, {{name}}",
-    "subtitle": "Evo što ste odabrali. Koristite Uredi na bilo kojoj kartici da je promijenite prije početka.",
+    "subtitle": "Evo tvojih odabira. Klikni Uredi na bilo kojoj kartici da ih promijeniš prije početka.",
     "on": "uključeno",
     "off": "isključeno",
     "unavailable": "nije dostupno ovdje",
@@ -185,6 +190,7 @@
       "identity": "Identitet",
       "voice": "Glas",
       "privateMessages": "Privatne poruke",
+      "notifications": "Obavijesti",
       "connections": "Veze",
       "chatContent": "Sadržaj chata",
       "features": "Značajke",
@@ -192,13 +198,15 @@
       "startup": "Pokretanje",
       "updates": "Ažuriranja"
     },
-    "identityDetail": "Spremljeno u sistemski privjesak ključeva",
-    "voiceDetail": "Smanjenje buke: {{noise}}",
+    "identityDetail": "Spremljeno u privjesak ključeva sustava",
+    "voiceDetail": "Potiskivanje šuma: {{noise}}",
     "pmDetail": "Moj kanal {{channel}} · prihvaćeni razgovori {{accepted}} · zahtjevi {{requests}}",
-    "contentTitle": "Pretpregledi poveznica {{previews}}",
+    "notificationsTitle": "Nove poruke: {{mode}}",
+    "notificationsDetail": "Obavijesti o aktivnosti: uključeno {{on}} od {{total}}",
+    "contentTitle": "Pregledi poveznica {{previews}}",
     "contentDetail": "Slike u punoj veličini {{images}} · sinkronizacija povijesti {{sync}}",
     "featuresTitle": "Overlay u igri {{overlay}}",
-    "featuresDetail": "Prati sistemski Ne smetaj {{dnd}} · trenutno svira {{playing}} · trenutno igra {{gaming}}",
+    "featuresDetail": "Prati Ne ometaj sustava {{dnd}} · trenutno svira {{playing}} · trenutno igra {{gaming}} · povijest aktivnosti {{history}}",
     "effectsDetail": "Vizualni efekti {{effects}}",
     "startupTitle": "Pokretanje pri prijavi {{login}}",
     "startupDetail": "Pokreni smanjeno {{minimized}} · mumble:// poveznice {{links}}",
@@ -208,9 +216,9 @@
       "off": "Isključeno"
     },
     "updatesDetail": "Ažuriranja se uvijek provjeravaju i verificiraju prije instalacije.",
-    "backup": "Vaš identitet {{name}} spremljen je u sistemski privjesak ključeva. Napravite sigurnosnu kopiju iz Postavke → Identitet kako nikad ne biste izgubili registrirano ime.",
-    "nextServer": "Sljedeće: dodajte svoj prvi poslužitelj",
-    "rerunNote": "Spremaju se samo vrijednosti koje ste promijenili."
+    "backup": "Tvoj identitet {{name}} spremljen je u privjesak ključeva sustava. Napravi sigurnosnu kopiju u odjeljku Postavke → Identitet da nikad ne izgubiš registrirano ime.",
+    "nextServer": "Sljedeće: dodaj svoj prvi poslužitelj",
+    "rerunNote": "Spremaju se samo promijenjene vrijednosti."
   },
   "rerun": {
     "title": "Čarobnjak za postavljanje",
@@ -220,5 +228,39 @@
     "discardBody": "Ništa se ne sprema prije završetka. Ako sada odustaneš, sve ostaje kako jest.",
     "discardKeep": "Nastavi uređivati",
     "discardConfirm": "Odbaci promjene"
+  },
+  "guide": {
+    "label": "Savjet od Aarona",
+    "from": "Savjet od Aarona",
+    "hide": "Sakrij Aarona",
+    "show": "Prikaži Aarona",
+    "titles": {
+      "welcome": "Dobro došao/la",
+      "import": "Prenesi svoje stvari iz Mumblea",
+      "identity": "Tvoje ime na poslužiteljima",
+      "voice": "Odaberi svoj mikrofon",
+      "setupStyle": "Odaberi stil",
+      "privateMessages": "Tko ti smije pisati",
+      "notifications": "Tvoje obavijesti",
+      "connections": "Izravne veze",
+      "features": "Odaberi dodatne značajke",
+      "appearance": "Odaberi svoj izgled",
+      "startup": "Pokretanje Mumcorda",
+      "summary": "Provjeri svoje odabire"
+    },
+    "hints": {
+      "welcome": "Bok, ja sam Aaron! Provest ću te kroz postavljanje. Traje samo minutu.",
+      "import": "Ovo su poslužitelji i postavke pronađeni u Mumbleu. Odaberi što želiš zadržati.",
+      "identity": "Tvoj identitet je tvoje ime na poslužiteljima. Stvori novi ili uvezi postojeći.",
+      "voice": "Ovdje odaberi mikrofon u koji govoriš, pa reci bok: zelena traka trebala bi zaplesati.",
+      "setupStyle": "Odaberi stil. Svaku pojedinu postavku možeš kasnije promijeniti.",
+      "privateMessages": "Odaberi tko ti smije slati privatne poruke. Pošiljatelji to nikad ne saznaju.",
+      "notifications": "Odaberi kako ti stiže svaka vrsta obavijesti ili je isključi.",
+      "connections": "Odaberi smije li te Mumcord izravno povezati s drugim korisnicima Mumcorda.",
+      "features": "Uključi samo dodatne značajke koje ti se sviđaju. Svaka kartica kaže tko ih može vidjeti.",
+      "appearance": "Svijetlo, tamno ili kao tvoj sustav: ovdje odaberi svoj izgled.",
+      "startup": "Odaberi kako se Mumcord pokreće kad se prijaviš na računalo.",
+      "summary": "Sve je spremno! Provjeri svoje odabire ovdje; Uredi te vraća na bilo koji korak."
+    }
   }
 }

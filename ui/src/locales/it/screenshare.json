@@ -85,7 +85,8 @@
     "soundNeeds": {
       "windows": "Nessun audio: richiede Windows 10 versione 2004 o successiva",
       "macos": "Nessun audio: richiede macOS 13 o successivo",
-      "pipewire": "Nessun audio: richiede PipeWire"
+      "pipewire": "Nessun audio: richiede PipeWire",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Gli spettatori ricevono:",
     "viewersGetSummary": "fino a {{resolution}} · {{fps}} fps · {{codec}} · circa {{mbit}} Mbit/s",

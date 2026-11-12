@@ -6,15 +6,15 @@ mod browser;
 mod cache_dirs;
 mod commands;
 mod deeplink;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod desktop_entry;
 mod display;
 mod dnd;
 mod fullscreen;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod glib_log;
 #[cfg(target_os = "linux")]
-mod gst_fallback;
+mod gst_plugins;
 mod hotkeys;
 mod ingame_overlay;
 mod kde;
@@ -28,7 +28,17 @@ mod plugins;
 mod portable;
 mod ptt;
 mod screen_frames;
+// The single-instance handover the plugin covers on the other platforms (FR-13.12).
+#[cfg(target_os = "freebsd")]
+mod single_instance;
 mod tray;
+// Which release channel the settings show; the same rule everywhere, see the module.
+mod update_channel;
+// FreeBSD has no in-app updater: `pkg` owns the install (see updater_freebsd.rs).
+#[cfg(not(target_os = "freebsd"))]
+mod updater;
+#[cfg(target_os = "freebsd")]
+#[path = "updater_freebsd.rs"]
 mod updater;
 mod version;
 mod watch_player;
@@ -119,6 +129,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             admin::person_ban,
             admin::person_action_close,
             admin::person_moderate,
+            admin::registered_users_open,
+            admin::registered_user_rename,
+            admin::registered_user_unregister,
+            admin::registered_user_groups,
+            admin::registered_users_close,
             channel_admin::channel_create,
             channel_admin::channel_edit,
             channel_admin::channel_remove,
@@ -127,6 +142,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channel_admin::channel_password_save,
             channel_admin::channel_acl_evaluate,
             channel_admin::channel_acl_lockout,
+            admin::person_set_server_mute,
+            admin::person_set_server_deafen,
+            admin::person_set_priority_speaker,
+            admin::person_register,
+            admin::person_move_all,
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,
@@ -159,6 +179,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::full_image::full_image_cancel,
             commands::files::files_availability,
             commands::files::files_chip_add,
+            commands::files::files_pick,
             commands::files::files_chip_remove,
             commands::files::files_send,
             commands::files::files_stop,
@@ -166,6 +187,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::files::files_download,
             commands::files::files_cancel,
             commands::files::files_save_folder,
+            commands::files::files_save_folder_choose,
             commands::files::files_open,
             commands::files::files_open_folder,
             links::link_preview,
@@ -477,6 +499,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
             audio::AudioDeviceFallback,
+            audio::NoiseSuppressionFallback,
             audio::BitrateMaxChanged,
             channel_audio::ChannelAudioProfilesChanged,
             channel_audio::ActiveAudioProfileChanged,
@@ -552,7 +575,7 @@ pub fn run() {
     #[cfg(target_os = "linux")]
     {
         // Before WebKit starts its web process, which inherits the GStreamer environment.
-        gst_fallback::prepare(&context.config().identifier);
+        gst_plugins::prepare(&context.config().identifier);
         // WebKit reads this when its web process starts (flicker workaround).
         webkit_compositing::prepare();
         // The Wayland app ID comes from the program name; it must match the desktop entry
@@ -561,6 +584,14 @@ pub fn run() {
         // GTK, GDK and WebKit warnings into Mumcord's log, before they start (issue #625).
         glib_log::install();
         ptt::set_host_app_id(&context.config().identifier);
+    }
+    #[cfg(target_os = "freebsd")]
+    {
+        // GTK and WebKit warnings into Mumcord's log, before they start (issue #625).
+        glib_log::install();
+        // The Wayland app ID comes from the program name; it must match the desktop entry
+        // (`desktop_entry`) for the taskbar icon. Set before GTK starts.
+        gtk::glib::set_prgname(Some(context.config().identifier.as_str()));
     }
 
     let builder = specta_builder();
@@ -575,19 +606,33 @@ pub fn run() {
         eprintln!("failed to export TypeScript bindings: {err}");
     }
 
-    let app = tauri::Builder::default()
-        // Must be registered first so a second launch hands over to the running instance.
-        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+    // A second launch hands its arguments to the running Mumcord and exits (FR-13.12).
+    #[cfg(target_os = "freebsd")]
+    if !single_instance::claim() {
+        return;
+    }
+
+    let tauri_builder = tauri::Builder::default();
+    // Must be registered first so a second launch hands over to the running instance. The plugin
+    // has no FreeBSD implementation; there a second launch opens a second window.
+    #[cfg(not(target_os = "freebsd"))]
+    let tauri_builder =
+        tauri_builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             // A login start while Mumcord already runs must not pop the window up.
             if !autostart::launched_at_login(&argv) {
                 window::show(app);
             }
-        }))
+        }));
+    // Replaces the app with a downloaded bundle. A FreeBSD package is updated by `pkg upgrade`,
+    // so the plugin is not built there at all (see updater_freebsd.rs).
+    #[cfg(not(target_os = "freebsd"))]
+    let tauri_builder = tauri_builder.plugin(tauri_plugin_updater::Builder::new().build());
+
+    let app = tauri_builder
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .register_asynchronous_uri_scheme_protocol(
             mumcord_plugins::api::webview::SCHEME,
             plugins::webview::handle,
@@ -629,12 +674,18 @@ pub fn run() {
             notifications::init(app.handle());
             create_main_window(app.handle())?;
             start_engine(app.handle())?;
+            // Logout, shutdown, `kill` and Ctrl+C quit like "Quit" does, so the plugins get
+            // their `stop` and the connections close cleanly (#748).
+            let quitting = app.handle().clone();
+            mumcord_engine::crash::on_quit_signal(move || window::quit(&quitting));
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
             dnd::init(app.handle());
             ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
-            #[cfg(target_os = "linux")]
+            #[cfg(target_os = "freebsd")]
+            single_instance::forward_launches(app.handle().clone());
+            #[cfg(any(target_os = "linux", target_os = "freebsd"))]
             {
                 desktop_entry::ensure(app.handle());
             }
@@ -645,7 +696,16 @@ pub fn run() {
     match app {
         Ok(app) => app.run(|app, event| {
             if matches!(event, tauri::RunEvent::Exit) {
+                #[cfg(target_os = "freebsd")]
+                single_instance::remove_socket();
                 mumcord_engine::crash::clean_exit();
+                // For exits that did not come through `window::quit` (the system ending
+                // the app); after a normal quit the plugins are stopped already (#704).
+                tauri::async_runtime::block_on(plugins::stop_all(app));
+                mumcord_engine::diag::flush_log();
+                if let Some(engine) = app.try_state::<Engine>() {
+                    engine.flush_chat_pending();
+                }
             }
             plugins::watchdog::on_run_event(app, event);
         }),
@@ -691,6 +751,29 @@ fn linux_appimage() -> bool {
     false
 }
 
+/// The folder with the files bundled beside the app (the camera backgrounds). Tauri resolves it
+/// on Linux, macOS and Windows only; FreeBSD follows the same `../lib/mumcord` rule the Linux
+/// packages use and falls back to the package prefix, where `packaging/freebsd` installs them.
+fn resource_dir(app: &AppHandle) -> Option<std::path::PathBuf> {
+    match app.path().resource_dir() {
+        Ok(dir) => return Some(dir),
+        Err(e) => tracing::info!(error = %e, "Tauri knows no resource folder; using the package's"),
+    }
+    #[cfg(target_os = "freebsd")]
+    {
+        let exe = std::env::current_exe().ok()?;
+        let beside = exe.parent()?.join("../lib/mumcord");
+        if let Ok(dir) = beside.canonicalize() {
+            return Some(dir);
+        }
+        let packaged = std::path::PathBuf::from("/usr/local/lib/mumcord");
+        if packaged.is_dir() {
+            return Some(packaged);
+        }
+    }
+    None
+}
+
 /// How Mumcord runs and on which screens, for crash reports (#568).
 fn set_crash_context(app: &AppHandle) {
     // AppImage and Flatpak exist only on Linux.
@@ -732,10 +815,16 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("early logging unavailable: {e}");
     }
     let runtime = tauri::async_runtime::handle().inner().clone();
-    let (engine, mut events) = Engine::new(&data_dir, SecretStore::os(), runtime)?;
+    let (engine, mut events) =
+        Engine::new(&data_dir, SecretStore::os_with_profile(&data_dir), runtime)?;
     let stored = engine.settings()?;
-    if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {
-        eprintln!("file logging unavailable: {e}");
+    if stored.log_to_disk {
+        if let Err(e) = diag::attach_file(&logs_dir, settings::diag_level(stored.log_level), 7) {
+            eprintln!("file logging unavailable: {e}");
+        }
+    } else if let Err(e) = diag::set_log_level(settings::diag_level(stored.log_level)) {
+        // No file (spec 12 FR-12.2); the level still filters the in-memory log.
+        eprintln!("setting the log level failed: {e}");
     }
     tracing::info!(
         version = version::DISPLAY,
@@ -743,7 +832,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
         "Mumcord starting"
     );
     #[cfg(target_os = "linux")]
-    gst_fallback::log_h264_status(&app.config().identifier);
+    gst_plugins::log_h264_status(&app.config().identifier);
     set_crash_context(app);
     mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
 
@@ -773,9 +862,9 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     engine.camera_set_frame_sink(camera_frames.0.clone());
     app.manage(camera_frames);
     app.manage(commands::camera_settings::CameraDeviceWatch::default());
-    match app.path().resource_dir() {
-        Ok(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
-        Err(e) => tracing::warn!(error = %e, "no resource folder for the camera backgrounds"),
+    match resource_dir(app) {
+        Some(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
+        None => tracing::warn!("no resource folder for the camera backgrounds"),
     }
     now_playing::start(engine.clone());
     now_gaming::start(engine.clone());
@@ -967,6 +1056,7 @@ fn emit_engine_event(
         EngineEvent::AudioDeviceFallback { input } => {
             audio::AudioDeviceFallback { input }.emit(app)
         }
+        EngineEvent::NoiseSuppressionFallback => audio::NoiseSuppressionFallback.emit(app),
         EngineEvent::BitrateMaxChanged(max_bps) => audio::BitrateMaxChanged {
             kbps: max_bps.map(|b| b / 1000),
         }

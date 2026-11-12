@@ -1,17 +1,17 @@
 {
   "card": {
-    "label": "Kartica od {{plugin}}",
+    "label": "Kartica dodatka {{plugin}}",
     "showMore": "Prikaži više",
     "showLess": "Prikaži manje"
   },
-  "via": "putem {{plugin}}",
+  "via": "putem dodatka {{plugin}}",
   "supersede": {
     "showText": "Prikaži izvorni tekst",
     "hideText": "Sakrij izvorni tekst",
-    "hiddenBy": "Sakrio {{plugin}}"
+    "hiddenBy": "Sakrio dodatak {{plugin}}"
   },
   "command": {
-    "list": "Naredbe dodataka",
+    "group": "Naredbe dodataka",
     "keys": "↑↓ odaberi · Tab dovrši · Enter pokreni · Esc zatvori",
     "unavailable": "Ova naredba trenutačno nije dostupna.",
     "failed": "Naredba se nije mogla pokrenuti. Pokušaj ponovno."

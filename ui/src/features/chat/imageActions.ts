@@ -6,7 +6,6 @@
  * the original file, animation included.
  */
 import { EngineError, getApi } from "../../api";
-import { pickSavePath } from "../settings/fileDialogs";
 
 /** Images the engine produced; anything else is not ours to copy or save. */
 const IMAGE_DATA_URL = /^data:image\/(png|jpeg|gif|webp);base64,/;
@@ -73,12 +72,9 @@ export async function saveImageAs(
 ): Promise<boolean> {
   const dataUrl = imageDataUrl(src);
   const extension = imageExtension(dataUrl);
-  const path = await pickSavePath(
-    imageFileName(name, extension),
-    { name: filterName, extensions: [extension] },
-    title,
+  // The engine opens the save dialog itself and writes only where the user chose.
+  return getApi().saveImage(
+    { title, defaultName: imageFileName(name, extension), filterName, extensions: [extension] },
+    dataUrl,
   );
-  if (path === null) return false;
-  await getApi().saveImage(path, dataUrl);
-  return true;
 }

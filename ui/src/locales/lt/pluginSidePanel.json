@@ -1,9 +1,9 @@
 {
-  "region": "„{{plugin}}“ šoninė juosta",
-  "close": "Uždaryti „{{plugin}}“ šoninę juostą",
-  "resize": "Keisti „{{plugin}}“ šoninės juostos dydį",
-  "failed": "Nepavyko uždaryti „{{plugin}}“ šoninės juostos. Bandyk dar kartą.",
+  "region": "„{{plugin}}“ šoninis skydelis",
+  "close": "Uždaryti „{{plugin}}“ šoninį skydelį",
+  "resize": "Keisti „{{plugin}}“ šoninio skydelio dydį",
+  "failed": "Nepavyko uždaryti „{{plugin}}“ šoninio skydelio. Bandyk dar kartą.",
   "options": "„{{plugin}}“ parinktys",
   "details": "Papildinio informacija",
-  "closePanel": "Uždaryti juostą"
+  "closePanel": "Uždaryti skydelį"
 }

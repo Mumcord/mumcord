@@ -1,7 +1,7 @@
 {
   "installTitle": "¿Instalar {{plugin}}?",
   "updateTitle": "¿Actualizar {{plugin}} a {{version}}?",
-  "asks": "{{plugin}} pide esto. Los permisos opcionales se pueden desactivar ahora o más tarde.",
+  "asks": "{{plugin}} pide estos permisos. Puedes desactivar los opcionales ahora o más tarde.",
   "asksShort": "Este plugin pide:",
   "scoreCountsOptional": "La puntuación cuenta todos los permisos que el plugin puede pedir, incluidos los opcionales.",
   "required": "Obligatorio",
@@ -20,14 +20,14 @@
   "installAnyway": "Instalar de todos modos",
   "updateAnyway": "Actualizar de todos modos",
   "highRiskTitle": "Este plugin es de alto riesgo",
-  "highRiskText": "Puede abrir sus propias páginas web y comunicarse con {{count}} sitios web que no puedes comprobar. Mumcord no puede ver qué envían esos sitios web al plugin ni qué les envía el plugin a ellos. Lo ha publicado alguien nuevo en este equipo. Instálalo solo si conoces y confías en su autor.",
+  "highRiskText": "Puede abrir sus propias páginas web y comunicarse con {{count}} sitios web que no puedes comprobar. Mumcord no puede ver qué envían esos sitios web al plugin ni qué les envía el plugin a ellos. Lo ha publicado un autor nuevo en este ordenador. Instálalo solo si conoces a su autor y confías en él.",
   "highRiskWouldBecome": "Esta actualización convertiría el plugin en uno de alto riesgo",
   "highRiskNotAutomatic": "No se instalará automáticamente. Quedarte en {{version}} mantiene la puntuación actual; puedes fijar la versión en Instalados.",
   "sameAuthorKey": "misma clave de autor",
   "places": {
     "stage": "área multimedia",
     "side-panel": "panel lateral",
-    "dialog": "diálogo",
+    "dialog": "cuadro de diálogo",
     "panel": "barra de plugins"
   },
   "highRiskParts": {
@@ -39,7 +39,7 @@
     "websites_other": "Puede comunicarse con {{count}} sitios web que no puedes comprobar.",
     "webPages": "Puede abrir sus propias páginas web.",
     "cantSee": "Mumcord no puede ver qué envían esos sitios web al plugin ni qué les envía el plugin a ellos.",
-    "newAuthor": "Lo ha publicado alguien nuevo en este equipo.",
-    "trust": "Instálalo solo si conoces y confías en su autor."
+    "newAuthor": "Lo ha publicado un autor nuevo en este ordenador.",
+    "trust": "Instálalo solo si conoces a su autor y confías en él."
   }
 }

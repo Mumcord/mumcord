@@ -10,6 +10,7 @@ import { BlockDialogHost } from "../features/blocking";
 import { CameraPreviewHost } from "../features/camera/preview";
 import { TraySync } from "../features/tray";
 import { GlobalHotkeys } from "../features/hotkeys";
+import { TipsHost } from "../features/tips";
 import { AppShell } from "./AppShell";
 import {
   ChannelsMount,
@@ -51,6 +52,9 @@ const ServerAdminWindowHost = lazy(() =>
 );
 const PersonActionHost = lazy(() =>
   import("../features/admin").then((m) => ({ default: m.PersonActionHost })),
+);
+const AdminConfirmHost = lazy(() =>
+  import("../features/admin").then((m) => ({ default: m.AdminConfirmHost })),
 );
 
 function MainScreen() {
@@ -121,6 +125,13 @@ function MainScreen() {
           <PersonActionHost />
         </LazyBoundary>
       )}
+      {overlay === null && (
+        <LazyBoundary>
+          <AdminConfirmHost />
+        </LazyBoundary>
+      )}
+      {/* Aaron's tips (#637) stay out of the way while the settings are open. */}
+      {overlay === null && <TipsHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
       <TraySync onOpenSettings={openSettings} />
       <GlobalHotkeys overlayOpen={overlay !== null} />

@@ -1,5 +1,23 @@
 use crate::{Error, Result};
 
+/// Widest picture a decoder hands out: the screen-share wire format's limit (8K UHD). Defined
+/// here because the engine depends on this crate, not the other way round.
+pub const MAX_DECODED_WIDTH: u32 = 7680;
+/// Tallest picture a decoder hands out, see [`MAX_DECODED_WIDTH`].
+pub const MAX_DECODED_HEIGHT: u32 = 4320;
+
+/// Rejects a decoded picture size beyond the wire limits. The size comes from a remote
+/// bitstream, not from the checked frame header, so a hostile sender could otherwise make every
+/// viewer allocate gigabytes.
+pub(crate) fn check_decoded_size(width: u32, height: u32) -> Result<()> {
+    if width > MAX_DECODED_WIDTH || height > MAX_DECODED_HEIGHT {
+        return Err(Error::InvalidFrame(format!(
+            "decoded picture {width}x{height} exceeds {MAX_DECODED_WIDTH}x{MAX_DECODED_HEIGHT}"
+        )));
+    }
+    Ok(())
+}
+
 /// One I420 picture: Y plane, then U, then V, without row padding.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct I420Frame {
@@ -110,6 +128,28 @@ mod tests {
         data.extend(std::iter::repeat_n(u, chroma));
         data.extend(std::iter::repeat_n(v, chroma));
         I420Frame::new(width, height, data).unwrap()
+    }
+
+    #[test]
+    fn decoded_size_up_to_the_wire_limit_is_accepted() {
+        check_decoded_size(1, 1).unwrap();
+        check_decoded_size(1920, 1080).unwrap();
+        check_decoded_size(MAX_DECODED_WIDTH, MAX_DECODED_HEIGHT).unwrap();
+    }
+
+    #[test]
+    fn decoded_size_beyond_the_wire_limit_is_rejected() {
+        for (w, h) in [
+            (MAX_DECODED_WIDTH + 1, 1),
+            (1, MAX_DECODED_HEIGHT + 1),
+            (65535, 65535),
+            (u32::MAX, u32::MAX),
+        ] {
+            assert!(
+                matches!(check_decoded_size(w, h), Err(Error::InvalidFrame(_))),
+                "{w}x{h}"
+            );
+        }
     }
 
     #[test]

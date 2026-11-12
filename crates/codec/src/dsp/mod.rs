@@ -23,7 +23,9 @@
 //! reports no speech probability, the `nnnoiseless` model is used as a detector for voice
 //! activation, and its audio output is discarded. Disabled stages are skipped rather than
 //! reconfigured, because reconfiguring `sonora` reallocates; a backend switch happens in the
-//! settings thread and the chain only adopts the finished object.
+//! settings thread and the chain only adopts the finished object. A selected backend that cannot
+//! keep up with the microphone is replaced by the `nnnoiseless` model the chain already holds, and
+//! tried again later.
 
 mod controls;
 mod echo_ref;
@@ -34,6 +36,7 @@ mod noise_suppression;
 mod tests;
 
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 use sonora::config::{AdaptiveDigital, EchoCanceller, GainController2};
 use sonora::{AudioProcessing, Config, StreamConfig};
@@ -50,6 +53,56 @@ pub use noise_suppression::{
 
 use gate::{PttGate, ThresholdGate, VoiceDetector};
 use leveler::Leveler;
+
+/// A frame of the selected noise suppression that takes longer than this counts as slow: half the
+/// frame period, so the rest of the send path (echo cancellation, gain, Opus) still fits.
+const SLOW_FRAME: Duration = Duration::from_millis(5);
+/// Frames over which slow frames are counted (one second of audio).
+const OVERLOAD_WINDOW_FRAMES: u32 = 100;
+/// Slow frames within one window that mean the backend cannot keep up with the microphone. A
+/// single stall (a page fault, a late wake-up) stays far below it.
+const OVERLOAD_SLOW_FRAMES: u32 = 20;
+/// Frames the standard backend stands in before the selected one gets another try (30 seconds),
+/// so the choice of the user comes back by itself once the load is gone.
+const FALLBACK_FRAMES: u32 = 3000;
+
+/// Watches how long the selected noise suppression takes per frame. A backend that needs longer
+/// than the microphone delivers makes the capture queue overflow, and the dropped audio reaches
+/// the others as static (issue #753); the chain then lets the standard backend stand in.
+#[derive(Debug, Default)]
+struct Overload {
+    window_frames: u32,
+    slow_frames: u32,
+    /// Frames the standard backend still stands in; zero while the selected one runs.
+    fallback_frames: u32,
+}
+
+impl Overload {
+    /// Whether the standard backend processes this frame. Counts the stand-in period down.
+    fn standing_in(&mut self) -> bool {
+        if self.fallback_frames == 0 {
+            return false;
+        }
+        self.fallback_frames -= 1;
+        true
+    }
+
+    /// Records one frame of the selected backend and tells whether the fallback starts now.
+    fn record(&mut self, elapsed: Duration) -> bool {
+        self.window_frames += 1;
+        if elapsed > SLOW_FRAME {
+            self.slow_frames += 1;
+        }
+        let overloaded = self.slow_frames >= OVERLOAD_SLOW_FRAMES;
+        if overloaded || self.window_frames >= OVERLOAD_WINDOW_FRAMES {
+            *self = Self::default();
+        }
+        if overloaded {
+            self.fallback_frames = FALLBACK_FRAMES;
+        }
+        overloaded
+    }
+}
 
 /// Decision of the send gate for one frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -68,9 +121,11 @@ pub struct DspChain {
     agc: AudioProcessing,
     /// The selected noise suppression backend; only this one changes the audio.
     backend: Box<dyn SuppressionBackend>,
-    /// Speech detector for voice activation. It runs only when the selected backend reports no
-    /// speech probability, and never writes to the audio.
+    /// The standard model (`nnnoiseless`). As speech detector for voice activation it runs only
+    /// when the selected backend reports no speech probability, and its audio is discarded. It is
+    /// also what suppresses the noise while the selected backend cannot keep up.
     detector: Box<dyn SuppressionBackend>,
+    overload: Overload,
     leveler: Leveler,
     /// Whether the leveler ran on the previous frame; it restarts from unity gain when it
     /// comes back, as the source may have changed meanwhile.
@@ -122,6 +177,7 @@ impl DspChain {
             agc,
             backend,
             detector,
+            overload: Overload::default(),
             leveler: Leveler::default(),
             leveling: false,
             vad: VoiceDetector::default(),
@@ -157,7 +213,9 @@ impl DspChain {
         let controls = &*self.controls;
         // A backend switch is only adopted here; the settings thread builds the new backend and
         // frees the old one, so nothing is allocated or freed in the frame path.
-        controls.exchange_backend(&mut self.backend);
+        if controls.exchange_backend(&mut self.backend) {
+            self.overload = Overload::default();
+        }
         // Low-latency mode keeps the signal untouched: these stages change the sound and the
         // echo canceller would need the far end it can no longer track at minimal buffering.
         let bypass = controls.low_latency();
@@ -201,7 +259,19 @@ impl DspChain {
         let music = controls.music_quality();
         let mut probability = None;
         if self.force_noise_suppression || (controls.noise_suppression() && !music && !bypass) {
-            let outcome = self.backend.process(out, &mut self.processed);
+            let outcome = if self.overload.standing_in() {
+                self.detector.process(out, &mut self.processed)
+            } else if self.backend.kind() == Backend::Nnnoiseless {
+                // Already the lightest backend: there is nothing to fall back to.
+                self.backend.process(out, &mut self.processed)
+            } else {
+                let started = Instant::now();
+                let outcome = self.backend.process(out, &mut self.processed);
+                if self.overload.record(started.elapsed()) {
+                    controls.count_fallback();
+                }
+                outcome
+            };
             if outcome.failed {
                 controls.count_error();
             } else {

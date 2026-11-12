@@ -14,6 +14,11 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [features]
 # Env-selected null/WAV-file audio backend for E2E runs (e2e/); never in release builds.
 test-backend = ["mumcord-engine/test-backend"]
+# Tauri's production switch: the UI is loaded from the assets embedded in the binary instead of
+# from the dev server. The Tauri CLI turns it on for `tauri build`; a plain
+# `cargo build --release` leaves it off, and the app would then wait for `npm run dev`. Builds
+# without the CLI (FreeBSD, scripts/build-freebsd-pkg.sh) pass it explicitly.
+custom-protocol = ["tauri/custom-protocol"]
 
 [build-dependencies]
 tauri-build.workspace = true
@@ -52,6 +57,26 @@ tauri-plugin-global-shortcut.workspace = true
 tauri-plugin-updater.workspace = true
 minisign-verify = "0.3"
 sha2.workspace = true
+
+# FreeBSD runs the same desktop code as Linux, but not the D-Bus portals (ashpd, gdk) that only
+# exist on Linux, so it gets everything else from the block below. There is no updater plugin
+# (a package is updated with `pkg upgrade`, see updater_freebsd.rs) and no single-instance
+# plugin, whose crate has no BSD implementation.
+[target.'cfg(target_os = "freebsd")'.dependencies]
+tauri-plugin-global-shortcut.workspace = true
+# Message notifications (FR-1.48c): D-Bus notification service, window activation token.
+zbus.workspace = true
+futures-util.workspace = true
+# Opens links through the desktop launchers (see browser.rs).
+open.workspace = true
+gtk.workspace = true
+# Full-screen requests from the pages Mumcord shows (see fullscreen.rs, issue #419).
+webkit2gtk.workspace = true
+# Mouse-button push-to-talk: XInput2 raw button events on X11.
+libc.workspace = true
+x11rb = { workspace = true, features = ["xinput"] }
+# Tray icon as a StatusNotifierItem (FR-2.52).
+ksni = { version = "0.3.7", default-features = false, features = ["tokio"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = { workspace = true, features = ["global_shortcuts"] }

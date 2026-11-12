@@ -1,22 +1,22 @@
 {
-  "title": "Watch party",
+  "title": "Sessão de visualização",
   "addVideo": "Adicionar vídeo",
   "beta": "Beta",
-  "join": "Entrar na watch party",
-  "leave": "Sair da party",
+  "join": "Entrar na sessão",
+  "leave": "Sair da sessão",
   "watching": "{{count}} a ver: {{names}}",
-  "player": "Leitor da watch party",
+  "player": "Leitor da sessão de visualização",
   "watchTogether": "Ver juntos",
   "watchTogetherFor": "Ver {{title}} em conjunto com este canal",
-  "embedsOff": "Ative os leitores incorporados nas definições de privacidade para ver juntos",
-  "embedsOffJoin": "Está a decorrer uma sessão de visualização: ative os leitores incorporados para participar",
+  "embedsOff": "Ativa os leitores incorporados nas definições de privacidade para ver juntos",
+  "embedsOffJoin": "Está a decorrer uma sessão de visualização: ativa os leitores incorporados para entrar",
   "openPrivacy": "Abrir definições de privacidade",
   "cantPlay": "O leitor não pode funcionar aqui.",
   "openInBrowser": "Abrir no navegador",
-  "startFailed": "Não foi possível iniciar a watch party.",
-  "joinFailed": "Não foi possível entrar na watch party.",
-  "leaveFailed": "Não foi possível sair da watch party.",
-  "commandFailed": "A watch party não recebeu a tua alteração.",
+  "startFailed": "Não foi possível iniciar a sessão de visualização.",
+  "joinFailed": "Não foi possível entrar na sessão de visualização.",
+  "leaveFailed": "Não foi possível sair da sessão de visualização.",
+  "commandFailed": "A sessão de visualização não recebeu a tua alteração.",
   "someone": "Alguém",
   "other": {
     "play": "{{name}} carregou em reproduzir",
@@ -24,11 +24,11 @@
     "seek": "{{name}} avançou",
     "skipped": "{{name}} saltou"
   },
-  "addToPlaylist": "Adicionar à playlist",
-  "addToPlaylistFor": "Adicionar {{title}} à playlist da watch party",
+  "addToPlaylist": "Adicionar à lista de reprodução",
+  "addToPlaylistFor": "Adicionar {{title}} à lista de reprodução da sessão",
   "playlist": {
     "title": "A seguir",
-    "empty": "Nada a seguir. Adiciona ligações do YouTube com «Adicionar à playlist».",
+    "empty": "Nada a seguir. Adiciona ligações do YouTube com «Adicionar à lista de reprodução».",
     "skip": "Saltar",
     "previous": "Anterior",
     "previousFailed": "Não foi possível voltar ao vídeo anterior.",
@@ -36,21 +36,21 @@
     "moved": "Movido para a posição {{position}}",
     "videoTitle": "Vídeo do YouTube",
     "addedBy": "Adicionado por {{name}}",
-    "remove": "Remover {{title}} da playlist",
-    "addFailed": "Não foi possível adicionar o vídeo à playlist. Leva até 50 vídeos.",
-    "removeFailed": "Não foi possível remover o vídeo da playlist.",
+    "remove": "Remover {{title}} da lista de reprodução",
+    "addFailed": "Não foi possível adicionar o vídeo à lista de reprodução. A lista leva até 50 vídeos.",
+    "removeFailed": "Não foi possível remover o vídeo da lista de reprodução.",
     "moveFailed": "Não foi possível mover o vídeo.",
     "skipFailed": "Não foi possível saltar para o vídeo seguinte.",
     "nextFailed": "Não foi possível iniciar o vídeo seguinte.",
     "move": "Mover {{title}}",
     "upNext": "A seguir: {{title}}",
     "upNextNone": "Nada a seguir",
-    "paste": "Colar um link do YouTube",
-    "notALink": "Isso não é um link do YouTube",
+    "paste": "Cola uma ligação do YouTube",
+    "notALink": "Isso não é uma ligação do YouTube",
     "more": "Mais sobre {{title}}",
     "playNext": "Reproduzir a seguir",
     "removeShort": "Remover da lista",
-    "emptyPaste": "Nada a seguir. Cole um link do YouTube acima."
+    "emptyPaste": "Nada a seguir. Cola uma ligação do YouTube acima."
   },
   "widget": {
     "play": "Reproduzir",
@@ -59,7 +59,9 @@
   "codecHint": {
     "install": "Este vídeo precisa de suporte para H.264. Instala o gst-libav:",
     "generic": "Este vídeo precisa de suporte para H.264. Instala o gst-libav (o plugin libav do GStreamer) com o gestor de pacotes do teu sistema.",
-    "rpmFusion": "No Fedora, o gst-libav vem do repositório RPM Fusion; ativa primeiro o RPM Fusion."
+    "rpmFusion": "No Fedora, o gst-libav vem do repositório RPM Fusion; ativa primeiro o RPM Fusion.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Espaço reproduzir/pausar · ← → saltar 5 s · M silenciar · F ecrã inteiro",
   "headerPill": "Ver juntos · {{count}}",
@@ -67,8 +69,8 @@
   "tabs": {
     "playlist": "Lista"
   },
-  "upNextHeading": "A seguir · arraste para reordenar",
+  "upNextHeading": "A seguir · arrasta para reordenar",
   "whoIsWatching": "Quem está a ver",
   "pasteKey": "Ctrl V",
-  "you": "Você"
+  "you": "Tu"
 }

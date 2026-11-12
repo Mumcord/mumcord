@@ -31,6 +31,9 @@ pub enum CameraUnavailable {
     /// "Camera sharing needs direct connections. Change it in Privacy & Connections." The mode
     /// leaves only the direct path and the user turned direct connections off (FR-4.3, FR-8.4).
     NeedsDirect,
+    /// "Camera sharing is not available on FreeBSD yet." This platform has no camera backend
+    /// (FR-13.27), so the entry stays visible but disabled.
+    UnsupportedPlatform,
 }
 
 /// Whether the relay can carry camera broadcasts at all (FR-8.2): it must be usable, offer
@@ -49,6 +52,9 @@ fn relay_carries_cameras(relay: &RelayInfo) -> Result<(), CameraUnavailable> {
     Ok(())
 }
 
+/// Whether this build has a camera backend at all.
+const CAMERA_BACKEND: bool = cfg!(any(target_os = "linux", target_os = "macos", windows, test));
+
 /// The reason camera sharing is unavailable, or `None` when it is available.
 pub(crate) fn evaluate(
     relay: &RelayInfo,
@@ -56,6 +62,10 @@ pub(crate) fn evaluate(
     has_certificate: bool,
     direct_allowed: bool,
 ) -> Option<CameraUnavailable> {
+    // Without a camera backend no mode and no relay can help (FR-13.27).
+    if !CAMERA_BACKEND {
+        return Some(CameraUnavailable::UnsupportedPlatform);
+    }
     // `relay_only` leaves the relay as the only path, so the three relay reasons come first
     // (FR-8.4). Every other mode keeps the direct path, and with it the camera (FR-8.2).
     if mode == P2pMode::RelayOnly
@@ -175,6 +185,16 @@ mod tests {
 
     fn check(relay: &RelayInfo) -> Option<CameraUnavailable> {
         evaluate(relay, P2pMode::RelayFirst, true, true)
+    }
+
+    /// A platform without a camera backend names that first, whatever the relay says (FR-13.27).
+    #[test]
+    fn a_platform_without_a_camera_backend_says_so() {
+        if CAMERA_BACKEND {
+            assert_eq!(check(&good()), None);
+        } else {
+            assert_eq!(check(&good()), Some(CameraUnavailable::UnsupportedPlatform));
+        }
     }
 
     #[test]

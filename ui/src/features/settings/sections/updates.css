@@ -48,6 +48,38 @@
   margin-bottom: 0;
 }
 
+/* Update channel (#741): a stacked row, radios with a hint under each name. */
+.upd-channel {
+  display: block;
+}
+
+.upd-channel .settings-radios {
+  margin: var(--space-2) 0 0;
+}
+
+.upd-channel .settings-radios__option {
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.upd-channel .settings-radios__option input {
+  margin-top: 0.2rem;
+}
+
+.upd-channel__name {
+  font-weight: var(--font-weight-bold);
+}
+
+.upd-channel__hint {
+  display: block;
+  margin: 0;
+}
+
+.upd-channel .settings-infoline {
+  margin-bottom: 0;
+}
+
 .upd-segmented {
   display: inline-flex;
   flex-wrap: wrap;

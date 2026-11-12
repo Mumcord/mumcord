@@ -181,7 +181,11 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   top("voiceAudio", "audio.duckingLevel", ["videoDuckingPercent"]),
   top("voiceAudio", "sounds.theme", ["soundTheme"]),
   ...SOUND_KEYS.map(sound),
-  top("chatNotifications", "notifications.legend", ["notifications"]),
+  top("chatNotifications", "notifications.messages", ["notifications"]),
+  top("chatNotifications", "notifications.activityTitle", ["activityNotify"]),
+  top("privacy", "activityHistory.keep", ["keepActivityHistory"], {
+    preset: "keepActivityHistory",
+  }),
   {
     id: "dndFollowSystem",
     section: "chatNotifications",
@@ -245,6 +249,10 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   positional("minDistance", "positional.minDistance"),
   positional("maxDistance", "positional.maxDistance"),
   top("advanced", "diagnostics.logLevel", ["logLevel"]),
+  top("advanced", "diagnostics.writeToDisk", ["logToDisk"]),
+  top("advanced", "diskWrites.durableSaves", ["durableSaves"]),
+  top("advanced", "diskWrites.linkPreviewsOnDisk", ["linkPreviewsOnDisk"]),
+  top("advanced", "diskWrites.pluginRegistryCache", ["pluginRegistryCache"]),
   top("about", "about.whatsNewAuto", ["whatsNewAuto"]),
 ];
 

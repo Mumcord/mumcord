@@ -1,5 +1,5 @@
 {
-  "hint": "Carica una cartella di plugin non compressa per provarla. I plugin per sviluppatori non sono firmati, non sono mai ufficiali e non possono ottenere net.http, secrets o ui.webview. Vengono scaricati quando la modalità sviluppatore viene disattivata.",
+  "hint": "Carica una cartella di plugin non compressa per provarlo. I plugin per sviluppatori non sono firmati, non sono mai ufficiali e non possono ottenere net.http, secrets o ui.webview. Vengono rimossi quando disattivi la modalità sviluppatore.",
   "load": "Carica cartella del plugin…",
   "pickFolder": "Scegli la cartella del plugin",
   "empty": "Nessun plugin per sviluppatori caricato.",
@@ -12,11 +12,11 @@
     "autoOff": "Disattivato dopo arresti anomali ripetuti",
     "allOff": "Tutti i plugin sono disattivati",
     "noPlugins": "I plugin sono disattivati per questa sessione",
-    "notLoaded": "Impossibile caricare"
+    "notLoaded": "Caricamento non riuscito"
   },
   "showLog": "Mostra il registro di {{name}}",
   "reload": "Ricarica {{name}}",
-  "unload": "Scarica {{name}}",
+  "unload": "Rimuovi {{name}}",
   "logLabel": "Registro di {{name}}",
   "logTitle": "Registro di {{name}}",
   "logEmpty": "Ancora nessuna riga di registro.",
@@ -29,7 +29,7 @@
   "errors": {
     "load": "Impossibile caricare la cartella del plugin.",
     "reload": "Impossibile ricaricare il plugin.",
-    "unload": "Impossibile scaricare il plugin.",
+    "unload": "Impossibile rimuovere il plugin.",
     "log": "Impossibile leggere il registro."
   }
 }

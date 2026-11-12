@@ -7,7 +7,7 @@
     "whisper": "Susurrando a {{target}}",
     "shout": "Gritando a {{target}}",
     "releaseKey": "Solo las personas de ahí te oyen. Suelta <key>{{key}}</key> para volver a hablar en {{channel}}.",
-    "stopToReturn": "Solo las personas de ahí te oyen. Detén para volver a hablar en {{channel}}.",
+    "stopToReturn": "Solo las personas de ahí te oyen. Pulsa Detener para volver a hablar en {{channel}}.",
     "onlyThere": "Solo las personas de ahí te oyen.",
     "stop": "Detener"
   },

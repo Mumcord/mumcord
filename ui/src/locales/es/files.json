@@ -2,7 +2,7 @@
   "composer": {
     "attach": "Compartir archivos",
     "attachLabel": "Compartir archivos en este canal",
-    "dropTitle": "Suelta para compartir con #{{channel}}",
+    "dropTitle": "Suelta para compartir en #{{channel}}",
     "dropChoiceTitle": "Algunos de estos archivos son imágenes. ¿Qué quieres hacer con ellos?",
     "sendAsImage": "Enviar como imagen",
     "shareAsFile": "Compartir como archivo",
@@ -14,7 +14,7 @@
     "unreadable": "No se pudo leer {{path}}",
     "serverRefused": "El servidor rechazó el mensaje: {{reason}}",
     "trayLabel": "Archivos para compartir",
-    "chipPeerToPeer": "{{size}} · peer-to-peer",
+    "chipPeerToPeer": "{{size}} · punto a punto",
     "zipping": "Comprimiendo carpeta… {{percent}} %",
     "checking": "Comprobando…",
     "checkingPercent": "Comprobando… {{percent}} %",
@@ -49,7 +49,7 @@
     "checksumLabel": "Suma de comprobación SHA-256 {{hash}}",
     "copy": "Copiar",
     "copied": "Copiado",
-    "available": "Disponible mientras {{sender}} esté en línea · termina {{when}}",
+    "available": "Disponible mientras {{sender}} esté en línea · hasta {{when}}",
     "download": "Descargar",
     "cancel": "Cancelar",
     "retry": "Reintentar",
@@ -92,7 +92,7 @@
     },
     "unavailable": {
       "offline": "{{sender}} se desconectó. El archivo ya no está disponible.",
-      "ended": "Este recurso compartido ha terminado. Los recursos compartidos terminan a las 24 horas.",
+      "ended": "Ya no se comparte. Los archivos se comparten 24 horas como máximo.",
       "askAgain": "Pide a {{sender}} que lo comparta de nuevo."
     },
     "disabled": {
@@ -106,16 +106,16 @@
   "sender": {
     "downloadedBy": "Descargado por {{names}}",
     "inProgress_one": "{{count}} descarga en curso · {{details}}",
-    "inProgress_many": "{{count}} downloads in progress · {{details}}",
+    "inProgress_many": "{{count}} descargas en curso · {{details}}",
     "inProgress_other": "{{count}} descargas en curso · {{details}}",
     "sendingTo": "Enviando a {{name}} · {{percent}} %",
     "waiting_one": "{{count}} en espera",
-    "waiting_many": "{{count}} waiting",
+    "waiting_many": "{{count}} en espera",
     "waiting_other": "{{count}} en espera",
-    "sharing": "Compartido mientras estés en línea · termina {{when}}",
+    "sharing": "Se comparte mientras estés en línea · hasta {{when}}",
     "stop": "Dejar de compartir",
     "stopFailed": "No se pudo dejar de compartir: {{reason}}. El archivo sigue compartido.",
-    "ended": "Compartir terminado",
+    "ended": "Ya no se comparte",
     "endedStopped": "Dejaste de compartir",
     "endedExpired": "Pasaron las 24 horas",
     "endedLeft": "Saliste del servidor",
@@ -143,7 +143,7 @@
     "title": "Compartir archivos",
     "new": "Nuevo",
     "receive": "Recibir archivos de otros usuarios de Mumcord",
-    "receiveHint": "Los archivos vienen del remitente mientras está en línea. Las personas bloqueadas no pueden enviarte archivos.",
+    "receiveHint": "Los archivos llegan del remitente mientras esté en línea. Las personas bloqueadas no pueden enviarte archivos.",
     "maxSize": "Tamaño máximo de archivo",
     "maxSizeHint": "Se pueden compartir archivos de hasta 2 GB. 1 GB por defecto. No es posible nada más grande.",
     "size100mb": "100 MB",
@@ -152,7 +152,7 @@
     "size2gb": "2 GB",
     "saveTo": "Guardar archivos en",
     "change": "Cambiar…",
-    "relayNote": "Los archivos siempre pasan por el relé del servidor, así nadie ve tu dirección IP. Los servidores sin relé no pueden compartir archivos. Nada se descarga sin tu clic y tu confirmación.",
+    "relayNote": "Los archivos siempre pasan por el relé del servidor, así que nadie ve tu dirección IP. Los servidores sin relé no pueden compartir archivos. Nada se descarga sin tu clic y tu confirmación.",
     "encryptionNote": "Los archivos están cifrados de extremo a extremo y se comprueban tras la descarga."
   }
 }

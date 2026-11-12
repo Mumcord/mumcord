@@ -1,7 +1,7 @@
 {
   "heading": "Plug-ins",
   "list": "Plug-inpanelen",
-  "expand": "{{name}} vergroten",
+  "expand": "{{name}} uitvouwen",
   "close": "Sluiten",
   "unsupported": "Deze server ondersteunt geen gedeelde plug-infuncties"
 }

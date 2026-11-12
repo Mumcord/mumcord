@@ -5,20 +5,20 @@
   "unread_other": "{{count}} olvasatlan üzenet",
   "errors": {
     "denied": "A szerver nem engedi, hogy kövesd ezt a csatornát.",
-    "limit": "Ezen a szerveren nem követhetsz több csatornát. Előbb szüntesd meg egy másik követését.",
+    "limit": "Ezen a szerveren nem követhetsz több csatornát. Előbb szüntesd meg egy másik csatorna követését.",
     "tooOld": "Ez a szerver túl régi a csatornák követéséhez (1.4-es vagy újabb verzió kell).",
-    "notConnected": "Nem csatlakozol a szerverhez.",
+    "notConnected": "Nem vagy csatlakozva a szerverhez.",
     "generic": "A csatorna követése nem sikerült. Próbáld újra."
   },
   "dm": {
     "unknown": "Ismeretlen személy"
   },
   "notify": {
-    "channel": "{{name}} itt: {{channel}}: {{text}}",
+    "channel": "{{name}} – {{channel}}: {{text}}",
     "private": "{{name}} (privát): {{text}}",
     "more_one": "Még {{count}} új üzenet",
     "more_other": "Még {{count}} új üzenet",
-    "channelOn": "{{name}} itt: {{channel}}, {{server}}: {{text}}",
+    "channelOn": "{{name}} – {{channel}}, {{server}}: {{text}}",
     "privateOn": "{{name}} (privát, {{server}}): {{text}}"
   },
   "history": {
@@ -48,12 +48,12 @@
     "noAnswer": "nincs válasz a szervertől",
     "unfollowed": "Minden csatorna követése megszűnt.",
     "failed": "Az összes csatorna követése nem sikerült. Próbáld újra.",
-    "dismiss": "Elvetés",
+    "dismiss": "Bezárás",
     "unfollowFailed": "Az összes csatorna követésének megszüntetése nem sikerült. Próbáld újra."
   },
   "mention": "megemlít téged",
   "header": {
     "follow": "Csatorna követése",
-    "unfollow": "Követed, kattints a leállításhoz"
+    "unfollow": "Követed, kattints a követés megszüntetéséhez"
   }
 }

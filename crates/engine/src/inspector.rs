@@ -354,9 +354,9 @@ fn camera_json(m: &crate::camera::signal::CameraMessage) -> Value {
 fn file_json(m: &crate::files::wire::FileMessage) -> Value {
     use crate::files::wire::FileMessage;
     match m {
-        FileMessage::Request { id } => json!({ "t": "req", "id": id }),
+        FileMessage::Request { id, fmt } => json!({ "t": "req", "id": id, "fmt": fmt }),
         FileMessage::Queued { id, position } => json!({ "t": "queued", "id": id, "pos": position }),
-        FileMessage::Go { id } => json!({ "t": "go", "id": id }),
+        FileMessage::Go { id, fmt } => json!({ "t": "go", "id": id, "fmt": fmt }),
         FileMessage::Busy { id } => json!({ "t": "busy", "id": id }),
         FileMessage::Gone { id } => json!({ "t": "gone", "id": id }),
         FileMessage::Cancel { id } => json!({ "t": "cancel", "id": id }),

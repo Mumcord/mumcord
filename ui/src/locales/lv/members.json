@@ -35,11 +35,11 @@
     "loadFailed": "Profilu neizdevās ielādēt.",
     "volume": "Skaļums",
     "volumeValue": "{{value}} %",
-    "localMute": "Izslēgt man",
+    "localMute": "Apklusināt man",
     "sessionOnly": "Šim cilvēkam nav sertifikāta, tāpēc šie iestatījumi darbojas tikai šajā sesijā.",
-    "sendPrivateMessage": "Sūtīt privātu ziņu",
-    "privateMessage": "Privāta ziņa",
-    "localSettingsHint": "Tikai tu tos redzi. Izmaiņas tiek saglabātas uzreiz.",
+    "sendPrivateMessage": "Sūtīt privāto ziņu",
+    "privateMessage": "Privātā ziņa",
+    "localSettingsHint": "Tos redzi tikai tu. Izmaiņas tiek saglabātas uzreiz.",
     "settingsFor": "{{name}} iestatījumi",
     "hintMuted": "Apklusināts",
     "hintVolume": "Skaļums {{value}} %",
@@ -58,10 +58,10 @@
     "sendMessage": "Sūtīt ziņu",
     "join": "Pievienoties kanālam {{channel}}",
     "joinFull": "Šis kanāls ir pilns.",
-    "joinLocked": "Tev nav atļauts ieiet šajā kanālā, vai tam vajag paroli.",
-    "mute": "Izslēgt man",
+    "joinLocked": "Tev nav atļauts pievienoties šim kanālam, vai tam vajag paroli.",
+    "mute": "Apklusināt man",
     "connectionInfo": "Savienojuma informācija",
-    "chatRequestPending": "Tērzēšanas pieprasījums gaida",
+    "chatRequestPending": "Tērzēšanas pieprasījums gaida atbildi",
     "revokeConsent": "Atsaukt tērzēšanas piekrišanu",
     "moveToMe": "Pārvietot uz manu kanālu",
     "moveTo": "Pārvietot uz"
@@ -88,7 +88,7 @@
     "joinFailed": "Steam neizdevās atvērt."
   },
   "preview": {
-    "privateMessage": "Privāta ziņa",
+    "privateMessage": "Privātā ziņa",
     "fullProfile": "Pilns profils"
   },
   "chatRequest": {
@@ -123,7 +123,7 @@
     "title": "Vai bloķēt {{name}}?",
     "onServer": "serverī {{server}}",
     "whatHappens": "Kas notiek",
-    "private": "{{name}} privātās ziņas netiek rādītas un tev nepaziņo.",
+    "private": "{{name}} privātās ziņas netiek rādītas, un par tām tev netiek paziņots.",
     "channelCollapsed": "{{name}} kanāla ziņas ir sakļautas. Tu tās joprojām vari atvērt.",
     "channelHidden": "{{name}} kanāla ziņas ir paslēptas.",
     "voice": "{{name}} tev ir apklusināts balsī, ieskaitot čukstus.",

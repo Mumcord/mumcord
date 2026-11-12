@@ -1,7 +1,7 @@
 {
   "show": "Atvērt Mumcord",
   "settings": "Iestatījumi",
-  "mute": "Izslēgt mikrofonu",
+  "mute": "Apklusināt",
   "deafen": "Izslēgt skaņu",
   "dnd": "Netraucēt",
   "dndSystem": "Netraucēt (sistēma)",
@@ -13,13 +13,13 @@
   "connectedIn": "Savienots · {channel}",
   "serverState": "{server} – {state}",
   "talking": "Savienots – runā",
-  "muted": "Savienots – izslēgts mikrofons",
+  "muted": "Savienots – apklusināts",
   "voiceMenu": "Balss serveris un kanāls",
   "voiceServer": "Balss serveris",
   "channelsOf": "Kanāli · {server}",
-  "moreChannels": "Vairāk kanālu Mumcord",
+  "moreChannels": "Vairāk kanālu lietotnē Mumcord",
   "recentChats": "Nesenās tērzēšanas",
-  "chatUnread": "{name} – {count} nelasīti",
+  "chatUnread": "{name} – nelasītas: {count}",
   "cameraOn": "Kamera ieslēgta",
   "turnOffCamera": "Izslēgt kameru"
 }

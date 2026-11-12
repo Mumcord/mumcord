@@ -1,13 +1,13 @@
 {
   "title": "Veřejné servery",
   "loading": "Načítání seznamu…",
-  "subtitle": "Načteno, protože jste otevřeli tuto stránku · zobrazeno {{shown}} z {{total}}",
+  "subtitle": "Načteno, protože jsi otevřel(a) tuto stránku · zobrazeno {{shown}} z {{total}}",
   "search": "Hledat podle názvu, adresy nebo země",
   "refresh": "Obnovit",
   "retry": "Zkusit znovu",
-  "loadFailed": "Seznam veřejných serverů se nepodařilo načíst. Zkontrolujte připojení k internetu a zkuste to znovu.",
+  "loadFailed": "Seznam veřejných serverů se nepodařilo načíst. Zkontroluj připojení k internetu a zkus to znovu.",
   "noMatch": "Hledání a filtrům neodpovídá žádný server.",
-  "saveFailed": "Server se nepodařilo přidat. Zkuste to znovu.",
+  "saveFailed": "Server se nepodařilo přidat. Zkus to znovu.",
   "filters": {
     "label": "Filtry",
     "country": "Země",
@@ -36,13 +36,13 @@
   "noAnswer": "Bez odpovědi",
   "ms": "{{ms}} ms",
   "connect": "Připojit",
-  "connectTo": "Připojit k {{server}}",
-  "favourite": "Oblíbený",
-  "favouriteServer": "Přidat {{server}} mezi vaše servery",
+  "connectTo": "Připojit k serveru {{server}}",
+  "favourite": "Do oblíbených",
+  "favouriteServer": "Přidat {{server}} mezi tvé servery",
   "saved": "Uloženo",
-  "savedAs": "{{server}} je mezi vašimi servery",
+  "savedAs": "{{server}} je mezi tvými servery",
   "announce": {
-    "saved": "{{server}} přidán mezi vaše servery"
+    "saved": "Server {{server}} byl přidán mezi tvé servery"
   },
-  "note": "Pingují se jen viditelné řádky, několik najednou. Nic dalšího se na server neodesílá, dokud se nepřipojíte."
+  "note": "Pingují se jen viditelné řádky, několik najednou. Nic dalšího se na server neodesílá, dokud se nepřipojíš."
 }

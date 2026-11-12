@@ -319,6 +319,18 @@
   color: var(--color-text-muted);
 }
 
+/* The platform limits of the About card (FR-13.27): a short list, not prose. */
+.settings-limits {
+  margin: var(--space-1) 0;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.settings-limits li + li {
+  margin-top: var(--space-1);
+}
+
 .settings-control-row__text {
   flex: 1 1 auto;
   min-width: 0;
@@ -1322,4 +1334,22 @@
   .settings-switch__input:disabled:checked::after {
     background: GrayText;
   }
+}
+
+/* What the FreeBSD machine runs on, in the diagnostics card (FR-13.31). */
+.settings-system-facts__list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+  font-size: 0.9em;
+}
+
+.settings-system-facts__list dt {
+  color: var(--color-text-muted);
+}
+
+.settings-system-facts__list dd {
+  margin: 0;
+  word-break: break-word;
 }

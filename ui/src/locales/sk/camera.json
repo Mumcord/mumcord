@@ -15,7 +15,8 @@
     "needsRelayMode": "Zdieľanie kamery je vypnuté. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
     "registeredOnly": "Na tomto serveri môžu kameru používať len registrovaní používatelia.",
-    "needsDirect": "Zdieľanie kamery potrebuje priame pripojenia. Zmeň to v Súkromie a pripojeniach."
+    "needsDirect": "Zdieľanie kamery potrebuje priame pripojenia. Zmeň to v Súkromie a pripojeniach.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera zapnutá",
   "turnOffTray": "Vypnúť kameru",
@@ -200,7 +201,8 @@
     "showVideo": "Zobraziť video",
     "viewing": "Sleduješ",
     "weak": "Slabé pripojenie",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Táto kamera vyžaduje Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Možnosti pre {{name}}",

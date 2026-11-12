@@ -26,7 +26,7 @@
   "history": {
     "clear": "Borrar historial",
     "title": "¿Borrar el historial?",
-    "body": "Esto elimina de forma permanente los mensajes guardados de esta conversación en este equipo. Las demás personas conservan sus copias. Sus copias no se volverán a sincronizar con este equipo.",
+    "body": "Esto elimina de forma permanente los mensajes guardados de esta conversación en este ordenador. Las demás personas conservan sus copias. Sus copias no se volverán a sincronizar con este ordenador.",
     "confirm": "Borrar historial",
     "cancel": "Cancelar",
     "failed": "No se pudo borrar el historial. Inténtalo de nuevo."
@@ -41,9 +41,9 @@
     "follow": "Seguir todos los canales",
     "unfollow": "Dejar de seguir todos los canales",
     "working": "Siguiendo canales…",
-    "followed_one": "Siguiendo {{count}} canal.",
-    "followed_other": "Siguiendo {{count}} canales.",
-    "followed_many": "Siguiendo {{count}} canales.",
+    "followed_one": "Ahora sigues {{count}} canal.",
+    "followed_other": "Ahora sigues {{count}} canales.",
+    "followed_many": "Ahora sigues {{count}} canales.",
     "skipped_one": "{{count}} omitido: {{reasons}}.",
     "skipped_other": "{{count}} omitidos: {{reasons}}.",
     "skipped_many": "{{count}} omitidos: {{reasons}}.",
@@ -55,7 +55,7 @@
     "dismiss": "Cerrar",
     "unfollowFailed": "No se pudo dejar de seguir todos los canales. Inténtalo de nuevo."
   },
-  "mention": "incluye una mención a ti",
+  "mention": "te menciona",
   "header": {
     "follow": "Seguir canal",
     "unfollow": "Siguiendo, haz clic para dejar de seguir"

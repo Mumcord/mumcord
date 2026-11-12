@@ -19,6 +19,7 @@ import { FeaturesStep } from "./FeaturesStep";
 import { IdentityStep } from "./IdentityStep";
 import { ImportStep } from "./ImportStep";
 import { matchingPreset, RECOMMENDED_PRESET } from "./presets";
+import { NotificationsStep } from "./NotificationsStep";
 import { PrivateMessagesStep } from "./PrivateMessagesStep";
 import { SetupStyleStep } from "./SetupStyleStep";
 import { StartupStep } from "./StartupStep";
@@ -27,6 +28,7 @@ import { SummaryStep } from "./SummaryStep";
 import { VoiceStep } from "./VoiceStep";
 import { WelcomeStep } from "./WelcomeStep";
 import { WizardCancelDialog } from "./WizardCancelDialog";
+import { WizardGuide } from "./WizardGuide";
 import {
   applyStyle,
   changedSettings,
@@ -210,6 +212,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   const stored = useRef<Settings | null>(null);
   const shownPreview = useRef<string | null>(null);
   const finished = useRef(false);
+  const stepRoot = useRef<HTMLDivElement>(null);
 
   const start = useCallback(() => {
     loadWizard(rerun)
@@ -486,6 +489,8 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
         return <SetupStyleStep style={flow.style} onSelect={chooseStyle} onNext={toNext} />;
       case "privateMessages":
         return <PrivateMessagesStep settings={settings} update={update} onNext={toNext} />;
+      case "notifications":
+        return <NotificationsStep settings={settings} update={update} onNext={toNext} />;
       case "connections":
         return <ConnectionsStep settings={settings} update={update} onNext={toNext} />;
       case "features":
@@ -554,10 +559,11 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       <div className="wizard-main">
         <StepNavContext.Provider value={nav}>
           {/* A new key per step remounts it, so its heading takes the focus. */}
-          <div key={flow.step} className="wizard-main__step">
+          <div key={flow.step} ref={stepRoot} className="wizard-main__step">
             {stepBody()}
           </div>
         </StepNavContext.Provider>
+        <WizardGuide step={flow.step} stepRoot={stepRoot} />
       </div>
       {cancelAsked && (
         <WizardCancelDialog

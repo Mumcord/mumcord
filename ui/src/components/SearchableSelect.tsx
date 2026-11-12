@@ -12,6 +12,11 @@ interface SearchableSelectProps {
   placeholder: string;
   /** Announced when nothing matches what was typed. */
   noMatch: string;
+  /**
+   * Accessible name of a "×" button that empties the field. Only shown while a value is chosen;
+   * leave out when the field must always hold a value. `onChange` then receives "".
+   */
+  clearLabel?: string;
   className?: string;
 }
 
@@ -27,6 +32,7 @@ export function SearchableSelect({
   onChange,
   placeholder,
   noMatch,
+  clearLabel,
   className,
 }: SearchableSelectProps) {
   const baseId = useId();
@@ -156,6 +162,21 @@ export function SearchableSelect({
           onKeyDown={onKeyDown}
           onBlur={close}
         />
+        {clearLabel !== undefined && selected !== undefined && (
+          <button
+            type="button"
+            className="select__clear"
+            aria-label={clearLabel}
+            data-tooltip={clearLabel}
+            onClick={() => {
+              close();
+              onChange("");
+              inputRef.current?.focus();
+            }}
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        )}
         <button
           type="button"
           className="select__toggle"

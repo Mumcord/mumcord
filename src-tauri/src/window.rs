@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use mumcord_engine::{ConnState, Engine, store::CloseBehaviour};
-use tauri::{AppHandle, Manager, WebviewWindow, Window, WindowEvent};
+use tauri::{AppHandle, Manager, Runtime, Window, WindowEvent};
 use tauri_specta::Event;
 
 use crate::commands::app::CloseRequested;
@@ -83,8 +83,21 @@ pub fn on_window_event(window: &Window, event: &WindowEvent) {
     }
 }
 
-fn main_window(app: &AppHandle) -> Option<WebviewWindow> {
-    let window = app.get_webview_window(MAIN);
+/// The main window itself. On macOS not `get_webview_window`: that finds nothing while a plugin
+/// frame's child web view sits in the window, and the window could not be shown or hidden then.
+/// Elsewhere plugin frames are no child web views, and the direct window lookup is not compiled
+/// in (Tauri's `unstable` feature is macOS only).
+pub fn find_main_window<R: Runtime>(app: &AppHandle<R>) -> Option<Window<R>> {
+    #[cfg(target_os = "macos")]
+    return app.get_window(MAIN);
+    #[cfg(not(target_os = "macos"))]
+    return app
+        .get_webview_window(MAIN)
+        .map(|window| window.as_ref().window());
+}
+
+fn main_window<R: Runtime>(app: &AppHandle<R>) -> Option<Window<R>> {
+    let window = find_main_window(app);
     if window.is_none() {
         tracing::warn!("main window not found");
     }
@@ -239,22 +252,22 @@ pub fn restart(app: &AppHandle) {
     after_disconnect(app, AppHandle::request_restart);
 }
 
-/// Saves the windows, disconnects cleanly (keeping what the next start rejoins), then runs
-/// `then`.
+/// Saves the windows, stops the plugins, disconnects cleanly (keeping what the next start
+/// rejoins), then runs `then`.
 pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'static) {
     crate::aux_window::save_before_exit(app);
-    if connected_servers(&app.state::<Engine>()) == 0 {
-        then(app);
-        return;
-    }
-    // Keeps the voice channel so the next start can offer to rejoin it (QA.9). Waits (bounded)
-    // until the connections have sent what is still queued and their TLS close, and for the
-    // quit sound (#325). A second quit request finds no connection left and exits at once, so
-    // the wait never blocks a forced quit.
-    let closed = app.state::<Engine>().shutdown();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
-        tokio::join!(closed, tokio::time::sleep(QUIT_GRACE));
+        // Before the disconnect, so a plugin can still send from its `stop` (#704).
+        crate::plugins::stop_all(&app).await;
+        if connected_servers(&app.state::<Engine>()) > 0 {
+            // Keeps the voice channel so the next start can offer to rejoin it (QA.9). Waits
+            // (bounded) until the connections have sent what is still queued and their TLS
+            // close, and for the quit sound (#325). A second quit request finds no connection
+            // left and skips this wait, so it never blocks a forced quit.
+            let closed = app.state::<Engine>().shutdown();
+            tokio::join!(closed, tokio::time::sleep(QUIT_GRACE));
+        }
         then(&app);
     });
 }
@@ -262,6 +275,39 @@ pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Issue #705: on macOS a plugin frame is a child web view in the main window. The window
+    /// must still be found then, or the tray can neither show nor hide it.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn the_main_window_is_found_while_a_plugin_frame_is_open() {
+        use tauri::{
+            LogicalPosition, LogicalSize, WebviewBuilder, WebviewUrl, WebviewWindowBuilder,
+        };
+
+        let app = tauri::test::mock_app();
+        let handle = app.handle();
+        WebviewWindowBuilder::new(handle, MAIN, WebviewUrl::default())
+            .build()
+            .expect("main window");
+        assert!(main_window(handle).is_some());
+
+        handle
+            .get_window(MAIN)
+            .expect("main window")
+            .add_child(
+                WebviewBuilder::new("plugin-frame-0123456789abcdef", WebviewUrl::default()),
+                LogicalPosition::new(0, 0),
+                LogicalSize::new(100, 100),
+            )
+            .expect("frame web view");
+        assert!(
+            handle.get_webview_window(MAIN).is_none(),
+            "the lookup this replaced"
+        );
+        let main = main_window(handle).expect("found with a frame open");
+        assert_eq!(main.label(), MAIN);
+    }
 
     #[test]
     fn the_window_waits_for_the_first_paint() {

@@ -30,6 +30,8 @@ export interface Toast {
   open?: (() => void) | undefined;
   /** Buttons below the text, e.g. "Trust new relay" and "Details" (#600). */
   actions?: readonly ToastAction[] | undefined;
+  /** "error" marks something that did not work, e.g. a refused channel move (#676). */
+  tone?: "error" | undefined;
 }
 
 export interface ToastAction {

@@ -8,8 +8,8 @@
   "nobodyElse": "Serveryje daugiau nieko nėra.",
   "inOtherChannels": "Kituose kanaluose",
   "you": "(tu)",
-  "registered": "Registruotas (-a)",
-  "unregistered": "Neregistruotas (-a)",
+  "registered": "Registruotas",
+  "unregistered": "Neregistruotas",
   "talking": "Kalba",
   "quality": {
     "label": "Ryšys",
@@ -40,14 +40,14 @@
     "sessionOnly": "Šis žmogus neturi sertifikato, todėl šie nustatymai galioja tik per šią sesiją.",
     "sendPrivateMessage": "Siųsti privačią žinutę",
     "privateMessage": "Privati žinutė",
-    "localSettingsHint": "Tai mato tik tu. Pakeitimai įrašomi iškart.",
+    "localSettingsHint": "Tai mato tik tu. Pakeitimai išsaugomi iškart.",
     "settingsFor": "{{name}} nustatymai",
     "hintMuted": "Nutildyta",
     "hintVolume": "Garsumas {{value}} %",
     "localMuteHint": "Šio žmogaus negirdėsi.",
     "privateNote": "Privati pastaba",
     "privateNoteHint": "Šią pastabą mato tik tu.",
-    "saved": "Įrašyta"
+    "saved": "Išsaugota"
   },
   "errors": {
     "notConnected": "Neprisijungta prie serverio.",
@@ -59,7 +59,7 @@
     "sendMessage": "Siųsti žinutę",
     "join": "Prisijungti prie {{channel}}",
     "joinFull": "Šis kanalas pilnas.",
-    "joinLocked": "Tau negalima įeiti į šį kanalą arba jam reikia slaptažodžio.",
+    "joinLocked": "Negali prisijungti prie šio kanalo arba jam reikia slaptažodžio.",
     "mute": "Nutildyti man",
     "connectionInfo": "Ryšio informacija",
     "chatRequestPending": "Pokalbio prašymas laukia",
@@ -71,7 +71,7 @@
     "label": "Dabar groja",
     "listening": "Klauso",
     "paused": "Pristabdyta",
-    "progress": "Atkūrimo eiga",
+    "progress": "Grojimo eiga",
     "position": "{{position}} iš {{duration}}"
   },
   "nowGaming": {
@@ -117,7 +117,7 @@
   },
   "revokeConsent": {
     "title": "Atšaukti pokalbio sutikimą naudotojui {{name}}?",
-    "message": "{{name}} turės vėl išsiųsti žinutės užklausą, kad jo žinutės tave pasiektų. Pokalbio istorija lieka.",
+    "message": "{{name}} turės vėl išsiųsti žinutės prašymą, kad jo žinutės tave pasiektų. Pokalbio istorija lieka.",
     "confirm": "Atšaukti",
     "failed": "Nepavyko atšaukti pokalbio sutikimo. Bandyk dar kartą."
   },
@@ -126,22 +126,22 @@
     "unblock": "Atblokuoti",
     "title": "Blokuoti {{name}}?",
     "onServer": "serveryje {{server}}",
-    "whatHappens": "Kas įvyksta",
+    "whatHappens": "Kas nutiks",
     "private": "Privačios {{name}} žinutės nerodomos ir tau nepranešama.",
     "channelCollapsed": "{{name}} kanalo žinutės suskleistos. Vis tiek gali jas atidaryti.",
     "channelHidden": "{{name}} kanalo žinutės paslėptos.",
-    "voice": "{{name}} tau nutildytas balse, įskaitant šnabždesius.",
+    "voice": "{{name}} tau nutildytas balse, įskaitant šnibždesius.",
     "data": "Jokio istorijos sinchronizavimo, kvietimų ar kitų Mumcord duomenų iš {{name}}.",
-    "followsCert": "Blokavimas seka {{name}} sertifikatą, todėl naujas vardas jo neapeina.",
+    "followsCert": "Blokavimas susietas su {{name}} sertifikatu, todėl naujas vardas jo neapeina.",
     "nameOnly": "{{name}} neturi sertifikato, todėl blokavimas galioja tik šiam vardui serveryje {{server}}.",
-    "warning": "{{name}} vis dar gali tave matyti ir skaityti tavo žinutes. Mumble negali to sustabdyti tik tavo pusėje. {{name}} apie blokavimą nepranešama.",
+    "warning": "{{name}} vis dar gali tave matyti ir skaityti tavo žinutes. Mumble negali to sustabdyti tik tavo pusėje. {{name}} nėra informuojamas apie blokavimą.",
     "cancel": "Atšaukti",
     "confirm": "Blokuoti {{name}}",
     "done": "{{name}} užblokuotas.",
     "failed": "Nepavyko užblokuoti {{name}}. Bandyk dar kartą.",
     "badge": "Užblokuotas",
-    "collapsed": "Žinutė nuo užblokuoto naudotojo",
+    "collapsed": "Užblokuoto naudotojo žinutė",
     "show": "Rodyti",
-    "showLabel": "Rodyti žinutę nuo užblokuoto naudotojo"
+    "showLabel": "Rodyti užblokuoto naudotojo žinutę"
   }
 }

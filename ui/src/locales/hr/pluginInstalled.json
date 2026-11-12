@@ -64,7 +64,7 @@
     "log": "Zapisnik",
     "logEmpty": "Zapisnik je prazan.",
     "level": {
-      "debug": "Ispravljanje",
+      "debug": "Otklanjanje pogrešaka",
       "info": "Informacija",
       "warn": "Upozorenje",
       "error": "Pogreška"
@@ -84,7 +84,7 @@
   "remove": {
     "title": "Ukloniti {{name}}?",
     "deleteData": "Izbriši i njegove podatke",
-    "hint": "Zadržani podaci brišu se nakon 30 dana. Ponovno instalirajte dodatak prije toga da ih vratite.",
+    "hint": "Zadržani podaci brišu se nakon 30 dana. Ponovno instaliraj dodatak prije toga da ih vratiš.",
     "confirm": "Ukloni"
   },
   "errors": {
@@ -105,15 +105,15 @@
   },
   "visibilityChip": "Razgovara s drugim korisnicima Mumcorda · {{visibility}}",
   "chips": {
-    "label": "Dozvole koje koristi",
+    "label": "Dopuštenja koja koristi",
     "uiPanel": "Ploča",
-    "uiMemberBadge": "Oznaka člana",
+    "uiMemberBadge": "Značka člana",
     "uiProfileCard": "Kartica profila",
     "uiChatCard": "Chat kartice",
     "uiUserMenu": "Korisnički izbornik",
     "uiDialog": "Vlastiti prozor",
-    "uiWebview": "Web sadržaj",
-    "eventsSelf": "Vaš status",
+    "uiWebview": "Web-sadržaj",
+    "eventsSelf": "Tvoj status",
     "eventsVoice": "Glasovna aktivnost",
     "eventsPresence": "Dolasci i odlasci",
     "eventsChatActivity": "Aktivnost u chatu",
@@ -121,7 +121,7 @@
     "randomBytes": "Slučajni brojevi",
     "commands": "Naredbe",
     "chatSend": "Piše u chatu",
-    "chatSupersedes": "Zamjenjuje svoj tekstni redak",
+    "chatSupersedes": "Zamjenjuje vlastiti tekst",
     "chatTriggers": "Okidačke riječi",
     "chatPatterns": "Uzorci u chatu",
     "netHttp": "Pristup internetu",

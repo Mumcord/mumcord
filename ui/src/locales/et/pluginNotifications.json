@@ -3,7 +3,7 @@
   "autoOff": {
     "title": "{{name}} lülitati välja",
     "body": "Välja lülitatud korduvate kokkujooksmiste tõttu",
-    "open": "Näita Pluginates"
+    "open": "Näita jaotises Pluginad"
   },
   "pictureRefused": {
     "title": "{{name}} ei saanud pilti kasutada",
@@ -15,20 +15,20 @@
     "open": "Näita uuendusi"
   },
   "suggestion": {
-    "title": "See server kasutab {{name}}",
+    "title": "See server kasutab pluginat {{name}}",
     "noReason": "Serveri soovitatud",
-    "install": "Installi…",
-    "installLabel": "Installi {{name}}",
+    "install": "Paigalda…",
+    "installLabel": "Paigalda {{name}}",
     "addRepositoryLabel": "Lisa hoidla: {{name}}",
     "details": "Vaata üksikasju",
     "detailsLabel": "Üksikasjad: {{name}}",
     "notNow": "Mitte praegu",
-    "notNowLabel": "Peida {{name}} praegu",
-    "dontAsk": "Ära enam selle serveri kohta küsi",
+    "notNowLabel": "Peida {{name}} praeguseks",
+    "dontAsk": "Ära selle serveri puhul enam küsi",
     "recommended": "Soovitatud",
     "official": "Ametlik",
     "unofficial": "Mitteametlik · {{host}}",
-    "footer": "Soovitused ei installi iial midagi ise. Server ei saa teada, mida sa installid."
+    "footer": "Soovitused ei paigalda kunagi midagi ise. Server ei saa teada, mida sa paigaldad."
   },
   "failed": "See ei õnnestunud. Proovi uuesti."
 }

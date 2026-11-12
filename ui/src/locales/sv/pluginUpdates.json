@@ -1,7 +1,7 @@
 {
   "mode": {
     "legend": "Tilläggsuppdateringar",
-    "info": "Skilt från appens uppdaterare. Mumcord söker efter tilläggsuppdateringar vid start och sedan var 6:e timme.",
+    "info": "Skilt från appens uppdaterare. Mumcord söker efter tilläggsuppdateringar vid start och sedan var 6:e timme medan appen körs.",
     "infoLabel": "Mer information: tilläggsuppdateringar",
     "auto": "Installera automatiskt",
     "notify": "Bara meddela",
@@ -16,14 +16,14 @@
   "review": "Granska och uppdatera",
   "update": "Uppdatera",
   "installFailed": "{{name}} kunde inte uppdateras. Försök igen.",
-  "pins": "Fäst version",
-  "pinsHint": "Ett fäst tillägg stannar på sin nuvarande version och erbjuds inga uppdateringar.",
+  "pins": "Lås version",
+  "pinsHint": "Ett låst tillägg stannar på sin nuvarande version och erbjuds inga uppdateringar.",
   "pin": "Behåll {{name}} på den här versionen",
   "pinVersion": "Version {{version}}",
   "versionsTo": "till",
   "pill": {
     "none": "Inga nya behörigheter",
-    "permission": "Behöver en ny behörighet",
+    "permission": "Ber om fler behörigheter",
     "author": "Ny upphovsperson",
     "websites": "Kommunicerar med nya webbplatser"
   },
@@ -35,7 +35,7 @@
     "remove": "Ta bort"
   },
   "checkNow": "Kontrollera nu",
-  "lastChecked": "Senast kontrollerad kl. {{time}}",
+  "lastChecked": "Senast kontrollerad: {{time}}",
   "checkFailed": "Kontrollen misslyckades. Försök igen.",
   "modeNote": "Tilläggsuppdateringar: {{mode}}. Du kan ändra det nedan.",
   "settings": "Uppdateringsinställningar",
@@ -73,8 +73,8 @@
   "dialog": {
     "title": "Uppdatera {{name}} till {{version}}?",
     "now": "nu {{version}}",
-    "sameKey": "samma upphovsnyckel",
-    "newKey": "ny upphovsnyckel",
+    "sameKey": "samma nyckel från upphovspersonen",
+    "newKey": "ny nyckel från upphovspersonen",
     "newWebsites_one": "Den här uppdateringen vill kommunicera med {{count}} ny webbplats.",
     "newWebsites_other": "Den här uppdateringen vill kommunicera med {{count}} nya webbplatser.",
     "staysOn": "{{name}} stannar på {{version}} tills du bestämmer dig.",
@@ -96,7 +96,7 @@
     "permissionsLabel": "Nya behörigheter",
     "recentChange": "Det räknas också som en nylig ändring: nya behörigheter under de senaste {{versions}} versionerna ger ytterligare +{{recent}} poäng. Tillsammans med +{{permissions}} ovan (× {{multiplier}}) blir det +{{total}}.",
     "highTitle": "Den här uppdateringen skulle ge tillägget hög risk",
-    "highText": "Det installeras inte automatiskt. Om du stannar på {{version}} behålls den nuvarande poängen; du kan fästa versionen under Installerade.",
+    "highText": "Det installeras inte automatiskt. Om du stannar på {{version}} behålls den nuvarande poängen; du kan låsa versionen under Installerade.",
     "highTick": "Jag förstår att risken har ökat och litar fortfarande på upphovspersonen",
     "skipHint": "Om du hoppar över den fungerar {{version}} fortfarande.",
     "skip": "Hoppa över den här versionen",

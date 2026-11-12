@@ -42,10 +42,10 @@
     "chatRequest": "{{name}} quer conversar contigo",
     "messageRequest": "Pedido de mensagem de {{name}}",
     "messageRequestBody_one": "{{count}} mensagem de um cliente Mumble padrão",
-    "messageRequestBody_many": "{{count}} de mensagens de um cliente Mumble padrão",
+    "messageRequestBody_many": "{{count}} mensagens de um cliente Mumble padrão",
     "messageRequestBody_other": "{{count}} mensagens de um cliente Mumble padrão",
     "invite": {
-      "watchParty": "{{name}} convidou-te para uma watch party",
+      "watchParty": "{{name}} convidou-te para uma sessão de visualização",
       "screenShare": "{{name}} está a partilhar o ecrã",
       "card": "{{name}} enviou-te um cartão",
       "theme": "{{name}} partilhou um tema contigo"
@@ -70,14 +70,18 @@
     "block": "Bloquear",
     "update": {
       "title": "O Mumcord {{version}} está pronto",
-      "body": "Reinicie para atualizar",
+      "body": "Reinicia para atualizar",
       "restart": "Reiniciar para atualizar",
       "whatsNew": "Novidades"
     },
     "relay": {
-      "title": "Relay alterado em {{server}}",
-      "body": "A partilha de ecrã e ficheiros está em pausa até confiares no novo relay.",
+      "title": "Retransmissor alterado em {{server}}",
+      "body": "A partilha de ecrã e de ficheiros está em pausa até confiares no novo retransmissor.",
       "decision": "Precisa da tua decisão"
     }
+  },
+  "suppressionFallback": {
+    "title": "Supressão de ruído demasiado lenta",
+    "text": "Demasiado lenta neste computador neste momento. Usa-se «{{standard}}» até conseguir acompanhar."
   }
 }

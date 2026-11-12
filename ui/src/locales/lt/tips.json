@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, patarimų pagalbininkas",
+  "greeting": {
+    "title": "Labas, aš Aaron!",
+    "body": "Aš esu aksolotlis ir Mumcord žinau kaip savo penkis pirštus. Nori trumpos ekskursijos? Ji užtrunka maždaug minutę. Jei ne dabar, mane rasi skiltyje Nustatymai → Apie → Patarimai.",
+    "start": "Parodyk",
+    "later": "Ne dabar"
+  },
+  "progress": "{{current}} patarimas iš {{total}}",
+  "back": "Atgal",
+  "next": "Toliau",
+  "done": "Atlikta",
+  "skip": "Praleisti ekskursiją",
+  "close": "Uždaryti patarimus",
+  "tips": {
+    "servers": {
+      "title": "Tavo serveriai",
+      "body": "Juostoje kairiajame krašte yra tavo serveriai. Pridėk serverį su +, o viešuosius serverius naršyk su didinamuoju stiklu. Vienu metu gali prisijungti prie kelių serverių."
+    },
+    "channels": {
+      "title": "Kanalai",
+      "body": "Dukart spustelėk kanalą, kad prisijungtum ir galėtum kalbėti. Vienas spustelėjimas parodo jo pokalbį neprisijungus, o mygtukas Sekti padės nieko nepraleisti."
+    },
+    "talk": {
+      "title": "Kaip kalbi",
+      "body": "Push-to-talk ar balso aktyvumas? Pasirink skiltyje Nustatymai → Balsas ir garsas arba atverk Balso nustatymai… mažąja rodykle šalia mikrofono. Push-to-talk veikia ir su pelės mygtukais."
+    },
+    "panel": {
+      "title": "Tavo naudotojo skydelis",
+      "body": "Apačioje kairėje nutildai mikrofoną, išjungi garsą, įjungi kamerą arba atsijungi. Šalia esančios mažos rodyklės atveria daugiau parinkčių."
+    },
+    "search": {
+      "title": "Rask bet ką",
+      "body": "Paspausk {{key}} ir rasi žmones bei kanalus net dideliuose serveriuose."
+    },
+    "chat": {
+      "title": "Pokalbis",
+      "body": "Atsakyk į žinutę, cituok ją, paminėk žmones su @ ir bendrink paveikslėlius bei failus. Formatavimo mygtukai atsiranda, kai rašai."
+    },
+    "apps": {
+      "title": "Programos",
+      "body": "Mygtukas Programos žinučių juostoje paleidžia ekrano bendrinimą, bendrą peržiūrą arba tavo kamerą. Papildiniai prideda dar daugiau."
+    },
+    "themes": {
+      "title": "Tavo stilius",
+      "body": "Krumpliaratis apačioje kairėje perjungia tamsią ir šviesią temą. Skiltyje Nustatymai → Išvaizda yra daugiau temų, o serveris gali turėti savo: spustelėk jį dešiniuoju pelės klavišu ir pasirink Tema."
+    },
+    "end": {
+      "title": "Tai viskas!",
+      "body": "Smagiai leisk laiką su Mumcord. Mane bet kada vėl pasikviesi skiltyje Nustatymai → Apie → Patarimai."
+    }
+  }
+}

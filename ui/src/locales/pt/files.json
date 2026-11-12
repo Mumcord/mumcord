@@ -14,7 +14,7 @@
     "unreadable": "Não foi possível ler {{path}}",
     "serverRefused": "O servidor recusou a mensagem: {{reason}}",
     "trayLabel": "Ficheiros para partilhar",
-    "chipPeerToPeer": "{{size}} · peer-to-peer",
+    "chipPeerToPeer": "{{size}} · ponto a ponto",
     "zipping": "A comprimir a pasta… {{percent}} %",
     "checking": "A verificar…",
     "checkingPercent": "A verificar… {{percent}} %",
@@ -58,7 +58,7 @@
     "progressLabel": "A descarregar {{name}}",
     "progressValue": "{{percent}} %",
     "progress": "{{percent}} % · {{received}} de {{size}} · {{speed}} · faltam cerca de {{left}}",
-    "transport": "Peer-to-peer · encriptado de ponta a ponta",
+    "transport": "Ponto a ponto · cifrado de ponta a ponta",
     "checking": "A verificar…",
     "done": "✓ Descarregado",
     "matches": "✓ Corresponde à oferta",
@@ -74,8 +74,8 @@
     "noSpace": "Espaço em disco insuficiente em {{folder}}",
     "reason": {
       "noAnswer": "{{sender}} não respondeu",
-      "connect": "Não foi possível ligar através do relay: {{reason}}",
-      "connectUnknown": "Não foi possível ligar através do relay",
+      "connect": "Não foi possível ligar através do retransmissor: {{reason}}",
+      "connectUnknown": "Não foi possível ligar através do retransmissor",
       "stalled": "A transferência ficou parada",
       "connectionLost": "A ligação foi perdida"
     },
@@ -106,11 +106,11 @@
   "sender": {
     "downloadedBy": "Descarregado por {{names}}",
     "inProgress_one": "{{count}} transferência em curso · {{details}}",
-    "inProgress_many": "{{count}} downloads in progress · {{details}}",
+    "inProgress_many": "{{count}} transferências em curso · {{details}}",
     "inProgress_other": "{{count}} transferências em curso · {{details}}",
     "sendingTo": "A enviar para {{name}} · {{percent}} %",
     "waiting_one": "{{count}} em espera",
-    "waiting_many": "{{count}} waiting",
+    "waiting_many": "{{count}} em espera",
     "waiting_other": "{{count}} em espera",
     "sharing": "Partilhado enquanto estiveres online · termina {{when}}",
     "stop": "Parar de partilhar",
@@ -132,7 +132,7 @@
     "cancel": "Cancelar",
     "riskyTitle": "Este ficheiro pode prejudicar o teu computador",
     "riskyFile": "{{name}} · {{size}} · de {{sender}}",
-    "riskyBody": "Isto é um programa. Os programas podem alterar o teu computador e ler os teus ficheiros. Só o descarregues se confiares em {{sender}} e estavas à espera deste ficheiro.",
+    "riskyBody": "Isto é um programa. Os programas podem alterar o teu computador e ler os teus ficheiros. Só o descarregues se confiares em {{sender}} e estiveres à espera deste ficheiro.",
     "riskyNote": "O Mumcord verifica se o ficheiro chega inalterado, mas não consegue saber se é seguro.",
     "riskyConfirm": "Descarregar mesmo assim",
     "riskyCancel": "Não descarregar",
@@ -152,7 +152,7 @@
     "size2gb": "2 GB",
     "saveTo": "Guardar ficheiros em",
     "change": "Alterar…",
-    "relayNote": "Os ficheiros passam sempre pelo relay do servidor, por isso ninguém vê o teu endereço IP. Os servidores sem relay não podem partilhar ficheiros. Nada é descarregado sem o teu clique e confirmação.",
-    "encryptionNote": "Os ficheiros são encriptados de ponta a ponta e verificados após a transferência."
+    "relayNote": "Os ficheiros passam sempre pelo retransmissor do servidor, por isso ninguém vê o teu endereço IP. Os servidores sem retransmissor não podem partilhar ficheiros. Nada é descarregado sem o teu clique e confirmação.",
+    "encryptionNote": "Os ficheiros são cifrados de ponta a ponta e verificados após a transferência."
   }
 }

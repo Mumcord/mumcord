@@ -18,6 +18,13 @@ pub enum Error {
     Settings(#[from] serde_json::Error),
     #[error("secure storage error: {0}")]
     SecureStorage(#[from] keyring::Error),
+    /// The encrypted secret file (FreeBSD, where most installs have no Secret Service).
+    #[cfg(target_os = "freebsd")]
+    #[error("secret file error: {0}")]
+    SecretFile(std::io::Error),
+    #[cfg(target_os = "freebsd")]
+    #[error("secret file could not be opened: {0}")]
+    SecretVault(String),
     #[error("secure storage holds an incomplete identity")]
     CorruptStoredIdentity,
     #[error("secure storage could not be read earlier; restart the app to try again")]

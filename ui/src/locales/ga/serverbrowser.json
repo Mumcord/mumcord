@@ -2,7 +2,7 @@
   "title": "Freastalaithe poiblí",
   "loading": "An liosta á lódáil…",
   "subtitle": "Lódáilte mar gur oscail tú an leathanach seo · {{shown}} as {{total}} á dtaispeáint",
-  "search": "Cuardaigh de réir ainm, seoladh nó tír",
+  "search": "Cuardaigh de réir ainm, seolta nó tíre",
   "refresh": "Athnuaigh",
   "retry": "Bain triail eile as",
   "loadFailed": "Níorbh fhéidir liosta na bhfreastalaithe poiblí a lódáil. Seiceáil do cheangal idirlín agus bain triail eile as.",
@@ -15,8 +15,8 @@
     "ping": "Ping",
     "anyPing": "Ping ar bith",
     "pingBelow": "Faoi {{ms}} ms",
-    "hideEmpty": "Folaigh folamh",
-    "hideFull": "Folaigh lán"
+    "hideEmpty": "Folaigh folmha",
+    "hideFull": "Folaigh lána"
   },
   "sortedBy": "Sórtáil: {{column}}",
   "columns": {
@@ -38,11 +38,11 @@
   "connect": "Ceangail",
   "connectTo": "Ceangail le {{server}}",
   "favourite": "Ceanán",
-  "favouriteServer": "Cuir {{server}} le do fhreastalaithe",
+  "favouriteServer": "Cuir {{server}} le d’fhreastalaithe",
   "saved": "Sábháilte",
-  "savedAs": "Tá {{server}} i measc do fhreastalaithe",
+  "savedAs": "Tá {{server}} i measc d’fhreastalaithe",
   "announce": {
-    "saved": "Cuireadh {{server}} le do fhreastalaithe"
+    "saved": "Cuireadh {{server}} le d’fhreastalaithe"
   },
   "note": "Ní chuirtear ping ach chuig na sraitheanna atá le feiceáil, cúpla ceann ag an am. Ní sheoltar aon rud eile chuig freastalaí go dtí go gceanglaíonn tú."
 }

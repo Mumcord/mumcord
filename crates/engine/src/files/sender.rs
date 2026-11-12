@@ -500,12 +500,13 @@ impl Engine {
         let step = {
             let mut sender = lock(&self.file_sharing().sender);
             match msg {
-                FileMessage::Request { id } => {
+                FileMessage::Request { id, fmt } => {
                     let active = sender
                         .shares
                         .get(id)
                         .is_some_and(|s| s.server_id == server_id);
-                    sender.queue.request(id, requester, false, active)
+                    let format = super::transfer::stream_format(*fmt);
+                    sender.queue.request(id, requester, format, false, active)
                 }
                 FileMessage::Cancel { id } => sender.queue.cancel(id, requester),
                 _ => return,
@@ -519,6 +520,7 @@ impl Engine {
         let step = lock(&self.file_sharing().sender).queue.request(
             id,
             Requester { server_id, session },
+            1,
             true,
             false,
         );
@@ -596,7 +598,7 @@ impl Engine {
                     // No `go` for a share that just ended; ending it answers `gone` instead.
                     step.send.retain(|o| {
                         !(o.to == start.requester
-                            && matches!(&o.message, FileMessage::Go { id } if *id == start.share_id))
+                            && matches!(&o.message, FileMessage::Go { id, .. } if *id == start.share_id))
                     });
                     if let Some(Err(e)) = changed {
                         ended.push(e);
@@ -649,7 +651,7 @@ impl Engine {
             {
                 tracing::debug!(error = %e, "file message not sent");
             }
-            if let FileMessage::Queued { id, .. } | FileMessage::Go { id } = &out.message {
+            if let FileMessage::Queued { id, .. } | FileMessage::Go { id, .. } = &out.message {
                 self.emit_own_card(out.to.server_id, id);
             }
         }
@@ -674,6 +676,7 @@ impl Engine {
                         &share.id,
                         &share.path,
                         size,
+                        request.format,
                         move |sent| {
                             progress_engine.transfer_progress(&progress_request, sent, size)
                         },
@@ -861,7 +864,14 @@ mod tests {
         let id = share.id.clone();
         lock(&engine.files().sender).shares.insert(share);
         std::fs::write(&path, b"abcd").expect("changed");
-        engine.files_on_request(1, 7, &FileMessage::Request { id: id.clone() });
+        engine.files_on_request(
+            1,
+            7,
+            &FileMessage::Request {
+                id: id.clone(),
+                fmt: 1,
+            },
+        );
         let view = engine.own_share_view(&id);
         assert_eq!(view.ended, Some(Some(EndReason::FileChanged)));
         assert!(lock(&engine.files().sender).queue.running().is_none());
@@ -875,9 +885,23 @@ mod tests {
         let share = share_of(&path, false);
         let id = share.id.clone();
         lock(&engine.files().sender).shares.insert(share);
-        engine.files_on_request(2, 7, &FileMessage::Request { id: id.clone() });
+        engine.files_on_request(
+            2,
+            7,
+            &FileMessage::Request {
+                id: id.clone(),
+                fmt: 1,
+            },
+        );
         assert!(lock(&engine.files().sender).queue.running().is_none());
-        engine.files_on_request(1, 7, &FileMessage::Request { id: id.clone() });
+        engine.files_on_request(
+            1,
+            7,
+            &FileMessage::Request {
+                id: id.clone(),
+                fmt: 1,
+            },
+        );
         assert!(
             lock(&engine.files().sender).queue.running().is_some(),
             "the transfer starts"

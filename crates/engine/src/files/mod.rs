@@ -137,7 +137,7 @@ impl FileSharing {
 
     /// A blocked person's request is refused silently with `gone` (FR-7.18).
     pub(crate) fn on_blocked_data(&self, ctx: &SessionCtx, data: &PluginData) {
-        if let Some((sender, FileMessage::Request { id })) = decode(ctx, data)
+        if let Some((sender, FileMessage::Request { id, .. })) = decode(ctx, data)
             && let Some(engine) = self.engine()
         {
             engine.files_refuse_blocked(ctx.server_id, sender, &id);

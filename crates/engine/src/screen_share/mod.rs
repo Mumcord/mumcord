@@ -20,7 +20,7 @@ pub mod capture_macos;
 pub mod capture_wayland;
 #[cfg(windows)]
 pub mod capture_windows;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 pub mod capture_x11;
 mod convert;
 pub(crate) mod encoder;
@@ -137,6 +137,8 @@ pub struct ScreenShareView {
     pub blocked: Option<WatchBlock>,
     /// What the sharer picked, when the platform can tell (issue #163).
     pub kind: Option<ShareKind>,
+    /// The picked window's title, only for the own share (issue #558); never sent anywhere.
+    pub title: Option<String>,
     /// How long the share has been running (issue #163): the own one from its start, another's
     /// from the time their signal arrived, so no clock of another machine is trusted.
     pub elapsed_ms: u32,
@@ -833,6 +835,7 @@ impl Engine {
             let mut own = OwnShare::new(sound, sound_status);
             own.sound_status.log(own.sound);
             own.kind = source.kind();
+            own.title = source.title();
             let media = media::Media::start(
                 source,
                 selection.prefs,

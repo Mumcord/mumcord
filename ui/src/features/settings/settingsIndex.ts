@@ -344,6 +344,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
     section: "privacy",
     group: "activityHistory.title",
+    control: "activityHistory.keep",
+    terms: ["activityHistory.keepHint"],
+  },
+  {
+    section: "privacy",
+    group: "activityHistory.title",
     control: "activityHistory.button",
     terms: ["activityHistory.clear", "activityHistory.hint", "activityHistory.local"],
   },
@@ -463,9 +469,16 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   {
     section: "chatNotifications",
     group: "notifications.title",
-    control: "notifications.legend",
-    terms: ["searchTerms.notifications", "notifications.explanation"],
+    control: "notifications.messages",
+    terms: ["searchTerms.notifications", "notifications.explanation", "notifications.modesHint"],
   },
+  ...(["screenShare", "watchParty", "pluginActivity", "pluginEvent", "joins"] as const).map(
+    (kind) => ({
+      section: "chatNotifications" as const,
+      group: "notifications.title",
+      control: `notifications.activity.${kind}`,
+    }),
+  ),
   {
     section: "gaming",
     group: "overlay.inGame.title",
@@ -567,10 +580,29 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   },
   { section: "plugins", group: "pluginSounds.title", control: "pluginSounds.mute" },
   { section: "advanced", group: "diagnostics.title", control: "diagnostics.logLevel" },
+  { section: "advanced", group: "diagnostics.title", control: "diagnostics.writeToDisk" },
   {
     section: "advanced",
     group: "diagnostics.title",
     terms: ["diagnostics.file", "diagnostics.fileHint"],
+  },
+  {
+    section: "advanced",
+    group: "diskWrites.title",
+    control: "diskWrites.durableSaves",
+    terms: ["diskWrites.durableSavesHint", "diskWrites.hint"],
+  },
+  {
+    section: "advanced",
+    group: "diskWrites.title",
+    control: "diskWrites.linkPreviewsOnDisk",
+    terms: ["diskWrites.linkPreviewsOnDiskHint"],
+  },
+  {
+    section: "advanced",
+    group: "diskWrites.title",
+    control: "diskWrites.pluginRegistryCache",
+    terms: ["diskWrites.pluginRegistryCacheHint"],
   },
   {
     section: "general",
@@ -604,6 +636,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     group: "about.setup",
     control: "about.setupWizardRun",
     terms: ["about.setupWizardHint"],
+  },
+  {
+    section: "about",
+    group: "about.tipsTitle",
+    control: "about.tipsShow",
+    terms: ["about.tipsHint"],
   },
   {
     section: "advanced",

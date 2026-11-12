@@ -16,6 +16,16 @@ use super::{
 };
 use crate::verify::{RegistryKeys, check_sequence};
 
+/// The offline cache for a path, or a no-op cache when the user turned it off
+/// (spec 12 FR-12.11).
+fn cache(dir: &Path, name: &'static str, enabled: bool) -> Cache {
+    if enabled {
+        Cache::new(dir, name)
+    } else {
+        Cache::disabled(dir, name)
+    }
+}
+
 /// Where a loaded list came from.
 #[derive(Debug)]
 pub enum Freshness {
@@ -121,12 +131,14 @@ pub async fn fetch_official(
     cache_dir: &Path,
     base: &Url,
     last_seen: Option<u64>,
+    cache_enabled: bool,
 ) -> Result<Loaded, RegistryError> {
     fetch_official_with(
         client,
         cache_dir,
         base,
         last_seen,
+        cache_enabled,
         &RegistryKeys::official(),
     )
     .await
@@ -137,13 +149,18 @@ pub(super) async fn fetch_official_with(
     cache_dir: &Path,
     base: &Url,
     last_seen: Option<u64>,
+    cache_enabled: bool,
     keys: &RegistryKeys,
 ) -> Result<Loaded, RegistryError> {
     let added = base
         .join(INDEX_FILE)
         .map_err(|_| RegistryError::InvalidUrl)?;
     let sibling = v1_1_sibling(&added, INDEX_FILE);
-    let cache = Cache::new(&path_cache_dir(cache_dir, sibling.is_some()), INDEX_FILE);
+    let cache = cache(
+        &path_cache_dir(cache_dir, sibling.is_some()),
+        INDEX_FILE,
+        cache_enabled,
+    );
     let url = sibling.unwrap_or(added);
     let verify = |bytes: &[u8], signature: &str| {
         keys.verify(bytes, signature)?;
@@ -173,20 +190,29 @@ pub async fn fetch_revoked(
     client: &Client,
     cache_dir: &Path,
     base: &Url,
+    cache_enabled: bool,
 ) -> Result<RevokedLoaded, RegistryError> {
-    fetch_revoked_with(client, cache_dir, base, &RegistryKeys::official()).await
+    fetch_revoked_with(
+        client,
+        cache_dir,
+        base,
+        cache_enabled,
+        &RegistryKeys::official(),
+    )
+    .await
 }
 
 pub(super) async fn fetch_revoked_with(
     client: &Client,
     cache_dir: &Path,
     base: &Url,
+    cache_enabled: bool,
     keys: &RegistryKeys,
 ) -> Result<RevokedLoaded, RegistryError> {
     let url = base
         .join(REVOKED_FILE)
         .map_err(|_| RegistryError::InvalidUrl)?;
-    let cache = Cache::new(cache_dir, REVOKED_FILE);
+    let cache = cache(cache_dir, REVOKED_FILE, cache_enabled);
     let verify = |bytes: &[u8], signature: &str| {
         keys.verify(bytes, signature)?;
         RevocationList::parse(bytes)

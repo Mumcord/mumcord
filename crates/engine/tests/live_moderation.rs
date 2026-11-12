@@ -1,7 +1,8 @@
 //! Server-side mute, deafen and suppression of other people reach the UI's user view, against
 //! the local test server with a SuperUser bot as the admin. `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_moderation -- --ignored --test-threads=1`
-#![cfg(feature = "test-backend")]
+// FreeBSD: see the note on the mumbot dev-dependency in Cargo.toml.
+#![cfg(all(feature = "test-backend", not(target_os = "freebsd")))]
 
 mod common;
 

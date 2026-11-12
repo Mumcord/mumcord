@@ -1,7 +1,7 @@
 {
   "heading": "Bővítmények",
   "list": "Bővítménypanelek",
-  "expand": "{{name}} nagyítása",
+  "expand": "{{name}} kibontása",
   "close": "Bezárás",
   "unsupported": "Ez a szerver nem támogatja a közös bővítményfunkciókat"
 }

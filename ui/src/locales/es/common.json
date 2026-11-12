@@ -20,7 +20,7 @@
   "floatingWidget": {
     "collapse": "Contraer",
     "expand": "Expandir",
-    "handle": "{{name}}: las flechas mueven, Mayúsculas+flechas cambian el tamaño"
+    "handle": "{{name}}: las flechas mueven, Mayús+flechas cambian el tamaño"
   },
   "latency": {
     "summary": "≈ {{total}} ms de la boca al oído (estimación)",
@@ -44,18 +44,18 @@
     "watching": "Viendo",
     "open": "Abrir",
     "next": "Siguiente",
-    "seek": "Buscar",
+    "seek": "Posición",
     "volume": "Volumen",
-    "syncedPlay": "Sincronizado",
+    "syncedPlay": "Reproducción sincronizada",
     "keys": "Espacio · ← → · M · F · Esc",
     "inControl": "{{name}} tiene el control",
     "inSync": "Sincronizado",
     "inSyncAll": "Todos sincronizados",
     "inSyncExcept": "Todos sincronizados excepto {{count}}",
-    "buffering": "Memorizando",
-    "behind": "{{seconds}} s detrás",
-    "ahead": "{{seconds}} s delante",
-    "noReport": "Sin informe",
+    "buffering": "Cargando",
+    "behind": "{{seconds}} s de retraso",
+    "ahead": "{{seconds}} s de adelanto",
+    "noReport": "Sin datos todavía",
     "you": "tú",
     "host": "Anfitrión",
     "fullscreen": "Pantalla completa",

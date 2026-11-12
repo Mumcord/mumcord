@@ -675,6 +675,8 @@ mod tests {
         let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../ui/src/locales");
         let folders = std::fs::read_dir(dir)
             .expect("locales folder exists")
+            // GLOSSARY.md lives next to the language folders.
+            .filter(|entry| entry.as_ref().is_ok_and(|e| e.path().is_dir()))
             .count();
         assert_eq!(
             folders,

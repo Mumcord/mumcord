@@ -9,7 +9,7 @@
     "denied": "Server ti nedovoľuje sledovať tento kanál.",
     "limit": "Na tomto serveri už nemôžeš sledovať ďalšie kanály. Najprv prestaň sledovať iný kanál.",
     "tooOld": "Tento server je na sledovanie kanálov príliš starý (vyžaduje sa verzia 1.4 alebo novšia).",
-    "notConnected": "Nie si pripojený k serveru.",
+    "notConnected": "Nemáš pripojenie k serveru.",
     "generic": "Sledovanie kanála sa nepodarilo. Skús to znova."
   },
   "dm": {

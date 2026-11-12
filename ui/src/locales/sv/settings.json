@@ -28,9 +28,9 @@
     "privacy": "Hur du ansluter till andra och vad Mumcord läser in utifrån.",
     "appearance": "Tema, layout och kanallistan.",
     "servers": "Anslutningar till flera servrar och inställningar per server.",
-    "gaming": "Överlägget i spel, positionsljud och spelinsticksmoduler.",
+    "gaming": "Överlägget i spel, positionsljud och speltillägg.",
     "advanced": "Utvecklarverktyg, diagnostik, lagring och licenser.",
-    "about": "Version, support och installationsguiden.",
+    "about": "Version, support och konfigurationsguiden.",
     "plugins": "Tillägg körs i en sandlåda och får bara det du tillåter. De ser aldrig ditt ljud, dina filer eller ditt certifikat.",
     "screenSharing": "Kvalitet, kodek och hårdvara för att dela din skärm. Tittarna ser alltid det du väljer innan du börjar.",
     "camera": "Din kamera, bakgrundseffekter och hur du ser andras kameror. Kameradelning kräver en server med mumpeer-relä."
@@ -149,7 +149,7 @@
     "testRecording": "Spelar in… prata nu.",
     "testPlaying": "Spelar upp din röst…",
     "musicQuality": "Musikkvalitet",
-    "musicQualityHint": "Använder mer bandbredd och stänger av brusreducering och automatisk volym, för musik. Push-to-talk fungerar bäst.",
+    "musicQualityHint": "Anpassar kodaren för musik och stänger av brusreducering och automatisk volym. För musik fungerar Push-to-talk bäst.",
     "bitrate": "Bithastighet",
     "bitrateMax": "Max",
     "bitrateValue": "{{kbps}} kbit/s",
@@ -166,7 +166,7 @@
     "lowLatencyBandwidth": "Använder mer bandbredd (10 ms-paket).",
     "lowLatencyWifi": "Kan hacka på wifi eller en hårt belastad anslutning; använd kabel om du kan.",
     "lowLatencyHeadphones": "Använd hörlurar: ekoreducering är avstängd (brusreducering och automatisk volym är också avstängda).",
-    "lowLatencyPtt": "Tryck-och-prata eller en manuell tröskel för röstaktivering rekommenderas."
+    "lowLatencyPtt": "Push-to-talk eller en manuell tröskel för röstaktivering rekommenderas."
   },
   "voice": {
     "talkMode": "Pratläge",
@@ -215,25 +215,25 @@
     "connectMuted": "Anslut med avstängd mikrofon tills jag går med i en kanal",
     "connectMutedHint": "När det är av ansluter du direkt med din senaste inställning för mikrofon och ljud i stället för att bara lyssna.",
     "autoGainHint": "Håller din röst på jämn nivå.",
-    "keyListeningMouse": "Tryck på en tangent eller en musknapp (mitten eller sida)… (Escape för att avbryta)",
+    "keyListeningMouse": "Tryck på en tangent eller en musknapp (mittenknapp eller sidoknapp)… (Escape för att avbryta)",
     "mouse": {
       "middle": "Mittersta musknappen",
       "back": "Musknapp 4 (bakåt)",
       "forward": "Musknapp 5 (framåt)"
     },
     "mouseToggle": "Tillåt musknappar (kräver gruppen input)",
-    "mouseToggleWarning": "Låter dig använda en musknapp för push-to-talk. För det måste du vara med i gruppen \"input\", som låter alla program du kör läsa alla inmatningsenheter, även ditt tangentbord. Mumcord öppnar själv bara möss, bevakar bara din push-to-talk-knapp och spelar eller loggar aldrig något.",
-    "mouseInputGroup": "Mumcord får kanske inte läsa din mus än. Lägg till dig själv i gruppen \"input\" genom att köra det här kommandot i en terminal:",
+    "mouseToggleWarning": "Låter dig använda en musknapp för Push-to-talk. För det måste du vara med i gruppen ”input”, som låter alla program du kör läsa alla inmatningsenheter, även ditt tangentbord. Mumcord öppnar själv bara möss, bevakar bara din Push-to-talk-knapp och spelar aldrig in eller loggar något.",
+    "mouseInputGroup": "Mumcord får kanske inte läsa din mus än. Lägg till dig själv i gruppen ”input” genom att köra det här kommandot i en terminal:",
     "mouseLogOut": "Logga sedan ut och in igen. Tills dess kan du använda en tangentbordstangent eller röstaktivering.",
     "mouseNoDevice": "Ingen mus hittades. Anslut en, så känner Mumcord av den automatiskt.",
     "mouseAccessibility": "För att använda musknappar, tillåt Mumcord under Systeminställningar → Integritet och säkerhet → Hjälpmedel och starta sedan om Mumcord.",
     "compatMode": "Kompatibilitetsläge (X11)",
-    "compatModeHint": "Mumcord körs via skrivbordets X11-kompatibilitetslager, så push-to-talk fungerar utan skrivbordsdialog och utan gruppen \"input\". Ditt skrivbord avgör vad Mumcord får se: i KDE under Systeminställningar → Stöd för äldre X11-appar. Som standard fungerar bara tangentkombinationer och modifierartangenter, och musknappar bara om du tillåter dem där. Detta är mindre isolerat än det moderna sättet.",
+    "compatModeHint": "Mumcord körs via skrivbordets X11-kompatibilitetslager, så Push-to-talk fungerar utan skrivbordsdialog och utan gruppen ”input”. Ditt skrivbord avgör vad Mumcord får se: i KDE under Systeminställningar → Stöd för äldre X11-appar. Som standard fungerar bara tangentkombinationer och modifierartangenter, och musknappar bara om du tillåter dem där. Detta är mindre isolerat än det moderna sättet.",
     "compatRestartNeeded": "Träder i kraft när Mumcord startar om. Du kopplas från en kort stund.",
     "compatRestart": "Starta om nu",
     "compatRestartFailed": "Mumcord kunde inte startas om. Stäng och öppna det själv.",
-    "compatKdeHint": "Musknappar för push-to-talk fungerar bara medan Mumcord ligger i bakgrunden om KDE tillåter dem för X11-appar.",
-    "compatKdeAllowed": "KDE tillåter redan musknappar för X11-appar, så push-to-talk-musknappen fungerar även i bakgrunden.",
+    "compatKdeHint": "Musknappar för Push-to-talk fungerar bara medan Mumcord ligger i bakgrunden om KDE tillåter dem för X11-appar.",
+    "compatKdeAllowed": "KDE tillåter redan musknappar för X11-appar, så Push-to-talk-musknappen fungerar även i bakgrunden.",
     "compatKdeAllow": "Tillåt musknappar",
     "compatKdeUndo": "Ångra",
     "compatKdeRestart": "Klart. Starta om Mumcord för att det ska börja gälla.",
@@ -243,7 +243,7 @@
     "compatKdeChangeFailed": "Mumcord kunde inte ändra KDE-inställningen. Använd ”Öppna KDE:s X11-inställningar” i stället.",
     "compatKdeOpen": "Öppna KDE:s X11-inställningar",
     "compatKdeFailed": "Mumcord kunde inte öppna KDE-inställningarna. Öppna Systeminställningar → Stöd för äldre X11-appar själv.",
-    "compatActive": "Kompatibilitetsläget är på: push-to-talk använder X11-sättet. Tangenter fungerar utan skrivbordsdialog, och musknappar fungerar om skrivbordets inställning för äldre X11 tillåter dem.",
+    "compatActive": "Kompatibilitetsläget är på: Push-to-talk använder X11-sättet. Tangenter fungerar utan skrivbordsdialog, och musknappar fungerar om skrivbordets inställning för äldre X11 tillåter dem.",
     "sensitivityLegend": "Känslighet för röstaktivering",
     "automatic": "Automatisk – känner av din röst",
     "manual": "Manuell tröskel – skickar över en nivå du anger",
@@ -280,12 +280,12 @@
       "summaryChannelTree": "Kanal och underkanaler · rop",
       "hotkey": "Håll ner för att prata:",
       "keyNotSet": "Inte angiven",
-      "keySet": "Ange tangent",
+      "keySet": "Välj tangent",
       "keyChange": "Ändra",
       "keyListening": "Tryck på en tangent…",
       "keyRemove": "Ta bort tangent",
-      "keyTaken": "Den här tangenten kan inte användas: den är inte en enskild tangent med valfria modifierare, eller så är den redan push-to-talk eller ett annat måls tangent.",
-      "keyFailed": "Tangenten hålls av en annan app och fungerar därför inte just nu.",
+      "keyTaken": "Den här tangenten kan inte användas: den är inte en enskild tangent med valfria modifierare, eller så är den redan Push-to-talk eller ett annat måls tangent.",
+      "keyFailed": "Tangenten används redan av en annan app och fungerar därför inte just nu.",
       "keysWayland": "Viskningstangenter är inte tillgängliga i den här Wayland-sessionen: ditt skrivbord erbjuder inga globala kortkommandon. Slå på kompatibilitetsläget för att använda dem, eller börja viska från användarpanelen.",
       "save": "Spara",
       "delete": "Ta bort mål",
@@ -313,14 +313,14 @@
   },
   "fullImages": {
     "offer": "Erbjud mina bilder i full storlek",
-    "offerHint": "Andra Mumcord-användare kan öppna mina bilder i full storlek. Av: bara den lilla förhandsvisningen skickas, ingen original sparas och inget delas.",
+    "offerHint": "Andra Mumcord-användare kan öppna mina bilder i full storlek. Av: bara den lilla förhandsvisningen skickas, inget original sparas och inget delas.",
     "load": "Läs in bilder i full storlek från andra",
     "loadHint": "Öppna bilder från andra Mumcord-användare i full storlek. Av: bara förhandsvisningen visas och originalet begärs aldrig."
   },
   "historySharing": {
     "title": "Historiksynkning",
     "switch": "Dela min kanalhistorik",
-    "hint": "Andra Mumcord-användare som går med i eller följer en kanal kan hämta dess meddelanden från din sparade historik (upp till 7 dagar, bara från före de gick med). Privata chattar delas aldrig."
+    "hint": "Andra Mumcord-användare som går med i eller följer en kanal kan hämta dess meddelanden från din sparade historik (upp till 7 dagar, bara från tiden innan de gick med). Privata chattar delas aldrig."
   },
   "appearance": {
     "messageDisplay": "Meddelandevisning",
@@ -404,7 +404,7 @@
     "keyboardHintsHint": "Korta tips på skärmen som ”Piltangenter: flytta” under kanallistan och i GIF-favoriterna. Skärmläsare läser dem fortfarande upp när det här är av.",
     "announcements": "Skärmläsarmeddelanden",
     "announcementsHint": "Din skärmläsare läser upp händelser som att personer går med, lämnar eller börjar prata.",
-    "skipLinks": "Hoppa-länkar",
+    "skipLinks": "Hopplänkar",
     "skipLinksHint": "Länkar i början av fönstret som hoppar direkt till chatten eller kanallistan när du trycker på Tab."
   },
   "language": {
@@ -420,7 +420,7 @@
     "theme": "Ljudtema",
     "themeClassic": "Klassiskt",
     "themeRich": "Fylligt",
-    "preview": "Lyssna",
+    "preview": "Provlyssna",
     "previewHint": "Fylligt har fylligare ljud, Klassiskt korta, enkla toner. Provlyssningen hörs medan du är i en röstkanal.",
     "joinLeave": "Någon går med i eller lämnar din kanal",
     "voiceJoin": "Du går med i en kanal för röst",
@@ -432,11 +432,11 @@
     "kicked": "Du blir utsparkad från en server",
     "banned": "Du blir bannlyst från en server",
     "messages": "Nytt meddelande i en följd kanal eller privat chatt",
-    "mention": "Ljud vid omnämning",
-    "mentionNotify": "Avisera vid omnämning",
-    "partyStarted": "Någon startar en watch party i din kanal",
-    "partyJoined": "Någon går med i din watch party",
-    "partyLeft": "Någon lämnar din watch party",
+    "mention": "Ljud när du nämns",
+    "mentionNotify": "Avisera när du nämns",
+    "partyStarted": "Någon startar ett watch party i din kanal",
+    "partyJoined": "Någon går med i ditt watch party",
+    "partyLeft": "Någon lämnar ditt watch party",
     "shareStarted": "Någon börjar dela skärm i din kanal",
     "shareStopped": "En skärmdelning i din kanal avslutas",
     "viewerStarted": "Någon börjar titta på din skärmdelning",
@@ -444,18 +444,22 @@
   },
   "notifications": {
     "title": "Aviseringar",
-    "legend": "Aviseringar för nya meddelanden",
-    "explanation": "För nya meddelanden i din kanal, följda kanaler och privata chattar, utom chatten du tittar på.",
-    "inApp": "I appen: en liten pop-up i Mumcord när det är i förgrunden",
-    "desktop": "Skrivbord: en systemavisering",
-    "both": "Båda: pop-up när Mumcord är i förgrunden, annars systemavisering",
-    "off": "Av",
+    "explanation": "Hur Mumcord meddelar dig om nya meddelanden och vad som händer på dina servrar. Varje sort har sitt eget val.",
+    "messages": "Nya meddelanden",
+    "messagesHint": "Din kanal, följda kanaler och privata chattar",
+    "mode": {
+      "off": "Av",
+      "inApp": "I appen",
+      "desktop": "System",
+      "both": "Båda"
+    },
+    "modesHint": "I appen: en liten popup-ruta i Mumcord när det är i förgrunden. System: en avisering från ditt operativsystem. Båda: popup-rutan när Mumcord är i förgrunden, annars en systemavisering. Inget visas för chatten du tittar på eller under Stör ej.",
     "activityTitle": "Aktivitetsaviseringar",
     "activity": {
       "screenShare": "Någon startar en skärmdelning",
-      "watchParty": "Någon startar en watch party",
-      "pluginActivity": "Någon startar en plugin-aktivitet",
-      "pluginEvent": "Plugin-händelser",
+      "watchParty": "Någon startar ett watch party",
+      "pluginActivity": "Någon startar en tilläggsaktivitet",
+      "pluginEvent": "Tilläggshändelser",
       "joins": "Någon ansluter, lämnar eller byter kanal"
     }
   },
@@ -470,12 +474,12 @@
     },
     "opacity": "Opacitet",
     "inGame": {
-      "title": "Overlay i spel",
+      "title": "Överlägg i spel",
       "explanation": "Visar vem som pratar i dina spel. Den startar av sig själv när ett spel startar och visas bara i spel.",
-      "mode": "Overlay i spel",
+      "mode": "Överlägg i spel",
       "off": "Av",
       "on": "På",
-      "antiCheat": "Vissa spel med anti-cheat-skydd ser alla overlayer som fusk och kan banna kontot. Dessa spel är av som standard, även när det här är På.",
+      "antiCheat": "Vissa spel med anti-cheat-skydd ser alla överlägg som fusk och kan bannlysa kontot. Dessa spel är av som standard, även när det här är På.",
       "games": "Spel",
       "noGames": "Inga spel kända än. Spel dyker upp här när de upptäcks.",
       "running": "Körs nu",
@@ -486,9 +490,9 @@
       "options": "Alternativ för {{game}}",
       "reset": "Använd standard för {{game}}",
       "size": "Storlek",
-      "unsupported": "Overlay i spel är inte tillgänglig på det här systemet. Fönsteroverlayen ovan används i stället.",
-      "loadFailed": "Inställningarna för overlay i spel kunde inte läsas in.",
-      "saveFailed": "Ändringen av overlay i spel kunde inte tillämpas.",
+      "unsupported": "Överlägget i spel är inte tillgängligt på det här systemet.",
+      "loadFailed": "Inställningarna för överlägget i spel kunde inte läsas in.",
+      "saveFailed": "Ändringen av överlägget i spel kunde inte tillämpas.",
       "opengl": {
         "title": "OpenGL-spel",
         "explanation": "Behövs bara för OpenGL-spel: klistra in i spelets startalternativ i Steam.",
@@ -497,13 +501,13 @@
         "copied": "Kopierat",
         "copyFailed": "Kopieringen misslyckades. Markera texten och kopiera den för hand."
       },
-      "confirmTitle": "Slå på overlayen för {{game}}?",
-      "confirmMessage": "Varning: {{game}} använder anti-cheat-skydd ({{reason}}). Overlayer kan upptäckas som fusk och ditt konto kan bli bannat. Mumcord ansvarar inte för det. Fortsätt bara om du accepterar risken.",
+      "confirmTitle": "Slå på överlägget för {{game}}?",
+      "confirmMessage": "Varning: {{game}} använder anti-cheat-skydd ({{reason}}). Överlägg kan upptäckas som fusk och ditt konto kan bli bannlyst. Mumcord ansvarar inte för det. Fortsätt bara om du accepterar risken.",
       "confirmEnable": "Slå på ändå",
       "limits": {
-        "libraryMissing": "Overlay i spel är inte tillgänglig: dess overlaybibliotek (libmumcord_overlay_layer.so) hittades inte bredvid Mumcord. Installera om Mumcord för att återställa det. Fönsteroverlayen ovan används i stället.",
+        "libraryMissing": "Överlägget i spel är inte tillgängligt: dess bibliotek (libmumcord_overlay_layer.so) hittades inte bredvid Mumcord. Installera om Mumcord för att återställa det.",
         "windowsFullscreen": "Använd kantlös eller fönsterbaserad helskärm i spelet.",
-        "macos": "macOS stöder inte overlayer i spel. Fönsteroverlayen ovan används i stället."
+        "macos": "macOS stöder inte överlägg i spel."
       }
     }
   },
@@ -527,7 +531,20 @@
     "copyWhole": "Kopiera hela loggen",
     "openLogFolder": "Öppna loggmappen",
     "logCopied": "Loggen har kopierats.",
-    "fileLabel": "Diagnostikfil"
+    "fileLabel": "Diagnostikfil",
+    "writeToDisk": "Skriv loggar till disk",
+    "writeToDiskHint": "Av behåller loggen endast i minnet för den här sessionen — inget skrivs till disk.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Version",
@@ -546,12 +563,23 @@
     "loading": "Läser in…",
     "devToolsUnlocked": "Utvecklarverktyg upplåsta: paketinspektören finns nu i inställningslistan.",
     "portable": "Portabel",
-    "setup": "Installation",
-    "setupWizardHint": "Gå igenom den första installationen igen för att se över mikrofon, integritetsval, uppdateringskontroll och talläge. Dina nuvarande val är förifyllda.",
-    "setupWizardRun": "Kör installationsguiden igen",
+    "setup": "Konfiguration",
+    "setupWizardHint": "Gå igenom den första konfigurationen igen för att se över mikrofon, integritetsval, uppdateringskontroll och pratläge. Dina nuvarande val är förifyllda.",
+    "setupWizardRun": "Kör konfigurationsguiden igen",
     "setupWizardIdentityNote": "Din identitet är inte en del av detta. Ditt certifikat, och med det ditt registrerade namn och dina behörigheter på servrar, förblir precis som det är.",
     "setupWizardIdentityLink": "Hantera den under Identitet",
-    "versionTitle": "Version och licens"
+    "tipsTitle": "Tips",
+    "tipsHint": "Aaron visar dig runt i Mumcord på ungefär en minut: servrar, kanaler, att prata, chatt och mer.",
+    "tipsShow": "Visa tips",
+    "versionTitle": "Version och licens",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profil",
@@ -573,7 +601,7 @@
   "nowPlaying": {
     "title": "Spelas nu",
     "switch": "Dela vad jag lyssnar på",
-    "hint": "Mumcord läser den aktuella låten från systemets mediaspelare (till exempel Spotify) – ingen Spotify-inloggning behövs. Andra Mumcord-användare ser titel, artist, omslag och förlopp. Officiella Mumble-klienter ser en rad \"🎵 Artist – Titel\" sist i din kommentar.",
+    "hint": "Mumcord läser den aktuella låten från systemets mediaspelare (till exempel Spotify) – ingen Spotify-inloggning behövs. Andra Mumcord-användare ser titel, artist, omslag och förlopp. Officiella Mumble-klienter ser en rad ”🎵 Artist – Titel” sist i din kommentar.",
     "unsupported": "Stöds inte på macOS: systemet ger appar inget sätt att läsa den aktuella låten.",
     "current": "Delar nu: {{track}}",
     "nothing": "Ingenting spelas just nu."
@@ -609,7 +637,7 @@
   "nowGaming": {
     "title": "Spelar nu",
     "switch": "Dela spelet jag spelar",
-    "hint": "Mumcord letar efter välkända spel bland dina körande program och efter spelet som Steam kör. Andra Mumcord-användare ser spelet, dess bild och hur länge du har spelat, och kan gå med på din server när spelet har en. Officiella Mumble-klienter ser en rad \"🎮 Spel\" sist i din kommentar.",
+    "hint": "Mumcord letar efter välkända spel bland dina körande program och efter spelet som Steam kör. Andra Mumcord-användare ser spelet, dess bild och hur länge du har spelat, och kan gå med på din server när spelet har en. Officiella Mumble-klienter ser en rad ”🎮 Spel” sist i din kommentar.",
     "unsupported": "Stöds inte på det här systemet.",
     "current": "Delar nu: {{game}}",
     "nothing": "Inget spel upptäcktes just nu."
@@ -624,16 +652,16 @@
     "sourceGame": "Positioner från: {{source}} – {{game}}",
     "source": "Positioner från: {{source}}",
     "none": "Inget spel upptäckt",
-    "betaHint": "Resultatet beror på spelet och dess pluginstöd."
+    "betaHint": "Resultatet beror på spelet och dess stöd för speltillägg."
   },
   "gamePlugins": {
-    "title": "Spelinsticksmoduler",
-    "explanation": "Spel talar om för Mumcord var du befinner dig via Mumble Link eller via officiella Mumble-spelplugin. Mumcord hittar pluginen i sin egen pluginmapp och i en befintlig Mumble-installation. Slå bara på pluginen för spel du spelar.",
-    "antiCheat": "Spelplugin läser spelets minne. Vissa anti-cheat-system kan flagga detta. Stäng av pluginen för spel med strikt anti-cheat.",
-    "loading": "Letar efter spelplugin…",
-    "none": "Inga spelplugin hittades. Installera Mumble eller kopiera pluginfiler till Mumcords pluginmapp.",
-    "loadFailed": "Spelpluginen kunde inte listas.",
-    "switchFailed": "Spelpluginet kunde inte slås på eller av.",
+    "title": "Speltillägg",
+    "explanation": "Spel talar om för Mumcord var du befinner dig via Mumble Link eller via officiella Mumble-speltillägg. Mumcord hittar tilläggen i sin egen tilläggsmapp och i en befintlig Mumble-installation. Slå bara på tilläggen för spel du spelar.",
+    "antiCheat": "Speltillägg läser spelets minne. Vissa anti-cheat-system kan flagga detta. Stäng av tilläggen för spel med strikt anti-cheat.",
+    "loading": "Letar efter speltillägg…",
+    "none": "Inga speltillägg hittades. Installera Mumble eller kopiera tilläggsfiler till Mumcords tilläggsmapp.",
+    "loadFailed": "Speltilläggen kunde inte listas.",
+    "switchFailed": "Speltillägget kunde inte slås på eller av.",
     "version": "Version {{version}}",
     "active": "Levererar positioner",
     "problem": {
@@ -663,7 +691,7 @@
   "p2p": {
     "title": "Peer-to-peer (skärmdelning, bilder i full storlek)",
     "modeLabel": "Peer-to-peer-läge",
-    "explanation": "Direkt visar din IP-adress för den andra personen. Reläet döljer den för dem; reläets operatör (den här serverns community) kan se den. Båda är end-to-end-krypterade.",
+    "explanation": "Direkt visar din IP-adress för den andra personen. Reläet döljer den för dem; reläets operatör (den här serverns gemenskap) kan se den. Båda är end-to-end-krypterade.",
     "useGlobal": "Använd global inställning",
     "overrideHint": "Endast för den här servern. ”Använd global inställning” följer Inställningar → Integritet.",
     "mode": {
@@ -681,12 +709,12 @@
   },
   "appImageMenu": {
     "label": "Lägg till Mumcord i appmenyn",
-    "hint": "Gör att ikonen och push-to-talk fungerar ordentligt under Wayland och att mumble://-länkar öppnar Mumcord. Bara för AppImage.",
+    "hint": "Gör att ikonen och Push-to-talk fungerar ordentligt under Wayland och att mumble://-länkar öppnar Mumcord. Bara för AppImage.",
     "failed": "Det fungerade inte. Försök igen."
   },
   "inspector": {
     "title": "Utvecklarverktyg",
-    "intro": "Visar de paket som Mumcord skickar och tar emot, främst Mumcord-plugindata, för felsökning. Bara de senaste 2 000 paketen sparas, i minnet på den här enheten; inget loggas eller skickas någonstans.",
+    "intro": "Visar de paket som Mumcord skickar och tar emot, främst tilläggsdata från Mumcord, för felsökning. Bara de senaste 2 000 paketen sparas, i minnet på den här enheten; inget loggas eller skickas någonstans.",
     "devTools": "Utvecklarverktyg",
     "devToolsHint": "Stäng av för att dölja paketinspektören igen och sluta fånga paket.",
     "open": "Öppna paketinspektören",
@@ -755,10 +783,10 @@
       "image": "Överföring av bild i full storlek",
       "nowgaming": "Status ”spelar nu”",
       "nowplaying": "Status ”lyssnar nu”",
-      "p2p": "Uppsättning av direktanslutning",
+      "p2p": "Upprättande av direktanslutning",
       "screen": "Signal för skärmdelning",
-      "watch": "Status för tittarkväll",
-      "plugin": "Plugindata",
+      "watch": "Status för watch party",
+      "plugin": "Tilläggsdata",
       "mumble": "Mumble-meddelande",
       "peer": "Reläinställning"
     }
@@ -775,7 +803,7 @@
     "shown": "Visas: {{shown}} av {{total}}",
     "empty": "Ingen komponent matchar sökningen.",
     "loadFailed": "Licenslistan kunde inte läsas in.",
-    "repository": "Kodförråd:",
+    "repository": "Förråd:",
     "copy": "Kopiera licenstext",
     "copied": "Licenstext kopierad",
     "copyFailed": "Kopieringen misslyckades",
@@ -804,7 +832,7 @@
   "dnd": {
     "title": "Stör ej",
     "label": "Stör ej",
-    "description": "Inga ljud eller banderoller för aviseringar på någon server. Röst och chatt fortsätter att fungera och olästräknarna fortsätter att räkna.",
+    "description": "Inga ljud eller banderoller för aviseringar på någon server. Röst och chatt fortsätter att fungera och märkena för olästa fortsätter att räkna.",
     "follow": "Följ systemets Stör ej",
     "followDescription": "Slår på Stör ej när skrivbordets Stör ej eller fokusläge är på.",
     "detected": "Identifierat",
@@ -823,7 +851,7 @@
     "nobody": "Ingen",
     "nobodyHint": "Inga privata meddelanden och inga chattförfrågningar visas. Avsändare får inget veta.",
     "keepRequests": "Behåll meddelanden från standardklienter som meddelandeförfrågningar",
-    "keepRequestsHint": "Används bara med ”Bara vänner”. När den är av släpps dessa meddelanden.",
+    "keepRequestsHint": "Används bara med ”Bara vänner”. När det är av kastas dessa meddelanden.",
     "overrideTitle": "Undantag per server",
     "overrideLabel": "Privata meddelanden från på {{server}}",
     "useDefault": "Använd standard ({{rule}})",
@@ -845,7 +873,7 @@
   },
   "blocked": {
     "title": "Blockerade användare",
-    "hint": "Blockeringar sparas bara på den här datorn. Blockerade användare är ljudavstängda för dig, och deras meddelanden och Mumcord-data ignoreras.",
+    "hint": "Blockeringar sparas bara på den här datorn. Blockerade användare är tystade för dig, och deras meddelanden och Mumcord-data ignoreras.",
     "empty": "Du har inte blockerat någon.",
     "user": "Användare",
     "server": "Server",
@@ -887,6 +915,16 @@
     "modeNotify": "Endast avisera",
     "modeOff": "Av",
     "autoUnavailable": "Den här kopian kan inte uppdatera sig själv, så Mumcord berättar bara om nya versioner.",
+    "channel": "Uppdateringskanal",
+    "channelHint": "Välj vilka versioner Mumcord erbjuder. Releasekandidater är tidiga byggen av nästa version.",
+    "channels": {
+      "stable": { "name": "Stabil", "hint": "Endast slutgiltiga versioner" },
+      "releaseCandidates": {
+        "name": "Releasekandidater",
+        "hint": "Tidiga byggen av nästa version; kan innehålla fel"
+      }
+    },
+    "channelSwitchBack": "Om du byter tillbaka till Stabil behåller du din nuvarande version tills nästa slutgiltiga version är ute.",
     "interval": "Sök efter uppdateringar",
     "intervalHint_one": "Vid start och varje timme",
     "intervalHint_other": "Vid start och var {{count}}:e timme",
@@ -937,9 +975,9 @@
     "heading": "Aktiv förinställning",
     "none": "Ingen förinställning",
     "customised": "{{preset}}, anpassad",
-    "changed_one": "{{count}} inställning ändrad sedan installationen",
-    "changed_other": "{{count}} inställningar ändrade sedan installationen",
-    "unchanged": "Inga ändringar sedan installationen",
+    "changed_one": "{{count}} inställning ändrad sedan konfigurationen",
+    "changed_other": "{{count}} inställningar ändrade sedan konfigurationen",
+    "unchanged": "Inga ändringar sedan konfigurationen",
     "switch": "Byt",
     "switchLabel": "Byt förinställning",
     "applyFailed": "Överlägget i spel eller Stör ej kunde inte ändras. Försök igen."
@@ -988,9 +1026,9 @@
   },
   "betaFeatures": {
     "title": "Betafunktioner",
-    "hint": "Tidiga funktioner som kan ändras. Varje funktion visas också där den hör hemma, med en Beta-märkning.",
-    "gamePlugins": "Spelinsticksmoduler",
-    "manage": "Hantera insticksmoduler"
+    "hint": "Tidiga funktioner som kan ändras. Varje funktion visas också där den hör hemma, med ett Beta-märke.",
+    "gamePlugins": "Speltillägg",
+    "manage": "Hantera tillägg"
   },
   "privacySummary": {
     "title": "Integritetssammanfattning",
@@ -1017,7 +1055,7 @@
   "hotkeys": {
     "global": "Globala kortkommandon",
     "background": "Fungera när Mumcord ligger i bakgrunden",
-    "backgroundHint": "Kortkommandona fungerar överallt, även i spel. Standardgenvägarna fungerar bara medan Mumcord-fönstret är i förgrunden.",
+    "backgroundHint": "Kortkommandona fungerar överallt, även i spel. Standardkortkommandona fungerar bara medan Mumcord-fönstret är i förgrunden.",
     "foregroundOnly": "Kortkommandona fungerar bara när Mumcord-fönstret är i förgrunden.",
     "portal": "Ditt skrivbord (Wayland) ber dig godkänna globala kortkommandon en gång.",
     "noPortal": "Ditt skrivbord erbjuder inte globala kortkommandon, så de fungerar bara när Mumcord-fönstret är i förgrunden.",
@@ -1038,17 +1076,17 @@
       "openMumcord": "Öppna Mumcord"
     },
     "pushToTalkHint": "Skickar medan tangenterna hålls nere",
-    "pushToTalkOff": "Används när talläget under Röst är push-to-talk",
+    "pushToTalkOff": "Används när pratläget under Röst är Push-to-talk",
     "channelPlace": "{{channel}} · {{server}}",
     "rootChannel": "Rotkanal",
     "notSet": "Inte inställt",
     "defaultKey": "Standard: {{key}}",
     "defaultNone": "Standard: ingen",
     "useDefault": "Använd standard",
-    "defaultBlockedInApp": "Inte aktiv: det är Mumcords egen genväg för {{shortcut}}.",
-    "defaultBlockedOther": "Inte aktiv: {{other}} använder den redan.",
-    "recording": "Tryck en tangentkombination…",
-    "recordingHint": "Tryck <esc>Esc</esc> för att avbryta, <back>Backspace</back> för att rensa. Inspelningen avslutas efter 5 sekunder.",
+    "defaultBlockedInApp": "Inte aktivt: det är Mumcords eget kortkommando för {{shortcut}}.",
+    "defaultBlockedOther": "Inte aktivt: {{other}} använder det redan.",
+    "recording": "Tryck på en tangentkombination…",
+    "recordingHint": "Tryck på <esc>Esc</esc> för att avbryta, <back>Backspace</back> för att rensa. Inspelningen avslutas efter 5 sekunder.",
     "clear": "Rensa",
     "clearLabel": "Rensa {{action}}",
     "cancel": "Avbryt",
@@ -1069,7 +1107,7 @@
     "addNone": "Anslut till en server för att välja en av dess kanaler.",
     "addConfirm": "Lägg till",
     "reset": "Återställ alla kortkommandon",
-    "resetHint": "Tar bort dina egna tangenter, så standardgenvägarna kommer tillbaka. Push-to-talk behåller sin tangent.",
+    "resetHint": "Tar bort dina egna tangenter, så att standardkortkommandona kommer tillbaka. Push-to-talk behåller sin tangent.",
     "camera": "Slå på / av kameran",
     "cameraHint": "Öppnar förhandsvisningen när kameran är av och stänger av den när den är på."
   },
@@ -1080,16 +1118,16 @@
   },
   "newBadge": "Ny",
   "pluginSafety": {
-    "title": "Pluginsäkerhet",
-    "blockHighRisk": "Tillåt inte plugins med hög risk",
-    "hint": "Döljer knappen Installera för plugins med en poäng på 60 eller mer och stoppar uppdateringar som skulle föra ett installerat plugin dit. Plugins du redan har installerat fortsätter fungera.",
-    "note": "Av som standard. Officiella plugins och utvecklarplugins påverkas aldrig. Poäng är uppskattningar, ingen garanti."
+    "title": "Tilläggssäkerhet",
+    "blockHighRisk": "Tillåt inte tillägg med hög risk",
+    "hint": "Döljer knappen Installera för tillägg med en poäng på 60 eller mer och stoppar uppdateringar som skulle föra ett installerat tillägg dit. Tillägg du redan har installerat fortsätter att fungera.",
+    "note": "Av som standard. Officiella tillägg och utvecklartillägg påverkas aldrig. Poängen är uppskattningar, ingen garanti."
   },
   "pluginSounds": {
-    "title": "Pluginljud",
-    "volume": "Volym för pluginljud",
-    "mute": "Stäng av pluginljud",
-    "hint": "Gäller varje ljud som ett plugin spelar upp. Pluginljud är lägre medan folk pratar.",
+    "title": "Tilläggsljud",
+    "volume": "Volym för tilläggsljud",
+    "mute": "Stäng av tilläggsljud",
+    "hint": "Gäller varje ljud som ett tillägg spelar upp. Tilläggsljud är lägre medan någon pratar.",
     "meter": "Utnivå (felsökning)"
   },
   "screenShare": {
@@ -1107,7 +1145,7 @@
     "uploadLimit": "Uppladdningsgräns",
     "uploadAuto": "Automatisk",
     "uploadOption": "{{mbit}} Mbit/s",
-    "uploadHint": "Det mesta din delning skickar totalt. Praktiskt på en delad eller begränsad anslutning.",
+    "uploadHint": "Den högsta datamängd som din delning skickar totalt. Praktiskt på en delad eller begränsad anslutning.",
     "codecTitle": "Videokodek",
     "codec": "Videokodek",
     "codecAuto": "Automatisk (rekommenderas)",
@@ -1162,7 +1200,7 @@
     "sendQualityAuto": "Automatisk",
     "sendQuality720": "720p · 15 fps",
     "sendQuality360": "360p · 30 fps",
-    "sendQualityHint": "Auto (upp till 720p · 30 fps) skickar bara så mycket som tittarna behöver: mindre i ett stort rutnät, skarpare när någon fäster dig.",
+    "sendQualityHint": "Automatisk (upp till 720p · 30 fps) skickar bara så mycket som tittarna behöver: mindre i ett stort rutnät, skarpare när någon fäster dig.",
     "mirror": "Spegla min egen vy",
     "mirrorHint": "Bara din egen vy speglas. Andra ser dig rättvänd.",
     "backgroundTitle": "Bakgrund",
@@ -1201,7 +1239,7 @@
     "showAlways": "Alltid",
     "showOnOpen": "När jag öppnar rummet",
     "showNever": "Aldrig",
-    "showHint": "Alltid öppnar kamerarummet när någon i din kanal slår på en kamera. Aldrig håller dig i enbart röst och laddar inte ner någon video.",
+    "showHint": "Alltid: öppnar kamerarummet när någon i din kanal slår på en kamera. Aldrig: du stannar i enbart röst och ingen video laddas ner.",
     "dataSaver": "Datasparläge: högst 15 fps för alla",
     "reduceMotion": "Minska rörelse: inget sken eller ingen animation på talarens ram",
     "reduceMotionHint": "Följer som standard systemets inställning för minskad rörelse.",
@@ -1231,7 +1269,7 @@
     "copyLabel": "Kopiera rapporten från {{when}} till en felrapport",
     "detailsLabel": "Visa detaljer för rapporten från {{when}}",
     "deleteLabel": "Ta bort rapporten från {{when}}",
-    "kindNative": "Inbyggd krasch",
+    "kindNative": "Krasch i inbyggd kod",
     "kindPanic": "Appfel",
     "kindUnexpected": "Stängdes oväntat",
     "copied": "Rapporten har kopierats. Klistra in den i en felrapport.",
@@ -1271,11 +1309,23 @@
   },
   "activityHistory": {
     "title": "Aktivitetshistorik",
+    "keep": "Behåll aktivitetshistorik efter omstart",
+    "keepHint": "Sparar vem som anslöt, lämnade, bytte kanal, delade skärm eller startade ett watch party, så att flödet finns kvar efter en omstart. Av: flödet börjar tomt varje gång. När du stänger av det raderas det som sparats.",
     "clear": "Rensa aktivitetshistorik",
     "hint": "Tar bort det sparade flödet för alla servrar.",
     "local": "Sparas bara på den här enheten.",
     "button": "Rensa historik",
     "confirm": "Vill du rensa aktivitetshistoriken för alla servrar? Det går inte att ångra.",
     "confirmButton": "Rensa"
+  },
+  "diskWrites": {
+    "title": "Färre skrivningar till disk",
+    "hint": "Färre skrivningar sliter mindre på SSD-diskar. Varje brytare behåller dagens beteende när den är på.",
+    "durableSaves": "Vänta på disken vid varje sparning",
+    "durableSavesHint": "Av skriver mindre, men vid ett strömavbrott kan de sista sekunderna av historik och inställningar gå förlorade.",
+    "linkPreviewsOnDisk": "Behåll länkförhandsvisningar på disk",
+    "linkPreviewsOnDiskHint": "Av behåller förhandsvisningar endast i minnet för den här sessionen.",
+    "pluginRegistryCache": "Behåll en kopia av tilläggsregistret på disk",
+    "pluginRegistryCacheHint": "Av hämtar alltid registret på nytt."
   }
 }

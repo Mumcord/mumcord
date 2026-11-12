@@ -1,6 +1,11 @@
 //! Plugin data `mumcord.file` (section 6.4): the small messages between sender and recipient
 //! while a download is requested, queued, started or cancelled. Each message is a Bovnar document
 //! (FR-7.75); this module and `offer` are the only places that know the encoding.
+//!
+//! `req` and `go` carry the optional field `fmt`, the file stream format
+//! ([`super::transfer`]): in `req` the highest format the recipient reads, in `go` the format the
+//! sender chose. A missing `fmt` means format 1, so clients from 0.7.x, which neither send nor
+//! read it, keep getting and sending format 1.
 
 use bovnar::{DomDoc, DomNode, Writer};
 
@@ -17,12 +22,12 @@ const VERSION: u8 = 1;
 /// One `mumcord.file` message. The sender is the session the server stamped on the data.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FileMessage {
-    /// Recipient to sender: please send the file.
-    Request { id: String },
+    /// Recipient to sender: please send the file; `fmt` is the highest stream format it reads.
+    Request { id: String, fmt: u8 },
     /// Sender to recipient: waiting in line; 1 = next.
     Queued { id: String, position: u16 },
-    /// Sender to recipient: start now.
-    Go { id: String },
+    /// Sender to recipient: start now, with stream format `fmt`.
+    Go { id: String, fmt: u8 },
     /// Sender to recipient: the queue is full.
     Busy { id: String },
     /// Sender to recipient: share ended, unknown or refused.
@@ -34,9 +39,9 @@ pub enum FileMessage {
 impl FileMessage {
     pub fn id(&self) -> &str {
         match self {
-            Self::Request { id }
+            Self::Request { id, .. }
             | Self::Queued { id, .. }
-            | Self::Go { id }
+            | Self::Go { id, .. }
             | Self::Busy { id }
             | Self::Gone { id }
             | Self::Cancel { id } => id,
@@ -88,6 +93,17 @@ pub(crate) fn version_field(doc: &DomDoc, min: u8) -> Result<(), Rejected> {
     Ok(())
 }
 
+/// The stream format in `req` or `go`; a missing field is format 1 (clients from 0.7.x).
+fn fmt_field(doc: &DomDoc) -> Result<u8, Rejected> {
+    let Some(node) = doc.get("fmt") else {
+        return Ok(1);
+    };
+    match node.as_u8().ok_or(Rejected::WrongType)? {
+        0 => Err(Rejected::Invalid),
+        fmt => Ok(fmt),
+    }
+}
+
 /// Writes a flat Bovnar document of at most `cap` bytes with the fields `write` adds.
 pub(crate) fn write_document(
     cap: usize,
@@ -103,13 +119,13 @@ pub fn encode(message: &FileMessage) -> Option<Vec<u8>> {
     if !is_share_id(message.id()) {
         return None;
     }
-    let (t, pos) = match message {
-        FileMessage::Request { .. } => ("req", None),
-        FileMessage::Queued { position, .. } => ("queued", Some(*position)),
-        FileMessage::Go { .. } => ("go", None),
-        FileMessage::Busy { .. } => ("busy", None),
-        FileMessage::Gone { .. } => ("gone", None),
-        FileMessage::Cancel { .. } => ("cancel", None),
+    let (t, pos, fmt) = match message {
+        FileMessage::Request { fmt, .. } => ("req", None, Some(*fmt)),
+        FileMessage::Queued { position, .. } => ("queued", Some(*position), None),
+        FileMessage::Go { fmt, .. } => ("go", None, Some(*fmt)),
+        FileMessage::Busy { .. } => ("busy", None, None),
+        FileMessage::Gone { .. } => ("gone", None, None),
+        FileMessage::Cancel { .. } => ("cancel", None, None),
     };
     write_document(MAX_PAYLOAD_BYTES, |w| {
         w.write_uint("v", VERSION.into(), 8, bovnar::Base::DECIMAL)?;
@@ -117,6 +133,9 @@ pub fn encode(message: &FileMessage) -> Option<Vec<u8>> {
         w.write_string("id", message.id())?;
         if let Some(pos) = pos {
             w.write_uint("pos", pos.into(), 16, bovnar::Base::DECIMAL)?;
+        }
+        if let Some(fmt) = fmt {
+            w.write_uint("fmt", fmt.into(), 8, bovnar::Base::DECIMAL)?;
         }
         Ok(())
     })
@@ -136,12 +155,18 @@ fn decode_checked(data: &[u8]) -> Result<FileMessage, Rejected> {
     }
     let id = id.to_owned();
     Ok(match str_field(&doc, "t")? {
-        "req" => FileMessage::Request { id },
+        "req" => FileMessage::Request {
+            id,
+            fmt: fmt_field(&doc)?,
+        },
         "queued" => FileMessage::Queued {
             id,
             position: field(&doc, "pos")?.as_u16().ok_or(Rejected::WrongType)?,
         },
-        "go" => FileMessage::Go { id },
+        "go" => FileMessage::Go {
+            id,
+            fmt: fmt_field(&doc)?,
+        },
         "busy" => FileMessage::Busy { id },
         "gone" => FileMessage::Gone { id },
         "cancel" => FileMessage::Cancel { id },
@@ -158,12 +183,12 @@ mod tests {
     fn all() -> Vec<FileMessage> {
         let id = || ID.to_owned();
         vec![
-            FileMessage::Request { id: id() },
+            FileMessage::Request { id: id(), fmt: 2 },
             FileMessage::Queued {
                 id: id(),
                 position: 3,
             },
-            FileMessage::Go { id: id() },
+            FileMessage::Go { id: id(), fmt: 2 },
             FileMessage::Busy { id: id() },
             FileMessage::Gone { id: id() },
             FileMessage::Cancel { id: id() },
@@ -252,7 +277,8 @@ mod tests {
 
     #[test]
     fn truncated_documents_are_dropped() {
-        let bytes = encode(&FileMessage::Go { id: ID.into() }).expect("valid");
+        // `busy` has no optional field, so no shorter prefix is a complete document.
+        let bytes = encode(&FileMessage::Busy { id: ID.into() }).expect("valid");
         for len in 0..bytes.len() {
             assert_eq!(decode(&bytes[..len]), None, "{len}");
         }
@@ -261,7 +287,42 @@ mod tests {
     #[test]
     fn higher_versions_and_unknown_fields_are_accepted() {
         let text = doc(r#".v = 4; .t = "go"; .id = "ID"; .extra = [1, 2];"#);
-        assert_eq!(decode(&text), Some(FileMessage::Go { id: ID.into() }));
+        assert_eq!(
+            decode(&text),
+            Some(FileMessage::Go {
+                id: ID.into(),
+                fmt: 1
+            })
+        );
+    }
+
+    #[test]
+    fn a_missing_fmt_is_stream_format_1() {
+        // What clients from 0.7.x send: no `fmt` in `req` or `go`.
+        for t in ["req", "go"] {
+            let text = doc(&format!(r#".v = 1; .t = "{t}"; .id = "ID";"#));
+            let fmt = match decode(&text).expect("valid") {
+                FileMessage::Request { fmt, .. } | FileMessage::Go { fmt, .. } => fmt,
+                other => panic!("{other:?}"),
+            };
+            assert_eq!(fmt, 1, "{t}");
+        }
+    }
+
+    #[test]
+    fn fmt_is_read_from_req_and_go() {
+        let req = doc(r#".v = 1; .t = "req"; .id = "ID"; .fmt = 2;"#);
+        assert_eq!(
+            decode(&req),
+            Some(FileMessage::Request {
+                id: ID.into(),
+                fmt: 2
+            })
+        );
+        let bad = doc(r#".v = 1; .t = "go"; .id = "ID"; .fmt = "2";"#);
+        assert_eq!(decode_checked(&bad), Err(Rejected::WrongType));
+        let zero = doc(r#".v = 1; .t = "go"; .id = "ID"; .fmt = 0;"#);
+        assert_eq!(decode_checked(&zero), Err(Rejected::Invalid));
     }
 
     #[test]
@@ -273,6 +334,12 @@ mod tests {
 
     #[test]
     fn encoding_refuses_a_bad_id() {
-        assert_eq!(encode(&FileMessage::Go { id: "x".into() }), None);
+        assert_eq!(
+            encode(&FileMessage::Go {
+                id: "x".into(),
+                fmt: 1,
+            }),
+            None
+        );
     }
 }

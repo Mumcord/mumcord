@@ -11,7 +11,7 @@
     "hiddenBy": "Dold av {{plugin}}"
   },
   "command": {
-    "list": "Pluginkommandon",
+    "group": "Tilläggskommandon",
     "keys": "↑↓ välj · Tab komplettera · Enter kör · Esc stäng",
     "unavailable": "Det här kommandot är inte tillgängligt just nu.",
     "failed": "Kommandot kunde inte köras. Försök igen."

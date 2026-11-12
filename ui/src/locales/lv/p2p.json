@@ -29,16 +29,16 @@
     "camerasDisallowed": "Šī servera relejs neļauj kopīgot kameru.",
     "imagesDisallowed": "Pilns izmērs nav pieejams: šī servera relejs neatļauj attēlus",
     "noCertificate": "Failu kopīgošanai nepieciešams klienta sertifikāts.",
-    "modeNeedsRelay": "Failu kopīgošanai nepieciešams relejs; tavs peer-to-peer iestatījums ir {{mode}}.",
+    "modeNeedsRelay": "Failu kopīgošanai nepieciešams relejs; tavs vienādranga savienojumu iestatījums ir {{mode}}.",
     "modeOff": "Izslēgts",
     "modeDirectOnly": "Tikai tiešais",
     "hideNoRelay": "Paslēpt šo padomu serverim {{server}}"
   },
   "reason": {
-    "p2pOff": "Peer-to-peer ir izslēgts.",
+    "p2pOff": "Vienādranga savienojumi ir izslēgti.",
     "noRelay": "Šim serverim nav releja.",
     "notConnected": "Nav savienojuma ar šo serveri.",
-    "untrusted": "Šī servera relejs ir mainījies un tam neuzticas.",
+    "untrusted": "Šī servera relejs ir mainījies un nav uzticams.",
     "conflict": "Šajā serverī ir paziņoti divi releji; neviens netiek izmantots.",
     "botLeft": "Releja bots atstāja serveri.",
     "relayDown": "Relejs pašlaik nav sasniedzams (ziņoja releja bots).",
@@ -50,8 +50,8 @@
     "notRegistered": "Šī servera relejs ir pieejams tikai reģistrētiem lietotājiem. Lai to izmantotu, reģistrējies šajā serverī.",
     "peerGone": "Otra persona atstāja serveri.",
     "rateLimited": "Pārāk daudz releja pieprasījumu. Mēģini vēlreiz pēc minūtes.",
-    "groupNotAllowed": "Šī servera retranslators pieejams tikai noteiktām grupām. Palūdz administratoram tevi pievienot.",
-    "noHello": "Retranslatora bots vēl nepazīst šo lietotni. Pievienojies vēlreiz."
+    "groupNotAllowed": "Šī servera relejs ir pieejams tikai noteiktām grupām. Palūdz administratoram tevi pievienot.",
+    "noHello": "Releja bots vēl nepazīst šo lietotni. Lai to novērstu, savienojies no jauna."
   },
   "refusal": {
     "unknownToken": "nezināms piekļuves marķieris",
@@ -66,25 +66,25 @@
   },
   "refusalAction": {
     "howToRegister": "Kā reģistrēties",
-    "reconnect": "Pievienoties vēlreiz",
+    "reconnect": "Savienoties no jauna",
     "filesRegisteredOnly": "Failu kopīgošana šajā serverī pieejama tikai reģistrētiem lietotājiem."
   },
   "trust": {
-    "title": "Retranslators serverī {{server}} mainījies",
-    "body": "Ekrāna un failu kopīgošana ir apturēta, līdz uzticēsies jaunajam retranslatoram.",
+    "title": "Serverī {{server}} mainījies relejs",
+    "body": "Ekrāna un failu kopīgošana ir apturēta, līdz uzticēsies jaunajam relejam.",
     "details": "Sīkāk",
-    "trustedTitle": "Jaunajam retranslatoram uzticas",
+    "trustedTitle": "Jaunais relejs ir uzticams",
     "trustedBody": "Ekrāna un failu kopīgošana serverī {{server}} atkal darbojas.",
-    "dialogBody": "Šī servera retranslators tagad izmanto citu sertifikātu. Kamēr tam neuzticēsies, ekrāna, failu kopīgošana un pilna izmēra attēli ir apturēti.",
-    "previous": "Iepriekš uzticamais retranslators",
-    "current": "Jauns retranslators",
+    "dialogBody": "Šī servera relejs tagad izmanto citu sertifikātu. Kamēr tam neuzticēsies, ekrāna kopīgošana, failu kopīgošana un pilna izmēra attēli ir apturēti.",
+    "previous": "Iepriekš uzticamais relejs",
+    "current": "Jaunais relejs",
     "unknown": "Nezināms",
     "trustIf": "Uzticies, ja",
-    "trustIfText": "servera administratori paziņoja par jaunu retranslatoru vai pārcelšanu un vari to ar viņiem apstiprināt.",
+    "trustIfText": "servera administratori paziņoja par jaunu releju vai tā pārcelšanu un tu to vari ar viņiem pārbaudīt.",
     "dontTrustIf": "Neuzticies, ja",
-    "dontTrustIfText": "neviens nepaziņoja par izmaiņām vai neesi pārliecināts. Kāds var uzdoties par retranslatoru.",
+    "dontTrustIfText": "neviens nepaziņoja par izmaiņām vai tev ir šaubas. Kāds var uzdoties par releju.",
     "notNow": "Ne tagad",
-    "review": "Retranslators mainījies – pārskatīt",
-    "filesBlocked": "Failu kopīgošana nav pieejama: šī servera retranslators ir mainījies un vēl nav uzticams."
+    "review": "Relejs mainījies – pārskatīt",
+    "filesBlocked": "Failu kopīgošana nav pieejama: šī servera relejs ir mainījies un vēl nav uzticams."
   }
 }

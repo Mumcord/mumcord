@@ -31,7 +31,7 @@ pub use av1_svt::{AV1_TEMPORAL_LAYERS, Av1Encoder, Av1Options, av1_cpu_supported
 pub use codec::{Codec, VideoDecoder, VideoEncoder};
 pub use decoder::Decoder;
 pub use encoder::{EncodedFrame, Encoder, EncoderConfig, TEMPORAL_LAYERS, threads as vp9_threads};
-pub use frame::I420Frame;
+pub use frame::{I420Frame, MAX_DECODED_HEIGHT, MAX_DECODED_WIDTH};
 pub use hw::{HardwareEncoder, open_hardware_encoder};
 
 #[derive(Debug, thiserror::Error)]

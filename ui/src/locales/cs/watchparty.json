@@ -3,13 +3,13 @@
   "addVideo": "Přidat video",
   "beta": "Beta",
   "join": "Připojit se ke společnému sledování",
-  "leave": "Opustit sledování",
+  "leave": "Opustit společné sledování",
   "watching": "{{count}} sleduje: {{names}}",
   "player": "Přehrávač společného sledování",
   "watchTogether": "Sledovat společně",
   "watchTogetherFor": "Sledovat {{title}} společně s tímto kanálem",
-  "embedsOff": "Zapněte vložené přehrávače v nastavení soukromí, abyste mohli sledovat společně",
-  "embedsOffJoin": "Probíhá společné sledování: zapněte vložené přehrávače a připojte se",
+  "embedsOff": "Pro společné sledování zapni vložené přehrávače v nastavení soukromí",
+  "embedsOffJoin": "Probíhá společné sledování: zapni vložené přehrávače a připoj se",
   "openPrivacy": "Otevřít nastavení soukromí",
   "cantPlay": "Přehrávač tady nemůže běžet.",
   "openInBrowser": "Otevřít v prohlížeči",
@@ -20,9 +20,9 @@
   "someone": "Někdo",
   "other": {
     "play": "{{name}} spustil(a) přehrávání",
-    "pause": "{{name}} pozastavil(a)",
+    "pause": "{{name}} pozastavil(a) přehrávání",
     "seek": "{{name}} přeskočil(a) dopředu",
-    "skipped": "{{name}} přeskočil(a)"
+    "skipped": "{{name}} přeskočil(a) video"
   },
   "addToPlaylist": "Přidat do playlistu",
   "addToPlaylistFor": "Přidat {{title}} do playlistu společného sledování",
@@ -45,12 +45,12 @@
     "move": "Přesunout {{title}}",
     "upNext": "Následuje: {{title}}",
     "upNextNone": "Nic dalšího nenásleduje",
-    "paste": "Vložte odkaz na YouTube",
+    "paste": "Vlož odkaz na YouTube",
     "notALink": "To není odkaz na YouTube",
     "more": "Další možnosti pro {{title}}",
     "playNext": "Přehrát jako další",
-    "removeShort": "Odebrat ze seznamu",
-    "emptyPaste": "Nic dalšího na řadě. Vložte výše odkaz na YouTube."
+    "removeShort": "Odebrat z playlistu",
+    "emptyPaste": "Nic dalšího nenásleduje. Vlož výše odkaz na YouTube."
   },
   "widget": {
     "play": "Přehrát",
@@ -59,16 +59,18 @@
   "codecHint": {
     "install": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav:",
     "generic": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav (plugin libav pro GStreamer) správcem balíčků svého systému.",
-    "rpmFusion": "Na Fedoře pochází gst-libav z repozitáře RPM Fusion; nejdřív povol RPM Fusion."
+    "rpmFusion": "Na Fedoře pochází gst-libav z repozitáře RPM Fusion; nejdřív povol RPM Fusion.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Mezerník přehrát/pozastavit · ← → posun o 5 s · M ztlumit · F celá obrazovka",
   "headerPill": "Sledovat společně · {{count}}",
   "miniPlayer": "Minipřehrávač",
   "tabs": {
-    "playlist": "Seznam"
+    "playlist": "Playlist"
   },
-  "upNextHeading": "Další na řadě · přetažením změníte pořadí",
-  "whoIsWatching": "Kdo se dívá",
+  "upNextHeading": "Následuje · přetažením změníš pořadí",
+  "whoIsWatching": "Kdo sleduje",
   "pasteKey": "Ctrl V",
-  "you": "Vy"
+  "you": "Ty"
 }

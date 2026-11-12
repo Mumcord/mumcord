@@ -1,4 +1,4 @@
 {
-  "label": "Odznak z {{plugin}}",
-  "section": "Sekce z {{plugin}}"
+  "label": "Odznak od pluginu {{plugin}}",
+  "section": "Sekce od pluginu {{plugin}}"
 }

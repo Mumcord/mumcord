@@ -35,7 +35,7 @@
     "commandTaken": "/{{command}}: Kommandoen er optaget af {{plugin}}"
   },
   "badge": {
-    "label": "Badge vist ved siden af navne",
+    "label": "Mærke ved siden af navne",
     "none": "Ingen"
   },
   "diagnostics": {
@@ -56,8 +56,8 @@
     "incomingRateDropped": "Indkommende beskeder droppet af hastighedsgrænsen",
     "incomingInvalid": "Ugyldige indkommende beskeder",
     "uiFreezes": "Antal gange Mumcord frøs, mens webindholdet var åbent",
-    "refusedAppMenuLabel": "Dette plugin blev afvist: en etiket i Apps-menuen er den samme som en af Mumcords egne eller begynder med \"Mumcord\".",
-    "fieldWithoutPermission": "Dette plugin blev afvist: det bruger \"{{field}}\" uden tilladelsen \"{{permission}}\".",
+    "refusedAppMenuLabel": "Dette plugin blev afvist: en etiket i Apps-menuen er den samme som en af Mumcords egne eller begynder med »Mumcord«.",
+    "fieldWithoutPermission": "Dette plugin blev afvist: det bruger »{{field}}« uden tilladelsen »{{permission}}«.",
     "webDisabled": "Webindholdet er slået fra, fordi Mumcord holdt op med at svare, mens det var åbent.",
     "reenableWeb": "Slå webindhold til",
     "reenableFailed": "Webindholdet kunne ikke slås til.",
@@ -88,7 +88,7 @@
     "confirm": "Fjern"
   },
   "errors": {
-    "enable": "Pluginet kunne ikke skiftes.",
+    "enable": "Pluginet kunne ikke slås til eller fra.",
     "permissions": "Tilladelsen kunne ikke ændres.",
     "visibility": "Synligheden kunne ikke ændres.",
     "notifications": "Notifikationerne kunne ikke ændres.",
@@ -96,16 +96,16 @@
     "export": "Dataene kunne ikke eksporteres.",
     "reset": "Dataene kunne ikke nulstilles.",
     "remove": "Pluginet kunne ikke fjernes.",
-    "badge": "Badget kunne ikke ændres.",
+    "badge": "Mærket kunne ikke ændres.",
     "update": "Pluginet kunne ikke opdateres."
   },
   "update": {
     "hint": "Opdatering {{version}}",
-    "button": "Opdater"
+    "button": "Opdatér"
   },
   "visibilityChip": "Taler med andre Mumcord-brugere · {{visibility}}",
   "chips": {
-    "label": "Tilladelser den bruger",
+    "label": "Tilladelser, det bruger",
     "uiPanel": "Panel",
     "uiMemberBadge": "Medlemsmærke",
     "uiProfileCard": "Profilkort",
@@ -115,13 +115,13 @@
     "uiWebview": "Webindhold",
     "eventsSelf": "Din status",
     "eventsVoice": "Stemmeaktivitet",
-    "eventsPresence": "Ind- og udgange",
+    "eventsPresence": "Ankomst og afgang",
     "eventsChatActivity": "Chataktivitet",
     "notify": "Notifikationer",
     "randomBytes": "Tilfældige tal",
     "commands": "Kommandoer",
     "chatSend": "Skriver i chatten",
-    "chatSupersedes": "Erstatter sin tekstlinje",
+    "chatSupersedes": "Erstatter sin tekst",
     "chatTriggers": "Udløserord",
     "chatPatterns": "Chatmønstre",
     "netHttp": "Internetadgang",

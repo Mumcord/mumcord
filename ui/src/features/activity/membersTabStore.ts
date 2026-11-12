@@ -1,7 +1,7 @@
 /**
  * Which tab of the members column is open (FR-11.2): remembered per server for the session, and
- * back to "Members" at the first sync of a new connection, so a reconnect does not land on a feed
- * that was discarded with the old connection (FR-11.4).
+ * back to "Activity" at the first sync of a new connection, so every connection opens on what is
+ * happening on the server (issue #709).
  */
 import { useCallback, useSyncExternalStore } from "react";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
@@ -10,7 +10,7 @@ import { subscribeAllServerChanges } from "../channels/serverStore";
 export type MembersTab = "members" | "activity";
 
 /** The tab every connection starts on. */
-const DEFAULT_TAB: MembersTab = "members";
+const DEFAULT_TAB: MembersTab = "activity";
 
 let choices = new Map<number | null, MembersTab>();
 let boundApi: MumcordApi | undefined;

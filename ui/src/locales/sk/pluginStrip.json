@@ -1,7 +1,7 @@
 {
-  "heading": "Pluginy",
-  "list": "Panely pluginov",
+  "heading": "Doplnky",
+  "list": "Panely doplnkov",
   "expand": "Zväčšiť {{name}}",
   "close": "Zavrieť",
-  "unsupported": "Tento server nepodporuje zdieľané funkcie pluginov"
+  "unsupported": "Tento server nepodporuje zdieľané funkcie doplnkov"
 }

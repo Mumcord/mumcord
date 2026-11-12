@@ -1,13 +1,15 @@
 #!/bin/sh
-# Installs Mumcord on Linux from the latest GitHub release:
+# Installs Mumcord on Linux or FreeBSD from the latest GitHub release:
 #
 #   curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
+#   fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 #
 # Debian/Ubuntu get the .deb (apt), Fedora/RHEL and openSUSE the .rpm (dnf/zypper), Arch the
-# AUR package when an AUR helper is installed and the AUR has it; everything else gets the
-# AppImage for the current user with an app-menu entry. Every download is checked against the
-# release's SHA256SUMS before anything from it runs. sudo is used only to install or remove a
-# package.
+# AUR package when an AUR helper is installed and the AUR has it; every other Linux gets the
+# AppImage for the current user with an app-menu entry. FreeBSD 15.x on amd64 gets the .pkg
+# (Mumcord 0.8.0 and later): its dependencies come from the configured pkg repositories, then
+# `pkg add` installs it. Every download is checked against the release's SHA256SUMS before
+# anything from it runs. sudo (or doas) is used only to install or remove a package.
 #
 # Options (after `sh -s --` when piped):
 #   --uninstall          remove Mumcord (settings and your certificate stay in place)
@@ -34,6 +36,10 @@ MANAGED_KEY=X-Mumcord-Managed=true
 WM_CLASS_LINE=StartupWMClass=$APP_ID
 AUR_PACKAGE=mumcord-bin
 ICON_SIZES="32x32 128x128 256x256 512x512"
+# The FreeBSD package and the release it is built for (specs/13-freebsd-support-specification.md).
+FREEBSD_PACKAGE=mumcord
+FREEBSD_MAJOR=15
+OS=$(uname -s)
 
 # Colours, Unicode marks and the spinner only for a terminal that wants them
 # (https://no-color.org); pipes, log files and TERM=dumb get plain ASCII lines.
@@ -163,7 +169,7 @@ file_size() {
 have() { command -v "$1" >/dev/null 2>&1; }
 
 usage() {
-    sed -n '2,19s/^# \{0,1\}//p' "$0" 2>/dev/null || say "See https://github.com/Mumcord/mumcord#download"
+    sed -n '2,21s/^# \{0,1\}//p' "$0" 2>/dev/null || say "See https://github.com/Mumcord/mumcord#download"
 }
 
 uninstall=false
@@ -209,9 +215,15 @@ need_root() {
         SUDO=
         return
     fi
-    have sudo || die "$1 needs administrator rights, but sudo is not installed. Run this script as root instead."
-    info "$1 needs administrator rights; sudo may ask for your password."
-    SUDO=sudo
+    # FreeBSD often has doas instead of sudo.
+    for tool in sudo doas; do
+        if have "$tool"; then
+            info "$1 needs administrator rights; $tool may ask for your password."
+            SUDO=$tool
+            return
+        fi
+    done
+    die "$1 needs administrator rights, but neither sudo nor doas is installed. Run this script as root instead."
 }
 
 download() {
@@ -219,8 +231,11 @@ download() {
         curl -fsSL -o "$2" "$1"
     elif have wget; then
         wget -q -O "$2" "$1"
+    elif have fetch; then
+        # FreeBSD's base system has fetch(1), but neither curl nor wget.
+        fetch -q -o "$2" "$1"
     else
-        die "curl or wget is needed to download Mumcord"
+        die "curl, wget or fetch is needed to download Mumcord"
     fi
 }
 
@@ -231,7 +246,7 @@ download_progress() {
         download "$1" "$2"
         return
     fi
-    have curl || have wget || die "curl or wget is needed to download Mumcord"
+    have curl || have wget || have fetch || die "curl, wget or fetch is needed to download Mumcord"
     # The shell cannot tell a finished background job from a running one without waiting, so the
     # job leaves its exit status in a file.
     rm -f "$work/download.status"
@@ -267,7 +282,10 @@ download_progress() {
 }
 
 sha256_of() {
-    if have sha256sum; then
+    # FreeBSD's base sha256(1) prints only the hash with -q.
+    if [ "$OS" = FreeBSD ] && have sha256; then
+        sha256 -q "$1"
+    elif have sha256sum; then
         sha256sum "$1" | cut -d ' ' -f 1
     elif have shasum; then
         shasum -a 256 "$1" | cut -d ' ' -f 1
@@ -312,13 +330,15 @@ asset_pattern() {
     rpm-aarch64) echo "^Mumcord-${v}\\.aarch64\\.rpm\$" ;;
     appimage-x86_64) echo "^Mumcord_${v}_amd64\\.AppImage\$" ;;
     appimage-aarch64) echo "^Mumcord_${v}_aarch64\\.AppImage\$" ;;
+    pkg-x86_64) echo "^${FREEBSD_PACKAGE}-${v}\\.pkg\$" ;;
     esac
 }
 
-# fetch KIND: downloads the matching asset into $work, checks it and sets $fetched to its path
-# and $version to the release version. It runs in this shell, not in $(...), so its step lines
-# reach the terminal and the step count goes on.
-fetch() {
+# fetch_asset KIND: downloads the matching asset into $work, checks it and sets $fetched to its
+# path and $version to the release version. It runs in this shell, not in $(...), so its step
+# lines reach the terminal and the step count goes on. (Not named fetch: that is FreeBSD's
+# download tool, which download() calls.)
+fetch_asset() {
     sums=$work/SHA256SUMS
     download "$RELEASE_URL/SHA256SUMS" "$sums" || die "could not download the checksum list from $RELEASE_URL"
     pattern=$(asset_pattern "$1" "$(cpu)")
@@ -330,7 +350,10 @@ fetch() {
             printf '%s\n' "$file" | grep -Eq "$pattern" && printf '%s %s\n' "$hash" "$file"
         done <"$sums"
     ) || true
-    [ -n "$matches" ] || die "the release has no $1 package for $(cpu)"
+    if [ -z "$matches" ]; then
+        [ "$1" != pkg ] || die "this release has no FreeBSD package; FreeBSD packages exist from Mumcord 0.8.0 on. Nothing was installed."
+        die "the release has no $1 package for $(cpu)"
+    fi
     [ "$(printf '%s\n' "$matches" | wc -l)" -eq 1 ] || die "the release lists more than one $1 package for $(cpu)"
     expected=${matches% *}
     name=${matches#* }
@@ -347,9 +370,11 @@ fetch() {
     fi
     step ok Checksum "OK, matches SHA256SUMS"
     fetched=$work/$name
-    # Mumcord_0.4.3_amd64.deb, Mumcord-0.4.3-1.x86_64.rpm, Mumcord_0.4.3_amd64.AppImage
+    # Mumcord_0.4.3_amd64.deb, Mumcord-0.4.3-1.x86_64.rpm, Mumcord_0.4.3_amd64.AppImage,
+    # mumcord-0.8.0.pkg
     case $name in
     Mumcord_*) version=${name#Mumcord_} version=${version%%_*} ;;
+    "$FREEBSD_PACKAGE"-*) version=${name#"$FREEBSD_PACKAGE"-} version=${version%.pkg} ;;
     *) version=${name#Mumcord-} version=${version%.*.rpm} version=${version%-*} ;;
     esac
 }
@@ -362,7 +387,8 @@ desktop_dir() {
 
 # The package's or the user's menu entry, whichever exists.
 menu_entry() {
-    for file in "$ENTRY" /usr/share/applications/Mumcord.desktop /usr/share/applications/$APP_ID.desktop; do
+    for file in "$ENTRY" /usr/share/applications/Mumcord.desktop /usr/share/applications/$APP_ID.desktop \
+        /usr/local/share/applications/$APP_ID.desktop; do
         [ -f "$file" ] && grep -qx "$WM_CLASS_LINE" "$file" && printf '%s\n' "$file" && return
     done
     return 1
@@ -408,12 +434,8 @@ refresh_menu() {
     fi
 }
 
-# Set once the AppImage is installed, whatever the distribution, so the codec hint follows it.
-appimage_installed=false
-
 install_appimage() {
-    appimage_installed=true
-    fetch appimage
+    fetch_asset appimage
     file=$fetched
     mkdir -p "$BIN_DIR" "$APPLICATIONS"
     chmod 755 "$file"
@@ -452,7 +474,7 @@ EOF
 install_package() {
     case $1 in
     debian)
-        fetch deb
+        fetch_asset deb
         file=$fetched
         # apt reads local packages as an unprivileged user, so the file must be readable.
         chmod 755 "$work"
@@ -461,13 +483,13 @@ install_package() {
         $SUDO apt-get install -y "$file" </dev/null || die "apt-get could not install $file"
         ;;
     fedora)
-        fetch rpm
+        fetch_asset rpm
         file=$fetched
         need_root "Installing the package"
         $SUDO dnf install -y "$file" </dev/null || die "dnf could not install $file"
         ;;
     suse)
-        fetch rpm
+        fetch_asset rpm
         file=$fetched
         need_root "Installing the package"
         # The release's .rpm files are not GPG-signed; the SHA256SUMS check above vouches for them.
@@ -479,56 +501,47 @@ install_package() {
     start_hint="from the app menu, or run mumcord"
 }
 
-# The AppImage has no H.264 decoder (patent-encumbered); the system's gst-libav adds it
-# (FR-2.41a). The distribution is unknown here, so the package manager decides the package.
-# Nothing is asked when it is already installed; otherwise the user may let the installer add it.
-codec_support() {
-    if installed_package gst-libav gstreamer1.0-libav gstreamer1-plugin-libav gstreamer1-libav gstreamer-plugins-libav >/dev/null; then
-        step ok "H.264 support" "gst-libav is installed"
-        return
+# Stops with what is supported unless this is FreeBSD 15.x on amd64. Runs before anything is
+# downloaded or installed.
+check_freebsd() {
+    release=$(uname -r)
+    machine=$(uname -m)
+    if [ "$machine" != amd64 ] || [ "${release%%.*}" != "$FREEBSD_MAJOR" ]; then
+        die "Mumcord for FreeBSD is available for FreeBSD $FREEBSD_MAJOR.x on amd64 only, not FreeBSD $release on $machine. Nothing was changed."
     fi
-    if have apt-get; then
-        hint="sudo apt install gstreamer1.0-libav"
-        set -- apt-get install -y gstreamer1.0-libav
-    elif have dnf; then
-        hint="sudo dnf install gstreamer1-libav (gst-libav comes from RPM Fusion; enable it first)"
-        set -- dnf install -y gstreamer1-libav
-    elif have pacman; then
-        hint="sudo pacman -S gst-libav"
-        set -- pacman -S --needed --noconfirm gst-libav
-    elif have zypper; then
-        hint="sudo zypper install gstreamer-plugins-libav"
-        set -- zypper --non-interactive install gstreamer-plugins-libav
-    else
-        step warn "H.264 support" "gst-libav is missing"
-        info "Some videos need H.264 support. Install gst-libav (the GStreamer libav plugin) with your system's package manager."
-        codec_todo="install gst-libav with your package manager"
-        return
-    fi
-    if ask_yes_no "Some videos need H.264 support. Install gst-libav now?"; then
-        if run_as_root "$@"; then
-            step ok "H.264 support" "gst-libav installed"
-            return
-        fi
-        warn "installing gst-libav failed"
-    fi
-    step warn "H.264 support" "gst-libav is missing"
-    info "Some videos need H.264 support. Install gst-libav: $hint"
-    codec_todo=${hint%% (*}
 }
 
-# run_as_root COMMAND...: like need_root, but a missing sudo only fails this command instead of
-# stopping the installer, for optional extras.
-run_as_root() {
-    if [ "$(id -u)" -eq 0 ]; then
-        "$@" </dev/null
-    elif have sudo; then
-        info "Installing gst-libav needs administrator rights; sudo may ask for your password."
-        sudo "$@" </dev/null
-    else
-        warn "sudo is not installed"
-        return 1
+install_freebsd() {
+    fetch_asset pkg
+    file=$fetched
+    need_root "Installing the package"
+    # A fresh system has only the pkg bootstrap stub, which would ask before installing pkg.
+    if ! pkg -N >/dev/null 2>&1; then
+        $SUDO env ASSUME_ALWAYS_YES=yes pkg bootstrap </dev/null || die "could not set up pkg"
     fi
+    # pkg add looks for missing dependencies only next to the package file, and the release has
+    # none there, so they come from the configured repositories first.
+    deps=$(pkg query -F "$file" '%dn') || die "could not read the dependencies of $file"
+    if [ -n "$deps" ]; then
+        deps=$(printf '%s\n' "$deps" | tr '\n' ' ')
+        info "Installing the packages Mumcord needs from the pkg repositories."
+        # shellcheck disable=SC2086 # one word per package name
+        $SUDO pkg install -y $deps </dev/null || die "pkg could not install the packages Mumcord needs: $deps"
+        step ok Dependencies "$(printf '%s' "$deps" | wc -w | tr -d ' ') packages from the pkg repositories"
+    fi
+    installed=$(pkg query '%v' "$FREEBSD_PACKAGE" 2>/dev/null) || installed=
+    if [ "$installed" = "$version" ]; then
+        step skip Install "Mumcord $version is already installed"
+    elif [ -n "$installed" ]; then
+        # Not every pkg version lets pkg add replace an installed version; -f always does.
+        $SUDO pkg add -f "$file" </dev/null || die "pkg add could not install $file"
+        step ok Install "Mumcord $installed replaced by $version"
+    else
+        $SUDO pkg add "$file" </dev/null || die "pkg add could not install $file"
+        step ok Install "Mumcord installed"
+    fi
+    installed_path=/usr/local/bin/mumcord
+    start_hint="from the app menu, or run mumcord"
 }
 
 aur_helper() {
@@ -545,9 +558,16 @@ aur_has_package() {
 
 do_install() {
     banner installer
+    version='' installed_path='' start_hint='' aur_tip=false
+    if [ "$OS" = FreeBSD ]; then
+        check_freebsd
+        install_freebsd
+        offer_desktop_icon
+        summary
+        return
+    fi
     family=$(distro_family)
     cpu >/dev/null
-    version='' installed_path='' start_hint='' codec_todo='' aur_tip=false
     case $family in
     debian | fedora | suse) install_package "$family" ;;
     arch)
@@ -570,10 +590,6 @@ do_install() {
     *) install_appimage ;;
     esac
     offer_desktop_icon
-    # After the desktop icon question, so its hint is not lost above it.
-    if [ "$appimage_installed" = true ]; then
-        codec_support
-    fi
     summary
 }
 
@@ -589,7 +605,6 @@ summary() {
     set -- "Mumcord${version:+ $version} is installed" "" \
         "Path    $(short_path "$installed_path")" \
         "Start   $start_hint"
-    [ -z "$codec_todo" ] || set -- "$@" "H.264   $codec_todo"
     if $aur_tip; then
         set -- "$@" "Tip     if the AUR has $AUR_PACKAGE, installing it with an AUR" \
             "        helper gets Mumcord updates with your system."
@@ -608,6 +623,9 @@ installed_package() {
         fi
         if have pacman && pacman -Q "$pkg" >/dev/null 2>&1; then
             echo "pacman $pkg" && return
+        fi
+        if [ "$OS" = FreeBSD ] && have pkg && pkg info -e "$pkg" 2>/dev/null; then
+            echo "pkg $pkg" && return
         fi
     done
     return 1
@@ -630,6 +648,7 @@ do_uninstall() {
             fi
             ;;
         pacman\ *) $SUDO pacman -R --noconfirm "$pkg" </dev/null ;;
+        pkg\ *) $SUDO pkg delete -y "$pkg" </dev/null ;;
         esac
         removed=true
     fi

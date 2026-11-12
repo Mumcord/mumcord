@@ -29,6 +29,7 @@ const ALLOWED_TAGS = [
   "del",
   "div",
   "em",
+  "font",
   "h1",
   "h2",
   "h3",
@@ -69,6 +70,30 @@ const MUMBLE_TEXT = /mumble:\/\/[^\s<>"']+/gi;
 /** Inline images only; anything else would be an external load. */
 const SAFE_IMAGE = /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+$/i;
 
+/**
+ * A text colour as Mumble writes it (`#rgb`, `#rrggbb` or `rgb(r, g, b)`), returned as
+ * `#rrggbb`; anything else is `null`.
+ */
+export function normalizeColor(value: string): string | null {
+  const text = value.trim().toLowerCase();
+  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/.exec(text);
+  if (hex?.[1] !== undefined) {
+    const digits = hex[1];
+    return `#${digits.length === 3 ? digits.replace(/./g, (d) => d + d) : digits}`;
+  }
+  const rgb = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/.exec(text);
+  if (!rgb) return null;
+  const parts = rgb.slice(1).map(Number);
+  if (parts.some((part) => part > 255)) return null;
+  return `#${parts.map((part) => part.toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** The colour of a `style` attribute that sets nothing but a text colour (issue #666). */
+export function colorOfStyle(style: string): string | null {
+  const match = /^\s*color\s*:\s*([^;]+?)\s*;?\s*$/i.exec(style);
+  return match?.[1] === undefined ? null : normalizeColor(match[1]);
+}
+
 // A private instance keeps these hooks away from any other DOMPurify user in the app.
 const purifier = DOMPurify(window);
 
@@ -85,6 +110,11 @@ purifier.addHook("uponSanitizeAttribute", (node, data) => {
     data.forceKeepAttr = true;
   } else if (node.nodeName === "PRE" && data.attrName === CODE_LANGUAGE_ATTRIBUTE) {
     data.forceKeepAttr = CODE_LANGUAGE.test(data.attrValue);
+  } else if (node.nodeName === "SPAN" && data.attrName === "style") {
+    // Text colour, the way Mumble writes it; any other style could hide or overlay content.
+    data.forceKeepAttr = colorOfStyle(data.attrValue) !== null;
+  } else if (node.nodeName === "FONT" && data.attrName === "color") {
+    data.forceKeepAttr = normalizeColor(data.attrValue) !== null;
   }
 });
 
@@ -97,6 +127,13 @@ purifier.addHook("afterSanitizeAttributes", (node) => {
     const src = node.getAttribute("src");
     const waiting = src === null && node.hasAttribute(IMAGE_REF_ATTRIBUTE);
     if (!waiting && (src === null || !SAFE_IMAGE.test(src.trim()))) node.remove();
+  } else if (node.nodeName === "SPAN" || node.nodeName === "FONT") {
+    // Kept colours are written back in one canonical form, so cleaning twice changes nothing.
+    const name = node.nodeName === "SPAN" ? "style" : "color";
+    const value = node.getAttribute(name);
+    const color =
+      value === null ? null : name === "style" ? colorOfStyle(value) : normalizeColor(value);
+    if (color !== null) node.setAttribute(name, name === "style" ? `color:${color}` : color);
   }
 });
 

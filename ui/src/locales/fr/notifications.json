@@ -1,8 +1,8 @@
 {
   "region": "Notifications",
   "channel": "#{{name}}",
-  "unknownChannel": "Un canal",
-  "line": "{{sender}} : {{preview}}",
+  "unknownChannel": "Un salon",
+  "line": "{{sender}} : {{preview}}",
   "groupedChannel_one": "{{count}} nouveau message dans {{name}}",
   "groupedChannel_many": "{{count}} nouveaux messages dans {{name}}",
   "groupedChannel_other": "{{count}} nouveaux messages dans {{name}}",
@@ -10,9 +10,9 @@
   "groupedPrivate_many": "{{count}} nouveaux messages de {{name}}",
   "groupedPrivate_other": "{{count}} nouveaux messages de {{name}}",
   "image": "A envoyé une image",
-  "open": "Ouvrir la discussion",
+  "open": "Ouvrir le chat",
   "close": "Ignorer la notification",
-  "mentionLine": "{{sender}} vous a mentionné : {{preview}}",
+  "mentionLine": "{{sender}} t’a mentionné : {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
     "title": "Notifications",
@@ -29,26 +29,26 @@
       "invites": "Invitations",
       "plugins": "Plugins"
     },
-    "empty": "Vous êtes à jour.",
+    "empty": "Tu es à jour.",
     "unread": "Non lues",
-    "dndOn": "Ne pas déranger est activé",
-    "dndOff": "Ne pas déranger est désactivé",
+    "dndOn": "« Ne pas déranger » est activé",
+    "dndOff": "« Ne pas déranger » est désactivé",
     "settings": "Paramètres des notifications",
     "someone": "Quelqu’un",
     "quoted": "« {{text}} »",
-    "mention": "{{name}} vous a mentionné",
+    "mention": "{{name}} t’a mentionné",
     "mentionGroup": "{{name}} a mentionné tout le monde",
-    "reply": "{{name}} a répondu à votre message",
-    "chatRequest": "{{name}} souhaite discuter avec vous",
+    "reply": "{{name}} a répondu à ton message",
+    "chatRequest": "{{name}} veut discuter avec toi",
     "messageRequest": "Demande de message de {{name}}",
     "messageRequestBody_one": "{{count}} message d’un client Mumble standard",
-    "messageRequestBody_many": "{{count}} de messages d’un client Mumble standard",
+    "messageRequestBody_many": "{{count}} messages d’un client Mumble standard",
     "messageRequestBody_other": "{{count}} messages d’un client Mumble standard",
     "invite": {
-      "watchParty": "{{name}} vous a invité à une watch party",
+      "watchParty": "{{name}} t’a invité à une soirée de visionnage",
       "screenShare": "{{name}} partage son écran",
-      "card": "{{name}} vous a envoyé une carte",
-      "theme": "{{name}} a partagé un thème avec vous"
+      "card": "{{name}} t’a envoyé une carte",
+      "theme": "{{name}} a partagé un thème avec toi"
     },
     "connection": "{{server}} est injoignable",
     "type": {
@@ -66,18 +66,22 @@
     "open": "Ouvrir",
     "dismiss": "Ignorer",
     "dismissItem": "Ignorer : {{title}}",
-    "failed": "Cela n’a pas fonctionné. Veuillez réessayer.",
+    "failed": "Cela n’a pas fonctionné. Réessaie.",
     "block": "Bloquer",
     "update": {
       "title": "Mumcord {{version}} est prêt",
-      "body": "Redémarrez pour mettre à jour",
+      "body": "Redémarre pour mettre à jour",
       "restart": "Redémarrer pour mettre à jour",
       "whatsNew": "Nouveautés"
     },
     "relay": {
       "title": "Relais modifié sur {{server}}",
-      "body": "Le partage d'écran et de fichiers est en pause jusqu'à ce que tu fasses confiance au nouveau relais.",
+      "body": "Le partage d’écran et de fichiers est en pause jusqu’à ce que tu fasses confiance au nouveau relais.",
       "decision": "Décision requise"
     }
+  },
+  "suppressionFallback": {
+    "title": "Suppression du bruit trop lente",
+    "text": "Trop lente sur cet ordinateur pour le moment. « {{standard}} » prend le relais en attendant."
   }
 }

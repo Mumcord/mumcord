@@ -11,8 +11,8 @@
     "autoOff": "Išjungtas po pasikartojančių strigčių",
     "backingOff": "Paleidžiamas iš naujo po strigties",
     "notLoaded": "Nepavyko įkelti",
-    "revoked": "Išjungė „Mumcord“: {{reason}}",
-    "revocationWarning": "„Mumcord“ įspėjimas: {{reason}}",
+    "revoked": "Išjungė Mumcord: {{reason}}",
+    "revocationWarning": "Mumcord įspėjimas: {{reason}}",
     "tampered": "Šio papildinio failai buvo pakeisti",
     "permission": "Išjungtas, nes išjungtas reikalingas leidimas"
   },
@@ -26,11 +26,11 @@
       "nobody": "Niekas"
     },
     "notifications": "Pranešimai",
-    "pin": "Prisegti versiją {{version}} (be automatinių atnaujinimų)",
+    "pin": "Užfiksuoti versiją {{version}} (be automatinių naujinių)",
     "settings": "Papildinio nustatymai",
     "diagnostics": "Diagnostika",
     "export": "Eksportuoti duomenis",
-    "reset": "Atstatyti duomenis",
+    "reset": "Išvalyti duomenis",
     "remove": "Pašalinti",
     "commandTaken": "/{{command}}: Komandą jau naudoja {{plugin}}"
   },
@@ -56,7 +56,7 @@
     "incomingRateDropped": "Dažnio ribos atmesti gaunami pranešimai",
     "incomingInvalid": "Netinkami gaunami pranešimai",
     "uiFreezes": "Kiek kartų Mumcord užstrigo, kai buvo atidarytas žiniatinklio turinys",
-    "refusedAppMenuLabel": "Šis papildinys atmestas: Programų meniu etiketė sutampa su „Mumcord“ pačios arba prasideda žodžiu „Mumcord“.",
+    "refusedAppMenuLabel": "Šis papildinys atmestas: jo programų meniu etiketė sutampa su paties Mumcord etikete arba prasideda žodžiu „Mumcord“.",
     "fieldWithoutPermission": "Šis papildinys atmestas: jis naudoja „{{field}}“ neturėdamas leidimo „{{permission}}“.",
     "webDisabled": "Žiniatinklio turinys išjungtas, nes Mumcord nustojo reaguoti, kol jis buvo atidarytas.",
     "reenableWeb": "Įjungti žiniatinklio turinį",
@@ -76,15 +76,15 @@
     "done": "Duomenys eksportuoti."
   },
   "reset": {
-    "title": "Atstatyti „{{name}}“ duomenis?",
+    "title": "Išvalyti „{{name}}“ duomenis?",
     "message": "Viskas, ką šis papildinys išsaugojo, bus ištrinta. To atšaukti negalima.",
-    "confirm": "Atstatyti duomenis",
-    "done": "Duomenys atstatyti."
+    "confirm": "Išvalyti duomenis",
+    "done": "Duomenys išvalyti."
   },
   "remove": {
     "title": "Pašalinti „{{name}}“?",
     "deleteData": "Ištrinti ir jo duomenis",
-    "hint": "Palikti duomenys ištrinami po 30 dienų. Iki tol įdiekite iš naujo, kad juos atgautumėte.",
+    "hint": "Palikti duomenys ištrinami po 30 dienų. Įdiek iš naujo iki tol, kad juos atgautum.",
     "confirm": "Pašalinti"
   },
   "errors": {
@@ -92,15 +92,15 @@
     "permissions": "Nepavyko pakeisti leidimo.",
     "visibility": "Nepavyko pakeisti matomumo.",
     "notifications": "Nepavyko pakeisti pranešimų.",
-    "pin": "Nepavyko prisegti versijos.",
+    "pin": "Nepavyko užfiksuoti versijos.",
     "export": "Nepavyko eksportuoti duomenų.",
-    "reset": "Nepavyko atstatyti duomenų.",
+    "reset": "Nepavyko išvalyti duomenų.",
     "remove": "Nepavyko pašalinti papildinio.",
     "badge": "Nepavyko pakeisti ženklelio.",
-    "update": "Įskiepio nepavyko atnaujinti."
+    "update": "Nepavyko atnaujinti papildinio."
   },
   "update": {
-    "hint": "Atnaujinimas {{version}}",
+    "hint": "Naujinys {{version}}",
     "button": "Atnaujinti"
   },
   "visibilityChip": "Bendrauja su kitais Mumcord naudotojais · {{visibility}}",
@@ -113,7 +113,7 @@
     "uiUserMenu": "Naudotojo meniu",
     "uiDialog": "Savas langas",
     "uiWebview": "Žiniatinklio turinys",
-    "eventsSelf": "Jūsų būsena",
+    "eventsSelf": "Tavo būsena",
     "eventsVoice": "Balso aktyvumas",
     "eventsPresence": "Prisijungimai ir išėjimai",
     "eventsChatActivity": "Pokalbio aktyvumas",
@@ -121,11 +121,11 @@
     "randomBytes": "Atsitiktiniai skaičiai",
     "commands": "Komandos",
     "chatSend": "Rašo pokalbyje",
-    "chatSupersedes": "Pakeičia savo teksto eilutę",
+    "chatSupersedes": "Pakeičia savo tekstą",
     "chatTriggers": "Aktyvinimo žodžiai",
     "chatPatterns": "Pokalbių šablonai",
     "netHttp": "Prieiga prie interneto",
-    "secrets": "Raktų pakabukas"
+    "secrets": "Raktų saugykla"
   },
   "offerBadge": "Nauji leidimai",
   "refused": {

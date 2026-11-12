@@ -1,7 +1,8 @@
 //! Pinned channel info (FR-1.48b) against the local test server, with a SuperUser bot that
 //! creates a temporary channel with a long description. `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_channel_info -- --ignored --test-threads=1`
-#![cfg(feature = "test-backend")]
+// FreeBSD: see the note on the mumbot dev-dependency in Cargo.toml.
+#![cfg(all(feature = "test-backend", not(target_os = "freebsd")))]
 
 mod common;
 

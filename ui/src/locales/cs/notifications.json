@@ -3,14 +3,14 @@
   "channel": "#{{name}}",
   "unknownChannel": "Kanál",
   "line": "{{sender}}: {{preview}}",
-  "groupedChannel_one": "{{count}} nová zpráva v {{name}}",
-  "groupedChannel_few": "{{count}} nové zprávy v {{name}}",
-  "groupedChannel_many": "{{count}} nových zpráv v {{name}}",
-  "groupedChannel_other": "{{count}} nových zpráv v {{name}}",
-  "groupedPrivate_one": "{{count}} nová zpráva od {{name}}",
-  "groupedPrivate_few": "{{count}} nové zprávy od {{name}}",
-  "groupedPrivate_many": "{{count}} nových zpráv od {{name}}",
-  "groupedPrivate_other": "{{count}} nových zpráv od {{name}}",
+  "groupedChannel_one": "{{count}} nová zpráva v kanálu {{name}}",
+  "groupedChannel_few": "{{count}} nové zprávy v kanálu {{name}}",
+  "groupedChannel_many": "{{count}} nové zprávy v kanálu {{name}}",
+  "groupedChannel_other": "{{count}} nových zpráv v kanálu {{name}}",
+  "groupedPrivate_one": "{{count}} nová zpráva od uživatele {{name}}",
+  "groupedPrivate_few": "{{count}} nové zprávy od uživatele {{name}}",
+  "groupedPrivate_many": "{{count}} nové zprávy od uživatele {{name}}",
+  "groupedPrivate_other": "{{count}} nových zpráv od uživatele {{name}}",
   "image": "Poslal(a) obrázek",
   "open": "Otevřít chat",
   "close": "Zavřít oznámení",
@@ -30,7 +30,7 @@
       "mentions": "Zmínky",
       "requests": "Žádosti",
       "invites": "Pozvánky",
-      "plugins": "Doplňky"
+      "plugins": "Pluginy"
     },
     "empty": "Vše je přečteno.",
     "unread": "Nepřečtené",
@@ -43,7 +43,7 @@
     "mentionGroup": "{{name}} zmínil(a) všechny",
     "reply": "{{name}} odpověděl(a) na tvou zprávu",
     "chatRequest": "{{name}} si s tebou chce psát",
-    "messageRequest": "Žádost o zprávu od {{name}}",
+    "messageRequest": "Žádost o zprávu od uživatele {{name}}",
     "messageRequestBody_one": "{{count}} zpráva ze standardního klienta Mumble",
     "messageRequestBody_few": "{{count}} zprávy ze standardního klienta Mumble",
     "messageRequestBody_many": "{{count}} zprávy ze standardního klienta Mumble",
@@ -54,7 +54,7 @@
       "card": "{{name}} ti poslal(a) kartu",
       "theme": "{{name}} s tebou sdílel(a) motiv"
     },
-    "connection": "{{server}} je nedostupný",
+    "connection": "Server {{server}} je nedostupný",
     "type": {
       "chatRequest": "Žádost o chat",
       "messageRequest": "Žádost o zprávu",
@@ -71,17 +71,21 @@
     "dismiss": "Zavřít",
     "dismissItem": "Zavřít: {{title}}",
     "failed": "To se nepodařilo. Zkus to znovu.",
-    "block": "Blokovat",
+    "block": "Zablokovat",
     "update": {
       "title": "Mumcord {{version}} je připraven",
-      "body": "Restartujte pro aktualizaci",
+      "body": "Aktualizace proběhne po restartu",
       "restart": "Restartovat a aktualizovat",
       "whatsNew": "Co je nového"
     },
     "relay": {
-      "title": "Relay na {{server}} se změnil",
-      "body": "Sdílení obrazovky a souborů je pozastaveno, dokud nového relaye nebudeš důvěřovat.",
+      "title": "Relay na serveru {{server}} se změnil",
+      "body": "Sdílení obrazovky a souborů je pozastaveno, dokud nepotvrdíš, že novému relayi důvěřuješ.",
       "decision": "Vyžaduje tvé rozhodnutí"
     }
+  },
+  "suppressionFallback": {
+    "title": "Potlačení šumu je příliš pomalé",
+    "text": "Na tomto počítači je teď příliš pomalé. Než to zvládne, běží „{{standard}}“."
   }
 }

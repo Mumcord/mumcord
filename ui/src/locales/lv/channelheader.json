@@ -6,7 +6,7 @@
     "join": "Pievienoties kanālam",
     "follow": "Sekot kanālam",
     "unfollow": "Pārtraukt sekot kanālam",
-    "following": "Seko",
+    "following": "Sekoju",
     "copyLink": "Kopēt kanāla saiti",
     "password": "Kanāla parole",
     "info": "Kanāla informācija",
@@ -16,7 +16,7 @@
       "music": "♪ Mūzika",
       "jam": "⚡ Jam"
     },
-    "move": "Pārvietot lietotājus šeit"
+    "move": "Pārvietot lietotājus uz šejieni"
   },
   "info": {
     "title": "Kanāla informācija: {{channel}}",
@@ -35,7 +35,7 @@
     "access": "Piekļuve",
     "accessOpen": "Atvērts",
     "accessRestricted": "Ierobežots (parole vai grupa)",
-    "accessSaved": "Aizsargāts, saglabāta parole to atslēdz",
+    "accessSaved": "Aizsargāts; to atslēdz saglabātā parole",
     "links": "Saistītie kanāli",
     "none": "Nav",
     "permissions": "Manas atļaujas",
@@ -50,7 +50,7 @@
     },
     "quality": "Kvalitātes ierobežojums",
     "qualityLimit": "Opus, līdz {{kbps}} kbit/s",
-    "following": "Seko",
+    "following": "Sekošana",
     "yes": "Jā",
     "no": "Nē",
     "audioProfile": "Mans audio profils",
@@ -100,7 +100,7 @@
     "bitrateDefault": "Noklusējums, {{value}}",
     "serverLimit": "Servera ierobežojums {{kbps}} kbit/s",
     "noServerLimit": "Nav servera ierobežojuma",
-    "note": "Tiek lietots, kad pievienojaties šim kanālam, tikai šajā ierīcē. Citus tas neietekmē. Savienojuma informācijā šīs vērtības ir atzīmētas ar „(kanāla profils)“.",
+    "note": "Tiek lietots, kad pievienojies šim kanālam, tikai šajā ierīcē. Citus tas neietekmē. Savienojuma informācijā šīs vērtības ir atzīmētas ar „(kanāla profils)”.",
     "saveFailed": "Neizdevās saglabāt audio profilu.",
     "remove": "Noņemt profilu",
     "cancel": "Atcelt",

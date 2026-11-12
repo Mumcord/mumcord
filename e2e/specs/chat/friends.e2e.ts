@@ -1,5 +1,6 @@
 import { browser, expect, $ } from "@wdio/globals";
 import { app, testenv } from "../../helpers/index.ts";
+import { openMembersTab } from "../../helpers/members-ui.ts";
 import { hasClass } from "../../helpers/selectors.ts";
 import {
   addFirstServer,
@@ -28,6 +29,8 @@ function presence() {
 }
 
 async function waitFriendStatus(name: string, status: RegExp): Promise<void> {
+  // The friends list sits under the member list, on the Members tab.
+  await openMembersTab();
   await browser.waitUntil(async () => status.test(await friendStatus(name)), {
     timeout: 15_000,
     timeoutMsg: `friend ${name} never matched ${String(status)}`,

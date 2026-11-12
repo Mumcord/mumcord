@@ -5,7 +5,7 @@
     "activity": "Aktivitet"
   },
   "you": "Du",
-  "selfName": "din",
+  "selfName": "dig",
   "someone": "någon",
   "verb": {
     "connected": "anslöt",
@@ -28,9 +28,9 @@
   "yesterday": "Igår",
   "empty": "Ingen aktivitet än.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} skärmdelning",
-    "watchParty": "{{action}} {{name}} watch party",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "screenShare": "{{action}} – skärmdelning från {{name}}",
+    "watchParty": "{{action}} – watch party från {{name}}",
+    "pluginActivity": "{{action}} – {{plugin}} från {{name}}",
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Kunde inte gå med i watch partyt.",

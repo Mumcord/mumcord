@@ -1,17 +1,17 @@
 {
-  "hint": "Laadige testimiseks lahtipakitud pistikprogrammi kaust. Arendaja pistikprogrammid pole allkirjastatud, ei ole kunagi ametlikud ega saa õigusi net.http, secrets ega ui.webview. Need eemaldatakse, kui arendajarežiim välja lülitatakse.",
-  "load": "Laadi pistikprogrammi kaust…",
-  "pickFolder": "Valige pistikprogrammi kaust",
-  "empty": "Ühtegi arendaja pistikprogrammi pole laaditud.",
-  "listLabel": "Arendaja pistikprogrammid",
-  "label": "Arendaja pistikprogramm",
+  "hint": "Testimiseks laadi lahtipakitud plugina kaust. Arendaja pluginad pole allkirjastatud, ei ole kunagi ametlikud ega saa õigusi net.http, secrets ega ui.webview. Need eemaldatakse, kui arendajarežiim välja lülitatakse.",
+  "load": "Laadi plugina kaust…",
+  "pickFolder": "Vali plugina kaust",
+  "empty": "Ühtegi arendaja pluginat pole laaditud.",
+  "listLabel": "Arendaja pluginad",
+  "label": "Arendaja plugin",
   "status": {
     "running": "Töötab",
     "off": "Väljas",
     "backingOff": "Taaskäivitub kokkujooksmise järel",
     "autoOff": "Välja lülitatud korduvate kokkujooksmiste järel",
-    "allOff": "Kõik pistikprogrammid on välja lülitatud",
-    "noPlugins": "Pistikprogrammid on selleks seansiks välja lülitatud",
+    "allOff": "Kõik pluginad on välja lülitatud",
+    "noPlugins": "Pluginad on selleks seansiks välja lülitatud",
     "notLoaded": "Laadimine ebaõnnestus"
   },
   "showLog": "Näita {{name}} logi",
@@ -27,9 +27,9 @@
     "error": "Viga"
   },
   "errors": {
-    "load": "Pistikprogrammi kausta laadimine ebaõnnestus.",
-    "reload": "Pistikprogrammi uuesti laadimine ebaõnnestus.",
-    "unload": "Pistikprogrammi eemaldamine ebaõnnestus.",
+    "load": "Plugina kausta laadimine ebaõnnestus.",
+    "reload": "Plugina uuesti laadimine ebaõnnestus.",
+    "unload": "Plugina eemaldamine ebaõnnestus.",
     "log": "Logi lugemine ebaõnnestus."
   }
 }

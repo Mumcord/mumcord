@@ -1,12 +1,12 @@
 {
   "close": {
-    "title": "Minimér til bakken eller afslut?",
-    "description": "Du er stadig forbundet. Når Mumcord er minimeret, bliver du i voice og appen forbliver i systembakken.",
+    "title": "Minimér til systembakken eller afslut?",
+    "description": "Du er stadig forbundet. Når Mumcord er minimeret, bliver du i talekanalen, og appen bliver i systembakken.",
     "remember": "Husk mit valg",
-    "minimize": "Minimér til bakken",
+    "minimize": "Minimér til systembakken",
     "quit": "Afslut",
     "failed": "Det virkede ikke. Prøv igen.",
-    "descriptionServers": "Du er stadig forbundet til {{count}} servere. Minimeret holder Mumcord dig i talekanalen og bliver i systembakken."
+    "descriptionServers": "Du er stadig forbundet til {{count}} servere. Når Mumcord er minimeret, bliver du i talekanalen, og appen bliver i systembakken."
   },
   "windowOverlay": {
     "title": "Vinduesoverlayet er fjernet",
@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabil",
+    "releaseCandidate": "Release candidate",
+    "prereleaseNote": "Dette er en forhåndsversion og kan indeholde fejl. Skift til den stabile kanal i indstillingerne for kun at få endelige udgivelser.",
     "available": {
       "title": "Opdatering tilgængelig",
       "subtitle": "Mumcord {{version}} er klar til download. Du har {{current}}.",
@@ -51,11 +53,11 @@
       "trust": "Hentes kun fra github.com via HTTPS og kontrolleres mod signatur og kontrolsum, før den installeres.",
       "skip": "Spring denne version over",
       "later": "Mind mig om det senere",
-      "download": "Download og installer",
+      "download": "Download og installér",
       "openReleasePage": "Åbn udgivelsessiden",
       "manual": "Download den nye version fra udgivelsessiden.",
-      "manualPackage": "Download pakken fra udgivelsessiden, og installer den derefter med:",
-      "manualAur": "Opdater den med din AUR-hjælper:"
+      "manualPackage": "Download pakken fra udgivelsessiden, og installér den derefter med:",
+      "manualAur": "Opdatér den med din AUR-hjælper:"
     },
     "tags": {
       "added": "Tilføjet",
@@ -66,8 +68,8 @@
     "noNotes": "Ingen noter til denne version.",
     "steps": {
       "download": "Download",
-      "verify": "Kontroller signatur og kontrolsum",
-      "install": "Installer",
+      "verify": "Kontrollér signatur og kontrolsum",
+      "install": "Installér",
       "done": "færdig",
       "current": "i gang",
       "pending": "ikke startet endnu"
@@ -83,7 +85,7 @@
       "secondsLeft_other": "omkring {{count}} sekunder tilbage",
       "minutesLeft_one": "omkring {{count}} minut tilbage",
       "minutesLeft_other": "omkring {{count}} minutter tilbage",
-      "cancel": "Annuller"
+      "cancel": "Annullér"
     },
     "ready": {
       "title": "Mumcord {{version}} er klar",

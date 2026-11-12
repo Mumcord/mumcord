@@ -14,7 +14,9 @@
 //! answers `full` (FR-8.52): the tile shows "Too many people are watching {name}" and joins
 //! again on the sender's next `on`, which it sends when a slot frees up, at most once per
 //! [`JOIN_EVERY`]. A join that brings neither a token nor `full` within [`FAILED_AFTER`] failed
-//! for another reason and is retried once per [`JOIN_EVERY`].
+//! for another reason and is retried once per [`JOIN_EVERY`]. A sender that cannot serve this
+//! client at all answers `needs` (FR-8.95): the tile says the camera needs Mumcord 0.9.0 and
+//! joins again only on the sender's next `on`.
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::Arc;
@@ -69,6 +71,9 @@ pub enum TileState {
     Full,
     /// The join brought no answer: "Couldn't join {name}'s camera"; retried once per 10 s.
     Failed,
+    /// The sender cannot serve this viewer: the camera needs Mumcord 0.9.0 (FR-8.95). The text
+    /// stays until the camera's next `on`; no join is retried meanwhile.
+    NeedsUpdate,
     /// Not downloading: the tile, the room or all cameras are hidden, or Show cameras is Never.
     Hidden,
 }
@@ -244,7 +249,7 @@ impl Tile {
                 TileState::Joining | TileState::Playing | TileState::Failed => {
                     Some(Act::Unbind { leave: true })
                 }
-                TileState::Full => Some(Act::Unbind { leave: false }),
+                TileState::Full | TileState::NeedsUpdate => Some(Act::Unbind { leave: false }),
                 TileState::Announced | TileState::Hidden => None,
             };
             self.state = TileState::Hidden;
@@ -276,6 +281,15 @@ impl Tile {
                 act
             }
             TileState::Full => None,
+            // A new `on` is the only thing that retries a camera this client cannot play.
+            TileState::NeedsUpdate if self.retry => {
+                self.state = TileState::Joining;
+                self.joining_since = None;
+                let act = self.try_join(now);
+                self.retry = act.is_none();
+                act
+            }
+            TileState::NeedsUpdate => None,
             TileState::Failed => self.try_join(now),
             TileState::Playing => None,
         }
@@ -307,6 +321,23 @@ impl Tile {
             return false;
         }
         self.state = TileState::Full;
+        self.joining_since = None;
+        self.retry = false;
+        true
+    }
+
+    /// The sender answered `needs` for broadcast `id` (FR-8.95): this client cannot play that
+    /// camera, it needs Mumcord 0.9.0. `false` if that changes nothing.
+    fn needs(&mut self, id: &str) -> bool {
+        if self.id != id
+            || !matches!(
+                self.state,
+                TileState::Joining | TileState::Failed | TileState::Full
+            )
+        {
+            return false;
+        }
+        self.state = TileState::NeedsUpdate;
         self.joining_since = None;
         self.retry = false;
         true
@@ -1001,7 +1032,7 @@ pub(crate) fn on_camera_on(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: S
         }
         match room.tiles.get_mut(&sharer) {
             Some(tile) if tile.id == id => {
-                tile.retry = tile.state == TileState::Full;
+                tile.retry = matches!(tile.state, TileState::Full | TileState::NeedsUpdate);
                 None
             }
             Some(tile) => {
@@ -1032,6 +1063,20 @@ pub(crate) fn on_camera_full(engine: &Engine, ctx: &SessionCtx, sharer: u32, id:
         .get_mut(&ctx.server_id)
         .and_then(|r| r.tiles.get_mut(&sharer))
         .is_some_and(|t| t.full(id));
+    if changed {
+        engine.camera_sync(ctx, false);
+    }
+}
+
+/// `needs` from `sharer` (FR-8.95): its camera cannot serve this client; the tile says it needs
+/// Mumcord 0.9.0 and stops joining until the camera's next `on`.
+pub(crate) fn on_camera_needs(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: &str) {
+    let changed = lock(engine.camera_state())
+        .recv
+        .rooms
+        .get_mut(&ctx.server_id)
+        .and_then(|r| r.tiles.get_mut(&sharer))
+        .is_some_and(|t| t.needs(id));
     if changed {
         engine.camera_sync(ctx, false);
     }
@@ -1185,6 +1230,50 @@ mod tests {
         // A playing tile ignores a stray full.
         tile.state = TileState::Playing;
         assert!(!tile.full(ID));
+    }
+
+    #[test]
+    fn needs_shows_the_text_and_waits_for_the_next_announcement() {
+        let now = Instant::now();
+        let mut tile = Tile::new(ID.into());
+        assert_eq!(tile.step(true, now), Some(Act::Join));
+        assert!(
+            !tile.needs("ffffffffffffffff"),
+            "another broadcast's needs is ignored"
+        );
+        assert!(tile.needs(ID));
+        assert_eq!(tile.state, TileState::NeedsUpdate);
+        // Neither the join's timeout nor the ticks retry without an announcement.
+        assert_eq!(tile.step(true, later(now, 30)), None);
+        assert_eq!(tile.step(true, later(now, 60)), None);
+        assert_eq!(tile.state, TileState::NeedsUpdate);
+        // Hiding it unbinds without cam-leave: the sender never admitted it.
+        assert_eq!(
+            tile.step(false, later(now, 61)),
+            Some(Act::Unbind { leave: false })
+        );
+        assert_eq!(tile.state, TileState::Hidden);
+
+        // `on` again: joined once more, within the sender's join limit.
+        let mut again = Tile::new(ID.into());
+        again.step(true, now);
+        assert!(again.needs(ID));
+        again.retry = true;
+        assert_eq!(again.step(true, later(now, 11)), Some(Act::Join));
+        assert_eq!(again.state, TileState::Joining);
+
+        // A join that timed out first turns needs-update when the sender answers late.
+        let mut late = Tile::new(ID.into());
+        late.step(true, now);
+        late.step(true, later(now, 10));
+        assert_eq!(late.state, TileState::Failed);
+        assert!(late.needs(ID));
+        assert_eq!(late.state, TileState::NeedsUpdate);
+
+        // A playing tile ignores a stray needs message.
+        let mut playing = Tile::new(ID.into());
+        playing.state = TileState::Playing;
+        assert!(!playing.needs(ID));
     }
 
     #[test]

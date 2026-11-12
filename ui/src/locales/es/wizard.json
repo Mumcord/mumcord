@@ -33,6 +33,7 @@
     "voice": "Voz",
     "setupStyle": "Estilo de configuración",
     "privateMessages": "Mensajes privados",
+    "notifications": "Notificaciones",
     "connections": "Conexiones",
     "features": "Funciones",
     "appearance": "Apariencia",
@@ -40,8 +41,8 @@
     "summary": "Todo listo"
   },
   "welcome": {
-    "title": "Chat de voz que se siente como",
-    "titleAccent": "tu propio lugar.",
+    "title": "Chat de voz donde te sientes",
+    "titleAccent": "como en casa.",
     "subtitle": "Mumcord habla Mumble, así que funciona con cualquier servidor de Mumble, y añade un chat moderno encima. Vamos a configurarlo a tu gusto. Lleva unos dos minutos.",
     "voice": {
       "title": "Voz cristalina",
@@ -61,7 +62,7 @@
     "intro": "Tu identidad es la forma en que los servidores te reconocen. Crea una nueva o trae la que ya usas.",
     "legend": "Tu identidad",
     "create": "Crear una identidad nueva",
-    "createText": "Tu identidad es un certificado que demuestra quién eres en los servidores de Mumble. Conserva tu nombre registrado y tus permisos, así eres la misma persona cada vez que entras.",
+    "createText": "Tu identidad es un certificado que demuestra quién eres en los servidores de Mumble. Conserva tu nombre registrado y tus permisos, así que eres la misma persona cada vez que entras.",
     "import": "Importar una identidad existente",
     "name": "Nombre para mostrar predeterminado",
     "nameHint": "Se usa en servidores que aún no te conocen. Puedes cambiarlo por servidor.",
@@ -113,13 +114,13 @@
       "p1": "Los demás ven lo que juegas y escuchas",
       "p2": "Tu IP es visible para las personas con las que te conectas directamente",
       "p3": "Cualquiera puede escribirte; los enlaces y las imágenes se cargan desde la web",
-      "p4": "El overlay, la sincronización del historial y las imágenes a tamaño completo están activados"
+      "p4": "La superposición, la sincronización del historial y las imágenes a tamaño completo están activadas"
     },
     "balanced": {
       "title": "Equilibrado",
       "subtitle": "Entre privacidad y comodidad",
       "p1": "Solo tus amigos y las personas de tu canal pueden escribirte",
-      "p2": "Conexión directa, con un relay como alternativa",
+      "p2": "Conexión directa, con un relé como alternativa",
       "p3": "Las vistas previas de enlaces y las imágenes a tamaño completo están activadas",
       "p4": "Lo que juegas y escuchas sigue siendo privado"
     },
@@ -127,7 +128,7 @@
       "title": "Máxima privacidad",
       "subtitle": "Compartir lo mínimo posible",
       "p1": "Solo tus amigos pueden escribirte, sin excepciones",
-      "p2": "Tu IP queda oculta; todo pasa por el relay",
+      "p2": "Tu IP queda oculta; todo pasa por el relé",
       "p3": "Sin contenido externo, sin sincronización del historial, sin compartir",
       "p4": "Las actualizaciones solo te avisan; no se comparte nada de lo que haces"
     },
@@ -146,6 +147,10 @@
     "subtitle": "Los mensajes privados son chats uno a uno. El chat del canal no se ve afectado por esta elección.",
     "local": "El filtrado ocurre en tu ordenador. No se avisa a quien escribe. Más tarde puedes fijar otra regla por servidor."
   },
+  "notifications": {
+    "title": "¿Cómo debe avisarte Mumcord?",
+    "subtitle": "Elige cómo te llega cada tipo de novedad. Puedes cambiarlo más tarde en Ajustes → Notificaciones."
+  },
   "connections": {
     "title": "Conexiones y contenido",
     "subtitle": "Algunas funciones te conectan directamente con otros usuarios de Mumcord, y parte del contenido del chat se carga desde otros sitios web. Elige lo que te parezca bien.",
@@ -157,7 +162,7 @@
     "subtitle": "Activa los extras que quieras. Cada uno indica quién puede ver qué.",
     "seenByMumcordUsers": "Visible para los usuarios de Mumcord del mismo servidor.",
     "onlyYou": "Solo tú lo ves.",
-    "ingameOverlayAlt": "Ejemplo del overlay en el juego mostrando quién está hablando"
+    "ingameOverlayAlt": "Ejemplo de la superposición en el juego mostrando quién está hablando"
   },
   "appearance": {
     "title": "Elige tu aspecto",
@@ -185,6 +190,7 @@
       "identity": "Identidad",
       "voice": "Voz",
       "privateMessages": "Mensajes privados",
+      "notifications": "Notificaciones",
       "connections": "Conexiones",
       "chatContent": "Contenido del chat",
       "features": "Funciones",
@@ -194,14 +200,16 @@
     },
     "identityDetail": "Guardada en el llavero de tu sistema",
     "voiceDetail": "Supresión de ruido: {{noise}}",
-    "pmDetail": "Mi canal {{channel}} · chats aceptados {{accepted}} · solicitudes {{requests}}",
-    "contentTitle": "Vistas previas de enlaces {{previews}}",
-    "contentDetail": "Imágenes a tamaño completo {{images}} · sincronización del historial {{sync}}",
-    "featuresTitle": "Overlay en el juego {{overlay}}",
-    "featuresDetail": "Seguir No molestar del sistema {{dnd}} · reproduciendo ahora {{playing}} · jugando ahora {{gaming}}",
-    "effectsDetail": "Efectos visuales {{effects}}",
-    "startupTitle": "Iniciar al iniciar sesión {{login}}",
-    "startupDetail": "Iniciar minimizado {{minimized}} · enlaces mumble:// {{links}}",
+    "pmDetail": "Mi canal: {{channel}} · chats aceptados: {{accepted}} · solicitudes: {{requests}}",
+    "notificationsTitle": "Mensajes nuevos: {{mode}}",
+    "notificationsDetail": "Notificaciones de actividad: {{on}} de {{total}} activadas",
+    "contentTitle": "Vistas previas de enlaces: {{previews}}",
+    "contentDetail": "Imágenes a tamaño completo: {{images}} · sincronización del historial: {{sync}}",
+    "featuresTitle": "Superposición en el juego: {{overlay}}",
+    "featuresDetail": "Seguir No molestar del sistema: {{dnd}} · reproduciendo ahora: {{playing}} · jugando ahora: {{gaming}} · historial de actividad: {{history}}",
+    "effectsDetail": "Efectos visuales: {{effects}}",
+    "startupTitle": "Abrir al iniciar sesión: {{login}}",
+    "startupDetail": "Iniciar minimizado: {{minimized}} · enlaces mumble://: {{links}}",
     "updates": {
       "auto": "Descargar automáticamente",
       "notify": "Solo avisar",
@@ -220,5 +228,39 @@
     "discardBody": "Nada se guarda antes de terminar. Si cancelas ahora, todo queda como está.",
     "discardKeep": "Seguir editando",
     "discardConfirm": "Descartar cambios"
+  },
+  "guide": {
+    "label": "Consejo de Aaron",
+    "from": "Consejo de Aaron",
+    "hide": "Ocultar a Aaron",
+    "show": "Mostrar a Aaron",
+    "titles": {
+      "welcome": "Te damos la bienvenida",
+      "import": "Trae tus cosas de Mumble",
+      "identity": "Tu nombre en los servidores",
+      "voice": "Elige tu micrófono",
+      "setupStyle": "Elige un estilo",
+      "privateMessages": "Quién puede escribirte",
+      "notifications": "Tus notificaciones",
+      "connections": "Conexiones directas",
+      "features": "Elige tus extras",
+      "appearance": "Elige tu aspecto",
+      "startup": "Al iniciar Mumcord",
+      "summary": "Revisa tus elecciones"
+    },
+    "hints": {
+      "welcome": "¡Hola, soy Aaron! Te guiaré por la configuración. Solo lleva un minuto.",
+      "import": "Estos son los servidores y ajustes encontrados en Mumble. Elige lo que quieras conservar.",
+      "identity": "Tu identidad es tu nombre en los servidores. Crea una nueva o importa una existente.",
+      "voice": "Elige aquí el micrófono con el que hablas y di hola: la barra verde debería bailar.",
+      "setupStyle": "Elige un estilo. Podrás cambiar cada ajuste más adelante.",
+      "privateMessages": "Elige quién puede enviarte mensajes privados. Los remitentes nunca se enteran.",
+      "notifications": "Elige cómo te llega cada tipo de novedad, o desactívala.",
+      "connections": "Elige si Mumcord puede conectarte directamente con otros usuarios de Mumcord.",
+      "features": "Activa solo los extras que te gusten. Cada tarjeta indica quién puede verlo.",
+      "appearance": "Claro, oscuro o como tu sistema: elige aquí tu aspecto.",
+      "startup": "Elige cómo arranca Mumcord cuando inicias sesión en tu ordenador.",
+      "summary": "¡Todo listo! Revisa aquí tus elecciones; Editar te lleva de vuelta a cualquier paso."
+    }
   }
 }

@@ -263,16 +263,26 @@ impl<'a> Reader<'a> {
 
     /// Decodes a `PacketDataStream` varint (negative forms included for completeness).
     fn varint(&mut self) -> Option<u64> {
+        self.varint_inner(true)
+    }
+
+    /// `allow_negative` is false after a 0xF8 prefix: Mumble never nests negation, and recursing
+    /// per byte would let a multi-megabyte tunnelled packet overflow the stack.
+    fn varint_inner(&mut self, allow_negative: bool) -> Option<u64> {
         let v = self.byte()?;
         Some(if v & 0x80 == 0 {
             v & 0x7F
         } else if v & 0xC0 == 0x80 {
             (v & 0x3F) << 8 | self.byte()?
         } else if v & 0xF0 == 0xF0 {
+            let negative = matches!(v & 0xFC, 0xF8 | 0xFC);
+            if negative && !allow_negative {
+                return None;
+            }
             match v & 0xFC {
                 0xF0 => self.be(4)?,
                 0xF4 => self.be(8)?,
-                0xF8 => !self.varint()?,
+                0xF8 => !self.varint_inner(false)?,
                 _ => !(v & 0x03),
             }
         } else if v & 0xF0 == 0xE0 {
@@ -314,6 +324,20 @@ mod tests {
         assert_eq!(out, [0x81, 0x2C]);
         assert_eq!(Reader(&[0xFC]).varint(), Some(!0), "-1 short form");
         assert_eq!(Reader(&[0x81]).varint(), None, "truncated");
+    }
+
+    #[test]
+    fn varint_negated_prefix_is_not_recursive() {
+        // A tunnelled packet can be megabytes long; nesting must not eat the stack.
+        let flood = vec![0xF8u8; 4 * 1024 * 1024];
+        assert_eq!(Reader(&flood).varint(), None);
+        assert_eq!(Reader(&[0xF8, 0xF8, 0x01]).varint(), None, "nested prefix");
+        assert_eq!(
+            Reader(&[0xF8, 0x05]).varint(),
+            Some(!5),
+            "single negated varint"
+        );
+        assert_eq!(Reader(&[0xF8]).varint(), None, "truncated");
     }
 
     #[test]

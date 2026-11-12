@@ -14,7 +14,7 @@
   "latencyValue": "{{value}} ms",
   "loss": "Paketförlust",
   "lossValue": "{{value}} %",
-  "bitrate": "Sändningsbitrate",
+  "bitrate": "Skickad bithastighet",
   "bitrateValue": "{{value}} kbit/s",
   "serverLimit": "Servergräns",
   "packets": "Paket skickade / mottagna",
@@ -44,7 +44,7 @@
     "device": "Din ljudenhet hade avbrott"
   },
   "details": "Detaljer",
-  "sinceConnected": "Räknare sedan anslutningen. Grafer: senaste {{minutes}} min.",
+  "sinceConnected": "Räknat sedan anslutningen. Grafer: senaste {{minutes}} min.",
   "about": "Om {{label}}",
   "help": {
     "dropouts": "Luckor när din ljudenhet inte hann med (överskridning, underskridning eller omstart). Normalt: 0.",
@@ -52,7 +52,7 @@
     "concealed": "Talramar från andra som inte kom fram i tid, så klienten fyllde luckan. Orsak: nätverksförlust. Normalt: nästan 0.",
     "jitter": "Fördröjning som jämnar ut andras talpaket som kommer ojämnt. Normalt: 20–60 ms.",
     "processing": "Tid att behandla en ram på 10 ms från din mikrofon. Normalt: långt under 10 ms.",
-    "realtime": "Om ljudtrådarna får realtidsprioritet av systemet. På hjälper mot avbrott under belastning."
+    "realtime": "Om ljudtrådarna får realtidsprioritet av systemet. Påslaget hjälper det mot avbrott under belastning."
   },
   "recent": {
     "perMinute": "Senaste {{minutes}} min: {{value}} per minut.",
@@ -64,11 +64,11 @@
     "title": "Röstkvalitet",
     "status": "Ping {{latency}}, förlust {{loss}}",
     "lowLatency": "Läge för låg fördröjning",
-    "lowLatencyHint": "För att spela musik tillsammans i realtid. Fungerar bäst med push-to-talk.",
+    "lowLatencyHint": "För att spela musik tillsammans i realtid. Fungerar bäst med Push-to-talk.",
     "voiceSettings": "Röstinställningar…",
     "applies": "Gäller direkt, sparas som i Inställningar → Ljud",
     "keys": "Esc stänger · ↑↓ flyttar · ← → justerar",
-    "bandwidthLabel": "Uppskattad bandbredd inkl. rubriker",
+    "bandwidthLabel": "Uppskattad bandbredd",
     "bandwidthValue": "≈ {{value}} av {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
     "bandwidthMeterText": "{{value}} av {{limit}} kbit/s ({{percent}} %)",
@@ -84,14 +84,14 @@
     "warningBandwidth": "Använder mer bandbredd: ≈ {{on}} kbit/s i stället för ≈ {{off}}.",
     "warningWifi": "Kan hacka på Wi-Fi eller en belastad anslutning.",
     "warningHeadphones": "Använd hörlurar: ekoreducering är av.",
-    "warningPtt": "Fungerar bäst med push-to-talk.",
-    "bandwidthLowLatencyWithin": "Paket på 10 ms ger extra header-overhead; inom gränsen. Stäng av läget för att spara ≈ {{value}} kbit/s.",
-    "bandwidthLowLatencyOver": "Paket på 10 ms ger extra header-overhead; över gränsen. Stäng av läget för att spara ≈ {{value}} kbit/s.",
-    "bandwidthLowLatencyNoLimit": "Paket på 10 ms ger extra header-overhead. Stäng av läget för att spara ≈ {{value}} kbit/s."
+    "warningPtt": "Fungerar bäst med Push-to-talk.",
+    "bandwidthLowLatencyWithin": "Paket på 10 ms ger mer overhead från pakethuvuden; inom gränsen. Stäng av läget för att spara ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Paket på 10 ms ger mer overhead från pakethuvuden; över gränsen. Stäng av läget för att spara ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Paket på 10 ms ger mer overhead från pakethuvuden. Stäng av läget för att spara ≈ {{value}} kbit/s."
   },
   "endToEnd": "Total latens",
   "endToEndValue": "≈ {{value}} ms (uppskattning)",
-  "lowLatencyMode": "Läge för låg latens",
+  "lowLatencyMode": "Läge för låg fördröjning",
   "identity": "Identitet",
   "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
   "profileSource": "{{label}} (kanalprofil)",
@@ -99,8 +99,8 @@
     "row": "Ljudprofil",
     "musicOn": "Musikkvalitet",
     "musicOff": "Musikkvalitet av",
-    "lowLatencyOn": "Läge för låg latens",
-    "lowLatencyOff": "Läge för låg latens av",
+    "lowLatencyOn": "Läge för låg fördröjning",
+    "lowLatencyOff": "Läge för låg fördröjning av",
     "defaults": "Standard"
   }
 }

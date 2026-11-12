@@ -15,7 +15,8 @@
     "needsRelayMode": "La condivisione della fotocamera è disattivata. Modificalo in Privacy e connessioni.",
     "noCertificate": "La condivisione della fotocamera richiede un certificato client.",
     "registeredOnly": "Su questo server solo gli utenti registrati possono usare la fotocamera.",
-    "needsDirect": "La condivisione della fotocamera richiede connessioni dirette. Modificalo in Privacy e connessioni."
+    "needsDirect": "La condivisione della fotocamera richiede connessioni dirette. Modificalo in Privacy e connessioni.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Fotocamera attiva",
   "turnOffTray": "Disattiva la fotocamera",
@@ -193,7 +194,8 @@
     "showVideo": "Mostra video",
     "viewing": "In visione",
     "weak": "Connessione debole",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Questa fotocamera richiede Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Opzioni per {{name}}",

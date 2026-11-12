@@ -13,7 +13,7 @@
   "groupedPrivate_other": "{{count}} naujų žinučių nuo {{name}}",
   "image": "Atsiuntė paveikslėlį",
   "open": "Atidaryti pokalbį",
-  "close": "Atmesti pranešimą",
+  "close": "Paslėpti pranešimą",
   "mentionLine": "{{sender}} paminėjo tave: {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
@@ -23,7 +23,7 @@
     "bellUnread_many": "Pranešimai, {{count}} neperskaityto",
     "bellUnread_other": "Pranešimai, {{count}} neperskaitytų",
     "shortcut": "Ctrl+Shift+N",
-    "markAllRead": "Pažymėti viską kaip perskaitytą",
+    "markAllRead": "Pažymėti visus kaip perskaitytus",
     "filterLabel": "Rodyti pranešimus",
     "filter": {
       "all": "Visi",
@@ -34,8 +34,8 @@
     },
     "empty": "Viską peržiūrėjai.",
     "unread": "Neperskaityta",
-    "dndOn": "Netrukdyti įjungta",
-    "dndOff": "Netrukdyti išjungta",
+    "dndOn": "Režimas „Netrukdyti“ įjungtas",
+    "dndOff": "Režimas „Netrukdyti“ išjungtas",
     "settings": "Pranešimų nustatymai",
     "someone": "Kažkas",
     "quoted": "„{{text}}“",
@@ -74,14 +74,18 @@
     "block": "Blokuoti",
     "update": {
       "title": "Mumcord {{version}} paruoštas",
-      "body": "Paleiskite iš naujo, kad atnaujintumėte",
+      "body": "Paleisk iš naujo, kad atnaujintum",
       "restart": "Paleisti iš naujo ir atnaujinti",
       "whatsNew": "Kas naujo"
     },
     "relay": {
-      "title": "Serverio {{server}} retransliatorius pasikeitė",
-      "body": "Ekrano ir failų bendrinimas sustabdytas, kol pasitikėsi nauju retransliatoriumi.",
+      "title": "Pasikeitė serverio {{server}} perdavimo mazgas",
+      "body": "Ekrano ir failų bendrinimas sustabdytas, kol patvirtinsi, kad pasitiki nauju perdavimo mazgu.",
       "decision": "Reikia tavo sprendimo"
     }
+  },
+  "suppressionFallback": {
+    "title": "Triukšmo slopinimas per lėtas",
+    "text": "Šiame kompiuteryje dabar per lėtas. Kol spės, naudojamas „{{standard}}“."
   }
 }

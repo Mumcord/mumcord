@@ -1,10 +1,10 @@
 name: Build and smoke
 
 # Reusable: builds the unsigned bundles (Linux AppImage, Windows NSIS installer and portable zip,
-# macOS universal DMG), uploads them as workflow artifacts, then installs each one on a fresh runner and
+# macOS DMGs for Apple Silicon and Intel), uploads them as workflow artifacts, then installs each one on a fresh runner and
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
 # test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
-# Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
+# Release builds sign and notarize the macOS DMGs only when the Apple secrets exist, and sign the
 # Windows app and installer with the Certum certificate through SimplySign only when the Certum
 # secrets and variable exist (docs/release-signing.md); without them those bundles are built unsigned.
 # Release builds also bundle the third-party notices that release.yml regenerated (artifact
@@ -45,6 +45,10 @@ env:
   # Official Mumble server for the native Windows/macOS smoke servers (Linux uses testenv).
   MUMBLE_SERVER_VERSION: 1.5.939
 
+# Callers grant at most this; the jobs only read the repository and upload run artifacts.
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build ${{ matrix.name }}
@@ -55,38 +59,44 @@ jobs:
           # AppImage, .deb and .rpm (FR-2.53) for x86_64 and, on GitHub's ARM runner, ARM64.
           - name: linux
             os: ubuntu-24.04
-            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json
+            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json
             bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
           - name: linux-arm64
             os: ubuntu-24.04-arm
-            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json
+            args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json
             bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
           - name: windows
             os: windows-latest
             args: --bundles nsis --config src-tauri/tauri.onnxruntime.windows.json
             # The installer and the portable zip (packaged below from the same Mumcord.exe).
             bundle: target/release/bundle/nsis/*-setup.exe target/release/bundle/nsis/*-portable.zip
-          # One DMG for Apple Silicon and Intel Macs. The smoke test on the arm64 runner
-          # exercises the arm64 half. "app" keeps Mumcord.app after the DMG is built (Tauri
-          # deletes it otherwise); releases pack it into the updater archive.
-          - name: macos
+          # One DMG per Mac architecture, each built natively in parallel: Apple Silicon on the
+          # arm64 runner, Intel on GitHub's last Intel image (macos-15-intel). Tauri names the
+          # DMG after the architecture (_aarch64.dmg, _x64.dmg); "arch" names the updater archive
+          # the same way. "app" keeps Mumcord.app after the DMG is built (Tauri deletes it
+          # otherwise); releases pack it into the updater archive.
+          - name: macos-aarch64
             os: macos-latest
-            args: --bundles app,dmg --target universal-apple-darwin --config src-tauri/tauri.onnxruntime.macos.json
-            onnxruntime-target: universal-apple-darwin
-            bundle: target/universal-apple-darwin/release/bundle/dmg/*.dmg
-            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
+            args: --bundles app,dmg --config src-tauri/tauri.onnxruntime.macos.json
+            bundle: target/release/bundle/dmg/*.dmg
+            arch: aarch64
+          - name: macos-x64
+            os: macos-15-intel
+            args: --bundles app,dmg --config src-tauri/tauri.onnxruntime.macos.json
+            bundle: target/release/bundle/dmg/*.dmg
+            arch: x64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
-    # The Certum signing secrets exist only in the "release" environment, which accepts only
-    # version tags.
-    environment: ${{ (inputs.release && matrix.name == 'windows') && 'release' || '' }}
+    # The Windows (Certum) and Apple signing secrets exist only in the "release" environment,
+    # which accepts only version tags, so no other workflow run can read them.
+    environment: ${{ (inputs.release && (matrix.name == 'windows' || matrix.name == 'macos')) && 'release' || '' }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Releases bundle the notices release.yml regenerated from the tagged commit.
       - name: Use the regenerated third-party notices
         if: inputs.release
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: third-party-notices
 
@@ -100,7 +110,7 @@ jobs:
       - name: Restore apt packages
         id: apt-cache
         if: runner.os == 'Linux'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -122,7 +132,7 @@ jobs:
 
       - name: Save apt packages
         if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-build-${{ matrix.os }}-${{ steps.apt.outputs.image }}
@@ -145,7 +155,7 @@ jobs:
 
       - name: Restore static libvpx
         id: libvpx-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -160,7 +170,7 @@ jobs:
 
       - name: Save static libvpx
         if: steps.libvpx-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -187,16 +197,16 @@ jobs:
       - name: Native AV1 libraries
         uses: ./.github/actions/native-av1
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
-          targets: ${{ matrix.rust-targets }}
+          toolchain: stable
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: release
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm
@@ -275,16 +285,61 @@ jobs:
       # in the build arguments (Linux /usr/lib/mumcord, Windows next to Mumcord.exe with the
       # Visual C++ runtime it needs, macOS Contents/Frameworks, signed with the app).
       - name: Stage ONNX Runtime
-        run: node scripts/stage-onnxruntime.js ${{ matrix.onnxruntime-target }}
+        run: node scripts/stage-onnxruntime.js
 
-      # The AppImage bundles the GStreamer plugins (bundleMediaFramework) but not H.264 (gst-libav,
-      # x264) or the GPL-only codecs; see RELEASING.md. The deb/rpm packages depend on gst-libav instead.
-      - name: Exclude H.264 and GPL-only GStreamer plugins from the AppImage
+      # H.264 and AAC for video playback (Twitch, .mp4) in every Linux package: an LGPL-only,
+      # decoders-only FFmpeg and gst-libav built against the runner's GStreamer 1.24
+      # (scripts/build-ffmpeg.sh, RELEASING.md), cached per architecture; the key changes with the
+      # script, which pins the versions. The .deb and .rpm carry it in /usr/lib/mumcord
+      # (src-tauri/tauri.ffmpeg.linux.json), the AppImage with its other GStreamer plugins.
+      - name: Restore bundled FFmpeg
+        id: ffmpeg-cache
+        if: runner.os == 'Linux'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/ffmpeg
+          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('scripts/build-ffmpeg.sh') }}
+
+      - name: Build bundled FFmpeg
+        if: runner.os == 'Linux' && steps.ffmpeg-cache.outputs.cache-hit != 'true'
+        run: |
+          scripts/ci/apt-install.sh nasm meson ninja-build libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+          scripts/build-ffmpeg.sh "$RUNNER_TEMP/ffmpeg"
+
+      - name: Save bundled FFmpeg
+        if: runner.os == 'Linux' && steps.ffmpeg-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/ffmpeg
+          key: ${{ steps.ffmpeg-cache.outputs.cache-primary-key }}
+
+      # Fails before the long build when the result is not LGPL only or contains encoders.
+      - name: Stage bundled FFmpeg
         if: runner.os == 'Linux'
         run: |
-          echo "GSTREAMER_PLUGINS_DIR=$(scripts/filter-gst-plugins.sh)" >> "$GITHUB_ENV"
-          # linuxdeploy only finds the plugin scanner by itself on Debian paths; pass it explicitly.
-          echo "GSTREAMER_HELPERS_DIR=$(scripts/gst-helpers-dir.sh)" >> "$GITHUB_ENV"
+          rm -rf src-tauri/gen/ffmpeg
+          mkdir -p src-tauri/gen
+          cp -R "$RUNNER_TEMP/ffmpeg" src-tauri/gen/ffmpeg
+          python3 -I scripts/smoke/check-ffmpeg.py src-tauri/gen/ffmpeg/libavcodec.so.60
+          echo "Bundled FFmpeg and gst-libav (bytes):"
+          find src-tauri/gen/ffmpeg -type f -printf '%s %P\n'
+          du -sb src-tauri/gen/ffmpeg
+
+      # The AppImage bundles the GStreamer plugins (bundleMediaFramework) without the system's
+      # H.264 and GPL-only ones, and with the bundled gst-libav instead; see RELEASING.md.
+      - name: Choose the GStreamer plugins for the AppImage
+        if: runner.os == 'Linux'
+        run: |
+          plugins=$(scripts/filter-gst-plugins.sh)
+          ln -s "$PWD/src-tauri/gen/ffmpeg/gstreamer-1.0/libgstlibav.so" "$plugins/"
+          helpers=$(scripts/gst-helpers-dir.sh)
+          {
+            echo "GSTREAMER_PLUGINS_DIR=$plugins"
+            # linuxdeploy finds the plugin's FFmpeg libraries here and copies them into the AppImage.
+            echo "LD_LIBRARY_PATH=$PWD/src-tauri/gen/ffmpeg"
+            # linuxdeploy only finds the plugin scanner by itself on Debian paths; pass it explicitly.
+            echo "GSTREAMER_HELPERS_DIR=$helpers"
+          } >> "$GITHUB_ENV"
 
       # --locked: the bundle is built from exactly the dependencies in Cargo.lock, the same ones the
       # notices job read (scripts/generate-notices.sh), or the build fails instead of resolving anew.
@@ -305,12 +360,12 @@ jobs:
             || { echo "::error::'$VERSION' is not a release candidate version like 1.2.3-rc.1"; exit 1; }
           base=${BASH_REMATCH[1]}
           rc=${BASH_REMATCH[2]}
-          npm run tauri build -- --bundles appimage,deb --config src-tauri/tauri.onnxruntime.linux.json -- --locked
+          npm run tauri build -- --bundles appimage,deb --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json -- --locked
           for deb in target/release/bundle/deb/*.deb; do
             scripts/deb-set-version.sh "$deb" "$base~rc.$rc"
           done
           rpm=$(jq -nc --arg v "$base" --arg r "0.rc.$rc" '{version: $v, bundle: {linux: {rpm: {release: $r}}}}')
-          npm run tauri bundle -- --bundles rpm --config src-tauri/tauri.onnxruntime.linux.json --config "$rpm"
+          npm run tauri bundle -- --bundles rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json --config "$rpm"
           ls -l target/release/bundle/rpm/*.rpm
 
       # Signed Windows release: Tauri signs the app exe, the uninstaller and the installer through
@@ -432,7 +487,7 @@ jobs:
           LIBVPX_VERSION: ${{ runner.os == 'Windows' && steps.libvpx.outputs.version || '' }}
         run: scripts/sbom-native.sh "$LIBVPX_VERSION" > "sbom-native-${{ matrix.name }}.txt"
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: inputs.release
         with:
           name: sbom-native-${{ matrix.name }}
@@ -446,9 +501,9 @@ jobs:
           cp ${{ matrix.bundle }} out/
           # The in-app updater swaps the whole app from this archive (issue #168); the release job
           # signs it. COPYFILE_DISABLE keeps macOS metadata files out of the archive.
-          if [[ "${{ matrix.name }}" == "macos" && "${{ inputs.release }}" == "true" ]]; then
-            COPYFILE_DISABLE=1 tar -czf "out/Mumcord_${{ inputs.version }}_universal.app.tar.gz" \
-              -C target/universal-apple-darwin/release/bundle/macos Mumcord.app
+          if [[ "$RUNNER_OS" == macOS && "${{ inputs.release }}" == "true" ]]; then
+            COPYFILE_DISABLE=1 tar -czf "out/Mumcord_${{ inputs.version }}_${{ matrix.arch }}.app.tar.gz" \
+              -C target/release/bundle/macos Mumcord.app
           fi
           # Tells the release job to describe the DMG as signed and notarized.
           if [[ "${MUMCORD_MACOS_SIGNED:-}" == "true" ]]; then touch out/MACOS-SIGNED; fi
@@ -465,12 +520,79 @@ jobs:
           EOF
           ls -l out
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mumcord-${{ matrix.name }}-${{ inputs.release && 'release' || 'unsigned-test-build' }}
           path: out/
           if-no-files-found: error
           retention-days: ${{ inputs.release && 7 || 14 }}
+
+  # FreeBSD 15.x amd64 in a VM on a Linux runner (spec 13 §10): the .pkg is built with the repo's
+  # own script and smoke-tested against a local mumble-server from the package collection. Its job
+  # is separate from the matrix because the build runs inside the VM, not on the runner.
+  freebsd:
+    name: Build FreeBSD package
+    if: inputs.release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Releases bundle the notices release.yml regenerated from the tagged commit.
+      - name: Use the regenerated third-party notices
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: third-party-notices
+
+      - name: Build the package in a FreeBSD VM
+        uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
+        with:
+          release: "15.1"
+          usesh: true
+          # 8 GB RAM and four cores: `cargo build --release` needs both (spec 13 §10).
+          mem: 8192
+          cpu: 4
+          prepare: |
+            # git: the plugin tool's publish test runs git. cmake and gmake build the bundled
+            # libopus (cpal -> opusic-sys) from source. bash: the version and SBOM scripts are
+            # bash scripts, and FreeBSD ships none.
+            pkg install -y git bash rust node24 npm protobuf python3 pkgconf cmake gmake ca_root_nss \
+              alsa-lib alsa-plugins libvpx svt-av1 dav1d gstreamer1-libav \
+              gstreamer1-plugins-vpx gstreamer1-plugins-opus webkit2-gtk_41 gtk3 \
+              libayatana-appindicator
+          run: |
+            set -e
+            export PATH="$HOME/.cargo/bin:$PATH"
+            export CARGO_BUILD_JOBS=4
+            # Called through bash: the script's "#!/bin/bash" does not exist on FreeBSD, where
+            # bash lives in /usr/local/bin.
+            bash scripts/set-version.sh "${{ inputs.version }}"
+            # The version stamp goes into the binary, so no cargo cache is reused across versions.
+            npm ci
+            npm run build
+            sh scripts/build-freebsd-pkg.sh
+            # The native libraries this build ships, for the SBOM job (scripts/generate-sbom.sh).
+            scripts/sbom-native.sh > sbom-native-freebsd.txt
+            ls -l dist-freebsd/ sbom-native-freebsd.txt
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sbom-native-freebsd
+          path: sbom-native-freebsd.txt
+          if-no-files-found: error
+
+      - name: Collect artifact
+        shell: bash
+        run: |
+          mkdir -p out
+          cp "${{ github.workspace }}/dist-freebsd/"*.pkg out/
+          ls -l out
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mumcord-freebsd-release
+          path: out/
+          if-no-files-found: error
+          retention-days: 7
 
   smoke:
     name: Smoke ${{ matrix.name }}
@@ -483,16 +605,18 @@ jobs:
           - { name: linux, os: ubuntu-24.04, mumbot: linux-x86_64 }
           - { name: linux-arm64, os: ubuntu-24.04-arm, mumbot: linux-aarch64 }
           - { name: windows, os: windows-latest, mumbot: windows-x86_64 }
-          - { name: macos, os: macos-latest, mumbot: macos-universal }
+          # The test bot itself ships as one universal macOS binary.
+          - { name: macos-aarch64, os: macos-latest, mumbot: macos-universal, arch: arm64 }
+          - { name: macos-x64, os: macos-15-intel, mumbot: macos-universal, arch: x86_64 }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: mumcord-${{ matrix.name }}-${{ inputs.release && 'release' || 'unsigned-test-build' }}
           path: build
@@ -509,7 +633,7 @@ jobs:
       - name: Restore apt packages
         id: apt-cache-smoke
         if: runner.os == 'Linux'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
@@ -521,7 +645,7 @@ jobs:
         run: |
           scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
             libasound2-dev cmake sqlite3 xvfb dbus-x11 gnome-keyring libsecret-tools \
-            libwebkit2gtk-4.1-0 libpipewire-0.3-0t64
+            libwebkit2gtk-4.1-0 libpipewire-0.3-0t64 gstreamer1.0-tools
           # The AppImage must bring its own tray library (it is loaded at runtime, so a missing
           # one only shows on machines without it). Keep it off the runner so the smoke test
           # exercises the bundled copy.
@@ -539,7 +663,7 @@ jobs:
 
       - name: Save apt packages
         if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache-smoke.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/apt-archives
           key: apt-smoke-${{ matrix.os }}-${{ steps.apt-smoke.outputs.image }}
@@ -575,7 +699,7 @@ jobs:
       - name: Cache Mumble server (macOS)
         if: runner.os == 'macOS'
         id: server-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/mumble-server
           key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}
@@ -598,7 +722,7 @@ jobs:
 
       - name: Save Mumble server (macOS)
         if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main' && steps.server-build.outcome == 'success'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/mumble-server
           key: ${{ steps.server-cache.outputs.cache-primary-key }}
@@ -621,9 +745,11 @@ jobs:
 
       # --- Smoke helpers ---------------------------------------------------------------------
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           key: smoke
@@ -636,7 +762,7 @@ jobs:
 
       # The archive name carries the version, so a bump in scripts/mumbot.env misses the cache.
       - id: mumbot-cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/mumbot
           key: mumbot-${{ matrix.mumbot }}-${{ hashFiles('scripts/mumbot.env') }}
@@ -645,7 +771,7 @@ jobs:
         run: scripts/fetch-mumbot.sh ${{ matrix.mumbot }} "$RUNNER_TEMP/mumbot"
 
       - if: steps.mumbot-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/mumbot
           key: ${{ steps.mumbot-cache.outputs.cache-primary-key }}
@@ -665,24 +791,34 @@ jobs:
           (cd "$RUNNER_TEMP" && "$GITHUB_WORKSPACE/$app" --appimage-extract >/dev/null)
           test -e "$RUNNER_TEMP/squashfs-root/usr/lib/libayatana-appindicator3.so.1" \
             || { echo "libayatana-appindicator3.so.1 is missing from the AppImage" >&2; exit 1; }
-          for f in libgstlibav.so libavcodec.so.* libx264.so.*; do
-            if compgen -G "$RUNNER_TEMP/squashfs-root/usr/lib/$f" >/dev/null \
-              || compgen -G "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer-1.0/$f" >/dev/null; then
+          root=$RUNNER_TEMP/squashfs-root
+          for f in libx264.so.* libgstx264.so libgstopenh264.so; do
+            if compgen -G "$root/usr/lib/$f" >/dev/null || compgen -G "$root/usr/lib/gstreamer-1.0/$f" >/dev/null; then
               echo "$f must not be bundled in the AppImage" >&2; exit 1
             fi
           done
-          # Without the Opus parser YouTube refuses to play in the AppImage (scripts/filter-gst-plugins.sh).
-          test -e "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer-1.0/libgstopusparse.so" \
-            || { echo "libgstopusparse.so is missing from the AppImage" >&2; exit 1; }
+          # Without the Opus parser YouTube refuses to play, without the H.264 parser Twitch
+          # (scripts/filter-gst-plugins.sh).
+          for f in libgstopusparse.so libgstvideoparsersbad.so; do
+            test -e "$root/usr/lib/gstreamer-1.0/$f" || { echo "$f is missing from the AppImage" >&2; exit 1; }
+          done
           # Without the bundled scanner every plugin load warns and runs in-process.
-          test -x "$RUNNER_TEMP/squashfs-root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
+          test -x "$root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
             || { echo "gst-plugin-scanner is missing from the AppImage" >&2; exit 1; }
+          # H.264 and AAC: the bundled FFmpeg (LGPL only, no encoders) decodes a sample through the
+          # AppImage's own GStreamer libraries, plugins and scanner, as the AppRun hook sets them up.
+          python3 -I scripts/smoke/check-ffmpeg.py "$root/usr/lib/libavcodec.so.60"
+          LD_LIBRARY_PATH="$root/usr/lib" GST_PLUGIN_PATH_1_0="" \
+            GST_PLUGIN_SYSTEM_PATH_1_0="$root/usr/lib/gstreamer-1.0" \
+            GST_PLUGIN_SCANNER_1_0="$root/usr/lib/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" \
+            GST_REGISTRY_1_0="$RUNNER_TEMP/appimage-registry.bin" \
+            scripts/smoke/check-h264-playback.sh "$root/usr/lib/gstreamer-1.0/libgstlibav.so"
           # Camera background effects: the bundled ONNX Runtime loads from where
           # crates/effects/src/runtime.rs looks for it (usr/lib/mumcord beside usr/bin).
           test -x "$RUNNER_TEMP/squashfs-root/usr/bin/mumcord" \
             || { echo "usr/bin/mumcord is missing from the AppImage" >&2; exit 1; }
-          python3 -I scripts/smoke/check-onnxruntime.py "$RUNNER_TEMP/squashfs-root/usr/lib/mumcord/libonnxruntime.so.1.23.2"
-          rm -rf "$RUNNER_TEMP/squashfs-root"
+          python3 -I scripts/smoke/check-onnxruntime.py "$root/usr/lib/mumcord/libonnxruntime.so.1.23.2"
+          rm -rf "$root"
           # Secret Service (unlocked gnome-keyring) for the identity, and a virtual display.
           # An EMPTY password creates no `login` collection, so unlock with a fixed non-empty
           # throwaway password in a fresh D-Bus session; verify with secret-tool before seeding.
@@ -721,12 +857,22 @@ jobs:
             grep -qx "MimeType=x-scheme-handler/mumble;" /usr/share/applications/Mumcord.desktop
             grep -qx "StartupWMClass=app.mumcord.client" /usr/share/applications/Mumcord.desktop
             test -e /usr/share/icons/hicolor/128x128/apps/mumcord.png
+            # H.264 and AAC from the bundled gst-libav in the system GStreamer, with the plugin
+            # path Mumcord sets at start (src-tauri/src/gst_plugins.rs); on Fedora without RPM Fusion.
+            plugin=/usr/lib/mumcord/gstreamer-1.0/libgstlibav.so
+            missing=$(ldd "$plugin" | grep "=> not found" || true)
+            if [ -n "$missing" ]; then echo "gst-libav: unresolved libraries: $missing" >&2; exit 1; fi
+            GST_PLUGIN_PATH_1_0=/usr/lib/mumcord/gstreamer-1.0 GST_REGISTRY_1_0=/tmp/mumcord-registry.bin \
+              /src/scripts/smoke/check-h264-playback.sh "$plugin"
           '
           sudo apt-get install -y --no-install-recommends "$PWD/$(ls build/*.deb)"
+          sudo ln -sfn "$PWD" /src
           bash -c "$check"
           python3 -I scripts/smoke/check-onnxruntime.py /usr/lib/mumcord/libonnxruntime.so.1.23.2
-          docker run --rm -v "$PWD/build:/build:ro" fedora:42 bash -c \
-            "dnf install -y -q /build/*.rpm >/dev/null && $check"
+          python3 -I scripts/smoke/check-ffmpeg.py /usr/lib/mumcord/libavcodec.so.60
+          # gstreamer1 brings gst-launch-1.0 and gst-inspect-1.0.
+          docker run --rm -v "$PWD/build:/build:ro" -v "$PWD/scripts:/src/scripts:ro" fedora:42 bash -c \
+            "dnf install -y -q /build/*.rpm gstreamer1 >/dev/null && $check"
 
       - name: Smoke test (Windows)
         if: runner.os == 'Windows'
@@ -796,11 +942,17 @@ jobs:
           mount=$(hdiutil attach -nobrowse -readonly "$dmg" | awk -F'\t' '/\/Volumes\//{print $NF}')
           cp -R "$mount/Mumcord.app" /Applications/
           hdiutil detach "$mount"
-          # Camera background effects: ONNX Runtime for both architectures in the app's
-          # Frameworks, signed with the app (Developer ID in a signed build, ad hoc otherwise).
+          # Each DMG holds exactly its own architecture: the runner's (uname -m), for the app and
+          # for ONNX Runtime (camera background effects) in the app's Frameworks, signed with the
+          # app (Developer ID in a signed build, ad hoc otherwise).
+          [[ "$(uname -m)" == "${{ matrix.arch }}" ]] \
+            || { echo "runner is $(uname -m), expected ${{ matrix.arch }}" >&2; exit 1; }
           ort=/Applications/Mumcord.app/Contents/Frameworks/libonnxruntime.1.23.2.dylib
-          for arch in arm64 x86_64; do
-            lipo "$ort" -verify_arch "$arch" || { echo "ONNX Runtime has no $arch slice" >&2; exit 1; }
+          exe=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' /Applications/Mumcord.app/Contents/Info.plist)
+          for bin in "/Applications/Mumcord.app/Contents/MacOS/$exe" "$ort"; do
+            archs=$(lipo -archs "$bin")
+            [[ "$archs" == "${{ matrix.arch }}" ]] \
+              || { echo "$bin has architectures '$archs', expected only ${{ matrix.arch }}" >&2; exit 1; }
           done
           codesign --verify --strict --verbose=2 "$ort"
           if [[ -e build/MACOS-SIGNED ]]; then

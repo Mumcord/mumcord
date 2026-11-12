@@ -14,11 +14,11 @@
     "revoked": "Mumcord poisti käytöstä: {{reason}}",
     "revocationWarning": "Mumcordin varoitus: {{reason}}",
     "tampered": "Tämän lisäosan tiedostoja on muutettu",
-    "permission": "Poistettu käytöstä, koska tarvittava lupa on pois päältä"
+    "permission": "Poistettu käytöstä, koska tarvittava oikeus on pois päältä"
   },
   "details": {
     "open": "Lisäosan {{name}} tiedot",
-    "permissions": "Luvat",
+    "permissions": "Oikeudet",
     "visibility": "Kuka näkee tämän lisäosan toiminnan",
     "visibilityOptions": {
       "everyone": "Kaikki",
@@ -57,7 +57,7 @@
     "incomingInvalid": "Virheelliset saapuvat viestit",
     "uiFreezes": "Kuinka monta kertaa Mumcord jumittui verkkosisällön ollessa auki",
     "refusedAppMenuLabel": "Tämä lisäosa hylättiin: Sovellukset-valikon nimike on sama kuin Mumcordin oma tai alkaa sanalla ”Mumcord”.",
-    "fieldWithoutPermission": "Tämä lisäosa hylättiin: se käyttää kenttää ”{{field}}” ilman lupaa ”{{permission}}”.",
+    "fieldWithoutPermission": "Tämä lisäosa hylättiin: se käyttää kenttää ”{{field}}” ilman oikeutta ”{{permission}}”.",
     "webDisabled": "Verkkosisältö on poistettu käytöstä, koska Mumcord lakkasi vastaamasta sen ollessa auki.",
     "reenableWeb": "Ota verkkosisältö käyttöön",
     "reenableFailed": "Verkkosisältöä ei voitu ottaa käyttöön.",
@@ -89,7 +89,7 @@
   },
   "errors": {
     "enable": "Lisäosan tilaa ei voitu vaihtaa.",
-    "permissions": "Lupaa ei voitu muuttaa.",
+    "permissions": "Oikeutta ei voitu muuttaa.",
     "visibility": "Näkyvyyttä ei voitu muuttaa.",
     "notifications": "Ilmoituksia ei voitu muuttaa.",
     "pin": "Versiota ei voitu kiinnittää.",
@@ -103,7 +103,7 @@
     "hint": "Päivitys {{version}}",
     "button": "Päivitä"
   },
-  "visibilityChip": "Puhuu muiden Mumcord-käyttäjien kanssa · {{visibility}}",
+  "visibilityChip": "Viestii muiden Mumcord-käyttäjien kanssa · {{visibility}}",
   "chips": {
     "label": "Käyttämät oikeudet",
     "uiPanel": "Paneeli",
@@ -121,13 +121,13 @@
     "randomBytes": "Satunnaisluvut",
     "commands": "Komennot",
     "chatSend": "Kirjoittaa chattiin",
-    "chatSupersedes": "Korvaa oman tekstirivinsä",
+    "chatSupersedes": "Korvaa oman tekstinsä",
     "chatTriggers": "Laukaisusanat",
     "chatPatterns": "Chat-mallit",
     "netHttp": "Internet-yhteys",
     "secrets": "Avainnippu"
   },
-  "offerBadge": "Uudet käyttöoikeudet",
+  "offerBadge": "Uudet oikeudet",
   "refused": {
     "title": "Hylätyt lisäosat",
     "when": "Hylätty {{time}}"

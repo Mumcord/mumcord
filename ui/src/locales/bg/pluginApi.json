@@ -1,7 +1,7 @@
 {
   "tooNew": "Изисква Mumcord {{version}} или по-нова",
-  "heldForApi": "Налична е актуализация след обновяване на Mumcord",
-  "updateMumcord": "Обнови Mumcord",
-  "oldMajor": "Създаден за по-стар Mumcord – може да не работи",
+  "heldForApi": "Актуализацията ще е налична, след като актуализираш Mumcord",
+  "updateMumcord": "Актуализирай Mumcord",
+  "oldMajor": "Създадена за по-стар Mumcord – може да не работи",
   "deprecated": "{{plugin}} ползва по-стар интерфейс за добавки, който Mumcord все още поддържа."
 }

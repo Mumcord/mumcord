@@ -659,6 +659,10 @@ function testErrorText(t: TFunction<"servers">, code: string): string {
       return t("dialog.test.wrongPassword");
     case "nameInUse":
       return t("dialog.test.nameInUse");
+    case "certificateRejected":
+      return t("dialog.test.certUntrustedNotSent");
+    case "certificateChanged":
+      return t("dialog.test.certChangedNotSent");
     case "serverUnreachable":
     case "localNetworkBlocked":
       return t("dialog.test.unreachable");

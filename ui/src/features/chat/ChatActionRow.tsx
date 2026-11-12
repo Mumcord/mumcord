@@ -147,6 +147,7 @@ export function ChatActionRow() {
         ref={trigger}
         type="button"
         className="chat-composer__icon chat-apps__button"
+        data-tour="apps"
         aria-haspopup="menu"
         aria-expanded={menuOpen}
         aria-controls={menuOpen ? menuId : undefined}

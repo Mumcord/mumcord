@@ -15,7 +15,8 @@
     "needsRelayMode": "Kameran jakaminen on pois päältä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
     "registeredOnly": "Vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella.",
-    "needsDirect": "Kameran jakaminen tarvitsee suoria yhteyksiä. Muuta asetus kohdassa Yksityisyys ja yhteydet."
+    "needsDirect": "Kameran jakaminen tarvitsee suoria yhteyksiä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera päällä",
   "turnOffTray": "Sammuta kamera",
@@ -186,7 +187,8 @@
     "showVideo": "Näytä video",
     "viewing": "Katselet",
     "weak": "Heikko yhteys",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Tämä kamera vaatii Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Asetukset: {{name}}",

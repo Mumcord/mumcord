@@ -121,6 +121,7 @@ describe("sharer live bar", () => {
       blocked: null,
       relayReason: null,
       kind: "window",
+      title: null,
       elapsedMs: 0,
     };
     act(() => {

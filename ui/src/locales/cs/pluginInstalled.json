@@ -1,25 +1,25 @@
 {
-  "listLabel": "Nainstalované moduly",
-  "empty": "Zatím žádné moduly.",
-  "browse": "Procházet moduly",
+  "listLabel": "Nainstalované pluginy",
+  "empty": "Zatím žádné pluginy.",
+  "browse": "Procházet pluginy",
   "enable": "{{name}} zapnut",
   "labels": {
     "official": "Oficiální",
     "unofficial": "Neoficiální · {{repository}}",
     "unofficialUnknown": "Neoficiální",
-    "developer": "Vývojářský modul",
+    "developer": "Vývojářský plugin",
     "autoOff": "Vypnutý po opakovaných pádech",
     "backingOff": "Restartuje se po pádu",
     "notLoaded": "Nepodařilo se načíst",
     "revoked": "Vypnuto aplikací Mumcord: {{reason}}",
     "revocationWarning": "Varování od aplikace Mumcord: {{reason}}",
-    "tampered": "Soubory tohoto modulu byly změněny",
+    "tampered": "Soubory tohoto pluginu byly změněny",
     "permission": "Vypnuto, protože je vypnuté potřebné oprávnění"
   },
   "details": {
-    "open": "Podrobnosti o modulu {{name}}",
+    "open": "Podrobnosti o pluginu {{name}}",
     "permissions": "Oprávnění",
-    "visibility": "Kdo vidí aktivitu tohoto modulu",
+    "visibility": "Kdo vidí aktivitu tohoto pluginu",
     "visibilityOptions": {
       "everyone": "Všichni",
       "friends": "Pouze přátelé",
@@ -27,7 +27,7 @@
     },
     "notifications": "Oznámení",
     "pin": "Připnout verzi {{version}} (bez automatických aktualizací)",
-    "settings": "Nastavení modulu",
+    "settings": "Nastavení pluginu",
     "diagnostics": "Diagnostika",
     "export": "Exportovat data",
     "reset": "Resetovat data",
@@ -61,8 +61,8 @@
     "webDisabled": "Webový obsah je vypnutý, protože Mumcord přestal reagovat, když byl otevřený.",
     "reenableWeb": "Zapnout webový obsah",
     "reenableFailed": "Webový obsah se nepodařilo zapnout.",
-    "log": "Záznam",
-    "logEmpty": "Záznam je prázdný.",
+    "log": "Protokol",
+    "logEmpty": "Protokol je prázdný.",
     "level": {
       "debug": "Ladění",
       "info": "Info",
@@ -71,31 +71,31 @@
     }
   },
   "export": {
-    "title": "Exportovat data modulu {{name}}",
+    "title": "Exportovat data pluginu {{name}}",
     "filter": "Soubor JSON",
     "done": "Data byla exportována."
   },
   "reset": {
-    "title": "Resetovat data modulu {{name}}?",
-    "message": "Vše, co tento modul uložil, bude smazáno. Tuto akci nelze vrátit zpět.",
+    "title": "Resetovat data pluginu {{name}}?",
+    "message": "Vše, co tento plugin uložil, se smaže. Tuto akci nelze vrátit zpět.",
     "confirm": "Resetovat data",
     "done": "Data byla resetována."
   },
   "remove": {
-    "title": "Odebrat modul {{name}}?",
+    "title": "Odebrat plugin {{name}}?",
     "deleteData": "Smazat také jeho data",
-    "hint": "Ponechaná data se smažou po 30 dnech. Do té doby modul nainstalujte znovu a získáte je zpět.",
+    "hint": "Ponechaná data se po 30 dnech smažou. Když plugin do té doby znovu nainstaluješ, získáš je zpět.",
     "confirm": "Odebrat"
   },
   "errors": {
-    "enable": "Modul se nepodařilo přepnout.",
+    "enable": "Plugin se nepodařilo přepnout.",
     "permissions": "Oprávnění se nepodařilo změnit.",
     "visibility": "Viditelnost se nepodařilo změnit.",
     "notifications": "Oznámení se nepodařilo změnit.",
     "pin": "Verzi se nepodařilo připnout.",
     "export": "Data se nepodařilo exportovat.",
     "reset": "Data se nepodařilo resetovat.",
-    "remove": "Modul se nepodařilo odebrat.",
+    "remove": "Plugin se nepodařilo odebrat.",
     "badge": "Odznak se nepodařilo změnit.",
     "update": "Plugin se nepodařilo aktualizovat."
   },
@@ -113,7 +113,7 @@
     "uiUserMenu": "Nabídka uživatele",
     "uiDialog": "Vlastní okno",
     "uiWebview": "Webový obsah",
-    "eventsSelf": "Váš stav",
+    "eventsSelf": "Tvůj stav",
     "eventsVoice": "Hlasová aktivita",
     "eventsPresence": "Příchody a odchody",
     "eventsChatActivity": "Aktivita v chatu",
@@ -121,7 +121,7 @@
     "randomBytes": "Náhodná čísla",
     "commands": "Příkazy",
     "chatSend": "Píše do chatu",
-    "chatSupersedes": "Nahrazuje svůj textový řádek",
+    "chatSupersedes": "Nahrazuje svůj text",
     "chatTriggers": "Spouštěcí slova",
     "chatPatterns": "Vzory v chatu",
     "netHttp": "Přístup k internetu",
@@ -129,7 +129,7 @@
   },
   "offerBadge": "Nová oprávnění",
   "refused": {
-    "title": "Odmítnuté zásuvné moduly",
+    "title": "Odmítnuté pluginy",
     "when": "Odmítnuto {{time}}"
   }
 }

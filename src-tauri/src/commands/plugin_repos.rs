@@ -364,12 +364,17 @@ pub async fn plugin_repo_review_key(
         .map(|i| i.plugins.iter().map(|p| p.id.clone()).collect())
         .unwrap_or_default();
     let client = registry_client(engine.settings()?.developer_mode)?;
+    let settings = engine.settings()?;
     let dir = plugins
         .registry_cache()
         .join(format!("repo-{}", repository.id));
-    let outcome = fetch_repository(&client, &dir, &repository, &|id| {
-        official.iter().any(|o| o == id)
-    })
+    let outcome = fetch_repository(
+        &client,
+        &dir,
+        &repository,
+        &|id| official.iter().any(|o| o == id),
+        settings.plugin_registry_cache,
+    )
     .await
     .map_err(registry_error)?;
     let new_key = match outcome {

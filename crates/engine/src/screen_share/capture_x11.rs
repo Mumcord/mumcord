@@ -5,7 +5,8 @@
 //! The picture is scaled into the encoder's box and converted to I420 in one pass.
 //!
 //! The sound is the desktop's through PipeWire, as on Wayland (FR-7.81): with the whole screen
-//! shared there is no window whose app could be asked for.
+//! shared there is no window whose app could be asked for. PipeWire is Linux's sound server, so
+//! a share on the BSDs carries no sound.
 
 use mumcord_screenshare::I420Frame;
 use x11rb::connection::Connection;
@@ -15,7 +16,9 @@ use x11rb::rust_connection::RustConnection;
 use super::capture::CaptureSource;
 use super::convert::bgrx_to_i420;
 use super::signal::ShareKind;
-use super::sound::{SoundOutcome, SoundRequest, pick};
+#[cfg(target_os = "linux")]
+use super::sound::pick;
+use super::sound::{SoundOutcome, SoundRequest};
 
 /// Why the screen cannot be captured.
 #[derive(Debug, thiserror::Error)]
@@ -72,7 +75,15 @@ impl CaptureSource for X11Capture {
     }
 
     fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
-        pick::take(request, &[])
+        #[cfg(target_os = "linux")]
+        {
+            pick::take(request, &[])
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            let _ = request;
+            SoundOutcome::NoSound
+        }
     }
 
     fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {

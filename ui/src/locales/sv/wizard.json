@@ -10,20 +10,20 @@
   },
   "nav": {
     "getStarted": "Nu kör vi",
-    "finishSetup": "Slutför installationen",
+    "finishSetup": "Slutför konfigurationen",
     "startMumcord": "Starta Mumcord",
     "finish": "Slutför",
-    "skip": "Hoppa över nu",
+    "skip": "Hoppa över tills vidare",
     "enterKey": "Enter",
     "enterHint": "för att fortsätta"
   },
   "rail": {
-    "label": "Installationssteg",
+    "label": "Konfigurationssteg",
     "appName": "Mumcord",
-    "setup": "Installation",
+    "setup": "Konfiguration",
     "custom": "Anpassad",
     "done": "(klart)",
-    "progress": "Installationens förlopp",
+    "progress": "Konfigurationens förlopp",
     "later": "Allt här kan ändras senare i Inställningar."
   },
   "steps": {
@@ -31,8 +31,9 @@
     "import": "Importera från Mumble",
     "identity": "Identitet",
     "voice": "Röst",
-    "setupStyle": "Installationsstil",
+    "setupStyle": "Konfigurationsstil",
     "privateMessages": "Privata meddelanden",
+    "notifications": "Aviseringar",
     "connections": "Anslutningar",
     "features": "Funktioner",
     "appearance": "Utseende",
@@ -58,7 +59,7 @@
   },
   "identity": {
     "title": "Vem är du på Mumble?",
-    "intro": "Din identitet är hur servrar känner igen dig. Skapa en ny eller ta med den du redan använder.",
+    "intro": "Med din identitet känner servrar igen dig. Skapa en ny eller ta med den du redan använder.",
     "legend": "Din identitet",
     "create": "Skapa en ny identitet",
     "createText": "Din identitet är ett certifikat som bevisar vem du är på Mumble-servrar. Det behåller ditt registrerade namn och dina behörigheter, så du är samma person varje gång du går med.",
@@ -106,7 +107,7 @@
   "style": {
     "title": "Hur mycket vill du dela?",
     "subtitle": "Välj en utgångspunkt. Du ser alla val igen på sista skärmen och kan ändra dem där.",
-    "legend": "Installationsstil",
+    "legend": "Konfigurationsstil",
     "everythingOn": {
       "title": "Allt på",
       "subtitle": "Alla funktioner",
@@ -129,7 +130,7 @@
       "p1": "Bara vänner kan skicka meddelanden till dig, inga undantag",
       "p2": "Din IP-adress är dold; allt går via reläet",
       "p3": "Inget externt innehåll, ingen historiksynkronisering, ingen delning",
-      "p4": "Uppdateringar meddelar bara dig; ingenting delas om vad du gör"
+      "p4": "Uppdateringar aviseras bara; ingenting delas om vad du gör"
     },
     "custom": {
       "title": "Anpassad",
@@ -145,6 +146,10 @@
     "title": "Vem kan skicka meddelanden till dig?",
     "subtitle": "Privata meddelanden är samtal mellan två personer. Kanalchatten påverkas inte av det här valet.",
     "local": "Filtreringen sker på din dator. Avsändare får inget besked. Du kan ställa in en annan regel per server senare."
+  },
+  "notifications": {
+    "title": "Hur ska Mumcord meddela dig?",
+    "subtitle": "Välj hur varje sorts nyheter når dig. Du kan ändra det senare under Inställningar → Aviseringar."
   },
   "connections": {
     "title": "Anslutningar och innehåll",
@@ -185,6 +190,7 @@
       "identity": "Identitet",
       "voice": "Röst",
       "privateMessages": "Privata meddelanden",
+      "notifications": "Aviseringar",
       "connections": "Anslutningar",
       "chatContent": "Chattinnehåll",
       "features": "Funktioner",
@@ -195,10 +201,12 @@
     "identityDetail": "Sparad i systemets nyckelring",
     "voiceDetail": "Brusreducering: {{noise}}",
     "pmDetail": "Min kanal {{channel}} · accepterade chattar {{accepted}} · förfrågningar {{requests}}",
+    "notificationsTitle": "Nya meddelanden: {{mode}}",
+    "notificationsDetail": "Aktivitetsaviseringar: {{on}} av {{total}} på",
     "contentTitle": "Länkförhandsvisningar {{previews}}",
     "contentDetail": "Bilder i full storlek {{images}} · historiksynkronisering {{sync}}",
     "featuresTitle": "Överlägg i spel {{overlay}}",
-    "featuresDetail": "Följ systemets Stör ej {{dnd}} · spelas nu {{playing}} · spelar nu {{gaming}}",
+    "featuresDetail": "Följ systemets Stör ej {{dnd}} · spelas nu {{playing}} · spelar nu {{gaming}} · aktivitetshistorik {{history}}",
     "effectsDetail": "Visuella effekter {{effects}}",
     "startupTitle": "Starta vid inloggning {{login}}",
     "startupDetail": "Starta minimerad {{minimized}} · mumble://-länkar {{links}}",
@@ -213,12 +221,46 @@
     "rerunNote": "Bara de värden du har ändrat sparas."
   },
   "rerun": {
-    "title": "Installationsguiden",
-    "note": "Du går igenom installationen igen. Din identitet ändras inte.",
+    "title": "Konfigurationsguiden",
+    "note": "Du går igenom konfigurationen igen. Din identitet ändras inte.",
     "manageIdentities": "Hantera identiteter",
-    "discardTitle": "Kasta ändringarna?",
+    "discardTitle": "Förkasta ändringarna?",
     "discardBody": "Inget sparas innan du är klar. Avbryter du nu förblir allt som det är.",
     "discardKeep": "Fortsätt redigera",
-    "discardConfirm": "Kasta ändringarna"
+    "discardConfirm": "Förkasta ändringarna"
+  },
+  "guide": {
+    "label": "Tips från Aaron",
+    "from": "Tips från Aaron",
+    "hide": "Dölj Aaron",
+    "show": "Visa Aaron",
+    "titles": {
+      "welcome": "Välkommen ombord",
+      "import": "Ta med dina Mumble-grejer",
+      "identity": "Ditt namn på servrar",
+      "voice": "Välj din mikrofon",
+      "setupStyle": "Välj en stil",
+      "privateMessages": "Vem som får skriva till dig",
+      "notifications": "Dina aviseringar",
+      "connections": "Direkta anslutningar",
+      "features": "Välj dina extrafunktioner",
+      "appearance": "Välj ditt utseende",
+      "startup": "När Mumcord startar",
+      "summary": "Kolla dina val"
+    },
+    "hints": {
+      "welcome": "Hej, jag är Aaron! Jag guidar dig genom konfigurationen. Det tar bara en minut.",
+      "import": "Det här är servrarna och inställningarna som hittades i Mumble. Välj vad du vill behålla.",
+      "identity": "Din identitet är ditt namn på servrar. Skapa en ny eller importera en befintlig.",
+      "voice": "Välj här mikrofonen du pratar i och säg sedan hej: den gröna stapeln ska dansa.",
+      "setupStyle": "Välj en stil. Du kan ändra varje enskild inställning senare.",
+      "privateMessages": "Välj vem som får skicka privata meddelanden till dig. Avsändare får aldrig veta det.",
+      "notifications": "Välj hur varje sorts nyhet når dig, eller stäng av den.",
+      "connections": "Välj om Mumcord får koppla dig direkt till andra Mumcord-användare.",
+      "features": "Aktivera bara de extrafunktioner du gillar. Varje kort visar vem som kan se det.",
+      "appearance": "Ljust, mörkt eller som ditt system: välj ditt utseende här.",
+      "startup": "Välj hur Mumcord startar när du loggar in på datorn.",
+      "summary": "Allt klart! Kolla dina val här; Redigera tar dig tillbaka till vilket steg som helst."
+    }
   }
 }

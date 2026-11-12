@@ -2,7 +2,7 @@
  * State and actions of the message input: text, an attachment tray of images, sending and inline errors.
  * Builds the HTML that goes to the server and enforces its size limits before sending.
  */
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import { shownServerId } from "../channels/serverStore";
@@ -65,6 +65,9 @@ export interface Composer {
   sendLink: (url: string) => Promise<void>;
 }
 
+/** How long an error stays under the message box before it goes away by itself. */
+const ERROR_SHOWN_MS = 6000;
+
 /**
  * `reply` is the message being replied to (FR-2.60): its quote goes in front of the text, and
  * `onReplied` runs once the reply is sent.
@@ -83,6 +86,18 @@ export function useComposer(
   // Files wait here so only one image is decoded at a time (keeps memory and the UI calm).
   const queue = useRef<Promise<void>>(Promise.resolve());
   const removed = useRef(new Set<number>());
+
+  // A refused file leaves nothing behind to fix, so its error would otherwise stay until the next
+  // keystroke; the message has been read (and announced) long before it goes away.
+  useEffect(() => {
+    if (error === null) return;
+    const timer = setTimeout(() => {
+      setError(null);
+    }, ERROR_SHOWN_MS);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [error]);
 
   const setText = useCallback((next: string) => {
     setTextState(next);

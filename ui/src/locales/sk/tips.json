@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, pomocník s tipmi",
+  "greeting": {
+    "title": "Ahoj, ja som Aaron!",
+    "body": "Som axolotl a Mumcord poznám ako vlastnú dlaň. Chceš rýchlu prehliadku? Zaberie asi minútu. Ak nie teraz, nájdeš ma v Nastaveniach → O aplikácii → Tipy.",
+    "start": "Ukáž mi to",
+    "later": "Teraz nie"
+  },
+  "progress": "Tip {{current}} z {{total}}",
+  "back": "Späť",
+  "next": "Ďalej",
+  "done": "Hotovo",
+  "skip": "Preskočiť prehliadku",
+  "close": "Zavrieť tipy",
+  "tips": {
+    "servers": {
+      "title": "Tvoje servery",
+      "body": "Na lište úplne vľavo sú tvoje servery. Tlačidlom + pridáš server, lupou prehliadaš verejné servery. Pripojiť sa môžeš k viacerým serverom naraz."
+    },
+    "channels": {
+      "title": "Kanály",
+      "body": "Dvojklikom sa ku kanálu pripojíš a môžeš hovoriť. Jedno kliknutie ukáže jeho chat bez pripojenia a tlačidlo Sledovať ťa udrží v obraze."
+    },
+    "talk": {
+      "title": "Ako hovoríš",
+      "body": "Push-to-talk alebo aktivácia hlasom? Vyber si v Nastaveniach → Hlas a zvuk, alebo otvor Nastavenia hlasu… malou šípkou vedľa mikrofónu. Push-to-talk funguje aj s tlačidlami myši."
+    },
+    "panel": {
+      "title": "Tvoj panel používateľa",
+      "body": "Vľavo dole stlmíš mikrofón alebo zvuk, zapneš kameru alebo sa odpojíš. Malé šípky vedľa otvárajú ďalšie možnosti."
+    },
+    "search": {
+      "title": "Nájdi čokoľvek",
+      "body": "Stlač {{key}} a nájdeš ľudí a kanály, aj na veľkých serveroch."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Odpovedaj na správy, cituj ich, spomínaj ľudí cez @ a zdieľaj obrázky a súbory. Tlačidlá formátovania sa zobrazia, keď píšeš."
+    },
+    "apps": {
+      "title": "Aplikácie",
+      "body": "Tlačidlo Aplikácie na lište správ spustí zdieľanie obrazovky, spoločné sledovanie alebo kameru. Doplnky pridávajú ďalšie."
+    },
+    "themes": {
+      "title": "Tvoj štýl",
+      "body": "Ozubené koliesko vľavo dole prepína medzi tmavým a svetlým vzhľadom. V Nastaveniach → Vzhľad nájdeš ďalšie motívy a server môže mať vlastný: klikni naň pravým tlačidlom a vyber Motív."
+    },
+    "end": {
+      "title": "To je všetko!",
+      "body": "Uži si Mumcord. Kedykoľvek ma znova privoláš v Nastaveniach → O aplikácii → Tipy."
+    }
+  }
+}

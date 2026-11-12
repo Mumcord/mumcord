@@ -13,7 +13,7 @@
     "finishSetup": "Beállítás befejezése",
     "startMumcord": "Mumcord indítása",
     "finish": "Befejezés",
-    "skip": "Kihagyás most",
+    "skip": "Most kihagyom",
     "enterKey": "Enter",
     "enterHint": "a folytatáshoz"
   },
@@ -33,6 +33,7 @@
     "voice": "Hang",
     "setupStyle": "Beállítási stílus",
     "privateMessages": "Privát üzenetek",
+    "notifications": "Értesítések",
     "connections": "Kapcsolatok",
     "features": "Funkciók",
     "appearance": "Megjelenés",
@@ -42,17 +43,17 @@
   "welcome": {
     "title": "Hangcsevegés, ami olyan, mint",
     "titleAccent": "a saját helyed.",
-    "subtitle": "A Mumcord érti a Mumble-t, ezért minden Mumble szerverrel működik, és modern csevegést ad hozzá. Állítsuk be úgy, ahogy tetszik. Nagyjából két percet vesz igénybe.",
+    "subtitle": "A Mumcord érti a Mumble-t, ezért minden Mumble-szerverrel működik, és modern csevegést ad hozzá. Állítsuk be úgy, ahogy tetszik. Nagyjából két percet vesz igénybe.",
     "voice": {
       "title": "Kristálytiszta hang",
-      "text": "Alacsony késleltetésű audió beépített zajszűréssel."
+      "text": "Alacsony késleltetésű hang beépített zajszűréssel."
     },
     "servers": {
-      "title": "Bármely Mumble szerverrel működik",
+      "title": "Bármely Mumble-szerverrel működik",
       "text": "Nincs fiók, nincs regisztráció. Csatlakozz a már használt szerverekhez."
     },
     "private": {
-      "title": "Tervezésből privát",
+      "title": "Alapból privát",
       "text": "Nincs telemetria. Amit a Mumcord eltárol, az a számítógépeden marad."
     }
   },
@@ -61,7 +62,7 @@
     "intro": "Az identitásod alapján ismernek fel a szerverek. Hozz létre egy újat, vagy használd a meglévőt.",
     "legend": "Az identitásod",
     "create": "Új identitás létrehozása",
-    "createText": "Az identitásod egy tanúsítvány, amely igazolja, ki vagy a Mumble szervereken. Megőrzi a regisztrált nevedet és a jogosultságaidat, így minden belépéskor ugyanaz a személy vagy.",
+    "createText": "Az identitásod egy tanúsítvány, amely igazolja, ki vagy a Mumble-szervereken. Megőrzi a regisztrált nevedet és a jogosultságaidat, így minden belépéskor ugyanaz a személy vagy.",
     "import": "Meglévő identitás importálása",
     "name": "Alapértelmezett megjelenített név",
     "nameHint": "Azokon a szervereken használatos, amelyek még nem ismernek. Szerverenként módosíthatod.",
@@ -69,7 +70,7 @@
     "noFile": "Nincs kiválasztott fájl",
     "chosenFile": "Kiválasztott fájl: {{file}}",
     "password": "Fájljelszó",
-    "passwordHint": "A jelszó ezen a számítógépen marad, és sehova sem kerül elküldésre.",
+    "passwordHint": "A jelszó ezen a számítógépen marad, és soha nem küldjük el sehova.",
     "existing": "Használt identitás: {{name}}.",
     "backup": "Később a Beállításokban készíthetsz róla biztonsági mentést. A mentéssel új számítógépen is visszaállíthatod az identitásodat.",
     "nameRequired": "Adj meg egy nevet.",
@@ -89,7 +90,7 @@
     "idle": "Nyomd meg a Teszt gombot, mondj valamit, és visszahallod magad.",
     "recording": "Beszélj most…",
     "playing": "A hangod visszajátszása…",
-    "devicesFailed": "Az audioeszközeidet nem sikerült listázni. Folytathatod, és később kiválaszthatod őket a Beállításokban.",
+    "devicesFailed": "A hangeszközeidet nem sikerült listázni. Folytathatod, és később kiválaszthatod őket a Beállításokban.",
     "testFailed": "A teszt nem indult el. Ellenőrizd, hogy a mikrofon csatlakoztatva van-e.",
     "test": "Hallgasd magad",
     "stop": "Leállítás"
@@ -101,7 +102,7 @@
     "voiceActivationDesc": "A mikrofon akkor nyílik meg, amikor beszélsz. Nem kell semmit nyomva tartani.",
     "pushToTalkDesc": "Zajos helyekre a legjobb. Te választod a billentyűt.",
     "sensitivity": "Érzékenység",
-    "changeLater": "Mindezt később módosíthatod a Beállítások → Hang és audió menüben."
+    "changeLater": "Mindezt később módosíthatod a Beállítások → Beszéd és hang menüben."
   },
   "style": {
     "title": "Mennyit szeretnél megosztani?",
@@ -111,25 +112,25 @@
       "title": "Minden bekapcsolva",
       "subtitle": "A teljes funkciókészlet",
       "p1": "Mások látják, mit játszol és mit hallgatsz",
-      "p2": "Az IP-címed látható azoknak, akikkel közvetlenül kapcsolódsz",
+      "p2": "Az IP-címed látható azoknak, akikhez közvetlenül csatlakozol",
       "p3": "Bárki írhat neked; a hivatkozások és képek a webről töltődnek be",
       "p4": "Az overlay, az előzményszinkron és a teljes méretű képek be vannak kapcsolva"
     },
     "balanced": {
       "title": "Kiegyensúlyozott",
       "subtitle": "Az adatvédelem és a kényelem között",
-      "p1": "Csak az ismerőseid és a csatornád tagjai írhatnak neked",
-      "p2": "Közvetlen kapcsolat, tartaléknak relével",
-      "p3": "A hivatkozás-előnézetek és a teljes méretű képek be vannak kapcsolva",
+      "p1": "Csak a barátaid és a csatornád tagjai írhatnak neked",
+      "p2": "Közvetlen kapcsolat, tartaléknak átjátszóval",
+      "p3": "A linkelőnézetek és a teljes méretű képek be vannak kapcsolva",
       "p4": "Az, amit játszol és hallgatsz, privát marad"
     },
     "maximumPrivacy": {
       "title": "Maximális adatvédelem",
       "subtitle": "A lehető legkevesebbet oszd meg",
-      "p1": "Csak az ismerőseid írhatnak neked, kivétel nélkül",
-      "p2": "Az IP-címed rejtett; minden a relén keresztül megy",
+      "p1": "Csak a barátaid írhatnak neked, kivétel nélkül",
+      "p2": "Az IP-címed rejtett; minden az átjátszón keresztül megy",
       "p3": "Nincs külső tartalom, nincs előzményszinkron, nincs megosztás",
-      "p4": "A frissítések csak értesítenek; semmi sem kerül megosztásra arról, amit csinálsz"
+      "p4": "A frissítések csak értesítenek; semmit nem osztunk meg arról, amit csinálsz"
     },
     "custom": {
       "title": "Egyéni",
@@ -146,9 +147,13 @@
     "subtitle": "A privát üzenetek egyéni beszélgetések. A csatornacsevegést ez a választás nem érinti.",
     "local": "A szűrés a számítógépeden történik. A feladókat nem értesítjük. Később szerverenként más szabályt is beállíthatsz."
   },
+  "notifications": {
+    "title": "Hogyan értesítsen a Mumcord?",
+    "subtitle": "Válaszd ki, hogyan érjenek el az egyes értesítéstípusok. Később módosíthatod a Beállítások → Értesítések részben."
+  },
   "connections": {
     "title": "Kapcsolatok és tartalom",
-    "subtitle": "Egyes funkciók közvetlenül más Mumcord-felhasználókhoz kapcsolnak, a csevegés egyes tartalmai pedig más weboldalakról töltődnek be. Válaszd ki, mi fér bele.",
+    "subtitle": "Egyes funkciók közvetlenül más Mumcord-felhasználókhoz kapcsolnak, a csevegés egyes tartalmai pedig más weboldalakról töltődnek be. Válaszd ki, mi elfogadható számodra.",
     "chatContent": "Csevegéstartalom",
     "sharing": "Megosztás Mumcord-felhasználókkal"
   },
@@ -167,7 +172,7 @@
     "title": "Indítás és frissítések",
     "subtitle": "Hogyan indul a Mumcord, és mit tesz az új verziókkal.",
     "linkHandler": "A mumble:// hivatkozások megnyitása a Mumcorddal",
-    "linkHandlerHint": "Egy weboldalon a szerverhivatkozásra kattintva az itt nyílik meg.",
+    "linkHandlerHint": "Ha egy weboldalon szerverhivatkozásra kattintasz, az itt nyílik meg.",
     "linkHandlerActive": "A Mumcord már megnyitja a mumble:// hivatkozásokat.",
     "linkHandlerFailed": "A Mumcordot nem sikerült beállítani a mumble:// hivatkozások megnyitására. A Beállításokban újra próbálkozhatsz.",
     "autostartFailed": "A Mumcordot nem sikerült beállítani, hogy bejelentkezéskor induljon. A Beállításokban újra próbálkozhatsz."
@@ -185,6 +190,7 @@
       "identity": "Identitás",
       "voice": "Hang",
       "privateMessages": "Privát üzenetek",
+      "notifications": "Értesítések",
       "connections": "Kapcsolatok",
       "chatContent": "Csevegéstartalom",
       "features": "Funkciók",
@@ -195,30 +201,66 @@
     "identityDetail": "A rendszer kulcstartójába mentve",
     "voiceDetail": "Zajszűrés: {{noise}}",
     "pmDetail": "Saját csatorna {{channel}} · elfogadott csevegések {{accepted}} · kérések {{requests}}",
-    "contentTitle": "Hivatkozás-előnézetek {{previews}}",
+    "notificationsTitle": "Új üzenetek: {{mode}}",
+    "notificationsDetail": "Tevékenységi értesítések: {{on}} / {{total}} bekapcsolva",
+    "contentTitle": "Linkelőnézetek {{previews}}",
     "contentDetail": "Teljes méretű képek {{images}} · előzményszinkron {{sync}}",
     "featuresTitle": "Játékon belüli overlay {{overlay}}",
-    "featuresDetail": "A rendszer Ne zavarjanak módjának követése {{dnd}} · most szól {{playing}} · most játszik {{gaming}}",
+    "featuresDetail": "A rendszer Ne zavarjanak módjának követése {{dnd}} · most szól {{playing}} · most játszik {{gaming}} · tevékenységi előzmények {{history}}",
     "effectsDetail": "Vizuális effektek {{effects}}",
     "startupTitle": "Indítás bejelentkezéskor {{login}}",
-    "startupDetail": "Indítás kis méretben {{minimized}} · mumble:// hivatkozások {{links}}",
+    "startupDetail": "Indítás kis méretben {{minimized}} · mumble:// linkek {{links}}",
     "updates": {
       "auto": "Automatikus letöltés",
       "notify": "Csak értesítés",
       "off": "Ki"
     },
-    "updatesDetail": "A frissítések telepítés előtt mindig ellenőrzésre és hitelesítésre kerülnek.",
+    "updatesDetail": "A frissítéseket telepítés előtt mindig ellenőrizzük és hitelesítjük.",
     "backup": "A(z) {{name}} identitásod a rendszer kulcstartójába van mentve. Készíts róla biztonsági mentést a Beállítások → Identitás menüpontban, hogy sose veszítsd el a regisztrált nevedet.",
     "nextServer": "Következő: add hozzá az első szervered",
-    "rerunNote": "Csak a módosított értékek kerülnek mentésre."
+    "rerunNote": "Csak a módosított értékeket mentjük."
   },
   "rerun": {
     "title": "Beállítási varázsló",
-    "note": "Újra végigfutsz a beállításon. Az identitásod nem változik.",
+    "note": "Újra futtatod a beállítást. Az identitásod nem változik.",
     "manageIdentities": "Identitások kezelése",
-    "discardTitle": "Elveti a módosításokat?",
-    "discardBody": "A befejezés előtt semmi nem mentődik. Ha most megszakítod, minden úgy marad, ahogy van.",
+    "discardTitle": "Elveted a módosításokat?",
+    "discardBody": "A befejezés előtt semmit nem mentünk. Ha most megszakítod, minden úgy marad, ahogy van.",
     "discardKeep": "Szerkesztés folytatása",
     "discardConfirm": "Módosítások elvetése"
+  },
+  "guide": {
+    "label": "Aaron tippje",
+    "from": "Aaron tippje",
+    "hide": "Aaron elrejtése",
+    "show": "Aaron megjelenítése",
+    "titles": {
+      "welcome": "Üdv a fedélzeten",
+      "import": "Hozd át a Mumble-dolgaidat",
+      "identity": "A neved a szervereken",
+      "voice": "Válassz mikrofont",
+      "setupStyle": "Válassz stílust",
+      "privateMessages": "Ki írhat neked",
+      "notifications": "Az értesítéseid",
+      "connections": "Közvetlen kapcsolatok",
+      "features": "Válaszd ki az extrákat",
+      "appearance": "Válaszd ki a megjelenést",
+      "startup": "A Mumcord indítása",
+      "summary": "Ellenőrizd a választásaidat"
+    },
+    "hints": {
+      "welcome": "Szia, Aaron vagyok! Végigvezetlek a beállításon. Csak egy percig tart.",
+      "import": "Ezeket a szervereket és beállításokat találtuk a Mumble-ban. Válaszd ki, mit tartanál meg.",
+      "identity": "Az identitásod a neved a szervereken. Hozz létre újat, vagy importálj egy meglévőt.",
+      "voice": "Itt választhatod ki a mikrofont, amibe beszélsz, aztán köszönj: a zöld sávnak táncolnia kell.",
+      "setupStyle": "Válassz egy stílust. Minden egyes beállítást később is módosíthatsz.",
+      "privateMessages": "Válaszd ki, ki küldhet neked privát üzenetet. A feladók ezt soha nem tudják meg.",
+      "notifications": "Válaszd ki, hogyan érjenek el az egyes értesítéstípusok, vagy kapcsold ki őket.",
+      "connections": "Válaszd ki, hogy a Mumcord közvetlenül összekapcsolhat-e más Mumcord-felhasználókkal.",
+      "features": "Csak azokat az extrákat kapcsold be, amelyek tetszenek. Minden kártya megmondja, ki láthatja.",
+      "appearance": "Világos, sötét vagy a rendszeredhez igazodó: itt választhatod ki a megjelenést.",
+      "startup": "Válaszd ki, hogyan induljon a Mumcord, amikor bejelentkezel a számítógépedre.",
+      "summary": "Minden kész! Itt ellenőrizheted a választásaidat; a Szerkesztés bármelyik lépéshez visszavisz."
+    }
   }
 }

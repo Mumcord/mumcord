@@ -29,8 +29,10 @@ ignore = [
     { id = "RUSTSEC-2026-0370", reason = "zvariant (unmaintained) via zbus 5, waiting for zbus 6 in ashpd, ksni and secret-service (#131)" },
     { id = "RUSTSEC-2026-0371", reason = "zbus_names (unmaintained) via zbus 5 (#131)" },
     { id = "RUSTSEC-2026-0372", reason = "zvariant_derive (unmaintained) via zbus 5 (#131)" },
-    { id = "RUSTSEC-2023-0071", reason = "rsa Marvin timing attack, no fix released; only used to generate identity keys, no RSA decryption (#131)" },
+    { id = "RUSTSEC-2023-0071", reason = "rsa Marvin timing attack; only used to generate identity keys, all private-key operations run in ring; fix needs the semver-major rsa 0.10 (#131)" },
 ]
+# Keep this list in sync with osv-scanner.toml (repository root and scripts/smoke/seed), which
+# OpenSSF Scorecard reads for the same advisories.
 
 [licenses]
 version = 2

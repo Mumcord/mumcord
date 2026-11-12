@@ -1,0 +1,53 @@
+{
+  "label": "Aarons, padomu palīgs",
+  "greeting": {
+    "title": "Sveiks, es esmu Aarons!",
+    "body": "Es esmu aksolotls un Mumcord pazīstu kā savus piecus pirkstus. Gribi ātru ekskursiju? Tā aizņem apmēram minūti. Ja ne tagad, atradīsi mani sadaļā Iestatījumi → Par lietotni → Padomi.",
+    "start": "Rādīt",
+    "later": "Ne tagad"
+  },
+  "progress": "{{current}}. padoms no {{total}}",
+  "back": "Atpakaļ",
+  "next": "Tālāk",
+  "done": "Gatavs",
+  "skip": "Izlaist ekskursiju",
+  "close": "Aizvērt padomus",
+  "tips": {
+    "servers": {
+      "title": "Tavi serveri",
+      "body": "Joslā pašā kreisajā malā ir tavi serveri. Pievieno serveri ar +, bet publiskos serverus atrodi ar palielināmo stiklu. Vienlaikus vari uzturēt savienojumu ar vairākiem serveriem."
+    },
+    "channels": {
+      "title": "Kanāli",
+      "body": "Veic dubultklikšķi uz kanāla, lai pievienotos balss sarunai. Viens klikšķis parāda tā tērzēšanu, nepievienojoties, bet poga Sekot ziņos tev par jaunumiem tajā."
+    },
+    "talk": {
+      "title": "Kā tu runā",
+      "body": "Push-to-talk vai balss aktivizācija? Izvēlies sadaļā Iestatījumi → Balss un skaņa vai atver „Balss iestatījumi…” ar mazo bultiņu blakus mikrofonam. Push-to-talk darbojas arī ar peles pogām."
+    },
+    "panel": {
+      "title": "Tavs lietotāja panelis",
+      "body": "Apakšā pa kreisi tu vari apklusināt mikrofonu, izslēgt skaņu, ieslēgt kameru vai atvienoties. Mazās bultiņas blakus tiem atver vairāk iespēju."
+    },
+    "search": {
+      "title": "Atrodi jebko",
+      "body": "Nospied {{key}}, lai atrastu cilvēkus un kanālus, pat lielos serveros."
+    },
+    "chat": {
+      "title": "Tērzēšana",
+      "body": "Atbildi uz ziņu, citē to, piemini cilvēkus ar @ un kopīgo attēlus un failus. Formatēšanas pogas parādās, kamēr raksti."
+    },
+    "apps": {
+      "title": "Lietotnes",
+      "body": "Ziņu joslas poga Lietotnes sāk ekrāna kopīgošanu, kopīgu skatīšanos vai tavu kameru. Spraudņi pievieno vēl vairāk."
+    },
+    "themes": {
+      "title": "Tavs stils",
+      "body": "Zobrats apakšā pa kreisi pārslēdz tumšo un gaišo motīvu. Sadaļā Iestatījumi → Izskats ir vairāk motīvu, un serverim var būt savs: noklikšķini uz tā ar peles labo pogu un izvēlies Motīvs."
+    },
+    "end": {
+      "title": "Tas arī viss!",
+      "body": "Lai jautri, lietojot Mumcord! Vari mani jebkurā laikā izsaukt atkal sadaļā Iestatījumi → Par lietotni → Padomi."
+    }
+  }
+}

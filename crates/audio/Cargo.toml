@@ -30,8 +30,17 @@ test-backend = ["dep:hound"]
 [dev-dependencies]
 hound.workspace = true
 
-[target.'cfg(target_os = "linux")'.dependencies]
+# The PipeWire device list (every sink and source of a multi-endpoint interface as its own
+# device, issue #183). Enabled on every platform except FreeBSD: there it is the Linux sound
+# server, and FreeBSD's OSS needs no libpipewire.
+[target.'cfg(not(target_os = "freebsd"))'.dependencies]
+cpal = { workspace = true, features = ["pipewire"] }
+
+# rtprio(2) for real-time audio threads (FR-13.17); Linux uses libc for the CPU-time limits.
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 libc.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
 pulseaudio.workspace = true
 futures.workspace = true
 

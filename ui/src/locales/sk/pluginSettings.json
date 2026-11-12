@@ -9,12 +9,12 @@
     "developer": "Vývojár"
   },
   "turnOffAll": "Vypnúť všetky doplnky",
-  "allOff": "Všetky doplnky sú vypnuté. Zostanú vypnuté aj po reštarte, kým ich znova nezapnete.",
+  "allOff": "Všetky doplnky sú vypnuté. Zostanú vypnuté aj po reštarte, kým ich znova nezapneš.",
   "noPlugins": "Doplnky sú pre túto reláciu vypnuté (spustené s --no-plugins).",
   "loadFailed": "Doplnky sa nepodarilo načítať.",
   "palette": {
     "label": "Paleta príkazov",
-    "placeholder": "Zadajte príkaz",
+    "placeholder": "Zadaj príkaz",
     "empty": "Žiadny zodpovedajúci príkaz",
     "openPlugins": "Doplnky",
     "turnOffAll": "Vypnúť všetky doplnky"

@@ -6,21 +6,21 @@
   "banner": {
     "whisper": "Szepczesz do: {{target}}",
     "shout": "Krzyczysz do: {{target}}",
-    "releaseKey": "Słyszą cię tylko osoby tam. Puść <key>{{key}}</key>, aby znów mówić na kanale {{channel}}.",
-    "stopToReturn": "Słyszą cię tylko osoby tam. Zatrzymaj, aby znów mówić na kanale {{channel}}.",
-    "onlyThere": "Słyszą cię tylko osoby tam.",
+    "releaseKey": "Słyszą cię tylko tamte osoby. Puść <key>{{key}}</key>, aby znów mówić na kanale {{channel}}.",
+    "stopToReturn": "Słyszą cię tylko tamte osoby. Kliknij Zatrzymaj, aby znów mówić na kanale {{channel}}.",
+    "onlyThere": "Słyszą cię tylko tamte osoby.",
     "stop": "Zatrzymaj"
   },
   "denied": {
     "title": "Nie udało się szepnąć do: {{target}}",
-    "noVoiceServer": "Najpierw wejdź na kanał: szept przechodzi przez serwer, na którym mówisz.",
+    "noVoiceServer": "Najpierw dołącz do kanału: szept przechodzi przez serwer, na którym mówisz.",
     "muted": "Włącz mikrofon, aby szeptać.",
     "serverMuted": "Serwer cię wyciszył, więc nie przekazuje twojego głosu.",
     "nobodyHere": "Nikogo z tych osób nie ma teraz na tym serwerze.",
     "channelNotFound": "Ten kanał nie istnieje na tym serwerze.",
     "noPermission": "Serwer nie pozwala ci szeptać na kanale {{channel}}.",
     "unknownTarget": "Ten cel już nie istnieje.",
-    "dismiss": "Odrzuć"
+    "dismiss": "Zamknij"
   },
   "badge": {
     "whisper": "szepcze",
@@ -33,7 +33,7 @@
     "ownShoutLabel": "Krzyczysz"
   },
   "panel": {
-    "open": "Szeptanie lub krzyk",
+    "open": "Szepnij lub krzyknij",
     "menu": "Cele szeptu i krzyku",
     "manage": "Zarządzaj celami…",
     "none": "Brak celów",

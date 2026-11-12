@@ -83,7 +83,8 @@
     "soundNeeds": {
       "windows": "Ei ääntä: vaatii Windows 10 -version 2004 tai uudemman",
       "macos": "Ei ääntä: vaatii macOS 13:n tai uudemman",
-      "pipewire": "Ei ääntä: vaatii PipeWiren"
+      "pipewire": "Ei ääntä: vaatii PipeWiren",
+      "platform": "On FreeBSD a share is the whole X11 screen and carries no sound."
     },
     "viewersGet": "Katsojat saavat:",
     "viewersGetSummary": "enintään {{resolution}} · {{fps}} kuvaa/s · {{codec}} · noin {{mbit}} Mbit/s",

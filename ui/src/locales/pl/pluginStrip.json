@@ -1,7 +1,7 @@
 {
   "heading": "Wtyczki",
   "list": "Panele wtyczek",
-  "expand": "Powiększ {{name}}",
+  "expand": "Rozwiń {{name}}",
   "close": "Zamknij",
   "unsupported": "Ten serwer nie obsługuje wspólnych funkcji wtyczek"
 }

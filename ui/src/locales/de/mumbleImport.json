@@ -23,7 +23,7 @@
   },
   "identity": {
     "title": "Identität (Client-Zertifikat)",
-    "keeps": "Behält deinen registrierten Namen und deine Rechte",
+    "keeps": "Behält deinen registrierten Namen und deine Berechtigungen",
     "locked": "in Mumble durch ein Passwort geschützt",
     "named": "Zertifikat für „{{name}}“",
     "validUntil": "gültig bis {{date}}",
@@ -40,7 +40,7 @@
     "missing": "Die Geräte aus Mumble sind nicht an diesen Computer angeschlossen."
   },
   "ptt": {
-    "title": "Push-to-talk-Taste",
+    "title": "Push-to-Talk-Taste",
     "modifierOnly": "Die Taste in Mumble ist nur eine Sondertaste, die Mumcord nicht nutzen kann. Du kannst später eine Taste wählen.",
     "tooManyKeys": "Das Tastenkürzel in Mumble hat mehr als eine Taste, was Mumcord nicht nutzen kann. Du kannst später eine Taste wählen.",
     "unknown": "Das Tastenkürzel in Mumble nutzt eine Taste oder ein Gerät, das Mumcord nicht kennt. Du kannst später eine Taste wählen."
@@ -53,7 +53,7 @@
   "selected_one": "{{count}} Element ausgewählt",
   "selected_other": "{{count}} Elemente ausgewählt",
   "import": "Importieren",
-  "importing": "Wird importiert …",
+  "importing": "Wird importiert…",
   "skip": "Vorerst überspringen",
   "cancel": "Abbrechen",
   "failed": "Der Import konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
@@ -77,7 +77,7 @@
     "identityServers": "Wird für die kopierten Server verwendet",
     "identitySkipped": "Identität bereits in Mumcord",
     "identitySkippedDetail": "Dieses Zertifikat gehört bereits zu deinen Identitäten",
-    "devicesAndPtt": "Audiogeräte und Push-to-talk-Taste",
+    "devicesAndPtt": "Audiogeräte und Push-to-Talk-Taste",
     "done": "Fertig",
     "undo": "Import rückgängig machen",
     "undone": "Der Import wurde rückgängig gemacht.",
@@ -86,8 +86,8 @@
   "settings": {
     "title": "Aus Mumble importieren",
     "hint": "Kopiere Server-Favoriten, gespeicherte Passwörter, dein Zertifikat und Audioeinstellungen aus dem offiziellen Mumble-Client.",
-    "button": "Aus Mumble importieren …",
-    "searching": "Suche nach Mumble …",
+    "button": "Aus Mumble importieren…",
+    "searching": "Suche nach Mumble…",
     "notFound": "Der offizielle Mumble-Client wurde auf diesem Computer nicht gefunden.",
     "breadcrumb": "Einstellungen · Server · Aus Mumble importieren"
   }

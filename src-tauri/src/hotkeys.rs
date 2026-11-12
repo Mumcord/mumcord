@@ -363,7 +363,12 @@ fn unbind(app: &AppHandle, group: Group) {
     if let Some(binding) = old.portal {
         binding.close();
     }
-    #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+    #[cfg(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "windows",
+        target_os = "macos"
+    ))]
     {
         use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
@@ -373,11 +378,21 @@ fn unbind(app: &AppHandle, group: Group) {
             }
         }
     }
-    #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+    #[cfg(not(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "windows",
+        target_os = "macos"
+    )))]
     let _ = (app, old);
 }
 
-#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+#[cfg(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+))]
 fn register_all(app: &AppHandle, group: Group, bindings: Vec<Binding>) -> Vec<String> {
     use std::sync::atomic::{AtomicBool, Ordering};
     use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
@@ -416,7 +431,12 @@ fn register_all(app: &AppHandle, group: Group, bindings: Vec<Binding>) -> Vec<St
     failed
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+#[cfg(not(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "windows",
+    target_os = "macos"
+)))]
 fn register_all(_app: &AppHandle, _group: Group, bindings: Vec<Binding>) -> Vec<String> {
     bindings.into_iter().map(|b| b.id).collect()
 }

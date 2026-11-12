@@ -72,6 +72,7 @@ pub struct DspControls {
     peak: AtomicF32,
     rms: AtomicF32,
     processing_errors: AtomicU32,
+    suppression_fallbacks: AtomicU32,
 }
 
 impl Default for DspControls {
@@ -101,6 +102,7 @@ impl Default for DspControls {
             peak: AtomicF32::new(0.0),
             rms: AtomicF32::new(0.0),
             processing_errors: AtomicU32::new(0),
+            suppression_fallbacks: AtomicU32::new(0),
         }
     }
 }
@@ -332,6 +334,17 @@ impl DspControls {
     /// Counted instead of logged because the processing path must not log.
     pub fn processing_errors(&self) -> u32 {
         self.processing_errors.load(Ordering::Relaxed)
+    }
+
+    /// Times the selected noise suppression could not keep up with the microphone and the chain
+    /// moved to the standard backend (issue #753). Counted instead of logged because the
+    /// processing path must not log.
+    pub fn suppression_fallbacks(&self) -> u32 {
+        self.suppression_fallbacks.load(Ordering::Relaxed)
+    }
+
+    pub(super) fn count_fallback(&self) {
+        self.suppression_fallbacks.fetch_add(1, Ordering::Relaxed);
     }
 
     pub(super) fn publish_frame(&self, peak: f32, rms: f32, voice: bool, transmitting: bool) {

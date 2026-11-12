@@ -12,7 +12,7 @@
   "connected": "Свързан",
   "connectedIn": "Свързан · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Свързан – говори",
+  "talking": "Свързан – говориш",
   "muted": "Свързан – заглушен",
   "voiceMenu": "Гласов сървър и канал",
   "voiceServer": "Гласов сървър",
