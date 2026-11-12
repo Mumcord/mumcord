@@ -78,6 +78,17 @@ export function SummaryStep({
       }),
     },
     {
+      id: "notifications",
+      step: "notifications",
+      title: t("summary.notificationsTitle", {
+        mode: ts(`notifications.mode.${settings.notifications}`),
+      }),
+      detail: t("summary.notificationsDetail", {
+        on: Object.values(settings.activityNotify).filter((mode) => mode !== "off").length,
+        total: Object.keys(settings.activityNotify).length,
+      }),
+    },
+    {
       id: "connections",
       step: "connections",
       title: ts(`p2p.mode.${settings.p2pMode}`),
@@ -103,6 +114,7 @@ export function SummaryStep({
         dnd: onOff(draft.dndFollowSystem),
         playing: onOff(settings.nowPlaying),
         gaming: onOff(settings.nowGaming),
+        history: onOff(settings.keepActivityHistory),
       }),
     },
     {

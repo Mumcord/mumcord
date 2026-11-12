@@ -1,0 +1,15 @@
+{
+  "manifest": 1,
+  "id": "test-quit-save",
+  "name": "Fixture Quit Save",
+  "description": "E2E test plugin that saves a value to its storage when it is stopped.",
+  "version": "1.0.0",
+  "api": "^1.0",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel"]
+  }
+}

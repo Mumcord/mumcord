@@ -311,6 +311,12 @@ impl PluginService {
         self.ctx.audio.stop_all(id);
     }
 
+    /// Stops every running plugin because the app quits (#704): each gets its `stop`, and what
+    /// it stores there is kept. Nothing stored changes, so the next start runs them again.
+    pub fn stop_all(&mut self) {
+        self.host.stop_all();
+    }
+
     /// Stops and forgets a plugin in the runtime and the permission gate.
     pub(super) fn unload(&mut self, id: &str) {
         if let Err(error) = self.host.unload(id)

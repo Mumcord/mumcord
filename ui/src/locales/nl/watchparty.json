@@ -1,15 +1,15 @@
 {
   "title": "Watchparty",
   "addVideo": "Video toevoegen",
-  "beta": "Bèta",
-  "join": "Meedoen aan watchparty",
-  "leave": "Party verlaten",
+  "beta": "Beta",
+  "join": "Deelnemen aan watchparty",
+  "leave": "Watchparty verlaten",
   "watching": "{{count}} kijken: {{names}}",
   "player": "Watchparty-speler",
   "watchTogether": "Samen kijken",
   "watchTogetherFor": "{{title}} samen met dit kanaal kijken",
   "embedsOff": "Zet ingesloten spelers aan in de privacyinstellingen om samen te kijken",
-  "embedsOffJoin": "Er loopt een kijkfeestje: zet ingesloten spelers aan om mee te doen",
+  "embedsOffJoin": "Er loopt een watchparty: zet ingesloten spelers aan om deel te nemen",
   "openPrivacy": "Privacyinstellingen openen",
   "cantPlay": "De speler kan hier niet draaien.",
   "openInBrowser": "Openen in browser",
@@ -21,14 +21,14 @@
   "other": {
     "play": "{{name}} drukte op afspelen",
     "pause": "{{name}} pauzeerde",
-    "seek": "{{name}} sprong vooruit",
+    "seek": "{{name}} sprong naar een ander punt",
     "skipped": "{{name}} sloeg over"
   },
   "addToPlaylist": "Aan afspeellijst toevoegen",
   "addToPlaylistFor": "{{title}} aan de watchparty-afspeellijst toevoegen",
   "playlist": {
     "title": "Hierna",
-    "empty": "Niets hierna. Voeg YouTube-links toe met ‘Aan afspeellijst toevoegen’.",
+    "empty": "Niets hierna. Voeg YouTube-links toe met “Aan afspeellijst toevoegen”.",
     "skip": "Overslaan",
     "previous": "Vorige",
     "previousFailed": "Terug naar de vorige video lukte niet.",
@@ -59,7 +59,9 @@
   "codecHint": {
     "install": "Deze video heeft H.264-ondersteuning nodig. Installeer gst-libav:",
     "generic": "Deze video heeft H.264-ondersteuning nodig. Installeer gst-libav (de GStreamer-libav-plug-in) met de pakketbeheerder van je systeem.",
-    "rpmFusion": "Op Fedora komt gst-libav uit de RPM Fusion-repository; schakel eerst RPM Fusion in."
+    "rpmFusion": "Op Fedora komt gst-libav uit de RPM Fusion-repository; schakel eerst RPM Fusion in.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Spatie afspelen/pauze · ← → 5 s verspringen · M dempen · F volledig scherm",
   "headerPill": "Samen kijken · {{count}}",

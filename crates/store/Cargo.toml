@@ -29,6 +29,12 @@ tracing.workspace = true
 image.workspace = true
 rand.workspace = true
 chrono.workspace = true
+# The encrypted fallback secret file on FreeBSD (AES-256-GCM); already in the tree through rustls.
+ring.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+# Owner check and O_NOFOLLOW for the secret file.
+libc.workspace = true
 
 [features]
 # Public in-memory `SecretStore` for tests in other crates.

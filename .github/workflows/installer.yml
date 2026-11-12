@@ -32,21 +32,32 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: shellcheck
         run: shellcheck -s sh scripts/install.sh scripts/install-test/*.sh
+
+  # A real FreeBSD install cannot run in a Linux container; this checks the FreeBSD path's
+  # platform checks, downloads, checksum and pkg commands with faked FreeBSD tools.
+  freebsd:
+    name: FreeBSD path (faked tools)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Test
+        run: sh scripts/install-test/check-freebsd.sh
 
   fake-release:
     name: Build fake release
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install rpmbuild
         run: scripts/ci/apt-install.sh rpm
       - name: Build
         run: sh scripts/install-test/make-fake-release.sh release
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: fake-release
           path: release
@@ -106,8 +117,8 @@ jobs:
               setup: "apt-get update -qq && apt-get install -y -qq curl",
             }
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: fake-release
           path: release

@@ -1,55 +1,55 @@
 {
   "mode": {
-    "legend": "Aktualizácie pluginov",
-    "info": "Oddelené od aktualizácií aplikácie. Mumcord hľadá aktualizácie pluginov pri spustení a potom každých 6 hodín.",
-    "infoLabel": "Ďalšie informácie: aktualizácie pluginov",
+    "legend": "Aktualizácie doplnkov",
+    "info": "Oddelené od aktualizácií aplikácie. Mumcord hľadá aktualizácie doplnkov pri spustení a potom každých 6 hodín.",
+    "infoLabel": "Ďalšie informácie: aktualizácie doplnkov",
     "auto": "Inštalovať automaticky",
     "notify": "Len upozorniť",
     "off": "Vypnuté"
   },
   "waiting": "Aktualizácie",
-  "empty": "Všetky pluginy sú aktuálne.",
-  "emptyOff": "Aktualizácie pluginov sú vypnuté. Zapnite ich vyššie, aby sa aktualizácie hľadali.",
+  "empty": "Všetky doplnky sú aktuálne.",
+  "emptyOff": "Aktualizácie doplnkov sú vypnuté. Ak chceš hľadať aktualizácie, zapni ich vyššie.",
   "loadFailed": "Aktualizácie sa nepodarilo načítať.",
-  "newAuthorKey": "Táto verzia je podpísaná iným autorom. Aktualizujte len vtedy, ak novému autorovi dôverujete.",
+  "newAuthorKey": "Táto verzia je podpísaná iným autorom. Aktualizuj, len ak novému autorovi dôveruješ.",
   "rolledBack": "Verzia {{version}} sa nespustila, preto sa obnovila predchádzajúca verzia. Dôvod:",
   "review": "Skontrolovať a aktualizovať",
   "update": "Aktualizovať",
-  "installFailed": "Plugin {{name}} sa nepodarilo aktualizovať. Skúste to znova.",
+  "installFailed": "Doplnok {{name}} sa nepodarilo aktualizovať. Skús to znova.",
   "pins": "Pripnúť verziu",
-  "pinsHint": "Pripnutý plugin zostane na súčasnej verzii a neponúkajú sa mu aktualizácie.",
+  "pinsHint": "Pripnutý doplnok zostane na súčasnej verzii a neponúkajú sa mu aktualizácie.",
   "pin": "Ponechať {{name}} na tejto verzii",
   "pinVersion": "Verzia {{version}}",
   "versionsTo": "na",
   "pill": {
     "none": "Žiadne nové oprávnenia",
-    "permission": "Potrebuje nové oprávnenie",
+    "permission": "Žiada o viac oprávnení",
     "author": "Nový autor",
     "websites": "Komunikuje s novými webmi"
   },
   "newPermissions": "Nové oprávnenia",
   "revoked": {
-    "title": "Plugin {{name}} bol vypnutý",
-    "text": "Verzia {{version}} je na zozname zrušených: {{reason}}. Údaje pluginu zostávajú zachované.",
+    "title": "Doplnok {{name}} bol vypnutý",
+    "text": "Verzia {{version}} je na zozname stiahnutých verzií: {{reason}}. Údaje doplnku zostávajú zachované.",
     "details": "Podrobnosti",
     "remove": "Odstrániť"
   },
   "checkNow": "Skontrolovať teraz",
   "lastChecked": "Naposledy skontrolované o {{time}}",
-  "checkFailed": "Kontrola zlyhala. Skúste to znova.",
-  "modeNote": "Aktualizácie pluginov: {{mode}}. Môžete to zmeniť nižšie.",
+  "checkFailed": "Kontrola zlyhala. Skús to znova.",
+  "modeNote": "Aktualizácie doplnkov: {{mode}}. Nižšie to môžeš zmeniť.",
   "settings": "Nastavenia aktualizácií",
   "offer": {
-    "heading": "Nové povolenia",
-    "title": "{{name}} {{version}} teraz dokáže viac. Tieto možnosti zostanú vypnuté, kým ich nezapnete.",
-    "permission": "Nové voliteľné povolenie: {{permission}}",
+    "heading": "Nové oprávnenia",
+    "title": "{{name}} {{version}} teraz dokáže viac. Tieto možnosti zostanú vypnuté, kým ich nezapneš.",
+    "permission": "Nové voliteľné oprávnenie: {{permission}}",
     "save": "Uložiť",
     "notNow": "Teraz nie",
-    "failed": "Povolenia pre {{name}} sa nepodarilo zmeniť. Skúste to znova."
+    "failed": "Oprávnenia doplnku {{name}} sa nepodarilo zmeniť. Skús to znova."
   },
   "waitingHeading": "Čakajúce aktualizácie",
   "autoNote": "Automatické aktualizácie sa nainštalujú, iba ak doplnok nežiada o nič nové a jeho skóre zostane v tom istom pásme alebo klesne. Všetko ostatné čaká tu.",
-  "needsMumcord": "Aktualizácia bude dostupná po aktualizácii aplikácie Mumcord",
+  "needsMumcord": "Aktualizácia bude dostupná po aktualizácii Mumcordu",
   "band": {
     "low": "Nízke",
     "medium": "Stredné",
@@ -109,6 +109,6 @@
     "notNow": "Teraz nie",
     "allow": "Povoliť a aktualizovať",
     "updateAnyway": "Napriek tomu aktualizovať",
-    "failed": "Doplnok {{name}} sa nepodarilo aktualizovať. Skús to prosím znova."
+    "failed": "Doplnok {{name}} sa nepodarilo aktualizovať. Skús to znova."
   }
 }

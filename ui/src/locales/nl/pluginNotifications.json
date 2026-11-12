@@ -22,7 +22,7 @@
     "addRepositoryLabel": "Repository voor {{name}} toevoegen",
     "details": "Details bekijken",
     "detailsLabel": "Details van {{name}}",
-    "notNow": "Nu niet",
+    "notNow": "Niet nu",
     "notNowLabel": "{{name}} voorlopig verbergen",
     "dontAsk": "Niet meer vragen voor deze server",
     "recommended": "Aanbevolen",

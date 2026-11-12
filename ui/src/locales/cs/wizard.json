@@ -27,12 +27,13 @@
     "later": "Vše zde lze později změnit v Nastavení."
   },
   "steps": {
-    "welcome": "Vítejte",
+    "welcome": "Vítej",
     "import": "Import z Mumble",
     "identity": "Identita",
     "voice": "Hlas",
     "setupStyle": "Styl nastavení",
     "privateMessages": "Soukromé zprávy",
+    "notifications": "Oznámení",
     "connections": "Připojení",
     "features": "Funkce",
     "appearance": "Vzhled",
@@ -41,41 +42,41 @@
   },
   "welcome": {
     "title": "Hlasový chat, který působí jako",
-    "titleAccent": "vaše vlastní místo.",
-    "subtitle": "Mumcord mluví protokolem Mumble, takže funguje s každým serverem Mumble, a přidává k tomu moderní chat. Nastavme ho podle vašich představ. Zabere to asi dvě minuty.",
+    "titleAccent": "tvoje vlastní místo.",
+    "subtitle": "Mumcord mluví protokolem Mumble, takže funguje s každým serverem Mumble, a přidává k tomu moderní chat. Nastavme ho podle tvých představ. Zabere to asi dvě minuty.",
     "voice": {
       "title": "Křišťálově čistý hlas",
       "text": "Zvuk s nízkou latencí a vestavěným potlačením šumu."
     },
     "servers": {
       "title": "Funguje s každým serverem Mumble",
-      "text": "Žádný účet, žádná registrace. Připojte se k serverům, které už používáte."
+      "text": "Žádný účet, žádná registrace. Připoj se k serverům, které už používáš."
     },
     "private": {
       "title": "Soukromé už z podstaty",
-      "text": "Žádná telemetrie. Co Mumcord ukládá, zůstává ve vašem počítači."
+      "text": "Žádná telemetrie. Co Mumcord ukládá, zůstává v tvém počítači."
     }
   },
   "identity": {
-    "title": "Kdo jste na Mumble?",
-    "intro": "Identita je způsob, jakým vás servery poznají. Vytvořte novou, nebo přineste tu, kterou už používáte.",
-    "legend": "Vaše identita",
+    "title": "Kdo jsi na Mumble?",
+    "intro": "Podle identity tě servery poznají. Vytvoř si novou, nebo použij tu, kterou už máš.",
+    "legend": "Tvoje identita",
     "create": "Vytvořit novou identitu",
-    "createText": "Vaše identita je certifikát, který na serverech Mumble dokládá, kdo jste. Uchovává vaše registrované jméno a oprávnění, takže jste při každém připojení stejná osoba.",
+    "createText": "Tvoje identita je certifikát, který na serverech Mumble dokládá, kdo jsi. Uchovává tvoje registrované jméno a oprávnění, takže jsi při každém připojení stejná osoba.",
     "import": "Importovat existující identitu",
     "name": "Výchozí zobrazované jméno",
-    "nameHint": "Používá se na serverech, které vás ještě neznají. Můžete ho změnit pro každý server zvlášť.",
+    "nameHint": "Používá se na serverech, které tě ještě neznají. Pro každý server ho můžeš změnit zvlášť.",
     "chooseFile": "Vybrat soubor…",
     "noFile": "Není vybrán žádný soubor",
     "chosenFile": "Vybraný soubor: {{file}}",
     "password": "Heslo souboru",
     "passwordHint": "Heslo zůstává v tomto počítači a nikam se neodesílá.",
     "existing": "Používá se identita {{name}}.",
-    "backup": "Zálohu si udělejte později v Nastavení. Se zálohou můžete identitu obnovit na novém počítači.",
+    "backup": "Zálohu si udělej později v Nastavení. Se zálohou můžeš identitu obnovit na novém počítači.",
     "nameRequired": "Zadej prosím jméno.",
     "fileRequired": "Vyber prosím soubor identity (.p12 nebo .pfx).",
     "fileType": "Soubor identity",
-    "importInvalid": "Soubor se nepodařilo otevřít. Zkontroluj heslo a že jde o soubor identity .p12 nebo .pfx.",
+    "importInvalid": "Soubor se nepodařilo otevřít. Zkontroluj heslo a jestli jde o soubor identity .p12 nebo .pfx.",
     "importNotFound": "Soubor nebyl nalezen. Vyber ho prosím znovu.",
     "importIo": "Soubor se nepodařilo přečíst. Vyber ho prosím znovu.",
     "pickFailed": "Výběr souboru se nepodařilo otevřít."
@@ -88,80 +89,84 @@
     "level": "Úroveň mikrofonu",
     "idle": "Stiskni Test, něco řekni a uslyšíš se zpátky.",
     "recording": "Teď mluv…",
-    "playing": "Přehrávám tvůj hlas…",
+    "playing": "Přehrává se tvůj hlas…",
     "devicesFailed": "Tvoje zvuková zařízení se nepodařilo zjistit. Můžeš pokračovat a vybrat je později v Nastavení.",
     "testFailed": "Test se nepodařilo spustit. Zkontroluj, že je mikrofon připojený.",
-    "test": "Poslechnout sám sebe",
+    "test": "Poslechnout se",
     "stop": "Zastavit"
   },
   "voice": {
     "title": "Zní to dobře?",
-    "subtitle": "Vyberte svá zařízení a něco řekněte. Ukazatel by se měl při mluvení hýbat.",
-    "talkLegend": "Jak chcete mluvit?",
+    "subtitle": "Vyber svá zařízení a něco řekni. Ukazatel by se měl při mluvení hýbat.",
+    "talkLegend": "Jak chceš mluvit?",
     "voiceActivationDesc": "Mikrofon se otevře, když mluvíš. Nic nedržíš ani nemačkáš.",
     "pushToTalkDesc": "Nejlepší do hlučných místností. Klávesu si vybereš.",
     "sensitivity": "Citlivost",
     "changeLater": "Vše můžeš později změnit v Nastavení → Hlas a zvuk."
   },
   "style": {
-    "title": "Kolik chcete sdílet?",
-    "subtitle": "Vyberte výchozí bod. Každou volbu uvidíte znovu na poslední obrazovce a můžete ji tam změnit.",
+    "title": "Kolik chceš sdílet?",
+    "subtitle": "Vyber výchozí bod. Každou volbu uvidíš znovu na poslední obrazovce a můžeš ji tam změnit.",
     "legend": "Styl nastavení",
     "everythingOn": {
       "title": "Vše zapnuto",
       "subtitle": "Plná sada funkcí",
-      "p1": "Ostatní vidí, co hrajete a posloucháte",
-      "p2": "Vaše IP adresa je viditelná pro lidi, ke kterým se připojujete přímo",
-      "p3": "Kdokoli vám může psát; odkazy a obrázky se načítají z webu",
-      "p4": "Překryv, synchronizace historie a obrázky v plné velikosti jsou zapnuté"
+      "p1": "Ostatní vidí, co hraješ a posloucháš",
+      "p2": "Tvoje IP adresa je viditelná pro lidi, ke kterým se připojuješ přímo",
+      "p3": "Psát ti může kdokoli; odkazy a obrázky se načítají z webu",
+      "p4": "Překrytí ve hře, synchronizace historie a obrázky v plné velikosti jsou zapnuté"
     },
     "balanced": {
       "title": "Vyvážené",
       "subtitle": "Mezi soukromím a pohodlím",
-      "p1": "Psát vám mohou jen přátelé a lidé ve vašem kanálu",
+      "p1": "Psát ti můžou jen přátelé a lidé ve tvém kanálu",
       "p2": "Přímé připojení s relay jako záložní možností",
       "p3": "Náhledy odkazů a obrázky v plné velikosti jsou zapnuté",
-      "p4": "To, co hrajete a posloucháte, zůstává soukromé"
+      "p4": "To, co hraješ a posloucháš, zůstává soukromé"
     },
     "maximumPrivacy": {
       "title": "Maximální soukromí",
-      "subtitle": "Sdílejte co nejméně",
-      "p1": "Psát vám mohou jen přátelé, bez výjimek",
-      "p2": "Vaše IP adresa je skrytá; vše jde přes relay",
+      "subtitle": "Sdílet co nejméně",
+      "p1": "Psát ti můžou jen přátelé, bez výjimek",
+      "p2": "Tvoje IP adresa je skrytá; vše jde přes relay",
       "p3": "Žádný externí obsah, žádná synchronizace historie, žádné sdílení",
-      "p4": "Aktualizace vás jen upozorní; o tom, co děláte, se nesdílí nic"
+      "p4": "Aktualizace tě jen upozorní; o tom, co děláš, se nesdílí nic"
     },
     "custom": {
       "title": "Vlastní",
-      "subtitle": "Projděte každou volbu",
-      "p1": "Projděte si každý krok sami",
-      "p2": "Podívejte se, co každé nastavení dělá a kdo ho vidí",
-      "p3": "Nejlepší, pokud víte, co chcete"
+      "subtitle": "Projít každou volbu",
+      "p1": "Projdeš si každý krok samostatně",
+      "p2": "Uvidíš, co každé nastavení dělá a kdo ho vidí",
+      "p3": "Nejlepší, pokud víš, co chceš"
     },
-    "presetSelected": "Vybráno {{preset}}: podrobné kroky ohledně soukromí přeskočíte. Vyberte Vlastní, abyste prošli každý zvlášť.",
+    "presetSelected": "Vybráno: {{preset}}. Podrobné kroky ohledně soukromí přeskočíš. Pokud je chceš projít všechny, vyber Vlastní.",
     "customSelected": "Vybráno Vlastní: další kroky projdou každou volbu."
   },
   "pm": {
-    "title": "Kdo vám může psát?",
-    "subtitle": "Soukromé zprávy jsou konverzace jeden na jednoho. Chat kanálu touto volbou nijak neovlivníte.",
-    "local": "Filtrování probíhá ve vašem počítači. Odesílatelé se to nedozvědí. Jiné pravidlo pro každý server můžete nastavit později."
+    "title": "Kdo ti může psát?",
+    "subtitle": "Soukromé zprávy jsou konverzace jeden na jednoho. Chat kanálu tato volba neovlivní.",
+    "local": "Filtrování probíhá v tvém počítači. Odesílatelé se to nedozvědí. Jiné pravidlo pro každý server můžeš nastavit později."
+  },
+  "notifications": {
+    "title": "Jak tě má Mumcord informovat?",
+    "subtitle": "Vyber, jak se k tobě má dostat každý druh novinek. Později to můžeš změnit v Nastavení → Oznámení."
   },
   "connections": {
     "title": "Připojení a obsah",
-    "subtitle": "Některé funkce vás spojují přímo s dalšími uživateli Mumcordu a část obsahu chatu se načítá z jiných webů. Vyberte, co vám vyhovuje.",
+    "subtitle": "Některé funkce tě spojují přímo s dalšími uživateli Mumcordu a část obsahu chatu se načítá z jiných webů. Vyber, co ti vyhovuje.",
     "chatContent": "Obsah chatu",
     "sharing": "Sdílení s uživateli Mumcordu"
   },
   "features": {
-    "title": "Udělejte si to po svém",
-    "subtitle": "Zapněte doplňky, které chcete. U každého je napsáno, kdo co vidí.",
+    "title": "Udělej si to po svém",
+    "subtitle": "Zapni funkce navíc, které chceš. U každé je napsáno, kdo co vidí.",
     "seenByMumcordUsers": "Viditelné pro uživatele Mumcordu na stejném serveru.",
-    "onlyYou": "Vidíte to jen vy.",
-    "ingameOverlayAlt": "Ukázka překryvu ve hře, který ukazuje, kdo mluví"
+    "onlyYou": "Vidíš to jen ty.",
+    "ingameOverlayAlt": "Ukázka překrytí ve hře, které ukazuje, kdo mluví"
   },
   "appearance": {
-    "title": "Vyberte si vzhled",
-    "subtitle": "Okno se při výběru průběžně aktualizuje. Další motivy a vlastní najdete v Nastavení."
+    "title": "Vyber si vzhled",
+    "subtitle": "Okno se při výběru průběžně mění. Další motivy i vlastní najdeš v Nastavení."
   },
   "startup": {
     "title": "Spuštění a aktualizace",
@@ -169,13 +174,13 @@
     "linkHandler": "Otevírat odkazy mumble:// v Mumcordu",
     "linkHandlerHint": "Kliknutí na odkaz na server na webu ho pak otevře tady.",
     "linkHandlerActive": "Mumcord už odkazy mumble:// otevírá.",
-    "linkHandlerFailed": "Mumcord se nepodařilo nastavit pro otevírání odkazů mumble://. Můžete to zkusit znovu v Nastavení.",
-    "autostartFailed": "Mumcord se nepodařilo nastavit, aby se spouštěl při přihlášení. Můžete to zkusit znovu v Nastavení."
+    "linkHandlerFailed": "Mumcord se nepodařilo nastavit pro otevírání odkazů mumble://. Můžeš to zkusit znovu v Nastavení.",
+    "autostartFailed": "Mumcord se nepodařilo nastavit, aby se spouštěl při přihlášení. Můžeš to zkusit znovu v Nastavení."
   },
   "summary": {
     "title": "Vše hotovo",
     "titleNamed": "Vše hotovo, {{name}}",
-    "subtitle": "Tady je, co jste zvolili. Tlačítkem Upravit na kterékoli kartě to před spuštěním změníte.",
+    "subtitle": "Tady je, co sis vybral(a). Tlačítkem Upravit na kterékoli kartě to před spuštěním změníš.",
     "on": "zapnuto",
     "off": "vypnuto",
     "unavailable": "zde není k dispozici",
@@ -185,6 +190,7 @@
       "identity": "Identita",
       "voice": "Hlas",
       "privateMessages": "Soukromé zprávy",
+      "notifications": "Oznámení",
       "connections": "Připojení",
       "chatContent": "Obsah chatu",
       "features": "Funkce",
@@ -192,13 +198,15 @@
       "startup": "Spuštění",
       "updates": "Aktualizace"
     },
-    "identityDetail": "Uloženo v klíčence vašeho systému",
+    "identityDetail": "Uloženo v klíčence tvého systému",
     "voiceDetail": "Potlačení šumu: {{noise}}",
     "pmDetail": "Můj kanál {{channel}} · přijaté chaty {{accepted}} · žádosti {{requests}}",
+    "notificationsTitle": "Nové zprávy: {{mode}}",
+    "notificationsDetail": "Oznámení o aktivitě: zapnuto {{on}} z {{total}}",
     "contentTitle": "Náhledy odkazů {{previews}}",
     "contentDetail": "Obrázky v plné velikosti {{images}} · synchronizace historie {{sync}}",
-    "featuresTitle": "Překryv ve hře {{overlay}}",
-    "featuresDetail": "Sledovat systémový režim Nerušit {{dnd}} · právě hraje {{playing}} · právě hraji {{gaming}}",
+    "featuresTitle": "Překrytí ve hře {{overlay}}",
+    "featuresDetail": "Sledovat systémový režim Nerušit {{dnd}} · co poslouchám {{playing}} · co hraju {{gaming}} · historie aktivity {{history}}",
     "effectsDetail": "Vizuální efekty {{effects}}",
     "startupTitle": "Spustit při přihlášení {{login}}",
     "startupDetail": "Spustit minimalizovaně {{minimized}} · odkazy mumble:// {{links}}",
@@ -208,9 +216,9 @@
       "off": "Vypnuto"
     },
     "updatesDetail": "Aktualizace se vždy zkontrolují a ověří, než se nainstalují.",
-    "backup": "Vaše identita {{name}} je uložena v klíčence vašeho systému. Zálohujte ji v Nastavení → Identita, abyste nikdy nepřišli o své registrované jméno.",
-    "nextServer": "Dále: přidejte svůj první server",
-    "rerunNote": "Ukládají se jen hodnoty, které jste změnili."
+    "backup": "Tvoje identita {{name}} je uložená v klíčence tvého systému. Zálohuj ji v Nastavení → Identita, abys o své registrované jméno nikdy nepřišel(a).",
+    "nextServer": "Dále: přidej svůj první server",
+    "rerunNote": "Uloží se jen hodnoty, které jsi změnil(a)."
   },
   "rerun": {
     "title": "Průvodce nastavením",
@@ -220,5 +228,39 @@
     "discardBody": "Nic se neukládá před dokončením. Když teď zrušíš, vše zůstane tak, jak to je.",
     "discardKeep": "Pokračovat v úpravách",
     "discardConfirm": "Zahodit změny"
+  },
+  "guide": {
+    "label": "Tip od Aarona",
+    "from": "Tip od Aarona",
+    "hide": "Skrýt Aarona",
+    "show": "Zobrazit Aarona",
+    "titles": {
+      "welcome": "Vítej na palubě",
+      "import": "Přenes si věci z Mumble",
+      "identity": "Tvé jméno na serverech",
+      "voice": "Vyber si mikrofon",
+      "setupStyle": "Vyber si styl",
+      "privateMessages": "Kdo ti smí psát",
+      "notifications": "Tvá oznámení",
+      "connections": "Přímá spojení",
+      "features": "Vyber si funkce navíc",
+      "appearance": "Vyber si vzhled",
+      "startup": "Spouštění Mumcordu",
+      "summary": "Zkontroluj své volby"
+    },
+    "hints": {
+      "welcome": "Ahoj, já jsem Aaron! Provedu tě nastavením. Zabere to jen minutu.",
+      "import": "Tohle jsou servery a nastavení nalezené v Mumble. Vyber, co chceš zachovat.",
+      "identity": "Tvoje identita je tvé jméno na serverech. Vytvoř novou, nebo importuj existující.",
+      "voice": "Tady vyber mikrofon, do kterého mluvíš, a pak řekni ahoj: zelený pruh by měl tančit.",
+      "setupStyle": "Vyber styl. Každé jednotlivé nastavení můžeš později změnit.",
+      "privateMessages": "Vyber, kdo ti smí posílat soukromé zprávy. Odesílatelé se to nikdy nedozvědí.",
+      "notifications": "Vyber, jak se k tobě každý druh novinek dostane, nebo ho vypni.",
+      "connections": "Vyber, jestli tě Mumcord smí propojit přímo s dalšími uživateli Mumcordu.",
+      "features": "Zapni jen funkce navíc, které se ti líbí. U každé karty je napsáno, kdo ji vidí.",
+      "appearance": "Světlý, tmavý, nebo podle systému: tady si vyber vzhled.",
+      "startup": "Vyber, jak se Mumcord spustí, když se přihlásíš k počítači.",
+      "summary": "Hotovo! Tady zkontroluj své volby; tlačítkem Upravit se vrátíš k libovolnému kroku."
+    }
   }
 }

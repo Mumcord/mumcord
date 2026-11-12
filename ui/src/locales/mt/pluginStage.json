@@ -19,18 +19,18 @@
   "controlsLabel": "Kontrolli ta' {{plugin}}",
   "popOut": "Iftaħ f'tieqa",
   "fullScreen": "Skrin sħiħ",
-  "leave": "Ħalli {{plugin}}",
+  "leave": "Itlaq minn {{plugin}}",
   "join": "Ingħaqad",
   "joinLabel": "Ingħaqad ma' {{plugin}}",
   "open": "Iftaħ",
-  "openLabel": "Iftaħ: {{plugin}}",
+  "openLabel": "Iftaħ {{plugin}}",
   "getPlugin": "Ikseb il-plugin",
   "getPluginLabel": "Ikseb {{plugin}}",
   "activityStarted": "{{name}} beda {{plugin}}",
   "activityPlaying": "{{name}} qed jilgħab {{plugin}}",
   "activitiesLabel": "Attivitajiet tal-plugins",
-  "noRelayTitle": "L-ebda relay għal data tal-plugins fuq dan is-server.",
-  "noRelayText": "Ir-relay ta' {{server}} ma jippermettix data tal-plugins, għalhekk {{plugin}} juża l-konnessjoni Mumble l-aktar bil-mod: il-mozzjonijiet jistgħu jieħdu ftit u l-bordijiet kbar huma mitfija.",
+  "noRelayTitle": "L-ebda relay għad-dejta tal-plugins fuq dan is-server.",
+  "noRelayText": "Ir-relay ta' {{server}} ma jippermettix dejta tal-plugins, għalhekk {{plugin}} juża l-konnessjoni Mumble, li hija aktar bil-mod: il-mossi jistgħu jieħdu ftit u l-bordijiet kbar huma mitfija.",
   "noRelayDetails": "Dettalji",
   "tooMany": "Wisq attivitajiet f'dan il-kanal",
   "full": "Din l-attività hija mimlija",
@@ -44,18 +44,18 @@
     "tagUnofficial": "Kontenut tal-plugin · {{plugin}} · Mhux uffiċjali",
     "label": "{{plugin}}, kontenut tal-plugin",
     "stopped": "{{plugin}} waqaf iwieġeb",
-    "reload": "Erġa' tella'",
-    "mute": "Skuta l-ħsejjes minn {{plugin}}",
-    "unmute": "Neħħi s-skiet tal-ħsejjes minn {{plugin}}"
+    "reload": "Erġa' għabbi",
+    "mute": "Sikket il-ħsejjes ta' {{plugin}}",
+    "unmute": "Ħalli l-ħsejjes ta' {{plugin}} jerġgħu jinstemgħu"
   },
   "sidePanel": {
-    "label": "Pannell laterali ta' {{plugin}}",
+    "label": "Pannell tal-ġenb ta' {{plugin}}",
     "options": "Għażliet ta' {{plugin}}",
-    "close": "Agħlaq il-pannell laterali ta' {{plugin}}",
-    "resize": "Biddel id-daqs tal-pannell laterali ta' {{plugin}}"
+    "close": "Agħlaq il-pannell tal-ġenb ta' {{plugin}}",
+    "resize": "Biddel id-daqs tal-pannell tal-ġenb ta' {{plugin}}"
   },
   "dialog": {
     "close": "Agħlaq {{plugin}}",
-    "footer": "Il-kontenut ġewwa l-frame ġej mill-plugin. Mumcord qatt ma jitlob passwords hemm. Esc jagħlaq."
+    "footer": "Il-kontenut ġewwa l-qafas ġej mill-plugin. Mumcord qatt ma jitlob passwords hemmhekk. Esc jagħlaq."
   }
 }

@@ -31,7 +31,7 @@
     "sealedPageTextNoSize": "{{entry}} · nincs hozzáférése a Mumcordhoz, a fájlokhoz, a mikrofonhoz, a kamerához és a vágólaphoz",
     "relayAsks": "Kéri a használatát · telepítéskor te döntesz",
     "securityTitle": "Biztonság",
-    "relayData": "Továbbított adatok",
+    "relayData": "Átjátszóadatok",
     "relayOff": "Ki ·",
     "relayOn": "Be",
     "turnOnInPermissions": "Bekapcsolás az engedélyeknél",
@@ -40,15 +40,15 @@
       "origins": "{{count}} weboldal",
       "stage": "Médiaterület",
       "sidePanel": "Oldalsó panel",
-      "relay": "Továbbított adatok",
+      "relay": "Átjátszóadatok",
       "appMenu": "Alkalmazások menü"
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Ez a frissítés {{count}} új weboldallal akar kommunikálni.",
     "wantsNew_other": "Ez a frissítés {{count}} új weboldallal akar kommunikálni.",
     "staysOn": "A(z) {{plugin}} a(z) {{version}} verzión marad, amíg nem döntesz.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "{{count}} frissítés vár rád. Az új engedélyeket vagy weboldalakat hozzáadó frissítések sosem települnek automatikusan.",
     "banner_other": "{{count}} frissítés vár rád. Az új engedélyeket vagy weboldalakat hozzáadó frissítések sosem települnek automatikusan.",
     "noOther": "Más engedély nem változik.",
     "whatsNew": "Újdonságok a(z) {{version}} verzióban",

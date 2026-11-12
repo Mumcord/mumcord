@@ -59,7 +59,9 @@
   "codecHint": {
     "install": "This video needs H.264 support. Install gst-libav:",
     "generic": "This video needs H.264 support. Install gst-libav (the GStreamer libav plugin) with your system's package manager.",
-    "rpmFusion": "On Fedora, gst-libav comes from the RPM Fusion repository; enable RPM Fusion first."
+    "rpmFusion": "On Fedora, gst-libav comes from the RPM Fusion repository; enable RPM Fusion first.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Space play/pause · ← → seek 5 s · M mute · F full screen",
   "headerPill": "Watch together · {{count}}",

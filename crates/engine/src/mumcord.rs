@@ -15,6 +15,7 @@
 //! another Mumcord-specific plugin payload to someone.
 
 use std::collections::{HashMap, HashSet};
+use std::time::{Duration, Instant};
 
 use mumcord_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
 use serde::{Deserialize, Serialize};
@@ -82,6 +83,10 @@ struct Wire {
     /// Kept raw so a malformed bot object does not discard the whole hello.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     bot: Option<serde_json::Value>,
+    /// "Please answer" (issue #647): sent to someone who never said hello. Older clients ignore
+    /// the field and treat it as a normal hello.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    ask: bool,
 }
 
 /// Optional bot fields stay raw: a wrong type drops only that field, not the whole bot.
@@ -129,6 +134,8 @@ pub struct Hello {
     pub features: Vec<String>,
     /// Set when the sender says it is a bot; a malformed `bot` object is ignored.
     pub bot: Option<Bot>,
+    /// The sender has no hello from us yet and asks for one (issue #647).
+    pub ask: bool,
 }
 
 /// Lowercase letters, digits, `-` and `.`, the alphabet of feature, bot and module names.
@@ -209,13 +216,14 @@ fn own_features() -> Vec<String> {
     FEATURES.iter().map(|f| (*f).to_owned()).collect()
 }
 
-/// The hello this client sends.
-pub fn encode() -> Vec<u8> {
+/// The hello this client sends; `ask` asks the receiver to answer with its own (issue #647).
+pub fn encode(ask: bool) -> Vec<u8> {
     let wire = Wire {
         app: APP.to_owned(),
         v: VERSION,
         features: own_features(),
         bot: None,
+        ask,
     };
     serde_json::to_vec(&wire).unwrap_or_default()
 }
@@ -241,6 +249,7 @@ pub fn decode(data: &[u8]) -> Result<Hello, HelloError> {
     Ok(Hello {
         features,
         bot: wire.bot.and_then(bot_of),
+        ask: wire.ask,
     })
 }
 
@@ -258,7 +267,33 @@ pub(crate) struct Peers {
     greeted: HashSet<u32>,
     /// Whether the connection finished syncing; joins before that are covered by the first send.
     synced: bool,
+    /// People who have not said hello yet, and when to ask them (issue #647).
+    asks: HashMap<u32, Ask>,
+    /// People asked three times without an answer; not asked again until they leave.
+    given_up: HashSet<u32>,
+    /// Session → when we last replied to its hello; see [`ANSWER_INTERVAL`].
+    answered: HashMap<u32, Instant>,
 }
+
+/// Asking someone who never said hello: when next, and how often already.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct Ask {
+    next: Instant,
+    sent: usize,
+}
+
+/// The gaps before asking someone who never said hello (issue #647): three requests in about two
+/// minutes, then they count as a plain Mumble client until they reconnect.
+const ASK_DELAYS: [Duration; 3] = [
+    Duration::from_secs(10),
+    Duration::from_secs(30),
+    Duration::from_secs(90),
+];
+
+/// The shortest gap between two replies to hellos of the same sender. Every reply is a plugin
+/// message that counts against our own budget on the server (pluginmessagelimit); without this
+/// gap anyone could send requests in a loop and make our file, camera and plugin messages drop.
+const ANSWER_INTERVAL: Duration = Duration::from_secs(30);
 
 impl Peers {
     pub(crate) fn features(&self, session: u32) -> Option<&[String]> {
@@ -275,7 +310,49 @@ impl Peers {
 
     /// Records a hello; true when the peer is new or its features changed.
     fn learn(&mut self, session: u32, features: Vec<String>) -> bool {
+        self.asks.remove(&session);
         self.known.insert(session, features.clone()) != Some(features)
+    }
+
+    /// Starts waiting for the hello of `session`; it is asked for one if none comes.
+    fn expect(&mut self, session: u32, now: Instant) {
+        if !self.known.contains_key(&session) && !self.given_up.contains(&session) {
+            self.asks.entry(session).or_insert(Ask {
+                next: now + ASK_DELAYS[0],
+                sent: 0,
+            });
+        }
+    }
+
+    /// The people to ask for their hello now; each is asked at most `ASK_DELAYS.len()` times.
+    fn due(&mut self, now: Instant) -> Vec<u32> {
+        let mut due = Vec::new();
+        let mut done = 0usize;
+        let given_up = &mut self.given_up;
+        self.asks.retain(|session, ask| {
+            if ask.next > now {
+                return true;
+            }
+            due.push(*session);
+            ask.sent += 1;
+            match ASK_DELAYS.get(ask.sent) {
+                Some(delay) => {
+                    ask.next = now + *delay;
+                    true
+                }
+                None => {
+                    done += 1;
+                    given_up.insert(*session);
+                    false
+                }
+            }
+        });
+        if done > 0 {
+            // Most likely plain Mumble clients; only the count, never a name (FR-1.62).
+            tracing::debug!(people = done, "no mumcord hello after 3 requests");
+        }
+        due.sort_unstable();
+        due
     }
 
     /// Records the bot info of a hello; true when it changed.
@@ -291,19 +368,39 @@ impl Peers {
         self.greeted.insert(session)
     }
 
+    /// Whether a hello from `session` is answered now: always the first one (`first`), a request
+    /// only when the last reply to this sender is older than [`ANSWER_INTERVAL`]. Entries are
+    /// keyed by server-assigned sessions and dropped in `forget`, so the map stays bounded by the
+    /// users on the server.
+    fn should_answer(&mut self, session: u32, first: bool, ask: bool, now: Instant) -> bool {
+        let recent = self
+            .answered
+            .get(&session)
+            .is_some_and(|last| now.saturating_duration_since(*last) < ANSWER_INTERVAL);
+        if first || (ask && !recent) {
+            self.answered.insert(session, now);
+            true
+        } else {
+            false
+        }
+    }
+
     fn forget(&mut self, session: u32) -> bool {
+        self.answered.remove(&session);
         self.greeted.remove(&session);
+        self.asks.remove(&session);
+        self.given_up.remove(&session);
         self.bots.remove(&session);
         self.known.remove(&session).is_some()
     }
 }
 
-fn send(handle: &Handle, receivers: &[u32]) {
+fn send(handle: &Handle, receivers: &[u32], ask: bool) {
     if receivers.is_empty() {
         return;
     }
     // Old servers (< 1.4) cannot forward plugin data; there the badge simply does not appear.
-    if let Err(e) = handle.send_plugin_data(receivers, DATA_ID, encode()) {
+    if let Err(e) = handle.send_plugin_data(receivers, DATA_ID, encode(ask)) {
         tracing::debug!(error = %e, "mumcord hello not sent");
     }
 }
@@ -333,8 +430,12 @@ pub(crate) fn on_synced(state: &ServerPeers, ctx: &SessionCtx) {
             peers.known.insert(own, own_features());
         }
         peers.greeted.extend(everyone.iter().copied());
+        let now = Instant::now();
+        for session in &everyone {
+            peers.expect(*session, now);
+        }
     }
-    send(&ctx.handle, &everyone);
+    send(&ctx.handle, &everyone, false);
 }
 
 /// Someone joined after the sync: they get our hello.
@@ -342,11 +443,14 @@ pub(crate) fn on_user_joined(state: &ServerPeers, ctx: &SessionCtx, session: u32
     if ctx.handle.with_state(|s| s.session) == Some(session) {
         return;
     }
-    let first = lock(state)
-        .get_mut(&ctx.server_id)
-        .is_some_and(|peers| peers.synced && peers.greet(session));
+    let first = lock(state).get_mut(&ctx.server_id).is_some_and(|peers| {
+        if peers.synced {
+            peers.expect(session, Instant::now());
+        }
+        peers.synced && peers.greet(session)
+    });
     if first {
-        send(&ctx.handle, &[session]);
+        send(&ctx.handle, &[session], false);
     }
 }
 
@@ -355,6 +459,16 @@ pub(crate) fn on_user_removed(state: &ServerPeers, server_id: ServerId, session:
     lock(state)
         .get_mut(&server_id)
         .is_some_and(|peers| peers.forget(session))
+}
+
+/// The session's tick: asks the people who still have not said hello (issue #647).
+pub(crate) fn on_tick(state: &ServerPeers, ctx: &SessionCtx) {
+    let due = lock(state)
+        .get_mut(&ctx.server_id)
+        .filter(|peers| peers.synced)
+        .map(|peers| peers.due(Instant::now()))
+        .unwrap_or_default();
+    send(&ctx.handle, &due, true);
 }
 
 pub(crate) fn on_disconnect(state: &ServerPeers, server_id: ServerId) {
@@ -387,13 +501,15 @@ pub(crate) fn on_plugin_data(
     let (changed, reply) = {
         let mut servers = lock(state);
         let peers = servers.entry(ctx.server_id).or_default();
+        let first = peers.synced && peers.greet(sender);
         (
             peers.learn(sender, hello.features) | peers.learn_bot(sender, hello.bot),
-            peers.synced && peers.greet(sender),
+            // A request is always answered, without asking back, so there is no ping-pong.
+            peers.synced && peers.should_answer(sender, first, hello.ask, Instant::now()),
         )
     };
     if reply {
-        send(&ctx.handle, &[sender]);
+        send(&ctx.handle, &[sender], false);
     }
     changed.then_some(sender)
 }
@@ -424,6 +540,77 @@ impl Engine {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn a_request_carries_ask_and_older_hellos_do_not() {
+        assert!(decode(&encode(true)).expect("request").ask);
+        assert!(!decode(&encode(false)).expect("hello").ask);
+        // A hello from an older Mumcord has no `ask` field at all.
+        let old = br#"{"app":"mumcord","v":1,"features":["files"]}"#;
+        assert!(!decode(old).expect("old hello").ask);
+        assert!(
+            !String::from_utf8(encode(false))
+                .expect("utf8")
+                .contains("ask")
+        );
+    }
+
+    #[test]
+    fn a_request_is_answered_at_most_once_per_interval_and_sender() {
+        let mut peers = Peers::default();
+        let start = Instant::now();
+        // The first hello of a new peer is answered.
+        assert!(peers.should_answer(7, true, true, start));
+        // Five more requests in a row get no reply.
+        for i in 1..=5 {
+            assert!(!peers.should_answer(7, false, true, start + Duration::from_secs(i)));
+        }
+        // A different sender is still answered, once.
+        assert!(peers.should_answer(8, false, true, start + Duration::from_secs(2)));
+        assert!(!peers.should_answer(8, false, true, start + Duration::from_secs(3)));
+        // After the interval the same sender is answered again.
+        assert!(peers.should_answer(7, false, true, start + ANSWER_INTERVAL));
+        assert!(!peers.should_answer(7, false, true, start + ANSWER_INTERVAL));
+        // A plain hello without a request is never answered unless it is the first.
+        assert!(!peers.should_answer(9, false, false, start));
+        // Leaving clears the entry.
+        peers.forget(7);
+        assert!(peers.should_answer(7, false, true, start + ANSWER_INTERVAL));
+        assert!(peers.answered.len() <= 3);
+    }
+
+    #[test]
+    fn someone_without_a_hello_is_asked_three_times_then_left_alone() {
+        let mut peers = Peers::default();
+        let start = Instant::now();
+        peers.expect(7, start);
+        assert!(peers.due(start + Duration::from_secs(9)).is_empty());
+        assert_eq!(peers.due(start + Duration::from_secs(10)), vec![7]);
+        assert!(peers.due(start + Duration::from_secs(39)).is_empty());
+        assert_eq!(peers.due(start + Duration::from_secs(40)), vec![7]);
+        assert_eq!(peers.due(start + Duration::from_secs(130)), vec![7]);
+        // Three requests: a plain Mumble client is not asked again during this stay.
+        assert!(peers.due(start + Duration::from_secs(10_000)).is_empty());
+        peers.expect(7, start);
+        assert!(peers.due(start + Duration::from_secs(20_000)).is_empty());
+        // Only a new stay starts over.
+        peers.forget(7);
+        peers.expect(7, start);
+        assert_eq!(peers.due(start + Duration::from_secs(20_000)), vec![7]);
+    }
+
+    #[test]
+    fn a_hello_ends_the_asking_and_known_people_are_never_asked() {
+        let mut peers = Peers::default();
+        let start = Instant::now();
+        peers.expect(7, start);
+        peers.expect(8, start);
+        peers.learn(7, vec!["files".into()]);
+        peers.expect(7, start);
+        assert_eq!(peers.due(start + Duration::from_secs(60)), vec![8]);
+        peers.forget(8);
+        assert!(peers.due(start + Duration::from_secs(600)).is_empty());
+    }
+
     use super::*;
 
     #[test]
@@ -436,7 +623,7 @@ mod tests {
 
     #[test]
     fn hello_round_trips() {
-        let hello = decode(&encode()).expect("own hello decodes");
+        let hello = decode(&encode(false)).expect("own hello decodes");
         assert_eq!(hello.bot, None);
         let features = hello.features;
         assert_eq!(
@@ -458,7 +645,7 @@ mod tests {
                 "watch-party"
             ]
         );
-        assert!(encode().len() <= PLUGIN_DATA_MAX);
+        assert!(encode(true).len() <= PLUGIN_DATA_MAX);
     }
 
     #[test]

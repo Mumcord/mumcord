@@ -564,6 +564,9 @@ pub enum EngineEvent {
     AudioDeviceFallback {
         input: bool,
     },
+    /// The selected noise suppression cannot keep up with the microphone and the standard one
+    /// stands in for now (issue #753). Sent at most once every ten minutes.
+    NoiseSuppressionFallback,
     /// The highest bitrate the bitrate slider can reach changed (FR-2.64); `None` without a
     /// voice server.
     BitrateMaxChanged(Option<u32>),

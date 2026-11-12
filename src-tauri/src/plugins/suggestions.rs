@@ -71,9 +71,15 @@ pub(crate) async fn ensure_index(plugins: &Arc<Plugins>, engine: &Engine) {
         let last_seen = u64::try_from(settings.plugins_last_official_sequence)
             .ok()
             .filter(|s| *s > 0);
-        fetch_official(&client, &cache, &base, last_seen)
-            .await
-            .map_err(|e| e.to_string())
+        fetch_official(
+            &client,
+            &cache,
+            &base,
+            last_seen,
+            settings.plugin_registry_cache,
+        )
+        .await
+        .map_err(|e| e.to_string())
     }
     .await;
     match result {

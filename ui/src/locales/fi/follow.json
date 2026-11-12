@@ -48,7 +48,7 @@
     "noAnswer": "ei vastausta palvelimelta",
     "unfollowed": "Kaikkien kanavien seuraaminen lopetettu.",
     "failed": "Kaikkien kanavien seuraaminen ei onnistunut. Yritä uudelleen.",
-    "dismiss": "Ohita",
+    "dismiss": "Sulje",
     "unfollowFailed": "Kaikkien kanavien seuraamisen lopettaminen ei onnistunut. Yritä uudelleen."
   },
   "mention": "sisältää maininnan sinusta",

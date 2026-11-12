@@ -9,7 +9,7 @@
 # Stages (#562): `runtime` has only what the test shards run (no compiler, headers or Rust), so
 # CI pulls a smaller image there; `build` (the default) adds the toolchain for compiling.
 
-FROM ubuntu:24.04 AS base
+FROM ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG NODE_MAJOR=24
@@ -22,7 +22,7 @@ RUN echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl gnupg git file \
       libwebkit2gtk-4.1-0 libayatana-appindicator3-1 librsvg2-2 libxdo3 libasound2t64 \
-      libssl3t64 webkit2gtk-driver libvpx9 libpipewire-0.3-0t64 \
+      libssl3t64 webkitgtk-webdriver libvpx12 libpipewire-0.3-0t64 \
       xvfb xauth dbus dbus-x11 libnss-wrapper gnome-keyring libsecret-tools xdotool \
       sqlite3 openssl \
       openbox libvulkan1 mesa-vulkan-drivers \
@@ -58,7 +58,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV RUSTUP_HOME=/opt/rustup PATH=/opt/cargo/bin:$PATH
-RUN curl -fsSL https://sh.rustup.rs | CARGO_HOME=/opt/cargo sh -s -- -y --profile minimal --default-toolchain stable \
+# rustup-init is pinned by version and SHA-256 (x86_64 only, like the rest of this image).
+ARG RUSTUP_VERSION=1.29.3
+ARG RUSTUP_INIT_SHA256=b1c8cb14e30889e7e2999e6b69e62d9e9b9ffc0f4df8180564d306d9680e6c55
+RUN curl -fsSL -o /tmp/rustup-init "https://static.rust-lang.org/rustup/archive/${RUSTUP_VERSION}/x86_64-unknown-linux-gnu/rustup-init" \
+    && echo "${RUSTUP_INIT_SHA256}  /tmp/rustup-init" | sha256sum -c - \
+    && chmod +x /tmp/rustup-init \
+    && CARGO_HOME=/opt/cargo /tmp/rustup-init -y --profile minimal --default-toolchain stable \
+    && rm /tmp/rustup-init \
     && chmod -R a+rX /opt/rustup /opt/cargo
 
 FROM toolchain AS driver

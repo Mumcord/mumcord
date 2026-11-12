@@ -59,9 +59,9 @@
     "dismiss": "Opusti",
     "unfollowFailed": "Prenehanje sledenja vsem kanalom ni uspelo. Poskusi znova."
   },
-  "mention": "vsebuje omembo tebe",
+  "mention": "te omenja",
   "header": {
     "follow": "Sledi kanalu",
-    "unfollow": "Slediš, klikni za prekinitev"
+    "unfollow": "Slediš – klikni, da prenehaš slediti"
   }
 }

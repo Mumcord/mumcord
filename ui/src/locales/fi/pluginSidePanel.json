@@ -1,9 +1,9 @@
 {
-  "region": "{{plugin}}n sivupaneeli",
-  "close": "Sulje {{plugin}}n sivupaneeli",
-  "resize": "Muuta {{plugin}}n sivupaneelin kokoa",
-  "failed": "{{plugin}}n sivupaneelia ei voitu sulkea. Yritä uudelleen.",
-  "options": "{{plugin}}n asetukset",
+  "region": "Lisäosan {{plugin}} sivupaneeli",
+  "close": "Sulje lisäosan {{plugin}} sivupaneeli",
+  "resize": "Muuta lisäosan {{plugin}} sivupaneelin kokoa",
+  "failed": "Lisäosan {{plugin}} sivupaneelia ei voitu sulkea. Yritä uudelleen.",
+  "options": "Lisäosan {{plugin}} asetukset",
   "details": "Lisäosan tiedot",
   "closePanel": "Sulje paneeli"
 }

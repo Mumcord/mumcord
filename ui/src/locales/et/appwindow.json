@@ -1,12 +1,12 @@
 {
   "close": {
     "title": "Minimeeri salve või välju?",
-    "description": "Oled endiselt ühendatud. Minimeerituna hoiab Mumcord sind häälkõnes ja jääb süsteemisalve.",
+    "description": "Oled endiselt ühendatud. Minimeerituna hoiab Mumcord sind häälvestluses ja jääb süsteemisalve.",
     "remember": "Jäta mu valik meelde",
     "minimize": "Minimeeri salve",
     "quit": "Välju",
     "failed": "See ei õnnestunud. Proovi palun uuesti.",
-    "descriptionServers": "Oled endiselt ühendatud {{count}} serveriga. Minimeerituna hoiab Mumcord sind häälkanalis ja jääb süsteemisalve."
+    "descriptionServers": "Oled endiselt ühendatud {{count}} serveriga. Minimeerituna hoiab Mumcord sind häälvestluses ja jääb süsteemisalve."
   },
   "windowOverlay": {
     "title": "Aknakattekiht eemaldati",
@@ -22,7 +22,7 @@
   },
   "appImageMenu": {
     "title": "Kas lisada Mumcord rakenduste menüüsse?",
-    "description": "Nii ilmub Mumcord sinu rakenduste menüüsse. Ikoon ja vajuta ja räägi töötavad Waylandis korralikult ning mumble:// lingid avavad Mumcordi. Saad seda hiljem seadetes muuta.",
+    "description": "Nii ilmub Mumcord sinu rakenduste menüüsse. Ikoon ja Push-to-talk töötavad Waylandis korralikult ning mumble:// lingid avavad Mumcordi. Saad seda hiljem seadetes muuta.",
     "no": "Ei",
     "yes": "Jah",
     "failed": "See ei õnnestunud. Proovi uuesti."
@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Stabiilne",
+    "releaseCandidate": "Väljalaskekandidaat",
+    "prereleaseNote": "See on eelversioon ja võib sisaldada vigu. Et saada ainult lõplikke väljalaskeid, lülitu seadetes stabiilsele kanalile.",
     "available": {
       "title": "Uuendus on saadaval",
       "subtitle": "Mumcord {{version}} on allalaadimiseks valmis. Sul on {{current}}.",
@@ -96,7 +98,7 @@
       "connected_one": "Oled ühendatud {{count}} serveriga. Pärast taaskäivitust ühendub Mumcord uuesti ja liitub taas sinu kanalitega.",
       "connected_other": "Oled ühendatud {{count}} serveriga. Pärast taaskäivitust ühendub Mumcord uuesti ja liitub taas sinu kanalitega.",
       "later": "Hiljem",
-      "restart": "Uuenda taaskäivitusega",
+      "restart": "Taaskäivita ja uuenda",
       "announce": "Mumcord {{version}} on valmis. Uuendamiseks käivita uuesti."
     },
     "failed": {

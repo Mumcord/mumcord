@@ -90,6 +90,7 @@ export function Updater({ actions = engineActions }: { actions?: UpdateActions }
   return (
     <UpdateToast
       version={readyVersion}
+      channel={ready?.channel ?? "stable"}
       connectedServers={connectedServers}
       onRestart={restartNow}
       onShowDialog={showDialog}

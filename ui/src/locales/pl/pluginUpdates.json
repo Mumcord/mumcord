@@ -23,7 +23,7 @@
   "versionsTo": "do",
   "pill": {
     "none": "Brak nowych uprawnień",
-    "permission": "Wymaga nowego uprawnienia",
+    "permission": "Prosi o więcej uprawnień",
     "author": "Nowy autor",
     "websites": "Łączy się z nowymi stronami"
   },
@@ -35,7 +35,7 @@
     "remove": "Usuń"
   },
   "checkNow": "Sprawdź teraz",
-  "lastChecked": "Ostatnio sprawdzono o {{time}}",
+  "lastChecked": "Ostatnie sprawdzenie: {{time}}",
   "checkFailed": "Sprawdzanie się nie powiodło. Spróbuj ponownie.",
   "modeNote": "Aktualizacje wtyczek: {{mode}}. Możesz to zmienić poniżej.",
   "settings": "Ustawienia aktualizacji",
@@ -49,7 +49,7 @@
   },
   "waitingHeading": "Oczekujące aktualizacje",
   "autoNote": "Automatyczne aktualizacje instalują się tylko wtedy, gdy wtyczka o nic nowego nie prosi, a jej ocena zostaje w tym samym przedziale lub spada. Reszta czeka tutaj.",
-  "needsMumcord": "Aktualizacja będzie dostępna po zaktualizowaniu Mumcord",
+  "needsMumcord": "Aktualizacja będzie dostępna po zaktualizowaniu Mumcorda",
   "band": {
     "low": "Niskie",
     "medium": "Średnie",
@@ -85,7 +85,7 @@
     "otherDomain": "Jedna z nich nie należy do domeny wtyczki.",
     "whatsNew": "Co nowego w wersji {{version}}",
     "websitesLead": "{{name}} i jej strona mogłyby wtedy łączyć się z:",
-    "websitesWarning": "Te strony widzą Twój adres IP i wszystko, co wyśle im {{name}}.",
+    "websitesWarning": "Te strony widzą twój adres IP i wszystko, co wyśle im {{name}}.",
     "websitesLabel": "Strony internetowe",
     "new": "Nowa",
     "changed": "Zmieniona",
@@ -101,8 +101,8 @@
     "asksForMore": "bo ta wersja prosi o więcej:",
     "permissionsLabel": "Nowe uprawnienia",
     "recentChange": "Liczy się to także jako niedawna zmiana: nowe uprawnienia w ostatnich wersjach ({{versions}}) dodają kolejne +{{recent}} pkt. Razem z +{{permissions}} powyżej (× {{multiplier}}) daje to +{{total}}.",
-    "highTitle": "Ta aktualizacja sprawiłaby, że wtyczka stałaby się wtyczką wysokiego ryzyka",
-    "highText": "Nie zostanie zainstalowana automatycznie. Pozostanie przy wersji {{version}} zachowa obecną ocenę; wersję możesz przypiąć w Zainstalowane.",
+    "highTitle": "Po tej aktualizacji wtyczka miałaby wysokie ryzyko",
+    "highText": "Nie zostanie zainstalowana automatycznie. Jeśli zostaniesz przy wersji {{version}}, ocena się nie zmieni; wersję możesz przypiąć w sekcji Zainstalowane.",
     "highTick": "Rozumiem, że ryzyko wzrosło, i nadal ufam autorowi",
     "skipHint": "Pominięcie zachowuje działającą wersję {{version}}.",
     "skip": "Pomiń tę wersję",

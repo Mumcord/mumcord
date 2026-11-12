@@ -18,7 +18,7 @@ use super::offer::FileOffer;
 /// Subfolder of the system Downloads folder that receives files by default (FR-7.25).
 const DEFAULT_SAVE_SUBFOLDER: &str = "Mumcord";
 use super::receive::{IncomingFile, ReceiveError};
-use super::transfer::{ANSWER_TIMEOUT, TransferError};
+use super::transfer::{ANSWER_TIMEOUT, STREAM_FORMAT, TransferError};
 use super::unix_now;
 use super::wire::{self, FileMessage};
 use crate::ServerId;
@@ -433,12 +433,13 @@ impl Engine {
             Ok(Err(e)) => return receive_failed(e),
             Err(e) => return CardState::Failed(FailReason::Io(e.to_string())),
         };
-        let expected = match self.file_expect(server_id, session, &offer.id, size) {
+        let mut expected = match self.file_expect(server_id, session, &offer.id, size) {
             Ok(expected) => expected,
             Err(e) => return failed(e),
         };
         let request = FileMessage::Request {
             id: offer.id.clone(),
+            fmt: STREAM_FORMAT,
         };
         if !self.send_file_message(server_id, session, &request) {
             return CardState::Failed(FailReason::ConnectionLost);
@@ -458,7 +459,12 @@ impl Engine {
                     queued = true;
                     self.set_card_state(server_id, &offer.id, CardState::Queued { position });
                 }
-                Some(FileMessage::Go { .. }) => break,
+                Some(FileMessage::Go { fmt, .. }) => {
+                    if let Err(e) = expected.started(fmt) {
+                        return failed(e);
+                    }
+                    break;
+                }
                 Some(FileMessage::Busy { .. }) => return CardState::Failed(FailReason::Busy),
                 Some(FileMessage::Gone { .. }) => {
                     return CardState::Unavailable(Unavailable::Ended);

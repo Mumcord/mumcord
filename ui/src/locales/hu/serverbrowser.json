@@ -4,7 +4,7 @@
   "subtitle": "Betöltve, mert megnyitottad ezt az oldalt · {{total}} közül {{shown}} látható",
   "search": "Keresés név, cím vagy ország szerint",
   "refresh": "Frissítés",
-  "retry": "Újra",
+  "retry": "Újrapróbálás",
   "loadFailed": "A nyilvános szerverek listája nem tölthető be. Ellenőrizd az internetkapcsolatot, és próbáld újra.",
   "noMatch": "Egy szerver sem felel meg a keresésnek és a szűrőknek.",
   "saveFailed": "A szervert nem sikerült hozzáadni. Próbáld újra.",

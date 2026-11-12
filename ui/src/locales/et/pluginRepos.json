@@ -1,5 +1,5 @@
 {
-  "intro": "Hoidlad on teiste peetavad lisatud pluginate loendid. Mumcord ei kontrolli nende pluginaid. Lisa ainult hoidlaid, mida usaldad.",
+  "intro": "Hoidlad on teiste inimeste peetavad lisaloendid pluginatega. Mumcord ei kontrolli nende pluginaid. Lisa ainult hoidlaid, mida usaldad.",
   "add": {
     "button": "Lisa hoidla",
     "title": "Lisa hoidla",
@@ -7,7 +7,7 @@
     "expectedKey": "Oodatud võti (valikuline)",
     "expectedKeyHint": "Kui omanik andis sulle võtme, kleebi see siia. Hoidla peab siis kasutama täpselt seda võtit.",
     "check": "Kontrolli hoidlat",
-    "found": "Selle leidsime",
+    "found": "Leitud teave",
     "confirm": "Lisa hoidla",
     "subtitle": "Lisa ainult usaldusväärsete inimeste hoidlaid.",
     "signatureValid": "allkiri kehtib",
@@ -18,7 +18,7 @@
     "warningBody": "Mumcord neid pluginaid ei kontrolli. Võti jäetakse meelde: kui see muutub, peatatakse hoidla, kuni selle üle vaatad. Sirvimisel näeb hoidla omanik sinu IP-aadressi. Ametliku nimega pluginaid sealt kunagi ei võeta."
   },
   "limit": "Saad lisada kuni {{max}} hoidlat.",
-  "limitReached": "{{max}} hoidla piir on täis.",
+  "limitReached": "Hoidlate piir ({{max}}) on täis.",
   "empty": "Hoidlaid pole veel lisatud.",
   "listLabel": "Lisatud hoidlad",
   "loadFailed": "Hoidlaid ei õnnestunud laadida.",
@@ -51,7 +51,7 @@
     "label": "Ametliku pluginaloendi peegel (valikuline)",
     "hint": "Muuda seda ainult siis, kui said peegli aadressi. Peegel peab pakkuma samu allkirjastatud faile; Mumcord kontrollib siiski iga allkirja.",
     "save": "Salvesta",
-    "reset": "Kasuta vaikimisi väärtust"
+    "reset": "Kasuta vaikeväärtust"
   },
   "official": {
     "name": "Mumcordi ametlikud pluginad",

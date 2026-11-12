@@ -186,6 +186,14 @@ const versions = {
     ),
   "@dav1d": () =>
     match(join(opt.root, "scripts/build-dav1d.sh"), /^DAV1D_VERSION=(\S+)$/mu, "DAV1D_VERSION"),
+  "@ffmpeg": () =>
+    match(join(opt.root, "scripts/build-ffmpeg.sh"), /^FFMPEG_VERSION=(\S+)$/mu, "FFMPEG_VERSION"),
+  "@gst-libav": () =>
+    match(
+      join(opt.root, "scripts/build-ffmpeg.sh"),
+      /^GST_LIBAV_VERSION=(\S+)$/mu,
+      "GST_LIBAV_VERSION",
+    ),
   "@libopus": () =>
     match(
       join(crateDir("opusic-sys"), "opus/package_version"),
@@ -222,7 +230,25 @@ const crateFiles = (dir) =>
 // Files cargo adds when it packs or unpacks a crate: its normalized Cargo.toml (the original is
 // Cargo.toml.orig), the VCS info and the registry's unpack marker.
 const CARGO_MADE = new Set(["Cargo.toml", ".cargo_vcs_info.json", ".cargo-ok"]);
+// The LGPL asks to name the exact sources and how they were built: both tarballs with their
+// checksums and FFmpeg's configure flags, read from scripts/build-ffmpeg.sh.
+const ffmpegBuild = (what) => {
+  const script = join(opt.root, "scripts/build-ffmpeg.sh");
+  const value = (name) => match(script, new RegExp(`^${name}=(\\S+)$`, "mu"), name);
+  if (what === "gst-libav") {
+    const v = value("GST_LIBAV_VERSION");
+    return `Source: https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${v}.tar.xz (SHA-256 ${value("GST_LIBAV_SHA256")}), unmodified.`;
+  }
+  const flags = match(script, /^ffmpeg_configure=\(\n([^)]*)\n\)$/mu, "ffmpeg_configure")
+    .split("\n")
+    .map((line) => line.trim())
+    .join(" ");
+  const v = value("FFMPEG_VERSION");
+  return `Source: https://ffmpeg.org/releases/ffmpeg-${v}.tar.xz (SHA-256 ${value("FFMPEG_SHA256")}), unmodified. Configured with: ${flags}`;
+};
 const revisions = {
+  "@ffmpeg-build": () => ffmpegBuild("ffmpeg"),
+  "@gst-libav-build": () => ffmpegBuild("gst-libav"),
   "@bovnar": () => {
     const dir = crateDir("bovnar");
     const where = join(dir, "PROVENANCE.json");

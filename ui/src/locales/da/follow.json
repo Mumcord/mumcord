@@ -6,7 +6,7 @@
   "errors": {
     "denied": "Serveren tillader ikke, at du følger denne kanal.",
     "limit": "Du kan ikke følge flere kanaler på denne server. Stop med at følge en anden kanal først.",
-    "tooOld": "Denne server er for gammel til at følge kanaler (kræver version 1.4 eller nyere).",
+    "tooOld": "Denne server er for gammel til, at du kan følge kanaler (kræver version 1.4 eller nyere).",
     "notConnected": "Du er ikke forbundet til serveren.",
     "generic": "Det lykkedes ikke at følge denne kanal. Prøv igen."
   },
@@ -24,7 +24,7 @@
   "history": {
     "clear": "Ryd historik",
     "title": "Ryd historik?",
-    "body": "Dette sletter permanent de gemte beskeder fra denne samtale på denne computer. Andre beholder deres kopier. Deres kopier synkroniseres ikke tilbage til denne computer.",
+    "body": "Dette sletter permanent de gemte beskeder fra denne samtale på denne computer. Andre beholder deres kopier, men de synkroniseres ikke tilbage til denne computer.",
     "confirm": "Ryd historik",
     "cancel": "Annullér",
     "failed": "Historikken kunne ikke ryddes. Prøv igen."
@@ -39,8 +39,8 @@
     "follow": "Følg alle kanaler",
     "unfollow": "Stop med at følge alle kanaler",
     "working": "Følger kanaler…",
-    "followed_one": "Følger {{count}} kanal.",
-    "followed_other": "Følger {{count}} kanaler.",
+    "followed_one": "Følger nu {{count}} kanal.",
+    "followed_other": "Følger nu {{count}} kanaler.",
     "skipped_one": "{{count}} sprunget over: {{reasons}}.",
     "skipped_other": "{{count}} sprunget over: {{reasons}}.",
     "limit": "grænsen er nået",
@@ -48,7 +48,7 @@
     "noAnswer": "intet svar fra serveren",
     "unfollowed": "Følger ikke længere nogen kanaler.",
     "failed": "Det lykkedes ikke at følge alle kanaler. Prøv igen.",
-    "dismiss": "Afvis",
+    "dismiss": "Luk",
     "unfollowFailed": "Det lykkedes ikke at stoppe med at følge alle kanaler. Prøv igen."
   },
   "mention": "indeholder en omtale af dig",

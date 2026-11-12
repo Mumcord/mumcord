@@ -1,11 +1,14 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { ChannelPermissions, MockApi } from "../../api";
 import { axeViolations } from "../../test/axe";
 import { ChannelsPanel } from "../channels";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { ChannelTreeMenu } from "../channelheader";
+import { getServerState } from "../channels/serverStore";
 import { resetFollowStore } from "../follow";
+import { GroupsView } from "./GroupsView";
 import { deleteImpact, descendants, parentOptions } from "./channelAdminModel";
 
 let api: MockApi;
@@ -132,6 +135,22 @@ describe("Channel window (FR-10.21–FR-10.24)", () => {
     );
   });
 
+  it("disables Save with the reason when the description is too long (issue #666)", async () => {
+    await renderTree({ 2: ADMIN });
+    fireEvent.keyDown(row(/^Raid/), { key: "F2" });
+    const dialog = screen.getByRole("dialog", { name: "Edit channel" });
+    const field = within(dialog).getByRole("textbox", { name: "Description" });
+    field.innerHTML = `<p>${"x".repeat(6000)}</p>`;
+    fireEvent.input(field);
+    expect(within(dialog).getByRole("button", { name: "Save changes" })).toBeDisabled();
+    expect(dialog).toHaveTextContent("Can't save: the description is too long for this server");
+    expect(within(dialog).getByRole("meter", { name: "Length" })).toHaveAttribute(
+      "aria-valuetext",
+      "6,007 / 5,000",
+    );
+    expect(await axeViolations(dialog)).toEqual([]);
+  });
+
   it("saves only what changed and asks before moving under another parent", async () => {
     await renderTree({ 2: ADMIN });
     fireEvent.keyDown(row(/^Raid/), { key: "F2" });
@@ -245,10 +264,61 @@ describe("Permissions tab (#252)", () => {
     expect(await axeViolations(dialog)).toEqual([]);
   });
 
+  it("stops checking a person with the clear button and when they leave (issue #710)", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    const field = within(dialog).getByRole("combobox", { name: "Check a person" });
+    expect(within(dialog).queryByRole("button", { name: /^Stop checking/ })).toBeNull();
+    const everyoneRow = within(dialog).getAllByRole("row").length;
+    fireEvent.click(field);
+    fireEvent.click(within(dialog).getAllByRole("option")[0] as HTMLElement);
+    const name = (field as HTMLInputElement).value;
+    expect(name).not.toBe("");
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow + 1);
+    fireEvent.click(within(dialog).getByRole("button", { name: `Stop checking ${name}` }));
+    expect(field).toHaveValue("");
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow);
+    expect(within(dialog).queryByRole("button", { name: /^Stop checking/ })).toBeNull();
+
+    fireEvent.click(field);
+    const other = within(dialog)
+      .getAllByRole("option")
+      .find((o) => o.textContent !== "Zoe") as HTMLElement;
+    const leaver = other.textContent;
+    fireEvent.click(other);
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow + 1);
+    const session = [...getServerState().users.values()].find((u) => u.name === leaver)?.session;
+    act(() => {
+      api.mock.removeUser(session as number);
+    });
+    expect(field).toHaveValue("");
+    expect(within(dialog).getAllByRole("row").length).toBe(everyoneRow);
+  });
+
+  it("marks the open view, shows counts and refreshes from the icon button", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    const who = within(dialog).getByRole("button", { name: "Who can do what" });
+    const rules = within(dialog).getByRole("button", { name: /^Rules, \d+$/ });
+    const groups = within(dialog).getByRole("button", { name: /^Groups, \d+$/ });
+    expect(who).toHaveAttribute("aria-pressed", "true");
+    expect(rules).toHaveAttribute("aria-pressed", "false");
+    expect(rules).toHaveTextContent(/^Rules\d+$/);
+    fireEvent.click(groups);
+    expect(groups).toHaveAttribute("aria-pressed", "true");
+    expect(who).toHaveAttribute("aria-pressed", "false");
+    const refresh = within(dialog).getByRole("button", { name: "Refresh" });
+    expect(refresh).toHaveAttribute("data-tooltip", "Refresh");
+    fireEvent.click(refresh);
+    expect(
+      await within(dialog).findByRole("button", { name: /^Groups, \d+$/ }),
+    ).toBeInTheDocument();
+  });
+
   it("adds a rule that denies Speak and saves it", async () => {
     await renderTree({ 2: ADMIN });
     const dialog = await openPermissions(/^Raid/);
-    fireEvent.click(within(dialog).getByRole("button", { name: "Rules" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: /^Rules/ }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Add rule" }));
     fireEvent.click(within(dialog).getByRole("checkbox", { name: "Deny Speak" }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
@@ -264,7 +334,7 @@ describe("Permissions tab (#252)", () => {
   it("asks before saving the Root channel's rules", async () => {
     await renderTree({ 0: ADMIN });
     const dialog = await openPermissions(/^Root/);
-    fireEvent.click(within(dialog).getByRole("button", { name: "Rules" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: /^Rules/ }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Add rule" }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
     const ask = await screen.findByRole("alertdialog", {
@@ -274,18 +344,85 @@ describe("Permissions tab (#252)", () => {
     expect(screen.getByRole("dialog", { name: "Edit channel" })).toBeInTheDocument();
   });
 
-  it("creates a group and adds a registered member", async () => {
+  /** Opens Groups and creates `name` through the "New group" box. */
+  async function groupsWith(name: string) {
     await renderTree({ 2: ADMIN });
     const dialog = await openPermissions(/^Raid/);
-    fireEvent.click(within(dialog).getByRole("button", { name: "Groups" }));
-    fireEvent.change(within(dialog).getByLabelText("New group"), { target: { value: "raiders" } });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Create" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: /^Groups/ }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "New group" }));
+    fireEvent.change(within(dialog).getByLabelText("Name of the new group"), {
+      target: { value: name },
+    });
+    return dialog;
+  }
+
+  it("creates a group with Enter and adds a registered member", async () => {
+    const dialog = await groupsWith("  raiders ");
+    fireEvent.keyDown(within(dialog).getByLabelText("Name of the new group"), { key: "Enter" });
+    expect(within(dialog).getByRole("heading", { name: "raiders" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "New group" })).toHaveFocus();
+    expect(within(dialog).getByText("No members yet")).toBeInTheDocument();
     const picker = within(dialog).getByLabelText("Add a registered user");
     fireEvent.change(picker, { target: { value: "Zoe" } });
     fireEvent.keyDown(picker, { key: "Enter" });
     const list = within(dialog).getByRole("list", { name: "Members" });
     expect(list).toHaveTextContent("Zoe");
     expect(list).toHaveTextContent("added here");
+    expect(within(dialog).getByText("1 member · 1 added here")).toBeInTheDocument();
+  });
+
+  it("says when a group name already exists and cancels with Escape", async () => {
+    const dialog = await groupsWith("raiders");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Create group" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "New group" }));
+    fireEvent.change(within(dialog).getByLabelText("Name of the new group"), {
+      target: { value: "raiders" },
+    });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Create group" }));
+    expect(within(dialog).getByRole("alert")).toHaveTextContent(
+      "A group named “raiders” already exists.",
+    );
+    fireEvent.keyDown(within(dialog).getByLabelText("Name of the new group"), { key: "Escape" });
+    expect(within(dialog).queryByLabelText("Name of the new group")).not.toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "New group" })).toHaveFocus();
+    expect(within(dialog).getAllByRole("button", { name: /raiders/ })).toHaveLength(2);
+  });
+
+  it("removes and restores an inherited member with the row buttons", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    fireEvent.click(within(dialog).getByRole("button", { name: /^Groups/ }));
+    const list = within(dialog).getByRole("list", { name: "Members" });
+    expect(list).toHaveTextContent("inherited");
+    fireEvent.click(within(list).getByRole("button", { name: "Remove Zoe here" }));
+    expect(list).toHaveTextContent("inherited, removed here");
+    fireEvent.click(within(list).getByRole("button", { name: "Restore Zoe" }));
+    expect(list).not.toHaveTextContent("removed here");
+    expect(within(list).getByRole("button", { name: "Remove Zoe here" })).toBeInTheDocument();
+  });
+
+  it("opens what the group can do in a dialog and jumps to Who can do what", async () => {
+    await renderTree({ 2: ADMIN });
+    const dialog = await openPermissions(/^Raid/);
+    fireEvent.click(within(dialog).getByRole("button", { name: /^Groups/ }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "New group" }));
+    fireEvent.change(within(dialog).getByLabelText("Name of the new group"), {
+      target: { value: "raiders" },
+    });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Create group" }));
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "See what raiders can do in Raid" }),
+    );
+    const can = await screen.findByRole("dialog", { name: "What raiders can do in Raid" });
+    expect(within(can).getByRole("rowheader", { name: "raiders" })).toBeInTheDocument();
+    expect(within(can).getByRole("rowheader", { name: "Everyone" })).toBeInTheDocument();
+    expect(within(can).getAllByRole("row")).toHaveLength(3);
+    fireEvent.click(within(can).getByRole("button", { name: "Open in “Who can do what”" }));
+    expect(screen.queryByRole("dialog", { name: "What raiders can do in Raid" })).toBeNull();
+    expect(within(dialog).getByRole("button", { name: "Who can do what" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 });
 
@@ -307,6 +444,55 @@ describe("Delete channel (FR-10.25, FR-10.10)", () => {
     fireEvent.keyDown(row(/^Raid/), { key: "Delete" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+});
+
+describe("Groups view member filter", () => {
+  const people = ["Ann", "Bob", "Cleo", "Dan", "Eve", "Finn"].map((name, i) => ({ id: i, name }));
+  const group = {
+    name: "crew",
+    inherited: false,
+    inherit: true,
+    inheritable: true,
+    add: people.map((p) => p.id),
+    remove: [],
+    inheritedMembers: [],
+  };
+  const acl = {
+    channelId: 2,
+    inheritAcls: true,
+    groups: [group],
+    rules: [],
+    userNames: people,
+  } as unknown as ComponentProps<typeof GroupsView>["acl"];
+  const view = (members: number) => {
+    render(
+      <GroupsView
+        serverId={1}
+        acl={{ ...acl, groups: [{ ...group, add: group.add.slice(0, members) }] }}
+        channelName="Raid"
+        readOnly={false}
+        people={people}
+        onChange={() => undefined}
+        onGoToRule={() => undefined}
+        onOpenWho={() => undefined}
+      />,
+    );
+  };
+
+  it("filters by name, ignoring case, once the group has more than five members", () => {
+    view(6);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Filter members…" }), {
+      target: { value: "EV" },
+    });
+    const list = screen.getByRole("list", { name: "Members" });
+    expect(within(list).getAllByRole("listitem")).toHaveLength(1);
+    expect(list).toHaveTextContent("Eve");
+  });
+
+  it("shows no filter for five members or fewer", () => {
+    view(5);
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
   });
 });
 

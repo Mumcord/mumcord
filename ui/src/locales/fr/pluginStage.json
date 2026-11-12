@@ -1,16 +1,16 @@
 {
-  "mediaLabel": "Zone multimédia : {{plugin}}",
+  "mediaLabel": "Zone multimédia : {{plugin}}",
   "tabsLabel": "Ce que la zone multimédia affiche",
   "tab": "{{plugin}} · Plugin",
   "tabLabel": "{{plugin}}, activité de plugin, onglet {{index}} sur {{count}}",
-  "tabsHint": "Changer d'onglet n'arrête rien · Alt+1 / Alt+2",
-  "tabsHintMany": "Changer d'onglet n'arrête rien · Alt+1 … Alt+{{count}}",
+  "tabsHint": "Changer d’onglet n’arrête rien · Alt+1 / Alt+2",
+  "tabsHintMany": "Changer d’onglet n’arrête rien · Alt+1 … Alt+{{count}}",
   "chipPlugin": "Plugin",
   "unofficial": "Non officiel",
   "unofficialRepository": "Non officiel · {{repository}}",
   "official": "Officiel",
   "startedBy": "Lancé par {{name}} · {{count}} dans la partie",
-  "startedByYou": "Lancé par vous · {{count}} dans la partie",
+  "startedByYou": "Lancé par toi · {{count}} dans la partie",
   "pluginBy": "plugin de {{author}}",
   "connection": {
     "relay": "Relais · chiffré de bout en bout",
@@ -23,19 +23,19 @@
   "join": "Rejoindre",
   "joinLabel": "Rejoindre {{plugin}}",
   "open": "Ouvrir",
-  "openLabel": "Ouvrir: {{plugin}}",
+  "openLabel": "Ouvrir {{plugin}}",
   "getPlugin": "Obtenir le plugin",
   "getPluginLabel": "Obtenir {{plugin}}",
   "activityStarted": "{{name}} a lancé {{plugin}}",
   "activityPlaying": "{{name}} joue à {{plugin}}",
   "activitiesLabel": "Activités de plugins",
   "noRelayTitle": "Pas de relais pour les données des plugins sur ce serveur.",
-  "noRelayText": "Le relais de {{server}} n'autorise pas les données des plugins, donc {{plugin}} utilise la connexion Mumble, plus lente : les coups peuvent prendre un moment et les grands plateaux sont désactivés.",
+  "noRelayText": "Le relais de {{server}} n’autorise pas les données des plugins, donc {{plugin}} utilise la connexion Mumble, plus lente : les coups peuvent prendre un moment et les grands plateaux sont désactivés.",
   "noRelayDetails": "Détails",
-  "tooMany": "Trop d'activités dans ce salon",
+  "tooMany": "Trop d’activités dans ce salon",
   "full": "Cette activité est complète",
   "joinGone": "Cette activité est terminée",
-  "joinNotPermitted": "Vous ne pouvez pas rejoindre {{plugin}} pour le moment",
+  "joinNotPermitted": "Tu ne peux pas rejoindre {{plugin}} pour le moment",
   "joinFailed": "Impossible de rejoindre {{plugin}}",
   "leaveFailed": "Impossible de quitter {{plugin}}",
   "fullScreenBanner": "{{plugin}} est en plein écran · Échap pour quitter",
@@ -56,6 +56,6 @@
   },
   "dialog": {
     "close": "Fermer {{plugin}}",
-    "footer": "Le contenu à l'intérieur du cadre vient du plugin. Mumcord ne demande jamais de mot de passe ici. Échap ferme."
+    "footer": "Le contenu à l’intérieur du cadre vient du plugin. Mumcord ne demande jamais de mot de passe ici. Échap ferme."
   }
 }

@@ -61,8 +61,8 @@
     "suppressed": "Soppresso – non può parlare in questo canale",
     "localMuted": "Silenziato per te",
     "unregistered": "Non registrato su questo server (ospite)",
-    "nowPlaying": "Ascolta {{track}}",
-    "nowGaming": "Gioca a {{game}}",
+    "nowPlaying": "Sta ascoltando {{track}}",
+    "nowGaming": "Sta giocando a {{game}}",
     "weakConnection": "Connessione debole – ping alto o perdita di pacchetti",
     "positional": "Audio posizionale attivo",
     "prioritySpeaker": "Oratore prioritario: si sente sopra tutti gli altri"
@@ -81,12 +81,12 @@
   "empty": {
     "disconnected": "Non connesso. Scegli un server per vederne i canali.",
     "loading": "Caricamento dei canali…",
-    "syncingBig": "Sincronizzazione server grande…"
+    "syncingBig": "Sincronizzazione di un server grande…"
   },
   "search": {
     "label": "Cerca canali e persone",
     "clear": "Cancella ricerca",
-    "empty": "Nessun canale o persona corrisponde a “{{query}}”.",
+    "empty": "Nessun canale o persona corrisponde a «{{query}}».",
     "count": "{{channels}}, {{people}}",
     "channels_one": "{{count}} canale",
     "channels_many": "{{count}} canali",
@@ -119,7 +119,26 @@
     "failed": "Non è stato possibile spostare alcune persone.",
     "resultTitle": "Spostamento persone",
     "resultAll": "Spostate {{people}} in {{channel}}.",
-    "resultSome": "Spostate {{moved}} di {{people}} in {{channel}}. Le altre sono state rifiutate.",
-    "busy": "Persone già in spostamento…"
+    "resultSome": "Spostate {{moved}} su {{people}} in {{channel}}. Le altre sono state rifiutate.",
+    "busy": "Spostamento già in corso…"
+  },
+  "drag": {
+    "into": "Sposta in {{channel}}",
+    "above": "Metti sopra {{channel}}",
+    "below": "Metti sotto {{channel}}",
+    "self": "Non può essere spostato dentro sé stesso",
+    "subChannel": "Non può essere spostato in un proprio sottocanale",
+    "confirmTitle": "Spostare «{{channel}}»?",
+    "alongAll": "Con {{channel}} si spostano: {{subChannels}} e {{people}}.",
+    "alongSubChannels": "Con {{channel}} si spostano: {{subChannels}}.",
+    "alongPeople": "Con {{channel}} si spostano: {{people}}.",
+    "alongNone": "Si sposta solo {{channel}}; è vuoto.",
+    "subChannels_one": "{{count}} sottocanale",
+    "subChannels_many": "{{count}} sottocanali",
+    "subChannels_other": "{{count}} sottocanali",
+    "pathTo": "in",
+    "confirm": "Sposta",
+    "failedTitle": "Impossibile spostare {{channel}}",
+    "refusedParent": "Non hai il permesso di spostare canali in {{channel}}."
   }
 }

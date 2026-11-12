@@ -5,7 +5,7 @@
   "tipLabel": "Despre {{name}}",
   "errors": {
     "generic": "Ceva n-a mers bine. Încearcă din nou.",
-    "secureStorageUnavailable": "Mumcord nu poate accesa stocarea securizată a sistemului tău. Deblochează keyring-ul sau managerul de parole și încearcă din nou.",
+    "secureStorageUnavailable": "Mumcord nu poate accesa stocarea securizată a sistemului tău. Deblochează depozitul de chei sau managerul de parole și încearcă din nou.",
     "saveFailed": "Setările tale nu au putut fi salvate. Încearcă din nou."
   },
   "nav": {
@@ -22,7 +22,7 @@
     "appName": "Mumcord",
     "setup": "Configurare",
     "custom": "Personalizat",
-    "done": "(făcut)",
+    "done": "(gata)",
     "progress": "Progresul configurării",
     "later": "Tot ce e aici poate fi schimbat mai târziu în Setări."
   },
@@ -33,6 +33,7 @@
     "voice": "Voce",
     "setupStyle": "Stilul configurării",
     "privateMessages": "Mesaje private",
+    "notifications": "Notificări",
     "connections": "Conexiuni",
     "features": "Funcții",
     "appearance": "Aspect",
@@ -40,12 +41,12 @@
     "summary": "Totul e gata"
   },
   "welcome": {
-    "title": "Chat vocal care se simte ca",
-    "titleAccent": "propriul tău loc.",
-    "subtitle": "Mumcord vorbește Mumble, așa că funcționează cu orice server Mumble, și adaugă un chat modern deasupra. Hai să-l configurăm cum îți place. Durează cam două minute.",
+    "title": "Chat vocal în care te simți",
+    "titleAccent": "ca acasă.",
+    "subtitle": "Mumcord vorbește Mumble, așa că funcționează cu orice server Mumble, și adaugă peste el un chat modern. Hai să-l configurăm cum îți place. Durează cam două minute.",
     "voice": {
       "title": "Voce cristalină",
-      "text": "Audio cu latență mică și eliminare a zgomotului integrată."
+      "text": "Audio cu latență mică și suprimarea zgomotului integrată."
     },
     "servers": {
       "title": "Funcționează cu orice server Mumble",
@@ -99,7 +100,7 @@
     "subtitle": "Alege-ți dispozitivele și spune ceva. Bara ar trebui să se miște cât vorbești.",
     "talkLegend": "Cum vrei să vorbești?",
     "voiceActivationDesc": "Microfonul se deschide când vorbești. Nimic de ținut sau apăsat.",
-    "pushToTalkDesc": "Cel mai bun pentru încăperi zgomotoase. Tu alegi tasta.",
+    "pushToTalkDesc": "Ideal pentru încăperi zgomotoase. Tu alegi tasta.",
     "sensitivity": "Sensibilitate",
     "changeLater": "Poți schimba toate acestea mai târziu în Setări → Voce și audio."
   },
@@ -146,6 +147,10 @@
     "subtitle": "Mesajele private sunt conversații între două persoane. Chatul canalului nu este afectat de această alegere.",
     "local": "Filtrarea se face pe calculatorul tău. Expeditorii nu sunt înștiințați. Mai târziu poți seta o altă regulă pentru fiecare server."
   },
+  "notifications": {
+    "title": "Cum să te anunțe Mumcord?",
+    "subtitle": "Alege cum ajunge la tine fiecare tip de noutăți. Poți schimba asta mai târziu în Setări → Notificări."
+  },
   "connections": {
     "title": "Conexiuni și conținut",
     "subtitle": "Unele funcții te conectează direct la alți utilizatori Mumcord, iar o parte din conținutul chatului se încarcă de pe alte site-uri. Alege ce ți se potrivește.",
@@ -154,7 +159,7 @@
   },
   "features": {
     "title": "Fă-l al tău",
-    "subtitle": "Activează extrele dorite. Fiecare spune cine ce poate vedea.",
+    "subtitle": "Activează funcțiile suplimentare dorite. Fiecare spune cine ce poate vedea.",
     "seenByMumcordUsers": "Vizibil pentru utilizatorii Mumcord de pe același server.",
     "onlyYou": "Doar tu vezi asta.",
     "ingameOverlayAlt": "Exemplu de suprapunere din joc care arată cine vorbește"
@@ -175,7 +180,7 @@
   "summary": {
     "title": "Totul e gata",
     "titleNamed": "Totul e gata, {{name}}",
-    "subtitle": "Iată ce ai ales. Folosește Editează pe oricare card ca să schimbi ceva înainte de a începe.",
+    "subtitle": "Iată ce ai ales. Folosește „Editează” pe oricare card ca să schimbi ceva înainte de a începe.",
     "on": "activat",
     "off": "dezactivat",
     "unavailable": "indisponibil aici",
@@ -185,6 +190,7 @@
       "identity": "Identitate",
       "voice": "Voce",
       "privateMessages": "Mesaje private",
+      "notifications": "Notificări",
       "connections": "Conexiuni",
       "chatContent": "Conținutul chatului",
       "features": "Funcții",
@@ -192,13 +198,15 @@
       "startup": "Pornire",
       "updates": "Actualizări"
     },
-    "identityDetail": "Salvată în depozitul de chei a sistemului",
-    "voiceDetail": "Eliminarea zgomotului: {{noise}}",
+    "identityDetail": "Salvată în depozitul de chei al sistemului",
+    "voiceDetail": "Suprimarea zgomotului: {{noise}}",
     "pmDetail": "Canalul meu {{channel}} · conversații acceptate {{accepted}} · cereri {{requests}}",
+    "notificationsTitle": "Mesaje noi: {{mode}}",
+    "notificationsDetail": "Notificări de activitate: {{on}} din {{total}} pornite",
     "contentTitle": "Previzualizări de linkuri {{previews}}",
     "contentDetail": "Imagini la dimensiune completă {{images}} · sincronizarea istoricului {{sync}}",
     "featuresTitle": "Suprapunere în joc {{overlay}}",
-    "featuresDetail": "Urmează Nu deranja din sistem {{dnd}} · se redă acum {{playing}} · joc acum {{gaming}}",
+    "featuresDetail": "„Nu deranja” din sistem {{dnd}} · ce asculți {{playing}} · ce joci {{gaming}} · istoricul activității {{history}}",
     "effectsDetail": "Efecte vizuale {{effects}}",
     "startupTitle": "Pornire la autentificare {{login}}",
     "startupDetail": "Pornire minimizată {{minimized}} · linkuri mumble:// {{links}}",
@@ -208,7 +216,7 @@
       "off": "Dezactivat"
     },
     "updatesDetail": "Actualizările sunt întotdeauna verificate și validate înainte de instalare.",
-    "backup": "Identitatea ta {{name}} este salvată în depozitul de chei a sistemului. Fă o copie de rezervă din Setări → Identitate, ca să nu-ți pierzi niciodată numele înregistrat.",
+    "backup": "Identitatea ta {{name}} este salvată în depozitul de chei al sistemului. Fă o copie de rezervă din Setări → Identitate, ca să nu-ți pierzi niciodată numele înregistrat.",
     "nextServer": "Urmează: adaugă primul tău server",
     "rerunNote": "Se salvează doar valorile pe care le-ai schimbat."
   },
@@ -220,5 +228,39 @@
     "discardBody": "Nimic nu este salvat înainte de finalizare. Dacă anulezi acum, totul rămâne așa cum este.",
     "discardKeep": "Continuă editarea",
     "discardConfirm": "Renunță la modificări"
+  },
+  "guide": {
+    "label": "Sfat de la Aaron",
+    "from": "Sfat de la Aaron",
+    "hide": "Ascunde-l pe Aaron",
+    "show": "Arată-l pe Aaron",
+    "titles": {
+      "welcome": "Bun venit la bord",
+      "import": "Adu-ți lucrurile din Mumble",
+      "identity": "Numele tău pe servere",
+      "voice": "Alege-ți microfonul",
+      "setupStyle": "Alege un stil",
+      "privateMessages": "Cine îți poate scrie",
+      "notifications": "Notificările tale",
+      "connections": "Conexiuni directe",
+      "features": "Alege funcțiile suplimentare",
+      "appearance": "Alege-ți aspectul",
+      "startup": "Pornirea Mumcord",
+      "summary": "Verifică-ți alegerile"
+    },
+    "hints": {
+      "welcome": "Salut, eu sunt Aaron! Te ghidez prin configurare. Durează doar un minut.",
+      "import": "Acestea sunt serverele și setările găsite în Mumble. Alege ce vrei să păstrezi.",
+      "identity": "Identitatea ta este numele tău pe servere. Creează una nouă sau importă una existentă.",
+      "voice": "Alege aici microfonul în care vorbești, apoi spune salut: bara verde ar trebui să danseze.",
+      "setupStyle": "Alege un stil. Poți schimba fiecare setare mai târziu.",
+      "privateMessages": "Alege cine îți poate trimite mesaje private. Expeditorii nu sunt anunțați niciodată.",
+      "notifications": "Alege cum ajunge la tine fiecare fel de noutăți sau dezactivează-l.",
+      "connections": "Alege dacă Mumcord te poate conecta direct cu alți utilizatori Mumcord.",
+      "features": "Activează doar funcțiile suplimentare care îți plac. Fiecare card spune cine le poate vedea.",
+      "appearance": "Luminos, întunecat sau ca sistemul tău: alege aici aspectul.",
+      "startup": "Alege cum pornește Mumcord când te autentifici pe calculator.",
+      "summary": "Gata! Verifică aici alegerile; „Editează” te duce înapoi la orice pas."
+    }
   }
 }

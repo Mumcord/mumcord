@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, de tipshulp",
+  "greeting": {
+    "title": "Hoi, ik ben Aaron!",
+    "body": "Ik ben een axolotl en ik ken Mumcord op mijn duimpje. Zin in een korte rondleiding? Die duurt ongeveer een minuut. Niet nu? Dan vind je me bij Instellingen → Over → Tips.",
+    "start": "Laat maar zien",
+    "later": "Niet nu"
+  },
+  "progress": "Tip {{current}} van {{total}}",
+  "back": "Terug",
+  "next": "Volgende",
+  "done": "Klaar",
+  "skip": "Rondleiding overslaan",
+  "close": "Tips sluiten",
+  "tips": {
+    "servers": {
+      "title": "Je servers",
+      "body": "In de balk helemaal links staan je servers. Voeg er een toe met + of bekijk openbare servers met het vergrootglas. Je kunt met meerdere servers tegelijk verbonden zijn."
+    },
+    "channels": {
+      "title": "Kanalen",
+      "body": "Dubbelklik op een kanaal om deel te nemen en te praten. Eén klik toont de chat zonder deel te nemen, en met Volgen blijf je op de hoogte."
+    },
+    "talk": {
+      "title": "Zo praat je",
+      "body": "Push-to-talk of spraakactivering? Kies het bij Instellingen → Spraak en audio, of open Spraakinstellingen… met het pijltje naast de microfoon. Push-to-talk werkt ook met muisknoppen."
+    },
+    "panel": {
+      "title": "Je gebruikerspaneel",
+      "body": "Linksonder kun je je microfoon dempen, jezelf doof zetten, je camera aanzetten of ophangen. De kleine pijltjes ernaast openen meer keuzes."
+    },
+    "search": {
+      "title": "Alles vinden",
+      "body": "Druk op {{key}} om personen en kanalen te vinden, ook op grote servers."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Beantwoord een bericht, citeer het, vermeld mensen met @ en deel afbeeldingen en bestanden. De opmaakknoppen verschijnen terwijl je typt."
+    },
+    "apps": {
+      "title": "Apps",
+      "body": "Met de knop Apps in de berichtenbalk deel je je scherm, start je een watchparty of zet je je camera aan. Plug-ins voegen meer toe."
+    },
+    "themes": {
+      "title": "Jouw look",
+      "body": "Het tandwiel linksonder schakelt tussen donker en licht. Bij Instellingen → Weergave vind je meer thema's, en een server kan een eigen thema krijgen: klik er met de rechtermuisknop op en kies Thema."
+    },
+    "end": {
+      "title": "Dat was het!",
+      "body": "Veel plezier met Mumcord. Je kunt me altijd terugroepen via Instellingen → Over → Tips."
+    }
+  }
+}

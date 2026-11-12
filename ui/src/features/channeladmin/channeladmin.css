@@ -150,6 +150,16 @@
   font-size: var(--font-size-sm);
 }
 
+.channel-window__status--error {
+  color: var(--color-danger);
+}
+
+/* Same look as the admin window's disabled buttons (FR-10.58). */
+.channel-window .button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 /* The shared field grows in a row; in this column it takes only its own height. */
 .channel-window__body > .admin-field {
   flex: none;
@@ -193,6 +203,88 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+}
+
+.permissions-tab__segments {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-sidebar);
+}
+
+.permissions-tab__segment {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.permissions-tab__segment:hover:not([aria-pressed="true"]) {
+  background: var(--color-bg-hover);
+}
+
+.permissions-tab__segment[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 600;
+}
+
+.permissions-tab__segment:focus-visible,
+.permissions-tab__refresh:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.permissions-tab__segment svg,
+.permissions-tab__refresh svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.permissions-tab__count {
+  padding: 0 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.permissions-tab__segment[aria-pressed="true"] .permissions-tab__count {
+  background: color-mix(in srgb, var(--color-on-accent) 18%, transparent);
+  color: inherit;
+}
+
+.permissions-tab__refresh {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  margin-inline-start: auto;
+}
+
+.permissions-tab__check + .permissions-tab__refresh {
+  margin-inline-start: 0;
+}
+
+.permissions-tab__refresh:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
 }
 
 .permissions-tab__check {
@@ -437,30 +529,240 @@ button.who-grid__cell {
   color: var(--color-text-muted);
 }
 
+.groups-view__new-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
 .groups-view__new {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
   gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-selected);
+}
+
+/* The shared field grows in a row; in this column it takes only its own height. */
+.groups-view__new .admin-field {
+  flex: none;
+}
+
+.groups-view__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.groups-view__new-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.groups-view__group[aria-current="true"] {
+  background: var(--color-bg-selected);
+}
+
+.groups-view__group-icon {
+  display: inline-flex;
+  color: var(--color-text-muted);
+}
+
+.groups-view__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.groups-view__title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.groups-view__name {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  overflow-wrap: anywhere;
+}
+
+.groups-view__meta {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.groups-view__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.groups-view__link:hover {
+  text-decoration: underline;
 }
 
 .groups-view__options {
   display: flex;
-  gap: var(--space-4);
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.groups-view__option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-2);
+}
+
+.groups-view__hint {
+  grid-column: 2;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.groups-view__members-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block: var(--space-3) var(--space-2);
+}
+
+.groups-view__members-head .rules-view__heading {
+  margin: 0;
+}
+
+.groups-view__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: auto;
+  padding-inline: var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+
+.groups-view__filter:focus-within {
+  border-color: var(--color-accent);
+}
+
+.groups-view__filter input {
+  border: 0;
+  background: transparent;
+  outline-offset: 2px;
+}
+
+.groups-view__members {
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 .groups-view__members li {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
 }
 
-.groups-view__members li span:first-child {
+.groups-view__members li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.groups-view__member-name {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.groups-view__members li[data-removed] span:first-child {
+.groups-view__members li[data-removed] .avatar {
+  opacity: 0.5;
+}
+
+.groups-view__members li[data-removed] .groups-view__member-name {
   color: var(--color-text-muted);
   text-decoration: line-through;
+}
+
+.groups-view__state {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.groups-view__state[data-state="added"] {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color: var(--color-text);
+}
+
+.groups-view__state[data-state="removed"] {
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-text);
+}
+
+.groups-view__remove {
+  display: inline-flex;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.groups-view__remove:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.groups-view__restore {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-block: var(--space-1);
+}
+
+.groups-view__empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.groups-view__empty strong {
+  color: var(--color-text);
+}
+
+.groups-view__dialog {
+  width: min(48rem, 92vw);
+}
+
+.who-grid__table tr[data-current] th[scope="row"],
+.who-grid__table tr[data-current] td {
+  background: var(--color-bg-selected);
 }
 
 .rules-view__heading,

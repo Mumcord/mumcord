@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
 import { bot, botInBackground, testenv } from "../../helpers/index.ts";
+import { openMembersTab } from "../../helpers/members-ui.ts";
 import { runFirstStartWizard } from "../../helpers/wizard-util.ts";
 
 // AC-1.19 (register on this server) and AC-1.20 (own/bot avatar + comment), spec 01 §11.
@@ -92,7 +93,7 @@ describe("profile: register, avatar, comment", () => {
     await openUserMenu();
     await clickItem("Edit profile");
     // The comment editor is a rich-text field (contenteditable), not a textarea.
-    const area = $("[role='textbox'].rich-editor__field");
+    const area = $("[role='textbox'].rte__field");
     await area.waitForDisplayed();
     await area.click();
     await area.setValue(`Hello from ${ME}`);
@@ -112,6 +113,7 @@ describe("profile: register, avatar, comment", () => {
         ["expect", "user", "Bot", "--has-avatar", "true", "--comment-contains", "XYZ"],
         { name: "Checker" },
       );
+      await openMembersTab();
       // Exact name (the name's own text, not its hidden status): other people on the server, e.g.
       // scale bots, may have "Bot" in theirs, and the list may need scrolling to reach the row.
       const row = $(

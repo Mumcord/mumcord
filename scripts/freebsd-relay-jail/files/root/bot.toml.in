@@ -1,0 +1,17 @@
+# mumbot peer configuration for the test jail. setup-stack.sh fills in the three values that are
+# only known after the server and the relay have started.
+[server]
+host = "@JAIL_IP@"
+port = 64738
+name = "RelayBot"
+server_cert_sha256 = "@SERVER_PIN@"
+
+[peer]
+# A shared-IP jail has no loopback, so the relay's allowlist API is on the jail address and uses
+# HTTPS with the relay's self-signed certificate; the bot pins that certificate instead.
+api_url = "https://@JAIL_IP@:7480"
+api_fp = "@RELAY_FP@"
+api_secret_file = "/usr/local/etc/mumpeer/api_secret"
+
+# Test rig: guests may use the relay too, so a fresh client works without registering it first.
+registered_only = false

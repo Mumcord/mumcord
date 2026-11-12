@@ -1,5 +1,5 @@
 {
-  "hint": "Lataa purettu lisäosakansio testataksesi sitä. Kehittäjälisäosat eivät ole allekirjoitettuja, eivät koskaan ole virallisia eivätkä voi saada oikeuksia net.http, secrets tai ui.webview. Ne poistetaan, kun kehittäjätila kytketään pois.",
+  "hint": "Lataa purettu lisäosakansio testataksesi sitä. Kehittäjälisäosia ei ole allekirjoitettu, ne eivät ole koskaan virallisia eivätkä voi saada oikeuksia net.http, secrets tai ui.webview. Ne poistetaan käytöstä, kun kehittäjätila kytketään pois.",
   "load": "Lataa lisäosakansio…",
   "pickFolder": "Valitse lisäosan kansio",
   "empty": "Kehittäjälisäosaa ei ole ladattu.",
@@ -16,7 +16,7 @@
   },
   "showLog": "Näytä lisäosan {{name}} loki",
   "reload": "Lataa {{name}} uudelleen",
-  "unload": "Poista {{name}}",
+  "unload": "Poista {{name}} käytöstä",
   "logLabel": "Lisäosan {{name}} loki",
   "logTitle": "Lisäosan {{name}} loki",
   "logEmpty": "Lokirivejä ei vielä ole.",
@@ -29,7 +29,7 @@
   "errors": {
     "load": "Lisäosakansion lataus epäonnistui.",
     "reload": "Lisäosan uudelleenlataus epäonnistui.",
-    "unload": "Lisäosan poisto epäonnistui.",
+    "unload": "Lisäosan poistaminen käytöstä epäonnistui.",
     "log": "Lokin lukeminen epäonnistui."
   }
 }

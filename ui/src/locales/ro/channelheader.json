@@ -44,7 +44,7 @@
       "enter": "Intrare",
       "speak": "Vorbire",
       "textMessage": "Text",
-      "whisper": "Șoptit",
+      "whisper": "Șoaptă",
       "listen": "Ascultare",
       "write": "Scriere ACL"
     },
@@ -93,7 +93,7 @@
     "on": "activat",
     "off": "dezactivat",
     "followsDefault": "Implicit ({{value}})",
-    "useDefault": "folosește implicitul",
+    "useDefault": "folosește valoarea implicită",
     "bitrate": "Rată de biți",
     "bitrateValue": "{{kbps}} kbit/s",
     "bitrateMax": "Max.",

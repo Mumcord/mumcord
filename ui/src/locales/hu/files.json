@@ -67,15 +67,15 @@
     "open": "Megnyitás",
     "gone": "A fájl már nincs itt: {{folder}}",
     "mismatchTitle": "Hash-eltérés – a fájl törölve",
-    "mismatch": "A fájl menet közben megváltozott, vagy nem egyezik az ajánlattal, ezért törölve lett. Semmi nem lett elmentve vagy megnyitva. Kérd meg {{sender}} felhasználót, hogy ossza meg újra.",
+    "mismatch": "A fájl menet közben megváltozott, vagy nem egyezik az ajánlattal, ezért töröltük. Semmit nem mentettünk el és nem nyitottunk meg. Kérd meg {{sender}} felhasználót, hogy ossza meg újra.",
     "failed": "A letöltés sikertelen: {{reason}}",
     "cancelled": "Letöltés megszakítva",
     "busy": "{{sender}} elfoglalt, próbáld újra később",
     "noSpace": "Nincs elég lemezterület itt: {{folder}}",
     "reason": {
       "noAnswer": "{{sender}} nem válaszolt",
-      "connect": "Nem sikerült kapcsolódni az átjátszón keresztül: {{reason}}",
-      "connectUnknown": "Nem sikerült kapcsolódni az átjátszón keresztül",
+      "connect": "Nem sikerült csatlakozni az átjátszón keresztül: {{reason}}",
+      "connectUnknown": "Nem sikerült csatlakozni az átjátszón keresztül",
       "stalled": "Az átvitel megakadt",
       "connectionLost": "A kapcsolat megszakadt"
     },
@@ -98,16 +98,16 @@
     "disabled": {
       "receiveOff": "Kikapcsoltad a fájlok fogadását",
       "receiveOffLink": "Fájlmegosztási beállítások megnyitása",
-      "tooLarge": "Nagyobb a {{limit}} értékű korlátodnál",
+      "tooLarge": "Nagyobb a beállított korlátodnál ({{limit}})",
       "tooLargeLink": "Korlát módosítása",
-      "anotherDownload": "Másik letöltés is fut"
+      "anotherDownload": "Már fut egy másik letöltés"
     }
   },
   "sender": {
     "downloadedBy": "Letöltötte: {{names}}",
     "inProgress_one": "{{count}} letöltés folyamatban · {{details}}",
     "inProgress_other": "{{count}} letöltés folyamatban · {{details}}",
-    "sendingTo": "Küldés neki: {{name}} · {{percent}} %",
+    "sendingTo": "Küldés {{name}} részére · {{percent}} %",
     "waiting_one": "{{count}} várakozik",
     "waiting_other": "{{count}} várakozik",
     "sharing": "Megosztva, amíg online vagy · vége: {{when}}",
@@ -132,10 +132,10 @@
     "riskyFile": "{{name}} · {{size}} · feladó: {{sender}}",
     "riskyBody": "Ez egy program. A programok módosíthatják a számítógépedet és olvashatják a fájljaidat. Csak akkor töltsd le, ha megbízol {{sender}} felhasználóban, és számítottál erre a fájlra.",
     "riskyNote": "A Mumcord ellenőrzi, hogy a fájl változatlanul érkezik-e, de azt nem tudja megmondani, hogy biztonságos-e.",
-    "riskyConfirm": "Letöltés mégis",
-    "riskyCancel": "Ne töltsd le",
+    "riskyConfirm": "Mégis letöltöm",
+    "riskyCancel": "Nem töltöm le",
     "riskyOpenBody": "A(z) {{name}} program vagy szkript. Csak akkor nyisd meg, ha megbízol {{sender}} felhasználóban.",
-    "riskyOpenConfirm": "Megnyitás mégis"
+    "riskyOpenConfirm": "Mégis megnyitom"
   },
   "settings": {
     "title": "Fájlmegosztás",

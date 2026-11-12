@@ -153,6 +153,21 @@ describe("useFollowScroll", () => {
     expect(state()).toBe("false 0");
   });
 
+  it("stays paused when the scroll event of its own scrolling arrives afterwards", () => {
+    const { rerender } = render(<Harness packets={list(2)} />);
+    const scroller = screen.getByTestId("scroller");
+    geometry(scroller, 0);
+    rerender(<Harness packets={list(3)} />);
+    expect(scroller.scrollTop).toBe(1000);
+    act(() => {
+      fireEvent.click(screen.getByText("pause"));
+    });
+    expect(state()).toBe("false 0");
+    // At the bottom, so only the known own scroll keeps it from switching following back on.
+    fireEvent.scroll(scroller);
+    expect(state()).toBe("false 0");
+  });
+
   describe("when the list gets shorter", () => {
     let resize: (() => void) | null = null;
     beforeEach(() => {

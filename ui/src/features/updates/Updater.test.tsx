@@ -28,7 +28,12 @@ async function emit(change: Partial<UpdateStatus>, prompt: boolean) {
   });
 }
 
-const offer = { version: "0.4.5", url: "https://example.com", notes: [] };
+const offer = {
+  version: "0.4.5",
+  url: "https://example.com",
+  notes: [],
+  channel: "stable" as const,
+};
 
 describe("Updater", () => {
   it("opens the dialog when the engine asks for it", async () => {

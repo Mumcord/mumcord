@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanaler",
-    "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul · Menutast: kanalindstillinger · Ctrl-klik eller Ctrl+mellemrum: vælg personer",
+    "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: gå ind · Piletaster: flyt, udvid, skjul · Menutast: kanalindstillinger · Ctrl-klik eller Ctrl+mellemrum: vælg personer",
     "join": "Deltag",
     "you": "(dig)",
     "youAreHere": "du er her",
@@ -18,7 +18,7 @@
     "jump": "Hop til min kanal",
     "locked": "låst",
     "temporary": "midlertidig",
-    "linked": "forbundet",
+    "linked": "tilknyttet",
     "full": "Kanalen er fuld",
     "fullPlaces": "Kanalen er fuld, {{places}}",
     "places_one": "{{taken}} af {{count}} plads optaget",
@@ -29,10 +29,10 @@
     "talking": "taler",
     "muted": "mikrofon slået fra",
     "deafened": "lyd slået fra",
-    "serverMuted": "slået fra af serveren",
+    "serverMuted": "mikrofon slået fra af serveren",
     "serverDeafened": "lyd slået fra af serveren",
     "suppressed": "undertrykt (kan ikke tale her)",
-    "localMuted": "slået fra for dig",
+    "localMuted": "lyd slået fra for dig",
     "unregistered": "ikke registreret",
     "prioritySpeaker": "prioriteret taler"
   },
@@ -53,10 +53,10 @@
     "listening": "Lytter kun",
     "muted": "Mikrofon slået fra",
     "deafened": "Lyd slået fra",
-    "serverMuted": "Slået fra af serveren",
+    "serverMuted": "Mikrofon slået fra af serveren",
     "serverDeafened": "Lyd slået fra af serveren",
     "suppressed": "Undertrykt – kan ikke tale i denne kanal",
-    "localMuted": "Slået fra for dig",
+    "localMuted": "Lyd slået fra for dig",
     "unregistered": "Ikke registreret på denne server (gæst)",
     "nowPlaying": "Lytter til {{track}}",
     "nowGaming": "Spiller {{game}}",
@@ -71,7 +71,7 @@
   },
   "errors": {
     "joinDenied": "Du har ikke adgang til denne kanal.",
-    "joinFailed": "Kunne ikke joine kanalen. Prøv igen.",
+    "joinFailed": "Kunne ikke gå ind i kanalen. Prøv igen.",
     "notConnected": "Ikke forbundet til en server.",
     "moveFailed": "Personen kunne ikke flyttes."
   },
@@ -83,7 +83,7 @@
   "search": {
     "label": "Søg i kanaler og personer",
     "clear": "Ryd søgning",
-    "empty": "Ingen kanaler eller personer matcher “{{query}}”.",
+    "empty": "Ingen kanaler eller personer matcher »{{query}}«.",
     "count": "{{channels}}, {{people}}",
     "channels_one": "{{count}} kanal",
     "channels_other": "{{count}} kanaler",
@@ -104,7 +104,7 @@
   "moveTo": {
     "title": "Flyt personer",
     "channel": "Kanal",
-    "search": "Søg kanaler",
+    "search": "Søg i kanaler",
     "noMatch": "Ingen kanal matcher.",
     "hint": "Vælg den kanal, personerne skal hen til.",
     "from": "Fra {{channel}}",
@@ -116,5 +116,23 @@
     "resultAll": "Flyttede {{people}} til {{channel}}.",
     "resultSome": "Flyttede {{moved}} af {{people}} til {{channel}}. Resten blev afvist.",
     "busy": "Flytter allerede personer…"
+  },
+  "drag": {
+    "into": "Flyt ind i {{channel}}",
+    "above": "Placér over {{channel}}",
+    "below": "Placér under {{channel}}",
+    "self": "Kan ikke flyttes ind i sig selv",
+    "subChannel": "Kan ikke flyttes ind i sin egen underkanal",
+    "confirmTitle": "Flyt »{{channel}}«?",
+    "alongAll": "Sammen med {{channel}} flyttes: {{subChannels}} og {{people}}.",
+    "alongSubChannels": "Sammen med {{channel}} flyttes: {{subChannels}}.",
+    "alongPeople": "Sammen med {{channel}} flyttes: {{people}}.",
+    "alongNone": "Kun {{channel}} flyttes; den er tom.",
+    "subChannels_one": "{{count}} underkanal",
+    "subChannels_other": "{{count}} underkanaler",
+    "pathTo": "til",
+    "confirm": "Flyt",
+    "failedTitle": "Kunne ikke flytte {{channel}}",
+    "refusedParent": "Du har ikke tilladelse til at flytte kanaler ind i {{channel}}."
   }
 }

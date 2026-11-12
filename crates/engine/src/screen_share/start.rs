@@ -15,6 +15,8 @@ pub(super) const ENDED_POLL: Duration = Duration::from_millis(500);
 pub enum StartOutcome {
     Started,
     /// The user closed the system picker without choosing: nothing is shared, nothing to report.
+    /// The X11 capture has no picker, so it never cancels.
+    #[cfg_attr(target_os = "freebsd", allow(dead_code))]
     Cancelled,
 }
 
@@ -31,19 +33,22 @@ pub(super) enum Backend {
     Unsupported,
 }
 
-/// Picks the backend from the session's environment: on Linux Wayland sessions the portal
-/// picker, otherwise the whole X11 screen.
+/// Picks the backend from the session's environment: the portal picker on a Wayland session of a
+/// desktop that has one (Linux), otherwise the whole X11 screen. The BSDs have X11 and no
+/// xdg-desktop-portal, so a Wayland session there reads the screen through XWayland.
 #[cfg_attr(feature = "test-backend", allow(dead_code))]
 pub(super) fn choose_backend(
-    linux: bool,
+    x11: bool,
+    portal: bool,
     wayland_display: Option<&str>,
     session_type: Option<&str>,
 ) -> Backend {
-    if !linux {
+    if !x11 {
         return Backend::Unsupported;
     }
-    let wayland = wayland_display.is_some_and(|d| !d.is_empty())
-        || session_type.is_some_and(|t| t.eq_ignore_ascii_case("wayland"));
+    let wayland = portal
+        && (wayland_display.is_some_and(|d| !d.is_empty())
+            || session_type.is_some_and(|t| t.eq_ignore_ascii_case("wayland")));
     if wayland {
         Backend::Wayland
     } else {
@@ -60,6 +65,7 @@ fn current_backend() -> Backend {
         return Backend::MacOs;
     }
     choose_backend(
+        cfg!(any(target_os = "linux", target_os = "freebsd")),
         cfg!(target_os = "linux"),
         std::env::var("WAYLAND_DISPLAY").ok().as_deref(),
         std::env::var("XDG_SESSION_TYPE").ok().as_deref(),
@@ -70,6 +76,8 @@ fn current_backend() -> Backend {
 #[derive(Debug)]
 #[cfg_attr(feature = "test-backend", allow(dead_code))]
 pub(super) enum OpenError {
+    /// No picker on X11, so a share there cannot be cancelled.
+    #[cfg_attr(target_os = "freebsd", allow(dead_code))]
     Cancelled,
     Failed(EngineError),
 }
@@ -108,7 +116,7 @@ async fn open_backend(backend: Backend) -> Result<Box<dyn CaptureSource>, OpenEr
             }
             Err(e) => Err(failed(e)),
         },
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "freebsd"))]
         Backend::X11 => super::capture_x11::X11Capture::new()
             .map(|c| Box::new(c) as Box<dyn CaptureSource>)
             .map_err(failed),
@@ -154,21 +162,33 @@ mod tests {
     #[test]
     fn wayland_when_display_or_session_type_says_so() {
         assert_eq!(
-            choose_backend(true, Some("wayland-0"), None),
+            choose_backend(true, true, Some("wayland-0"), None),
             Backend::Wayland
         );
         assert_eq!(
-            choose_backend(true, None, Some("wayland")),
+            choose_backend(true, true, None, Some("wayland")),
             Backend::Wayland
         );
-        assert_eq!(choose_backend(true, Some(""), Some("x11")), Backend::X11);
-        assert_eq!(choose_backend(true, None, None), Backend::X11);
+        assert_eq!(
+            choose_backend(true, true, Some(""), Some("x11")),
+            Backend::X11
+        );
+        assert_eq!(choose_backend(true, true, None, None), Backend::X11);
+    }
+
+    /// A Wayland session without a portal (the BSDs) still has XWayland to read.
+    #[test]
+    fn wayland_without_a_portal_falls_back_to_x11() {
+        assert_eq!(
+            choose_backend(true, false, Some("wayland-0"), Some("wayland")),
+            Backend::X11
+        );
     }
 
     #[test]
     fn other_systems_are_unsupported() {
         assert_eq!(
-            choose_backend(false, Some("wayland-0"), None),
+            choose_backend(false, false, Some("wayland-0"), None),
             Backend::Unsupported
         );
     }

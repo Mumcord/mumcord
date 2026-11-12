@@ -4,12 +4,12 @@
   "beta": "Beta",
   "join": "Watch-Party beitreten",
   "leave": "Party verlassen",
-  "watching": "{{count}} schauen zu: {{names}}",
+  "watching": "Zuschauer ({{count}}): {{names}}",
   "player": "Watch-Party-Player",
   "watchTogether": "Gemeinsam ansehen",
   "watchTogetherFor": "{{title}} gemeinsam mit diesem Kanal ansehen",
   "embedsOff": "Aktiviere eingebettete Player in den Datenschutz-Einstellungen, um gemeinsam zu schauen",
-  "embedsOffJoin": "Eine Watchparty läuft: Aktiviere eingebettete Player, um beizutreten",
+  "embedsOffJoin": "Eine Watch-Party läuft: Aktiviere eingebettete Player, um beizutreten",
   "openPrivacy": "Datenschutz-Einstellungen öffnen",
   "cantPlay": "Der Player kann hier nicht laufen.",
   "openInBrowser": "Im Browser öffnen",
@@ -21,7 +21,7 @@
   "other": {
     "play": "{{name}} hat Play gedrückt",
     "pause": "{{name}} hat pausiert",
-    "seek": "{{name}} ist vorgesprungen",
+    "seek": "{{name}} hat vorgespult",
     "skipped": "{{name}} hat übersprungen"
   },
   "addToPlaylist": "Zur Playlist hinzufügen",
@@ -50,7 +50,7 @@
     "more": "Mehr zu {{title}}",
     "playNext": "Als Nächstes abspielen",
     "removeShort": "Aus der Playlist entfernen",
-    "emptyPaste": "Nichts in der Warteschlange. Füge oben einen YouTube-Link ein."
+    "emptyPaste": "Nichts als Nächstes. Füge oben einen YouTube-Link ein."
   },
   "widget": {
     "play": "Abspielen",
@@ -59,7 +59,9 @@
   "codecHint": {
     "install": "Dieses Video braucht H.264-Unterstützung. Installiere gst-libav:",
     "generic": "Dieses Video braucht H.264-Unterstützung. Installiere gst-libav (das GStreamer-libav-Plugin) mit der Paketverwaltung deines Systems.",
-    "rpmFusion": "Unter Fedora kommt gst-libav aus dem RPM-Fusion-Repository; aktiviere zuerst RPM Fusion."
+    "rpmFusion": "Unter Fedora kommt gst-libav aus dem RPM-Fusion-Repository; aktiviere zuerst RPM Fusion.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Leertaste Wiedergabe/Pause · ← → 5 s springen · M stumm · F Vollbild",
   "headerPill": "Gemeinsam ansehen · {{count}}",

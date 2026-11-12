@@ -3,32 +3,32 @@
   "autoOff": {
     "title": "Wyłączono wtyczkę {{name}}",
     "body": "Wyłączona po wielokrotnych awariach",
-    "open": "Pokaż w Wtyczkach"
+    "open": "Pokaż w sekcji Wtyczki"
   },
   "pictureRefused": {
-    "title": "{{name}} nie mogła użyć obrazu",
+    "title": "Wtyczka {{name}} nie mogła użyć obrazu",
     "body": "Tego obrazu nie można użyć. Wybierz plik PNG, JPEG lub WebP do 10 MB."
   },
   "update": {
-    "title": "Aktualizacja dla {{name}}",
+    "title": "Aktualizacja wtyczki {{name}}",
     "body": "Wersja {{version}} czeka na karcie Aktualizacje",
     "open": "Pokaż aktualizacje"
   },
   "suggestion": {
-    "title": "Ten serwer używa {{name}}",
+    "title": "Ten serwer używa wtyczki {{name}}",
     "noReason": "Zaproponowane przez serwer",
     "install": "Zainstaluj…",
     "installLabel": "Zainstaluj {{name}}",
-    "addRepositoryLabel": "Dodaj repozytorium dla {{name}}",
+    "addRepositoryLabel": "Dodaj repozytorium wtyczki {{name}}",
     "details": "Zobacz szczegóły",
     "detailsLabel": "Szczegóły: {{name}}",
     "notNow": "Nie teraz",
-    "notNowLabel": "Ukryj {{name}} na razie",
-    "dontAsk": "Nie pytaj więcej dla tego serwera",
+    "notNowLabel": "Na razie ukryj: {{name}}",
+    "dontAsk": "Nie pytaj więcej na tym serwerze",
     "recommended": "Polecane",
     "official": "Oficjalna",
     "unofficial": "Nieoficjalna · {{host}}",
     "footer": "Sugestie same niczego nie instalują. Serwer nie dowiaduje się, co instalujesz."
   },
-  "failed": "To nie zadziałało. Spróbuj ponownie."
+  "failed": "Nie udało się. Spróbuj ponownie."
 }

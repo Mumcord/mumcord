@@ -1,7 +1,7 @@
 {
   "close": {
     "title": "Zminimalizować do zasobnika czy zamknąć?",
-    "description": "Nadal jesteś połączony(-a). Po zminimalizowaniu Mumcord utrzyma Cię na kanale głosowym i pozostanie w zasobniku systemowym.",
+    "description": "Nadal jesteś połączony(-a). Po zminimalizowaniu Mumcord utrzyma cię na kanale głosowym i pozostanie w zasobniku systemowym.",
     "remember": "Zapamiętaj mój wybór",
     "minimize": "Minimalizuj do zasobnika",
     "quit": "Zamknij aplikację",
@@ -16,13 +16,13 @@
   },
   "audioDevice": {
     "title": "Wybierz ponownie urządzenia audio",
-    "description": "Mumcord pokazuje teraz osobno każde wejście i wyjście Twoich urządzeń audio. Zapisanego urządzenia nie udało się dopasować do żadnego z nich, więc na razie używane jest domyślne urządzenie systemowe. Urządzenie możesz wybrać w ustawieniach audio.",
+    "description": "Mumcord pokazuje teraz osobno każde wejście i wyjście twoich urządzeń audio. Zapisanego urządzenia nie udało się dopasować do żadnego z nich, więc na razie używane jest domyślne urządzenie systemowe. Urządzenie możesz wybrać w ustawieniach audio.",
     "dismiss": "Rozumiem",
     "openSettings": "Otwórz ustawienia audio"
   },
   "appImageMenu": {
     "title": "Dodać Mumcord do menu aplikacji?",
-    "description": "Dzięki temu Mumcord pojawi się w menu aplikacji. Ikona i push-to-talk będą działać poprawnie w Wayland, a linki mumble:// otworzą Mumcord. Możesz to później zmienić w Ustawieniach.",
+    "description": "Dzięki temu Mumcord pojawi się w menu aplikacji. Ikona i Push-to-talk będą działać poprawnie w środowisku Wayland, a linki mumble:// będą otwierać Mumcorda. Możesz to później zmienić w Ustawieniach.",
     "no": "Nie",
     "yes": "Tak",
     "failed": "Nie udało się. Spróbuj ponownie."
@@ -36,13 +36,15 @@
   },
   "directConsent": {
     "title": "Zezwolić na połączenia bezpośrednie?",
-    "description": "Połączenia bezpośrednie są szybsze, ale druga osoba może zobaczyć Twój adres IP. Mumcord używa ich do obrazów w pełnym rozmiarze i udostępniania ekranu innym użytkownikom Mumcorda i może w tym celu otworzyć port na Twoim routerze. Jeśli odmówisz, obrazy nadal dotrą przez serwer, a udostępnianie ekranu będzie niedostępne. Możesz to później zmienić w Ustawienia → Prywatność. Jeśli ten serwer oferuje przekaźnik, Mumcord może go użyć zamiast tego; wtedy druga osoba nie widzi twojego adresu IP.",
+    "description": "Połączenia bezpośrednie są szybsze, ale druga osoba może zobaczyć twój adres IP. Mumcord używa ich do obrazów w pełnym rozmiarze i udostępniania ekranu innym użytkownikom Mumcorda i może w tym celu otworzyć port na twoim routerze. Jeśli odmówisz, obrazy nadal dotrą przez serwer, a udostępnianie ekranu będzie niedostępne. Możesz to później zmienić w sekcji Ustawienia → Prywatność. Jeśli ten serwer oferuje przekaźnik, Mumcord może go użyć zamiast tego; wtedy druga osoba nie widzi twojego adresu IP.",
     "no": "Nie",
     "yes": "Tak",
     "failed": "Nie udało się. Spróbuj ponownie."
   },
   "updater": {
     "stable": "Stabilna",
+    "releaseCandidate": "Wersja kandydująca",
+    "prereleaseNote": "To wersja przedpremierowa i może zawierać błędy. Przełącz się w ustawieniach na kanał stabilny, aby otrzymywać tylko wersje finalne.",
     "available": {
       "title": "Dostępna aktualizacja",
       "subtitle": "Mumcord {{version}} jest gotowy do pobrania. Masz wersję {{current}}.",
@@ -73,18 +75,18 @@
       "pending": "jeszcze nie rozpoczęto"
     },
     "progress": {
-      "title": "Pobieranie Mumcord {{version}}",
+      "title": "Pobieranie Mumcorda {{version}}",
       "subtitle": "Możesz dalej korzystać z Mumcorda, gdy to trwa.",
       "label": "Postęp aktualizacji",
       "unknown": "Rozmiar nie jest jeszcze znany",
       "size": "{{received}} z {{total}} MB",
       "received": "{{received}} MB",
       "secondsLeft_one": "zostało około {{count}} sekundy",
-      "secondsLeft_few": "zostały około {{count}} sekundy",
+      "secondsLeft_few": "zostało około {{count}} sekund",
       "secondsLeft_many": "zostało około {{count}} sekund",
       "secondsLeft_other": "zostało około {{count}} sekundy",
       "minutesLeft_one": "zostało około {{count}} minuty",
-      "minutesLeft_few": "zostały około {{count}} minuty",
+      "minutesLeft_few": "zostało około {{count}} minut",
       "minutesLeft_many": "zostało około {{count}} minut",
       "minutesLeft_other": "zostało około {{count}} minuty",
       "cancel": "Anuluj"
@@ -97,10 +99,10 @@
       "checked": "Podpis i suma kontrolna zweryfikowane",
       "installed": "Zainstalowano",
       "installsOnRestart": "Zainstaluje się po ponownym uruchomieniu Mumcorda",
-      "connected_one": "Jesteś połączony z {{count}} serwerem. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
-      "connected_few": "Jesteś połączony z {{count}} serwerami. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
-      "connected_many": "Jesteś połączony z {{count}} serwerami. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
-      "connected_other": "Jesteś połączony z {{count}} serwera. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
+      "connected_one": "Masz połączenie z {{count}} serwerem. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
+      "connected_few": "Masz połączenie z {{count}} serwerami. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
+      "connected_many": "Masz połączenie z {{count}} serwerami. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
+      "connected_other": "Masz połączenie z {{count}} serwera. Po ponownym uruchomieniu Mumcord połączy się ponownie i wróci do twoich kanałów.",
       "later": "Później",
       "restart": "Uruchom ponownie, aby zaktualizować",
       "announce": "Mumcord {{version}} jest gotowy. Uruchom ponownie, aby zaktualizować."

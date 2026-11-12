@@ -6,7 +6,6 @@ import { AudioRatingBadge } from "../connection";
 import { Group } from "../settings/components/Section";
 import { Switch } from "../settings/components/Switch";
 import { errorText } from "../settings/errors";
-import { pickSavePath } from "../settings/fileDialogs";
 import { useFollowScroll } from "./follow";
 import { PacketTable } from "./PacketTable";
 import {
@@ -108,19 +107,20 @@ export function PacketInspector({ names }: { names: Names }) {
     setStatus(null);
     try {
       const json = format === "json";
-      const path = await pickSavePath(
-        json ? "mumcord-packets.json" : "mumcord-packets.md",
-        {
-          name: t(json ? "inspector.fileTypeJson" : "inspector.fileTypeMarkdown"),
-          extensions: [json ? "json" : "md"],
-        },
-        t(json ? "inspector.exportJson" : "inspector.exportMarkdown"),
-      );
-      if (path === null) return;
       const app = await getApi().appInfo();
       const info = { appVersion: app.version, os: app.os, exportedAtMs: Date.now() };
       const contents = json ? exportJson(shown, info, names) : exportMarkdown(shown, info, names);
-      await getApi().packetCaptureExport(path, contents);
+      // The engine opens the save dialog itself and writes only where the user chose.
+      const saved = await getApi().packetCaptureExport(
+        {
+          title: t(json ? "inspector.exportJson" : "inspector.exportMarkdown"),
+          defaultName: json ? "mumcord-packets.json" : "mumcord-packets.md",
+          filterName: t(json ? "inspector.fileTypeJson" : "inspector.fileTypeMarkdown"),
+          extensions: [json ? "json" : "md"],
+        },
+        contents,
+      );
+      if (!saved) return;
       setStatus({ kind: "success", text: t("inspector.exported") });
     } catch (error: unknown) {
       console.error("Exporting the captured packets failed", error);

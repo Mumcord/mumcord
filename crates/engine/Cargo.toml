@@ -63,9 +63,12 @@ xattr.workspace = true
 # Free space in the save folder before a download starts (statvfs without unsafe).
 rustix = { version = "1", features = ["fs"] }
 
-[target.'cfg(target_os = "linux")'.dependencies]
-# Core protocol only: whole-screen capture on X11 (GetImage on the root window).
+# Whole-screen capture on X11 (GetImage on the root window): the BSDs have X11 but no
+# xdg-desktop-portal, so only the direct capture exists there.
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 x11rb.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
 # Wayland capture: the ScreenCast portal picks the window or screen, PipeWire delivers the frames.
 ashpd = { workspace = true, features = ["screencast"] }
 pipewire.workspace = true
@@ -132,13 +135,20 @@ windows-future = "0.3"
 # Env-selected file/null audio backend for headless tests and E2E; never in release builds.
 test-backend = ["mumcord-audio/test-backend"]
 
+# The live tests drive scripted bots through the mumbot library. Not on FreeBSD: the release's
+# build script wants a vendored protoc binary, which only exists for the platforms
+# protoc-bin-vendored ships, so neither it nor the tests that use it build there (the client
+# itself is unaffected).
+[target.'cfg(not(target_os = "freebsd"))'.dev-dependencies]
+# Live tests drive scripted bots through the mumbot library, on the media-v2 branch until that
+# work is released.
+mumbot = { git = "https://github.com/sothis/mumbot", branch = "feat/media-v2", features = ["tester"] }
+
 [dev-dependencies]
 tempfile.workspace = true
 proptest.workspace = true
 # Paused time for the relay timeouts.
 tokio = { workspace = true, features = ["test-util"] }
-# Live tests drive scripted bots through the mumbot library.
-mumbot = { git = "https://github.com/sothis/mumbot", branch = "feat/media-v2", features = ["tester"] }
 mumcord-store = { workspace = true, features = ["test-util"] }
 mumcord-audio = { workspace = true, features = ["test-backend"] }
 netsim = { path = "../../tools/netsim" }

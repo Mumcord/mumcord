@@ -3,10 +3,10 @@
   "channel": "#{{name}}",
   "unknownChannel": "Kanał",
   "line": "{{sender}}: {{preview}}",
-  "groupedChannel_one": "{{count}} nowa wiadomość na {{name}}",
-  "groupedChannel_few": "{{count}} nowe wiadomości na {{name}}",
-  "groupedChannel_many": "{{count}} nowych wiadomości na {{name}}",
-  "groupedChannel_other": "{{count}} nowej wiadomości na {{name}}",
+  "groupedChannel_one": "{{count}} nowa wiadomość na kanale {{name}}",
+  "groupedChannel_few": "{{count}} nowe wiadomości na kanale {{name}}",
+  "groupedChannel_many": "{{count}} nowych wiadomości na kanale {{name}}",
+  "groupedChannel_other": "{{count}} nowej wiadomości na kanale {{name}}",
   "groupedPrivate_one": "{{count}} nowa wiadomość od {{name}}",
   "groupedPrivate_few": "{{count}} nowe wiadomości od {{name}}",
   "groupedPrivate_many": "{{count}} nowych wiadomości od {{name}}",
@@ -14,14 +14,14 @@
   "image": "Wysłano obraz",
   "open": "Otwórz czat",
   "close": "Zamknij powiadomienie",
-  "mentionLine": "{{sender}} wspomina o Tobie: {{preview}}",
+  "mentionLine": "{{sender}} wspomniał(-a) o tobie: {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
     "title": "Powiadomienia",
-    "bellUnread_one": "Powiadomienia, {{count}} nieprzeczytane",
-    "bellUnread_few": "Powiadomienia, {{count}} nieprzeczytane",
-    "bellUnread_many": "Powiadomienia, {{count}} nieprzeczytanych",
-    "bellUnread_other": "Powiadomienia, {{count}} nieprzeczytanego",
+    "bellUnread_one": "Powiadomienia, nieprzeczytane: {{count}}",
+    "bellUnread_few": "Powiadomienia, nieprzeczytane: {{count}}",
+    "bellUnread_many": "Powiadomienia, nieprzeczytane: {{count}}",
+    "bellUnread_other": "Powiadomienia, nieprzeczytane: {{count}}",
     "shortcut": "Ctrl+Shift+N",
     "markAllRead": "Oznacz wszystko jako przeczytane",
     "filterLabel": "Pokaż powiadomienia",
@@ -34,14 +34,14 @@
     },
     "empty": "Wszystko przeczytane.",
     "unread": "Nieprzeczytane",
-    "dndOn": "Tryb Nie przeszkadzać jest włączony",
-    "dndOff": "Tryb Nie przeszkadzać jest wyłączony",
+    "dndOn": "Tryb „Nie przeszkadzać” jest włączony",
+    "dndOff": "Tryb „Nie przeszkadzać” jest wyłączony",
     "settings": "Ustawienia powiadomień",
     "someone": "Ktoś",
     "quoted": "„{{text}}”",
-    "mention": "{{name}} wspomniał(a) o tobie",
-    "mentionGroup": "{{name}} wspomniał(a) o wszystkich",
-    "reply": "{{name}} odpowiedział(a) na twoją wiadomość",
+    "mention": "{{name}} wspomniał(-a) o tobie",
+    "mentionGroup": "{{name}} wspomniał(-a) o wszystkich",
+    "reply": "{{name}} odpowiedział(-a) na twoją wiadomość",
     "chatRequest": "{{name}} chce z tobą pisać",
     "messageRequest": "Prośba o wiadomość od {{name}}",
     "messageRequestBody_one": "{{count}} wiadomość ze standardowego klienta Mumble",
@@ -49,12 +49,12 @@
     "messageRequestBody_many": "{{count}} wiadomości ze standardowego klienta Mumble",
     "messageRequestBody_other": "{{count}} wiadomości ze standardowego klienta Mumble",
     "invite": {
-      "watchParty": "{{name}} zaprosił(a) cię do wspólnego oglądania",
+      "watchParty": "{{name}} zaprosił(-a) cię do wspólnego oglądania",
       "screenShare": "{{name}} udostępnia ekran",
-      "card": "{{name}} wysłał(a) ci kartę",
-      "theme": "{{name}} udostępnił(a) ci motyw"
+      "card": "{{name}} wysłał(-a) ci kartę",
+      "theme": "{{name}} udostępnił(-a) ci motyw"
     },
-    "connection": "{{server}} jest niedostępny",
+    "connection": "Serwer {{server}} jest niedostępny",
     "type": {
       "chatRequest": "Prośba o czat",
       "messageRequest": "Prośba o wiadomość",
@@ -63,7 +63,7 @@
       "connection": "Połączenie",
       "update": "Aktualizacja"
     },
-    "accept": "Akceptuj",
+    "accept": "Zaakceptuj",
     "decline": "Odrzuć",
     "join": "Dołącz",
     "watch": "Oglądaj",
@@ -79,9 +79,13 @@
       "whatsNew": "Co nowego"
     },
     "relay": {
-      "title": "Przekaźnik na {{server}} się zmienił",
+      "title": "Zmienił się przekaźnik na serwerze {{server}}",
       "body": "Udostępnianie ekranu i plików jest wstrzymane, dopóki nie zaufasz nowemu przekaźnikowi.",
       "decision": "Wymaga twojej decyzji"
     }
+  },
+  "suppressionFallback": {
+    "title": "Tłumienie szumów jest zbyt wolne",
+    "text": "Na tym komputerze jest teraz zbyt wolne. Dopóki nie nadąży, działa „{{standard}}”."
   }
 }

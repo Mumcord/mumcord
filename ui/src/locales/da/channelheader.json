@@ -5,7 +5,7 @@
     "label": "Kanalindstillinger for {{channel}}",
     "join": "Gå ind i kanalen",
     "follow": "Følg kanal",
-    "unfollow": "Følg ikke kanalen længere",
+    "unfollow": "Stop med at følge kanal",
     "following": "Følger",
     "copyLink": "Kopiér kanallink",
     "password": "Kanaladgangskode",
@@ -33,10 +33,10 @@
     "access": "Adgang",
     "accessOpen": "Åben",
     "accessRestricted": "Begrænset (adgangskode eller gruppe)",
-    "accessSaved": "Beskyttet, en gemt adgangskode låser op",
-    "links": "Forbundne kanaler",
+    "accessSaved": "Beskyttet, låses op med en gemt adgangskode",
+    "links": "Tilknyttede kanaler",
     "none": "Ingen",
-    "permissions": "Mine rettigheder",
+    "permissions": "Mine tilladelser",
     "denied": "ingen {{permission}}",
     "permission": {
       "enter": "Gå ind",
@@ -59,8 +59,8 @@
       "jam": "⚡ Jam (lav latenstid)",
       "custom": "Brugerdefineret"
     },
-    "audioEdit": "Rediger…",
-    "audioSet": "Konfigurer…",
+    "audioEdit": "Redigér…",
+    "audioSet": "Konfigurér…",
     "cleared": "Historik sidst ryddet",
     "never": "Aldrig",
     "copyLink": "Kopiér link",
@@ -83,7 +83,7 @@
       "jamHint": "Lav latenstid"
     },
     "musicQuality": "Musikkvalitet",
-    "musicQualityHint": "Encoder tunet til musik; støjdæmpning slået fra.",
+    "musicQualityHint": "Encoder tilpasset musik; støjdæmpning slået fra.",
     "musicIncluded": "Inkluderet, mens tilstanden med lav latenstid er slået til.",
     "lowLatency": "Tilstand med lav latenstid",
     "lowLatencyHint": "Mindste pakker. Mere båndbredde, mindre robust.",
@@ -98,10 +98,10 @@
     "bitrateDefault": "Standard, {{value}}",
     "serverLimit": "Servergrænse {{kbps}} kbit/s",
     "noServerLimit": "Ingen servergrænse",
-    "note": "Gælder, når du går ind i denne kanal, kun på denne enhed. Andre påvirkes ikke. Forbindelsesinfo markerer disse værdier med „(kanalprofil)“.",
+    "note": "Gælder, når du går ind i denne kanal, kun på denne enhed. Andre påvirkes ikke. Forbindelsesinfo markerer disse værdier med »(kanalprofil)«.",
     "saveFailed": "Lydprofilen kunne ikke gemmes.",
     "remove": "Fjern profil",
-    "cancel": "Annuller",
+    "cancel": "Annullér",
     "save": "Gem"
   },
   "moveDialog": {
@@ -109,7 +109,7 @@
     "legend": "Personer der skal flyttes",
     "empty": "Der er ingen i andre kanaler, som du må flytte.",
     "failed": "Nogle personer kunne ikke flyttes.",
-    "cancel": "Annuller",
+    "cancel": "Annullér",
     "submit": "Flyt"
   }
 }

@@ -72,7 +72,7 @@
       "link": "Tento odkaz mumble:// sa nedá prečítať. Skontroluj, či bol skopírovaný celý.",
       "invalid": "Údaje servera nie sú platné. Skontroluj adresu a port.",
       "addressInvalid": "Toto nevyzerá ako adresa servera.",
-      "portEmpty": "Zadajte port.",
+      "portEmpty": "Zadaj port.",
       "labelLong": "Názov v lište serverov môže mať najviac 64 znakov."
     },
     "alwaysConnect": "Vždy pripojiť pri spustení",
@@ -104,12 +104,14 @@
       "result": "{{address}} · Ping: {{ms}} ms · Verzia servera: {{version}}",
       "certTrusted": "Certifikát je už dôveryhodný",
       "certUnknown": "Certifikát zatiaľ nie je dôveryhodný – pri pripojení sa opýtame",
-      "certChanged": "Certifikát sa zmenil – skontrolujte ho pred pripojením",
+      "certChanged": "Certifikát sa zmenil – pred pripojením ho skontroluj",
       "wrongPassword": "Server heslo odmietol.",
-      "nameInUse": "Tento názov je na serveri už obsadený.",
+      "nameInUse": "Toto meno je na serveri už obsadené.",
+      "certUntrustedNotSent": "Certifikátu servera zatiaľ nedôverujete, preto sa heslo neodoslalo. Pripojte sa raz a certifikátu dôverujte, potom test zopakujte.",
+      "certChangedNotSent": "Certifikát servera sa zmenil, preto sa heslo neodoslalo.",
       "unreachable": "Server je nedostupný.",
       "invalid": "Údaje nie sú platné.",
-      "failed": "Test zlyhal. Skúste to znova."
+      "failed": "Test zlyhal. Skús to znova."
     }
   },
   "errors": {
@@ -126,8 +128,8 @@
     "secureStorage": "Zabezpečené úložisko tvojho systému nie je dostupné, takže heslo servera sa nepodarilo prečítať ani uložiť. Odomkni ho a skús to znova.",
     "notFound": "Tento server už nie je uložený.",
     "generic": "Niečo sa pokazilo. Skús to znova.",
-    "serverLimit": "Už si pripojený k maximu {{limit}} serverov. Odpoj nejaký server alebo zvýš limit v Nastavenia → Servery.",
-    "serverLimitUnknown": "Už si pripojený k maximálnemu počtu serverov. Odpoj nejaký server alebo zvýš limit v Nastavenia → Servery.",
+    "serverLimit": "Už máš pripojenie k maximálnemu počtu serverov ({{limit}}). Odpoj nejaký server alebo zvýš limit v Nastavenia → Servery.",
+    "serverLimitUnknown": "Už máš pripojenie k maximálnemu počtu serverov. Odpoj nejaký server alebo zvýš limit v Nastavenia → Servery.",
     "alwaysConnectLimit": "Len {{limit}} serverov môže mať „Vždy pripojiť pri spustení“, rovnako ako je limit pripojených serverov. Vypni to pri inom serveri alebo zvýš limit v Nastavenia → Servery.",
     "alwaysConnectLimitUnknown": "„Vždy pripojiť pri spustení“ nemôže mať viac serverov, než je limit pripojených serverov. Vypni to pri inom serveri alebo zvýš limit v Nastavenia → Servery."
   },
@@ -140,7 +142,7 @@
     "newTitle": "Dôverovať tomuto serveru?",
     "newIntro": "Mumcord certifikát servera {{server}} ešte nevidel. Ak ti správca servera dal odtlačok, skontroluj, či sa zhoduje. Tvoja voľba sa zapamätá.",
     "fingerprint": "Odtlačok certifikátu",
-    "changedTitle": "Upozornenie: certifikát servera sa zmenil",
+    "changedTitle": "Varovanie: certifikát servera sa zmenil",
     "changedWarning": "Certifikát servera {{server}} sa líši od toho, ktorému si predtým dôveroval.",
     "changedAdvice": "Môže sa to stať po obnovení servera, ale môže to tiež znamenať, že niekto odpočúva tvoje pripojenie. Pokračuj, len ak správca servera zmenu potvrdil.",
     "previousFingerprint": "Predtým dôveryhodný odtlačok",
@@ -151,7 +153,7 @@
   },
   "rejoin": {
     "label": "Vrátiť sa do posledného kanála",
-    "text": "Naposledy si bol v {{channel}} – vrátiť sa?",
+    "text": "Naposledy: {{channel}} – vrátiť sa?",
     "rejoin": "Vrátiť sa",
     "notNow": "Teraz nie"
   },
@@ -173,13 +175,13 @@
       "disconnect": "Odpojenie zlyhalo. Skús to znova.",
       "alwaysConnect": "„Vždy pripojiť pri spustení“ sa nepodarilo uložiť. Skús to znova.",
       "notifications": "Nastavenie upozornení sa nepodarilo uložiť. Skús to znova.",
-      "savePassword": "Nové heslo sa nepodarilo uložiť. Uprav server, aby si ho uložil.",
-      "identity": "Identitu sa nepodarilo uložiť. Skúste to znova."
+      "savePassword": "Nové heslo sa nepodarilo uložiť. Ulož ho cez úpravu servera.",
+      "identity": "Identitu sa nepodarilo uložiť. Skús to znova."
     }
   },
   "empty": {
     "title": "Pridaj svoj prvý server",
-    "description": "Zadaj adresu, ktorú si dostal od svojej skupiny, alebo vlož odkaz mumble://.",
+    "description": "Zadaj adresu od svojej skupiny alebo vlož odkaz mumble://.",
     "addressLabel": "Adresa servera alebo odkaz mumble://",
     "addressHint": "Napríklad mumble.example.org alebo mumble.example.org:64738.",
     "connect": "Pridať a pripojiť",
@@ -210,8 +212,8 @@
     "wrong": "Nesprávne heslo",
     "failed": "Heslo sa nepodarilo odoslať. Skús to znova.",
     "cancel": "Zrušiť",
-    "join": "Vstúpiť",
-    "joining": "Vstupuje sa…"
+    "join": "Pripojiť sa",
+    "joining": "Pripája sa…"
   },
   "serverInfo": {
     "title": "Informácie o serveri",
@@ -244,15 +246,15 @@
     "copied": "Skopírované",
     "close": "Zavrieť",
     "serverSection": "Server",
-    "youSection": "Vy",
+    "youSection": "Ty",
     "certificate": "Certifikát",
     "maxMessageLength": "Max. dĺžka správy",
     "maxImageMessageLength": "Max. správa s obrázkom",
     "usersOf": "{{online}} z {{max}}",
     "unlimited": "Neobmedzene",
     "registeredAs": "Áno, ako {{name}}",
-    "inChannelYouMay": "V kanáli {{channel}} môžete",
-    "youMay": "Môžete",
+    "inChannelYouMay": "V kanáli {{channel}} môžeš",
+    "youMay": "Môžeš",
     "nothing": "Nič",
     "mumcordUsersOf": "{{count}} z {{total}}",
     "none": "—",
@@ -274,7 +276,7 @@
     "permissionTraverse": "Prechádzať",
     "permissionEnter": "Vstúpiť",
     "permissionSpeak": "Hovoriť",
-    "permissionMuteDeafen": "Stlmiť/ohlušiť ostatných",
+    "permissionMuteDeafen": "Stlmiť mikrofón/zvuk ostatným",
     "permissionMove": "Presúvať používateľov",
     "permissionMakeChannel": "Vytvoriť kanál",
     "permissionLinkChannel": "Prepojiť kanál",
@@ -283,7 +285,7 @@
     "permissionMakeTempChannel": "Vytvoriť dočasný kanál",
     "permissionListen": "Počúvať",
     "permissionKick": "Vyhodiť",
-    "permissionBan": "Zablokovať",
+    "permissionBan": "Zakázať prístup",
     "permissionRegister": "Registrovať používateľov",
     "permissionSelfRegister": "Registrovať seba",
     "permissionResetUserContent": "Resetovať obsah používateľa",
@@ -293,10 +295,10 @@
     "field": "Identita pre tento server",
     "useDefault": "Použiť predvolenú ({{identity}})",
     "option": "{{label}} ({{name}})",
-    "hint": "Zmena identity znovu pripojí tento server. Registrovaný názov a oprávnenia tu patria zvolenej identite.",
+    "hint": "Zmena identity znovu pripojí tento server. Registrované meno a oprávnenia tu patria zvolenej identite.",
     "manage": "Spravovať identity…",
     "title": "Identita pre {{server}}",
-    "intro": "Zvoľte, ktorú identitu Mumcord používa na pripojenie. „Použiť predvolenú“ nasleduje predvolenú identitu.",
+    "intro": "Zvoľ identitu, ktorú Mumcord použije na pripojenie k tomuto serveru. „Použiť predvolenú“ sa riadi predvolenou identitou.",
     "save": "Uložiť",
     "saveAndReconnect": "Uložiť a pripojiť znova",
     "reconnectTitle": "Znova pripojiť {{server}}?",

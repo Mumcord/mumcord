@@ -21,6 +21,7 @@ import {
 
 const CUSTOM: WizardStepId[] = [
   "privateMessages",
+  "notifications",
   "connections",
   "features",
   "appearance",
@@ -78,7 +79,7 @@ describe("first start", () => {
       "summary",
     ]);
     expect(primaryButton(at(state, "setupStyle"))).toBe("next");
-    expect(stepTotal(state)).toBe(10);
+    expect(stepTotal(state)).toBe(11);
   });
 
   it("puts the Mumble import before the identity when a profile was found", () => {
@@ -223,7 +224,7 @@ describe("rail", () => {
   it("numbers the Custom steps once Custom is selected", () => {
     const style = selectStyle(at(createWizardFlow({ mode: "firstStart" }), "setupStyle"), "custom");
     expect(railEntries(style).map((entry) => entry.number)).toEqual([
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
     ]);
     expect(progress(createWizardFlow({ mode: "firstStart" }))).toBe(0);
     expect(progress(at(style, "summary"))).toBe(1);

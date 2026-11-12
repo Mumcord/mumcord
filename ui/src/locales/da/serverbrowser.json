@@ -3,7 +3,7 @@
   "loading": "Indlæser listen…",
   "subtitle": "Indlæst, fordi du åbnede siden · {{shown}} af {{total}} vist",
   "search": "Søg efter navn, adresse eller land",
-  "refresh": "Opdater",
+  "refresh": "Opdatér",
   "retry": "Prøv igen",
   "loadFailed": "Listen over offentlige servere kunne ikke indlæses. Tjek din internetforbindelse, og prøv igen.",
   "noMatch": "Ingen server matcher din søgning og dine filtre.",

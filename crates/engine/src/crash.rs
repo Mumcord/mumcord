@@ -10,7 +10,7 @@ use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 use std::time::Instant;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::diag;
 
@@ -86,6 +86,9 @@ static SYSTEM: OnceLock<Vec<String>> = OnceLock::new();
 
 /// What is running right now (camera, screen share, install type, …), see [`set_context`].
 static RUNNING: Mutex<BTreeMap<&'static str, String>> = Mutex::new(BTreeMap::new());
+/// Last time the context file was written, so rapid changes write at most once per second
+/// (spec 12 FR-12.12). The in-memory [`RUNNING`] map stays exact for the panic hook.
+static LAST_CONTEXT_WRITE: Mutex<Option<Instant>> = Mutex::new(None);
 
 /// Records what is going on, e.g. `set_context("camera", "on, NV12 1280x720@15")`, so a crash
 /// report can say what was running. Values must hold nothing personal (no names, URLs, paths).
@@ -106,9 +109,19 @@ pub fn clear_context(key: &'static str) {
 }
 
 fn persist_context(running: &BTreeMap<&'static str, String>) {
-    if let Some(state) = STATE.get() {
-        let _ = fs::write(state.dir.join(CONTEXT), context_text(running));
+    let Some(state) = STATE.get() else {
+        return;
+    };
+    // Debounce: at most one file write per second (spec 12 FR-12.12).
+    let now = Instant::now();
+    let mut last = LAST_CONTEXT_WRITE
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    if last.is_some_and(|at| now.duration_since(at) < Duration::from_secs(1)) {
+        return;
     }
+    *last = Some(now);
+    let _ = fs::write(state.dir.join(CONTEXT), context_text(running));
 }
 
 fn context_text(running: &BTreeMap<&'static str, String>) -> String {
@@ -174,7 +187,7 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
                 if let (Some(kind), Some(previous)) = (unclean, previous) {
                     let cause = match &kind {
                         CrashKind::Signal(name) => format!("Mumcord was stopped by {name}"),
-                        _ => "Mumcord closed without shutting down".to_owned(),
+                        _ => unexpected_cause(cfg!(windows)).to_owned(),
                     };
                     let report = Report {
                         kind,
@@ -202,6 +215,28 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
     Ok(())
 }
 
+/// The cause of a run that left its marker but no native record. On Windows every exception the
+/// handler can see is recorded (issue #699), so a missing record itself says how the run ended.
+fn unexpected_cause(windows: bool) -> &'static str {
+    if windows {
+        "Mumcord closed without shutting down (no exception recorded: likely a fast-fail such as \
+         a Rust abort or a stack-cookie check, or the process was ended from outside)"
+    } else {
+        "Mumcord closed without shutting down"
+    }
+}
+
+/// Runs `quit` once, on its own thread, when the system asks the app to end (Unix: SIGTERM,
+/// SIGINT or SIGHUP, i.e. shutdown, logout, `kill` or Ctrl+C), instead of the process ending at
+/// once: `quit` is expected to shut down as a normal quit does and then exit (#748). A second
+/// such signal ends the process immediately. Either way the run does not count as a crash.
+/// Call it once.
+pub fn on_quit_signal(quit: impl FnOnce() + Send + 'static) {
+    if let Err(e) = native::on_quit(quit) {
+        tracing::warn!(error = %e, "no clean quit when the system ends the app");
+    }
+}
+
 /// The app is closing normally: the next start does not report a crash.
 pub fn clean_exit() {
     if let Some(state) = STATE.get() {
@@ -215,6 +250,9 @@ fn install_panic_hook() {
     let previous = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |info| {
         if let Some(state) = STATE.get() {
+            // Push buffered log lines to the file too (spec 12 FR-12.1); the report below
+            // already uses the exact in-memory ring.
+            crate::diag::flush_log();
             let thread = std::thread::current();
             let message = match info.payload().downcast_ref::<&str>() {
                 Some(s) => (*s).to_owned(),
@@ -574,7 +612,7 @@ pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
 mod native {
     use std::os::fd::IntoRawFd;
     use std::path::Path;
-    use std::sync::atomic::{AtomicI32, Ordering};
+    use std::sync::atomic::{AtomicBool, AtomicI32, Ordering};
 
     pub const MAX_FRAMES: usize = 64;
     static MARKER_FD: AtomicI32 = AtomicI32::new(-1);
@@ -583,20 +621,107 @@ mod native {
     /// Asked to quit (the system shuts down, the session ends, Ctrl+C): not a crash.
     const QUIT_SIGNALS: [libc::c_int; 3] = [libc::SIGTERM, libc::SIGINT, libc::SIGHUP];
 
+    /// Write end of the pipe that wakes the quit thread; -1 until [`on_quit`] ran.
+    static QUIT_FD: AtomicI32 = AtomicI32::new(-1);
+    /// A quit signal was already handed to the quit thread.
+    static QUITTING: AtomicBool = AtomicBool::new(false);
+
     /// A quit request: the run ends on purpose, so its marker goes and the next start reports
-    /// nothing; then the default action ends the process as before.
+    /// nothing. The first one wakes the quit thread, which runs the normal quit path (plugins
+    /// get their `stop`, the connections close; #748). A second one, or one before anybody
+    /// listens, ends the process through the default action, so a hanging quit can be forced.
     extern "C" fn quit(signal: libc::c_int) {
+        // The process goes on after this handler, so the code it interrupted must find its
+        // errno untouched.
+        // SAFETY: the errno location is valid for the calling thread.
+        let errno = unsafe { *errno_location() };
         if let Some(path) = MARKER_PATH.get() {
             // SAFETY: unlink(2) is async-signal-safe; the path was set before the handler.
             unsafe {
                 libc::unlink(path.as_ptr());
             }
         }
+        let fd = QUIT_FD.load(Ordering::Acquire);
+        if fd >= 0 && !QUITTING.swap(true, Ordering::AcqRel) {
+            put(fd, &[0]);
+            // SAFETY: as above.
+            unsafe {
+                *errno_location() = errno;
+            }
+            return;
+        }
         // SAFETY: raise(3) is async-signal-safe; SA_RESETHAND restored the default action.
         unsafe {
             libc::raise(signal);
         }
     }
+
+    fn errno_location() -> *mut libc::c_int {
+        // SAFETY: these only return the address of the calling thread's errno.
+        unsafe {
+            #[cfg(target_os = "linux")]
+            return libc::__errno_location();
+            #[cfg(target_os = "android")]
+            return libc::__errno();
+            // The BSDs spell it `__error` like macOS does.
+            #[cfg(any(target_os = "macos", target_os = "ios", target_os = "freebsd"))]
+            return libc::__error();
+        }
+    }
+
+    fn install_quit_handlers() {
+        for signal in QUIT_SIGNALS {
+            // SAFETY: a plain C handler installed with sigaction; it only uses async-signal-safe
+            // calls (unlink, write, raise) and atomics.
+            unsafe {
+                let mut action: libc::sigaction = std::mem::zeroed();
+                action.sa_sigaction = quit as extern "C" fn(libc::c_int) as libc::sighandler_t;
+                action.sa_flags = libc::SA_RESETHAND;
+                libc::sigemptyset(&mut action.sa_mask);
+                libc::sigaction(signal, &action, std::ptr::null_mut());
+            }
+        }
+    }
+
+    /// Runs `run` on its own thread at the first quit signal. A signal handler may not do more
+    /// than a few system calls, so it only writes a byte into a pipe this thread waits on.
+    pub fn on_quit(run: impl FnOnce() + Send + 'static) -> std::io::Result<()> {
+        let mut fds: [libc::c_int; 2] = [-1; 2];
+        // SAFETY: pipe(2) fills the two descriptors; fcntl only sets a flag on them.
+        unsafe {
+            if libc::pipe(fds.as_mut_ptr()) != 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            for fd in fds {
+                libc::fcntl(fd, libc::F_SETFD, libc::FD_CLOEXEC);
+            }
+        }
+        let [read, write] = fds;
+        std::thread::Builder::new()
+            .name("quit-signal".to_owned())
+            .spawn(move || {
+                let mut byte = 0u8;
+                loop {
+                    // SAFETY: reads at most one byte into a one-byte buffer.
+                    let got = unsafe { libc::read(read, std::ptr::from_mut(&mut byte).cast(), 1) };
+                    if got == 1 {
+                        run();
+                        return;
+                    }
+                    let interrupted = got < 0
+                        && std::io::Error::last_os_error().kind()
+                            == std::io::ErrorKind::Interrupted;
+                    if !interrupted {
+                        return;
+                    }
+                }
+            })?;
+        QUIT_FD.store(write, Ordering::Release);
+        // Again, in case crash reporting could not be set up and left them out.
+        install_quit_handlers();
+        Ok(())
+    }
+
     const SIGNALS: [(libc::c_int, &[u8]); 5] = [
         (libc::SIGSEGV, b"SIGSEGV"),
         (libc::SIGILL, b"SIGILL"),
@@ -612,16 +737,7 @@ mod native {
         if let Ok(path) = std::ffi::CString::new(marker.as_os_str().as_encoded_bytes()) {
             let _ = MARKER_PATH.set(path);
         }
-        for signal in QUIT_SIGNALS {
-            // SAFETY: as below; the handler only calls unlink and raise.
-            unsafe {
-                let mut action: libc::sigaction = std::mem::zeroed();
-                action.sa_sigaction = quit as extern "C" fn(libc::c_int) as libc::sighandler_t;
-                action.sa_flags = libc::SA_RESETHAND;
-                libc::sigemptyset(&mut action.sa_mask);
-                libc::sigaction(signal, &action, std::ptr::null_mut());
-            }
-        }
+        install_quit_handlers();
         MARKER_FD.store(file.into_raw_fd(), Ordering::Release);
         if let Ok(file) = std::fs::File::create(maps) {
             MAPS_FD.store(file.into_raw_fd(), Ordering::Release);
@@ -757,37 +873,118 @@ mod native {
     }
 }
 
-/// Windows (issue #629): an unhandled-exception filter writes the exception, the thread, the stack
-/// and the loaded modules into the marker and the modules file, in the same marker format as the
-/// Unix handler, so the next start names the module and offset of every frame. The filter runs
-/// once, writes only into memory reserved at start and through handles opened at start, and then
-/// lets Windows end the process as before.
+/// Windows exception codes and how the handler treats them. Outside the Windows build only the
+/// tests use them.
+#[cfg(any(windows, test))]
+mod codes {
+    pub const ACCESS_VIOLATION: u32 = 0xC000_0005;
+    const STACK_OVERFLOW: u32 = 0xC000_00FD;
+    const STACK_BUFFER_OVERRUN: u32 = 0xC000_0409;
+    const HEAP_CORRUPTION: u32 = 0xC000_0374;
+    const FAIL_FAST: u32 = 0xC000_0602;
+
+    /// The name of an exception code; Rust's own `abort` and C++ `throw` included.
+    pub fn exception_name(code: u32) -> &'static str {
+        match code {
+            ACCESS_VIOLATION => "EXCEPTION_ACCESS_VIOLATION",
+            STACK_OVERFLOW => "EXCEPTION_STACK_OVERFLOW",
+            STACK_BUFFER_OVERRUN => "STATUS_STACK_BUFFER_OVERRUN",
+            0xC000_001D => "EXCEPTION_ILLEGAL_INSTRUCTION",
+            0xC000_0094 => "EXCEPTION_INT_DIVIDE_BY_ZERO",
+            0xC000_0006 => "EXCEPTION_IN_PAGE_ERROR",
+            HEAP_CORRUPTION => "STATUS_HEAP_CORRUPTION",
+            FAIL_FAST => "STATUS_FAIL_FAST_EXCEPTION",
+            0xC000_0096 => "EXCEPTION_PRIV_INSTRUCTION",
+            0x8000_0003 => "EXCEPTION_BREAKPOINT",
+            0xE06D_7363 => "C++ exception",
+            _ => "EXCEPTION",
+        }
+    }
+
+    /// Codes nobody recovers from, recorded as soon as they are raised (issue #699): a stack
+    /// overflow leaves too little room to wait for the filter, and Windows never hands heap
+    /// corruption or a raised fail-fast to the unhandled-exception filter at all.
+    pub fn fatal_at_first_chance(code: u32) -> bool {
+        matches!(
+            code,
+            STACK_OVERFLOW | STACK_BUFFER_OVERRUN | HEAP_CORRUPTION | FAIL_FAST
+        )
+    }
+
+    /// An error (the two top bits set), as opposed to a warning or an information such as a
+    /// debugger message; only errors can end the process.
+    pub fn is_error(code: u32) -> bool {
+        code >> 30 == 0b11
+    }
+}
+
+/// Windows (issues #629, #699): the exception, the thread, the stack and the loaded modules go into
+/// the marker and the modules file, in the same marker format as the Unix handler, so the next
+/// start names the module and offset of every frame. Three ways in, all writing the same record
+/// once per run, only into memory reserved at start and through handles opened at start:
+///
+/// - the unhandled-exception filter, for every crash nobody catches;
+/// - a vectored handler, which Windows calls before anything else: it records the codes the filter
+///   never sees (stack overflow, heap corruption) and puts the filter back when a library loaded
+///   later (ONNX Runtime, camera drivers, Media Foundation) replaced it;
+/// - a `SIGABRT` handler, because the C runtime's `abort()` (also behind `std::terminate`, e.g. an
+///   uncaught C++ exception in a library) would otherwise end the process with a fast-fail that
+///   no handler sees.
+///
+/// Afterwards Windows ends the process as before. What stays out of reach is a fast-fail (Rust's
+/// `abort`, a stack-cookie check): the next start then says that no exception was recorded.
 #[cfg(windows)]
 mod native {
     use std::os::windows::io::IntoRawHandle;
     use std::path::Path;
-    use std::sync::atomic::{AtomicBool, AtomicIsize, Ordering};
+    use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicUsize, Ordering};
 
     use windows::Win32::Foundation::{HANDLE, HMODULE};
     use windows::Win32::Storage::FileSystem::{
         FILE_BEGIN, SetEndOfFile, SetFilePointerEx, WriteFile,
     };
     use windows::Win32::System::Diagnostics::Debug::{
-        EXCEPTION_POINTERS, RtlCaptureStackBackTrace, SetUnhandledExceptionFilter,
+        AddVectoredExceptionHandler, EXCEPTION_POINTERS, EXCEPTION_RECORD,
+        RtlCaptureStackBackTrace, SetUnhandledExceptionFilter,
     };
     use windows::Win32::System::ProcessStatus::{
         K32EnumProcessModules, K32GetModuleBaseNameW, K32GetModuleInformation, MODULEINFO,
     };
-    use windows::Win32::System::Threading::{GetCurrentProcess, GetCurrentThreadId};
+    use windows::Win32::System::Threading::{
+        GetCurrentProcess, GetCurrentThreadId, SetThreadStackGuarantee,
+    };
+
+    use super::codes;
 
     const MAX_FRAMES: usize = 62;
     const MAX_MODULES: usize = 512;
     /// Lets Windows go on and end the process.
     const CONTINUE_SEARCH: i32 = 0;
+    /// Room the main thread keeps for the handler after a stack overflow. Rust already keeps
+    /// 20 KiB on every thread it starts; the main thread runs the UI and the deepest calls, so it
+    /// gets a little more.
+    const STACK_GUARANTEE: u32 = 32 * 1024;
+    const SIGABRT: i32 = 22;
+    /// `_CALL_REPORTFAULT`: without it `abort()` exits after the `SIGABRT` handler instead of
+    /// fast-failing.
+    const CALL_REPORTFAULT: u32 = 0x2;
+
+    // The C runtime Rust links against; DLLs built with the shared C runtime (ONNX Runtime) use
+    // the same one, so their `abort()` reaches this handler too.
+    unsafe extern "C" {
+        fn signal(signum: i32, handler: usize) -> usize;
+        fn _set_abort_behavior(flags: u32, mask: u32) -> u32;
+    }
+
+    type Filter = unsafe extern "system" fn(*const EXCEPTION_POINTERS) -> i32;
 
     static MARKER: AtomicIsize = AtomicIsize::new(0);
     static MODULES: AtomicIsize = AtomicIsize::new(0);
     static ENTERED: AtomicBool = AtomicBool::new(false);
+    /// A filter a library installed over ours; ours runs first and then hands the crash to it.
+    static REPLACED: AtomicUsize = AtomicUsize::new(0);
+    /// Set while the replaced filter runs: when it calls back into ours, that call ends at once.
+    static HANDED_OVER: AtomicBool = AtomicBool::new(false);
 
     /// Text built without allocating, in memory that exists before any crash.
     struct Text {
@@ -799,6 +996,9 @@ mod native {
         bytes: [0; 64 * 1024],
         len: 0,
     };
+    /// The module list lives here, not on the stack, which may be nearly used up after a stack
+    /// overflow.
+    static mut MODULE_LIST: [HMODULE; MAX_MODULES] = [HMODULE(std::ptr::null_mut()); MAX_MODULES];
 
     impl Text {
         fn push(&mut self, part: &[u8]) {
@@ -851,6 +1051,11 @@ mod native {
         }
     }
 
+    /// Windows has no quit signals; the end of the session reaches the app as a window message.
+    pub fn on_quit(_run: impl FnOnce() + Send + 'static) -> std::io::Result<()> {
+        Ok(())
+    }
+
     pub fn install(marker: &Path, maps: &Path) {
         let Ok(file) = std::fs::OpenOptions::new().write(true).open(marker) else {
             return;
@@ -859,27 +1064,18 @@ mod native {
         if let Ok(file) = std::fs::File::create(maps) {
             MODULES.store(file.into_raw_handle() as isize, Ordering::Release);
         }
-        // SAFETY: installs a plain filter function; it only reads the exception record and calls
-        // functions that do not allocate on the Rust heap.
+        let mut guarantee = STACK_GUARANTEE;
+        // SAFETY: plain functions are installed; they only read the exception record and call
+        // functions that do not allocate on the Rust heap. `install` runs on the main thread, so
+        // the stack guarantee applies to it.
         unsafe {
             SetUnhandledExceptionFilter(Some(filter));
-        }
-    }
-
-    /// The name of an exception code; Rust's own `abort` and C++ `throw` included.
-    pub(super) fn exception_name(code: u32) -> &'static str {
-        match code {
-            0xC000_0005 => "EXCEPTION_ACCESS_VIOLATION",
-            0xC000_00FD => "EXCEPTION_STACK_OVERFLOW",
-            0xC000_0409 => "STATUS_STACK_BUFFER_OVERRUN",
-            0xC000_001D => "EXCEPTION_ILLEGAL_INSTRUCTION",
-            0xC000_0094 => "EXCEPTION_INT_DIVIDE_BY_ZERO",
-            0xC000_0006 => "EXCEPTION_IN_PAGE_ERROR",
-            0xC000_0374 => "STATUS_HEAP_CORRUPTION",
-            0xC000_0096 => "EXCEPTION_PRIV_INSTRUCTION",
-            0x8000_0003 => "EXCEPTION_BREAKPOINT",
-            0xE06D_7363 => "C++ exception",
-            _ => "EXCEPTION",
+            // First in line, so a library's own vectored handler cannot end the process before
+            // the record is written.
+            AddVectoredExceptionHandler(1, Some(vectored));
+            _set_abort_behavior(0, CALL_REPORTFAULT);
+            signal(SIGABRT, aborted as extern "C" fn(i32) as usize);
+            let _ = SetThreadStackGuarantee(&mut guarantee);
         }
     }
 
@@ -896,27 +1092,31 @@ mod native {
         }
     }
 
-    unsafe extern "system" fn filter(info: *const EXCEPTION_POINTERS) -> i32 {
-        // A second exception while writing ends here; Windows still ends the process.
+    /// Writes the record: `name (code)` (or just `name` without a code), the thread, the faulting
+    /// address, the stack and the modules. Only the first call of a run writes; a second one (the
+    /// filter after the vectored handler, another thread crashing too) leaves it as it is.
+    fn write_record(name: &[u8], code: Option<u32>, record: Option<&EXCEPTION_RECORD>) {
         if ENTERED.swap(true, Ordering::AcqRel) {
-            return CONTINUE_SEARCH;
+            return;
         }
-        // SAFETY: only this one call of the filter reaches here (ENTERED), so the static text has
-        // a single user; the record comes from Windows and is valid during the call.
+        // SAFETY: only this one call reaches here (ENTERED), so the static memory has a single
+        // user.
         let text = unsafe { &mut *std::ptr::addr_of_mut!(TEXT) };
+        let modules = unsafe { &mut *std::ptr::addr_of_mut!(MODULE_LIST) };
         text.len = 0;
-        let record = unsafe { info.as_ref().and_then(|i| i.ExceptionRecord.as_ref()) };
-        let code = record.map_or(0, |r| r.ExceptionCode.0 as u32);
-        text.push(exception_name(code).as_bytes());
-        text.push(b" (");
-        text.hex(code as usize);
-        text.push(b")\nthread id ");
+        text.push(name);
+        if let Some(code) = code {
+            text.push(b" (");
+            text.hex(code as usize);
+            text.push(b")");
+        }
+        text.push(b"\nthread id ");
         // SAFETY: plain query of the current thread.
         text.decimal(unsafe { GetCurrentThreadId() });
         text.push(b"\n");
         if let Some(record) = record {
             // For an access violation the second parameter is the address that was touched.
-            if code == 0xC000_0005 && record.NumberParameters >= 2 {
+            if code == Some(codes::ACCESS_VIOLATION) && record.NumberParameters >= 2 {
                 text.push(b"fault ");
                 text.hex(record.ExceptionInformation[1]);
                 text.push(b"\n");
@@ -936,14 +1136,13 @@ mod native {
         write_all(MARKER.load(Ordering::Acquire), &text.bytes[..text.len]);
 
         text.len = 0;
-        let mut modules = [HMODULE::default(); MAX_MODULES];
         let mut needed = 0u32;
-        // SAFETY: the process's own module list into an array on the stack.
+        // SAFETY: the process's own module list into static memory.
         let listed = unsafe {
             K32EnumProcessModules(
                 GetCurrentProcess(),
                 modules.as_mut_ptr(),
-                std::mem::size_of_val(&modules) as u32,
+                std::mem::size_of_val(modules) as u32,
                 &mut needed,
             )
         };
@@ -976,7 +1175,65 @@ mod native {
             }
         }
         write_all(MODULES.load(Ordering::Acquire), &text.bytes[..text.len]);
+    }
+
+    /// The exception record Windows passes to both handlers.
+    ///
+    /// # Safety
+    /// `info` comes from Windows and is valid during the handler call.
+    unsafe fn exception<'a>(info: *const EXCEPTION_POINTERS) -> Option<&'a EXCEPTION_RECORD> {
+        // SAFETY: see above.
+        unsafe { info.as_ref().and_then(|i| i.ExceptionRecord.as_ref()) }
+    }
+
+    fn record_exception(record: Option<&EXCEPTION_RECORD>) {
+        let code = record.map_or(0, |r| r.ExceptionCode.0 as u32);
+        write_record(codes::exception_name(code).as_bytes(), Some(code), record);
+    }
+
+    unsafe extern "system" fn filter(info: *const EXCEPTION_POINTERS) -> i32 {
+        // SAFETY: Windows passes valid exception pointers for the duration of the call.
+        record_exception(unsafe { exception(info) });
+        let replaced = REPLACED.load(Ordering::Acquire);
+        if replaced == 0 || HANDED_OVER.swap(true, Ordering::AcqRel) {
+            return CONTINUE_SEARCH;
+        }
+        // SAFETY: the value was stored from a filter function pointer in `keep_filter`; the
+        // library that installed it is still loaded, since it is part of this process.
+        let replaced = unsafe { std::mem::transmute::<usize, Filter>(replaced) };
+        // SAFETY: the same arguments Windows passed to this filter.
+        unsafe { replaced(info) }
+    }
+
+    /// Puts our filter back at the top if a library replaced it, and keeps theirs to hand over
+    /// to. Cheap enough for every exception: one pointer swap.
+    fn keep_filter() {
+        // SAFETY: swaps the process-wide filter; no other effect.
+        let current = unsafe { SetUnhandledExceptionFilter(Some(filter)) };
+        if let Some(current) = current
+            && current as usize != filter as Filter as usize
+        {
+            REPLACED.store(current as usize, Ordering::Release);
+        }
+    }
+
+    unsafe extern "system" fn vectored(info: *mut EXCEPTION_POINTERS) -> i32 {
+        // SAFETY: Windows passes valid exception pointers for the duration of the call.
+        let record = unsafe { exception(info) };
+        let code = record.map_or(0, |r| r.ExceptionCode.0 as u32);
+        if codes::fatal_at_first_chance(code) {
+            record_exception(record);
+        } else if codes::is_error(code) {
+            // Most errors are caught somewhere and the run goes on; only the filter knows at the
+            // end, so it must still be ours then.
+            keep_filter();
+        }
         CONTINUE_SEARCH
+    }
+
+    /// The C runtime's `abort()` raised `SIGABRT`; after this returns it exits the process.
+    extern "C" fn aborted(_signal: i32) {
+        write_record(b"SIGABRT (abort or std::terminate)", None, None);
     }
 }
 
@@ -984,6 +1241,10 @@ mod native {
 #[cfg(not(any(unix, windows)))]
 mod native {
     pub fn install(_marker: &std::path::Path, _maps: &std::path::Path) {}
+
+    pub fn on_quit(_run: impl FnOnce() + Send + 'static) -> std::io::Result<()> {
+        Ok(())
+    }
 }
 
 /// A module line the Windows handler wrote: `module <base> <size> <name>`.
@@ -1152,6 +1413,41 @@ mod tests {
 
     use super::*;
 
+    #[test]
+    fn windows_says_why_a_run_left_no_record() {
+        assert!(unexpected_cause(true).contains("no exception recorded: likely a fast-fail"));
+        assert_eq!(
+            unexpected_cause(false),
+            "Mumcord closed without shutting down"
+        );
+    }
+
+    #[test]
+    fn windows_codes_are_named_and_sorted_by_when_they_are_recorded() {
+        assert_eq!(
+            codes::exception_name(0xC000_00FD),
+            "EXCEPTION_STACK_OVERFLOW"
+        );
+        assert_eq!(
+            codes::exception_name(0xC000_0602),
+            "STATUS_FAIL_FAST_EXCEPTION"
+        );
+        assert_eq!(codes::exception_name(0x1234), "EXCEPTION");
+        // Recorded at once: nobody recovers, and the filter would come too late or never.
+        for code in [0xC000_00FD, 0xC000_0409, 0xC000_0374, 0xC000_0602] {
+            assert!(codes::fatal_at_first_chance(code), "{code:x}");
+        }
+        // Often caught and survived (an access violation in a probing driver, a C++ throw):
+        // left to the filter.
+        assert!(!codes::fatal_at_first_chance(0xC000_0005));
+        assert!(!codes::fatal_at_first_chance(0xE06D_7363));
+        assert!(codes::is_error(0xC000_0005));
+        assert!(codes::is_error(0xE06D_7363));
+        // A debugger message or a breakpoint is no error.
+        assert!(!codes::is_error(0x4001_0006));
+        assert!(!codes::is_error(0x8000_0003));
+    }
+
     fn test_report(
         dir: &Path,
         kind: CrashKind,
@@ -1213,6 +1509,30 @@ mod tests {
     }
 
     #[test]
+    fn context_file_is_written_at_most_once_per_second() {
+        let dir = tempfile::tempdir().unwrap();
+        let _ = STATE.set(State {
+            dir: dir.path().to_path_buf(),
+            version: "0.7.2".to_owned(),
+            started: Instant::now(),
+        });
+        let on_disk = || fs::read_to_string(dir.path().join(CONTEXT)).unwrap();
+
+        // The first write always happens.
+        set_context("camera", "on");
+        assert_eq!(on_disk(), "camera: on\n");
+
+        // A change right after the write is not written again.
+        set_context("camera", "off");
+        assert_eq!(on_disk(), "camera: on\n");
+
+        // After a second has passed, the next change reaches the file.
+        *LAST_CONTEXT_WRITE.lock().unwrap() = Some(Instant::now() - Duration::from_secs(2));
+        set_context("camera", "off");
+        assert_eq!(on_disk(), "camera: off\n");
+    }
+
+    #[test]
     fn the_upload_is_the_report_plus_an_optional_comment() {
         let dir = tempfile::tempdir().unwrap();
         let path = test_report(dir.path(), CrashKind::Panic, "boom", &[]).unwrap();
@@ -1229,6 +1549,22 @@ mod tests {
         assert_eq!(utc(0), "1970-01-01 00:00 UTC");
         assert_eq!(utc(1_794_001_864), "2026-11-06 21:51 UTC");
         assert_eq!(utc(951_782_400), "2000-02-29 00:00 UTC");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_quit_signal_runs_the_quit_path_instead_of_ending_the_process() {
+        let (tx, rx) = std::sync::mpsc::channel();
+        on_quit_signal(move || {
+            let _ = tx.send(());
+        });
+        // SAFETY: raises a signal whose handler was just installed.
+        unsafe {
+            libc::raise(libc::SIGTERM);
+        }
+        // Still alive, and the quit path was started.
+        rx.recv_timeout(std::time::Duration::from_secs(5))
+            .expect("the quit path runs");
     }
 
     #[test]

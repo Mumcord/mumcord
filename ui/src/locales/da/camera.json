@@ -15,7 +15,8 @@
     "needsRelayMode": "Kameradeling er slået fra. Ændr det under Privatliv og forbindelser.",
     "noCertificate": "Kameradeling kræver et klientcertifikat.",
     "registeredOnly": "Kun registrerede brugere må bruge kameraet på denne server.",
-    "needsDirect": "Kameradeling kræver direkte forbindelser. Ændr det under Privatliv og forbindelser."
+    "needsDirect": "Kameradeling kræver direkte forbindelser. Ændr det under Privatliv og forbindelser.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera tændt",
   "turnOffTray": "Sluk kamera",
@@ -186,7 +187,8 @@
     "showVideo": "Vis video",
     "viewing": "Ser med",
     "weak": "Svag forbindelse",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Dette kamera kræver Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Indstillinger for {{name}}",

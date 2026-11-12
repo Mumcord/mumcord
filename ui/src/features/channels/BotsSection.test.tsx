@@ -85,9 +85,26 @@ describe("BotsSection", () => {
 
   it("lists every bot with what it does, the tester not", async () => {
     await renderPanel();
-    expect(botButton(/^Night Owls Relay Bot, Relay · Chat history · Webhooks$/)).toBeVisible();
-    expect(botButton(/^DJ Byte Bot, Plays music · in Lobby$/)).toBeVisible();
+    expect(
+      botButton(/^Night Owls Relay Bot, in Lobby · Relay · Chat history · Webhooks$/),
+    ).toBeVisible();
+    expect(botButton(/^DJ Byte Bot, in Lobby · Plays music$/)).toBeVisible();
     expect(within(section()).queryByRole("button", { name: /Testy/ })).toBeNull();
+  });
+
+  it("shows the current channel of a hidden bot and follows it when it moves", async () => {
+    await renderPanel();
+    const other = [...getServerState().channels.values()].find((c) => c.id !== 0 && c.id !== 1);
+    if (!other) throw new Error("no second channel");
+    act(() => {
+      api.mock.upsertUser(
+        RELAY({ channelId: other.id, isMumcord: true, bot: { voice: false, modules: [] } }),
+      );
+    });
+    expect(botButton(/^Night Owls Relay Bot, in /)).toHaveTextContent(`in ${other.name}`);
+    expect(
+      within(screen.getByRole("tree", { name: "Channels" })).queryByText("Night Owls Relay"),
+    ).toBeNull();
   });
 
   it("keeps the relay out of the tree, shows the voice bot there with the badge", async () => {

@@ -6,11 +6,11 @@
   "leave": "Poistu yhteiskatselusta",
   "watching": "{{count}} katsoo: {{names}}",
   "player": "Yhteiskatselun soitin",
-  "watchTogether": "Katsotaan yhdessä",
+  "watchTogether": "Katso yhdessä",
   "watchTogetherFor": "Katso {{title}} yhdessä tämän kanavan kanssa",
-  "embedsOff": "Ota upotetut soittimet käyttöön tietosuoja-asetuksissa katsoaksesi yhdessä",
+  "embedsOff": "Ota upotetut soittimet käyttöön Yksityisyys-asetuksissa, niin voit katsoa yhdessä",
   "embedsOffJoin": "Yhteiskatselu on käynnissä: ota upotetut soittimet käyttöön liittyäksesi",
-  "openPrivacy": "Avaa tietosuoja-asetukset",
+  "openPrivacy": "Avaa Yksityisyys-asetukset",
   "cantPlay": "Soitin ei voi toimia täällä.",
   "openInBrowser": "Avaa selaimessa",
   "startFailed": "Yhteiskatselua ei voitu aloittaa.",
@@ -20,7 +20,7 @@
   "someone": "Joku",
   "other": {
     "play": "{{name}} painoi toistoa",
-    "pause": "{{name}} pysäytti tauolle",
+    "pause": "{{name}} keskeytti toiston",
     "seek": "{{name}} hyppäsi eteenpäin",
     "skipped": "{{name}} ohitti"
   },
@@ -58,11 +58,13 @@
   },
   "codecHint": {
     "install": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav:",
-    "generic": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav (GStreamerin libav-liitännäinen) järjestelmäsi paketinhallinnalla.",
-    "rpmFusion": "Fedorassa gst-libav tulee RPM Fusion -ohjelmistolähteestä; ota RPM Fusion ensin käyttöön."
+    "generic": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav (GStreamerin libav-lisäosa) järjestelmäsi paketinhallinnalla.",
+    "rpmFusion": "Fedorassa gst-libav tulee RPM Fusion -ohjelmistolähteestä; ota RPM Fusion ensin käyttöön.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Välilyönti toista/tauko · ← → hyppää 5 s · M mykistä · F koko näyttö",
-  "headerPill": "Katsokaa yhdessä · {{count}}",
+  "headerPill": "Katso yhdessä · {{count}}",
   "miniPlayer": "Minisoitin",
   "tabs": {
     "playlist": "Soittolista"

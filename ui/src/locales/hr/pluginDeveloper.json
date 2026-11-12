@@ -1,7 +1,7 @@
 {
-  "hint": "Učitajte raspakiranu mapu dodatka kako biste ga isprobali. Razvojni dodaci nisu potpisani, nikad nisu službeni i ne mogu dobiti net.http, secrets ni ui.webview. Uklanjaju se kad se isključi razvojni način.",
+  "hint": "Učitaj raspakiranu mapu dodatka da ga isprobaš. Razvojni dodaci nisu potpisani, nikad nisu službeni i ne mogu dobiti net.http, secrets ni ui.webview. Uklanjaju se kad se isključi razvojni način.",
   "load": "Učitaj mapu dodatka…",
-  "pickFolder": "Odaberite mapu dodatka",
+  "pickFolder": "Odaberi mapu dodatka",
   "empty": "Nijedan razvojni dodatak nije učitan.",
   "listLabel": "Razvojni dodaci",
   "label": "Razvojni dodatak",
@@ -21,7 +21,7 @@
   "logTitle": "Zapisnik dodatka {{name}}",
   "logEmpty": "Još nema redaka zapisnika.",
   "level": {
-    "debug": "Ispravljanje",
+    "debug": "Otklanjanje pogrešaka",
     "info": "Informacija",
     "warn": "Upozorenje",
     "error": "Pogreška"

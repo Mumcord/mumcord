@@ -57,7 +57,7 @@
   "search": {
     "label": "Cerca nelle impostazioni",
     "results": "Risultati della ricerca",
-    "empty": "Nessuna impostazione corrisponde a “{{query}}”.",
+    "empty": "Nessuna impostazione corrisponde a «{{query}}».",
     "count_one": "{{count}} impostazione trovata",
     "count_many": "{{count}} impostazioni trovate",
     "count_other": "{{count}} impostazioni trovate",
@@ -91,7 +91,7 @@
     "imported": "Identità «{{name}}» importata.",
     "listTitle": "Identità",
     "listLabel": "Identità",
-    "intro": "Un'identità è un certificato nell'archivio sicuro del sistema. I server ti riconoscono da esso. Usane una ovunque oppure scegline una diversa per server.",
+    "intro": "Un'identità è un certificato nell'archivio sicuro del sistema. È così che i server ti riconoscono. Usane una ovunque oppure scegline una diversa per server.",
     "new": "Nuova identità",
     "createTitle": "Nuova identità",
     "createIntro": "Mumcord crea un nuovo certificato. Il nome sui server è quello che gli altri vedono come tuo nome utente.",
@@ -108,8 +108,8 @@
     "createdLine": "Nome: {{name}} · Creata il {{date}}",
     "fingerprintLine": "Impronta {{fingerprint}}",
     "notUsed": "Non ancora usata da nessun server",
-    "setDefault": "Predefinita",
-    "setDefaultFor": "Predefinita – {{identity}}",
+    "setDefault": "Imposta come predefinita",
+    "setDefaultFor": "Imposta come predefinita – {{identity}}",
     "defaultSet": "{{identity}} è ora l'identità predefinita.",
     "details": "Dettagli",
     "detailsFor": "Mostra i dettagli di {{identity}}",
@@ -121,7 +121,7 @@
     "rename": "Rinomina",
     "renameFor": "Rinomina {{identity}}",
     "renameTitle": "Rinomina {{identity}}",
-    "renameIntro": "Cambia solo l'etichetta in Mumcord. Il certificato e tutto ciò che i server sanno di esso restano uguali.",
+    "renameIntro": "Cambia solo l'etichetta in Mumcord. Il certificato e tutto ciò che i server ne sanno restano invariati.",
     "delete": "Elimina",
     "deleteFor": "Elimina {{identity}}",
     "deleteTitle": "Eliminare l'identità {{identity}}?",
@@ -151,7 +151,7 @@
     "testRecording": "Registrazione… parla ora.",
     "testPlaying": "Riproduzione della tua voce…",
     "musicQuality": "Qualità musica",
-    "musicQualityHint": "Usa più banda e disattiva la soppressione del rumore e il volume automatico; pensata per la musica. Funziona meglio con il push-to-talk.",
+    "musicQualityHint": "Ottimizza l'encoder per la musica e disattiva la soppressione del rumore e il volume automatico. Funziona meglio con il Push-to-talk.",
     "bitrate": "Bitrate",
     "bitrateMax": "Max",
     "bitrateValue": "{{kbps}} kbit/s",
@@ -159,12 +159,12 @@
     "bitrateMaxUnknown": "Massimo: dipende dal server. Le perdite sulla connessione possono ancora ridurlo.",
     "videoSound": "Audio dei video",
     "ducking": "Abbassa l'audio dei video mentre qualcuno parla",
-    "duckingHint": "L'audio del video del watch party e della condivisione schermo si abbassa mentre qualcuno parla nel tuo canale vocale.",
+    "duckingHint": "L'audio del video della watch party e della condivisione schermo si abbassa mentre qualcuno parla nel tuo canale vocale.",
     "duckingLevel": "Volume ridotto",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modalità a bassa latenza",
     "lowLatencyHint": "Per suonare insieme in tempo reale",
-    "lowLatencyWarningTitle": "Scambia robustezza con velocità",
+    "lowLatencyWarningTitle": "Più velocità, meno robustezza",
     "lowLatencyBandwidth": "Usa più banda (pacchetti da 10 ms).",
     "lowLatencyWifi": "Può dare interruzioni con il Wi-Fi o una connessione trafficata; usa un cavo se puoi.",
     "lowLatencyHeadphones": "Usa le cuffie: la cancellazione dell'eco è disattivata (anche la soppressione del rumore e il volume automatico).",
@@ -178,12 +178,12 @@
     "unavailable": {
       "waylandNoPortal": "Il push-to-talk non è disponibile: il tuo desktop non offre scorciatoie globali.",
       "registrationFailed": "Il push-to-talk non è disponibile: non è stato possibile registrare la scorciatoia.",
-      "mouseDisabled": "Il push-to-talk non è disponibile: il pulsante del mouse richiede che \"Consenti i pulsanti del mouse\" sia attivo.",
+      "mouseDisabled": "Il push-to-talk non è disponibile: il pulsante del mouse richiede che «Consenti i pulsanti del mouse» sia attivo.",
       "mouseNeedsInputGroup": "Il push-to-talk non è disponibile: Mumcord potrebbe non poter ancora leggere il tuo mouse (vedi sotto).",
       "mouseNeedsAccessibility": "Il push-to-talk non è disponibile: Mumcord ha bisogno del permesso di Accessibilità per vedere i pulsanti del mouse."
     },
     "suggestVoiceActivation": "Usa invece l'attivazione vocale.",
-    "keyCurrent": "Tasto push-to-talk:",
+    "keyCurrent": "Tasto Push-to-talk:",
     "keyNone": "nessuno",
     "keySet": "Imposta tasto",
     "keyChange": "Cambia tasto",
@@ -203,7 +203,7 @@
       "off": "Disattivata"
     },
     "noiseChoiceHint": {
-      "light": "Filtro classico per rumore costante, come ventole o ronzio. Il minor uso della CPU.",
+      "light": "Filtro classico per rumore costante, come ventole o ronzio. Uso minimo della CPU.",
       "standard": "Filtro IA per il rumore di tutti i giorni, come tastiere e ventole. Basso uso della CPU.",
       "advanced": "Modello IA più recente che rimuove anche il rumore variabile. Circa il triplo della CPU di Standard e 10 ms di ritardo in più."
     },
@@ -214,7 +214,7 @@
     "echoCancellationHint": "Evita che gli altri sentano sé stessi quando usi gli altoparlanti.",
     "autoGain": "Volume automatico",
     "connecting": "Connessione",
-    "connectMuted": "Connettiti silenziato finché non entro in un canale",
+    "connectMuted": "Connetti con microfono disattivato finché non entro in un canale",
     "connectMutedHint": "Se disattivato, ti connetti subito con l'ultima impostazione di microfono e audio, invece di restare solo in ascolto.",
     "autoGainHint": "Mantiene la tua voce a un livello uniforme.",
     "keyListeningMouse": "Premi un tasto o un pulsante del mouse (centrale o laterale)… (Esc per annullare)",
@@ -224,13 +224,13 @@
       "forward": "Pulsante 5 del mouse (avanti)"
     },
     "mouseToggle": "Consenti i pulsanti del mouse (richiede il gruppo input)",
-    "mouseToggleWarning": "Ti permette di usare un pulsante del mouse per il push-to-talk. Per questo devi far parte del gruppo \"input\", che permette a ogni programma che avvii di leggere tutti i dispositivi di input, tastiera compresa. Mumcord apre solo i mouse, osserva solo il tuo pulsante push-to-talk e non registra né salva nulla nei log.",
-    "mouseInputGroup": "Mumcord potrebbe non poter ancora leggere il tuo mouse. Aggiungiti al gruppo \"input\" eseguendo questo comando in un terminale:",
+    "mouseToggleWarning": "Ti permette di usare un pulsante del mouse per il push-to-talk. Per questo devi far parte del gruppo «input», che permette a ogni programma che avvii di leggere tutti i dispositivi di input, tastiera compresa. Mumcord apre solo i mouse, osserva solo il tuo pulsante push-to-talk e non registra né salva nulla nei log.",
+    "mouseInputGroup": "Mumcord potrebbe non poter ancora leggere il tuo mouse. Aggiungiti al gruppo «input» eseguendo questo comando in un terminale:",
     "mouseLogOut": "Poi esci e rientra nella sessione. Fino ad allora, usa un tasto della tastiera o l'attivazione vocale.",
     "mouseNoDevice": "Nessun mouse trovato. Collegane uno; Mumcord lo rileva automaticamente.",
     "mouseAccessibility": "Per usare i pulsanti del mouse, consenti Mumcord in Impostazioni di sistema → Privacy e sicurezza → Accessibilità, poi riavvia Mumcord.",
     "compatMode": "Modalità compatibilità (X11)",
-    "compatModeHint": "Mumcord funziona tramite il livello di compatibilità X11 del tuo desktop, quindi il push-to-talk funziona senza finestre del desktop e senza il gruppo \"input\". È il tuo desktop a decidere cosa Mumcord può vedere: in KDE in Impostazioni di sistema → Supporto per le app X11 legacy. Di default funzionano solo le combinazioni di tasti e i tasti modificatori; i pulsanti del mouse solo se li consenti lì. È meno isolato rispetto al metodo moderno.",
+    "compatModeHint": "Mumcord funziona tramite il livello di compatibilità X11 del tuo desktop, quindi il push-to-talk funziona senza finestre del desktop e senza il gruppo «input». È il tuo desktop a decidere cosa Mumcord può vedere: in KDE in Impostazioni di sistema → Supporto per le app X11 legacy. Di default funzionano solo le combinazioni di tasti e i tasti modificatori; i pulsanti del mouse solo se li consenti lì. È meno isolato rispetto al metodo moderno.",
     "compatRestartNeeded": "Ha effetto dopo il riavvio di Mumcord. Verrai disconnesso per un attimo.",
     "compatRestart": "Riavvia ora",
     "compatRestartFailed": "Mumcord non è riuscito a riavviarsi. Chiudilo e riaprilo tu stesso.",
@@ -242,7 +242,7 @@
     "compatKdeConfirmTitle": "Consentire i pulsanti del mouse?",
     "compatKdeConfirm": "Questo permette alle app X11 in esecuzione in background di vedere la pressione dei pulsanti del mouse. Modifica un'impostazione di KDE (Impostazioni di sistema → Supporto per le app X11 legacy). Puoi annullarla qui in qualsiasi momento.",
     "compatKdeConfirmButton": "Consenti",
-    "compatKdeChangeFailed": "Mumcord non è riuscito a modificare l'impostazione di KDE. Usa invece \"Apri le impostazioni X11 di KDE\".",
+    "compatKdeChangeFailed": "Mumcord non è riuscito a modificare l'impostazione di KDE. Usa invece «Apri le impostazioni X11 di KDE».",
     "compatKdeOpen": "Apri le impostazioni X11 di KDE",
     "compatKdeFailed": "Mumcord non è riuscito ad aprire le impostazioni di KDE. Apri tu Impostazioni di sistema → Supporto per le app X11 legacy.",
     "compatActive": "La modalità compatibilità è attiva: il push-to-talk usa il metodo X11. I tasti funzionano senza finestre del desktop; i pulsanti del mouse funzionano se l'impostazione X11 legacy del tuo desktop li consente.",
@@ -273,7 +273,7 @@
       "links": "Includi i canali collegati",
       "group": "Solo membri di un gruppo (facoltativo)",
       "groupHint": "Un gruppo definito sul server, ad es. admin. È il server a decidere chi ne fa parte.",
-      "noPeople": "In questo momento non c’è nessun altro su questo server.",
+      "noPeople": "In questo momento non c'è nessun altro su questo server.",
       "noServer": "Connettiti a un server per scegliere persone o un canale.",
       "missingChannel": "{{channel}} (non presente su questo server)",
       "summaryPeople_one": "{{count}} persona · sussurro",
@@ -288,7 +288,7 @@
       "keyListening": "Premi un tasto…",
       "keyRemove": "Rimuovi tasto",
       "keyTaken": "Questo tasto non può essere usato: non è un tasto singolo con modificatori facoltativi, oppure è già il push-to-talk o il tasto di un altro destinatario.",
-      "keyFailed": "Questo tasto è occupato da un’altra app, quindi ora non funziona.",
+      "keyFailed": "Questo tasto è occupato da un'altra app, quindi ora non funziona.",
       "keysWayland": "I tasti di sussurro non sono disponibili in questa sessione Wayland: il tuo desktop non offre scorciatoie globali. Attiva la modalità compatibilità per usarli, oppure inizia a sussurrare dal pannello utente.",
       "save": "Salva",
       "delete": "Elimina destinatario",
@@ -361,7 +361,7 @@
       "surface": "Superficie",
       "text": "Testo",
       "accent": "Accento",
-      "talking": "Parla e online",
+      "talking": "In conversazione e online",
       "warning": "Avviso",
       "error": "Errore"
     },
@@ -404,7 +404,7 @@
   "accessibility": {
     "hints": "Accessibilità",
     "keyboardHints": "Mostra suggerimenti da tastiera",
-    "keyboardHintsHint": "Brevi consigli a schermo come “Frecce: sposta” sotto l'elenco dei canali e nelle GIF preferite. Gli screen reader li leggono comunque anche quando è disattivato.",
+    "keyboardHintsHint": "Brevi consigli a schermo come «Frecce: sposta» sotto l'elenco dei canali e nelle GIF preferite. Gli screen reader li leggono comunque anche quando è disattivato.",
     "announcements": "Annunci per lo screen reader",
     "announcementsHint": "Il tuo screen reader legge eventi come persone che entrano, escono o iniziano a parlare.",
     "skipLinks": "Link di salto",
@@ -431,15 +431,15 @@
     "selfDeaf": "Attivi o disattivi il tuo audio",
     "hangUp": "Ti disconnetti da un server",
     "quit": "Esci da Mumcord mentre sei in un canale vocale",
-    "channelSwitch": "Passi a un altro canale mentre sei in voce",
+    "channelSwitch": "Passi a un altro canale mentre sei in un canale vocale",
     "kicked": "Vieni espulso da un server",
-    "banned": "Vieni bannato da un server",
+    "banned": "Vieni bandito da un server",
     "messages": "Nuovo messaggio in un canale seguito o in una chat privata",
     "mention": "Suono quando vieni menzionato",
     "mentionNotify": "Notifica quando vieni menzionato",
-    "partyStarted": "Qualcuno avvia un watch party nel tuo canale",
-    "partyJoined": "Qualcuno entra nel tuo watch party",
-    "partyLeft": "Qualcuno esce dal tuo watch party",
+    "partyStarted": "Qualcuno avvia una watch party nel tuo canale",
+    "partyJoined": "Qualcuno entra nella tua watch party",
+    "partyLeft": "Qualcuno esce dalla tua watch party",
     "shareStarted": "Qualcuno avvia una condivisione schermo nel tuo canale",
     "shareStopped": "Una condivisione schermo nel tuo canale termina",
     "viewerStarted": "Qualcuno inizia a guardare la tua condivisione schermo",
@@ -447,16 +447,20 @@
   },
   "notifications": {
     "title": "Notifiche",
-    "legend": "Notifiche per i nuovi messaggi",
-    "explanation": "Per i nuovi messaggi nel tuo canale, nei canali seguiti e nelle chat private, tranne la chat che stai guardando.",
-    "inApp": "Nell'app: un piccolo pop-up dentro Mumcord quando è in primo piano",
-    "desktop": "Desktop: una notifica di sistema",
-    "both": "Entrambe: pop-up quando Mumcord è in primo piano, altrimenti notifica di sistema",
-    "off": "Disattivate",
+    "explanation": "Come Mumcord ti avvisa dei nuovi messaggi e di ciò che accade sui tuoi server. Puoi scegliere per ogni tipo.",
+    "messages": "Nuovi messaggi",
+    "messagesHint": "Il tuo canale, i canali seguiti e le chat private",
+    "mode": {
+      "off": "Disattivato",
+      "inApp": "Nell'app",
+      "desktop": "Sistema",
+      "both": "Entrambe"
+    },
+    "modesHint": "Nell'app: un piccolo pop-up dentro Mumcord quando è in primo piano. Sistema: una notifica del tuo sistema operativo. Entrambe: il pop-up quando Mumcord è in primo piano, altrimenti una notifica di sistema. Non viene mostrato nulla per la chat che stai guardando né durante Non disturbare.",
     "activityTitle": "Notifiche di attività",
     "activity": {
       "screenShare": "Qualcuno avvia una condivisione schermo",
-      "watchParty": "Qualcuno avvia un watch party",
+      "watchParty": "Qualcuno avvia una watch party",
       "pluginActivity": "Qualcuno avvia un'attività di un plugin",
       "pluginEvent": "Eventi dei plugin",
       "joins": "Qualcuno si connette, esce o cambia canale"
@@ -473,9 +477,9 @@
     },
     "opacity": "Opacità",
     "inGame": {
-      "title": "Overlay nel gioco",
+      "title": "Overlay in gioco",
       "explanation": "Mostra chi sta parlando dentro i tuoi giochi. Si avvia da solo quando parte un gioco e appare solo nei giochi.",
-      "mode": "Overlay nel gioco",
+      "mode": "Overlay in gioco",
       "off": "Disattivato",
       "on": "Attivo",
       "antiCheat": "Alcuni giochi con protezione anti-cheat considerano qualsiasi overlay un imbroglio e possono bannare l'account. Questi giochi sono disattivati di default, anche quando questa opzione è su Attivo.",
@@ -489,9 +493,9 @@
       "options": "Opzioni per {{game}}",
       "reset": "Usa il predefinito per {{game}}",
       "size": "Dimensione",
-      "unsupported": "L'overlay nel gioco non è disponibile su questo sistema. Viene usato l'overlay in finestra qui sopra.",
-      "loadFailed": "Non è stato possibile caricare le impostazioni dell'overlay nel gioco.",
-      "saveFailed": "Non è stato possibile applicare la modifica dell'overlay nel gioco.",
+      "unsupported": "L'overlay in gioco non è disponibile su questo sistema.",
+      "loadFailed": "Non è stato possibile caricare le impostazioni dell'overlay in gioco.",
+      "saveFailed": "Non è stato possibile applicare la modifica dell'overlay in gioco.",
       "opengl": {
         "title": "Giochi OpenGL",
         "explanation": "Serve solo per i giochi OpenGL: incollalo nelle opzioni di avvio Steam del gioco.",
@@ -504,9 +508,9 @@
       "confirmMessage": "Attenzione: {{game}} usa una protezione anti-cheat ({{reason}}). Gli overlay possono essere scambiati per imbrogli e il tuo account potrebbe essere bannato. Mumcord non è responsabile. Continua solo se accetti questo rischio.",
       "confirmEnable": "Attiva comunque",
       "limits": {
-        "libraryMissing": "L'overlay nel gioco non è disponibile: la sua libreria (libmumcord_overlay_layer.so) non è stata trovata accanto a Mumcord. Reinstalla Mumcord per ripristinarla. Viene usato l'overlay in finestra qui sopra.",
+        "libraryMissing": "L'overlay in gioco non è disponibile: la sua libreria (libmumcord_overlay_layer.so) non è stata trovata accanto a Mumcord. Reinstalla Mumcord per ripristinarla.",
         "windowsFullscreen": "Usa nel gioco lo schermo intero senza bordi o in finestra.",
-        "macos": "macOS non supporta gli overlay nel gioco. Viene usato l'overlay in finestra qui sopra."
+        "macos": "macOS non supporta gli overlay in gioco."
       }
     }
   },
@@ -530,7 +534,20 @@
     "copyWhole": "Copia tutto il registro",
     "openLogFolder": "Apri la cartella dei registri",
     "logCopied": "Registro copiato.",
-    "fileLabel": "File di diagnostica"
+    "fileLabel": "File diagnostico",
+    "writeToDisk": "Scrivi i registri su disco",
+    "writeToDiskHint": "Disattivato tiene il registro solo in memoria per questa sessione: non viene scritto nulla su disco.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Versione",
@@ -547,14 +564,25 @@
     "showNotices": "Mostra licenze di terze parti",
     "noticesFailed": "Impossibile aprire le licenze di terze parti.",
     "loading": "Caricamento…",
-    "devToolsUnlocked": "Strumenti per sviluppatori sbloccati: l’ispettore pacchetti è ora nell’elenco delle impostazioni.",
+    "devToolsUnlocked": "Strumenti per sviluppatori sbloccati: l'ispettore pacchetti è ora nell'elenco delle impostazioni.",
     "portable": "Portatile",
     "setup": "Configurazione",
     "setupWizardHint": "Rifai la configurazione iniziale per rivedere microfono, scelte sulla privacy, controllo aggiornamenti e modalità di conversazione. I valori attuali sono già inseriti.",
     "setupWizardRun": "Ripeti la procedura guidata",
     "setupWizardIdentityNote": "La tua identità non ne fa parte. Il tuo certificato, e con esso il nome registrato e i permessi sui server, resta esattamente com'è.",
     "setupWizardIdentityLink": "Gestiscila in Identità",
-    "versionTitle": "Versione e licenza"
+    "tipsTitle": "Suggerimenti",
+    "tipsHint": "Aaron ti mostra Mumcord in circa un minuto: server, canali, come parlare, chat e altro ancora.",
+    "tipsShow": "Mostra suggerimenti",
+    "versionTitle": "Versione e licenza",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profilo",
@@ -576,7 +604,7 @@
   "nowPlaying": {
     "title": "In riproduzione",
     "switch": "Condividi cosa sto ascoltando",
-    "hint": "Mumcord legge il brano attuale dal lettore multimediale del tuo sistema (ad esempio Spotify) – nessun login a Spotify necessario. Gli altri utenti Mumcord vedono titolo, artista, copertina e avanzamento; i client Mumble ufficiali vedono una riga \"🎵 Artista – Titolo\" alla fine del tuo commento.",
+    "hint": "Mumcord legge il brano attuale dal lettore multimediale del tuo sistema (ad esempio Spotify) – nessun login a Spotify necessario. Gli altri utenti Mumcord vedono titolo, artista, copertina e avanzamento; i client Mumble ufficiali vedono una riga «🎵 Artista – Titolo» alla fine del tuo commento.",
     "unsupported": "Non supportato su macOS: il sistema non offre alle app un modo per leggere il brano attuale.",
     "current": "Stai condividendo: {{track}}",
     "nothing": "Al momento non è in riproduzione nulla."
@@ -613,7 +641,7 @@
   "nowGaming": {
     "title": "In gioco",
     "switch": "Condividi il gioco a cui sto giocando",
-    "hint": "Mumcord cerca giochi molto noti tra i programmi in esecuzione e il gioco che Steam sta eseguendo. Gli altri utenti Mumcord vedono il gioco, la sua immagine e da quanto tempo giochi, e possono unirsi al tuo server quando il gioco ne offre uno; i client Mumble ufficiali vedono una riga \"🎮 Gioco\" alla fine del tuo commento.",
+    "hint": "Mumcord cerca giochi molto noti tra i programmi in esecuzione e il gioco che Steam sta eseguendo. Gli altri utenti Mumcord vedono il gioco, la sua immagine e da quanto tempo giochi, e possono entrare nel tuo server quando il gioco ne offre uno; i client Mumble ufficiali vedono una riga «🎮 Gioco» alla fine del tuo commento.",
     "unsupported": "Non supportato su questo sistema.",
     "current": "Stai condividendo: {{game}}",
     "nothing": "Nessun gioco rilevato al momento."
@@ -655,7 +683,7 @@
   },
   "appearanceEffects": {
     "visualEffects": "Grana pellicola",
-    "visualEffectsHint": "Una leggera grana pellicola sopra l’interfaccia. Disattivata automaticamente quando il sistema chiede meno trasparenza o movimento."
+    "visualEffectsHint": "Una leggera grana pellicola sopra l'interfaccia. Disattivata automaticamente quando il sistema chiede meno trasparenza o movimento."
   },
   "channelList": {
     "title": "Elenco canali",
@@ -692,8 +720,8 @@
     "title": "Strumenti per sviluppatori",
     "intro": "Mostra i pacchetti che Mumcord invia e riceve, soprattutto dati dei plugin di Mumcord, per il debug. Vengono conservati solo gli ultimi 2.000 pacchetti, in memoria su questo dispositivo; nulla viene registrato o inviato altrove.",
     "devTools": "Strumenti per sviluppatori",
-    "devToolsHint": "Disattiva per nascondere di nuovo l’ispettore pacchetti e interrompere l’acquisizione.",
-    "open": "Apri l’ispettore pacchetti",
+    "devToolsHint": "Disattiva per nascondere di nuovo l'ispettore pacchetti e interrompere l'acquisizione.",
+    "open": "Apri l'ispettore pacchetti",
     "filters": "Filtri ed esportazione",
     "server": "Server",
     "allServers": "Tutti i server",
@@ -786,7 +814,7 @@
     "collapseAll": "Comprimi tutto",
     "shown": "Mostrati: {{shown}} di {{total}}",
     "empty": "Nessun componente corrisponde alla ricerca.",
-    "loadFailed": "Impossibile caricare l’elenco delle licenze.",
+    "loadFailed": "Impossibile caricare l'elenco delle licenze.",
     "repository": "Repository:",
     "copy": "Copia testo della licenza",
     "copied": "Testo della licenza copiato",
@@ -837,7 +865,7 @@
     "keepRequests": "Conserva i messaggi dei client standard come richieste di messaggi",
     "keepRequestsHint": "Usata solo con «Solo amici». Se disattivata, questi messaggi vengono scartati.",
     "overrideTitle": "Eccezione per server",
-    "overrideLabel": "Messaggi privati da su {{server}}",
+    "overrideLabel": "Messaggi privati su {{server}} da",
     "useDefault": "Usa il valore predefinito ({{rule}})",
     "noServers": "Nessun server salvato per ora.",
     "alwaysTitle": "Sempre consentiti",
@@ -899,14 +927,24 @@
     "modeNotify": "Solo notifica",
     "modeOff": "Disattivato",
     "autoUnavailable": "Questa copia non può aggiornarsi da sola, quindi Mumcord ti avvisa soltanto delle nuove versioni.",
+    "channel": "Canale di aggiornamento",
+    "channelHint": "Scegli quali versioni offre Mumcord. Le release candidate sono build iniziali della prossima versione.",
+    "channels": {
+      "stable": { "name": "Stabile", "hint": "Solo versioni finali" },
+      "releaseCandidates": {
+        "name": "Release candidate",
+        "hint": "Build iniziali della prossima versione; possono contenere errori"
+      }
+    },
+    "channelSwitchBack": "Tornando a Stabile, mantieni la versione attuale finché non esce la prossima versione finale.",
     "interval": "Cerca aggiornamenti",
     "intervalHint_one": "All'avvio e ogni ora",
-    "intervalHint_many": "All'avvio e ogni {{count}} ore",
-    "intervalHint_other": "All'avvio e ogni {{count}} di ore",
+    "intervalHint_many": "All'avvio e ogni {{count}} di ore",
+    "intervalHint_other": "All'avvio e ogni {{count}} ore",
     "intervalWeekHint": "All'avvio e una volta a settimana",
     "intervalHours_one": "Ogni ora",
-    "intervalHours_many": "Ogni {{count}} ore",
-    "intervalHours_other": "Ogni {{count}} di ore",
+    "intervalHours_many": "Ogni {{count}} di ore",
+    "intervalHours_other": "Ogni {{count}} ore",
     "intervalWeek": "Una volta a settimana",
     "state": {
       "idle": "Non ancora controllato",
@@ -933,7 +971,7 @@
     "stopSkipping": "Smetti di saltare",
     "whatsNew": "Novità",
     "whatsNewHint": "Guarda le modifiche di ogni versione.",
-    "openChangelog": "Apri il registro delle modifiche"
+    "openChangelog": "Apri l'elenco delle modifiche"
   },
   "badges": {
     "changed": "Modificato",
@@ -972,7 +1010,7 @@
     "everythingOn": {
       "name": "Tutto attivo",
       "tagline": "Tutte le funzioni",
-      "point1": "Gli altri vedono cosa giochi e cosa ascolti",
+      "point1": "Gli altri vedono a cosa giochi e cosa ascolti",
       "point2": "Il tuo IP è visibile alle persone a cui ti connetti direttamente",
       "point3": "Chiunque può scriverti; link e immagini vengono caricati dal web",
       "point4": "Overlay, sincronizzazione della cronologia e immagini a dimensione intera sono attivi"
@@ -983,7 +1021,7 @@
       "point1": "Solo gli amici e le persone nel tuo canale possono scriverti",
       "point2": "Connessione diretta, con un relay come alternativa",
       "point3": "Anteprime dei link e immagini a dimensione intera sono attive",
-      "point4": "Ciò che giochi e ascolti resta privato"
+      "point4": "Ciò a cui giochi e ciò che ascolti resta privato"
     },
     "maximumPrivacy": {
       "name": "Privacy massima",
@@ -1022,10 +1060,10 @@
     "imagesOff": "Le immagini a dimensione intera non vengono scambiate.",
     "historyOn": "La sincronizzazione della cronologia è attiva: condividi la cronologia dei tuoi canali con altri utenti di Mumcord.",
     "historyOff": "La sincronizzazione della cronologia è disattivata.",
-    "sharingBoth": "Gli altri vedono cosa giochi e cosa ascolti.",
+    "sharingBoth": "Gli altri vedono a cosa giochi e cosa ascolti.",
     "sharingPlaying": "Gli altri vedono cosa ascolti.",
     "sharingGaming": "Gli altri vedono il gioco a cui giochi.",
-    "sharingNone": "Ciò che giochi e ascolti resta privato.",
+    "sharingNone": "Ciò a cui giochi e ciò che ascolti resta privato.",
     "change": "Modifica",
     "changeLabel": "Modifica: {{topic}}"
   },
@@ -1041,7 +1079,7 @@
     "actions": "Azioni",
     "action": {
       "pushToTalk": "Push-to-talk",
-      "toggleMute": "Silenzia / riattiva il microfono",
+      "toggleMute": "Disattiva / riattiva il microfono",
       "toggleDeafen": "Disattiva / riattiva l'audio",
       "toggleDnd": "Attiva / disattiva Non disturbare",
       "joinLeaveVoice": "Entra / esci dalla voce",
@@ -1077,7 +1115,7 @@
       "closeWindow": "la chiusura di una finestra"
     },
     "assignHere": "Assegna qui",
-    "rejected": "Questo tasto non può essere una scorciatoia globale. Premi un tasto diverso da Ctrl, Alt, Shift o Super, con o senza di essi.",
+    "rejected": "Questo tasto non può essere una scorciatoia globale. Premi un tasto diverso da Ctrl, Alt, Maiusc o Super, con o senza di essi.",
     "failed": "Impossibile registrare questa scorciatoia. Forse un'altra app o il tuo desktop la usa già.",
     "add": "Aggiungi scorciatoia «passa al canale»…",
     "addChannel": "Canale",
@@ -1098,7 +1136,7 @@
     "title": "Sicurezza dei plugin",
     "blockHighRisk": "Non consentire plugin ad alto rischio",
     "hint": "Nasconde il pulsante Installa per i plugin con un punteggio di 60 o più e blocca gli aggiornamenti che porterebbero un plugin installato a quel livello. I plugin già installati continuano a funzionare.",
-    "note": "Disattivato per impostazione predefinita. I plugin ufficiali e quelli per sviluppatori non sono mai interessati. I punteggi sono stime, non una garanzia."
+    "note": "Disattivato per impostazione predefinita. I plugin ufficiali e quelli per sviluppatori non sono mai coinvolti. I punteggi sono stime, non una garanzia."
   },
   "pluginSounds": {
     "title": "Suoni dei plugin",
@@ -1177,7 +1215,7 @@
     "sendQualityAuto": "Automatico",
     "sendQuality720": "720p · 15 fps",
     "sendQuality360": "360p · 30 fps",
-    "sendQualityHint": "Auto (fino a 720p · 30 fps) invia solo ciò che serve a chi guarda: più piccolo in una griglia ampia, più nitido quando qualcuno ti fissa.",
+    "sendQualityHint": "Automatico (fino a 720p · 30 fps) invia solo ciò che serve a chi guarda: più piccolo in una griglia grande, più nitido quando qualcuno ti fissa in primo piano.",
     "mirror": "Specchia la mia immagine",
     "mirrorHint": "Solo la tua immagine è specchiata. Gli altri ti vedono dal verso giusto.",
     "backgroundTitle": "Sfondo",
@@ -1191,9 +1229,9 @@
     "blurStrong": "Forte",
     "effectQuality": "Qualità degli effetti",
     "effectAuto": "Automatico",
-    "effectBest": "Massima (scheda grafica)",
+    "effectBest": "Massima (scheda video)",
     "effectLight": "Leggera (risparmia batteria)",
-    "effectHint": "Auto usa la scheda grafica quando può e passa a Leggera a batteria o quando il PC è occupato.",
+    "effectHint": "Auto usa la scheda video quando può e passa a Leggera a batteria o quando il PC è occupato.",
     "ownImages_one": "Le tue immagini di sfondo restano su questo dispositivo (salvate: {{count}}). Viene inviata solo l'immagine finale.",
     "ownImages_many": "Le tue immagini di sfondo restano su questo dispositivo (salvate: {{count}}). Viene inviata solo l'immagine finale.",
     "ownImages_other": "Le tue immagini di sfondo restano su questo dispositivo (salvate: {{count}}). Viene inviata solo l'immagine finale.",
@@ -1217,7 +1255,7 @@
     "showAlways": "Sempre",
     "showOnOpen": "Quando apro la stanza",
     "showNever": "Mai",
-    "showHint": "Sempre apre la stanza delle fotocamere quando qualcuno nel tuo canale ne accende una. Mai ti lascia solo in voce e non scarica video.",
+    "showHint": "«Sempre» apre la stanza delle fotocamere quando qualcuno nel tuo canale ne accende una. «Mai» ti lascia solo in voce e non scarica video.",
     "dataSaver": "Risparmio dati: fino a 15 fps per tutti",
     "reduceMotion": "Riduci movimento: nessun alone né animazione sulla cornice di chi parla",
     "reduceMotionHint": "Per impostazione predefinita segue l'impostazione di riduzione del movimento del sistema.",
@@ -1232,7 +1270,7 @@
     "imageImportFailed": "Questa immagine non può essere usata. Usa un file PNG, JPEG o WebP fino a 10 MB."
   },
   "crashReports": {
-    "title": "Segnalazioni di arresto anomalo",
+    "title": "Rapporti di arresto anomalo",
     "info": "Quando Mumcord si chiude in modo imprevisto, salva un breve rapporto: ora, versione, sistema, cosa è andato storto e le ultime righe del log. I rapporti restano su questo computer e vengono inviati solo quando segnali tu stesso un crash. Mumcord conserva gli ultimi 10.",
     "listLabel": "Rapporti di arresto anomalo salvati",
     "emptyTitle": "Nessun rapporto di arresto anomalo",
@@ -1266,21 +1304,21 @@
     "confirmDeleteAllText_many": "{{count}} di rapporti verranno rimossi da questo computer.",
     "confirmDeleteAllText_other": "{{count}} rapporti verranno rimossi da questo computer.",
     "noticeTitle": "Mumcord si è chiuso in modo imprevisto",
-    "noticeText": "Un rapporto di crash è stato salvato su questo computer. Viene inviato solo se segnali il crash. Copiarlo in una segnalazione di bug o segnalare il crash ci aiuta a risolvere il problema.",
+    "noticeText": "Un rapporto di arresto anomalo è stato salvato su questo computer. Viene inviato solo se segnali il crash. Copiarlo in una segnalazione di bug o segnalare il crash ci aiuta a risolvere il problema.",
     "copyForBug": "Copia per una segnalazione di bug",
     "noticeCopied": "Copiato. Incollalo nella segnalazione di bug.",
     "actionFailed": "Non ha funzionato. Riprova o apri la cartella.",
     "reportText": "Testo del rapporto",
     "upload": "Segnala il crash…",
     "uploadLabel": "Segnala al team di Mumcord il crash del {{when}}",
-    "uploaded": "Caricata",
+    "uploaded": "Inviato",
     "uploadTitle": "Inviare la segnalazione di arresto anomalo al team di Mumcord?",
     "uploadWhat": "Cosa verrà inviato",
     "uploadComment": "Cosa stavi facendo? (facoltativo)",
     "uploadCommentPlaceholder": "Per esempio: stavo guardando uno schermo condiviso quando l'app si è chiusa.",
     "uploadWhere": "Inviata a crash.mumcord.app tramite una connessione cifrata. Conservata per 90 giorni.",
     "uploadSharedLabel": "Condiviso:",
-    "uploadShared": "la versione di Mumcord, cosa è andato storto, quali funzioni erano in uso, le ultime righe del registro e i dettagli del tuo sistema (sistema operativo, kernel, desktop, processore, scheda grafica, memoria, risoluzioni dello schermo). Nulla di tutto ciò riporta il tuo nome, ma insieme questi dettagli possono identificare questo computer.",
+    "uploadShared": "la versione di Mumcord, cosa è andato storto, quali funzioni erano in uso, le ultime righe del registro e i dettagli del tuo sistema (sistema operativo, kernel, desktop, processore, scheda video, memoria, risoluzioni dello schermo). Nulla di tutto ciò riporta il tuo nome, ma insieme questi dettagli possono identificare questo computer.",
     "uploadSend": "Invia segnalazione",
     "uploadSending": "Invio in corso…",
     "uploadDone": "Segnalazione inviata. Grazie!",
@@ -1288,11 +1326,23 @@
   },
   "activityHistory": {
     "title": "Cronologia attività",
+    "keep": "Mantieni la cronologia attività dopo il riavvio",
+    "keepHint": "Salva chi si è connesso, è uscito, ha cambiato canale, ha condiviso lo schermo o ha avviato una watch party, così il feed resta anche dopo il riavvio. Disattivato: il feed parte vuoto ogni volta. Disattivandolo, ciò che era stato salvato viene eliminato.",
     "clear": "Cancella cronologia attività",
     "hint": "Rimuove il feed salvato di tutti i server.",
     "local": "Salvato solo su questo dispositivo.",
     "button": "Cancella cronologia",
     "confirm": "Cancellare la cronologia attività di tutti i server? L'operazione non può essere annullata.",
     "confirmButton": "Cancella"
+  },
+  "diskWrites": {
+    "title": "Riduci le scritture su disco",
+    "hint": "Meno scritture usurano meno gli SSD. Ogni interruttore mantiene il comportamento attuale quando è attivo.",
+    "durableSaves": "Attendi il disco a ogni salvataggio",
+    "durableSavesHint": "Disattivato scrive meno, ma un'interruzione di corrente può far perdere gli ultimi secondi di cronologia e impostazioni.",
+    "linkPreviewsOnDisk": "Tieni le anteprime dei link su disco",
+    "linkPreviewsOnDiskHint": "Disattivato tiene le anteprime solo in memoria per questa sessione.",
+    "pluginRegistryCache": "Tieni una copia del registro dei plugin su disco",
+    "pluginRegistryCacheHint": "Disattivato scarica sempre di nuovo il registro."
   }
 }

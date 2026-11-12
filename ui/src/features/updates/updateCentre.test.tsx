@@ -8,7 +8,12 @@ import { getCentreState } from "../notifications/centreStore";
 import { Updater } from "./Updater";
 import type { UpdateActions } from "./UpdateDialog";
 
-const offer = { version: "0.4.5", url: "https://example.com/releases/v0.4.5", notes: [] };
+const offer = {
+  version: "0.4.5",
+  url: "https://example.com/releases/v0.4.5",
+  notes: [],
+  channel: "stable" as const,
+};
 let api: MockApi;
 
 function fakeActions(): UpdateActions {

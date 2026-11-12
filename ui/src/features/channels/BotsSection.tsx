@@ -31,13 +31,14 @@ export function BotsSection({ state }: { state: ServerState }) {
 
   const describe = (bot: User): string => {
     const known = new Set(BOT_MODULES);
-    const parts = orderedModules(bot.bot?.modules ?? []).map((module) =>
+    const modules = orderedModules(bot.bot?.modules ?? []).map((module) =>
       known.has(module) ? t(`bots.modules.${module}`) : module,
     );
+    // Every bot shows its channel, hidden ones too: a bot that claims "no voice" may still
+    // listen in a channel, so the list must not hide where it is. The channel comes first so
+    // the ellipsis never cuts it off. Channel names are untrusted: rendered as plain text only.
     const channel = state.channels.get(bot.channelId);
-    if (bot.bot?.voice === true && channel) {
-      parts.push(t("bots.inChannel", { channel: channel.name }));
-    }
+    const parts = channel ? [t("bots.inChannel", { channel: channel.name }), ...modules] : modules;
     return parts.join(" · ");
   };
 

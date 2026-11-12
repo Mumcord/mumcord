@@ -1,6 +1,7 @@
 /** Shared state between `ChannelTree` and its memoised rows (`treeRows`). */
 import { createContext, type ReactNode } from "react";
 import type { User } from "../../api";
+import type { ChannelMovePlan } from "./channelDrag";
 import type { ServerState } from "./serverStore";
 
 /** A value that rows read through selectors; setting it notifies them. */
@@ -60,6 +61,8 @@ export interface TreeActions {
   openMenu: (channelId: number, position: { x: number; y: number }) => void;
   /** Moves dragged people into a channel (issues #172, #255). */
   movePeople: (sessions: readonly number[], channelId: number) => void;
+  /** Moves or reorders a dragged channel (issue #676). */
+  moveChannel: (plan: ChannelMovePlan) => void;
   /** Ctrl/Shift-click on a person row (issue #255). */
   selectPerson: (session: number, mode: PersonSelectMode) => void;
   /** Pure factories of self-updating content (e.g. the unread badge); see `ChannelTreeProps`. */

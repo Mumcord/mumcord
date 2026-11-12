@@ -18,6 +18,7 @@ export type WizardStepId =
   | "voice"
   | "setupStyle"
   | "privateMessages"
+  | "notifications"
   | "connections"
   | "features"
   | "appearance"
@@ -27,6 +28,7 @@ export type WizardStepId =
 /** The detailed steps only Custom walks through; the rail tags them "Custom". */
 export const CUSTOM_STEPS: readonly WizardStepId[] = [
   "privateMessages",
+  "notifications",
   "connections",
   "features",
   "appearance",

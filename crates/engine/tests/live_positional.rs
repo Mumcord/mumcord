@@ -1,7 +1,8 @@
 //! Positional audio against the local 1.5 test server (FR-1.41, FR-1.72, AC-1.31, AC-1.55).
 //! `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_positional -- --ignored --nocapture --test-threads=1`
-#![cfg(feature = "test-backend")]
+// FreeBSD: see the note on the mumbot dev-dependency in Cargo.toml.
+#![cfg(all(feature = "test-backend", not(target_os = "freebsd")))]
 
 mod common;
 

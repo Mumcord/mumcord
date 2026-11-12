@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Mumcord
+Comment=Voice chat compatible with Mumble
+Exec=/usr/local/bin/mumcord %u
+Icon=app.mumcord.client
+Terminal=false
+Categories=Network;Chat;AudioVideo;
+MimeType=x-scheme-handler/mumble;x-scheme-handler/mumcord;
+# Matches the window's app id, so the taskbar groups the window under this entry.
+StartupWMClass=app.mumcord.client

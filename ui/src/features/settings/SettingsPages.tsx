@@ -1,6 +1,12 @@
 import { SettingsImport } from "../mumbleImport/SettingsImport";
 import { WhisperTargetsGroup } from "../whisper/WhisperTargetsGroup";
-import { LicencesCard, SetupCard, SupportCard, VersionCard } from "./sections/AboutSection";
+import {
+  LicencesCard,
+  SetupCard,
+  SupportCard,
+  TipsCard,
+  VersionCard,
+} from "./sections/AboutSection";
 import { AccessibilityCard } from "./sections/AccessibilitySection";
 import { AcceptedConversationsGroup } from "./sections/AcceptedConversationsGroup";
 import { ChannelListCard, LookCard, StartupCard, ThemeCard } from "./sections/AppearanceSection";
@@ -8,6 +14,7 @@ import { DevicesCard, MicTestCard } from "./sections/AudioSection";
 import { BlockedMessagesGroup, BlockedUsersGroup } from "./sections/BlockedUsersGroup";
 import { BetaFeaturesCard } from "./sections/BetaFeaturesCard";
 import { CacheGroup } from "./sections/CacheGroup";
+import { DiskWritesGroup } from "./sections/DiskWritesGroup";
 import {
   ExternalContentCard,
   HistorySyncCard,
@@ -117,7 +124,7 @@ export function SettingsPageCards({
           <ConnectionsCard {...props} />
           <ExternalContentCard {...props} />
           <HistorySyncCard {...props} />
-          <ActivityHistoryCard />
+          <ActivityHistoryCard {...props} />
         </>
       );
     case "plugins":
@@ -186,6 +193,7 @@ export function SettingsPageCards({
           <CrashReportsCard />
           <DiagnosticsCard {...props} />
           <CacheGroup />
+          <DiskWritesGroup {...props} />
           <LicencesCard />
         </>
       );
@@ -195,6 +203,7 @@ export function SettingsPageCards({
           <VersionCard {...props} />
           <SupportCard />
           <SetupCard />
+          <TipsCard />
         </>
       );
   }

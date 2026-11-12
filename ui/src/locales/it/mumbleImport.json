@@ -32,7 +32,7 @@
     "validUntil": "valido fino al {{date}}",
     "passwordNeeded": "Password necessaria",
     "already": "Già in Mumcord",
-    "password": "Password del certificato in Mumble",
+    "password": "Password del certificato di Mumble",
     "passwordRequired": "Inserisci la password del certificato.",
     "wrongPassword": "Questa password non apre il certificato. Riprova."
   },
@@ -43,7 +43,7 @@
     "missing": "I dispositivi di Mumble non sono collegati a questo computer."
   },
   "ptt": {
-    "title": "Tasto push-to-talk",
+    "title": "Tasto Push-to-talk",
     "modifierOnly": "Il tasto di Mumble è solo un tasto modificatore, che Mumcord non può usare. Potrai scegliere un tasto più tardi.",
     "tooManyKeys": "La scorciatoia di Mumble ha più di un tasto, cosa che Mumcord non può usare. Potrai scegliere un tasto più tardi.",
     "unknown": "La scorciatoia di Mumble usa un tasto o un dispositivo che Mumcord non conosce. Potrai scegliere un tasto più tardi."
@@ -85,7 +85,7 @@
     "identityServers": "Usata per i server copiati",
     "identitySkipped": "Identità già in Mumcord",
     "identitySkippedDetail": "Questo certificato è già una delle tue identità",
-    "devicesAndPtt": "Dispositivi audio e tasto push-to-talk",
+    "devicesAndPtt": "Dispositivi audio e tasto Push-to-talk",
     "done": "Fatto",
     "undo": "Annulla importazione",
     "undone": "L'importazione è stata annullata.",

@@ -9,14 +9,14 @@
   "groupedPrivate_other": "{{count}} nye beskeder fra {{name}}",
   "image": "Sendte et billede",
   "open": "Åbn chat",
-  "close": "Afvis notifikation",
+  "close": "Luk notifikation",
   "mentionLine": "{{sender}} omtalte dig: {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
     "title": "Notifikationer",
     "bellUnread_one": "Notifikationer, {{count}} ulæst",
     "bellUnread_other": "Notifikationer, {{count}} ulæste",
-    "shortcut": "Ctrl+Skift+N",
+    "shortcut": "Ctrl+Shift+N",
     "markAllRead": "Markér alle som læst",
     "filterLabel": "Vis notifikationer",
     "filter": {
@@ -41,7 +41,7 @@
     "messageRequestBody_one": "{{count}} besked fra en almindelig Mumble-klient",
     "messageRequestBody_other": "{{count}} beskeder fra en almindelig Mumble-klient",
     "invite": {
-      "watchParty": "{{name}} inviterede dig til en watch party",
+      "watchParty": "{{name}} inviterede dig til en fællesvisning",
       "screenShare": "{{name}} deler sin skærm",
       "card": "{{name}} sendte dig et kort",
       "theme": "{{name}} delte et tema med dig"
@@ -55,7 +55,7 @@
       "connection": "Forbindelse",
       "update": "Opdatering"
     },
-    "accept": "Accepter",
+    "accept": "Acceptér",
     "decline": "Afvis",
     "join": "Deltag",
     "watch": "Se med",
@@ -63,7 +63,7 @@
     "dismiss": "Luk",
     "dismissItem": "Luk: {{title}}",
     "failed": "Det virkede ikke. Prøv igen.",
-    "block": "Bloker",
+    "block": "Blokér",
     "update": {
       "title": "Mumcord {{version}} er klar",
       "body": "Genstart for at opdatere",
@@ -75,5 +75,9 @@
       "body": "Skærm- og fildeling er sat på pause, indtil du stoler på det nye relæ.",
       "decision": "Kræver din beslutning"
     }
+  },
+  "suppressionFallback": {
+    "title": "Støjdæmpning er for langsom",
+    "text": "For langsom på denne computer lige nu. Bruger “{{standard}}”, indtil den kan følge med."
   }
 }

@@ -1,4 +1,3 @@
-import { open } from "@tauri-apps/plugin-dialog";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
@@ -41,12 +40,9 @@ export function FileSharingSettings({ settings, update }: SettingsSectionProps) 
 
   const change = async () => {
     try {
-      const picked = await open({
-        title: t("settings.saveTo"),
-        directory: true,
-        multiple: false,
-        ...(folder === "" ? {} : { defaultPath: folder }),
-      });
+      // The engine opens the folder picker and stores the choice itself; the page cannot set
+      // the folder. Updating the record here only shows the new folder.
+      const picked = await getApi().filesSaveFolderChoose(t("settings.saveTo"));
       if (picked !== null) update({ filesSaveFolder: picked });
     } catch (error) {
       console.error("Could not pick the save folder", error);

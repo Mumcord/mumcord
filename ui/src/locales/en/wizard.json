@@ -33,6 +33,7 @@
     "voice": "Voice",
     "setupStyle": "Setup style",
     "privateMessages": "Private messages",
+    "notifications": "Notifications",
     "connections": "Connections",
     "features": "Features",
     "appearance": "Appearance",
@@ -146,6 +147,10 @@
     "subtitle": "Private messages are one-to-one chats. Channel chat isn't affected by this choice.",
     "local": "Filtering happens on your computer. Senders aren't told. You can set a different rule per server later."
   },
+  "notifications": {
+    "title": "How should Mumcord tell you?",
+    "subtitle": "Pick how each kind of news reaches you. You can change it later in Settings → Notifications."
+  },
   "connections": {
     "title": "Connections and content",
     "subtitle": "Some features connect you straight to other Mumcord users, and some chat content loads from other websites. Choose what's OK for you.",
@@ -185,6 +190,7 @@
       "identity": "Identity",
       "voice": "Voice",
       "privateMessages": "Private messages",
+      "notifications": "Notifications",
       "connections": "Connections",
       "chatContent": "Chat content",
       "features": "Features",
@@ -195,10 +201,12 @@
     "identityDetail": "Saved in your system keychain",
     "voiceDetail": "Noise suppression: {{noise}}",
     "pmDetail": "My channel {{channel}} · accepted chats {{accepted}} · requests {{requests}}",
+    "notificationsTitle": "New messages: {{mode}}",
+    "notificationsDetail": "Activity notifications: {{on}} of {{total}} on",
     "contentTitle": "Link previews {{previews}}",
     "contentDetail": "Full-size images {{images}} · history sync {{sync}}",
     "featuresTitle": "In-game overlay {{overlay}}",
-    "featuresDetail": "Follow system Do Not Disturb {{dnd}} · now playing {{playing}} · now gaming {{gaming}}",
+    "featuresDetail": "Follow system Do Not Disturb {{dnd}} · now playing {{playing}} · now gaming {{gaming}} · activity history {{history}}",
     "effectsDetail": "Visual effects {{effects}}",
     "startupTitle": "Start at login {{login}}",
     "startupDetail": "Start minimized {{minimized}} · mumble:// links {{links}}",
@@ -220,5 +228,39 @@
     "discardBody": "Nothing you changed is saved before you finish. Cancel now and everything stays as it is.",
     "discardKeep": "Keep editing",
     "discardConfirm": "Discard changes"
+  },
+  "guide": {
+    "label": "Tip from Aaron",
+    "from": "Tip from Aaron",
+    "hide": "Hide Aaron",
+    "show": "Show Aaron",
+    "titles": {
+      "welcome": "Welcome aboard",
+      "import": "Bring your Mumble stuff",
+      "identity": "Your name on servers",
+      "voice": "Pick your microphone",
+      "setupStyle": "Choose a style",
+      "privateMessages": "Who may message you",
+      "notifications": "Your notifications",
+      "connections": "Direct connections",
+      "features": "Pick your extras",
+      "appearance": "Choose your look",
+      "startup": "Starting Mumcord",
+      "summary": "Check your choices"
+    },
+    "hints": {
+      "welcome": "Hi, I'm Aaron! I'll walk you through the setup. It only takes a minute.",
+      "import": "These are the servers and settings found in Mumble. Pick what you want to keep.",
+      "identity": "Your identity is your name on servers. Create a new one or import an existing one.",
+      "voice": "Choose the mic you talk into right here, then say hi: the green bar should dance.",
+      "setupStyle": "Pick a style. You can change every single setting later.",
+      "privateMessages": "Choose who may send you private messages. Senders are never told.",
+      "notifications": "Pick how each kind of news reaches you, or turn it off.",
+      "connections": "Choose whether Mumcord may connect you straight to other Mumcord users.",
+      "features": "Turn on only the extras you like. Each card says who can see it.",
+      "appearance": "Light, dark or like your system: pick your look here.",
+      "startup": "Choose how Mumcord starts when you log in to your computer.",
+      "summary": "All set! Check your choices here; Edit takes you back to any step."
+    }
   }
 }

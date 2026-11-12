@@ -27,7 +27,7 @@
       "mentions": "Menciones",
       "requests": "Solicitudes",
       "invites": "Invitaciones",
-      "plugins": "Complementos"
+      "plugins": "Plugins"
     },
     "empty": "Estás al día.",
     "unread": "Sin leer",
@@ -42,15 +42,15 @@
     "chatRequest": "{{name}} quiere chatear contigo",
     "messageRequest": "Solicitud de mensaje de {{name}}",
     "messageRequestBody_one": "{{count}} mensaje de un cliente de Mumble estándar",
-    "messageRequestBody_many": "{{count}} de mensajes de un cliente de Mumble estándar",
+    "messageRequestBody_many": "{{count}} mensajes de un cliente de Mumble estándar",
     "messageRequestBody_other": "{{count}} mensajes de un cliente de Mumble estándar",
     "invite": {
-      "watchParty": "{{name}} te invitó a una watch party",
+      "watchParty": "{{name}} te invitó a una sesión de visionado",
       "screenShare": "{{name}} está compartiendo su pantalla",
       "card": "{{name}} te envió una tarjeta",
       "theme": "{{name}} compartió un tema contigo"
     },
-    "connection": "{{server}} no está disponible",
+    "connection": "No se puede acceder a {{server}}",
     "type": {
       "chatRequest": "Solicitud de chat",
       "messageRequest": "Solicitud de mensaje",
@@ -79,5 +79,9 @@
       "body": "Compartir pantalla y archivos está en pausa hasta que confíes en el nuevo relé.",
       "decision": "Requiere tu decisión"
     }
+  },
+  "suppressionFallback": {
+    "title": "Supresión de ruido demasiado lenta",
+    "text": "Ahora mismo es demasiado lenta en este ordenador. Se usa «{{standard}}» hasta que pueda seguir el ritmo."
   }
 }

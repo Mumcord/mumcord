@@ -19,14 +19,14 @@
     "unavailable": "Nem elérhető: {{reason}}",
     "untrusted": "Megváltozott, nem megbízható",
     "changed": "A szerver átjátszója megváltozott.",
-    "trustNew": "Bízz az új átjátszóban",
+    "trustNew": "Megbízom az új átjátszóban",
     "keepBlocked": "Maradjon letiltva",
     "forget": "Átjátszó elfelejtése",
     "actionFailed": "Ez nem sikerült. Próbáld újra.",
     "noRelay": "Ennek a szervernek nincs átjátszója, ezért a fájlmegosztás nem érhető el.",
     "filesDisallowed": "Ennek a szervernek az átjátszója nem engedélyezi a fájlmegosztást.",
     "screenDisallowed": "Ennek a szervernek az átjátszója nem engedélyezi a képernyőmegosztást.",
-    "camerasDisallowed": "Ennek a kiszolgálónak az átjátszója nem engedélyezi a kamera megosztását.",
+    "camerasDisallowed": "Ennek a szervernek az átjátszója nem engedélyezi a kameramegosztást.",
     "imagesDisallowed": "A teljes méret nem elérhető: ennek a szervernek az átjátszója nem engedélyezi a képeket",
     "noCertificate": "A fájlmegosztáshoz ügyféltanúsítvány kell.",
     "modeNeedsRelay": "A fájlmegosztáshoz az átjátszó kell; a peer-to-peer beállításod: {{mode}}.",
@@ -37,9 +37,9 @@
   "reason": {
     "p2pOff": "A peer-to-peer ki van kapcsolva.",
     "noRelay": "Ennek a szervernek nincs átjátszója.",
-    "notConnected": "Nincs kapcsolat ezzel a szerverrel.",
+    "notConnected": "Nem vagy csatlakozva ehhez a szerverhez.",
     "untrusted": "A szerver átjátszója megváltozott, és nem megbízható.",
-    "conflict": "Ezen a szerveren két átjátszót hirdettek meg; egyiket sem használja.",
+    "conflict": "Ezen a szerveren két átjátszót hirdettek meg; a Mumcord egyiket sem használja.",
     "botLeft": "Az átjátszó botja elhagyta a szervert.",
     "relayDown": "Az átjátszó jelenleg nem érhető el (az átjátszó botja jelezte).",
     "botNoAnswer": "Az átjátszó botja nem válaszolt.",
@@ -50,8 +50,8 @@
     "notRegistered": "Ennek a szervernek az átjátszója csak regisztrált felhasználók számára érhető el. Használatához regisztrálj ezen a szerveren.",
     "peerGone": "A másik fél elhagyta a szervert.",
     "rateLimited": "Túl sok átjátszókérés. Próbáld újra egy perc múlva.",
-    "groupNotAllowed": "A szerver relay-e csak bizonyos csoportoknak érhető el. Kérj meg egy admint, hogy adjon hozzá.",
-    "noHello": "A relay bot még nem ismeri ezt az alkalmazást. Csatlakozz újra a javításhoz."
+    "groupNotAllowed": "Ennek a szervernek az átjátszója csak bizonyos csoportoknak érhető el. Kérj meg egy admint, hogy adjon hozzá.",
+    "noHello": "Az átjátszó botja még nem ismeri ezt az alkalmazást. A javításhoz csatlakozz újra."
   },
   "refusal": {
     "unknownToken": "ismeretlen hozzáférési token",
@@ -65,26 +65,26 @@
     "badRequest": "érvénytelen kérés"
   },
   "refusalAction": {
-    "howToRegister": "Hogyan regisztrálj",
+    "howToRegister": "Így regisztrálhatsz",
     "reconnect": "Újracsatlakozás",
     "filesRegisteredOnly": "A fájlmegosztás ezen a szerveren csak regisztrált felhasználóknak érhető el."
   },
   "trust": {
-    "title": "Megváltozott a relay ezen: {{server}}",
-    "body": "A képernyő- és fájlmegosztás szünetel, amíg meg nem bízol az új relayben.",
+    "title": "Megváltozott az átjátszó ezen: {{server}}",
+    "body": "A képernyő- és fájlmegosztás szünetel, amíg meg nem bízol az új átjátszóban.",
     "details": "Részletek",
-    "trustedTitle": "Az új relay megbízható",
+    "trustedTitle": "Új átjátszó elfogadva",
     "trustedBody": "A képernyő- és fájlmegosztás ismét működik ezen: {{server}}.",
-    "dialogBody": "A szerver relay-e mostantól másik tanúsítványt használ. Amíg meg nem bízol benne, a képernyő- és fájlmegosztás és a teljes méretű képek szünetelnek.",
-    "previous": "Eddig megbízható relay",
-    "current": "Új relay",
+    "dialogBody": "A szerver átjátszója mostantól másik tanúsítványt használ. Amíg meg nem bízol benne, a képernyőmegosztás, a fájlmegosztás és a teljes méretű képek szünetelnek.",
+    "previous": "Korábban megbízható átjátszó",
+    "current": "Új átjátszó",
     "unknown": "Ismeretlen",
     "trustIf": "Bízz meg benne, ha",
-    "trustIfText": "a szerver adminjai új relayt vagy költözést jelentettek be, és ezt meg tudod erősíteni velük.",
+    "trustIfText": "a szerver adminjai új átjátszót vagy költözést jelentettek be, és ezt meg tudod erősíteni velük.",
     "dontTrustIf": "Ne bízz meg benne, ha",
-    "dontTrustIfText": "senki nem jelentett be változást, vagy bizonytalan vagy. Valaki kiadhatja magát a relaynek.",
+    "dontTrustIfText": "senki nem jelentett be változást, vagy bizonytalan vagy. Valaki kiadhatja magát az átjátszónak.",
     "notNow": "Most nem",
-    "review": "Relay megváltozott – ellenőrzés",
-    "filesBlocked": "A fájlmegosztás nem érhető el: a szerver relay-e megváltozott, és még nem megbízható."
+    "review": "Megváltozott az átjátszó – ellenőrzés",
+    "filesBlocked": "A fájlmegosztás nem érhető el: a szerver átjátszója megváltozott, és még nem megbízható."
   }
 }

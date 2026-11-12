@@ -1,5 +1,5 @@
 {
-  "noConversation": "Opret forbindelse til en server og vælg en kanal for at begynde at chatte.",
+  "noConversation": "Forbind til en server, og vælg en kanal for at begynde at chatte.",
   "empty": "Ingen beskeder endnu. Beskeder, du modtager her, gemmes på denne computer.",
   "header": {
     "channel": "#{{name}}",
@@ -64,7 +64,7 @@
     "imageUnreadable": "Billedet kunne ikke læses. Prøv en anden fil.",
     "denied": "Serveren tillod ikke denne besked.",
     "deniedWithReason": "Serveren tillod ikke denne besked: {{reason}}",
-    "notConnected": "Du er ikke forbundet. Opret forbindelse igen, og prøv igen.",
+    "notConnected": "Du er ikke forbundet. Forbind igen, og prøv så igen.",
     "generic": "Beskeden kunne ikke sendes. Prøv igen.",
     "onlyImages": "Kun billeder kan sendes.",
     "sourceTooLarge": "Denne fil er for stor til at blive sendt (over 25 MB).",
@@ -100,7 +100,8 @@
     "peopleHeading": "Personer",
     "channelHint": "Giv besked til alle i {{channel}} ({{count}})",
     "allHint": "Giv besked til alle, der kan læse denne kanal ({{count}})",
-    "keys": "↑↓ vælg · Enter indsæt · Esc luk"
+    "keys": "↑↓ vælg · Enter indsæt · Esc luk",
+    "channelList": "Kanalforslag"
   },
   "preview": {
     "open": "Åbn i browser",
@@ -117,7 +118,7 @@
       "show": "Program"
     },
     "inBrowser": "Afspilles i din browser",
-    "inBrowserOnly": "Twitch's player does not run inside Mumcord's window on this system, so Play opens the stream in your browser.",
+    "inBrowserOnly": "Twitchs afspiller kan ikke køre i Mumcords vindue på dette system, så Afspil åbner streamen i din browser.",
     "card": "Linkvisning: {{title}}",
     "dismiss": "Skjul visning"
   },
@@ -125,11 +126,11 @@
     "loading": "Indlæser billedet {{name}}",
     "label": "Billede: {{name}}",
     "view": "Vis billedet {{name}}",
-    "viewMessage": "Billede fra {{name}}, åbn i billedvisning",
+    "viewMessage": "Billede fra {{name}}, åbn i billedfremviser",
     "failed": "Billedet kan ikke vises (for stort eller utilgængeligt)."
   },
   "viewer": {
-    "label": "Billedvisning",
+    "label": "Billedfremviser",
     "counter": "{{current}} / {{total}}",
     "zoomIn": "Zoom ind",
     "zoomOut": "Zoom ud",
@@ -156,7 +157,7 @@
     "removeNamed": "Fjern {{name}} fra favoritter",
     "send": "Send {{name}}",
     "hint": "Piletaster flytter, Enter sender, Delete fjerner, Escape lukker.",
-    "empty": "Ingen favoritter endnu. Højreklik på en GIF i chatten, eller brug stjernen på den, og vælg \"Gem som favorit\". Den vises så her."
+    "empty": "Ingen favoritter endnu. Højreklik på en GIF i chatten, eller brug stjernen på den, og vælg »Gem som favorit«. Den vises så her."
   },
   "linkMenu": {
     "label": "Link",
@@ -221,11 +222,11 @@
   "activity": {
     "share": "{{name}} deler sin skærm",
     "watch": "Se",
-    "party": "Watch party: {{title}}",
+    "party": "Fællesvisning: {{title}}",
     "join": "Deltag",
     "videoFallback": "YouTube-video",
     "someone": "Nogen",
-    "joinFailed": "Kunne ikke deltage i watch partyen."
+    "joinFailed": "Kunne ikke deltage i fællesvisningen."
   },
   "card": {
     "label": "Kort: {{title}}",
@@ -259,18 +260,23 @@
     "copyLabel": "Kopiér link til {{server}}",
     "figures": "Ping {{ping}} ms · {{users}} af {{max}} brugere · server {{version}}",
     "goToChannel": "Gå til kanalen",
-    "join": "Tilslut",
-    "joinLabel": "Tilslut {{server}}",
-    "joined": "Tilsluttet",
+    "join": "Forbind",
+    "joinLabel": "Forbind til {{server}}",
+    "joined": "Forbundet",
     "label": "Serverkort for {{server}}",
-    "privacyOff": "Serverværdier er slået fra i indstillingerne",
+    "privacyOff": "Serveroplysninger er slået fra i indstillingerne",
     "querying": "Tjekker serveren…",
     "retry": "Tjek igen",
-    "retryLabel": "Tjek igen {{server}}",
+    "retryLabel": "Tjek {{server}} igen",
     "server": "{{server}}",
     "unreachable": "Serveren kan ikke nås",
     "warning_one": "{{count}} link i denne besked viser loginoplysninger",
     "warning_other": "{{count}} links i denne besked viser loginoplysninger"
+  },
+  "pluginCard": {
+    "label": "Pluginkort for {{name}}",
+    "loading": "Indlæser plugin…",
+    "openLabel": "Åbn {{name}}"
   },
   "requests": {
     "entry": "Beskedanmodninger",
@@ -288,10 +294,10 @@
     "sentMessages_one": "{{name}} har sendt dig {{count}} besked",
     "sentMessages_other": "{{name}} har sendt dig {{count}} beskeder",
     "messagesLabel": "Beskeder fra {{name}}",
-    "accept": "Accepter",
+    "accept": "Acceptér",
     "decline": "Afvis",
     "addFriend": "Tilføj ven",
-    "replyBlocked": "Accepter anmodningen for at svare {{name}}.",
+    "replyBlocked": "Acceptér anmodningen for at svare {{name}}.",
     "empty": "Ingen beskedanmodninger.",
     "failed": "Det virkede ikke. Prøv igen."
   },
@@ -310,7 +316,7 @@
     "requestMetaChat": "{{server}} · vil chatte med dig · {{time}}",
     "requestMetaMessages": "{{server}} · har sendt dig beskeder · {{time}}",
     "quote": "»{{text}}«",
-    "block": "Bloker",
+    "block": "Blokér",
     "showMore_one": "Vis {{count}} anmodning mere",
     "showMore_other": "Vis {{count}} anmodninger mere",
     "showFewer": "Vis færre anmodninger",
@@ -321,18 +327,18 @@
     "offline": "offline",
     "unreadCount": "{{count}} ulæste",
     "pinned": "fastgjort",
-    "muted": "lydløs",
+    "muted": "lyd slået fra",
     "you": "Dig: {{text}}",
     "image": "Sendte et billede",
     "yesterday": "I går",
     "emptyTitle": "Ingen samtaler endnu",
-    "emptyText": "Private beskeder fra alle tilsluttede servere vises her.",
+    "emptyText": "Private beskeder fra alle forbundne servere vises her.",
     "noMatch": "Ingen samtaler fundet.",
     "noRequests": "Ingen beskedanmodninger.",
     "failed": "Det virkede ikke. Prøv igen.",
     "newTitle": "Start en ny samtale",
     "newSearch": "Søg efter personer på dine servere",
-    "newEmpty": "Ingen fundet på dine tilsluttede servere.",
+    "newEmpty": "Ingen fundet på dine forbundne servere.",
     "deleteTitle": "Slet historik med {{name}}?",
     "deleteMessage": "Beskederne slettes kun fra denne enhed. {{name}} beholder sin kopi.",
     "menu": {
@@ -340,13 +346,13 @@
       "markRead": "Markér som læst",
       "pin": "Fastgør øverst",
       "unpin": "Frigør",
-      "mute": "Slå samtalen fra",
+      "mute": "Slå lyden fra for samtalen",
       "unmute": "Slå lyden til for samtalen",
       "muteHour": "I 1 time",
       "muteEightHours": "I 8 timer",
       "muteForever": "Indtil jeg slår den til igen",
       "profile": "Se profil",
-      "block": "Bloker {{name}}",
+      "block": "Blokér {{name}}",
       "deleteHistory": "Slet historik",
       "deleteHint": "Kun denne enhed · {{name}} beholder sin kopi"
     }
@@ -405,5 +411,17 @@
     "loading": "Indlæser billede…",
     "unavailable": "Billedet er ikke tilgængeligt",
     "load": "Indlæs billede"
+  },
+  "slash": {
+    "list": "Kommandoer med skråstreg"
+  },
+  "channelMention": {
+    "chipLabel": "#{{name}}, kanal – åbn menuen",
+    "join": "Gå ind i kanalen",
+    "joinPath": "Gå ind i {{path}}",
+    "show": "Vis i kanallisten",
+    "showPath": "Vis {{path}} i kanallisten",
+    "copy": "Kopiér navn",
+    "menu": "Kanal {{channel}}"
   }
 }

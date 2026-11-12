@@ -1,7 +1,7 @@
 {
   "mode": {
     "legend": "Aggiornamenti dei plugin",
-    "info": "Separato dall'aggiornamento dell'app. Mumcord cerca aggiornamenti dei plugin all'avvio e ogni 6 ore.",
+    "info": "Separato dall'aggiornamento dell'app. Mumcord cerca aggiornamenti dei plugin all'avvio e ogni 6 ore mentre è in esecuzione.",
     "infoLabel": "Maggiori informazioni: aggiornamenti dei plugin",
     "auto": "Installa automaticamente",
     "notify": "Solo notifica",
@@ -23,7 +23,7 @@
   "versionsTo": "a",
   "pill": {
     "none": "Nessun nuovo permesso",
-    "permission": "Richiede un nuovo permesso",
+    "permission": "Richiede più permessi",
     "author": "Nuovo autore",
     "websites": "Comunica con nuovi siti web"
   },
@@ -35,17 +35,17 @@
     "remove": "Rimuovi"
   },
   "checkNow": "Controlla ora",
-  "lastChecked": "Ultimo controllo alle {{time}}",
+  "lastChecked": "Ultimo controllo: {{time}}",
   "checkFailed": "Il controllo non è riuscito. Riprova.",
   "modeNote": "Aggiornamenti dei plugin: {{mode}}. Puoi cambiarlo qui sotto.",
   "settings": "Impostazioni di aggiornamento",
   "offer": {
-    "heading": "Nuove autorizzazioni",
+    "heading": "Nuovi permessi",
     "title": "{{name}} {{version}} ora può fare di più. Queste opzioni restano disattivate finché non le attivi.",
-    "permission": "Nuova autorizzazione facoltativa: {{permission}}",
+    "permission": "Nuovo permesso facoltativo: {{permission}}",
     "save": "Salva",
     "notNow": "Non ora",
-    "failed": "Impossibile modificare le autorizzazioni di {{name}}. Riprova."
+    "failed": "Impossibile modificare i permessi di {{name}}. Riprova."
   },
   "waitingHeading": "Aggiornamenti in attesa",
   "autoNote": "Gli aggiornamenti automatici si installano solo quando il plugin non richiede nulla di nuovo e il suo punteggio resta nella stessa fascia o scende. Tutto il resto attende qui.",
@@ -61,7 +61,7 @@
     "newWebsites_other": "Questo aggiornamento vuole comunicare con {{count}} nuovi siti web. {{name}} resta sulla {{version}} finché non decidi.",
     "riskUp": "Non installato automaticamente: il rischio è passato da {{from}} a {{to}}. Controllalo prima.",
     "scoreUp": "Non installato automaticamente: il punteggio è passato da {{from}} a {{to}}. Controllalo prima.",
-    "blockedBySafety": "Non installato: questa versione è ad alto rischio e “Non consentire plugin ad alto rischio” è attivo.",
+    "blockedBySafety": "Non installato: questa versione è ad alto rischio e «Non consentire plugin ad alto rischio» è attivo.",
     "scoreUnknown": "Non installato automaticamente: non è stato possibile calcolare il punteggio di sicurezza di questa versione. Controllala prima."
   },
   "score": {

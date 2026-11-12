@@ -75,5 +75,9 @@
       "body": "Screen and file sharing are paused until you trust the new relay.",
       "decision": "Needs your decision"
     }
+  },
+  "suppressionFallback": {
+    "title": "Noise suppression too slow",
+    "text": "Too slow on this computer right now. Using “{{standard}}” until it keeps up."
   }
 }

@@ -12,7 +12,7 @@
   "connected": "Verbonden",
   "connectedIn": "Verbonden · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Verbonden – praat",
+  "talking": "Verbonden – aan het praten",
   "muted": "Verbonden – gedempt",
   "voiceMenu": "Spraakserver en kanaal",
   "voiceServer": "Spraakserver",

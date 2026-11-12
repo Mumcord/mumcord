@@ -1,18 +1,22 @@
 //! The Server administration window (Epic 4, issue #254): the server's ban list, and the kick and
-//! ban of a person (Epic 4, issue #253).
+//! ban of a person (Epic 4, issue #253). The admin actions a slash command runs — server mute,
+//! deafen, priority speaker, registering a guest and moving a whole channel — join here (issue
+//! #378), because they check the same rights and answer the same way.
 //!
 //! The window reads the list when it opens and drops it when it closes or the connection ends
 //! (FR-10.63, FR-10.50). Every save re-reads first and sends back the fresh list with only the
 //! user's own change applied (FR-10.66). Entries carry the full address; the UI masks it by default
 //! and shows it only for one row at a time (FR-10.51, FR-10.65).
 
-use mumcord_engine::{Engine, banlist};
+use mumcord_engine::{Engine, banlist, registered};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use std::net::IpAddr;
 use tauri::State;
 
-use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
+use super::types::{
+    ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
+};
 
 /// One ban entry as the window shows it. `key` is what identifies the entry across a re-read, so
 /// an edit or a removal can still be matched (FR-10.66). Name, reason and fingerprint are server
@@ -175,12 +179,31 @@ pub struct BanInput {
     quick: bool,
 }
 
-/// What a kick produced: the server's answer, or nothing within 5 s.
+/// What an action on a person produced: the server's answer, or nothing within 5 s (FR-10.59).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum KickResult {
+pub enum PersonAction {
     Confirmed,
     Unconfirmed,
+}
+
+impl From<mumcord_engine::ActionOutcome> for PersonAction {
+    fn from(v: mumcord_engine::ActionOutcome) -> Self {
+        match v {
+            mumcord_engine::ActionOutcome::Confirmed => Self::Confirmed,
+            mumcord_engine::ActionOutcome::Unconfirmed => Self::Unconfirmed,
+        }
+    }
+}
+
+/// What a mass move produced (FR-10.17, FR-10.18).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum MassMoveResult {
+    /// All moves were sent; `moved` of `total` people arrived in the target channel.
+    Done { moved: u32, total: u32 },
+    /// Another mass move is still running on this server (FR-10.18).
+    AlreadyRunning,
 }
 
 /// What a ban produced (FR-10.12, FR-10.13, FR-10.66).
@@ -229,14 +252,11 @@ pub async fn person_kick(
     server_id: ServerId,
     session: SessionId,
     reason: Option<String>,
-) -> ApiResult<KickResult> {
+) -> ApiResult<PersonAction> {
     let outcome = engine
         .kick_person(to_engine_server_id(server_id), session, reason.as_deref())
         .await?;
-    Ok(match outcome {
-        mumcord_engine::KickOutcome::Confirmed => KickResult::Confirmed,
-        mumcord_engine::KickOutcome::Unconfirmed => KickResult::Unconfirmed,
-    })
+    Ok(outcome.into())
 }
 
 /// Bans a person: one entry added to the server's ban list with the safe save of FR-10.66, then the
@@ -270,6 +290,214 @@ pub async fn person_ban(
 pub fn person_action_close(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
     engine.admin_close(to_engine_server_id(server_id));
     Ok(())
+}
+
+/// One registered account as the window shows it (issue #256). `userId` is the key of the row: the
+/// server does not keep names unique in a way a client can rely on, and only the id says which
+/// account a change acts on. `certHash` is personal data shown only to a user with the Ban right
+/// (FR-10.65).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct RegisteredUserEntry {
+    pub user_id: u32,
+    pub name: String,
+    /// RFC 3339, or `null` when the server does not say (FR-10.5).
+    pub last_seen: Option<String>,
+    /// The channel the account was last seen in, named, or `null` when the server does not say.
+    pub last_channel: Option<String>,
+    /// Whether one of their accounts is connected right now.
+    pub online: bool,
+    pub cert_hash: Option<String>,
+}
+
+impl From<registered::RegisteredView> for RegisteredUserEntry {
+    fn from(v: registered::RegisteredView) -> Self {
+        Self {
+            user_id: v.user_id,
+            name: v.name,
+            last_seen: v.last_seen,
+            last_channel: v.last_channel,
+            online: v.online,
+            cert_hash: v.cert_hash,
+        }
+    }
+}
+
+/// What a rename or an unregister produced (issue #256). The window shows `entries` either way,
+/// because the server's own list is the only account of what stands.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum RegisteredSaveResult {
+    /// The server's list now carries the change.
+    Saved { entries: Vec<RegisteredUserEntry> },
+    /// The list still shows the account as it was, which the server does not say in words: the
+    /// usual cause is a name another account already holds.
+    Kept { entries: Vec<RegisteredUserEntry> },
+}
+
+/// Reads the server's registered accounts for the window (issue #256). Fails with
+/// `permissionDenied` without the Register right in the root channel, and with `serverUnreachable`
+/// when the server does not answer within 5 s. Nothing is stored on disk (FR-10.63).
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_users_open(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Vec<RegisteredUserEntry>> {
+    Ok(registered_entries(
+        engine
+            .registered_open(to_engine_server_id(server_id))
+            .await?,
+    ))
+}
+
+/// Renames one account (FR-10.52, AC-10.37). One `UserList` entry carries the new name; the answer
+/// is the list the server holds afterwards, which is what tells whether it took the name.
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_user_rename(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    user_id: u32,
+    name: String,
+) -> ApiResult<RegisteredSaveResult> {
+    let outcome = engine
+        .registered_rename(to_engine_server_id(server_id), user_id, &name)
+        .await?;
+    Ok(to_save_result(outcome))
+}
+
+/// Removes one registration (FR-10.52, AC-10.37). The person can still connect, as a guest, and
+/// loses the name and the group memberships that name them.
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_user_unregister(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    user_id: u32,
+) -> ApiResult<RegisteredSaveResult> {
+    let outcome = engine
+        .registered_unregister(to_engine_server_id(server_id), user_id)
+        .await?;
+    Ok(to_save_result(outcome))
+}
+
+/// The groups that name one account in a channel (issue #256). A server that will not show its
+/// groups answers with an empty list rather than an error.
+#[tauri::command]
+#[specta::specta]
+pub async fn registered_user_groups(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    user_id: u32,
+) -> ApiResult<Vec<String>> {
+    engine
+        .registered_groups(to_engine_server_id(server_id), user_id)
+        .await
+        .map_err(|error| error.into())
+}
+
+/// The window closed: what it held is dropped (FR-10.63).
+#[tauri::command]
+#[specta::specta]
+pub fn registered_users_close(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
+    engine.registered_close(to_engine_server_id(server_id));
+    Ok(())
+}
+
+fn to_save_result(outcome: registered::RegisteredOutcome) -> RegisteredSaveResult {
+    match outcome {
+        registered::RegisteredOutcome::Saved { entries } => RegisteredSaveResult::Saved {
+            entries: entries.into_iter().map(Into::into).collect(),
+        },
+        registered::RegisteredOutcome::Kept { entries } => RegisteredSaveResult::Kept {
+            entries: entries.into_iter().map(Into::into).collect(),
+        },
+    }
+}
+
+/// Server mute of another person (Epic 4, issue #378, FR-10.15). The server checks the Mute others
+/// right in the channel the person is in and answers with their new state.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_set_server_mute(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    muted: bool,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_set_server_mute(to_engine_server_id(server_id), session, muted)
+        .await?
+        .into())
+}
+
+/// Server deafen of another person (FR-10.15). Deafening always mutes too (spec 10, A5).
+#[tauri::command]
+#[specta::specta]
+pub async fn person_set_server_deafen(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    deaf: bool,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_set_server_deafen(to_engine_server_id(server_id), session, deaf)
+        .await?
+        .into())
+}
+
+/// Priority speaker of another person (issue #378); the same right as server mute.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_set_priority_speaker(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    priority: bool,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_set_priority(to_engine_server_id(server_id), session, priority)
+        .await?
+        .into())
+}
+
+/// Registers an online guest under their current name (issue #378, FR-10.20); only a guest, and
+/// only with the Register right in the root channel.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_register(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+) -> ApiResult<PersonAction> {
+    Ok(engine
+        .person_register(to_engine_server_id(server_id), session)
+        .await?
+        .into())
+}
+
+/// Moves everyone in the admin's own channel to another one (`/moveall`, FR-10.17). The moves go
+/// out at the paced rate of FR-10.18, so the answer comes after they all arrived or were refused;
+/// a second call while one runs answers `alreadyRunning`.
+#[tauri::command]
+#[specta::specta]
+pub async fn person_move_all(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<MassMoveResult> {
+    Ok(
+        match engine
+            .move_all(to_engine_server_id(server_id), channel_id)
+            .await?
+        {
+            mumcord_engine::MassMoveOutcome::Done { moved, total } => {
+                MassMoveResult::Done { moved, total }
+            }
+            mumcord_engine::MassMoveOutcome::AlreadyRunning => MassMoveResult::AlreadyRunning,
+        },
+    )
 }
 
 fn to_ban_request(input: BanInput) -> ApiResult<mumcord_engine::BanRequest> {
@@ -335,6 +563,10 @@ fn invalid(message: &str) -> ApiError {
 }
 
 fn entries(list: Vec<banlist::BanView>) -> Vec<BanEntry> {
+    list.into_iter().map(Into::into).collect()
+}
+
+fn registered_entries(list: Vec<registered::RegisteredView>) -> Vec<RegisteredUserEntry> {
     list.into_iter().map(Into::into).collect()
 }
 

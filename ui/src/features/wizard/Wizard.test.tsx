@@ -60,6 +60,7 @@ function presetValues(settings: Settings) {
     historySharing: settings.historySharing,
     nowPlaying: settings.nowPlaying,
     nowGaming: settings.nowGaming,
+    keepActivityHistory: settings.keepActivityHistory,
   };
 }
 
@@ -79,7 +80,7 @@ describe("Wizard (first start)", () => {
       return heading("Who are you on Mumble?");
     })();
     await waitFor(() => expect(identity).toHaveFocus());
-    expect(identity).toHaveAccessibleDescription("Step 2 of 10 · Identity");
+    expect(identity).toHaveAccessibleDescription("Step 2 of 11 · Identity");
     fireEvent.change(screen.getByLabelText("Default display name"), {
       target: { value: "Tobias" },
     });
@@ -115,9 +116,9 @@ describe("Wizard (first start)", () => {
     const items = within(rail).getAllByRole("listitem");
     expect(items.map((item) => item.getAttribute("aria-current"))).toEqual([
       "step",
-      ...Array<null>(9).fill(null),
+      ...Array<null>(10).fill(null),
     ]);
-    expect(within(rail).getAllByText("Custom")).toHaveLength(5);
+    expect(within(rail).getAllByText("Custom")).toHaveLength(6);
     expect(within(rail).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
     expect(screen.getByText("Everything here can be changed later in Settings.")).toBeVisible();
 
@@ -137,7 +138,7 @@ describe("Wizard (first start)", () => {
     expect(spoken).toEqual([]);
     click("Let's get started");
     await waitFor(() => {
-      expect(spoken).toEqual(["Who are you on Mumble?. Step 2 of 10"]);
+      expect(spoken).toEqual(["Who are you on Mumble?. Step 2 of 11"]);
     });
     unsubscribe();
   });
@@ -161,6 +162,8 @@ describe("Wizard (first start)", () => {
     click("Next");
     await heading("Who can message you?");
     fireEvent.click(screen.getByRole("radio", { name: "Everyone" }));
+    click("Next");
+    await heading("How should Mumcord tell you?");
     click("Next");
     await heading("Connections and content");
     fireEvent.click(screen.getByRole("radio", { name: "Relay only" }));
@@ -189,7 +192,12 @@ describe("Wizard (first start)", () => {
     renderInWizard(harness, <Wizard />);
     await toSetupStyle();
     fireEvent.click(screen.getByRole("radio", { name: "Custom" }));
-    for (const step of ["Who can message you?", "Connections and content", "Make it yours"]) {
+    for (const step of [
+      "Who can message you?",
+      "How should Mumcord tell you?",
+      "Connections and content",
+      "Make it yours",
+    ]) {
       click("Next");
       await heading(step);
     }
@@ -293,6 +301,7 @@ describe("Wizard (first start)", () => {
     fireEvent.click(screen.getByRole("radio", { name: "Custom" }));
     for (const step of [
       "Who can message you?",
+      "How should Mumcord tell you?",
       "Connections and content",
       "Make it yours",
       "Pick your look",
@@ -339,35 +348,41 @@ describe("Wizard (first start)", () => {
     expect(await heading("Voice chat that feels like your own place.")).toBeInTheDocument();
   });
 
-  it.each(["dark", "light"] as const)("has no axe violations on any step (%s)", async (theme) => {
-    harness = await setupWizardTest(theme);
-    const { container } = renderInWizard(harness, <Wizard />);
-    await heading("Voice chat that feels like your own place.");
-    expect(await axeViolations(container)).toEqual([]);
-    click("Let's get started");
-    await heading("Who are you on Mumble?");
-    expect(await axeViolations(container)).toEqual([]);
-    fireEvent.change(screen.getByLabelText("Default display name"), { target: { value: "Ana" } });
-    click("Next");
-    await heading("Sound good?");
-    expect(await axeViolations(container)).toEqual([]);
-    click("Next");
-    await heading("How much do you want to share?");
-    expect(await axeViolations(container)).toEqual([]);
-    fireEvent.click(screen.getByRole("radio", { name: "Custom" }));
-    for (const step of [
-      "Who can message you?",
-      "Connections and content",
-      "Make it yours",
-      "Pick your look",
-      "Startup and updates",
-      "You're all set, Ana",
-    ]) {
-      click("Next");
-      await heading(step);
+  it.each(["dark", "light"] as const)(
+    "has no axe violations on any step (%s)",
+    async (theme) => {
+      harness = await setupWizardTest(theme);
+      const { container } = renderInWizard(harness, <Wizard />);
+      await heading("Voice chat that feels like your own place.");
       expect(await axeViolations(container)).toEqual([]);
-    }
-  });
+      click("Let's get started");
+      await heading("Who are you on Mumble?");
+      expect(await axeViolations(container)).toEqual([]);
+      fireEvent.change(screen.getByLabelText("Default display name"), { target: { value: "Ana" } });
+      click("Next");
+      await heading("Sound good?");
+      expect(await axeViolations(container)).toEqual([]);
+      click("Next");
+      await heading("How much do you want to share?");
+      expect(await axeViolations(container)).toEqual([]);
+      fireEvent.click(screen.getByRole("radio", { name: "Custom" }));
+      for (const step of [
+        "Who can message you?",
+        "How should Mumcord tell you?",
+        "Connections and content",
+        "Make it yours",
+        "Pick your look",
+        "Startup and updates",
+        "You're all set, Ana",
+      ]) {
+        click("Next");
+        await heading(step);
+        expect(await axeViolations(container)).toEqual([]);
+      }
+      // Eleven full axe runs, each over Aaron's detailed SVG, take longer than the 5 s default.
+    },
+    20_000,
+  );
 });
 
 describe("Wizard rerun from Settings (#149)", () => {

@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, an cúntóir leideanna",
+  "greeting": {
+    "title": "Dia duit, is mise Aaron!",
+    "body": "Is axolotl mé agus tá Mumcord ar eolas agam go maith. Ar mhaith leat turas gasta? Tógann sé thart ar nóiméad. Mura n-oireann sé anois, gheobhaidh tú mé i Socruithe → Maidir le → Leideanna.",
+    "start": "Taispeáin dom",
+    "later": "Ní anois"
+  },
+  "progress": "Leid {{current}} as {{total}}",
+  "back": "Siar",
+  "next": "Ar aghaidh",
+  "done": "Déanta",
+  "skip": "Scipeáil an turas",
+  "close": "Dún na leideanna",
+  "tips": {
+    "servers": {
+      "title": "D’fhreastalaithe",
+      "body": "Tá d’fhreastalaithe sa bharra ar an taobh clé ar fad. Cuir ceann leis le +, nó aimsigh freastalaithe poiblí leis an ngloine formhéadúcháin. Is féidir leat fanacht ceangailte le roinnt freastalaithe ag an am céanna."
+    },
+    "channels": {
+      "title": "Cainéil",
+      "body": "Déan dúbailt-chliceáil ar chainéal chun dul isteach ann agus labhairt. Taispeánann cliceáil amháin a chomhrá gan dul isteach, agus coinníonn an cnaipe Lean ar an eolas thú."
+    },
+    "talk": {
+      "title": "Conas a labhraíonn tú",
+      "body": "Push-to-talk nó gníomhachtú gutha? Roghnaigh i Socruithe → Guth agus fuaim, nó oscail Socruithe gutha… leis an tsaighead bheag in aice leis an micreafón. Oibríonn Push-to-talk le cnaipí luiche freisin."
+    },
+    "panel": {
+      "title": "Do phainéal úsáideora",
+      "body": "Thíos ar chlé, balbhaíonn tú do mhicreafón, bodhraíonn tú thú féin, cuireann tú do cheamara ar siúl nó dícheanglaíonn tú. Osclaíonn na saighde beaga in aice leo tuilleadh roghanna."
+    },
+    "search": {
+      "title": "Aimsigh rud ar bith",
+      "body": "Brúigh {{key}} chun daoine agus cainéil a aimsiú, fiú ar fhreastalaithe móra."
+    },
+    "chat": {
+      "title": "Comhrá",
+      "body": "Freagair teachtaireacht, déan athfhriotal uirthi, luaigh daoine le @ agus comhroinn íomhánna agus comhaid. Feictear na cnaipí formáidithe fad is atá tú ag clóscríobh."
+    },
+    "apps": {
+      "title": "Aipeanna",
+      "body": "Tosaíonn an cnaipe Aipeanna sa bharra teachtaireachtaí comhroinnt scáileáin, Breathnú le chéile nó do cheamara. Cuireann breiseáin tuilleadh leis."
+    },
+    "themes": {
+      "title": "Do stíl",
+      "body": "Athraíonn an giar thíos ar chlé idir dorcha agus geal. Tá tuilleadh téamaí i Socruithe → Cuma, agus is féidir a théama féin a bheith ag freastalaí: cliceáil ar dheis air agus roghnaigh Téama."
+    },
+    "end": {
+      "title": "Sin é!",
+      "body": "Bain sult as Mumcord. Is féidir leat glaoch orm arís am ar bith i Socruithe → Maidir le → Leideanna."
+    }
+  }
+}

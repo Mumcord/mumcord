@@ -40,7 +40,7 @@ export function ChannelSearch({ value, onChange, onClear, onSubmit }: ChannelSea
   }, []);
 
   return (
-    <div role="search" className="channel-search">
+    <div role="search" className="channel-search" data-tour="search">
       <label htmlFor={id} className="visually-hidden">
         {label}
       </label>

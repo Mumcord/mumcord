@@ -1,33 +1,33 @@
 {
-  "listLabel": "Installerade plugins",
-  "empty": "Inga plugins ännu.",
-  "browse": "Bläddra bland plugins",
+  "listLabel": "Installerade tillägg",
+  "empty": "Inga tillägg ännu.",
+  "browse": "Bläddra bland tillägg",
   "enable": "{{name}} på",
   "labels": {
     "official": "Officiell",
     "unofficial": "Inofficiell · {{repository}}",
     "unofficialUnknown": "Inofficiell",
-    "developer": "Utvecklarplugin",
+    "developer": "Utvecklartillägg",
     "autoOff": "Avstängt efter upprepade krascher",
     "backingOff": "Startar om efter en krasch",
-    "notLoaded": "Kunde inte laddas",
+    "notLoaded": "Kunde inte läsas in",
     "revoked": "Avstängt av Mumcord: {{reason}}",
     "revocationWarning": "Varning från Mumcord: {{reason}}",
-    "tampered": "Filerna i det här pluginet har ändrats",
-    "permission": "Avstängt eftersom ett nödvändigt tillstånd är av"
+    "tampered": "Filerna i det här tillägget har ändrats",
+    "permission": "Avstängt eftersom en nödvändig behörighet är av"
   },
   "details": {
     "open": "Detaljer för {{name}}",
     "permissions": "Behörigheter",
-    "visibility": "Vem som kan se det här pluginets aktivitet",
+    "visibility": "Vem som kan se det här tilläggets aktivitet",
     "visibilityOptions": {
       "everyone": "Alla",
       "friends": "Bara vänner",
       "nobody": "Ingen"
     },
     "notifications": "Aviseringar",
-    "pin": "Fäst version {{version}} (inga automatiska uppdateringar)",
-    "settings": "Plugininställningar",
+    "pin": "Lås version {{version}} (inga automatiska uppdateringar)",
+    "settings": "Tilläggsinställningar",
     "diagnostics": "Diagnostik",
     "export": "Exportera data",
     "reset": "Återställ data",
@@ -39,8 +39,8 @@
     "none": "Inget"
   },
   "diagnostics": {
-    "loading": "Laddar diagnostik…",
-    "failed": "Diagnostiken kunde inte laddas.",
+    "loading": "Läser in diagnostik…",
+    "failed": "Diagnostiken kunde inte läsas in.",
     "unknown": "Inte tillgänglig",
     "ms": "{{value}} ms",
     "cpuTime": "CPU-tid",
@@ -56,8 +56,8 @@
     "incomingRateDropped": "Inkommande meddelanden som tappats av hastighetsgränsen",
     "incomingInvalid": "Ogiltiga inkommande meddelanden",
     "uiFreezes": "Antal gånger Mumcord frös medan webbinnehållet var öppet",
-    "refusedAppMenuLabel": "Det här tillägget avvisades: en etikett i Appar-menyn är densamma som en av Mumcords egna eller börjar med \"Mumcord\".",
-    "fieldWithoutPermission": "Det här tillägget avvisades: det använder \"{{field}}\" utan behörigheten \"{{permission}}\".",
+    "refusedAppMenuLabel": "Det här tillägget avvisades: en etikett i Appar-menyn är densamma som en av Mumcords egna eller börjar med ”Mumcord”.",
+    "fieldWithoutPermission": "Det här tillägget avvisades: det använder ”{{field}}” utan behörigheten ”{{permission}}”.",
     "webDisabled": "Webbinnehållet är avstängt eftersom Mumcord slutade svara medan det var öppet.",
     "reenableWeb": "Slå på webbinnehåll",
     "reenableFailed": "Webbinnehållet kunde inte slås på.",
@@ -77,7 +77,7 @@
   },
   "reset": {
     "title": "Återställa data för {{name}}?",
-    "message": "Allt som det här pluginet har sparat raderas. Det går inte att ångra.",
+    "message": "Allt som det här tillägget har sparat raderas. Det går inte att ångra.",
     "confirm": "Återställ data",
     "done": "Data återställd."
   },
@@ -88,14 +88,14 @@
     "confirm": "Ta bort"
   },
   "errors": {
-    "enable": "Pluginet kunde inte växlas.",
+    "enable": "Tillägget kunde inte slås på eller av.",
     "permissions": "Behörigheten kunde inte ändras.",
     "visibility": "Synligheten kunde inte ändras.",
     "notifications": "Aviseringarna kunde inte ändras.",
-    "pin": "Versionen kunde inte fästas.",
+    "pin": "Versionen kunde inte låsas.",
     "export": "Datan kunde inte exporteras.",
     "reset": "Datan kunde inte återställas.",
-    "remove": "Pluginet kunde inte tas bort.",
+    "remove": "Tillägget kunde inte tas bort.",
     "badge": "Märket kunde inte ändras.",
     "update": "Tillägget kunde inte uppdateras."
   },
@@ -121,7 +121,7 @@
     "randomBytes": "Slumptal",
     "commands": "Kommandon",
     "chatSend": "Skriver i chatten",
-    "chatSupersedes": "Ersätter sin textrad",
+    "chatSupersedes": "Ersätter sin text",
     "chatTriggers": "Utlösarord",
     "chatPatterns": "Chattmönster",
     "netHttp": "Internetåtkomst",

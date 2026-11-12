@@ -34,7 +34,7 @@
     "relayData": "Releeandmed",
     "relayOff": "Väljas ·",
     "relayOn": "Sees",
-    "turnOnInPermissions": "Lülita sisse lubades",
+    "turnOnInPermissions": "Lülita sisse õiguste all",
     "tags": {
       "webview": "Oma veebisisu",
       "origins": "{{count}} veebisaiti",
@@ -45,14 +45,14 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "See uuendus soovib suhelda {{count}} uue veebisaidiga.",
     "wantsNew_other": "See uuendus soovib suhelda {{count}} uue veebisaidiga.",
     "staysOn": "{{plugin}} jääb versioonile {{version}}, kuni otsustad.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
-    "banner_other": "{{count}} uuendust ootab sind. Uuendusi, mis lisavad lube või veebisaite, ei paigaldata kunagi automaatselt.",
-    "noOther": "Muud load ei muutu.",
+    "banner_one": "{{count}} uuendus ootab sind. Uuendusi, mis lisavad õigusi või veebisaite, ei paigaldata kunagi automaatselt.",
+    "banner_other": "{{count}} uuendust ootab sind. Uuendusi, mis lisavad õigusi või veebisaite, ei paigaldata kunagi automaatselt.",
+    "noOther": "Muud õigused ei muutu.",
     "whatsNew": "Mis on versioonis {{version}} uut",
-    "skipKeeps": "Vahelejätmisel jääb {{version}} tööle.",
+    "skipKeeps": "Kui jätad vahele, töötab {{version}} edasi.",
     "skip": "Jäta see versioon vahele",
     "allow": "Luba ja uuenda"
   }

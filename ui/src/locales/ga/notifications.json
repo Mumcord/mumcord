@@ -13,9 +13,9 @@
   "groupedPrivate_few": "{{count}} theachtaireacht nua ó {{name}}",
   "groupedPrivate_many": "{{count}} dteachtaireacht nua ó {{name}}",
   "groupedPrivate_other": "{{count}} teachtaireacht nua ó {{name}}",
-  "image": "Sheol sé íomhá",
+  "image": "Íomhá seolta",
   "open": "Oscail an comhrá",
-  "close": "Díbir an fógra",
+  "close": "Ruaig an fógra",
   "mentionLine": "Luaigh {{sender}} thú: {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
@@ -29,13 +29,13 @@
     "markAllRead": "Marcáil gach ceann mar léite",
     "filterLabel": "Taispeáin fógraí",
     "filter": {
-      "all": "Gach ceann",
+      "all": "Uile",
       "mentions": "Luanna",
       "requests": "Iarratais",
       "invites": "Cuirí",
       "plugins": "Breiseáin"
     },
-    "empty": "Tá tú ar an eolas.",
+    "empty": "Tá tú suas chun dáta.",
     "unread": "Gan léamh",
     "dndOn": "Tá Ná Cuir Isteach ar siúl",
     "dndOff": "Tá Ná Cuir Isteach as",
@@ -53,10 +53,10 @@
     "messageRequestBody_many": "{{count}} dteachtaireacht ó chliant Mumble caighdeánach",
     "messageRequestBody_other": "{{count}} teachtaireacht ó chliant Mumble caighdeánach",
     "invite": {
-      "watchParty": "Thug {{name}} cuireadh duit chuig féachaint le chéile",
-      "screenShare": "Tá {{name}} ag roinnt a scáileáin",
+      "watchParty": "Thug {{name}} cuireadh duit chuig Breathnú le chéile",
+      "screenShare": "Tá {{name}} ag comhroinnt scáileáin",
       "card": "Sheol {{name}} cárta chugat",
-      "theme": "Roinn {{name}} téama leat"
+      "theme": "Chomhroinn {{name}} téama leat"
     },
     "connection": "Níl {{server}} inrochtana",
     "type": {
@@ -64,16 +64,16 @@
       "messageRequest": "Iarratas teachtaireachta",
       "invite": "Cuireadh",
       "private": "Teachtaireacht phríobháideach",
-      "connection": "Nasc",
+      "connection": "Ceangal",
       "update": "Nuashonrú"
     },
     "accept": "Glac leis",
     "decline": "Diúltaigh",
-    "join": "Bí páirteach",
-    "watch": "Féach",
+    "join": "Téigh isteach",
+    "watch": "Breathnaigh",
     "open": "Oscail",
-    "dismiss": "Cuir ar leataobh",
-    "dismissItem": "Cuir ar leataobh: {{title}}",
+    "dismiss": "Ruaig",
+    "dismissItem": "Ruaig: {{title}}",
     "failed": "Níor oibrigh sé sin. Bain triail eile as.",
     "block": "Bac",
     "update": {
@@ -83,9 +83,13 @@
       "whatsNew": "Cad atá nua"
     },
     "relay": {
-      "title": "Athraíodh an athsheachadán ar {{server}}",
-      "body": "Tá comhroinnt scáileáin agus comhad ar sos go dtí go mbíonn muinín agat as an athsheachadán nua.",
+      "title": "Athraíodh an t-athsheachadán ar {{server}}",
+      "body": "Tá comhroinnt scáileáin agus comhad ar sos go dtí go mbeidh muinín agat as an athsheachadán nua.",
       "decision": "Teastaíonn do chinneadh"
     }
+  },
+  "suppressionFallback": {
+    "title": "Tá an laghdú torainn rómhall",
+    "text": "Rómhall ar an ríomhaire seo faoi láthair. “{{standard}}” in úsáid go dtí go gcoinneoidh sé suas."
   }
 }

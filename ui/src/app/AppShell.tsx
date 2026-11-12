@@ -176,7 +176,12 @@ export function AppShell({
             { id: SHELL_IDS.channels, label: t("skipLinks.channels") },
           ]}
         />
-        <nav ref={serverBarRef} className="shell__servers" aria-label={t("regions.servers")}>
+        <nav
+          ref={serverBarRef}
+          className="shell__servers"
+          aria-label={t("regions.servers")}
+          data-tour="servers"
+        >
           {slots.servers}
         </nav>
         {slots.page ? <div className="shell__page">{slots.page}</div> : null}
@@ -184,12 +189,17 @@ export function AppShell({
           <nav
             id={SHELL_IDS.channels}
             className="shell__channels"
+            data-tour="channels"
             aria-label={t("regions.channels")}
             tabIndex={-1}
           >
             {slots.channels}
           </nav>
-          <section className="shell__user-panel" aria-label={t("regions.userPanel")}>
+          <section
+            className="shell__user-panel"
+            aria-label={t("regions.userPanel")}
+            data-tour="panel"
+          >
             {slots.userPanel}
           </section>
         </div>

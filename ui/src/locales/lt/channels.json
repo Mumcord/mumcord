@@ -1,7 +1,7 @@
 {
   "tree": {
     "label": "Kanalai",
-    "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti · Meniu klavišas: kanalo parinktys · Ctrl+spustelėjimas arba Ctrl+tarpas: pasirinkti žmones",
+    "hint": "Enter: rodyti pokalbį · Shift+Enter arba dvigubas spustelėjimas: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti · Meniu klavišas: kanalo parinktys · Ctrl+spustelėjimas arba Ctrl+tarpas: pasirinkti žmones",
     "join": "Prisijungti",
     "you": "(tu)",
     "youAreHere": "tu čia",
@@ -33,13 +33,13 @@
   "status": {
     "listening": "tik klauso",
     "talking": "kalba",
-    "muted": "nutildytas (-a)",
-    "deafened": "išjungtas (-a) garsas",
+    "muted": "nutildytas",
+    "deafened": "garsas išjungtas",
     "serverMuted": "nutildė serveris",
     "serverDeafened": "garsą išjungė serveris",
-    "suppressed": "užtildytas (-a) (čia kalbėti negali)",
-    "localMuted": "nutildytas (-a) tau",
-    "unregistered": "neregistruotas (-a)",
+    "suppressed": "užtildytas (čia kalbėti negali)",
+    "localMuted": "nutildytas tau",
+    "unregistered": "neregistruotas",
     "prioritySpeaker": "pirmenybinis kalbėtojas"
   },
   "mumcordBadge": "Naudoja Mumcord",
@@ -55,28 +55,28 @@
     }
   },
   "statusTip": {
-    "registered": "Registruotas (-a) šiame serveryje",
+    "registered": "Registruotas šiame serveryje",
     "listening": "Tik klauso",
-    "muted": "Nutildytas (-a)",
-    "deafened": "Išjungtas garsas",
+    "muted": "Nutildytas",
+    "deafened": "Garsas išjungtas",
     "serverMuted": "Nutildė serveris",
     "serverDeafened": "Garsą išjungė serveris",
-    "suppressed": "Užtildytas (-a) – šiame kanale kalbėti negali",
-    "localMuted": "Nutildytas (-a) tau",
-    "unregistered": "Neregistruotas (-a) šiame serveryje (svečias)",
+    "suppressed": "Užtildytas – šiame kanale kalbėti negali",
+    "localMuted": "Nutildytas tau",
+    "unregistered": "Neregistruotas šiame serveryje (svečias)",
     "nowPlaying": "Klauso: {{track}}",
     "nowGaming": "Žaidžia: {{game}}",
     "weakConnection": "Silpnas ryšys – didelis ping arba paketų praradimas",
     "positional": "Pozicinis garsas įjungtas",
-    "prioritySpeaker": "Pirmenybinis kalbėtojas – girdimas virš visų"
+    "prioritySpeaker": "Pirmenybinis kalbėtojas – girdimas geriau už kitus"
   },
   "announce": {
     "joined": "{{name}} prisijungė prie tavo kanalo",
-    "left": "{{name}} paliko tavo kanalą",
+    "left": "{{name}} išėjo iš tavo kanalo",
     "talking": "{{name}} kalba"
   },
   "errors": {
-    "joinDenied": "Tau neleidžiama įeiti į šį kanalą.",
+    "joinDenied": "Tau neleidžiama prisijungti prie šio kanalo.",
     "joinFailed": "Nepavyko prisijungti prie kanalo. Bandyk dar kartą.",
     "notConnected": "Neprisijungta prie serverio.",
     "moveFailed": "Nepavyko perkelti šio žmogaus."
@@ -108,8 +108,8 @@
       "reconnecting": "Jungiamasi iš naujo…",
       "disconnected": "Atsijungta"
     },
-    "online": "{{count}} prisijungę",
-    "onlinePing": "{{count}} prisijungę · {{ping}} ms"
+    "online": "Prisijungę: {{count}}",
+    "onlinePing": "Prisijungę: {{count}} · {{ping}} ms"
   },
   "moveTo": {
     "title": "Perkelti žmones",
@@ -118,13 +118,33 @@
     "noMatch": "Nė vienas kanalas neatitinka.",
     "hint": "Pasirink kanalą, į kurį turi patekti žmonės.",
     "from": "Iš {{channel}}",
-    "question": "Perkelti {{people}} iš {{from}} į {{to}}?",
-    "questionNoSource": "Perkelti {{people}} į {{to}}?",
+    "question": "Perkelti iš {{from}} į {{to}}: {{people}}?",
+    "questionNoSource": "Perkelti į {{to}}: {{people}}?",
     "confirm": "Perkelti",
     "failed": "Kai kurių žmonių nepavyko perkelti.",
     "resultTitle": "Perkeliami žmonės",
-    "resultAll": "Perkelta {{people}} į {{channel}}.",
-    "resultSome": "Perkelta {{moved}} iš {{people}} į {{channel}}. Likusieji atmesti.",
+    "resultAll": "Perkelti į {{channel}}: {{people}}.",
+    "resultSome": "Į {{channel}} perkelta: {{moved}} iš {{people}}. Kitų perkelti neleista.",
     "busy": "Žmonės jau perkeliami…"
+  },
+  "drag": {
+    "into": "Perkelti į {{channel}}",
+    "above": "Dėti virš {{channel}}",
+    "below": "Dėti po {{channel}}",
+    "self": "Negalima perkelti į save patį",
+    "subChannel": "Negalima perkelti į savo pokanalį",
+    "confirmTitle": "Perkelti „{{channel}}“?",
+    "alongAll": "Kartu su {{channel}} perkeliama: {{subChannels}} ir {{people}}.",
+    "alongSubChannels": "Kartu su {{channel}} perkeliama: {{subChannels}}.",
+    "alongPeople": "Kartu su {{channel}} perkeliama: {{people}}.",
+    "alongNone": "Perkeliamas tik {{channel}}; jis tuščias.",
+    "subChannels_one": "{{count}} pokanalis",
+    "subChannels_few": "{{count}} pokanaliai",
+    "subChannels_many": "{{count}} pokanalio",
+    "subChannels_other": "{{count}} pokanalių",
+    "pathTo": "į",
+    "confirm": "Perkelti",
+    "failedTitle": "Nepavyko perkelti {{channel}}",
+    "refusedParent": "Neturi leidimo perkelti kanalų į {{channel}}."
   }
 }

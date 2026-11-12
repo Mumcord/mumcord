@@ -112,21 +112,29 @@ const animationFrames: Scheduler = {
  * Measures `element` on every animation frame and reports each change of its placement (the
  * first measurement always). Layout moves without a resize (a panel opening next to it) and
  * scrolling anywhere are caught alike; nothing is sent while nothing changes.
+ *
+ * A placement is reported again when the window's height changed, even if it is the same: the
+ * system keeps a child web view at its distance from the window's bottom edge, so a frame whose
+ * place is fixed from the top would otherwise drift up or down by the height change.
  */
 export function trackPlacement(
   element: HTMLElement,
   onChange: (bounds: PluginFrameBounds | null) => void,
   measure: (element: HTMLElement) => PluginFrameBounds | null = measurePlacement,
   scheduler: Scheduler = animationFrames,
+  windowHeight: () => number = () => window.innerHeight,
 ): () => void {
   let last: PluginFrameBounds | null | undefined;
+  let lastHeight = windowHeight();
   let handle = 0;
   const tick = () => {
     const next = measure(element);
-    if (last === undefined || !sameBounds(last, next)) {
+    const height = windowHeight();
+    if (last === undefined || !sameBounds(last, next) || (next !== null && height !== lastHeight)) {
       last = next;
       onChange(next);
     }
+    lastHeight = height;
     handle = scheduler.request(tick);
   };
   tick();

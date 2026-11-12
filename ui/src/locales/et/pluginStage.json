@@ -24,11 +24,11 @@
   "joinLabel": "Liitu: {{plugin}}",
   "open": "Ava",
   "openLabel": "Ava: {{plugin}}",
-  "getPlugin": "Hangi pistikprogramm",
+  "getPlugin": "Hangi plugin",
   "getPluginLabel": "Hangi {{plugin}}",
   "activityStarted": "{{name}} käivitas {{plugin}}",
   "activityPlaying": "{{name}} mängib: {{plugin}}",
-  "activitiesLabel": "Pistikprogrammide tegevused",
+  "activitiesLabel": "Pluginate tegevused",
   "noRelayTitle": "Sellel serveril pole plugina andmete releeserverit.",
   "noRelayText": "Serveri {{server}} releeserver ei luba plugina andmeid, seega kasutab {{plugin}} aeglasemat Mumble'i ühendust: käigud võivad võtta hetke ja suured lauad on välja lülitatud.",
   "noRelayDetails": "Üksikasjad",
@@ -46,11 +46,11 @@
     "stopped": "{{plugin}} lakkas vastamast",
     "reload": "Laadi uuesti",
     "mute": "Vaigista plugina {{plugin}} helid",
-    "unmute": "Lõpeta plugina {{plugin}} helide vaigistus"
+    "unmute": "Lõpeta plugina {{plugin}} helide vaigistamine"
   },
   "sidePanel": {
     "label": "{{plugin}} külgpaneel",
-    "options": "{{plugin}} suvandid",
+    "options": "{{plugin}} valikud",
     "close": "Sulge {{plugin}} külgpaneel",
     "resize": "Muuda {{plugin}} külgpaneeli suurust"
   },

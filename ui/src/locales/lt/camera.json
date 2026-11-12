@@ -15,7 +15,8 @@
     "needsRelayMode": "Kameros bendrinimas išjungtas. Pakeisk tai skiltyje Privatumas ir ryšiai.",
     "noCertificate": "Kameros bendrinimui reikia kliento sertifikato.",
     "registeredOnly": "Šiame serveryje kamerą gali naudoti tik registruoti naudotojai.",
-    "needsDirect": "Kameros bendrinimui reikia tiesioginių ryšių. Pakeisk tai skiltyje Privatumas ir ryšiai."
+    "needsDirect": "Kameros bendrinimui reikia tiesioginių ryšių. Pakeisk tai skiltyje Privatumas ir ryšiai.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera įjungta",
   "turnOffTray": "Išjungti kamerą",
@@ -200,7 +201,8 @@
     "showVideo": "Rodyti vaizdą",
     "viewing": "Žiūri",
     "weak": "Silpnas ryšys",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Šiai kamerai reikia Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "{{name}} parinktys",

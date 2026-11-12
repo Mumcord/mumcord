@@ -9,10 +9,10 @@
   "lastSeen": "Offline, senast sedd {{when}}",
   "friend": "Vän",
   "friendHint": "Visar när personen är online och sparar din privata chatt med personen.",
-  "noCertificate": "Personer utan certifikat kan inte vara vänner, eftersom Mumcord inte skulle känna igen dem igen.",
+  "noCertificate": "Personer utan certifikat kan inte vara vänner, eftersom Mumcord inte skulle kunna känna igen dem.",
   "add": "Lägg till vän",
   "remove": "Ta bort vän",
   "failed": "Det gick inte att ändra vänlistan. Försök igen.",
   "join": "Gå med",
-  "joinFriend": "Gå med i {{name}}s kanal"
+  "joinFriend": "Gå med i kanalen där {{name}} är"
 }

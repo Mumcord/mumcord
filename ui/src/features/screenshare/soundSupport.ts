@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getApi } from "../../api";
 
 /** What is missing, named for the note; `null` where sound can be shared. */
-export type SoundBlock = "windows" | "macos" | "pipewire" | null;
+export type SoundBlock = "windows" | "macos" | "pipewire" | "platform" | null;
 
 /**
  * A failed sound capture only shows up in the live bar (FR-7.84); everything else is decided by
@@ -18,6 +18,7 @@ export async function loadSoundBlock(): Promise<SoundBlock> {
   try {
     const reason = await api.screenShareSoundSupport();
     if (reason === "noPipeWire") return "pipewire";
+    if (reason === "platform") return "platform";
     if (reason !== "osTooOld") return null;
     const { os } = await api.appInfo();
     return os.toLowerCase().startsWith("windows") ? "windows" : "macos";
@@ -46,4 +47,5 @@ export const SOUND_NEEDS_KEYS = {
   windows: "soundNeeds.windows",
   macos: "soundNeeds.macos",
   pipewire: "soundNeeds.pipewire",
+  platform: "soundNeeds.platform",
 } as const;

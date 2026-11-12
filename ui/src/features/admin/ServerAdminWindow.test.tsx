@@ -1,8 +1,9 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { setApi, type MumcordApi } from "../../api";
+import { setApi, type MockApi } from "../../api";
 import { axeViolations } from "../../test/axe";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
+import { getServerState } from "../channels/serverStore";
 import {
   closeServerAdmin,
   openServerAdmin,
@@ -15,10 +16,20 @@ import { ServerAdminWindowHost } from "./ServerAdminWindow";
 const MALLORY = "203.0.113.1/32|a3f9c21e8b4d6f2a1c5e7b9d0f1a2b3c4d5e6f70";
 const TITLE = "Server administration · Local test server";
 
-let api: MumcordApi;
+let api: MockApi;
 
-async function openWindow(): Promise<HTMLElement> {
-  openServerAdmin(1);
+/** The server's own answer for the root channel decides which tabs the window has (FR-10.50). */
+function grant(patch: { ban?: boolean; register?: boolean }): void {
+  const root = getServerState().channels.get(0);
+  if (!root) throw new Error("seed channel missing");
+  act(() => {
+    api.mock.updateChannel(0, { ...root, permissions: { ...root.permissions, ...patch } });
+  });
+}
+
+async function openWindow(tab: "bans" | "registered" = "bans"): Promise<HTMLElement> {
+  grant({ ban: true, register: true });
+  openServerAdmin(1, tab);
   render(<ServerAdminWindowHost />);
   const dialog = await screen.findByRole("dialog", { name: TITLE });
   await within(dialog).findByText("Mallory");

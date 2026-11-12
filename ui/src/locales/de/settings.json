@@ -28,12 +28,12 @@
     "privacy": "Wie du dich mit anderen verbindest und was Mumcord von außerhalb lädt.",
     "appearance": "Design, Layout und die Kanalliste.",
     "servers": "Verbindungen zu mehreren Servern und Einstellungen pro Server.",
-    "gaming": "Das Ingame-Overlay, Positionsaudio und Spiel-Plugins.",
+    "gaming": "Das In-Game-Overlay, positionsabhängiger Ton und Spiel-Plugins.",
     "advanced": "Entwicklerwerkzeuge, Diagnose, Speicher und Lizenzen.",
     "about": "Version, Support und der Einrichtungsassistent.",
     "plugins": "Plugins laufen in einer Sandbox und bekommen nur, was du erlaubst. Sie sehen nie dein Audio, deine Dateien oder dein Zertifikat.",
     "screenSharing": "Qualität, Codec und Hardware für die Freigabe deines Bildschirms. Zuschauer sehen immer das, was du auswählst, bevor du startest.",
-    "camera": "Deine Kamera, Hintergrundeffekte und wie du die Kameras anderer siehst. Kamera-Teilen braucht einen Server mit mumpeer-Relay."
+    "camera": "Deine Kamera, Hintergrundeffekte und wie du die Kameras anderer siehst. Für das Teilen der Kamera brauchst du einen Server mit mumpeer-Relay."
   },
   "breadcrumb": "Einstellungen / {{section}}",
   "moreInfo": "Mehr Informationen: {{topic}}",
@@ -43,16 +43,16 @@
     "noiseSuppression": "Hintergrundgeräusche Rauschen entfernen",
     "p2p": "P2P Relay direkte Verbindungen meine IP-Adresse verbergen",
     "theme": "Dunkelmodus Hellmodus Farben",
-    "startup": "Autostart Systemstart Anmeldung Tray",
+    "startup": "Autostart Systemstart Anmeldung Tray Infobereich",
     "language": "Übersetzung Sprache Region",
     "updates": "neue Version Aktualisierung",
     "storage": "Speicherplatz Cache leeren",
     "blocked": "ignorieren blockieren stummschalten Personen",
     "notifications": "Hinweise Pop-ups",
     "externalContent": "Einbettungen Bilder Vorschauen",
-    "fileSharing": "dateien senden empfangen herunterladen speichern ordner anhang zip",
+    "fileSharing": "Dateien senden empfangen herunterladen speichern Ordner Anhang zip",
     "screenSharing": "Bildschirmfreigabe Qualität Auflösung fps Videocodec AV1 VP9 Encoder Grafikkarte",
-    "camera": "kamera webcam video hintergrund unschärfe virtueller hintergrund spiegeln selbstansicht"
+    "camera": "Kamera Webcam Video Hintergrund Unschärfe virtueller Hintergrund spiegeln Selbstansicht"
   },
   "search": {
     "label": "Einstellungen durchsuchen",
@@ -106,8 +106,8 @@
     "createdLine": "Name: {{name}} · Erstellt am {{date}}",
     "fingerprintLine": "Fingerabdruck {{fingerprint}}",
     "notUsed": "Noch von keinem Server genutzt",
-    "setDefault": "Als Standard",
-    "setDefaultFor": "Als Standard – {{identity}}",
+    "setDefault": "Als Standard festlegen",
+    "setDefaultFor": "Als Standard festlegen – {{identity}}",
     "defaultSet": "{{identity}} ist jetzt die Standardidentität.",
     "details": "Details",
     "detailsFor": "Details zu {{identity}} anzeigen",
@@ -123,7 +123,7 @@
     "delete": "Löschen",
     "deleteFor": "{{identity}} löschen",
     "deleteTitle": "Identität {{identity}} löschen?",
-    "deleteWarning": "Ohne Sicherung gehen die mit dieser Identität auf Servern registrierten Namen und Rechte verloren. Das lässt sich nicht rückgängig machen.",
+    "deleteWarning": "Ohne Sicherung gehen die mit dieser Identität auf Servern registrierten Namen und Berechtigungen verloren. Das lässt sich nicht rückgängig machen.",
     "deleteNewDefault": "{{identity}} wird die Standardidentität.",
     "lastIdentity": "Mumcord braucht mindestens eine Identität. Erstelle zuerst eine weitere.",
     "backupFirst": "Erst sichern",
@@ -149,7 +149,7 @@
     "testRecording": "Aufnahme läuft… sprich jetzt.",
     "testPlaying": "Wiedergabe deiner Stimme…",
     "musicQuality": "Musikqualität",
-    "musicQualityHint": "Braucht mehr Bandbreite und schaltet Rauschunterdrückung und automatische Lautstärke ab; für Musik. Push-to-Talk funktioniert am besten.",
+    "musicQualityHint": "Stimmt den Encoder auf Musik ab und schaltet Rauschunterdrückung und automatische Lautstärke aus. Push-to-Talk funktioniert am besten.",
     "bitrate": "Bitrate",
     "bitrateMax": "Max.",
     "bitrateValue": "{{kbps}} kbit/s",
@@ -190,7 +190,7 @@
     "keyCancel": "Abbrechen",
     "keyMissing": "Lege eine Taste fest, sonst hört dich niemand.",
     "keyRejected": "Diese Taste kann nicht verwendet werden. Versuche eine andere, optional mit Strg, Alt oder Umschalt.",
-    "keyNotConfirmed": "Die Arbeitsumgebung hat das Tastenkürzel nicht bestätigt. Versuche es erneut und bestätige den Systemdialog oder lege die Taste in den Kurzbefehl-Einstellungen deiner Arbeitsumgebung fest.",
+    "keyNotConfirmed": "Die Arbeitsumgebung hat das Tastenkürzel nicht bestätigt. Versuche es erneut und bestätige den Systemdialog oder lege die Taste in den Tastenkürzel-Einstellungen deiner Arbeitsumgebung fest.",
     "processing": "Verarbeitung & Qualität",
     "noiseSuppression": "Rauschunterdrückung",
     "noiseSuppressionHint": "Filtert Hintergrundgeräusche wie Tastaturen und Lüfter heraus.",
@@ -222,13 +222,13 @@
       "forward": "Maustaste 5 (vor)"
     },
     "mouseToggle": "Maustasten erlauben (benötigt die Gruppe input)",
-    "mouseToggleWarning": "Damit kannst du eine Maustaste für Push-to-Talk nutzen. Dafür musst du in der Gruppe „input“ sein – dann kann jedes Programm, das du startest, alle Eingabegeräte lesen, auch deine Tastatur. Mumcord selbst öffnet nur Mäuse, beachtet nur deine Push-to-Talk-Taste und zeichnet nichts auf oder protokolliert es.",
+    "mouseToggleWarning": "Damit kannst du eine Maustaste für Push-to-Talk nutzen. Dafür musst du in der Gruppe „input“ sein – dann kann jedes Programm, das du startest, alle Eingabegeräte lesen, auch deine Tastatur. Mumcord selbst öffnet nur Mäuse, beachtet nur deine Push-to-Talk-Taste und zeichnet nie etwas auf oder protokolliert es.",
     "mouseInputGroup": "Mumcord darf deine Maus noch nicht lesen. Füge dich mit diesem Befehl in einem Terminal zur Gruppe „input“ hinzu:",
     "mouseLogOut": "Melde dich danach ab und wieder an. Bis dahin nutze eine Tastaturtaste oder die Sprachaktivierung.",
     "mouseNoDevice": "Keine Maus gefunden. Schließe eine an; Mumcord erkennt sie automatisch.",
     "mouseAccessibility": "Um Maustasten zu nutzen, erlaube Mumcord unter Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen und starte Mumcord neu.",
     "compatMode": "Kompatibilitätsmodus (X11)",
-    "compatModeHint": "Mumcord läuft über die X11-Kompatibilitätsschicht deines Desktops. So funktioniert Push-to-Talk ohne Desktop-Dialog und ohne die Gruppe \"input\". Dein Desktop entscheidet, was Mumcord sehen darf: bei KDE unter Systemeinstellungen → Unterstützung für ältere X11-Anwendungen. Standardmäßig funktionieren nur Tastenkombinationen und Zusatztasten; Maustasten nur, wenn du sie dort erlaubst. Das ist weniger abgeschottet als der moderne Weg.",
+    "compatModeHint": "Mumcord läuft über die X11-Kompatibilitätsschicht deines Desktops. So funktioniert Push-to-Talk ohne Desktop-Dialog und ohne die Gruppe „input“. Dein Desktop entscheidet, was Mumcord sehen darf: bei KDE unter Systemeinstellungen → Unterstützung für ältere X11-Anwendungen. Standardmäßig funktionieren nur Tastenkombinationen und Zusatztasten; Maustasten nur, wenn du sie dort erlaubst. Das ist weniger abgeschottet als der moderne Weg.",
     "compatRestartNeeded": "Wirkt nach einem Neustart von Mumcord. Die Verbindung wird kurz getrennt.",
     "compatRestart": "Jetzt neu starten",
     "compatRestartFailed": "Mumcord konnte nicht neu starten. Bitte schließe und öffne es selbst.",
@@ -240,7 +240,7 @@
     "compatKdeConfirmTitle": "Maustasten erlauben?",
     "compatKdeConfirm": "Dadurch können X11-Anwendungen im Hintergrund deine Mausklicks sehen. Es ändert eine Einstellung in KDE (Systemeinstellungen → Unterstützung für ältere X11-Anwendungen). Du kannst es hier jederzeit rückgängig machen.",
     "compatKdeConfirmButton": "Erlauben",
-    "compatKdeChangeFailed": "Mumcord konnte die KDE-Einstellung nicht ändern. Nutze stattdessen \"KDE-X11-Einstellungen öffnen\".",
+    "compatKdeChangeFailed": "Mumcord konnte die KDE-Einstellung nicht ändern. Nutze stattdessen „KDE-X11-Einstellungen öffnen“.",
     "compatKdeOpen": "KDE-X11-Einstellungen öffnen",
     "compatKdeFailed": "Mumcord konnte die KDE-Einstellungen nicht öffnen. Öffne Systemeinstellungen → Unterstützung für ältere X11-Anwendungen selbst.",
     "compatActive": "Der Kompatibilitätsmodus ist an: Push-to-Talk nutzt den X11-Weg. Tasten funktionieren ohne Desktop-Dialog; Maustasten, wenn die X11-Einstellung deines Desktops sie erlaubt.",
@@ -252,23 +252,23 @@
     "thresholdValue": "{{value}} dBFS",
     "thresholdHint": "Ziehe den Regler über die Anzeige. Mumcord sendet, solange der Pegel über der Linie liegt, und einen kurzen Moment danach.",
     "measure": "Live-Pegel anzeigen",
-    "measuring": "Messe… sprich jetzt",
+    "measuring": "Messung läuft… sprich jetzt",
     "whisper": {
       "title": "Flüster- und Rufziele",
       "saved": "Gespeicherte Ziele",
       "edit": "Ziel bearbeiten",
       "new": "Neues Ziel",
-      "empty": "Noch keine Ziele. Lege hier eines an oder über „Flüstern an …“ im Menü einer Person oder eines Kanals.",
+      "empty": "Noch keine Ziele. Lege hier eines an oder über „Flüstern an…“ im Menü einer Person oder eines Kanals.",
       "hint": "Halte die Taste, um zum Ziel zu sprechen. Lass los, um zu deinem Kanal zurückzukehren. Funktioniert auf jedem Mumble-Server.",
       "name": "Name",
       "receiversLegend": "Wer dich hört",
       "people": "Personen",
-      "peopleHint": "Wähle einen oder mehrere Nutzer auf diesem Server",
+      "peopleHint": "Wähle eine oder mehrere Personen auf diesem Server",
       "channel": "Kanal",
       "channelHint": "Sprich mit allen in einem Kanal, ohne dorthin zu wechseln",
       "channelPick": "Kanal",
       "children": "Unterkanäle einbeziehen",
-      "links": "Verlinkte Kanäle einbeziehen",
+      "links": "Verknüpfte Kanäle einbeziehen",
       "group": "Nur Mitglieder einer Gruppe (optional)",
       "groupHint": "Eine auf dem Server definierte Gruppe, z. B. admin. Der Server entscheidet, wer dazugehört.",
       "noPeople": "Gerade ist niemand sonst auf diesem Server.",
@@ -282,11 +282,11 @@
       "keyNotSet": "Nicht festgelegt",
       "keySet": "Taste festlegen",
       "keyChange": "Ändern",
-      "keyListening": "Taste drücken …",
+      "keyListening": "Taste drücken…",
       "keyRemove": "Taste entfernen",
-      "keyTaken": "Diese Taste ist nicht nutzbar: Es ist keine einzelne Taste mit optionalen Modifikatoren, oder sie ist schon Push-to-Talk oder die Taste eines anderen Ziels.",
+      "keyTaken": "Diese Taste ist nicht nutzbar: Es ist keine einzelne Taste mit optionalen Zusatztasten, oder sie ist schon die Push-to-Talk-Taste oder die Taste eines anderen Ziels.",
       "keyFailed": "Diese Taste wird von einer anderen App belegt und funktioniert gerade nicht.",
-      "keysWayland": "Flüstertasten sind in dieser Wayland-Sitzung nicht verfügbar: Deine Arbeitsumgebung bietet keine globalen Tastenkürzel. Aktiviere den Kompatibilitätsmodus, um sie zu nutzen, oder starte das Flüstern über das Nutzerpanel.",
+      "keysWayland": "Flüstertasten sind in dieser Wayland-Sitzung nicht verfügbar: Deine Arbeitsumgebung bietet keine globalen Tastenkürzel. Aktiviere den Kompatibilitätsmodus, um sie zu nutzen, oder starte das Flüstern über den Benutzerbereich.",
       "save": "Speichern",
       "delete": "Ziel löschen",
       "savedStatus": "Gespeichert.",
@@ -297,7 +297,7 @@
   "history": {
     "title": "Nachrichtenverlauf",
     "explanation": "Chatnachrichten werden nur auf diesem Computer gespeichert.",
-    "perServer": "Überschreibungen pro Server",
+    "perServer": "Ausnahmen pro Server",
     "noServers": "Noch keine gespeicherten Server.",
     "save": "Verlauf von {{server}} speichern",
     "clearServer": "Verlauf von {{server}} löschen…",
@@ -313,14 +313,14 @@
   },
   "fullImages": {
     "offer": "Meine Bilder in Originalgröße anbieten",
-    "offerHint": "Andere Mumcord-Nutzer können meine Bilder in Originalgröße öffnen. Aus: Es wird nur die kleine Vorschau gesendet, kein Original gespeichert und keins weitergegeben.",
+    "offerHint": "Andere Mumcord-Benutzer können meine Bilder in Originalgröße öffnen. Aus: Es wird nur die kleine Vorschau gesendet, kein Original gespeichert und keins weitergegeben.",
     "load": "Bilder anderer in Originalgröße laden",
-    "loadHint": "Bilder anderer Mumcord-Nutzer in Originalgröße öffnen. Aus: Es wird nur die Vorschau gezeigt und das Original nie angefordert."
+    "loadHint": "Bilder anderer Mumcord-Benutzer in Originalgröße öffnen. Aus: Es wird nur die Vorschau gezeigt und das Original nie angefordert."
   },
   "historySharing": {
-    "title": "Verlauf-Synchronisierung",
+    "title": "Verlaufsabgleich",
     "switch": "Meinen Kanalverlauf teilen",
-    "hint": "Andere Mumcord-Nutzer, die einen Kanal betreten oder ihm folgen, können seine Nachrichten aus deinem gespeicherten Verlauf abrufen (bis zu 7 Tage, nur von vor ihrem Beitritt). Private Chats werden nie geteilt."
+    "hint": "Andere Mumcord-Benutzer, die einem Kanal beitreten oder ihm folgen, können seine Nachrichten aus deinem gespeicherten Verlauf abrufen (bis zu 7 Tage, nur von vor ihrem Beitritt). Private Chats werden nie geteilt."
   },
   "appearance": {
     "messageDisplay": "Nachrichtenanzeige",
@@ -329,7 +329,7 @@
     "compact": "Kompakt: Uhrzeit, Name und Nachricht in einer Zeile",
     "theme": "Design",
     "themeLegend": "Farbschema",
-    "modeLegend": "Dunkel oder hell",
+    "modeLegend": "Dunkel oder Hell",
     "system": "Wie das System",
     "dark": "Dunkel",
     "light": "Hell",
@@ -373,7 +373,7 @@
     "share": "Teilen",
     "shared": "Design kopiert. Füge es in einen Chat ein, um es zu teilen.",
     "shareFailed": "Mumcord konnte das Design nicht in die Zwischenablage kopieren.",
-    "import": "Importieren …",
+    "import": "Importieren…",
     "importTitle": "Ein Design importieren",
     "importLabel": "Design-Nachricht oder Code",
     "importHint": "Füge eine Chatnachricht mit einem Mumcord-Design ein oder nur ihren Code (er beginnt mit mct1.).",
@@ -401,7 +401,7 @@
   "accessibility": {
     "hints": "Barrierefreiheit",
     "keyboardHints": "Tastaturhinweise anzeigen",
-    "keyboardHintsHint": "Kurze Tipps wie „Pfeiltasten: bewegen“ unter der Kanalliste und in den GIF-Favoriten. Screenreader lesen sie auch ausgeschaltet vor.",
+    "keyboardHintsHint": "Kurze Tipps wie „Pfeiltasten: bewegen“ unter der Kanalliste und in den GIF-Favoriten. Screenreader lesen sie auch dann vor, wenn dies aus ist.",
     "announcements": "Screenreader-Ansagen",
     "announcementsHint": "Dein Screenreader sagt Ereignisse an, zum Beispiel wenn jemand beitritt, geht oder zu sprechen beginnt.",
     "skipLinks": "Sprunglinks",
@@ -417,7 +417,7 @@
   "sounds": {
     "title": "Töne",
     "explanation": "Kurze Töne, die bei diesen Ereignissen abgespielt werden.",
-    "theme": "Sound-Thema",
+    "theme": "Soundschema",
     "themeClassic": "Klassisch",
     "themeRich": "Reichhaltig",
     "preview": "Probehören",
@@ -425,12 +425,12 @@
     "joinLeave": "Jemand betritt oder verlässt deinen Kanal",
     "voiceJoin": "Du betrittst einen Sprachkanal",
     "selfMute": "Du schaltest dich stumm oder wieder laut",
-    "selfDeaf": "Du schaltest den Ton aus oder wieder ein",
+    "selfDeaf": "Du schaltest die Taubschaltung ein oder aus",
     "hangUp": "Du trennst die Verbindung zu einem Server",
     "quit": "Du beendest Mumcord, während du in einem Sprachkanal bist",
     "channelSwitch": "Du wechselst im Sprachkanal in einen anderen Kanal",
     "kicked": "Du wirst von einem Server gekickt",
-    "banned": "Du wirst von einem Server gebannt",
+    "banned": "Du wirst von einem Server gesperrt",
     "messages": "Neue Nachricht in einem gefolgten Kanal oder Privatchat",
     "mention": "Ton bei Erwähnung",
     "mentionNotify": "Benachrichtigen bei Erwähnung",
@@ -444,15 +444,19 @@
   },
   "notifications": {
     "title": "Benachrichtigungen",
-    "legend": "Benachrichtigungen bei neuen Nachrichten",
-    "explanation": "Für neue Nachrichten in deinem Kanal, in gefolgten Kanälen und in Privatchats, außer dem Chat, den du gerade ansiehst.",
-    "inApp": "In der App: ein kleines Pop-up in Mumcord, solange es im Vordergrund ist",
-    "desktop": "Desktop: eine Systembenachrichtigung",
-    "both": "Beides: Pop-up, solange Mumcord im Vordergrund ist, sonst Systembenachrichtigung",
-    "off": "Aus",
-    "activityTitle": "Aktivitäts-Benachrichtigungen",
+    "explanation": "Wie Mumcord dich über neue Nachrichten und das Geschehen auf deinen Servern informiert. Jede Art hat ihre eigene Auswahl.",
+    "messages": "Neue Nachrichten",
+    "messagesHint": "Dein Kanal, gefolgte Kanäle und Privatchats",
+    "mode": {
+      "off": "Aus",
+      "inApp": "In der App",
+      "desktop": "System",
+      "both": "Beides"
+    },
+    "modesHint": "In der App: ein kleines Pop-up in Mumcord, solange es im Vordergrund ist. System: eine Benachrichtigung deines Betriebssystems. Beides: das Pop-up, solange Mumcord im Vordergrund ist, sonst eine Systembenachrichtigung. Für den Chat, den du gerade ansiehst, und bei „Nicht stören“ wird nichts angezeigt.",
+    "activityTitle": "Aktivitätsbenachrichtigungen",
     "activity": {
-      "screenShare": "Jemand startet eine Bildschirmübertragung",
+      "screenShare": "Jemand startet eine Bildschirmfreigabe",
       "watchParty": "Jemand startet eine Watch-Party",
       "pluginActivity": "Jemand startet eine Plugin-Aktivität",
       "pluginEvent": "Plugin-Ereignisse",
@@ -486,7 +490,7 @@
       "options": "Optionen für {{game}}",
       "reset": "Voreinstellung für {{game}} nutzen",
       "size": "Größe",
-      "unsupported": "Das In-Game-Overlay ist auf diesem System nicht verfügbar. Stattdessen wird das Fenster-Overlay oben genutzt.",
+      "unsupported": "Das In-Game-Overlay ist auf diesem System nicht verfügbar.",
       "loadFailed": "Die In-Game-Overlay-Einstellungen konnten nicht geladen werden.",
       "saveFailed": "Die In-Game-Overlay-Änderung konnte nicht angewendet werden.",
       "opengl": {
@@ -501,9 +505,9 @@
       "confirmMessage": "Warnung: {{game}} nutzt Anti-Cheat-Schutz ({{reason}}). Overlays können als Betrug erkannt werden und dein Account kann gesperrt werden. Mumcord haftet dafür nicht. Fahre nur fort, wenn du dieses Risiko akzeptierst.",
       "confirmEnable": "Trotzdem aktivieren",
       "limits": {
-        "libraryMissing": "Das In-Game-Overlay ist nicht verfügbar: Seine Overlay-Bibliothek (libmumcord_overlay_layer.so) wurde neben Mumcord nicht gefunden. Installiere Mumcord neu, um sie wiederherzustellen. Stattdessen wird das Fenster-Overlay oben genutzt.",
+        "libraryMissing": "Das In-Game-Overlay ist nicht verfügbar: Seine Overlay-Bibliothek (libmumcord_overlay_layer.so) wurde neben Mumcord nicht gefunden. Installiere Mumcord neu, um sie wiederherzustellen.",
         "windowsFullscreen": "Nutze im Spiel randlosen Vollbild- oder Fenstermodus.",
-        "macos": "macOS unterstützt keine In-Game-Overlays. Stattdessen wird das Fenster-Overlay oben genutzt."
+        "macos": "macOS unterstützt keine In-Game-Overlays."
       }
     }
   },
@@ -527,7 +531,20 @@
     "copyWhole": "Ganzes Protokoll kopieren",
     "openLogFolder": "Protokollordner öffnen",
     "logCopied": "Protokoll kopiert.",
-    "fileLabel": "Diagnosedatei"
+    "fileLabel": "Diagnosedatei",
+    "writeToDisk": "Protokolle auf die Festplatte schreiben",
+    "writeToDiskHint": "Aus hält das Protokoll nur für diese Sitzung im Speicher — es wird nichts auf die Festplatte geschrieben.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Version",
@@ -548,10 +565,21 @@
     "portable": "Portabel",
     "setup": "Einrichtung",
     "setupWizardHint": "Gehe die Ersteinrichtung erneut durch, um Mikrofon, Datenschutz, Update-Prüfung und Sprechmodus zu prüfen. Deine aktuellen Einstellungen sind vorausgefüllt.",
-    "setupWizardRun": "Einrichtung erneut ausführen",
-    "setupWizardIdentityNote": "Deine Identität gehört nicht dazu. Dein Zertifikat und damit dein registrierter Name und deine Rechte auf Servern bleiben genau, wie sie sind.",
+    "setupWizardRun": "Einrichtungsassistent erneut starten",
+    "setupWizardIdentityNote": "Deine Identität gehört nicht dazu. Dein Zertifikat und damit dein registrierter Name und deine Berechtigungen auf Servern bleiben genau, wie sie sind.",
     "setupWizardIdentityLink": "Verwalte sie unter Identität",
-    "versionTitle": "Version und Lizenz"
+    "tipsTitle": "Tipps",
+    "tipsHint": "Aaron zeigt dir Mumcord in etwa einer Minute: Server, Kanäle, Sprechen, Chat und mehr.",
+    "tipsShow": "Tipps anzeigen",
+    "versionTitle": "Version und Lizenz",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profil",
@@ -567,13 +595,13 @@
     "skipped": "Dein Standard-Avatar wurde nicht gesendet: Er ist zu groß für diesen Server."
   },
   "linkPreviews": {
-    "switch": "Linkvorschauen und eingebettete Videos anzeigen",
+    "switch": "Linkvorschauen und eingebettete Inhalte anzeigen",
     "hint": "Mumcord lädt verlinkte Seiten für Vorschauen und Videoplayer; diese Seiten sehen deine IP-Adresse."
   },
   "nowPlaying": {
     "title": "Läuft gerade",
     "switch": "Teilen, was ich höre",
-    "hint": "Mumcord liest den aktuellen Titel aus dem Mediaplayer deines Systems (zum Beispiel Spotify) – ohne Spotify-Anmeldung. Andere Mumcord-Nutzer sehen Titel, Interpret, Cover und Fortschritt; offizielle Mumble-Clients sehen am Ende deines Kommentars eine Zeile „🎵 Interpret – Titel“.",
+    "hint": "Mumcord liest den aktuellen Titel aus dem Mediaplayer deines Systems (zum Beispiel Spotify) – ohne Spotify-Anmeldung. Andere Mumcord-Benutzer sehen Titel, Interpret, Cover und Fortschritt; offizielle Mumble-Clients sehen am Ende deines Kommentars eine Zeile „🎵 Interpret – Titel“.",
     "unsupported": "Unter macOS nicht unterstützt: Das System bietet Apps keine Möglichkeit, den aktuellen Titel zu lesen.",
     "current": "Wird geteilt: {{track}}",
     "nothing": "Gerade läuft nichts."
@@ -590,7 +618,7 @@
     "title": "Speicher",
     "hint": "Mumcord speichert temporäre Daten auf diesem Computer, damit alles schneller lädt. Das Leeren ist unbedenklich; die Daten werden bei Bedarf neu aufgebaut.",
     "kind": {
-      "previews": "Link-Vorschauen und Bilder",
+      "previews": "Linkvorschauen und Bilder",
       "webEngine": "Cache der Web-Engine",
       "temp": "Temporäre Dateien"
     },
@@ -609,7 +637,7 @@
   "nowGaming": {
     "title": "Spielt gerade",
     "switch": "Teilen, was ich gerade spiele",
-    "hint": "Mumcord sucht unter deinen laufenden Programmen nach bekannten Spielen und nach dem Spiel, das Steam gerade ausführt. Andere Mumcord-Nutzer sehen das Spiel, sein Bild und wie lange du schon spielst, und können deinem Server beitreten, wenn das Spiel einen anbietet; offizielle Mumble-Clients sehen eine Zeile „🎮 Spiel“ am Ende deines Kommentars.",
+    "hint": "Mumcord sucht unter deinen laufenden Programmen nach bekannten Spielen und nach dem Spiel, das Steam gerade ausführt. Andere Mumcord-Benutzer sehen das Spiel, sein Bild und wie lange du schon spielst, und können deinem Server beitreten, wenn das Spiel einen anbietet; offizielle Mumble-Clients sehen eine Zeile „🎮 Spiel“ am Ende deines Kommentars.",
     "unsupported": "Auf diesem System nicht unterstützt.",
     "current": "Wird geteilt: {{game}}",
     "nothing": "Gerade wird kein Spiel erkannt."
@@ -630,7 +658,7 @@
     "title": "Spiel-Plugins",
     "explanation": "Spiele teilen Mumcord über Mumble Link oder über offizielle Mumble-Spiel-Plugins mit, wo du bist. Mumcord findet die Plugins in seinem eigenen Plugin-Ordner und in einer vorhandenen Mumble-Installation. Schalte nur die Plugins für Spiele ein, die du spielst.",
     "antiCheat": "Spiel-Plugins lesen den Speicher des Spiels. Manche Anti-Cheat-Systeme können das beanstanden; schalte Plugins für Spiele mit strengem Anti-Cheat aus.",
-    "loading": "Suche nach Spiel-Plugins …",
+    "loading": "Suche nach Spiel-Plugins…",
     "none": "Keine Spiel-Plugins gefunden. Installiere Mumble oder kopiere Plugin-Dateien in Mumcords Plugin-Ordner.",
     "loadFailed": "Die Spiel-Plugins konnten nicht aufgelistet werden.",
     "switchFailed": "Das Spiel-Plugin konnte nicht umgeschaltet werden.",
@@ -665,7 +693,7 @@
     "modeLabel": "Peer-to-Peer-Modus",
     "explanation": "Bei „Direkt“ sieht die andere Person deine IP-Adresse. Das Relay verbirgt sie vor ihr; der Betreiber des Relays (die Community dieses Servers) kann sie sehen. Beides ist Ende-zu-Ende-verschlüsselt.",
     "useGlobal": "Globale Einstellung verwenden",
-    "overrideHint": "Nur für diesen Server. „Globale Einstellung verwenden“ folgt Einstellungen → Datenschutz.",
+    "overrideHint": "Nur für diesen Server. „Globale Einstellung verwenden“ folgt Einstellungen → Privatsphäre.",
     "mode": {
       "directRelay": "Direkt + Relay (zuerst direkt)",
       "relayFirst": "Direkt + Relay (immer Relay, verbirgt meine IP)",
@@ -675,7 +703,7 @@
     }
   },
   "privacyDirect": {
-    "allow": "Direkte Verbindungen zu anderen Mumcord-Nutzern erlauben",
+    "allow": "Direkte Verbindungen zu anderen Mumcord-Benutzern erlauben",
     "hint": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Bis du dich entscheidest, fragt Mumcord beim ersten Mal, wenn eine genutzt würde.",
     "notUsed": "Im gewählten Peer-to-Peer-Modus nicht verwendet: Mumcord verbindet sich nie direkt mit anderen."
   },
@@ -801,17 +829,17 @@
     "collapseAll": "Alle zuklappen",
     "found": "Gefundene Versionen: {{count}}",
     "empty": "Kein Eintrag passt zur Suche.",
-    "loadFailed": "Die Änderungsliste konnte nicht geladen werden.",
+    "loadFailed": "Das Änderungsprotokoll konnte nicht geladen werden.",
     "current": "Aktuell",
     "forDevelopers": "für Entwickler",
     "releasePage": "Release-Seite",
     "entries": "Einträge: {{count}}",
-    "englishNote": "Die Änderungsliste ist auf Englisch."
+    "englishNote": "Das Änderungsprotokoll ist auf Englisch."
   },
   "dnd": {
     "title": "Nicht stören",
     "label": "Nicht stören",
-    "description": "Keine Benachrichtigungstöne oder -banner auf allen Servern. Sprache und Chat funktionieren weiter, Ungelesen-Zähler zählen weiter.",
+    "description": "Auf keinem Server Benachrichtigungstöne oder -banner. Sprache und Chat funktionieren weiter, Ungelesen-Zähler zählen weiter.",
     "follow": "„Nicht stören“ des Systems folgen",
     "followDescription": "Schaltet „Nicht stören“ ein, sobald „Nicht stören“ oder der Fokus-Modus deines Desktops an ist.",
     "detected": "Erkannt",
@@ -821,18 +849,18 @@
     "unavailableText": "Mumcord kann den „Nicht stören“-Status deines Systems hier nicht lesen. Nur der eigene Schalter wirkt."
   },
   "privateMessages": {
-    "title": "Private Nachrichten",
-    "legend": "Private Nachrichten von",
+    "title": "Privatnachrichten",
+    "legend": "Privatnachrichten von",
     "everyone": "Alle",
     "everyoneHint": "Jeder auf einem Server kann dir schreiben.",
     "friendsOnly": "Nur Freunde",
-    "friendsOnlyHint": "Andere Mumcord-Nutzer können stattdessen eine Chatanfrage senden. Nachrichten von Standard-Clients landen unter „Nachrichtenanfragen“.",
+    "friendsOnlyHint": "Andere Mumcord-Benutzer können stattdessen eine Chatanfrage senden. Nachrichten von Standard-Clients landen unter „Nachrichtenanfragen“.",
     "nobody": "Niemand",
-    "nobodyHint": "Es werden keine privaten Nachrichten und keine Chatanfragen angezeigt. Absender erfahren davon nichts.",
+    "nobodyHint": "Es werden keine Privatnachrichten und keine Chatanfragen angezeigt. Absender erfahren davon nichts.",
     "keepRequests": "Nachrichten von Standard-Clients als Nachrichtenanfragen behalten",
     "keepRequestsHint": "Wird nur bei „Nur Freunde“ verwendet. Ist die Option aus, werden diese Nachrichten verworfen.",
     "overrideTitle": "Ausnahme pro Server",
-    "overrideLabel": "Private Nachrichten von auf {{server}}",
+    "overrideLabel": "Privatnachrichten auf {{server}} von",
     "useDefault": "Standard verwenden ({{rule}})",
     "noServers": "Noch keine gespeicherten Server.",
     "alwaysTitle": "Immer erlaubt",
@@ -851,10 +879,10 @@
     "revokeFailed": "Widerrufen fehlgeschlagen. Bitte versuche es erneut."
   },
   "blocked": {
-    "title": "Blockierte Nutzer",
-    "hint": "Blockierungen werden nur auf diesem Computer gespeichert. Blockierte Nutzer sind für dich stummgeschaltet, ihre Nachrichten und Mumcord-Daten werden ignoriert.",
+    "title": "Blockierte Benutzer",
+    "hint": "Blockierungen werden nur auf diesem Computer gespeichert. Blockierte Benutzer sind für dich stummgeschaltet, ihre Nachrichten und Mumcord-Daten werden ignoriert.",
     "empty": "Du hast niemanden blockiert.",
-    "user": "Nutzer",
+    "user": "Benutzer",
     "server": "Server",
     "since": "Blockiert seit",
     "actions": "Aktionen",
@@ -863,7 +891,7 @@
     "unblockFailed": "Die Blockierung konnte nicht aufgehoben werden. Bitte versuche es erneut.",
     "messagesTitle": "Blockierte Nachrichten im Kanalchat",
     "collapse": "Einklappen",
-    "collapseHint": "Zeigt „Nachricht eines blockierten Nutzers“ mit einer Schaltfläche „Anzeigen“.",
+    "collapseHint": "Zeigt „Nachricht eines blockierten Benutzers“ mit einer Schaltfläche „Anzeigen“.",
     "hide": "Komplett ausblenden",
     "hideHint": "Im Chat wird nichts angezeigt."
   },
@@ -894,6 +922,16 @@
     "modeNotify": "Nur benachrichtigen",
     "modeOff": "Aus",
     "autoUnavailable": "Diese Kopie kann sich nicht selbst aktualisieren, deshalb weist Mumcord dich nur auf neue Versionen hin.",
+    "channel": "Update-Kanal",
+    "channelHint": "Lege fest, welche Versionen Mumcord anbietet. Release Candidates sind frühe Builds der nächsten Version.",
+    "channels": {
+      "stable": { "name": "Stabil", "hint": "Nur finale Versionen" },
+      "releaseCandidates": {
+        "name": "Release Candidates",
+        "hint": "Frühe Builds der nächsten Version; können Fehler enthalten"
+      }
+    },
+    "channelSwitchBack": "Wenn du zu Stabil zurückwechselst, bleibt deine aktuelle Version, bis die nächste finale Version erscheint.",
     "interval": "Nach Updates suchen",
     "intervalHint_one": "Beim Start und jede Stunde",
     "intervalHint_other": "Beim Start und alle {{count}} Stunden",
@@ -924,7 +962,7 @@
     "skipped": "Übersprungene Version",
     "skippedHint": "{{version}} wird übersprungen und nicht mehr angeboten.",
     "stopSkipping": "Nicht mehr überspringen",
-    "whatsNew": "Was ist neu",
+    "whatsNew": "Neuigkeiten",
     "whatsNewHint": "Sieh dir die Änderungen jeder Version an.",
     "openChangelog": "Änderungsprotokoll öffnen"
   },
@@ -949,7 +987,7 @@
     "unchanged": "Seit der Einrichtung nichts geändert",
     "switch": "Wechseln",
     "switchLabel": "Voreinstellung wechseln",
-    "applyFailed": "Das Ingame-Overlay oder „Nicht stören“ konnte nicht geändert werden. Bitte versuche es erneut."
+    "applyFailed": "Das In-Game-Overlay oder „Nicht stören“ konnte nicht geändert werden. Bitte versuche es erneut."
   },
   "presets": {
     "dialogTitle": "Voreinstellung wechseln",
@@ -1010,9 +1048,9 @@
     "p2pDirectOnly": "Peer-to-Peer verbindet nur direkt; die andere Person kann deine IP-Adresse sehen.",
     "externalOn": "Linkvorschauen sind an: Mumcord ruft verlinkte Seiten ab, um sie zu erstellen.",
     "externalOff": "Linkvorschauen sind aus: Mumcord lädt nichts von verlinkten Seiten.",
-    "imagesOn": "Bilder in voller Größe werden direkt zwischen Mumcord-Nutzern ausgetauscht.",
+    "imagesOn": "Bilder in voller Größe werden direkt zwischen Mumcord-Benutzern ausgetauscht.",
     "imagesOff": "Bilder in voller Größe werden nicht ausgetauscht.",
-    "historyOn": "Verlaufsabgleich ist an: Du teilst deinen Kanalverlauf mit anderen Mumcord-Nutzern.",
+    "historyOn": "Verlaufsabgleich ist an: Du teilst deinen Kanalverlauf mit anderen Mumcord-Benutzern.",
     "historyOff": "Verlaufsabgleich ist aus.",
     "sharingBoth": "Andere sehen, was du spielst und hörst.",
     "sharingPlaying": "Andere sehen, was du hörst.",
@@ -1023,7 +1061,7 @@
   },
   "hotkeys": {
     "global": "Globale Tastenkürzel",
-    "background": "Auch im Hintergrund arbeiten",
+    "background": "Auch im Hintergrund funktionieren",
     "backgroundHint": "Die Tastenkürzel gelten überall, auch in Spielen. Die Standards gelten nur, solange das Mumcord-Fenster im Vordergrund ist.",
     "foregroundOnly": "Die Tastenkürzel funktionieren nur, solange das Mumcord-Fenster im Vordergrund ist.",
     "portal": "Dein Desktop (Wayland) bittet dich einmalig, globale Tastenkürzel zu genehmigen.",
@@ -1034,8 +1072,8 @@
     "action": {
       "pushToTalk": "Push-to-Talk",
       "toggleMute": "Mikrofon stummschalten / aktivieren",
-      "toggleDeafen": "Ton aus / an (Taubschalten)",
-      "toggleDnd": "Nicht stören umschalten",
+      "toggleDeafen": "Taubschaltung an / aus",
+      "toggleDnd": "„Nicht stören“ umschalten",
       "joinLeaveVoice": "Sprachkanal beitreten / verlassen",
       "switchVoiceServer": "Sprachserver wechseln",
       "switchChannel": "Zu Kanal wechseln…",
@@ -1045,7 +1083,7 @@
       "openMumcord": "Mumcord öffnen"
     },
     "pushToTalkHint": "Sendet, solange die Tasten gehalten werden",
-    "pushToTalkOff": "Wird verwendet, wenn der Sprechmodus unter Stimme auf Push-to-Talk steht",
+    "pushToTalkOff": "Wird verwendet, wenn der Sprechmodus unter Sprache & Audio auf Push-to-Talk steht",
     "channelPlace": "{{channel}} · {{server}}",
     "rootChannel": "Stammkanal",
     "notSet": "Nicht festgelegt",
@@ -1055,7 +1093,7 @@
     "defaultBlockedInApp": "Nicht aktiv: Es ist Mumcords eigenes Tastenkürzel für {{shortcut}}.",
     "defaultBlockedOther": "Nicht aktiv: {{other}} verwendet es bereits.",
     "recording": "Tastenkombination drücken…",
-    "recordingHint": "Mit <esc>Esc</esc> abbrechen, mit <back>Backspace</back> löschen. Die Aufnahme endet nach 5 Sekunden.",
+    "recordingHint": "Mit <esc>Esc</esc> abbrechen, mit <back>Rücktaste</back> löschen. Die Aufnahme endet nach 5 Sekunden.",
     "clear": "Löschen",
     "clearLabel": "{{action}} löschen",
     "cancel": "Abbrechen",
@@ -1069,7 +1107,7 @@
       "closeWindow": "das Schließen eines Fensters"
     },
     "assignHere": "Hier zuweisen",
-    "rejected": "Diese Taste kann kein globales Tastenkürzel sein. Drücke eine andere Taste als Ctrl, Alt, Shift oder Super, mit oder ohne diese.",
+    "rejected": "Diese Taste kann kein globales Tastenkürzel sein. Drücke eine andere Taste als Strg, Alt, Umschalt oder Super, mit oder ohne diese.",
     "failed": "Dieses Tastenkürzel konnte nicht registriert werden. Möglicherweise nutzt es schon eine andere App oder dein Desktop.",
     "add": "Tastenkürzel „Zu Kanal wechseln“ hinzufügen…",
     "addChannel": "Kanal",
@@ -1089,14 +1127,14 @@
   "pluginSafety": {
     "title": "Plugin-Sicherheit",
     "blockHighRisk": "Plugins mit hohem Risiko nicht zulassen",
-    "hint": "Blendet die Schaltfläche Installieren für Plugins mit einer Bewertung ab 60 aus und verhindert Updates, die ein installiertes Plugin dorthin bringen würden. Bereits installierte Plugins funktionieren weiter.",
+    "hint": "Blendet die Schaltfläche „Installieren“ für Plugins mit einer Bewertung ab 60 aus und verhindert Updates, die ein installiertes Plugin dorthin bringen würden. Bereits installierte Plugins funktionieren weiter.",
     "note": "Standardmäßig aus. Offizielle Plugins und Entwickler-Plugins sind nie betroffen. Bewertungen sind Schätzungen, keine Garantie."
   },
   "pluginSounds": {
-    "title": "Plugin-Sounds",
-    "volume": "Lautstärke der Plugin-Sounds",
-    "mute": "Plugin-Sounds stummschalten",
-    "hint": "Gilt für jeden Sound, den ein Plugin abspielt. Plugin-Sounds sind leiser, während Leute sprechen.",
+    "title": "Plugin-Töne",
+    "volume": "Lautstärke der Plugin-Töne",
+    "mute": "Plugin-Töne stummschalten",
+    "hint": "Gilt für jeden Ton, den ein Plugin abspielt. Plugin-Töne sind leiser, während Leute sprechen.",
     "meter": "Ausgangspegel (Debug)"
   },
   "screenShare": {
@@ -1169,7 +1207,7 @@
     "sendQualityAuto": "Automatisch",
     "sendQuality720": "720p · 15 fps",
     "sendQuality360": "360p · 30 fps",
-    "sendQualityHint": "Auto (bis zu 720p · 30 fps) sendet nur so viel, wie die Zuschauenden brauchen: kleiner in einem großen Raster, schärfer, wenn dich jemand anheftet.",
+    "sendQualityHint": "Auto (bis zu 720p · 30 fps) sendet nur so viel, wie die Zuschauer brauchen: kleiner in einem großen Raster, schärfer, wenn dich jemand anheftet.",
     "mirror": "Meine Selbstansicht spiegeln",
     "mirrorHint": "Nur deine eigene Ansicht wird gespiegelt. Andere sehen dich seitenrichtig.",
     "backgroundTitle": "Hintergrund",
@@ -1202,7 +1240,7 @@
     "close": "Schließen",
     "privacyTitle": "Datenschutz",
     "lockOff": "Meine Kamera ausschalten, wenn der Bildschirm gesperrt wird",
-    "privacyNote": "Deine Kamera startet immer ausgeschaltet und zeigt zuerst eine Vorschau. Sie schaltet sich aus, wenn du den Kanal verlässt oder die Verbindung trennst. Nur Personen in deinem Sprachkanal sehen sie, über das Relay dieses Servers und Ende-zu-Ende-verschlüsselt. Mumcord zeichnet Kameras nie auf. Mumcord speichert dein Bild bei den Zuschauenden nie auf der Festplatte, kann aber niemanden daran hindern, mit dem Betriebssystem einen Screenshot zu machen.",
+    "privacyNote": "Deine Kamera startet immer ausgeschaltet und zeigt zuerst eine Vorschau. Sie schaltet sich aus, wenn du den Kanal verlässt oder die Verbindung trennst. Nur Personen in deinem Sprachkanal sehen sie, über das Relay dieses Servers und Ende-zu-Ende-verschlüsselt. Mumcord zeichnet Kameras nie auf. Mumcord speichert dein Bild bei den Zuschauern nie auf der Festplatte, kann aber niemanden daran hindern, mit dem Betriebssystem einen Screenshot zu machen.",
     "othersTitle": "Kameras anderer",
     "showCameras": "Kameras anzeigen",
     "showAlways": "Immer",
@@ -1278,11 +1316,23 @@
   },
   "activityHistory": {
     "title": "Aktivitätsverlauf",
+    "keep": "Aktivitätsverlauf nach einem Neustart behalten",
+    "keepHint": "Speichert, wer sich verbunden hat, gegangen ist, den Kanal gewechselt, einen Bildschirm freigegeben oder eine Watch-Party gestartet hat, damit der Verlauf nach einem Neustart noch da ist. Aus: Der Verlauf beginnt jedes Mal leer. Beim Ausschalten wird das Gespeicherte gelöscht.",
     "clear": "Aktivitätsverlauf löschen",
     "hint": "Entfernt den gespeicherten Verlauf aller Server.",
     "local": "Nur auf diesem Gerät gespeichert.",
     "button": "Verlauf löschen",
     "confirm": "Den Aktivitätsverlauf aller Server löschen? Das kann nicht rückgängig gemacht werden.",
     "confirmButton": "Löschen"
+  },
+  "diskWrites": {
+    "title": "Festplatten-Schreibvorgänge reduzieren",
+    "hint": "Weniger Schreibvorgänge schonen SSDs. Jeder Schalter behält das heutige Verhalten, wenn er an ist.",
+    "durableSaves": "Bei jedem Speichern auf die Festplatte warten",
+    "durableSavesHint": "Aus schreibt weniger, aber bei einem Stromausfall können die letzten Sekunden von Verlauf und Einstellungen verloren gehen.",
+    "linkPreviewsOnDisk": "Linkvorschauen auf der Festplatte behalten",
+    "linkPreviewsOnDiskHint": "Aus hält Vorschauen nur für diese Sitzung im Speicher.",
+    "pluginRegistryCache": "Kopie des Plugin-Registers auf der Festplatte behalten",
+    "pluginRegistryCacheHint": "Aus lädt das Register immer neu."
   }
 }

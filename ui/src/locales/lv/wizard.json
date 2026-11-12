@@ -2,10 +2,10 @@
   "progress": "{{current}}. solis no {{total}}",
   "loadFailed": "Iestatīšanu neizdevās ielādēt.",
   "recommended": "Ieteicams",
-  "tipLabel": "Par “{{name}}”",
+  "tipLabel": "Par „{{name}}”",
   "errors": {
     "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz.",
-    "secureStorageUnavailable": "Mumcord nevar piekļūt tavas sistēmas drošajai krātuvei. Atbloķē atslēgu saišķi vai paroļu pārvaldnieku un mēģini vēlreiz.",
+    "secureStorageUnavailable": "Mumcord nevar piekļūt tavas sistēmas drošajai glabātuvei. Atbloķē atslēgu saišķi vai paroļu pārvaldnieku un mēģini vēlreiz.",
     "saveFailed": "Tavus iestatījumus neizdevās saglabāt. Lūdzu, mēģini vēlreiz."
   },
   "nav": {
@@ -33,6 +33,7 @@
     "voice": "Balss",
     "setupStyle": "Iestatīšanas stils",
     "privateMessages": "Privātās ziņas",
+    "notifications": "Paziņojumi",
     "connections": "Savienojumi",
     "features": "Funkcijas",
     "appearance": "Izskats",
@@ -40,38 +41,38 @@
     "summary": "Viss gatavs"
   },
   "welcome": {
-    "title": "Balss tērzēšana, kas justos kā",
-    "titleAccent": "jūsu pašu vieta.",
-    "subtitle": "Mumcord runā Mumble valodā, tāpēc darbojas ar katru Mumble serveri, un papildus piedāvā modernu tērzēšanu. Iestatīsim to tā, kā jums patīk. Tas aizņem apmēram divas minūtes.",
+    "title": "Balss tērzēšana, kas šķiet kā",
+    "titleAccent": "tava paša vieta.",
+    "subtitle": "Mumcord runā Mumble valodā, tāpēc darbojas ar katru Mumble serveri, un papildus piedāvā modernu tērzēšanu. Iestatīsim to tā, kā tev patīk. Tas aizņem apmēram divas minūtes.",
     "voice": {
       "title": "Kristāldzidra balss",
       "text": "Skaņa ar mazu aizkavi un iebūvētu trokšņu slāpēšanu."
     },
     "servers": {
       "title": "Darbojas ar jebkuru Mumble serveri",
-      "text": "Nekāda konta, nekādas reģistrācijas. Pievienojieties serveriem, ko jau izmantojat."
+      "text": "Nekāda konta, nekādas reģistrācijas. Pievienojies serveriem, ko jau izmanto."
     },
     "private": {
-      "title": "Privāts pēc dizaina",
-      "text": "Nekādas telemetrijas. Tas, ko Mumcord saglabā, paliek jūsu datorā."
+      "title": "Privāts jau pēc būtības",
+      "text": "Nekādas telemetrijas. Tas, ko Mumcord saglabā, paliek tavā datorā."
     }
   },
   "identity": {
-    "title": "Kas jūs esat Mumble?",
-    "intro": "Jūsu identitāte ir veids, kā serveri jūs atpazīst. Izveidojiet jaunu vai ienesiet to, ko jau izmantojat.",
-    "legend": "Jūsu identitāte",
+    "title": "Kas tu esi Mumble?",
+    "intro": "Tava identitāte ir tas, pēc kā serveri tevi atpazīst. Izveido jaunu vai paņem līdzi to, ko jau izmanto.",
+    "legend": "Tava identitāte",
     "create": "Izveidot jaunu identitāti",
-    "createText": "Jūsu identitāte ir sertifikāts, kas pierāda, kas jūs esat Mumble serveros. Tas saglabā jūsu reģistrēto vārdu un atļaujas, tāpēc katru reizi, pievienojoties, jūs esat tā pati persona.",
+    "createText": "Tava identitāte ir sertifikāts, kas pierāda, kas tu esi Mumble serveros. Tas saglabā tavu reģistrēto vārdu un atļaujas, tāpēc ikreiz, kad pievienojies, tu esi tā pati persona.",
     "import": "Importēt esošu identitāti",
     "name": "Noklusējuma attēlotais vārds",
-    "nameHint": "Izmanto serveros, kas jūs vēl nepazīst. To var mainīt katram serverim.",
+    "nameHint": "Tiek izmantots serveros, kas tevi vēl nepazīst. To var mainīt katram serverim.",
     "chooseFile": "Izvēlēties failu…",
     "noFile": "Fails nav izvēlēts",
     "chosenFile": "Izvēlētais fails: {{file}}",
     "password": "Faila parole",
     "passwordHint": "Parole paliek šajā datorā un netiek nekur sūtīta.",
     "existing": "Tiek izmantota identitāte {{name}}.",
-    "backup": "Dublējiet to vēlāk Iestatījumos. Dublējums ļauj atjaunot identitāti jaunā datorā.",
+    "backup": "Dublē to vēlāk iestatījumos. Dublējums ļauj atjaunot identitāti jaunā datorā.",
     "nameRequired": "Lūdzu, ievadi vārdu.",
     "fileRequired": "Lūdzu, izvēlies identitātes failu (.p12 vai .pfx).",
     "fileType": "Identitātes fails",
@@ -86,82 +87,86 @@
     "systemDefault": "Sistēmas noklusējums",
     "defaultVia": "Sistēmas noklusējums ({{backend}})",
     "level": "Mikrofona līmenis",
-    "idle": "Nospied Pārbaudīt, pasaki kaut ko, un tu sevi dzirdēsi atskaņojumā.",
+    "idle": "Nospied „Dzirdēt sevi”, pasaki kaut ko, un tu sevi dzirdēsi atskaņojumā.",
     "recording": "Runā tagad…",
     "playing": "Atskaņo tavu balsi…",
     "devicesFailed": "Tavas audio ierīces neizdevās uzskaitīt. Vari turpināt un izvēlēties tās vēlāk iestatījumos.",
     "testFailed": "Pārbaudi neizdevās sākt. Pārbaudi, vai mikrofons ir pievienots.",
-    "test": "Dzirdiet sevi",
+    "test": "Dzirdēt sevi",
     "stop": "Apturēt"
   },
   "voice": {
     "title": "Skan labi?",
-    "subtitle": "Izvēlieties ierīces un pasakiet kaut ko. Joslai jākustas, kamēr runājat.",
-    "talkLegend": "Kā vēlaties runāt?",
+    "subtitle": "Izvēlies ierīces un pasaki kaut ko. Joslai jākustas, kamēr runā.",
+    "talkLegend": "Kā tu vēlies runāt?",
     "voiceActivationDesc": "Mikrofons ieslēdzas, kad runā. Nekas nav jātur vai jāspiež.",
-    "pushToTalkDesc": "Labākais trokšņainām telpām. Taustiņu izvēlies pats.",
+    "pushToTalkDesc": "Labākais trokšņainām telpām. Taustiņu vari izvēlēties.",
     "sensitivity": "Jutība",
     "changeLater": "To visu vēlāk vari mainīt sadaļā Iestatījumi → Balss un skaņa."
   },
   "style": {
-    "title": "Cik daudz vēlaties kopīgot?",
-    "subtitle": "Izvēlieties sākumpunktu. Katru izvēli vēlreiz redzēsiet pēdējā ekrānā un tur varēsiet to mainīt.",
+    "title": "Cik daudz tu vēlies kopīgot?",
+    "subtitle": "Izvēlies sākumpunktu. Katru izvēli vēlreiz redzēsi pēdējā ekrānā un tur varēsi to mainīt.",
     "legend": "Iestatīšanas stils",
     "everythingOn": {
       "title": "Viss ieslēgts",
       "subtitle": "Visas funkcijas",
-      "p1": "Citi redz, ko jūs spēlējat un klausāties",
-      "p2": "Jūsu IP ir redzams cilvēkiem, ar kuriem savienojaties tieši",
-      "p3": "Ikviens var jums rakstīt; saites un attēli tiek ielādēti no tīmekļa",
+      "p1": "Citi redz, ko tu spēlē un klausies",
+      "p2": "Tava IP adrese ir redzama cilvēkiem, ar kuriem savienojies tieši",
+      "p3": "Ikviens var tev rakstīt; saites un attēli tiek ielādēti no tīmekļa",
       "p4": "Pārklājums, vēstures sinhronizācija un pilna izmēra attēli ir ieslēgti"
     },
     "balanced": {
       "title": "Līdzsvarots",
       "subtitle": "Starp privātumu un ērtībām",
-      "p1": "Jums var rakstīt tikai draugi un cilvēki jūsu kanālā",
-      "p2": "Tiešs savienojums, ar releja serveri kā rezerves variantu",
+      "p1": "Tev var rakstīt tikai draugi un cilvēki tavā kanālā",
+      "p2": "Tiešs savienojums, ar releju kā rezerves variantu",
       "p3": "Saišu priekšskatījumi un pilna izmēra attēli ir ieslēgti",
-      "p4": "Tas, ko spēlējat un klausāties, paliek privāts"
+      "p4": "Tas, ko spēlē un klausies, paliek privāts"
     },
     "maximumPrivacy": {
       "title": "Maksimāls privātums",
-      "subtitle": "Kopīgojiet pēc iespējas mazāk",
-      "p1": "Jums var rakstīt tikai draugi, bez izņēmumiem",
-      "p2": "Jūsu IP ir paslēpts; viss iet caur releja serveri",
+      "subtitle": "Kopīgo pēc iespējas mazāk",
+      "p1": "Tev var rakstīt tikai draugi, bez izņēmumiem",
+      "p2": "Tava IP adrese ir paslēpta; viss iet caur releju",
       "p3": "Nav ārēja satura, nav vēstures sinhronizācijas, nav kopīgošanas",
-      "p4": "Atjauninājumi tikai paziņo; nekas netiek kopīgots par to, ko jūs darāt"
+      "p4": "Atjauninājumi tikai paziņo; nekas netiek kopīgots par to, ko tu dari"
     },
     "custom": {
       "title": "Pielāgots",
-      "subtitle": "Izejiet cauri katrai izvēlei",
-      "p1": "Paši izejiet cauri katram solim",
-      "p2": "Redziet, ko dara katrs iestatījums un kas to redz",
-      "p3": "Vislabāk, ja zināt, ko vēlaties"
+      "subtitle": "Izej cauri katrai izvēlei",
+      "p1": "Pats izej cauri katram solim",
+      "p2": "Redzi, ko dara katrs iestatījums un kas to redz",
+      "p3": "Vislabāk, ja zini, ko vēlies"
     },
-    "presetSelected": "Izvēlēts: “{{preset}}”. Jūs izlaižat detalizētos privātuma soļus. Izvēlieties Pielāgots, lai izietu cauri katram.",
-    "customSelected": "Izvēlēts: Pielāgots. Nākamie soļi iet cauri katrai izvēlei."
+    "presetSelected": "Izvēlēts: „{{preset}}”. Tu izlaid detalizētos privātuma soļus. Izvēlies „Pielāgots”, lai izietu cauri katram.",
+    "customSelected": "Izvēlēts: „Pielāgots”. Nākamie soļi iet cauri katrai izvēlei."
   },
   "pm": {
-    "title": "Kas var jums rakstīt?",
+    "title": "Kas var tev rakstīt?",
     "subtitle": "Privātās ziņas ir tērzēšana vienam ar vienu. Šī izvēle neietekmē kanāla tērzēšanu.",
-    "local": "Filtrēšana notiek jūsu datorā. Sūtītājiem netiek paziņots. Vēlāk varēsiet iestatīt citu noteikumu katram serverim."
+    "local": "Filtrēšana notiek tavā datorā. Sūtītājiem netiek paziņots. Vēlāk vari iestatīt citu noteikumu katram serverim."
+  },
+  "notifications": {
+    "title": "Kā Mumcord tev ziņot?",
+    "subtitle": "Izvēlies, kā tevi sasniedz katrs jaunumu veids. Vēlāk to vari mainīt sadaļā Iestatījumi → Paziņojumi."
   },
   "connections": {
     "title": "Savienojumi un saturs",
-    "subtitle": "Dažas funkcijas savieno jūs tieši ar citiem Mumcord lietotājiem, un daļa tērzēšanas satura tiek ielādēta no citām vietnēm. Izvēlieties, kas jums der.",
+    "subtitle": "Dažas funkcijas savieno tevi tieši ar citiem Mumcord lietotājiem, un daļa tērzēšanas satura tiek ielādēta no citām vietnēm. Izvēlies, kas tev der.",
     "chatContent": "Tērzēšanas saturs",
     "sharing": "Kopīgošana ar Mumcord lietotājiem"
   },
   "features": {
-    "title": "Pielāgojiet sev",
-    "subtitle": "Ieslēdziet papildinājumus, ko vēlaties. Katrs norāda, kas ko var redzēt.",
+    "title": "Pielāgo sev",
+    "subtitle": "Ieslēdz papildiespējas, ko vēlies. Katra norāda, kas ko var redzēt.",
     "seenByMumcordUsers": "Redzams Mumcord lietotājiem tajā pašā serverī.",
-    "onlyYou": "Redzat tikai jūs.",
+    "onlyYou": "To redzi tikai tu.",
     "ingameOverlayAlt": "Pārklājuma spēlē piemērs, kas rāda, kas runā"
   },
   "appearance": {
-    "title": "Izvēlieties izskatu",
-    "subtitle": "Logs atjaunojas, jums izvēloties. Vairāk motīvu un jūsu pašu motīvi ir Iestatījumos."
+    "title": "Izvēlies izskatu",
+    "subtitle": "Logs mainās, kamēr tu izvēlies. Vairāk motīvu, arī tavi paša, ir iestatījumos."
   },
   "startup": {
     "title": "Palaišana un atjauninājumi",
@@ -169,13 +174,13 @@
     "linkHandler": "Atvērt mumble:// saites ar Mumcord",
     "linkHandlerHint": "Noklikšķinot uz servera saites tīmekļa vietnē, tā atveras šeit.",
     "linkHandlerActive": "Mumcord jau atver mumble:// saites.",
-    "linkHandlerFailed": "Neizdevās iestatīt Mumcord, lai atvērtu mumble:// saites. Varat mēģināt vēlreiz Iestatījumos.",
-    "autostartFailed": "Neizdevās iestatīt Mumcord, lai tas startētu pieteikšanās brīdī. Varat mēģināt vēlreiz Iestatījumos."
+    "linkHandlerFailed": "Neizdevās iestatīt Mumcord, lai atvērtu mumble:// saites. Vari mēģināt vēlreiz iestatījumos.",
+    "autostartFailed": "Neizdevās iestatīt Mumcord, lai tas startētu pieteikšanās brīdī. Vari mēģināt vēlreiz iestatījumos."
   },
   "summary": {
     "title": "Viss gatavs",
     "titleNamed": "Viss gatavs, {{name}}",
-    "subtitle": "Lūk, ko izvēlējāties. Pirms sākat, izmantojiet Rediģēt jebkurā kartītē, lai to mainītu.",
+    "subtitle": "Lūk, ko tu izvēlējies. Pirms sāc, jebkurā kartītē izmanto „Rediģēt”, lai to mainītu.",
     "on": "ieslēgts",
     "off": "izslēgts",
     "unavailable": "šeit nav pieejams",
@@ -185,6 +190,7 @@
       "identity": "Identitāte",
       "voice": "Balss",
       "privateMessages": "Privātās ziņas",
+      "notifications": "Paziņojumi",
       "connections": "Savienojumi",
       "chatContent": "Tērzēšanas saturs",
       "features": "Funkcijas",
@@ -192,13 +198,15 @@
       "startup": "Palaišana",
       "updates": "Atjauninājumi"
     },
-    "identityDetail": "Saglabāta jūsu sistēmas atslēgu saišķī",
+    "identityDetail": "Saglabāta tavas sistēmas atslēgu saišķī",
     "voiceDetail": "Trokšņu slāpēšana: {{noise}}",
     "pmDetail": "Mans kanāls {{channel}} · pieņemtās tērzēšanas {{accepted}} · pieprasījumi {{requests}}",
+    "notificationsTitle": "Jaunas ziņas: {{mode}}",
+    "notificationsDetail": "Darbību paziņojumi: ieslēgti {{on}} no {{total}}",
     "contentTitle": "Saišu priekšskatījumi {{previews}}",
     "contentDetail": "Pilna izmēra attēli {{images}} · vēstures sinhronizācija {{sync}}",
     "featuresTitle": "Pārklājums spēlē {{overlay}}",
-    "featuresDetail": "Sekot sistēmas režīmam “Netraucēt” {{dnd}} · tagad skan {{playing}} · tagad spēlē {{gaming}}",
+    "featuresDetail": "Sekot sistēmas režīmam „Netraucēt” {{dnd}} · tagad skan {{playing}} · tagad spēlē {{gaming}} · darbību vēsture {{history}}",
     "effectsDetail": "Vizuālie efekti {{effects}}",
     "startupTitle": "Palaist pieteikšanās brīdī {{login}}",
     "startupDetail": "Palaist minimizētu {{minimized}} · mumble:// saites {{links}}",
@@ -208,9 +216,9 @@
       "off": "Izslēgts"
     },
     "updatesDetail": "Atjauninājumi vienmēr tiek pārbaudīti un verificēti pirms instalēšanas.",
-    "backup": "Jūsu identitāte {{name}} ir saglabāta sistēmas atslēgu saišķī. Dublējiet to sadaļā Iestatījumi → Identitāte, lai nekad nezaudētu reģistrēto vārdu.",
-    "nextServer": "Tālāk: pievienojiet savu pirmo serveri",
-    "rerunNote": "Tiek saglabātas tikai jūsu mainītās vērtības."
+    "backup": "Tava identitāte {{name}} ir saglabāta sistēmas atslēgu saišķī. Dublē to sadaļā Iestatījumi → Identitāte, lai nekad nezaudētu reģistrēto vārdu.",
+    "nextServer": "Tālāk: pievieno savu pirmo serveri",
+    "rerunNote": "Tiek saglabātas tikai tevis mainītās vērtības."
   },
   "rerun": {
     "title": "Iestatīšanas vednis",
@@ -220,5 +228,39 @@
     "discardBody": "Nekas netiek saglabāts pirms pabeigšanas. Ja tagad atcelsi, viss paliks kā ir.",
     "discardKeep": "Turpināt rediģēt",
     "discardConfirm": "Atmest izmaiņas"
+  },
+  "guide": {
+    "label": "Aarona padoms",
+    "from": "Aarona padoms",
+    "hide": "Paslēpt Aaronu",
+    "show": "Rādīt Aaronu",
+    "titles": {
+      "welcome": "Laipni lūgts",
+      "import": "Paņem līdzi savas Mumble lietas",
+      "identity": "Tavs vārds serveros",
+      "voice": "Izvēlies mikrofonu",
+      "setupStyle": "Izvēlies stilu",
+      "privateMessages": "Kas drīkst tev rakstīt",
+      "notifications": "Tavi paziņojumi",
+      "connections": "Tiešie savienojumi",
+      "features": "Izvēlies papildiespējas",
+      "appearance": "Izvēlies izskatu",
+      "startup": "Mumcord palaišana",
+      "summary": "Pārbaudi savas izvēles"
+    },
+    "hints": {
+      "welcome": "Sveiks, es esmu Aarons! Es tevi izvadīšu cauri iestatīšanai. Tas aizņem tikai minūti.",
+      "import": "Šie ir serveri un iestatījumi, kas atrasti Mumble. Izvēlies, ko vēlies paturēt.",
+      "identity": "Tava identitāte ir tavs vārds serveros. Izveido jaunu vai importē esošu.",
+      "voice": "Šeit izvēlies mikrofonu, kurā runā, un pasaki sveiki: zaļajai joslai jādejo.",
+      "setupStyle": "Izvēlies stilu. Katru atsevišķo iestatījumu vari mainīt vēlāk.",
+      "privateMessages": "Izvēlies, kas drīkst tev sūtīt privātās ziņas. Sūtītājiem par to nekad netiek paziņots.",
+      "notifications": "Izvēlies, kā tevi sasniedz katrs jaunumu veids, vai izslēdz to.",
+      "connections": "Izvēlies, vai Mumcord drīkst tevi tieši savienot ar citiem Mumcord lietotājiem.",
+      "features": "Ieslēdz tikai tās papildiespējas, kas tev patīk. Katra kartīte norāda, kas to var redzēt.",
+      "appearance": "Gaišs, tumšs vai kā tava sistēma: šeit izvēlies savu izskatu.",
+      "startup": "Izvēlies, kā Mumcord startē, kad piesakies datorā.",
+      "summary": "Viss gatavs! Šeit pārbaudi savas izvēles; „Rediģēt” aizved tevi atpakaļ uz jebkuru soli."
+    }
   }
 }

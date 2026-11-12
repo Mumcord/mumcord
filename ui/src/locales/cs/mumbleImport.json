@@ -46,8 +46,8 @@
     "missing": "Zařízení z Mumble nejsou k tomuto počítači připojena."
   },
   "ptt": {
-    "title": "Klávesa push-to-talk",
-    "modifierOnly": "Klávesa v Mumble je jen modifikátor, který Mumcord nemůže použít. Klávesu můžeš vybrat později.",
+    "title": "Klávesa Push-to-talk",
+    "modifierOnly": "V Mumble je nastavena samotná modifikační klávesa, kterou Mumcord nemůže použít. Klávesu můžeš vybrat později.",
     "tooManyKeys": "Zkratka v Mumble má více než jednu klávesu, což Mumcord nemůže použít. Klávesu můžeš vybrat později.",
     "unknown": "Zkratka v Mumble používá klávesu nebo zařízení, které Mumcord nezná. Klávesu můžeš vybrat později."
   },
@@ -80,8 +80,8 @@
     "skipped_other": "{{count}} serverů přeskočeno",
     "skippedDetail_one": "{{names}} už je v tvém seznamu",
     "skippedDetail_few": "{{names}} už jsou v tvém seznamu",
-    "skippedDetail_many": "{{names}} už je v tvém seznamu",
-    "skippedDetail_other": "{{names}} už je v tvém seznamu",
+    "skippedDetail_many": "{{names}} už jsou v tvém seznamu",
+    "skippedDetail_other": "{{names}} už jsou v tvém seznamu",
     "duplicate": "Duplicita",
     "passwords_one": "{{count}} heslo uloženo",
     "passwords_few": "{{count}} hesla uložena",
@@ -93,7 +93,7 @@
     "identityServers": "Používá se pro zkopírované servery",
     "identitySkipped": "Identita už je v Mumcordu",
     "identitySkippedDetail": "Tento certifikát už je jednou z tvých identit",
-    "devicesAndPtt": "Zvuková zařízení a klávesa push-to-talk",
+    "devicesAndPtt": "Zvuková zařízení a klávesa Push-to-talk",
     "done": "Hotovo",
     "undo": "Vrátit import zpět",
     "undone": "Import byl vrácen zpět.",

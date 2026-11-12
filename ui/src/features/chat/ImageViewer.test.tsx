@@ -18,9 +18,6 @@ function shownSrc(): string {
   return originalSrc(src);
 }
 
-const dialogs = vi.hoisted(() => ({ pickSavePath: vi.fn() }));
-vi.mock("../settings/fileDialogs", () => dialogs);
-
 const PNG = "data:image/png;base64,iVBORw0KGgo=";
 const GIF = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
 const IMAGES: ViewerImage[] = [
@@ -47,7 +44,6 @@ beforeAll(async () => {
 beforeEach(() => {
   api = createMockApi();
   setApi(api);
-  dialogs.pickSavePath.mockReset();
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => frames.push(callback));
   vi.stubGlobal("cancelAnimationFrame", () => undefined);
 });
@@ -173,20 +169,21 @@ describe("ImageViewer", () => {
   });
 
   it("saves the loaded image through the engine, without a new download", async () => {
-    dialogs.pickSavePath.mockResolvedValue("/tmp/pic.png");
-    const save = vi.spyOn(api, "saveImage");
+    const save = vi.spyOn(api, "saveImage").mockResolvedValue(true);
     render(<Harness />);
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save image" }));
       await Promise.resolve();
     });
     // A message image has no name of its own: it gets a dated one (issue #115).
-    expect(dialogs.pickSavePath).toHaveBeenCalledWith(
-      expect.stringMatching(/^image-\d{4}-\d{2}-\d{2}\.png$/),
-      expect.objectContaining({ extensions: ["png"] }),
-      "Save image",
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Save image",
+        defaultName: expect.stringMatching(/^image-\d{4}-\d{2}-\d{2}\.png$/) as string,
+        extensions: ["png"],
+      }),
+      PNG,
     );
-    expect(save).toHaveBeenCalledWith("/tmp/pic.png", PNG);
     expect(await screen.findByText("Image saved")).toBeInTheDocument();
   });
 
@@ -207,18 +204,18 @@ describe("ImageViewer", () => {
   });
 
   it("saves nothing when the save dialog is cancelled", async () => {
-    dialogs.pickSavePath.mockResolvedValue(null);
-    const save = vi.spyOn(api, "saveImage");
+    const save = vi.spyOn(api, "saveImage").mockResolvedValue(false);
     render(<Harness />);
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save image" }));
       await Promise.resolve();
     });
-    expect(save).not.toHaveBeenCalled();
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Image saved")).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("reports a failed save", async () => {
-    dialogs.pickSavePath.mockResolvedValue("/tmp/pic.png");
     vi.spyOn(api, "saveImage").mockRejectedValue(new Error("disk full"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     render(<Harness />);
@@ -442,8 +439,7 @@ describe("full images", () => {
 
   it("saves the full image once it is there", async () => {
     vi.spyOn(api, "fullImageFetch").mockResolvedValue(FULL);
-    dialogs.pickSavePath.mockResolvedValue("/tmp/pic.png");
-    const save = vi.spyOn(api, "saveImage");
+    const save = vi.spyOn(api, "saveImage").mockResolvedValue(true);
     viewer();
     await act(async () => {
       await Promise.resolve();
@@ -453,7 +449,7 @@ describe("full images", () => {
       fireEvent.click(screen.getByRole("button", { name: "Save image" }));
       await Promise.resolve();
     });
-    expect(save).toHaveBeenCalledWith("/tmp/pic.png", FULL);
+    expect(save).toHaveBeenCalledWith(expect.objectContaining({ extensions: ["png"] }), FULL);
   });
 
   it("never requests the original while loading full images is off (FR-1.74)", async () => {

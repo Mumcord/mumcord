@@ -8,10 +8,10 @@
   "unread_other": "{{count}} teachtaireacht gan léamh",
   "errors": {
     "denied": "Ní cheadaíonn an freastalaí duit an cainéal seo a leanúint.",
-    "limit": "Ní féidir leat tuilleadh cainéal a leanúint ar an bhfreastalaí seo. Scoir de chainéal eile a leanúint ar dtús.",
+    "limit": "Ní féidir leat tuilleadh cainéal a leanúint ar an bhfreastalaí seo. Stop ag leanúint cainéil eile ar dtús.",
     "tooOld": "Tá an freastalaí seo róshean chun cainéil a leanúint (teastaíonn leagan 1.4 nó níos nuaí).",
     "notConnected": "Níl tú ceangailte leis an bhfreastalaí.",
-    "generic": "Níor oibrigh sé an cainéal seo a leanúint. Bain triail eile as."
+    "generic": "Theip ar leanúint an chainéil seo. Bain triail eile as."
   },
   "dm": {
     "unknown": "Duine anaithnid"
@@ -37,14 +37,14 @@
   },
   "star": {
     "follow": "Lean {{channel}}",
-    "unfollow": "Scoir de {{channel}} a leanúint"
+    "unfollow": "Stop ag leanúint {{channel}}"
   },
   "all": {
     "menu": "Roghanna freastalaí do {{server}}",
     "menuLabel": "Roghanna freastalaí",
     "follow": "Lean gach cainéal",
-    "unfollow": "Scoir de gach cainéal a leanúint",
-    "working": "Ag leanúint cainéal…",
+    "unfollow": "Stop ag leanúint gach cainéil",
+    "working": "Cainéil á leanúint…",
     "followed_one": "Leanadh {{count}} cainéal.",
     "followed_two": "Leanadh {{count}} chainéal.",
     "followed_few": "Leanadh {{count}} chainéal.",
@@ -58,14 +58,14 @@
     "limit": "sroicheadh an teorainn",
     "notAllowed": "gan chead",
     "noAnswer": "gan freagra ón bhfreastalaí",
-    "unfollowed": "Scoireadh de gach cainéal a leanúint.",
-    "failed": "Níor oibrigh sé gach cainéal a leanúint. Bain triail eile as.",
+    "unfollowed": "Ní leantar aon chainéal anois.",
+    "failed": "Theip ar leanúint gach cainéil. Bain triail eile as.",
     "dismiss": "Dún",
-    "unfollowFailed": "Níor oibrigh sé scor de gach cainéal a leanúint. Bain triail eile as."
+    "unfollowFailed": "Theip ar stopadh ag leanúint gach cainéil. Bain triail eile as."
   },
-  "mention": "luann sé thú",
+  "mention": "luaitear thú ann",
   "header": {
     "follow": "Lean an cainéal",
-    "unfollow": "Ag leanúint, cliceáil chun éirí as"
+    "unfollow": "Ag leanúint, cliceáil chun stopadh"
   }
 }

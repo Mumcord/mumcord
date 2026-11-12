@@ -158,13 +158,15 @@ describe("AudioCard", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Can't play this file");
   });
 
-  it("saves the file where the user chooses", async () => {
-    vi.spyOn(window, "prompt").mockReturnValue("/home/me/night-drive.mp3");
-    const save = vi.spyOn(api, "audioSave").mockResolvedValue(null);
+  it("asks the engine to save the file through its save dialog", async () => {
+    const save = vi.spyOn(api, "audioSave").mockResolvedValue(true);
     renderCard();
     fireEvent.click(await screen.findByRole("button", { name: "Save night-drive.mp3" }));
     await waitFor(() => {
-      expect(save).toHaveBeenCalledWith(URL_A, "/home/me/night-drive.mp3");
+      expect(save).toHaveBeenCalledWith(
+        URL_A,
+        expect.objectContaining({ defaultName: "night-drive.mp3", extensions: ["mp3"] }),
+      );
     });
   });
 });

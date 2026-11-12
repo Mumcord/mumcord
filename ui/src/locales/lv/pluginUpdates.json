@@ -9,13 +9,13 @@
   },
   "waiting": "Atjauninājumi",
   "empty": "Visi spraudņi ir atjaunināti.",
-  "emptyOff": "Spraudņu atjauninājumi ir izslēgti. Ieslēdziet tos augstāk, lai meklētu atjauninājumus.",
+  "emptyOff": "Spraudņu atjauninājumi ir izslēgti. Ieslēdz tos augstāk, lai meklētu atjauninājumus.",
   "loadFailed": "Atjauninājumus neizdevās ielādēt.",
-  "newAuthorKey": "Šo versiju ir parakstījis cits autors. Atjauniniet tikai tad, ja uzticaties jaunajam autoram.",
-  "rolledBack": "Versija {{version}} neuzsākās, tāpēc tika atjaunota iepriekšējā versija. Iemesls:",
+  "newAuthorKey": "Šo versiju ir parakstījis cits autors. Atjaunini tikai tad, ja uzticies jaunajam autoram.",
+  "rolledBack": "Versiju {{version}} neizdevās startēt, tāpēc tika atjaunota iepriekšējā versija. Iemesls:",
   "review": "Pārskatīt un atjaunināt",
   "update": "Atjaunināt",
-  "installFailed": "Spraudni {{name}} neizdevās atjaunināt. Mēģiniet vēlreiz.",
+  "installFailed": "Spraudni {{name}} neizdevās atjaunināt. Mēģini vēlreiz.",
   "pins": "Piespraust versiju",
   "pinsHint": "Piesprausts spraudnis paliek pašreizējā versijā, un tam atjauninājumi netiek piedāvāti.",
   "pin": "Paturēt {{name}} šajā versijā",
@@ -23,7 +23,7 @@
   "versionsTo": "uz",
   "pill": {
     "none": "Nav jaunu atļauju",
-    "permission": "Nepieciešama jauna atļauja",
+    "permission": "Pieprasa vairāk atļauju",
     "author": "Jauns autors",
     "websites": "Sazinās ar jaunām vietnēm"
   },
@@ -35,17 +35,17 @@
     "remove": "Noņemt"
   },
   "checkNow": "Pārbaudīt tagad",
-  "lastChecked": "Pēdējā pārbaude plkst. {{time}}",
-  "checkFailed": "Pārbaude neizdevās. Mēģiniet vēlreiz.",
+  "lastChecked": "Pēdējā pārbaude: {{time}}",
+  "checkFailed": "Pārbaude neizdevās. Mēģini vēlreiz.",
   "modeNote": "Spraudņu atjauninājumi: {{mode}}. To var mainīt zemāk.",
   "settings": "Atjauninājumu iestatījumi",
   "offer": {
     "heading": "Jaunas atļaujas",
-    "title": "{{name}} {{version}} tagad var vairāk. Šīs iespējas paliek izslēgtas, līdz jūs tās ieslēdzat.",
+    "title": "{{name}} {{version}} tagad var vairāk. Šīs iespējas paliek izslēgtas, līdz tu tās ieslēgsi.",
     "permission": "Jauna neobligāta atļauja: {{permission}}",
     "save": "Saglabāt",
     "notNow": "Ne tagad",
-    "failed": "Neizdevās mainīt {{name}} atļaujas. Lūdzu, mēģiniet vēlreiz."
+    "failed": "Neizdevās mainīt {{name}} atļaujas. Lūdzu, mēģini vēlreiz."
   },
   "waitingHeading": "Atjauninājumi gaida",
   "autoNote": "Automātiskie atjauninājumi tiek instalēti tikai tad, ja spraudnis nepieprasa neko jaunu un tā vērtējums paliek tajā pašā līmenī vai samazinās. Viss pārējais gaida šeit.",
@@ -61,7 +61,7 @@
     "newWebsites_other": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm. {{name}} paliek pie {{version}}, līdz izlemsi.",
     "riskUp": "Netiek instalēts automātiski: risks pieauga no {{from}} līdz {{to}}. Vispirms pārskati to.",
     "scoreUp": "Netiek instalēts automātiski: vērtējums pieauga no {{from}} līdz {{to}}. Vispirms pārskati to.",
-    "blockedBySafety": "Netiek instalēts: šī versija ir augsta riska un ir ieslēgts “Neatļaut augsta riska spraudņus”.",
+    "blockedBySafety": "Netiek instalēts: šī versija ir augsta riska un ir ieslēgts „Neatļaut augsta riska spraudņus”.",
     "scoreUnknown": "Netiek instalēts automātiski: šīs versijas drošības vērtējumu nevarēja aprēķināt. Vispirms pārskati to."
   },
   "score": {
@@ -98,7 +98,7 @@
     "asksForMore": "jo šī versija pieprasa vairāk:",
     "permissionsLabel": "Jaunas atļaujas",
     "recentChange": "Tas arī skaitās kā nesena izmaiņa: jaunas atļaujas pēdējās {{versions}} versijās pievieno vēl +{{recent}} punktus. Kopā ar augstāk minētajiem +{{permissions}} (× {{multiplier}}) tie ir +{{total}}.",
-    "highTitle": "Šis atjauninājums padarītu spraudni par augsta riska spraudni",
+    "highTitle": "Pēc šī atjauninājuma spraudnis būtu augsta riska",
     "highText": "Tas netiks instalēts automātiski. Palikšana pie {{version}} saglabā pašreizējo vērtējumu; versiju vari piespraust sadaļā Instalētie.",
     "highTick": "Es saprotu, ka risks ir pieaudzis, un joprojām uzticos autoram",
     "skipHint": "Izlaižot, {{version}} turpina darboties.",

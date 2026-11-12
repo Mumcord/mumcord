@@ -10,7 +10,9 @@ import {
   filesContaining,
   keyringDump,
   launchWithLink,
+  menuItem,
   normalizeFingerprint,
+  openServerMenu,
   serverButton,
   waitServerStatus,
 } from "../../helpers/servers-ui.ts";
@@ -21,6 +23,8 @@ import {
 const LINK = `mumble://${testenv.address("v15")}/Raid`;
 const PASSWORD = "qa-ac14-Pw-7f3c9e";
 const PW_SERVER = "Password server";
+// The server the link saved in the first AC-1.6 test, named after its host.
+const LINK_SERVER = "localhost";
 const BOT = { name: "QAWatcher", timeout: 25, port: testenv.ports.v15 };
 
 async function fingerprints(): Promise<string[]> {
@@ -127,6 +131,14 @@ describe("servers (AC-1.4, AC-1.5, AC-1.6)", function () {
     await app.startDriver();
     await browser.reloadSession();
     await serverButton(PW_SERVER).waitForDisplayed({ timeout: 20_000 });
+    // SIGTERM is a normal quit (#748), so the link-started run recorded its connected server and
+    // this start brings the session back by itself. Leave it again: the certificate test below
+    // connects on its own terms, without a restored session reconnecting next to it.
+    await waitServerStatus(LINK_SERVER, "connected");
+    await bot(["expect", "user", "Tester"], BOT);
+    await openServerMenu(LINK_SERVER);
+    await menuItem(LINK_SERVER, "Disconnect").click();
+    await bot(["expect", "user-gone", "Tester"], BOT);
   });
 
   it("AC-1.5: a changed server certificate shows a blocking warning", async () => {

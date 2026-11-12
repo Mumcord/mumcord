@@ -28,10 +28,10 @@
     "privacy": "Hoe je met anderen verbinding maakt en wat Mumcord van buiten laadt.",
     "appearance": "Thema, indeling en de kanalenlijst.",
     "servers": "Verbindingen met meerdere servers en instellingen per server.",
-    "gaming": "De overlay in games, positionele audio en game-plug-ins.",
+    "gaming": "De in-game-overlay, positionele audio en gameplug-ins.",
     "advanced": "Ontwikkelaarstools, diagnostiek, opslag en licenties.",
     "about": "Versie, ondersteuning en de installatiewizard.",
-    "plugins": "Plugins draaien in een sandbox en krijgen alleen wat jij toestaat. Ze zien nooit je audio, bestanden of certificaat.",
+    "plugins": "Plug-ins draaien in een sandbox en krijgen alleen wat jij toestaat. Ze zien nooit je audio, bestanden of certificaat.",
     "screenSharing": "Kwaliteit, codec en hardware voor het delen van je scherm. Kijkers zien altijd wat je kiest voordat je begint.",
     "camera": "Je camera, achtergrondeffecten en hoe je de camera's van anderen ziet. Camera delen heeft een server met een mumpeer-relay nodig."
   },
@@ -86,7 +86,7 @@
     "exported": "Identiteit geëxporteerd.",
     "importTitle": "Identiteit importeren",
     "importPassword": "Bestandswachtwoord (leeg laten als er geen is)",
-    "imported": "Identiteit ‘{{name}}’ geïmporteerd.",
+    "imported": "Identiteit “{{name}}” geïmporteerd.",
     "listTitle": "Identiteiten",
     "listLabel": "Identiteiten",
     "intro": "Een identiteit is een certificaat in de beveiligde opslag van je systeem. Servers herkennen je eraan. Gebruik er één overal, of kies per server een andere.",
@@ -106,8 +106,8 @@
     "createdLine": "Naam: {{name}} · Aangemaakt {{date}}",
     "fingerprintLine": "Vingerafdruk {{fingerprint}}",
     "notUsed": "Nog door geen enkele server gebruikt",
-    "setDefault": "Als standaard",
-    "setDefaultFor": "Als standaard – {{identity}}",
+    "setDefault": "Als standaard instellen",
+    "setDefaultFor": "Als standaard instellen – {{identity}}",
     "defaultSet": "{{identity}} is nu de standaardidentiteit.",
     "details": "Details",
     "detailsFor": "Details van {{identity}} tonen",
@@ -128,7 +128,7 @@
     "lastIdentity": "Mumcord heeft minstens één identiteit nodig. Maak eerst een andere aan.",
     "backupFirst": "Eerst back-uppen",
     "typeToConfirm": "Typ het label van de identiteit om te bevestigen",
-    "typeToConfirmHint": "Typ precies ‘{{identity}}’ om Verwijderen vrij te geven.",
+    "typeToConfirmHint": "Typ precies “{{identity}}” om Verwijderen vrij te geven.",
     "deleted": "Identiteit verwijderd.",
     "backupWarning": "Maak een back-up voor je verwijdert. Een identiteit zonder back-up is niet te herstellen.",
     "usedBy": "Gebruikt door: {{servers}}",
@@ -149,7 +149,7 @@
     "testRecording": "Opnemen… praat nu.",
     "testPlaying": "Je stem wordt afgespeeld…",
     "musicQuality": "Muziekkwaliteit",
-    "musicQualityHint": "Gebruikt meer bandbreedte en schakelt ruisonderdrukking en automatisch volume uit; bedoeld voor muziek. Push-to-talk werkt het best.",
+    "musicQualityHint": "Stemt de encoder af op muziek en schakelt ruisonderdrukking en automatisch volume uit. Push-to-talk werkt het best.",
     "bitrate": "Bitrate",
     "bitrateMax": "Max",
     "bitrateValue": "{{kbps}} kbit/s",
@@ -178,7 +178,7 @@
       "registrationFailed": "Push-to-talk is niet beschikbaar: de sneltoets kon niet worden geregistreerd.",
       "mouseDisabled": "Push-to-talk is niet beschikbaar: voor je muisknop moet “Muisknoppen toestaan” zijn ingeschakeld.",
       "mouseNeedsInputGroup": "Push-to-talk is niet beschikbaar: Mumcord mag je muis misschien nog niet lezen (zie hieronder).",
-      "mouseNeedsAccessibility": "Push-to-talk is niet beschikbaar: Mumcord heeft de toegankelijkheidsmachtiging nodig om muisknoppen te zien."
+      "mouseNeedsAccessibility": "Push-to-talk is niet beschikbaar: Mumcord heeft het recht Toegankelijkheid nodig om muisknoppen te zien."
     },
     "suggestVoiceActivation": "Gebruik in plaats daarvan spraakactivering.",
     "keyCurrent": "Push-to-talk-toets:",
@@ -205,7 +205,7 @@
       "standard": "AI-filter voor alledaags geluid zoals toetsenborden en ventilatoren. Laag CPU-gebruik.",
       "advanced": "Nieuwer AI-model dat ook wisselend geluid verwijdert. Ongeveer drie keer de CPU van Standaard en 10 ms meer vertraging."
     },
-    "noiseChoiceBeta": "Bèta",
+    "noiseChoiceBeta": "Beta",
     "noiseChoiceTipLabel": "Over {{choice}}",
     "detectorHint": "Spraakactivering herkent spraak met het RNNoise-model; het verandert je audio niet.",
     "echoCancellation": "Echo-onderdrukking",
@@ -222,13 +222,13 @@
       "forward": "Muisknop 5 (vooruit)"
     },
     "mouseToggle": "Muisknoppen toestaan (vereist input-groep)",
-    "mouseToggleWarning": "Hiermee kun je een muisknop gebruiken voor push-to-talk. Daarvoor moet je lid zijn van de groep \"input\", waardoor elk programma dat je start alle invoerapparaten kan lezen, inclusief je toetsenbord. Mumcord zelf opent alleen muizen, let alleen op je push-to-talk-knop en neemt of logt nooit iets op.",
-    "mouseInputGroup": "Mumcord mag je muis misschien nog niet lezen. Voeg jezelf toe aan de groep \"input\" door dit commando in een terminal uit te voeren:",
+    "mouseToggleWarning": "Hiermee kun je een muisknop gebruiken voor push-to-talk. Daarvoor moet je lid zijn van de groep “input”, waardoor elk programma dat je start alle invoerapparaten kan lezen, inclusief je toetsenbord. Mumcord zelf opent alleen muizen, let alleen op je push-to-talk-knop en neemt nooit iets op en logt niets.",
+    "mouseInputGroup": "Mumcord mag je muis misschien nog niet lezen. Voeg jezelf toe aan de groep “input” door dit commando in een terminal uit te voeren:",
     "mouseLogOut": "Log daarna uit en weer in. Gebruik tot die tijd een toets op het toetsenbord of spraakactivering.",
-    "mouseNoDevice": "Geen muis gevonden. Sluit er een aan; Mumcord pikt hem automatisch op.",
+    "mouseNoDevice": "Geen muis gevonden. Sluit er een aan; Mumcord herkent hem automatisch.",
     "mouseAccessibility": "Om muisknoppen te gebruiken, geef je Mumcord toestemming onder Systeeminstellingen → Privacy en beveiliging → Toegankelijkheid en start je Mumcord daarna opnieuw op.",
     "compatMode": "Compatibiliteitsmodus (X11)",
-    "compatModeHint": "Mumcord draait via de X11-compatibiliteitslaag van je desktop, zodat push-to-talk werkt zonder desktopvenster en zonder de groep \"input\". Je desktop bepaalt wat Mumcord mag zien: in KDE onder Systeeminstellingen → Ondersteuning voor verouderde X11-apps. Standaard werken alleen toetscombinaties en modificatietoetsen; muisknoppen alleen als je ze daar toestaat. Dit is minder geïsoleerd dan de moderne manier.",
+    "compatModeHint": "Mumcord draait via de X11-compatibiliteitslaag van je desktop, zodat push-to-talk werkt zonder desktopvenster en zonder de groep “input”. Je desktop bepaalt wat Mumcord mag zien: in KDE onder Systeeminstellingen → Ondersteuning voor verouderde X11-apps. Standaard werken alleen toetscombinaties en modificatietoetsen; muisknoppen alleen als je ze daar toestaat. Dit is minder afgeschermd dan de moderne manier.",
     "compatRestartNeeded": "Wordt actief nadat Mumcord opnieuw is gestart. Je verbinding wordt even verbroken.",
     "compatRestart": "Nu opnieuw starten",
     "compatRestartFailed": "Mumcord kon niet opnieuw starten. Sluit het af en open het zelf opnieuw.",
@@ -251,14 +251,14 @@
     "threshold": "Drempel voor spraakactivering",
     "thresholdValue": "{{value}} dBFS",
     "thresholdHint": "Sleep de schuifregelaar over de meter. Mumcord verzendt zolang het niveau boven de lijn ligt, plus nog even daarna.",
-    "measure": "Live niveau tonen",
+    "measure": "Live-niveau tonen",
     "measuring": "Meten… praat nu",
     "whisper": {
       "title": "Fluister- en roepdoelen",
       "saved": "Opgeslagen doelen",
       "edit": "Doel bewerken",
       "new": "Nieuw doel",
-      "empty": "Nog geen doelen. Maak er hier een of via „Fluister naar…” in het menu van een persoon of kanaal.",
+      "empty": "Nog geen doelen. Maak er hier een of via “Fluister naar…” in het menu van een persoon of kanaal.",
       "hint": "Houd de toets ingedrukt om met het doel te praten. Laat los om terug te gaan naar je kanaal. Werkt op elke Mumble-server.",
       "name": "Naam",
       "receiversLegend": "Wie je hoort",
@@ -284,7 +284,7 @@
       "keyChange": "Wijzigen",
       "keyListening": "Druk op een toets…",
       "keyRemove": "Toets verwijderen",
-      "keyTaken": "Deze toets kan niet worden gebruikt: het is geen enkele toets met optionele modifiers, of het is al push-to-talk of de toets van een ander doel.",
+      "keyTaken": "Deze toets kan niet worden gebruikt: het is geen enkele toets met optionele modificatietoetsen, of hij is al de push-to-talk-toets of de toets van een ander doel.",
       "keyFailed": "Deze toets wordt door een andere app vastgehouden en werkt nu niet.",
       "keysWayland": "Fluistertoetsen zijn niet beschikbaar in deze Wayland-sessie: je desktop biedt geen globale sneltoetsen. Zet de compatibiliteitsmodus aan om ze te gebruiken, of begin met fluisteren vanuit het gebruikerspaneel.",
       "save": "Opslaan",
@@ -299,7 +299,7 @@
     "explanation": "Chatberichten worden alleen op deze computer opgeslagen.",
     "perServer": "Uitzonderingen per server",
     "noServers": "Nog geen opgeslagen servers.",
-    "save": "Geschiedenis opslaan op {{server}}",
+    "save": "Geschiedenis opslaan voor {{server}}",
     "clearServer": "Geschiedenis van {{server}} wissen…",
     "clearAll": "Alle geschiedenis wissen…",
     "confirmTitle": "Geschiedenis wissen?",
@@ -313,14 +313,14 @@
   },
   "fullImages": {
     "offer": "Mijn afbeeldingen op volledige grootte aanbieden",
-    "offerHint": "Andere Mumcord-gebruikers kunnen mijn afbeeldingen op volledige grootte openen. Uit: alleen het kleine voorbeeld wordt verzonden, er wordt geen origineel bewaard en er wordt er niets van gedeeld.",
+    "offerHint": "Andere Mumcord-gebruikers kunnen mijn afbeeldingen op volledige grootte openen. Uit: alleen het kleine voorbeeld wordt verzonden, er wordt geen origineel bewaard en niets gedeeld.",
     "load": "Afbeeldingen op volledige grootte van anderen laden",
     "loadHint": "Open afbeeldingen van andere Mumcord-gebruikers op volledige grootte. Uit: alleen het voorbeeld wordt getoond en het origineel wordt nooit opgevraagd."
   },
   "historySharing": {
     "title": "Geschiedenis synchroniseren",
     "switch": "Mijn kanaalgeschiedenis delen",
-    "hint": "Andere Mumcord-gebruikers die een kanaal betreden of volgen, kunnen de berichten ervan ophalen uit je opgeslagen geschiedenis (tot 7 dagen, alleen van vóór hun komst). Privéchats worden nooit gedeeld."
+    "hint": "Andere Mumcord-gebruikers die aan een kanaal deelnemen of het volgen, kunnen de berichten ervan ophalen uit je opgeslagen geschiedenis (tot 7 dagen, alleen van vóór hun komst). Privéchats worden nooit gedeeld."
   },
   "appearance": {
     "messageDisplay": "Berichtweergave",
@@ -350,7 +350,7 @@
     "auto": "auto",
     "cellLabel": "{{color}}, {{version}}",
     "newTitle": "Nieuw thema",
-    "editTitle": "‘{{name}}’ bewerken",
+    "editTitle": "“{{name}}” bewerken",
     "generatedFromDark": "Automatisch gemaakt van de donkere versie. Volgt je wijzigingen daar totdat je het hier wijzigt.",
     "generatedFromLight": "Automatisch gemaakt van de lichte versie. Volgt je wijzigingen daar totdat je het hier wijzigt.",
     "colors": {
@@ -380,8 +380,8 @@
     "importConfirm": "Importeren",
     "importInvalid": "Dit is geen geldig Mumcord-thema.",
     "importUnreadable": "Dit thema is niet goed genoeg leesbaar.",
-    "imported": "‘{{name}}’ geïmporteerd.",
-    "alreadyImported": "‘{{name}}’ staat al in je thema's.",
+    "imported": "“{{name}}” geïmporteerd.",
+    "alreadyImported": "“{{name}}” staat al in je thema's.",
     "madeWithNewer": "Gemaakt met Mumcord {{version}} – werk bij om het volledig te zien.",
     "reset": "Herstellen",
     "menuLabel": "Opties voor {{name}}",
@@ -391,10 +391,10 @@
     "previewing": "Voorbeeld van {{name}}",
     "backToEditor": "Terug naar editor",
     "rename": "Thema hernoemen",
-    "renameTitle": "‘{{name}}’ hernoemen",
+    "renameTitle": "“{{name}}” hernoemen",
     "renameConfirm": "Hernoemen",
     "delete": "Thema verwijderen",
-    "deleteTitle": "‘{{name}}’ verwijderen?",
+    "deleteTitle": "“{{name}}” verwijderen?",
     "deleteMessage": "Servers die dit thema gebruiken, gaan terug naar het app-thema.",
     "deleteConfirm": "Verwijderen"
   },
@@ -404,7 +404,7 @@
     "keyboardHintsHint": "Korte tips op het scherm zoals “Pijltjestoetsen: bewegen” onder de kanaallijst en in de GIF-favorieten. Schermlezers lezen ze nog steeds voor als dit uit staat.",
     "announcements": "Meldingen voor schermlezers",
     "announcementsHint": "Je schermlezer leest gebeurtenissen voor, zoals mensen die binnenkomen, vertrekken of beginnen te praten.",
-    "skipLinks": "Snelkoppelingen",
+    "skipLinks": "Skiplinks",
     "skipLinksHint": "Links aan het begin van het venster die met Tab direct naar de chat of de kanaallijst springen."
   },
   "language": {
@@ -422,20 +422,20 @@
     "themeRich": "Rijk",
     "preview": "Beluisteren",
     "previewHint": "Rijk heeft vollere geluiden, Klassiek korte, eenvoudige tonen. Het voorbeeld is hoorbaar terwijl je in een spraakkanaal zit.",
-    "joinLeave": "Iemand komt binnen in of verlaat je kanaal",
-    "voiceJoin": "Je neemt deel aan een kanaal voor voice",
+    "joinLeave": "Iemand komt in je kanaal of verlaat het",
+    "voiceJoin": "Je neemt deel aan een kanaal om te praten",
     "selfMute": "Je dempt jezelf of heft de demping op",
     "selfDeaf": "Je zet jezelf doof of heft het doof zetten op",
     "hangUp": "Je verbreekt de verbinding met een server",
     "quit": "Je sluit Mumcord af terwijl je in een spraakkanaal zit",
-    "channelSwitch": "Je wisselt naar een ander kanaal terwijl je in spraak zit",
-    "kicked": "Je wordt van een server gekickt",
+    "channelSwitch": "Je wisselt naar een ander kanaal terwijl je in een spraakkanaal zit",
+    "kicked": "Je wordt van een server verwijderd",
     "banned": "Je wordt van een server verbannen",
     "messages": "Nieuw bericht in een gevolgd kanaal of privéchat",
     "mention": "Geluid bij vermelding",
     "mentionNotify": "Melding bij vermelding",
     "partyStarted": "Iemand start een watchparty in je kanaal",
-    "partyJoined": "Iemand doet mee aan je watchparty",
+    "partyJoined": "Iemand neemt deel aan je watchparty",
     "partyLeft": "Iemand verlaat je watchparty",
     "shareStarted": "Iemand begint in je kanaal een scherm te delen",
     "shareStopped": "Een schermdeling in je kanaal stopt",
@@ -444,19 +444,23 @@
   },
   "notifications": {
     "title": "Meldingen",
-    "legend": "Meldingen voor nieuwe berichten",
-    "explanation": "Voor nieuwe berichten in je kanaal, gevolgde kanalen en privéchats, behalve de chat waar je naar kijkt.",
-    "inApp": "In de app: een kleine pop-up in Mumcord zolang het op de voorgrond staat",
-    "desktop": "Desktop: een systeemmelding",
-    "both": "Beide: pop-up zolang Mumcord op de voorgrond staat, anders een systeemmelding",
-    "off": "Uit",
+    "explanation": "Hoe Mumcord je op de hoogte houdt van nieuwe berichten en wat er op je servers gebeurt. Elke soort heeft een eigen keuze.",
+    "messages": "Nieuwe berichten",
+    "messagesHint": "Je kanaal, gevolgde kanalen en privéchats",
+    "mode": {
+      "off": "Uit",
+      "inApp": "In de app",
+      "desktop": "Systeem",
+      "both": "Beide"
+    },
+    "modesHint": "In de app: een kleine pop-up in Mumcord zolang het op de voorgrond staat. Systeem: een melding van je besturingssysteem. Beide: de pop-up zolang Mumcord op de voorgrond staat, anders een systeemmelding. Voor de chat waar je nu naar kijkt en tijdens Niet storen wordt niets getoond.",
     "activityTitle": "Activiteitsmeldingen",
     "activity": {
       "screenShare": "Iemand start een schermdeling",
       "watchParty": "Iemand start een watchparty",
       "pluginActivity": "Iemand start een plug-inactiviteit",
       "pluginEvent": "Plug-ingebeurtenissen",
-      "joins": "Iemand verbindt, vertrekt of wisselt van kanaal"
+      "joins": "Iemand maakt verbinding, vertrekt of wisselt van kanaal"
     }
   },
   "overlay": {
@@ -470,12 +474,12 @@
     },
     "opacity": "Dekking",
     "inGame": {
-      "title": "Overlay in games",
+      "title": "In-game-overlay",
       "explanation": "Toont wie er praat in je games. Hij start vanzelf als een game start en verschijnt alleen in games.",
-      "mode": "Overlay in games",
+      "mode": "In-game-overlay",
       "off": "Uit",
       "on": "Aan",
-      "antiCheat": "Sommige games met anticheatbescherming zien elke overlay als valsspelen en kunnen het account bannen. Die games staan standaard uit, ook als dit op Aan staat.",
+      "antiCheat": "Sommige games met anticheatbescherming zien elke overlay als valsspelen en kunnen het account verbannen. Die games staan standaard uit, ook als dit op Aan staat.",
       "games": "Games",
       "noGames": "Nog geen games bekend. Games verschijnen hier zodra ze zijn gedetecteerd.",
       "running": "Draait nu",
@@ -486,9 +490,9 @@
       "options": "Opties voor {{game}}",
       "reset": "Standaard gebruiken voor {{game}}",
       "size": "Grootte",
-      "unsupported": "De overlay in games is niet beschikbaar op dit systeem. In plaats daarvan wordt de vensteroverlay hierboven gebruikt.",
-      "loadFailed": "De instellingen voor de overlay in games konden niet worden geladen.",
-      "saveFailed": "De wijziging van de overlay in games kon niet worden toegepast.",
+      "unsupported": "De in-game-overlay is niet beschikbaar op dit systeem.",
+      "loadFailed": "De instellingen voor de in-game-overlay konden niet worden geladen.",
+      "saveFailed": "De wijziging van de in-game-overlay kon niet worden toegepast.",
       "opengl": {
         "title": "OpenGL-games",
         "explanation": "Alleen nodig voor OpenGL-games: plak in de Steam-startopties van de game.",
@@ -498,12 +502,12 @@
         "copyFailed": "Kopiëren mislukt. Selecteer de tekst en kopieer die handmatig."
       },
       "confirmTitle": "De overlay inschakelen voor {{game}}?",
-      "confirmMessage": "Waarschuwing: {{game}} gebruikt anticheatbescherming ({{reason}}). Overlays kunnen als valsspelen worden gedetecteerd en je account kan worden gebanned. Mumcord is daar niet verantwoordelijk voor. Ga alleen verder als je dit risico accepteert.",
+      "confirmMessage": "Waarschuwing: {{game}} gebruikt anticheatbescherming ({{reason}}). Overlays kunnen als valsspelen worden gedetecteerd en je account kan worden verbannen. Mumcord is daar niet verantwoordelijk voor. Ga alleen verder als je dit risico accepteert.",
       "confirmEnable": "Toch inschakelen",
       "limits": {
-        "libraryMissing": "De overlay in games is niet beschikbaar: de overlaybibliotheek (libmumcord_overlay_layer.so) is niet naast Mumcord gevonden. Installeer Mumcord opnieuw om hem te herstellen. In plaats daarvan wordt de vensteroverlay hierboven gebruikt.",
-        "windowsFullscreen": "Gebruik in de game randloos of venster-volledig scherm.",
-        "macos": "macOS ondersteunt geen overlays in games. In plaats daarvan wordt de vensteroverlay hierboven gebruikt."
+        "libraryMissing": "De in-game-overlay is niet beschikbaar: de overlaybibliotheek (libmumcord_overlay_layer.so) is niet naast Mumcord gevonden. Installeer Mumcord opnieuw om hem te herstellen.",
+        "windowsFullscreen": "Gebruik in de game randloos volledig scherm of volledig scherm in venster.",
+        "macos": "macOS ondersteunt geen in-game-overlays."
       }
     }
   },
@@ -527,15 +531,28 @@
     "copyWhole": "Hele log kopiëren",
     "openLogFolder": "Logmap openen",
     "logCopied": "Log gekopieerd.",
-    "fileLabel": "Diagnosebestand"
+    "fileLabel": "Diagnosebestand",
+    "writeToDisk": "Logs naar schijf schrijven",
+    "writeToDiskHint": "Als dit uit staat, blijft de log alleen voor deze sessie in het geheugen — er wordt niets naar schijf geschreven.",
+    "mediaPackages": "Missing media packages. Install them and restart Mumcord: video and sound of a watch party will not play until you do.",
+    "system": "System",
+    "systemOs": "Operating system",
+    "systemSession": "Session",
+    "systemAudio": "Audio device (output · input)",
+    "systemDefault": "System default",
+    "crashSymbols": "Crash reports on FreeBSD carry coarser symbol names, because /proc is missing.",
+    "session": {
+      "x11": "X11",
+      "wayland": "Wayland (hotkeys and capture through XWayland)"
+    }
   },
   "about": {
     "version": "Versie",
     "os": "Systeem",
     "license": "Mumcord-licentie (AGPL-3.0)",
     "whatsNew": "Wat is er nieuw",
-    "whatsNewAuto": "‘Wat is er nieuw’ automatisch tonen na updates",
-    "changelogFailed": "Het venster ‘Wat is er nieuw’ kon niet worden geopend.",
+    "whatsNewAuto": "“Wat is er nieuw” automatisch tonen na updates",
+    "changelogFailed": "Het venster “Wat is er nieuw” kon niet worden geopend.",
     "support": "Ondersteuning",
     "reportBug": "Een bug melden",
     "requestFeature": "Een functie aanvragen",
@@ -547,11 +564,22 @@
     "devToolsUnlocked": "Ontwikkelaarstools ontgrendeld: de pakketinspecteur staat nu in de lijst met instellingen.",
     "portable": "Draagbaar",
     "setup": "Installatie",
-    "setupWizardHint": "Doorloop de eerste installatie opnieuw om je microfoon, privacykeuzes, updatecontrole en spraakmodus te bekijken. Je huidige keuzes zijn al ingevuld.",
+    "setupWizardHint": "Doorloop de eerste installatie opnieuw om je microfoon, privacykeuzes, updatecontrole en praatmodus te bekijken. Je huidige keuzes zijn al ingevuld.",
     "setupWizardRun": "Installatiewizard opnieuw uitvoeren",
     "setupWizardIdentityNote": "Je identiteit hoort hier niet bij. Je certificaat, en daarmee je geregistreerde naam en rechten op servers, blijft precies zoals het is.",
     "setupWizardIdentityLink": "Beheer die bij Identiteit",
-    "versionTitle": "Versie en licentie"
+    "tipsTitle": "Tips",
+    "tipsHint": "Aaron laat je in ongeveer een minuut Mumcord zien: servers, kanalen, praten, chat en meer.",
+    "tipsShow": "Tips tonen",
+    "versionTitle": "Versie en licentie",
+    "limitsTitle": "Not available on FreeBSD",
+    "limitCamera": "Camera: no camera backend on FreeBSD yet.",
+    "limitCameraEffects": "Camera background effects: no ONNX Runtime for FreeBSD.",
+    "limitScreenShareSound": "Screen-share sound: FreeBSD has no PipeWire to capture it.",
+    "limitWindowPicker": "Window or app picking: FreeBSD has no desktop portal; a share is the whole X11 screen.",
+    "limitOverlay": "In-game overlay: it needs the Linux or Windows graphics stack.",
+    "freebsdDriver": "Intel graphics: use drm-66-kmod (\"pkg install drm-66-kmod\"); drm-612-kmod hangs these GPUs (freebsd/drm-kmod #509).",
+    "limitProtectedVideo": "Protected (DRM) video cannot play in the app; it opens in the browser instead."
   },
   "profile": {
     "title": "Profiel",
@@ -571,11 +599,11 @@
     "hint": "Mumcord laadt gelinkte pagina's om voorbeelden en videospelers te tonen; die sites zien je IP-adres."
   },
   "nowPlaying": {
-    "title": "Speelt nu",
+    "title": "Wordt nu afgespeeld",
     "switch": "Delen waar ik naar luister",
-    "hint": "Mumcord leest het huidige nummer uit de mediaspeler van je systeem (bijvoorbeeld Spotify) – geen Spotify-login nodig. Andere Mumcord-gebruikers zien titel, artiest, hoes en voortgang; officiële Mumble-clients zien een regel \"🎵 Artiest – Titel\" aan het einde van je opmerking.",
+    "hint": "Mumcord leest het huidige nummer uit de mediaspeler van je systeem (bijvoorbeeld Spotify) – geen Spotify-login nodig. Andere Mumcord-gebruikers zien titel, artiest, hoes en voortgang; officiële Mumble-clients zien een regel “🎵 Artiest – Titel” aan het einde van je opmerking.",
     "unsupported": "Niet ondersteund op macOS: het systeem biedt apps geen manier om het huidige nummer te lezen.",
-    "current": "Nu gedeeld: {{track}}",
+    "current": "Wordt nu gedeeld: {{track}}",
     "nothing": "Er wordt nu niets afgespeeld."
   },
   "previewCache": {
@@ -607,11 +635,11 @@
     "days_other": "{{count}} dagen"
   },
   "nowGaming": {
-    "title": "Gamet nu",
+    "title": "Nu aan het gamen",
     "switch": "Delen welke game ik speel",
-    "hint": "Mumcord zoekt naar bekende games tussen je draaiende programma's en naar de game die Steam uitvoert. Andere Mumcord-gebruikers zien de game, de afbeelding ervan en hoe lang je al speelt, en kunnen meespelen op je server als de game er een biedt; officiële Mumble-clients zien een regel \"🎮 Game\" aan het einde van je opmerking.",
+    "hint": "Mumcord zoekt naar bekende games tussen je draaiende programma's en naar de game die Steam uitvoert. Andere Mumcord-gebruikers zien de game, de afbeelding ervan en hoe lang je al speelt, en kunnen meespelen op je server als de game er een biedt; officiële Mumble-clients zien een regel “🎮 Game” aan het einde van je opmerking.",
     "unsupported": "Niet ondersteund op dit systeem.",
-    "current": "Nu gedeeld: {{game}}",
+    "current": "Wordt nu gedeeld: {{game}}",
     "nothing": "Op dit moment geen game gedetecteerd."
   },
   "positional": {
@@ -627,13 +655,13 @@
     "betaHint": "De resultaten hangen af van de game en de ondersteuning voor plug-ins."
   },
   "gamePlugins": {
-    "title": "Game-plug-ins",
-    "explanation": "Games vertellen Mumcord waar je bent via Mumble Link of via officiële Mumble-gameplug-ins. Mumcord vindt de plug-ins in zijn eigen plug-inmap en in een bestaande Mumble-installatie. Schakel alleen de plug-ins in voor games die je speelt.",
+    "title": "Gameplug-ins",
+    "explanation": "Games vertellen Mumcord waar je bent via Mumble Link of via officiële gameplug-ins van Mumble. Mumcord vindt de plug-ins in zijn eigen plug-inmap en in een bestaande Mumble-installatie. Schakel alleen de plug-ins in voor games die je speelt.",
     "antiCheat": "Gameplug-ins lezen het geheugen van de game. Sommige anticheatsystemen kunnen dit markeren; schakel plug-ins uit voor games met strenge anticheat.",
     "loading": "Zoeken naar gameplug-ins…",
     "none": "Geen gameplug-ins gevonden. Installeer Mumble of kopieer plug-inbestanden naar de plug-inmap van Mumcord.",
-    "loadFailed": "De gameplug-ins konden niet worden opgesomd.",
-    "switchFailed": "De gameplug-in kon niet worden omgeschakeld.",
+    "loadFailed": "De gameplug-ins konden niet worden weergegeven.",
+    "switchFailed": "De gameplug-in kon niet worden in- of uitgeschakeld.",
     "version": "Versie {{version}}",
     "active": "Levert posities",
     "problem": {
@@ -661,11 +689,11 @@
     "weakConnectionHint": "Een klein signaalpictogram naast mensen met een slechte verbinding."
   },
   "p2p": {
-    "title": "Peer-to-peer (schermdelen, afbeeldingen op volledige grootte)",
+    "title": "Peer-to-peer (schermdeling, afbeeldingen op volledige grootte)",
     "modeLabel": "Peer-to-peer-modus",
-    "explanation": "Bij direct ziet de ander je IP-adres. De relay verbergt het voor hem of haar; de beheerder van de relay (de community van deze server) kan het zien. Beide zijn end-to-end versleuteld.",
+    "explanation": "Bij direct ziet de ander je IP-adres. De relay verbergt het voor de ander; de beheerder van de relay (de gemeenschap van deze server) kan het zien. Beide zijn end-to-end versleuteld.",
     "useGlobal": "Globale instelling gebruiken",
-    "overrideHint": "Alleen voor deze server. \"Globale instelling gebruiken\" volgt Instellingen → Privacy.",
+    "overrideHint": "Alleen voor deze server. “Globale instelling gebruiken” volgt Instellingen → Privacy.",
     "mode": {
       "directRelay": "Direct + relay (eerst direct)",
       "relayFirst": "Direct + relay (altijd relay, verbergt mijn IP)",
@@ -686,10 +714,10 @@
   },
   "inspector": {
     "title": "Ontwikkelaarstools",
-    "intro": "Toont de pakketten die Mumcord verstuurt en ontvangt, vooral Mumcord-plugingegevens, voor foutopsporing. Alleen de laatste 2.000 pakketten worden bewaard, in het geheugen van dit apparaat; er wordt niets gelogd of ergens heen gestuurd.",
+    "intro": "Toont de pakketten die Mumcord verstuurt en ontvangt, vooral plug-ingegevens van Mumcord, voor foutopsporing. Alleen de laatste 2.000 pakketten worden bewaard, in het geheugen van dit apparaat; er wordt niets gelogd of ergens heen gestuurd.",
     "devTools": "Ontwikkelaarstools",
     "devToolsHint": "Zet uit om de pakketinspecteur weer te verbergen en het vastleggen te stoppen.",
-    "open": "Pakketinspector openen",
+    "open": "Pakketinspecteur openen",
     "filters": "Filters en export",
     "server": "Server",
     "allServers": "Alle servers",
@@ -759,12 +787,12 @@
       "hello": "Mumcord-hallo",
       "history": "Synchronisatie van chatgeschiedenis",
       "image": "Overdracht van afbeelding op volledige grootte",
-      "nowgaming": "Status ‘speelt nu’",
-      "nowplaying": "Status ‘luistert nu’",
+      "nowgaming": "Status “speelt nu”",
+      "nowplaying": "Status “luistert nu”",
       "p2p": "Opzetten van directe verbinding",
-      "screen": "Signaal voor schermdelen",
-      "watch": "Status van kijkfeest",
-      "plugin": "Plugingegevens",
+      "screen": "Signaal voor schermdeling",
+      "watch": "Status van watchparty",
+      "plugin": "Plug-ingegevens",
       "mumble": "Mumble-bericht",
       "peer": "Relay instellen",
       "media": "Mediastroom"
@@ -772,7 +800,7 @@
   },
   "licences": {
     "title": "Licenties van derden",
-    "own": "Mumcord zelf is vrije software onder de GNU Affero General Public License v3 only (AGPL-3.0-only).",
+    "own": "Mumcord zelf is vrije software onder uitsluitend de GNU Affero General Public License v3 (AGPL-3.0-only).",
     "sourceCode": "Broncode",
     "search": "Zoeken op naam of licentie",
     "filter": "Licentie",
@@ -811,9 +839,9 @@
   "dnd": {
     "title": "Niet storen",
     "label": "Niet storen",
-    "description": "Geen meldingsgeluiden of -banners op welke server dan ook. Spraak en chat blijven werken en ongelezen-tellers blijven tellen.",
+    "description": "Geen meldingsgeluiden of -banners op welke server dan ook. Spraak en chat blijven werken en badges voor ongelezen berichten blijven tellen.",
     "follow": "Niet storen van het systeem volgen",
-    "followDescription": "Zet Niet storen aan zodra Niet storen of de focusmodus van je bureaublad aan staat.",
+    "followDescription": "Zet Niet storen aan zodra Niet storen of de focusmodus van je desktop aan staat.",
     "detected": "Gedetecteerd",
     "detectedOn": "{{desktop}} · Niet storen staat aan (systeem). Wijzigingen worden direct opgepikt.",
     "detectedOff": "{{desktop}} · Niet storen staat uit. Wijzigingen worden direct opgepikt.",
@@ -826,18 +854,18 @@
     "everyone": "Iedereen",
     "everyoneHint": "Iedereen op een server kan je berichten sturen.",
     "friendsOnly": "Alleen vrienden",
-    "friendsOnlyHint": "Andere Mumcord-gebruikers kunnen in plaats daarvan een chatverzoek sturen. Berichten van standaardclients komen onder ‘Berichtverzoeken’.",
+    "friendsOnlyHint": "Andere Mumcord-gebruikers kunnen in plaats daarvan een chatverzoek sturen. Berichten van standaardclients komen onder “Berichtverzoeken”.",
     "nobody": "Niemand",
     "nobodyHint": "Er worden geen privéberichten en geen chatverzoeken getoond. Afzenders krijgen hier niets van te horen.",
     "keepRequests": "Berichten van standaardclients bewaren als berichtverzoeken",
-    "keepRequestsHint": "Alleen gebruikt bij ‘Alleen vrienden’. Als dit uit staat, worden deze berichten genegeerd.",
+    "keepRequestsHint": "Alleen gebruikt bij “Alleen vrienden”. Als dit uit staat, worden deze berichten genegeerd.",
     "overrideTitle": "Uitzondering per server",
-    "overrideLabel": "Privéberichten van op {{server}}",
+    "overrideLabel": "Privéberichten op {{server}} van",
     "useDefault": "Standaard gebruiken ({{rule}})",
     "noServers": "Nog geen opgeslagen servers.",
     "alwaysTitle": "Altijd toegestaan",
     "currentChannel": "Mensen in mijn huidige kanaal",
-    "currentChannelHint": "Gaat vóór ‘Alleen vrienden’ en ‘Niemand’ zolang we in hetzelfde kanaal zitten.",
+    "currentChannelHint": "Gaat vóór “Alleen vrienden” en “Niemand” zolang we in hetzelfde kanaal zitten.",
     "accepted": "Gesprekken die ik al heb geaccepteerd",
     "acceptedHint": "Mensen van wie je het chatverzoek hebt geaccepteerd, mogen je blijven schrijven."
   },
@@ -863,7 +891,7 @@
     "unblockFailed": "Deblokkeren is mislukt. Probeer het opnieuw.",
     "messagesTitle": "Geblokkeerde berichten in de kanaalchat",
     "collapse": "Inklappen",
-    "collapseHint": "Toont ‘Bericht van een geblokkeerde gebruiker’ met een knop ‘Tonen’.",
+    "collapseHint": "Toont “Bericht van een geblokkeerde gebruiker” met een knop “Tonen”.",
     "hide": "Helemaal verbergen",
     "hideHint": "Er wordt niets in de chat getoond."
   },
@@ -894,6 +922,16 @@
     "modeNotify": "Alleen melden",
     "modeOff": "Uit",
     "autoUnavailable": "Deze kopie kan zichzelf niet bijwerken, dus Mumcord meldt alleen nieuwe versies.",
+    "channel": "Updatekanaal",
+    "channelHint": "Kies welke versies Mumcord aanbiedt. Release candidates zijn vroege builds van de volgende versie.",
+    "channels": {
+      "stable": { "name": "Stabiel", "hint": "Alleen definitieve versies" },
+      "releaseCandidates": {
+        "name": "Release candidates",
+        "hint": "Vroege builds van de volgende versie; kunnen bugs bevatten"
+      }
+    },
+    "channelSwitchBack": "Als je terugschakelt naar Stabiel, houd je je huidige versie tot de volgende definitieve versie uit is.",
     "interval": "Op updates controleren",
     "intervalHint_one": "Bij het starten en elk uur",
     "intervalHint_other": "Bij het starten en elke {{count}} uur",
@@ -926,7 +964,7 @@
     "stopSkipping": "Niet meer overslaan",
     "whatsNew": "Wat is er nieuw",
     "whatsNewHint": "Bekijk de wijzigingen in elke versie.",
-    "openChangelog": "Wijzigingenlogboek openen"
+    "openChangelog": "Wijzigingslogboek openen"
   },
   "badges": {
     "changed": "Gewijzigd",
@@ -949,7 +987,7 @@
     "unchanged": "Geen wijzigingen sinds de installatie",
     "switch": "Wisselen",
     "switchLabel": "Preset wisselen",
-    "applyFailed": "De overlay in games of Niet storen kon niet worden gewijzigd. Probeer het opnieuw."
+    "applyFailed": "De in-game-overlay of Niet storen kon niet worden gewijzigd. Probeer het opnieuw."
   },
   "presets": {
     "dialogTitle": "Preset wisselen",
@@ -967,14 +1005,14 @@
       "point1": "Anderen zien wat je speelt en waar je naar luistert",
       "point2": "Je IP-adres is zichtbaar voor mensen met wie je rechtstreeks verbindt",
       "point3": "Iedereen kan je berichten sturen; links en afbeeldingen worden van internet geladen",
-      "point4": "Overlay, geschiedenissynchronisatie en afbeeldingen op volle grootte staan aan"
+      "point4": "Overlay, geschiedenissynchronisatie en afbeeldingen op volledige grootte staan aan"
     },
     "balanced": {
       "name": "Gebalanceerd",
       "tagline": "Tussen privacy en gemak",
       "point1": "Alleen vrienden en mensen in je kanaal kunnen je berichten sturen",
       "point2": "Directe verbinding, met een relay als reserve",
-      "point3": "Linkvoorbeelden en afbeeldingen op volle grootte staan aan",
+      "point3": "Linkvoorbeelden en afbeeldingen op volledige grootte staan aan",
       "point4": "Wat je speelt en waar je naar luistert blijft privé"
     },
     "maximumPrivacy": {
@@ -994,9 +1032,9 @@
     }
   },
   "betaFeatures": {
-    "title": "Bètafuncties",
-    "hint": "Vroege functies die nog kunnen veranderen. Elke functie staat ook op de plek waar ze hoort, met een bètalabel.",
-    "gamePlugins": "Game-plug-ins",
+    "title": "Beta-functies",
+    "hint": "Vroege functies die nog kunnen veranderen. Elke functie staat ook op de plek waar ze hoort, met een Beta-badge.",
+    "gamePlugins": "Gameplug-ins",
     "manage": "Plug-ins beheren"
   },
   "privacySummary": {
@@ -1010,13 +1048,13 @@
     "p2pDirectOnly": "Peer-to-peer maakt alleen rechtstreeks verbinding; de ander kan je IP-adres zien.",
     "externalOn": "Linkvoorbeelden staan aan: Mumcord haalt de gelinkte pagina's op om ze te maken.",
     "externalOff": "Linkvoorbeelden staan uit: Mumcord laadt niets van gelinkte pagina's.",
-    "imagesOn": "Afbeeldingen op volle grootte worden rechtstreeks tussen Mumcord-gebruikers uitgewisseld.",
-    "imagesOff": "Afbeeldingen op volle grootte worden niet uitgewisseld.",
+    "imagesOn": "Afbeeldingen op volledige grootte worden rechtstreeks tussen Mumcord-gebruikers uitgewisseld.",
+    "imagesOff": "Afbeeldingen op volledige grootte worden niet uitgewisseld.",
     "historyOn": "Geschiedenissynchronisatie staat aan: je deelt je kanaalgeschiedenis met andere Mumcord-gebruikers.",
     "historyOff": "Geschiedenissynchronisatie staat uit.",
     "sharingBoth": "Anderen zien wat je speelt en waar je naar luistert.",
     "sharingPlaying": "Anderen zien waar je naar luistert.",
-    "sharingGaming": "Anderen zien welk spel je speelt.",
+    "sharingGaming": "Anderen zien welke game je speelt.",
     "sharingNone": "Wat je speelt en waar je naar luistert blijft privé.",
     "change": "Wijzigen",
     "changeLabel": "Wijzigen: {{topic}}"
@@ -1026,17 +1064,17 @@
     "background": "Werken terwijl Mumcord op de achtergrond draait",
     "backgroundHint": "De sneltoetsen werken overal, ook in games. De standaardsneltoetsen werken alleen zolang het Mumcord-venster vooraan staat.",
     "foregroundOnly": "Sneltoetsen werken alleen als het Mumcord-venster op de voorgrond staat.",
-    "portal": "Je bureaublad (Wayland) vraagt je eenmalig om globale sneltoetsen goed te keuren.",
-    "noPortal": "Je bureaublad biedt geen globale sneltoetsen aan, dus ze werken alleen als het Mumcord-venster op de voorgrond staat.",
+    "portal": "Je desktop (Wayland) vraagt je eenmalig om globale sneltoetsen goed te keuren.",
+    "noPortal": "Je desktop biedt geen globale sneltoetsen aan, dus ze werken alleen als het Mumcord-venster op de voorgrond staat.",
     "compatLink": "Gebruik de compatibiliteitsmodus (X11)",
     "compatSuffix": "als dat niet beschikbaar is.",
     "actions": "Acties",
     "action": {
       "pushToTalk": "Push-to-talk",
       "toggleMute": "Microfoon dempen / dempen opheffen",
-      "toggleDeafen": "Geluid uit / aan",
+      "toggleDeafen": "Doof zetten / opheffen",
       "toggleDnd": "Niet storen aan- of uitzetten",
-      "joinLeaveVoice": "Spraak betreden / verlaten",
+      "joinLeaveVoice": "Deelnemen aan / verlaten van spraak",
       "switchVoiceServer": "Spraakserver wisselen",
       "switchChannel": "Naar kanaal gaan…",
       "previousChannel": "Terug naar vorig kanaal",
@@ -1045,7 +1083,7 @@
       "openMumcord": "Mumcord openen"
     },
     "pushToTalkHint": "Verzendt zolang de toetsen ingedrukt zijn",
-    "pushToTalkOff": "Wordt gebruikt als de spreekmodus bij Spraak push-to-talk is",
+    "pushToTalkOff": "Wordt gebruikt als de praatmodus bij Spraak push-to-talk is",
     "channelPlace": "{{channel}} · {{server}}",
     "rootChannel": "Hoofdkanaal",
     "notSet": "Niet ingesteld",
@@ -1060,7 +1098,7 @@
     "clearLabel": "{{action}} wissen",
     "cancel": "Annuleren",
     "conflictTitle": "Conflict.",
-    "conflict": "Deze combinatie wordt al gebruikt door „{{other}}”. Kies een andere, of wijs haar hier toe en wis de andere.",
+    "conflict": "Deze combinatie wordt al gebruikt door “{{other}}”. Kies een andere, of wijs hem hier toe en wis de andere.",
     "inApp": "Deze combinatie is de eigen sneltoets van Mumcord voor {{shortcut}}. Kies een andere.",
     "inAppShortcut": {
       "memberColumn": "het tonen en verbergen van de ledenkolom",
@@ -1070,8 +1108,8 @@
     },
     "assignHere": "Hier toewijzen",
     "rejected": "Deze toets kan geen globale sneltoets zijn. Druk op een andere toets dan Ctrl, Alt, Shift of Super, met of zonder die toetsen.",
-    "failed": "Deze sneltoets kon niet worden geregistreerd. Misschien gebruikt een andere app of je bureaublad hem al.",
-    "add": "Sneltoets „naar kanaal gaan” toevoegen…",
+    "failed": "Deze sneltoets kon niet worden geregistreerd. Misschien gebruikt een andere app of je desktop hem al.",
+    "add": "Sneltoets “Naar kanaal gaan” toevoegen…",
     "addChannel": "Kanaal",
     "addNone": "Maak verbinding met een server om een van de kanalen te kiezen.",
     "addConfirm": "Toevoegen",
@@ -1087,16 +1125,16 @@
   },
   "newBadge": "Nieuw",
   "pluginSafety": {
-    "title": "Pluginveiligheid",
-    "blockHighRisk": "Plugins met een hoog risico niet toestaan",
-    "hint": "Verbergt de knop Installeren bij plugins met een score van 60 of hoger en blokkeert updates die een geïnstalleerde plugin daar zouden brengen. Plugins die je al hebt geïnstalleerd blijven werken.",
-    "note": "Standaard uit. Officiële plugins en ontwikkelaarsplugins worden nooit beïnvloed. Scores zijn schattingen, geen garantie."
+    "title": "Veiligheid van plug-ins",
+    "blockHighRisk": "Plug-ins met een hoog risico niet toestaan",
+    "hint": "Verbergt de knop Installeren bij plug-ins met een score van 60 of hoger en blokkeert updates die een geïnstalleerde plug-in daar zouden brengen. Plug-ins die je al hebt geïnstalleerd blijven werken.",
+    "note": "Standaard uit. Officiële plug-ins en ontwikkelaarsplug-ins worden nooit beïnvloed. Scores zijn schattingen, geen garantie."
   },
   "pluginSounds": {
-    "title": "Pluginigeluiden",
-    "volume": "Volume van pluginigeluiden",
-    "mute": "Pluginigeluiden dempen",
-    "hint": "Geldt voor elk geluid dat een plugin afspeelt. Pluginigeluiden klinken zachter terwijl mensen praten.",
+    "title": "Plug-ingeluiden",
+    "volume": "Volume van plug-ingeluiden",
+    "mute": "Plug-ingeluiden dempen",
+    "hint": "Geldt voor elk geluid dat een plug-in afspeelt. Plug-ingeluiden klinken zachter terwijl mensen praten.",
     "meter": "Uitvoerniveau (foutopsporing)"
   },
   "screenShare": {
@@ -1131,7 +1169,7 @@
     "statusList": "Encoderstatus",
     "av1Encode": "AV1-codering",
     "sound": "Geluid",
-    "askEachTime": "Vraag me bij elke keer delen om deze instellingen",
+    "askEachTime": "Bij elke keer delen naar deze instellingen vragen",
     "av1Playback": "AV1-weergave",
     "vp9Playback": "VP9-weergave",
     "playbackHardware": "Hardwarematig",
@@ -1152,7 +1190,7 @@
     "activeVp9Gpu": "VP9 ({{gpu}})",
     "activeVp9Cpu": "VP9 (softwarematig)",
     "skippedTooHeavy": "VP9 (AV1 te zwaar voor deze pc)",
-    "skippedOnBattery": "VP9 (op batterij)",
+    "skippedOnBattery": "VP9 (op accu)",
     "skippedAboveLimit": "VP9 (je beeld is hoger dan wat AV1 hier aankan)",
     "softwareWarning": "AV1 draait op de processor zonder geslaagde test en kan te zwaar zijn voor deze pc.",
     "checkAgain": "Opnieuw controleren"
@@ -1183,11 +1221,11 @@
     "blurStrong": "Sterk",
     "effectQuality": "Effectkwaliteit",
     "effectAuto": "Automatisch",
-    "effectBest": "Beste (grafische kaart)",
+    "effectBest": "Beste (videokaart)",
     "effectLight": "Licht (spaart accu)",
-    "effectHint": "Auto gebruikt de grafische kaart als het kan en schakelt over op Licht op de accu of als de pc het druk heeft.",
-    "ownImages_one": "Je eigen achtergrondafbeeldingen blijven op dit apparaat (opgeslagen: {{count}}). Alleen het eindbeeld wordt verstuurd.",
-    "ownImages_other": "Je eigen achtergrondafbeeldingen blijven op dit apparaat (opgeslagen: {{count}}). Alleen het eindbeeld wordt verstuurd.",
+    "effectHint": "Automatisch gebruikt de videokaart als het kan en schakelt over op Licht op de accu of als de pc het druk heeft.",
+    "ownImages_one": "Je eigen achtergrondafbeeldingen blijven op dit apparaat (opgeslagen: {{count}}). Alleen het eindbeeld wordt verzonden.",
+    "ownImages_other": "Je eigen achtergrondafbeeldingen blijven op dit apparaat (opgeslagen: {{count}}). Alleen het eindbeeld wordt verzonden.",
     "manageImages": "Afbeeldingen beheren",
     "imagesTitle": "Je achtergrondafbeeldingen",
     "imagesEmpty": "Nog geen afbeeldingen. Voeg een PNG-, JPEG- of WebP-afbeelding toe om die als achtergrond te gebruiken.",
@@ -1208,7 +1246,7 @@
     "showAlways": "Altijd",
     "showOnOpen": "Als ik de ruimte open",
     "showNever": "Nooit",
-    "showHint": "Altijd opent de cameraruimte zodra iemand in je kanaal een camera aanzet. Nooit houdt je alleen op spraak en downloadt geen video.",
+    "showHint": "Bij Altijd opent de cameraruimte zodra iemand in je kanaal een camera aanzet. Bij Nooit blijf je alleen bij spraak en wordt er geen video gedownload.",
     "dataSaver": "Databesparing: maximaal 15 fps voor iedereen",
     "reduceMotion": "Minder beweging: geen gloed of animatie op het kader van wie spreekt",
     "reduceMotionHint": "Volgt standaard de systeeminstelling voor minder beweging.",
@@ -1278,11 +1316,23 @@
   },
   "activityHistory": {
     "title": "Activiteitengeschiedenis",
+    "keep": "Activiteitengeschiedenis bewaren na een herstart",
+    "keepHint": "Slaat op wie verbinding maakte, vertrok, van kanaal wisselde, een scherm deelde of een watchparty startte, zodat de feed na een herstart nog bestaat. Uit: de feed begint elke keer leeg. Uitschakelen wist wat is opgeslagen.",
     "clear": "Activiteitengeschiedenis wissen",
     "hint": "Verwijdert de opgeslagen feed van alle servers.",
     "local": "Alleen op dit apparaat opgeslagen.",
     "button": "Geschiedenis wissen",
     "confirm": "De activiteitengeschiedenis van alle servers wissen? Dit kan niet ongedaan worden gemaakt.",
     "confirmButton": "Wissen"
+  },
+  "diskWrites": {
+    "title": "Minder schijfschrijfacties",
+    "hint": "Minder schrijfacties slijten SSD's minder. Als een schakelaar aan staat, blijft het huidige gedrag behouden.",
+    "durableSaves": "Bij elke opslag op de schijf wachten",
+    "durableSavesHint": "Uit schrijft minder, maar bij stroomuitval kunnen de laatste seconden geschiedenis en instellingen verloren gaan.",
+    "linkPreviewsOnDisk": "Linkvoorbeelden op schijf bewaren",
+    "linkPreviewsOnDiskHint": "Uit bewaart voorbeelden alleen in het geheugen voor deze sessie.",
+    "pluginRegistryCache": "Kopie van het plug-inregister op schijf bewaren",
+    "pluginRegistryCacheHint": "Uit haalt het register altijd opnieuw op."
   }
 }

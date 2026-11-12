@@ -51,12 +51,15 @@ export interface SharePlatform {
 }
 
 /**
- * What this OS supports, from the backend's OS description ("linux x86_64"). Whether a share
- * can carry sound is the engine's answer (`screenShareSoundSupport`, FR-7.84).
+ * What this OS supports, from the backend's OS description ("linux x86_64"). FreeBSD captures
+ * the whole X11 screen like Linux on X11 (FR-13.20); whether a share can carry sound is the
+ * engine's answer (`screenShareSoundSupport`, FR-7.84).
  */
 export function platformOf(os: string): SharePlatform {
   const name = os.toLowerCase();
-  return { supported: ["macos", "windows", "linux"].some((p) => name.startsWith(p)) };
+  return {
+    supported: ["macos", "windows", "linux", "freebsd"].some((p) => name.startsWith(p)),
+  };
 }
 
 /** The platform support, `null` until the app info arrived. */

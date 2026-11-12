@@ -1,16 +1,10 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  getApi,
-  type ActivityNotifySettings,
-  type NotificationMode,
-  type SoundSettings,
-  type SoundTheme,
-} from "../../../api";
-import { RadioGroup } from "../components/RadioGroup";
+import { getApi, type SoundSettings, type SoundTheme } from "../../../api";
 import { Group } from "../components/Section";
 import { ChangedBadge } from "../components/SettingBadges";
 import { Switch } from "../components/Switch";
+import { NotificationModeRows } from "./NotificationModeRows";
 import type { SettingsSectionProps } from "./types";
 import "./updates.css";
 
@@ -34,15 +28,6 @@ const EVENTS: (keyof SoundSettings)[] = [
   "shareStopped",
   "viewerStarted",
   "viewerStopped",
-];
-const NOTIFICATION_MODES: NotificationMode[] = ["both", "inApp", "desktop", "off"];
-/** Activity events that notify like messages (#597), in the order of the feed's kinds. */
-const ACTIVITY_KINDS: (keyof ActivityNotifySettings)[] = [
-  "screenShare",
-  "watchParty",
-  "pluginActivity",
-  "pluginEvent",
-  "joins",
 ];
 const SOUND_THEMES: SoundTheme[] = ["rich", "classic"];
 const THEME_LABELS: Record<SoundTheme, string> = {
@@ -132,35 +117,13 @@ function SoundThemeRow(props: { theme: SoundTheme; onChange: (theme: SoundTheme)
   );
 }
 
-/** Which message notifications are shown (FR-1.48c). */
+/** How messages and activity events notify (FR-1.48c, #597, #660). */
 export function NotificationsCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   return (
     <Group title={t("notifications.title")} icon="bell" info={t("notifications.explanation")}>
-      <RadioGroup
-        legend={t("notifications.legend")}
-        value={settings.notifications}
-        options={NOTIFICATION_MODES.map((mode) => ({
-          value: mode,
-          label: t(`notifications.${mode}`),
-        }))}
-        onChange={(notifications) => {
-          update({ notifications });
-        }}
-      />
-      <fieldset className="settings-radios">
-        <legend className="settings-radios__legend">{t("notifications.activityTitle")}</legend>
-        {ACTIVITY_KINDS.map((kind) => (
-          <Switch
-            key={kind}
-            label={t(`notifications.activity.${kind}`)}
-            checked={settings.activityNotify[kind]}
-            onChange={(enabled) => {
-              update({ activityNotify: { ...settings.activityNotify, [kind]: enabled } });
-            }}
-          />
-        ))}
-      </fieldset>
+      <NotificationModeRows settings={settings} update={update} />
+      <p className="settings-hint">{t("notifications.modesHint")}</p>
     </Group>
   );
 }

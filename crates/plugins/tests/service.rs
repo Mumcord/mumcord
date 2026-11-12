@@ -428,6 +428,54 @@ fn revoking_a_required_permission_turns_the_plugin_off() {
     assert_eq!(plugin.disabled_reason.as_deref(), Some("user"));
 }
 
+/// A plugin whose `stop` stores "nope" under the key "n", like one that saves its state there.
+fn saves_in_stop() -> Vec<u8> {
+    let core = include_str!("fixtures/plugin.wat")
+        .replace(
+            "(memory (export",
+            r#"(import "mumcord:plugin/storage@1.0.0" "set"
+                 (func $set (param i32 i32 i32 i32 i32 i32)))
+               (memory (export"#,
+        )
+        .replace("{{START}}", OK_START)
+        .replace("{{EVENT}}", "")
+        .replace(
+            "{{STOP}}",
+            "(call $set (i32.const 1) (i32.const 32) (i32.const 1) (i32.const 32) (i32.const 4)
+               (i32.const 100))",
+        );
+    encode(&core)
+}
+
+/// Issue #704: quitting the app stops the plugins, so what a plugin stores in `stop` is there
+/// after the restart. The service is leaked like the app's is at exit (nothing drops it).
+#[test]
+fn quitting_stops_the_plugins_and_keeps_what_they_store_in_stop() {
+    let fx = Fixture::new();
+    let (mut service, _events) = fx.service();
+    let saver = signed_wasm("saver", &saves_in_stop(), "", &[]);
+    service
+        .install(&saver.request, &saver.download)
+        .expect("installs");
+    let stored = || {
+        fx.store
+            .lock()
+            .expect("lock")
+            .plugin_kv_get("saver", "global", "n")
+            .expect("kv read")
+    };
+    assert_eq!(stored(), None, "nothing is stored before the plugin stops");
+
+    service.stop_all();
+    std::mem::forget(service);
+    assert_eq!(stored(), Some(b"nope".to_vec()));
+
+    // The next start runs the plugin again: quitting did not turn it off.
+    let (service, _events) = fx.service();
+    assert_eq!(info(&service, "saver").status, Status::Running);
+    assert_eq!(stored(), Some(b"nope".to_vec()));
+}
+
 #[test]
 fn turn_off_all_survives_a_restart_and_no_plugins_loads_nothing() {
     let fx = Fixture::new();

@@ -15,10 +15,10 @@
     "pluginsLine": "Pluginuri: {{number}}",
     "signingKey": "Cheie de semnare",
     "warningTitle": "Depozit neoficial",
-    "warningBody": "Mumcord nu verifică aceste pluginuri. Cheia este reținută: dacă se schimbă vreodată, depozitul este pus pe pauză până o verifici. Navigarea arată adresa ta IP gazdei. Pluginurile cu nume oficiale nu sunt niciodată preluate de aici."
+    "warningBody": "Mumcord nu verifică aceste pluginuri. Cheia este reținută: dacă se schimbă vreodată, depozitul este pus pe pauză până o verifici. Când îl răsfoiești, gazda lui îți vede adresa IP. Pluginurile cu nume oficiale nu sunt niciodată preluate de aici."
   },
   "limit": "Poți adăuga cel mult {{max}} depozite.",
-  "limitReached": "S-a atins limita de {{max}} depozite.",
+  "limitReached": "S-a atins limita de depozite ({{max}}).",
   "empty": "Nu ai adăugat încă niciun depozit.",
   "listLabel": "Depozite adăugate",
   "loadFailed": "Depozitele nu au putut fi încărcate.",
@@ -43,13 +43,13 @@
     "oldKey": "Cheia în care ai avut încredere până acum",
     "newKey": "Cheie nouă",
     "keepPaused": "Păstrează în pauză",
-    "trust": "Am încredere în cheia nouă",
+    "trust": "Acordă încredere cheii noi",
     "review": "Examinează schimbarea cheii"
   },
   "mirror": {
     "title": "Avansat",
     "label": "Oglindă pentru lista oficială de pluginuri (opțional)",
-    "hint": "Schimbă doar dacă ai primit o adresă de oglindă. Oglinda trebuie să ofere aceleași fișiere semnate; Mumcord verifică oricum fiecare semnătură.",
+    "hint": "Schimbă asta doar dacă ai primit o adresă de oglindă. Oglinda trebuie să ofere aceleași fișiere semnate; Mumcord verifică oricum fiecare semnătură.",
     "save": "Salvează",
     "reset": "Folosește valoarea implicită"
   },

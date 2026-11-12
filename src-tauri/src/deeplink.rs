@@ -80,8 +80,44 @@ pub fn init(app: &AppHandle) {
         Ok(None) => {}
         Err(e) => tracing::warn!(error = %e, "reading the start link failed"),
     }
+    // The deep-link plugin reads the command line on Windows and Linux only, so FreeBSD
+    // applies the same rule itself: a browser's protocol handler starts the app with the URL
+    // as its single argument.
+    #[cfg(target_os = "freebsd")]
+    if let Some(url) = start_link() {
+        open_urls(app, &[url]);
+    }
     let handle = app.clone();
     deep_link.on_open_url(move |event| open_urls(&handle, &event.urls()));
+}
+
+/// Handles the arguments of a later launch (FR-13.12): it passes links, nothing else.
+#[cfg(target_os = "freebsd")]
+pub(crate) fn open_arguments(app: &AppHandle, args: &[String]) {
+    let urls: Vec<Url> = args
+        .iter()
+        .filter_map(|arg| arg.parse::<Url>().ok())
+        .filter(|url| matches!(url.scheme(), "mumble" | "mumcord"))
+        .collect();
+    if urls.is_empty() {
+        // A launch without a link: the user just wants the running window.
+        window::show(app);
+        return;
+    }
+    open_urls(app, &urls);
+}
+
+/// The URL the app was started with, when it is the only argument and one of our schemes.
+/// Flags and file paths never parse as such a URL, so a normal start yields `None`.
+#[cfg(target_os = "freebsd")]
+fn start_link() -> Option<Url> {
+    let mut args = std::env::args().skip(1);
+    let arg = args.next()?;
+    if args.next().is_some() {
+        return None;
+    }
+    let url = arg.parse::<Url>().ok()?;
+    matches!(url.scheme(), "mumble" | "mumcord").then_some(url)
 }
 
 /// `plugins://open-details`: Browse opens the details of the named plugin.

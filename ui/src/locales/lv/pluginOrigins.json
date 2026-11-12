@@ -1,5 +1,5 @@
 {
-  "title": "Sazinās ar šīm vietnēm",
+  "title": "Saziņa ar šīm vietnēm",
   "intro": "{{plugin}} un tā lapa drīkst sūtīt un saņemt datus tikai ar:",
   "introUpdate": "{{plugin}} un tā lapa tad varētu sazināties ar:",
   "privacy": "Šīs vietnes var redzēt tavu IP adresi un visu, ko {{plugin}} tām sūta.",
@@ -22,7 +22,7 @@
       "side-panel": "Sānu panelis",
       "dialog": "Dialoglodziņš",
       "panel": "Spraudņu josla",
-      "appMenu": "Lietotņu izvēlne · {{count}} vienumi",
+      "appMenu": "Lietotņu izvēlne · vienumi: {{count}}",
       "chat": "Tērzēšanas kartītes"
     },
     "ownCode": "Savs kods",
@@ -37,7 +37,7 @@
     "turnOnInPermissions": "Ieslēgt atļaujās",
     "tags": {
       "webview": "Savs tīmekļa saturs",
-      "origins": "{{count}} tīmekļa vietnes",
+      "origins": "Tīmekļa vietnes: {{count}}",
       "stage": "Mediju zona",
       "sidePanel": "Sānu panelis",
       "relay": "Releja dati",
@@ -46,15 +46,15 @@
   },
   "update": {
     "wantsNew_zero": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm.",
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Šis atjauninājums vēlas sazināties ar {{count}} jaunu tīmekļa vietni.",
     "wantsNew_other": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm.",
-    "staysOn": "{{plugin}} paliek pie {{version}}, līdz izlemsi.",
-    "banner_zero": "Tavu lēmumu gaida {{count}} atjauninājumi. Atjauninājumi, kas pievieno atļaujas vai vietnes, netiek instalēti automātiski.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
-    "banner_other": "Tavu lēmumu gaida {{count}} atjauninājumi. Atjauninājumi, kas pievieno atļaujas vai vietnes, netiek instalēti automātiski.",
+    "staysOn": "{{plugin}} paliek pie versijas {{version}}, līdz izlemsi.",
+    "banner_zero": "Tavu lēmumu gaida {{count}} atjauninājumi. Atjauninājumi, kas pievieno atļaujas vai vietnes, nekad netiek instalēti automātiski.",
+    "banner_one": "Tavu lēmumu gaida {{count}} atjauninājums. Atjauninājumi, kas pievieno atļaujas vai vietnes, nekad netiek instalēti automātiski.",
+    "banner_other": "Tavu lēmumu gaida {{count}} atjauninājumi. Atjauninājumi, kas pievieno atļaujas vai vietnes, nekad netiek instalēti automātiski.",
     "noOther": "Citas atļaujas nemainās.",
     "whatsNew": "Kas jauns versijā {{version}}",
-    "skipKeeps": "Izlaižot, {{version}} turpina darboties.",
+    "skipKeeps": "Ja izlaidīsi, versija {{version}} turpinās darboties.",
     "skip": "Izlaist šo versiju",
     "allow": "Atļaut un atjaunināt"
   }

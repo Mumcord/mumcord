@@ -15,50 +15,50 @@
   "groupedPrivate_other": "{{count}} messaġġ ġdid minn {{name}}",
   "image": "Bagħat stampa",
   "open": "Iftaħ iċ-chat",
-  "close": "Ormi n-notifika",
-  "mentionLine": "{{sender}} semmielek: {{preview}}",
+  "close": "Neħħi n-notifika",
+  "mentionLine": "{{sender}} semmiek: {{preview}}",
   "withServer": "{{server}} · {{what}}",
   "centre": {
     "title": "Notifiki",
-    "bellUnread_one": "Notifiki, {{count}} mhux moqri",
+    "bellUnread_one": "Notifiki, {{count}} mhux moqrija",
     "bellUnread_two": "Notifiki, {{count}} mhux moqrijin",
     "bellUnread_few": "Notifiki, {{count}} mhux moqrijin",
     "bellUnread_many": "Notifiki, {{count}} mhux moqrijin",
     "bellUnread_other": "Notifiki, {{count}} mhux moqrijin",
     "shortcut": "Ctrl+Shift+N",
-    "markAllRead": "Immarka kollha bħala moqrija",
+    "markAllRead": "Immarka kollox bħala moqri",
     "filterLabel": "Uri n-notifiki",
     "filter": {
       "all": "Kollha",
       "mentions": "Referenzi",
       "requests": "Talbiet",
       "invites": "Stediniet",
-      "plugins": "Plagins"
+      "plugins": "Plugins"
     },
     "empty": "Qrajt kollox.",
     "unread": "Mhux moqrija",
     "dndOn": "Tiddisturbax huwa mixgħul",
     "dndOff": "Tiddisturbax huwa mitfi",
-    "settings": "Settings tan-notifiki",
+    "settings": "Issettjar tan-notifiki",
     "someone": "Xi ħadd",
     "quoted": "“{{text}}”",
     "mention": "{{name}} semmiek",
     "mentionGroup": "{{name}} semma lil kulħadd",
-    "reply": "{{name}} wieġeb il-messaġġ tiegħek",
+    "reply": "{{name}} wieġeb għall-messaġġ tiegħek",
     "chatRequest": "{{name}} irid jitkellem miegħek",
     "messageRequest": "Talba għal messaġġ minn {{name}}",
-    "messageRequestBody_one": "{{count}} messaġġ minn klijent standard ta’ Mumble",
-    "messageRequestBody_two": "{{count}} messaġġi minn klijent standard ta’ Mumble",
-    "messageRequestBody_few": "{{count}} messaġġi minn klijent standard ta’ Mumble",
-    "messageRequestBody_many": "{{count}} messaġġ minn klijent standard ta’ Mumble",
-    "messageRequestBody_other": "{{count}} messaġġ minn klijent standard ta’ Mumble",
+    "messageRequestBody_one": "{{count}} messaġġ minn klijent standard ta' Mumble",
+    "messageRequestBody_two": "{{count}} messaġġi minn klijent standard ta' Mumble",
+    "messageRequestBody_few": "{{count}} messaġġi minn klijent standard ta' Mumble",
+    "messageRequestBody_many": "{{count}} messaġġ minn klijent standard ta' Mumble",
+    "messageRequestBody_other": "{{count}} messaġġ minn klijent standard ta' Mumble",
     "invite": {
-      "watchParty": "{{name}} stiednek għal watch party",
+      "watchParty": "{{name}} stiednek għal ħarsa flimkien",
       "screenShare": "{{name}} qed jaqsam l-iskrin tiegħu",
       "card": "{{name}} bagħtlek karta",
       "theme": "{{name}} qasam tema miegħek"
     },
-    "connection": "{{server}} mhux disponibbli",
+    "connection": "{{server}} ma jintlaħaqx",
     "type": {
       "chatRequest": "Talba għal chat",
       "messageRequest": "Talba għal messaġġ",
@@ -74,7 +74,7 @@
     "open": "Iftaħ",
     "dismiss": "Neħħi",
     "dismissItem": "Neħħi: {{title}}",
-    "failed": "Ma ħadimx. Erġa’ pprova.",
+    "failed": "Ma ħadimx. Erġa' pprova.",
     "block": "Imblokka",
     "update": {
       "title": "Mumcord {{version}} huwa lest",
@@ -87,5 +87,9 @@
       "body": "Il-qsim tal-iskrin u tal-fajls huwa mwaqqaf sakemm tafda r-relay il-ġdid.",
       "decision": "Jeħtieġ id-deċiżjoni tiegħek"
     }
+  },
+  "suppressionFallback": {
+    "title": "It-tnaqqis tal-istorbju huwa bil-mod wisq",
+    "text": "Bil-mod wisq fuq dan il-kompjuter bħalissa. Jintuża “{{standard}}” sakemm ilaħħaq."
   }
 }

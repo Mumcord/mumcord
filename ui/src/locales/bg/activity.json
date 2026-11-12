@@ -1,11 +1,11 @@
 {
   "tab": {
-    "tabsLabel": "Колона с членове",
+    "tabsLabel": "Колона с участници",
     "members": "Участници",
     "activity": "Активност"
   },
-  "you": "Вие",
-  "selfName": "твоето",
+  "you": "Ти",
+  "selfName": "теб",
   "someone": "някой",
   "verb": {
     "connected": "се свърза",
@@ -20,7 +20,7 @@
     "pluginEvent": "„{{text}}“"
   },
   "channel": "# {{channel}}",
-  "plugin": "плъгин",
+  "plugin": "добавка",
   "live": "на живо",
   "watch": "Гледай",
   "join": "Влез",
@@ -28,9 +28,9 @@
   "yesterday": "Вчера",
   "empty": "Все още няма активност.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} споделяне на екрана",
-    "watchParty": "{{action}} {{name}} общо гледане",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
+    "screenShare": "{{action}}: споделяне на екрана от {{name}}",
+    "watchParty": "{{action}}: общо гледане от {{name}}",
+    "pluginActivity": "{{action}}: {{plugin}} от {{name}}",
     "pluginEvent": "{{action}} {{plugin}}"
   },
   "joinPartyFailed": "Неуспешно влизане в общото гледане.",

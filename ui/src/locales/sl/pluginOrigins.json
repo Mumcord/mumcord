@@ -1,6 +1,6 @@
 {
   "title": "Komunicira s temi spletnimi mesti",
-  "intro": "{{plugin}} in njegova stran lahko pošiljata in prejemata podatke samo z:",
+  "intro": "{{plugin}} in njegova stran lahko pošiljata in prejemata podatke samo s temi spletnimi mesti:",
   "introUpdate": "{{plugin}} in njegova stran bi potem lahko dosegla:",
   "privacy": "Ta spletna mesta vidijo tvoj naslov IP in vse, kar jim pošlje {{plugin}}.",
   "includesNames": "To lahko vključuje imena ljudi v tvojem kanalu.",
@@ -22,7 +22,7 @@
       "side-panel": "Stranska plošča",
       "dialog": "Pogovorno okno",
       "panel": "Vrstica vtičnikov",
-      "appMenu": "Meni Aplikacije · {{count}} vnosov",
+      "appMenu": "Meni Aplikacije · vnosi: {{count}}",
       "chat": "Kartice v klepetu"
     },
     "ownCode": "Lastna koda",
@@ -37,7 +37,7 @@
     "turnOnInPermissions": "Vklopi v dovoljenjih",
     "tags": {
       "webview": "Lastna spletna vsebina",
-      "origins": "{{count}} spletnih mest",
+      "origins": "Spletna mesta: {{count}}",
       "stage": "Območje medijev",
       "sidePanel": "Stranska plošča",
       "relay": "Podatki prek releja",
@@ -45,12 +45,12 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Ta posodobitev želi komunicirati z {{count}} novim spletnim mestom.",
     "wantsNew_two": "Ta posodobitev želi komunicirati z {{count}} novima spletnima mestoma.",
     "wantsNew_few": "Ta posodobitev želi komunicirati s {{count}} novimi spletnimi mesti.",
     "wantsNew_other": "Ta posodobitev želi komunicirati s {{count}} novimi spletnimi mesti.",
     "staysOn": "{{plugin}} ostane na {{version}}, dokler se ne odločiš.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "Na tebe čaka {{count}} posodobitev. Posodobitve, ki dodajo dovoljenja ali spletna mesta, se nikoli ne namestijo samodejno.",
     "banner_two": "Na tebe čakata {{count}} posodobitvi. Posodobitve, ki dodajo dovoljenja ali spletna mesta, se nikoli ne namestijo samodejno.",
     "banner_few": "Na tebe čakajo {{count}} posodobitve. Posodobitve, ki dodajo dovoljenja ali spletna mesta, se nikoli ne namestijo samodejno.",
     "banner_other": "Na tebe čaka {{count}} posodobitev. Posodobitve, ki dodajo dovoljenja ali spletna mesta, se nikoli ne namestijo samodejno.",

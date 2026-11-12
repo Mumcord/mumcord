@@ -1,6 +1,6 @@
 {
-  "title": "Plagins",
-  "tabsLabel": "Taqsimiet tal-plagins",
+  "title": "Plugins",
+  "tabsLabel": "Taqsimiet tal-plugins",
   "tabs": {
     "installed": "Installati",
     "browse": "Ibbrawża",
@@ -8,15 +8,15 @@
     "repositories": "Repożitorji",
     "developer": "Żviluppatur"
   },
-  "turnOffAll": "Itfi l-plagins kollha",
-  "allOff": "Il-plagins kollha huma mitfija. Jibqgħu mitfija, anki wara li terġa' tibda, sakemm terġa' tixgħelhom.",
-  "noPlugins": "Il-plagins huma mitfija għal din is-sessjoni (nbdiet b'--no-plugins).",
-  "loadFailed": "Il-plagins ma setgħux jitgħabbew.",
+  "turnOffAll": "Itfi l-plugins kollha",
+  "allOff": "Il-plugins kollha huma mitfija. Jibqgħu mitfija, anki wara li terġa' tibda, sakemm terġa' tixgħelhom.",
+  "noPlugins": "Il-plugins huma mitfija għal din is-sessjoni (nbdiet b'--no-plugins).",
+  "loadFailed": "Il-plugins ma setgħux jitgħabbew.",
   "palette": {
     "label": "Paletta tal-kmandi",
-    "placeholder": "Ittajpja kmand",
+    "placeholder": "Ikteb kmand",
     "empty": "L-ebda kmand li jaqbel",
-    "openPlugins": "Plagins",
-    "turnOffAll": "Itfi l-plagins kollha"
+    "openPlugins": "Plugins",
+    "turnOffAll": "Itfi l-plugins kollha"
   }
 }

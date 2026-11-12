@@ -22,7 +22,11 @@ function lookup(object, path) {
 
 const { keys } = JSON.parse(readFileSync(join(root, "scripts/builtin-label-keys.json"), "utf8"));
 const labels = new Set();
-for (const locale of readdirSync(locales).sort()) {
+// Only the language folders: GLOSSARY.md lives next to them.
+const languages = readdirSync(locales, { withFileTypes: true }).filter((entry) =>
+  entry.isDirectory(),
+);
+for (const locale of languages.map((entry) => entry.name).sort()) {
   for (const { namespace, key } of keys) {
     const file = join(locales, locale, `${namespace}.json`);
     const value = lookup(JSON.parse(readFileSync(file, "utf8")), key);

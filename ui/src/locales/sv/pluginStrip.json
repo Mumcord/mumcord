@@ -1,7 +1,7 @@
 {
   "heading": "Tillägg",
   "list": "Tilläggspaneler",
-  "expand": "Utöka {{name}}",
+  "expand": "Fäll ut {{name}}",
   "close": "Stäng",
   "unsupported": "Den här servern stöder inte delade tilläggsfunktioner"
 }

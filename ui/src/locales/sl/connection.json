@@ -42,8 +42,8 @@
     "good_few": "Brez težav v zadnjih {{count}} minutah",
     "good_other": "Brez težav v zadnjih {{count}} minutah",
     "network": "Del glasu drugih je bil prikrit: izguba v omrežju",
-    "cpu": "Obdelava vašega zvoka zamuja: visoka obremenitev procesorja",
-    "device": "Vaša zvočna naprava je imela prekinitve"
+    "cpu": "Obdelava tvojega zvoka zamuja: visoka obremenitev procesorja",
+    "device": "Tvoja zvočna naprava je imela izpade"
   },
   "details": "Podrobnosti",
   "sinceConnected": "Števci od povezave. Grafi: zadnjih {{minutes}} min.",
@@ -53,7 +53,7 @@
     "late": "Zvočni okvirji, ki jih je računalnik obdelal prepozno, običajno zaradi visoke obremenitve procesorja. Običajno: 0 ali skoraj 0.",
     "concealed": "Glasovni okvirji drugih, ki niso prispeli pravočasno, zato je odjemalec zapolnil vrzel. Vzrok: izguba v omrežju. Običajno: skoraj 0.",
     "jitter": "Zakasnitev, ki izravna neenakomerno prihajajoče glasovne pakete drugih. Običajno: 20–60 ms.",
-    "processing": "Čas za obdelavo enega 10-milisekundnega okvirja z vašega mikrofona. Običajno: precej pod 10 ms.",
+    "processing": "Čas za obdelavo enega 10-milisekundnega okvirja s tvojega mikrofona. Običajno: precej pod 10 ms.",
     "realtime": "Ali zvočne niti od sistema dobijo prednost v realnem času. Vklopljeno pomaga preprečiti prekinitve pod obremenitvijo."
   },
   "recent": {
@@ -66,11 +66,11 @@
     "title": "Kakovost glasu",
     "status": "Ping {{latency}}, izguba {{loss}}",
     "lowLatency": "Način nizke zakasnitve",
-    "lowLatencyHint": "Za skupno igranje glasbe v realnem času. Najbolje deluje s pritiskom za govor.",
+    "lowLatencyHint": "Za skupno igranje glasbe v realnem času. Najbolje deluje Push-to-talk.",
     "voiceSettings": "Nastavitve glasu…",
-    "applies": "Velja takoj, shranjeno kot v Nastavitve → Zvok",
+    "applies": "Velja takoj, shranjeno kot v razdelku Nastavitve → Zvok",
     "keys": "Esc zapre · ↑↓ premika · ← → prilagodi",
-    "bandwidthLabel": "Ocenjena pasovna širina z glavami",
+    "bandwidthLabel": "Ocenjena pasovna širina",
     "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
     "bandwidthMeterText": "{{value}} od {{limit}} kbit/s ({{percent}} %)",
@@ -84,9 +84,9 @@
     "effectiveTip": "Bitna hitrost, ki se trenutno pošilja, po prilagoditvi izgubi paketov.",
     "musicIncluded": "Vključeno, ko je način nizke zakasnitve vklopljen: dušenje šuma in samodejna glasnost sta izklopljena, kodirnik pa deluje v nastavitvi za glasbo z nizko zakasnitvijo.",
     "warningBandwidth": "Porabi več pasovne širine: ≈ {{on}} kbit/s namesto ≈ {{off}}.",
-    "warningWifi": "Na Wi-Fi ali obremenjeni povezavi lahko zatika.",
+    "warningWifi": "Na omrežju Wi-Fi ali obremenjeni povezavi lahko zatika.",
     "warningHeadphones": "Uporabi slušalke: odpravljanje odmeva je izklopljeno.",
-    "warningPtt": "Najbolje deluje s pritiskom za govor.",
+    "warningPtt": "Najbolje deluje Push-to-talk.",
     "bandwidthLowLatencyWithin": "Paketi po 10 ms dodajo obremenitev glav; znotraj omejitve. Izklopi način, da prihraniš ≈ {{value}} kbit/s.",
     "bandwidthLowLatencyOver": "Paketi po 10 ms dodajo obremenitev glav; nad omejitvijo. Izklopi način, da prihraniš ≈ {{value}} kbit/s.",
     "bandwidthLowLatencyNoLimit": "Paketi po 10 ms dodajo obremenitev glav. Izklopi način, da prihraniš ≈ {{value}} kbit/s."

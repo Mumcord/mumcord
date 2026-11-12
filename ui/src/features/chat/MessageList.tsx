@@ -67,6 +67,8 @@ import { useSharedTheme, withoutThemeShare } from "./sharedTheme";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
 import { linkMentions, MENTION_CLASS, mentionPeopleOf } from "./mentionChips";
+import { CHANNEL_MENTION_CLASS, linkChannelMentions, mentionableChannels } from "./channelMentions";
+import { ChannelMentionMenu } from "./ChannelMentionMenu";
 import { originalSrc } from "./displaySrc";
 import { imageName, type ImageClickHandler } from "./links";
 import { openInBrowser, openLink } from "./openLink";
@@ -80,6 +82,7 @@ import { isCopyShortcut, selectedText } from "./selectionText";
 import { revealDone, usePendingReveal } from "./reveal";
 import { CollapsedMessage } from "../blocking/CollapsedMessage";
 import { LeadingPluginCards, PluginLine } from "../plugins/chat";
+import type { PrivateLine } from "./privateLines";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
 const EDGE_PX = 48;
@@ -115,6 +118,11 @@ export interface MessageListProps {
    * Ids of messages from blocked users drawn collapsed (issue #140) until the user shows one.
    */
   collapsedIds?: ReadonlySet<string> | undefined;
+  /**
+   * Lines only this user sees: the result of an admin command (Epic 4, issue #378, FR-10.61). They
+   * sit in the timeline at their time and are never sent to the server.
+   */
+  privateLines?: readonly PrivateLine[] | undefined;
 }
 
 /** Messages drawn when a conversation is shown, and drawn more each time the user scrolls up. */
@@ -139,6 +147,18 @@ interface BodyProps {
   onJump: (() => void) | null;
   /** Copies a card link (issue #419); the same path the link menu uses, with its confirmation. */
   onCopy: (text: string) => void;
+}
+
+/** The `#Channel` chip an event happened on, with the channels it stands for (issue #643). */
+function channelChipOf(target: EventTarget): { chip: HTMLElement; ids: number[] } | null {
+  const chip =
+    target instanceof Element ? target.closest<HTMLElement>(`.${CHANNEL_MENTION_CLASS}`) : null;
+  if (!chip) return null;
+  const ids = (chip.dataset["channelIds"] ?? "")
+    .split(",")
+    .map(Number)
+    .filter((id) => Number.isInteger(id) && id >= 0);
+  return ids.length === 0 ? null : { chip, ids };
 }
 
 /** The mention chip an event happened on, with the person it stands for. */
@@ -233,6 +253,13 @@ function TextBody({
   const inlineShown = useInlineShown(message.id);
   const serverId = useShownServerId();
   const users = useServerSelector((state) => state.users);
+  const serverChannels = useServerSelector((state) => state.channels);
+  const channelChoices = useMemo(() => mentionableChannels(serverChannels), [serverChannels]);
+  // The menu of a `#Channel` chip (issue #643).
+  const [channelMenu, setChannelMenu] = useState<{
+    ids: number[];
+    menu: MenuPosition;
+  } | null>(null);
   // A link whose image is shown below gives way to the image (QA.43).
   const sharedTheme = useSharedTheme(cleaned);
   // The theme card replaces the raw share text (FR-2.16); an unusable code stays visible.
@@ -247,13 +274,19 @@ function TextBody({
   // Mentions of people on the server become chips; added after sanitizing, from text nodes only.
   const sanitized = useMemo(
     () =>
-      linkMentions(withoutLinks, mentionPeopleOf(users), (name) =>
-        t("mention.chipLabel", { name }),
+      linkChannelMentions(
+        linkMentions(withoutLinks, mentionPeopleOf(users), (name) =>
+          t("mention.chipLabel", { name }),
+        ),
+        channelChoices,
+        (name) => t("channelMention.chipLabel", { name }),
       ),
-    [withoutLinks, users, t],
+    [withoutLinks, users, channelChoices, t],
   );
   useEffect(() => {
-    for (const chip of ref.current?.querySelectorAll(`.${MENTION_CLASS}`) ?? []) {
+    for (const chip of ref.current?.querySelectorAll(
+      `.${MENTION_CLASS}, .${CHANNEL_MENTION_CLASS}`,
+    ) ?? []) {
       chip.setAttribute("tabindex", String(tabIndex));
     }
     for (const link of ref.current?.querySelectorAll("a") ?? []) {
@@ -308,6 +341,14 @@ function TextBody({
         if (chipOf(event.target)) releasePreview();
       }}
       onClick={(event) => {
+        const channel = channelChipOf(event.target);
+        if (channel) {
+          setChannelMenu({
+            ids: channel.ids,
+            menu: { x: event.clientX, y: event.clientY, opener: channel.chip },
+          });
+          return;
+        }
         const hit = chipOf(event.target);
         if (hit && clickablePeople) clickPerson(event.detail, hit.session, hit.chip, hit.name);
       }}
@@ -316,6 +357,21 @@ function TextBody({
         if (hit && clickablePeople) doubleClickPerson(hit.session, hit.name);
       }}
       onContextMenu={(event) => {
+        const channel = channelChipOf(event.target);
+        if (channel) {
+          event.preventDefault();
+          const rect = channel.chip.getBoundingClientRect();
+          const keyboard = event.clientX === 0 && event.clientY === 0;
+          setChannelMenu({
+            ids: channel.ids,
+            menu: {
+              x: keyboard ? rect.left : event.clientX,
+              y: keyboard ? rect.bottom : event.clientY,
+              opener: channel.chip,
+            },
+          });
+          return;
+        }
         const hit = chipOf(event.target);
         if (!hit) return;
         event.preventDefault();
@@ -330,6 +386,21 @@ function TextBody({
         });
       }}
       onKeyDown={(event) => {
+        const channel = channelChipOf(event.target);
+        if (
+          channel &&
+          event.target === channel.chip &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          const rect = channel.chip.getBoundingClientRect();
+          setChannelMenu({
+            ids: channel.ids,
+            menu: { x: rect.left, y: rect.bottom, opener: channel.chip },
+          });
+          return;
+        }
         const hit = chipOf(event.target);
         if (!hit || event.target !== hit.chip) return;
         if (event.key === "Enter" || event.key === " ") {
@@ -342,6 +413,15 @@ function TextBody({
   );
   return (
     <PluginLine message={message}>
+      {channelMenu !== null && (
+        <ChannelMentionMenu
+          channelIds={channelMenu.ids}
+          menu={channelMenu.menu}
+          onClose={() => {
+            setChannelMenu(null);
+          }}
+        />
+      )}
       {reply ? <ReplyHeader quote={reply.quote} onJump={onJump} tabIndex={tabIndex} /> : null}
       {body}
       {codeActions}
@@ -380,21 +460,27 @@ export function MessageList({
   onReply,
   listKey = "",
   collapsedIds,
+  privateLines,
 }: MessageListProps) {
   const { t, i18n } = useTranslation("chat");
   // Own messages not confirmed yet show greyed (FR-2.74) at their send time, where they stay once
   // confirmed, even when others write meanwhile (issue #379).
   const outgoing = log.outgoing;
-  const allMessages = useMemo(
-    () =>
-      outgoing?.length
-        ? insertByTime(
-            log.messages,
-            outgoing.map((item) => item.message),
-          )
-        : log.messages,
-    [log.messages, outgoing],
-  );
+  const allMessages = useMemo(() => {
+    let list: readonly ChatMessage[] = log.messages;
+    if (outgoing?.length)
+      list = insertByTime(
+        list,
+        outgoing.map((item) => item.message),
+      );
+    // A command's result line belongs at the time it happened, among the real messages.
+    if (privateLines?.length)
+      list = insertByTime(
+        list,
+        privateLines.map((line) => line.message),
+      );
+    return list;
+  }, [log.messages, outgoing, privateLines]);
   const {
     shown: messages,
     hidden,
@@ -409,6 +495,11 @@ export function MessageList({
   const outgoingById = useMemo(
     () => new Map((outgoing ?? []).map((item) => [item.message.id, item])),
     [outgoing],
+  );
+  // Which rows of this list are the admin's own results, and the note under each one.
+  const privateNotes = useMemo(
+    () => new Map((privateLines ?? []).map((line) => [line.message.id, line.note])),
+    [privateLines],
   );
   const scrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
@@ -1001,31 +1092,49 @@ export function MessageList({
                 if (index >= 0) setFocusIndex(index);
               }}
             >
-              {messages.map((message, index) => (
-                <MessageItem
-                  key={renderKey(message.id)}
-                  message={message}
-                  index={index}
-                  outgoing={outgoingById.get(message.id) ?? null}
-                  start={layout[index]?.start ?? true}
-                  day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
-                  display={display}
-                  avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
-                  time={time}
-                  fullTime={fullTime}
-                  tabIndex={index === active ? 0 : -1}
-                  clickablePeople={clickablePeople}
-                  linkPreviews={linkPreviews}
-                  senderName={names[index] ?? message.senderName}
-                  highlighted={highlighted === message.id}
-                  canReply={onReply !== undefined}
-                  original={originals[index] ?? null}
-                  collapsed={
-                    collapsedIds?.has(message.id) === true && !shownBlocked.has(message.id)
-                  }
-                  actions={itemActions}
-                />
-              ))}
+              {messages.map((message, index) => {
+                const note = privateNotes.get(message.id);
+                if (note !== undefined) {
+                  return (
+                    <PrivateMessage
+                      key={renderKey(message.id)}
+                      message={message}
+                      note={note}
+                      index={index}
+                      day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
+                      time={time}
+                      fullTime={fullTime}
+                      tabIndex={index === active ? 0 : -1}
+                      actions={itemActions}
+                    />
+                  );
+                }
+                return (
+                  <MessageItem
+                    key={renderKey(message.id)}
+                    message={message}
+                    index={index}
+                    outgoing={outgoingById.get(message.id) ?? null}
+                    start={layout[index]?.start ?? true}
+                    day={layout[index]?.newDay ? dayLabel(new Date(message.sentAt)) : null}
+                    display={display}
+                    avatar={display === "cozy" && layout[index]?.start ? avatarFor(message) : null}
+                    time={time}
+                    fullTime={fullTime}
+                    tabIndex={index === active ? 0 : -1}
+                    clickablePeople={clickablePeople}
+                    linkPreviews={linkPreviews}
+                    senderName={names[index] ?? message.senderName}
+                    highlighted={highlighted === message.id}
+                    canReply={onReply !== undefined}
+                    original={originals[index] ?? null}
+                    collapsed={
+                      collapsedIds?.has(message.id) === true && !shownBlocked.has(message.id)
+                    }
+                    actions={itemActions}
+                  />
+                );
+              })}
             </ol>
           )}
         </div>
@@ -1195,6 +1304,57 @@ interface MessageItemProps {
   /** From a blocked user and not shown yet: only a placeholder with "Show" (issue #140). */
   collapsed: boolean;
 }
+
+/**
+ * A line only its admin sees: the result of an admin command (Epic 4, issue #378, FR-10.35) with
+ * the note that says who can see it (mockup `05-result-line`). It was never sent and is never
+ * stored, and it carries none of a message's actions: there is nothing to reply to.
+ */
+const PrivateMessage = memo(function PrivateMessage({
+  message,
+  note,
+  index,
+  day,
+  time,
+  fullTime,
+  tabIndex,
+  actions,
+}: {
+  message: ChatMessage;
+  note: string;
+  index: number;
+  day: string | null;
+  time: Intl.DateTimeFormat;
+  fullTime: Intl.DateTimeFormat;
+  tabIndex: number;
+  actions: MessageItemActions;
+}) {
+  const itemRef = useCallback(
+    (element: HTMLLIElement | null) => {
+      actions.setRef(index, element);
+    },
+    [actions, index],
+  );
+  const when = new Date(message.sentAt);
+  return (
+    <li
+      ref={itemRef}
+      className="chat-message chat-message--start chat-message--private"
+      tabIndex={tabIndex}
+    >
+      {day !== null ? <div className="chat-day">{day}</div> : null}
+      <p className="chat-private">
+        <span className="chat-private__time">{time.format(when)}</span>{" "}
+        <span
+          className="chat-private__text"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(message.body) }}
+        />{" "}
+        <span className="chat-private__note">{note}</span>
+      </p>
+      <span className="visually-hidden">{fullTime.format(when)}</span>
+    </li>
+  );
+});
 
 const MessageItem = memo(function MessageItem({
   message,

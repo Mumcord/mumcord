@@ -1,0 +1,29 @@
+# mumpeer test relay inside the jail.
+#
+# Listeners are IPv4-only on purpose: a shared-IP jail on FreeBSD has no IPv6 address and the
+# relay's default [::] listener fails with "Protocol not supported".
+public_host = "@RELAY_HOST@"
+udp_listen = "0.0.0.0:443"
+tcp_listen = "0.0.0.0:443"
+# Loopback does not exist in a shared-IP jail (127.0.0.1 is the host's), so the allowlist API
+# listens on the jail address and switches to HTTPS with the relay certificate; the bot pins it.
+api_listen = "@JAIL_IP@:7480"
+data_dir = "/var/db/mumpeer"
+api_secret_file = "/usr/local/etc/mumpeer/api_secret"
+
+[uses]
+images = true
+files = true
+screen_share = true
+camera = true
+plugin_data = true
+
+[limits]
+session_mbit = 10
+total_mbit = 200
+max_sessions = 50
+max_sessions_per_peer = 4
+token_ttl_s = 120
+idle_timeout_s = 60
+max_session_s = 0
+conn_per_ip_per_min = 20

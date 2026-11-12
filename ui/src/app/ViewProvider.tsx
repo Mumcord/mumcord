@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useReducer, type ReactNode } from "react";
 import { migrateLegacyHintPreferences } from "../a11y";
 import { getApi } from "../api";
+import { offerTour } from "../features/tips";
 import { usePreferences } from "./preferences";
 import { initialViewState, viewReducer, ViewContext, type View } from "./view";
 
@@ -37,6 +38,9 @@ export function ViewProvider({ children }: { children: ReactNode }) {
     () => ({
       ...state,
       finishWizard: () => {
+        // Only the first-start wizard ends here (a rerun from Settings closes on its own), so
+        // this is the one moment Aaron offers the tour by itself (#637).
+        offerTour();
         dispatch({ type: "finishWizard" });
       },
       openSettings: (section) => {

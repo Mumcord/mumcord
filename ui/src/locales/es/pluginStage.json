@@ -23,7 +23,7 @@
   "join": "Unirse",
   "joinLabel": "Unirse a {{plugin}}",
   "open": "Abrir",
-  "openLabel": "Abrir: {{plugin}}",
+  "openLabel": "Abrir {{plugin}}",
   "getPlugin": "Obtener plugin",
   "getPluginLabel": "Obtener {{plugin}}",
   "activityStarted": "{{name}} inició {{plugin}}",

@@ -1,13 +1,13 @@
 {
   "title": "Verejné servery",
   "loading": "Načítava sa zoznam…",
-  "subtitle": "Načítané, pretože ste otvorili túto stránku · zobrazené {{shown}} z {{total}}",
+  "subtitle": "Načítané po otvorení tejto stránky · zobrazené {{shown}} z {{total}}",
   "search": "Hľadať podľa názvu, adresy alebo krajiny",
   "refresh": "Obnoviť",
   "retry": "Skúsiť znova",
-  "loadFailed": "Zoznam verejných serverov sa nepodarilo načítať. Skontrolujte pripojenie na internet a skúste to znova.",
+  "loadFailed": "Zoznam verejných serverov sa nepodarilo načítať. Skontroluj pripojenie k internetu a skús to znova.",
   "noMatch": "Hľadaniu a filtrom nezodpovedá žiadny server.",
-  "saveFailed": "Server sa nepodarilo pridať. Skúste to znova.",
+  "saveFailed": "Server sa nepodarilo pridať. Skús to znova.",
   "filters": {
     "label": "Filtre",
     "country": "Krajina",
@@ -38,11 +38,11 @@
   "connect": "Pripojiť",
   "connectTo": "Pripojiť k {{server}}",
   "favourite": "Obľúbený",
-  "favouriteServer": "Pridať {{server}} medzi vaše servery",
+  "favouriteServer": "Pridať {{server}} medzi tvoje servery",
   "saved": "Uložené",
-  "savedAs": "{{server}} je medzi vašimi servermi",
+  "savedAs": "{{server}} je medzi tvojimi servermi",
   "announce": {
-    "saved": "{{server}} pridaný medzi vaše servery"
+    "saved": "{{server}} je pridaný medzi tvoje servery"
   },
-  "note": "Pingujú sa iba viditeľné riadky, niekoľko naraz. Nič iné sa na server neodosiela, kým sa nepripojíte."
+  "note": "Pingujú sa iba viditeľné riadky, niekoľko naraz. Kým sa nepripojíš, na server sa nič iné neodosiela."
 }

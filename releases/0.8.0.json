@@ -1,0 +1,183 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.8.0-1.aarch64.rpm",
+      "sha256": "52a75c98c9b9070db4c628784866df003ff93321777fd725b0c0cec98f8df87d",
+      "size": 70166384
+    },
+    {
+      "name": "Mumcord-0.8.0-1.x86_64.rpm",
+      "sha256": "2844bb7f8f7a894f5c1ff1e482feb311978e17e6697b942b2efecc3edcd15ddc",
+      "size": 71172065
+    },
+    {
+      "name": "Mumcord_0.8.0_aarch64.AppImage",
+      "sha256": "f3d39b41595c8edc17a5c2af72cdb96799b978fb8dc7ab8d701f7cba64a2f281",
+      "size": 150039048
+    },
+    {
+      "name": "Mumcord_0.8.0_aarch64.AppImage.sig",
+      "sha256": "028f8483834753f55d07fb3136bf03147afff655cb378537fa15ea219d0a9e19",
+      "size": 440
+    },
+    {
+      "name": "Mumcord_0.8.0_aarch64.app.tar.gz",
+      "sha256": "fc8c6798801a4bb4e834c825654047b9fa69a949ee73afdbb5feab2bd229ec5e",
+      "size": 57338386
+    },
+    {
+      "name": "Mumcord_0.8.0_aarch64.app.tar.gz.sig",
+      "sha256": "15246465976be2cd5f513cd64bd9b1bb8c0fe1facc654d0766537f453f57ef4c",
+      "size": 444
+    },
+    {
+      "name": "Mumcord_0.8.0_aarch64.dmg",
+      "sha256": "1cf51fce9e3c1296610550a2d8319c579ff8655a1c4ee7dbbee0c881240382f4",
+      "size": 57650811
+    },
+    {
+      "name": "Mumcord_0.8.0_amd64.AppImage",
+      "sha256": "19b62479176bc6a76738e952fa3bd09c2fe8c106ff8f30851c1d6219fac9f745",
+      "size": 153573880
+    },
+    {
+      "name": "Mumcord_0.8.0_amd64.AppImage.sig",
+      "sha256": "36cf906c390c14ee518693231744a6b3b976d7b7443e58bf0c44597ef1bc530c",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.8.0_amd64.deb",
+      "sha256": "362eb4f982413b404dd94beb22560ac6028db0b7a3bed29059bf872c77c76cdd",
+      "size": 71169612
+    },
+    {
+      "name": "Mumcord_0.8.0_arm64.deb",
+      "sha256": "a237cf54f14908b3cbf0b0679e216c5ff89c5871f7df112bdab6309c80acc9f5",
+      "size": 70159866
+    },
+    {
+      "name": "Mumcord_0.8.0_x64-portable.zip",
+      "sha256": "8ed4c3ee93b50f14ebd6219e72a1e9b66644a15036e518c9bff9884e9ce7999a",
+      "size": 53479609
+    },
+    {
+      "name": "Mumcord_0.8.0_x64-setup.exe",
+      "sha256": "0ced8ccd822126c9216071cbc2d883ee8064c6610257146886840b620d54d6af",
+      "size": 42949880
+    },
+    {
+      "name": "Mumcord_0.8.0_x64-setup.exe.sig",
+      "sha256": "9bcacfae741dcc1174e17e7d5bf53e5a9d73d6624128bcbe643bad7bc9429bea",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.8.0_x64.app.tar.gz",
+      "sha256": "9b10f97edbca8e8ffb85270f72f1843f95813cc60606b66e1146a66da5d0ade1",
+      "size": 63758872
+    },
+    {
+      "name": "Mumcord_0.8.0_x64.app.tar.gz.sig",
+      "sha256": "579cc926e683b40b849c8889fbb5f335b932e4ae1de0ff25b32da30cf131e477",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.8.0_x64.dmg",
+      "sha256": "b81f20c03f2e484ae00423c89564a5805bbd2acccccc7adbd2029454684a8158",
+      "size": 64016414
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "a91b60d4b9512f3d755492c2800395cf3f370178165b94bf8162742ced07ee77",
+      "size": 2700
+    },
+    {
+      "name": "install.sh",
+      "sha256": "080cece0679d7c9b2bdd62cc9307081c2ad8dcd49ad7afbe49d5fa210cf5ee37",
+      "size": 20914
+    },
+    {
+      "name": "latest.json",
+      "sha256": "37a6937536dedebe30464669109cba5eb6d04095a7ad760650d4a47dfdd994f0",
+      "size": 3113
+    },
+    {
+      "name": "mumcord-0.8.0-appimage-aarch64.cdx.json",
+      "sha256": "9983513271f2a13bb80fdd2673213597033268580b9b78541692523c8d29695a",
+      "size": 954560
+    },
+    {
+      "name": "mumcord-0.8.0-appimage-x86_64.cdx.json",
+      "sha256": "4c83016c28c5488a1e9d424871c77a5a1fc57247031a2306789fc97e934cdb70",
+      "size": 955624
+    },
+    {
+      "name": "mumcord-0.8.0-deb-rpm-aarch64.cdx.json",
+      "sha256": "d65002e6fbb928316a14e86989b53fdce22849c1b14e8d7a9dac474b054927a4",
+      "size": 903671
+    },
+    {
+      "name": "mumcord-0.8.0-deb-rpm-x86_64.cdx.json",
+      "sha256": "a7ba04cf3c4ee0b13314edf23b420a1c95f5bc88e84a11e68dca276392725017",
+      "size": 904735
+    },
+    {
+      "name": "mumcord-0.8.0-freebsd-pkg-x86_64.cdx.json",
+      "sha256": "09c4303ac427f3f2ca66423bf1b2bdb4d422a02a438c1a6ea8e2fedebe58bb2e",
+      "size": 870582
+    },
+    {
+      "name": "mumcord-0.8.0-macos-aarch64.cdx.json",
+      "sha256": "6f53b9650c734d334a7e6e7d94813b2aa8066867f3dacccb9f5ff2f6580dd162",
+      "size": 770405
+    },
+    {
+      "name": "mumcord-0.8.0-macos-x86_64.cdx.json",
+      "sha256": "e058feb323dd33fdc99fa66459103a1fe073d303026c73779dcde54a8dddd958",
+      "size": 771470
+    },
+    {
+      "name": "mumcord-0.8.0-windows-x86_64.cdx.json",
+      "sha256": "72f6f186abf6e265a0cd07a13a6cd61242e1d08e67219bcde4f62c008e04a12e",
+      "size": 738456
+    },
+    {
+      "name": "mumcord-0.8.0.intoto.jsonl",
+      "sha256": "230f3a3bfb2144260f57f19ce6e4a8b66097ec435faef36170340dfa882418f0",
+      "size": 15358
+    },
+    {
+      "name": "mumcord-0.8.0.pkg",
+      "sha256": "f5a43c98bad47b91270ac4d4e283caf1e92edcbe9a9531665f18b3f79fd0b101",
+      "size": 38927921
+    }
+  ],
+  "changelog": {
+    "sha256": "7510e5e4b38e8a849587da2706ad9985ddc830b033c57037d8e3013ee2ef82cb",
+    "text": "## [0.8.0] - 2026-11-12\n\n### Added\n\n- Allow all plugin permissions at once (issue #708): the install prompt has a new \"Allow all\" button that switches on every optional permission with one click. When some of them are high risk, it asks first and names them; you can allow all, allow all except the high-risk ones, or cancel. The single switches work as before\n- Update channel (issue #741): a new setting \"Update channel\" in Settings → Updates chooses between Stable (final releases only, the default) and Release candidates (early builds of the next version). The update notice and the \"ready to restart\" note show a \"Release candidate\" badge, and the notice warns that it is a pre-release build\n- Plugin links in chat (issue #755): a `mumcord://plugins/<id>` link to an official plugin now shows a card under the message with the plugin's icon, name and short description, and buttons to install it (you still confirm in the install prompt), open it when it is already installed, or see its details\n- FreeBSD 15.x (amd64) as a desktop platform: a signed-off `.pkg` that installs with `pkg add` and updates with `pkg upgrade`, with voice, chat, file sharing, watch party, Wasm plugins, hotkeys and push-to-talk, tray and notifications, positional audio and screen sharing of the whole X11 screen. Direct Mumcord-to-Mumcord connections work as on Linux, and the app runs as one instance that hands `mumble://` links to the running window. Camera and AI backgrounds, the in-game overlay, screen-share sound and the window picker are not available there and say so in Settings → About; a missing media decoder is named with its `pkg install` line, and protected (DRM) video opens in the browser. Intel graphics need `drm-66-kmod`, real-time audio needs the `realtime` group, and `pkg info -D mumcord` repeats both\n- Homebrew (issue #662): `brew install --cask mumcord/tap/mumcord` on macOS and `brew install mumcord/tap/mumcord` on Linux, from the new tap `Mumcord/homebrew-tap`, which follows new releases by itself\n- Release candidates (issue #686): coming versions can be tried early as pre-releases (e.g. \"Mumcord 0.8.0 RC 1\") on the Releases page, with every package; the in-app updater, Homebrew and the AUR keep offering only final releases, and the final release installs over a release candidate\n- Every release has its signed build provenance attached as `mumcord-<version>.intoto.jsonl`, so the downloads can be checked offline with `gh attestation verify <file> --repo Mumcord/mumcord --bundle mumcord-<version>.intoto.jsonl`\n- Drag channels in the channel tree (issue #676): drop a channel onto another one to move it there with all its sub-channels and the people in them, or between two channels to change the order. A new parent asks first, naming what moves along and the path before and after; a new spot among the same siblings needs no question. A channel cannot go into itself or its own sub-channels, the root channel stays put, and only channels you may edit can be dragged. When the server refuses, a notice says why and the tree stays as it was. The Edit dialog (parent and position) remains the keyboard way. Works with every standard Mumble server\n- Notifications per kind (issue #660): new messages and each kind of activity (screen share, watch party, plugin activity, plugin events, people connecting, leaving or moving) now have their own choice of Off, In-app, System or Both, in Settings → Notifications and in a new \"Notifications\" step of the setup wizard. New profiles start with In-app for everything; existing profiles keep how they were notified so far\n- Activity history only when you want it (issue #661): a new switch \"Keep activity history after a restart\" in Settings → Activity history and in the wizard's Features step. It is off by default (the \"Everything on\" preset turns it on), so the activity feed is no longer saved on this device unless you choose so; turning it off deletes what was saved\n- Screen share: the live bar names the shared window, e.g. \"Window · VS Code\" (issue #558), on Windows and macOS 15.2 and newer (there the app's name when the window has no title). Linux shows \"Window\", because the system does not tell apps the title. The title stays on your device: viewers, the relay and the server never see it\n- Mumcord now notices other Mumcord users even when their first hello got lost: someone who has not said hello some seconds after appearing is asked for one, up to three times (after 10, 30 and 90 seconds). After that they count as a plain Mumble client until they reconnect. Mumble clients see nothing of this\n- Now playing on macOS (issue #658): Mumcord reads the track from the same place as Control Center, so Music, Spotify, browsers and other players all work, without a permission prompt. Covers are not shared on macOS, as on Windows. Where a macOS version gives no access, the setting says so\n- Channel mentions: typing `#` in the message box suggests the server's channels like `@` suggests people, and `#Channel` in a message becomes a link when that channel exists (names with spaces work, the longest matching name wins). Clicking it offers Join channel, Show in channel list and Copy name; channels sharing a name are listed with their path. Other Mumble clients see the plain text\n- Registered users (issue #256): the server menu gains \"Registered users…\", which opens a tab next to Bans in Server administration and lists every account the server knows, with the account id, the last seen and the last channel. Search, \"Online\" and \"Inactive 90+ days\" filters, renaming, unregistering and registering someone who is connected right now, groups that name the account, and one save for all your changes with a clear note when the server did not take one. Only with the server's Register right; without it the menu item and the tab stay away\n- Admin commands in the chat box (issue #378): typing `/` lists the admin commands this server allows you, above the plugin commands and marked \"Built-in\" — `/kick`, `/ban`, `/mute`, `/unmute`, `/deaf`, `/undeaf`, `/priority`, `/register`, `/move`, `/moveall` and `/unban`. While typing, Mumcord completes the names of the people you may act on and the channels you may move people to. Kick, ban, unban and move-everyone still confirm first: the kick and ban dialogs open with the name, reason and duration you typed. Every command ends with a short result line that only you see in that chat, and the command text is never sent, so other clients see only the usual server result\n- Rich text editor for your profile comment and channel descriptions (issue #666): one box with the toolbar attached, for bold, italic, underline, strikethrough, text colour (a palette, \"default\" and any hex colour), links you can edit or remove, images, bulleted and numbered lists, and a Source view for the HTML. Buttons show the formatting at the cursor. Images are scaled down until everything fits the server's limit, and a meter under the text shows how much room is left; when it is too long, Save says why instead of failing. Other Mumble clients see the same formatting, including the colours\n- H.264 videos (Twitch, .mp4 links) and AAC sound now play on every Linux distribution without extra packages (issue #678): the AppImage, the .deb and the .rpm bring their own H.264 and AAC decoders, so Fedora no longer needs RPM Fusion and the AppImage no longer needs gst-libav from the system (which newer distributions could not load into it). The .deb and .rpm no longer depend on gst-libav\n- Aaron, an axolotl guide in Mumcord's colours, gives new users a short tour of the main window right after the setup wizard (issue #637): the server bar, joining and following channels, how you talk, the user panel, search, chat, the Apps button and themes, one tip at a time with Back, Next and Skip tour. The rest of the window dims while Aaron points at each part in a spotlight, its eyes follow the mouse and its gills pulse while it talks. In the setup wizard it stands next to the field of each step, makes it glow, gives a short tip and can be hidden. Settings → About → Tips shows the tour again at any time\n\n### Changed\n\n- Channel permissions are easier to read (issue #711): the Permissions tab now shows clearly which view is open (\"Who can do what\", \"Rules\" or \"Groups\"), with the number of rules and groups, and Refresh is a small button at the side. The Groups view starts with a prominent \"New group\" button, lists a group's members with their picture, how they got in and one-click remove or restore, and sums up the group in one line; long member lists can be filtered. What a group may do moved out of the view into its own dialog, opened with \"See what … can do in …\"\n- The members column now opens on the Activity tab instead of Members (issue #709), also after a reconnect. Switching to Members is still remembered until you disconnect\n- Translations reviewed in all 23 languages (issue #687): more natural wording, the informal \"you\" everywhere (French now says \"tu\"), one word per term within each language, and strings that were still in English or meant something else are fixed. \"Push-to-talk\" and product names stay in English everywhere; the rules and the word list for each language are in `ui/src/locales/GLOSSARY.md`. Native speakers still get the final word (issue #291)\n- File sharing (issue #673): the file data now travels as Bovnar documents, like the file messages already do, which keeps the format open for later additions at no noticeable cost. Both sides agree on the format when the download starts, so sending to and receiving from Mumcord 0.7.x keeps working as before\n- macOS releases come as two downloads instead of one universal app (issue #663): \"macOS (Apple Silicon)\" (`Mumcord_<version>_aarch64.dmg`) and \"macOS (Intel)\" (`Mumcord_<version>_x64.dmg`), each built natively, signed, notarized and smoke-tested on its own architecture. The download and the installed app are about half the size. Installed universal apps update to the build for their own Mac.\n\n### Fixed\n\n- macOS: plugin content such as the Whiteboard stays exactly in its frame when the window's height changes (issue #706); before, it could sit too high or too low, covering the frame's title and leaving a gap at the bottom, until the frame itself moved or changed size\n- Security: \"Test\" in the server dialog no longer sends a password to a server whose certificate differs from the one you trusted, and the saved password only goes to the trusted certificate. The test then runs without the password and says so, instead of handing the saved password to whoever answers at that address. A password you type for a server you have not connected to yet is still tested.\n- Security: a malicious server can no longer crash Mumcord with a crafted voice packet or with a channel list in which channels are each other's parent, and a screen share or camera stream that claims a picture larger than 8K is refused instead of using up all memory.\n- Security: saving a file, attaching a file and choosing the download folder now only work with a file or folder you picked in the system dialog or dropped onto the window; the app no longer acts on a path that merely comes from its own interface.\n- \"Bots on this server\" now shows the channel every bot is in, including bots that never talk and are therefore not listed in the channel itself.\n- Admin chat commands such as `/mute Bob Smith` now act on the person with exactly that name instead of on \"Bob\", and a name typed only in part opens the picker instead of acting right away.\n- People you blocked no longer trigger join, leave and move notifications, and everyone else triggers at most one such notification every 30 seconds.\n- Mumcord answers a \"say hello\" request from the same person at most once every 30 seconds, so nobody can use up your message allowance on the server and break file sharing, camera and plugins for you.\n- FreeBSD: the folder for the single-instance socket is only used when it belongs to you and nobody else can enter it, the web view gets the same hardening as on Linux (no WebRTC, no link preconnect), and the secret file and its key are refused when other users can read them. Mumcord no longer switches silently between the system keyring and the secret file; `PRIVACY.md` explains what the secret file protects.\n- Advanced (AI) noise suppression no longer turns your voice into static for the others when the computer cannot keep up, for example an older processor without AVX2 under high CPU and memory load (issue #753). When the selected noise suppression needs too long per frame, Mumcord switches to the Standard model by itself and tries your choice again after 30 seconds, so it comes back once the load is gone. A notice at the bottom right says so when it happens (at most once every ten minutes)\n- Pictures in your profile comment, a channel description or the server notice are saved again (issue #712): the picture was already scaled down to fit, but the server still answered \"This is too large for the server\" as soon as the text with the picture was longer than the server's plain text limit. Mumcord now writes the text in the form Mumble servers expect\n- Plugins are now stopped properly when Mumcord quits or restarts (issue #704): what a plugin saves while stopping, such as the last Whiteboard edits before quitting, is no longer lost. A plugin that hangs cannot hold up quitting\n- The in-app updater no longer offers release candidates to people on final releases (issue #741); release candidates are offered only after choosing \"Release candidates\" in Settings → Updates\n- Permissions → Who can do what: the person you check can now be unchecked again with a small \"×\" in the field (issue #710), and the check ends by itself when that person disconnects; before, you could only switch to another person\n- Plugins are now also stopped properly when Linux ends the session (issue #748): on logout, shutdown, `kill` or Ctrl+C Mumcord quits the same way as with \"Quit\", so what a plugin saves while stopping is kept and the connections close cleanly. A second such signal ends Mumcord at once\n- Windows crash reports now name the crash in more cases (issue #699): a crash after a library such as ONNX Runtime (background effects) or a camera driver replaced Mumcord's crash handler, a stack overflow, heap corruption and a C or C++ library calling `abort()` (for example an uncaught C++ exception) are now recorded with their code and stack. When a crash still leaves nothing to record (a fast-fail), the report says so instead of only \"Mumcord closed without shutting down\"\n- An error above the message box, such as \"Only images can be sent.\", now goes away by itself after a few seconds instead of staying until you type or send something (issue #707)\n- Plugin stage pages can send messages of up to 64 KiB to their plugin again (issue #692); messages above 16 KiB used to be dropped silently, as in a side panel, popover or dialog, where 16 KiB stays the limit\n- Linux: cameras through the desktop camera portal no longer stop with \"the camera sends unreadable pictures\" when the camera reports only the brightness part of each picture as filled; the first picture's layout is now logged to diagnose other cameras\n- Linux: cameras through the desktop camera portal now get the picture format and size Mumcord picks, instead of the camera's default (often a small 640×480 picture); when a camera still sends something else, Mumcord reads what actually arrives instead of stopping with \"the camera sends unreadable pictures\"\n- The activity feed no longer offers \"Watch\" on your own screen share or \"Join\" on your own watch party or activity; you are already in it (#664)\n- Screen readers no longer get a broken list announcement while the @mention or /command suggestions are open in the message box; they hear how many suggestions there are\n- Windows: virtual cameras that only DirectShow knows, such as the OBS Virtual Camera, now show in the camera list next to real cameras and work like them, background effects included. OBS is asked for 720p, so a 1080p output does not arrive at half size. A virtual camera that has nothing to show or never starts stops with \"The camera couldn't be started\" instead of hanging (#631)\n- The icons in a plugin's permission list are drawn icons now instead of text characters, so they look the same on Windows, macOS and Linux\n- macOS: plugin content in a dialog or panel sits exactly in its frame again instead of being shifted up by about the title bar's height\n- macOS: a plugin's dialog, panel or stage page no longer closes after about five seconds with the plugin's web content turned off (\"Mumcord stopped responding while it was open\") although nothing froze (issue #705); the check that watches for a frozen window could not reach the window while a plugin page was open, so every open page counted as a freeze. If a plugin's web content is still off, turn it on once more in Settings → Plugins → the plugin's diagnostics\n- macOS: while a plugin's dialog, panel or stage page is open, the tray icon and a click on a notification bring the window back again, closing to the tray works, a chat you are looking at no longer sends a notification as if the window were in the background, and a plugin's file dialogs open attached to the window (issue #705)\n- macOS: when a plugin froze the window, restarting the window failed every time (\"a webview with label `main` already exists\"); it now waits until the old window is really gone\n- A plugin's badge next to a name keeps the size of the Mumcord badge beside it instead of shrinking when the name is long\n- Copy works again in the packet inspector, and when Windows refuses the app's clipboard (e.g. \"Copy\" on a crash report) Mumcord copies through the window's own clipboard instead"
+  },
+  "commit": "bff40b827b162a5b587ee6f1e946a2d4659c228e",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "2e7d9bf889c057229b0a4e5ba2ac097183afed3f3218945fd0a5698e12a5a21a",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "166c49403bc8f2f941eeb7df4160cdc5c5fe385d4108581636a32ccf150d13f4",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "2a63e242ce31cbf4d2ef434497579b737ba9d272c0b485b725010cfdd021007a",
+      "yanked": false
+    },
+    "mumcord-protocol": {
+      "cksum": "ecc8df3233694f036d4b2c54c51c0f293f934e88a8e968b40b5024f2fd136d76",
+      "yanked": false
+    },
+    "mumcord-store": {
+      "cksum": "1a39d43de6e4302177f69f7d42833dfddb044f161afa5984d200c6f552a634cd",
+      "yanked": false
+    }
+  },
+  "sha256sums": "a91b60d4b9512f3d755492c2800395cf3f370178165b94bf8162742ced07ee77",
+  "tag": "v0.8.0"
+}

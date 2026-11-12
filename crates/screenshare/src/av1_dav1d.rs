@@ -1,6 +1,7 @@
 use std::ptr;
 
 use crate::codec::{Codec, VideoDecoder};
+use crate::frame::{MAX_DECODED_HEIGHT, MAX_DECODED_WIDTH, check_decoded_size};
 use crate::{Error, I420Frame, Result};
 
 mod ffi {
@@ -31,21 +32,15 @@ unsafe impl Send for Av1Decoder {}
 
 impl Av1Decoder {
     pub fn new() -> Result<Self> {
-        // SAFETY: dav1d fills the settings struct before it is read; the context pointer is only
-        // kept when dav1d_open succeeds.
-        unsafe {
-            let mut settings = std::mem::zeroed::<ffi::Dav1dSettings>();
-            ffi::dav1d_default_settings(&mut settings);
-            settings.n_threads = THREADS;
-            // One frame in, one picture out: no frame-threading delay on a live stream.
-            settings.max_frame_delay = 1;
-            // Decode errors come back as status codes; dav1d's own log would only repeat them on
-            // stderr.
-            settings.logger.callback = None;
-            let mut ctx = ptr::null_mut();
-            check(ffi::dav1d_open(&mut ctx, &settings), "decoder init")?;
-            Ok(Self { ctx })
-        }
+        let settings = decoder_settings();
+        let mut ctx = ptr::null_mut();
+        // SAFETY: `settings` is fully initialised; the context pointer is only kept when
+        // dav1d_open succeeds.
+        check(
+            unsafe { ffi::dav1d_open(&mut ctx, &settings) },
+            "decoder init",
+        )?;
+        Ok(Self { ctx })
     }
 
     /// Decodes one compressed frame (a temporal unit). Returns `None` when dav1d has no picture
@@ -130,6 +125,23 @@ impl Drop for Av1Decoder {
     }
 }
 
+fn decoder_settings() -> ffi::Dav1dSettings {
+    // SAFETY: an all-zero Dav1dSettings is valid plain data (integers, a null callback and a null
+    // pointer), and dav1d_default_settings overwrites every field before it is read.
+    let mut settings = unsafe { std::mem::zeroed::<ffi::Dav1dSettings>() };
+    // SAFETY: `settings` is a valid, exclusively borrowed struct for dav1d to fill.
+    unsafe { ffi::dav1d_default_settings(&mut settings) };
+    settings.n_threads = THREADS;
+    // One frame in, one picture out: no frame-threading delay on a live stream.
+    settings.max_frame_delay = 1;
+    // dav1d refuses larger frames before allocating for them; its default 0 means unlimited, and
+    // the frame size comes from the remote bitstream.
+    settings.frame_size_limit = MAX_DECODED_WIDTH * MAX_DECODED_HEIGHT;
+    // Decode errors come back as status codes; dav1d's own log would only repeat them on stderr.
+    settings.logger.callback = None;
+    settings
+}
+
 /// dav1d's "try again" status, `DAV1D_ERR(EAGAIN)`: negative errno, whose value differs per OS.
 fn again() -> i32 {
     -(ffi::EAGAIN as i32)
@@ -161,7 +173,9 @@ unsafe fn copy_picture(pic: &ffi::Dav1dPicture) -> Result<I420Frame> {
             pic.p.layout, pic.p.bpc
         )));
     }
+    // A negative size turns into a huge one and is rejected with it.
     let (w, h) = (pic.p.w as u32, pic.p.h as u32);
+    check_decoded_size(w, h)?;
     let mut data = Vec::with_capacity(I420Frame::buffer_len(w, h));
     let chroma = (w.div_ceil(2) as usize, h.div_ceil(2) as usize);
     let planes = [
@@ -179,4 +193,19 @@ unsafe fn copy_picture(pic: &ffi::Dav1dPicture) -> Result<I420Frame> {
         }
     }
     I420Frame::new(w, h, data)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn decoder_refuses_frames_beyond_the_wire_limit() {
+        let settings = decoder_settings();
+        assert_eq!(
+            settings.frame_size_limit,
+            MAX_DECODED_WIDTH * MAX_DECODED_HEIGHT
+        );
+        assert_ne!(settings.frame_size_limit, 0, "0 means unlimited");
+    }
 }

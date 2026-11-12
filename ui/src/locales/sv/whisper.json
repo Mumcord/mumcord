@@ -1,7 +1,7 @@
 {
   "menu": {
     "whisper": "Viska till",
-    "noPermission": "Servern tillåter inte att viska här"
+    "noPermission": "Servern tillåter inte viskning här"
   },
   "banner": {
     "whisper": "Viskar till {{target}}",

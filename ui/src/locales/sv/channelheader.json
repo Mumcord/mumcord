@@ -3,7 +3,7 @@
   "copyFailed": "Det gick inte att kopiera länken",
   "menu": {
     "label": "Kanalalternativ för {{channel}}",
-    "join": "Gå in i kanalen",
+    "join": "Gå med i kanalen",
     "follow": "Följ kanal",
     "unfollow": "Sluta följa kanalen",
     "following": "Följer",
@@ -37,7 +37,7 @@
     "links": "Länkade kanaler",
     "none": "Inga",
     "permissions": "Mina behörigheter",
-    "denied": "ingen {{permission}}",
+    "denied": "inte {{permission}}",
     "permission": {
       "enter": "Gå in",
       "speak": "Tala",

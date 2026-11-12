@@ -2,7 +2,7 @@
   "composer": {
     "attach": "Sdílet soubory",
     "attachLabel": "Sdílet soubory v tomto kanálu",
-    "dropTitle": "Pusť pro sdílení s #{{channel}}",
+    "dropTitle": "Pusť a sdílej v #{{channel}}",
     "dropChoiceTitle": "Některé z nich jsou obrázky. Co s nimi udělat?",
     "sendAsImage": "Odeslat jako obrázek",
     "shareAsFile": "Sdílet jako soubor",
@@ -67,13 +67,13 @@
     "open": "Otevřít",
     "gone": "Soubor už není ve složce {{folder}}",
     "mismatchTitle": "Hash nesouhlasí – soubor smazán",
-    "mismatch": "Soubor se cestou změnil nebo neodpovídá nabídce, a proto byl smazán. Nic se neuložilo ani neotevřelo. Požádej {{sender}}, aby ho sdílel znovu.",
+    "mismatch": "Soubor se cestou změnil nebo neodpovídá nabídce, a proto byl smazán. Nic se neuložilo ani neotevřelo. Požádej uživatele {{sender}} o nové sdílení.",
     "failed": "Stahování selhalo: {{reason}}",
     "cancelled": "Stahování zrušeno",
-    "busy": "{{sender}} je zaneprázdněn, zkus to později",
+    "busy": "Uživatel {{sender}} je zaneprázdněn, zkus to později",
     "noSpace": "Ve složce {{folder}} není dost místa na disku",
     "reason": {
-      "noAnswer": "{{sender}} neodpověděl",
+      "noAnswer": "Uživatel {{sender}} neodpověděl",
       "connect": "Nepodařilo se připojit přes relay: {{reason}}",
       "connectUnknown": "Nepodařilo se připojit přes relay",
       "stalled": "Přenos uvízl",
@@ -91,9 +91,9 @@
       "unavailable": "nedostupné"
     },
     "unavailable": {
-      "offline": "{{sender}} se odpojil. Soubor už není dostupný.",
+      "offline": "Uživatel {{sender}} se odpojil. Soubor už není dostupný.",
       "ended": "Sdílení skončilo. Sdílení končí po 24 hodinách.",
-      "askAgain": "Požádej {{sender}}, aby ho sdílel znovu."
+      "askAgain": "Požádej uživatele {{sender}} o nové sdílení."
     },
     "disabled": {
       "receiveOff": "Příjem souborů máš vypnutý",
@@ -120,7 +120,7 @@
     "ended": "Sdílení skončilo",
     "endedStopped": "Sdílení bylo zastaveno",
     "endedExpired": "24 hodin uplynulo",
-    "endedLeft": "Server byl opuštěn",
+    "endedLeft": "Opustil(a) jsi server",
     "endedChanged": "Soubor se na disku změnil, proto se sdílení zastavilo"
   },
   "dialog": {

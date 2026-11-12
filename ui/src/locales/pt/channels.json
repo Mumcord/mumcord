@@ -30,10 +30,10 @@
   "status": {
     "listening": "apenas a ouvir",
     "talking": "a falar",
-    "muted": "sem microfone",
-    "deafened": "sem áudio",
+    "muted": "silenciado",
+    "deafened": "áudio desativado",
     "serverMuted": "silenciado pelo servidor",
-    "serverDeafened": "sem áudio pelo servidor",
+    "serverDeafened": "áudio desativado pelo servidor",
     "suppressed": "suprimido (não pode falar aqui)",
     "localMuted": "silenciado para ti",
     "unregistered": "não registado",
@@ -54,10 +54,10 @@
   "statusTip": {
     "registered": "Registado neste servidor",
     "listening": "Apenas a ouvir",
-    "muted": "Sem microfone",
-    "deafened": "Sem áudio",
+    "muted": "Silenciado",
+    "deafened": "Áudio desativado",
     "serverMuted": "Silenciado pelo servidor",
-    "serverDeafened": "Sem áudio pelo servidor",
+    "serverDeafened": "Áudio desativado pelo servidor",
     "suppressed": "Suprimido – não pode falar neste canal",
     "localMuted": "Silenciado para ti",
     "unregistered": "Não registado neste servidor (convidado)",
@@ -86,7 +86,7 @@
   "search": {
     "label": "Pesquisar canais e pessoas",
     "clear": "Limpar pesquisa",
-    "empty": "Nenhum canal ou pessoa corresponde a “{{query}}”.",
+    "empty": "Nenhum canal ou pessoa corresponde a «{{query}}».",
     "count": "{{channels}}, {{people}}",
     "channels_one": "{{count}} canal",
     "channels_many": "{{count}} canais",
@@ -100,7 +100,7 @@
     "state": {
       "connected": "Ligado",
       "connecting": "A ligar",
-      "reconnecting": "A religar…",
+      "reconnecting": "A voltar a ligar…",
       "disconnected": "Desligado"
     },
     "online": "{{count}} online",
@@ -121,5 +121,24 @@
     "resultAll": "Movidas {{people}} para {{channel}}.",
     "resultSome": "Movidas {{moved}} de {{people}} para {{channel}}. As restantes foram recusadas.",
     "busy": "Já se estão a mover pessoas…"
+  },
+  "drag": {
+    "into": "Mover para {{channel}}",
+    "above": "Colocar acima de {{channel}}",
+    "below": "Colocar abaixo de {{channel}}",
+    "self": "Não pode ir para dentro de si mesmo",
+    "subChannel": "Não pode ir para um subcanal próprio",
+    "confirmTitle": "Mover «{{channel}}»?",
+    "alongAll": "Com {{channel}} movem-se: {{subChannels}} e {{people}}.",
+    "alongSubChannels": "Com {{channel}} movem-se: {{subChannels}}.",
+    "alongPeople": "Com {{channel}} movem-se: {{people}}.",
+    "alongNone": "Só {{channel}} é movido; está vazio.",
+    "subChannels_one": "{{count}} subcanal",
+    "subChannels_many": "{{count}} subcanais",
+    "subChannels_other": "{{count}} subcanais",
+    "pathTo": "para",
+    "confirm": "Mover",
+    "failedTitle": "Não foi possível mover {{channel}}",
+    "refusedParent": "Não tens permissão para mover canais para {{channel}}."
   }
 }

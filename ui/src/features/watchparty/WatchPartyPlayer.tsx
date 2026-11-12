@@ -10,6 +10,9 @@ import { useTranslation } from "react-i18next";
 import { getApi, type WatchCommand } from "../../api";
 import { openInBrowser } from "../chat/openLink";
 import { CodecHint } from "./CodecHint";
+import { STALL_MS } from "./stall";
+import { missingPackages, probeCodecs } from "./codecSupport";
+import { useHintPlatform } from "./useHintPlatform";
 import { PartySync } from "./partySync";
 import { ducker } from "./ducking";
 import {
@@ -38,6 +41,18 @@ export function WatchPartyPlayer({ live, onCommand, onEnded }: WatchPartyPlayerP
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [youTubeError, setYouTubeError] = useState<number | null>(null);
+  const [stalled, setStalled] = useState(false);
+  const platform = useHintPlatform();
+  // Probed once per session and kept in state: render must not read a ref, and the answer cannot
+  // change while the app runs.
+  const [codecs] = useState(() => probeCodecs());
+  // A missing decoder only matters where a package can fix it (FreeBSD, FR-13.34).
+  const decoderMissing = platform?.kind === "freebsd" && missingPackages(codecs).length > 0;
+  // The stall timer starts before the app info arrives, so it reads this on the way out.
+  const decoderMissingRef = useRef(decoderMissing);
+  useEffect(() => {
+    decoderMissingRef.current = decoderMissing;
+  }, [decoderMissing]);
   const onCommandRef = useRef(onCommand);
   const onEndedRef = useRef(onEnded);
   const liveRef = useRef(live);
@@ -120,6 +135,7 @@ export function WatchPartyPlayer({ live, onCommand, onEnded }: WatchPartyPlayerP
         // The page starts at the viewer's own volume; only a lowered level needs sending.
         if (ducker.level !== 1) post(volumeCommand(ducker.level));
       }
+      if (report.type === "time" && report.seconds > 0) window.clearTimeout(stall);
       if (report.type === "state") control.onState(report.state);
       else if (report.type === "ended") control.onState(ENDED);
       else if (report.type === "time") control.onTime(report.seconds);
@@ -132,10 +148,15 @@ export function WatchPartyPlayer({ live, onCommand, onEnded }: WatchPartyPlayerP
     const timeout = window.setTimeout(() => {
       if (!answered) setFailed(true);
     }, READY_TIMEOUT_MS);
+    // The picture must move; a stream that stays at zero means a decoder is missing.
+    const stall = window.setTimeout(() => {
+      if (decoderMissingRef.current) setStalled(true);
+    }, STALL_MS);
     return () => {
       window.removeEventListener("message", onMessage);
       unsubscribeDucking();
       window.clearTimeout(timeout);
+      window.clearTimeout(stall);
       sync.current = null;
     };
   }, [videoId, origin]);
@@ -165,6 +186,9 @@ export function WatchPartyPlayer({ live, onCommand, onEnded }: WatchPartyPlayerP
             frame.current?.contentWindow?.postMessage(load, origin);
           }}
         />
+      )}
+      {stalled && !failed && (
+        <CodecHint failure={{ kind: "stalled" }} className="watch-party__codec-hint" />
       )}
       {failed && (
         <div className="watch-party__unavailable" role="status">

@@ -61,6 +61,13 @@ struct Registered {
     commands: Vec<Command>,
 }
 
+/// Mumcord's own commands (Epic 4, issue #378, FR-10.30): a plugin cannot take these names, they
+/// always run in Mumcord. The names stay English in every language (spec 10, Q4.14).
+pub const BUILT_IN_COMMANDS: &[&str] = &[
+    "kick", "ban", "mute", "unmute", "deaf", "undeaf", "move", "unban", "priority", "register",
+    "moveall",
+];
+
 /// Slash commands of all installed plugins. Registration order is install order, which decides
 /// clashes between plugins ("first installed wins").
 #[derive(Debug, Default)]
@@ -618,6 +625,29 @@ mod tests {
             r.lost_commands("other"),
             vec![("roll".to_owned(), "Dice roller".to_owned())]
         );
+    }
+
+    #[test]
+    fn the_admin_command_names_stay_mumcords() {
+        // The chat box answers these itself, so a plugin that declares one of the names is shown
+        // as "taken by Mumcord" and never runs it (Epic 4, issue #378, FR-10.30).
+        let builtins: Vec<(&str, &str)> = BUILT_IN_COMMANDS.iter().map(|n| (*n, "")).collect();
+        let mut r = CommandRegistry::new(&builtins);
+        r.register("dice", "Dice roller", &[cmd("mute"), cmd("roll")]);
+        assert_eq!(r.resolve("/mute Anna"), Resolution::Builtin);
+        assert_eq!(r.taken_by("dice", "mute").as_deref(), Some("Mumcord"));
+        assert_eq!(
+            r.lost_commands("dice"),
+            vec![("mute".to_owned(), "Mumcord".to_owned())]
+        );
+        // The set is what `ui/src/features/admin/commands/commands.ts` lists.
+        for name in [
+            "kick", "ban", "mute", "unmute", "deaf", "undeaf", "move", "unban", "priority",
+            "register", "moveall",
+        ] {
+            assert!(BUILT_IN_COMMANDS.contains(&name), "{name} must stay free");
+        }
+        assert_eq!(BUILT_IN_COMMANDS.len(), 11);
     }
 
     #[test]

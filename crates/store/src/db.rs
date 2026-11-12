@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::path::Path;
 
 use rusqlite::{Connection, OpenFlags};
@@ -670,6 +671,11 @@ const DOWN_STEPS_VERSION: usize = 30;
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
 pub struct Store {
     pub(crate) conn: Connection,
+    /// Chat messages queued for the next batch write (spec 12 FR-12.5), with their assigned
+    /// row ids, so callers get a real id before the rows are on disk.
+    pub(crate) pending_messages: RefCell<Vec<crate::history::PendingMessage>>,
+    /// Next row id for a queued message; `None` until the first queue reads `MAX(id)`.
+    pub(crate) next_message_id: RefCell<Option<i64>>,
 }
 
 impl Store {
@@ -679,7 +685,13 @@ impl Store {
         // A read-write open already writes (journal mode, WAL files), which a newer
         // profile must never see: an older app may not change it (issue #510).
         check_schema(data_dir)?;
-        Self::from_connection(Connection::open(data_dir.join(DB_FILE_NAME))?)
+        let store = Self::from_connection(Connection::open(data_dir.join(DB_FILE_NAME))?)?;
+        // The durability switch (spec 12 FR-12.8) is applied after opening and migrating:
+        // migrations always run under NORMAL, so a schema change is never written with OFF.
+        if !store.settings()?.durable_saves {
+            store.conn.pragma_update(None, "synchronous", "OFF")?;
+        }
+        Ok(store)
     }
 
     fn from_connection(mut conn: Connection) -> Result<Self> {
@@ -690,7 +702,11 @@ impl Store {
         // (plugin storage writes run inside a plugin's 50 ms call budget).
         conn.pragma_update(None, "synchronous", "NORMAL")?;
         migrate(&mut conn)?;
-        Ok(Self { conn })
+        Ok(Self {
+            conn,
+            pending_messages: RefCell::new(Vec::new()),
+            next_message_id: RefCell::new(None),
+        })
     }
 
     /// Current schema version (number of applied migrations).
@@ -1021,6 +1037,24 @@ pub(crate) mod tests {
             ("wal", 1),
             "WAL with synchronous=NORMAL"
         );
+    }
+
+    #[test]
+    fn durable_saves_off_sets_synchronous_off() {
+        // FR-12.8 / FR-12.9: the switch is read after open + migration and applied then.
+        let dir = tempfile::tempdir().expect("tempdir");
+        let store = Store::open(dir.path()).expect("open store");
+        let mut settings = store.settings().expect("settings");
+        settings.durable_saves = false;
+        store.save_settings(&settings).expect("save");
+        drop(store);
+
+        let store = Store::open(dir.path()).expect("reopen");
+        let sync: i64 = store
+            .conn
+            .query_row("PRAGMA synchronous", [], |row| row.get(0))
+            .expect("synchronous");
+        assert_eq!(sync, 0, "synchronous=OFF when durable saves are off");
     }
 
     /// Testers' local databases already have #218's `channel_audio_profile` as v18, so

@@ -1,0 +1,15 @@
+# Advisories accepted for this directory's Cargo.lock. OSV-Scanner reads its config per directory,
+# so the entries for the crates this tool shares with the main workspace (through mumcord-store)
+# are repeated here. Keep them in sync with osv-scanner.toml and deny.toml at the repository root.
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0370"
+reason = "zvariant is unmaintained (no vulnerability); via zbus 5, waiting for zbus 6 in secret-service (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0371"
+reason = "zbus_names is unmaintained (no vulnerability); via zbus 5 (#131)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0372"
+reason = "zvariant_derive is unmaintained (no vulnerability); via zbus 5 (#131)"

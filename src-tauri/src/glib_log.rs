@@ -100,13 +100,15 @@ mod tests {
             .expect("the message is in the log");
         assert!(line.contains("glib") && line.contains("Gdk"), "{line}");
         assert!(!lines.iter().any(|l| l.contains("chatty debug line")));
+        // Log writes are buffered (spec 12); flush before reading the file.
+        mumcord_engine::diag::flush_log();
         let on_disk: String = std::fs::read_dir(&dir)
             .expect("log dir")
             .filter_map(|e| std::fs::read_to_string(e.ok()?.path()).ok())
             .collect();
         assert!(
             on_disk.contains("dispatching to Wayland display"),
-            "written to disk at once"
+            "written to disk after the flush"
         );
         let _ = std::fs::remove_dir_all(&dir);
     }

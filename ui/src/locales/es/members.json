@@ -126,7 +126,7 @@
     "private": "Los mensajes privados de {{name}} no se muestran y no te notifican.",
     "channelCollapsed": "Los mensajes de canal de {{name}} están contraídos. Aún puedes abrirlos.",
     "channelHidden": "Los mensajes de canal de {{name}} están ocultos.",
-    "voice": "{{name}} está silenciado para ti en la voz, incluidos los susurros.",
+    "voice": "{{name}} está silenciado para ti en el chat de voz, incluidos los susurros.",
     "data": "Sin sincronización del historial, invitaciones ni otros datos de Mumcord de {{name}}.",
     "followsCert": "El bloqueo sigue el certificado de {{name}}, así que un nombre nuevo no lo evita.",
     "nameOnly": "{{name}} no tiene certificado, así que el bloqueo solo se aplica a este nombre en {{server}}.",

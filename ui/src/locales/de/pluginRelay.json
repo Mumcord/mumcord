@@ -8,11 +8,11 @@
   "serverDenies": "{{server}} · Relay erlaubt keine Plugin-Daten",
   "serverNone": "{{server}} · kein Relay",
   "mumbleOnly": "Nur Mumble-Verbindung",
-  "plugins": "Plugins mit Erlaubnis zur Nutzung",
+  "plugins": "Plugins, die es nutzen dürfen",
   "pluginUsed": "Inoffiziell · {{size}} in dieser Sitzung",
   "pluginUsedOfficial": "Offiziell · {{size}} in dieser Sitzung",
   "mayUse": "{{plugin}} darf das Relay nutzen",
-  "officialNone": "Offiziell · braucht keine Relay-Daten",
+  "officialNone": "Offiziell · bittet nicht um Relay-Daten",
   "noPlugins": "Kein Plugin bittet um Relay-Daten.",
   "sounds": {
     "title": "Plugin-Töne",

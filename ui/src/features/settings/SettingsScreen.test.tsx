@@ -411,18 +411,24 @@ describe("SettingsScreen", () => {
     });
   });
 
-  it("chooses how message notifications are shown", async () => {
+  it("chooses how each kind of notification is shown (#660)", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Chat & Notifications");
-    const group = screen.getByRole("group", { name: "Notifications for new messages" });
-    expect(within(group).getByRole("radio", { name: /^Both/ })).toBeChecked();
-    fireEvent.click(within(group).getByRole("radio", { name: "Off" }));
+    const messages = screen.getByRole("combobox", { name: "New messages" });
+    expect(messages).toHaveTextContent("Both");
+    expect(optionLabels(messages)).toEqual(["Off", "In-app", "System", "Both"]);
+    chooseOption(messages, "Off");
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ notifications: "off" }));
     });
-    fireEvent.click(within(group).getByRole("radio", { name: /^In-app/ }));
+    const shares = screen.getByRole("combobox", { name: "Someone starts a screen share" });
+    expect(shares).toHaveTextContent("In-app");
+    chooseOption(shares, "System");
     await waitFor(() => {
-      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ notifications: "inApp" }));
+      expect(update.mock.lastCall?.[0].activityNotify).toMatchObject({
+        screenShare: "desktop",
+        joins: "inApp",
+      });
     });
   });
 
@@ -1392,7 +1398,6 @@ describe("Identity section", () => {
 
 describe("Diagnostics section", () => {
   it("changes the log level and saves a diagnostic file", async () => {
-    savePath.mockResolvedValue("/home/me/diag.txt");
     const update = vi.spyOn(api, "settingsUpdate");
     const save = vi.spyOn(api, "diagnosticsSave");
     await openSection("Advanced & Developer");
@@ -1405,7 +1410,9 @@ describe("Diagnostics section", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Save diagnostic file…" }));
     await waitFor(() => {
-      expect(save).toHaveBeenCalledWith("/home/me/diag.txt");
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({ defaultName: "mumcord-diagnostics.txt", extensions: ["txt"] }),
+      );
     });
     expect(await screen.findByText("Diagnostic file saved.")).toBeInTheDocument();
   });
@@ -1624,6 +1631,8 @@ describe("Overlay on macOS (QA.58)", () => {
       appimage: false,
       portable: false,
       distro: null,
+      limits: [],
+      session: null,
     });
 
   it("hides the in-game overlay card and its search entries", async () => {
@@ -1648,6 +1657,8 @@ describe("Overlay on macOS (QA.58)", () => {
       appimage: false,
       portable: false,
       distro: null,
+      limits: [],
+      session: null,
     });
     renderScreen();
     await switchSection("Gaming & Overlay");

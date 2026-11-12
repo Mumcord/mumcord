@@ -3,7 +3,7 @@
   "announce": {
     "connected": "Csatlakozva: {{server}}.",
     "lost": "Megszakadt a kapcsolat: {{server}}. Újracsatlakozás…",
-    "ended": "Lecsatlakozva: {{server}}. A teendőket a chat feletti sávban találod.",
+    "ended": "Lecsatlakozva: {{server}}. A teendőket a csevegés feletti sávban találod.",
     "disconnected": "Lecsatlakozva: {{server}}.",
     "tcp": "A hang most TCP-n megy, mert az UDP blokkolva van. A hang kissé késhet.",
     "removed": "{{server}} eltávolítva.",
@@ -20,7 +20,7 @@
       "connecting": "csatlakozás",
       "reconnecting": "újracsatlakozás",
       "error": "a kapcsolat megszakadt",
-      "failed": "a kapcsolódás sikertelen",
+      "failed": "a csatlakozás sikertelen",
       "voice": "hangszerver",
       "unread": "olvasatlan üzenetek",
       "mentions": "említések: {{mentions}}"
@@ -35,7 +35,7 @@
     "moveDown": "Mozgatás le",
     "remove": "Szerver eltávolítása",
     "reconnect": "Újracsatlakozás",
-    "alwaysConnect": "Mindig csatlakozzon indításkor",
+    "alwaysConnect": "Csatlakozás minden indításkor",
     "muteNotifications": "Értesítések némítása",
     "muteGroupMentions": "@all és @channel némítása",
     "theme": "Téma",
@@ -73,9 +73,9 @@
       "invalid": "A szerver adatai érvénytelenek. Ellenőrizd a címet és a portot.",
       "addressInvalid": "Ez nem tűnik szervercímnek.",
       "portEmpty": "Add meg a portot.",
-      "labelLong": "A szerver sávban legfeljebb 64 karakter lehet a név."
+      "labelLong": "A szerversávban legfeljebb 64 karakter lehet a név."
     },
-    "alwaysConnect": "Mindig csatlakozzon indításkor",
+    "alwaysConnect": "Csatlakozás minden indításkor",
     "alwaysConnectHint": "A Mumcord indításkor csak olvasható módban csatlakozik ehhez a szerverhez.",
     "channelPasswords": "Csatornajelszavak",
     "channelPassword": "{{number}}. jelszó",
@@ -107,6 +107,8 @@
       "certChanged": "A tanúsítvány megváltozott – ellenőrizd csatlakozás előtt",
       "wrongPassword": "A szerver elutasította a jelszót.",
       "nameInUse": "Ez a név már használatban van ezen a szerveren.",
+      "certUntrustedNotSent": "A kiszolgáló tanúsítványában még nem bízol, ezért a jelszót nem küldtük el. Csatlakozz egyszer, bízz meg a tanúsítványban, majd teszteld újra.",
+      "certChangedNotSent": "A kiszolgáló tanúsítványa megváltozott, ezért a jelszót nem küldtük el.",
       "unreachable": "A szerver nem érhető el.",
       "invalid": "Az adatok nem érvényesek.",
       "failed": "A teszt sikertelen. Próbáld újra."
@@ -126,14 +128,14 @@
     "secureStorage": "A rendszered biztonságos tárolója nem érhető el, ezért a szerverjelszót nem sikerült beolvasni vagy menteni. Oldd fel a zárolását, és próbáld újra.",
     "notFound": "Ez a szerver már nincs elmentve.",
     "generic": "Valami hiba történt. Próbáld újra.",
-    "serverLimit": "Már a maximális {{limit}} szerverhez csatlakozol. Bonts egy kapcsolatot, vagy emeld a korlátot: Beállítások → Szerverek.",
-    "serverLimitUnknown": "Már a maximális számú szerverhez csatlakozol. Bonts egy kapcsolatot, vagy emeld a korlátot: Beállítások → Szerverek.",
-    "alwaysConnectLimit": "Csak {{limit}} szervernél lehet bekapcsolva a „Mindig csatlakozzon indításkor”, ugyanannyinál, amennyi a csatlakoztatott szerverek korlátja. Kapcsold ki egy másik szervernél, vagy emeld a korlátot: Beállítások → Szerverek.",
-    "alwaysConnectLimitUnknown": "A „Mindig csatlakozzon indításkor” nem lehet több szervernél bekapcsolva, mint a csatlakoztatott szerverek korlátja. Kapcsold ki egy másik szervernél, vagy emeld a korlátot: Beállítások → Szerverek."
+    "serverLimit": "Már a maximális {{limit}} szerverhez csatlakozol. Csatlakozz le egy szerverről, vagy emeld a korlátot: Beállítások → Szerverek.",
+    "serverLimitUnknown": "Már a maximális számú szerverhez csatlakozol. Csatlakozz le egy szerverről, vagy emeld a korlátot: Beállítások → Szerverek.",
+    "alwaysConnectLimit": "Csak {{limit}} szervernél lehet bekapcsolva a „Csatlakozás minden indításkor” beállítás, ugyanannyinál, amennyi az egyszerre csatlakozott szerverek korlátja. Kapcsold ki egy másik szervernél, vagy emeld a korlátot: Beállítások → Szerverek.",
+    "alwaysConnectLimitUnknown": "A „Csatlakozás minden indításkor” beállítás nem lehet több szervernél bekapcsolva, mint az egyszerre csatlakozott szerverek korlátja. Kapcsold ki egy másik szervernél, vagy emeld a korlátot: Beállítások → Szerverek."
   },
   "remove": {
     "title": "Eltávolítod: {{server}}?",
-    "message": "A mentett jelszava, a tanúsítványdöntés, a követett csatornák és a chatelőzmények törlődnek erről a számítógépről.",
+    "message": "A mentett jelszava, a tanúsítványdöntés, a követett csatornák és a csevegési előzmények törlődnek erről a számítógépről.",
     "confirm": "Eltávolítás"
   },
   "cert": {
@@ -145,7 +147,7 @@
     "changedAdvice": "Ez előfordulhat a szerver megújítása után, de azt is jelentheti, hogy valaki lehallgatja a kapcsolatodat. Csak akkor folytasd, ha a szerver tulajdonosa megerősítette a változást.",
     "previousFingerprint": "Korábban elfogadott ujjlenyomat",
     "newFingerprint": "Új ujjlenyomat",
-    "reject": "Ne csatlakozzon",
+    "reject": "Mégsem csatlakozom",
     "trust": "Megbízom, csatlakozás",
     "trustChanged": "Megbízom az új tanúsítványban"
   },
@@ -158,7 +160,7 @@
   "status": {
     "label": "Kapcsolat állapota",
     "connecting": "Csatlakozás: {{server}}…",
-    "reconnecting": "Újracsatlakozás… ({{attempt}}. próbálkozás a(z) {{max}}-ból, következő {{seconds}} mp múlva)",
+    "reconnecting": "Újracsatlakozás… ({{attempt}}/{{max}}. próbálkozás, a következő {{seconds}} mp múlva)",
     "tcp": "Csatlakozva TCP-n (UDP blokkolva). A hang működik, de kissé késhet.",
     "disconnected": "Lecsatlakozva",
     "disconnectedReason": "Lecsatlakozva – {{reason}}",
@@ -171,7 +173,7 @@
       "reorder": "Az új szerversorrendet nem sikerült menteni. Próbáld újra.",
       "remove": "A szervert nem sikerült eltávolítani. Próbáld újra.",
       "disconnect": "A lecsatlakozás nem sikerült. Próbáld újra.",
-      "alwaysConnect": "A „Mindig csatlakozzon indításkor” beállítást nem sikerült menteni. Próbáld újra.",
+      "alwaysConnect": "A „Csatlakozás minden indításkor” beállítást nem sikerült menteni. Próbáld újra.",
       "notifications": "Az értesítési beállítást nem sikerült menteni. Próbáld újra.",
       "savePassword": "Az új jelszót nem sikerült menteni. Szerkeszd a szervert a mentéshez.",
       "identity": "Az identitást nem sikerült menteni. Próbáld újra."
@@ -231,7 +233,7 @@
     "copyFingerprint": "Ujjlenyomat másolása",
     "codecs": "Engedélyezett kodekek",
     "welcomeText": "Üdvözlőszöveg",
-    "usersOnline": "Elérhető felhasználók",
+    "usersOnline": "Online felhasználók",
     "sessionId": "Munkamenet-azonosító",
     "registered": "Regisztrált",
     "permissions": "Jogosultságok az aktuális csatornán",
@@ -251,8 +253,8 @@
     "usersOf": "{{online}} / {{max}}",
     "unlimited": "Korlátlan",
     "registeredAs": "Igen, {{name}} néven",
-    "inChannelYouMay": "A(z) {{channel}} csatornán megteheted",
-    "youMay": "Megteheted",
+    "inChannelYouMay": "A(z) {{channel}} csatornán ezeket teheted",
+    "youMay": "Ezeket teheted",
     "nothing": "Semmit",
     "mumcordUsersOf": "{{count}} / {{total}}",
     "none": "—",
@@ -267,8 +269,8 @@
     "packetLoss": "Csomagvesztés",
     "bandwidthInUse": "Használt sávszélesség",
     "bandwidthOf": "{{used}} / {{limit}} kbit/s",
-    "privacyNote": "Semmi sem kerül elküldésre sehová. Minden ezen az eszközön marad.",
-    "versionOnOs": "Mumble {{version}} ezen: {{os}}",
+    "privacyNote": "Semmi nem megy el sehová. Minden ezen az eszközön marad.",
+    "versionOnOs": "Mumble {{version}} ({{os}})",
     "versionOnly": "Mumble {{version}}",
     "permissionWrite": "Írás",
     "permissionTraverse": "Áthaladás",
@@ -286,7 +288,7 @@
     "permissionBan": "Kitiltás",
     "permissionRegister": "Felhasználók regisztrálása",
     "permissionSelfRegister": "Önregisztráció",
-    "permissionResetUserContent": "Felhasználói tartalom visszaállítása",
+    "permissionResetUserContent": "Felhasználói tartalom alaphelyzetbe állítása",
     "characters": "{{value}} karakter"
   },
   "identity": {
@@ -299,7 +301,7 @@
     "intro": "Válaszd ki, melyik identitást használja a Mumcord itt. Az „Alapértelmezett használata” az alapértelmezett identitást követi.",
     "save": "Mentés",
     "saveAndReconnect": "Mentés és újracsatlakozás",
-    "reconnectTitle": "Újracsatlakozás: {{server}}?",
+    "reconnectTitle": "Újracsatlakozol ide: {{server}}?",
     "reconnectMessage": "Újracsatlakoztatod most ezt a szervert a(z) {{identity}} identitással? A többi szerver csatlakozva marad.",
     "reconnect": "Újracsatlakozás",
     "later": "Később",

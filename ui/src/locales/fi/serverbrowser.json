@@ -12,8 +12,8 @@
     "label": "Suodattimet",
     "country": "Maa",
     "anyCountry": "Mikä tahansa maa",
-    "ping": "Viive",
-    "anyPing": "Mikä tahansa viive",
+    "ping": "Ping",
+    "anyPing": "Mikä tahansa ping",
     "pingBelow": "Alle {{ms}} ms",
     "hideEmpty": "Piilota tyhjät",
     "hideFull": "Piilota täydet"
@@ -22,7 +22,7 @@
   "columns": {
     "name": "Nimi",
     "country": "Maa",
-    "ping": "Viive",
+    "ping": "Ping",
     "users": "Käyttäjät",
     "actions": "Toiminnot"
   },

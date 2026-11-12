@@ -11,7 +11,7 @@ arch=('x86_64' 'aarch64')
 url='https://github.com/Mumcord/mumcord'
 license=('AGPL-3.0-only')
 depends=('webkit2gtk-4.1' 'gtk3' 'libayatana-appindicator' 'alsa-lib' 'libpipewire' 'hicolor-icon-theme'
-         'gst-plugins-good' 'gst-plugins-bad' 'gst-libav')
+         'gst-plugins-good' 'gst-plugins-bad')
 optdepends=('pipewire-alsa: audio through PipeWire'
             'pulseaudio-alsa: audio through PulseAudio')
 provides=('mumcord')

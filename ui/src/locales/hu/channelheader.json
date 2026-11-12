@@ -3,9 +3,9 @@
   "copyFailed": "A hivatkozást nem sikerült másolni",
   "menu": {
     "label": "{{channel}} csatorna beállításai",
-    "join": "Belépés a csatornába",
+    "join": "Csatlakozás a csatornához",
     "follow": "Csatorna követése",
-    "unfollow": "Csatorna követésének leállítása",
+    "unfollow": "Csatorna követésének megszüntetése",
     "following": "Követed",
     "copyLink": "Csatornahivatkozás másolása",
     "password": "Csatorna jelszava",
@@ -69,7 +69,7 @@
   },
   "badge": {
     "music": "Zeneprofil",
-    "jam": "Jam profil"
+    "jam": "Jam-profil"
   },
   "audio": {
     "title": "Hang ehhez a csatornához",
@@ -86,7 +86,7 @@
     "musicQualityHint": "Zenére hangolt kódoló; zajszűrés kikapcsolva.",
     "musicIncluded": "Benne van, amíg az alacsony késleltetésű mód be van kapcsolva.",
     "lowLatency": "Alacsony késleltetésű mód",
-    "lowLatencyHint": "Legkisebb csomagok. Több sávszélesség, kevésbé robusztus.",
+    "lowLatencyHint": "Legkisebb csomagok. Több sávszélesség, kevésbé hibatűrő.",
     "beta": "Beta",
     "on": "be",
     "off": "ki",
@@ -98,7 +98,7 @@
     "bitrateDefault": "Alapértelmezett, {{value}}",
     "serverLimit": "Szerverkorlát: {{kbps}} kbit/s",
     "noServerLimit": "Nincs szerverkorlát",
-    "note": "Akkor lép életbe, amikor csatlakozol ehhez a csatornához, csak ezen az eszközön. Másokat nem érint. A kapcsolat adatai ezeket az értékeket a „(csatornaprofil)” jelöléssel látják el.",
+    "note": "Akkor lép életbe, amikor csatlakozol ehhez a csatornához, és csak ezen az eszközön. Másokat nem érint. A kapcsolatadatokban ezek az értékek „(csatornaprofil)” jelölést kapnak.",
     "saveFailed": "Nem sikerült menteni a hangprofilt.",
     "remove": "Profil eltávolítása",
     "cancel": "Mégse",

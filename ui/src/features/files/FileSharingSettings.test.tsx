@@ -1,14 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { FileSharingSettings } from "./FileSharingSettings";
-import { createMockApi, setApi, type Settings } from "../../api";
+import { createMockApi, setApi, type MumcordApi, type Settings } from "../../api";
 import { applyLanguage } from "../../i18n";
 
-const pick = vi.hoisted(() => vi.fn());
-vi.mock("@tauri-apps/plugin-dialog", () => ({ open: pick }));
-
-async function renderCard() {
-  setApi(createMockApi());
+async function renderCard(api: MumcordApi = createMockApi()) {
+  setApi(api);
   await applyLanguage("en");
   const base = await (await import("../../api")).getApi().settingsGet();
   const update = vi.fn<(patch: Partial<Settings>) => void>();
@@ -35,9 +32,10 @@ describe("FileSharingSettings", () => {
     expect(update).toHaveBeenCalledWith({ filesMaxSize: "2G" });
   });
 
-  it("writes the folder picked with the dialog", async () => {
-    pick.mockResolvedValueOnce("/data/in");
-    const update = await renderCard();
+  it("shows the folder the engine's folder dialog stored", async () => {
+    const api = createMockApi();
+    const choose = vi.spyOn(api, "filesSaveFolderChoose").mockResolvedValueOnce("/data/in");
+    const update = await renderCard(api);
     await waitFor(() => {
       expect(
         screen.getByRole("button", {
@@ -50,5 +48,6 @@ describe("FileSharingSettings", () => {
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith({ filesSaveFolder: "/data/in" });
     });
+    expect(choose).toHaveBeenCalledWith("Save files to");
   });
 });

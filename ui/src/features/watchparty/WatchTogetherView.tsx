@@ -291,6 +291,10 @@ export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }
         fullscreenLabel={tc("media.fullscreen")}
         exitFullscreenLabel={tc("media.exitFullscreen")}
       />
+      {/* A missing decoder, under the picture and never over it (FR-13.35). */}
+      {player.stalled && !player.failed && !inPopout && (
+        <CodecHint failure={{ kind: "stalled" }} className="watch-party__stall-hint" />
+      )}
       {/* The pop-out shows only the picture (issue #164). */}
       {/* The combined card shows only the picture between strip and room bar (mockup 09). */}
       {!inPopout && !combined && (

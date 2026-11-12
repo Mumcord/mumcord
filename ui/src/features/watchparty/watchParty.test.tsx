@@ -21,6 +21,7 @@ import { WatchHeaderActions } from "./WatchHeader";
 import { WatchTogetherView } from "./WatchTogetherView";
 import { NOTICE_MS, WatchPartyPanel } from "./WatchPartyPanel";
 import { READY_TIMEOUT_MS } from "./WatchPartyPlayer";
+import { STALL_MS } from "./stall";
 import { WatchTogetherButton } from "./WatchTogetherButton";
 import { positionAt, resetWatchPartyStore, type LiveParty } from "./watchPartyStore";
 import { loadCommand, parseBridgeReport, playerOrigin } from "./playerBridge";
@@ -425,6 +426,41 @@ describe("panel", () => {
     expect(screen.getByRole("button", { name: "Open in browser" })).toBeInTheDocument();
     expect(screen.queryByTitle("Watch party player")).toBeNull();
   });
+
+  it(
+    "names the missing FreeBSD decoder when the picture never starts",
+    async () => {
+      // FR-13.35: YouTube answers a missing decoder with its own panel and no onError.
+      vi.spyOn(api, "appInfo").mockResolvedValue({
+        version: "0.8.0",
+        packageVersion: "0.8.0",
+        os: "freebsd x86_64",
+        appimage: false,
+        portable: false,
+        limits: [],
+        session: null,
+        distro: null,
+      });
+      vi.spyOn(HTMLMediaElement.prototype, "canPlayType").mockReturnValue("");
+      render(<WatchPartyPanel serverId={1} channelId={channelId} />);
+      announce(party({ channelId, joined: true }));
+      const frame = await findPlayer();
+      report(frame, { type: "ready" });
+      report(frame, { type: "time", seconds: 0 });
+      // Real timers: the hint waits out the stall window on its own.
+      expect(
+        await screen.findByText(/needs a GStreamer decoder that is missing/, undefined, {
+          timeout: STALL_MS + 4000,
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/sudo pkg install gstreamer1-libav gstreamer1-plugins-vpx/),
+      ).toBeInTheDocument();
+      // The frame stays: only the hint is added.
+      expect(screen.getByTitle("Watch party player")).toBeInTheDocument();
+    },
+    STALL_MS + 8000,
+  );
 
   it("drives the player through the loopback page and ignores other senders", async () => {
     render(<WatchPartyPanel serverId={1} channelId={channelId} />);

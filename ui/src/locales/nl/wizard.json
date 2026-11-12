@@ -33,6 +33,7 @@
     "voice": "Spraak",
     "setupStyle": "Installatiestijl",
     "privateMessages": "Privéberichten",
+    "notifications": "Meldingen",
     "connections": "Verbindingen",
     "features": "Functies",
     "appearance": "Uiterlijk",
@@ -49,10 +50,10 @@
     },
     "servers": {
       "title": "Werkt met elke Mumble-server",
-      "text": "Geen account, geen aanmelding. Sluit je aan bij de servers die je al gebruikt."
+      "text": "Geen account, geen aanmelding. Verbind met de servers die je al gebruikt."
     },
     "private": {
-      "title": "Privé door ontwerp",
+      "title": "Privacy voorop",
       "text": "Geen telemetrie. Wat Mumcord opslaat, blijft op je computer."
     }
   },
@@ -65,7 +66,7 @@
     "import": "Bestaande identiteit importeren",
     "name": "Standaardweergavenaam",
     "nameHint": "Wordt gebruikt op servers die je nog niet kennen. Je kunt dit per server wijzigen.",
-    "chooseFile": "Kies bestand…",
+    "chooseFile": "Bestand kiezen…",
     "noFile": "Geen bestand gekozen",
     "chosenFile": "Gekozen bestand: {{file}}",
     "password": "Bestandswachtwoord",
@@ -89,16 +90,16 @@
     "idle": "Druk op Testen, zeg iets en je hoort jezelf terug.",
     "recording": "Praat nu…",
     "playing": "Je stem wordt afgespeeld…",
-    "devicesFailed": "Je audioapparaten konden niet worden opgesomd. Je kunt doorgaan en ze later kiezen in de instellingen.",
+    "devicesFailed": "Je audioapparaten konden niet worden opgehaald. Je kunt doorgaan en ze later kiezen in de instellingen.",
     "testFailed": "De test kon niet starten. Controleer of de microfoon is aangesloten.",
-    "test": "Hoor jezelf",
+    "test": "Jezelf horen",
     "stop": "Stoppen"
   },
   "voice": {
     "title": "Klinkt het goed?",
     "subtitle": "Kies je apparaten en zeg iets. De balk moet bewegen terwijl je praat.",
     "talkLegend": "Hoe wil je praten?",
-    "voiceActivationDesc": "Je microfoon gaat open als je praat. Niets vast te houden of in te drukken.",
+    "voiceActivationDesc": "Je microfoon gaat open als je praat. Je hoeft niets ingedrukt te houden.",
     "pushToTalkDesc": "Het beste voor lawaaiige ruimtes. Jij kiest de toets.",
     "sensitivity": "Gevoeligheid",
     "changeLater": "Je kunt dit allemaal later wijzigen in Instellingen → Spraak en audio."
@@ -146,6 +147,10 @@
     "subtitle": "Privéberichten zijn één-op-één-gesprekken. Kanaalchat wordt door deze keuze niet beïnvloed.",
     "local": "Het filteren gebeurt op je computer. Afzenders krijgen hier geen melding van. Later kun je per server een andere regel instellen."
   },
+  "notifications": {
+    "title": "Hoe moet Mumcord je waarschuwen?",
+    "subtitle": "Kies hoe elk soort nieuws je bereikt. Je kunt dit later wijzigen in Instellingen → Meldingen."
+  },
   "connections": {
     "title": "Verbindingen en inhoud",
     "subtitle": "Sommige functies verbinden je rechtstreeks met andere Mumcord-gebruikers en sommige chatinhoud wordt van andere websites geladen. Kies wat voor jou prima is.",
@@ -157,7 +162,7 @@
     "subtitle": "Zet de extra's aan die je wilt. Bij elk staat wie wat kan zien.",
     "seenByMumcordUsers": "Zichtbaar voor Mumcord-gebruikers op dezelfde server.",
     "onlyYou": "Alleen jij ziet dit.",
-    "ingameOverlayAlt": "Voorbeeld van de overlay in games die laat zien wie er praat"
+    "ingameOverlayAlt": "Voorbeeld van de in-game-overlay die laat zien wie er praat"
   },
   "appearance": {
     "title": "Kies je stijl",
@@ -185,6 +190,7 @@
       "identity": "Identiteit",
       "voice": "Spraak",
       "privateMessages": "Privéberichten",
+      "notifications": "Meldingen",
       "connections": "Verbindingen",
       "chatContent": "Chatinhoud",
       "features": "Functies",
@@ -195,10 +201,12 @@
     "identityDetail": "Opgeslagen in de sleutelhanger van je systeem",
     "voiceDetail": "Ruisonderdrukking: {{noise}}",
     "pmDetail": "Mijn kanaal {{channel}} · geaccepteerde chats {{accepted}} · verzoeken {{requests}}",
+    "notificationsTitle": "Nieuwe berichten: {{mode}}",
+    "notificationsDetail": "Activiteitsmeldingen: {{on}} van {{total}} aan",
     "contentTitle": "Linkvoorbeelden {{previews}}",
     "contentDetail": "Afbeeldingen op volle grootte {{images}} · geschiedenissynchronisatie {{sync}}",
-    "featuresTitle": "Overlay in games {{overlay}}",
-    "featuresDetail": "Systeem-Niet-storen volgen {{dnd}} · nu aan het afspelen {{playing}} · nu aan het gamen {{gaming}}",
+    "featuresTitle": "In-game-overlay {{overlay}}",
+    "featuresDetail": "Systeem-Niet-storen volgen {{dnd}} · nu aan het afspelen {{playing}} · nu aan het gamen {{gaming}} · activiteitengeschiedenis {{history}}",
     "effectsDetail": "Visuele effecten {{effects}}",
     "startupTitle": "Starten bij inloggen {{login}}",
     "startupDetail": "Geminimaliseerd starten {{minimized}} · mumble://-links {{links}}",
@@ -220,5 +228,39 @@
     "discardBody": "Er wordt niets opgeslagen voordat je klaar bent. Als je nu annuleert, blijft alles zoals het is.",
     "discardKeep": "Verder bewerken",
     "discardConfirm": "Wijzigingen weggooien"
+  },
+  "guide": {
+    "label": "Tip van Aaron",
+    "from": "Tip van Aaron",
+    "hide": "Aaron verbergen",
+    "show": "Aaron tonen",
+    "titles": {
+      "welcome": "Welkom aan boord",
+      "import": "Neem je Mumble-spullen mee",
+      "identity": "Je naam op servers",
+      "voice": "Kies je microfoon",
+      "setupStyle": "Kies een stijl",
+      "privateMessages": "Wie je berichten mag sturen",
+      "notifications": "Je meldingen",
+      "connections": "Directe verbindingen",
+      "features": "Kies je extra's",
+      "appearance": "Kies je uiterlijk",
+      "startup": "Mumcord opstarten",
+      "summary": "Controleer je keuzes"
+    },
+    "hints": {
+      "welcome": "Hoi, ik ben Aaron! Ik loop met je door de installatie. Dat duurt maar een minuut.",
+      "import": "Dit zijn de servers en instellingen die in Mumble zijn gevonden. Kies wat je wilt houden.",
+      "identity": "Je identiteit is je naam op servers. Maak een nieuwe aan of importeer een bestaande.",
+      "voice": "Kies hier de microfoon waarin je praat en zeg dan hoi: de groene balk moet gaan dansen.",
+      "setupStyle": "Kies een stijl. Elke instelling kun je later nog wijzigen.",
+      "privateMessages": "Kies wie je privéberichten mag sturen. Afzenders krijgen daar nooit iets van te horen.",
+      "notifications": "Kies hoe elk soort nieuws je bereikt, of zet het uit.",
+      "connections": "Kies of Mumcord je rechtstreeks met andere Mumcord-gebruikers mag verbinden.",
+      "features": "Zet alleen de extra's aan die je leuk vindt. Op elke kaart staat wie het kan zien.",
+      "appearance": "Licht, donker of zoals je systeem: kies hier je uiterlijk.",
+      "startup": "Kies hoe Mumcord start wanneer je inlogt op je computer.",
+      "summary": "Klaar! Controleer hier je keuzes; met Wijzigen ga je terug naar elke stap."
+    }
   }
 }

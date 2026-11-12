@@ -30,26 +30,26 @@
   "newPermissions": "Nieuwe rechten",
   "revoked": {
     "title": "{{name}} is uitgezet",
-    "text": "Versie {{version}} staat op de intrekkingslijst: {{reason}}. De plugingegevens blijven bewaard.",
+    "text": "Versie {{version}} staat op de intrekkingslijst: {{reason}}. De plug-ingegevens blijven bewaard.",
     "details": "Details",
     "remove": "Verwijderen"
   },
   "checkNow": "Nu controleren",
   "lastChecked": "Laatst gecontroleerd om {{time}}",
   "checkFailed": "De controle is mislukt. Probeer het opnieuw.",
-  "modeNote": "Plugin-updates: {{mode}}. Je kunt dit hieronder wijzigen.",
+  "modeNote": "Plug-inupdates: {{mode}}. Je kunt dit hieronder wijzigen.",
   "settings": "Update-instellingen",
   "offer": {
-    "heading": "Nieuwe machtigingen",
+    "heading": "Nieuwe rechten",
     "title": "{{name}} {{version}} kan nu meer. Deze opties blijven uit totdat je ze aanzet.",
-    "permission": "Nieuwe optionele machtiging: {{permission}}",
+    "permission": "Nieuw optioneel recht: {{permission}}",
     "save": "Opslaan",
     "notNow": "Niet nu",
-    "failed": "De machtigingen van {{name}} konden niet worden gewijzigd. Probeer het opnieuw."
+    "failed": "De rechten van {{name}} konden niet worden gewijzigd. Probeer het opnieuw."
   },
   "waitingHeading": "Updates in afwachting",
   "autoNote": "Automatische updates worden alleen geïnstalleerd als de plug-in niets nieuws vraagt en de score in dezelfde categorie blijft of daalt. Al het andere wacht hier.",
-  "needsMumcord": "Update beschikbaar na het updaten van Mumcord",
+  "needsMumcord": "Update beschikbaar na het bijwerken van Mumcord",
   "band": {
     "low": "Laag",
     "medium": "Gemiddeld",
@@ -71,7 +71,7 @@
     "goesDown": ", het risico daalt"
   },
   "dialog": {
-    "title": "{{name}} updaten naar {{version}}?",
+    "title": "{{name}} bijwerken naar {{version}}?",
     "now": "nu {{version}}",
     "sameKey": "zelfde auteurssleutel",
     "newKey": "nieuwe auteurssleutel",
@@ -95,14 +95,14 @@
     "asksForMore": "omdat deze versie om meer vraagt:",
     "permissionsLabel": "Nieuwe rechten",
     "recentChange": "Dit telt ook als recente wijziging: nieuwe rechten in de laatste {{versions}} versies voegen nog +{{recent}} punten toe. Samen met de +{{permissions}} hierboven (× {{multiplier}}) is dat de +{{total}}.",
-    "highTitle": "Deze update zou de plug-in tot hoog risico maken",
+    "highTitle": "Met deze update krijgt de plug-in een hoog risico",
     "highText": "Hij wordt niet automatisch geïnstalleerd. Blijven op {{version}} behoudt de huidige score; je kunt de versie vastzetten onder Geïnstalleerd.",
     "highTick": "Ik begrijp dat het risico is gestegen en vertrouw de auteur nog steeds",
     "skipHint": "Overslaan laat {{version}} gewoon werken.",
     "skip": "Deze versie overslaan",
     "notNow": "Niet nu",
-    "allow": "Toestaan en updaten",
-    "updateAnyway": "Toch updaten",
-    "failed": "{{name}} kon niet worden geüpdatet. Probeer het opnieuw."
+    "allow": "Toestaan en bijwerken",
+    "updateAnyway": "Toch bijwerken",
+    "failed": "{{name}} kon niet worden bijgewerkt. Probeer het opnieuw."
   }
 }

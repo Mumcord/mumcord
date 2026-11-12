@@ -57,8 +57,10 @@ async function uiTexts(): Promise<string[]> {
     // User/server content, not UI text. Also skipped: license texts (legal originals, shown
     // verbatim), the live regions (transient announcements made before the switch), key chips
     // and the server name and figures ("1 online · 25 ms" reads the same in many languages).
+    // Toast texts are written when their event happens (#660: people joining notify in-app), so
+    // one from before the switch stays in the old language.
     const skip =
-      ".chat-message__body,.chat-message__sender,.tree-person__name,.tree-channel__name,code,time,.server-bar__server,.chat-header__title,.profile-card__name,.member__name,pre.settings-text,[data-testid^='live-'],kbd,.server-section__name,.server-section__meta";
+      ".toast__title,.toast__text,.chat-message__body,.chat-message__sender,.tree-person__name,.tree-channel__name,code,time,.server-bar__server,.chat-header__title,.profile-card__name,.member__name,pre.settings-text,[data-testid^='live-'],kbd,.server-section__name,.server-section__meta";
     const out = new Set<string>();
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
@@ -113,11 +115,14 @@ const neutral = (t: string) =>
   // A single letter (avatar initial), the test audio backend's device name, the OS string.
   /^\p{L}$/u.test(t) ||
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
+  // The channel of an activity row ("· # Lobby") is a channel name, not UI text.
+  /^· # /.test(t) ||
   // "Beta" is the same word in English, German and Spanish; "Details" is the German one.
   /^(Beta|Details)$/.test(t) ||
-  // "Apps" and "Plugins" are also the German and Spanish words, "Bitrate", "Status" and "Updates" the German ones;
+  // "Apps" and "Plugin(s)" are also the German and Spanish words, "Bitrate", "Status" and "Updates" the German ones;
+  // "Push-to-talk" stays English in every language (ui/src/locales/GLOSSARY.md);
   // preset theme names are names, not translated.
-  /^(Apps|Plugins|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  /^(Apps|Plugins?|Push-to-talk|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
   // "Standard" is the German default-identity badge ("Default"), which only matches the English
   // noise suppression level by chance.
   /^Standard$/.test(t) ||

@@ -5,19 +5,40 @@ import { announce } from "../../../a11y";
 import { getApi } from "../../../api";
 import { useUnlockClicks } from "../../inspector/devTools";
 import { openInBrowser } from "../../chat/openLink";
+import { startTour } from "../../tips";
 import { useView } from "../../../app/view";
 import { openSettingsSection } from "../settingsOpener";
 import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { useAppInfo } from "../useAppInfo";
+import type { PlatformLimit } from "../../../bindings/commands";
 import type { SettingsSectionProps } from "./types";
 
 const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/new";
+
+/** The sentence for a platform limit, from `AppInfo.limits`. */
+function limitText(limit: PlatformLimit): string {
+  switch (limit) {
+    case "camera":
+      return "about.limitCamera";
+    case "cameraEffects":
+      return "about.limitCameraEffects";
+    case "screenShareSound":
+      return "about.limitScreenShareSound";
+    case "windowPicker":
+      return "about.limitWindowPicker";
+    case "overlay":
+      return "about.limitOverlay";
+    case "protectedVideo":
+      return "about.limitProtectedVideo";
+  }
+}
 
 /** Version, OS, What's new and Mumcord's AGPL license (AC-1.29). */
 export function VersionCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const info = useAppInfo();
+  const limits = info?.limits ?? [];
   const [changelogFailed, setChangelogFailed] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const versionClicked = useUnlockClicks(() => {
@@ -39,6 +60,18 @@ export function VersionCard({ settings, update }: SettingsSectionProps) {
         <dt>{t("about.os")}</dt>
         <dd>{info?.os ?? "…"}</dd>
       </dl>
+      {/* What this platform cannot do (FR-13.27): named once, where the user checks the version. */}
+      {limits.length > 0 && (
+        <div className="settings-facts">
+          <p className="settings-hint">{t("about.limitsTitle")}</p>
+          <ul className="settings-limits">
+            {limits.map((limit) => (
+              <li key={limit}>{t(limitText(limit))}</li>
+            ))}
+            <li>{t("about.freebsdDriver")}</li>
+          </ul>
+        </div>
+      )}
       {unlocked && (
         <p role="status" className="settings-success">
           {t("about.devToolsUnlocked")}
@@ -101,6 +134,28 @@ export function SetupCard() {
           {t("about.setupWizardIdentityLink")}
         </button>
       </p>
+    </Group>
+  );
+}
+
+/** Aaron's tour of the main window (#637), on demand; it starts once the settings are closed. */
+export function TipsCard() {
+  const { t } = useTranslation("settings");
+  const { closeOverlay } = useView();
+  return (
+    <Group title={t("about.tipsTitle")} icon="compass" info={t("about.tipsHint")}>
+      <div className="settings-actions">
+        <button
+          type="button"
+          className="settings-button"
+          onClick={() => {
+            closeOverlay();
+            startTour();
+          }}
+        >
+          {t("about.tipsShow")}
+        </button>
+      </div>
     </Group>
   );
 }

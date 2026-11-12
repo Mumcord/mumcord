@@ -8,7 +8,7 @@
     "unofficial": "Mhux uffiċjali · {{repository}}",
     "unofficialUnknown": "Mhux uffiċjali",
     "developer": "Plugin tal-iżviluppatur",
-    "autoOff": "Mitfi wara krazzjiet ripetuti",
+    "autoOff": "Mitfi wara kraxxijiet ripetuti",
     "backingOff": "Qed jerġa' jibda wara kraxx",
     "notLoaded": "Ma setax jitgħabba",
     "revoked": "Mitfi minn Mumcord: {{reason}}",
@@ -26,8 +26,8 @@
       "nobody": "Ħadd"
     },
     "notifications": "Notifiki",
-    "pin": "Waħħal il-verżjoni {{version}} (mingħajr aġġornamenti awtomatiċi)",
-    "settings": "Settings tal-plugin",
+    "pin": "Iffissa l-verżjoni {{version}} (mingħajr aġġornamenti awtomatiċi)",
+    "settings": "Issettjar tal-plugin",
     "diagnostics": "Dijanjostika",
     "export": "Esporta d-dejta",
     "reset": "Irrisettja d-dejta",
@@ -36,7 +36,7 @@
   },
   "badge": {
     "label": "Badge muri maġenb l-ismijiet",
-    "none": "L-ebda wieħed"
+    "none": "Xejn"
   },
   "diagnostics": {
     "loading": "Qed titgħabba d-dijanjostika…",
@@ -56,13 +56,13 @@
     "incomingRateDropped": "Messaġġi dieħla mwaqqgħa mil-limitu tar-rata",
     "incomingInvalid": "Messaġġi dieħla invalidi",
     "uiFreezes": "Kemm-il darba Mumcord iffriża waqt li l-kontenut tal-web tiegħu kien miftuħ",
-    "refusedAppMenuLabel": "Dan il-plugin ġie miċħud: tikketta fil-menu tal-Apps hija l-istess bħal waħda ta' Mumcord stess jew tibda b'\"Mumcord\".",
-    "fieldWithoutPermission": "Dan il-plugin ġie miċħud: juża \"{{field}}\" mingħajr il-permess \"{{permission}}\".",
+    "refusedAppMenuLabel": "Dan il-plugin ġie miċħud: tikketta fil-menu tal-Apps hija l-istess bħal waħda ta' Mumcord stess jew tibda b'“Mumcord”.",
+    "fieldWithoutPermission": "Dan il-plugin ġie miċħud: juża “{{field}}” mingħajr il-permess “{{permission}}”.",
     "webDisabled": "Il-kontenut tal-web tiegħu huwa mitfi għax Mumcord waqaf iwieġeb waqt li kien miftuħ.",
     "reenableWeb": "Ixgħel il-kontenut tal-web",
     "reenableFailed": "Il-kontenut tal-web ma setax jinxtegħel.",
-    "log": "Log",
-    "logEmpty": "Il-log huwa vojt.",
+    "log": "Reġistru",
+    "logEmpty": "Ir-reġistru huwa vojt.",
     "level": {
       "debug": "Debug",
       "info": "Info",
@@ -84,26 +84,26 @@
   "remove": {
     "title": "Tneħħi {{name}}?",
     "deleteData": "Ħassar ukoll id-dejta tiegħu",
-    "hint": "Id-dejta miżmuma titħassar wara 30 jum. Erġa' installa qabel dan biex terġa' tikseb.",
+    "hint": "Id-dejta miżmuma titħassar wara 30 jum. Erġa' installa qabel dakinhar biex terġa' tiksibha.",
     "confirm": "Neħħi"
   },
   "errors": {
-    "enable": "Il-plugin ma setax jinbidel.",
+    "enable": "Il-plugin ma setax jinxtegħel jew jintefa.",
     "permissions": "Il-permess ma setax jinbidel.",
     "visibility": "Il-viżibbiltà ma setgħetx tinbidel.",
     "notifications": "In-notifiki ma setgħux jinbidlu.",
-    "pin": "Il-verżjoni ma setgħetx tiġi mwaħħla.",
+    "pin": "Il-verżjoni ma setgħetx tiġi ffissata.",
     "export": "Id-dejta ma setgħetx tiġi esportata.",
     "reset": "Id-dejta ma setgħetx tiġi rrisettjata.",
     "remove": "Il-plugin ma setax jitneħħa.",
     "badge": "Il-badge ma setax jinbidel.",
-    "update": "Il-plagin ma setax jiġi aġġornat."
+    "update": "Il-plugin ma setax jiġi aġġornat."
   },
   "update": {
     "hint": "Aġġornament {{version}}",
     "button": "Aġġorna"
   },
-  "visibilityChip": "Titkellem ma' utenti oħra ta' Mumcord · {{visibility}}",
+  "visibilityChip": "Jitkellem ma' utenti oħra ta' Mumcord · {{visibility}}",
   "chips": {
     "label": "Permessi li juża",
     "uiPanel": "Pannell",
@@ -111,18 +111,18 @@
     "uiProfileCard": "Karta tal-profil",
     "uiChatCard": "Karti taċ-chat",
     "uiUserMenu": "Menu tal-utent",
-    "uiDialog": "Tieqa tiegħu",
+    "uiDialog": "Tieqa proprja",
     "uiWebview": "Kontenut tal-web",
     "eventsSelf": "L-istatus tiegħek",
-    "eventsVoice": "Attività tal-leħen",
+    "eventsVoice": "Attività tal-vuċi",
     "eventsPresence": "Dħul u ħruġ",
     "eventsChatActivity": "Attività taċ-chat",
     "notify": "Notifiki",
     "randomBytes": "Numri każwali",
     "commands": "Kmandi",
     "chatSend": "Jikteb fiċ-chat",
-    "chatSupersedes": "Jissostitwixxi l-linja tat-test tiegħu",
-    "chatTriggers": "Kliem li jixgħel",
+    "chatSupersedes": "Jissostitwixxi t-test tiegħu",
+    "chatTriggers": "Kliem ta' attivazzjoni",
     "chatPatterns": "Mudelli taċ-chat",
     "netHttp": "Aċċess għall-internet",
     "secrets": "Keychain"

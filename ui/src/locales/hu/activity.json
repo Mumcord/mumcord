@@ -9,14 +9,14 @@
   "someone": "valaki",
   "verb": {
     "connected": "csatlakozott",
-    "disconnected": "bontotta a kapcsolatot",
-    "moved": "megváltoztatta a csatornát",
+    "disconnected": "lecsatlakozott",
+    "moved": "csatornát váltott",
     "screenShareStarted": "elindította a képernyőmegosztást",
     "screenShareStopped": "leállította a képernyőmegosztást",
     "watchPartyStarted": "elindította a közös nézést",
     "watchPartyStopped": "leállította a közös nézést",
-    "pluginActivityStarted": "elindította {{plugin}}",
-    "pluginActivityStopped": "leállította {{plugin}}",
+    "pluginActivityStarted": "elindította: {{plugin}}",
+    "pluginActivityStopped": "leállította: {{plugin}}",
     "pluginEvent": "„{{text}}”"
   },
   "channel": "# {{channel}}",
@@ -28,15 +28,15 @@
   "yesterday": "Tegnap",
   "empty": "Még nincs tevékenység.",
   "rowLabel": {
-    "screenShare": "{{action}} {{name}} képernyőmegosztása",
-    "watchParty": "{{action}} {{name}} közös nézése",
-    "pluginActivity": "{{action}} {{name}} {{plugin}}",
-    "pluginEvent": "{{action}} {{plugin}}"
+    "screenShare": "{{action}}: {{name}} képernyőmegosztása",
+    "watchParty": "{{action}}: {{name}} közös nézése",
+    "pluginActivity": "{{action}}: {{name}} – {{plugin}}",
+    "pluginEvent": "{{action}}: {{plugin}}"
   },
   "joinPartyFailed": "Nem sikerült csatlakozni a közös nézéshez.",
   "joinActivityFailed": "Nem sikerült csatlakozni a bővítmény tevékenységéhez.",
   "earlier": "Korábban",
-  "earlierLabel": "Korábban, a munkamenet előttről",
+  "earlierLabel": "Korábban, a mostani munkamenet előtt",
   "notice": {
     "body": "{{name}} {{action}}",
     "bodyInChannel": "{{name}} {{action}} itt: #{{channel}}"

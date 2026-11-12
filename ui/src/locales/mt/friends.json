@@ -6,7 +6,7 @@
   "onlineOnServer": "Online fuq {{server}}",
   "inChannelOnServer": "F'{{channel}} · {{server}}",
   "offline": "Offline",
-  "lastSeen": "Offline, dehru l-aħħar {{when}}",
+  "lastSeen": "Offline, l-aħħar darba {{when}}",
   "friend": "Ħabib",
   "friendHint": "Juri meta jkun online u jżomm iċ-chat privat tiegħek miegħu.",
   "noCertificate": "Persuni mingħajr ċertifikat ma jistgħux ikunu ħbieb, għax Mumcord ma jkunx jista' jagħrafhom mill-ġdid.",

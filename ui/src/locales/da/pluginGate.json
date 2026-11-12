@@ -1,7 +1,7 @@
 {
   "installTitle": "Installér {{plugin}}?",
   "updateTitle": "Opdatér {{plugin}} til {{version}}?",
-  "asks": "{{plugin}} beder om disse. Valgfrie kan slås fra nu eller senere.",
+  "asks": "{{plugin}} beder om disse. De valgfrie kan slås fra nu eller senere.",
   "asksShort": "Dette plugin beder om:",
   "scoreCountsOptional": "Scoren tæller alle tilladelser, pluginet kan bede om, også de valgfrie.",
   "required": "Påkrævet",
@@ -9,10 +9,10 @@
   "runsCode": "Kører kode lavet af {{author}}. Mumcord har ikke gennemgået den.",
   "sealedFrame": "Det kan ikke se Mumcord, dine filer, mikrofon, kamera eller udklipsholder. Vises kun i: {{places}}.",
   "ownCodeAndWebsites": "Dette plugin har sin egen kode og kontakter websteder.",
-  "trustRepository": "{{repository}} er et arkiv, du har tilføjet. Installér kun, hvis du stoler på dem.",
+  "trustRepository": "{{repository}} er et arkiv, du har tilføjet. Installér det kun, hvis du stoler på dem.",
   "understand": "Jeg forstår",
-  "trustAuthor": "Jeg forstår risikoen og stoler på ophavsmanden til {{plugin}}",
-  "understandUpdate": "Jeg forstår, at risikoen er steget, og stoler stadig på ophavsmanden",
+  "trustAuthor": "Jeg forstår risikoen og stoler på udgiveren til {{plugin}}",
+  "understandUpdate": "Jeg forstår, at risikoen er steget, og stoler stadig på udgiveren",
   "changeLater": "Ændr senere under Indstillinger → Plugins.",
   "cancel": "Annullér",
   "notNow": "Ikke nu",
@@ -20,10 +20,10 @@
   "installAnyway": "Installér alligevel",
   "updateAnyway": "Opdatér alligevel",
   "highRiskTitle": "Dette plugin har høj risiko",
-  "highRiskText": "Det kan åbne sine egne websider og kontakte {{count}} websteder, du ikke kan kontrollere. Mumcord kan ikke se, hvad disse websteder sender til pluginet, eller hvad pluginet sender til dem. Det er udgivet af en, der er ny på denne computer. Installér kun, hvis du kender og stoler på ophavsmanden.",
+  "highRiskText": "Det kan åbne sine egne websider og kontakte {{count}} websteder, du ikke kan kontrollere. Mumcord kan ikke se, hvad disse websteder sender til pluginet, eller hvad pluginet sender til dem. Det er udgivet af en, der er ny på denne computer. Installér det kun, hvis du kender og stoler på udgiveren.",
   "highRiskWouldBecome": "Denne opdatering ville give pluginet høj risiko",
-  "highRiskNotAutomatic": "Det installeres ikke automatisk. Hvis du bliver på {{version}}, beholder du den nuværende score; du kan fastholde versionen under Installerede.",
-  "sameAuthorKey": "samme ophavsnøgle",
+  "highRiskNotAutomatic": "Det installeres ikke automatisk. Hvis du bliver på {{version}}, beholder du den nuværende score; du kan fastgøre versionen under Installeret.",
+  "sameAuthorKey": "samme udgivernøgle",
   "places": {
     "stage": "medieområde",
     "side-panel": "sidepanel",
@@ -38,6 +38,6 @@
     "webPages": "Det kan åbne sine egne websider.",
     "cantSee": "Mumcord kan ikke se, hvad disse websteder sender til pluginet, eller hvad pluginet sender til dem.",
     "newAuthor": "Det er udgivet af en, der er ny på denne computer.",
-    "trust": "Installér kun, hvis du kender og stoler på ophavsmanden."
+    "trust": "Installér det kun, hvis du kender og stoler på udgiveren."
   }
 }

@@ -56,7 +56,7 @@
     "incomingRateDropped": "Mesaje primite eliminate de limita de rată",
     "incomingInvalid": "Mesaje primite invalide",
     "uiFreezes": "De câte ori s-a blocat Mumcord cu conținutul web deschis",
-    "refusedAppMenuLabel": "Acest plugin a fost refuzat: o etichetă din meniul Aplicații este la fel cu una a Mumcord sau începe cu „Mumcord”.",
+    "refusedAppMenuLabel": "Acest plugin a fost refuzat: o etichetă din meniul Aplicații coincide cu una dintre cele ale Mumcord sau începe cu „Mumcord”.",
     "fieldWithoutPermission": "Acest plugin a fost refuzat: folosește „{{field}}” fără permisiunea „{{permission}}”.",
     "webDisabled": "Conținutul web este dezactivat, deoarece Mumcord nu a mai răspuns cât timp era deschis.",
     "reenableWeb": "Activează conținutul web",
@@ -88,7 +88,7 @@
     "confirm": "Elimină"
   },
   "errors": {
-    "enable": "Pluginul nu a putut fi comutat.",
+    "enable": "Pluginul nu a putut fi activat sau dezactivat.",
     "permissions": "Permisiunea nu a putut fi schimbată.",
     "visibility": "Vizibilitatea nu a putut fi schimbată.",
     "notifications": "Notificările nu au putut fi schimbate.",
@@ -103,7 +103,7 @@
     "hint": "Actualizare {{version}}",
     "button": "Actualizează"
   },
-  "visibilityChip": "Vorbește cu alți utilizatori Mumcord · {{visibility}}",
+  "visibilityChip": "Comunică cu alți utilizatori Mumcord · {{visibility}}",
   "chips": {
     "label": "Permisiuni folosite",
     "uiPanel": "Panou",
@@ -121,11 +121,11 @@
     "randomBytes": "Numere aleatorii",
     "commands": "Comenzi",
     "chatSend": "Scrie în chat",
-    "chatSupersedes": "Înlocuiește linia sa de text",
+    "chatSupersedes": "Își înlocuiește textul",
     "chatTriggers": "Cuvinte declanșatoare",
     "chatPatterns": "Modele de chat",
     "netHttp": "Acces la internet",
-    "secrets": "Breloc de chei"
+    "secrets": "Depozit de chei"
   },
   "offerBadge": "Permisiuni noi",
   "refused": {

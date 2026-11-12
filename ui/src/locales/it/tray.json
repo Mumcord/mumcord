@@ -12,7 +12,7 @@
   "connected": "Connesso",
   "connectedIn": "Connesso · {channel}",
   "serverState": "{server} – {state}",
-  "talking": "Connesso – sta parlando",
+  "talking": "Connesso – stai parlando",
   "muted": "Connesso – microfono disattivato",
   "voiceMenu": "Server vocale e canale",
   "voiceServer": "Server vocale",

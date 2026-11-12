@@ -1,19 +1,19 @@
 {
   "card": {
-    "label": "Karta od {{plugin}}",
+    "label": "Karta od doplnku {{plugin}}",
     "showMore": "Zobraziť viac",
     "showLess": "Zobraziť menej"
   },
-  "via": "cez {{plugin}}",
+  "via": "cez doplnok {{plugin}}",
   "supersede": {
     "showText": "Zobraziť pôvodný text",
     "hideText": "Skryť pôvodný text",
-    "hiddenBy": "Skryl {{plugin}}"
+    "hiddenBy": "Skryté doplnkom {{plugin}}"
   },
   "command": {
-    "list": "Príkazy doplnkov",
+    "group": "Príkazy doplnkov",
     "keys": "↑↓ vybrať · Tab doplniť · Enter spustiť · Esc zavrieť",
     "unavailable": "Tento príkaz teraz nie je k dispozícii.",
-    "failed": "Príkaz sa nepodarilo spustiť. Skúste to znova."
+    "failed": "Príkaz sa nepodarilo spustiť. Skús to znova."
   }
 }

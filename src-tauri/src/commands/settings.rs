@@ -11,6 +11,7 @@ use super::camera::{CameraBackground, CameraEffectQuality};
 use super::types::{
     ApiError, ApiResult, ErrorCode, ServerId, to_api_server_id, to_engine_server_id,
 };
+use crate::updater::effective_update_channel;
 
 /// Answer to a question asked once (direct connections, update check, AppImage menu entry).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -20,6 +21,33 @@ pub enum Consent {
     Unset,
     Yes,
     No,
+}
+
+/// Which releases the updater offers (issue #741): final releases only, or release candidates
+/// as well.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum UpdateChannel {
+    Stable,
+    ReleaseCandidates,
+}
+
+impl From<store::UpdateChannel> for UpdateChannel {
+    fn from(channel: store::UpdateChannel) -> Self {
+        match channel {
+            store::UpdateChannel::Stable => Self::Stable,
+            store::UpdateChannel::ReleaseCandidates => Self::ReleaseCandidates,
+        }
+    }
+}
+
+impl From<UpdateChannel> for store::UpdateChannel {
+    fn from(channel: UpdateChannel) -> Self {
+        match channel {
+            UpdateChannel::Stable => Self::Stable,
+            UpdateChannel::ReleaseCandidates => Self::ReleaseCandidates,
+        }
+    }
 }
 
 /// How peer-to-peer features reach another Mumcord user (spec 04, FR-4.1). Also the value of
@@ -462,27 +490,28 @@ impl From<SoundTheme> for store::SoundTheme {
     }
 }
 
-/// Activity-feed events that notify like messages (#597).
+/// How each kind of activity-feed event notifies (#597, #660), with the same choices as
+/// messages. Every kind starts as `inApp`.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityNotifySettings {
-    /// Someone connected, left or moved channel. Off by default.
-    pub joins: bool,
-    pub screen_share: bool,
-    pub watch_party: bool,
-    pub plugin_activity: bool,
+    /// Someone connected, left or moved channel.
+    pub joins: NotificationMode,
+    pub screen_share: NotificationMode,
+    pub watch_party: NotificationMode,
+    pub plugin_activity: NotificationMode,
     /// Events a plugin pushes to the feed.
-    pub plugin_event: bool,
+    pub plugin_event: NotificationMode,
 }
 
 impl From<store::ActivityNotifySettings> for ActivityNotifySettings {
     fn from(s: store::ActivityNotifySettings) -> Self {
         Self {
-            joins: s.joins,
-            screen_share: s.screen_share,
-            watch_party: s.watch_party,
-            plugin_activity: s.plugin_activity,
-            plugin_event: s.plugin_event,
+            joins: s.joins.into(),
+            screen_share: s.screen_share.into(),
+            watch_party: s.watch_party.into(),
+            plugin_activity: s.plugin_activity.into(),
+            plugin_event: s.plugin_event.into(),
         }
     }
 }
@@ -490,11 +519,11 @@ impl From<store::ActivityNotifySettings> for ActivityNotifySettings {
 impl From<ActivityNotifySettings> for store::ActivityNotifySettings {
     fn from(s: ActivityNotifySettings) -> Self {
         Self {
-            joins: s.joins,
-            screen_share: s.screen_share,
-            watch_party: s.watch_party,
-            plugin_activity: s.plugin_activity,
-            plugin_event: s.plugin_event,
+            joins: s.joins.into(),
+            screen_share: s.screen_share.into(),
+            watch_party: s.watch_party.into(),
+            plugin_activity: s.plugin_activity.into(),
+            plugin_event: s.plugin_event.into(),
         }
     }
 }
@@ -721,9 +750,15 @@ pub struct Settings {
     pub notifications: NotificationMode,
     /// Activity events that notify (#597).
     pub activity_notify: ActivityNotifySettings,
+    /// "Keep activity history after a restart" (#661); off by default.
+    pub keep_activity_history: bool,
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
+    /// Write logs to disk (default on; spec 12). Off: memory-only log.
+    pub log_to_disk: bool,
+    /// Wait for disk on every save (default on; spec 12). Off: synchronous = OFF.
+    pub durable_saves: bool,
     /// Send the default avatar to servers connected to for the first time (FR-1.47).
     pub send_default_avatar: bool,
     /// "Start Mumcord when I log in" (default off, FR-1.48d). Changing it adds or removes the
@@ -736,6 +771,8 @@ pub struct Settings {
     /// "Show link previews and embeds" (default on; FR-1.49, QA.34). Off: plain links only
     /// and `link_preview` fetches nothing.
     pub link_previews: bool,
+    /// Keep link previews on disk (default on; spec 12). Off: memory only for the session.
+    pub link_previews_on_disk: bool,
     /// "Delete cached previews after X days" (default 7; `null` never; QA.42). Previews,
     /// thumbnails and images are pruned at start, periodically and when this changes.
     pub preview_cache_days: Option<u32>,
@@ -774,6 +811,8 @@ pub struct Settings {
     pub plugins_badge_plugin: Option<String>,
     /// Optional mirror of the official plugin repository.
     pub plugins_mirror_url: Option<String>,
+    /// Keep the plugin registry copy on disk (default on; spec 12). Off: always fetch fresh.
+    pub plugin_registry_cache: bool,
     /// Developer mode (dev folders, local HTTP repositories).
     pub developer_mode: bool,
     /// Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14).
@@ -798,6 +837,9 @@ pub struct Settings {
     pub update_auto_download: bool,
     /// Hours between two update checks, 1–168 (FR-3.144).
     pub update_interval_hours: u32,
+    /// The effective update channel (issue #741): the user's choice, else the one that fits the
+    /// installed version. Saving stores it as the choice.
+    pub update_channel: UpdateChannel,
     /// The version the user skipped; `null` when none is (FR-3.144).
     pub update_skipped: Option<String>,
     /// AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55).
@@ -917,6 +959,7 @@ impl Settings {
             sound_theme: s.sounds.theme.into(),
             notifications: s.notifications.into(),
             activity_notify: s.activity_notify.into(),
+            keep_activity_history: s.keep_activity_history,
             close_behaviour: match s.close_behaviour {
                 store::CloseBehaviour::Ask => CloseBehaviour::Ask,
                 store::CloseBehaviour::MinimizeToTray => CloseBehaviour::MinimizeToTray,
@@ -932,11 +975,14 @@ impl Settings {
                 store::LogLevel::Info => LogLevel::Info,
                 store::LogLevel::Debug => LogLevel::Debug,
             },
+            log_to_disk: s.log_to_disk,
+            durable_saves: s.durable_saves,
             send_default_avatar: s.send_default_avatar,
             autostart: s.autostart,
             start_minimized: s.start_minimized,
             connect_muted: s.connect_muted,
             link_previews: s.link_previews,
+            link_previews_on_disk: s.link_previews_on_disk,
             preview_cache_days: s.preview_cache_days,
             history_max_age_days: s.history_max_age_days,
             now_playing: s.now_playing,
@@ -957,6 +1003,7 @@ impl Settings {
             plugins_all_off: s.plugins_all_off,
             plugins_badge_plugin: s.plugins_badge_plugin.clone(),
             plugins_mirror_url: s.plugins_mirror_url.clone(),
+            plugin_registry_cache: s.plugin_registry_cache,
             developer_mode: s.developer_mode,
             app_theme_id: s.app_theme_id.clone(),
             custom_themes: s
@@ -981,6 +1028,7 @@ impl Settings {
             update_check: s.update_check.into(),
             update_auto_download: s.update_auto_download,
             update_interval_hours: s.update_interval_hours,
+            update_channel: effective_update_channel(s.update_channel, crate::version::DISPLAY),
             update_skipped: s.update_skipped.clone(),
             appimage_menu_entry: s.appimage_menu_entry.into(),
             window_overlay_notice_shown: s.window_overlay_notice_shown,
@@ -1082,6 +1130,7 @@ impl Settings {
         s.sounds.banned = self.sounds.banned;
         s.notifications = self.notifications.into();
         s.activity_notify = self.activity_notify.into();
+        s.keep_activity_history = self.keep_activity_history;
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
             CloseBehaviour::MinimizeToTray => store::CloseBehaviour::MinimizeToTray,
@@ -1097,11 +1146,14 @@ impl Settings {
             LogLevel::Info => store::LogLevel::Info,
             LogLevel::Debug => store::LogLevel::Debug,
         };
+        s.log_to_disk = self.log_to_disk;
+        s.durable_saves = self.durable_saves;
         s.send_default_avatar = self.send_default_avatar;
         s.autostart = self.autostart;
         s.start_minimized = self.start_minimized;
         s.connect_muted = self.connect_muted;
         s.link_previews = self.link_previews;
+        s.link_previews_on_disk = self.link_previews_on_disk;
         // 0 days would make every entry expire at once; treat it as 1.
         s.preview_cache_days = self.preview_cache_days.map(|d| d.max(1));
         s.history_max_age_days = self.history_max_age_days.map(|d| d.max(1));
@@ -1136,12 +1188,20 @@ impl Settings {
             store::MIN_UPDATE_INTERVAL_HOURS,
             store::MAX_UPDATE_INTERVAL_HOURS,
         );
+        // Only a real change pins the channel: saving any other setting must leave it
+        // following the installed version.
+        if self.update_channel
+            != effective_update_channel(s.update_channel, crate::version::DISPLAY)
+        {
+            s.update_channel = Some(self.update_channel.into());
+        }
         s.update_skipped.clone_from(&self.update_skipped);
         s.plugins_updates = self.plugins_updates.into();
         s.plugins_all_off = self.plugins_all_off;
         s.plugins_badge_plugin
             .clone_from(&self.plugins_badge_plugin);
         s.plugins_mirror_url.clone_from(&self.plugins_mirror_url);
+        s.plugin_registry_cache = self.plugin_registry_cache;
         s.developer_mode = self.developer_mode;
         s.appimage_menu_entry = self.appimage_menu_entry.into();
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
@@ -1152,10 +1212,8 @@ impl Settings {
         s.blocked_messages = self.blocked_messages.into();
         s.files_receive = self.files_receive;
         s.files_max_size = self.files_max_size.into();
-        s.files_save_folder = self
-            .files_save_folder
-            .clone()
-            .filter(|folder| !folder.is_empty());
+        // `files_save_folder` keeps the stored value: only `files_save_folder_choose` (a Rust-side
+        // folder dialog) changes it, so a script in the page cannot redirect downloads.
         s.screen_resolution = self.screen_resolution.into();
         s.screen_fps = self.screen_fps.into();
         s.screen_optimize = self.screen_optimize.into();
@@ -1337,10 +1395,17 @@ pub async fn settings_update(
         return Err(ApiError::new(ErrorCode::Internal, e.to_string()));
     }
     let stored = engine.update_settings(settings.to_store(&previous)).await?;
-    if stored.log_level != previous.log_level
-        && let Err(e) = diag::set_log_level(diag_level(stored.log_level))
-    {
-        tracing::warn!(error = %e, "changing the log level failed");
+    if stored.log_level != previous.log_level || stored.log_to_disk != previous.log_to_disk {
+        let logs_dir = crate::portable::log_dir(&app)
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+        if let Err(e) = diag::set_disk_logging(
+            stored.log_to_disk,
+            &logs_dir,
+            diag_level(stored.log_level),
+            7,
+        ) {
+            tracing::warn!(error = %e, "changing the log settings failed");
+        }
     }
     let key = active_ptt_key(&stored);
     let mouse_changed = stored.allow_mouse_buttons != previous.allow_mouse_buttons;
@@ -1409,7 +1474,9 @@ mod tests {
         assert!(!ui.wizard_completed);
         assert_eq!(ui.log_level, LogLevel::Info);
         assert!(ui.send_default_avatar);
-        assert_eq!(ui.notifications, NotificationMode::Both);
+        assert_eq!(ui.notifications, NotificationMode::InApp);
+        assert_eq!(ui.activity_notify.joins, NotificationMode::InApp);
+        assert!(!ui.keep_activity_history);
         assert_eq!(ui.sound_theme, SoundTheme::Classic);
         assert!(ui.sounds.channel_switch);
 
@@ -1426,6 +1493,12 @@ mod tests {
         ui.sounds.share_stopped = false;
         ui.sounds.banned = false;
         ui.log_level = LogLevel::Debug;
+        assert!(ui.log_to_disk && ui.durable_saves);
+        assert!(ui.link_previews_on_disk && ui.plugin_registry_cache);
+        ui.log_to_disk = false;
+        ui.durable_saves = false;
+        ui.link_previews_on_disk = false;
+        ui.plugin_registry_cache = false;
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
         ui.ptt_compatibility_mode = true;
@@ -1454,6 +1527,8 @@ mod tests {
         assert!(stored.autostart && !stored.start_minimized);
         assert!(!stored.connect_muted);
         assert!(!stored.link_previews);
+        assert!(!stored.log_to_disk && !stored.durable_saves);
+        assert!(!stored.link_previews_on_disk && !stored.plugin_registry_cache);
         assert_eq!(stored.preview_cache_days, Some(14));
         assert_eq!(stored.history_max_age_days, Some(30));
         assert!(stored.now_playing);
@@ -1560,6 +1635,30 @@ mod tests {
             };
             assert_eq!(window_overlay_notice_due(&settings), due);
         }
+    }
+
+    #[test]
+    fn update_channel_is_derived_until_the_user_chooses() {
+        let base = store::Settings::default();
+        assert_eq!(base.update_channel, None);
+        assert_eq!(
+            Settings::from_store(&base).update_channel,
+            effective_update_channel(None, crate::version::DISPLAY)
+        );
+
+        let unchanged = Settings::from_store(&base).to_store(&base);
+        assert_eq!(unchanged.update_channel, None);
+
+        let derived = Settings::from_store(&base).update_channel;
+        let other = match derived {
+            UpdateChannel::Stable => UpdateChannel::ReleaseCandidates,
+            UpdateChannel::ReleaseCandidates => UpdateChannel::Stable,
+        };
+        let mut ui = Settings::from_store(&base);
+        ui.update_channel = other;
+        let stored = ui.to_store(&base);
+        assert_eq!(stored.update_channel, Some(other.into()));
+        assert_eq!(Settings::from_store(&stored).update_channel, other);
     }
 
     #[test]

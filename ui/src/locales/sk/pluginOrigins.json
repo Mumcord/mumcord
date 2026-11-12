@@ -3,7 +3,7 @@
   "intro": "{{plugin}} a jeho stránka môžu posielať a prijímať údaje iba s týmito webmi:",
   "introUpdate": "{{plugin}} a jeho stránka by potom mohli komunikovať s:",
   "privacy": "Tieto weby vidia tvoju IP adresu a všetko, čo im {{plugin}} pošle.",
-  "includesNames": "Môže to zahŕňať mená ľudí vo tvojom kanáli.",
+  "includesNames": "Môže to zahŕňať mená ľudí v tvojom kanáli.",
   "listLabel": "Weby",
   "changesLabel": "Zmeny",
   "new": "Nové",
@@ -45,12 +45,12 @@
     }
   },
   "update": {
-    "wantsNew_one": "This update wants to talk to {{count}} new websites.",
+    "wantsNew_one": "Táto aktualizácia chce komunikovať s {{count}} novým webom.",
     "wantsNew_few": "Táto aktualizácia chce komunikovať s {{count}} novými webmi.",
     "wantsNew_many": "Táto aktualizácia chce komunikovať s {{count}} nového webu.",
     "wantsNew_other": "Táto aktualizácia chce komunikovať s {{count}} novými webmi.",
     "staysOn": "{{plugin}} zostane na verzii {{version}}, kým sa nerozhodneš.",
-    "banner_one": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_one": "Čaká na teba {{count}} aktualizácia. Aktualizácie, ktoré pridávajú oprávnenia alebo weby, sa nikdy neinštalujú automaticky.",
     "banner_few": "Čakajú na teba {{count}} aktualizácie. Aktualizácie, ktoré pridávajú oprávnenia alebo weby, sa nikdy neinštalujú automaticky.",
     "banner_many": "Čaká na teba {{count}} aktualizácie. Aktualizácie, ktoré pridávajú oprávnenia alebo weby, sa nikdy neinštalujú automaticky.",
     "banner_other": "Čaká na teba {{count}} aktualizácií. Aktualizácie, ktoré pridávajú oprávnenia alebo weby, sa nikdy neinštalujú automaticky.",

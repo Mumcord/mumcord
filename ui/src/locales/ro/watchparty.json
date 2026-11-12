@@ -2,19 +2,19 @@
   "title": "Vizionare comună",
   "addVideo": "Adaugă videoclip",
   "beta": "Beta",
-  "join": "Alătură-te vizionării comune",
+  "join": "Intră în vizionarea comună",
   "leave": "Părăsește vizionarea",
   "watching": "{{count}} urmăresc: {{names}}",
   "player": "Player pentru vizionare comună",
-  "watchTogether": "Urmăriți împreună",
+  "watchTogether": "Urmărește împreună",
   "watchTogetherFor": "Urmărește {{title}} împreună cu acest canal",
-  "embedsOff": "Activați playerele încorporate în setările de confidențialitate pentru a viziona împreună",
-  "embedsOffJoin": "O vizionare în comun este în desfășurare: activați playerele încorporate pentru a vă alătura",
+  "embedsOff": "Activează playerele încorporate în setările de confidențialitate ca să urmărești împreună cu ceilalți",
+  "embedsOffJoin": "O vizionare comună e în desfășurare: activează playerele încorporate ca să intri",
   "openPrivacy": "Deschide setările de confidențialitate",
   "cantPlay": "Playerul nu poate rula aici.",
   "openInBrowser": "Deschide în browser",
   "startFailed": "Vizionarea comună nu a putut porni.",
-  "joinFailed": "Nu te-ai putut alătura vizionării comune.",
+  "joinFailed": "Nu ai putut intra în vizionarea comună.",
   "leaveFailed": "Nu ai putut părăsi vizionarea comună.",
   "commandFailed": "Vizionarea comună nu a primit modificarea ta.",
   "someone": "Cineva",
@@ -22,7 +22,7 @@
     "play": "{{name}} a pornit redarea",
     "pause": "{{name}} a pus pauză",
     "seek": "{{name}} a sărit înainte",
-    "skipped": "{{name}} a sărit peste"
+    "skipped": "{{name}} a sărit peste videoclip"
   },
   "addToPlaylist": "Adaugă în playlist",
   "addToPlaylistFor": "Adaugă {{title}} în playlistul vizionării comune",
@@ -31,7 +31,7 @@
     "empty": "Nu urmează nimic. Adaugă linkuri YouTube cu „Adaugă în playlist”.",
     "skip": "Sari peste",
     "previous": "Anterior",
-    "previousFailed": "Nu s-a putut reveni la videoul anterior.",
+    "previousFailed": "Nu s-a putut reveni la videoclipul anterior.",
     "moveHint": "Alt+Sus și Alt+Jos mută videoclipul; îl poți și trage.",
     "moved": "Mutat pe poziția {{position}}",
     "videoTitle": "Videoclip YouTube",
@@ -46,11 +46,11 @@
     "upNext": "Urmează: {{title}}",
     "upNextNone": "Nu urmează nimic",
     "paste": "Lipește un link YouTube",
-    "notALink": "Acela nu este un link YouTube",
+    "notALink": "Acesta nu este un link YouTube",
     "more": "Mai multe pentru {{title}}",
-    "playNext": "Redă în continuare",
-    "removeShort": "Elimină din listă",
-    "emptyPaste": "Nu urmează nimic. Lipiți mai sus un link YouTube."
+    "playNext": "Redă ca următorul",
+    "removeShort": "Elimină din playlist",
+    "emptyPaste": "Nu urmează nimic. Lipește mai sus un link YouTube."
   },
   "widget": {
     "play": "Redă",
@@ -59,15 +59,17 @@
   "codecHint": {
     "install": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav:",
     "generic": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav (pluginul libav pentru GStreamer) cu managerul de pachete al sistemului tău.",
-    "rpmFusion": "Pe Fedora, gst-libav vine din depozitul RPM Fusion; activează mai întâi RPM Fusion."
+    "rpmFusion": "Pe Fedora, gst-libav vine din depozitul RPM Fusion; activează mai întâi RPM Fusion.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
-  "keys": "Spațiu redare/pauză · ← → salt 5 s · M fără sunet · F ecran complet",
-  "headerPill": "Urmăriți împreună · {{count}}",
+  "keys": "Spațiu redare/pauză · ← → salt 5 s · M dezactivează sunetul · F ecran complet",
+  "headerPill": "Vizionare comună · {{count}}",
   "miniPlayer": "Mini player",
   "tabs": {
-    "playlist": "Listă"
+    "playlist": "Playlist"
   },
-  "upNextHeading": "Urmează · trageți pentru a reordona",
+  "upNextHeading": "Urmează · trage pentru a reordona",
   "whoIsWatching": "Cine urmărește",
   "pasteKey": "Ctrl V",
   "you": "Tu"

@@ -13,9 +13,10 @@ use mumcord_engine::inspector::{
 };
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager, State, WebviewWindow};
 use tauri_specta::Event;
 
+use super::file_dialog::{SaveDialog, pick_save_path};
 use super::session::AudioRatingLabel;
 use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_api_server_id};
 
@@ -305,12 +306,21 @@ pub fn packet_capture_clear(engine: State<'_, Engine>) -> ApiResult<()> {
     Ok(())
 }
 
-/// Writes an export the UI built from the captured packets (JSON or Markdown) to `path`.
+/// Asks where to save an export the UI built from the captured packets (JSON or Markdown) and
+/// writes it there. Returns false when the user cancelled the save dialog.
 #[tauri::command]
 #[specta::specta]
-pub fn packet_capture_export(path: String, contents: String) -> ApiResult<()> {
+pub async fn packet_capture_export(
+    window: WebviewWindow,
+    dialog: SaveDialog,
+    contents: String,
+) -> ApiResult<bool> {
+    let Some(path) = pick_save_path(&window, dialog).await? else {
+        return Ok(false);
+    };
     std::fs::write(&path, contents)
-        .map_err(|e| ApiError::new(ErrorCode::Io, format!("writing packet export failed: {e}")))
+        .map_err(|e| ApiError::new(ErrorCode::Io, format!("writing packet export failed: {e}")))?;
+    Ok(true)
 }
 
 /// A person the main window knows, for the inspector's from / to column.

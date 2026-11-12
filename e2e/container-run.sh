@@ -39,10 +39,18 @@ export MUMCORD_OVERLAY_SOCKET="mumcord-overlay-e2e-${run:-$$}"
 
 # The X socket is abstract as well, so parallel runs need a display of their own.
 export DISPLAY=":$((99 + ${run:-0}))"
-Xvfb "$DISPLAY" -screen 0 1600x1000x24 -nolisten tcp >/dev/null 2>&1 &
+Xvfb "$DISPLAY" -screen 0 1600x1000x24 -nolisten tcp -noreset >/dev/null 2>&1 &
 xvfb_pid=$!
 pids=("$xvfb_pid")
 trap 'kill "${pids[@]}" 2>/dev/null || true' EXIT
+
+# Ubuntu 26.04's virtual-terminal function-key mappings make xdotool add Alt to plain F7/F9.
+# No virtual terminals exist in Xvfb; use ordinary function keys and retain the map across clients.
+for _ in $(seq 50); do
+  xdotool getdisplaygeometry >/dev/null 2>&1 && break
+  sleep 0.1
+done
+setxkbmap -layout us -option srvrkeys:none
 
 # Sound daemon for the share-sound specs. MUMCORD_E2E_AUDIO=pipewire (default) starts PipeWire and
 # WirePlumber with a null sink as the default output, so test apps (helpers/pwapps.ts) have
@@ -97,6 +105,10 @@ if [ "$step" != test ]; then
   scripts/fetch-mumbot.sh linux-x86_64 "$CARGO_TARGET_DIR/debug"
 fi
 [ "$step" = build ] && exit 0
+
+# Fail before WebDriver if native dialog icons cannot load, with the loader's own diagnostics.
+# Keep verbose loader logging in this probe, not in the app or its chat/plugin processes.
+RUST_LOG=glycin=debug python3 -I e2e/helpers/check-svg.py
 
 # The bot is a release binary, not built from this repository: point it at this checkout's test
 # servers (SuperUser password) and at a fixed place for its certificates (AC-1.2 imports one).

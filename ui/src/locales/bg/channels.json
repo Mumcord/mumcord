@@ -71,7 +71,7 @@
   },
   "errors": {
     "joinDenied": "Нямаш право да влезеш в този канал.",
-    "joinFailed": "Не успя да влезеш в канала. Опитай отново.",
+    "joinFailed": "Влизането в канала не успя. Опитай отново.",
     "notConnected": "Не си свързан със сървър.",
     "moveFailed": "Този човек не можа да бъде преместен."
   },
@@ -96,7 +96,7 @@
       "connected": "Свързан",
       "connecting": "Свързване",
       "reconnecting": "Повторно свързване…",
-      "disconnected": "Прекъснат"
+      "disconnected": "Без връзка"
     },
     "online": "{{count}} на линия",
     "onlinePing": "{{count}} на линия · {{ping}} ms"
@@ -114,7 +114,25 @@
     "failed": "Някои хора не можаха да бъдат преместени.",
     "resultTitle": "Преместване на хора",
     "resultAll": "Преместени {{people}} в {{channel}}.",
-    "resultSome": "Преместени {{moved}} от {{people}} в {{channel}}. Останалите бяха отказани.",
+    "resultSome": "Преместени {{moved}} от {{people}} в {{channel}}. За останалите сървърът отказа.",
     "busy": "Вече се преместват хора…"
+  },
+  "drag": {
+    "into": "Премести в {{channel}}",
+    "above": "Постави над {{channel}}",
+    "below": "Постави под {{channel}}",
+    "self": "Не може да се постави в самия себе си",
+    "subChannel": "Не може да се постави в собствения си подканал",
+    "confirmTitle": "Да се премести ли „{{channel}}“?",
+    "alongAll": "Заедно с {{channel}} се преместват: {{subChannels}} и {{people}}.",
+    "alongSubChannels": "Заедно с {{channel}} се преместват: {{subChannels}}.",
+    "alongPeople": "Заедно с {{channel}} се преместват: {{people}}.",
+    "alongNone": "Премества се само {{channel}}; каналът е празен.",
+    "subChannels_one": "{{count}} подканал",
+    "subChannels_other": "{{count}} подканала",
+    "pathTo": "към",
+    "confirm": "Премести",
+    "failedTitle": "{{channel}} не можа да бъде преместен",
+    "refusedParent": "Нямаш разрешение да местиш канали в {{channel}}."
   }
 }

@@ -52,11 +52,19 @@ export async function showAllPeople(): Promise<void> {
   });
 }
 
-/** Connects to the saved server from the server bar (after a restart). */
+/** Connects to the saved server after a restart, or keeps the automatically restored connection. */
 export async function reconnect(): Promise<void> {
-  const button = $(`button[aria-label="${SERVER}"]`);
-  await button.waitForDisplayed({ timeout: 30_000 });
-  await button.click();
+  const state = await browser.waitUntil(
+    () =>
+      browser.execute((server: string) => {
+        if (document.querySelector(`button[aria-label="${server} (connected)"]`))
+          return "connected";
+        if (document.querySelector(`button[aria-label="${server}"]`)) return "disconnected";
+        return null;
+      }, SERVER),
+    { timeout: 30_000, timeoutMsg: "the saved server neither appeared nor reconnected" },
+  );
+  if (state === "disconnected") await $(`button[aria-label="${SERVER}"]`).click();
   await waitConnected();
   await joinIfReadOnly();
 }

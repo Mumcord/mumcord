@@ -403,6 +403,7 @@ pub fn is_handler(app: &AppHandle) -> io::Result<bool> {
 
 /// AppImage only, after the user agreed: writes the entry and icons and moves an old
 /// `mumble://` default over. Safe to repeat.
+#[cfg(target_os = "linux")]
 pub fn add_for_appimage(app: &AppHandle) -> io::Result<()> {
     if !is_appimage() {
         return Err(io::Error::other("not running as an AppImage"));

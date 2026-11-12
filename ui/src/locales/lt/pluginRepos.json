@@ -1,23 +1,23 @@
 {
-  "intro": "Saugyklos yra papildomi įskiepių sąrašai, kuriuos tvarko kiti žmonės. „Mumcord“ jų įskiepių netikrina. Pridėkite tik saugyklas, kuriomis pasitikite.",
+  "intro": "Saugyklos yra papildomi papildinių sąrašai, kuriuos tvarko kiti žmonės. Mumcord jų papildinių netikrina. Pridėk tik saugyklą, kuria pasitiki.",
   "add": {
     "button": "Pridėti saugyklą",
     "title": "Pridėti saugyklą",
     "address": "Saugyklos adresas",
     "expectedKey": "Laukiamas raktas (neprivaloma)",
-    "expectedKeyHint": "Jei savininkas davė raktą, įklijuokite jį čia. Tada saugykla turi naudoti būtent šį raktą.",
+    "expectedKeyHint": "Jei savininkas davė tau raktą, įklijuok jį čia. Tada saugykla turi naudoti būtent šį raktą.",
     "check": "Patikrinti saugyklą",
     "found": "Štai ką radome",
     "confirm": "Pridėti saugyklą",
-    "subtitle": "Pridėkite tik žmonių, kuriais pasitikite, saugyklas.",
+    "subtitle": "Pridėk tik žmonių, kuriais pasitiki, saugyklas.",
     "signatureValid": "parašas tinkamas",
     "contactLine": "kontaktas: {{contact}}",
     "pluginsLine": "Papildinių: {{number}}",
     "signingKey": "Pasirašymo raktas",
     "warningTitle": "Neoficiali saugykla",
-    "warningBody": "„Mumcord“ šių papildinių netikrina. Raktas įsimenamas: jei jis pasikeistų, saugykla bus sustabdyta, kol jį patikrinsite. Naršant šeimininkas mato jūsų IP adresą. Papildiniai su oficialiais pavadinimais iš čia niekada neimami."
+    "warningBody": "Mumcord šių papildinių netikrina. Raktas įsimenamas: jei jis kada pasikeis, saugykla bus pristabdyta, kol jį patikrinsi. Naršant saugyklą, jos talpintojas mato tavo IP adresą. Papildiniai oficialiais pavadinimais iš jos niekada neimami."
   },
-  "limit": "Galite pridėti iki {{max}} saugyklų.",
+  "limit": "Gali pridėti iki {{max}} saugyklų.",
   "limitReached": "Pasiektas {{max}} saugyklų limitas.",
   "empty": "Saugyklų dar nepridėta.",
   "listLabel": "Pridėtos saugyklos",
@@ -28,19 +28,19 @@
   "fingerprintLine": "Rakto kontrolinis kodas: {{fingerprint}}",
   "neverChecked": "Dar netikrinta",
   "lastChecked": "Paskutinį kartą tikrinta: {{when}}",
-  "installedCount": "Įdiegti įskiepiai: {{number}}",
+  "installedCount": "Įdiegti papildiniai: {{number}}",
   "toggle": "Naudoti {{name}}",
   "remove": {
     "button": "Pašalinti",
     "label": "Pašalinti {{name}}",
     "title": "Pašalinti {{name}}?",
-    "message": "Saugykla pašalinama, o jos įskiepiai išjungiami. Jie lieka įdiegti su savo duomenimis, bet nebegauna naujinimų.",
+    "message": "Saugykla pašalinama, o jos papildiniai išjungiami. Jie lieka įdiegti su savo duomenimis, bet nebegauna naujinių.",
     "confirm": "Pašalinti"
   },
   "keyChange": {
     "title": "{{name}} pakeitė raktą",
-    "message": "Ši saugykla dabar pasirašo įskiepių sąrašą kitu raktu. Ji lieka pristabdyta, kol nuspręsite. Pasitikėkite nauju raktu tik jei savininkas pranešė apie pakeitimą.",
-    "oldKey": "Iki šiol patikėtas raktas",
+    "message": "Ši saugykla dabar pasirašo papildinių sąrašą kitu raktu. Ji lieka pristabdyta, kol nuspręsi. Pasitikėk nauju raktu tik tada, jei savininkas tau pranešė apie pakeitimą.",
+    "oldKey": "Raktas, kuriuo pasitikėjai anksčiau",
     "newKey": "Naujas raktas",
     "keepPaused": "Palikti pristabdytą",
     "trust": "Pasitikėti nauju raktu",
@@ -48,13 +48,13 @@
   },
   "mirror": {
     "title": "Papildomai",
-    "label": "Oficialaus įskiepių sąrašo veidrodis (neprivaloma)",
-    "hint": "Keiskite tik jei gavote veidrodžio adresą. Veidrodis turi pateikti tuos pačius pasirašytus failus; „Mumcord“ vis tiek tikrina kiekvieną parašą.",
-    "save": "Įrašyti",
+    "label": "Oficialaus papildinių sąrašo veidrodis (neprivaloma)",
+    "hint": "Keisk tik tada, jei gavai veidrodžio adresą. Veidrodis turi pateikti tuos pačius pasirašytus failus; Mumcord vis tiek tikrina kiekvieną parašą.",
+    "save": "Išsaugoti",
     "reset": "Naudoti numatytąjį"
   },
   "official": {
-    "name": "Oficialūs „Mumcord“ papildiniai",
+    "name": "Oficialūs Mumcord papildiniai",
     "alwaysOn": "Visada įjungta"
   }
 }

@@ -1,11 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  isPermissionId,
-  PERMISSION_RISK,
-  type PermissionRisk,
-  type RequestedPermission,
-} from "./catalogue";
+import { isPermissionId, permissionRisk, type RequestedPermission } from "./catalogue";
 import { PERMISSION_ICONS, UNKNOWN_PERMISSION_ICON } from "./permissionIcons";
 import { usePermissionExplanation } from "./usePermissionExplanation";
 import { usePermissionText } from "./usePermissionText";
@@ -47,9 +42,8 @@ function Row({
   const { t } = useTranslation("pluginPermissions");
   const permissionText = usePermissionText();
   const explanation = usePermissionExplanation()(id, pluginName);
-  // Unknown ids cannot come from a validated manifest; show them as the highest risk, never hide them.
   const known = isPermissionId(id);
-  const risk: PermissionRisk = known ? PERMISSION_RISK[id] : "red";
+  const risk = permissionRisk(id);
   const text = permissionText(id);
   const riskLabel = t(`risk.${risk}`);
   const content = (

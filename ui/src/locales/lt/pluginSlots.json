@@ -1,7 +1,7 @@
 {
   "tree": {
-    "empty": "Šis įskiepis čia dar nieko nerodo.",
-    "actionFailed": "Įskiepis negalėjo to apdoroti. Bandykite dar kartą."
+    "empty": "Šis papildinys čia dar nieko nerodo.",
+    "actionFailed": "Papildinys negalėjo to apdoroti. Bandyk dar kartą."
   },
   "progress": {
     "working": "Vykdoma"

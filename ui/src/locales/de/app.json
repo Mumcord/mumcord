@@ -21,7 +21,7 @@
   "wizard": {
     "title": "Willkommen bei Mumcord"
   },
-  "placeholder": "Folgt bald",
+  "placeholder": "Kommt bald",
   "startupError": {
     "title": "Mumcord konnte nicht starten",
     "description": "Die App konnte deine Einstellungen nicht laden. Versuche es erneut; wenn es weiter fehlschlägt, starte Mumcord neu."

@@ -7,111 +7,12 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>Mumcord</title>
     <!--
-      Start screen (issue #323): plain HTML and CSS so it is on screen from the very first frame,
-      long before the app bundle has loaded. The app fades it out once its first screen has
-      rendered (ui/src/app/startScreen.ts). The colours mirror the background and text tokens of
-      tokens.css, which is not loaded yet at this point.
+      Start screen (issue #323): plain HTML and CSS so it is on screen from the very first
+      frame, long before the app bundle has loaded. The app fades it out once its first
+      screen has rendered (ui/src/app/startScreen.ts). The styles live in
+      /start-screen.css (public), so the app CSP needs no inline styles.
     -->
-    <style>
-      #start-screen {
-        --start-bg: #0e0a26;
-        --start-bg-centre: #1a1342;
-        --start-text: #f6f0e8;
-        --start-track: rgb(246 240 232 / 10%);
-        --start-glow: rgb(155 123 255 / 28%);
-        --start-bar: linear-gradient(90deg, #ffb08a, #ff6fa8, #9b7bff);
-        position: fixed;
-        inset: 0;
-        z-index: 2147483647;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 22px;
-        padding-bottom: 4vh;
-        background: radial-gradient(
-            ellipse 60% 55% at 50% 44%,
-            var(--start-bg-centre),
-            var(--start-bg) 70%
-          )
-          var(--start-bg);
-        color: var(--start-text);
-        font-family: system-ui, sans-serif;
-        transition: opacity 200ms ease-out;
-      }
-      html[data-start-theme="light"] #start-screen {
-        --start-bg: #f5f2fb;
-        --start-bg-centre: #ffffff;
-        --start-text: #17113a;
-        --start-track: rgb(23 17 58 / 10%);
-        --start-glow: rgb(106 64 224 / 18%);
-        --start-bar: linear-gradient(90deg, #e8784a, #e0457f, #6a40e0);
-      }
-      #start-screen[data-leaving] {
-        opacity: 0;
-        pointer-events: none;
-      }
-      .start-screen__logo {
-        width: 132px;
-        height: 132px;
-        filter: drop-shadow(0 18px 48px var(--start-glow));
-        animation: start-screen-breathe 2.8s ease-in-out infinite;
-      }
-      .start-screen__word {
-        margin: 2px 0 6px;
-        font-size: 34px;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-      }
-      .start-screen__bar {
-        position: relative;
-        width: 168px;
-        height: 4px;
-        overflow: hidden;
-        border-radius: 4px;
-        background: var(--start-track);
-      }
-      .start-screen__bar::after {
-        content: "";
-        position: absolute;
-        inset: 0 auto 0 29%;
-        width: 42%;
-        border-radius: inherit;
-        background: var(--start-bar);
-        animation: start-screen-slide 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-      }
-      @keyframes start-screen-breathe {
-        50% {
-          transform: scale(1.035);
-        }
-      }
-      @keyframes start-screen-slide {
-        from {
-          transform: translateX(-170%);
-        }
-        to {
-          transform: translateX(170%);
-        }
-      }
-      @keyframes start-screen-pulse {
-        50% {
-          opacity: 0.45;
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        #start-screen {
-          transition: none;
-        }
-        .start-screen__logo {
-          animation: none;
-        }
-        .start-screen__bar::after {
-          inset: 0;
-          width: 100%;
-          animation: start-screen-pulse 2s ease-in-out infinite;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="/start-screen.css" />
     <script>
       // Before the first frame: the theme the app showed last time (cached by the app, because
       // the stored setting needs the bundle and IPC), else the OS theme.

@@ -9,7 +9,7 @@
   "runsCode": "Führt Code von {{author}} aus. Mumcord hat ihn nicht geprüft.",
   "sealedFrame": "Es kann weder Mumcord noch deine Dateien, dein Mikrofon, deine Kamera oder die Zwischenablage sehen. Wird nur angezeigt in: {{places}}.",
   "ownCodeAndWebsites": "Dieses Plugin bringt eigenen Code mit und kommuniziert mit Websites.",
-  "trustRepository": "{{repository}} ist ein Repository, das du hinzugefügt hast. Installiere es nur, wenn du ihm vertraust.",
+  "trustRepository": "{{repository}} ist eine Quelle, die du hinzugefügt hast. Installiere das Plugin nur, wenn du ihr vertraust.",
   "understand": "Ich habe verstanden",
   "trustAuthor": "Ich kenne das Risiko und vertraue dem Autor von {{plugin}}",
   "understandUpdate": "Ich weiß, dass das Risiko gestiegen ist, und vertraue dem Autor trotzdem",
@@ -21,7 +21,7 @@
   "updateAnyway": "Trotzdem aktualisieren",
   "highRiskTitle": "Dieses Plugin hat ein hohes Risiko",
   "highRiskText": "Es kann eigene Webseiten öffnen und mit {{count}} Websites kommunizieren, die du nicht prüfen kannst. Mumcord kann nicht sehen, was diese Websites an das Plugin senden oder was das Plugin an sie sendet. Es wurde von jemandem veröffentlicht, der auf diesem Computer neu ist. Installiere es nur, wenn du den Autor kennst und ihm vertraust.",
-  "highRiskWouldBecome": "Dieses Update würde das Plugin zu einem Plugin mit hohem Risiko machen",
+  "highRiskWouldBecome": "Mit diesem Update hätte das Plugin ein hohes Risiko",
   "highRiskNotAutomatic": "Es wird nicht automatisch installiert. Bleibst du bei {{version}}, bleibt die aktuelle Bewertung bestehen; du kannst die Version unter „Installiert“ festsetzen.",
   "sameAuthorKey": "gleicher Autorenschlüssel",
   "places": {

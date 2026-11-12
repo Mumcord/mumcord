@@ -1,9 +1,9 @@
 {
-  "type": "Complemento",
+  "type": "Plugin",
   "autoOff": {
     "title": "{{name}} se ha desactivado",
     "body": "Desactivado tras fallos repetidos",
-    "open": "Mostrar en Complementos"
+    "open": "Mostrar en Plugins"
   },
   "pictureRefused": {
     "title": "{{name}} no pudo usar la imagen",

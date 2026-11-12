@@ -540,14 +540,130 @@
   }
 }
 
-/* A channel a dragged person can be dropped on (issue #172). */
+/* A channel a dragged person or channel can be dropped into (issues #172, #676). */
 .tree-channel__row[data-drop="true"] {
   outline: 2px dashed var(--color-accent);
   outline-offset: -2px;
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
 }
 
+/* A channel dragged onto itself or one of its own sub-channels (issue #676). */
+.tree-channel__row[data-drop="refused"] {
+  outline: 2px dashed var(--color-danger);
+  outline-offset: -2px;
+}
+
+/* Placing a dragged channel above or below this row: a line with a dot at its start (#676). */
+.tree-channel__row[data-drop-line]::before,
+.tree-channel__row[data-drop-line]::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  background: var(--color-accent);
+}
+
+.tree-channel__row[data-drop-line]::before {
+  left: var(--space-1);
+  right: var(--space-1);
+  height: 2px;
+}
+
+.tree-channel__row[data-drop-line]::after {
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tree-channel__row[data-drop-line="above"]::before {
+  top: -1px;
+}
+
+.tree-channel__row[data-drop-line="above"]::after {
+  top: -4px;
+}
+
+.tree-channel__row[data-drop-line="below"]::before {
+  bottom: -1px;
+}
+
+.tree-channel__row[data-drop-line="below"]::after {
+  bottom: -4px;
+}
+
+/* What the drop would do, as a small label on the row it concerns (#676). */
+.tree-channel__drop-hint {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% - var(--space-2));
+  left: 40%;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tree-channel__drop-hint[data-drop="above"] {
+  top: var(--space-2);
+}
+
+.tree-channel__drop-hint[data-drop="below"] {
+  top: calc(100% + var(--space-2));
+}
+
+.tree-channel__drop-hint[data-drop="self"],
+.tree-channel__drop-hint[data-drop="subChannel"] {
+  left: var(--space-6);
+  background: var(--color-danger);
+}
+
+/* The dragged channel and its branch stay in place, faded, until the server moves them. Only the
+   rows' content fades: a refused ring and its hint inside the branch stay fully visible. */
+:is(.tree-channel[data-dragging], [role="group"][data-dragging])
+  :is(.tree-channel__row, .tree-person__row, .avatar-stack__line)
+  > :not(.tree-channel__drop-hint) {
+  opacity: 0.4;
+}
+
+.tree-channel[draggable="true"] > .tree-channel__row,
 .tree-person[draggable="true"] {
   cursor: grab;
+}
+
+/* The picture under the pointer while a channel is dragged; only on screen for one frame. */
+.channel-drag-ghost {
+  position: fixed;
+  top: -100px;
+  left: 0;
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+
+.channel-drag-ghost > span {
+  color: var(--color-text-muted);
+}
+
+/* The path before → after in the "Move “Raid”?" dialog (#676). */
+.channel-move__path {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.channel-move__path b {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
 }
 
 /* People picked with Ctrl/Shift-click to move them together (issue #255): like the selected

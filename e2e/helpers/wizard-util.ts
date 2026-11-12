@@ -69,7 +69,7 @@ export async function chooseFileInNativeDialog(path: string): Promise<void> {
 // ---- Setup wizard (#159) ----
 //
 // First start: Welcome → [Import from Mumble] → Identity → Voice → Setup style → [Custom only:
-// Private messages → Connections → Features → Appearance → Startup and updates] → All set.
+// Private messages → Notifications → Connections → Features → Appearance → Startup and updates] → All set.
 // Rerun from Settings → About (#149): the same without import and identity.
 
 /** Rail names of the steps, as the step header shows them ("STEP n OF m · <name>"). */
@@ -80,6 +80,7 @@ export const WIZARD_STEP_NAMES = {
   voice: "Voice",
   setupStyle: "Setup style",
   privateMessages: "Private messages",
+  notifications: "Notifications",
   connections: "Connections",
   features: "Features",
   appearance: "Appearance",
@@ -91,6 +92,7 @@ export type WizardStepName = keyof typeof WIZARD_STEP_NAMES;
 /** The Custom-only steps in order. */
 export const CUSTOM_STEPS: readonly WizardStepName[] = [
   "privateMessages",
+  "notifications",
   "connections",
   "features",
   "appearance",
@@ -188,10 +190,31 @@ export async function finishWithPreset(preset: WizardPreset): Promise<void> {
   await waitForWizardStep("summary");
   await button("Start Mumcord").click();
   await mainWindowMarker().waitForExist({ timeout: 30_000 });
+  await declineTourOffer();
 }
 
 /**
- * On the setup style step: Custom → Next through the five Custom steps (running `onStep` on each
+ * Right after the first-start wizard Aaron offers the tips tour (#637) in the lower right corner,
+ * where his bubble covers the chat and holds the focus. A real user answers it first; the specs
+ * that only need a finished wizard close it, like such a user would. The offer lives only in the
+ * page, so a reload right after the wizard (as with the plugin test environment) drops it; then
+ * there is nothing to close.
+ */
+export async function declineTourOffer(): Promise<void> {
+  const offer = $("//*[@role='region'][@aria-label='Aaron, the tips helper']");
+  const shown = await offer
+    .waitForDisplayed({ timeout: 3_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (!shown) return;
+  // Escape instead of a click on "Not now": a click leaves the pointer over the toast corner,
+  // and hovered toasts stay open, so later specs would see stale toasts.
+  await browser.keys("Escape");
+  await offer.waitForExist({ reverse: true, timeout: 10_000 });
+}
+
+/**
+ * On the setup style step: Custom → Next through the six Custom steps (running `onStep` on each
  * before Next) → summary.
  */
 export async function walkCustomSteps(

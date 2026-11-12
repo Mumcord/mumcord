@@ -5,7 +5,7 @@
   "search": "Buscar por nombre, dirección o país",
   "refresh": "Actualizar",
   "retry": "Reintentar",
-  "loadFailed": "No se pudo cargar la lista de servidores públicos. Comprueba tu conexión a Internet e inténtalo de nuevo.",
+  "loadFailed": "No se pudo cargar la lista de servidores públicos. Comprueba tu conexión a internet e inténtalo de nuevo.",
   "noMatch": "Ningún servidor coincide con tu búsqueda y filtros.",
   "saveFailed": "No se pudo añadir el servidor. Inténtalo de nuevo.",
   "filters": {

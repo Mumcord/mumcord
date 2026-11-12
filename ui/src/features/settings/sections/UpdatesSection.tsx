@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, type UpdateStatus } from "../../../api";
+import { getApi, type UpdateChannel, type UpdateStatus } from "../../../api";
 import { InfoTip } from "../../../components/InfoTip";
 import { Select } from "../../../components/Select";
 import { openUpdateDialog, useUpdateStatus } from "../../updates";
@@ -39,6 +39,12 @@ export function UpdatesCard({ settings, update }: SettingsSectionProps) {
         canInstall={canInstall}
         onChange={(next) => {
           update(updateModePatch(next));
+        }}
+      />
+      <UpdateChannelRow
+        channel={settings.updateChannel}
+        onChange={(channel) => {
+          update({ updateChannel: channel });
         }}
       />
       <IntervalRow
@@ -123,6 +129,70 @@ export function UpdateModeRow(props: {
           </label>
         ))}
       </div>
+    </div>
+  );
+}
+
+const CHANNELS: readonly UpdateChannel[] = ["stable", "releaseCandidates"];
+
+/** Which releases are offered: final ones only, or early builds of the next version too (#741). */
+function UpdateChannelRow(props: {
+  channel: UpdateChannel;
+  onChange: (channel: UpdateChannel) => void;
+}) {
+  const { t } = useTranslation("settings");
+  const titleId = useId();
+  return (
+    <div className="upd-settings-row upd-channel">
+      <p className="upd-settings-row__title">
+        <span id={titleId}>{t("updates.channel")}</span>
+        <InfoTip
+          label={t("moreInfo", { topic: t("updates.channel") })}
+          text={t("updates.channelHint")}
+        />
+      </p>
+      <div role="radiogroup" className="settings-radios" aria-labelledby={titleId}>
+        {CHANNELS.map((channel) => (
+          // The text sits in nested spans (name and hint), which the rule cannot see through.
+          // eslint-disable-next-line jsx-a11y/label-has-associated-control
+          <label key={channel} className="settings-radios__option">
+            <input
+              type="radio"
+              name={titleId}
+              value={channel}
+              checked={props.channel === channel}
+              onChange={() => {
+                props.onChange(channel);
+              }}
+            />
+            <span>
+              <span className="upd-channel__name">{t(`updates.channels.${channel}.name`)}</span>
+              <span className="settings-hint upd-channel__hint">
+                {t(`updates.channels.${channel}.hint`)}
+              </span>
+            </span>
+          </label>
+        ))}
+      </div>
+      {props.channel === "releaseCandidates" && (
+        <div className="settings-infoline">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4M12 8h.01" />
+          </svg>
+          <span>{t("updates.channelSwitchBack")}</span>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,53 @@
+{
+  "label": "Aaron, asistentul pentru sfaturi",
+  "greeting": {
+    "title": "Salut, eu sunt Aaron!",
+    "body": "Sunt un axolotl și cunosc Mumcord ca pe propriul buzunar. Vrei un tur rapid? Durează cam un minut. Dacă nu acum, mă găsești în Setări → Despre → Sfaturi.",
+    "start": "Arată-mi",
+    "later": "Nu acum"
+  },
+  "progress": "Sfatul {{current}} din {{total}}",
+  "back": "Înapoi",
+  "next": "Înainte",
+  "done": "Gata",
+  "skip": "Sari peste tur",
+  "close": "Închide sfaturile",
+  "tips": {
+    "servers": {
+      "title": "Serverele tale",
+      "body": "Bara din extrema stângă conține serverele tale. Adaugă unul cu + sau găsește servere publice cu lupa. Poți rămâne conectat la mai multe servere deodată."
+    },
+    "channels": {
+      "title": "Canale",
+      "body": "Dă dublu clic pe un canal ca să intri și să vorbești. Un singur clic îi arată chatul fără să intri, iar butonul Urmărește te ține la curent."
+    },
+    "talk": {
+      "title": "Cum vorbești",
+      "body": "Push-to-talk sau activare vocală? Alege în Setări → Voce și audio sau deschide Setări de voce… cu săgeata mică de lângă microfon. Push-to-talk funcționează și cu butoanele mouse-ului."
+    },
+    "panel": {
+      "title": "Panoul tău de utilizator",
+      "body": "Din stânga jos îți oprești microfonul sau sunetul, pornești camera sau închizi apelul. Săgețile mici de lângă ele deschid mai multe opțiuni."
+    },
+    "search": {
+      "title": "Găsește orice",
+      "body": "Apasă {{key}} ca să găsești persoane și canale, chiar și pe serverele mari."
+    },
+    "chat": {
+      "title": "Chat",
+      "body": "Răspunde la un mesaj, citează-l, menționează persoane cu @ și partajează imagini și fișiere. Butoanele de formatare apar în timp ce scrii."
+    },
+    "apps": {
+      "title": "Aplicații",
+      "body": "Butonul Aplicații din bara de mesaje pornește partajarea ecranului, o vizionare comună sau camera ta. Pluginurile adaugă și mai multe."
+    },
+    "themes": {
+      "title": "Stilul tău",
+      "body": "Roata dințată din stânga jos comută între întunecat și luminos. În Setări → Aspect găsești mai multe teme, iar un server își poate avea propria temă: dă clic dreapta pe el și alege Temă."
+    },
+    "end": {
+      "title": "Asta e tot!",
+      "body": "Distracție plăcută pe Mumcord! Mă poți chema înapoi oricând din Setări → Despre → Sfaturi."
+    }
+  }
+}

@@ -1,12 +1,12 @@
 {
   "close": {
     "title": "¿Minimizar a la bandeja o salir?",
-    "description": "Sigues conectado. Minimizado, Mumcord te mantiene en el canal de voz y queda en la bandeja del sistema.",
+    "description": "Sigues conectado. Si lo minimizas, Mumcord te mantiene en el canal de voz y se queda en la bandeja del sistema.",
     "remember": "Recordar mi elección",
     "minimize": "Minimizar a la bandeja",
     "quit": "Salir",
     "failed": "No ha funcionado. Inténtalo de nuevo.",
-    "descriptionServers": "Sigues conectado a {{count}} servidores. Minimizado, Mumcord te mantiene en el canal de voz y sigue en la bandeja del sistema."
+    "descriptionServers": "Sigues conectado a {{count}} servidores. Si lo minimizas, Mumcord te mantiene en el canal de voz y se queda en la bandeja del sistema."
   },
   "windowOverlay": {
     "title": "Se eliminó la superposición en ventana",
@@ -22,7 +22,7 @@
   },
   "appImageMenu": {
     "title": "¿Añadir Mumcord al menú de aplicaciones?",
-    "description": "Así Mumcord aparece en tu menú de aplicaciones. El icono y pulsar para hablar funcionan bien en Wayland, y los enlaces mumble:// abren Mumcord. Puedes cambiarlo más tarde en Ajustes.",
+    "description": "Así Mumcord aparece en tu menú de aplicaciones. El icono y Push-to-talk funcionan bien en Wayland, y los enlaces mumble:// abren Mumcord. Puedes cambiarlo más tarde en Ajustes.",
     "no": "No",
     "yes": "Sí",
     "failed": "No ha funcionado. Inténtalo de nuevo."
@@ -43,6 +43,8 @@
   },
   "updater": {
     "stable": "Estable",
+    "releaseCandidate": "Versión candidata",
+    "prereleaseNote": "Esta es una versión preliminar y puede contener errores. Cambia al canal Estable en los ajustes para recibir solo versiones finales.",
     "available": {
       "title": "Actualización disponible",
       "subtitle": "Mumcord {{version}} está listo para descargar. Tienes la {{current}}.",
@@ -55,7 +57,7 @@
       "openReleasePage": "Abrir la página de la versión",
       "manual": "Descarga la nueva versión desde la página de la versión.",
       "manualPackage": "Descarga el paquete desde la página de la versión y luego instálalo con:",
-      "manualAur": "Actualízalo con tu ayudante de AUR:"
+      "manualAur": "Actualízalo con tu helper de AUR:"
     },
     "tags": {
       "added": "Añadido",
@@ -80,10 +82,10 @@
       "size": "{{received}} de {{total}} MB",
       "received": "{{received}} MB",
       "secondsLeft_one": "queda aproximadamente {{count}} segundo",
-      "secondsLeft_many": "quedan aproximadamente {{count}} de segundos",
+      "secondsLeft_many": "quedan aproximadamente {{count}} segundos",
       "secondsLeft_other": "quedan aproximadamente {{count}} segundos",
       "minutesLeft_one": "queda aproximadamente {{count}} minuto",
-      "minutesLeft_many": "quedan aproximadamente {{count}} de minutos",
+      "minutesLeft_many": "quedan aproximadamente {{count}} minutos",
       "minutesLeft_other": "quedan aproximadamente {{count}} minutos",
       "cancel": "Cancelar"
     },
@@ -96,7 +98,7 @@
       "installed": "Instalada",
       "installsOnRestart": "Se instala cuando Mumcord se reinicie",
       "connected_one": "Estás conectado a {{count}} servidor. Tras el reinicio, Mumcord volverá a conectarse y a entrar en tus canales.",
-      "connected_many": "Estás conectado a {{count}} de servidores. Tras el reinicio, Mumcord volverá a conectarse y a entrar en tus canales.",
+      "connected_many": "Estás conectado a {{count}} servidores. Tras el reinicio, Mumcord volverá a conectarse y a entrar en tus canales.",
       "connected_other": "Estás conectado a {{count}} servidores. Tras el reinicio, Mumcord volverá a conectarse y a entrar en tus canales.",
       "later": "Más tarde",
       "restart": "Reiniciar para actualizar",
@@ -113,7 +115,7 @@
       "retry": "Reintentar",
       "close": "Cerrar"
     },
-    "actionFailed": "No funcionó. Inténtalo de nuevo.",
+    "actionFailed": "No ha funcionado. Inténtalo de nuevo.",
     "toast": {
       "title": "Mumcord {{version}} está listo",
       "body": "Reinicia para actualizar.",

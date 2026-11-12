@@ -4,17 +4,17 @@
     "noPermission": "Der Server erlaubt hier kein Flüstern"
   },
   "banner": {
-    "whisper": "Flüstert an {{target}}",
-    "shout": "Ruft in {{target}}",
+    "whisper": "Flüstern an {{target}}",
+    "shout": "Rufen in {{target}}",
     "releaseKey": "Nur die Leute dort hören dich. Lass <key>{{key}}</key> los, um wieder in {{channel}} zu sprechen.",
-    "stopToReturn": "Nur die Leute dort hören dich. Beende es, um wieder in {{channel}} zu sprechen.",
+    "stopToReturn": "Nur die Leute dort hören dich. Klicke auf „Beenden“, um wieder in {{channel}} zu sprechen.",
     "onlyThere": "Nur die Leute dort hören dich.",
     "stop": "Beenden"
   },
   "denied": {
     "title": "Flüstern an {{target}} nicht möglich",
-    "noVoiceServer": "Betritt zuerst einen Kanal: Flüstern läuft über den Server, auf dem du sprichst.",
-    "muted": "Schalte dein Mikrofon ein, um zu flüstern.",
+    "noVoiceServer": "Tritt zuerst einem Kanal bei: Flüstern läuft über den Server, auf dem du sprichst.",
+    "muted": "Heb die Stummschaltung deines Mikrofons auf, um zu flüstern.",
     "serverMuted": "Der Server hat dich stummgeschaltet und gibt deine Stimme nicht weiter.",
     "nobodyHere": "Niemand von ihnen ist gerade auf diesem Server.",
     "channelNotFound": "Diesen Kanal gibt es auf diesem Server nicht.",
@@ -27,18 +27,18 @@
     "shout": "ruft",
     "whisperLabel": "Flüstert dir zu",
     "shoutLabel": "Ruft in deinen Kanal",
-    "ownWhisper": "flüsterst",
-    "ownShout": "rufst",
+    "ownWhisper": "flüstert",
+    "ownShout": "ruft",
     "ownWhisperLabel": "Du flüsterst",
     "ownShoutLabel": "Du rufst"
   },
   "panel": {
     "open": "Flüstern oder rufen",
     "menu": "Flüster- und Rufziele",
-    "manage": "Ziele verwalten …",
+    "manage": "Ziele verwalten…",
     "none": "Noch keine Ziele",
-    "indicatorWhisper": "Flüstert an {{target}}",
-    "indicatorShout": "Ruft in {{target}}",
+    "indicatorWhisper": "Flüstern an {{target}}",
+    "indicatorShout": "Rufen in {{target}}",
     "stop": "Beenden"
   }
 }

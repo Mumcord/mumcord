@@ -28,9 +28,9 @@
     "listening": "nur zuhörend",
     "talking": "spricht",
     "muted": "stummgeschaltet",
-    "deafened": "taub geschaltet",
+    "deafened": "taubgeschaltet",
     "serverMuted": "vom Server stummgeschaltet",
-    "serverDeafened": "vom Server taub geschaltet",
+    "serverDeafened": "vom Server taubgeschaltet",
     "suppressed": "unterdrückt (darf hier nicht sprechen)",
     "localMuted": "für dich stummgeschaltet",
     "unregistered": "nicht registriert",
@@ -52,9 +52,9 @@
     "registered": "Auf diesem Server registriert",
     "listening": "Nur zuhörend",
     "muted": "Stummgeschaltet",
-    "deafened": "Taub geschaltet",
+    "deafened": "Taubgeschaltet",
     "serverMuted": "Vom Server stummgeschaltet",
-    "serverDeafened": "Vom Server taub geschaltet",
+    "serverDeafened": "Vom Server taubgeschaltet",
     "suppressed": "Unterdrückt – darf in diesem Kanal nicht sprechen",
     "localMuted": "Für dich stummgeschaltet",
     "unregistered": "Auf diesem Server nicht registriert (Gast)",
@@ -78,7 +78,7 @@
   "empty": {
     "disconnected": "Nicht verbunden. Wähle einen Server, um seine Kanäle zu sehen.",
     "loading": "Kanäle werden geladen…",
-    "syncingBig": "Großer Server wird synchronisiert …"
+    "syncingBig": "Großer Server wird synchronisiert…"
   },
   "search": {
     "label": "Kanäle und Personen suchen",
@@ -94,8 +94,8 @@
   "section": {
     "state": {
       "connected": "Verbunden",
-      "connecting": "Verbinde",
-      "reconnecting": "Verbinde erneut…",
+      "connecting": "Wird verbunden",
+      "reconnecting": "Wird neu verbunden…",
       "disconnected": "Getrennt"
     },
     "online": "{{count}} online",
@@ -104,9 +104,9 @@
   "moveTo": {
     "title": "Personen verschieben",
     "channel": "Kanal",
-    "search": "Kanäle durchsuchen",
-    "noMatch": "Kein Kanal passt.",
-    "hint": "Wähle den Kanal, in den die Personen sollen.",
+    "search": "Kanäle suchen",
+    "noMatch": "Keine Kanäle gefunden.",
+    "hint": "Wähle den Kanal, in den die Personen verschoben werden sollen.",
     "from": "Aus {{channel}}",
     "question": "{{people}} von {{from}} nach {{to}} verschieben?",
     "questionNoSource": "{{people}} nach {{to}} verschieben?",
@@ -116,5 +116,23 @@
     "resultAll": "{{people}} nach {{channel}} verschoben.",
     "resultSome": "{{moved}} von {{people}} nach {{channel}} verschoben. Der Rest wurde abgelehnt.",
     "busy": "Es werden bereits Personen verschoben…"
+  },
+  "drag": {
+    "into": "In {{channel}} verschieben",
+    "above": "Über {{channel}} einordnen",
+    "below": "Unter {{channel}} einordnen",
+    "self": "Kann nicht in sich selbst verschoben werden",
+    "subChannel": "Kann nicht in den eigenen Unterkanal verschoben werden",
+    "confirmTitle": "„{{channel}}“ verschieben?",
+    "alongAll": "Mit {{channel}} werden verschoben: {{subChannels}} und {{people}}.",
+    "alongSubChannels": "Mit {{channel}} werden verschoben: {{subChannels}}.",
+    "alongPeople": "Mit {{channel}} werden verschoben: {{people}}.",
+    "alongNone": "Nur {{channel}} wird verschoben; der Kanal ist leer.",
+    "subChannels_one": "{{count}} Unterkanal",
+    "subChannels_other": "{{count}} Unterkanäle",
+    "pathTo": "nach",
+    "confirm": "Verschieben",
+    "failedTitle": "{{channel}} konnte nicht verschoben werden",
+    "refusedParent": "Dir fehlt die Berechtigung, Kanäle in {{channel}} zu verschieben."
   }
 }

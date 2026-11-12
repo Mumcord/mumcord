@@ -17,7 +17,7 @@
     },
     "showAll": "Arată tot ({{total}})",
     "showFewer": "Arată mai puține",
-    "jump": "Salt la canalul meu",
+    "jump": "Mergi la canalul meu",
     "locked": "blocat",
     "temporary": "temporar",
     "linked": "legat",
@@ -35,7 +35,7 @@
     "serverMuted": "microfon oprit de server",
     "serverDeafened": "sunet oprit de server",
     "suppressed": "suprimat (nu poate vorbi aici)",
-    "localMuted": "fără sunet pentru tine",
+    "localMuted": "sunet dezactivat pentru tine",
     "unregistered": "neînregistrat",
     "prioritySpeaker": "vorbitor prioritar"
   },
@@ -59,8 +59,8 @@
     "serverMuted": "Microfon oprit de server",
     "serverDeafened": "Sunet oprit de server",
     "suppressed": "Suprimat – nu poate vorbi în acest canal",
-    "localMuted": "Fără sunet pentru tine",
-    "unregistered": "Neînregistrat pe acest server (oaspete)",
+    "localMuted": "Sunet dezactivat pentru tine",
+    "unregistered": "Neînregistrat pe acest server (invitat)",
     "nowPlaying": "Ascultă {{track}}",
     "nowGaming": "Joacă {{game}}",
     "weakConnection": "Conexiune slabă – ping mare sau pierdere de pachete",
@@ -121,5 +121,24 @@
     "resultAll": "{{people}} mutate în {{channel}}.",
     "resultSome": "{{moved}} din {{people}} mutate în {{channel}}. Restul au fost refuzate.",
     "busy": "Se mută deja persoane…"
+  },
+  "drag": {
+    "into": "Mută în {{channel}}",
+    "above": "Plasează deasupra lui {{channel}}",
+    "below": "Plasează sub {{channel}}",
+    "self": "Nu poate fi mutat în el însuși",
+    "subChannel": "Nu poate fi mutat în propriul subcanal",
+    "confirmTitle": "Muți „{{channel}}”?",
+    "alongAll": "Împreună cu {{channel}} se mută: {{subChannels}} și {{people}}.",
+    "alongSubChannels": "Împreună cu {{channel}} se mută: {{subChannels}}.",
+    "alongPeople": "Împreună cu {{channel}} se mută: {{people}}.",
+    "alongNone": "Se mută doar {{channel}}; este gol.",
+    "subChannels_one": "{{count}} subcanal",
+    "subChannels_few": "{{count}} subcanale",
+    "subChannels_other": "{{count}} de subcanale",
+    "pathTo": "în",
+    "confirm": "Mută",
+    "failedTitle": "{{channel}} nu a putut fi mutat",
+    "refusedParent": "Nu ai permisiunea să muți canale în {{channel}}."
   }
 }

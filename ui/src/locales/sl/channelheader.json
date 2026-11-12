@@ -5,7 +5,7 @@
     "label": "Možnosti kanala {{channel}}",
     "join": "Pridruži se kanalu",
     "follow": "Sledi kanalu",
-    "unfollow": "Ne sledi več kanalu",
+    "unfollow": "Prenehaj slediti kanalu",
     "following": "Slediš",
     "copyLink": "Kopiraj povezavo do kanala",
     "password": "Geslo kanala",
@@ -72,7 +72,7 @@
     "close": "Zapri"
   },
   "badge": {
-    "music": "Profil glasbe",
+    "music": "Glasbeni profil",
     "jam": "Profil Jam"
   },
   "audio": {
@@ -102,7 +102,7 @@
     "bitrateDefault": "Privzeto, {{value}}",
     "serverLimit": "Omejitev strežnika {{kbps}} kbit/s",
     "noServerLimit": "Brez omejitve strežnika",
-    "note": "Velja ob pridružitvi temu kanalu, samo na tej napravi. Drugih ne prizadene. Podatki o povezavi te vrednosti označijo z „(profil kanala)“.",
+    "note": "Velja ob pridružitvi temu kanalu, samo na tej napravi. Drugih ne prizadene. Podatki o povezavi te vrednosti označijo z »(profil kanala)«.",
     "saveFailed": "Zvočnega profila ni bilo mogoče shraniti.",
     "remove": "Odstrani profil",
     "cancel": "Prekliči",

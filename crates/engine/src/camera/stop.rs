@@ -198,6 +198,7 @@ fn start_platform_watch(_engine: &Engine) {}
 
 /// The OS reported a screen lock. Runs on the listener's thread (the macOS main thread, the
 /// Windows message loop), so the work moves to each engine's runtime.
+#[cfg(any(target_os = "linux", target_os = "macos", windows))]
 fn screen_locked() {
     let engines: Vec<Engine> = lock(&LOCK_LISTENERS)
         .iter()

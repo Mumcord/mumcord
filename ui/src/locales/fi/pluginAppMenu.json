@@ -1,6 +1,6 @@
 {
   "pluginsGroup": "Lisäosat",
-  "moreItems": "Lisää lisäosia",
+  "moreItems": "Muut lisäosat",
   "subline": "{{plugin}} · Epävirallinen",
   "sublineOfficial": "{{plugin}}",
   "footer": "Lisäosien kohteet näyttävät aina lisäosan nimen. Hallitse niitä kohdassa Asetukset → Lisäosat.",

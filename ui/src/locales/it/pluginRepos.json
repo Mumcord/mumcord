@@ -5,7 +5,7 @@
     "title": "Aggiungi repository",
     "address": "Indirizzo del repository",
     "expectedKey": "Chiave attesa (facoltativa)",
-    "expectedKeyHint": "Se il titolare ti ha dato una chiave, incollala qui. Il repository dovrà usare esattamente questa chiave.",
+    "expectedKeyHint": "Se il proprietario ti ha dato una chiave, incollala qui. Il repository dovrà usare esattamente questa chiave.",
     "check": "Controlla repository",
     "found": "Ecco cosa abbiamo trovato",
     "confirm": "Aggiungi repository",
@@ -39,7 +39,7 @@
   },
   "keyChange": {
     "title": "{{name}} ha cambiato chiave",
-    "message": "Questo repository ora firma il suo elenco di plugin con un'altra chiave. Resta in pausa finché non decidi. Fidati della nuova chiave solo se il titolare ti ha avvisato del cambiamento.",
+    "message": "Questo repository ora firma il suo elenco di plugin con un'altra chiave. Resta in pausa finché non decidi. Fidati della nuova chiave solo se il proprietario ti ha avvisato del cambiamento.",
     "oldKey": "Chiave di cui ti fidavi finora",
     "newKey": "Nuova chiave",
     "keepPaused": "Lascia in pausa",

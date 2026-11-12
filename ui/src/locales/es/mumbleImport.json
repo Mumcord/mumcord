@@ -1,6 +1,6 @@
 {
   "title": "Trae tu configuración de Mumble",
-  "intro": "Hemos encontrado el cliente oficial de Mumble en este equipo. Elige qué copiar. No se cambia nada en Mumble y nada sale de tu equipo.",
+  "intro": "Hemos encontrado el cliente oficial de Mumble en este ordenador. Elige qué copiar. No se cambia nada en Mumble y nada sale de tu ordenador.",
   "optional": "{{progress}} · opcional",
   "listLabel": "Qué copiar desde Mumble",
   "favourites": {
@@ -40,10 +40,10 @@
     "title": "Dispositivos de audio",
     "input": "Micrófono: {{name}}",
     "output": "Salida: {{name}}",
-    "missing": "Los dispositivos de Mumble no están conectados a este equipo."
+    "missing": "Los dispositivos de Mumble no están conectados a este ordenador."
   },
   "ptt": {
-    "title": "Tecla de pulsar para hablar",
+    "title": "Tecla de Push-to-talk",
     "modifierOnly": "La tecla de Mumble es solo una tecla modificadora, que Mumcord no puede usar. Podrás elegir una tecla más tarde.",
     "tooManyKeys": "El atajo de Mumble tiene más de una tecla, algo que Mumcord no puede usar. Podrás elegir una tecla más tarde.",
     "unknown": "El atajo de Mumble usa una tecla o un dispositivo que Mumcord no reconoce. Podrás elegir una tecla más tarde."
@@ -54,7 +54,7 @@
     "notRecommended": "No recomendado"
   },
   "selected_one": "{{count}} elemento seleccionado",
-  "selected_many": "{{count}} de elementos seleccionados",
+  "selected_many": "{{count}} elementos seleccionados",
   "selected_other": "{{count}} elementos seleccionados",
   "import": "Importar",
   "importing": "Importando…",
@@ -67,25 +67,25 @@
     "title": "Importación terminada",
     "intro": "Se copiaron tus datos de Mumble. Revisa lo que ha pasado.",
     "added_one": "{{count}} servidor añadido a favoritos",
-    "added_many": "{{count}} de servidores añadidos a favoritos",
+    "added_many": "{{count}} servidores añadidos a favoritos",
     "added_other": "{{count}} servidores añadidos a favoritos",
     "skipped_one": "{{count}} servidor omitido",
-    "skipped_many": "{{count}} de servidores omitidos",
+    "skipped_many": "{{count}} servidores omitidos",
     "skipped_other": "{{count}} servidores omitidos",
     "skippedDetail_one": "{{names}} ya está en tu lista",
     "skippedDetail_many": "{{names}} ya están en tu lista",
     "skippedDetail_other": "{{names}} ya están en tu lista",
     "duplicate": "Duplicado",
     "passwords_one": "{{count}} contraseña guardada",
-    "passwords_many": "{{count}} de contraseñas guardadas",
+    "passwords_many": "{{count}} contraseñas guardadas",
     "passwords_other": "{{count}} contraseñas guardadas",
-    "passwordsDetail": "Guardada en el llavero del sistema, no en un archivo",
+    "passwordsDetail": "Guardadas en el llavero del sistema, no en un archivo",
     "identity": "Identidad importada",
     "identityDefault": "Mumcord ya la usa",
     "identityServers": "Se usa para los servidores copiados",
     "identitySkipped": "Identidad ya en Mumcord",
     "identitySkippedDetail": "Este certificado ya es una de tus identidades",
-    "devicesAndPtt": "Dispositivos de audio y tecla de pulsar para hablar",
+    "devicesAndPtt": "Dispositivos de audio y tecla de Push-to-talk",
     "done": "Hecho",
     "undo": "Deshacer importación",
     "undone": "Se deshizo la importación.",
@@ -96,7 +96,7 @@
     "hint": "Copia servidores favoritos, contraseñas guardadas, tu certificado y los ajustes de audio desde el cliente oficial de Mumble.",
     "button": "Importar desde Mumble…",
     "searching": "Buscando Mumble…",
-    "notFound": "No se encontró el cliente oficial de Mumble en este equipo.",
+    "notFound": "No se encontró el cliente oficial de Mumble en este ordenador.",
     "breadcrumb": "Ajustes · Servidores · Importar desde Mumble"
   }
 }

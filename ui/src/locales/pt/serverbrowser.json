@@ -1,13 +1,13 @@
 {
   "title": "Servidores públicos",
   "loading": "A carregar a lista…",
-  "subtitle": "Carregada porque abriu esta página · {{shown}} de {{total}} mostrados",
+  "subtitle": "Carregada porque abriste esta página · {{shown}} de {{total}} mostrados",
   "search": "Pesquisar por nome, endereço ou país",
   "refresh": "Atualizar",
   "retry": "Tentar novamente",
-  "loadFailed": "Não foi possível carregar a lista de servidores públicos. Verifique a ligação à Internet e tente novamente.",
+  "loadFailed": "Não foi possível carregar a lista de servidores públicos. Verifica a tua ligação à internet e tenta novamente.",
   "noMatch": "Nenhum servidor corresponde à pesquisa e aos filtros.",
-  "saveFailed": "Não foi possível adicionar o servidor. Tente novamente.",
+  "saveFailed": "Não foi possível adicionar o servidor. Tenta novamente.",
   "filters": {
     "label": "Filtros",
     "country": "País",
@@ -38,11 +38,11 @@
   "connect": "Ligar",
   "connectTo": "Ligar a {{server}}",
   "favourite": "Favorito",
-  "favouriteServer": "Adicionar {{server}} aos seus servidores",
+  "favouriteServer": "Adicionar {{server}} aos teus servidores",
   "saved": "Guardado",
-  "savedAs": "{{server}} está nos seus servidores",
+  "savedAs": "{{server}} está nos teus servidores",
   "announce": {
-    "saved": "{{server}} adicionado aos seus servidores"
+    "saved": "{{server}} adicionado aos teus servidores"
   },
-  "note": "Só as linhas visíveis recebem ping, poucas de cada vez. Nada mais é enviado a um servidor até se ligar."
+  "note": "Só as linhas visíveis recebem ping, poucas de cada vez. Nada mais é enviado a um servidor até te ligares."
 }

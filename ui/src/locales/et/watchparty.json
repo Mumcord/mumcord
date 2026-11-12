@@ -1,17 +1,17 @@
 {
   "title": "Ühisvaatamine",
   "addVideo": "Lisa video",
-  "beta": "Beeta",
+  "beta": "Beta",
   "join": "Liitu ühisvaatamisega",
   "leave": "Lahku ühisvaatamiselt",
-  "watching": "{{count}} vaatavad: {{names}}",
-  "player": "Ühisvaatamise mängija",
+  "watching": "Vaatajaid {{count}}: {{names}}",
+  "player": "Ühisvaatamise pleier",
   "watchTogether": "Vaatame koos",
   "watchTogetherFor": "Vaata {{title}} koos selle kanaliga",
-  "embedsOff": "Lülitage privaatsusseadetes sisseehitatud mängijad sisse, et koos vaadata",
-  "embedsOffJoin": "Ühisvaatamine käib: liitumiseks lülitage sisseehitatud mängijad sisse",
+  "embedsOff": "Koos vaatamiseks lülita privaatsusseadetes põimitud pleierid sisse",
+  "embedsOffJoin": "Ühisvaatamine käib: liitumiseks lülita põimitud pleierid sisse",
   "openPrivacy": "Ava privaatsusseaded",
-  "cantPlay": "Mängija ei saa siin töötada.",
+  "cantPlay": "Pleier ei saa siin töötada.",
   "openInBrowser": "Ava brauseris",
   "startFailed": "Ühisvaatamist ei õnnestunud alustada.",
   "joinFailed": "Ühisvaatamisega liitumine ebaõnnestus.",
@@ -19,7 +19,7 @@
   "commandFailed": "Ühisvaatamine ei saanud sinu muudatust kätte.",
   "someone": "Keegi",
   "other": {
-    "play": "{{name}} vajutas esitust",
+    "play": "{{name}} käivitas esituse",
     "pause": "{{name}} peatas",
     "seek": "{{name}} hüppas edasi",
     "skipped": "{{name}} jättis vahele"
@@ -45,7 +45,7 @@
     "move": "Teisalda {{title}}",
     "upNext": "Järgmisena: {{title}}",
     "upNextNone": "Järgmisena pole midagi",
-    "paste": "Aseta YouTube'i link",
+    "paste": "Kleebi YouTube'i link",
     "notALink": "See ei ole YouTube'i link",
     "more": "Rohkem: {{title}}",
     "playNext": "Esita järgmisena",
@@ -59,11 +59,13 @@
   "codecHint": {
     "install": "See video vajab H.264 tuge. Paigalda gst-libav:",
     "generic": "See video vajab H.264 tuge. Paigalda gst-libav (GStreameri libav-plugin) oma süsteemi paketihalduriga.",
-    "rpmFusion": "Fedoras tuleb gst-libav RPM Fusioni hoidlast; luba esmalt RPM Fusion."
+    "rpmFusion": "Fedoras tuleb gst-libav RPM Fusioni hoidlast; luba esmalt RPM Fusion.",
+    "freebsdInstall": "Mumcord's WebView needs a GStreamer decoder that is missing. Install it and restart Mumcord:",
+    "freebsdNoPackage": "No FreeBSD package decodes this video (no AV1 decoder, no DRM support). Open it in your browser instead."
   },
   "keys": "Tühik esita/peata · ← → hüppa 5 s · M vaigista · F täisekraan",
   "headerPill": "Vaata koos · {{count}}",
-  "miniPlayer": "Minimängija",
+  "miniPlayer": "Minipleier",
   "tabs": {
     "playlist": "Esitusloend"
   },

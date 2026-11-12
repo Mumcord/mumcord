@@ -36,6 +36,12 @@ export const memberRowId = (session: number) => `u${String(session)}`;
 const collator = new Intl.Collator(undefined, { sensitivity: "base" });
 const byName = (a: { name: string }, b: { name: string }) => collator.compare(a.name, b.name);
 
+/** The order the tree shows sibling channels in: Mumble sorts by position, then name. */
+export const compareChannels = (
+  a: { position: number; name: string },
+  b: { position: number; name: string },
+) => a.position - b.position || byName(a, b);
+
 /**
  * Builds the nested tree. Channel listeners are not part of it; they only show in the member list.
  * Channels whose parent is unknown are shown at the top level.
@@ -64,13 +70,11 @@ export function buildTree(
     else roots.push(node);
   }
   const sortNode = (node: ChannelNode) => {
-    node.children.sort(
-      (a, b) => a.channel.position - b.channel.position || byName(a.channel, b.channel),
-    );
+    node.children.sort((a, b) => compareChannels(a.channel, b.channel));
     node.members.sort(byName);
     node.children.forEach(sortNode);
   };
-  roots.sort((a, b) => a.channel.position - b.channel.position || byName(a.channel, b.channel));
+  roots.sort((a, b) => compareChannels(a.channel, b.channel));
   roots.forEach(sortNode);
   if (previous === undefined) return roots;
   const before = new Map<number, ChannelNode>();
