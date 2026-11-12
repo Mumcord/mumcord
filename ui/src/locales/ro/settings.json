@@ -744,7 +744,13 @@
       "gap": "Interval față de pachetul anterior",
       "kind": "ID intern",
       "size": "Dimensiune",
-      "decoded": "Conținut decodat"
+      "decoded": "Conținut decodat",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "canal {{channel}}",
+      "keyframe": "cadru cheie",
+      "delta": "cadru delta"
     },
     "noDecoding": "Aceste date nu au o formă lizibilă; vezi octeții bruți.",
     "controlOnly": "Mesaj Mumble standard: sunt înregistrate doar tipul și dimensiunea.",
@@ -765,7 +771,8 @@
       "watch": "Starea sesiunii de vizionare",
       "plugin": "Date plugin",
       "mumble": "Mesaj Mumble",
-      "peer": "Configurarea releului"
+      "peer": "Configurarea releului",
+      "media": "Flux media"
     }
   },
   "licences": {

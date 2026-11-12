@@ -739,7 +739,13 @@
       "gap": "Eltelt idő az előző csomag óta",
       "kind": "Belső azonosító",
       "size": "Méret",
-      "decoded": "Dekódolt tartalom"
+      "decoded": "Dekódolt tartalom",
+      "media": "Média"
+    },
+    "media": {
+      "channel": "csatorna {{channel}}",
+      "keyframe": "kulcsképkocka",
+      "delta": "deltaképkocka"
     },
     "noDecoding": "Ennek a tartalomnak nincs olvasható formája; nézd a nyers bájtokat.",
     "controlOnly": "Szabványos Mumble-üzenet: csak a típusa és a mérete kerül rögzítésre.",
@@ -760,7 +766,8 @@
       "watch": "Közös nézés állapota",
       "plugin": "Bővítményadatok",
       "mumble": "Mumble-üzenet",
-      "peer": "Átjátszó beállítása"
+      "peer": "Átjátszó beállítása",
+      "media": "Médiafolyam"
     }
   },
   "licences": {

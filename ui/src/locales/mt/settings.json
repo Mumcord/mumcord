@@ -754,7 +754,13 @@
       "gap": "Distakk mill-pakkett preċedenti",
       "kind": "ID intern",
       "size": "Daqs",
-      "decoded": "Kontenut deskodifikat"
+      "decoded": "Kontenut deskodifikat",
+      "media": "Midja"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "qafas ewlieni",
+      "delta": "qafas delta"
     },
     "noDecoding": "Dan il-kontenut m’għandux forma li tinqara; ara l-bytes mhux ipproċessati.",
     "controlOnly": "Messaġġ standard ta’ Mumble: jiġu rreġistrati biss it-tip u d-daqs tiegħu.",
@@ -775,7 +781,8 @@
       "watch": "Stat tas-sessjoni ta’ ħarsa flimkien",
       "plugin": "Data tal-plugin",
       "mumble": "Messaġġ ta’ Mumble",
-      "peer": "Konfigurazzjoni tar-relay"
+      "peer": "Konfigurazzjoni tar-relay",
+      "media": "Fluss tal-midja"
     }
   },
   "licences": {

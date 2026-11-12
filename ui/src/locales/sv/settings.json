@@ -739,7 +739,13 @@
       "gap": "Avstånd till föregående paket",
       "kind": "Internt id",
       "size": "Storlek",
-      "decoded": "Avkodat innehåll"
+      "decoded": "Avkodat innehåll",
+      "media": "Medie"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "nyckelbild",
+      "delta": "deltabild"
     },
     "noDecoding": "Den här nyttolasten har ingen läsbar form; se råbytena.",
     "controlOnly": "Vanligt Mumble-meddelande: bara typ och storlek registreras.",
@@ -760,7 +766,8 @@
       "watch": "Status för tittarkväll",
       "plugin": "Plugindata",
       "mumble": "Mumble-meddelande",
-      "peer": "Reläinställning"
+      "peer": "Reläinställning",
+      "media": "Mediaström"
     }
   },
   "licences": {

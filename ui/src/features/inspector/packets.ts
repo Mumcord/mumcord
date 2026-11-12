@@ -2,7 +2,8 @@
  * Packet list logic of the packet inspector, free of React: merging polled packets, filters,
  * display formats and the JSON and Markdown exports.
  */
-import type { Packet as ApiPacket, PacketDirection } from "../../api";
+import type { TFunction } from "i18next";
+import type { MediaPacket, Packet as ApiPacket, PacketDirection } from "../../api";
 
 /**
  * A captured packet as the inspector uses it. The bindings type every float as nullable; the
@@ -31,9 +32,38 @@ export const PLUGIN_KINDS: Readonly<Record<string, string>> = {
 };
 
 /** Translation key of a packet type's plain name, below `inspector.kinds`. */
-export function kindKey(packet: Pick<Packet, "kind" | "pluginData">): string {
+export function kindKey(packet: Pick<Packet, "kind" | "pluginData" | "media">): string {
+  if (packet.media !== null) return "media";
   if (!packet.pluginData) return "mumble";
   return PLUGIN_KINDS[packet.kind] ?? "plugin";
+}
+
+/**
+ * The channel-0 control kinds of the media profile (spec 07, FR-7.91), by their wire byte.
+ * These are protocol tokens, not UI text, so they are shown as they are.
+ */
+const CONTROL_KINDS = ["description", "keyreq", "key", "kf", "layers", "want", "gone"];
+
+/** The protocol token of a channel-0 control message; `kind <n>` for one outside the profile. */
+export function controlToken(control: number): string {
+  return CONTROL_KINDS[control] ?? `kind ${String(control)}`;
+}
+
+/**
+ * What a media message is, in the words `t` gives: the channel-0 control message, or the channel
+ * with the frame kind and the flags byte. `null` for a packet that is no media message. The old
+ * header has no channel and no flags byte, so only its keyframe bit shows.
+ */
+export function mediaFacts(t: TFunction<"settings">, media: MediaPacket | null): string | null {
+  if (media === null) return null;
+  if (media.control !== null) return controlToken(media.control);
+  return [
+    media.channel === null ? null : t("inspector.media.channel", { channel: media.channel }),
+    t(media.keyframe ? "inspector.media.keyframe" : "inspector.media.delta"),
+    media.flags === null ? null : `0x${media.flags.toString(16).padStart(2, "0")}`,
+  ]
+    .filter((part) => part !== null)
+    .join(" · ");
 }
 
 export function mergePackets(current: readonly Packet[], added: readonly Packet[]): Packet[] {
@@ -111,6 +141,19 @@ function peer(names: Names, serverId: number, session: number) {
   return { session, name: names.user(serverId, session) };
 }
 
+/** JSON as an export can carry it; the payload texts are engine-written JSON. */
+type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
+
+/** The payload as JSON for the export; the text as it is if it does not parse. */
+function decodedJson(text: string | null): Json {
+  if (text === null) return null;
+  try {
+    return JSON.parse(text) as Json;
+  } catch {
+    return text;
+  }
+}
+
 /** Complete, machine-readable export of the given packets. */
 export function exportJson(packets: readonly Packet[], info: ExportInfo, names: Names): string {
   const first = packets[0];
@@ -138,8 +181,9 @@ export function exportJson(packets: readonly Packet[], info: ExportInfo, names: 
         from: p.sender === null ? null : peer(names, p.serverId, p.sender),
         to: p.receivers.map((s) => peer(names, p.serverId, s)),
         pacer: p.delayMs === null ? null : { delayMs: p.delayMs, tokensLeft: p.tokensLeft },
-        decoded: p.decoded === null ? null : (JSON.parse(p.decoded) as unknown),
+        decoded: decodedJson(p.decoded),
         rawHex: p.rawHex,
+        media: p.media,
       })),
     },
     null,
@@ -169,6 +213,30 @@ function pacerText(p: Packet): string {
   if (p.delayMs === null) return "";
   const delay = p.delayMs > 0 ? `delayed ${String(p.delayMs)} ms` : "not delayed";
   return `${delay}, ${String(p.tokensLeft ?? 0)} tokens left`;
+}
+
+/** The media facts of a media row in the exports, which are always English. */
+export function mediaText(p: Packet): string {
+  const media = p.media;
+  if (media === null) return "";
+  return [
+    media.format === "media" ? ".media document" : `.media legacy v${String(media.version)}`,
+    media.channel === null
+      ? ""
+      : media.control === null
+        ? `channel ${String(media.channel)}`
+        : controlToken(media.control),
+    media.control !== null
+      ? ""
+      : [
+          media.keyframe ? "keyframe" : "delta frame",
+          media.flags === null ? "" : `flags 0x${media.flags.toString(16).padStart(2, "0")}`,
+        ]
+          .filter((part) => part !== "")
+          .join(", "),
+  ]
+    .filter((part) => part !== "")
+    .join(", ");
 }
 
 function headerLines(packets: readonly Packet[], info: ExportInfo): string[] {
@@ -213,6 +281,7 @@ export function packetBlock(p: Packet, names: Names, previousAtMs: number | null
     `${formatTime(p.atMs)} ${p.direction === "sent" ? "↑ sent" : "↓ received"} ${p.kind}, ${formatSize(p.size)}`,
     peersText(p, names),
     pacerText(p),
+    mediaText(p),
     previousAtMs === null ? "" : `gap ${formatGap(p.atMs - previousAtMs)}`,
   ].filter((line) => line !== "");
   const lines = [`### ${facts[0] ?? ""}`, "", ...facts.slice(1).map((f) => `- ${f}`)];

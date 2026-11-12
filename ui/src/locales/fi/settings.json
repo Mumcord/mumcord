@@ -739,7 +739,13 @@
       "gap": "Väli edelliseen pakettiin",
       "kind": "Sisäinen tunnus",
       "size": "Koko",
-      "decoded": "Purettu sisältö"
+      "decoded": "Purettu sisältö",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "kanava {{channel}}",
+      "keyframe": "avainkuva",
+      "delta": "deltakuva"
     },
     "noDecoding": "Tällä sisällöllä ei ole luettavaa muotoa; katso raakatavut.",
     "controlOnly": "Tavallinen Mumble-viesti: vain sen tyyppi ja koko tallennetaan.",
@@ -760,7 +766,8 @@
       "watch": "Yhteiskatselun tila",
       "plugin": "Lisäosan tiedot",
       "mumble": "Mumble-viesti",
-      "peer": "Releen käyttöönotto"
+      "peer": "Releen käyttöönotto",
+      "media": "Mediavirta"
     }
   },
   "licences": {

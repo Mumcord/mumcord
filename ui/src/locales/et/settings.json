@@ -739,7 +739,13 @@
       "gap": "Vahe eelmise paketiga",
       "kind": "Sisemine ID",
       "size": "Suurus",
-      "decoded": "Dekodeeritud sisu"
+      "decoded": "Dekodeeritud sisu",
+      "media": "Meedia"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "võtmeraam",
+      "delta": "deltaraam"
     },
     "noDecoding": "Sellel sisul pole loetavat kuju; vaata toorbaite.",
     "controlOnly": "Tavaline Mumble’i sõnum: salvestatakse ainult selle tüüp ja suurus.",
@@ -760,7 +766,8 @@
       "watch": "Ühisvaatamise olek",
       "plugin": "Plugina andmed",
       "mumble": "Mumble’i sõnum",
-      "peer": "Releeserveri seadistus"
+      "peer": "Releeserveri seadistus",
+      "media": "Meediavoog"
     }
   },
   "licences": {
