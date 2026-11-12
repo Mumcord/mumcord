@@ -197,7 +197,18 @@ export function dominantFrequencies(
   candidates: readonly number[],
   minPower = 0.05 ** 2,
 ): number[] {
-  return candidates.filter((hz) => tonePower(x, hz) >= minPower);
+  if (x.length === 0) return [];
+  // Measure power in 100 ms windows, then average it. One coherent measurement over the
+  // whole recording can cancel an audible tone after a phase jump or small clock drift.
+  const window = RATE / 10;
+  return candidates.filter((hz) => {
+    let power = 0;
+    for (let start = 0; start < x.length; start += window) {
+      const part = x.subarray(start, start + window);
+      power += tonePower(part, hz) * part.length;
+    }
+    return power / x.length >= minPower;
+  });
 }
 
 /**
