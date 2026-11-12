@@ -85,6 +85,7 @@ describe("user-panel camera button", () => {
     ["relayDisallows", "This server's relay doesn't allow camera sharing."],
     ["needsRelayMode", "Camera sharing is turned off. Change it in Privacy & Connections."],
     ["noCertificate", "Camera sharing needs a client certificate."],
+    ["needsDirect", "Camera sharing needs direct connections. Change it in Privacy & Connections."],
   ] as const)("is disabled with the %s reason as tooltip", async (reason, text) => {
     const api = await setup();
     render(
