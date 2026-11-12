@@ -1,4 +1,4 @@
 {
-  "manifest.description": "E2E test plugin: version 3.0.0, API 1.1; the registry entry sets min_mumcord 0.8 (Needs Mumcord).",
+  "manifest.description": "E2E test plugin: version 3.0.0, API 1.1; the registry scenario requires a future Mumcord release (Needs Mumcord).",
   "manifest.name": "Fixture versions"
 }

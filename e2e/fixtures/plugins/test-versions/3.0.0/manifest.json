@@ -2,7 +2,7 @@
   "manifest": 1,
   "id": "test-versions",
   "name": "Fixture versions",
-  "description": "E2E test plugin: version 3.0.0, API 1.1; the registry entry sets min_mumcord 0.8 (Needs Mumcord).",
+  "description": "E2E test plugin: version 3.0.0, API 1.1; the registry scenario requires a future Mumcord release (Needs Mumcord).",
   "version": "3.0.0",
   "api": "^1.1",
   "authors": ["Mumcord test fixtures"],
