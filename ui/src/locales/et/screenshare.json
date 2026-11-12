@@ -159,7 +159,7 @@
     "noFanoutBody_other": "Iga vaataja saab oma koopia sinu arvutist, seega saab vaadata kuni {{max}} inimest. Kvaliteet langeb, kui liitujaid lisandub: praegu vajavad {{count}} vaatajat umbes {{mbit}} Mbit/s üleslaadimiskiirust, seega töötab sinu jagamine tasemel {{now}} taseme {{wanted}} asemel.",
     "fanoutUnavailable": "Releeserveri levi pole saadaval ({{reason}}). Iga vaataja saab oma koopia, seega saab vaadata kuni {{max}} inimest ja kvaliteet võib langeda.",
     "reasonNoRelay": "sellel serveril pole releeserverit",
-    "reasonOldRelay": "selle serveri relay vajab uuendust",
+    "reasonOldRelay": "selle serveri releeserver vajab uuendust",
     "reasonDisallowed": "releeserver ei luba ekraani jagamist",
     "reasonRefused": "releeserver keeldus ülekandest",
     "reasonFull": "releeserver on täis",

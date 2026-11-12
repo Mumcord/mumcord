@@ -101,10 +101,10 @@
     "endedByRelay": "A kamerát a szerver átjátszója leállította",
     "dismissStopped": "Elvetés",
     "notRegistered": "A kamera nem indult el: ezen a szerveren csak regisztrált felhasználók használhatják a kamerát.",
-    "groupNotAllowed": "A kamera nem indult el: a szerver relay-e csak bizonyos csoportokat szolgál ki. Kérj meg egy admint, hogy adjon hozzá.",
+    "groupNotAllowed": "A kamera nem indult el: a szerver átjátszója csak bizonyos csoportokat szolgál ki. Kérj meg egy admint, hogy adjon hozzá.",
     "notSameChannel": "A kamera nem indult el: neked és a nézőidnek ugyanabban a csatornában kell lennetek.",
     "notInChannel": "A kamera nem indult el: előbb lépj be egy csatornába.",
-    "noHello": "A kamera nem indult el: a relay bot még nem ismeri ezt az alkalmazást. Csatlakozz újra a javításhoz."
+    "noHello": "A kamera nem indult el: az átjátszó botja még nem ismeri ezt az alkalmazást. Csatlakozz újra a javításhoz."
   },
   "privacy": {
     "windows": "A Windows blokkolja a kamera elérését az asztali alkalmazások elől",

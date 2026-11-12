@@ -163,7 +163,7 @@
     "noFanoutBody_other": "Cada espectador recibe su propia copia desde tu ordenador, así que pueden ver hasta {{max}} personas. La calidad baja a medida que se unen más: ahora mismo {{count}} espectadores necesitan unos {{mbit}} Mbit/s de subida, por lo que tu transmisión va a {{now}} en lugar de {{wanted}}.",
     "fanoutUnavailable": "La difusión por relé no está disponible ({{reason}}). Cada espectador recibe su propia copia, así que pueden ver hasta {{max}} y la calidad puede bajar.",
     "reasonNoRelay": "este servidor no tiene relé",
-    "reasonOldRelay": "el relay de este servidor necesita una actualización",
+    "reasonOldRelay": "el relé de este servidor necesita una actualización",
     "reasonDisallowed": "el relé no permite compartir pantalla",
     "reasonRefused": "el relé rechazó la difusión",
     "reasonFull": "el relé está lleno",
