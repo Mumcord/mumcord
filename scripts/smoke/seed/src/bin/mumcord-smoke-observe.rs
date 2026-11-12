@@ -31,7 +31,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         expect_user(port.parse()?, username),
     )
     .await
-    .map_err(|_| format!("timed out waiting for {username} on the local server"))?
+    .map_err(|_| "timed out waiting for the expected test user on the local server")?
 }
 
 fn config(port: u16) -> ConnectConfig {
@@ -65,7 +65,7 @@ async fn expect_user(port: u16, username: &str) -> Result<(), Box<dyn std::error
             .with_state(|state| state.users.values().any(|user| user.name == username))
         {
             connection.handle.disconnect();
-            println!("local server sees {username}");
+            println!("local server sees the expected test user");
             return Ok(());
         }
         match connection.events.recv().await {
