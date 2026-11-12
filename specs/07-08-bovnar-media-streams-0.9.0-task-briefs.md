@@ -60,17 +60,18 @@
 | R5 | mumpeer: new format, routing, description cache | done — `4b94be6` on `sothis/mumpeer`, PR #17 | P0.3, W1, W2 | complex |
 | R6 | mumbot: pass `mv` through the broadcast messages | done — `0887674` on `sothis/mumbot`, PR #72 | S1, R1 | simple |
 | E1 | Packet inspector: description, channels, format | done — `e43e87ce`, `fe004f81`, `432578c0`, `42b9eb4e` on `feat/e1-inspector`; screenshots not retaken | D1, R2 | complex |
-| E2 | UI texts and 24 locales for fallback paths | partial — `8f8a516b`: screen-share fallbacks in 24 locales; camera texts wait for D6 | D4, D6 | simple |
+| E2 | UI texts and 24 locales for fallback paths | done — `8f8a516b` screen-share fallbacks and `874ed800` camera path labels in 24 locales (the 0.8.x tile text "This camera needs Mumcord 0.9.0" ships in P0.5, `a2ba6e57`); `i18n.test.ts` guards the fallback texts, `shareView.test.tsx` covers the refusal states; screenshots go to E4 | D4, D6 | simple |
 | E3 | Notices and licences for Bovnar 2.1.0 | done — `scripts/ci/test-notices.sh` passes, 771 Rust / 19 native, 363 texts | – | simple |
 | E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
-then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4, D7, R1–R6 and E3 are
-done; E2 has the screen-share fallbacks. D5 has both halves of the direct camera stream; what
-remains of its "done when" (no relay, old relay, the `needs` reception in a real 0.8.0 build) is
-D6's path matrix, together with the camera texts and E4. The engine dev-dependency temporarily
-points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the 0.9.0 tag exists.
+then release 0.8.0 (P0.1). Push or merge the W1–W3 and W6 branches. D1–D4, D7, R1–R6, E2 and E3 are
+done; E2 has the fallback texts in all 24 locales, guarded by a test, with its screenshots left to
+E4. D5 has both halves of the direct camera stream; what remains of its "done when" (no relay, old
+relay, the `needs` reception in a real 0.8.0 build) is D6's path matrix and E4. The engine
+dev-dependency temporarily points at `sothis/mumbot` branch `feat/media-v2` (PR #72) until the
+0.9.0 tag exists.
 
 Environment notes for the next agents: `cargo check -p mumcord` and any app build fail on a host
 whose rustc is older than 1.97 (cranelift 0.137.1 needs it; CI uses stable, so CI is fine) — say
