@@ -145,6 +145,8 @@
     "direct": "Diretto · crittografato end-to-end",
     "both": "Relay e diretto · crittografato end-to-end",
     "relayTitle": "Ogni fotocamera viene inviata una sola volta al relay e copiata per gli spettatori",
+    "directTitle": "Ogni spettatore riceve la propria copia direttamente da te, senza relay",
+    "bothTitle": "Gli spettatori con un Mumcord più vecchio ricevono una copia dal relay, quelli nuovi il proprio flusso da te",
     "layout": "Layout",
     "grid": "Griglia",
     "speaker": "Oratore",

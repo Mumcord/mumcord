@@ -140,6 +140,8 @@
     "direct": "Direct · end-to-end encrypted",
     "both": "Relay and direct · end-to-end encrypted",
     "relayTitle": "Every camera is sent once to the relay and copied to viewers",
+    "directTitle": "Every viewer gets their own copy straight from you, without a relay",
+    "bothTitle": "Viewers on older Mumcord get a copy from the relay, newer ones their own stream from you",
     "layout": "Layout",
     "grid": "Grid",
     "speaker": "Speaker",

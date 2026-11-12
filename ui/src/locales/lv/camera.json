@@ -145,6 +145,8 @@
     "direct": "Tiešais · šifrēts no gala līdz galam",
     "both": "Relejs un tiešais · šifrēts no gala līdz galam",
     "relayTitle": "Katra kamera tiek nosūtīta releja serverim vienu reizi un nokopēta skatītājiem",
+    "directTitle": "Katrs skatītājs saņem savu kopiju tieši no tevis, bez releja",
+    "bothTitle": "Vecākas Mumcord versijas skatītāji saņem kopiju no releja, jaunākie — savu straumi no tevis",
     "layout": "Izkārtojums",
     "grid": "Režģis",
     "speaker": "Runātājs",

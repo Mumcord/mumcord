@@ -140,6 +140,8 @@
     "direct": "Direkte · end-to-end-krypteret",
     "both": "Relæ og direkte · end-to-end-krypteret",
     "relayTitle": "Hvert kamera sendes én gang til relæet og kopieres til seerne",
+    "directTitle": "Hver seer får sin egen kopi direkte fra dig, uden et relæ",
+    "bothTitle": "Seere med ældre Mumcord får en kopi fra relæet, nyere deres egen strøm fra dig",
     "layout": "Layout",
     "grid": "Gitter",
     "speaker": "Taler",

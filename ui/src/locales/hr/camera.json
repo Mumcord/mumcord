@@ -144,6 +144,8 @@
     "direct": "Izravno · end-to-end šifrirano",
     "both": "Relej i izravno · end-to-end šifrirano",
     "relayTitle": "Svaka se kamera jednom šalje releju, a on je kopira gledateljima",
+    "directTitle": "Svaki gledatelj dobiva vlastitu kopiju izravno od tebe, bez releja",
+    "bothTitle": "Gledatelji sa starijim Mumcordom dobivaju kopiju preko releja, a noviji vlastiti tok od tebe",
     "layout": "Raspored",
     "grid": "Mreža",
     "speaker": "Govornik",

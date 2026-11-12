@@ -145,6 +145,8 @@
     "direct": "Directo · cifrado de extremo a extremo",
     "both": "Relé y directo · cifrado de extremo a extremo",
     "relayTitle": "Cada cámara se envía una vez al relé y se copia a los espectadores",
+    "directTitle": "Cada espectador recibe su propia copia directamente de ti, sin relé",
+    "bothTitle": "Los espectadores con Mumcord antiguo reciben una copia del relé, los nuevos su propio flujo de ti",
     "layout": "Diseño",
     "grid": "Cuadrícula",
     "speaker": "Orador",

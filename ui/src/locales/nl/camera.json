@@ -140,6 +140,8 @@
     "direct": "Direct · end-to-end versleuteld",
     "both": "Relay en direct · end-to-end versleuteld",
     "relayTitle": "Elke camera wordt één keer naar de relay gestuurd en gekopieerd naar kijkers",
+    "directTitle": "Elke kijker krijgt een eigen kopie rechtstreeks van jou, zonder relay",
+    "bothTitle": "Kijkers op oudere Mumcord krijgen een kopie van de relay, nieuwere hun eigen stream van jou",
     "layout": "Indeling",
     "grid": "Raster",
     "speaker": "Spreker",
