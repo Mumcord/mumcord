@@ -744,7 +744,13 @@
       "gap": "Intervallo dal pacchetto precedente",
       "kind": "ID interno",
       "size": "Dimensione",
-      "decoded": "Contenuto decodificato"
+      "decoded": "Contenuto decodificato",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "canale {{channel}}",
+      "keyframe": "fotogramma chiave",
+      "delta": "fotogramma delta"
     },
     "noDecoding": "Questo payload non ha una forma leggibile; vedi i byte grezzi.",
     "controlOnly": "Messaggio Mumble standard: vengono registrati solo tipo e dimensione.",
@@ -765,7 +771,8 @@
       "watch": "Stato della watch party",
       "plugin": "Dati del plugin",
       "mumble": "Messaggio Mumble",
-      "peer": "Configurazione del relay"
+      "peer": "Configurazione del relay",
+      "media": "Flusso multimediale"
     }
   },
   "licences": {

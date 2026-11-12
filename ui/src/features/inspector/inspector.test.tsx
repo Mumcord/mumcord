@@ -57,6 +57,7 @@ function packet(over: Partial<Packet>): Packet {
     tokensLeft: 2,
     decoded: '{\n  "a": "<b>x</b>"\n}',
     rawHex: "7b7d",
+    media: null,
     ...over,
   };
 }
@@ -72,6 +73,34 @@ describe("PacketTable", () => {
     expect(within(row).getByText("→ 3 users")).toBeInTheDocument();
     expect(within(row).getByText("Alice (session 2)")).toBeInTheDocument();
     expect(within(row).getByText(/delayed 340 ms/u)).toBeInTheDocument();
+  });
+
+  it("shows a media message's channel, frame kind and flags", () => {
+    const media = packet({
+      id: 3,
+      kind: ".media",
+      pluginData: false,
+      decoded: null,
+      rawHex: "",
+      media: {
+        format: "media",
+        version: null,
+        channel: 2,
+        control: null,
+        flags: 1,
+        keyframe: true,
+      },
+    });
+    render(<PacketTable packets={[media]} names={names} />);
+    const row = screen.getByRole("row", { name: /12:00:00\.000/u });
+    expect(within(row).getByText("Media stream")).toBeInTheDocument();
+    expect(within(row).getByText(".media")).toBeInTheDocument();
+    const toggle = screen.getByRole("button", { name: /packet at 12:00:00\.000/u });
+    fireEvent.click(toggle);
+    expect(screen.getByText("Media", { selector: "dt" })).toBeInTheDocument();
+    expect(screen.getByText("channel 2 · keyframe · 0x01")).toBeInTheDocument();
+    // A media message has no readable payload, and the list does not claim it was not decoded.
+    expect(screen.queryByText(/has no readable form/u)).toBeNull();
   });
 
   it("expands a row to the decoded fields, the gap, raw hex and copy", async () => {
@@ -114,7 +143,7 @@ describe("PacketInspector", () => {
     const prompt = vi.spyOn(window, "prompt");
     render(<PacketInspector names={names} />);
     expect(await screen.findAllByText("Mumcord hello")).not.toHaveLength(0);
-    expect(screen.getByText("Packets (6 of 6)")).toBeInTheDocument();
+    expect(screen.getByText("Packets (10 of 10)")).toBeInTheDocument();
     expect(screen.getByText(/Voice packets: 1520 sent, 3044 received/u)).toBeInTheDocument();
     // The voice server's line carries the audio rating badge with its reason.
     const voiceLine = screen.getByText(/Voice packets: 1520 sent, 3044 received/u);
@@ -125,7 +154,7 @@ describe("PacketInspector", () => {
 
     fireEvent.click(screen.getByRole("combobox", { name: "Direction" }));
     fireEvent.click(screen.getByRole("option", { name: "Received" }));
-    expect(screen.getByText("Packets (3 of 6)")).toBeInTheDocument();
+    expect(screen.getByText("Packets (3 of 10)")).toBeInTheDocument();
 
     prompt.mockReturnValueOnce("out.json");
     fireEvent.click(screen.getByRole("button", { name: "Export JSON" }));
@@ -149,7 +178,7 @@ describe("PacketInspector", () => {
     setDevToolsUnlocked(true);
     await api.packetCaptureSet(true);
     render(<PacketInspector names={names} />);
-    await screen.findByText("Packets (6 of 6)");
+    await screen.findByText("Packets (10 of 10)");
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
     await screen.findByText("No packets yet.");
   });

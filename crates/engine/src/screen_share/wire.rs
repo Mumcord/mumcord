@@ -39,6 +39,8 @@ use mumcord_p2p::media::{
 };
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
+use crate::inspector::{MediaFormat, MediaTap, MediaTapSink, TapDirection};
+
 pub use mumcord_screenshare::Codec;
 
 /// The wire format of a direct screen stream (FR-7.89, FR-7.98).
@@ -103,6 +105,12 @@ pub fn header_len(version: u8) -> Option<usize> {
         V2 => Some(MAX_HEADER_LEN),
         _ => None,
     }
+}
+
+/// The wire size of one legacy frame: its header plus its payload.
+fn wire_size(version: u8, payload_len: usize) -> u32 {
+    let header = header_len(version).unwrap_or(0);
+    u32::try_from(header + payload_len).unwrap_or(u32::MAX)
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -332,6 +340,8 @@ pub struct FrameWriter<W> {
     payload: Vec<u8>,
     /// One complete mux message.
     message: Vec<u8>,
+    /// Where each framed message goes for the packet inspector (FR-7.101).
+    tap: Option<MediaTapSink>,
 }
 
 impl<W: AsyncWrite + Unpin> FrameWriter<W> {
@@ -344,6 +354,19 @@ impl<W: AsyncWrite + Unpin> FrameWriter<W> {
             finished: false,
             payload: Vec::new(),
             message: Vec::new(),
+            tap: None,
+        }
+    }
+
+    /// Records every message this writer frames for the packet inspector.
+    pub fn with_tap(mut self, tap: Option<MediaTapSink>) -> Self {
+        self.tap = tap;
+        self
+    }
+
+    fn record(&self, tap: MediaTap<'_>) {
+        if let Some(sink) = &self.tap {
+            sink.record(TapDirection::Sent, tap);
         }
     }
 
@@ -362,13 +385,29 @@ impl<W: AsyncWrite + Unpin> FrameWriter<W> {
         if self.payload.len() > media::MAX_DESCRIPTION + 1 {
             return Err(WireError::TooLarge(media::MAX_DESCRIPTION as u32 + 1));
         }
-        self.write_media_message(CHANNEL_CONTROL).await
+        let size = u32::try_from(self.payload.len()).unwrap_or(u32::MAX);
+        self.write_media_message(CHANNEL_CONTROL).await?;
+        self.record(MediaTap::control(
+            MediaFormat::Document,
+            ControlKind::Description,
+            size,
+            Some(description),
+        ));
+        Ok(())
     }
 
     /// Writes one frame in the format this writer was opened with.
     pub async fn write_frame(&mut self, frame: &Frame) -> Result<(), WireError> {
         match self.format {
-            Format::Legacy(version) => write_frame(&mut self.inner, frame, version).await,
+            Format::Legacy(version) => {
+                write_frame(&mut self.inner, frame, version).await?;
+                self.record(MediaTap::legacy(
+                    version,
+                    frame.header.keyframe,
+                    wire_size(version, frame.payload.len()),
+                ));
+                Ok(())
+            }
             Format::Media => self.write_media_frame(frame).await,
         }
     }
@@ -400,7 +439,11 @@ impl<W: AsyncWrite + Unpin> FrameWriter<W> {
         self.payload
             .extend_from_slice(&frame.header.timestamp_us.to_be_bytes());
         self.payload.extend_from_slice(&frame.payload);
-        self.write_media_message(channel).await
+        let flags = self.payload.first().copied().unwrap_or(0);
+        let size = u32::try_from(self.payload.len()).unwrap_or(u32::MAX);
+        self.write_media_message(channel).await?;
+        self.record(MediaTap::track(MediaFormat::Document, channel, flags, size));
+        Ok(())
     }
 
     /// Sends the composed [`payload`](Self::payload) on `channel`, opening the document first.
@@ -448,8 +491,12 @@ pub struct FrameReader<R> {
     auto: bool,
     /// The first legacy header byte read while detecting the format.
     first: Option<u8>,
+    /// The legacy header version once the format is known; `None` for a media document.
+    legacy: Option<u8>,
     /// What the description must say; see [`Self::with_check`].
     check: DescriptionCheck,
+    /// Where every framed message goes for the packet inspector (FR-7.101).
+    tap: Option<MediaTapSink>,
 }
 
 impl<R: AsyncRead + Unpin> FrameReader<R> {
@@ -460,7 +507,12 @@ impl<R: AsyncRead + Unpin> FrameReader<R> {
             media: matches!(format, Format::Media).then(|| MediaFraming::new(check.clone())),
             auto: false,
             first: None,
+            legacy: match format {
+                Format::Legacy(version) => Some(version),
+                Format::Media => None,
+            },
             check,
+            tap: None,
         }
     }
 
@@ -471,8 +523,19 @@ impl<R: AsyncRead + Unpin> FrameReader<R> {
             media: None,
             auto: true,
             first: None,
+            legacy: None,
             check: DescriptionCheck::Any,
+            tap: None,
         }
+    }
+
+    /// Records every message this reader frames for the packet inspector.
+    pub fn with_tap(mut self, tap: Option<MediaTapSink>) -> Self {
+        self.tap = tap.clone();
+        if let Some(media) = &mut self.media {
+            media.tap = tap;
+        }
+        self
     }
 
     /// Accepts only a description `check` allows and ends the stream on any other (FR-8.92):
@@ -496,19 +559,36 @@ impl<R: AsyncRead + Unpin> FrameReader<R> {
             match first[0] {
                 b'#' => {
                     let mut media = MediaFraming::new(self.check.clone());
+                    media.tap = self.tap.clone();
                     media.buffer.push(b'#');
                     self.media = Some(media);
                 }
-                V1 | V2 => self.first = Some(first[0]),
+                V1 | V2 => {
+                    self.first = Some(first[0]);
+                    self.legacy = Some(first[0]);
+                }
                 other => return Err(WireError::BadVersion(other)),
             }
         }
         match &mut self.media {
             Some(media) => media.read_frame(&mut self.inner).await,
-            None => match self.first.take() {
-                Some(first) => read_frame_after_first(&mut self.inner, first).await,
-                None => read_frame(&mut self.inner).await,
-            },
+            None => {
+                let frame = match self.first.take() {
+                    Some(first) => read_frame_after_first(&mut self.inner, first).await?,
+                    None => read_frame(&mut self.inner).await?,
+                };
+                if let (Some(frame), Some(version), Some(sink)) = (&frame, self.legacy, &self.tap) {
+                    sink.record(
+                        TapDirection::Received,
+                        MediaTap::legacy(
+                            version,
+                            frame.header.keyframe,
+                            wire_size(version, frame.payload.len()),
+                        ),
+                    );
+                }
+                Ok(frame)
+            }
         }
     }
 
@@ -528,6 +608,8 @@ struct MediaFraming {
     check: DescriptionCheck,
     /// A description this check refused: the stream is over.
     refused: bool,
+    /// Where every framed message goes for the packet inspector (FR-7.101).
+    tap: Option<MediaTapSink>,
 }
 
 impl MediaFraming {
@@ -540,7 +622,45 @@ impl MediaFraming {
             eof: false,
             check,
             refused: false,
+            tap: None,
         }
+    }
+
+    /// Records one received track message; its flags byte is all the inspector keeps of it.
+    fn record_track(&self, channel: u16, payload: &[u8]) {
+        let Some(sink) = &self.tap else {
+            return;
+        };
+        let flags = payload.first().copied().unwrap_or(0);
+        let size = u32::try_from(payload.len()).unwrap_or(u32::MAX);
+        sink.record(
+            TapDirection::Received,
+            MediaTap::track(MediaFormat::Document, channel, flags, size),
+        );
+    }
+
+    /// Records one received channel-0 message; only a description has readable content.
+    fn record_control(
+        &self,
+        kind: Option<ControlKind>,
+        size: u32,
+        description: Option<&Description>,
+    ) {
+        let Some(sink) = &self.tap else {
+            return;
+        };
+        sink.record(
+            TapDirection::Received,
+            MediaTap {
+                format: MediaFormat::Document,
+                channel: Some(CHANNEL_CONTROL),
+                flags: None,
+                control: kind,
+                size,
+                keyframe: false,
+                description,
+            },
+        );
     }
 
     async fn read_frame<R: AsyncRead + Unpin>(
@@ -609,8 +729,14 @@ impl MediaFraming {
                 self.description_message(payload);
                 None
             }
-            Some(ChannelUse::VideoLayer(layer)) => self.video_frame(layer, payload),
-            Some(ChannelUse::Audio) => self.audio_frame(payload),
+            Some(ChannelUse::VideoLayer(layer)) => {
+                self.record_track(channel, payload);
+                self.video_frame(layer, payload)
+            }
+            Some(ChannelUse::Audio) => {
+                self.record_track(channel, payload);
+                self.audio_frame(payload)
+            }
             Some(ChannelUse::PluginData | ChannelUse::Reserved) | None => {
                 tracing::debug!(
                     channel,
@@ -622,13 +748,23 @@ impl MediaFraming {
     }
 
     fn description_message(&mut self, payload: &[u8]) {
+        let size = u32::try_from(payload.len()).unwrap_or(u32::MAX);
         let Some((&kind, body)) = payload.split_first() else {
             tracing::debug!("dropping an empty media control message");
             return;
         };
         match ControlKind::from_byte(kind) {
             Some(ControlKind::Description) => match Description::parse(body) {
-                Ok(description) if self.check.accepts(&description) => {
+                Ok(description) => {
+                    self.record_control(Some(ControlKind::Description), size, Some(&description));
+                    if !self.check.accepts(&description) {
+                        tracing::debug!(
+                            kind = description.kind.name(),
+                            "refusing a media description this viewer did not ask for"
+                        );
+                        self.refused = true;
+                        return;
+                    }
                     tracing::trace!(
                         kind = description.kind.name(),
                         tracks = description.tracks.len(),
@@ -640,14 +776,8 @@ impl MediaFraming {
                         self.description = Some(description);
                     }
                 }
-                Ok(description) => {
-                    tracing::debug!(
-                        kind = description.kind.name(),
-                        "refusing a media description this viewer did not ask for"
-                    );
-                    self.refused = true;
-                }
                 Err(error) => {
+                    self.record_control(Some(ControlKind::Description), size, None);
                     tracing::debug!(%error, "dropping an invalid media description");
                     // A viewer that waits for one particular stream closes on it; a screen
                     // share keeps reading and waits for a description it can use.
@@ -655,9 +785,13 @@ impl MediaFraming {
                 }
             },
             Some(kind) => {
+                self.record_control(Some(kind), size, None);
                 tracing::debug!(?kind, "ignoring a direct media control message");
             }
-            None => tracing::debug!(kind, "ignoring an unknown media control message"),
+            None => {
+                self.record_control(None, size, None);
+                tracing::debug!(kind, "ignoring an unknown media control message");
+            }
         }
     }
 
@@ -759,6 +893,7 @@ fn codec(codec: VideoCodec) -> Codec {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use std::sync::Arc;
 
     fn video(codec: Codec, payload_len: u32) -> FrameHeader {
         FrameHeader {
@@ -905,6 +1040,82 @@ mod tests {
             read.push(frame);
         }
         assert_eq!(read, frames, "the description fills the frame fields");
+    }
+
+    #[tokio::test]
+    async fn every_message_of_the_document_is_tapped_for_the_inspector() {
+        let inspector = Arc::new(crate::inspector::Inspector::default());
+        inspector.set_enabled(true);
+        let tap = MediaTapSink::new(&inspector, 1);
+        let mut buf = Vec::new();
+        let mut writer = FrameWriter::new(&mut buf, Format::Media).with_tap(Some(tap.clone()));
+        writer
+            .write_description(&screen_description(Codec::Vp9, 1280, 720))
+            .await
+            .unwrap();
+        writer
+            .write_frame(&frame(Codec::Vp9, true, 1, 0, &[1, 2, 3, 4]))
+            .await
+            .unwrap();
+        writer.finish().await.unwrap();
+
+        let sent = inspector.poll(None, Vec::new());
+        assert_eq!(sent.packets.len(), 2);
+        let description = sent.packets[0].media.as_ref().expect("a media row");
+        assert_eq!(description.channel, Some(CHANNEL_CONTROL));
+        assert_eq!(description.control, Some(media::KIND_DESCRIPTION));
+        assert!(
+            sent.packets[0]
+                .decoded
+                .as_deref()
+                .is_some_and(|d: &str| d.contains("\"kind\": \"screen\"")),
+            "the description is decoded"
+        );
+        let layer = sent.packets[1].media.as_ref().expect("a media row");
+        assert_eq!(layer.channel, Some(2), "channel = 1 + layer");
+        assert!(layer.keyframe);
+        assert_eq!(sent.packets[1].size, 1 + 8 + 4, "flags, timestamp, payload");
+        assert_eq!(sent.packets[1].raw_hex, "", "no media content, ever");
+
+        let mut reader = FrameReader::new(buf.as_slice(), Format::Media).with_tap(Some(tap));
+        while reader.read_frame().await.unwrap().is_some() {}
+        let received = inspector.poll(Some(sent.packets[1].id), Vec::new());
+        assert_eq!(received.packets.len(), 2);
+        assert!(
+            received
+                .packets
+                .iter()
+                .all(|p| p.direction == TapDirection::Received)
+        );
+        let layer = received.packets[1].media.as_ref().expect("a media row");
+        assert_eq!(layer.channel, Some(2));
+        assert!(layer.keyframe);
+    }
+
+    #[tokio::test]
+    async fn legacy_frames_are_tapped_with_their_version() {
+        let inspector = Arc::new(crate::inspector::Inspector::default());
+        inspector.set_enabled(true);
+        let tap = MediaTapSink::new(&inspector, 1);
+        let mut buf = Vec::new();
+        let mut writer = FrameWriter::new(&mut buf, Format::Legacy(V2)).with_tap(Some(tap.clone()));
+        writer
+            .write_frame(&frame(Codec::Vp9, true, 0, 0, &[1, 2, 3]))
+            .await
+            .unwrap();
+
+        let sent = inspector.poll(None, Vec::new());
+        let row = &sent.packets[0];
+        assert_eq!(row.kind, ".media legacy v2");
+        assert_eq!(row.size, (MAX_HEADER_LEN + 3) as u32);
+        let view = row.media.as_ref().expect("a media row");
+        assert_eq!((view.channel, view.keyframe), (None, true));
+
+        let mut reader = FrameReader::auto(buf.as_slice()).with_tap(Some(tap));
+        assert!(reader.read_frame().await.unwrap().is_some());
+        let received = inspector.poll(Some(row.id), Vec::new());
+        assert_eq!(received.packets[0].kind, ".media legacy v2");
+        assert_eq!(received.packets[0].direction, TapDirection::Received);
     }
 
     #[tokio::test]

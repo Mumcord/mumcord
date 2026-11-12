@@ -739,7 +739,13 @@
       "gap": "Abstand zum vorherigen Paket",
       "kind": "Interne ID",
       "size": "Größe",
-      "decoded": "Dekodierter Inhalt"
+      "decoded": "Dekodierter Inhalt",
+      "media": "Medium"
+    },
+    "media": {
+      "channel": "Kanal {{channel}}",
+      "keyframe": "Schlüsselbild",
+      "delta": "Deltabild"
     },
     "noDecoding": "Diese Nutzdaten haben keine lesbare Form; siehe die Rohbytes.",
     "controlOnly": "Standard-Mumble-Nachricht: Nur Typ und Größe werden aufgezeichnet.",
@@ -760,7 +766,8 @@
       "watch": "Status der Watch-Party",
       "plugin": "Plugin-Daten",
       "mumble": "Mumble-Nachricht",
-      "peer": "Relay-Einrichtung"
+      "peer": "Relay-Einrichtung",
+      "media": "Medienstrom"
     }
   },
   "licences": {

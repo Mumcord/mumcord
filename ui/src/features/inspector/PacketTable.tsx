@@ -12,6 +12,7 @@ import {
   formatSize,
   formatTime,
   kindKey,
+  mediaFacts,
   packetBlock,
   peerLabel,
   type Names,
@@ -178,6 +179,7 @@ function PacketDetails({ packet, previousAtMs, names }: Omit<RowProps, "open" | 
   const { t } = useTranslation("settings");
   const [hex, setHex] = useState(false);
   const [copy, setCopy] = useState<"copied" | "failed" | null>(null);
+  const media = mediaFacts(t, packet.media);
   const copyPacket = async () => {
     try {
       await getApi().copyText(packetBlock(packet, names, previousAtMs).join("\n"));
@@ -198,10 +200,16 @@ function PacketDetails({ packet, previousAtMs, names }: Omit<RowProps, "open" | 
         </dd>
         <dt>{t("inspector.fields.size")}</dt>
         <dd>{t("inspector.bytes", { bytes: packet.size })}</dd>
+        {media !== null && (
+          <>
+            <dt>{t("inspector.fields.media")}</dt>
+            <dd>{media}</dd>
+          </>
+        )}
       </dl>
       {packet.decoded !== null ? (
         <JsonView json={packet.decoded} label={t("inspector.fields.decoded")} />
-      ) : (
+      ) : packet.media !== null ? null : (
         <p className="settings-hint">
           {packet.pluginData ? t("inspector.noDecoding") : t("inspector.controlOnly")}
         </p>

@@ -17,6 +17,7 @@ use super::media::BROADCAST_KEY;
 use super::state::{Answer, Watching};
 use super::{Here, Signal, WatchBlock, emit, here, send, send_viewers};
 use crate::ServerId;
+use crate::inspector::MediaTapSink;
 use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{Engine, EngineError, EngineResult, ErrorKind, SessionCtx, lock};
 use admit::{Decision, Roster};
@@ -308,6 +309,7 @@ impl Engine {
                     opened.me,
                     opened.link,
                     media.subscribe(BROADCAST_KEY),
+                    Some(MediaTapSink::new(&self.inspector(), server_id)),
                     on_end,
                 ) {
                     Ok(publisher) => {
