@@ -87,7 +87,30 @@ export interface CameraView {
   state: CameraState;
   error: string | null;
   broadcast: string | null;
-  viewers: number[];
+  viewers: CameraViewer[];
+}
+
+/** How one viewer gets the own camera (FR-8.62, FR-8.94). */
+export interface CameraViewer {
+  session: number;
+  path: "relay" | "direct";
+}
+
+/** Waits until the own camera lists `session` as a viewer and returns the viewer. */
+export async function waitOwnViewer(session: number, timeout = 20_000): Promise<CameraViewer> {
+  let viewers: CameraViewer[] = [];
+  await browser
+    .waitUntil(
+      async () => {
+        viewers = (await cameraView())?.viewers ?? [];
+        return viewers.some((v) => v.session === session);
+      },
+      { timeout, interval: 250 },
+    )
+    .catch(() => {
+      throw new Error(`the own viewers are ${JSON.stringify(viewers)}; want ${String(session)}`);
+    });
+  return viewers.find((v) => v.session === session) as CameraViewer;
 }
 
 export type TileState = "announced" | "joining" | "playing" | "full" | "failed" | "hidden";
@@ -368,6 +391,21 @@ function encode(fields: Field[]): Buffer {
   return Buffer.from(out);
 }
 
+/**
+ * The type field of a `mumcord.camera` document (`.t = "on";`, §6.5): Bovnar text, so a scripted
+ * client reads it without a parser.
+ */
+function cameraType(document: string): string {
+  return /\.t\s*=\s*"([a-z-]+)"/.exec(document)?.[1] ?? "";
+}
+
+/** The camera session id a `mumcord.camera` `on` document names (16 lowercase hex). */
+export function cameraId(document: string): string {
+  const id = /\.id\s*=\s*"([0-9a-f]{16})"/.exec(document)?.[1];
+  if (id === undefined) throw new Error(`no camera id in '${document}'`);
+  return id;
+}
+
 /** Varint and length-delimited fields of one protobuf message (enough for ServerSync/UserState). */
 function decode(buf: Buffer): Map<number, (bigint | Buffer)[]> {
   const fields = new Map<number, (bigint | Buffer)[]>();
@@ -421,6 +459,9 @@ export class RawClient {
   private pending = Buffer.alloc(0);
   session: number | undefined;
   readonly users = new Map<number, { name: string; channelId: number }>();
+  /** Plugin data it received, oldest first: `dataId` and payload (a 0.8.x-style scripted viewer
+   * reads the camera session id out of the `mumcord.camera` `on` document). */
+  readonly received: { dataId: string; data: Buffer }[] = [];
 
   constructor(private readonly name: string) {}
 
@@ -464,6 +505,13 @@ export class RawClient {
           name: Buffer.isBuffer(name) ? name.toString("utf8") : (prev?.name ?? ""),
           channelId: typeof channel === "bigint" ? Number(channel) : (prev?.channelId ?? 0),
         });
+      } else if (type === MSG.PluginData) {
+        const f = decode(body);
+        const data = f.get(3)?.[0];
+        const dataId = f.get(4)?.[0];
+        if (Buffer.isBuffer(data) && Buffer.isBuffer(dataId)) {
+          this.received.push({ dataId: dataId.toString("utf8"), data });
+        }
       }
     }
   }
@@ -478,6 +526,25 @@ export class RawClient {
   sessionOf(name: string): number {
     for (const [session, user] of this.users) if (user.name === name) return session;
     throw new Error(`the raw client does not see ${name}`);
+  }
+
+  /**
+   * Waits for a `mumcord.camera` document of type `t` and returns it as text: Bovnar documents
+   * are `.v = 1; .t = "on"; .id = "…";` (§6.5), so a scripted client can read them without a
+   * parser.
+   */
+  async cameraDocument(t: string, timeout = 15_000): Promise<string> {
+    let found = "";
+    await browser.waitUntil(
+      () => {
+        const wanted = this.received.filter((p) => p.dataId === "mumcord.camera");
+        const hit = wanted.find((p) => cameraType(p.data.toString("utf8")) === t);
+        found = hit?.data.toString("utf8") ?? "";
+        return Promise.resolve(hit !== undefined);
+      },
+      { timeout, timeoutMsg: `the raw client got no '${t}' camera document` },
+    );
+    return found;
   }
 
   /** Moves into the channel of `name`, so its camera messages count as same-channel. */

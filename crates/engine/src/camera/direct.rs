@@ -47,6 +47,12 @@ const fn request(first: u8) -> Option<Request> {
     }
 }
 
+/// Whether a direct path with `open` streams can take one more viewer (FR-8.93): a viewer without
+/// a stream fits only below [`MAX_DIRECT_VIEWERS`], one that already has a stream keeps it.
+const fn room_for(open: usize, keeps_stream: bool) -> bool {
+    keeps_stream || open < MAX_DIRECT_VIEWERS
+}
+
 /// The direct streams of one camera session.
 pub(crate) struct DirectViewers {
     /// The camera session id: the `id` of the `on` message and of the stream description.
@@ -67,7 +73,7 @@ impl DirectViewers {
     /// Whether `viewer` can be served over the direct path: it keeps the stream it has, and a
     /// new one fits while the path serves fewer than [`MAX_DIRECT_VIEWERS`] (FR-8.93).
     pub(crate) fn has_room(&self, viewer: u32) -> bool {
-        self.views.len() < MAX_DIRECT_VIEWERS || self.views.contains_key(&viewer)
+        room_for(self.views.len(), self.views.contains_key(&viewer))
     }
 
     /// Sends the camera to `viewer` from now on; a stream it had already closes.
@@ -277,6 +283,28 @@ mod tests {
         // FR-8.93: 8 over the direct path, 25 over a relay broadcast.
         assert_eq!(MAX_DIRECT_VIEWERS, 8);
         assert!(MAX_DIRECT_VIEWERS < usize::from(crate::camera::admit::MAX_VIEWERS));
+    }
+
+    #[test]
+    fn the_ninth_direct_viewer_is_full_and_an_admitted_one_keeps_its_stream() {
+        // The 8 seats of FR-8.93 are taken by open streams; a viewer that already has one is not
+        // turned away by its own seat, and blocked, hidden or left viewers close the stream and
+        // free it again (`DirectViewers::remove`).
+        for open in 0..MAX_DIRECT_VIEWERS {
+            assert!(room_for(open, false), "{open} open streams leave a seat");
+        }
+        assert!(
+            !room_for(MAX_DIRECT_VIEWERS, false),
+            "the ninth viewer is full"
+        );
+        assert!(
+            room_for(MAX_DIRECT_VIEWERS, true),
+            "a viewer keeps its own stream"
+        );
+        assert!(
+            room_for(MAX_DIRECT_VIEWERS + 8, true),
+            "even after a double admit"
+        );
     }
 
     #[test]
