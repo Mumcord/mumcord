@@ -6,6 +6,10 @@
 
 - The install script supports FreeBSD (issue #781): on FreeBSD 15.x (amd64), `fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh` downloads the release's `.pkg`, checks it against SHA256SUMS, installs the packages it needs from the pkg repositories and then installs it with `pkg add` (with sudo or doas when you are not root); running it again updates Mumcord, and `--uninstall` removes it with `pkg delete`
 
+### Changed
+
+- Update bindgen to 0.73 and require prost-build 0.14.5 with prettyplease 0.3 support; remove the temporary Dependabot hold on bindgen minor updates (issue #79)
+
 ### Security
 
 - Upgrade the RSA identity-key generator to the patched `rsa 0.10` release and remove the accepted Marvin timing-attack advisory (issue #131). Existing identities and Mumble-compatible RSA-2048 certificates remain unchanged; certificate signing and TLS still use ring
