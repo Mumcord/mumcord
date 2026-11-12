@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-12
+
 ### Added
 
 - Allow all plugin permissions at once (issue #708): the install prompt has a new "Allow all" button that switches on every optional permission with one click. When some of them are high risk, it asks first and names them; you can allow all, allow all except the high-risk ones, or cancel. The single switches work as before
@@ -719,6 +721,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.8.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.8.0
 [0.7.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.2
 [0.7.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.1
 [0.7.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.0
