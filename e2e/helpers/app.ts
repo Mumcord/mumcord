@@ -265,6 +265,8 @@ export async function startDriver(inst: Instance = state.a): Promise<void> {
     },
   });
   await waitPort(inst.port, true);
+  // The proxy can listen before WebKitWebDriver does; an early session request is refused.
+  await waitPort(inst.port + 1, true);
 }
 
 /** The instance a process belongs to, from its environment (unmarked = A). */
