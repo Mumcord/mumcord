@@ -22,7 +22,7 @@ RUN echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl gnupg git file \
       libwebkit2gtk-4.1-0 libayatana-appindicator3-1 librsvg2-2 libxdo3 libasound2t64 \
-      libssl3t64 webkit2gtk-driver libvpx9 libpipewire-0.3-0t64 \
+      libssl3t64 webkitgtk-webdriver libvpx12 libpipewire-0.3-0t64 \
       xvfb xauth dbus dbus-x11 libnss-wrapper gnome-keyring libsecret-tools xdotool \
       sqlite3 openssl \
       openbox libvulkan1 mesa-vulkan-drivers \
