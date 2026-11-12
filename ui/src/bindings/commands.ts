@@ -1974,6 +1974,16 @@ export type CameraFailure = "notConnected" |
 /**  The relay bot doesn't know this client yet; reconnect (#601). */
 "noHello";
 
+/**
+ *  How one viewer gets the own camera (FR-8.62, FR-8.94); the camera room's viewer list shows
+ *  it.
+ */
+export type CameraPath = 
+/**  Through the relay broadcast. */
+"relay" | 
+/**  Through its own stream. */
+"direct";
+
 /**  "Reduce motion" for the speaking frame; `system` follows the operating system. */
 export type CameraReduceMotion = "system" | "on" | "off";
 
@@ -2046,7 +2056,7 @@ export type CameraTileState =
 "hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
-export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | 
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | "needsDirect" | 
 /**  This platform has no camera backend at all (FR-13.27). */
 "unsupportedPlatform";
 
@@ -2061,13 +2071,6 @@ export type CameraView = {
 	/**  The people who receive the camera now, with the path each of them gets. */
 	viewers: CameraViewer[],
 };
-
-/**  How one viewer gets the own camera (FR-8.62, FR-8.94); the camera room's viewer list shows it. */
-export type CameraPath = 
-/**  Through the relay broadcast. */
-"relay" | 
-/**  Through its own stream. */
-"direct";
 
 /**  One admitted viewer of the own camera. */
 export type CameraViewer = {
@@ -2511,7 +2514,7 @@ export type ErrorCode =
 /**  The screen share already has the maximum of 8 viewers (FR-2.43). */
 "shareFull" | 
 /**  The share or camera needs a newer Mumcord. */
-"needsUpdate" |
+"needsUpdate" | 
 /**
  *  Watching a screen share needs a direct connection and none can be made (FR-2.46);
  *  `message` is the reason: `consentOff`, `peerUnsupported` or `noDirectPath`.
