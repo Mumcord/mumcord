@@ -106,6 +106,10 @@ if [ "$step" != test ]; then
 fi
 [ "$step" = build ] && exit 0
 
+# Fail before WebDriver if native dialog icons cannot load, with the loader's own diagnostics.
+# Keep verbose loader logging in this probe, not in the app or its chat/plugin processes.
+RUST_LOG=glycin=debug python3 -I e2e/helpers/check-svg.py
+
 # The bot is a release binary, not built from this repository: point it at this checkout's test
 # servers (SuperUser password) and at a fixed place for its certificates (AC-1.2 imports one).
 export MUMCORD_TESTENV_DIR="$PWD/testenv" MUMCORD_BOT_DATA="$HOME/.local/share/mumbot"

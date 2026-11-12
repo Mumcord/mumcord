@@ -119,8 +119,8 @@ if [ -n "$mumpeer" ] && [ -f "$mumpeer/testenv/up.sh" ]; then
   export MUMCORD_E2E_OLD_MUMPEER_IMAGE="${MUMCORD_E2E_OLD_MUMPEER_IMAGE:-ghcr.io/mumcord/mumpeer:0.1.0}"
   export MUMCORD_E2E_OLD_MUMBOT_IMAGE="${MUMCORD_E2E_OLD_MUMBOT_IMAGE:-ghcr.io/mumcord/mumbot:0.4.1}"
 fi
-# Ubuntu runner AppArmor can block nested bubblewrap namespaces and crash Glycin's SVG loader
-# in native file dialogs. Let the E2E container run the loader's own sandbox.
+# Keep Docker's default seccomp profile: Glycin detects blocked user namespaces and loads
+# icons inside the container instead of attempting a nested bubblewrap sandbox.
 # Host network: the app, bots and netsim reach the testenv servers on localhost:64738-64741 and
 # netsim on 64800/64801. The repo is mounted at its host path so docker compose (via the host
 # socket) resolves testenv's relative volume paths to real host paths.
@@ -128,8 +128,6 @@ exec docker run --rm -i --init "${tty[@]}" \
   --network host \
   --user "$(id -u):$(id -g)" \
   --group-add "$(stat -c %g /var/run/docker.sock)" \
-  --security-opt seccomp=unconfined \
-  --security-opt apparmor=unconfined \
   --shm-size 1g \
   --add-host declared.plugins.test:127.0.0.1 --add-host undeclared.plugins.test:127.0.0.1 \
   --add-host update.plugins.test:127.0.0.1 \
