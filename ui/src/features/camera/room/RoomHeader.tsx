@@ -3,7 +3,7 @@
  * "{n} of 9 cameras" while the room is full, how the own camera reaches its viewers — Relay,
  * Direct or both — and the layout switch Grid / Speaker, a radio group (spec 08 §5.5).
  */
-import { useRef, type KeyboardEvent } from "react";
+import { useId, useRef, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { RoomIcon } from "./icons";
 import { ROOM_MAX } from "./layout";
@@ -20,6 +20,10 @@ export function RoomHeader({ model }: { model: RoomModel }) {
   // The room's own camera decides how the header speaks about the path (FR-8.62); with the own
   // camera off nothing here knows a path, and the chip keeps the room's plain relay text.
   const path = ownCameraPath(model.own) ?? "relay";
+  // The chip says what the path means in a tooltip and in the same words as its description, so
+  // keyboard and screen-reader users get the explanation too (FR-8.62).
+  const pathTipId = useId();
+  const pathTip = t(`room.${path}Title`);
   return (
     <header className="cam-room__head">
       <span className="cam-room__icon" aria-hidden="true">
@@ -37,13 +41,20 @@ export function RoomHeader({ model }: { model: RoomModel }) {
             {t("room.limit", { count: model.cameraCount, max: ROOM_MAX })}
           </span>
         )}
+        {/* Focusable so keyboard users can open the explanation, as on the sound badge. */}
         <span
           className="cam-chip"
           data-tone="ok"
-          data-tooltip={path === "relay" ? t("room.relayTitle") : undefined}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          data-tooltip={pathTip}
+          aria-describedby={pathTipId}
         >
           <RoomIcon name="relay" size={12} />
           {t(`room.${path}`)}
+        </span>
+        <span id={pathTipId} className="visually-hidden">
+          {pathTip}
         </span>
         <LayoutSwitch layout={model.layout} />
       </span>
