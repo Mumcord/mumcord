@@ -2,9 +2,9 @@
 // AC-9.30 against the fixture registry (official + third-party, each with `v1/` and `v1.1/`).
 //
 // - `test-versions` has 1.0.0 (API 1.0), 2.0.0 (API 1.1) and 3.0.0 (API 1.1, the index sets
-//   `min_mumcord: "0.8"`): 0.7.0 installs 2.0.0, the v1 index lists only 1.0.0, and 3.0.0 is held
-//   back as "Update available after updating Mumcord" with automatic updates on.
-// - "Fixture Highlight" gets `min_mumcord: "0.8"` on every version: "Needs Mumcord 0.8.0 or newer".
+//   `min_mumcord` to the next minor release): this build installs 2.0.0, the v1 index lists only
+//   1.0.0, and 3.0.0 is held back as "Update available after updating Mumcord" with automatic updates on.
+// - "Fixture Highlight" needs the next minor release on every version: "Needs Mumcord … or newer".
 // - `test-api12` declares `api: "^1.2"` in its package; the index claims 1.1 so Browse offers it
 //   and only the client's check of the downloaded package can refuse it (FR-9.17).
 // - The third-party repository is added by its `v1/index.json`: without a `v1.1` sibling only
@@ -13,7 +13,7 @@
 // Manual (not on the Linux CI runner): a 0.6.x release build pointed at the fixture registry
 // installs test-versions 1.0.0 and never sees 2.0.0, and refuses a local 1.1 package (AC-9.26,
 // #396 AC 1 and 3). There is no 1.0-only client here, so the refusal is automated with an API
-// this 0.7.0 build does not know (^1.2).
+// this build does not know (^1.2).
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { $, $$, browser, expect } from "@wdio/globals";
@@ -80,14 +80,20 @@ async function addRepository(url: string): Promise<void> {
 
 describe("plugins: API versions and Needs Mumcord (AC-9.26 … AC-9.28, AC-9.30)", () => {
   let fixtures: pluginenv.PluginFixtures;
+  let nextRelease: string;
 
   before(async function () {
     this.timeout(20 * 60_000);
+    // Stay ahead of the running binary, not its display version or a hard-coded old release.
+    const info = await app.invoke<{ packageVersion: string }>("app_info");
+    const version = /^(\d+)\.(\d+)\./.exec(info.packageVersion);
+    if (!version) throw new Error(`invalid Mumcord package version: ${info.packageVersion}`);
+    nextRelease = `${version[1]}.${String(Number(version[2]) + 1)}`;
     fixtures = await pluginenv.startPluginFixtures({
       official: {
         scenarios: [
-          "min-mumcord:test-versions@3.0.0=0.8",
-          "min-mumcord:echolings=0.8",
+          `min-mumcord:test-versions@3.0.0=${nextRelease}`,
+          `min-mumcord:echolings=${nextRelease}`,
           "index-api:test-api12=1.1",
         ],
       },
@@ -123,14 +129,14 @@ describe("plugins: API versions and Needs Mumcord (AC-9.26 … AC-9.28, AC-9.30)
         ["3.0.0", "1.1"],
       ]),
     );
-    expect(v11.find((v) => v.version === "3.0.0")?.min_mumcord).toBe("0.8");
+    expect(v11.find((v) => v.version === "3.0.0")?.min_mumcord).toBe(nextRelease);
   });
 
   it("AC-9.27: a plugin without a version for this Mumcord shows Needs Mumcord, Install disabled", async () => {
     await openPlugins("Browse");
     await card(HIGHLIGHT).waitForDisplayed({ timeout: 30_000 });
     await expect(card(HIGHLIGHT).$(".plugin-card-needs")).toHaveText(
-      expect.stringContaining("Needs Mumcord 0.8.0 or newer"),
+      expect.stringContaining(`Needs Mumcord ${nextRelease}.0 or newer`),
     );
     await expect(card(HIGHLIGHT).$("button.plugin-card-needs-link")).toHaveText("Update Mumcord");
     await expect(card(HIGHLIGHT).$(`button[aria-label='Install ${HIGHLIGHT}']`)).toBeDisabled();
@@ -138,7 +144,7 @@ describe("plugins: API versions and Needs Mumcord (AC-9.26 … AC-9.28, AC-9.30)
     await expect(card(VERSIONS).$(".plugin-card-needs")).not.toBeExisting();
   });
 
-  it("AC-9.26: 0.7.0 installs the newest version it can run (2.0.0, API 1.1)", async () => {
+  it("AC-9.26: installs the newest version this build can run (2.0.0, API 1.1)", async () => {
     const install = card(VERSIONS).$(`button[aria-label='Install ${VERSIONS}']`);
     await install.waitForClickable({ timeout: 30_000 });
     await install.click();
