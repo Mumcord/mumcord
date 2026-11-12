@@ -96,6 +96,8 @@ describe("chat: private messages overview (#173)", () => {
   });
 
   it("pin and mute survive a restart; the row opens the private chat", async () => {
+    // The overview needs stored chat history; a forced restart can discard the pending batch.
+    await app.quitCleanly();
     await app.restart({});
     await reconnectSaved();
     await openOverview();
