@@ -122,10 +122,16 @@ export interface CameraView {
   state: "off" | "preview" | "requesting" | "onAir";
   /** A `CameraFailure` code ("roomFull", "relayDown", …). */
   error: string | null;
-  /** The broadcast id while on air. */
+  /** The broadcast id while on air; `null` for a camera that runs without a relay broadcast. */
   broadcast: string | null;
-  /** Session ids of the people who receive the camera now. */
-  viewers: number[];
+  /** The people who receive the camera now, with the path each of them gets (FR-8.94). */
+  viewers: CameraViewer[];
+}
+
+/** How one viewer gets the own camera (FR-8.62, FR-8.94). */
+export interface CameraViewer {
+  session: number;
+  path: "relay" | "direct";
 }
 
 /** The own camera of the running client (`camera_view`), `null` when it is off. */
