@@ -40,6 +40,10 @@ const OFFICIAL = "Test Stage Official";
 const SURFACE = "Test Surface";
 const TOO_MANY = "Too many activities in this channel";
 
+interface StageWindow extends Window {
+  __fullscreenBanner?: { text: string; observer: MutationObserver };
+}
+
 interface Activity {
   id: string;
   plugin: string;
@@ -386,12 +390,46 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
     const frame = stageFrame(STAGE);
     await frame.waitForDisplayed({ timeout: 10_000 });
 
-    const full = stageButton(STAGE, "Full screen");
-    await full.click();
-    const banner = $("p.plugin-stage__banner");
-    await expect(banner).toHaveText(`${STAGE} is full screen · Esc to exit`, { wait: 5_000 });
-    // The banner goes after 3 s; full screen stays until Esc.
-    await banner.waitForExist({ reverse: true, timeout: 8_000 });
+    // A WebDriver round trip can miss the 3 s banner. Record it before activating the button,
+    // then check its text after it disappears; full screen must still remain active.
+    await frame.execute((element) => {
+      const w = window as StageWindow;
+      const observer = new MutationObserver(() => {
+        const banner = element.querySelector("p.plugin-stage__banner");
+        if (banner !== null && w.__fullscreenBanner !== undefined) {
+          w.__fullscreenBanner.text = banner.textContent.trim();
+        }
+      });
+      w.__fullscreenBanner = { text: "", observer };
+      observer.observe(element, { childList: true, subtree: true, characterData: true });
+    });
+    try {
+      // WebKit's pointer click sometimes reaches the button without entering full screen.
+      // A real Enter key on the focused button exercises the same handler reliably.
+      const full = stageButton(STAGE, "Full screen");
+      await full.waitForClickable({ timeout: 10_000 });
+      await full.execute((button) => {
+        button.focus();
+      });
+      await expect(full).toBeFocused();
+      await browser.keys("Enter");
+      const text = await browser.waitUntil(
+        () =>
+          frame.execute((element) =>
+            element.querySelector("p.plugin-stage__banner") === null
+              ? (window as StageWindow).__fullscreenBanner?.text
+              : "",
+          ),
+        { timeout: 8_000, timeoutMsg: "the full-screen banner never appeared and disappeared" },
+      );
+      expect(text).toBe(`${STAGE} is full screen · Esc to exit`);
+    } finally {
+      await browser.execute(() => {
+        const w = window as StageWindow;
+        w.__fullscreenBanner?.observer.disconnect();
+        delete w.__fullscreenBanner;
+      });
+    }
     await expect(stageButton(STAGE, "Leave full screen")).toHaveAttribute("aria-pressed", "true");
     await browser.keys("Escape");
     await expect(stageButton(STAGE, "Full screen")).toHaveAttribute("aria-pressed", "false", {

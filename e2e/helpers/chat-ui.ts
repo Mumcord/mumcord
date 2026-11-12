@@ -355,9 +355,16 @@ export async function readClipboard(kind: "text" | "png"): Promise<string> {
  */
 export async function startScreenShare(): Promise<void> {
   await $("button.chat-apps__button").click();
-  await $(
+  const share = $(
     "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share your screen')]",
-  ).click();
+  );
+  await share.waitForDisplayed({ timeout: 10_000 });
+  // Capability checks can resize the menu after it opens. Keyboard activation cannot hit a
+  // neighbouring plugin action when WebKit's pointer coordinates lag behind that layout change.
+  await browser.keys("Home");
+  await expect(share).toBeFocused();
+  await expect(share).not.toHaveAttribute("aria-disabled", "true");
+  await browser.keys("Enter");
   const confirm = $("//dialog//button[normalize-space()='Choose what to share']");
   await confirm.waitForClickable({
     timeout: 20_000,
