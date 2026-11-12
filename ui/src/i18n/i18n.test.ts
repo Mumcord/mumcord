@@ -223,6 +223,7 @@ describe("translation files", () => {
     "it screenviewer.pathRelay",
     "mt screenviewer.pathRelay",
     "nl screenviewer.pathRelay",
+    "sk screenviewer.pathRelay",
     "fr screenviewer.pathDirect",
     "nl screenviewer.pathDirect",
     "cs screenviewer.header.relay",
