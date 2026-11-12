@@ -36,6 +36,17 @@ jobs:
       - name: shellcheck
         run: shellcheck -s sh scripts/install.sh scripts/install-test/*.sh
 
+  # A real FreeBSD install cannot run in a Linux container; this checks the FreeBSD path's
+  # platform checks, downloads, checksum and pkg commands with faked FreeBSD tools.
+  freebsd:
+    name: FreeBSD path (faked tools)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Test
+        run: sh scripts/install-test/check-freebsd.sh
+
   fake-release:
     name: Build fake release
     runs-on: ubuntu-24.04
