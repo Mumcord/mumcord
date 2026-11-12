@@ -13,7 +13,3 @@ reason = "zbus_names is unmaintained (no vulnerability); via zbus 5 (#131)"
 [[IgnoredVulns]]
 id = "RUSTSEC-2026-0372"
 reason = "zvariant_derive is unmaintained (no vulnerability); via zbus 5 (#131)"
-
-[[IgnoredVulns]]
-id = "RUSTSEC-2023-0071"
-reason = "rsa Marvin timing attack: rsa only generates identity keys; all private-key operations (signing, TLS) run in ring, so the vulnerable code is not reachable; fix needs the semver-major rsa 0.10 (#131)"

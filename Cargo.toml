@@ -91,7 +91,7 @@ sha2 = "0.11"
 rcgen = "0.14"
 p12-keystore = "0.4"
 # Only used to generate RSA identity keys (ring cannot generate RSA keys); signing stays with ring.
-rsa = { version = "0.9", default-features = false, features = ["std", "getrandom", "u64_digit"] }
+rsa = { version = "0.10", default-features = false, features = ["std", "getrandom", "encoding"] }
 
 # Audio
 # realtime-dbus: cpal asks for real-time scheduling of its device threads (rtkit over D-Bus on
@@ -289,7 +289,10 @@ debug = "line-tables-only"
 [profile.dev.package.rsa]
 opt-level = 3
 
-[profile.dev.package.num-bigint-dig]
+[profile.dev.package.crypto-bigint]
+opt-level = 3
+
+[profile.dev.package.crypto-primes]
 opt-level = 3
 
 # Voice DSP (noise suppression, echo cancellation, resampling, Opus) in an unoptimised build
