@@ -140,6 +140,8 @@
     "direct": "Otse · otspunktkrüptitud",
     "both": "Releeserver ja otse · otspunktkrüptitud",
     "relayTitle": "Iga kaamera saadetakse üks kord releeserverisse ja kopeeritakse vaatajatele",
+    "directTitle": "Iga vaataja saab oma koopia otse sinult, ilma releeserverita",
+    "bothTitle": "Vanema Mumcordi vaatajad saavad koopia releeserverist, uuemad oma voo sinult",
     "layout": "Paigutus",
     "grid": "Ruudustik",
     "speaker": "Kõneleja",

@@ -152,6 +152,8 @@
     "direct": "Díreach · criptithe ó cheann go ceann",
     "both": "Athsheachadán agus díreach · criptithe ó cheann go ceann",
     "relayTitle": "Seoltar gach ceamara uair amháin chuig an athsheachadán agus déantar cóip de lucht féachana",
+    "directTitle": "Faigheann gach duine de lucht féachana a chóip féin uait go díreach, gan athsheachadán",
+    "bothTitle": "Faigheann lucht féachana ar Mumcord níos sine cóip ón athsheachadán, agus lucht féachana níos nuaí a sruth féin uait",
     "layout": "Leagan amach",
     "grid": "Greille",
     "speaker": "Cainteoir",

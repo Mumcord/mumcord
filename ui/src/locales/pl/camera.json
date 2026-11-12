@@ -151,6 +151,8 @@
     "direct": "Bezpośrednio · szyfrowanie end-to-end",
     "both": "Przekaźnik i bezpośrednio · szyfrowanie end-to-end",
     "relayTitle": "Każda kamera jest wysyłana raz do przekaźnika i kopiowana do widzów",
+    "directTitle": "Każdy widz dostaje własną kopię prosto od ciebie, bez przekaźnika",
+    "bothTitle": "Widzowie starszego Mumcorda dostają kopię z przekaźnika, nowsi własny strumień od ciebie",
     "layout": "Układ",
     "grid": "Siatka",
     "speaker": "Mówca",

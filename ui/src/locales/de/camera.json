@@ -140,6 +140,8 @@
     "direct": "Direkt · Ende-zu-Ende-verschlüsselt",
     "both": "Relay und direkt · Ende-zu-Ende-verschlüsselt",
     "relayTitle": "Jede Kamera wird einmal an das Relay gesendet und an die Zuschauer verteilt",
+    "directTitle": "Jeder Zuschauer bekommt eine eigene Kopie direkt von dir, ohne Relay",
+    "bothTitle": "Zuschauer mit älterem Mumcord bekommen eine Kopie vom Relay, neuere ihren eigenen Stream von dir",
     "layout": "Layout",
     "grid": "Raster",
     "speaker": "Sprecher",

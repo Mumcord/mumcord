@@ -144,6 +144,8 @@
     "direct": "Direct · criptat end-to-end",
     "both": "Releu și direct · criptat end-to-end",
     "relayTitle": "Fiecare cameră este trimisă o singură dată releului și copiată pentru spectatori",
+    "directTitle": "Fiecare spectator primește propria copie direct de la tine, fără releu",
+    "bothTitle": "Spectatorii cu o versiune mai veche de Mumcord primesc o copie de la releu, cei mai noi fluxul lor propriu de la tine",
     "layout": "Aranjare",
     "grid": "Grilă",
     "speaker": "Vorbitor",

@@ -132,6 +132,8 @@ describe("translation files", () => {
       "room.direct",
       "room.both",
       "room.relayTitle",
+      "room.directTitle",
+      "room.bothTitle",
       "viewers.relay",
       "viewers.direct",
       "tile.full",
