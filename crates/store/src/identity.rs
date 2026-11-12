@@ -7,12 +7,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use p12_keystore::{
     Certificate, KeyStore, KeyStoreEntry, Pkcs12Archive, PrivateKey, PrivateKeyChain,
 };
+use rand::{TryRng, rngs::SysRng};
 use rcgen::{
     CertificateParams, DistinguishedName, DnType, ExtendedKeyUsagePurpose, IsCa, KeyPair,
     PublicKeyData, SerialNumber, date_time_ymd,
 };
 use rsa::pkcs8::EncodePrivateKey;
-use rsa::rand_core::{OsRng, RngCore};
 use sha1::{Digest, Sha1};
 
 use crate::error::{Error, Result};
@@ -57,10 +57,8 @@ impl Identity {
         }
         // ring (our crypto backend, chosen to keep the build cmake-free) cannot generate
         // RSA keys, so the `rsa` crate is used for key generation only. All private-key
-        // operations (certificate signing here, TLS signatures at runtime) run in ring;
-        // RUSTSEC-2023-0071 (timing side channel) concerns the `rsa` crate's private-key
-        // operations, which are never used.
-        let key = rsa::RsaPrivateKey::new(&mut OsRng, RSA_BITS)
+        // operations (certificate signing here, TLS signatures at runtime) run in ring.
+        let key = rsa::PrivateKey::new(&mut SysRng, RSA_BITS)
             .map_err(|e| Error::KeyGeneration(e.to_string()))?;
         let key_pkcs8 = key
             .to_pkcs8_der()
@@ -73,7 +71,7 @@ impl Identity {
         params.distinguished_name = subject;
         params.is_ca = IsCa::ExplicitNoCa;
         params.extended_key_usages = vec![ExtendedKeyUsagePurpose::ClientAuth];
-        params.serial_number = Some(random_serial());
+        params.serial_number = Some(random_serial()?);
         let (year, month, day) = today_utc();
         params.not_before = date_time_ymd(year, month, day);
         // Feb 29 does not exist in every target year.
@@ -170,12 +168,14 @@ fn common_name(subject: &str) -> Option<String> {
         .map(str::to_owned)
 }
 
-fn random_serial() -> SerialNumber {
+fn random_serial() -> Result<SerialNumber> {
     let mut bytes = [0u8; 16];
-    OsRng.fill_bytes(&mut bytes);
+    SysRng
+        .try_fill_bytes(&mut bytes)
+        .map_err(|e| Error::KeyGeneration(e.to_string()))?;
     // Serial numbers must be positive DER integers.
     bytes[0] &= 0x7f;
-    SerialNumber::from_slice(&bytes)
+    Ok(SerialNumber::from_slice(&bytes))
 }
 
 /// Today's UTC date as (year, month, day).
@@ -239,6 +239,30 @@ mod tests {
             Identity::generate("  "),
             Err(Error::EmptyIdentityName)
         ));
+    }
+
+    #[test]
+    fn generated_identity_can_sign_and_verify_with_ring() {
+        let key_pair = ring::signature::RsaKeyPair::from_pkcs8(TESTER.key_pkcs8_der())
+            .expect("ring loads generated PKCS#8 key");
+        assert_eq!(key_pair.public().modulus_len() * 8, RSA_BITS);
+
+        let message = b"Mumcord identity compatibility";
+        let mut signature = vec![0; key_pair.public().modulus_len()];
+        key_pair
+            .sign(
+                &ring::signature::RSA_PKCS1_SHA256,
+                &ring::rand::SystemRandom::new(),
+                message,
+                &mut signature,
+            )
+            .expect("ring signs with generated key");
+        ring::signature::UnparsedPublicKey::new(
+            &ring::signature::RSA_PKCS1_2048_8192_SHA256,
+            key_pair.public(),
+        )
+        .verify(message, &signature)
+        .expect("signature matches generated public key");
     }
 
     #[test]
