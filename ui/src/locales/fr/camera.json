@@ -144,6 +144,8 @@
     "direct": "Direct · chiffré de bout en bout",
     "both": "Relais et direct · chiffré de bout en bout",
     "relayTitle": "Chaque caméra est envoyée une seule fois au relais, qui la copie pour les spectateurs",
+    "directTitle": "Chaque spectateur reçoit sa propre copie directement de vous, sans relais",
+    "bothTitle": "Les spectateurs d'une ancienne version de Mumcord reçoivent une copie du relais, les plus récents leur propre flux direct",
     "layout": "Disposition",
     "grid": "Grille",
     "speaker": "Orateur",

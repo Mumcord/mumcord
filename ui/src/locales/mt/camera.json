@@ -151,6 +151,8 @@
     "direct": "Dirett · encrypted minn tarf sa tarf",
     "both": "Relay u dirett · encrypted minn tarf sa tarf",
     "relayTitle": "Kull kamera tintbagħat darba lir-relay u tiġi kkupjata għal dawk li jaraw",
+    "directTitle": "Kull min jara jieħu l-kopja tiegħu direttament mingħandek, mingħajr relay",
+    "bothTitle": "Dawk li jaraw b'Mumcord iktar antik jieħdu kopja mir-relay, u dawk il-ġodda l-istream tagħhom mingħandek",
     "layout": "Disinn",
     "grid": "Griglja",
     "speaker": "Kelliem",

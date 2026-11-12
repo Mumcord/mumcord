@@ -147,6 +147,8 @@
     "direct": "Tiesiogiai · visapusiškai užšifruota",
     "both": "Perdavimo mazgas ir tiesiogiai · visapusiškai užšifruota",
     "relayTitle": "Kiekviena kamera vieną kartą siunčiama į perdavimo mazgą ir kopijuojama žiūrovams",
+    "directTitle": "Kiekvienas žiūrovas gauna savo kopiją tiesiogiai iš tavęs, be perdavimo mazgo",
+    "bothTitle": "Senesnio Mumcord žiūrovai gauna kopiją iš perdavimo mazgo, naujesni – savo srautą iš tavęs",
     "layout": "Išdėstymas",
     "grid": "Tinklelis",
     "speaker": "Kalbantysis",

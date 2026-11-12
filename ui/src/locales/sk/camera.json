@@ -150,6 +150,8 @@
     "direct": "Priamo · end-to-end šifrovanie",
     "both": "Relay a priamo · end-to-end šifrovanie",
     "relayTitle": "Každá kamera sa na relay pošle raz a ten ju rozkopíruje divákom",
+    "directTitle": "Každý divák dostane vlastnú kópiu priamo od teba, bez relay",
+    "bothTitle": "Diváci so starším Mumcordom dostanú kópiu z relay, novší vlastný stream od teba",
     "layout": "Rozloženie",
     "grid": "Mriežka",
     "speaker": "Rečník",

@@ -150,6 +150,8 @@
     "direct": "Neposredno · šifriranje od konca do konca",
     "both": "Relej in neposredno · šifriranje od konca do konca",
     "relayTitle": "Vsaka kamera se releju pošlje enkrat, ta pa jo skopira gledalcem",
+    "directTitle": "Vsak gledalec dobi svojo kopijo neposredno od tebe, brez releja",
+    "bothTitle": "Gledalci s starejšim Mumcordom dobijo kopijo z releja, novejši pa svoj lastni tok od tebe",
     "layout": "Postavitev",
     "grid": "Mreža",
     "speaker": "Govorec",

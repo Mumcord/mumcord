@@ -139,6 +139,8 @@
     "direct": "Közvetlen · végpontok közötti titkosítás",
     "both": "Átjátszó és közvetlen · végpontok közötti titkosítás",
     "relayTitle": "Minden kamera egyszer megy az átjátszóhoz, ami lemásolja a nézőknek",
+    "directTitle": "Minden néző a saját másolatát kapja közvetlenül tőled, átjátszó nélkül",
+    "bothTitle": "A régebbi Mumcordot használó nézők másolatot kapnak az átjátszótól, az újabbak a saját adatfolyamukat tőled",
     "layout": "Elrendezés",
     "grid": "Rács",
     "speaker": "Beszélő",
