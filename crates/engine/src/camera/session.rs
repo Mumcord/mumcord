@@ -230,6 +230,9 @@ pub(crate) fn next_state(state: CameraState, step: Step) -> Option<CameraState> 
     }
 }
 
+/// The bot's answer to a `cam-join`: the broadcast, the token for it and its media format.
+type CameraToken = (BroadcastId, RelayToken, bool);
+
 /// The broadcast id as `mumcord.camera` carries it.
 pub fn broadcast_hex(id: BroadcastId) -> String {
     format!("{:016x}", id.0)
@@ -398,7 +401,7 @@ pub(crate) struct Cameras {
     /// The OS camera API, or the test camera; set once.
     backend: Option<Arc<dyn CameraBackend>>,
     /// Viewers waiting for the bot's `bcast-tok` of a camera, by server and camera owner.
-    waiting: HashMap<(ServerId, u32), oneshot::Sender<(BroadcastId, RelayToken)>>,
+    waiting: HashMap<(ServerId, u32), oneshot::Sender<CameraToken>>,
     /// Other people's cameras (the viewer side).
     pub(super) recv: super::recv::Receiving,
     /// Broadcast ends kept open by the test viewer.
@@ -982,13 +985,14 @@ impl Engine {
         sharer: u32,
         id: BroadcastId,
         token: RelayToken,
+        media: bool,
     ) {
         let waiter = lock(self.camera_state())
             .waiting
             .remove(&(ctx.server_id, sharer));
         match waiter {
             Some(waiter) => {
-                let _ = waiter.send((id, token));
+                let _ = waiter.send((id, token, media));
             }
             None => tracing::debug!("ignoring a camera token nobody waits for"),
         }
@@ -1000,7 +1004,7 @@ impl Engine {
         &self,
         server_id: ServerId,
         sharer: u32,
-    ) -> oneshot::Receiver<(BroadcastId, RelayToken)> {
+    ) -> oneshot::Receiver<CameraToken> {
         let (tx, rx) = oneshot::channel();
         lock(self.camera_state())
             .waiting
@@ -1029,7 +1033,7 @@ impl Engine {
         if !signal::send(&ctx, &[sharer], &join) {
             return Err(failed("cam-join not sent"));
         }
-        let (bid, token) = tokio::time::timeout(std::time::Duration::from_secs(30), token)
+        let (bid, token, media) = tokio::time::timeout(std::time::Duration::from_secs(30), token)
             .await
             .map_err(|_| failed("no camera token"))?
             .map_err(|_| failed("token wait dropped"))?;
@@ -1044,7 +1048,7 @@ impl Engine {
             .ok_or_else(|| failed("no identity"))?;
         let me = cert_key(&identity).ok_or_else(|| failed("no key"))?;
         let link = p2p
-            .broadcast(&ann, &token, BindRole::Subscriber, false)
+            .broadcast(&ann, &token, BindRole::Subscriber, media)
             .await
             .map_err(|e| failed(&e.to_string()))?;
         let (subscriber, frames, _units) = crate::screen_share::broadcast::link::Subscriber::start(

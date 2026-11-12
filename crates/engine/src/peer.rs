@@ -788,7 +788,7 @@ impl Relays {
             }
             BroadcastTokenRoute::Camera => {
                 if let Some(engine) = engine() {
-                    engine.camera_broadcast_token(ctx, sharer, id, token);
+                    engine.camera_broadcast_token(ctx, sharer, id, token, media);
                 }
             }
             BroadcastTokenRoute::Ignore(reason) => {
