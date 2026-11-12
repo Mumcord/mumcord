@@ -102,10 +102,10 @@
     "endedByRelay": "Câmara parada pelo retransmissor do servidor",
     "dismissStopped": "Dispensar",
     "notRegistered": "A câmara não arrancou: neste servidor só utilizadores registados podem usar a câmara.",
-    "groupNotAllowed": "A câmara não arrancou: o relay deste servidor só serve certos grupos. Pede a um administrador para te adicionar.",
+    "groupNotAllowed": "A câmara não arrancou: o retransmissor deste servidor só serve certos grupos. Pede a um administrador para te adicionar.",
     "notSameChannel": "A câmara não arrancou: tu e os teus espectadores têm de estar no mesmo canal.",
     "notInChannel": "A câmara não arrancou: entra primeiro num canal.",
-    "noHello": "A câmara não arrancou: o bot do relay ainda não conhece esta app. Volta a ligar para resolver."
+    "noHello": "A câmara não arrancou: o bot do retransmissor ainda não conhece esta app. Volta a ligar para resolver."
   },
   "privacy": {
     "windows": "O Windows bloqueia o acesso à câmara para aplicações de ambiente de trabalho",

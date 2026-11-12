@@ -159,7 +159,7 @@
     "noFanoutBody_other": "Jokainen katsoja saa oman kopionsa tietokoneeltasi, joten katsojia voi olla enintään {{max}}. Laatu laskee, kun liittyjiä tulee lisää: tällä hetkellä {{count}} katsojaa tarvitsee noin {{mbit}} Mbit/s lähetysnopeutta, joten jakosi toimii tasolla {{now}} tason {{wanted}} sijaan.",
     "fanoutUnavailable": "Välityspalvelimen jakelu ei ole käytettävissä ({{reason}}). Jokainen katsoja saa oman kopionsa, joten katsojia voi olla enintään {{max}} ja laatu voi laskea.",
     "reasonNoRelay": "tällä palvelimella ei ole välityspalvelinta",
-    "reasonOldRelay": "tämän palvelimen relay tarvitsee päivityksen",
+    "reasonOldRelay": "tämän palvelimen välityspalvelin tarvitsee päivityksen",
     "reasonDisallowed": "välityspalvelin ei salli näytönjakoa",
     "reasonRefused": "välityspalvelin hylkäsi lähetyksen",
     "reasonFull": "välityspalvelin on täynnä",

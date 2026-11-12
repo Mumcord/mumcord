@@ -102,10 +102,10 @@
     "endedByRelay": "Servera relejs apturēja kameru",
     "dismissStopped": "Aizvērt",
     "notRegistered": "Kamera nesāka darboties: šajā serverī kameru drīkst izmantot tikai reģistrēti lietotāji.",
-    "groupNotAllowed": "Kamera nesāka darboties: šī servera retranslators apkalpo tikai noteiktas grupas. Palūdz administratoram tevi pievienot.",
+    "groupNotAllowed": "Kamera nesāka darboties: šī servera relejs apkalpo tikai noteiktas grupas. Palūdz administratoram tevi pievienot.",
     "notSameChannel": "Kamera nesāka darboties: tev un taviem skatītājiem jābūt vienā kanālā.",
     "notInChannel": "Kamera nesāka darboties: vispirms pievienojies kanālam.",
-    "noHello": "Kamera nesāka darboties: retranslatora bots vēl nepazīst šo lietotni. Pievienojies vēlreiz."
+    "noHello": "Kamera nesāka darboties: releja bots vēl nepazīst šo lietotni. Pievienojies vēlreiz."
   },
   "privacy": {
     "windows": "Windows bloķē piekļuvi kamerai darbvirsmas lietotnēm",
