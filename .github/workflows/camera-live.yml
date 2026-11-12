@@ -1,0 +1,105 @@
+name: Camera live tests
+
+# The camera's engine tests drive the local testenv (Mumble server, mumpeer
+# relay, mumbot peer) and are #[ignore]d for a bare `cargo test`, so CI never
+# ran them: the direct path shipped broken twice before the E4 acceptance run
+# found it (spec 08, FR-8.92 – FR-8.96). This job starts the testenv and runs
+# the camera tests against it. It is not a required check; the path filter
+# decides whether it has anything to do.
+on:
+  pull_request:
+    paths:
+      - "crates/engine/src/camera/**"
+      - "crates/engine/src/p2p.rs"
+      - "crates/p2p/src/media/**"
+      - "crates/p2p/src/broadcast.rs"
+      - "crates/engine/src/screen_share/broadcast/**"
+      - "crates/engine/tests/live_camera*.rs"
+      - "Cargo.lock"
+      - ".github/workflows/camera-live.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: camera-live-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # Debug info only slows the link down; the job needs pass/fail.
+  CARGO_PROFILE_DEV_DEBUG: 0
+  # The testenv's fixed ports (see mumpeer testenv/env.sh).
+  MUMCORD_CAMERA_PORT: 44758
+
+jobs:
+  camera-live:
+    name: Camera live tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Linux system libraries
+        timeout-minutes: 20
+        run: |
+          scripts/ci/apt-install.sh --cache-dir "$RUNNER_TEMP/apt-archives" \
+            libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev \
+            libdbus-1-dev pkg-config cmake
+
+      - uses: ./.github/actions/native-av1
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          key: camera-live
+
+      # The relay and the bot live in their own repositories: the testenv
+      # builds mumpeer from its checkout and runs mumbot's peer bot.
+      - name: Check out the relay and the bot
+        run: |
+          git clone --depth 1 https://github.com/Mumcord/mumpeer \
+            "$RUNNER_TEMP/mumpeer"
+          git clone --depth 1 https://github.com/Mumcord/mumbot \
+            "$RUNNER_TEMP/mumbot"
+
+      - name: Build the relay bot
+        run: docker build -t local/mumbot:testenv "$RUNNER_TEMP/mumbot"
+
+      - name: Start the testenv
+        run: |
+          cd "$RUNNER_TEMP/mumpeer/testenv"
+          MUMBOT_IMAGE=local/mumbot:testenv MUMPEER_PROFILE=all ./up.sh
+
+      # The relay's media profile decides which fallback cells can run: without
+      # `mv` it is an old relay, and the new-relay cells skip themselves.
+      # MUMPEER_PROFILE is about uses, not about the media format.
+      - name: Relay media profile
+        id: relay
+        run: |
+          env_file="$RUNNER_TEMP/mumpeer/testenv/.env"
+          secret=$(sed -n 's/^MUMPEER_API_SECRET=//p' "$env_file")
+          status=$(curl -fsS -H "Authorization: Bearer $secret" \
+            http://127.0.0.1:44760/v1/status)
+          if [[ "$(echo "$status" | jq -r '.media // empty')" == "2" ]]; then
+            echo "profile=all" >> "$GITHUB_OUTPUT"
+            echo "the relay announces the media profile"
+          else
+            echo "profile=old" >> "$GITHUB_OUTPUT"
+            echo "the relay speaks the old format only"
+          fi
+
+      - name: Camera paths
+        run: |
+          MUMCORD_LIVE=1 MUMCORD_TEST_CAMERA=1 \
+            MUMCORD_CAMERA_PROFILE=${{ steps.relay.outputs.profile }} \
+            cargo test -p mumcord-engine --features test-backend --locked \
+            --test live_camera_paths -- --ignored --test-threads=1
+
+      - name: Direct camera stream
+        run: |
+          MUMCORD_LIVE=1 MUMCORD_TEST_CAMERA=1 \
+            cargo test -p mumcord-engine --features test-backend --locked \
+            --test live_camera_direct -- --ignored --test-threads=1
+
+      - name: Stop the testenv
+        if: always()
+        run: cd "$RUNNER_TEMP/mumpeer/testenv" && ./down.sh
