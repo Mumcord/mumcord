@@ -137,6 +137,11 @@ describe("packet inspector (issue #60)", () => {
     await browser.waitUntil(async () => (await follow.getAttribute("aria-pressed")) === "false", {
       timeoutMsg: "following did not pause",
     });
+    // WebDriver can align the row beneath the sticky table header; centre it before clicking.
+    await browser.execute((el: HTMLElement) => {
+      el.scrollIntoView({ block: "center" });
+    }, await toggle);
+    await toggle.waitForClickable({ timeout: 5_000 });
     await toggle.click();
     await browser.waitUntil(async () => (await toggle.getAttribute("aria-expanded")) === "true", {
       timeout: 5_000,
@@ -168,10 +173,13 @@ describe("packet inspector (issue #60)", () => {
   it("follows new packets and stops following when scrolled up", async () => {
     const list = $(".pi-table-wrap");
     const follow = button("Follow");
-    // The earlier test paused following; the toggle resumes it.
-    expect(await follow.getAttribute("aria-pressed")).toBe("false");
+    // Set up live capture and paused following here, independently of the row-expansion test.
+    const resume = button("Resume");
+    if (await resume.isExisting()) await resume.click();
+    if ((await follow.getAttribute("aria-pressed")) === "true") await follow.click();
+    await expect(follow).toHaveAttribute("aria-pressed", "false");
     await follow.click();
-    expect(await follow.getAttribute("aria-pressed")).toBe("true");
+    await expect(follow).toHaveAttribute("aria-pressed", "true");
     // A short list overflows with the few packets already there; the client's own pings
     // (every few seconds) are the new packets that arrive while it is scrolled up.
     await browser.execute((el: HTMLElement) => {
