@@ -51,7 +51,7 @@
 | D3 | Viewer: description, changes at keyframes, both formats | done — `b41444ab`, branch not pushed | D2 | complex |
 | D4 | Capability negotiation and refusal texts | done — `12bb9696`, `abc88dd0`, `7794576b`, `b103d57c`; 24 locales in E2, `needsUpdate` error mapping `10b030f2` | D3 | complex |
 | D5 | Direct camera path (`STREAM_CAMERA`) | partial — `dee7fb92`, `1b910208`, `491d076d`, `a16c306e`, `63345098`, `2e7c83e4`, `87998b23`, `2003f007`, `bd516e64`: stream kind, `mv`, `needs`, old-viewer refusal, media description, frame hub, per-viewer direct stream, viewer bind and reverse `want`; no-relay and old-relay paths follow in D6 | D4 | complex |
-| D6 | Camera relay/direct choice and fallback matrix | open | D5, P0.5 | complex |
+| D6 | Camera relay/direct choice and fallback matrix | done — engine matrix and e2e from `5af60204`/`5288c227`/`59abb613` (PR #798), live paths `e7a7fbcd`; 0.8.x viewer half and the old-relay-that-carries-cameras cell are reported unverifiable and belong to E4 | D5, P0.5 | complex |
 | D7 | Watch-party UI regression | done — UI tests unchanged, 183 pass | D1 | simple |
 | R1 | Relay broadcast profile types and new links | done — `f8d35244`, branch not pushed separately (in `feat/r1-profile-types`) | W1, W2, W6 | complex |
 | R2 | Relay transports: QUIC streams and TCP mux chunks | done — `dff7deb9`, `feat/r2-transports` | R1 | complex |
