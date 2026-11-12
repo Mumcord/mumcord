@@ -710,14 +710,16 @@ impl Engine {
         let ctx = ctx.clone();
         self.runtime().spawn(async move {
             // A later join or a reset drops the waiting sender.
-            let Ok((bid, token)) = token.await else {
+            let Ok((bid, token, media)) = token.await else {
                 return;
             };
             if broadcast_hex(bid) != id {
                 tracing::debug!("camera token for another broadcast ignored");
                 return;
             }
-            engine.camera_bind(&ctx, sharer, attempt, bid, token).await;
+            engine
+                .camera_bind(&ctx, sharer, attempt, bid, token, media)
+                .await;
         });
     }
 
@@ -729,6 +731,8 @@ impl Engine {
         attempt: u64,
         id: BroadcastId,
         token: RelayToken,
+        // The broadcast's format, as the bot answered it: a subscriber must speak it (FR-7.97).
+        media: bool,
     ) {
         let server_id = ctx.server_id;
         let opened = async {
@@ -743,7 +747,7 @@ impl Engine {
                 .ok_or("no identity for the key exchange")?;
             let me = cert_key(&identity).ok_or("no key for the key exchange")?;
             let link = p2p
-                .broadcast(&ann, &token, BindRole::Subscriber, false)
+                .broadcast(&ann, &token, BindRole::Subscriber, media)
                 .await
                 .map_err(|e| {
                     tracing::info!(error = %e, "camera bind refused");
