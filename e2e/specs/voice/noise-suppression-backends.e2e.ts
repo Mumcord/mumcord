@@ -45,14 +45,8 @@ const CLIP_SECONDS = Math.floor(noisy.length / RATE);
  * of the copy is gone, the alignment matches the wrong windows, and the measured levels say nothing
  * about the suppressor. */
 const PREFIX = 15;
-/** How far the recorded copy may sit from the window the connect time implies for it. The copy cannot
- * start before the app connected, so the alignment may not put it much earlier than that: the test
- * sees the connection only when the label shows it, one poll of up to 100 ms or more later (locally
- * up to 7 windows). The app buffers
- * before its first frame goes out and a neural model shifts the frame it returns, so it can sit later.
- * Runs that measured correctly landed 3-57 windows after the connect; the run that failed in CI was 50
- * windows before it, which is impossible, so it matched a shifted part of the clip. */
-const ALIGN_EARLY_GRACE_WINDOWS = 25;
+/** The app buffers before its first frame goes out and a neural model shifts the frame it returns,
+ * so the copy may arrive after the latest capture-start time permits on its own. */
 const ALIGN_LATE_SLACK_WINDOWS = 100;
 /** How far the second copy of the switch run may sit from where the first copy puts it: the neural
  * backend returns its frame one window late, anything more means audio was lost or held up. */
@@ -168,6 +162,7 @@ async function record(
   botTimeout = 120,
 ): Promise<{ received: Float32Array; lag: number }> {
   writeWav(f(`${label}-in.wav`), sample);
+  const recordingRequested = Date.now();
   let recordingEnded = 0;
   const recording = bot(["record", f(`${label}.wav`), "--seconds", String(seconds)], {
     name: "Measure",
@@ -176,13 +171,14 @@ async function record(
     recordingEnded = Date.now();
     return result;
   });
+  const restartRequested = Date.now();
   await app.restart({ audio: `file:${f(`${label}-in.wav`)}:${f(`${label}-out.wav`)}` });
   const restarted = Date.now();
   const reconnected = await reconnectApp();
   const connected = reconnected - restarted;
-  if (connected > PREFIX * 1000 - 1000) {
+  if (reconnected - restartRequested > PREFIX * 1000 - 1000) {
     throw new Error(
-      `"${label}": the app connected ${String(connected)} ms after the restart, later than the ` +
+      `"${label}": the app connected ${String(reconnected - restartRequested)} ms after the restart request, later than the ` +
         `${String(PREFIX * 1000)} ms prefix, so the copy lost its head and this run measures nothing`,
     );
   }
@@ -190,17 +186,19 @@ async function record(
   await recording;
   const received = readWav(f(`${label}.wav`));
   const lag = align(received, noisy);
-  // The bot records for exactly `seconds` from when it is in, and exits right after: its end gives
-  // its start. The restart alone is no clock for it: a restart that waited for the old app to quit
-  // took seconds longer than the bot needed to connect (CI: 5 s, the copy 526 windows "late").
-  const recordingStarted = recordingEnded - seconds * 1000;
-  const earliest = PREFIX * 100 + Math.round((reconnected - recordingStarted) / 10);
-  if (lag < earliest - ALIGN_EARLY_GRACE_WINDOWS || lag > earliest + ALIGN_LATE_SLACK_WINDOWS) {
+  // Neither process exit nor the connected label is an exact audio clock. The bot renders and
+  // writes its WAV before exiting; capture can start before WebDriver observes the connection.
+  // Bound both starts instead: recording starts between the bot request and exit minus duration,
+  // capture between the restart request and the connected label. This still rejects a shifted copy
+  // without declaring valid audio impossible just because UI polling or WAV finalisation was slow.
+  const recordingStartedBy = recordingEnded - seconds * 1000;
+  const earliest = PREFIX * 100 + Math.floor((restartRequested - recordingStartedBy) / 10);
+  const latest = PREFIX * 100 + Math.ceil((reconnected - recordingRequested) / 10) + ALIGN_LATE_SLACK_WINDOWS;
+  if (lag < earliest || lag > latest) {
     throw new Error(
-      `"${label}": the copy cannot start before the end of the ${String(PREFIX * 100)} windows prefix ` +
-        `and the app connected ${String(reconnected - recordingStarted)} ms into the recording, so window ${String(earliest)} ` +
-        `(up to ${String(ALIGN_LATE_SLACK_WINDOWS)} windows later for the app's startup) is where it ` +
-        `has to be; the alignment put it at window ${String(lag)}, so it matched a shifted part of the ` +
+      `"${label}": the copy must start between windows ${String(earliest)} and ${String(latest)} ` +
+        `given the ${String(PREFIX * 100)} windows prefix and the recording/capture start bounds; ` +
+        `the alignment put it at window ${String(lag)}, so it matched a shifted part of the ` +
         `clip and this run measures nothing`,
     );
   }
