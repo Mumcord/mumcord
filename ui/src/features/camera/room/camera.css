@@ -145,6 +145,22 @@
   flex: 1;
 }
 
+/* FR-8.5: no tiles, only why. */
+.cam-room__cant-watch {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--media-glass);
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
 .cam-grid {
   display: grid;
   grid-template-columns: repeat(var(--cols, 2), 1fr);
