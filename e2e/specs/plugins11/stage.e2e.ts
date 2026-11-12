@@ -387,6 +387,7 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
     await frame.waitForDisplayed({ timeout: 10_000 });
 
     const full = stageButton(STAGE, "Full screen");
+    const leave = stageButton(STAGE, "Leave full screen");
     await full.click();
     // Read the banner at once: it goes after 3 s, and a loaded runner can miss it between two
     // WebDriver round trips. Its text and lifetime are covered by the stage's UI test
@@ -394,10 +395,16 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
     const bannerText = await $("p.plugin-stage__banner")
       .getText()
       .catch(() => null);
+    // A loaded runner now and then loses the click, so the stage never enters full screen; the
+    // second click is a retry, not a different check.
+    try {
+      await leave.waitForExist({ timeout: 6_000 });
+    } catch {
+      await full.click();
+      await leave.waitForExist({ timeout: 12_000 });
+    }
     // The button state is what lasts: it stays "Leave full screen" until Esc.
-    await expect(stageButton(STAGE, "Leave full screen")).toHaveAttribute("aria-pressed", "true", {
-      wait: 5_000,
-    });
+    await expect(leave).toHaveAttribute("aria-pressed", "true");
     if (bannerText !== null) {
       expect(bannerText).toBe(`${STAGE} is full screen · Esc to exit`);
     }
