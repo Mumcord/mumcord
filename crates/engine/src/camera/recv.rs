@@ -930,8 +930,8 @@ fn may_bind(tile: Option<&Tile>, blocked: bool) -> bool {
 }
 
 /// A sender opened a `STREAM_CAMERA` to this client (FR-8.92). It plays on that sender's tile
-/// only if the description names the camera session the tile waits for (FR-8.95) and the tile
-/// shows video; anything else closes the stream unread.
+/// only if the description names the camera session the tile waits for (a stale session is
+/// refused, FR-8.92) and the tile shows video; anything else closes the stream unread.
 pub(crate) async fn serve_direct(
     engine: &Engine,
     server_id: ServerId,
