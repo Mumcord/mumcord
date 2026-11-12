@@ -4051,9 +4051,9 @@ dependencies = [
  "clap",
  "hound",
  "image",
- "mumcord-codec",
- "mumcord-p2p",
- "mumcord-protocol",
+ "mumcord-codec 0.7.2",
+ "mumcord-p2p 0.7.2",
+ "mumcord-protocol 0.7.2",
  "rcgen",
  "ring",
  "rtrb",
@@ -4072,7 +4072,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "ashpd",
  "base64 0.23.1",
@@ -4089,7 +4089,7 @@ dependencies = [
  "mumcord-engine",
  "mumcord-overlay-ipc",
  "mumcord-plugins",
- "mumcord-protocol",
+ "mumcord-protocol 0.8.0",
  "notify-rust",
  "objc2",
  "open",
@@ -4123,14 +4123,14 @@ dependencies = [
 
 [[package]]
 name = "mumcord-audio"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "audio_thread_priority",
  "cpal",
  "futures",
  "hound",
  "libc",
- "mumcord-codec",
+ "mumcord-codec 0.8.0",
  "pulseaudio",
  "rtrb",
  "rubato",
@@ -4140,7 +4140,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-camera"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "ashpd",
  "block2",
@@ -4166,6 +4166,20 @@ dependencies = [
 [[package]]
 name = "mumcord-codec"
 version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac470f8fca6ec4acfc1aecf23963f30e6869b4f9d98afc09640a0864467ed053"
+dependencies = [
+ "nnnoiseless",
+ "opus",
+ "rtrb",
+ "sonora",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
+name = "mumcord-codec"
+version = "0.8.0"
 dependencies = [
  "hound",
  "nnnoiseless",
@@ -4178,7 +4192,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-effects"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "image",
  "mumcord-camera",
@@ -4192,7 +4206,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-engine"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "ammonia",
  "anyhow",
@@ -4214,9 +4228,9 @@ dependencies = [
  "mumcord-audio",
  "mumcord-camera",
  "mumcord-effects",
- "mumcord-p2p",
+ "mumcord-p2p 0.8.0",
  "mumcord-positional",
- "mumcord-protocol",
+ "mumcord-protocol 0.8.0",
  "mumcord-screenshare",
  "mumcord-store",
  "netsim",
@@ -4267,7 +4281,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-overlay-ipc"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "ab_glyph",
  "libc",
@@ -4275,7 +4289,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-overlay-layer"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "ash",
  "libc",
@@ -4285,11 +4299,35 @@ dependencies = [
 [[package]]
 name = "mumcord-p2p"
 version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baff7c5abff8826b814d9c1320f66753a18ea461e5b182ad53eefa64a676012c"
 dependencies = [
  "bytes",
  "crab_nat",
  "igd-next",
- "mumcord-protocol",
+ "mumcord-protocol 0.7.2",
+ "netdev",
+ "quinn",
+ "rand 0.10.3",
+ "rustls",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "socket2",
+ "thiserror 2.0.21",
+ "tokio",
+ "tokio-rustls",
+ "tracing",
+]
+
+[[package]]
+name = "mumcord-p2p"
+version = "0.8.0"
+dependencies = [
+ "bytes",
+ "crab_nat",
+ "igd-next",
+ "mumcord-protocol 0.8.0",
  "mumcord-store",
  "netdev",
  "quinn",
@@ -4308,7 +4346,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-plugin"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -4331,7 +4369,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-plugin-sdk"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "bovnar",
  "serde",
@@ -4341,7 +4379,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-plugins"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "ammonia",
  "base64 0.23.1",
@@ -4381,7 +4419,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-positional"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "libc",
  "libloading 0.9.0",
@@ -4393,6 +4431,28 @@ dependencies = [
 [[package]]
 name = "mumcord-protocol"
 version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aff4e5eaacfa0469331ae496581b815f311f131ab60b0fab7d8d8b76b8a3e63b"
+dependencies = [
+ "aes",
+ "base64 0.23.1",
+ "bytes",
+ "prost",
+ "prost-build",
+ "protoc-bin-vendored",
+ "rand 0.10.3",
+ "rustls",
+ "sha1",
+ "thiserror 2.0.21",
+ "tokio",
+ "tokio-rustls",
+ "tracing",
+ "x509-parser",
+]
+
+[[package]]
+name = "mumcord-protocol"
+version = "0.8.0"
 dependencies = [
  "aes",
  "base64 0.23.1",
@@ -4413,7 +4473,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-screenshare"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "bindgen 0.72.1",
  "libloading 0.8.9",
@@ -4423,7 +4483,7 @@ dependencies = [
 
 [[package]]
 name = "mumcord-store"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "image",
@@ -4544,7 +4604,7 @@ dependencies = [
 
 [[package]]
 name = "netsim"
-version = "0.7.2"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "clap",
