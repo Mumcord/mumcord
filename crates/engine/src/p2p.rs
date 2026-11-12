@@ -138,6 +138,17 @@ pub(crate) struct Plan {
 }
 
 impl Plan {
+    /// The same plan with direct connections allowed as `consent` says, for answering the offer
+    /// of a camera this client asked for (spec 08, FR-8.94).
+    pub(crate) fn with_direct(self, consent: Consent) -> Self {
+        let direct = match consent {
+            Consent::Yes => DirectUse::Yes,
+            Consent::Unset => DirectUse::Ask,
+            Consent::No => DirectUse::No,
+        };
+        Self { direct, ..self }
+    }
+
     /// What the offer or answer reveals once an open consent question is settled:
     /// `ask_answer` is the answer to it (ignored when nothing was asked).
     pub(crate) fn reveal(self, ask_answer: bool) -> Result<Reveal, DirectError> {
@@ -154,6 +165,14 @@ impl Plan {
             relay: self.relay,
         })
     }
+}
+
+/// Whether the offer of a camera this client asked for may be answered with addresses although
+/// the mode would rather not go direct (spec 08, FR-8.94). The viewer wants that picture and the
+/// sender may have no relay broadcast that could serve it, so `relay_first` gives way; the hard
+/// "never direct" of `relay_only`, `off` and a turned-off consent still hold.
+pub(crate) fn camera_direct_ok(mode: P2pMode, consent: Consent, wanted: bool) -> bool {
+    wanted && consent != Consent::No && !matches!(mode, P2pMode::RelayOnly | P2pMode::Off)
 }
 
 /// What this side may use given the effective mode of the server, the relay's availability for
@@ -641,6 +660,21 @@ async fn answer(
     };
     let relay = engine.relays().availability(ctx.server_id);
     let plan = plan_for(&ctx.store(), ctx.server_id, relay);
+    // A viewer that asked for this camera accepts the sender's direct stream even in
+    // `relay_first`: the sender may have no broadcast to serve it (FR-8.94).
+    let (mode, consent) = mode_and_consent(&ctx.store(), ctx.server_id);
+    let camera = camera_direct_ok(
+        mode,
+        consent,
+        engine.camera_wants_direct(ctx.server_id, from),
+    );
+    let plan = plan.map(|plan| {
+        if camera {
+            plan.with_direct(consent)
+        } else {
+            plan
+        }
+    });
     // An offer through the relay without addresses (relay first, or a file) never goes direct
     // (`route`): answering with addresses would only reveal them, so neither side does.
     let relay_only = *peer_relay && candidates.is_empty();
@@ -978,7 +1012,7 @@ impl Engine {
         session: u32,
         relay_use: RelayUse,
     ) -> Result<Arc<PeerConnection>, DirectError> {
-        self.p2p_connection_prompting(server_id, session, relay_use, ConsentPrompt::Allowed)
+        self.p2p_connection_prompting(server_id, session, relay_use, ConsentPrompt::Allowed, false)
             .await
     }
 
@@ -989,6 +1023,7 @@ impl Engine {
         session: u32,
         relay_use: RelayUse,
         prompt: ConsentPrompt,
+        camera: bool,
     ) -> Result<Arc<PeerConnection>, DirectError> {
         let key = (server_id, session);
         if let Some(open) = self.p2p_open_for(key, relay_use, false) {
@@ -996,7 +1031,14 @@ impl Engine {
         }
         let (ctx, peer_hash) = self.p2p_peer(server_id, session)?;
         let relay = self.relays().availability_for(server_id, relay_use);
+        // A camera stream is opened because the viewer asked for it and no broadcast can serve
+        // it, so `relay_first` gives way (spec 08, FR-8.94); the mode and the consent still hold.
+        let (mode, consent) = mode_and_consent(&ctx.store(), server_id);
         let plan = plan_for(&ctx.store(), server_id, relay)?;
+        let plan = match camera_direct_ok(mode, consent, camera) {
+            true => plan.with_direct(consent),
+            false => plan,
+        };
         let asked = plan.direct == DirectUse::Ask
             && prompt == ConsentPrompt::Allowed
             && self.direct_allowed(&ctx).await;
@@ -1177,7 +1219,7 @@ impl Engine {
         let relay_use =
             stream_use(kind).ok_or_else(|| DirectError::Stream(format!("unknown kind {kind}")))?;
         let conn = self
-            .p2p_connection_prompting(server_id, session, relay_use, prompt)
+            .p2p_connection_prompting(server_id, session, relay_use, prompt, kind == STREAM_CAMERA)
             .await?;
         let (mut send, recv) = conn
             .connection()
@@ -1201,6 +1243,18 @@ impl Engine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_camera_stream_may_go_direct_even_in_relay_first() {
+        // `relay_first` gives way for a camera the viewer asked for (spec 08, FR-8.94)…
+        assert!(camera_direct_ok(P2pMode::RelayFirst, Consent::Yes, true));
+        // …but never for a mode or a consent that forbids direct connections, and only while the
+        // viewer actually wants that camera.
+        assert!(!camera_direct_ok(P2pMode::RelayOnly, Consent::Yes, true));
+        assert!(!camera_direct_ok(P2pMode::Off, Consent::Yes, true));
+        assert!(!camera_direct_ok(P2pMode::RelayFirst, Consent::No, true));
+        assert!(!camera_direct_ok(P2pMode::RelayFirst, Consent::Yes, false));
+    }
 
     const MODES: [P2pMode; 5] = [
         P2pMode::DirectRelay,
