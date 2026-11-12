@@ -42,7 +42,9 @@ runs:
         steps.svt-av1.outputs.cache-hit != 'true' || steps.dav1d.outputs.cache-hit != 'true' ||
         (runner.os != 'macOS' && steps.hwenc.outputs.cache-hit != 'true')
       shell: bash
-      run: |
+      # Adds NASM to PATH for the Windows build below. The entry is the runner's temp directory and
+      # a fixed version, never input from a pull request.
+      run: | # zizmor: ignore[github-env]
         case "$RUNNER_OS" in
           Linux) scripts/ci/apt-install.sh nasm meson ninja-build ;;
           macOS) brew install nasm meson ninja ;;
