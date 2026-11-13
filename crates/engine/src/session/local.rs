@@ -807,7 +807,12 @@ impl Engine {
         {
             self.files_settings_changed();
         }
-        if previous.p2p_mode != settings.p2p_mode {
+        // Consent alone can take the last camera path away (`direct_only` with direct
+        // connections turned off, FR-8.4). A mode change was the only refresh before, so the
+        // button stayed enabled after the switch.
+        if previous.p2p_mode != settings.p2p_mode
+            || previous.allow_direct_connections != settings.allow_direct_connections
+        {
             self.camera_availability_refresh_all();
         }
         if previous.positional != settings.positional {
