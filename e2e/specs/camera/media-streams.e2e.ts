@@ -198,9 +198,11 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
       });
       await waitNoOwnViewer(bob);
 
-      // Leaving voice closes the stream too: the testenv server has only the root channel, so
-      // "leaving the channel" is leaving voice, as in stop.e2e.ts.
-      await on("c", () => app.invoke("voice_leave"));
+      // Leaving closes the stream (FR-8.49). Leave voice only self-deafens and keeps Carol in
+      // the channel, so the sender still sees her. Disconnecting removes her from the server.
+      await on("c", async () => {
+        await app.invoke("disconnect", { serverId: await serverId() });
+      });
       await waitNoOwnViewer(carol);
       await on("c", reconnect);
 
