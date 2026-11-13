@@ -3,7 +3,10 @@ use std::ptr;
 use std::sync::{Mutex, Once, PoisonError};
 
 use crate::codec::{Codec, VideoEncoder};
-use crate::{EncodedFrame, EncoderConfig, Error, I420Frame, Result};
+use crate::{
+    AV1_TEMPORAL_LAYERS, Av1Options, EncodedFrame, EncoderConfig, Error, I420Frame, Result,
+    av1_cpu_supported,
+};
 
 mod ffi {
     #![allow(
@@ -27,11 +30,6 @@ const PRESET: i8 = 10;
 /// 70% of the frame budget on a 16-thread desktop CPU, 720p30 about 40%), which is why Sharp text
 /// lowers the frame rate first (FR-7.38).
 const SCREEN_CONTENT_PRESET: i8 = 8;
-
-/// Temporal layers (pattern 0-2-1-2). SVT-AV1's low-delay CBR mode allows at most three
-/// (hierarchical levels 0–2), so unlike VP9 and the hardware encoders it has no fourth layer at
-/// 60 fps; software AV1 is capped at 30 fps anyway (FR-7.37).
-pub const AV1_TEMPORAL_LAYERS: u8 = 3;
 
 /// Presentation times are milliseconds.
 const TIMEBASE_MS: i64 = 1000;
@@ -90,13 +88,6 @@ unsafe extern "C" fn svt_log(
         unsafe { CStr::from_ptr(tag) }.to_string_lossy()
     };
     eprintln!("{tag}: {}", message.trim_end());
-}
-
-/// Software AV1 options that only exist for this encoder.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct Av1Options {
-    /// AV1's screen-content tools (palette, intra block copy) for "Sharp text" (FR-7.38).
-    pub screen_content: bool,
 }
 
 /// Realtime AV1 encoder on SVT-AV1 (low delay, CBR) with [`AV1_TEMPORAL_LAYERS`] temporal layers.
@@ -477,22 +468,6 @@ fn close(handle: *mut ffi::EbComponentType) {
             eprintln!("SVT-AV1 encoder shutdown failed: {status:#x}");
         }
         ffi::svt_av1_enc_deinit_handle(handle);
-    }
-}
-
-/// SVT-AV1 4.2's SSSE3 code, which it picks on x86 CPUs without AVX2, reads a reference block
-/// with an aligned load that is not always aligned (`svt_aom_sub_pixel_variance16xh_ssse3`), so
-/// the encoder kills the whole app with a general protection fault. Such CPUs are also far too
-/// slow for real-time AV1, so screen sharing uses VP9 there instead. Callers check this before
-/// opening an encoder; [`Av1Encoder::new`] refuses such CPUs as a safety net.
-pub fn av1_cpu_supported() -> bool {
-    #[cfg(target_arch = "x86_64")]
-    {
-        std::arch::is_x86_feature_detected!("avx2")
-    }
-    #[cfg(not(target_arch = "x86_64"))]
-    {
-        true
     }
 }
 

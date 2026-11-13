@@ -2,12 +2,9 @@ use std::mem::MaybeUninit;
 use std::os::raw::{c_int, c_ulong};
 use std::ptr;
 
-use crate::codec::{Codec, VideoEncoder};
+use crate::codec::{Codec, VideoEncoder, threads};
 use crate::ffi::{self, check};
-use crate::{Error, I420Frame, Result};
-
-/// Number of VP9 temporal layers (L1T3). Layer ids run 0..TEMPORAL_LAYERS.
-pub const TEMPORAL_LAYERS: u8 = 3;
+use crate::{EncodedFrame, EncoderConfig, Error, I420Frame, Result, TEMPORAL_LAYERS};
 
 /// libvpx's two-frame pattern for three layers: layer 0 every 4th frame, layer 1 in between,
 /// layer 2 on every odd frame.
@@ -21,26 +18,6 @@ const TIMEBASE_DEN: c_int = 1000;
 
 /// Fastest realtime preset that still keeps text readable; tuned with the `encode_speed` example.
 const CPU_USED: c_int = 7;
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct EncoderConfig {
-    pub width: u32,
-    pub height: u32,
-    pub fps: u32,
-    pub bitrate_kbps: u32,
-}
-
-/// One compressed frame (VP9 or AV1), ready to send.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct EncodedFrame {
-    pub data: Vec<u8>,
-    pub keyframe: bool,
-    /// Temporal layer 0..[`VideoEncoder::temporal_layers`]. A viewer that skips all frames above some layer
-    /// still decodes the rest; keyframes are always layer 0.
-    pub temporal_layer: u8,
-    /// Milliseconds, as passed to [`Encoder::encode`].
-    pub pts: i64,
-}
 
 /// Realtime VP9 encoder with L1T3 temporal layers.
 pub struct Encoder {
@@ -396,16 +373,6 @@ fn set_layer_bitrates(cfg: &mut ffi::vpx_codec_enc_cfg_t, bitrate_kbps: u32) {
         // VP9 reads the per-layer targets from here; `ts_target_bitrate` is the VP8 field.
         cfg.layer_target_bitrate[layer] = kbps;
     }
-}
-
-/// The libvpx thread count every software VP9 encoder is configured with.
-pub fn threads() -> u32 {
-    // More than four threads gains little at 720p (tile columns cap the parallelism) and takes
-    // cores from the game or app being shared.
-    std::thread::available_parallelism()
-        .map_or(1, |n| n.get().min(4))
-        .try_into()
-        .unwrap_or(1)
 }
 
 /// Describes `frame`'s packed planes as a libvpx image without copying.

@@ -6,17 +6,48 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
+# One feature per C library or encoder family. Desktop builds use the default (all of them).
+# Without a feature its codec type stays in the API but fails to open with `Error::Codec`
+# (`open_hardware_encoder`: `Error::HardwareUnavailable`); with none of them the crate needs no
+# bindgen, no pkg-config and no C library, which is what the phone targets build.
+[features]
+default = ["vp9", "av1-decode", "av1-encode", "hw-encode"]
+# VP9 encoder and decoder on libvpx.
+vp9 = ["dep:bindgen", "dep:pkg-config"]
+# AV1 decoder on dav1d.
+av1-decode = ["dep:bindgen", "dep:pkg-config"]
+# AV1 encoder on SVT-AV1.
+av1-encode = ["dep:bindgen", "dep:pkg-config"]
+# NVENC, VA-API, AMF and Quick Sync (still only built where `HWENC_SDK_DIR` is set).
+hw-encode = ["dep:bindgen", "dep:libloading"]
+
 [dependencies]
 thiserror.workspace = true
 
 # Loads the GPU driver libraries for the hardware encoders at runtime (none on macOS). 0.8, not
 # the workspace's 0.9: bindgen's generated loaders (build.rs) are written against the 0.8 API.
 [target.'cfg(not(target_os = "macos"))'.dependencies]
-libloading = "0.8"
+libloading = { version = "0.8", optional = true }
 
 [build-dependencies]
-bindgen.workspace = true
-pkg-config.workspace = true
+bindgen = { workspace = true, optional = true }
+pkg-config = { workspace = true, optional = true }
+
+[[test]]
+name = "codec"
+required-features = ["vp9"]
+
+[[test]]
+name = "av1"
+required-features = ["vp9", "av1-decode", "av1-encode"]
+
+[[test]]
+name = "vaapi"
+required-features = ["vp9", "av1-decode", "hw-encode"]
+
+[[example]]
+name = "encode_speed"
+required-features = ["vp9", "av1-encode"]
 
 [lints]
 workspace = true

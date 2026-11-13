@@ -9,6 +9,8 @@ pub const MAX_DECODED_HEIGHT: u32 = 4320;
 /// Rejects a decoded picture size beyond the wire limits. The size comes from a remote
 /// bitstream, not from the checked frame header, so a hostile sender could otherwise make every
 /// viewer allocate gigabytes.
+// Only the decoders call this.
+#[cfg(any(test, feature = "vp9", feature = "av1-decode"))]
 pub(crate) fn check_decoded_size(width: u32, height: u32) -> Result<()> {
     if width > MAX_DECODED_WIDTH || height > MAX_DECODED_HEIGHT {
         return Err(Error::InvalidFrame(format!(
