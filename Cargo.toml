@@ -100,9 +100,12 @@ rsa = { version = "0.10", default-features = false, features = ["std", "getrando
 # sharing already links; no effect on Windows and macOS. It is enabled per target in
 # crates/audio, because FreeBSD has no PipeWire (the sound server is OSS) and the feature would
 # otherwise pull in libpipewire there.
-cpal = { version = "0.18", features = ["realtime-dbus"] }
-# The same request for Mumcord's own capture and playback threads.
-audio_thread_priority = { version = "0.35", default-features = false, features = ["with_dbus"] }
+# Both options are desktop-only and therefore switched on per target in crates/audio, not here:
+# Android and iOS get neither.
+cpal = "0.18"
+# The same request for Mumcord's own capture and playback threads (`with_dbus`, also switched on
+# in crates/audio for the desktop targets only).
+audio_thread_priority = { version = "0.35", default-features = false }
 # opusic-sys builds libopus statically from bundled sources.
 opus = "0.4"
 nnnoiseless = { version = "0.5", default-features = false }
