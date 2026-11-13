@@ -905,7 +905,7 @@ impl PluginService {
         let _ = self.events.send(event);
     }
 
-    fn changed(&self) {
+    fn changed(&mut self) {
         self.sync_peers();
         self.emit(ServiceEvent::Changed);
     }

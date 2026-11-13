@@ -781,7 +781,11 @@ const SENDER: &str = r#"
   (data (i32.const 40) "hi")
   (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
     (local $p i32)
-    (local.set $p (global.get $heap))
+    ;; Peer-ready is delivered as soon as the plugin starts. The host refuses an unaligned
+    ;; return, which used to crash this fixture before the test could see the send.
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
     (global.set $heap (i32.add (local.get $p) (local.get 3)))
     (local.get $p))
   (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
@@ -994,7 +998,10 @@ const BURSTER: &str = r#"
   (data (i32.const 40) "hi")
   (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
     (local $p i32)
-    (local.set $p (global.get $heap))
+    ;; Peer-ready arrives right after start. An unaligned return crashes the plugin.
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
     (global.set $heap (i32.add (local.get $p) (local.get 3)))
     (local.get $p))
   (func $spam (local $i i32)
@@ -1869,6 +1876,32 @@ fn an_announce_before_the_focus_or_the_join_still_makes_the_peer_ready() {
     // Leaving and joining again with the announce already known: ready again on the join.
     service.peer_left(1, &bob());
     service.peer_joined(1, bob());
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll, b"Bob".to_vec())]
+    );
+}
+
+#[test]
+fn installing_a_plugin_after_the_announce_makes_the_peer_ready() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    let wait = std::time::Duration::from_millis(300);
+    let runs_poll = br#"{"v":1,"p":["poll@1~dev"]}"#;
+    // Bob's announce can arrive before this client has the plugin. It is stored, and Poll
+    // hears he is ready once the plugin is actually running (FR-6.35, AC-9.18).
+    service.peer_data(1, &bob(), "mumcord.plugins", runs_poll);
+    assert!(echoed(&mut service, &mut host_events, &mut events, wait).is_empty());
+
+    let poll = service
+        .load_dev(&ready_folder(fx.root.path(), "poll"))
+        .expect("loads");
     assert_eq!(
         echoed(&mut service, &mut host_events, &mut events, wait),
         [(poll, b"Bob".to_vec())]

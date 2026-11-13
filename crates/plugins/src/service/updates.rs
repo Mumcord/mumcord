@@ -942,7 +942,7 @@ impl PluginService {
         // Before the start, so a plugin may already message from its `start`.
         self.sync_peers();
         if record.enabled && !self.host.all_off() {
-            self.host.enable(&record.id)?;
+            self.enable_plugin(&record.id)?;
         }
         Ok(())
     }

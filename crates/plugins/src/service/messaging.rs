@@ -45,7 +45,7 @@ impl PluginService {
             self.stage_sync_place(true);
             self.relay_refresh();
             if let Some(server) = server {
-                self.ready_by_announce(server, None);
+                self.ready_by_announce(server, None, None);
             }
         }
         self.broadcast_self();
@@ -105,14 +105,41 @@ impl PluginService {
             self.stage_member_announced(peer.session);
         }
         self.dispatch(server, |keys, id| Event::Joined(wit_peer(keys, id, &peer)));
-        self.ready_by_announce(server, Some(peer.session));
+        self.ready_by_announce(server, Some(peer.session), None);
+    }
+
+    /// `peer-ready` for plugins that just started, so a peer who announced before the install is
+    /// not stuck unknown (FR-6.35). No-op until the plugin is running.
+    pub(super) fn ready_plugins(&mut self, ids: &[String]) {
+        if ids.is_empty() {
+            return;
+        }
+        let Some(server) = self.io.peers().focused else {
+            return;
+        };
+        self.ready_by_announce(server, None, Some(ids));
+    }
+
+    /// Starts `id` and then tells it about peers whose announce is already stored. The announce
+    /// often arrives while the plugin is still being installed (AC-9.18).
+    pub(super) fn enable_plugin(&mut self, id: &str) -> Result<(), crate::host::HostError> {
+        self.host.enable(id)?;
+        let ids = [id.to_owned()];
+        self.ready_plugins(&ids);
+        Ok(())
     }
 
     /// `peer-ready` for each plugin that a member (`only`, or everyone in the channel) reaches by
-    /// their last announce. The announce path only covers members already in the channel of the
-    /// focused server; after a reconnect it often comes before their join or before the focus,
-    /// and then their plugins would never hear that they can be reached (FR-6.35).
-    fn ready_by_announce(&mut self, server: ServerId, only: Option<u32>) {
+    /// their last announce. `only_plugins` limits that to plugins that just became reachable.
+    /// The announce path only covers members already in the channel of the focused server; after
+    /// a reconnect it often comes before their join or before the focus, and then their plugins
+    /// would never hear that they can be reached (FR-6.35).
+    fn ready_by_announce(
+        &mut self,
+        server: ServerId,
+        only: Option<u32>,
+        only_plugins: Option<&[String]>,
+    ) {
         let ready: Vec<(String, PeerInfo)> = {
             let state = self.io.peers();
             if state.focused != Some(server) {
@@ -133,6 +160,9 @@ impl PluginService {
                         .unwrap_or_default();
                     newly_reachable(&state.plugins, peer, None, entries)
                         .into_iter()
+                        .filter(|id| {
+                            only_plugins.is_none_or(|ids| ids.iter().any(|want| want == id))
+                        })
                         .map(|id| (id, peer.clone()))
                 })
                 .collect()
@@ -416,7 +446,7 @@ impl PluginService {
     /// Brings the I/O view of the switched-on plugins (name for the chat prefix; source,
     /// visibility and payload limit for those holding `peers.messages`) in line with the
     /// service; a messaging change is announced.
-    pub(super) fn sync_peers(&self) {
+    pub(super) fn sync_peers(&mut self) {
         let records = match self.store().plugins() {
             Ok(records) => records,
             Err(error) => {
@@ -493,7 +523,11 @@ impl PluginService {
             })
             .map(|(id, _)| id.clone())
             .collect();
-        let gained = announced(&metas).any(|entry| !announced(&state.plugins).any(|e| e == entry));
+        let gained_ids: Vec<String> = announced(&metas)
+            .filter(|entry| !announced(&state.plugins).any(|e| e == *entry))
+            .map(|(id, _)| id.to_owned())
+            .collect();
+        let gained = !gained_ids.is_empty();
         for connection in state.connections.values_mut() {
             for id in &gone {
                 connection.messenger.forget_plugin(id, now);
@@ -504,9 +538,15 @@ impl PluginService {
                 connection.throttle.mark_changed();
             }
         }
+        let focused = state.focused;
         state.plugins = metas;
         drop(state);
         self.relay_refresh();
+        // A plugin that is already running hears peers who announced it before this change.
+        // One that is not running yet hears them from [`Self::enable_plugin`], after it starts.
+        if focused.is_some() {
+            self.ready_plugins(&gained_ids);
+        }
     }
 
     /// How peers tell this plugin's source apart (FR-6.35); `None` for a repository that is
