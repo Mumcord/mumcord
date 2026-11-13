@@ -182,7 +182,9 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
         );
         await show.waitForClickable({ timeout: 10_000 });
         await show.click();
-        await waitTile(NAMES.a, "playing", TILE_MS);
+        // Show sends cam-join again (FR-8.57). A viewer may send that at most once per 10 s
+        // (§6.5), so this is not the 3 s camera-start budget.
+        await waitTile(NAMES.a, "playing");
       });
       expect((await waitOwnViewer(bob)).path).toBe("direct");
 
