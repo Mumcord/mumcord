@@ -16,8 +16,10 @@ pub enum Error {
     RollbackUnavailable,
     #[error("settings could not be (de)serialized: {0}")]
     Settings(#[from] serde_json::Error),
+    /// The secure storage (the OS store on desktop, the injected
+    /// [`SecretBackend`](crate::SecretBackend) elsewhere) failed or refused access.
     #[error("secure storage error: {0}")]
-    SecureStorage(#[from] keyring::Error),
+    SecureStorage(#[from] SecretBackendError),
     /// The encrypted secret file (FreeBSD, where most installs have no Secret Service).
     #[cfg(target_os = "freebsd")]
     #[error("secret file error: {0}")]
@@ -72,4 +74,28 @@ pub enum Error {
     InvalidBackgroundImage,
     #[error("background image {0} does not exist")]
     UnknownBackgroundImage(String),
+}
+
+/// The failure of a secure-storage backend, as reported by a
+/// [`SecretBackend`](crate::SecretBackend) implementation.
+///
+/// It wraps the platform's own error (a Keychain status, a Keystore exception text, …) so the
+/// store can treat every backend alike. The message is written to the log, so it must describe
+/// the failure only and never contain the secret or the account's content.
+#[derive(Debug, Error)]
+#[error(transparent)]
+pub struct SecretBackendError(Box<dyn std::error::Error + Send + Sync>);
+
+impl SecretBackendError {
+    /// Wraps a platform error or a plain message.
+    pub fn new(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> Self {
+        Self(error.into())
+    }
+}
+
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+impl From<keyring::Error> for Error {
+    fn from(error: keyring::Error) -> Self {
+        Self::SecureStorage(SecretBackendError::new(error))
+    }
 }

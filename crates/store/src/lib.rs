@@ -4,6 +4,9 @@
 //!
 //! Secrets (the identity PKCS#12 and server passwords) only ever go to the OS secure
 //! storage via [`SecretStore`]; nothing secret is written to SQLite or plain files.
+//! On the desktop platforms [`SecretStore::os`] uses the OS store; on Android and iOS the
+//! embedding app implements [`SecretBackend`] on top of the phone's secure storage and passes
+//! it to [`SecretStore::with_backend`].
 
 mod accepted;
 mod blocked;
@@ -39,7 +42,7 @@ pub use channel_audio::{ChannelAudioProfile, SavedChannelAudio, resolve_channel_
 pub use channel_tokens::{ChannelToken, TokenChannel};
 pub use db::{DB_FILE_NAME, Rollback, Store, UnixMillis, check_schema, roll_back, rollback_plan};
 pub use encoder_cache::{EncoderCache, EncoderEntry, SvtSelftest};
-pub use error::{Error, Result};
+pub use error::{Error, Result, SecretBackendError};
 pub use favorites::{GifFavorite, MAX_GIF_FAVORITES};
 pub use file_cards::FileCardRecord;
 pub use friends::Friend;
@@ -53,7 +56,7 @@ pub use plugins::{
 };
 pub use pm_overview::{MUTED_FOREVER, PmConversationPrefs, PrivateConversationSummary};
 pub use relay_pin::RelayPin;
-pub use secrets::{KEYRING_SERVICE, SecretStore};
+pub use secrets::{KEYRING_SERVICE, SecretBackend, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
     ActivityNotifySettings, BlockedMessages, CameraBackground, CameraEffectQuality,
