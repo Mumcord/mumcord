@@ -84,13 +84,21 @@ const DEFAULT_RECEIVERS: u16 = 16;
 const KEY_RETRY: Duration = Duration::from_secs(3);
 /// Bytes of the piece header (index, count) in a unit's plaintext.
 const PIECE_HEADER: usize = 2;
-/// Largest piece of an envelope in one unit: what the relay takes, minus the tag and header.
-const MAX_PIECE: usize = {
-    let legacy = MAX_DATA_PAYLOAD as usize - TAG_LEN - PIECE_HEADER;
-    let media = media::MAX_PLUGIN_MESSAGE
-        - (1 + SFrameHeader::MAX_LEN + TIMESTAMP_LEN + TAG_LEN)
-        - PIECE_HEADER;
-    if media < legacy { media } else { legacy }
+/// Largest piece of an envelope in one legacy unit (old relays, FR-7.98).
+const LEGACY_MAX_PIECE: usize = MAX_DATA_PAYLOAD as usize - TAG_LEN - PIECE_HEADER;
+/// Largest piece of an envelope in one media-profile unit.
+const MEDIA_MAX_PIECE: usize = media::MAX_PLUGIN_MESSAGE
+    - (1 + SFrameHeader::MAX_LEN + TIMESTAMP_LEN + TAG_LEN)
+    - PIECE_HEADER;
+/// Piece size that fits either link. A legacy link uses [`LEGACY_MAX_PIECE`] instead: a 64 KiB
+/// payload with a normal plugin id is one byte over this cap, so it would be a second piece, and
+/// an old relay drops that piece. The first unit already leaves its 64 KiB burst in debt
+/// (AC-9.18). Tests that do not pick a link still use this smaller cap.
+#[cfg(test)]
+const MAX_PIECE: usize = if MEDIA_MAX_PIECE < LEGACY_MAX_PIECE {
+    MEDIA_MAX_PIECE
+} else {
+    LEGACY_MAX_PIECE
 };
 // The encryption has to fit in the room the relay leaves for it.
 const _: () = assert!(TAG_LEN + PIECE_HEADER <= ENCRYPTION_OVERHEAD as usize);
@@ -1028,7 +1036,14 @@ impl PublisherTask {
 
     /// Seals the envelope in pieces and sends them at the relay's per-sender rate.
     async fn send(&mut self, envelope: &[u8], units: &mpsc::Sender<Vec<u8>>) -> bool {
-        for plain in pieces(envelope, MAX_PIECE) {
+        // A legacy link can carry a larger piece than a media one. Using the media cap there
+        // splits a 64 KiB message, and the old relay drops the extra piece (AC-9.18).
+        let max_piece = if self.media {
+            MEDIA_MAX_PIECE
+        } else {
+            LEGACY_MAX_PIECE
+        };
+        for plain in pieces(envelope, max_piece) {
             let mut sealed = Vec::new();
             if let Err(e) = self.sealer.seal(&plain, &mut sealed) {
                 tracing::warn!(error = %e, "plugin broadcast unit not sealed");
@@ -1439,6 +1454,29 @@ mod tests {
             out = received.push(opened);
         }
         assert_eq!(out, Some(whole));
+    }
+
+    #[test]
+    fn a_max_payload_with_a_normal_plugin_id_is_one_legacy_unit() {
+        // One byte over the media piece cap. Two pieces would not both pass an old relay's
+        // idle 64 KiB burst: the first unit leaves it in debt and the second is dropped.
+        let whole = envelope::encode(&Envelope {
+            api_major: 1,
+            api_minor: 1,
+            seq: 1,
+            plugin: "test-relay".into(),
+            data: vec![0; envelope::MAX_DATA],
+        })
+        .expect("valid");
+        assert_eq!(pieces(&whole, MEDIA_MAX_PIECE).len(), 2);
+        let parts = pieces(&whole, LEGACY_MAX_PIECE);
+        assert_eq!(parts.len(), 1);
+        let mut sealer = FrameSealer::new().expect("sealer");
+        let mut unit = Vec::new();
+        let header = sealer
+            .seal(Content::Data, &parts[0], &mut unit)
+            .expect("sealed");
+        assert!(header.payload_len <= MAX_DATA_PAYLOAD);
     }
 
     #[test]
