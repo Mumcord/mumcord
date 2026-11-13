@@ -25,8 +25,10 @@ const MAX_LOG: usize = 12;
 struct State {
     running: bool,
     seq: u32,
-    /// The person direct messages go to: the last one who showed they run this plugin.
-    peer: Option<(Session, String)>,
+    /// People who currently run this plugin, oldest first. Direct messages go to the latest.
+    /// A later one who leaves must not forget the others: the relay bot can become ready and
+    /// then leave while the other user stays (AC-9.19).
+    peers: Vec<(Session, String)>,
     /// How many `peer-ready` events came, so a spec can wait for a new one after a reconnect.
     ready: u32,
     received: u32,
@@ -66,7 +68,7 @@ fn view(with_buttons: bool) -> ui::El {
             .child(ui::text(&format!("Received: {}", s.received)))
             .child(ui::text(&format!(
                 "Peer: {} ({})",
-                s.peer.as_ref().map_or("none", |(_, name)| name.as_str()),
+                s.peers.last().map_or("none", |(_, name)| name.as_str()),
                 s.ready
             )));
         if with_buttons {
@@ -93,7 +95,7 @@ fn redraw() {
 fn send(action: &str, size: usize, fallback: bool, direct: bool) {
     let (seq, peer) = STATE.with_borrow_mut(|s| {
         s.seq = s.seq.wrapping_add(1);
-        (s.seq, s.peer.as_ref().map(|(session, _)| *session))
+        (s.seq, s.peers.last().map(|(session, _)| *session))
     });
     let Some(message) = messages::message(seq, size) else {
         note(format!("{action}: cannot build {size} B"));
@@ -192,18 +194,21 @@ impl Plugin for TestRelay {
             Event::PeerReady(peer) => {
                 note(format!("peer: {}", peer.name));
                 STATE.with_borrow_mut(|s| {
-                    s.peer = Some((peer.session, peer.name));
+                    s.peers.retain(|(id, _)| *id != peer.session);
+                    s.peers.push((peer.session, peer.name));
                     s.ready += 1;
                 });
             }
-            // The peer left the channel: until a new `peer-ready`, nobody here runs this plugin.
+            // Someone left. Drop only them; another person who is still ready stays the peer.
             Event::Left(peer) => {
-                let ours = STATE
-                    .with_borrow(|s| s.peer.as_ref().is_some_and(|(id, _)| *id == peer.session));
-                if !ours {
+                let removed = STATE.with_borrow_mut(|s| {
+                    let before = s.peers.len();
+                    s.peers.retain(|(id, _)| *id != peer.session);
+                    before != s.peers.len()
+                });
+                if !removed {
                     return;
                 }
-                STATE.with_borrow_mut(|s| s.peer = None);
                 note(format!("gone: {}", peer.name));
             }
             Event::RelayMessage((peer, data)) => match messages::decode(&data) {
@@ -215,7 +220,9 @@ impl Plugin for TestRelay {
                     ));
                     STATE.with_borrow_mut(|s| {
                         s.received = s.received.saturating_add(1);
-                        s.peer.get_or_insert((peer.session, peer.name));
+                        if s.peers.is_empty() {
+                            s.peers.push((peer.session, peer.name));
+                        }
                     });
                 }
                 // The SDK has logged the reason and size; the host passes the bytes unchanged.
