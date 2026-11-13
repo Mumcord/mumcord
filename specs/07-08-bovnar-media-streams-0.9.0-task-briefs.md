@@ -612,6 +612,47 @@ file
 
 ---
 
+## E4a — A machine that can run the acceptance run
+
+**Type:** simple · **Depends:** — (blocks E4) · **Owns:** the run environment; `testenv/preflight.sh`
+
+**Goal:** the first E4 attempt on 2026-11-12 never reached a single acceptance cell; the report
+(`07-08-bovnar-media-streams-0.9.0-acceptance-inventory.md`, "Run 1") names five blockers, none of
+them a product defect. This task removes them.
+
+- **AVX2.** SVT-AV1 refuses to open on a CPU without it, so no share and no camera starts. Needs an
+  AVX2 CPU (Haswell 2013 or newer); nothing in the client can work around it.
+- **docker with compose.** `testenv/up.sh` and the mumpeer testenv call `docker compose`.
+- **Passwordless `sudo`.** The `netns` cells (`AC-7.77` (c), `AC-7.86`, `AC-8.38`) need it.
+- **mumpeer with the media profile.** 0.3.0 is unreleased; the work is on
+  `feat/r5-media-profile` (`src/broadcast/media.rs`, `"media": 2`). Check it out as
+  `MUMPEER_DIR` or ship 0.3.0 first.
+- **A 0.8.0 build.** Build tag `v0.8.0` and point `MUMCORD_V080_BINARY` at the binary.
+- **SVT-AV1 4.0+** for every local build: `scripts/build-svt-av1.sh ~/.cache/mumcord-build/svt-av1`
+  and `export SVTAV1_STATIC_DIR=...`.
+
+`testenv/preflight.sh` checks all of it and exits non-zero while anything is missing. Run it before
+every E4 attempt, and record its output in the report.
+
+**Run 1 (2026-11-12, this workstation).** Four of the six items are now in place here:
+
+| Item | State |
+| --- | --- |
+| SVT-AV1 4.0+ | built once: `scripts/build-svt-av1.sh ~/.cache/mumcord-build/svt-av1` |
+| mumpeer with the media profile | worktree `../mumpeer-media` on `feat/r5-media-profile` (`"media": 2`); `MUMPEER_DIR` points there |
+| 0.8.0 build | release `.deb` of tag `v0.8.0` unpacked to `~/.cache/mumcord-build/v080/root/usr/bin/mumcord` (no build needed) |
+| `testenv/.env` | created from the example, random `SUPERUSER_PASSWORD`, git-ignored |
+| AVX2 | **not possible here.** The CPU is an i7-2700K; no software change can add it |
+| docker with compose | **not possible here** without root. Rootless podman is not a substitute even through a `docker` shim: it maps the host user to container root, so the server cannot read the 0600 `testenv/certs/A/key.pem` and exits. Also, this host's LAN is `10.0.0.0/8`, which swallows podman's default subnet pools (`could not find free subnet`) |
+| passwordless `sudo` | **needs the account's password** |
+
+So E4a cannot be closed on this workstation: two of the three open items are the machine itself and
+the account's privileges. It needs a host with an AVX2 CPU, docker and passwordless `sudo`.
+
+**Done when:** `testenv/preflight.sh` exits 0 on the machine that will run E4.
+
+---
+
 ## E5 — Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot
 
 **Type:** simple · **Depends:** E4 · **Owns:** release metadata only
