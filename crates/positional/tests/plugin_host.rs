@@ -26,18 +26,21 @@ const WAIT: Duration = Duration::from_secs(8);
 /// The built test plugin.
 fn fixture() -> PathBuf {
     let exe = std::env::current_exe().expect("test exe");
-    let file = exe
-        .parent()
-        .and_then(Path::parent)
-        .expect("target dir")
-        .join("examples")
-        .join(format!("{DLL_PREFIX}test_plugin.{DLL_EXTENSION}"));
-    assert!(
-        file.exists(),
-        "{} missing: run `cargo test -p mumcord-positional`, which builds the test plugin",
-        file.display()
-    );
-    file
+    let name = format!("{DLL_PREFIX}test_plugin.{DLL_EXTENSION}");
+    // How deep the test program sits below the profile directory depends on the Cargo version
+    // (`deps/` up to 1.99, `build/<package>/<hash>/out/` since 1.100), so search upwards for the
+    // `examples` directory instead of counting levels.
+    exe.ancestors()
+        .skip(1)
+        .map(|dir| dir.join("examples").join(&name))
+        .find(|file| file.exists())
+        .unwrap_or_else(|| {
+            panic!(
+                "{name} not found above {}: run `cargo test -p mumcord-positional`, which builds \
+                 the test plugin",
+                exe.display()
+            )
+        })
 }
 
 fn plugin_dir(name: &str) -> PathBuf {
