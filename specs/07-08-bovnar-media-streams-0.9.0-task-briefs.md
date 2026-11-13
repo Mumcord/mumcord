@@ -63,6 +63,9 @@
 | E2 | UI texts and 24 locales for fallback paths | done — `8f8a516b` screen-share fallbacks and `874ed800` camera path labels in 24 locales (the 0.8.x tile text "This camera needs Mumcord 0.9.0" ships in P0.5, `a2ba6e57`); `i18n.test.ts` guards the fallback texts, `shareView.test.tsx` covers the refusal states; screenshots go to E4 | D4, D6 | simple |
 | E3 | Notices and licences for Bovnar 2.1.0 | done — `scripts/ci/test-notices.sh` passes, 771 Rust / 19 native, 363 texts | – | simple |
 | E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
+| E4a | A machine that can run the acceptance run | open — 4 of 6 items provisioned, AVX2, docker and `sudo` are the host's | – | simple |
+| E4b | Keep the no-relay cells out of the relay shards | done — `e2e/specs/media/{media-streams,media-streams-relay}.e2e.ts`, `e2e/specs/media/flows.ts`, `e2e/specs/camera/media-streams-direct.e2e.ts`; both no-relay files stop a running relay env in `before` | – | simple |
+| E4c | Triage what E4b leaves failing | open | E4b | complex |
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
@@ -650,6 +653,50 @@ So E4a cannot be closed on this workstation: two of the three open items are the
 the account's privileges. It needs a host with an AVX2 CPU, docker and passwordless `sudo`.
 
 **Done when:** `testenv/preflight.sh` exits 0 on the machine that will run E4.
+
+---
+
+## E4b — Keep the no-relay cells out of the relay shards
+
+**Type:** simple · **Depends:** — (found by the first E2E run after `7fd35764`) · **Owns:**
+`e2e/specs/media/*`, `e2e/specs/camera/media-streams.e2e.ts`, `e2e/shards.json`
+
+**Goal:** the `camera/media-streams.e2e.ts` cell AC-8.29 ("no relay, no bot") asserts that the camera
+has no relay broadcast and the room says Direct. On the E2E runner it now runs in a **relay shard**
+and fails with the room chip reading "Relay · end-to-end encrypted" on a plain `v15` server: a shard
+where the relay environment runs cannot offer a server without a relay. `7fd35764` stopped every
+shard from skipping its relay specs, so these cells run for the first time since Nov 6 and collide.
+
+- Split the new `e2e/specs/media/media-streams.e2e.ts` the way the share-sound specs already are:
+  `media-streams.e2e.ts` (AC-7.80, AC-7.85 — no relay) and `media-streams-relay.e2e.ts` (AC-7.72,
+  AC-7.73, AC-7.76), so `scripts/e2e-shards.js` puts the first into a shard without relay specs.
+- The same split applies to `camera/media-streams.e2e.ts`: its AC-8.29 cell needs a relay-free
+  server, the rest need the relay.
+- Rebalance with `node scripts/e2e-shards.js --shards 10` and check that no shard mixes the two.
+
+**Done when:** every "no relay" cell lives in a shard that starts no relay environment, and both
+spec files pass in CI.
+
+---
+
+## E4c — Triage what E4b leaves failing
+
+**Type:** complex · **Depends:** E4b · **Owns:** the findings, each its own fix task
+
+**Goal:** after E4b, whatever still fails is a real defect. The first run (`39a0e763`, E2E run
+43402357622) left these, and each needs a cause before a fix:
+
+- `camera/effects` AC-8.5: "the 18 background thumbnails did not show within 3 s".
+- `camera/stop` AC-8.12, `camera/signal` AC-8.25: tile `{"state":"failed"}`.
+- `camera/room-limits` AC-8.8: "no picture in … canvas.cam-video__canvas".
+- `media/media-streams` AC-7.80 and `plugins/sound-frame`: the connect step is refused, the screenshot
+  reads "The server password is wrong" on a `v15` server whose `SERVER_PASSWORD` is empty.
+- E2E shard 2 (no relay specs at all): `EADDRINUSE :::47180`. Unrelated to the relay fix; find the
+  port owner.
+
+The screenshots and DOM dumps are in the `e2e-artifacts-shard-*` artifacts of that run.
+
+**Done when:** each item has a cause and either a fix commit or a written reason it is not a defect.
 
 ---
 
