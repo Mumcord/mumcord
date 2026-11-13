@@ -5,7 +5,7 @@
 # (specs/07-08-bovnar-media-streams-0.9.0-acceptance-inventory.md). Fails fast instead of after
 # hours: a missing piece here is what stops a whole family of ACs.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 failed=0
 ok() { printf '  ok    %s\n' "$1"; }
