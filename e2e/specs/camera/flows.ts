@@ -573,7 +573,19 @@ export class RawClient {
     this.send(MSG.Ping, encode([[1, BigInt(Date.now())]]));
   }
 
-  close(): void {
-    this.socket?.destroy();
+  /**
+   * Closes after the bytes already written have gone out. `destroy` drops that buffer, so the
+   * broken camera documents of AC-8.26 never reached the other client.
+   */
+  close(): Promise<void> {
+    const socket = this.socket;
+    this.socket = undefined;
+    if (!socket || socket.destroyed) return Promise.resolve();
+    return new Promise((resolve) => {
+      socket.once("close", () => {
+        resolve();
+      });
+      socket.end();
+    });
   }
 }

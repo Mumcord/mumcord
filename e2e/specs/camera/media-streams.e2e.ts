@@ -217,7 +217,7 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
         expect(viewers.some((v) => v.session === stale.session)).toBe(false);
         expect(await sentCamera("needs")).toEqual([]);
       } finally {
-        stale.close();
+        await stale.close();
       }
       expect((await cameraView())?.state).toBe("onAir");
       await turnCameraOff();
@@ -292,7 +292,7 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
         // And the viewer itself reads the refusal (§6.5).
         expect(await olaf.cameraDocument("needs")).toContain(broadcast);
       } finally {
-        olaf.close();
+        await olaf.close();
       }
 
       // The same with `direct_only`: no broadcast at all, so the session id comes from A's `on`,
@@ -307,7 +307,7 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
         expect(await olga.cameraDocument("needs")).toContain(id);
         expect((await cameraView())?.viewers.some((v) => v.session === olga.session)).toBe(false);
       } finally {
-        olga.close();
+        await olga.close();
       }
       await updateSettings({ p2pMode: "relayFirst" });
     });

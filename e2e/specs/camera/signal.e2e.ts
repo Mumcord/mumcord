@@ -119,7 +119,7 @@ const MARK = "fuzzmark";
       for (const doc of docs) mallory.pluginData(target, "mumcord.camera", Buffer.from(doc, "utf8"));
       mallory.ping();
     } finally {
-      mallory.close();
+      await mallory.close();
     }
 
     await on("b", async () => {
