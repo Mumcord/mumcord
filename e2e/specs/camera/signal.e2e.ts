@@ -13,7 +13,7 @@
 //
 // Skips itself without a mumpeer checkout (see relay-uses.e2e.ts).
 // Run: npm run e2e -- --spec e2e/specs/camera/signal.e2e.ts
-import { $, browser, expect } from "@wdio/globals";
+import { $, expect } from "@wdio/globals";
 import { apps, relayenv } from "../../helpers/index.ts";
 import { botInBackground } from "../../helpers/bot.ts";
 import { sendText, waitMessage } from "../../helpers/chat-ui.ts";
@@ -28,6 +28,7 @@ import {
   ownSession,
   sessionOf,
   setRoomOpen,
+  sleep,
   startCamClient,
   startCapture,
   turnCameraOn,
@@ -117,15 +118,6 @@ const MARK = "fuzzmark";
       const target = mallory.sessionOf(NAMES.b);
       for (const doc of docs) mallory.pluginData(target, "mumcord.camera", Buffer.from(doc, "utf8"));
       mallory.ping();
-      // Disk logs are buffered and flushed every five seconds. Wait for the rejection
-      // records themselves, not a sleep that can finish before the next flush.
-      await browser.waitUntil(
-        () => Promise.resolve(ignoredLines(clientLog("b")).length - seen >= docs.length),
-        {
-          timeout: 15_000,
-          timeoutMsg: "the malformed camera messages never reached the rejection log",
-        },
-      );
     } finally {
       mallory.close();
     }
@@ -137,13 +129,19 @@ const MARK = "fuzzmark";
       expect(room.tiles.map((t) => t.sharer).sort()).toEqual(roomBefore.tiles.map((t) => t.sharer).sort());
       expect((await cameraView())?.state ?? "off").toBe("off");
     });
-    const log = clientLog("b");
-    const lines = ignoredLines(log);
+    // The log file is written out every 5 s, so the ignore lines are not on disk at once.
+    let lines: string[] = [];
+    const deadline = Date.now() + 12_000;
+    while (Date.now() < deadline) {
+      lines = ignoredLines(clientLog("b"));
+      if (lines.length - seen >= docs.length) break;
+      await sleep(500);
+    }
     expect(lines.length - seen).toBe(docs.length);
     const fresh = lines.slice(seen).join("\n");
     expect(fresh).toMatch(/too-large/);
     expect(fresh).toMatch(/wrong-type|malformed/);
-    expect(log).not.toContain(MARK);
+    expect(clientLog("b")).not.toContain(MARK);
   });
 
   it("AC-8.27: a client without camera support sees nothing and chat keeps working", async () => {
