@@ -54,11 +54,15 @@ export function cleanUpSound(): void {
  * A joins the voice channel of the local test server as the sharer, with the given test hooks.
  * Its log runs at debug level from the start, for the privacy check of AC-7.70.
  */
-export async function startSharer(hooks: TestHooks, port: number): Promise<void> {
+export async function startSharer(
+  hooks: TestHooks,
+  port: number,
+  name = SHARER,
+): Promise<void> {
   await app.restart({ freshProfile: true, env: hookEnv(hooks) });
   await useDebugLog();
   await app.restart();
-  await completeWizard(SHARER);
+  await completeWizard(name);
   await allowDirect();
   await addAndConnect(`localhost:${String(port)}`);
   await joinIfReadOnly();
@@ -67,7 +71,7 @@ export async function startSharer(hooks: TestHooks, port: number): Promise<void>
 }
 
 /** B joins the same channel as the viewer; its microphone plays a steady tone ("B talks"). */
-export async function startViewer(port: number): Promise<void> {
+export async function startViewer(port: number, name = VIEWER): Promise<void> {
   work ??= mkdtempSync(join(tmpdir(), "mumcord-share-sound-"));
   const voice = join(work, "b-in.wav");
   const tone = new Float32Array(RATE * 120);
@@ -76,7 +80,7 @@ export async function startViewer(port: number): Promise<void> {
   writeWav(voice, tone);
   await apps.startB({ audio: `file:${voice}:${viewerOutput()}` });
   await apps.onB(async () => {
-    await completeWizard(VIEWER);
+    await completeWizard(name);
     await allowDirect();
     await addAndConnect(`localhost:${String(port)}`);
     await joinIfReadOnly();

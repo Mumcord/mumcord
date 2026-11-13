@@ -29,7 +29,9 @@ export const REASON = {
   noRelay: "This server has no relay, so camera sharing isn't available.",
   relayTooOld: "This server's relay is too old for camera sharing.",
   relayDisallows: "This server's relay doesn't allow camera sharing.",
-  needsRelayMode: "Camera sharing needs the relay. Change it in Privacy & Connections.",
+  /** P2P mode `off` (the variant name stayed when the text changed, FR-8.4). */
+  needsRelayMode: "Camera sharing is turned off. Change it in Privacy & Connections.",
+  needsDirect: "Camera sharing needs direct connections. Change it in Privacy & Connections.",
 } as const;
 
 export const ROOM_FULL = "The camera room is full (9 of 9 cameras).";
@@ -50,8 +52,19 @@ export async function joinVoice(): Promise<void> {
  * on `port`, joins the channel and registers: the relay bot gives relay tokens to registered users
  * only, and cameras always go through the relay.
  */
+/**
+ * Allows direct connections. The camera's fallback path (no relay, an old relay, or direct-only)
+ * asks both people before it opens; that question is not what these specs are about, and nobody
+ * answers it here. A spec that checks the refusal sets the answer back to "no" itself.
+ */
+async function allowDirect(): Promise<void> {
+  const settings = await app.invoke<Record<string, unknown>>("settings_get");
+  await app.invoke("settings_update", { settings: { ...settings, allowDirectConnections: "yes" } });
+}
+
 export async function connectRegistered(name: string, port: number): Promise<void> {
   await completeWizard(name);
+  await allowDirect();
   await addAndConnect(`localhost:${String(port)}`);
   await joinVoice();
   await registerOnServer();
@@ -76,7 +89,9 @@ export async function startC(name: string, port: number, env = CAMERA_ENV): Prom
 }
 
 /** Settings → Privacy & Connections: picks the peer-to-peer mode of the running client. */
-export async function setP2pMode(mode: "directRelay" | "relayOnly" | "directOnly"): Promise<void> {
+export async function setP2pMode(
+  mode: "directRelay" | "relayFirst" | "relayOnly" | "directOnly" | "off",
+): Promise<void> {
   await openSettingsGroup("Privacy & Connections");
   const radio = $(`fieldset.p2p-modes input[type='radio'][value='${mode}']`);
   await radio.waitForExist();
@@ -312,8 +327,10 @@ export async function waitBuiltinThumbnails(count: number): Promise<void> {
         count,
       ),
     {
-      timeout: 3_000,
-      timeoutMsg: `the ${String(count)} background thumbnails did not show within 3 s`,
+      // The command decodes every built-in image before the tiles appear. A debug build, which
+      // is what E2E launches, takes several seconds; the UI then shows them all at once.
+      timeout: 20_000,
+      timeoutMsg: `the ${String(count)} background thumbnails did not show within 20 s`,
     },
   );
 }

@@ -44,8 +44,11 @@ describe("share sound without PipeWire (#435, AC-7.66)", function () {
     if (hadPipeWire) await pwapps.pulseOnly();
     expect(pwapps.pipewireRunning()).toBe(false);
     await testenv.up("v15");
-    await startSharer({ sharePick: "screen" }, ports.v15);
-    await startViewer(ports.v15);
+    // Alice and Bob are registered on this shared server by earlier specs. A fresh certificate
+    // with a registered name is refused as a wrong password (murmur: wrong certificate for
+    // that user). These names are not registered.
+    await startSharer({ sharePick: "screen" }, ports.v15, "PipeA");
+    await startViewer(ports.v15, "PipeB");
     await openShareDialog();
     const toggle = dialogSoundSwitch();
     expect(await toggle.isSelected()).toBe(false);

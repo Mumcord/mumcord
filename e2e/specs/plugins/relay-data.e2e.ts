@@ -400,6 +400,9 @@ async function waitReady(after: number, who: string): Promise<void> {
 async function bothInChannel(before?: ReadyCounts): Promise<void> {
   await personRow("Bob").waitForDisplayed({ timeout: 60_000, timeoutMsg: "A never saw Bob" });
   await waitPanel("Peer: Bob", 60_000);
+  // B drops a channel message until Alice's announce is stored (FR-6.35). A's view of Bob is
+  // not that check.
+  await apps.onB(() => waitPanel("Peer: Alice", 60_000));
   if (before) {
     await waitReady(before.a, "A");
     await apps.onB(() => waitReady(before.b, "B"));

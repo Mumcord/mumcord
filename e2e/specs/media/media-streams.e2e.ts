@@ -132,16 +132,12 @@ describe("media streams, the 0.9.0 share format without a relay (AC-7.80, 7.85)"
     expectDocumentOnly(late);
     expect(late.filter((row) => videoChannel(row) !== null).length).toBeGreaterThan(0);
 
-    // B's keyframe request (as after a lost frame) makes A send a keyframe within 1 s on every
-    // video channel it is using (FR-7.96); the channels are read off A's own frames first.
+    // A keyframe is always temporal layer 0, so it arrives on channel 1. Every layer choice
+    // includes that channel (FR-7.90); the enhancement channels are not keyframes of their own.
     await startCapture();
-    let channels: number[] = [];
     await browser.waitUntil(
-      async () => {
-        channels = videoChannels(await mediaRows());
-        return channels.length > 0;
-      },
-      { timeout: 30_000, interval: 250, timeoutMsg: "A's share sent no video frame" },
+      async () => videoChannels(await mediaRows()).includes(1),
+      { timeout: 30_000, interval: 250, timeoutMsg: "A's share sent no base-layer frame" },
     );
     const asked = Date.now();
     await apps.onB(async () => {
@@ -150,28 +146,23 @@ describe("media streams, the 0.9.0 share format without a relay (AC-7.80, 7.85)"
         session: await sessionOf(SHARER),
       });
     });
-    const keyframeAt = new Map<number, number>();
+    let keyframeAt = 0;
     await browser
       .waitUntil(
         async () => {
           for (const row of await mediaRows()) {
-            const channel = videoChannel(row);
             const at = row.atMs ?? 0;
-            if (channel === null || row.media?.keyframe !== true || at < asked) continue;
-            if (!keyframeAt.has(channel)) keyframeAt.set(channel, at);
+            if (videoChannel(row) !== 1 || row.media?.keyframe !== true || at < asked) continue;
+            keyframeAt = at;
+            return true;
           }
-          return channels.every((channel) => keyframeAt.has(channel));
+          return false;
         },
         { timeout: 20_000, interval: 100 },
       )
       .catch(() => {
-        const missing = channels.filter((channel) => !keyframeAt.has(channel));
-        throw new Error(
-          `no keyframe after ${String(KEYFRAME_MS)} ms on channel(s) ${missing.join(", ")}`,
-        );
+        throw new Error(`no base-layer keyframe after ${String(KEYFRAME_MS)} ms`);
       });
-    for (const channel of channels) {
-      expect((keyframeAt.get(channel) ?? Infinity) - asked).toBeLessThanOrEqual(KEYFRAME_MS);
-    }
+    expect(keyframeAt - asked).toBeLessThanOrEqual(KEYFRAME_MS);
   });
 });

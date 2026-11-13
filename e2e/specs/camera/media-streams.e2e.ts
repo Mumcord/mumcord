@@ -18,11 +18,14 @@
 // Not automatable in this environment, so covered elsewhere or reported:
 //   - AC-8.31's 0.8.0 build (the tile text "This camera needs Mumcord 0.9.0", no second
 //     `cam-join`, no video): the E2E image carries only the current build. Reported as "not
-//     verified" instead of worked around; the sender half is automated here.
-//   - AC-8.30/8.31/8.40 on an old relay that still carries cameras: the only old mumpeer image
-//     (`MUMCORD_E2E_OLD_MUMPEER_IMAGE`, 0.1.0) has no broadcasts at all, so an old-format camera
-//     broadcast serving 0.8.x viewers is covered by the engine live tests
-//     (`crates/engine/tests/live_camera_paths.rs`, profile `old`) and the unit matrix.
+//     verified" instead of worked around; the sender half is automated here when the relay
+//     announces media version 2.
+//   - The pinned mumpeer (`MUMPEER_REF`) still speaks the old format: `/v1/status` has no
+//     `"media": 2`. AC-8.30 then checks the old-relay half (0.9.0 viewers on the direct path,
+//     the old-format broadcast still open). AC-8.31 and AC-8.33 need the new format, so they
+//     skip until the pin moves. The 0.1.0 image (`MUMCORD_E2E_OLD_MUMPEER_IMAGE`) has no
+//     broadcasts at all; an old-format broadcast serving a 0.8.x viewer stays in
+//     `crates/engine/tests/live_camera_paths.rs`.
 //   - The 8-viewer direct and 25-viewer relay `full`: eight real direct viewers need eight more
 //     app instances, and the bot admits relay viewers by certificate, which a scripted client has
 //     not. Covered by `camera::direct::tests`, `camera::admit::tests` and the live tests.
@@ -136,6 +139,8 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
     let port = 0;
     let bob = 0;
     let carol = 0;
+    /** True once AC-8.30 has seen a relay that announces media version 2 (FR-8.94). */
+    let freshRelay = false;
 
     after(async () => {
       await apps.stopB();
@@ -144,6 +149,22 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
     });
 
     it("AC-8.32: hiding, leaving and blocking close the viewer's direct stream; a stale session id is refused", async () => {
+      // This cell is first and stands on its own: a plain server, no relay, three clients already
+      // watching A's camera over the direct path (FR-8.96). The relay cells below start their
+      // own server.
+      await relayenv.stopRelay();
+      await testenv.up("v15");
+      const plain = testenv.ports.v15;
+      await startCamClient("a", plain);
+      await startCamClient("b", plain);
+      await startCamClient("c", plain);
+      for (const id of ["a", "b", "c"] as const) await on(id, () => setRoomOpen(true));
+      await turnCameraOn();
+      await on("b", () => waitTile(NAMES.a, "playing", TILE_MS));
+      await on("c", () => waitTile(NAMES.a, "playing", TILE_MS));
+      bob = await sessionOf(NAMES.b);
+      carol = await sessionOf(NAMES.c);
+
       // B hides A's video: the link closes and A drops B from its viewer list (FR-8.57).
       await on("b", async () => {
         await app.invoke("camera_tile_set_hidden", {
@@ -207,14 +228,23 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
       await startCamClient("b", port);
       for (const id of ["a", "b"] as const) await on(id, () => setRoomOpen(true));
       bob = await sessionOf(NAMES.b);
+      // Profile `all` on a relay that announces `mv` is the new format. The pinned image does
+      // not, and then 0.9.0 viewers stay on the direct path while the old broadcast stays up
+      // for 0.8.x (FR-8.94).
+      freshRelay = ((await relayenv.relayStatus()).media as number | undefined) === 2;
 
       const view = await turnCameraOn();
-      // FR-8.94: a usable relay is the first path, so the camera has a broadcast.
       expect(view.broadcast).toMatch(/^[0-9a-f]{16}$/);
       await on("b", () => waitTile(NAMES.a, "playing", TILE_MS));
-      expect((await waitOwnViewer(bob)).path).toBe("relay");
-      expect(await pathChip().getText()).toBe(RELAY_CHIP);
-      expect(await viewerListPaths()).toEqual(["Relay"]);
+      if (freshRelay) {
+        expect((await waitOwnViewer(bob)).path).toBe("relay");
+        expect(await pathChip().getText()).toBe(RELAY_CHIP);
+        expect(await viewerListPaths()).toEqual(["Relay"]);
+      } else {
+        expect((await waitOwnViewer(bob)).path).toBe("direct");
+        expect(await pathChip().getText()).toBe(DIRECT_CHIP);
+        expect(await viewerListPaths()).toEqual(["Direct"]);
+      }
 
       // `direct_only` never opens a relay broadcast; the same viewer then gets a stream.
       await turnCameraOff();
@@ -228,7 +258,10 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
       await updateSettings({ p2pMode: "relayFirst" });
     });
 
-    it("AC-8.31: a viewer without `media-v2` gets `needs` and no stream, on the relay and with `direct_only`", async () => {
+    it("AC-8.31: a viewer without `media-v2` gets `needs` and no stream, on the relay and with `direct_only`", async function () {
+      // On an old relay the same viewer is served by the old-format broadcast and gets no
+      // `needs` (AC-8.31). That half needs a 0.8.0 build, which this image does not carry.
+      if (!freshRelay) this.skip();
       await app.invoke("packet_capture_background", { enabled: true });
       await app.invoke("packet_capture_clear");
       const broadcast = (await turnCameraOn()).broadcast;
@@ -277,7 +310,10 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
       await updateSettings({ p2pMode: "relayFirst" });
     });
 
-    it("AC-8.33: a room mixes a relay camera and a direct camera of two senders", async () => {
+    it("AC-8.33: a room mixes a relay camera and a direct camera of two senders", async function () {
+      // Both 0.9.0 viewers are on the direct path until the relay speaks the new format, so
+      // this cell has no relay camera to mix in.
+      if (!freshRelay) this.skip();
       await turnCameraOff();
       // A keeps the new relay's broadcast, B runs `direct_only` with its own streams.
       await on("b", async () => {

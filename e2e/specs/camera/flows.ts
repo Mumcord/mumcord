@@ -71,6 +71,9 @@ export async function startCamClient(
   }
   await on(id, async () => {
     await completeWizard(opts.name ?? NAMES[id]);
+    // The direct camera path asks before it opens. These specs are not about that question;
+    // leaving it unanswered makes the viewer's tile fail while the sender is still waiting.
+    await updateSettings({ allowDirectConnections: "yes" });
     await addAndConnect(`localhost:${String(port)}`);
     await joinIfReadOnly();
     await registerOnServer();
