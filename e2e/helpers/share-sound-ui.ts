@@ -37,6 +37,8 @@ export const SHARER = "Alice";
 export const VIEWER = "Bob";
 
 let work: string | undefined;
+/** The name `startSharer` actually used. The banner says that name, not always Alice. */
+let sharerName = SHARER;
 
 /** B's recorded output (the file backend's out.wav). */
 export function viewerOutput(): string {
@@ -54,11 +56,8 @@ export function cleanUpSound(): void {
  * A joins the voice channel of the local test server as the sharer, with the given test hooks.
  * Its log runs at debug level from the start, for the privacy check of AC-7.70.
  */
-export async function startSharer(
-  hooks: TestHooks,
-  port: number,
-  name = SHARER,
-): Promise<void> {
+export async function startSharer(hooks: TestHooks, port: number, name = SHARER): Promise<void> {
+  sharerName = name;
   await app.restart({ freshProfile: true, env: hookEnv(hooks) });
   await useDebugLog();
   await app.restart();
@@ -103,11 +102,11 @@ export async function stopShare(): Promise<void> {
 export async function watch(): Promise<void> {
   await apps.onB(async () => {
     const button = $(
-      `//div[contains(@class,'activity-banner')][contains(.,'${SHARER} is sharing their screen')]//button[normalize-space()='Watch']`,
+      `//div[contains(@class,'activity-banner')][contains(.,'${sharerName} is sharing their screen')]//button[normalize-space()='Watch']`,
     );
     await button.waitForClickable({ timeout: 30_000, timeoutMsg: "B never saw A's share" });
     await button.click();
-    const connecting = $(`//*[contains(text(),"Connecting to ${SHARER}'s screen")]`);
+    const connecting = $(`//*[contains(text(),"Connecting to ${sharerName}'s screen")]`);
     await browser.waitUntil(async () => !(await connecting.isExisting()), {
       timeout: 45_000,
       timeoutMsg: "B's view of the share never connected",

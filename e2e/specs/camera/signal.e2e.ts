@@ -71,7 +71,12 @@ const MARK = "fuzzmark";
         (m) => m.direction === "received" && m.sender === alice && m.fields?.t === "on",
       );
       expect(onMsg).toBeDefined();
-      expect(onMsg?.fields).toEqual({ t: "on", id: view.broadcast });
+      // §6.5: `mv` is 2 on the new media profile and absent on the old one. The inspector
+      // writes a missing `mv` as null. The pinned relay is old, so this run sees null.
+      const fields = onMsg?.fields ?? {};
+      const { mv, ...rest } = fields;
+      expect(rest).toEqual({ t: "on", id: view.broadcast });
+      expect(mv === undefined || mv === null || mv === 2).toBe(true);
       // Bovnar text, never JSON (§6.5): `.v=<uint:8>1;.t="on";.id="…";`; the encoder writes the
       // integer's Bovnar type, a hand-written document may leave it out.
       expect(onMsg?.raw.trimStart().startsWith("{")).toBe(false);
