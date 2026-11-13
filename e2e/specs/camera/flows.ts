@@ -9,6 +9,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { $, browser } from "@wdio/globals";
 import { app, apps } from "../../helpers/index.ts";
+import { waitForAbsent } from "../../helpers/dom.ts";
 import { registerOnServer } from "../../helpers/files-ui.ts";
 import { openAllSettings } from "../../helpers/settings-ui.ts";
 import { addAndConnect, completeWizard, joinIfReadOnly } from "../../helpers/voice-ui.ts";
@@ -251,7 +252,9 @@ export async function turnCameraOn(): Promise<CameraView> {
   const confirm = previewDialog().$(".app-dialog__actions .button--primary");
   await confirm.waitForEnabled({ timeout: 20_000 });
   await confirm.click();
-  await previewDialog().waitForExist({ reverse: true, timeout: 20_000 });
+  await waitForAbsent("dialog.cam-dialog", {
+    timeout: 20_000, timeoutMsg: "the camera preview did not close",
+  });
   return waitCameraState("onAir");
 }
 

@@ -38,6 +38,7 @@ import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { $, browser, expect } from "@wdio/globals";
 import { app, apps, pluginenv, relayenv } from "../../helpers/index.ts";
+import { waitForAbsent } from "../../helpers/dom.ts";
 import { registerOnServer } from "../../helpers/files-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { run } from "../../helpers/run.ts";
@@ -516,7 +517,10 @@ async function bothInChannel(before?: ReadyCounts): Promise<void> {
       const before = await readyCounts();
       const serverId = await apps.onB(() => invokeOk<number>("voice_server_get"));
       await apps.onB(() => invokeOk("disconnect", { serverId }));
-      await personRow("Bob").waitForExist({ reverse: true, timeout: 30_000 });
+      await waitForAbsent(
+        "//div[contains(@class,'tree-person')][.//span[contains(@class,'tree-person__name') and text()='Bob']]",
+        { timeout: 30_000, timeoutMsg: "Bob's person row remained after disconnecting" },
+      );
       // Once A's plugin has seen B leave, nobody in the channel runs it: the send is refused
       // (FR-9.58: the same reach rules as peers.send), and it takes a sequence number B never gets.
       await waitPanel("Peer: none");
