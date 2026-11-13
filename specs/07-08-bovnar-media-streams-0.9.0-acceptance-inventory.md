@@ -55,14 +55,21 @@ where the specification names a test file that does not exist, the row says so.
 ### Prerequisites (once, on the capable machine)
 
 `testenv/preflight.sh` checks all of the following and exits non-zero while anything is missing
-(task E4a). Run it before every attempt and put its output in the report.
+(task E4a). Run it before every attempt and put its output in the report. It finds the mumpeer
+checkout and the old client through the environment, so export both first:
+
+    export MUMPEER_DIR=../mumpeer
+    export MUMCORD_V080_BINARY=/path/to/mumcord-0.8.0
+    ./testenv/preflight.sh
 
 - Docker with compose (the user in the `docker` group), `sqlite3`, `openssl`, Node 20+, Rust
   (stable) and the Linux build libraries of `scripts/ci/apt-install.sh`.
 - `cp testenv/.env.example testenv/.env` and set `SUPERUSER_PASSWORD`.
-- A mumpeer checkout at the commit CI pins (`.github/workflows/e2e.yml`, `MUMPEER_REF`; 0.3.0 or
-  later for `"media": 2`), next to this repo or at `MUMPEER_DIR`:
-  `git clone https://github.com/Mumcord/mumpeer ../mumpeer`.
+- A mumpeer checkout, next to this repo or at `MUMPEER_DIR`: `git clone https://github.com/Mumcord/mumpeer
+  ../mumpeer`. `main` has no media profile yet, so for the new-relay cells check out the 0.3.0 work
+  (Mumcord/mumpeer#17, branch `feat/r5-media-profile`) and build it in the testenv, or wait for 0.3.0
+  and use the commit CI pins (`MUMPEER_REF` in `.github/workflows/e2e.yml`). The testenv mounts the
+  checkout, so no separate binary is needed. `preflight.sh` only finds it through `MUMPEER_DIR`.
 - The previous mumpeer and bot images for relay profile `old`
   (`MUMPEER_IMAGE` / `MUMBOT_IMAGE`; see `e2e/helpers/relayenv.ts`).
 - The 0.8.0 build: tag `v0.8.0` (it contains P0.5, `a2ba6e57`). Take the release artefact of that
