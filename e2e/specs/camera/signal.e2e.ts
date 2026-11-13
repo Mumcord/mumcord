@@ -13,7 +13,7 @@
 //
 // Skips itself without a mumpeer checkout (see relay-uses.e2e.ts).
 // Run: npm run e2e -- --spec e2e/specs/camera/signal.e2e.ts
-import { expect } from "@wdio/globals";
+import { $, browser, expect } from "@wdio/globals";
 import { apps, relayenv } from "../../helpers/index.ts";
 import { botInBackground } from "../../helpers/bot.ts";
 import { sendText, waitMessage } from "../../helpers/chat-ui.ts";
@@ -28,7 +28,6 @@ import {
   ownSession,
   sessionOf,
   setRoomOpen,
-  sleep,
   startCamClient,
   startCapture,
   turnCameraOn,
@@ -113,8 +112,15 @@ const MARK = "fuzzmark";
       const target = mallory.sessionOf(NAMES.b);
       for (const doc of docs) mallory.pluginData(target, "mumcord.camera", Buffer.from(doc, "utf8"));
       mallory.ping();
-      // Nothing to wait for on success: give the messages time to arrive and be refused.
-      await sleep(3_000);
+      // Disk logs are buffered and flushed every five seconds. Wait for the rejection
+      // records themselves, not a sleep that can finish before the next flush.
+      await browser.waitUntil(
+        () => Promise.resolve(ignoredLines(clientLog("b")).length - seen >= docs.length),
+        {
+          timeout: 15_000,
+          timeoutMsg: "the malformed camera messages never reached the rejection log",
+        },
+      );
     } finally {
       mallory.close();
     }
@@ -148,10 +154,14 @@ const MARK = "fuzzmark";
     await olaf.done;
     // A's camera stayed on, and the camera wrote nothing into the chat.
     expect((await cameraView())?.state).toBe("onAir");
+    // The large camera room can leave the chat outside its viewport. Close only the
+    // room (not the camera) before checking the visible chat in either client.
+    await $(".cam-room__bar").$("button=Close room").click();
     await waitMessage("compat-from-olaf");
     await on("b", async () => {
-      await waitMessage("compat-from-olaf");
       await waitTile(NAMES.a);
+      await $(".cam-room__bar").$("button=Close room").click();
+      await waitMessage("compat-from-olaf");
     });
     expect((await cameraView())?.error ?? null).toBeNull();
   });
