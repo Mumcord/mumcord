@@ -852,7 +852,13 @@ impl Engine {
                 // FR-8.95).
                 signal::send(ctx, &[viewer], &refused);
             }
-            Ok(Admit::Direct) => self.camera_direct_open(ctx.server_id, viewer, id),
+            Ok(Admit::Direct) => {
+                // A relay viewer is reported once the bot admits them. A direct viewer is
+                // admitted here, and the room's viewer list only hears about that through
+                // this event (FR-8.62).
+                self.emit_camera(ctx.server_id, self.camera_view());
+                self.camera_direct_open(ctx.server_id, viewer, id);
+            }
             Ok(Admit::Relay(broadcast)) => {
                 let engine = self.clone();
                 let server_id = ctx.server_id;
