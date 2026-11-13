@@ -2,9 +2,6 @@
 // client: which path each viewer gets, what the room shows per viewer, and how a viewer that
 // cannot be served is refused.
 //
-//   AC-8.29  two 0.9.0 clients with no relay and no bot watch each other over the direct path;
-//            the room header says "Direct · end-to-end encrypted", the viewer list says Direct,
-//            and a client that enters the channel later gets its own stream.
 //   AC-8.32  on the direct path hiding, leaving and blocking close the viewer's stream, and a
 //            stale camera session id is refused without a crash.
 //   AC-8.30  with the new relay (profile `all`) the camera uses its relay broadcast and each
@@ -13,6 +10,10 @@
 //            is admitted to nothing and gets no second broadcast — on the new relay and with
 //            `direct_only`.
 //   AC-8.33  a room mixes a relay camera and a direct camera of two senders.
+//
+// AC-8.29 (two 0.9.0 clients with no relay watch each other over the direct path) lives in
+// `camera/media-streams-direct.e2e.ts`: it asserts there is no relay, which a shard that starts the
+// relay environment cannot offer. Keeping the two apart is what lets both run.
 //
 // Not automatable in this environment, so covered elsewhere or reported:
 //   - AC-8.31's 0.8.0 build (the tile text "This camera needs Mumcord 0.9.0", no second
@@ -127,7 +128,7 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
 }
 
 (relayenv.relayAvailable() ? describe : describe.skip)(
-  "camera path matrix and fallbacks (AC-8.29 to 8.33)",
+  "camera path matrix and fallbacks over the relay (AC-8.30 to 8.33)",
   function () {
     this.timeout(900_000);
     this.bail(true);
@@ -140,37 +141,6 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
       await apps.stopB();
       await apps.stopC();
       await relayenv.stopRelay();
-    });
-
-    it("AC-8.29: with no relay the two 0.9.0 clients watch each other over the direct path", async () => {
-      // The plain test server: no relay, no bot (as in avail.e2e.ts), so the direct path is the
-      // only one (FR-8.96).
-      await testenv.up("v15");
-      const plain = testenv.ports.v15;
-      await startCamClient("a", plain);
-      await startCamClient("b", plain);
-      for (const id of ["a", "b"] as const) await on(id, () => setRoomOpen(true));
-      bob = await sessionOf(NAMES.b);
-
-      const view = await turnCameraOn();
-      // FR-8.94: no usable relay, so no relay broadcast is created at all.
-      expect(view.broadcast).toBeNull();
-      // The tile arrives within 3 s (FR-8.60) over A's own `STREAM_CAMERA` (FR-8.92).
-      await on("b", () => waitTile(NAMES.a, "playing", TILE_MS));
-      expect((await waitOwnViewer(bob)).path).toBe("direct");
-      // The room names the path: header chip and viewer list (FR-8.62).
-      expect(await pathChip().getText()).toBe(DIRECT_CHIP);
-      expect(await viewerListPaths()).toEqual(["Direct"]);
-
-      // C enters the channel while the camera is on: its own stream opens, its tile arrives.
-      await startCamClient("c", plain);
-      await on("c", async () => {
-        await setRoomOpen(true);
-        await waitTile(NAMES.a, "playing", TILE_MS);
-      });
-      carol = await sessionOf(NAMES.c);
-      expect((await waitOwnViewer(carol)).path).toBe("direct");
-      expect(await viewerListPaths()).toEqual(["Direct", "Direct"]);
     });
 
     it("AC-8.32: hiding, leaving and blocking close the viewer's direct stream; a stale session id is refused", async () => {
