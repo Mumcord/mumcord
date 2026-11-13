@@ -21,6 +21,7 @@ use crossbeam_queue::ArrayQueue;
 use mumcord_camera::{
     CameraBackend, CameraError, CameraFrame, CaptureRequest, CaptureSession, DeviceId, FrameSink,
 };
+#[cfg(feature = "camera-effects")]
 use mumcord_effects::{Effects, EffectsConfig};
 use mumcord_screenshare::{EncoderConfig, I420Frame, VideoEncoder};
 use mumcord_store::{CameraSendQuality, ScreenOptimize};
@@ -163,6 +164,7 @@ impl Resize {
 pub(crate) struct Stages {
     /// The background effects; `None` passes frames unchanged (and the background can't be
     /// changed while the camera runs).
+    #[cfg(feature = "camera-effects")]
     pub effects: Option<EffectsConfig>,
     pub preview: Option<Arc<PreviewTap>>,
 }
@@ -294,6 +296,7 @@ impl FrameSink for QueueSink {
 pub(crate) struct CameraSend {
     control: Arc<Control>,
     capture: Option<Box<dyn CaptureSession>>,
+    #[cfg(feature = "camera-effects")]
     effects: Option<Effects>,
     frames: Option<mpsc::Receiver<Arc<Frame>>>,
     thread: Option<JoinHandle<()>>,
@@ -326,25 +329,23 @@ impl CameraSend {
             .spawn(move || encode.run())
             .map_err(|e| CameraError::Backend(format!("encode thread: {e}")))?;
         let _ = control.thread.set(thread.thread().clone());
-        let mut sink: Box<dyn FrameSink> = Box::new(QueueSink {
+        let sink: Box<dyn FrameSink> = Box::new(QueueSink {
             queue,
             control: control.clone(),
         });
-        let mut effects = None;
-        if let Some(config) = stages.effects {
-            // Without the effects thread the camera still works, with the background unchanged.
-            match Effects::start(config, sink) {
-                Ok((started, input)) => {
-                    effects = Some(started);
-                    sink = input;
-                }
+        // Without the effects thread the camera still works, with the background unchanged.
+        #[cfg(feature = "camera-effects")]
+        let (effects, sink) = match stages.effects {
+            Some(config) => match Effects::start(config, sink) {
+                Ok((started, input)) => (Some(started), input),
                 Err(e) => {
                     control.stop.store(true, Ordering::Relaxed);
                     control.wake();
                     return Err(CameraError::Backend(format!("effects thread: {e}")));
                 }
-            }
-        }
+            },
+            None => (None, sink),
+        };
         let request = CaptureRequest {
             max_fps: ceiling.fps.max(1),
             ..CaptureRequest::default()
@@ -360,6 +361,7 @@ impl CameraSend {
         Ok(Self {
             control,
             capture: Some(capture),
+            #[cfg(feature = "camera-effects")]
             effects,
             frames: Some(rx),
             thread: Some(thread),
@@ -390,6 +392,7 @@ impl CameraSend {
     }
 
     /// The background effects of this camera, when they run.
+    #[cfg(feature = "camera-effects")]
     pub fn effects(&self) -> Option<&Effects> {
         self.effects.as_ref()
     }
@@ -405,6 +408,7 @@ impl Drop for CameraSend {
         // The capture first: its drop joins the capture thread and turns the camera light off.
         // The effects thread then sees no more frames and stops when its handle drops.
         self.capture.take();
+        #[cfg(feature = "camera-effects")]
         self.effects.take();
         self.control.stop.store(true, Ordering::Relaxed);
         self.control.wake();
@@ -948,6 +952,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "vp9")]
     fn wait_for(rt: &tokio::runtime::Runtime, frames: &CameraFrames, what: &str) -> Arc<Frame> {
         let deadline = Instant::now() + Duration::from_secs(10);
         loop {
@@ -962,11 +967,14 @@ mod tests {
     }
 
     /// Whether no frame comes within `wait`.
+    #[cfg(feature = "vp9")]
     fn nothing(rt: &tokio::runtime::Runtime, frames: &CameraFrames, wait: Duration, what: &str) {
         let waited = rt.block_on(async { tokio::time::timeout(wait, frames.next()).await });
         assert!(waited.is_err(), "unexpected frames: {what}");
     }
 
+    // Opens a real VP9 encoder.
+    #[cfg(feature = "vp9")]
     #[test]
     fn the_test_camera_is_encoded_only_on_air_with_viewers_and_at_the_wanted_size() {
         let rt = tokio::runtime::Builder::new_current_thread()
@@ -1036,6 +1044,7 @@ mod tests {
         assert_eq!(send.ended(), None);
     }
 
+    #[cfg(feature = "camera-effects")]
     #[test]
     fn the_preview_gets_pictures_through_the_effects_before_the_camera_is_on_air() {
         use mumcord_effects::Background;

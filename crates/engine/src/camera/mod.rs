@@ -20,6 +20,7 @@ pub(crate) mod stop;
 
 pub use admit::{CameraPath, CameraViewer};
 pub use mumcord_camera::{CameraDevice, CameraError, DeviceId};
+#[cfg(feature = "camera-effects")]
 pub use mumcord_effects::{
     Background, EffectStats, EffectsError, Level as EffectLevel, Load as EffectLoad,
 };

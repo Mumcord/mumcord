@@ -1,6 +1,18 @@
 //! Picture conversion shared by the capture backends: the OS hands out packed BGRX/BGRA
 //! pictures, the encoder takes I420.
 
+#[cfg(any(
+    test,
+    all(
+        feature = "screen-capture",
+        any(
+            target_os = "linux",
+            target_os = "freebsd",
+            windows,
+            target_os = "macos"
+        )
+    )
+))]
 use mumcord_screenshare::I420Frame;
 
 /// Rounds a picture size down to what every encoder takes without padding: AMD's AMF pads widths
@@ -17,6 +29,18 @@ pub(crate) fn encode_size(width: u32, height: u32) -> (u32, u32) {
 
 /// Size that fits `src` into the box with its aspect ratio kept, rounded down by
 /// [`encode_size`]. Never enlarges.
+#[cfg(any(
+    test,
+    all(
+        feature = "screen-capture",
+        any(
+            target_os = "linux",
+            target_os = "freebsd",
+            windows,
+            target_os = "macos"
+        )
+    )
+))]
 pub(crate) fn fit(src_w: u32, src_h: u32, max_w: u32, max_h: u32) -> Option<(u32, u32)> {
     if src_w == 0 || src_h == 0 || max_w < 2 || max_h < 2 {
         return None;
@@ -39,6 +63,18 @@ pub(crate) fn fit(src_w: u32, src_h: u32, max_w: u32, max_h: u32) -> Option<(u32
 /// Scales a packed BGRX picture (`src_w * 4` bytes per row) into the box and converts it to
 /// I420 (BT.601 limited range). Luma is sampled per output pixel (nearest); chroma is the
 /// average of each 2×2 block of output pixels.
+#[cfg(any(
+    test,
+    all(
+        feature = "screen-capture",
+        any(
+            target_os = "linux",
+            target_os = "freebsd",
+            windows,
+            target_os = "macos"
+        )
+    )
+))]
 pub(crate) fn bgrx_to_i420(
     src: &[u8],
     src_w: u32,
@@ -98,7 +134,10 @@ pub(crate) fn bgrx_to_i420(
 
 /// Copies a BGRX picture with `stride` bytes per row (rows may be padded) into `out` as tight
 /// rows of `width * 4` bytes, ready for [`bgrx_to_i420`]. `false` when `src` is too short.
-#[cfg_attr(not(any(target_os = "macos", windows, test)), allow(dead_code))]
+#[cfg(any(
+    test,
+    all(feature = "screen-capture", any(target_os = "macos", windows))
+))]
 pub(crate) fn pack_rows(
     src: &[u8],
     stride: usize,

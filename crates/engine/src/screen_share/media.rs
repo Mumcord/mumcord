@@ -1147,16 +1147,19 @@ fn to_frame(out: EncodedFrame, (width, height): (u32, u32), codec: Codec) -> Fra
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "vp9")]
     use mumcord_screenshare::Encoder;
 
     use super::*;
 
     /// The default share's steps (1080p30 → 720p30 → 720p15 → 480p15).
+    #[cfg(feature = "vp9")]
     fn steps() -> Steps {
         Steps::new(QualityPrefs::default(), Codec::Vp9)
     }
 
     /// The lowest quality step (480p15).
+    #[cfg(feature = "vp9")]
     const FLOOR: usize = 3;
 
     #[test]
@@ -1330,6 +1333,7 @@ mod tests {
     }
 
     /// Software AV1 behind the encoder trait, with screen-content tools for "Sharp text".
+    #[cfg(feature = "desktop-codecs")]
     fn av1_encoder(screen_content: Arc<Mutex<Vec<bool>>>) -> EncoderFactory {
         EncoderFactory {
             offers_av1: true,
@@ -1630,6 +1634,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "desktop-codecs")]
     #[test]
     fn picks_change_live_and_sharp_text_restarts_av1_with_screen_content() {
         use mumcord_store::{ScreenFps, ScreenResolution};
@@ -1662,6 +1667,7 @@ mod tests {
     /// Encodes the test pattern the way the encode loop does: 10 s at 720p30 (long enough for
     /// rate control to settle), 2 s at 720p15, then `seconds` at the floor; the kbps of each
     /// second at the floor. Full HD before them would only make the test slower.
+    #[cfg(feature = "vp9")]
     fn floor_kbps(seconds: u32) -> Vec<usize> {
         let mut capture = super::super::capture::TestPattern::default();
         let mut encoder: Option<Encoder> = None;
@@ -1707,6 +1713,7 @@ mod tests {
 
     /// A throttled viewer's upload is sized for the floor's bitrate, so no second, not even the
     /// one right after the step down, may overshoot it by much.
+    #[cfg(feature = "vp9")]
     #[test]
     fn the_floor_stays_near_its_bitrate() {
         let per_second = floor_kbps(10);

@@ -40,7 +40,7 @@ mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
-mumcord-screenshare = { path = "crates/screenshare" }
+mumcord-screenshare = { path = "crates/screenshare", default-features = false }
 mumcord-camera = { path = "crates/camera" }
 mumcord-effects = { path = "crates/effects" }
 mumcord-plugins = { path = "crates/plugins", version = "0.8" }

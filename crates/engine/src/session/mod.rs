@@ -18,6 +18,7 @@ mod description;
 pub mod extension;
 mod local;
 mod machine;
+#[cfg(feature = "mumble-import")]
 mod mumble_import;
 mod types;
 
@@ -47,6 +48,7 @@ use tokio::task::JoinHandle;
 pub use channel_audio::{ActiveAudioProfile, ChannelAudioView};
 pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
+#[cfg(feature = "mumble-import")]
 pub use mumble_import::{
     ImportDevice, ImportFavouriteView, ImportIdentityView, MumbleImportChoice, MumbleImportPreview,
     MumbleImportResult,
@@ -273,8 +275,10 @@ struct Inner {
     /// Images of synced messages still being fetched (FR-1.60f).
     history_images: crate::history_sync::HistoryImages,
     /// What the last import from the official Mumble client added, for its undo (issue #66).
+    #[cfg(feature = "mumble-import")]
     mumble_import: Mutex<Option<mumble_import::LastImport>>,
     /// Positional audio (FR-1.41).
+    #[cfg(feature = "positional")]
     positional: crate::positional::Positional,
     /// Watch parties in the user's channels (FR-2.39).
     watch_parties: crate::watch_party::ServerParties,
@@ -622,6 +626,7 @@ impl Engine {
             blocked: Mutex::new(blocked),
             history_sync: Arc::default(),
             history_images: crate::history_sync::HistoryImages::default(),
+            #[cfg(feature = "mumble-import")]
             mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
@@ -629,6 +634,7 @@ impl Engine {
             camera_signals: crate::camera::signal::CameraSignals::default(),
             screen_encoders: Arc::default(),
             inspector: Arc::default(),
+            #[cfg(feature = "positional")]
             positional: crate::positional::Positional::new(
                 voice.positional.clone(),
                 &settings.positional,
@@ -641,6 +647,7 @@ impl Engine {
         engine.inner.history_images.bind(&engine);
         lock(&engine.inner.screen_shares).engine = Some(engine.downgrade());
         lock(&engine.inner.cameras).engine = Some(engine.downgrade());
+        #[cfg(feature = "positional")]
         engine.positional_poll_restart();
         engine
             .link_previews()
@@ -679,6 +686,7 @@ impl Engine {
     }
 
     /// Context of the session the voice pipeline is bound to (positional audio, FR-2.2).
+    #[cfg(feature = "positional")]
     pub(crate) fn voice_ctx(&self) -> Option<SessionCtx> {
         let core = lock(&self.inner.core);
         let server_id = core.audio_server?;
@@ -949,6 +957,7 @@ impl Engine {
         &self.inner.history_images
     }
 
+    #[cfg(feature = "positional")]
     pub(crate) fn positional(&self) -> &crate::positional::Positional {
         &self.inner.positional
     }
@@ -2047,6 +2056,7 @@ impl Inner {
         let target = core.voice_server.or_else(|| core.earliest_connected());
         if core.audio_server != target {
             self.stop_pipeline(core);
+            #[cfg(feature = "positional")]
             if core.audio_server.is_some() {
                 self.positional.on_disconnect();
             }
@@ -2063,6 +2073,7 @@ impl Inner {
             self.voice.muted.store(voice.mute, Ordering::Relaxed);
             self.voice.deaf.store(voice.deaf, Ordering::Relaxed);
             if let Some(id) = target {
+                #[cfg(feature = "positional")]
                 self.positional.on_synced();
                 // The sound hub learns the people of its new server, as on a sync.
                 if let Some(snapshot) = self.snapshot(core, id) {
@@ -2453,6 +2464,7 @@ impl Inner {
         if audio {
             // A reconnect of the pipeline's server: fresh counters and game context.
             self.voice.reset_link();
+            #[cfg(feature = "positional")]
             self.positional.on_synced();
         }
         let snapshot = self.snapshot(&lock(&self.core), server_id);
@@ -2548,6 +2560,7 @@ impl Inner {
                     // Only the pipeline's server plays voice; read-only servers send none.
                     VoiceEvent::Packet(packet) if self.is_audio_server(server_id) => {
                         self.voice.packets_received.fetch_add(1, Ordering::Relaxed);
+                        #[cfg(feature = "positional")]
                         if let Some(sending) = self.positional.on_voice_packet(
                             packet.session,
                             packet.positional.is_some(),
@@ -2600,6 +2613,7 @@ impl Inner {
                         core.sample_audio_health(&self.voice);
                         core.sync_queue_target(self.controls.low_latency());
                         drop(core);
+                        #[cfg(feature = "positional")]
                         for session in self.positional.expire(Instant::now()) {
                             ctx.events.emit(EngineEvent::PositionalSendingChanged {
                                 session,
@@ -2889,6 +2903,7 @@ impl Inner {
                 {
                     pipeline.forget(user.session);
                 }
+                #[cfg(feature = "positional")]
                 let audio = core.audio_server == Some(server_id);
                 drop(core);
                 crate::now_playing::on_user_removed(&self.now_playing, server_id, user.session);
@@ -2921,6 +2936,7 @@ impl Inner {
                 self.files.on_user_removed(server_id, user.session);
                 self.direct.forget(server_id, user.session);
                 self.relays.on_user_removed(ctx, user.session);
+                #[cfg(feature = "positional")]
                 if audio {
                     self.positional.on_user_removed(user.session);
                 }

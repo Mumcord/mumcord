@@ -116,7 +116,11 @@ impl CaptureSource for TestPattern {
         }
     }
 
-    #[cfg(all(target_os = "linux", feature = "test-backend"))]
+    #[cfg(all(
+        feature = "screen-capture",
+        target_os = "linux",
+        feature = "test-backend"
+    ))]
     fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
         use crate::test_hooks::SharePick;
         match &self.pick {

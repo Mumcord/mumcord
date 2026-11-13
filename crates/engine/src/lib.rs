@@ -22,6 +22,7 @@ pub mod ingame_overlay;
 pub mod inspector;
 pub mod latency;
 mod maintenance;
+#[cfg(feature = "mumble-import")]
 pub mod mumble_import;
 pub mod mumcord;
 pub mod noise_backend;
@@ -36,6 +37,7 @@ pub mod plugin_sounds;
 pub mod plugins;
 pub mod pm_overview;
 pub mod pm_rules;
+#[cfg(feature = "positional")]
 pub mod positional;
 pub mod profile;
 pub mod public_servers;
@@ -66,6 +68,7 @@ pub use ingame_overlay::{
 };
 pub use latency::LatencyEstimateView;
 /// Position sources (Mumble Link, plugin host) as the engine uses them.
+#[cfg(feature = "positional")]
 pub use mumcord_positional as positional_sources;
 /// Stored types (settings record etc.) as the engine hands them out.
 pub use mumcord_store as store;
@@ -74,6 +77,7 @@ pub use now_gaming::{GameSource, LocalGame, NowGamingView};
 pub use now_playing::{LocalTrack, NowPlayingView};
 pub use pm_overview::PrivateConversationView;
 pub use pm_rules::{MessageRequestView, PmRequestsView, SentChatRequestView};
+#[cfg(feature = "positional")]
 pub use positional::PositionalStatus;
 pub use registered::{RegisteredOutcome, RegisteredView};
 pub use server_query::{QueryOutcome, ServerQueries, ServerQuery};
@@ -87,7 +91,9 @@ pub use session::{
     ServerFields, ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot, TaggedEvent,
     TestConnectionView, UnreadView, UserView, VoiceTransportKind,
 };
-pub use session::{DenialKind, MumbleImportChoice, MumbleImportPreview, MumbleImportResult, Right};
+pub use session::{DenialKind, Right};
+#[cfg(feature = "mumble-import")]
+pub use session::{MumbleImportChoice, MumbleImportPreview, MumbleImportResult};
 pub use stats::UserStatsView;
 pub use watch_party::{
     HISTORY_MAX, HistoryItem, PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand,

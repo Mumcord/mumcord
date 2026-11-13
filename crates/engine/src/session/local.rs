@@ -295,6 +295,7 @@ impl Engine {
     /// Takes back an identity the import from the official client just added (issue #66).
     /// Unlike [`Engine::identity_delete`] this may remove the last identity: the user
     /// undoes the import, e.g. in the first-start wizard before any identity existed.
+    #[cfg(feature = "mumble-import")]
     pub(crate) async fn identity_undo_import(&self, id: IdentityId) -> EngineResult<()> {
         let store = self.inner.store.clone();
         self.blocking(move |secrets| {
@@ -815,6 +816,7 @@ impl Engine {
         {
             self.camera_availability_refresh_all();
         }
+        #[cfg(feature = "positional")]
         if previous.positional != settings.positional {
             self.positional_configure(&settings.positional);
         }

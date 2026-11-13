@@ -648,9 +648,11 @@ pub enum EngineEvent {
     /// Pinned or muted private conversations changed (issue #173).
     PmConversationPrefsChanged(Vec<mumcord_store::PmConversationPrefs>),
     /// Positional audio was switched, or the game delivering positions changed (FR-1.43).
+    #[cfg(feature = "positional")]
     PositionalStatusChanged(crate::positional::PositionalStatus),
     /// A person (or the user, with the own session) started or stopped sending positions
     /// (the "3D" icon, FR-1.72).
+    #[cfg(feature = "positional")]
     PositionalSendingChanged {
         session: u32,
         sending: bool,

@@ -9,18 +9,18 @@
 //! the pipeline attaches its share port to [`ShareSoundHub`] while it runs, and each watch opens
 //! a new ring whenever the hub's generation changed.
 
-#[cfg(any(target_os = "linux", test))]
+#[cfg(all(feature = "screen-capture", any(target_os = "linux", test)))]
 pub mod icon;
-#[cfg(any(target_os = "linux", test))]
+#[cfg(all(feature = "screen-capture", any(target_os = "linux", test)))]
 pub mod linux;
-#[cfg(any(target_os = "macos", test))]
+#[cfg(all(feature = "screen-capture", any(target_os = "macos", test)))]
 pub mod macos;
-#[cfg(any(target_os = "linux", test))]
+#[cfg(all(feature = "screen-capture", any(target_os = "linux", test)))]
 pub mod matcher;
-#[cfg(any(target_os = "linux", test))]
+#[cfg(all(feature = "screen-capture", any(target_os = "linux", test)))]
 pub mod pick;
 pub(crate) mod status;
-#[cfg(windows)]
+#[cfg(all(feature = "screen-capture", windows))]
 pub(crate) mod windows;
 
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -41,20 +41,23 @@ pub use status::{
 /// Why this system cannot share sound at all (FR-7.84), checked before the share starts and
 /// shown in the start dialog; `None` where it can.
 pub(crate) fn unavailable() -> Option<SoundUnavailable> {
-    #[cfg(windows)]
+    #[cfg(all(feature = "screen-capture", windows))]
     {
         (!super::capture_windows::sound_available()).then_some(SoundUnavailable::OsTooOld)
     }
-    #[cfg(target_os = "macos")]
+    #[cfg(all(feature = "screen-capture", target_os = "macos"))]
     {
         let (major, _) = super::capture_macos::os_version();
         (!super::capture_macos::sound_supported(major)).then_some(SoundUnavailable::OsTooOld)
     }
-    #[cfg(target_os = "linux")]
+    #[cfg(all(feature = "screen-capture", target_os = "linux"))]
     {
         (!linux::running()).then_some(SoundUnavailable::NoPipeWire)
     }
-    #[cfg(not(any(windows, target_os = "macos", target_os = "linux")))]
+    #[cfg(not(all(
+        feature = "screen-capture",
+        any(windows, target_os = "macos", target_os = "linux")
+    )))]
     {
         Some(SoundUnavailable::NoPipeWire)
     }
@@ -63,7 +66,11 @@ pub(crate) fn unavailable() -> Option<SoundUnavailable> {
 /// The sound for the test backend's pretend pick (test hook): the same decision and PipeWire
 /// capture as a real Linux share, so the E2E hears exactly what such a share would carry and a
 /// window without a clear app asks "Which app's sound?" (FR-7.83).
-#[cfg(all(target_os = "linux", feature = "test-backend"))]
+#[cfg(all(
+    feature = "screen-capture",
+    target_os = "linux",
+    feature = "test-backend"
+))]
 pub(crate) fn test_pick(request: SoundRequest, hint: Option<&str>) -> SoundOutcome {
     let hints: Vec<&str> = hint.into_iter().collect();
     pick::take(request, &hints)

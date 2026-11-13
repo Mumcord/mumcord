@@ -555,6 +555,7 @@ impl DecodeThread {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(all(feature = "desktop-codecs", feature = "av1-decode"))]
     use mumcord_screenshare::{Av1Encoder, Av1Options, EncoderConfig};
 
     use super::*;
@@ -671,8 +672,10 @@ mod tests {
         assert!(!notified(&control).await, "the keyframe came");
     }
 
+    #[cfg(all(feature = "desktop-codecs", feature = "av1-decode"))]
     struct Pictures(Mutex<mpsc::Sender<(Codec, u32, u32)>>);
 
+    #[cfg(all(feature = "desktop-codecs", feature = "av1-decode"))]
     impl ScreenFrameSink for Pictures {
         fn on_encoded(&self, _: ServerId, _: u32, _: &Frame) {
             unreachable!("every frame is decoded here");
@@ -687,6 +690,7 @@ mod tests {
     }
 
     /// AC-7.41: an AV1 share plays without WebCodecs, decoded by dav1d on the decode thread.
+    #[cfg(all(feature = "desktop-codecs", feature = "av1-decode"))]
     #[test]
     fn av1_frames_round_trip_through_the_engine_decoder() {
         let (width, height, fps) = (320, 192, 30);

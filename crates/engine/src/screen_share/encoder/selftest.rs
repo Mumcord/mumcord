@@ -86,6 +86,7 @@ mod tests {
         assert!(!passes(34, 15));
     }
 
+    #[cfg(feature = "desktop-codecs")]
     #[test]
     fn measures_a_small_size_within_the_budget() {
         let started = Instant::now();
