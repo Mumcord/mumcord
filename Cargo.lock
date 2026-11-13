@@ -4084,7 +4084,7 @@ checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
 [[package]]
 name = "mumbot"
 version = "0.5.4"
-source = "git+https://github.com/sothis/mumbot?branch=feat%2Fmedia-v2#dfd7647cb56aeef3d60732c92c66a3c1215084ac"
+source = "git+https://github.com/sothis/mumbot?rev=dfd7647cb56aeef3d60732c92c66a3c1215084ac#dfd7647cb56aeef3d60732c92c66a3c1215084ac"
 dependencies = [
  "anyhow",
  "base64 0.23.1",
