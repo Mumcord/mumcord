@@ -12,7 +12,7 @@
 //! field. Payloads are untrusted: they are size-capped and versioned, and viewer lists are
 //! capped (and must still be checked against the people in the channel by the caller).
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 use serde::{Deserialize, Serialize};
 
 /// Plugin data id of every screen share signal; other ids are ignored.
@@ -21,6 +21,8 @@ pub const DATA_ID: &str = "mumcord.screen";
 pub const FEATURE: &str = "screen-share";
 /// The signal version this client sends; higher versions are still read.
 pub const VERSION: u32 = 2;
+/// The `mv` value of a client that reads the Bovnar media profile (FR-7.96).
+pub const MEDIA_VERSION: u8 = 2;
 
 /// What the sharer picked, when the platform can tell (issue #163).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -63,11 +65,16 @@ pub enum Signal {
         /// 1 when the viewer can join relay broadcasts (FR-7.42).
         #[serde(default, skip_serializing_if = "is_zero")]
         bc: u8,
+        /// [`MEDIA_VERSION`] when the viewer reads the Bovnar media profile (FR-7.96).
+        #[serde(default, skip_serializing_if = "is_zero")]
+        mv: u8,
     },
     /// The receiver may watch the sender's share now.
     Accept,
     /// The sender's share already has [`MAX_VIEWERS`] viewers.
     Full,
+    /// The sender's share uses a format this viewer's Mumcord cannot read.
+    NeedsUpdate,
     /// The sender stopped watching the receiver's share.
     Unwatch,
     /// Everyone watching the sender's share, sorted.
@@ -98,6 +105,7 @@ pub fn watch_request(broadcast: bool) -> Signal {
     Signal::Watch {
         codecs: PLAYABLE_CODECS.to_vec(),
         bc: u8::from(broadcast),
+        mv: MEDIA_VERSION,
     }
 }
 
@@ -171,10 +179,12 @@ mod tests {
             Signal::Watch {
                 codecs: vec![],
                 bc: 0,
+                mv: 0,
             },
             Signal::Watch {
                 codecs: vec![CodecName::Av1, CodecName::Vp9],
                 bc: 1,
+                mv: MEDIA_VERSION,
             },
             Signal::Accept,
             Signal::Full,
@@ -238,7 +248,8 @@ mod tests {
             decode(br#"{"v":2,"t":"watch","extra":1}"#),
             Some(Signal::Watch {
                 codecs: vec![],
-                bc: 0
+                bc: 0,
+                mv: 0
             })
         );
         assert_eq!(
@@ -253,7 +264,8 @@ mod tests {
             decode(br#"{"v":2,"t":"watch","codecs":["h266","av1",7,"vp9"],"bc":1}"#),
             Some(Signal::Watch {
                 codecs: vec![CodecName::Av1, CodecName::Vp9],
-                bc: 1
+                bc: 1,
+                mv: 0
             })
         );
         assert_eq!(decode(br#"{"v":2,"t":"watch","codecs":"av1"}"#), None);
@@ -261,7 +273,8 @@ mod tests {
         assert_eq!(
             encode(&Signal::Watch {
                 codecs: vec![],
-                bc: 0
+                bc: 0,
+                mv: 0
             }),
             br#"{"v":2,"t":"watch"}"#
         );
@@ -270,12 +283,15 @@ mod tests {
     #[test]
     fn this_client_asks_with_its_playable_codecs() {
         let sent = encode(&watch_request(false));
-        assert_eq!(sent, br#"{"v":2,"t":"watch","codecs":["av1","vp9"]}"#);
+        assert_eq!(
+            sent,
+            br#"{"v":2,"t":"watch","codecs":["av1","vp9"],"mv":2}"#
+        );
         // 0.6.x reads `{"t":"watch"}` with extra fields as a plain watch (see the test above).
         assert!(decode(&sent).is_some());
         assert_eq!(
             encode(&watch_request(true)),
-            br#"{"v":2,"t":"watch","codecs":["av1","vp9"],"bc":1}"#
+            br#"{"v":2,"t":"watch","codecs":["av1","vp9"],"bc":1,"mv":2}"#
         );
     }
 }

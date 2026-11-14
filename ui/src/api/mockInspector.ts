@@ -2,7 +2,7 @@
  * Packet inspector of the mock engine: a fixed set of fictional packets appears when capture
  * starts, so the inspector can be tried and photographed without a server.
  */
-import type { Packet, PacketCapture } from "../bindings/commands";
+import type { MediaPacket, Packet, PacketCapture } from "../bindings/commands";
 
 function hex(text: string): string {
   return Array.from(new TextEncoder().encode(text), (b) => b.toString(16).padStart(2, "0")).join(
@@ -34,6 +34,7 @@ function plugin(
     tokensLeft: pacing?.tokensLeft ?? null,
     decoded: JSON.stringify(payload, null, 2),
     rawHex: hex(text),
+    media: null,
   };
 }
 
@@ -58,6 +59,34 @@ function control(
     tokensLeft: null,
     decoded: null,
     rawHex: "",
+    media: null,
+  };
+}
+
+/** One message of a media stream: no payload, so no hex, and a description only on channel 0. */
+function media(
+  id: number,
+  atMs: number,
+  direction: Packet["direction"],
+  size: number,
+  message: MediaPacket,
+  decoded: string | null = null,
+): Packet {
+  return {
+    id,
+    serverId: 1,
+    atMs,
+    direction,
+    kind: message.format === "media" ? ".media" : `.media legacy v${String(message.version)}`,
+    pluginData: false,
+    size,
+    sender: null,
+    receivers: [],
+    delayMs: null,
+    tokensLeft: null,
+    decoded,
+    rawHex: "",
+    media: message,
   };
 }
 
@@ -99,6 +128,45 @@ function samplePackets(start: number): Packet[] {
       { sender: 3 },
     ),
     control(5, start + 2050, "received", "UserState", 64),
+    media(
+      6,
+      start + 2600,
+      "sent",
+      214,
+      {
+        format: "media",
+        version: null,
+        channel: 0,
+        control: 0,
+        flags: null,
+        keyframe: false,
+      },
+      '{\n  "kind": "screen"\n}',
+    ),
+    media(7, start + 2612, "sent", 20480, {
+      format: "media",
+      version: null,
+      channel: 2,
+      control: null,
+      flags: 1,
+      keyframe: true,
+    }),
+    media(8, start + 2645, "sent", 3210, {
+      format: "media",
+      version: null,
+      channel: 2,
+      control: null,
+      flags: 0,
+      keyframe: false,
+    }),
+    media(9, start + 2700, "sent", 4096, {
+      format: "legacy",
+      version: 2,
+      channel: null,
+      control: null,
+      flags: null,
+      keyframe: false,
+    }),
   ];
 }
 

@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20FreeBSD-555" alt="Platforms: Windows, macOS, Linux, FreeBSD" />
   <a href="https://scorecard.dev/viewer/?uri=github.com/Mumcord/mumcord"><img src="https://api.scorecard.dev/projects/github.com/Mumcord/mumcord/badge" alt="OpenSSF Scorecard" /></a>
   <a href="https://www.bestpractices.dev/projects/16577"><img src="https://www.bestpractices.dev/projects/16577/badge" alt="OpenSSF Best Practices" /></a>
-  <a href="https://crates.io/crates/mumcord-protocol"><img src="https://img.shields.io/crates/v/mumcord-protocol?label=crates.io" alt="mumcord-protocol on crates.io" /></a>
+  <a href="https://crates.io/crates/mumble-client-protocol"><img src="https://img.shields.io/crates/v/mumble-client-protocol?label=crates.io" alt="mumble-client-protocol on crates.io" /></a>
 </p>
 
 <p align="center">
@@ -181,7 +181,7 @@ Mumcord is compatible with Mumble but **not affiliated with or endorsed by the M
 | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | [Mumcord/mumbot](https://github.com/Mumcord/mumbot)                                                                              | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use                                 |
 | [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)                                                                            | Optional community relay for direct connections when no direct path is possible; Mumcord has the relay client built in    |     |
-| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol)                                                                  | Rust library for the Mumble protocol                                                                                      |
+| [`mumble-client-protocol`](https://crates.io/crates/mumble-client-protocol)                                                      | Rust library for the Mumble protocol, in its own [repository](https://github.com/Mumcord/mumble-client-protocol)          |
 | [`mumcord-codec`](https://crates.io/crates/mumcord-codec)                                                                        | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots)                     |
 | [`mumcord-audio`](https://crates.io/crates/mumcord-audio)                                                                        | Audio device input and output on top of `mumcord-codec`                                                                   |
 | [`mumcord-store`](https://crates.io/crates/mumcord-store), [`mumcord-p2p`](https://crates.io/crates/mumcord-p2p)                 | Local storage and direct connections, on crates.io since 0.4.3                                                            |
@@ -225,7 +225,7 @@ Logs contain no chat, names or audio. Known problems and fixes: [Troubleshooting
 
 ## Building from source
 
-You need Rust 1.90+, Node.js 24 and the platform libraries listed on the wiki's [Building](https://github.com/Mumcord/mumcord/wiki/Building) page. Screen sharing also needs SVT-AV1 4.0+ and dav1d: on Linux the system packages (Arch: `svt-av1 dav1d`), or static builds from `scripts/build-svt-av1.sh` and `scripts/build-dav1d.sh` with `SVTAV1_STATIC_DIR` and `DAV1D_STATIC_DIR` pointing at them (Debian/Ubuntu ship an SVT-AV1 that is too old). Then:
+You need Rust 1.97+, Node.js 24 and the platform libraries listed on the wiki's [Building](https://github.com/Mumcord/mumcord/wiki/Building) page. Screen sharing also needs SVT-AV1 4.0+ and dav1d: on Linux the system packages (Arch: `svt-av1 dav1d`), or static builds from `scripts/build-svt-av1.sh` and `scripts/build-dav1d.sh` with `SVTAV1_STATIC_DIR` and `DAV1D_STATIC_DIR` pointing at them (Debian/Ubuntu ship an SVT-AV1 that is too old). Then:
 
 ```sh
 git clone https://github.com/Mumcord/mumcord.git && cd mumcord
@@ -272,4 +272,4 @@ macOS builds are signed and notarized. Windows releases are signed with a Certum
 
 Mumcord is licensed under the [GNU AGPL v3 only](LICENSE) from version 0.2.0. Versions up to and including 0.1.1 were released under the MIT License and stay MIT for those who have them.
 
-Third-party licences, including Mumble's BSD licence for the protocol definitions in `proto/`, are listed in [`THIRD_PARTY_NOTICES`](THIRD_PARTY_NOTICES).
+Third-party licences, including Mumble's BSD licence for the protocol definitions, are listed in [`THIRD_PARTY_NOTICES`](THIRD_PARTY_NOTICES).

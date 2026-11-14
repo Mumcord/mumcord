@@ -22,8 +22,8 @@ export async function addAndConnect(address = `${SERVER}:${String(ports.v15)}`):
   await waitConnected();
 }
 
-export async function waitConnected(): Promise<void> {
-  await $(`button[aria-label="${SERVER} (connected)"]`).waitForExist({ timeout: 30_000 });
+export async function waitConnected(timeout = 30_000): Promise<void> {
+  await $(`button[aria-label="${SERVER} (connected)"]`).waitForExist({ timeout });
   await $("[role='tree']").waitForExist({ timeout: 15_000 });
   await showAllPeople();
 }

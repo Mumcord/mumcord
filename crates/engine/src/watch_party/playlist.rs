@@ -14,7 +14,7 @@ use std::collections::VecDeque;
 use std::hash::{BuildHasher, Hasher};
 use std::time::{Duration, Instant};
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 use serde::{Deserialize, Serialize};
 
 use super::valid_video_id;

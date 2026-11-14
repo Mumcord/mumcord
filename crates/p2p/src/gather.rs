@@ -16,8 +16,10 @@ use crate::signal::MAX_CANDIDATES;
 /// Requested lifetime of a router port mapping. An active UDP flow keeps the router's state
 /// after the lease ends, so a connection outlives it; new connections request a fresh mapping.
 const MAPPING_LEASE_SECS: u32 = 3600;
-/// Time budget for asking the router, so an offer is not held up by a router that never answers.
-const MAPPING_BUDGET: Duration = Duration::from_secs(3);
+/// Time budget for asking the router. A router that can map a port answers in one round trip;
+/// a silent one must not hold the offer. Camera start, direct path included, has to put a tile
+/// up within 3 s (spec 08, performance), and this wait sits inside that budget.
+const MAPPING_BUDGET: Duration = Duration::from_millis(300);
 const MAPPING_DESCRIPTION: &str = "Mumcord direct connection";
 
 /// A router port mapping; removed again when dropped.
@@ -282,6 +284,12 @@ mod tests {
 
     fn ips(list: &[IpAddr]) -> Vec<String> {
         list.iter().map(ToString::to_string).collect()
+    }
+
+    #[test]
+    fn a_silent_router_cannot_spend_the_camera_start() {
+        // The direct camera path has the same 3 s as a LAN relay (spec 08, performance).
+        assert!(MAPPING_BUDGET <= Duration::from_millis(500));
     }
 
     #[test]

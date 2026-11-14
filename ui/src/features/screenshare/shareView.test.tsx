@@ -1,7 +1,8 @@
 /** Opening a watched share and the mini bar that remains (issue #163, FR-3.125). */
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockApi, ScreenShare } from "../../api";
+import { EngineError, type MockApi, type ScreenShare } from "../../api";
+import { axeViolations } from "../../test/axe";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { CombinedHeaderContext } from "../media/combinedHeader";
 import { leaveCinema, mediaView, resetMediaView } from "../media/mediaView";
@@ -181,6 +182,51 @@ describe("watched share", () => {
     fireEvent.click(screen.getByRole("button", { name: "Fill" }));
     expect(mediaView().fit).toBe("fill");
     expect(document.querySelector(".share-screen--fill")).not.toBeNull();
+  });
+
+  // The refusal texts of the 0.9.0 fallback (FR-7.99, FR-2.43, FR-2.46): the viewer shows why it
+  // gets no picture instead of an empty stage, and every way out stays reachable by keyboard.
+  it("says a share needs a newer Mumcord and offers no picture (FR-7.99)", async () => {
+    const watch = vi
+      .spyOn(api, "screenShareWatch")
+      .mockRejectedValue(new EngineError("needsUpdate", ""));
+    const { container } = render(<Viewer serverId={1} session={ANNA} />);
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [annaShares()] });
+    });
+    await screen.findByText("This share needs Mumcord 0.9.0.");
+    // The stage's status line: a screen reader hears it without moving there.
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("This share needs Mumcord 0.9.0.");
+    // No picture: the stage hides the empty canvas instead of announcing "Shared screen of Anna".
+    expect(screen.queryByRole("img", { name: "Shared screen of Anna" })).toBeNull();
+    fireEvent.click(within(status).getByRole("button", { name: "Try again" }));
+    await vi.waitFor(() => {
+      expect(watch).toHaveBeenCalledTimes(2);
+    });
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("says the share is full (FR-2.43)", async () => {
+    vi.spyOn(api, "screenShareWatch").mockRejectedValue(new EngineError("shareFull", ""));
+    render(<Viewer serverId={1} session={ANNA} />);
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [annaShares()] });
+    });
+    expect(await screen.findByText("This share is full.")).toBeInTheDocument();
+  });
+
+  it("says the sharer's Mumcord is too old for direct connections (FR-2.46)", async () => {
+    vi.spyOn(api, "screenShareWatch").mockRejectedValue(
+      new EngineError("directUnavailable", "peerUnsupported"),
+    );
+    render(<Viewer serverId={1} session={ANNA} />);
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [annaShares()] });
+    });
+    expect(
+      await screen.findByText("Anna's Mumcord is too old to share their screen with you."),
+    ).toBeInTheDocument();
   });
 
   it("sets the share's own volume and leaves the sharer's voice volume alone (issue #333)", async () => {

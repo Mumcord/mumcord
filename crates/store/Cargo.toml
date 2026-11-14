@@ -15,7 +15,6 @@ license.workspace = true
 
 [dependencies]
 rusqlite.workspace = true
-keyring.workspace = true
 rcgen.workspace = true
 p12-keystore.workspace = true
 rsa.workspace = true
@@ -31,6 +30,18 @@ rand.workspace = true
 chrono.workspace = true
 # The encrypted fallback secret file on FreeBSD (AES-256-GCM); already in the tree through rustls.
 ring.workspace = true
+# The transfer to the phone (`transfer` module): key derivation, compression, part checksum and
+# wiping of key material.
+argon2.workspace = true
+miniz_oxide.workspace = true
+crc32fast.workspace = true
+zeroize.workspace = true
+
+# The OS secure storage of the desktop platforms. Phones have no backend in `keyring` that fits
+# (Android Keystore, iOS Keychain with "this device only"); there the embedding app implements
+# `SecretBackend` itself.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+keyring.workspace = true
 
 [target.'cfg(unix)'.dependencies]
 # Owner check and O_NOFOLLOW for the secret file.
@@ -42,6 +53,11 @@ test-util = []
 
 [dev-dependencies]
 tempfile.workspace = true
+proptest.workspace = true
+# Read the QR codes of "Send to your phone" back from pictures of the desktop dialog
+# (examples/transfer_read.rs, used by the end-to-end test); never part of the app.
+rqrr = "=0.11.0"
+image.workspace = true
 
 [lints]
 workspace = true

@@ -17,6 +17,7 @@
     "muted": "Pornește microfonul ca să șoptești.",
     "serverMuted": "Serverul ți-a oprit microfonul, deci nu îți transmite vocea.",
     "nobodyHere": "Niciuna dintre aceste persoane nu este acum pe acest server.",
+    "ambiguousName": "Mai multe persoane de aici au acest nume, așa că șoapta nu a fost trimisă.",
     "channelNotFound": "Acest canal nu există pe acest server.",
     "noPermission": "Serverul nu îți permite să șoptești în {{channel}}.",
     "unknownTarget": "Această țintă nu mai există.",

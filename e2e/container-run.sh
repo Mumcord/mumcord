@@ -96,11 +96,15 @@ if [ "$step" != test ]; then
     scripts/build-dav1d.sh /cache/native/dav1d
     export DAV1D_STATIC_DIR=/cache/native/dav1d
   fi
-  echo "building app (debug, test-backend), netsim, test game plugin..."
-  npx tauri build --debug --no-bundle --features test-backend -- --locked
+  # MUMCORD_E2E_APP_FEATURES replaces the app's Cargo features, e.g. `test-backend` alone to check
+  # that a build without `phone-transfer` hides "Send to your phone" (CONTRIBUTING.md, "Build flags").
+  app_features="${MUMCORD_E2E_APP_FEATURES:-test-backend,phone-transfer}"
+  echo "building app (debug, $app_features), netsim, test game plugin..."
+  npx tauri build --debug --no-bundle --features "$app_features" -- --locked
   cargo build --locked --quiet -p netsim
   cargo build --locked --quiet -p mumcord-positional --example test_plugin
   cargo build --locked --quiet -p mumcord-overlay-layer --example headless_check
+  cargo build --locked --quiet -p mumcord-store --example transfer_read
   # Next to the debug binaries, so CI ships it to the shard jobs with them.
   scripts/fetch-mumbot.sh linux-x86_64 "$CARGO_TARGET_DIR/debug"
 fi

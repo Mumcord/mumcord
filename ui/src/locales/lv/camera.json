@@ -12,9 +12,10 @@
     "noRelay": "Šim serverim nav releja, tāpēc kameras kopīgošana nav pieejama.",
     "relayTooOld": "Šī servera relejs ir pārāk vecs kameras kopīgošanai.",
     "relayDisallows": "Šī servera relejs neļauj kopīgot kameru.",
-    "needsRelayMode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
+    "needsRelayMode": "Kameras kopīgošana ir izslēgta. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
     "registeredOnly": "Šajā serverī kameru drīkst izmantot tikai reģistrēti lietotāji.",
+    "needsDirect": "Kameras kopīgošanai nepieciešami tiešie savienojumi. Maini to sadaļā Privātums un savienojumi.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera ieslēgta",
@@ -24,7 +25,7 @@
     "title": "Ieslēdz savu kameru",
     "subtitle": "Priekšskatījums · neviens to vēl neredz",
     "previewLabel": "Kameras priekšskatījums",
-    "privacy": "Tavu kameru redz tikai kanāla {{channel}} dalībnieki, un tikai pēc tam, kad nospiedīsi „Ieslēgt kameru”. Mumcord nekad neieraksta kameras.",
+    "privacy": "Tavu kameru redz tikai kanāla {{channel}} dalībnieki, un tikai pēc tam, kad nospied Ieslēgt kameru. Mumcord nekad neieraksta kameras.",
     "camera": "Kamera",
     "background": "Fons",
     "backgroundNone": "Nav",
@@ -50,7 +51,7 @@
     "cancel": "Atcelt",
     "turnOn": "Ieslēgt kameru",
     "starting": "Kamera tiek startēta …",
-    "privacyNote": "Tavu kameru redz tikai kanāla <channel/> dalībnieki, un tikai pēc tam, kad nospiedīsi „Ieslēgt kameru”. Mumcord nekad neieraksta kameras.",
+    "privacyNote": "Tavu kameru redz tikai kanāla <channel/> dalībnieki, un tikai pēc tam, kad nospied Ieslēgt kameru. Mumcord nekad neieraksta kameras.",
     "effectsLoadOnly": "Efekti darbojas šajā ierīcē. Slodze: {{load}}",
     "effectsIdle": "Efekti darbojas šajā ierīcē.",
     "effectsUnavailable": "Fona efekti šajā datorā nav pieejami: {{reason}}",
@@ -82,7 +83,7 @@
   },
   "noCameraFound": "Kamera nav atrasta. Pievieno kameru, un tā parādīsies šeit.",
   "imageImportFailed": "Šo attēlu nevar izmantot. Izmanto PNG, JPEG vai WebP failu līdz 10 MB.",
-  "effectsTooHeavy": "Tavs dators ir pārāk noslogots šim fona efektam. Izvēlies „Nav”.",
+  "effectsTooHeavy": "Tavs dators ir pārāk noslogots šim fona efektam. Izmēģini Nav.",
   "errors": {
     "busy": "Kamera apstājās: tavu kameru izmanto cita lietotne.",
     "noCamera": "Kamera nav atrasta. Pievieno kameru, un tā parādīsies šeit.",
@@ -96,7 +97,7 @@
     "denied": "Kameru neizdevās startēt: servera relejs to noraidīja.",
     "relayDown": "Kamera apstājās: relejs nav sasniedzams",
     "rateLimited": "Kameru neizdevās startēt: pārāk daudz mēģinājumu. Mēģini vēlreiz pēc minūtes.",
-    "mode": "Kameras kopīgošanai nepieciešams relejs. Maini to sadaļā Privātums un savienojumi.",
+    "mode": "Kameras kopīgošana ir izslēgta. Maini to sadaļā Privātums un savienojumi.",
     "noCertificate": "Kameras kopīgošanai nepieciešams klienta sertifikāts.",
     "endedByRelay": "Servera relejs apturēja kameru",
     "dismissStopped": "Aizvērt",
@@ -104,7 +105,7 @@
     "groupNotAllowed": "Kamera nesāka darboties: šī servera relejs apkalpo tikai noteiktas grupas. Palūdz administratoram tevi pievienot.",
     "notSameChannel": "Kamera nesāka darboties: tev un taviem skatītājiem jābūt vienā kanālā.",
     "notInChannel": "Kamera nesāka darboties: vispirms pievienojies kanālam.",
-    "noHello": "Kamera nesāka darboties: releja bots vēl nepazīst šo lietotni. Savienojies no jauna, lai to novērstu."
+    "noHello": "Kamera nesāka darboties: releja bots vēl nepazīst šo lietotni. Pievienojies vēlreiz."
   },
   "privacy": {
     "windows": "Windows bloķē piekļuvi kamerai darbvirsmas lietotnēm",
@@ -141,7 +142,11 @@
     "people_other": "{{count}} cilvēki",
     "limit": "{{count}} no {{max}} kamerām",
     "relay": "Relejs · šifrēts no gala līdz galam",
+    "direct": "Tiešais · šifrēts no gala līdz galam",
+    "both": "Relejs un tiešais · šifrēts no gala līdz galam",
     "relayTitle": "Katra kamera tiek nosūtīta releja serverim vienu reizi un nokopēta skatītājiem",
+    "directTitle": "Katrs skatītājs saņem savu kopiju tieši no tevis, bez releja",
+    "bothTitle": "Vecākas Mumcord versijas skatītāji saņem kopiju no releja, jaunākie — savu straumi no tevis",
     "layout": "Izkārtojums",
     "grid": "Režģis",
     "speaker": "Runātājs",
@@ -157,7 +162,7 @@
     "hideSelf": "Paslēpt savu attēlu",
     "showSelf": "Rādīt savu attēlu",
     "popOut": "Atvērt atsevišķā logā",
-    "popOutLabel": "Atvērt kameru istabu atsevišķā logā",
+    "popOutLabel": "Atvērt kameru istabu savā logā",
     "close": "Aizvērt istabu",
     "open": "Atvērt istabu",
     "miniBar_zero": "Ieslēgtas kameras: {{count}}",
@@ -165,7 +170,7 @@
     "cameras": "Kameras",
     "label_other": "Kameru istaba, {{count}} kameras ieslēgtas",
     "miniBar_other": "{{count}} kameras ieslēgtas",
-    "fullTitle": "Istaba ir pilna: 9 kameras",
+    "fullTitle": "Telpa ir pilna ar 9 kamerām",
     "backgroundPicker": "Mainīt fonu"
   },
   "position": {
@@ -184,15 +189,15 @@
     "quality": "{{resolution}} · {{codec}}",
     "menu": "Citas darbības: {{name}}",
     "joining": "Pievienojas lietotāja {{name}} kamerai …",
-    "full": "Pārāk daudz cilvēku skatās lietotāja {{name}} kameru",
+    "full": "Pārāk daudz cilvēku skatās lietotāju {{name}}",
     "failed": "Neizdevās pievienoties lietotāja {{name}} kamerai",
-    "needsUpdate": "Šai kamerai nepieciešams Mumcord 0.9.0",
     "retry": "Mēģināt vēlreiz",
     "hidden": "Video paslēpts",
     "showVideo": "Rādīt video",
     "viewing": "Skaties",
     "weak": "Vājš savienojums",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Šai kamerai nepieciešams Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "{{name}} opcijas",
@@ -204,7 +209,7 @@
     "showVideo": "Rādīt lietotāja {{name}} video",
     "quality": "Kvalitāte man",
     "qualityAuto": "Automātiska",
-    "qualityAutoHint": "atbilst lodziņa izmēram",
+    "qualityAutoHint": "atbilst flīzes izmēram",
     "qualityDataSaver": "Datu taupīšana",
     "qualityDataSaverHint": "līdz 15 fps",
     "qualityBest": "Labākā",
@@ -242,7 +247,7 @@
     "effectAuto": "Automātiska",
     "effectBest": "Labākā (grafiskā karte)",
     "effectLight": "Viegla (taupa akumulatoru)",
-    "effectHint": "Automātiskā izmanto grafisko karti, kad iespējams, un pārslēdzas uz „Viegla”, strādājot ar akumulatoru vai kad dators ir noslogots.",
+    "effectHint": "Automātiskā izmanto grafisko karti, kad iespējams, un pārslēdzas uz Vieglu, strādājot ar akumulatoru vai kad dators ir noslogots.",
     "ownImages_zero": "Tavi paša fona attēli paliek šajā ierīcē (saglabāti: {{count}}). Tiek sūtīts tikai gatavais attēls.",
     "ownImages_one": "Tavi paša fona attēli paliek šajā ierīcē (saglabāti: {{count}}). Tiek sūtīts tikai gatavais attēls.",
     "ownImages_other": "Tavi paša fona attēli paliek šajā ierīcē (saglabāti: {{count}}). Tiek sūtīts tikai gatavais attēls.",
@@ -255,9 +260,14 @@
     "showAlways": "Vienmēr",
     "showOnOpen": "Kad atveru istabu",
     "showNever": "Nekad",
-    "showHint": "„Vienmēr” atver kameru istabu, kad kāds tavā kanālā ieslēdz kameru. „Nekad” atstāj tikai balsi un nelejupielādē video.",
+    "showHint": "Vienmēr atver kameru istabu, kad kāds tavā kanālā ieslēdz kameru. Nekad patur tevi tikai balsī un nelejupielādē video.",
     "dataSaver": "Datu taupīšana: līdz 15 fps visiem",
     "reduceMotion": "Mazināt kustību: bez mirdzuma un animācijas uz runātāja rāmja",
     "reduceMotionHint": "Pēc noklusējuma seko tavas sistēmas kustības mazināšanas iestatījumam."
+  },
+  "viewers": {
+    "title": "Skatītāji",
+    "relay": "Relejs",
+    "direct": "Tiešais"
   }
 }

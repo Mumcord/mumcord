@@ -23,6 +23,15 @@ export const commands = {
 	identitySetDefault: (id: number) => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_set_default", { id })),
 	/**  Chooses the identity a saved server connects with; `null` uses the default. */
 	serverSetIdentity: (serverId: number, identityId: number | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_identity", { serverId, identityId })),
+	/**
+	 *  Builds a new transfer of the chosen identities and, if wanted, the server list and puts it
+	 *  on show. A transfer that was shown before is dropped first, so calling this again is how
+	 *  the dialog gets new codes after a change of the selection or after the expiry. Saved server
+	 *  passwords and channel access tokens are never part of it (FR-5.66).
+	 */
+	phoneTransferStart: (identityIds: number[], includeServers: boolean) => typedError<PhoneTransfer, ApiError>(__TAURI_INVOKE("phone_transfer_start", { identityIds, includeServers })),
+	/**  Drops the transfer; the dialog calls it when it closes. */
+	phoneTransferCancel: () => __TAURI_INVOKE<void>("phone_transfer_cancel"),
 	/**  Looks for an installed official Mumble client; `null` when there is none. */
 	mumbleImportScan: () => typedError<MumbleImportFound | null, ApiError>(__TAURI_INVOKE("mumble_import_scan")),
 	/**
@@ -1643,6 +1652,11 @@ export type AppInfo = {
 	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything.
 	 */
 	session: SessionKind | null,
+	/**
+	 *  Whether this build offers "Send to your phone" (Cargo feature `phone-transfer`); the
+	 *  identity settings show its button only then.
+	 */
+	phoneTransfer: boolean,
 };
 
 /**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
@@ -1974,6 +1988,16 @@ export type CameraFailure = "notConnected" |
 /**  The relay bot doesn't know this client yet; reconnect (#601). */
 "noHello";
 
+/**
+ *  How one viewer gets the own camera (FR-8.62, FR-8.94); the camera room's viewer list shows
+ *  it.
+ */
+export type CameraPath = 
+/**  Through the relay broadcast. */
+"relay" | 
+/**  Through its own stream. */
+"direct";
+
 /**  "Reduce motion" for the speaking frame; `system` follows the operating system. */
 export type CameraReduceMotion = "system" | "on" | "off";
 
@@ -2046,7 +2070,7 @@ export type CameraTileState =
 "hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
-export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | 
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | "needsDirect" | 
 /**  This platform has no camera backend at all (FR-13.27). */
 "unsupportedPlatform";
 
@@ -2056,10 +2080,16 @@ export type CameraView = {
 	state: CameraState,
 	/**  Why the last **Turn on camera** failed; shown in the preview until the next try. */
 	error: CameraFailure | null,
-	/**  The broadcast id (16 hex) while on air. */
+	/**  The relay broadcast id (16 hex) while on air; `null` for a camera that runs without one. */
 	broadcast: string | null,
-	/**  The people who receive the camera now. */
-	viewers: number[],
+	/**  The people who receive the camera now, with the path each of them gets. */
+	viewers: CameraViewer[],
+};
+
+/**  One admitted viewer of the own camera. */
+export type CameraViewer = {
+	session: number,
+	path: CameraPath,
 };
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
@@ -2497,6 +2527,8 @@ export type ErrorCode =
 "shortcutNotConfirmed" | 
 /**  The screen share already has the maximum of 8 viewers (FR-2.43). */
 "shareFull" | 
+/**  The share or camera needs a newer Mumcord. */
+"needsUpdate" | 
 /**
  *  Watching a screen share needs a direct connection and none can be made (FR-2.46);
  *  `message` is the reason: `consentOff`, `peerUnsupported` or `noDirectPath`.
@@ -3176,6 +3208,27 @@ export type MassMoveResult =
 /**  Another mass move is still running on this server (FR-10.18). */
 { kind: "alreadyRunning" };
 
+/**  The wire format of a captured media stream. */
+export type MediaFormat = "media" | "legacy";
+
+/**
+ *  One message of a media stream (FR-7.101): its format, channel, flags and keyframe state.
+ *  The media content itself is never captured, so there is no payload here.
+ */
+export type MediaPacket = {
+	/**  `"media"` for the 0.9.0 `.media` document, `"legacy"` for the old fixed header. */
+	format: MediaFormat,
+	/**  The old header's version byte; `null` for the media document. */
+	version: number | null,
+	/**  The channel the message travelled on; `null` for the old header, which has none. */
+	channel: number | null,
+	/**  The channel-0 control kind; `null` for a track message. */
+	control: number | null,
+	/**  The track message's flags byte; `null` for a control message and the old header. */
+	flags: number | null,
+	keyframe: boolean,
+};
+
 /**  Which views are popped out changed; sent to every window. */
 export type MediaPopoutChanged = {
 	state: MediaPopoutState,
@@ -3584,6 +3637,8 @@ export type Packet = {
 	decoded: string | null,
 	/**  The plugin data as lowercase hex; empty for other types. */
 	rawHex: string,
+	/**  What this message is within its media stream; `null` for control-channel packets. */
+	media: MediaPacket | null,
 };
 
 export type PacketCapture = {
@@ -3657,6 +3712,26 @@ export type PersonTarget = {
 	/**  The rights in the root channel, which decide what the menu offers at all (FR-10.1, FR-10.2). */
 	canKick: boolean,
 	canBan: boolean,
+};
+
+/**  A transfer on show. */
+export type PhoneTransfer = {
+	/**  The QR codes in the order they are shown, all of the same size. */
+	codes: PhoneTransferQr[],
+	/**  The digits the user types on the phone; the UI groups them. */
+	code: string,
+	totalParts: number,
+	/**  Seconds until the codes must leave the screen. */
+	secondsLeft: number,
+};
+
+/**
+ *  One QR code as the UI draws it: `size` rows of `size` characters, `1` for a dark module.
+ *  The quiet zone around it is not included.
+ */
+export type PhoneTransferQr = {
+	size: number,
+	rows: string[],
 };
 
 /**  A feature this platform cannot provide, with the reason named in the About note. */
@@ -5886,7 +5961,9 @@ export type WatchStats = {
 	rms: number | null,
 };
 
-export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";
+export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | 
+/**  A saved name fits several people on the server; nothing is sent to any of them. */
+"ambiguousName" | "channelNotFound" | "noPermission" | "unknownTarget";
 
 /**  Why whisper keys cannot work in this session. */
 export type WhisperKeysUnavailable = 

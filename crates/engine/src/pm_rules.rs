@@ -12,7 +12,7 @@
 use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant};
 
-use mumcord_protocol::{PLUGIN_DATA_MAX, PluginData};
+use mumble_client_protocol::{PLUGIN_DATA_MAX, PluginData};
 use mumcord_store::{AcceptedConversation, PmRule, PrivateMessageSettings, ServerId, UnixMillis};
 use serde::{Deserialize, Serialize};
 

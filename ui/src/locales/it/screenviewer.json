@@ -13,6 +13,7 @@
   "starting": "Connessione allo schermo di {{name}}…",
   "paused": "{{name}} ha messo in pausa la condivisione.",
   "full": "Questa condivisione è piena.",
+  "needsUpdate": "Questa condivisione richiede Mumcord 0.9.0.",
   "unreachable": "Impossibile raggiungere {{name}} direttamente. La sua rete potrebbe bloccare le connessioni dirette.",
   "tooOld": "La versione di Mumcord di {{name}} è troppo vecchia per condividere lo schermo con te.",
   "consentOff": "Per guardare servono connessioni dirette, e le hai disattivate.",

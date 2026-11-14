@@ -178,7 +178,7 @@ jobs:
           # Tauri recognises a Cargo output directory by .cargo-lock; without it Linux
           # looks for resources in /usr/lib/mumcord instead of beside the test binary.
           tar -C "$MUMCORD_E2E_CACHE/target/debug" -cf - mumcord mumbot netsim examples/libtest_plugin.so \
-            examples/headless_check libmumcord_overlay_layer.so libonnxruntime.so.1.23.2 .cargo-lock camera-backgrounds \
+            examples/headless_check examples/transfer_read libmumcord_overlay_layer.so libonnxruntime.so.1.23.2 .cargo-lock camera-backgrounds \
             | zstd -T0 -3 -q -o e2e-bin.tar.zst
           ls -lh e2e-*.tar.zst
 

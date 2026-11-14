@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { TFunction } from "i18next";
+import type { MediaPacket } from "../../api";
 import { tokenizeJson } from "./json";
 import {
   exportJson,
@@ -8,7 +10,10 @@ import {
   formatHex,
   formatSize,
   formatTime,
+  kindKey,
   MAX_PACKETS,
+  mediaFacts,
+  mediaText,
   mergePackets,
   packetBlock,
   packetKinds,
@@ -33,6 +38,7 @@ function packet(over: Partial<Packet> = {}): Packet {
     tokensLeft: 2,
     decoded: '{\n  "v": 1\n}',
     rawHex: "7b7d",
+    media: null,
     ...over,
   };
 }
@@ -119,10 +125,93 @@ describe("exports", () => {
     expect(md).toContain('```json\n{\n  "v": 1\n}\n```');
   });
 
+  it("Markdown keeps backslashes and pipes inside their table cell", () => {
+    const tricky: Names = {
+      user: (_server, session) => (session === 12 ? "Bob\\" : "a\\|b"),
+      server: () => "Lobby server",
+    };
+    const md = exportMarkdown(
+      [packet({ kind: "odd\\" }), packet({ id: 2, receivers: [13] })],
+      info,
+      tricky,
+    );
+    // A backslash from the value must not swallow or expose a column separator.
+    expect(md).toContain("| odd\\\\ | 412 B | → Bob\\\\ (session 12) |");
+    expect(md).toContain("| → a\\\\\\|b (session 13) |");
+  });
+
   it("a copied packet has the gap, and fences survive backticks in the payload", () => {
     const block = packetBlock(packet({ decoded: '"```"' }), names, at - 340).join("\n");
     expect(block).toContain("- gap +340 ms");
     expect(block).toContain('````json\n"```"\n````');
+  });
+});
+
+describe("media packets", () => {
+  /** Translation stand-in: channel and frame keys come back as readable English. */
+  const t = ((key: string, options?: Record<string, unknown>) =>
+    key === "inspector.media.channel"
+      ? `channel ${String(options?.channel)}`
+      : key.replace("inspector.media.", "")) as unknown as TFunction<"settings">;
+
+  const media = (over: Partial<MediaPacket> = {}): MediaPacket => ({
+    format: "media",
+    version: null,
+    channel: 2,
+    control: null,
+    flags: 1,
+    keyframe: true,
+    ...over,
+  });
+  const mediaPacket = (over: Partial<MediaPacket> = {}) =>
+    packet({
+      kind: ".media",
+      pluginData: false,
+      decoded: null,
+      rawHex: "",
+      media: media(over),
+    });
+
+  it("lists a media message under its own type", () => {
+    expect(kindKey(mediaPacket())).toBe("media");
+    expect(kindKey(packet())).toBe("watch");
+  });
+
+  it("tells control messages, frames and the old header apart", () => {
+    expect(mediaFacts(t, null)).toBeNull();
+    expect(mediaFacts(t, media({ channel: 0, control: 2, flags: null, keyframe: false }))).toBe(
+      "key",
+    );
+    expect(mediaFacts(t, media({ channel: 0, control: 3, flags: null }))).toBe("kf");
+    expect(mediaFacts(t, media({ channel: 0, control: 42, flags: null }))).toBe("kind 42");
+    expect(mediaFacts(t, media())).toBe("channel 2 · keyframe · 0x01");
+    expect(mediaFacts(t, media({ channel: 3, flags: 0, keyframe: false }))).toBe(
+      "channel 3 · delta · 0x00",
+    );
+    // The old header has neither a channel nor a flags byte; its keyframe bit still shows.
+    expect(mediaFacts(t, media({ format: "legacy", version: 2, channel: null, flags: null }))).toBe(
+      "keyframe",
+    );
+  });
+
+  it("writes the media facts into both exports", () => {
+    expect(mediaText(mediaPacket())).toBe(".media document, channel 2, keyframe, flags 0x01");
+    expect(mediaText(packet())).toBe("");
+    expect(mediaText(mediaPacket({ channel: 0, control: 0, flags: null, keyframe: false }))).toBe(
+      ".media document, description",
+    );
+    expect(
+      mediaText(
+        mediaPacket({ format: "legacy", version: 1, channel: null, flags: null, keyframe: false }),
+      ),
+    ).toBe(".media legacy v1, delta frame");
+    expect(packetBlock(mediaPacket(), names, null)).toContain(
+      "- .media document, channel 2, keyframe, flags 0x01",
+    );
+    const { packets } = JSON.parse(exportJson([mediaPacket()], info, names)) as {
+      packets: { media: MediaPacket | null }[];
+    };
+    expect(packets[0]?.media).toEqual(media());
   });
 });
 

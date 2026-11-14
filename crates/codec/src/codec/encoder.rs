@@ -9,7 +9,7 @@ pub const MAX_PACKET_BYTES: usize = 1275;
 /// Largest Opus payload that still fits one Mumble voice packet: the server accepts at most
 /// 1024 bytes of plaintext (`Mumble::Protocol::MAX_UDP_PACKET_SIZE`), and the voice header
 /// (legacy or protobuf format, with positional data and the largest sequence number) takes up
-/// to 34 bytes. The rest is a safety margin. `mumcord_protocol::MAX_VOICE_PAYLOAD` is the same
+/// to 34 bytes. The rest is a safety margin. `mumble_client_protocol::MAX_VOICE_PAYLOAD` is the same
 /// budget seen from the packet side; the engine checks at compile time that both agree.
 pub const MAX_VOICE_PAYLOAD_BYTES: usize = 958;
 

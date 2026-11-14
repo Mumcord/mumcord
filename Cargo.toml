@@ -1,7 +1,6 @@
 [workspace]
 resolver = "3"
 members = [
-    "crates/protocol",
     "crates/audio",
     "crates/codec",
     "crates/store",
@@ -23,13 +22,16 @@ members = [
 [workspace.package]
 version = "0.8.0"
 edition = "2024"
-rust-version = "1.90"
+rust-version = "1.97"
 license = "AGPL-3.0-only"
 repository = "https://github.com/Mumcord/mumcord"
 
 [workspace.dependencies]
+# The Mumble protocol (control channel, state, voice transport); it started as crates/protocol and
+# now lives in its own repository (https://github.com/Mumcord/mumble-client-protocol).
+mumble-client-protocol = "0.1"
+
 # Internal crates
-mumcord-protocol = { path = "crates/protocol", version = "0.8" }
 # The version is the minor series: crates.io needs it for the publish of the crates that depend on it (mumcord-audio, mumcord-p2p, mumcord-plugins, mumcord-plugin), and it only changes with a minor/major bump.
 mumcord-codec = { path = "crates/codec", version = "0.8" }
 mumcord-audio = { path = "crates/audio" }
@@ -38,7 +40,7 @@ mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
-mumcord-screenshare = { path = "crates/screenshare" }
+mumcord-screenshare = { path = "crates/screenshare", default-features = false }
 mumcord-camera = { path = "crates/camera" }
 mumcord-effects = { path = "crates/effects" }
 mumcord-plugins = { path = "crates/plugins", version = "0.8" }
@@ -68,11 +70,8 @@ socket2 = "0.6"
 
 # Protobuf
 prost = "0.14"
-prost-build = "0.14.5"
-protoc-bin-vendored = "3.3"
 
 # Crypto & certificates
-aes = "0.9"
 # X.509 parsing for the TLS certificate details in the server info panel (FR-1.10).
 x509-parser = "0.18"
 # PEM for the "Show certificate" action in the server info panel.
@@ -92,6 +91,13 @@ rcgen = "0.14"
 p12-keystore = "0.4"
 # Only used to generate RSA identity keys (ring cannot generate RSA keys); signing stays with ring.
 rsa = { version = "0.10", default-features = false, features = ["std", "getrandom", "encoding"] }
+# "Send to your phone" (spec 05, FR-5.64): the slow key derivation from the typed code. Pure
+# Rust, so it builds for the phone targets without a C toolchain.
+argon2 = { version = "0.6", default-features = false, features = ["alloc", "zeroize"] }
+# The rest of the transfer format; all three are in the tree already (rustls, flate2).
+zeroize = "1"
+miniz_oxide = "0.9"
+crc32fast = "1"
 
 # Audio
 # realtime-dbus: cpal asks for real-time scheduling of its device threads (rtkit over D-Bus on
@@ -101,9 +107,15 @@ rsa = { version = "0.10", default-features = false, features = ["std", "getrando
 # sharing already links; no effect on Windows and macOS. It is enabled per target in
 # crates/audio, because FreeBSD has no PipeWire (the sound server is OSS) and the feature would
 # otherwise pull in libpipewire there.
-cpal = { version = "0.18", features = ["realtime-dbus"] }
-# The same request for Mumcord's own capture and playback threads.
-audio_thread_priority = { version = "0.35", default-features = false, features = ["with_dbus"] }
+# Both options are desktop-only and therefore switched on per target in crates/audio, not here:
+# Android and iOS get neither.
+cpal = "0.18"
+# The sample conversion traits cpal uses, for the audio callbacks of the platform-fed backend,
+# which exists without cpal on Android and iOS.
+dasp_sample = "0.11"
+# The same request for Mumcord's own capture and playback threads (`with_dbus`, also switched on
+# in crates/audio for the desktop targets only).
+audio_thread_priority = { version = "0.35", default-features = false }
 # opusic-sys builds libopus statically from bundled sources.
 opus = "0.4"
 nnnoiseless = { version = "0.5", default-features = false }
@@ -295,6 +307,14 @@ opt-level = 3
 [profile.dev.package.crypto-primes]
 opt-level = 3
 
+# The key derivation of "Send to your phone" fills 128 MiB four times; unoptimised it takes
+# many seconds per code instead of a fraction of one.
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3
+
 # Voice DSP (noise suppression, echo cancellation, resampling, Opus) in an unoptimised build
 # needs several milliseconds per 10 ms frame, enough to fall behind the microphone (issue #139).
 [profile.dev.package.nnnoiseless]
@@ -349,9 +369,8 @@ opt-level = 3
 [profile.dev.package.mumcord-effects]
 opt-level = 3
 
-# mumbot (dev-dependency of the engine's live tests) depends on the published protocol, codec and p2p
-# crates; build it against these instead, so they exist once and `cargo -p` stays unambiguous.
+# mumbot (dev-dependency of the engine's live tests) depends on the published codec and p2p crates;
+# build it against these instead, so they exist once and `cargo -p` stays unambiguous.
 [patch.crates-io]
-mumcord-protocol = { path = "crates/protocol" }
 mumcord-codec = { path = "crates/codec" }
 mumcord-p2p = { path = "crates/p2p" }

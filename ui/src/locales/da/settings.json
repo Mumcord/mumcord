@@ -133,7 +133,28 @@
     "backupWarning": "Tag en sikkerhedskopi, før du sletter. En identitet uden kopi kan ikke gendannes.",
     "usedBy": "Bruges af: {{servers}}",
     "deleteUsedBy": "Disse servere bruger derefter standardidentiteten {{identity}}: {{servers}}",
-    "exportFor": "Eksportér {{identity}}"
+    "exportFor": "Eksportér {{identity}}",
+    "phoneSend": "Send til din telefon…",
+    "phoneTitle": "Send til din telefon",
+    "phoneSelectionLabel": "Hvad der sendes",
+    "phoneIdentity": "Identitet: {{identity}}",
+    "phoneIdentityDefault": "Identitet: {{identity}} (standard)",
+    "phoneServers_one": "Serverliste ({{count}} server)",
+    "phoneServers_other": "Serverliste ({{count}} servere)",
+    "phoneNothingSelected": "Vælg mindst ét element.",
+    "phoneShow": "Vis koder",
+    "phoneDone": "Færdig",
+    "phonePreparing": "Forbereder koderne…",
+    "phoneCodesLabel": "Koder til din telefon",
+    "phoneQrLabel": "QR-kode {{current}} af {{total}}",
+    "phoneCodeOf": "Kode {{current}} af {{total}}",
+    "phoneCycleHint": "Koderne skifter automatisk. Hold din telefon rettet mod skærmen, indtil alle {{total}} er læst.",
+    "phoneSingleHint": "Hold din telefon rettet mod skærmen, indtil koden er læst.",
+    "phoneTypeCode": "Indtast denne kode på din telefon",
+    "phoneExpires": "Udløber om {{time}}",
+    "phoneRenewed": "Nye koder og et nyt nummer. Start forfra på din telefon.",
+    "phoneWarning": "Enhver, der scanner disse koder og kender nummeret, får din identitet. Vis dem kun til din egen telefon.",
+    "phoneTooLarge": "Det er for meget til én overførsel. Vælg færre elementer."
   },
   "audio": {
     "devices": "Enheder",
@@ -767,7 +788,13 @@
       "gap": "Afstand til forrige pakke",
       "kind": "Internt id",
       "size": "Størrelse",
-      "decoded": "Afkodet indhold"
+      "decoded": "Afkodet indhold",
+      "media": "Medie"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "nøglebillede",
+      "delta": "deltabillede"
     },
     "noDecoding": "Denne nyttelast har ingen læsbar form; se de rå bytes.",
     "controlOnly": "Almindelig Mumble-besked: kun type og størrelse registreres.",
@@ -788,7 +815,8 @@
       "watch": "Status for fællesvisning",
       "plugin": "Plugindata",
       "mumble": "Mumble-besked",
-      "peer": "Opsætning af relæ"
+      "peer": "Opsætning af relæ",
+      "media": "Mediestrøm"
     }
   },
   "licences": {

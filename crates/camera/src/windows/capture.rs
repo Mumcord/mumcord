@@ -19,6 +19,7 @@ use ::windows::Win32::Media::MediaFoundation::{
 };
 use ::windows::core::{HSTRING, Interface};
 
+use super::bounded::{STOP_TIMEOUT, run_bounded};
 use super::com::{Com, MediaFoundation, mf_error, video_capture_attributes};
 use super::media_type::{self, raw, tight_stride};
 use crate::mode::{self, Geometry, Mode, PixelFormat};
@@ -36,6 +37,16 @@ pub(super) const UNREADABLE: Raw<'static> = Raw::Packed {
 
 /// The camera's media source, kept by the session to stop a `ReadSample` that waits.
 struct Source(IMFMediaSource);
+
+impl Source {
+    /// Releases the camera (its light goes off) and wakes a `ReadSample` waiting for a frame.
+    fn shutdown(&self) {
+        // SAFETY: see the `Send` impl; shutting down twice only returns `MF_E_SHUTDOWN`.
+        if let Err(err) = unsafe { self.0.Shutdown() } {
+            tracing::debug!(code = err.code().0, "camera source shutdown failed");
+        }
+    }
+}
 
 // SAFETY: Media Foundation media sources are free-threaded; `Shutdown` may be called from any
 // thread while another one reads from it.
@@ -89,15 +100,23 @@ impl Session {
 
 impl Drop for Session {
     fn drop(&mut self) {
-        let _com = Com::init();
         self.stop.store(true, Ordering::Release);
-        // Releases the camera (its light goes off) and wakes a `ReadSample` waiting for a frame.
-        // SAFETY: see `Source`; shutting down twice only returns `MF_E_SHUTDOWN`.
-        if let Err(err) = unsafe { self.source.0.Shutdown() } {
-            tracing::debug!(code = err.code().0, "camera source shutdown failed");
-        }
-        if let Some(thread) = self.thread.take() {
-            join(thread);
+        let thread = self.thread.take();
+        let source = Source(self.source.0.clone());
+        // A camera that opened but never delivered a picture can leave `ReadSample` waiting
+        // even after the shutdown, and the shutdown itself can wait on the driver. Both run on
+        // a helper thread, so a camera switch or closing the app cannot freeze on them.
+        let stopped = run_bounded("camera-mf-stop", STOP_TIMEOUT, move || {
+            let _com = Com::init();
+            source.shutdown();
+            if let Some(thread) = thread {
+                join(thread);
+            }
+            // Released while COM is still initialised on this thread.
+            drop(source);
+        });
+        if !stopped {
+            tracing::warn!("the camera did not stop in time; its capture thread is left behind");
         }
     }
 }

@@ -8,6 +8,10 @@
 //! rtkit, a sandbox, a FreeBSD user without the realtime privilege), the thread keeps its normal
 //! priority and audio works as before.
 //!
+//! Android and iOS never promote a thread here: phone audio I/O and its thread priority come
+//! from the platform-fed backend (Epic 5, task 3.1), so [`promote_current_thread`] reports that
+//! real-time scheduling is unavailable and the thread keeps its normal priority.
+//!
 //! On Linux a real-time thread that runs too long without blocking gets SIGXCPU once it passes
 //! the soft `RLIMIT_RTTIME` and SIGKILL at the hard one; rtkit requires both to be set. By
 //! default SIGXCPU ends the process (issue #139), so this module handles it: the overrunning
@@ -15,21 +19,36 @@
 //! one, so only a real overrun triggers that, never an ordinary burst of work. Windows (MMCSS)
 //! and macOS (time-constraint policy) have no such kill: MMCSS keeps a share of the CPU for
 //! normal threads, and macOS demotes a thread that exceeds its computation time by itself.
+//!
+//! The limit is process-wide and this module is not its only writer: the audio host (cpal on
+//! PipeWire) promotes its own device threads and sets the soft limit to one device buffer each
+//! time (about 21 ms for 1024 frames), on every stream start and whenever the buffer grows.
+//! Widening once after our own promotion therefore does not last, so the app calls
+//! [`keep_overrun_headroom`] regularly from a normal thread to put the soft limit back. Between
+//! the host's reset and the next call the limit is briefly the narrow one.
 
 use std::marker::PhantomData;
 use std::sync::atomic::{AtomicU32, Ordering};
 
-#[cfg(not(target_os = "freebsd"))]
+#[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
 use audio_thread_priority::{
     RtPriorityHandle, demote_current_thread_from_real_time, promote_current_thread_to_real_time,
 };
 
-#[cfg(not(target_os = "freebsd"))]
+#[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
 use crate::{FRAME_SAMPLES, SAMPLE_RATE};
 
 /// Real-time threads returned to normal priority for running past their time budget, since the
 /// last [`take_demotions`].
 static DEMOTIONS: AtomicU32 = AtomicU32::new(0);
+
+/// What [`set_overrun_hook`] registered; null until then.
+#[cfg(target_os = "linux")]
+static OVERRUN_HOOK: std::sync::atomic::AtomicPtr<()> =
+    std::sync::atomic::AtomicPtr::new(std::ptr::null_mut());
+
+#[cfg(any(target_os = "android", target_os = "ios"))]
+const PHONE_UNAVAILABLE: &str = "the platform schedules the audio threads on Android and iOS";
 
 /// Why a thread kept its normal priority.
 #[derive(Debug, thiserror::Error)]
@@ -40,7 +59,7 @@ pub struct RtError(String);
 /// priority. Bound to its thread, so it is neither `Send` nor `Sync`.
 #[must_use = "the thread returns to normal priority when the guard is dropped"]
 pub struct RtGuard {
-    #[cfg(not(target_os = "freebsd"))]
+    #[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
     handle: Option<RtPriorityHandle>,
     _thread_bound: PhantomData<*const ()>,
 }
@@ -51,7 +70,7 @@ impl Drop for RtGuard {
         if let Err(e) = freebsd::set(libc::RTP_PRIO_NORMAL, 0) {
             tracing::debug!("returning an audio thread to normal priority failed: {e}");
         }
-        #[cfg(not(target_os = "freebsd"))]
+        #[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
         if let Some(handle) = self.handle.take()
             && let Err(e) = demote_current_thread_from_real_time(handle)
         {
@@ -80,7 +99,13 @@ pub fn promote_current_thread() -> Result<RtGuard, RtError> {
             _thread_bound: PhantomData,
         })
     }
-    #[cfg(not(target_os = "freebsd"))]
+    // Phones: the platform-fed audio backend of task 3.1 owns the audio threads and their
+    // priority, so the desktop mechanisms (rtkit, MMCSS, time-constraint policy) stay out.
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        Err(RtError(PHONE_UNAVAILABLE.to_owned()))
+    }
+    #[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
     {
         // FRAME_SAMPLES (480) always fits; the conversion cannot fail.
         let frames = u32::try_from(FRAME_SAMPLES).unwrap_or(u32::MAX);
@@ -131,6 +156,29 @@ pub fn take_demotions() -> u32 {
     DEMOTIONS.swap(0, Ordering::Relaxed)
 }
 
+/// Brings the soft `RLIMIT_RTTIME` back to half the hard one after another part of the process
+/// lowered it (see the module docs). Cheap and idempotent: one `getrlimit` when nothing changed.
+/// Call it regularly from a normal thread, never from a real-time one. Does nothing off Linux.
+pub fn keep_overrun_headroom() {
+    #[cfg(target_os = "linux")]
+    {
+        // The same lock as a promotion, so the widening never lands between its two steps.
+        let _limits = linux::LIMITS
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        linux::widen_soft_limit();
+    }
+}
+
+/// Registers `hook` to run when a real-time thread of this process (ours or a library's) runs
+/// past its time budget: inside the SIGXCPU handler, on that thread, after the attempt to demote
+/// it. That is the only moment to record where the thread is busy. `hook` must be
+/// async-signal-safe: no allocation, no locks, no logging.
+#[cfg(target_os = "linux")]
+pub fn set_overrun_hook(hook: extern "C" fn()) {
+    OVERRUN_HOOK.store(hook as *mut (), Ordering::Release);
+}
+
 /// Makes an overrunning real-time thread drop to normal priority instead of ending the process;
 /// needed before any thread of the process goes real-time. Idempotent.
 pub(crate) fn guard_overruns() {
@@ -151,7 +199,8 @@ mod linux {
     pub(super) static LIMITS: Mutex<()> = Mutex::new(());
 
     /// Runs on the thread that exceeded the soft `RLIMIT_RTTIME`: the kernel directs that
-    /// SIGXCPU at the thread itself. Only async-signal-safe calls: raw syscalls and an atomic.
+    /// SIGXCPU at the thread itself. Only async-signal-safe calls: raw syscalls, atomics and
+    /// the hook, which promises the same.
     extern "C" fn on_sigxcpu(_signal: libc::c_int) {
         // SAFETY: plain syscalls on the calling thread (pid 0); `param` outlives the call.
         unsafe {
@@ -172,6 +221,11 @@ mod linux {
             ) == 0
             {
                 DEMOTIONS.fetch_add(1, Ordering::Relaxed);
+            }
+            let hook = super::OVERRUN_HOOK.load(Ordering::Acquire);
+            if !hook.is_null() {
+                // SAFETY: only `set_overrun_hook` stores here, always an `extern "C" fn()`.
+                std::mem::transmute::<*mut (), extern "C" fn()>(hook)();
             }
         }
     }
@@ -251,6 +305,19 @@ mod tests {
         })
         .join()
         .expect("thread");
+    }
+
+    /// Phones never promote: the caller gets the reason and keeps its normal priority.
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[test]
+    fn phones_report_real_time_as_unavailable() {
+        let error = promote_current_thread()
+            .err()
+            .expect("no promotion on phones");
+        assert_eq!(
+            error.to_string(),
+            format!("real-time scheduling unavailable: {PHONE_UNAVAILABLE}")
+        );
     }
 
     /// The normal priority the guard returns the thread to is always permitted.

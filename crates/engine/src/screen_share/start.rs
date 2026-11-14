@@ -15,8 +15,15 @@ pub(super) const ENDED_POLL: Duration = Duration::from_millis(500);
 pub enum StartOutcome {
     Started,
     /// The user closed the system picker without choosing: nothing is shared, nothing to report.
-    /// The X11 capture has no picker, so it never cancels.
-    #[cfg_attr(target_os = "freebsd", allow(dead_code))]
+    /// The X11 capture has no picker, so it never cancels; neither does a build without a
+    /// capture backend.
+    #[cfg_attr(
+        not(all(
+            feature = "screen-capture",
+            any(target_os = "linux", windows, target_os = "macos")
+        )),
+        allow(dead_code)
+    )]
     Cancelled,
 }
 
@@ -58,6 +65,10 @@ pub(super) fn choose_backend(
 
 #[cfg_attr(feature = "test-backend", allow(dead_code))]
 fn current_backend() -> Backend {
+    // Built without the capture backends (phones): sharing the screen is not offered.
+    if !cfg!(feature = "screen-capture") {
+        return Backend::Unsupported;
+    }
     if cfg!(windows) {
         return Backend::Windows;
     }
@@ -76,15 +87,21 @@ fn current_backend() -> Backend {
 #[derive(Debug)]
 #[cfg_attr(feature = "test-backend", allow(dead_code))]
 pub(super) enum OpenError {
-    /// No picker on X11, so a share there cannot be cancelled.
-    #[cfg_attr(target_os = "freebsd", allow(dead_code))]
+    /// No picker on X11 or without a capture backend, so a share there cannot be cancelled.
+    #[cfg_attr(
+        not(all(
+            feature = "screen-capture",
+            any(target_os = "linux", windows, target_os = "macos")
+        )),
+        allow(dead_code)
+    )]
     Cancelled,
     Failed(EngineError),
 }
 
 /// The message of the `PermissionDenied` error when macOS does not allow screen recording; the
 /// UI points the user to System Settings.
-#[cfg(target_os = "macos")]
+#[cfg(all(feature = "screen-capture", target_os = "macos"))]
 #[cfg_attr(feature = "test-backend", allow(dead_code))]
 const SCREEN_RECORDING_DENIED: &str = "screenRecording";
 
@@ -108,7 +125,7 @@ pub(super) async fn open_source() -> Result<Box<dyn CaptureSource>, OpenError> {
 #[cfg(not(feature = "test-backend"))]
 async fn open_backend(backend: Backend) -> Result<Box<dyn CaptureSource>, OpenError> {
     match backend {
-        #[cfg(target_os = "linux")]
+        #[cfg(all(feature = "screen-capture", target_os = "linux"))]
         Backend::Wayland => match super::capture_wayland::WaylandCapture::open().await {
             Ok(capture) => Ok(Box::new(capture)),
             Err(super::capture_wayland::WaylandCaptureError::Cancelled) => {
@@ -116,11 +133,14 @@ async fn open_backend(backend: Backend) -> Result<Box<dyn CaptureSource>, OpenEr
             }
             Err(e) => Err(failed(e)),
         },
-        #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+        #[cfg(all(
+            feature = "screen-capture",
+            any(target_os = "linux", target_os = "freebsd")
+        ))]
         Backend::X11 => super::capture_x11::X11Capture::new()
             .map(|c| Box::new(c) as Box<dyn CaptureSource>)
             .map_err(failed),
-        #[cfg(windows)]
+        #[cfg(all(feature = "screen-capture", windows))]
         Backend::Windows => match super::capture_windows::WindowsCapture::open().await {
             Ok(capture) => Ok(Box::new(capture)),
             Err(super::capture_windows::WindowsCaptureError::Cancelled) => {
@@ -128,7 +148,7 @@ async fn open_backend(backend: Backend) -> Result<Box<dyn CaptureSource>, OpenEr
             }
             Err(e) => Err(failed(e)),
         },
-        #[cfg(target_os = "macos")]
+        #[cfg(all(feature = "screen-capture", target_os = "macos"))]
         Backend::MacOs => {
             use super::capture_macos::{MacCapture, MacCaptureError};
             match MacCapture::open().await {
@@ -191,6 +211,13 @@ mod tests {
             choose_backend(false, false, Some("wayland-0"), None),
             Backend::Unsupported
         );
+    }
+
+    /// A build without the capture backends never opens one, whatever the session looks like.
+    #[cfg(not(feature = "screen-capture"))]
+    #[test]
+    fn without_the_capture_feature_nothing_is_supported() {
+        assert_eq!(current_backend(), Backend::Unsupported);
     }
 
     struct Fake;

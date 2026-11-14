@@ -4,7 +4,7 @@
 
 use bytes::BytesMut;
 use libfuzzer_sys::fuzz_target;
-use mumcord_protocol::framing;
+use mumble_client_protocol::framing;
 
 fuzz_target!(|data: &[u8]| {
     let mut buf = BytesMut::from(data);

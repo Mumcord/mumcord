@@ -8,19 +8,19 @@ license.workspace = true
 
 [dependencies]
 crossbeam-queue.workspace = true
-mumcord-protocol.workspace = true
+mumble-client-protocol.workspace = true
 mumcord-audio.workspace = true
 mumcord-store.workspace = true
-mumcord-positional.workspace = true
+mumcord-positional = { workspace = true, optional = true }
 mumcord-camera.workspace = true
-mumcord-effects.workspace = true
+mumcord-effects = { workspace = true, optional = true }
 mumcord-p2p.workspace = true
 mumcord-screenshare.workspace = true
 tokio.workspace = true
 # Import from the official Mumble client (issue #66): its database and 1.4/1.5 settings.
-rusqlite.workspace = true
+rusqlite = { workspace = true, optional = true }
 base64.workspace = true
-plist.workspace = true
+plist = { workspace = true, optional = true }
 x509-parser.workspace = true
 bytes.workspace = true
 ammonia.workspace = true
@@ -59,19 +59,22 @@ tracing-appender.workspace = true
 # Crash reports: the native signal handler and its stack (#568).
 libc.workspace = true
 backtrace.workspace = true
-xattr.workspace = true
 # Free space in the save folder before a download starts (statvfs without unsafe).
 rustix = { version = "1", features = ["fs"] }
 
 # Whole-screen capture on X11 (GetImage on the root window): the BSDs have X11 but no
 # xdg-desktop-portal, so only the direct capture exists there.
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
-x11rb.workspace = true
+x11rb = { workspace = true, optional = true }
+
+# Where a received file came from (mark-of-the-web). Phones have no such mark an app could set.
+[target.'cfg(all(unix, not(any(target_os = "android", target_os = "ios"))))'.dependencies]
+xattr.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # Wayland capture: the ScreenCast portal picks the window or screen, PipeWire delivers the frames.
-ashpd = { workspace = true, features = ["screencast"] }
-pipewire.workspace = true
+ashpd = { workspace = true, features = ["screencast"], optional = true }
+pipewire = { workspace = true, optional = true }
 futures-util.workspace = true
 # Screen-lock events from systemd-logind turn the camera off (spec 08, FR-8.21).
 zbus.workspace = true
@@ -84,54 +87,95 @@ objc2.workspace = true
 block2.workspace = true
 dispatch2.workspace = true
 objc2-foundation = { workspace = true, features = ["NSArray", "NSDistributedNotificationCenter", "NSEnumerator", "NSError", "NSNotification", "NSOperation", "NSProcessInfo", "NSString", "NSValue", "block2"] }
-objc2-screen-capture-kit = { workspace = true, features = ["SCContentSharingPicker", "SCError", "SCShareableContent", "SCStream", "block2", "dispatch2", "objc2-core-foundation", "objc2-core-graphics", "objc2-core-media"] }
-objc2-core-media = { workspace = true, features = ["CMBase", "CMBlockBuffer", "CMFormatDescription", "CMSampleBuffer", "CMTime", "objc2-core-audio-types", "objc2-core-video"] }
-objc2-core-video = { workspace = true, features = ["CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVReturn"] }
-objc2-core-graphics = { workspace = true, features = ["CGDirectDisplay", "CGWindow"] }
-objc2-core-audio-types = { workspace = true, features = ["CoreAudioBaseTypes"] }
+objc2-screen-capture-kit = { workspace = true, features = ["SCContentSharingPicker", "SCError", "SCShareableContent", "SCStream", "block2", "dispatch2", "objc2-core-foundation", "objc2-core-graphics", "objc2-core-media"], optional = true }
+objc2-core-media = { workspace = true, features = ["CMBase", "CMBlockBuffer", "CMFormatDescription", "CMSampleBuffer", "CMTime", "objc2-core-audio-types", "objc2-core-video"], optional = true }
+objc2-core-video = { workspace = true, features = ["CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVReturn"], optional = true }
+objc2-core-graphics = { workspace = true, features = ["CGDirectDisplay", "CGWindow"], optional = true }
+objc2-core-audio-types = { workspace = true, features = ["CoreAudioBaseTypes"], optional = true }
 
 [target.'cfg(windows)'.dependencies]
-# Mumble 1.4 keeps its settings in the registry (issue #66).
-windows-registry.workspace = true
-# Screen capture: the system picker and frames of Windows.Graphics.Capture (Direct3D 11), and the
-# shared app's sound via WASAPI process loopback. Same version as Tauri's own `windows`;
-# `windows-core` for the activation callback (`#[implement]`).
+# Mumble 1.4 keeps its settings in the registry (issue #66); the encoder probe reads the
+# graphics driver versions from it.
+windows-registry = { workspace = true, optional = true }
+# Same version as Tauri's own `windows`. Screen capture adds its own features through
+# `screen-capture`: the system picker and frames of Windows.Graphics.Capture (Direct3D 11), and
+# the shared app's sound via WASAPI process loopback; `windows-core` for the activation callback
+# (`#[implement]`).
 windows = { version = "0.62", features = [
-    "Foundation",
-    "Graphics_Capture",
-    "Graphics_DirectX_Direct3D11",
-    "Wdk_System_SystemServices",
     "Win32_Foundation",
-    "Win32_Graphics_Direct3D",
-    "Win32_Graphics_Direct3D11",
-    "Win32_Graphics_Dwm",
-    "Win32_Graphics_Dxgi",
-    "Win32_Graphics_Dxgi_Common",
     "Win32_Graphics_Gdi",
-    "Win32_Media_Audio",
     "Win32_Storage_FileSystem",
-    "Win32_System_Com",
-    "Win32_System_Com_StructuredStorage",
     "Win32_System_Diagnostics_Debug",
-    "Win32_System_Diagnostics_ToolHelp",
     "Win32_System_IO",
     "Win32_System_Kernel",
     "Win32_System_LibraryLoader",
     "Win32_System_Power",
     "Win32_System_ProcessStatus",
     "Win32_System_RemoteDesktop",
-    "Win32_System_SystemInformation",
     "Win32_System_Threading",
-    "Win32_System_Variant",
-    "Win32_System_WinRT",
-    "Win32_System_WinRT_Direct3D11",
-    "Win32_UI_Shell",
     "Win32_UI_WindowsAndMessaging",
 ] }
-windows-core = "0.62"
-windows-future = "0.3"
+windows-core = { version = "0.62", optional = true }
+windows-future = { version = "0.3", optional = true }
 
 [features]
+default = ["desktop"]
+# Everything the desktop app uses. Phones build with `default-features = false` and switch on
+# only what they need (spec 05).
+desktop = [
+    "positional",
+    "camera-effects",
+    "screen-capture",
+    "mumble-import",
+    "desktop-codecs",
+    "vp9",
+    "av1-decode",
+]
+# Positional audio for games (Mumble Link reads POSIX shared memory, which Android lacks).
+positional = ["dep:mumcord-positional"]
+# Camera background blur and images (pulls in the ONNX runtime).
+camera-effects = ["dep:mumcord-effects"]
+# Sending a screen share: capture backends and share sound. Watching is always available.
+screen-capture = [
+    "dep:ashpd",
+    "dep:pipewire",
+    "dep:x11rb",
+    "dep:objc2-screen-capture-kit",
+    "dep:objc2-core-media",
+    "dep:objc2-core-video",
+    "dep:objc2-core-graphics",
+    "dep:objc2-core-audio-types",
+    "dep:windows-core",
+    "dep:windows-future",
+    "windows/Foundation",
+    "windows/Graphics_Capture",
+    "windows/Graphics_DirectX_Direct3D11",
+    "windows/Wdk_System_SystemServices",
+    "windows/Win32_Graphics_Direct3D",
+    "windows/Win32_Graphics_Direct3D11",
+    "windows/Win32_Graphics_Dwm",
+    "windows/Win32_Graphics_Dxgi",
+    "windows/Win32_Graphics_Dxgi_Common",
+    "windows/Win32_Media_Audio",
+    "windows/Win32_System_Com",
+    "windows/Win32_System_Com_StructuredStorage",
+    "windows/Win32_System_Diagnostics_ToolHelp",
+    "windows/Win32_System_SystemInformation",
+    "windows/Win32_System_Variant",
+    "windows/Win32_System_WinRT",
+    "windows/Win32_System_WinRT_Direct3D11",
+    "windows/Win32_UI_Shell",
+]
+# Import from the official Mumble client (issue #66).
+mumble-import = ["dep:plist", "dep:rusqlite", "dep:windows-registry"]
+# Stream codecs, one C library or encoder family each (see crates/screenshare).
+vp9 = ["mumcord-screenshare/vp9"]
+av1-decode = ["mumcord-screenshare/av1-decode"]
+desktop-codecs = [
+    "mumcord-screenshare/av1-encode",
+    "mumcord-screenshare/hw-encode",
+    "dep:windows-registry",
+]
 # Env-selected file/null audio backend for headless tests and E2E; never in release builds.
 test-backend = ["mumcord-audio/test-backend"]
 
@@ -140,7 +184,17 @@ test-backend = ["mumcord-audio/test-backend"]
 # protoc-bin-vendored ships, so neither it nor the tests that use it build there (the client
 # itself is unaffected).
 [target.'cfg(not(target_os = "freebsd"))'.dev-dependencies]
-mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.5.4", features = ["tester"] }
+# Live tests drive scripted bots through the mumbot library, pinned to the media-v2 work until it
+# is released.
+mumbot = { git = "https://github.com/sothis/mumbot", rev = "dfd7647cb56aeef3d60732c92c66a3c1215084ac", features = ["tester"] }
+
+[[test]]
+name = "live_positional"
+required-features = ["positional"]
+
+[[test]]
+name = "screen_capture_x11"
+required-features = ["screen-capture"]
 
 [dev-dependencies]
 tempfile.workspace = true
@@ -156,3 +210,8 @@ prost.workspace = true
 
 [lints]
 workspace = true
+
+# W5: a hand-rolled harness prints the AC-7.82 figures itself; no benchmark crate is needed.
+[[bench]]
+name = "media_crypto"
+harness = false

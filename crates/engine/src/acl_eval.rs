@@ -7,7 +7,7 @@
 //! another channel, a group the server fills itself) the answer is "depends", with the condition.
 //! The server has the final say; nothing here is stored (FR-10.63).
 
-use mumcord_protocol::permissions as p;
+use mumble_client_protocol::permissions as p;
 
 use crate::channel_acl::{AclGroup, AclRule, ChannelAcl};
 
@@ -510,7 +510,7 @@ impl crate::session::Engine {
         let ctx = self.session_ctx_for(server_id)?;
         let root = acl.channel_id == 0;
         Ok(ctx.handle.with_state(|state| {
-            let person_of = |user: &mumcord_protocol::User| Person {
+            let person_of = |user: &mumble_client_protocol::User| Person {
                 user_id: user.user_id,
                 in_channel: Some(user.channel_id == acl.channel_id),
                 superuser: user.user_id == Some(0),

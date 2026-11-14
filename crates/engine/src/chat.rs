@@ -12,7 +12,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use mumcord_protocol::{
+use mumble_client_protocol::{
     DenyKind, PermissionDenied, ServerState, TextMessage, TextTarget, User, permissions,
 };
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
@@ -25,8 +25,7 @@ use crate::session::{
 };
 use crate::sounds::Sound;
 
-pub use sanitize::sanitize_html;
-pub(crate) use sanitize::sanitize_message_html;
+pub use sanitize::{sanitize_html, sanitize_message_html};
 
 /// Size cap for messages with images when the server sets no limit; the UI scales images to
 /// the same target.
@@ -638,6 +637,44 @@ impl Engine {
             }
             .map_err(store_error)?
         };
+        Ok(self.history_views(&ctx, &conversation, rows))
+    }
+
+    /// One stored message of a conversation on the connected server `server_id` by its id, as
+    /// [`Engine::history_load`] returns it; `None` if it is not (or no longer) stored there.
+    pub fn history_message(
+        &self,
+        server_id: ServerId,
+        conversation: ConversationRef,
+        message_id: &str,
+    ) -> EngineResult<Option<ChatMessageView>> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let Some(stored) = stored_conversation(&ctx, &conversation)? else {
+            return Ok(None);
+        };
+        // Messages that were not stored (`tmp-` ids) cannot be fetched again.
+        let Ok(id) = message_id.parse::<i64>() else {
+            return Ok(None);
+        };
+        let row = ctx
+            .store()
+            .message(ctx.server_id, &stored, id)
+            .map_err(store_error)?;
+        Ok(row.and_then(|row| {
+            self.history_views(&ctx, &conversation, vec![row])
+                .into_iter()
+                .next()
+        }))
+    }
+
+    /// Stored rows of `conversation` as the UI sees them, with their dismissed previews, sync
+    /// origins and file cards.
+    fn history_views(
+        &self,
+        ctx: &SessionCtx,
+        conversation: &ConversationRef,
+        rows: Vec<mumcord_store::ChatMessage>,
+    ) -> Vec<ChatMessageView> {
         let own_hash = ctx
             .handle
             .with_state(|s| s.own_user().and_then(|u| u.cert_hash.clone()));
@@ -657,13 +694,13 @@ impl Engine {
             .map(|m| {
                 let urls = dismissed.remove(&m.id).unwrap_or_default();
                 let origin = origins.remove(&m.id);
-                history_view(m, &conversation, own_hash.as_deref(), urls, origin)
+                history_view(m, conversation, own_hash.as_deref(), urls, origin)
             })
             .collect();
         if matches!(conversation, ConversationRef::Channel { .. }) {
-            self.attach_file_cards(&ctx, &ids, &mut views);
+            self.attach_file_cards(ctx, &ids, &mut views);
         }
-        Ok(views)
+        views
     }
 
     /// Whether the sender of a history message is blocked now (offers of blocked people are not
@@ -918,7 +955,7 @@ fn own_message(
 
 #[cfg(test)]
 mod tests {
-    use mumcord_protocol::{Channel, User};
+    use mumble_client_protocol::{Channel, User};
 
     use super::*;
 

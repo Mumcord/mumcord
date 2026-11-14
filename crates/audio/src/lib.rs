@@ -1,4 +1,4 @@
-//! Mumcord audio: device I/O (capture and playback via cpal) on top of `mumcord-codec`.
+//! Mumcord audio: device I/O (capture and playback via cpal, or fed by the embedding app) on top of `mumcord-codec`.
 //!
 //! The codec items (Opus, jitter buffer, mixer, bitrate control, spatial placement, processing
 //! chain and the frame constants) are re-exported, so `mumcord_audio::codec`, `::mixer` and so

@@ -17,6 +17,7 @@
     "muted": "Įjunk mikrofoną, kad galėtum šnibždėti.",
     "serverMuted": "Serveris tave nutildė, todėl neperduoda tavo balso.",
     "nobodyHere": "Nė vieno iš šių žmonių dabar nėra šiame serveryje.",
+    "ambiguousName": "Šį vardą čia turi daugiau nei vienas žmogus, todėl šnabždesys nebuvo išsiųstas.",
     "channelNotFound": "Šio kanalo šiame serveryje nėra.",
     "noPermission": "Serveris neleidžia tau šnibždėti kanalui {{channel}}.",
     "unknownTarget": "Šio tikslo nebėra.",

@@ -232,6 +232,7 @@ impl Mumpeer {
             broadcast: None,
             plugin_data_kbps: uses.contains(&RelayUse::PluginData).then_some(512),
             registered_only: false,
+            media: false,
         }
     }
 }

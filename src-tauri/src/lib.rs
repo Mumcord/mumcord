@@ -10,6 +10,8 @@ mod deeplink;
 mod desktop_entry;
 mod display;
 mod dnd;
+#[cfg(target_os = "linux")]
+mod freeze;
 mod fullscreen;
 #[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod glib_log;
@@ -55,7 +57,7 @@ use tauri_specta::{Builder, Event, collect_commands, collect_events};
 use commands::{
     admin, app, audio, blocking, channel_admin, channel_audio, channels, chat, diagnostics,
     dropped, follow, friends, history, identity, links, mumble_import, notifications as notify,
-    people, pm_overview, pm_rules, profile, servers, session, settings,
+    people, phone_transfer, pm_overview, pm_rules, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -82,6 +84,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             identity::identity_delete,
             identity::identity_set_default,
             identity::server_set_identity,
+            phone_transfer::phone_transfer_start,
+            phone_transfer::phone_transfer_cancel,
             mumble_import::mumble_import_scan,
             mumble_import::mumble_import_apply,
             mumble_import::mumble_import_undo,
@@ -649,6 +653,13 @@ pub fn run() {
                 ));
                 return true;
             }
+            if !commands::phone_transfer::command_allowed(call.message.command()) {
+                call.resolver.reject(commands::types::ApiError::new(
+                    commands::types::ErrorCode::NotImplemented,
+                    "Send to your phone is not available in this build",
+                ));
+                return true;
+            }
             invoke(call)
         })
         .manage(window::StartReveal::default())
@@ -657,6 +668,7 @@ pub fn run() {
         .manage(plugins::ui::FrameMuteStore::default())
         .manage(plugins::child_webview::Frames::default())
         .manage(commands::inspector::SharedView::default())
+        .manage(commands::phone_transfer::PhoneTransferState::default())
         .manage(commands::inspector::CaptureMode::default())
         .manage(commands::licences::SharedLook::default())
         .manage(watch_player::PlayerServer::default())
@@ -678,6 +690,9 @@ pub fn run() {
             // their `stop` and the connections close cleanly (#748).
             let quitting = app.handle().clone();
             mumcord_engine::crash::on_quit_signal(move || window::quit(&quitting));
+            // After the engine start, which sets up the crash reports a freeze is written to.
+            #[cfg(target_os = "linux")]
+            freeze::start(app.handle());
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
             dnd::init(app.handle());
@@ -774,6 +789,20 @@ fn resource_dir(app: &AppHandle) -> Option<std::path::PathBuf> {
     None
 }
 
+/// Built-in camera backgrounds. A packaged app has them in `camera-backgrounds` inside Tauri's
+/// resource folder. An unpackaged debug build (what the end-to-end tests launch) has no bundle,
+/// so `MUMCORD_CAMERA_BACKGROUNDS` names that folder of `{id}.webp` files directly.
+fn camera_backgrounds_dir(app: &AppHandle) -> Option<std::path::PathBuf> {
+    if let Some(dir) = resource_dir(app) {
+        let bundled = dir.join("camera-backgrounds");
+        if bundled.is_dir() {
+            return Some(bundled);
+        }
+    }
+    let path = std::path::PathBuf::from(std::env::var_os("MUMCORD_CAMERA_BACKGROUNDS")?);
+    path.is_dir().then_some(path)
+}
+
 /// How Mumcord runs and on which screens, for crash reports (#568).
 fn set_crash_context(app: &AppHandle) {
     // AppImage and Flatpak exist only on Linux.
@@ -834,7 +863,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "linux")]
     gst_plugins::log_h264_status(&app.config().identifier);
     set_crash_context(app);
-    mumcord_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
+    mumble_client_protocol::set_client_release(version::client_release());
 
     let info_engine = engine.clone();
     let diag_version = if portable::is_active() {
@@ -862,8 +891,8 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     engine.camera_set_frame_sink(camera_frames.0.clone());
     app.manage(camera_frames);
     app.manage(commands::camera_settings::CameraDeviceWatch::default());
-    match resource_dir(app) {
-        Some(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
+    match camera_backgrounds_dir(app) {
+        Some(dir) => engine.camera_set_builtin_backgrounds(dir),
         None => tracing::warn!("no resource folder for the camera backgrounds"),
     }
     now_playing::start(engine.clone());
@@ -1203,6 +1232,7 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        EngineEvent::WhisperEnded => commands::whisper::on_engine_ended(app),
         EngineEvent::UserStatsChanged(stats) => commands::user_stats::UserStatsChanged {
             server_id,
             session: stats.session,

@@ -17,6 +17,7 @@
     "muted": "Zet je microfoon aan om te fluisteren.",
     "serverMuted": "De server heeft je gedempt en geeft je stem daarom niet door.",
     "nobodyHere": "Geen van deze mensen is nu op deze server.",
+    "ambiguousName": "Meer dan één persoon hier heeft deze naam, dus de fluistering is niet verstuurd.",
     "channelNotFound": "Dit kanaal bestaat niet op deze server.",
     "noPermission": "De server staat niet toe dat je naar {{channel}} fluistert.",
     "unknownTarget": "Dit doel bestaat niet meer.",

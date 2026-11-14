@@ -17,6 +17,7 @@
     "muted": "Slå på mikrofonen för att viska.",
     "serverMuted": "Servern har tystat dig och vidarebefordrar därför inte din röst.",
     "nobodyHere": "Ingen av dessa personer är på servern just nu.",
+    "ambiguousName": "Mer än en person här har det här namnet, så viskningen skickades inte.",
     "channelNotFound": "Kanalen finns inte på den här servern.",
     "noPermission": "Servern tillåter inte att du viskar till {{channel}}.",
     "unknownTarget": "Det här målet finns inte längre.",

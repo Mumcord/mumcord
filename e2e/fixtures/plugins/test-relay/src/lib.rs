@@ -20,13 +20,17 @@ const BIG: usize = 64 * 1024;
 /// Fits the Mumble plugin-data fallback (at most 997 bytes).
 const SMALL: usize = 900;
 const MAX_LOG: usize = 12;
+/// The mumpeer testenv always registers its relay bot under this name. The bot becomes ready
+/// again after it leaves, and that must not hide the other person (AC-9.19).
+const RELAY_BOT: &str = "RelayBot";
 
 #[derive(Default)]
 struct State {
     running: bool,
     seq: u32,
-    /// The person direct messages go to: the last one who showed they run this plugin.
-    peer: Option<(Session, String)>,
+    /// People who currently run this plugin, oldest first. Direct messages and the status line
+    /// name the latest person who is not the relay bot, while one is ready (AC-9.19).
+    peers: Vec<(Session, String)>,
     /// How many `peer-ready` events came, so a spec can wait for a new one after a reconnect.
     ready: u32,
     received: u32,
@@ -66,7 +70,7 @@ fn view(with_buttons: bool) -> ui::El {
             .child(ui::text(&format!("Received: {}", s.received)))
             .child(ui::text(&format!(
                 "Peer: {} ({})",
-                s.peer.as_ref().map_or("none", |(_, name)| name.as_str()),
+                direct_peer(&s.peers).map_or("none", |(_, name)| name.as_str()),
                 s.ready
             )));
         if with_buttons {
@@ -90,10 +94,20 @@ fn redraw() {
     }
 }
 
+/// The latest ready person. The relay bot stays in the list, but it is not the peer the spec
+/// talks to while a person is still ready.
+fn direct_peer(peers: &[(Session, String)]) -> Option<&(Session, String)> {
+    peers
+        .iter()
+        .rev()
+        .find(|(_, name)| name != RELAY_BOT)
+        .or_else(|| peers.last())
+}
+
 fn send(action: &str, size: usize, fallback: bool, direct: bool) {
     let (seq, peer) = STATE.with_borrow_mut(|s| {
         s.seq = s.seq.wrapping_add(1);
-        (s.seq, s.peer.as_ref().map(|(session, _)| *session))
+        (s.seq, direct_peer(&s.peers).map(|(session, _)| *session))
     });
     let Some(message) = messages::message(seq, size) else {
         note(format!("{action}: cannot build {size} B"));
@@ -192,18 +206,21 @@ impl Plugin for TestRelay {
             Event::PeerReady(peer) => {
                 note(format!("peer: {}", peer.name));
                 STATE.with_borrow_mut(|s| {
-                    s.peer = Some((peer.session, peer.name));
+                    s.peers.retain(|(id, _)| *id != peer.session);
+                    s.peers.push((peer.session, peer.name));
                     s.ready += 1;
                 });
             }
-            // The peer left the channel: until a new `peer-ready`, nobody here runs this plugin.
+            // Someone left. Drop only them; another person who is still ready stays the peer.
             Event::Left(peer) => {
-                let ours = STATE
-                    .with_borrow(|s| s.peer.as_ref().is_some_and(|(id, _)| *id == peer.session));
-                if !ours {
+                let removed = STATE.with_borrow_mut(|s| {
+                    let before = s.peers.len();
+                    s.peers.retain(|(id, _)| *id != peer.session);
+                    before != s.peers.len()
+                });
+                if !removed {
                     return;
                 }
-                STATE.with_borrow_mut(|s| s.peer = None);
                 note(format!("gone: {}", peer.name));
             }
             Event::RelayMessage((peer, data)) => match messages::decode(&data) {
@@ -215,7 +232,9 @@ impl Plugin for TestRelay {
                     ));
                     STATE.with_borrow_mut(|s| {
                         s.received = s.received.saturating_add(1);
-                        s.peer.get_or_insert((peer.session, peer.name));
+                        if s.peers.is_empty() {
+                            s.peers.push((peer.session, peer.name));
+                        }
                     });
                 }
                 // The SDK has logged the reason and size; the host passes the bytes unchanged.
@@ -254,3 +273,23 @@ impl Plugin for TestRelay {
 }
 
 mumcord_plugin_sdk::export!(TestRelay);
+
+#[cfg(test)]
+mod tests {
+    use super::direct_peer;
+
+    #[test]
+    fn the_relay_bot_does_not_hide_the_person() {
+        let peers = vec![(1, "Alice".to_owned()), (2, "RelayBot".to_owned())];
+        assert_eq!(
+            direct_peer(&peers).map(|(_, name)| name.as_str()),
+            Some("Alice")
+        );
+        let only_bot = vec![(2, "RelayBot".to_owned())];
+        assert_eq!(
+            direct_peer(&only_bot).map(|(_, name)| name.as_str()),
+            Some("RelayBot")
+        );
+        assert!(direct_peer(&[]).is_none());
+    }
+}

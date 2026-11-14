@@ -19,6 +19,11 @@ pub enum ErrorKind {
     CertificateRejected,
     CertificateChanged,
     ServerTooOld,
+    /// The server banned the user while connected; `message` is the reason the server gave
+    /// (untrusted text, may be empty). Only reported when the server says so: a stock server
+    /// tells a banned client nothing at connect time, where a ban shows up as
+    /// `ServerUnreachable` and cannot be told apart from other causes.
+    Banned,
     PermissionDenied,
     ListenerLimitReached,
     /// As many servers are connected (or marked "Always connect at start") as the limit in
@@ -31,6 +36,8 @@ pub enum ErrorKind {
     NotFound,
     /// The screen share already has the maximum of viewers (FR-2.43).
     ShareFull,
+    /// The share or camera needs a newer Mumcord.
+    NeedsUpdate,
     /// Watching needs a direct connection and none can be made (FR-2.46); `message` is the
     /// reason, a [`crate::screen_share::WatchBlock::code`].
     DirectUnavailable,
@@ -77,6 +84,16 @@ impl fmt::Display for EngineError {
 impl std::error::Error for EngineError {}
 
 pub type EngineResult<T> = Result<T, EngineError>;
+
+/// Who cancels the echo of the speakers in the microphone signal.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EchoCancellationMode {
+    /// The engine's own echo canceller, switched by the `echo_cancellation` setting.
+    Engine,
+    /// The system's voice processing does it (audio supplied by the app, Epic 5 FR-5.25): the
+    /// engine's canceller stays off and the `echo_cancellation` setting has no effect.
+    System,
+}
 
 /// Connection state machine of spec §7.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -646,9 +663,11 @@ pub enum EngineEvent {
     /// Pinned or muted private conversations changed (issue #173).
     PmConversationPrefsChanged(Vec<mumcord_store::PmConversationPrefs>),
     /// Positional audio was switched, or the game delivering positions changed (FR-1.43).
+    #[cfg(feature = "positional")]
     PositionalStatusChanged(crate::positional::PositionalStatus),
     /// A person (or the user, with the own session) started or stopped sending positions
     /// (the "3D" icon, FR-1.72).
+    #[cfg(feature = "positional")]
     PositionalSendingChanged {
         session: u32,
         sending: bool,
@@ -657,8 +676,11 @@ pub enum EngineEvent {
     /// (issue #67); `None` ends the mark.
     IncomingWhisperChanged {
         session: u32,
-        kind: Option<mumcord_protocol::WhisperKind>,
+        kind: Option<mumble_client_protocol::WhisperKind>,
     },
+    /// The own whisper or shout ended without [`crate::Engine::whisper_stop`]: everyone it
+    /// was bound to left, or the server no longer carries the user's voice.
+    WhisperEnded,
     /// New UserStats of a person on the server (FR-2.25).
     UserStatsChanged(crate::stats::UserStatsView),
     /// The watch party in the user's channel started, changed or ended (`None`) (FR-2.39).

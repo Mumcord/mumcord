@@ -1,7 +1,7 @@
 //! Conversions from protocol/store types to engine views, channel paths and error mapping.
 
-use mumcord_protocol::permissions;
-use mumcord_protocol::{
+use mumble_client_protocol::permissions;
+use mumble_client_protocol::{
     Channel, CommandError, ConnectError, DenyKind, PermissionDenied, RejectReason, ServerState,
     User,
 };

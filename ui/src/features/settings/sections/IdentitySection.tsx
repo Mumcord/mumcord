@@ -14,6 +14,8 @@ import {
   ImportIdentityDialog,
   RenameIdentityDialog,
 } from "./IdentityDialogs";
+import { SendToPhoneDialog } from "./SendToPhoneDialog";
+import { useAppInfo } from "../useAppInfo";
 import { identityInitial, identityTone, serversFor, shortFingerprint } from "../identityFormat";
 
 const IDENTITY_FILTER_EXTENSIONS = ["p12", "pfx"];
@@ -24,6 +26,7 @@ type Dialog =
   | { kind: "rename"; identity: Identity }
   | { kind: "details"; identity: Identity }
   | { kind: "delete"; identity: Identity }
+  | { kind: "phone" }
   | null;
 
 type Status = { kind: "success" | "error"; text: string } | null;
@@ -36,6 +39,9 @@ type Status = { kind: "success" | "error"; text: string } | null;
 export function IdentitiesCard() {
   const { t, i18n } = useTranslation("settings");
   const { identities, servers } = useServers();
+  // Only builds with the `phone-transfer` feature offer "Send to your phone"; release builds
+  // leave it off until the phone apps are released.
+  const phoneTransfer = useAppInfo()?.phoneTransfer === true;
   const [dialog, setDialog] = useState<Dialog>(null);
   const [status, setStatus] = useState<Status>(null);
   const [exportPath, setExportPath] = useState<{ id: number; path: string } | null>(null);
@@ -108,6 +114,18 @@ export function IdentitiesCard() {
       wide
       actions={
         <>
+          {phoneTransfer && (
+            <button
+              type="button"
+              className="settings-button"
+              onClick={() => {
+                setStatus(null);
+                setDialog({ kind: "phone" });
+              }}
+            >
+              {t("identity.phoneSend")}
+            </button>
+          )}
           <button type="button" className="settings-button" onClick={() => void startImport()}>
             {t("identity.import")}
           </button>
@@ -220,6 +238,15 @@ export function IdentitiesCard() {
       <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
         {status?.text}
       </p>
+      {dialog?.kind === "phone" && (
+        <SendToPhoneDialog
+          identities={identities}
+          serverCount={servers.length}
+          onClose={() => {
+            setDialog(null);
+          }}
+        />
+      )}
       {dialog?.kind === "create" && (
         <CreateIdentityDialog
           onCancel={() => {

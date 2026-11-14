@@ -6,6 +6,26 @@
 //! [`FrameSink`]. Format negotiation, YUY2/MJPEG conversion and the 4:3 centre crop (FR-8.26)
 //! happen inside the backend, so everything after capture sees one format.
 //!
+//! # Platform-fed capture (Android, iOS)
+//!
+//! On Android and iOS this crate has no OS capture backend: no module for those targets is
+//! compiled, and `target_os = "ios"` never takes the macOS AVFoundation branch. The app's native
+//! layer (CameraX, AVCaptureSession) captures the pictures and feeds them in through the same
+//! interface the desktop backends use:
+//!
+//! - The app implements [`CameraBackend`]; its `open` returns a [`CaptureSession`] and keeps the
+//!   boxed [`FrameSink`].
+//! - Per picture the feeder takes a buffer with [`FramePool::acquire`] (4 buffers,
+//!   [`POOL_BUFFERS`]; `None` means the consumer is behind, so the feeder drops that picture),
+//!   converts into it as NV12 without row padding (see [`CameraFrame`], at most
+//!   [`MAX_WIDTH`]×[`MAX_HEIGHT`], 16:9; conversion and cropping are the feeder's job), and calls
+//!   [`FrameSink::frame`] with the time since the session started.
+//! - Threading: [`FrameSink::frame`] is called from one feeder thread (the platform's camera
+//!   callback thread) at a time and is on the real-time path: no blocking, locking, I/O or
+//!   logging. The feeder owns the buffer until the call; the sink then owns the frame and
+//!   dropping it returns the buffer to the pool. [`FrameSink::ended`] reports permission loss or
+//!   unplugging; dropping the session stops the feeder before returning.
+//!
 //! [`TestCamera`] is the debug-build `MUMCORD_TEST_CAMERA` fixture (FR-8.31); it implements the
 //! same trait, so all later pipeline stages run unchanged.
 
@@ -163,4 +183,58 @@ pub trait CameraBackend: Send + Sync {
         request: CaptureRequest,
         sink: Box<dyn FrameSink>,
     ) -> Result<Box<dyn CaptureSession>, CameraError>;
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::mpsc;
+
+    use super::*;
+
+    struct ChannelSink(mpsc::Sender<(u32, u32, Duration, Vec<u8>)>);
+
+    impl FrameSink for ChannelSink {
+        fn frame(&mut self, frame: CameraFrame) {
+            let _ = self.0.send((
+                frame.width,
+                frame.height,
+                frame.timestamp,
+                frame.data.to_vec(),
+            ));
+        }
+
+        fn ended(&mut self, _reason: CameraError) {}
+    }
+
+    /// What a mobile app does: render pictures itself and push them into the sink through the
+    /// pool, with no backend involved. The test camera's renderer stands in for the OS camera.
+    #[test]
+    fn externally_fed_frames_reach_the_sink() {
+        let (tx, rx) = mpsc::channel();
+        let mut sink: Box<dyn FrameSink> = Box::new(ChannelSink(tx));
+        let (width, height) = (MAX_WIDTH, MAX_HEIGHT);
+        let pool = FramePool::new(POOL_BUFFERS, nv12_len(width, height));
+
+        for index in 0..3u64 {
+            let mut data = pool.acquire().expect("a free buffer");
+            TestCamera::render(index, &mut data);
+            sink.frame(CameraFrame {
+                width,
+                height,
+                timestamp: Duration::from_millis(33 * index),
+                data,
+            });
+        }
+
+        for index in 0..3u64 {
+            let (w, h, timestamp, bytes) = rx.try_recv().expect("a frame");
+            let mut expected = vec![0; nv12_len(width, height)];
+            TestCamera::render(index, &mut expected);
+            assert_eq!((w, h), (width, height));
+            assert_eq!(timestamp, Duration::from_millis(33 * index));
+            assert_eq!(bytes, expected);
+        }
+        // Every frame was dropped by the sink, so all buffers are back in the pool.
+        assert_eq!(pool.available(), POOL_BUFFERS);
+    }
 }

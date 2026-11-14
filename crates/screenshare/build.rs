@@ -1,4 +1,6 @@
-//! Links libvpx (VP9), SVT-AV1 (AV1 encode) and dav1d (AV1 decode) and generates their bindings.
+//! Links libvpx (VP9), SVT-AV1 (AV1 encode) and dav1d (AV1 decode) and generates their bindings,
+//! each only when its Cargo feature (`vp9`, `av1-encode`, `av1-decode`) is on. With none of them
+//! and without `hw-encode` this script needs no bindgen, no pkg-config and no C library.
 //!
 //! Each library is either a static build from its `scripts/build-*.sh` script, pointed at by an
 //! environment variable (CI and release builds), or the system library found with pkg-config
@@ -14,15 +16,30 @@
 //! the libvpx ABI versions are checked at runtime and SVT-AV1's configuration struct changes
 //! between releases.
 //!
-//! The direct hardware encoders need `HWENC_SDK_DIR` (Windows and Linux, from
+//! The direct hardware encoders (feature `hw-encode`) need `HWENC_SDK_DIR` (Windows and Linux, from
 //! `scripts/build-hwenc-sdk.sh`): bindings for the NVENC, AMF, oneVPL and (Linux) VA-API headers,
 //! plus the static oneVPL dispatcher and the C++ runtime it needs. The GPU drivers themselves are
 //! loaded at runtime, so the app starts without them. Without the variable the hardware encoders
 //! are compiled out (`cfg(hwenc)` is unset) and screen sharing uses the software encoders only.
 
+#[cfg(any(
+    feature = "vp9",
+    feature = "av1-encode",
+    feature = "av1-decode",
+    feature = "hw-encode"
+))]
 use std::env;
-use std::path::{Path, PathBuf};
+#[cfg(any(feature = "vp9", feature = "av1-encode", feature = "av1-decode"))]
+use std::path::Path;
+#[cfg(any(
+    feature = "vp9",
+    feature = "av1-encode",
+    feature = "av1-decode",
+    feature = "hw-encode"
+))]
+use std::path::PathBuf;
 
+#[cfg(any(feature = "vp9", feature = "av1-encode", feature = "av1-decode"))]
 struct Library {
     name: &'static str,
     env: &'static str,
@@ -38,6 +55,7 @@ struct Library {
     script: &'static str,
 }
 
+#[cfg(feature = "vp9")]
 const VPX: Library = Library {
     name: "libvpx",
     env: "LIBVPX_STATIC_DIR",
@@ -53,6 +71,7 @@ const VPX: Library = Library {
 
 // SVT-AV1 4 is the first release with the per-frame rate, frame-rate and layer-count events the
 // encoder relies on for live changes.
+#[cfg(feature = "av1-encode")]
 const SVT_AV1: Library = Library {
     name: "SVT-AV1",
     env: "SVTAV1_STATIC_DIR",
@@ -66,6 +85,7 @@ const SVT_AV1: Library = Library {
     script: "scripts/build-svt-av1.sh",
 };
 
+#[cfg(feature = "av1-decode")]
 const DAV1D: Library = Library {
     name: "dav1d",
     env: "DAV1D_STATIC_DIR",
@@ -80,6 +100,19 @@ const DAV1D: Library = Library {
 };
 
 fn main() {
+    println!("cargo::rustc-check-cfg=cfg(hwenc)");
+    #[cfg(feature = "vp9")]
+    vpx();
+    #[cfg(feature = "av1-encode")]
+    svt_av1();
+    #[cfg(feature = "av1-decode")]
+    dav1d();
+    #[cfg(feature = "hw-encode")]
+    hardware_encoders();
+}
+
+#[cfg(feature = "vp9")]
+fn vpx() {
     let vpx = find(&VPX);
     generate(
         &vpx,
@@ -91,7 +124,10 @@ fn main() {
         "vpx.rs",
     );
     println!("cargo:rerun-if-changed=wrapper.h");
+}
 
+#[cfg(feature = "av1-encode")]
+fn svt_av1() {
     let svt = find(&SVT_AV1);
     generate(
         &svt,
@@ -117,7 +153,10 @@ fn main() {
     if env::var("CARGO_CFG_TARGET_ENV").is_ok_and(|env| env == "msvc") {
         println!("cargo:rustc-link-lib=dylib=legacy_stdio_definitions");
     }
+}
 
+#[cfg(feature = "av1-decode")]
+fn dav1d() {
     let dav1d = find(&DAV1D);
     generate(
         &dav1d,
@@ -129,14 +168,12 @@ fn main() {
             .allowlist_var("DAV1D_.*|EAGAIN"),
         "dav1d.rs",
     );
-
-    hardware_encoders();
 }
 
 /// Generates the hardware encoder bindings and links the oneVPL dispatcher when `HWENC_SDK_DIR`
 /// is set; see the module documentation.
+#[cfg(feature = "hw-encode")]
 fn hardware_encoders() {
-    println!("cargo::rustc-check-cfg=cfg(hwenc)");
     println!("cargo:rerun-if-env-changed=HWENC_SDK_DIR");
     let Some(dir) = env::var_os("HWENC_SDK_DIR") else {
         return;
@@ -246,6 +283,7 @@ fn hardware_encoders() {
 }
 
 /// Links `lib` (static prefix or pkg-config) and returns its include paths.
+#[cfg(any(feature = "vp9", feature = "av1-encode", feature = "av1-decode"))]
 fn find(lib: &Library) -> Vec<PathBuf> {
     println!("cargo:rerun-if-env-changed={}", lib.env);
     if let Some(dir) = env::var_os(lib.env) {
@@ -265,6 +303,7 @@ fn find(lib: &Library) -> Vec<PathBuf> {
 }
 
 /// Links the static library in `dir` and returns its include path.
+#[cfg(any(feature = "vp9", feature = "av1-encode", feature = "av1-decode"))]
 fn link_static(lib: &Library, dir: &Path) -> Vec<PathBuf> {
     let include = dir.join("include");
     let lib_dir = dir.join("lib");
@@ -288,6 +327,12 @@ fn link_static(lib: &Library, dir: &Path) -> Vec<PathBuf> {
     vec![include]
 }
 
+#[cfg(any(
+    feature = "vp9",
+    feature = "av1-encode",
+    feature = "av1-decode",
+    feature = "hw-encode"
+))]
 fn generate(include_paths: &[PathBuf], builder: bindgen::Builder, file: &str) {
     let mut builder = builder
         .prepend_enum_name(false)

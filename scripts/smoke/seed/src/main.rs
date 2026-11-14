@@ -13,7 +13,7 @@ use std::process::ExitCode;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use mumcord_protocol::{ConnectConfig, ConnectError, ServerCert};
+use mumble_client_protocol::{ConnectConfig, ConnectError, ServerCert};
 use mumcord_store::{Identity, NewIdentity, NewServer, SecretStore, Store};
 
 const HOST: &str = "127.0.0.1";
@@ -82,7 +82,7 @@ async fn server_cert(port: u16) -> Result<ServerCert, Box<dyn std::error::Error>
         verify_cert: Arc::new(|_| false),
         login_timeout: Duration::from_secs(10),
     };
-    match mumcord_protocol::connect(config).await {
+    match mumble_client_protocol::connect(config).await {
         Err(ConnectError::CertificateRejected(cert)) => Ok(*cert),
         Err(e) => Err(format!("reading the server certificate failed: {e}").into()),
         Ok(_) => Err("server accepted a connection that rejected its certificate".into()),

@@ -135,7 +135,29 @@
     "backupWarning": "Faz uma cópia antes de eliminar. Uma identidade sem cópia não pode ser recuperada.",
     "usedBy": "Usada por: {{servers}}",
     "deleteUsedBy": "Estes servidores passam a usar a identidade predefinida {{identity}}: {{servers}}",
-    "exportFor": "Exportar {{identity}}"
+    "exportFor": "Exportar {{identity}}",
+    "phoneSend": "Enviar para o teu telemóvel…",
+    "phoneTitle": "Enviar para o teu telemóvel",
+    "phoneSelectionLabel": "O que enviar",
+    "phoneIdentity": "Identidade: {{identity}}",
+    "phoneIdentityDefault": "Identidade: {{identity}} (predefinida)",
+    "phoneServers_one": "Lista de servidores ({{count}} servidor)",
+    "phoneServers_many": "Lista de servidores ({{count}} servidores)",
+    "phoneServers_other": "Lista de servidores ({{count}} servidores)",
+    "phoneNothingSelected": "Seleciona pelo menos um item.",
+    "phoneShow": "Mostrar códigos",
+    "phoneDone": "Concluído",
+    "phonePreparing": "A preparar os códigos…",
+    "phoneCodesLabel": "Códigos para o teu telemóvel",
+    "phoneQrLabel": "Código QR {{current}} de {{total}}",
+    "phoneCodeOf": "Código {{current}} de {{total}}",
+    "phoneCycleHint": "Os códigos mudam automaticamente. Mantém o telemóvel apontado para o ecrã até todos os {{total}} serem lidos.",
+    "phoneSingleHint": "Mantém o telemóvel apontado para o ecrã até o código ser lido.",
+    "phoneTypeCode": "Escreve este código no teu telemóvel",
+    "phoneExpires": "Expira em {{time}}",
+    "phoneRenewed": "Novos códigos e um novo número. Recomeça no teu telemóvel.",
+    "phoneWarning": "Quem ler estes códigos e souber o número fica com a tua identidade. Mostra-os apenas ao teu próprio telemóvel.",
+    "phoneTooLarge": "É demasiado para uma transferência. Seleciona menos itens."
   },
   "audio": {
     "devices": "Dispositivos",
@@ -772,7 +794,13 @@
       "gap": "Intervalo para o pacote anterior",
       "kind": "ID interno",
       "size": "Tamanho",
-      "decoded": "Conteúdo descodificado"
+      "decoded": "Conteúdo descodificado",
+      "media": "Média"
+    },
+    "media": {
+      "channel": "canal {{channel}}",
+      "keyframe": "quadro-chave",
+      "delta": "quadro delta"
     },
     "noDecoding": "Estes dados não têm forma legível; vê os bytes em bruto.",
     "controlOnly": "Mensagem Mumble padrão: só o tipo e o tamanho são registados.",
@@ -793,7 +821,8 @@
       "watch": "Estado da sessão de visualização",
       "plugin": "Dados do plugin",
       "mumble": "Mensagem Mumble",
-      "peer": "Configuração do retransmissor"
+      "peer": "Configuração do retransmissor",
+      "media": "Fluxo de mídia"
     }
   },
   "licences": {

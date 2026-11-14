@@ -16,7 +16,7 @@ use mumcord_camera::CameraError;
 use mumcord_p2p::BroadcastEnd;
 
 use super::send::SendEnded;
-use super::session::{CameraFailure, CameraState, ServerCameras};
+use super::session::{CameraFailure, ServerCameras};
 use crate::ServerId;
 use crate::session::{Engine, WeakEngine, lock};
 
@@ -134,16 +134,29 @@ impl Engine {
         true
     }
 
-    /// Camera availability on `server_id` became `unavailable`: a camera on air there loses its
-    /// relay (FR-8.7, FR-8.24). The caller may hold engine locks.
-    pub(crate) fn camera_relay_unavailable(&self, server_id: ServerId) {
-        if self
-            .camera_own()
-            .is_some_and(|(server, state)| server == server_id && state == CameraState::OnAir)
-        {
+    /// Camera sharing on `server_id` lost a path. `unavailable` means no path is left at all, so
+    /// any camera turns off. `relay_lost` means the relay can no longer carry cameras, so only a
+    /// camera that is on that relay turns off (FR-8.7, FR-8.24). A healthy relay does not stop
+    /// a relay camera just because availability was refreshed. The caller may hold engine locks.
+    pub(crate) fn camera_path_lost(
+        &self,
+        server_id: ServerId,
+        unavailable: bool,
+        relay_lost: bool,
+    ) {
+        let stop = lock(self.camera_state())
+            .own
+            .as_ref()
+            .is_some_and(|o| path_ends_camera(unavailable, relay_lost, o.on_relay(server_id)));
+        if stop {
             self.camera_stop_later(server_id, StopReason::RelayLost);
         }
     }
+}
+
+/// Whether a camera on air stops for this availability refresh (FR-8.7, FR-8.24).
+fn path_ends_camera(unavailable: bool, relay_lost: bool, on_relay: bool) -> bool {
+    unavailable || (relay_lost && on_relay)
 }
 
 /// The voice server changed to `voice` (switched or left): a camera on another server turns off
@@ -211,6 +224,19 @@ fn screen_locked() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_healthy_relay_does_not_stop_a_relay_camera() {
+        // A refresh that leaves the relay able to carry cameras changes nothing.
+        assert!(!path_ends_camera(false, false, true));
+        // The relay went away, but this camera is not on it.
+        assert!(!path_ends_camera(false, true, false));
+        // The relay went away and the camera is on it.
+        assert!(path_ends_camera(false, true, true));
+        // No path left at all (the mode is off, or relay-only with no relay).
+        assert!(path_ends_camera(true, false, false));
+        assert!(path_ends_camera(true, true, true));
+    }
 
     #[test]
     fn own_actions_carry_no_notice() {

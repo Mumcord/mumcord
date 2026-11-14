@@ -45,7 +45,7 @@ const LONG =
   "Thanks!";
 const PRIYA = "Anyone tried the Windows build against the 0.7.1 crash yet?";
 
-/** Mumble's ACL bits, as in `crates/protocol/src/permissions.rs`. */
+/** Mumble's ACL bits, as in `permissions.rs` of the `mumble-client-protocol` crate. */
 const TRAVERSE = 0x2;
 const ENTER = 0x4;
 const SPEAK = 0x8;

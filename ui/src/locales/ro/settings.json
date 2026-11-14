@@ -135,7 +135,29 @@
     "backupWarning": "Fă o copie de siguranță înainte de ștergere. O identitate fără copie nu poate fi recuperată.",
     "usedBy": "Folosită de: {{servers}}",
     "deleteUsedBy": "Aceste servere vor folosi apoi identitatea implicită {{identity}}: {{servers}}",
-    "exportFor": "Exportă {{identity}}"
+    "exportFor": "Exportă {{identity}}",
+    "phoneSend": "Trimite pe telefonul tău…",
+    "phoneTitle": "Trimite pe telefonul tău",
+    "phoneSelectionLabel": "Ce se trimite",
+    "phoneIdentity": "Identitate: {{identity}}",
+    "phoneIdentityDefault": "Identitate: {{identity}} (implicită)",
+    "phoneServers_one": "Lista de servere ({{count}} server)",
+    "phoneServers_few": "Lista de servere ({{count}} servere)",
+    "phoneServers_other": "Lista de servere ({{count}} de servere)",
+    "phoneNothingSelected": "Selectează cel puțin un element.",
+    "phoneShow": "Afișează codurile",
+    "phoneDone": "Gata",
+    "phonePreparing": "Se pregătesc codurile…",
+    "phoneCodesLabel": "Coduri pentru telefonul tău",
+    "phoneQrLabel": "Cod QR {{current}} din {{total}}",
+    "phoneCodeOf": "Cod {{current}} din {{total}}",
+    "phoneCycleHint": "Codurile se schimbă automat. Ține telefonul îndreptat spre ecran până când sunt citite toate cele {{total}}.",
+    "phoneSingleHint": "Ține telefonul îndreptat spre ecran până când codul este citit.",
+    "phoneTypeCode": "Tastează acest cod pe telefonul tău",
+    "phoneExpires": "Expiră în {{time}}",
+    "phoneRenewed": "Coduri noi și un număr nou. Începe din nou pe telefonul tău.",
+    "phoneWarning": "Oricine scanează aceste coduri și cunoaște numărul îți obține identitatea. Arată-le doar propriului telefon.",
+    "phoneTooLarge": "Este prea mult pentru un singur transfer. Selectează mai puține elemente."
   },
   "audio": {
     "devices": "Dispozitive",
@@ -772,7 +794,13 @@
       "gap": "Interval față de pachetul anterior",
       "kind": "ID intern",
       "size": "Dimensiune",
-      "decoded": "Conținut decodat"
+      "decoded": "Conținut decodat",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "canal {{channel}}",
+      "keyframe": "cadru cheie",
+      "delta": "cadru delta"
     },
     "noDecoding": "Aceste date nu au o formă lizibilă; vezi octeții bruți.",
     "controlOnly": "Mesaj Mumble standard: sunt înregistrate doar tipul și dimensiunea.",
@@ -793,7 +821,8 @@
       "watch": "Starea vizionării comune",
       "plugin": "Date plugin",
       "mumble": "Mesaj Mumble",
-      "peer": "Configurarea releului"
+      "peer": "Configurarea releului",
+      "media": "Flux media"
     }
   },
   "licences": {

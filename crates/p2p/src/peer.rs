@@ -20,13 +20,15 @@ use std::net::IpAddr;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 
 /// Plugin data id of the relay discovery messages.
 pub const PEER_DATA_ID: &str = "mumcord.peer";
 /// The message version this side sends. Any version >= 1 is accepted on receipt and unknown
 /// fields are ignored; a breaking change gets a new data id.
 pub const PEER_VERSION: u32 = 1;
+/// The `mv` value of a relay or client that speaks the Bovnar media profile (FR-7.96).
+pub const MEDIA_VERSION: u8 = 2;
 
 /// The hello feature of clients that can send and show cameras (spec 08). Hello features live in
 /// the engine's hello; this is the wire name it announces.
@@ -159,6 +161,8 @@ pub struct RelayAnnouncement {
     /// The relay only serves registered users (wire `reg`, #601), so a guest's client can say so
     /// before trying. `false` when not announced.
     pub registered_only: bool,
+    /// The relay speaks the Bovnar media profile (wire `mv >= MEDIA_VERSION`, FR-7.96).
+    pub media: bool,
 }
 
 impl RelayAnnouncement {
@@ -360,6 +364,8 @@ pub enum PeerMessage {
         rid: RequestId,
         max: u16,
         kind: Option<RelayUse>,
+        /// The publisher will use the Bovnar media profile (wire `mv`, FR-7.96).
+        media: bool,
     },
     /// Bot → sharer: the broadcast and its publisher token (`bcast`).
     Broadcast {
@@ -368,6 +374,8 @@ pub enum PeerMessage {
         token: RelayToken,
         /// Seconds the token stays valid until it is bound.
         ttl: u16,
+        /// The broadcast's format, repeated from `bcast-req` (wire `mv`, FR-7.96).
+        media: bool,
     },
     /// Sharer → bot: admit the user with session `viewer` (`bcast-admit`).
     BroadcastAdmit {
@@ -383,6 +391,8 @@ pub enum PeerMessage {
         ttl: u16,
         sharer: u32,
         kind: BroadcastKind,
+        /// The broadcast's format, from the publisher's `mv` (FR-7.96).
+        media: bool,
     },
     /// Sharer → bot: remove the user with session `viewer` from the broadcast (`bcast-kick`).
     BroadcastKick { id: BroadcastId, viewer: u32 },
@@ -459,6 +469,8 @@ struct RelayWire {
     pk: Option<u32>,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     reg: bool,
+    #[serde(default, skip_serializing_if = "is_zero_u8")]
+    mv: u8,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -490,6 +502,8 @@ struct BroadcastRequestWire {
     max: u16,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     k: Option<String>,
+    #[serde(default, skip_serializing_if = "is_zero_u8")]
+    mv: u8,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -498,6 +512,8 @@ struct BroadcastWire {
     id: String,
     tok: String,
     ttl: u16,
+    #[serde(default, skip_serializing_if = "is_zero_u8")]
+    mv: u8,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -515,12 +531,22 @@ struct BroadcastTokenWire {
     sharer: u32,
     #[serde(default)]
     k: Option<String>,
+    #[serde(default, skip_serializing_if = "is_zero_u8")]
+    mv: u8,
 }
 
 #[derive(Serialize, Deserialize)]
 struct BroadcastKickWire {
     id: String,
     viewer: u32,
+}
+
+fn is_zero_u8(value: &u8) -> bool {
+    *value == 0
+}
+
+fn media_version(media: bool) -> u8 {
+    if media { MEDIA_VERSION } else { 0 }
 }
 
 impl PeerMessage {
@@ -555,6 +581,7 @@ impl PeerMessage {
                         bc: relay.broadcast,
                         pk: relay.plugin_data_kbps,
                         reg: relay.registered_only,
+                        mv: media_version(relay.media),
                     },
                 )?
             }
@@ -598,7 +625,12 @@ impl PeerMessage {
                     r: reason.as_str().to_owned(),
                 },
             )?,
-            Self::BroadcastRequest { rid, max, kind } => {
+            Self::BroadcastRequest {
+                rid,
+                max,
+                kind,
+                media,
+            } => {
                 if *max == 0 {
                     return Err(PeerError::BadViewers);
                 }
@@ -611,6 +643,7 @@ impl PeerMessage {
                         rid: hex16(rid.0),
                         max: *max,
                         k: kind.map(|k| k.as_str().to_owned()),
+                        mv: media_version(*media),
                     },
                 )?
             }
@@ -619,6 +652,7 @@ impl PeerMessage {
                 id,
                 token,
                 ttl,
+                media,
             } => envelope(
                 "bcast",
                 BroadcastWire {
@@ -626,6 +660,7 @@ impl PeerMessage {
                     id: hex16(id.0),
                     tok: token.0.clone(),
                     ttl: *ttl,
+                    mv: media_version(*media),
                 },
             )?,
             Self::BroadcastAdmit { rid, id, viewer } => envelope(
@@ -642,6 +677,7 @@ impl PeerMessage {
                 ttl,
                 sharer,
                 kind,
+                media,
             } => envelope(
                 "bcast-tok",
                 BroadcastTokenWire {
@@ -650,6 +686,7 @@ impl PeerMessage {
                     ttl: *ttl,
                     sharer: *sharer,
                     k: Some(kind.as_str().to_owned()),
+                    mv: media_version(*media),
                 },
             )?,
             Self::BroadcastKick { id, viewer } => envelope(
@@ -709,6 +746,7 @@ impl PeerMessage {
                     // A limit of zero kbit/s would allow nothing; treat it as not announced.
                     plugin_data_kbps: wire.pk.filter(|&kbps| kbps > 0),
                     registered_only: wire.reg,
+                    media: wire.mv >= MEDIA_VERSION,
                 }))
             }
             "token-req" => {
@@ -761,6 +799,7 @@ impl PeerMessage {
                     rid: parse_rid(&wire.rid)?,
                     max: wire.max,
                     kind,
+                    media: wire.mv >= MEDIA_VERSION,
                 })
             }
             "bcast" => {
@@ -770,6 +809,7 @@ impl PeerMessage {
                     id: parse_broadcast_id(&wire.id)?,
                     token: RelayToken::parse(&wire.tok)?,
                     ttl: wire.ttl,
+                    media: wire.mv >= MEDIA_VERSION,
                 })
             }
             "bcast-admit" => {
@@ -792,6 +832,7 @@ impl PeerMessage {
                         .map(|k| BroadcastKind::parse(&k).ok_or(PeerError::BadUse))
                         .transpose()?
                         .unwrap_or(BroadcastKind::ScreenShare),
+                    media: wire.mv >= MEDIA_VERSION,
                 })
             }
             "bcast-kick" => {
@@ -929,6 +970,7 @@ mod tests {
             broadcast: None,
             plugin_data_kbps: None,
             registered_only: false,
+            media: false,
         })
     }
 
@@ -956,6 +998,7 @@ mod tests {
                 broadcast: Some(25),
                 plugin_data_kbps: Some(512),
                 registered_only: false,
+                media: false,
             }),
             PeerMessage::Token {
                 rid: RequestId(1),
@@ -976,22 +1019,26 @@ mod tests {
                 rid: RequestId(4),
                 max: 25,
                 kind: None,
+                media: false,
             },
             PeerMessage::BroadcastRequest {
                 rid: RequestId(6),
                 max: 8,
                 kind: Some(RelayUse::PluginData),
+                media: false,
             },
             PeerMessage::BroadcastRequest {
                 rid: RequestId(7),
                 max: 8,
                 kind: Some(RelayUse::Camera),
+                media: false,
             },
             PeerMessage::Broadcast {
                 rid: RequestId(4),
                 id: BroadcastId(0xfedc_ba98_7654_3210),
                 token: RelayToken::parse(TOKEN).expect("token"),
                 ttl: 60,
+                media: false,
             },
             PeerMessage::BroadcastAdmit {
                 rid: RequestId(5),
@@ -1004,6 +1051,7 @@ mod tests {
                 ttl: 60,
                 sharer: 8,
                 kind: BroadcastKind::Camera,
+                media: false,
             },
             PeerMessage::BroadcastKick {
                 id: BroadcastId(1),
@@ -1083,6 +1131,7 @@ mod tests {
             broadcast: Some(u16::MAX),
             plugin_data_kbps: Some(u32::MAX),
             registered_only: false,
+            media: false,
         });
         let bytes = message.encode().expect("encode");
         assert_eq!(PeerMessage::decode(&bytes).expect("decode"), message);
@@ -1100,6 +1149,7 @@ mod tests {
                 rid: RequestId(1),
                 max: 9,
                 kind: Some(RelayUse::Camera),
+                media: false,
             }
         );
         let err = PeerMessage::decode(
@@ -1298,6 +1348,7 @@ mod tests {
             rid: RequestId(1),
             max: 0,
             kind: None,
+            media: false,
         };
         assert_eq!(request.encode(), Err(PeerError::BadViewers));
     }
@@ -1336,6 +1387,7 @@ mod tests {
                 rid: RequestId(6),
                 max: 8,
                 kind: Some(RelayUse::PluginData),
+                media: false,
             })
             .ends_with(r#""max":8,"k":"plg"}"#)
         );
@@ -1344,6 +1396,7 @@ mod tests {
                 rid: RequestId(6),
                 max: 8,
                 kind: None,
+                media: false,
             })
             .contains(r#""k""#)
         );
@@ -1362,6 +1415,7 @@ mod tests {
                 ttl: 60,
                 sharer: 8,
                 kind: BroadcastKind::PluginData,
+                media: false,
             }),
             format!(
                 r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":8,"k":"plg"}}"#
@@ -1453,8 +1507,88 @@ mod tests {
             rid: RequestId(1),
             max: 4,
             kind: Some(RelayUse::Files),
+            media: false,
         };
         assert_eq!(request.encode(), Err(PeerError::BadUse));
+    }
+
+    #[test]
+    fn media_version_is_optional_on_every_capability() {
+        let mut announcement = match relay() {
+            PeerMessage::Relay(announcement) => announcement,
+            other => panic!("unexpected: {other:?}"),
+        };
+        announcement.media = true;
+        let bytes = PeerMessage::Relay(announcement.clone())
+            .encode()
+            .expect("encode");
+        assert!(
+            String::from_utf8(bytes.clone())
+                .expect("utf8")
+                .contains(r#""mv":2"#)
+        );
+        assert_eq!(
+            PeerMessage::decode(&bytes),
+            Ok(PeerMessage::Relay(announcement))
+        );
+
+        let token = RelayToken::parse(TOKEN).expect("token");
+        let request = PeerMessage::BroadcastRequest {
+            rid: RequestId(1),
+            max: 4,
+            kind: None,
+            media: true,
+        };
+        let bytes = request.encode().expect("encode");
+        assert!(
+            String::from_utf8(bytes.clone())
+                .expect("utf8")
+                .contains(r#""mv":2"#)
+        );
+        assert_eq!(PeerMessage::decode(&bytes), Ok(request));
+
+        let broadcast = PeerMessage::Broadcast {
+            rid: RequestId(1),
+            id: BroadcastId(1),
+            token: token.clone(),
+            ttl: 60,
+            media: true,
+        };
+        let bytes = broadcast.encode().expect("encode");
+        assert!(
+            String::from_utf8(bytes.clone())
+                .expect("utf8")
+                .contains(r#""mv":2"#)
+        );
+        assert_eq!(PeerMessage::decode(&bytes), Ok(broadcast));
+
+        let token_message = PeerMessage::BroadcastToken {
+            id: BroadcastId(1),
+            token,
+            ttl: 60,
+            sharer: 8,
+            kind: BroadcastKind::ScreenShare,
+            media: true,
+        };
+        let bytes = token_message.encode().expect("encode");
+        assert!(
+            String::from_utf8(bytes.clone())
+                .expect("utf8")
+                .contains(r#""mv":2"#)
+        );
+        assert_eq!(PeerMessage::decode(&bytes), Ok(token_message));
+
+        let old = PeerMessage::BroadcastRequest {
+            rid: RequestId(1),
+            max: 4,
+            kind: None,
+            media: false,
+        };
+        assert!(
+            !String::from_utf8(old.encode().expect("encode"))
+                .expect("utf8")
+                .contains(r#""mv""#)
+        );
     }
 
     #[test]

@@ -22,6 +22,7 @@ import { TileMenu } from "./TileMenu";
 import { useRoomModel } from "./useRoomModel";
 import { useCameraAnnouncements } from "./useCameraAnnouncements";
 import { useCameraLook } from "./useCameraLook";
+import { useCantWatch } from "./useCantWatch";
 import { WithoutCamera } from "./WithoutCamera";
 import "./camera.css";
 
@@ -59,6 +60,8 @@ export function CameraRoom({ serverId, onTurnOn }: CameraRoomProps) {
   const title = usePopoutTitle(serverId, t("room.title"));
   useStageLabel("camera", t("room.title"));
   useCameraAnnouncements(model.tiles);
+  // FR-8.5: without camera sharing there are no tiles to show, only the reason.
+  const cantWatch = useCantWatch(serverId, model.tiles.length);
 
   return (
     <section
@@ -69,33 +72,39 @@ export function CameraRoom({ serverId, onTurnOn }: CameraRoomProps) {
       data-reduce-motion={reduceMotion || undefined}
     >
       <RoomHeader model={model} />
-      <RoomStage
-        model={model}
-        renderTile={(tile, _place, tabIndex) => (
-          <CameraTile
-            serverId={serverId}
-            tile={tile}
-            backgrounded={!shown}
-            mirror={mirror}
-            avatar={tile.user === undefined ? null : avatarOf(tile.user)}
-            tabIndex={tabIndex}
-            menu={
-              <TileMenu
-                serverId={serverId}
-                tile={tile}
-                large={model.large}
-                onBackground={
-                  onAir
-                    ? () => {
-                        setPickingBackground(true);
-                      }
-                    : null
-                }
-              />
-            }
-          />
-        )}
-      />
+      {cantWatch !== null ? (
+        <p className="cam-room__cant-watch" role="status">
+          {cantWatch}
+        </p>
+      ) : (
+        <RoomStage
+          model={model}
+          renderTile={(tile, _place, tabIndex) => (
+            <CameraTile
+              serverId={serverId}
+              tile={tile}
+              backgrounded={!shown}
+              mirror={mirror}
+              avatar={tile.user === undefined ? null : avatarOf(tile.user)}
+              tabIndex={tabIndex}
+              menu={
+                <TileMenu
+                  serverId={serverId}
+                  tile={tile}
+                  large={model.large}
+                  onBackground={
+                    onAir
+                      ? () => {
+                          setPickingBackground(true);
+                        }
+                      : null
+                  }
+                />
+              }
+            />
+          )}
+        />
+      )}
       <WithoutCamera people={model.withoutCamera} avatarOf={avatarOf} />
       <RoomBar
         serverId={serverId}

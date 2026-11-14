@@ -18,6 +18,8 @@ export type WatchFailure =
   | "relayUnavailable"
   /** The sharer already has the most viewers. */
   | "full"
+  /** The share uses a format this Mumcord cannot read. */
+  | "needsUpdate"
   /** Anything else; the engine's message is logged. */
   | "failed";
 
@@ -28,6 +30,8 @@ export function watchFailure(error: EngineError): WatchFailure {
   switch (error.code) {
     case "shareFull":
       return "full";
+    case "needsUpdate":
+      return "needsUpdate";
     case "directUnavailable":
       if (error.message === "peerUnsupported") return "tooOld";
       if (error.message === "consentOff") return "consentOff";

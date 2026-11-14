@@ -6,12 +6,13 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use mumble_client_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumble_client_protocol::{ClientIdentity, ConnectConfig, ConnectError};
 use mumcord_audio::dsp::{
     Backend as DspBackend, DspControls, SuppressionLevel as DspSuppressionLevel,
     TalkMode as DspTalkMode,
 };
-use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
-use mumcord_protocol::{ClientIdentity, ConnectConfig, ConnectError};
+use mumcord_store::transfer::{ImportReport, TransferPayload};
 use mumcord_store::{
     Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, NoiseBackend, P2pMode,
     SavedServer, SecretStore, ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
@@ -20,17 +21,20 @@ use mumcord_store::{
 use super::channel_audio::effective_settings;
 use super::machine::{CertCheck, Failure, check_cert, format_fingerprint};
 use super::{
-    CertificateState, IdentityView, PasswordChange, ServerFields, ServerTestInput, ServerView,
-    TestConnectionView,
+    CertificateState, EchoCancellationMode, IdentityView, PasswordChange, ServerFields,
+    ServerTestInput, ServerView, TestConnectionView,
 };
 use super::{Engine, EngineError, EngineResult, ErrorKind, lock, store_error};
 
 /// Upper bound for a test connection, from TCP connect to the ping answer.
 const TEST_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
 
-/// Applies the DSP switches and talk mode of `settings`.
-pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
-    controls.set_echo_cancellation(settings.echo_cancellation);
+/// Applies the DSP switches and talk mode of `settings`. With [`EchoCancellationMode::System`]
+/// the engine's echo canceller stays off whatever the setting says: two cancellers in a row
+/// distort the voice.
+pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings, echo: EchoCancellationMode) {
+    controls
+        .set_echo_cancellation(echo == EchoCancellationMode::Engine && settings.echo_cancellation);
     controls.set_noise_suppression(settings.noise_suppression);
     // The backend is built here, on the settings thread, never in the audio path. Every choice is
     // a plain level without its own options, so `sonora-ns` (Light) runs at one fixed strength:
@@ -295,6 +299,7 @@ impl Engine {
     /// Takes back an identity the import from the official client just added (issue #66).
     /// Unlike [`Engine::identity_delete`] this may remove the last identity: the user
     /// undoes the import, e.g. in the first-start wizard before any identity existed.
+    #[cfg(feature = "mumble-import")]
     pub(crate) async fn identity_undo_import(&self, id: IdentityId) -> EngineResult<()> {
         let store = self.inner.store.clone();
         self.blocking(move |secrets| {
@@ -345,6 +350,41 @@ impl Engine {
         tokio::fs::write(&path, data)
             .await
             .map_err(|e| EngineError::new(ErrorKind::Io, format!("writing the file failed: {e}")))
+    }
+
+    /// Collects the chosen identities and, if wanted, the server list for "Send to your phone"
+    /// (spec 05, FR-5.64). Saved server passwords and channel access tokens are never part of
+    /// it (FR-5.66). The result holds private keys: hand it to
+    /// [`Transfer::create`](mumcord_store::transfer::Transfer::create) and drop it.
+    pub async fn transfer_export_payload(
+        &self,
+        identity_ids: Vec<IdentityId>,
+        include_servers: bool,
+    ) -> EngineResult<TransferPayload> {
+        let store = self.inner.store.clone();
+        self.blocking(move |secrets| {
+            lock(&store).export_transfer_payload(secrets, &identity_ids, include_servers)
+        })
+        .await
+    }
+
+    /// Imports what a [`TransferReader`](mumcord_store::transfer::TransferReader) opened
+    /// (spec 05, FR-5.65, FR-5.66): identities whose certificate is already in the list and
+    /// servers that are already saved are skipped, everything else is added. The report says
+    /// what happened to each entry.
+    pub async fn transfer_import(&self, payload: TransferPayload) -> EngineResult<ImportReport> {
+        let store = self.inner.store.clone();
+        let report = self
+            .blocking(move |secrets| {
+                lock(&store).import_transfer_payload(secrets, &payload, now_ms())
+            })
+            .await?;
+        tracing::info!(
+            identities = report.identities_imported.len(),
+            servers = report.servers_imported.len(),
+            "transfer imported"
+        );
+        Ok(report)
     }
 
     /// Label of a saved server as the server bar shows it (the address when none was given).
@@ -455,9 +495,9 @@ impl Engine {
         };
 
         let probe = async {
-            let connection = match mumcord_protocol::connect(config(password)).await {
+            let connection = match mumble_client_protocol::connect(config(password)).await {
                 Err(ConnectError::CertificateRejected(_)) => {
-                    mumcord_protocol::connect(config(None))
+                    mumble_client_protocol::connect(config(None))
                         .await
                         .map_err(|err| withheld_failure(test_failure(err), trusted.is_some()))?
                 }
@@ -776,7 +816,11 @@ impl Engine {
             let profile = core.channel_audio.map(|a| a.profile);
             let before = effective_settings(&previous, profile.as_ref());
             let after = effective_settings(&settings, profile.as_ref());
-            apply_dsp(&self.inner.controls, &after);
+            apply_dsp(
+                &self.inner.controls,
+                &after,
+                self.inner.echo_cancellation_mode(),
+            );
             if before.low_latency != after.low_latency {
                 core.set_low_latency(after.low_latency);
             }
@@ -807,9 +851,15 @@ impl Engine {
         {
             self.files_settings_changed();
         }
-        if previous.p2p_mode != settings.p2p_mode {
+        // Consent alone can take the last camera path away (`direct_only` with direct
+        // connections turned off, FR-8.4). A mode change was the only refresh before, so the
+        // button stayed enabled after the switch.
+        if previous.p2p_mode != settings.p2p_mode
+            || previous.allow_direct_connections != settings.allow_direct_connections
+        {
             self.camera_availability_refresh_all();
         }
+        #[cfg(feature = "positional")]
         if previous.positional != settings.positional {
             self.positional_configure(&settings.positional);
         }
@@ -958,11 +1008,36 @@ mod tests {
         assert!(validated(&zero).is_err());
     }
 
+    /// The phone system cancels the echo (FR-5.25): the engine's canceller stays off, noise
+    /// suppression and automatic gain follow the settings as on desktop.
+    #[test]
+    fn system_echo_cancellation_keeps_the_engine_canceller_off() {
+        let controls = DspControls::default();
+        let settings = Settings::default();
+        assert!(settings.echo_cancellation);
+        apply_dsp(&controls, &settings, EchoCancellationMode::Engine);
+        assert!(controls.echo_cancellation());
+        apply_dsp(&controls, &settings, EchoCancellationMode::System);
+        assert!(!controls.echo_cancellation());
+        assert!(controls.noise_suppression() && controls.auto_gain());
+        let quiet = Settings {
+            noise_suppression: false,
+            auto_gain: false,
+            ..settings
+        };
+        apply_dsp(&controls, &quiet, EchoCancellationMode::System);
+        assert!(!controls.noise_suppression() && !controls.auto_gain());
+    }
+
     /// The Settings choices (FR-3.65) select their libraries; Light runs at its fixed strength.
     #[test]
     fn each_noise_choice_selects_its_backend() {
         let controls = DspControls::default();
-        apply_dsp(&controls, &Settings::default());
+        apply_dsp(
+            &controls,
+            &Settings::default(),
+            EchoCancellationMode::Engine,
+        );
         assert_eq!(controls.noise_backend(), DspBackend::Nnnoiseless);
 
         for (choice, backend) in [
@@ -974,7 +1049,7 @@ mod tests {
                 noise_suppression_backend: choice,
                 ..Settings::default()
             };
-            apply_dsp(&controls, &settings);
+            apply_dsp(&controls, &settings, EchoCancellationMode::Engine);
             assert_eq!(controls.noise_backend(), backend);
         }
         assert_eq!(controls.suppression_level(), DspSuppressionLevel::Moderate);
@@ -1034,6 +1109,57 @@ mod tests {
             engine.identity().await.expect("default").map(|i| i.id),
             Some(work.id)
         );
+    }
+
+    #[tokio::test]
+    async fn a_transfer_moves_identities_and_servers_but_no_password() {
+        let (_dir, engine) = engine().await;
+        let main = engine
+            .identity_create("Zoe".into(), Some("Main".into()))
+            .await
+            .expect("create");
+        engine
+            .server_add(ServerFields {
+                password: PasswordChange::Set("server-password".into()),
+                ..fields("Home", "voice.example.org", "Zoe")
+            })
+            .await
+            .expect("add server");
+        let payload = engine
+            .transfer_export_payload(vec![main.id], true)
+            .await
+            .expect("export");
+        assert_eq!(payload.identities.len(), 1);
+        assert_eq!(payload.servers.as_ref().map(Vec::len), Some(1));
+
+        // The phone: a fresh data folder with empty secure storage.
+        let phone_dir = tempfile::tempdir().expect("tempdir");
+        let (phone, _phone_rx) = Engine::new(
+            phone_dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("second engine");
+        let report = phone
+            .transfer_import(payload.clone())
+            .await
+            .expect("import");
+        assert_eq!(report.identities_imported.len(), 1);
+        assert_eq!(report.servers_imported.len(), 1);
+        let identities = phone.identity_list().await.expect("identities");
+        assert_eq!(identities.len(), 1);
+        assert_eq!(identities[0].label, "Main");
+        assert!(identities[0].is_default);
+        let servers = phone.servers().await.expect("servers");
+        assert_eq!(servers.len(), 1);
+        assert_eq!(servers[0].address, "voice.example.org");
+        assert!(!servers[0].has_password);
+
+        // A second import adds nothing (spec 03: duplicates are refused).
+        let again = phone.transfer_import(payload).await.expect("import");
+        assert!(again.identities_imported.is_empty());
+        assert!(again.servers_imported.is_empty());
+        assert_eq!(phone.identity_list().await.expect("identities").len(), 1);
     }
 
     #[tokio::test]

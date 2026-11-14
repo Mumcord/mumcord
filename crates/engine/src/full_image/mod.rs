@@ -26,7 +26,7 @@ use std::sync::{Arc, Mutex};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use tokio::sync::Notify;
 
-use mumcord_protocol::{Handle, PluginData};
+use mumble_client_protocol::{Handle, PluginData};
 
 use crate::ServerId;
 use crate::history_sync::HistorySync;

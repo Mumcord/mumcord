@@ -613,7 +613,9 @@ describe("plugins 1.1: keyboard and themes over the new plugin UI (AC-9.39)", fu
     const fixtures = await pluginenv.startPluginFixtures({ thirdParty: { packages: repo }, https: true });
     await testenv.up("v15");
     await app.restart({ env: themeEnv("light") });
-    await finishWizard("Alice");
+    // A fresh name. An earlier spec on this server may have registered Alice, and murmur
+    // refuses a new certificate for a registered user as a wrong password.
+    await finishWizard("A11yQA");
     await addFirstServer(testenv.ports.v15);
     await joinChannel();
     // The fixture repository is plain http on localhost, which only Developer mode accepts.

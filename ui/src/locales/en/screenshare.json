@@ -159,7 +159,7 @@
     "noFanoutBody_other": "Each viewer gets their own copy from your computer, so up to {{max}} people can watch. Quality goes down as more join: right now {{count}} viewers need about {{mbit}} Mbit/s of upload, so your share runs at {{now}} instead of {{wanted}}.",
     "fanoutUnavailable": "Relay fan-out isn't available ({{reason}}). Each viewer gets their own copy, so up to {{max}} can watch and quality may drop.",
     "reasonNoRelay": "this server has no relay",
-    "reasonOldRelay": "the relay is too old",
+    "reasonOldRelay": "this server's relay needs an update",
     "reasonDisallowed": "the relay doesn't allow screen sharing",
     "reasonRefused": "the relay refused the broadcast",
     "reasonFull": "the relay is full",

@@ -133,7 +133,28 @@
     "backupWarning": "Vor dem Löschen sichern. Eine Identität ohne Sicherung lässt sich nicht wiederherstellen.",
     "usedBy": "Genutzt von: {{servers}}",
     "deleteUsedBy": "Diese Server verwenden danach die Standardidentität {{identity}}: {{servers}}",
-    "exportFor": "{{identity}} exportieren"
+    "exportFor": "{{identity}} exportieren",
+    "phoneSend": "An dein Handy senden…",
+    "phoneTitle": "An dein Handy senden",
+    "phoneSelectionLabel": "Was gesendet wird",
+    "phoneIdentity": "Identität: {{identity}}",
+    "phoneIdentityDefault": "Identität: {{identity}} (Standard)",
+    "phoneServers_one": "Serverliste ({{count}} Server)",
+    "phoneServers_other": "Serverliste ({{count}} Server)",
+    "phoneNothingSelected": "Wähle mindestens einen Eintrag aus.",
+    "phoneShow": "Codes anzeigen",
+    "phoneDone": "Fertig",
+    "phonePreparing": "Codes werden vorbereitet…",
+    "phoneCodesLabel": "Codes für dein Handy",
+    "phoneQrLabel": "QR-Code {{current}} von {{total}}",
+    "phoneCodeOf": "Code {{current}} von {{total}}",
+    "phoneCycleHint": "Die Codes wechseln automatisch. Halte dein Handy auf den Bildschirm gerichtet, bis alle {{total}} gelesen sind.",
+    "phoneSingleHint": "Halte dein Handy auf den Bildschirm gerichtet, bis der Code gelesen ist.",
+    "phoneTypeCode": "Gib diesen Code auf deinem Handy ein",
+    "phoneExpires": "Läuft ab in {{time}}",
+    "phoneRenewed": "Neue Codes und eine neue Nummer. Beginne auf deinem Handy von vorn.",
+    "phoneWarning": "Wer diese Codes scannt und die Nummer kennt, bekommt deine Identität. Zeige sie nur deinem eigenen Handy.",
+    "phoneTooLarge": "Das ist zu viel für eine Übertragung. Wähle weniger Einträge aus."
   },
   "audio": {
     "devices": "Geräte",
@@ -767,7 +788,13 @@
       "gap": "Abstand zum vorherigen Paket",
       "kind": "Interne ID",
       "size": "Größe",
-      "decoded": "Dekodierter Inhalt"
+      "decoded": "Dekodierter Inhalt",
+      "media": "Medium"
+    },
+    "media": {
+      "channel": "Kanal {{channel}}",
+      "keyframe": "Schlüsselbild",
+      "delta": "Deltabild"
     },
     "noDecoding": "Diese Nutzdaten haben keine lesbare Form; siehe die Rohbytes.",
     "controlOnly": "Standard-Mumble-Nachricht: Nur Typ und Größe werden aufgezeichnet.",
@@ -788,7 +815,8 @@
       "watch": "Status der Watch-Party",
       "plugin": "Plugin-Daten",
       "mumble": "Mumble-Nachricht",
-      "peer": "Relay-Einrichtung"
+      "peer": "Relay-Einrichtung",
+      "media": "Medienstrom"
     }
   },
   "licences": {

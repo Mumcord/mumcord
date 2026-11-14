@@ -139,7 +139,31 @@
     "backupWarning": "Agħmel kopja tas-sigurtà qabel ma tħassar. Identità mingħajr kopja ma tistax tiġi rkuprata.",
     "usedBy": "Użata minn: {{servers}}",
     "deleteUsedBy": "Dawn is-servers wara jużaw l-identità predefinita {{identity}}: {{servers}}",
-    "exportFor": "Esporta {{identity}}"
+    "exportFor": "Esporta {{identity}}",
+    "phoneSend": "Ibgħat lit-telefon tiegħek…",
+    "phoneTitle": "Ibgħat lit-telefon tiegħek",
+    "phoneSelectionLabel": "X'għandu jintbagħat",
+    "phoneIdentity": "Identità: {{identity}}",
+    "phoneIdentityDefault": "Identità: {{identity}} (predefinita)",
+    "phoneServers_one": "Lista tas-servers ({{count}} server)",
+    "phoneServers_two": "Lista tas-servers ({{count}} servers)",
+    "phoneServers_few": "Lista tas-servers ({{count}} servers)",
+    "phoneServers_many": "Lista tas-servers ({{count}}-il server)",
+    "phoneServers_other": "Lista tas-servers ({{count}} server)",
+    "phoneNothingSelected": "Agħżel mill-inqas entrata waħda.",
+    "phoneShow": "Uri l-kodiċijiet",
+    "phoneDone": "Lest",
+    "phonePreparing": "Qed jitħejjew il-kodiċijiet…",
+    "phoneCodesLabel": "Kodiċijiet għat-telefon tiegħek",
+    "phoneQrLabel": "Kodiċi QR {{current}} minn {{total}}",
+    "phoneCodeOf": "Kodiċi {{current}} minn {{total}}",
+    "phoneCycleHint": "Il-kodiċijiet jinbidlu awtomatikament. Żomm it-telefon tiegħek ippuntat lejn l-iskrin sakemm jinqraw kollha {{total}}.",
+    "phoneSingleHint": "Żomm it-telefon tiegħek ippuntat lejn l-iskrin sakemm jinqara l-kodiċi.",
+    "phoneTypeCode": "Ikteb dan il-kodiċi fuq it-telefon tiegħek",
+    "phoneExpires": "Jiskadi fi {{time}}",
+    "phoneRenewed": "Kodiċijiet ġodda u numru ġdid. Erġa' ibda fuq it-telefon tiegħek.",
+    "phoneWarning": "Kull min jiskennja dawn il-kodiċijiet u jaf in-numru jikseb l-identità tiegħek. Urihom biss lit-telefon tiegħek stess.",
+    "phoneTooLarge": "Dan huwa wisq għal trasferiment wieħed. Agħżel inqas entrati."
   },
   "audio": {
     "devices": "Apparati",
@@ -782,7 +806,13 @@
       "gap": "Distakk mill-pakkett preċedenti",
       "kind": "ID intern",
       "size": "Daqs",
-      "decoded": "Kontenut deskodifikat"
+      "decoded": "Kontenut deskodifikat",
+      "media": "Midja"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "qafas ewlieni",
+      "delta": "qafas delta"
     },
     "noDecoding": "Dan il-kontenut m'għandux forma li tinqara; ara l-bytes mhux ipproċessati.",
     "controlOnly": "Messaġġ standard ta' Mumble: jiġu rreġistrati biss it-tip u d-daqs tiegħu.",
@@ -803,7 +833,8 @@
       "watch": "Stat tas-sessjoni ta' ħarsa flimkien",
       "plugin": "Dejta tal-plugin",
       "mumble": "Messaġġ ta' Mumble",
-      "peer": "Konfigurazzjoni tar-relay"
+      "peer": "Konfigurazzjoni tar-relay",
+      "media": "Fluss tal-midja"
     }
   },
   "licences": {

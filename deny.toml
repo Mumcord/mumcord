@@ -68,9 +68,12 @@ wildcards = "allow"
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-# The engine's live tests drive bots through mumbot, pinned by tag (crates/engine/Cargo.toml).
+# The engine's live tests drive bots through mumbot (crates/engine/Cargo.toml): the released
+# version from Mumcord/mumbot, and until the media-v2 work lands there its branch on the personal
+# fork.
 allow-git = [
     "https://github.com/Mumcord/mumbot",
+    "https://github.com/sothis/mumbot",
     # rnnoise-rs is not on crates.io; Mumcord pins its own fork (see Cargo.toml).
     "https://github.com/Mumcord/rnnoise-rs",
 ]

@@ -135,7 +135,29 @@
     "backupWarning": "Napravi sigurnosnu kopiju prije brisanja. Identitet bez kopije nije moguće vratiti.",
     "usedBy": "Koristi: {{servers}}",
     "deleteUsedBy": "Ovi poslužitelji će zatim koristiti zadani identitet {{identity}}: {{servers}}",
-    "exportFor": "Izvezi {{identity}}"
+    "exportFor": "Izvezi {{identity}}",
+    "phoneSend": "Pošalji na svoj telefon…",
+    "phoneTitle": "Pošalji na svoj telefon",
+    "phoneSelectionLabel": "Što poslati",
+    "phoneIdentity": "Identitet: {{identity}}",
+    "phoneIdentityDefault": "Identitet: {{identity}} (zadani)",
+    "phoneServers_one": "Popis poslužitelja ({{count}} poslužitelj)",
+    "phoneServers_few": "Popis poslužitelja ({{count}} poslužitelja)",
+    "phoneServers_other": "Popis poslužitelja ({{count}} poslužitelja)",
+    "phoneNothingSelected": "Odaberi barem jednu stavku.",
+    "phoneShow": "Prikaži kodove",
+    "phoneDone": "Gotovo",
+    "phonePreparing": "Priprema kodova…",
+    "phoneCodesLabel": "Kodovi za tvoj telefon",
+    "phoneQrLabel": "QR kod {{current}} od {{total}}",
+    "phoneCodeOf": "Kod {{current}} od {{total}}",
+    "phoneCycleHint": "Kodovi se izmjenjuju automatski. Drži telefon usmjeren prema zaslonu dok se ne pročita svih {{total}}.",
+    "phoneSingleHint": "Drži telefon usmjeren prema zaslonu dok se kod ne pročita.",
+    "phoneTypeCode": "Upiši ovaj kod na svom telefonu",
+    "phoneExpires": "Istječe za {{time}}",
+    "phoneRenewed": "Novi kodovi i novi broj. Počni ispočetka na svom telefonu.",
+    "phoneWarning": "Tko god skenira ove kodove i zna broj, dobiva tvoj identitet. Pokaži ih samo svom telefonu.",
+    "phoneTooLarge": "Ovo je previše za jedan prijenos. Odaberi manje stavki."
   },
   "audio": {
     "devices": "Uređaji",
@@ -772,7 +794,13 @@
       "gap": "Razmak od prethodnog paketa",
       "kind": "Interni ID",
       "size": "Veličina",
-      "decoded": "Dekodirani sadržaj"
+      "decoded": "Dekodirani sadržaj",
+      "media": "Mediji"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "ključni kadar",
+      "delta": "delta kadar"
     },
     "noDecoding": "Ovaj sadržaj nema čitljiv oblik; pogledaj sirove bajtove.",
     "controlOnly": "Standardna Mumble poruka: bilježi se samo njezina vrsta i veličina.",
@@ -793,7 +821,8 @@
       "watch": "Stanje zajedničkog gledanja",
       "plugin": "Podaci dodatka",
       "mumble": "Mumble poruka",
-      "peer": "Postavljanje releja"
+      "peer": "Postavljanje releja",
+      "media": "Medijski tok"
     }
   },
   "licences": {

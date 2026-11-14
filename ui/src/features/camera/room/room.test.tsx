@@ -8,12 +8,14 @@ import { connectedMock, resetAll } from "../../channels/testUtils";
 import { mediaView, openMedia, resetMediaView, selectStage } from "../../media/mediaView";
 import { resetPopoutStore } from "../../media/popoutStore";
 import { resetLiveBackground } from "../preview/liveBackground";
+import { resetCameraAvailability } from "../availability";
 import { resetCameraDecode } from "./cameraDecode";
 import { CameraMiniBar } from "./CameraMiniBar";
 import { CameraRoom } from "./CameraRoom";
 import { CameraRoomSync } from "./CameraRoomSync";
 import { resetRoomChoices } from "./roomChoices";
 import { resetCameraRoomStore } from "./roomStore";
+import { resetCantWatch } from "./useCantWatch";
 import { resetCameraLook, setCameraLookSettings } from "./useCameraLook";
 
 // jsdom has no Tauri runtime; the frame channels only need an id.
@@ -48,7 +50,7 @@ function onAir(api: MockApi): void {
     state: "onAir",
     error: null,
     broadcast: "00112233aabbccdd",
-    viewers: [ANNA],
+    viewers: [{ session: ANNA, path: "relay" }],
   });
 }
 
@@ -66,12 +68,15 @@ describe("camera room", () => {
     resetPopoutStore();
     resetRoomChoices();
     resetLiveBackground();
+    resetCameraAvailability();
+    resetCantWatch();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
     resetCameraLook();
     resetCameraRoomStore();
+    resetCantWatch();
     resetAll();
   });
 
@@ -128,6 +133,51 @@ describe("camera room", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("names the path each viewer of the own camera gets", async () => {
+    api.mock.setCameraView({
+      serverId: 1,
+      state: "onAir",
+      error: null,
+      broadcast: "00112233aabbccdd",
+      viewers: [{ session: ANNA, path: "direct" }],
+    });
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    const room = await screen.findByRole("region", { name: /^Camera room/ });
+    // Only a direct viewer: the header says so (FR-8.62).
+    expect(room).toHaveTextContent("Direct · end-to-end encrypted");
+    const button = await screen.findByRole("button", { name: "Viewers (1)" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(button);
+    const list = screen.getByRole("list", { name: "Viewers" });
+    expect(list).toHaveTextContent("Anna");
+    expect(list).toHaveTextContent("Direct");
+    fireEvent.keyDown(button, { key: "Escape" });
+    expect(screen.queryByRole("list", { name: "Viewers" })).toBeNull();
+  });
+
+  it("says both when an old relay and a direct stream serve the camera", async () => {
+    api.mock.setCameraView({
+      serverId: 1,
+      state: "onAir",
+      error: null,
+      broadcast: "00112233aabbccdd",
+      viewers: [
+        { session: ANNA, path: "relay" },
+        { session: BEN, path: "direct" },
+      ],
+    });
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    const room = await screen.findByRole("region", { name: /^Camera room/ });
+    expect(room).toHaveTextContent("Relay and direct · end-to-end encrypted");
+    fireEvent.click(await screen.findByRole("button", { name: "Viewers (2)" }));
+    const list = screen.getByRole("list", { name: "Viewers" });
+    expect(list).toHaveTextContent("Anna");
+    expect(list).toHaveTextContent("Relay");
+    expect(list).toHaveTextContent("Ben");
+    expect(list).toHaveTextContent("Direct");
+  });
+
   it("follows the Mirror and Reduce motion settings", async () => {
     onAir(api);
     api.mock.setCameraRoom(1, [tile(ANNA)], true);
@@ -160,6 +210,55 @@ describe("camera room", () => {
     expect(await screen.findByRole("group", { name: "Anna, camera on" })).toHaveTextContent(
       "This camera needs Mumcord 0.9.0",
     );
+  });
+
+  const CANT_WATCH = "You can't see cameras on this server: This server's relay doesn't allow ";
+
+  it("says why it can't show cameras instead of the tiles (FR-8.5)", async () => {
+    vi.spyOn(api, "cameraUnavailable").mockResolvedValue("relayDisallows");
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    const { container } = render(<CameraRoom serverId={1} onTurnOn={null} />);
+    const notice = await screen.findByRole("status");
+    expect(notice).toHaveTextContent(`${CANT_WATCH}camera sharing.`);
+    // Nobody's camera is drawn for a viewer who cannot watch.
+    expect(screen.queryByRole("group", { name: "Anna, camera on" })).toBeNull();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("shows the tiles of a viewer who can watch", async () => {
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    expect(await screen.findByRole("group", { name: "Anna, camera on" })).toBeInTheDocument();
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("says nothing about watching when nobody in the channel has a camera on", async () => {
+    vi.spyOn(api, "cameraUnavailable").mockResolvedValue("relayDisallows");
+    api.mock.setCameraRoom(1, [], true);
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    await screen.findByRole("region", { name: /^Camera room/ });
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("says it once per channel visit, and again after rejoining the channel", async () => {
+    vi.spyOn(api, "cameraUnavailable").mockResolvedValue("relayDisallows");
+    api.mock.setCameraRoom(1, [tile(ANNA)], true);
+    const first = render(<CameraRoom serverId={1} onTurnOn={null} />);
+    await screen.findByRole("status");
+    first.unmount();
+    // The room reopened in the same channel: it stays quiet.
+    const second = render(<CameraRoom serverId={1} onTurnOn={null} />);
+    await screen.findByRole("region", { name: /^Camera room/ });
+    expect(screen.queryByRole("status")).toBeNull();
+    second.unmount();
+
+    // Leaving the channel and coming back is a new visit.
+    await act(async () => {
+      await api.channelJoin(1, 2);
+      await api.channelJoin(1, 1);
+    });
+    render(<CameraRoom serverId={1} onTurnOn={null} />);
+    expect(await screen.findByRole("status")).toHaveTextContent(CANT_WATCH);
   });
 
   it("shows a hidden video again", async () => {

@@ -11,8 +11,9 @@
 //! requests. The frame path takes no lock and does not log. The encoders allocate their output
 //! (as for screen sharing); everything else reuses its buffers.
 
-use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU16, AtomicUsize, Ordering};
-use std::sync::{Arc, OnceLock};
+use std::collections::BTreeMap;
+use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU16, AtomicU32, AtomicUsize, Ordering};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::thread::{self, JoinHandle, Thread};
 use std::time::{Duration, Instant};
 
@@ -20,16 +21,21 @@ use crossbeam_queue::ArrayQueue;
 use mumcord_camera::{
     CameraBackend, CameraError, CameraFrame, CaptureRequest, CaptureSession, DeviceId, FrameSink,
 };
+#[cfg(feature = "camera-effects")]
 use mumcord_effects::{Effects, EffectsConfig};
+use mumcord_p2p::media::Description;
 use mumcord_screenshare::{EncoderConfig, I420Frame, VideoEncoder};
 use mumcord_store::{CameraSendQuality, ScreenOptimize};
+use tokio::runtime::Handle;
 use tokio::sync::mpsc;
 
 use super::preview::PreviewTap;
 use crate::screen_share::EncoderFactory;
+use crate::screen_share::ViewerQueue;
 use crate::screen_share::broadcast::link::FrameSource;
 use crate::screen_share::encoder::monitor::{FrameLoad, LoadMonitor};
 use crate::screen_share::wire::{Codec, Frame, FrameHeader, FrameKind};
+use crate::session::lock;
 
 /// Tile heights a viewer reports and the sender encodes (FR-8.45).
 pub const HEIGHTS: [u32; 4] = [180, 360, 540, 720];
@@ -159,6 +165,7 @@ impl Resize {
 pub(crate) struct Stages {
     /// The background effects; `None` passes frames unchanged (and the background can't be
     /// changed while the camera runs).
+    #[cfg(feature = "camera-effects")]
     pub effects: Option<EffectsConfig>,
     pub preview: Option<Arc<PreviewTap>>,
 }
@@ -213,6 +220,8 @@ pub(crate) struct Control {
     keyframe: AtomicBool,
     /// The relay asked for a keyframe (rate-limited by [`KEYFRAME_REQUEST_PAUSE`]).
     keyframe_requested: AtomicBool,
+    /// Frame rate of the camera session, for the stream description (FR-7.95).
+    fps: AtomicU32,
     ended: AtomicU8,
     /// The encode thread, woken for each captured frame.
     thread: OnceLock<Thread>,
@@ -228,6 +237,7 @@ impl Control {
             vp9_only: AtomicBool::new(false),
             keyframe: AtomicBool::new(true),
             keyframe_requested: AtomicBool::new(false),
+            fps: AtomicU32::new(0),
             ended: AtomicU8::new(0),
             thread: OnceLock::new(),
         }
@@ -287,6 +297,7 @@ impl FrameSink for QueueSink {
 pub(crate) struct CameraSend {
     control: Arc<Control>,
     capture: Option<Box<dyn CaptureSession>>,
+    #[cfg(feature = "camera-effects")]
     effects: Option<Effects>,
     frames: Option<mpsc::Receiver<Arc<Frame>>>,
     thread: Option<JoinHandle<()>>,
@@ -303,6 +314,7 @@ impl CameraSend {
         stages: Stages,
     ) -> Result<Self, CameraError> {
         let control = Arc::new(Control::new());
+        control.fps.store(ceiling.fps, Ordering::Relaxed);
         let queue = Arc::new(ArrayQueue::new(CAPTURE_QUEUE));
         let (tx, rx) = mpsc::channel(SEND_QUEUE);
         let encode = EncodeLoop {
@@ -318,25 +330,23 @@ impl CameraSend {
             .spawn(move || encode.run())
             .map_err(|e| CameraError::Backend(format!("encode thread: {e}")))?;
         let _ = control.thread.set(thread.thread().clone());
-        let mut sink: Box<dyn FrameSink> = Box::new(QueueSink {
+        let sink: Box<dyn FrameSink> = Box::new(QueueSink {
             queue,
             control: control.clone(),
         });
-        let mut effects = None;
-        if let Some(config) = stages.effects {
-            // Without the effects thread the camera still works, with the background unchanged.
-            match Effects::start(config, sink) {
-                Ok((started, input)) => {
-                    effects = Some(started);
-                    sink = input;
-                }
+        // Without the effects thread the camera still works, with the background unchanged.
+        #[cfg(feature = "camera-effects")]
+        let (effects, sink) = match stages.effects {
+            Some(config) => match Effects::start(config, sink) {
+                Ok((started, input)) => (Some(started), input),
                 Err(e) => {
                     control.stop.store(true, Ordering::Relaxed);
                     control.wake();
                     return Err(CameraError::Backend(format!("effects thread: {e}")));
                 }
-            }
-        }
+            },
+            None => (None, sink),
+        };
         let request = CaptureRequest {
             max_fps: ceiling.fps.max(1),
             ..CaptureRequest::default()
@@ -352,6 +362,7 @@ impl CameraSend {
         Ok(Self {
             control,
             capture: Some(capture),
+            #[cfg(feature = "camera-effects")]
             effects,
             frames: Some(rx),
             thread: Some(thread),
@@ -370,15 +381,19 @@ impl CameraSend {
         self.control.vp9_only.store(vp9_only, Ordering::Relaxed);
     }
 
-    /// The encoded frames for the publisher; there is one taker.
-    pub fn take_frames(&mut self) -> Option<CameraFrames> {
-        self.frames.take().map(|rx| CameraFrames {
-            rx: tokio::sync::Mutex::new(rx),
+    /// The encoded frames on their way to every path; there is one taker.
+    pub fn take_frames(&mut self) -> Option<Arc<CameraHub>> {
+        let rx = self.frames.take()?;
+        Some(Arc::new(CameraHub {
             control: self.control.clone(),
-        })
+            rx: Mutex::new(Some(rx)),
+            relay: Mutex::new(None),
+            direct: Mutex::new(BTreeMap::new()),
+        }))
     }
 
     /// The background effects of this camera, when they run.
+    #[cfg(feature = "camera-effects")]
     pub fn effects(&self) -> Option<&Effects> {
         self.effects.as_ref()
     }
@@ -394,6 +409,7 @@ impl Drop for CameraSend {
         // The capture first: its drop joins the capture thread and turns the camera light off.
         // The effects thread then sees no more frames and stops when its handle drops.
         self.capture.take();
+        #[cfg(feature = "camera-effects")]
         self.effects.take();
         self.control.stop.store(true, Ordering::Relaxed);
         self.control.wake();
@@ -404,34 +420,198 @@ impl Drop for CameraSend {
 
 /// The publisher's frame source (relay broadcast, FR-8.42).
 pub(crate) struct CameraFrames {
-    rx: tokio::sync::Mutex<mpsc::Receiver<Arc<Frame>>>,
-    control: Arc<Control>,
+    queue: Arc<ViewerQueue>,
+    hub: Arc<CameraHub>,
+    /// The camera session id, carried in the stream description (FR-8.92).
+    session: String,
 }
 
 impl FrameSource for CameraFrames {
     async fn next(&self) -> Arc<Frame> {
-        match self.rx.lock().await.recv().await {
-            Some(frame) => frame,
-            // The encode thread is gone; the camera session ends the broadcast.
-            None => std::future::pending().await,
-        }
+        self.queue.next().await
     }
 
     fn request_keyframe(&self) {
+        self.hub.request_keyframe();
+    }
+
+    fn force_keyframe(&self) {
+        self.hub.force_keyframe();
+    }
+
+    fn viewers_changed(&self, viewers: usize, max_want: Option<u16>) {
+        self.hub.relay_viewers_changed(viewers, max_want);
+    }
+
+    fn description(&self, video: &FrameHeader) -> Option<Description> {
+        // The same description the direct streams send, so a relay viewer can tell this camera
+        // session from an older one (FR-8.92, AC-8.34).
+        super::direct::stream_description(*video, self.hub.fps(), &self.session)
+    }
+}
+
+/// One consumer of the encoded frames, with the tile height it last asked for (camera `want`,
+/// FR-8.45).
+struct Consumer {
+    queue: Arc<ViewerQueue>,
+    want: Option<u16>,
+}
+
+/// The relay publisher's queue and what its control task reports about it.
+struct Relay {
+    queue: Arc<ViewerQueue>,
+    /// Viewers that hold the share keys.
+    viewers: usize,
+    /// Largest tile height those viewers want.
+    want: Option<u16>,
+}
+
+/// Fans the encoded frames out to the relay publisher and every direct viewer stream, and tells
+/// the encode thread how many viewers hold the keys and the largest tile any of them wants
+/// (FR-8.45, FR-8.93). One encoder and one frame queue feed every path of a camera.
+pub(crate) struct CameraHub {
+    control: Arc<Control>,
+    /// The encode thread's frames; the pump takes it once.
+    rx: Mutex<Option<mpsc::Receiver<Arc<Frame>>>>,
+    relay: Mutex<Option<Relay>>,
+    /// One queue per direct viewer stream (FR-8.92).
+    direct: Mutex<BTreeMap<u32, Consumer>>,
+}
+
+impl CameraHub {
+    /// Hands every encoded frame to all queues until the encode thread ends. Called once, when
+    /// the camera goes on air.
+    pub(crate) fn pump(self: &Arc<Self>, rt: &Handle) {
+        let Some(mut rx) = lock(&self.rx).take() else {
+            return;
+        };
+        let hub = self.clone();
+        rt.spawn(async move {
+            while let Some(frame) = rx.recv().await {
+                hub.distribute(frame);
+            }
+        });
+    }
+
+    fn distribute(&self, frame: Arc<Frame>) {
+        let top = frame.header.temporal_layer;
+        let now = Instant::now();
+        let mut need_keyframe = false;
+        if let Some(relay) = lock(&self.relay).as_ref() {
+            need_keyframe |= relay.queue.push(frame.clone(), top, now).need_keyframe;
+        }
+        for consumer in lock(&self.direct).values() {
+            need_keyframe |= consumer.queue.push(frame.clone(), top, now).need_keyframe;
+        }
+        if need_keyframe {
+            self.request_keyframe();
+        }
+    }
+
+    /// The relay publisher's source; it takes the share once, like one more viewer. Calling it
+    /// again returns a source on the same queue, so the viewer counts stay. `session` is the
+    /// camera session id the stream description carries (FR-8.92).
+    pub(crate) fn relay(self: &Arc<Self>, session: &str) -> CameraFrames {
+        let queue = {
+            let mut relay = lock(&self.relay);
+            match relay.as_mut() {
+                Some(relay) => relay.queue.clone(),
+                None => {
+                    let queue = Arc::new(ViewerQueue::new());
+                    *relay = Some(Relay {
+                        queue: queue.clone(),
+                        viewers: 0,
+                        want: None,
+                    });
+                    queue
+                }
+            }
+        };
+        self.update_viewers();
+        CameraFrames {
+            queue,
+            hub: self.clone(),
+            session: session.to_owned(),
+        }
+    }
+
+    /// A queue for a direct viewer stream, or `None` when that viewer already has one.
+    pub(crate) fn add_direct(&self, session: u32) -> Option<Arc<ViewerQueue>> {
+        let queue = Arc::new(ViewerQueue::new());
+        let previous = lock(&self.direct).insert(
+            session,
+            Consumer {
+                queue: queue.clone(),
+                want: None,
+            },
+        );
+        if previous.is_some() {
+            return None;
+        }
+        self.update_viewers();
+        Some(queue)
+    }
+
+    pub(crate) fn remove_direct(&self, session: u32) {
+        let removed = lock(&self.direct).remove(&session).is_some();
+        if removed {
+            self.update_viewers();
+        }
+    }
+
+    /// The tile height one direct viewer asked for (camera `want`, FR-8.93).
+    pub(crate) fn set_direct_want(&self, session: u32, height: u16) {
+        let changed = {
+            let mut direct = lock(&self.direct);
+            match direct.get_mut(&session) {
+                Some(consumer) if consumer.want != Some(height) => {
+                    consumer.want = Some(height);
+                    true
+                }
+                _ => false,
+            }
+        };
+        if changed {
+            self.update_viewers();
+        }
+    }
+
+    pub(crate) fn fps(&self) -> u32 {
+        self.control.fps.load(Ordering::Relaxed)
+    }
+
+    pub(crate) fn request_keyframe(&self) {
         self.control
             .keyframe_requested
             .store(true, Ordering::Relaxed);
     }
 
-    fn force_keyframe(&self) {
+    pub(crate) fn force_keyframe(&self) {
         self.control.keyframe.store(true, Ordering::Relaxed);
     }
 
-    fn viewers_changed(&self, viewers: usize, max_want: Option<u16>) {
+    fn relay_viewers_changed(&self, viewers: usize, max_want: Option<u16>) {
+        if let Some(relay) = lock(&self.relay).as_mut() {
+            relay.viewers = viewers;
+            relay.want = max_want;
+        }
+        self.update_viewers();
+    }
+
+    /// Tells the encode thread what every path together needs: no key holder pauses the encoder,
+    /// and the largest wanted tile decides the height (FR-8.45).
+    fn update_viewers(&self) {
+        let relay = lock(&self.relay)
+            .as_ref()
+            .map_or((0, None), |r| (r.viewers, r.want));
+        let direct = lock(&self.direct);
+        let want = direct.values().filter_map(|c| c.want).chain(relay.1).max();
+        self.control
+            .viewers
+            .store(relay.0 + direct.len(), Ordering::Relaxed);
         self.control
             .max_want
-            .store(max_want.unwrap_or(0), Ordering::Relaxed);
-        self.control.viewers.store(viewers, Ordering::Relaxed);
+            .store(want.unwrap_or(0), Ordering::Relaxed);
     }
 }
 
@@ -783,23 +963,35 @@ mod tests {
         )
     }
 
-    fn wait_for(rx: &mut mpsc::Receiver<Arc<Frame>>, what: &str) -> Arc<Frame> {
+    #[cfg(feature = "vp9")]
+    fn wait_for(rt: &tokio::runtime::Runtime, frames: &CameraFrames, what: &str) -> Arc<Frame> {
         let deadline = Instant::now() + Duration::from_secs(10);
         loop {
-            if let Ok(frame) = rx.try_recv() {
+            let waited = rt.block_on(async {
+                tokio::time::timeout(Duration::from_millis(20), frames.next()).await
+            });
+            if let Ok(frame) = waited {
                 return frame;
             }
             assert!(Instant::now() < deadline, "timed out waiting for {what}");
-            thread::sleep(Duration::from_millis(10));
         }
     }
 
-    fn drain(rx: &mut mpsc::Receiver<Arc<Frame>>) {
-        while rx.try_recv().is_ok() {}
+    /// Whether no frame comes within `wait`.
+    #[cfg(feature = "vp9")]
+    fn nothing(rt: &tokio::runtime::Runtime, frames: &CameraFrames, wait: Duration, what: &str) {
+        let waited = rt.block_on(async { tokio::time::timeout(wait, frames.next()).await });
+        assert!(waited.is_err(), "unexpected frames: {what}");
     }
 
+    // Opens a real VP9 encoder.
+    #[cfg(feature = "vp9")]
     #[test]
     fn the_test_camera_is_encoded_only_on_air_with_viewers_and_at_the_wanted_size() {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_time()
+            .build()
+            .expect("runtime");
         let camera = TestCamera::new(TestCameraMode::Present);
         let ceiling = SendCeiling::from_setting(CameraSendQuality::Auto);
         let mut send = CameraSend::start(
@@ -810,44 +1002,60 @@ mod tests {
             Stages::default(),
         )
         .expect("test camera opens");
-        let mut rx = send.frames.take().expect("one taker");
-        // The publisher's side of the control, without its queue.
-        let frames = CameraFrames {
-            rx: tokio::sync::Mutex::new(mpsc::channel(1).1),
-            control: send.control.clone(),
-        };
+        let hub = send.take_frames().expect("one taker");
+        hub.pump(&rt.handle().clone());
+        let frames = hub.relay("cam");
         // Preview: nothing is encoded.
-        thread::sleep(Duration::from_millis(300));
-        assert!(rx.try_recv().is_err(), "nothing is sent in the preview");
+        nothing(&rt, &frames, Duration::from_millis(300), "in the preview");
         // On air without viewers: still paused.
         send.set_on_air(true);
-        thread::sleep(Duration::from_millis(300));
-        assert!(rx.try_recv().is_err(), "paused without viewers");
+        nothing(
+            &rt,
+            &frames,
+            Duration::from_millis(300),
+            "paused without viewers",
+        );
         // A viewer with the keys: frames come, the first a keyframe at the default height.
-        frames.viewers_changed(1, None);
-        let first = wait_for(&mut rx, "the first frame");
+        hub.relay("cam").viewers_changed(1, None);
+        let first = wait_for(&rt, &frames, "the first frame");
         assert!(first.header.keyframe);
         assert_eq!(first.header.kind, FrameKind::Video(Codec::Vp9));
         assert_eq!((first.header.width, first.header.height), (640, 360));
         // A viewer wants 720: the next size is 1280×720, starting with a keyframe.
-        frames.viewers_changed(1, Some(720));
+        hub.relay("cam").viewers_changed(1, Some(720));
         let big = loop {
-            let f = wait_for(&mut rx, "a 720p frame");
+            let f = wait_for(&rt, &frames, "a 720p frame");
             if f.header.height == 720 {
                 break f;
             }
         };
         assert!(big.header.keyframe, "the size changes at a keyframe");
         assert_eq!(big.header.width, 1280);
+        // A direct viewer that wants a larger tile counts too (FR-8.93).
+        let queue = hub.add_direct(7).expect("a direct viewer queue");
+        hub.set_direct_want(7, 540);
+        assert_eq!(hub.control.max_want.load(Ordering::Relaxed), 720);
+        hub.remove_direct(7);
+        drop(queue);
         // The last viewer leaves: the encoder pauses.
-        frames.viewers_changed(0, None);
-        thread::sleep(Duration::from_millis(200));
-        drain(&mut rx);
-        thread::sleep(Duration::from_millis(300));
-        assert!(rx.try_recv().is_err(), "paused again without viewers");
+        hub.relay("cam").viewers_changed(0, None);
+        rt.block_on(async {
+            let until = tokio::time::Instant::now() + Duration::from_millis(300);
+            while let Ok(Some(_)) = tokio::time::timeout_at(until, frames.next())
+                .await
+                .map(Some)
+            {}
+        });
+        nothing(
+            &rt,
+            &frames,
+            Duration::from_millis(300),
+            "paused again without viewers",
+        );
         assert_eq!(send.ended(), None);
     }
 
+    #[cfg(feature = "camera-effects")]
     #[test]
     fn the_preview_gets_pictures_through_the_effects_before_the_camera_is_on_air() {
         use mumcord_effects::Background;

@@ -44,8 +44,7 @@ MEMBERS=$members VERSION=$version perl -00 -pi -e '
 ' Cargo.lock
 cargo metadata --format-version 1 >/dev/null
 # The seeder is its own Cargo project, a CI helper whose lock cargo may refresh freely.
-cargo update --manifest-path scripts/smoke/seed/Cargo.toml --quiet \
-  -p mumcord-protocol -p mumcord-store
+cargo update --manifest-path scripts/smoke/seed/Cargo.toml --quiet -p mumcord-store
 
 # macOS bundle versions allow digits and dots only, and Tauri would write the full version
 # (0.8.0-rc.1) into both. For a pre-release the bundle carries X.Y.Z; the app's About shows the
