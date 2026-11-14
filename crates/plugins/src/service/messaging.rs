@@ -52,9 +52,19 @@ impl PluginService {
     }
 
     /// Whether the server passes plugin data (engine `SharedState`).
+    ///
+    /// A second call is a resync after the link dropped. The previous sessions and announces
+    /// belong to that link; keeping them makes the same announce look unchanged, so a peer who
+    /// is back never becomes ready again (FR-6.35).
     pub fn shared_state(&mut self, server: ServerId, supported: bool) {
         let mut state = self.io.peers();
+        let resync = state.connections.contains_key(&server);
         let connection = connection(&mut state.connections, server);
+        if resync {
+            let me = connection.me.clone();
+            *connection = Connection::new(Instant::now());
+            connection.me = me;
+        }
         if supported && !connection.supported {
             connection.throttle.reset();
         }

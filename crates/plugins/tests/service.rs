@@ -1883,6 +1883,42 @@ fn an_announce_before_the_focus_or_the_join_still_makes_the_peer_ready() {
 }
 
 #[test]
+fn a_resync_treats_the_same_announce_as_new() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    let poll = service
+        .load_dev(&ready_folder(fx.root.path(), "poll"))
+        .expect("loads");
+    let wait = std::time::Duration::from_millis(300);
+    let runs_poll = br#"{"v":1,"p":["poll@1~dev"]}"#;
+    service.peer_joined(1, bob());
+    service.peer_data(1, &bob(), "mumcord.plugins", runs_poll);
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll.clone(), b"Bob".to_vec())]
+    );
+
+    // The link dropped and came back. The same session and the same announce must count again.
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    assert!(
+        echoed(&mut service, &mut host_events, &mut events, wait).is_empty(),
+        "ready waits for the announce of the new link"
+    );
+    service.peer_data(1, &bob(), "mumcord.plugins", runs_poll);
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll, b"Bob".to_vec())]
+    );
+}
+
+#[test]
 fn installing_a_plugin_after_the_announce_makes_the_peer_ready() {
     let fx = Fixture::new();
     fx.set_developer_mode(true);
