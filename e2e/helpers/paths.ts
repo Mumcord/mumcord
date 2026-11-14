@@ -13,6 +13,8 @@ export const bin = {
   testPlugin: join(targetDir, "debug", "examples", "libtest_plugin.so"),
   /** Renders frames through the in-game overlay layer (crates/overlay-layer/examples). */
   headlessCheck: join(targetDir, "debug", "examples", "headless_check"),
+  /** Reads a "Send to your phone" transfer from pictures (crates/store/examples). */
+  transferRead: join(targetDir, "debug", "examples", "transfer_read"),
 };
 
 export const testenvDir = join(repoRoot, "testenv");

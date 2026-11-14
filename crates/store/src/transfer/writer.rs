@@ -4,7 +4,7 @@ use std::fmt;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use rand::{TryRng, rngs::SysRng};
-use zeroize::Zeroizing;
+use zeroize::{Zeroize, Zeroizing};
 
 use super::envelope::{self, Header, ID_LEN, KdfBand, KdfParams, SALT_LEN};
 use super::parts::{MAX_PART_BYTES, PART_OVERHEAD, Part};
@@ -183,6 +183,22 @@ impl Transfer {
     pub fn is_expired(&self, now: u64) -> bool {
         self.seconds_left(now) == 0
     }
+
+    /// Overwrites the part texts. The code wipes itself when it is dropped.
+    fn wipe(&mut self) {
+        for part in &mut self.parts {
+            part.zeroize();
+        }
+        self.parts.clear();
+    }
+}
+
+/// Whoever holds all parts only needs to guess the code, so the parts do not stay behind in
+/// freed memory once the dialog lets go of the transfer.
+impl Drop for Transfer {
+    fn drop(&mut self) {
+        self.wipe();
+    }
 }
 
 impl fmt::Debug for Transfer {
@@ -234,6 +250,14 @@ pub(crate) mod tests {
     pub(crate) fn fast_transfer(payload: &TransferPayload, options: &TransferOptions) -> Transfer {
         let randomness = Randomness::generate(options.code_digits).expect("randomness");
         Transfer::build(payload, NOW, options, &KdfBand::TEST, randomness).expect("build")
+    }
+
+    #[test]
+    fn wiping_removes_the_part_texts() {
+        let mut transfer = fast_transfer(&sample(1, None), &fast_options());
+        assert!(!transfer.parts().is_empty());
+        transfer.wipe();
+        assert!(transfer.parts().is_empty());
     }
 
     #[test]

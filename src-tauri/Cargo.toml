@@ -45,6 +45,9 @@ tauri-specta.workspace = true
 specta.workspace = true
 specta-typescript.workspace = true
 serde.workspace = true
+# QR codes of "Send to your phone" (spec 05, FR-5.64), drawn locally: no network, no service.
+qrcodegen = "=1.8.0"
+zeroize.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
 rand.workspace = true

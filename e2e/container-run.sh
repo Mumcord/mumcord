@@ -101,6 +101,7 @@ if [ "$step" != test ]; then
   cargo build --locked --quiet -p netsim
   cargo build --locked --quiet -p mumcord-positional --example test_plugin
   cargo build --locked --quiet -p mumcord-overlay-layer --example headless_check
+  cargo build --locked --quiet -p mumcord-store --example transfer_read
   # Next to the debug binaries, so CI ships it to the shard jobs with them.
   scripts/fetch-mumbot.sh linux-x86_64 "$CARGO_TARGET_DIR/debug"
 fi

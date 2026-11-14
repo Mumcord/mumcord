@@ -56,6 +56,7 @@ import type {
   Friend,
   HistoryScope,
   Identity,
+  PhoneTransfer,
   AudioInfo,
   InlineImage,
   LinkPreview,
@@ -1065,6 +1066,28 @@ function mockHotkey(key: string): string {
   return [...parts, single ? single[1] : main].join("+");
 }
 
+/**
+ * A stand-in for "Send to your phone": three patterns that look like QR codes but carry
+ * nothing, and a code that differs from one start to the next like the real one does.
+ */
+function mockPhoneTransfer(nth: number): PhoneTransfer {
+  const size = 29;
+  const codes = [0, 1, 2].map((part) => ({
+    size,
+    rows: Array.from({ length: size }, (_, y) =>
+      Array.from({ length: size }, (_, x) =>
+        (x * 7 + y * 13 + ((x * y) % 5) + part * 3 + nth) % 3 === 0 ? "1" : "0",
+      ).join(""),
+    ),
+  }));
+  return {
+    codes,
+    code: String(41820735 + (nth - 1) * 1234567).slice(0, 8),
+    totalParts: codes.length,
+    secondsLeft: 120,
+  };
+}
+
 function fail(code: ErrorCode, message: string): never {
   throw new EngineError(code, message);
 }
@@ -1299,6 +1322,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const certPrompts = new Map<number, string | null>();
 
   // Identities are added one by one; the first one is the default (issue #148).
+  let phoneTransfers = 0;
   let identities: Identity[] = fresh
     ? []
     : [
@@ -2641,6 +2665,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       identities = identities.map((i) => ({ ...i, isDefault: i.id === id }));
       return Promise.resolve(orderedIdentities().map((i) => ({ ...i })));
     },
+
+    phoneTransferStart: (identityIds, includeServers) => {
+      identityIds.forEach(requireIdentity);
+      if (identityIds.length === 0 && !includeServers) fail("invalidInput", "nothing is selected");
+      phoneTransfers += 1;
+      return Promise.resolve(mockPhoneTransfer(phoneTransfers));
+    },
+    phoneTransferCancel: () => Promise.resolve(),
 
     mumbleImportScan: () => Promise.resolve(mumbleScan()),
     mumbleImportApply: (request) => Promise.resolve(mumbleApply(request)),
