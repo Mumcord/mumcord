@@ -9,6 +9,7 @@
 //! listed after Media Foundation's cameras and captured through a DirectShow graph (`dshow`,
 //! #631). Real cameras always go through Media Foundation.
 
+mod bounded;
 #[cfg(windows)]
 mod capture;
 #[cfg(windows)]
