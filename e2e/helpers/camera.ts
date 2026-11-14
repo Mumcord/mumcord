@@ -294,22 +294,80 @@ export async function pickImage(name: string): Promise<void> {
   });
 }
 
-/** Waits until every built-in background tile shows its decoded thumbnail. */
+interface BackgroundLibraryResult {
+  builtin: { thumbnail: string | null }[];
+}
+
+function errorText(error: unknown): string {
+  if (error instanceof Error && error.message !== "") return error.message;
+  if (typeof error === "string") return error;
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return "unknown error";
+  }
+}
+
+/**
+ * Decodes the built-in backgrounds into the app's process cache (`camera_backgrounds`)
+ * before a preview opens. A debug build encodes all of them in one blocking call the
+ * first time, which took longer than the tile wait on a busy runner and left the
+ * dialog with labels but no images. Fails with the command's own error, or when fewer
+ * than `count` thumbnails came back, so a missing tile is not reported as "slow".
+ */
+export async function preloadBuiltinBackgrounds(count: number): Promise<void> {
+  let library: BackgroundLibraryResult;
+  try {
+    library = await app.invoke<BackgroundLibraryResult>("camera_backgrounds");
+  } catch (error: unknown) {
+    throw new Error(`camera_backgrounds failed: ${errorText(error)}`);
+  }
+  if (!Array.isArray(library.builtin)) {
+    throw new Error("camera_backgrounds returned no built-in list");
+  }
+  const ready = library.builtin.filter(
+    (image) => typeof image.thumbnail === "string" && image.thumbnail !== "",
+  ).length;
+  if (ready < count) {
+    throw new Error(
+      `camera_backgrounds returned ${String(ready)} built-in thumbnails, expected ${String(count)}`,
+    );
+  }
+}
+
+/**
+ * Waits until every built-in background tile shows its decoded thumbnail.
+ * The decode itself belongs in `preloadBuiltinBackgrounds` (called before the dialog);
+ * these 3 s only cover painting the cached images. On a timeout the command is asked
+ * again and its error is part of the failure, so an empty grid is not called "slow"
+ * when `camera_backgrounds` failed.
+ */
 export async function waitBuiltinThumbnails(count: number): Promise<void> {
-  await browser.waitUntil(
-    async () =>
-      browser.execute(
-        (expected) =>
-          [
-            ...document.querySelectorAll<HTMLImageElement>("dialog.cam-dialog .bg-thumb img"),
-          ].filter((img) => img.complete && img.naturalWidth > 0).length >= expected,
-        count,
-      ),
-    {
-      timeout: 3_000,
-      timeoutMsg: `the ${String(count)} background thumbnails did not show within 3 s`,
-    },
-  );
+  try {
+    await browser.waitUntil(
+      async () =>
+        browser.execute(
+          (expected) =>
+            [
+              ...document.querySelectorAll<HTMLImageElement>("dialog.cam-dialog .bg-thumb img"),
+            ].filter((img) => img.complete && img.naturalWidth > 0).length >= expected,
+          count,
+        ),
+      {
+        timeout: 3_000,
+        timeoutMsg: `the ${String(count)} background thumbnails did not show within 3 s`,
+      },
+    );
+  } catch (error: unknown) {
+    let command: string;
+    try {
+      await preloadBuiltinBackgrounds(count);
+      command = `camera_backgrounds returned the ${String(count)} thumbnails; the dialog did not paint them`;
+    } catch (commandError: unknown) {
+      command = errorText(commandError);
+    }
+    throw new Error(`${errorText(error)} ${command}`);
+  }
 }
 
 /** The "Background effects are not available …" line of the open preview, `null` without one. */
