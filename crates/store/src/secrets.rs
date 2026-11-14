@@ -1578,6 +1578,11 @@ mod tests {
         }
     }
 
+    /// A throwaway password built at runtime, so no credential-looking literal sits in the test.
+    fn sample_password() -> String {
+        format!("pw-{}", std::process::id())
+    }
+
     #[test]
     fn an_injected_backend_holds_all_secrets() {
         let backend = Arc::new(EmbedderBackend::default());
@@ -1586,7 +1591,8 @@ mod tests {
         // Identities and server secrets are found again after a restart.
         let store = SecretStore::with_backend(backend.clone());
         store.save_identity(3, &IDENTITY).expect("save");
-        store.set_server_password(12, "hunter2").expect("set");
+        let password = sample_password();
+        store.set_server_password(12, &password).expect("set");
         let restarted = SecretStore::with_backend(backend);
         assert_eq!(
             restarted.load_identity(3).expect("load").as_ref(),
@@ -1594,7 +1600,7 @@ mod tests {
         );
         assert_eq!(
             restarted.server_password(12).expect("get").as_deref(),
-            Some("hunter2")
+            Some(password.as_str())
         );
     }
 
@@ -1607,7 +1613,7 @@ mod tests {
         let store = SecretStore::with_backend(backend);
 
         let error = store
-            .set_server_password(12, "hunter2")
+            .set_server_password(12, &sample_password())
             .expect_err("locked storage");
         assert!(matches!(error, Error::SecureStorage(_)), "{error:?}");
         assert_eq!(
