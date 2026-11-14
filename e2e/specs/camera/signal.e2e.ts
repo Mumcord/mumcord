@@ -150,15 +150,18 @@ const MARK = "fuzzmark";
 
   it("AC-8.27: a client without camera support sees nothing and chat keeps working", async () => {
     // Olaf stands in for a client that knows no `mumcord.camera` (0.6.2, official Mumble).
-    const olaf = botInBackground(["script"], { name: "Olaf", port, timeout: 60 });
+    // The pinned test bot (mumbot 0.4.1) can still have the chat line in its send queue when
+    // the script ends, and disconnect drops that queue. Hold the connection until the line
+    // has been read.
+    const olaf = botInBackground(["script"], { name: "Olaf", port, timeout: 60, hold: 30 });
     olaf.send(`expect message --from ${NAMES.b} --contains compat-from-bob`);
     olaf.send("say compat-from-olaf");
     olaf.process.stdin?.end();
+    const finished = olaf.done.catch((e: unknown) => e);
     await on("b", async () => {
       await sessionOf("Olaf");
       await sendText("compat-from-bob");
     });
-    await olaf.done;
     // A's camera stayed on, and the camera wrote nothing into the chat.
     expect((await cameraView())?.state).toBe("onAir");
     // The large camera room can leave the chat outside its viewport. Close only the
@@ -171,5 +174,7 @@ const MARK = "fuzzmark";
       await waitMessage("compat-from-olaf");
     });
     expect((await cameraView())?.error ?? null).toBeNull();
+    const result = await finished;
+    if (result instanceof Error) throw result;
   });
 });
