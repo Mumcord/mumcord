@@ -19,6 +19,11 @@ pub enum ErrorKind {
     CertificateRejected,
     CertificateChanged,
     ServerTooOld,
+    /// The server banned the user while connected; `message` is the reason the server gave
+    /// (untrusted text, may be empty). Only reported when the server says so: a stock server
+    /// tells a banned client nothing at connect time, where a ban shows up as
+    /// `ServerUnreachable` and cannot be told apart from other causes.
+    Banned,
     PermissionDenied,
     ListenerLimitReached,
     /// As many servers are connected (or marked "Always connect at start") as the limit in
@@ -673,6 +678,9 @@ pub enum EngineEvent {
         session: u32,
         kind: Option<mumble_client_protocol::WhisperKind>,
     },
+    /// The own whisper or shout ended without [`crate::Engine::whisper_stop`]: everyone it
+    /// was bound to left, or the server no longer carries the user's voice.
+    WhisperEnded,
     /// New UserStats of a person on the server (FR-2.25).
     UserStatsChanged(crate::stats::UserStatsView),
     /// The watch party in the user's channel started, changed or ended (`None`) (FR-2.39).

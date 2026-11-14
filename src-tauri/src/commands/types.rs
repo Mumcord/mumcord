@@ -104,6 +104,13 @@ impl std::error::Error for ApiError {}
 
 impl From<EngineError> for ApiError {
     fn from(err: EngineError) -> Self {
+        // The desktop shows a ban as a refusal with the server's reason, as before.
+        if err.kind == ErrorKind::Banned {
+            return Self::new(
+                ErrorCode::PermissionDenied,
+                format!("banned: {}", err.message),
+            );
+        }
         let code = match err.kind {
             ErrorKind::NotConnected => ErrorCode::NotConnected,
             ErrorKind::ServerUnreachable => ErrorCode::ServerUnreachable,
@@ -113,7 +120,7 @@ impl From<EngineError> for ApiError {
             ErrorKind::CertificateRejected => ErrorCode::CertificateRejected,
             ErrorKind::CertificateChanged => ErrorCode::CertificateChanged,
             ErrorKind::ServerTooOld => ErrorCode::ServerTooOld,
-            ErrorKind::PermissionDenied => ErrorCode::PermissionDenied,
+            ErrorKind::Banned | ErrorKind::PermissionDenied => ErrorCode::PermissionDenied,
             ErrorKind::ListenerLimitReached => ErrorCode::ListenerLimitReached,
             ErrorKind::ServerLimitReached => ErrorCode::ServerLimitReached,
             ErrorKind::MessageTooLarge => ErrorCode::MessageTooLarge,

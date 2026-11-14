@@ -17,6 +17,7 @@
     "muted": "Slå mikrofonen til for at hviske.",
     "serverMuted": "Serveren har slået din mikrofon fra, så din stemme sendes ikke videre.",
     "nobodyHere": "Ingen af disse personer er på serveren lige nu.",
+    "ambiguousName": "Mere end én person her har dette navn, så hvisken blev ikke sendt.",
     "channelNotFound": "Kanalen findes ikke på denne server.",
     "noPermission": "Serveren tillader ikke, at du hvisker til {{channel}}.",
     "unknownTarget": "Dette mål findes ikke længere.",

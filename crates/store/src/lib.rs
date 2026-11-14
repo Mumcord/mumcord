@@ -63,15 +63,15 @@ pub use settings::{
     ActivityNotifySettings, BlockedMessages, CameraBackground, CameraEffectQuality,
     CameraReduceMotion, CameraSendQuality, CameraShow, CameraStripPosition, ChatDisplay,
     CloseBehaviour, Consent, DEFAULT_APP_THEME_ID, DEFAULT_INGAME_OPACITY_PERCENT,
-    DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS, FilesMaxSize, GameKey,
-    GameOverlayEntry, Hotkey, HotkeyAction, InGameOverlayMode, InGameOverlaySettings, LogLevel,
-    MAX_CAMERA_BLUR_STRENGTH, MAX_MAX_CONNECTED_SERVERS, MAX_UPDATE_INTERVAL_HOURS,
+    DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS, DefaultOutput, FilesMaxSize,
+    GameKey, GameOverlayEntry, Hotkey, HotkeyAction, InGameOverlayMode, InGameOverlaySettings,
+    LogLevel, MAX_CAMERA_BLUR_STRENGTH, MAX_MAX_CONNECTED_SERVERS, MAX_UPDATE_INTERVAL_HOURS,
     MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS, MIN_UPDATE_INTERVAL_HOURS,
-    MIN_VIDEO_DUCKING_PERCENT, NoiseBackend, NotificationMode, OverlayCorner, OwnVoice, P2pMode,
-    PluginUpdates, PmRule, PositionalSettings, PrivateMessageSettings, ScreenCodec, ScreenFps,
-    ScreenOptimize, ScreenResolution, ScreenUploadLimit, Settings, SetupPreset, SoundSettings,
-    SoundTheme, TalkMode, Theme, ThemePreference, UpdateChannel, VoiceActivation, WhisperReceivers,
-    WhisperTarget,
+    MIN_VIDEO_DUCKING_PERCENT, MobileSettings, NoiseBackend, NotificationMode, OverlayCorner,
+    OwnVoice, P2pMode, PluginUpdates, PmRule, PositionalSettings, PrivateMessageSettings,
+    ScreenCodec, ScreenFps, ScreenOptimize, ScreenResolution, ScreenUploadLimit, Settings,
+    SetupPreset, SoundSettings, SoundTheme, TalkMode, Theme, ThemePreference, UpdateChannel,
+    VoiceActivation, WhisperReceivers, WhisperTarget,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

@@ -5961,7 +5961,9 @@ export type WatchStats = {
 	rms: number | null,
 };
 
-export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";
+export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | 
+/**  A saved name fits several people on the server; nothing is sent to any of them. */
+"ambiguousName" | "channelNotFound" | "noPermission" | "unknownTarget";
 
 /**  Why whisper keys cannot work in this session. */
 export type WhisperKeysUnavailable = 

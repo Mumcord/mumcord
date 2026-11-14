@@ -233,6 +233,8 @@ struct Inner {
     meter: Arc<Meter>,
     voice: Arc<VoiceShared>,
     reconnects: AtomicU32,
+    /// The own whisper or shout going on, bound to the sessions it was started for.
+    active_whisper: Mutex<Option<crate::whisper::ActiveWhisper>>,
     /// Voice channels the user was joined to when the app last quit, per server. Each is
     /// offered for rejoining once, on the first fresh connect to its server (QA.9).
     rejoin_offers: Mutex<HashMap<ServerId, String>>,
@@ -630,6 +632,7 @@ impl Engine {
             meter,
             voice: voice.clone(),
             reconnects: AtomicU32::new(0),
+            active_whisper: Mutex::new(None),
             rejoin_offers: Mutex::new(rejoin_offers),
             password_overrides: Mutex::new(HashMap::new()),
             password_attempts: Mutex::default(),
@@ -699,6 +702,10 @@ impl Engine {
     }
 
     /// Shared DSP switches; push-to-talk key state goes to `set_ptt_pressed`.
+    pub(crate) fn active_whisper(&self) -> &Mutex<Option<crate::whisper::ActiveWhisper>> {
+        &self.inner.active_whisper
+    }
+
     pub fn dsp_controls(&self) -> Arc<DspControls> {
         self.inner.controls.clone()
     }
@@ -2031,6 +2038,7 @@ impl Inner {
             task.abort();
         }
         if core.voice_server == Some(server_id) {
+            self.reset_talking(server_id);
             core.voice_server = None;
             self.events.emit(EngineEvent::VoiceServerChanged(None));
         }
@@ -2176,6 +2184,24 @@ impl Inner {
         }
     }
 
+    /// A whisper or shout going to `server_id` ends: voice no longer goes there.
+    fn end_whisper_on(&self, server_id: ServerId) {
+        crate::whisper::on_voice_lost(
+            &self.active_whisper,
+            &self.controls,
+            &self.events,
+            server_id,
+        );
+    }
+
+    /// The voice server's connection ended: nothing of the talking there carries over to the
+    /// next connection. A whisper ends, and a push-to-talk key counts as released, so a key
+    /// whose release was missed cannot keep the microphone open after a reconnect.
+    fn reset_talking(&self, server_id: ServerId) {
+        self.end_whisper_on(server_id);
+        self.controls.set_ptt_pressed(false);
+    }
+
     /// Stops voice on the voice server without leaving it ("Leave voice"): the server becomes
     /// read-only like any other connected one and no server has voice until the next explicit
     /// join. Uses only the self-deafen flag, so it works on every standard Mumble server.
@@ -2183,6 +2209,7 @@ impl Inner {
         let Some(server_id) = core.voice_server.take() else {
             return;
         };
+        self.end_whisper_on(server_id);
         Self::make_read_only(core, server_id);
         // Nothing to offer for rejoining after a restart, as after a disconnect.
         self.forget_voice_channel();
@@ -2198,6 +2225,7 @@ impl Inner {
             return;
         }
         if let Some(previous) = core.voice_server.take() {
+            self.end_whisper_on(previous);
             Self::make_read_only(core, previous);
         }
         core.voice_server = Some(server_id);
@@ -2282,13 +2310,16 @@ impl Inner {
                     } else {
                         Arrival::Fresh(path.take())
                     };
+                    // `attempt` returns once the login is through.
+                    let logged_in = Instant::now();
                     match self
                         .run_connection(generation, server_id, connection, &host, port, arrival)
                         .await
                     {
                         Ended::Lost => {
                             synced_before = true;
-                            self.step(server_id, generation, Machine::lost)
+                            let survived = logged_in.elapsed();
+                            self.step(server_id, generation, |machine| machine.lost(survived))
                         }
                         Ended::Final(error) => {
                             self.finish(server_id, generation, error);
@@ -2753,6 +2784,9 @@ impl Inner {
         if core.audio_server == Some(server_id) {
             self.stop_pipeline_after_removal(&mut core, &reason);
         }
+        if core.voice_server == Some(server_id) {
+            self.reset_talking(server_id);
+        }
         if let Some(slot) = core.slots.get_mut(&server_id) {
             slot.session = None;
         }
@@ -2763,12 +2797,23 @@ impl Inner {
         self.forget_password_attempt(server_id);
         match reason {
             DisconnectReason::Requested => Ended::Final(None),
-            DisconnectReason::Kicked { reason, ban, .. } => {
-                tracing::info!(server_id, ban, "removed by the server");
-                let what = if ban { "banned" } else { "kicked" };
+            // The reason is the server's text: untrusted, shown as plain text, never logged.
+            DisconnectReason::Kicked {
+                reason, ban: true, ..
+            } => {
+                tracing::info!(server_id, "banned by the server");
+                Ended::Final(Some(EngineError::new(
+                    ErrorKind::Banned,
+                    reason.unwrap_or_default(),
+                )))
+            }
+            DisconnectReason::Kicked {
+                reason, ban: false, ..
+            } => {
+                tracing::info!(server_id, "kicked by the server");
                 Ended::Final(Some(EngineError::new(
                     ErrorKind::PermissionDenied,
-                    format!("{what}: {}", reason.unwrap_or_default()),
+                    format!("kicked: {}", reason.unwrap_or_default()),
                 )))
             }
             DisconnectReason::Closed | DisconnectReason::Timeout | DisconnectReason::Error(_) => {
@@ -3017,6 +3062,12 @@ impl Inner {
                 }
                 crate::stats::on_user_removed(&self.user_stats, server_id, user.session);
                 crate::admin::on_removed(&self.admin, server_id, user.session);
+                crate::whisper::on_user_removed(
+                    &self.active_whisper,
+                    &self.controls,
+                    ctx,
+                    user.session,
+                );
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
                 ctx.events.emit(EngineEvent::UserRemoved(user.session));
             }

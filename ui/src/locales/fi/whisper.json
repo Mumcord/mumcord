@@ -17,6 +17,7 @@
     "muted": "Poista mikrofonin mykistys kuiskataksesi.",
     "serverMuted": "Palvelin on mykistänyt sinut, joten se ei välitä ääntäsi.",
     "nobodyHere": "Yksikään näistä henkilöistä ei ole nyt tällä palvelimella.",
+    "ambiguousName": "Täällä on useampi tämänniminen henkilö, joten kuiskausta ei lähetetty.",
     "channelNotFound": "Tätä kanavaa ei ole tällä palvelimella.",
     "noPermission": "Palvelin ei salli sinun kuiskata kanavalle {{channel}}.",
     "unknownTarget": "Tätä kohdetta ei enää ole.",

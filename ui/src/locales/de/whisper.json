@@ -17,6 +17,7 @@
     "muted": "Heb die Stummschaltung deines Mikrofons auf, um zu flüstern.",
     "serverMuted": "Der Server hat dich stummgeschaltet und gibt deine Stimme nicht weiter.",
     "nobodyHere": "Niemand von ihnen ist gerade auf diesem Server.",
+    "ambiguousName": "Mehrere Personen hier tragen diesen Namen, deshalb wurde nicht geflüstert.",
     "channelNotFound": "Diesen Kanal gibt es auf diesem Server nicht.",
     "noPermission": "Der Server erlaubt dir nicht, in {{channel}} zu flüstern.",
     "unknownTarget": "Dieses Ziel gibt es nicht mehr.",

@@ -1232,6 +1232,7 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        EngineEvent::WhisperEnded => commands::whisper::on_engine_ended(app),
         EngineEvent::UserStatsChanged(stats) => commands::user_stats::UserStatsChanged {
             server_id,
             session: stats.session,
