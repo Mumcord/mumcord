@@ -21,6 +21,18 @@ import {
 const ME = "PhoneQA"; // the identity the wizard creates (its label is its name)
 const TITLE = "Send to your phone";
 const SERVER = { label: "Home", address: "127.0.0.1", port: 64738, username: "phone-qa" };
+
+interface TransferSummary {
+  identities: { label: string; cert_hash: string; default: boolean }[];
+  servers: { name: string; address: string; port: number; username: string }[];
+  contains_needle: boolean;
+}
+
+/** The JSON summary `transfer_read` prints; it never carries keys or the code. */
+function readSummary(stdout: string): TransferSummary {
+  return JSON.parse(stdout) as TransferSummary;
+}
+
 const SERVER_PASSWORD = "pw-must-not-travel-7f3a";
 const SHORT_VALIDITY_S = 8;
 
@@ -137,18 +149,27 @@ describe("send to your phone (spec 05, FR-5.64, FR-5.67, AC-5.21 desktop half)",
 
     const pictures = await photographAll();
     const digits = code.replace(" ", "");
-    const read = await run(bin.transferRead, [digits, ...pictures]);
+    const read = await run(bin.transferRead, [digits, ...pictures], {
+      TRANSFER_NEEDLE: SERVER_PASSWORD,
+    });
     if (read.code !== 0) throw new Error(`reading the transfer failed: ${read.stderr}`);
 
     const [me] = (await app.invoke<IdentityRow[]>("identity_list", {})).filter(
       (identity) => identity.label === ME,
     );
-    const lines = read.stdout.trim().split("\n");
-    expect(lines).toEqual([
-      `identity\t${ME}\t${me.certHash}\tdefault`,
-      `server\t${SERVER.label}\t${SERVER.address}\t${String(SERVER.port)}\t${SERVER.username}`,
+    const summary = readSummary(read.stdout);
+    expect(summary.identities).toEqual([
+      { label: ME, cert_hash: me.certHash, default: true },
     ]);
-    expect(read.stdout).not.toContain(SERVER_PASSWORD);
+    expect(summary.servers).toEqual([
+      {
+        name: SERVER.label,
+        address: SERVER.address,
+        port: SERVER.port,
+        username: SERVER.username,
+      },
+    ]);
+    expect(summary.contains_needle).toBe(false);
 
     // The number is what protects the codes: the same pictures do not open with another one.
     const wrong = digits === "00000000" ? "00000001" : "00000000";
@@ -169,8 +190,9 @@ describe("send to your phone (spec 05, FR-5.64, FR-5.67, AC-5.21 desktop half)",
     const pictures = await photographAll();
     const read = await run(bin.transferRead, [(await shownCode()).replace(" ", ""), ...pictures]);
     if (read.code !== 0) throw new Error(`reading the transfer failed: ${read.stderr}`);
-    expect(read.stdout).toContain(`identity\t${ME}\t`);
-    expect(read.stdout).not.toContain("server\t");
+    const summary = readSummary(read.stdout);
+    expect(summary.identities.map((identity) => identity.label)).toContain(ME);
+    expect(summary.servers).toEqual([]);
   });
 
   it("closing takes the codes away; opening again starts at the selection", async () => {
@@ -203,7 +225,7 @@ describe("send to your phone (spec 05, FR-5.64, FR-5.67, AC-5.21 desktop half)",
     const pictures = await photographAll();
     const read = await run(bin.transferRead, [(await shownCode()).replace(" ", ""), ...pictures]);
     if (read.code !== 0) throw new Error(`reading the transfer failed: ${read.stderr}`);
-    expect(read.stdout).toContain(`identity\t${ME}\t`);
+    expect(readSummary(read.stdout).identities.map((identity) => identity.label)).toContain(ME);
     await browser.keys("Escape");
     await settingsTitle(TITLE).waitForExist({ reverse: true });
   });

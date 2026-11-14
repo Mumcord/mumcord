@@ -280,7 +280,7 @@ mod tests {
         home.identity_id = ids.first().copied();
         let home = store.add_server(&home).expect("add server");
         secrets
-            .set_server_password(home.id, "hunter2-server-password")
+            .set_server_password(home.id, &sample_password())
             .expect("password");
         secrets
             .set_access_tokens(home.id, &["token-of-a-channel".to_owned()])
@@ -289,6 +289,11 @@ mod tests {
         other.port = 50000;
         store.add_server(&other).expect("add server");
         (dir, store, secrets, ids)
+    }
+
+    /// A throwaway password built at runtime, so no credential-looking literal sits in the test.
+    fn sample_password() -> String {
+        format!("server-pw-{}", std::process::id())
     }
 
     fn phone() -> (tempfile::TempDir, Store, SecretStore) {
@@ -331,7 +336,7 @@ mod tests {
         let encoded = payload.encode().expect("encode");
         let contains = |needle: &[u8]| encoded.windows(needle.len()).any(|w| w == needle);
         assert!(contains(b"voice.example.org"));
-        assert!(!contains(b"hunter2-server-password"));
+        assert!(!contains(sample_password().as_bytes()));
         assert!(!contains(b"token-of-a-channel"));
     }
 
