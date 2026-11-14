@@ -690,13 +690,13 @@ dependencies = [
  "cexpr",
  "clang-sys",
  "log",
- "prettyplease 0.3.0",
+ "prettyplease 0.2.37",
  "proc-macro2",
  "quote",
  "regex",
  "rustc-hash 2.1.3",
  "shlex 2.0.1",
- "syn 3.0.9",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -1720,7 +1720,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d045de693cb712d0b22c6a64be5b953f67b3ce00ab5ad3dd5d8b441886ab8e1a"
 dependencies = [
  "quote",
- "syn 3.0.9",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -3106,7 +3106,7 @@ checksum = "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87"
 [[package]]
 name = "hwcodec"
 version = "0.1.0"
-source = "git+https://github.com/Mumcord/hwcodec?rev=62ae904e4d20a3e8071ce24f3038d2605ced8725#62ae904e4d20a3e8071ce24f3038d2605ced8725"
+source = "git+https://github.com/Mumcord/hwcodec?rev=aa6cde698e334310151762c672cac2adffef85d1#aa6cde698e334310151762c672cac2adffef85d1"
 dependencies = [
  "bindgen 0.73.2",
  "hwcodec-dav1d-src",
@@ -3124,27 +3124,27 @@ dependencies = [
 [[package]]
 name = "hwcodec-dav1d-src"
 version = "0.1.0+1.5.4"
-source = "git+https://github.com/Mumcord/hwcodec?rev=62ae904e4d20a3e8071ce24f3038d2605ced8725#62ae904e4d20a3e8071ce24f3038d2605ced8725"
+source = "git+https://github.com/Mumcord/hwcodec?rev=aa6cde698e334310151762c672cac2adffef85d1#aa6cde698e334310151762c672cac2adffef85d1"
 
 [[package]]
 name = "hwcodec-libvpl-src"
 version = "0.1.0+2.17.0"
-source = "git+https://github.com/Mumcord/hwcodec?rev=62ae904e4d20a3e8071ce24f3038d2605ced8725#62ae904e4d20a3e8071ce24f3038d2605ced8725"
+source = "git+https://github.com/Mumcord/hwcodec?rev=aa6cde698e334310151762c672cac2adffef85d1#aa6cde698e334310151762c672cac2adffef85d1"
 
 [[package]]
 name = "hwcodec-libvpx-src"
 version = "0.1.0+1.15.2"
-source = "git+https://github.com/Mumcord/hwcodec?rev=62ae904e4d20a3e8071ce24f3038d2605ced8725#62ae904e4d20a3e8071ce24f3038d2605ced8725"
+source = "git+https://github.com/Mumcord/hwcodec?rev=aa6cde698e334310151762c672cac2adffef85d1#aa6cde698e334310151762c672cac2adffef85d1"
 
 [[package]]
 name = "hwcodec-prebuilt-x86_64-pc-windows-msvc"
 version = "0.1.0+native-libs.1"
-source = "git+https://github.com/Mumcord/hwcodec?rev=62ae904e4d20a3e8071ce24f3038d2605ced8725#62ae904e4d20a3e8071ce24f3038d2605ced8725"
+source = "git+https://github.com/Mumcord/hwcodec?rev=aa6cde698e334310151762c672cac2adffef85d1#aa6cde698e334310151762c672cac2adffef85d1"
 
 [[package]]
 name = "hwcodec-svt-av1-src"
 version = "0.1.0+4.2.0"
-source = "git+https://github.com/Mumcord/hwcodec?rev=62ae904e4d20a3e8071ce24f3038d2605ced8725#62ae904e4d20a3e8071ce24f3038d2605ced8725"
+source = "git+https://github.com/Mumcord/hwcodec?rev=aa6cde698e334310151762c672cac2adffef85d1#aa6cde698e334310151762c672cac2adffef85d1"
 
 [[package]]
 name = "hybrid-array"

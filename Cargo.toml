@@ -43,7 +43,7 @@ mumcord-p2p = { path = "crates/p2p" }
 # then this becomes the plain crates.io version.
 # No default features: the engine switches the codecs on (its features `vp9`, `av1-decode` and
 # `desktop-codecs`), so a phone build compiles none of the C libraries.
-hwcodec = { git = "https://github.com/Mumcord/hwcodec", rev = "62ae904e4d20a3e8071ce24f3038d2605ced8725", default-features = false }
+hwcodec = { git = "https://github.com/Mumcord/hwcodec", rev = "aa6cde698e334310151762c672cac2adffef85d1", default-features = false }
 mumcord-camera = { path = "crates/camera" }
 mumcord-effects = { path = "crates/effects" }
 mumcord-plugins = { path = "crates/plugins", version = "0.8" }
