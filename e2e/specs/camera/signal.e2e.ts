@@ -32,6 +32,7 @@ import {
   startCamClient,
   startCapture,
   turnCameraOn,
+  waitSameChannel,
   waitTile,
 } from "./flows.ts";
 
@@ -115,6 +116,9 @@ const MARK = "fuzzmark";
     await mallory.connect(port);
     try {
       await mallory.joinChannelOf(NAMES.b);
+      // Her own echo is not Bob's view. Until he has applied the move he refuses every
+      // document as not-same-channel, and that check runs before too-large or wrong-type.
+      await on("b", () => waitSameChannel("Mallory"));
       const target = mallory.sessionOf(NAMES.b);
       for (const doc of docs) mallory.pluginData(target, "mumcord.camera", Buffer.from(doc, "utf8"));
       mallory.ping();

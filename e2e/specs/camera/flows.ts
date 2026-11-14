@@ -179,6 +179,23 @@ export async function sessionOf(name: string): Promise<number> {
   return found as number;
 }
 
+/**
+ * Waits until `name` stands in this client's channel. A move this client has not applied yet
+ * still counts as another channel, and camera messages from there are ignored as
+ * `not-same-channel` before their contents are read (AC-8.26).
+ */
+export async function waitSameChannel(name: string): Promise<void> {
+  await browser.waitUntil(
+    async () => {
+      const snap = await snapshot();
+      const own = snap.users.find((u) => u.session === snap.selfSession)?.channelId;
+      const theirs = snap.users.find((u) => u.name === name)?.channelId;
+      return own !== undefined && theirs === own;
+    },
+    { timeout: 15_000, timeoutMsg: `${name} is not in this channel` },
+  );
+}
+
 /** The current client's own session. */
 export async function ownSession(): Promise<number> {
   return (await snapshot()).selfSession;
