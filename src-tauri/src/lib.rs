@@ -653,6 +653,13 @@ pub fn run() {
                 ));
                 return true;
             }
+            if !commands::phone_transfer::command_allowed(call.message.command()) {
+                call.resolver.reject(commands::types::ApiError::new(
+                    commands::types::ErrorCode::NotImplemented,
+                    "Send to your phone is not available in this build",
+                ));
+                return true;
+            }
             invoke(call)
         })
         .manage(window::StartReveal::default())

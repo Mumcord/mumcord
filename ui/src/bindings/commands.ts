@@ -1652,6 +1652,11 @@ export type AppInfo = {
 	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything.
 	 */
 	session: SessionKind | null,
+	/**
+	 *  Whether this build offers "Send to your phone" (Cargo feature `phone-transfer`); the
+	 *  identity settings show its button only then.
+	 */
+	phoneTransfer: boolean,
 };
 
 /**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */

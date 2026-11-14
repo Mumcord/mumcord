@@ -14,6 +14,10 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [features]
 # Env-selected null/WAV-file audio backend for E2E runs (e2e/); never in release builds.
 test-backend = ["mumcord-engine/test-backend"]
+# "Send to your phone" in the identity settings (spec 05): off in release builds until the
+# Android and iOS apps that read its codes are released, on in E2E builds. This feature is the
+# one switch (CONTRIBUTING.md, "Build flags"); remove it when the phone apps ship.
+phone-transfer = []
 # Tauri's production switch: the UI is loaded from the assets embedded in the binary instead of
 # from the dev server. The Tauri CLI turns it on for `tauri build`; a plain
 # `cargo build --release` leaves it off, and the app would then wait for `npm run dev`. Builds

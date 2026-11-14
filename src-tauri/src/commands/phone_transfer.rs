@@ -22,6 +22,25 @@ use zeroize::Zeroize;
 
 use super::types::{ApiError, ApiResult, ErrorCode, to_engine_identity_id};
 
+/// Whether this build offers "Send to your phone": only with the `phone-transfer` Cargo feature,
+/// which release builds leave off until the phone apps that read the codes are released
+/// (CONTRIBUTING.md, "Build flags"). The UI learns it from `app_info` and shows the button only
+/// then; the invoke handler refuses the commands of this module otherwise.
+pub const ENABLED: bool = cfg!(feature = "phone-transfer");
+
+/// The commands of this module, as the webview names them.
+const COMMANDS: [&str; 2] = ["phone_transfer_start", "phone_transfer_cancel"];
+
+/// Whether the webview may call `command` in this build: everything but the commands of this
+/// module, and those only when the feature is [`ENABLED`].
+pub fn command_allowed(command: &str) -> bool {
+    command_allowed_when(ENABLED, command)
+}
+
+fn command_allowed_when(enabled: bool, command: &str) -> bool {
+    enabled || !COMMANDS.contains(&command)
+}
+
 /// One QR code as the UI draws it: `size` rows of `size` characters, `1` for a dark module.
 /// The quiet zone around it is not included.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -273,6 +292,34 @@ mod tests {
     use super::*;
 
     const NOW: u64 = 1_800_000_000;
+
+    #[test]
+    fn the_commands_are_refused_unless_the_feature_is_on() {
+        for command in COMMANDS {
+            assert!(!command_allowed_when(false, command));
+            assert!(command_allowed_when(true, command));
+            assert_eq!(command_allowed(command), ENABLED);
+        }
+        assert!(command_allowed_when(false, "identity_list"));
+    }
+
+    /// Release builds are built without the feature: they must not offer the transfer.
+    #[cfg(not(feature = "phone-transfer"))]
+    #[test]
+    fn a_build_without_the_feature_does_not_offer_the_transfer() {
+        assert!(!command_allowed("phone_transfer_start"));
+        assert!(!command_allowed("phone_transfer_cancel"));
+        let info = crate::commands::diagnostics::app_info().expect("app info");
+        assert!(!info.phone_transfer);
+    }
+
+    #[cfg(feature = "phone-transfer")]
+    #[test]
+    fn a_build_with_the_feature_offers_the_transfer() {
+        assert!(command_allowed("phone_transfer_start"));
+        let info = crate::commands::diagnostics::app_info().expect("app info");
+        assert!(info.phone_transfer);
+    }
 
     fn servers(count: usize) -> TransferPayload {
         TransferPayload {
