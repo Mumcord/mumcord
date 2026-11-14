@@ -49,7 +49,7 @@ import {
   type OutgoingSend,
 } from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
-import { pinnedIndex } from "./pinnedAuthor";
+import { firstVisibleIndex, pinnedIndex } from "./pinnedAuthor";
 import { useCodeBlockActions } from "./useCodeBlockActions";
 import { useHighlightedCode } from "./highlight";
 import { hideShownLinks, useInlineShown } from "./inlineLinks";
@@ -579,18 +579,8 @@ export function MessageList({
     const element = scrollRef.current;
     if (!element) return;
     const top = element.getBoundingClientRect().top;
-    const items = itemRefs.current.slice(0, messages.length).map((item) => {
-      if (!item) return null;
-      const rect = item.getBoundingClientRect();
-      const header = item.querySelector(".chat-message__header");
-      return {
-        top: rect.top,
-        bottom: rect.bottom,
-        headerBottom: header ? header.getBoundingClientRect().bottom : null,
-      };
-    });
     const height = bannerRef.current?.offsetHeight ?? PINNED_BANNER_FALLBACK_PX;
-    const next = pinnedIndex(items, top, height);
+    const next = pinnedIndex(itemRefs.current, top, height);
     setPinned((current) => (current === next ? current : next));
   }
 
@@ -598,16 +588,11 @@ export function MessageList({
     const element = scrollRef.current;
     if (!element) return;
     const top = element.getBoundingClientRect().top;
-    anchor.current = null;
-    for (const [index, item] of itemRefs.current.entries()) {
-      const id = messages[index]?.id;
-      if (!item || id === undefined) continue;
-      const rect = item.getBoundingClientRect();
-      if (rect.bottom > top) {
-        anchor.current = { id, offset: rect.top - top };
-        return;
-      }
-    }
+    const index = firstVisibleIndex(itemRefs.current, top);
+    const item = itemRefs.current[index];
+    const id = messages[index]?.id;
+    anchor.current =
+      item && id !== undefined ? { id, offset: item.getBoundingClientRect().top - top } : null;
   }
 
   // Follow new messages at the bottom; otherwise keep the message at the top of the view where it
