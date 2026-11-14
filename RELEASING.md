@@ -121,6 +121,30 @@ A published release must never change. Its fingerprint is `releases/<version>.js
 - **If it fires.** Never fix a published release in place (no re-uploaded asset, no moved tag): find out what changed and who did it, then publish a patch version. A crate can only be yanked, never replaced; yanking is also reported.
 - **Prevention.** The ruleset "Protect release tags" blocks creating, updating and deleting `v*` tags; only the repository role Admin can bypass it (always), so an admin can still move a tag. Assets are not protected by it. GitHub's **immutable releases** lock a release's assets and tag once published and are available for this repository (the setting exists and is currently off): switch it on under **Settings → General → Releases → Enable release immutability** (or the organisation's settings for all repositories). Because it applies to releases published afterwards, and a draft stays editable until you publish it, the normal flow (draft, review, publish) keeps working; it makes the daily check a second line of defence for already published releases.
 
+## FreeBSD: package smoke test
+
+Release and release-candidate builds run **Build and smoke FreeBSD package** in the same FreeBSD 15.x VM that builds the `.pkg`. Before the package is uploaded, `scripts/smoke/freebsd.sh`:
+
+1. Installs it with `pkg add` (without ignoring missing dependencies), checks dependencies without repairing them (`pkg check -dn`), and checks the installed package version.
+2. Checks that every linked library from `/usr/local` and the three dynamically loaded GStreamer decoder packages are declared dependencies. This catches omissions even though build dependencies are still installed in the VM.
+3. Starts an unmodified `mumble-server` package on loopback with a disposable database, no server password and `autobanAttempts=0`.
+4. Starts the installed `/usr/local/bin/mumcord` under Xvfb in an isolated profile and D-Bus session. The shared `scripts/smoke/smoke.sh` requires both a connection in the client log and the test user appearing on the server, observed by a second native client. It also requires the exact release version in the startup log. The build explicitly sets `MUMCORD_VERSION` inside the VM.
+
+Any failure fails the job and blocks the release. Server and display diagnostics are printed on failure; temporary profiles, identities and server data are removed. The job uses Xvfb directly because FreeBSD does not ship Linux's `xvfb-run`. FreeBSD's identity store uses the encrypted profile file, so no GNOME keyring is needed.
+
+**Shared helpers:** `smoke.sh` supports FreeBSD's XDG profile/log paths, an optional `--version` check and `--observer` in place of mumbot. The existing seeder is unchanged; its standalone Cargo package also builds `mumcord-smoke-observe`, which uses the workspace protocol to watch for the test user on loopback with a pinned server certificate and a timeout. This is needed because mumbot has no FreeBSD binary release, and its pinned source release depends on a published protocol crate whose vendored protoc does not support FreeBSD. Other platforms still use their pinned prebuilt testers. Offline regression tests for the shell helper run in the workflow/script lint job.
+
+To repeat the package check in a disposable FreeBSD build environment (with the app's runtime dependencies already installed), additionally install `mumble-server xorg-vfbserver xdpyinfo dbus bash`, build both native helpers with `CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml`, then run as root:
+
+```sh
+bash scripts/smoke/freebsd.sh "$PWD/dist-freebsd/mumcord-<version>.pkg" '<version>' \
+  "$PWD/target/release/mumcord-smoke-seed" "$PWD/target/release/mumcord-smoke-observe"
+```
+
+The package must not already be installed. An optional fifth argument selects another local server port (default `64738`). This installs a real package; do not use a regular desktop as a disposable CI machine without backing up its installed package first. The ordinary **Test builds** workflow still skips the release-only FreeBSD job; a GitHub-hosted validation needs a release or RC run.
+
+For negative checks on that disposable machine, repack a copy with `gstreamer1-plugins-opus` removed from its manifest's dependencies: the smoke must fail with `undeclared runtime dependency`, even while the decoder is installed. Repacking with only the manifest version changed must also fail: the app can still connect, but its startup log reports the original binary's version.
+
 ## Linux: GStreamer plugins and H.264
 
 `bundleMediaFramework` (in `src-tauri/tauri.linux.conf.json`) makes Tauri's linuxdeploy GStreamer plugin copy every plugin in `GSTREAMER_PLUGINS_DIR` into the AppImage, together with their libraries. To keep the build host's H.264/H.265 (patents) and GPL-only codecs out, `.github/workflows/build-and-smoke.yml` sets `GSTREAMER_PLUGINS_DIR` to a filtered copy made by `scripts/filter-gst-plugins.sh` (it omits libgstlibav, x264, x265, OpenH264, a52dec, dtsdec, mpeg2dec, libdvdread, faac, faad). The smoke test fails if `libx264`, x264 or OpenH264 end up in the AppImage. VP9 (`libgstvpx`) stays, so YouTube plays. The build host also installs gst-plugins-bad, but the script keeps only its Opus parser (`libgstopusparse`) and video parsers (`libgstvideoparsersbad`, with `h264parse`): without them WebKit reports Opus in WebM as unsupported (YouTube refuses to play) and cannot play H.264 streams such as Twitch; the smoke test checks both are bundled. To change the list, edit `scripts/filter-gst-plugins.sh`. The plugin scanner (`gst-plugin-scanner`) must be bundled too, or the web process warns "External plugin loader failed" for every plugin; linuxdeploy only finds it on Debian-style hosts, so the workflow sets `GSTREAMER_HELPERS_DIR` from `scripts/gst-helpers-dir.sh` and the smoke test checks it is in the AppImage. The AppImage loads only its bundled plugins, with its own plugin registry in `~/.cache/app.mumcord.client/gstreamer-1.0/` (`src-tauri/src/gst_plugins.rs`).

@@ -61,6 +61,7 @@ async function onAirWith(choose: () => Promise<void>): Promise<void> {
   });
 
   it("AC-8.5: Blur and a built-in image change the preview's background, not the person", async () => {
+    await camera.preloadBuiltinBackgrounds(18);
     await camera.openPreview();
     expect(await camera.effectsUnavailable()).toBeNull();
     await camera.pickBackgroundMode("None");

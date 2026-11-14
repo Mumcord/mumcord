@@ -60,11 +60,13 @@ jobs:
           - name: linux
             os: ubuntu-24.04
             args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json
-            bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
+            # Space-separated globs. The collect step expands each word; braces would not
+            # expand once the value lives in an environment variable.
+            bundle: "target/release/bundle/appimage/*.AppImage target/release/bundle/deb/*.deb target/release/bundle/rpm/*.rpm"
           - name: linux-arm64
             os: ubuntu-24.04-arm
             args: --bundles appimage,deb,rpm --config src-tauri/tauri.onnxruntime.linux.json --config src-tauri/tauri.ffmpeg.linux.json
-            bundle: target/release/bundle/{appimage/*.AppImage,deb/*.deb,rpm/*.rpm}
+            bundle: "target/release/bundle/appimage/*.AppImage target/release/bundle/deb/*.deb target/release/bundle/rpm/*.rpm"
           - name: windows
             os: windows-latest
             args: --bundles nsis --config src-tauri/tauri.onnxruntime.windows.json
@@ -144,13 +146,15 @@ jobs:
       - name: libvpx cache key
         id: libvpx
         shell: bash
+        env:
+          LIBVPX_SCRIPT_HASH: ${{ hashFiles('scripts/build-libvpx.sh') }}
         run: |
           version=pinned
           if [[ "$RUNNER_OS" == Windows ]]; then
             version=$(jq -r '(.version // ."version-semver" // ."version-string" | tostring) + "-" + (."port-version" // 0 | tostring)' \
               "$VCPKG_INSTALLATION_ROOT/ports/libvpx/vcpkg.json")
           fi
-          echo "key=libvpx-$RUNNER_OS-$RUNNER_ARCH-$version-${{ hashFiles('scripts/build-libvpx.sh') }}" >> "$GITHUB_OUTPUT"
+          echo "key=libvpx-$RUNNER_OS-$RUNNER_ARCH-$version-$LIBVPX_SCRIPT_HASH" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Restore static libvpx
@@ -166,7 +170,7 @@ jobs:
         run: |
           if [[ "$RUNNER_OS" == macOS ]]; then brew install nasm; fi
           if [[ "$RUNNER_OS" == Linux ]]; then scripts/ci/apt-install.sh nasm; fi
-          scripts/build-libvpx.sh '${{ runner.temp }}/libvpx'
+          scripts/build-libvpx.sh "$RUNNER_TEMP/libvpx"
 
       - name: Save static libvpx
         if: steps.libvpx-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
@@ -180,7 +184,7 @@ jobs:
       - name: Point the build at libvpx and libclang
         shell: bash
         run: |
-          echo 'LIBVPX_STATIC_DIR=${{ runner.temp }}/libvpx' >> "$GITHUB_ENV"
+          echo "LIBVPX_STATIC_DIR=$RUNNER_TEMP/libvpx" >> "$GITHUB_ENV"
           if [[ "$RUNNER_OS" == Linux ]]; then exit 0; fi
           if [[ "$RUNNER_OS" == Windows ]]; then
             libclang='C:\Program Files\LLVM\bin'
@@ -345,7 +349,12 @@ jobs:
       # notices job read (scripts/generate-notices.sh), or the build fails instead of resolving anew.
       - name: Build bundle
         if: steps.certum.outputs.enabled != 'true' && !(runner.os == 'Linux' && contains(inputs.version, '-'))
-        run: npm run tauri build -- ${{ matrix.args }} -- --locked
+        env:
+          ARGS: ${{ matrix.args }}
+        run: |
+          # Word-split only. A value from the environment is not parsed as shell syntax.
+          # shellcheck disable=SC2086
+          npm run tauri build -- $ARGS -- --locked
 
       # A release candidate (X.Y.Z-rc.N) must sort before the final X.Y.Z in apt and dnf, and RPM
       # rejects the '-' that Tauri would write. The .deb gets X.Y.Z~rc.N (scripts/deb-set-version.sh).
@@ -485,7 +494,8 @@ jobs:
         env:
           # Windows links vcpkg's libvpx; the other systems build the version in the script.
           LIBVPX_VERSION: ${{ runner.os == 'Windows' && steps.libvpx.outputs.version || '' }}
-        run: scripts/sbom-native.sh "$LIBVPX_VERSION" > "sbom-native-${{ matrix.name }}.txt"
+          NAME: ${{ matrix.name }}
+        run: scripts/sbom-native.sh "$LIBVPX_VERSION" > "sbom-native-$NAME.txt"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: inputs.release
@@ -496,24 +506,52 @@ jobs:
 
       - name: Collect artifact
         shell: bash
+        env:
+          BUNDLE: ${{ matrix.bundle }}
+          VERSION: ${{ inputs.version }}
+          ARCH: ${{ matrix.arch }}
+          # A boolean input stringifies as "true" or "false"; pin that here so an empty value
+          # cannot look like a release.
+          RELEASE: ${{ inputs.release && 'true' || 'false' }}
+          SHA: ${{ github.sha }}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           mkdir out
-          cp ${{ matrix.bundle }} out/
+          # Each word of BUNDLE is one glob. Split first with globbing off, then expand each
+          # word. The value is not parsed as shell syntax (no $(...), no quotes). Quoting
+          # "$BUNDLE" would copy nothing, because the packages are selected by those globs.
+          shopt -s nullglob
+          # read splits on spaces. It does not glob and does not re-parse the value as shell.
+          read -r -a bundle_globs <<< "$BUNDLE"
+          for glob in "${bundle_globs[@]}"; do
+            matched=0
+            # shellcheck disable=SC2086
+            for file in $glob; do
+              cp "$file" out/
+              matched=1
+            done
+            if [[ "$matched" -eq 0 ]]; then
+              echo "no file matched $glob" >&2
+              exit 1
+            fi
+          done
           # The in-app updater swaps the whole app from this archive (issue #168); the release job
           # signs it. COPYFILE_DISABLE keeps macOS metadata files out of the archive.
-          if [[ "$RUNNER_OS" == macOS && "${{ inputs.release }}" == "true" ]]; then
-            COPYFILE_DISABLE=1 tar -czf "out/Mumcord_${{ inputs.version }}_${{ matrix.arch }}.app.tar.gz" \
+          if [[ "$RUNNER_OS" == macOS && "$RELEASE" == "true" ]]; then
+            COPYFILE_DISABLE=1 tar -czf "out/Mumcord_${VERSION}_${ARCH}.app.tar.gz" \
               -C target/release/bundle/macos Mumcord.app
           fi
           # Tells the release job to describe the DMG as signed and notarized.
           if [[ "${MUMCORD_MACOS_SIGNED:-}" == "true" ]]; then touch out/MACOS-SIGNED; fi
           if [[ "${MUMCORD_WINDOWS_SIGNED:-}" == "true" ]]; then touch out/WINDOWS-SIGNED; fi
           # Releases carry this note in the release text instead.
-          if [[ "${{ inputs.release }}" == "true" ]]; then ls -l out; exit 0; fi
+          if [[ "$RELEASE" == "true" ]]; then ls -l out; exit 0; fi
           cat > out/UNSIGNED-TEST-BUILD.txt <<EOF
           Mumcord unsigned test build
-          Commit: ${{ github.sha }}
-          Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Commit: $SHA
+          Workflow run: $SERVER_URL/$REPOSITORY/actions/runs/$RUN_ID
 
           This build is not signed. Windows (SmartScreen) and macOS (Gatekeeper) show a security
           warning on first launch. For testing only; not a release.
@@ -528,10 +566,11 @@ jobs:
           retention-days: ${{ inputs.release && 7 || 14 }}
 
   # FreeBSD 15.x amd64 in a VM on a Linux runner (spec 13 §10): the .pkg is built with the repo's
-  # own script and smoke-tested against a local mumble-server from the package collection. Its job
-  # is separate from the matrix because the build runs inside the VM, not on the runner.
+  # own script, installed with pkg add, checked for undeclared runtime dependencies, then
+  # smoke-tested under Xvfb against a local packaged mumble-server (including the release version).
+  # Build and smoke run in the same VM; any failure blocks the release and artifact upload.
   freebsd:
-    name: Build FreeBSD package
+    name: Build and smoke FreeBSD package
     if: inputs.release
     runs-on: ubuntu-24.04
     timeout-minutes: 120
@@ -543,11 +582,16 @@ jobs:
         with:
           name: third-party-notices
 
-      - name: Build the package in a FreeBSD VM
+      - name: Build and smoke the package in a FreeBSD VM
         uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
+        env:
+          MUMCORD_VERSION: ${{ inputs.version }}
         with:
           release: "15.1"
           usesh: true
+          # vmactions forwards only GITHUB_*, CI, and the names listed here. The run script
+          # below reads $MUMCORD_VERSION; it does not interpolate the version itself.
+          envs: MUMCORD_VERSION
           # 8 GB RAM and four cores: `cargo build --release` needs both (spec 13 §10).
           mem: 8192
           cpu: 4
@@ -558,14 +602,16 @@ jobs:
             pkg install -y git bash rust node24 npm protobuf python3 pkgconf cmake gmake ca_root_nss \
               alsa-lib alsa-plugins libvpx svt-av1 dav1d gstreamer1-libav \
               gstreamer1-plugins-vpx gstreamer1-plugins-opus webkit2-gtk_41 gtk3 \
-              libayatana-appindicator
+              libayatana-appindicator mumble-server xorg-vfbserver xdpyinfo dbus
           run: |
             set -e
             export PATH="$HOME/.cargo/bin:$PATH"
             export CARGO_BUILD_JOBS=4
+            # MUMCORD_VERSION is forwarded by this step's `envs` input. Without it the
+            # installed app reports a development build.
             # Called through bash: the script's "#!/bin/bash" does not exist on FreeBSD, where
             # bash lives in /usr/local/bin.
-            bash scripts/set-version.sh "${{ inputs.version }}"
+            bash scripts/set-version.sh "$MUMCORD_VERSION"
             # The version stamp goes into the binary, so no cargo cache is reused across versions.
             npm ci
             npm run build
@@ -573,6 +619,9 @@ jobs:
             # The native libraries this build ships, for the SBOM job (scripts/generate-sbom.sh).
             scripts/sbom-native.sh > sbom-native-freebsd.txt
             ls -l dist-freebsd/ sbom-native-freebsd.txt
+            CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml
+            bash scripts/smoke/freebsd.sh "$PWD/dist-freebsd/mumcord-${MUMCORD_VERSION}.pkg" \
+              "$MUMCORD_VERSION" "$PWD/target/release/mumcord-smoke-seed" "$PWD/target/release/mumcord-smoke-observe"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -582,9 +631,11 @@ jobs:
 
       - name: Collect artifact
         shell: bash
+        env:
+          WORKSPACE: ${{ github.workspace }}
         run: |
           mkdir -p out
-          cp "${{ github.workspace }}/dist-freebsd/"*.pkg out/
+          cp "$WORKSPACE"/dist-freebsd/*.pkg out/
           ls -l out
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -768,7 +819,9 @@ jobs:
           key: mumbot-${{ matrix.mumbot }}-${{ hashFiles('scripts/mumbot.env') }}
 
       - name: Fetch mumbot
-        run: scripts/fetch-mumbot.sh ${{ matrix.mumbot }} "$RUNNER_TEMP/mumbot"
+        env:
+          MUMBOT: ${{ matrix.mumbot }}
+        run: scripts/fetch-mumbot.sh "$MUMBOT" "$RUNNER_TEMP/mumbot"
 
       - if: steps.mumbot-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -937,6 +990,9 @@ jobs:
 
       - name: Smoke test (macOS)
         if: runner.os == 'macOS'
+        env:
+          ARCH: ${{ matrix.arch }}
+          MAC_SERVER: ${{ steps.mac-server.outcome }}
         run: |
           dmg=$(ls build/*.dmg)
           mount=$(hdiutil attach -nobrowse -readonly "$dmg" | awk -F'\t' '/\/Volumes\//{print $NF}')
@@ -945,14 +1001,14 @@ jobs:
           # Each DMG holds exactly its own architecture: the runner's (uname -m), for the app and
           # for ONNX Runtime (camera background effects) in the app's Frameworks, signed with the
           # app (Developer ID in a signed build, ad hoc otherwise).
-          [[ "$(uname -m)" == "${{ matrix.arch }}" ]] \
-            || { echo "runner is $(uname -m), expected ${{ matrix.arch }}" >&2; exit 1; }
+          [[ "$(uname -m)" == "$ARCH" ]] \
+            || { echo "runner is $(uname -m), expected $ARCH" >&2; exit 1; }
           ort=/Applications/Mumcord.app/Contents/Frameworks/libonnxruntime.1.23.2.dylib
           exe=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' /Applications/Mumcord.app/Contents/Info.plist)
           for bin in "/Applications/Mumcord.app/Contents/MacOS/$exe" "$ort"; do
             archs=$(lipo -archs "$bin")
-            [[ "$archs" == "${{ matrix.arch }}" ]] \
-              || { echo "$bin has architectures '$archs', expected only ${{ matrix.arch }}" >&2; exit 1; }
+            [[ "$archs" == "$ARCH" ]] \
+              || { echo "$bin has architectures '$archs', expected only $ARCH" >&2; exit 1; }
           done
           codesign --verify --strict --verbose=2 "$ort"
           if [[ -e build/MACOS-SIGNED ]]; then
@@ -961,7 +1017,7 @@ jobs:
               || { echo "ONNX Runtime is not signed by the app's team" >&2; exit 1; }
           fi
           python3 -I scripts/smoke/check-onnxruntime.py "$ort"
-          if [[ "${{ steps.mac-server.outcome }}" == "success" ]]; then
+          if [[ "$MAC_SERVER" == "success" ]]; then
             scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot "$RUNNER_TEMP/mumbot/mumbot"
           else
             echo "::warning::No Mumble server on macOS – start-only check; 'connects' is a manual checklist item (AC-1.30)."
