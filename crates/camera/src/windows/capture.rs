@@ -7,7 +7,6 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, SyncSender};
 use std::thread::JoinHandle;
-use std::time::Duration;
 
 use ::windows::Win32::Media::MediaFoundation::{
     IMF2DBuffer2, IMFMediaBuffer, IMFMediaSource, IMFMediaType, IMFSample, IMFSourceReader,
@@ -20,7 +19,7 @@ use ::windows::Win32::Media::MediaFoundation::{
 };
 use ::windows::core::{HSTRING, Interface};
 
-use super::bounded::run_bounded;
+use super::bounded::{STOP_TIMEOUT, run_bounded};
 use super::com::{Com, MediaFoundation, mf_error, video_capture_attributes};
 use super::media_type::{self, raw, tight_stride};
 use crate::mode::{self, Geometry, Mode, PixelFormat};
@@ -35,9 +34,6 @@ pub(super) const UNREADABLE: Raw<'static> = Raw::Packed {
     data: &[],
     stride: 0,
 };
-
-/// How long a stop waits for the capture thread. Stopping normally takes a few milliseconds.
-const STOP_TIMEOUT: Duration = Duration::from_secs(2);
 
 /// The camera's media source, kept by the session to stop a `ReadSample` that waits.
 struct Source(IMFMediaSource);
@@ -105,9 +101,7 @@ impl Session {
 impl Drop for Session {
     fn drop(&mut self) {
         self.stop.store(true, Ordering::Release);
-        let Some(thread) = self.thread.take() else {
-            return;
-        };
+        let thread = self.thread.take();
         let source = Source(self.source.0.clone());
         // A camera that opened but never delivered a picture can leave `ReadSample` waiting
         // even after the shutdown, and the shutdown itself can wait on the driver. Both run on
@@ -115,7 +109,9 @@ impl Drop for Session {
         let stopped = run_bounded("camera-mf-stop", STOP_TIMEOUT, move || {
             let _com = Com::init();
             source.shutdown();
-            join(thread);
+            if let Some(thread) = thread {
+                join(thread);
+            }
             // Released while COM is still initialised on this thread.
             drop(source);
         });

@@ -7,6 +7,10 @@
 use std::sync::mpsc;
 use std::time::Duration;
 
+/// How long a stop waits for the capture thread. Stopping normally takes a few milliseconds.
+#[cfg(windows)]
+pub(super) const STOP_TIMEOUT: Duration = Duration::from_secs(2);
+
 /// Runs `stop` on a thread named `name` and waits at most `limit` for it. Returns whether it
 /// finished; if not, the thread is left behind and ends whenever `stop` returns.
 pub(super) fn run_bounded(
