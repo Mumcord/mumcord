@@ -168,12 +168,16 @@ screen-capture = [
 ]
 # Import from the official Mumble client (issue #66).
 mumble-import = ["dep:plist", "dep:rusqlite", "dep:windows-registry"]
-# Stream codecs, one C library or encoder family each (see crates/screenshare).
-vp9 = ["mumcord-screenshare/vp9"]
-av1-decode = ["mumcord-screenshare/av1-decode"]
+# Stream codecs, one C library or encoder family each (hwcodec's features). All three together
+# are hwcodec's full default set; `screen_share/codecs.rs` opens the codecs a build may lack.
+vp9 = ["hwcodec/libvpx"]
+av1-decode = ["hwcodec/dav1d"]
 desktop-codecs = [
-    "mumcord-screenshare/av1-encode",
-    "mumcord-screenshare/hw-encode",
+    "hwcodec/svt-av1",
+    "hwcodec/nvenc",
+    "hwcodec/amf",
+    "hwcodec/qsv",
+    "hwcodec/vaapi",
     "dep:windows-registry",
 ]
 # Env-selected file/null audio backend for headless tests and E2E; never in release builds.
