@@ -88,8 +88,9 @@ fn policy() -> libc::c_int {
 fn child(idle: Duration) -> ! {
     limit_realtime_cpu_time();
     install_webkit_style_handler();
-    // What the app does to protect itself.
+    // What the app does to protect itself, after the web view (and its handler) exists.
     mumcord_audio::rt::keep_overrun_headroom();
+    mumcord_audio::rt::guard_foreign_threads();
 
     let policy = std::thread::Builder::new()
         .name("ReceiveQueue".to_owned())
