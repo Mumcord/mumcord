@@ -19,7 +19,9 @@
 //!
 //! # Backends
 //!
-//! The real backend is `cpal`. With the `test-backend` cargo feature, the
+//! The device backend is `cpal` (desktop targets only). [`BackendKind::External`] is fed by the
+//! embedding app instead and exists on every target; phones have nothing else (see
+//! [`external`]). With the `test-backend` cargo feature, the
 //! environment variable `MUMCORD_AUDIO_BACKEND` selects a replacement for
 //! headless tests and E2E runs (see [`BackendKind::from_env`]):
 //!
@@ -33,8 +35,11 @@
 //!   48 kHz stereo 16-bit (left and right kept apart, for positional audio checks).
 
 mod controller;
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod cpal_backend;
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod devices;
+mod external;
 mod frames;
 mod resample;
 mod ring;
@@ -46,6 +51,10 @@ mod test_backend;
 use std::path::PathBuf;
 
 pub use controller::{AudioHandles, AudioIo};
+pub use external::{
+    EXTERNAL_DEVICE_ID, ExternalAudio, ExternalCapture, ExternalFormat, ExternalPlayback,
+    MAX_BLOCK_MS, STALL, external,
+};
 pub use frames::{FrameSink, FrameSource};
 #[cfg(any(test, feature = "test-backend"))]
 pub use test_backend::input_opens;
@@ -152,13 +161,19 @@ pub enum IoError {
     ControlThreadGone,
     #[error("audio control thread is not responding")]
     ControlThreadStalled,
+    /// Phones have no device backend: the app has to feed audio ([`BackendKind::External`]).
+    #[error("no audio backend: on this platform the app has to supply the audio")]
+    NoBackend,
 }
 
 /// Which audio backend to run.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BackendKind {
     /// Real devices via cpal.
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     Cpal,
+    /// Capture and playback are done by the embedding app (see [`external`]).
+    External(ExternalAudio),
     /// Silence in, output discarded.
     #[cfg(any(test, feature = "test-backend"))]
     Null { period_frames: u32 },
@@ -171,19 +186,19 @@ pub enum BackendKind {
 }
 
 impl BackendKind {
-    /// Reads [`BACKEND_ENV`]. Unset, empty or `cpal` selects real devices.
-    /// Test values are rejected in builds without the `test-backend` feature
-    /// rather than silently using real devices.
+    /// Reads [`BACKEND_ENV`]. Unset, empty or `cpal` selects real devices; on phones, which
+    /// have none, that is [`IoError::NoBackend`]. Test values are rejected in builds without
+    /// the `test-backend` feature rather than silently using real devices.
     pub fn from_env() -> Result<Self, IoError> {
-        match std::env::var(BACKEND_ENV) {
-            Ok(value) => Self::parse(&value),
-            Err(_) => Ok(BackendKind::Cpal),
-        }
+        Self::parse(&std::env::var(BACKEND_ENV).unwrap_or_default())
     }
 
     fn parse(value: &str) -> Result<Self, IoError> {
         match value {
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
             "" | "cpal" => Ok(BackendKind::Cpal),
+            #[cfg(any(target_os = "android", target_os = "ios"))]
+            "" => Err(IoError::NoBackend),
             #[cfg(any(test, feature = "test-backend"))]
             "null" => Ok(BackendKind::Null {
                 period_frames: test_backend::DEFAULT_PERIOD_FRAMES,

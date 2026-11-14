@@ -20,17 +20,20 @@ use mumcord_store::{
 use super::channel_audio::effective_settings;
 use super::machine::{CertCheck, Failure, check_cert, format_fingerprint};
 use super::{
-    CertificateState, IdentityView, PasswordChange, ServerFields, ServerTestInput, ServerView,
-    TestConnectionView,
+    CertificateState, EchoCancellationMode, IdentityView, PasswordChange, ServerFields,
+    ServerTestInput, ServerView, TestConnectionView,
 };
 use super::{Engine, EngineError, EngineResult, ErrorKind, lock, store_error};
 
 /// Upper bound for a test connection, from TCP connect to the ping answer.
 const TEST_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
 
-/// Applies the DSP switches and talk mode of `settings`.
-pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
-    controls.set_echo_cancellation(settings.echo_cancellation);
+/// Applies the DSP switches and talk mode of `settings`. With [`EchoCancellationMode::System`]
+/// the engine's echo canceller stays off whatever the setting says: two cancellers in a row
+/// distort the voice.
+pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings, echo: EchoCancellationMode) {
+    controls
+        .set_echo_cancellation(echo == EchoCancellationMode::Engine && settings.echo_cancellation);
     controls.set_noise_suppression(settings.noise_suppression);
     // The backend is built here, on the settings thread, never in the audio path. Every choice is
     // a plain level without its own options, so `sonora-ns` (Light) runs at one fixed strength:
@@ -777,7 +780,11 @@ impl Engine {
             let profile = core.channel_audio.map(|a| a.profile);
             let before = effective_settings(&previous, profile.as_ref());
             let after = effective_settings(&settings, profile.as_ref());
-            apply_dsp(&self.inner.controls, &after);
+            apply_dsp(
+                &self.inner.controls,
+                &after,
+                self.inner.echo_cancellation_mode(),
+            );
             if before.low_latency != after.low_latency {
                 core.set_low_latency(after.low_latency);
             }
@@ -965,11 +972,36 @@ mod tests {
         assert!(validated(&zero).is_err());
     }
 
+    /// The phone system cancels the echo (FR-5.25): the engine's canceller stays off, noise
+    /// suppression and automatic gain follow the settings as on desktop.
+    #[test]
+    fn system_echo_cancellation_keeps_the_engine_canceller_off() {
+        let controls = DspControls::default();
+        let settings = Settings::default();
+        assert!(settings.echo_cancellation);
+        apply_dsp(&controls, &settings, EchoCancellationMode::Engine);
+        assert!(controls.echo_cancellation());
+        apply_dsp(&controls, &settings, EchoCancellationMode::System);
+        assert!(!controls.echo_cancellation());
+        assert!(controls.noise_suppression() && controls.auto_gain());
+        let quiet = Settings {
+            noise_suppression: false,
+            auto_gain: false,
+            ..settings
+        };
+        apply_dsp(&controls, &quiet, EchoCancellationMode::System);
+        assert!(!controls.noise_suppression() && !controls.auto_gain());
+    }
+
     /// The Settings choices (FR-3.65) select their libraries; Light runs at its fixed strength.
     #[test]
     fn each_noise_choice_selects_its_backend() {
         let controls = DspControls::default();
-        apply_dsp(&controls, &Settings::default());
+        apply_dsp(
+            &controls,
+            &Settings::default(),
+            EchoCancellationMode::Engine,
+        );
         assert_eq!(controls.noise_backend(), DspBackend::Nnnoiseless);
 
         for (choice, backend) in [
@@ -981,7 +1013,7 @@ mod tests {
                 noise_suppression_backend: choice,
                 ..Settings::default()
             };
-            apply_dsp(&controls, &settings);
+            apply_dsp(&controls, &settings, EchoCancellationMode::Engine);
             assert_eq!(controls.noise_backend(), backend);
         }
         assert_eq!(controls.suppression_level(), DspSuppressionLevel::Moderate);

@@ -21,7 +21,8 @@ use mumcord_audio::codec::{
 };
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
 use mumcord_audio::io::{
-    AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource, IoError, IoStats,
+    AudioIo, BackendKind, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource, IoError,
+    IoStats,
 };
 use mumcord_audio::mixer::share::ShareGain;
 use mumcord_audio::mixer::{
@@ -131,11 +132,13 @@ pub(crate) struct Audio {
 
 impl Audio {
     pub fn start(
+        backend: Result<BackendKind, IoError>,
         input: Option<String>,
         output: Option<String>,
         events: Events,
     ) -> EngineResult<Self> {
-        let handles = AudioIo::start(input, output)
+        let handles = backend
+            .and_then(|kind| AudioIo::start_with(kind, input, output))
             .map_err(|e| EngineError::internal(format!("audio: {e}")))?;
         let io = Arc::new(handles.io);
         let weak = Arc::downgrade(&io);
@@ -233,8 +236,9 @@ fn device_list(io: &AudioIo) -> EngineResult<AudioDeviceList> {
 }
 
 /// The device list while no audio runs, without opening any stream.
-pub fn idle_device_list() -> EngineResult<AudioDeviceList> {
-    device_list_with(AudioIo::list_devices)
+pub fn idle_device_list(backend: Result<BackendKind, IoError>) -> EngineResult<AudioDeviceList> {
+    let kind = backend.map_err(|e| EngineError::internal(format!("audio devices: {e}")))?;
+    device_list_with(|direction| AudioIo::list_devices_with(kind.clone(), direction))
 }
 
 fn device_list_with(

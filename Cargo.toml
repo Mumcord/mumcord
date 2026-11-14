@@ -103,6 +103,9 @@ rsa = { version = "0.10", default-features = false, features = ["std", "getrando
 # Both options are desktop-only and therefore switched on per target in crates/audio, not here:
 # Android and iOS get neither.
 cpal = "0.18"
+# The sample conversion traits cpal uses, for the audio callbacks of the platform-fed backend,
+# which exists without cpal on Android and iOS.
+dasp_sample = "0.11"
 # The same request for Mumcord's own capture and playback threads (`with_dbus`, also switched on
 # in crates/audio for the desktop targets only).
 audio_thread_priority = { version = "0.35", default-features = false }

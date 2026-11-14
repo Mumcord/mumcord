@@ -38,7 +38,7 @@ use mumcord_audio::bitrate::{
     BitrateController, LinkStats as BitrateStats, Transport as BitrateTransport,
 };
 use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase as DspPhase};
-use mumcord_audio::io::{AudioIo, DeviceMigration, Direction};
+use mumcord_audio::io::{AudioIo, BackendKind, DeviceMigration, Direction, ExternalAudio, IoError};
 use mumcord_audio::mixer::PacketSender;
 use mumcord_store::{Identity, IdentityId, OwnVoice, SavedServer, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
@@ -224,6 +224,10 @@ struct Inner {
     audio_start: tokio::sync::Mutex<()>,
     /// Saved device choices were checked against the current device list (issue #183).
     audio_devices_migrated: std::sync::Once,
+    /// Audio supplied by the embedding app instead of audio devices (phones, Epic 5).
+    external_audio: Option<ExternalAudio>,
+    /// Bitrate limit in kbit/s set at runtime by the app; 0 is none (FR-5.26).
+    bitrate_limit_kbps: AtomicU32,
     events: Events,
     controls: Arc<DspControls>,
     meter: Arc<Meter>,
@@ -546,6 +550,29 @@ impl Engine {
         secrets: SecretStore,
         rt: Runtime,
     ) -> EngineResult<(Self, EventReceiver)> {
+        Self::open(data_dir, secrets, rt, None)
+    }
+
+    /// Like [`new`](Self::new), but the embedding app captures and plays the audio itself and
+    /// moves it through the endpoints of [`mumcord_audio::io::external`] (phones, Epic 5: only
+    /// the system's voice-communication session gives echo cancellation and call routing).
+    /// The engine's own echo canceller stays off, see
+    /// [`echo_cancellation_mode`](Self::echo_cancellation_mode).
+    pub fn with_external_audio(
+        data_dir: &Path,
+        secrets: SecretStore,
+        rt: Runtime,
+        audio: ExternalAudio,
+    ) -> EngineResult<(Self, EventReceiver)> {
+        Self::open(data_dir, secrets, rt, Some(audio))
+    }
+
+    fn open(
+        data_dir: &Path,
+        secrets: SecretStore,
+        rt: Runtime,
+        external_audio: Option<ExternalAudio>,
+    ) -> EngineResult<(Self, EventReceiver)> {
         std::fs::create_dir_all(data_dir).map_err(|e| {
             EngineError::new(
                 ErrorKind::Io,
@@ -578,7 +605,12 @@ impl Engine {
         // `mumcord-codec` cannot carry the rnnoise-rs git dependency, so the engine supplies the
         // implementation for that backend.
         noise_backend::register(&controls);
-        local::apply_dsp(&controls, &settings);
+        let echo = if external_audio.is_some() {
+            EchoCancellationMode::System
+        } else {
+            EchoCancellationMode::Engine
+        };
+        local::apply_dsp(&controls, &settings, echo);
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let voice = Arc::new(VoiceShared::default());
@@ -591,6 +623,8 @@ impl Engine {
             secrets: Arc::new(secrets),
             audio_start: tokio::sync::Mutex::new(()),
             audio_devices_migrated: std::sync::Once::new(),
+            external_audio,
+            bitrate_limit_kbps: AtomicU32::new(0),
             events,
             controls,
             meter,
@@ -1610,6 +1644,23 @@ impl Engine {
         Some(self.inner.voice.bitrate_max_bps.load(Ordering::Relaxed)).filter(|&b| b > 0)
     }
 
+    /// Who cancels echo: the engine (the `echo_cancellation` setting applies) or the system,
+    /// when the app supplies the audio. A settings screen shows "handled by the system" for the
+    /// latter instead of a switch that would do nothing.
+    pub fn echo_cancellation_mode(&self) -> EchoCancellationMode {
+        self.inner.echo_cancellation_mode()
+    }
+
+    /// Limits the voice bitrate at runtime, in kbit/s; `None` lifts the limit. It is not
+    /// stored and applies on top of the user's own cap (the lower one wins), so the server's
+    /// maximum and the automatic bitrate keep working below it. For "Reduced voice quality" on
+    /// mobile data (FR-5.26): 24 while on mobile data. Takes effect within a second.
+    pub fn set_bitrate_limit_kbps(&self, kbps: Option<u32>) {
+        self.inner
+            .bitrate_limit_kbps
+            .store(kbps.unwrap_or(0), Ordering::Relaxed);
+    }
+
     /// Lists devices. Without a connection or mic test no stream is opened for it: opening the
     /// microphone just to list it made macOS ask for microphone access on every device-picker
     /// screen.
@@ -1624,7 +1675,7 @@ impl Engine {
                         return audio.devices();
                     }
                 }
-                voice::idle_device_list()
+                voice::idle_device_list(inner.audio_backend())
             })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
@@ -1737,7 +1788,9 @@ impl Engine {
                 .audio
                 .as_ref()
                 .map(|audio| audio.io().devices(direction));
-            let devices = running.unwrap_or_else(|| AudioIo::list_devices(direction));
+            let devices = running.unwrap_or_else(|| {
+                AudioIo::list_devices_with(self.inner.audio_backend()?, direction)
+            });
             match devices {
                 Ok(devices) => {
                     info.audio_devices.extend(devices.into_iter().map(|d| {
@@ -1796,9 +1849,31 @@ impl Inner {
         }
     }
 
-    /// The user's own bitrate cap in bits per second; `None` is "Max" (FR-2.64).
+    /// The bitrate cap in bits per second: the lower of the user's own cap (FR-2.64) and the
+    /// app's runtime limit (FR-5.26); `None` is "Max".
     fn user_cap_bps(&self) -> Option<u32> {
-        self.controls.bitrate_cap_kbps().map(|k| k * 1000)
+        let limit = Some(self.bitrate_limit_kbps.load(Ordering::Relaxed)).filter(|&k| k > 0);
+        let cap = match (self.controls.bitrate_cap_kbps(), limit) {
+            (Some(own), Some(limit)) => Some(own.min(limit)),
+            (own, limit) => own.or(limit),
+        };
+        cap.map(|k| k.saturating_mul(1000))
+    }
+
+    /// The audio backend this engine runs on: the app's, or the device backend.
+    fn audio_backend(&self) -> Result<BackendKind, IoError> {
+        match &self.external_audio {
+            Some(audio) => Ok(BackendKind::External(audio.clone())),
+            None => BackendKind::from_env(),
+        }
+    }
+
+    pub(crate) fn echo_cancellation_mode(&self) -> EchoCancellationMode {
+        if self.external_audio.is_some() {
+            EchoCancellationMode::System
+        } else {
+            EchoCancellationMode::Engine
+        }
     }
 
     /// Stores the slider maximum for `bitrate_max` and reports a change.
@@ -3458,6 +3533,10 @@ impl Inner {
     /// the devices; a choice that cannot be mapped is reset to the system default, and the
     /// notice tells the user.
     pub(crate) fn migrate_audio_devices(&self) {
+        // The app's audio has one logical device; saved ids are not used with it.
+        if self.external_audio.is_some() {
+            return;
+        }
         self.audio_devices_migrated.call_once(|| {
             let store = lock(&self.store);
             let mut settings = match store.settings() {
@@ -3504,10 +3583,16 @@ impl Inner {
         self.migrate_audio_devices();
         let settings = lock(&self.store).settings().map_err(store_error)?;
         let events = self.events.clone();
+        let backend = self.audio_backend();
         let audio = self
             .rt
             .spawn_blocking(move || {
-                let audio = Audio::start(settings.input_device, settings.output_device, events)?;
+                let audio = Audio::start(
+                    backend,
+                    settings.input_device,
+                    settings.output_device,
+                    events,
+                )?;
                 audio.set_output_volume_percent(settings.output_volume_percent);
                 Ok::<_, EngineError>(audio)
             })

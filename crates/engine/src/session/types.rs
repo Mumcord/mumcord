@@ -80,6 +80,16 @@ impl std::error::Error for EngineError {}
 
 pub type EngineResult<T> = Result<T, EngineError>;
 
+/// Who cancels the echo of the speakers in the microphone signal.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EchoCancellationMode {
+    /// The engine's own echo canceller, switched by the `echo_cancellation` setting.
+    Engine,
+    /// The system's voice processing does it (audio supplied by the app, Epic 5 FR-5.25): the
+    /// engine's canceller stays off and the `echo_cancellation` setting has no effect.
+    System,
+}
+
 /// Connection state machine of spec §7.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ConnState {

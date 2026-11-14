@@ -88,7 +88,7 @@ impl Inner {
         let before = effective_settings(&global, core.channel_audio.as_ref().map(|a| &a.profile));
         let after = effective_settings(&global, target.as_ref().map(|a| &a.profile));
         core.channel_audio = target;
-        local::apply_dsp(&self.controls, &after);
+        local::apply_dsp(&self.controls, &after, self.echo_cancellation_mode());
         if before.low_latency != after.low_latency {
             core.set_low_latency(after.low_latency);
         }
@@ -193,6 +193,7 @@ impl Engine {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::session::EchoCancellationMode;
     use mumcord_audio::dsp::DspControls;
 
     const MUSIC: ChannelAudioProfile = ChannelAudioProfile {
@@ -260,15 +261,27 @@ mod tests {
     fn joining_applies_and_leaving_restores_the_global_controls() {
         let controls = DspControls::default();
         let global = global();
-        local::apply_dsp(&controls, &effective_settings(&global, None));
+        local::apply_dsp(
+            &controls,
+            &effective_settings(&global, None),
+            EchoCancellationMode::Engine,
+        );
         assert!(!controls.music_quality());
         assert_eq!(controls.bitrate_cap_kbps(), Some(96));
 
-        local::apply_dsp(&controls, &effective_settings(&global, Some(&MUSIC)));
+        local::apply_dsp(
+            &controls,
+            &effective_settings(&global, Some(&MUSIC)),
+            EchoCancellationMode::Engine,
+        );
         assert!(controls.music_quality());
         assert_eq!(controls.bitrate_cap_kbps(), Some(256));
 
-        local::apply_dsp(&controls, &effective_settings(&global, None));
+        local::apply_dsp(
+            &controls,
+            &effective_settings(&global, None),
+            EchoCancellationMode::Engine,
+        );
         assert!(!controls.music_quality());
         assert_eq!(controls.bitrate_cap_kbps(), Some(96));
     }

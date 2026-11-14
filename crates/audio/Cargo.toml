@@ -15,7 +15,7 @@ license.workspace = true
 
 [dependencies]
 mumcord-codec.workspace = true
-cpal.workspace = true
+dasp_sample.workspace = true
 rtrb.workspace = true
 rubato.workspace = true
 thiserror.workspace = true
@@ -31,7 +31,8 @@ hound.workspace = true
 
 # Real-time scheduling for the device threads (cpal) and Mumcord's own audio threads (issue
 # #123): rtkit over D-Bus on Linux, MMCSS on Windows. Desktop only: on Android and iOS the audio
-# I/O and its thread priority come from the platform-fed backend (Epic 5, task 3.1).
+# I/O and its thread priority come from the platform-fed backend (Epic 5, task 3.1), so cpal and
+# the platform audio libraries it links are not built for them at all.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 cpal = { workspace = true, features = ["realtime-dbus"] }
 audio_thread_priority = { workspace = true, features = ["with_dbus"] }
