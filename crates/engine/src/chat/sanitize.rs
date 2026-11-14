@@ -231,6 +231,43 @@ mod tests {
     }
 
     #[test]
+    fn rejects_svg_mathml_mutation_xss() {
+        // RUSTSEC-2026-0533 / upstream PR #269: removing a namespace root must not
+        // turn foreign content into executable HTML, including after reparsing.
+        for tag in [
+            "title",
+            "textarea",
+            "xmp",
+            "iframe",
+            "noembed",
+            "noframes",
+            "plaintext",
+            "noscript",
+            "style",
+            "script",
+        ] {
+            for prefix in ["<svg><foreignObject><math>", "<math><mi><svg>"] {
+                let payload = format!("{prefix}<{tag}><!--</{tag}><img src onerror=alert(1)>-->");
+                for sanitize in [sanitize_html, sanitize_message_html] {
+                    let clean = sanitize(&payload);
+                    for forbidden in [
+                        "<svg",
+                        "<foreignObject",
+                        "<math",
+                        "<mi",
+                        "<!--",
+                        "onerror",
+                        &format!("<{tag}"),
+                    ] {
+                        assert!(!clean.contains(forbidden), "{payload}: {clean}");
+                    }
+                    assert_eq!(sanitize(&clean), clean, "{payload}");
+                }
+            }
+        }
+    }
+
+    #[test]
     fn drops_external_and_non_image_sources() {
         for src in [
             "https://tracker.example/pixel.png",

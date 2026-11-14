@@ -12,6 +12,7 @@
 
 ### Security
 
+- Require patched `ammonia 4.2.5` or newer to address the SVG/MathML mutation-XSS advisory RUSTSEC-2026-0533, with regression tests for chat HTML and plugin SVG assets; existing sanitization allow-lists remain unchanged (issue #819)
 - Upgrade the RSA identity-key generator to the patched `rsa 0.10` release and remove the accepted Marvin timing-attack advisory (issue #131). Existing identities and Mumble-compatible RSA-2048 certificates remain unchanged; certificate signing and TLS still use ring
 
 ## [0.8.0] - 2026-11-12

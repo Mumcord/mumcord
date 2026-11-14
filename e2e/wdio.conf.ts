@@ -2,8 +2,17 @@ import { globSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { browser } from "@wdio/globals";
-import { capabilities, driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
+import {
+  capabilities,
+  driverPort,
+  prepareFresh,
+  profile,
+  stopDriver,
+  withTimeout,
+  type AppId,
+} from "./helpers/app.ts";
 import { browserB, browserC, runningB, runningC, stopB, stopC } from "./helpers/apps.ts";
+import { saveFailureLogs } from "./helpers/failure-logs.ts";
 import { netsim, relayenv } from "./helpers/index.ts";
 import { artifactsDir } from "./helpers/paths.ts";
 
@@ -95,10 +104,10 @@ export const config: WebdriverIO.Config = {
     const name = `${test.parent} ${test.title}`.replace(/[^\w-]+/g, "_").slice(0, 120);
     // Best effort: after a hang the session may be dead, and every command would wait for
     // connectionRetryTimeout.
-    const sessions: [string, WebdriverIO.Browser][] = [[name, browser]];
-    if (runningB()) sessions.push([`${name}-B`, browserB()]);
-    if (runningC()) sessions.push([`${name}-C`, browserC()]);
-    for (const [file, session] of sessions) {
+    const sessions: [string, WebdriverIO.Browser, AppId][] = [[name, browser, "a"]];
+    if (runningB()) sessions.push([`${name}-B`, browserB(), "b"]);
+    if (runningC()) sessions.push([`${name}-C`, browserC(), "c"]);
+    for (const [file, session, id] of sessions) {
       try {
         await withTimeout(
           session.saveScreenshot(join(artifactsDir, `${file}.png`)),
@@ -111,6 +120,11 @@ export const config: WebdriverIO.Config = {
         );
       } catch (e) {
         console.warn(`[e2e] no failure screenshot/page source for ${file}: ${String(e)}`);
+      }
+      try {
+        saveFailureLogs(profile(id), artifactsDir, file);
+      } catch (e) {
+        console.warn(`[e2e] no diagnostic logs for ${file}: ${String(e)}`);
       }
     }
   },
