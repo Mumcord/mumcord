@@ -12,7 +12,7 @@
 
 use std::ffi::CStr;
 use std::sync::Mutex;
-use std::sync::mpsc;
+use std::sync::mpsc::{self, Receiver, TryRecvError};
 use std::time::Duration;
 
 use futures::executor::block_on;
@@ -26,6 +26,10 @@ use super::devices::ServerNode;
 /// The PulseAudio handshake has no socket timeout of its own.
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(2);
 
+/// How long the sound server may take to answer a device query. Its requests have no timeout
+/// either, and a server that stopped answering would hold the control thread forever.
+const QUERY_TIMEOUT: Duration = Duration::from_secs(2);
+
 /// Prefix of cpal's PipeWire device ids, so a listed id opens through cpal unchanged.
 pub(crate) const ID_PREFIX: &str = "pipewire:";
 
@@ -34,7 +38,58 @@ const ALSA_CARD_ID: &CStr = c"alsa.id";
 
 /// A connection to the sound server, reopened when the server restarts.
 pub(crate) struct SoundServer {
-    client: Mutex<Client>,
+    connection: Mutex<Connection>,
+}
+
+struct Connection {
+    client: Client,
+    helper: Helper,
+}
+
+/// Runs the sound server's blocking calls on a helper thread, so the caller can give up
+/// waiting. A call that timed out leaves its thread behind, blocked in the sound server;
+/// until that thread returns no further call is started, so a server that stays hung costs
+/// one thread rather than one per poll.
+#[derive(Default)]
+struct Helper {
+    /// Disconnects once the thread of the call that timed out has ended.
+    stuck: Option<Receiver<()>>,
+}
+
+impl Helper {
+    fn run<T: Send + 'static>(
+        &mut self,
+        what: &'static str,
+        timeout: Duration,
+        call: impl FnOnce() -> T + Send + 'static,
+    ) -> Result<T, IoError> {
+        if let Some(ended) = &self.stuck {
+            if matches!(ended.try_recv(), Err(TryRecvError::Empty)) {
+                return Err(IoError::Backend("sound server is not responding".into()));
+            }
+            tracing::info!("sound server answers again");
+            self.stuck = None;
+        }
+        let (tx, rx) = mpsc::channel();
+        let (alive, ended) = mpsc::channel();
+        std::thread::spawn(move || {
+            let _alive = alive;
+            let _ = tx.send(call());
+        });
+        rx.recv_timeout(timeout).map_err(|_| {
+            // Logged here, once per stall: later calls are refused without waiting.
+            tracing::warn!("sound server {what} timed out; pausing its queries until it answers");
+            self.stuck = Some(ended);
+            IoError::Backend(format!("sound server {what} timed out"))
+        })
+    }
+
+    fn connect(&mut self) -> Result<Client, IoError> {
+        self.run("connection", CONNECT_TIMEOUT, || {
+            Client::from_env(c"Mumcord")
+        })?
+        .map_err(backend_err)
+    }
 }
 
 impl SoundServer {
@@ -44,11 +99,13 @@ impl SoundServer {
         if !cpal::available_hosts().contains(&cpal::HostId::PipeWire) {
             return None;
         }
-        connect_client()
+        let mut helper = Helper::default();
+        helper
+            .connect()
             .inspect_err(|e| tracing::info!("sound server unavailable, using ALSA: {e}"))
             .ok()
             .map(|client| Self {
-                client: Mutex::new(client),
+                connection: Mutex::new(Connection { client, helper }),
             })
     }
 
@@ -58,30 +115,33 @@ impl SoundServer {
         &self,
         direction: Direction,
     ) -> Result<(Vec<ServerNode>, Option<String>), IoError> {
-        let mut client = self.client.lock().unwrap_or_else(|e| e.into_inner());
-        match query(&client, direction) {
+        let mut connection = self.connection.lock().unwrap_or_else(|e| e.into_inner());
+        match connection.query(direction) {
             Ok(nodes) => Ok(nodes),
+            // The server stopped answering: a new connection would only hang as well.
+            Err(first) if connection.helper.stuck.is_some() => Err(first),
             // A restarted sound server drops the connection: reconnect once.
             Err(first) => {
                 tracing::debug!("sound server query failed ({first}); reconnecting");
-                *client = connect_client()?;
-                query(&client, direction)
+                connection.client = connection.helper.connect()?;
+                connection.query(direction)
             }
         }
     }
 }
 
-fn connect_client() -> Result<Client, IoError> {
-    let (tx, rx) = mpsc::channel();
-    std::thread::spawn(move || {
-        let _ = tx.send(Client::from_env(c"Mumcord"));
-    });
-    rx.recv_timeout(CONNECT_TIMEOUT)
-        .map_err(|_| IoError::Backend("sound server connection timed out".into()))?
-        .map_err(backend_err)
+impl Connection {
+    fn query(
+        &mut self,
+        direction: Direction,
+    ) -> Result<(Vec<ServerNode>, Option<String>), IoError> {
+        let client = self.client.clone();
+        self.helper
+            .run("query", QUERY_TIMEOUT, move || request(&client, direction))?
+    }
 }
 
-fn query(
+fn request(
     client: &Client,
     direction: Direction,
 ) -> Result<(Vec<ServerNode>, Option<String>), IoError> {
@@ -123,4 +183,49 @@ fn text(s: &CStr) -> String {
 
 fn backend_err(err: impl std::fmt::Display) -> IoError {
     IoError::Backend(err.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    use super::*;
+
+    /// A sound server that stays hung used to cost one blocked thread per poll.
+    #[test]
+    fn a_stalled_call_blocks_further_calls_until_it_returns() {
+        let timeout = Duration::from_millis(50);
+        let started = Arc::new(AtomicUsize::new(0));
+        let (release, stalled) = mpsc::channel::<()>();
+        let mut helper = Helper::default();
+
+        let count = started.clone();
+        let first = helper.run("query", timeout, move || {
+            count.fetch_add(1, Ordering::SeqCst);
+            // Returns once the test drops its sender.
+            let _ = stalled.recv();
+        });
+        assert!(first.is_err());
+
+        for _ in 0..3 {
+            let count = started.clone();
+            let refused = helper.run("query", timeout, move || {
+                count.fetch_add(1, Ordering::SeqCst);
+            });
+            assert!(refused.is_err());
+        }
+        assert_eq!(started.load(Ordering::SeqCst), 1);
+
+        drop(release);
+        let deadline = std::time::Instant::now() + Duration::from_secs(5);
+        let answered = loop {
+            let result = helper.run("query", timeout, || 7);
+            if result.is_ok() || std::time::Instant::now() >= deadline {
+                break result;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        };
+        assert!(matches!(answered, Ok(7)));
+    }
 }
