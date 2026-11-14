@@ -10,6 +10,11 @@
 
 - Update bindgen to 0.73 and require prost-build 0.14.5 with prettyplease 0.3 support; remove the temporary Dependabot hold on bindgen minor updates (issue #79)
 
+### Fixed
+
+- On Linux the window no longer freezes for good when you hang up or disconnect while the audio system (PipeWire) has stopped responding: closing the audio devices and listing them now give up after a short wait instead of waiting forever
+- On Linux a voice thread that is briefly busy keeps its real-time priority: the audio system (PipeWire) kept shrinking the allowed time to a single audio buffer, and Mumcord now restores the intended 100 ms margin during a call.
+
 ### Security
 
 - Require patched `ammonia 4.2.5` or newer to address the SVG/MathML mutation-XSS advisory RUSTSEC-2026-0533, with regression tests for chat HTML and plugin SVG assets; existing sanitization allow-lists remain unchanged (issue #819)
