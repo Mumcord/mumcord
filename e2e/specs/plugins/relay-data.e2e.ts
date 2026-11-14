@@ -577,6 +577,10 @@ async function bothInChannel(before?: ReadyCounts): Promise<void> {
      * reconnect to the recreated server (registrations are kept).
      */
     async function withoutRelayData(before: ReadyCounts): Promise<void> {
+      // The recreated server drops the connection. A reconnect comes back read-only until
+      // Join voice, and the old "Peer:" line stays on the panel until the new announce.
+      await joinVoice();
+      await apps.onB(joinVoice);
       await bothInChannel(before);
       await waitPanel(status("NotAllowed"), 60_000);
       await expectChip(MUMBLE_CHIP);

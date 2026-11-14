@@ -142,6 +142,23 @@ export function firstCaptured(rows: MediaRow[], what: string): MediaRow {
   return row;
 }
 
+/** Waits until the inspector holds a media message. The first packet follows the watch. */
+export async function waitMediaRows(what: string, timeout = 30_000): Promise<MediaRow[]> {
+  let rows: MediaRow[] = [];
+  await browser
+    .waitUntil(
+      async () => {
+        rows = await mediaRows();
+        return rows.length > 0;
+      },
+      { timeout, interval: 250 },
+    )
+    .catch(() => {
+      throw new Error(`${what} captured no media message`);
+    });
+  return rows;
+}
+
 /** Every captured message is the 0.9.0 document, never the 0.8.x header (FR-7.89, FR-7.98). */
 export function expectDocumentOnly(rows: MediaRow[]): void {
   for (const row of rows) expect(row.media?.format).toBe("media");

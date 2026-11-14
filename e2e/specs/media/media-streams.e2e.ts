@@ -33,6 +33,7 @@ import {
   KEYFRAME_MS,
   expectDocumentOnly,
   firstCaptured,
+  waitMediaRows,
   isDescription,
   listedShares,
   mediaRows,
@@ -73,7 +74,8 @@ describe("media streams, the 0.9.0 share format without a relay (AC-7.80, 7.85)"
 
     // One `.media` document: the description on channel 0 first, then frames on the layer
     // channels, and never the old header (FR-7.89, FR-7.98).
-    const rows = await mediaRows();
+    // The watch can report the direct path before the first packet is in the inspector.
+    const rows = await waitMediaRows("A's share");
     const head = firstCaptured(rows, "A's share");
     expect(isDescription(head)).toBe(true);
     expect(head.media?.channel).toBe(0);
