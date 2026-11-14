@@ -9,7 +9,7 @@
 //   `host-not-allowed` (the DNS rebinding case).
 // - AC-9.8: the plugin's details then list its website and purpose, the approval date, the last
 //   request and today's count with the blocked ones.
-// - AC-9.10: test-dev-localhost loaded unpacked in Developer mode reaches http://localhost:47180.
+// - AC-9.10: test-dev-localhost loaded unpacked in Developer mode reaches http://localhost:24718.
 //   The test loads the folder through the `plugin_dev_load` command, because the native folder
 //   picker can't be driven in the container; picking a folder by hand stays a manual check.
 import { createServer, type Server } from "node:http";
@@ -25,8 +25,14 @@ import { addAndConnect, completeWizard, reconnect } from "../../helpers/voice-ui
 
 const SURFACE = "Test Surface";
 const DEV = { id: "test-dev-localhost", name: "Test Dev Localhost" };
-/** The origin test-dev-localhost declares; its port is kept free by the HTTPS fixture. */
-const DEV_PORT = 47180;
+/**
+ * Origin port of test-dev-localhost. It sits below the Linux ephemeral range
+ * (32768–60999). Plugin registries in the same shard listen with `--port 0`
+ * (`e2e/helpers/pluginenv.ts`), and the kernel may assign any port in that range,
+ * including a fixed port that lives inside it. 24718 needs no extra privileges
+ * (it is above 1024), and a registry server cannot be given it.
+ */
+const DEV_PORT = 24718;
 const DECLARED_HOST = "declared.plugins.test";
 
 /** Hard-stop fixtures by name, with the reason the prompt gives (crates/plugins/src/origins.rs). */
@@ -129,8 +135,8 @@ describe("plugins: websites and net.http (AC-9.7 … AC-9.10)", function () {
 
   before(async function () {
     this.timeout(20 * 60_000);
-    // Bound first: the fixtures and registries below take free ports from the same range, and the
-    // dev plugin's port is fixed by its manifest, so it cannot move out of the way.
+    // Bound before the registries as well. The port is outside the ephemeral range, so a
+    // `--port 0` server cannot take it; binding first only matters if this port moves back up.
     devServer = await startDevServer();
     await testenv.up("v15");
     // test-surface 1.1.1 (one more website) is for the update gate (AC-9.36). Holding it back
