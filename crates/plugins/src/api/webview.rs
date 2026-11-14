@@ -828,9 +828,9 @@ mod tests {
 
     #[test]
     fn a_developer_localhost_origin_is_reachable_from_the_page() {
-        let declared = [crate::origins::validate("http://localhost:18080", true).unwrap()];
+        let declared = [crate::origins::validate("http://localhost:24718", true).unwrap()];
         let csp = content_security_policy("mumcord-web://localhost", "dev", &declared);
-        assert!(csp.contains("connect-src mumcord-web://localhost/dev/ http://localhost:18080;"));
+        assert!(csp.contains("connect-src mumcord-web://localhost/dev/ http://localhost:24718;"));
     }
 
     #[test]

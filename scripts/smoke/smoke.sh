@@ -4,10 +4,12 @@
 #
 #   scripts/smoke/smoke.sh --app <app> --seed <mumcord-smoke-seed> --bot <mumbot> [--port N]
 #
-#   --app   Linux: the AppImage (or binary); Windows: Mumcord.exe; macOS: Mumcord.app
+#   --app   Linux: the AppImage (or binary); FreeBSD: installed binary; Windows: Mumcord.exe; macOS: Mumcord.app
 #   --seed  built scripts/smoke/seed binary
 #   --bot   mumbot binary (scripts/fetch-mumbot.sh)
+#   --observer  native mumcord-smoke-observe binary instead of mumbot (FreeBSD)
 #   --port  test server port (default 64738)
+#   --version  require this exact display version in the app's startup log
 #   --start-only  no server available: only check that the app starts and keeps running
 #                 (no --seed/--bot needed; the connect part then belongs on the manual checklist)
 #   --portable    Windows: the app is the portable Mumcord.exe (with the `portable` marker), so
@@ -15,21 +17,23 @@
 #
 # Steps: seed a profile (identity in the OS secure storage, wizard done, saved server with its
 # certificate trusted) → start the app with a mumble:// link to that server → pass when the app
-# log shows "connected" with a server_id AND mumbot sees the app's user on the server.
+# log shows "connected" with a server_id AND a second client sees the app's user on the server.
 #
 # The seed step replaces the identity in the OS secure storage, so the script only runs when
 # CI is set or --allow-identity-overwrite is given (use a throwaway keyring/profile locally).
-# Runs in bash on Linux, macOS and Windows (Git Bash).
+# Runs in bash on Linux, FreeBSD, macOS and Windows (Git Bash).
 set -euo pipefail
 
 port=64738
-app="" seed="" bot="" allow_overwrite="" start_only="" portable=""
+app="" seed="" bot="" observer="" allow_overwrite="" start_only="" portable="" expected_version=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --app) app=$2; shift 2 ;;
     --seed) seed=$2; shift 2 ;;
     --bot) bot=$2; shift 2 ;;
+    --observer) observer=$2; shift 2 ;;
     --port) port=$2; shift 2 ;;
+    --version) expected_version=$2; shift 2 ;;
     --allow-identity-overwrite) allow_overwrite=1; shift ;;
     --start-only) start_only=1; shift ;;
     --portable) portable=1; shift ;;
@@ -37,7 +41,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ -n $app ]] || { echo "--app is required" >&2; exit 2; }
-[[ -n $start_only || (-n $seed && -n $bot) ]] || { echo "--seed and --bot are required" >&2; exit 2; }
+[[ -n $start_only || (-n $seed && (-n $bot || -n $observer)) ]] || { echo "--seed and --bot (or --observer) are required" >&2; exit 2; }
 if [[ -z $start_only && -z ${CI:-} && -z $allow_overwrite ]]; then
   echo "refusing to overwrite the stored identity outside CI (pass --allow-identity-overwrite)" >&2
   exit 2
@@ -50,8 +54,8 @@ readonly timeout_secs=${SMOKE_TIMEOUT:-120}
 
 # Tauri's app_data_dir / app_log_dir per OS.
 case "$(uname -s)" in
-  Linux)
-    os=linux
+  Linux | FreeBSD)
+    os=unix
     data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/$identifier"
     log_dir="$data_dir/logs"
     ;;
@@ -89,7 +93,7 @@ app_pid=""
 # shellcheck disable=SC2329 # only reached through cleanup, which the EXIT trap invokes
 stop_app() {
   case $os in
-    linux) [[ -n $app_pid ]] && kill "$app_pid" 2>/dev/null || true ;;
+    unix) [[ -n $app_pid ]] && kill "$app_pid" 2>/dev/null || true ;;
     macos) pkill -x Mumcord 2>/dev/null || pkill -x mumcord 2>/dev/null || true ;;
     windows) MSYS2_ARG_CONV_EXCL="*" taskkill /F /IM "$(basename "$app")" >/dev/null 2>&1 || true ;;
   esac
@@ -130,10 +134,19 @@ app_running() {
   esac
 }
 
+version_ok() {
+  [[ -z $expected_version ]] && return 0
+  # Compare a whole field, not a substring: 0.8.0 must not accept 0.8.0-rc.1 or 0.8.0-dev.
+  awk -v expected="version=$expected_version" '
+    /Mumcord starting/ { for (i = 1; i <= NF; i++) if ($i == expected) found = 1 }
+    END { exit !found }
+  ' "$log_dir"/*
+}
+
 if [[ -n $start_only ]]; then
   start_app
   sleep 20
-  if app_running && compgen -G "$log_dir/*" >/dev/null; then
+  if app_running && compgen -G "$log_dir/*" >/dev/null && version_ok; then
     echo "== PASS (start only): app is running and writes its log; connect is a manual check"
     exit 0
   fi
@@ -145,10 +158,15 @@ fi
 echo "== seeding profile in $data_dir"
 "$seed" "$(native_path "$data_dir")" "$port" "$username"
 
-# The bot waits (up to the timeout) for the app's user to appear; start it first.
-echo "== waiting for $username with mumbot"
-"$bot" --port "$port" --name SmokeBot --timeout "$timeout_secs" expect user "$username" \
-  >"$work/bot.out" 2>&1 &
+# The second client waits (up to the timeout) for the app's user to appear; start it first.
+if [[ -n $observer ]]; then
+  echo "== waiting for $username with the native observer"
+  "$observer" "$port" "$username" "$timeout_secs" >"$work/bot.out" 2>&1 &
+else
+  echo "== waiting for $username with mumbot"
+  "$bot" --port "$port" --name SmokeBot --timeout "$timeout_secs" expect user "$username" \
+    >"$work/bot.out" 2>&1 &
+fi
 bot_pid=$!
 
 start_app "$url"
@@ -170,10 +188,10 @@ bot_ok=""
 if wait "$bot_pid"; then bot_ok=1; fi
 cat "$work/bot.out"
 
-if [[ -n $log_ok && -n $bot_ok ]]; then
+if [[ -n $log_ok && -n $bot_ok ]] && version_ok; then
   echo "== PASS: app started and connected (log + bot)"
   exit 0
 fi
-echo "== FAIL: app log connected=${log_ok:-no}, bot saw user=${bot_ok:-no}" >&2
+echo "== FAIL: app log connected=${log_ok:-no}, bot saw user=${bot_ok:-no}, expected version=${expected_version:-unchecked}" >&2
 show_logs
 exit 1

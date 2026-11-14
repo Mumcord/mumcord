@@ -116,7 +116,7 @@ rnnoise-rs = { git = "https://github.com/Mumcord/rnnoise-rs", rev = "4430677a365
 # adds the incremental streaming mux codec (`bovnar::codec`) for the 0.9.0 media profile; its
 # crate carries PROVENANCE.json, which scripts/notices.js checks.
 bovnar = "2.1.0"
-sonora = "0.2"
+sonora = "0.3"
 rtrb = "0.4"
 # Lock-free bounded queue: the camera frame pool hands buffers between capture and consumer
 # threads without locks or allocation.

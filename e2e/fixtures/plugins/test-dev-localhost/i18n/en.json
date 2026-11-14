@@ -1,5 +1,5 @@
 {
   "manifest.name": "Test Dev Localhost",
-  "manifest.description": "E2E test plugin: reaches http://localhost:18080, allowed only for developer plugins.",
+  "manifest.description": "E2E test plugin: reaches http://localhost:24718, allowed only for developer plugins.",
   "origins.localhost": "Local development server"
 }
