@@ -86,23 +86,47 @@ impl I420Frame {
     /// The picture as packed RGBA (opaque), for viewers whose webview cannot decode VP9 itself.
     /// BT.601 limited range, matching the capture side.
     pub fn to_rgba(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        self.append_rgba(&mut out);
+        out
+    }
+
+    /// Appends packed RGBA directly to a transport buffer, avoiding a second picture-sized
+    /// allocation and copy when the caller prefixes the picture with a frame header.
+    pub fn append_rgba(&self, out: &mut Vec<u8>) {
         let (w, h) = (self.width as usize, self.height as usize);
         let cw = w.div_ceil(2);
         let (y_plane, u_plane, v_plane) = (self.y(), self.u(), self.v());
-        let mut out = Vec::with_capacity(w * h * 4);
-        for row in 0..h {
+        let start = out.len();
+        out.resize(start + w * h * 4, 0);
+        for (row, (luma, rgba)) in y_plane
+            .chunks_exact(w)
+            .zip(out[start..].chunks_exact_mut(w * 4))
+            .enumerate()
+        {
             let chroma_row = row / 2 * cw;
-            for col in 0..w {
-                let c = i32::from(y_plane[row * w + col]) - 16;
-                let d = i32::from(u_plane[chroma_row + col / 2]) - 128;
-                let e = i32::from(v_plane[chroma_row + col / 2]) - 128;
-                let r = (298 * c + 409 * e + 128) >> 8;
-                let g = (298 * c - 100 * d - 208 * e + 128) >> 8;
-                let b = (298 * c + 516 * d + 128) >> 8;
-                out.extend([clamp(r), clamp(g), clamp(b), u8::MAX]);
+            let u = &u_plane[chroma_row..chroma_row + cw];
+            let v = &v_plane[chroma_row..chroma_row + cw];
+            // Two adjacent pixels share chroma, including the single last pixel of odd widths.
+            for ((luma_pair, pixels), (&u, &v)) in
+                luma.chunks(2).zip(rgba.chunks_mut(8)).zip(u.iter().zip(v))
+            {
+                let d = i32::from(u) - 128;
+                let e = i32::from(v) - 128;
+                let r_chroma = 409 * e + 128;
+                let g_chroma = -100 * d - 208 * e + 128;
+                let b_chroma = 516 * d + 128;
+                for (&y, pixel) in luma_pair.iter().zip(pixels.as_chunks_mut::<4>().0) {
+                    let c = 298 * (i32::from(y) - 16);
+                    pixel.copy_from_slice(&[
+                        clamp((c + r_chroma) >> 8),
+                        clamp((c + g_chroma) >> 8),
+                        clamp((c + b_chroma) >> 8),
+                        u8::MAX,
+                    ]);
+                }
             }
         }
-        out
     }
 
     fn luma_len(&self) -> usize {
@@ -151,6 +175,40 @@ mod tests {
                 matches!(check_decoded_size(w, h), Err(Error::InvalidFrame(_))),
                 "{w}x{h}"
             );
+        }
+    }
+
+    #[test]
+    fn rgba_matches_bt601_on_varied_planes_and_sizes() {
+        for width in 1..=9 {
+            for height in 1..=9 {
+                let data = (0..I420Frame::buffer_len(width, height))
+                    .map(|index| (index * 113 + 17) as u8)
+                    .collect();
+                let frame = I420Frame::new(width, height, data).unwrap();
+                let w = width as usize;
+                let mut expected = Vec::new();
+                for row in 0..height as usize {
+                    for col in 0..w {
+                        let chroma = row / 2 * w.div_ceil(2) + col / 2;
+                        let c = i32::from(frame.y()[row * w + col]) - 16;
+                        let d = i32::from(frame.u()[chroma]) - 128;
+                        let e = i32::from(frame.v()[chroma]) - 128;
+                        expected.extend([
+                            clamp((298 * c + 409 * e + 128) >> 8),
+                            clamp((298 * c - 100 * d - 208 * e + 128) >> 8),
+                            clamp((298 * c + 516 * d + 128) >> 8),
+                            255,
+                        ]);
+                    }
+                }
+                assert_eq!(frame.to_rgba(), expected, "{width}x{height}");
+                let mut prefixed = vec![1, 2, 3, 4, 5];
+                frame.append_rgba(&mut prefixed);
+                frame.append_rgba(&mut prefixed);
+                assert_eq!(&prefixed[..5], &[1, 2, 3, 4, 5]);
+                assert_eq!(&prefixed[5..], expected.repeat(2));
+            }
         }
     }
 
