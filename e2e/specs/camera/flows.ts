@@ -57,8 +57,15 @@ export async function startCamClient(
   const env = { MUMCORD_TEST_CAMERA: opts.camera ?? "1", ...opts.env };
   const launch = { env, ...(opts.audio === undefined ? {} : { audio: opts.audio }) };
   if (id === "a") await app.restart({ freshProfile: true, ...launch });
-  else if (id === "b") await apps.startB(launch);
-  else await apps.startC(launch);
+  else if (id === "b") {
+    // A fresh profile. An earlier test in this file may still have B open, and startB
+    // refuses to replace a running instance (AC-8.30 follows AC-8.32).
+    await apps.stopB();
+    await apps.startB(launch);
+  } else {
+    await apps.stopC();
+    await apps.startC(launch);
+  }
   if (opts.debugLog) {
     // The log level applies from the next start.
     await on(id, async () => {
