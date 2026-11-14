@@ -10932,12 +10932,12 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - sonora-agc2 0.2.0 (https://github.com/dignifiedquire/sonora)
-  - sonora-common-audio 0.2.0 (https://github.com/dignifiedquire/sonora)
-  - sonora-fft 0.2.0 (https://github.com/dignifiedquire/sonora)
-  - sonora-ns 0.2.0 (https://github.com/dignifiedquire/sonora)
-  - sonora-simd 0.2.0 (https://github.com/dignifiedquire/sonora)
-  - sonora 0.2.0 (https://github.com/dignifiedquire/sonora)
+  - sonora-agc2 0.3.0 (https://github.com/dignifiedquire/sonora)
+  - sonora-common-audio 0.3.0 (https://github.com/dignifiedquire/sonora)
+  - sonora-fft 0.3.0 (https://github.com/dignifiedquire/sonora)
+  - sonora-ns 0.3.0 (https://github.com/dignifiedquire/sonora)
+  - sonora-simd 0.3.0 (https://github.com/dignifiedquire/sonora)
+  - sonora 0.3.0 (https://github.com/dignifiedquire/sonora)
 
 Copyright (c) 2011, The WebRTC Project Authors. All rights reserved.
 Copyright (c) 2016, Arun Raghavan and contributors. All rights reserved.
@@ -11125,7 +11125,7 @@ BSD 3-Clause "New" or "Revised" License
 
 Used by:
   - alloc-stdlib 0.3.0 (https://github.com/dropbox/rust-alloc-no-stdlib)
-  - sonora-aec3 0.2.0 (https://github.com/dignifiedquire/sonora)
+  - sonora-aec3 0.3.0 (https://github.com/dignifiedquire/sonora)
 
 Copyright (c) <year> <owner>. 
 
@@ -13604,7 +13604,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - ammonia 4.2.4 (https://github.com/rust-ammonia/ammonia)
+  - ammonia 4.2.5 (https://github.com/rust-ammonia/ammonia)
 
 Copyright (c) 2015-2022 The ammonia Developers
 
