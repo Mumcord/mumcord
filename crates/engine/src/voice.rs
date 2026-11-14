@@ -499,6 +499,8 @@ impl VoicePipeline {
                 while let Ok(e) = talk_events.pop() {
                     batch.set(e.session, e.talking, now);
                 }
+                #[cfg(target_os = "linux")]
+                crate::crash::report_overrun();
                 let demoted = mumcord_audio::rt::take_demotions();
                 if demoted > 0 {
                     // Logged here, not in the voice threads: they must not block on logging.

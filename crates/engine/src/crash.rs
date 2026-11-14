@@ -3,6 +3,8 @@
 //! Reports are plain text in `crash-reports/` next to `logs/`, never uploaded, at most
 //! [`MAX_REPORTS`] kept. They hold the version, OS, cause, backtrace and the last log lines,
 //! which are redacted like the log itself; the home folder is shortened to `~`.
+//! On Linux a real-time thread that overruns its time budget leaves a report too, although the
+//! app keeps running (see `report_overrun`).
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -40,6 +42,9 @@ pub enum CrashKind {
     /// The previous run left its marker without a signal: killed, power loss or a crash the
     /// handler could not see.
     Unexpected,
+    /// Not a crash: a real-time thread ran past its time budget (SIGXCPU) and the app kept
+    /// running. The report says where that thread was busy.
+    Overrun,
 }
 
 impl CrashKind {
@@ -48,6 +53,7 @@ impl CrashKind {
             Self::Panic => "panic".to_owned(),
             Self::Signal(name) => format!("signal {name}"),
             Self::Unexpected => "unexpected exit".to_owned(),
+            Self::Overrun => "real-time overrun".to_owned(),
         }
     }
 
@@ -55,6 +61,7 @@ impl CrashKind {
         match s {
             "panic" => Self::Panic,
             "unexpected exit" => Self::Unexpected,
+            "real-time overrun" => Self::Overrun,
             other => Self::Signal(other.trim_start_matches("signal ").to_owned()),
         }
     }
@@ -160,6 +167,9 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
         .as_ref()
         .and_then(|crash| crash.thread.clone())
         .unwrap_or_else(|| "-".to_owned());
+    // An overrun the previous run recorded but could not report any more (it was ended first).
+    #[cfg(target_os = "linux")]
+    let previous_overrun = overrun::take_record(dir).map(|record| (record, previous_log_tail(dir)));
     let previous_context = fs::read_to_string(dir.join(CONTEXT)).unwrap_or_default();
     let _ = fs::remove_file(dir.join(CONTEXT));
     // The libraries still sit where the crashed run had them on disk, so the stack can be
@@ -201,6 +211,20 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
                     let _ = write_report(&dir, &version, &report);
                     let _ = prune(&dir);
                 }
+                #[cfg(target_os = "linux")]
+                if let Some((record, log)) = previous_overrun {
+                    let cause = "A real-time thread ran past its time budget in the previous run, \
+                                 which ended before this report was written";
+                    let _ = overrun::write(
+                        &dir,
+                        &version,
+                        &record,
+                        cause,
+                        &log,
+                        &previous_context,
+                        None,
+                    );
+                }
             });
     }
     fs::write(&marker, b"")?;
@@ -212,7 +236,47 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
     });
     install_panic_hook();
     native::install(&marker, &dir.join(MAPS));
+    #[cfg(target_os = "linux")]
+    overrun::install(dir);
     Ok(())
+}
+
+/// Writes the report of a real-time overrun the signal handler recorded (see the `overrun` module), at
+/// most once per run; later overruns are only counted and logged. Costs one atomic read when
+/// there is nothing to report, and the writing happens on its own thread, so it can be polled.
+#[cfg(target_os = "linux")]
+pub fn report_overrun() {
+    let Some(state) = STATE.get() else {
+        return;
+    };
+    if !overrun::claim() {
+        return;
+    }
+    let spawned = std::thread::Builder::new()
+        .name("overrun-report".to_owned())
+        .spawn(|| {
+            let Some(record) = overrun::take_record(&state.dir) else {
+                return;
+            };
+            let cause = "A real-time thread ran past its time budget; Mumcord kept running \
+                         (not a crash)";
+            let uptime = Some(state.started.elapsed().as_secs());
+            let log = diag::recent_log_lines();
+            if let Err(e) = overrun::write(
+                &state.dir,
+                &state.version,
+                &record,
+                cause,
+                &log,
+                &context_now(),
+                uptime,
+            ) {
+                tracing::warn!(error = %e, "writing the real-time overrun report failed");
+            }
+        });
+    if let Err(e) = spawned {
+        tracing::warn!(error = %e, "no thread for the real-time overrun report");
+    }
 }
 
 /// The cause of a run that left its marker but no native record. On Windows every exception the
@@ -243,6 +307,8 @@ pub fn clean_exit() {
         let _ = fs::remove_file(state.dir.join(MARKER));
         let _ = fs::remove_file(state.dir.join(CONTEXT));
         let _ = fs::remove_file(state.dir.join(MAPS));
+        #[cfg(target_os = "linux")]
+        overrun::remove_record(&state.dir);
     }
 }
 
@@ -588,6 +654,7 @@ pub fn export(dir: &Path, ids: &[String], dest: &Path) -> io::Result<()> {
 /// Crashes the notice has not told about yet; all reports count as shown afterwards. An
 /// unexpected exit without a signal (killed, power loss) is listed in Settings but brings no
 /// notice: it is mostly not Mumcord's fault, and a notice after every forced quit would mislead.
+/// Neither does a real-time overrun: the app kept running.
 pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
     let seen_path = dir.join(SEEN);
     let seen = fs::read_to_string(&seen_path).unwrap_or_default();
@@ -595,7 +662,7 @@ pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
     let unseen: Vec<CrashSummary> = all
         .iter()
         .filter(|s| !seen.lines().any(|l| l == s.id))
-        .filter(|s| s.kind != CrashKind::Unexpected)
+        .filter(|s| !matches!(s.kind, CrashKind::Unexpected | CrashKind::Overrun))
         .cloned()
         .collect();
     let ids: Vec<&str> = all.iter().map(|s| s.id.as_str()).collect();
@@ -656,7 +723,7 @@ mod native {
         }
     }
 
-    fn errno_location() -> *mut libc::c_int {
+    pub(super) fn errno_location() -> *mut libc::c_int {
         // SAFETY: these only return the address of the calling thread's errno.
         unsafe {
             #[cfg(target_os = "linux")]
@@ -759,7 +826,7 @@ mod native {
         }
     }
 
-    fn put(fd: libc::c_int, bytes: &[u8]) {
+    pub(super) fn put(fd: libc::c_int, bytes: &[u8]) {
         // SAFETY: write(2) is async-signal-safe; the buffer is valid for its length.
         unsafe {
             libc::write(fd, bytes.as_ptr().cast(), bytes.len());
@@ -805,21 +872,8 @@ mod native {
                 let address = unsafe { (*info).si_addr() } as usize;
                 put_hex(fd, b"fault", address);
             }
-            let mut frames = [0usize; MAX_FRAMES];
-            let mut count = 0;
-            // SAFETY: no other thread unwinds through this one while it is stopped in a fatal
-            // signal; the closure only stores into a stack array.
-            unsafe {
-                backtrace::trace_unsynchronized(|frame| {
-                    frames[count] = frame.ip() as usize;
-                    count += 1;
-                    count < MAX_FRAMES
-                });
-            }
-            for &ip in &frames[..count] {
-                put_hex(fd, b"ip", ip);
-            }
-            copy_maps();
+            put_stack(fd);
+            copy_maps(MAPS_FD.load(Ordering::Acquire));
         }
         // SA_RESETHAND restored the default action: raising again ends the process as before.
         // SAFETY: raise(3) is async-signal-safe.
@@ -828,9 +882,27 @@ mod native {
         }
     }
 
+    /// One `ip 0x<hex>` line per return address of the calling thread, innermost first.
+    pub(super) fn put_stack(fd: libc::c_int) {
+        let mut frames = [0usize; MAX_FRAMES];
+        let mut count = 0;
+        // SAFETY: the unwinder only reads this thread's own stack, which stands still while its
+        // signal handler runs; the closure only stores into a stack array.
+        unsafe {
+            backtrace::trace_unsynchronized(|frame| {
+                frames[count] = frame.ip() as usize;
+                count += 1;
+                count < MAX_FRAMES
+            });
+        }
+        for &ip in &frames[..count] {
+            put_hex(fd, b"ip", ip);
+        }
+    }
+
     /// `thread <name>` of the crashing thread. Linux names threads through prctl, a plain
     /// system call; elsewhere the line is left out.
-    fn thread_name(fd: libc::c_int) {
+    pub(super) fn thread_name(fd: libc::c_int) {
         #[cfg(target_os = "linux")]
         {
             let mut name = [0u8; 16];
@@ -847,10 +919,9 @@ mod native {
         let _ = fd;
     }
 
-    /// Copies `/proc/self/maps` (which library sits where) for the symbol lookup at the next
-    /// start, using only open/read/write/close.
-    fn copy_maps() {
-        let out = MAPS_FD.load(Ordering::Acquire);
+    /// Copies `/proc/self/maps` (which library sits where) into `out` for the symbol lookup
+    /// later, using only open/read/write/close.
+    pub(super) fn copy_maps(out: libc::c_int) {
         if out < 0 {
             return;
         }
@@ -870,6 +941,124 @@ mod native {
             }
             libc::close(input);
         }
+    }
+}
+
+/// Real-time overruns (Linux). A real-time thread that runs too long without blocking gets
+/// SIGXCPU, and the whole process SIGKILL a little later if it stays real-time; the audio crate
+/// demotes the thread at SIGXCPU (`mumcord_audio::rt`). That warning is the only moment the
+/// thread can say where it is busy, so [`capture`] runs inside the signal handler and writes
+/// the thread name and its stack into a file opened beforehand, the way the fatal handler fills
+/// the marker. A normal thread turns the record into a report ([`super::report_overrun`]); if
+/// the run is ended first, the next start does.
+#[cfg(target_os = "linux")]
+mod overrun {
+    use std::fs;
+    use std::io;
+    use std::os::fd::IntoRawFd;
+    use std::path::{Path, PathBuf};
+    use std::sync::atomic::{AtomicI32, AtomicU8, Ordering};
+
+    use super::{CrashKind, NativeCrash, Report, native};
+
+    /// What [`capture`] wrote, in the marker's format.
+    const RECORD: &str = "overrun";
+    /// The loaded libraries at that moment, for naming the stack.
+    const MAPS: &str = "overrun-maps";
+
+    static RECORD_FD: AtomicI32 = AtomicI32::new(-1);
+    static MAPS_FD: AtomicI32 = AtomicI32::new(-1);
+
+    const IDLE: u8 = 0;
+    const CAPTURING: u8 = 1;
+    const CAPTURED: u8 = 2;
+    const REPORTED: u8 = 3;
+    /// Only the first overrun of a run is recorded and reported, so a thread that keeps
+    /// overrunning cannot fill the disk.
+    static STAGE: AtomicU8 = AtomicU8::new(IDLE);
+
+    /// Opens the record files and asks the audio crate to call [`capture`] at an overrun.
+    pub(super) fn install(dir: &Path) {
+        let (Ok(record), Ok(maps)) = (
+            fs::File::create(dir.join(RECORD)),
+            fs::File::create(dir.join(MAPS)),
+        ) else {
+            return;
+        };
+        RECORD_FD.store(record.into_raw_fd(), Ordering::Release);
+        MAPS_FD.store(maps.into_raw_fd(), Ordering::Release);
+        mumcord_audio::rt::set_overrun_hook(capture);
+    }
+
+    /// Runs inside the SIGXCPU handler, on the thread that overran. Async-signal-safe calls
+    /// only (write, prctl, open, read, close and atomics) plus the unwinder, like the fatal
+    /// handler.
+    pub(super) extern "C" fn capture() {
+        let fd = RECORD_FD.load(Ordering::Acquire);
+        if fd < 0
+            || STAGE
+                .compare_exchange(IDLE, CAPTURING, Ordering::AcqRel, Ordering::Acquire)
+                .is_err()
+        {
+            return;
+        }
+        // The thread goes on after the handler, so the code it interrupted must find its errno
+        // untouched.
+        // SAFETY: the errno location is valid for the calling thread.
+        let errno = unsafe { *native::errno_location() };
+        native::put(fd, b"SIGXCPU\n");
+        native::thread_name(fd);
+        native::put_stack(fd);
+        native::copy_maps(MAPS_FD.load(Ordering::Acquire));
+        // SAFETY: as above.
+        unsafe {
+            *native::errno_location() = errno;
+        }
+        STAGE.store(CAPTURED, Ordering::Release);
+    }
+
+    /// Whether a captured overrun waits for its report; true only once per run.
+    pub(super) fn claim() -> bool {
+        STAGE
+            .compare_exchange(CAPTURED, REPORTED, Ordering::AcqRel, Ordering::Acquire)
+            .is_ok()
+    }
+
+    pub(super) fn remove_record(dir: &Path) {
+        let _ = fs::remove_file(dir.join(RECORD));
+        let _ = fs::remove_file(dir.join(MAPS));
+    }
+
+    /// The record in `dir` with its library mappings, taken off the disk so that it is
+    /// reported once.
+    pub(super) fn take_record(dir: &Path) -> Option<(NativeCrash, String)> {
+        let record = fs::read_to_string(dir.join(RECORD)).ok();
+        let maps = fs::read_to_string(dir.join(MAPS)).unwrap_or_default();
+        remove_record(dir);
+        Some((super::parse_marker(&record?)?, maps))
+    }
+
+    pub(super) fn write(
+        dir: &Path,
+        version: &str,
+        (record, maps): &(NativeCrash, String),
+        cause: &str,
+        log: &[String],
+        context: &str,
+        uptime_secs: Option<u64>,
+    ) -> io::Result<PathBuf> {
+        let report = Report {
+            kind: CrashKind::Overrun,
+            thread: record.thread.as_deref().unwrap_or("-"),
+            cause,
+            backtrace: &super::symbolize(&record.ips, maps).join("\n"),
+            log,
+            context,
+            uptime_secs,
+        };
+        let path = super::write_report(dir, version, &report)?;
+        super::prune(dir)?;
+        Ok(path)
     }
 }
 
@@ -1620,6 +1809,54 @@ mod tests {
         test_report(dir.path(), CrashKind::Unexpected, "closed", &[]).unwrap();
         assert!(take_unseen(dir.path()).is_empty());
         assert_eq!(list(dir.path()).len(), 1);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn an_overrun_record_becomes_a_non_fatal_report_without_a_notice() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::write(
+            dir.path().join("overrun"),
+            "SIGXCPU\nthread voice-capture\nip 0x10\nip 0x20\n",
+        )
+        .unwrap();
+        fs::write(dir.path().join("overrun-maps"), "").unwrap();
+
+        let record = overrun::take_record(dir.path()).unwrap();
+        let cause = "ran past its time budget; Mumcord kept running";
+        overrun::write(dir.path(), "0.9.0", &record, cause, &[], "", Some(42)).unwrap();
+
+        let reports = list(dir.path());
+        assert_eq!(reports.len(), 1);
+        assert_eq!(reports[0].kind, CrashKind::Overrun);
+        assert_eq!(reports[0].cause, cause);
+        let text = read(dir.path(), &reports[0].id).unwrap();
+        assert!(text.contains("kind: real-time overrun\nthread: voice-capture\n"));
+        assert!(text.contains("backtrace:\n  0: 0x10\n  1: 0x20\n"));
+        // The record is gone, so neither this run nor the next start reports it again.
+        assert!(overrun::take_record(dir.path()).is_none());
+        assert!(take_unseen(dir.path()).is_empty());
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn only_the_first_overrun_of_a_run_is_recorded_and_reported() {
+        let dir = tempfile::tempdir().unwrap();
+        overrun::install(dir.path());
+        assert!(!overrun::claim(), "nothing captured yet");
+
+        // What the SIGXCPU handler calls, here on the test's own thread.
+        overrun::capture();
+        overrun::capture();
+
+        assert!(overrun::claim());
+        assert!(!overrun::claim(), "one report per run");
+        let text = fs::read_to_string(dir.path().join("overrun")).unwrap();
+        assert_eq!(text.matches("SIGXCPU").count(), 1);
+        let (record, maps) = overrun::take_record(dir.path()).unwrap();
+        assert!(!record.ips.is_empty());
+        let stack = symbolize(&record.ips, &maps).join("\n");
+        assert!(stack.contains("overrun::capture"), "{stack}");
     }
 
     #[test]
