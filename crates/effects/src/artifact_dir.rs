@@ -48,16 +48,16 @@ mod tests {
     #[test]
     fn old_layout_stops_at_the_profile_dir() {
         let (dir, out) = tree("target/debug/build/mumcord-effects-abc/out");
-        fs::write(dir.path().join("target/debug/.cargo-lock"), "").unwrap();
-        let found = artifact_dir(&out, "debug").unwrap();
+        fs::write(dir.path().join("target/debug/.cargo-lock"), "").expect("lock file");
+        let found = artifact_dir(&out, "debug").expect("profile dir");
         assert_eq!(found, dir.path().join("target/debug"));
     }
 
     #[test]
     fn cargo_1_100_layout_stops_at_the_profile_dir() {
         let (dir, out) = tree("target/debug/build/mumcord-effects/abc/out");
-        fs::write(dir.path().join("target/debug/.cargo-lock"), "").unwrap();
-        let found = artifact_dir(&out, "debug").unwrap();
+        fs::write(dir.path().join("target/debug/.cargo-lock"), "").expect("lock file");
+        let found = artifact_dir(&out, "debug").expect("profile dir");
         assert_eq!(found, dir.path().join("target/debug"));
     }
 
@@ -66,15 +66,15 @@ mod tests {
         let (dir, out) =
             tree("target/x86_64-unknown-linux-gnu/release/build/mumcord-effects/abc/out");
         let profile = dir.path().join("target/x86_64-unknown-linux-gnu/release");
-        fs::write(profile.join(".cargo-lock"), "").unwrap();
-        let found = artifact_dir(&out, "release").unwrap();
+        fs::write(profile.join(".cargo-lock"), "").expect("lock file");
+        let found = artifact_dir(&out, "release").expect("profile dir");
         assert_eq!(found, profile);
     }
 
     #[test]
     fn falls_back_to_the_profile_name_without_the_lock_file() {
         let (_dir, out) = tree("target/debug/build/mumcord-effects/abc/out");
-        let found = artifact_dir(&out, "debug").unwrap();
-        assert_eq!(found.file_name().unwrap(), "debug");
+        let found = artifact_dir(&out, "debug").expect("profile dir");
+        assert_eq!(found.file_name().expect("name"), "debug");
     }
 }
