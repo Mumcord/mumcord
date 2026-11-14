@@ -118,10 +118,32 @@ const MARK = "fuzzmark";
       await mallory.joinChannelOf(NAMES.b);
       // Her own echo is not Bob's view. Until he has applied the move he refuses every
       // document as not-same-channel, and that check runs before too-large or wrong-type.
+      // She has to stay connected while he reads them: closing first lets the server drop
+      // her before it forwards the documents, and he then ignores them for that reason.
       await on("b", () => waitSameChannel("Mallory"));
       const target = mallory.sessionOf(NAMES.b);
-      for (const doc of docs) mallory.pluginData(target, "mumcord.camera", Buffer.from(doc, "utf8"));
-      mallory.ping();
+      const sendDocs = (): void => {
+        for (const doc of docs) mallory.pluginData(target, "mumcord.camera", Buffer.from(doc, "utf8"));
+        mallory.ping();
+      };
+      sendDocs();
+      // The log file is written out every 5 s, so the ignore lines are not on disk at once.
+      let fresh = "";
+      let resent = false;
+      const deadline = Date.now() + 12_000;
+      while (Date.now() < deadline) {
+        const lines = ignoredLines(clientLog("b"));
+        fresh = lines.slice(seen).join("\n");
+        if (/too-large/.test(fresh) && /wrong-type|malformed/.test(fresh)) break;
+        if (!resent && lines.length - seen >= docs.length) {
+          resent = true;
+          await on("b", () => waitSameChannel("Mallory"));
+          sendDocs();
+        }
+        await sleep(500);
+      }
+      expect(fresh).toMatch(/too-large/);
+      expect(fresh).toMatch(/wrong-type|malformed/);
     } finally {
       await mallory.close();
     }
@@ -133,18 +155,6 @@ const MARK = "fuzzmark";
       expect(room.tiles.map((t) => t.sharer).sort()).toEqual(roomBefore.tiles.map((t) => t.sharer).sort());
       expect((await cameraView())?.state ?? "off").toBe("off");
     });
-    // The log file is written out every 5 s, so the ignore lines are not on disk at once.
-    let lines: string[] = [];
-    const deadline = Date.now() + 12_000;
-    while (Date.now() < deadline) {
-      lines = ignoredLines(clientLog("b"));
-      if (lines.length - seen >= docs.length) break;
-      await sleep(500);
-    }
-    expect(lines.length - seen).toBe(docs.length);
-    const fresh = lines.slice(seen).join("\n");
-    expect(fresh).toMatch(/too-large/);
-    expect(fresh).toMatch(/wrong-type|malformed/);
     expect(clientLog("b")).not.toContain(MARK);
   });
 
