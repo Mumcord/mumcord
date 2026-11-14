@@ -151,6 +151,43 @@ describe("MembersPanel", () => {
     fireEvent.click(others);
   });
 
+  it("does not sort names again for a talking-only update", async () => {
+    await renderPanel();
+    const compare = vi.spyOn(String.prototype, "localeCompare");
+    try {
+      act(() => {
+        api.mock.setTalking(2, true);
+      });
+      expect(member(/^Anna/)).toHaveAttribute("data-talking", "true");
+      expect(compare).not.toHaveBeenCalled();
+    } finally {
+      compare.mockRestore();
+    }
+  });
+
+  it("refreshes cached names and membership when people change", async () => {
+    await renderPanel();
+    const anna = [...getServerState().users.values()].find((user) => user.name === "Anna");
+    if (!anna) throw new Error("seed has no Anna");
+    act(() => {
+      api.mock.upsertUser({ ...anna, name: "Zanna" });
+    });
+    const rows = screen.getAllByRole("button").filter((b) => b.classList.contains("member"));
+    expect(rows.at(-2)).toHaveAccessibleName(/^Zanna/);
+    act(() => {
+      api.mock.upsertUser({ ...anna, name: "Zanna", channelId: 2, listeningChannelIds: [] });
+    });
+    expect(screen.queryByRole("button", { name: /^Zanna/ })).not.toBeInTheDocument();
+    act(() => {
+      api.mock.upsertUser({ ...anna, name: "Zanna", channelId: 2, listeningChannelIds: [1] });
+    });
+    expect(member(/^Zanna/)).toHaveAccessibleName(/listening only/);
+    act(() => {
+      api.mock.emit("userRemoved", { serverId: 1, session: anna.session });
+    });
+    expect(screen.queryByRole("button", { name: /^Zanna/ })).not.toBeInTheDocument();
+  });
+
   it("follows talking state and uses one Tab stop", async () => {
     await renderPanel();
     act(() => {
