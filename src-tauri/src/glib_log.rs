@@ -8,6 +8,10 @@
 //!
 //! Message, Warning, Critical and Error go to the log; Info and Debug stay out so the log is not
 //! flooded. Every line still goes to stderr as before, and through the log's usual redaction.
+//!
+//! One message is dropped: the tray library's notice that it is deprecated (issue #822). It is
+//! addressed to developers, appears on every start that uses the fallback tray, and nothing can
+//! be done about it until Tauri offers another tray backend.
 
 use gtk::glib::{self, LogField, LogLevel, LogWriterOutput};
 
@@ -17,9 +21,12 @@ pub fn install() {
 }
 
 fn write(level: LogLevel, fields: &[LogField<'_>]) -> LogWriterOutput {
+    let domain = field(fields, "GLIB_DOMAIN").unwrap_or("GLib");
+    let message = field(fields, "MESSAGE").unwrap_or_default();
+    if is_tray_deprecation_notice(domain, message) {
+        return LogWriterOutput::Handled;
+    }
     if let Some(level) = level_of(level) {
-        let domain = field(fields, "GLIB_DOMAIN").unwrap_or("GLib");
-        let message = field(fields, "MESSAGE").unwrap_or_default();
         match level {
             tracing::Level::ERROR => tracing::error!(target: "glib", domain, "{message}"),
             tracing::Level::WARN => tracing::warn!(target: "glib", domain, "{message}"),
@@ -27,6 +34,15 @@ fn write(level: LogLevel, fields: &[LogField<'_>]) -> LogWriterOutput {
         }
     }
     glib::log_writer_default(level, fields)
+}
+
+/// The fallback tray (Tauri's, through libayatana-appindicator) announces on every start that
+/// the library is deprecated in favour of one Tauri does not support. Only this notice is
+/// dropped; every other message of the library still reaches stderr and the log. To be removed
+/// with the switch to Tauri's own StatusNotifierItem backend (issue #822).
+fn is_tray_deprecation_notice(domain: &str, message: &str) -> bool {
+    domain == "libayatana-appindicator"
+        && message.starts_with("libayatana-appindicator is deprecated")
 }
 
 /// The level a GLib message gets in Mumcord's log; `None` for the chatty ones.
@@ -78,6 +94,21 @@ mod tests {
         assert_eq!(field(&fields, "CODE_FILE"), None);
     }
 
+    #[test]
+    fn only_the_tray_deprecation_notice_is_dropped() {
+        let notice = "libayatana-appindicator is deprecated. Please use \
+                      libayatana-appindicator-glib in newly written code.";
+        assert!(is_tray_deprecation_notice(
+            "libayatana-appindicator",
+            notice
+        ));
+        assert!(!is_tray_deprecation_notice(
+            "libayatana-appindicator",
+            "Unable to get the session bus"
+        ));
+        assert!(!is_tray_deprecation_notice("Gtk", notice));
+    }
+
     /// End to end: a GTK-style message emitted through GLib lands in Mumcord's log, with its
     /// domain, as the next crash report would read it.
     #[test]
@@ -93,6 +124,10 @@ mod tests {
             "Error 71 (Protocol error) dispatching to Wayland display."
         );
         glib::g_debug!("Gdk", "chatty debug line");
+        glib::g_warning!(
+            "libayatana-appindicator",
+            "libayatana-appindicator is deprecated. Please use libayatana-appindicator-glib in newly written code."
+        );
         let lines = mumcord_engine::diag::recent_log_lines();
         let line = lines
             .iter()
@@ -100,6 +135,7 @@ mod tests {
             .expect("the message is in the log");
         assert!(line.contains("glib") && line.contains("Gdk"), "{line}");
         assert!(!lines.iter().any(|l| l.contains("chatty debug line")));
+        assert!(!lines.iter().any(|l| l.contains("is deprecated")));
         // Log writes are buffered (spec 12); flush before reading the file.
         mumcord_engine::diag::flush_log();
         let on_disk: String = std::fs::read_dir(&dir)
