@@ -282,6 +282,21 @@ impl PublisherSealer {
             Self::Legacy(_) => Err(super::crypto::CryptoError::NotMedia),
         }
     }
+
+    fn has_pending(&self) -> bool {
+        match self {
+            Self::Media(sealer) => sealer.has_pending(),
+            Self::Legacy(_) => false,
+        }
+    }
+
+    /// Installs a staged media key now. The legacy sealer switches inside `seal` instead.
+    fn commit_pending(&mut self) -> bool {
+        match self {
+            Self::Media(sealer) => sealer.commit_pending(),
+            Self::Legacy(_) => false,
+        }
+    }
 }
 
 /// A sealed description waiting to be sent to a late joiner, shared between the writer and the
@@ -430,6 +445,29 @@ impl Drop for Publisher {
     }
 }
 
+/// What a video frame does with a staged key and the stream description before it is sealed
+/// (FR-7.44, FR-7.95). The description is sealed with the new key, so the key is committed
+/// first; a viewer applies a pending description at the keyframe, which has to follow it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct MediaPreface {
+    /// Install the staged key before sealing anything of this frame.
+    commit: bool,
+    /// Seal and send the description ahead of the frame.
+    send_description: bool,
+    /// This frame is not a keyframe, so the next one must be: the viewer applies the new
+    /// description there.
+    force_keyframe: bool,
+}
+
+fn media_preface(keyframe: bool, pending: bool, changed: bool) -> MediaPreface {
+    let commit = keyframe && pending;
+    MediaPreface {
+        commit,
+        send_description: changed || commit,
+        force_keyframe: changed && !keyframe,
+    }
+}
+
 async fn write_units<S: FrameSource>(
     frames: Arc<S>,
     sealer: Arc<Mutex<PublisherSealer>>,
@@ -441,42 +479,68 @@ async fn write_units<S: FrameSource>(
     let mut writer = profile::MessageWriter::new();
     loop {
         let frame = frames.next().await;
-        if media
-            && let FrameKind::Video(_) = frame.header.kind
-            && let Some(wanted) = frames.description(&frame.header)
-        {
-            let changed = lock(&description).as_ref() != Some(&wanted);
-            if changed {
+        if media && let FrameKind::Video(_) = frame.header.kind {
+            let pending = lock(&sealer).has_pending();
+            let wanted = frames.description(&frame.header);
+            let changed = wanted
+                .as_ref()
+                .is_some_and(|wanted| lock(&description).as_ref() != Some(wanted));
+            let preface = media_preface(frame.header.keyframe, pending, changed);
+            if preface.commit {
+                lock(&sealer).commit_pending();
+            }
+            if preface.send_description
+                && let Some(wanted) = wanted
+            {
+                let failed = |reason: &str| {
+                    tracing::warn!(reason, "broadcast description not sent");
+                };
                 let sealed = match lock(&sealer).seal_description(&wanted) {
-                    Ok(sealed) => sealed,
+                    Ok(sealed) => Some(sealed),
                     Err(e) => {
-                        tracing::warn!(error = %e, "broadcast description not sealed");
-                        continue;
+                        failed(&e.to_string());
+                        None
                     }
                 };
-                let sealed_len = u32::try_from(sealed.len()).unwrap_or(u32::MAX);
-                let message =
-                    match profile::Message::control(media::ControlKind::Description, sealed) {
-                        Ok(message) => message,
-                        Err(e) => {
-                            tracing::warn!(error = %e, "broadcast description not made");
-                            continue;
+                let sent = match sealed {
+                    Some(sealed) => {
+                        let sealed_len = u32::try_from(sealed.len()).unwrap_or(u32::MAX);
+                        match profile::Message::control(media::ControlKind::Description, sealed) {
+                            Ok(message) => match writer.encode(&message) {
+                                Ok(bytes) => {
+                                    if units.send(bytes.to_vec()).await.is_err() {
+                                        return;
+                                    }
+                                    tap_description(&tap, sealed_len, &wanted);
+                                    true
+                                }
+                                Err(e) => {
+                                    failed(&e.to_string());
+                                    false
+                                }
+                            },
+                            Err(e) => {
+                                failed(&e.to_string());
+                                false
+                            }
                         }
-                    };
-                let bytes = match writer.encode(&message) {
-                    Ok(bytes) => bytes.to_vec(),
-                    Err(e) => {
-                        tracing::warn!(error = %e, "broadcast description not made");
-                        continue;
                     }
+                    None => false,
                 };
-                if units.send(bytes).await.is_err() {
-                    return;
+                if sent {
+                    *lock(&description) = Some(wanted);
+                    if preface.force_keyframe {
+                        // The viewer applies the description at the next keyframe.
+                        frames.force_keyframe();
+                    }
+                } else {
+                    // The description did not go out. When the key already moved, the next
+                    // keyframe retries it and gives viewers a frame they can start that key on.
+                    if preface.commit {
+                        frames.force_keyframe();
+                    }
+                    continue;
                 }
-                tap_description(&tap, sealed_len, &wanted);
-                *lock(&description) = Some(wanted);
-                // The viewer applies the description at the next keyframe.
-                frames.force_keyframe();
             }
         }
         let sealed = match lock(&sealer).seal_frame(&frame) {
@@ -714,7 +778,8 @@ impl<S: FrameSource> PublisherControl<S> {
     }
 
     /// Stages a new key, hands it to every remaining viewer and makes the next frame a
-    /// keyframe, where the switch happens.
+    /// keyframe. The writer commits the key there and reseals the description with it before
+    /// that frame (FR-7.95).
     async fn rekey(&mut self, units: &mpsc::Sender<Vec<u8>>) -> bool {
         let keys = {
             let mut sealer = lock(&self.sealer);
@@ -1367,6 +1432,72 @@ mod tests {
         wants.insert(2, 540);
         assert_eq!(max_want(&channels, &wants), Some(540));
         assert_eq!(max_want(&HashMap::<u16, ()>::new(), &wants), None);
+    }
+
+    #[test]
+    fn a_rekey_keyframe_reseals_the_description_before_the_frame() {
+        // Unchanged description, no staged key: nothing to send.
+        assert_eq!(
+            media_preface(false, false, false),
+            MediaPreface {
+                commit: false,
+                send_description: false,
+                force_keyframe: false,
+            }
+        );
+        // A staged key waits for a video keyframe; a delta stays on the old key.
+        assert_eq!(
+            media_preface(false, true, false),
+            MediaPreface {
+                commit: false,
+                send_description: false,
+                force_keyframe: false,
+            }
+        );
+        // The keyframe commits first, then the description goes out with the new key.
+        assert_eq!(
+            media_preface(true, true, false),
+            MediaPreface {
+                commit: true,
+                send_description: true,
+                force_keyframe: false,
+            }
+        );
+        // A resolution change on a delta sends the description with the current key and asks
+        // for a keyframe. On a keyframe it is already the frame the viewer applies it at.
+        assert_eq!(
+            media_preface(false, false, true),
+            MediaPreface {
+                commit: false,
+                send_description: true,
+                force_keyframe: true,
+            }
+        );
+        assert_eq!(
+            media_preface(true, false, true),
+            MediaPreface {
+                commit: false,
+                send_description: true,
+                force_keyframe: false,
+            }
+        );
+        // Both at once: the delta does not commit. The following keyframe does, and resends.
+        assert_eq!(
+            media_preface(false, true, true),
+            MediaPreface {
+                commit: false,
+                send_description: true,
+                force_keyframe: true,
+            }
+        );
+        assert_eq!(
+            media_preface(true, true, true),
+            MediaPreface {
+                commit: true,
+                send_description: true,
+                force_keyframe: false,
+            }
+        );
     }
 
     #[test]

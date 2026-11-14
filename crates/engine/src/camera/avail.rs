@@ -140,9 +140,11 @@ impl Engine {
     /// wherever an input changes: the relay, the P2P mode.
     pub(crate) fn camera_availability_refresh(&self, server_id: ServerId) {
         let reason = self.camera_unavailable(server_id);
-        // A camera on air ends when its relay can no longer carry it (FR-8.7, FR-8.24), and when
-        // no path is left at all.
-        self.camera_path_lost(server_id, reason.is_some());
+        // A relay camera ends only when the relay can no longer carry cameras, and any camera
+        // ends when no path is left (FR-8.7, FR-8.24). A refresh that leaves the relay healthy
+        // does not stop a camera that is on it.
+        let relay_lost = relay_carries_cameras(&self.relays().info(server_id)).is_err();
+        self.camera_path_lost(server_id, reason.is_some(), relay_lost);
         if self.relays().camera_changed(server_id, reason) {
             self.events()
                 .for_server(server_id)

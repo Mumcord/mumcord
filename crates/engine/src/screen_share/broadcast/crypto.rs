@@ -29,10 +29,13 @@
 //!
 //! [`TrackSealer::rekey`] and [`FrameSealer::rekey`] stage a new key (key id + 1), which is
 //! handed to the remaining viewers through the key exchange (`keyx`); the sealer switches to it
-//! at the next video keyframe, so viewers always start a key on a decodable frame. A viewer that
-//! leaves gets no new key. The opener holds the few keys it was given; once a frame decrypts
-//! with a newer key, the older keys are dropped. `keys()` hands the current and, during a rekey,
-//! the staged key to a late joiner.
+//! at the next video keyframe, so viewers always start a key on a decodable frame. A caller with
+//! no video keyframe (plugin data) or that must seal the stream description with the new key
+//! before that frame calls [`TrackSealer::commit_pending`] first. `seal` itself still switches
+//! only on a video keyframe, so audio and plugin data stay on the old key until then. A viewer
+//! that leaves gets no new key. The opener holds the few keys it was given; once a frame
+//! decrypts with a newer key, the older keys are dropped. `keys()` hands the current and, during
+//! a rekey, the staged key to a late joiner.
 //!
 //! The media profile delivers messages in order (FR-7.96), so [`TrackOpener`] rejects a counter
 //! at or below the last one it opened with that key: a replayed or too-old frame cannot make it
@@ -371,6 +374,25 @@ impl TrackSealer {
         let key = ShareKey::generate(last.wrapping_add(1))?;
         self.pending = Some(key.clone());
         Ok(key)
+    }
+
+    /// A staged key is waiting for [`Self::seal`] or [`Self::commit_pending`].
+    pub fn has_pending(&self) -> bool {
+        self.pending.is_some()
+    }
+
+    /// Installs a staged key now and reports whether there was one. Plugin data has no video
+    /// keyframe to switch on (FR-7.93), and a stream description must be sealed with the new key
+    /// before the keyframe frame that follows a rekey (FR-7.95). [`Self::seal`] still switches
+    /// only on a video keyframe, so audio and plugin data stay on the old key unless the caller
+    /// commits first.
+    pub fn commit_pending(&mut self) -> bool {
+        let Some(key) = self.pending.take() else {
+            return false;
+        };
+        self.current = FrameKey::derive(&key);
+        self.current_share = key;
+        true
     }
 
     /// Writes one relay track message to `out` (cleared first): the flags byte, the SFrame
@@ -1339,6 +1361,46 @@ mod tests {
 
         // After the switch a viewer admitted later gets the current key only.
         assert_eq!(sealer.keys(), vec![new_key]);
+    }
+
+    #[test]
+    fn committing_a_staged_key_switches_plugin_data_without_a_video_keyframe() {
+        let mut sealer = TrackSealer::new().expect("sealer");
+        let mut stays = track_opener_for(&sealer);
+        let mut leaves = track_opener_for(&sealer);
+        let new_key = sealer.rekey().expect("rekey");
+        assert!(sealer.has_pending());
+        stays.add_key(&new_key);
+        // Without a commit, channel 6 stays on the old key even with the keyframe bit set.
+        // The commit is what a plugin-data message does, because it has no video keyframe.
+        assert!(sealer.commit_pending());
+        assert!(!sealer.has_pending());
+        assert!(!sealer.commit_pending());
+        assert_eq!(sealer.current_key_id(), 1);
+        assert_eq!(sealer.keys(), vec![new_key]);
+
+        let mut message = Vec::new();
+        let header = sealer
+            .seal(
+                media::CHANNEL_PLUGIN_DATA,
+                false,
+                timestamp(),
+                b"data",
+                &mut message,
+            )
+            .expect("seal");
+        assert_eq!(header.key_id, 1);
+        assert_eq!(
+            leaves.open(media::CHANNEL_PLUGIN_DATA, &mut message.clone()),
+            Err(CryptoError::UnknownKey(1))
+        );
+        assert_eq!(
+            stays
+                .open(media::CHANNEL_PLUGIN_DATA, &mut message)
+                .expect("new key")
+                .frame,
+            b"data"
+        );
     }
 
     #[test]

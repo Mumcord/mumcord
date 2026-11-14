@@ -169,6 +169,10 @@ impl MessageReader {
         if let Some(error) = self.fatal {
             return Err(error);
         }
+        // A skip is applied on the next read. One retry covers a dropped message that this
+        // read did not consume, so a later message in the same buffer is not stuck behind it.
+        // A second read that still consumes nothing means the message is incomplete (FR-7.94).
+        let mut retried = false;
         loop {
             let (consumed, step) = {
                 let mut input = &self.buffer[..];
@@ -196,10 +200,15 @@ impl MessageReader {
                     Ok(message) => return Ok(Some(message)),
                     Err(error) => {
                         tracing::debug!(%error, "dropping a broadcast message outside the profile");
+                        retried = false;
                     }
                 },
+                Step::Dropped if consumed == 0 && !retried => {
+                    retried = true;
+                    continue;
+                }
                 Step::Dropped if consumed == 0 => return Ok(None),
-                Step::Dropped => {}
+                Step::Dropped => retried = false,
                 Step::None => return Ok(None),
             }
         }
@@ -342,6 +351,29 @@ mod tests {
         let mut reader = MessageReader::new();
         reader.push(&document);
         assert_eq!(reader.next_message().expect("stream"), Some(good));
+        assert_eq!(reader.next_message().expect("stream"), None);
+    }
+
+    #[test]
+    fn a_dropped_message_after_a_good_one_does_not_stall_the_next() {
+        use bovnar::codec::MuxWriter;
+
+        // The first good message consumes the preamble. The reserved message is then peeked
+        // without consuming bytes, and the message after it must still come out of this buffer.
+        let mut writer = MessageWriter::new();
+        let mut document = Vec::new();
+        let mux = MuxWriter::with_preamble(b"#!bovnar 1.2\n", "media").expect("opening");
+        mux.begin(&mut document);
+        let first = Message::track(media::CHANNEL_VIDEO_BASE, vec![1]).expect("video");
+        document.extend_from_slice(writer.encode(&first).expect("encode"));
+        mux.write_message(&mut document, 7, b"hidden");
+        let second = Message::track(media::CHANNEL_VIDEO_BASE, vec![2]).expect("video");
+        document.extend_from_slice(writer.encode(&second).expect("encode"));
+
+        let mut reader = MessageReader::new();
+        reader.push(&document);
+        assert_eq!(reader.next_message().expect("stream"), Some(first));
+        assert_eq!(reader.next_message().expect("stream"), Some(second));
         assert_eq!(reader.next_message().expect("stream"), None);
     }
 

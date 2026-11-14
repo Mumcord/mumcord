@@ -101,9 +101,14 @@ impl DirectViewers {
         );
     }
 
-    /// `viewer` left or was removed; its stream closes.
-    pub(crate) fn remove(&mut self, viewer: u32) {
-        self.views.remove(&viewer);
+    /// `viewer` left or was removed; its stream closes. True when it had one.
+    pub(crate) fn remove(&mut self, viewer: u32) -> bool {
+        self.views.remove(&viewer).is_some()
+    }
+
+    /// A new viewer would be turned away: eight streams are already open (FR-8.93).
+    pub(crate) fn blocks_new(&self) -> bool {
+        self.views.len() >= MAX_DIRECT_VIEWERS
     }
 }
 
@@ -145,6 +150,13 @@ impl DescriptionKey {
             fps,
         })
     }
+}
+
+/// The description a camera stream sends, on the relay broadcast and on every direct viewer
+/// stream: one video track per temporal layer, no audio and nothing on channel 6 (FR-7.95,
+/// FR-8.92). `id` is the camera session id.
+pub(crate) fn stream_description(video: FrameHeader, fps: u32, id: &str) -> Option<Description> {
+    camera_description(video, DescriptionKey::of(video, fps)?, id)
 }
 
 /// The description of what one camera stream carries: one video track per temporal layer, no
@@ -312,6 +324,10 @@ mod tests {
         let header = video(0, 1280, 720, wire::Codec::Vp9);
         let key = DescriptionKey::of(header, 30).expect("video key");
         let description = camera_description(header, key, ID).expect("description");
+        assert_eq!(
+            stream_description(header, 30, ID).as_ref(),
+            Some(&description)
+        );
         assert_eq!(description.kind, StreamKind::Camera);
         assert_eq!(description.id.as_deref(), Some(ID));
         assert_eq!(description.timebase, 1);

@@ -463,7 +463,7 @@ impl Engine {
             }
         };
         match p2p
-            .broadcast(&ann, &token, BindRole::Publisher, false)
+            .broadcast(&ann, &token, BindRole::Publisher, ann.media)
             .await
         {
             Ok(link) => Some((id, me, link)),
@@ -702,7 +702,7 @@ impl Engine {
         let (p2p, identity) = self.p2p_with_identity().await?;
         let me = cert_key(&identity)?;
         match p2p
-            .broadcast(&ann, token, BindRole::Subscriber, false)
+            .broadcast(&ann, token, BindRole::Subscriber, ann.media)
             .await
         {
             Ok(link) => Some((me, link)),
@@ -816,6 +816,9 @@ impl DataSealer {
                 Ok(())
             }
             Self::Media(sealer) => {
+                // Channel 6 is not a video keyframe, so a staged key would never install on
+                // its own (FR-7.93). The next plugin message is the switch.
+                sealer.commit_pending();
                 sealer.seal(media::CHANNEL_PLUGIN_DATA, false, 0, plain, out)?;
                 Ok(())
             }
@@ -1429,6 +1432,31 @@ mod tests {
             out = received.push(&opened);
         }
         assert_eq!(out, Some(whole));
+    }
+
+    #[test]
+    fn a_media_rekey_switches_on_the_next_plugin_message() {
+        let mut sealer = DataSealer::new(true).expect("sealer");
+        let mut stays = DataOpener::new(true);
+        let mut leaves = DataOpener::new(true);
+        for key in sealer.keys() {
+            stays.add_key(&key);
+            leaves.add_key(&key);
+        }
+        let mut sealed = Vec::new();
+        sealer.seal(b"before", &mut sealed).expect("sealed");
+        assert_eq!(leaves.open_media(&mut sealed).expect("old key"), b"before");
+
+        let new_key = sealer.rekey().expect("rekey");
+        // The staged key is still listed, so a receiver admitted now can open either.
+        assert_eq!(sealer.keys().len(), 2);
+        stays.add_key(&new_key);
+        sealed.clear();
+        sealer.seal(b"after", &mut sealed).expect("sealed");
+        // The message committed the key: a receiver who left cannot open it.
+        assert_eq!(sealer.keys(), vec![new_key]);
+        assert!(leaves.open_media(&mut sealed.clone()).is_err());
+        assert_eq!(stays.open_media(&mut sealed).expect("new key"), b"after");
     }
 
     #[test]

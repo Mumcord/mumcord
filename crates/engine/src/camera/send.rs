@@ -22,6 +22,7 @@ use mumcord_camera::{
     CameraBackend, CameraError, CameraFrame, CaptureRequest, CaptureSession, DeviceId, FrameSink,
 };
 use mumcord_effects::{Effects, EffectsConfig};
+use mumcord_p2p::media::Description;
 use mumcord_screenshare::{EncoderConfig, I420Frame, VideoEncoder};
 use mumcord_store::{CameraSendQuality, ScreenOptimize};
 use tokio::runtime::Handle;
@@ -417,6 +418,8 @@ impl Drop for CameraSend {
 pub(crate) struct CameraFrames {
     queue: Arc<ViewerQueue>,
     hub: Arc<CameraHub>,
+    /// The camera session id, carried in the stream description (FR-8.92).
+    session: String,
 }
 
 impl FrameSource for CameraFrames {
@@ -434,6 +437,12 @@ impl FrameSource for CameraFrames {
 
     fn viewers_changed(&self, viewers: usize, max_want: Option<u16>) {
         self.hub.relay_viewers_changed(viewers, max_want);
+    }
+
+    fn description(&self, video: &FrameHeader) -> Option<Description> {
+        // The same description the direct streams send, so a relay viewer can tell this camera
+        // session from an older one (FR-8.92, AC-8.34).
+        super::direct::stream_description(*video, self.hub.fps(), &self.session)
     }
 }
 
@@ -496,8 +505,9 @@ impl CameraHub {
     }
 
     /// The relay publisher's source; it takes the share once, like one more viewer. Calling it
-    /// again returns a source on the same queue, so the viewer counts stay.
-    pub(crate) fn relay(self: &Arc<Self>) -> CameraFrames {
+    /// again returns a source on the same queue, so the viewer counts stay. `session` is the
+    /// camera session id the stream description carries (FR-8.92).
+    pub(crate) fn relay(self: &Arc<Self>, session: &str) -> CameraFrames {
         let queue = {
             let mut relay = lock(&self.relay);
             match relay.as_mut() {
@@ -517,6 +527,7 @@ impl CameraHub {
         CameraFrames {
             queue,
             hub: self.clone(),
+            session: session.to_owned(),
         }
     }
 
@@ -985,7 +996,7 @@ mod tests {
         .expect("test camera opens");
         let hub = send.take_frames().expect("one taker");
         hub.pump(&rt.handle().clone());
-        let frames = hub.relay();
+        let frames = hub.relay("cam");
         // Preview: nothing is encoded.
         nothing(&rt, &frames, Duration::from_millis(300), "in the preview");
         // On air without viewers: still paused.
@@ -997,13 +1008,13 @@ mod tests {
             "paused without viewers",
         );
         // A viewer with the keys: frames come, the first a keyframe at the default height.
-        hub.relay().viewers_changed(1, None);
+        hub.relay("cam").viewers_changed(1, None);
         let first = wait_for(&rt, &frames, "the first frame");
         assert!(first.header.keyframe);
         assert_eq!(first.header.kind, FrameKind::Video(Codec::Vp9));
         assert_eq!((first.header.width, first.header.height), (640, 360));
         // A viewer wants 720: the next size is 1280×720, starting with a keyframe.
-        hub.relay().viewers_changed(1, Some(720));
+        hub.relay("cam").viewers_changed(1, Some(720));
         let big = loop {
             let f = wait_for(&rt, &frames, "a 720p frame");
             if f.header.height == 720 {
@@ -1019,7 +1030,7 @@ mod tests {
         hub.remove_direct(7);
         drop(queue);
         // The last viewer leaves: the encoder pauses.
-        hub.relay().viewers_changed(0, None);
+        hub.relay("cam").viewers_changed(0, None);
         rt.block_on(async {
             let until = tokio::time::Instant::now() + Duration::from_millis(300);
             while let Ok(Some(_)) = tokio::time::timeout_at(until, frames.next())

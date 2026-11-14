@@ -701,12 +701,19 @@ impl Engine {
                                 engine.camera_broadcast_ended(server_id, id, end);
                             }
                         });
-                        let publisher =
-                            Publisher::start(&rt, id, me, link, frames.relay(), None, on_end)
-                                .map_err(|e| {
-                                    tracing::warn!(error = %e, "camera broadcast not started");
-                                    CameraFailure::RelayDown
-                                })?;
+                        let publisher = Publisher::start(
+                            &rt,
+                            id,
+                            me,
+                            link,
+                            frames.relay(&session),
+                            None,
+                            on_end,
+                        )
+                        .map_err(|e| {
+                            tracing::warn!(error = %e, "camera broadcast not started");
+                            CameraFailure::RelayDown
+                        })?;
                         Some(Broadcast { id, publisher })
                     }
                     None => None,
@@ -955,9 +962,12 @@ impl Engine {
             let send = &own.send;
             match own.live.as_mut().filter(|l| on_air && l.session == session) {
                 Some(live) => {
+                    // Fullness is the state before the seat goes: `has_room` of the leaver
+                    // itself stays true, and removing the stream first would hide a full path.
+                    let direct_was_full = live.direct.blocks_new();
+                    let relay_was_full = live.viewers.path_full(CameraPath::Relay);
                     // Its direct stream, if any, closes with the admission (FR-8.92).
-                    live.direct.remove(viewer);
-                    let was_full = live.viewers.is_full();
+                    let had_stream = live.direct.remove(viewer);
                     match live.viewers.leave(viewer) {
                         Some((hash, path)) => {
                             // Only a relay viewer holds the broadcast keys (FR-8.48).
@@ -967,11 +977,17 @@ impl Engine {
                                 broadcast.publisher.remove(&hash);
                             }
                             send.set_vp9_only(live.viewers.needs_vp9());
-                            Some((
-                                was_full,
-                                live.broadcast.as_ref().map(|b| b.id),
-                                live.sends_media(),
-                            ))
+                            // A freed seat is the path this viewer was on, and only when that
+                            // path was full (FR-8.52, FR-8.93). The bot hears about a relay
+                            // viewer only.
+                            let seat_freed = match path {
+                                CameraPath::Relay => relay_was_full,
+                                CameraPath::Direct => direct_was_full && had_stream,
+                            };
+                            let broadcast = (path == CameraPath::Relay)
+                                .then(|| live.broadcast.as_ref().map(|b| b.id))
+                                .flatten();
+                            Some((seat_freed, broadcast, live.sends_media()))
                         }
                         None => None,
                     }
@@ -994,6 +1010,7 @@ impl Engine {
                 },
             );
         }
+        // A direct viewer was never on the bot's list (FR-8.49).
         if kick && let Some(broadcast) = broadcast {
             self.relay_broadcast_kick(server_id, RelayUse::Camera, broadcast, viewer);
         }
@@ -1007,26 +1024,33 @@ impl Engine {
         live.viewers.contains(viewer).then(|| live.session.clone())
     }
 
-    /// Nobody this client blocks keeps a direct camera stream (FR-8.92); the relay broadcast of
-    /// the camera is left as it is.
+    /// Nobody this client blocks keeps a direct camera stream (FR-8.92). The admission goes with
+    /// the stream, so the viewer list and a freed direct seat update. The relay broadcast is
+    /// left as it is: a blocked relay viewer is not kicked and the key does not rotate here.
     pub(super) fn camera_close_blocked_direct(&self, ctx: &SessionCtx) {
         let blocked = self.camera_blocked(ctx);
         if blocked.is_empty() {
             return;
         }
-        let mut cameras = lock(self.camera_state());
-        let Some(own) = cameras
-            .own
-            .as_mut()
-            .filter(|o| o.server_id == ctx.server_id)
-        else {
-            return;
+        let leaving = {
+            let cameras = lock(self.camera_state());
+            let Some(live) = cameras
+                .own
+                .as_ref()
+                .filter(|o| o.server_id == ctx.server_id)
+                .and_then(|o| o.live.as_ref())
+            else {
+                return;
+            };
+            let viewers: Vec<u32> = blocked
+                .into_iter()
+                .filter(|viewer| live.viewers.path_of(*viewer) == Some(CameraPath::Direct))
+                .collect();
+            (live.session.clone(), viewers)
         };
-        let Some(live) = own.live.as_mut() else {
-            return;
-        };
-        for viewer in blocked {
-            live.direct.remove(viewer);
+        // The lock is released first: removal takes it again.
+        for viewer in leaving.1 {
+            self.camera_remove_viewer(ctx.server_id, &leaving.0, viewer, false);
         }
     }
 

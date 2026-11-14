@@ -66,9 +66,10 @@ impl CameraViewers {
 
     /// `viewer` with certificate `hash` asked to join, playing `codecs` and served over `path`.
     /// A viewer who is already in is admitted again (it binds anew, for example after a
-    /// reconnect of its link).
+    /// reconnect of its link). The relay broadcast and the direct path fill separately
+    /// (FR-8.93).
     pub fn join(&mut self, viewer: u32, hash: &str, codecs: &[Codec], path: CameraPath) -> Join {
-        if !self.viewers.contains_key(&viewer) && self.is_full() {
+        if !self.viewers.contains_key(&viewer) && self.path_full(path) {
             return Join::Full;
         }
         self.viewers.insert(
@@ -88,9 +89,23 @@ impl CameraViewers {
         self.viewers.remove(&viewer).map(|v| (v.hash, v.path))
     }
 
-    /// No room for another viewer.
-    pub fn is_full(&self) -> bool {
-        self.viewers.len() >= self.limit
+    /// No room for another viewer on `path`. The relay cap is this list's limit (at most 25);
+    /// the direct cap is eight, and one path being full leaves the other open (FR-8.93).
+    pub fn path_full(&self, path: CameraPath) -> bool {
+        let taken = self.viewers.values().filter(|v| v.path == path).count();
+        taken >= self.cap(path)
+    }
+
+    /// The path `viewer` was admitted on, if they were.
+    pub fn path_of(&self, viewer: u32) -> Option<CameraPath> {
+        self.viewers.get(&viewer).map(|v| v.path)
+    }
+
+    fn cap(&self, path: CameraPath) -> usize {
+        match path {
+            CameraPath::Relay => self.limit,
+            CameraPath::Direct => super::direct::MAX_DIRECT_VIEWERS,
+        }
     }
 
     pub fn contains(&self, viewer: u32) -> bool {
@@ -121,12 +136,17 @@ mod tests {
     const BOTH: &[Codec] = &[Codec::Av1, Codec::Vp9];
 
     #[test]
-    fn viewers_are_admitted_until_the_broadcast_is_full() {
+    fn the_relay_and_direct_paths_fill_on_their_own() {
         let mut viewers = CameraViewers::new(2);
         assert_eq!(viewers.join(1, "AA", BOTH, CameraPath::Relay), Join::Admit);
         assert_eq!(viewers.join(2, "bb", BOTH, CameraPath::Direct), Join::Admit);
-        assert_eq!(viewers.join(3, "cc", BOTH, CameraPath::Relay), Join::Full);
-        assert!(viewers.is_full());
+        // A direct viewer does not take a relay seat (FR-8.93).
+        assert_eq!(viewers.join(3, "cc", BOTH, CameraPath::Relay), Join::Admit);
+        assert!(viewers.path_full(CameraPath::Relay));
+        assert!(!viewers.path_full(CameraPath::Direct));
+        assert_eq!(viewers.path_of(2), Some(CameraPath::Direct));
+        assert_eq!(viewers.join(4, "dd", BOTH, CameraPath::Relay), Join::Full);
+        assert_eq!(viewers.join(5, "ee", BOTH, CameraPath::Direct), Join::Admit);
         // Joining again is fine for someone who is in.
         assert_eq!(viewers.join(1, "aa", BOTH, CameraPath::Relay), Join::Admit);
         assert_eq!(
@@ -139,15 +159,38 @@ mod tests {
                 CameraViewer {
                     session: 2,
                     path: CameraPath::Direct
+                },
+                CameraViewer {
+                    session: 3,
+                    path: CameraPath::Relay
+                },
+                CameraViewer {
+                    session: 5,
+                    path: CameraPath::Direct
                 }
             ]
         );
         // A leave frees the seat and hands back the hash and path for the rekey.
         assert_eq!(viewers.leave(1), Some(("aa".to_owned(), CameraPath::Relay)));
         assert_eq!(viewers.leave(1), None);
-        assert!(!viewers.is_full());
-        assert_eq!(viewers.join(3, "cc", BOTH, CameraPath::Relay), Join::Admit);
-        assert!(viewers.contains(3));
+        assert!(!viewers.path_full(CameraPath::Relay));
+        assert_eq!(viewers.join(4, "dd", BOTH, CameraPath::Relay), Join::Admit);
+        assert!(viewers.contains(4));
+    }
+
+    #[test]
+    fn the_direct_path_fills_at_eight_while_the_relay_still_has_room() {
+        let mut viewers = CameraViewers::new(MAX_VIEWERS);
+        for viewer in 0..u32::try_from(crate::camera::direct::MAX_DIRECT_VIEWERS).expect("fits") {
+            assert_eq!(
+                viewers.join(viewer, "h", BOTH, CameraPath::Direct),
+                Join::Admit
+            );
+        }
+        assert!(viewers.path_full(CameraPath::Direct));
+        assert!(!viewers.path_full(CameraPath::Relay));
+        assert_eq!(viewers.join(8, "h", BOTH, CameraPath::Direct), Join::Full);
+        assert_eq!(viewers.join(100, "h", BOTH, CameraPath::Relay), Join::Admit);
     }
 
     #[test]

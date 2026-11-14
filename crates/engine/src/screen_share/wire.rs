@@ -688,6 +688,10 @@ impl MediaFraming {
     /// One complete message, if the buffer holds one. A dropped message is logged and the scan
     /// goes on; only a broken document is fatal.
     fn next_frame(&mut self) -> Result<Option<Frame>, WireError> {
+        // A skip is applied on the next read. One retry covers a dropped message that this
+        // read did not consume, so a later frame in the same buffer is not stuck behind it.
+        // A second read that still consumes nothing means the message is incomplete (FR-7.94).
+        let mut retried = false;
         loop {
             if self.refused {
                 return Err(WireError::Refused);
@@ -711,9 +715,17 @@ impl MediaFraming {
                 self.buffer.drain(..consumed);
             }
             match step {
+                Step::Dropped if consumed == 0 && !retried => {
+                    retried = true;
+                    continue;
+                }
                 Step::Dropped if consumed == 0 => return Ok(None),
-                Step::Dropped => continue,
+                Step::Dropped => {
+                    retried = false;
+                    continue;
+                }
                 Step::Message(channel, payload) => {
+                    retried = false;
                     if let Some(frame) = self.message_frame(channel, &payload) {
                         return Ok(Some(frame));
                     }
@@ -1205,6 +1217,45 @@ mod tests {
             .unwrap();
         writer.finish(&mut document);
         let mut reader = FrameReader::new(document.as_slice(), Format::Media);
+        assert!(reader.read_frame().await.unwrap().is_none());
+    }
+
+    #[tokio::test]
+    async fn a_dropped_message_between_frames_does_not_stall_the_next() {
+        use bovnar::codec::MuxWriter;
+
+        let description = screen_description(Codec::Vp9, 1280, 720);
+        let mut document = Vec::new();
+        let mux = MuxWriter::with_preamble(b"#!bovnar 1.2\n", "media").unwrap();
+        mux.begin(&mut document);
+        let mut control = vec![media::KIND_DESCRIPTION];
+        control.extend_from_slice(&description.encode().unwrap());
+        mux.write_message(&mut document, u64::from(CHANNEL_CONTROL), &control);
+        let video = |byte: u8| {
+            let mut body = vec![media::FLAG_KEYFRAME];
+            body.extend_from_slice(&0u64.to_be_bytes());
+            body.push(byte);
+            body
+        };
+        mux.write_message(
+            &mut document,
+            u64::from(media::CHANNEL_VIDEO_BASE),
+            &video(1),
+        );
+        // Reserved channel, after a message that already consumed the preamble: the peek
+        // consumes nothing, and the frame after it must still be read from this buffer.
+        mux.write_message(&mut document, 7, b"hidden");
+        mux.write_message(
+            &mut document,
+            u64::from(media::CHANNEL_VIDEO_BASE),
+            &video(2),
+        );
+
+        let mut reader = FrameReader::new(document.as_slice(), Format::Media);
+        let first = reader.read_frame().await.unwrap().expect("first frame");
+        assert_eq!(first.payload, [1]);
+        let second = reader.read_frame().await.unwrap().expect("second frame");
+        assert_eq!(second.payload, [2]);
         assert!(reader.read_frame().await.unwrap().is_none());
     }
 
