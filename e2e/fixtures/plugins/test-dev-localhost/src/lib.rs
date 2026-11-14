@@ -1,5 +1,5 @@
 //! E2E test plugin for the Developer-mode exception (spec 09 FR-9.26, AC-9.10): it declares
-//! `http://localhost:47180`, which a developer plugin may reach and a packaged plugin may not
+//! `http://localhost:18080`, which a developer plugin may reach and a packaged plugin may not
 //! declare at all (hard stop). The panel button fetches the origin and shows the outcome.
 
 use std::cell::RefCell;
@@ -10,7 +10,7 @@ use mumcord_plugin_sdk::types::StartInfo;
 use mumcord_plugin_sdk::ui::{self, Slot};
 use mumcord_plugin_sdk::{Plugin, log};
 
-const ORIGIN: &str = "http://localhost:47180";
+const ORIGIN: &str = "http://localhost:18080";
 
 thread_local! {
     static RESULT: RefCell<String> = RefCell::new("not fetched".to_owned());

@@ -1,7 +1,7 @@
 # Test Dev Localhost (`test-dev-localhost`)
 
 E2E fixture of the 1.1 plugin platform (spec 09 FR-9.26, AC-9.10). It declares
-`http://localhost:47180`; the E2E test serves plain HTTP there.
+`http://localhost:18080`; the E2E test serves plain HTTP there.
 
 - Developer mode: load the unpacked package (unzip the built `.mcplugin`: `manifest.json`,
   `plugin.wasm`, `i18n/`). The panel button "Fetch localhost" shows `Result: 200`.
