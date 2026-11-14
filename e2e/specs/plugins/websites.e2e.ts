@@ -9,7 +9,7 @@
 //   `host-not-allowed` (the DNS rebinding case).
 // - AC-9.8: the plugin's details then list its website and purpose, the approval date, the last
 //   request and today's count with the blocked ones.
-// - AC-9.10: test-dev-localhost loaded unpacked in Developer mode reaches http://localhost:47180.
+// - AC-9.10: test-dev-localhost loaded unpacked in Developer mode reaches http://localhost:18080.
 //   The test loads the folder through the `plugin_dev_load` command, because the native folder
 //   picker can't be driven in the container; picking a folder by hand stays a manual check.
 import { createServer, type Server } from "node:http";
@@ -25,8 +25,14 @@ import { addAndConnect, completeWizard, reconnect } from "../../helpers/voice-ui
 
 const SURFACE = "Test Surface";
 const DEV = { id: "test-dev-localhost", name: "Test Dev Localhost" };
-/** The origin test-dev-localhost declares; its port is kept free by the HTTPS fixture. */
-const DEV_PORT = 47180;
+/**
+ * The origin test-dev-localhost declares; its port is kept free by the HTTPS fixture.
+ *
+ * Below the Linux ephemeral range (32768–60999): the registries of the same shard take their ports
+ * from it with `--port 0` (e2e/helpers/pluginenv.ts), so a fixed port inside the range loses the
+ * bind race whenever a previous spec leaks one of them (E4c, shard 2's `EADDRINUSE :::47180`).
+ */
+const DEV_PORT = 18080;
 const DECLARED_HOST = "declared.plugins.test";
 
 /** Hard-stop fixtures by name, with the reason the prompt gives (crates/plugins/src/origins.rs). */

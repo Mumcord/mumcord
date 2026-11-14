@@ -65,7 +65,7 @@
 | E4 | Acceptance run of every AC | open | all (incl. P0.5) | complex |
 | E4a | A machine that can run the acceptance run | open — 4 of 6 items provisioned, AVX2, docker and `sudo` are the host's | – | simple |
 | E4b | Keep the no-relay cells out of the relay shards | done — `e2e/specs/media/{media-streams,media-streams-relay}.e2e.ts`, `e2e/specs/media/flows.ts`, `e2e/specs/camera/media-streams-direct.e2e.ts`; both no-relay files stop a running relay env in `before` | – | simple |
-| E4c | Triage what E4b leaves failing | open | E4b | complex |
+| E4c | Triage what E4b leaves failing | done — every item has a cause and a fix commit; findings below | E4b | complex |
 | E5 | Release Mumcord 0.9.0, mumpeer 0.3.0, mumbot | open | E4 | simple |
 
 Next steps: merge P0.5 (PR #728) after its screenshots, bindings regeneration and locale review,
@@ -697,6 +697,52 @@ spec files pass in CI.
 The screenshots and DOM dumps are in the `e2e-artifacts-shard-*` artifacts of that run.
 
 **Done when:** each item has a cause and either a fix commit or a written reason it is not a defect.
+
+### Findings (2026-11-14)
+
+Evidence: run 43402357622 (`39a0e763`) shards 2, 5, 6, 8, and the green E2E run 43571776525
+(`9f1bfcd9`), where every cell below ran and passed — shard 5 ran `camera/{effects,media-streams,
+room-limits,signal}`, shard 3 `camera/stop`, shard 7 `camera/{a11y,avail,layout,onair,settings,
+viewer}` plus `plugins/{relay-data,websites}`, shard 8 `media/media-streams` and
+`plugins/sound-frame`.
+
+1. **`camera/stop` AC-8.12, `camera/signal` AC-8.25, `camera/room-limits` AC-8.8, `camera/a11y`,
+   `camera/layout`, `camera/onair`, `camera/media-streams-direct` — tile `joining`/`failed`, no
+   picture.** Cause: three defects of the new direct camera path plus tests that waited on the old
+   relay-only timings. A viewer in the default `relay_first` mode declined every direct offer while a
+   relay was announced, so the tile failed after 10 s (`47337350`); a viewer always bound as an
+   old-format subscriber, so a media-format broadcast never arrived (`a68bd40c`); a router that never
+   answered a port-mapping request spent the 3 s the direct tile has to appear in (`7f963b88`); the
+   direct viewer was admitted but the room was never told (`9f285325`); the test client waited on a
+   consent question that is never answered in those cells (`ef19c1fb`). The relay cells of this
+   cluster need a media-capable relay (mumpeer PR #17) or the direct fallback. **Verdict: product
+   defects (engine) plus test defects, all fixed.**
+2. **`camera/effects` AC-8.5 — "the 18 background thumbnails did not show within 3 s".** The dump
+   has 18 `label.bg-thumb` entries and zero `<img>` in the document: `camera_backgrounds` returned an
+   empty library, because the E2E app is an unpackaged debug build with no Tauri bundle, so
+   `resource_dir()/camera-backgrounds` does not exist. Not a time budget. Fixed by `13c3aa65`
+   (`MUMCORD_CAMERA_BACKGROUNDS`, set to `assets/backgrounds` in `e2e/helpers/app.ts`). **Verdict:
+   product defect (unpackaged build), fixed.**
+3. **`media/media-streams` AC-7.80 and `plugins/sound-frame` — connect refused, "The server password
+   is wrong" on a `v15` whose `SERVER_PASSWORD` is empty.** Not the relay testenv's password: a spec
+   that registers a user on the plain test server marked its worker as the owner of the relay data,
+   so the next `startRelay` kept that spec's certificates and refused a fresh Alice as a wrong
+   password (`bced5189`, `relayenv.noteRegistration`). The share cells had the same shape: they
+   connected as a name an earlier spec had already registered (`ef19c1fb`). **Verdict: test defect,
+   fixed.**
+4. **E2E shard 2 — `EADDRINUSE :::47180`.** `DEV_PORT` of `plugins/websites.e2e.ts` is a fixed port
+   inside the Linux ephemeral range (32768–60999), and every plugin registry in the same container
+   takes its port from that range with `--port 0` (`e2e/helpers/pluginenv.ts`), so a registry left
+   over from an earlier spec of the shard took 47180 and `websites.e2e.ts` died in `before()`. Not a
+   product defect and not relay-related. Fixed by moving the dev plugin's origin to `http://
+   localhost:18080`, below the ephemeral range (fixture manifest, i18n, README, `src/lib.rs`,
+   `DEV_PORT`, the CSP unit test in `crates/plugins/src/api/webview.rs`).
+   **shortcut:** `e2e/fixtures/https/server.ts` still fixes 47443/47478, which sit inside the
+   ephemeral range and carry the same latent race; move them the same way if that fixture ever
+   reports `EADDRINUSE`.
+
+None of the six items was a defect of the media format itself; five were the new direct camera path
+or the test environment, one was the unpackaged build's asset lookup.
 
 ---
 
