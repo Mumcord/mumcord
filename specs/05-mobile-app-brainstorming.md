@@ -375,3 +375,9 @@ Correction noted while writing the specification: desktop has no GIF search (Spe
 
 Found during the first Android slice: on Android 17 (API 37, the app's target) an app cannot reach addresses on the directly connected local network, such as a Mumble server at home (192.168.x.x), without the runtime permission `ACCESS_LOCAL_NETWORK`. Without it the connection is dropped silently and the app shows "server could not be reached" after a timeout; internet servers are unaffected. iOS has a comparable local network privacy prompt that needs a usage description.
 Decision (team lead, product manager informed): the app declares the permission. When the user connects to a local-network address and the permission is missing, the app explains in one sentence why it is needed, then triggers the system prompt. If denied, the connection error says so and offers the way to the system settings. Applies to Android and iOS. Recorded as FR-5.8 and AC-5.37.
+
+## Addendum 2026-11-14: transfer code length
+
+Found while building the transfer format for "Send to your phone" (FR-5.64): a 6-digit code has only a million possibilities. Someone who photographs all QR codes but not the number could try every code in roughly 5–10 hours on one desktop PC, in spite of the slow key derivation, and would then hold the identities for good. The three attempts and the two-minute limit only apply on the user's own phone.
+
+Decision (product manager): the code has 8 digits, shown as two groups of four. That is a hundred times the effort (roughly three to four weeks on one PC, within a day on rented machines). The main protection stays that the codes and the number are only on the user's own screen for at most two minutes. The length is a setting of the sending side; the phone accepts 6 to 10 digits. Q4.3 (everything inside the QR codes plus a typed code) is unchanged.

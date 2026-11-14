@@ -30,6 +30,12 @@ rand.workspace = true
 chrono.workspace = true
 # The encrypted fallback secret file on FreeBSD (AES-256-GCM); already in the tree through rustls.
 ring.workspace = true
+# The transfer to the phone (`transfer` module): key derivation, compression, part checksum and
+# wiping of key material.
+argon2.workspace = true
+miniz_oxide.workspace = true
+crc32fast.workspace = true
+zeroize.workspace = true
 
 # The OS secure storage of the desktop platforms. Phones have no backend in `keyring` that fits
 # (Android Keystore, iOS Keychain with "this device only"); there the embedding app implements
@@ -47,6 +53,7 @@ test-util = []
 
 [dev-dependencies]
 tempfile.workspace = true
+proptest.workspace = true
 
 [lints]
 workspace = true

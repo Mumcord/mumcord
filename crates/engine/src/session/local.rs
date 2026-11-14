@@ -12,6 +12,7 @@ use mumcord_audio::dsp::{
     Backend as DspBackend, DspControls, SuppressionLevel as DspSuppressionLevel,
     TalkMode as DspTalkMode,
 };
+use mumcord_store::transfer::{ImportReport, TransferPayload};
 use mumcord_store::{
     Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, NoiseBackend, P2pMode,
     SavedServer, SecretStore, ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
@@ -349,6 +350,41 @@ impl Engine {
         tokio::fs::write(&path, data)
             .await
             .map_err(|e| EngineError::new(ErrorKind::Io, format!("writing the file failed: {e}")))
+    }
+
+    /// Collects the chosen identities and, if wanted, the server list for "Send to your phone"
+    /// (spec 05, FR-5.64). Saved server passwords and channel access tokens are never part of
+    /// it (FR-5.66). The result holds private keys: hand it to
+    /// [`Transfer::create`](mumcord_store::transfer::Transfer::create) and drop it.
+    pub async fn transfer_export_payload(
+        &self,
+        identity_ids: Vec<IdentityId>,
+        include_servers: bool,
+    ) -> EngineResult<TransferPayload> {
+        let store = self.inner.store.clone();
+        self.blocking(move |secrets| {
+            lock(&store).export_transfer_payload(secrets, &identity_ids, include_servers)
+        })
+        .await
+    }
+
+    /// Imports what a [`TransferReader`](mumcord_store::transfer::TransferReader) opened
+    /// (spec 05, FR-5.65, FR-5.66): identities whose certificate is already in the list and
+    /// servers that are already saved are skipped, everything else is added. The report says
+    /// what happened to each entry.
+    pub async fn transfer_import(&self, payload: TransferPayload) -> EngineResult<ImportReport> {
+        let store = self.inner.store.clone();
+        let report = self
+            .blocking(move |secrets| {
+                lock(&store).import_transfer_payload(secrets, &payload, now_ms())
+            })
+            .await?;
+        tracing::info!(
+            identities = report.identities_imported.len(),
+            servers = report.servers_imported.len(),
+            "transfer imported"
+        );
+        Ok(report)
     }
 
     /// Label of a saved server as the server bar shows it (the address when none was given).
@@ -1073,6 +1109,57 @@ mod tests {
             engine.identity().await.expect("default").map(|i| i.id),
             Some(work.id)
         );
+    }
+
+    #[tokio::test]
+    async fn a_transfer_moves_identities_and_servers_but_no_password() {
+        let (_dir, engine) = engine().await;
+        let main = engine
+            .identity_create("Zoe".into(), Some("Main".into()))
+            .await
+            .expect("create");
+        engine
+            .server_add(ServerFields {
+                password: PasswordChange::Set("server-password".into()),
+                ..fields("Home", "voice.example.org", "Zoe")
+            })
+            .await
+            .expect("add server");
+        let payload = engine
+            .transfer_export_payload(vec![main.id], true)
+            .await
+            .expect("export");
+        assert_eq!(payload.identities.len(), 1);
+        assert_eq!(payload.servers.as_ref().map(Vec::len), Some(1));
+
+        // The phone: a fresh data folder with empty secure storage.
+        let phone_dir = tempfile::tempdir().expect("tempdir");
+        let (phone, _phone_rx) = Engine::new(
+            phone_dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("second engine");
+        let report = phone
+            .transfer_import(payload.clone())
+            .await
+            .expect("import");
+        assert_eq!(report.identities_imported.len(), 1);
+        assert_eq!(report.servers_imported.len(), 1);
+        let identities = phone.identity_list().await.expect("identities");
+        assert_eq!(identities.len(), 1);
+        assert_eq!(identities[0].label, "Main");
+        assert!(identities[0].is_default);
+        let servers = phone.servers().await.expect("servers");
+        assert_eq!(servers.len(), 1);
+        assert_eq!(servers[0].address, "voice.example.org");
+        assert!(!servers[0].has_password);
+
+        // A second import adds nothing (spec 03: duplicates are refused).
+        let again = phone.transfer_import(payload).await.expect("import");
+        assert!(again.identities_imported.is_empty());
+        assert!(again.servers_imported.is_empty());
+        assert_eq!(phone.identity_list().await.expect("identities").len(), 1);
     }
 
     #[tokio::test]

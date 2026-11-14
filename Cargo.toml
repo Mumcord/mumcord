@@ -91,6 +91,13 @@ rcgen = "0.14"
 p12-keystore = "0.4"
 # Only used to generate RSA identity keys (ring cannot generate RSA keys); signing stays with ring.
 rsa = { version = "0.10", default-features = false, features = ["std", "getrandom", "encoding"] }
+# "Send to your phone" (spec 05, FR-5.64): the slow key derivation from the typed code. Pure
+# Rust, so it builds for the phone targets without a C toolchain.
+argon2 = { version = "0.6", default-features = false, features = ["alloc", "zeroize"] }
+# The rest of the transfer format; all three are in the tree already (rustls, flate2).
+zeroize = "1"
+miniz_oxide = "0.9"
+crc32fast = "1"
 
 # Audio
 # realtime-dbus: cpal asks for real-time scheduling of its device threads (rtkit over D-Bus on
@@ -298,6 +305,14 @@ opt-level = 3
 opt-level = 3
 
 [profile.dev.package.crypto-primes]
+opt-level = 3
+
+# The key derivation of "Send to your phone" fills 128 MiB four times; unoptimised it takes
+# many seconds per code instead of a fraction of one.
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
 opt-level = 3
 
 # Voice DSP (noise suppression, echo cancellation, resampling, Opus) in an unoptimised build

@@ -32,6 +32,7 @@ mod settings;
 mod settings_compat;
 mod social;
 mod synced;
+pub mod transfer;
 
 pub use accepted::AcceptedConversation;
 pub use blocked::BlockedUser;

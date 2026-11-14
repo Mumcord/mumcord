@@ -114,8 +114,8 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 - **FR-5.61** Create a new identity on the phone (same certificate parameters as desktop).
 - **FR-5.62** Import a `.p12` / `.pfx` file through the system file picker, with password entry; duplicates by fingerprint are refused (Spec 03 FR-3.6).
 - **FR-5.63** Export a password-protected `.p12` file through the system share sheet (Spec 03 FR-3.8). Delete rules as in Spec 03 (the last identity cannot be deleted).
-- **FR-5.64** QR transfer, desktop side ("Send to your phone", in identity settings): choose which identities and whether the server list is included; the desktop shows a repeating sequence of QR codes and a 6-digit code. The data is compressed and encrypted with a key derived from the 6-digit code through a slow key derivation; the codes are valid while the dialog is open and at most 2 minutes, then a new set with a new code is needed.
-- **FR-5.65** QR transfer, phone side: the scanner collects the codes in any order and shows progress ("Code 3 of 7"); after the last one the user types the 6-digit code. Wrong code: clear error, three attempts, then the scan must be repeated. On success the app lists what arrives and imports after confirmation.
+- **FR-5.64** QR transfer, desktop side ("Send to your phone", in identity settings): choose which identities and whether the server list is included; the desktop shows a repeating sequence of QR codes and an 8-digit code (shown as two groups of four). The data is compressed and encrypted with a key derived from the 8-digit code through a slow key derivation; the codes are valid while the dialog is open and at most 2 minutes, then a new set with a new code is needed.
+- **FR-5.65** QR transfer, phone side: the scanner collects the codes in any order and shows progress ("Code 3 of 7"); after the last one the user types the 8-digit code. Wrong code: clear error, three attempts, then the scan must be repeated. On success the app lists what arrives and imports after confirmation.
 - **FR-5.66** The server list in a transfer contains name, address, port and user name per server. Saved server passwords and channel access tokens are not transferred. Existing entries on the phone are kept; exact duplicates are skipped. This is a one-time import, not a sync.
 - **FR-5.67** Nothing of a transfer touches a network; the desktop dialog warns to show the codes only to the own phone.
 
@@ -355,7 +355,7 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 18. **AC-5.18** Private message from desktop while the phone shows another tab or is locked → system notification; tap opens the conversation. With "Show sender only" the text is absent. After disconnecting, a private message produces nothing.
 19. **AC-5.19** Chat history is still there after restarting the app.
 20. **AC-5.20** Desktop exports an identity as `.p12` → phone imports it with the password → the test server recognises the phone as the same registered user.
-21. **AC-5.21** Desktop "Send to your phone" with one identity and the server list → phone scans all codes, enters the 6-digit code → identity and servers are present; server passwords are not. A wrong code is refused three times, then a rescan is required. After 2 minutes the codes are no longer accepted.
+21. **AC-5.21** Desktop "Send to your phone" with one identity and the server list → phone scans all codes, enters the 8-digit code → identity and servers are present; server passwords are not. A wrong code is refused three times, then a rescan is required. After 2 minutes the codes are no longer accepted.
 22. **AC-5.22** Desktop starts a screen share → a live tile appears on the phone; tap → full screen; rotate → landscape; back → floating mini window above the chat; chat still usable.
 23. **AC-5.23** On mobile data with default settings the tile shows tap-to-watch and loads nothing before the tap; with "Start streams automatically" on, it starts.
 24. **AC-5.24** Phone shares its camera after the preview sheet → desktop sees it; switching front and back works; sending the app to the background shows "paused" on desktop while voice continues.
@@ -413,6 +413,7 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 | Q5.4 | Own repository; engine as a pinned library | |
 | Q5.5 | Own mobile version numbers from 0.1.0 | |
 | Q5.6 | Spec in the Mumcord repository; all issues of the epic in the mobile repository | Issue location changed by a later instruction in chat: engine and desktop tasks are issues there too, labelled accordingly |
+| Transfer code length | 8 digits, shown as 4 + 4 (FR-5.64, FR-5.65) | Decided 2026-11-14 after the security estimate: 6 digits could be tried out in 5–10 hours on one desktop PC by someone who photographed the QR codes; the format accepts 6–10 digits |
 | — | GIFs mean inline playback and favourites | No GIF search exists (Spec 01 FR-1.52) |
 | — | System echo cancellation on phones | Technical decision by recommendation |
 | — | Camera cap 540p30, no blur | Technical decision by recommendation |
@@ -426,7 +427,7 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 - **Streams and the relay.** On mobile networks a direct path between clients is rare, so streams will mostly need the optional relay. Voice, chat and everything else are unaffected.
 - **Call integration.** A channel session is not a classic call. To verify early: no entry in recent calls, correct behaviour with real calls, and Bluetooth car systems. Apple restricts call integration in mainland China, relevant for Epic 6 only.
 - **Engine audio on phones.** The audio library used by the engine supports both platforms, but routing, Bluetooth and interruptions are controlled by the system session. If this proves unreliable, capture and playback move into the platform code behind the same engine interface.
-- **QR transfer security.** With everything inside the codes, protection rests on nobody else seeing the screen during the two minutes; a 6-digit code is short. The slow key derivation, the short lifetime and the warning text reduce the risk but do not remove it.
+- **QR transfer security.** With everything inside the codes, protection rests on nobody else seeing the screen during the two minutes; an 8-digit code is short: someone who photographs all codes but not the number can try every number in roughly three to four weeks on one desktop PC, or within a day on rented machines. The slow key derivation, the short lifetime and the warning text reduce the risk but do not remove it.
 - **Server passwords in a transfer.** Left out by default (FR-5.66). Owner: product manager, if a different rule is wanted.
 - **Licence on iOS.** AGPL-3.0 and Apple's distribution terms can conflict. Before the public TestFlight link: confirm that the copyright holders agree to distribution through Apple and check the licences of all dependencies. Owner: product manager.
 - **CI cost.** macOS runners cost about ten times Linux minutes; iOS jobs run on pull requests that touch iOS or the bridge and on releases.
