@@ -3202,6 +3202,7 @@ export type MassMoveResult =
 { kind: "done"; moved: number; total: number } | 
 /**  Another mass move is still running on this server (FR-10.18). */
 { kind: "alreadyRunning" };
+
 /**  The wire format of a captured media stream. */
 export type MediaFormat = "media" | "legacy";
 
@@ -3210,6 +3211,7 @@ export type MediaFormat = "media" | "legacy";
  *  The media content itself is never captured, so there is no payload here.
  */
 export type MediaPacket = {
+	/**  `"media"` for the 0.9.0 `.media` document, `"legacy"` for the old fixed header. */
 	format: MediaFormat,
 	/**  The old header's version byte; `null` for the media document. */
 	version: number | null,
