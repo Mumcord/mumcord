@@ -424,6 +424,7 @@ fn write_freeze_report(
         log: &log,
         context: &context,
         uptime_secs: Some(uptime_secs),
+        ended_by: None,
     };
     write_report(dir, version, &report)
 }
@@ -1141,6 +1142,7 @@ mod overrun {
             log,
             context,
             uptime_secs,
+            ended_by: None,
         };
         let path = super::write_report(dir, version, &report)?;
         super::prune(dir)?;
