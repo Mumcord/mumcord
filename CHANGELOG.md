@@ -12,6 +12,7 @@
 
 ### Fixed
 
+- Mumcord freezes on Windows after a camera opened but delivered no picture: leaving the camera settings, switching to another camera (for example the OBS Virtual Camera) or closing the app waited for the camera forever, the camera stayed black and Windows showed "Not responding". Stopping the camera now gives up after two seconds, so switching cameras and closing the app work again
 - Embedded YouTube, Twitch, Spotify and SoundCloud players and the watch party stay black on Windows: since 0.8.0 the app's own local player page was sent through the web view's connection filter, which refused it. The page is loaded directly again; all other connections of the web view still go through the filter
 
 ### Security
