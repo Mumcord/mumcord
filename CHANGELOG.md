@@ -4,6 +4,7 @@
 
 ### Added
 
+- Linux: when an audio thread runs past its real-time budget, Mumcord now saves a report that shows where that thread was busy (code locations and the thread name only). It appears under Settings → Crash reports marked as a real-time overrun, which is not a crash: the app keeps running. At most one such report is written per run, and it can be uploaded like any other report. This helps find the cause when Linux ends the app without a trace
 - The install script supports FreeBSD (issue #781): on FreeBSD 15.x (amd64), `fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh` downloads the release's `.pkg`, checks it against SHA256SUMS, installs the packages it needs from the pkg repositories and then installs it with `pkg add` (with sudo or doas when you are not root); running it again updates Mumcord, and `--uninstall` removes it with `pkg delete`
 
 ### Changed
