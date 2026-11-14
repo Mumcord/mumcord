@@ -132,18 +132,13 @@ pub struct Netsim {
 }
 
 /// Starts the proxy on `listen` (TCP and UDP, same port) and the control socket on `control`.
-/// A port of 0 in `listen` picks a free port that is valid for both protocols.
+/// A port of 0 in `listen` picks a free port that is valid for both protocols. On Windows the
+/// TCP port can land in a range Hyper-V reserves for UDP (os error 10013), so that pick is tried
+/// again.
 pub async fn start(listen: SocketAddr, target: SocketAddr, control: SocketAddr) -> Result<Netsim> {
     let controls = Arc::new(Controls::new());
-    let tcp = TcpListener::bind(listen)
-        .await
-        .context("bind TCP listener")?;
-    let proxy_addr = tcp.local_addr()?;
-    let udp = Arc::new(
-        UdpSocket::bind(proxy_addr)
-            .await
-            .context("bind UDP socket")?,
-    );
+    let (tcp, proxy_addr, udp) = bind_proxy(listen).await?;
+    let udp = Arc::new(udp);
     let ctl = TcpListener::bind(control)
         .await
         .context("bind control socket")?;
@@ -157,6 +152,35 @@ pub async fn start(listen: SocketAddr, target: SocketAddr, control: SocketAddr) 
         control_addr,
         controls,
     })
+}
+
+/// Binds the proxy's TCP and UDP sockets on one port. A port of 0 is asked for again when the
+/// number the OS gave TCP is not bindable for UDP.
+async fn bind_proxy(listen: SocketAddr) -> Result<(TcpListener, SocketAddr, UdpSocket)> {
+    let attempts = if listen.port() == 0 { 20 } else { 1 };
+    let mut last = None;
+    for _ in 0..attempts {
+        let tcp = TcpListener::bind(listen)
+            .await
+            .context("bind TCP listener")?;
+        let proxy_addr = tcp.local_addr()?;
+        match UdpSocket::bind(proxy_addr).await {
+            Ok(udp) => return Ok((tcp, proxy_addr, udp)),
+            Err(e) if attempts > 1 && udp_port_rejected(&e) => last = Some(e),
+            Err(e) => return Err(e).context("bind UDP socket"),
+        }
+    }
+    Err(last.expect("at least one attempt")).context("bind UDP socket")
+}
+
+/// Windows refuses a UDP bind on a port Hyper-V has reserved (WSAEACCES, 10013). A port taken
+/// between the two binds is the same kind of miss.
+fn udp_port_rejected(err: &std::io::Error) -> bool {
+    err.raw_os_error() == Some(10013)
+        || matches!(
+            err.kind(),
+            std::io::ErrorKind::PermissionDenied | std::io::ErrorKind::AddrInUse
+        )
 }
 
 async fn tcp_accept_loop(listener: TcpListener, target: SocketAddr, controls: Arc<Controls>) {
@@ -345,4 +369,19 @@ pub async fn send_command(control: SocketAddr, command: &str) -> Result<String> 
         .await?
         .context("control socket closed without a reply")?;
     Ok(reply)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::udp_port_rejected;
+
+    #[test]
+    fn a_windows_excluded_udp_port_is_retried() {
+        let excluded = std::io::Error::from_raw_os_error(10013);
+        assert!(udp_port_rejected(&excluded));
+        let busy = std::io::Error::from(std::io::ErrorKind::AddrInUse);
+        assert!(udp_port_rejected(&busy));
+        let other = std::io::Error::from(std::io::ErrorKind::ConnectionRefused);
+        assert!(!udp_port_rejected(&other));
+    }
 }
