@@ -255,7 +255,9 @@ async function scriptedJoin(viewer: RawClient, owner: string, staleId?: string):
       await updateSettings({ p2pMode: "directOnly" });
       const direct = await turnCameraOn();
       expect(direct.broadcast).toBeNull();
-      await on("b", () => waitTile(NAMES.a, "playing", TILE_MS));
+      // Bob already sent cam-join for the first start. A viewer may send that at most once
+      // per 10 s (§6.5), so this second start is not the 3 s camera-start budget.
+      await on("b", () => waitTile(NAMES.a, "playing"));
       expect((await waitOwnViewer(bob)).path).toBe("direct");
       expect(await pathChip().getText()).toBe(DIRECT_CHIP);
       expect(await viewerListPaths()).toEqual(["Direct"]);
