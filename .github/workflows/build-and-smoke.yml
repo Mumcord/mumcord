@@ -528,10 +528,11 @@ jobs:
           retention-days: ${{ inputs.release && 7 || 14 }}
 
   # FreeBSD 15.x amd64 in a VM on a Linux runner (spec 13 §10): the .pkg is built with the repo's
-  # own script and smoke-tested against a local mumble-server from the package collection. Its job
-  # is separate from the matrix because the build runs inside the VM, not on the runner.
+  # own script, installed with pkg add, checked for undeclared runtime dependencies, then
+  # smoke-tested under Xvfb against a local packaged mumble-server (including the release version).
+  # Build and smoke run in the same VM; any failure blocks the release and artifact upload.
   freebsd:
-    name: Build FreeBSD package
+    name: Build and smoke FreeBSD package
     if: inputs.release
     runs-on: ubuntu-24.04
     timeout-minutes: 120
@@ -543,7 +544,7 @@ jobs:
         with:
           name: third-party-notices
 
-      - name: Build the package in a FreeBSD VM
+      - name: Build and smoke the package in a FreeBSD VM
         uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
         with:
           release: "15.1"
@@ -558,11 +559,14 @@ jobs:
             pkg install -y git bash rust node24 npm protobuf python3 pkgconf cmake gmake ca_root_nss \
               alsa-lib alsa-plugins libvpx svt-av1 dav1d gstreamer1-libav \
               gstreamer1-plugins-vpx gstreamer1-plugins-opus webkit2-gtk_41 gtk3 \
-              libayatana-appindicator
+              libayatana-appindicator mumble-server xorg-vfbserver xdpyinfo dbus
           run: |
             set -e
             export PATH="$HOME/.cargo/bin:$PATH"
             export CARGO_BUILD_JOBS=4
+            # vmactions does not forward the caller's environment into the VM. Stamp the
+            # release version explicitly, or the installed app reports a development build.
+            export MUMCORD_VERSION="${{ inputs.version }}"
             # Called through bash: the script's "#!/bin/bash" does not exist on FreeBSD, where
             # bash lives in /usr/local/bin.
             bash scripts/set-version.sh "${{ inputs.version }}"
@@ -573,6 +577,9 @@ jobs:
             # The native libraries this build ships, for the SBOM job (scripts/generate-sbom.sh).
             scripts/sbom-native.sh > sbom-native-freebsd.txt
             ls -l dist-freebsd/ sbom-native-freebsd.txt
+            CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml
+            bash scripts/smoke/freebsd.sh "$PWD/dist-freebsd/mumcord-${{ inputs.version }}.pkg" \
+              "${{ inputs.version }}" "$PWD/target/release/mumcord-smoke-seed" "$PWD/target/release/mumcord-smoke-observe"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

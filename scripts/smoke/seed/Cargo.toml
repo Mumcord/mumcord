@@ -1,4 +1,4 @@
-# Prepares a Mumcord profile for the packaging smoke test (scripts/smoke/smoke.sh).
+# Native helpers for the packaging smoke test: profile seeder and loopback user observer.
 # Standalone on purpose: it is a CI helper, not part of the app workspace.
 [package]
 name = "mumcord-smoke-seed"
