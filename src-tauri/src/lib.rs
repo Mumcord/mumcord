@@ -853,7 +853,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "linux")]
     gst_plugins::log_h264_status(&app.config().identifier);
     set_crash_context(app);
-    mumble_client_protocol::set_client_release(format!("Mumcord {}", version::DISPLAY));
+    mumble_client_protocol::set_client_release(version::client_release());
 
     let info_engine = engine.clone();
     let diag_version = if portable::is_active() {
