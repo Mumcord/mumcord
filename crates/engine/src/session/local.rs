@@ -6,12 +6,12 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use mumble_client_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumble_client_protocol::{ClientIdentity, ConnectConfig, ConnectError};
 use mumcord_audio::dsp::{
     Backend as DspBackend, DspControls, SuppressionLevel as DspSuppressionLevel,
     TalkMode as DspTalkMode,
 };
-use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
-use mumcord_protocol::{ClientIdentity, ConnectConfig, ConnectError};
 use mumcord_store::{
     Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, NoiseBackend, P2pMode,
     SavedServer, SecretStore, ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
@@ -455,9 +455,9 @@ impl Engine {
         };
 
         let probe = async {
-            let connection = match mumcord_protocol::connect(config(password)).await {
+            let connection = match mumble_client_protocol::connect(config(password)).await {
                 Err(ConnectError::CertificateRejected(_)) => {
-                    mumcord_protocol::connect(config(None))
+                    mumble_client_protocol::connect(config(None))
                         .await
                         .map_err(|err| withheld_failure(test_failure(err), trusted.is_some()))?
                 }

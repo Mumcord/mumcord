@@ -11,7 +11,7 @@ Signalling messages (`Signal`) are encoded here and carried by the caller, for e
 ```rust
 use mumcord_p2p::{P2p, P2pConfig};
 
-// `identity` is the user's `mumcord_protocol::ClientIdentity`; `peer_hash` is the
+// `identity` is the user's `mumble_client_protocol::ClientIdentity`; `peer_hash` is the
 // certificate hash the Mumble server reports for the other user.
 let p2p = P2p::new(&identity, P2pConfig::default());
 let pending = p2p.offer(&peer_hash).await?;

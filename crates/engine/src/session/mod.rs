@@ -28,17 +28,17 @@ use std::sync::atomic::{AtomicI64, AtomicU32, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::{Duration, Instant};
 
+use mumble_client_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumble_client_protocol::{
+    ClientIdentity, ConnectConfig, ConnectError, Connection, DisconnectReason, Event, Handle,
+    ServerCert, ServerState, Transport, VoiceEvent, VoiceTransport,
+};
 use mumcord_audio::bitrate::{
     BitrateController, LinkStats as BitrateStats, Transport as BitrateTransport,
 };
 use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase as DspPhase};
 use mumcord_audio::io::{AudioIo, DeviceMigration, Direction};
 use mumcord_audio::mixer::PacketSender;
-use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
-use mumcord_protocol::{
-    ClientIdentity, ConnectConfig, ConnectError, Connection, DisconnectReason, Event, Handle,
-    ServerCert, ServerState, Transport, VoiceEvent, VoiceTransport,
-};
 use mumcord_store::{Identity, IdentityId, OwnVoice, SavedServer, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
@@ -1312,7 +1312,7 @@ impl Engine {
             &ctx,
             self.admin_state(),
             session,
-            crate::admin::Pending::State(mumcord_protocol::permissions::MOVE),
+            crate::admin::Pending::State(mumble_client_protocol::permissions::MOVE),
             || ctx.handle.move_user(session, channel_id),
         )
         .await;
@@ -2348,13 +2348,13 @@ impl Inner {
             login_timeout: LOGIN_TIMEOUT,
         };
         let events = self.events.for_server(server_id);
-        let progress: mumcord_protocol::SyncProgress = Arc::new(move |channels| {
+        let progress: mumble_client_protocol::SyncProgress = Arc::new(move |channels| {
             events.emit(EngineEvent::SyncProgress {
                 channels: u32::try_from(channels).unwrap_or(u32::MAX),
             });
         });
         let tap = Some(self.inspector.tap(server_id));
-        match mumcord_protocol::connect_with_tap(config, Some(progress), tap).await {
+        match mumble_client_protocol::connect_with_tap(config, Some(progress), tap).await {
             Ok(connection) => Ok((connection, server.address, server.port)),
             Err(ConnectError::CertificateRejected(cert)) => {
                 let fingerprint = format_fingerprint(&cert.sha256_hex);
@@ -2622,7 +2622,7 @@ impl Inner {
                     if let Some(t) = &transport {
                         let stats = t.stats();
                         handle.report_voice_link(
-                            stats.rtt.map(|rtt| mumcord_protocol::UdpPing {
+                            stats.rtt.map(|rtt| mumble_client_protocol::UdpPing {
                                 avg_ms: rtt.as_secs_f32() * 1000.0,
                                 packets: stats.crypt.good,
                             }),
@@ -2934,8 +2934,8 @@ impl Inner {
                 crate::admin::on_denied(&self.admin, ctx.server_id, denied);
                 let kick_or_ban = denied.session.is_some()
                     && denied.permission.is_some_and(|bits| {
-                        bits & (mumcord_protocol::permissions::KICK
-                            | mumcord_protocol::permissions::BAN)
+                        bits & (mumble_client_protocol::permissions::KICK
+                            | mumble_client_protocol::permissions::BAN)
                             != 0
                     });
                 // A refused read, rename or unregister of the registered accounts, and a refused
@@ -2944,7 +2944,7 @@ impl Inner {
                     crate::registered::on_denied(&self.registered, ctx.server_id, denied);
                 // A ban-list query is refused with the Ban permission (issue #254).
                 let ban_list = denied.session.is_none()
-                    && denied.permission == Some(mumcord_protocol::permissions::BAN);
+                    && denied.permission == Some(mumble_client_protocol::permissions::BAN);
                 if ban_list {
                     crate::banlist::on_denied(
                         &self.ban_lists,
@@ -3103,7 +3103,7 @@ impl Inner {
     }
 
     /// Whether `user` on the server of `ctx` is blocked (issue #140).
-    fn user_blocked(&self, ctx: &SessionCtx, user: &mumcord_protocol::User) -> bool {
+    fn user_blocked(&self, ctx: &SessionCtx, user: &mumble_client_protocol::User) -> bool {
         let blocks = lock(&self.blocked);
         ctx.handle
             .with_state(|s| crate::blocking::user_blocked(&blocks, s, ctx.server_id, user))
@@ -3113,7 +3113,7 @@ impl Inner {
     fn user_view_of(
         &self,
         server_id: ServerId,
-        user: &mumcord_protocol::User,
+        user: &mumble_client_protocol::User,
         setting: mumcord_store::PersonSetting,
     ) -> UserView {
         let peers = lock(&self.mumcord);
@@ -3430,7 +3430,7 @@ impl Inner {
         core: &Core,
         server_id: ServerId,
         session: u32,
-    ) -> EngineResult<mumcord_protocol::User> {
+    ) -> EngineResult<mumble_client_protocol::User> {
         core.session(server_id)?
             .handle
             .with_state(|st| st.users.get(&session).cloned())

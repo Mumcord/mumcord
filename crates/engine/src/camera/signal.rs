@@ -11,7 +11,7 @@ use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use bovnar::DomDoc;
-use mumcord_protocol::PluginData;
+use mumble_client_protocol::PluginData;
 
 use crate::files::wire::{parse_document, str_field, version_field, write_document};
 use crate::files::{is_lower_hex, wire::Rejected as WireRejected};

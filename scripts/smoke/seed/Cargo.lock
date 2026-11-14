@@ -1182,8 +1182,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084"
 
 [[package]]
-name = "mumcord-protocol"
-version = "0.8.0"
+name = "mumble-client-protocol"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8ef1445c60981edb8a9704d3b22c1e90049159a1cc250b56af2973f08586dc5"
 dependencies = [
  "aes",
  "base64",
@@ -1205,7 +1207,7 @@ dependencies = [
 name = "mumcord-smoke-seed"
 version = "0.1.0"
 dependencies = [
- "mumcord-protocol",
+ "mumble-client-protocol",
  "mumcord-store",
  "tokio",
 ]

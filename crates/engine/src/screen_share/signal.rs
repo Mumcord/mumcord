@@ -12,7 +12,7 @@
 //! field. Payloads are untrusted: they are size-capped and versioned, and viewer lists are
 //! capped (and must still be checked against the people in the channel by the caller).
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 use serde::{Deserialize, Serialize};
 
 /// Plugin data id of every screen share signal; other ids are ignored.

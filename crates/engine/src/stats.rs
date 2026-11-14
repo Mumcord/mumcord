@@ -13,8 +13,8 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
-use mumcord_protocol::proto;
-use mumcord_protocol::{Handle, MumbleVersion};
+use mumble_client_protocol::proto;
+use mumble_client_protocol::{Handle, MumbleVersion};
 
 use crate::ServerId;
 use crate::session::{Engine, EngineEvent, EngineResult, SessionCtx, VoiceTransportKind, lock};

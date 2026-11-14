@@ -17,7 +17,7 @@
 use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant};
 
-use mumcord_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
+use mumble_client_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
 use serde::{Deserialize, Serialize};
 
 use crate::ServerId;

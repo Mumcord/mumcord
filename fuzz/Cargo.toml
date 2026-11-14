@@ -13,7 +13,7 @@ cargo-fuzz = true
 [dependencies]
 libfuzzer-sys = "0.4"
 bytes = "1"
-mumcord-protocol = { path = "../crates/protocol" }
+mumble-client-protocol = "0.1"
 mumcord-engine = { path = "../crates/engine" }
 
 [[bin]]

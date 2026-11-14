@@ -10,7 +10,7 @@
 
 use std::sync::Mutex;
 
-use mumcord_protocol::{PluginData, ServerState, User};
+use mumble_client_protocol::{PluginData, ServerState, User};
 use mumcord_store::{BlockedUser, ServerId, Store};
 
 use crate::chat::now_millis;

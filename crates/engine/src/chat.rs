@@ -12,7 +12,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use mumcord_protocol::{
+use mumble_client_protocol::{
     DenyKind, PermissionDenied, ServerState, TextMessage, TextTarget, User, permissions,
 };
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
@@ -918,7 +918,7 @@ fn own_message(
 
 #[cfg(test)]
 mod tests {
-    use mumcord_protocol::{Channel, User};
+    use mumble_client_protocol::{Channel, User};
 
     use super::*;
 

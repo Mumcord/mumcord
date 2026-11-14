@@ -6,7 +6,7 @@
 //! or drops fields until it fits. Received payloads come from other clients and are untrusted:
 //! the decoder caps every field and keeps only http(s) cover links.
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 

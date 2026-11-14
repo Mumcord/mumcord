@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
-use mumcord_protocol::{CommandError, PluginData, ServerState, User, permissions};
+use mumble_client_protocol::{CommandError, PluginData, ServerState, User, permissions};
 use mumcord_store::{ServerId, Store, UnixMillis};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle;

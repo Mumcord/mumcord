@@ -14,7 +14,7 @@ use std::net::IpAddr;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime};
 
-use mumcord_protocol::ban::{self, Ban};
+use mumble_client_protocol::ban::{self, Ban};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
@@ -137,7 +137,7 @@ impl Engine {
                 .permissions
                 .get(&ROOT)
                 .copied()
-                .is_some_and(|bits| bits & mumcord_protocol::permissions::BAN != 0)
+                .is_some_and(|bits| bits & mumble_client_protocol::permissions::BAN != 0)
         }))
     }
 
