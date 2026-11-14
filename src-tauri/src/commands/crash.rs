@@ -75,6 +75,8 @@ impl From<crash::CrashSummary> for CrashReport {
             crash::CrashKind::Panic => (CrashKind::Panic, None),
             crash::CrashKind::Signal(name) => (CrashKind::Signal, Some(name)),
             crash::CrashKind::Unexpected => (CrashKind::Unexpected, None),
+            // The list has no chip of its own for a freeze yet; the cause line says what it is.
+            crash::CrashKind::Freeze => (CrashKind::Unexpected, None),
         };
         Self {
             id: s.id,
