@@ -15,6 +15,7 @@ use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
 use bytes::Bytes;
+use mumble_client_protocol::{OutgoingAudio, VoiceTransport};
 use mumcord_audio::codec::{
     CodecError, MAX_PACKET_BYTES, MAX_VOICE_PAYLOAD_BYTES, OpusEncoder, PacketDuration,
 };
@@ -28,7 +29,6 @@ use mumcord_audio::mixer::{
 };
 use mumcord_audio::rt::RtGuard;
 use mumcord_audio::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
-use mumcord_protocol::{OutgoingAudio, VoiceTransport};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;
 
@@ -43,7 +43,7 @@ use crate::session::{
 /// Interval of `MicLevel` events (about 20 per second).
 // The encoder caps every packet at the audio crate's budget; it must be the one the protocol
 // crate derives from Mumble's voice packet limit, or packets would be dropped (issue #7).
-const _: () = assert!(MAX_VOICE_PAYLOAD_BYTES == mumcord_protocol::MAX_VOICE_PAYLOAD);
+const _: () = assert!(MAX_VOICE_PAYLOAD_BYTES == mumble_client_protocol::MAX_VOICE_PAYLOAD);
 
 const METER_INTERVAL: Duration = Duration::from_millis(50);
 /// Shortest time between two notices that noise suppression fell back. Under lasting load it
@@ -828,7 +828,7 @@ fn realtime(thread: &'static str, shared: &VoiceShared) -> Option<RtGuard> {
 
 /// Converts a received packet for the mixer; `None` if the payload is oversized.
 pub(crate) fn playback_packet(
-    packet: &mumcord_protocol::VoicePacket,
+    packet: &mumble_client_protocol::VoicePacket,
 ) -> Option<mumcord_audio::mixer::VoicePacket> {
     mumcord_audio::mixer::VoicePacket::new(
         packet.session,

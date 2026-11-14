@@ -18,8 +18,8 @@ use std::net::IpAddr;
 use std::sync::Mutex;
 use std::time::Duration;
 
-use mumcord_protocol::PermissionDenied;
-use mumcord_protocol::{CommandError, ban, permissions, proto};
+use mumble_client_protocol::PermissionDenied;
+use mumble_client_protocol::{CommandError, ban, permissions, proto};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
@@ -802,7 +802,7 @@ pub(crate) fn on_removed(hub: &Mutex<Admin>, server_id: ServerId, session: u32) 
 
 /// The server echoed a person's state: the open wait for a change of theirs ends (FR-10.15,
 /// FR-10.20, FR-10.35). Like a refusal, only an echo of the field the wait asked to change
-/// (`echoed_rights`, see [`mumcord_protocol::UserChange`]) ends it, so an unrelated change of the
+/// (`echoed_rights`, see [`mumble_client_protocol::UserChange`]) ends it, so an unrelated change of the
 /// same person (they move or mute themselves) does not confirm the action (issue #640).
 pub(crate) fn on_state(hub: &Mutex<Admin>, server_id: ServerId, session: u32, echoed_rights: u32) {
     lock(hub).complete(server_id, session, Ok(()), |pending| match pending {
@@ -870,7 +870,7 @@ mod tests {
         let hub = Mutex::new(Admin::default());
         let mut mute = lock(&hub).expect_action(1, 7, Pending::State(permissions::MUTE_DEAFEN));
         let base = PermissionDenied {
-            kind: mumcord_protocol::DenyKind::Permission,
+            kind: mumble_client_protocol::DenyKind::Permission,
             permission: Some(permissions::KICK),
             channel_id: Some(0),
             session: Some(7),

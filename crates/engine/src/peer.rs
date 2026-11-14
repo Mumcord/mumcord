@@ -16,12 +16,12 @@ use std::fmt::Write as _;
 use std::sync::{Mutex, OnceLock};
 use std::time::Duration;
 
+use mumble_client_protocol::PluginData;
 use mumcord_p2p::{
     BroadcastErrorReason, BroadcastId, BroadcastKind, MAX_PEER_BYTES, PEER_DATA_ID, PeerMessage,
     RequestId, TokenErrorReason,
 };
 pub use mumcord_p2p::{RelayAnnouncement, RelayRefusal, RelayState, RelayToken, RelayUse};
-use mumcord_protocol::PluginData;
 use mumcord_store::{IdentityId, RelayPin, ServerId, Store, UnixMillis};
 use tokio::sync::oneshot;
 use tokio::time::Instant;

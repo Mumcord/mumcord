@@ -56,7 +56,7 @@ When it fails:
 
 ## Fuzzing
 
-`fuzz/` holds [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) targets for the code that reads bytes from servers and other users: `control_frame` (TCP control frames, `crates/protocol/src/framing.rs`), `voice_packet` (UDP and tunnelled voice packets in both wire formats, `crates/protocol/src/voice/packet.rs`) and `mumcord_hello` (the Mumcord hello plugin data, `crates/engine/src/mumcord.rs`). Each one feeds arbitrary bytes in and fails on a panic, a hang or a stack overflow. The voice decoder is private; cargo-fuzz builds with `--cfg fuzzing`, which exposes `mumcord_protocol::voice::fuzz_decode` for the target and nothing else.
+`fuzz/` holds [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) targets for the code that reads bytes from servers and other users: `control_frame` (TCP control frames) and `voice_packet` (UDP and tunnelled voice packets in both wire formats), both in the [`mumble-client-protocol`](https://github.com/Mumcord/mumble-client-protocol) crate Mumcord depends on, and `mumcord_hello` (the Mumcord hello plugin data, `crates/engine/src/mumcord.rs`). Each one feeds arbitrary bytes in and fails on a panic, a hang or a stack overflow. The voice decoder is private; cargo-fuzz builds with `--cfg fuzzing`, which exposes `mumble_client_protocol::voice::fuzz_decode` for the target and nothing else.
 
 The fuzz crate is its own workspace because it needs a nightly toolchain and sanitizer flags. It needs `rustup toolchain install nightly`, `cargo install cargo-fuzz` and, for `mumcord_hello`, the same system libraries as the app build. To run a target for a minute:
 

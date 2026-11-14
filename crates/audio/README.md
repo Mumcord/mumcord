@@ -2,7 +2,7 @@
 
 The voice audio layer of [Mumcord](https://github.com/Mumcord/mumcord), a modern voice chat client for standard Mumble servers. It is meant for clients and bots that need to send and receive Mumble voice.
 
-It adds microphone and speaker I/O (via cpal), resampling and the microphone test to `mumcord-codec`, which provides the Opus encoder and decoder, a jitter buffer, a mixer with positional placement and the voice processing chain (noise suppression, echo cancellation, gate, leveler); this crate re-exports all of it. Network transport is not part of this crate; see `mumcord-protocol` for that.
+It adds microphone and speaker I/O (via cpal), resampling and the microphone test to `mumcord-codec`, which provides the Opus encoder and decoder, a jitter buffer, a mixer with positional placement and the voice processing chain (noise suppression, echo cancellation, gate, leveler); this crate re-exports all of it. Network transport is not part of this crate; see [`mumble-client-protocol`](https://crates.io/crates/mumble-client-protocol) for that.
 
 All audio inside the crate is 48 kHz mono `f32`, split into 10 ms frames of 480 samples.
 

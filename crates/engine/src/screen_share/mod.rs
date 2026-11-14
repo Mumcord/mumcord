@@ -41,9 +41,9 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use mumble_client_protocol::{Handle, PluginData};
 use mumcord_p2p::DeclineReason;
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_protocol::{Handle, PluginData};
 use tokio::sync::oneshot;
 
 use crate::ServerId;

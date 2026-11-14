@@ -18,11 +18,11 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+pub use mumble_client_protocol::TapDirection;
+use mumble_client_protocol::framing::MessageType;
+use mumble_client_protocol::{PacketTap, TappedFrame};
 use mumcord_p2p::PEER_DATA_ID;
 use mumcord_p2p::media::{self, Description, Track};
-pub use mumcord_protocol::TapDirection;
-use mumcord_protocol::framing::MessageType;
-use mumcord_protocol::{PacketTap, TappedFrame};
 use mumcord_store::ServerId;
 use serde_json::{Value, json};
 
@@ -639,7 +639,7 @@ mod tests {
     use std::time::Duration;
 
     use bytes::Bytes;
-    use mumcord_protocol::{TapPacing, TapPluginData};
+    use mumble_client_protocol::{TapPacing, TapPluginData};
 
     use super::*;
 

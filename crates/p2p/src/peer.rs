@@ -20,7 +20,7 @@ use std::net::IpAddr;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 
 /// Plugin data id of the relay discovery messages.
 pub const PEER_DATA_ID: &str = "mumcord.peer";

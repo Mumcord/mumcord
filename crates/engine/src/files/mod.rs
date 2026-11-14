@@ -23,7 +23,7 @@ pub mod wire;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
-use mumcord_protocol::PluginData;
+use mumble_client_protocol::PluginData;
 
 use crate::ServerId;
 use crate::session::{Engine, SessionCtx, WeakEngine, lock};

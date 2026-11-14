@@ -26,7 +26,7 @@ tauri-build.workspace = true
 [dependencies]
 mumcord-engine.workspace = true
 mumcord-overlay-ipc = { workspace = true, features = ["render"] }
-mumcord-protocol.workspace = true
+mumble-client-protocol.workspace = true
 mumcord-plugins.workspace = true
 semver.workspace = true
 base64 = "0.23"

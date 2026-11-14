@@ -21,13 +21,13 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use mumble_client_protocol::PluginData;
 use mumcord_camera::{CameraBackend, CameraError, TestCamera, TestCameraMode};
 use mumcord_p2p::broadcast::BindRole;
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_p2p::{
     BroadcastEnd, BroadcastErrorReason, BroadcastId, P2pError, RelayRefusal, RelayToken,
 };
-use mumcord_protocol::PluginData;
 use mumcord_store::{Consent, P2pMode, ScreenFps, ScreenOptimize, ScreenResolution};
 use tokio::sync::oneshot;
 

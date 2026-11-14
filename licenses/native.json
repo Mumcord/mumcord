@@ -7,7 +7,8 @@
       "license": "BSD-3-Clause",
       "repository": "https://github.com/mumble-voip/mumble",
       "description": [
-        "The protocol definition files in proto/ (Mumble.proto, MumbleUDP.proto) are taken",
+        "The protocol definition files (Mumble.proto, MumbleUDP.proto) and the OCB2 voice",
+        "encryption in the mumble-client-protocol crate, which Mumcord compiles in, are taken",
         "from the Mumble project. The official Mumble game plugins that Mumcord can load at",
         "runtime to read game positions are developed by the Mumble project under the same",
         "license; they are not part of this repository. Mumcord's plugin host",
@@ -15,7 +16,7 @@
         "Mumble project (MumblePlugin.h and the headers it includes). Mumcord is compatible",
         "with Mumble but is not affiliated with or endorsed by the Mumble project."
       ],
-      "texts": ["crates/protocol/proto/LICENSE.mumble"]
+      "texts": ["licenses/mumble.txt"]
     },
     {
       "name": "libopus",

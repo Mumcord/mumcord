@@ -47,8 +47,8 @@ use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr, UdpSocket};
 use std::sync::Arc;
 use std::time::Duration;
 
-use mumcord_protocol::ClientIdentity;
-use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer};
+use mumble_client_protocol::ClientIdentity;
+use mumble_client_protocol::pki_types::{CertificateDer, PrivateKeyDer};
 use quinn::{Connection, Endpoint, EndpointConfig, TokioRuntime, TransportConfig, VarInt};
 use tokio::sync::mpsc;
 use tokio::task::JoinSet;

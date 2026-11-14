@@ -8,7 +8,7 @@ license.workspace = true
 
 [dependencies]
 crossbeam-queue.workspace = true
-mumcord-protocol.workspace = true
+mumble-client-protocol.workspace = true
 mumcord-audio.workspace = true
 mumcord-store.workspace = true
 mumcord-positional.workspace = true

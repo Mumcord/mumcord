@@ -1,7 +1,6 @@
 [workspace]
 resolver = "3"
 members = [
-    "crates/protocol",
     "crates/audio",
     "crates/codec",
     "crates/store",
@@ -28,8 +27,11 @@ license = "AGPL-3.0-only"
 repository = "https://github.com/Mumcord/mumcord"
 
 [workspace.dependencies]
+# The Mumble protocol (control channel, state, voice transport); it started as crates/protocol and
+# now lives in its own repository (https://github.com/Mumcord/mumble-client-protocol).
+mumble-client-protocol = "0.1"
+
 # Internal crates
-mumcord-protocol = { path = "crates/protocol", version = "0.8" }
 # The version is the minor series: crates.io needs it for the publish of the crates that depend on it (mumcord-audio, mumcord-p2p, mumcord-plugins, mumcord-plugin), and it only changes with a minor/major bump.
 mumcord-codec = { path = "crates/codec", version = "0.8" }
 mumcord-audio = { path = "crates/audio" }
@@ -68,11 +70,8 @@ socket2 = "0.6"
 
 # Protobuf
 prost = "0.14"
-prost-build = "0.14.5"
-protoc-bin-vendored = "3.3"
 
 # Crypto & certificates
-aes = "0.9"
 # X.509 parsing for the TLS certificate details in the server info panel (FR-1.10).
 x509-parser = "0.18"
 # PEM for the "Show certificate" action in the server info panel.
@@ -349,9 +348,8 @@ opt-level = 3
 [profile.dev.package.mumcord-effects]
 opt-level = 3
 
-# mumbot (dev-dependency of the engine's live tests) depends on the published protocol, codec and p2p
-# crates; build it against these instead, so they exist once and `cargo -p` stays unambiguous.
+# mumbot (dev-dependency of the engine's live tests) depends on the published codec and p2p crates;
+# build it against these instead, so they exist once and `cargo -p` stays unambiguous.
 [patch.crates-io]
-mumcord-protocol = { path = "crates/protocol" }
 mumcord-codec = { path = "crates/codec" }
 mumcord-p2p = { path = "crates/p2p" }

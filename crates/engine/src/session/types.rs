@@ -659,7 +659,7 @@ pub enum EngineEvent {
     /// (issue #67); `None` ends the mark.
     IncomingWhisperChanged {
         session: u32,
-        kind: Option<mumcord_protocol::WhisperKind>,
+        kind: Option<mumble_client_protocol::WhisperKind>,
     },
     /// New UserStats of a person on the server (FR-2.25).
     UserStatsChanged(crate::stats::UserStatsView),

@@ -19,9 +19,9 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
-pub use mumcord_protocol::WhisperKind;
-use mumcord_protocol::proto::{self, voice_target};
-use mumcord_protocol::{ServerState, VOICE_TARGET_MAX, permissions};
+pub use mumble_client_protocol::WhisperKind;
+use mumble_client_protocol::proto::{self, voice_target};
+use mumble_client_protocol::{ServerState, VOICE_TARGET_MAX, permissions};
 use mumcord_store::WhisperReceivers;
 
 use crate::session::Engine;
@@ -209,7 +209,7 @@ impl IncomingWhispers {
 
 #[cfg(test)]
 mod tests {
-    use mumcord_protocol::{Channel, User};
+    use mumble_client_protocol::{Channel, User};
     use prost::Message;
 
     use super::*;

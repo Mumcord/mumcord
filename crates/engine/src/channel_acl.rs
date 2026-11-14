@@ -16,7 +16,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::Mutex;
 use std::time::Duration;
 
-use mumcord_protocol::{DenyKind, PermissionDenied, permissions, proto};
+use mumble_client_protocol::{DenyKind, PermissionDenied, permissions, proto};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
@@ -37,7 +37,7 @@ pub struct AclRule {
     /// Who: one registered user, or a group (one of the two is set).
     pub user_id: Option<u32>,
     pub group: Option<String>,
-    /// Permission bits, see [`mumcord_protocol::permissions`].
+    /// Permission bits, see [`mumble_client_protocol::permissions`].
     pub grant: u32,
     pub deny: u32,
 }

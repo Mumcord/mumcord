@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use mumcord_protocol::User;
+use mumble_client_protocol::User;
 use mumcord_store::{PersonSetting, ServerId, Store};
 
 use crate::session::{EngineError, EngineResult, ProfileView, convert::sanitize_html};

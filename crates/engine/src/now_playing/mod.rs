@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use mumcord_protocol::{Handle, PluginData};
+use mumble_client_protocol::{Handle, PluginData};
 
 use crate::ServerId;
 use crate::session::{Engine, EngineEvent, SessionCtx, lock};
