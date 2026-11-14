@@ -75,19 +75,19 @@ async function invokeOk<T>(command: string, args: object = {}): Promise<T> {
 }
 
 /** Joins the shown server's channel when its read-only notice offers it. */
-async function joinVoice(): Promise<void> {
+async function joinVoice(timeout = 30_000): Promise<void> {
   // Plugins only see the voice server, so this waits until the server is it. A reconnect comes
   // back read-only, and the "Join voice" button only shows once the connection has synced.
-  await waitConnected();
+  await waitConnected(timeout);
   const join = $(".userpanel-readonly__join");
   const voice = async () => (await invokeOk<number | null>("voice_server_get")) !== null;
   await browser.waitUntil(async () => (await voice()) || (await join.isDisplayed()), {
-    timeout: 15_000,
+    timeout,
     timeoutMsg: "the server is neither the voice server nor offers Join voice",
   });
   if (!(await voice())) {
     await join.click();
-    await browser.waitUntil(voice, { timeout: 15_000, timeoutMsg: "Join voice did not take voice" });
+    await browser.waitUntil(voice, { timeout, timeoutMsg: "Join voice did not take voice" });
   }
 }
 
@@ -577,10 +577,12 @@ async function bothInChannel(before?: ReadyCounts): Promise<void> {
      * reconnect to the recreated server (registrations are kept).
      */
     async function withoutRelayData(before: ReadyCounts): Promise<void> {
-      // The recreated server drops the connection. A reconnect comes back read-only until
-      // Join voice, and the old "Peer:" line stays on the panel until the new announce.
-      await joinVoice();
-      await apps.onB(joinVoice);
+      // The recreated server drops the connection. While it is down the client is already
+      // inside a reconnect wait of up to 30 s, so the "connected" label can take longer than
+      // a fresh connect. A reconnect comes back read-only until Join voice, and the old
+      // "Peer:" line stays on the panel until the new announce.
+      await joinVoice(90_000);
+      await apps.onB(() => joinVoice(90_000));
       await bothInChannel(before);
       await waitPanel(status("NotAllowed"), 60_000);
       await expectChip(MUMBLE_CHIP);
