@@ -10,6 +10,10 @@
 
 - Update bindgen to 0.73 and require prost-build 0.14.5 with prettyplease 0.3 support; remove the temporary Dependabot hold on bindgen minor updates (issue #79)
 
+### Fixed
+
+- Embedded YouTube, Twitch, Spotify and SoundCloud players and the watch party stay black on Windows: since 0.8.0 the app's own local player page was sent through the web view's connection filter, which refused it. The page is loaded directly again; all other connections of the web view still go through the filter
+
 ### Security
 
 - Require patched `ammonia 4.2.5` or newer to address the SVG/MathML mutation-XSS advisory RUSTSEC-2026-0533, with regression tests for chat HTML and plugin SVG assets; existing sanitization allow-lists remain unchanged (issue #819)
