@@ -207,7 +207,7 @@ async fn a_ban_is_named_only_where_the_server_names_it() {
         !while_connected
             .iter()
             .any(|s| matches!(s, ConnState::Reconnecting { .. })),
-        "a ban is not retried: {while_connected:?}"
+        "a ban is not retried"
     );
 
     let error = ended(&from_banned_address).expect("the connect failed");
@@ -220,7 +220,7 @@ async fn a_ban_is_named_only_where_the_server_names_it() {
         !from_banned_address
             .iter()
             .any(|s| matches!(s, ConnState::Reconnecting { .. })),
-        "a failed first connect is not retried: {from_banned_address:?}"
+        "a failed first connect is not retried"
     );
 
     // Every login succeeds and is closed at once; the attempts add up instead of starting
@@ -232,14 +232,18 @@ async fn a_ban_is_named_only_where_the_server_names_it() {
             _ => None,
         })
         .collect();
-    assert_eq!(attempts, vec![1, 2, 3], "{with_banned_certificate:?}");
+    // The states are not printed on failure: they describe an identity's logins.
+    assert!(
+        attempts == [1, 2, 3],
+        "the reconnect attempts count up from one to three"
+    );
     assert!(
         with_banned_certificate
             .iter()
             .filter(|s| matches!(s, ConnState::Connected { .. }))
             .count()
             >= 3,
-        "the server accepts each login before closing: {with_banned_certificate:?}"
+        "the server accepts each login before closing"
     );
 
     assert!(
