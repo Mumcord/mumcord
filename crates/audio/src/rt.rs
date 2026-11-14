@@ -31,6 +31,11 @@ use crate::{FRAME_SAMPLES, SAMPLE_RATE};
 /// last [`take_demotions`].
 static DEMOTIONS: AtomicU32 = AtomicU32::new(0);
 
+/// What [`set_overrun_hook`] registered; null until then.
+#[cfg(target_os = "linux")]
+static OVERRUN_HOOK: std::sync::atomic::AtomicPtr<()> =
+    std::sync::atomic::AtomicPtr::new(std::ptr::null_mut());
+
 /// Why a thread kept its normal priority.
 #[derive(Debug, thiserror::Error)]
 #[error("real-time scheduling unavailable: {0}")]
@@ -131,6 +136,15 @@ pub fn take_demotions() -> u32 {
     DEMOTIONS.swap(0, Ordering::Relaxed)
 }
 
+/// Registers `hook` to run when a real-time thread of this process (ours or a library's) runs
+/// past its time budget: inside the SIGXCPU handler, on that thread, after the attempt to demote
+/// it. That is the only moment to record where the thread is busy. `hook` must be
+/// async-signal-safe: no allocation, no locks, no logging.
+#[cfg(target_os = "linux")]
+pub fn set_overrun_hook(hook: extern "C" fn()) {
+    OVERRUN_HOOK.store(hook as *mut (), Ordering::Release);
+}
+
 /// Makes an overrunning real-time thread drop to normal priority instead of ending the process;
 /// needed before any thread of the process goes real-time. Idempotent.
 pub(crate) fn guard_overruns() {
@@ -151,7 +165,8 @@ mod linux {
     pub(super) static LIMITS: Mutex<()> = Mutex::new(());
 
     /// Runs on the thread that exceeded the soft `RLIMIT_RTTIME`: the kernel directs that
-    /// SIGXCPU at the thread itself. Only async-signal-safe calls: raw syscalls and an atomic.
+    /// SIGXCPU at the thread itself. Only async-signal-safe calls: raw syscalls, atomics and
+    /// the hook, which promises the same.
     extern "C" fn on_sigxcpu(_signal: libc::c_int) {
         // SAFETY: plain syscalls on the calling thread (pid 0); `param` outlives the call.
         unsafe {
@@ -172,6 +187,11 @@ mod linux {
             ) == 0
             {
                 DEMOTIONS.fetch_add(1, Ordering::Relaxed);
+            }
+            let hook = super::OVERRUN_HOOK.load(Ordering::Acquire);
+            if !hook.is_null() {
+                // SAFETY: only `set_overrun_hook` stores here, always an `extern "C" fn()`.
+                std::mem::transmute::<*mut (), extern "C" fn()>(hook)();
             }
         }
     }
