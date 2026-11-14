@@ -10,6 +10,8 @@ mod deeplink;
 mod desktop_entry;
 mod display;
 mod dnd;
+#[cfg(target_os = "linux")]
+mod freeze;
 mod fullscreen;
 #[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod glib_log;
@@ -678,6 +680,9 @@ pub fn run() {
             // their `stop` and the connections close cleanly (#748).
             let quitting = app.handle().clone();
             mumcord_engine::crash::on_quit_signal(move || window::quit(&quitting));
+            // After the engine start, which sets up the crash reports a freeze is written to.
+            #[cfg(target_os = "linux")]
+            freeze::start(app.handle());
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
             dnd::init(app.handle());
