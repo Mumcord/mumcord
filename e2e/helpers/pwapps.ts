@@ -5,7 +5,8 @@ import { type ChildProcess, execFileSync, spawn } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { RATE, readWav, writeWav } from "./voice-audio.ts";
+import { Readable } from "node:stream";
+import { RATE, readWav } from "./voice-audio.ts";
 
 /** The 1 kHz tone of Mumcord's own test notification: must never be in the share. */
 export const OWN_SOUND_HZ = 1000;
@@ -128,26 +129,50 @@ export function startTestApp(name: string, hz: number): TestApp {
   const players: ChildProcess[] = [];
   let stopped = false;
   const stream = (tone: number): void => {
-    const wav = join(dir, `${slug}-${String(tone)}.wav`);
-    const sine = new Float32Array(RATE * 30);
-    for (let i = 0; i < sine.length; i++) sine[i] = 0.5 * Math.sin((2 * Math.PI * tone * i) / RATE);
-    writeWav(wav, sine);
-    let slot = -1;
-    // 30 s per run; start again when it ends so a long spec never goes silent.
-    const play = (): void => {
-      if (stopped) return;
-      const started = Date.now();
-      const child = spawn(binary, ["--playback", "-P", `{ application.name = "${name}" }`, wav], {
-        stdio: "ignore",
-      });
-      if (slot < 0) slot = players.push(child) - 1;
-      else players[slot] = child;
-      child.on("exit", () => {
-        // A player that dies at once (no daemon) must not turn into a busy loop.
-        if (Date.now() - started > 1000) play();
-      });
-    };
-    play();
+    // Repeat raw PCM through one long-lived player. Restarting a finite WAV every 30 s removed
+    // the PipeWire stream briefly, so a healthy share intermittently recorded silence.
+    const pcm = Buffer.alloc(RATE * 2);
+    for (let i = 0; i < RATE; i++)
+      pcm.writeInt16LE(Math.round(0.5 * 32767 * Math.sin((2 * Math.PI * tone * i) / RATE)), i * 2);
+    const input = Readable.from(
+      (function* () {
+        while (!stopped) yield pcm;
+      })(),
+      { objectMode: false },
+    );
+    const child = spawn(
+      binary,
+      [
+        "--playback",
+        // PipeWire 1.6 otherwise tries to decode stdin as a container, not raw PCM.
+        "--raw",
+        "--rate",
+        String(RATE),
+        "--channels",
+        "1",
+        "--format",
+        "s16",
+        "-P",
+        `{ application.name = "${name}" }`,
+        "-",
+      ],
+      { stdio: ["pipe", "ignore", "ignore"] },
+    );
+    players.push(child);
+    child.on("error", (error: Error) => {
+      input.destroy();
+      console.error(`[pwapps] player failed: ${error.message}`);
+    });
+    child.stdin.on("error", (error: Error) => {
+      input.destroy();
+      if (!stopped) console.error(`[pwapps] playback pipe failed: ${error.message}`);
+    });
+    child.on("exit", (code, signal) => {
+      input.destroy();
+      if (!stopped) console.error(`[pwapps] player exited unexpectedly: ${String(code ?? signal)}`);
+    });
+    // pipe applies backpressure, so the endless source retains only a bounded amount of PCM.
+    input.pipe(child.stdin);
   };
   stream(hz);
   const app: TestApp = {

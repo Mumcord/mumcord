@@ -56,6 +56,7 @@ const SWITCH_BUDGET_MS = 1500;
   it("AC-7.61: B hears the desktop sound without Mumcord's own sounds", async () => {
     await testenv.up("v15");
     p1 = remember(pwapps.startTestApp("Test App One", P1_HZ));
+    const playerPids = p1.pids();
     remember(pwapps.startTestApp("Test App Two", P2_HZ));
     await startSharer({ sharePick: "screen" }, ports.v15);
     await startViewer(ports.v15);
@@ -64,7 +65,10 @@ const SWITCH_BUDGET_MS = 1500;
     await watch();
     // Mumcord's own test sound while B listens: it must not reach the share.
     await app.invoke("audio_test_sound");
-    await expectHeard([P1_HZ, P2_HZ]);
+    // Cover the old fixture's 30 s file boundary: restarting its player briefly removed the
+    // PipeWire stream and made a healthy share go silent, depending on the UI setup time.
+    await expectHeard([P1_HZ, P2_HZ], 31_000);
+    expect(p1.pids()).toEqual(playerPids);
     await app.invoke("audio_test_sound");
     await expectHeard([P1_HZ, P2_HZ], 2000);
   });
