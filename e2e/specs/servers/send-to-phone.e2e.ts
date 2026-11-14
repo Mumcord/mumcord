@@ -4,6 +4,7 @@ import { browser, expect } from "@wdio/globals";
 import { app } from "../../helpers/index.ts";
 import { artifactsDir, bin } from "../../helpers/paths.ts";
 import { run } from "../../helpers/run.ts";
+import { call } from "../../helpers/test-surface.ts";
 import {
   completeWizard,
   dialogButtonIn,
@@ -18,6 +19,14 @@ import {
 // gets them, and opened with the shown code by the same reader the phone app uses
 // (crates/store/examples/transfer_read.rs). No server is needed: nothing of a transfer touches
 // a network.
+//
+// The feature is behind the build flag `phone-transfer` (CONTRIBUTING.md, "Build flags"): release
+// builds are made without it. The E2E build has it, so everything here runs in CI; with
+// `MUMCORD_E2E_APP_FEATURES=test-backend` the first test proves that a build without the flag has
+// neither the button nor the commands, and the others skip.
+const FEATURES = (process.env.MUMCORD_E2E_APP_FEATURES ?? "test-backend,phone-transfer").split(",");
+const BUILT_WITH_FLAG = FEATURES.includes("phone-transfer");
+const FLAG_TEST = "is offered only by a build with the phone-transfer flag";
 const ME = "PhoneQA"; // the identity the wizard creates (its label is its name)
 const TITLE = "Send to your phone";
 const SERVER = { label: "Home", address: "127.0.0.1", port: 64738, username: "phone-qa" };
@@ -113,6 +122,31 @@ describe("send to your phone (spec 05, FR-5.64, FR-5.67, AC-5.21 desktop half)",
     await app.invoke("server_add", {
       input: { ...SERVER, password: { kind: "set", value: SERVER_PASSWORD } },
     });
+  });
+
+  beforeEach(function () {
+    if (!BUILT_WITH_FLAG && this.currentTest?.title !== FLAG_TEST) this.skip();
+  });
+
+  it(FLAG_TEST, async () => {
+    const info = await app.invoke<{ phoneTransfer: boolean }>("app_info");
+    expect(info.phoneTransfer).toBe(BUILT_WITH_FLAG);
+    await openSettingsSection("account");
+    // Its neighbour is there, so the card with the actions has rendered.
+    await settingsAction("Import…").waitForDisplayed();
+    if (BUILT_WITH_FLAG) {
+      await expect(settingsAction("Send to your phone…")).toBeDisplayed();
+      return;
+    }
+    await expect(settingsAction("Send to your phone…")).not.toBeExisting();
+    await expect(browser.$('//*[contains(text(), "Send to your phone")]')).not.toBeExisting();
+    for (const [command, args] of [
+      ["phone_transfer_start", { identityIds: [], includeServers: true }],
+      ["phone_transfer_cancel", {}],
+    ] as const) {
+      const result = await call(command, args);
+      expect(result.error).toContain("not available in this build");
+    }
   });
 
   it("shows nothing secret before the codes are asked for", async () => {
