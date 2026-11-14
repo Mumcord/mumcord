@@ -1,0 +1,26 @@
+/*
+ * Shared base for the neon, light and glass share images. Colours follow ui/src/theme/tokens.css;
+ * fonts are the app's Bricolage Grotesque and Instrument Sans, loaded from Google Fonts.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@500;600;700&display=block");
+
+:root {
+  --ink: #0e0a26;
+  --text: #f6f0e8;
+  --soft: #cbc3e3;
+  --peach: #ffb08a;
+  --pink: #ff6fa8;
+  --violet: #9b7bff;
+  --green: #3ee39e;
+  --display: "Bricolage Grotesque", "Noto Sans", sans-serif;
+  --body: "Instrument Sans", "Noto Sans", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: var(--w); height: var(--h); overflow: hidden; }
+body { position: relative; font-family: var(--body); }
+.display { font-family: var(--display); font-weight: 800; letter-spacing: -0.035em; line-height: 0.92; font-variation-settings: "opsz" 96; }
+.lockup { display: flex; align-items: center; gap: 0.4em; font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; font-size: var(--lock); }
+.lockup img { display: block; width: 1.6em; height: 1.6em; }
+.small { margin-top: 0.7em; font: 600 var(--small) var(--body); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; }
+h1, p { text-wrap: balance; }

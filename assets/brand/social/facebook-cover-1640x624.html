@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mumcord share image – Facebook cover 1640×624</title>
+<link rel="stylesheet" href="social.css">
+<style>
+  :root { --w: 1640px; --h: 624px; }
+  /* Text stays in the centre 1100 px (mobile crops the sides) and above the bottom-left
+     corner, where the profile picture overlaps on desktop. */
+  .brand { left: 330px; width: 640px; top: 0; bottom: 60px; justify-content: center; gap: 26px; }
+  .lockup { gap: 26px; }
+  .logo { width: 120px; height: 120px; }
+  .name { font-size: 108px; }
+  .bar { width: 170px; }
+  .tagline { font-size: 44px; }
+  .chips { font-size: 26px; }
+  /* Decorative only: may be cropped on phones. */
+  .shot { left: 1000px; top: 90px; width: 760px; height: 476px; }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <div class="lockup">
+      <img class="logo" src="../mumcord-icon.svg" alt="">
+      <h1 class="name">Mumcord</h1>
+    </div>
+    <div class="bar"></div>
+    <p class="tagline">Modern voice chat for any Mumble server</p>
+    <ul class="chips"><li>Text chat</li><li>Screen sharing</li><li>Cameras</li><li>Plugins</li></ul>
+  </div>
+  <div class="shot"><img src="../../../docs/images/screenshots/main-dark.png" alt=""></div>
+</body>
+</html>
