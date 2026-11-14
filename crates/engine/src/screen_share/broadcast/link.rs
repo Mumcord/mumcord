@@ -51,6 +51,9 @@ fn content_of(frame: &Frame) -> Content {
             codec: match codec {
                 Codec::Vp9 => VideoCodec::Vp9,
                 Codec::Av1 => VideoCodec::Av1,
+                // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+                // Anything else is treated like VP9, the codec every viewer plays.
+                _ => VideoCodec::Vp9,
             },
             keyframe: frame.header.keyframe,
             temporal_layer: frame.header.temporal_layer,

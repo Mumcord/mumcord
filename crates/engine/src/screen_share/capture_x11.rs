@@ -8,17 +8,17 @@
 //! shared there is no window whose app could be asked for. PipeWire is Linux's sound server, so
 //! a share on the BSDs carries no sound.
 
-use mumcord_screenshare::I420Frame;
+use hwcodec::I420Frame;
 use x11rb::connection::Connection;
 use x11rb::protocol::xproto::{ConnectionExt, ImageFormat, ImageOrder};
 use x11rb::rust_connection::RustConnection;
 
 use super::capture::CaptureSource;
-use super::convert::bgrx_to_i420;
 use super::signal::ShareKind;
 #[cfg(target_os = "linux")]
 use super::sound::pick;
 use super::sound::{SoundOutcome, SoundRequest};
+use hwcodec::convert::bgra_to_i420;
 
 /// Why the screen cannot be captured.
 #[derive(Debug, thiserror::Error)]
@@ -101,7 +101,7 @@ impl CaptureSource for X11Capture {
             .ok()?
             .reply();
         match image {
-            Ok(image) => bgrx_to_i420(
+            Ok(image) => bgra_to_i420(
                 &image.data,
                 u32::from(self.width),
                 u32::from(self.height),

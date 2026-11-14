@@ -1,7 +1,7 @@
 //! The start dialog's "Viewers get" line (FR-7.36): what a share started with the dialog's picks
 //! would send, and how it would reach its viewers.
 
-use mumcord_screenshare::Codec;
+use hwcodec::Codec;
 
 use super::encoder::ActiveEncoder;
 use super::encoder::Av1Skipped;
@@ -72,7 +72,7 @@ pub(crate) fn preview(
     let quality = Steps::new(selection.prefs, encoder.codec).quality();
     let av1 = encoder.codec == Codec::Av1;
     let cpu_cores = (encoder.codec == Codec::Vp9 && encoder.gpu.is_none()).then(|| CpuCores {
-        used: mumcord_screenshare::vp9_threads(),
+        used: hwcodec::vp9_threads(),
         total: std::thread::available_parallelism()
             .map_or(1, |n| u32::try_from(n.get()).unwrap_or(u32::MAX)),
     });
@@ -151,7 +151,7 @@ mod tests {
     fn software_vp9_reports_its_thread_count_and_the_machine_cores() {
         let got = preview(&selection(vec![VP9]), false, None);
         let cores = got.cpu_cores.expect("software VP9 uses CPU cores");
-        assert_eq!(cores.used, mumcord_screenshare::vp9_threads());
+        assert_eq!(cores.used, hwcodec::vp9_threads());
         assert!(cores.used >= 1 && cores.used <= cores.total.max(1));
     }
 

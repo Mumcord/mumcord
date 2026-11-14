@@ -1,8 +1,8 @@
 //! The live picture the sharer's control bar shows (issue #163, FR-3.127): the last keyframe the
 //! encoder took, scaled down and re-encoded as a JPEG the UI can show as it is.
 
+use hwcodec::I420Frame;
 use image::{ImageBuffer, Rgb, codecs::jpeg::JpegEncoder};
-use mumcord_screenshare::I420Frame;
 
 use crate::people::base64;
 

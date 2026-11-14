@@ -10,7 +10,7 @@ use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use mumcord_screenshare::TEMPORAL_LAYERS;
+use hwcodec::TEMPORAL_LAYERS;
 use tokio::sync::Notify;
 
 use super::wire::{Frame, FrameKind};

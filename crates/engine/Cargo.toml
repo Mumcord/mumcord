@@ -15,7 +15,7 @@ mumcord-positional = { workspace = true, optional = true }
 mumcord-camera.workspace = true
 mumcord-effects = { workspace = true, optional = true }
 mumcord-p2p.workspace = true
-mumcord-screenshare.workspace = true
+hwcodec.workspace = true
 tokio.workspace = true
 # Import from the official Mumble client (issue #66): its database and 1.4/1.5 settings.
 rusqlite = { workspace = true, optional = true }

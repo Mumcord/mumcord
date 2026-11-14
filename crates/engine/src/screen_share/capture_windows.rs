@@ -9,7 +9,7 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicIsize, Ordering};
 
-use mumcord_screenshare::I420Frame;
+use hwcodec::I420Frame;
 use windows::Foundation::TypedEventHandler;
 use windows::Graphics::Capture::{
     Direct3D11CaptureFramePool, GraphicsCaptureItem, GraphicsCapturePicker, GraphicsCaptureSession,
@@ -47,7 +47,6 @@ use windows::Win32::UI::WindowsAndMessaging::{
 use windows::core::{BOOL, Interface};
 
 use super::capture::CaptureSource;
-use super::convert::{bgrx_to_i420, pack_rows};
 use super::signal::ShareKind;
 use super::sound::windows::{LoopbackTarget, ProcessLoopback};
 use super::sound::{AppName, ShareSoundMode, SoundOutcome, SoundRequest};
@@ -55,6 +54,7 @@ use super::windows_rules::{
     OwnerTree, ProcessEntry, TopWindow, capture_supported, owner_tree, pick_kind, sound_process,
     sound_supported,
 };
+use hwcodec::convert::{bgra_to_i420, pack_rows};
 
 /// Why no capture was started.
 #[derive(Debug, thiserror::Error)]
@@ -316,7 +316,7 @@ impl CaptureSource for WindowsCapture {
             tracing::warn!(error = %e, "screen capture frame failed");
         }
         let (width, height) = self.picture_size;
-        bgrx_to_i420(&self.picture, width, height, max_width, max_height)
+        bgra_to_i420(&self.picture, width, height, max_width, max_height)
     }
 
     fn ended(&self) -> bool {

@@ -9,8 +9,8 @@
 
 use std::time::{Duration, Instant};
 
+use hwcodec::I420Frame;
 use mumcord_audio::{Frame, SAMPLE_RATE};
-use mumcord_screenshare::I420Frame;
 
 use super::signal::ShareKind;
 use super::sound::{SoundOutcome, SoundRequest};
@@ -73,7 +73,7 @@ impl CaptureSource for TestPattern {
         if max_width < 2 || max_height < 2 {
             return None;
         }
-        let (width, height) = super::convert::encode_size(max_width, max_height);
+        let (width, height) = hwcodec::convert::encode_size(max_width, max_height);
         let tick = self.tick;
         self.tick = self.tick.wrapping_add(1);
         let luma = (width * height) as usize;

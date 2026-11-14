@@ -11,9 +11,9 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use hwcodec::{I420Frame, open_software_decoder};
 use mumcord_audio::mixer::share::{ShareSoundStats, ShareStats, ShareVolume};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_screenshare::{Av1Decoder, Decoder, I420Frame, VideoDecoder};
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 
@@ -93,8 +93,10 @@ impl Control {
 
 fn codec_bit(codec: Codec) -> u8 {
     match codec {
-        Codec::Vp9 => 1,
         Codec::Av1 => 2,
+        // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+        // Anything else counts as VP9, the codec every viewer plays.
+        _ => 1,
     }
 }
 
@@ -480,13 +482,6 @@ struct DecodeThread {
     skip_to_keyframe: bool,
 }
 
-fn new_decoder(codec: Codec) -> mumcord_screenshare::Result<Box<dyn VideoDecoder>> {
-    Ok(match codec {
-        Codec::Vp9 => Box::new(Decoder::new()?),
-        Codec::Av1 => Box::new(Av1Decoder::new()?),
-    })
-}
-
 impl DecodeThread {
     fn start(
         source: Source,
@@ -498,7 +493,7 @@ impl DecodeThread {
         let spawned = thread::Builder::new()
             .name("screen-decode".into())
             .spawn(move || {
-                let mut decoder = match new_decoder(codec) {
+                let mut decoder = match open_software_decoder(codec) {
                     Ok(decoder) => decoder,
                     Err(e) => {
                         tracing::error!(error = %e, ?codec, "screen share decoder did not start");
@@ -556,7 +551,7 @@ impl DecodeThread {
 #[cfg(test)]
 mod tests {
     #[cfg(all(feature = "desktop-codecs", feature = "av1-decode"))]
-    use mumcord_screenshare::{Av1Encoder, Av1Options, EncoderConfig};
+    use hwcodec::{Av1Encoder, Av1Options, EncoderConfig};
 
     use super::*;
 
@@ -695,12 +690,7 @@ mod tests {
     fn av1_frames_round_trip_through_the_engine_decoder() {
         let (width, height, fps) = (320, 192, 30);
         let mut encoder = Av1Encoder::new(
-            EncoderConfig {
-                width,
-                height,
-                fps,
-                bitrate_kbps: 800,
-            },
+            EncoderConfig::new(width, height, fps, 800),
             Av1Options::default(),
         )
         .expect("SVT-AV1 encoder");

@@ -41,7 +41,7 @@ use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
 use crate::inspector::{MediaFormat, MediaTap, MediaTapSink, TapDirection};
 
-pub use mumcord_screenshare::Codec;
+pub use hwcodec::Codec;
 
 /// The wire format of a direct screen stream (FR-7.89, FR-7.98).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -221,6 +221,9 @@ impl FrameHeader {
             FrameKind::Video(Codec::Vp9) => (1, 1),
             FrameKind::Video(Codec::Av1) => (1, 2),
             FrameKind::Audio => (2, 0),
+            // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+            // Anything else has no place in the header.
+            FrameKind::Video(_) => return Err(WireError::BadField),
         };
         if version == V1 && codec == 2 {
             return Err(WireError::CodecNotInVersion);
@@ -943,6 +946,7 @@ mod tests {
         let codec = match codec {
             Codec::Vp9 => VideoCodec::Vp9,
             Codec::Av1 => VideoCodec::Av1,
+            _ => VideoCodec::Vp9,
         };
         let video = |layer: u8| {
             Track::Video(mumcord_p2p::media::VideoTrack {

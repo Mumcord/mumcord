@@ -6,7 +6,7 @@
 
 use std::time::{Duration, Instant};
 
-use mumcord_screenshare::Codec;
+use hwcodec::Codec;
 use mumcord_store::{ScreenFps, ScreenOptimize, ScreenResolution, ScreenUploadLimit, Settings};
 
 /// One quality step, with the bitrate for the codec in use.
@@ -244,6 +244,9 @@ impl Steps {
         let bitrate_kbps = match self.codec {
             Codec::Av1 => rate.av1_kbps,
             Codec::Vp9 => rate.vp9_kbps,
+            // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+            // Anything else is rated like VP9, the codec every viewer plays.
+            _ => rate.vp9_kbps,
         };
         Quality {
             width,

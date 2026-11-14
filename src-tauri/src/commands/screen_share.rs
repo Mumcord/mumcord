@@ -784,6 +784,9 @@ impl From<engine_share::wire::Codec> for VideoCodec {
         match c {
             engine_share::wire::Codec::Vp9 => Self::Vp9,
             engine_share::wire::Codec::Av1 => Self::Av1,
+            // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+            // Anything else is treated like VP9, the codec every viewer plays.
+            _ => Self::Vp9,
         }
     }
 }

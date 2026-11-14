@@ -1,10 +1,12 @@
-//! Hardware encoder probe with smoke test (FR-7.55): an encoder counts only if it opens and
-//! then encodes a few real frames, so a driver that claims support but fails is never used.
+//! Hardware encoder probe (FR-7.55): hwcodec tests each encoder by opening it and encoding a few
+//! real frames, so a driver that claims support but fails is never used. This module keeps what
+//! is Mumcord's: the encoders tried per platform, the time budget, the cache ids and the vendor.
 
 use std::time::{Duration, Instant};
 
-use mumcord_screenshare::{
-    Codec, EncoderConfig, Error, HardwareEncoder, VideoEncoder, open_hardware_encoder,
+use hwcodec::{
+    Codec, EncoderKind, EncoderStatus, HardwareEncoder, UnavailableReason, default_order,
+    detect_encoder,
 };
 use mumcord_store::EncoderEntry;
 
@@ -16,14 +18,6 @@ use crate::test_hooks::{ProbeOverride, ProbeResult};
 /// absent until the next check.
 pub const BUDGET: Duration = Duration::from_secs(3);
 
-const SMOKE_FRAMES: u32 = 5;
-const SMOKE_CONFIG: EncoderConfig = EncoderConfig {
-    width: 1280,
-    height: 720,
-    fps: 30,
-    bitrate_kbps: 2000,
-};
-
 /// The working hardware encoders, best first per codec.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Hardware {
@@ -31,24 +25,19 @@ pub struct Hardware {
     pub vp9: Vec<Candidate>,
 }
 
-/// Which vendor encoders each platform tries, in order (FR-7.53, FR-7.55). macOS has none.
-fn targets() -> &'static [(Codec, HardwareEncoder)] {
-    if cfg!(target_os = "linux") {
-        &[
-            (Codec::Av1, HardwareEncoder::Nvenc),
-            (Codec::Av1, HardwareEncoder::Vaapi),
-            (Codec::Vp9, HardwareEncoder::Vaapi),
-        ]
-    } else if cfg!(windows) {
-        &[
-            (Codec::Av1, HardwareEncoder::Nvenc),
-            (Codec::Av1, HardwareEncoder::Amf),
-            (Codec::Av1, HardwareEncoder::Qsv),
-            (Codec::Vp9, HardwareEncoder::Qsv),
-        ]
-    } else {
-        &[]
-    }
+/// Which vendor encoders this platform tries, in order (FR-7.53, FR-7.55). macOS has none.
+fn targets() -> Vec<(Codec, HardwareEncoder)> {
+    [Codec::Av1, Codec::Vp9]
+        .into_iter()
+        .flat_map(|codec| {
+            default_order(codec)
+                .into_iter()
+                .filter_map(move |kind| match kind {
+                    EncoderKind::Hardware(encoder) => Some((codec, encoder)),
+                    _ => None,
+                })
+        })
+        .collect()
 }
 
 /// The id an encoder is cached under, e.g. `av1_nvenc`.
@@ -56,12 +45,16 @@ pub fn cache_id(codec: Codec, encoder: HardwareEncoder) -> String {
     let codec = match codec {
         Codec::Av1 => "av1",
         Codec::Vp9 => "vp9",
+        // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+        // Anything else is treated like VP9 and as an unknown encoder.
+        _ => "vp9",
     };
     let encoder = match encoder {
         HardwareEncoder::Nvenc => "nvenc",
         HardwareEncoder::Vaapi => "vaapi",
         HardwareEncoder::Amf => "amf",
         HardwareEncoder::Qsv => "qsv",
+        _ => "other",
     };
     format!("{codec}_{encoder}")
 }
@@ -70,8 +63,8 @@ pub fn cache_id(codec: Codec, encoder: HardwareEncoder) -> String {
 pub fn probe() -> Vec<EncoderEntry> {
     let started = Instant::now();
     targets()
-        .iter()
-        .map(|&(codec, encoder)| {
+        .into_iter()
+        .map(|(codec, encoder)| {
             let (available, smoke_ok) = if started.elapsed() < BUDGET {
                 probe_one(codec, encoder)
             } else {
@@ -87,51 +80,40 @@ pub fn probe() -> Vec<EncoderEntry> {
         .collect()
 }
 
+/// Whether the encoder opened and whether it then passed the test encode, as the cache stores it.
 fn probe_one(codec: Codec, encoder: HardwareEncoder) -> (bool, bool) {
-    match open_hardware_encoder(encoder, codec, SMOKE_CONFIG) {
-        Ok(mut opened) => {
-            let smoke_ok = smoke_test(opened.as_mut());
-            if !smoke_ok {
-                tracing::warn!(%encoder, ?codec, "hardware encoder failed its smoke test");
-            }
-            (true, smoke_ok)
+    let report = detect_encoder(codec, encoder);
+    // Spec 07 §9: every probe result and its reason at info. Device and driver version name the
+    // graphics hardware only, never the user.
+    let device = report.device.as_deref();
+    let driver_version = report.driver_version.as_deref();
+    match report.status {
+        EncoderStatus::Works => {
+            tracing::info!(%encoder, ?codec, device, driver_version, "hardware encoder works");
+            (true, true)
         }
-        Err(Error::HardwareUnavailable { reason, .. }) => {
-            tracing::debug!(%encoder, ?codec, %reason, "hardware encoder unavailable");
-            (false, false)
+        EncoderStatus::Unavailable { reason, detail, .. } => {
+            tracing::info!(
+                %encoder, ?codec, %reason, %detail, device, driver_version,
+                "hardware encoder unavailable"
+            );
+            (reason == UnavailableReason::TestEncodeFailed, false)
         }
-        Err(e) => {
-            tracing::warn!(%encoder, ?codec, error = %e, "hardware encoder did not open");
+        // hwcodec's status is open for additions; a state Mumcord does not know is not usable.
+        status => {
+            tracing::info!(
+                %encoder, ?codec, %status, device, driver_version,
+                "hardware encoder in an unknown state"
+            );
             (false, false)
         }
     }
-}
-
-/// Encodes a few frames; passes when every call works and a keyframe with data came out.
-pub(super) fn smoke_test(encoder: &mut dyn VideoEncoder) -> bool {
-    let config = encoder.config();
-    let mut keyframe = false;
-    let mut bytes = 0;
-    for n in 0..SMOKE_FRAMES {
-        let frame = super::test_frame(config.width, config.height, n);
-        match encoder.encode(&frame, i64::from(n) * 33, n == 0) {
-            Ok(out) => {
-                keyframe |= out.iter().any(|f| f.keyframe);
-                bytes += out.iter().map(|f| f.data.len()).sum::<usize>();
-            }
-            Err(e) => {
-                tracing::warn!(error = %e, "smoke test frame failed");
-                return false;
-            }
-        }
-    }
-    keyframe && bytes > 0
 }
 
 /// The working encoders among cached entries.
 pub fn from_entries(entries: &[EncoderEntry]) -> Hardware {
     let mut hardware = Hardware::default();
-    for &(codec, encoder) in targets() {
+    for (codec, encoder) in targets() {
         let id = cache_id(codec, encoder);
         if !entries
             .iter()
@@ -145,7 +127,7 @@ pub fn from_entries(entries: &[EncoderEntry]) -> Hardware {
         };
         match codec {
             Codec::Av1 => hardware.av1.push(candidate),
-            Codec::Vp9 => hardware.vp9.push(candidate),
+            _ => hardware.vp9.push(candidate),
         }
     }
     hardware
@@ -173,7 +155,7 @@ pub fn from_overrides(overrides: &[ProbeOverride]) -> Hardware {
         };
         match codec {
             Codec::Av1 => hardware.av1.push(candidate),
-            Codec::Vp9 => hardware.vp9.push(candidate),
+            _ => hardware.vp9.push(candidate),
         }
     }
     hardware
@@ -185,6 +167,7 @@ fn vendor(encoder: HardwareEncoder) -> GpuVendor {
         HardwareEncoder::Amf => GpuVendor::Amd,
         HardwareEncoder::Qsv => GpuVendor::Intel,
         HardwareEncoder::Vaapi => render_node_vendor(),
+        _ => GpuVendor::Unknown,
     }
 }
 
@@ -204,9 +187,6 @@ fn render_node_vendor() -> GpuVendor {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(feature = "vp9")]
-    use mumcord_screenshare::Encoder;
-
     use super::*;
 
     #[test]
@@ -257,13 +237,6 @@ mod tests {
                 kind: Kind::FakeHardware
             }]
         );
-    }
-
-    #[cfg(feature = "vp9")]
-    #[test]
-    fn a_working_encoder_passes_the_smoke_test() {
-        let mut vp9 = Encoder::new(SMOKE_CONFIG).expect("vp9");
-        assert!(smoke_test(&mut vp9));
     }
 
     #[test]

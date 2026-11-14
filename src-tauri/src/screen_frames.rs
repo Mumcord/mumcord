@@ -122,6 +122,9 @@ fn codec_byte(codec: Codec) -> u8 {
     match codec {
         Codec::Vp9 => CODEC_VP9,
         Codec::Av1 => CODEC_AV1,
+        // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+        // Anything else is treated like VP9, the codec every viewer plays.
+        _ => CODEC_VP9,
     }
 }
 

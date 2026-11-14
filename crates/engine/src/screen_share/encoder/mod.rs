@@ -17,9 +17,9 @@ use std::sync::mpsc;
 use std::sync::{Arc, Mutex, Once};
 use std::thread;
 
-use mumcord_screenshare::{
-    Av1Encoder, Av1Options, Codec, Encoder, EncoderConfig, I420Frame, VideoEncoder,
-    av1_cpu_supported, open_hardware_encoder,
+use hwcodec::{
+    Av1Encoder, Av1Options, Codec, EncoderConfig, VideoEncoder, Vp9Encoder, av1_cpu_supported,
+    open_hardware_encoder,
 };
 use mumcord_store::{
     EncoderCache, EncoderEntry, ScreenCodec, ScreenOptimize, Settings, Store,
@@ -410,7 +410,6 @@ impl Worker<'_> {
             self.save();
             // A test that could not run counts as far too slow.
             let ms = selftest::measure(height, fps, optimize).unwrap_or(FAILED_SELFTEST);
-            tracing::info!(height, fps, ?optimize, ms, "AV1 self-test measured");
             record_selftest(&mut lock(&self.encoders.state).selftests, key, ms);
             self.save();
         }
@@ -488,9 +487,7 @@ fn factory_for(
                 }
             }
         }
-        Err(last.unwrap_or_else(|| {
-            mumcord_screenshare::Error::InvalidConfig("no encoder to try".into())
-        }))
+        Err(last.unwrap_or_else(|| hwcodec::Error::InvalidConfig("no encoder to try".into())))
     });
     EncoderFactory { offers_av1, open }
 }
@@ -500,40 +497,22 @@ fn open(
     config: EncoderConfig,
     optimize: ScreenOptimize,
     natural: bool,
-) -> mumcord_screenshare::Result<Box<dyn VideoEncoder>> {
+) -> hwcodec::Result<Box<dyn VideoEncoder>> {
     match (candidate.kind, candidate.codec) {
         (Kind::Hardware(encoder, _), codec) => open_hardware_encoder(encoder, codec, config),
         (Kind::FakeHardware | Kind::Software, Codec::Av1) => Ok(Box::new(Av1Encoder::new(
             config,
-            Av1Options {
-                screen_content: !natural && optimize == ScreenOptimize::Text,
-            },
+            Av1Options::new(!natural && optimize == ScreenOptimize::Text),
         )?)),
         (Kind::FakeHardware | Kind::Software, Codec::Vp9) if natural => {
-            Ok(Box::new(Encoder::natural(config)?))
+            Ok(Box::new(Vp9Encoder::natural(config)?))
         }
-        (Kind::FakeHardware | Kind::Software, Codec::Vp9) => Ok(Box::new(Encoder::new(config)?)),
+        (Kind::FakeHardware | Kind::Software, Codec::Vp9) => Ok(Box::new(Vp9Encoder::new(config)?)),
+        // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+        (Kind::FakeHardware | Kind::Software, _) => Err(hwcodec::Error::InvalidConfig(
+            "Mumcord has no software encoder for this codec".into(),
+        )),
     }
-}
-
-/// A screen-like test picture: a soft background with rows of sharp "text" blocks; `n`
-/// shifts the blocks so consecutive frames differ.
-fn test_frame(width: u32, height: u32, n: u32) -> I420Frame {
-    let (w, h) = (width as usize, height as usize);
-    let mut data = vec![128u8; I420Frame::buffer_len(width, height)];
-    for (y, row) in data[..w * h].chunks_exact_mut(w).enumerate() {
-        for (x, px) in row.iter_mut().enumerate() {
-            let text = !(y / 4).is_multiple_of(5)
-                && !((x + n as usize * 3) / 6).is_multiple_of(3)
-                && (y / 20).is_multiple_of(2);
-            *px = if text {
-                ((x * 7 + y * 13) % 64) as u8
-            } else {
-                (180 + (x + y) / 32 % 60) as u8
-            };
-        }
-    }
-    I420Frame::new(width, height, data).expect("buffer_len fits the size")
 }
 
 impl Engine {
@@ -566,17 +545,14 @@ impl Engine {
 #[cfg(test)]
 mod tests {
     #[cfg(feature = "vp9")]
-    use mumcord_screenshare::HardwareEncoder;
+    use hwcodec::HardwareEncoder;
 
     use super::*;
 
     #[cfg(any(feature = "vp9", feature = "desktop-codecs"))]
-    const CONFIG: EncoderConfig = EncoderConfig {
-        width: 320,
-        height: 180,
-        fps: 30,
-        bitrate_kbps: 500,
-    };
+    fn config() -> EncoderConfig {
+        EncoderConfig::new(320, 180, 30, 500)
+    }
 
     #[cfg(feature = "vp9")]
     #[test]
@@ -596,7 +572,8 @@ mod tests {
             active.clone(),
         );
         assert!(make.offers_av1);
-        let (encoder, _) = (make.open)(CONFIG, ScreenOptimize::Balanced, true).expect("falls back");
+        let (encoder, _) =
+            (make.open)(config(), ScreenOptimize::Balanced, true).expect("falls back");
         assert_eq!(encoder.codec(), Codec::Vp9);
         assert_eq!(
             *lock(&active),
@@ -618,7 +595,7 @@ mod tests {
             }],
             active.clone(),
         );
-        let (encoder, _) = (make.open)(CONFIG, ScreenOptimize::Text, true).expect("opens");
+        let (encoder, _) = (make.open)(config(), ScreenOptimize::Text, true).expect("opens");
         assert_eq!(encoder.codec(), Codec::Av1);
         assert_eq!(
             *lock(&active),
@@ -651,7 +628,7 @@ mod tests {
             active.clone(),
         );
         let (encoder, opened) =
-            (make.open)(CONFIG, ScreenOptimize::Balanced, false).expect("opens");
+            (make.open)(config(), ScreenOptimize::Balanced, false).expect("opens");
         assert_eq!(encoder.codec(), Codec::Vp9);
         let vp9_gpu = ActiveEncoder {
             codec: Codec::Vp9,
@@ -786,13 +763,5 @@ mod tests {
             startup_tests(&motion),
             [(1080, 30, ScreenOptimize::Motion), CAMERA_SELFTEST]
         );
-    }
-
-    #[test]
-    fn test_frames_have_the_right_size_and_move() {
-        let a = test_frame(64, 48, 0);
-        let b = test_frame(64, 48, 1);
-        assert_eq!(a.data().len(), I420Frame::buffer_len(64, 48));
-        assert_ne!(a.data(), b.data());
     }
 }

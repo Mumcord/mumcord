@@ -470,7 +470,7 @@ mod tests {
         let own = OwnShare::new(false, SoundStatus::default());
         assert_eq!(own.active_encoder(), None);
         let opened = ActiveEncoder {
-            codec: mumcord_screenshare::Codec::Av1,
+            codec: hwcodec::Codec::Av1,
             gpu: None,
         };
         *crate::session::lock(&own.encoder) = Some(opened);

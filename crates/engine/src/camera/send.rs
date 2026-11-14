@@ -18,13 +18,13 @@ use std::thread::{self, JoinHandle, Thread};
 use std::time::{Duration, Instant};
 
 use crossbeam_queue::ArrayQueue;
+use hwcodec::{EncoderConfig, I420Frame, VideoEncoder};
 use mumcord_camera::{
     CameraBackend, CameraError, CameraFrame, CaptureRequest, CaptureSession, DeviceId, FrameSink,
 };
 #[cfg(feature = "camera-effects")]
 use mumcord_effects::{Effects, EffectsConfig};
 use mumcord_p2p::media::Description;
-use mumcord_screenshare::{EncoderConfig, I420Frame, VideoEncoder};
 use mumcord_store::{CameraSendQuality, ScreenOptimize};
 use tokio::runtime::Handle;
 use tokio::sync::mpsc;
@@ -112,6 +112,9 @@ pub fn bitrate_kbps(codec: Codec, height: u32, fps: u32) -> u32 {
     let kbps = match codec {
         Codec::Av1 => av1,
         Codec::Vp9 => vp9,
+        // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+        // Anything else is rated like VP9, the codec every viewer plays.
+        _ => vp9,
     };
     let kbps = if fps <= 15 { kbps * 2 / 3 } else { kbps };
     kbps.min(MAX_KBPS)
@@ -757,12 +760,12 @@ impl EncodeLoop {
 
     fn open(&self, (width, height): (u32, u32), av1: bool) -> Option<Running> {
         let codec = if av1 { Codec::Av1 } else { Codec::Vp9 };
-        let config = EncoderConfig {
+        let config = EncoderConfig::new(
             width,
             height,
-            fps: self.ceiling.fps,
-            bitrate_kbps: bitrate_kbps(codec, height, self.ceiling.fps),
-        };
+            self.ceiling.fps,
+            bitrate_kbps(codec, height, self.ceiling.fps),
+        );
         match (self.encoders.open)(config, ScreenOptimize::Motion, av1) {
             Ok((mut encoder, active)) => {
                 if active.codec != codec {
@@ -786,11 +789,7 @@ impl EncodeLoop {
     }
 }
 
-fn to_frame(
-    out: mumcord_screenshare::EncodedFrame,
-    (width, height): (u32, u32),
-    codec: Codec,
-) -> Frame {
+fn to_frame(out: hwcodec::EncodedFrame, (width, height): (u32, u32), codec: Codec) -> Frame {
     Frame {
         header: FrameHeader {
             kind: FrameKind::Video(codec),
