@@ -75,6 +75,8 @@ impl From<crash::CrashSummary> for CrashReport {
             crash::CrashKind::Panic => (CrashKind::Panic, None),
             crash::CrashKind::Signal(name) => (CrashKind::Signal, Some(name)),
             crash::CrashKind::Unexpected => (CrashKind::Unexpected, None),
+            // Shown like the signal it is; the cause line says that the app kept running.
+            crash::CrashKind::Overrun => (CrashKind::Signal, Some("SIGXCPU".to_owned())),
         };
         Self {
             id: s.id,
