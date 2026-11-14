@@ -523,10 +523,8 @@ jobs:
           # word. The value is not parsed as shell syntax (no $(...), no quotes). Quoting
           # "$BUNDLE" would copy nothing, because the packages are selected by those globs.
           shopt -s nullglob
-          set -f
-          # shellcheck disable=SC2086
-          bundle_globs=($BUNDLE)
-          set +f
+          # read splits on spaces. It does not glob and does not re-parse the value as shell.
+          read -r -a bundle_globs <<< "$BUNDLE"
           for glob in "${bundle_globs[@]}"; do
             matched=0
             # shellcheck disable=SC2086
