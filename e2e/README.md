@@ -82,7 +82,9 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
 - **CI shards:** `.github/workflows/e2e.yml` builds the image and the binaries once
   (`MUMCORD_E2E_STEP=build`), shares them as an artifact, and runs the shards of `e2e/shards.json`
   in parallel jobs (`MUMCORD_E2E_STEP=test MUMCORD_E2E_SHARD=<n>`, each runner with its own test
-  servers). The "Linux E2E" job fails if the build or any shard failed. A push to main runs only
+  servers). The binary artifact includes `camera-backgrounds/` and the `.cargo-lock` marker
+  Tauri needs to find those resources beside a Cargo-built executable on Linux. The "Linux E2E"
+  job fails if the build or any shard failed. A push to main runs only
   the build job, to keep its caches warm for pull requests (which only restore caches).
 - **Shard balance:** ten shards, balanced by the measured CI duration of each spec file
   (`e2e/spec-durations.json`). The longest spec (network resilience, ~5 min in CI) is pinned alone
@@ -109,8 +111,13 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   so every spec file starts on an empty server and still runs alone. CI builds the mumpeer and
   relay bot images once per pinned commit pair (job "E2E relay images") instead of in every shard.
 
-- **Failures:** screenshot + page source of the app go to `e2e/artifacts/` (git-ignored); CI uploads
-  them (instance B: same name with `-B`). axe reports land there too.
+- **Failures:** screenshot, page source and Mumcord's redacted diagnostic log files go to
+  `e2e/artifacts/` (git-ignored); CI uploads them for every running client (`-B` / `-C` for the
+  extra clients). Identities, keyrings and profile databases are never copied. axe reports land
+  there too.
+- **Server readiness:** `testenv.up`, `reset`, `start` and `restart` wait for a TLS handshake
+  against the local server after the container command returns. A running Docker container alone
+  does not mean Mumble is accepting connections yet.
 
 ## Writing specs
 

@@ -23,21 +23,25 @@ const COUNT_SHUTDOWN_POSITIONAL: u32 = 4;
 
 const WAIT: Duration = Duration::from_secs(8);
 
+fn find_fixture(exe: &Path) -> Option<PathBuf> {
+    let name = format!("{DLL_PREFIX}test_plugin.{DLL_EXTENSION}");
+    // Cargo 1.100 moved test binaries from deps/ to build/<crate>/<hash>/out/.
+    // The example library still lives in the profile's examples/ directory.
+    exe.ancestors()
+        .skip(1)
+        .map(|dir| dir.join("examples").join(&name))
+        .find(|file| file.is_file())
+}
+
 /// The built test plugin.
 fn fixture() -> PathBuf {
     let exe = std::env::current_exe().expect("test exe");
-    let file = exe
-        .parent()
-        .and_then(Path::parent)
-        .expect("target dir")
-        .join("examples")
-        .join(format!("{DLL_PREFIX}test_plugin.{DLL_EXTENSION}"));
-    assert!(
-        file.exists(),
-        "{} missing: run `cargo test -p mumcord-positional`, which builds the test plugin",
-        file.display()
-    );
-    file
+    find_fixture(&exe).unwrap_or_else(|| {
+        panic!(
+            "test plugin missing above {}: run `cargo test -p mumcord-positional`, which builds the test plugin",
+            exe.display()
+        )
+    })
 }
 
 fn plugin_dir(name: &str) -> PathBuf {
@@ -144,6 +148,26 @@ fn info(host: &PluginHost, id: &str) -> PluginInfo {
 
 fn ids(list: &[&str]) -> Vec<String> {
     list.iter().map(|s| (*s).to_owned()).collect()
+}
+
+#[test]
+fn fixture_lookup_supports_both_cargo_binary_layouts() {
+    let dir = plugin_dir("fixture-layouts");
+    let profile = dir.join("custom-target").join("custom-profile");
+    let examples = profile.join("examples");
+    std::fs::create_dir_all(&examples).expect("examples dir");
+    let library = examples.join(format!("{DLL_PREFIX}test_plugin.{DLL_EXTENSION}"));
+    std::fs::write(&library, b"fixture").expect("fixture file");
+
+    for relative in [
+        "deps/plugin_host-hash",
+        "build/mumcord-positional/hash/out/plugin_host-hash",
+    ] {
+        assert_eq!(find_fixture(&profile.join(relative)), Some(library.clone()));
+    }
+    assert_eq!(find_fixture(&dir.join("elsewhere/deps/plugin_host")), None);
+    std::fs::remove_file(&library).expect("remove fixture");
+    assert_eq!(find_fixture(&profile.join("deps/plugin_host-hash")), None);
 }
 
 #[test]
