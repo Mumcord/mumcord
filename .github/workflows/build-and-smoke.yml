@@ -349,6 +349,9 @@ jobs:
       # notices job read (scripts/generate-notices.sh), or the build fails instead of resolving anew.
       - name: Build bundle
         if: steps.certum.outputs.enabled != 'true' && !(runner.os == 'Linux' && contains(inputs.version, '-'))
+        # Bash on every runner: in PowerShell (the Windows default) `$ARGS` is the script's own
+        # empty argument list, not the environment value, and the bundle options were dropped.
+        shell: bash
         env:
           ARGS: ${{ matrix.args }}
         run: |
