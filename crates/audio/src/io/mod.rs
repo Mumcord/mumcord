@@ -150,6 +150,8 @@ pub enum IoError {
     InvalidBackend(String),
     #[error("audio control thread stopped")]
     ControlThreadGone,
+    #[error("audio control thread is not responding")]
+    ControlThreadStalled,
 }
 
 /// Which audio backend to run.
