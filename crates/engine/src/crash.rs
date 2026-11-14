@@ -14,6 +14,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::diag;
 
+#[cfg(target_os = "linux")]
+mod exit_reason;
+
 /// How many reports stay; older ones are deleted.
 pub const MAX_REPORTS: usize = 10;
 /// Log lines a report carries.
@@ -162,6 +165,9 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
         .unwrap_or_else(|| "-".to_owned());
     let previous_context = fs::read_to_string(dir.join(CONTEXT)).unwrap_or_default();
     let _ = fs::remove_file(dir.join(CONTEXT));
+    // Read before this run notes its own details in the same file.
+    #[cfg(target_os = "linux")]
+    let previous_run = exit_reason::Run::load(dir);
     // The libraries still sit where the crashed run had them on disk, so the stack can be
     // named now; the mapping file is reused for this run's handler.
     let stack = native
@@ -189,6 +195,13 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
                         CrashKind::Signal(name) => format!("Mumcord was stopped by {name}"),
                         _ => unexpected_cause(cfg!(windows)).to_owned(),
                     };
+                    // A run that left no record was ended in a way the app could not see; on
+                    // Linux the system journal often knows how.
+                    #[cfg(target_os = "linux")]
+                    let ended_by = (kind == CrashKind::Unexpected)
+                        .then(|| exit_reason::ended_by(previous_run.as_ref()));
+                    #[cfg(not(target_os = "linux"))]
+                    let ended_by: Option<String> = None;
                     let report = Report {
                         kind,
                         thread: &thread,
@@ -197,6 +210,7 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
                         log: &previous,
                         context: &previous_context,
                         uptime_secs: None,
+                        ended_by: ended_by.as_deref(),
                     };
                     let _ = write_report(&dir, &version, &report);
                     let _ = prune(&dir);
@@ -204,6 +218,10 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
             });
     }
     fs::write(&marker, b"")?;
+    #[cfg(target_os = "linux")]
+    if let Some(run) = exit_reason::Run::current() {
+        run.save(dir);
+    }
     prune(dir)?;
     let _ = STATE.set(State {
         dir: dir.to_path_buf(),
@@ -243,6 +261,8 @@ pub fn clean_exit() {
         let _ = fs::remove_file(state.dir.join(MARKER));
         let _ = fs::remove_file(state.dir.join(CONTEXT));
         let _ = fs::remove_file(state.dir.join(MAPS));
+        #[cfg(target_os = "linux")]
+        let _ = fs::remove_file(state.dir.join(exit_reason::RUN));
     }
 }
 
@@ -278,6 +298,7 @@ fn install_panic_hook() {
                 log: &log,
                 context: &context,
                 uptime_secs: Some(state.started.elapsed().as_secs()),
+                ended_by: None,
             };
             let _ = write_report(&state.dir, &state.version, &report);
         }
@@ -349,6 +370,8 @@ struct Report<'a> {
     /// What was running, one `key: value` per line.
     context: &'a str,
     uptime_secs: Option<u64>,
+    /// What ended a run that left no record, as far as the system journal knows (Linux).
+    ended_by: Option<&'a str>,
 }
 
 fn write_report(dir: &Path, version: &str, report: &Report<'_>) -> io::Result<PathBuf> {
@@ -360,6 +383,7 @@ fn write_report(dir: &Path, version: &str, report: &Report<'_>) -> io::Result<Pa
         log,
         context,
         uptime_secs,
+        ended_by,
     } = report;
     let created = now_unix();
     let mut path = dir.join(format!("{PREFIX}{created}{SUFFIX}"));
@@ -382,6 +406,9 @@ fn write_report(dir: &Path, version: &str, report: &Report<'_>) -> io::Result<Pa
             secs / 60 % 60,
             secs % 60
         ));
+    }
+    if let Some(ended_by) = ended_by {
+        text.push_str(&format!("ended by: {ended_by}\n"));
     }
     if !context.is_empty() {
         text.push_str("\nrunning:\n");
@@ -1465,8 +1492,31 @@ mod tests {
                 log,
                 context: "camera: on\n",
                 uptime_secs: Some(42),
+                ended_by: None,
             },
         )
+    }
+
+    #[test]
+    fn what_ended_the_run_is_one_more_header_line() {
+        let dir = tempfile::tempdir().unwrap();
+        let report = Report {
+            kind: CrashKind::Unexpected,
+            thread: "-",
+            cause: "closed",
+            backtrace: "",
+            log: &[],
+            context: "",
+            uptime_secs: None,
+            ended_by: Some("SIGKILL (from outside the app)"),
+        };
+        let path = write_report(dir.path(), "0.9.0", &report).unwrap();
+        let text = fs::read_to_string(path).unwrap();
+        assert!(text.contains("cause: closed\nended by: SIGKILL (from outside the app)\n\n"));
+        // The list still reads the report as before.
+        let listed = list(dir.path());
+        assert_eq!(listed[0].kind, CrashKind::Unexpected);
+        assert_eq!(listed[0].cause, "closed");
     }
 
     #[test]
