@@ -211,7 +211,30 @@ fn thread_name(thread: i32) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::{Mutex, MutexGuard, PoisonError};
+
     use super::*;
+
+    /// The registry is one per process and every sweep frees the slots of ended threads, so
+    /// these tests must not run side by side.
+    fn serial() -> MutexGuard<'static, ()> {
+        static SERIAL: Mutex<()> = Mutex::new(());
+        SERIAL.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// Sweeps until the thread is back at normal scheduling. One sweep can miss a thread: the
+    /// kernel's listing of /proc/self/task skips entries when other threads of the process end
+    /// meanwhile, as they do while tests run side by side. The sweeper repeats for that reason.
+    fn sweep_until_demoted(thread: i32) -> bool {
+        for _ in 0..200 {
+            Sweeper::default().sweep();
+            if !is_realtime(thread) {
+                return true;
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        false
+    }
 
     /// Real-time scheduling the way a foreign library gets it: set directly, no registry.
     fn become_realtime() -> bool {
@@ -234,6 +257,7 @@ mod tests {
 
     #[test]
     fn registered_thread_stays_realtime_until_it_leaves_the_registry() {
+        let _serial = serial();
         on_thread("some-thread", || {
             assert!(register_current_thread());
             if !become_realtime() {
@@ -245,14 +269,14 @@ mod tests {
             assert!(is_realtime(thread), "an audio thread keeps its priority");
 
             unregister_current_thread();
-            Sweeper::default().sweep();
-            assert!(!is_realtime(thread), "a foreign thread is demoted");
+            assert!(sweep_until_demoted(thread), "a foreign thread is demoted");
             true
         });
     }
 
     #[test]
     fn host_device_thread_stays_realtime_before_its_first_callback() {
+        let _serial = serial();
         on_thread("pw_out", || {
             if !become_realtime() {
                 return false;
@@ -265,6 +289,7 @@ mod tests {
 
     #[test]
     fn slot_of_an_ended_thread_is_freed() {
+        let _serial = serial();
         let thread = std::thread::spawn(|| {
             assert!(register_current_thread());
             current_thread_id()
@@ -272,6 +297,12 @@ mod tests {
         .join()
         .expect("thread");
         assert!(is_audio_thread(thread));
+        // `join` returns when the thread has finished, which is a moment before the kernel
+        // removes it from /proc; the sweeper simply frees the slot on a later sweep.
+        let deadline = std::time::Instant::now() + Duration::from_secs(5);
+        while thread_exists(thread) && std::time::Instant::now() < deadline {
+            std::thread::sleep(Duration::from_millis(1));
+        }
         forget_ended_threads();
         assert!(!is_audio_thread(thread));
     }
