@@ -558,6 +558,47 @@ mod tests {
     }
 
     #[test]
+    fn rejects_svg_mathml_mutation_xss() {
+        // RUSTSEC-2026-0533 / upstream PR #269, plus the SVG policy's allowed title.
+        // A malicious asset may be rejected entirely or reduced to safe SVG.
+        for tag in ["iframe", "title"] {
+            for prefix in [
+                "<svg><foreignObject><math>",
+                "<math><mi><svg>",
+                "<svg><title><math><mi><svg>",
+                "<svg><desc><math><mi><svg>",
+            ] {
+                let payload = format!("{prefix}<{tag}><!--</{tag}><img src onerror=alert(1)>-->");
+                if let Some(bytes) = sanitize_svg(payload.as_bytes()) {
+                    let out = String::from_utf8(bytes).expect("utf-8");
+                    for forbidden in [
+                        "foreignObject",
+                        "<math",
+                        "<mi",
+                        "<iframe",
+                        "<!--",
+                        "<img",
+                        "onerror",
+                    ] {
+                        assert!(!out.contains(forbidden), "{payload}: {out}");
+                    }
+                    assert_eq!(clean(&out), out, "{payload}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn keeps_safe_svg_titles_and_descriptions() {
+        let out = clean(
+            "<svg><title>Icon &amp; label</title><desc>A circle</desc><circle r=\"2\"/></svg>",
+        );
+        assert!(out.contains("<title>Icon &amp; label</title>"), "{out}");
+        assert!(out.contains("<desc>A circle</desc>"), "{out}");
+        assert!(out.contains("<circle r=\"2\">"), "{out}");
+    }
+
+    #[test]
     fn adds_a_missing_namespace_and_refuses_non_svg() {
         assert!(
             clean("<svg><g></g></svg>").starts_with("<svg xmlns=\"http://www.w3.org/2000/svg\">")

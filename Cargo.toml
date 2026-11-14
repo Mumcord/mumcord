@@ -188,7 +188,7 @@ rusqlite = { version = "0.41", features = ["bundled"] }
 keyring = "4.2"
 
 # Sanitizing, own avatar scaling
-ammonia = "4.2"
+ammonia = "4.2.5"
 # Tokenizer for page metadata; the same version ammonia already uses.
 html5ever = "0.40"
 # Plugin chat patterns (`chat.patterns`): linear-time matching with size limits; regex-syntax
