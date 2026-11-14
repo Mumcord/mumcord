@@ -24,6 +24,7 @@
 
 ### Fixed
 
+- Linux: the notice "libayatana-appindicator is deprecated" no longer appears in the terminal and in Mumcord's log on every start that uses the fallback tray. It is a note for developers and has no effect on the tray; the switch to another tray backend is tracked in issue #822.
 - Linux: Mumcord no longer disappears without a crash dialog when the computer is very busy (issue #844). The time limit that protects the system from a runaway audio thread also applied to background threads of the built-in web view, which are not built for it; when one of them was busy for too long, Linux ended the whole app at once. Mumcord now keeps only its audio threads at real-time priority and returns all others to normal priority, and the warning before that limit works again after it was used once
 - Mumcord freezes on Windows after a camera opened but delivered no picture: leaving the camera settings, switching to another camera (for example the OBS Virtual Camera) or closing the app waited for the camera forever, the camera stayed black and Windows showed "Not responding". Stopping the camera now gives up after two seconds, so switching cameras and closing the app work again
 - Embedded YouTube, Twitch, Spotify and SoundCloud players and the watch party stay black on Windows: since 0.8.0 the app's own local player page was sent through the web view's connection filter, which refused it. The page is loaded directly again; all other connections of the web view still go through the filter
