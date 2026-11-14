@@ -125,6 +125,21 @@ describe("exports", () => {
     expect(md).toContain('```json\n{\n  "v": 1\n}\n```');
   });
 
+  it("Markdown keeps backslashes and pipes inside their table cell", () => {
+    const tricky: Names = {
+      user: (_server, session) => (session === 12 ? "Bob\\" : "a\\|b"),
+      server: () => "Lobby server",
+    };
+    const md = exportMarkdown(
+      [packet({ kind: "odd\\" }), packet({ id: 2, receivers: [13] })],
+      info,
+      tricky,
+    );
+    // A backslash from the value must not swallow or expose a column separator.
+    expect(md).toContain("| odd\\\\ | 412 B | → Bob\\\\ (session 12) |");
+    expect(md).toContain("| → a\\\\\\|b (session 13) |");
+  });
+
   it("a copied packet has the gap, and fences survive backticks in the payload", () => {
     const block = packetBlock(packet({ decoded: '"```"' }), names, at - 340).join("\n");
     expect(block).toContain("- gap +340 ms");

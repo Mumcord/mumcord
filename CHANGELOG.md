@@ -14,6 +14,7 @@
 
 - On Linux the window no longer freezes for good when you hang up or disconnect while the audio system (PipeWire) has stopped responding: closing the audio devices and listing them now give up after a short wait instead of waiting forever
 - On Linux a voice thread that is briefly busy keeps its real-time priority: the audio system (PipeWire) kept shrinking the allowed time to a single audio buffer, and Mumcord now restores the intended 100 ms margin during a call.
+- Packet inspector: the Markdown export no longer breaks a table row when a name or packet type contains a backslash (issue #771)
 
 ### Security
 
