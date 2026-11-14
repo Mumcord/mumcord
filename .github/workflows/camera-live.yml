@@ -23,6 +23,10 @@ concurrency:
   group: camera-live-${{ github.ref }}
   cancel-in-progress: true
 
+# The job only builds and tests the checked-out code; it never writes to the repository.
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
   # Debug info only slows the link down; the job needs pass/fail.
