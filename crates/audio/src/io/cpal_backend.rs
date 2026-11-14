@@ -478,6 +478,7 @@ where
             {
                 let counters = counters.clone();
                 move |data: &[T], _: &cpal::InputCallbackInfo| {
+                    crate::rt::mark_device_thread();
                     ring::capture(data, channels, &mut producer, &counters);
                 }
             },
@@ -525,6 +526,7 @@ where
             {
                 let counters = counters.clone();
                 move |data: &mut [T], _: &cpal::OutputCallbackInfo| {
+                    crate::rt::mark_device_thread();
                     ring::playback(data, channels, &mut consumer, &counters);
                 }
             },

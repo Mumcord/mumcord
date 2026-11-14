@@ -29,6 +29,9 @@ use mumcord_audio::mixer::{
     FrameTime, PacketSender, Playback, PlaybackConfig, PlaybackSink, PlaybackStats,
 };
 use mumcord_audio::rt::RtGuard;
+/// For the app to call once its web view exists; the engine itself has no foreign threads.
+#[cfg(target_os = "linux")]
+pub use mumcord_audio::rt::guard_foreign_threads;
 use mumcord_audio::{FRAME_SAMPLES, Frame, SAMPLE_RATE};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;

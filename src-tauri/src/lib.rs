@@ -686,6 +686,12 @@ pub fn run() {
             notifications::init(app.handle());
             create_main_window(app.handle())?;
             start_engine(app.handle())?;
+            // WebKitGTK makes threads of this process real-time, where they fall under the
+            // time limit of the audio threads and can get the app killed (#844). After the
+            // window, whose web view brings those threads, and after the engine start, which
+            // sets up the log.
+            #[cfg(target_os = "linux")]
+            mumcord_engine::voice::guard_foreign_threads();
             // Logout, shutdown, `kill` and Ctrl+C quit like "Quit" does, so the plugins get
             // their `stop` and the connections close cleanly (#748).
             let quitting = app.handle().clone();

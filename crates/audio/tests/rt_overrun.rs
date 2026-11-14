@@ -79,6 +79,22 @@ fn overrunning_realtime_thread_is_demoted_not_killed() {
 
     if ran {
         assert_eq!(mumcord_audio::rt::take_demotions(), 1);
+
+        // With the SIGXCPU the kernel moved the soft limit a second up, above the hard one, so
+        // the next overrun of any thread would be killed without a warning (issue #844).
+        mumcord_audio::rt::keep_overrun_headroom();
+        let mut limit = libc::rlimit {
+            rlim_cur: 0,
+            rlim_max: 0,
+        };
+        // SAFETY: getrlimit only writes `limit`.
+        let result = unsafe { libc::getrlimit(libc::RLIMIT_RTTIME, &raw mut limit) };
+        assert_eq!(result, 0, "reading RLIMIT_RTTIME");
+        assert_eq!(
+            limit.rlim_cur,
+            limit.rlim_max / 2,
+            "the soft limit warns again before the hard one"
+        );
     } else {
         eprintln!("skipped: real-time scheduling unavailable (no rtkit, RLIMIT_RTPRIO is 0)");
     }
