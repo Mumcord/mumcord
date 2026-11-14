@@ -16,7 +16,7 @@ import { runOk } from "../../helpers/run.ts";
 export const DECLARED_HOST = "declared.plugins.test";
 export const UNDECLARED_HOST = "undeclared.plugins.test";
 export const UPDATE_HOST = "update.plugins.test";
-/** Fixed, because plugin manifests declare their origins literally. 47180 stays free for the dev localhost of E2. */
+/** Fixed, because plugin manifests declare their origins literally. The dev localhost of E2 listens on 24718, below the ephemeral range, so these ports never take it. */
 export const HTTPS_PORT = 47443;
 export const STUN_PORT = 47478;
 
