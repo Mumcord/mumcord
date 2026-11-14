@@ -66,7 +66,8 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   helpers call `testenv/up.sh` / `reset.sh` / `docker restart` from inside the container.
 - `e2e/container-run.sh` (inside): session D-Bus, unlocked gnome-keyring (Secret Service, which the
   app uses for the identity and server passwords), Xvfb on `:99` (`:99+n` for run id n), then builds the app
-  (`tauri build --debug --no-bundle --features test-backend`), `netsim`, the test game plugin
+  (`tauri build --debug --no-bundle --features test-backend,phone-transfer`; `MUMCORD_E2E_APP_FEATURES`
+  replaces the feature list, see "Build flags" in `CONTRIBUTING.md`), `netsim`, the test game plugin
   (`crates/positional/examples/test_plugin.rs`) and `headless_check`, fetches the test bot (the
   [mumbot](https://github.com/Mumcord/mumbot) release pinned in `scripts/mumbot.env`, via
   `scripts/fetch-mumbot.sh`), then runs `wdio run e2e/wdio.conf.ts`.

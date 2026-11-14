@@ -17,6 +17,7 @@
     "muted": "A suttogáshoz oldd fel a mikrofon némítását.",
     "serverMuted": "A szerver elnémított, ezért nem továbbítja a hangodat.",
     "nobodyHere": "Ezek közül senki sincs most ezen a szerveren.",
+    "ambiguousName": "Itt többen is viselik ezt a nevet, ezért a suttogás nem lett elküldve.",
     "channelNotFound": "Ez a csatorna nem létezik ezen a szerveren.",
     "noPermission": "A szerver nem engedi, hogy a(z) {{channel}} csatornába suttogj.",
     "unknownTarget": "Ez a cél már nem létezik.",

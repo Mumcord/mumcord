@@ -10,6 +10,12 @@ use super::types::{ConnState, EngineError, ErrorKind};
 /// Failed reconnect attempts before giving up (FR-1.13).
 pub const MAX_RECONNECT_ATTEMPTS: u32 = 10;
 
+/// A connection that lasted this long after the login counts as working: a later loss starts
+/// the reconnect attempts from the beginning. One that ends sooner keeps counting, so a server
+/// that accepts the login and closes right away is not retried without end. Stock Mumble
+/// servers do exactly that to a client whose certificate is banned, without a message.
+pub const STABLE_AFTER: Duration = Duration::from_secs(10);
+
 /// Wait before reconnect attempt `attempt` (1-based): quick first retries for short blips,
 /// then capped so a returning server is found within half a minute.
 pub fn backoff(attempt: u32) -> Duration {
@@ -43,6 +49,8 @@ pub enum Step {
 pub struct Machine {
     state: ConnState,
     attempt: u32,
+    /// Connections in a row that ended sooner than [`STABLE_AFTER`] after their login.
+    short_lived: u32,
 }
 
 impl Default for Machine {
@@ -50,6 +58,7 @@ impl Default for Machine {
         Self {
             state: ConnState::Disconnected { error: None },
             attempt: 0,
+            short_lived: 0,
         }
     }
 }
@@ -65,20 +74,26 @@ impl Machine {
 
     pub fn connect(&mut self, server_id: ServerId) {
         self.attempt = 0;
+        self.short_lived = 0;
         self.state = ConnState::Connecting { server_id };
     }
 
-    /// ServerSync received.
+    /// ServerSync received. The attempts are only forgotten once the connection has proved
+    /// itself, see [`Machine::lost`].
     pub fn synced(&mut self) {
         if let Some(server_id) = self.server_id() {
-            self.attempt = 0;
             self.state = ConnState::Connected { server_id };
         }
     }
 
-    /// An established connection dropped unexpectedly.
-    pub fn lost(&mut self) -> Step {
-        self.attempt = 0;
+    /// An established connection dropped unexpectedly, `survived` after its login.
+    pub fn lost(&mut self, survived: Duration) -> Step {
+        if survived >= STABLE_AFTER {
+            self.attempt = 0;
+            self.short_lived = 0;
+        } else {
+            self.short_lived += 1;
+        }
         self.schedule_retry()
     }
 
@@ -96,9 +111,16 @@ impl Machine {
         };
         self.attempt += 1;
         if self.attempt > MAX_RECONNECT_ATTEMPTS {
+            // Only what was observed: the server gives no reason for closing.
+            let message = match self.short_lived {
+                0 => format!("gave up after {MAX_RECONNECT_ATTEMPTS} reconnect attempts"),
+                times => format!(
+                    "gave up: the server closed the connection right after login, {times} times"
+                ),
+            };
             return self.stop(Some(EngineError::new(
                 ErrorKind::ServerUnreachable,
-                format!("gave up after {MAX_RECONNECT_ATTEMPTS} reconnect attempts"),
+                message,
             )));
         }
         let delay = backoff(self.attempt);
@@ -113,6 +135,7 @@ impl Machine {
 
     fn stop(&mut self, error: Option<EngineError>) -> Step {
         self.attempt = 0;
+        self.short_lived = 0;
         self.state = ConnState::Disconnected { error };
         Step::Stop
     }
@@ -258,7 +281,7 @@ mod tests {
         let mut m = Machine::default();
         m.connect(1);
         m.synced();
-        assert_eq!(m.lost(), Step::Retry(Duration::from_secs(1)));
+        assert_eq!(m.lost(STABLE_AFTER), Step::Retry(Duration::from_secs(1)));
         assert_eq!(
             m.state(),
             &ConnState::Reconnecting {
@@ -272,7 +295,52 @@ mod tests {
         m.synced();
         assert_eq!(m.state(), &ConnState::Connected { server_id: 1 });
         // A later loss starts counting from 1 again.
-        assert_eq!(m.lost(), Step::Retry(Duration::from_secs(1)));
+        assert_eq!(m.lost(STABLE_AFTER), Step::Retry(Duration::from_secs(1)));
+    }
+
+    #[test]
+    fn a_server_that_closes_right_after_every_login_is_given_up() {
+        let mut m = Machine::default();
+        m.connect(1);
+        let mut logins = 0;
+        loop {
+            m.synced();
+            logins += 1;
+            if m.lost(Duration::from_millis(20)) == Step::Stop {
+                break;
+            }
+        }
+        assert_eq!(logins, MAX_RECONNECT_ATTEMPTS + 1);
+        assert!(matches!(
+            m.state(),
+            ConnState::Disconnected { error: Some(e) }
+                if e.kind == ErrorKind::ServerUnreachable
+                    && e.message.contains("right after login, 11 times")
+        ));
+    }
+
+    #[test]
+    fn a_connection_that_held_starts_the_attempts_anew() {
+        let mut m = Machine::default();
+        m.connect(1);
+        m.synced();
+        for _ in 0..3 {
+            m.lost(Duration::from_secs(1));
+            m.synced();
+        }
+        // Minutes later the network drops: the earlier short connections no longer count.
+        assert_eq!(
+            m.lost(Duration::from_secs(300)),
+            Step::Retry(Duration::from_secs(1))
+        );
+        let mut step = Step::Retry(Duration::ZERO);
+        while let Step::Retry(_) = step {
+            step = m.failed(unreachable());
+        }
+        assert!(matches!(
+            m.state(),
+            ConnState::Disconnected { error: Some(e) } if e.message.contains("reconnect attempts")
+        ));
     }
 
     #[test]
@@ -280,7 +348,7 @@ mod tests {
         let mut m = Machine::default();
         m.connect(1);
         m.synced();
-        let mut step = m.lost();
+        let mut step = m.lost(STABLE_AFTER);
         let mut retries = 1;
         while let Step::Retry(_) = step {
             step = m.failed(unreachable());
@@ -298,7 +366,7 @@ mod tests {
         let mut m = Machine::default();
         m.connect(1);
         m.synced();
-        m.lost();
+        m.lost(STABLE_AFTER);
         let wrong = EngineError::new(ErrorKind::WrongPassword, "rejected");
         assert_eq!(m.failed(Failure::Fatal(wrong.clone())), Step::Stop);
         assert_eq!(m.state(), &ConnState::Disconnected { error: Some(wrong) });

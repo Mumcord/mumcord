@@ -17,6 +17,7 @@
     "muted": "Activa tu micrófono para susurrar.",
     "serverMuted": "El servidor te ha silenciado, así que no transmite tu voz.",
     "nobodyHere": "Ninguna de estas personas está ahora en este servidor.",
+    "ambiguousName": "Más de una persona aquí tiene este nombre, así que el susurro no se envió.",
     "channelNotFound": "Este canal no existe en este servidor.",
     "noPermission": "El servidor no te permite susurrar a {{channel}}.",
     "unknownTarget": "Este destino ya no existe.",

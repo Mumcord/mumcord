@@ -21,7 +21,8 @@ use mumcord_audio::codec::{
 };
 use mumcord_audio::dsp::{DspChain, DspControls, EchoRefConsumer, Gate, MicTest, echo_reference};
 use mumcord_audio::io::{
-    AudioIo, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource, IoError, IoStats,
+    AudioIo, BackendKind, DeviceEvent, DeviceInfo, Direction, FrameSink, FrameSource, IoError,
+    IoStats,
 };
 use mumcord_audio::mixer::share::ShareGain;
 use mumcord_audio::mixer::{
@@ -33,6 +34,7 @@ use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle as TaskHandle;
 
 use crate::audio_rating::HealthHistory;
+#[cfg(feature = "positional")]
 use crate::positional::PositionalShared;
 use crate::screen_share::sound::ShareSoundHub;
 use crate::session::batch::TalkBatch;
@@ -130,11 +132,13 @@ pub(crate) struct Audio {
 
 impl Audio {
     pub fn start(
+        backend: Result<BackendKind, IoError>,
         input: Option<String>,
         output: Option<String>,
         events: Events,
     ) -> EngineResult<Self> {
-        let handles = AudioIo::start(input, output)
+        let handles = backend
+            .and_then(|kind| AudioIo::start_with(kind, input, output))
             .map_err(|e| EngineError::internal(format!("audio: {e}")))?;
         let io = Arc::new(handles.io);
         let weak = Arc::downgrade(&io);
@@ -232,8 +236,9 @@ fn device_list(io: &AudioIo) -> EngineResult<AudioDeviceList> {
 }
 
 /// The device list while no audio runs, without opening any stream.
-pub fn idle_device_list() -> EngineResult<AudioDeviceList> {
-    device_list_with(AudioIo::list_devices)
+pub fn idle_device_list(backend: Result<BackendKind, IoError>) -> EngineResult<AudioDeviceList> {
+    let kind = backend.map_err(|e| EngineError::internal(format!("audio devices: {e}")))?;
+    device_list_with(|direction| AudioIo::list_devices_with(kind.clone(), direction))
 }
 
 fn device_list_with(
@@ -319,6 +324,7 @@ pub(crate) struct VoiceShared {
     /// Voice threads (capture, playback) running with real-time scheduling.
     pub realtime_threads: AtomicU32,
     /// Listener pose and own position for positional audio.
+    #[cfg(feature = "positional")]
     pub positional: Arc<PositionalShared>,
     /// Where watched screen shares' sound goes while the pipeline runs (FR-2.42).
     pub share_sound: ShareSoundHub,
@@ -352,6 +358,7 @@ impl Default for VoiceShared {
             capture_time: FrameTime::default(),
             capture_late_frames: AtomicU64::new(0),
             realtime_threads: AtomicU32::new(0),
+            #[cfg(feature = "positional")]
             positional: Arc::default(),
             share_sound: ShareSoundHub::default(),
             share_gain: Arc::default(),
@@ -440,7 +447,10 @@ impl VoicePipeline {
                 // A full reference queue only degrades echo cancellation briefly.
                 let _ = echo_producer.push(frame);
             })),
+            #[cfg(feature = "positional")]
             listener: Some(shared.positional.listener.clone()),
+            #[cfg(not(feature = "positional"))]
+            listener: None,
             share_gain: shared.share_gain.clone(),
             on_thread_start: Some({
                 let shared = shared.clone();
@@ -653,11 +663,11 @@ fn capture_loop(
     // its terminator went out, so no audio meant for the target leaks into the channel.
     let mut burst_target = 0u8;
     let send = |len: usize, packet: &[u8], frames: u8, is_last: bool, target: u8| {
-        transport.send_audio(
-            OutgoingAudio::new(Bytes::copy_from_slice(&packet[..len]), frames, is_last)
-                .to_target(target)
-                .with_position(shared.positional.own_position()),
-        );
+        let audio = OutgoingAudio::new(Bytes::copy_from_slice(&packet[..len]), frames, is_last)
+            .to_target(target);
+        #[cfg(feature = "positional")]
+        let audio = audio.with_position(shared.positional.own_position());
+        transport.send_audio(audio);
         shared.packets_sent.fetch_add(1, Ordering::Relaxed);
     };
 

@@ -204,6 +204,7 @@ fn render_node_vendor() -> GpuVendor {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "vp9")]
     use mumcord_screenshare::Encoder;
 
     use super::*;
@@ -258,6 +259,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "vp9")]
     #[test]
     fn a_working_encoder_passes_the_smoke_test() {
         let mut vp9 = Encoder::new(SMOKE_CONFIG).expect("vp9");

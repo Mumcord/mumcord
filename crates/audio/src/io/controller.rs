@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 
 use rtrb::{Consumer, Producer};
 
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 use super::cpal_backend::CpalBackend;
 use super::frames::{CaptureEndpoint, FrameSink, FrameSource, PlaybackEndpoint};
 use super::ring::Counters;
@@ -246,7 +247,9 @@ impl Drop for AudioIo {
 
 fn make_backend(kind: BackendKind) -> Box<dyn Backend> {
     match kind {
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
         BackendKind::Cpal => Box::new(CpalBackend::new()),
+        BackendKind::External(audio) => Box::new(audio),
         #[cfg(any(test, feature = "test-backend"))]
         BackendKind::Null { period_frames } => {
             Box::new(super::test_backend::TestBackend::Null { period_frames })

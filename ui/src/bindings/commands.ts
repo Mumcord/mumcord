@@ -23,6 +23,15 @@ export const commands = {
 	identitySetDefault: (id: number) => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_set_default", { id })),
 	/**  Chooses the identity a saved server connects with; `null` uses the default. */
 	serverSetIdentity: (serverId: number, identityId: number | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_identity", { serverId, identityId })),
+	/**
+	 *  Builds a new transfer of the chosen identities and, if wanted, the server list and puts it
+	 *  on show. A transfer that was shown before is dropped first, so calling this again is how
+	 *  the dialog gets new codes after a change of the selection or after the expiry. Saved server
+	 *  passwords and channel access tokens are never part of it (FR-5.66).
+	 */
+	phoneTransferStart: (identityIds: number[], includeServers: boolean) => typedError<PhoneTransfer, ApiError>(__TAURI_INVOKE("phone_transfer_start", { identityIds, includeServers })),
+	/**  Drops the transfer; the dialog calls it when it closes. */
+	phoneTransferCancel: () => __TAURI_INVOKE<void>("phone_transfer_cancel"),
 	/**  Looks for an installed official Mumble client; `null` when there is none. */
 	mumbleImportScan: () => typedError<MumbleImportFound | null, ApiError>(__TAURI_INVOKE("mumble_import_scan")),
 	/**
@@ -1643,6 +1652,11 @@ export type AppInfo = {
 	 *  elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything.
 	 */
 	session: SessionKind | null,
+	/**
+	 *  Whether this build offers "Send to your phone" (Cargo feature `phone-transfer`); the
+	 *  identity settings show its button only then.
+	 */
+	phoneTransfer: boolean,
 };
 
 /**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
@@ -3193,6 +3207,7 @@ export type MassMoveResult =
 { kind: "done"; moved: number; total: number } | 
 /**  Another mass move is still running on this server (FR-10.18). */
 { kind: "alreadyRunning" };
+
 /**  The wire format of a captured media stream. */
 export type MediaFormat = "media" | "legacy";
 
@@ -3201,6 +3216,7 @@ export type MediaFormat = "media" | "legacy";
  *  The media content itself is never captured, so there is no payload here.
  */
 export type MediaPacket = {
+	/**  `"media"` for the 0.9.0 `.media` document, `"legacy"` for the old fixed header. */
 	format: MediaFormat,
 	/**  The old header's version byte; `null` for the media document. */
 	version: number | null,
@@ -3696,6 +3712,26 @@ export type PersonTarget = {
 	/**  The rights in the root channel, which decide what the menu offers at all (FR-10.1, FR-10.2). */
 	canKick: boolean,
 	canBan: boolean,
+};
+
+/**  A transfer on show. */
+export type PhoneTransfer = {
+	/**  The QR codes in the order they are shown, all of the same size. */
+	codes: PhoneTransferQr[],
+	/**  The digits the user types on the phone; the UI groups them. */
+	code: string,
+	totalParts: number,
+	/**  Seconds until the codes must leave the screen. */
+	secondsLeft: number,
+};
+
+/**
+ *  One QR code as the UI draws it: `size` rows of `size` characters, `1` for a dark module.
+ *  The quiet zone around it is not included.
+ */
+export type PhoneTransferQr = {
+	size: number,
+	rows: string[],
 };
 
 /**  A feature this platform cannot provide, with the reason named in the About note. */
@@ -5925,7 +5961,9 @@ export type WatchStats = {
 	rms: number | null,
 };
 
-export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";
+export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | 
+/**  A saved name fits several people on the server; nothing is sent to any of them. */
+"ambiguousName" | "channelNotFound" | "noPermission" | "unknownTarget";
 
 /**  Why whisper keys cannot work in this session. */
 export type WhisperKeysUnavailable = 

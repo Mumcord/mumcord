@@ -17,6 +17,7 @@
     "muted": "Ixgħel il-mikrofonu tiegħek biex tibbisbes.",
     "serverMuted": "Is-server issikkettjak, għalhekk ma jgħaddix leħnek.",
     "nobodyHere": "L-ebda wieħed minn dawn il-persuni mhu fuq dan is-server issa.",
+    "ambiguousName": "Hawn aktar minn persuna waħda b’dan l-isem, għalhekk il-whisper ma ntbagħatx.",
     "channelNotFound": "Dan il-kanal ma jeżistix fuq dan is-server.",
     "noPermission": "Is-server ma jippermettilekx tibbisbes f'{{channel}}.",
     "unknownTarget": "Din il-mira m'għadhiex teżisti.",

@@ -14,13 +14,16 @@
 
 pub mod broadcast;
 pub mod capture;
-#[cfg(any(target_os = "macos", test))]
+#[cfg(all(feature = "screen-capture", any(target_os = "macos", test)))]
 pub mod capture_macos;
-#[cfg(target_os = "linux")]
+#[cfg(all(feature = "screen-capture", target_os = "linux"))]
 pub mod capture_wayland;
-#[cfg(windows)]
+#[cfg(all(feature = "screen-capture", windows))]
 pub mod capture_windows;
-#[cfg(any(target_os = "linux", target_os = "freebsd"))]
+#[cfg(all(
+    feature = "screen-capture",
+    any(target_os = "linux", target_os = "freebsd")
+))]
 pub mod capture_x11;
 mod convert;
 pub(crate) mod encoder;
@@ -34,6 +37,7 @@ mod start;
 mod state;
 mod thumbnail;
 pub(crate) mod watch;
+#[cfg(feature = "screen-capture")]
 mod windows_rules;
 pub mod wire;
 
@@ -948,11 +952,11 @@ impl Engine {
     /// The apps playing sound now, for "Which app's sound?" while the own share waits for the
     /// user's pick (Linux, FR-7.83); call it again to refresh the open list. Empty elsewhere.
     pub fn screen_share_sound_apps(&self) -> EngineResult<Vec<SoundApp>> {
-        #[cfg(target_os = "linux")]
+        #[cfg(all(feature = "screen-capture", target_os = "linux"))]
         {
             sound::pick::list().map_err(|reason| EngineError::invalid(reason.code()))
         }
-        #[cfg(not(target_os = "linux"))]
+        #[cfg(not(all(feature = "screen-capture", target_os = "linux")))]
         {
             Ok(Vec::new())
         }
@@ -1571,7 +1575,7 @@ fn with_picks(
 /// The capture of the app the user chose in "Which app's sound?"; an error when it stopped
 /// playing meanwhile.
 fn chosen_sound(id: &str) -> EngineResult<SoundOutcome> {
-    #[cfg(target_os = "linux")]
+    #[cfg(all(feature = "screen-capture", target_os = "linux"))]
     {
         match sound::pick::start_chosen(id) {
             Ok(Some(outcome)) => Ok(outcome),
@@ -1582,7 +1586,7 @@ fn chosen_sound(id: &str) -> EngineResult<SoundOutcome> {
             Err(reason) => Ok(SoundOutcome::Unavailable(reason)),
         }
     }
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(all(feature = "screen-capture", target_os = "linux")))]
     {
         let _ = id;
         Err(EngineError::invalid("no sound choice on this system"))

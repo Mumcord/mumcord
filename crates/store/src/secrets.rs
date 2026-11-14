@@ -26,12 +26,19 @@
 //!
 //! The OS calls can block (e.g. while a wallet unlock prompt is open); async callers
 //! should run them on a blocking thread.
+//!
+//! Android and iOS have no OS backend in this crate: the embedding app implements
+//! [`SecretBackend`] on top of the phone's secure storage and injects it with
+//! [`SecretStore::with_backend`]. The layout, the caching and the migrations above are the
+//! same for every backend.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 
 use serde::{Deserialize, Serialize};
 
+#[cfg(any(test, feature = "test-util"))]
+use crate::error::SecretBackendError;
 use crate::error::{Error, Result};
 use crate::identities::IdentityId;
 use crate::identity::Identity;
@@ -44,23 +51,86 @@ pub const KEYRING_SERVICE: &str = "app.mumcord.client";
 const LEGACY_IDENTITY_ACCOUNT: &str = "identity";
 const CHUNK_SIZE: usize = if cfg!(windows) { 2048 } else { usize::MAX };
 
-trait SecretBackend: Send + Sync {
+/// The secure storage a [`SecretStore`] keeps its items in: a flat map from an account name to
+/// a secret of arbitrary bytes.
+///
+/// The desktop platforms use the OS store ([`SecretStore::os`]). An app on another platform
+/// implements this trait on top of the platform's secure storage (Android Keystore-protected
+/// storage, iOS Keychain) and injects it with [`SecretStore::with_backend`].
+///
+/// Rules for an implementation:
+/// - Account names are short ASCII paths such as `identity/3/0` or `server/12`. They are chosen
+///   by the store and must be kept exactly; they are not secret.
+/// - Secrets are opaque bytes of any length (a PKCS#12 file of several kilobytes, a JSON text)
+///   and must come back unchanged.
+/// - A missing item is `Ok(None)` on [`get`](Self::get) and `Ok(())` on
+///   [`delete`](Self::delete), never an error.
+/// - Every other failure (storage locked, access denied, …) is reported as
+///   [`Error::SecureStorage`] with a [`SecretBackendError`](crate::SecretBackendError). Its
+///   message is logged, so it must never contain the secret.
+/// - Calls may block and come from any thread. The store caches what it reads, so each item is
+///   read at most once per [`SecretStore`] and written only when its value changes.
+/// - Secrets must not leave the device: no backups, no cloud sync.
+///
+/// ```
+/// use std::collections::HashMap;
+/// use std::sync::{Arc, Mutex};
+///
+/// use mumcord_store::{Error, Result, SecretBackend, SecretBackendError, SecretStore};
+///
+/// /// Stands in for the platform's secure storage.
+/// #[derive(Default)]
+/// struct PhoneStorage(Mutex<HashMap<String, Vec<u8>>>);
+///
+/// impl PhoneStorage {
+///     fn items(&self) -> Result<std::sync::MutexGuard<'_, HashMap<String, Vec<u8>>>> {
+///         self.0
+///             .lock()
+///             .map_err(|_| Error::SecureStorage(SecretBackendError::new("storage is locked")))
+///     }
+/// }
+///
+/// impl SecretBackend for PhoneStorage {
+///     fn set(&self, account: &str, secret: &[u8]) -> Result<()> {
+///         self.items()?.insert(account.to_owned(), secret.to_vec());
+///         Ok(())
+///     }
+///     fn get(&self, account: &str) -> Result<Option<Vec<u8>>> {
+///         Ok(self.items()?.get(account).cloned())
+///     }
+///     fn delete(&self, account: &str) -> Result<()> {
+///         self.items()?.remove(account);
+///         Ok(())
+///     }
+/// }
+///
+/// let secrets = SecretStore::with_backend(Arc::new(PhoneStorage::default()));
+/// secrets.set_server_password(1, "hunter2")?;
+/// assert_eq!(secrets.server_password(1)?.as_deref(), Some("hunter2"));
+/// # Ok::<(), Error>(())
+/// ```
+pub trait SecretBackend: Send + Sync {
+    /// Stores `secret` under `account`, replacing an existing item.
     fn set(&self, account: &str, secret: &[u8]) -> Result<()>;
+    /// The secret stored under `account`, or `None` if there is none.
     fn get(&self, account: &str) -> Result<Option<Vec<u8>>>;
-    /// Deleting a missing entry is not an error.
+    /// Removes the item under `account`. Deleting a missing entry is not an error.
     fn delete(&self, account: &str) -> Result<()>;
 }
 
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 struct KeyringBackend {
     service: String,
 }
 
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 impl KeyringBackend {
     fn entry(&self, account: &str) -> Result<keyring::Entry> {
         Ok(keyring::Entry::new(&self.service, account)?)
     }
 }
 
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 impl SecretBackend for KeyringBackend {
     fn set(&self, account: &str, secret: &[u8]) -> Result<()> {
         Ok(self.entry(account)?.set_secret(secret)?)
@@ -435,7 +505,8 @@ impl ServerSecrets {
     }
 }
 
-/// Access to secrets in the OS secure storage.
+/// Access to secrets in the secure storage: the OS store on desktop, an injected
+/// [`SecretBackend`] elsewhere.
 pub struct SecretStore {
     backend: Arc<dyn SecretBackend>,
     /// Server items read this session; a server without item is cached as empty.
@@ -448,7 +519,9 @@ pub struct SecretStore {
 }
 
 impl SecretStore {
-    /// The OS secure storage under [`KEYRING_SERVICE`].
+    /// The OS secure storage under [`KEYRING_SERVICE`]. Not available on Android and iOS; use
+    /// [`with_backend`](Self::with_backend) there.
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     pub fn os() -> Self {
         Self::os_with_service(KEYRING_SERVICE)
     }
@@ -456,7 +529,9 @@ impl SecretStore {
     /// The OS secure storage under [`KEYRING_SERVICE`], falling back to the encrypted secret file
     /// in `profile_dir` where no Secret Service answers (FreeBSD). Once a profile has used one
     /// of the two it sticks with it (see `backend_choice`). Every other platform ignores the
-    /// directory and uses the OS store only.
+    /// directory and uses the OS store only. Not available on Android and iOS; use
+    /// [`with_backend`](Self::with_backend) there.
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     pub fn os_with_profile(profile_dir: impl Into<std::path::PathBuf>) -> Self {
         #[cfg(target_os = "freebsd")]
         {
@@ -475,13 +550,16 @@ impl SecretStore {
         }
     }
 
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     fn os_with_service(service: &str) -> Self {
         Self::with_backend(Arc::new(KeyringBackend {
             service: service.to_owned(),
         }))
     }
 
-    fn with_backend(backend: Arc<dyn SecretBackend>) -> Self {
+    /// A store on top of the given secure storage, for platforms without an OS backend in this
+    /// crate (Android, iOS): the embedding app implements [`SecretBackend`] and passes it here.
+    pub fn with_backend(backend: Arc<dyn SecretBackend>) -> Self {
         Self {
             backend,
             servers: Mutex::new(HashMap::new()),
@@ -821,6 +899,12 @@ fn legacy_tokens_account(server: ServerId) -> String {
     format!("access-tokens/{server}")
 }
 
+/// The error of a denied keychain prompt, for the test backends.
+#[cfg(any(test, feature = "test-util"))]
+fn denied() -> Error {
+    Error::SecureStorage(SecretBackendError::new("denied"))
+}
+
 #[cfg(any(test, feature = "test-util"))]
 mod memory {
     use std::collections::HashMap;
@@ -870,7 +954,7 @@ mod memory {
     impl MemoryBackend {
         fn check_denied(&self) -> Result<()> {
             if self.0.denied.load(Ordering::Relaxed) {
-                return Err(keyring::Error::NoStorageAccess("denied".into()).into());
+                return Err(denied());
             }
             Ok(())
         }
@@ -1450,24 +1534,113 @@ mod tests {
         assert_eq!(backend.accounts(), ["server/4"]);
     }
 
+    /// A backend written against the public interface only, like the one of a phone app: its
+    /// own storage and its own error type.
+    #[derive(Default)]
+    struct EmbedderBackend {
+        items: Mutex<HashMap<String, Vec<u8>>>,
+        locked: std::sync::atomic::AtomicBool,
+    }
+
+    #[derive(Debug)]
+    struct DeviceLocked;
+
+    impl std::fmt::Display for DeviceLocked {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.write_str("the device is locked")
+        }
+    }
+
+    impl std::error::Error for DeviceLocked {}
+
+    impl EmbedderBackend {
+        fn items(&self) -> Result<MutexGuard<'_, HashMap<String, Vec<u8>>>> {
+            if self.locked.load(std::sync::atomic::Ordering::Relaxed) {
+                return Err(Error::SecureStorage(crate::SecretBackendError::new(
+                    DeviceLocked,
+                )));
+            }
+            Ok(lock(&self.items))
+        }
+    }
+
+    impl SecretBackend for EmbedderBackend {
+        fn set(&self, account: &str, secret: &[u8]) -> Result<()> {
+            self.items()?.insert(account.to_owned(), secret.to_vec());
+            Ok(())
+        }
+        fn get(&self, account: &str) -> Result<Option<Vec<u8>>> {
+            Ok(self.items()?.get(account).cloned())
+        }
+        fn delete(&self, account: &str) -> Result<()> {
+            self.items()?.remove(account);
+            Ok(())
+        }
+    }
+
+    /// A throwaway password built at runtime, so no credential-looking literal sits in the test.
+    fn sample_password() -> String {
+        format!("pw-{}", std::process::id())
+    }
+
+    #[test]
+    fn an_injected_backend_holds_all_secrets() {
+        let backend = Arc::new(EmbedderBackend::default());
+        exercise(&SecretStore::with_backend(backend.clone()));
+
+        // Identities and server secrets are found again after a restart.
+        let store = SecretStore::with_backend(backend.clone());
+        store.save_identity(3, &IDENTITY).expect("save");
+        let password = sample_password();
+        store.set_server_password(12, &password).expect("set");
+        let restarted = SecretStore::with_backend(backend);
+        assert_eq!(
+            restarted.load_identity(3).expect("load").as_ref(),
+            Some(&*IDENTITY)
+        );
+        assert_eq!(
+            restarted.server_password(12).expect("get").as_deref(),
+            Some(password.as_str())
+        );
+    }
+
+    #[test]
+    fn an_injected_backend_reports_its_own_error() {
+        let backend = Arc::new(EmbedderBackend::default());
+        backend
+            .locked
+            .store(true, std::sync::atomic::Ordering::Relaxed);
+        let store = SecretStore::with_backend(backend);
+
+        let error = store
+            .set_server_password(12, &sample_password())
+            .expect_err("locked storage");
+        assert!(matches!(error, Error::SecureStorage(_)), "{error:?}");
+        assert_eq!(
+            error.to_string(),
+            "secure storage error: the device is locked"
+        );
+    }
+
     /// Reads succeed, writes fail like a denied prompt for an item of another app version.
     struct FailingWrites(MemoryBackend);
 
     impl SecretBackend for FailingWrites {
         fn set(&self, _account: &str, _secret: &[u8]) -> Result<()> {
-            Err(keyring::Error::NoStorageAccess("denied".into()).into())
+            Err(denied())
         }
         fn get(&self, account: &str) -> Result<Option<Vec<u8>>> {
             self.0.get(account)
         }
         fn delete(&self, _account: &str) -> Result<()> {
-            Err(keyring::Error::NoStorageAccess("denied".into()).into())
+            Err(denied())
         }
     }
 
     /// Runs against the real OS secure storage under a separate test service name and
     /// removes its entries afterwards. Run with:
     /// `cargo test -p mumcord-store -- --ignored os_keyring`
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     #[test]
     #[ignore = "touches the real OS secure storage"]
     fn os_keyring_round_trip() {

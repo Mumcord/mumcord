@@ -57,7 +57,7 @@ use tauri_specta::{Builder, Event, collect_commands, collect_events};
 use commands::{
     admin, app, audio, blocking, channel_admin, channel_audio, channels, chat, diagnostics,
     dropped, follow, friends, history, identity, links, mumble_import, notifications as notify,
-    people, pm_overview, pm_rules, profile, servers, session, settings,
+    people, phone_transfer, pm_overview, pm_rules, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -84,6 +84,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             identity::identity_delete,
             identity::identity_set_default,
             identity::server_set_identity,
+            phone_transfer::phone_transfer_start,
+            phone_transfer::phone_transfer_cancel,
             mumble_import::mumble_import_scan,
             mumble_import::mumble_import_apply,
             mumble_import::mumble_import_undo,
@@ -651,6 +653,13 @@ pub fn run() {
                 ));
                 return true;
             }
+            if !commands::phone_transfer::command_allowed(call.message.command()) {
+                call.resolver.reject(commands::types::ApiError::new(
+                    commands::types::ErrorCode::NotImplemented,
+                    "Send to your phone is not available in this build",
+                ));
+                return true;
+            }
             invoke(call)
         })
         .manage(window::StartReveal::default())
@@ -659,6 +668,7 @@ pub fn run() {
         .manage(plugins::ui::FrameMuteStore::default())
         .manage(plugins::child_webview::Frames::default())
         .manage(commands::inspector::SharedView::default())
+        .manage(commands::phone_transfer::PhoneTransferState::default())
         .manage(commands::inspector::CaptureMode::default())
         .manage(commands::licences::SharedLook::default())
         .manage(watch_player::PlayerServer::default())
@@ -1222,6 +1232,7 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        EngineEvent::WhisperEnded => commands::whisper::on_engine_ended(app),
         EngineEvent::UserStatsChanged(stats) => commands::user_stats::UserStatsChanged {
             server_id,
             session: stats.session,

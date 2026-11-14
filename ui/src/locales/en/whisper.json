@@ -17,6 +17,7 @@
     "muted": "Unmute your microphone to whisper.",
     "serverMuted": "The server has muted you, so it does not pass on your voice.",
     "nobodyHere": "None of these people are on this server right now.",
+    "ambiguousName": "More than one person here has this name, so the whisper was not sent.",
     "channelNotFound": "This channel does not exist on this server.",
     "noPermission": "The server does not allow you to whisper to {{channel}}.",
     "unknownTarget": "This target no longer exists.",

@@ -565,10 +565,12 @@ impl Engine {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "vp9")]
     use mumcord_screenshare::HardwareEncoder;
 
     use super::*;
 
+    #[cfg(any(feature = "vp9", feature = "desktop-codecs"))]
     const CONFIG: EncoderConfig = EncoderConfig {
         width: 320,
         height: 180,
@@ -576,6 +578,7 @@ mod tests {
         bitrate_kbps: 500,
     };
 
+    #[cfg(feature = "vp9")]
     #[test]
     fn a_hardware_encoder_that_fails_to_open_falls_through_to_software() {
         let active = Arc::new(Mutex::new(None));
@@ -604,6 +607,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "desktop-codecs")]
     #[test]
     fn forced_hardware_runs_the_software_encoder_but_reports_the_gpu() {
         let active = Arc::new(Mutex::new(None));
@@ -625,6 +629,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "vp9")]
     #[test]
     fn without_av1_the_factory_opens_the_first_vp9_encoder() {
         let active = Arc::new(Mutex::new(None));

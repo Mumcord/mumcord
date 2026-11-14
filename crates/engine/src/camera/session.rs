@@ -436,6 +436,7 @@ pub(crate) struct Cameras {
     /// preview dialog takes it over (FR-8.29).
     pub(super) local: Option<CameraSend>,
     /// The background of the running camera, kept for a device change.
+    #[cfg(feature = "camera-effects")]
     pub(super) background: Option<mumcord_effects::Background>,
     /// Where the built-in background images are (the app's resources).
     pub(super) builtin_backgrounds: Option<std::path::PathBuf>,
@@ -542,6 +543,7 @@ impl Engine {
             .map_err(|_| CameraFailure::NotConnected)?;
         super::stop::watch_screen_lock(self);
         let settings = self.encoder_settings();
+        #[cfg(feature = "camera-effects")]
         let background = self.camera_default_background(&settings);
         let view = {
             let mut cameras = lock(self.camera_state());
@@ -554,7 +556,14 @@ impl Engine {
             }
             let send = match cameras.local.take() {
                 Some(send) => send,
-                None => self.camera_send_start(&mut cameras, &settings, None, background)?,
+                None => {
+                    let start = super::local::SendStart {
+                        device: None,
+                        #[cfg(feature = "camera-effects")]
+                        background,
+                    };
+                    self.camera_send_start(&mut cameras, &settings, start)?
+                }
             };
             let Some(state) = next_state(CameraState::Off, Step::Open) else {
                 return Err(CameraFailure::Busy);

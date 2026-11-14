@@ -18,6 +18,7 @@ mod description;
 pub mod extension;
 mod local;
 mod machine;
+#[cfg(feature = "mumble-import")]
 mod mumble_import;
 mod types;
 
@@ -37,7 +38,7 @@ use mumcord_audio::bitrate::{
     BitrateController, LinkStats as BitrateStats, Transport as BitrateTransport,
 };
 use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase as DspPhase};
-use mumcord_audio::io::{AudioIo, DeviceMigration, Direction};
+use mumcord_audio::io::{AudioIo, BackendKind, DeviceMigration, Direction, ExternalAudio, IoError};
 use mumcord_audio::mixer::PacketSender;
 use mumcord_store::{Identity, IdentityId, OwnVoice, SavedServer, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
@@ -47,6 +48,7 @@ use tokio::task::JoinHandle;
 pub use channel_audio::{ActiveAudioProfile, ChannelAudioView};
 pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
+#[cfg(feature = "mumble-import")]
 pub use mumble_import::{
     ImportDevice, ImportFavouriteView, ImportIdentityView, MumbleImportChoice, MumbleImportPreview,
     MumbleImportResult,
@@ -222,11 +224,17 @@ struct Inner {
     audio_start: tokio::sync::Mutex<()>,
     /// Saved device choices were checked against the current device list (issue #183).
     audio_devices_migrated: std::sync::Once,
+    /// Audio supplied by the embedding app instead of audio devices (phones, Epic 5).
+    external_audio: Option<ExternalAudio>,
+    /// Bitrate limit in kbit/s set at runtime by the app; 0 is none (FR-5.26).
+    bitrate_limit_kbps: AtomicU32,
     events: Events,
     controls: Arc<DspControls>,
     meter: Arc<Meter>,
     voice: Arc<VoiceShared>,
     reconnects: AtomicU32,
+    /// The own whisper or shout going on, bound to the sessions it was started for.
+    active_whisper: Mutex<Option<crate::whisper::ActiveWhisper>>,
     /// Voice channels the user was joined to when the app last quit, per server. Each is
     /// offered for rejoining once, on the first fresh connect to its server (QA.9).
     rejoin_offers: Mutex<HashMap<ServerId, String>>,
@@ -273,8 +281,10 @@ struct Inner {
     /// Images of synced messages still being fetched (FR-1.60f).
     history_images: crate::history_sync::HistoryImages,
     /// What the last import from the official Mumble client added, for its undo (issue #66).
+    #[cfg(feature = "mumble-import")]
     mumble_import: Mutex<Option<mumble_import::LastImport>>,
     /// Positional audio (FR-1.41).
+    #[cfg(feature = "positional")]
     positional: crate::positional::Positional,
     /// Watch parties in the user's channels (FR-2.39).
     watch_parties: crate::watch_party::ServerParties,
@@ -542,6 +552,29 @@ impl Engine {
         secrets: SecretStore,
         rt: Runtime,
     ) -> EngineResult<(Self, EventReceiver)> {
+        Self::open(data_dir, secrets, rt, None)
+    }
+
+    /// Like [`new`](Self::new), but the embedding app captures and plays the audio itself and
+    /// moves it through the endpoints of [`mumcord_audio::io::external`] (phones, Epic 5: only
+    /// the system's voice-communication session gives echo cancellation and call routing).
+    /// The engine's own echo canceller stays off, see
+    /// [`echo_cancellation_mode`](Self::echo_cancellation_mode).
+    pub fn with_external_audio(
+        data_dir: &Path,
+        secrets: SecretStore,
+        rt: Runtime,
+        audio: ExternalAudio,
+    ) -> EngineResult<(Self, EventReceiver)> {
+        Self::open(data_dir, secrets, rt, Some(audio))
+    }
+
+    fn open(
+        data_dir: &Path,
+        secrets: SecretStore,
+        rt: Runtime,
+        external_audio: Option<ExternalAudio>,
+    ) -> EngineResult<(Self, EventReceiver)> {
         std::fs::create_dir_all(data_dir).map_err(|e| {
             EngineError::new(
                 ErrorKind::Io,
@@ -574,7 +607,12 @@ impl Engine {
         // `mumcord-codec` cannot carry the rnnoise-rs git dependency, so the engine supplies the
         // implementation for that backend.
         noise_backend::register(&controls);
-        local::apply_dsp(&controls, &settings);
+        let echo = if external_audio.is_some() {
+            EchoCancellationMode::System
+        } else {
+            EchoCancellationMode::Engine
+        };
+        local::apply_dsp(&controls, &settings, echo);
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let voice = Arc::new(VoiceShared::default());
@@ -587,11 +625,14 @@ impl Engine {
             secrets: Arc::new(secrets),
             audio_start: tokio::sync::Mutex::new(()),
             audio_devices_migrated: std::sync::Once::new(),
+            external_audio,
+            bitrate_limit_kbps: AtomicU32::new(0),
             events,
             controls,
             meter,
             voice: voice.clone(),
             reconnects: AtomicU32::new(0),
+            active_whisper: Mutex::new(None),
             rejoin_offers: Mutex::new(rejoin_offers),
             password_overrides: Mutex::new(HashMap::new()),
             password_attempts: Mutex::default(),
@@ -622,6 +663,7 @@ impl Engine {
             blocked: Mutex::new(blocked),
             history_sync: Arc::default(),
             history_images: crate::history_sync::HistoryImages::default(),
+            #[cfg(feature = "mumble-import")]
             mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
@@ -629,6 +671,7 @@ impl Engine {
             camera_signals: crate::camera::signal::CameraSignals::default(),
             screen_encoders: Arc::default(),
             inspector: Arc::default(),
+            #[cfg(feature = "positional")]
             positional: crate::positional::Positional::new(
                 voice.positional.clone(),
                 &settings.positional,
@@ -641,6 +684,7 @@ impl Engine {
         engine.inner.history_images.bind(&engine);
         lock(&engine.inner.screen_shares).engine = Some(engine.downgrade());
         lock(&engine.inner.cameras).engine = Some(engine.downgrade());
+        #[cfg(feature = "positional")]
         engine.positional_poll_restart();
         engine
             .link_previews()
@@ -658,6 +702,10 @@ impl Engine {
     }
 
     /// Shared DSP switches; push-to-talk key state goes to `set_ptt_pressed`.
+    pub(crate) fn active_whisper(&self) -> &Mutex<Option<crate::whisper::ActiveWhisper>> {
+        &self.inner.active_whisper
+    }
+
     pub fn dsp_controls(&self) -> Arc<DspControls> {
         self.inner.controls.clone()
     }
@@ -679,6 +727,7 @@ impl Engine {
     }
 
     /// Context of the session the voice pipeline is bound to (positional audio, FR-2.2).
+    #[cfg(feature = "positional")]
     pub(crate) fn voice_ctx(&self) -> Option<SessionCtx> {
         let core = lock(&self.inner.core);
         let server_id = core.audio_server?;
@@ -949,6 +998,7 @@ impl Engine {
         &self.inner.history_images
     }
 
+    #[cfg(feature = "positional")]
     pub(crate) fn positional(&self) -> &crate::positional::Positional {
         &self.inner.positional
     }
@@ -1601,6 +1651,23 @@ impl Engine {
         Some(self.inner.voice.bitrate_max_bps.load(Ordering::Relaxed)).filter(|&b| b > 0)
     }
 
+    /// Who cancels echo: the engine (the `echo_cancellation` setting applies) or the system,
+    /// when the app supplies the audio. A settings screen shows "handled by the system" for the
+    /// latter instead of a switch that would do nothing.
+    pub fn echo_cancellation_mode(&self) -> EchoCancellationMode {
+        self.inner.echo_cancellation_mode()
+    }
+
+    /// Limits the voice bitrate at runtime, in kbit/s; `None` lifts the limit. It is not
+    /// stored and applies on top of the user's own cap (the lower one wins), so the server's
+    /// maximum and the automatic bitrate keep working below it. For "Reduced voice quality" on
+    /// mobile data (FR-5.26): 24 while on mobile data. Takes effect within a second.
+    pub fn set_bitrate_limit_kbps(&self, kbps: Option<u32>) {
+        self.inner
+            .bitrate_limit_kbps
+            .store(kbps.unwrap_or(0), Ordering::Relaxed);
+    }
+
     /// Lists devices. Without a connection or mic test no stream is opened for it: opening the
     /// microphone just to list it made macOS ask for microphone access on every device-picker
     /// screen.
@@ -1615,7 +1682,7 @@ impl Engine {
                         return audio.devices();
                     }
                 }
-                voice::idle_device_list()
+                voice::idle_device_list(inner.audio_backend())
             })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
@@ -1728,7 +1795,9 @@ impl Engine {
                 .audio
                 .as_ref()
                 .map(|audio| audio.io().devices(direction));
-            let devices = running.unwrap_or_else(|| AudioIo::list_devices(direction));
+            let devices = running.unwrap_or_else(|| {
+                AudioIo::list_devices_with(self.inner.audio_backend()?, direction)
+            });
             match devices {
                 Ok(devices) => {
                     info.audio_devices.extend(devices.into_iter().map(|d| {
@@ -1787,9 +1856,31 @@ impl Inner {
         }
     }
 
-    /// The user's own bitrate cap in bits per second; `None` is "Max" (FR-2.64).
+    /// The bitrate cap in bits per second: the lower of the user's own cap (FR-2.64) and the
+    /// app's runtime limit (FR-5.26); `None` is "Max".
     fn user_cap_bps(&self) -> Option<u32> {
-        self.controls.bitrate_cap_kbps().map(|k| k * 1000)
+        let limit = Some(self.bitrate_limit_kbps.load(Ordering::Relaxed)).filter(|&k| k > 0);
+        let cap = match (self.controls.bitrate_cap_kbps(), limit) {
+            (Some(own), Some(limit)) => Some(own.min(limit)),
+            (own, limit) => own.or(limit),
+        };
+        cap.map(|k| k.saturating_mul(1000))
+    }
+
+    /// The audio backend this engine runs on: the app's, or the device backend.
+    fn audio_backend(&self) -> Result<BackendKind, IoError> {
+        match &self.external_audio {
+            Some(audio) => Ok(BackendKind::External(audio.clone())),
+            None => BackendKind::from_env(),
+        }
+    }
+
+    pub(crate) fn echo_cancellation_mode(&self) -> EchoCancellationMode {
+        if self.external_audio.is_some() {
+            EchoCancellationMode::System
+        } else {
+            EchoCancellationMode::Engine
+        }
     }
 
     /// Stores the slider maximum for `bitrate_max` and reports a change.
@@ -1947,6 +2038,7 @@ impl Inner {
             task.abort();
         }
         if core.voice_server == Some(server_id) {
+            self.reset_talking(server_id);
             core.voice_server = None;
             self.events.emit(EngineEvent::VoiceServerChanged(None));
         }
@@ -2047,6 +2139,7 @@ impl Inner {
         let target = core.voice_server.or_else(|| core.earliest_connected());
         if core.audio_server != target {
             self.stop_pipeline(core);
+            #[cfg(feature = "positional")]
             if core.audio_server.is_some() {
                 self.positional.on_disconnect();
             }
@@ -2063,6 +2156,7 @@ impl Inner {
             self.voice.muted.store(voice.mute, Ordering::Relaxed);
             self.voice.deaf.store(voice.deaf, Ordering::Relaxed);
             if let Some(id) = target {
+                #[cfg(feature = "positional")]
                 self.positional.on_synced();
                 // The sound hub learns the people of its new server, as on a sync.
                 if let Some(snapshot) = self.snapshot(core, id) {
@@ -2090,6 +2184,24 @@ impl Inner {
         }
     }
 
+    /// A whisper or shout going to `server_id` ends: voice no longer goes there.
+    fn end_whisper_on(&self, server_id: ServerId) {
+        crate::whisper::on_voice_lost(
+            &self.active_whisper,
+            &self.controls,
+            &self.events,
+            server_id,
+        );
+    }
+
+    /// The voice server's connection ended: nothing of the talking there carries over to the
+    /// next connection. A whisper ends, and a push-to-talk key counts as released, so a key
+    /// whose release was missed cannot keep the microphone open after a reconnect.
+    fn reset_talking(&self, server_id: ServerId) {
+        self.end_whisper_on(server_id);
+        self.controls.set_ptt_pressed(false);
+    }
+
     /// Stops voice on the voice server without leaving it ("Leave voice"): the server becomes
     /// read-only like any other connected one and no server has voice until the next explicit
     /// join. Uses only the self-deafen flag, so it works on every standard Mumble server.
@@ -2097,6 +2209,7 @@ impl Inner {
         let Some(server_id) = core.voice_server.take() else {
             return;
         };
+        self.end_whisper_on(server_id);
         Self::make_read_only(core, server_id);
         // Nothing to offer for rejoining after a restart, as after a disconnect.
         self.forget_voice_channel();
@@ -2112,6 +2225,7 @@ impl Inner {
             return;
         }
         if let Some(previous) = core.voice_server.take() {
+            self.end_whisper_on(previous);
             Self::make_read_only(core, previous);
         }
         core.voice_server = Some(server_id);
@@ -2196,13 +2310,16 @@ impl Inner {
                     } else {
                         Arrival::Fresh(path.take())
                     };
+                    // `attempt` returns once the login is through.
+                    let logged_in = Instant::now();
                     match self
                         .run_connection(generation, server_id, connection, &host, port, arrival)
                         .await
                     {
                         Ended::Lost => {
                             synced_before = true;
-                            self.step(server_id, generation, Machine::lost)
+                            let survived = logged_in.elapsed();
+                            self.step(server_id, generation, |machine| machine.lost(survived))
                         }
                         Ended::Final(error) => {
                             self.finish(server_id, generation, error);
@@ -2453,6 +2570,7 @@ impl Inner {
         if audio {
             // A reconnect of the pipeline's server: fresh counters and game context.
             self.voice.reset_link();
+            #[cfg(feature = "positional")]
             self.positional.on_synced();
         }
         let snapshot = self.snapshot(&lock(&self.core), server_id);
@@ -2548,6 +2666,7 @@ impl Inner {
                     // Only the pipeline's server plays voice; read-only servers send none.
                     VoiceEvent::Packet(packet) if self.is_audio_server(server_id) => {
                         self.voice.packets_received.fetch_add(1, Ordering::Relaxed);
+                        #[cfg(feature = "positional")]
                         if let Some(sending) = self.positional.on_voice_packet(
                             packet.session,
                             packet.positional.is_some(),
@@ -2600,6 +2719,7 @@ impl Inner {
                         core.sample_audio_health(&self.voice);
                         core.sync_queue_target(self.controls.low_latency());
                         drop(core);
+                        #[cfg(feature = "positional")]
                         for session in self.positional.expire(Instant::now()) {
                             ctx.events.emit(EngineEvent::PositionalSendingChanged {
                                 session,
@@ -2664,6 +2784,9 @@ impl Inner {
         if core.audio_server == Some(server_id) {
             self.stop_pipeline_after_removal(&mut core, &reason);
         }
+        if core.voice_server == Some(server_id) {
+            self.reset_talking(server_id);
+        }
         if let Some(slot) = core.slots.get_mut(&server_id) {
             slot.session = None;
         }
@@ -2674,12 +2797,23 @@ impl Inner {
         self.forget_password_attempt(server_id);
         match reason {
             DisconnectReason::Requested => Ended::Final(None),
-            DisconnectReason::Kicked { reason, ban, .. } => {
-                tracing::info!(server_id, ban, "removed by the server");
-                let what = if ban { "banned" } else { "kicked" };
+            // The reason is the server's text: untrusted, shown as plain text, never logged.
+            DisconnectReason::Kicked {
+                reason, ban: true, ..
+            } => {
+                tracing::info!(server_id, "banned by the server");
+                Ended::Final(Some(EngineError::new(
+                    ErrorKind::Banned,
+                    reason.unwrap_or_default(),
+                )))
+            }
+            DisconnectReason::Kicked {
+                reason, ban: false, ..
+            } => {
+                tracing::info!(server_id, "kicked by the server");
                 Ended::Final(Some(EngineError::new(
                     ErrorKind::PermissionDenied,
-                    format!("{what}: {}", reason.unwrap_or_default()),
+                    format!("kicked: {}", reason.unwrap_or_default()),
                 )))
             }
             DisconnectReason::Closed | DisconnectReason::Timeout | DisconnectReason::Error(_) => {
@@ -2889,6 +3023,7 @@ impl Inner {
                 {
                     pipeline.forget(user.session);
                 }
+                #[cfg(feature = "positional")]
                 let audio = core.audio_server == Some(server_id);
                 drop(core);
                 crate::now_playing::on_user_removed(&self.now_playing, server_id, user.session);
@@ -2921,11 +3056,18 @@ impl Inner {
                 self.files.on_user_removed(server_id, user.session);
                 self.direct.forget(server_id, user.session);
                 self.relays.on_user_removed(ctx, user.session);
+                #[cfg(feature = "positional")]
                 if audio {
                     self.positional.on_user_removed(user.session);
                 }
                 crate::stats::on_user_removed(&self.user_stats, server_id, user.session);
                 crate::admin::on_removed(&self.admin, server_id, user.session);
+                crate::whisper::on_user_removed(
+                    &self.active_whisper,
+                    &self.controls,
+                    ctx,
+                    user.session,
+                );
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
                 ctx.events.emit(EngineEvent::UserRemoved(user.session));
             }
@@ -3442,6 +3584,10 @@ impl Inner {
     /// the devices; a choice that cannot be mapped is reset to the system default, and the
     /// notice tells the user.
     pub(crate) fn migrate_audio_devices(&self) {
+        // The app's audio has one logical device; saved ids are not used with it.
+        if self.external_audio.is_some() {
+            return;
+        }
         self.audio_devices_migrated.call_once(|| {
             let store = lock(&self.store);
             let mut settings = match store.settings() {
@@ -3488,10 +3634,16 @@ impl Inner {
         self.migrate_audio_devices();
         let settings = lock(&self.store).settings().map_err(store_error)?;
         let events = self.events.clone();
+        let backend = self.audio_backend();
         let audio = self
             .rt
             .spawn_blocking(move || {
-                let audio = Audio::start(settings.input_device, settings.output_device, events)?;
+                let audio = Audio::start(
+                    backend,
+                    settings.input_device,
+                    settings.output_device,
+                    events,
+                )?;
                 audio.set_output_volume_percent(settings.output_volume_percent);
                 Ok::<_, EngineError>(audio)
             })

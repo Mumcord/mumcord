@@ -374,6 +374,16 @@ jobs:
         if: matrix.task == 'test' || runner.os == 'macOS'
         run: cargo test --workspace --locked
 
+      # "Send to your phone" is off in release builds (Cargo feature `phone-transfer`,
+      # CONTRIBUTING.md "Build flags"). The steps above lint and test the build without it,
+      # which includes the test that such a build refuses its commands; this one covers the
+      # build with it, which only the E2E build makes otherwise.
+      - name: Send to your phone with the feature on
+        if: matrix.task == 'test' && runner.os == 'Linux'
+        run: |
+          cargo clippy -p mumcord --features phone-transfer --all-targets --locked -- -D warnings
+          cargo test -p mumcord --features phone-transfer --locked phone_transfer
+
       # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,
       # tested and free of the device crates (cpal/ALSA) and the resampler.
       - name: Codec crate lint
@@ -470,6 +480,188 @@ jobs:
         # starves vitest's own timers, so only this limit stops such a hang early.
         timeout-minutes: 10
         run: npm test
+
+  # The phone apps (spec 05) build the engine with `--no-default-features` for Android and iOS.
+  # The desktop jobs above only ever build the default features, so the four jobs below keep the
+  # phone build from breaking. They are not part of the required "result" checks.
+  #
+  # Their own gate: narrower than "changes" (UI-only changes cannot break the engine) and it
+  # counts an edit of this workflow, which "changes" ignores.
+  mobile-changes:
+    name: Changed engine files
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      # Lists the changed files of the pull request through the API.
+      pull-requests: read
+    outputs:
+      engine: ${{ steps.filter.outputs.engine }}
+    steps:
+      - id: filter
+        shell: bash
+        run: |
+          engine=true
+          if [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+            engine=false
+            while IFS= read -r file; do
+              case "$file" in
+                crates/* | Cargo.toml | Cargo.lock | .github/workflows/ci.yml)
+                  echo "engine change: $file" >&2
+                  engine=true
+                  break
+                  ;;
+              esac
+            done < <(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" -q '.[].filename')
+          fi
+          echo "engine=$engine" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+  # The engine without the desktop features, and with each desktop feature alone, on Linux: the
+  # cheapest place to catch code that only compiles when all of them are on.
+  engine-mobile-linux:
+    name: Engine without desktop features (Linux)
+    needs: mobile-changes
+    if: needs.mobile-changes.outputs.engine == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Restores the packages the "build-test" Linux jobs saved (a superset of the ones needed
+      # here); those jobs own the cache, so nothing is saved here.
+      - name: apt cache key
+        id: apt
+        run: echo "image=$ImageVersion" >> "$GITHUB_OUTPUT"
+
+      - name: Restore apt packages
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/apt-archives
+          key: apt-ubuntu-24.04-${{ steps.apt.outputs.image }}
+          restore-keys: apt-ubuntu-24.04-
+
+      # ALSA and cmake: the audio devices and the bundled Opus, needed without any feature. D-Bus:
+      # libdbus-sys (cpal's real-time priority, keyring); the desktop build gets it with WebKitGTK.
+      # The rest is for the single features: libvpx (vp9), PipeWire and libclang (screen-capture).
+      - name: Install Linux system libraries
+        timeout-minutes: 20
+        run: |
+          scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
+            libasound2-dev libdbus-1-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+
+      # For the features av1-decode (dav1d) and desktop-codecs (SVT-AV1, hardware encoders).
+      - name: Native AV1 libraries
+        uses: ./.github/actions/native-av1
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+          components: clippy
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          key: engine-mobile
+
+      - name: Lint without desktop features
+        run: cargo clippy -p mumcord-engine --no-default-features --all-targets --locked -- -D warnings
+
+      - name: Tests without desktop features
+        run: cargo test -p mumcord-engine --no-default-features --locked
+
+      # Each feature alone: a feature that silently relies on another one fails here. Clippy
+      # rather than check, so an import that is only unused in one combination fails too.
+      - name: Lint each desktop feature alone
+        shell: bash
+        run: |
+          status=0
+          for feature in positional camera-effects screen-capture mumble-import vp9 av1-decode desktop-codecs; do
+            echo "::group::feature $feature"
+            cargo clippy -p mumcord-engine --no-default-features --features "$feature" --all-targets --locked -- -D warnings || {
+              echo "::error::mumcord-engine does not build cleanly with only the feature $feature"
+              status=1
+            }
+            echo "::endgroup::"
+          done
+          exit "$status"
+
+  # The engine for the two Android ABIs (arm64-v8a for phones, x86_64 for the emulator). Its
+  # dependency tree still compiles C code (ring, SQLite, Opus, Bovnar), hence the NDK.
+  engine-android:
+    name: Engine for Android
+    needs: mobile-changes
+    if: needs.mobile-changes.outputs.engine == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      # The versions the mobile repository builds with.
+      ANDROID_NDK_VERSION: 30.0.16248370
+      CARGO_NDK_VERSION: 4.1.2
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The runner image ships the Android SDK and cmake, but its NDK versions change with the
+      # image. Not cached: the NDK is about 2 GB and would evict main's build caches.
+      - name: Install the Android NDK
+        timeout-minutes: 15
+        run: |
+          echo y | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$ANDROID_NDK_VERSION" > /dev/null
+          test -f "$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION/source.properties"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION" >> "$GITHUB_ENV"
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+          components: clippy
+          targets: aarch64-linux-android, x86_64-linux-android
+
+      - uses: ./.github/actions/cargo-tool
+        with:
+          crate: cargo-ndk
+          version: ${{ env.CARGO_NDK_VERSION }}
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          key: engine-android
+
+      - name: Check
+        run: cargo ndk -t arm64-v8a -t x86_64 check -p mumcord-engine --no-default-features --locked
+
+      # Also compiles the unit tests, so the Android-only code paths and their tests are linted.
+      - name: Lint
+        run: cargo ndk -t arm64-v8a -t x86_64 clippy -p mumcord-engine --no-default-features --all-targets --locked -- -D warnings
+
+  # The engine for iOS devices and the simulator, in its own job so a failure points at iOS
+  # alone. macOS runners are scarce and expensive: clippy only (it includes the check), cached.
+  engine-ios:
+    name: Engine for iOS
+    needs: mobile-changes
+    if: needs.mobile-changes.outputs.engine == 'true'
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          toolchain: stable
+          components: clippy
+          targets: aarch64-apple-ios, aarch64-apple-ios-sim
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          key: engine-ios
+
+      - name: Lint for iOS devices
+        run: cargo clippy -p mumcord-engine --no-default-features --all-targets --target aarch64-apple-ios --locked -- -D warnings
+
+      - name: Lint for the iOS simulator
+        run: cargo clippy -p mumcord-engine --no-default-features --all-targets --target aarch64-apple-ios-sim --locked -- -D warnings
 
   # Required status checks, one per OS under the old names. Runs even when the build was
   # skipped (no code change), because a skipped matrix job would not report these names.

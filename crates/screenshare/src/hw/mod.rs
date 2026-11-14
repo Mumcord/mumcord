@@ -1,9 +1,9 @@
 //! Direct hardware encoders (FR-7 codec), each behind [`VideoEncoder`]: NVENC (NVIDIA), VA-API
 //! (Linux, Intel and AMD), AMF (AMD) and Quick Sync through oneVPL (Intel).
 //!
-//! They are only compiled when the build found the vendor headers (`HWENC_SDK_DIR`, see
-//! `build.rs`; never on macOS). The GPU drivers are loaded at runtime ([`dl`]), so a missing
-//! driver, an unsupported GPU or a build without the SDK all end in the same
+//! They are only compiled with the `hw-encode` feature and when the build found the vendor
+//! headers (`HWENC_SDK_DIR`, see `build.rs`; never on macOS). The GPU drivers are loaded at
+//! runtime ([`dl`]), so a missing driver, an unsupported GPU or a build without the feature or the SDK all end in the same
 //! [`Error::HardwareUnavailable`], and the caller falls back to the software encoders.
 
 #[cfg(hwenc)]

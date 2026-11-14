@@ -8,6 +8,10 @@
 //! rtkit, a sandbox, a FreeBSD user without the realtime privilege), the thread keeps its normal
 //! priority and audio works as before.
 //!
+//! Android and iOS never promote a thread here: phone audio I/O and its thread priority come
+//! from the platform-fed backend (Epic 5, task 3.1), so [`promote_current_thread`] reports that
+//! real-time scheduling is unavailable and the thread keeps its normal priority.
+//!
 //! On Linux a real-time thread that runs too long without blocking gets SIGXCPU once it passes
 //! the soft `RLIMIT_RTTIME` and SIGKILL at the hard one; rtkit requires both to be set. By
 //! default SIGXCPU ends the process (issue #139), so this module handles it: the overrunning
@@ -26,12 +30,12 @@
 use std::marker::PhantomData;
 use std::sync::atomic::{AtomicU32, Ordering};
 
-#[cfg(not(target_os = "freebsd"))]
+#[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
 use audio_thread_priority::{
     RtPriorityHandle, demote_current_thread_from_real_time, promote_current_thread_to_real_time,
 };
 
-#[cfg(not(target_os = "freebsd"))]
+#[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
 use crate::{FRAME_SAMPLES, SAMPLE_RATE};
 
 /// Real-time threads returned to normal priority for running past their time budget, since the
@@ -43,6 +47,9 @@ static DEMOTIONS: AtomicU32 = AtomicU32::new(0);
 static OVERRUN_HOOK: std::sync::atomic::AtomicPtr<()> =
     std::sync::atomic::AtomicPtr::new(std::ptr::null_mut());
 
+#[cfg(any(target_os = "android", target_os = "ios"))]
+const PHONE_UNAVAILABLE: &str = "the platform schedules the audio threads on Android and iOS";
+
 /// Why a thread kept its normal priority.
 #[derive(Debug, thiserror::Error)]
 #[error("real-time scheduling unavailable: {0}")]
@@ -52,7 +59,7 @@ pub struct RtError(String);
 /// priority. Bound to its thread, so it is neither `Send` nor `Sync`.
 #[must_use = "the thread returns to normal priority when the guard is dropped"]
 pub struct RtGuard {
-    #[cfg(not(target_os = "freebsd"))]
+    #[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
     handle: Option<RtPriorityHandle>,
     _thread_bound: PhantomData<*const ()>,
 }
@@ -63,7 +70,7 @@ impl Drop for RtGuard {
         if let Err(e) = freebsd::set(libc::RTP_PRIO_NORMAL, 0) {
             tracing::debug!("returning an audio thread to normal priority failed: {e}");
         }
-        #[cfg(not(target_os = "freebsd"))]
+        #[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
         if let Some(handle) = self.handle.take()
             && let Err(e) = demote_current_thread_from_real_time(handle)
         {
@@ -92,7 +99,13 @@ pub fn promote_current_thread() -> Result<RtGuard, RtError> {
             _thread_bound: PhantomData,
         })
     }
-    #[cfg(not(target_os = "freebsd"))]
+    // Phones: the platform-fed audio backend of task 3.1 owns the audio threads and their
+    // priority, so the desktop mechanisms (rtkit, MMCSS, time-constraint policy) stay out.
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        Err(RtError(PHONE_UNAVAILABLE.to_owned()))
+    }
+    #[cfg(not(any(target_os = "freebsd", target_os = "android", target_os = "ios")))]
     {
         // FRAME_SAMPLES (480) always fits; the conversion cannot fail.
         let frames = u32::try_from(FRAME_SAMPLES).unwrap_or(u32::MAX);
@@ -292,6 +305,19 @@ mod tests {
         })
         .join()
         .expect("thread");
+    }
+
+    /// Phones never promote: the caller gets the reason and keeps its normal priority.
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    #[test]
+    fn phones_report_real_time_as_unavailable() {
+        let error = promote_current_thread()
+            .err()
+            .expect("no promotion on phones");
+        assert_eq!(
+            error.to_string(),
+            format!("real-time scheduling unavailable: {PHONE_UNAVAILABLE}")
+        );
     }
 
     /// The normal priority the guard returns the thread to is always permitted.

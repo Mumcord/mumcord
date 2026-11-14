@@ -17,6 +17,7 @@
     "muted": "Réactive ton micro pour chuchoter.",
     "serverMuted": "Le serveur t’a rendu muet, il ne transmet donc pas ta voix.",
     "nobodyHere": "Aucune de ces personnes n’est sur ce serveur pour le moment.",
+    "ambiguousName": "Plusieurs personnes ici portent ce nom, le chuchotement n’a donc pas été envoyé.",
     "channelNotFound": "Ce salon n’existe pas sur ce serveur.",
     "noPermission": "Le serveur ne t’autorise pas à chuchoter à {{channel}}.",
     "unknownTarget": "Cette cible n’existe plus.",
