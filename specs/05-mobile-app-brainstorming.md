@@ -381,3 +381,12 @@ Decision (team lead, product manager informed): the app declares the permission.
 Found while building the transfer format for "Send to your phone" (FR-5.64): a 6-digit code has only a million possibilities. Someone who photographs all QR codes but not the number could try every code in roughly 5–10 hours on one desktop PC, in spite of the slow key derivation, and would then hold the identities for good. The three attempts and the two-minute limit only apply on the user's own phone.
 
 Decision (product manager): the code has 8 digits, shown as two groups of four. That is a hundred times the effort (roughly three to four weeks on one PC, within a day on rented machines). The main protection stays that the codes and the number are only on the user's own screen for at most two minutes. The length is a setting of the sending side; the phone accepts 6 to 10 digits. Q4.3 (everything inside the QR codes plus a typed code) is unchanged.
+
+## Addendum 2026-11-14: product review of the Android screens
+
+The product manager reviewed the Android screens on 2026-11-14 and decided:
+
+- **Public server browsing is in the first version.** The server list gets a "Find more" section with "Browse public servers" (mockup `01-server-list`): a searchable list of the public Mumble servers from the official list that desktop and the engine already use, with ping for visible entries. Recorded as FR-5.9 and AC-5.38. The second mockup row "Scan an invite code" has no matching feature; it is an open point for the product manager (section 13).
+- **Chat input converts typed Markdown when sending**, by the same rules as the desktop client (no tables or task lists; only bare `http(s)://` addresses become links). FR-5.51 updated.
+- **Confirmed as built:** the root channel is always the first row of the channel tree; "Leave" in the voice bar and voice view disconnects at once; mockup elements without a function yet are left out until they work; the Android screens built without a mockup are approved and iOS keeps that look.
+- **Findings from implementation**, recorded in section 13 and at the requirements: banned clients are not told at connect time by a standard server (FR-5.7); Android call notification labels (FR-5.32); no iOS API for the local-network permission (FR-5.8); phone echo cancellation, sound, Bluetooth routing and the microphone indicator are unverified on real devices (FR-5.25); stream and camera flags of others are only known in the own channel; the emulator's simulated modem sometimes loses an answered call.

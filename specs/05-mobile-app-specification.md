@@ -1,6 +1,6 @@
 # Epic 5 – Android and iOS app · Specification
 
-> Status: Final (brainstorming completed) · As of: 2026-11-13
+> Status: Final (brainstorming completed) · As of: 2026-11-14
 > Sources: `specs/roadmap.md` (Epic 5), `specs/05-mobile-app-brainstorming.md`, overview issue #228
 > Builds on: `specs/01-foundation-specification.md` (engine, voice, chat), `specs/02-multi-server-themes-specification.md` (themes), `specs/03-identity-manager-specification.md` (identities), `specs/03-comfort-polish-specification.md` (whisper, Do Not Disturb, blocking), `specs/04-mumpeer-relay-specification.md` (relay), `specs/07-file-sharing-screenshare-specification.md` and its 0.9.0 addendum (streams), `specs/08-camera-sharing-specification.md` (camera), `specs/10-admin-moderation-specification.md` (moderation), `specs/11-activity-log-specification.md` (activity log)
 
@@ -13,7 +13,7 @@ Mumcord comes to phones and tablets: an Android app and an iOS app that speak th
 ### 2.1 In scope (first mobile version)
 
 - Android app (Android 12 and newer) and iOS app (iOS 17 and newer), phones and tablets, with a real two-column tablet layout.
-- Server list with favourites; connecting with user name, server password and the certificate warnings; one server at a time.
+- Server list with favourites and a searchable browser of public Mumble servers (FR-5.9); connecting with user name, server password and the certificate warnings; one server at a time.
 - Channel tree with people; joining and switching channels; channel passwords.
 - Voice: voice activity and on-screen push-to-talk, mute, deafen, per-person volume and local mute, whisper and shout.
 - Voice in the background and with a locked screen, shown to the system as a call; behaviour on incoming phone calls; audio output choice; headset button.
@@ -59,12 +59,14 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 - **FR-5.4** Connecting follows the desktop flow (Spec 01): TLS always on, server certificate checked against the system store, a clear prompt for an unknown certificate and a strong warning for a changed one.
 - **FR-5.5** Exactly one server is connected at a time. Connecting to another server asks for confirmation and disconnects the current one.
 - **FR-5.6** A `mumble://` link opened from another app adds nothing silently: the app shows the target (server, channel, user name) and connects after confirmation. If already connected elsewhere, FR-5.5 applies.
-- **FR-5.7** Connection errors (unreachable, wrong password, name in use, rejected certificate, banned) are shown in plain words with a retry action.
-- **FR-5.8** Local network permission. The app declares the permission to reach the local network (Android `ACCESS_LOCAL_NETWORK`, required from Android 17 / API 37, the target; iOS: local network usage description). Without it the system drops connections to addresses on the directly connected local network (for example a Mumble server at home) silently; servers on the internet are unaffected. When the user connects to a server whose address is on the local network and the permission is missing, the app first explains in one sentence why it is needed and then triggers the system prompt. If the user denies it, the connection error says so and offers the way to the system settings. Applies to Android and iOS.
+- **FR-5.7** Connection errors (unreachable, wrong password, name in use, rejected certificate, banned) are shown in plain words with a retry action. Note on "banned": a standard Mumble server tells a banned client nothing at connect time (an address ban drops the connection during the TLS handshake; a certificate ban lets the login succeed and then closes the connection silently). The app can therefore name a ban only when it happens while connected. At connect time it reports that the server closed the connection and gives up after ten short-lived logins (see section 13).
+- **FR-5.8** Local network permission. The app declares the permission to reach the local network (Android `ACCESS_LOCAL_NETWORK`, required from Android 17 / API 37, the target; iOS: local network usage description). Without it the system drops connections to addresses on the directly connected local network (for example a Mumble server at home) silently; servers on the internet are unaffected. When the user connects to a server whose address is on the local network and the permission is missing, the app first explains in one sentence why it is needed and then triggers the system prompt. If the user denies it, the connection error says so and offers the way to the system settings. Applies to Android and iOS. Note on iOS: there is no API to ask for or read the local-network permission. The app explains before the first connect to a server on the own network; the system prompt comes from the connect itself; after a failed connect the app says that access "may be missing" unless the system reports a refusal.
+
+- **FR-5.9** Public servers. The server list has a "Find more" section with "Browse public servers" (mockup `01-server-list`). It opens a searchable list of the public Mumble servers with name, address and country; the list can be filtered by name and country. For the visible entries a ping shows people online and latency. Adding an entry saves it to the server list; connecting then follows the normal flow (FR-5.3 … FR-5.5). The list comes from the official public Mumble server list that the desktop client and the engine already use. Nothing is contacted until the user opens the browser. If a refresh fails, the last list is kept and the failure is shown calmly. See section 9 for the privacy note.
 
 ### 4.2 Channels and people
 
-- **FR-5.10** The Channels tab shows the channel tree with collapsible channels, member counts, lock icon for restricted channels, and the people in each channel with talking ring and state icons (muted, deafened, streaming, camera).
+- **FR-5.10** The Channels tab shows the channel tree with collapsible channels, member counts, lock icon for restricted channels, and the people in each channel with talking ring and state icons (muted, deafened, streaming, camera). The server's root channel is always shown as the first row of the tree. Streaming and camera flags of other people are only known for people in the own channel, by design of how the server sends them (see section 13).
 - **FR-5.11** Tapping a channel joins it; a channel that needs a password asks for it (access tokens as on desktop, Spec 02 FR-2.78). The own channel is marked.
 - **FR-5.12** Tapping a person opens the person sheet: volume for me, mute for me, send private message, whisper, and the moderation section (FR-5.90 … FR-5.93) when permitted. Long-press on a channel offers join, shout to this channel, and collapse.
 - **FR-5.13** A search field filters channels and people by name.
@@ -74,17 +76,17 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 
 - **FR-5.20** Talk modes are voice activity and push-to-talk. On first start a choice screen explains both; nothing is preselected silently and the choice can be changed in the voice view and in the settings.
 - **FR-5.21** Push-to-talk is a large on-screen hold button in the expanded voice view. It works only while the app is open on screen. With a locked screen or in the background the microphone stays closed in push-to-talk mode; listening continues.
-- **FR-5.22** A slim voice bar is visible on every screen while connected: current channel, talk indicator, mute, deafen, leave. Tapping it or swiping it up opens the full voice view with the people in the channel, who is talking, the audio output choice, large mute, deafen and leave buttons, the talk mode switch and the hold-to-talk button.
+- **FR-5.22** A slim voice bar is visible on every screen while connected: current channel, talk indicator, mute, deafen, leave. "Leave" in the voice bar and in the voice view disconnects at once, without a confirmation. Tapping it or swiping it up opens the full voice view with the people in the channel, who is talking, the audio output choice (once FR-5.34 is built, see the rule in section 5), large mute, deafen and leave buttons, the talk mode switch and the hold-to-talk button.
 - **FR-5.23** Mute and deafen behave as on desktop; deafen implies mute.
 - **FR-5.24** Whisper and shout use the standard VoiceTarget messages (Spec 03 FR-3.70). Choosing "Whisper to …" or "Shout to channel" shows a whisper bar naming the target with a hold-to-whisper button; closing the bar ends it. While holding, normal talking is paused.
-- **FR-5.25** Processing follows Spec 01: noise suppression on by default and switchable, automatic gain on. Echo cancellation uses the voice processing of the phone system, because it is tuned to the device's microphone and speaker.
+- **FR-5.25** Processing follows Spec 01: noise suppression on by default and switchable, automatic gain on. Echo cancellation uses the voice processing of the phone system, because it is tuned to the device's microphone and speaker. Note: how well this works, real sound, Bluetooth routing and the microphone indicator are unverified until tested on real devices; nothing has run on a real phone yet (see section 13).
 - **FR-5.26** Codec and bitrate rules follow Spec 01 (Opus, automatic bitrate). The mobile data switch "Reduced voice quality" caps the bitrate at 24 kbit/s while on mobile data.
 
 ### 4.4 Background, calls and audio routing
 
 - **FR-5.30** A voice session keeps running when the app is in the background or the screen is locked.
 - **FR-5.31** A session is presented to the phone system as an ongoing call: on iOS through the system call integration, on Android as a self-managed call with a permanent call-style notification. The session is not written to the recent calls list.
-- **FR-5.32** System controls: Android notification with Mute, Deafen and Leave; the iOS call screen with mute and end (iOS offers no deafen there). Tapping opens the app.
+- **FR-5.32** System controls: Android notification with Mute, Deafen and Leave; the iOS call screen with mute and end (iOS offers no deafen there). Tapping opens the app. Note on Android: the hang-up button of the call-style notification carries the system's label ("Hang up"), not "Leave"; the call's name in the phone system is fixed at session start while the notification follows the channel; the notification is shown even when notifications are refused.
 - **FR-5.33** When a normal phone call is accepted, Mumcord mutes and deafens for its duration and restores the previous state when it ends. The user stays in the channel.
 - **FR-5.34** Audio output: a connected wired or Bluetooth headset is used automatically. Without a headset, the first connection asks "Loudspeaker or earpiece?" and remembers the answer. The voice view offers switching between all available outputs at any time.
 - **FR-5.35** A headset button press toggles the microphone, with a short sound as feedback.
@@ -101,7 +103,7 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 ### 4.6 Chat, private messages and notifications
 
 - **FR-5.50** The Chat tab shows the chat of the current channel: messages with avatar, name and time, links, inline images, inline GIFs, replies, mention highlighting and `@` autocomplete as on desktop (Spec 01, Spec 02). All server-supplied content is sanitised before display.
-- **FR-5.51** Sending: text, images from the photo library or camera (same size rules as desktop), GIFs from the favourites sheet. GIF favourites are local to the phone; there is no GIF search.
+- **FR-5.51** Sending: text, images from the photo library or camera (same size rules as desktop), GIFs from the favourites sheet. Typed Markdown is converted when sending, by the same rules as the desktop client: the bridge ports the desktop rules. Known differences: no tables or task lists, and only bare `http(s)://` addresses become links. GIF favourites are local to the phone; there is no GIF search.
 - **FR-5.52** The Messages tab lists private conversations with last message, time and unread count, and message requests (Spec 03 private message rules). Blocking a person works as on desktop.
 - **FR-5.53** Chat history is stored on the phone only, with the same retention settings as desktop.
 - **FR-5.54** Notifications exist only while connected: private messages and mentions raise a system notification when the chat in question is not open on screen; tapping opens that chat. After disconnecting there are none, and the settings say so.
@@ -152,7 +154,7 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 
 ## 5. UI & UX
 
-Mockups (dark and light, one design for both platforms): attached to issue #228. Screens: server list, channels, voice view, audio output, talk mode choice, person sheet, channel chat, GIF favourites, messages, activity log, stream full screen, stream mini window, camera share, lock screen, more, settings, identities, QR scan, themes, edit profile, tablet channels and chat, tablet stream, desktop "Send to your phone".
+Mockups (dark and light, one design for both platforms): attached to issue #228. Screens: server list, public server browser, channels, voice view, audio output, talk mode choice, person sheet, channel chat, GIF favourites, messages, activity log, stream full screen, stream mini window, camera share, lock screen, more, settings, identities, QR scan, themes, edit profile, tablet channels and chat, tablet stream, desktop "Send to your phone".
 
 ```mermaid
 flowchart TD
@@ -210,7 +212,8 @@ flowchart TD
 └──┴──────────────┴───────────────────────────┘
 ```
 
-- **Touch rules**: every target at least 44 pt / 48 dp; no action only reachable by long-press or swipe (each has a visible alternative); destructive actions confirm.
+- **Touch rules**: every target at least 44 pt / 48 dp; no action only reachable by long-press or swipe (each has a visible alternative); destructive actions confirm, except "Leave", which disconnects at once (FR-5.22).
+- **Mockups and missing functions**: an element of a mockup that has no function yet is left out until it works; there are no inactive controls. Examples: the search and settings icons on the server list, the audio output chip, stream tiles. They return with their features. The screens built without a mockup on Android were reviewed and approved as built on 2026-11-14; the iOS versions keep that look.
 - **Platform-native pieces**: back gesture and back button, share sheet, file and photo pickers, permission dialogs, keyboards, system call screen, system picture-in-picture.
 - **Empty states**: no servers yet (with "Add server" and "Scan from desktop app"), empty channel, no messages, no activity.
 - **Errors**: connection errors (FR-5.7), local network permission denied (FR-5.8: says so and offers the way to system settings), microphone permission denied (explains how to allow it in system settings; listening still works), camera permission denied, stream not reachable (FR-5.73), transfer code wrong (FR-5.65).
@@ -264,6 +267,7 @@ Stored on the phone, in the engine's SQLite database and the secure storage, wit
 | Chat history, private messages, message requests, blocks | Database | As Spec 01, Spec 03 |
 | Activity log | Database | As Spec 11 |
 | GIF favourites | Database | Local to the phone |
+| Public server list | Database | Last successful list, kept when a refresh fails (FR-5.9) |
 | Themes, custom themes | Database | As Spec 02 |
 | Settings | Database | New mobile keys below |
 
@@ -315,7 +319,7 @@ stateDiagram-v2
 - **Data**: voice at default quality stays below 40 MB per hour.
 - **Start**: from tap to usable server list under 2 seconds on the reference devices.
 - **Security**: TLS always on with certificate verification and change warnings; identities never leave secure storage unencrypted; transfer codes are encrypted and short-lived; all server content is sanitised before display.
-- **Privacy**: no personal data, chat content or audio in logs; no tracking; the only outbound contact besides the user's server and stream paths is the optional Android update check to GitHub. Crash reports opt-in.
+- **Privacy**: no personal data, chat content or audio in logs; no tracking; the only outbound contact besides the user's server and stream paths is the optional Android update check to GitHub and the public server browser (FR-5.9): opening the browser contacts the public list service, and pings contact the listed servers. Nothing of this happens before the user opens the browser. Crash reports opt-in.
 - **Accessibility**: section 5 rules; verified with TalkBack and VoiceOver.
 - **Robustness**: the app survives being ended by the system (FR-5.37) without data loss.
 
@@ -326,7 +330,7 @@ stateDiagram-v2
 - **Android**: one signed universal APK (arm64) attached to the GitHub release of the mobile repository, with SHA-256 checksum, SBOM and third-party notices. Signing key only as CI secret; an offline backup is kept by the product manager, because losing the key forces every user to reinstall.
 - **iOS**: build on a macOS CI runner, upload to TestFlight. Internal testers first; the public TestFlight link follows as its own step once the app is stable.
 - **CI on every pull request**: Rust tests of the bridge, Android unit and Compose tests, iOS unit and XCUITest tests, lint and format checks, and the emulator end-to-end run below.
-- **Automated end-to-end tests**: the app runs in an Android emulator and an iOS simulator against the local Docker Mumble test server (Spec 01), with a second scripted client: connect, channels, chat, private messages, voice round trip with injected audio, moderation, transfer import with generated codes. Never against public servers.
+- **Automated end-to-end tests**: the app runs in an Android emulator and an iOS simulator against the local Docker Mumble test server (Spec 01), with a second scripted client: connect, channels, chat, private messages, voice round trip with injected audio, moderation, transfer import with generated codes. Never against public servers; the public server browser is tested against a local fixture list, never the real list service.
 - **Manual device checklist per release** (real phones, at least one current and one minimum-version device per platform): background and locked-screen voice, incoming phone call, Bluetooth and wired headset, headset button, output switching, network change, battery measurement, camera sharing, stream viewing on mobile data, notifications, TalkBack and VoiceOver.
 - **One-time setup by the product manager**: App Store Connect app record and API key, TestFlight tester group, Android signing key backup, CI secrets.
 - **Mumcord repository**: engine features and the "Send to your phone" dialog ship with normal desktop releases; the mobile repository pins the first release that contains them.
@@ -372,6 +376,7 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 35. **AC-5.35** A tagged release of the mobile repository produces the signed APK with checksum on the GitHub release and a build in TestFlight, without any secret in the repository.
 36. **AC-5.36** Desktop regression: with the engine features in place, the desktop build and its end-to-end tests pass unchanged.
 37. **AC-5.37** Local network permission: on a fresh install, connecting to the local test server by its local address first shows the one-sentence explanation, then the system prompt; allowing it connects. Denying it shows a clear error that names the missing permission and offers the way to the system settings.
+38. **AC-5.38** Public servers: with a local fixture list instead of the real list service, "Browse public servers" shows the fixture entries with name, address and country; filtering by name and by country narrows the list; visible entries show people online and latency where the local test server is listed; adding an entry puts it in the server list and connecting works as in AC-5.2. Before the browser is opened nothing is requested; with the fixture made unreachable, a refresh keeps the last list.
 
 ## 12. Decision log
 
@@ -418,6 +423,12 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 | — | System echo cancellation on phones | Technical decision by recommendation |
 | — | Camera cap 540p30, no blur | Technical decision by recommendation |
 | — | Server passwords are not part of a transfer | Safer default; see section 13 |
+| — | Public server browsing is in the first mobile version (FR-5.9) | Decided 2026-11-14 by the product manager while reviewing the Android screens; "Find more" with "Browse public servers" on the server list (mockup `01-server-list`) |
+| — | Typed Markdown in chat is converted when sending, by the desktop rules (FR-5.51) | Decided 2026-11-14; no tables or task lists, only bare `http(s)://` addresses become links |
+| — | The server's root channel is always the first row of the channel tree (FR-5.10) | Confirmed as built, 2026-11-14 |
+| — | "Leave" in the voice bar and voice view disconnects at once, without confirmation (FR-5.22) | Confirmed as built, 2026-11-14 |
+| — | Mockup elements without a function yet are left out, no inactive controls (section 5) | Confirmed as built, 2026-11-14; e.g. search and settings icons on the server list, the audio output chip, stream tiles |
+| — | Screens built without a mockup on Android are approved as built; iOS keeps that look | Reviewed by the product manager, 2026-11-14 |
 | — | Local network permission is declared and requested with a one-sentence explanation before the system prompt (FR-5.8) | Found during implementation, 2026-11-14 |
 
 ## 13. Open points & risks
@@ -432,6 +443,13 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 - **Licence on iOS.** AGPL-3.0 and Apple's distribution terms can conflict. Before the public TestFlight link: confirm that the copyright holders agree to distribution through Apple and check the licences of all dependencies. Owner: product manager.
 - **CI cost.** macOS runners cost about ten times Linux minutes; iOS jobs run on pull requests that touch iOS or the bridge and on releases.
 - **Local network ranges.** The exact address ranges that trigger the Android local network rule for networks behind a router are not verified yet; to check on a real phone and router before relying on the address test in FR-5.8.
+- **Mockup row "Scan an invite code" (open, product manager).** The server list mockup `01-server-list` shows a second "Find more" row "Scan an invite code". No requirement in this specification matches it (FR-5.6 covers `mumble://` links only). Not built; the product manager decides whether it becomes a feature and what an invite code is.
+- **Banned at connect time (found in implementation).** A standard Mumble server tells a banned client nothing when it connects (FR-5.7). The app cannot tell a ban from other failures there; it reports that the server closed the connection and stops retrying after ten short-lived logins.
+- **Android call notification (found in implementation).** The hang-up button carries the system's label "Hang up", not "Leave"; the call's name in the phone system is fixed at session start while the notification follows the channel; the notification is shown even when notifications are refused (FR-5.32).
+- **Local network permission on iOS (found in implementation).** No API exists to ask for or read it; the explanation comes before the first connect to a server on the own network and the system prompt from the connect itself. After a failed connect the app says access "may be missing" unless the system reports a refusal (FR-5.8).
+- **Nothing tested on real phones yet (found in implementation).** Echo cancellation by the phone system, real sound, Bluetooth routing and the microphone indicator are unverified until tested on real devices (FR-5.25); they belong on the device checklist.
+- **Streams and camera flags of others.** The server only sends them for people in the own channel, so state icons for streams and cameras show only there (FR-5.10, FR-5.70).
+- **Android emulator.** The simulated modem occasionally loses an answered call; the end-to-end test repeats the call once.
 - **Two-step changes.** An engine change needed by mobile lands in the Mumcord repository first and reaches the apps with the next pin update.
 
 ## 14. Impact on the roadmap
