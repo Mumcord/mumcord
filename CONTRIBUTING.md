@@ -39,6 +39,23 @@ Bug fixes (and security, crash, CI and dependency fixes) target `main`. New feat
 
 Add entries to the `## [Unreleased]` or `## [X.Y.Z] - Unreleased` section of `CHANGELOG.md`. Sections of released versions (a heading with a date) must never change: CI fails a pull request that edits one, and a daily check compares them with the fingerprint in `releases/`. Correct an old entry with a note in the next version instead (see `RELEASING.md`, "Release integrity").
 
+## Build flags
+
+Cargo features of the app crate (`src-tauri/Cargo.toml`) switch parts of the app that release builds must not have. Release builds (`npm run tauri build`, the release workflow) use none of them.
+
+| Feature          | What it does                                                                                                                                     | Who turns it on                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| `test-backend`   | Null/WAV-file audio backend chosen by `MUMCORD_AUDIO_BACKEND`, and a throwaway updater key                                                       | The E2E build (`e2e/container-run.sh`) |
+| `phone-transfer` | "Send to your phone…" in Settings → Account & Identity: identities and the server list as QR codes for the coming Android and iOS apps (spec 05) | The E2E build; by hand for development |
+
+`phone-transfer` is off by default because the phone apps that read the codes are not released yet. The feature is the only switch: `commands::phone_transfer::ENABLED` in `src-tauri/src/commands/phone_transfer.rs` reads it, the app reports it to the UI in `app_info` (`phoneTransfer`), which shows the button only then, and without it the app refuses the commands `phone_transfer_start` and `phone_transfer_cancel`. The transfer format in the engine and store is always built and tested. To turn it on:
+
+- development: `npm run tauri dev -- --features phone-transfer`
+- a build: `npm run tauri build -- --features phone-transfer`
+- E2E: on already; `MUMCORD_E2E_APP_FEATURES=test-backend npm run e2e -- --spec <spec>` builds without it
+
+Remove the feature, the check in the invoke handler (`src-tauri/src/lib.rs`), the `phoneTransfer` field and this section when the phone apps ship, and move the changelog entry from "Internal" to "Added" of that release.
+
 ## Linting workflows and scripts
 
 The CI job "Lint workflows and scripts" runs [actionlint](https://github.com/rhysd/actionlint) over `.github/workflows` and `.github/actions` (it also runs shellcheck on inline `run:` steps) and [shellcheck](https://www.shellcheck.net/) over every `*.sh` file. Run the same checks locally with `scripts/ci/lint-ci.sh`; it needs both tools on your `PATH`, and the CI job pins their versions. If it fails, fix the finding. Where a warning is a false positive, add a `# shellcheck disable=SCxxxx # reason` comment directly above that one command; blanket disables are not accepted.
