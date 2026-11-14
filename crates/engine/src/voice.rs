@@ -499,6 +499,9 @@ impl VoicePipeline {
                 while let Ok(e) = talk_events.pop() {
                     batch.set(e.session, e.talking, now);
                 }
+                // The audio host narrows the process-wide real-time budget whenever it starts a
+                // device stream; widened again here because this task is not a real-time thread.
+                mumcord_audio::rt::keep_overrun_headroom();
                 let demoted = mumcord_audio::rt::take_demotions();
                 if demoted > 0 {
                     // Logged here, not in the voice threads: they must not block on logging.

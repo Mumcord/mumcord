@@ -15,6 +15,13 @@
 //! one, so only a real overrun triggers that, never an ordinary burst of work. Windows (MMCSS)
 //! and macOS (time-constraint policy) have no such kill: MMCSS keeps a share of the CPU for
 //! normal threads, and macOS demotes a thread that exceeds its computation time by itself.
+//!
+//! The limit is process-wide and this module is not its only writer: the audio host (cpal on
+//! PipeWire) promotes its own device threads and sets the soft limit to one device buffer each
+//! time (about 21 ms for 1024 frames), on every stream start and whenever the buffer grows.
+//! Widening once after our own promotion therefore does not last, so the app calls
+//! [`keep_overrun_headroom`] regularly from a normal thread to put the soft limit back. Between
+//! the host's reset and the next call the limit is briefly the narrow one.
 
 use std::marker::PhantomData;
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -129,6 +136,20 @@ mod freebsd {
 /// frames again; callers log it from a normal thread (the signal handler cannot).
 pub fn take_demotions() -> u32 {
     DEMOTIONS.swap(0, Ordering::Relaxed)
+}
+
+/// Brings the soft `RLIMIT_RTTIME` back to half the hard one after another part of the process
+/// lowered it (see the module docs). Cheap and idempotent: one `getrlimit` when nothing changed.
+/// Call it regularly from a normal thread, never from a real-time one. Does nothing off Linux.
+pub fn keep_overrun_headroom() {
+    #[cfg(target_os = "linux")]
+    {
+        // The same lock as a promotion, so the widening never lands between its two steps.
+        let _limits = linux::LIMITS
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        linux::widen_soft_limit();
+    }
 }
 
 /// Makes an overrunning real-time thread drop to normal priority instead of ending the process;

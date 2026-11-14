@@ -22,6 +22,9 @@ const POLL_INTERVAL: Duration = Duration::from_secs(2);
 /// after this delay, doubling up to `RETRY_MAX`. A device that newly appears is tried at once.
 const RETRY_MIN: Duration = POLL_INTERVAL;
 const RETRY_MAX: Duration = Duration::from_secs(60);
+/// How long a caller waits for the control thread to answer or to stop. The thread can be
+/// held up by the sound server, and callers include the UI thread, which must never hang.
+const CONTROL_TIMEOUT: Duration = Duration::from_secs(2);
 
 /// Keeps a device stream alive; dropping it stops the stream.
 pub(crate) trait StreamGuard {
@@ -123,6 +126,14 @@ impl AudioIo {
         input: Option<String>,
         output: Option<String>,
     ) -> Result<AudioHandles, IoError> {
+        Self::start_backend(move || make_backend(kind), input, output)
+    }
+
+    fn start_backend(
+        make: impl FnOnce() -> Box<dyn Backend> + Send + 'static,
+        input: Option<String>,
+        output: Option<String>,
+    ) -> Result<AudioHandles, IoError> {
         let (commands, command_rx) = mpsc::channel();
         let (events_tx, events) = mpsc::channel();
         let (capture_tx, capture_rx) = mpsc::channel();
@@ -133,7 +144,7 @@ impl AudioIo {
             .name("audio-ctl".to_owned())
             .spawn(move || {
                 // Created on this thread: cpal hosts need not be `Send`.
-                let backend = make_backend(kind);
+                let backend = make();
                 let mut control = Control {
                     backend: backend.as_ref(),
                     counters: thread_counters,
@@ -143,6 +154,7 @@ impl AudioIo {
                     input: Slot::new(input),
                     output: Slot::new(output),
                     known_devices: None,
+                    listing_failed: false,
                     last_periods: DevicePeriods::default(),
                     low_latency: false,
                 };
@@ -165,7 +177,14 @@ impl AudioIo {
     pub fn devices(&self, direction: Direction) -> Result<Vec<DeviceInfo>, IoError> {
         let (reply, response) = mpsc::channel();
         self.send(Command::Devices(direction, reply))?;
-        response.recv().map_err(|_| IoError::ControlThreadGone)?
+        match response.recv_timeout(CONTROL_TIMEOUT) {
+            Ok(devices) => devices,
+            Err(RecvTimeoutError::Timeout) => {
+                tracing::warn!("audio control thread did not answer the device list request");
+                Err(IoError::ControlThreadStalled)
+            }
+            Err(RecvTimeoutError::Disconnected) => Err(IoError::ControlThreadGone),
+        }
     }
 
     /// Switches the input device (`None` = OS default) while streams keep running.
@@ -205,9 +224,21 @@ impl Drop for AudioIo {
     fn drop(&mut self) {
         // The thread may already be gone; joining below still cleans up.
         let _ = self.commands.send(Command::Shutdown);
-        if let Some(thread) = self.thread.take()
-            && thread.join().is_err()
-        {
+        let Some(thread) = self.thread.take() else {
+            return;
+        };
+        // The thread only sees the shutdown between two steps, and a step can hang in the
+        // sound server (a device query, or closing a stream). Hanging up runs on the UI
+        // thread, so a stuck control thread is left behind to finish on its own.
+        let deadline = Instant::now() + CONTROL_TIMEOUT;
+        while !thread.is_finished() {
+            if Instant::now() >= deadline {
+                tracing::warn!("audio control thread did not stop in time; leaving it behind");
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        if thread.join().is_err() {
             tracing::error!("audio control thread panicked");
         }
     }
@@ -302,6 +333,8 @@ struct Control<'a> {
     output: Slot,
     /// Last seen device list (ids and default flags), to detect hot-plug.
     known_devices: Option<Vec<(String, bool)>>,
+    /// Whether the last device listing failed, so a lasting failure is logged once.
+    listing_failed: bool,
     /// Last device period per direction, to notice the delivered buffer changing (see
     /// [`Control::notice_period`]).
     last_periods: DevicePeriods,
@@ -359,13 +392,16 @@ impl Control<'_> {
             ) {
                 (Ok(inputs), Ok(outputs)) => Some((inputs, outputs)),
                 (Err(e), _) | (_, Err(e)) => {
-                    tracing::warn!("listing audio devices failed: {e}");
+                    if !self.listing_failed {
+                        tracing::warn!("listing audio devices failed: {e}");
+                    }
                     None
                 }
             }
         } else {
             None
         };
+        self.listing_failed = self.backend.polls_devices() && lists.is_none();
         if let Some((inputs, outputs)) = &lists {
             let seen: Vec<(String, bool)> = inputs
                 .iter()
@@ -1070,6 +1106,77 @@ mod tests {
         println!("stats: {:?}", handles.io.stats());
     }
 
+    /// A backend whose device list never answers until the test lets go of `release`, like a
+    /// sound server that stopped responding.
+    struct Stalled {
+        release: Receiver<()>,
+    }
+
+    impl Backend for Stalled {
+        fn devices(&self, _direction: Direction) -> Result<Vec<DeviceInfo>, IoError> {
+            // Returns once the test drops its sender.
+            let _ = self.release.recv();
+            Ok(Vec::new())
+        }
+
+        fn polls_devices(&self) -> bool {
+            false
+        }
+
+        fn open_input(
+            &self,
+            _id: Option<&str>,
+            _counters: &Arc<Counters>,
+            _low_latency: bool,
+        ) -> Result<Opened<Consumer<f32>>, IoError> {
+            Err(IoError::DeviceNotFound)
+        }
+
+        fn open_output(
+            &self,
+            _id: Option<&str>,
+            _counters: &Arc<Counters>,
+            _low_latency: bool,
+        ) -> Result<Opened<Producer<f32>>, IoError> {
+            Err(IoError::DeviceNotFound)
+        }
+    }
+
+    /// Runs `f` on its own thread and fails if it is still running after `bound`, so a hang
+    /// fails the test instead of blocking the test run.
+    fn within<T: Send + 'static>(bound: Duration, f: impl FnOnce() -> T + Send + 'static) -> T {
+        let (done, result) = mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = done.send(f());
+        });
+        result
+            .recv_timeout(bound)
+            .unwrap_or_else(|_| panic!("still blocked after {bound:?}"))
+    }
+
+    /// Hanging up used to freeze the window for good: closing audio waited without limit for
+    /// a control thread that was stuck in the sound server, and so did asking for devices.
+    #[test]
+    fn stalled_control_thread_blocks_neither_device_listing_nor_teardown() {
+        let (release, stalled) = mpsc::channel();
+        let handles = AudioIo::start_backend(
+            move || Box::new(Stalled { release: stalled }) as Box<dyn Backend>,
+            None,
+            None,
+        )
+        .expect("start");
+        let bound = CONTROL_TIMEOUT + Duration::from_secs(5);
+        let io = handles.io;
+        let (io, listed) = within(bound, move || {
+            let listed = io.devices(Direction::Input);
+            (io, listed)
+        });
+        assert!(matches!(listed, Err(IoError::ControlThreadStalled)));
+        // The control thread is still stuck in that device query.
+        within(bound, move || drop(io));
+        drop(release);
+    }
+
     mod fallback {
         use std::cell::{Cell, RefCell};
         use std::rc::Rc;
@@ -1202,6 +1309,7 @@ mod tests {
                 input: Slot::new(Some(CHOSEN.to_owned())),
                 output: Slot::new(None),
                 known_devices: None,
+                listing_failed: false,
                 last_periods: DevicePeriods::default(),
                 low_latency: false,
             };
