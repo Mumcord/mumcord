@@ -374,6 +374,16 @@ jobs:
         if: matrix.task == 'test' || runner.os == 'macOS'
         run: cargo test --workspace --locked
 
+      # "Send to your phone" is off in release builds (Cargo feature `phone-transfer`,
+      # CONTRIBUTING.md "Build flags"). The steps above lint and test the build without it,
+      # which includes the test that such a build refuses its commands; this one covers the
+      # build with it, which only the E2E build makes otherwise.
+      - name: Send to your phone with the feature on
+        if: matrix.task == 'test' && runner.os == 'Linux'
+        run: |
+          cargo clippy -p mumcord --features phone-transfer --all-targets --locked -- -D warnings
+          cargo test -p mumcord --features phone-transfer --locked phone_transfer
+
       # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,
       # tested and free of the device crates (cpal/ALSA) and the resampler.
       - name: Codec crate lint
