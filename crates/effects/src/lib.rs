@@ -9,6 +9,8 @@
 //! quality levels Auto / Best / Light and the load monitor of FR-8.35. When ONNX Runtime can't
 //! be loaded, effects are off with a reason ([`availability`]) and frames pass unchanged.
 
+#[cfg(test)]
+mod artifact_dir;
 mod background;
 mod guided;
 pub mod hooks;
