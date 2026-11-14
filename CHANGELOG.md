@@ -13,6 +13,7 @@
 
 - Update bindgen to 0.73 and require prost-build 0.14.5 with prettyplease 0.3 support; remove the temporary Dependabot hold on bindgen minor updates (issue #79)
 - The Mumble protocol library moved out of this repository: Mumcord now uses [`mumble-client-protocol`](https://crates.io/crates/mumble-client-protocol) from crates.io (MIT OR Apache-2.0, developed at [Mumcord/mumble-client-protocol](https://github.com/Mumcord/mumble-client-protocol)) instead of its own `mumcord-protocol` crate, which is no longer published with Mumcord releases; projects that depend on `mumcord-protocol` should switch to the new crate. Nothing changes for users: servers still see the client as "Mumcord" with its version (issue #455)
+- Minimum supported Rust version is now 1.97 (was 1.90): the audio dependency `sonora` needs 1.91 and the plugin runtime `wasmtime` needs 1.97
 
 ### Fixed
 
