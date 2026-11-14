@@ -57,6 +57,7 @@
     "pause": "Pozastavit"
   },
   "codecHint": {
+    "appimage": "Tento AppImage nemůže přehrávat video H.264. Aktualizuj Mumcord nebo použij balíček své distribuce (AUR na Archu). Instalace gst-libav do systému problém tohoto AppImage nevyřeší.",
     "install": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav:",
     "generic": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav (plugin libav pro GStreamer) správcem balíčků svého systému.",
     "rpmFusion": "Na Fedoře pochází gst-libav z repozitáře RPM Fusion; nejdřív povol RPM Fusion.",

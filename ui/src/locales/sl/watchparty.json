@@ -57,6 +57,7 @@
     "pause": "Začasno ustavi"
   },
   "codecHint": {
+    "appimage": "Ta AppImage ne more predvajati videa H.264. Posodobi Mumcord ali uporabi paket svoje distribucije (AUR v Archu). Namestitev gst-libav v sistem ne bo odpravila težave tega AppImage.",
     "install": "Ta video potrebuje podporo za H.264. Namesti gst-libav:",
     "generic": "Ta video potrebuje podporo za H.264. Namesti gst-libav (vtičnik libav za GStreamer) z upraviteljem paketov svojega sistema.",
     "rpmFusion": "V Fedori gst-libav prihaja iz skladišča RPM Fusion; najprej omogoči RPM Fusion.",

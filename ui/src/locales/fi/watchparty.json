@@ -57,6 +57,7 @@
     "pause": "Tauko"
   },
   "codecHint": {
+    "appimage": "Tämä AppImage ei voi toistaa H.264-videota. Päivitä Mumcord tai käytä jakelusi pakettia (Archissa AUR). Järjestelmän gst-libav-paketin asentaminen ei korjaa tämän AppImagen ongelmaa.",
     "install": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav:",
     "generic": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav (GStreamerin libav-lisäosa) järjestelmäsi paketinhallinnalla.",
     "rpmFusion": "Fedorassa gst-libav tulee RPM Fusion -ohjelmistolähteestä; ota RPM Fusion ensin käyttöön.",

@@ -57,6 +57,7 @@
     "pause": "Sos"
   },
   "codecHint": {
+    "appimage": "Ní féidir leis an AppImage seo físeán H.264 a sheinm. Nuashonraigh Mumcord nó úsáid pacáiste do dháileacháin (AUR ar Arch). Ní réiteofar fadhb an AppImage seo trí gst-libav a shuiteáil ar an gcóras.",
     "install": "Teastaíonn tacaíocht H.264 ón bhfíseán seo. Suiteáil gst-libav:",
     "generic": "Teastaíonn tacaíocht H.264 ón bhfíseán seo. Suiteáil gst-libav (breiseán libav GStreamer) le bainisteoir pacáistí do chórais.",
     "rpmFusion": "Ar Fedora, tagann gst-libav ó stór RPM Fusion; cumasaigh RPM Fusion ar dtús.",

@@ -57,6 +57,7 @@
     "pause": "Pristabdyti"
   },
   "codecHint": {
+    "appimage": "Šis AppImage negali atkurti H.264 vaizdo. Atnaujink Mumcord arba naudok savo distribucijos paketą (AUR sistemoje Arch). Sistemos gst-libav įdiegimas neišspręs šio AppImage problemos.",
     "install": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav:",
     "generic": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav (GStreamer libav papildinį) savo sistemos paketų tvarkykle.",
     "rpmFusion": "Fedora sistemoje gst-libav gaunamas iš RPM Fusion saugyklos; pirmiausia įjunk RPM Fusion.",

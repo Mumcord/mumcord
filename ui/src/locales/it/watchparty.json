@@ -57,6 +57,7 @@
     "pause": "Pausa"
   },
   "codecHint": {
+    "appimage": "Questa AppImage non può riprodurre video H.264. Aggiorna Mumcord o usa il pacchetto della tua distribuzione (AUR su Arch). Installare gst-libav nel sistema non risolverà il problema di questa AppImage.",
     "install": "Questo video richiede il supporto H.264. Installa gst-libav:",
     "generic": "Questo video richiede il supporto H.264. Installa gst-libav (il plugin libav di GStreamer) con il gestore pacchetti del tuo sistema.",
     "rpmFusion": "Su Fedora gst-libav arriva dal repository RPM Fusion; abilita prima RPM Fusion.",

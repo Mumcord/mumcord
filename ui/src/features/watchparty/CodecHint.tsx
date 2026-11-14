@@ -2,8 +2,9 @@
  * "This video needs H.264 support. Install gst-libav: ‹command›" (FR-2.41a), shown under a player
  * that failed because the webview lacks a decoder.
  *
- * Linux: only shown when the distribution can install gst-libav and the webview really lacks
- * H.264. FreeBSD (FR-13.34 – FR-13.36): the decoder packages WebKitGTK loads at runtime are named
+ * Linux: only shown when the webview really lacks H.264. AppImages cannot load the system's
+ * gst-libav, so they offer an update or a native package instead of an install command.
+ * FreeBSD (FR-13.34 – FR-13.36): the decoder packages WebKitGTK loads at runtime are named
  * with their `pkg install` line; when every installable decoder is present and the player still
  * fails (AV1-only stream, DRM-protected video), the hint offers the browser instead of a command.
  */
@@ -53,6 +54,13 @@ export function CodecHint({ failure, className }: CodecHintProps) {
   }
 
   if (h264) return null;
+  if (platform.appimage) {
+    return (
+      <div className={className} role="status">
+        <p>{t("codecHint.appimage")}</p>
+      </div>
+    );
+  }
   const hint = installHint(platform.distro);
   return (
     <div className={className} role="status">
