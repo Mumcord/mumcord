@@ -551,7 +551,7 @@ impl DecodeThread {
 #[cfg(test)]
 mod tests {
     #[cfg(all(feature = "desktop-codecs", feature = "av1-decode"))]
-    use hwcodec::{Av1Encoder, Av1Options, EncoderConfig};
+    use hwcodec::{Av1Options, EncoderConfig};
 
     use super::*;
 
@@ -689,7 +689,7 @@ mod tests {
     #[test]
     fn av1_frames_round_trip_through_the_engine_decoder() {
         let (width, height, fps) = (320, 192, 30);
-        let mut encoder = Av1Encoder::new(
+        let mut encoder = super::super::codecs::open_av1(
             EncoderConfig::new(width, height, fps, 800),
             Av1Options::default(),
         )

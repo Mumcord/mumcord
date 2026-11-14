@@ -25,6 +25,7 @@ pub mod capture_windows;
     any(target_os = "linux", target_os = "freebsd")
 ))]
 pub mod capture_x11;
+pub(crate) mod codecs;
 pub(crate) mod encoder;
 mod fanout;
 mod media;

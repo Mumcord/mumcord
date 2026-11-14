@@ -18,8 +18,7 @@ use std::sync::{Arc, Mutex, Once};
 use std::thread;
 
 use hwcodec::{
-    Av1Encoder, Av1Options, Codec, EncoderConfig, VideoEncoder, Vp9Encoder, av1_cpu_supported,
-    open_hardware_encoder,
+    Av1Options, Codec, EncoderConfig, VideoEncoder, av1_cpu_supported, open_hardware_encoder,
 };
 use mumcord_store::{
     EncoderCache, EncoderEntry, ScreenCodec, ScreenOptimize, Settings, Store,
@@ -28,6 +27,7 @@ use mumcord_store::{
 
 use self::probe::Hardware;
 use self::select::{Candidate, Inputs, Kind, Selection};
+use super::codecs;
 use super::media::EncoderFactory;
 use super::quality::QualityPrefs;
 use crate::session::{Engine, EngineEvent, Events, lock};
@@ -500,14 +500,14 @@ fn open(
 ) -> hwcodec::Result<Box<dyn VideoEncoder>> {
     match (candidate.kind, candidate.codec) {
         (Kind::Hardware(encoder, _), codec) => open_hardware_encoder(encoder, codec, config),
-        (Kind::FakeHardware | Kind::Software, Codec::Av1) => Ok(Box::new(Av1Encoder::new(
+        (Kind::FakeHardware | Kind::Software, Codec::Av1) => codecs::open_av1(
             config,
             Av1Options::new(!natural && optimize == ScreenOptimize::Text),
-        )?)),
+        ),
         (Kind::FakeHardware | Kind::Software, Codec::Vp9) if natural => {
-            Ok(Box::new(Vp9Encoder::natural(config)?))
+            codecs::open_vp9_natural(config)
         }
-        (Kind::FakeHardware | Kind::Software, Codec::Vp9) => Ok(Box::new(Vp9Encoder::new(config)?)),
+        (Kind::FakeHardware | Kind::Software, Codec::Vp9) => codecs::open_vp9(config),
         // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
         (Kind::FakeHardware | Kind::Software, _) => Err(hwcodec::Error::InvalidConfig(
             "Mumcord has no software encoder for this codec".into(),

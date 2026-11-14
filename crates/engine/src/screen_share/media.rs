@@ -264,7 +264,7 @@ pub(crate) fn vp9_encoder() -> EncoderFactory {
                 codec: Codec::Vp9,
                 gpu: None,
             };
-            Ok((Box::new(hwcodec::Vp9Encoder::new(config)?), opened))
+            Ok((super::codecs::open_vp9(config)?, opened))
         }),
     }
 }
@@ -1143,9 +1143,6 @@ fn to_frame(out: EncodedFrame, (width, height): (u32, u32), codec: Codec) -> Fra
 
 #[cfg(test)]
 mod tests {
-    #[cfg(feature = "vp9")]
-    use hwcodec::Vp9Encoder;
-
     use super::*;
 
     /// The default share's steps (1080p30 → 720p30 → 720p15 → 480p15).
@@ -1336,8 +1333,10 @@ mod tests {
             open: Box::new(move |config, optimize, _| {
                 let options = hwcodec::Av1Options::new(optimize == ScreenOptimize::Text);
                 lock(&screen_content).push(options.screen_content);
-                let encoder = hwcodec::Av1Encoder::new(config, options)?;
-                Ok((Box::new(encoder), SOFTWARE_AV1))
+                Ok((
+                    super::super::codecs::open_av1(config, options)?,
+                    SOFTWARE_AV1,
+                ))
             }),
         }
     }
@@ -1664,7 +1663,7 @@ mod tests {
     #[cfg(feature = "vp9")]
     fn floor_kbps(seconds: u32) -> Vec<usize> {
         let mut capture = super::super::capture::TestPattern::default();
-        let mut encoder: Option<Vp9Encoder> = None;
+        let mut encoder: Option<Box<dyn VideoEncoder>> = None;
         let mut pts = 0_i64;
         let mut per_second = Vec::new();
         for (step, seconds) in [(FLOOR - 2, 10), (FLOOR - 1, 2), (FLOOR, seconds)] {
@@ -1677,10 +1676,10 @@ mod tests {
                         .expect("pattern");
                     let size = (picture.width(), picture.height());
                     let keyframe = match encoder.as_mut() {
-                        Some(enc) => reconfigure(enc, size, quality).expect("reconfigure"),
+                        Some(enc) => reconfigure(enc.as_mut(), size, quality).expect("reconfigure"),
                         None => {
                             encoder = Some(
-                                Vp9Encoder::new(EncoderConfig::new(
+                                super::super::codecs::open_vp9(EncoderConfig::new(
                                     size.0,
                                     size.1,
                                     quality.fps,

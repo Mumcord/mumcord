@@ -2,15 +2,17 @@
 //! frames at the share's size, rate and Optimize for; it passes when an average frame takes
 //! clearly less than half its time budget.
 
-use hwcodec::{Av1Options, measure_av1};
+use hwcodec::Av1Options;
 use mumcord_store::ScreenOptimize;
+
+use crate::screen_share::codecs;
 
 /// Average milliseconds per frame (rounded up); `None` when SVT-AV1 did not start or failed.
 pub fn measure(height: u32, fps: u32, optimize: ScreenOptimize) -> Option<u32> {
     let options = Av1Options::new(optimize == ScreenOptimize::Text);
-    match measure_av1(width_for(height), height, fps, options) {
-        Ok(result) => {
-            let average = result.average_frame_time.as_secs_f64() * 1000.0;
+    match codecs::measure_av1(width_for(height), height, fps, options) {
+        Ok(frame_time) => {
+            let average = frame_time.as_secs_f64() * 1000.0;
             let frame_ms = average.ceil() as u32;
             tracing::info!(
                 height,
@@ -45,6 +47,7 @@ fn width_for(height: u32) -> u32 {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "desktop-codecs")]
     use std::time::{Duration, Instant};
 
     use super::*;
