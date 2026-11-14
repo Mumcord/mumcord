@@ -12,9 +12,10 @@
     "noRelay": "Servern har inget relä, så kameradelning är inte tillgänglig.",
     "relayTooOld": "Serverns relä är för gammalt för kameradelning.",
     "relayDisallows": "Serverns relä tillåter inte kameradelning.",
-    "needsRelayMode": "Kameradelning kräver reläet. Ändra det under Integritet och anslutningar.",
+    "needsRelayMode": "Kameradelning är avstängd. Ändra det under Integritet och anslutningar.",
     "noCertificate": "Kameradelning kräver ett klientcertifikat.",
     "registeredOnly": "Bara registrerade användare får använda kameran på den här servern.",
+    "needsDirect": "Kameradelning kräver direkta anslutningar. Ändra det under Integritet och anslutningar.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kameran på",
@@ -96,7 +97,7 @@
     "denied": "Kameran kunde inte startas: serverns relä avvisade den.",
     "relayDown": "Kameran stoppades: reläet kan inte nås",
     "rateLimited": "Kameran kunde inte startas: för många försök. Försök igen om en minut.",
-    "mode": "Kameradelning kräver reläet. Ändra det under Integritet och anslutningar.",
+    "mode": "Kameradelning är avstängd. Ändra det under Integritet och anslutningar.",
     "noCertificate": "Kameradelning kräver ett klientcertifikat.",
     "endedByRelay": "Kameran stoppades av serverns relä",
     "dismissStopped": "Avfärda",
@@ -136,7 +137,11 @@
     "people_other": "{{count}} personer",
     "limit": "{{count}} av {{max}} kameror",
     "relay": "Relä · end-to-end-krypterat",
+    "direct": "Direkt · end-to-end-krypterat",
+    "both": "Relä och direkt · end-to-end-krypterat",
     "relayTitle": "Varje kamera skickas en gång till reläet och kopieras till tittarna",
+    "directTitle": "Varje tittare får en egen kopia direkt från dig, utan relä",
+    "bothTitle": "Tittare med äldre Mumcord får en kopia från reläet, nyare sin egen ström från dig",
     "layout": "Layout",
     "grid": "Rutnät",
     "speaker": "Talare",
@@ -179,13 +184,13 @@
     "joining": "Ansluter till {{name}}s kamera …",
     "full": "För många tittar på {{name}}",
     "failed": "Kunde inte ansluta till {{name}}s kamera",
-    "needsUpdate": "Den här kameran kräver Mumcord 0.9.0",
     "retry": "Försök igen",
     "hidden": "Video dold",
     "showVideo": "Visa video",
     "viewing": "Tittar",
     "weak": "Svag anslutning",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Den här kameran kräver Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Alternativ för {{name}}",
@@ -223,7 +228,7 @@
     "sendQualityAuto": "Automatisk",
     "sendQuality720": "720p · 15 fps",
     "sendQuality360": "360p · 30 fps",
-    "sendQualityHint": "Automatisk (upp till 720p · 30 fps) skickar bara så mycket som tittarna behöver: mindre i ett stort rutnät, skarpare när någon fäster dig.",
+    "sendQualityHint": "Auto (upp till 720p · 30 fps) skickar bara så mycket som tittarna behöver: mindre i ett stort rutnät, skarpare när någon fäster dig.",
     "mirror": "Spegelvänd min egen bild",
     "mirrorHint": "Bara din egen vy speglas. Andra ser dig rättvänd.",
     "backgroundSection": "Bakgrund",
@@ -235,7 +240,7 @@
     "effectAuto": "Automatisk",
     "effectBest": "Bäst (grafikkort)",
     "effectLight": "Lätt (sparar batteri)",
-    "effectHint": "Automatisk använder grafikkortet när det går och växlar till Lätt på batteri eller när datorn är upptagen.",
+    "effectHint": "Auto använder grafikkortet när det går och växlar till Lätt på batteri eller när datorn är upptagen.",
     "ownImages_one": "Dina egna bakgrundsbilder stannar på den här enheten ({{count}} sparad). Bara den färdiga bilden skickas.",
     "ownImages_other": "Dina egna bakgrundsbilder stannar på den här enheten ({{count}} sparade). Bara den färdiga bilden skickas.",
     "manageImages": "Hantera bilder",
@@ -247,9 +252,14 @@
     "showAlways": "Alltid",
     "showOnOpen": "När jag öppnar rummet",
     "showNever": "Aldrig",
-    "showHint": "Alltid: kamerarummet öppnas när någon i din kanal slår på en kamera. Aldrig: du får bara röst och ingen video laddas ned.",
+    "showHint": "Alltid öppnar kamerarummet när någon i din kanal slår på en kamera. Aldrig håller dig enbart på röst och laddar inte ned någon video.",
     "dataSaver": "Datasparläge: upp till 15 fps för alla",
     "reduceMotion": "Minska rörelse: ingen glöd eller animation på talarramen",
     "reduceMotionHint": "Följer som standard systemets inställning för minskad rörelse."
+  },
+  "viewers": {
+    "title": "Tittare",
+    "relay": "Relä",
+    "direct": "Direkt"
   }
 }

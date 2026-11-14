@@ -24,6 +24,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
 use mumcord_p2p::broadcast::{BindRole, ControlKind};
+use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_p2p::{BroadcastEnd, BroadcastId, RelayToken, Unit};
 use mumcord_screenshare::I420Frame;
 use mumcord_store::CameraShow;
@@ -38,8 +39,8 @@ use crate::screen_share::ScreenFrameSink;
 use crate::screen_share::broadcast::cert_key;
 use crate::screen_share::broadcast::link::{OnEnd, Subscriber};
 use crate::screen_share::sound::ShareSound;
-use crate::screen_share::watch::WatchLink;
-use crate::screen_share::wire::{self, Frame};
+use crate::screen_share::watch::{FrameSource, RequestSink, WatchLink};
+use crate::screen_share::wire::{self, DescriptionCheck, Frame};
 use crate::session::{Engine, EngineEvent, SessionCtx, lock};
 
 /// The sender takes at most one `cam-join` per viewer in this time (section 6.5).
@@ -181,11 +182,23 @@ impl ScreenFrameSink for CountingSink {
 /// A bound camera.
 struct TileWatch {
     link: WatchLink,
-    /// The subscriber link's unit sender, for `want`.
-    units: mpsc::Sender<Vec<u8>>,
+    /// Where the tile's `want` report goes: the relay broadcast's control units or the direct
+    /// stream's reverse messages (FR-8.55, FR-8.93).
+    want: WantPath,
+    /// The frames came in over the sender's own `STREAM_CAMERA`, not the relay.
+    #[cfg_attr(not(feature = "test-backend"), allow(dead_code))]
+    direct: bool,
     frames: Arc<AtomicU32>,
     sent_want: Option<u16>,
     data_saver: bool,
+}
+
+/// Where a tile's `want` report goes.
+enum WantPath {
+    /// Control units of the relay broadcast.
+    Relay(mpsc::Sender<Vec<u8>>),
+    /// Reverse-stream messages of the direct camera stream.
+    Direct(mpsc::Sender<Vec<u8>>),
 }
 
 struct Tile {
@@ -432,15 +445,28 @@ fn send_want(watch: &mut TileWatch, want: u16) {
     if watch.sent_want == Some(want) {
         return;
     }
-    match Unit::control(ControlKind::Want, &want.to_be_bytes()) {
-        // A full queue just means the report waits for the next second.
-        Ok(unit) => {
-            if watch.units.try_send(unit).is_ok() {
-                watch.sent_want = Some(want);
+    let queued = match &watch.want {
+        WantPath::Relay(units) => match Unit::control(ControlKind::Want, &want.to_be_bytes()) {
+            // A full queue just means the report waits for the next second.
+            Ok(unit) => units.try_send(unit).is_ok(),
+            Err(e) => {
+                tracing::warn!(error = %e, "camera want not sent");
+                false
             }
-        }
-        Err(e) => tracing::warn!(error = %e, "camera want not sent"),
+        },
+        WantPath::Direct(messages) => messages.try_send(direct_want(want)).is_ok(),
+    };
+    if queued {
+        watch.sent_want = Some(want);
     }
+}
+
+/// `WANT = 2` followed by one big-endian u16 tile height (FR-8.93).
+fn direct_want(height: u16) -> Vec<u8> {
+    let mut message = Vec::with_capacity(3);
+    message.push(super::direct::WANT);
+    message.extend_from_slice(&height.to_be_bytes());
+    message
 }
 
 fn apply_data_saver(watch: &mut TileWatch, on: bool) {
@@ -548,6 +574,35 @@ impl Engine {
         }
     }
 
+    /// Whether this client wants `sharer`'s camera right now, so it welcomes a direct answer to
+    /// that sender's offer (spec 08, FR-8.94): a tile that is announced, joining or playing.
+    pub(crate) fn camera_wants_direct(&self, server_id: ServerId, sharer: u32) -> bool {
+        lock(self.camera_state())
+            .recv
+            .rooms
+            .get(&server_id)
+            .and_then(|room| room.tiles.get(&sharer))
+            .is_some_and(|tile| {
+                matches!(
+                    tile.state,
+                    TileState::Announced | TileState::Joining | TileState::Playing
+                )
+            })
+    }
+
+    /// Test access: whether `sharer`'s tile plays the sender's own `STREAM_CAMERA` instead of a
+    /// relay broadcast (FR-8.92).
+    #[cfg(feature = "test-backend")]
+    pub fn camera_test_direct(&self, server_id: ServerId, sharer: u32) -> bool {
+        lock(self.camera_state())
+            .recv
+            .rooms
+            .get(&server_id)
+            .and_then(|room| room.tiles.get(&sharer))
+            .and_then(|tile| tile.watch.as_ref())
+            .is_some_and(|watch| watch.direct)
+    }
+
     /// Show cameras or Data saver changed in Settings (FR-8.53, FR-8.56).
     pub(crate) fn camera_settings_changed(&self, settings: &mumcord_store::Settings) {
         lock(self.camera_state()).recv.prefs = Some(Prefs {
@@ -564,6 +619,8 @@ impl Engine {
     pub(crate) fn camera_blocks_changed(&self) {
         for ctx in self.session_ctxs() {
             self.camera_sync(&ctx, false);
+            // Nobody this client blocks keeps a direct camera stream (FR-8.92).
+            self.camera_close_blocked_direct(&ctx);
         }
     }
 
@@ -675,7 +732,7 @@ impl Engine {
     }
 
     /// The people in the own channel `ctx` blocks.
-    fn camera_blocked(&self, ctx: &SessionCtx) -> HashSet<u32> {
+    pub(super) fn camera_blocked(&self, ctx: &SessionCtx) -> HashSet<u32> {
         let sessions: Vec<u32> = ctx.handle.with_state(|s| s.users.keys().copied().collect());
         sessions
             .into_iter()
@@ -690,6 +747,7 @@ impl Engine {
             id: id.clone(),
             // Both play: whatever the webview cannot decode is decoded here.
             codecs: vec![Codec::Av1, Codec::Vp9],
+            media: true,
         };
         if !super::signal::send(ctx, &[sharer], &join) {
             // The tile stays Joining; the tick retries within the join limit.
@@ -699,14 +757,16 @@ impl Engine {
         let ctx = ctx.clone();
         self.runtime().spawn(async move {
             // A later join or a reset drops the waiting sender.
-            let Ok((bid, token)) = token.await else {
+            let Ok((bid, token, media)) = token.await else {
                 return;
             };
             if broadcast_hex(bid) != id {
                 tracing::debug!("camera token for another broadcast ignored");
                 return;
             }
-            engine.camera_bind(&ctx, sharer, attempt, bid, token).await;
+            engine
+                .camera_bind(&ctx, sharer, attempt, bid, token, media)
+                .await;
         });
     }
 
@@ -718,6 +778,8 @@ impl Engine {
         attempt: u64,
         id: BroadcastId,
         token: RelayToken,
+        // The broadcast's format, as the bot answered it: a subscriber must speak it (FR-7.97).
+        media: bool,
     ) {
         let server_id = ctx.server_id;
         let opened = async {
@@ -732,7 +794,7 @@ impl Engine {
                 .ok_or("no identity for the key exchange")?;
             let me = cert_key(&identity).ok_or("no key for the key exchange")?;
             let link = p2p
-                .broadcast(&ann, &token, BindRole::Subscriber)
+                .broadcast(&ann, &token, BindRole::Subscriber, media)
                 .await
                 .map_err(|e| {
                     tracing::info!(error = %e, "camera bind refused");
@@ -788,7 +850,8 @@ impl Engine {
         link.set_decode_codecs(&decode_here);
         let watch = TileWatch {
             link,
-            units,
+            want: WantPath::Relay(units),
+            direct: false,
             frames: counter,
             sent_want: None,
             data_saver: false,
@@ -833,6 +896,10 @@ impl Engine {
         end: BroadcastEnd,
     ) {
         tracing::info!(?end, "camera link ended");
+        self.camera_link_ended(server_id, sharer, attempt);
+    }
+
+    fn camera_link_ended(&self, server_id: ServerId, sharer: u32, attempt: u64) {
         let watch = {
             let mut cameras = lock(self.camera_state());
             let Some(tile) = cameras
@@ -852,6 +919,119 @@ impl Engine {
         drop(watch);
         if let Ok(ctx) = self.session_ctx_for(server_id) {
             self.camera_sync(&ctx, false);
+        }
+    }
+}
+
+/// Whether a direct stream may bind to `tile` (FR-8.92): the own channel shows that camera (a
+/// tile exists) and the user has not blocked its sender.
+fn may_bind(tile: Option<&Tile>, blocked: bool) -> bool {
+    tile.is_some_and(|tile| !blocked && tile.state != TileState::Hidden)
+}
+
+/// A sender opened a `STREAM_CAMERA` to this client (FR-8.92). It plays on that sender's tile
+/// only if the description names the camera session the tile waits for (a stale session is
+/// refused, FR-8.92) and the tile shows video; anything else closes the stream unread.
+pub(crate) async fn serve_direct(
+    engine: &Engine,
+    server_id: ServerId,
+    sharer: u32,
+    send: SendStream,
+    recv: RecvStream,
+) {
+    let Ok(ctx) = engine.session_ctx_for(server_id) else {
+        return;
+    };
+    let blocked = engine.camera_blocked(&ctx);
+    let target = {
+        let cameras = lock(engine.camera_state());
+        let tile = cameras
+            .recv
+            .rooms
+            .get(&server_id)
+            .and_then(|room| room.tiles.get(&sharer));
+        match (may_bind(tile, blocked.contains(&sharer)), tile) {
+            (true, Some(tile)) => Some((tile.id.clone(), tile.attempt)),
+            _ => None,
+        }
+    };
+    let Some((expected, attempt)) = target else {
+        tracing::debug!(
+            sharer,
+            "camera stream for a tile that shows no video; closing it"
+        );
+        return;
+    };
+    let reader =
+        wire::FrameReader::auto(recv).with_check(DescriptionCheck::Camera(expected.clone()));
+    let (messages, queued) = mpsc::channel(8);
+    engine.runtime().spawn(write_requests(send, queued));
+    let counter = Arc::new(AtomicU32::new(0));
+    let (sink, decode_here) = {
+        let cameras = lock(engine.camera_state());
+        (cameras.recv.sink.clone(), cameras.recv.decode_here.clone())
+    };
+    let weak = engine.downgrade();
+    let link = WatchLink::start_prepared(
+        engine.runtime(),
+        server_id,
+        sharer,
+        Some(Arc::new(CountingSink {
+            inner: sink,
+            frames: counter.clone(),
+        })),
+        // A camera has no sound; the share's sound source stays empty.
+        ShareSound::new(engine.voice_shared().clone(), 0),
+        FrameSource::Stream(Box::new(reader)),
+        RequestSink::Shared(messages.clone()),
+        Some(Box::new(move || {
+            if let Some(engine) = weak.upgrade() {
+                tracing::info!("camera direct stream ended");
+                engine.camera_link_ended(server_id, sharer, attempt);
+            }
+        })),
+    );
+    link.set_decode_codecs(&decode_here);
+    let watch = TileWatch {
+        link,
+        want: WantPath::Direct(messages),
+        direct: true,
+        frames: counter,
+        sent_want: None,
+        data_saver: false,
+    };
+    let stale = {
+        let mut cameras = lock(engine.camera_state());
+        match cameras
+            .recv
+            .rooms
+            .get_mut(&server_id)
+            .and_then(|r| r.tiles.get_mut(&sharer))
+            .filter(|t| t.id == expected && t.attempt == attempt)
+        {
+            Some(tile) => {
+                tile.state = TileState::Playing;
+                tile.joining_since = None;
+                tile.fps = FpsMeter::default();
+                tile.badge = None;
+                // Replaces a relay watch: the sender serves this viewer directly (FR-8.92).
+                tile.watch.replace(watch)
+            }
+            None => Some(watch),
+        }
+    };
+    // Hidden, gone or another camera meanwhile: the stream closes.
+    drop(stale);
+    engine.camera_sync(&ctx, false);
+}
+
+/// Writes what the viewer sends back on a direct camera stream: keyframe requests and the tile
+/// height (FR-8.93). One task keeps them in order; it ends when the tile lets go of it.
+async fn write_requests(mut send: SendStream, mut messages: mpsc::Receiver<Vec<u8>>) {
+    while let Some(message) = messages.recv().await {
+        if let Err(e) = send.write_all(&message).await {
+            tracing::debug!(error = %e, "camera stream requests not sent");
+            return;
         }
     }
 }
@@ -1221,5 +1401,27 @@ mod tests {
     #[test]
     fn a_stalled_camera_shows_zero_fps() {
         assert_eq!(meter(&[0, 0, 0]).badge(None), Some(0));
+    }
+
+    #[test]
+    fn only_a_shown_unblocked_tile_takes_a_direct_stream() {
+        // FR-8.92: a stream for a camera the room does not show, or whose sender the user
+        // blocked, is closed without decoding anything.
+        let mut tile = Tile::new(ID.into());
+        assert!(may_bind(Some(&tile), false));
+        assert!(!may_bind(Some(&tile), true), "blocked");
+        tile.state = TileState::Hidden;
+        assert!(!may_bind(Some(&tile), false), "hidden");
+        assert!(!may_bind(None, false), "no tile for that sender");
+    }
+
+    #[test]
+    fn the_direct_want_message_is_the_spec_layout() {
+        // FR-8.93: `WANT = 2` then one big-endian u16 tile height.
+        assert_eq!(direct_want(720), [2, 0x02, 0xd0]);
+        assert_eq!(direct_want(180), [2, 0x00, 0xb4]);
+        assert_eq!(direct_want(360), [2, 0x01, 0x68]);
+        assert_eq!(direct_want(540), [2, 0x02, 0x1c]);
+        assert_eq!(direct_want(720)[0], super::super::direct::WANT);
     }
 }

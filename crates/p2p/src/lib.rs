@@ -26,8 +26,8 @@
 //! accepts it. [`PeerConnection::path`] tells how a connection travels.
 //!
 //! Screen-share broadcasts (spec 07): the relay bot sets them up with the `bcast-*` messages of
-//! [`PeerMessage`]; [`broadcast`] holds the relay `bind` with a role and the clear frame header
-//! the relay reads to fan frames out.
+//! [`PeerMessage`]; [`broadcast`] holds the relay `bind` with a role and the shared slot helper,
+//! and [`broadcast::legacy`] keeps the clear frame header the relay reads for 0.8.x fallback.
 //!
 //! Consent (FR-2.36) is the caller's job: an offer or answer reveals this machine's addresses
 //! (it also opens a router port mapping), and [`PendingOffer::complete`] and
@@ -37,6 +37,7 @@
 
 pub mod broadcast;
 mod gather;
+pub mod media;
 mod peer;
 mod relay;
 mod signal;
@@ -53,12 +54,14 @@ use tokio::sync::mpsc;
 use tokio::task::JoinSet;
 
 pub use peer::{
-    BroadcastErrorReason, BroadcastId, BroadcastKind, CAMERA_FEATURE, MAX_PEER_BYTES, PEER_DATA_ID,
-    PEER_VERSION, PeerError, PeerMessage, RelayAnnouncement, RelayState, RelayToken, RelayUse,
-    RequestId, TokenErrorReason,
+    BroadcastErrorReason, BroadcastId, BroadcastKind, CAMERA_FEATURE, MAX_PEER_BYTES,
+    MEDIA_VERSION, PEER_DATA_ID, PEER_VERSION, PeerError, PeerMessage, RelayAnnouncement,
+    RelayState, RelayToken, RelayUse, RequestId, TokenErrorReason,
 };
 pub use quinn;
-pub use relay::{BroadcastEnd, BroadcastLink, RelayRefusal, RelayTransport, Unit};
+pub use relay::{
+    BroadcastEnd, BroadcastLink, BroadcastMessage, RelayRefusal, RelayTransport, Unit,
+};
 pub use signal::{
     DATA_ID, DeclineReason, MAX_CANDIDATES, MAX_SIGNAL_BYTES, SessionId, Signal, SignalError,
     VERSION,

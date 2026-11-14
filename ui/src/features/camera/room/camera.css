@@ -145,6 +145,22 @@
   flex: 1;
 }
 
+/* FR-8.5: no tiles, only why. */
+.cam-room__cant-watch {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--media-glass);
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
 .cam-grid {
   display: grid;
   grid-template-columns: repeat(var(--cols, 2), 1fr);
@@ -680,4 +696,50 @@
 
 .cam-bg-popover .cam-seg__button:not([aria-pressed="true"]) {
   color: var(--color-text-secondary);
+}
+
+/* Who watches the own camera, with the path each of them gets (FR-8.62, FR-8.94). */
+.cam-viewers {
+  position: relative;
+}
+
+.cam-viewers__list {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 16rem;
+  min-width: 12rem;
+  margin: 0;
+  padding: var(--space-2);
+  overflow-y: auto;
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  list-style: none;
+}
+
+.cam-viewers__row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+}
+
+.cam-viewers__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cam-viewers__path {
+  flex: none;
+  color: var(--media-on-scrim-muted, var(--media-on-scrim));
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
 }

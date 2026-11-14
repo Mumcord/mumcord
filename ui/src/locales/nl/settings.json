@@ -767,7 +767,13 @@
       "gap": "Tijd sinds vorig pakket",
       "kind": "Interne id",
       "size": "Grootte",
-      "decoded": "Gedecodeerde inhoud"
+      "decoded": "Gedecodeerde inhoud",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "kanaal {{channel}}",
+      "keyframe": "sleutelframe",
+      "delta": "deltaframe"
     },
     "noDecoding": "Deze payload heeft geen leesbare vorm; zie de ruwe bytes.",
     "controlOnly": "Standaard Mumble-bericht: alleen het type en de grootte worden vastgelegd.",
@@ -788,7 +794,8 @@
       "watch": "Status van watchparty",
       "plugin": "Plug-ingegevens",
       "mumble": "Mumble-bericht",
-      "peer": "Relay instellen"
+      "peer": "Relay instellen",
+      "media": "Mediastroom"
     }
   },
   "licences": {

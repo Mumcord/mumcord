@@ -772,7 +772,13 @@
       "gap": "Atstarpe no iepriekšējās paketes",
       "kind": "Iekšējais ID",
       "size": "Izmērs",
-      "decoded": "Atkodētais saturs"
+      "decoded": "Atkodētais saturs",
+      "media": "Mediji"
+    },
+    "media": {
+      "channel": "kanāls {{channel}}",
+      "keyframe": "atslēgas kadrs",
+      "delta": "delta kadrs"
     },
     "noDecoding": "Šim saturam nav lasāmas formas; skati neapstrādātos baitus.",
     "controlOnly": "Standarta Mumble ziņa: tiek reģistrēts tikai tās veids un izmērs.",
@@ -793,7 +799,8 @@
       "watch": "Kopīgas skatīšanās stāvoklis",
       "plugin": "Spraudņa dati",
       "mumble": "Mumble ziņa",
-      "peer": "Releja iestatīšana"
+      "peer": "Releja iestatīšana",
+      "media": "Multivides straume"
     }
   },
   "licences": {

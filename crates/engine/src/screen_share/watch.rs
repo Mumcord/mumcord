@@ -116,8 +116,8 @@ pub(crate) struct WatchLink {
 
 /// Where a watched share's frames come from.
 pub(crate) enum FrameSource {
-    /// The direct stream from the sharer.
-    Stream(RecvStream),
+    /// The direct stream from the sharer, in either wire format.
+    Stream(Box<wire::FrameReader<RecvStream>>),
     /// Frames decrypted from the relay broadcast.
     Broadcast(mpsc_async::Receiver<Frame>),
 }
@@ -125,7 +125,7 @@ pub(crate) enum FrameSource {
 impl FrameSource {
     async fn next(&mut self) -> Result<Option<Frame>, wire::WireError> {
         match self {
-            Self::Stream(recv) => wire::read_frame(recv).await,
+            Self::Stream(reader) => reader.read_frame().await,
             Self::Broadcast(frames) => Ok(frames.recv().await),
         }
     }
@@ -136,9 +136,14 @@ pub(crate) enum RequestSink {
     Stream(SendStream),
     /// The broadcast link: a `kf` control unit, which the relay rate-limits and forwards.
     Broadcast(mpsc_async::Sender<Vec<u8>>),
+    /// A stream whose writer the caller shares with another sender (the camera's `want`).
+    Shared(mpsc_async::Sender<Vec<u8>>),
 }
 
 impl WatchLink {
+    /// Plays a direct stream. `tap` records every message of it for the packet inspector
+    /// (FR-7.101).
+    #[allow(clippy::too_many_arguments)]
     pub fn start(
         rt: &tokio::runtime::Handle,
         server_id: ServerId,
@@ -147,15 +152,44 @@ impl WatchLink {
         sound: ShareSound,
         send: SendStream,
         recv: RecvStream,
+        tap: Option<crate::inspector::MediaTapSink>,
     ) -> Self {
         Self::start_with(
             rt,
             Source { server_id, sharer },
             sink,
             sound,
-            FrameSource::Stream(recv),
+            FrameSource::Stream(Box::new(wire::FrameReader::auto(recv).with_tap(tap))),
             RequestSink::Stream(send),
             None,
+            None,
+        )
+    }
+
+    /// Plays a stream the caller opened itself: `frames` is a reader it prepared (the camera
+    /// checks the description first), `requests` are the reverse messages it shares with its
+    /// `want` reports (FR-8.92, FR-8.93), and `on_end` runs when the stream ends by itself — a
+    /// dropped link does not (see [`Drop`]).
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn start_prepared(
+        rt: &tokio::runtime::Handle,
+        server_id: ServerId,
+        sharer: u32,
+        sink: Option<Arc<dyn ScreenFrameSink>>,
+        sound: ShareSound,
+        frames: FrameSource,
+        requests: RequestSink,
+        on_end: Option<Box<dyn FnOnce() + Send>>,
+    ) -> Self {
+        Self::start_with(
+            rt,
+            Source { server_id, sharer },
+            sink,
+            sound,
+            frames,
+            requests,
+            None,
+            on_end,
         )
     }
 
@@ -180,9 +214,11 @@ impl WatchLink {
             FrameSource::Broadcast(frames),
             RequestSink::Broadcast(units),
             Some(subscriber),
+            None,
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn start_with(
         rt: &tokio::runtime::Handle,
         source: Source,
@@ -191,6 +227,7 @@ impl WatchLink {
         frames: FrameSource,
         requests: RequestSink,
         broadcast: Option<Subscriber>,
+        on_end: Option<Box<dyn FnOnce() + Send>>,
     ) -> Self {
         crate::crash::set_context("watching a screen share", "yes");
         let sound_stats = sound.stats();
@@ -201,7 +238,14 @@ impl WatchLink {
             0
         };
         let control = Arc::new(Control::new(0, forced_here));
-        let reader = rt.spawn(read_frames(source, sink, sound, control.clone(), frames));
+        let reader = rt.spawn(read_frames(
+            source,
+            sink,
+            sound,
+            control.clone(),
+            frames,
+            on_end,
+        ));
         let requests = rt.spawn(send_requests(control.clone(), requests));
         Self {
             control,
@@ -285,16 +329,17 @@ async fn read_frames(
     mut sound: ShareSound,
     control: Arc<Control>,
     mut frames: FrameSource,
+    on_end: Option<Box<dyn FnOnce() + Send>>,
 ) {
     let mut decoder: Option<DecodeThread> = None;
     let mut layers = LayerFilter::default();
     loop {
         let frame = match frames.next().await {
             Ok(Some(frame)) => frame,
-            Ok(None) => return,
+            Ok(None) => break,
             Err(e) => {
                 tracing::debug!(error = %e, "screen stream from a sharer ended");
-                return;
+                break;
             }
         };
         let FrameKind::Video(codec) = frame.header.kind else {
@@ -324,6 +369,10 @@ async fn read_frames(
             decoder = None;
             sink.on_encoded(source.server_id, source.sharer, &frame);
         }
+    }
+    drop(decoder);
+    if let Some(on_end) = on_end {
+        on_end();
     }
 }
 
@@ -412,6 +461,10 @@ async fn send_requests(control: Arc<Control>, mut requests: RequestSink) {
                 Ok(unit) => units.send(unit).await.map_err(|e| e.to_string()),
                 Err(e) => Err(e.to_string()),
             },
+            RequestSink::Shared(messages) => messages
+                .send(vec![wire::KEYFRAME_REQUEST])
+                .await
+                .map_err(|e| e.to_string()),
         };
         if let Err(e) = sent {
             tracing::debug!(error = %e, "screen stream to a sharer ended");

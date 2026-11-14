@@ -1,20 +1,21 @@
 {
   "turnOn": "Zapnout kameru",
-  "turnOnHint": "Nejdřív uvidíš náhled. Vidět tě můžou jen lidé v kanálu {{channel}}.",
+  "turnOnHint": "Nejdřív uvidíš náhled. Vidět tě můžou jen lidé v {{channel}}.",
   "turnOff": "Vypnout kameru",
   "turnOffLabel": "Vypnout kameru. Tvoje kamera je zapnutá.",
   "cameraOn": "Kamera zapnutá",
   "cameraOnLabel": "Tvoje kamera je zapnutá",
   "cameraOffLabel": "Tvoje kamera je vypnutá",
   "personCameraOn": "Kamera uživatele {{name}} je zapnutá",
-  "notInChannel": "Pro zapnutí kamery se připoj k hlasovému kanálu.",
+  "notInChannel": "Připoj se k hlasovému kanálu, abys mohl zapnout kameru.",
   "unavailable": {
     "noRelay": "Tento server nemá relay, takže sdílení kamery není dostupné.",
     "relayTooOld": "Relay tohoto serveru je pro sdílení kamery příliš starý.",
     "relayDisallows": "Relay tohoto serveru sdílení kamery nepovoluje.",
-    "needsRelayMode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
+    "needsRelayMode": "Sdílení kamery je vypnuté. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
     "registeredOnly": "Na tomto serveru mohou kameru používat jen registrovaní uživatelé.",
+    "needsDirect": "Sdílení kamery potřebuje přímá připojení. Změň to v Soukromí a připojení.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera zapnutá",
@@ -24,7 +25,7 @@
     "title": "Zapnout kameru",
     "subtitle": "Náhled · zatím to nikdo nevidí",
     "previewLabel": "Náhled kamery",
-    "privacy": "Tvoji kameru vidí jen lidé v kanálu {{channel}}, a to až po stisknutí Zapnout kameru. Mumcord kamery nikdy nenahrává.",
+    "privacy": "Tvoji kameru vidí jen lidé v {{channel}} a až po stisknutí Zapnout kameru. Mumcord kamery nikdy nenahrává.",
     "camera": "Kamera",
     "background": "Pozadí",
     "backgroundNone": "Žádné",
@@ -96,7 +97,7 @@
     "denied": "Kameru se nepodařilo spustit: relay serveru ji odmítl.",
     "relayDown": "Kamera se zastavila: relay není dostupný",
     "rateLimited": "Kameru se nepodařilo spustit: příliš mnoho pokusů. Zkus to znovu za minutu.",
-    "mode": "Sdílení kamery potřebuje relay. Změň to v Soukromí a připojení.",
+    "mode": "Sdílení kamery je vypnuté. Změň to v Soukromí a připojení.",
     "noCertificate": "Sdílení kamery potřebuje klientský certifikát.",
     "endedByRelay": "Kameru zastavil relay serveru",
     "dismissStopped": "Zavřít",
@@ -117,7 +118,7 @@
   "announce": {
     "on": "Kamera zapnutá",
     "off": "Kamera vypnutá",
-    "live": "Tvoje kamera vysílá živě",
+    "live": "Tvoje kamera běží živě",
     "stopped": "Tvoje kamera se zastavila",
     "joined": "{{name}} zapnul(a) kameru",
     "left": "{{name}} vypnul(a) kameru",
@@ -136,7 +137,7 @@
     "label_few": "Místnost kamer, {{count}} zapnuté kamery",
     "label_many": "Místnost kamer, {{count}} zapnuté kamery",
     "label_other": "Místnost kamer, {{count}} zapnutých kamer",
-    "subtitle": "{{cameras}} · {{people}} v kanálu {{channel}}",
+    "subtitle": "{{cameras}} · {{people}} v {{channel}}",
     "cameras_one": "{{count}} zapnutá kamera",
     "cameras_few": "{{count}} zapnuté kamery",
     "cameras_many": "{{count}} zapnuté kamery",
@@ -147,7 +148,11 @@
     "people_other": "{{count}} lidí",
     "limit": "{{count}} z {{max}} kamer",
     "relay": "Relay · koncové šifrování",
+    "direct": "Přímo · koncové šifrování",
+    "both": "Relay a přímo · koncové šifrování",
     "relayTitle": "Každá kamera se na relay pošle jednou a ten ji rozkopíruje divákům",
+    "directTitle": "Každý divák dostane vlastní kopii přímo od tebe, bez relay",
+    "bothTitle": "Diváci se starším Mumcordem dostanou kopii z relay, novější svůj vlastní proud od tebe",
     "layout": "Rozvržení",
     "grid": "Mřížka",
     "speaker": "Mluvčí",
@@ -172,13 +177,13 @@
     "miniBar_many": "{{count}} zapnuté kamery",
     "miniBar_other": "{{count}} zapnutých kamer",
     "cameras": "Kamery",
-    "fullTitle": "Místnost je plná (9 kamer)",
+    "fullTitle": "Místnost je plná při 9 kamerách",
     "backgroundPicker": "Změnit pozadí"
   },
   "position": {
     "label": "Kamery",
     "beside": "Kamery vedle",
-    "above": "Nahoře",
+    "above": "Nad",
     "hidden": "Skryté"
   },
   "tile": {
@@ -193,13 +198,13 @@
     "joining": "Připojování ke kameře uživatele {{name}} …",
     "full": "Uživatele {{name}} sleduje příliš mnoho lidí",
     "failed": "Ke kameře uživatele {{name}} se nepodařilo připojit",
-    "needsUpdate": "Tato kamera vyžaduje Mumcord 0.9.0",
     "retry": "Zkusit znovu",
     "hidden": "Video skryto",
     "showVideo": "Zobrazit video",
     "viewing": "Sleduješ",
     "weak": "Slabé připojení",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Tato kamera vyžaduje Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Možnosti pro {{name}}",
@@ -224,7 +229,7 @@
     "screenLive": "Živě",
     "partyTitle": "Společné sledování",
     "partyStarted": "Spustil(a) {{name}}",
-    "label": "{{title}} a místnost kamer"
+    "label": "{{title}} s místností s kamerami"
   },
   "settings": {
     "title": "Kamera",
@@ -237,8 +242,8 @@
     "sendQualityAuto": "Automaticky",
     "sendQuality720": "720p · 15 fps",
     "sendQuality360": "360p · 30 fps",
-    "sendQualityHint": "Automaticky (až 720p · 30 fps) posílá jen tolik, kolik diváci potřebují: menší obraz ve velké mřížce, ostřejší, když tě někdo připne.",
-    "mirror": "Zrcadlit vlastní náhled",
+    "sendQualityHint": "Auto (až 720p · 30 fps) posílá jen tolik, kolik diváci potřebují: menší obraz ve velké mřížce, ostřejší, když tě někdo připne.",
+    "mirror": "Zrcadlit můj vlastní náhled",
     "mirrorHint": "Zrcadlí se jen tvůj vlastní náhled. Ostatní tě vidí správně.",
     "backgroundSection": "Pozadí",
     "defaultBackground": "Výchozí pozadí",
@@ -249,7 +254,7 @@
     "effectAuto": "Automaticky",
     "effectBest": "Nejlepší (grafická karta)",
     "effectLight": "Lehká (šetří baterii)",
-    "effectHint": "Automaticky se použije grafická karta, kdykoli to jde; na baterii nebo při vytíženém počítači se přepne na Lehkou.",
+    "effectHint": "Auto používá grafickou kartu, kdykoli to jde, a na baterii nebo při vytíženém počítači přepne na Lehkou.",
     "ownImages_one": "Tvoje vlastní obrázky pozadí zůstávají v tomto zařízení (uloženo: {{count}}). Odesílá se jen hotový obraz.",
     "ownImages_few": "Tvoje vlastní obrázky pozadí zůstávají v tomto zařízení (uloženo: {{count}}). Odesílá se jen hotový obraz.",
     "ownImages_many": "Tvoje vlastní obrázky pozadí zůstávají v tomto zařízení (uloženo: {{count}}). Odesílá se jen hotový obraz.",
@@ -263,9 +268,14 @@
     "showAlways": "Vždy",
     "showOnOpen": "Když otevřu místnost",
     "showNever": "Nikdy",
-    "showHint": "Možnost Vždy otevře místnost kamer, když někdo ve tvém kanálu zapne kameru. Možnost Nikdy tě nechá jen u hlasu a nestahuje žádné video.",
+    "showHint": "Vždy otevře místnost kamer, když někdo ve tvém kanálu zapne kameru. Nikdy tě nechá jen u hlasu a nestahuje žádné video.",
     "dataSaver": "Šetření daty: až 15 fps pro všechny",
     "reduceMotion": "Omezit pohyb: žádná záře ani animace na rámečku mluvčího",
     "reduceMotionHint": "Ve výchozím stavu se řídí nastavením omezení pohybu v systému."
+  },
+  "viewers": {
+    "title": "Diváci",
+    "relay": "Relay",
+    "direct": "Přímo"
   }
 }

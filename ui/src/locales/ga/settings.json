@@ -782,7 +782,13 @@
       "gap": "Bearna ón bpaicéad roimhe",
       "kind": "Aitheantas inmheánach",
       "size": "Méid",
-      "decoded": "Ábhar díchódaithe"
+      "decoded": "Ábhar díchódaithe",
+      "media": "Meáin"
+    },
+    "media": {
+      "channel": "cainéal {{channel}}",
+      "keyframe": "eochairfhráma",
+      "delta": "fráma deilte"
     },
     "noDecoding": "Níl foirm inléite ag an ábhar seo; féach na bearta amha.",
     "controlOnly": "Gnáththeachtaireacht Mumble: ní thaifeadtar ach a cineál agus a méid.",
@@ -803,7 +809,8 @@
       "watch": "Staid Breathnú le chéile",
       "plugin": "Sonraí breiseáin",
       "mumble": "Teachtaireacht Mumble",
-      "peer": "Socrú athsheachadáin"
+      "peer": "Socrú athsheachadáin",
+      "media": "Sruth meán"
     }
   },
   "licences": {

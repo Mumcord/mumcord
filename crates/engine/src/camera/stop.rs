@@ -16,7 +16,7 @@ use mumcord_camera::CameraError;
 use mumcord_p2p::BroadcastEnd;
 
 use super::send::SendEnded;
-use super::session::{CameraFailure, CameraState, ServerCameras};
+use super::session::{CameraFailure, ServerCameras};
 use crate::ServerId;
 use crate::session::{Engine, WeakEngine, lock};
 
@@ -134,13 +134,15 @@ impl Engine {
         true
     }
 
-    /// Camera availability on `server_id` became `unavailable`: a camera on air there loses its
-    /// relay (FR-8.7, FR-8.24). The caller may hold engine locks.
-    pub(crate) fn camera_relay_unavailable(&self, server_id: ServerId) {
-        if self
-            .camera_own()
-            .is_some_and(|(server, state)| server == server_id && state == CameraState::OnAir)
-        {
+    /// Camera sharing on `server_id` lost a path: a camera on air over the relay turns off when
+    /// the relay can no longer carry it (FR-8.7, FR-8.24), and any camera turns off when
+    /// `unavailable` says no path is left at all. The caller may hold engine locks.
+    pub(crate) fn camera_path_lost(&self, server_id: ServerId, unavailable: bool) {
+        let stop = lock(self.camera_state())
+            .own
+            .as_ref()
+            .is_some_and(|o| unavailable || o.on_relay(server_id));
+        if stop {
             self.camera_stop_later(server_id, StopReason::RelayLost);
         }
     }

@@ -184,6 +184,9 @@ async function restoreA(): Promise<void> {
     await addAndConnect(`localhost:${String(port)}`);
     await joinIfReadOnly();
     await registerOnServer();
+    // An old relay has no camera broadcast, so the picture goes direct. That path waits for
+    // both people to allow it; these cells are not about that question.
+    await updateSettings({ allowDirectConnections: "yes" });
     // The next preview starts with the default background and blur strength.
     await openPreview();
     await previewDialog()

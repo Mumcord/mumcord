@@ -163,7 +163,7 @@
     "noFanoutBody_other": "Fiecare spectator primește propria copie de pe calculatorul tău, așa că pot urmări până la {{max}} persoane. Calitatea scade pe măsură ce se alătură mai mulți: acum {{count}} de spectatori au nevoie de aproximativ {{mbit}} Mbit/s de încărcare, deci partajarea ta rulează la {{now}} în loc de {{wanted}}.",
     "fanoutUnavailable": "Distribuirea prin releu nu este disponibilă ({{reason}}). Fiecare spectator primește propria copie, așa că pot urmări până la {{max}} persoane, iar calitatea poate scădea.",
     "reasonNoRelay": "acest server nu are releu",
-    "reasonOldRelay": "releul este prea vechi",
+    "reasonOldRelay": "releul acestui server necesită o actualizare",
     "reasonDisallowed": "releul nu permite partajarea ecranului",
     "reasonRefused": "releul a refuzat difuzarea",
     "reasonFull": "releul este plin",

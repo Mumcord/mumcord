@@ -493,12 +493,12 @@ Spec 08. One own camera per Mumcord instance (FR-8.29); `CameraView { serverId, 
 
 ## Packet inspector
 
-A hidden debugging view (issue #60, [packet-inspector.md](packet-inspector.md)). While the developer tools are unlocked the UI calls `packet_capture_set(true)`; the engine then keeps the last 2,000 control-channel packets of every connection in memory. Nothing is logged or sent anywhere, and `packet_capture_set(false)` drops it all.
+A hidden debugging view (issue #60, [packet-inspector.md](packet-inspector.md)). While the developer tools are unlocked the UI calls `packet_capture_set(true)`; the engine then keeps the last 2,000 captured packets of every connection in memory, the control-channel messages and the media messages of screen shares and cameras. Nothing is logged or sent anywhere, and `packet_capture_set(false)` drops it all.
 
 `packet_capture_poll(after)` returns `PacketCapture`:
 
 - `capturing`: whether capture is on.
-- `packets`: `Packet`s with an id above `after` (all kept ones with `null`), oldest first. Each has `id`, `serverId`, `atMs` (Unix milliseconds), `direction` (`sent` / `received`), `kind` (plugin data id such as `mumcord.watch`, or the Mumble message name such as `UserState`), `pluginData`, `size` (bytes of the plugin data, or of the whole message), `sender` / `receivers` (sessions, plugin data only), `delayMs` / `tokensLeft` (client pacer, sent plugin data only), `decoded` (pretty-printed JSON of the payload or `null`) and `rawHex` (plugin data only). Plugin data and names come from other clients: render as plain text.
+- `packets`: `Packet`s with an id above `after` (all kept ones with `null`), oldest first. Each has `id`, `serverId`, `atMs` (Unix milliseconds), `direction` (`sent` / `received`), `kind` (plugin data id such as `mumcord.watch`, or the Mumble message name such as `UserState`), `pluginData`, `size` (bytes of the plugin data, or of the whole message), `sender` / `receivers` (sessions, plugin data only), `delayMs` / `tokensLeft` (client pacer, sent plugin data only), `decoded` (pretty-printed JSON of the payload or `null`), `rawHex` (plugin data only) and `media` (`null` unless the packet is a message of a screen-share or camera stream: then `format` is `media` for the 0.9.0 document or `legacy` for the old header, `version` is that header's version byte or `null`, `channel` and `control` describe the channel-0 control message or the layer channel, and `flags` and `keyframe` describe a track message; the media content itself is never captured). Plugin data and names come from other clients: render as plain text.
 - `counters`: packets per server, kind and direction since capture started or was cleared, including those the ring buffer dropped.
 - `voice`: audio packets sent and received per connected server since its voice link started. Voice is counted, never captured.
 

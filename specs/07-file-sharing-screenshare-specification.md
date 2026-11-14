@@ -1,10 +1,10 @@
 # Epic 4.1 – File sharing and screen-sharing upgrade · Specification
 
-> Status: Final (written directly from the agreed issues, no brainstorming file; open points in section 13 carry a recommended default; addendum for application and desktop audio in `specs/07-file-sharing-screenshare-brainstorming.md`) · As of: 2026-11-04
-> Sources: issue #348 (file sharing: concept and mockups, branch `mockups/file-sharing`), issue #355 with its comments (screen-sharing upgrade, AV1 per OS, Intel Quick Sync and hardware VP9; mockups on branch `mockups/screenshare-41`), issue #331 (origin of file sharing), issue #372 (malware check, not part of this epic), user decisions of 2026-11-02 (section 12), issue #435 with the user decisions of 2026-11-04 (application and desktop audio, brainstorming addendum QA.1 … QA.4). There is no `specs/roadmap.md`; the issues are the roadmap.
+> Status: Final (written directly from the agreed issues, no brainstorming file; open points in section 13 carry a recommended default; addendum for application and desktop audio in `specs/07-file-sharing-screenshare-brainstorming.md`; the 0.9.0 Bovnar media stream profile of `specs/07-08-bovnar-media-streams-0.9.0-spec-addendum.md` is merged into section 4.11, the decision log and the acceptance criteria) · As of: 2026-11-10
+> Sources: issue #348 (file sharing: concept and mockups, branch `mockups/file-sharing`), issue #355 with its comments (screen-sharing upgrade, AV1 per OS, Intel Quick Sync and hardware VP9; mockups on branch `mockups/screenshare-41`), issue #331 (origin of file sharing), issue #372 (malware check, not part of this epic), user decisions of 2026-11-02 (section 12), issue #435 with the user decisions of 2026-11-04 (application and desktop audio, brainstorming addendum QA.1 … QA.4), issue #492 with the plan `specs/07-08-bovnar-media-streams-0.9.0-plan.md` and the product-owner decisions of 2026-11-10 (Bovnar media streams for screen share and camera). There is no `specs/roadmap.md`; the issues are the roadmap.
 > Builds on: `specs/01-foundation-specification.md`, `specs/02-multi-server-themes-specification.md` (P2P signalling `mumcord.p2p`, FR-2.35 … FR-2.37), `specs/03-comfort-polish-specification.md` (blocking, notification centre, Settings window, packet inspector), `specs/04-mumpeer-relay-specification.md` (relay, mumbot `peer`, `mumcord.peer`, relay handshake and API), `specs/06-plugin-system-specification.md` (plugin data budget FR-6.36, hello feature limit).
 > Repositories: `Mumcord/mumcord` (client), `Mumcord/mumpeer` (relay: broadcast sessions, allowed uses), `Mumcord/mumbot` (module `peer`: broadcast admission, allowed uses in the announcement).
-> Numbering: requirements and criteria use the spec file number (`FR-7.n`, `AC-7.n`) so they never clash with Epic 4's `FR-4.n`. Where this spec and an issue differ, this spec wins.
+> Numbering: requirements and criteria use the spec file number (`FR-7.n`, `AC-7.n`) so they never clash with Epic 4's `FR-4.n`. Where this spec and an issue differ, this spec wins. The new-media-stream requirements FR-7.89 … FR-7.101 and criteria AC-7.72 … AC-7.88 are provisional until the 0.8.0 branch is merged into `main`; they start after the highest numbers on `main` (FR-7.88, AC-7.71) and are renumbered once after that merge, never against `milestone/0.8.0`.
 
 ## 1. Goal & context
 
@@ -35,6 +35,13 @@ Two things people ask for most after the relay arrived: sending files to the cha
 - Viewer list "x of 25" with codec, path (relay/direct) and "slow connection" badge; viewer frame-rate choice (Auto, up to 30, up to 15).
 - Settings → Screen sharing tab: quality defaults, codec, "Use graphics card when available", active encoder, "Check again".
 
+**Bovnar media streams (0.9.0, #492)**
+- New media profile on a screen-share link when both ends and, for a broadcast, the relay support it: one endless Bovnar document per link, a fixed channel map (control and description on channel 0, temporal layers on 1–4, audio on 5, plugin data on 6), a stream description, SFrame encryption on the relay path (FR-7.89 … FR-7.95).
+- The old 14/21-byte format stays as a capability-based fallback for 0.8.x peers and old relays; it is marked legacy, tested and removed only in a later milestone (FR-7.96 … FR-7.99).
+- Capability negotiation through the hello feature `media-v2`, `Watch` `mv`, the relay announcement `mv`, `bcast-req`/`bcast`/`bcast-tok` `mv` and the relay `bind` field `"media": 2`; mumpeer speaks both formats and advertises `"media": 2` (FR-7.96).
+- Late joiners, layer filtering, keyframe requests, rekey, the relay description cache and the packet inspector for the new profile (FR-7.100, FR-7.101).
+- The direct camera path (spec 08, FR-8.92 … FR-8.96) reuses this profile with video channels only.
+
 **Relay allowed uses (user decision 2026-11-02)**
 - mumpeer config: images, files, screen sharing each enabled or disabled (default all enabled); reported in `/v1/status`; carried in the bot's announcement; enforced by the relay when a session is created; honoured by the client with a clear reason.
 
@@ -55,6 +62,7 @@ Two things people ask for most after the relay arrived: sending files to the cha
 - Screen share resolution above 1440p ("Source up to 4K") – later (open point Q-SS3).
 - Viewer resolution choice (simulcast or spatial layers) – later; viewers see "Quality set by sharer".
 - A second VP9 encode for old viewers inside an AV1 share – later.
+- Removing the old media format: it stays through 0.9.x for 0.8.x peers and old relays; removal is a later milestone once 0.8.x is unsupported (FR-7.98, D14).
 - A separate sound picker on every share (desktop, one app or no sound) – not planned; the picker choice decides (#435, QA.1). The "Which app's sound?" list appears only on Linux when the app can't be matched (FR-7.82).
 - Including Mumcord's own sound in the share – never (QA.2).
 - Share sound on Linux without PipeWire (PulseAudio only, ALSA only) – not planned.
@@ -209,6 +217,88 @@ The media area is the shared media frame above the chat that shows a screen-shar
 - **FR-7.87** **Privacy.** Only the source chosen by FR-7.76 … FR-7.83 is captured; no other app's sound and no microphone. App names, window titles, process ids and binary names stay on the sharer's device: they are never sent to viewers, the relay or the server, never stored, and never logged. Logs contain only the mode (`desktop`, `app`, `none`) and a reason code at `info`.
 - **FR-7.88** **Transport unchanged.** The new sources feed the existing share-sound path: Opus encode, the same direct path and the encrypted audio frames of broadcasts (FR-7.43), and the viewers' own share volume. Viewers notice no difference between systems.
 
+### 4.11 Screen sharing: Bovnar media streams (0.9.0, #492)
+
+The new media profile carries one endless Bovnar document per media link when both ends and, for a relay broadcast, the relay support it. The old format stays as the fallback. The direct camera path of spec 08 uses the same profile with video channels only (FR-8.92 … FR-8.96).
+
+- **FR-7.89 — One endless Bovnar document per media link.** A new-format media link carries one Bovnar document that never ends:
+
+  ```bovnar
+  #!bovnar 1.2
+  .media = \x00 …messages… \x00;
+  ```
+
+  A message is `varint(channel) varint(length) bytes`. Every message starts a new chunk; a message above 64 KiB spans several chunks, each starting with its channel varint. The writer ends only when the link closes. The same document shape is used on the direct `STREAM_SCREEN` stream, the relay over QUIC and the relay over TCP; only the transport framing differs. On a QUIC relay link each message is one unidirectional stream, in order (D8, FR-7.96); over TCP, messages travel as mux chunks inside the existing `0x01` frames. Reading accepts arbitrary byte splits; EOF at a message boundary is a clean stop, not a truncated document. The codec is `bovnar::codec` 2.1.0 (`MuxWriter`, `MuxReader`, `Peek::skip`, `Peek::forward`); the closed AGPL prototype #682 is not used.
+- **FR-7.90 — Channel map.** The channels are fixed (D3, D9):
+
+  | Channel | Use |
+  |---|---|
+  | 0 | Control and stream description |
+  | 1–4 | Video temporal layers 0–3 (channel = 1 + layer) |
+  | 5 | Audio (Opus) |
+  | 6 | Plugin relay data |
+  | 7–4095 | Reserved |
+
+  Every video frame goes to channel `1 + temporal_layer`, where the layer comes with the encoder's frame output. This mapping is settled: the P0.4 spike confirmed it for every encoder path — VP9 L1T3, SVT-AV1 and the camera pipelines, and the hardware paths through the mock-driver tests. Every emitted frame reports a layer, a keyframe is always layer 0 so every layer choice receives it, and up to four layers fit channels 1–4. The current encoders use three layers (L1T3); channel 4 holds a fourth layer when the 60 fps four-layer mode is enabled. Real-GPU runs are part of the normal hardware acceptance (AC-7.36, E4), not a separate open requirement. A viewer that wants layer ≤ N receives channels 1…N+1; the relay drops the higher channels whole at chunk boundaries, and what it forwards is still a valid stream. This replaces today's `layer` field in the header.
+- **FR-7.91 — Channel 0 control.** Every channel-0 message starts with a one-byte kind:
+
+  | Kind | Message | Direction | Payload |
+  |---|---|---|---|
+  | 0 | Description | Sharer → all | Embedded Bovnar document (FR-7.95) |
+  | 1 | `keyreq` | Subscriber → publisher | opaque chunk; the relay prepends the u16 slot |
+  | 2 | `key` | Publisher → one subscriber | u16 slot + opaque chunk; the relay strips the slot |
+  | 3 | `kf` | Subscriber → relay → publisher | empty |
+  | 4 | `layers` | Subscriber → relay | one byte, highest temporal layer |
+  | 5 | `want` | Subscriber → relay → publisher | u16 tile height; the relay prepends the slot |
+  | 6 | `gone` | Relay → publisher | u16 slot |
+
+  The payload layouts stay as they are today, so key exchange and admission do not change. The kind byte is clear so the relay can route control messages and cache the latest description without parsing it. **The description travels on channel 0 only** (D1): there is no `.meta` preamble and no second mechanism for the first description, later changes or the relay cache. The direct stream has no relay: relay-only control (`layers`, relay-forwarded `kf`, `gone`, relay `want`) does not appear there, and the direct viewer's keyframe request stays the one-byte `KEYFRAME_REQUEST` on the reverse stream (D5; camera `WANT` in FR-8.93).
+- **FR-7.92 — Track message and encryption.** Every track message starts with one clear flags byte (bit 0 = keyframe, other bits zero). Then:
+  - **Direct stream:** an 8-byte big-endian capture timestamp in microseconds, then the encoded frame. QUIC TLS protects the whole message; no SFrame layer is added and the timestamp is clear.
+  - **Relay broadcast:** an SFrame header (RFC 9605 compact key id and counter), then the SFrame ciphertext of (8-byte timestamp + encoded frame). The AAD is `channel varint + flags + SFrame header` (D4), so the relay cannot change the channel or the keyframe flag unnoticed. Key id and counter move into the SFrame header; the old 14-byte clear header goes away on new links. The relay sees only channel, flags and the SFrame header — never the timestamp, resolution or frame sequence.
+
+  The timestamp unit is microseconds; the description states the timebase. Audio packets use the same layout on channel 5; the plaintext is the Opus packet and the timestamp is the capture timestamp.
+- **FR-7.93 — Plugin relay data (D6).** Plugin data that uses a relay broadcast travels on channel 6 with the same track layout; the plaintext is the existing relay-data envelope. New links use channel 6; old links keep `Content::Data`. The relay forwards channel 6 without looking inside and treats it as the lowest priority. This removes the old header completely from new-format broadcasts.
+- **FR-7.94 — Limits and untrusted input.** Video message at most 4 MiB + 64 bytes; audio message at most 4 KiB + 64 bytes; plugin data message at most 64 KiB + 64 bytes; description at most 8 KiB before parsing; channels 0–4095. A frame on the wrong channel, with unknown flag bits or over its cap is dropped with a log line that contains no media content. A direct stream that ends at a message boundary is a clean stop, not a truncated document. Everything received is untrusted: validate the channel map, codec and track count, and reject anything outside this profile without allocating on it.
+- **FR-7.95 — Stream description (D1, D2).** The first channel-0 message is an embedded Bovnar document, capped at 8 KiB, for example:
+
+  ```bovnar
+  .v = <uint:8> 1;
+  .timebase = <uint:32,µ~s> 1;
+  .kind = "screen";                       # "screen" | "camera"
+  .id = "…";                              # camera session id, absent for screen
+  .tracks = [
+      { .ch = <uint:8> 1; .kind = "video"; .codec = "av1"; .layer = <uint:8> 0;
+        .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0;
+        .bitrate = <uint:32,k~b/s> 0; },
+      { .ch = <uint:8> 2; .kind = "video"; .codec = "av1"; .layer = <uint:8> 1;
+        .width = <uint:16> 1920; .height = <uint:16> 1080; .rate = <float:32,Hz> 30.0;
+        .bitrate = <uint:32,k~b/s> 0; },
+      { .ch = <uint:8> 5; .kind = "audio"; .codec = "opus"; .layer = <uint:8> 0;
+        .width = <uint:16> 0; .height = <uint:16> 0; .rate = <uint:32,Hz> 48000;
+        .bitrate = <uint:32,k~b/s> 96; }
+  ];
+  ```
+
+  Every track object carries the same eight fields, because a Bovnar `DomDoc` array must hold one struct shape; fields that do not apply to a track are zero (video `.bitrate` = 0; audio `.layer`, `.width` and `.height` = 0). The parser requires the fields that belong to the track's kind, validates their ranges, and ignores unknown or inapplicable fields, so a streaming parse still accepts either shape. `width`, `height`, `codec` and `rate` change with the quality step; `ch` and `layer` state where the frames for that track arrive. Unknown fields remain ignored, so a later codec, HDR metadata or a second audio track needs no wire version bump. The camera description carries `.kind = "camera"` and the camera session id in `.id` (spec 08, FR-8.92), so a stale stream is refused. The description is sent at stream start, again whenever the encoder changes resolution, codec, rate or track set, and at every rekey. The viewer applies a new description only at a keyframe. On the direct stream the description is clear inside the QUIC TLS connection. On the relay path it is encrypted with the current share key (D2); the relay caches the latest kind-0 ciphertext opaquely and replays it to a late joiner after the key exchange.
+- **FR-7.96 — Capability negotiation (D9).** 0.9.0 clients announce the hello feature `media-v2`. `Watch` gains an optional `mv: 2`; the relay announcement gains `mv`; `bcast-req` gains `mv` (the publisher's chosen format); `bcast` and `bcast-tok` carry it so every subscriber binds with the same format; relay `bind` gains an optional `"media": 2`; mumpeer `/v1/status` gains `"media": 2`. A missing field means the old format. A new mumpeer accepts both formats and advertises `media: 2`; an old mumpeer has no `mv`, so the client chooses the old format. The publisher's format is fixed for the whole broadcast: a new relay never mixes formats inside one broadcast, and a subscriber binds with the broadcast's format. The exact names are fixed before code (D9).
+- **FR-7.97 — Fallback matrix (D10).** The new format is used only when both ends and, for a relay broadcast, the relay support it. Otherwise the old format is used; the fallback is a normal mode, not an error.
+
+  | Sharer | Viewer | Relay | Screen share |
+  |---|---|---|---|
+  | 0.9.0 | 0.9.0 | new (`mv:2`) | new relay broadcast |
+  | 0.9.0 | 0.9.0 | old/none | new direct |
+  | 0.9.0 | 0.8.x | old | old relay broadcast |
+  | 0.9.0 | 0.8.x | new | old direct copy if capacity, else "needs 0.9.0" |
+  | 0.8.x | 0.9.0 | any | old direct/relay as today |
+  | 0.8.x | 0.8.x | any | old |
+
+  An old viewer of a new-format broadcast gets a direct copy in the old format when the direct path has room (8 viewers, as today's direct screen share); otherwise the viewer sees "This share needs Mumcord 0.9.0" (FR-7.99). The camera fallback matrix is FR-8.94/FR-8.95.
+- **FR-7.98 — Old-format retention (D14).** The old 14/21-byte format stays in 0.9.0 for 0.8.x peers and old relays. It stays behind a `legacy` module, is tested and marked legacy, and is used only by the fallback selection; removing it is a later decision once 0.8.x is no longer supported (no earlier than the milestone after 0.9.x).
+- **FR-7.99 — Refusal texts.** A viewer that cannot be served says "This share needs Mumcord 0.9.0". An old relay says "This server's relay needs an update" when the share has to fall back from the relay. A relay broadcast that is full keeps the existing "This share is full". All texts are translated into all 24 locales.
+- **FR-7.100 — Late joiner (D7).** The relay caches the latest description ciphertext and the stream prologue (the document header up to and including the `.media` opening); after the key exchange it sends them to the late joiner, then frames from the next keyframe. The publisher sends a keyframe on request. The cache holds one entry per broadcast, is capped at 8 KiB, and is cleared when the broadcast ends.
+- **FR-7.101 — Packet inspector.** The inspector shows the detected format, the decoded description, and for each message its channel, flags, keyframe state and size. It never logs or displays media content.
+
 ## 5. UI & UX
 
 > **The mockups are binding.** The UI must match the mockups in the issues: layout, texts, states, icons, spacing and both themes (dark and light).
@@ -303,7 +393,7 @@ Viewers get: 1080p · 30 fps · AV1 · about 4 Mbit/s · sent once via relay, up
 ```
 
 - Confirmation dialogs: download confirmation and risky warning (FR-7.22), Stop sharing (no confirmation; it can be undone by sharing again).
-- Notices: fan-out unavailable (FR-7.47, once per share), encoder fallback with Undo/Details (FR-7.57), codec switch for an old viewer (FR-7.58), quality lowered (FR-7.38).
+- Notices: fan-out unavailable (FR-7.47, once per share), encoder fallback with Undo/Details (FR-7.57), codec switch for an old viewer (FR-7.58), quality lowered (FR-7.38), old-relay fallback "This server's relay needs an update" (FR-7.99), "This share needs Mumcord 0.9.0" when an old viewer cannot be served (FR-7.97, FR-7.99).
 - No new global hotkeys, tray or overlay behaviour; the media-area handle keys (FR-7.67) work only while the handle has focus. Enter on a focused file card = Download; Escape closes dialogs.
 - Accessibility: all controls keyboard operable; file cards are list items with a label "{name}, {size}, from {sender}, {state}"; the short checksum's accessible name is the full hash; progress uses a progressbar role with value text; state changes (queued, done, mismatch) are announced politely; the risky warning is an alert dialog with focus on "Don't download". Both themes, system scaling, reduced motion (no animated progress stripes). All new texts in all 24 locales.
 
@@ -323,7 +413,7 @@ Mumcord's own sound is never captured (FR-7.77). In a broadcast it travels as en
 
 ### 6.2 Codecs and quality
 
-VP9 (libvpx, today) and new AV1 (hardware through the vendor encoder APIs directly, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
+VP9 (libvpx, today) and new AV1 (hardware through the vendor encoder APIs directly, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). On a new-format link each frame travels on channel `1 + temporal layer` (FR-7.90), so the relay drops whole layer channels and the viewer's frame-rate choice needs no re-encode. Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
 
 ### 6.3 File transfer sequence
 
@@ -418,25 +508,25 @@ sequenceDiagram
 
 | `t` | Direction | Fields | Rules |
 |---|---|---|---|
-| `relay` (extended) | bot → client | + `u` (array of `img`, `file`, `scr`), + `bc` (u16 max viewers; absent = no broadcast) | Missing `u` = all allowed |
+| `relay` (extended) | bot → client | + `u` (array of `img`, `file`, `scr`), + `bc` (u16 max viewers; absent = no broadcast), + `mv` (u8; 2 = the bot/relay speaks the new media format) | Missing `u` = all allowed; missing `mv` = old format |
 | `token-req` (extended) | client → bot | + `use` (`img`, `file`, `scr`) | Missing `use` from older clients = treated as `scr` by the bot |
 | `token-err` (extended) | bot → client | + `r = "use-not-allowed"` | |
-| `bcast-req` | sharer → bot | `v`, `rid`, `max` (u16) | Sender needs `p2p` + `screen-share` hello and a cert hash |
-| `bcast` | bot → sharer | `v`, `rid`, `id` (16 hex), `tok`, `ttl` | |
+| `bcast-req` | sharer → bot | `v`, `rid`, `max` (u16), optional `mv` (u8; the publisher's chosen format) | Sender needs `p2p` + `screen-share` hello and a cert hash; missing `mv` = old format |
+| `bcast` | bot → sharer | `v`, `rid`, `id` (16 hex), `tok`, `ttl`, optional `mv` | Copies the format from `bcast-req` |
 | `bcast-admit` | sharer → bot | `v`, `rid`, `id`, `viewer` (u32 session) | Only the broadcast's publisher session may admit |
-| `bcast-tok` | bot → viewer | `v`, `id`, `tok`, `ttl`, `sharer` (u32 session) | Viewer accepts it only from the pinned bot and only after it sent Watch to that sharer |
+| `bcast-tok` | bot → viewer | `v`, `id`, `tok`, `ttl`, `sharer` (u32 session), optional `mv` | Viewer accepts it only from the pinned bot and only after it sent Watch to that sharer; binds with the broadcast's format |
 | `bcast-kick` | sharer → bot | `v`, `id`, `viewer` | Bot deletes the viewer at the relay |
 | `bcast-err` | bot → requester | `v`, `rid`, `r` one of `denied`, `not-same-channel`, `full`, `relay-down`, `relay-full`, `use-not-allowed`, `rate-limited` | Mapped to reason texts |
 
-Each message ≤ 1000 bytes. New hello feature: `screen-broadcast`.
+Each message ≤ 1000 bytes. New hello feature: `screen-broadcast`; the new media profile adds the hello feature `media-v2` (FR-7.96).
 
-**Relay handshake (spec 04 §6.5)** gains `{"v":1,"t":"bind","tok":"…","role":"pub"|"sub"}` for broadcast tokens (pair tokens keep the old form) and error codes `use_not_allowed`, `broadcast_full`. After `ready`, broadcast data uses the same framing (QUIC datagrams for small control, one QUIC stream per frame or `0x01` frames on TCP) with the clear header of FR-7.43. Control kinds through the broadcast: `keyreq` (sub → pub, opaque, ≤ 1 KiB, relay adds the subscriber's slot number), `key` (pub → one sub by slot, opaque, ≤ 1 KiB), `kf` (sub → relay → pub keyframe request), `layers` (sub → relay, max temporal layer), `gone` (relay → pub, slot left).
+**Relay handshake (spec 04 §6.5)** gains `{"v":1,"t":"bind","tok":"…","role":"pub"|"sub"}` for broadcast tokens (pair tokens keep the old form) and error codes `use_not_allowed`, `broadcast_full`. On a new-format link `bind` also carries `"media": 2`; absent means the old format (FR-7.96). After `ready`, a new-format broadcast carries one endless Bovnar media document per link (FR-7.89): QUIC one unidirectional stream per message, TCP mux chunks inside the existing `0x01` frames; channel 0 carries control with the kind byte (FR-7.91), channels 1–4 video layers, 5 audio, 6 plugin data. An old-format broadcast keeps the same framing as today (QUIC datagrams for small control, one QUIC stream per frame or `0x01` frames on TCP) with the clear header of FR-7.43. Old control kinds keep their layouts; the new profile moves them to channel 0 and adds the description (kind 0) and `want` (kind 5).
 
 **Allowlist API (spec 04 §6.6)**
 
 | Method & path | Body | Response |
 |---|---|---|
-| `GET /v1/status` (extended) | — | + `"uses":[…]`, + `"broadcast":{"max_viewers":n}` (absent if `screen_share` is off or `max_broadcasts = 0`) |
+| `GET /v1/status` (extended) | — | + `"uses":[…]`, + `"broadcast":{"max_viewers":n}` (absent if `screen_share` is off or `max_broadcasts = 0`), + `"media": 2` (FR-7.96) |
 | `POST /v1/pairs` (extended) | + `"use"` | `403 {"code":"use_not_allowed"}` |
 | `POST /v1/broadcasts` | `{"publisher":"<40 hex>","max_viewers":n}` | `201 {"id","tok","expires_in"}`; `503 relay_full`; `403 use_not_allowed` |
 | `POST /v1/broadcasts/{id}/viewers` | `{"viewer":"<40 hex>"}` | `201 {"tok","expires_in"}`; `409 broadcast_full`; `404` |
@@ -445,11 +535,13 @@ Each message ≤ 1000 bytes. New hello feature: `screen-broadcast`.
 
 `DELETE /v1/peers/{hash}` (spec 04) also removes that hash from every broadcast (as publisher: the broadcast ends).
 
-**Screen-share signalling (`mumcord.p2p` / screen share signal):** `Watch` gains optional `codecs` (array) and `bc` (1 = I can join broadcasts); media frames get wire version 2 with a codec field. Old clients ignore the new fields and get VP9 direct copies.
+**Screen-share signalling (`mumcord.p2p` / screen share signal):** `Watch` gains optional `codecs` (array), `bc` (1 = I can join broadcasts) and `mv` (2 = I can read the new media profile, FR-7.96); media frames get wire version 2 with a codec field; a direct 0.9.0-to-0.9.0 link uses the media document of FR-7.89. Old clients ignore the new fields and get VP9 direct copies.
 
 ### 6.7 Protocol compatibility
 
 Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMessage (offer), PluginDataTransmission, UserState, UserRemove. Official clients see the offer text line and nothing else. A new client with an old bot/relay: no `u` (all allowed), no `bc` (no fan-out, FR-7.47); file transfer works with an old relay (pair session; old bot ignores `use`). An old Mumcord viewer watching a new sharer: VP9, direct copy.
+
+**New media profile (0.9.0).** A missing `media-v2`/`mv`/`"media": 2` means the old format. A new client with an old relay uses the old format on the relay and falls back to a new-format direct share between 0.9.0 peers (FR-7.97); it says "This server's relay needs an update" (FR-7.99). A new relay serves old and new clients; an old viewer of a new-format broadcast gets an old-format direct copy while capacity allows, otherwise "This share needs Mumcord 0.9.0". Old clients never receive a new-format document, and a new relay never mixes formats inside one broadcast.
 
 ## 7. Data & state model
 
@@ -473,7 +565,7 @@ Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMes
 
 Offers are stored in chat history as decoded fields (the Bovnar bytes are not kept); the wire format does not change the stored form.
 
-Not stored: active shares, queues, transfer progress, broadcast tokens and keys (memory only).
+Not stored: active shares, queues, transfer progress, broadcast tokens and keys, the negotiated media format per link, SFrame keys and counters and the relay description cache (all memory only).
 
 ### 7.2 File card state (recipient)
 
@@ -547,6 +639,7 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 ## 8. Technology & architecture
 
 - **Bovnar (#400):** `files::wire` encodes and decodes the offer and the `mumcord.file` messages with the Bovnar crate (thin Rust wrapper around the upstream C library; since 12b34052 the published `bovnar` crate from crates.io, one version pinned with its checksum in Cargo.lock, before that a git dependency on the fork Mumcord/bovnar; the published crate bundles the C sources and generated tables, so the build needs a C compiler but no Python); licence notice added to the licences window.
+- **Bovnar media streams (#492, 0.9.0):** `bovnar` 2.1.0 provides the incremental, allocation-free `bovnar::codec` (`MuxWriter`, `MuxReader`, `Peek::skip`, `Peek::forward`). The new profile uses it directly for the `.media` document in a new `mumcord-p2p` `media` module (channel constants, control kinds, description, limits); the old header moves behind a `legacy` module. The closed AGPL prototype #682 is not copied. The SFrame layer keeps the existing RFC 9605 key schedule and key exchange; only the header placement and the AAD change (FR-7.92). The engine keeps `Frame` / `FrameHeader` as its internal type, so the UI, fan-out and decoder are unchanged.
 
 - **File transfer on the existing `mumcord-p2p` connection, forced through the relay.** Reuses the end-to-end encrypted, certificate-pinned QUIC session and the relay of spec 04, so no new crypto or transport is needed.
 - **Offer as a normal text message with a data attribute**, like full-size images today (FR-1.60c): official clients see readable text and the offer arrives with the chat, including for history.
@@ -554,7 +647,7 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 - **Mark-of-the-web** in a small platform module (`windows` ADS write, macOS `xattr`, Linux `xattr`).
 - **Hardware encoders written directly against the vendor APIs (no FFmpeg):** NVENC via nv-codec-headers with the driver loaded at runtime (dlopen); AMD AMF via the AMF headers, loaded at runtime; Intel Quick Sync via oneVPL/libvpl; Linux VA-API via libva, loaded at runtime (no package dependency). Vendor drivers are loaded at runtime, so no SDK ships. macOS has no hardware encoder for AV1 or VP9; it uses software only.
 - **SVT-AV1** for software AV1 encode (real-time presets, low delay, screen-content mode): the only open encoder fast enough for live 1080p30 (rav1e and libaom are too slow, #355). **dav1d** for AV1 decode in the engine fallback.
-- **Frame encryption** with AES-128-GCM from `ring` (already used by rustls); key exchange with X25519 (`ring`) signed by the Mumble client certificate key (`rustls`/`rcgen` key types already present). SFrame-style framing per RFC 9605, own minimal implementation (no extra dependency).
+- **Frame encryption** with AES-128-GCM from `ring` (already used by rustls); key exchange with X25519 (`ring`) signed by the Mumble client certificate key (`rustls`/`rcgen` key types already present). SFrame-style framing per RFC 9605, own minimal implementation (no extra dependency). On a new-format relay link the SFrame header carries the key id and counter and the AAD is channel varint + flags + SFrame header (FR-7.92); a direct link has no SFrame layer because QUIC TLS already protects it.
 - **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, one module per vendor API (`nvenc.rs`, `amf.rs`, `qsv.rs`, `vaapi.rs`), `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
 - **mumpeer:** new module `broadcast` (sessions, per-subscriber queues with the `fanout.rs` policy, control forwarding), `uses` in `config` and `api`. **mumbot `peer`:** uses/bc pass-through, `use` on pairs, broadcast messages and admission checks.
 - **Share sound capture per system (#435):** Windows WASAPI process loopback (`ActivateAudioInterfaceAsync` with process-loopback parameters, include or exclude target process tree; Windows 10 version 2004 is the first release with it); macOS ScreenCaptureKit audio with "exclude current process audio" (macOS 13 is the first release with it); Linux PipeWire through the `pipewire` crate (libpipewire loaded at runtime, so no package dependency and no failure without PipeWire), linking capture to the matching playback stream nodes. New module `screen_share/sound/` in `mumcord-engine` with one file per system plus a pure, tested matcher for FR-7.82. Capture runs on its own thread and hands audio to the existing share-sound encoder through the existing lock-free queue; nothing new on the voice audio thread.
@@ -562,9 +655,9 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 
 ## 9. Non-functional requirements
 
-- **Security:** file and media data only ever end-to-end encrypted (inner QUIC, or frame encryption in broadcasts); relay and bot can't read them. Every offer, `mumcord.file`, `mumcord.peer` and broadcast control message is untrusted: size-checked before parsing, fields validated. File names sanitized (FR-7.23); no path from the network ever reaches the file system unsanitized. Downloads never open automatically. Risky-type warning. Mark-of-the-web.
-- **Privacy:** no file names, checksums, sizes of specific files, user names or chat content in logs; only counts (transfers started/finished/failed, bytes) at `info`. The relay operator sees: who transfers to whom (certificate hashes), volume, timing, IP addresses, and the allowed-use of each session; not names or contents. PRIVACY.md gets a file-sharing section and the broadcast note. Share sound (#435): only the chosen source is captured, Mumcord's own sound and the microphone never; app names, window titles and process ids never leave the device and are never logged (FR-7.87); PRIVACY.md gets a short "Screen-share sound" note.
-- **Performance:** hashing ≥ 300 MB/s on a modern CPU; a 2 GB file hash finishes in under 10 s; UI stays responsive during zip/hash. Hardware probe and self-test never block startup; probe ≤ 3 s, self-test ≤ 2 s per (resolution, fps). Software AV1 1080p30 ≤ 4 cores at 100 %; load monitoring prevents sustained overload. mumpeer: one broadcast of 25 viewers at 6 Mbit/s on a 2-vCPU VPS with < 50 % CPU.
+- **Security:** file and media data only ever end-to-end encrypted (inner QUIC, or frame encryption in broadcasts); relay and bot can't read them. Every offer, `mumcord.file`, `mumcord.peer` and broadcast control message is untrusted: size-checked before parsing, fields validated. File names sanitized (FR-7.23); no path from the network ever reaches the file system unsanitized. Downloads never open automatically. Risky-type warning. Mark-of-the-web. New media profile: the description is size-checked before parsing, the AAD binds channel, flags and SFrame header, and a new-format relay sees only channel, flags and the SFrame header (FR-7.92, FR-7.94).
+- **Privacy:** no file names, checksums, sizes of specific files, user names or chat content in logs; only counts (transfers started/finished/failed, bytes) at `info`. The relay operator sees: who transfers to whom (certificate hashes), volume, timing, IP addresses, and the allowed-use of each session; not names or contents. On a new-format relay link it sees no timestamp, resolution or frame sequence (FR-7.92). PRIVACY.md gets a file-sharing section and the broadcast note. Share sound (#435): only the chosen source is captured, Mumcord's own sound and the microphone never; app names, window titles and process ids never leave the device and are never logged (FR-7.87); PRIVACY.md gets a short "Screen-share sound" note.
+- **Performance:** hashing ≥ 300 MB/s on a modern CPU; a 2 GB file hash finishes in under 10 s; UI stays responsive during zip/hash. Hardware probe and self-test never block startup; probe ≤ 3 s, self-test ≤ 2 s per (resolution, fps). Software AV1 1080p30 ≤ 4 cores at 100 %; load monitoring prevents sustained overload. mumpeer: one broadcast of 25 viewers at 6 Mbit/s on a 2-vCPU VPS with < 50 % CPU. The new codec allocates nothing per message once warm; the relay's peek/skip/forward path shows no regression against 0.8.0 across the benchmark (150 B audio, 30 KB video delta, 400 KB keyframe; the accepted keyframe caveat is recorded with the figures).
 - **Battery:** on battery power Automatic skips software AV1 (FR-7.53).
 - **Accessibility:** section 5.
 - **Platforms:** Windows 10+, macOS 12+, Linux (all Mumcord targets). Share sound: Windows 10 version 2004+, macOS 13+, Linux with PipeWire; below that a share has no sound and says why (FR-7.84). Hardware encoders as listed in FR-7.53; macOS has only software AV1 and software VP9.
@@ -576,7 +669,9 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 - **Licences:** third-party notices and the licences window list SVT-AV1 (BSD-3-Clause-Clear + AOM Patent License 1.0), dav1d (BSD-2-Clause). No GPL parts, no H.264.
 - **mumpeer:** release with broadcast and uses; README sections "Allowed uses" and "Broadcasts and bandwidth"; `testenv/` gains a profile with broadcasts enabled and a scripted subscriber load tool (`bcast-sim`, N fake viewers that are real Mumble clients with certificates, send hello and Watch, join and count frames) for AC-7.29.
 - **mumbot:** release with the `peer` extensions; CHANGELOG.
-- **mumcord-p2p:** version bump on crates.io for the extended `mumcord.peer` types.
+- **mumcord-p2p:** version bump on crates.io for the extended `mumcord.peer` types; the 0.9.0 media profile adds the `media` module types and the `legacy` module and needs its own version bump.
+- **Bovnar 2.1.0 (0.9.0):** the workspace and mumpeer use `bovnar` 2.1.0 (`bovnar::codec`); it is MIT, its `PROVENANCE.json` matches the published crate, and `scripts/generate-notices.sh` / `scripts/ci/test-notices.sh` name v2.1.0. The plugin-SDK prebuilt wasm library is refreshed to the same version.
+- **0.9.0 releases:** Mumcord 0.9.0, mumpeer 0.3.0 and a mumbot patch ship together; the release notes explain the new format, the fallback and the direct camera path (`specs/07-08-bovnar-media-streams-0.9.0-plan.md` §10).
 - **Test hooks** (debug builds only, environment variables): force encoder probe results, add artificial encode delay, fake battery state. Never in release builds.
 - **README (#435):** the table "Screen sharing (Beta): what each system supports" changes its Sound column: Windows "Whole screen: desktop sound without Mumcord; one window: only that app's sound; Windows 10 version 2004 or newer"; macOS "Whole screen: desktop sound without Mumcord; window or app: only its sound; macOS 13 or newer"; Linux Wayland "With PipeWire: whole screen = desktop sound without Mumcord, window = that app's sound (asks when unclear); no sound without PipeWire"; Linux X11 "With PipeWire: desktop sound without Mumcord; no sound without PipeWire". The "No sound" lines for Linux go away. CHANGELOG entry under [Unreleased].
 - **E2E (Linux, #435):** the CI Linux E2E image runs a headless PipeWire with WirePlumber; test apps are `pw-play` instances with distinct sine tones and distinct `application.name`; a debug-only test hook selects the picker result (screen or window with a given app hint) and another reports the dominant frequencies of the share sound a viewer receives. Never in release builds.
@@ -669,6 +764,26 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 70. **AC-7.70** Privacy: after AC-7.61 … AC-7.64 the client log (debug level too) contains no app names, window titles, binary names or process ids, only mode and reason; the packet inspector and the relay see no app name.
 71. **AC-7.71** Accessibility and looks: the sound line in the start dialog, the "Which app's sound?" list and the live bar's sound line match their mockups in dark and light, are keyboard operable with screen-reader labels (the reason is read for "No sound"), and show translated texts in one non-English locale.
 
+**Bovnar media streams (0.9.0, #492)** — numbers provisional until the 0.8.0 branch is merged; final renumbering once after that merge. Setup as above, plus a local mumpeer with `media: 2` and 0.8.x clients where named. E2E spec names are the 0.9.0 media specs added under `e2e/specs/` (E4); they run in the relay environment of `e2e/README.md`. Checks marked *manual* need a 0.8.x build, `sudo testenv/netns.sh`, a capture on the relay host or a human judgement and are not automatable there.
+
+72. **AC-7.72** A and B are 0.9.0 with a new mumpeer; A shares. A's packet inspector shows one endless `.media = \x00` document, the description on channel 0 and each frame on its layer channel; a capture on the relay host shows only channel, flags and the SFrame header — never a timestamp, resolution or frame sequence; B watches the share. (E2E: `e2e/specs/media/media-streams.e2e.ts`; relay-host capture: manual check)
+73. **AC-7.73** Share sound: A shares sound; B hears it; the inspector shows audio messages on channel 5. Late joiner C joins mid-share: C receives the description before the first frame and starts at the next keyframe. (E2E: `e2e/specs/media/media-streams.e2e.ts`)
+74. **AC-7.74** A picks 720p15 and separately switches the codec mid-share → A sends a new description; B applies it only at a keyframe; no frame is decoded with the wrong description (inspector and decoder log). (E2E: `e2e/specs/media/media-streams.e2e.ts`)
+75. **AC-7.75** B chooses "up to 15" → B receives only channels 1–2 and its frame rate drops; C keeps the full rate; the relay log shows the dropped channels. B switches back to Auto and then to "up to 15" again → B receives channels 1–4 and then 1–2 again, with the picture never stopping. (E2E: `e2e/specs/media/media-streams.e2e.ts`)
+76. **AC-7.76** B stops watching → A rekeys and sends the new description with the new key; a test hook holding B's old key cannot decrypt the new frames; C keeps watching without a black frame; the relay sees only channel, flags and the SFrame header. (E2E: `e2e/specs/media/media-streams.e2e.ts`, `keepOldKey`)
+77. **AC-7.77** Malformed, truncated and oversized input is refused on every path: (a) two 0.9.0 clients on a new direct share, where a test sender writes a truncated document, a description with a wrong type, an unknown channel, unknown flag bits and a video message above 4 MiB + 64; (b) a new relay broadcast over QUIC, with the same messages, an 8 KiB+ description, a message split at every byte and a drop at a chunk boundary; (c) the same over TCP (`netns.sh noudp`); (d) a 0.8.x client reading old-format units. Every case drops the message with a reason code, without a crash, a hang or media content in the log; a stream that ends at a message boundary ends cleanly. (E2E: `e2e/specs/media/media-streams.e2e.ts` for (a) and (b) over QUIC; (c) and (d): manual check)
+78. **AC-7.78** A 0.9.0 sharer with a 0.8.x viewer and an old relay (profile `old`) shares in the old format; the 0.8.x viewer sees the share; the inspector shows the old header; no new-format message reaches the old viewer. (manual check: needs a 0.8.x build)
+79. **AC-7.79** A 0.9.0 sharer with a 0.8.x viewer and a new relay (profile `all`): the old viewer gets an old-format direct copy while the direct limit allows, otherwise "This share needs Mumcord 0.9.0"; checked with two old viewers and with all 8 direct slots in use. (manual check: needs 0.8.x builds)
+80. **AC-7.80** A 0.9.0 sharer with an old relay (profile `old`) and separately with no relay at all (no mumbot, no relay announced) and a 0.9.0 viewer falls back to a new-format direct `STREAM_SCREEN` share; the share never stops; with the old relay A sees "This server's relay needs an update", without a relay that text does not appear; the inspector shows one `.media` document and no relay session is opened. (E2E: `e2e/specs/media/media-streams.e2e.ts`)
+81. **AC-7.81** A 0.8.x sharer and a 0.8.x viewer on an old relay and on a new relay use the old relay broadcast exactly as before; the new relay names the old format in the bind, and every subscriber of that broadcast binds with the same format — the relay log shows no mixed format inside one broadcast, while the new relay still serves 0.9.0 clients in their own new-format broadcasts. (manual check: needs a 0.8.x build; the bind and the no-mixing rule can be read from the relay log)
+82. **AC-7.82** The counting allocator shows zero allocations per message once warm; the relay peek/skip/forward benchmark (150 B audio, 30 KB video delta, 400 KB keyframe) shows no regression against 0.8.0; the figures and the accepted 400 KB keyframe caveat are recorded. (unit/benchmark)
+83. **AC-7.83** The Rust output matches the C reference in both directions through `bovnar` 2.1.0; every network decoder (media reader, description, control messages, crypto opener, legacy header) runs clean for the fixed CI fuzz budget. (unit/CI)
+84. **AC-7.84** Dark and light screenshots exist for every changed UI surface; every new text is in all 24 locales; keyboard and screen-reader checks pass. (manual visual check; axe scans where the view is reachable)
+85. **AC-7.85** A and B are 0.9.0 with no relay and no bot (mumbot stopped); A shares and B watches on a direct `STREAM_SCREEN` stream. A's inspector shows one endless `.media` document, the description (kind `screen`, `.timebase`, tracks) on channel 0 before the first frame and frames on channels `1 + layer`, with no SFrame header; B's picture plays. C joins the channel later and watches mid-share: C receives the description before its first frame and starts at the next keyframe. B's keyframe request (the existing `screen_share_request_keyframe`, as after a lost frame) makes A send a keyframe on every video channel within 1 s. (E2E: `e2e/specs/media/media-streams.e2e.ts`)
+86. **AC-7.86** Two 0.9.0 clients with the new relay, whose link is forced to TCP 443 (`sudo testenv/netns.sh up noudp`, which drops all UDP from both clients): A shares and B watches; the new-format broadcast works over TCP, the relay log names TCP and shows `0x01` mux chunks carrying the media messages; a video message above 64 KiB reassembles across chunks; B's layer choice and a late joiner work as over QUIC. (manual check)
+87. **AC-7.87** A, B and C are 0.9.0 with the new relay; A's share runs. B invokes the existing keyframe request (as after a lost frame); the relay forwards at most one `kf` per 2 s per subscriber and one per 500 ms per broadcast; A's inspector shows the forwarded request and a new keyframe on channels 1–4 within 1 s; B's picture continues without a stall; C is unaffected and sees no keyframe storm. (E2E: `e2e/specs/media/media-streams.e2e.ts`)
+88. **AC-7.88** A 0.8.x sharer with a 0.9.0 viewer on an old relay and on a new relay: the 0.9.0 viewer watches the old-format stream as today (old direct/relay path, old header in the inspector, wire version 1/2), no new-format error appears, and the stream never changes format mid-share. (manual check: needs a 0.8.x build; the new relay's old-format bind can be read from the relay log)
+
 ## 12. Decision log
 
 | Question | Decision | Note |
@@ -711,6 +826,19 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Sound switch (#435, QA.4) | Stays as on/off on top of the automatic choice | User decision 2026-11-04; FR-7.78 |
 | Below the minimum version | No sound, Sound switch disabled with a note naming the needed version or PipeWire | Derived from QA.3; FR-7.84 |
 | Default save folder (mockup 8) | `<system Downloads>/Mumcord`, created on the first download; a user-chosen folder is used as-is | mockup 8 wins over the spec text (user decision 2); FR-7.25 |
+| Media profile (#492, 2026-11-10) | New Bovnar media profile when both ends and the relay support it; the old 14/21-byte format stays as a capability-based fallback through 0.9.x. The clean-break decision of 2026-11-04 is superseded. | Product-owner decisions 2026-11-10; FR-7.89 … FR-7.99 |
+| Description placement (D1) | Channel 0 only; no `.meta` preamble | One mechanism for the first description, later changes and the relay cache; FR-7.91 |
+| Description encryption (D2) | Encrypted with the current share key on the relay path; resent at every rekey; the relay caches the ciphertext opaquely | Relay stays blind; FR-7.95, FR-7.100 |
+| Temporal layer mapping (D3) | Channel = 1 + temporal layer; a keyframe is always layer 0; up to four layers fit channels 1–4 | P0.4 passed for every encoder path (software directly, hardware through the mock-driver tests and the normal hardware acceptance); FR-7.90 |
+| SFrame header and AAD (D4) | RFC 9605 header; AAD = channel varint + flags + SFrame header; timestamp inside the ciphertext | Relay sees only channel, flags and the SFrame header; FR-7.92 |
+| Direct reverse control (D5) | The one-byte `KEYFRAME_REQUEST` stays; direct camera adds `WANT = 2` + big-endian u16 tile height | No second framing path; FR-7.91, FR-8.93 |
+| Plugin relay data (D6) | Channel 6 on new links; old links keep `Content::Data` | Removes the old header from new-format broadcasts; FR-7.93 |
+| Late joiner (D7) | Relay caches the description ciphertext and the prologue; keys first, then frames from the next keyframe; publisher sends a keyframe on request | FR-7.100 |
+| QUIC relay transport (D8) | One unidirectional stream per message, in order | Revisit only if the measured per-message stream cost matters; FR-7.89 |
+| Capability names (D9) | hello `media-v2`, `Watch`/announcement `mv`, relay bind `"media": 2` | Fixed before code; FR-7.96 |
+| Fallback rule (D10) | Capability-based; the old format is retained and tested, not a best-effort guess | FR-7.97 |
+| Old viewer on a new relay | Old-format direct copy while the 8-viewer direct limit allows; otherwise "This share needs Mumcord 0.9.0" | Product-owner decision 2026-11-10; FR-7.97 (screen share only; the camera fallback is FR-8.95) |
+| Old-format lifetime (D14) | Keep through 0.9.x; remove only in a later milestone once 0.8.x is unsupported | Product-owner decision 2026-11-10; FR-7.98 |
 
 ## 13. Open points & risks
 
@@ -724,6 +852,7 @@ Open points (the recommended answer is already written into this spec):
 - **Q-F3** Retention of finished file cards: kept with chat history (this spec). Owner: user.
 - **Q-SA1** "Which app's sound?" list: does it also offer "Whole desktop sound" as an entry? This spec says no (apps plus "No sound"), to keep a window share from leaking other apps' sound. Owner: user.
 - **Q-SA2** Linux window match: which hint the portal/compositor provides varies (GNOME, KDE, wlroots); if none provides any, the list appears on every window share. This spec accepts that. Owner: user.
+- **0.9.0 media streams:** no open points; D1–D14 are settled in section 12. FR and AC numbers are provisional only until the 0.8.0 branch is merged, then renumbered once (header note).
 
 Risks:
 - **Relay bandwidth:** one 25-viewer share needs up to 150–225 Mbit/s out; small community VPS relays can carry few. Defaults stay conservative (`max_broadcasts = 4`, `total_mbit = 200`); the client handles "relay full" by falling back.
@@ -737,6 +866,8 @@ Risks:
 - **Linux window sound matching (#435):** desktop portals don't reveal the window's app, so matching is a heuristic; apps that play through a helper process (e.g. browsers' audio service, Flatpak sandboxes) may not match and fall back to the list. Wrong matches are limited by requiring exactly one candidate.
 - **Windows exclusion of the web view:** Mumcord's web view runs in its own processes; they must be inside the excluded process tree, or a watch party would be shared. Covered by AC-7.67.
 - **Offer spoofing:** anyone can post a hand-made offer message; the card always shows the real Mumble sender, and the download is only accepted from that sender's session and checked against the hash.
+- **Two media formats:** they double the test matrix and keep old code alive. A single format-selection point, the kept legacy tests and the explicit fallback matrix (FR-7.97) contain it; the old format is removed only after 0.8.x is unsupported (FR-7.98).
+- **Temporal layer mapping on real GPUs:** P0.4 settled the mapping; the hardware encoders verify it through their mock drivers and the normal hardware acceptance (AC-7.36, E4) on real machines, so a driver that misreports layers is caught there, not by a separate open point.
 
 ## 14. Impact on the roadmap
 
@@ -748,6 +879,8 @@ Risks:
 - **README** "Screen sharing (Beta): what each system supports": Sound column updated, the "No sound" lines for Linux removed (§10).
 - **Epic 4.1 camera spec** reuses the resizable media area (FR-7.74) and must not add its own handle.
 - New hello features `files` and `screen-broadcast` count toward the hello limit of 16 features (spec 06).
+- **0.9.0 media streams (#492):** extends this spec (FR-7.89 … FR-7.101) and spec 08 (direct camera path); mumpeer 0.3.0 speaks both formats and advertises `media: 2`; mumbot passes `mv` through with no media parsing. The old format stays until a later milestone (FR-7.98).
+- New hello feature `media-v2` counts toward the hello limit of 16 (spec 06).
 
 ## 15. Implementation split
 
@@ -758,3 +891,5 @@ Risks:
 | Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, SVT-AV1/dav1d/vendor-SDK builds, selection and load monitoring; codec negotiation (wire v2) |
 | Step 2b (parallel) | — | — | Share sound sources (#435): Windows process loopback, macOS capture audio, Linux PipeWire capture and matcher, "Which app's sound?" list, dialog and live-bar sound lines (after the mockups); E2E AC-7.61 … AC-7.66, AC-7.70, AC-7.71; README, PRIVACY.md, CHANGELOG |
 | Step 3 | Release + README | Release | Broadcast publisher/subscriber, frame encryption, key exchange, fallback logic, viewer list; E2E along AC-7.1 … AC-7.43; PRIVACY.md, licences, 24 locales |
+
+The **0.9.0 media streams** build follows `specs/07-08-bovnar-media-streams-0.9.0-plan.md` §7 and its task briefs (W1–W6, D1–D7, R1–R6, E1–E5) on `milestone/0.9.0`; this spec's FRs and ACs are the contract. The direct camera path is spec 08 §4.14.

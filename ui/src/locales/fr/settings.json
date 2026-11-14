@@ -772,7 +772,13 @@
       "gap": "Écart avec le paquet précédent",
       "kind": "Identifiant interne",
       "size": "Taille",
-      "decoded": "Contenu décodé"
+      "decoded": "Contenu décodé",
+      "media": "Média"
+    },
+    "media": {
+      "channel": "canal {{channel}}",
+      "keyframe": "image clé",
+      "delta": "image delta"
     },
     "noDecoding": "Ce contenu n’a pas de forme lisible ; voir les octets bruts.",
     "controlOnly": "Message Mumble standard : seuls son type et sa taille sont enregistrés.",
@@ -793,7 +799,8 @@
       "watch": "État de la soirée de visionnage",
       "plugin": "Données de plugin",
       "mumble": "Message Mumble",
-      "peer": "Configuration du relais"
+      "peer": "Configuration du relais",
+      "media": "Flux média"
     }
   },
   "licences": {

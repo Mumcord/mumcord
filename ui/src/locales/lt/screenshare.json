@@ -167,7 +167,7 @@
     "noFanoutBody_other": "Kiekvienas žiūrovas gauna savo kopiją iš tavo kompiuterio, todėl stebėti gali iki {{max}} žmonių. Kokybė krenta, kai prisijungia daugiau: dabar {{count}} žiūrovų reikia apie {{mbit}} Mbit/s išsiuntimo spartos, todėl tavo bendrinimas veikia {{now}} vietoj {{wanted}}.",
     "fanoutUnavailable": "Perdavimo mazgo transliacija nepasiekiama ({{reason}}). Kiekvienas žiūrovas gauna savo kopiją, todėl stebėti gali iki {{max}} žmonių, o kokybė gali kristi.",
     "reasonNoRelay": "šis serveris neturi perdavimo mazgo",
-    "reasonOldRelay": "perdavimo mazgas per senas",
+    "reasonOldRelay": "šio serverio perdavimo mazgą reikia atnaujinti",
     "reasonDisallowed": "perdavimo mazgas neleidžia bendrinti ekrano",
     "reasonRefused": "perdavimo mazgas atmetė transliaciją",
     "reasonFull": "perdavimo mazgas perpildytas",

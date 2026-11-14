@@ -25,6 +25,9 @@ use std::process::Command;
 
 use sha2::{Digest, Sha256};
 
+#[path = "src/artifact_dir.rs"]
+mod artifact_dir;
+
 struct Download {
     url: &'static str,
     sha256: &'static str,
@@ -109,6 +112,7 @@ fn runtime_for(os: &str, arch: &str) -> Option<Runtime> {
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=src/artifact_dir.rs");
     println!("cargo:rerun-if-env-changed=MUMCORD_FETCH_CACHE");
     let out_dir = PathBuf::from(env::var_os("OUT_DIR").expect("cargo sets OUT_DIR"));
     let cache = cache_dir();
@@ -237,8 +241,10 @@ fn fetch_runtime(cache: &Path, runtime: &Runtime, out_dir: &Path) -> Result<Path
             .map_err(|err| format!("cannot store {}: {err}", library.display()))?;
         let _ = fs::remove_dir_all(&scratch);
     }
-    // OUT_DIR is target/<profile>/build/<crate>-<hash>/out; executables live in target/<profile>.
-    if let Some(exe_dir) = out_dir.ancestors().nth(3) {
+    // Executables live in the profile directory. `OUT_DIR` is under `build/` at a depth that
+    // changed in Cargo 1.100, so walk up instead of counting parents (see `artifact_dir`).
+    let profile = env::var("PROFILE").unwrap_or_else(|_| "debug".to_string());
+    if let Some(exe_dir) = artifact_dir::artifact_dir(out_dir, &profile) {
         let target = exe_dir.join(runtime.library);
         if !target.is_file()
             || fs::metadata(&target).map(|m| m.len()).ok()
@@ -247,6 +253,11 @@ fn fetch_runtime(cache: &Path, runtime: &Runtime, out_dir: &Path) -> Result<Path
             fs::copy(&library, &target)
                 .map_err(|err| format!("cannot copy the library to {}: {err}", target.display()))?;
         }
+    } else {
+        println!(
+            "cargo:warning=ONNX Runtime library was not copied next to the executables (no {profile} directory above {})",
+            out_dir.display()
+        );
     }
     Ok(library)
 }

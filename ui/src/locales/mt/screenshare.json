@@ -171,7 +171,7 @@
     "noFanoutBody_other": "Kull wieħed li jara jirċievi kopja tiegħu mill-kompjuter tiegħek, għalhekk jistgħu jarawha sa {{max}} persuni. Il-kwalità tonqos hekk kif jingħaqdu aktar: bħalissa {{count}} spettatur jeħtieġu madwar {{mbit}} Mbit/s ta' upload, għalhekk il-qsim tiegħek jaħdem fuq {{now}} minflok {{wanted}}.",
     "fanoutUnavailable": "Il-fan-out tar-relay mhuwiex disponibbli ({{reason}}). Kull wieħed li jara jirċievi kopja tiegħu, għalhekk jistgħu jaraw sa {{max}} u l-kwalità tista' tonqos.",
     "reasonNoRelay": "dan is-server m'għandux relay",
-    "reasonOldRelay": "ir-relay huwa qadim wisq",
+    "reasonOldRelay": "ir-relay ta' dan is-server jeħtieġ aġġornament",
     "reasonDisallowed": "ir-relay ma jippermettix il-qsim tal-iskrin",
     "reasonRefused": "ir-relay irrifjuta x-xandir",
     "reasonFull": "ir-relay huwa mimli",

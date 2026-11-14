@@ -8,7 +8,9 @@ use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use mumcord_engine::Engine;
-use mumcord_engine::inspector::{InspectorPoll, PacketCount, PacketView, TapDirection, VoiceCount};
+use mumcord_engine::inspector::{
+    InspectorPoll, MediaView, PacketCount, PacketView, TapDirection, VoiceCount,
+};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, Manager, State, WebviewWindow};
@@ -62,6 +64,53 @@ pub struct Packet {
     pub decoded: Option<String>,
     /// The plugin data as lowercase hex; empty for other types.
     pub raw_hex: String,
+    /// What this message is within its media stream; `null` for control-channel packets.
+    pub media: Option<MediaPacket>,
+}
+
+/// One message of a media stream (FR-7.101): its format, channel, flags and keyframe state.
+/// The media content itself is never captured, so there is no payload here.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaPacket {
+    /// `"media"` for the 0.9.0 `.media` document, `"legacy"` for the old fixed header.
+    pub format: MediaFormat,
+    /// The old header's version byte; `null` for the media document.
+    pub version: Option<u8>,
+    /// The channel the message travelled on; `null` for the old header, which has none.
+    pub channel: Option<u16>,
+    /// The channel-0 control kind; `null` for a track message.
+    pub control: Option<u8>,
+    /// The track message's flags byte; `null` for a control message and the old header.
+    pub flags: Option<u8>,
+    pub keyframe: bool,
+}
+
+/// The wire format of a captured media stream.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum MediaFormat {
+    Media,
+    Legacy,
+}
+
+impl From<MediaView> for MediaPacket {
+    fn from(view: MediaView) -> Self {
+        let (format, version) = match view.format {
+            mumcord_engine::inspector::MediaFormat::Document => (MediaFormat::Media, None),
+            mumcord_engine::inspector::MediaFormat::Legacy(version) => {
+                (MediaFormat::Legacy, Some(version))
+            }
+        };
+        Self {
+            format,
+            version,
+            channel: view.channel,
+            control: view.control,
+            flags: view.flags,
+            keyframe: view.keyframe,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
@@ -118,6 +167,7 @@ impl From<PacketView> for Packet {
             tokens_left: p.tokens_left,
             decoded: p.decoded,
             raw_hex: p.raw_hex,
+            media: p.media.map(MediaPacket::from),
         }
     }
 }

@@ -7,14 +7,15 @@
   "cameraOnLabel": "Tvoja kamera je zapnutá",
   "cameraOffLabel": "Tvoja kamera je vypnutá",
   "personCameraOn": "Kamera používateľa {{name}} je zapnutá",
-  "notInChannel": "Pripoj sa k hlasovému kanálu, potom môžeš zapnúť kameru.",
+  "notInChannel": "Pripoj sa k hlasovému kanálu, aby si mohol zapnúť kameru.",
   "unavailable": {
     "noRelay": "Tento server nemá relay, takže zdieľanie kamery nie je dostupné.",
     "relayTooOld": "Relay tohto servera je na zdieľanie kamery príliš starý.",
     "relayDisallows": "Relay tohto servera zdieľanie kamery nepovoľuje.",
-    "needsRelayMode": "Zdieľanie kamery potrebuje relay. Zmeň to v Súkromie a pripojeniach.",
+    "needsRelayMode": "Zdieľanie kamery je vypnuté. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
     "registeredOnly": "Na tomto serveri môžu kameru používať len registrovaní používatelia.",
+    "needsDirect": "Zdieľanie kamery potrebuje priame pripojenia. Zmeň to v Súkromie a pripojeniach.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera zapnutá",
@@ -96,7 +97,7 @@
     "denied": "Kameru sa nepodarilo spustiť: relay servera ju odmietol.",
     "relayDown": "Kamera sa zastavila: relay nie je dostupný",
     "rateLimited": "Kameru sa nepodarilo spustiť: príliš veľa pokusov. Skús to znova o minútu.",
-    "mode": "Zdieľanie kamery potrebuje relay. Zmeň to v Súkromie a pripojeniach.",
+    "mode": "Zdieľanie kamery je vypnuté. Zmeň to v Súkromie a pripojeniach.",
     "noCertificate": "Zdieľanie kamery potrebuje klientsky certifikát.",
     "endedByRelay": "Kameru zastavil relay servera",
     "dismissStopped": "Zavrieť",
@@ -104,7 +105,7 @@
     "groupNotAllowed": "Kamera sa nespustila: relay tohto servera obsluhuje len určité skupiny. Požiadaj správcu, nech ťa pridá.",
     "notSameChannel": "Kamera sa nespustila: ty a tvoji diváci musíte byť v rovnakom kanáli.",
     "notInChannel": "Kamera sa nespustila: najprv sa pripoj do kanála.",
-    "noHello": "Kamera sa nespustila: bot relayu túto aplikáciu ešte nepozná. Pripoj sa znova."
+    "noHello": "Kamera sa nespustila: bot relaya túto aplikáciu ešte nepozná. Pripoj sa znova."
   },
   "privacy": {
     "windows": "Windows blokuje prístup ku kamere desktopovým aplikáciám",
@@ -121,11 +122,11 @@
     "stopped": "Tvoja kamera sa zastavila",
     "joined": "{{name}} zapol(a) kameru",
     "left": "{{name}} vypol(a) kameru",
-    "turnedOn_one": "{{names}} zapol(a) kameru",
+    "turnedOn_one": "{{names}} zapol/zapla kameru",
     "turnedOn_few": "{{names}} zapli kamery",
     "turnedOn_many": "{{names}} zapli kamery",
     "turnedOn_other": "{{names}} zapli kamery",
-    "turnedOff_one": "{{names}} vypol(a) kameru",
+    "turnedOff_one": "{{names}} vypol/vypla kameru",
     "turnedOff_few": "{{names}} vypli kamery",
     "turnedOff_many": "{{names}} vypli kamery",
     "turnedOff_other": "{{names}} vypli kamery"
@@ -147,7 +148,11 @@
     "people_other": "{{count}} osôb",
     "limit": "{{count}} z {{max}} kamier",
     "relay": "Relay · end-to-end šifrovanie",
+    "direct": "Priamo · end-to-end šifrovanie",
+    "both": "Relay a priamo · end-to-end šifrovanie",
     "relayTitle": "Každá kamera sa na relay pošle raz a ten ju rozkopíruje divákom",
+    "directTitle": "Každý divák dostane vlastnú kópiu priamo od teba, bez relay",
+    "bothTitle": "Diváci so starším Mumcordom dostanú kópiu z relay, novší vlastný stream od teba",
     "layout": "Rozloženie",
     "grid": "Mriežka",
     "speaker": "Rečník",
@@ -172,13 +177,13 @@
     "miniBar_many": "{{count}} zapnutej kamery",
     "miniBar_other": "{{count}} zapnutých kamier",
     "cameras": "Kamery",
-    "fullTitle": "Miestnosť je plná (9 kamier)",
+    "fullTitle": "Miestnosť je plná pri 9 kamerách",
     "backgroundPicker": "Zmeniť pozadie"
   },
   "position": {
     "label": "Kamery",
     "beside": "Kamery vedľa",
-    "above": "Hore",
+    "above": "Nad",
     "hidden": "Skryté"
   },
   "tile": {
@@ -193,20 +198,20 @@
     "joining": "Pripájanie ku kamere používateľa {{name}} …",
     "full": "Používateľa {{name}} sleduje príliš veľa ľudí",
     "failed": "Ku kamere používateľa {{name}} sa nepodarilo pripojiť",
-    "needsUpdate": "Táto kamera vyžaduje Mumcord 0.9.0",
     "retry": "Skúsiť znova",
     "hidden": "Video skryté",
     "showVideo": "Zobraziť video",
     "viewing": "Sleduješ",
     "weak": "Slabé pripojenie",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Táto kamera vyžaduje Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Možnosti pre {{name}}",
     "pin": "Pripnúť pre mňa",
     "unpin": "Odopnúť",
     "showLarge": "Zobraziť veľké",
-    "leaveLarge": "Zavrieť veľké zobrazenie",
+    "leaveLarge": "Opustiť veľké zobrazenie",
     "hideVideo": "Skryť video používateľa {{name}}",
     "showVideo": "Zobraziť video používateľa {{name}}",
     "quality": "Kvalita pre mňa",
@@ -224,12 +229,12 @@
     "screenLive": "Naživo",
     "partyTitle": "Spoločné sledovanie",
     "partyStarted": "Spustil(a) {{name}}",
-    "label": "{{title}} s miestnosťou kamier"
+    "label": "{{title}} s miestnosťou s kamerami"
   },
   "settings": {
     "title": "Kamera",
     "intro": "Tvoja kamera, efekty pozadia a to, ako vidíš kamery ostatných.",
-    "needsRelay": "Zdieľanie kamery potrebuje server s relayom mumpeer.",
+    "needsRelay": "Zdieľanie kamery potrebuje server s relay mumpeer.",
     "cameraSection": "Kamera",
     "previewNote": "Ukážka len v tomto zariadení. Skončí, keď túto stránku opustíš.",
     "camera": "Kamera",
@@ -257,15 +262,20 @@
     "manageImages": "Spravovať obrázky",
     "privacySection": "Súkromie",
     "lockOff": "Vypnúť moju kameru pri zamknutí obrazovky",
-    "privacyNote": "Tvoja kamera je na začiatku vždy vypnutá a najprv ukáže náhľad. Vypne sa, keď opustíš kanál alebo sa odpojíš. Vidia ju len ľudia v tvojom hlasovom kanáli, cez relay tohto servera, s end-to-end šifrovaním. Mumcord kamery nikdy nenahráva.",
+    "privacyNote": "Tvoja kamera sa vždy spúšťa vypnutá a najprv ukáže náhľad. Vypne sa, keď opustíš kanál alebo sa odpojíš. Vidia ju len ľudia v tvojom hlasovom kanáli, cez relay tohto servera, s end-to-end šifrovaním. Mumcord kamery nikdy nenahráva.",
     "othersSection": "Kamery ostatných",
     "showCameras": "Zobrazovať kamery",
     "showAlways": "Vždy",
     "showOnOpen": "Keď otvorím miestnosť",
     "showNever": "Nikdy",
-    "showHint": "„Vždy“ otvorí miestnosť kamier, keď niekto v tvojom kanáli zapne kameru. „Nikdy“ ťa nechá len pri hlase a nesťahuje žiadne video.",
+    "showHint": "Vždy otvorí miestnosť kamier, keď niekto v tvojom kanáli zapne kameru. Nikdy ťa nechá len pri hlase a nesťahuje žiadne video.",
     "dataSaver": "Šetrenie dát: až 15 fps pre všetkých",
     "reduceMotion": "Obmedziť pohyb: žiadna žiara ani animácia na rámčeku hovoriaceho",
     "reduceMotionHint": "Predvolene sa riadi nastavením obmedzenia pohybu v systéme."
+  },
+  "viewers": {
+    "title": "Diváci",
+    "relay": "Relay",
+    "direct": "Priamo"
   }
 }

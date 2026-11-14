@@ -1974,6 +1974,16 @@ export type CameraFailure = "notConnected" |
 /**  The relay bot doesn't know this client yet; reconnect (#601). */
 "noHello";
 
+/**
+ *  How one viewer gets the own camera (FR-8.62, FR-8.94); the camera room's viewer list shows
+ *  it.
+ */
+export type CameraPath = 
+/**  Through the relay broadcast. */
+"relay" | 
+/**  Through its own stream. */
+"direct";
+
 /**  "Reduce motion" for the speaking frame; `system` follows the operating system. */
 export type CameraReduceMotion = "system" | "on" | "off";
 
@@ -2046,7 +2056,7 @@ export type CameraTileState =
 "hidden";
 
 /**  Why camera sharing is unavailable (FR-8.4); the UI shows the text of the reason. */
-export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | 
+export type CameraUnavailable = "noRelay" | "relayTooOld" | "relayDisallows" | "needsRelayMode" | "noCertificate" | "needsDirect" | 
 /**  This platform has no camera backend at all (FR-13.27). */
 "unsupportedPlatform";
 
@@ -2056,10 +2066,16 @@ export type CameraView = {
 	state: CameraState,
 	/**  Why the last **Turn on camera** failed; shown in the preview until the next try. */
 	error: CameraFailure | null,
-	/**  The broadcast id (16 hex) while on air. */
+	/**  The relay broadcast id (16 hex) while on air; `null` for a camera that runs without one. */
 	broadcast: string | null,
-	/**  The people who receive the camera now. */
-	viewers: number[],
+	/**  The people who receive the camera now, with the path each of them gets. */
+	viewers: CameraViewer[],
+};
+
+/**  One admitted viewer of the own camera. */
+export type CameraViewer = {
+	session: number,
+	path: CameraPath,
 };
 
 /**  The server's certificate is unknown or changed; the connection waits for `cert_trust_decide`. */
@@ -2497,6 +2513,8 @@ export type ErrorCode =
 "shortcutNotConfirmed" | 
 /**  The screen share already has the maximum of 8 viewers (FR-2.43). */
 "shareFull" | 
+/**  The share or camera needs a newer Mumcord. */
+"needsUpdate" | 
 /**
  *  Watching a screen share needs a direct connection and none can be made (FR-2.46);
  *  `message` is the reason: `consentOff`, `peerUnsupported` or `noDirectPath`.
@@ -3175,6 +3193,25 @@ export type MassMoveResult =
 { kind: "done"; moved: number; total: number } | 
 /**  Another mass move is still running on this server (FR-10.18). */
 { kind: "alreadyRunning" };
+/**  The wire format of a captured media stream. */
+export type MediaFormat = "media" | "legacy";
+
+/**
+ *  One message of a media stream (FR-7.101): its format, channel, flags and keyframe state.
+ *  The media content itself is never captured, so there is no payload here.
+ */
+export type MediaPacket = {
+	format: MediaFormat,
+	/**  The old header's version byte; `null` for the media document. */
+	version: number | null,
+	/**  The channel the message travelled on; `null` for the old header, which has none. */
+	channel: number | null,
+	/**  The channel-0 control kind; `null` for a track message. */
+	control: number | null,
+	/**  The track message's flags byte; `null` for a control message and the old header. */
+	flags: number | null,
+	keyframe: boolean,
+};
 
 /**  Which views are popped out changed; sent to every window. */
 export type MediaPopoutChanged = {
@@ -3584,6 +3621,8 @@ export type Packet = {
 	decoded: string | null,
 	/**  The plugin data as lowercase hex; empty for other types. */
 	rawHex: string,
+	/**  What this message is within its media stream; `null` for control-channel packets. */
+	media: MediaPacket | null,
 };
 
 export type PacketCapture = {

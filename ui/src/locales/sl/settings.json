@@ -777,7 +777,13 @@
       "gap": "Razmik od prejšnjega paketa",
       "kind": "Notranji ID",
       "size": "Velikost",
-      "decoded": "Dekodirana vsebina"
+      "decoded": "Dekodirana vsebina",
+      "media": "Mediji"
+    },
+    "media": {
+      "channel": "kanal {{channel}}",
+      "keyframe": "ključna sličica",
+      "delta": "delta sličica"
     },
     "noDecoding": "Ta vsebina nima berljive oblike; oglej si surove bajte.",
     "controlOnly": "Standardno sporočilo Mumble: beležita se le njegova vrsta in velikost.",
@@ -798,7 +804,8 @@
       "watch": "Stanje skupnega gledanja",
       "plugin": "Podatki vtičnika",
       "mumble": "Sporočilo Mumble",
-      "peer": "Nastavitev releja"
+      "peer": "Nastavitev releja",
+      "media": "Medijski tok"
     }
   },
   "licences": {

@@ -4,6 +4,8 @@
 use std::env::consts::{DLL_EXTENSION, DLL_PREFIX};
 use std::ffi::{CString, c_char};
 use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 
 use libloading::Library;
@@ -23,25 +25,49 @@ const COUNT_SHUTDOWN_POSITIONAL: u32 = 4;
 
 const WAIT: Duration = Duration::from_secs(8);
 
-fn find_fixture(exe: &Path) -> Option<PathBuf> {
-    let name = format!("{DLL_PREFIX}test_plugin.{DLL_EXTENSION}");
-    // Cargo 1.100 moved test binaries from deps/ to build/<crate>/<hash>/out/.
-    // The example library still lives in the profile's examples/ directory.
-    exe.ancestors()
-        .skip(1)
-        .map(|dir| dir.join("examples").join(&name))
-        .find(|file| file.is_file())
+/// The built test plugin, built on demand.
+///
+/// `cargo test` compiles the example itself, but a restored target cache can hide the artifact it
+/// produced (seen in CI: the five tests below failed with "libtest_plugin.so missing"). Building
+/// it here keeps the tests working whatever the target directory holds; `OnceLock` keeps the five
+/// parallel tests to one build, and the build is a no-op when the example is already current.
+fn fixture() -> PathBuf {
+    static FIXTURE: OnceLock<PathBuf> = OnceLock::new();
+    FIXTURE.get_or_init(build_fixture).clone()
 }
 
-/// The built test plugin.
-fn fixture() -> PathBuf {
-    let exe = std::env::current_exe().expect("test exe");
-    find_fixture(&exe).unwrap_or_else(|| {
-        panic!(
-            "test plugin missing above {}: run `cargo test -p mumcord-positional`, which builds the test plugin",
-            exe.display()
-        )
-    })
+fn build_fixture() -> PathBuf {
+    let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+    let build = Command::new(cargo)
+        .args([
+            "build",
+            "--locked",
+            "-p",
+            "mumcord-positional",
+            "--examples",
+            "--message-format=json",
+        ])
+        .current_dir(env!("CARGO_MANIFEST_DIR"))
+        .output()
+        .expect("run cargo to build the test plugin");
+    assert!(
+        build.status.success(),
+        "building the test plugin failed: {}",
+        String::from_utf8_lossy(&build.stderr)
+    );
+    // Cargo reports where it put each artifact, so the layout (custom target dir, cached dir,
+    // build-script output) never has to be guessed here. The example is a cdylib, so its path sits
+    // among the artifact's filenames rather than in an "executable" field.
+    let stdout = String::from_utf8_lossy(&build.stdout);
+    let file = stdout
+        .split('"')
+        .filter(|part| part.contains("test_plugin") && part.ends_with(DLL_EXTENSION))
+        .map(PathBuf::from)
+        .find(|path| path.exists());
+    match file {
+        Some(file) => file,
+        None => panic!("cargo built the test plugin but reported no executable: {stdout}"),
+    }
 }
 
 fn plugin_dir(name: &str) -> PathBuf {
@@ -148,26 +174,6 @@ fn info(host: &PluginHost, id: &str) -> PluginInfo {
 
 fn ids(list: &[&str]) -> Vec<String> {
     list.iter().map(|s| (*s).to_owned()).collect()
-}
-
-#[test]
-fn fixture_lookup_supports_both_cargo_binary_layouts() {
-    let dir = plugin_dir("fixture-layouts");
-    let profile = dir.join("custom-target").join("custom-profile");
-    let examples = profile.join("examples");
-    std::fs::create_dir_all(&examples).expect("examples dir");
-    let library = examples.join(format!("{DLL_PREFIX}test_plugin.{DLL_EXTENSION}"));
-    std::fs::write(&library, b"fixture").expect("fixture file");
-
-    for relative in [
-        "deps/plugin_host-hash",
-        "build/mumcord-positional/hash/out/plugin_host-hash",
-    ] {
-        assert_eq!(find_fixture(&profile.join(relative)), Some(library.clone()));
-    }
-    assert_eq!(find_fixture(&dir.join("elsewhere/deps/plugin_host")), None);
-    std::fs::remove_file(&library).expect("remove fixture");
-    assert_eq!(find_fixture(&profile.join("deps/plugin_host-hash")), None);
 }
 
 #[test]

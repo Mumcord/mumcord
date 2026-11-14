@@ -30,11 +30,18 @@ thiserror.workspace = true
 tracing.workspace = true
 socket2.workspace = true
 mumcord-protocol.workspace = true
+# The stream description of the Bovnar media profile (spec 07, FR-7.95).
+bovnar.workspace = true
 
 [dev-dependencies]
 rcgen.workspace = true
 # Path only, so the published package does not depend on mumcord-store.
 mumcord-store = { path = "../store" }
+
+# W5: a hand-rolled harness prints the AC-7.82 figures itself; no benchmark crate is needed.
+[[bench]]
+name = "media"
+harness = false
 
 [lints]
 workspace = true

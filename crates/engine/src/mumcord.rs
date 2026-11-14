@@ -35,6 +35,8 @@ pub const FEATURE_FILES: &str = crate::files::FEATURE;
 /// Feature name of clients that can watch a screen share through the relay broadcast (spec 07,
 /// FR-7.48); viewers without it get a direct copy.
 pub const FEATURE_SCREEN_BROADCAST: &str = "screen-broadcast";
+/// Feature name of clients that read the Bovnar media profile (FR-7.96).
+pub const FEATURE_MEDIA_V2: &str = "media-v2";
 /// What this client can do for other Mumcord clients.
 pub const FEATURES: &[&str] = &[
     "now-playing",
@@ -47,6 +49,7 @@ pub const FEATURES: &[&str] = &[
     crate::screen_share::signal::FEATURE,
     crate::camera::signal::FEATURE,
     FEATURE_SCREEN_BROADCAST,
+    FEATURE_MEDIA_V2,
     crate::pm_rules::FEATURE,
     crate::plugins::FEATURE,
     crate::plugins::SERVER_FEATURE,
@@ -612,7 +615,7 @@ mod tests {
 
     #[test]
     fn file_and_broadcast_features_are_valid_names_and_announced() {
-        for name in [FEATURE_FILES, FEATURE_SCREEN_BROADCAST] {
+        for name in [FEATURE_FILES, FEATURE_SCREEN_BROADCAST, FEATURE_MEDIA_V2] {
             assert!(!name.is_empty() && name.len() <= MAX_FEATURE_LEN);
             assert!(FEATURES.contains(&name));
         }
@@ -631,6 +634,7 @@ mod tests {
                 "files",
                 "full-image",
                 "histimg",
+                "media-v2",
                 "now-gaming",
                 "now-playing",
                 "p2p",

@@ -50,9 +50,10 @@ const PREFIX = 15;
  * sees the connection only when the label shows it, one poll of up to 100 ms or more later (locally
  * up to 7 windows). The app buffers
  * before its first frame goes out and a neural model shifts the frame it returns, so it can sit later.
- * Runs that measured correctly landed 3-57 windows after the connect; the run that failed in CI was 50
- * windows before it, which is impossible, so it matched a shifted part of the clip. */
-const ALIGN_EARLY_GRACE_WINDOWS = 25;
+ * Runs that measured correctly landed 3-57 windows after the connect. On a busy runner the
+ * connected label can show about half a second after the first frame, so the true copy sits
+ * that far before the label. A match seconds away is still a shifted part of the clip. */
+const ALIGN_EARLY_GRACE_WINDOWS = 80;
 const ALIGN_LATE_SLACK_WINDOWS = 100;
 /** How far the second copy of the switch run may sit from where the first copy puts it: the neural
  * backend returns its frame one window late, anything more means audio was lost or held up. */

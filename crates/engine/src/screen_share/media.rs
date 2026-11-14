@@ -12,13 +12,16 @@
 
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
 use mumcord_audio::codec::MAX_PACKET_BYTES;
-use mumcord_audio::mixer::share::share_encoder;
+use mumcord_audio::mixer::share::{SHARE_BITRATE_BPS, share_encoder};
 use mumcord_audio::{FRAME_SAMPLES, SAMPLE_RATE};
+use mumcord_p2p::media::{
+    self as profile, AudioCodec, AudioTrack, Description, StreamKind, Track, VideoCodec, VideoTrack,
+};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_screenshare::{
     Codec, EncodedFrame, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder,
@@ -201,6 +204,9 @@ struct Hub {
     stats: Mutex<ScreenMediaStats>,
     /// The last keyframe the encoder took, for the picture in the sharer's bar (issue #163).
     thumbnail: Mutex<Option<I420Frame>>,
+    /// Where the frames this share sends go for the packet inspector (FR-7.101). Set once,
+    /// right after the share starts, before any viewer can be added.
+    tap: OnceLock<crate::inspector::MediaTapSink>,
 }
 
 impl Hub {
@@ -290,6 +296,7 @@ impl Media {
             top_layer: AtomicU8::new(TEMPORAL_LAYERS - 1),
             stats: Mutex::new(ScreenMediaStats::default()),
             thumbnail: Mutex::new(None),
+            tap: OnceLock::new(),
         });
         crate::crash::set_context("screen share", "sending");
         let thread_hub = hub.clone();
@@ -362,6 +369,12 @@ impl Media {
     /// the next frame (FR-7.58).
     pub fn set_av1_blocker(&self, viewer: Option<u32>) {
         *lock(&self.hub.av1_blocker) = viewer;
+    }
+
+    /// Records what this share sends for the packet inspector (FR-7.101); call it once, before
+    /// any viewer is added.
+    pub fn set_media_tap(&self, tap: crate::inspector::MediaTapSink) {
+        let _ = self.hub.tap.set(tap);
     }
 
     /// Goes back to the encoder before a load fallback; false when the share offers no Undo.
@@ -511,6 +524,16 @@ pub(crate) struct Subscription {
 }
 
 impl Subscription {
+    /// The description this share sends to a media-profile viewer, for the last video frame.
+    pub(crate) fn description(&self, video: FrameHeader) -> Description {
+        media_description(
+            video,
+            self.hub.top_layer.load(Ordering::Relaxed),
+            self.hub.step_fps.load(Ordering::Relaxed),
+            self.hub.sound.load(Ordering::Relaxed),
+        )
+    }
+
     /// The next frame to send, once the upload limits allow it. Relay units carry frame
     /// version 2, and while a viewer that cannot play AV1 watches (on any path), AV1 frames
     /// left from before the switch to VP9 are skipped (FR-7.58).
@@ -543,14 +566,119 @@ async fn write_frames(
     mut send: SendStream,
     caps: ViewerCaps,
 ) {
-    let version = caps.wire;
-    let header_len = wire::header_len(version).unwrap_or(wire::MAX_HEADER_LEN);
+    let format = if caps.media {
+        wire::Format::Media
+    } else {
+        wire::Format::Legacy(caps.wire)
+    };
+    let mut writer = wire::FrameWriter::new(&mut send, format).with_tap(hub.tap.get().cloned());
+    let mut video = None;
+    let mut description = None;
     loop {
-        let frame = paced_next(&queue, &hub, header_len, caps.av1).await;
-        if let Err(e) = wire::write_frame(&mut send, &frame, version).await {
+        let frame = paced_next(&queue, &hub, wire::MAX_HEADER_LEN, caps.av1).await;
+        if matches!(frame.header.kind, FrameKind::Video(_)) {
+            video = Some(frame.header);
+        }
+        if caps.media
+            && let Some(video) = video
+        {
+            let key = DescriptionKey {
+                width: video.width,
+                height: video.height,
+                codec: video.kind,
+                top_layer: hub.top_layer.load(Ordering::Relaxed),
+                fps: hub.step_fps.load(Ordering::Relaxed),
+                sound: hub.sound.load(Ordering::Relaxed),
+            };
+            if description != Some(key) {
+                let wanted = media_description(video, key.top_layer, key.fps, key.sound);
+                if let Err(e) = writer.write_description(&wanted).await {
+                    tracing::debug!(error = %e, "screen stream description to a viewer failed");
+                    return;
+                }
+                description = Some(key);
+                // The viewer applies a new description at a keyframe, so ask for one.
+                hub.keyframe.store(true, Ordering::Relaxed);
+            }
+        }
+        if let Err(e) = writer.write_frame(&frame).await {
             tracing::debug!(error = %e, "screen stream to a viewer ended");
             return;
         }
+    }
+}
+
+/// What a media description depends on; comparing this every frame avoids building a new
+/// description (and allocating its track list) unless something actually changed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct DescriptionKey {
+    width: u16,
+    height: u16,
+    codec: FrameKind,
+    top_layer: u8,
+    fps: u32,
+    sound: bool,
+}
+
+/// The description of what this share sends to a media viewer: one video track per temporal
+/// layer the encoder can emit, plus the audio track while the share has sound (FR-7.95).
+pub(crate) fn media_description(
+    video: FrameHeader,
+    top_layer: u8,
+    fps: u32,
+    sound: bool,
+) -> Description {
+    let FrameKind::Video(codec) = video.kind else {
+        // Callers only pass a video header; keep the profile model valid if that ever changes.
+        return Description {
+            kind: StreamKind::Screen,
+            timebase: 1,
+            id: None,
+            tracks: vec![Track::Video(VideoTrack {
+                channel: profile::CHANNEL_VIDEO_BASE,
+                codec: VideoCodec::Vp9,
+                layer: 0,
+                width: video.width.max(1),
+                height: video.height.max(1),
+                rate: 30.0,
+            })],
+        };
+    };
+    let codec = match codec {
+        Codec::Vp9 => VideoCodec::Vp9,
+        Codec::Av1 => VideoCodec::Av1,
+    };
+    let rate = if fps == 0 {
+        30.0
+    } else {
+        f32::from(u16::try_from(fps).unwrap_or(u16::MAX))
+    };
+    let top = top_layer.min(profile::MAX_LAYER);
+    let mut tracks: Vec<Track> = (0..=top)
+        .map(|layer| {
+            Track::Video(VideoTrack {
+                channel: profile::CHANNEL_VIDEO_BASE + u16::from(layer),
+                codec,
+                layer,
+                width: video.width.max(1),
+                height: video.height.max(1),
+                rate,
+            })
+        })
+        .collect();
+    if sound {
+        tracks.push(Track::Audio(AudioTrack {
+            channel: profile::CHANNEL_AUDIO,
+            codec: AudioCodec::Opus,
+            rate: SAMPLE_RATE,
+            bitrate: u32::try_from(SHARE_BITRATE_BPS / 1000).unwrap_or(96),
+        }));
+    }
+    Description {
+        kind: StreamKind::Screen,
+        timebase: 1,
+        id: None,
+        tracks,
     }
 }
 
@@ -1030,6 +1158,66 @@ mod tests {
 
     /// The lowest quality step (480p15).
     const FLOOR: usize = 3;
+
+    #[test]
+    fn media_description_lists_every_layer_and_the_audio_track() {
+        let video = FrameHeader {
+            kind: FrameKind::Video(Codec::Av1),
+            keyframe: true,
+            temporal_layer: 2,
+            timestamp_us: 0,
+            width: 1920,
+            height: 1080,
+            payload_len: 1,
+        };
+        let description = media_description(video, 2, 30, true);
+        assert_eq!(description.kind, StreamKind::Screen);
+        assert_eq!(description.tracks.len(), 4);
+        for (at, track) in description.tracks[..3].iter().enumerate() {
+            let Track::Video(track) = track else {
+                panic!("layer {at} is not video");
+            };
+            assert_eq!(track.channel, 1 + at as u16);
+            assert_eq!(track.layer, at as u8);
+            assert_eq!(track.codec, VideoCodec::Av1);
+            assert_eq!((track.width, track.height), (1920, 1080));
+            assert_eq!(track.rate, 30.0);
+        }
+        let Track::Audio(audio) = description.tracks[3] else {
+            panic!("no audio track");
+        };
+        assert_eq!(audio.channel, profile::CHANNEL_AUDIO);
+        assert_eq!(audio.bitrate, 96);
+    }
+
+    #[test]
+    fn media_description_has_no_audio_while_the_share_has_no_sound() {
+        let video = FrameHeader {
+            kind: FrameKind::Video(Codec::Vp9),
+            keyframe: false,
+            temporal_layer: 0,
+            timestamp_us: 0,
+            width: 640,
+            height: 360,
+            payload_len: 1,
+        };
+        let description = media_description(video, 9, 0, false);
+        assert_eq!(
+            description.tracks.len(),
+            usize::from(profile::MAX_LAYER) + 1
+        );
+        assert!(
+            description
+                .tracks
+                .iter()
+                .all(|track| matches!(track, Track::Video(_)))
+        );
+        let Some(Track::Video(last)) = description.tracks.last() else {
+            panic!("no video track");
+        };
+        assert_eq!(last.layer, profile::MAX_LAYER);
+        assert_eq!(last.rate, 30.0, "a missing rate falls back to 30 Hz");
+    }
 
     #[test]
     fn viewer_stats_get_the_share_codec_and_their_path() {

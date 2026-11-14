@@ -167,7 +167,7 @@
     "noFanoutBody_other": "Každý divák dostáva vlastnú kópiu z tvojho počítača, takže sa môže pozerať najviac {{max}} ľudí. Kvalita klesá, ako sa pridávajú ďalší: práve teraz {{count}} divákov potrebuje približne {{mbit}} Mbit/s odosielania, takže tvoje zdieľanie beží v {{now}} namiesto {{wanted}}.",
     "fanoutUnavailable": "Rozosielanie cez relay nie je dostupné ({{reason}}). Každý divák dostáva vlastnú kópiu, takže sa môže pozerať najviac {{max}} ľudí a kvalita môže klesnúť.",
     "reasonNoRelay": "tento server nemá relay",
-    "reasonOldRelay": "relay je príliš starý",
+    "reasonOldRelay": "relay tohto servera vyžaduje aktualizáciu",
     "reasonDisallowed": "relay zdieľanie obrazovky nepovoľuje",
     "reasonRefused": "relay vysielanie odmietol",
     "reasonFull": "relay je plný",

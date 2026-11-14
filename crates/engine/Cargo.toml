@@ -140,7 +140,9 @@ test-backend = ["mumcord-audio/test-backend"]
 # protoc-bin-vendored ships, so neither it nor the tests that use it build there (the client
 # itself is unaffected).
 [target.'cfg(not(target_os = "freebsd"))'.dev-dependencies]
-mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.5.4", features = ["tester"] }
+# Live tests drive scripted bots through the mumbot library, pinned to the media-v2 work until it
+# is released.
+mumbot = { git = "https://github.com/sothis/mumbot", rev = "dfd7647cb56aeef3d60732c92c66a3c1215084ac", features = ["tester"] }
 
 [dev-dependencies]
 tempfile.workspace = true
@@ -156,3 +158,8 @@ prost.workspace = true
 
 [lints]
 workspace = true
+
+# W5: a hand-rolled harness prints the AC-7.82 figures itself; no benchmark crate is needed.
+[[bench]]
+name = "media_crypto"
+harness = false

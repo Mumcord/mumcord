@@ -234,7 +234,7 @@ impl PluginService {
         // Before the start, so a plugin may already message from its `start`.
         self.sync_peers();
         if !self.host.all_off()
-            && let Err(error) = self.host.enable(id)
+            && let Err(error) = self.enable_plugin(id)
         {
             self.undo_install(id, previous.as_ref());
             return Err(error.into());

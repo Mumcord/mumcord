@@ -774,6 +774,20 @@ fn resource_dir(app: &AppHandle) -> Option<std::path::PathBuf> {
     None
 }
 
+/// Built-in camera backgrounds. A packaged app has them in `camera-backgrounds` inside Tauri's
+/// resource folder. An unpackaged debug build (what the end-to-end tests launch) has no bundle,
+/// so `MUMCORD_CAMERA_BACKGROUNDS` names that folder of `{id}.webp` files directly.
+fn camera_backgrounds_dir(app: &AppHandle) -> Option<std::path::PathBuf> {
+    if let Some(dir) = resource_dir(app) {
+        let bundled = dir.join("camera-backgrounds");
+        if bundled.is_dir() {
+            return Some(bundled);
+        }
+    }
+    let path = std::path::PathBuf::from(std::env::var_os("MUMCORD_CAMERA_BACKGROUNDS")?);
+    path.is_dir().then_some(path)
+}
+
 /// How Mumcord runs and on which screens, for crash reports (#568).
 fn set_crash_context(app: &AppHandle) {
     // AppImage and Flatpak exist only on Linux.
@@ -862,8 +876,8 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     engine.camera_set_frame_sink(camera_frames.0.clone());
     app.manage(camera_frames);
     app.manage(commands::camera_settings::CameraDeviceWatch::default());
-    match resource_dir(app) {
-        Some(dir) => engine.camera_set_builtin_backgrounds(dir.join("camera-backgrounds")),
+    match camera_backgrounds_dir(app) {
+        Some(dir) => engine.camera_set_builtin_backgrounds(dir),
         None => tracing::warn!("no resource folder for the camera backgrounds"),
     }
     now_playing::start(engine.clone());

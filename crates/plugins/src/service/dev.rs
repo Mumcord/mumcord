@@ -84,7 +84,7 @@ impl PluginService {
         self.sync_peers();
         // A developer wants to see a failing start in the log, so the plugin stays loaded.
         if !self.host.all_off()
-            && let Err(error) = self.host.enable(&id)
+            && let Err(error) = self.enable_plugin(&id)
         {
             tracing::info!(plugin = id.as_str(), %error, "developer plugin did not start");
         }

@@ -42,7 +42,13 @@ import { waitForAbsent } from "../../helpers/dom.ts";
 import { registerOnServer } from "../../helpers/files-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { run } from "../../helpers/run.ts";
-import { addAndConnect, completeWizard, personRow, waitConnected } from "../../helpers/voice-ui.ts";
+import {
+  addAndConnect,
+  completeWizard,
+  personRow,
+  showAllPeople,
+  SERVER,
+} from "../../helpers/voice-ui.ts";
 
 const ID = "test-relay";
 const PLUGIN = "Test Relay";
@@ -74,20 +80,78 @@ async function invokeOk<T>(command: string, args: object = {}): Promise<T> {
   return result.ok as T;
 }
 
+/** Accessible name of the localhost server icon, including status and badges. */
+async function serverLabel(): Promise<string> {
+  return browser.execute((server: string) => {
+    const icon = Array.from(document.querySelectorAll(".server-bar__server")).find((element) =>
+      (element.getAttribute("aria-label") ?? "").startsWith(server),
+    );
+    return icon?.getAttribute("aria-label") ?? "";
+  }, SERVER);
+}
+
+/**
+ * Waits until the server icon says it is connected. The name also carries badges ("voice
+ * server", unread), so an exact "localhost (connected)" never matches once voice is up. A
+ * recreate can end the automatic reconnect (the server resets logins until it is up); the icon
+ * is then clicked once, which connects again. A new certificate is trusted: this is the local
+ * test server.
+ */
+async function waitServerUp(timeout: number): Promise<void> {
+  let label = "";
+  let nudged = false;
+  await browser
+    .waitUntil(
+      async () => {
+        const trustChanged = $("button=Trust the new certificate");
+        const trustNew = $("button=Trust and connect");
+        if ((await trustChanged.isExisting()) && (await trustChanged.isDisplayed())) {
+          await trustChanged.click();
+          return false;
+        }
+        if ((await trustNew.isExisting()) && (await trustNew.isDisplayed())) {
+          await trustNew.click();
+          return false;
+        }
+        label = await serverLabel();
+        if (label.startsWith(`${SERVER} (connected)`)) return true;
+        const gaveUp =
+          label.startsWith(`${SERVER} (connection lost)`) ||
+          label.startsWith(`${SERVER} (connection failed)`);
+        if (!nudged && gaveUp) {
+          nudged = true;
+          await browser.execute((server: string) => {
+            const icon = Array.from(document.querySelectorAll(".server-bar__server")).find(
+              (element) => (element.getAttribute("aria-label") ?? "").startsWith(server),
+            );
+            if (icon instanceof HTMLElement) icon.click();
+          }, SERVER);
+        }
+        return false;
+      },
+      { timeout, interval: 500 },
+    )
+    .catch(() => {
+      throw new Error(`the server did not show connected (last label: "${label}")`);
+    });
+  await $("[role='tree']").waitForExist({ timeout: 15_000 });
+  await showAllPeople();
+}
+
 /** Joins the shown server's channel when its read-only notice offers it. */
-async function joinVoice(): Promise<void> {
-  // Plugins only see the voice server, so this waits until the server is it. A reconnect comes
-  // back read-only, and the "Join voice" button only shows once the connection has synced.
-  await waitConnected();
+async function joinVoice(timeout = 30_000): Promise<void> {
+  // Plugins only see the voice server. A reconnect that kept voice is already it; one that came
+  // back read-only shows "Join voice" once the connection has synced.
+  await waitServerUp(timeout);
   const join = $(".userpanel-readonly__join");
   const voice = async () => (await invokeOk<number | null>("voice_server_get")) !== null;
   await browser.waitUntil(async () => (await voice()) || (await join.isDisplayed()), {
-    timeout: 15_000,
+    timeout,
     timeoutMsg: "the server is neither the voice server nor offers Join voice",
   });
   if (!(await voice())) {
     await join.click();
-    await browser.waitUntil(voice, { timeout: 15_000, timeoutMsg: "Join voice did not take voice" });
+    await browser.waitUntil(voice, { timeout, timeoutMsg: "Join voice did not take voice" });
   }
 }
 
@@ -400,6 +464,9 @@ async function waitReady(after: number, who: string): Promise<void> {
 async function bothInChannel(before?: ReadyCounts): Promise<void> {
   await personRow("Bob").waitForDisplayed({ timeout: 60_000, timeoutMsg: "A never saw Bob" });
   await waitPanel("Peer: Bob", 60_000);
+  // B drops a channel message until Alice's announce is stored (FR-6.35). A's view of Bob is
+  // not that check.
+  await apps.onB(() => waitPanel("Peer: Alice", 60_000));
   if (before) {
     await waitReady(before.a, "A");
     await apps.onB(() => waitReady(before.b, "B"));
@@ -574,6 +641,10 @@ async function bothInChannel(before?: ReadyCounts): Promise<void> {
      * reconnect to the recreated server (registrations are kept).
      */
     async function withoutRelayData(before: ReadyCounts): Promise<void> {
+      // The recreated server drops the connection. Coming back can take longer than a fresh
+      // connect, and the old "Peer:" line stays on the panel until the new announce.
+      await joinVoice(90_000);
+      await apps.onB(() => joinVoice(90_000));
       await bothInChannel(before);
       await waitPanel(status("NotAllowed"), 60_000);
       await expectChip(MUMBLE_CHIP);

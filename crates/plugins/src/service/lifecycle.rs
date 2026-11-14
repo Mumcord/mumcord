@@ -103,7 +103,7 @@ impl PluginService {
                 r.disabled_reason = None;
             })?;
             self.changed();
-            self.host.enable(id)?;
+            self.enable_plugin(id)?;
         } else {
             self.update_record(id, |r| {
                 r.enabled = false;
@@ -196,7 +196,7 @@ impl PluginService {
         self.ctx.http.forget(id);
         if self.host.state(id) == Some(crate::RunState::Running) {
             self.stop(id);
-            self.host.enable(id)?;
+            self.enable_plugin(id)?;
         }
         self.changed();
         Ok(())
@@ -299,7 +299,7 @@ impl PluginService {
         }
         // Before the start, so a plugin may already message from its `start`.
         self.sync_peers();
-        if let Err(error) = self.host.enable(&record.id) {
+        if let Err(error) = self.enable_plugin(&record.id) {
             tracing::warn!(plugin = record.id.as_str(), %error, "plugin did not start");
         }
     }
