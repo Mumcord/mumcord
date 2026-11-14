@@ -165,7 +165,7 @@ fn encoded_message(frame: &Frame) -> Option<Vec<u8>> {
     Some(out)
 }
 
-/// `None` for a picture too large for the header; the sharer never sends one (720p at most).
+/// `None` for a picture too large for the header; negotiated shares stay within the wire limit.
 fn picture_message(codec: Codec, frame: &I420Frame) -> Option<Vec<u8>> {
     let mut out = header(&Header {
         kind: KIND_RGBA,
@@ -176,7 +176,7 @@ fn picture_message(codec: Codec, frame: &I420Frame) -> Option<Vec<u8>> {
         width: u16::try_from(frame.width()).ok()?,
         height: u16::try_from(frame.height()).ok()?,
     });
-    out.extend(frame.to_rgba());
+    frame.append_rgba(&mut out);
     Some(out)
 }
 

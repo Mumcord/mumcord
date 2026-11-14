@@ -8,6 +8,7 @@
  */
 import { getCurrentWebview, type DragDropEvent } from "@tauri-apps/api/webview";
 import { EngineError, getApi } from "../../api";
+import { decodeBase64 } from "../../api/base64";
 import type { DroppedImage } from "../../bindings/commands";
 
 /** A point in physical pixels, relative to the top-left corner of the webview. */
@@ -74,13 +75,6 @@ function failureReason(err: unknown): DropFailureReason {
   if (err.code === "invalidInput") return "notImage";
   if (err.code === "messageTooLarge") return "sourceTooLarge";
   return "unreadable";
-}
-
-function decodeBase64(data: string): Uint8Array<ArrayBuffer> {
-  const binary = atob(data);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-  return bytes;
 }
 
 function toFile(image: DroppedImage): File {

@@ -6,6 +6,7 @@
  * image's identity for checks and saving.
  */
 import { useCallback, useSyncExternalStore } from "react";
+import { decodeBase64 } from "../../api/base64";
 
 const DATA_URL = /^data:([^;,]+);base64,/;
 
@@ -15,9 +16,7 @@ const entries = new Map<string, { url: string; users: number }>();
 const dataUrls = new Map<string, string>();
 
 function objectUrl(src: string, type: string): string {
-  const binary = atob(src.slice(src.indexOf(",") + 1));
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const bytes = decodeBase64(src.slice(src.indexOf(",") + 1));
   return URL.createObjectURL(new Blob([bytes], { type }));
 }
 
