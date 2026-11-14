@@ -5,6 +5,9 @@
 //! which are redacted like the log itself; the home folder is shortened to `~`.
 //! On Linux a real-time thread that overruns its time budget leaves a report too, although the
 //! app keeps running (see `report_overrun`).
+//!
+//! A window that stops answering is reported too ([`report_freeze`], Linux only so far): the run
+//! goes on, and the report holds the stacks of all threads so the hang can be found.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -48,6 +51,9 @@ pub enum CrashKind {
     /// Not a crash: a real-time thread ran past its time budget (SIGXCPU) and the app kept
     /// running. The report says where that thread was busy.
     Overrun,
+    /// The window stopped answering for a while. Not fatal: the run went on, and the report
+    /// holds the stacks of all threads at that moment (`report_freeze`).
+    Freeze,
 }
 
 impl CrashKind {
@@ -57,6 +63,7 @@ impl CrashKind {
             Self::Signal(name) => format!("signal {name}"),
             Self::Unexpected => "unexpected exit".to_owned(),
             Self::Overrun => "real-time overrun".to_owned(),
+            Self::Freeze => "freeze".to_owned(),
         }
     }
 
@@ -65,6 +72,7 @@ impl CrashKind {
             "panic" => Self::Panic,
             "unexpected exit" => Self::Unexpected,
             "real-time overrun" => Self::Overrun,
+            "freeze" => Self::Freeze,
             other => Self::Signal(other.trim_start_matches("signal ").to_owned()),
         }
     }
@@ -371,6 +379,53 @@ fn install_panic_hook() {
         }
         previous(info);
     }));
+}
+
+/// Reports that the window has not answered for `stalled`: writes one report of kind
+/// [`CrashKind::Freeze`] with the stacks of all threads (main thread first), through the same
+/// path as every other report, so it is listed and can be uploaded like them. The stacks are
+/// code locations and thread names only, never arguments or memory. Nothing else happens: the
+/// run goes on. Call it from any thread but the frozen one.
+///
+/// Linux only so far; another platform needs its own way to read the other threads' stacks.
+#[cfg(target_os = "linux")]
+pub fn report_freeze(stalled: Duration) -> io::Result<PathBuf> {
+    let state = STATE
+        .get()
+        .ok_or_else(|| io::Error::other("crash reports are not set up"))?;
+    let uptime = state.started.elapsed().as_secs();
+    let path = write_freeze_report(&state.dir, &state.version, stalled, uptime)?;
+    prune(&state.dir)?;
+    Ok(path)
+}
+
+#[cfg(target_os = "linux")]
+fn write_freeze_report(
+    dir: &Path,
+    version: &str,
+    stalled: Duration,
+    uptime_secs: u64,
+) -> io::Result<PathBuf> {
+    let stacks = threads::capture()?;
+    let maps = fs::read_to_string("/proc/self/maps")?;
+    let backtrace = threads::render(&stacks, &maps);
+    let cause = format!(
+        "The window did not answer for {} s (main thread blocked); not fatal, Mumcord kept \
+         running",
+        stalled.as_secs()
+    );
+    let log = diag::recent_log_lines();
+    let context = context_now();
+    let report = Report {
+        kind: CrashKind::Freeze,
+        thread: "main",
+        cause: &cause,
+        backtrace: &backtrace,
+        log: &log,
+        context: &context,
+        uptime_secs: Some(uptime_secs),
+    };
+    write_report(dir, version, &report)
 }
 
 /// The last lines of the newest log file (the previous run's, since this run has not written
@@ -697,6 +752,9 @@ pub fn take_unseen(dir: &Path) -> Vec<CrashSummary> {
     let _ = fs::write(&seen_path, ids.join("\n"));
     unseen
 }
+
+#[cfg(target_os = "linux")]
+mod threads;
 
 /// The native handler (Unix). At a fatal signal it writes, with async-signal-safe calls only
 /// (no allocation, no locks), into the marker: the signal name, the faulting address and up to
@@ -1515,59 +1573,119 @@ fn mappings(maps: &str) -> Vec<Mapping<'_>> {
         .collect()
 }
 
-/// The nearest symbol at or below `file_offset` in an ELF file, with the distance to it.
-fn symbol_at(data: &[u8], file_offset: usize) -> Option<(String, u64)> {
-    use object::{Object, ObjectSegment, ObjectSymbol};
-    let file = object::File::parse(data).ok()?;
-    let offset = file_offset as u64;
-    let address = file.segments().find_map(|segment| {
-        let (seg_offset, size) = segment.file_range();
-        (seg_offset..seg_offset + size)
-            .contains(&offset)
-            .then(|| segment.address() + (offset - seg_offset))
-    })?;
-    let best = file
-        .symbols()
-        .chain(file.dynamic_symbols())
-        .filter(|s| s.is_definition() && s.address() <= address && s.address() != 0)
-        .filter(|s| s.size() == 0 || address < s.address() + s.size())
-        .max_by_key(|s| s.address())?;
-    let name = best.name().ok()?;
-    Some((
-        format!("{:#}", rustc_demangle::demangle(name)),
-        address - best.address(),
-    ))
+/// The symbols of one ELF file, read once so that many addresses can be named: a freeze report
+/// names the frames of every thread, and the files are large.
+struct Symbols {
+    /// Each segment's file offset, size and address.
+    segments: Vec<(u64, u64, u64)>,
+    /// Address, size and raw name of every defined symbol, sorted by address.
+    symbols: Vec<(u64, u64, Box<str>)>,
+}
+
+impl Symbols {
+    fn load(path: &str) -> Option<Self> {
+        use object::{Object, ObjectSegment, ObjectSymbol};
+        let data = fs::read(path).ok()?;
+        let file = object::File::parse(&*data).ok()?;
+        let segments = file
+            .segments()
+            .map(|segment| {
+                let (offset, size) = segment.file_range();
+                (offset, size, segment.address())
+            })
+            .collect();
+        let mut symbols: Vec<(u64, u64, Box<str>)> = file
+            .symbols()
+            .chain(file.dynamic_symbols())
+            .filter(|s| s.is_definition() && s.address() != 0)
+            .filter_map(|s| Some((s.address(), s.size(), s.name().ok()?.into())))
+            .collect();
+        symbols.sort_by_key(|&(address, _, _)| address);
+        Some(Self { segments, symbols })
+    }
+
+    /// The nearest symbol at or below `file_offset`, with the distance to it.
+    fn at(&self, file_offset: usize) -> Option<(String, u64)> {
+        let offset = file_offset as u64;
+        let address = self.segments.iter().find_map(|&(start, size, address)| {
+            (start..start + size)
+                .contains(&offset)
+                .then(|| address + (offset - start))
+        })?;
+        let below = self
+            .symbols
+            .partition_point(|&(start, _, _)| start <= address);
+        let (start, _, name) = self.symbols[..below]
+            .iter()
+            .rev()
+            .find(|&&(start, size, _)| size == 0 || address < start + size)?;
+        Some((
+            format!("{:#}", rustc_demangle::demangle(name)),
+            address - start,
+        ))
+    }
 }
 
 /// Turns the addresses the native handler wrote into `library symbol+offset` lines. Addresses
 /// outside any file (JIT code, the stack) stay as they are.
 fn symbolize(ips: &[usize], maps: &str) -> Vec<String> {
-    let windows = modules(maps);
-    let maps = mappings(maps);
-    let mut files: BTreeMap<&str, Option<Vec<u8>>> = BTreeMap::new();
-    ips.iter()
-        .enumerate()
-        .map(|(i, &ip)| {
-            let Some(map) = maps.iter().find(|m| m.start <= ip && ip < m.end) else {
-                // Windows names a frame by its module and the offset in it (issue #629).
-                return match windows.iter().find(|m| m.start <= ip && ip < m.end) {
-                    Some(module) => format!("{i:>3}: {} +0x{:x}", module.name, ip - module.start),
-                    None => format!("{i:>3}: 0x{ip:x}"),
-                };
+    Symbolizer::new(maps).lines(ips)
+}
+
+/// Names addresses for one set of loaded libraries; each library file is read once and each
+/// address looked up once, however many stacks are named.
+struct Symbolizer<'a> {
+    windows: Vec<Module<'a>>,
+    maps: Vec<Mapping<'a>>,
+    files: BTreeMap<&'a str, Option<Symbols>>,
+    names: BTreeMap<usize, String>,
+}
+
+impl<'a> Symbolizer<'a> {
+    fn new(maps: &'a str) -> Self {
+        Self {
+            windows: modules(maps),
+            maps: mappings(maps),
+            files: BTreeMap::new(),
+            names: BTreeMap::new(),
+        }
+    }
+
+    /// One numbered line per address, innermost frame first.
+    fn lines(&mut self, ips: &[usize]) -> Vec<String> {
+        ips.iter()
+            .enumerate()
+            .map(|(i, &ip)| {
+                if !self.names.contains_key(&ip) {
+                    let name = self.lookup(ip);
+                    self.names.insert(ip, name);
+                }
+                format!("{i:>3}: {}", self.names[&ip])
+            })
+            .collect()
+    }
+
+    fn lookup(&mut self, ip: usize) -> String {
+        let Some(map) = self.maps.iter().find(|m| m.start <= ip && ip < m.end) else {
+            // Windows names a frame by its module and the offset in it (issue #629).
+            return match self.windows.iter().find(|m| m.start <= ip && ip < m.end) {
+                Some(module) => format!("{} +0x{:x}", module.name, ip - module.start),
+                None => format!("0x{ip:x}"),
             };
-            let file_offset = ip - map.start + map.offset;
-            let library = Path::new(map.path)
-                .file_name()
-                .map_or(map.path.to_owned(), |n| n.to_string_lossy().into_owned());
-            let data = files
-                .entry(map.path)
-                .or_insert_with(|| fs::read(map.path).ok());
-            match data.as_deref().and_then(|d| symbol_at(d, file_offset)) {
-                Some((name, delta)) => format!("{i:>3}: {library} {name}+0x{delta:x}"),
-                None => format!("{i:>3}: {library} +0x{file_offset:x}"),
-            }
-        })
-        .collect()
+        };
+        let file_offset = ip - map.start + map.offset;
+        let library = Path::new(map.path)
+            .file_name()
+            .map_or(map.path.to_owned(), |n| n.to_string_lossy().into_owned());
+        let symbols = self
+            .files
+            .entry(map.path)
+            .or_insert_with(|| Symbols::load(map.path));
+        match symbols.as_ref().and_then(|s| s.at(file_offset)) {
+            Some((name, delta)) => format!("{library} {name}+0x{delta:x}"),
+            None => format!("{library} +0x{file_offset:x}"),
+        }
+    }
 }
 
 /// The marker a fatal signal left: the signal name, the faulting address and the stack.
@@ -1936,5 +2054,117 @@ mod tests {
             let text = format!("{}/x", home.to_string_lossy());
             assert_eq!(shorten_home(&text), "~/x");
         }
+    }
+
+    /// Where the helper thread of the freeze tests waits; its name must show up in the stack.
+    #[cfg(target_os = "linux")]
+    #[inline(never)]
+    fn parked_for_the_freeze_test(release: &std::sync::mpsc::Receiver<()>) {
+        let _ = std::hint::black_box(release.recv());
+    }
+
+    /// Runs `check` while a thread named `parked-helper` waits in the function above.
+    #[cfg(target_os = "linux")]
+    fn with_a_parked_thread(check: impl FnOnce()) {
+        let (release, parked) = std::sync::mpsc::channel();
+        let (ready, started) = std::sync::mpsc::channel();
+        let helper = std::thread::Builder::new()
+            .name("parked-helper".to_owned())
+            .spawn(move || {
+                ready.send(()).unwrap();
+                parked_for_the_freeze_test(&parked);
+            })
+            .unwrap();
+        started.recv().unwrap();
+        // Give it the moment it needs to get from `send` into the wait.
+        std::thread::sleep(Duration::from_millis(100));
+        check();
+        release.send(()).unwrap();
+        helper.join().unwrap();
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn the_stack_of_another_thread_is_captured_with_its_name() {
+        with_a_parked_thread(|| {
+            let stacks = threads::capture().unwrap();
+            // The main thread comes first, whatever else runs in the test process.
+            assert_eq!(stacks[0].name, "main");
+            let helper = stacks.iter().find(|t| t.name == "parked-helper").unwrap();
+            let threads::Stack::Frames(ips) = &helper.stack else {
+                panic!("the parked thread did not answer");
+            };
+            let maps = fs::read_to_string("/proc/self/maps").unwrap();
+            let lines = symbolize(ips, &maps);
+            assert!(
+                lines
+                    .iter()
+                    .any(|l| l.contains("parked_for_the_freeze_test")),
+                "{lines:?}"
+            );
+            // The handler's own frames are cut off: the stack starts where the thread waits.
+            assert!(!lines[0].contains("threads::record"), "{lines:?}");
+        });
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_freeze_report_lists_every_thread_and_reads_like_any_report() {
+        let dir = tempfile::tempdir().unwrap();
+        with_a_parked_thread(|| {
+            write_freeze_report(dir.path(), "0.9.0", Duration::from_secs(8), 42).unwrap();
+        });
+        let listed = list(dir.path());
+        assert_eq!(listed.len(), 1);
+        assert_eq!(listed[0].kind, CrashKind::Freeze);
+        assert_eq!(listed[0].version, "0.9.0");
+        assert!(
+            listed[0]
+                .cause
+                .starts_with("The window did not answer for 8 s")
+        );
+        assert!(listed[0].cause.contains("not fatal"));
+        let text = read(dir.path(), &listed[0].id).unwrap();
+        assert!(text.contains("kind: freeze\nthread: main\n"), "{text}");
+        let stacks = text.split("\nbacktrace:\n").nth(1).unwrap();
+        let mut lines = stacks.lines();
+        assert!(lines.next().unwrap().contains("threads, main thread first"));
+        assert_eq!(lines.next(), Some("thread main:"));
+        let helper = stacks.split("\nthread parked-helper:\n").nth(1).unwrap();
+        let helper = helper.split("\nthread ").next().unwrap();
+        assert!(helper.contains("parked_for_the_freeze_test"), "{helper}");
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn threads_with_the_same_name_and_stack_share_a_block() {
+        let thread = |name: &str, stack| threads::ThreadStack {
+            name: name.to_owned(),
+            stack,
+        };
+        let text = threads::render(
+            &[
+                thread("main", threads::Stack::Frames(vec![0x10, 0x20])),
+                thread("worker", threads::Stack::Frames(vec![0x30])),
+                thread("worker", threads::Stack::Frames(vec![0x30])),
+                thread("driver", threads::Stack::SignalBlocked),
+                thread("stuck", threads::Stack::NoAnswer),
+            ],
+            "",
+        );
+        assert_eq!(
+            text,
+            "5 threads, main thread first (code locations only)\n\
+             thread main:\n  0: 0x10\n  1: 0x20\n\
+             thread worker (x2):\n  0: 0x30\n\
+             thread driver:\n  blocks signals, not captured\n\
+             thread stuck:\n  did not answer in time"
+        );
+    }
+
+    #[test]
+    fn a_freeze_is_its_own_kind() {
+        assert_eq!(CrashKind::Freeze.as_str(), "freeze");
+        assert_eq!(CrashKind::parse("freeze"), CrashKind::Freeze);
     }
 }
