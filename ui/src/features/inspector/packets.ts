@@ -197,8 +197,11 @@ export function peerLabel(names: Names, serverId: number, session: number): stri
   return name === null ? `session ${String(session)}` : `${name} (session ${String(session)})`;
 }
 
-/** Table cells may not contain pipes or line breaks. */
-const cell = (text: string) => text.replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " ");
+/**
+ * Table cells may not contain pipes or line breaks. Backslashes are escaped too, otherwise one in
+ * front of a pipe would cancel that pipe's escape and split the row.
+ */
+const cell = (text: string) => text.replace(/[\\|]/g, "\\$&").replace(/\s*\n\s*/g, " ");
 
 function peersText(p: Packet, names: Names): string {
   if (p.direction === "received") {
