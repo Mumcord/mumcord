@@ -3,6 +3,8 @@
  * `data:` URL into a blob the `<audio>` element plays, and the waveform drawn from the file.
  */
 
+import { decodeBase64 } from "../../api/base64";
+
 /** Bars of the waveform; fits the card's width at the smallest scaling. */
 export const WAVEFORM_BARS = 56;
 
@@ -31,14 +33,12 @@ export function dataUrlToBlob(dataUrl: string): Blob | null {
   const match = /^data:([a-z0-9.+/-]+);base64,/.exec(dataUrl);
   const type = match?.[1];
   if (match === null || type === undefined) return null;
-  let binary: string;
+  let bytes: Uint8Array<ArrayBuffer>;
   try {
-    binary = atob(dataUrl.slice(match[0].length));
+    bytes = decodeBase64(dataUrl.slice(match[0].length));
   } catch {
     return null;
   }
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return new Blob([bytes], { type });
 }
 
