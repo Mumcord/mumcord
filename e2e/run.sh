@@ -64,9 +64,10 @@ read -r -a extra <<< "${MUMCORD_E2E_DOCKER_ARGS:-}"
 if [ -n "${MUMCORD_E2E_PLUGIN_PACKAGES:-}" ]; then
   extra+=(-v "$MUMCORD_E2E_PLUGIN_PACKAGES:$MUMCORD_E2E_PLUGIN_PACKAGES:ro" -e MUMCORD_E2E_PLUGIN_PACKAGES)
 fi
-# Screen sharing's static AV1 libraries (SVT-AV1, dav1d): CI passes the ones its native-av1 cache
-# restored; without them container-run.sh builds them once into the native cache.
-for lib in SVTAV1_STATIC_DIR DAV1D_STATIC_DIR; do
+# Screen sharing's static libraries (SVT-AV1, dav1d, the hardware encoder interfaces): CI passes
+# the ones its native-av1 cache restored; without them container-run.sh builds them once into the
+# native cache. LIBVPX_STATIC_DIR is passed on when set; otherwise the image's libvpx-dev is used.
+for lib in SVTAV1_STATIC_DIR DAV1D_STATIC_DIR HWENC_SDK_DIR LIBVPX_STATIC_DIR; do
   if [ -n "${!lib:-}" ]; then
     extra+=(-v "${!lib}:${!lib}:ro" -e "$lib")
   fi

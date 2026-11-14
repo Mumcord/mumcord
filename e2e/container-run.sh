@@ -86,8 +86,9 @@ export LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1
 # it shared. Unset = both.
 step="${MUMCORD_E2E_STEP:-}"
 if [ "$step" != test ]; then
-  # Screen sharing links static SVT-AV1 and dav1d; Ubuntu's packages are too old. The scripts
-  # return at once when the library is already in the native cache.
+  # Screen sharing links static SVT-AV1 and dav1d; Ubuntu's packages are too old. The hardware
+  # encoder interfaces come from the same pinned build as in CI, so the build never depends on
+  # Ubuntu's libvpl. The scripts return at once when the library is already in the native cache.
   if [ -z "${SVTAV1_STATIC_DIR:-}" ]; then
     scripts/build-svt-av1.sh /cache/native/svt-av1
     export SVTAV1_STATIC_DIR=/cache/native/svt-av1
@@ -95,6 +96,10 @@ if [ "$step" != test ]; then
   if [ -z "${DAV1D_STATIC_DIR:-}" ]; then
     scripts/build-dav1d.sh /cache/native/dav1d
     export DAV1D_STATIC_DIR=/cache/native/dav1d
+  fi
+  if [ -z "${HWENC_SDK_DIR:-}" ]; then
+    scripts/build-hwenc-sdk.sh /cache/native/hwenc-sdk
+    export HWENC_SDK_DIR=/cache/native/hwenc-sdk
   fi
   # MUMCORD_E2E_APP_FEATURES replaces the app's Cargo features, e.g. `test-backend` alone to check
   # that a build without `phone-transfer` hides "Send to your phone" (CONTRIBUTING.md, "Build flags").
