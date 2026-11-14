@@ -200,6 +200,8 @@ pub fn guard_foreign_threads() {
 /// Tells the sweeper of [`guard_foreign_threads`] that the calling thread is one of the audio
 /// host's device threads, which the host made real-time. Called from the device callbacks, so
 /// it neither allocates nor locks; after the first call on a thread it is one thread-local read.
+// Same condition as the device backend, its only caller.
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub(crate) fn mark_device_thread() {
     #[cfg(target_os = "linux")]
     {
