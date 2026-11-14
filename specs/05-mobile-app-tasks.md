@@ -91,6 +91,8 @@ docs/                   device checklist, screenshots (dark and light) per UI ch
 - **Host interfaces** (implemented in Kotlin and Swift, handed to the bridge): `SecureStorage { set(account, bytes), get(account) -> bytes?, delete(account) }` (mirrors the engine's `SecretBackend`), later `AudioHost` (phase 3), `CameraHost` and `VideoSink` (phase 7). Real-time audio data never crosses UniFFI per frame through allocating calls; phase 3 defines the low-level path.
 - Bridge types are own records and enums; engine types do not leak into the generated bindings. Mapping lives in `bridge/src/convert/`.
 - No secrets, chat text or audio in logs (same rule as the engine).
+- UniFFI errors use the field `detail`, never `message`, which Kotlin exceptions reserve.
+- The Rust toolchain is pinned to 1.99.1 (the engine needs at least 1.91).
 
 ### Test server and verification
 
@@ -105,23 +107,23 @@ Goal: the engine builds for phones without changing desktop, the mobile reposito
 
 | ID | Title | Status | Owner | Depends on | Complexity | Covers | Repo · owned files/areas |
 |---|---|---|---|---|---|---|---|
-| 1.1 | Store: public secure-storage interface, `keyring` only on desktop targets | open | | – | complex | FR-5.3, FR-5.60, m#2 | Mumcord · `crates/store/Cargo.toml`, `crates/store/src/secrets.rs`, `src/error.rs`, `src/lib.rs` |
-| 1.2 | Audio: `mumcord-audio` and `mumcord-codec` compile for the phone targets (cpal options, thread priority, `rt.rs`), desktop unchanged | open | | – | complex | m#2 | Mumcord · `crates/audio/**`, `crates/codec/**`, root `Cargo.toml` (only the `cpal` and `audio_thread_priority` lines) |
-| 1.3 | Screenshare crate: one feature per codec library, builds without C libraries when all are off | open | | – | complex | m#2 | Mumcord · `crates/screenshare/**` |
-| 1.4 | Camera crate: confirm it builds without an OS backend, document and test the platform-fed frame interface | open | | – | simple | FR-5.74, m#2 | Mumcord · `crates/camera/src/lib.rs`, `src/pool.rs`, `src/testcam.rs` |
-| 1.5 | Engine features part 1: feature table in the manifest, `positional`, `camera-effects`, `mumble-import` | open | | 1.1, 1.3 | complex | m#2 | Mumcord · `crates/engine/Cargo.toml`, `src/lib.rs`, `src/positional.rs`, `src/camera/**`, `src/mumble_import/**`, the session call sites of these modules |
-| 1.6 | Engine features part 2: `screen-capture`, codec forwarding, remaining platform code (`files/motw.rs`, `files/receive.rs`, `sysinfo.rs`, `crash.rs`, `diag.rs`) gets phone fallbacks | open | | 1.5 | complex | m#2 | Mumcord · `crates/engine/src/screen_share/**`, `src/files/**`, `src/sysinfo.rs`, `src/crash.rs`, `src/diag.rs` |
-| 1.7 | `p2p` and `protocol`: confirm they build for the phone targets, fix what does not (network interface lookup, port mapping) | open | | 1.9 | simple | m#2 | Mumcord · `crates/p2p/**`, `crates/protocol/**` |
-| 1.8 | CI target check: job that checks the engine with `--no-default-features` on Linux and for Android, and for iOS on a macOS runner; feature combinations of desktop stay checked | open | | 1.6, 1.7 | complex | AC-5.36, m#2 | Mumcord · `.github/workflows/ci.yml` (new job only) |
-| 1.9 | Local Android toolchain: Rust phone targets, JDK 21, Android SDK, NDK, emulator image, cargo-ndk; written down as a repeatable script | open | | – | complex | m#1 | this machine · mumcord-mobile `scripts/setup-android.sh`, `docs/development.md` |
-| 1.10 | Mobile repository skeleton: layout, Rust workspace, `engine.lock.toml`, CLAUDE.md, CHANGELOG, licence headers, ignore rules | open | | – | simple | m#1 | mumcord-mobile · root files, empty directories of the layout |
-| 1.11 | Bridge crate with UniFFI, first API: create engine, connect, certificate prompt answer, disconnect, snapshot with channels and people, events; host test against the local test server | open | | 1.6, 1.10 | complex | FR-5.4, m#1, m#3 | mumcord-mobile · `bridge/**`, root `Cargo.toml` |
-| 1.12 | Android project: Gradle, Compose, native library build with cargo-ndk, generated Kotlin bindings, app starts on the emulator and shows the engine version | open | | 1.9, 1.11 | complex | m#1 | mumcord-mobile · `android/**` except `android/platform/securestore`, `scripts/build-android.sh` |
-| 1.13 | Android secure storage (Keystore-protected, excluded from backups) behind `SecureStorage`, and system certificate checking start-up | open | | 1.12 | complex | FR-5.3, FR-5.60, m#2 | mumcord-mobile · `android/platform/securestore/**`, backup rules XML |
-| 1.14 | iOS project: XcodeGen project, SwiftUI app, xcframework build of the bridge, generated Swift bindings, Keychain `SecureStorage` (this device only); app starts in the simulator in CI | open | | 1.11 | complex | FR-5.60, m#1, m#2 | mumcord-mobile · `ios/**`, `scripts/build-ios.sh` |
-| 1.15 | Mobile CI: Rust (format, lint, bridge tests), Android (build, unit tests, lint), iOS (build and unit tests on macOS, only when iOS or bridge files change) | open | | 1.11 (Rust), 1.12 (Android), 1.14 (iOS) | complex | m#1 | mumcord-mobile · `.github/workflows/ci-rust.yml`, `ci-android.yml`, `ci-ios.yml` |
-| 1.16 | First slice on Android: plain screen to enter server and user name, connect, unknown-certificate prompt, channel tree with people, disconnect | open | | 1.13 | complex | part of FR-5.4, FR-5.10, m#5, m#6 | mumcord-mobile · `android/app/**` (slice screens and view models) |
-| 1.17 | Emulator test harness: script starts the local test server and the emulator, instrumented test connects and checks the channel names | open | | 1.16 | complex | m#27 | mumcord-mobile · `e2e/**`, `scripts/testenv.sh` |
+| 1.1 | Store: public secure-storage interface, `keyring` only on desktop targets | done | b1-1-store | – | complex | FR-5.3, FR-5.60, m#2 | Mumcord · `crates/store/Cargo.toml`, `crates/store/src/secrets.rs`, `src/error.rs`, `src/lib.rs` |
+| 1.2 | Audio: `mumcord-audio` and `mumcord-codec` compile for the phone targets (cpal options, thread priority, `rt.rs`), desktop unchanged | done | b1-2-audio | – | complex | m#2 | Mumcord · `crates/audio/**`, `crates/codec/**`, root `Cargo.toml` (only the `cpal` and `audio_thread_priority` lines) |
+| 1.3 | Screenshare crate: one feature per codec library, builds without C libraries when all are off | done | b1-3-screenshare | – | complex | m#2 | Mumcord · `crates/screenshare/**` |
+| 1.4 | Camera crate: confirm it builds without an OS backend, document and test the platform-fed frame interface | done | b1-4-camera | – | simple | FR-5.74, m#2 | Mumcord · `crates/camera/src/lib.rs`, `src/pool.rs`, `src/testcam.rs` |
+| 1.5 | Engine features part 1: feature table in the manifest, `positional`, `camera-effects`, `mumble-import` | done | b1-5-engine-features | 1.1, 1.3 | complex | m#2 | Mumcord · `crates/engine/Cargo.toml`, `src/lib.rs`, `src/positional.rs`, `src/camera/**`, `src/mumble_import/**`, the session call sites of these modules |
+| 1.6 | Engine features part 2: `screen-capture`, codec forwarding, remaining platform code (`files/motw.rs`, `files/receive.rs`, `sysinfo.rs`, `crash.rs`, `diag.rs`) gets phone fallbacks | done | b1-6-engine-capture | 1.5 | complex | m#2 | Mumcord · `crates/engine/src/screen_share/**`, `src/files/**`, `src/sysinfo.rs`, `src/crash.rs`, `src/diag.rs` |
+| 1.7 | `p2p` and `protocol`: confirm they build for the phone targets, fix what does not (network interface lookup, port mapping) | done | b1-7-p2p | 1.9 | simple | m#2 | Mumcord · `crates/p2p/**`, `crates/protocol/**` |
+| 1.8 | CI target check: job that checks the engine with `--no-default-features` on Linux and for Android, and for iOS on a macOS runner; feature combinations of desktop stay checked | in progress | b1-8-ci-targets | 1.6, 1.7 | complex | AC-5.36, m#2 | Mumcord · `.github/workflows/ci.yml` (new job only) |
+| 1.9 | Local Android toolchain: Rust phone targets, JDK 21, Android SDK, NDK, emulator image, cargo-ndk; written down as a repeatable script | done | b1-9-android-tools | – | complex | m#1 | this machine · mumcord-mobile `scripts/setup-android.sh`, `docs/development.md` |
+| 1.10 | Mobile repository skeleton: layout, Rust workspace, `engine.lock.toml`, CLAUDE.md, CHANGELOG, licence headers, ignore rules | done | b1-10-skeleton | – | simple | m#1 | mumcord-mobile · root files, empty directories of the layout |
+| 1.11 | Bridge crate with UniFFI, first API: create engine, connect, certificate prompt answer, disconnect, snapshot with channels and people, events; host test against the local test server | done | b1-11-bridge | 1.6, 1.10 | complex | FR-5.4, m#1, m#3 | mumcord-mobile · `bridge/**`, root `Cargo.toml` |
+| 1.12 | Android project: Gradle, Compose, native library build with cargo-ndk, generated Kotlin bindings, app starts on the emulator and shows the engine version | done | b1-12-android | 1.9, 1.11 | complex | m#1 | mumcord-mobile · `android/**` except `android/platform/securestore`, `scripts/build-android.sh` |
+| 1.13 | Android secure storage (Keystore-protected, excluded from backups) behind `SecureStorage`, and system certificate checking start-up | done | b1-13-securestore | 1.12 | complex | FR-5.3, FR-5.60, m#2 | mumcord-mobile · `android/platform/securestore/**`, backup rules XML |
+| 1.14 | iOS project: XcodeGen project, SwiftUI app, xcframework build of the bridge, generated Swift bindings, Keychain `SecureStorage` (this device only); app starts in the simulator in CI | in progress | b1-14-ios | 1.11 | complex | FR-5.60, m#1, m#2 | mumcord-mobile · `ios/**`, `scripts/build-ios.sh` |
+| 1.15 | Mobile CI: Rust (format, lint, bridge tests), Android (build, unit tests, lint), iOS (build and unit tests on macOS, only when iOS or bridge files change) | in progress | b1-15a-ci-ios | 1.11 (Rust), 1.12 (Android), 1.14 (iOS) | complex | m#1 | mumcord-mobile · `.github/workflows/ci-rust.yml`, `ci-android.yml`, `ci-ios.yml` |
+| 1.16 | First slice on Android: plain screen to enter server and user name, connect, unknown-certificate prompt, channel tree with people, disconnect | done | b1-16-slice | 1.13 | complex | part of FR-5.4, FR-5.10, m#5, m#6 | mumcord-mobile · `android/app/**` (slice screens and view models) |
+| 1.17 | Emulator test harness: script starts the local test server and the emulator, instrumented test connects and checks the channel names | in progress | b1-17-harness | 1.16 | complex | m#27 | mumcord-mobile · `e2e/**`, `scripts/testenv.sh` |
 | V1.1 | Verification: desktop regression. Desktop build, tests, lints and the end-to-end run pass unchanged with the engine features in place | open | | 1.8 | simple | AC-5.36 | Mumcord · no files (report only) |
 | V1.2 | Verification: first slice in the running app on the emulator against the local test server, with a desktop client or bot visible in the channel tree | open | | 1.15, 1.17 | simple | part of AC-5.2 | mumcord-mobile · no files (report only) |
 
@@ -137,7 +139,9 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 | 2.4 | Android: first-start setup, server list, add/edit, connecting, certificate warnings, error states, one-server rule, `mumble://` links | open | | 2.1, 2.2 | complex | FR-5.1 … FR-5.7, m#5 | mumcord-mobile · `android/app` (setup, servers) |
 | 2.5 | Android: Channels tab, join, channel passwords, person sheet frame, search, hints for unsupported things, bottom tabs | open | | 2.4 | complex | FR-5.10 … FR-5.14, m#6 | mumcord-mobile · `android/app` (channels) |
 | 2.6 | iOS: same scope as 2.4 and 2.5 | open | | 2.3, 2.5 | complex | FR-5.1 … FR-5.14, m#5, m#6 | mumcord-mobile · `ios/Mumcord/**` |
-| V2 | Verification on emulator and simulator | open | | 2.5, 2.6 | simple | AC-5.1, AC-5.2, AC-5.3, AC-5.4, AC-5.29, AC-5.32 | mumcord-mobile · `e2e/**` |
+| 2.7 | Local network permission: explanation, system prompt, denied state, on Android and iOS | open | | 2.4, 2.6 | complex | FR-5.8, AC-5.37 | mumcord-mobile · `android/app` (connect flow), `ios/Mumcord/**` |
+| 2.8 | Bridge: banned connection error | open | | 2.1 | simple | FR-5.7 | mumcord-mobile · `bridge/**` |
+| V2 | Verification on emulator and simulator | open | | 2.5, 2.6, 2.7, 2.8 | simple | AC-5.1, AC-5.2, AC-5.3, AC-5.4, AC-5.29, AC-5.32, AC-5.37 | mumcord-mobile · `e2e/**` |
 
 ## Phase 3 – Voice
 
@@ -235,7 +239,7 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 |---|---|
 | V1.1 | AC-5.36 |
 | V1.2 | AC-5.2 (partly) |
-| V2 | AC-5.1, AC-5.2, AC-5.3, AC-5.4, AC-5.29, AC-5.32 |
+| V2 | AC-5.1, AC-5.2, AC-5.3, AC-5.4, AC-5.29, AC-5.32, AC-5.37 |
 | V3 | AC-5.5, AC-5.6, AC-5.7, AC-5.14, AC-5.15, AC-5.36 (re-run) |
 | V4 | AC-5.8, AC-5.9, AC-5.10, AC-5.11, AC-5.12, AC-5.13, AC-5.30 |
 | V5 | AC-5.16, AC-5.17, AC-5.18, AC-5.19 |

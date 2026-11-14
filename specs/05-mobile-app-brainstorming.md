@@ -370,3 +370,8 @@ Correction noted while writing the specification: desktop has no GIF search (Spe
 ## Closing
 
 2026-11-13: All rounds answered. The specification has been created: `specs/05-mobile-app-specification.md`.
+
+## Addendum 2026-11-14
+
+Found during the first Android slice: on Android 17 (API 37, the app's target) an app cannot reach addresses on the directly connected local network, such as a Mumble server at home (192.168.x.x), without the runtime permission `ACCESS_LOCAL_NETWORK`. Without it the connection is dropped silently and the app shows "server could not be reached" after a timeout; internet servers are unaffected. iOS has a comparable local network privacy prompt that needs a usage description.
+Decision (team lead, product manager informed): the app declares the permission. When the user connects to a local-network address and the permission is missing, the app explains in one sentence why it is needed, then triggers the system prompt. If denied, the connection error says so and offers the way to the system settings. Applies to Android and iOS. Recorded as FR-5.8 and AC-5.37.

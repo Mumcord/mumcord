@@ -53,13 +53,14 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 
 ### 4.1 Start, servers and connecting
 
-- **FR-5.1** First start runs a short setup: create or bring an identity (FR-5.60 … FR-5.66), choose the talk mode (FR-5.20), then the server list. Permissions (microphone, notifications) are requested at the moment they are first needed, with a one-sentence reason.
+- **FR-5.1** First start runs a short setup: create or bring an identity (FR-5.60 … FR-5.66), choose the talk mode (FR-5.20), then the server list. Permissions (microphone, notifications, local network, see FR-5.8) are requested at the moment they are first needed, with a one-sentence reason.
 - **FR-5.2** The server list shows favourites with name, address and, where the server answers a ping, people online and latency. Actions: add, edit, remove, connect.
 - **FR-5.3** A server entry holds name, address, port, user name, optional server password and the identity to use. The password is kept in the secure storage of the phone, never in the database.
 - **FR-5.4** Connecting follows the desktop flow (Spec 01): TLS always on, server certificate checked against the system store, a clear prompt for an unknown certificate and a strong warning for a changed one.
 - **FR-5.5** Exactly one server is connected at a time. Connecting to another server asks for confirmation and disconnects the current one.
 - **FR-5.6** A `mumble://` link opened from another app adds nothing silently: the app shows the target (server, channel, user name) and connects after confirmation. If already connected elsewhere, FR-5.5 applies.
 - **FR-5.7** Connection errors (unreachable, wrong password, name in use, rejected certificate, banned) are shown in plain words with a retry action.
+- **FR-5.8** Local network permission. The app declares the permission to reach the local network (Android `ACCESS_LOCAL_NETWORK`, required from Android 17 / API 37, the target; iOS: local network usage description). Without it the system drops connections to addresses on the directly connected local network (for example a Mumble server at home) silently; servers on the internet are unaffected. When the user connects to a server whose address is on the local network and the permission is missing, the app first explains in one sentence why it is needed and then triggers the system prompt. If the user denies it, the connection error says so and offers the way to the system settings. Applies to Android and iOS.
 
 ### 4.2 Channels and people
 
@@ -212,7 +213,7 @@ flowchart TD
 - **Touch rules**: every target at least 44 pt / 48 dp; no action only reachable by long-press or swipe (each has a visible alternative); destructive actions confirm.
 - **Platform-native pieces**: back gesture and back button, share sheet, file and photo pickers, permission dialogs, keyboards, system call screen, system picture-in-picture.
 - **Empty states**: no servers yet (with "Add server" and "Scan from desktop app"), empty channel, no messages, no activity.
-- **Errors**: connection errors (FR-5.7), microphone permission denied (explains how to allow it in system settings; listening still works), camera permission denied, stream not reachable (FR-5.73), transfer code wrong (FR-5.65).
+- **Errors**: connection errors (FR-5.7), local network permission denied (FR-5.8: says so and offers the way to system settings), microphone permission denied (explains how to allow it in system settings; listening still works), camera permission denied, stream not reachable (FR-5.73), transfer code wrong (FR-5.65).
 - **Design**: the theme tokens and fonts of the desktop app (Instrument Sans, Bricolage Grotesque), dark and light, contrast AA. Safe areas respected. Text scales with the system font size up to 200 % without clipping.
 - **Accessibility**: every control has a screen-reader label (TalkBack, VoiceOver); talking state is announced politely, not on every change; focus order follows the visual order; reduced-motion setting respected.
 
@@ -370,6 +371,7 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 34. **AC-5.34** Android: installing a newer signed APK over the app keeps all data; with an older version installed and a newer release published, the update notice appears and opens the download.
 35. **AC-5.35** A tagged release of the mobile repository produces the signed APK with checksum on the GitHub release and a build in TestFlight, without any secret in the repository.
 36. **AC-5.36** Desktop regression: with the engine features in place, the desktop build and its end-to-end tests pass unchanged.
+37. **AC-5.37** Local network permission: on a fresh install, connecting to the local test server by its local address first shows the one-sentence explanation, then the system prompt; allowing it connects. Denying it shows a clear error that names the missing permission and offers the way to the system settings.
 
 ## 12. Decision log
 
@@ -415,6 +417,7 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 | — | System echo cancellation on phones | Technical decision by recommendation |
 | — | Camera cap 540p30, no blur | Technical decision by recommendation |
 | — | Server passwords are not part of a transfer | Safer default; see section 13 |
+| — | Local network permission is declared and requested with a one-sentence explanation before the system prompt (FR-5.8) | Found during implementation, 2026-11-14 |
 
 ## 13. Open points & risks
 
@@ -427,6 +430,7 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 - **Server passwords in a transfer.** Left out by default (FR-5.66). Owner: product manager, if a different rule is wanted.
 - **Licence on iOS.** AGPL-3.0 and Apple's distribution terms can conflict. Before the public TestFlight link: confirm that the copyright holders agree to distribution through Apple and check the licences of all dependencies. Owner: product manager.
 - **CI cost.** macOS runners cost about ten times Linux minutes; iOS jobs run on pull requests that touch iOS or the bridge and on releases.
+- **Local network ranges.** The exact address ranges that trigger the Android local network rule for networks behind a router are not verified yet; to check on a real phone and router before relying on the address test in FR-5.8.
 - **Two-step changes.** An engine change needed by mobile lands in the Mumcord repository first and reaches the apps with the next pin update.
 
 ## 14. Impact on the roadmap
