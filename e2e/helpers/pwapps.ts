@@ -144,6 +144,8 @@ export function startTestApp(name: string, hz: number): TestApp {
       binary,
       [
         "--playback",
+        // PipeWire 1.6 otherwise tries to decode stdin as a container, not raw PCM.
+        "--raw",
         "--rate",
         String(RATE),
         "--channels",
