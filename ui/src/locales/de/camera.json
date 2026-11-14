@@ -15,7 +15,8 @@
     "needsRelayMode": "Die Kamerafreigabe ist ausgeschaltet. Ändere das unter Privatsphäre & Verbindungen.",
     "noCertificate": "Die Kamerafreigabe benötigt ein Client-Zertifikat.",
     "registeredOnly": "Auf diesem Server dürfen nur registrierte Nutzer die Kamera verwenden.",
-    "needsDirect": "Die Kamerafreigabe benötigt direkte Verbindungen. Ändere das unter Privatsphäre & Verbindungen."
+    "needsDirect": "Die Kamerafreigabe benötigt direkte Verbindungen. Ändere das unter Privatsphäre & Verbindungen.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera an",
   "turnOffTray": "Kamera ausschalten",
@@ -188,7 +189,8 @@
     "showVideo": "Video anzeigen",
     "viewing": "Ansicht",
     "weak": "Schwache Verbindung",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Diese Kamera benötigt Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Optionen für {{name}}",

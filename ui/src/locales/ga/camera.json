@@ -15,7 +15,8 @@
     "needsRelayMode": "Tá comhroinnt ceamara múchta. Athraigh é in Príobháideachas agus naisc.",
     "noCertificate": "Teastaíonn teastas cliaint ó chomhroinnt ceamara.",
     "registeredOnly": "Ar an bhfreastalaí seo ní féidir ach le húsáideoirí cláraithe an ceamara a úsáid.",
-    "needsDirect": "Teastaíonn naisc dhíreacha ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc."
+    "needsDirect": "Teastaíonn naisc dhíreacha ó chomhroinnt ceamara. Athraigh é in Príobháideachas agus naisc.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Ceamara ar siúl",
   "turnOffTray": "Cas ceamara as",
@@ -209,7 +210,8 @@
     "showVideo": "Taispeáin an físeán",
     "viewing": "Ag féachaint",
     "weak": "Nasc lag",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Teastaíonn Mumcord 0.9.0 ón gceamara seo"
   },
   "tileMenu": {
     "options": "Roghanna do {{name}}",

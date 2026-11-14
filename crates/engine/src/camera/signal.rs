@@ -82,7 +82,7 @@ pub enum CameraMessage {
     /// the next `on`.
     Full { id: String },
     /// Camera owner to one viewer: camera `id` uses a media format this client cannot play and
-    /// needs Mumcord 0.9.0 (FR-8.95); stop asking until the next `on`.
+    /// needs Mumcord 0.9.0 (FR-8.95); do not retry until the next `on`.
     Needs { id: String },
 }
 

@@ -15,7 +15,8 @@
     "needsRelayMode": "A partilha de câmara está desativada. Altera-o em Privacidade e ligações.",
     "noCertificate": "A partilha de câmara precisa de um certificado de cliente.",
     "registeredOnly": "Neste servidor só utilizadores registados podem usar a câmara.",
-    "needsDirect": "A partilha de câmara precisa de ligações diretas. Altera-o em Privacidade e ligações."
+    "needsDirect": "A partilha de câmara precisa de ligações diretas. Altera-o em Privacidade e ligações.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Câmara ligada",
   "turnOffTray": "Desligar a câmara",
@@ -195,7 +196,8 @@
     "showVideo": "Mostrar vídeo",
     "viewing": "A ver",
     "weak": "Ligação fraca",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Esta câmara requer o Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Opções para {{name}}",

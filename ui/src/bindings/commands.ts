@@ -3193,7 +3193,6 @@ export type MassMoveResult =
 { kind: "done"; moved: number; total: number } | 
 /**  Another mass move is still running on this server (FR-10.18). */
 { kind: "alreadyRunning" };
-
 /**  The wire format of a captured media stream. */
 export type MediaFormat = "media" | "legacy";
 

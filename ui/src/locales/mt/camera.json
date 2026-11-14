@@ -15,7 +15,8 @@
     "needsRelayMode": "Il-qsim tal-kamera huwa mitfi. Biddlu f'Privatezza u konnessjonijiet.",
     "noCertificate": "Il-qsim tal-kamera jeħtieġ ċertifikat tal-klijent.",
     "registeredOnly": "Fuq dan is-server biss utenti rreġistrati jistgħu jużaw il-kamera.",
-    "needsDirect": "Il-qsim tal-kamera jeħtieġ konnessjonijiet diretti. Biddlu f'Privatezza u konnessjonijiet."
+    "needsDirect": "Il-qsim tal-kamera jeħtieġ konnessjonijiet diretti. Biddlu f'Privatezza u konnessjonijiet.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera mixgħula",
   "turnOffTray": "Itfi l-kamera",
@@ -209,7 +210,8 @@
     "showVideo": "Uri l-vidjo",
     "viewing": "Qed tara",
     "weak": "Konnessjoni dgħajfa",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Din il-kamera teħtieġ Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Għażliet għal {{name}}",

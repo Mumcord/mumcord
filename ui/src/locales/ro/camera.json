@@ -15,7 +15,8 @@
     "needsRelayMode": "Partajarea camerei este oprită. Schimbă asta în Confidențialitate și conexiuni.",
     "noCertificate": "Partajarea camerei are nevoie de un certificat de client.",
     "registeredOnly": "Pe acest server doar utilizatorii înregistrați pot folosi camera.",
-    "needsDirect": "Partajarea camerei are nevoie de conexiuni directe. Schimbă asta în Confidențialitate și conexiuni."
+    "needsDirect": "Partajarea camerei are nevoie de conexiuni directe. Schimbă asta în Confidențialitate și conexiuni.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Cameră pornită",
   "turnOffTray": "Oprește camera",
@@ -195,7 +196,8 @@
     "showVideo": "Arată video",
     "viewing": "Vizionezi",
     "weak": "Conexiune slabă",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Această cameră necesită Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Opțiuni pentru {{name}}",

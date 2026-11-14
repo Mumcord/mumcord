@@ -15,7 +15,8 @@
     "needsRelayMode": "Camera delen staat uit. Wijzig dit in Privacy en verbindingen.",
     "noCertificate": "Camera delen heeft een clientcertificaat nodig.",
     "registeredOnly": "Alleen geregistreerde gebruikers mogen de camera op deze server gebruiken.",
-    "needsDirect": "Camera delen heeft directe verbindingen nodig. Wijzig dit in Privacy en verbindingen."
+    "needsDirect": "Camera delen heeft directe verbindingen nodig. Wijzig dit in Privacy en verbindingen.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Camera aan",
   "turnOffTray": "Camera uitzetten",
@@ -188,7 +189,8 @@
     "showVideo": "Video tonen",
     "viewing": "Kijkt mee",
     "weak": "Zwakke verbinding",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Deze camera heeft Mumcord 0.9.0 nodig"
   },
   "tileMenu": {
     "options": "Opties voor {{name}}",

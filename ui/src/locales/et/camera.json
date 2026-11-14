@@ -15,7 +15,8 @@
     "needsRelayMode": "Kaamera jagamine on välja lülitatud. Muuda seda jaotises Privaatsus ja ühendused.",
     "noCertificate": "Kaamera jagamine vajab kliendisertifikaati.",
     "registeredOnly": "Selles serveris tohivad kaamerat kasutada ainult registreeritud kasutajad.",
-    "needsDirect": "Kaamera jagamine vajab otseseid ühendusi. Muuda seda jaotises Privaatsus ja ühendused."
+    "needsDirect": "Kaamera jagamine vajab otseseid ühendusi. Muuda seda jaotises Privaatsus ja ühendused.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kaamera sees",
   "turnOffTray": "Lülita kaamera välja",
@@ -188,7 +189,8 @@
     "showVideo": "Näita videot",
     "viewing": "Vaatad",
     "weak": "Nõrk ühendus",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "See kaamera vajab Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Valikud: {{name}}",

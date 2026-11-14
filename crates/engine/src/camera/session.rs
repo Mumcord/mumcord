@@ -1153,7 +1153,6 @@ pub(crate) fn on_plugin_data(
             super::recv::on_camera_needs(&engine, ctx, event.sender, &id)
         }
         CameraMessage::Off => super::recv::on_camera_gone(&engine, ctx, event.sender),
-        CameraMessage::Needs { .. } => {}
     }
 }
 

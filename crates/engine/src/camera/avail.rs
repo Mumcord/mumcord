@@ -62,6 +62,7 @@ pub(crate) fn evaluate(
     has_certificate: bool,
     direct_allowed: bool,
 ) -> Option<CameraUnavailable> {
+    // Without a camera backend no mode and no relay can help (FR-13.27).
     if !CAMERA_BACKEND {
         return Some(CameraUnavailable::UnsupportedPlatform);
     }

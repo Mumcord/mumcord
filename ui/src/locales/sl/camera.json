@@ -15,7 +15,8 @@
     "needsRelayMode": "Deljenje kamere je izklopljeno. Spremeni to v Zasebnost in povezave.",
     "noCertificate": "Deljenje kamere potrebuje odjemalsko potrdilo.",
     "registeredOnly": "Na tem strežniku lahko kamero uporabljajo le registrirani uporabniki.",
-    "needsDirect": "Deljenje kamere potrebuje neposredne povezave. Spremeni to v Zasebnost in povezave."
+    "needsDirect": "Deljenje kamere potrebuje neposredne povezave. Spremeni to v Zasebnost in povezave.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera vklopljena",
   "turnOffTray": "Izklopi kamero",
@@ -202,7 +203,8 @@
     "showVideo": "Pokaži video",
     "viewing": "Gledaš",
     "weak": "Šibka povezava",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Ta kamera potrebuje Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Možnosti za {{name}}",

@@ -15,7 +15,8 @@
     "needsRelayMode": "A kamera megosztás ki van kapcsolva. Módosítsd az Adatvédelem és kapcsolatok alatt.",
     "noCertificate": "A kamera megosztásához kliens tanúsítvány kell.",
     "registeredOnly": "Ezen a szerveren csak regisztrált felhasználók használhatják a kamerát.",
-    "needsDirect": "A kamera megosztásához közvetlen kapcsolatok kellenek. Módosítsd az Adatvédelem és kapcsolatok alatt."
+    "needsDirect": "A kamera megosztásához közvetlen kapcsolatok kellenek. Módosítsd az Adatvédelem és kapcsolatok alatt.",
+    "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera bekapcsolva",
   "turnOffTray": "Kamera kikapcsolása",
@@ -188,7 +189,8 @@
     "showVideo": "Videó megjelenítése",
     "viewing": "Nézed",
     "weak": "Gyenge kapcsolat",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Ez a kamera a Mumcord 0.9.0 verziót igényli"
   },
   "tileMenu": {
     "options": "{{name}} beállításai",
