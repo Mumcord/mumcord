@@ -533,13 +533,14 @@ jobs:
           key: apt-ubuntu-24.04-${{ steps.apt.outputs.image }}
           restore-keys: apt-ubuntu-24.04-
 
-      # ALSA and cmake: the audio devices and the bundled Opus, needed without any feature. The
-      # rest is for the single features: libvpx (vp9), PipeWire and libclang (screen-capture).
+      # ALSA and cmake: the audio devices and the bundled Opus, needed without any feature. D-Bus:
+      # libdbus-sys (cpal's real-time priority, keyring); the desktop build gets it with WebKitGTK.
+      # The rest is for the single features: libvpx (vp9), PipeWire and libclang (screen-capture).
       - name: Install Linux system libraries
         timeout-minutes: 20
         run: |
           scripts/ci/apt-install.sh --cache-dir "$HOME/apt-archives" \
-            libasound2-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
+            libasound2-dev libdbus-1-dev libvpx-dev libpipewire-0.3-dev libclang-dev pkg-config cmake
 
       # For the features av1-decode (dav1d) and desktop-codecs (SVT-AV1, hardware encoders).
       - name: Native AV1 libraries
