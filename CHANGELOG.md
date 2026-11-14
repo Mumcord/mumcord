@@ -5,6 +5,7 @@
 ### Added
 
 - The install script supports FreeBSD (issue #781): on FreeBSD 15.x (amd64), `fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh` downloads the release's `.pkg`, checks it against SHA256SUMS, installs the packages it needs from the pkg repositories and then installs it with `pkg add` (with sudo or doas when you are not root); running it again updates Mumcord, and `--uninstall` removes it with `pkg delete`
+- A frozen window now leaves a report that shows where it hangs (Linux): when the window has not answered for about 8 seconds, Mumcord saves a crash report of kind "freeze" with the stacks of all its threads, main thread first (code locations and thread names only, no data). The app keeps running and continues normally if the window answers again; the report is listed, exported and uploaded like any other crash report, only when you choose to, and at most 3 are written per run
 
 ### Changed
 
