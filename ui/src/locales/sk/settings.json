@@ -947,6 +947,10 @@
       "deb": "balík .deb",
       "rpm": "balík .rpm",
       "aur": "AUR",
+      "aptRepo": "repozitár Mumcordu pre APT",
+      "dnfRepo": "repozitár Mumcordu pre DNF",
+      "zypperRepo": "repozitár Mumcordu pre zypper",
+      "pacmanRepo": "repozitár Mumcordu pre pacman",
       "otherLinux": "balík pre Linux"
     },
     "mode": "Keď sa nájde aktualizácia",

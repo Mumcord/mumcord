@@ -57,7 +57,8 @@
       "openReleasePage": "Iftaħ il-paġna tal-ħruġ",
       "manual": "Niżżel il-verżjoni l-ġdida mill-paġna tal-ħruġ.",
       "manualPackage": "Niżżel il-pakkett mill-paġna tal-ħruġ, imbagħad installah b'dan:",
-      "manualAur": "Aġġornah bl-AUR helper tiegħek:"
+      "manualAur": "Aġġornah bl-AUR helper tiegħek:",
+      "manualRepo": "Mumcord ġej mir-repożitorju tal-pakketti tiegħu. Aġġornah bil-maniġer tal-pakketti tiegħek:"
     },
     "tags": {
       "added": "Miżjud",

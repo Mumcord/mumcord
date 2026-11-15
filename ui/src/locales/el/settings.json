@@ -935,6 +935,10 @@
       "deb": "το πακέτο .deb",
       "rpm": "το πακέτο .rpm",
       "aur": "το AUR",
+      "aptRepo": "το αποθετήριο APT του Mumcord",
+      "dnfRepo": "το αποθετήριο DNF του Mumcord",
+      "zypperRepo": "το αποθετήριο zypper του Mumcord",
+      "pacmanRepo": "το αποθετήριο pacman του Mumcord",
       "otherLinux": "ένα πακέτο Linux"
     },
     "mode": "Όταν βρεθεί ενημέρωση",

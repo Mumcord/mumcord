@@ -947,6 +947,10 @@
       "deb": "balíček .deb",
       "rpm": "balíček .rpm",
       "aur": "AUR",
+      "aptRepo": "repozitář Mumcordu pro APT",
+      "dnfRepo": "repozitář Mumcordu pro DNF",
+      "zypperRepo": "repozitář Mumcordu pro zypper",
+      "pacmanRepo": "repozitář Mumcordu pro pacman",
       "otherLinux": "balíček pro Linux"
     },
     "mode": "Když se najde aktualizace",

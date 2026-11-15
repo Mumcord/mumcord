@@ -57,7 +57,8 @@
       "openReleasePage": "Ava väljaandelehekülg",
       "manual": "Laadi uus versioon alla väljaandelehelt.",
       "manualPackage": "Laadi pakett alla väljaandelehelt ja paigalda see seejärel käsuga:",
-      "manualAur": "Uuenda see oma AUR-abilisega:"
+      "manualAur": "Uuenda see oma AUR-abilisega:",
+      "manualRepo": "Mumcord pärineb oma paketihoidlast. Uuenda seda oma paketihalduriga:"
     },
     "tags": {
       "added": "Lisatud",

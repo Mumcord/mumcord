@@ -3040,7 +3040,15 @@ export type InstallKind =
 /**  A Mac app outside an `.app` bundle (a development run). */
 "otherMac" | 
 /**  Packages: the package manager updates them. */
-"deb" | "rpm" | "aur" | "otherLinux" | 
+"deb" | "rpm" | "aur" | 
+/**  Installed from the Mumcord APT repository (packages.mumcord.app): `apt` updates it. */
+"aptRepo" | 
+/**  Installed from the Mumcord DNF repository: `dnf` updates it. */
+"dnfRepo" | 
+/**  Installed from the Mumcord zypper repository: `zypper` updates it. */
+"zypperRepo" | 
+/**  Installed from the Mumcord pacman repository: `pacman` updates it. */
+"pacmanRepo" | "otherLinux" | 
 /**  A FreeBSD package: `pkg upgrade mumcord` updates it (see updater_freebsd.rs). */
 "pkg";
 

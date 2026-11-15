@@ -31,6 +31,14 @@ pub enum InstallKind {
     Deb,
     Rpm,
     Aur,
+    /// Installed from the Mumcord APT repository (packages.mumcord.app): `apt` updates it.
+    AptRepo,
+    /// Installed from the Mumcord DNF repository: `dnf` updates it.
+    DnfRepo,
+    /// Installed from the Mumcord zypper repository: `zypper` updates it.
+    ZypperRepo,
+    /// Installed from the Mumcord pacman repository: `pacman` updates it.
+    PacmanRepo,
     OtherLinux,
     /// A FreeBSD package: `pkg upgrade mumcord` updates it (see updater_freebsd.rs).
     Pkg,

@@ -57,7 +57,8 @@
       "openReleasePage": "Oscail leathanach an eisiúna",
       "manual": "Íoslódáil an leagan nua ó leathanach an eisiúna.",
       "manualPackage": "Íoslódáil an pacáiste ó leathanach an eisiúna agus suiteáil ansin é le:",
-      "manualAur": "Nuashonraigh é le do chúntóir AUR:"
+      "manualAur": "Nuashonraigh é le do chúntóir AUR:",
+      "manualRepo": "Tagann Mumcord óna stór pacáistí. Nuashonraigh é le do bhainisteoir pacáistí:"
     },
     "tags": {
       "added": "Curtha leis",

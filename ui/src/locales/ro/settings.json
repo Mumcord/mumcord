@@ -941,6 +941,10 @@
       "deb": "pachetul .deb",
       "rpm": "pachetul .rpm",
       "aur": "AUR",
+      "aptRepo": "depozitul APT Mumcord",
+      "dnfRepo": "depozitul DNF Mumcord",
+      "zypperRepo": "depozitul zypper Mumcord",
+      "pacmanRepo": "depozitul pacman Mumcord",
       "otherLinux": "un pachet Linux"
     },
     "mode": "Când se găsește o actualizare",

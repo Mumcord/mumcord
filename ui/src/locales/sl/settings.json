@@ -947,6 +947,10 @@
       "deb": "paket .deb",
       "rpm": "paket .rpm",
       "aur": "AUR",
+      "aptRepo": "skladišče APT za Mumcord",
+      "dnfRepo": "skladišče DNF za Mumcord",
+      "zypperRepo": "skladišče zypper za Mumcord",
+      "pacmanRepo": "skladišče pacman za Mumcord",
       "otherLinux": "paket za Linux"
     },
     "mode": "Ko je najdena posodobitev",

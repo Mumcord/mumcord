@@ -941,6 +941,10 @@
       "deb": ".deb paket",
       "rpm": ".rpm paket",
       "aur": "AUR",
+      "aptRepo": "Mumcordov APT repozitorij",
+      "dnfRepo": "Mumcordov DNF repozitorij",
+      "zypperRepo": "Mumcordov zypper repozitorij",
+      "pacmanRepo": "Mumcordov pacman repozitorij",
       "otherLinux": "Linux paket"
     },
     "mode": "Kad se pronađe ažuriranje",

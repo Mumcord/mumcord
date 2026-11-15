@@ -953,6 +953,10 @@
       "deb": "an pacáiste .deb",
       "rpm": "an pacáiste .rpm",
       "aur": "an AUR",
+      "aptRepo": "stór APT Mumcord",
+      "dnfRepo": "stór DNF Mumcord",
+      "zypperRepo": "stór zypper Mumcord",
+      "pacmanRepo": "stór pacman Mumcord",
       "otherLinux": "pacáiste Linux"
     },
     "mode": "Nuair a aimsítear nuashonrú",

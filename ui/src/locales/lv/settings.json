@@ -941,6 +941,10 @@
       "deb": ".deb pakotne",
       "rpm": ".rpm pakotne",
       "aur": "AUR",
+      "aptRepo": "Mumcord APT krātuve",
+      "dnfRepo": "Mumcord DNF krātuve",
+      "zypperRepo": "Mumcord zypper krātuve",
+      "pacmanRepo": "Mumcord pacman krātuve",
       "otherLinux": "Linux pakotne"
     },
     "mode": "Kad atrasts atjauninājums",

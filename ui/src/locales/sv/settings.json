@@ -935,6 +935,10 @@
       "deb": ".deb-paketet",
       "rpm": ".rpm-paketet",
       "aur": "AUR",
+      "aptRepo": "Mumcords APT-förråd",
+      "dnfRepo": "Mumcords DNF-förråd",
+      "zypperRepo": "Mumcords zypper-förråd",
+      "pacmanRepo": "Mumcords pacman-förråd",
       "otherLinux": "ett Linux-paket"
     },
     "mode": "När en uppdatering hittas",

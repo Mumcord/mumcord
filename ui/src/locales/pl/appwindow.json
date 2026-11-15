@@ -57,7 +57,8 @@
       "openReleasePage": "Otwórz stronę wydania",
       "manual": "Pobierz nową wersję ze strony wydania.",
       "manualPackage": "Pobierz pakiet ze strony wydania, a potem zainstaluj go poleceniem:",
-      "manualAur": "Zaktualizuj go za pomocą swojego narzędzia do AUR:"
+      "manualAur": "Zaktualizuj go za pomocą swojego narzędzia do AUR:",
+      "manualRepo": "Mumcord pochodzi z własnego repozytorium pakietów. Zaktualizuj go za pomocą menedżera pakietów:"
     },
     "tags": {
       "added": "Dodano",

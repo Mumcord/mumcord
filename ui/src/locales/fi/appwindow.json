@@ -57,7 +57,8 @@
       "openReleasePage": "Avaa julkaisusivu",
       "manual": "Lataa uusi versio julkaisusivulta.",
       "manualPackage": "Lataa paketti julkaisusivulta ja asenna se sitten komennolla:",
-      "manualAur": "Päivitä se AUR-apuohjelmallasi:"
+      "manualAur": "Päivitä se AUR-apuohjelmallasi:",
+      "manualRepo": "Mumcord tulee omasta pakettivarastostaan. Päivitä se pakettienhallinnalla:"
     },
     "tags": {
       "added": "Lisätty",

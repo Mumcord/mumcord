@@ -935,6 +935,10 @@
       "deb": "a .deb csomag",
       "rpm": "az .rpm csomag",
       "aur": "az AUR",
+      "aptRepo": "a Mumcord APT-tárolója",
+      "dnfRepo": "a Mumcord DNF-tárolója",
+      "zypperRepo": "a Mumcord zypper-tárolója",
+      "pacmanRepo": "a Mumcord pacman-tárolója",
       "otherLinux": "egy Linux-csomag"
     },
     "mode": "Ha frissítés található",

@@ -57,7 +57,8 @@
       "openReleasePage": "Atvērt laidiena lapu",
       "manual": "Lejupielādē jauno versiju no laidiena lapas.",
       "manualPackage": "Lejupielādē pakotni no laidiena lapas un pēc tam instalē to ar:",
-      "manualAur": "Atjaunini to ar savu AUR palīgu:"
+      "manualAur": "Atjaunini to ar savu AUR palīgu:",
+      "manualRepo": "Mumcord nāk no savas pakotņu krātuves. Atjaunini to ar savu pakotņu pārvaldnieku:"
     },
     "tags": {
       "added": "Pievienots",

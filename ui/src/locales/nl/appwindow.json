@@ -57,7 +57,8 @@
       "openReleasePage": "Releasepagina openen",
       "manual": "Download de nieuwe versie van de releasepagina.",
       "manualPackage": "Download het pakket van de releasepagina en installeer het daarna met:",
-      "manualAur": "Werk het bij met je AUR-helper:"
+      "manualAur": "Werk het bij met je AUR-helper:",
+      "manualRepo": "Mumcord komt uit zijn pakketrepository. Werk het bij met je pakketbeheerder:"
     },
     "tags": {
       "added": "Toegevoegd",

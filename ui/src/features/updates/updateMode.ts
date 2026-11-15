@@ -46,7 +46,20 @@ export function packageCommand(kind: InstallKind, version: string): string | nul
       return `sudo dnf install ./Mumcord-${version}-1.x86_64.rpm`;
     case "aur":
       return "yay -Syu mumcord-bin";
+    case "aptRepo":
+      return "sudo apt update && sudo apt install --only-upgrade mumcord";
+    case "dnfRepo":
+      return "sudo dnf upgrade --refresh mumcord";
+    case "zypperRepo":
+      return "sudo zypper refresh && sudo zypper update mumcord";
+    case "pacmanRepo":
+      return "sudo pacman -Syu";
     default:
       return null;
   }
+}
+
+/** The kinds installed from the Mumcord package repository. */
+export function isRepoInstall(kind: InstallKind): boolean {
+  return kind === "aptRepo" || kind === "dnfRepo" || kind === "zypperRepo" || kind === "pacmanRepo";
 }

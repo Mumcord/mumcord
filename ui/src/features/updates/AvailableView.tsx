@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { InstallKind, UpdateOffer, UpdateStatus } from "../../api";
 import { ChannelBadge, DialogHeader, PrereleaseNote } from "./DialogHeader";
 import { ReleaseNotesList } from "./ReleaseNotesList";
-import { packageCommand } from "./updateMode";
+import { isRepoInstall, packageCommand } from "./updateMode";
 
 export interface AvailableViewProps {
   status: UpdateStatus;
@@ -69,15 +69,18 @@ export function AvailableView(props: AvailableViewProps) {
   );
 }
 
+function manualKey(install: InstallKind): string {
+  if (isRepoInstall(install)) return "updater.available.manualRepo";
+  return install === "aur" ? "updater.available.manualAur" : "updater.available.manualPackage";
+}
+
 function ManualInstructions({ install, version }: { install: InstallKind; version: string }) {
   const { t } = useTranslation("appwindow");
   const command = packageCommand(install, version);
   if (command === null) return <p className="upd-note-text">{t("updater.available.manual")}</p>;
   return (
     <div className="upd-manual">
-      <p className="upd-note-text">
-        {t(install === "aur" ? "updater.available.manualAur" : "updater.available.manualPackage")}
-      </p>
+      <p className="upd-note-text">{t(manualKey(install))}</p>
       <code className="upd-command">{command}</code>
     </div>
   );

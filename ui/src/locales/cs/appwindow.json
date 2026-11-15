@@ -57,7 +57,8 @@
       "openReleasePage": "Otevřít stránku vydání",
       "manual": "Stáhni novou verzi ze stránky vydání.",
       "manualPackage": "Stáhni balíček ze stránky vydání a pak ho nainstaluj příkazem:",
-      "manualAur": "Aktualizuj ho pomocí svého AUR helperu:"
+      "manualAur": "Aktualizuj ho pomocí svého AUR helperu:",
+      "manualRepo": "Mumcord pochází ze svého repozitáře balíčků. Aktualizuj ho pomocí správce balíčků:"
     },
     "tags": {
       "added": "Přidáno",

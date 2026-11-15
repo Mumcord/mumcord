@@ -33,6 +33,14 @@ describe("package commands", () => {
     expect(packageCommand("deb", "0.5.0")).toBe("sudo apt install ./Mumcord_0.5.0_amd64.deb");
     expect(packageCommand("rpm", "0.5.0")).toBe("sudo dnf install ./Mumcord-0.5.0-1.x86_64.rpm");
     expect(packageCommand("aur", "0.5.0")).toBe("yay -Syu mumcord-bin");
+    expect(packageCommand("aptRepo", "0.5.0")).toBe(
+      "sudo apt update && sudo apt install --only-upgrade mumcord",
+    );
+    expect(packageCommand("dnfRepo", "0.5.0")).toBe("sudo dnf upgrade --refresh mumcord");
+    expect(packageCommand("zypperRepo", "0.5.0")).toBe(
+      "sudo zypper refresh && sudo zypper update mumcord",
+    );
+    expect(packageCommand("pacmanRepo", "0.5.0")).toBe("sudo pacman -Syu");
     expect(packageCommand("windowsPortable", "0.5.0")).toBeNull();
   });
 });

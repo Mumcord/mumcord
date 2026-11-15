@@ -57,7 +57,8 @@
       "openReleasePage": "Åbn udgivelsessiden",
       "manual": "Download den nye version fra udgivelsessiden.",
       "manualPackage": "Download pakken fra udgivelsessiden, og installér den derefter med:",
-      "manualAur": "Opdatér den med din AUR-hjælper:"
+      "manualAur": "Opdatér den med din AUR-hjælper:",
+      "manualRepo": "Mumcord kommer fra sit pakkelager. Opdatér den med din pakkehåndtering:"
     },
     "tags": {
       "added": "Tilføjet",

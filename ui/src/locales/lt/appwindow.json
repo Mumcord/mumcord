@@ -57,7 +57,8 @@
       "openReleasePage": "Atidaryti leidimo puslapį",
       "manual": "Atsisiųsk naują versiją iš leidimo puslapio.",
       "manualPackage": "Atsisiųsk paketą iš leidimo puslapio ir įdiek jį komanda:",
-      "manualAur": "Atnaujink jį savo AUR pagalbininku:"
+      "manualAur": "Atnaujink jį savo AUR pagalbininku:",
+      "manualRepo": "Mumcord gautas iš savo paketų saugyklos. Atnaujink jį savo paketų tvarkykle:"
     },
     "tags": {
       "added": "Pridėta",

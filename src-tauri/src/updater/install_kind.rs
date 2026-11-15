@@ -45,6 +45,14 @@ struct LinuxFacts {
     arch: bool,
     dpkg_owns_us: bool,
     rpm: bool,
+    /// The Mumcord APT source file exists.
+    apt_repo: bool,
+    /// The Mumcord DNF repo file exists.
+    dnf_repo: bool,
+    /// The Mumcord zypper repo file exists.
+    zypper_repo: bool,
+    /// `/etc/pacman.conf` has a `[mumcord]` section.
+    pacman_repo: bool,
 }
 
 #[cfg_attr(not(any(target_os = "linux", test)), allow(dead_code))]
@@ -57,11 +65,25 @@ fn linux_kind(facts: &LinuxFacts) -> InstallKind {
         };
     }
     if facts.arch {
-        InstallKind::Aur
+        if facts.pacman_repo {
+            InstallKind::PacmanRepo
+        } else {
+            InstallKind::Aur
+        }
     } else if facts.dpkg_owns_us {
-        InstallKind::Deb
+        if facts.apt_repo {
+            InstallKind::AptRepo
+        } else {
+            InstallKind::Deb
+        }
     } else if facts.rpm {
-        InstallKind::Rpm
+        if facts.zypper_repo {
+            InstallKind::ZypperRepo
+        } else if facts.dnf_repo {
+            InstallKind::DnfRepo
+        } else {
+            InstallKind::Rpm
+        }
     } else {
         InstallKind::OtherLinux
     }
@@ -92,7 +114,29 @@ pub fn detect() -> InstallKind {
         arch: exists("/etc/arch-release"),
         dpkg_owns_us: exists("/var/lib/dpkg/info/mumcord.list"),
         rpm: exists("/usr/bin/rpm") || exists("/bin/rpm"),
+        apt_repo: exists("/etc/apt/sources.list.d/mumcord.sources")
+            || exists("/etc/apt/sources.list.d/mumcord.list"),
+        dnf_repo: exists("/etc/yum.repos.d/mumcord.repo"),
+        zypper_repo: exists("/etc/zypp/repos.d/mumcord.repo"),
+        pacman_repo: pacman_conf_has_mumcord(),
     })
+}
+
+#[cfg(target_os = "linux")]
+fn pacman_conf_has_mumcord() -> bool {
+    match std::fs::read_to_string("/etc/pacman.conf") {
+        Ok(conf) => has_mumcord_section(&conf),
+        Err(e) => {
+            tracing::debug!(error = %e, "reading /etc/pacman.conf failed");
+            false
+        }
+    }
+}
+
+/// A `[mumcord]` section header, ignoring surrounding whitespace.
+#[cfg_attr(not(any(target_os = "linux", test)), allow(dead_code))]
+fn has_mumcord_section(conf: &str) -> bool {
+    conf.lines().any(|line| line.trim() == "[mumcord]")
 }
 
 #[cfg(target_os = "windows")]
@@ -134,6 +178,10 @@ mod tests {
             arch: false,
             dpkg_owns_us: false,
             rpm: false,
+            apt_repo: false,
+            dnf_repo: false,
+            zypper_repo: false,
+            pacman_repo: false,
         }
     }
 
@@ -175,6 +223,65 @@ mod tests {
     }
 
     #[test]
+    fn repository_installs_get_their_package_manager() {
+        let apt = LinuxFacts {
+            dpkg_owns_us: true,
+            apt_repo: true,
+            ..facts()
+        };
+        assert_eq!(linux_kind(&apt), InstallKind::AptRepo);
+        let dnf = LinuxFacts {
+            rpm: true,
+            dnf_repo: true,
+            ..facts()
+        };
+        assert_eq!(linux_kind(&dnf), InstallKind::DnfRepo);
+        let zypper = LinuxFacts {
+            rpm: true,
+            zypper_repo: true,
+            ..facts()
+        };
+        assert_eq!(linux_kind(&zypper), InstallKind::ZypperRepo);
+        let pacman = LinuxFacts {
+            arch: true,
+            pacman_repo: true,
+            ..facts()
+        };
+        assert_eq!(linux_kind(&pacman), InstallKind::PacmanRepo);
+    }
+
+    #[test]
+    fn repository_files_without_the_matching_package_do_not_count() {
+        let apt_file_only = LinuxFacts {
+            apt_repo: true,
+            ..facts()
+        };
+        assert_eq!(linux_kind(&apt_file_only), InstallKind::OtherLinux);
+        let pacman_on_other = LinuxFacts {
+            pacman_repo: true,
+            rpm: true,
+            ..facts()
+        };
+        assert_eq!(linux_kind(&pacman_on_other), InstallKind::Rpm);
+        let appimage = LinuxFacts {
+            appimage: true,
+            appimage_writable: true,
+            dpkg_owns_us: true,
+            apt_repo: true,
+            ..facts()
+        };
+        assert_eq!(linux_kind(&appimage), InstallKind::AppImage);
+    }
+
+    #[test]
+    fn pacman_section_is_found_by_its_header() {
+        assert!(has_mumcord_section(
+            "[options]\n\n  [mumcord]  \nServer = x\n"
+        ));
+        assert!(!has_mumcord_section("#[mumcord]\n[mumcord-extra]\n"));
+    }
+
+    #[test]
     fn only_self_updating_kinds_have_a_manifest_target() {
         assert!(
             InstallKind::AppImage
@@ -187,6 +294,10 @@ mod tests {
             InstallKind::Deb,
             InstallKind::Rpm,
             InstallKind::Aur,
+            InstallKind::AptRepo,
+            InstallKind::DnfRepo,
+            InstallKind::ZypperRepo,
+            InstallKind::PacmanRepo,
             InstallKind::OtherLinux,
             InstallKind::OtherMac,
         ] {
