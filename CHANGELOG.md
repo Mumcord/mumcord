@@ -47,10 +47,10 @@
 - A whisper only reaches the people you chose. Until now a whisper target was matched by name each time, so a different person using the same name could hear a whisper that was meant for somebody else, for example somebody who took the name over after your contact left. A whisper is now tied to the exact people it was started for: when one of them leaves, they are removed from it, when the last one leaves, it ends, and nobody who joins later can hear it, whatever their name is. If a saved whisper target's name fits more than one person on the server, Mumcord does not whisper at all and tells you why
 - Require patched `ammonia 4.2.5` or newer to address the SVG/MathML mutation-XSS advisory RUSTSEC-2026-0533, with regression tests for chat HTML and plugin SVG assets; existing sanitization allow-lists remain unchanged (issue #819)
 - Upgrade the RSA identity-key generator to the patched `rsa 0.10` release and remove the accepted Marvin timing-attack advisory (issue #131). Existing identities and Mumble-compatible RSA-2048 certificates remain unchanged; certificate signing and TLS still use ring
+- Noise suppression (RNNoise) rejects a damaged or manipulated noise model when it loads instead of crashing later during a call, and its processor-specific fast paths check sizes themselves instead of relying on the loader
 
 ### Internal
 
-- Noise suppression (RNNoise) moves to a newer build that rejects a damaged noise model when it loads instead of failing later during a call, and checks sizes in its fast processor-specific paths
 - Send to your phone (spec 05, mumcord-mobile#14) is built but not yet enabled: release builds do not show it until the Android and iOS apps that read its codes are released. With the Cargo feature `phone-transfer` (on in E2E builds; `npm run tauri dev -- --features phone-transfer`, see "Build flags" in `CONTRIBUTING.md`), Settings → Account & Identity has a "Send to your phone…" button that shows the chosen identities and optionally the server list as a loop of QR codes with an 8-digit number to type on the phone, valid for 2 minutes. Nothing is sent over a network, and saved server passwords and channel access tokens are never included. Without the feature the button is absent and the commands behind it are refused.
 
 ## [0.8.0] - 2026-11-12
