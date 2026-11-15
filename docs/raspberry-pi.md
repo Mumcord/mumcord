@@ -166,3 +166,36 @@ noise-suppression, echo-cancellation and automatic-gain chain on synthetic speec
 
 Both met the benchmark's 5 ms mean limit. This is a baseline, not a claimed speedup from the
 rendering fix, and does not include devices, transport, mixing or the UI.
+
+The same release build was then run as two instances side by side (one sharer, one lean client)
+against the unmodified local Mumble server, so screenshare cost could be measured without a
+second machine. Screen capture went through the ScreenCast portal (`xdg-desktop-portal-wlr`
+under labwc); CPU is the sum over all processes of one instance's systemd scope:
+
+| Scenario                                   | Setting                | CPU (share of one core) |
+| ------------------------------------------ | ---------------------- | ----------------------- |
+| idle, connected, nothing shared            | –                      | 4.4–5.0% per instance   |
+| sharing, own window visible on that screen | 720p, asked for 15 fps | 107% (4–5 fps encoded)  |
+| sharing, both windows minimized            | 720p, 10 fps           | 17%                     |
+
+Three things follow from this and from the encoder self-test:
+
+- Software VP9 cannot carry 720p on four Cortex-A72 cores. The share starts at the picked
+  setting, notices the encoder falling behind and lowers itself to 720p and 4–10 fps with a
+  visible "encoder too slow" note. That is the honest result, not a defect to paper over: the
+  Pi 4 has no hardware encoder for VP9 or AV1.
+- AV1 is worse and already reports itself as failed on this board (about 187 ms per 1080p frame,
+  i.e. roughly 5 fps), so the dialog correctly defaults to VP9.
+- Sharing the whole screen while Mumcord itself is on that screen costs about six times as much
+  as sharing the same screen with the windows minimized: the app repaints, the capture sees the
+  change and encodes it, which repaints again. On a single-screen setup, sharing the window of
+  another app instead of the whole screen avoids that loop.
+
+Not measured on the Pi: the viewer side of a share and watch-party embeds. Two instances on the
+same board never brought up the direct media path between them (the test server has no relay,
+which a two-client call on one host would otherwise use), and the watch-party player needs
+YouTube or Twitch. Both stay open questions for a two-machine setup.
+
+One more desktop observation: minimizing a Mumcord window through an external tool (`wlrctl`)
+and restoring it left the window blank until the app was restarted. It was seen twice and is
+recorded here rather than worked around.
