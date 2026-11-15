@@ -71,7 +71,8 @@
     "invalidInput": "Det virkede ikke: filen eller adgangskoden er ikke gyldig.",
     "duplicateIdentity": "Denne identitet er allerede i din liste.",
     "notFound": "Filen eller elementet blev ikke fundet.",
-    "generic": "Noget gik galt. Prøv igen."
+    "generic": "Noget gik galt. Prøv igen.",
+    "wrongPassword": "Adgangskoden er forkert. Tjek den, og prøv igen."
   },
   "identity": {
     "export": "Eksportér…",
@@ -956,7 +957,10 @@
     "channel": "Opdateringskanal",
     "channelHint": "Vælg, hvilke udgivelser Mumcord tilbyder. Release candidates er tidlige versioner af den næste version.",
     "channels": {
-      "stable": { "name": "Stabil", "hint": "Kun endelige udgivelser" },
+      "stable": {
+        "name": "Stabil",
+        "hint": "Kun endelige udgivelser"
+      },
       "releaseCandidates": {
         "name": "Release candidates",
         "hint": "Tidlige versioner af den næste version; kan indeholde fejl"

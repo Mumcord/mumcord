@@ -71,7 +71,8 @@
     "invalidInput": "See ei õnnestunud: fail või parool pole kehtiv.",
     "duplicateIdentity": "See identiteet on juba sinu nimekirjas.",
     "notFound": "Faili või kirjet ei leitud.",
-    "generic": "Midagi läks valesti. Proovi palun uuesti."
+    "generic": "Midagi läks valesti. Proovi palun uuesti.",
+    "wrongPassword": "Parool ei ole õige. Kontrolli seda ja proovi uuesti."
   },
   "identity": {
     "export": "Ekspordi…",
@@ -956,7 +957,10 @@
     "channel": "Uuenduste kanal",
     "channelHint": "Vali, milliseid väljalaskeid Mumcord pakub. Väljalaskekandidaadid on järgmise versiooni varased järgud.",
     "channels": {
-      "stable": { "name": "Stabiilne", "hint": "Ainult lõplikud väljalasked" },
+      "stable": {
+        "name": "Stabiilne",
+        "hint": "Ainult lõplikud väljalasked"
+      },
       "releaseCandidates": {
         "name": "Väljalaskekandidaadid",
         "hint": "Järgmise versiooni varased järgud; võivad sisaldada vigu"

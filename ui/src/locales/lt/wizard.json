@@ -79,7 +79,8 @@
     "importInvalid": "Nepavyko atidaryti failo. Patikrink slaptažodį ir ar tai .p12 arba .pfx tapatybės failas.",
     "importNotFound": "Failo nepavyko rasti. Pasirink jį dar kartą.",
     "importIo": "Failo nepavyko nuskaityti. Pasirink jį dar kartą.",
-    "pickFailed": "Nepavyko atidaryti failo parinkiklio."
+    "pickFailed": "Nepavyko atidaryti failo parinkiklio.",
+    "importWrongPassword": "Slaptažodis neteisingas. Patikrinkite jį ir bandykite dar kartą."
   },
   "mic": {
     "input": "Mikrofonas",

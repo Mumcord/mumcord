@@ -23,6 +23,7 @@
 
 ### Fixed
 
+- Importing an identity file with a wrong password says that the password is not correct, instead of the same message as for a file that holds no identity
 - The MUMCORD lettering at the top of the install script lines up again
 - Servers that publish their address as a DNS SRV record (`_mumble._tcp.<domain>`) can be joined by entering just the domain, like in the official Mumble client (issue #859): for an address without a port Mumcord looks up the record and connects to the host and port it names, in the order of its priority and weight, and moves on to the next one when a target cannot be reached. Without a record, or when the lookup fails, it connects to the address on port 64738 as before. An explicitly entered port other than 64738 skips the lookup. This applies to saved servers, `mumble://` links without a port, reconnects, "Test connection" and the online status in the server list; the trusted certificate stays tied to the saved server, so a changed certificate still asks
 - Scrollbars are no longer drawn on top of menus, popovers and dialogs (issue #875): every scrolling list and panel now has a slim scrollbar in the theme's colours, dark and light, that sits beside the content instead of floating over it, so it no longer covers row highlights or buttons at the right edge either. The scrollbar shows while you scroll or point at it and hides again a second after scrolling stops
@@ -38,6 +39,7 @@
 
 ### Internal
 
+- Engine: `identity_import_bytes` and `identity_export_bytes` import and export identities without a file (for the phone apps), and a server that iOS keeps from the local network is reported as "local network blocked", like on macOS
 - Crash reports: `crash::record_foreign` records an exception of the phone apps (kind "foreign exception", exception types only, never their messages, stack cut at 64 KiB); `crash::install` takes the app's private folders to shorten and ignores `HOME=/`; Android and iOS keep only the newest "unexpected exit" report; test builds (feature `test-backend`) can send uploads to a local loopback server through `MUMCORD_CRASH_UPLOAD_URL`, release builds always use the crash server
 - Engine: `reconnect_now` reconnects a server at once for an app that just got a working network again: it ends the wait before the next attempt, or drops a connection whose socket may be dead after a network change, and returns to the last channel with the own mute and deafen
 - Engine: `EngineEvent::UserRemoved` carries who kicked or banned the person, the reason and whether it was a ban; `UserView.comment_hash` changes whenever a person's comment changes; `set_own_avatar_bytes` sets the own avatar from image bytes without a file (for the phone apps)

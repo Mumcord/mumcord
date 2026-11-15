@@ -79,7 +79,8 @@
     "importInvalid": "A fájlt nem sikerült megnyitni. Ellenőrizd a jelszót, és hogy .p12 vagy .pfx identitásfájl-e.",
     "importNotFound": "A fájl nem található. Válaszd ki újra.",
     "importIo": "A fájlt nem sikerült beolvasni. Válaszd ki újra.",
-    "pickFailed": "A fájlválasztót nem sikerült megnyitni."
+    "pickFailed": "A fájlválasztót nem sikerült megnyitni.",
+    "importWrongPassword": "A jelszó nem megfelelő. Ellenőrizd, és próbáld újra."
   },
   "mic": {
     "input": "Mikrofon",

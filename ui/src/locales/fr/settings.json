@@ -73,7 +73,8 @@
     "invalidInput": "Cela n’a pas fonctionné : le fichier ou le mot de passe n’est pas valide.",
     "duplicateIdentity": "Cette identité est déjà dans ta liste.",
     "notFound": "Le fichier ou l’élément est introuvable.",
-    "generic": "Une erreur s’est produite. Réessaie."
+    "generic": "Une erreur s’est produite. Réessaie.",
+    "wrongPassword": "Le mot de passe est incorrect. Vérifiez-le et réessayez."
   },
   "identity": {
     "export": "Exporter…",
@@ -962,7 +963,10 @@
     "channel": "Canal de mise à jour",
     "channelHint": "Choisis les versions que Mumcord propose. Les versions candidates sont des préversions de la prochaine version.",
     "channels": {
-      "stable": { "name": "Stable", "hint": "Versions finales uniquement" },
+      "stable": {
+        "name": "Stable",
+        "hint": "Versions finales uniquement"
+      },
       "releaseCandidates": {
         "name": "Versions candidates",
         "hint": "Préversions de la prochaine version ; peuvent contenir des bogues"

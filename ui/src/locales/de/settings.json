@@ -71,7 +71,8 @@
     "invalidInput": "Das hat nicht geklappt: Datei oder Passwort sind ungültig.",
     "duplicateIdentity": "Diese Identität ist bereits in deiner Liste.",
     "notFound": "Die Datei oder das Element wurde nicht gefunden.",
-    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "wrongPassword": "Das Passwort ist nicht richtig. Prüfe es und versuche es erneut."
   },
   "identity": {
     "export": "Exportieren…",
@@ -956,7 +957,10 @@
     "channel": "Update-Kanal",
     "channelHint": "Lege fest, welche Versionen Mumcord anbietet. Release Candidates sind frühe Builds der nächsten Version.",
     "channels": {
-      "stable": { "name": "Stabil", "hint": "Nur finale Versionen" },
+      "stable": {
+        "name": "Stabil",
+        "hint": "Nur finale Versionen"
+      },
       "releaseCandidates": {
         "name": "Release Candidates",
         "hint": "Frühe Builds der nächsten Version; können Fehler enthalten"

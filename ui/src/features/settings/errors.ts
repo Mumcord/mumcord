@@ -13,6 +13,8 @@ export function errorText(t: TFunction<"settings">, error: unknown): string {
       return t("errors.invalidInput");
     case "duplicateIdentity":
       return t("errors.duplicateIdentity");
+    case "wrongPassword":
+      return t("errors.wrongPassword");
     case "notFound":
       return t("errors.notFound");
     default:

@@ -75,7 +75,8 @@
     "invalidInput": "Nepodarilo sa: súbor alebo heslo nie sú platné.",
     "duplicateIdentity": "Táto identita už je v tvojom zozname.",
     "notFound": "Súbor alebo položka sa nenašli.",
-    "generic": "Niečo sa pokazilo. Skús to znova."
+    "generic": "Niečo sa pokazilo. Skús to znova.",
+    "wrongPassword": "Heslo nie je správne. Skontrolujte ho a skúste to znova."
   },
   "identity": {
     "export": "Exportovať…",
@@ -968,7 +969,10 @@
     "channel": "Kanál aktualizácií",
     "channelHint": "Vyber, ktoré vydania ti Mumcord ponúka. Kandidáti na vydanie sú skoré zostavenia ďalšej verzie.",
     "channels": {
-      "stable": { "name": "Stabilná", "hint": "Iba finálne vydania" },
+      "stable": {
+        "name": "Stabilná",
+        "hint": "Iba finálne vydania"
+      },
       "releaseCandidates": {
         "name": "Kandidáti na vydanie",
         "hint": "Skoré zostavenia ďalšej verzie; môžu obsahovať chyby"

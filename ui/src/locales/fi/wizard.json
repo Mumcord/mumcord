@@ -79,7 +79,8 @@
     "importInvalid": "Tiedostoa ei voitu avata. Tarkista salasana ja että kyseessä on .p12- tai .pfx-identiteettitiedosto.",
     "importNotFound": "Tiedostoa ei löytynyt. Valitse se uudelleen.",
     "importIo": "Tiedostoa ei voitu lukea. Valitse se uudelleen.",
-    "pickFailed": "Tiedostonvalitsinta ei voitu avata."
+    "pickFailed": "Tiedostonvalitsinta ei voitu avata.",
+    "importWrongPassword": "Salasana ei ole oikein. Tarkista se ja yritä uudelleen."
   },
   "mic": {
     "input": "Mikrofoni",

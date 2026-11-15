@@ -206,12 +206,17 @@ pub fn server_info_view(state: &ServerState) -> ServerInfoView {
 /// Server-provided HTML is untrusted: strip scripts, handlers and remote resources.
 pub use crate::chat::sanitize_html;
 
+/// The system asks before an app may reach the local network (macOS 15, iOS 14).
+const LOCAL_NETWORK_PRIVACY: bool = cfg!(any(target_os = "macos", target_os = "ios"));
+
 /// Classifies a failed connection attempt.
 pub fn connect_failure(err: &ConnectError) -> Failure {
     use ErrorKind as K;
     let e = |kind, msg: String| EngineError::new(kind, msg);
     match err {
-        ConnectError::Io(io) if cfg!(target_os = "macos") && is_no_route(io) => {
+        // macOS and iOS refuse servers on the local network until the user allows it, and the
+        // refusal looks like a missing route.
+        ConnectError::Io(io) if LOCAL_NETWORK_PRIVACY && is_no_route(io) => {
             Failure::Transient(e(K::LocalNetworkBlocked, err.to_string()))
         }
         ConnectError::Resolve(_)
@@ -572,8 +577,8 @@ mod tests {
     }
 
     #[test]
-    fn no_route_points_to_local_network_permission_on_macos_only() {
-        let expected = if cfg!(target_os = "macos") {
+    fn no_route_points_to_local_network_permission_on_macos_and_ios_only() {
+        let expected = if cfg!(any(target_os = "macos", target_os = "ios")) {
             ErrorKind::LocalNetworkBlocked
         } else {
             ErrorKind::ServerUnreachable

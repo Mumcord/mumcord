@@ -79,7 +79,8 @@
     "importInvalid": "Nie udało się otworzyć pliku. Sprawdź hasło i czy to plik tożsamości .p12 lub .pfx.",
     "importNotFound": "Nie znaleziono pliku. Wybierz go ponownie.",
     "importIo": "Nie udało się odczytać pliku. Wybierz go ponownie.",
-    "pickFailed": "Nie udało się otworzyć okna wyboru pliku."
+    "pickFailed": "Nie udało się otworzyć okna wyboru pliku.",
+    "importWrongPassword": "Hasło jest nieprawidłowe. Sprawdź je i spróbuj ponownie."
   },
   "mic": {
     "input": "Mikrofon",

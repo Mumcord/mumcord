@@ -79,7 +79,8 @@
     "importInvalid": "Il-fajl ma setax jinfetaħ. Iċċekkja l-password u li huwa fajl tal-identità .p12 jew .pfx.",
     "importNotFound": "Il-fajl ma nstabx. Jekk jogħġbok erġa' agħżlu.",
     "importIo": "Il-fajl ma setax jinqara. Jekk jogħġbok erġa' agħżlu.",
-    "pickFailed": "Is-selettur tal-fajls ma setax jinfetaħ."
+    "pickFailed": "Is-selettur tal-fajls ma setax jinfetaħ.",
+    "importWrongPassword": "Il-password mhix korretta. Iċċekkjaha u erġa' pprova."
   },
   "mic": {
     "input": "Mikrofonu",
