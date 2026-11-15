@@ -14,7 +14,7 @@ use std::time::{Duration, Instant};
 use mumcord_engine::camera::{CameraState, TileState};
 use mumcord_engine::p2p::P2pConfig;
 use mumcord_engine::screen_share::wire::{Codec, Frame, FrameHeader};
-use mumcord_engine::screen_share::{I420Frame, ScreenFrameSink};
+use mumcord_engine::screen_share::{I420Frame, ScreenFrameSink, ViewerPath};
 use mumcord_engine::store::{Consent, P2pMode};
 use mumcord_engine::{
     Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields, ServerId,
@@ -251,6 +251,10 @@ async fn the_camera_reaches_a_viewer_over_the_direct_stream() {
     })
     .await;
     poll("camera frames", || (frames.frames() > 5).then_some(())).await;
+    assert_eq!(
+        b.engine.camera_tile_path(server_b, sharer),
+        Some(ViewerPath::Direct)
+    );
 
     // B's tile is 720 high: `want` travels back and the encoder follows within a second, with a
     // keyframe at the new size (FR-8.93, FR-8.45).
@@ -292,6 +296,27 @@ async fn the_camera_reaches_a_viewer_over_the_direct_stream() {
         !b.engine.camera_test_direct(server_b, sharer),
         "stream closed"
     );
+
+    // A tile the app does not want stays unloaded even when shown, and plays once asked for
+    // (the phones load a camera only after a tap).
+    b.engine.camera_tile_set_wanted(server_b, sharer, false);
+    b.engine.camera_tile_set_hidden(server_b, sharer, false);
+    tokio::time::sleep(Duration::from_secs(2)).await;
+    let state = |b: &Client| {
+        b.engine
+            .camera_room(server_b)
+            .tiles
+            .iter()
+            .find(|t| t.sharer == sharer)
+            .map(|t| t.state)
+    };
+    assert_eq!(state(&b), Some(TileState::Hidden));
+    assert_eq!(b.engine.camera_tile_path(server_b, sharer), None);
+    b.engine.camera_tile_set_wanted(server_b, sharer, true);
+    poll("the wanted tile playing", || {
+        (state(&b) == Some(TileState::Playing)).then_some(())
+    })
+    .await;
 
     // Blocking B's side is refused the same way (FR-8.59).
     b.engine
