@@ -41,6 +41,23 @@ async function openChannelMenu(name: string): Promise<void> {
     );
   }, name);
   await $("//div[@role='menu']").waitForDisplayed();
+  // Scrollbars hide when idle; the pointer on the tree's scrollbar keeps it in the picture.
+  const thumb = await browser.execute((channel) => {
+    const label = Array.from(document.querySelectorAll(".tree-channel__name")).find(
+      (span) => span.textContent.trim() === channel,
+    );
+    let el = label?.parentElement ?? null;
+    while (
+      el &&
+      !(el.scrollHeight > el.clientHeight && getComputedStyle(el).overflowY !== "visible")
+    ) {
+      el = el.parentElement;
+    }
+    if (!el) throw new Error("no scrolling tree");
+    const box = el.getBoundingClientRect();
+    return { x: Math.round(box.right - 2), y: Math.round(box.top + 20) };
+  }, name);
+  await browser.action("pointer").move(thumb).perform();
 }
 
 /** The load-test server of testenv/scale. */
