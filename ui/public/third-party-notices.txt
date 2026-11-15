@@ -8346,7 +8346,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (685 crates)
+* MIT License (695 crates)
 * Apache License 2.0 (44 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
 * ISC License (20 crates)
@@ -8583,7 +8583,7 @@ Used by:
   - cranelift-frontend 0.137.1 (https://github.com/bytecodealliance/wasmtime)
   - cranelift-native 0.137.1 (https://github.com/bytecodealliance/wasmtime)
   - regalloc2 0.15.2 (https://github.com/bytecodealliance/regalloc2)
-  - target-lexicon 0.13.5 (https://github.com/bytecodealliance/target-lexicon)
+  - target-lexicon 0.13.6 (https://github.com/bytecodealliance/target-lexicon)
   - wasmtime-environ 50.0.1 (https://github.com/bytecodealliance/wasmtime)
   - wasmtime-internal-cranelift 50.0.1 (https://github.com/bytecodealliance/wasmtime)
   - wasmtime-internal-unwinder 50.0.1 (https://github.com/bytecodealliance/wasmtime)
@@ -9519,8 +9519,8 @@ Apache License 2.0
 
 Used by:
   - gethostname 1.1.0 (https://codeberg.org/swsnr/gethostname.rs.git)
-  - prost-derive 0.14.5 (https://github.com/tokio-rs/prost)
-  - prost 0.14.5 (https://github.com/tokio-rs/prost)
+  - prost-derive 0.14.6 (https://github.com/tokio-rs/prost)
+  - prost 0.14.6 (https://github.com/tokio-rs/prost)
   - ring 0.17.14 (https://github.com/briansmith/ring)
 
                               Apache License
@@ -9951,7 +9951,7 @@ Used by:
   - owned_ttf_parser 0.25.1 (https://github.com/alexheretic/owned-ttf-parser)
   - pulley-interpreter 50.0.1 (https://github.com/bytecodealliance/wasmtime/tree/main/pulley)
   - pulley-macros 50.0.1 (https://github.com/bytecodealliance/wasmtime/tree/main/pulley/macros)
-  - rpassword 7.5.4 (https://github.com/conradkleinespel/rpassword)
+  - rpassword 7.5.5 (https://github.com/conradkleinespel/rpassword)
   - rtoolbox 0.0.6 (https://github.com/conradkleinespel/rtoolbox)
   - sync_wrapper 1.0.2 (https://github.com/Actyx/sync_wrapper)
   - wasmtime-internal-component-macro 50.0.1 (https://github.com/bytecodealliance/wasmtime)
@@ -10059,7 +10059,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (C) 2013 Xiph.Org Foundation and contributors
@@ -10115,7 +10115,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (C) 2015 Vidyo
@@ -10163,7 +10163,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10233,7 +10233,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10289,7 +10289,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10346,7 +10346,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10400,7 +10400,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10458,7 +10458,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10523,7 +10523,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10579,7 +10579,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10636,7 +10636,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10698,7 +10698,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10748,7 +10748,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10809,7 +10809,7 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 /***********************************************************************
 Copyright (c) 2006-2011, Skype Limited. All rights reserved.
@@ -10987,7 +10987,7 @@ BSD 3-Clause "New" or "Revised" License
 
 Used by:
   - alloc-no-stdlib 3.0.0 (https://github.com/dropbox/rust-alloc-no-stdlib)
-  - brotli 9.0.0 (https://github.com/dropbox/rust-brotli)
+  - brotli 9.1.1 (https://github.com/dropbox/rust-brotli)
 
 Copyright (c) 2016 Dropbox, Inc.
 All rights reserved.
@@ -11154,8 +11154,8 @@ BSD 3-Clause "New" or "Revised" License
 --------------------------------------------------------------------------------
 
 Used by:
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
-  - opusic-sys 0.7.5 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
+  - opusic-sys 0.7.7 (https://github.com/DoumanAsh/opusic-sys)
 
 Copyright 2001-2023 Xiph.Org, Skype Limited, Octasic,
                     Jean-Marc Valin, Timothy B. Terriberry,
@@ -12025,7 +12025,7 @@ ISC License
 
 Used by:
   - libloading 0.7.4 (https://github.com/nagisa/rust_libloading/)
-  - libloading 0.9.0 (https://github.com/nagisa/rust_libloading/)
+  - libloading 0.9.1 (https://github.com/nagisa/rust_libloading/)
 
 Copyright © 2015, Simonas Kazlauskas
 
@@ -12046,7 +12046,7 @@ ISC License
 --------------------------------------------------------------------------------
 
 Used by:
-  - rustls-webpki 0.103.16 (https://github.com/rustls/webpki)
+  - rustls-webpki 0.103.17 (https://github.com/rustls/webpki)
 
 Except as otherwise noted, this project is licensed under the following
 (ISC-style) terms:
@@ -12436,7 +12436,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - brotli 9.0.0 (https://github.com/dropbox/rust-brotli)
+  - brotli 9.1.1 (https://github.com/dropbox/rust-brotli)
 
 Copyright (c) 2009, 2010, 2013-2016 by the Brotli Authors.
 
@@ -12606,7 +12606,7 @@ Used by:
   - cfg-if 1.0.5 (https://github.com/rust-lang/cfg-if)
   - filetime 0.2.29 (https://github.com/alexcrichton/filetime)
   - id-arena 2.3.0 (https://github.com/fitzgen/id-arena)
-  - openssl-probe 0.2.1 (https://github.com/rustls/openssl-probe)
+  - openssl-probe 0.2.2 (https://github.com/rustls/openssl-probe)
   - rustc-demangle 0.1.28 (https://github.com/rust-lang/rustc-demangle)
   - socket2 0.6.5 (https://github.com/rust-lang/socket2)
   - toml_datetime 0.6.3 (https://github.com/toml-rs/toml)
@@ -12643,7 +12643,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - mio 1.2.4 (https://github.com/tokio-rs/mio)
+  - mio 1.2.5 (https://github.com/tokio-rs/mio)
 
 Copyright (c) 2014 Carl Lerche and other MIO contributors
 
@@ -12705,7 +12705,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - errno 0.3.14 (https://github.com/lambda-fairy/rust-errno)
+  - errno 0.3.15 (https://github.com/lambda-fairy/rust-errno)
 
 Copyright (c) 2014 Chris Wong
 
@@ -12772,7 +12772,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - mime 0.3.17 (https://github.com/hyperium/mime)
+  - mime 0.3.18 (https://github.com/hyperium/mime)
 
 Copyright (c) 2014 Sean McArthur
 
@@ -12839,7 +12839,7 @@ Used by:
   - bitflags 1.3.2 (https://github.com/bitflags/bitflags)
   - bitflags 2.13.2 (https://github.com/bitflags/bitflags)
   - glob 0.3.4 (https://github.com/rust-lang/glob)
-  - log 0.4.34 (https://github.com/rust-lang/log)
+  - log 0.4.35 (https://github.com/rust-lang/log)
   - num-bigint 0.4.8 (https://github.com/rust-num/num-bigint)
   - num-complex 0.4.6 (https://github.com/rust-num/num-complex)
   - num-integer 0.1.47 (https://github.com/rust-num/num-integer)
@@ -12883,7 +12883,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - uuid 1.29.0 (https://github.com/uuid-rs/uuid)
+  - uuid 1.29.2 (https://github.com/uuid-rs/uuid)
 
 Copyright (c) 2014 The Rust Project Developers
 Copyright (c) 2018 Ashley Mannix, Christopher Armstrong, Dylan DPC, Hunar Roop Kahlon
@@ -13080,7 +13080,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - flate2 1.1.10 (https://github.com/rust-lang/flate2-rs)
+  - flate2 1.1.11 (https://github.com/rust-lang/flate2-rs)
 
 Copyright (c) 2014-2026 Alex Crichton
 
@@ -13145,6 +13145,7 @@ Used by:
   - coreaudio-rs 0.14.2 (https://github.com/RustAudio/coreaudio-rs.git)
   - either 1.19.0 (https://github.com/rayon-rs/either)
   - itertools 0.14.0 (https://github.com/rust-itertools/itertools)
+  - itertools 0.15.0 (https://github.com/rust-itertools/itertools)
   - maplit 1.0.2 (https://github.com/bluss/maplit)
   - petgraph 0.8.3 (https://github.com/petgraph/petgraph)
   - serde_with 3.24.0 (https://github.com/jonasbb/serde_with/)
@@ -13346,6 +13347,7 @@ MIT License
 
 Used by:
   - object 0.40.0 (https://github.com/gimli-rs/object)
+  - object 0.41.0 (https://github.com/gimli-rs/object)
 
 Copyright (c) 2015 The Gimli Developers
 
@@ -13384,7 +13386,7 @@ Used by:
   - heck 0.4.1 (https://github.com/withoutboats/heck)
   - heck 0.5.0 (https://github.com/withoutboats/heck)
   - unicode-segmentation 1.13.3 (https://github.com/unicode-rs/unicode-segmentation)
-  - unicode-width 0.2.2 (https://github.com/unicode-rs/unicode-width)
+  - unicode-width 0.2.3 (https://github.com/unicode-rs/unicode-width)
   - unicode-xid 0.2.6 (https://github.com/unicode-rs/unicode-xid)
 
 Copyright (c) 2015 The Rust Project Developers
@@ -13611,7 +13613,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - fixedbitset 0.5.7 (https://github.com/petgraph/fixedbitset)
+  - fixedbitset 0.5.9 (https://github.com/petgraph/fixedbitset)
 
 Copyright (c) 2015-2017
 
@@ -14819,7 +14821,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - arc-swap 1.9.3 (https://github.com/vorner/arc-swap)
+  - arc-swap 1.9.5 (https://github.com/vorner/arc-swap)
 
 Copyright (c) 2017 arc-swap developers
 
@@ -15266,7 +15268,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - smallvec 1.16.4 (https://github.com/servo/rust-smallvec)
+  - smallvec 1.16.5 (https://github.com/servo/rust-smallvec)
 
 Copyright (c) 2018 The Servo Project Developers
 
@@ -15974,7 +15976,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - bumpalo 3.20.3 (https://github.com/fitzgen/bumpalo)
+  - bumpalo 3.20.4 (https://github.com/fitzgen/bumpalo)
 
 Copyright (c) 2019 Nick Fitzgerald
 
@@ -16397,7 +16399,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - rubato 5.0.1 (https://github.com/HEnquist/rubato)
+  - rubato 5.1.0 (https://github.com/HEnquist/rubato)
 
 Copyright (c) 2020 Henrik Enquist
 
@@ -16424,7 +16426,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - cms 0.3.0-pre.1 (https://github.com/RustCrypto/formats)
+  - cms 0.3.0-rc.2 (https://github.com/RustCrypto/formats)
   - cpufeatures 0.2.17 (https://github.com/RustCrypto/utils)
   - der_derive 0.8.0 (https://github.com/RustCrypto/formats)
 
@@ -16460,9 +16462,9 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - const-oid 0.10.2 (https://github.com/RustCrypto/formats)
+  - const-oid 0.10.3 (https://github.com/RustCrypto/formats)
   - cpufeatures 0.3.1 (https://github.com/RustCrypto/utils)
-  - der 0.8.2 (https://github.com/RustCrypto/formats)
+  - der 0.8.3 (https://github.com/RustCrypto/formats)
   - pkcs8 0.11.0 (https://github.com/RustCrypto/formats)
 
 Copyright (c) 2020-2026 The RustCrypto Project Developers
@@ -16770,41 +16772,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - pkcs12 0.2.0-pre.0 (https://github.com/RustCrypto/formats)
-
-Copyright (c) 2022-2025 The RustCrypto Project Developers
-
-Permission is hereby granted, free of charge, to any
-person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the
-Software without restriction, including without
-limitation the rights to use, copy, modify, merge,
-publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software
-is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice
-shall be included in all copies or substantial portions
-of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
-ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
-SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
-IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
-
-
---------------------------------------------------------------------------------
-MIT License
---------------------------------------------------------------------------------
-
-Used by:
-  - inout 0.2.5 (https://github.com/RustCrypto/utils)
+  - inout 0.2.6 (https://github.com/RustCrypto/utils)
 
 Copyright (c) 2022-2025 The RustCrypto Project Developers
 Copyright (c) 2022 Artyom Pavlov
@@ -16841,6 +16809,7 @@ MIT License
 Used by:
   - cmov 0.5.4 (https://github.com/RustCrypto/utils)
   - hybrid-array 0.4.15 (https://github.com/RustCrypto/hybrid-array)
+  - pkcs12 0.2.0-rc.0 (https://github.com/RustCrypto/formats)
 
 Copyright (c) 2022-2026 The RustCrypto Project Developers
 
@@ -16874,7 +16843,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - rustls-pki-types 1.15.1 (https://github.com/rustls/pki-types)
+  - rustls-pki-types 1.16.0 (https://github.com/rustls/pki-types)
 
 Copyright (c) 2023 Dirkjan Ochtman <dirkjan@ochtman.nl>
 
@@ -17140,9 +17109,9 @@ MIT License
 
 Used by:
   - zbus 5.19.0 (https://github.com/z-galaxy/zbus/)
-  - zbus 6.2.1 (https://github.com/z-galaxy/zbus/)
+  - zbus 6.3.0 (https://github.com/z-galaxy/zbus/)
   - zbus_macros 5.19.0 (https://github.com/z-galaxy/zbus/)
-  - zbus_macros 6.2.1 (https://github.com/z-galaxy/zbus/)
+  - zbus_macros 6.3.0 (https://github.com/z-galaxy/zbus/)
   - zbus_names 4.3.5 (https://github.com/z-galaxy/zbus/)
   - zbus_utils 6.1.0 (https://github.com/z-galaxy/zbus/)
   - zvariant 5.15.1 (https://github.com/z-galaxy/zbus/)
@@ -17305,7 +17274,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - zcheapstr 1.1.0 (https://github.com/z-galaxy/zcheapstr/)
+  - zcheapstr 1.2.0 (https://github.com/z-galaxy/zcheapstr/)
 
 Copyright (c) 2026 Zeeshan Ali Khan & zcheapstr contributors
 
@@ -17339,7 +17308,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - zruntime 0.2.1 (https://github.com/z-galaxy/zruntime)
+  - zruntime 0.2.3 (https://github.com/z-galaxy/zruntime)
 
 Copyright (c) 2026 Zeeshan Ali Khan & zruntime contributors
 
@@ -17379,7 +17348,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - annotate-snippets 0.12.17 (https://github.com/rust-lang/annotate-snippets-rs)
+  - annotate-snippets 0.12.18 (https://github.com/rust-lang/annotate-snippets-rs)
   - anstream 1.0.0 (https://github.com/rust-cli/anstyle.git)
   - anstyle-parse 1.0.0 (https://github.com/rust-cli/anstyle.git)
   - anstyle-query 1.1.5 (https://github.com/rust-cli/anstyle.git)
@@ -17397,7 +17366,7 @@ Used by:
   - toml_datetime 1.1.3+spec-1.1.0 (https://github.com/toml-rs/toml)
   - toml_edit 0.19.15 (https://github.com/toml-rs/toml)
   - toml_edit 0.20.2 (https://github.com/toml-rs/toml)
-  - toml_edit 0.25.17+spec-1.1.0 (https://github.com/toml-rs/toml)
+  - toml_edit 0.25.19+spec-1.1.0 (https://github.com/toml-rs/toml)
   - toml_parser 1.1.5+spec-1.1.0 (https://github.com/toml-rs/toml)
   - toml_writer 1.2.0+spec-1.1.0 (https://github.com/toml-rs/toml)
 
@@ -17843,7 +17812,8 @@ MIT License
 Used by:
   - encoding_rs 0.8.44 (https://github.com/hsivonen/encoding_rs)
   - multiversion_no_op 1.0.0 (https://github.com/hsivonen/multiversion_no_op)
-  - utf8_iter 1.0.4 (https://github.com/hsivonen/utf8_iter)
+  - utf8_iter 1.1.0 (https://github.com/hsivonen/utf8_iter)
+  - utf_types 1.0.0 (https://github.com/hsivonen/utf_types)
 
 Copyright Mozilla Foundation
 
@@ -17997,7 +17967,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - psl 2.1.249 (https://github.com/addr-rs/psl)
+  - psl 2.1.254 (https://github.com/addr-rs/psl)
 
 MIT License
 
@@ -18365,7 +18335,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - crc32fast 1.5.3 (https://github.com/srijs/rust-crc32fast)
+  - crc32fast 1.5.5 (https://github.com/srijs/rust-crc32fast)
 
 MIT License
 
@@ -18712,6 +18682,36 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - realfft 3.5.1 (https://github.com/HEnquist/realfft)
+
+MIT License
+
+Copyright (c) 2020 Henrik Enquist and RealFFT contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
 
 MIT License
@@ -18772,36 +18772,6 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - trim-in-place 0.1.8 (https://github.com/magiclen/trim-in-place)
-
-MIT License
-
-Copyright (c) 2020 magiclen.org (Ron Li)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
---------------------------------------------------------------------------------
-MIT License
---------------------------------------------------------------------------------
-
-Used by:
   - window-vibrancy 0.8.1 (https://github.com/tauri-apps/tauri-plugin-vibrancy)
 
 MIT License
@@ -18832,7 +18802,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - wry 0.57.1 (https://github.com/tauri-apps/wry)
+  - wry 0.57.2 (https://github.com/tauri-apps/wry)
 
 MIT License
 
@@ -19103,8 +19073,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - tauri-specta-macros 2.0.0-rc.26 (https://github.com/specta-rs/tauri-specta)
-  - tauri-specta 2.0.0-rc.26 (https://github.com/specta-rs/tauri-specta)
+  - tauri-specta 2.0.0-rc.29 (https://github.com/specta-rs/tauri-specta)
 
 MIT License
 
@@ -19321,8 +19290,8 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - ort-sys 2.0.0-rc.13 (https://github.com/pykeio/ort)
-  - ort 2.0.0-rc.13 (https://github.com/pykeio/ort)
+  - ort-sys 2.0.0-rc.15 (https://github.com/pykeio/ort)
+  - ort 2.0.0-rc.15 (https://github.com/pykeio/ort)
 
 MIT License
 
@@ -19476,7 +19445,7 @@ Used by:
   - anymap3 1.1.0 (https://github.com/reivilibre/anymap3)
   - asn1-rs-impl 0.2.0 (https://github.com/rusticata/asn1-rs.git)
   - block2 0.6.2 (https://github.com/madsmtm/objc2)
-  - brotli-decompressor 6.0.1 (https://github.com/dropbox/rust-brotli-decompressor)
+  - brotli-decompressor 6.3.1 (https://github.com/dropbox/rust-brotli-decompressor)
   - chrono 0.4.45 (https://github.com/chronotope/chrono)
   - cookie-factory 0.3.3 (https://github.com/rust-bakery/cookie-factory)
   - crab_nat 0.8.1 (https://github.com/ryco117/crab_nat)
@@ -19515,20 +19484,20 @@ Used by:
   - p12-keystore 0.4.1 (https://github.com/ancwrd1/p12-keystore)
   - qrcodegen 1.8.0 (https://github.com/nayuki/QR-Code-generator)
   - rcgen 0.14.10 (https://github.com/rustls/rcgen)
-  - realfft 3.5.0 (https://github.com/HEnquist/realfft)
-  - specta-macros 2.0.0-rc.26 (https://github.com/specta-rs/specta)
-  - specta-serde 0.0.13 (https://github.com/specta-rs/specta)
-  - specta-typescript 0.0.13 (https://github.com/specta-rs/specta)
-  - specta-util 0.0.13 (https://github.com/specta-rs/specta)
-  - specta 2.0.0-rc.26 (https://github.com/specta-rs/specta)
+  - specta-macros 2.0.0-rc.28 (https://github.com/specta-rs/specta)
+  - specta-serde 0.0.15 (https://github.com/specta-rs/specta)
+  - specta-typescript 0.0.15 (https://github.com/specta-rs/specta)
+  - specta-util 0.0.15 (https://github.com/specta-rs/specta)
+  - specta 2.0.0-rc.28 (https://github.com/specta-rs/specta)
   - tauri-plugin-clipboard-manager 2.5.0 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-deep-link 2.6.3 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-dialog 2.8.4 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-fs 2.7.1 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-global-shortcut 2.4.1 (https://github.com/tauri-apps/plugins-workspace)
-  - tauri-plugin-opener 2.7.2 (https://github.com/tauri-apps/plugins-workspace)
+  - tauri-plugin-opener 2.7.3 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-single-instance 2.5.5 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-updater 2.14.1 (https://github.com/tauri-apps/plugins-workspace)
+  - tauri-specta-macros 2.0.0-rc.29 (https://github.com/specta-rs/tauri-specta)
   - tauri-winrt-notification 0.8.1 (https://github.com/tauri-apps/winrt-notification)
   - v4l2-sys-mit 0.3.0
   - webview2-com-macros 0.8.1 (https://github.com/wravery/webview2-rs)
@@ -19539,18 +19508,26 @@ Used by:
   - windows-future 0.3.2 (https://github.com/microsoft/windows-rs)
   - windows-implement 0.60.2 (https://github.com/microsoft/windows-rs)
   - windows-interface 0.59.3 (https://github.com/microsoft/windows-rs)
+  - windows-link 0.100.0 (https://github.com/microsoft/windows-rs)
   - windows-link 0.2.1 (https://github.com/microsoft/windows-rs)
   - windows-numerics 0.3.1 (https://github.com/microsoft/windows-rs)
+  - windows-registry 0.100.0 (https://github.com/microsoft/windows-rs)
   - windows-registry 0.6.1 (https://github.com/microsoft/windows-rs)
+  - windows-result 0.100.0 (https://github.com/microsoft/windows-rs)
   - windows-result 0.4.1 (https://github.com/microsoft/windows-rs)
+  - windows-strings 0.100.0 (https://github.com/microsoft/windows-rs)
   - windows-strings 0.5.1 (https://github.com/microsoft/windows-rs)
+  - windows-sys 0.45.0 (https://github.com/microsoft/windows-rs)
+  - windows-sys 0.52.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.59.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.61.2 (https://github.com/microsoft/windows-rs)
+  - windows-targets 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows-targets 0.52.6 (https://github.com/microsoft/windows-rs)
   - windows-threading 0.2.1 (https://github.com/microsoft/windows-rs)
   - windows-version 0.1.7 (https://github.com/microsoft/windows-rs)
   - windows 0.62.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_gnu 0.52.6 (https://github.com/microsoft/windows-rs)
+  - windows_x86_64_msvc 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_msvc 0.52.6 (https://github.com/microsoft/windows-rs)
 
 MIT License
@@ -19885,7 +19862,7 @@ Used by:
   - async-channel 2.5.0 (https://github.com/smol-rs/async-channel)
   - async-executor 1.14.1 (https://github.com/smol-rs/async-executor)
   - async-io 2.6.0 (https://github.com/smol-rs/async-io)
-  - async-lock 3.4.2 (https://github.com/smol-rs/async-lock)
+  - async-lock 3.5.0 (https://github.com/smol-rs/async-lock)
   - async-process 2.5.0 (https://github.com/smol-rs/async-process)
   - async-signal 0.2.14 (https://github.com/smol-rs/async-signal)
   - async-task 4.7.1 (https://github.com/smol-rs/async-task)
@@ -19900,12 +19877,12 @@ Used by:
   - dtoa 1.0.11 (https://github.com/dtolnay/dtoa)
   - dyn-clone 1.0.20 (https://github.com/dtolnay/dyn-clone)
   - endi 1.1.1 (https://github.com/zeenix/endi)
-  - erased-serde 0.4.10 (https://github.com/dtolnay/erased-serde)
+  - erased-serde 0.4.11 (https://github.com/dtolnay/erased-serde)
   - event-listener-strategy 0.5.4 (https://github.com/smol-rs/event-listener-strategy)
   - event-listener 5.4.2 (https://github.com/smol-rs/event-listener)
   - fastrand 2.5.0 (https://github.com/smol-rs/fastrand)
   - futures-lite 2.6.1 (https://github.com/smol-rs/futures-lite)
-  - itoa 1.0.18 (https://github.com/dtolnay/itoa)
+  - itoa 1.0.19 (https://github.com/dtolnay/itoa)
   - lazy_static 1.5.1 (https://github.com/rust-lang-nursery/lazy-static.rs)
   - leb128fmt 0.1.0 (https://github.com/bluk/leb128fmt)
   - linux-raw-sys 0.12.1 (https://github.com/sunfishcode/linux-raw-sys)
@@ -19944,7 +19921,7 @@ Used by:
   - servo_arc 0.4.3 (https://github.com/servo/stylo)
   - syn 1.0.109 (https://github.com/dtolnay/syn)
   - syn 2.0.119 (https://github.com/dtolnay/syn)
-  - syn 3.0.9 (https://github.com/dtolnay/syn)
+  - syn 3.0.10 (https://github.com/dtolnay/syn)
   - thiserror-impl 1.0.69 (https://github.com/dtolnay/thiserror)
   - thiserror-impl 2.0.21 (https://github.com/dtolnay/thiserror)
   - thiserror 1.0.69 (https://github.com/dtolnay/thiserror)
@@ -20071,7 +20048,7 @@ MIT License
 
 Used by:
   - winnow 0.5.40 (https://github.com/winnow-rs/winnow)
-  - winnow 1.0.4 (https://github.com/winnow-rs/winnow)
+  - winnow 1.0.5 (https://github.com/winnow-rs/winnow)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -20198,7 +20175,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - ctor 1.0.13 (https://github.com/mmastrac/linktime)
+  - ctor 1.0.14 (https://github.com/mmastrac/linktime)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -20381,7 +20358,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - rust-ini 0.21.1 (https://github.com/zonyitoo/rust-ini)
+  - rust-ini 0.21.3 (https://github.com/zonyitoo/rust-ini)
 
 The MIT License (MIT)
 
@@ -20867,8 +20844,8 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - async-compression 0.4.51 (https://github.com/Nullus157/async-compression)
-  - compression-codecs 0.4.46 (https://github.com/Nullus157/async-compression)
+  - async-compression 0.4.52 (https://github.com/Nullus157/async-compression)
+  - compression-codecs 0.4.47 (https://github.com/Nullus157/async-compression)
   - compression-core 0.4.34 (https://github.com/Nullus157/async-compression)
 
 The MIT License (MIT)
