@@ -38,6 +38,7 @@
 
 ### Internal
 
+- Crash reports: `crash::record_foreign` records an exception of the phone apps (kind "foreign exception", exception types only, never their messages, stack cut at 64 KiB); `crash::install` takes the app's private folders to shorten and ignores `HOME=/`; Android and iOS keep only the newest "unexpected exit" report; test builds (feature `test-backend`) can send uploads to a local loopback server through `MUMCORD_CRASH_UPLOAD_URL`, release builds always use the crash server
 - Engine: `reconnect_now` reconnects a server at once for an app that just got a working network again: it ends the wait before the next attempt, or drops a connection whose socket may be dead after a network change, and returns to the last channel with the own mute and deafen
 - Engine: `EngineEvent::UserRemoved` carries who kicked or banned the person, the reason and whether it was a ban; `UserView.comment_hash` changes whenever a person's comment changes; `set_own_avatar_bytes` sets the own avatar from image bytes without a file (for the phone apps)
 - Engine: `camera_set_tiles_wanted_by_default`, `camera_tile_set_wanted` and `camera_tile_path` for the phone apps, which load a camera only after the user taps it and show how it arrives; the desktop keeps loading every shown camera
