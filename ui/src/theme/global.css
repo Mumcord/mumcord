@@ -142,12 +142,17 @@ body::after {
    popovers and dialogs and covered the right edge of list rows. Kept to the ::-webkit-scrollbar
    rules on purpose: once scrollbar-width or scrollbar-color is set, WebView2 ignores them. */
 ::-webkit-scrollbar {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.375rem;
+  height: 0.375rem;
 }
 
+/* Hidden while idle; shown while the element scrolls (scrollActivity.ts) or the pointer is on it. */
 ::-webkit-scrollbar-thumb {
   border-radius: var(--radius-full);
+  background: transparent;
+}
+
+[data-scrolling]::-webkit-scrollbar-thumb {
   background: var(--color-border-strong);
 }
 

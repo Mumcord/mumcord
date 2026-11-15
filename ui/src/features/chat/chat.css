@@ -545,11 +545,6 @@
   opacity: 1;
 }
 
-/* A thin scroll bar, only visible once the text is taller than the cap (#596). */
-.chat-composer__input::-webkit-scrollbar {
-  width: 0.375rem;
-}
-
 /* Icon row under the field: every button gets the same box, colour and round hover (#596). */
 .chat-composer__tools {
   display: flex;

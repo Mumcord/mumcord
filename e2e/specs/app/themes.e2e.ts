@@ -129,21 +129,36 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
   });
 
   // #875: GTK overlay scrollbars take no room and are painted after the whole page, so they
-  // crossed open menus. The themed scrollbar is an in-page one: it takes its 0.5rem of room.
-  it("scrollbars are themed in-page scrollbars, not overlays drawn above menus", async () => {
+  // crossed open menus. The themed scrollbar is an in-page one: it takes its 0.375rem of room.
+  // It shows only while its element scrolls, marked by data-scrolling, and hides when idle.
+  it("scrollbars are themed in-page scrollbars that hide when idle, not overlays above menus", async () => {
     const room = await browser.execute(() => {
       const scroller = document.createElement("div");
+      scroller.id = "e2e-scroller";
       scroller.style.cssText = "position:fixed;top:0;left:0;width:200px;height:100px;overflow-y:scroll";
       scroller.appendChild(document.createElement("div")).style.height = "400px";
       document.getElementById("root")?.appendChild(scroller);
-      const result = {
+      return {
         scrollbar: scroller.offsetWidth - scroller.clientWidth,
-        expected: parseFloat(getComputedStyle(document.documentElement).fontSize) / 2,
+        expected: parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.375,
       };
-      scroller.remove();
-      return result;
     });
     expect(room.scrollbar).toBe(room.expected);
+
+    const scroller = $("#e2e-scroller");
+    expect(await scroller.getAttribute("data-scrolling")).toBeNull();
+    await browser.execute(() => {
+      const el = document.getElementById("e2e-scroller");
+      if (el) el.scrollTop = 120;
+    });
+    await browser.waitUntil(async () => (await scroller.getAttribute("data-scrolling")) !== null, {
+      timeoutMsg: "scrollbar not shown while scrolling",
+    });
+    await browser.waitUntil(async () => (await scroller.getAttribute("data-scrolling")) === null, {
+      timeout: 5_000,
+      timeoutMsg: "scrollbar not hidden once idle",
+    });
+    await browser.execute(() => document.getElementById("e2e-scroller")?.remove());
   });
 
   it("AC-2.12: a custom theme made in dark gets a passing light version, both editable", async () => {
