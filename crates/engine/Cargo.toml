@@ -188,9 +188,9 @@ test-backend = ["mumcord-audio/test-backend"]
 # protoc-bin-vendored ships, so neither it nor the tests that use it build there (the client
 # itself is unaffected).
 [target.'cfg(not(target_os = "freebsd"))'.dev-dependencies]
-# Live tests drive scripted bots through the mumbot library, pinned to the media-v2 work until it
-# is released.
-mumbot = { git = "https://github.com/sothis/mumbot", rev = "dfd7647cb56aeef3d60732c92c66a3c1215084ac", features = ["tester"] }
+# Live tests drive scripted bots through the mumbot library, pinned to the v0.6.0 release, the
+# first that takes the 0.9 mumcord crates (so it builds against this workspace's mumcord-p2p).
+mumbot = { git = "https://github.com/Mumcord/mumbot", rev = "c502d37b162bf95442f23e8d2a5c922f51d41f49", features = ["tester"] }
 
 [[test]]
 name = "live_positional"
