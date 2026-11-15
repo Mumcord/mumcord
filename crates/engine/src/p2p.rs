@@ -24,13 +24,13 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 
+use mumble_client_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumble_client_protocol::{ClientIdentity, PluginData};
 use mumcord_p2p::quinn::{self, RecvStream, SendStream};
 pub use mumcord_p2p::{
     ConnectionPath, DATA_ID, P2pConfig, P2pError, PeerConnection, RelayTransport,
 };
 use mumcord_p2p::{DeclineReason, P2p, Reveal, SessionId, Side, Signal};
-use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
-use mumcord_protocol::{ClientIdentity, PluginData};
 use mumcord_store::{Consent, P2pMode, Store};
 use tokio::sync::{Notify, oneshot};
 
@@ -50,6 +50,8 @@ pub const STREAM_SCREEN: u8 = 2;
 pub const STREAM_FILE: u8 = 3;
 /// Plugin data to one person (spec 09 FR-9.59), on a one-way stream.
 pub const STREAM_PLUGIN_DATA: u8 = 4;
+/// A direct camera stream, opened by the sharer to one admitted viewer (spec 08 FR-8.92).
+pub const STREAM_CAMERA: u8 = 5;
 
 /// What a stream of `kind` uses the relay for (FR-7.6); `None` for an unknown kind.
 pub(crate) fn stream_use(kind: u8) -> Option<RelayUse> {
@@ -58,6 +60,7 @@ pub(crate) fn stream_use(kind: u8) -> Option<RelayUse> {
         STREAM_SCREEN => Some(RelayUse::ScreenShare),
         STREAM_FILE => Some(RelayUse::Files),
         STREAM_PLUGIN_DATA => Some(RelayUse::PluginData),
+        STREAM_CAMERA => Some(RelayUse::Camera),
         _ => None,
     }
 }
@@ -135,6 +138,17 @@ pub(crate) struct Plan {
 }
 
 impl Plan {
+    /// The same plan with direct connections allowed as `consent` says, for answering the offer
+    /// of a camera this client asked for (spec 08, FR-8.94).
+    pub(crate) fn with_direct(self, consent: Consent) -> Self {
+        let direct = match consent {
+            Consent::Yes => DirectUse::Yes,
+            Consent::Unset => DirectUse::Ask,
+            Consent::No => DirectUse::No,
+        };
+        Self { direct, ..self }
+    }
+
     /// What the offer or answer reveals once an open consent question is settled:
     /// `ask_answer` is the answer to it (ignored when nothing was asked).
     pub(crate) fn reveal(self, ask_answer: bool) -> Result<Reveal, DirectError> {
@@ -151,6 +165,14 @@ impl Plan {
             relay: self.relay,
         })
     }
+}
+
+/// Whether the offer of a camera this client asked for may be answered with addresses although
+/// the mode would rather not go direct (spec 08, FR-8.94). The viewer wants that picture and the
+/// sender may have no relay broadcast that could serve it, so `relay_first` gives way; the hard
+/// "never direct" of `relay_only`, `off` and a turned-off consent still hold.
+pub(crate) fn camera_direct_ok(mode: P2pMode, consent: Consent, wanted: bool) -> bool {
+    wanted && consent != Consent::No && !matches!(mode, P2pMode::RelayOnly | P2pMode::Off)
 }
 
 /// What this side may use given the effective mode of the server, the relay's availability for
@@ -288,9 +310,10 @@ pub(crate) fn mode_and_consent(store: &Store, server_id: ServerId) -> (P2pMode, 
 }
 
 impl Engine {
-    /// The effective P2P mode of `server_id` ("off" when it cannot be read).
-    pub(crate) fn p2p_mode_of(&self, server_id: ServerId) -> P2pMode {
-        mode_and_consent(&lock(&self.store_handle()), server_id).0
+    /// The effective P2P mode of `server_id` and whether direct connections are allowed there.
+    /// A stored "no" forbids the direct path whatever the mode says (FR-4.3, FR-4.5).
+    pub(crate) fn p2p_mode_and_consent_of(&self, server_id: ServerId) -> (P2pMode, Consent) {
+        mode_and_consent(&lock(&self.store_handle()), server_id)
     }
 }
 
@@ -637,6 +660,21 @@ async fn answer(
     };
     let relay = engine.relays().availability(ctx.server_id);
     let plan = plan_for(&ctx.store(), ctx.server_id, relay);
+    // A viewer that asked for this camera accepts the sender's direct stream even in
+    // `relay_first`: the sender may have no broadcast to serve it (FR-8.94).
+    let (mode, consent) = mode_and_consent(&ctx.store(), ctx.server_id);
+    let camera = camera_direct_ok(
+        mode,
+        consent,
+        engine.camera_wants_direct(ctx.server_id, from),
+    );
+    let plan = plan.map(|plan| {
+        if camera {
+            plan.with_direct(consent)
+        } else {
+            plan
+        }
+    });
     // An offer through the relay without addresses (relay first, or a file) never goes direct
     // (`route`): answering with addresses would only reveal them, so neither side does.
     let relay_only = *peer_relay && candidates.is_empty();
@@ -766,6 +804,9 @@ async fn accept_streams(engine: WeakEngine, key: Key, connection: quinn::Connect
                 }
                 STREAM_SCREEN => {
                     crate::screen_share::serve_direct(&engine, key.0, key.1, send, recv).await;
+                }
+                STREAM_CAMERA => {
+                    crate::camera::recv::serve_direct(&engine, key.0, key.1, send, recv).await;
                 }
                 other => tracing::debug!(kind = other, "ignoring an unknown direct stream"),
             }
@@ -971,7 +1012,7 @@ impl Engine {
         session: u32,
         relay_use: RelayUse,
     ) -> Result<Arc<PeerConnection>, DirectError> {
-        self.p2p_connection_prompting(server_id, session, relay_use, ConsentPrompt::Allowed)
+        self.p2p_connection_prompting(server_id, session, relay_use, ConsentPrompt::Allowed, false)
             .await
     }
 
@@ -982,6 +1023,7 @@ impl Engine {
         session: u32,
         relay_use: RelayUse,
         prompt: ConsentPrompt,
+        camera: bool,
     ) -> Result<Arc<PeerConnection>, DirectError> {
         let key = (server_id, session);
         if let Some(open) = self.p2p_open_for(key, relay_use, false) {
@@ -989,7 +1031,14 @@ impl Engine {
         }
         let (ctx, peer_hash) = self.p2p_peer(server_id, session)?;
         let relay = self.relays().availability_for(server_id, relay_use);
+        // A camera stream is opened because the viewer asked for it and no broadcast can serve
+        // it, so `relay_first` gives way (spec 08, FR-8.94); the mode and the consent still hold.
+        let (mode, consent) = mode_and_consent(&ctx.store(), server_id);
         let plan = plan_for(&ctx.store(), server_id, relay)?;
+        let plan = match camera_direct_ok(mode, consent, camera) {
+            true => plan.with_direct(consent),
+            false => plan,
+        };
         let asked = plan.direct == DirectUse::Ask
             && prompt == ConsentPrompt::Allowed
             && self.direct_allowed(&ctx).await;
@@ -1170,7 +1219,7 @@ impl Engine {
         let relay_use =
             stream_use(kind).ok_or_else(|| DirectError::Stream(format!("unknown kind {kind}")))?;
         let conn = self
-            .p2p_connection_prompting(server_id, session, relay_use, prompt)
+            .p2p_connection_prompting(server_id, session, relay_use, prompt, kind == STREAM_CAMERA)
             .await?;
         let (mut send, recv) = conn
             .connection()
@@ -1194,6 +1243,18 @@ impl Engine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_camera_stream_may_go_direct_even_in_relay_first() {
+        // `relay_first` gives way for a camera the viewer asked for (spec 08, FR-8.94)…
+        assert!(camera_direct_ok(P2pMode::RelayFirst, Consent::Yes, true));
+        // …but never for a mode or a consent that forbids direct connections, and only while the
+        // viewer actually wants that camera.
+        assert!(!camera_direct_ok(P2pMode::RelayOnly, Consent::Yes, true));
+        assert!(!camera_direct_ok(P2pMode::Off, Consent::Yes, true));
+        assert!(!camera_direct_ok(P2pMode::RelayFirst, Consent::No, true));
+        assert!(!camera_direct_ok(P2pMode::RelayFirst, Consent::Yes, false));
+    }
 
     const MODES: [P2pMode; 5] = [
         P2pMode::DirectRelay,
@@ -1352,6 +1413,7 @@ mod tests {
         assert_eq!(stream_use(STREAM_SCREEN), Some(RelayUse::ScreenShare));
         assert_eq!(stream_use(STREAM_FILE), Some(RelayUse::Files));
         assert_eq!(stream_use(STREAM_PLUGIN_DATA), Some(RelayUse::PluginData));
+        assert_eq!(stream_use(STREAM_CAMERA), Some(RelayUse::Camera));
         assert_eq!(stream_use(0), None);
     }
 

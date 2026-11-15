@@ -9,7 +9,7 @@ publish = false
 
 [dependencies]
 mumcord-store = { path = "../../../crates/store" }
-mumcord-protocol = { path = "../../../crates/protocol" }
+mumble-client-protocol = "0.1"
 tokio = { version = "1.54", features = ["rt", "macros", "time"] }
 
 [workspace]

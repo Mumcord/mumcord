@@ -15,7 +15,7 @@
 //! Integers are big-endian. Everything received is untrusted: decoding rejects unknown kinds,
 //! wrong lengths and oversized chunks.
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 use sha2::{Digest, Sha256};
 
 /// Plugin data id of full-image transfers; other ids are ignored.

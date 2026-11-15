@@ -4,7 +4,7 @@
 //! the connection lifecycle. Use [`SessionCtx`] for the protocol handle, the store and event
 //! output, and `Engine::session_ctx_for` from commands.
 
-use mumcord_protocol::Event;
+use mumble_client_protocol::Event;
 
 use super::{SessionCtx, Snapshot};
 use crate::{chat, follow};

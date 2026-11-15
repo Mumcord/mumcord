@@ -179,7 +179,7 @@ jobs:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
 
-      # bindgen (crates/screenshare/build.rs) loads libclang: LLVM on the Windows runner, Xcode's
+      # bindgen (the build script of the hwcodec crate) loads libclang: LLVM on the Windows runner, Xcode's
       # toolchain on macOS, libclang-dev (found on its own) on Linux.
       - name: Point the build at libvpx and libclang
         shell: bash

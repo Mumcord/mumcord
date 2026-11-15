@@ -27,7 +27,8 @@ Mumble protocol and plugin interface
 License: BSD-3-Clause
 Repository: https://github.com/mumble-voip/mumble
 
-The protocol definition files in proto/ (Mumble.proto, MumbleUDP.proto) are taken
+The protocol definition files (Mumble.proto, MumbleUDP.proto) and the OCB2 voice
+encryption in the mumble-client-protocol crate, which Mumcord compiles in, are taken
 from the Mumble project. The official Mumble game plugins that Mumcord can load at
 runtime to read game positions are developed by the Mumble project under the same
 license; they are not part of this repository. Mumcord's plugin host
@@ -128,9 +129,11 @@ libvpx 1.15.2
 License: BSD-3-Clause
 Repository: https://chromium.googlesource.com/webm/libvpx
 
-VP9 (and VP8) screen-share encoder and decoder, linked by crates/screenshare.
+VP9 (and VP8) screen-share encoder and decoder, linked by the hwcodec crate.
 Statically linked into the Windows app (vcpkg build) and the macOS and Linux apps
 (built from the libvpx release source), so it is part of every Mumcord build.
+hwcodec's hwcodec-libvpx-src crate bundles the same sources under the same licence;
+Mumcord links its own build (scripts/build-libvpx.sh) instead.
 
 Copyright (c) 2010, The WebM Project authors. All rights reserved.
 
@@ -173,9 +176,9 @@ NVIDIA NVENC API headers (nv-codec-headers) 13.0.19.0
 License: MIT
 Repository: https://github.com/FFmpeg/nv-codec-headers
 
-Interface definitions for NVIDIA's hardware AV1 encoder, compiled into the Windows and
-Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The NVIDIA driver itself is
-loaded from the system at runtime.
+Interface definitions for NVIDIA's hardware AV1 encoder, bundled in the hwcodec crate
+and compiled into the Windows and Linux apps for screen sharing. The NVIDIA driver
+itself is loaded from the system at runtime.
 
 Copyright (c) 2010-2023 NVIDIA Corporation
 
@@ -207,8 +210,8 @@ AMD AMF headers 1.5.3
 License: MIT
 Repository: https://github.com/GPUOpen-LibrariesAndSDKs/AMF
 
-Interface definitions for AMD's hardware AV1 encoder, compiled into the Windows and
-Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The AMD driver itself is
+Interface definitions for AMD's hardware AV1 encoder, bundled in the hwcodec crate and
+compiled into the Windows and Linux apps for screen sharing. The AMD driver itself is
 loaded from the system at runtime.
 
 Notice Regarding Standards.  AMD does not provide a license or sublicense to
@@ -249,7 +252,9 @@ License: MIT
 Repository: https://github.com/intel/libvpl
 
 Finds and loads Intel's Quick Sync runtime for the hardware AV1 and VP9 encoders of
-Intel graphics. Statically linked into the Windows and Linux apps.
+Intel graphics. Statically linked into the Windows and Linux apps
+(scripts/build-hwenc-sdk.sh). hwcodec's hwcodec-libvpl-src crate bundles the same
+sources under the same licence; Mumcord links its own build instead.
 
 MIT License
 
@@ -280,8 +285,9 @@ VA-API headers (libva) 2.22.0
 License: MIT
 Repository: https://github.com/intel/libva
 
-Interface definitions for the Linux video acceleration API, compiled into the Linux app
-for hardware AV1 and VP9 encoding. The system's libva is loaded at runtime when present.
+Interface definitions for the Linux video acceleration API, bundled in the hwcodec
+crate and compiled into the Linux app for hardware AV1 and VP9 encoding. The system's
+libva is loaded at runtime when present.
 
 Copyright (c) 2007-2009 Intel Corporation. All Rights Reserved.
 
@@ -314,7 +320,8 @@ Repository: https://gitlab.com/AOMediaCodec/SVT-AV1
 
 Software AV1 encoder for screen sharing (scripts/build-svt-av1.sh), statically linked
 into every Mumcord build. Licensed under the Clear BSD licence together with the
-Alliance for Open Media Patent License 1.0.
+Alliance for Open Media Patent License 1.0. hwcodec's hwcodec-svt-av1-src crate
+bundles the same sources under the same licence; Mumcord links its own build instead.
 
 BSD 3-Clause Clear License
 The Clear BSD License
@@ -1204,7 +1211,9 @@ License: BSD-2-Clause
 Repository: https://code.videolan.org/videolan/dav1d
 
 AV1 decoder for screen sharing when the web view cannot decode AV1 itself
-(scripts/build-dav1d.sh), statically linked into every Mumcord build.
+(scripts/build-dav1d.sh), statically linked into every Mumcord build. hwcodec's
+hwcodec-dav1d-src crate bundles the same sources under the same licence; Mumcord links
+its own build instead.
 
 Copyright © 2018-2025, VideoLAN and dav1d authors
 All rights reserved.
@@ -8337,10 +8346,10 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (680 crates)
+* MIT License (685 crates)
 * Apache License 2.0 (44 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
-* ISC License (21 crates)
+* ISC License (20 crates)
 * Unicode License v3 (19 crates)
 * Mozilla Public License 2.0 (7 crates)
 * zlib License (3 crates)
@@ -12016,7 +12025,6 @@ ISC License
 
 Used by:
   - libloading 0.7.4 (https://github.com/nagisa/rust_libloading/)
-  - libloading 0.8.9 (https://github.com/nagisa/rust_libloading/)
   - libloading 0.9.0 (https://github.com/nagisa/rust_libloading/)
 
 Copyright © 2015, Simonas Kazlauskas
@@ -12151,6 +12159,102 @@ fn is_meta_character(c: char) -> bool {
         _ => false,
     }
 }
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
+
+/*
+ * Copyright (c) 2007-2009 Intel Corporation. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the
+ * next paragraph) shall be included in all copies or substantial portions
+ * of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+ * IN NO EVENT SHALL INTEL AND/OR ITS SUPPLIERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+#ifndef _VA_TPI_H_
+#define _VA_TPI_H_
+
+#warning The APIs / data structures included in this file are deprecated
+
+#endif
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
+
+/*
+ * Copyright (c) 2017 Intel Corporation. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the
+ * next paragraph) shall be included in all copies or substantial portions
+ * of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+ * IN NO EVENT SHALL INTEL AND/OR ITS SUPPLIERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+
+#ifndef _VA_STR_H_
+#define _VA_STR_H_
+
+#include <va/va.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+const char *vaProfileStr(VAProfile profile);
+
+const char *vaEntrypointStr(VAEntrypoint entrypoint);
+
+const char *vaConfigAttribTypeStr(VAConfigAttribType configAttribType);
+
+const char *vaBufferTypeStr(VABufferType bufferType);
+
+const char *vaStatusStr(VAStatus status);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _VA_STR_H_ */
 
 
 --------------------------------------------------------------------------------
@@ -15092,6 +15196,42 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - blake2 0.11.0 (https://github.com/RustCrypto/hashes)
+
+Copyright (c) 2017-2026 The RustCrypto Project Developers
+Copyright (c) 2017 Artyom Pavlov
+Copyright (c) 2015-2016 The blake2-rfc Developers, Cesar Barros
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - bytes 1.12.1 (https://github.com/tokio-rs/bytes)
 
 Copyright (c) 2018 Carl Lerche
@@ -16494,6 +16634,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - argon2 0.6.0 (https://github.com/RustCrypto/password-hashes)
   - crypto-bigint 0.7.11 (https://github.com/RustCrypto/crypto-bigint)
   - pkcs1 0.8.0 (https://github.com/RustCrypto/formats)
   - pkcs5 0.8.1 (https://github.com/RustCrypto/formats)
@@ -18571,6 +18712,36 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
+
+MIT License
+
+Copyright (c) 2020 Intel Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - embed_plist 1.2.2 (https://github.com/nvzqz/embed-plist-rs)
 
 MIT License
@@ -19242,6 +19413,66 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
+
+MIT License
+
+Copyright (c) 2026 The hwcodec authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - mumble-client-protocol 0.1.0 (https://github.com/Mumcord/mumble-client-protocol)
+
+MIT License
+
+Copyright (c) 2026 The mumble-client-protocol authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - anymap3 1.1.0 (https://github.com/reivilibre/anymap3)
   - asn1-rs-impl 0.2.0 (https://github.com/rusticata/asn1-rs.git)
   - block2 0.6.2 (https://github.com/madsmtm/objc2)
@@ -19282,6 +19513,7 @@ Used by:
   - objc2-web-kit 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2 0.6.5 (https://github.com/madsmtm/objc2)
   - p12-keystore 0.4.1 (https://github.com/ancwrd1/p12-keystore)
+  - qrcodegen 1.8.0 (https://github.com/nayuki/QR-Code-generator)
   - rcgen 0.14.10 (https://github.com/rustls/rcgen)
   - realfft 3.5.0 (https://github.com/HEnquist/realfft)
   - specta-macros 2.0.0-rc.26 (https://github.com/specta-rs/specta)
@@ -19312,17 +19544,13 @@ Used by:
   - windows-registry 0.6.1 (https://github.com/microsoft/windows-rs)
   - windows-result 0.4.1 (https://github.com/microsoft/windows-rs)
   - windows-strings 0.5.1 (https://github.com/microsoft/windows-rs)
-  - windows-sys 0.45.0 (https://github.com/microsoft/windows-rs)
-  - windows-sys 0.52.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.59.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.61.2 (https://github.com/microsoft/windows-rs)
-  - windows-targets 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows-targets 0.52.6 (https://github.com/microsoft/windows-rs)
   - windows-threading 0.2.1 (https://github.com/microsoft/windows-rs)
   - windows-version 0.1.7 (https://github.com/microsoft/windows-rs)
   - windows 0.62.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_gnu 0.52.6 (https://github.com/microsoft/windows-rs)
-  - windows_x86_64_msvc 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_msvc 0.52.6 (https://github.com/microsoft/windows-rs)
 
 MIT License
@@ -20977,6 +21205,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
+
+This copyright notice applies to this header file only:
+
+Copyright (c) 2010-2024 NVIDIA Corporation
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the software, and to permit persons to whom the
+software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+/
 
 
 --------------------------------------------------------------------------------

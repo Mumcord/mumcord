@@ -1,6 +1,6 @@
 {
   "turnOn": "Laita kamera päälle",
-  "turnOnHint": "Näet ensin esikatselun. Vain kanavalla {{channel}} olevat näkevät sinut.",
+  "turnOnHint": "Näet ensin esikatselun. Vain kanavan {{channel}} jäsenet näkevät sinut.",
   "turnOff": "Sammuta kamera",
   "turnOffLabel": "Sammuta kamera. Kamerasi on päällä.",
   "cameraOn": "Kamera päällä",
@@ -12,9 +12,10 @@
     "noRelay": "Tällä palvelimella ei ole välityspalvelinta, joten kameran jakaminen ei ole käytettävissä.",
     "relayTooOld": "Tämän palvelimen välityspalvelin on liian vanha kameran jakamiseen.",
     "relayDisallows": "Tämän palvelimen välityspalvelin ei salli kameran jakamista.",
-    "needsRelayMode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
+    "needsRelayMode": "Kameran jakaminen on pois päältä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
     "registeredOnly": "Vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella.",
+    "needsDirect": "Kameran jakaminen tarvitsee suoria yhteyksiä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "unsupportedPlatform": "Camera sharing is not available on FreeBSD yet."
   },
   "cameraOnTray": "Kamera päällä",
@@ -24,7 +25,7 @@
     "title": "Laita kamera päälle",
     "subtitle": "Esikatselu · kukaan ei näe tätä vielä",
     "previewLabel": "Kameran esikatselu",
-    "privacy": "Vain kanavalla {{channel}} olevat näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
+    "privacy": "Vain kanavan {{channel}} jäsenet näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
     "camera": "Kamera",
     "background": "Tausta",
     "backgroundNone": "Ei mitään",
@@ -50,7 +51,7 @@
     "cancel": "Peruuta",
     "turnOn": "Laita kamera päälle",
     "starting": "Käynnistetään kameraa …",
-    "privacyNote": "Vain kanavalla <channel/> olevat näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
+    "privacyNote": "Vain kanavan <channel/> jäsenet näkevät kamerasi, ja vasta kun painat Laita kamera päälle. Mumcord ei koskaan tallenna kameroita.",
     "effectsLoadOnly": "Tehosteet toimivat tällä laitteella. Kuormitus: {{load}}",
     "effectsIdle": "Tehosteet toimivat tällä laitteella.",
     "effectsUnavailable": "Taustatehosteet eivät ole käytettävissä tällä tietokoneella: {{reason}}",
@@ -96,15 +97,15 @@
     "denied": "Kameraa ei voitu käynnistää: palvelimen välityspalvelin hylkäsi sen.",
     "relayDown": "Kamera pysähtyi: välityspalvelin ei ole tavoitettavissa",
     "rateLimited": "Kameraa ei voitu käynnistää: liian monta yritystä. Yritä uudelleen minuutin kuluttua.",
-    "mode": "Kameran jakaminen tarvitsee välityspalvelimen. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
+    "mode": "Kameran jakaminen on pois päältä. Muuta asetus kohdassa Yksityisyys ja yhteydet.",
     "noCertificate": "Kameran jakaminen tarvitsee asiakasvarmenteen.",
     "endedByRelay": "Palvelimen välityspalvelin pysäytti kameran",
     "dismissStopped": "Ohita",
     "notRegistered": "Kamera ei käynnistynyt: vain rekisteröityneet käyttäjät voivat käyttää kameraa tällä palvelimella.",
-    "groupNotAllowed": "Kamera ei käynnistynyt: palvelimen välityspalvelin palvelee vain tiettyjä ryhmiä. Pyydä ylläpitäjää lisäämään sinut.",
+    "groupNotAllowed": "Kamera ei käynnistynyt: palvelimen välitin palvelee vain tiettyjä ryhmiä. Pyydä ylläpitoa lisäämään sinut.",
     "notSameChannel": "Kamera ei käynnistynyt: sinun ja katsojiesi pitää olla samalla kanavalla.",
     "notInChannel": "Kamera ei käynnistynyt: liity ensin kanavalle.",
-    "noHello": "Kamera ei käynnistynyt: välityspalvelimen botti ei vielä tunne tätä sovellusta. Korjaa yhdistämällä uudelleen."
+    "noHello": "Kamera ei käynnistynyt: välitinbotti ei vielä tunne tätä sovellusta. Yhdistä uudelleen korjataksesi."
   },
   "privacy": {
     "windows": "Windows estää työpöytäsovellusten pääsyn kameraan",
@@ -117,14 +118,14 @@
   "announce": {
     "on": "Kamera päällä",
     "off": "Kamera pois päältä",
-    "live": "Kamerasi lähettää nyt suorana",
+    "live": "Kamerasi on livenä",
     "stopped": "Kamerasi pysähtyi",
     "joined": "{{name}} laittoi kameransa päälle",
     "left": "{{name}} sammutti kameransa",
     "turnedOn_one": "{{names}} laittoi kameransa päälle",
     "turnedOn_other": "{{names}} laittoivat kameransa päälle",
-    "turnedOff_one": "{{names}} sammutti kameransa",
-    "turnedOff_other": "{{names}} sammuttivat kameransa"
+    "turnedOff_one": "{{names}} sulki kameransa",
+    "turnedOff_other": "{{names}} sulkivat kameransa"
   },
   "room": {
     "title": "Kamerahuone",
@@ -136,16 +137,20 @@
     "people_other": "{{count}} henkilöä",
     "limit": "{{count}} / {{max}} kameraa",
     "relay": "Välityspalvelin · päästä päähän salattu",
+    "direct": "Suora · päästä päähän salattu",
+    "both": "Välityspalvelin ja suora · päästä päähän salattu",
     "relayTitle": "Jokainen kamera lähetetään kerran välityspalvelimelle, joka kopioi sen katsojille",
+    "directTitle": "Jokainen katsoja saa oman kopionsa suoraan sinulta, ilman välityspalvelinta",
+    "bothTitle": "Vanhemman Mumcordin katsojat saavat kopion välityspalvelimelta, uudemmat oman suoran yhteyden sinulta",
     "layout": "Asettelu",
     "grid": "Ruudukko",
     "speaker": "Puhuja",
     "controls": "Kamerahuoneen hallinta",
     "without_one": "{{names}} on täällä ilman kameraa",
     "without_other": "{{names}} ovat täällä ilman kameraa",
-    "live": "Suorana",
+    "live": "Livenä",
     "you": "Sinä",
-    "selfLabel": "Sinä, kamera päällä, suorana",
+    "selfLabel": "Sinä, kamera päällä, livenä",
     "selfLabelPlain": "Sinä, kamera päällä",
     "background": "Tausta: {{name}}",
     "hideSelf": "Piilota oma kuva",
@@ -179,13 +184,13 @@
     "joining": "Liitytään käyttäjän {{name}} kameraan …",
     "full": "Liian moni katsoo käyttäjää {{name}}",
     "failed": "Käyttäjän {{name}} kameraan ei voitu liittyä",
-    "needsUpdate": "Tämä kamera vaatii Mumcord 0.9.0",
     "retry": "Yritä uudelleen",
     "hidden": "Video piilotettu",
     "showVideo": "Näytä video",
     "viewing": "Katselet",
     "weak": "Heikko yhteys",
-    "format": "{{height}}p · {{codec}}"
+    "format": "{{height}}p · {{codec}}",
+    "needsUpdate": "Tämä kamera vaatii Mumcord 0.9.0"
   },
   "tileMenu": {
     "options": "Asetukset: {{name}}",
@@ -207,7 +212,7 @@
   },
   "combined": {
     "screenTitle": "Käyttäjän {{name}} näyttö",
-    "screenLive": "Suorana",
+    "screenLive": "Livenä",
     "partyTitle": "Yhteiskatselu",
     "partyStarted": "Aloittanut {{name}}",
     "label": "{{title}} ja kamerahuone"
@@ -247,9 +252,14 @@
     "showAlways": "Aina",
     "showOnOpen": "Kun avaan huoneen",
     "showNever": "Ei koskaan",
-    "showHint": "Aina: kamerahuone avautuu, kun joku kanavallasi laittaa kameran päälle. Ei koskaan: kuulet vain äänen, eikä videota ladata.",
+    "showHint": "Aina avaa kamerahuoneen, kun joku kanavallasi laittaa kameran päälle. Ei koskaan pitää sinut vain äänessä eikä lataa videota.",
     "dataSaver": "Datansäästö: enintään 15 fps kaikille",
     "reduceMotion": "Vähennä liikettä: ei hehkua tai animaatiota puhujan kehyksessä",
     "reduceMotionHint": "Noudattaa oletuksena järjestelmäsi liikkeen vähennys -asetusta."
+  },
+  "viewers": {
+    "title": "Katsojat",
+    "relay": "Välityspalvelin",
+    "direct": "Suora"
   }
 }

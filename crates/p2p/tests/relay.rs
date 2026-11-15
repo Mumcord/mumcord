@@ -4,12 +4,12 @@
 
 use std::time::{Duration, Instant};
 
+use mumble_client_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumble_client_protocol::{ClientIdentity, cert_hash};
 use mumcord_p2p::{
     ConnectionPath, P2p, P2pConfig, P2pError, PeerConnection, RelayAnnouncement, RelayRefusal,
     RelayState, RelayToken, RelayTransport, Side,
 };
-use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
-use mumcord_protocol::{ClientIdentity, cert_hash};
 
 const TIMEOUT: Duration = Duration::from_secs(5);
 
@@ -233,6 +233,7 @@ async fn reports_an_unreachable_relay_within_the_setup_timeout() {
         broadcast: None,
         plugin_data_kbps: None,
         registered_only: false,
+        media: false,
     };
     drop(closed);
     let (alice, _) = identity();
@@ -257,9 +258,9 @@ mod fake {
     use std::time::Duration;
 
     use bytes::Bytes;
+    use mumble_client_protocol::cert_hash;
     use mumcord_p2p::quinn;
     use mumcord_p2p::{RelayAnnouncement, RelayState, RelayToken};
-    use mumcord_protocol::cert_hash;
     use rustls::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer, UnixTime};
     use rustls::server::danger::{ClientCertVerified, ClientCertVerifier};
     use rustls::{DigitallySignedStruct, DistinguishedName, SignatureScheme};
@@ -375,6 +376,7 @@ mod fake {
                 broadcast: None,
                 plugin_data_kbps: None,
                 registered_only: false,
+                media: false,
             }
         }
 

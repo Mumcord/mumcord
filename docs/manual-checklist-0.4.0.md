@@ -74,7 +74,7 @@ An official Mumble client (1.5) in the same channel as Mumcord.
 ## 8. Linux rendering, tray and desktop (about 15 min)
 
 - [ ] **Flicker fix (F44c):** on Linux (WebKitGTK 2.54), run a watch party with a playing video, hover over chat messages and let someone talk. Nothing flickers. Start Mumcord with `MUMCORD_WEBKIT_COMPOSITING=1`: WebKit's default compositing is used (flicker may come back, which confirms the switch). An own `WEBKIT_DISABLE_COMPOSITING_MODE=0` is kept.
-- [ ] **YouTube in release builds (AC-2.54):** in the AppImage and the `.deb`, a YouTube card and a Twitch card in the chat play inline, and a watch party plays in the widget. In the AppImage, a video that YouTube only offers as H.264 shows the codec hint; after installing gst-libav on the system and restarting, it plays.
+- [ ] **YouTube in release builds (AC-2.54):** in the AppImage and the `.deb`, a YouTube card and a Twitch card in the chat play inline, and a watch party plays in the widget. The AppImage carries compatible H.264/AAC decoders and plays without system gst-libav. If its H.264 decoder is unavailable, the hint suggests an update or the distribution/AUR package, never installing system gst-libav (issue #567).
 - [ ] **Tray tooltip (AC-2.33):** on KDE, hovering the tray icon shows the tooltip.
 - [ ] **App menu offer (AC-2.35):** start a plain downloaded AppImage: it offers "Add Mumcord to the app menu"; after accepting, the entry with icon appears.
 - [ ] **Start at login (AC-2.36):** switch on "Start Mumcord when I log in", log out and in: Mumcord starts. On Linux, Windows and macOS.

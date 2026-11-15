@@ -18,6 +18,7 @@ function packet(id: number): Packet {
     tokensLeft: null,
     decoded: null,
     rawHex: "",
+    media: null,
   };
 }
 

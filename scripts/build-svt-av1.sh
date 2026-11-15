@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the static SVT-AV1 encoder that screen sharing uses for software AV1 (crates/screenshare
+# Builds the static SVT-AV1 encoder that screen sharing uses for software AV1 (the hwcodec crate
 # picks it up through SVTAV1_STATIC_DIR).
 #
 #   scripts/build-svt-av1.sh <prefix>

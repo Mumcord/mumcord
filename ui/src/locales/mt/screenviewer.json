@@ -13,6 +13,7 @@
   "starting": "Qed jikkonnettja mal-iskrin ta' {{name}}…",
   "paused": "{{name}} ippawża l-qsim.",
   "full": "Dan il-qsim huwa mimli.",
+  "needsUpdate": "Dan il-qsim jeħtieġ Mumcord 0.9.0.",
   "unreachable": "Ma stajniex nilħqu lil {{name}} direttament. In-netwerk tiegħu jista' jkun qed jimblokka konnessjonijiet diretti.",
   "tooOld": "Il-Mumcord ta' {{name}} huwa qadim wisq biex jaqsam l-iskrin miegħek.",
   "consentOff": "Biex tara jeħtieġ konnessjonijiet diretti, u int tfejthom.",

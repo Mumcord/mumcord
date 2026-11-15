@@ -2,6 +2,8 @@
 //! is the port of v15 (default 64738); v14, v13, limit and v15b follow at +1 to +4.
 #![allow(dead_code)]
 
+pub mod host;
+
 fn base() -> u16 {
     std::env::var("MUMCORD_PORT_BASE")
         .ok()

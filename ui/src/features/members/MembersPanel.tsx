@@ -63,22 +63,11 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
 
   const channel =
     conversation?.kind === "channel" ? state.channels.get(conversation.channelId) : undefined;
-  // Bots without voice are listed only under "Bots on this server" (issue #458).
-  const users = channel ? [...state.users.values()].filter((u) => !isHiddenBot(u)) : [];
-  const members = users.filter((u) => u.channelId === channel?.id);
-  const listeners = users.filter(
-    (u) =>
-      channel !== undefined &&
-      u.channelId !== channel.id &&
-      u.listeningChannelIds.includes(channel.id),
-  );
+  const alphabetical = useChannelPeople(state.users, channel?.id);
   const { talkingFirst } = useListPreferences();
   const talks = (user: User) => talkingFirst && state.talking.has(user.session);
   const people = talkingPeopleFirst(
-    [
-      ...members.map((user) => ({ user, listener: false })),
-      ...listeners.map((user) => ({ user, listener: true })),
-    ].sort((a, b) => byName(a.user, b.user)),
+    alphabetical,
     // Listeners hear the channel but do not talk in it.
     (p) => !p.listener && talks(p.user),
   );
@@ -306,6 +295,23 @@ const MemberRow = memo(function MemberRow({
     </li>
   );
 });
+
+/** Talking changes neither channel membership nor names, so they must not repeat this scan/sort. */
+function useChannelPeople(users: ServerState["users"], channelId: number | undefined) {
+  return useMemo(() => {
+    if (channelId === undefined) return [];
+    // Bots without voice are listed only under "Bots on this server" (issue #458).
+    const visible = [...users.values()].filter((user) => !isHiddenBot(user));
+    const members = visible.filter((user) => user.channelId === channelId);
+    const listeners = visible.filter(
+      (user) => user.channelId !== channelId && user.listeningChannelIds.includes(channelId),
+    );
+    return [
+      ...members.map((user) => ({ user, listener: false })),
+      ...listeners.map((user) => ({ user, listener: true })),
+    ].sort((a, b) => byName(a.user, b.user));
+  }, [users, channelId]);
+}
 
 interface ChannelGroup {
   channel: ChannelNode["channel"];

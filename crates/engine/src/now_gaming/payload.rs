@@ -5,7 +5,7 @@
 //! Received payloads come from other clients and are untrusted: the decoder caps the name and
 //! keeps a join target only when it is a well-formed `steam://connect/<host>:<port>` link.
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 use serde::{Deserialize, Serialize};
 
 use crate::web::meta::clean;

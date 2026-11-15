@@ -135,7 +135,29 @@
     "backupWarning": "Fais une sauvegarde avant de supprimer. Une identité sans sauvegarde ne peut pas être récupérée.",
     "usedBy": "Utilisée par : {{servers}}",
     "deleteUsedBy": "Ces serveurs utiliseront ensuite l’identité par défaut {{identity}} : {{servers}}",
-    "exportFor": "Exporter {{identity}}"
+    "exportFor": "Exporter {{identity}}",
+    "phoneSend": "Envoyer vers ton téléphone…",
+    "phoneTitle": "Envoyer vers ton téléphone",
+    "phoneSelectionLabel": "Éléments à envoyer",
+    "phoneIdentity": "Identité : {{identity}}",
+    "phoneIdentityDefault": "Identité : {{identity}} (par défaut)",
+    "phoneServers_one": "Liste des serveurs ({{count}} serveur)",
+    "phoneServers_many": "Liste des serveurs ({{count}} serveurs)",
+    "phoneServers_other": "Liste des serveurs ({{count}} serveurs)",
+    "phoneNothingSelected": "Sélectionne au moins un élément.",
+    "phoneShow": "Afficher les codes",
+    "phoneDone": "Terminé",
+    "phonePreparing": "Préparation des codes…",
+    "phoneCodesLabel": "Codes pour ton téléphone",
+    "phoneQrLabel": "Code QR {{current}} sur {{total}}",
+    "phoneCodeOf": "Code {{current}} sur {{total}}",
+    "phoneCycleHint": "Les codes défilent automatiquement. Garde ton téléphone pointé vers l'écran jusqu'à ce que les {{total}} soient lus.",
+    "phoneSingleHint": "Garde ton téléphone pointé vers l'écran jusqu'à ce que le code soit lu.",
+    "phoneTypeCode": "Saisis ce code sur ton téléphone",
+    "phoneExpires": "Expire dans {{time}}",
+    "phoneRenewed": "Nouveaux codes et nouveau numéro. Recommence sur ton téléphone.",
+    "phoneWarning": "Toute personne qui scanne ces codes et connaît le numéro obtient ton identité. Ne les montre qu'à ton propre téléphone.",
+    "phoneTooLarge": "C'est trop pour un seul transfert. Sélectionne moins d'éléments."
   },
   "audio": {
     "devices": "Périphériques",
@@ -772,7 +794,13 @@
       "gap": "Écart avec le paquet précédent",
       "kind": "Identifiant interne",
       "size": "Taille",
-      "decoded": "Contenu décodé"
+      "decoded": "Contenu décodé",
+      "media": "Média"
+    },
+    "media": {
+      "channel": "canal {{channel}}",
+      "keyframe": "image clé",
+      "delta": "image delta"
     },
     "noDecoding": "Ce contenu n’a pas de forme lisible ; voir les octets bruts.",
     "controlOnly": "Message Mumble standard : seuls son type et sa taille sont enregistrés.",
@@ -793,7 +821,8 @@
       "watch": "État de la soirée de visionnage",
       "plugin": "Données de plugin",
       "mumble": "Message Mumble",
-      "peer": "Configuration du relais"
+      "peer": "Configuration du relais",
+      "media": "Flux média"
     }
   },
   "licences": {

@@ -47,4 +47,7 @@ runs:
     - shell: bash
       env:
         ROOT: ${{ steps.dir.outputs.root }}
-      run: echo "$ROOT/bin" >> "$GITHUB_PATH"
+      # Later steps call the tool by name, so its bin directory goes on PATH. The entry is $HOME
+      # plus the crate and version the caller passes (scripts/license-tools.env), never input from
+      # a pull request, so it cannot inject a variable or shadow a command.
+      run: echo "$ROOT/bin" >> "$GITHUB_PATH" # zizmor: ignore[github-env]

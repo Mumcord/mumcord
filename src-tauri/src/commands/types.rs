@@ -60,6 +60,8 @@ pub enum ErrorCode {
     ShortcutNotConfirmed,
     /// The screen share already has the maximum of 8 viewers (FR-2.43).
     ShareFull,
+    /// The share or camera needs a newer Mumcord.
+    NeedsUpdate,
     /// Watching a screen share needs a direct connection and none can be made (FR-2.46);
     /// `message` is the reason: `consentOff`, `peerUnsupported` or `noDirectPath`.
     DirectUnavailable,
@@ -102,6 +104,13 @@ impl std::error::Error for ApiError {}
 
 impl From<EngineError> for ApiError {
     fn from(err: EngineError) -> Self {
+        // The desktop shows a ban as a refusal with the server's reason, as before.
+        if err.kind == ErrorKind::Banned {
+            return Self::new(
+                ErrorCode::PermissionDenied,
+                format!("banned: {}", err.message),
+            );
+        }
         let code = match err.kind {
             ErrorKind::NotConnected => ErrorCode::NotConnected,
             ErrorKind::ServerUnreachable => ErrorCode::ServerUnreachable,
@@ -111,7 +120,7 @@ impl From<EngineError> for ApiError {
             ErrorKind::CertificateRejected => ErrorCode::CertificateRejected,
             ErrorKind::CertificateChanged => ErrorCode::CertificateChanged,
             ErrorKind::ServerTooOld => ErrorCode::ServerTooOld,
-            ErrorKind::PermissionDenied => ErrorCode::PermissionDenied,
+            ErrorKind::Banned | ErrorKind::PermissionDenied => ErrorCode::PermissionDenied,
             ErrorKind::ListenerLimitReached => ErrorCode::ListenerLimitReached,
             ErrorKind::ServerLimitReached => ErrorCode::ServerLimitReached,
             ErrorKind::MessageTooLarge => ErrorCode::MessageTooLarge,
@@ -119,6 +128,7 @@ impl From<EngineError> for ApiError {
             ErrorKind::DuplicateIdentity => ErrorCode::DuplicateIdentity,
             ErrorKind::NotFound => ErrorCode::NotFound,
             ErrorKind::ShareFull => ErrorCode::ShareFull,
+            ErrorKind::NeedsUpdate => ErrorCode::NeedsUpdate,
             ErrorKind::DirectUnavailable => ErrorCode::DirectUnavailable,
             ErrorKind::SecureStorageUnavailable => ErrorCode::SecureStorageUnavailable,
             ErrorKind::Io => ErrorCode::Io,

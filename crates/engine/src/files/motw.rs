@@ -1,6 +1,7 @@
 //! Mark-of-the-web for received files (FR-7.27): the operating system then treats the file as
 //! coming from the internet (Windows SmartScreen, macOS Gatekeeper). Linux has no blocking mark,
-//! so there the attribute only records where the file came from.
+//! so there the attribute only records where the file came from. Phones have no mark an app could
+//! set: their files stay inside the app's own storage until the user shares them.
 
 use std::io;
 use std::path::Path;
@@ -43,17 +44,26 @@ fn now_unix() -> u64 {
         .map_or(0, |d| d.as_secs())
 }
 
-#[cfg(all(unix, not(target_os = "macos")))]
+#[cfg(all(
+    unix,
+    not(any(target_os = "macos", target_os = "android", target_os = "ios"))
+))]
 fn set_mark(path: &Path, host: &str) -> io::Result<()> {
     xattr::set(path, "user.xdg.origin.url", origin_url(host).as_bytes())
 }
 
-#[cfg(any(all(unix, not(target_os = "macos")), test))]
+#[cfg(any(
+    all(
+        unix,
+        not(any(target_os = "macos", target_os = "android", target_os = "ios"))
+    ),
+    test
+))]
 fn origin_url(host: &str) -> String {
     format!("mumble://{host}")
 }
 
-#[cfg(not(any(unix, windows)))]
+#[cfg(any(not(any(unix, windows)), any(target_os = "android", target_os = "ios")))]
 fn set_mark(_path: &Path, _host: &str) -> io::Result<()> {
     Ok(())
 }
@@ -76,7 +86,10 @@ mod tests {
         );
     }
 
-    #[cfg(all(unix, not(target_os = "macos")))]
+    #[cfg(all(
+        unix,
+        not(any(target_os = "macos", target_os = "android", target_os = "ios"))
+    ))]
     #[test]
     fn linux_sets_origin_attribute_where_supported() {
         let dir = tempfile::tempdir().unwrap();

@@ -159,7 +159,7 @@
     "noFanoutBody_other": "Jeder Zuschauer erhält eine eigene Kopie von deinem Computer, daher können bis zu {{max}} Personen zuschauen. Die Qualität sinkt, je mehr dazukommen: Aktuell brauchen {{count}} Zuschauer etwa {{mbit}} Mbit/s Upload, deshalb läuft deine Freigabe mit {{now}} statt {{wanted}}.",
     "fanoutUnavailable": "Die Relay-Verteilung ist nicht verfügbar ({{reason}}). Jeder Zuschauer erhält eine eigene Kopie, daher können bis zu {{max}} zuschauen und die Qualität kann sinken.",
     "reasonNoRelay": "dieser Server hat kein Relay",
-    "reasonOldRelay": "das Relay ist zu alt",
+    "reasonOldRelay": "der Relay dieses Servers braucht ein Update",
     "reasonDisallowed": "das Relay erlaubt keine Bildschirmfreigabe",
     "reasonRefused": "das Relay hat den Broadcast abgelehnt",
     "reasonFull": "das Relay ist voll",

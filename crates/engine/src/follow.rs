@@ -8,7 +8,7 @@ use std::collections::HashSet;
 use std::sync::LazyLock;
 use std::time::Duration;
 
-use mumcord_protocol::{DenyKind, PermissionDenied, ServerState};
+use mumble_client_protocol::{DenyKind, PermissionDenied, ServerState};
 use mumcord_store::ServerId;
 use tokio::sync::broadcast;
 use tokio::sync::broadcast::error::TryRecvError;
@@ -454,7 +454,7 @@ mod tests {
 
     #[test]
     fn follow_all_skips_channels_the_user_may_not_enter() {
-        use mumcord_protocol::{Channel, User};
+        use mumble_client_protocol::{Channel, User};
         let mut s = ServerState {
             session: Some(5),
             ..ServerState::default()

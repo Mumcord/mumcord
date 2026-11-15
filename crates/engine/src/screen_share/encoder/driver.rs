@@ -69,7 +69,7 @@ fn va_drivers<'a>(dirs: impl Iterator<Item = &'a std::path::Path>) -> Vec<String
     found
 }
 
-#[cfg(windows)]
+#[cfg(all(windows, feature = "desktop-codecs"))]
 fn os_driver_id() -> String {
     // The display adapter class; each numbered subkey is one installed adapter driver.
     const CLASS: &str =
@@ -86,8 +86,9 @@ fn os_driver_id() -> String {
     parts.join("; ")
 }
 
-/// macOS has no hardware AV1 or VP9 encoder to probe (FR-7.55); only app updates matter.
-#[cfg(not(any(target_os = "linux", windows)))]
+/// macOS has no hardware AV1 or VP9 encoder to probe (FR-7.55), and neither has a build without
+/// the hardware encoders; only app updates matter.
+#[cfg(not(any(target_os = "linux", all(windows, feature = "desktop-codecs"))))]
 fn os_driver_id() -> String {
     std::env::consts::OS.to_owned()
 }

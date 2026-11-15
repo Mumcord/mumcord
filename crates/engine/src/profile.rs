@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use image::codecs::jpeg::JpegEncoder;
 use image::{DynamicImage, ImageFormat};
-use mumcord_protocol::{DenyKind, PermissionDenied, permissions};
+use mumble_client_protocol::{DenyKind, PermissionDenied, permissions};
 
 use crate::ServerId;
 use crate::chat::{IMAGE_SOFT_CAP, check_text_size};

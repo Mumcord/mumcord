@@ -7,7 +7,7 @@
 
 use std::collections::HashMap;
 
-use mumcord_protocol::{DenyKind, Handle, PermissionDenied, permissions};
+use mumble_client_protocol::{DenyKind, Handle, PermissionDenied, permissions};
 use mumcord_store::{ChannelToken, ServerId, TokenChannel, UnixMillis};
 
 use super::convert::channel_path;

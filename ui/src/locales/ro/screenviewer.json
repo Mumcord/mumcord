@@ -13,6 +13,7 @@
   "starting": "Conectare la ecranul lui {{name}}…",
   "paused": "{{name}} a pus partajarea pe pauză.",
   "full": "Această partajare este plină.",
+  "needsUpdate": "Această partajare necesită Mumcord 0.9.0.",
   "unreachable": "{{name}} nu poate fi contactat direct. Rețeaua poate bloca conexiunile directe.",
   "tooOld": "Mumcord-ul lui {{name}} este prea vechi ca să își partajeze ecranul cu tine.",
   "consentOff": "Urmărirea are nevoie de conexiuni directe, iar tu le-ai dezactivat.",

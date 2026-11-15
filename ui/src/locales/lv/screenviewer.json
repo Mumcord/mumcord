@@ -13,6 +13,7 @@
   "starting": "Savienojas ar {{name}} ekrānu…",
   "paused": "{{name}} pauzēja kopīgošanu.",
   "full": "Šī kopīgošana ir pilna.",
+  "needsUpdate": "Šai koplietošanai nepieciešams Mumcord 0.9.0.",
   "unreachable": "Neizdevās tieši sazināties ar {{name}}. Tīkls, iespējams, bloķē tiešos savienojumus.",
   "tooOld": "{{name}} Mumcord ir pārāk vecs, lai ar tevi kopīgotu ekrānu.",
   "consentOff": "Skatīšanai vajadzīgi tiešie savienojumi, bet tu tos izslēdzi.",

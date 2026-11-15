@@ -57,6 +57,7 @@
     "pause": "Szünet"
   },
   "codecHint": {
+    "appimage": "Ez az AppImage nem tud H.264-videót lejátszani. Frissítsd a Mumcordot, vagy használd a disztribúciód csomagját (Archon az AUR-ból). A gst-libav rendszerre telepítése nem oldja meg ennek az AppImage-nak a problémáját.",
     "install": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot:",
     "generic": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot (a GStreamer libav bővítményét) a rendszered csomagkezelőjével.",
     "rpmFusion": "Fedorán a gst-libav az RPM Fusion tárolóból érhető el; előbb engedélyezd az RPM Fusiont.",

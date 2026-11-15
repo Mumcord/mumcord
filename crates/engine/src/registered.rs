@@ -6,7 +6,7 @@
 //! one message for one person (issue: "changes are sent per user when saving").
 //!
 //! What a change did cannot be read from the message: measured against the local test server
-//! (`crates/protocol/tests/live_registered_users.rs`), mumble-server 1.5.735 sends its list only in
+//! (`tests/live_registered_users.rs` of the `mumble-client-protocol` crate), mumble-server 1.5.735 sends its list only in
 //! answer to a query and never pushes it after a change. It also neither refuses nor confirms a
 //! rename onto a name another account holds — it keeps the old name and says nothing. So every
 //! change here is followed by a read, and the effect is taken from what the server's list says
@@ -21,8 +21,8 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime};
 
-use mumcord_protocol::permissions;
-use mumcord_protocol::{PermissionDenied, RegisteredUser, ServerState, proto};
+use mumble_client_protocol::permissions;
+use mumble_client_protocol::{PermissionDenied, RegisteredUser, ServerState, proto};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
@@ -406,7 +406,7 @@ fn denied(message: &str) -> EngineError {
 }
 
 fn rfc3339(when: SystemTime) -> String {
-    mumcord_protocol::ban::format_start(when)
+    mumble_client_protocol::ban::format_start(when)
 }
 
 /// Drops control characters from text the server sent, so the window renders what it can show.

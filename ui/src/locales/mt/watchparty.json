@@ -57,6 +57,7 @@
     "pause": "Pawża"
   },
   "codecHint": {
+    "appimage": "Dan l-AppImage ma jistax idoqq vidjo H.264. Aġġorna Mumcord jew uża l-pakkett tad-distribuzzjoni tiegħek (AUR fuq Arch). L-installazzjoni ta' gst-libav fis-sistema mhux se ssolvi l-problema ta' dan l-AppImage.",
     "install": "Dan il-vidjo jeħtieġ appoġġ għal H.264. Installa gst-libav:",
     "generic": "Dan il-vidjo jeħtieġ appoġġ għal H.264. Installa gst-libav (il-plugin libav ta' GStreamer) bil-package manager tas-sistema tiegħek.",
     "rpmFusion": "Fuq Fedora, gst-libav jiġi mir-repożitorju RPM Fusion; l-ewwel ixgħel RPM Fusion.",

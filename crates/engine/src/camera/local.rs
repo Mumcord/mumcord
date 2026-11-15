@@ -6,18 +6,31 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use mumcord_camera::{CameraDevice, CameraError, DeviceId, DeviceList};
+#[cfg(feature = "camera-effects")]
 use mumcord_effects::{Background, EffectStats, EffectsConfig, EffectsError};
-use mumcord_store::{CameraBackground, CameraBackgrounds, CameraEffectQuality, Settings};
+use mumcord_store::Settings;
+#[cfg(feature = "camera-effects")]
+use mumcord_store::{CameraBackground, CameraBackgrounds, CameraEffectQuality};
 
 use super::preview::PreviewSink;
 use super::send::{CameraSend, SendCeiling, Stages};
 use super::session::{CameraFailure, CameraState, Cameras, encoder_prefs};
+#[cfg(feature = "camera-effects")]
 use crate::screen_share::encoder::battery;
 use crate::screen_share::encoder::natural_factory;
 use crate::session::{Engine, lock};
 
+/// What [`Engine::camera_send_start`] opens.
+pub(super) struct SendStart {
+    /// `None`: the remembered camera, else the OS default (FR-8.27).
+    pub device: Option<DeviceId>,
+    #[cfg(feature = "camera-effects")]
+    pub background: Background,
+}
+
 /// The background when the default one can't be used (FR-8.15: a deleted own image falls back
 /// to Blur).
+#[cfg(feature = "camera-effects")]
 fn fallback_background(blur_strength: u8) -> Background {
     Background::Blur {
         strength: blur_strength.min(100),
@@ -25,6 +38,7 @@ fn fallback_background(blur_strength: u8) -> Background {
 }
 
 /// The running pipeline: the preview dialog's or on-air camera, else the Settings preview.
+#[cfg(feature = "camera-effects")]
 fn running(cameras: &Cameras) -> Option<&CameraSend> {
     cameras
         .own
@@ -57,12 +71,14 @@ impl Engine {
 
     /// Whether background effects can run on this PC; the error is the reason for "Background
     /// effects are not available on this PC: {reason}" (FR-8.33).
+    #[cfg(feature = "camera-effects")]
     pub fn camera_effects_available(&self) -> Result<(), String> {
         mumcord_effects::availability()
     }
 
     /// Resolves a background choice: built-in images from the app's resources, own images from
     /// the profile's background store (FR-8.14).
+    #[cfg(feature = "camera-effects")]
     pub fn camera_resolve_background(
         &self,
         setting: &CameraBackground,
@@ -77,6 +93,7 @@ impl Engine {
     }
 
     /// The default background of the settings (FR-8.76); Blur when it can't be used.
+    #[cfg(feature = "camera-effects")]
     pub(super) fn camera_default_background(&self, settings: &Settings) -> Background {
         self.camera_resolve_background(
             &settings.camera_default_background,
@@ -88,14 +105,12 @@ impl Engine {
         })
     }
 
-    /// Opens `device` (else the remembered camera, else the OS default, FR-8.27) with the
-    /// effects and the preview.
+    /// Opens the camera of `start` with the effects (when built in) and the preview.
     pub(super) fn camera_send_start(
         &self,
         cameras: &mut Cameras,
         settings: &Settings,
-        device: Option<DeviceId>,
-        background: Background,
+        start: SendStart,
     ) -> Result<CameraSend, CameraFailure> {
         let ceiling = SendCeiling::from_setting(settings.camera_send_quality);
         let backend = cameras
@@ -103,8 +118,9 @@ impl Engine {
             .ok_or(CameraFailure::Camera(CameraError::NoCamera))?;
         let mut devices = DeviceList::new();
         devices.update(backend.devices().map_err(CameraFailure::Camera)?);
-        let wanted =
-            device.or_else(|| settings.camera_device_id.clone().map(DeviceId::from_stored));
+        let wanted = start
+            .device
+            .or_else(|| settings.camera_device_id.clone().map(DeviceId::from_stored));
         let device = devices
             .pick(wanted.as_ref())
             .ok_or(CameraFailure::Camera(CameraError::NoCamera))?
@@ -115,17 +131,21 @@ impl Engine {
             .select(settings, encoder_prefs(ceiling));
         let encoders = natural_factory(selection.candidates, Arc::default());
         let stages = Stages {
+            #[cfg(feature = "camera-effects")]
             effects: Some(EffectsConfig {
                 fps: ceiling.fps,
                 quality: settings.camera_effect_quality,
-                background: background.clone(),
+                background: start.background.clone(),
                 on_battery: Arc::new(battery::on_battery),
             }),
             preview: Some(cameras.preview.clone()),
         };
         let send = CameraSend::start(backend.as_ref(), &device, ceiling, encoders, stages)
             .map_err(CameraFailure::Camera)?;
-        cameras.background = Some(background);
+        #[cfg(feature = "camera-effects")]
+        {
+            cameras.background = Some(start.background);
+        }
         Ok(send)
     }
 
@@ -133,13 +153,19 @@ impl Engine {
     /// the default background. `Busy` while the preview dialog or the camera runs (FR-8.29).
     pub fn camera_local_preview_start(&self) -> Result<(), CameraFailure> {
         let settings = self.encoder_settings();
+        #[cfg(feature = "camera-effects")]
         let background = self.camera_default_background(&settings);
         let mut cameras = lock(self.camera_state());
         if cameras.own.is_some() {
             return Err(CameraFailure::Busy);
         }
         if cameras.local.is_none() {
-            let send = self.camera_send_start(&mut cameras, &settings, None, background)?;
+            let start = SendStart {
+                device: None,
+                #[cfg(feature = "camera-effects")]
+                background,
+            };
+            let send = self.camera_send_start(&mut cameras, &settings, start)?;
             cameras.local = Some(send);
         }
         Ok(())
@@ -168,11 +194,15 @@ impl Engine {
         if cameras.own.is_none() && cameras.local.is_none() {
             return Ok(());
         }
-        let background = cameras
-            .background
-            .clone()
-            .unwrap_or_else(|| fallback_background(settings.camera_blur_strength));
-        let send = self.camera_send_start(&mut cameras, &settings, Some(device), background)?;
+        let start = SendStart {
+            device: Some(device),
+            #[cfg(feature = "camera-effects")]
+            background: cameras
+                .background
+                .clone()
+                .unwrap_or_else(|| fallback_background(settings.camera_blur_strength)),
+        };
+        let send = self.camera_send_start(&mut cameras, &settings, start)?;
         // The old pipeline stops (its camera light goes off) when it is replaced here.
         let old = match cameras.own.as_mut() {
             Some(own) => std::mem::replace(&mut own.send, send),
@@ -188,6 +218,7 @@ impl Engine {
 
     /// Changes the background of the running camera, also on air (FR-8.40). Without a running
     /// camera the choice is not kept: the next preview starts with the default (FR-8.76).
+    #[cfg(feature = "camera-effects")]
     pub fn camera_set_background(&self, background: Background) {
         let mut cameras = lock(self.camera_state());
         if let Some(effects) = running(&cameras).and_then(CameraSend::effects) {
@@ -197,6 +228,7 @@ impl Engine {
     }
 
     /// Changes the effect quality of the running camera; Auto measures again (FR-8.35).
+    #[cfg(feature = "camera-effects")]
     pub fn camera_set_effect_quality(&self, quality: CameraEffectQuality) {
         let cameras = lock(self.camera_state());
         if let Some(effects) = running(&cameras).and_then(CameraSend::effects) {
@@ -206,6 +238,7 @@ impl Engine {
 
     /// The load line of the preview (FR-8.36): level, load, "too busy" and why effects are off;
     /// `None` while no camera runs.
+    #[cfg(feature = "camera-effects")]
     pub fn camera_effect_stats(&self) -> Option<EffectStats> {
         let cameras = lock(self.camera_state());
         running(&cameras)

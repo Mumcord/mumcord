@@ -12,8 +12,8 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::Duration;
 
-use mumcord_protocol::Channel;
-use mumcord_protocol::{PermissionDenied, permissions, proto};
+use mumble_client_protocol::Channel;
+use mumble_client_protocol::{PermissionDenied, permissions, proto};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
@@ -328,7 +328,7 @@ pub(crate) fn on_denied(
 /// nesting, count, temporary). Joining (Enter), speaking or kicking are someone else's. A refusal of
 /// your own request names your own session, or none.
 fn is_channel_refusal(denied: &PermissionDenied, own_session: Option<u32>) -> bool {
-    use mumcord_protocol::DenyKind;
+    use mumble_client_protocol::DenyKind;
     if denied
         .session
         .is_some_and(|session| Some(session) != own_session)
@@ -358,7 +358,7 @@ pub(crate) fn on_disconnect(hub: &Mutex<ChannelAdmin>, server_id: ServerId) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use mumcord_protocol::DenyKind;
+    use mumble_client_protocol::DenyKind;
 
     fn channel(id: u32, parent: u32, name: &str) -> Channel {
         Channel {

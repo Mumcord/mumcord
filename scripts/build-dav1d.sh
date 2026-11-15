@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the static dav1d AV1 decoder that screen sharing uses when the webview cannot decode AV1
-# itself (crates/screenshare picks it up through DAV1D_STATIC_DIR).
+# itself (the hwcodec crate picks it up through DAV1D_STATIC_DIR).
 #
 #   scripts/build-dav1d.sh <prefix>
 #

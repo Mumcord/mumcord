@@ -3,11 +3,11 @@
 
 use std::time::{Duration, Instant};
 
+use mumble_client_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumble_client_protocol::{ClientIdentity, cert_hash};
 use mumcord_p2p::{
     DeclineReason, P2p, P2pConfig, P2pError, Reveal, SessionId, Signal, SignalError,
 };
-use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
-use mumcord_protocol::{ClientIdentity, cert_hash};
 
 const TIMEOUT: Duration = Duration::from_secs(3);
 

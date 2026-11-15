@@ -137,7 +137,30 @@
     "backupWarning": "Pred odstránením zálohuj. Identitu bez zálohy nie je možné obnoviť.",
     "usedBy": "Používa: {{servers}}",
     "deleteUsedBy": "Tieto servery potom použijú predvolenú identitu {{identity}}: {{servers}}",
-    "exportFor": "Exportovať {{identity}}"
+    "exportFor": "Exportovať {{identity}}",
+    "phoneSend": "Odoslať do tvojho telefónu…",
+    "phoneTitle": "Odoslať do tvojho telefónu",
+    "phoneSelectionLabel": "Čo odoslať",
+    "phoneIdentity": "Identita: {{identity}}",
+    "phoneIdentityDefault": "Identita: {{identity}} (predvolená)",
+    "phoneServers_one": "Zoznam serverov ({{count}} server)",
+    "phoneServers_few": "Zoznam serverov ({{count}} servery)",
+    "phoneServers_many": "Zoznam serverov ({{count}} servera)",
+    "phoneServers_other": "Zoznam serverov ({{count}} serverov)",
+    "phoneNothingSelected": "Vyber aspoň jednu položku.",
+    "phoneShow": "Zobraziť kódy",
+    "phoneDone": "Hotovo",
+    "phonePreparing": "Pripravujú sa kódy…",
+    "phoneCodesLabel": "Kódy pre tvoj telefón",
+    "phoneQrLabel": "QR kód {{current}} z {{total}}",
+    "phoneCodeOf": "Kód {{current}} z {{total}}",
+    "phoneCycleHint": "Kódy sa striedajú automaticky. Drž telefón namierený na obrazovku, kým sa neprečíta všetkých {{total}}.",
+    "phoneSingleHint": "Drž telefón namierený na obrazovku, kým sa kód neprečíta.",
+    "phoneTypeCode": "Zadaj tento kód na svojom telefóne",
+    "phoneExpires": "Vyprší o {{time}}",
+    "phoneRenewed": "Nové kódy a nové číslo. Začni na telefóne odznova.",
+    "phoneWarning": "Ktokoľvek, kto tieto kódy naskenuje a pozná číslo, získa tvoju identitu. Ukazuj ich len svojmu vlastnému telefónu.",
+    "phoneTooLarge": "Na jeden prenos je toho priveľa. Vyber menej položiek."
   },
   "audio": {
     "devices": "Zariadenia",
@@ -777,7 +800,13 @@
       "gap": "Odstup od predchádzajúceho paketu",
       "kind": "Interné ID",
       "size": "Veľkosť",
-      "decoded": "Dekódovaný obsah"
+      "decoded": "Dekódovaný obsah",
+      "media": "Médiá"
+    },
+    "media": {
+      "channel": "kanál {{channel}}",
+      "keyframe": "kľúčový snímok",
+      "delta": "delta snímok"
     },
     "noDecoding": "Tieto dáta nemajú čitateľnú podobu; pozri si surové bajty.",
     "controlOnly": "Štandardná správa Mumble: zaznamenáva sa iba jej typ a veľkosť.",
@@ -798,7 +827,8 @@
       "watch": "Stav spoločného sledovania",
       "plugin": "Dáta doplnku",
       "mumble": "Správa Mumble",
-      "peer": "Nastavenie relayu"
+      "peer": "Nastavenie relayu",
+      "media": "Mediálny tok"
     }
   },
   "licences": {

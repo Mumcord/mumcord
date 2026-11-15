@@ -17,6 +17,7 @@
     "muted": "Díbhalbhaigh do mhicreafón chun cogarnach.",
     "serverMuted": "Bhalbhaigh an freastalaí thú, mar sin ní sheolann sé do ghuth ar aghaidh.",
     "nobodyHere": "Níl aon duine acu seo ar an bhfreastalaí seo faoi láthair.",
+    "ambiguousName": "Tá an t-ainm seo ar níos mó ná duine amháin anseo, mar sin níor seoladh an cogar.",
     "channelNotFound": "Níl an cainéal seo ann ar an bhfreastalaí seo.",
     "noPermission": "Ní cheadaíonn an freastalaí duit cogar a dhéanamh le {{channel}}.",
     "unknownTarget": "Níl an sprioc seo ann a thuilleadh.",

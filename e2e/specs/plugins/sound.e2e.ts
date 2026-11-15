@@ -29,6 +29,12 @@ import { RATE, readWav, silence, wavSamples, writeWav } from "../../helpers/voic
 const TALK_HZ = 1320;
 /** Below this a recording counts as silent at the beep's frequency. */
 const SILENT_DB = -60;
+/**
+ * A's speakers while she can still hear also carry the voice mix. On a busy runner that
+ * floor reaches about -56 dB at the beep's frequency. A beep that ignored the mute is
+ * about -15 dB, and one that was only ducked is about -26 dB (FR-9.68).
+ */
+const MUTED_DB = -45;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const deafenButton = () => $("button[aria-label='Deafen']");
@@ -143,7 +149,7 @@ describe("plugins 1.1: plugin sound effects (AC-9.23)", function () {
     const muted = toneLevel(await playAndCapture(), BEEP_HZ);
     await toggleMute(false);
     const unmuted = toneLevel(await playAndCapture(), BEEP_HZ);
-    expect(muted).toBeLessThan(SILENT_DB);
+    expect(muted).toBeLessThan(MUTED_DB);
     expect(Math.abs(plainDb - unmuted)).toBeLessThan(3);
   });
 

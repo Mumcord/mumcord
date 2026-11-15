@@ -2,8 +2,10 @@ name: Build the native AV1 libraries
 description: >-
   Restores or builds the static SVT-AV1 and dav1d that screen sharing links and, on Windows and
   Linux, the hardware encoder interfaces (scripts/build-{svt-av1,dav1d,hwenc-sdk}.sh), and exports
-  SVTAV1_STATIC_DIR, DAV1D_STATIC_DIR and HWENC_SDK_DIR. Each library is cached per system and architecture; its key changes with
-  its build script, which pins the version, so a cache hit skips the build and all build tools.
+  SVTAV1_STATIC_DIR, DAV1D_STATIC_DIR and HWENC_SDK_DIR. The hwcodec crate links these prebuilt
+  libraries instead of building its bundled sources. Each library is cached per system and
+  architecture; its key changes with its build script, which pins the version, so a cache hit
+  skips the build and all build tools.
 runs:
   using: composite
   steps:
@@ -42,7 +44,9 @@ runs:
         steps.svt-av1.outputs.cache-hit != 'true' || steps.dav1d.outputs.cache-hit != 'true' ||
         (runner.os != 'macOS' && steps.hwenc.outputs.cache-hit != 'true')
       shell: bash
-      run: |
+      # Adds NASM to PATH for the Windows build below. The entry is the runner's temp directory and
+      # a fixed version, never input from a pull request.
+      run: | # zizmor: ignore[github-env]
         case "$RUNNER_OS" in
           Linux) scripts/ci/apt-install.sh nasm meson ninja-build ;;
           macOS) brew install nasm meson ninja ;;

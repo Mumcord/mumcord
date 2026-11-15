@@ -5,10 +5,24 @@
 //! (`ulimit -r`) for a direct SCHED_FIFO request; skipped when neither is available.
 #![cfg(target_os = "linux")]
 
+use std::sync::atomic::{AtomicI64, Ordering};
 use std::time::{Duration, Instant};
 
 /// Longer than rtkit's default hard limit (200 ms), past which the kernel sends SIGKILL.
 const OVERRUN: Duration = Duration::from_millis(400);
+
+/// The thread the overrun hook ran on; 0 until it ran.
+static HOOK_THREAD: AtomicI64 = AtomicI64::new(0);
+
+fn thread_id() -> i64 {
+    // SAFETY: gettid takes no arguments and cannot fail.
+    unsafe { libc::syscall(libc::SYS_gettid) }
+}
+
+/// Stands in for the engine's stack capture; a raw syscall and an atomic are signal-safe.
+extern "C" fn overrun_hook() {
+    HOOK_THREAD.store(thread_id(), Ordering::Relaxed);
+}
 
 /// The calling thread's scheduling policy, without the reset-on-fork flag rtkit adds.
 fn policy() -> libc::c_int {
@@ -36,6 +50,7 @@ fn promote_directly() -> bool {
 
 #[test]
 fn overrunning_realtime_thread_is_demoted_not_killed() {
+    mumcord_audio::rt::set_overrun_hook(overrun_hook);
     let ran = std::thread::spawn(|| {
         let guard = mumcord_audio::rt::promote_current_thread();
         if guard.is_err() && !promote_directly() {
@@ -51,6 +66,11 @@ fn overrunning_realtime_thread_is_demoted_not_killed() {
         }
 
         assert_eq!(policy(), libc::SCHED_OTHER, "overrunning thread is demoted");
+        assert_eq!(
+            HOOK_THREAD.load(Ordering::Relaxed),
+            thread_id(),
+            "the overrun hook runs on the overrunning thread"
+        );
         drop(guard);
         true
     })
@@ -59,6 +79,22 @@ fn overrunning_realtime_thread_is_demoted_not_killed() {
 
     if ran {
         assert_eq!(mumcord_audio::rt::take_demotions(), 1);
+
+        // With the SIGXCPU the kernel moved the soft limit a second up, above the hard one, so
+        // the next overrun of any thread would be killed without a warning (issue #844).
+        mumcord_audio::rt::keep_overrun_headroom();
+        let mut limit = libc::rlimit {
+            rlim_cur: 0,
+            rlim_max: 0,
+        };
+        // SAFETY: getrlimit only writes `limit`.
+        let result = unsafe { libc::getrlimit(libc::RLIMIT_RTTIME, &raw mut limit) };
+        assert_eq!(result, 0, "reading RLIMIT_RTTIME");
+        assert_eq!(
+            limit.rlim_cur,
+            limit.rlim_max / 2,
+            "the soft limit warns again before the hard one"
+        );
     } else {
         eprintln!("skipped: real-time scheduling unavailable (no rtkit, RLIMIT_RTPRIO is 0)");
     }

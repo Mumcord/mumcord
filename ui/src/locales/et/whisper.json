@@ -17,6 +17,7 @@
     "muted": "Sosistamiseks tühista mikrofoni vaigistus.",
     "serverMuted": "Server on sind vaigistanud, seega ei edasta see sinu häält.",
     "nobodyHere": "Keegi neist pole praegu selles serveris.",
+    "ambiguousName": "Siin on selle nimega rohkem kui üks inimene, seega sosinat ei saadetud.",
     "channelNotFound": "Seda kanalit pole selles serveris olemas.",
     "noPermission": "Server ei luba sul kanalis {{channel}} sosistada.",
     "unknownTarget": "Seda sihtmärki pole enam olemas.",

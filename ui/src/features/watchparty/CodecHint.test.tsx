@@ -23,12 +23,13 @@ afterEach(() => {
   setApi(undefined);
 });
 
-function onSystem(os: string, distro: LinuxDistro | null) {
+function onSystem(os: string, distro: LinuxDistro | null, appimage = false) {
   vi.spyOn(api, "appInfo").mockResolvedValue({
     version: "0.4.0",
     packageVersion: "0.4.0",
     os,
-    appimage: true,
+    appimage,
+    phoneTransfer: false,
     portable: false,
     limits: [],
     session: null,
@@ -69,6 +70,35 @@ describe("CodecHint", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Install gst-libav (the GStreamer libav plugin) with your system's package manager.",
     );
+  });
+
+  it("offers an AppImage workaround, never a system codec install, on Arch and Fedora", async () => {
+    for (const distro of [
+      { id: "arch", idLike: [] },
+      { id: "fedora", idLike: [] },
+    ]) {
+      onSystem("linux x86_64", distro, true);
+      const { unmount } = await renderHint({ kind: "twitch" });
+      const hint = await screen.findByRole("status");
+      expect(hint).toHaveTextContent("This AppImage cannot play H.264 video");
+      expect(hint).toHaveTextContent("Update Mumcord");
+      expect(hint).toHaveTextContent("AUR on Arch");
+      expect(hint).not.toHaveTextContent("Install gst-libav");
+      expect(hint).not.toHaveTextContent("sudo");
+      expect(hint).not.toHaveTextContent("RPM Fusion");
+      unmount();
+    }
+  });
+
+  it("keeps the AppImage hint hidden when H.264 works or the failure is unrelated", async () => {
+    onSystem("linux x86_64", { id: "arch", idLike: [] }, true);
+    const unrelated = await renderHint({ kind: "youtube", code: 150 });
+    expect(screen.queryByRole("status")).toBeNull();
+    unrelated.unmount();
+
+    vi.spyOn(HTMLMediaElement.prototype, "canPlayType").mockReturnValue("probably");
+    await renderHint({ kind: "twitch" });
+    expect(screen.queryByRole("status")).toBeNull();
   });
 
   it("names the FreeBSD package that decodes the missing codec", async () => {

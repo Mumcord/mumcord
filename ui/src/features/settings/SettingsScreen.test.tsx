@@ -1620,6 +1620,37 @@ describe("Accessibility section", () => {
   });
 });
 
+describe("Send to your phone (build flag phone-transfer)", () => {
+  const SEND = "Send to your phone…";
+  const withPhoneTransfer = async (phoneTransfer: boolean) => {
+    const info = await api.appInfo();
+    vi.spyOn(api, "appInfo").mockResolvedValue({ ...info, phoneTransfer });
+  };
+
+  it("has no button in a build without the feature", async () => {
+    await withPhoneTransfer(false);
+    renderScreen();
+    await switchSection("Account & Identity");
+    // The neighbouring button is there, so the card has rendered.
+    expect(await screen.findByRole("button", { name: "Import…" })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(api.appInfo).toHaveBeenCalled();
+    });
+    expect(screen.queryByRole("button", { name: SEND })).toBeNull();
+    fireEvent.change(screen.getByRole("searchbox", { name: "Search settings" }), {
+      target: { value: "phone" },
+    });
+    expect(screen.queryByText(/Send to your phone/)).toBeNull();
+  });
+
+  it("has the button in a build with the feature", async () => {
+    await withPhoneTransfer(true);
+    renderScreen();
+    await switchSection("Account & Identity");
+    expect(await screen.findByRole("button", { name: SEND })).toBeInTheDocument();
+  });
+});
+
 const OVERLAY_CARD = "In-game overlay";
 
 describe("Overlay on macOS (QA.58)", () => {
@@ -1629,6 +1660,7 @@ describe("Overlay on macOS (QA.58)", () => {
       packageVersion: "0.0.0",
       os: "macos aarch64",
       appimage: false,
+      phoneTransfer: false,
       portable: false,
       distro: null,
       limits: [],
@@ -1655,6 +1687,7 @@ describe("Overlay on macOS (QA.58)", () => {
       packageVersion: "0.0.0",
       os: "linux x86_64",
       appimage: false,
+      phoneTransfer: false,
       portable: false,
       distro: null,
       limits: [],

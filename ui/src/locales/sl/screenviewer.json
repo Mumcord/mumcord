@@ -13,6 +13,7 @@
   "starting": "Povezujem se z zaslonom: {{name}}…",
   "paused": "{{name}} je začasno ustavil deljenje.",
   "full": "To deljenje je polno.",
+  "needsUpdate": "To deljenje zahteva Mumcord 0.9.0.",
   "unreachable": "{{name}} ni neposredno dosegljiv. Omrežje morda blokira neposredne povezave.",
   "tooOld": "Mumcord osebe {{name}} je prestar, da bi s tabo delil zaslon.",
   "consentOff": "Gledanje potrebuje neposredne povezave, ti pa si jih izklopil.",

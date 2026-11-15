@@ -2,3 +2,9 @@
 # relative to the working directory, and cargo runs tests from the crate's directory.
 [env]
 MUMCORD_TESTENV_DIR = { value = "testenv", relative = true }
+# The hwcodec crate (video encoders and decoders) takes each native library from its prebuilt
+# static build when LIBVPX_STATIC_DIR, SVTAV1_STATIC_DIR, DAV1D_STATIC_DIR or HWENC_SDK_DIR is set
+# (CI, release builds, scripts/build-*.sh), and otherwise from the system through pkg-config.
+# Without this switch a missing library would silently start hwcodec's own source build, which
+# is slow and not the pinned build Mumcord ships; with it the build stops and names the library.
+HWCODEC_USE_SYSTEM_LIBS = "1"

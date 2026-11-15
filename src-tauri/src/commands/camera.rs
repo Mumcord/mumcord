@@ -8,9 +8,10 @@ use std::sync::{Arc, Mutex, PoisonError};
 
 use mumcord_engine::Engine;
 use mumcord_engine::camera::{
-    self as engine_camera, CameraFailure as EngineFailure, CameraRoomView as EngineRoomView,
-    CameraState as EngineState, CameraTile as EngineTile, CameraView as EngineView, EffectLevel,
-    EffectLoad, PreviewPicture, TileQuality as EngineQuality, TileState as EngineTileState,
+    self as engine_camera, CameraFailure as EngineFailure, CameraPath as EnginePath,
+    CameraRoomView as EngineRoomView, CameraState as EngineState, CameraTile as EngineTile,
+    CameraView as EngineView, CameraViewer as EngineViewer, EffectLevel, EffectLoad,
+    PreviewPicture, TileQuality as EngineQuality, TileState as EngineTileState,
 };
 use mumcord_engine::screen_share::wire::Codec;
 use mumcord_engine::store;
@@ -129,6 +130,37 @@ fn api_error(f: &EngineFailure) -> ApiError {
     ApiError::new(ErrorCode::Camera, code)
 }
 
+/// How one viewer gets the own camera (FR-8.62, FR-8.94); the camera room's viewer list shows
+/// it.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum CameraPath {
+    /// Through the relay broadcast.
+    Relay,
+    /// Through its own stream.
+    Direct,
+}
+
+/// One admitted viewer of the own camera.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct CameraViewer {
+    pub session: SessionId,
+    pub path: CameraPath,
+}
+
+impl From<EngineViewer> for CameraViewer {
+    fn from(v: EngineViewer) -> Self {
+        Self {
+            session: v.session,
+            path: match v.path {
+                EnginePath::Relay => CameraPath::Relay,
+                EnginePath::Direct => CameraPath::Direct,
+            },
+        }
+    }
+}
+
 /// The own camera as the preview dialog, Settings, the room and the tray see it.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -137,10 +169,10 @@ pub struct CameraView {
     pub state: CameraState,
     /// Why the last **Turn on camera** failed; shown in the preview until the next try.
     pub error: Option<CameraFailure>,
-    /// The broadcast id (16 hex) while on air.
+    /// The relay broadcast id (16 hex) while on air; `null` for a camera that runs without one.
     pub broadcast: Option<String>,
-    /// The people who receive the camera now.
-    pub viewers: Vec<SessionId>,
+    /// The people who receive the camera now, with the path each of them gets.
+    pub viewers: Vec<CameraViewer>,
 }
 
 impl From<EngineView> for CameraView {
@@ -150,7 +182,7 @@ impl From<EngineView> for CameraView {
             state: v.state.into(),
             error: v.error.as_ref().map(Into::into),
             broadcast: v.broadcast,
-            viewers: v.viewers,
+            viewers: v.viewers.into_iter().map(Into::into).collect(),
         }
     }
 }

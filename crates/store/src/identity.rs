@@ -120,6 +120,23 @@ impl Identity {
         Err(Error::Pkcs12NoIdentity)
     }
 
+    /// Builds an identity from a DER certificate and its PKCS#8 private key, as they arrive in
+    /// a transfer from another device (spec 05, FR-5.65). Both are untrusted: the key must be
+    /// one this app can use and must belong to the certificate, as in
+    /// [`from_pkcs12`](Self::from_pkcs12).
+    pub fn from_der(cert_der: &[u8], key_pkcs8_der: &[u8]) -> Result<Self> {
+        let cert = Certificate::from_der(cert_der)?;
+        let key_pair = KeyPair::try_from(key_pkcs8_der)?;
+        if !contains(cert_der, key_pair.der_bytes()) {
+            return Err(Error::IdentityKeyMismatch);
+        }
+        Ok(Self {
+            name: common_name(cert.subject()).unwrap_or_default(),
+            cert_der: cert_der.to_vec(),
+            key_pkcs8_der: key_pkcs8_der.to_vec(),
+        })
+    }
+
     /// Exports as a PKCS#12 file protected with `password` (AES-256, HMAC-SHA256).
     pub fn to_pkcs12(&self, password: &str) -> Result<Vec<u8>> {
         let chain = PrivateKeyChain::new(

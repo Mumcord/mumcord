@@ -14,7 +14,7 @@ import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { browser } from "@wdio/globals";
-import { bin } from "./paths.ts";
+import { bin, repoRoot } from "./paths.ts";
 import { run } from "./run.ts";
 import { shared } from "./state.ts";
 
@@ -261,6 +261,9 @@ export async function startDriver(inst: Instance = state.a): Promise<void> {
       MUMCORD_AUDIO_BACKEND: inst.audio,
       // Link previews may only fetch the local test page, never the internet (FR-1.49).
       MUMCORD_TEST_PREVIEW_ADDRESSES: "127.0.0.1",
+      // Unpackaged debug binary: no Tauri resource bundle, so the built-in camera backgrounds
+      // would be missing. The folder uses the same `{id}.webp` names as the packaged one.
+      MUMCORD_CAMERA_BACKGROUNDS: join(repoRoot, "assets", "backgrounds"),
       ...inst.env,
     },
   });

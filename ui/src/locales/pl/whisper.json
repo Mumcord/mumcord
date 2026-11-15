@@ -17,6 +17,7 @@
     "muted": "Włącz mikrofon, aby szeptać.",
     "serverMuted": "Serwer cię wyciszył, więc nie przekazuje twojego głosu.",
     "nobodyHere": "Nikogo z tych osób nie ma teraz na tym serwerze.",
+    "ambiguousName": "Więcej niż jedna osoba tutaj ma tę nazwę, więc szept nie został wysłany.",
     "channelNotFound": "Ten kanał nie istnieje na tym serwerze.",
     "noPermission": "Serwer nie pozwala ci szeptać na kanale {{channel}}.",
     "unknownTarget": "Ten cel już nie istnieje.",

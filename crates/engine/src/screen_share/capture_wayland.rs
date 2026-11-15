@@ -25,7 +25,7 @@ use ashpd::desktop::screencast::{
 };
 use ashpd::desktop::{CreateSessionOptions, PersistMode, ResponseError};
 use futures_util::StreamExt;
-use mumcord_screenshare::I420Frame;
+use hwcodec::I420Frame;
 use pipewire as pw;
 use pw::spa;
 use pw::spa::param::ParamType;
@@ -38,10 +38,10 @@ use pw::stream::{StreamFlags, StreamState};
 use tokio::sync::oneshot;
 
 use super::capture::CaptureSource;
-use super::convert::bgrx_to_i420;
 use super::signal::ShareKind;
 use super::sound::{SoundOutcome, SoundRequest, pick};
 use crate::session::lock;
+use hwcodec::convert::bgra_to_i420;
 
 /// Why a Wayland share could not start.
 #[derive(Debug, thiserror::Error)]
@@ -224,7 +224,7 @@ impl CaptureSource for WaylandCapture {
             std::mem::swap(&mut latest.data, &mut self.spare);
             (latest.width, latest.height)
         };
-        bgrx_to_i420(&self.spare, width, height, max_width, max_height)
+        bgra_to_i420(&self.spare, width, height, max_width, max_height)
     }
 }
 

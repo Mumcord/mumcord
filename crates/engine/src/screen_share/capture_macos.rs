@@ -15,8 +15,8 @@
 //!
 //! The parts without macOS calls are compiled everywhere for the tests.
 
-use super::convert::fit;
 use super::signal::ShareKind;
+use hwcodec::convert::fit;
 
 /// The encoder's largest picture (the 1080p30 quality step); the system scales into it, so a 5K
 /// screen costs no more than a Full HD one.
@@ -118,7 +118,7 @@ mod sck {
 
     use block2::RcBlock;
     use dispatch2::{DispatchQueue, DispatchRetained};
-    use mumcord_screenshare::I420Frame;
+    use hwcodec::I420Frame;
     use objc2::rc::Retained;
     use objc2::runtime::ProtocolObject;
     use objc2::{AnyThread, DefinedClass, Message, define_class, msg_send};
@@ -145,7 +145,6 @@ mod sck {
     use tokio::sync::oneshot;
 
     use super::super::capture::CaptureSource;
-    use super::super::convert::{bgrx_to_i420, pack_rows};
     use super::super::signal::ShareKind;
     use super::super::sound::macos::{MacSound, SoundSender, sound_channel};
     use super::super::sound::{AppName, ShareSoundMode, SoundOutcome, SoundRequest};
@@ -154,6 +153,7 @@ mod sck {
         plan, sound_supported, stream_size,
     };
     use crate::session::lock;
+    use hwcodec::convert::{bgra_to_i420, pack_rows};
 
     /// Frames per second the stream delivers at most, the encoder's top rate.
     const CAPTURE_FPS: i32 = 30;
@@ -742,7 +742,7 @@ mod sck {
                 std::mem::swap(&mut latest.data, &mut self.spare);
                 (latest.width, latest.height)
             };
-            bgrx_to_i420(&self.spare, width, height, max_width, max_height)
+            bgra_to_i420(&self.spare, width, height, max_width, max_height)
         }
     }
 

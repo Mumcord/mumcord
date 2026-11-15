@@ -16,7 +16,7 @@ use std::net::{IpAddr, SocketAddr};
 use std::sync::Mutex;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use mumcord_protocol::{
+use mumble_client_protocol::{
     MumbleVersion, QueryAnswer, decode_answer, encode_legacy_query, encode_query,
 };
 use tokio::net::UdpSocket;
@@ -203,7 +203,7 @@ mod tests {
     use prost::Message;
 
     use super::*;
-    use mumcord_protocol::{LEGACY_QUERY_LEN, udp_proto};
+    use mumble_client_protocol::{LEGACY_QUERY_LEN, udp_proto};
 
     /// A stand-in for murmur: it answers in the format the query was written in, like the server
     /// does. `legacy_only` stands for a server before 1.5, which cannot read the modern query.

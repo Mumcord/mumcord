@@ -17,6 +17,7 @@
     "muted": "Za šaptanje uključi mikrofon.",
     "serverMuted": "Poslužitelj te je utišao pa ne prosljeđuje tvoj glas.",
     "nobodyHere": "Nitko od tih osoba trenutačno nije na ovom poslužitelju.",
+    "ambiguousName": "Više osoba ovdje ima ovo ime, pa šapat nije poslan.",
     "channelNotFound": "Ovaj kanal ne postoji na ovom poslužitelju.",
     "noPermission": "Poslužitelj ti ne dopušta šaptanje u kanal {{channel}}.",
     "unknownTarget": "Ovaj cilj više ne postoji.",

@@ -41,6 +41,7 @@ use ::windows::Win32::System::Variant::{VARIANT, VT_BSTR, VariantClear};
 use ::windows::core::{GUID, HRESULT, Interface, PCWSTR, implement, w};
 
 use self::qedit::{ISampleGrabber, ISampleGrabberCB, ISampleGrabberCB_Impl};
+use super::bounded::{STOP_TIMEOUT, run_bounded};
 use super::capture::UNREADABLE;
 use super::com::{self, Com};
 use super::dshow_type::{
@@ -284,8 +285,13 @@ impl Drop for Session {
     fn drop(&mut self) {
         // The capture thread sees the stop within `WAIT`; stopping its graph releases the camera.
         self.stop.store(true, Ordering::Release);
-        if let Some(thread) = self.thread.take() {
-            join(thread);
+        let Some(thread) = self.thread.take() else {
+            return;
+        };
+        // Stopping the graph calls into the camera's filter, which can hang like any driver.
+        // The wait is limited, so a camera switch or closing the app cannot freeze on it.
+        if !run_bounded("camera-dshow-stop", STOP_TIMEOUT, move || join(thread)) {
+            tracing::warn!("the camera did not stop in time; its capture thread is left behind");
         }
     }
 }

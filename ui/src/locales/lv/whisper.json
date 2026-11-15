@@ -17,6 +17,7 @@
     "muted": "Atcel mikrofona apklusināšanu, lai čukstētu.",
     "serverMuted": "Serveris tevi ir apklusinājis, tāpēc tas nepārraida tavu balsi.",
     "nobodyHere": "Neviena no šīm personām pašlaik nav šajā serverī.",
+    "ambiguousName": "Šāds vārds šeit ir vairākiem cilvēkiem, tāpēc čuksts netika nosūtīts.",
     "channelNotFound": "Šī kanāla šajā serverī nav.",
     "noPermission": "Serveris neļauj tev čukstēt kanālā {{channel}}.",
     "unknownTarget": "Šī mērķa vairs nav.",

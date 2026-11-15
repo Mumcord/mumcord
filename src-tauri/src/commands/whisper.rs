@@ -73,6 +73,8 @@ pub enum WhisperDeniedReason {
     Muted,
     ServerMuted,
     NobodyHere,
+    /// A saved name fits several people on the server; nothing is sent to any of them.
+    AmbiguousName,
     ChannelNotFound,
     NoPermission,
     UnknownTarget,
@@ -315,6 +317,7 @@ fn denied_state(target_id: String, denied: WhisperDenied) -> WhisperState {
         WhisperDenied::Muted => (WhisperDeniedReason::Muted, None),
         WhisperDenied::ServerMuted => (WhisperDeniedReason::ServerMuted, None),
         WhisperDenied::NobodyHere => (WhisperDeniedReason::NobodyHere, None),
+        WhisperDenied::AmbiguousName => (WhisperDeniedReason::AmbiguousName, None),
         WhisperDenied::ChannelNotFound => (WhisperDeniedReason::ChannelNotFound, None),
         WhisperDenied::NoPermission { channel } => {
             (WhisperDeniedReason::NoPermission, Some(channel))
@@ -339,6 +342,18 @@ fn stop(app: &AppHandle, engine: &Engine, only: Option<&str>) {
     }
     engine.whisper_stop();
     emit(app, WhisperState::Idle);
+}
+
+/// The engine ended the whisper itself: everyone it was bound to left, or voice left the
+/// server. The banner goes away as after [`stop`].
+pub fn on_engine_ended(app: &AppHandle) -> tauri::Result<()> {
+    if active().take().is_none() {
+        return Ok(());
+    }
+    WhisperStateChanged {
+        state: WhisperState::Idle,
+    }
+    .emit(app)
 }
 
 fn emit(app: &AppHandle, state: WhisperState) {

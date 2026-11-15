@@ -9,7 +9,7 @@
 //!   like the official client does; the server forwards positions only between users with the
 //!   same context, so only people in the same game are placed;
 //! - its avatar position goes into every outgoing voice packet, once the server knows the
-//!   current context (both voice formats carry it, see `mumcord_protocol::voice`).
+//!   current context (both voice formats carry it, see `mumble_client_protocol::voice`).
 //!
 //! Independently of the setting, people whose voice packets carry a position are reported as
 //! "sending positions" (the "3D" icon) until [`SENDING_TIMEOUT`] passes without such a packet;

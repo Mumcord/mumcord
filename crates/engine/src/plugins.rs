@@ -18,7 +18,7 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::sync::{Arc, Mutex};
 
-use mumcord_protocol::{
+use mumble_client_protocol::{
     CommandError, MumbleVersion, PLUGIN_DATA_MAX, PluginData, PluginTicket, ServerState,
     TextMessage,
 };
@@ -409,7 +409,7 @@ fn shares_plugin_data(version: Option<MumbleVersion>) -> bool {
     version.is_some_and(|v| v >= MumbleVersion::PLUGIN_DATA)
 }
 
-fn peer_of(user: &mumcord_protocol::User) -> PluginPeer {
+fn peer_of(user: &mumble_client_protocol::User) -> PluginPeer {
     PluginPeer {
         session: user.session,
         name: user.name.clone(),

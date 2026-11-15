@@ -17,6 +17,7 @@ use super::media::BROADCAST_KEY;
 use super::state::{Answer, Watching};
 use super::{Here, Signal, WatchBlock, emit, here, send, send_viewers};
 use crate::ServerId;
+use crate::inspector::MediaTapSink;
 use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{Engine, EngineError, EngineResult, ErrorKind, SessionCtx, lock};
 use admit::{Decision, Roster};
@@ -168,6 +169,7 @@ struct Opened {
     me: CertKey,
     link: mumcord_p2p::BroadcastLink,
     limit: u16,
+    media: bool,
 }
 
 impl Engine {
@@ -228,10 +230,10 @@ impl Engine {
         let me = cert_key(&identity).ok_or(FanoutUnavailable::NoCertificate)?;
         self.with_fanout(server_id, token, |fanout| *fanout = Some(Fanout::Starting));
         let (ann, id, relay_token) = self
-            .relay_broadcast_request(server_id, RelayUse::ScreenShare, limit)
+            .relay_broadcast_request(server_id, RelayUse::ScreenShare, limit, true)
             .await?;
         let link = p2p
-            .broadcast(&ann, &relay_token, BindRole::Publisher)
+            .broadcast(&ann, &relay_token, BindRole::Publisher, ann.media)
             .await
             .map_err(|e| {
                 tracing::info!(error = %e, "screen share broadcast link not opened");
@@ -242,6 +244,7 @@ impl Engine {
             me,
             link,
             limit,
+            media: ann.media,
         })
     }
 
@@ -306,14 +309,15 @@ impl Engine {
                     opened.me,
                     opened.link,
                     media.subscribe(BROADCAST_KEY),
+                    Some(MediaTapSink::new(&self.inspector(), server_id)),
                     on_end,
                 ) {
                     Ok(publisher) => {
-                        let mut roster = Roster::new(opened.limit);
+                        let mut roster = Roster::new(opened.limit, opened.media);
                         let now = Instant::now();
                         // Viewers that got direct copies while the broadcast started.
-                        for viewer in own.viewers.keys() {
-                            roster.decide(*viewer, false, now);
+                        for (viewer, caps) in own.viewers_caps() {
+                            roster.decide(viewer, false, caps.media, now);
                         }
                         tracing::info!(
                             limit = opened.limit,
@@ -443,6 +447,7 @@ impl Engine {
             match decision {
                 Decision::Direct => send(&ctx.handle, &[viewer], &Signal::Accept),
                 Decision::Full => send(&ctx.handle, &[viewer], &Signal::Full),
+                Decision::NeedsUpdate => send(&ctx.handle, &[viewer], &Signal::NeedsUpdate),
                 Decision::Relay | Decision::Wait => {}
             }
             if let Some(Here { others, .. }) = here(&ctx.handle) {
@@ -466,6 +471,7 @@ impl Engine {
         sharer: u32,
         id: BroadcastId,
         token: RelayToken,
+        media: bool,
     ) -> bool {
         if !here(&ctx.handle).is_some_and(|h| h.others.contains(&sharer)) {
             return false;
@@ -473,7 +479,7 @@ impl Engine {
         lock(self.screen_share_state())
             .servers
             .get_mut(&ctx.server_id)
-            .is_some_and(|shares| shares.answered(sharer, Answer::Broadcast(id, token)))
+            .is_some_and(|shares| shares.answered(sharer, Answer::Broadcast(id, token, media)))
     }
 
     /// Opens the subscriber end of `sharer`'s broadcast `id` for watch `attempt` (FR-7.42).
@@ -484,9 +490,10 @@ impl Engine {
         attempt: u64,
         id: BroadcastId,
         token: RelayToken,
+        media: bool,
     ) -> EngineResult<()> {
         let server_id = ctx.server_id;
-        let opened = self.open_subscriber(ctx, sharer, &token).await;
+        let opened = self.open_subscriber(ctx, sharer, &token, media).await;
         let volume = self.person_share_volume(server_id, sharer);
         let result = {
             let mut all = lock(self.screen_share_state());
@@ -542,6 +549,7 @@ impl Engine {
         ctx: &SessionCtx,
         sharer: u32,
         token: &RelayToken,
+        media: bool,
     ) -> Result<(CertKey, String, mumcord_p2p::BroadcastLink), (EngineError, Option<WatchBlock>)>
     {
         let block = |b: WatchBlock| (super::blocked(b), Some(b));
@@ -557,7 +565,7 @@ impl Engine {
             .ok_or_else(|| block(WatchBlock::PeerUnsupported))?;
         let me = cert_key(&identity).ok_or_else(|| block(WatchBlock::PeerUnsupported))?;
         let link = p2p
-            .broadcast(&ann, token, BindRole::Subscriber)
+            .broadcast(&ann, token, BindRole::Subscriber, media)
             .await
             .map_err(|e| {
                 tracing::info!(error = %e, "screen share broadcast not joined");

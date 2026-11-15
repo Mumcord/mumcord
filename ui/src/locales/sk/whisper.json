@@ -17,6 +17,7 @@
     "muted": "Na šepkanie zapni mikrofón.",
     "serverMuted": "Server ťa stlmil, preto neprenáša tvoj hlas.",
     "nobodyHere": "Nikto z týchto ľudí teraz nie je na serveri.",
+    "ambiguousName": "Toto meno tu má viac ľudí, preto šepot nebol odoslaný.",
     "channelNotFound": "Tento kanál na serveri neexistuje.",
     "noPermission": "Server ti nedovoľuje šepkať do kanála {{channel}}.",
     "unknownTarget": "Tento cieľ už neexistuje.",

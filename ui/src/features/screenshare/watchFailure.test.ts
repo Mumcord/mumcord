@@ -5,6 +5,7 @@ import { watchFailure } from "./watchFailure";
 describe("watch failure reasons", () => {
   it.each([
     ["shareFull", "this share is full", "full"],
+    ["needsUpdate", "this share needs Mumcord 0.9.0", "needsUpdate"],
     ["directUnavailable", "noDirectPath", "unreachable"],
     ["directUnavailable", "peerUnsupported", "tooOld"],
     ["directUnavailable", "consentOff", "consentOff"],

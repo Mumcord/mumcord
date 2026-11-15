@@ -5,7 +5,7 @@
 
 use std::collections::HashSet;
 
-use mumcord_protocol::Channel;
+use mumble_client_protocol::Channel;
 
 /// Blob requests already sent on this connection, keyed by channel and description hash.
 #[derive(Debug, Default)]
@@ -34,7 +34,7 @@ pub fn has_description(channel: &Channel) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use mumcord_protocol::{ServerState, proto};
+    use mumble_client_protocol::{ServerState, proto};
 
     use super::*;
     use crate::session::convert::channel_view;

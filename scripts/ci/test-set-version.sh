@@ -1,6 +1,6 @@
 #!/bin/bash
 # Tests scripts/set-version.sh on a temporary copy of the committed tree: every manifest and lock
-# file carries the new version, the locks stay valid for --locked builds, and mumcord-protocol
+# file carries the new version, the locks stay valid for --locked builds, and mumcord-codec
 # still packages for crates.io. The real release runs the same script in release.yml.
 #   scripts/ci/test-set-version.sh [version]   (default 9.8.7; CI also runs a pre-release)
 set -euo pipefail
@@ -34,7 +34,7 @@ cargo metadata --locked --format-version 1 --manifest-path scripts/smoke/seed/Ca
 
 requirement=$version
 [[ "$version" == *-* ]] || requirement=${version%.*}
-grep -q "^mumcord-protocol = { path = \"crates/protocol\", version = \"$requirement\" }" Cargo.toml \
+grep -q "^mumcord-codec = { path = \"crates/codec\", version = \"$requirement\" }" Cargo.toml \
   || fail "internal crate requirement is not $requirement"
 
 plist=src-tauri/Info.plist
@@ -51,7 +51,7 @@ fi
 
 if [[ "$version" != *-* ]]; then
   # --allow-dirty: the copy has no git repository.
-  cargo publish -p mumcord-protocol --dry-run --locked --allow-dirty --quiet \
-    || fail "cargo publish --dry-run of mumcord-protocol"
+  cargo publish -p mumcord-codec --dry-run --locked --allow-dirty --quiet \
+    || fail "cargo publish --dry-run of mumcord-codec"
 fi
 echo "set-version.sh $version: all manifests and locks consistent."

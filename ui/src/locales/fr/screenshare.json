@@ -163,7 +163,7 @@
     "noFanoutBody_other": "Chaque spectateur reçoit sa propre copie depuis ton ordinateur ; jusqu’à {{max}} personnes peuvent donc regarder. La qualité baisse à mesure que d’autres arrivent : en ce moment, {{count}} spectateurs ont besoin d’environ {{mbit}} Mbit/s de débit montant, donc ton partage passe à {{now}} au lieu de {{wanted}}.",
     "fanoutUnavailable": "La diffusion par relais n’est pas disponible ({{reason}}). Chaque spectateur reçoit sa propre copie : jusqu’à {{max}} peuvent regarder et la qualité peut baisser.",
     "reasonNoRelay": "ce serveur n’a pas de relais",
-    "reasonOldRelay": "le relais est trop ancien",
+    "reasonOldRelay": "le relais de ce serveur doit être mis à jour",
     "reasonDisallowed": "le relais n’autorise pas le partage d’écran",
     "reasonRefused": "le relais a refusé la diffusion",
     "reasonFull": "le relais est saturé",

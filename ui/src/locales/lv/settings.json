@@ -135,7 +135,29 @@
     "backupWarning": "Pirms dzēšanas izveido dublējumu. Identitāti bez dublējuma nevar atjaunot.",
     "usedBy": "Izmanto: {{servers}}",
     "deleteUsedBy": "Šie serveri turpmāk izmantos noklusējuma identitāti {{identity}}: {{servers}}",
-    "exportFor": "Eksportēt {{identity}}"
+    "exportFor": "Eksportēt {{identity}}",
+    "phoneSend": "Sūtīt uz savu tālruni…",
+    "phoneTitle": "Sūtīt uz savu tālruni",
+    "phoneSelectionLabel": "Ko sūtīt",
+    "phoneIdentity": "Identitāte: {{identity}}",
+    "phoneIdentityDefault": "Identitāte: {{identity}} (noklusējuma)",
+    "phoneServers_zero": "Serveru saraksts ({{count}} serveru)",
+    "phoneServers_one": "Serveru saraksts ({{count}} serveris)",
+    "phoneServers_other": "Serveru saraksts ({{count}} serveri)",
+    "phoneNothingSelected": "Izvēlies vismaz vienu ierakstu.",
+    "phoneShow": "Rādīt kodus",
+    "phoneDone": "Gatavs",
+    "phonePreparing": "Kodi tiek sagatavoti…",
+    "phoneCodesLabel": "Kodi tavam tālrunim",
+    "phoneQrLabel": "QR kods {{current}} no {{total}}",
+    "phoneCodeOf": "Kods {{current}} no {{total}}",
+    "phoneCycleHint": "Kodi mainās automātiski. Turi tālruni pavērstu pret ekrānu, līdz nolasīti visi {{total}}.",
+    "phoneSingleHint": "Turi tālruni pavērstu pret ekrānu, līdz kods ir nolasīts.",
+    "phoneTypeCode": "Ievadi šo kodu savā tālrunī",
+    "phoneExpires": "Beidzas pēc {{time}}",
+    "phoneRenewed": "Jauni kodi un jauns numurs. Sāc tālrunī no sākuma.",
+    "phoneWarning": "Ikviens, kas noskenē šos kodus un zina numuru, iegūst tavu identitāti. Rādi tos tikai savam tālrunim.",
+    "phoneTooLarge": "Vienai pārsūtīšanai tas ir par daudz. Izvēlies mazāk ierakstu."
   },
   "audio": {
     "devices": "Ierīces",
@@ -772,7 +794,13 @@
       "gap": "Atstarpe no iepriekšējās paketes",
       "kind": "Iekšējais ID",
       "size": "Izmērs",
-      "decoded": "Atkodētais saturs"
+      "decoded": "Atkodētais saturs",
+      "media": "Mediji"
+    },
+    "media": {
+      "channel": "kanāls {{channel}}",
+      "keyframe": "atslēgas kadrs",
+      "delta": "delta kadrs"
     },
     "noDecoding": "Šim saturam nav lasāmas formas; skati neapstrādātos baitus.",
     "controlOnly": "Standarta Mumble ziņa: tiek reģistrēts tikai tās veids un izmērs.",
@@ -793,7 +821,8 @@
       "watch": "Kopīgas skatīšanās stāvoklis",
       "plugin": "Spraudņa dati",
       "mumble": "Mumble ziņa",
-      "peer": "Releja iestatīšana"
+      "peer": "Releja iestatīšana",
+      "media": "Multivides straume"
     }
   },
   "licences": {

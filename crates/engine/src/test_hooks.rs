@@ -59,6 +59,12 @@ pub fn file_expiry() -> Option<Duration> {
     parse_seconds(var("MUMCORD_TEST_FILE_EXPIRY_S")?.as_str())
 }
 
+/// Shorter lifetime of a "Send to your phone" transfer on the desktop (normally 2 minutes), so
+/// the end-to-end test sees the dialog replace an expired transfer (spec 05, AC-5.21).
+pub fn transfer_validity() -> Option<Duration> {
+    parse_seconds(var("MUMCORD_TEST_TRANSFER_VALIDITY_S")?.as_str())
+}
+
 /// Flip one byte of a file in transit (AC-7.11).
 pub fn file_corrupt() -> bool {
     flag("MUMCORD_TEST_FILE_CORRUPT")

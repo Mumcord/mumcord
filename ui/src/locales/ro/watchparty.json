@@ -57,6 +57,7 @@
     "pause": "Pauză"
   },
   "codecHint": {
+    "appimage": "Acest AppImage nu poate reda videoclipuri H.264. Actualizează Mumcord sau folosește pachetul distribuției tale (AUR pe Arch). Instalarea gst-libav în sistem nu va rezolva problema acestui AppImage.",
     "install": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav:",
     "generic": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav (pluginul libav pentru GStreamer) cu managerul de pachete al sistemului tău.",
     "rpmFusion": "Pe Fedora, gst-libav vine din depozitul RPM Fusion; activează mai întâi RPM Fusion.",

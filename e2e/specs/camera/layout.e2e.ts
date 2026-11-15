@@ -50,11 +50,14 @@ function stripTiles(): Promise<number> {
 
 /** Waits until the camera view of the current client lists `viewer` (or not). */
 async function waitViewer(viewer: number, present: boolean): Promise<void> {
-  await browser.waitUntil(async () => ((await cameraView())?.viewers ?? []).includes(viewer) === present, {
-    timeout: 20_000,
-    interval: 250,
-    timeoutMsg: `viewer ${String(viewer)} ${present ? "never joined" : "stayed bound"}`,
-  });
+  await browser.waitUntil(
+    async () => ((await cameraView())?.viewers ?? []).some((v) => v.session === viewer) === present,
+    {
+      timeout: 20_000,
+      interval: 250,
+      timeoutMsg: `viewer ${String(viewer)} ${present ? "never joined" : "stayed bound"}`,
+    },
+  );
 }
 
 /** On B: walks the switch through Beside, Above and Hidden and back, checking the strip. */

@@ -137,7 +137,30 @@
     "backupWarning": "Zrób kopię zapasową przed usunięciem. Tożsamości bez kopii nie da się odzyskać.",
     "usedBy": "Używana przez: {{servers}}",
     "deleteUsedBy": "Te serwery będą potem używać tożsamości domyślnej {{identity}}: {{servers}}",
-    "exportFor": "Eksportuj {{identity}}"
+    "exportFor": "Eksportuj {{identity}}",
+    "phoneSend": "Wyślij na swój telefon…",
+    "phoneTitle": "Wyślij na swój telefon",
+    "phoneSelectionLabel": "Co wysłać",
+    "phoneIdentity": "Tożsamość: {{identity}}",
+    "phoneIdentityDefault": "Tożsamość: {{identity}} (domyślna)",
+    "phoneServers_one": "Lista serwerów ({{count}} serwer)",
+    "phoneServers_few": "Lista serwerów ({{count}} serwery)",
+    "phoneServers_many": "Lista serwerów ({{count}} serwerów)",
+    "phoneServers_other": "Lista serwerów ({{count}} serwera)",
+    "phoneNothingSelected": "Wybierz co najmniej jedną pozycję.",
+    "phoneShow": "Pokaż kody",
+    "phoneDone": "Gotowe",
+    "phonePreparing": "Przygotowywanie kodów…",
+    "phoneCodesLabel": "Kody dla twojego telefonu",
+    "phoneQrLabel": "Kod QR {{current}} z {{total}}",
+    "phoneCodeOf": "Kod {{current}} z {{total}}",
+    "phoneCycleHint": "Kody zmieniają się automatycznie. Trzymaj telefon skierowany na ekran, aż wszystkie {{total}} zostaną odczytane.",
+    "phoneSingleHint": "Trzymaj telefon skierowany na ekran, aż kod zostanie odczytany.",
+    "phoneTypeCode": "Wpisz ten kod na swoim telefonie",
+    "phoneExpires": "Wygasa za {{time}}",
+    "phoneRenewed": "Nowe kody i nowy numer. Zacznij od nowa na swoim telefonie.",
+    "phoneWarning": "Każdy, kto zeskanuje te kody i zna numer, otrzyma twoją tożsamość. Pokazuj je tylko własnemu telefonowi.",
+    "phoneTooLarge": "To za dużo na jedno przesłanie. Wybierz mniej pozycji."
   },
   "audio": {
     "devices": "Urządzenia",
@@ -777,7 +800,13 @@
       "gap": "Odstęp od poprzedniego pakietu",
       "kind": "Wewnętrzny identyfikator",
       "size": "Rozmiar",
-      "decoded": "Zdekodowana zawartość"
+      "decoded": "Zdekodowana zawartość",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "kanał {{channel}}",
+      "keyframe": "klatka kluczowa",
+      "delta": "klatka delta"
     },
     "noDecoding": "Ta zawartość nie ma czytelnej postaci; zobacz surowe bajty.",
     "controlOnly": "Standardowa wiadomość Mumble: zapisywany jest tylko jej typ i rozmiar.",
@@ -798,7 +827,8 @@
       "watch": "Stan wspólnego oglądania",
       "plugin": "Dane wtyczki",
       "mumble": "Wiadomość Mumble",
-      "peer": "Konfiguracja przekaźnika"
+      "peer": "Konfiguracja przekaźnika",
+      "media": "Strumień mediów"
     }
   },
   "licences": {

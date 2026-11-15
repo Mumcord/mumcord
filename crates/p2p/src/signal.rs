@@ -15,7 +15,7 @@ use std::net::{IpAddr, SocketAddr};
 
 use serde::{Deserialize, Serialize};
 
-use mumcord_protocol::PLUGIN_DATA_MAX;
+use mumble_client_protocol::PLUGIN_DATA_MAX;
 
 /// Plugin data id of the signalling messages; other ids are not for this crate.
 pub const DATA_ID: &str = "mumcord.p2p";

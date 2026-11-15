@@ -13,6 +13,7 @@
   "starting": "Jungiamasi prie {{name}} ekrano…",
   "paused": "{{name}} pristabdė bendrinimą.",
   "full": "Šis bendrinimas pilnas.",
+  "needsUpdate": "Šiam bendrinimui reikia „Mumcord 0.9.0“.",
   "unreachable": "Nepavyko tiesiogiai pasiekti {{name}}. Tinklas gali blokuoti tiesioginius ryšius.",
   "tooOld": "{{name}} naudoja per seną Mumcord versiją, kad galėtų su tavimi bendrinti ekraną.",
   "consentOff": "Žiūrėjimui reikia tiesioginių ryšių, o tu juos išjungei.",

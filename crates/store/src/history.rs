@@ -232,6 +232,30 @@ impl Store {
         Ok(rows.collect::<rusqlite::Result<_>>()?)
     }
 
+    /// The stored message `id`, if it belongs to `conversation` as seen from `server`.
+    pub fn message(
+        &self,
+        server: ServerId,
+        conversation: &Conversation,
+        id: i64,
+    ) -> Result<Option<ChatMessage>> {
+        self.flush_pending()?;
+        let (kind, key) = conversation.parts();
+        let scope = self.history_scope(server, conversation)?;
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT id, conversation_kind, conversation_key, sender_name, sender_cert_hash,
+                        sent_at, body
+                 FROM chat_message
+                 WHERE id = ?4 AND (?1 IS NULL OR server_id = ?1) AND conversation_kind = ?2
+                   AND conversation_key = ?3",
+                params![scope, kind, key, id],
+                message_from_row,
+            )
+            .optional()?)
+    }
+
     pub fn count_messages_since(
         &self,
         server: ServerId,

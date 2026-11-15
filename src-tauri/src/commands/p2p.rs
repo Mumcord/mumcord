@@ -308,6 +308,7 @@ pub enum CameraUnavailable {
     RelayDisallows,
     NeedsRelayMode,
     NoCertificate,
+    NeedsDirect,
     /// This platform has no camera backend at all (FR-13.27).
     UnsupportedPlatform,
 }
@@ -321,6 +322,7 @@ impl From<camera::avail::CameraUnavailable> for CameraUnavailable {
             R::RelayDisallows => Self::RelayDisallows,
             R::NeedsRelayMode => Self::NeedsRelayMode,
             R::NoCertificate => Self::NoCertificate,
+            R::NeedsDirect => Self::NeedsDirect,
             R::UnsupportedPlatform => Self::UnsupportedPlatform,
         }
     }

@@ -7,7 +7,8 @@
       "license": "BSD-3-Clause",
       "repository": "https://github.com/mumble-voip/mumble",
       "description": [
-        "The protocol definition files in proto/ (Mumble.proto, MumbleUDP.proto) are taken",
+        "The protocol definition files (Mumble.proto, MumbleUDP.proto) and the OCB2 voice",
+        "encryption in the mumble-client-protocol crate, which Mumcord compiles in, are taken",
         "from the Mumble project. The official Mumble game plugins that Mumcord can load at",
         "runtime to read game positions are developed by the Mumble project under the same",
         "license; they are not part of this repository. Mumcord's plugin host",
@@ -15,7 +16,7 @@
         "Mumble project (MumblePlugin.h and the headers it includes). Mumcord is compatible",
         "with Mumble but is not affiliated with or endorsed by the Mumble project."
       ],
-      "texts": ["crates/protocol/proto/LICENSE.mumble"]
+      "texts": ["licenses/mumble.txt"]
     },
     {
       "name": "libopus",
@@ -33,9 +34,11 @@
       "license": "BSD-3-Clause",
       "repository": "https://chromium.googlesource.com/webm/libvpx",
       "description": [
-        "VP9 (and VP8) screen-share encoder and decoder, linked by crates/screenshare.",
+        "VP9 (and VP8) screen-share encoder and decoder, linked by the hwcodec crate.",
         "Statically linked into the Windows app (vcpkg build) and the macOS and Linux apps",
-        "(built from the libvpx release source), so it is part of every Mumcord build."
+        "(built from the libvpx release source), so it is part of every Mumcord build.",
+        "hwcodec's hwcodec-libvpx-src crate bundles the same sources under the same licence;",
+        "Mumcord links its own build (scripts/build-libvpx.sh) instead."
       ],
       "texts": ["licenses/libvpx.txt"]
     },
@@ -45,9 +48,9 @@
       "license": "MIT",
       "repository": "https://github.com/FFmpeg/nv-codec-headers",
       "description": [
-        "Interface definitions for NVIDIA's hardware AV1 encoder, compiled into the Windows and",
-        "Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The NVIDIA driver itself is",
-        "loaded from the system at runtime."
+        "Interface definitions for NVIDIA's hardware AV1 encoder, bundled in the hwcodec crate",
+        "and compiled into the Windows and Linux apps for screen sharing. The NVIDIA driver",
+        "itself is loaded from the system at runtime."
       ],
       "texts": ["licenses/nv-codec-headers.txt"]
     },
@@ -57,8 +60,8 @@
       "license": "MIT",
       "repository": "https://github.com/GPUOpen-LibrariesAndSDKs/AMF",
       "description": [
-        "Interface definitions for AMD's hardware AV1 encoder, compiled into the Windows and",
-        "Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The AMD driver itself is",
+        "Interface definitions for AMD's hardware AV1 encoder, bundled in the hwcodec crate and",
+        "compiled into the Windows and Linux apps for screen sharing. The AMD driver itself is",
         "loaded from the system at runtime."
       ],
       "texts": ["licenses/amf.txt"]
@@ -70,7 +73,9 @@
       "repository": "https://github.com/intel/libvpl",
       "description": [
         "Finds and loads Intel's Quick Sync runtime for the hardware AV1 and VP9 encoders of",
-        "Intel graphics. Statically linked into the Windows and Linux apps."
+        "Intel graphics. Statically linked into the Windows and Linux apps",
+        "(scripts/build-hwenc-sdk.sh). hwcodec's hwcodec-libvpl-src crate bundles the same",
+        "sources under the same licence; Mumcord links its own build instead."
       ],
       "texts": ["licenses/libvpl.txt"]
     },
@@ -80,8 +85,9 @@
       "license": "MIT",
       "repository": "https://github.com/intel/libva",
       "description": [
-        "Interface definitions for the Linux video acceleration API, compiled into the Linux app",
-        "for hardware AV1 and VP9 encoding. The system's libva is loaded at runtime when present."
+        "Interface definitions for the Linux video acceleration API, bundled in the hwcodec",
+        "crate and compiled into the Linux app for hardware AV1 and VP9 encoding. The system's",
+        "libva is loaded at runtime when present."
       ],
       "texts": ["licenses/libva.txt"]
     },
@@ -93,7 +99,8 @@
       "description": [
         "Software AV1 encoder for screen sharing (scripts/build-svt-av1.sh), statically linked",
         "into every Mumcord build. Licensed under the Clear BSD licence together with the",
-        "Alliance for Open Media Patent License 1.0."
+        "Alliance for Open Media Patent License 1.0. hwcodec's hwcodec-svt-av1-src crate",
+        "bundles the same sources under the same licence; Mumcord links its own build instead."
       ],
       "texts": ["licenses/svt-av1.txt"]
     },
@@ -118,7 +125,9 @@
       "repository": "https://code.videolan.org/videolan/dav1d",
       "description": [
         "AV1 decoder for screen sharing when the web view cannot decode AV1 itself",
-        "(scripts/build-dav1d.sh), statically linked into every Mumcord build."
+        "(scripts/build-dav1d.sh), statically linked into every Mumcord build. hwcodec's",
+        "hwcodec-dav1d-src crate bundles the same sources under the same licence; Mumcord links",
+        "its own build instead."
       ],
       "texts": ["licenses/dav1d.txt"]
     },

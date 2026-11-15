@@ -35,7 +35,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
-use mumcord_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
+use mumble_client_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
 use serde::{Deserialize, Serialize};
 
 use playlist::{Flush, Op, Playlist};

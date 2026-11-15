@@ -921,6 +921,58 @@ pub struct Settings {
     pub camera_strip_position: CameraStripPosition,
     /// Global hotkey that opens the preview or turns the camera off (FR-8.20); unset by default.
     pub camera_hotkey: Option<String>,
+    /// Settings of the phone apps (Epic 5). The desktop app keeps them untouched.
+    pub mobile: MobileSettings,
+}
+
+/// Where voice plays on a phone when nothing else (a headset) is connected (FR-5.100).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DefaultOutput {
+    /// Not chosen yet: the app asks once and stores the answer.
+    #[default]
+    Ask,
+    Speaker,
+    Earpiece,
+}
+
+/// Settings only the phone apps use (Epic 5, spec section 7). They are stored with the other
+/// settings so one record holds everything; the engine attaches no behaviour to them.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct MobileSettings {
+    /// The user picked [`Settings::talk_mode`] on the first-start choice screen (FR-5.20).
+    /// While false the phone app treats the talk mode as not chosen and preselects nothing.
+    pub talk_mode_chosen: bool,
+    pub default_output: DefaultOutput,
+    /// On mobile data, streams start by themselves instead of showing a tap-to-watch tile
+    /// (FR-5.41).
+    pub mobile_data_autoplay_streams: bool,
+    /// On mobile data, images and GIFs are loaded (FR-5.41).
+    pub mobile_data_load_media: bool,
+    /// On mobile data, voice uses a reduced quality (FR-5.41).
+    pub mobile_data_reduced_voice: bool,
+    /// Disconnect after 30 minutes alone in a channel (FR-5.42).
+    pub idle_disconnect: bool,
+    /// Notifications show the sender without the message text (FR-5.55).
+    pub notify_sender_only: bool,
+    /// Android: look for a newer version once a day (FR-5.101).
+    pub update_check: bool,
+}
+
+impl Default for MobileSettings {
+    fn default() -> Self {
+        Self {
+            talk_mode_chosen: false,
+            default_output: DefaultOutput::default(),
+            mobile_data_autoplay_streams: false,
+            mobile_data_load_media: true,
+            mobile_data_reduced_voice: false,
+            idle_disconnect: false,
+            notify_sender_only: false,
+            update_check: true,
+        }
+    }
 }
 
 /// Default and bounds of the camera blur strength.
@@ -1156,6 +1208,7 @@ impl Default for Settings {
             camera_reduce_motion: CameraReduceMotion::default(),
             camera_strip_position: CameraStripPosition::default(),
             camera_hotkey: None,
+            mobile: MobileSettings::default(),
         }
     }
 }
@@ -1600,6 +1653,48 @@ mod tests {
             )
             .expect("insert");
         store.settings().expect("load")
+    }
+
+    #[test]
+    fn mobile_settings_default_for_old_profiles_and_round_trip() {
+        // Spec 05 section 7: the defaults, also for a profile written before they existed.
+        let expected = MobileSettings {
+            talk_mode_chosen: false,
+            default_output: DefaultOutput::Ask,
+            mobile_data_autoplay_streams: false,
+            mobile_data_load_media: true,
+            mobile_data_reduced_voice: false,
+            idle_disconnect: false,
+            notify_sender_only: false,
+            update_check: true,
+        };
+        assert_eq!(Settings::default().mobile, expected);
+        let old = load_raw(r#"{"talk_mode":"push_to_talk","update_check":"yes"}"#);
+        assert_eq!(old.mobile, expected);
+        // A desktop profile keeps its talk mode and its own update setting.
+        assert_eq!(old.talk_mode, TalkMode::PushToTalk);
+        assert_eq!(old.update_check, Consent::Yes);
+
+        let partial = load_raw(r#"{"mobile":{"default_output":"earpiece"}}"#);
+        assert_eq!(partial.mobile.default_output, DefaultOutput::Earpiece);
+        assert!(partial.mobile.mobile_data_load_media);
+
+        let changed = Settings {
+            mobile: MobileSettings {
+                talk_mode_chosen: true,
+                default_output: DefaultOutput::Speaker,
+                mobile_data_autoplay_streams: true,
+                mobile_data_load_media: false,
+                mobile_data_reduced_voice: true,
+                idle_disconnect: true,
+                notify_sender_only: true,
+                update_check: false,
+            },
+            ..Settings::default()
+        };
+        let (_dir, store) = temp_store();
+        store.save_settings(&changed).expect("save");
+        assert_eq!(store.settings().expect("load").mobile, changed.mobile);
     }
 
     #[test]

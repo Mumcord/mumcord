@@ -6,7 +6,7 @@ use std::process::ExitCode;
 use std::sync::Arc;
 use std::time::Duration;
 
-use mumcord_protocol::{ConnectConfig, ConnectError, Event};
+use mumble_client_protocol::{ConnectConfig, ConnectError, Event};
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
@@ -50,14 +50,14 @@ fn config(port: u16) -> ConnectConfig {
 async fn expect_user(port: u16, username: &str) -> Result<(), Box<dyn std::error::Error>> {
     // Pin the loopback server's certificate, just as the profile seeder does. Never disable TLS
     // verification globally or allow this helper to connect to a non-local server.
-    let cert = match mumcord_protocol::connect(config(port)).await {
+    let cert = match mumble_client_protocol::connect(config(port)).await {
         Err(ConnectError::CertificateRejected(cert)) => cert,
         Err(error) => return Err(error.into()),
         Ok(_) => return Err("server accepted a rejected certificate".into()),
     };
     let mut cfg = config(port);
     cfg.verify_cert = Arc::new(move |seen| seen.sha256_hex == cert.sha256_hex);
-    let mut connection = mumcord_protocol::connect(cfg).await?;
+    let mut connection = mumble_client_protocol::connect(cfg).await?;
     loop {
         // Also covers users already present in the initial ServerSync snapshot.
         if connection

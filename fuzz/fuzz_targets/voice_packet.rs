@@ -4,5 +4,5 @@
 use libfuzzer_sys::fuzz_target;
 
 fuzz_target!(|data: &[u8]| {
-    mumcord_protocol::voice::fuzz_decode(data);
+    mumble_client_protocol::voice::fuzz_decode(data);
 });

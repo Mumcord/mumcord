@@ -108,11 +108,13 @@ jobs:
           version: ${{ steps.tools.outputs.CARGO_ABOUT_VERSION }}
           features: cli
 
+      # No npm cache: this run publishes the changelog and the Homebrew tap update, so it must not
+      # restore a cache another workflow wrote.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         if: steps.current.outputs.skip == 'false'
         with:
           node-version: 24
-          cache: npm
+          package-manager-cache: false
 
       - name: Install npm dependencies
         if: steps.current.outputs.skip == 'false'

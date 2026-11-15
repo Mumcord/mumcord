@@ -1263,7 +1263,7 @@ fn proofs_go_only_to_holders_inside_the_channel() {
 
 #[test]
 fn locks_are_inherited_from_parents_and_unknown_channels_count_as_locked() {
-    use mumcord_protocol::{Channel, ServerState};
+    use mumble_client_protocol::{Channel, ServerState};
     let mut s = ServerState::default();
     for (id, parent) in [(ROOT, None), (RAID, Some(ROOT)), (SQUAD, Some(RAID))] {
         s.channels.insert(

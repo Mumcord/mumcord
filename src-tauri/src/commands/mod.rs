@@ -39,6 +39,7 @@ pub mod now_gaming;
 pub mod now_playing;
 pub mod p2p;
 pub mod people;
+pub mod phone_transfer;
 pub mod plugin_repos;
 pub mod plugin_safety;
 pub mod plugins;

@@ -684,6 +684,40 @@ describe("MessageList replies", () => {
   });
 });
 
+describe("MessageList scroll measurements", () => {
+  it("measures only nearby rows in a long conversation and keeps the pinned author", () => {
+    const messages = Array.from({ length: 30 }, (_, index) =>
+      message(String(index), `Sender ${String(index)}`, 30 - index, `Line ${String(index)}`),
+    );
+    const { container } = renderList("cozy", messages);
+    const list = container.querySelector<HTMLElement>(".chat-list");
+    if (!list) throw new Error("no list");
+    const rows = [...container.querySelectorAll<HTMLElement>(".chat-message")];
+    const measured = vi.fn();
+    rows.forEach((row, index) => {
+      const top = index * 100 - 2550;
+      vi.spyOn(row, "getBoundingClientRect").mockImplementation(() => {
+        measured();
+        return new DOMRect(0, top, 400, 100);
+      });
+      const header = row.querySelector(".chat-message__header");
+      if (!header) throw new Error("no header");
+      vi.spyOn(header, "getBoundingClientRect").mockImplementation(() => {
+        measured();
+        return new DOMRect(0, top, 400, 20);
+      });
+    });
+    Object.defineProperty(list, "clientHeight", { configurable: true, value: 100 });
+    Object.defineProperty(list, "scrollHeight", { configurable: true, value: 3000 });
+    list.scrollTop = 2550;
+
+    fireEvent.scroll(list);
+
+    expect(container.querySelector(".chat-pinned__name")).toHaveTextContent("Sender 25");
+    expect(measured.mock.calls.length).toBeLessThan(20);
+  });
+});
+
 describe("MessageList follows the bottom when content grows (F40)", () => {
   const VIEW = 100;
   let contentHeight = 300;

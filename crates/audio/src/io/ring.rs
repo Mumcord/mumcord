@@ -4,7 +4,7 @@
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::time::Duration;
 
-use cpal::{FromSample, Sample};
+use dasp_sample::{FromSample, Sample};
 use rtrb::{Consumer, Producer, RingBuffer};
 
 use super::{DevicePeriods, Direction, IoStats};
@@ -52,6 +52,8 @@ impl Counters {
         self.playback_frames_dropped.fetch_add(1, Ordering::Relaxed);
     }
 
+    // Reported by device streams only; phones have none.
+    #[cfg(any(test, not(any(target_os = "android", target_os = "ios"))))]
     pub(crate) fn device_xrun(&self) {
         self.device_xruns.fetch_add(1, Ordering::Relaxed);
     }
@@ -60,6 +62,8 @@ impl Counters {
         self.stream_restarts.fetch_add(1, Ordering::Relaxed);
     }
 
+    // Reported by device streams only; phones have none.
+    #[cfg(any(test, not(any(target_os = "android", target_os = "ios"))))]
     pub(crate) fn realtime_denied(&self) {
         self.realtime_denied.fetch_add(1, Ordering::Relaxed);
     }

@@ -62,6 +62,13 @@ else
   for dir in "$repo"/e2e/fixtures/plugins/*/; do
     name="$(basename "$dir")"
     marker="$dir/e2e-fixture.json"
+    # Rust-cache restores e2e/fixtures/plugins/*/target from main, which can leave a folder here
+    # that this branch does not have as a fixture: a fixture folder is a manifest, or both a
+    # marker and the versions it names.
+    if [ ! -f "$marker" ] && [ ! -f "$dir/manifest.json" ]; then
+      echo "skipping $name: no manifest.json and no e2e-fixture.json" >&2
+      continue
+    fi
     # test-api10 is built once with the 0.6.2 SDK; its committed package is used as-is.
     if [ "$name" = test-api10 ] && [ ! -f "$marker" ]; then
       mkdir -p "$work/built"

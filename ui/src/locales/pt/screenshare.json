@@ -163,7 +163,7 @@
     "noFanoutBody_other": "Cada espetador recebe a sua própria cópia a partir do teu computador, por isso até {{max}} pessoas podem ver. A qualidade desce à medida que entram mais: neste momento, {{count}} espetadores precisam de cerca de {{mbit}} Mbit/s de envio, por isso a tua partilha corre a {{now}} em vez de {{wanted}}.",
     "fanoutUnavailable": "A distribuição pelo retransmissor não está disponível ({{reason}}). Cada espetador recebe a sua própria cópia, por isso até {{max}} podem ver e a qualidade pode baixar.",
     "reasonNoRelay": "este servidor não tem retransmissor",
-    "reasonOldRelay": "o retransmissor é demasiado antigo",
+    "reasonOldRelay": "o retransmissor deste servidor precisa de uma atualização",
     "reasonDisallowed": "o retransmissor não permite a partilha de ecrã",
     "reasonRefused": "o retransmissor recusou a difusão",
     "reasonFull": "o retransmissor está cheio",

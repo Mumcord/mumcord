@@ -270,6 +270,10 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
       { timeout: 15_000, timeoutMsg: "Bot not shown in the tree" },
     );
     await watchTalking();
+    // The first play opens the clip and the voice path. The 200 ms budget is how fast the
+    // indicator follows speech once the bot is talking, so that open is not a measured try.
+    await main.do(`play ${speechPath}`, 30_000);
+    await sleep(1500);
     const lat: number[] = [];
     for (let i = 0; i < 5; i++) {
       const marker = `sleep 0.${String(i + 1)}`;

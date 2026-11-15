@@ -8,9 +8,9 @@
 //! - the hosts the chat's video and music embeds need, port 443 only ([`EMBED_PROVIDERS`]).
 //!
 //! Only `CONNECT` tunnels are relayed; plain HTTP is refused. Loopback (the app's own player
-//! page and Developer-mode `http://localhost` origins) bypasses the proxy through
-//! `--proxy-bypass-list=<-loopback>`. The proxy only decides whether to connect; TLS stays
-//! end-to-end between the web view and the website.
+//! page and Developer-mode `http://localhost` origins) bypasses the proxy ([`browser_args`]).
+//! The proxy only decides whether to connect; TLS stays end-to-end between the web view and the
+//! website.
 
 #[cfg(windows)]
 use std::sync::Arc;
@@ -104,6 +104,20 @@ fn allowed(host: &str, port: u16, declared: impl Fn(&str, u16) -> bool) -> bool 
     (port == HTTPS_PORT && is_embed_host(host)) || declared(host, port)
 }
 
+/// The WebView2 arguments that route the web view's traffic through the proxy on `port`.
+///
+/// Chromium bypasses a proxy for loopback and link-local addresses on its own. `<-loopback>`
+/// switches that built-in rule off (it does not add a bypass), so link-local hosts cannot be
+/// reached past the proxy; the loopback hosts are then named again, because the plain-HTTP player
+/// page on `http://localhost:<port>` would otherwise be sent to the proxy and refused. Later
+/// rules win over earlier ones, so the loopback hosts have to follow `<-loopback>`.
+fn browser_args(port: u16) -> String {
+    format!(
+        "--proxy-server=http://127.0.0.1:{port} \
+         --proxy-bypass-list=<-loopback>;localhost;127.0.0.1;[::1]"
+    )
+}
+
 /// Starts the proxy on a free loopback port and returns the WebView2 arguments that route the
 /// app's traffic through it. `None` (logged) if no port could be bound; the app then runs
 /// without this measure rather than not at all.
@@ -140,9 +154,7 @@ pub fn start<R: Runtime>(app: &AppHandle<R>) -> Option<String> {
             }
         }
     });
-    Some(format!(
-        "--proxy-server=http://127.0.0.1:{port} --proxy-bypass-list=<-loopback>"
-    ))
+    Some(browser_args(port))
 }
 
 /// Answers one proxy connection: reads the request head, then either tunnels to an allowed
@@ -204,6 +216,22 @@ async fn relay(mut client: tokio::net::TcpStream, plugins: Option<Arc<Plugins>>)
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    /// The watch party and embed player page is plain HTTP on `localhost`. Sent to the proxy it
+    /// is refused, and the YouTube player stays black.
+    #[test]
+    fn loopback_bypasses_the_proxy() {
+        let args = browser_args(4321);
+        let rules = args
+            .split_ascii_whitespace()
+            .find_map(|arg| arg.strip_prefix("--proxy-bypass-list="))
+            .map(|list| list.split(';').collect::<Vec<_>>());
+        assert_eq!(
+            rules,
+            Some(vec!["<-loopback>", "localhost", "127.0.0.1", "[::1]"])
+        );
+        assert!(args.contains("--proxy-server=http://127.0.0.1:4321 "));
+    }
 
     #[test]
     fn connect_lines_are_parsed_strictly() {

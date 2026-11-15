@@ -171,9 +171,14 @@ function publish(r: Relay): void {
  * Notes that a user registers on the environment's server: the relay bot hands out tokens to
  * registered users only, and a registered name would lock later spec files (with new
  * certificates) out, so the next `startRelay` wipes the server data first.
+ *
+ * Ignored while the relay is stopped. Registering on the plain test server must not claim this
+ * worker owns the relay data: the next `startRelay` would then keep the previous spec's
+ * certificates and refuse the new ones as a wrong password (AC-8.30).
  */
 export function noteRegistration(): void {
-  if (relayAvailable()) writeState({ ...readState(), dirty: process.pid });
+  if (!relayAvailable() || readState().config === undefined) return;
+  writeState({ ...readState(), dirty: process.pid });
 }
 
 /**

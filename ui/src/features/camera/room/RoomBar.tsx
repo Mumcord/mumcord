@@ -9,6 +9,7 @@ import { getApi } from "../../../api";
 import { popIn, setPopoutOnTop, useInPopout, usePopouts } from "../../media/popoutStore";
 import { CameraStoppedNotice } from "./CameraStoppedNotice";
 import { RoomIcon } from "./icons";
+import { OwnViewers } from "./OwnViewers";
 import { setSelfHidden } from "./roomChoices";
 import { useRoomBarOnScreen } from "./useCameraRoomShown";
 
@@ -75,6 +76,7 @@ export function RoomBar({
         )
       )}
       {onAir && background}
+      {onAir && <OwnViewers serverId={serverId} />}
       {onAir && (
         <button
           type="button"

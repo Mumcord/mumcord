@@ -135,7 +135,29 @@
     "backupWarning": "Esegui un backup prima di eliminare. Un'identità senza backup non è recuperabile.",
     "usedBy": "Usata da: {{servers}}",
     "deleteUsedBy": "Questi server useranno poi l'identità predefinita {{identity}}: {{servers}}",
-    "exportFor": "Esporta {{identity}}"
+    "exportFor": "Esporta {{identity}}",
+    "phoneSend": "Invia al tuo telefono…",
+    "phoneTitle": "Invia al tuo telefono",
+    "phoneSelectionLabel": "Cosa inviare",
+    "phoneIdentity": "Identità: {{identity}}",
+    "phoneIdentityDefault": "Identità: {{identity}} (predefinita)",
+    "phoneServers_one": "Elenco dei server ({{count}} server)",
+    "phoneServers_many": "Elenco dei server ({{count}} server)",
+    "phoneServers_other": "Elenco dei server ({{count}} server)",
+    "phoneNothingSelected": "Seleziona almeno una voce.",
+    "phoneShow": "Mostra i codici",
+    "phoneDone": "Fatto",
+    "phonePreparing": "Preparazione dei codici…",
+    "phoneCodesLabel": "Codici per il tuo telefono",
+    "phoneQrLabel": "Codice QR {{current}} di {{total}}",
+    "phoneCodeOf": "Codice {{current}} di {{total}}",
+    "phoneCycleHint": "I codici scorrono automaticamente. Tieni il telefono puntato sullo schermo finché non sono stati letti tutti e {{total}}.",
+    "phoneSingleHint": "Tieni il telefono puntato sullo schermo finché il codice non è stato letto.",
+    "phoneTypeCode": "Digita questo codice sul tuo telefono",
+    "phoneExpires": "Scade tra {{time}}",
+    "phoneRenewed": "Nuovi codici e un nuovo numero. Ricomincia sul tuo telefono.",
+    "phoneWarning": "Chiunque scansioni questi codici e conosca il numero ottiene la tua identità. Mostrali solo al tuo telefono.",
+    "phoneTooLarge": "È troppo per un solo trasferimento. Seleziona meno voci."
   },
   "audio": {
     "devices": "Dispositivi",
@@ -772,7 +794,13 @@
       "gap": "Intervallo dal pacchetto precedente",
       "kind": "ID interno",
       "size": "Dimensione",
-      "decoded": "Contenuto decodificato"
+      "decoded": "Contenuto decodificato",
+      "media": "Media"
+    },
+    "media": {
+      "channel": "canale {{channel}}",
+      "keyframe": "fotogramma chiave",
+      "delta": "fotogramma delta"
     },
     "noDecoding": "Questo payload non ha una forma leggibile; vedi i byte grezzi.",
     "controlOnly": "Messaggio Mumble standard: vengono registrati solo tipo e dimensione.",
@@ -793,7 +821,8 @@
       "watch": "Stato della watch party",
       "plugin": "Dati del plugin",
       "mumble": "Messaggio Mumble",
-      "peer": "Configurazione del relay"
+      "peer": "Configurazione del relay",
+      "media": "Flusso multimediale"
     }
   },
   "licences": {

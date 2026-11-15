@@ -46,6 +46,7 @@ on). Otherwise each connection checks one flag per message and does nothing else
 | ------------------------------------------------- | --------------------------------------------------------------- |
 | Plugin data (`PluginDataTransmission`), both ways | Type (data id), size, sender or receivers, pacer state, payload |
 | Other Mumble control messages, both ways          | Type and size only                                              |
+| Screen-share and camera media                     | Format, channel or control kind, flags, keyframe state, size    |
 | Voice (UDP and tunnelled through TCP)             | Counters only (sent and received per server)                    |
 
 All plugin data is captured, Mumcord's own (`mumcord.hello`, `mumcord.history`, `mumcord.image`,
@@ -59,6 +60,12 @@ Sent packets are captured when they actually leave the client, after the client 
 **Pacer** column shows how long a plugin-data message waited (`delayed 340 ms` or `not delayed`)
 and how many messages the pacer still lets through at once (`tokens left`).
 
+Screen-share and camera media is captured where it is framed: every message of a direct stream or
+of a relay broadcast becomes a row. The type shows the format, `.media` for the 0.9.0 document or
+`.media legacy v1` / `v2` for the old fixed header. One share reads as one endless document: a
+description on channel 0, then each frame on its layer channel. The media content itself is never
+captured, so a media row has no raw hex.
+
 **Size** is the size of the plugin data itself (the part the server's 1,000-byte limit applies
 to), or of the whole message for other types.
 
@@ -66,6 +73,8 @@ to), or of the whole message for other types.
 
 - Captured packets live in memory only, in a ring buffer of the last **2,000** packets for all
   servers together. Nothing is logged or sent anywhere.
+- The media content of a screen share or camera is never captured, only which message it was: its
+  format, channel, flags, keyframe state and size.
 - Closing the inspector window, hiding the developer tools or quitting the app drops everything
   captured (closing the window keeps it only while **Keep capturing in the background** is on).
 - Content leaves the device only when the user exports it. Exports start with a warning that they
@@ -90,9 +99,14 @@ only controls scrolling; **Pause** is what stops the list from receiving packets
 Click a row (or press Enter on its time) to expand it:
 
 - the gap to the previous packet in the list (`+340 ms`), to spot bursts or resends,
+- for a media message, what it is: the channel-0 control kind (`description`, `keyreq`, `key`,
+  `kf`, `layers`, `want`, `gone`), or the channel with the frame kind and the flags byte
+  (`channel 2 · keyframe · 0x01`). The old header has no channel and no flags byte, so only its
+  keyframe state shows,
 - the decoded content as highlighted JSON. Mumcord's messages are JSON; history sync shows its
   JSON header and the size of the binary body; full-image transfers show their decoded fields;
-  any other UTF-8 payload shows as a string,
+  a media stream's description shows its decoded fields; any other UTF-8 payload shows as a
+  string,
 - **Show raw hex** for the exact bytes of the plugin data,
 - **Copy packet** copies the packet as Markdown.
 
@@ -103,7 +117,8 @@ those the ring buffer already dropped, plus the voice packet counts of each conn
 ## Export
 
 - **Export JSON**: complete and machine-readable, every field including decoded content and raw
-  hex.
+  hex. A media message carries what it is (format, channel, control kind, flags, keyframe state),
+  never the media content.
 - **Export Markdown**: readable, for pasting into an issue: a table with the same columns, then
   the decoded content per packet.
 

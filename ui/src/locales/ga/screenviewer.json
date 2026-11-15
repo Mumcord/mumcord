@@ -13,6 +13,7 @@
   "starting": "Ag ceangal le scáileán {{name}}…",
   "paused": "Chuir {{name}} an chomhroinnt ar sos.",
   "full": "Tá an chomhroinnt seo lán.",
+  "needsUpdate": "Teastaíonn Mumcord 0.9.0 ón gcomhroinnt seo.",
   "unreachable": "Níorbh fhéidir {{name}} a bhaint amach go díreach. B’fhéidir go gcuireann a líonra bac ar cheangail dhíreacha.",
   "tooOld": "Tá Mumcord {{name}} ró-shean chun a scáileán a chomhroinnt leat.",
   "consentOff": "Teastaíonn ceangail dhíreacha chun breathnú, agus chas tú as iad.",

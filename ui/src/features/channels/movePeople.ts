@@ -79,7 +79,8 @@ export function massMoveRunning(serverId: number): boolean {
 
 /**
  * Sends one move per person and counts who arrived. The server paces the messages itself (see
- * `crates/protocol/src/ratelimit.rs`), so a whole channel can be sent in one go (FR-10.18).
+ * `ratelimit.rs` of the `mumble-client-protocol` crate), so a whole channel can be sent in one
+ * go (FR-10.18).
  */
 export async function movePeopleToChannel(
   serverId: number,

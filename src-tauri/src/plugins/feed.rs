@@ -5,12 +5,12 @@ use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use mumble_client_protocol::LowOutcome;
 use mumcord_engine::plugins::{PluginEngineEvent, PluginPeer};
 use mumcord_engine::{ChatMessageView, ConversationRef, Engine, ServerId};
 use mumcord_plugins::messaging::Outgoing;
 use mumcord_plugins::messaging::announce::ANNOUNCE_DATA_ID;
 use mumcord_plugins::service::{BotInfo, PeerInfo, PluginService, SelfInfo};
-use mumcord_protocol::LowOutcome;
 
 use tauri::AppHandle;
 use tauri_specta::Event;

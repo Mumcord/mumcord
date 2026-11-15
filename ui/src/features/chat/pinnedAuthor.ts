@@ -1,30 +1,43 @@
-/** Vertical extent of one message, relative to the viewport; `headerBottom` is null when it has no author header. */
-export interface PinItem {
-  top: number;
-  bottom: number;
-  headerBottom: number | null;
+/**
+ * First partly visible message in document order. Binary search avoids measuring all the older
+ * rows on every scroll. A missing ref can occur during a render; use the safe linear path then.
+ */
+export function firstVisibleIndex(items: readonly (HTMLElement | null)[], listTop: number): number {
+  let low = 0;
+  let high = items.length;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    const item = items[middle];
+    if (!item) {
+      return items.findIndex((row) => row != null && row.getBoundingClientRect().bottom > listTop);
+    }
+    if (item.getBoundingClientRect().bottom > listTop) high = middle;
+    else low = middle + 1;
+  }
+  return low < items.length ? low : -1;
 }
 
 /**
- * FR-2.62: index of the run's first message (the one with the author header) whose author belongs
- * in the banner at the top of the list, or null. The topmost partly visible message decides: it
- * either has its own header or is a grouped follow-up of the run before it. The banner shows once
- * that run's header has scrolled out of view and enough of the run remains below the banner.
+ * FR-2.62: the first visible message decides the pinned author. Find its group's header and last
+ * row without measuring every row between them: only those two boundaries affect the banner.
  */
 export function pinnedIndex(
-  items: readonly (PinItem | null)[],
+  items: readonly (HTMLElement | null)[],
   listTop: number,
   bannerHeight: number,
 ): number | null {
-  const topmost = items.findIndex((item) => item !== null && item.bottom > listTop);
+  const topmost = firstVisibleIndex(items, listTop);
   if (topmost < 0) return null;
   let start = topmost;
-  while (start >= 0 && items[start]?.headerBottom === null) start -= 1;
-  const header = items[start];
-  if (!header || header.headerBottom === null || header.headerBottom > listTop) return null;
+  let header = items[start]?.querySelector(".chat-message__header");
+  while (start >= 0 && items[start] && !header) {
+    start -= 1;
+    header = items[start]?.querySelector(".chat-message__header");
+  }
+  if (!header || header.getBoundingClientRect().bottom > listTop) return null;
   let end = topmost;
-  while (items[end + 1]?.headerBottom === null) end += 1;
+  while (items[end + 1] && !items[end + 1]?.querySelector(".chat-message__header")) end += 1;
   const last = items[end];
-  if (!last || last.bottom <= listTop + bannerHeight) return null;
+  if (!last || last.getBoundingClientRect().bottom <= listTop + bannerHeight) return null;
   return start;
 }

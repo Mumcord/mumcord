@@ -38,6 +38,8 @@ pub(crate) enum Decision {
     Wait,
     /// Send `Full`.
     Full,
+    /// The viewer's Mumcord cannot read this broadcast's format and no direct copy is left.
+    NeedsUpdate,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -57,15 +59,18 @@ pub(crate) struct Roster {
     limit: usize,
     /// The broadcast is up; without it everyone gets a direct copy.
     relay: bool,
+    /// The broadcast carries the new media document; old viewers need a direct copy.
+    media: bool,
 }
 
 impl Roster {
-    pub fn new(limit: u16) -> Self {
+    pub fn new(limit: u16, media: bool) -> Self {
         Self {
             seats: BTreeMap::new(),
             next: 0,
             limit: usize::from(limit).max(1),
             relay: true,
+            media,
         }
     }
 
@@ -75,8 +80,14 @@ impl Roster {
     }
 
     /// Decides about a `Watch` from `viewer`; `broadcast` says whether its Mumcord can join
-    /// broadcasts. Records the seat.
-    pub fn decide(&mut self, viewer: u32, broadcast: bool, now: Instant) -> Decision {
+    /// broadcasts, `viewer_media` whether it can read the new media profile. Records the seat.
+    pub fn decide(
+        &mut self,
+        viewer: u32,
+        broadcast: bool,
+        viewer_media: bool,
+        now: Instant,
+    ) -> Decision {
         if let Some(seat) = self.seats.get_mut(&viewer) {
             return match seat.path {
                 Path::Direct => Decision::Direct,
@@ -90,10 +101,12 @@ impl Roster {
         if self.seats.len() >= self.limit() {
             return Decision::Full;
         }
-        let path = if self.relay && broadcast {
+        let path = if self.relay && broadcast && (!self.media || viewer_media) {
             Path::Relay
         } else if self.direct_count() < MAX_VIEWERS {
             Path::Direct
+        } else if self.media && broadcast {
+            return Decision::NeedsUpdate;
         } else {
             return Decision::Full;
         };
@@ -189,11 +202,23 @@ mod tests {
     use super::*;
 
     #[test]
+    fn an_old_viewer_gets_a_direct_copy_or_the_needs_update_answer() {
+        let now = Instant::now();
+        let mut roster = Roster::new(25, true);
+        assert_eq!(roster.decide(1, true, false, now), Decision::Direct);
+        assert_eq!(roster.decide(2, true, true, now), Decision::Relay);
+        for viewer in 3..10 {
+            assert_eq!(roster.decide(viewer, true, false, now), Decision::Direct);
+        }
+        assert_eq!(roster.decide(10, true, false, now), Decision::NeedsUpdate);
+    }
+
+    #[test]
     fn broadcast_viewers_go_through_the_relay_others_get_direct_copies() {
         let now = Instant::now();
-        let mut roster = Roster::new(25);
-        assert_eq!(roster.decide(1, true, now), Decision::Relay);
-        assert_eq!(roster.decide(2, false, now), Decision::Direct);
+        let mut roster = Roster::new(25, false);
+        assert_eq!(roster.decide(1, true, true, now), Decision::Relay);
+        assert_eq!(roster.decide(2, false, true, now), Decision::Direct);
         assert_eq!(roster.path(1), Some(Path::Relay));
         assert_eq!(roster.relay_viewers(), vec![1]);
         assert_eq!(roster.path(2), Some(Path::Direct));
@@ -202,39 +227,42 @@ mod tests {
     #[test]
     fn at_most_eight_direct_copies_and_the_total_within_the_limit() {
         let now = Instant::now();
-        let mut roster = Roster::new(10);
+        let mut roster = Roster::new(10, false);
         for v in 0..8 {
-            assert_eq!(roster.decide(v, false, now), Decision::Direct);
+            assert_eq!(roster.decide(v, false, true, now), Decision::Direct);
         }
-        assert_eq!(roster.decide(8, false, now), Decision::Full);
-        assert_eq!(roster.decide(9, true, now), Decision::Relay);
-        assert_eq!(roster.decide(10, true, now), Decision::Relay);
+        assert_eq!(roster.decide(8, false, true, now), Decision::Full);
+        assert_eq!(roster.decide(9, true, true, now), Decision::Relay);
+        assert_eq!(roster.decide(10, true, true, now), Decision::Relay);
         // 10 of 10: even a broadcast viewer is turned away.
-        assert_eq!(roster.decide(11, true, now), Decision::Full);
+        assert_eq!(roster.decide(11, true, true, now), Decision::Full);
         roster.remove(3);
-        assert_eq!(roster.decide(11, true, now), Decision::Relay);
+        assert_eq!(roster.decide(11, true, true, now), Decision::Relay);
     }
 
     #[test]
     fn a_repeated_watch_waits_for_the_token_then_admits_again() {
         let now = Instant::now();
-        let mut roster = Roster::new(25);
-        assert_eq!(roster.decide(1, true, now), Decision::Relay);
+        let mut roster = Roster::new(25, false);
+        assert_eq!(roster.decide(1, true, true, now), Decision::Relay);
         assert_eq!(
-            roster.decide(1, true, now + Duration::from_secs(1)),
+            roster.decide(1, true, true, now + Duration::from_secs(1)),
             Decision::Wait
         );
-        assert_eq!(roster.decide(1, true, now + READMIT_AFTER), Decision::Relay);
-        assert_eq!(roster.decide(2, false, now), Decision::Direct);
-        assert_eq!(roster.decide(2, false, now), Decision::Direct);
+        assert_eq!(
+            roster.decide(1, true, true, now + READMIT_AFTER),
+            Decision::Relay
+        );
+        assert_eq!(roster.decide(2, false, true, now), Decision::Direct);
+        assert_eq!(roster.decide(2, false, true, now), Decision::Direct);
     }
 
     #[test]
     fn a_refused_admission_falls_back_to_a_direct_copy_unless_full() {
         let now = Instant::now();
-        let mut roster = Roster::new(25);
-        roster.decide(1, true, now);
-        roster.decide(2, true, now);
+        let mut roster = Roster::new(25, false);
+        roster.decide(1, true, true, now);
+        roster.decide(2, true, true, now);
         assert_eq!(roster.admit_failed(1, false), Decision::Direct);
         assert_eq!(roster.path(1), Some(Path::Direct));
         assert_eq!(roster.admit_failed(2, true), Decision::Full);
@@ -245,10 +273,10 @@ mod tests {
     #[test]
     fn a_lost_relay_keeps_the_first_eight_by_joining() {
         let now = Instant::now();
-        let mut roster = Roster::new(25);
+        let mut roster = Roster::new(25, false);
         // Sessions in reverse order of joining, so joining and session order differ.
         for v in (0..12).rev() {
-            roster.decide(v, v != 5, now);
+            roster.decide(v, v != 5, true, now);
         }
         let (moved, dropped) = roster.relay_lost();
         // Joined first: 11, 10, …, 4; 5 was direct already.
@@ -256,6 +284,6 @@ mod tests {
         assert_eq!(dropped, vec![3, 2, 1, 0]);
         assert_eq!(roster.direct_count(), 8);
         assert_eq!(roster.limit(), MAX_VIEWERS);
-        assert_eq!(roster.decide(20, true, now), Decision::Full);
+        assert_eq!(roster.decide(20, true, true, now), Decision::Full);
     }
 }

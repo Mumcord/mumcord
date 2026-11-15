@@ -17,6 +17,7 @@
     "muted": "Vklopi mikrofon, da lahko šepetaš.",
     "serverMuted": "Strežnik te je utišal, zato ne posreduje tvojega glasu.",
     "nobodyHere": "Nikogar od teh trenutno ni na tem strežniku.",
+    "ambiguousName": "To ime ima tukaj več oseb, zato šepet ni bil poslan.",
     "channelNotFound": "Tega kanala na tem strežniku ni.",
     "noPermission": "Strežnik ti ne dovoli šepetati v kanalu {{channel}}.",
     "unknownTarget": "Tega cilja ni več.",
