@@ -26,6 +26,7 @@ native builds on disk (`TMPDIR`), not the RAM-backed `/tmp`. Use a dedicated tar
 and remove it after the session:
 
 ```sh
+umask 077
 export CARGO_BUILD_JOBS=1
 export CMAKE_BUILD_PARALLEL_LEVEL=1
 export CARGO_INCREMENTAL=0
@@ -79,13 +80,39 @@ of the pinned native codec libraries. Merely setting `--target aarch64-unknown-l
 is not enough. Run the resulting ARM64 executables on the Pi; a successful cross-build alone
 does not verify its drivers, desktop integration or audio.
 
+## Pi 4 rendering and desktop limitations
+
+On the tested Pi 4 Model B, Raspberry Pi OS 13 with WebKitGTK 2.54 rendered the entire window
+as horizontal stripes. Changing accelerated compositing alone did not fix it. Mumcord now sets
+`WEBKIT_DISABLE_DMABUF_RENDERER=1` before GTK/WebKit starts on a board whose device tree contains
+exactly `raspberrypi,4-model-b`. Other boards, architectures and operating systems keep their
+existing defaults. An explicit `WEBKIT_DISABLE_DMABUF_RENDERER`, including `0`, is never
+overwritten. The existing compositing workaround and its override are independent of this.
+
+The stock labwc desktop did not offer the GlobalShortcuts portal. Mumcord reports that push-to-talk
+is unavailable there; its existing XWayland compatibility mode is the alternative. A first-run
+identity also needs an unlocked default Secret Service keyring. An auto-login desktop can have a
+running keyring daemon but no default collection: create and unlock a password-protected keyring
+with the desktop's keyring manager. Do not disable identity protection to bypass this.
+
+The fixed ARM64 debug build was run in the real labwc session, completed setup, and connected to
+an unmodified local Mumble server over TLS and UDP. Output audio opened, but the machine had no
+input device, so microphone capture and a two-person voice call were not verified. These are
+functional checks, not release-performance measurements.
+
+Light and dark screenshots from that run (no renderer override supplied at launch):
+
+![Raspberry Pi 4, light theme](images/screenshots/raspberry-pi-light.png)
+
+![Raspberry Pi 4, dark theme](images/screenshots/raspberry-pi-dark.png)
+
 ## Checks
 
 ```sh
 bash scripts/ci/test-native-build-jobs.sh
 npm run typecheck
 npm run lint
-npm test -- --maxWorkers=1
+npm test -- --maxWorkers=1 --hookTimeout=60000
 cargo test --workspace --locked -- --test-threads=1
 ```
 
@@ -95,7 +122,47 @@ actual desktop session, not just over a headless SSH session. Check startup, the
 wizard, reconnect, voice, tray behavior and window resizing against a local test server.
 Record which checks actually ran and distinguish failures from checks that were not performed.
 
+On a Pi, allow extra time for test setup rather than adding more workers. The translation
+suite's loading hook exceeded its normal 10-second limit on the first full run; it passed with
+`--hookTimeout=60000`. Use a private `umask` for the Rust storage tests: Pi OS's inherited
+`0002` creates group-writable temporary directories, which the secret-file tests correctly
+refuse. Neither adjustment changes the app's security rules or other platforms' test defaults.
+
 For performance comparisons use a release build, identical settings and the same workload.
 Record the Pi model, OS and WebKitGTK versions, CPU/RAM usage, and `vcgencmd get_throttled`.
 Do not globally disable GPU acceleration or change other operating systems' defaults to work
 around a Pi-specific problem without reproducing it first.
+
+## Validation record: 2026-11-15
+
+Hardware: Raspberry Pi 4 Model B Rev 1.4, 8 GB RAM, ARM64 Raspberry Pi OS/Debian 13.7,
+kernel 6.18.60, labwc, WebKitGTK 2.54.0. Frontend and ARM64 binaries were built on an x86_64
+host; the executable tests and desktop checks below ran on the Pi.
+
+- ARM64 standalone debug build and Clippy with `-D warnings`: passed on the build host.
+- Frontend build, type check, ESLint/Prettier, Rust formatting, ShellCheck and native-build job
+  regression checks: passed (ESLint retained an existing fast-refresh warning).
+- UI: 3,442 tests passed in the full run; the translation suite's 126 tests passed on a separate
+  rerun with the longer hook timeout. The original full run therefore reported one failed
+  suite; it was not rerun in full with the adjusted timeout.
+- Rust unit tests on the Pi: audio 57, codec 119, store 270, positional 14, plus all 5 rendering
+  policy tests. Seven opt-in tests were ignored. The first store run had four failures under
+  `umask 0002`; the complete store suite passed under `0077`. The whole Rust workspace and
+  automated desktop E2E suite were not run.
+- Desktop: setup, local TLS trust prompt, UDP connection, chat, maximizing, theme changes and
+  automatic reconnection after restarting the local server: passed. No microphone was
+  available; a real two-person voice call, camera and watch-party playback remain unverified.
+- Swap was disabled during the checks; kernel `pswpin` and `pswpout` both stayed at zero.
+  `vcgencmd get_throttled` reported `0x0`.
+
+The codec's existing `per_frame_processing_time` benchmark was cross-built in **release**
+mode and run on the Pi after the other tests, with the app stopped. It processes a full
+noise-suppression, echo-cancellation and automatic-gain chain on synthetic speech and noise:
+
+| Backend     | Mean per 10 ms frame | p99      | Share of one core |
+| ----------- | -------------------- | -------- | ----------------- |
+| Nnnoiseless | 0.740 ms             | 0.845 ms | 7.40%             |
+| Sonora      | 0.835 ms             | 1.055 ms | 8.35%             |
+
+Both met the benchmark's 5 ms mean limit. This is a baseline, not a claimed speedup from the
+rendering fix, and does not include devices, transport, mixing or the UI.
