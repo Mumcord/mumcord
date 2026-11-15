@@ -39,6 +39,10 @@ Bug fixes (and security, crash, CI and dependency fixes) target `main`. New feat
 
 Add entries to the `## [Unreleased]` or `## [X.Y.Z] - Unreleased` section of `CHANGELOG.md`. Sections of released versions (a heading with a date) must never change: CI fails a pull request that edits one, and a daily check compares them with the fingerprint in `releases/`. Correct an old entry with a note in the next version instead (see `RELEASING.md`, "Release integrity").
 
+## Raspberry Pi
+
+For memory-conscious ARM64 builds and on-device checks, see [Raspberry Pi development and testing](docs/raspberry-pi.md). The normal Linux/ARM64 client is used; other platforms' build defaults are unchanged.
+
 ## Build flags
 
 Cargo features of the app crate (`src-tauri/Cargo.toml`) switch parts of the app that release builds must not have. Release builds (`npm run tauri build`, the release workflow) use none of them.
