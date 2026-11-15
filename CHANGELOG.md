@@ -50,6 +50,7 @@
 
 ### Internal
 
+- Noise suppression (RNNoise) moves to a newer build that rejects a damaged noise model when it loads instead of failing later during a call, and checks sizes in its fast processor-specific paths
 - Send to your phone (spec 05, mumcord-mobile#14) is built but not yet enabled: release builds do not show it until the Android and iOS apps that read its codes are released. With the Cargo feature `phone-transfer` (on in E2E builds; `npm run tauri dev -- --features phone-transfer`, see "Build flags" in `CONTRIBUTING.md`), Settings → Account & Identity has a "Send to your phone…" button that shows the chosen identities and optionally the server list as a loop of QR codes with an 8-digit number to type on the phone, valid for 2 minutes. Nothing is sent over a network, and saved server passwords and channel access tokens are never included. Without the feature the button is absent and the commands behind it are refused.
 
 ## [0.8.0] - 2026-11-12

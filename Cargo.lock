@@ -6565,7 +6565,7 @@ dependencies = [
 [[package]]
 name = "rnnoise-rs"
 version = "0.1.0"
-source = "git+https://github.com/Mumcord/rnnoise-rs?rev=4430677a365294ca8a6fd0b2e7854c02537a47a4#4430677a365294ca8a6fd0b2e7854c02537a47a4"
+source = "git+https://github.com/Mumcord/rnnoise-rs?rev=d85520adcddea2abd6cd054205f00444fefd703f#d85520adcddea2abd6cd054205f00444fefd703f"
 
 [[package]]
 name = "rpassword"
