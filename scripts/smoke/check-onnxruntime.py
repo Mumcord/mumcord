@@ -12,8 +12,8 @@ import ctypes
 import sys
 
 EXPECTED_VERSION = "1.23.2"
-# ort 2.0.0-rc.13 without api-* features asks for API version 17 (ort-sys src/version.rs).
-API_VERSION = 17
+# Keep this aligned with ort's api-23 feature in the workspace Cargo.toml.
+API_VERSION = 23
 
 
 class OrtApiBase(ctypes.Structure):

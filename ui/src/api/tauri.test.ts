@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { commands } from "../bindings/commands";
 import { EngineError } from "./client";
 import { copyWithFallback, createTauriApi } from "./tauri";
 
@@ -16,16 +17,29 @@ describe("tauri client", () => {
     listen.mockReset();
   });
 
+  it("keeps generated fallible commands as tagged results", async () => {
+    invoke.mockResolvedValueOnce([]);
+    await expect(commands.serversList()).resolves.toEqual({ status: "ok", data: [] });
+
+    const error = { code: "notImplemented", message: "not implemented yet" };
+    invoke.mockRejectedValueOnce(error);
+    await expect(commands.serversList()).resolves.toEqual({ status: "error", error });
+  });
+
   it("passes arguments through and resolves with the data", async () => {
     invoke.mockResolvedValue([]);
     const api = createTauriApi();
     expect(await api.historyLoad(1, { kind: "channel", channelId: 3 }, null, 20)).toEqual([]);
-    expect(invoke).toHaveBeenCalledWith("history_load", {
-      serverId: 1,
-      conversation: { kind: "channel", channelId: 3 },
-      before: null,
-      limit: 20,
-    });
+    expect(invoke).toHaveBeenCalledWith(
+      "history_load",
+      {
+        serverId: 1,
+        conversation: { kind: "channel", channelId: 3 },
+        before: null,
+        limit: 20,
+      },
+      undefined,
+    );
   });
 
   it("resolves commands that cannot fail with their plain value", async () => {
@@ -33,7 +47,7 @@ describe("tauri client", () => {
     invoke.mockResolvedValue(status);
     const api = createTauriApi();
     expect(await api.updateStatus()).toEqual(status);
-    expect(invoke).toHaveBeenCalledWith("update_status");
+    expect(invoke).toHaveBeenCalledWith("update_status", undefined, undefined);
   });
 
   it("sends a command only after the listeners subscribed before it are registered", async () => {
@@ -54,7 +68,7 @@ describe("tauri client", () => {
     expect(invoke).not.toHaveBeenCalled();
     registered(() => undefined);
     expect(await listed).toEqual([]);
-    expect(invoke).toHaveBeenCalledWith("connections_list");
+    expect(invoke).toHaveBeenCalledWith("connections_list", undefined, undefined);
   });
 
   it("still sends commands when registering a listener fails", async () => {
