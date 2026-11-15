@@ -1,0 +1,180 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.9.0-1.aarch64.rpm",
+      "sha256": "a26352a813abab210ab80974996d9c833b54fc5a0bcf9af252602b25a6edb8f3",
+      "size": 70763689
+    },
+    {
+      "name": "Mumcord-0.9.0-1.x86_64.rpm",
+      "sha256": "9f575c2fe1493a1ff48e0dcbe2a3c8324aa24aad7a087d5ad0fdf81e8baceecd",
+      "size": 71718653
+    },
+    {
+      "name": "Mumcord_0.9.0_aarch64.AppImage",
+      "sha256": "0f87b963b77c96c04a25ad83318ee8a1506cee254d4f42112327b77246687798",
+      "size": 150563336
+    },
+    {
+      "name": "Mumcord_0.9.0_aarch64.AppImage.sig",
+      "sha256": "875de9fa21a989ef9535dc1b0dcd133b83da61adc126fcb6ade8776a2676d13e",
+      "size": 440
+    },
+    {
+      "name": "Mumcord_0.9.0_aarch64.app.tar.gz",
+      "sha256": "d12ebe6a863d3c0f84e99292438e0802cc1e9fce598a759fee320764fc9375f1",
+      "size": 57756041
+    },
+    {
+      "name": "Mumcord_0.9.0_aarch64.app.tar.gz.sig",
+      "sha256": "316db66d393f56f27eae85a02975a707369804337e3cf8bb5dcfade1128e48c5",
+      "size": 444
+    },
+    {
+      "name": "Mumcord_0.9.0_aarch64.dmg",
+      "sha256": "6e5122aa72775e89b6d998cf5347ebc0b07145509a945d7bc0dab4494ce6611b",
+      "size": 58075004
+    },
+    {
+      "name": "Mumcord_0.9.0_amd64.AppImage",
+      "sha256": "21b699e53cd952f8dadceb99055d1a794290faf7ed64877dfcbaa508fa097e9c",
+      "size": 153999864
+    },
+    {
+      "name": "Mumcord_0.9.0_amd64.AppImage.sig",
+      "sha256": "712ae66f4c22ead54ae432a474fbb92db20bd74b84da428a982c1c75ef440058",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.9.0_amd64.deb",
+      "sha256": "e9bb03adf007e122aac70e6fe83dbf09f0a67f4ff4321f8cb8b231e02e8f94d1",
+      "size": 71711752
+    },
+    {
+      "name": "Mumcord_0.9.0_arm64.deb",
+      "sha256": "e62afeebecb18fad4faa77f42ce2a3c9c3ad673f13872c2f5b17f2bfe3b760ed",
+      "size": 70756852
+    },
+    {
+      "name": "Mumcord_0.9.0_x64-portable.zip",
+      "sha256": "0c4d9a1ecb35a3f9f54e8fc29beaa9236de65e31b64d05115db5f95fce128d70",
+      "size": 54020541
+    },
+    {
+      "name": "Mumcord_0.9.0_x64-setup.exe",
+      "sha256": "43547061308cbb6855a7128b0c5a519b8e8cf550faa83b0398ffd32b7f30f978",
+      "size": 43265600
+    },
+    {
+      "name": "Mumcord_0.9.0_x64-setup.exe.sig",
+      "sha256": "68daf83f71ad26f6504de262fe4491dd9587fee63edd7263e62f97e69c8162fa",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.9.0_x64.app.tar.gz",
+      "sha256": "746efac0977e33c07ef683700fdbaa3473449c3b57c111a99357cc311660e673",
+      "size": 64243296
+    },
+    {
+      "name": "Mumcord_0.9.0_x64.app.tar.gz.sig",
+      "sha256": "940300585d6bcdad7264e2ce88d112a6f881542382248911992b3cc632a9db3d",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.9.0_x64.dmg",
+      "sha256": "d9f6a37dae0fd4a70c08ad16a13af28c0eabc74d5f8dda60e90eef3c43b43b46",
+      "size": 64473690
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "9dca7eda461f0ac8089246f6dd08cb7c81509e4ff1682f2695a09ff4544b6b06",
+      "size": 2700
+    },
+    {
+      "name": "install.sh",
+      "sha256": "dab62a8f8ad0c78c04393e9ca13e089d845b4624680a253f26eb765dcaed4126",
+      "size": 24788
+    },
+    {
+      "name": "latest.json",
+      "sha256": "e754a4c09b88f31c2acb2839061c0f205b234aef977246085e7ed03211005c88",
+      "size": 3113
+    },
+    {
+      "name": "mumcord-0.9.0-appimage-aarch64.cdx.json",
+      "sha256": "5cffbc502abbd196aace445d417b4193b4ce4748f21cf5d05cb85974a2726fae",
+      "size": 957795
+    },
+    {
+      "name": "mumcord-0.9.0-appimage-x86_64.cdx.json",
+      "sha256": "da0db4119c7d533d77fef43e9ac6347bc09b8808242559cb5a86f825bf92651b",
+      "size": 958942
+    },
+    {
+      "name": "mumcord-0.9.0-deb-rpm-aarch64.cdx.json",
+      "sha256": "aaec07e6aec185d6bc79dc17d82069ad94435bc4cc24ec5cf6f84bc4c0b31811",
+      "size": 906906
+    },
+    {
+      "name": "mumcord-0.9.0-deb-rpm-x86_64.cdx.json",
+      "sha256": "8843ba432333acf4e9cae4174ffbc02ea2c418837a4ead49c7e380af710f1e6c",
+      "size": 908053
+    },
+    {
+      "name": "mumcord-0.9.0-freebsd-pkg-x86_64.cdx.json",
+      "sha256": "649671a52a2af1e38c7c97075f2ec17baeb6f44696d4d9841fa25f9959074850",
+      "size": 872758
+    },
+    {
+      "name": "mumcord-0.9.0-macos-aarch64.cdx.json",
+      "sha256": "6acd023324df06a9d05eeff7c7f77b8088c835af32989558454fae376942d548",
+      "size": 772380
+    },
+    {
+      "name": "mumcord-0.9.0-macos-x86_64.cdx.json",
+      "sha256": "d62aad91d2ddc87c0ce7f58354dcefa0f72922f1cb989d54c0262b978be323e6",
+      "size": 773528
+    },
+    {
+      "name": "mumcord-0.9.0-windows-x86_64.cdx.json",
+      "sha256": "ff9280497b907d15998c7f4e956e8c7aa48c1fbcd374888e7e4ac30125278824",
+      "size": 739366
+    },
+    {
+      "name": "mumcord-0.9.0.intoto.jsonl",
+      "sha256": "b7a54239f7cc3be173c0213ef7debea551c9e62fb6218fdf6aa879b178d1d4e4",
+      "size": 15327
+    },
+    {
+      "name": "mumcord-0.9.0.pkg",
+      "sha256": "512c517a5bf857ad7dd388591a14b277b181e6d3b1afd97815d4a4e77ca793e4",
+      "size": 39210632
+    }
+  ],
+  "changelog": {
+    "sha256": "6923dd9039b7964347de9b9fb19196697eb9d20362c532ec82d7bbcaf10de5ce",
+    "text": "## [0.9.0] - 2026-11-15\n\n### Added\n\n- Crash reports on Linux say what ended Mumcord when it closed without shutting down: the \"unexpected exit\" report has a new line `ended by:` with what the system journal recorded about that run, e.g. `SIGKILL (from outside the app)`, `out-of-memory killer`, `systemd-oomd (memory pressure)` or the kernel's real-time watchdog. When the journal has nothing, cannot be read or does not answer within three seconds, the line says `unknown` and why. Only entries about Mumcord's own previous process are looked at, and no journal text is copied into the report\n- Linux: when an audio thread runs past its real-time budget, Mumcord now saves a report that shows where that thread was busy (code locations and the thread name only). It appears under Settings → Crash reports marked as a real-time overrun, which is not a crash: the app keeps running. At most one such report is written per run, and it can be uploaded like any other report. This helps find the cause when Linux ends the app without a trace\n- The install script supports FreeBSD (issue #781): on FreeBSD 15.x (amd64), `fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh` downloads the release's `.pkg`, checks it against SHA256SUMS, installs the packages it needs from the pkg repositories and then installs it with `pkg add` (with sudo or doas when you are not root); running it again updates Mumcord, and `--uninstall` removes it with `pkg delete`\n- A frozen window now leaves a report that shows where it hangs (Linux): when the window has not answered for about 8 seconds, Mumcord saves a crash report of kind \"freeze\" with the stacks of all its threads, main thread first (code locations and thread names only, no data). The app keeps running and continues normally if the window answers again; the report is listed, exported and uploaded like any other crash report, only when you choose to, and at most 3 are written per run\n- Engine: audio can be supplied by the embedding app instead of audio devices (`BackendKind::External`, `Engine::with_external_audio`), for the Android and iOS apps, where the system then cancels echo; a runtime bitrate limit (`Engine::set_bitrate_limit_kbps`) for reduced voice quality on mobile data; Android and iOS builds no longer include the desktop audio library cpal\n- Engine: the transfer format for \"Send to your phone\" (`mumcord_store::transfer`, `Engine::transfer_export_payload`, `Engine::transfer_import`), which carries identities and optionally the server list to the phone app inside QR codes, encrypted with a key derived from a typed code and valid for two minutes; saved server passwords and channel access tokens are never included\n- Engine, for the Android and iOS apps: a whisper can be started to exact people or a channel (`Engine::whisper_start_to` with `WhisperTo`), and `EngineEvent::WhisperEnded` tells when it ended by itself; being banned while connected is its own error kind (`ErrorKind::Banned`, with the server's reason as plain text); the phone settings of spec 05 are stored with the other settings (`Settings.mobile`: talk mode chosen, default output, the three mobile data switches, idle disconnect, sender-only notifications, update check) and change nothing on the desktop; one stored message can be fetched by its id (`Engine::history_message`), and `chat::sanitize_message_html` is public\n\n### Changed\n\n- Long conversations do less work while scrolling: Mumcord finds the first visible message without measuring every older row, and measures only the boundaries needed for the pinned author. The reading position and pinned-author behaviour stay unchanged\n- Member lists reuse their alphabetical order when only someone's talking indicator changes, avoiding repeated name sorting on busy servers\n- Media decoding uses the webview's native base64 decoder when available, with the existing fallback for older webviews\n- Fallback screen-share and received-camera pictures reuse adjacent pixels' colour calculations and convert directly into the outgoing frame buffer, avoiding a second picture-sized allocation and copy\n- The video encoders and decoders for screen sharing and camera now come from the open-source `hwcodec` crate, which the Mumcord team maintains in its own repository (issue #449). Nothing changes in how sharing looks or behaves\n- Update bindgen to 0.73 and require prost-build 0.14.5 with prettyplease 0.3 support; remove the temporary Dependabot hold on bindgen minor updates (issue #79)\n- The Mumble protocol library moved out of this repository: Mumcord now uses [`mumble-client-protocol`](https://crates.io/crates/mumble-client-protocol) from crates.io (MIT OR Apache-2.0, developed at [Mumcord/mumble-client-protocol](https://github.com/Mumcord/mumble-client-protocol)) instead of its own `mumcord-protocol` crate, which is no longer published with Mumcord releases; projects that depend on `mumcord-protocol` should switch to the new crate. Nothing changes for users: servers still see the client as \"Mumcord\" with its version (issue #455)\n- Minimum supported Rust version is now 1.97 (was 1.90): the audio dependency `sonora` needs 1.91 and the plugin runtime `wasmtime` needs 1.97\n\n### Fixed\n\n- AppImage: when H.264 playback is unavailable, the player now suggests updating Mumcord or using the distribution's package (AUR on Arch), not installing system gst-libav, which the AppImage cannot use (issue #567)\n- Linux: the notice \"libayatana-appindicator is deprecated\" no longer appears in the terminal and in Mumcord's log on every start that uses the fallback tray. It is a note for developers and has no effect on the tray; the switch to another tray backend is tracked in issue #822.\n- Linux: Mumcord no longer disappears without a crash dialog when the computer is very busy (issue #844). The time limit that protects the system from a runaway audio thread also applied to background threads of the built-in web view, which are not built for it; when one of them was busy for too long, Linux ended the whole app at once. Mumcord now keeps only its audio threads at real-time priority and returns all others to normal priority, and the warning before that limit works again after it was used once\n- Mumcord freezes on Windows after a camera opened but delivered no picture: leaving the camera settings, switching to another camera (for example the OBS Virtual Camera) or closing the app waited for the camera forever, the camera stayed black and Windows showed \"Not responding\". Stopping the camera now gives up after two seconds, so switching cameras and closing the app work again\n- Embedded YouTube, Twitch, Spotify and SoundCloud players and the watch party stay black on Windows: since 0.8.0 the app's own local player page was sent through the web view's connection filter, which refused it. The page is loaded directly again; all other connections of the web view still go through the filter\n- On Linux the window no longer freezes for good when you hang up or disconnect while the audio system (PipeWire) has stopped responding: closing the audio devices and listing them now give up after a short wait instead of waiting forever\n- On Linux a voice thread that is briefly busy keeps its real-time priority: the audio system (PipeWire) kept shrinking the allowed time to a single audio buffer, and Mumcord now restores the intended 100 ms margin during a call.\n- Packet inspector: the Markdown export no longer breaks a table row when a name or packet type contains a backslash (issue #771)\n- No more endless reconnecting to a server that accepts the login and closes the connection right away, which standard Mumble servers do without any message to a client whose certificate is banned. Mumcord now counts such short connections like failed attempts and stops after 10 with a message saying what happened. A connection that held for 10 seconds or more reconnects as before\n- When the connection to the voice server ends, a running whisper ends and a held push-to-talk key counts as released, so nothing of it carries over to the next connection\n\n### Security\n\n- A whisper only reaches the people you chose. Until now a whisper target was matched by name each time, so a different person using the same name could hear a whisper that was meant for somebody else, for example somebody who took the name over after your contact left. A whisper is now tied to the exact people it was started for: when one of them leaves, they are removed from it, when the last one leaves, it ends, and nobody who joins later can hear it, whatever their name is. If a saved whisper target's name fits more than one person on the server, Mumcord does not whisper at all and tells you why\n- Require patched `ammonia 4.2.5` or newer to address the SVG/MathML mutation-XSS advisory RUSTSEC-2026-0533, with regression tests for chat HTML and plugin SVG assets; existing sanitization allow-lists remain unchanged (issue #819)\n- Upgrade the RSA identity-key generator to the patched `rsa 0.10` release and remove the accepted Marvin timing-attack advisory (issue #131). Existing identities and Mumble-compatible RSA-2048 certificates remain unchanged; certificate signing and TLS still use ring\n\n### Internal\n\n- Send to your phone (spec 05, mumcord-mobile#14) is built but not yet enabled: release builds do not show it until the Android and iOS apps that read its codes are released. With the Cargo feature `phone-transfer` (on in E2E builds; `npm run tauri dev -- --features phone-transfer`, see \"Build flags\" in `CONTRIBUTING.md`), Settings → Account & Identity has a \"Send to your phone…\" button that shows the chosen identities and optionally the server list as a loop of QR codes with an 8-digit number to type on the phone, valid for 2 minutes. Nothing is sent over a network, and saved server passwords and channel access tokens are never included. Without the feature the button is absent and the commands behind it are refused."
+  },
+  "commit": "b56cbc445112a972cb7fe388e2d768776c442192",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "57630f40e9ae9a4ae401f779419c35aa7e4f713bd5a9c3a9f89cd10fd04018f2",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "44df9dbe24521500e3666cb1b2ce9955aa8903eae7ec45f17bae0025ac0e662a",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "dc85fe2eb2f13a3e660f4d825cf9bc81ee67b1e9be4ff7a269505209a8d2ba2e",
+      "yanked": false
+    },
+    "mumcord-protocol": null,
+    "mumcord-store": {
+      "cksum": "b31278858af46bea2956219cad4e6d3a40f1d481b4e9b95847003b44712e4e0f",
+      "yanked": false
+    }
+  },
+  "sha256sums": "9dca7eda461f0ac8089246f6dd08cb7c81509e4ff1682f2695a09ff4544b6b06",
+  "tag": "v0.9.0"
+}

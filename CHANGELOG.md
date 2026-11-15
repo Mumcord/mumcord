@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-15
+
 ### Added
 
 - Crash reports on Linux say what ended Mumcord when it closed without shutting down: the "unexpected exit" report has a new line `ended by:` with what the system journal recorded about that run, e.g. `SIGKILL (from outside the app)`, `out-of-memory killer`, `systemd-oomd (memory pressure)` or the kernel's real-time watchdog. When the journal has nothing, cannot be read or does not answer within three seconds, the line says `unknown` and why. Only entries about Mumcord's own previous process are looked at, and no journal text is copied into the report
@@ -765,6 +767,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.9.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.9.0
 [0.8.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.8.0
 [0.7.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.2
 [0.7.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.7.1

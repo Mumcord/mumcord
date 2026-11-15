@@ -19,7 +19,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.8.0"
+version = "0.9.0"
 edition = "2024"
 rust-version = "1.97"
 license = "AGPL-3.0-only"
@@ -32,9 +32,9 @@ mumble-client-protocol = "0.1"
 
 # Internal crates
 # The version is the minor series: crates.io needs it for the publish of the crates that depend on it (mumcord-audio, mumcord-p2p, mumcord-plugins, mumcord-plugin), and it only changes with a minor/major bump.
-mumcord-codec = { path = "crates/codec", version = "0.8" }
+mumcord-codec = { path = "crates/codec", version = "0.9" }
 mumcord-audio = { path = "crates/audio" }
-mumcord-store = { path = "crates/store", version = "0.8" }
+mumcord-store = { path = "crates/store", version = "0.9" }
 mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
@@ -44,8 +44,8 @@ mumcord-p2p = { path = "crates/p2p" }
 hwcodec = { version = "0.1", default-features = false }
 mumcord-camera = { path = "crates/camera" }
 mumcord-effects = { path = "crates/effects" }
-mumcord-plugins = { path = "crates/plugins", version = "0.8" }
-mumcord-plugin-sdk = { path = "crates/plugin-sdk", version = "0.8" }
+mumcord-plugins = { path = "crates/plugins", version = "0.9" }
+mumcord-plugin-sdk = { path = "crates/plugin-sdk", version = "0.9" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
