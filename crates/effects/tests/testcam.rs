@@ -8,11 +8,9 @@
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use bgmatte::{Frame, ModelShape, OnnxSegmenter, Pipeline, Segmenter};
 use mumcord_camera::{CameraError, CameraFrame, FramePool, FrameSink, TestCamera, nv12_len};
-use mumcord_effects::{
-    Background, EffectStats, Effects, EffectsConfig, FixtureSegmenter, Level, ModelShape,
-    OnnxSegmenter, Pipeline, Segmenter,
-};
+use mumcord_effects::{Background, EffectStats, Effects, EffectsConfig, FixtureSegmenter, Level};
 use mumcord_store::CameraEffectQuality;
 
 const W: usize = 1280;
@@ -75,14 +73,19 @@ fn mean_luma_change(a: &[u8], b: &[u8], points: &[(usize, usize)]) -> f64 {
 
 #[test]
 fn fixture_mask_keeps_the_person_and_blurs_the_background_pixel_exactly() {
-    let mut pipeline = Pipeline::new(W as u32, H as u32, Background::Blur { strength: 60 });
+    let mut pipeline =
+        Pipeline::new(W as u32, H as u32, Background::Blur { strength: 60 }).expect("pipeline");
     let mut segmenter = FixtureSegmenter::new(ModelShape::Square, 30);
     for n in [0u64, 1, 2, 45] {
         let original = testcam_frame(n);
         let mut out = original.clone();
         let timestamp = Duration::from_secs_f64(n as f64 / 30.0);
         pipeline
-            .process(&mut out, timestamp, &mut segmenter as &mut dyn Segmenter)
+            .process(
+                Frame::nv12(&mut out, W as u32, H as u32),
+                timestamp,
+                &mut segmenter as &mut dyn Segmenter,
+            )
             .expect("process");
         for (x, y) in person_interior(n) {
             assert_eq!(
@@ -120,13 +123,14 @@ fn the_real_model_runs_and_changes_the_background() {
             .expect("segment");
         assert!(mask.iter().all(|v| (0.0..=1.0).contains(v)), "{shape:?}");
 
-        let mut pipeline = Pipeline::new(W as u32, H as u32, Background::Blur { strength: 60 });
+        let mut pipeline =
+            Pipeline::new(W as u32, H as u32, Background::Blur { strength: 60 }).expect("pipeline");
         pipeline.set_level(level);
         let original = testcam_frame(0);
         let mut out = original.clone();
         pipeline
             .process(
-                &mut out,
+                Frame::nv12(&mut out, W as u32, H as u32),
                 Duration::ZERO,
                 &mut segmenter as &mut dyn Segmenter,
             )

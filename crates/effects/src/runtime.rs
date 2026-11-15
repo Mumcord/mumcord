@@ -1,13 +1,12 @@
-//! Loading ONNX Runtime at run time and the "effects unavailable" fallback (FR-8.33).
+//! Finding the ONNX Runtime library Mumcord ships and the "effects unavailable" fallback
+//! (FR-8.33).
 //!
-//! The library is loaded once per process. When it is missing or fails to load, every
-//! background other than None is turned off with the reason from here, and the camera keeps
-//! working. Sessions share the environment kept here so initialization happens only once.
+//! bgmatte loads the library once per process from the path given here. When it is missing or
+//! fails to load, every background other than None is turned off with the reason from here, and
+//! the camera keeps working.
 
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
-
-use ort::environment::Environment;
 
 use crate::hooks;
 
@@ -18,19 +17,16 @@ const LIBRARY: &str = "libonnxruntime.1.23.2.dylib";
 #[cfg(not(any(target_os = "windows", target_os = "macos")))]
 const LIBRARY: &str = "libonnxruntime.so.1.23.2";
 
-static RUNTIME: OnceLock<Result<Environment, String>> = OnceLock::new();
+static RUNTIME: OnceLock<Result<(), String>> = OnceLock::new();
 
 /// Whether background effects can run on this PC; the error is the user-facing reason
-/// ("Background effects are not available on this PC: {reason}").
+/// ("Background effects are not available on this PC: {reason}"). Loads ONNX Runtime on the
+/// first call, so the models never fall back to a library from the system's search path.
 pub fn availability() -> Result<(), String> {
-    environment().map(|_| ())
+    RUNTIME.get_or_init(load).clone()
 }
 
-pub(crate) fn environment() -> Result<&'static Environment, String> {
-    RUNTIME.get_or_init(load).as_ref().map_err(Clone::clone)
-}
-
-fn load() -> Result<Environment, String> {
+fn load() -> Result<(), String> {
     if hooks::onnx_unavailable() {
         return Err("ONNX Runtime is turned off for this test run.".to_owned());
     }
@@ -39,21 +35,18 @@ fn load() -> Result<Environment, String> {
         tracing::warn!(?candidates, "ONNX Runtime library not found");
         return Err("the ONNX Runtime library is missing.".to_owned());
     };
-    match ort::init_from(path) {
-        Ok(builder) => {
-            let environment = builder
-                .with_name("mumcord-effects")
-                .build()
-                .map_err(|err| {
-                    tracing::warn!(%err, "ONNX Runtime environment failed to initialize");
-                    format!("the ONNX Runtime environment failed to initialize ({err}).")
-                })?;
+    match bgmatte::init_runtime(path) {
+        Ok(()) => {
             tracing::info!(path = %path.display(), "ONNX Runtime loaded");
-            Ok(environment)
+            Ok(())
+        }
+        Err(bgmatte::Error::Unavailable(reason)) => {
+            tracing::warn!(%reason, "ONNX Runtime failed to load");
+            Err(format!("{reason}."))
         }
         Err(err) => {
             tracing::warn!(%err, "ONNX Runtime failed to load");
-            Err(format!("the ONNX Runtime library failed to load ({err})."))
+            Err(format!("{err}."))
         }
     }
 }
@@ -95,11 +88,9 @@ fn beside_executable(dir: &Path) -> Vec<PathBuf> {
 mod tests {
     #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
     #[test]
-    fn repeated_requests_share_the_runtime_environment() {
-        let first = super::environment().expect("bundled runtime loads");
+    fn loads_the_runtime_the_build_fetched_once() {
+        super::availability().expect("bundled runtime loads");
         super::availability().expect("runtime stays available");
-        let second = super::environment().expect("runtime stays available");
-        assert!(std::ptr::eq(first, second));
     }
 
     /// The installers put the library where the packaged executable finds it. No FreeBSD

@@ -42,6 +42,11 @@ mumcord-p2p = { path = "crates/p2p" }
 # No default features: the engine switches the codecs on (its features `vp9`, `av1-decode` and
 # `desktop-codecs`), so a phone build compiles none of the C libraries.
 hwcodec = { version = "0.1", default-features = false }
+# Camera background effects (spec 08, FR-8.32 … FR-8.41): segmentation, edge refinement, blur
+# and image backgrounds. ONNX Runtime is loaded at run time from the library that
+# crates/effects/build.rs fetches, so a missing or broken runtime disables the effects instead
+# of stopping Mumcord.
+bgmatte = "0.1"
 mumcord-camera = { path = "crates/camera" }
 mumcord-effects = { path = "crates/effects" }
 mumcord-plugins = { path = "crates/plugins", version = "0.9" }
@@ -139,11 +144,6 @@ rtrb = "0.4"
 # threads without locks or allocation.
 crossbeam-queue = "0.3"
 
-# Camera background effects (spec 08, FR-8.33): ONNX Runtime through `ort`, loaded at run time
-# (`load-dynamic`) so a missing or broken runtime library disables the effects instead of
-# stopping Mumcord. The runtime library itself is fetched by crates/effects/build.rs.
-# Keep the API level aligned with the bundled ONNX Runtime 1.23.2.
-ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "load-dynamic", "api-23"] }
 rubato = "5.0"
 # Lists the sound server's sinks and sources with their default flags (issue #183). Pure Rust
 # PulseAudio protocol client; PipeWire answers it through pipewire-pulse.
@@ -371,7 +371,7 @@ opt-level = 3
 
 # Camera background effects run per 720p frame; unoptimised they would miss the frame budget in
 # the debug builds the E2E tests use.
-[profile.dev.package.mumcord-effects]
+[profile.dev.package.bgmatte]
 opt-level = 3
 
 # mumbot (dev-dependency of the engine's live tests) depends on the published codec and p2p crates;

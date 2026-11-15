@@ -1,125 +1,10 @@
-//! Person segmentation: the MediaPipe Selfie Segmenter through ONNX Runtime (FR-8.33), and the
-//! test camera's known outline for the `MUMCORD_TEST_SEGMENT_MASK` hook (FR-8.41).
+//! Segmenters for the test hooks (FR-8.41): the test camera's known outline in place of the
+//! model, and a wrapper that makes any segmenter slow like a weak PC.
 
 use std::time::Duration;
 
+use bgmatte::{ModelShape, Segmenter};
 use mumcord_camera::TestCamera;
-use ort::session::Session;
-use ort::session::builder::GraphOptimizationLevel;
-use ort::value::TensorRef;
-
-use crate::EffectsError;
-
-/// Square 256×256 model for the full level ("Best").
-static SQUARE_MODEL: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/selfie_square.onnx"));
-/// Landscape 256×144 model for the light level.
-static LANDSCAPE_MODEL: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/selfie_landscape.onnx"));
-
-/// One CPU thread for the model: with capture and encoding the camera must stay within about
-/// 1.5 cores (spec 08 §9), and a second thread gained little at these input sizes.
-const MODEL_THREADS: usize = 1;
-
-/// Which of the two shipped models to use.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModelShape {
-    Square,
-    Landscape,
-}
-
-impl ModelShape {
-    /// Input width and height in pixels.
-    pub fn size(self) -> (usize, usize) {
-        match self {
-            Self::Square => (256, 256),
-            Self::Landscape => (256, 144),
-        }
-    }
-}
-
-/// Produces a person mask (0 = background, 1 = person) of the model's input size from a planar
-/// RGB image (`3 × h × w`, values 0..=1).
-pub trait Segmenter: Send {
-    fn shape(&self) -> ModelShape;
-
-    /// `timestamp` is the camera frame's timestamp; only the fixture mask uses it.
-    fn segment(
-        &mut self,
-        rgb: &[f32],
-        timestamp: Duration,
-        mask: &mut [f32],
-    ) -> Result<(), EffectsError>;
-}
-
-/// The Selfie Segmenter run by ONNX Runtime on the CPU.
-pub struct OnnxSegmenter {
-    shape: ModelShape,
-    session: Session,
-}
-
-impl OnnxSegmenter {
-    /// Creates the session. Fails with [`EffectsError::Unavailable`] when ONNX Runtime can't be
-    /// loaded on this PC.
-    pub fn new(shape: ModelShape) -> Result<Self, EffectsError> {
-        let environment = crate::runtime::environment().map_err(EffectsError::Unavailable)?;
-        let model = match shape {
-            ModelShape::Square => SQUARE_MODEL,
-            ModelShape::Landscape => LANDSCAPE_MODEL,
-        };
-        let session = build_session(model, environment).map_err(EffectsError::Model)?;
-        Ok(Self { shape, session })
-    }
-}
-
-fn build_session(
-    model: &[u8],
-    environment: &ort::environment::Environment,
-) -> Result<Session, String> {
-    Session::builder(environment)
-        .map_err(|e| e.to_string())?
-        .with_optimization_level(GraphOptimizationLevel::Level3)
-        .map_err(|e| e.to_string())?
-        .with_intra_threads(MODEL_THREADS)
-        .map_err(|e| e.to_string())?
-        .with_inter_threads(1)
-        .map_err(|e| e.to_string())?
-        // Spinning worker threads would burn a core between frames.
-        .with_intra_op_spinning(false)
-        .map_err(|e| e.to_string())?
-        .commit_from_memory(model)
-        .map_err(|e| e.to_string())
-}
-
-impl Segmenter for OnnxSegmenter {
-    fn shape(&self) -> ModelShape {
-        self.shape
-    }
-
-    fn segment(
-        &mut self,
-        rgb: &[f32],
-        _timestamp: Duration,
-        mask: &mut [f32],
-    ) -> Result<(), EffectsError> {
-        let (w, h) = self.shape.size();
-        let input = TensorRef::from_array_view(([1usize, 3, h, w], rgb))
-            .map_err(|err| EffectsError::Model(err.to_string()))?;
-        let outputs = self
-            .session
-            .run(ort::inputs!["pixel_values" => input])
-            .map_err(|err| EffectsError::Model(err.to_string()))?;
-        let (_, alphas) = outputs["alphas"]
-            .try_extract_tensor::<f32>()
-            .map_err(|err| EffectsError::Model(err.to_string()))?;
-        if alphas.len() != mask.len() {
-            return Err(EffectsError::Model(format!(
-                "unexpected mask size {}",
-                alphas.len()
-            )));
-        }
-        mask.copy_from_slice(alphas);
-        Ok(())
-    }
-}
 
 /// The test camera's person outline at the frame shown at `timestamp` (hook
 /// `MUMCORD_TEST_SEGMENT_MASK=fixture`). The test camera does not stamp frame numbers, so the
@@ -149,7 +34,7 @@ impl Segmenter for FixtureSegmenter {
         _rgb: &[f32],
         timestamp: Duration,
         mask: &mut [f32],
-    ) -> Result<(), EffectsError> {
+    ) -> Result<(), bgmatte::Error> {
         let frame = (timestamp.as_secs_f64() * f64::from(self.fps)).floor() as u64;
         fixture_mask(self.shape.size(), frame, mask);
         Ok(())
@@ -158,7 +43,7 @@ impl Segmenter for FixtureSegmenter {
 
 /// Rasterises the test camera's person (1280×720 coordinates) at `w × h`, sampling each mask
 /// pixel at its centre.
-pub fn fixture_mask((w, h): (usize, usize), frame: u64, mask: &mut [f32]) {
+fn fixture_mask((w, h): (usize, usize), frame: u64, mask: &mut [f32]) {
     let (cw, ch) = (
         mumcord_camera::MAX_WIDTH as f32,
         mumcord_camera::MAX_HEIGHT as f32,
@@ -171,5 +56,71 @@ pub fn fixture_mask((w, h): (usize, usize), frame: u64, mask: &mut [f32]) {
             let inside = span.is_some_and(|(start, end)| (start..end).contains(&cx));
             mask[y * w + x] = if inside { 1.0 } else { 0.0 };
         }
+    }
+}
+
+/// Waits `delay` before each mask (hook `MUMCORD_TEST_EFFECT_SLOW`). bgmatte measures the
+/// effect time itself, so the delay has to be real for Auto to see a slow PC and step down.
+pub(crate) struct SlowSegmenter {
+    pub(crate) inner: Box<dyn Segmenter>,
+    pub(crate) delay: Duration,
+}
+
+impl Segmenter for SlowSegmenter {
+    fn shape(&self) -> ModelShape {
+        self.inner.shape()
+    }
+
+    fn segment(
+        &mut self,
+        rgb: &[f32],
+        timestamp: Duration,
+        mask: &mut [f32],
+    ) -> Result<(), bgmatte::Error> {
+        std::thread::sleep(self.delay);
+        self.inner.segment(rgb, timestamp, mask)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Instant;
+
+    use super::*;
+
+    #[test]
+    fn the_fixture_mask_has_the_person_in_the_middle_and_background_at_the_sides() {
+        let mut segmenter = FixtureSegmenter::new(ModelShape::Landscape, 30);
+        let (w, h) = ModelShape::Landscape.size();
+        let mut mask = vec![-1.0f32; w * h];
+        segmenter
+            .segment(&[], Duration::ZERO, &mut mask)
+            .expect("fixture mask");
+        assert!(mask.iter().all(|&v| v == 0.0 || v == 1.0));
+        assert_eq!(
+            mask[(h - 1) * w + w / 2],
+            1.0,
+            "person at the bottom centre"
+        );
+        assert_eq!(mask[(h - 1) * w], 0.0, "background at the left edge");
+    }
+
+    #[test]
+    fn the_slow_segmenter_waits_and_keeps_the_mask() {
+        let mut slow = SlowSegmenter {
+            inner: Box::new(FixtureSegmenter::new(ModelShape::Square, 30)),
+            delay: Duration::from_millis(20),
+        };
+        assert_eq!(slow.shape(), ModelShape::Square);
+        let (w, h) = ModelShape::Square.size();
+        let (mut direct, mut delayed) = (vec![0.0f32; w * h], vec![0.0f32; w * h]);
+        FixtureSegmenter::new(ModelShape::Square, 30)
+            .segment(&[], Duration::ZERO, &mut direct)
+            .expect("fixture mask");
+        let started = Instant::now();
+        slow.segment(&[], Duration::ZERO, &mut delayed)
+            .expect("slow mask");
+        assert!(started.elapsed() >= Duration::from_millis(20));
+        assert_eq!(direct, delayed);
     }
 }
