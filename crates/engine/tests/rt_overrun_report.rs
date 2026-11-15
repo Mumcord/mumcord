@@ -40,7 +40,7 @@ fn stuck_dsp_stage() {
 fn an_overrun_is_reported_with_the_stack_of_the_overrunning_thread() {
     let root = tempfile::tempdir().expect("temp dir");
     let dir = root.path().join("crash-reports");
-    crash::install(&dir, "0.0.0-test").expect("crash reporting");
+    crash::install(&dir, "0.0.0-test", &[]).expect("crash reporting");
 
     let ran = std::thread::Builder::new()
         .name("stuck-voice".to_owned())
