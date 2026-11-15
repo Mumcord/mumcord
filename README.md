@@ -87,11 +87,13 @@ No Homebrew? Download the `.dmg` for your Mac from the **[latest release](https:
 curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 ```
 
-**😈 FreeBSD 15.x (amd64):** download `mumcord-<version>.pkg` from the **[latest release](https://github.com/Mumcord/mumcord/releases/latest)** and install it as root:
+**😈 FreeBSD 15.x (amd64):**
 
 ```sh
-pkg add ./mumcord-<version>.pkg
+fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 ```
+
+The script downloads the release's `.pkg`, checks it against `SHA256SUMS`, installs the packages it needs and then Mumcord (with sudo or doas when you are not root). Or download `mumcord-<version>.pkg` from the **[latest release](https://github.com/Mumcord/mumcord/releases/latest)** and install it as root with `pkg add ./mumcord-<version>.pkg`.
 
 ### 2. Set up
 
@@ -109,15 +111,15 @@ Other packages (portable Windows, `.deb`, `.rpm`, AppImage, AUR, Homebrew on Lin
 
 Get the latest build from the [Releases page](https://github.com/Mumcord/mumcord/releases/latest). Every release ships a `SHA256SUMS` file to check your download.
 
-| System                      | Package                                                  | Notes                                                                                                                                                                                                                                                                                                                                               |
-| --------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Windows** 10/11           | `*-setup.exe` installer or `*-portable.zip`              | Code-signed with a Certum certificate from 0.6.1 on (0.6.0 and older are unsigned: SmartScreen warns, choose "More info" → "Run anyway"). Portable: unpack and run, no installation ([details](docs/windows-portable.md))                                                                                                                           |
-| **macOS (Apple Silicon)**   | `*_aarch64.dmg`                                          | Signed and notarized since 0.4.1                                                                                                                                                                                                                                                                                                                    |
-| **macOS (Intel)**           | `*_x64.dmg`                                              | Signed and notarized since 0.4.1                                                                                                                                                                                                                                                                                                                    |
-| **Linux** x86_64 and ARM64  | `.deb`, `.rpm`, `.AppImage`                              | The `.deb` and `.rpm` pull in everything they need                                                                                                                                                                                                                                                                                                  |
-| **Arch Linux**              | AUR `mumcord-bin`                                        | `paru -S mumcord-bin` or `yay -S mumcord-bin`                                                                                                                                                                                                                                                                                                       |
-| **FreeBSD** 15.x, amd64     | `mumcord-*.pkg`                                          | Install with `pkg add ./mumcord-<version>.pkg`, update with `pkg upgrade mumcord`. Not available on FreeBSD: camera and AI backgrounds, the in-game overlay, screen-share sound and the window picker (Settings → About says so). Intel graphics need `drm-66-kmod`, real-time audio needs the `realtime` group; `pkg info -D mumcord` repeats both |
-| **Homebrew** (macOS, Linux) | [`mumcord/tap`](https://github.com/Mumcord/homebrew-tap) | macOS: `brew install --cask mumcord/tap/mumcord`. Linux: `brew install mumcord/tap/mumcord` (installs the AppImage; `brew info` lists the system packages it needs)                                                                                                                                                                                 |
+| System                      | Package                                                  | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Windows** 10/11           | `*-setup.exe` installer or `*-portable.zip`              | Code-signed with a Certum certificate from 0.6.1 on (0.6.0 and older are unsigned: SmartScreen warns, choose "More info" → "Run anyway"). Portable: unpack and run, no installation ([details](docs/windows-portable.md))                                                                                                                                                                                                             |
+| **macOS (Apple Silicon)**   | `*_aarch64.dmg`                                          | Signed and notarized since 0.4.1                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **macOS (Intel)**           | `*_x64.dmg`                                              | Signed and notarized since 0.4.1                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Linux** x86_64 and ARM64  | `.deb`, `.rpm`, `.AppImage`                              | The `.deb` and `.rpm` pull in everything they need                                                                                                                                                                                                                                                                                                                                                                                    |
+| **Arch Linux**              | AUR `mumcord-bin`                                        | `paru -S mumcord-bin` or `yay -S mumcord-bin`                                                                                                                                                                                                                                                                                                                                                                                         |
+| **FreeBSD** 15.x, amd64     | `mumcord-*.pkg`                                          | Install with the one-liner below (`fetch` instead of `curl`; running it again updates) or with `pkg add ./mumcord-<version>.pkg`, update with `pkg upgrade mumcord`. Not available on FreeBSD: camera and AI backgrounds, the in-game overlay, screen-share sound and the window picker (Settings → About says so). Intel graphics need `drm-66-kmod`, real-time audio needs the `realtime` group; `pkg info -D mumcord` repeats both |
+| **Homebrew** (macOS, Linux) | [`mumcord/tap`](https://github.com/Mumcord/homebrew-tap) | macOS: `brew install --cask mumcord/tap/mumcord`. Linux: `brew install mumcord/tap/mumcord` (installs the AppImage; `brew info` lists the system packages it needs)                                                                                                                                                                                                                                                                   |
 
 **Linux one-liner** (picks the right package for your distribution, falls back to the AppImage):
 
@@ -125,7 +127,13 @@ Get the latest build from the [Releases page](https://github.com/Mumcord/mumcord
 curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 ```
 
-To remove Mumcord, add `-s -- --uninstall` after `sh`.
+**FreeBSD one-liner** (installs the release's `.pkg` and the packages it needs):
+
+```sh
+fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
+```
+
+To remove Mumcord, add `-s -- --uninstall` after `sh` (on FreeBSD it uses `pkg delete`).
 
 - **macOS Local Network:** macOS 15 and later ask whether Mumcord may find devices on your local network. Allow it, or servers in your home network fail with "No route to host" (change it later in System Settings → Privacy & Security → Local Network).
 - **macOS plugins:** Mumcord 0.6.0 on macOS closes as soon as a plugin starts. Update to 0.6.1 or newer.
@@ -177,29 +185,31 @@ Mumcord is compatible with Mumble but **not affiliated with or endorsed by the M
 
 ## Ecosystem
 
-| Project                                                                                                                          | What it is                                                                                                                |
-| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| [Mumcord/mumbot](https://github.com/Mumcord/mumbot)                                                                              | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use                                 |
-| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)                                                                            | Optional community relay for direct connections when no direct path is possible; Mumcord has the relay client built in    |     |
-| [`mumble-client-protocol`](https://crates.io/crates/mumble-client-protocol)                                                      | Rust library for the Mumble protocol, in its own [repository](https://github.com/Mumcord/mumble-client-protocol)          |
-| [`mumcord-codec`](https://crates.io/crates/mumcord-codec)                                                                        | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots)                     |
-| [`mumcord-audio`](https://crates.io/crates/mumcord-audio)                                                                        | Audio device input and output on top of `mumcord-codec`                                                                   |
-| [`mumcord-store`](https://crates.io/crates/mumcord-store), [`mumcord-p2p`](https://crates.io/crates/mumcord-p2p)                 | Local storage and direct connections, on crates.io since 0.4.3                                                            |
-| [Mumcord/plugins](https://github.com/Mumcord/plugins)                                                                            | Plugin registry, the official plugins, the plugin template and the [plugin docs](https://mumcord.github.io/plugins/docs/) |
-| [`mumcord-plugin-sdk`](https://crates.io/crates/mumcord-plugin-sdk), [`mumcord-plugin`](https://crates.io/crates/mumcord-plugin) | SDK and command-line tool for writing Mumcord plugins (`cargo install mumcord-plugin`), on crates.io since 0.6.0          |
-| [`mumcord-plugins`](https://crates.io/crates/mumcord-plugins)                                                                    | Plugin host: sandboxed WebAssembly runtime, manifest and package handling, on crates.io since 0.6.0                       |
+| Project                                                                                                                          | What it is                                                                                                                                                                                                  |
+| -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Mumcord/mumbot](https://github.com/Mumcord/mumbot)                                                                              | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use                                                                                                                   |
+| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)                                                                            | Optional community relay for direct connections when no direct path is possible; Mumcord has the relay client built in                                                                                      |
+| [`mumble-client-protocol`](https://crates.io/crates/mumble-client-protocol)                                                      | Rust library for the Mumble protocol, in its own [repository](https://github.com/Mumcord/mumble-client-protocol)                                                                                            |
+| [`mumcord-codec`](https://crates.io/crates/mumcord-codec)                                                                        | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots)                                                                                                       |
+| [`mumcord-audio`](https://crates.io/crates/mumcord-audio)                                                                        | Audio device input and output on top of `mumcord-codec`                                                                                                                                                     |
+| [`hwcodec`](https://crates.io/crates/hwcodec)                                                                                    | AV1 and VP9 video encoders and decoders (graphics card or processor) for screen sharing and cameras, maintained by the Mumcord team in its own [repository](https://github.com/Mumcord/hwcodec) since 0.9.0 |
+| [`mumcord-store`](https://crates.io/crates/mumcord-store), [`mumcord-p2p`](https://crates.io/crates/mumcord-p2p)                 | Local storage and direct connections, on crates.io since 0.4.3                                                                                                                                              |
+| [Mumcord/plugins](https://github.com/Mumcord/plugins)                                                                            | Plugin registry, the official plugins, the plugin template and the [plugin docs](https://mumcord.github.io/plugins/docs/)                                                                                   |
+| [`mumcord-plugin-sdk`](https://crates.io/crates/mumcord-plugin-sdk), [`mumcord-plugin`](https://crates.io/crates/mumcord-plugin) | SDK and command-line tool for writing Mumcord plugins (`cargo install mumcord-plugin`), on crates.io since 0.6.0                                                                                            |
+| [`mumcord-plugins`](https://crates.io/crates/mumcord-plugins)                                                                    | Plugin host: sandboxed WebAssembly runtime, manifest and package handling, on crates.io since 0.6.0                                                                                                         |
 
 ## Roadmap
 
-| Stage                                                                                  | Status                                                                                                                                          |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Epic 1: Foundation (everyday client, chat, in-game, people)                            | Released, 0.1.0 to 0.3.1                                                                                                                        |
-| Epic 2: Multi-server and themes, watch party and screen sharing                        | Released, 0.4.0 to 0.4.3                                                                                                                        |
-| Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …)                 | Released, 0.5.0                                                                                                                                 |
-| Epic 3.1: Plugin system and the official plugins                                       | Released, 0.6.0; fixes in [0.6.1](https://github.com/Mumcord/mumcord/milestone/10)                                                              |
-| Epic 4.1: File sharing, camera sharing, screen-sharing upgrade and plugin platform 1.1 | Released, 0.7.0 to 0.7.2                                                                                                                        |
-| Epic 4: Admin features (channels, permissions, bans, registered users, admin commands) | Released, 0.8.0                                                                                                                                 |
-| Epics 5 and 6: Android and iOS apps, release and distribution (store listings)         | Later, see the [Epic 5](https://github.com/Mumcord/mumcord/milestone/6) and [Epic 6](https://github.com/Mumcord/mumcord/milestone/5) milestones |
+| Stage                                                                                                                           | Status                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Epic 1: Foundation (everyday client, chat, in-game, people)                                                                     | Released, 0.1.0 to 0.3.1                                                                                                                        |
+| Epic 2: Multi-server and themes, watch party and screen sharing                                                                 | Released, 0.4.0 to 0.4.3                                                                                                                        |
+| Epic 3: Comfort and polish (hotkeys, tray, whisper, Do Not Disturb, …)                                                          | Released, 0.5.0                                                                                                                                 |
+| Epic 3.1: Plugin system and the official plugins                                                                                | Released, 0.6.0; fixes in [0.6.1](https://github.com/Mumcord/mumcord/milestone/10)                                                              |
+| Epic 4.1: File sharing, camera sharing, screen-sharing upgrade and plugin platform 1.1                                          | Released, 0.7.0 to 0.7.2                                                                                                                        |
+| Epic 4: Admin features (channels, permissions, bans, registered users, admin commands)                                          | Released, 0.8.0                                                                                                                                 |
+| 0.9.0: video codecs as the open-source `hwcodec` crate, crash and freeze reports on Linux, engine groundwork for the phone apps | Released, 0.9.0                                                                                                                                 |
+| Epics 5 and 6: Android and iOS apps, release and distribution (store listings)                                                  | Later, see the [Epic 5](https://github.com/Mumcord/mumcord/milestone/6) and [Epic 6](https://github.com/Mumcord/mumcord/milestone/5) milestones |
 
 Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
 
@@ -213,7 +223,7 @@ Details: [Roadmap](https://github.com/Mumcord/mumcord/wiki/Roadmap) in the wiki.
 
 ## Troubleshooting
 
-For bug reports, use **Settings → Diagnostics → Save diagnostic file**: app version, OS, audio devices, connection statistics and recent log lines, with no chat, passwords or certificates. Mumcord also has a hidden [packet inspector](docs/packet-inspector.md) for debugging plugin data (click the version in About seven times). Then [open an issue](https://github.com/Mumcord/mumcord/issues/new/choose).
+For bug reports, use **Settings → Advanced & Developer → Save diagnostic file**: app version, OS, audio devices, connection statistics and recent log lines, with no chat, passwords or certificates. Crash reports are listed in the same place under **Crash reports**; on Linux they also cover a window that froze and say what ended Mumcord when it closed without a crash dialog, and they are only uploaded when you choose to. Mumcord also has a hidden [packet inspector](docs/packet-inspector.md) for debugging plugin data (click the version in About seven times). Then [open an issue](https://github.com/Mumcord/mumcord/issues/new/choose).
 
 | System  | Log folder                                                                                      |
 | ------- | ----------------------------------------------------------------------------------------------- |
@@ -225,7 +235,14 @@ Logs contain no chat, names or audio. Known problems and fixes: [Troubleshooting
 
 ## Building from source
 
-You need Rust 1.97+, Node.js 24 and the platform libraries listed on the wiki's [Building](https://github.com/Mumcord/mumcord/wiki/Building) page. Screen sharing also needs SVT-AV1 4.0+ and dav1d: on Linux the system packages (Arch: `svt-av1 dav1d`), or static builds from `scripts/build-svt-av1.sh` and `scripts/build-dav1d.sh` with `SVTAV1_STATIC_DIR` and `DAV1D_STATIC_DIR` pointing at them (Debian/Ubuntu ship an SVT-AV1 that is too old). On Linux and Windows the hardware encoders also need Intel's VPL dispatcher: run `scripts/build-hwenc-sdk.sh <dir>` and point `HWENC_SDK_DIR` at it, or on Linux install the system package (Debian/Ubuntu: `libvpl-dev`, Fedora: `libvpl-devel`, Arch: `libvpl`). Then:
+You need Rust 1.97+, Node.js 24 and the platform libraries listed on the wiki's [Building](https://github.com/Mumcord/mumcord/wiki/Building) page.
+
+Screen sharing and cameras encode and decode video with the [`hwcodec`](https://github.com/Mumcord/hwcodec) crate, which the Mumcord team maintains in its own repository. It links libvpx (VP9), SVT-AV1 4.0+ and dav1d (AV1) and, on Linux and Windows, Intel's VPL dispatcher for the hardware encoders. `.cargo/config.toml` sets `HWCODEC_USE_SYSTEM_LIBS=1`: each library comes from a prebuilt static build when its variable is set (`LIBVPX_STATIC_DIR`, `SVTAV1_STATIC_DIR`, `DAV1D_STATIC_DIR`, `HWENC_SDK_DIR`) and otherwise from the system through pkg-config. A missing library stops the build with its name instead of starting hwcodec's own source build.
+
+- **Linux:** the system packages (Debian/Ubuntu: `libvpx-dev`; Arch: `libvpx svt-av1 dav1d`). Debian and Ubuntu ship an SVT-AV1 that is too old: build static SVT-AV1 and dav1d with `scripts/build-svt-av1.sh <dir>` and `scripts/build-dav1d.sh <dir>` and point `SVTAV1_STATIC_DIR` and `DAV1D_STATIC_DIR` at them. For the hardware encoders either install the distribution's libvpl (Debian/Ubuntu: `libvpl-dev`, Fedora: `libvpl-devel`, Arch: `libvpl`) or run `scripts/build-hwenc-sdk.sh <dir>` and point `HWENC_SDK_DIR` at it.
+- **Windows and macOS:** build the static libraries with `scripts/build-libvpx.sh`, `scripts/build-svt-av1.sh`, `scripts/build-dav1d.sh` and, on Windows, `scripts/build-hwenc-sdk.sh`, each with a target folder, and point the matching variable at it (see [RELEASING.md](RELEASING.md#static-libvpx)).
+
+Then:
 
 ```sh
 git clone https://github.com/Mumcord/mumcord.git && cd mumcord
@@ -238,7 +255,7 @@ npm run tauri dev
 
 - Message cards: how bots and people write them is in [docs/message-cards.md](docs/message-cards.md).
 - Version: a local build shows `dev~YYYYMMDD` in Settings → About and in the diagnostics file, plus `-dirty` when the tree has uncommitted changes; set `MUMCORD_VERSION` to override it. Release and CI versions: [RELEASING.md](RELEASING.md#versions).
-- Release packages: `npm run tauri build`; bundles land in `target/release/bundle/`. Windows and macOS link a static libvpx, see [RELEASING.md](RELEASING.md#static-libvpx).
+- Release packages: `npm run tauri build`; bundles land in `target/release/bundle/`. Release bundles on every platform link a static libvpx, see [RELEASING.md](RELEASING.md#static-libvpx).
 - Checks before a pull request:
 
   ```sh
@@ -250,7 +267,7 @@ npm run tauri dev
 
 - Local Mumble servers for manual and automated tests: [`testenv/README.md`](testenv/README.md). Never test against public servers.
 - UI end-to-end tests (`npm run e2e`, needs Docker): [`e2e/README.md`](e2e/README.md).
-- Manual checklists: [release 0.4.0](docs/manual-checklist-0.4.0.md), [screen sharing on Windows](docs/screen-share-windows.md) and [on macOS](docs/screen-share-macos.md); measurements in [docs/screen-share-performance.md](docs/screen-share-performance.md).
+- Manual checklists: [release 0.9.0](docs/manual-checklist-0.9.0.md), [release 0.5.0](docs/manual-checklist-0.5.0.md), [release 0.4.0](docs/manual-checklist-0.4.0.md), [screen sharing on Windows](docs/screen-share-windows.md) and [on macOS](docs/screen-share-macos.md); measurements in [docs/screen-share-performance.md](docs/screen-share-performance.md).
 - Third-party notices are generated by CI for every release (and a pull request updates them after dependency changes on `main`); to check them locally run `scripts/generate-notices.sh`.
 - Maintainers: cutting a release is described in [RELEASING.md](RELEASING.md).
 

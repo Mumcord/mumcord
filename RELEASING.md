@@ -33,7 +33,7 @@ Between a release and the merge of its sync pull request (step 4), the manifests
 
 No release pull request is needed. Make sure `CHANGELOG.md` on `main` has a section for the version, headed `## [0.4.3] - Unreleased` (a plain `## [Unreleased]` section works too: it is renamed after the release). Its text becomes the "What's new" part of the release notes, so write it for users. Do not put a date in the heading; the sync pull request (step 4) adds the tag's date.
 
-Work through the manual checks of the release, for 0.4.0 [docs/manual-checklist-0.4.0.md](docs/manual-checklist-0.4.0.md).
+Work through the manual checks of the release, for 0.9.0 [docs/manual-checklist-0.9.0.md](docs/manual-checklist-0.9.0.md).
 
 ## 2. Tag the release on `main`
 
