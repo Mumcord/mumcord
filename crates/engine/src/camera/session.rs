@@ -457,6 +457,11 @@ pub(crate) struct Cameras {
 pub(crate) type ServerCameras = std::sync::Mutex<Cameras>;
 
 impl Cameras {
+    /// Whether the embedding app set a backend ([`Engine::camera_set_backend`]).
+    pub(super) fn has_set_backend(&self) -> bool {
+        self.backend.is_some()
+    }
+
     pub(super) fn backend(&mut self) -> Option<Arc<dyn CameraBackend>> {
         if self.backend.is_none() {
             self.backend = TestCameraMode::from_env()
