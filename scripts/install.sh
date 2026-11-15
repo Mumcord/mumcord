@@ -600,10 +600,10 @@ fetch_repo_key() {
     actual=$(sha256_of "$work/$1")
     if [ "$actual" != "$2" ]; then
         rm -f "$work/$1"
-        step fail "Repository key" "does not match the expected hash"
+        step fail "Signing key" "does not match the expected hash"
         die "the repository key $1 is not the one this script expects. Nothing was installed."
     fi
-    step ok "Repository key" "$1 downloaded, hash OK"
+    step ok "Signing key" "$1 downloaded, hash OK"
 }
 
 # put_file SRC DEST: installs a world-readable file as administrator, creating the folder.
@@ -748,12 +748,20 @@ choose_method() {
     fi
     method=repo
     can_ask || return 0
+    # The menu names this system's own tools, so the choice is concrete.
+    case $1 in
+    debian) tool=apt package_label='.deb package from the release: you update it by hand' ;;
+    fedora) tool=dnf package_label='.rpm package from the release: you update it by hand' ;;
+    suse) tool=zypper package_label='.rpm package from the release: you update it by hand' ;;
+    arch) tool=pacman package_label='AUR package mumcord-bin: updates come with your AUR helper' ;;
+    *) tool=pkg package_label='.pkg package from the release: run this script again to update' ;;
+    esac
     {
         printf '  %s%s%s How do you want to install Mumcord?\n' "$ACCENT" "$MARK_ASK" "$RESET"
-        printf '      1) Package repository (recommended, updates come with apt/dnf/zypper/pacman/pkg)\n'
-        printf '      2) Download package (.deb/.rpm/AUR/.pkg, as today)\n'
+        printf '      1) Package repository: updates come with %s (recommended)\n' "$tool"
+        printf '      2) %s\n' "$package_label"
         case $avail in
-        *appimage*) printf '      3) AppImage (Linux only)\n' ;;
+        *appimage*) printf '      3) AppImage in your home folder: updates itself, no root needed\n' ;;
         esac
         printf '  Choose [1]: '
     } >/dev/tty

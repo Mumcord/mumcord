@@ -119,7 +119,7 @@ if [ "$expected" = appimage ]; then
     out=$(printf '3\nn\n' | script -qec "env TERM=xterm-256color LANG=C.UTF-8 sh $installer --no-desktop-icon" /dev/null 2>&1)
     printf '%s\n' "$out"
     printf '%s\n' "$out" | grep -qF "Package repository (recommended" || fail "no method question"
-    printf '%s\n' "$out" | grep -qF "AppImage (Linux only)" || fail "the AppImage option is missing"
+    printf '%s\n' "$out" | grep -qF "AppImage in your home folder" || fail "the AppImage option is missing"
     [ -x "$appimage" ] || fail "answer 3 did not install the AppImage"
 
     unset MUMCORD_RELEASE_URL
