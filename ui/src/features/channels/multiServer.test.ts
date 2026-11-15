@@ -49,7 +49,13 @@ describe("several connected servers", () => {
 
     act(() => {
       api.mock.emit("channelRemoved", { serverId: 1, channelId: 3 });
-      api.mock.emit("userRemoved", { serverId: 1, session: 2 });
+      api.mock.emit("userRemoved", {
+        serverId: 1,
+        session: 2,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
       api.mock.emit("talkStateChanged", { serverId: 1, session: 3, talking: true });
     });
     expect(getServerStateOf(1).channels.has(3)).toBe(false);

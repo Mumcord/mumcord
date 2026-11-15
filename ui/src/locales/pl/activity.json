@@ -17,7 +17,11 @@
     "watchPartyStopped": "zakończył(-a) wspólne oglądanie",
     "pluginActivityStarted": "uruchomił(-a) {{plugin}}",
     "pluginActivityStopped": "zakończył(-a) {{plugin}}",
-    "pluginEvent": "„{{text}}”"
+    "pluginEvent": "„{{text}}”",
+    "kicked": "został(a) wyrzucony(-a)",
+    "banned": "został(a) zbanowany(-a)",
+    "kickedBy": "został(a) wyrzucony(-a) przez {{name}}",
+    "bannedBy": "został(a) zbanowany(-a) przez {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "wtyczka",

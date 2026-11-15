@@ -17,7 +17,11 @@
     "watchPartyStopped": "stop breathnú le chéile",
     "pluginActivityStarted": "thosaigh {{plugin}}",
     "pluginActivityStopped": "stop {{plugin}}",
-    "pluginEvent": "“{{text}}”"
+    "pluginEvent": "“{{text}}”",
+    "kicked": "díbríodh é/í",
+    "banned": "cuireadh cosc air/uirthi",
+    "kickedBy": "díbríodh é/í ag {{name}}",
+    "bannedBy": "cuireadh cosc air/uirthi ag {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "breiseán",

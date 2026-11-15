@@ -183,7 +183,13 @@ describe("MembersPanel", () => {
     });
     expect(member(/^Zanna/)).toHaveAccessibleName(/listening only/);
     act(() => {
-      api.mock.emit("userRemoved", { serverId: 1, session: anna.session });
+      api.mock.emit("userRemoved", {
+        serverId: 1,
+        session: anna.session,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(screen.queryByRole("button", { name: /^Zanna/ })).not.toBeInTheDocument();
   });
@@ -374,7 +380,13 @@ describe("MembersPanel", () => {
     openFullProfile(/^Anna/);
     await screen.findByRole("dialog", { name: "Anna" });
     act(() => {
-      api.mock.emit("userRemoved", { serverId: 1, session: 2 });
+      api.mock.emit("userRemoved", {
+        serverId: 1,
+        session: 2,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(screen.queryByRole("dialog")).toBeNull();
   });

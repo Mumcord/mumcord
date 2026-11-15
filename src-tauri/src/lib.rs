@@ -1075,7 +1075,19 @@ fn emit_engine_event(
             user: user.into(),
         }
         .emit(app),
-        EngineEvent::UserRemoved(session) => people::UserRemoved { server_id, session }.emit(app),
+        EngineEvent::UserRemoved {
+            session,
+            actor,
+            reason,
+            ban,
+        } => people::UserRemoved {
+            server_id,
+            session,
+            actor,
+            reason,
+            ban,
+        }
+        .emit(app),
         EngineEvent::TalkStateChanged { session, talking } => people::TalkStateChanged {
             server_id,
             session,

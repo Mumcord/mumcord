@@ -117,6 +117,17 @@ fn hex(bytes: &[u8]) -> String {
     })
 }
 
+/// The comment's hash as Mumble computes it (SHA-1 of the text), so a comment sent in full and
+/// one sent as a hash compare equal.
+fn comment_hash(user: &User) -> Option<String> {
+    use sha1::{Digest, Sha1};
+    if let Some(hash) = user.comment_hash.as_deref() {
+        return Some(hex(hash));
+    }
+    let comment = user.comment.as_deref().filter(|c| !c.is_empty())?;
+    Some(hex(&Sha1::digest(comment.as_bytes())))
+}
+
 pub fn user_view(
     user: &User,
     local: PersonSetting,
@@ -141,6 +152,7 @@ pub fn user_view(
             || user.texture.as_ref().is_some_and(|t| !t.is_empty()),
         has_comment: user.comment_hash.is_some()
             || user.comment.as_ref().is_some_and(|c| !c.is_empty()),
+        comment_hash: comment_hash(user),
         volume: local.volume,
         local_mute: local.local_mute,
         share_volume: local.share_volume,
@@ -366,6 +378,34 @@ pub fn right_of(bits: u32) -> Option<Right> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use sha1::Digest;
+
+    #[test]
+    fn a_comment_hash_is_the_same_whether_the_server_sent_the_text_or_the_hash() {
+        let text = User {
+            comment: Some("<b>back at 8</b>".into()),
+            ..User::default()
+        };
+        let digest = sha1::Sha1::digest(b"<b>back at 8</b>");
+        let hashed = User {
+            comment_hash: Some(digest.to_vec()),
+            ..User::default()
+        };
+        let from_text = comment_hash(&text);
+        assert_eq!(from_text, Some(hex(&digest)));
+        assert_eq!(comment_hash(&hashed), from_text);
+        let changed = User {
+            comment: Some("<b>back at 9</b>".into()),
+            ..User::default()
+        };
+        assert_ne!(comment_hash(&changed), from_text);
+        assert_eq!(comment_hash(&User::default()), None);
+        let empty = User {
+            comment: Some(String::new()),
+            ..User::default()
+        };
+        assert_eq!(comment_hash(&empty), None);
+    }
 
     #[test]
     fn a_refusal_names_its_kind_and_right() {

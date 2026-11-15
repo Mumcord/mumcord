@@ -17,7 +17,11 @@
     "watchPartyStopped": "lõpetas ühisvaatamise",
     "pluginActivityStarted": "käivitas {{plugin}}",
     "pluginActivityStopped": "lõpetas {{plugin}}",
-    "pluginEvent": "„{{text}}“"
+    "pluginEvent": "„{{text}}“",
+    "kicked": "visati välja",
+    "banned": "keelustati",
+    "kickedBy": "visati välja kasutaja {{name}} poolt",
+    "bannedBy": "keelustati kasutaja {{name}} poolt"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",

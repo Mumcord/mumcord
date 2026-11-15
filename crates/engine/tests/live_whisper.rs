@@ -258,7 +258,7 @@ async fn a_whisper_stays_with_the_person_it_was_started_for() {
     twin.disconnect().await.expect("twin leaves");
     wait_for(&mut rx, "the twin to leave", |e| match e {
         EngineEvent::WhisperEnded => panic!("the whisper still has a listener"),
-        EngineEvent::UserRemoved(session) if *session == twin_session => Some(()),
+        EngineEvent::UserRemoved { session, .. } if *session == twin_session => Some(()),
         _ => None,
     })
     .await;

@@ -17,7 +17,11 @@
     "watchPartyStopped": "waqqaf il-ħarsa flimkien",
     "pluginActivityStarted": "beda {{plugin}}",
     "pluginActivityStopped": "waqqaf {{plugin}}",
-    "pluginEvent": "“{{text}}”"
+    "pluginEvent": "“{{text}}”",
+    "kicked": "tkeċċa",
+    "banned": "ġie pprojbit",
+    "kickedBy": "tkeċċa minn {{name}}",
+    "bannedBy": "ġie pprojbit minn {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",

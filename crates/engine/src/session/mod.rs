@@ -3040,7 +3040,12 @@ impl Inner {
                 }
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
             }
-            Event::UserRemoved { user, .. } => {
+            Event::UserRemoved {
+                user,
+                actor,
+                reason,
+                ban,
+            } => {
                 let mut core = lock(&self.core);
                 if let Some(slot) = core.slots.get_mut(&server_id) {
                     slot.people.forget(user.session);
@@ -3096,7 +3101,12 @@ impl Inner {
                     user.session,
                 );
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
-                ctx.events.emit(EngineEvent::UserRemoved(user.session));
+                ctx.events.emit(EngineEvent::UserRemoved {
+                    session: user.session,
+                    actor: *actor,
+                    reason: reason.clone(),
+                    ban: *ban,
+                });
             }
             Event::PermissionDenied(denied) => {
                 // A refusal answers the open kick or ban dialog (issue #253, FR-10.59).

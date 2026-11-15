@@ -50,8 +50,17 @@ export type ServerChange =
   | { kind: "connection" }
   | { kind: "channels" }
   | { kind: "userUpserted"; previous: User | undefined; user: User }
-  | { kind: "userRemoved"; user: User }
+  | { kind: "userRemoved"; user: User; removedBy: Removal | null }
   | { kind: "talk"; session: number; talking: boolean };
+
+/**
+ * A kick or ban from the standard Mumble `UserRemove` message: `name` is the person who did it
+ * as known at that moment, `null` when the server named nobody or they are gone.
+ */
+export interface Removal {
+  name: string | null;
+  ban: boolean;
+}
 
 const EMPTY: ServerState = {
   connection: { state: "disconnected", error: null },
@@ -92,7 +101,7 @@ export type ServerEvent =
   | { kind: "channelsUpserted"; channels: readonly ChannelInfo[] }
   | { kind: "channelRemoved"; channelId: number }
   | { kind: "userUpserted"; user: User }
-  | { kind: "userRemoved"; session: number }
+  | { kind: "userRemoved"; session: number; actor: number | null; ban: boolean }
   | { kind: "talk"; session: number; talking: boolean };
 
 /** Runs `flush` soon; returns a function that cancels it. */
@@ -295,7 +304,14 @@ export function applyEvents(
         if (!user) break;
         ownUsers().delete(event.session);
         if (next.talking.has(event.session)) ownTalking().delete(event.session);
-        record({ kind: "userRemoved", user });
+        const removedBy =
+          event.actor === null && !event.ban
+            ? null
+            : {
+                name: event.actor === null ? null : (next.users.get(event.actor)?.name ?? null),
+                ban: event.ban,
+              };
+        record({ kind: "userRemoved", user, removedBy });
         break;
       }
       case "talk":
@@ -363,8 +379,8 @@ function bind(api: MumcordApi): void {
     api.on("userUpserted", ({ serverId, user }) => {
       enqueue(serverId, { kind: "userUpserted", user });
     }),
-    api.on("userRemoved", ({ serverId, session }) => {
-      enqueue(serverId, { kind: "userRemoved", session });
+    api.on("userRemoved", ({ serverId, session, actor, ban }) => {
+      enqueue(serverId, { kind: "userRemoved", session, actor, ban });
     }),
     api.on("talkStateChanged", ({ serverId, session, talking }) => {
       enqueue(serverId, { kind: "talk", session, talking });
