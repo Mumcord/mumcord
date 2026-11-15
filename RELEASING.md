@@ -209,6 +209,13 @@ One-time setup:
 3. Create the package once by hand: `git clone ssh://aur@aur.archlinux.org/mumcord-bin.git`, copy `packaging/aur/PKGBUILD` (with real version and checksums) and a `.SRCINFO` into it, commit and push.
 4. In the GitHub repository add the secret `AUR_SSH_KEY` (Settings > Secrets and variables > Actions) with the content of the private key file `aur-key`. Then delete the local key files.
 
+## Package repository (packages.mumcord.app)
+
+The signed APT, RPM, pacman and FreeBSD repository ([user docs](docs/package-repository.md), [keys](CODE_SIGNING.md#linux-and-freebsd-package-repository)) is updated automatically when you click **Publish release** (step 4); pre-releases are skipped. `.github/workflows/package-repo.yml` rebuilds the whole site from that release's `.deb`, `.rpm` and `.pkg` (checked against `SHA256SUMS`), signs it, checks it in Debian, Ubuntu, Fedora, openSUSE, Arch and FreeBSD (a changed index or package must be rejected, then Mumcord must install), and only then deploys it to GitHub Pages. Only the newest release is kept. Without the secrets `PACKAGE_REPO_GPG_KEY` and `FREEBSD_REPO_KEY` it skips itself.
+
+- **Publish again or an older release:** Actions → **Package repository** → **Run workflow** on `main`, optionally with a tag. A run on another branch builds and checks everything but does not deploy.
+- **Hosting:** GitHub Pages of this repository (source: GitHub Actions), custom domain `packages.mumcord.app` (DNS: `CNAME packages → mumcord.github.io`). The `github-pages` environment deploys only from `main`. Pages allows a 1 GB site and about 100 GB traffic a month; if traffic outgrows that, move the same files to object storage behind the same domain, and users change nothing.
+
 ## If the workflow fails
 
 Nothing has been published, so it is safe to start over:

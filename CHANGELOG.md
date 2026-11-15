@@ -2,8 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Linux and FreeBSD package repository at https://packages.mumcord.app (issue #620): Debian, Ubuntu and Mint (APT), Fedora (DNF), openSUSE (zypper), Arch (pacman) and FreeBSD 15.x (`pkg`) can add it once and then get every new stable release through `apt upgrade`, `dnf upgrade`, `zypper update`, `pacman -Syu` or `pkg upgrade`. The repository metadata and the packages are signed with a dedicated Mumcord key (fingerprint `A4096249A499587C9AEF13E7F022C81D47D2BBEB`; FreeBSD uses its own `pkg` key), so a changed package or index is rejected. Steps and fingerprints are in `docs/package-repository.md`. The release workflow publishes each stable release there automatically after checking it on every supported system
+- The install script asks how to install Mumcord: from the package repository (the default where the system supports it), as a downloaded package, or as an AppImage; `--method repo|package|appimage` chooses without asking. `--uninstall` also removes the repository setup
+- When Mumcord was installed from the package repository, the update dialog shows the package manager command to update it (e.g. `sudo apt update && sudo apt install --only-upgrade mumcord`) instead of pointing to the release page
+
 ### Fixed
 
+- The MUMCORD lettering at the top of the install script lines up again
 - Servers that publish their address as a DNS SRV record (`_mumble._tcp.<domain>`) can be joined by entering just the domain, like in the official Mumble client (issue #859): for an address without a port Mumcord looks up the record and connects to the host and port it names, in the order of its priority and weight, and moves on to the next one when a target cannot be reached. Without a record, or when the lookup fails, it connects to the address on port 64738 as before. An explicitly entered port other than 64738 skips the lookup. This applies to saved servers, `mumble://` links without a port, reconnects, "Test connection" and the online status in the server list; the trusted certificate stays tied to the saved server, so a changed certificate still asks
 - Scrollbars are no longer drawn on top of menus, popovers and dialogs (issue #875): every scrolling list and panel now has a slim scrollbar in the theme's colours, dark and light, that sits beside the content instead of floating over it, so it no longer covers row highlights or buttons at the right edge either. The scrollbar shows while you scroll or point at it and hides again a second after scrolling stops
 
