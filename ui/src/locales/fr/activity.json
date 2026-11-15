@@ -17,7 +17,11 @@
     "watchPartyStopped": "a terminé une soirée de visionnage",
     "pluginActivityStarted": "a lancé {{plugin}}",
     "pluginActivityStopped": "a arrêté {{plugin}}",
-    "pluginEvent": "« {{text}} »"
+    "pluginEvent": "« {{text}} »",
+    "kicked": "a été expulsé",
+    "banned": "a été banni",
+    "kickedBy": "a été expulsé par {{name}}",
+    "bannedBy": "a été banni par {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",

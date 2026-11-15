@@ -87,6 +87,12 @@ pub struct UserUpserted {
 pub struct UserRemoved {
     pub server_id: ServerId,
     pub session: SessionId,
+    /// Who kicked or banned the person; `null` when they left on their own.
+    pub actor: Option<SessionId>,
+    /// The reason the kicker gave; untrusted plain text from the server.
+    pub reason: Option<String>,
+    /// A ban rather than a kick.
+    pub ban: bool,
 }
 
 /// Someone (including the own user) started or stopped talking.

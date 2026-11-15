@@ -17,7 +17,11 @@
     "watchPartyStopped": "спря общото гледане",
     "pluginActivityStarted": "стартира {{plugin}}",
     "pluginActivityStopped": "спря {{plugin}}",
-    "pluginEvent": "„{{text}}“"
+    "pluginEvent": "„{{text}}“",
+    "kicked": "беше изгонен(а)",
+    "banned": "беше блокиран(а)",
+    "kickedBy": "беше изгонен(а) от {{name}}",
+    "bannedBy": "беше блокиран(а) от {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "добавка",

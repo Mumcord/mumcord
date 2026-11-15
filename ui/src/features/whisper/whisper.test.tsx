@@ -77,7 +77,13 @@ describe("incoming whisper marks (issue #67)", () => {
     });
     expect(screen.getByRole("img")).toBeInTheDocument();
     act(() => {
-      api.mock.emit("userRemoved", { serverId: 1, session: 7 });
+      api.mock.emit("userRemoved", {
+        serverId: 1,
+        session: 7,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(screen.queryByRole("img")).toBeNull();
   });

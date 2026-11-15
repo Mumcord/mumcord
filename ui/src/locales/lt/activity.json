@@ -17,7 +17,11 @@
     "watchPartyStopped": "baigė bendrą peržiūrą",
     "pluginActivityStarted": "pradėjo {{plugin}}",
     "pluginActivityStopped": "baigė {{plugin}}",
-    "pluginEvent": "„{{text}}“"
+    "pluginEvent": "„{{text}}“",
+    "kicked": "buvo išmestas (-a)",
+    "banned": "buvo užblokuotas (-a)",
+    "kickedBy": "buvo išmestas (-a), išmetė {{name}}",
+    "bannedBy": "buvo užblokuotas (-a), užblokavo {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "papildinys",

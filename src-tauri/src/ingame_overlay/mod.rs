@@ -469,7 +469,7 @@ pub fn on_engine_event(runtime: &Runtime, engine: &Engine, event: &mumcord_engin
         }
         E::ServerSynced(_)
         | E::UserUpserted(_)
-        | E::UserRemoved(_)
+        | E::UserRemoved { .. }
         | E::ChannelUpserted(_)
         | E::ChannelsUpserted(_)
         | E::ChannelRemoved(_) => {

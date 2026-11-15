@@ -4,6 +4,7 @@
 
 ### Added
 
+- The activity log and its notices say "{name} was kicked by {name}" or "was banned by {name}" when the server removes someone with a kick or ban, instead of a plain "disconnected"; who did it comes from the standard Mumble `UserRemove` message
 - A camera tile shows "{name} paused the camera" instead of a frozen last picture while the person's phone app is in the background (the coming Android and iOS apps pause their camera there); the pause travels as an extra field of the existing camera announcement, so older Mumcord versions keep showing the camera as before
 - Linux and FreeBSD package repository at https://packages.mumcord.app (issue #620): Debian, Ubuntu and Mint (APT), Fedora (DNF), openSUSE (zypper), Arch (pacman) and FreeBSD 15.x (`pkg`) can add it once and then get every new stable release through `apt upgrade`, `dnf upgrade`, `zypper update`, `pacman -Syu` or `pkg upgrade`. The repository metadata and the packages are signed with a dedicated Mumcord key (fingerprint `A4096249A499587C9AEF13E7F022C81D47D2BBEB`; FreeBSD uses its own `pkg` key), so a changed package or index is rejected. Steps and fingerprints are in `docs/package-repository.md`. The release workflow publishes each stable release there automatically after checking it on every supported system; opened in a browser, the address shows the install steps and the key fingerprint
 - The install script asks how to install Mumcord: from the package repository (the default where the system supports it), as a downloaded package, or as an AppImage; `--method repo|package|appimage` chooses without asking. `--uninstall` also removes the repository setup
@@ -37,6 +38,7 @@
 
 ### Internal
 
+- Engine: `EngineEvent::UserRemoved` carries who kicked or banned the person, the reason and whether it was a ban; `UserView.comment_hash` changes whenever a person's comment changes; `set_own_avatar_bytes` sets the own avatar from image bytes without a file (for the phone apps)
 - Engine: `camera_set_tiles_wanted_by_default`, `camera_tile_set_wanted` and `camera_tile_path` for the phone apps, which load a camera only after the user taps it and show how it arrives; the desktop keeps loading every shown camera
 - Engine: a camera backend set by the embedding app counts as a camera backend, and Android and iOS builds count as platforms with a camera; before, any camera availability refresh (P2P mode, relay or direct-connections change) stopped a phone's camera as "not supported on this platform"
 - Native video-library build scripts honor explicit job limits (`CARGO_BUILD_JOBS` for libvpx and dav1d, `CMAKE_BUILD_PARALLEL_LEVEL` for SVT-AV1 and the hardware encoder SDK), allowing single-job builds on Raspberry Pi without changing other platforms' defaults; added regression checks and a Raspberry Pi build/test guide

@@ -193,7 +193,7 @@ impl PluginSounds {
                     talkers.remove(session);
                 }
             }
-            EngineEvent::UserRemoved(session) => {
+            EngineEvent::UserRemoved { session, .. } => {
                 talkers.remove(session);
             }
             _ => return,
@@ -660,7 +660,12 @@ mod tests {
             (gain() - 0.7 * DUCK_GAIN).abs() < 1e-6,
             "−12 dB while talking"
         );
-        sounds.observe(&EngineEvent::UserRemoved(3));
+        sounds.observe(&EngineEvent::UserRemoved {
+            session: 3,
+            actor: None,
+            reason: None,
+            ban: false,
+        });
         assert!(
             (gain() - 0.7).abs() < 1e-6,
             "a removed talker stops ducking"

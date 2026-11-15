@@ -5826,6 +5826,12 @@ export type UserName = {
 export type UserRemoved = {
 	serverId: number,
 	session: number,
+	/**  Who kicked or banned the person; `null` when they left on their own. */
+	actor: number | null,
+	/**  The reason the kicker gave; untrusted plain text from the server. */
+	reason: string | null,
+	/**  A ban rather than a kick. */
+	ban: boolean,
 };
 
 /**

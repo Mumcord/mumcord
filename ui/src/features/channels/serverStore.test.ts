@@ -101,7 +101,13 @@ describe("server store", () => {
           enterRestricted: false,
         },
       });
-      api.mock.emit("userRemoved", { serverId: 1, session: 2 });
+      api.mock.emit("userRemoved", {
+        serverId: 1,
+        session: 2,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(result.current.channels.get(9)?.name).toBe("Sub");
     expect(result.current.users.has(2)).toBe(false);
@@ -290,7 +296,7 @@ describe("applyEvents", () => {
     const start = base();
     const { next, changes } = applyEvents(start, [
       { kind: "talk", session: 5, talking: false },
-      { kind: "userRemoved", session: 99 },
+      { kind: "userRemoved", session: 99, actor: null, ban: false },
     ]);
     expect(next).toBe(start);
     expect(changes).toEqual([]);

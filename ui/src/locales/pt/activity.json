@@ -17,7 +17,11 @@
     "watchPartyStopped": "terminou a sessão de visualização",
     "pluginActivityStarted": "iniciou {{plugin}}",
     "pluginActivityStopped": "parou {{plugin}}",
-    "pluginEvent": "«{{text}}»"
+    "pluginEvent": "«{{text}}»",
+    "kicked": "foi expulso",
+    "banned": "foi banido",
+    "kickedBy": "foi expulso por {{name}}",
+    "bannedBy": "foi banido por {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",

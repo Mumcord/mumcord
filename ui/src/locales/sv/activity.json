@@ -17,7 +17,11 @@
     "watchPartyStopped": "avslutade watch partyt",
     "pluginActivityStarted": "startade {{plugin}}",
     "pluginActivityStopped": "stoppade {{plugin}}",
-    "pluginEvent": "”{{text}}”"
+    "pluginEvent": "”{{text}}”",
+    "kicked": "sparkades ut",
+    "banned": "stängdes av",
+    "kickedBy": "sparkades ut av {{name}}",
+    "bannedBy": "stängdes av av {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "tillägg",

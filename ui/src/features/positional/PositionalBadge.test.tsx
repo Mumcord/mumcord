@@ -66,7 +66,13 @@ describe("PositionalBadge", () => {
       api.mock.emit("positionalSendingChanged", { serverId: 1, session: 7, sending: true });
     });
     act(() => {
-      api.mock.emit("userRemoved", { serverId: 1, session: 7 });
+      api.mock.emit("userRemoved", {
+        serverId: 1,
+        session: 7,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(screen.queryByRole("img", { name: "Positional audio active" })).toBeNull();
   });
