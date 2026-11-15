@@ -57,7 +57,8 @@
       "openReleasePage": "Abrir a página da versão",
       "manual": "Transfere a nova versão a partir da página da versão.",
       "manualPackage": "Transfere o pacote a partir da página da versão e instala-o depois com:",
-      "manualAur": "Atualiza-o com o teu assistente de AUR:"
+      "manualAur": "Atualiza-o com o teu assistente de AUR:",
+      "manualRepo": "O Mumcord vem do seu repositório de pacotes. Atualiza-o com o teu gestor de pacotes:"
     },
     "tags": {
       "added": "Adicionado",

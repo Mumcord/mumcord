@@ -121,7 +121,7 @@ run() {
     out=$(env -i HOME="$work/home" PATH="$bin" FAKE_LOG="$log" FAKE_STATE="$state" \
         FAKE_RELEASE=15.1-RELEASE FAKE_MACHINE=amd64 \
         MUMCORD_RELEASE_URL="http://release.invalid/$folder" $vars \
-        "$shell" "$installer" --yes --no-desktop-icon "$@" 2>&1) && status=0 || status=$?
+        "$shell" "$installer" --yes --no-desktop-icon --method package "$@" 2>&1) && status=0 || status=$?
     printf '%s\n' "$out"
 }
 

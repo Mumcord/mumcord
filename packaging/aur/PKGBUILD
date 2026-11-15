@@ -16,7 +16,7 @@ optdepends=('pipewire-alsa: audio through PipeWire'
             'pulseaudio-alsa: audio through PulseAudio')
 provides=('mumcord')
 conflicts=('mumcord')
-options=('!debug')
+options=('!debug' '!strip')
 _base="$url/releases/download/v$pkgver"
 source_x86_64=("$_base/${_name}_${pkgver}_amd64.deb")
 source_aarch64=("$_base/${_name}_${pkgver}_arm64.deb")

@@ -953,6 +953,10 @@
       "deb": "il-pakkett .deb",
       "rpm": "il-pakkett .rpm",
       "aur": "l-AUR",
+      "aptRepo": "ir-repożitorju APT ta' Mumcord",
+      "dnfRepo": "ir-repożitorju DNF ta' Mumcord",
+      "zypperRepo": "ir-repożitorju zypper ta' Mumcord",
+      "pacmanRepo": "ir-repożitorju pacman ta' Mumcord",
       "otherLinux": "pakkett tal-Linux"
     },
     "mode": "Meta jinstab aġġornament",

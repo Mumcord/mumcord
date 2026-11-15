@@ -947,6 +947,10 @@
       "deb": "pakiet .deb",
       "rpm": "pakiet .rpm",
       "aur": "AUR",
+      "aptRepo": "repozytorium APT Mumcorda",
+      "dnfRepo": "repozytorium DNF Mumcorda",
+      "zypperRepo": "repozytorium zypper Mumcorda",
+      "pacmanRepo": "repozytorium pacman Mumcorda",
       "otherLinux": "pakiet dla Linuksa"
     },
     "mode": "Gdy znajdzie się aktualizacja",

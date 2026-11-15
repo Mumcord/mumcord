@@ -1,7 +1,8 @@
 name: Installer
 
 # Tests the curl installer (scripts/install.sh) in distribution containers against a fake
-# release served from the runner over http, so no test ever downloads from github.com. The fake
+# release served from the runner over http, so no test ever downloads from github.com (the
+# installer's default, the package repository, is tested with faked tools). The fake
 # packages carry the real asset names but only a stub program: installing the real .deb and .rpm
 # is already checked in build-and-smoke.yml, and this keeps the job a few minutes long instead
 # of waiting for the full app build.
@@ -46,6 +47,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Test
         run: sh scripts/install-test/check-freebsd.sh
+
+  # The package-repository method (apt, dnf, zypper, pacman, pkg) with faked package managers:
+  # the config files it writes, the key check, the upgrade on a second run and the uninstall.
+  repository:
+    name: Repository method (faked tools)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Test
+        run: sh scripts/install-test/check-repo.sh
 
   fake-release:
     name: Build fake release

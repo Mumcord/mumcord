@@ -947,6 +947,10 @@
       "deb": ".deb paketas",
       "rpm": ".rpm paketas",
       "aur": "AUR",
+      "aptRepo": "„Mumcord“ APT saugykla",
+      "dnfRepo": "„Mumcord“ DNF saugykla",
+      "zypperRepo": "„Mumcord“ zypper saugykla",
+      "pacmanRepo": "„Mumcord“ pacman saugykla",
       "otherLinux": "Linux paketas"
     },
     "mode": "Kai randamas naujinys",

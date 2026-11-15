@@ -57,7 +57,8 @@
       "openReleasePage": "Apri la pagina della versione",
       "manual": "Scarica la nuova versione dalla pagina della versione.",
       "manualPackage": "Scarica il pacchetto dalla pagina della versione, poi installalo con:",
-      "manualAur": "Aggiornalo con il tuo helper AUR:"
+      "manualAur": "Aggiornalo con il tuo helper AUR:",
+      "manualRepo": "Mumcord proviene dal suo repository di pacchetti. Aggiornalo con il tuo gestore di pacchetti:"
     },
     "tags": {
       "added": "Aggiunto",

@@ -935,6 +935,10 @@
       "deb": "het .deb-pakket",
       "rpm": "het .rpm-pakket",
       "aur": "de AUR",
+      "aptRepo": "de Mumcord-APT-repository",
+      "dnfRepo": "de Mumcord-DNF-repository",
+      "zypperRepo": "de Mumcord-zypper-repository",
+      "pacmanRepo": "de Mumcord-pacman-repository",
       "otherLinux": "een Linux-pakket"
     },
     "mode": "Als er een update wordt gevonden",

@@ -57,7 +57,8 @@
       "openReleasePage": "Otvori stranicu izdanja",
       "manual": "Preuzmi novu verziju sa stranice izdanja.",
       "manualPackage": "Preuzmi paket sa stranice izdanja, a zatim ga instaliraj naredbom:",
-      "manualAur": "Ažuriraj ga svojim AUR pomoćnikom:"
+      "manualAur": "Ažuriraj ga svojim AUR pomoćnikom:",
+      "manualRepo": "Mumcord dolazi iz svojeg repozitorija paketa. Ažuriraj ga svojim upraviteljem paketa:"
     },
     "tags": {
       "added": "Dodano",

@@ -90,6 +90,11 @@ EOF
     chmod 755 "$file"
 done
 
+# The repository key, served like https://packages.mumcord.app/mumcord.asc, so the installer's
+# key check can be tested over http; the tampered copy goes into bad/.
+cp "$here/../../packaging/repo/mumcord.asc" "$out/mumcord.asc"
+chmod 644 "$out/mumcord.asc"
+
 cp "$here/../install.sh" "$out/install.sh"
 (cd "$out" && sha256sum -- Mumcord_* Mumcord-* install.sh >SHA256SUMS)
 
@@ -98,3 +103,4 @@ cp -R "$out" "$bad"
 for file in "$bad"/Mumcord_* "$bad"/Mumcord-*; do
     printf 'tampered' >>"$file"
 done
+printf 'tampered' >>"$bad/mumcord.asc"

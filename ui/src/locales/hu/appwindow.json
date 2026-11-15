@@ -57,7 +57,8 @@
       "openReleasePage": "Kiadási oldal megnyitása",
       "manual": "Töltsd le az új verziót a kiadási oldalról.",
       "manualPackage": "Töltsd le a csomagot a kiadási oldalról, majd telepítsd ezzel:",
-      "manualAur": "Frissítsd az AUR-segédeddel:"
+      "manualAur": "Frissítsd az AUR-segédeddel:",
+      "manualRepo": "A Mumcord a saját csomagtárolójából származik. Frissítsd a csomagkezelőddel:"
     },
     "tags": {
       "added": "Hozzáadva",

@@ -935,6 +935,10 @@
       "deb": ".deb-paketti",
       "rpm": ".rpm-paketti",
       "aur": "AUR",
+      "aptRepo": "Mumcordin APT-varasto",
+      "dnfRepo": "Mumcordin DNF-varasto",
+      "zypperRepo": "Mumcordin zypper-varasto",
+      "pacmanRepo": "Mumcordin pacman-varasto",
       "otherLinux": "Linux-paketti"
     },
     "mode": "Kun päivitys löytyy",

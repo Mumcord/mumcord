@@ -935,6 +935,10 @@
       "deb": "пакета .deb",
       "rpm": "пакета .rpm",
       "aur": "AUR",
+      "aptRepo": "хранилището на Mumcord за APT",
+      "dnfRepo": "хранилището на Mumcord за DNF",
+      "zypperRepo": "хранилището на Mumcord за zypper",
+      "pacmanRepo": "хранилището на Mumcord за pacman",
       "otherLinux": "пакет за Linux"
     },
     "mode": "Когато бъде намерена актуализация",

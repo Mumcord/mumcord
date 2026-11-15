@@ -935,6 +935,10 @@
       "deb": ".deb-pakett",
       "rpm": ".rpm-pakett",
       "aur": "AUR",
+      "aptRepo": "Mumcordi APT-hoidla",
+      "dnfRepo": "Mumcordi DNF-hoidla",
+      "zypperRepo": "Mumcordi zypper-hoidla",
+      "pacmanRepo": "Mumcordi pacman-hoidla",
       "otherLinux": "Linuxi pakett"
     },
     "mode": "Kui uuendus leitakse",

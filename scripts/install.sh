@@ -4,20 +4,28 @@
 #   curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 #   fetch -qo - https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh
 #
-# Debian/Ubuntu get the .deb (apt), Fedora/RHEL and openSUSE the .rpm (dnf/zypper), Arch the
-# AUR package when an AUR helper is installed and the AUR has it; every other Linux gets the
-# AppImage for the current user with an app-menu entry. FreeBSD 15.x on amd64 gets the .pkg
-# (Mumcord 0.8.0 and later): its dependencies come from the configured pkg repositories, then
-# `pkg add` installs it. Every download is checked against the release's SHA256SUMS before
-# anything from it runs. sudo (or doas) is used only to install or remove a package.
+# You choose how to install (the default is the first one that fits your system):
+#   repository  adds Mumcord's signed package repository (https://packages.mumcord.app) to
+#               apt, dnf, zypper, pacman or pkg and installs from it, so updates come with your
+#               system updates. Running the script again upgrades.
+#   package     downloads the release package: the .deb (apt), .rpm (dnf/zypper), the AUR package
+#               on Arch when an AUR helper is installed and the AUR has it, or the FreeBSD 15.x
+#               .pkg on amd64 (Mumcord 0.8.0 and later).
+#   appimage    the AppImage for the current user with an app-menu entry (Linux only). Every
+#               other Linux gets only this one.
+# Every download is checked against a checksum before anything from it runs: packages against
+# the release's SHA256SUMS, the repository keys against a hash inside this script. sudo (or
+# doas) is used only to install or remove software and repository settings.
 #
 # Options (after `sh -s --` when piped):
-#   --uninstall          remove Mumcord (settings and your certificate stay in place)
+#   --method repo|package|appimage   how to install (see above); asked when omitted
+#   --uninstall          remove Mumcord and its repository setup (settings and certificate stay)
 #   --desktop-icon       add a desktop icon without asking
 #   --no-desktop-icon    do not add a desktop icon and do not ask
 #   --yes                ask nothing and use the defaults (for scripts and CI)
-# Environment: MUMCORD_DESKTOP_ICON=yes|no, MUMCORD_NONINTERACTIVE=1, and
-# MUMCORD_RELEASE_URL to download from another release folder (tests use a local server).
+# Environment: MUMCORD_INSTALL_METHOD=repo|package|appimage, MUMCORD_DESKTOP_ICON=yes|no,
+# MUMCORD_NONINTERACTIVE=1, MUMCORD_RELEASE_URL to download from another release folder and
+# MUMCORD_REPO_URL to use another package repository (tests use a local server).
 # Colours and the progress spinner appear only on a terminal; NO_COLOR or TERM=dumb turn them off.
 
 set -eu
@@ -40,6 +48,22 @@ ICON_SIZES="32x32 128x128 256x256 512x512"
 FREEBSD_PACKAGE=mumcord
 FREEBSD_MAJOR=15
 OS=$(uname -s)
+# The signed package repository (specs: issue #620). The key hashes pin the published keys, so a
+# changed key file on the server is never trusted; the *_SHA256 overrides exist for tests only.
+REPO_URL=${MUMCORD_REPO_URL:-https://packages.mumcord.app}
+REPO_KEY_FPR=A4096249A499587C9AEF13E7F022C81D47D2BBEB
+REPO_KEY_SHA256=${MUMCORD_REPO_KEY_SHA256:-7d85c44e4f245bef0d52f129957d12ec8fbbd7f118950e97076478bf54439c6e}
+REPO_PUBKEY_SHA256=${MUMCORD_REPO_PUBKEY_SHA256:-9c03cc83f882d84192c8489d070c519ac2ec190c7eb61a53161913d330aeafa6}
+REPO_PACKAGE=mumcord
+# Prefix for every system path the repository setup touches; empty except in tests.
+ROOT=${MUMCORD_ROOT:-}
+APT_KEY=$ROOT/etc/apt/keyrings/mumcord.asc
+APT_SOURCES=$ROOT/etc/apt/sources.list.d/mumcord.sources
+DNF_REPO=$ROOT/etc/yum.repos.d/mumcord.repo
+ZYPP_REPO=$ROOT/etc/zypp/repos.d/mumcord.repo
+PACMAN_CONF=$ROOT/etc/pacman.conf
+BSD_KEY=$ROOT/usr/local/etc/pkg/keys/mumcord.pub
+BSD_CONF=$ROOT/usr/local/etc/pkg/repos/mumcord.conf
 
 # Colours, Unicode marks and the spinner only for a terminal that wants them
 # (https://no-color.org); pipes, log files and TERM=dumb get plain ASCII lines.
@@ -109,7 +133,7 @@ banner() {
     say
     if $unicode; then
         printf '  %s┌┬┐┬ ┬┌┬┐┌─┐┌─┐┬─┐┌┬┐%s\n' "$ACCENT" "$RESET"
-        printf '  %s││││ ││││││  │ │├┬┘ ││%s   %s%s%s\n' "$ACCENT" "$RESET" "$BOLD" "$1" "$RESET"
+        printf '  %s││││ │││││  │ │├┬┘ ││%s   %s%s%s\n' "$ACCENT" "$RESET" "$BOLD" "$1" "$RESET"
         printf '  %s┴ ┴└─┘┴ ┴└─┘└─┘┴└──┴┘%s   %svoice chat for Mumble servers%s\n' "$ACCENT" "$RESET" "$DIM" "$RESET"
     else
         printf '  %sMumcord%s %s\n' "$ACCENT" "$RESET" "$1"
@@ -169,14 +193,23 @@ file_size() {
 have() { command -v "$1" >/dev/null 2>&1; }
 
 usage() {
-    sed -n '2,21s/^# \{0,1\}//p' "$0" 2>/dev/null || say "See https://github.com/Mumcord/mumcord#download"
+    sed -n '2,32s/^# \{0,1\}//p' "$0" 2>/dev/null || say "See https://github.com/Mumcord/mumcord#download"
 }
 
 uninstall=false
+method=${MUMCORD_INSTALL_METHOD:-}
 desktop_icon=${MUMCORD_DESKTOP_ICON:-ask}
 noninteractive=${MUMCORD_NONINTERACTIVE:-}
-for arg in "$@"; do
+while [ $# -gt 0 ]; do
+    arg=$1
+    shift
     case $arg in
+    --method)
+        [ $# -gt 0 ] || die "--method needs repo, package or appimage"
+        method=$1
+        shift
+        ;;
+    --method=*) method=${arg#--method=} ;;
     --uninstall) uninstall=true ;;
     --desktop-icon) desktop_icon=yes ;;
     --no-desktop-icon) desktop_icon=no ;;
@@ -191,6 +224,10 @@ done
 case $desktop_icon in
 yes | no | ask) ;;
 *) die "MUMCORD_DESKTOP_ICON must be yes or no" ;;
+esac
+case $method in
+'' | repo | package | appimage) ;;
+*) die "the install method must be repo, package or appimage, not $method" ;;
 esac
 
 # Questions go to the terminal, because with `curl | sh` standard input is the script itself.
@@ -210,7 +247,12 @@ ask_yes_no() {
 }
 
 SUDO=
+root_checked=false
 need_root() {
+    if $root_checked; then
+        return
+    fi
+    root_checked=true
     if [ "$(id -u)" -eq 0 ]; then
         SUDO=
         return
@@ -298,7 +340,7 @@ sha256_of() {
 distro_family() {
     ids=$(
         # shellcheck disable=SC1091
-        [ -r /etc/os-release ] && . /etc/os-release && printf '%s %s' "${ID:-}" "${ID_LIKE:-}"
+        [ -r "$ROOT/etc/os-release" ] && . "$ROOT/etc/os-release" && printf '%s %s' "${ID:-}" "${ID_LIKE:-}"
     ) || ids=
     for id in $ids; do
         case $id in
@@ -511,14 +553,18 @@ check_freebsd() {
     fi
 }
 
+# A fresh system has only the pkg bootstrap stub, which would ask before installing pkg.
+bootstrap_pkg() {
+    if ! pkg -N >/dev/null 2>&1; then
+        $SUDO env ASSUME_ALWAYS_YES=yes pkg bootstrap </dev/null || die "could not set up pkg"
+    fi
+}
+
 install_freebsd() {
     fetch_asset pkg
     file=$fetched
     need_root "Installing the package"
-    # A fresh system has only the pkg bootstrap stub, which would ask before installing pkg.
-    if ! pkg -N >/dev/null 2>&1; then
-        $SUDO env ASSUME_ALWAYS_YES=yes pkg bootstrap </dev/null || die "could not set up pkg"
-    fi
+    bootstrap_pkg
     # pkg add looks for missing dependencies only next to the package file, and the release has
     # none there, so they come from the configured repositories first.
     deps=$(pkg query -F "$file" '%dn') || die "could not read the dependencies of $file"
@@ -544,6 +590,192 @@ install_freebsd() {
     start_hint="from the app menu, or run mumcord"
 }
 
+# --- Package repository ---------------------------------------------------------------------
+
+# fetch_repo_key NAME HASH: downloads NAME from the repository into $work and checks its hash.
+# The hash is inside this script, because gpg may not be installed and the key must not be
+# trusted just because the server sent it.
+fetch_repo_key() {
+    download "$REPO_URL/$1" "$work/$1" || die "could not download $REPO_URL/$1"
+    actual=$(sha256_of "$work/$1")
+    if [ "$actual" != "$2" ]; then
+        rm -f "$work/$1"
+        step fail "Signing key" "does not match the expected hash"
+        die "the repository key $1 is not the one this script expects. Nothing was installed."
+    fi
+    step ok "Signing key" "$1 downloaded, hash OK"
+}
+
+# put_file SRC DEST: installs a world-readable file as administrator, creating the folder.
+put_file() {
+    if ! { $SUDO mkdir -p "$(dirname "$2")" && $SUDO cp "$1" "$2" && $SUDO chmod 644 "$2"; }; then
+        die "could not write $2"
+    fi
+}
+
+# write_repo_file DEST: reads the new content from standard input.
+write_repo_file() {
+    cat >"$work/repo-file"
+    put_file "$work/repo-file" "$1"
+    step ok "Repository" "added $(short_path "${1#"$ROOT"}")"
+}
+
+# update_hint_for MANAGER: what the summary says about updates.
+repo_update_hint() {
+    update_hint="now come from $1 with your system updates"
+}
+
+# installed_version PACKAGE: best-effort version of an installed package, for the summary.
+installed_version() {
+    case $family in
+    debian) dpkg-query -W -f '${Version}' "$1" 2>/dev/null ;;
+    fedora | suse) rpm -q --qf '%{VERSION}' "$1" 2>/dev/null ;;
+    arch) found=$(pacman -Q "$1" 2>/dev/null) && printf '%s' "${found#* }" ;;
+    freebsd) pkg query '%v' "$1" 2>/dev/null ;;
+    esac || true
+}
+
+install_repo() {
+    pkg_name=$REPO_PACKAGE
+    case $1 in
+    debian)
+        need_root "Adding the package repository"
+        fetch_repo_key mumcord.asc "$REPO_KEY_SHA256"
+        put_file "$work/mumcord.asc" "$APT_KEY"
+        write_repo_file "$APT_SOURCES" <<EOF
+Types: deb
+URIs: $REPO_URL/apt
+Suites: stable
+Components: main
+Architectures: amd64 arm64
+Signed-By: /etc/apt/keyrings/mumcord.asc
+EOF
+        $SUDO apt-get update </dev/null || die "apt-get update failed"
+        # Installing an already installed package upgrades it to the newest version.
+        $SUDO apt-get install -y "$pkg_name" </dev/null || die "apt-get could not install $pkg_name"
+        repo_update_hint apt
+        ;;
+    fedora | suse)
+        need_root "Adding the package repository"
+        fetch_repo_key mumcord.asc "$REPO_KEY_SHA256"
+        $SUDO rpm --import "$work/mumcord.asc" || die "could not import the repository key"
+        repo_file=$DNF_REPO
+        [ "$1" != suse ] || repo_file=$ZYPP_REPO
+        write_repo_file "$repo_file" <<EOF
+[mumcord]
+name=Mumcord
+type=rpm-md
+baseurl=$REPO_URL/rpm
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=$REPO_URL/mumcord.asc
+EOF
+        if [ "$1" = fedora ]; then
+            $SUDO dnf install -y "$pkg_name" </dev/null || die "dnf could not install $pkg_name"
+            repo_update_hint dnf
+        else
+            $SUDO zypper --non-interactive refresh </dev/null || die "zypper could not refresh the repositories"
+            $SUDO zypper --non-interactive install "$pkg_name" </dev/null || die "zypper could not install $pkg_name"
+            repo_update_hint zypper
+        fi
+        ;;
+    arch)
+        pkg_name=$AUR_PACKAGE
+        need_root "Adding the package repository"
+        fetch_repo_key mumcord.asc "$REPO_KEY_SHA256"
+        $SUDO pacman-key --add "$work/mumcord.asc" </dev/null || die "could not add the repository key"
+        $SUDO pacman-key --lsign-key "$REPO_KEY_FPR" </dev/null || die "could not trust the repository key"
+        if grep -qx '\[mumcord\]' "$PACMAN_CONF" 2>/dev/null; then
+            step skip "Repository" "[mumcord] is already in pacman.conf"
+        else
+            # $arch is for pacman to expand.
+            # shellcheck disable=SC2016
+            printf '\n[mumcord]\nServer = %s/arch/$arch\n' "$REPO_URL" | $SUDO tee -a "$PACMAN_CONF" >/dev/null ||
+                die "could not write $PACMAN_CONF"
+            step ok "Repository" "added [mumcord] to pacman.conf"
+        fi
+        # -Syu, never -Sy alone: a partial upgrade can break Arch.
+        if can_ask; then
+            $SUDO pacman -Syu --needed "$pkg_name" </dev/tty || die "pacman could not install $pkg_name"
+        else
+            $SUDO pacman -Syu --needed --noconfirm "$pkg_name" </dev/null || die "pacman could not install $pkg_name"
+        fi
+        repo_update_hint pacman
+        ;;
+    freebsd)
+        need_root "Adding the package repository"
+        fetch_repo_key mumcord.pub "$REPO_PUBKEY_SHA256"
+        put_file "$work/mumcord.pub" "$BSD_KEY"
+        # ${ABI} is for pkg to expand.
+        # shellcheck disable=SC2016
+        write_repo_file "$BSD_CONF" <<EOF
+mumcord: {
+  url: "$REPO_URL/freebsd/\${ABI}",
+  signature_type: "pubkey",
+  pubkey: "/usr/local/etc/pkg/keys/mumcord.pub",
+  enabled: yes
+}
+EOF
+        bootstrap_pkg
+        $SUDO pkg update </dev/null || die "pkg update failed"
+        $SUDO pkg install -y "$pkg_name" </dev/null || die "pkg could not install $pkg_name"
+        repo_update_hint pkg
+        ;;
+    esac
+    step ok Install "Mumcord installed from the package repository"
+    version=$(installed_version "$pkg_name")
+    if [ "$1" = freebsd ]; then installed_path=/usr/local/bin/mumcord; else installed_path=/usr/bin/mumcord; fi
+    start_hint="from the app menu, or run mumcord"
+}
+
+# choose_method FAMILY: sets $method from --method, the question or the default.
+choose_method() {
+    avail="repo package appimage"
+    case $1 in
+    other) avail=appimage ;;
+    freebsd) avail="repo package" ;;
+    esac
+    if [ -n "$method" ]; then
+        case " $avail " in
+        *" $method "*) return ;;
+        esac
+        die "--method $method is not available on this system (available: $(printf '%s' "$avail" | tr ' ' ','))"
+    fi
+    if [ "$avail" = appimage ]; then
+        method=appimage
+        return
+    fi
+    method=repo
+    can_ask || return 0
+    # The menu names this system's own tools, so the choice is concrete.
+    case $1 in
+    debian) tool=apt package_label='.deb package from the release: you update it by hand' ;;
+    fedora) tool=dnf package_label='.rpm package from the release: you update it by hand' ;;
+    suse) tool=zypper package_label='.rpm package from the release: you update it by hand' ;;
+    arch) tool=pacman package_label='AUR package mumcord-bin: updates come with your AUR helper' ;;
+    *) tool=pkg package_label='.pkg package from the release: run this script again to update' ;;
+    esac
+    {
+        printf '  %s%s%s How do you want to install Mumcord?\n' "$ACCENT" "$MARK_ASK" "$RESET"
+        printf '      1) Package repository: updates come with %s (recommended)\n' "$tool"
+        printf '      2) %s\n' "$package_label"
+        case $avail in
+        *appimage*) printf '      3) AppImage in your home folder: updates itself, no root needed\n' ;;
+        esac
+        printf '  Choose [1]: '
+    } >/dev/tty
+    read -r answer </dev/tty || return 0
+    case $answer in
+    2 | package) method=package ;;
+    3 | appimage)
+        case $avail in
+        *appimage*) method=appimage ;;
+        esac
+        ;;
+    esac
+}
+
 aur_helper() {
     for helper in paru yay; do
         have "$helper" && echo "$helper" && return
@@ -558,17 +790,27 @@ aur_has_package() {
 
 do_install() {
     banner installer
-    version='' installed_path='' start_hint='' aur_tip=false
+    version='' installed_path='' start_hint='' aur_tip=false update_hint=''
     if [ "$OS" = FreeBSD ]; then
+        family=freebsd
         check_freebsd
-        install_freebsd
-        offer_desktop_icon
-        summary
-        return
+    else
+        family=$(distro_family)
+        cpu >/dev/null
     fi
-    family=$(distro_family)
-    cpu >/dev/null
-    case $family in
+    choose_method "$family"
+    case $method in
+    repo) install_repo "$family" ;;
+    appimage) install_appimage ;;
+    *) install_by_package "$family" ;;
+    esac
+    offer_desktop_icon
+    summary
+}
+
+install_by_package() {
+    case $1 in
+    freebsd) install_freebsd ;;
     debian | fedora | suse) install_package "$family" ;;
     arch)
         if helper=$(aur_helper) && aur_has_package "$helper"; then
@@ -587,10 +829,7 @@ do_install() {
             aur_tip=true
         fi
         ;;
-    *) install_appimage ;;
     esac
-    offer_desktop_icon
-    summary
 }
 
 # short_path PATH: PATH with the home folder written as ~.
@@ -605,6 +844,9 @@ summary() {
     set -- "Mumcord${version:+ $version} is installed" "" \
         "Path    $(short_path "$installed_path")" \
         "Start   $start_hint"
+    if [ -n "$update_hint" ]; then
+        set -- "$@" "Updates $update_hint"
+    fi
     if $aur_tip; then
         set -- "$@" "Tip     if the AUR has $AUR_PACKAGE, installing it with an AUR" \
             "        helper gets Mumcord updates with your system."
@@ -631,6 +873,35 @@ installed_package() {
     return 1
 }
 
+# remove_repo_setup: deletes the repository settings and keys the installer added.
+remove_repo_setup() {
+    files=
+    for file in "$APT_SOURCES" "$APT_KEY" "$DNF_REPO" "$ZYPP_REPO" "$BSD_CONF" "$BSD_KEY"; do
+        [ -f "$file" ] && files="$files $file"
+    done
+    pacman_block=false
+    if grep -qx '\[mumcord\]' "$PACMAN_CONF" 2>/dev/null; then
+        pacman_block=true
+    fi
+    if [ -z "$files" ] && ! $pacman_block; then
+        return
+    fi
+    need_root "Removing the repository setup"
+    if [ -n "$files" ]; then
+        # shellcheck disable=SC2086 # one word per path; none contains spaces
+        $SUDO rm -f $files
+    fi
+    if $pacman_block; then
+        # The block is the [mumcord] line up to its Server line.
+        sed '/^\[mumcord\]$/,/^Server/d' "$PACMAN_CONF" >"$work/pacman.conf"
+        $SUDO cp "$work/pacman.conf" "$PACMAN_CONF" || warn "could not edit $PACMAN_CONF"
+        if have pacman-key; then
+            $SUDO pacman-key --delete "$REPO_KEY_FPR" </dev/null || warn "could not remove the repository key from pacman"
+        fi
+    fi
+    removed=true
+}
+
 do_uninstall() {
     removed=false
     if found=$(installed_package mumcord Mumcord "$AUR_PACKAGE"); then
@@ -652,6 +923,7 @@ do_uninstall() {
         esac
         removed=true
     fi
+    remove_repo_setup
     if [ -f "$APPIMAGE" ]; then
         rm -f "$APPIMAGE"
         removed=true
@@ -677,11 +949,6 @@ do_uninstall() {
     fi
 }
 
-if $uninstall; then
-    do_uninstall
-    exit 0
-fi
-
 work=$(mktemp -d)
 download_pid=
 # Background jobs ignore Ctrl+C in a script, so a running download is stopped here.
@@ -695,4 +962,8 @@ cleanup() {
 }
 trap cleanup EXIT
 trap 'exit 1' HUP INT TERM
+if $uninstall; then
+    do_uninstall
+    exit 0
+fi
 do_install
