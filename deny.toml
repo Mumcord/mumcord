@@ -78,7 +78,4 @@ allow-git = [
     "https://github.com/sothis/mumbot",
     # rnnoise-rs is not on crates.io; Mumcord pins its own fork (see Cargo.toml).
     "https://github.com/Mumcord/rnnoise-rs",
-    # Temporary until hwcodec 0.1.0 is on crates.io; remove together with the git dependency in
-    # Cargo.toml (#449).
-    "https://github.com/Mumcord/hwcodec",
 ]

@@ -39,11 +39,9 @@ mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
-# Temporary: pinned to a commit of the public repository until hwcodec 0.1.0 is on crates.io (#449);
-# then this becomes the plain crates.io version.
 # No default features: the engine switches the codecs on (its features `vp9`, `av1-decode` and
 # `desktop-codecs`), so a phone build compiles none of the C libraries.
-hwcodec = { git = "https://github.com/Mumcord/hwcodec", rev = "aa6cde698e334310151762c672cac2adffef85d1", default-features = false }
+hwcodec = { version = "0.1", default-features = false }
 mumcord-camera = { path = "crates/camera" }
 mumcord-effects = { path = "crates/effects" }
 mumcord-plugins = { path = "crates/plugins", version = "0.8" }
