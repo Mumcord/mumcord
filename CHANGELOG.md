@@ -36,6 +36,7 @@
 
 ### Internal
 
+- Engine: a camera backend set by the embedding app counts as a camera backend, and Android and iOS builds count as platforms with a camera; before, any camera availability refresh (P2P mode, relay or direct-connections change) stopped a phone's camera as "not supported on this platform"
 - Native video-library build scripts honor explicit job limits (`CARGO_BUILD_JOBS` for libvpx and dav1d, `CMAKE_BUILD_PARALLEL_LEVEL` for SVT-AV1 and the hardware encoder SDK), allowing single-job builds on Raspberry Pi without changing other platforms' defaults; added regression checks and a Raspberry Pi build/test guide
 - FreeBSD packages could not be built into a relative output directory, and the package did not require the dynamically loaded `alsa-plugins` package that makes the OSS devices visible; both are fixed, with checks that run in CI. The native FreeBSD smoke and GPU-endurance tests are part of the CI job as well
 - Updated Rust dependencies and all checked-in Cargo lock files, among them Wry 0.57.2, `object` 0.41, `ort` 2.0.0-rc.15 and `windows-registry` 0.100; the bundled ONNX Runtime stays on 1.23.2, and audio thread priority, GTK, native dialogs, SQLite and the Windows bindings stay on the versions CPAL, Tauri and the live-test bot require
