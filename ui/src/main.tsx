@@ -9,6 +9,7 @@ import { installNativeMenuSuppression } from "./app/nativeContextMenu";
 import { installNativeDragGuard } from "./app/nativeDrag";
 import { installLinkGuard } from "./app/nativeLinks";
 import { applyThemeToDocument, osPrefersDark, resolveTheme } from "./theme/theme";
+import { installScrollActivity } from "./theme/scrollActivity";
 
 const root = document.getElementById("root");
 if (!root) {
@@ -18,6 +19,7 @@ if (!root) {
 installNativeMenuSuppression();
 installNativeDragGuard();
 installLinkGuard();
+installScrollActivity();
 
 // Paint the OS theme right away; the stored theme setting replaces it once settings load.
 applyThemeToDocument(resolveTheme("system", osPrefersDark()));
