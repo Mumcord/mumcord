@@ -200,11 +200,11 @@ Follow [the local scale fixture instructions](../testenv/scale/README.md) for th
 
 For member-list comparisons, select the populated Lobby, open Members, join its voice channel, let connection/avatars settle and toggle the load generator's talk-file control. Temporarily count `String.prototype.localeCompare` calls for 10 seconds and restore the original method in `finally`. Repeat three times per version, with the same server population and window size. Collect process-tree CPU separately; fewer comparisons alone do not prove lower overall CPU use.
 
-The allocating conversion workload is also provided as a reusable Cargo example:
+The allocating conversion workload is also provided as a reusable Cargo example. The conversion lives in the [`hwcodec`](https://github.com/Mumcord/hwcodec) crate, so run it in a checkout of that repository:
 
 ```sh
 CARGO_TARGET_DIR="$HOME/.cache/mumcord-build/gui-perf" \
-  cargo run --release --locked -p mumcord-screenshare --example rgba_speed
+  cargo run --release --locked --example rgba_speed
 ```
 
 The example uses the same seven-by-twenty workload; Cargo release-profile/link-time settings can affect the absolute timings relative to the standalone harness. Compare unchanged and optimized sources under the same compiler/profile. Remove this dedicated build cache after testing.

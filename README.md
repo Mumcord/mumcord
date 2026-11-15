@@ -225,7 +225,7 @@ Logs contain no chat, names or audio. Known problems and fixes: [Troubleshooting
 
 ## Building from source
 
-You need Rust 1.97+, Node.js 24 and the platform libraries listed on the wiki's [Building](https://github.com/Mumcord/mumcord/wiki/Building) page. Screen sharing also needs SVT-AV1 4.0+ and dav1d: on Linux the system packages (Arch: `svt-av1 dav1d`), or static builds from `scripts/build-svt-av1.sh` and `scripts/build-dav1d.sh` with `SVTAV1_STATIC_DIR` and `DAV1D_STATIC_DIR` pointing at them (Debian/Ubuntu ship an SVT-AV1 that is too old). Then:
+You need Rust 1.97+, Node.js 24 and the platform libraries listed on the wiki's [Building](https://github.com/Mumcord/mumcord/wiki/Building) page. Screen sharing also needs SVT-AV1 4.0+ and dav1d: on Linux the system packages (Arch: `svt-av1 dav1d`), or static builds from `scripts/build-svt-av1.sh` and `scripts/build-dav1d.sh` with `SVTAV1_STATIC_DIR` and `DAV1D_STATIC_DIR` pointing at them (Debian/Ubuntu ship an SVT-AV1 that is too old). On Linux and Windows the hardware encoders also need Intel's VPL dispatcher: run `scripts/build-hwenc-sdk.sh <dir>` and point `HWENC_SDK_DIR` at it, or on Linux install the system package (Debian/Ubuntu: `libvpl-dev`, Fedora: `libvpl-devel`, Arch: `libvpl`). Then:
 
 ```sh
 git clone https://github.com/Mumcord/mumcord.git && cd mumcord

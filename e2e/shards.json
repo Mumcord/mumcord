@@ -121,6 +121,7 @@
     [
       "specs/chat/audio-music-embeds.e2e.ts",
       "specs/disk-writes/app.e2e.ts",
+      "specs/media/encoder-fallback.e2e.ts",
       "specs/media/share-sound.e2e.ts",
       "specs/plugins/score-updates.e2e.ts",
       "specs/voice/channel-audio.e2e.ts",

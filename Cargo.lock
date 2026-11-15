@@ -690,13 +690,13 @@ dependencies = [
  "cexpr",
  "clang-sys",
  "log",
- "prettyplease 0.3.0",
+ "prettyplease 0.2.37",
  "proc-macro2",
  "quote",
  "regex",
  "rustc-hash 2.1.3",
  "shlex 2.0.1",
- "syn 3.0.9",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -1720,7 +1720,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d045de693cb712d0b22c6a64be5b953f67b3ce00ab5ad3dd5d8b441886ab8e1a"
 dependencies = [
  "quote",
- "syn 3.0.9",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -3104,6 +3104,55 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87"
 
 [[package]]
+name = "hwcodec"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a5f3b34358c88459dda491bb34bb7b710bd5a58921379e2ca2bdc51c1070a79"
+dependencies = [
+ "bindgen 0.73.2",
+ "hwcodec-dav1d-src",
+ "hwcodec-libvpl-src",
+ "hwcodec-libvpx-src",
+ "hwcodec-prebuilt-x86_64-pc-windows-msvc",
+ "hwcodec-svt-av1-src",
+ "libloading 0.9.0",
+ "log",
+ "pkg-config",
+ "sha2 0.10.9",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "hwcodec-dav1d-src"
+version = "0.1.0+1.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc1a7c8e1f06f1d2203ba2910493ef9ea7f3614a6e841106ca811dadb437ca98"
+
+[[package]]
+name = "hwcodec-libvpl-src"
+version = "0.1.0+2.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c0350ebb48600df9aefeea7844b764bfe565fa8b9705f49d411cf86f5fb8a86"
+
+[[package]]
+name = "hwcodec-libvpx-src"
+version = "0.1.0+1.15.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2562071f786dfb7ef5fec498ddff1cf63b1cc64d3dc8268cb2401317103f9fdd"
+
+[[package]]
+name = "hwcodec-prebuilt-x86_64-pc-windows-msvc"
+version = "0.1.0+native-libs.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb1a372a5f44266552eac166f7436bea3b2ad94954cc56bbb2528066b72d5a3f"
+
+[[package]]
+name = "hwcodec-svt-av1-src"
+version = "0.1.0+4.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3391dc4893e117f3dd6047d241eac9930dbce524f489254e8d5ffd2ae10042da"
+
+[[package]]
 name = "hybrid-array"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4332,6 +4381,7 @@ dependencies = [
  "futures-util",
  "hound",
  "html5ever 0.40.1",
+ "hwcodec",
  "image",
  "lewton",
  "libc",
@@ -4342,7 +4392,6 @@ dependencies = [
  "mumcord-effects",
  "mumcord-p2p",
  "mumcord-positional",
- "mumcord-screenshare",
  "mumcord-store",
  "netsim",
  "objc2",
@@ -4536,16 +4585,6 @@ dependencies = [
  "tokio-rustls",
  "tracing",
  "x509-parser",
-]
-
-[[package]]
-name = "mumcord-screenshare"
-version = "0.8.0"
-dependencies = [
- "bindgen 0.73.2",
- "libloading 0.8.9",
- "pkg-config",
- "thiserror 2.0.21",
 ]
 
 [[package]]

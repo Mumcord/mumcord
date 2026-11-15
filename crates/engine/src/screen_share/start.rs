@@ -222,7 +222,7 @@ mod tests {
 
     struct Fake;
     impl CaptureSource for Fake {
-        fn frame(&mut self, _: u32, _: u32) -> Option<mumcord_screenshare::I420Frame> {
+        fn frame(&mut self, _: u32, _: u32) -> Option<hwcodec::I420Frame> {
             None
         }
     }

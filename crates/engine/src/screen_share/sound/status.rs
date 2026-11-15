@@ -291,7 +291,7 @@ pub(crate) fn take(
 mod tests {
     use super::super::super::capture::TestTone;
     use super::*;
-    use mumcord_screenshare::I420Frame;
+    use hwcodec::I420Frame;
 
     #[test]
     fn a_capture_that_fails_during_the_share_leaves_no_sound_with_the_reason() {

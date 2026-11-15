@@ -15,9 +15,9 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+use hwcodec::TEMPORAL_LAYERS;
 use mumcord_p2p::media::{self, Description, StreamKind, Track, VideoCodec, VideoTrack};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_screenshare::TEMPORAL_LAYERS;
 use tokio::runtime::Handle;
 use tokio::task::JoinHandle;
 
@@ -168,6 +168,8 @@ fn camera_description(video: FrameHeader, key: DescriptionKey, id: &str) -> Opti
     let codec = match codec {
         wire::Codec::Vp9 => VideoCodec::Vp9,
         wire::Codec::Av1 => VideoCodec::Av1,
+        // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+        _ => return None,
     };
     let rate = if key.fps == 0 {
         30.0

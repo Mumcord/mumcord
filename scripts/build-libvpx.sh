@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the static libvpx that the release packages link (crates/screenshare/build.rs picks it
+# Builds the static libvpx that the release packages link (the hwcodec crate picks it
 # up through LIBVPX_STATIC_DIR). Linux packages link it too: a .deb, .rpm or AppImage built on a
 # new distribution would otherwise need that distribution's libvpx soname (libvpx.so.9 on
 # Ubuntu 24.04), which older ones such as Debian 12 (libvpx.so.7) do not have. Development and

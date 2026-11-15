@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Collects what screen sharing needs to talk to the graphics card's AV1 and VP9 encoders directly
-# (crates/screenshare picks it up through HWENC_SDK_DIR). macOS has no such encoders, so this
+# (the hwcodec crate picks it up through HWENC_SDK_DIR). macOS has no such encoders, so this
 # script refuses to run there.
 #
 #   scripts/build-hwenc-sdk.sh <prefix>

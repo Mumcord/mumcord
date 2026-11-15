@@ -16,6 +16,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use hwcodec::{Codec, EncodedFrame, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder};
 use mumcord_audio::codec::MAX_PACKET_BYTES;
 use mumcord_audio::mixer::share::{SHARE_BITRATE_BPS, share_encoder};
 use mumcord_audio::{FRAME_SAMPLES, SAMPLE_RATE};
@@ -23,9 +24,6 @@ use mumcord_p2p::media::{
     self as profile, AudioCodec, AudioTrack, Description, StreamKind, Track, VideoCodec, VideoTrack,
 };
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_screenshare::{
-    Codec, EncodedFrame, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder,
-};
 use mumcord_store::ScreenOptimize;
 use tokio::task::JoinHandle;
 
@@ -245,7 +243,7 @@ pub(crate) type OpenEncoder = Box<
             EncoderConfig,
             ScreenOptimize,
             bool,
-        ) -> mumcord_screenshare::Result<(Box<dyn VideoEncoder>, ActiveEncoder)>
+        ) -> hwcodec::Result<(Box<dyn VideoEncoder>, ActiveEncoder)>
         + Send,
 >;
 
@@ -266,7 +264,7 @@ pub(crate) fn vp9_encoder() -> EncoderFactory {
                 codec: Codec::Vp9,
                 gpu: None,
             };
-            Ok((Box::new(mumcord_screenshare::Encoder::new(config)?), opened))
+            Ok((super::codecs::open_vp9(config)?, opened))
         }),
     }
 }
@@ -647,6 +645,9 @@ pub(crate) fn media_description(
     let codec = match codec {
         Codec::Vp9 => VideoCodec::Vp9,
         Codec::Av1 => VideoCodec::Av1,
+        // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
+        // Anything else is treated like VP9, the codec every viewer plays.
+        _ => VideoCodec::Vp9,
     };
     let rate = if fps == 0 {
         30.0
@@ -786,12 +787,7 @@ fn encode_loop(
             Instant::now(),
         );
         if encoder.is_none() {
-            let config = EncoderConfig {
-                width: size.0,
-                height: size.1,
-                fps: quality.fps,
-                bitrate_kbps: quality.bitrate_kbps,
-            };
+            let config = EncoderConfig::new(size.0, size.1, quality.fps, quality.bitrate_kbps);
             match (make_encoder.open)(config, steps.prefs().optimize, codecs.want_av1()) {
                 Ok((enc, opened)) => {
                     steps.set_codec(enc.codec());
@@ -1035,7 +1031,7 @@ fn reconfigure(
     enc: &mut dyn VideoEncoder,
     size: (u32, u32),
     quality: Quality,
-) -> mumcord_screenshare::Result<bool> {
+) -> hwcodec::Result<bool> {
     let current = enc.config();
     let resized = (current.width, current.height) != size;
     if resized {
@@ -1147,9 +1143,6 @@ fn to_frame(out: EncodedFrame, (width, height): (u32, u32), codec: Codec) -> Fra
 
 #[cfg(test)]
 mod tests {
-    #[cfg(feature = "vp9")]
-    use mumcord_screenshare::Encoder;
-
     use super::*;
 
     /// The default share's steps (1080p30 → 720p30 → 720p15 → 480p15).
@@ -1262,7 +1255,7 @@ mod tests {
 
     struct Ending;
     impl CaptureSource for Ending {
-        fn frame(&mut self, _: u32, _: u32) -> Option<mumcord_screenshare::I420Frame> {
+        fn frame(&mut self, _: u32, _: u32) -> Option<hwcodec::I420Frame> {
             None
         }
         fn ended(&self) -> bool {
@@ -1338,12 +1331,12 @@ mod tests {
         EncoderFactory {
             offers_av1: true,
             open: Box::new(move |config, optimize, _| {
-                let options = mumcord_screenshare::Av1Options {
-                    screen_content: optimize == ScreenOptimize::Text,
-                };
+                let options = hwcodec::Av1Options::new(optimize == ScreenOptimize::Text);
                 lock(&screen_content).push(options.screen_content);
-                let encoder = mumcord_screenshare::Av1Encoder::new(config, options)?;
-                Ok((Box::new(encoder), SOFTWARE_AV1))
+                Ok((
+                    super::super::codecs::open_av1(config, options)?,
+                    SOFTWARE_AV1,
+                ))
             }),
         }
     }
@@ -1367,11 +1360,11 @@ mod tests {
     }
 
     impl Fake {
-        fn check_size(&self, width: u32, height: u32) -> mumcord_screenshare::Result<()> {
+        fn check_size(&self, width: u32, height: u32) -> hwcodec::Result<()> {
             match self.blocks {
                 Some((bw, bh)) if !width.is_multiple_of(bw) || !height.is_multiple_of(bh) => {
-                    Err(mumcord_screenshare::Error::HardwareUnavailable {
-                        encoder: mumcord_screenshare::HardwareEncoder::Amf,
+                    Err(hwcodec::Error::HardwareUnavailable {
+                        encoder: hwcodec::HardwareEncoder::Amf,
                         reason: format!("{width}x{height} is not aligned"),
                     })
                 }
@@ -1395,7 +1388,7 @@ mod tests {
             _: &I420Frame,
             pts: i64,
             keyframe: bool,
-        ) -> mumcord_screenshare::Result<Vec<EncodedFrame>> {
+        ) -> hwcodec::Result<Vec<EncodedFrame>> {
             thread::sleep(self.delay);
             Ok(vec![EncodedFrame {
                 data: vec![0],
@@ -1404,16 +1397,16 @@ mod tests {
                 pts,
             }])
         }
-        fn set_resolution(&mut self, width: u32, height: u32) -> mumcord_screenshare::Result<()> {
+        fn set_resolution(&mut self, width: u32, height: u32) -> hwcodec::Result<()> {
             self.check_size(width, height)?;
             (self.config.width, self.config.height) = (width, height);
             Ok(())
         }
-        fn set_bitrate(&mut self, kbps: u32) -> mumcord_screenshare::Result<()> {
+        fn set_bitrate(&mut self, kbps: u32) -> hwcodec::Result<()> {
             self.config.bitrate_kbps = kbps;
             Ok(())
         }
-        fn set_fps(&mut self, fps: u32) -> mumcord_screenshare::Result<()> {
+        fn set_fps(&mut self, fps: u32) -> hwcodec::Result<()> {
             self.config.fps = fps;
             Ok(())
         }
@@ -1670,7 +1663,7 @@ mod tests {
     #[cfg(feature = "vp9")]
     fn floor_kbps(seconds: u32) -> Vec<usize> {
         let mut capture = super::super::capture::TestPattern::default();
-        let mut encoder: Option<Encoder> = None;
+        let mut encoder: Option<Box<dyn VideoEncoder>> = None;
         let mut pts = 0_i64;
         let mut per_second = Vec::new();
         for (step, seconds) in [(FLOOR - 2, 10), (FLOOR - 1, 2), (FLOOR, seconds)] {
@@ -1683,15 +1676,15 @@ mod tests {
                         .expect("pattern");
                     let size = (picture.width(), picture.height());
                     let keyframe = match encoder.as_mut() {
-                        Some(enc) => reconfigure(enc, size, quality).expect("reconfigure"),
+                        Some(enc) => reconfigure(enc.as_mut(), size, quality).expect("reconfigure"),
                         None => {
                             encoder = Some(
-                                Encoder::new(EncoderConfig {
-                                    width: size.0,
-                                    height: size.1,
-                                    fps: quality.fps,
-                                    bitrate_kbps: quality.bitrate_kbps,
-                                })
+                                super::super::codecs::open_vp9(EncoderConfig::new(
+                                    size.0,
+                                    size.1,
+                                    quality.fps,
+                                    quality.bitrate_kbps,
+                                ))
                                 .expect("encoder"),
                             );
                             true

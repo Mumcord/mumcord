@@ -2,7 +2,7 @@
 //! from the settings, the probe and self-test results and the power state, so every rule is
 //! testable without a GPU.
 
-use mumcord_screenshare::{Codec, HardwareEncoder};
+use hwcodec::{Codec, HardwareEncoder};
 use mumcord_store::{ScreenCodec, ScreenFps, ScreenResolution};
 
 use super::GpuVendor;

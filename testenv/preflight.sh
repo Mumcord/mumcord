@@ -13,7 +13,7 @@ bad() { printf '  FAIL  %s\n' "$1"; failed=$((failed + 1)); }
 warn() { printf '  warn  %s\n' "$1"; }
 
 echo "Hardware"
-# SVT-AV1 refuses to open on a CPU without AVX2 (crates/screenshare/src/av1_svt.rs), so no share
+# SVT-AV1 refuses to open on a CPU without AVX2 (the hwcodec crate checks it), so no share
 # and no camera can start there.
 case "$(uname -m)" in
   x86_64 | amd64)

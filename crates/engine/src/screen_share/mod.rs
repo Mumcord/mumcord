@@ -25,7 +25,7 @@ pub mod capture_windows;
     any(target_os = "linux", target_os = "freebsd")
 ))]
 pub mod capture_x11;
-mod convert;
+pub(crate) mod codecs;
 pub(crate) mod encoder;
 mod fanout;
 mod media;
@@ -70,12 +70,12 @@ pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use encoder::monitor::LoadDetails;
 pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
 pub(crate) use fanout::ViewerQueue;
+pub use hwcodec::I420Frame;
 pub(crate) use media::EncoderFactory;
 pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats, ViewerPath};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 /// Why the bot refused a broadcast, part of [`FanoutUnavailable::Refused`].
 pub use mumcord_p2p::BroadcastErrorReason;
-pub use mumcord_screenshare::I420Frame;
 pub use preview::{CpuCores, SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
@@ -1459,8 +1459,8 @@ impl Engine {
             .and_then(|s| s.own.as_ref())
             .ok_or_else(not_sharing)?;
         // Software AV1 stays at 1080p30 at most (FR-7.37).
-        let software_av1 = lock(&own.encoder)
-            .is_some_and(|e| e.codec == mumcord_screenshare::Codec::Av1 && e.gpu.is_none());
+        let software_av1 =
+            lock(&own.encoder).is_some_and(|e| e.codec == hwcodec::Codec::Av1 && e.gpu.is_none());
         let prefs = if software_av1 {
             encoder::select::cap_for_software_av1(prefs)
         } else {
@@ -1507,6 +1507,9 @@ impl Engine {
                 .map(|codec| match codec {
                     wire::Codec::Vp9 => signal::CodecName::Vp9,
                     wire::Codec::Av1 => signal::CodecName::Av1,
+                    // hwcodec's enums are open for additions; Mumcord itself only creates AV1
+                    // and VP9, so anything else is treated like VP9.
+                    _ => signal::CodecName::Vp9,
                 })
                 .collect()
         });

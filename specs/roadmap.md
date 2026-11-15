@@ -51,6 +51,8 @@ of the specs and what has shipped.
   history, durability and cache switches). Plan in `docs/ssd-write-reduction.md`.
 - `13-plugin-platform-1-2-specification.md` — plugin API 1.2: theme tokens and the UI kit for
   plugin web pages (0.8.0).
+- `14-hwcodec-crate-specification.md` — the video encoders and decoders as the standalone
+  open-source crate `hwcodec` (0.9.0). With brainstorming and tasks. Lives in its own repository.
 
 ## Current state
 

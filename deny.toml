@@ -46,6 +46,8 @@ allow = [
     "Apache-2.0 WITH LLVM-exception",
     "BSD-2-Clause",
     "BSD-3-Clause",
+    # SVT-AV1, whose sources the hwcodec-svt-av1-src crate bundles (licenses/svt-av1.txt).
+    "BSD-3-Clause-Clear",
     "ISC",
     "Unicode-3.0",
     "Unicode-DFS-2016",
