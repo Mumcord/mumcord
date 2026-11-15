@@ -124,6 +124,7 @@ Locations: **HW** = `~/code/hwcodec` (new local git repository, no remote until 
 | B12 | Publish and tag 0.1.0 | done 2026-11-15: all six packages on crates.io (`hwcodec` 0.1.0 needed a second attempt: crates.io limits how many new crate names may be published in a short time), GitHub release https://github.com/Mumcord/hwcodec/releases/tag/v0.1.0 | lead | G2 | simple | Spec §10 |
 | B13 | Mumcord depends on the crates.io version (first state that can be committed) | in progress | b13-crates-io | B12 | simple | FR-14.17 |
 | B23 | hwcodec follow-ups after 0.1.0 (pull request): CHANGELOG date of 0.1.0 corrected to the publish day, `RELEASING.md` notes the crates.io limit for new crate names, docs.rs build of 0.1.0 checked | in progress | b23-followups | B12 | simple | Spec §10 |
+| G4 | Trusted Publishing on crates.io for the six packages, then take hwcodec off the organisation secret `CARGO_REGISTRY_TOKEN` | deferred by the user (2026-11-15: "not important for now"); the release pipeline keeps using the token | user | B12 | – | Spec §10 |
 | P1 | Decoder interface, detection with built-in test stream, fallback, run-time failure report | open | | B12 | complex | FR-14.13, 14.14 |
 | P2 | VA-API decoding | open | | P1 | complex | FR-14.12 |
 | P3 | AMF decoding | open | | P1 | complex | FR-14.12 |
