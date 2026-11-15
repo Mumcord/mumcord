@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mumcord package repository</title>
+    <meta
+      name="description"
+      content="Signed APT, DNF, zypper, pacman and FreeBSD pkg repository for Mumcord, the voice chat client for Mumble servers."
+    />
+    <style>
+      /* Self-contained on purpose: the repository host serves only static files, no fonts or scripts. */
+      :root {
+        --bg: #f7f6fb;
+        --fg: #1d1a2c;
+        --muted: #5f5a75;
+        --line: #dfdbea;
+        --code-bg: #eeebf6;
+        --accent: #5b34d6;
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #121019;
+          --fg: #ebe8f5;
+          --muted: #a49fbb;
+          --line: #2c2939;
+          --code-bg: #1c1a26;
+          --accent: #b4a2ff;
+        }
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          16px/1.55 system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        padding: 48px max(16px, env(safe-area-inset-right)) 64px
+          max(16px, env(safe-area-inset-left));
+      }
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        display: grid;
+        gap: 28px;
+      }
+      h1 {
+        font-size: clamp(1.6rem, 4vw, 2.1rem);
+        margin: 0 0 6px;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 0 0 8px;
+      }
+      p {
+        margin: 0;
+        max-width: 65ch;
+      }
+      .lead {
+        color: var(--muted);
+      }
+      a {
+        color: var(--accent);
+      }
+      a:focus-visible,
+      summary:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      pre,
+      code {
+        font-family: ui-monospace, "SF Mono", "DejaVu Sans Mono", Menlo, monospace;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin: 8px 0 0;
+        overflow-x: auto;
+        line-height: 1.5;
+      }
+      details {
+        border-top: 1px solid var(--line);
+        padding: 12px 0;
+      }
+      details:last-of-type {
+        border-bottom: 1px solid var(--line);
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      details p {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+      dl {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 4px 16px;
+        margin: 0;
+      }
+      dt {
+        color: var(--muted);
+      }
+      dd {
+        margin: 0;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      footer {
+        color: var(--muted);
+        font-size: 0.92em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Mumcord package repository</h1>
+        <p class="lead">
+          Signed packages of <a href="https://mumcord.app">Mumcord</a>, the voice chat client for
+          Mumble servers. Add this repository once, and new Mumcord releases arrive with your normal
+          system updates.
+        </p>
+      </header>
+
+      <section>
+        <h2>Easiest: the install script</h2>
+        <p>It asks how you want to install Mumcord and sets up this repository for you.</p>
+        <pre>
+curl -fsSL https://github.com/Mumcord/mumcord/releases/latest/download/install.sh | sh</pre>
+        <p class="lead">
+          On FreeBSD use <code>fetch -qo -</code> instead of <code>curl -fsSL</code>.
+        </p>
+      </section>
+
+      <section aria-labelledby="manual">
+        <h2 id="manual">Or set it up by hand</h2>
+        <details>
+          <summary>Debian, Ubuntu, Linux Mint (APT)</summary>
+          <pre>
+sudo install -d -m 0755 /etc/apt/keyrings
+sudo curl -fsSLo /etc/apt/keyrings/mumcord.asc https://packages.mumcord.app/mumcord.asc
+sudo curl -fsSLo /etc/apt/sources.list.d/mumcord.sources https://packages.mumcord.app/mumcord.sources
+sudo apt update
+sudo apt install mumcord</pre>
+        </details>
+        <details>
+          <summary>Fedora (DNF)</summary>
+          <pre>
+sudo rpm --import https://packages.mumcord.app/mumcord.asc
+sudo curl -fsSLo /etc/yum.repos.d/mumcord.repo https://packages.mumcord.app/mumcord.repo
+sudo dnf install mumcord</pre>
+        </details>
+        <details>
+          <summary>openSUSE (zypper)</summary>
+          <pre>
+sudo rpm --import https://packages.mumcord.app/mumcord.asc
+sudo zypper addrepo https://packages.mumcord.app/mumcord.repo
+sudo zypper refresh
+sudo zypper install mumcord</pre>
+        </details>
+        <details>
+          <summary>Arch Linux (pacman)</summary>
+          <pre>
+curl -fsSLO https://packages.mumcord.app/mumcord.asc
+sudo pacman-key --add mumcord.asc
+sudo pacman-key --lsign-key A4096249A499587C9AEF13E7F022C81D47D2BBEB</pre>
+          <p>
+            Then add this to the end of <code>/etc/pacman.conf</code> and run
+            <code>sudo pacman -Syu mumcord-bin</code>:
+          </p>
+          <pre>
+[mumcord]
+Server = https://packages.mumcord.app/arch/$arch</pre>
+        </details>
+        <details>
+          <summary>FreeBSD 15.x (pkg)</summary>
+          <pre>
+mkdir -p /usr/local/etc/pkg/keys /usr/local/etc/pkg/repos
+fetch -o /usr/local/etc/pkg/keys/mumcord.pub https://packages.mumcord.app/mumcord.pub
+fetch -o /usr/local/etc/pkg/repos/mumcord.conf https://packages.mumcord.app/mumcord.conf
+pkg update
+pkg install mumcord</pre>
+          <p>Run as root.</p>
+        </details>
+      </section>
+
+      <section>
+        <h2>Signing key</h2>
+        <dl>
+          <dt>Name</dt>
+          <dd>Mumcord Package Signing &lt;packages@mumcord.app&gt;</dd>
+          <dt>Fingerprint</dt>
+          <dd><code>A409 6249 A499 587C 9AEF&nbsp; 13E7 F022 C81D 47D2 BBEB</code></dd>
+          <dt>Valid until</dt>
+          <dd>2031-11-15</dd>
+          <dt>Key</dt>
+          <dd>
+            <a href="mumcord.asc">mumcord.asc</a> (APT, RPM, pacman) ·
+            <a href="mumcord.pub">mumcord.pub</a> (FreeBSD)
+          </dd>
+        </dl>
+        <p class="lead" style="margin-top: 10px">
+          Compare the fingerprint before you trust the key.
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          Stable releases only, newest version. Full guide, removal steps and key policy:
+          <a href="https://github.com/Mumcord/mumcord/blob/main/docs/package-repository.md"
+            >docs/package-repository.md</a
+          >
+          · <a href="https://github.com/Mumcord/mumcord">GitHub</a>
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
