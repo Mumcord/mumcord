@@ -1,7 +1,9 @@
 # FreeBSD support · Implementation report
 
 > Specification: `specs/13-freebsd-support-specification.md`
-> As of: 2026-11-09 · Mode: single session
+> As of: 2026-11-15 · Mode: native FreeBSD verification
+>
+> **Latest status (Run 4): GPU endurance failed.** Hardware acceleration is confirmed, but the current development build exhausts memory during sustained 1080p screen-share playback. AC-13.19 is not currently passed; earlier successful checks below are historical results.
 
 ## Run 1 – 2026-11-09
 
@@ -193,3 +195,39 @@ A read-only check of the real desktop before and after testing reported `Mesa In
 The native package is at `~/mumcord-freebsd-e2e/dist-freebsd-redo/mumcord-0.8.0.pkg`; it contains the development build identified above, not a tagged release. Current screenshots and redacted client logs are under `e2e/artifacts/freebsd/`; the previous run's native artifacts were retained under `e2e/artifacts/freebsd-run2/`. Disposable profiles, identities, vault keys and server databases were removed, and no test client or Xvfb process remained.
 
 Installing the temporary Xvfb prerequisite automatically updated FreeBSD's `pkg` tool from 2.8.4 to 2.9.2; no general system upgrade was run. Xvfb 21.1.26 was removed after verification. The installed Mumcord package remains 0.7.2 and the normal profile was not used or replaced. No new dedicated Rust build cache was created. Only this report changed in the repository; nothing was pushed and no pull request was created.
+
+## Run 4 – 2026-11-15: Real-desktop GPU checks and failed endurance
+
+**Result: hardware rendering verified; the ten-minute acceptance session failed because playback exhausted memory.** This is not a successful GPU endurance result, even though no kernel GPU-hang/reset markers were recorded. The current development build must not inherit the historical AC-13.19 pass from Run 1.
+
+### Method and hardware evidence
+
+The binary was the Run 3 release build, `dev~8a377d68`, on the same FreeBSD 15.1 amd64 machine with eight logical CPUs and 8 GB RAM. Tests used the real 1920×1080 X11 desktop, two disposable profiles, a private session bus and an unmodified loopback-only Mumble server. During the playback checks both clients were in voice with microphones muted; native capture and playback streams opened without fallback. Audible voice was not tested.
+
+- `glxinfo -B`, before and after: `Accelerated: yes`, `Mesa Intel(R) UHD Graphics (CML GT2)`, Mesa 26.2.2; `drm-66-kmod` 6.6.25.1501000_11 loaded, render-device PCI ID `8086:9b41`.
+- Both clients opened `/dev/drm/128` in short two-window GPU probes. The later normal-viewer run independently confirmed its WebKit process held that render node and mapped `libgallium-26.2.2.so` and `libEGL_mesa.so.0.0.0`, without injecting a WebGL context or forcing software rendering.
+- Browser-reported WebGL renderer names were not treated as hardware proof: WebKit exposed the generic string `Apple GPU` on this Intel machine. Early probes also encountered animation-timing and GTK-window-coordinate assumptions; those were corrected rather than counted as driver failures.
+- To avoid recursively capturing the receiving window, the sustained test placed the publisher on private Xvfb and the normal, unmodified receiver on the real GPU desktop. A small changing colour pattern on the private source was detected in the physically presented receiver window using X11. Only colour statistics were retained, not screenshots or desktop images.
+
+### Endurance failure and bounded reproduction
+
+An initial instrumented run timed out on a UI-control request after roughly one minute. Repeating without the injected WebGL animation or full-canvas readbacks reproduced the failure, so it cannot be dismissed as only an intrusive-probe issue.
+
+In the normal-viewer attempt starting at 14:59:22 UTC, 1920×1080 capture and direct playback initially worked. At approximately one minute of playback, WebDriver lost the receiving page. The kernel reported `swap_pager: out of swap space` and killed the receiving `WebKitWebProcess`, the publishing `mumcord` process and its `WebKitWebProcess` with `failed to reclaim memory`. Those PIDs belonged to the disposable test run, not the user's desktop applications. No GPU HANG, GPU reset or preemption-timeout marker was found before or after the tests. The workload did not reach ten minutes, so **AC-13.19 failed**; sustained 1080p receiving is also not accepted on this revision.
+
+A final bounded reproduction starting at 15:04:38 UTC sampled only this run's descendant processes once per second. It stopped both test apps when summed process RSS crossed 3 GiB, avoiding another host OOM:
+
+| Seconds after launch | Receiving WebKit process RSS | Publishing WebKit process RSS | Summed test-process RSS |
+|---|---:|---:|---:|
+| 10.0 | 358.4 MiB | 382.5 MiB | 1,973.4 MiB |
+| 15.1 | 450.7 MiB | 392.2 MiB | 2,248.0 MiB |
+| 20.1 | 930.1 MiB | 397.2 MiB | 2,872.9 MiB |
+| 22.0, safety stop | 1,258.8 MiB | 397.4 MiB | 3,202.7 MiB |
+
+Summed RSS includes shared mappings and is not unique physical-memory accounting. The rapid growth of the individual receiving WebKit process is nevertheless clear. The precise allocation/queue responsible is not yet proven; the next step is to isolate the receiving frame-delivery/rendering memory growth, add a regression check and fix it before rerunning endurance. Forcing software rendering or silently lowering quality would not establish that the normal hardware-rendered path is fixed.
+
+### Evidence and cleanup
+
+Run output, redacted client logs, native-device evidence and colour statistics are retained in ignored `e2e/artifacts/freebsd-gpu/`; the guarded memory samples are in ignored `e2e/artifacts/freebsd-gpu-memory/memory.jsonl`. The final normal-viewer log is `mumcord-gpu-check.log`. Ad-hoc probe sources are retained alongside the artifacts for diagnosis, not added to the application or CI.
+
+All disposable profiles, identities, server databases and test clients were removed. The temporary Xvfb package was removed again. Xorg and Plasma remained running; the installed Mumcord package is still 0.7.2, and the normal Mumcord profile was never used or replaced. No application runtime code or other operating system's behaviour changed. No new Rust build cache was created, nothing was pushed and no pull request was created.
