@@ -386,6 +386,8 @@ The frame-protocol change has no visual redesign. Dark/light screenshots below c
 
 ![FreeBSD bounded screen-share playback, light theme](../docs/images/screenshots/freebsd-fps-light.png)
 
+Review requested a `CHANGELOG.md` entry for the user-visible FreeBSD changes; it was added under `[Unreleased]` (faster capture, no memory kill, fewer plugin lookups, package fixes). That entry changes the bundled "What's new" data, so the embedded UI is intentionally no longer byte-identical to the run above.
+
 Final statistics, native device evidence, `guard-audit.json` and validation logs are in ignored `e2e/artifacts/freebsd-gpu/`. The earlier completed two-credit run is in `freebsd-gpu-credit2/`; rejected budget runs are in `freebsd-fps-guard3g/` and `freebsd-fps-guard35g/`, and the single-credit diagnostic/interrupted run are in `freebsd-credit1-diagnostic/` and `freebsd-credit1-incomplete/`. Temporary diagnostic JavaScript sources were archived rather than exempted from lint. No real-desktop screenshots or profile/server databases were retained.
 
 Test clients, local servers, private displays/buses, disposable profiles and temporary helpers/scripts were removed. The temporary Xvfb package was uninstalled; Xorg and Plasma remained running. The installed application is still 0.7.2 and the normal profile was not used or replaced. Existing Rust target artifacts were reused; no dedicated build cache was created. Nothing was pushed or opened as a pull request.
