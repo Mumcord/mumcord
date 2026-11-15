@@ -46,6 +46,7 @@ pub mod screen_share;
 pub mod server_query;
 pub mod session;
 pub mod sounds;
+mod srv;
 pub mod stats;
 pub mod sysinfo;
 pub mod test_hooks;

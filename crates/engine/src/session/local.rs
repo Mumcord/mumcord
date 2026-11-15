@@ -463,13 +463,15 @@ impl Engine {
         // attempt that must not send the password refuses the certificate, and the probe then
         // tries again without it.
         let presented = Arc::new(std::sync::Mutex::new(None::<String>));
-        let config = |password: Option<String>| {
+        // Probes the server a connect would reach, behind an SRV record too (issue #859).
+        let targets = crate::srv::targets(&address, input.port).await;
+        let config = |target: &crate::srv::Target, password: Option<String>| {
             let seen = presented.clone();
             let trusted = trusted.clone();
             let needs_trust = password.is_some();
             ConnectConfig {
-                host: address.clone(),
-                port: input.port,
+                host: target.host.clone(),
+                port: target.port,
                 username: username.clone(),
                 password,
                 tokens: Vec::new(),
@@ -495,14 +497,26 @@ impl Engine {
         };
 
         let probe = async {
-            let connection = match mumble_client_protocol::connect(config(password)).await {
-                Err(ConnectError::CertificateRejected(_)) => {
-                    mumble_client_protocol::connect(config(None))
-                        .await
-                        .map_err(|err| withheld_failure(test_failure(err), trusted.is_some()))?
-                }
-                attempt => attempt.map_err(test_failure)?,
-            };
+            let mut outcome = Err(EngineError::new(
+                ErrorKind::ServerUnreachable,
+                "no address to connect to",
+            ));
+            for (index, target) in targets.iter().enumerate() {
+                let last = index + 1 == targets.len();
+                outcome = match mumble_client_protocol::connect(config(target, password.clone()))
+                    .await
+                {
+                    Err(ConnectError::CertificateRejected(_)) => {
+                        mumble_client_protocol::connect(config(target, None))
+                            .await
+                            .map_err(|err| withheld_failure(test_failure(err), trusted.is_some()))
+                    }
+                    Err(err) if !last && crate::srv::unreachable(&err) => continue,
+                    attempt => attempt.map_err(test_failure),
+                };
+                break;
+            }
+            let connection = outcome?;
             let info = super::convert::server_info_view(&connection.handle.state());
             let ping = connection.handle.ping().await;
             connection.handle.disconnect();

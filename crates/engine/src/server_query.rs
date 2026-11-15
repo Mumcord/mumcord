@@ -180,7 +180,13 @@ async fn ask(socket: &UdpSocket, query: &[u8], echo: u64) -> Option<(QueryAnswer
 }
 
 async fn resolve(address: &str, port: u16) -> Option<SocketAddr> {
-    match tokio::net::lookup_host((address, port)).await {
+    // The server a connect would reach first, so a server behind an SRV record (issue #859)
+    // shows as online in the list.
+    let target = crate::srv::targets(address, port)
+        .await
+        .into_iter()
+        .next()?;
+    match tokio::net::lookup_host((target.host.as_str(), target.port)).await {
         Ok(targets) => targets.into_iter().next(),
         Err(e) => {
             tracing::debug!(address, error = %e, "resolving the query address failed");
