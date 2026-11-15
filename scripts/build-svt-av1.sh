@@ -54,7 +54,8 @@ build() {
   local dir=$1 install=$2
   shift 2
   cmake -S "$src" -B "$dir" -DCMAKE_INSTALL_PREFIX="$install" "${options[@]}" "$@"
-  cmake --build "$dir" --config Release --parallel
+  # A bare --parallel overrides CMAKE_BUILD_PARALLEL_LEVEL with the generator's default.
+  cmake --build "$dir" --config Release --parallel ${CMAKE_BUILD_PARALLEL_LEVEL:+"$CMAKE_BUILD_PARALLEL_LEVEL"}
   cmake --install "$dir" --config Release
 }
 

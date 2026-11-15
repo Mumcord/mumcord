@@ -73,7 +73,8 @@ else
   options+=(-DCMAKE_BUILD_TYPE=Release)
 fi
 cmake -S "$vpl_src" -B "$vpl_build" -DCMAKE_INSTALL_PREFIX="$install" "${options[@]}"
-cmake --build "$vpl_build" --config Release --parallel
+# A bare --parallel overrides CMAKE_BUILD_PARALLEL_LEVEL with the generator's default.
+cmake --build "$vpl_build" --config Release --parallel ${CMAKE_BUILD_PARALLEL_LEVEL:+"$CMAKE_BUILD_PARALLEL_LEVEL"}
 cmake --install "$vpl_build" --config Release
 cp -R "$work/install/include/vpl" "$prefix/include/"
 cp "$work/install/lib/$lib" "$prefix/lib/"
