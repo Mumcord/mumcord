@@ -57,6 +57,7 @@
     "pause": "Pauzēt"
   },
   "codecHint": {
+    "appimage": "Šis AppImage nevar atskaņot H.264 video. Atjaunini Mumcord vai izmanto savas distribūcijas pakotni (AUR Arch sistēmā). Sistēmas gst-libav instalēšana neatrisinās šī AppImage problēmu.",
     "install": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav:",
     "generic": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav (GStreamer libav spraudni) ar savas sistēmas pakotņu pārvaldnieku.",
     "rpmFusion": "Fedora sistēmā gst-libav nāk no RPM Fusion krātuves; vispirms iespējo RPM Fusion.",

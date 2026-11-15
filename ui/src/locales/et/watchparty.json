@@ -57,6 +57,7 @@
     "pause": "Peata"
   },
   "codecHint": {
+    "appimage": "See AppImage ei saa H.264-videot esitada. Uuenda Mumcordi või kasuta oma distributsiooni paketti (Archis AUR). Süsteemi gst-libav paigaldamine ei lahenda selle AppImage'i probleemi.",
     "install": "See video vajab H.264 tuge. Paigalda gst-libav:",
     "generic": "See video vajab H.264 tuge. Paigalda gst-libav (GStreameri libav-plugin) oma süsteemi paketihalduriga.",
     "rpmFusion": "Fedoras tuleb gst-libav RPM Fusioni hoidlast; luba esmalt RPM Fusion.",

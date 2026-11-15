@@ -1,5 +1,20 @@
 # Troubleshooting
 
+## Twitch asks for H.264 although gst-libav is installed
+
+Applies to: Linux AppImage, watch parties and embedded videos (issue #567).
+
+Older AppImages, including 0.7.0, tried to load the system's gst-libav into their bundled
+GStreamer. On rolling distributions such as Arch, the system plugin can require a newer
+GStreamer than the AppImage contains. Installing gst-libav again does not fix that mismatch.
+YouTube may still work because it also offers VP9, while Twitch requires H.264.
+
+Update Mumcord: current Linux packages carry their own compatible H.264 and AAC decoders, and
+the AppImage no longer loads system GStreamer plugins. If you cannot update or the AppImage
+still cannot play H.264, use your distribution's package (the AUR package on Arch), which uses
+system GStreamer, or open the video in your browser. For a current AppImage, include the
+`H.264 support` or `the bundled gst-libav did not load` log entry in a bug report.
+
 ## OpenGL games need a launch option
 
 Applies to: Linux, in-game overlay.

@@ -1,9 +1,10 @@
 /**
  * The missing-codec hint (FR-2.41a). Every Linux package brings its own H.264/AAC decoders, but a
  * source build has only the system's, and some distributions ship WebKitGTK without them; videos
- * that need H.264 then fail. The hint names the package manager command that installs gst-libav. It is only shown
- * when the player failed in a way a missing decoder causes and the webview really lacks H.264,
- * so a generic failure never gets a misleading install hint.
+ * that need H.264 then fail. The hint names the package manager command that installs gst-libav,
+ * except in an AppImage, which cannot use system plugins and offers an update or native package.
+ * It is only shown when the player failed in a way a missing decoder causes and the webview
+ * really lacks H.264, so a generic failure never gets a misleading install hint.
  *
  * FreeBSD always needs this (FR-13.34 – FR-13.36): WebKitGTK loads its decoders from GStreamer
  * packages, and the app probes H.264, VP9 and Opus to name the one that is missing. AV1 and
