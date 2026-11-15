@@ -37,6 +37,7 @@
 
 ### Internal
 
+- Engine: `camera_set_tiles_wanted_by_default`, `camera_tile_set_wanted` and `camera_tile_path` for the phone apps, which load a camera only after the user taps it and show how it arrives; the desktop keeps loading every shown camera
 - Engine: a camera backend set by the embedding app counts as a camera backend, and Android and iOS builds count as platforms with a camera; before, any camera availability refresh (P2P mode, relay or direct-connections change) stopped a phone's camera as "not supported on this platform"
 - Native video-library build scripts honor explicit job limits (`CARGO_BUILD_JOBS` for libvpx and dav1d, `CMAKE_BUILD_PARALLEL_LEVEL` for SVT-AV1 and the hardware encoder SDK), allowing single-job builds on Raspberry Pi without changing other platforms' defaults; added regression checks and a Raspberry Pi build/test guide
 - FreeBSD packages could not be built into a relative output directory, and the package did not require the dynamically loaded `alsa-plugins` package that makes the OSS devices visible; both are fixed, with checks that run in CI. The native FreeBSD smoke and GPU-endurance tests are part of the CI job as well

@@ -35,12 +35,12 @@ use super::session::{ServerCameras, broadcast_hex, cert_hash};
 use super::signal::{CameraMessage, Codec};
 use crate::ServerId;
 use crate::peer::RelayUse;
-use crate::screen_share::ScreenFrameSink;
 use crate::screen_share::broadcast::cert_key;
 use crate::screen_share::broadcast::link::{OnEnd, Subscriber};
 use crate::screen_share::sound::ShareSound;
 use crate::screen_share::watch::{FrameSource, RequestSink, WatchLink};
 use crate::screen_share::wire::{self, DescriptionCheck, Frame};
+use crate::screen_share::{ScreenFrameSink, ViewerPath};
 use crate::session::{Engine, EngineEvent, SessionCtx, lock};
 
 /// The sender takes at most one `cam-join` per viewer in this time (section 6.5).
@@ -189,7 +189,6 @@ struct TileWatch {
     /// stream's reverse messages (FR-8.55, FR-8.93).
     want: WantPath,
     /// The frames came in over the sender's own `STREAM_CAMERA`, not the relay.
-    #[cfg_attr(not(feature = "test-backend"), allow(dead_code))]
     direct: bool,
     frames: Arc<AtomicU32>,
     sent_want: Option<u16>,
@@ -225,10 +224,13 @@ struct Tile {
     badge: Option<u32>,
     /// The last `on` said the camera is paused.
     paused: bool,
+    /// The app asked for this camera ([`Engine::camera_tile_set_wanted`]); a new tile starts
+    /// with [`Receiving::wanted_by_default`].
+    wanted: bool,
 }
 
 impl Tile {
-    fn new(id: String) -> Self {
+    fn new(id: String, wanted: bool) -> Self {
         Self {
             id,
             state: TileState::Announced,
@@ -244,7 +246,14 @@ impl Tile {
             fps: FpsMeter::default(),
             badge: None,
             paused: false,
+            wanted,
         }
+    }
+
+    /// Whether the tile should play: the room `shows` cameras, the app asked for it, and the
+    /// user neither hid nor blocked the person.
+    fn wants(&self, shows: bool) -> bool {
+        shows && self.wanted && !self.hidden && !self.blocked
     }
 
     /// Moves the tile towards showing video (`wants`) or not, along section 7.2.
@@ -403,6 +412,17 @@ pub(crate) struct Receiving {
     /// Codecs decoded in the engine because the webview cannot (FR-7.59).
     decode_here: Vec<wire::Codec>,
     prefs: Option<Prefs>,
+    /// New tiles are not wanted until the app asks for them
+    /// ([`Engine::camera_set_tiles_wanted_by_default`]); `false` (the default) keeps the desktop
+    /// behaviour of loading every camera that is shown.
+    tiles_not_wanted: bool,
+}
+
+impl Receiving {
+    /// Whether a new tile loads without being asked for.
+    fn wanted_by_default(&self) -> bool {
+        !self.tiles_not_wanted
+    }
 }
 
 impl Room {
@@ -540,6 +560,47 @@ impl Engine {
                 tile.hidden = hidden;
             }
         });
+    }
+
+    /// Whether new camera tiles load as soon as they are shown (`true`, the default and the
+    /// desktop behaviour) or only once the app asks for each with
+    /// [`Self::camera_tile_set_wanted`] (phones: nothing is downloaded before the user taps a
+    /// camera). Tiles already in a room keep their choice.
+    pub fn camera_set_tiles_wanted_by_default(&self, wanted: bool) {
+        lock(self.camera_state()).recv.tiles_not_wanted = !wanted;
+    }
+
+    /// Asks for `sharer`'s camera or lets it go: an unwanted tile stays announced and downloads
+    /// nothing, like a hidden one, but without the "Video hidden" choice of the user.
+    pub fn camera_tile_set_wanted(&self, server_id: ServerId, sharer: u32, wanted: bool) {
+        self.camera_room_change(server_id, |room| {
+            if let Some(tile) = room.tiles.get_mut(&sharer) {
+                tile.wanted = wanted;
+            }
+        });
+    }
+
+    /// How `sharer`'s camera reaches this client while it plays: the relay broadcast
+    /// ([`ViewerPath::Broadcast`]), or the sender's own stream over a direct
+    /// ([`ViewerPath::Direct`]) or relayed ([`ViewerPath::Relay`]) connection. `None` while the
+    /// tile does not play.
+    pub fn camera_tile_path(&self, server_id: ServerId, sharer: u32) -> Option<ViewerPath> {
+        let direct = lock(self.camera_state())
+            .recv
+            .rooms
+            .get(&server_id)
+            .and_then(|room| room.tiles.get(&sharer))
+            .filter(|tile| tile.state == TileState::Playing)
+            .and_then(|tile| tile.watch.as_ref())
+            .map(|watch| watch.direct)?;
+        if !direct {
+            return Some(ViewerPath::Broadcast);
+        }
+        // Read after the camera state is released: the P2P links have their own lock.
+        Some(match self.p2p_link(server_id, sharer).map(|l| l.path) {
+            Some(mumcord_p2p::ConnectionPath::Relay(_)) => ViewerPath::Relay,
+            Some(mumcord_p2p::ConnectionPath::Direct) | None => ViewerPath::Direct,
+        })
     }
 
     /// Quality for me on one tile (FR-8.56).
@@ -681,7 +742,7 @@ impl Engine {
             let shows = room.shows(prefs.show);
             for (&sharer, tile) in &mut room.tiles {
                 tile.blocked = blocked.contains(&sharer);
-                let wants = shows && !tile.hidden && !tile.blocked;
+                let wants = tile.wants(shows);
                 match tile.step(wants, now) {
                     Some(Act::Join) => out.push(Out::Join {
                         sharer,
@@ -1056,6 +1117,7 @@ pub(crate) fn on_camera_on(
     let show = engine.camera_prefs().show;
     let replaced = {
         let mut cameras = lock(engine.camera_state());
+        let wanted = cameras.recv.wanted_by_default();
         let room = cameras.recv.rooms.entry(ctx.server_id).or_default();
         if room.tiles.is_empty() && show == CameraShow::Always {
             room.open = true;
@@ -1067,9 +1129,10 @@ pub(crate) fn on_camera_on(
                 None
             }
             Some(tile) => {
-                let old = std::mem::replace(tile, Tile::new(id));
+                let old = std::mem::replace(tile, Tile::new(id, wanted));
                 // The choices made on the tile stay with the person.
                 tile.hidden = old.hidden;
+                tile.wanted = old.wanted;
                 tile.quality = old.quality;
                 tile.height = old.height;
                 tile.last_join = old.last_join;
@@ -1078,7 +1141,7 @@ pub(crate) fn on_camera_on(
                 Some(old)
             }
             None => {
-                let mut tile = Tile::new(id);
+                let mut tile = Tile::new(id, wanted);
                 tile.paused = paused;
                 room.tiles.insert(sharer, tile);
                 None
@@ -1171,9 +1234,31 @@ mod tests {
     }
 
     #[test]
+    fn a_tile_plays_only_when_wanted_shown_and_neither_hidden_nor_blocked() {
+        let mut tile = Tile::new(ID.into(), false);
+        assert!(!tile.wants(true), "not asked for yet");
+        tile.wanted = true;
+        assert!(tile.wants(true));
+        assert!(!tile.wants(false), "the room shows no cameras");
+        tile.hidden = true;
+        assert!(!tile.wants(true));
+        tile.hidden = false;
+        tile.blocked = true;
+        assert!(!tile.wants(true));
+    }
+
+    #[test]
+    fn new_tiles_are_wanted_unless_the_app_asks_otherwise() {
+        let mut receiving = Receiving::default();
+        assert!(receiving.wanted_by_default());
+        receiving.tiles_not_wanted = true;
+        assert!(!receiving.wanted_by_default());
+    }
+
+    #[test]
     fn a_shown_camera_joins_plays_and_unbinds_with_cam_leave_when_hidden() {
         let now = Instant::now();
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert_eq!(tile.step(true, now), Some(Act::Join));
         assert_eq!(tile.state, TileState::Joining);
         assert_eq!(tile.step(true, later(now, 1)), None);
@@ -1188,7 +1273,7 @@ mod tests {
 
     #[test]
     fn a_camera_that_should_not_show_never_joins() {
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert_eq!(tile.step(false, Instant::now()), None);
         assert_eq!(tile.state, TileState::Hidden);
         assert_eq!(tile.last_join, None);
@@ -1197,7 +1282,7 @@ mod tests {
     #[test]
     fn showing_again_waits_for_the_senders_join_limit() {
         let now = Instant::now();
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert_eq!(tile.step(true, now), Some(Act::Join));
         tile.step(false, later(now, 2));
         assert_eq!(tile.step(true, later(now, 3)), None);
@@ -1209,7 +1294,7 @@ mod tests {
     #[test]
     fn a_join_without_any_answer_fails_and_retries_every_ten_seconds() {
         let now = Instant::now();
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         tile.step(true, now);
         assert_eq!(tile.step(true, later(now, 9)), None);
         assert_eq!(tile.step(true, later(now, 10)), None);
@@ -1228,7 +1313,7 @@ mod tests {
     #[test]
     fn full_waits_for_the_next_announcement_and_the_join_limit() {
         let now = Instant::now();
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert_eq!(tile.step(true, now), Some(Act::Join));
         assert!(
             !tile.full("ffffffffffffffff"),
@@ -1251,7 +1336,7 @@ mod tests {
         assert_eq!(tile.step(true, later(now, 41)), Some(Act::Join));
         assert_eq!(tile.state, TileState::Full);
         // A failed join turns full when the sender answers late.
-        let mut late = Tile::new(ID.into());
+        let mut late = Tile::new(ID.into(), true);
         late.step(true, now);
         late.step(true, later(now, 10));
         assert_eq!(late.state, TileState::Failed);
@@ -1269,7 +1354,7 @@ mod tests {
     #[test]
     fn needs_shows_the_text_and_waits_for_the_next_announcement() {
         let now = Instant::now();
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert_eq!(tile.step(true, now), Some(Act::Join));
         assert!(
             !tile.needs("ffffffffffffffff"),
@@ -1289,7 +1374,7 @@ mod tests {
         assert_eq!(tile.state, TileState::Hidden);
 
         // `on` again: joined once more, within the sender's join limit.
-        let mut again = Tile::new(ID.into());
+        let mut again = Tile::new(ID.into(), true);
         again.step(true, now);
         assert!(again.needs(ID));
         again.retry = true;
@@ -1297,7 +1382,7 @@ mod tests {
         assert_eq!(again.state, TileState::Joining);
 
         // A join that timed out first turns needs-update when the sender answers late.
-        let mut late = Tile::new(ID.into());
+        let mut late = Tile::new(ID.into(), true);
         late.step(true, now);
         late.step(true, later(now, 10));
         assert_eq!(late.state, TileState::Failed);
@@ -1305,7 +1390,7 @@ mod tests {
         assert_eq!(late.state, TileState::NeedsUpdate);
 
         // A playing tile ignores a stray needs message.
-        let mut playing = Tile::new(ID.into());
+        let mut playing = Tile::new(ID.into(), true);
         playing.state = TileState::Playing;
         assert!(!playing.needs(ID));
     }
@@ -1313,7 +1398,7 @@ mod tests {
     #[test]
     fn every_join_and_unbind_starts_a_new_attempt() {
         let now = Instant::now();
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         tile.step(true, now);
         let first = tile.attempt;
         tile.step(false, later(now, 1));
@@ -1342,7 +1427,7 @@ mod tests {
             open: true,
             ..Room::default()
         };
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         tile.hidden = true;
         tile.quality = TileQuality::Best;
         room.tiles.insert(7, tile);
@@ -1355,10 +1440,10 @@ mod tests {
     #[test]
     fn blocked_people_have_no_tile() {
         let mut room = Room::default();
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         tile.blocked = true;
         room.tiles.insert(7, tile);
-        room.tiles.insert(8, Tile::new(ID.into()));
+        room.tiles.insert(8, Tile::new(ID.into(), true));
         let view = room.view(1, false);
         assert_eq!(view.tiles.len(), 1);
         assert_eq!(view.tiles[0].sharer, 8);
@@ -1366,7 +1451,7 @@ mod tests {
 
     #[test]
     fn want_is_the_rounded_tile_height_or_720_for_best() {
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert_eq!(tile.want(), None);
         tile.height = 200;
         assert_eq!(tile.want(), Some(360));
@@ -1383,7 +1468,7 @@ mod tests {
 
     #[test]
     fn data_saver_follows_the_tile_then_the_setting() {
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert!(!tile.data_saver(false));
         assert!(tile.data_saver(true));
         tile.quality = TileQuality::Best;
@@ -1425,7 +1510,7 @@ mod tests {
     fn only_a_shown_unblocked_tile_takes_a_direct_stream() {
         // FR-8.92: a stream for a camera the room does not show, or whose sender the user
         // blocked, is closed without decoding anything.
-        let mut tile = Tile::new(ID.into());
+        let mut tile = Tile::new(ID.into(), true);
         assert!(may_bind(Some(&tile), false));
         assert!(!may_bind(Some(&tile), true), "blocked");
         tile.state = TileState::Hidden;
