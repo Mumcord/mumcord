@@ -120,9 +120,10 @@ Locations: **HW** = `~/code/hwcodec` (new local git repository, no remote until 
 | B22 | Port base commit `d06d931b9` ("perf: streamline fallback video colour conversion": `frame.rs`, example `rgba_speed.rs`) into hwcodec as a pull request, so the change is not lost when Mumcord drops `crates/screenshare`; must be in 0.1.0 | done: https://github.com/Mumcord/hwcodec/pull/11 merged (adds `I420Frame::append_rgba`, about a third less time per picture; co-authored by the original author) | b22-port | F8 | complex | FR-14.18 |
 | F9 | Mumcord #846: rebase onto `milestone/0.9.0` (keep the crate deleted), pin the hwcodec commit that contains B22, push the shard fix, watch E2E | in progress | f9-rebase | B22 | simple | AC-14.7 |
 | B21 | hwcodec release preparation: https://github.com/Mumcord/hwcodec/pull/10 merged (`main` = `56e44ea`): CHANGELOG `[0.1.0] - 2026-11-14` with known limits, crates.io metadata, package contents, docs.rs build setting. Open before the tag: green CI on `main`, release dry run on `main`, CHANGELOG date if the tag is pushed on a later day | done | b21-release-prep | B22 | simple | Spec §10 |
-| G2 | User OK: publish 0.1.0 | open | user | C2b, C3 | – | – |
-| B12 | Publish and tag 0.1.0 | open | | G2 | simple | Spec §10 |
-| B13 | Mumcord depends on the crates.io version (first state that can be committed) | open | | B12 | simple | FR-14.17 |
+| G2 | User OK: publish 0.1.0 | done ("tag now 0.1.0", 2026-11-15, after the crates.io token was confirmed; release rehearsal on `main` green: run 43655694115) | user | C2b, C3 | – | – |
+| B12 | Publish and tag 0.1.0 | done 2026-11-15: all six packages on crates.io (`hwcodec` 0.1.0 needed a second attempt: crates.io limits how many new crate names may be published in a short time), GitHub release https://github.com/Mumcord/hwcodec/releases/tag/v0.1.0 | lead | G2 | simple | Spec §10 |
+| B13 | Mumcord depends on the crates.io version (first state that can be committed) | in progress | b13-crates-io | B12 | simple | FR-14.17 |
+| B23 | hwcodec follow-ups after 0.1.0 (pull request): CHANGELOG date of 0.1.0 corrected to the publish day, `RELEASING.md` notes the crates.io limit for new crate names, docs.rs build of 0.1.0 checked | in progress | b23-followups | B12 | simple | Spec §10 |
 | P1 | Decoder interface, detection with built-in test stream, fallback, run-time failure report | open | | B12 | complex | FR-14.13, 14.14 |
 | P2 | VA-API decoding | open | | P1 | complex | FR-14.12 |
 | P3 | AMF decoding | open | | P1 | complex | FR-14.12 |
