@@ -42,7 +42,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  # Official Mumble server for the native Windows/macOS smoke servers (Linux uses testenv).
+  # Official Mumble server for the Windows smoke server (Linux uses testenv, macOS
+  # scripts/smoke/mac-server.env).
   MUMBLE_SERVER_VERSION: 1.5.939
 
 # Callers grant at most this; the jobs only read the repository and upload run artifacts.
@@ -747,55 +748,16 @@ jobs:
           # Started in the smoke step below: runner processes do not survive the end of a step.
           "MUMBLE_SERVER_EXE=$($server.FullName)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
 
-      # Homebrew has no Mumble server and the official releases ship none for macOS, so it is
-      # built from the release source (server only) and cached. If this fails, the macOS smoke
-      # falls back to a start-only check and "connects" stays on the manual checklist.
-      - name: Cache Mumble server (macOS)
-        if: runner.os == 'macOS'
-        id: server-cache
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/mumble-server
-          key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-
-      - name: Build Mumble server (macOS)
-        id: server-build
-        if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true'
-        continue-on-error: true
-        run: |
-          brew install qt@5 protobuf@21 openssl@3 pkgconf
-          v=$MUMBLE_SERVER_VERSION
-          curl -fsSL "https://github.com/mumble-voip/mumble/releases/download/v$v/mumble-$v.tar.gz" | tar -xz -C "$RUNNER_TEMP"
-          cmake -S "$RUNNER_TEMP/mumble-$v" -B "$RUNNER_TEMP/mumble-build" -DCMAKE_BUILD_TYPE=Release \
-            -Dclient=OFF -Dserver=ON -Dice=OFF -Dzeroconf=OFF -Dtests=OFF -Dplugins=OFF \
-            -Dwarnings-as-errors=OFF \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5);$(brew --prefix protobuf@21);$(brew --prefix openssl@3)"
-          cmake --build "$RUNNER_TEMP/mumble-build" -j "$(sysctl -n hw.ncpu)"
-          mkdir -p ~/mumble-server
-          cp "$(find "$RUNNER_TEMP/mumble-build" -type f -perm -u+x -name 'mumble-server' | head -n 1)" ~/mumble-server/
-
-      - name: Save Mumble server (macOS)
-        if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main' && steps.server-build.outcome == 'success'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/mumble-server
-          key: ${{ steps.server-cache.outputs.cache-primary-key }}
-
-      - name: Start test server (macOS)
+      # Official macOS server build (Mumble 1.6 RC, pinned and checked against its SHA-256 and
+      # signature: scripts/smoke/mac-server.env). Started in the smoke step below, like on Windows.
+      # If the download fails, the macOS smoke falls back to a start-only check with a warning.
+      - name: Fetch test server (macOS, official Mumble server)
         if: runner.os == 'macOS'
         id: mac-server
         continue-on-error: true
-        run: |
-          test -x ~/mumble-server/mumble-server
-          # Runtime libraries of the cached binary.
-          brew install qt@5 protobuf@21 openssl@3
-          dir=$RUNNER_TEMP/mumble-server-data
-          mkdir -p "$dir"
-          printf 'database=%s\nport=64738\nautobanAttempts=0\n' "$dir/mumble-server.sqlite" > "$dir/mumble-server.ini"
-          ~/mumble-server/mumble-server -ini "$dir/mumble-server.ini" -fg > "$dir/server.log" 2>&1 &
-          for _ in $(seq 60); do nc -z 127.0.0.1 64738 && exit 0; sleep 1; done
-          cat "$dir/server.log"
-          exit 1
+        env:
+          ARCH: ${{ matrix.arch }}
+        run: scripts/smoke/fetch-mac-server.sh "$ARCH" "$RUNNER_TEMP/mumble-server"
 
       # --- Smoke helpers ---------------------------------------------------------------------
 
@@ -1020,9 +982,13 @@ jobs:
               || { echo "ONNX Runtime is not signed by the app's team" >&2; exit 1; }
           fi
           python3 -I scripts/smoke/check-onnxruntime.py "$ort"
-          if [[ "$MAC_SERVER" == "success" ]]; then
-            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot "$RUNNER_TEMP/mumbot/mumbot"
+          # The server is a pre-release: if it cannot be fetched or started, an upstream problem
+          # must not block a release, so only the start is checked and a warning says so.
+          data="$RUNNER_TEMP/mumble-server-data"
+          if [[ "$MAC_SERVER" == "success" ]] && scripts/smoke/start-mac-server.sh "$RUNNER_TEMP/mumble-server/mumble-server" "$data"; then
+            scripts/smoke/smoke.sh --app /Applications/Mumcord.app --seed target/release/mumcord-smoke-seed --bot "$RUNNER_TEMP/mumbot/mumbot" \
+              || { echo "== server log"; cat "$data/server.log"; exit 1; }
           else
-            echo "::warning::No Mumble server on macOS – start-only check; 'connects' is a manual checklist item (AC-1.30)."
+            echo "::warning::Mumble server for macOS could not be fetched or started – start-only check; 'connects' is a manual check this time (AC-1.30)."
             scripts/smoke/smoke.sh --app /Applications/Mumcord.app --start-only
           fi
