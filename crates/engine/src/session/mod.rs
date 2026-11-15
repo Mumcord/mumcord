@@ -62,7 +62,9 @@ use crate::people::{self, People};
 use crate::sounds::SoundHub;
 use crate::voice::{self, Audio, Meter, VoicePipeline, VoiceShared};
 use convert::{channel_path, channel_view, join_path, resolve_path, split_path, user_view};
-use machine::{CertCheck, Failure, Machine, SelfVoice, Step, check_cert, format_fingerprint};
+use machine::{
+    CertCheck, Failure, Machine, ReconnectNow, SelfVoice, Step, check_cert, format_fingerprint,
+};
 
 /// Upper bound for TCP connect + TLS + login of one attempt.
 const LOGIN_TIMEOUT: Duration = Duration::from_secs(15);
@@ -334,6 +336,8 @@ pub struct MicTestDevices {
 struct Slot {
     machine: Machine,
     generation: u64,
+    /// [`Engine::reconnect_now`] for this connection's supervisor.
+    wake: Arc<ReconnectNow>,
     supervisor: Option<JoinHandle<()>>,
     session: Option<Session>,
     pending_trust: Option<PendingTrust>,
@@ -1230,6 +1234,27 @@ impl Engine {
         }
     }
 
+    /// Reconnects `server_id` at once, for an app that just got a working network again (a phone
+    /// moving between Wi-Fi and mobile data): while reconnecting, the wait before the next attempt
+    /// ends now; while connected, the connection is dropped, because its socket may be dead
+    /// without any sign yet, and set up again right away. Either way the reconnect returns to
+    /// the last channel with the own mute and deafen, like any reconnect. Does nothing while the
+    /// first connect is still running or a trust decision is pending.
+    pub fn reconnect_now(&self, server_id: ServerId) -> EngineResult<()> {
+        let core = lock(&self.inner.core);
+        let slot = core
+            .slots
+            .get(&server_id)
+            .ok_or_else(|| EngineError::new(ErrorKind::NotConnected, "not connected"))?;
+        let running = matches!(slot.machine.state(), ConnState::Reconnecting { .. })
+            || (matches!(slot.machine.state(), ConnState::Connected { .. })
+                && slot.session.is_some());
+        if running && slot.pending_trust.is_none() {
+            slot.wake.request();
+        }
+        Ok(())
+    }
+
     /// Stops reconnecting; same as disconnecting.
     pub fn reconnect_cancel(&self, server_id: ServerId) {
         self.disconnect(server_id);
@@ -1986,9 +2011,11 @@ impl Inner {
         let generation = core.generations;
         let mut machine = Machine::default();
         machine.connect(server_id);
+        let wake = Arc::new(ReconnectNow::default());
         let slot = Slot {
             machine,
             generation,
+            wake: wake.clone(),
             supervisor: None,
             session: None,
             pending_trust: None,
@@ -2006,7 +2033,7 @@ impl Inner {
         let inner = self.clone();
         let task = self.rt.spawn(async move {
             inner
-                .supervise(generation, server_id, channel_path, rejoin)
+                .supervise(generation, server_id, &wake, channel_path, rejoin)
                 .await
         });
         if let Some(slot) = core.slots.get_mut(&server_id) {
@@ -2306,6 +2333,7 @@ impl Inner {
         self: Arc<Self>,
         generation: u64,
         server_id: ServerId,
+        wake: &ReconnectNow,
         mut path: Option<Vec<String>>,
         mut rejoin: Option<String>,
     ) {
@@ -2322,8 +2350,12 @@ impl Inner {
                     };
                     // `attempt` returns once the login is through.
                     let logged_in = Instant::now();
+                    // A request made while this attempt ran is answered by it.
+                    wake.take();
                     match self
-                        .run_connection(generation, server_id, connection, &host, port, arrival)
+                        .run_connection(
+                            generation, server_id, wake, connection, &host, port, arrival,
+                        )
                         .await
                     {
                         Ended::Lost => {
@@ -2378,7 +2410,16 @@ impl Inner {
                 Some(Step::Retry(delay)) => {
                     self.reconnects.fetch_add(1, Ordering::Relaxed);
                     tracing::info!(server_id, delay_secs = delay.as_secs(), "reconnecting");
-                    tokio::time::sleep(delay).await;
+                    if wake.take() {
+                        tracing::info!(server_id, "reconnecting now on request");
+                    } else {
+                        tokio::select! {
+                            () = tokio::time::sleep(delay) => {}
+                            () = wake.requested() => {
+                                tracing::info!(server_id, "reconnecting now on request");
+                            }
+                        }
+                    }
                 }
                 Some(Step::Stop) | None => return,
             }
@@ -2528,10 +2569,12 @@ impl Inner {
     }
 
     /// Runs a synced connection until it ends.
+    #[allow(clippy::too_many_arguments)]
     async fn run_connection(
         self: &Arc<Self>,
         generation: u64,
         server_id: ServerId,
+        wake: &ReconnectNow,
         connection: Connection,
         host: &str,
         port: u16,
@@ -2649,6 +2692,14 @@ impl Inner {
                 }
             };
             tokio::select! {
+                () = wake.requested() => {
+                    // The app knows the network changed: this socket may be dead without any
+                    // sign yet. Close it and connect again at once, as after a lost connection
+                    // (channel, mute and deafen are restored).
+                    tracing::info!(server_id, "dropping the connection to reconnect now");
+                    handle.disconnect();
+                    return self.end_connection(generation, server_id, DisconnectReason::Timeout);
+                }
                 event = events.recv() => {
                     let event = match event {
                         Some(Event::Disconnected(reason)) => {

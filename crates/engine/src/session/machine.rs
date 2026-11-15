@@ -1,6 +1,7 @@
 //! Pure connection logic: the state machine of spec §7 with reconnect backoff, the
 //! trust-on-first-use decision and the self mute/deafen rules. No I/O, so it is unit-tested.
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use mumcord_store::{OwnVoice, ServerId};
@@ -240,9 +241,62 @@ impl SelfVoice {
     }
 }
 
+/// A request to reconnect at once: the supervisor skips its wait before the next attempt, and a
+/// running connection is dropped (its socket may be dead after a network change).
+#[derive(Default)]
+pub(crate) struct ReconnectNow {
+    requested: AtomicBool,
+    notify: tokio::sync::Notify,
+}
+
+impl ReconnectNow {
+    pub(crate) fn request(&self) {
+        self.requested.store(true, Ordering::SeqCst);
+        self.notify.notify_one();
+    }
+
+    /// Takes a pending request.
+    pub(crate) fn take(&self) -> bool {
+        self.requested.swap(false, Ordering::SeqCst)
+    }
+
+    /// Resolves at the next request. A wake-up left over from a request that was already taken
+    /// is ignored.
+    pub(crate) async fn requested(&self) {
+        loop {
+            self.notify.notified().await;
+            if self.take() {
+                return;
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn a_reconnect_request_wakes_once_and_a_taken_one_is_not_seen_again() {
+        let wake = ReconnectNow::default();
+        assert!(!wake.take());
+        // Asked while nothing waits: the next wait ends at once.
+        wake.request();
+        tokio::time::timeout(Duration::from_secs(1), wake.requested())
+            .await
+            .expect("the request wakes the waiter");
+        assert!(!wake.take(), "answered once");
+        // Asked and taken before anyone waited (an attempt answered it): the left-over wake-up
+        // must not end the next connection.
+        wake.request();
+        assert!(wake.take());
+        assert!(
+            tokio::time::timeout(Duration::from_millis(50), wake.requested())
+                .await
+                .is_err(),
+            "a taken request does not wake anyone"
+        );
+    }
 
     fn unreachable() -> Failure {
         Failure::Transient(EngineError::new(ErrorKind::ServerUnreachable, "refused"))

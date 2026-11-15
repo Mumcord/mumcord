@@ -300,6 +300,31 @@ async fn tofu_voice_mute_and_reconnect() {
         .await
         .expect("bot hears the engine after reconnect");
 
+    // The app reports a new network: the connection is set up again at once, without waiting
+    // for its socket to time out, back in Raid with the own mute.
+    engine.set_self_mute(true).expect("mute");
+    bot.wait_user(&name, &muted(true)).await.expect("muted");
+    engine
+        .reconnect_now(only_server(&engine))
+        .expect("reconnect now");
+    wait_for(&mut rx, "Reconnecting on request", |e| match e {
+        EngineEvent::StateChanged(ConnState::Reconnecting { .. }) => Some(()),
+        _ => None,
+    })
+    .await;
+    let snapshot = wait_synced(&mut rx).await;
+    wait_own_channel(&mut rx, snapshot.self_session, raid).await;
+    bot.wait_user(
+        &name,
+        &UserCheck {
+            in_channel: Some("Raid".into()),
+            muted: Some(true),
+            ..UserCheck::default()
+        },
+    )
+    .await
+    .expect("back in Raid and still muted after reconnecting now");
+
     engine.disconnect(only_server(&engine));
     wait_for(&mut rx, "Disconnected", |e| match e {
         EngineEvent::StateChanged(ConnState::Disconnected { error: None }) => Some(()),
