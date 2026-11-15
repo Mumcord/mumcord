@@ -188,6 +188,8 @@ pub struct CameraView {
     pub broadcast: Option<String>,
     /// The admitted viewers with the path each of them gets (FR-8.62).
     pub viewers: Vec<CameraViewer>,
+    /// The app told viewers that the camera is paused ([`Engine::camera_set_paused`]).
+    pub paused: bool,
 }
 
 impl CameraView {
@@ -198,6 +200,7 @@ impl CameraView {
             error: None,
             broadcast: None,
             viewers: Vec::new(),
+            paused: false,
         }
     }
 }
@@ -390,6 +393,9 @@ pub(super) struct Own {
     error: Option<CameraFailure>,
     pub(super) send: CameraSend,
     live: Option<Live>,
+    /// Viewers are told the camera is paused (spec 05 FR-5.75); kept from the preview on, so a
+    /// camera turned on while paused announces it right away.
+    paused: bool,
 }
 
 impl Own {
@@ -408,7 +414,19 @@ impl Own {
                 .as_ref()
                 .map(|l| l.viewers.entries())
                 .unwrap_or_default(),
+            paused: self.paused,
         }
+    }
+
+    /// The `on` announcement of the camera while it is on air here.
+    fn on_message(&mut self, server_id: ServerId) -> Option<CameraMessage> {
+        let paused = self.paused;
+        let live = self.live_on(server_id)?;
+        Some(CameraMessage::On {
+            id: live.session.clone(),
+            media: live.sends_media(),
+            paused,
+        })
     }
 
     fn live_on(&mut self, server_id: ServerId) -> Option<&mut Live> {
@@ -580,6 +598,7 @@ impl Engine {
                 error: None,
                 send,
                 live: None,
+                paused: false,
             };
             let view = own.view();
             cameras.own = Some(own);
@@ -746,14 +765,12 @@ impl Engine {
             });
             match started {
                 Ok(live) => {
-                    let session = live.session.clone();
-                    let media = live.sends_media();
                     own.live = Some(live);
                     own.state = next_state(own.state, Step::Ready).unwrap_or(CameraState::OnAir);
                     own.send.set_on_air(true);
                     tracing::info!("camera on air");
                     crate::crash::set_context("camera", "on air");
-                    (Ok(()), own.view(), Some((session, media)))
+                    (Ok(()), own.view(), own.on_message(server_id))
                 }
                 Err(failure) => {
                     tracing::info!(reason = failure.code(), "camera not turned on");
@@ -764,12 +781,37 @@ impl Engine {
                 }
             }
         };
-        if let (Some((session, media)), Ok(ctx)) = (announce, self.session_ctx_for(server_id)) {
+        if let (Some(on), Ok(ctx)) = (announce, self.session_ctx_for(server_id)) {
             let peers = signal::channel_peers(&ctx, self.mumcord_state());
-            signal::send(&ctx, &peers, &CameraMessage::On { id: session, media });
+            signal::send(&ctx, &peers, &on);
         }
         self.emit_camera(server_id, Some(view));
         result
+    }
+
+    /// Tells viewers that the camera is paused or running again (spec 05 FR-5.75): a phone app
+    /// that goes to the background stops sending frames, and viewers show "paused" instead of a
+    /// frozen picture. Announced with `on` to the channel while on air; before that it is kept
+    /// for the announcement of Turn on. Voice is unaffected. Does nothing without a camera on
+    /// `server_id`.
+    pub fn camera_set_paused(&self, server_id: ServerId, paused: bool) {
+        let (view, on) = {
+            let mut cameras = lock(self.camera_state());
+            let Some(own) = cameras
+                .own
+                .as_mut()
+                .filter(|o| o.server_id == server_id && o.paused != paused)
+            else {
+                return;
+            };
+            own.paused = paused;
+            (own.view(), own.on_message(server_id))
+        };
+        if let (Some(on), Ok(ctx)) = (on, self.session_ctx_for(server_id)) {
+            let peers = signal::channel_peers(&ctx, self.mumcord_state());
+            signal::send(&ctx, &peers, &on);
+        }
+        self.emit_camera(server_id, Some(view));
     }
 
     /// Turns the camera off from any state (Cancel in the preview, the camera button): announces
@@ -973,6 +1015,7 @@ impl Engine {
                 return;
             };
             let on_air = own.server_id == server_id && own.state == CameraState::OnAir;
+            let paused = own.paused;
             let send = &own.send;
             match own.live.as_mut().filter(|l| on_air && l.session == session) {
                 Some(live) => {
@@ -1001,7 +1044,7 @@ impl Engine {
                             let broadcast = (path == CameraPath::Relay)
                                 .then(|| live.broadcast.as_ref().map(|b| b.id))
                                 .flatten();
-                            Some((seat_freed, broadcast, live.sends_media()))
+                            Some((seat_freed, broadcast, live.sends_media(), paused))
                         }
                         None => None,
                     }
@@ -1009,7 +1052,7 @@ impl Engine {
                 None => None,
             }
         };
-        let Some((was_full, broadcast, media)) = removed else {
+        let Some((was_full, broadcast, media, paused)) = removed else {
             return;
         };
         // A freed slot is announced again, so viewers turned away as full ask anew (FR-8.52).
@@ -1021,6 +1064,7 @@ impl Engine {
                 &CameraMessage::On {
                     id: session.to_owned(),
                     media,
+                    paused,
                 },
             );
         }
@@ -1185,7 +1229,9 @@ pub(crate) fn on_plugin_data(
         }
         // A 0.9.0 client reads both formats, so `mv` changes nothing it does; a 0.8.x viewer of a
         // new-format camera learns from it that it needs 0.9.0 (FR-8.95).
-        CameraMessage::On { id, .. } => super::recv::on_camera_on(&engine, ctx, event.sender, id),
+        CameraMessage::On { id, paused, .. } => {
+            super::recv::on_camera_on(&engine, ctx, event.sender, id, paused)
+        }
         CameraMessage::Full { id } => super::recv::on_camera_full(&engine, ctx, event.sender, &id),
         CameraMessage::Needs { id } => {
             super::recv::on_camera_needs(&engine, ctx, event.sender, &id)
@@ -1224,19 +1270,14 @@ pub(crate) fn on_peer_known(
     ctx: &SessionCtx,
     session: u32,
 ) {
-    let (camera, media) = {
-        let mut cameras = lock(state);
-        let Some(live) = cameras.own.as_mut().and_then(|o| o.live_on(ctx.server_id)) else {
-            return;
-        };
-        (live.session.clone(), live.sends_media())
+    let Some(on) = lock(state)
+        .own
+        .as_mut()
+        .and_then(|o| o.on_message(ctx.server_id))
+    else {
+        return;
     };
-    signal::announce_to_newcomer(
-        ctx,
-        peers,
-        session,
-        &CameraMessage::On { id: camera, media },
-    );
+    signal::announce_to_newcomer(ctx, peers, session, &on);
 }
 
 /// A person joined the server or moved: a viewer who left the own channel is removed and the

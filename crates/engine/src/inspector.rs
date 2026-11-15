@@ -587,8 +587,14 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
 fn camera_json(m: &crate::camera::signal::CameraMessage) -> Value {
     use crate::camera::signal::CameraMessage;
     match m {
-        CameraMessage::On { id, media } => {
-            json!({ "t": "on", "id": id, "mv": if *media { Some(2) } else { None } })
+        CameraMessage::On { id, media, paused } => {
+            let mut fields =
+                json!({ "t": "on", "id": id, "mv": if *media { Some(2) } else { None } });
+            // `ps` is written only while paused, as on the wire.
+            if *paused {
+                fields["ps"] = json!(1);
+            }
+            fields
         }
         CameraMessage::Off => json!({ "t": "off" }),
         CameraMessage::CamJoin { id, codecs, .. } => json!({
@@ -675,6 +681,19 @@ mod tests {
         let inspector = Arc::new(Inspector::default());
         inspector.set_enabled(true);
         inspector
+    }
+
+    #[test]
+    fn a_camera_on_shows_ps_only_while_paused() {
+        use crate::camera::signal::CameraMessage;
+        let on = |paused| CameraMessage::On {
+            id: "0123456789abcdef".into(),
+            media: false,
+            paused,
+        };
+        let running = camera_json(&on(false));
+        assert!(running.get("ps").is_none());
+        assert_eq!(camera_json(&on(true))["ps"], 1);
     }
 
     #[test]

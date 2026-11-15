@@ -190,7 +190,9 @@
     "viewing": "Nézed",
     "weak": "Gyenge kapcsolat",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Ez a kamera a Mumcord 0.9.0 verziót igényli"
+    "needsUpdate": "Ez a kamera a Mumcord 0.9.0 verziót igényli",
+    "paused": "{{name}} szüneteltette a kamerát",
+    "pausedLabel": ", kamera szüneteltetve"
   },
   "tileMenu": {
     "options": "{{name}} beállításai",

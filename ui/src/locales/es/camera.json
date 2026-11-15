@@ -197,7 +197,9 @@
     "viewing": "Viendo",
     "weak": "Conexión débil",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Esta cámara necesita Mumcord 0.9.0"
+    "needsUpdate": "Esta cámara necesita Mumcord 0.9.0",
+    "paused": "{{name}} ha pausado la cámara",
+    "pausedLabel": ", cámara en pausa"
   },
   "tileMenu": {
     "options": "Opciones para {{name}}",

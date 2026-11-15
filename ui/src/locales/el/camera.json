@@ -190,7 +190,9 @@
     "viewing": "Παρακολούθηση",
     "weak": "Αδύναμη σύνδεση",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Αυτή η κάμερα απαιτεί Mumcord 0.9.0"
+    "needsUpdate": "Αυτή η κάμερα απαιτεί Mumcord 0.9.0",
+    "paused": "Ο/Η {{name}} έθεσε την κάμερα σε παύση",
+    "pausedLabel": ", κάμερα σε παύση"
   },
   "tileMenu": {
     "options": "Επιλογές για {{name}}",

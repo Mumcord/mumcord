@@ -2050,6 +2050,11 @@ export type CameraTile = {
 	dataSaver: boolean,
 	/**  The "{n} fps" badge with "Weak connection" (FR-8.58); `null` hides it. */
 	fpsBadge: number | null,
+	/**
+	 *  The person's app paused the camera (it went to the background); no frames come until it
+	 *  resumes.
+	 */
+	paused: boolean,
 };
 
 /**  "Quality for me" of one tile (FR-8.56). */

@@ -190,7 +190,9 @@
     "viewing": "Katselet",
     "weak": "Heikko yhteys",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Tämä kamera vaatii Mumcord 0.9.0"
+    "needsUpdate": "Tämä kamera vaatii Mumcord 0.9.0",
+    "paused": "{{name}} keskeytti kameran",
+    "pausedLabel": ", kamera keskeytetty"
   },
   "tileMenu": {
     "options": "Asetukset: {{name}}",

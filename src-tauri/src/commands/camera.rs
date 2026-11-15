@@ -545,6 +545,9 @@ pub struct CameraTile {
     pub data_saver: bool,
     /// The "{n} fps" badge with "Weak connection" (FR-8.58); `null` hides it.
     pub fps_badge: Option<u32>,
+    /// The person's app paused the camera (it went to the background); no frames come until it
+    /// resumes.
+    pub paused: bool,
 }
 
 impl From<EngineTile> for CameraTile {
@@ -556,6 +559,7 @@ impl From<EngineTile> for CameraTile {
             quality: t.quality.into(),
             data_saver: t.data_saver,
             fps_badge: t.fps_badge,
+            paused: t.paused,
         }
     }
 }
