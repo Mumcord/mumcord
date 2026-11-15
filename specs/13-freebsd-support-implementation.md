@@ -165,3 +165,31 @@ Screenshots and redacted client logs are in `e2e/artifacts/freebsd/` in the nati
 - A clean-system package install/uninstall: the package was built and inspected without replacing the user's installed app.
 - Watch-party video/decoder removal, registry plugin installation, relay-backed file sharing, a second physical host and a ten-minute hardware-GPU stability run. Xvfb screenshots do not establish hardware acceleration.
 - Windows/macOS builds or hosted CI. No push or pull request was made; only FreeBSD runtime code, FreeBSD packaging/CI, tests and this report changed.
+
+## Run 3 – 2026-11-15, 13:36–13:51 UTC: Fresh verification after reboot
+
+Revalidated source revision `8a377d68` on the same FreeBSD 15.1-RELEASE amd64 host after its reboot. No new application regression was found and no runtime changes were needed. The app shell was explicitly recompiled with the current embedded UI and `MUMCORD_VERSION=dev~8a377d68`; dependency build artifacts were reused. All Mumble connections again used disposable, loopback-only test servers and profiles.
+
+| Check | Fresh result |
+|---|---|
+| `npm ci` and `npm run build` | Passed; lockfile dependencies restored, TypeScript and production UI build passed |
+| Native release rebuild, `custom-protocol`, two build jobs | Passed in 5 minutes 48 seconds |
+| `cargo test --workspace --locked` | Passed: 2,806 tests, 24 ignored, 118 reported targets including doc tests |
+| FreeBSD X11 scaled-colour capture integration test | Passed against Xvfb, not skipped |
+| `cargo clippy --workspace --all-targets --locked -- -D warnings` | Passed |
+| `cargo fmt --all --check` | Passed on FreeBSD and Linux |
+| `npm test -- --maxWorkers=2` | Passed: 324 files, 3,567 tests, 306 seconds |
+| `NODE_OPTIONS=--max-old-space-size=4096 npm run lint` | Passed; the same existing Fast Refresh warning in `UpdateCheckPrompt.tsx`, no errors; Prettier passed |
+| Package regression helper and existing smoke-helper tests | Three package cases and nine smoke-helper cases passed on both FreeBSD and Linux |
+| Native package build using relative output `dist-freebsd-redo` | Passed with `pkg` 2.9.2; approximately 37 MB, 18 backgrounds, four icons, and explicit `alsa-plugins`/libav/VPX/Opus runtime dependencies verified |
+| Native two-client E2E, two consecutive fresh runs | Both passed: setup, trust, two-way chat, platform/update limits, direct live screen playback, pause/resume/stop, About, and single-instance link handoff |
+
+Both E2E runs reported 1920×1080 at 29 encoder-reported fps after the ten-second playback hold, with positive viewer frame reports over the direct connection. These were headless Xvfb measurements after the build/test workload finished, not a hardware-GPU benchmark or evidence of a new code-level speedup.
+
+The process-enumeration improvement remains verified: a fresh kernel probe returned 978 rows, 357 positive-PID rows and 895 duplicate-PID rows with `KERN_PROC_ALL`, versus 83 rows, 82 positive-PID rows and no duplicate PIDs with `KERN_PROC_PROC`. Approximately 77% fewer command-line queries are needed in this sample; this is not a whole-app CPU measurement. The positional regression tests passed again in the full native suite.
+
+A read-only check of the real desktop before and after testing reported `Mesa Intel(R) UHD Graphics (CML GT2)`, Mesa 26.2.2, `Accelerated: yes`, with `drm-66-kmod` loaded. No matching GPU hang/reset/timeout markers were found in `dmesg` at either check. This verifies driver availability, not a ten-minute hardware-rendered Mumcord session. Audible voice, physical hotplug/PTT, clean-system install/uninstall and the other manual/second-host checks excluded in Run 2 remain unverified in this run.
+
+The native package is at `~/mumcord-freebsd-e2e/dist-freebsd-redo/mumcord-0.8.0.pkg`; it contains the development build identified above, not a tagged release. Current screenshots and redacted client logs are under `e2e/artifacts/freebsd/`; the previous run's native artifacts were retained under `e2e/artifacts/freebsd-run2/`. Disposable profiles, identities, vault keys and server databases were removed, and no test client or Xvfb process remained.
+
+Installing the temporary Xvfb prerequisite automatically updated FreeBSD's `pkg` tool from 2.8.4 to 2.9.2; no general system upgrade was run. Xvfb 21.1.26 was removed after verification. The installed Mumcord package remains 0.7.2 and the normal profile was not used or replaced. No new dedicated Rust build cache was created. Only this report changed in the repository; nothing was pushed and no pull request was created.
