@@ -14,9 +14,9 @@ SVT-AV1 and dav1d are statically linked into every build, the hardware encoder
 interfaces (NVENC, AMF and VA-API headers, Intel's VPL dispatcher) into the
 Windows and Linux builds, PipeWire is loaded from the Linux system, and
 the Linux AppImage carries GStreamer and WebKitGTK from its Ubuntu 24.04 build host.
-The camera background effects embed the MediaPipe Selfie Segmenter models and load
-the ONNX Runtime library at run time; the built-in camera background images are
-Mumcord's own work.
+The camera background effects embed the MediaPipe Selfie Segmenter models (bundled
+in the bgmatte crate) and load the ONNX Runtime library at run time; the built-in
+camera background images are Mumcord's own work.
 BoringSSL-derived code compiled in by the ring crate is covered by ring's license
 texts in the Rust section below.
 
@@ -1246,8 +1246,8 @@ MediaPipe Selfie Segmenter 2023 (ONNX conversion by onnx-community)
 License: Apache-2.0
 Repository: https://github.com/google-ai-edge/mediapipe
 
-The person segmentation models behind the camera background effects (crates/effects),
-embedded into every Mumcord build.
+The person segmentation models behind the camera background effects, bundled in the
+bgmatte crate and embedded into every Mumcord build.
 
 MediaPipe Selfie Segmenter (square 256x256 and landscape 144x256 models)
 
@@ -1260,8 +1260,8 @@ Source project: https://github.com/google-ai-edge/mediapipe
 Mumcord uses the ONNX conversions of these models published by onnx-community on Hugging Face
 (https://huggingface.co/onnx-community/mediapipe_selfie_segmentation and
 https://huggingface.co/onnx-community/mediapipe_selfie_segmentation_landscape, Apache-2.0),
-pinned to a fixed revision and checked by SHA-256 when Mumcord is built. The models are not
-modified.
+as bundled in the bgmatte crate (https://github.com/Mumcord/bgmatte) at a fixed revision with
+recorded checksums. The models are not modified.
 
 
                                  Apache License
@@ -1473,8 +1473,8 @@ ONNX Runtime 1.23.2
 License: MIT
 Repository: https://github.com/microsoft/onnxruntime
 
-Runs the segmentation models for the camera background effects. The official CPU
-build is shipped next to Mumcord and loaded at run time.
+Runs the segmentation models for the camera background effects (through the bgmatte
+crate). The official CPU build is shipped next to Mumcord and loaded at run time.
 
 MIT License
 
@@ -8346,7 +8346,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (705 crates)
+* MIT License (706 crates)
 * Apache License 2.0 (45 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
 * ISC License (20 crates)
@@ -19776,6 +19776,36 @@ Used by:
 MIT License
 
 Copyright (c) 2025 shellrow
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - bgmatte 0.1.0 (https://github.com/Mumcord/bgmatte)
+
+MIT License
+
+Copyright (c) 2026 The bgmatte authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
