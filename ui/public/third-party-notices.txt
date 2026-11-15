@@ -8346,7 +8346,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (686 crates)
+* MIT License (685 crates)
 * Apache License 2.0 (44 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
 * ISC License (20 crates)
@@ -18712,7 +18712,6 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
   - hwcodec 0.1.0 (https://github.com/Mumcord/hwcodec)
 
 MIT License
