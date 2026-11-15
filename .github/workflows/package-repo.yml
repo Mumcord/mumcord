@@ -142,7 +142,7 @@ jobs:
               pacman -Sy --noconfirm --needed fakeroot >/dev/null
               /src/scripts/package-repo/build-pacman.sh "$FPR" "$VERSION" /src/pkgs /src/site'
           rm -rf "$GNUPGHOME"
-          cp packaging/repo/mumcord.{asc,sources,repo,conf,pub} site/
+          cp packaging/repo/{index.html,mumcord.asc,mumcord.sources,mumcord.repo,mumcord.conf,mumcord.pub} site/
           du -sh site
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
