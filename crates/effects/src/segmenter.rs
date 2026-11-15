@@ -60,18 +60,21 @@ impl OnnxSegmenter {
     /// Creates the session. Fails with [`EffectsError::Unavailable`] when ONNX Runtime can't be
     /// loaded on this PC.
     pub fn new(shape: ModelShape) -> Result<Self, EffectsError> {
-        crate::runtime::availability().map_err(EffectsError::Unavailable)?;
+        let environment = crate::runtime::environment().map_err(EffectsError::Unavailable)?;
         let model = match shape {
             ModelShape::Square => SQUARE_MODEL,
             ModelShape::Landscape => LANDSCAPE_MODEL,
         };
-        let session = build_session(model).map_err(EffectsError::Model)?;
+        let session = build_session(model, environment).map_err(EffectsError::Model)?;
         Ok(Self { shape, session })
     }
 }
 
-fn build_session(model: &[u8]) -> Result<Session, String> {
-    Session::builder()
+fn build_session(
+    model: &[u8],
+    environment: &ort::environment::Environment,
+) -> Result<Session, String> {
+    Session::builder(environment)
         .map_err(|e| e.to_string())?
         .with_optimization_level(GraphOptimizationLevel::Level3)
         .map_err(|e| e.to_string())?

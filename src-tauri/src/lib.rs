@@ -71,6 +71,8 @@ const BINDINGS_PATH: &str = concat!(
 /// Collects all typed commands and events shared with the UI (contract: docs/engine-api.md).
 fn specta_builder() -> Builder<tauri::Wry> {
     Builder::<tauri::Wry>::new()
+        // Preserve the UI's tagged-result contract; newer Specta releases default to throwing.
+        .error_handling(tauri_specta::ErrorHandlingMode::Result)
         // One TS type per Rust type: `Option` fields stay required `T | null` instead of
         // splitting every type into `_Serialize`/`_Deserialize` variants.
         .disable_serde_phases()

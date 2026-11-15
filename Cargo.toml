@@ -80,7 +80,7 @@ base64 = "0.23"
 # Import from the official Mumble client (issue #66): its 1.4 settings on macOS (property list)
 # and Windows (registry).
 plist = "1.10"
-windows-registry = "0.6"
+windows-registry = "0.100"
 rand = "0.10"
 # Direct use for file sharing and screen sharing (spec 07): AES-GCM, X25519, signatures. The same
 # ring that rustls already uses, so nothing new is linked.
@@ -115,7 +115,8 @@ cpal = "0.18"
 # which exists without cpal on Android and iOS.
 dasp_sample = "0.11"
 # The same request for Mumcord's own capture and playback threads (`with_dbus`, also switched on
-# in crates/audio for the desktop targets only).
+# in crates/audio for the desktop targets only). Match cpal's series: linking two versions
+# duplicates audio_thread_priority's exported C symbols.
 audio_thread_priority = { version = "0.35", default-features = false }
 # opusic-sys builds libopus statically from bundled sources.
 opus = "0.4"
@@ -138,7 +139,8 @@ crossbeam-queue = "0.3"
 # Camera background effects (spec 08, FR-8.33): ONNX Runtime through `ort`, loaded at run time
 # (`load-dynamic`) so a missing or broken runtime library disables the effects instead of
 # stopping Mumcord. The runtime library itself is fetched by crates/effects/build.rs.
-ort = { version = "=2.0.0-rc.13", default-features = false, features = ["std", "load-dynamic"] }
+# Keep the API level aligned with the bundled ONNX Runtime 1.23.2.
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "load-dynamic", "api-23"] }
 rubato = "5.0"
 # Lists the sound server's sinks and sources with their default flags (issue #183). Pure Rust
 # PulseAudio protocol client; PipeWire answers it through pipewire-pulse.
@@ -193,6 +195,7 @@ toml = "1"
 serde-saphyr = "2"
 
 # Storage & secrets
+# mumbot's pinned live-test revision shares libsqlite3-sys and requires this series.
 rusqlite = { version = "0.41", features = ["bundled"] }
 keyring = "4.2"
 
@@ -220,13 +223,14 @@ libloading = "0.9"
 libc = "0.2"
 # Crash reports: the native stack at a fatal signal and its symbols at the next start (#568).
 backtrace = "0.3"
-object = { version = "0.40", default-features = false, features = ["read", "std"] }
+object = { version = "0.41", default-features = false, features = ["read", "std"] }
 rustc-demangle = "0.1"
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Memory", "Win32_System_Diagnostics_ToolHelp"] }
 
 # Linux desktop portals (Wayland global shortcuts)
 ashpd = "0.14"
-# XDG activation token so the desktop may raise the window a portal call opens (already in the tree via Tauri)
+# XDG activation token so the desktop may raise the window a portal call opens (already in the tree via Tauri).
+# Keep gdk/gtk on Tauri and WebKitGTK's 0.18 series: 0.19 links a different GLib series.
 gdk = "0.18"
 # Desktop notifications for new messages (FR-1.48c): the freedesktop notification service on D-Bus,
 # talked to directly for click actions and per-channel replacement (zbus and futures-util are
@@ -270,13 +274,14 @@ tauri-plugin-deep-link = "2.6"
 tauri-plugin-global-shortcut = "2.4"
 tauri-plugin-dialog = "2.8"
 # The same build tauri-plugin-dialog uses, for a message before Tauri starts.
+# 0.18's GTK3 backend needs gtk-sys 0.19, which conflicts with Tauri's 0.18.
 rfd = { version = "0.17", default-features = false, features = ["gtk3", "common-controls-v6"] }
 tauri-plugin-opener = "2.7"
 tauri-plugin-clipboard-manager = "2.5"
 tauri-plugin-updater = { version = "2.10", default-features = false, features = ["rustls-tls", "zip"] }
-tauri-specta = { version = "=2.0.0-rc.26", features = ["derive", "typescript"] }
-specta = { version = "=2.0.0-rc.26", features = ["derive"] }
-specta-typescript = "0.0.13"
+tauri-specta = { version = "=2.0.0-rc.29", features = ["derive", "typescript"] }
+specta = { version = "=2.0.0-rc.28", features = ["derive"] }
+specta-typescript = "0.0.15"
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "warn"
