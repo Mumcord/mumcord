@@ -128,6 +128,24 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     await closeSettings();
   });
 
+  // #875: GTK overlay scrollbars take no room and are painted after the whole page, so they
+  // crossed open menus. The themed scrollbar is an in-page one: it takes its 0.5rem of room.
+  it("scrollbars are themed in-page scrollbars, not overlays drawn above menus", async () => {
+    const room = await browser.execute(() => {
+      const scroller = document.createElement("div");
+      scroller.style.cssText = "position:fixed;top:0;left:0;width:200px;height:100px;overflow-y:scroll";
+      scroller.appendChild(document.createElement("div")).style.height = "400px";
+      document.getElementById("root")?.appendChild(scroller);
+      const result = {
+        scrollbar: scroller.offsetWidth - scroller.clientWidth,
+        expected: parseFloat(getComputedStyle(document.documentElement).fontSize) / 2,
+      };
+      scroller.remove();
+      return result;
+    });
+    expect(room.scrollbar).toBe(room.expected);
+  });
+
   it("AC-2.12: a custom theme made in dark gets a passing light version, both editable", async () => {
     await appearance();
     await pickMode("Dark");

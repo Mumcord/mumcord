@@ -5,6 +5,7 @@
 ### Fixed
 
 - Servers that publish their address as a DNS SRV record (`_mumble._tcp.<domain>`) can be joined by entering just the domain, like in the official Mumble client (issue #859): for an address without a port Mumcord looks up the record and connects to the host and port it names, in the order of its priority and weight, and moves on to the next one when a target cannot be reached. Without a record, or when the lookup fails, it connects to the address on port 64738 as before. An explicitly entered port other than 64738 skips the lookup. This applies to saved servers, `mumble://` links without a port, reconnects, "Test connection" and the online status in the server list; the trusted certificate stays tied to the saved server, so a changed certificate still asks
+- Scrollbars are no longer drawn on top of menus, popovers and dialogs (issue #875): every scrolling list and panel now has a slim scrollbar in the theme's colours, dark and light, that sits beside the content instead of floating over it, so it no longer covers row highlights or buttons at the right edge either
 
 ### Security
 

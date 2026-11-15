@@ -136,3 +136,26 @@ body::after {
     -webkit-text-fill-color: transparent;
   }
 }
+
+/* Themed scrollbars everywhere (#875). Styling them also makes WebKit draw classic in-page
+   scrollbars: GTK's overlay scrollbars are painted after the whole page, so they crossed menus,
+   popovers and dialogs and covered the right edge of list rows. Kept to the ::-webkit-scrollbar
+   rules on purpose: once scrollbar-width or scrollbar-color is set, WebView2 ignores them. */
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
