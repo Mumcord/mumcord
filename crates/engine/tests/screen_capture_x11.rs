@@ -1,5 +1,5 @@
 //! X11 whole-screen capture against a private Xvfb; skipped when Xvfb is not installed.
-#![cfg(target_os = "linux")]
+#![cfg(any(target_os = "linux", target_os = "freebsd"))]
 #![allow(clippy::unwrap_used)]
 
 use std::process::{Child, Command, Stdio};

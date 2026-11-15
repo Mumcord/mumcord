@@ -102,3 +102,66 @@ to the repository.
   loopback of its own (so both services bind IPv4 addresses explicitly and the relay's allowlist
   API runs on the jail address with HTTPS + certificate pinning), and `mumbot`'s
   `mumcord-protocol` dependency needs a system `protoc` (a `[patch.crates-io]` path patch).
+
+## Run 2 – 2026-11-15: Native rebuild, desktop E2E and performance checks
+
+### Environment and isolation
+
+- FreeBSD 15.1-RELEASE amd64, 8 logical CPUs and 8 GB RAM; Rust 1.99.1, Node 22.23.4 and npm 12.0.2.
+- Sources copied from `b56cbc44` plus this branch's fixes into `~/mumcord-freebsd-e2e`, without changing the existing source checkout. The build reused the existing Cargo artifact cache.
+- The installed `/usr/local/bin/mumcord` and the desktop user's profile were not replaced. Native desktop tests used their own Xvfb display, D-Bus session, two disposable profiles and an unmodified `mumble-server` bound to loopback on a temporary port. No public or third-party Mumble server was contacted.
+- The native release-profile binary embeds the current UI (`custom-protocol`); its display version is `dev~20261115`. This is a development verification build, not a tagged release.
+
+### Verified fixes
+
+1. **Positional plugins repeatedly enumerated threads as programs.** A new FreeBSD regression test failed against the original implementation because several entries had the same process ID. `KERN_PROC_PROC` now replaces `KERN_PROC_ALL` inside the FreeBSD platform module. A native probe returned 944 rows (324 with positive process IDs) with the old query and 83 rows (82 with positive IDs) with the new query: approximately 75% fewer command-line queries in that sample, as well as fewer allocations and duplicate plugin candidates. This is a reduction in enumeration work, not a claim about whole-app CPU use. All 15 positional unit tests pass on FreeBSD; all 14 applicable tests also pass on Linux.
+2. **A clean package install did not require the sound backend.** The original generated manifest omitted `alsa-plugins`, even though it owns the OSS PCM plugin and `alsa-lib` has no dependency on it. The package now declares it explicitly, alongside the dynamically loaded GStreamer decoders; the package smoke check also requires it. No installed dependency was removed to reproduce this: the missing declaration was verified in the generated package metadata.
+3. **A relative package output directory lost the generated package.** `pkg create` ran inside the temporary staging tree, so a relative output was written there and removed during cleanup. Native packaging with `--no-build dist-freebsd` reproduced `pkg create produced no package`. Resolving the output before changing directory fixes it. Regression tests cover absolute output, relative output with spaces, declared runtime backends and refusal when the OSS plugin is unavailable. They fail against the original builder, pass on FreeBSD and Linux, and are added only to the FreeBSD CI job.
+
+### Checks and results
+
+| Check | Result |
+|---|---|
+| `npm ci --no-audit --no-fund` and `npm run build` | Passed; includes TypeScript checking and the production UI build |
+| `CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_RELEASE_DEBUG=0 cargo build --release --locked -p mumcord --features custom-protocol` | Passed; native rebuild took 17 minutes 24 seconds |
+| `cargo test --workspace --locked` | Passed: 2,806 tests, 24 ignored, 118 reported test targets including doc tests |
+| `cargo clippy --workspace --all-targets --locked -- -D warnings` | Passed |
+| `cargo fmt --all --check` | Passed on FreeBSD and Linux |
+| `npm test -- --maxWorkers=1` | Passed: 324 files, 3,567 tests |
+| `NODE_OPTIONS=--max-old-space-size=4096 npm run lint` | Passed, with one pre-existing `react-refresh/only-export-components` warning in `UpdateCheckPrompt.tsx`; Prettier passed |
+| `sh scripts/ci/test-freebsd-pkg.sh` | Three regression cases passed on FreeBSD and Linux |
+| `bash scripts/ci/test-smoke.sh` | All nine existing helper cases passed on Linux |
+| `sh scripts/build-freebsd-pkg.sh --no-build dist-freebsd` | Passed: package remains at `~/mumcord-freebsd-e2e/dist-freebsd/mumcord-0.8.0.pkg`, approximately 37 MB; 18 backgrounds, four icons and the explicit OSS/decoder dependencies verified |
+
+The first full ESLint attempt exhausted Node's default heap. The successful rerun increased the heap for that command only; no shared build settings or other platform defaults were changed. The release build also emitted the existing unused `TEST_URL_ENV` warning and the expected unavailable ONNX Runtime warning on FreeBSD.
+
+### Native desktop E2E
+
+Run from the checkout on FreeBSD:
+
+```sh
+node e2e/freebsd/smoke.mjs target/release/mumcord
+```
+
+The standalone runner requires `npm ci`, `Xvfb`, `WebKitWebDriver-4.1`, `dbus` and `mumble-server`; it needs neither Docker nor root. Linux's existing E2E runner and configuration are unchanged. Xvfb was installed only for this verification and removed afterwards, so it must be installed again to repeat the native desktop tests. The task's small dedicated Rust probe cache was also removed; the user's pre-existing shared Cargo cache was retained.
+
+Verified through the real native app:
+
+- Two fresh-profile setup wizards, new identities, saved local servers, certificate trust and connection.
+- Chat delivered in both directions between the two clients.
+- Camera unavailable with `unsupportedPlatform`; screen-share sound unavailable with `platform`.
+- Update check reports package ownership, `canInstall: false` and no check timestamp.
+- Whole-screen X11 capture, live decoded pictures over a direct connection, and no share sound. The final run reported 1920×1080 at 24 fps after ten seconds of playback; an earlier successful run reported 18 fps while the full build/test workload was active. These headless measurements are not a guarantee of 1080p30 or a hardware-rendering benchmark.
+- Pause and resume reach the viewer; stopping removes the share.
+- Settings → About shows the FreeBSD limitations.
+- A second launch with a local `mumble://` link exits successfully, the running instance logs receipt, and exactly one connection remains.
+- The existing scaled-colour X11 capture integration test now runs on FreeBSD too and passed against Xvfb.
+
+Screenshots and redacted client logs are in `e2e/artifacts/freebsd/` in the native checkout. Profiles, identities, vault files and keys are deleted after each run and are never copied to artifacts.
+
+### Not reverified in this run
+
+- Audible voice in both directions, physical push-to-talk keys, unplug/replug recovery and switching the two real sound cards. Both USB sound devices and realtime-group permissions were present, but the E2E clients mute their microphones after joining.
+- A clean-system package install/uninstall: the package was built and inspected without replacing the user's installed app.
+- Watch-party video/decoder removal, registry plugin installation, relay-backed file sharing, a second physical host and a ten-minute hardware-GPU stability run. Xvfb screenshots do not establish hardware acceleration.
+- Windows/macOS builds or hosted CI. No push or pull request was made; only FreeBSD runtime code, FreeBSD packaging/CI, tests and this report changed.
