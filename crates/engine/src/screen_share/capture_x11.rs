@@ -18,6 +18,11 @@ use super::signal::ShareKind;
 #[cfg(target_os = "linux")]
 use super::sound::pick;
 use super::sound::{SoundOutcome, SoundRequest};
+#[cfg(target_os = "freebsd")]
+mod freebsd;
+#[cfg(target_os = "freebsd")]
+use freebsd::bgra_to_i420;
+#[cfg(not(target_os = "freebsd"))]
 use hwcodec::convert::bgra_to_i420;
 
 /// Why the screen cannot be captured.
