@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Security
+
+- Noise suppression (RNNoise) rejects a damaged or manipulated noise model when it loads instead of crashing later during a call, and its processor-specific fast paths check sizes themselves instead of relying on the loader
+
 ### Internal
 
 - Updated Rust dependencies and all checked-in Cargo lock files, among them Wry 0.57.2, `object` 0.41, `ort` 2.0.0-rc.15 and `windows-registry` 0.100; the bundled ONNX Runtime stays on 1.23.2, and audio thread priority, GTK, native dialogs, SQLite and the Windows bindings stay on the versions CPAL, Tauri and the live-test bot require
@@ -47,7 +51,6 @@
 - A whisper only reaches the people you chose. Until now a whisper target was matched by name each time, so a different person using the same name could hear a whisper that was meant for somebody else, for example somebody who took the name over after your contact left. A whisper is now tied to the exact people it was started for: when one of them leaves, they are removed from it, when the last one leaves, it ends, and nobody who joins later can hear it, whatever their name is. If a saved whisper target's name fits more than one person on the server, Mumcord does not whisper at all and tells you why
 - Require patched `ammonia 4.2.5` or newer to address the SVG/MathML mutation-XSS advisory RUSTSEC-2026-0533, with regression tests for chat HTML and plugin SVG assets; existing sanitization allow-lists remain unchanged (issue #819)
 - Upgrade the RSA identity-key generator to the patched `rsa 0.10` release and remove the accepted Marvin timing-attack advisory (issue #131). Existing identities and Mumble-compatible RSA-2048 certificates remain unchanged; certificate signing and TLS still use ring
-- Noise suppression (RNNoise) rejects a damaged or manipulated noise model when it loads instead of crashing later during a call, and its processor-specific fast paths check sizes themselves instead of relying on the loader
 
 ### Internal
 
