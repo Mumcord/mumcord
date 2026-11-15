@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Native FreeBSD E2E: node e2e/freebsd/smoke.mjs [path/to/mumcord]
+// Native FreeBSD E2E: node e2e/freebsd/smoke.mjs [path/to/mumcord] [--gpu]
 // Requires npm ci, Xvfb, WebKitWebDriver-4.1, dbus and mumble-server. No Docker or root.
-// Uses a private display, session bus, loopback server and two disposable profiles. Never
-// points at the desktop user's profile, keyring or server. Linux's E2E runner is unchanged.
+// Uses a private display, session bus, loopback server and two disposable profiles. --gpu
+// puts only the receiver on the inherited real DISPLAY/XAUTHORITY for ten minutes.
+// Never uses the desktop user's profile, keyring or server. Linux's runner is unchanged.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -24,14 +25,20 @@ import { join, resolve } from "node:path";
 import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 import { remote } from "webdriverio";
+import { startGpuChecks, gpuSoak } from "./gpu.mjs";
 
 assert.equal(process.platform, "freebsd", "this runner is FreeBSD-only");
-const binary = resolve(process.argv[2] ?? "target/release/mumcord");
+const gpu = process.argv.includes("--gpu");
+const args = process.argv.slice(2).filter((arg) => arg !== "--gpu");
+assert(args.length <= 1, "usage: smoke.mjs [path/to/mumcord] [--gpu]");
+const binary = resolve(args[0] ?? "target/release/mumcord");
 const root = mkdtempSync(join(tmpdir(), "mumcord-freebsd-e2e-"));
 const children = [];
 const browsers = [];
+const drivers = [];
 const envs = [];
-const artifacts = resolve("e2e/artifacts/freebsd");
+let gpuChecks;
+const artifacts = resolve(gpu ? "e2e/artifacts/freebsd-gpu" : "e2e/artifacts/freebsd");
 mkdirSync(artifacts, { recursive: true });
 
 function profile(name) {
@@ -172,6 +179,7 @@ async function invoke(browser, command, args = {}) {
 }
 
 try {
+  if (gpu) gpuChecks = startGpuChecks(root, artifacts);
   const env = profile("services");
   const bus = start("dbus-daemon", ["--session", "--nofork", "--print-address=3"], env, "bus", [
     "pipe",
@@ -199,7 +207,8 @@ try {
     const clientEnv = {
       ...env,
       ...profile(name),
-      DISPLAY: env.DISPLAY,
+      DISPLAY: gpu && name === "FreeBSD-B" ? process.env.DISPLAY : env.DISPLAY,
+      ...(gpu ? { XAUTHORITY: name === "FreeBSD-B" ? process.env.XAUTHORITY : "" } : {}),
       DBUS_SESSION_BUS_ADDRESS: env.DBUS_SESSION_BUS_ADDRESS,
     };
     envs.push(clientEnv);
@@ -210,11 +219,13 @@ try {
       clientEnv,
       name,
     );
+    drivers.push(driver);
     await ready(driver, driverPort);
     const browser = await remote({
       hostname: "127.0.0.1",
       port: driverPort,
       logLevel: "error",
+      ...(gpu ? { connectionRetryTimeout: 15000, connectionRetryCount: 0 } : {}),
       capabilities: {
         "wdio:enforceWebDriverClassic": true,
         browserName: "wry",
@@ -225,6 +236,7 @@ try {
     await browser.setWindowSize(1400, 900);
     await wizard(browser, name);
     await connect(browser, port);
+    if (gpu && name === "FreeBSD-B") await browser.setWindowRect(0, 30, 1400, 900);
     console.log(`PASS ${name}: fresh-profile wizard, certificate trust, local connection`);
   }
 
@@ -287,7 +299,19 @@ try {
       timeoutMsg: "viewer never reported decoded frames over the direct connection",
     },
   );
-  await delay(10_000);
+  if (gpu) {
+    await gpuSoak({
+      a,
+      b,
+      serverId,
+      invoke,
+      driverPid: drivers[1].pid,
+      checks: gpuChecks,
+      artifacts,
+    });
+  } else {
+    await delay(10_000);
+  }
   quality = await invoke(a, "screen_share_quality", { serverId });
   assert(quality.viewers.some((viewer) => viewer.fps > 0 && viewer.path === "direct"));
   const own = (await invoke(a, "screen_share_list", { serverId }))[0];
@@ -296,7 +320,7 @@ try {
   console.log(
     `PASS whole-screen X11 capture and direct playback: ${quality.width}x${quality.height}, ${quality.fps} fps`,
   );
-  await b.saveScreenshot(join(artifacts, "screen-viewer.png"));
+  if (!gpu) await b.saveScreenshot(join(artifacts, "screen-viewer.png"));
   await invoke(a, "screen_share_set_paused", { serverId, paused: true });
   await b.waitUntil(async () => (await invoke(b, "screen_share_list", { serverId }))[0]?.paused, {
     timeout: 10_000,
@@ -320,7 +344,7 @@ try {
     async () => (await a.$("body").getText()).includes("Not available on FreeBSD"),
     { timeout: 15_000 },
   );
-  await a.saveScreenshot(join(artifacts, "about.png"));
+  if (!gpu) await a.saveScreenshot(join(artifacts, "about.png"));
   console.log("PASS FreeBSD About note and unsupported share sound");
   await a.keys("Escape");
 
@@ -348,10 +372,12 @@ try {
   console.log("PASS second launch hands off its link and exits without another connection");
   console.log("PASS FreeBSD native E2E");
 } catch (error) {
-  for (const [index, browser] of browsers.entries()) {
-    await browser.saveScreenshot(join(artifacts, `failure-${index}.png`)).catch((error) => {
-      console.error(`Could not save failure screenshot: ${error.message}`);
-    });
+  if (!gpu) {
+    for (const [index, browser] of browsers.entries()) {
+      await browser.saveScreenshot(join(artifacts, `failure-${index}.png`)).catch((error) => {
+        console.error(`Could not save failure screenshot: ${error.message}`);
+      });
+    }
   }
   throw error;
 } finally {
@@ -367,6 +393,7 @@ try {
       if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
     }
   }
+  gpuChecks?.stop();
   // Only the app's redacted diagnostic logs leave the disposable profiles. Never copy the
   // databases, certificates, encrypted vault or its key into E2E artifacts.
   try {

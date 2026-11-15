@@ -3,7 +3,7 @@
 > Specification: `specs/13-freebsd-support-specification.md`
 > As of: 2026-11-15 · Mode: native FreeBSD verification
 >
-> **Latest status (Run 4): GPU endurance failed.** Hardware acceleration is confirmed, but the current development build exhausts memory during sustained 1080p screen-share playback. AC-13.19 is not currently passed; earlier successful checks below are historical results.
+> **Latest status (Run 5): GPU endurance passed after a FreeBSD-only decoding fix.** A fresh ten-minute 1080p receiving session kept hardware rendering enabled, with no GPU faults or memory exhaustion. Receiving WebKit memory was 479.6 → 506.9 MiB after warm-up. AC-13.19 is now passed on this machine; the sampled encoder median was 12 fps, not evidence of sustained 1080p30. Run 4 below records the earlier failing revision.
 
 ## Run 1 – 2026-11-09
 
@@ -198,7 +198,7 @@ Installing the temporary Xvfb prerequisite automatically updated FreeBSD's `pkg`
 
 ## Run 4 – 2026-11-15: Real-desktop GPU checks and failed endurance
 
-**Result: hardware rendering verified; the ten-minute acceptance session failed because playback exhausted memory.** This is not a successful GPU endurance result, even though no kernel GPU-hang/reset markers were recorded. The current development build must not inherit the historical AC-13.19 pass from Run 1.
+**Result: hardware rendering verified; the ten-minute acceptance session failed because playback exhausted memory.** This is not a successful GPU endurance result, even though no kernel GPU-hang/reset markers were recorded. The tested `dev~8a377d68` build must not inherit the historical AC-13.19 pass from Run 1.
 
 ### Method and hardware evidence
 
@@ -231,3 +231,67 @@ Summed RSS includes shared mappings and is not unique physical-memory accounting
 Run output, redacted client logs, native-device evidence and colour statistics are retained in ignored `e2e/artifacts/freebsd-gpu/`; the guarded memory samples are in ignored `e2e/artifacts/freebsd-gpu-memory/memory.jsonl`. The final normal-viewer log is `mumcord-gpu-check.log`. Ad-hoc probe sources are retained alongside the artifacts for diagnosis, not added to the application or CI.
 
 All disposable profiles, identities, server databases and test clients were removed. The temporary Xvfb package was removed again. Xorg and Plasma remained running; the installed Mumcord package is still 0.7.2, and the normal Mumcord profile was never used or replaced. No application runtime code or other operating system's behaviour changed. No new Rust build cache was created, nothing was pushed and no pull request was created.
+
+## Run 5 – 2026-11-15: Isolated decoding failure, fixed playback and passed GPU endurance
+
+**Result: the ten-minute hardware-rendered receiving session passed after the FreeBSD-only fix in `f5a7aa85`.** This supersedes Run 4's failed current status, not its evidence about `dev~8a377d68`. The native binary identifies itself as `dev~freebsd-decode`; it was built from the same application source plus the decoding-policy fix, with dependencies reused from the existing target directory.
+
+### Diagnosis and scope of the fix
+
+Disposable-profile comparisons isolated the rapid growth to FreeBSD WebKit's VP9 WebCodecs-to-canvas path. The same Tauri binary channel stayed stable while delivering Rust-decoded 1920×1080 RGBA frames. Instrumentation showed ordered-channel delivery recovering normally, a decoder queue around zero to one, no decoding/drawing errors and every emitted WebCodecs frame being closed. Enabling WebCodecs still drove aggregate test RSS to approximately 3.2 GiB in about twenty seconds and triggered the test-only safety stop. Disabling only the receiver's `VideoDecoder` used the existing engine fallback and survived a 45-second comparison while delivering approximately 6.5 GB of cumulative RGBA payload.
+
+This identifies an unsafe playback path on the installed WebKitGTK 2.46, not the precise internal allocation responsible. It is not evidence of missing `VideoFrame.close()` calls or a permanently blocked Tauri channel. No WebKit source or system graphics configuration was modified.
+
+`WatchLink` now requires both AV1 and VP9 to use the existing bounded engine decoder on FreeBSD, including after the webview changes codec preferences. The normal RGBA canvas and hardware window compositor remain enabled. The shared incoming-camera path also uses this policy; outgoing FreeBSD camera support remains unavailable. Other platforms retain their previous decoding choices and test-hook behavior. No frame-rate cap, image-quality reduction or forced-software-rendering environment variable was introduced.
+
+The new platform-policy unit test was run against the old FreeBSD behavior first and failed with `false` versus expected `true`. It passed after the fix and again in the full native suite.
+
+### Repeatable endurance coverage
+
+`node e2e/freebsd/smoke.mjs target/release/mumcord --gpu` now runs the real-desktop check without Docker. Its source stays on private Xvfb; only the normal receiving client appears on the physical desktop. A changing synthetic pattern is checked through X11 colour statistics, not retained screenshots. Both clients remain connected and joined to voice with microphones muted. This does not verify audible voice or physical push-to-talk.
+
+The runner samples descendant-process RSS once per second and terminates only its own test clients above 3 GiB aggregate RSS or after fifteen minutes. It rejects kernel GPU faults, new OOM messages, a replaced receiving WebKit process, disconnected clients, frozen pictures and more than 256 MiB of receiving-process median RSS growth between the 60–120-second warm-up interval and the final minute. Aggregate RSS includes shared mappings; it is a conservative test budget, not unique physical-memory accounting. Run on an otherwise idle machine with adequate memory headroom.
+
+Six pure Node regression checks cover process ownership/RSS parsing, GPU-fault detection, software-renderer rejection, steady versus growing/missing memory samples and removal of stale success artifacts before a failed startup. They pass on FreeBSD and Linux and are included in the FreeBSD CI job. Real hardware endurance remains an explicit desktop check, not a claim about the hosted VM.
+
+### Ten-minute measured result
+
+The guarded GPU run started at **16:00:22 UTC** and completed at **16:10:46 UTC**. Its measured playback hold was **600.264 seconds**, followed by successful pause/resume/stop, About and single-instance link-handoff checks.
+
+| Evidence | Result |
+|---|---|
+| Real desktop and stream | X11, 1920×1080; direct receiving stream stayed active throughout |
+| Driver/renderer | Intel UHD Graphics (CML GT2), Mesa 26.2.2, `Accelerated: yes`; `drm-66-kmod` remained loaded |
+| Native receiving WebKit evidence | PID 10578 retained `/dev/drm/128`, `libgallium-26.2.2.so` and `libEGL_mesa.so.0.0.0` before and after the hold |
+| Receiving WebKit median RSS | 479.6 MiB during warm-up → 506.9 MiB in the final minute; peak 507.0 MiB |
+| Maximum summed test-process RSS | 2,469.9 MiB; no safety termination |
+| Physically presented picture | 58 checks of the changing synthetic pattern; no frozen-picture failure |
+| Connections/voice | Both clients remained connected and joined; microphones muted |
+| Kernel evidence | No GPU hang/reset/timeout and no new OOM messages |
+| Encoder-reported rate | Median 12 fps, sampled range 4–12 fps; VP9 CPU encoder |
+| AC-13.19 | Passed on this host with the FreeBSD decoding fix |
+
+**Performance limitation:** this was a stability fix, not a sustained 1080p30 performance pass. The two-client, same-host real-GPU run reported about 12 encoder fps; the subsequent short, all-Xvfb run reported 20 fps. Run 3's 29 fps headless result is not a like-for-like GPU comparison. Longer sessions, second-host throughput and optimization of the native fallback remain separate work.
+
+### Final validation and package
+
+| Check | Result |
+|---|---|
+| Native release build with `custom-protocol` | Passed in 6 minutes 4 seconds, two build jobs |
+| `cargo test --workspace --locked` | 2,807 passed, 24 ignored, 118 reported targets including doc tests |
+| Clippy with `-D warnings` and Rust formatting | Passed; formatting also checked on Linux |
+| `npm test -- --maxWorkers=2` | 3,567 passed across 324 files, 252 seconds |
+| TypeScript and production UI build | Passed; final SHA256 comparison matched all 1,207 embedded-UI resource files, with no application UI/changelog change |
+| Full ESLint/Prettier | Passed; only the existing Fast Refresh warning in `UpdateCheckPrompt.tsx` |
+| Native E2E | Ten-minute GPU run and subsequent fresh headless run both passed |
+| Node GPU-helper regression checks | Six passed on FreeBSD and Linux |
+| Package and smoke-helper regressions | Three package cases and nine smoke-helper cases passed on FreeBSD and Linux |
+| Native package creation | Passed; approximately 37 MB, explicit ALSA OSS plugin, libav, VPX and Opus runtime dependencies |
+
+The development package is `~/mumcord-freebsd-e2e/dist-freebsd-decode/mumcord-0.8.0.pkg`, SHA256 `126c2250cc2d964e674f63eac14c293e5cb5a68d1ed8b23d159a7e1e3174616b`. It was not installed and is not a tagged release.
+
+The first final-check attempt detected an optional changelog edit changing the bundled “What's new” data; that edit was removed to keep the application UI unchanged, and the rebuilt resource hashes then matched the tested embedded UI exactly. Full lint initially also found unused declarations in ignored ad-hoc diagnostic scripts; those scripts were archived outside lint's source inputs, and the complete lint command then passed without changing the global lint configuration.
+
+Current statistics, device evidence and redacted logs are in ignored `e2e/artifacts/freebsd-gpu/`. Earlier failed GPU artifacts were preserved under `e2e/artifacts/freebsd-gpu-failed-run4/`; its ad-hoc JavaScript probes are archived as `diagnostic-scripts.tar.gz`. No real-desktop screenshots were retained. Disposable profiles, identities, server databases, test processes, temporary pixel probes and launch scripts were removed. The temporary Xvfb package was uninstalled; Xorg and Plasma stayed running. The installed application remains 0.7.2 and its normal profile was not used or replaced. No dedicated Rust build cache was created, no other operating system's runtime behavior changed, and nothing was pushed or opened as a pull request.
+
+Audible voice, physical PTT/hotplug, clean-system install/uninstall, the other manual/second-host checks listed in Run 2 and native Windows/macOS builds remain unverified in this run.
