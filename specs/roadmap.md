@@ -40,7 +40,9 @@ of the specs and what has shipped.
   With brainstorming and tasks.
 - `07-file-sharing-screenshare-specification.md` — file sharing and the screen-share upgrade.
   With brainstorming.
-- `08-camera-sharing-specification.md` — camera sharing.
+- `08-camera-sharing-specification.md` — camera sharing. The background effects come from the
+  standalone open-source crate `bgmatte` since 0.9.1 (issue #454); it lives in its own
+  repository.
 - `09-plugin-platform-1-1-specification.md` — plugin API 1.1.
 - `10-admin-moderation-specification.md` — moderation and server administration. With
   brainstorming. Delivered incrementally: kick/ban and ban list (0.7.0), moving people,

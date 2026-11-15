@@ -8,6 +8,10 @@
 - The install script asks how to install Mumcord: from the package repository (the default where the system supports it), as a downloaded package, or as an AppImage; `--method repo|package|appimage` chooses without asking. `--uninstall` also removes the repository setup
 - When Mumcord was installed from the package repository, the update dialog shows the package manager command to update it (e.g. `sudo apt update && sudo apt install --only-upgrade mumcord`) instead of pointing to the release page
 
+### Changed
+
+- The camera background effects (blur and background images) now come from the open-source `bgmatte` crate, which the Mumcord team maintains in its own repository (issue #454). The segmentation models ship inside that crate, so building Mumcord no longer downloads them; ONNX Runtime is still fetched and shipped with Mumcord as before. Nothing changes in how the effects look or behave
+
 ### Fixed
 
 - The MUMCORD lettering at the top of the install script lines up again
