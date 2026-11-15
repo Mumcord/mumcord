@@ -7,6 +7,8 @@ import process from "node:process";
 import {
   assertHardwareRenderer,
   assertStableMemory,
+  assertMemoryBudget,
+  memoryHeadroomKiB,
   descendants,
   gpuFaults,
   processTable,
@@ -29,6 +31,21 @@ test("failed GPU startup removes stale success and memory artifacts, not unrelat
     else process.env.DISPLAY = display;
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test("FreeBSD headroom uses free plus inactive pages and rejects malformed counters", () => {
+  assert.equal(memoryHeadroomKiB("4096\n1000000\n500000\n"), 6000000);
+  for (const counters of ["4096\n1", "4096\n-1\n0", "0\n1\n2", "4096\nNaN\n0"]) {
+    assert.throws(() => memoryHeadroomKiB(counters), /invalid FreeBSD memory/);
+  }
+});
+
+test("memory guard retains the 3 GiB RSS budget and rejects low host headroom and runaway tests", () => {
+  const gib = 1024 * 1024;
+  assert.doesNotThrow(() => assertMemoryBudget(2.9 * gib, 600, 2 * gib));
+  assert.throws(() => assertMemoryBudget(3.1 * gib, 600, 2 * gib), /RSS exceeds/);
+  assert.throws(() => assertMemoryBudget(2 * gib, 600, 0.9 * gib), /host has less/);
+  assert.throws(() => assertMemoryBudget(2 * gib, 901, 2 * gib), /fifteen minutes/);
 });
 
 test("FreeBSD process columns preserve parents and RSS; ownership is transitive, not global", () => {

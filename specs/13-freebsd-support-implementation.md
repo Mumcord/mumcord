@@ -3,7 +3,7 @@
 > Specification: `specs/13-freebsd-support-specification.md`
 > As of: 2026-11-15 · Mode: native FreeBSD verification
 >
-> **Latest status (Run 5): GPU endurance passed after a FreeBSD-only decoding fix.** A fresh ten-minute 1080p receiving session kept hardware rendering enabled, with no GPU faults or memory exhaustion. Receiving WebKit memory was 479.6 → 506.9 MiB after warm-up. AC-13.19 is now passed on this machine; the sampled encoder median was 12 fps, not evidence of sustained 1080p30. Run 4 below records the earlier failing revision.
+> **Latest status (Run 6): faster capture and bounded playback passed GPU endurance.** Matched 1080p canvas throughput improved 11.80 → 14.04 draws/second (~19%). The final rebuilt client passed a fresh ten-minute hardware-rendered session under the original 3 GiB test budget, with no GPU faults or OOM; receiving WebKit median RSS was 483.3 → 532.1 MiB. AC-13.19 passes on this host, but sustained 1080p30 remains unproven. Earlier failures and rejected performance experiments remain documented below.
 
 ## Run 1 – 2026-11-09
 
@@ -292,6 +292,102 @@ The development package is `~/mumcord-freebsd-e2e/dist-freebsd-decode/mumcord-0.
 
 The first final-check attempt detected an optional changelog edit changing the bundled “What's new” data; that edit was removed to keep the application UI unchanged, and the rebuilt resource hashes then matched the tested embedded UI exactly. Full lint initially also found unused declarations in ignored ad-hoc diagnostic scripts; those scripts were archived outside lint's source inputs, and the complete lint command then passed without changing the global lint configuration.
 
-Current statistics, device evidence and redacted logs are in ignored `e2e/artifacts/freebsd-gpu/`. Earlier failed GPU artifacts were preserved under `e2e/artifacts/freebsd-gpu-failed-run4/`; its ad-hoc JavaScript probes are archived as `diagnostic-scripts.tar.gz`. No real-desktop screenshots were retained. Disposable profiles, identities, server databases, test processes, temporary pixel probes and launch scripts were removed. The temporary Xvfb package was uninstalled; Xorg and Plasma stayed running. The installed application remains 0.7.2 and its normal profile was not used or replaced. No dedicated Rust build cache was created, no other operating system's runtime behavior changed, and nothing was pushed or opened as a pull request.
+Run 5 statistics, device evidence and redacted logs are archived in ignored `e2e/artifacts/freebsd-gpu-run5/`. Earlier failed GPU artifacts were preserved under `e2e/artifacts/freebsd-gpu-failed-run4/`; its ad-hoc JavaScript probes are archived as `diagnostic-scripts.tar.gz`. No real-desktop screenshots were retained. Disposable profiles, identities, server databases, test processes, temporary pixel probes and launch scripts were removed. The temporary Xvfb package was uninstalled; Xorg and Plasma stayed running. The installed application remains 0.7.2 and its normal profile was not used or replaced. No dedicated Rust build cache was created, no other operating system's runtime behavior changed, and nothing was pushed or opened as a pull request.
 
 Audible voice, physical PTT/hotplug, clean-system install/uninstall, the other manual/second-host checks listed in Run 2 and native Windows/macOS builds remain unverified in this run.
+
+## Run 6 – 2026-11-15: Faster FreeBSD capture with bounded decoded-frame delivery
+
+**Result: the matched 1080p diagnostic improved canvas draw throughput from 11.80 to 14.04 draws/second, approximately 19%, and the final build passed a fresh ten-minute hardware-rendered receiving session.** The diagnostic encoder median increased from 12 to 17 fps. These are different measurements: the encoder improvement is not a 42% improvement in displayed frame rate, and neither measurement establishes sustained 1080p30. The final tested development binary identifies itself as `dev~freebsd-fps-final`.
+
+### Measured bottleneck and production changes
+
+DTrace samples of the original publisher attributed approximately 44% of sampled stacks to capture colour conversion and 32% to libvpx. This is a sampled publisher-stack breakdown, not a whole-application CPU benchmark. At native 1920×1080, the existing converter constructs an approximately 24 MiB intermediate RGB array before producing I420.
+
+FreeBSD now converts native-size BGRA directly in 2×2 pixel blocks. It retains the original BT.601 coefficients, luma rounding, chroma averaging and output bytes. Scaled, rounded and odd-size cases continue through the existing converter. Three native regressions cover colours, randomized/full-HD byte parity, fallback dimensions, short/invalid input and trailing bytes. Other operating systems still import the original converter.
+
+A standalone optimized benchmark on the FreeBSD host asserted byte-for-byte equality against the original implementation. Each value is the median of five batches of twelve frames:
+
+| Native-size conversion | Original | Direct conversion | Speed-up |
+|---|---:|---:|---:|
+| 640×480 | 1.978 ms | 0.790 ms | 2.50× |
+| 1920×1080 | 16.042 ms | 5.391 ms | 2.98× |
+| 2560×1440 | 28.902 ms | 9.851 ms | 2.93× |
+
+Higher capture throughput also exposed receive-side memory-budget failures. The FreeBSD raw-frame handoff now allows **two messages in flight and only the newest waiting decoded picture**, rather than sending unlimited messages into Tauri's raw channel cache. Intermediate waiting pictures are replaced, not accumulated; the codec still decodes its reference frames normally. A credit follows synchronous consumption by the webview. Conversion of a waiting picture runs outside GTK's main thread and the async runtime. Lossless 64-bit tokens, shared across screen/camera registries, prevent late credits from releasing another watch. The webview skips an older conversion that finishes late, while still releasing its credit.
+
+This is an internal Tauri handoff, not a Mumble protocol change. Only FreeBSD's native-decoded pictures carry the credit flag. Other platforms retain their existing frame delivery, and tests explicitly check that legacy RGBA and encoded messages send no extra credit requests. Incoming FreeBSD camera pictures share the bounded path; outgoing camera remains unavailable. The existing FreeBSD Rust-decoder policy remains in place: unsafe WebCodecs playback was not re-enabled. No resolution, codec-quality or configured frame-rate ceiling was reduced, and no software-rendering override was introduced.
+
+Five new native handoff tests cover queue bounds/latest-picture selection, replacement/detachment, independent watches/retention, closed raw channels and distinct screen/camera credits. Three new frontend tests cover credit timing, legacy-message behavior, stale conversion suppression, lossless tokens above JavaScript's safe-integer range, drawing exceptions and credit-error logging.
+
+The production changes are committed locally as `dc9bfbaf` (bounded FreeBSD delivery) and `fe558d4b` (direct FreeBSD capture conversion).
+
+### Rejected attempts and safety policy
+
+The performance-only build reached about 17 canvas draws/second in its short comparison, but failed the original 3 GiB summed-RSS guard after 374.7 seconds. A diagnostic increase to 3.5 GiB also failed, after about 214 seconds of playback; it was not accepted as a fix. These were guarded memory-budget failures, not successful endurance runs. The precise internal allocation responsible for the bursts was not established.
+
+The first bounded implementation allowed only one message in flight. It serialized too much IPC latency: its 90-second diagnostic produced 10.65 canvas draws/second despite an 18-fps encoder median. That performance regression was rejected and its ensuing endurance attempt deliberately stopped. The final two-credit window overlaps IPC without restoring an unbounded queue.
+
+An earlier release build was also found to have reused stale engine artifacts after synchronization across the hosts' differing clocks. Its diagnostic and interrupted endurance attempt are invalid optimization evidence. Changed remote capture sources were explicitly touched, actual engine compilation was checked, and all three conversion regressions ran before the later comparisons.
+
+The final test runner retains the original **3 GiB summed-RSS ceiling** and fifteen-minute deadline, and adds estimated host headroom: at least 4 GiB free plus inactive pages before GPU startup, and at least 1 GiB throughout. The 256 MiB receiving-WebKit median-growth check is unchanged. Two additional Node tests validate the FreeBSD counters and budget boundaries. RSS includes shared mappings; headroom is a reclaimable-memory estimate, not a guarantee or unique-process memory accounting.
+
+The final lint pass initially found callback typing/bracing violations in the new TypeScript. They were corrected and the nine frame-protocol tests rerun. Because the corrections changed the UI bundle, the release was rebuilt with the lint-clean UI and the complete ten-minute GPU check was repeated with the original 3 GiB limit active. The final **615 recorded samples** also passed a replay through the final guard. An earlier completed two-credit hold and its 617-sample audit are archived separately, not substituted for this final run.
+
+### Matched diagnostic and full endurance measurements
+
+The 90-second comparisons used the same host, 1920×1080 synthetic Xvfb publisher, real Intel-desktop receiver, VP9 CPU encoding, muted voice participation and canvas-timing instrumentation. The optimized diagnostic used the `credit2` protocol build before the later lint-only callback cleanup. These are short diagnostics, not substitutes for the separate uninstrumented ten-minute run.
+
+| Matched diagnostic | Original decoding-fix build | Optimized two-credit protocol build |
+|---|---:|---:|
+| Measured canvas interval | 90.323 s | 90.575 s |
+| Canvas draws | 1,066 | 1,272 |
+| Canvas draws/second | 11.80 | 14.04 |
+| Encoder median | 12 fps | 17 fps |
+| Mean `putImageData` call | 5.07 ms | 6.35 ms |
+
+The conversion improvement did not make the canvas upload itself faster; remaining copy/upload and encoding costs still limit end-to-end throughput. Draw calls are not a count of independently measured physical panel refreshes.
+
+The final full GPU check started at **19:16:13 UTC**. Its measured playback hold was **600.873 seconds**; the complete verification sequence, including a subsequent fresh headless E2E, finished at **19:27:09 UTC**.
+
+| Evidence | Result |
+|---|---|
+| Stream and renderer | 1920×1080; real Intel UHD Graphics (CML GT2), Mesa 26.2.2; hardware rendering preserved |
+| Receiving WebKit device evidence | PID 37920 retained `/dev/drm/128`, `libgallium-26.2.2.so` and `libEGL_mesa.so.0.0.0` before and after playback |
+| Receiving WebKit median RSS | 483.3 MiB warm-up → 532.1 MiB final minute; peak 550.6 MiB |
+| Maximum summed test RSS | 2,699.1 MiB, below the original 3 GiB ceiling |
+| Minimum estimated host headroom | 3,709.5 MiB |
+| Changing physical picture | 57 checks passed |
+| Encoder samples during the full hold | Median 16 fps, range 1–20 fps; VP9 CPU encoder |
+| Connections and controls | Both clients stayed connected and joined to muted voice; pause/resume/stop and link handoff passed |
+| Kernel evidence | No new GPU hang/reset/timeout or OOM messages |
+| Subsequent headless E2E | Passed; sampled encoder 29 fps, not evidence of real-desktop 1080p30 |
+| AC-13.19 | Passed again on this host with the optimized, bounded build |
+
+### Validation, package and screenshots
+
+| Check | Result |
+|---|---|
+| Native release build with `custom-protocol` | Passed in 4 minutes 23 seconds; existing target artifacts, two build jobs |
+| Full native Rust workspace tests | 2,815 passed, 24 ignored, 118 reported targets including doc tests |
+| Clippy `-D warnings` and Rust formatting | Passed; formatting also checked locally on Linux |
+| Full frontend tests | 3,570 passed across 324 files, 241.70 seconds; nine protocol tests passed again after lint-only fixes |
+| TypeScript / production UI build | Passed; SHA256 comparison matched all 1,207 final embedded-UI resources |
+| Full ESLint / Prettier | Passed; only the existing Fast Refresh warning in `UpdateCheckPrompt.tsx` |
+| GPU-helper regressions | Eight passed on FreeBSD and Linux; final guard also passed all 615 endurance samples |
+| Package / smoke-helper regressions | Three package cases and nine smoke-helper cases passed on FreeBSD |
+| Native package creation | Passed; approximately 37 MB, not installed |
+
+The package is `~/mumcord-freebsd-e2e/dist-freebsd-fps/mumcord-0.8.0.pkg`, SHA256 `456694abcaf5f392b3493e6ac17ac888362d036379827759113e6f236cc98d54`. It is a development build, not a tagged release.
+
+The frame-protocol change has no visual redesign. Dark/light screenshots below come only from the disposable **private Xvfb** E2E, with synthetic users, loopback server and test messages. They are not real-desktop screenshots or performance evidence.
+
+![FreeBSD bounded screen-share playback, dark theme](../docs/images/screenshots/freebsd-fps-dark.png)
+
+![FreeBSD bounded screen-share playback, light theme](../docs/images/screenshots/freebsd-fps-light.png)
+
+Final statistics, native device evidence, `guard-audit.json` and validation logs are in ignored `e2e/artifacts/freebsd-gpu/`. The earlier completed two-credit run is in `freebsd-gpu-credit2/`; rejected budget runs are in `freebsd-fps-guard3g/` and `freebsd-fps-guard35g/`, and the single-credit diagnostic/interrupted run are in `freebsd-credit1-diagnostic/` and `freebsd-credit1-incomplete/`. Temporary diagnostic JavaScript sources were archived rather than exempted from lint. No real-desktop screenshots or profile/server databases were retained.
+
+Test clients, local servers, private displays/buses, disposable profiles and temporary helpers/scripts were removed. The temporary Xvfb package was uninstalled; Xorg and Plasma remained running. The installed application is still 0.7.2 and the normal profile was not used or replaced. Existing Rust target artifacts were reused; no dedicated build cache was created. Nothing was pushed or opened as a pull request.
+
+**Remaining limits:** sustained real-desktop 1080p30 is not achieved. Further optimization should profile the remaining native-frame copy/upload and encoding costs without re-enabling the unsafe WebCodecs path. Audible voice, physical PTT/hotplug, clean-system install/uninstall, second-host throughput, the other manual checks in Run 2 and native Windows/macOS builds remain unverified in this run.

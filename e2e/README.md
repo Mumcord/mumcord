@@ -277,8 +277,12 @@ Hardware evidence uses Intel's renderer plus the receiver's native DRM device/Me
 not WebKit's generic WebGL renderer name. Colour statistics prove that the normal receiver's
 visible picture keeps changing; no real-desktop screenshots are retained.
 
-A one-second memory guard stops only the test clients if their summed RSS exceeds 3 GiB or the
-run exceeds fifteen minutes. The check rejects new kernel GPU faults or OOM kills, a restarted
+Run on an otherwise idle machine. GPU mode requires at least 4 GiB estimated memory headroom
+(FreeBSD free plus inactive pages) before starting. A one-second guard stops only the test clients
+if that estimate falls below 1 GiB, their summed RSS exceeds 3 GiB, or the run exceeds fifteen
+minutes. The separate 256 MiB warm-up-to-final-minute median growth limit remains unchanged.
+The check rejects new
+kernel GPU faults or OOM kills, a restarted
 WebKit process, frozen pictures, lost connections and continued receiving-memory growth after
 warm-up. Summed RSS includes shared mappings, so it is a conservative safety limit, not unique
 physical-memory accounting. Logs, colour statistics and memory samples go to ignored

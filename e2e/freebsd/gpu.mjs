@@ -75,6 +75,34 @@ export function assertStableMemory(samples, pid, startedSeconds) {
   return { warmMiB, endMiB, peakMiB: Math.max(...points.map((point) => point.rss)) / 1024 };
 }
 
+export function memoryHeadroomKiB(text) {
+  const values = text.trim().split(/\s+/).map(Number);
+  assert(
+    values.length === 3 && values.every((value) => Number.isSafeInteger(value) && value >= 0),
+    "invalid FreeBSD memory counters",
+  );
+  const [pageSize, free, inactive] = values;
+  const bytes = pageSize * (free + inactive);
+  assert(pageSize > 0 && Number.isSafeInteger(bytes), "invalid FreeBSD memory size");
+  return bytes / 1024;
+}
+
+export function assertMemoryBudget(totalRssKiB, elapsedSeconds, headroomKiB) {
+  assert(totalRssKiB >= 0 && totalRssKiB <= 3 * 1024 * 1024, "test RSS exceeds 3 GiB");
+  assert(headroomKiB >= 1024 * 1024, "host has less than 1 GiB estimated memory headroom");
+  assert(elapsedSeconds >= 0 && elapsedSeconds <= 900, "test exceeds fifteen minutes");
+}
+
+function memoryHeadroom() {
+  return memoryHeadroomKiB(
+    execFileSync(
+      "sysctl",
+      ["-n", "hw.pagesize", "vm.stats.vm.v_free_count", "vm.stats.vm.v_inactive_count"],
+      { encoding: "utf8", timeout: 5000 },
+    ),
+  );
+}
+
 function ps() {
   return processTable(
     execFileSync("ps", ["-ax", "-o", "pid,ppid,rss,comm"], { encoding: "utf8", timeout: 5000 }),
@@ -142,6 +170,7 @@ export function startGpuChecks(root, artifacts) {
     !/^(1|true)$/i.test(process.env.WEBKIT_DISABLE_COMPOSITING_MODE ?? ""),
     "compositing is disabled",
   );
+  assert(memoryHeadroom() >= 4 * 1024 * 1024, "--gpu needs 4 GiB estimated memory headroom");
   const glx = execFileSync("glxinfo", ["-B"], { encoding: "utf8", timeout: 15000 });
   assertHardwareRenderer(glx);
   writeFileSync(join(artifacts, "glxinfo.txt"), glx);
@@ -188,17 +217,14 @@ export function startGpuChecks(root, artifacts) {
       const processes = descendants(lastRows, process.pid);
       const totalRssKiB = processes.reduce((sum, row) => sum + row.rssKiB, 0);
       const elapsedSeconds = (performance.now() - started) / 1000;
-      const sample = { elapsedSeconds, totalRssKiB, processes };
+      const headroomKiB = memoryHeadroom();
+      const sample = { elapsedSeconds, totalRssKiB, headroomKiB, processes };
       samples.push(sample);
       writeFileSync(join(artifacts, "memory.jsonl"), JSON.stringify(sample) + "\n", {
         flag: "a",
         mode: 0o600,
       });
-      if (totalRssKiB > 3 * 1024 * 1024 || elapsedSeconds > 900) {
-        throw new Error(
-          `safety limit: ${totalRssKiB} KiB summed test RSS after ${elapsedSeconds.toFixed(1)} seconds`,
-        );
-      }
+      assertMemoryBudget(totalRssKiB, elapsedSeconds, headroomKiB);
     } catch (error) {
       if (failure !== null) return;
       failure = error.message;
