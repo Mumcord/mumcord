@@ -38,8 +38,12 @@ expect_fail() {
   echo "Rejected as expected: $*"
 }
 
+# pkg reports a bad catalogue signature and drops the catalogue but exits 0, so what counts is
+# that nothing can be fetched from it afterwards.
 use "$work/bad-meta"
-expect_fail pkg update -f -r mumcord
+pkg update -f -r mumcord > "$work/update" 2>&1 || true
+grep -q "Invalid signature" "$work/update" || { cat "$work/update"; echo "::error::pkg did not reject the catalogue signed with another key." >&2; exit 1; }
+expect_fail pkg fetch -y -r mumcord mumcord
 use "$work/bad-pkg"
 pkg update -f -r mumcord
 expect_fail pkg fetch -y -r mumcord mumcord
