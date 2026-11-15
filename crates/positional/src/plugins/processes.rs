@@ -83,7 +83,7 @@ mod platform {
 }
 
 /// FreeBSD has no `/proc` by default (procfs is optional and deprecated), so the programs come
-/// from `sysctl`: `KERN_PROC_ALL` for the list and `KERN_PROC_ARGS` for the command line, which
+/// from `sysctl`: `KERN_PROC_PROC` for the list and `KERN_PROC_ARGS` for the command line, which
 /// keeps the full file name instead of `ki_comm`'s 19 bytes. Another user's command line needs
 /// `security.bsd.see_other_uids`; without it the shorter `ki_comm` is used.
 #[cfg(target_os = "freebsd")]
@@ -119,8 +119,9 @@ mod platform {
 
     /// Every process the kernel reports, or `None` when `sysctl` refuses.
     fn list() -> Option<Vec<libc::kinfo_proc>> {
-        // Three names: `KERN_PROC_ALL` takes no pid.
-        let mib = [libc::CTL_KERN, libc::KERN_PROC, libc::KERN_PROC_ALL];
+        // KERN_PROC_ALL includes one entry per thread, repeating each process's command-line
+        // query and plugin candidate. KERN_PROC_PROC reports each program once, with no pid.
+        let mib = [libc::CTL_KERN, libc::KERN_PROC, libc::KERN_PROC_PROC];
         // Start with room for more processes than reported, and grow when they multiplied in
         // between (the call then fails with ENOMEM).
         let mut count = 512;
@@ -149,7 +150,7 @@ mod platform {
             }
             let error = std::io::Error::last_os_error();
             if error.raw_os_error() != Some(libc::ENOMEM) {
-                tracing::debug!(error = %error, "sysctl KERN_PROC_ALL failed");
+                tracing::debug!(error = %error, "sysctl KERN_PROC_PROC failed");
                 return None;
             }
             count *= 2;
@@ -248,7 +249,29 @@ mod tests {
         assert_eq!(file_name("plain"), "plain");
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos", windows))]
+    #[cfg(target_os = "freebsd")]
+    #[test]
+    fn lists_each_program_once_even_with_several_threads() {
+        let (stop, wait) = std::sync::mpsc::channel::<()>();
+        let worker = std::thread::spawn(move || wait.recv());
+        let programs = running();
+        drop(stop);
+        worker
+            .join()
+            .expect("worker finished")
+            .expect_err("stopped");
+        let mut pids = std::collections::HashSet::new();
+        for (_, pid) in programs {
+            assert!(pids.insert(pid), "a thread was listed as another program");
+        }
+    }
+
+    #[cfg(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "macos",
+        windows
+    ))]
     #[test]
     fn lists_this_test_program() {
         let me = std::env::current_exe().expect("exe");
