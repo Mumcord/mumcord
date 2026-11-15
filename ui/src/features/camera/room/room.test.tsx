@@ -40,6 +40,7 @@ function tile(sharer: number, patch: Partial<CameraTile> = {}): CameraTile {
     quality: "auto",
     dataSaver: false,
     fpsBadge: null,
+    paused: false,
     ...patch,
   };
 }
@@ -130,6 +131,15 @@ describe("camera room", () => {
     expect(self).toHaveTextContent("Live");
     expect(room).toHaveTextContent("Ben is here without a camera");
     expect(screen.getByRole("radio", { name: "Grid" })).toBeChecked();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("covers a paused camera with a paused notice instead of the last picture", async () => {
+    onAir(api);
+    api.mock.setCameraRoom(1, [tile(ANNA, { paused: true })], true);
+    const { container } = render(<CameraRoom serverId={1} onTurnOn={null} />);
+    const anna = await screen.findByRole("group", { name: "Anna, camera on, camera paused" });
+    expect(anna).toHaveTextContent("Anna paused the camera");
     expect(await axeViolations(container)).toEqual([]);
   });
 

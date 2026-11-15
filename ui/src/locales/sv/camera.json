@@ -190,7 +190,9 @@
     "viewing": "Tittar",
     "weak": "Svag anslutning",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Den här kameran kräver Mumcord 0.9.0"
+    "needsUpdate": "Den här kameran kräver Mumcord 0.9.0",
+    "paused": "{{name}} har pausat kameran",
+    "pausedLabel": ", kameran pausad"
   },
   "tileMenu": {
     "options": "Alternativ för {{name}}",

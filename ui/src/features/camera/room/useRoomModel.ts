@@ -29,6 +29,8 @@ export interface TileModel {
   micOff: boolean;
   /** The "{n} fps" badge of a weak connection (FR-8.58). */
   fpsBadge: number | null;
+  /** The person's app paused the camera (spec 05 FR-5.75): no picture comes until it resumes. */
+  paused: boolean;
   quality: CameraTileQuality;
   pinned: boolean;
   user: User | undefined;
@@ -126,6 +128,7 @@ export function useRoomModel(serverId: number): RoomModel {
         speaking: talking.has(selfSession),
         micOff: self !== undefined && voiceState(self) !== null,
         fpsBadge: null,
+        paused: false,
         quality: "auto",
         pinned: choices.pinned.includes(key),
         user: self,
@@ -143,6 +146,7 @@ export function useRoomModel(serverId: number): RoomModel {
       speaking: talking.has(tile.sharer),
       micOff: user !== undefined && voiceState(user) !== null,
       fpsBadge: tile.fpsBadge,
+      paused: tile.paused,
       quality: tile.quality,
       pinned: choices.pinned.includes(key),
       user,

@@ -197,7 +197,9 @@
     "viewing": "A ver",
     "weak": "Ligação fraca",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Esta câmara requer o Mumcord 0.9.0"
+    "needsUpdate": "Esta câmara requer o Mumcord 0.9.0",
+    "paused": "{{name}} pausou a câmara",
+    "pausedLabel": ", câmara em pausa"
   },
   "tileMenu": {
     "options": "Opções para {{name}}",

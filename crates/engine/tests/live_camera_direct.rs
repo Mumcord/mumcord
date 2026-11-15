@@ -1,7 +1,7 @@
 //! The direct camera path (spec 08, FR-8.92, FR-8.93) with two engines on this machine: A runs
 //! `direct_only`, so it opens one `STREAM_CAMERA` to B; B's tile plays it without any relay
-//! broadcast, follows B's tile height on the reverse stream, and closes when B blocks A or A
-//! turns the camera off.
+//! broadcast, follows B's tile height on the reverse stream, shows A's pause, and closes when B
+//! blocks A or A turns the camera off.
 //!
 //! `testenv/up.sh` with the camera profile (see `live_camera.rs`), then:
 //! `MUMCORD_LIVE=1 MUMCORD_TEST_CAMERA=1 MUMCORD_CAMERA_PORT=44758 cargo test -p mumcord-engine --features test-backend --test live_camera_direct -- --ignored --test-threads=1 --nocapture`
@@ -259,6 +259,22 @@ async fn the_camera_reaches_a_viewer_over_the_direct_stream() {
         (frames.newest_size() == (1280, 720)).then_some(())
     })
     .await;
+
+    // A's app goes to the background: B's tile says paused, and running again on return
+    // (spec 05 FR-5.75).
+    let paused_is = |paused: bool| {
+        b.engine
+            .camera_room(server_b)
+            .tiles
+            .iter()
+            .find(|t| t.sharer == sharer && t.paused == paused)
+            .map(|_| ())
+    };
+    a.engine.camera_set_paused(server_a, true);
+    assert_eq!(a.engine.camera_view().map(|v| v.paused), Some(true));
+    poll("B's tile paused", || paused_is(true)).await;
+    a.engine.camera_set_paused(server_a, false);
+    poll("B's tile running again", || paused_is(false)).await;
 
     // B hides the tile: the stream closes and nothing plays any more (FR-8.57).
     b.engine.camera_tile_set_hidden(server_b, sharer, true);

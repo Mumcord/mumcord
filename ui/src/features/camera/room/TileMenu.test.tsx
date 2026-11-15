@@ -33,6 +33,7 @@ function tile(sharer: number, patch: Partial<CameraTile> = {}): CameraTile {
     quality: "auto",
     dataSaver: false,
     fpsBadge: null,
+    paused: false,
     ...patch,
   };
 }

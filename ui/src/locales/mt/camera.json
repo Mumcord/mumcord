@@ -211,7 +211,9 @@
     "viewing": "Qed tara",
     "weak": "Konnessjoni dgħajfa",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Din il-kamera teħtieġ Mumcord 0.9.0"
+    "needsUpdate": "Din il-kamera teħtieġ Mumcord 0.9.0",
+    "paused": "{{name}} waqqaf il-kamera temporanjament",
+    "pausedLabel": ", kamera waqfa temporanja"
   },
   "tileMenu": {
     "options": "Għażliet għal {{name}}",

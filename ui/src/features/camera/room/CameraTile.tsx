@@ -2,8 +2,9 @@
  * One camera tile (FR-8.65, spec 08 §5.3): the video, the name tag with the microphone icon, the
  * green speaking frame, "● Live" on the self-view, the "{n} fps" badge of a weak connection and,
  * with the tile under the pointer or focused, the height and codec it arrives in (mockup 10).
- * Without a picture it shows who it is and why: joining, full, couldn't join, needs 0.9.0 or
- * hidden (§7.2).
+ * Without a picture it shows who it is and why: joining, full, couldn't join, needs 0.9.0,
+ * hidden (§7.2) or paused by the person's phone app (spec 05 FR-5.75), which covers the last
+ * picture instead of leaving it frozen.
  * Names come from the server and are rendered as text only.
  */
 import type { TFunction } from "i18next";
@@ -158,11 +159,15 @@ function tileLabel(tile: TileModel, t: TFunction<"camera">): string {
   let label = t("tile.label", { name: tile.name });
   if (tile.speaking) label += t("tile.speaking");
   if (tile.micOff) label += t("tile.micOff");
+  if (tile.paused) label += t("tile.pausedLabel");
   return label;
 }
 
 /** What a tile without a picture says (spec 08 §5.6, §7.2); `null` while it plays. */
 function statusText(tile: TileModel, t: TFunction<"camera">): string | null {
+  if (tile.paused && (tile.state === "playing" || tile.state === "joining")) {
+    return t("tile.paused", { name: tile.name });
+  }
   switch (tile.state) {
     case "announced":
     case "joining":

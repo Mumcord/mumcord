@@ -103,6 +103,9 @@ pub struct CameraTile {
     pub data_saver: bool,
     /// The "{n} fps" badge with "Weak connection" (FR-8.58); `None` hides it.
     pub fps_badge: Option<u32>,
+    /// The person's app paused the camera (spec 05 FR-5.75): no frames come until it resumes,
+    /// so the tile shows "paused" instead of the last picture.
+    pub paused: bool,
 }
 
 /// The cameras of the own channel on one server (blocked people are left out, FR-8.59).
@@ -220,6 +223,8 @@ struct Tile {
     watch: Option<TileWatch>,
     fps: FpsMeter,
     badge: Option<u32>,
+    /// The last `on` said the camera is paused.
+    paused: bool,
 }
 
 impl Tile {
@@ -238,6 +243,7 @@ impl Tile {
             watch: None,
             fps: FpsMeter::default(),
             badge: None,
+            paused: false,
         }
     }
 
@@ -368,6 +374,7 @@ impl Tile {
             quality: self.quality,
             data_saver: self.data_saver(everyone_data_saver),
             fps_badge: self.badge.filter(|_| self.state == TileState::Playing),
+            paused: self.paused,
         }
     }
 }
@@ -1036,9 +1043,16 @@ async fn write_requests(mut send: SendStream, mut messages: mpsc::Receiver<Vec<u
     }
 }
 
-/// `on` from `sharer` in the own channel (FR-8.8): a new tile, or a new broadcast on an
-/// existing one. With "Show cameras: Always" the first camera opens the room (FR-8.53).
-pub(crate) fn on_camera_on(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: String) {
+/// `on` from `sharer` in the own channel (FR-8.8): a new tile, a new broadcast on an existing
+/// one, or the same broadcast paused or resumed. With "Show cameras: Always" the first camera
+/// opens the room (FR-8.53).
+pub(crate) fn on_camera_on(
+    engine: &Engine,
+    ctx: &SessionCtx,
+    sharer: u32,
+    id: String,
+    paused: bool,
+) {
     let show = engine.camera_prefs().show;
     let replaced = {
         let mut cameras = lock(engine.camera_state());
@@ -1049,6 +1063,7 @@ pub(crate) fn on_camera_on(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: S
         match room.tiles.get_mut(&sharer) {
             Some(tile) if tile.id == id => {
                 tile.retry = matches!(tile.state, TileState::Full | TileState::NeedsUpdate);
+                tile.paused = paused;
                 None
             }
             Some(tile) => {
@@ -1059,10 +1074,13 @@ pub(crate) fn on_camera_on(engine: &Engine, ctx: &SessionCtx, sharer: u32, id: S
                 tile.height = old.height;
                 tile.last_join = old.last_join;
                 tile.attempt = old.attempt + 1;
+                tile.paused = paused;
                 Some(old)
             }
             None => {
-                room.tiles.insert(sharer, Tile::new(id));
+                let mut tile = Tile::new(id);
+                tile.paused = paused;
+                room.tiles.insert(sharer, tile);
                 None
             }
         }

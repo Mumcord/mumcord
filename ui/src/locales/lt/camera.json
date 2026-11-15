@@ -204,7 +204,9 @@
     "viewing": "Žiūri",
     "weak": "Silpnas ryšys",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Šiai kamerai reikia Mumcord 0.9.0"
+    "needsUpdate": "Šiai kamerai reikia Mumcord 0.9.0",
+    "paused": "{{name}} pristabdė kamerą",
+    "pausedLabel": ", kamera pristabdyta"
   },
   "tileMenu": {
     "options": "{{name}} parinktys",

@@ -190,7 +190,9 @@
     "viewing": "Kijkt mee",
     "weak": "Zwakke verbinding",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Deze camera heeft Mumcord 0.9.0 nodig"
+    "needsUpdate": "Deze camera heeft Mumcord 0.9.0 nodig",
+    "paused": "{{name}} heeft de camera gepauzeerd",
+    "pausedLabel": ", camera gepauzeerd"
   },
   "tileMenu": {
     "options": "Opties voor {{name}}",
