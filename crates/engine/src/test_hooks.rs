@@ -54,6 +54,12 @@ fn flag(name: &str) -> bool {
     var(name).as_deref() == Some("1")
 }
 
+/// DNS server for the SRV lookup of server addresses (issue #859), e.g. `127.0.0.1:5353`: the
+/// live test points it at a local DNS fixture instead of the system resolver.
+pub fn dns_server() -> Option<std::net::SocketAddr> {
+    var("MUMCORD_TEST_DNS")?.parse().ok()
+}
+
 /// Offer lifetime override (normally 24 h) for AC-7.15.
 pub fn file_expiry() -> Option<Duration> {
     parse_seconds(var("MUMCORD_TEST_FILE_EXPIRY_S")?.as_str())

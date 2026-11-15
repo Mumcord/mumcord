@@ -2446,32 +2446,49 @@ impl Inner {
         };
 
         let expected = trusted.clone();
-        let config = ConnectConfig {
-            host: server.address.clone(),
-            port: server.port,
-            username: server.username.clone(),
-            password,
-            tokens,
-            identity: Some(ClientIdentity {
-                chain: vec![CertificateDer::from(identity.cert_der().to_vec())],
-                key: PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(
-                    identity.key_pkcs8_der().to_vec(),
-                )),
-            }),
-            verify_cert: Arc::new(move |cert| {
-                check_cert(expected.as_deref(), &format_fingerprint(&cert.sha256_hex))
-                    == CertCheck::Trusted
-            }),
-            login_timeout: LOGIN_TIMEOUT,
-        };
+        // The check is pinned to the saved server, not to the host name, so an SRV target
+        // (issue #859) cannot pass for a different server and a changed certificate still asks.
+        let verify_cert = Arc::new(move |cert: &ServerCert| {
+            check_cert(expected.as_deref(), &format_fingerprint(&cert.sha256_hex))
+                == CertCheck::Trusted
+        });
         let events = self.events.for_server(server_id);
         let progress: mumble_client_protocol::SyncProgress = Arc::new(move |channels| {
             events.emit(EngineEvent::SyncProgress {
                 channels: u32::try_from(channels).unwrap_or(u32::MAX),
             });
         });
-        let tap = Some(self.inspector.tap(server_id));
-        match mumble_client_protocol::connect_with_tap(config, Some(progress), tap).await {
+        let targets = crate::srv::targets(&server.address, server.port).await;
+        let mut outcome = Err(ConnectError::Resolve(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "no address to connect to",
+        )));
+        for (index, target) in targets.iter().enumerate() {
+            let config = ConnectConfig {
+                host: target.host.clone(),
+                port: target.port,
+                username: server.username.clone(),
+                password: password.clone(),
+                tokens: tokens.clone(),
+                identity: Some(ClientIdentity {
+                    chain: vec![CertificateDer::from(identity.cert_der().to_vec())],
+                    key: PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(
+                        identity.key_pkcs8_der().to_vec(),
+                    )),
+                }),
+                verify_cert: verify_cert.clone(),
+                login_timeout: LOGIN_TIMEOUT,
+            };
+            let tap = Some(self.inspector.tap(server_id));
+            outcome =
+                mumble_client_protocol::connect_with_tap(config, Some(progress.clone()), tap).await;
+            let unreachable = outcome.as_ref().is_err_and(crate::srv::unreachable);
+            if !unreachable || index + 1 == targets.len() {
+                break;
+            }
+            tracing::info!(server_id, "SRV target unreachable; trying the next one");
+        }
+        match outcome {
             Ok(connection) => Ok((connection, server.address, server.port)),
             Err(ConnectError::CertificateRejected(cert)) => {
                 let fingerprint = format_fingerprint(&cert.sha256_hex);

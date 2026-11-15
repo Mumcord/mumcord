@@ -68,6 +68,9 @@ crab_nat = "0.8"
 netdev = { version = "0.47", default-features = false, features = ["gateway"] }
 # Dual-stack UDP socket (IPv6 with IPv4 mapped) on every platform; already in the tree via tokio.
 socket2 = "0.6"
+# DNS SRV records of Mumble servers (issue #859): Mumble's own lookup of `_mumble._tcp.<host>`.
+# Plain DNS over UDP/TCP with the system resolver configuration; no DNS-over-TLS stack.
+hickory-resolver = { version = "0.26", default-features = false, features = ["tokio", "system-config"] }
 
 # Protobuf
 prost = "0.14"
