@@ -79,7 +79,8 @@
     "importInvalid": "Datoteke ni bilo mogoče odpreti. Preveri geslo in ali gre za datoteko identitete .p12 ali .pfx.",
     "importNotFound": "Datoteke ni bilo mogoče najti. Izberi jo znova.",
     "importIo": "Datoteke ni bilo mogoče prebrati. Izberi jo znova.",
-    "pickFailed": "Izbirnika datotek ni bilo mogoče odpreti."
+    "pickFailed": "Izbirnika datotek ni bilo mogoče odpreti.",
+    "importWrongPassword": "Geslo ni pravilno. Preverite ga in poskusite znova."
   },
   "mic": {
     "input": "Mikrofon",

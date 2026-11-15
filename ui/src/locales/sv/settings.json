@@ -71,7 +71,8 @@
     "invalidInput": "Det fungerade inte: filen eller lösenordet är ogiltigt.",
     "duplicateIdentity": "Den här identiteten finns redan i listan.",
     "notFound": "Filen eller objektet hittades inte.",
-    "generic": "Något gick fel. Försök igen."
+    "generic": "Något gick fel. Försök igen.",
+    "wrongPassword": "Lösenordet är fel. Kontrollera det och försök igen."
   },
   "identity": {
     "export": "Exportera…",
@@ -956,7 +957,10 @@
     "channel": "Uppdateringskanal",
     "channelHint": "Välj vilka versioner Mumcord erbjuder. Releasekandidater är tidiga byggen av nästa version.",
     "channels": {
-      "stable": { "name": "Stabil", "hint": "Endast slutgiltiga versioner" },
+      "stable": {
+        "name": "Stabil",
+        "hint": "Endast slutgiltiga versioner"
+      },
       "releaseCandidates": {
         "name": "Releasekandidater",
         "hint": "Tidiga byggen av nästa version; kan innehålla fel"

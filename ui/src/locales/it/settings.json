@@ -73,7 +73,8 @@
     "invalidInput": "Non ha funzionato: il file o la password non sono validi.",
     "duplicateIdentity": "Questa identità è già nell'elenco.",
     "notFound": "Impossibile trovare il file o l'elemento.",
-    "generic": "Qualcosa è andato storto. Riprova."
+    "generic": "Qualcosa è andato storto. Riprova.",
+    "wrongPassword": "La password non è corretta. Controllala e riprova."
   },
   "identity": {
     "export": "Esporta…",
@@ -962,7 +963,10 @@
     "channel": "Canale di aggiornamento",
     "channelHint": "Scegli quali versioni offre Mumcord. Le release candidate sono build iniziali della prossima versione.",
     "channels": {
-      "stable": { "name": "Stabile", "hint": "Solo versioni finali" },
+      "stable": {
+        "name": "Stabile",
+        "hint": "Solo versioni finali"
+      },
       "releaseCandidates": {
         "name": "Release candidate",
         "hint": "Build iniziali della prossima versione; possono contenere errori"

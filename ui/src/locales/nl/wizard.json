@@ -79,7 +79,8 @@
     "importInvalid": "Het bestand kon niet worden geopend. Controleer het wachtwoord en of het een .p12- of .pfx-identiteitsbestand is.",
     "importNotFound": "Het bestand is niet gevonden. Kies het opnieuw.",
     "importIo": "Het bestand kon niet worden gelezen. Kies het opnieuw.",
-    "pickFailed": "De bestandskiezer kon niet worden geopend."
+    "pickFailed": "De bestandskiezer kon niet worden geopend.",
+    "importWrongPassword": "Het wachtwoord klopt niet. Controleer het en probeer het opnieuw."
   },
   "mic": {
     "input": "Microfoon",

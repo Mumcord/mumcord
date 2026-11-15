@@ -85,6 +85,8 @@ export function IdentityStep({ identity, onDone }: IdentityStepProps) {
     switch (code) {
       case "invalidInput":
         return t("identity.importInvalid");
+      case "wrongPassword":
+        return t("identity.importWrongPassword");
       case "notFound":
         return t("identity.importNotFound");
       case "io":

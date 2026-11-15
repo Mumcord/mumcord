@@ -79,7 +79,8 @@
     "importInvalid": "Non è stato possibile aprire il file. Controlla la password e che sia un file di identità .p12 o .pfx.",
     "importNotFound": "Il file non è stato trovato. Sceglilo di nuovo.",
     "importIo": "Non è stato possibile leggere il file. Sceglilo di nuovo.",
-    "pickFailed": "Non è stato possibile aprire il selettore di file."
+    "pickFailed": "Non è stato possibile aprire il selettore di file.",
+    "importWrongPassword": "La password non è corretta. Controllala e riprova."
   },
   "mic": {
     "input": "Microfono",

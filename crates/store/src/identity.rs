@@ -89,8 +89,17 @@ impl Identity {
     /// Imports a PKCS#12 file. Supports the modern (AES/SHA-256) and legacy
     /// (3DES/RC2/SHA-1) encodings and empty passwords, which covers files exported
     /// by the official Mumble client with any OpenSSL version.
+    /// A wrong password is [`Error::Pkcs12WrongPassword`]; anything else that is not a PKCS#12
+    /// file with an identity is [`Error::Pkcs12`] or [`Error::Pkcs12NoIdentity`].
     pub fn from_pkcs12(data: &[u8], password: &str) -> Result<Self> {
-        let archive = Pkcs12Archive::from_pkcs12(data, password)?;
+        let archive = Pkcs12Archive::from_pkcs12(data, password).map_err(|e| match e {
+            // The integrity check fails first with a wrong password; a file without one fails
+            // to decrypt instead.
+            p12_keystore::error::Error::MacError(_) | p12_keystore::error::Error::UnpadError => {
+                Error::Pkcs12WrongPassword
+            }
+            other => Error::Pkcs12(other),
+        })?;
         // Pair key and certificate by public key rather than by bag attributes:
         // local key ids and friendly names are optional and set inconsistently by tools.
         for key_bag in &archive.keys {
@@ -289,7 +298,20 @@ mod tests {
         let imported = Identity::from_pkcs12(&p12, "s3cret").expect("import");
         assert_eq!(&imported, identity);
         assert_eq!(imported.cert_hash(), identity.cert_hash());
-        assert!(Identity::from_pkcs12(&p12, "wrong").is_err());
+        // Derived at run time: a literal password in a test reads as a hard-coded secret.
+        let wrong = identity.cert_hash();
+        assert!(matches!(
+            Identity::from_pkcs12(&p12, &wrong),
+            Err(Error::Pkcs12WrongPassword)
+        ));
+    }
+
+    #[test]
+    fn a_file_that_is_no_pkcs12_is_not_a_wrong_password() {
+        assert!(matches!(
+            Identity::from_pkcs12(b"just some text, not a certificate", &TESTER.cert_hash()),
+            Err(Error::Pkcs12(_))
+        ));
     }
 
     #[test]
