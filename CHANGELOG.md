@@ -10,6 +10,7 @@
 
 - Updated Rust dependencies and all checked-in Cargo lock files, among them Wry 0.57.2, `object` 0.41, `ort` 2.0.0-rc.15 and `windows-registry` 0.100; the bundled ONNX Runtime stays on 1.23.2, and audio thread priority, GTK, native dialogs, SQLite and the Windows bindings stay on the versions CPAL, Tauri and the live-test bot require
 - The live tests use the released test bot mumbot 0.6.0 instead of a branch on a personal fork; the fork still asked for the 0.8 Mumcord crates and no longer built against 0.9.0
+- The E2E and smoke tests run against the test bot mumbot 0.6.0 instead of 0.4.1
 
 ## [0.9.0] - 2026-11-15
 
