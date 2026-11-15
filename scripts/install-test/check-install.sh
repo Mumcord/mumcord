@@ -7,6 +7,10 @@
 # colours and Unicode marks, none with TERM=dumb or NO_COLOR, and no gst-libav question (every
 # package brings its own H.264 decoder).
 #
+# The installer's package-repository method is tested without a repository server in
+# check-repo.sh; here only its key check runs for real, over http. Every other install below
+# uses --method package, because the default is the repository.
+#
 # Usage: check-install.sh deb|rpm|appimage GOOD_URL BAD_URL
 #   GOOD_URL serves the fake release, BAD_URL the same files with a wrong checksum.
 
@@ -35,7 +39,7 @@ assert_nothing_installed() {
 }
 
 step "tampered checksum aborts"
-if out=$(curl -fsSL "$bad/install.sh" | MUMCORD_RELEASE_URL=$bad sh -s -- --yes --desktop-icon 2>&1); then
+if out=$(curl -fsSL "$bad/install.sh" | MUMCORD_RELEASE_URL=$bad sh -s -- --yes --method package --desktop-icon 2>&1); then
     printf '%s\n' "$out"
     fail "installer succeeded with a wrong checksum"
 fi
@@ -43,8 +47,20 @@ printf '%s\n' "$out"
 printf '%s\n' "$out" | grep -q "checksum mismatch" || fail "no checksum mismatch message"
 assert_nothing_installed "after the checksum mismatch"
 
+step "repository key with a wrong hash aborts"
+if out=$(curl -fsSL "$bad/install.sh" | MUMCORD_REPO_URL=$bad sh -s -- --yes --method repo 2>&1); then
+    printf '%s\n' "$out"
+    fail "installer succeeded with a tampered repository key"
+fi
+printf '%s\n' "$out"
+printf '%s\n' "$out" | grep -q "not the one this script expects" || fail "no key mismatch message"
+for file in /etc/apt/sources.list.d/mumcord.sources /etc/apt/keyrings/mumcord.asc /etc/yum.repos.d/mumcord.repo /etc/zypp/repos.d/mumcord.repo; do
+    [ ! -e "$file" ] || fail "$file exists after the key mismatch"
+done
+! grep -qs '^\[mumcord\]' /etc/pacman.conf || fail "pacman.conf changed after the key mismatch"
+
 step "install with curl | sh"
-out=$(curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good TERM=xterm-256color sh -s -- --yes --desktop-icon 2>&1) || {
+out=$(curl -fsSL "$good/install.sh" | MUMCORD_RELEASE_URL=$good TERM=xterm-256color sh -s -- --yes --method package --desktop-icon 2>&1) || {
     printf '%s\n' "$out"
     fail "the installer failed"
 }
@@ -73,7 +89,7 @@ esac
 # tty_run [VAR=VALUE...]: runs the installer in a pseudo-terminal (script(1)) with the given
 # environment, answers no to any question and prints what the terminal showed.
 tty_run() {
-    printf 'n\n' | script -qec "env $* sh $installer --no-desktop-icon" /dev/null 2>&1
+    printf 'n\n' | script -qec "env $* sh $installer --no-desktop-icon --method package" /dev/null 2>&1
 }
 
 if [ "$expected" = appimage ]; then
@@ -97,6 +113,14 @@ if [ "$expected" = appimage ]; then
     out=$(tty_run TERM=xterm-256color LANG=C.UTF-8 NO_COLOR=1)
     printf '%s\n' "$out"
     ! printf '%s\n' "$out" | grep -qF "$esc" || fail "escape codes despite NO_COLOR"
+
+    step "terminal: the method question lists the options, 3 picks the AppImage"
+    rm -f "$appimage"
+    out=$(printf '3\nn\n' | script -qec "env TERM=xterm-256color LANG=C.UTF-8 sh $installer --no-desktop-icon" /dev/null 2>&1)
+    printf '%s\n' "$out"
+    printf '%s\n' "$out" | grep -qF "Package repository (recommended" || fail "no method question"
+    printf '%s\n' "$out" | grep -qF "AppImage (Linux only)" || fail "the AppImage option is missing"
+    [ -x "$appimage" ] || fail "answer 3 did not install the AppImage"
 
     unset MUMCORD_RELEASE_URL
 fi
