@@ -639,6 +639,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 
 [[package]]
+name = "bgmatte"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "98e079b1a827c67b7e95122ae868e585efeff826d04620346d9e4e0b9c15172c"
+dependencies = [
+ "image",
+ "log",
+ "ort",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "bindgen"
 version = "0.65.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4481,10 +4493,10 @@ dependencies = [
 name = "mumcord-effects"
 version = "0.9.0"
 dependencies = [
+ "bgmatte",
  "image",
  "mumcord-camera",
  "mumcord-store",
- "ort",
  "sha2 0.11.1",
  "tempfile",
  "thiserror 2.0.21",

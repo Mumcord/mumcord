@@ -5,9 +5,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use mumcord_camera::{CameraError, CameraFrame, FramePool, FrameSink, TestCamera, nv12_len};
-use mumcord_effects::{
-    Background, Effects, EffectsConfig, EffectsError, ModelShape, OnnxSegmenter,
-};
+use mumcord_effects::{Background, Effects, EffectsConfig};
 use mumcord_store::CameraEffectQuality;
 
 #[derive(Clone, Default)]
@@ -30,10 +28,6 @@ fn without_onnx_runtime_effects_are_off_with_a_reason() {
 
     let reason = mumcord_effects::availability().expect_err("unavailable");
     assert!(!reason.is_empty());
-    assert!(matches!(
-        OnnxSegmenter::new(ModelShape::Square),
-        Err(EffectsError::Unavailable(_))
-    ));
 
     let collector = Collector::default();
     let config = EffectsConfig {

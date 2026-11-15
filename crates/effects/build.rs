@@ -1,21 +1,19 @@
-//! Fetches the segmentation models and the ONNX Runtime library (spec 08, FR-8.33).
+//! Fetches the ONNX Runtime library for the camera background effects (spec 08, FR-8.33).
 //!
-//! Neither is committed to the repository. Each file is downloaded once from a pinned URL,
-//! checked against its SHA-256 and kept in a shared cache (`MUMCORD_FETCH_CACHE`, or
-//! `mumcord-fetch` in the user's cache folder), named by its hash so worktrees and target
-//! folders share one copy. A pre-filled cache makes the build work offline.
+//! The segmentation models are bundled in the `bgmatte` crate; ONNX Runtime 1.23.2 (MIT, the
+//! official Microsoft release, CPU only) is not, because bgmatte loads it at run time from a
+//! library the application provides. It is not committed to the repository either: the archive
+//! is downloaded once from a pinned URL, checked against its SHA-256 and kept in a shared cache
+//! (`MUMCORD_FETCH_CACHE`, or `mumcord-fetch` in the user's cache folder), named by its hash so
+//! worktrees and target folders share one copy. A pre-filled cache makes the build work
+//! offline.
 //!
-//! - The two MediaPipe Selfie Segmenter models (Apache-2.0, ONNX conversions published by
-//!   onnx-community on Hugging Face, pinned to a commit) are embedded into the binary with
-//!   `include_bytes!`, so a model can never be missing at run time. A failed download fails the
-//!   build.
-//! - ONNX Runtime 1.23.2 (MIT, the official Microsoft release, CPU only) is loaded at run time.
-//!   The library is copied next to the build's executables for development and test runs, and
-//!   its cached path is passed to the crate as `MUMCORD_ORT_BUILD_DYLIB` (used by debug builds
-//!   only, and read by scripts/stage-onnxruntime.js, which copies the library into the
-//!   installers at one of the places `src/runtime.rs` looks in). A failed
-//!   download is only a warning: Mumcord then runs with background effects disabled and says
-//!   why (FR-8.33), which is the same state a user sees when the library is missing.
+//! The library is copied next to the build's executables for development and test runs, and
+//! its cached path is passed to the crate as `MUMCORD_ORT_BUILD_DYLIB` (used by debug builds
+//! only, and read by scripts/stage-onnxruntime.js, which copies the library into the
+//! installers at one of the places `src/runtime.rs` looks in). A failed download is only a
+//! warning: Mumcord then runs with background effects disabled and says why (FR-8.33), which is
+//! the same state a user sees when the library is missing.
 
 use std::env;
 use std::fs;
@@ -31,22 +29,9 @@ mod artifact_dir;
 struct Download {
     url: &'static str,
     sha256: &'static str,
-    /// File name in the cache (after the hash) and, for models, in `OUT_DIR`.
+    /// File name in the cache (after the hash).
     name: &'static str,
 }
-
-const MODELS: [Download; 2] = [
-    Download {
-        url: "https://huggingface.co/onnx-community/mediapipe_selfie_segmentation/resolve/be49485c8e027524be38591817fc5cd31bd9d00e/onnx/model.onnx",
-        sha256: "3241ac4ad8aa35bdaf33946776db29f7c283a413aa0b0dacb9483594b4531aad",
-        name: "selfie_square.onnx",
-    },
-    Download {
-        url: "https://huggingface.co/onnx-community/mediapipe_selfie_segmentation_landscape/resolve/2497d5bec26c626c7b3c4edc6e1fefc21b64f6c3/onnx/model.onnx",
-        sha256: "7a0adcfdb1715d3b0ff0f61486d8a181c33f4a208343a5abfccbc6540e872d24",
-        name: "selfie_landscape.onnx",
-    },
-];
 
 struct Runtime {
     archive: Download,
@@ -121,12 +106,6 @@ fn main() {
             "cannot create the download cache {}: {err}",
             cache.display()
         );
-    }
-
-    for model in &MODELS {
-        let path = fetch(&cache, model).unwrap_or_else(|err| panic!("{err}"));
-        fs::copy(&path, out_dir.join(model.name))
-            .unwrap_or_else(|err| panic!("cannot copy {}: {err}", model.name));
     }
 
     let os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();

@@ -8,8 +8,8 @@
 //! - `MUMCORD_TEST_EFFECT_STATS=1`: the median effect time is shown in the debug panel (read by
 //!   the app through [`effect_stats`]).
 //! - `MUMCORD_TEST_ONNX=unavailable`: ONNX Runtime counts as missing, so effects are disabled.
-//! - `MUMCORD_TEST_EFFECT_SLOW=<ms>`: adds `<ms>` to every measured effect time, so Auto picks
-//!   and steps down to Light as on a slow PC.
+//! - `MUMCORD_TEST_EFFECT_SLOW=<ms>`: the segmenter waits `<ms>` before each mask, so the
+//!   measured effect time grows and Auto picks and steps down to Light as on a slow PC.
 
 use std::time::Duration;
 
@@ -36,7 +36,7 @@ pub fn onnx_unavailable() -> bool {
     var("MUMCORD_TEST_ONNX").as_deref() == Some("unavailable")
 }
 
-/// Extra time added to each measured effect time.
+/// How long the segmenter waits before each mask.
 pub fn effect_slow() -> Duration {
     var("MUMCORD_TEST_EFFECT_SLOW")
         .as_deref()

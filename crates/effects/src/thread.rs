@@ -1,7 +1,8 @@
 //! The dedicated effects thread (FR-8.38): sits between the camera and the encoder.
 //!
 //! The camera hands frames to [`Effects::start`]'s input sink; the thread applies the
-//! background effect in place and passes each frame on to the output sink (the encoder).
+//! background effect in place with [`bgmatte::Effects`] and passes each frame on to the output
+//! sink (the encoder).
 //! When the effects fall behind, new frames are dropped at the input (their buffers go straight
 //! back to the camera's pool), so the camera runs at the rate the effects can deliver.
 
@@ -10,14 +11,12 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
+use bgmatte::{Background, Config, Frame, ModelShape, OnnxSegmenter, Quality, Segmenter};
 use mumcord_camera::{CameraError, CameraFrame, FrameSink};
 use mumcord_store::CameraEffectQuality;
 
-use crate::background::Background;
-use crate::level::{Level, LevelController, Load};
-use crate::pipeline::Pipeline;
-use crate::segmenter::{FixtureSegmenter, ModelShape, OnnxSegmenter, Segmenter};
-use crate::{EffectsError, hooks};
+use crate::segmenter::{FixtureSegmenter, SlowSegmenter};
+use crate::{EffectStats, hooks, runtime};
 
 /// How often the battery state is read (it is a file or system call).
 const BATTERY_POLL: Duration = Duration::from_secs(5);
@@ -35,23 +34,6 @@ pub struct EffectsConfig {
     pub quality: CameraEffectQuality,
     pub background: Background,
     pub on_battery: BatteryProbe,
-}
-
-/// What the preview shows about the effects (FR-8.33, FR-8.36, FR-8.37), and the debug
-/// panel's effect time (`MUMCORD_TEST_EFFECT_STATS`).
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct EffectStats {
-    /// The running level; `None` while no effect runs (Background None, or unavailable).
-    pub level: Option<Level>,
-    pub load: Load,
-    /// Median effect time per frame.
-    pub median: Duration,
-    /// The effects can't hold 15 fps: "Your PC is too busy for this background effect."
-    pub too_busy: bool,
-    /// Why background effects are off on this PC, when they are.
-    pub unavailable: Option<String>,
-    /// Frames that passed through the effect so far.
-    pub frames: u64,
 }
 
 enum Command {
@@ -148,42 +130,32 @@ impl FrameSink for EffectsInput {
 }
 
 struct Worker {
-    fps: u32,
-    quality: CameraEffectQuality,
-    background: Background,
+    effects: bgmatte::Effects,
     on_battery: BatteryProbe,
-    battery: bool,
     battery_read_at: Instant,
-    controller: LevelController,
-    pipeline: Option<Pipeline>,
-    full: Option<Box<dyn Segmenter>>,
-    light: Option<Box<dyn Segmenter>>,
-    unavailable: Option<String>,
     unsupported_logged: bool,
     model_error_logged: bool,
     stats: Arc<Mutex<EffectStats>>,
-    frames: u64,
 }
 
 impl Worker {
     fn new(config: EffectsConfig, stats: Arc<Mutex<EffectStats>>) -> Self {
-        let battery = (config.on_battery)();
+        let effects = bgmatte::Effects::with_segmenters(
+            Config {
+                fps: config.fps,
+                quality: quality(config.quality),
+                background: config.background,
+                on_battery: (config.on_battery)(),
+            },
+            segmenters(config.fps),
+        );
         Self {
-            fps: config.fps,
-            quality: config.quality,
-            background: config.background,
-            controller: LevelController::new(config.quality, config.fps, battery),
+            effects,
             on_battery: config.on_battery,
-            battery,
             battery_read_at: Instant::now(),
-            pipeline: None,
-            full: None,
-            light: None,
-            unavailable: None,
             unsupported_logged: false,
             model_error_logged: false,
             stats,
-            frames: 0,
         }
     }
 
@@ -219,120 +191,93 @@ impl Worker {
 
     fn apply(&mut self, command: Command) {
         match command {
-            Command::Background(background) => {
-                if let Some(pipeline) = &mut self.pipeline {
-                    pipeline.set_background(background.clone());
-                }
-                self.background = background;
-            }
-            Command::Quality(quality) => {
-                self.quality = quality;
-                self.controller = LevelController::new(quality, self.fps, self.battery);
-            }
+            Command::Background(background) => self.effects.set_background(background),
+            Command::Quality(setting) => self.effects.set_quality(quality(setting)),
         }
         self.publish();
     }
 
     fn handle(&mut self, frame: &mut CameraFrame) {
-        if self.background.is_none() || self.unavailable.is_some() {
-            return;
-        }
-        if !Pipeline::supports(frame.width, frame.height) {
-            if !self.unsupported_logged {
-                tracing::warn!(
-                    width = frame.width,
-                    height = frame.height,
-                    "camera frame size not supported by the background effects"
-                );
-                self.unsupported_logged = true;
-            }
-            return;
-        }
         if self.battery_read_at.elapsed() >= BATTERY_POLL {
-            self.battery = (self.on_battery)();
+            self.effects.set_on_battery((self.on_battery)());
             self.battery_read_at = Instant::now();
         }
-        if self
-            .pipeline
-            .as_ref()
-            .is_none_or(|p| p.size() != (frame.width, frame.height))
+        let (width, height) = (frame.width, frame.height);
+        match self
+            .effects
+            .process(Frame::nv12(&mut frame.data, width, height), frame.timestamp)
         {
-            let mut pipeline = Pipeline::new(frame.width, frame.height, self.background.clone());
-            pipeline.set_level(self.controller.level());
-            self.pipeline = Some(pipeline);
-        }
-        let level = self.controller.level();
-        let (slot, shape) = match level {
-            Level::Full => (&mut self.full, ModelShape::Square),
-            Level::Light => (&mut self.light, ModelShape::Landscape),
-        };
-        if slot.is_none() {
-            match create_segmenter(shape, self.fps) {
-                Ok(segmenter) => *slot = Some(segmenter),
-                Err(EffectsError::Unavailable(reason)) => {
-                    tracing::warn!(%reason, "camera background effects unavailable");
-                    self.unavailable = Some(reason);
-                    self.publish();
-                    return;
-                }
-                Err(err) => {
-                    self.log_model_error(&err);
-                    return;
+            Ok(()) => {}
+            Err(bgmatte::Error::Unavailable(reason)) => {
+                tracing::warn!(%reason, "camera background effects unavailable");
+            }
+            Err(bgmatte::Error::UnsupportedSize { .. }) => {
+                if !self.unsupported_logged {
+                    tracing::warn!(
+                        width,
+                        height,
+                        "camera frame size not supported by the background effects"
+                    );
+                    self.unsupported_logged = true;
                 }
             }
-        }
-        let (Some(segmenter), Some(pipeline)) = (slot.as_deref_mut(), self.pipeline.as_mut())
-        else {
-            return;
-        };
-        let started = Instant::now();
-        let result = pipeline.process(&mut frame.data, frame.timestamp, segmenter);
-        let elapsed = started.elapsed() + hooks::effect_slow();
-        if let Err(err) = result {
-            self.log_model_error(&err);
-            return;
-        }
-        self.frames += 1;
-        if let Some(level) = self
-            .controller
-            .record(Instant::now(), elapsed, self.battery)
-        {
-            tracing::info!(?level, "camera effect level changed");
-            pipeline.set_level(level);
+            Err(err) => {
+                if !self.model_error_logged {
+                    tracing::error!(%err, "camera background effect failed; sending the plain picture");
+                    self.model_error_logged = true;
+                }
+            }
         }
         self.publish();
     }
 
-    fn log_model_error(&mut self, err: &EffectsError) {
-        if !self.model_error_logged {
-            tracing::error!(%err, "camera background effect failed; sending the plain picture");
-            self.model_error_logged = true;
-        }
-    }
-
     fn publish(&self) {
-        let running = !self.background.is_none() && self.unavailable.is_none();
-        let stats = EffectStats {
-            level: running.then(|| self.controller.level()),
-            load: if running {
-                self.controller.load()
-            } else {
-                Load::Low
-            },
-            median: self.controller.median(),
-            too_busy: running && self.controller.too_busy(),
-            unavailable: self.unavailable.clone(),
-            frames: self.frames,
-        };
-        *self.stats.lock().unwrap_or_else(PoisonError::into_inner) = stats;
+        *self.stats.lock().unwrap_or_else(PoisonError::into_inner) = self.effects.stats();
     }
 }
 
-/// The fixture outline under `MUMCORD_TEST_SEGMENT_MASK=fixture`, otherwise the real model.
-fn create_segmenter(shape: ModelShape, fps: u32) -> Result<Box<dyn Segmenter>, EffectsError> {
-    if hooks::segment_mask_fixture() {
-        Ok(Box::new(FixtureSegmenter::new(shape, fps)))
-    } else {
-        Ok(Box::new(OnnxSegmenter::new(shape)?))
+fn quality(setting: CameraEffectQuality) -> Quality {
+    match setting {
+        CameraEffectQuality::Auto => Quality::Auto,
+        CameraEffectQuality::Best => Quality::Best,
+        CameraEffectQuality::Light => Quality::Light,
+    }
+}
+
+/// Makes the segmenter for each model shape: the fixture outline under
+/// `MUMCORD_TEST_SEGMENT_MASK=fixture`, otherwise the real model with the ONNX Runtime Mumcord
+/// ships; slowed down under `MUMCORD_TEST_EFFECT_SLOW`.
+fn segmenters(
+    fps: u32,
+) -> impl FnMut(ModelShape) -> Result<Box<dyn Segmenter>, bgmatte::Error> + Send + 'static {
+    let fixture = hooks::segment_mask_fixture();
+    let delay = hooks::effect_slow();
+    move |shape| {
+        let segmenter: Box<dyn Segmenter> = if fixture {
+            Box::new(FixtureSegmenter::new(shape, fps))
+        } else {
+            runtime::availability().map_err(bgmatte::Error::Unavailable)?;
+            Box::new(OnnxSegmenter::new(shape)?)
+        };
+        if delay.is_zero() {
+            Ok(segmenter)
+        } else {
+            Ok(Box::new(SlowSegmenter {
+                inner: segmenter,
+                delay,
+            }))
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn maps_every_quality_setting() {
+        assert_eq!(quality(CameraEffectQuality::Auto), Quality::Auto);
+        assert_eq!(quality(CameraEffectQuality::Best), Quality::Best);
+        assert_eq!(quality(CameraEffectQuality::Light), Quality::Light);
     }
 }

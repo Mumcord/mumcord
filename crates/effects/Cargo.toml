@@ -1,6 +1,6 @@
 [package]
 name = "mumcord-effects"
-description = "Camera background effects: person segmentation, edge refinement, blur and image backgrounds"
+description = "Camera background effects: Mumcord's effects thread, settings and ONNX Runtime location on top of the bgmatte crate"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,10 +8,9 @@ license.workspace = true
 publish = false
 
 [dependencies]
-image.workspace = true
+bgmatte.workspace = true
 mumcord-camera.workspace = true
 mumcord-store.workspace = true
-ort.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 
@@ -19,6 +18,7 @@ tracing.workspace = true
 sha2.workspace = true
 
 [dev-dependencies]
+image.workspace = true
 tempfile.workspace = true
 
 [lints]
