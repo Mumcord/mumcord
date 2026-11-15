@@ -15,6 +15,37 @@ still cannot play H.264, use your distribution's package (the AUR package on Arc
 system GStreamer, or open the video in your browser. For a current AppImage, include the
 `H.264 support` or `the bundled gst-libav did not load` log entry in a bug report.
 
+## Mumcord closed or froze on Linux without a crash dialog
+
+Applies to: Linux, 0.9.0 and later.
+
+Open **Settings → Advanced & Developer → Crash reports**. Mumcord saves a report in these cases,
+and uploads one only when you choose to:
+
+- **Unexpected exit:** Mumcord ended without shutting down. The report's `ended by:` line says
+  what the system journal recorded about that run, for example `SIGKILL (from outside the app)`,
+  `out-of-memory killer`, `systemd-oomd (memory pressure)` or the kernel's real-time watchdog.
+  When the journal has nothing or cannot be read, the line says `unknown` and why.
+- **Freeze:** the window did not answer for about 8 seconds. The report holds where each thread
+  was busy (code locations and thread names only). Mumcord keeps running and continues normally
+  if the window answers again; at most 3 such reports are written per run.
+- **Real-time overrun:** an audio thread ran past its real-time budget. This is not a crash and
+  the app keeps running; at most one such report is written per run.
+
+Attach the report to a bug report. Since 0.9.0 only Mumcord's audio threads run at real-time
+priority, which fixes the case where Linux ended the whole app on a very busy computer
+(issue #844).
+
+## Mumcord stops reconnecting to a server
+
+Applies to: all systems, 0.9.0 and later.
+
+Some servers accept the login and close the connection right away; standard Mumble servers do
+that without any message to a client whose certificate is banned. Mumcord counts such short
+connections like failed attempts and stops after 10, with a message saying what happened. A
+connection that held for 10 seconds or more reconnects as before. If you did not expect to be
+banned, ask the server's administrators.
+
 ## OpenGL games need a launch option
 
 Applies to: Linux, in-game overlay.
