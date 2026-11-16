@@ -57,6 +57,7 @@ windows = { version = "0.62", features = [
     "Win32_System_Ole",
     "Win32_System_Variant",
 ] }
+# Must match `windows`' core version: its COM macros generate `::windows_core` paths.
 windows-core = "0.62"
 
 [lints]
