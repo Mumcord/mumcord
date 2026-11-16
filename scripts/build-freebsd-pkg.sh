@@ -37,6 +37,12 @@ for arg in "$@"; do
   esac
 done
 [ -n "$output" ] || output="$root_dir/dist-freebsd"
+# pkg create runs inside the staging tree. Resolve a caller-relative output before changing
+# directory, otherwise the package is created in that temporary tree and removed by the trap.
+case "$output" in
+  /*) ;;
+  *) output="$(pwd)/$output" ;;
+esac
 
 app_id=app.mumcord.client
 binary="$root_dir/target/release/mumcord"
@@ -123,10 +129,10 @@ for lib in $(printf '%s\n' "$linked" | awk '/=>/ {print $3}' | sort -u); do
   case " $deps " in *" $name "*) continue ;; esac
   deps="$deps $name"
 done
-# Packages the app loads at runtime instead of linking, so `ldd` never sees them: WebKitGTK
-# pulls its media decoders from GStreamer, and without libav/vpx/opus the watch party and any
-# video in the app stay black on FreeBSD.
-for name in gstreamer1-libav gstreamer1-plugins-vpx gstreamer1-plugins-opus; do
+# Packages loaded at runtime, so `ldd` never sees them: ALSA's OSS plugin is the actual
+# FreeBSD capture/playback backend, and WebKitGTK pulls its media decoders from GStreamer.
+# alsa-lib has no dependency on alsa-plugins; omitting it leaves a clean install without sound.
+for name in alsa-plugins gstreamer1-libav gstreamer1-plugins-vpx gstreamer1-plugins-opus; do
   pkg query -e "%n == $name" '%n' >/dev/null || {
     echo "missing build dependency $name" >&2
     exit 1

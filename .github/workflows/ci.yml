@@ -704,6 +704,8 @@ jobs:
             # step's env: the action runs this script inside the VM, which does not see it.
             export MUMCORD_VERSION="${{ steps.version.outputs.value }}"
             export CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=4
+            sh scripts/ci/test-freebsd-pkg.sh
+            node --test e2e/freebsd/gpu.test.mjs
             cargo check --workspace --all-targets --locked
             cargo clippy --workspace --all-targets --locked -- -D warnings
             cargo test --workspace --locked

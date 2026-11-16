@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { invoke } from "@tauri-apps/api/core";
 import { parseScreenFrame, screenFrameChannel, webCodecsCodecs } from "./screenFrames";
 
 vi.mock("@tauri-apps/api/core", () => ({
+  invoke: vi.fn().mockResolvedValue(null),
   Channel: class {
     onmessage: (message: ArrayBuffer) => void = () => undefined;
   },
@@ -32,6 +34,7 @@ function message(
 describe("screen share frames", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.mocked(invoke).mockClear();
   });
 
   it("reads an encoded VP9 frame", () => {
@@ -87,6 +90,49 @@ describe("screen share frames", () => {
     channel.onmessage(new ArrayBuffer(3));
     expect(onFrame).toHaveBeenCalledTimes(1);
     expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
+  it("acknowledges only credit-tagged RGBA frames after their handler consumes them", () => {
+    const onFrame = vi.fn(() => {
+      expect(invoke).not.toHaveBeenCalled();
+    });
+    const channel = screenFrameChannel(onFrame);
+    channel.onmessage(message(2, 2, 0, 1, 1, [1, 2, 3, 255]));
+    expect(invoke).toHaveBeenCalledExactlyOnceWith("screen_frame_ack", { token: "1234567" });
+    vi.mocked(invoke).mockClear();
+    channel.onmessage(message(2, 0, 0, 1, 1, [1, 2, 3, 255]));
+    channel.onmessage(message(1, 2, 0, 1, 1, [7]));
+    expect(invoke).not.toHaveBeenCalled();
+  });
+
+  it("drops a late older picture but releases both credits without losing 64-bit token precision", () => {
+    const onFrame = vi.fn();
+    const channel = screenFrameChannel(onFrame);
+    for (const token of [9_007_199_254_740_993n, 9_007_199_254_740_992n]) {
+      const buffer = message(2, 2, 0, 1, 1, [1, 2, 3, 255]);
+      new DataView(buffer).setBigUint64(4, token, true);
+      channel.onmessage(buffer);
+    }
+    expect(onFrame).toHaveBeenCalledOnce();
+    expect(invoke).toHaveBeenNthCalledWith(1, "screen_frame_ack", { token: "9007199254740993" });
+    expect(invoke).toHaveBeenNthCalledWith(2, "screen_frame_ack", { token: "9007199254740992" });
+  });
+
+  it("releases credit even if drawing throws, and reports acknowledgement errors", async () => {
+    const error = new Error("draw failed");
+    const channel = screenFrameChannel(() => {
+      throw error;
+    });
+    expect(() => {
+      channel.onmessage(message(2, 2, 0, 1, 1, [1, 2, 3, 255]));
+    }).toThrow(error);
+    expect(invoke).toHaveBeenCalledOnce();
+    vi.mocked(invoke).mockRejectedValueOnce(new Error("credit failed"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    screenFrameChannel(() => undefined).onmessage(message(2, 2, 0, 1, 1, [1, 2, 3, 255]));
+    await Promise.resolve();
+    expect(warn).toHaveBeenCalledWith("screen frame acknowledgement failed", expect.any(Error));
     warn.mockRestore();
   });
 

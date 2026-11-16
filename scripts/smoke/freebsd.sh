@@ -48,9 +48,9 @@ while read -r lib; do
   owner=$(pkg which -q -o "$lib")
   grep -Fxq "$owner" "$work/deps" || { echo "undeclared runtime dependency: $owner ($lib)" >&2; exit 1; }
 done < <(awk '/=> \/usr\/local\// {print $3}' <<< "$linked" | sort -u)
-# These are loaded by WebKit, not linked into the executable (build-freebsd-pkg.sh).
+# ALSA's OSS backend and WebKit's decoders are loaded, not linked (build-freebsd-pkg.sh).
 pkg query '%dn' mumcord > "$work/dep-names"
-for dep in gstreamer1-libav gstreamer1-plugins-vpx gstreamer1-plugins-opus; do
+for dep in alsa-plugins gstreamer1-libav gstreamer1-plugins-vpx gstreamer1-plugins-opus; do
   grep -Fxq "$dep" "$work/dep-names" || { echo "undeclared runtime dependency: $dep" >&2; exit 1; }
 done
 

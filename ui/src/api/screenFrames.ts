@@ -3,13 +3,14 @@
  * over the Tauri channel passed to `screenShareWatch`: a 16-byte little-endian header, then
  * the payload. Layout and kinds are defined in `src-tauri/src/screen_frames.rs`.
  */
-import { Channel } from "@tauri-apps/api/core";
+import { Channel, invoke } from "@tauri-apps/api/core";
 import type { VideoCodec } from "../bindings/commands";
 
 const HEADER_LEN = 16;
 const KIND_ENCODED = 1;
 const KIND_RGBA = 2;
 const FLAG_KEYFRAME = 1;
+const FLAG_ACK_REQUIRED = 2;
 const CODEC_BYTES: Record<number, VideoCodec> = { 1: "vp9", 2: "av1" };
 
 /** WebCodecs strings per codec, as the sharer's encoders produce them (8 bit). */
@@ -81,10 +82,35 @@ export function parseScreenFrame(buffer: ArrayBuffer): ScreenFrame | null {
 /** The channel to pass to `screenShareWatch`; malformed messages are logged and skipped. */
 export function screenFrameChannel(onFrame: (frame: ScreenFrame) => void): Channel<ArrayBuffer> {
   const channel = new Channel<ArrayBuffer>();
+  let lastPictureToken: bigint | null = null;
   channel.onmessage = (message) => {
+    let credit: bigint | null = null;
+    // Only FreeBSD RGBA messages request credit. Other platforms retain their channel path.
+    if (message.byteLength >= HEADER_LEN) {
+      const header = new DataView(message);
+      if (header.getUint8(0) === KIND_RGBA && (header.getUint8(1) & FLAG_ACK_REQUIRED) !== 0) {
+        credit = header.getBigUint64(4, true);
+      }
+    }
     const frame = parseScreenFrame(message);
-    if (frame) onFrame(frame);
-    else console.warn("skipped a malformed screen share frame", message.byteLength);
+    try {
+      if (frame) {
+        if (credit !== null) {
+          // Two native conversions may finish out of order; never paint an older picture over a newer one.
+          if (lastPictureToken !== null && credit <= lastPictureToken) return;
+          lastPictureToken = credit;
+        }
+        onFrame(frame);
+      } else console.warn("skipped a malformed screen share frame", message.byteLength);
+    } finally {
+      if (credit !== null) {
+        void invoke<null>("screen_frame_ack", { token: credit.toString() }).catch(
+          (error: unknown) => {
+            console.warn("screen frame acknowledgement failed", error);
+          },
+        );
+      }
+    }
   };
   return channel;
 }

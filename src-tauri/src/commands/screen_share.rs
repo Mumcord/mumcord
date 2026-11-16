@@ -993,6 +993,45 @@ pub fn screen_share_set_quality(
     Ok(engine.screen_share_set_quality(to_engine_server_id(server_id), choice.into())?)
 }
 
+/// Releases a FreeBSD raw-frame credit after the webview has consumed the picture.
+#[tauri::command]
+#[specta::specta]
+pub async fn screen_frame_ack(
+    screen_frames: State<'_, Arc<ScreenFrames>>,
+    camera_frames: State<'_, super::camera::CameraFrames>,
+    token: String,
+) -> ApiResult<()> {
+    #[cfg(target_os = "freebsd")]
+    {
+        // Decimal text keeps the full 64-bit token intact across JSON.
+        let token = token.parse::<u64>().map_err(|_| {
+            super::types::ApiError::new(
+                super::types::ErrorCode::InvalidInput,
+                "Invalid screen frame credit",
+            )
+        })?;
+        let screen = screen_frames.inner().clone();
+        let camera = camera_frames.inner().0.clone();
+        // Converting a waiting picture must not block GTK's main thread or the async runtime.
+        tokio::task::spawn_blocking(move || {
+            if !screen.acknowledge(token) {
+                camera.acknowledge(token);
+            }
+        })
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "screen frame credit task failed");
+            super::types::ApiError::new(
+                super::types::ErrorCode::Internal,
+                "Could not acknowledge the screen frame",
+            )
+        })?;
+    }
+    #[cfg(not(target_os = "freebsd"))]
+    let _ = (screen_frames, camera_frames, token);
+    Ok(())
+}
+
 /// "Undo" on "Switched to VP9 to reduce load" (FR-7.57). Errors when no Undo is offered.
 #[tauri::command]
 #[specta::specta]

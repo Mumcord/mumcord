@@ -6,18 +6,25 @@
 //! | bytes | field                                                        |
 //! |-------|--------------------------------------------------------------|
 //! | 0     | kind: [`KIND_ENCODED`] or [`KIND_RGBA`]                       |
-//! | 1     | flags: bit 0 = keyframe (encoded only)                       |
+//! | 1     | flags: bit 0 = keyframe; bit 1 = RGBA acknowledgement required |
 //! | 2     | temporal layer (encoded only)                                |
 //! | 3     | codec: [`CODEC_VP9`] or [`CODEC_AV1`] (of the picture too)   |
-//! | 4–11  | timestamp in microseconds (encoded only)                     |
+//! | 4–11  | encoded timestamp or unsigned RGBA acknowledgement token    |
 //! | 12–13 | width                                                        |
 //! | 14–15 | height                                                       |
 //! | 16–   | encoded frame for WebCodecs, or `width * height * 4` RGBA    |
 //!
 //! The UI parses it in `ui/src/api/screenFrames.ts`; keep both in step.
 
+#[cfg(not(target_os = "freebsd"))]
 use std::collections::HashMap;
+#[cfg(not(target_os = "freebsd"))]
 use std::sync::{Mutex, MutexGuard};
+
+#[cfg(target_os = "freebsd")]
+mod freebsd;
+#[cfg(target_os = "freebsd")]
+pub use freebsd::ScreenFrames;
 
 use mumcord_engine::ServerId;
 use mumcord_engine::screen_share::wire::{Codec, Frame, FrameKind};
@@ -53,11 +60,13 @@ impl specta::Type for FrameMessage {
 pub type FrameChannel = Channel<FrameMessage>;
 
 /// The channel of every watched share, by server and sharer.
+#[cfg(not(target_os = "freebsd"))]
 #[derive(Default)]
 pub struct ScreenFrames {
     channels: Mutex<HashMap<(ServerId, u32), FrameChannel>>,
 }
 
+#[cfg(not(target_os = "freebsd"))]
 impl ScreenFrames {
     /// Frames of `sharer` go to `channel` from now on, replacing an earlier one.
     pub fn attach(&self, server_id: ServerId, sharer: u32, channel: FrameChannel) {
@@ -108,6 +117,7 @@ impl ScreenFrames {
     }
 }
 
+#[cfg(not(target_os = "freebsd"))]
 impl ScreenFrameSink for ScreenFrames {
     fn on_encoded(&self, server_id: ServerId, sharer: u32, frame: &Frame) {
         self.send(server_id, sharer, || encoded_message(frame));
@@ -202,7 +212,7 @@ pub fn rgba_message(width: u32, height: u32, rgba: &[u8]) -> Option<FrameMessage
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
 
     use mumcord_engine::screen_share::wire::FrameHeader;
 

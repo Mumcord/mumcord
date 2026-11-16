@@ -11,6 +11,9 @@
 ### Changed
 
 - The camera background effects (blur and background images) now come from the open-source `bgmatte` crate, which the Mumcord team maintains in its own repository (issue #454). The segmentation models ship inside that crate, so building Mumcord no longer downloads them; ONNX Runtime is still fetched and shipped with Mumcord as before. Nothing changes in how the effects look or behave
+- FreeBSD: watching a screen share no longer ends with Mumcord being killed for running out of memory. The web view's own video decoder on FreeBSD keeps growing until the system kills the app, so incoming screen shares and shared cameras are now always decoded by Mumcord itself, which stays within a fixed memory budget. The picture, the codec choice and hardware rendering stay the same
+- FreeBSD: screen sharing sends more frames per second. Turning a captured 1920×1080 picture into the format the encoder needs took about 16 ms per frame and built a 24 MiB temporary copy of it; it now takes about 5.4 ms and avoids the copy, with the same colours and the same output bytes. In our two-client test the viewer showed about 19 % more frames per second. Scaled and rounded capture sizes keep the previous path
+- FreeBSD: the plugin location scan no longer reads the command line of every thread on the system, but only of the running processes it needs, which costs about 77 % fewer lookups on a normal desktop
 
 ### Fixed
 
@@ -24,6 +27,7 @@
 
 ### Internal
 
+- FreeBSD packages could not be built into a relative output directory, and the package did not require the dynamically loaded `alsa-plugins` package that makes the OSS devices visible; both are fixed, with checks that run in CI. The native FreeBSD smoke and GPU-endurance tests are part of the CI job as well
 - Updated Rust dependencies and all checked-in Cargo lock files, among them Wry 0.57.2, `object` 0.41, `ort` 2.0.0-rc.15 and `windows-registry` 0.100; the bundled ONNX Runtime stays on 1.23.2, and audio thread priority, GTK, native dialogs, SQLite and the Windows bindings stay on the versions CPAL, Tauri and the live-test bot require
 - The live tests use the released test bot mumbot 0.6.0 instead of a branch on a personal fork; the fork still asked for the 0.8 Mumcord crates and no longer built against 0.9.0
 - The E2E and smoke tests run against the test bot mumbot 0.6.0 instead of 0.4.1
