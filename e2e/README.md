@@ -250,3 +250,42 @@ pinned Mumcord release.
 A new test plugin is a folder under `e2e/fixtures/plugins` with a `manifest.json`, `i18n/en.json` and a Rust crate on
 the in-repo SDK (`crates/plugin-sdk`). The script builds every folder; a package whose id starts
 with `fx-` goes to the third-party repository unless the script's `case` lists it as official.
+
+## Native FreeBSD checks
+
+The standalone runner uses the native release binary, two disposable profiles, a private D-Bus,
+private Xvfb and an unmodified loopback Mumble server. It does not use Docker, the installed app,
+the normal profile or the desktop user's keyring. Install the native build dependencies and run
+`npm ci` first; runtime prerequisites are Xvfb, WebKitWebDriver-4.1, D-Bus and mumble-server.
+
+```sh
+node --test e2e/freebsd/gpu.test.mjs
+node e2e/freebsd/smoke.mjs target/release/mumcord
+```
+
+On the Intel `drm-66-kmod` machine, run from the real X11 desktop's terminal with `DISPLAY` and
+`XAUTHORITY` inherited. This adds a ten-minute receiving-video endurance check:
+
+```sh
+node e2e/freebsd/smoke.mjs target/release/mumcord --gpu
+```
+
+GPU mode additionally needs `glxinfo` (mesa-demos), `cc`, pkg-config and the X11 headers/library.
+Only the receiver appears on the real desktop; its sender stays on private Xvfb to avoid filming
+the receiving window recursively. Both clients join voice with microphones muted for the check.
+Hardware evidence uses Intel's renderer plus the receiver's native DRM device/Mesa mappings,
+not WebKit's generic WebGL renderer name. Colour statistics prove that the normal receiver's
+visible picture keeps changing; no real-desktop screenshots are retained.
+
+Run on an otherwise idle machine. GPU mode requires at least 4 GiB estimated memory headroom
+(FreeBSD free plus inactive pages) before starting. A one-second guard stops only the test clients
+if that estimate falls below 1 GiB, their summed RSS exceeds 3 GiB, or the run exceeds fifteen
+minutes. The separate 256 MiB warm-up-to-final-minute median growth limit remains unchanged.
+The check rejects new
+kernel GPU faults or OOM kills, a restarted
+WebKit process, frozen pictures, lost connections and continued receiving-memory growth after
+warm-up. Summed RSS includes shared mappings, so it is a conservative safety limit, not unique
+physical-memory accounting. Logs, colour statistics and memory samples go to ignored
+`e2e/artifacts/freebsd-gpu/`; profiles, identities, server data and the compiled pixel probe are
+removed when the runner exits. An interrupted or guarded run is a failure, never a shortened
+endurance pass.

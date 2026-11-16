@@ -49,7 +49,7 @@ const KEYFRAME_RETRY: Duration = Duration::from_millis(2500);
 struct Control {
     /// Codecs decoded here instead of in the webview, as [`codec_bit`] flags.
     decode_here: AtomicU8,
-    /// Codecs always decoded here (debug test hook for AC-7.41), fixed at the start.
+    /// Platform-required decoding and the AC-7.41 test hook, fixed at the start.
     forced_here: u8,
     /// The viewer's frame-rate cap; 0 means the sharer's rate.
     max_fps: AtomicU32,
@@ -97,6 +97,19 @@ fn codec_bit(codec: Codec) -> u8 {
         // hwcodec's enums are open for additions; Mumcord itself only creates AV1 and VP9.
         // Anything else counts as VP9, the codec every viewer plays.
         _ => 1,
+    }
+}
+
+fn forced_decode_codecs() -> u8 {
+    // FreeBSD WebKitGTK 2.46 accepts VP9 in WebCodecs, but sustained VideoFrame drawing
+    // exhausts memory even when every frame is closed. Keep its hardware compositor,
+    // using the engine's bounded decoder and RGBA delivery instead of that video path.
+    if cfg!(target_os = "freebsd") {
+        codec_bits(&[Codec::Av1, Codec::Vp9])
+    } else if crate::test_hooks::no_webcodecs_av1() {
+        codec_bit(Codec::Av1)
+    } else {
+        0
     }
 }
 
@@ -234,12 +247,7 @@ impl WatchLink {
         crate::crash::set_context("watching a screen share", "yes");
         let sound_stats = sound.stats();
         let volume = sound.volume();
-        let forced_here = if crate::test_hooks::no_webcodecs_av1() {
-            codec_bit(Codec::Av1)
-        } else {
-            0
-        };
-        let control = Arc::new(Control::new(0, forced_here));
+        let control = Arc::new(Control::new(0, forced_decode_codecs()));
         let reader = rt.spawn(read_frames(
             source,
             sink,
@@ -628,6 +636,27 @@ mod tests {
         assert!(!filter.keep(&header(n + 1, 60, 3), 0));
         assert!(filter.keep(&header(64, 60, 0), 0));
         assert!(filter.keep(&header(65, 60, 3), 0));
+    }
+
+    #[test]
+    fn platform_decode_policy_survives_webview_codec_preferences() {
+        let control = Control::new(0, forced_decode_codecs());
+        for codec in [Codec::Av1, Codec::Vp9] {
+            assert_eq!(control.decodes_here(codec), cfg!(target_os = "freebsd"));
+        }
+        control
+            .decode_here
+            .store(codec_bits(&[Codec::Vp9]), Ordering::Relaxed);
+        assert!(control.decodes_here(Codec::Vp9));
+        assert_eq!(
+            control.decodes_here(Codec::Av1),
+            cfg!(target_os = "freebsd")
+        );
+        control.decode_here.store(0, Ordering::Relaxed);
+        assert_eq!(
+            control.decodes_here(Codec::Vp9),
+            cfg!(target_os = "freebsd")
+        );
     }
 
     #[test]

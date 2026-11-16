@@ -1336,6 +1336,8 @@ export const commands = {
 	screenShareBlock: (serverId: number, options?: InvokeOptions) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId }, options)),
 	/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
 	screenShareQuality: (serverId: number, options?: InvokeOptions) => typedError<ShareQuality | null, ApiError>(__TAURI_INVOKE("screen_share_quality", { serverId }, options)),
+	/**  Releases a FreeBSD raw-frame credit after the webview has consumed the picture. */
+	screenFrameAck: (token: string, options?: InvokeOptions) => typedError<null, ApiError>(__TAURI_INVOKE("screen_frame_ack", { token }, options)),
 	/**  What a share started now with these picks would get (FR-7.36). Starts no self-test. */
 	screenSharePreview: (serverId: number, choice: QualityChoice, codec: ScreenCodec, options?: InvokeOptions) => __TAURI_INVOKE<SharePreview>("screen_share_preview", { serverId, choice, codec }, options),
 	/**  The picture the sharer's bar shows: the last keyframe the encoder took (issue #163). */

@@ -4567,6 +4567,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(mediaDemo.share !== null && serverId === 1 ? mediaDemo.quality : null);
     },
     screenShareSetQuality: () => Promise.resolve(null),
+    screenFrameAck: () => Promise.resolve(null),
     // The "Viewers get" line of the start dialog; the mock always has a relay with fan-out.
     screenSharePreview: (_serverId, choice, codec) => {
       const small = choice.resolution === "720";
