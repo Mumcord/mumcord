@@ -119,7 +119,7 @@ windows = { version = "0.62", features = [
 ] }
 # Must match `windows`' core version: its COM macros generate `::windows_core` paths.
 windows-core = { version = "0.62", optional = true }
-windows-future = { version = "0.3", optional = true }
+windows-future = { version = "0.100", optional = true }
 
 [features]
 default = ["desktop"]
