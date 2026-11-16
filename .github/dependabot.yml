@@ -18,6 +18,10 @@ updates:
       # ([workspace.dependencies]); tauri-specta and specta must be bumped together.
       - dependency-name: "tauri-specta"
       - dependency-name: "specta"
+      # COM macros require windows-core to match the 0.62 series used by `windows`.
+      # Allow 0.62 patches; upgrade to a newer series only together with `windows`.
+      - dependency-name: "windows-core"
+        versions: [">=0.63"]
   - package-ecosystem: "cargo"
     directory: "/scripts/smoke/seed"
     schedule:
