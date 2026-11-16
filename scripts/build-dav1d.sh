@@ -53,7 +53,7 @@ build() {
   local dir=$1 install=$2
   shift 2
   meson setup "$dir" "$src" --prefix="$install" --libdir=lib "${options[@]}" "$@"
-  meson compile -C "$dir"
+  meson compile -C "$dir" ${CARGO_BUILD_JOBS:+-j "$CARGO_BUILD_JOBS"}
   meson install -C "$dir"
 }
 

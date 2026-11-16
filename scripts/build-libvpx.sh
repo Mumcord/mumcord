@@ -69,7 +69,7 @@ if [[ $os == linux ]]; then
     --prefix="$work/install" \
     --enable-static --disable-shared --enable-pic \
     --disable-examples --disable-tools --disable-docs --disable-unit-tests \
-    && make -j"$(nproc)" && make install)
+    && make -j"${CARGO_BUILD_JOBS:-$(nproc)}" && make install)
   mkdir -p "$prefix/include" "$prefix/lib"
   cp -R "$work/install/include/vpx" "$prefix/include/"
   cp "$work/install/lib/libvpx.a" "$prefix/lib/"
@@ -85,7 +85,7 @@ elif [[ $os == macos ]]; then
     --extra-cxxflags="-arch $arch -mmacosx-version-min=$MACOS_DEPLOYMENT_TARGET" \
     --enable-static --disable-shared --enable-pic \
     --disable-examples --disable-tools --disable-docs --disable-unit-tests \
-    && make -j"$(sysctl -n hw.ncpu)" && make install)
+    && make -j"${CARGO_BUILD_JOBS:-$(sysctl -n hw.ncpu)}" && make install)
   mkdir -p "$prefix/include" "$prefix/lib"
   cp -R "$work/install/include/vpx" "$prefix/include/"
   cp "$work/install/lib/libvpx.a" "$prefix/lib/"

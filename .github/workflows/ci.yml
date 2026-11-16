@@ -76,6 +76,9 @@ jobs:
       - name: Test smoke helper
         run: bash scripts/ci/test-smoke.sh
 
+      - name: Test native build job limits
+        run: bash scripts/ci/test-native-build-jobs.sh
+
   # Released versions' CHANGELOG.md sections are part of the release and must not change
   # (RELEASING.md, "Release integrity"). Cheap, so it runs on every pull request, outside the
   # changes gate; it needs only CHANGELOG.md and scripts.
