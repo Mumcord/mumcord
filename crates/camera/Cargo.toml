@@ -57,7 +57,7 @@ windows = { version = "0.62", features = [
     "Win32_System_Ole",
     "Win32_System_Variant",
 ] }
-windows-core = "0.62"
+windows-core = "0.100"
 
 [lints]
 workspace = true
