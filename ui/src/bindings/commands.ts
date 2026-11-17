@@ -5307,6 +5307,11 @@ export type Settings = {
 	privateMessages: PrivateMessageSettings,
 	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
 	blockedMessages: BlockedMessages,
+	/**
+	 *  "Forget local mutes when Mumcord starts" (default off; FR-15.1). Takes effect from
+	 *  the next app start; turning it on clears nothing immediately (FR-15.5).
+	 */
+	forgetLocalMutesOnStart: boolean,
 	/**  Accept files offered by others (Settings → Files). */
 	filesReceive: boolean,
 	filesMaxSize: FilesMaxSize,
