@@ -981,7 +981,9 @@ pub fn roll_back(data_dir: &Path) -> Result<std::path::PathBuf> {
 /// Copies the database file to `mumcord.sqlite3.backup-<local time>` beside it, never over an
 /// existing file.
 fn backup(path: &Path) -> Result<std::path::PathBuf> {
-    let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S");
+    let stamp = jiff::ZonedDateTime::now()
+        .strftime("%Y%m%d-%H%M%S")
+        .to_string();
     let target = path.with_file_name(format!("{DB_FILE_NAME}.backup-{stamp}"));
     let copy = || -> std::io::Result<()> {
         let mut source = std::fs::File::open(path)?;
@@ -1985,8 +1987,12 @@ pub(crate) mod tests {
         let backup = roll_back(dir.path()).expect("roll back");
         assert_eq!(backup.parent(), Some(dir.path()));
         let name = backup.file_name().expect("name").to_string_lossy();
+        let stamp = name
+            .strip_prefix(&format!("{DB_FILE_NAME}.backup-"))
+            .expect("backup name");
+        assert_eq!(stamp.len(), 15, "{name}");
         assert!(
-            name.starts_with(&format!("{DB_FILE_NAME}.backup-")),
+            stamp.bytes().all(|b| b.is_ascii_digit() || b == b'-'),
             "{name}"
         );
         assert_eq!(std::fs::read(&backup).expect("backup"), before);

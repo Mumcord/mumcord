@@ -1,9 +1,6 @@
 //! `clock` (FR-6.21): wall time rounded down to the second plus the local UTC offset, so a
 //! plugin can find "today" but cannot time anything precisely.
 
-use std::time::{SystemTime, UNIX_EPOCH};
-
-use chrono::{Local, Offset};
 use wasmtime::component::{HasSelf, Linker};
 
 use crate::runtime::bindings::mumcord::plugin::clock::{Datetime, Host, add_to_linker};
@@ -24,18 +21,18 @@ impl Host for PluginState {
 }
 
 fn now() -> Datetime {
-    let unix_seconds = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |since| since.as_secs());
-    let offset_seconds = Local::now().offset().fix().local_minus_utc();
+    let zoned = jiff::ZonedDateTime::now();
     Datetime {
-        unix_seconds,
-        utc_offset_minutes: offset_seconds / 60,
+        // A clock set before 1970 has no seconds to report.
+        unix_seconds: u64::try_from(zoned.timestamp().as_second()).unwrap_or(0),
+        utc_offset_minutes: zoned.offset().seconds() / 60,
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
     use super::*;
 
     #[test]
