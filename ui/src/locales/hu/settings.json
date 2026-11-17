@@ -48,6 +48,7 @@
     "updates": "új verzió frissítés",
     "storage": "lemezterület gyorsítótár törlése",
     "blocked": "mellőzés tiltás némítás személyek",
+    "localMutes": "némítás némít elnémít felejtsd el indítás start",
     "notifications": "riasztások felugró ablakok",
     "externalContent": "beágyazások képek előnézetek",
     "fileSharing": "fájlok küldés fogadás letöltés mentés mappa melléklet zip",
@@ -898,6 +899,11 @@
     "revoke": "Visszavonás",
     "revokeLabel": "Az elfogadott beszélgetés visszavonása vele: {{name}}",
     "revokeFailed": "A visszavonás nem sikerült. Próbáld újra."
+  },
+  "localMutes": {
+    "title": "Helyi némítások",
+    "switch": "Helyi némítások elfelejtése a Mumcord indításakor",
+    "hint": "Azok a személyek, akiket csak magadnak némítottál el, újraindítás után ismét hallhatók lesznek. A hangerők és a letiltott felhasználók megmaradnak."
   },
   "blocked": {
     "title": "Letiltott felhasználók",

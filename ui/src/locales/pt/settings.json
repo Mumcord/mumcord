@@ -48,6 +48,7 @@
     "updates": "nova versão atualização",
     "storage": "espaço em disco limpar cache",
     "blocked": "ignorar bloquear silenciar pessoas",
+    "localMutes": "silenciar silenciado silêncio esquecer início arranque",
     "notifications": "alertas pop-ups",
     "externalContent": "conteúdo incorporado imagens pré-visualizações",
     "fileSharing": "ficheiros enviar receber descarregar guardar pasta anexo zip",
@@ -904,6 +905,11 @@
     "revoke": "Revogar",
     "revokeLabel": "Revogar a conversa aceite com {{name}}",
     "revokeFailed": "Não foi possível revogar. Tenta novamente."
+  },
+  "localMutes": {
+    "title": "Silenciamentos locais",
+    "switch": "Esquecer os silenciamentos locais ao iniciar o Mumcord",
+    "hint": "As pessoas que silenciaste só para ti voltam a ser audíveis depois de um reinício. Os volumes e os utilizadores bloqueados são mantidos."
   },
   "blocked": {
     "title": "Utilizadores bloqueados",

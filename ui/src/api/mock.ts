@@ -436,6 +436,7 @@ const DEFAULT_SETTINGS: Settings = {
     keepRequests: true,
   },
   blockedMessages: "collapse",
+  forgetLocalMutesOnStart: false,
   filesReceive: true,
   filesMaxSize: "1G",
   filesSaveFolder: null,

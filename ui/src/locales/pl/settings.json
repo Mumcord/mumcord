@@ -48,6 +48,7 @@
     "updates": "nowa wersja aktualizacja",
     "storage": "miejsce na dysku wyczyść pamięć podręczną",
     "blocked": "ignoruj blokuj wycisz osoby",
+    "localMutes": "wycisz wyciszenie wyciszony zapomnij start uruchomienie",
     "notifications": "powiadomienia wyskakujące okna",
     "externalContent": "osadzone treści obrazy podglądy",
     "fileSharing": "pliki wyślij odbierz pobierz zapisz folder załącznik zip",
@@ -910,6 +911,11 @@
     "revoke": "Cofnij",
     "revokeLabel": "Cofnij zaakceptowaną rozmowę z {{name}}",
     "revokeFailed": "Cofnięcie nie powiodło się. Spróbuj ponownie."
+  },
+  "localMutes": {
+    "title": "Lokalne wyciszenia",
+    "switch": "Zapominaj lokalne wyciszenia przy starcie Mumcord",
+    "hint": "Osoby, które wyciszyłeś(-aś) tylko dla siebie, będą znów słyszalne po ponownym uruchomieniu. Głośności i zablokowani użytkownicy zostają zachowani."
   },
   "blocked": {
     "title": "Zablokowani użytkownicy",

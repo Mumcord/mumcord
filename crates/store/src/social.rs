@@ -189,6 +189,17 @@ impl Store {
         Ok(())
     }
 
+    /// Resets `local_mute` for every stored person on every server ("Forget local mutes when
+    /// Mumcord starts", issue #872, FR-15.2). One transaction so a crash mid-sweep cannot
+    /// leave a half-cleared database (FR-15.8); volume, share volume and all other tables are
+    /// untouched. Returns the number of rows updated, for a debug-level count log.
+    pub fn clear_local_mutes(&self) -> Result<usize> {
+        let tx = self.conn.unchecked_transaction()?;
+        let cleared = tx.execute("UPDATE person_setting SET local_mute = 0", [])?;
+        tx.commit()?;
+        Ok(cleared)
+    }
+
     /// The private note about a person; empty when there is none (FR-1.63).
     pub fn person_note(&self, server: ServerId, cert_hash: &str) -> Result<String> {
         Ok(self
@@ -338,6 +349,47 @@ mod tests {
             store.set_person_setting(a, "h1", &share_too_loud),
             Err(Error::InvalidVolume(201))
         ));
+    }
+
+    #[test]
+    fn clear_local_mutes_sweeps_all_servers_and_keeps_volumes() {
+        let (_dir, store) = temp_store();
+        let a = store
+            .add_server(&NewServer::new("A", "a", "u"))
+            .expect("a")
+            .id;
+        let b = store
+            .add_server(&NewServer::new("B", "b", "u"))
+            .expect("b")
+            .id;
+        let muted = PersonSetting {
+            volume: 150,
+            local_mute: true,
+            share_volume: 40,
+        };
+        store.set_person_setting(a, "h1", &muted).expect("set");
+        store.set_person_setting(a, "h2", &muted).expect("set");
+        store.set_person_setting(b, "h1", &muted).expect("set");
+
+        assert_eq!(store.clear_local_mutes().expect("sweep"), 3);
+        let cleared = PersonSetting {
+            local_mute: false,
+            ..muted
+        };
+        for (server, hash) in [(a, "h1"), (a, "h2"), (b, "h1")] {
+            assert_eq!(
+                store.person_setting(server, hash).expect("get"),
+                Some(cleared)
+            );
+        }
+        // Sweeping again is harmless and reports every row it reset.
+        assert_eq!(store.clear_local_mutes().expect("sweep again"), 3);
+    }
+
+    #[test]
+    fn clear_local_mutes_on_empty_table_is_fine() {
+        let (_dir, store) = temp_store();
+        assert_eq!(store.clear_local_mutes().expect("sweep"), 0);
     }
 
     #[test]

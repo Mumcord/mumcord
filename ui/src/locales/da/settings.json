@@ -52,7 +52,8 @@
     "externalContent": "indlejringer billeder forhåndsvisninger",
     "fileSharing": "filer send modtag download gem mappe vedhæftning zip",
     "screenSharing": "skærmdeling kvalitet opløsning fps kodek AV1 VP9 encoder grafikkort",
-    "camera": "kamera webcam video baggrund sløring virtuel baggrund spejl egenvisning"
+    "camera": "kamera webcam video baggrund sløring virtuel baggrund spejl egenvisning",
+    "localMutes": "slå lyd fra for mig glem opstart"
   },
   "search": {
     "label": "Søg i indstillinger",
@@ -898,6 +899,11 @@
     "revoke": "Træk tilbage",
     "revokeLabel": "Træk den accepterede samtale med {{name}} tilbage",
     "revokeFailed": "Tilbagetrækningen mislykkedes. Prøv igen."
+  },
+  "localMutes": {
+    "title": "Lyd slået fra for mig",
+    "switch": "Glem lyd slået fra for mig, når Mumcord starter",
+    "hint": "Personer, du kun har slået lyden fra for dig selv, kan høres igen efter en genstart. Lydstyrker og blokerede brugere bevares."
   },
   "blocked": {
     "title": "Blokerede brugere",

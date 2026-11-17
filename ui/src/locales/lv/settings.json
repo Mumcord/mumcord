@@ -48,6 +48,7 @@
     "updates": "jauna versija jauninājums",
     "storage": "diska vieta notīrīt kešatmiņu",
     "blocked": "ignorēt bloķēt apklusināt cilvēki",
+    "localMutes": "klusināt klusinājums klusināts aizmirst startēšana palaist",
     "notifications": "brīdinājumi uznirstošie logi",
     "externalContent": "iegulumi attēli priekšskatījumi",
     "fileSharing": "faili sūtīt saņemt lejupielādēt saglabāt mape pielikums zip",
@@ -904,6 +905,11 @@
     "revoke": "Atsaukt",
     "revokeLabel": "Atsaukt pieņemto sarunu ar {{name}}",
     "revokeFailed": "Atsaukšana neizdevās. Lūdzu, mēģini vēlreiz."
+  },
+  "localMutes": {
+    "title": "Vietējie klusinājumi",
+    "switch": "Aizmirst vietējos klusinājumus, kad Mumcord startē",
+    "hint": "Cilvēki, kurus tu klusināji tikai sev, pēc pārstartēšanas atkal būs dzirdami. Skaļumi un bloķētie lietotāji paliek nemainīgi."
   },
   "blocked": {
     "title": "Bloķētie lietotāji",

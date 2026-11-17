@@ -48,6 +48,7 @@
     "updates": "nauja versija naujinys atnaujinimas",
     "storage": "disko vieta išvalyti talpyklą",
     "blocked": "ignoruoti blokuoti nutildyti žmones",
+    "localMutes": "nutildyti nutildymas nutildytas pamiršti paleidimas",
     "notifications": "įspėjimai iššokantys langai",
     "externalContent": "įterpiniai paveikslėliai peržiūros",
     "fileSharing": "failai siųsti gauti atsisiųsti išsaugoti aplankas priedas zip",
@@ -910,6 +911,11 @@
     "revoke": "Atšaukti",
     "revokeLabel": "Atšaukti priimtą pokalbį su {{name}}",
     "revokeFailed": "Atšaukti nepavyko. Bandyk dar kartą."
+  },
+  "localMutes": {
+    "title": "Vietiniai nutildymai",
+    "switch": "Pamiršti vietinius nutildymus paleidžiant Mumcord",
+    "hint": "Žmonės, kuriuos nutildei tik sau, po paleidimo vėl bus girdimi. Garsiai ir užblokuoti naudotojai išlieka."
   },
   "blocked": {
     "title": "Užblokuoti naudotojai",
