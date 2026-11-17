@@ -48,6 +48,7 @@
     "updates": "verżjoni ġdida upgrade",
     "storage": "spazju fid-disk imsaħ il-cache",
     "blocked": "injora blokka mute persuni",
+    "localMutes": "skiet silenzju skietta insa bidu",
     "notifications": "twissijiet pop-ups",
     "externalContent": "embeds immaġini previews",
     "fileSharing": "fajls ibgħat irċievi niżżel sejvja folder anness zip",
@@ -916,6 +917,11 @@
     "revoke": "Irrevoka",
     "revokeLabel": "Irrevoka l-konversazzjoni aċċettata ma' {{name}}",
     "revokeFailed": "L-irrevokar falla. Erġa' pprova."
+  },
+  "localMutes": {
+    "title": "Silenzi lokali",
+    "switch": "Insa l-isilenzi lokali meta Mumcord jibda",
+    "hint": "Nies li skiettagħhom għalik biss jerġgħu jinstemgħu wara li jerġa’ jibda. Il-volumi u l-utenti mblukkati jinżammu."
   },
   "blocked": {
     "title": "Utenti mblokkati",

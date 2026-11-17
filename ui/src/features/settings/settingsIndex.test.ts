@@ -90,6 +90,13 @@ describe("settings search index", () => {
     expect(labels(searchSettings("never requested", t))).toEqual(["fullImages.load"]);
   });
 
+  it("finds the forget-local-mutes switch (FR-15.1)", () => {
+    expect(labels(searchSettings("mute", t))).toContain("localMutes.switch");
+    expect(labels(searchSettings("local mute", t))).toEqual(["localMutes.switch"]);
+    expect(labels(searchSettings("forget", t))).toEqual(["localMutes.switch"]);
+    expect(labels(searchSettings("startup", t))).toContain("localMutes.switch");
+  });
+
   it("matches the current language without accents", () => {
     expect(labels(searchSettings("sprunglinks", translator(de)))).toEqual([
       "accessibility.skipLinks",

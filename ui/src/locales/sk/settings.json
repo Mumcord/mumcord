@@ -48,6 +48,7 @@
     "updates": "nová verzia aktualizácia",
     "storage": "miesto na disku vymazať vyrovnávaciu pamäť",
     "blocked": "ignorovať blokovať stlmiť ľudí",
+    "localMutes": "stlmiť stlmenie stlmený zabudnúť spustenie štart",
     "notifications": "upozornenia vyskakovacie okná",
     "externalContent": "vložený obsah obrázky náhľady",
     "fileSharing": "súbory odoslať prijať stiahnuť uložiť priečinok príloha zip",
@@ -910,6 +911,11 @@
     "revoke": "Odvolať",
     "revokeLabel": "Odvolať prijatú konverzáciu s používateľom {{name}}",
     "revokeFailed": "Odvolanie sa nepodarilo. Skús to znova."
+  },
+  "localMutes": {
+    "title": "Lokálne stlmenia",
+    "switch": "Zabudnúť lokálne stlmenia pri spustení Mumcordu",
+    "hint": "Ľudia, ktorých si stlmil len pre seba, budú po reštarte opäť počuť. Hlasitosti a zablokovaní používatelia zostanú zachovaní."
   },
   "blocked": {
     "title": "Zablokovaní používatelia",

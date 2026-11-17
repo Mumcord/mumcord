@@ -52,7 +52,8 @@
     "externalContent": "Einbettungen Bilder Vorschauen",
     "fileSharing": "Dateien senden empfangen herunterladen speichern Ordner Anhang zip",
     "screenSharing": "Bildschirmfreigabe Qualität Auflösung fps Videocodec AV1 VP9 Encoder Grafikkarte",
-    "camera": "Kamera Webcam Video Hintergrund Unschärfe virtueller Hintergrund spiegeln Selbstansicht"
+    "camera": "Kamera Webcam Video Hintergrund Unschärfe virtueller Hintergrund spiegeln Selbstansicht",
+    "localMutes": "Stummschalten stummgeschaltet lokal vergessen Start"
   },
   "search": {
     "label": "Einstellungen durchsuchen",
@@ -898,6 +899,11 @@
     "revoke": "Widerrufen",
     "revokeLabel": "Angenommene Unterhaltung mit {{name}} widerrufen",
     "revokeFailed": "Widerrufen fehlgeschlagen. Bitte versuche es erneut."
+  },
+  "localMutes": {
+    "title": "Lokale Stummschaltungen",
+    "switch": "Lokale Stummschaltungen beim Start von Mumcord vergessen",
+    "hint": "Personen, die du nur für dich stummgeschaltet hast, sind nach einem Neustart wieder hörbar. Lautstärken und blockierte Benutzer bleiben erhalten."
   },
   "blocked": {
     "title": "Blockierte Benutzer",

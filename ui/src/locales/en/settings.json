@@ -52,7 +52,8 @@
     "externalContent": "embeds images previews",
     "fileSharing": "files send receive download save folder attachment zip",
     "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card",
-    "camera": "webcam video background blur virtual background mirror self-view"
+    "camera": "webcam video background blur virtual background mirror self-view",
+    "localMutes": "mute local mute forget startup start"
   },
   "search": {
     "label": "Search settings",
@@ -898,6 +899,11 @@
     "revoke": "Revoke",
     "revokeLabel": "Revoke the accepted conversation with {{name}}",
     "revokeFailed": "Revoking failed. Please try again."
+  },
+  "localMutes": {
+    "title": "Local mutes",
+    "switch": "Forget local mutes when Mumcord starts",
+    "hint": "People you muted only for yourself become audible again after a restart. Volumes and blocked users are kept."
   },
   "blocked": {
     "title": "Blocked users",

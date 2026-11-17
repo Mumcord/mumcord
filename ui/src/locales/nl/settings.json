@@ -48,6 +48,7 @@
     "updates": "nieuwe versie upgrade",
     "storage": "schijfruimte cache wissen",
     "blocked": "negeren blokkeren dempen mensen",
+    "localMutes": "dempen gedempt demping vergeten opstarten start",
     "notifications": "meldingen pop-ups",
     "externalContent": "insluitingen afbeeldingen voorbeelden",
     "fileSharing": "bestanden versturen ontvangen downloaden opslaan map bijlage zip",
@@ -898,6 +899,11 @@
     "revoke": "Intrekken",
     "revokeLabel": "Het geaccepteerde gesprek met {{name}} intrekken",
     "revokeFailed": "Intrekken mislukt. Probeer het opnieuw."
+  },
+  "localMutes": {
+    "title": "Lokale dempingen",
+    "switch": "Lokale dempingen vergeten als Mumcord start",
+    "hint": "Mensen die je alleen voor jezelf hebt gedempt, zijn na een herstart weer hoorbaar. Volumes en geblokkeerde gebruikers blijven bewaard."
   },
   "blocked": {
     "title": "Geblokkeerde gebruikers",

@@ -48,6 +48,7 @@
     "updates": "versiune nouă actualizare",
     "storage": "spațiu pe disc golește memoria cache",
     "blocked": "ignoră blochează dezactivează sunetul persoane",
+    "localMutes": "silențios silențiere mut uită pornire start",
     "notifications": "alerte ferestre pop-up",
     "externalContent": "conținut încorporat imagini previzualizări",
     "fileSharing": "fișiere trimite primește descarcă salvează folder atașament zip",
@@ -904,6 +905,11 @@
     "revoke": "Revocă",
     "revokeLabel": "Revocă conversația acceptată cu {{name}}",
     "revokeFailed": "Revocarea a eșuat. Încearcă din nou."
+  },
+  "localMutes": {
+    "title": "Silențieri locale",
+    "switch": "Uită silențierile locale la pornirea Mumcord",
+    "hint": "Persoanele pe care le-ai silențiat doar pentru tine vor fi din nou audibile după o repornire. Volumele și utilizatorii blocați sunt păstrați."
   },
   "blocked": {
     "title": "Utilizatori blocați",

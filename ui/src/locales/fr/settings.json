@@ -48,6 +48,7 @@
     "updates": "nouvelle version mise à niveau",
     "storage": "espace disque vider le cache",
     "blocked": "ignorer bloquer sourdine muet personnes",
+    "localMutes": "sourdine sourdines muet rendre muet oublier démarrage lancer",
     "notifications": "alertes fenêtres contextuelles",
     "externalContent": "intégrations images aperçus",
     "fileSharing": "fichiers envoyer recevoir télécharger enregistrer dossier pièce jointe zip",
@@ -904,6 +905,11 @@
     "revoke": "Révoquer",
     "revokeLabel": "Révoquer la conversation acceptée avec {{name}}",
     "revokeFailed": "La révocation a échoué. Réessaie."
+  },
+  "localMutes": {
+    "title": "Sourdines locales",
+    "switch": "Oublier les sourdines locales au démarrage de Mumcord",
+    "hint": "Les personnes que tu as mises en sourdine pour toi seul redeviennent audibles après un redémarrage. Les volumes et les utilisateurs bloqués sont conservés."
   },
   "blocked": {
     "title": "Utilisateurs bloqués",

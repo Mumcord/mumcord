@@ -48,6 +48,7 @@
     "updates": "leagan nua uasghrádú",
     "storage": "spás diosca glan taisce",
     "blocked": "déan neamhaird bac bactha blocáil balbhaigh daoine",
+    "localMutes": "balbhaigh balbhú balbhuithe áitiúil dearmad tosú atosú",
     "notifications": "foláirimh preabfhuinneoga",
     "externalContent": "leabaithe íomhánna réamhamharcanna",
     "fileSharing": "comhaid seol faigh íoslódáil sábháil fillteán ceangaltán zip",
@@ -916,6 +917,11 @@
     "revoke": "Cealaigh",
     "revokeLabel": "Cealaigh an comhrá glactha le {{name}}",
     "revokeFailed": "Theip ar an gcealú. Bain triail eile as."
+  },
+  "localMutes": {
+    "title": "Balbhuithe áitiúla",
+    "switch": "Dearmad a dhéanamh ar na balbhuithe áitiúla nuair a thosaíonn Mumcord",
+    "hint": "Beidh daoine ar chuir tú balbhú orthu duit féin le cloisteáil arís tar éis atosú. Coinnítear na hairde agus na húsáideoirí blocáilte."
   },
   "blocked": {
     "title": "Úsáideoirí bactha",

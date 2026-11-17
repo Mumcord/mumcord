@@ -198,6 +198,7 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   privateMessages("keepRequests", "privateMessages.keepRequests"),
   privateMessages("allowCurrentChannel", "privateMessages.currentChannel"),
   privateMessages("allowAccepted", "privateMessages.accepted"),
+  top("chatNotifications", "localMutes.switch", ["forgetLocalMutesOnStart"]),
   top("chatNotifications", "blocked.messagesTitle", ["blockedMessages"]),
   top("chatNotifications", "history.autoDelete", ["historyMaxAgeDays"]),
   top("privacy", "p2p.title", ["p2pMode"], { preset: "p2pMode" }),
