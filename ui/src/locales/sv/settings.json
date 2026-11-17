@@ -48,6 +48,7 @@
     "updates": "ny version uppgradering",
     "storage": "diskutrymme rensa cache",
     "blocked": "ignorera blockera tysta personer",
+    "localMutes": "tysta tystad tystning glöm start omstart",
     "notifications": "aviseringar popup-fönster",
     "externalContent": "inbäddat innehåll bilder förhandsvisningar",
     "fileSharing": "filer skicka ta emot ladda ner spara mapp bilaga zip",
@@ -898,6 +899,11 @@
     "revoke": "Återkalla",
     "revokeLabel": "Återkalla den accepterade konversationen med {{name}}",
     "revokeFailed": "Återkallningen misslyckades. Försök igen."
+  },
+  "localMutes": {
+    "title": "Lokala tystningar",
+    "switch": "Glöm lokala tystningar när Mumcord startar",
+    "hint": "Personer som du har tystat bara för dig själv hörs igen efter en omstart. Volymer och blockerade användare behålls."
   },
   "blocked": {
     "title": "Blockerade användare",

@@ -52,7 +52,8 @@
     "externalContent": "upotukset kuvat esikatselut",
     "fileSharing": "tiedostot lähetä vastaanota lataa tallenna kansio liite zip",
     "screenSharing": "näytön jakaminen laatu tarkkuus fps koodekki AV1 VP9 enkooderi näytönohjain",
-    "camera": "kamera web-kamera video tausta sumennus virtuaalitausta peilaus omakuva"
+    "camera": "kamera web-kamera video tausta sumennus virtuaalitausta peilaus omakuva",
+    "localMutes": "mykistä mykistetty unohda käynnistys"
   },
   "search": {
     "label": "Hae asetuksista",
@@ -898,6 +899,11 @@
     "revoke": "Peru",
     "revokeLabel": "Peru hyväksytty keskustelu käyttäjän {{name}} kanssa",
     "revokeFailed": "Peruminen epäonnistui. Yritä uudelleen."
+  },
+  "localMutes": {
+    "title": "Mykistetty sinulle",
+    "switch": "Unohda sinulle mykistetyt henkilöt, kun Mumcord käynnistyy",
+    "hint": "Henkilöt, jotka mykistit vain itsellesi, ovat uudelleenkäynnistyksen jälkeen taas kuultavissa. Äänenvoimakkuudet ja estetyt käyttäjät säilyvät."
   },
   "blocked": {
     "title": "Estetyt käyttäjät",

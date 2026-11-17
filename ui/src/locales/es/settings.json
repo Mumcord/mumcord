@@ -52,7 +52,8 @@
     "externalContent": "incrustados imágenes vistas previas",
     "fileSharing": "archivos enviar recibir descargar guardar carpeta adjunto zip",
     "screenSharing": "compartir pantalla calidad resolución fps códec AV1 VP9 codificador tarjeta gráfica",
-    "camera": "cámara webcam vídeo fondo desenfoque fondo virtual espejo autovista"
+    "camera": "cámara webcam vídeo fondo desenfoque fondo virtual espejo autovista",
+    "localMutes": "silenciar silenciados local olvidar inicio"
   },
   "search": {
     "label": "Buscar ajustes",
@@ -904,6 +905,11 @@
     "revoke": "Revocar",
     "revokeLabel": "Revocar la conversación aceptada con {{name}}",
     "revokeFailed": "No se pudo revocar. Inténtalo de nuevo."
+  },
+  "localMutes": {
+    "title": "Silenciados para mí",
+    "switch": "Olvidar los silenciados para mí al iniciar Mumcord",
+    "hint": "Las personas que silenciaste solo para ti vuelven a oírse después de reiniciar. Los volúmenes y los usuarios bloqueados se conservan."
   },
   "blocked": {
     "title": "Usuarios bloqueados",

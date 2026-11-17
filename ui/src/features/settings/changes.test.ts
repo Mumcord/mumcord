@@ -82,6 +82,20 @@ describe("changedSettings", () => {
     expect(ids(changedSettings(custom, baselineDraft(base, "custom")))).toEqual(["linkPreviews"]);
   });
 
+  it("counts the local mutes switch as a change of Chat & Notifications", async () => {
+    const base = defaultDraft(await defaults(), true);
+    const current: PresetDraft = {
+      ...base,
+      settings: {
+        ...base.settings,
+        forgetLocalMutesOnStart: !base.settings.forgetLocalMutesOnStart,
+      },
+    };
+    const changed = changedSettings(current, baselineDraft(base, null));
+    expect(ids(changed)).toEqual(["forgetLocalMutesOnStart"]);
+    expect([...changedSections(changed)]).toEqual(["chatNotifications"]);
+  });
+
   it("leaves the in-game overlay out where the platform has none", async () => {
     const base = defaultDraft(await defaults(), false);
     expect(base.ingameOverlay).toBeNull();
@@ -110,6 +124,22 @@ describe("resetSection", () => {
     // Another group's change stays.
     expect(draft.settings.autoGain).toBe(current.settings.autoGain);
     expect(draft.settings.setupPreset).toBe("balanced");
+  });
+
+  it("puts the local mutes switch back too", async () => {
+    const base = defaultDraft(await defaults(), true);
+    const current: PresetDraft = {
+      ...base,
+      settings: {
+        ...base.settings,
+        forgetLocalMutesOnStart: !base.settings.forgetLocalMutesOnStart,
+      },
+    };
+    const reset = resetSection(current, baselineDraft(base, null), "chatNotifications");
+    expect(ids(reset.changes)).toEqual(["forgetLocalMutesOnStart"]);
+    expect(reset.draft.settings.forgetLocalMutesOnStart).toBe(
+      base.settings.forgetLocalMutesOnStart,
+    );
   });
 
   it("puts overlay and Do Not Disturb back too", async () => {

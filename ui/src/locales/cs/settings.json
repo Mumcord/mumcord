@@ -52,7 +52,8 @@
     "externalContent": "vložený obsah obrázky náhledy",
     "fileSharing": "soubory odeslat přijmout stáhnout uložit složka příloha zip",
     "screenSharing": "sdílení obrazovky kvalita rozlišení fps kodek AV1 VP9 enkodér grafická karta",
-    "camera": "kamera webkamera video pozadí rozostření virtuální pozadí zrcadlit vlastní náhled"
+    "camera": "kamera webkamera video pozadí rozostření virtuální pozadí zrcadlit vlastní náhled",
+    "localMutes": "ztlumit ztlumení pro mě zapomenout spuštění"
   },
   "search": {
     "label": "Hledat v nastavení",
@@ -910,6 +911,11 @@
     "revoke": "Odvolat",
     "revokeLabel": "Odvolat přijatou konverzaci s uživatelem {{name}}",
     "revokeFailed": "Odvolání se nepodařilo. Zkus to prosím znovu."
+  },
+  "localMutes": {
+    "title": "Ztlumení pro mě",
+    "switch": "Zapomenout ztlumení pro mě při spuštění Mumcordu",
+    "hint": "Lidé, které sis ztlumil(a) jen pro sebe, se po restartu zase ozvou. Hlasitosti a zablokovaní uživatelé zůstanou."
   },
   "blocked": {
     "title": "Zablokovaní uživatelé",
