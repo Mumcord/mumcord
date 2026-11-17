@@ -1124,20 +1124,30 @@ impl Engine {
     /// Connects at app start (FR-2.7): servers marked "Always connect at start" first, then
     /// the servers connected when the app last quit, most recent first (the voice server
     /// before the others, then the saved order), up to the limit. Every connect is read-only.
-    /// Nothing happens before the first-run wizard created an identity.
+    /// Nothing connects before the first-run wizard created an identity. With "Forget local
+    /// mutes when Mumcord starts" on, every stored local mute is cleared first (FR-15.2).
     pub async fn connect_at_start(&self) -> EngineResult<()> {
+        let settings = lock(&self.inner.store).settings().map_err(store_error)?;
+        // The one clearing moment (FR-15.2, FR-15.4): once per app start, before any connect,
+        // so sessions start from the cleared state (FR-15.7). Reconnects and server switches
+        // go through `connect` and never clear. A failed sweep is logged and must not stop
+        // the startup connects.
+        if settings.forget_local_mutes_on_start {
+            match lock(&self.inner.store).clear_local_mutes() {
+                // Count only: names and certificate hashes never go into logs.
+                Ok(cleared) => {
+                    tracing::debug!(cleared, "forgot the stored local mutes at start");
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, "forgetting the local mutes at start failed");
+                }
+            }
+        }
         if self.inner.default_identity_id().await?.is_none() {
             return Ok(());
         }
-        let (servers, max) = {
-            let store = lock(&self.inner.store);
-            let servers = store.servers().map_err(store_error)?;
-            (
-                servers,
-                store.settings().map_err(store_error)?.max_connected_servers,
-            )
-        };
-        for server_id in start_servers(&servers, max) {
+        let servers = lock(&self.inner.store).servers().map_err(store_error)?;
+        for server_id in start_servers(&servers, settings.max_connected_servers) {
             if let Err(e) = self.connect(server_id, None) {
                 tracing::warn!(server_id, error = %e, "connecting at start failed");
             }
@@ -4071,5 +4081,106 @@ mod password_override_tests {
         assert!(lock(&engine.inner.password_overrides).is_empty());
         engine.connect(server.id, None).expect("plain connect");
         assert!(lock(&engine.inner.password_overrides).is_empty());
+    }
+}
+
+#[cfg(test)]
+mod forget_local_mutes_tests {
+    use super::*;
+    use crate::{PasswordChange, ServerFields};
+    use mumcord_store::PersonSetting;
+
+    const HASH: &str = "aa11";
+
+    // Single-threaded runtime: the connect task cannot run before the assertions, so the
+    // stored person setting is observable right after the call. Port 1 is unreachable; the
+    // sweep must not depend on a connect succeeding.
+    async fn engine_with_muted_person(forget: bool) -> (Engine, tempfile::TempDir, ServerId) {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, _rx) = Engine::new(
+            dir.path(),
+            SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        engine
+            .identity_create("Tester".into(), None)
+            .await
+            .expect("identity");
+        let server = engine
+            .server_add(ServerFields {
+                label: "s".into(),
+                address: "127.0.0.1".into(),
+                port: 1,
+                username: "me".into(),
+                password: PasswordChange::Keep,
+            })
+            .await
+            .expect("server");
+        let store = engine.store_handle();
+        let stored = lock(&store);
+        let mut settings = stored.settings().expect("settings");
+        settings.forget_local_mutes_on_start = forget;
+        stored.save_settings(&settings).expect("save settings");
+        stored
+            .set_person_setting(
+                server.id,
+                HASH,
+                &PersonSetting {
+                    volume: 80,
+                    local_mute: true,
+                    share_volume: 60,
+                },
+            )
+            .expect("person setting");
+        let mut saved = stored.server(server.id).expect("server").expect("saved");
+        saved.always_connect_at_start = true;
+        stored.update_server(&saved).expect("always connect");
+        drop(stored);
+        (engine, dir, server.id)
+    }
+
+    fn person(engine: &Engine, server_id: ServerId) -> PersonSetting {
+        lock(&engine.store_handle())
+            .person_setting(server_id, HASH)
+            .expect("person setting")
+            .expect("stored")
+    }
+
+    #[tokio::test]
+    async fn start_with_the_flag_on_clears_mutes_before_connecting() {
+        let (engine, _dir, server_id) = engine_with_muted_person(true).await;
+        engine.connect_at_start().await.expect("connect at start");
+        let setting = person(&engine, server_id);
+        assert!(!setting.local_mute, "FR-15.2: the sweep ran at start");
+        assert_eq!(setting.volume, 80, "volumes are never touched");
+        assert_eq!(setting.share_volume, 60, "share volumes are never touched");
+    }
+
+    #[tokio::test]
+    async fn start_with_the_flag_off_keeps_mutes() {
+        let (engine, _dir, server_id) = engine_with_muted_person(false).await;
+        engine.connect_at_start().await.expect("connect at start");
+        assert!(person(&engine, server_id).local_mute, "FR-15.3");
+    }
+
+    #[tokio::test]
+    async fn connect_never_clears_even_with_the_flag_on() {
+        let (engine, _dir, server_id) = engine_with_muted_person(true).await;
+        // `connect` is also the reconnect and server-switch path (FR-15.4).
+        engine.connect(server_id, None).expect("connect");
+        assert!(person(&engine, server_id).local_mute);
+    }
+
+    #[tokio::test]
+    async fn turning_the_flag_on_clears_nothing_immediately() {
+        let (engine, _dir, server_id) = engine_with_muted_person(false).await;
+        let mut settings = engine.settings().expect("settings");
+        settings.forget_local_mutes_on_start = true;
+        engine.update_settings(settings).await.expect("update");
+        assert!(
+            person(&engine, server_id).local_mute,
+            "FR-15.5: only the next app start clears"
+        );
     }
 }
