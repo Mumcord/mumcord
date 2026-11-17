@@ -402,7 +402,9 @@ fn check_details(plugin: &IndexPlugin) -> Result<(), String> {
         _ => Ok(()),
     };
     let date = |name: &str, value: &Option<String>| match value {
-        Some(v) if chrono::NaiveDate::parse_from_str(v, "%Y-%m-%d").is_err() => {
+        // Ten characters plus a valid `Date` means exactly `YYYY-MM-DD`: `Date`'s own parser
+        // also takes signed expanded years, which a registry date must not be.
+        Some(v) if v.len() != 10 || v.parse::<jiff::civil::Date>().is_err() => {
             Err(format!("bad {name}"))
         }
         _ => Ok(()),
@@ -654,6 +656,27 @@ pub(super) mod tests {
         );
         assert_eq!(index.plugins.len(), 2);
         assert_eq!(index.ignored.len(), 2);
+    }
+
+    #[test]
+    fn dates_must_be_exactly_iso_day_strings() {
+        for text in [
+            "20 Oct",
+            "2026-1-5",
+            "2026-02-30",
+            "2026-13-01",
+            "2026-10-20x",
+            "2026-10-20 ",
+            "+002026-10-20",
+            "",
+        ] {
+            let mut bad = plugin("a-date");
+            bad["added_on"] = json!(text);
+            let index =
+                Index::parse(&official(vec![bad]), &IndexKind::Official).expect("test step");
+            assert!(index.plugin("a-date").is_none(), "{text:?} accepted");
+            assert_eq!(index.ignored.len(), 1, "{text:?}");
+        }
     }
 
     #[test]

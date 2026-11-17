@@ -181,19 +181,23 @@ impl Counters {
         let Some(store) = &self.store else {
             return;
         };
-        let now = chrono::Local::now();
-        let day = now.format("%Y-%m-%d").to_string();
-        let at: UnixMillis = now.timestamp_millis();
+        let now = jiff::ZonedDateTime::now();
+        let day = now.strftime("%Y-%m-%d").to_string();
+        let at: UnixMillis = now.timestamp().as_millisecond();
         let store = store.lock().unwrap_or_else(PoisonError::into_inner);
         if let Err(error) = store.record_plugin_request(plugin, &day, host, blocked, at) {
             tracing::warn!(plugin, %error, "can't count a plugin request");
         }
         let mut pruned = self.pruned.lock().unwrap_or_else(PoisonError::into_inner);
         if pruned.as_deref() != Some(day.as_str()) {
-            let oldest = (now.date_naive() - chrono::Days::new(KEPT_DAYS as u64 - 1))
-                .format("%Y-%m-%d")
-                .to_string();
-            match store.prune_plugin_origin_counters(&oldest) {
+            let cutoff = now
+                .date()
+                .checked_add(jiff::Span::new().days(-(KEPT_DAYS - 1)));
+            let Ok(cutoff) = cutoff else {
+                tracing::warn!(plugin, "can't compute the plugin counter prune day");
+                return;
+            };
+            match store.prune_plugin_origin_counters(&cutoff.to_string()) {
                 Ok(_) => *pruned = Some(day),
                 Err(error) => tracing::warn!(%error, "can't prune the plugin request counters"),
             }
@@ -373,7 +377,7 @@ mod tests {
         assert_eq!(rows.len(), 1);
         assert_eq!(
             rows[0].day,
-            chrono::Local::now().format("%Y-%m-%d").to_string()
+            jiff::ZonedDateTime::now().strftime("%Y-%m-%d").to_string()
         );
         assert_eq!((rows[0].requests, rows[0].blocked), (2, 1));
         assert_eq!(rows[0].last_host.as_deref(), Some("evil.example.net"));
