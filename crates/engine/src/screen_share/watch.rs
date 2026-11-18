@@ -11,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use hwcodec::{I420Frame, open_software_decoder, av1_cpu_supported};
+use hwcodec::{I420Frame, av1_cpu_supported, open_software_decoder};
 use mumcord_audio::mixer::share::{ShareSoundStats, ShareStats, ShareVolume};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use tokio::sync::Notify;
