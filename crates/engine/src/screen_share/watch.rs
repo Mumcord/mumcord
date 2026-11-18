@@ -11,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use hwcodec::{I420Frame, open_software_decoder};
+use hwcodec::{I420Frame, open_software_decoder, av1_cpu_supported};
 use mumcord_audio::mixer::share::{ShareSoundStats, ShareStats, ShareVolume};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use tokio::sync::Notify;
@@ -107,6 +107,10 @@ fn forced_decode_codecs() -> u8 {
     if cfg!(target_os = "freebsd") {
         codec_bits(&[Codec::Av1, Codec::Vp9])
     } else if crate::test_hooks::no_webcodecs_av1() {
+        codec_bit(Codec::Av1)
+    } else if !av1_cpu_supported() {
+        // A CPU without AVX2 (e.g., Sandy Bridge) would crash when using the decoder,
+        // so gate the Rust decoding path on this capability.
         codec_bit(Codec::Av1)
     } else {
         0
