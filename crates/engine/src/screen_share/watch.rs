@@ -104,9 +104,6 @@ fn forced_decode_codecs() -> u8 {
     // FreeBSD WebKitGTK 2.46 accepts VP9 in WebCodecs, but sustained VideoFrame drawing
     // exhausts memory even when every frame is closed. Keep its hardware compositor,
     // using the engine's bounded decoder and RGBA delivery instead of that video path.
-    // CPUs without AVX2 would crash when using the Rust decoder; gate the Rust path on
-    // platform requirements only. CPUs without AVX2 are handled by letting the webview
-    // decode the video, avoiding the crash.
     if cfg!(target_os = "freebsd") {
         codec_bits(&[Codec::Av1, Codec::Vp9])
     } else if crate::test_hooks::no_webcodecs_av1() {
