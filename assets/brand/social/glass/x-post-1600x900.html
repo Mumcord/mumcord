@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mumcord share image – glass – x-post 1600×900</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  /* Shown in full at 16:9; 60 px margin. */
+  :root { --lock: 44px; --h1: 100px; --p: 32px; --small: 24px; --label: 22px; }
+  .copy { left: 80px; top: 80px; width: 740px; }
+  .rig { transform: rotateY(-16deg) rotateX(8deg); transform-origin: 1200px 450px; }
+  .c-share { left: 900px; top: 80px; width: 600px; transform: translateZ(0px) rotate(0deg); }
+  .c-chat { left: 840px; top: 420px; width: 400px; transform: translateZ(70px) rotate(-3deg); }
+  .c-cam { left: 1250px; top: 450px; width: 300px; transform: translateZ(40px) rotate(4deg); }
+  .o1 { left: 700px; top: -180px; width: 560px; height: 560px; }
+  .o2 { left: 1300px; top: 660px; width: 340px; height: 340px; }
+  .o3 { left: 60px; top: 700px; width: 180px; height: 180px; }
+
+</style>
+</head>
+<body>
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="scene"><div class="rig">
+    <div class="glass c-share"><img src="../shared/crop-share.png" alt=""><span class="label">Screen sharing</span></div>
+    <div class="glass c-cam"><div class="cams"><div class="cam talking"><img src="cameras/maya.jpg" alt=""></div><div class="cam"><img src="cameras/jonas.jpg" alt=""></div><div class="cam"><img src="cameras/mei.jpg" alt=""></div><div class="cam"><img src="cameras/leo.jpg" alt=""></div></div><span class="label">Cameras</span></div>
+    <div class="glass c-chat"><img src="../shared/crop-chat.png" alt=""><span class="label">Chat with images</span></div>
+  </div></div>
+  <div class="copy">
+    <div class="lockup"><img src="../../mumcord-icon.svg" alt="">Mumcord</div>
+    <h1 class="display">Crystal-clear voice for your community.</h1>
+    <p><b>Talk, text, share your screen and turn on cameras.</b> Plugins included.</p>
+    <div class="small">Built on the open Mumble protocol</div>
+  </div>
+</body>
+</html>
