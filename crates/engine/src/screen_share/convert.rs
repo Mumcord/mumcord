@@ -23,10 +23,38 @@ pub(super) fn bgra_to_i420(
     max_w: u32,
     max_h: u32,
 ) -> Option<I420Frame> {
+    let stride = usize::try_from(src_w).ok()?.checked_mul(4)?;
+    scaled(src, stride, src_w, src_h, max_w, max_h)
+}
+
+/// [`bgra_to_i420`] for a picture whose rows are `stride` bytes apart: a producer's buffers are
+/// usually padded (`stride > src_w * 4`), and packing them first copies a whole frame — 81 MiB
+/// at 6144×3456 — that nothing needs.
+#[cfg(target_os = "linux")]
+pub(super) fn bgra_to_i420_strided(
+    src: &[u8],
+    stride: usize,
+    src_w: u32,
+    src_h: u32,
+    max_w: u32,
+    max_h: u32,
+) -> Option<I420Frame> {
+    scaled(src, stride, src_w, src_h, max_w, max_h)
+}
+
+fn scaled(
+    src: &[u8],
+    stride: usize,
+    src_w: u32,
+    src_h: u32,
+    max_w: u32,
+    max_h: u32,
+) -> Option<I420Frame> {
     let (w, h) = hwcodec::convert::fit(src_w, src_h, max_w, max_h)?;
     let (width, height) = (usize::try_from(w).ok()?, usize::try_from(h).ok()?);
-    let stride = usize::try_from(src_w).ok()?.checked_mul(4)?;
-    if src.len() < stride.checked_mul(usize::try_from(src_h).ok()?)? {
+    let row = usize::try_from(src_w).ok()?.checked_mul(4)?;
+    let rows = usize::try_from(src_h).ok()?.checked_sub(1)?;
+    if stride < row || src.len() < stride.checked_mul(rows)?.checked_add(row)? {
         return None;
     }
     let mut data = vec![0; I420Frame::buffer_len(w, h)];
@@ -194,6 +222,33 @@ mod tests {
         ] {
             matches_reference(&pattern(w, h), w, h, max_w, max_h);
         }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_padded_stride_converts_like_a_packed_picture() {
+        let (w, h) = (640u32, 360u32);
+        let packed = pattern(w, h);
+        let stride = w as usize * 4 + 64;
+        let mut padded = vec![0xEEu8; stride * h as usize];
+        for y in 0..h as usize {
+            let row = &packed[y * w as usize * 4..(y + 1) * w as usize * 4];
+            padded[y * stride..y * stride + row.len()].copy_from_slice(row);
+        }
+        for (max_w, max_h) in [(640, 360), (854, 480), (1920, 1080)] {
+            let want = hwcodec::convert::bgra_to_i420(&packed, w, h, max_w, max_h);
+            assert_eq!(
+                bgra_to_i420_strided(&padded, stride, w, h, max_w, max_h),
+                want,
+                "{w}x{h} into {max_w}x{max_h}"
+            );
+        }
+        // A stride narrower than a row, or a buffer that stops inside the last row, is refused.
+        assert!(bgra_to_i420_strided(&padded, w as usize * 4 - 4, w, h, w, h).is_none());
+        assert!(
+            bgra_to_i420_strided(&padded[..stride * (h as usize - 1) + 8], stride, w, h, w, h)
+                .is_none()
+        );
     }
 
     #[test]
