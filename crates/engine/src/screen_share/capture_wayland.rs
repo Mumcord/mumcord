@@ -38,7 +38,7 @@ use pw::stream::{StreamFlags, StreamState};
 use tokio::sync::oneshot;
 
 use super::capture::CaptureSource;
-use super::convert::bgra_to_i420;
+use super::convert::{bgra_to_i420, bgra_to_i420_strided};
 use super::signal::ShareKind;
 use super::sound::{SoundOutcome, SoundRequest, pick};
 use crate::session::lock;
@@ -66,18 +66,18 @@ impl From<ashpd::Error> for WaylandCaptureError {
     }
 }
 
-/// The newest picture PipeWire delivered, as tight BGRX.
-#[derive(Default)]
-struct Latest {
-    data: Vec<u8>,
-    width: u32,
-    height: u32,
-    fresh: bool,
-}
-
+/// The newest picture PipeWire delivered, ready for the encoder.
+///
+/// The callback converts into the box the encode thread asked for and holds one picture at a
+/// time: converting one the loop has not taken yet would only throw it away, and a frame is
+/// 81 MiB at 6144×3456.
 #[derive(Default)]
 struct Shared {
-    latest: Mutex<Latest>,
+    latest: Mutex<Option<I420Frame>>,
+    /// The box [`CaptureSource::frame`] last asked for; `0` before the loop's first poll.
+    target: Mutex<(u32, u32)>,
+    /// Where the layouts other than BGRX are packed before converting.
+    packing: Mutex<Vec<u8>>,
     ended: AtomicBool,
 }
 
@@ -85,8 +85,6 @@ struct Shared {
 /// which also removes the desktop's "screen is being shared" indicator.
 pub struct WaylandCapture {
     shared: Arc<Shared>,
-    /// Picture buffer swapped with the slot, so neither side allocates per frame.
-    spare: Vec<u8>,
     quit: pw::channel::Sender<()>,
     thread: Option<JoinHandle<()>>,
     /// What the user picked in the system picker; `None` when the portal did not say.
@@ -170,7 +168,6 @@ impl WaylandCapture {
         tokio::spawn(watch_session(session, close_rx, shared.clone()));
         Ok(Self {
             shared,
-            spare: Vec::new(),
             quit,
             thread: Some(thread),
             kind,
@@ -215,16 +212,23 @@ impl CaptureSource for WaylandCapture {
     }
 
     fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {
-        let (width, height) = {
-            let mut latest = lock(&self.shared.latest);
-            if !latest.fresh {
-                return None;
+        *lock(&self.shared.target) = (max_width, max_height);
+        let mut latest = lock(&self.shared.latest);
+        match latest.take() {
+            // A picture converted for an earlier, bigger box (the quality step just changed) does
+            // not fit any more; the source keeps sending, so the next conversion uses the new box.
+            Some(picture)
+                if hwcodec::convert::fit(
+                    picture.width(),
+                    picture.height(),
+                    max_width,
+                    max_height,
+                ) == Some((picture.width(), picture.height())) =>
+            {
+                Some(picture)
             }
-            latest.fresh = false;
-            std::mem::swap(&mut latest.data, &mut self.spare);
-            (latest.width, latest.height)
-        };
-        bgra_to_i420(&self.spare, width, height, max_width, max_height)
+            _ => None,
+        }
     }
 }
 
@@ -276,6 +280,9 @@ struct Layout {
     g: usize,
     b: usize,
 }
+
+/// BGRX (xRGB8888), the layout compositors hand out unless asked otherwise.
+const BGRX: Layout = Layout { r: 2, g: 1, b: 0 };
 
 /// The packed 8-bit RGB formats compositors hand out; BGRx (xRGB8888) is the common one.
 const OFFERED: [VideoFormat; 8] = [
@@ -449,10 +456,9 @@ fn to_bgrx(
     }
     out.clear();
     out.reserve(row_len * rows);
-    let bgrx = Layout { r: 2, g: 1, b: 0 };
     for row in src.chunks(stride).take(rows) {
         let row = &row[..row_len];
-        if layout == bgrx {
+        if layout == BGRX {
             out.extend_from_slice(row);
         } else {
             for px in row.as_chunks::<4>().0 {
@@ -461,6 +467,49 @@ fn to_bgrx(
         }
     }
     true
+}
+
+/// Offers one delivered picture: converts it into the box the encode loop asked for, unless the
+/// slot still holds one. The loop takes at most one picture per poll, so converting another one
+/// before that would only throw it away.
+fn offer(shared: &Shared, src: &[u8], stride: usize, format: Negotiated) {
+    let mut latest = lock(&shared.latest);
+    if latest.is_some() {
+        return;
+    }
+    let (max_width, max_height) = *lock(&shared.target);
+    if max_width < 2 || max_height < 2 {
+        // No picture was asked for yet; the encode loop sets the box before its first poll.
+        return;
+    }
+    let row = usize::try_from(format.width).map_or(0, |width| width * 4);
+    let stride = if stride == 0 { row } else { stride };
+    let picture = if format.layout == BGRX {
+        bgra_to_i420_strided(
+            src,
+            stride,
+            format.width,
+            format.height,
+            max_width,
+            max_height,
+        )
+    } else {
+        // The other packed layouts are rare; the reference conversion takes them packed.
+        let mut packing = lock(&shared.packing);
+        if to_bgrx(
+            src,
+            stride,
+            format.width,
+            format.height,
+            format.layout,
+            &mut packing,
+        ) {
+            bgra_to_i420(&packing, format.width, format.height, max_width, max_height)
+        } else {
+            None
+        }
+    };
+    *latest = picture;
 }
 
 /// Runs the PipeWire stream of the portal node until `quit` fires or the stream ends.
@@ -540,13 +589,7 @@ fn run_stream(
             let Some(src) = data.data().and_then(|d| d.get(offset..offset + size)) else {
                 return;
             };
-            let mut latest = lock(&process_shared.latest);
-            let latest = &mut *latest;
-            if to_bgrx(src, stride, f.width, f.height, f.layout, &mut latest.data) {
-                latest.width = f.width;
-                latest.height = f.height;
-                latest.fresh = true;
-            }
+            offer(&process_shared, src, stride, f);
         })
         .register()?;
     let format = enum_format().ok_or(pw::Error::CreationFailed)?;
@@ -565,6 +608,98 @@ fn run_stream(
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    /// A BGRX picture whose pixels differ from the next one, so a stale slot is visible.
+    fn bgrx(width: u32, height: u32, seed: u32) -> Vec<u8> {
+        let mut state = seed;
+        (0..width * height * 4)
+            .map(|_| {
+                state = state.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+                (state >> 24) as u8
+            })
+            .collect()
+    }
+
+    fn settled(layout: Layout, width: u32, height: u32) -> Negotiated {
+        Negotiated {
+            layout,
+            width,
+            height,
+        }
+    }
+
+    fn asking_for(box_side: (u32, u32)) -> Shared {
+        let shared = Shared::default();
+        *lock(&shared.target) = box_side;
+        shared
+    }
+
+    #[test]
+    fn a_picture_waits_for_the_loop_and_the_next_one_is_skipped() {
+        let shared = asking_for((64, 48));
+        let first = bgrx(64, 48, 0x1234_5678);
+        let second = bgrx(64, 48, 0x9abc_def0);
+        offer(&shared, &first, 0, settled(BGRX, 64, 48));
+        let want = bgra_to_i420(&first, 64, 48, 64, 48);
+        assert_eq!(*lock(&shared.latest), want);
+
+        // The loop has not taken the first one: the second is not converted, not even kept.
+        offer(&shared, &second, 0, settled(BGRX, 64, 48));
+        assert_eq!(*lock(&shared.latest), want);
+
+        let taken = lock(&shared.latest).take().expect("a picture");
+        assert_eq!(Some(taken), want);
+        assert!(lock(&shared.latest).is_none());
+        offer(&shared, &second, 0, settled(BGRX, 64, 48));
+        assert_eq!(
+            *lock(&shared.latest),
+            bgra_to_i420(&second, 64, 48, 64, 48),
+            "the newer picture replaces nothing while the slot is empty"
+        );
+    }
+
+    #[test]
+    fn a_padded_picture_converts_as_delivered() {
+        let shared = asking_for((64, 48));
+        let packed = bgrx(64, 48, 7);
+        let stride = 64 * 4 + 40;
+        let mut padded = vec![0xEEu8; stride * 48];
+        for y in 0..48 {
+            padded[y * stride..y * stride + 64 * 4]
+                .copy_from_slice(&packed[y * 64 * 4..(y + 1) * 64 * 4]);
+        }
+        offer(&shared, &padded, stride, settled(BGRX, 64, 48));
+        assert_eq!(*lock(&shared.latest), bgra_to_i420(&packed, 64, 48, 64, 48));
+    }
+
+    #[test]
+    fn nothing_is_converted_before_the_loop_asks_for_a_box() {
+        let shared = Shared::default();
+        offer(&shared, &bgrx(64, 48, 1), 0, settled(BGRX, 64, 48));
+        assert!(lock(&shared.latest).is_none());
+    }
+
+    #[test]
+    fn the_other_layouts_land_as_the_same_picture() {
+        let bgrx_picture = bgrx(32, 18, 42);
+        let rgba: Vec<u8> = bgrx_picture
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .flat_map(|px| [px[2], px[1], px[0], px[3]])
+            .collect();
+        let from_bgrx = asking_for((32, 18));
+        let from_rgba = asking_for((32, 18));
+        offer(&from_bgrx, &bgrx_picture, 0, settled(BGRX, 32, 18));
+        offer(
+            &from_rgba,
+            &rgba,
+            0,
+            settled(Layout { r: 0, g: 1, b: 2 }, 32, 18),
+        );
+        assert!(lock(&from_bgrx.latest).is_some());
+        assert_eq!(*lock(&from_bgrx.latest), *lock(&from_rgba.latest));
+    }
 
     #[test]
     fn the_portal_pick_decides_the_kind() {
@@ -680,27 +815,35 @@ mod tests {
     }
 
     #[test]
-    fn the_newest_picture_is_converted_once() {
+    fn the_loop_takes_one_picture_per_poll() {
         let (quit, _rx) = pw::channel::channel();
         let (close, _close_rx) = oneshot::channel();
         let shared = Arc::new(Shared::default());
         let mut capture = WaylandCapture {
             shared: shared.clone(),
-            spare: Vec::new(),
             quit,
             thread: None,
             kind: None,
             _close: close,
         };
+        // The first poll asks for a box; until then the callback converts nothing.
         assert!(capture.frame(1280, 720).is_none());
-        {
-            let mut latest = lock(&shared.latest);
-            latest.data = vec![0; 8 * 4 * 4];
-            (latest.width, latest.height, latest.fresh) = (8, 4, true);
-        }
-        let frame = capture.frame(4, 4).unwrap();
-        assert_eq!((frame.width(), frame.height()), (4, 2));
-        assert!(capture.frame(4, 4).is_none(), "nothing new");
+        assert_eq!(*lock(&shared.target), (1280, 720));
+        offer(&shared, &bgrx(640, 360, 3), 0, settled(BGRX, 640, 360));
+        let frame = capture.frame(1280, 720).expect("the offered picture");
+        assert_eq!((frame.width(), frame.height()), (640, 360));
+        assert!(capture.frame(1280, 720).is_none(), "nothing new");
+        // A step down leaves the picture converted for the old, bigger box behind.
+        offer(&shared, &bgrx(640, 360, 4), 0, settled(BGRX, 640, 360));
+        assert!(
+            capture.frame(320, 180).is_none(),
+            "the bigger picture does not fit"
+        );
+        offer(&shared, &bgrx(640, 360, 5), 0, settled(BGRX, 640, 360));
+        let small = capture
+            .frame(320, 180)
+            .expect("converted for the smaller box");
+        assert_eq!((small.width(), small.height()), (320, 180));
         assert!(!capture.ended());
     }
 }
