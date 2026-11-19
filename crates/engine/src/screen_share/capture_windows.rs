@@ -47,6 +47,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
 use windows::core::{BOOL, Interface};
 
 use super::capture::CaptureSource;
+use super::convert::bgra_to_i420;
 use super::signal::ShareKind;
 use super::sound::windows::{LoopbackTarget, ProcessLoopback};
 use super::sound::{AppName, ShareSoundMode, SoundOutcome, SoundRequest};
@@ -54,7 +55,7 @@ use super::windows_rules::{
     OwnerTree, ProcessEntry, TopWindow, capture_supported, owner_tree, pick_kind, sound_process,
     sound_supported,
 };
-use hwcodec::convert::{bgra_to_i420, pack_rows};
+use hwcodec::convert::pack_rows;
 
 /// Why no capture was started.
 #[derive(Debug, thiserror::Error)]
