@@ -12,12 +12,21 @@ ok() { printf '  ok    %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; failed=$((failed + 1)); }
 warn() { printf '  warn  %s\n' "$1"; }
 
+# True when $1 is 4.3.0 or newer, the first SVT-AV1 release that runs on CPUs without AVX2.
+newer_than_4_3() {
+  local major minor
+  IFS=. read -r major minor _ <<<"$1"
+  (( ${major:-0} > 4 || (${major:-0} == 4 && ${minor:-0} >= 3) ))
+}
+
 echo "Hardware"
-# SVT-AV1 refuses to open on a CPU without AVX2 (the hwcodec crate checks it), so no share
-# and no camera can start there.
+# The CPU is no longer a gate: SVT-AV1 4.3.0 fixes the SSSE3 load that killed the encoder on x86
+# CPUs without AVX2. What must be current is the build (see "SVT-AV1 4.3+" below); 4.2.0 still
+# crashes there. A CPU without AVX2 only means 1080p30 will not keep up (about 28 ms a frame on a
+# 2011 i7), so it is a warning, not a failure.
 case "$(uname -m)" in
   x86_64 | amd64)
-    if grep -qw avx2 /proc/cpuinfo; then ok "CPU has AVX2"; else bad "CPU has no AVX2: SVT-AV1 cannot encode, no share or camera starts"; fi
+    if grep -qw avx2 /proc/cpuinfo; then ok "CPU has AVX2"; else warn "CPU has no AVX2: SVT-AV1 4.3.0 runs, but 1080p30 will not keep up"; fi
     ;;
   *) warn "not x86: check AV1 encoding by hand" ;;
 esac
@@ -42,14 +51,22 @@ for tool in sqlite3 node npm cargo; do
   if command -v "$tool" >/dev/null; then ok "$tool"; else bad "$tool missing"; fi
 done
 
-echo "SVT-AV1 4.0+"
+echo "SVT-AV1 4.3+"
 static="${SVTAV1_STATIC_DIR:-$HOME/.cache/mumcord-build/svt-av1}"
-if [[ -f "$static/lib/libSvtAv1Enc.a" ]]; then
-  ok "static build in $static (export SVTAV1_STATIC_DIR=$static)"
-elif pkg-config --atleast-version=4.0 SvtAv1Enc 2>/dev/null; then
+# The archive alone does not say which version it is: a prefix built from 4.2.0 looks exactly like
+# a current one and crashes on CPUs without AVX2. The installed pkg-config file carries the
+# version, so read it there.
+static_version=$(sed -n 's/^Version: *//p' "$static/lib/pkgconfig/SvtAv1Enc.pc" 2>/dev/null)
+if [[ -n $static_version && -f "$static/lib/libSvtAv1Enc.a" ]]; then
+  if newer_than_4_3 "$static_version"; then
+    ok "static build $static_version in $static (export SVTAV1_STATIC_DIR=$static)"
+  else
+    bad "static build $static_version in $static is older than 4.3.0 and crashes on CPUs without AVX2: rerun scripts/build-svt-av1.sh $static"
+  fi
+elif pkg-config --atleast-version=4.3 SvtAv1Enc 2>/dev/null; then
   ok "system SvtAv1Enc $(pkg-config --modversion SvtAv1Enc)"
 else
-  bad "none: run scripts/build-svt-av1.sh ~/.cache/mumcord-build/svt-av1 and export SVTAV1_STATIC_DIR"
+  bad "none at 4.3.0 or newer: run scripts/build-svt-av1.sh ~/.cache/mumcord-build/svt-av1 and export SVTAV1_STATIC_DIR"
 fi
 
 echo "Mumble test server"
