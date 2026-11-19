@@ -145,6 +145,7 @@ mod sck {
     use tokio::sync::oneshot;
 
     use super::super::capture::CaptureSource;
+    use super::super::convert::bgra_to_i420;
     use super::super::signal::ShareKind;
     use super::super::sound::macos::{MacSound, SoundSender, sound_channel};
     use super::super::sound::{AppName, ShareSoundMode, SoundOutcome, SoundRequest};
@@ -153,7 +154,7 @@ mod sck {
         plan, sound_supported, stream_size,
     };
     use crate::session::lock;
-    use hwcodec::convert::{bgra_to_i420, pack_rows};
+    use hwcodec::convert::pack_rows;
 
     /// Frames per second the stream delivers at most, the encoder's top rate.
     const CAPTURE_FPS: i32 = 30;

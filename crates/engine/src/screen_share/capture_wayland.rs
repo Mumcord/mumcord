@@ -38,10 +38,10 @@ use pw::stream::{StreamFlags, StreamState};
 use tokio::sync::oneshot;
 
 use super::capture::CaptureSource;
+use super::convert::bgra_to_i420;
 use super::signal::ShareKind;
 use super::sound::{SoundOutcome, SoundRequest, pick};
 use crate::session::lock;
-use hwcodec::convert::bgra_to_i420;
 
 /// Why a Wayland share could not start.
 #[derive(Debug, thiserror::Error)]
