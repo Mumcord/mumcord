@@ -34,8 +34,8 @@ esac
 # the archive exists would silently keep a prefix built from an older SVT-AV1 (4.2.0 crashes on
 # CPUs without AVX2), so compare the version too. Reading one line stays cheap for the CI jobs
 # that restore the prefix from their cache.
-built=$(sed -n 's/^Version: *//p' "$prefix/lib/pkgconfig/SvtAv1Enc.pc" 2>/dev/null)
-if [[ -f "$prefix/lib/$lib" && -f "$prefix/include/svt-av1/EbSvtAv1Enc.h" && $built == "$SVT_AV1_VERSION" ]]; then
+built=$(sed -n 's/^Version: *//p' "$prefix/lib/pkgconfig/SvtAv1Enc.pc" 2>/dev/null) || built=
+if [[ -f "$prefix/lib/$lib" && -f "$prefix/include/svt-av1/EbSvtAv1Enc.h" && "$built" == "$SVT_AV1_VERSION" ]]; then
   echo "SVT-AV1 $SVT_AV1_VERSION already present in $prefix"
   exit 0
 fi
