@@ -9,7 +9,7 @@
     "unmuted": "Microfono attivato",
     "deafened": "Audio disattivato. Non senti gli altri e il tuo microfono è disattivato",
     "undeafened": "Audio attivato",
-    "leftVoice": "Sei uscito dalla voce su {{server}}",
+    "leftVoice": "Sei uscito dal canale vocale su {{server}}",
     "disconnected": "Disconnesso da {{server}}",
     "disconnectedAll": "Disconnesso da tutti i server"
   },
@@ -23,8 +23,8 @@
     "connected": "Connesso",
     "readOnly": "Sola lettura",
     "disconnected": "Non connesso",
-    "playing": "Sta giocando a {{game}}",
-    "listening": "Sta ascoltando {{track}}"
+    "playing": "Stai giocando a {{game}}",
+    "listening": "Stai ascoltando {{track}}"
   },
   "profile": {
     "title": "Modifica profilo",
@@ -108,10 +108,10 @@
   "disconnectMenu": {
     "label": "Opzioni di disconnessione",
     "open": "Altre opzioni di disconnessione",
-    "leaveVoice": "Esci dalla voce",
+    "leaveVoice": "Esci dal canale vocale",
     "leaveVoiceHint": "Smetti di parlare e ascoltare, resta connesso per la chat",
     "disconnectHint": "Chiudi la connessione a questo server",
-    "switchTo": "Sposta la voce su {{server}}",
+    "switchTo": "Passa la voce a {{server}}",
     "all": "Disconnetti da tutti i server",
     "allHint": "Chiudi tutte le connessioni ai server"
   },
