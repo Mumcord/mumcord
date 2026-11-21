@@ -19,11 +19,11 @@
     },
     "channels": {
       "title": "Canali",
-      "body": "Fai doppio clic su un canale per entrarci e parlare. Un clic singolo ne mostra la chat senza entrare, e Segui ti tiene aggiornato."
+      "body": "Fai doppio clic su un canale per entrarci e parlare. Un clic singolo ne mostra la chat senza entrare, e «Segui» ti tiene aggiornato."
     },
     "talk": {
       "title": "Come parli",
-      "body": "Push-to-talk o attivazione vocale? Scegli in Impostazioni → Voce e audio, oppure apri Impostazioni vocali… con la piccola freccia accanto al microfono. Il push-to-talk funziona anche con i pulsanti del mouse."
+      "body": "Push-to-talk o attivazione vocale? Scegli in Impostazioni → Voce e audio, oppure apri Impostazioni vocali… con la piccola freccia accanto al microfono. Il Push-to-talk funziona anche con i pulsanti del mouse."
     },
     "panel": {
       "title": "Il tuo pannello utente",
@@ -39,7 +39,7 @@
     },
     "apps": {
       "title": "App",
-      "body": "Il pulsante App nella barra dei messaggi avvia la condivisione dello schermo, una watch party o la fotocamera. I plugin ne aggiungono altre."
+      "body": "Il pulsante App nella barra dei messaggi avvia la condivisione dello schermo, una visione di gruppo o la fotocamera. I plugin ne aggiungono altre."
     },
     "themes": {
       "title": "Il tuo stile",

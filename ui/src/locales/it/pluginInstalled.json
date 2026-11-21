@@ -8,8 +8,8 @@
     "unofficial": "Non ufficiale · {{repository}}",
     "unofficialUnknown": "Non ufficiale",
     "developer": "Plugin per sviluppatori",
-    "autoOff": "Disattivato dopo arresti anomali ripetuti",
-    "backingOff": "Riavvio dopo un arresto anomalo",
+    "autoOff": "Disattivato dopo crash ripetuti",
+    "backingOff": "Riavvio dopo un crash",
     "notLoaded": "Caricamento non riuscito",
     "revoked": "Disattivato da Mumcord: {{reason}}",
     "revocationWarning": "Avviso da Mumcord: {{reason}}",
@@ -26,7 +26,7 @@
       "nobody": "Nessuno"
     },
     "notifications": "Notifiche",
-    "pin": "Blocca la versione {{version}} (nessun aggiornamento automatico)",
+    "pin": "Fissa la versione {{version}} (nessun aggiornamento automatico)",
     "settings": "Impostazioni del plugin",
     "diagnostics": "Diagnostica",
     "export": "Esporta i dati",
@@ -92,7 +92,7 @@
     "permissions": "Impossibile modificare il permesso.",
     "visibility": "Impossibile modificare la visibilità.",
     "notifications": "Impossibile modificare le notifiche.",
-    "pin": "Impossibile bloccare la versione.",
+    "pin": "Impossibile fissare la versione.",
     "export": "Impossibile esportare i dati.",
     "reset": "Impossibile reimpostare i dati.",
     "remove": "Impossibile rimuovere il plugin.",
@@ -130,6 +130,6 @@
   "offerBadge": "Nuovi permessi",
   "refused": {
     "title": "Plugin rifiutati",
-    "when": "Rifiutato il {{time}}"
+    "when": "Rifiutato: {{time}}"
   }
 }
