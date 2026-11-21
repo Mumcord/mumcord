@@ -87,7 +87,7 @@
     "systemDefault": "Predefinito di sistema",
     "defaultVia": "Predefinito di sistema ({{backend}})",
     "level": "Livello del microfono",
-    "idle": "Premi Prova, di' qualcosa e ti riascolterai.",
+    "idle": "Premi «Ascoltati», di' qualcosa e ti riascolterai.",
     "recording": "Parla ora…",
     "playing": "Riproduzione della tua voce…",
     "devicesFailed": "Non è stato possibile elencare i tuoi dispositivi audio. Puoi continuare e sceglierli più tardi in Impostazioni.",
@@ -139,7 +139,7 @@
       "p2": "Scopri cosa fa ogni impostazione e chi la vede",
       "p3": "Ideale se sai cosa vuoi"
     },
-    "presetSelected": "{{preset}} selezionato: salti i passaggi dettagliati sulla privacy. Scegli Personalizzato per percorrerli tutti.",
+    "presetSelected": "{{preset}} selezionato: salti i passaggi dettagliati sulla privacy. Scegli «Personalizzato» per percorrerli tutti.",
     "customSelected": "Personalizzato selezionato: i prossimi passaggi passano in rassegna ogni scelta."
   },
   "pm": {
@@ -180,7 +180,7 @@
   "summary": {
     "title": "Tutto pronto",
     "titleNamed": "Tutto pronto, {{name}}",
-    "subtitle": "Ecco cosa hai scelto. Usa Modifica su qualsiasi scheda per cambiarla prima di iniziare.",
+    "subtitle": "Ecco cosa hai scelto. Usa «Modifica» su qualsiasi scheda per cambiarla prima di iniziare.",
     "on": "attivato",
     "off": "disattivato",
     "unavailable": "non disponibile qui",
@@ -260,7 +260,7 @@
       "features": "Attiva solo gli extra che ti piacciono. Ogni scheda dice chi può vederlo.",
       "appearance": "Chiaro, scuro o come il tuo sistema: scegli qui l'aspetto.",
       "startup": "Scegli come si avvia Mumcord quando accedi al computer.",
-      "summary": "Tutto pronto! Controlla qui le tue scelte; Modifica ti riporta a qualsiasi passaggio."
+      "summary": "Tutto pronto! Controlla qui le tue scelte; «Modifica» ti riporta a qualsiasi passaggio."
     }
   }
 }

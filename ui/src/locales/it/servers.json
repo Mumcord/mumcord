@@ -76,7 +76,7 @@
       "labelLong": "Il nome nella barra dei server può avere al massimo 64 caratteri."
     },
     "alwaysConnect": "Connetti sempre all'avvio",
-    "alwaysConnectHint": "All'avvio Mumcord connette questo server in sola lettura.",
+    "alwaysConnectHint": "All'avvio Mumcord si connette a questo server in sola lettura.",
     "channelPasswords": "Password dei canali",
     "channelPassword": "Password {{number}}",
     "channelPasswordChannel": "{{name}} ({{parent}})",
@@ -139,7 +139,7 @@
     "confirm": "Rimuovi"
   },
   "cert": {
-    "newTitle": "Fidarti di questo server?",
+    "newTitle": "Ti fidi di questo server?",
     "newIntro": "Mumcord non ha mai visto il certificato di {{server}}. Se il proprietario del server ti ha dato un'impronta digitale, controlla che corrisponda. La tua scelta viene ricordata.",
     "fingerprint": "Impronta digitale del certificato",
     "changedTitle": "Attenzione: il certificato del server è cambiato",
@@ -147,7 +147,7 @@
     "changedAdvice": "Può succedere dopo che il server è stato rinnovato, ma può anche significare che qualcuno sta intercettando la tua connessione. Continua solo se il proprietario del server ha confermato la modifica.",
     "previousFingerprint": "Impronta digitale attendibile in precedenza",
     "newFingerprint": "Nuova impronta digitale",
-    "reject": "Non connettere",
+    "reject": "Non connetterti",
     "trust": "Fidati e connetti",
     "trustChanged": "Fidati del nuovo certificato"
   },
@@ -272,7 +272,7 @@
     "privacyNote": "Non viene inviato nulla da nessuna parte. Tutto resta su questo dispositivo.",
     "versionOnOs": "Mumble {{version}} su {{os}}",
     "versionOnly": "Mumble {{version}}",
-    "permissionWrite": "Scrivere",
+    "permissionWrite": "Modificare ACL",
     "permissionTraverse": "Attraversare",
     "permissionEnter": "Entrare",
     "permissionSpeak": "Parlare",
