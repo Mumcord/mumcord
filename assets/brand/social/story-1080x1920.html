@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mumcord share image – Story / Reel cover 1080×1920</title>
+<link rel="stylesheet" href="social.css">
+<style>
+  :root { --w: 1080px; --h: 1920px; }
+  /* Stays clear of the top 250 px and bottom 340 px, where the Stories and Reels UI sits. */
+  .brand { left: 90px; right: 90px; top: 300px; align-items: center; text-align: center; gap: 34px; }
+  .logo { width: 240px; height: 240px; }
+  .name { font-size: 150px; }
+  .bar { width: 220px; height: 10px; }
+  .tagline { font-size: 60px; }
+  .chips { font-size: 36px; justify-content: center; max-width: 640px; }
+  .shot { left: 90px; top: 1190px; width: 1180px; height: 390px; border-radius: 30px; }
+  .shot img { width: 1180px; height: auto; }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <img class="logo" src="../mumcord-icon.svg" alt="">
+    <h1 class="name">Mumcord</h1>
+    <div class="bar"></div>
+    <p class="tagline">Modern voice chat<br>for any Mumble server</p>
+    <ul class="chips"><li>Text chat</li><li>Screen sharing</li><li>Cameras</li><li>Plugins</li></ul>
+  </div>
+  <div class="shot"><img src="../../../docs/images/screenshots/main-dark.png" alt=""></div>
+</body>
+</html>

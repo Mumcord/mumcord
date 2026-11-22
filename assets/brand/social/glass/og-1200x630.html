@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mumcord share image – glass – og 1200×630</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  :root { --w: 1200px; --h: 630px; }
+  /* 60 px margin on every side; text on the left, the picture is decorative. */
+  :root { --lock: 34px; --h1: 76px; --p: 27px; --small: 19px; --label: 18px; }
+  .copy { left: 60px; top: 60px; width: 560px; }
+  .rig { transform: rotateY(-16deg) rotateX(8deg); transform-origin: 900px 300px; }
+  .c-share { left: 680px; top: 50px; width: 440px; transform: translateZ(0px) rotate(0deg); }
+  .c-chat { left: 620px; top: 290px; width: 300px; transform: translateZ(70px) rotate(-3deg); }
+  .c-cam { left: 950px; top: 330px; width: 220px; transform: translateZ(40px) rotate(4deg); }
+  .o1 { left: 520px; top: -140px; width: 420px; height: 420px; }
+  .o2 { left: 980px; top: 420px; width: 260px; height: 260px; }
+  .o3 { left: 40px; top: 540px; width: 140px; height: 140px; }
+
+</style>
+</head>
+<body>
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="scene"><div class="rig">
+    <div class="glass c-share"><img src="../shared/crop-share.png" alt=""><span class="label">Screen sharing</span></div>
+    <div class="glass c-cam"><div class="cams"><div class="cam talking"><img src="cameras/maya.jpg" alt=""></div><div class="cam"><img src="cameras/jonas.jpg" alt=""></div><div class="cam"><img src="cameras/mei.jpg" alt=""></div><div class="cam"><img src="cameras/leo.jpg" alt=""></div></div><span class="label">Cameras</span></div>
+    <div class="glass c-chat"><img src="../shared/crop-chat.png" alt=""><span class="label">Chat with images</span></div>
+  </div></div>
+  <div class="copy">
+    <div class="lockup"><img src="../../mumcord-icon.svg" alt="">Mumcord</div>
+    <h1 class="display">Crystal-clear voice for your community.</h1>
+    <p><b>Talk, text, share your screen and turn on cameras.</b> Plugins included.</p>
+    <div class="small">Built on the open Mumble protocol</div>
+  </div>
+</body>
+</html>
