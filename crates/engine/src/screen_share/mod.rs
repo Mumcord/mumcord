@@ -26,6 +26,9 @@ pub mod capture_windows;
 ))]
 pub mod capture_x11;
 pub(crate) mod codecs;
+// Only the capture backends use it, so a build without `screen-capture` does not carry it.
+#[cfg(feature = "screen-capture")]
+mod convert;
 pub(crate) mod encoder;
 mod fanout;
 mod media;

@@ -6,15 +6,15 @@
 #
 # Result: <prefix>/include/svt-av1/*.h, <prefix>/lib/SvtAv1Enc.lib (Windows) or
 # <prefix>/lib/libSvtAv1Enc.a (macOS and Linux: the host architecture), and <prefix>/lib/pkgconfig/SvtAv1Enc.pc, which locates itself, so the
-# prefix can move. An existing result is kept, so CI can restore <prefix> from its cache and call
-# this script unconditionally.
+# prefix can move. A result of the same version is kept, so CI can restore <prefix> from its cache
+# and call this script unconditionally; a prefix built from another version is rebuilt.
 #
 # Needs cmake and, for x86_64 assembly, nasm 2.14 or newer. Windows builds with MSVC (the Visual
 # Studio generator) on the dynamic C runtime, like Rust's MSVC target. Only the library is built,
 # without the command-line apps.
 set -euo pipefail
 
-SVT_AV1_VERSION=4.2.0
+SVT_AV1_VERSION=4.3.0
 # Matches the oldest macOS that Rust's aarch64 target supports, so the linker does not warn
 # about objects built for a newer system.
 MACOS_DEPLOYMENT_TARGET=11.0
@@ -30,9 +30,17 @@ case "$(uname -s)" in
   *) echo "build-svt-av1.sh: unsupported system $(uname -s)" >&2; exit 1 ;;
 esac
 
-if [[ -f "$prefix/lib/$lib" && -f "$prefix/include/svt-av1/EbSvtAv1Enc.h" ]]; then
-  echo "SVT-AV1 already present in $prefix"
+# The installed pkg-config file records the version the prefix was built from. Checking only that
+# the archive exists would silently keep a prefix built from an older SVT-AV1 (4.2.0 crashes on
+# CPUs without AVX2), so compare the version too. Reading one line stays cheap for the CI jobs
+# that restore the prefix from their cache.
+built=$(sed -n 's/^Version: *//p' "$prefix/lib/pkgconfig/SvtAv1Enc.pc" 2>/dev/null) || built=
+if [[ -f "$prefix/lib/$lib" && -f "$prefix/include/svt-av1/EbSvtAv1Enc.h" && "$built" == "$SVT_AV1_VERSION" ]]; then
+  echo "SVT-AV1 $SVT_AV1_VERSION already present in $prefix"
   exit 0
+fi
+if [[ -n $built ]]; then
+  echo "SVT-AV1 $built in $prefix is not $SVT_AV1_VERSION: rebuilding"
 fi
 
 work=$(mktemp -d)

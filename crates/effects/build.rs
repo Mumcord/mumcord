@@ -2,11 +2,18 @@
 //!
 //! The segmentation models are bundled in the `bgmatte` crate; ONNX Runtime 1.23.2 (MIT, the
 //! official Microsoft release, CPU only) is not, because bgmatte loads it at run time from a
-//! library the application provides. It is not committed to the repository either: the archive
-//! is downloaded once from a pinned URL, checked against its SHA-256 and kept in a shared cache
-//! (`MUMCORD_FETCH_CACHE`, or `mumcord-fetch` in the user's cache folder), named by its hash so
-//! worktrees and target folders share one copy. A pre-filled cache makes the build work
-//! offline.
+//! library the application provides. It is not committed to the repository either: Microsoft's
+//! own package of that release is downloaded once from a pinned URL, checked against its
+//! SHA-256 and kept in a shared cache (`MUMCORD_FETCH_CACHE`, or `mumcord-fetch` in the user's
+//! cache folder), named by its hash so worktrees and target folders share one copy. A
+//! pre-filled cache makes the build work offline.
+//!
+//! The package is the NuGet one rather than the release's per-platform archives: a GitHub
+//! release asset under a pinned URL can disappear (the whole `microsoft/onnxruntime`
+//! repository answered 404 for every download on 2026-11-19, which failed the build and its
+//! tests on macOS, Windows and Linux at once), while a published NuGet version stays on the
+//! feed, unchangeable, for as long as the package exists. It carries every platform's library
+//! of this release, so all targets share one download and one hash.
 //!
 //! The library is copied next to the build's executables for development and test runs, and
 //! its cached path is passed to the crate as `MUMCORD_ORT_BUILD_DYLIB` (used by debug builds
@@ -22,6 +29,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use sha2::{Digest, Sha256};
+use zip::ZipArchive;
 
 #[path = "src/artifact_dir.rs"]
 mod artifact_dir;
@@ -33,11 +41,17 @@ struct Download {
     name: &'static str,
 }
 
+/// The one package every target takes its library from.
+const PACKAGE: Download = Download {
+    url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.23.2/microsoft.ml.onnxruntime.1.23.2.nupkg",
+    sha256: "25fe172f7fcdf34f2b5b02c8b997f6b88abc282956849d4af4335af23d0c4e4a",
+    name: "microsoft.ml.onnxruntime.1.23.2.nupkg",
+};
+
 struct Runtime {
-    archive: Download,
-    /// Path of the library inside the archive.
+    /// Path of the library inside [`PACKAGE`].
     member: &'static str,
-    /// File name the library gets next to the executables.
+    /// File name the library gets next to the executables, which `src/runtime.rs` looks for.
     library: &'static str,
 }
 
@@ -46,48 +60,23 @@ struct Runtime {
 fn runtime_for(os: &str, arch: &str) -> Option<Runtime> {
     let runtime = match (os, arch) {
         ("linux", "x86_64") => Runtime {
-            archive: Download {
-                url: "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-linux-x64-1.23.2.tgz",
-                sha256: "1fa4dcaef22f6f7d5cd81b28c2800414350c10116f5fdd46a2160082551c5f9b",
-                name: "onnxruntime-linux-x64-1.23.2.tgz",
-            },
-            member: "onnxruntime-linux-x64-1.23.2/lib/libonnxruntime.so.1.23.2",
+            member: "runtimes/linux-x64/native/libonnxruntime.so",
             library: "libonnxruntime.so.1.23.2",
         },
         ("linux", "aarch64") => Runtime {
-            archive: Download {
-                url: "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-linux-aarch64-1.23.2.tgz",
-                sha256: "7c63c73560ed76b1fac6cff8204ffe34fe180e70d6582b5332ec094810241e5c",
-                name: "onnxruntime-linux-aarch64-1.23.2.tgz",
-            },
-            member: "onnxruntime-linux-aarch64-1.23.2/lib/libonnxruntime.so.1.23.2",
+            member: "runtimes/linux-arm64/native/libonnxruntime.so",
             library: "libonnxruntime.so.1.23.2",
         },
         ("windows", "x86_64") => Runtime {
-            archive: Download {
-                url: "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-win-x64-1.23.2.zip",
-                sha256: "0b38df9af21834e41e73d602d90db5cb06dbd1ca618948b8f1d66d607ac9f3cd",
-                name: "onnxruntime-win-x64-1.23.2.zip",
-            },
-            member: "onnxruntime-win-x64-1.23.2/lib/onnxruntime.dll",
+            member: "runtimes/win-x64/native/onnxruntime.dll",
             library: "onnxruntime.dll",
         },
         ("macos", "aarch64") => Runtime {
-            archive: Download {
-                url: "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-osx-arm64-1.23.2.tgz",
-                sha256: "b4d513ab2b26f088c66891dbbc1408166708773d7cc4163de7bdca0e9bbb7856",
-                name: "onnxruntime-osx-arm64-1.23.2.tgz",
-            },
-            member: "./onnxruntime-osx-arm64-1.23.2/lib/libonnxruntime.1.23.2.dylib",
+            member: "runtimes/osx-arm64/native/libonnxruntime.dylib",
             library: "libonnxruntime.1.23.2.dylib",
         },
         ("macos", "x86_64") => Runtime {
-            archive: Download {
-                url: "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-osx-x86_64-1.23.2.tgz",
-                sha256: "d10359e16347b57d9959f7e80a225a5b4a66ed7d7e007274a15cae86836485a6",
-                name: "onnxruntime-osx-x86_64-1.23.2.tgz",
-            },
-            member: "./onnxruntime-osx-x86_64-1.23.2/lib/libonnxruntime.1.23.2.dylib",
+            member: "runtimes/osx-x64/native/libonnxruntime.dylib",
             library: "libonnxruntime.1.23.2.dylib",
         },
         _ => return None,
@@ -199,26 +188,22 @@ fn sha256_of(path: &Path) -> Result<String, String> {
         .collect())
 }
 
-/// Fetches the runtime archive, extracts the library into the cache once, and copies it next
+/// Fetches the runtime package, extracts the library into the cache once, and copies it next
 /// to the build's executables. Returns the cached library path.
 fn fetch_runtime(cache: &Path, runtime: &Runtime, out_dir: &Path) -> Result<PathBuf, String> {
-    let library = cache.join(format!(
-        "{}-{}",
-        &runtime.archive.sha256[..16],
-        runtime.library
-    ));
+    let library = cache.join(format!("{}-{}", &PACKAGE.sha256[..16], runtime.library));
     if !library.is_file() {
-        let archive = fetch(cache, &runtime.archive)?;
-        let scratch = out_dir.join("ort-extract");
-        let _ = fs::remove_dir_all(&scratch);
-        fs::create_dir_all(&scratch).map_err(|err| format!("cannot create {err}"))?;
-        extract(&archive, runtime.member, &scratch)?;
-        let extracted = scratch.join(runtime.member);
+        let package = fetch(cache, &PACKAGE)?;
         let partial = library.with_extension(format!("part{}", std::process::id()));
-        fs::copy(&extracted, &partial)
-            .and_then(|_| fs::rename(&partial, &library))
-            .map_err(|err| format!("cannot store {}: {err}", library.display()))?;
-        let _ = fs::remove_dir_all(&scratch);
+        extract(&package, runtime.member, &partial)
+            .and_then(|()| make_executable(&partial))
+            .and_then(|()| {
+                fs::rename(&partial, &library)
+                    .map_err(|err| format!("cannot store {}: {err}", library.display()))
+            })
+            .inspect_err(|_| {
+                let _ = fs::remove_file(&partial);
+            })?;
     }
     // Executables live in the profile directory. `OUT_DIR` is under `build/` at a depth that
     // changed in Cargo 1.100, so walk up instead of counting parents (see `artifact_dir`).
@@ -241,34 +226,33 @@ fn fetch_runtime(cache: &Path, runtime: &Runtime, out_dir: &Path) -> Result<Path
     Ok(library)
 }
 
-/// Extracts one member with the system `tar` (bsdtar on Windows and macOS reads zip too);
-/// `unzip` covers zip files on hosts whose `tar` is GNU tar.
-fn extract(archive: &Path, member: &str, into: &Path) -> Result<(), String> {
-    let is_zip = archive.extension().is_some_and(|ext| ext == "zip");
-    let tar = Command::new("tar")
-        .arg(if is_zip { "-xf" } else { "-xzf" })
-        .arg(archive)
-        .arg("-C")
-        .arg(into)
-        .arg(member)
-        .output();
-    if tar.as_ref().is_ok_and(|out| out.status.success()) {
-        return Ok(());
+/// Writes one member of the package to `into`. The package is a zip, so this needs no `tar` or
+/// `unzip` to be installed on the build host.
+fn extract(package: &Path, member: &str, into: &Path) -> Result<(), String> {
+    let file = fs::File::open(package)
+        .map_err(|err| format!("cannot read {}: {err}", package.display()))?;
+    let mut archive =
+        ZipArchive::new(file).map_err(|err| format!("cannot open {}: {err}", package.display()))?;
+    let mut entry = archive
+        .by_name(member)
+        .map_err(|err| format!("cannot find {member} in {}: {err}", package.display()))?;
+    let mut out =
+        fs::File::create(into).map_err(|err| format!("cannot write {}: {err}", into.display()))?;
+    std::io::copy(&mut entry, &mut out)
+        .map_err(|err| format!("cannot write {}: {err}", into.display()))?;
+    Ok(())
+}
+
+/// The loader maps the library as code, and the installers copy its permissions along; give it
+/// what the release's own archives carry.
+fn make_executable(path: &Path) -> Result<(), String> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(path, fs::Permissions::from_mode(0o755))
+            .map_err(|err| format!("cannot make {} executable: {err}", path.display()))?;
     }
-    if is_zip {
-        let unzip = Command::new("unzip")
-            .args(["-q", "-o"])
-            .arg(archive)
-            .arg(member)
-            .arg("-d")
-            .arg(into)
-            .status();
-        if unzip.is_ok_and(|status| status.success()) {
-            return Ok(());
-        }
-    }
-    Err(format!(
-        "cannot extract {member} from {}",
-        archive.display()
-    ))
+    #[cfg(not(unix))]
+    let _ = path;
+    Ok(())
 }

@@ -1143,90 +1143,95 @@ Register: informal "te" everywhere (tegező imperative: "Válaszd", "Használj")
 
 Register: informal "tu" everywhere (Sei, Puoi, Il tuo …); no "Lei", and no impersonal "si" where English says "you" (e.g. "si possono disattivare" → "puoi disattivare"). Typography: quotes « », straight apostrophe ', "…" without a space before it. Buttons: imperative 2nd person singular ("Entra", "Salva", "Connetti"); infinitive only for permission names and in confirm-dialog questions ("Reimpostare l'avatar?").
 
-| English                   | Italian                                                  | Note                                                                            |
-| ------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| channel                   | canale                                                   |                                                                                 |
-| sub-channel               | sottocanale                                              |                                                                                 |
-| server                    | server                                                   | invariable plural                                                               |
-| server browser            | elenco dei server                                        | (unsure)                                                                        |
-| screen share              | condivisione schermo                                     |                                                                                 |
-| share your screen         | Condividi lo schermo                                     | not "il tuo schermo"                                                            |
-| camera                    | fotocamera                                               | webcam; as Windows, Teams, Meet; Discord says "videocamera" (unsure)            |
-| watch party               | watch party (f.)                                         | "la watch party"; "Esci dalla watch party", not "dal party" (unsure)            |
-| player                    | lettore                                                  | was mostly "player"; "Mini lettore"                                             |
-| playlist                  | playlist (f.)                                            |                                                                                 |
-| plugin                    | plugin                                                   | invariable plural                                                               |
-| stage                     | palco                                                    | (unsure)                                                                        |
-| whisper                   | sussurrare / Sussurra                                    | permission name "Sussurrare"                                                    |
-| Push-to-talk              | Push-to-talk                                             | "tasto Push-to-talk"                                                            |
-| voice activity            | attività vocale                                          |                                                                                 |
-| mute                      | Disattiva microfono (self) · Silenzia (others)           | state: "Microfono disattivato" / "Silenziato"; media players: "Disattiva audio" |
-| deafen                    | Disattiva audio                                          | state "Audio disattivato"; "Disattiva audio sul server", not "Assorda"          |
-| friend                    | amico                                                    |                                                                                 |
-| friend request            | richiesta di amicizia                                    |                                                                                 |
-| direct message            | messaggio diretto                                        |                                                                                 |
-| private message           | messaggio privato                                        |                                                                                 |
-| message                   | messaggio                                                |                                                                                 |
-| notification              | notifica                                                 |                                                                                 |
-| settings                  | impostazioni                                             |                                                                                 |
-| profile                   | profilo                                                  |                                                                                 |
-| avatar                    | avatar                                                   |                                                                                 |
-| badge                     | badge                                                    | not "Distintivo"                                                                |
-| overlay                   | overlay                                                  | "Overlay in gioco", not "nel gioco"                                             |
-| join                      | Entra / entrare                                          | not "Unisciti"                                                                  |
-| leave                     | Esci (da)                                                | "Leave voice" → "Esci dalla voce" (unsure)                                      |
-| connect                   | Connetti / connesso                                      |                                                                                 |
-| disconnect                | Disconnetti / disconnesso                                |                                                                                 |
-| certificate               | certificato                                              |                                                                                 |
-| ban                       | Bandisci / ban (noun)                                    | permission name "Bandire", not "Bannare"                                        |
-| kick                      | Espelli / espulsione                                     |                                                                                 |
-| move                      | Sposta                                                   |                                                                                 |
-| comment                   | commento                                                 |                                                                                 |
-| nickname                  | nickname                                                 | as Discord (unsure)                                                             |
-| username                  | nome utente                                              |                                                                                 |
-| register                  | Registrati (self) / registrato                           |                                                                                 |
-| admin                     | amministrazione (area) / amministratore (role)           | not "Admin" menu label                                                          |
-| permission                | permesso                                                 | not plugin "autorizzazione"                                                     |
-| invite                    | invito / Invita                                          |                                                                                 |
-| tray                      | area di notifica                                         |                                                                                 |
-| pin                       | Fissa / fissato                                          | unpin "Non fissare più"                                                         |
-| reaction                  | reazione                                                 |                                                                                 |
-| emoji                     | emoji                                                    |                                                                                 |
-| file                      | file                                                     |                                                                                 |
-| upload                    | upload (bandwidth) / Carica (action)                     |                                                                                 |
-| stream                    | trasmissione                                             | was "flusso" (unsure)                                                           |
-| viewer                    | spettatore                                               | image viewer: "visualizzatore"                                                  |
-| live                      | In diretta                                               | was "Live"                                                                      |
-| chat                      | chat                                                     |                                                                                 |
-| mention                   | menzione / menziona                                      |                                                                                 |
-| activity                  | attività                                                 |                                                                                 |
-| follow                    | Segui / Stai seguendo                                    | not "Seguito" for "Following"                                                   |
-| repository                | repository                                               |                                                                                 |
-| install                   | Installa                                                 |                                                                                 |
-| update                    | Aggiorna / aggiornamento                                 |                                                                                 |
-| volume                    | volume                                                   |                                                                                 |
-| microphone                | microfono                                                |                                                                                 |
-| speaker                   | altoparlanti (device) / oratore (person)                 |                                                                                 |
-| headphones                | cuffie                                                   |                                                                                 |
-| noise suppression         | soppressione del rumore                                  | not "riduzione del rumore" (as Discord)                                         |
-| echo cancellation         | cancellazione dell'eco                                   |                                                                                 |
-| push to mute              | Push-to-mute                                             | analogous to Push-to-talk (unsure)                                              |
-| hotkey                    | scorciatoia                                              |                                                                                 |
-| shortcut                  | scorciatoia (da tastiera)                                |                                                                                 |
-| theme                     | tema                                                     |                                                                                 |
-| dark                      | scuro                                                    |                                                                                 |
-| light                     | chiaro (theme) / leggero (strength)                      |                                                                                 |
-| tip                       | suggerimento                                             |                                                                                 |
-| wizard                    | procedura guidata                                        |                                                                                 |
-| import                    | Importa                                                  |                                                                                 |
-| link                      | link (URL) / collegamento (linked channels)              |                                                                                 |
-| favourite / favorite      | preferito / preferiti                                    |                                                                                 |
-| loading                   | Caricamento…                                             |                                                                                 |
-| relay                     | relay (m.)                                               | "il relay", kept in English (unsure)                                            |
-| mirror                    | mirror (m.)                                              | kept in English (unsure)                                                        |
-| unload (developer plugin) | Rimuovi                                                  | not "Scarica" (= download) (unsure)                                             |
-| crash report              | rapporto di arresto anomalo (file) / segnalazione (sent) | (unsure)                                                                        |
-| activity row label        | "{{action}}: <thing> ({{name}})"                         | selfName "tu"                                                                   |
+| English                   | Italian                                                 | Note                                                                            |
+| ------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| channel                   | canale                                                  |                                                                                 |
+| sub-channel               | sottocanale                                             |                                                                                 |
+| server                    | server                                                  | invariable plural                                                               |
+| server browser            | elenco dei server                                       | native review: kept                                                             |
+| screen share              | condivisione schermo                                    |                                                                                 |
+| share your screen         | Condividi lo schermo                                    | not "il tuo schermo"                                                            |
+| camera                    | fotocamera                                              | webcam; as Windows, Teams, Meet (native review: kept, not "videocamera")        |
+| watch party               | visione di gruppo (f.)                                  | "Esci dalla visione di gruppo"; was "watch party" (native review)               |
+| player                    | lettore                                                 | was mostly "player"; "Mini lettore"                                             |
+| playlist                  | playlist (f.)                                           |                                                                                 |
+| plugin                    | plugin                                                  | invariable plural                                                               |
+| stage                     | palco                                                   | native review: kept                                                             |
+| whisper                   | sussurrare / Sussurra                                   | permission name "Sussurrare"                                                    |
+| Push-to-talk              | Push-to-talk                                            | "tasto Push-to-talk"                                                            |
+| voice activity            | attività vocale                                         |                                                                                 |
+| mute                      | Disattiva microfono (self) · Silenzia (others)          | state: "Microfono disattivato" / "Silenziato"; media players: "Disattiva audio" |
+| deafen                    | Disattiva audio                                         | state "Audio disattivato"; "Disattiva audio sul server", not "Assorda"          |
+| friend                    | amico                                                   |                                                                                 |
+| friend request            | richiesta di amicizia                                   |                                                                                 |
+| direct message            | messaggio diretto                                       |                                                                                 |
+| private message           | messaggio privato                                       |                                                                                 |
+| message                   | messaggio                                               |                                                                                 |
+| notification              | notifica                                                |                                                                                 |
+| settings                  | impostazioni                                            |                                                                                 |
+| profile                   | profilo                                                 |                                                                                 |
+| avatar                    | avatar                                                  |                                                                                 |
+| badge                     | badge                                                   | not "Distintivo"                                                                |
+| overlay                   | overlay                                                 | "Overlay in gioco", not "nel gioco"                                             |
+| join                      | Entra / entrare                                         | not "Unisciti"                                                                  |
+| leave                     | Esci (da)                                               | "Leave voice" → "Esci dal canale vocale"                                        |
+| connect                   | Connetti / connesso                                     |                                                                                 |
+| disconnect                | Disconnetti / disconnesso                               |                                                                                 |
+| certificate               | certificato                                             |                                                                                 |
+| ban                       | Bandisci / ban (noun)                                   | permission name "Bandire", not "Bannare"                                        |
+| kick                      | Espelli / espulsione                                    |                                                                                 |
+| move                      | Sposta                                                  |                                                                                 |
+| comment                   | commento                                                |                                                                                 |
+| nickname                  | nickname                                                | as Discord (native review: kept)                                                |
+| username                  | nome utente                                             |                                                                                 |
+| register                  | Registrati (self) / registrato                          |                                                                                 |
+| admin                     | amministrazione (area) / amministratore (role)          | not "Admin" menu label                                                          |
+| permission                | permesso                                                | not plugin "autorizzazione"                                                     |
+| invite                    | invito / Invita                                         |                                                                                 |
+| tray                      | area di notifica                                        |                                                                                 |
+| pin                       | Fissa / fissato                                         | unpin "Non fissare più"; pinned plugin version "Fissa la versione"              |
+| reaction                  | reazione                                                |                                                                                 |
+| emoji                     | emoji                                                   |                                                                                 |
+| file                      | file                                                    |                                                                                 |
+| upload                    | upload (bandwidth) / Carica (action)                    |                                                                                 |
+| stream                    | trasmissione                                            | was "flusso" (native review: kept)                                              |
+| viewer                    | spettatore                                              | image viewer: "visualizzatore"                                                  |
+| live                      | In diretta                                              | was "Live"                                                                      |
+| chat                      | chat                                                    |                                                                                 |
+| mention                   | menzione / menziona                                     |                                                                                 |
+| activity                  | attività                                                |                                                                                 |
+| follow                    | Segui / Stai seguendo                                   | not "Seguito" for "Following"                                                   |
+| repository                | repository                                              |                                                                                 |
+| install                   | Installa                                                |                                                                                 |
+| update                    | Aggiorna / aggiornamento                                |                                                                                 |
+| volume                    | volume                                                  |                                                                                 |
+| microphone                | microfono                                               |                                                                                 |
+| speaker                   | altoparlanti (device) / oratore (person)                |                                                                                 |
+| headphones                | cuffie                                                  |                                                                                 |
+| noise suppression         | soppressione del rumore                                 | not "riduzione del rumore" (as Discord)                                         |
+| echo cancellation         | cancellazione dell'eco                                  |                                                                                 |
+| push to mute              | Push-to-mute                                            | analogous to Push-to-talk (native review: kept)                                 |
+| hotkey                    | scorciatoia                                             |                                                                                 |
+| shortcut                  | scorciatoia (da tastiera)                               |                                                                                 |
+| theme                     | tema                                                    |                                                                                 |
+| dark                      | scuro                                                   |                                                                                 |
+| light                     | chiaro (theme) / leggero (strength)                     |                                                                                 |
+| tip                       | suggerimento                                            |                                                                                 |
+| wizard                    | procedura guidata                                       |                                                                                 |
+| import                    | Importa                                                 |                                                                                 |
+| link                      | link (URL) / collegamento (linked channels)             |                                                                                 |
+| favourite / favorite      | preferito / preferiti                                   |                                                                                 |
+| loading                   | Caricamento…                                            |                                                                                 |
+| relay                     | relay (m.)                                              | "il relay", kept in English (native review: kept)                               |
+| mirror                    | mirror (m.)                                             | kept in English (native review: kept)                                           |
+| unload (developer plugin) | Rimuovi                                                 | not "Scarica" (= download) (native review: kept)                                |
+| crash report              | rapporto di crash (file) / segnalazione di crash (sent) | was "arresto anomalo" (native review)                                           |
+| graphics card             | scheda grafica                                          | not "scheda video"                                                              |
+| frame rate                | frequenza fotogrammi                                    | not "fotogrammi/s"; unit "fps"                                                  |
+| Auto (option name)        | Automatico / Automatica                                 | quoted as «Automatico» in hints, not "Auto"                                     |
+| activity row label        | "{{action}}: <thing> ({{name}})"                        | selfName "tu"                                                                   |
+
+Plural forms: Italian has `_one`, `_many` and `_other`. `_many` covers numbers like 1 000 000, which need "di" before a noun ("{{count}} di persone"), but not before an adjective or verb ("{{count}} saltati", "{{count}} stanno guardando").
 
 ### Lietuvių (lt)
 

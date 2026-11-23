@@ -16,16 +16,16 @@
     "loading": "Caricamento dei messaggi…",
     "loadFailed": "Non è stato possibile caricare i messaggi precedenti. Scorri verso l'alto per riprovare.",
     "loadEarlier": "Carica messaggi precedenti",
-    "syncing": "Cerco messaggi precedenti da altri utenti Mumcord…",
+    "syncing": "Ricerca di messaggi precedenti da altri utenti Mumcord…",
     "syncAdded_one": "{{count}} messaggio precedente aggiunto da altri utenti Mumcord.",
-    "syncAdded_many": "{{count}} messaggi precedenti aggiunti da altri utenti Mumcord.",
+    "syncAdded_many": "{{count}} di messaggi precedenti aggiunti da altri utenti Mumcord.",
     "syncAdded_other": "{{count}} messaggi precedenti aggiunti da altri utenti Mumcord.",
     "syncNone": "Nessun messaggio precedente trovato.",
     "syncFailed": "Qui non è possibile caricare i messaggi precedenti.",
     "syncedFrom": "dalla cronologia di {{name}}",
     "jumpToNewest": "Vai all'ultimo messaggio",
     "jumpToNewestUnseen_one": "Vai all'ultimo messaggio, {{count}} nuovo messaggio",
-    "jumpToNewestUnseen_many": "Vai all'ultimo messaggio, {{count}} nuovi messaggi",
+    "jumpToNewestUnseen_many": "Vai all'ultimo messaggio, {{count}} di nuovi messaggi",
     "jumpToNewestUnseen_other": "Vai all'ultimo messaggio, {{count}} nuovi messaggi"
   },
   "format": {
@@ -82,7 +82,7 @@
     "message": "{{name}}: {{text}}",
     "image": "{{name}} ha inviato un'immagine",
     "more_one": "{{count}} altro messaggio nuovo",
-    "more_many": "{{count}} altri messaggi nuovi",
+    "more_many": "{{count}} di altri messaggi nuovi",
     "more_other": "{{count}} altri messaggi nuovi"
   },
   "pinned": {
@@ -122,7 +122,7 @@
       "show": "Programma"
     },
     "inBrowser": "Si riproduce nel tuo browser",
-    "inBrowserOnly": "Su questo sistema il lettore di Twitch non funziona nella finestra di Mumcord, quindi Riproduci apre la trasmissione nel browser.",
+    "inBrowserOnly": "Su questo sistema il lettore di Twitch non funziona nella finestra di Mumcord, quindi «Riproduci» apre la trasmissione nel browser.",
     "card": "Anteprima del link: {{title}}",
     "dismiss": "Nascondi anteprima"
   },
@@ -226,11 +226,11 @@
   "activity": {
     "share": "{{name}} sta condividendo lo schermo",
     "watch": "Guarda",
-    "party": "Watch party: {{title}}",
+    "party": "Visione di gruppo: {{title}}",
     "join": "Entra",
     "videoFallback": "Video YouTube",
     "someone": "Qualcuno",
-    "joinFailed": "Impossibile entrare nella watch party."
+    "joinFailed": "Impossibile entrare nella visione di gruppo."
   },
   "card": {
     "label": "Scheda: {{title}}",
@@ -413,7 +413,7 @@
     "music": "Lettore musicale nascosto, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
     "link": "Anteprima del link nascosta, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
     "several_one": "{{count}} anteprima nascosta, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
-    "several_many": "{{count}} anteprime nascoste, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
+    "several_many": "{{count}} di anteprime nascoste, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
     "several_other": "{{count}} anteprime nascoste, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>."
   },
   "historyImage": {

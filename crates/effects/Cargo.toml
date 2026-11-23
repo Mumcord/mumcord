@@ -16,6 +16,8 @@ tracing.workspace = true
 
 [build-dependencies]
 sha2.workspace = true
+# The build script reads the ONNX Runtime package Microsoft publishes (a zip).
+zip.workspace = true
 
 [dev-dependencies]
 image.workspace = true
